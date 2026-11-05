@@ -249,6 +249,7 @@ pub fn spec_for(ch: &Challenge, candidate: &MethodSpec, epoch: u64) -> Spec {
             warmup: m.warmup,
             order: Order::Alternate,
             seed: derive_u64(ALGORITHM_SEED_LAW, &[w.nonce, epoch]),
+            algorithm_seed_round: Default::default(),
             isolation_required: m.isolation_required,
             timeout_seconds: m.timeout_seconds,
         },

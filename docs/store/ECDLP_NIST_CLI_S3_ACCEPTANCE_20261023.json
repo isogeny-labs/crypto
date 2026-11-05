@@ -1,0 +1,71 @@
+{
+  "schema": "crypto.ecdlp-nist-s3-acceptance/v1",
+  "checked_at_utc": "2026-10-24T02:37:09.833095+00:00",
+  "source_commits": {
+    "crypto": "6f467933a175f39e43476af6f6a2ac5df8385182",
+    "cryptanalysis": "bcd1014c9c26a4aa01dd507681013378f0bf44e0"
+  },
+  "binary_sha256": {
+    "crypto": "233f58a6c0090d9496a8fefafcfe56594cc3f9cfc3d49b6560be02fd0f0714a4",
+    "ecdlp-nist": "e88655f5f1bfca05e0040df97a5e81739d8754e1b9f231c0f14b45be60b2f8fa",
+    "crax": "ef3240cff338bccf7fefa2d61fc9340629c905a2e44afd281b9659d9d186749d"
+  },
+  "bucket": "setec-astronomy-artifacts",
+  "region": "us-east-2",
+  "aws_profile": "ecc-challenges-new",
+  "remote": "s3://setec-astronomy-artifacts/ic/v1/acceptance/20261024T023603Z-4d67acef",
+  "object_key": "ic/v1/acceptance/20261024T023603Z-4d67acef/sha256/1f/1f813eb1a91dee4d8399439eb819427b6164fd0519c7498d0b2e215b96629a0a",
+  "logical_name": "ecdlp-targets/p256/public-12345.json",
+  "bytes": 1201,
+  "sha256": "1f813eb1a91dee4d8399439eb819427b6164fd0519c7498d0b2e215b96629a0a",
+  "target": {
+    "curve": "P-256",
+    "schema_version": 1,
+    "expected_scalar": "12345",
+    "interval_bits": 16
+  },
+  "commands": [
+    "crypto store push TARGET --name ecdlp-targets/p256/public-12345.json --json",
+    "crypto store verify ecdlp-targets/p256/public-12345.json --remote --download --json",
+    "crax --json ecdlp-nist solve P-256 --point-file store:ecdlp-targets/p256/public-12345.json --interval-bits 16",
+    "aws s3api head-object --checksum-mode ENABLED",
+    "aws s3api delete-object --key OBJECT_KEY",
+    "aws s3api head-object --key OBJECT_KEY",
+    "aws s3api list-objects-v2 --prefix ACCEPTANCE_PREFIX/"
+  ],
+  "checks": {
+    "push_uploaded": true,
+    "remote_verify_output": "ecdlp-targets/p256/public-12345.json: cache ok, remote bytes ok",
+    "fresh_cache_solve": {
+      "exit_code": 0,
+      "verified": true,
+      "scalar": "12345",
+      "input_reference": "store:ecdlp-targets/p256/public-12345.json",
+      "input_sha256": "1f813eb1a91dee4d8399439eb819427b6164fd0519c7498d0b2e215b96629a0a"
+    },
+    "head_bytes_match": true,
+    "head_checksum_type": "FULL_OBJECT",
+    "post_delete_head_404": true,
+    "prefix_empty_after_delete": true
+  },
+  "limitations": [
+    "The solve uses a public bounded P-256 target with a known interval.",
+    "The acceptance object was deleted after the checks."
+  ],
+  "validation": {
+    "receipt_json_parse_and_invariants": "passed",
+    "release_library_test_first_run": {
+      "command": "cargo test --release --lib -- --quiet",
+      "result": "4488 passed, 1 failed, 119 ignored",
+      "failure": "cryptanalysis::ecbench::gpu::tests::selftest_gates_stage_and_outputs_are_bound: expected stage_completed, observed selftest_failed"
+    },
+    "failed_test_targeted_rerun": {
+      "command": "cargo test --release --lib cryptanalysis::ecbench::gpu::tests::selftest_gates_stage_and_outputs_are_bound -- --exact --nocapture",
+      "result": "1 passed, 0 failed"
+    },
+    "release_library_test_four_threads": {
+      "command": "cargo test --release --lib -- --quiet --test-threads=4",
+      "result": "4489 passed, 0 failed, 119 ignored"
+    }
+  }
+}

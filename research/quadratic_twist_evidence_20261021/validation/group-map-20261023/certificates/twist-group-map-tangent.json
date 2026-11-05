@@ -1,0 +1,237 @@
+{
+  "schema": "identity.certificate/v1",
+  "id": "IDC1h501f62832dc059fb",
+  "statement": {
+    "name": "twist-group-map-tangent",
+    "source": "research/quadratic_twist_evidence_20261021/lean/TwistGroupMap.lean:TwistGroupMap.cleared_tangent_identity; polynomial part only; actual field and point claims checked by Lean",
+    "variables": [
+      "a",
+      "d",
+      "u",
+      "x"
+    ],
+    "degree_bound": 6,
+    "lhs": {
+      "op": "add",
+      "args": [
+        {
+          "op": "mul",
+          "args": [
+            {
+              "op": "add",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "const",
+                      "args": 3
+                    },
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "x"
+                        },
+                        {
+                          "op": "var",
+                          "args": "x"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "mul",
+                      "args": [
+                        {
+                          "op": "var",
+                          "args": "d"
+                        },
+                        {
+                          "op": "var",
+                          "args": "d"
+                        }
+                      ]
+                    },
+                    {
+                      "op": "var",
+                      "args": "a"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "u"
+                },
+                {
+                  "op": "var",
+                  "args": "u"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "op": "neg",
+          "args": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "var",
+                "args": "d"
+              },
+              {
+                "op": "add",
+                "args": [
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "const",
+                        "args": 3
+                      },
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "x"
+                          },
+                          {
+                            "op": "var",
+                            "args": "x"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "op": "mul",
+                    "args": [
+                      {
+                        "op": "mul",
+                        "args": [
+                          {
+                            "op": "var",
+                            "args": "d"
+                          },
+                          {
+                            "op": "var",
+                            "args": "d"
+                          }
+                        ]
+                      },
+                      {
+                        "op": "var",
+                        "args": "a"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "rhs": {
+      "op": "mul",
+      "args": [
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "var",
+                  "args": "u"
+                },
+                {
+                  "op": "var",
+                  "args": "u"
+                }
+              ]
+            },
+            {
+              "op": "neg",
+              "args": {
+                "op": "var",
+                "args": "d"
+              }
+            }
+          ]
+        },
+        {
+          "op": "add",
+          "args": [
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "const",
+                  "args": 3
+                },
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "x"
+                    },
+                    {
+                      "op": "var",
+                      "args": "x"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "op": "mul",
+              "args": [
+                {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "var",
+                      "args": "d"
+                    },
+                    {
+                      "op": "var",
+                      "args": "d"
+                    }
+                  ]
+                },
+                {
+                  "op": "var",
+                  "args": "a"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "modulus": 2305843009213693951,
+  "points": 32,
+  "seed": 20261023,
+  "value_digest": "472b95c641396fdb424c72790291d3a852d35d7044ef7c2fc9c4f937fd45ae99",
+  "independence": "Native IDC1 replay plus 16 independent-seed points; no performance claim",
+  "proof": {
+    "kind": "lean4",
+    "path": "research/quadratic_twist_evidence_20261021/lean/TwistGroupMap.lean",
+    "sha256": "b7105277cbda68880f2cb40385a3e15b03fa44f1e3a9af4ef2b82daffc8ce173"
+  }
+}

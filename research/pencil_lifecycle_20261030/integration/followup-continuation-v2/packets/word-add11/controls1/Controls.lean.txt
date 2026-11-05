@@ -1,0 +1,14 @@
+import WordAdd11
+open PencilWordRefinement
+example : wordPow5 7 0 = 0 := by decide
+example : wordPow5 7 6 = 6 := by decide
+example : wordPow5 7 3 = 5 := by decide
+example : wordGuard 7 ⟨0,0,2,3⟩ ⟨2,3,3,2⟩ = .distinct := by decide
+example : wordGuard 7 ⟨1,0,1,1⟩ ⟨1,0,1,1⟩ = .inverse := by decide
+example : wordGuard 7 ⟨1,1,1,1⟩ ⟨1,1,1,1⟩ = .doubling := by decide
+example : wordGuard 7 ⟨1,1,1,1⟩ ⟨1,2,1,1⟩ = .assertionFailure := by decide
+example : (add11WordPayload 7 ⟨0,0,2,3⟩ ⟨2,3,3,2⟩).w = 1 := by decide
+-- Noncanonical and out-of-bound machine reductions do not inherit field decoding.
+example : ((18446744073709551615 : UInt64) * 2).toNat ≠ 18446744073709551615*2 := by decide
+example : ¬ WordD1.canonical 7 ⟨7,0,1,1⟩ := by decide
+example : wordGuard 7 ⟨4,1,2,1⟩ ⟨2,2,3,1⟩ ≠ .distinct := by decide

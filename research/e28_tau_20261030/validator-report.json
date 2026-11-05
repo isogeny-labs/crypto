@@ -1,0 +1,4336 @@
+{
+ "schema": "validator-report/v1",
+ "status": "fail",
+ "independent": true,
+ "validator": "independent validator subagent (Claude Opus 5.5), not the session that produced E28; this recompute is its own standard-library Rust program (validate_e28.rs: JSON parser, SHA-256 and leaf comparator taken from the E27 validator's validate_e27.rs, the rest new) and shares no code with examples/e28_tau.rs, examples/e28_tables.rs, crypto_lib or experiments/33_tau_stage_a/summary.json",
+ "date": "2026-10-31",
+ "row": "E28 (GLV note §9.26 pre-registration, §9.30 results): GLS psi fold on E19's single-tau_T line. Stage 0 (40 curves), Stage A (10 curves, tau and tau-psi arms on one exact-oracle stream, 640 walks, the registered solve-cost control) and the supplementary control are measurements; Stage A2 (S_model) is a model. Evidence directory research/e28_tau_20261030",
+ "script": "research/e28_tau_20261030/validate_e28.rs (rustc -O --edition 2021; `validate_e28 report <repo> research/e28_tau_20261030`)",
+ "status_rule": "pass iff (a) every check holds, (b) every headline agrees with its printed figure within half a unit of the last printed digit (exact for counts), and (c) the row has a measured end-to-end index-calculus cost S, which the validation gate needs to show it against a matched rho. E28 meets (a) and (b) and fails (c): its S is Stage A2's model (R x C + R x g + 16 LA), no end-to-end run with the D4 solve was made (no Stage B, by registration). Status is therefore fail for the gate; the measured parts are verified (replay-certificate.json)",
+ "gate_refusal": "model-only S: no measured end-to-end S exists for E28 (Stage A2 is a model by registration, §9.26; §9.30 labels it so). Validation of the measured parts and of the model's arithmetic does not make the model a measurement.",
+ "numbers_verified": false,
+ "raw_data": [
+  {
+   "path": "../../experiments/33_tau_stage_a/tables.md",
+   "sha256": "5c716b86ddaab398172b673166eba2f7457fac5185891222298add992f4ef429"
+  },
+  {
+   "path": "../../experiments/33_tau_stage_a/stage0.json",
+   "sha256": "52e1fb5111d9fde3442935f6f847f1edfc6181ba87fcf7542907eeeeb6f6a4b5"
+  },
+  {
+   "path": "../../experiments/27_quartic_pipeline_d4/p53s1.json",
+   "sha256": "496fccf85793ad0519a5259166286af549f8a3cb1c2e291ebb0ac12e3596668e"
+  },
+  {
+   "path": "../../experiments/27_quartic_pipeline_d4/p53s2.json",
+   "sha256": "fc79faeb2361829bf0ccd428d44549dc40c6598caed55c333d2d8533feb0af29"
+  },
+  {
+   "path": "../../experiments/27_quartic_pipeline_d4/p101s1.json",
+   "sha256": "87c92013961300b98c65e4190050bccd886e7ee2a68019f847752d0b5e4065df"
+  },
+  {
+   "path": "../../experiments/27_quartic_pipeline_d4/p101s2.json",
+   "sha256": "975d8e0b16ae82a2e8363ec89c2bbe983f1d25995b28c0c2aafd1bffc778b891"
+  },
+  {
+   "path": "../../experiments/27_quartic_pipeline_d4/p149s1.json",
+   "sha256": "c8a9604e8949dbea9d08d8005bc7688834178b3db66cd46f363c42c50459796b"
+  },
+  {
+   "path": "../../experiments/27_quartic_pipeline_d4/p149s2.json",
+   "sha256": "df714b1d2ef879288cc912ac0befe902e197495c9c000f046dbf5fca8535c989"
+  },
+  {
+   "path": "../../experiments/27_quartic_pipeline_d4/p197s1.json",
+   "sha256": "6e60b454b5b1af323e75de6dfd85b33c37823434ebabc53585b567c986014a8e"
+  },
+  {
+   "path": "../../experiments/27_quartic_pipeline_d4/p197s2.json",
+   "sha256": "151649dbd5daef50ff126bd9642e965d5f41beaef0ebfcfa5ef81cec72fcf40c"
+  },
+  {
+   "path": "../../experiments/27_quartic_pipeline_d4/p269s1.json",
+   "sha256": "1665c4ff2f842f2a17fb8c2ff55c3fbcd39779c16da05396613711835e65d146"
+  },
+  {
+   "path": "../../experiments/27_quartic_pipeline_d4/p269s2.json",
+   "sha256": "e3ca5ea3708645b0e94705f33eb84caa4988d0a19ba7f85a49ca8bf055d458cc"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p101s1.json",
+   "sha256": "b36f3a9fdb704233d1af8d93d59ec1a683a8a964ceaa3d71743e9ad25d3c3b39"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p101s2.json",
+   "sha256": "a090dc3efe4585a4532f86eb8966b7995b007b8f94b421ee4f38094b379e6653"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p149s1.json",
+   "sha256": "94f077092d14eb94072cd373a1cd3d8183ece90f320619f91d04bb9b69c643ce"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p149s2.json",
+   "sha256": "210c65f16dab920edf43031868b88197336439c2e93599575c4bfee8e176cb06"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p197s1.json",
+   "sha256": "33fc49156cbbd88df15fe9fd8d4c759f0a730718a2da329c3de46cf4b2572b8d"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p197s2.json",
+   "sha256": "2ac24660a68e713a5a0b4c17f04fa7268b84efd0c7afae56e69972bf69647d7e"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p269s1.json",
+   "sha256": "1549c869ea9192de424fd15dec1e074ea51fbfe018023df75d49d3b6a3717277"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p269s2.json",
+   "sha256": "2bf95cc827b0ca91d7941b7268efacc523e7c289bd12e792083bd5e825a4b388"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p397s1.json",
+   "sha256": "2fb42a34c4c84a22a6fa88a7b54ddf5a41c98b89783b06db43c2b64324915bde"
+  },
+  {
+   "path": "../../experiments/31_solve_cost/e2e_chain_p397s2.json",
+   "sha256": "4398fc1c6ed6c699493ad2b916a604bad086a64c70ac4c568a378b8482e3ded6"
+  },
+  {
+   "path": "../../experiments/33_tau_stage_a/control_decomposed.json",
+   "sha256": "e99734142f86c421452a3f60bc284ed4620f48477eca470d811eca1ce8896e39"
+  },
+  {
+   "path": "../../experiments/33_tau_stage_a/stage_a_p53s1.json",
+   "sha256": "30033c65edc84d95ce3a40ddbcf464d0ebf469bbb16ac62f47b9048a2c8f48fb"
+  },
+  {
+   "path": "../../experiments/33_tau_stage_a/stage_a_p53s2.json",
+   "sha256": "91f4e8b4ecf2b6fca541949e4985795a02fabeb11cdb762c41f546f133a8a0bf"
+  },
+  {
+   "path": "../../experiments/33_tau_stage_a/stage_a_p101s1.json",
+   "sha256": "c8a60cc1d6029510fab295516838cb2dfe85b5401a5ae85a23687bed815007cb"
+  },
+  {
+   "path": "../../experiments/33_tau_stage_a/stage_a_p101s2.json",
+   "sha256": "70d43f1bcb88cc5632a90b8b98b664fd84d09e69401b2f37d44573b896867898"
+  },
+  {
+   "path": "../../experiments/33_tau_stage_a/stage_a_p149s1.json",
+   "sha256": "edab042b735f1bbe25031c0666dffcd06e6b62d34a4f21a40d092ad4014148aa"
+  },
+  {
+   "path": "../../experiments/33_tau_stage_a/stage_a_p149s2.json",
+   "sha256": "4d588d77a6f5bbb30a98894b63d887851d1029f0e9880f557c839dbc06ef4340"
+  },
+  {
+   "path": "../../experiments/33_tau_stage_a/stage_a_p197s1.json",
+   "sha256": "8238b908e0602355fad084574a0f6624f77e8d4da344e455beb79a3b94db6f1b"
+  },
+  {
+   "path": "../../experiments/33_tau_stage_a/stage_a_p197s2.json",
+   "sha256": "6964caa50a20383ff9cf176a2064764ea1a6224cac56e1275b455e3c8effd642"
+  },
+  {
+   "path": "../../experiments/33_tau_stage_a/stage_a_p269s1.json",
+   "sha256": "30bdf423eec2f3219fa6a7f10a4722de4f9fa7741950838a41a0815d350dbee3"
+  },
+  {
+   "path": "../../experiments/33_tau_stage_a/stage_a_p269s2.json",
+   "sha256": "2f135549359478c20392033233caa7e15e46be29cddf100451aa94eda6a6e751"
+  },
+  {
+   "path": "replay/params.txt",
+   "sha256": "db4548530bb8476a2ae6557cd9cb7033ce48c814339048d63c96a47f1d46aa3d"
+  },
+  {
+   "path": "replay/curve_check.json",
+   "sha256": "7cc95c913bc07422f36bc31a0da942c8b5ded60508af03112fdfe378bbc11d35"
+  }
+ ],
+ "check_failures": [],
+ "headline_disagreements": [
+  "e19_over_e28_by_size_p53: printed 1.77, recomputed 1.780323911384596",
+  "e19_over_e28_by_size_p149: printed 2.39, recomputed 2.3966243966108443"
+ ],
+ "checks": [
+  {
+   "id": "S0.1",
+   "check": "Stage 0: 40 curves (8 seeds x 5 sizes), no error row",
+   "holds": true,
+   "detail": "40 rows"
+  },
+  {
+   "id": "S0.2",
+   "check": "Stage 0: psi^2 = -1, psi(G) = [lambda]G, lambda^2 = -1, psi(T) = T, j in F_p2 and the line checks all true on every curve (the binary's own checks, replayed)",
+   "holds": true,
+   "detail": "all flags true: true"
+  },
+  {
+   "id": "S0.3",
+   "check": "Stage 0: h = 4 on all 40",
+   "holds": true,
+   "detail": "40 of 40"
+  },
+  {
+   "id": "S0.4",
+   "check": "Stage 0: cols_tau = 2 cols_tau_psi and base = 2 cols_tau on every curve (2 / 4 abscissae a column; 4 / 8 points with ±)",
+   "holds": true,
+   "detail": "cols true, points per column true"
+  },
+  {
+   "id": "S0.5",
+   "check": "Stage 0: density = base / (p - 5) on every curve",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "id": "S0.6",
+   "check": "Validator's own number theory on (p, n, h) of all 40 curves: n prime, h n within Hasse and of GLS-twist shape (p^4 + 1 + t2^2 - 2p^2 with t2^2 a square; the untwisted shape is not), ordinary, no CM by Q(i) or Q(sqrt -3) (so j is neither 1728 nor 0)",
+   "holds": true,
+   "detail": "40 of 40; the order screen alone (no t with t^2 = 2p ± t2) rules out j in F_p on 33 of 40, the other 7 are decided by S0.7"
+  },
+  {
+   "id": "S0.7",
+   "check": "Validator's own F_p4 arithmetic on the 40 curves' coefficients (replay/curve_check.rs on replay/params.txt, sha256 recorded): G on the curve, [n]G = O, n prime, h n in the Hasse interval (so #E = 4n), j = 1728*4a^3/(4a^3+27b^2) in F_p2 but not in F_p, psi(G) = [lambda]G, psi^2(G) = -G, lambda^2 = -1 mod n; (p, seed, n, h) equal the Stage 0 records. With S0.6: Aut(E) = ±1 and psi is the only Frobenius-type endomorphism over F_p4, so <±psi> is the largest fold and the <±psi> walk the strongest rho available",
+   "holds": true,
+   "detail": "40 of 40 curves ok; records match: true; curve_check.json sha256 7cc95c913bc07422f36bc31a0da942c8b5ded60508af03112fdfe378bbc11d35"
+  },
+  {
+   "id": "REF.1",
+   "check": "E19's recorded ratio equals its total_muls / rho_matched_muls on all 10 rows",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "id": "REF.2",
+   "check": "E31 solver A (chain) records: 20 rows, ratio = total_muls / rho_matched_muls",
+   "holds": true,
+   "detail": "20 rows"
+  },
+  {
+   "id": "A.1",
+   "check": "Stage A: cols tau / tau-psi = 2.00 on every curve",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "id": "A.2",
+   "check": "Stage A: decompositions per decomposed target, median 8 on every curve (from the recorded histogram)",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "id": "A.3",
+   "check": "Stage A: histogram consistent with residuals, targets_decomposed and decompositions",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "id": "A.4",
+   "check": "Stage A: both arms solved and correct (the binary checks the Wiedemann logarithm against the planted d and [x]G = Q) and recover the same d as all 64 walks of the curve, on all 10 curves",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "id": "A.5",
+   "check": "Stage A: all 640 walks correct (10 curves x {<±psi>, negation} x 16 x {E25 schoolbook serial, E27 Karatsuba batched})",
+   "holds": true,
+   "detail": "640 of 640"
+  },
+  {
+   "id": "A.6",
+   "check": "Stage A: the E25-arithmetic and E27-arithmetic walks are the same walks (steps, group ops, recovered d, visit digest, cycle escapes equal per seed and fold)",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "id": "A.7",
+   "check": "Registered control: 3 uniform targets per curve, 30 calls, every call solved, 0 solver and 0 oracle decompositions (agreement 0 = 0: a negative control only)",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "id": "A.8",
+   "check": "Supplementary control (added after the run, disclosed in §9.30): 3 oracle-decomposable targets per curve, 30 calls, every call solved and its decomposition set equal to the oracle's (agrees = solved && sets equal)",
+   "holds": true,
+   "detail": "true; decomposition counts seen {2, 8}"
+  },
+  {
+   "id": "A.9",
+   "check": "The 10 Stage A curves are Stage 0's seeds 1-2 (same p, seed, n) and pass S0.6 and S0.7: the <±psi> walk is the strongest rho available on every Stage A curve",
+   "holds": true,
+   "detail": "true"
+  },
+  {
+   "id": "A.10",
+   "check": "G2.102: every control's median C within ±30 % of E19's per-call median at the same p (mean of E19's two seeds)",
+   "holds": true,
+   "detail": "C / C_E19 in [0.9808, 1.0570]"
+  },
+  {
+   "id": "M.1",
+   "check": "Model fidelity (validator's own control, not a registered check): E28's A2 formula with the median call applied to E19's own measured rows (R = residuals_at_solve, C = call.median, generation and LA as recorded) against E19's measured total_muls",
+   "holds": true,
+   "detail": "measured / modelled = 1.0290-1.1702 (median C); 1.0000-1.0000 with the mean call: the median-based model under-prices E19's measured S by up to 17 %"
+  }
+ ],
+ "headline": [
+  {
+   "name": "stage0_density_pooled_p53",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage 0",
+   "printed": "0.500",
+   "claimed": 0.5,
+   "recomputed": 0.5,
+   "rel_tol": 0.001000000001,
+   "agrees": true,
+   "definition": "sum of base points / sum of (p - 5) over the 8 seeds"
+  },
+  {
+   "name": "stage0_density_pooled_p101",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage 0",
+   "printed": "0.521",
+   "claimed": 0.521,
+   "recomputed": 0.5208333333333334,
+   "rel_tol": 0.0009596928992322457,
+   "agrees": true,
+   "definition": "sum of base points / sum of (p - 5) over the 8 seeds"
+  },
+  {
+   "name": "stage0_density_pooled_p149",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage 0",
+   "printed": "0.521",
+   "claimed": 0.521,
+   "recomputed": 0.5208333333333334,
+   "rel_tol": 0.0009596928992322457,
+   "agrees": true,
+   "definition": "sum of base points / sum of (p - 5) over the 8 seeds"
+  },
+  {
+   "name": "stage0_density_pooled_p197",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage 0",
+   "printed": "0.508",
+   "claimed": 0.508,
+   "recomputed": 0.5078125,
+   "rel_tol": 0.000984251969488189,
+   "agrees": true,
+   "definition": "sum of base points / sum of (p - 5) over the 8 seeds"
+  },
+  {
+   "name": "stage0_density_pooled_p269",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage 0",
+   "printed": "0.506",
+   "claimed": 0.506,
+   "recomputed": 0.5056818181818182,
+   "rel_tol": 0.0009881422934782608,
+   "agrees": true,
+   "definition": "sum of base points / sum of (p - 5) over the 8 seeds"
+  },
+  {
+   "name": "stage0_density_pooled_min",
+   "source": "note §9.30 Stage 0 (\"density pooled 0.50-0.52 per size\")",
+   "printed": "0.50",
+   "claimed": 0.5,
+   "recomputed": 0.5,
+   "rel_tol": 0.010000000010000001,
+   "agrees": true,
+   "definition": "least pooled density over the five sizes"
+  },
+  {
+   "name": "stage0_density_pooled_max",
+   "source": "note §9.30 Stage 0",
+   "printed": "0.52",
+   "claimed": 0.52,
+   "recomputed": 0.5208333333333334,
+   "rel_tol": 0.009615384625,
+   "agrees": true,
+   "definition": "largest pooled density over the five sizes"
+  },
+  {
+   "name": "stage0_curves_h4",
+   "source": "note §9.30 Stage 0 (\"h = 4 on all 40\")",
+   "printed": "40",
+   "claimed": 40,
+   "recomputed": 40,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "curves with cofactor 4"
+  },
+  {
+   "name": "e19_call_median_min",
+   "source": "note §9.26 (E19's C \"1.37-1.41·10⁹\")",
+   "printed": "1.37·10⁹",
+   "claimed": 1370000000,
+   "recomputed": 1371585124,
+   "rel_tol": 0.0036496350401459855,
+   "agrees": true,
+   "definition": "least E19 per-call median (call.median) over its 10 rows"
+  },
+  {
+   "name": "e19_call_median_max",
+   "source": "note §9.26",
+   "printed": "1.41·10⁹",
+   "claimed": 1410000000,
+   "recomputed": 1411558115,
+   "rel_tol": 0.0035460992943262414,
+   "agrees": true,
+   "definition": "largest E19 per-call median over its 10 rows"
+  },
+  {
+   "name": "residuals_tau_p53s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "5519",
+   "claimed": 5519,
+   "recomputed": 5519,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "tau.residuals_at_solve"
+  },
+  {
+   "name": "residuals_tau_psi_p53s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "4055",
+   "claimed": 4055,
+   "recomputed": 4055,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "tau_psi.residuals_at_solve"
+  },
+  {
+   "name": "y_tau_p53s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "613.2",
+   "claimed": 613.2,
+   "recomputed": 613.2222222222222,
+   "rel_tol": 0.0000815394651826484,
+   "agrees": true,
+   "definition": "residuals_at_solve / relations, tau arm"
+  },
+  {
+   "name": "y_tau_psi_p53s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "811.0",
+   "claimed": 811,
+   "recomputed": 811,
+   "rel_tol": 0.00006165228119605426,
+   "agrees": true,
+   "definition": "residuals_at_solve / relations, tau-psi arm"
+  },
+  {
+   "name": "residuals_ratio_p53s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "1.361",
+   "claimed": 1.361,
+   "recomputed": 1.361035758323058,
+   "rel_tol": 0.00036737692909625283,
+   "agrees": true,
+   "definition": "R tau / R tau-psi"
+  },
+  {
+   "name": "control_c_median_uniform_p53s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "`1.36·10^9`",
+   "claimed": 1360000000,
+   "recomputed": 1364410169,
+   "rel_tol": 0.003676470591911765,
+   "agrees": true,
+   "definition": "median call_muls of the 3 registered (uniform) control calls"
+  },
+  {
+   "name": "control_c_median_decomposed_p53s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "`1.37·10^9`",
+   "claimed": 1370000000,
+   "recomputed": 1371495972,
+   "rel_tol": 0.0036496350401459855,
+   "agrees": true,
+   "definition": "median call_muls of the 3 supplementary (decomposable) control calls"
+  },
+  {
+   "name": "residuals_tau_p53s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "748",
+   "claimed": 748,
+   "recomputed": 748,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "tau.residuals_at_solve"
+  },
+  {
+   "name": "residuals_tau_psi_p53s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "292",
+   "claimed": 292,
+   "recomputed": 292,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "tau_psi.residuals_at_solve"
+  },
+  {
+   "name": "y_tau_p53s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "44.0",
+   "claimed": 44,
+   "recomputed": 44,
+   "rel_tol": 0.0011363636375000003,
+   "agrees": true,
+   "definition": "residuals_at_solve / relations, tau arm"
+  },
+  {
+   "name": "y_tau_psi_p53s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "32.4",
+   "claimed": 32.4,
+   "recomputed": 32.44444444444444,
+   "rel_tol": 0.00154320987808642,
+   "agrees": true,
+   "definition": "residuals_at_solve / relations, tau-psi arm"
+  },
+  {
+   "name": "residuals_ratio_p53s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "2.562",
+   "claimed": 2.562,
+   "recomputed": 2.5616438356164384,
+   "rel_tol": 0.00019516003142076507,
+   "agrees": true,
+   "definition": "R tau / R tau-psi"
+  },
+  {
+   "name": "control_c_median_uniform_p53s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "`1.39·10^9`",
+   "claimed": 1390000000,
+   "recomputed": 1393112004,
+   "rel_tol": 0.003597122305755396,
+   "agrees": true,
+   "definition": "median call_muls of the 3 registered (uniform) control calls"
+  },
+  {
+   "name": "control_c_median_decomposed_p53s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "`1.38·10^9`",
+   "claimed": 1380000000,
+   "recomputed": 1375149190,
+   "rel_tol": 0.00362318840942029,
+   "agrees": true,
+   "definition": "median call_muls of the 3 supplementary (decomposable) control calls"
+  },
+  {
+   "name": "residuals_tau_p101s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "2273",
+   "claimed": 2273,
+   "recomputed": 2273,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "tau.residuals_at_solve"
+  },
+  {
+   "name": "residuals_tau_psi_p101s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "1261",
+   "claimed": 1261,
+   "recomputed": 1261,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "tau_psi.residuals_at_solve"
+  },
+  {
+   "name": "y_tau_p101s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "90.9",
+   "claimed": 90.9,
+   "recomputed": 90.92,
+   "rel_tol": 0.000550055006050605,
+   "agrees": true,
+   "definition": "residuals_at_solve / relations, tau arm"
+  },
+  {
+   "name": "y_tau_psi_p101s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "97.0",
+   "claimed": 97,
+   "recomputed": 97,
+   "rel_tol": 0.0005154639180412372,
+   "agrees": true,
+   "definition": "residuals_at_solve / relations, tau-psi arm"
+  },
+  {
+   "name": "residuals_ratio_p101s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "1.803",
+   "claimed": 1.803,
+   "recomputed": 1.80253766851705,
+   "rel_tol": 0.00027731558541320027,
+   "agrees": true,
+   "definition": "R tau / R tau-psi"
+  },
+  {
+   "name": "control_c_median_uniform_p101s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "`1.40·10^9`",
+   "claimed": 1400000000,
+   "recomputed": 1395578557,
+   "rel_tol": 0.003571428575,
+   "agrees": true,
+   "definition": "median call_muls of the 3 registered (uniform) control calls"
+  },
+  {
+   "name": "control_c_median_decomposed_p101s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "`1.42·10^9`",
+   "claimed": 1420000000,
+   "recomputed": 1421761771,
+   "rel_tol": 0.0035211267640845073,
+   "agrees": true,
+   "definition": "median call_muls of the 3 supplementary (decomposable) control calls"
+  },
+  {
+   "name": "residuals_tau_p101s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "1183",
+   "claimed": 1183,
+   "recomputed": 1183,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "tau.residuals_at_solve"
+  },
+  {
+   "name": "residuals_tau_psi_p101s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "481",
+   "claimed": 481,
+   "recomputed": 481,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "tau_psi.residuals_at_solve"
+  },
+  {
+   "name": "y_tau_p101s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "35.8",
+   "claimed": 35.8,
+   "recomputed": 35.84848484848485,
+   "rel_tol": 0.001396648046089386,
+   "agrees": true,
+   "definition": "residuals_at_solve / relations, tau arm"
+  },
+  {
+   "name": "y_tau_psi_p101s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "28.3",
+   "claimed": 28.3,
+   "recomputed": 28.294117647058822,
+   "rel_tol": 0.0017667844540636044,
+   "agrees": true,
+   "definition": "residuals_at_solve / relations, tau-psi arm"
+  },
+  {
+   "name": "residuals_ratio_p101s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "2.459",
+   "claimed": 2.459,
+   "recomputed": 2.4594594594594597,
+   "rel_tol": 0.0002033346891012607,
+   "agrees": true,
+   "definition": "R tau / R tau-psi"
+  },
+  {
+   "name": "control_c_median_uniform_p101s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "`1.37·10^9`",
+   "claimed": 1370000000,
+   "recomputed": 1369470954,
+   "rel_tol": 0.0036496350401459855,
+   "agrees": true,
+   "definition": "median call_muls of the 3 registered (uniform) control calls"
+  },
+  {
+   "name": "control_c_median_decomposed_p101s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "`1.40·10^9`",
+   "claimed": 1400000000,
+   "recomputed": 1396591975,
+   "rel_tol": 0.003571428575,
+   "agrees": true,
+   "definition": "median call_muls of the 3 supplementary (decomposable) control calls"
+  },
+  {
+   "name": "residuals_tau_p149s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "4288",
+   "claimed": 4288,
+   "recomputed": 4288,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "tau.residuals_at_solve"
+  },
+  {
+   "name": "residuals_tau_psi_p149s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "2306",
+   "claimed": 2306,
+   "recomputed": 2306,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "tau_psi.residuals_at_solve"
+  },
+  {
+   "name": "y_tau_p149s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "115.9",
+   "claimed": 115.9,
+   "recomputed": 115.89189189189189,
+   "rel_tol": 0.0004314063852459017,
+   "agrees": true,
+   "definition": "residuals_at_solve / relations, tau arm"
+  },
+  {
+   "name": "y_tau_psi_p149s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "121.4",
+   "claimed": 121.4,
+   "recomputed": 121.36842105263158,
+   "rel_tol": 0.00041186161490939046,
+   "agrees": true,
+   "definition": "residuals_at_solve / relations, tau-psi arm"
+  },
+  {
+   "name": "residuals_ratio_p149s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "1.859",
+   "claimed": 1.859,
+   "recomputed": 1.8594969644405899,
+   "rel_tol": 0.00026896180769230775,
+   "agrees": true,
+   "definition": "R tau / R tau-psi"
+  },
+  {
+   "name": "control_c_median_uniform_p149s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "`1.38·10^9`",
+   "claimed": 1380000000,
+   "recomputed": 1377546049,
+   "rel_tol": 0.00362318840942029,
+   "agrees": true,
+   "definition": "median call_muls of the 3 registered (uniform) control calls"
+  },
+  {
+   "name": "control_c_median_decomposed_p149s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "`1.40·10^9`",
+   "claimed": 1400000000,
+   "recomputed": 1403761706,
+   "rel_tol": 0.003571428575,
+   "agrees": true,
+   "definition": "median call_muls of the 3 supplementary (decomposable) control calls"
+  },
+  {
+   "name": "residuals_tau_p149s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "1570",
+   "claimed": 1570,
+   "recomputed": 1570,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "tau.residuals_at_solve"
+  },
+  {
+   "name": "residuals_tau_psi_p149s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "696",
+   "claimed": 696,
+   "recomputed": 696,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "tau_psi.residuals_at_solve"
+  },
+  {
+   "name": "y_tau_p149s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "32.0",
+   "claimed": 32,
+   "recomputed": 32.04081632653061,
+   "rel_tol": 0.0015625000015625002,
+   "agrees": true,
+   "definition": "residuals_at_solve / relations, tau arm"
+  },
+  {
+   "name": "y_tau_psi_p149s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "27.8",
+   "claimed": 27.8,
+   "recomputed": 27.84,
+   "rel_tol": 0.001798561152877698,
+   "agrees": true,
+   "definition": "residuals_at_solve / relations, tau-psi arm"
+  },
+  {
+   "name": "residuals_ratio_p149s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "2.256",
+   "claimed": 2.256,
+   "recomputed": 2.2557471264367814,
+   "rel_tol": 0.0002216312058953901,
+   "agrees": true,
+   "definition": "R tau / R tau-psi"
+  },
+  {
+   "name": "control_c_median_uniform_p149s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "`1.40·10^9`",
+   "claimed": 1400000000,
+   "recomputed": 1403141789,
+   "rel_tol": 0.003571428575,
+   "agrees": true,
+   "definition": "median call_muls of the 3 registered (uniform) control calls"
+  },
+  {
+   "name": "control_c_median_decomposed_p149s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "`1.48·10^9`",
+   "claimed": 1480000000,
+   "recomputed": 1483722562,
+   "rel_tol": 0.0033783783817567573,
+   "agrees": true,
+   "definition": "median call_muls of the 3 supplementary (decomposable) control calls"
+  },
+  {
+   "name": "residuals_tau_p197s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "8804",
+   "claimed": 8804,
+   "recomputed": 8804,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "tau.residuals_at_solve"
+  },
+  {
+   "name": "residuals_tau_psi_p197s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "4738",
+   "claimed": 4738,
+   "recomputed": 4738,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "tau_psi.residuals_at_solve"
+  },
+  {
+   "name": "y_tau_p197s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "204.7",
+   "claimed": 204.7,
+   "recomputed": 204.74418604651163,
+   "rel_tol": 0.00024425989276990724,
+   "agrees": true,
+   "definition": "residuals_at_solve / relations, tau arm"
+  },
+  {
+   "name": "y_tau_psi_p197s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "215.4",
+   "claimed": 215.4,
+   "recomputed": 215.36363636363637,
+   "rel_tol": 0.00023212627692664812,
+   "agrees": true,
+   "definition": "residuals_at_solve / relations, tau-psi arm"
+  },
+  {
+   "name": "residuals_ratio_p197s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "1.858",
+   "claimed": 1.858,
+   "recomputed": 1.8581680033769523,
+   "rel_tol": 0.00026910656646932183,
+   "agrees": true,
+   "definition": "R tau / R tau-psi"
+  },
+  {
+   "name": "control_c_median_uniform_p197s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "`1.38·10^9`",
+   "claimed": 1380000000,
+   "recomputed": 1381427017,
+   "rel_tol": 0.00362318840942029,
+   "agrees": true,
+   "definition": "median call_muls of the 3 registered (uniform) control calls"
+  },
+  {
+   "name": "control_c_median_decomposed_p197s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "`1.41·10^9`",
+   "claimed": 1410000000,
+   "recomputed": 1407275662,
+   "rel_tol": 0.0035460992943262414,
+   "agrees": true,
+   "definition": "median call_muls of the 3 supplementary (decomposable) control calls"
+  },
+  {
+   "name": "residuals_tau_p197s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "4307",
+   "claimed": 4307,
+   "recomputed": 4307,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "tau.residuals_at_solve"
+  },
+  {
+   "name": "residuals_tau_psi_p197s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "2166",
+   "claimed": 2166,
+   "recomputed": 2166,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "tau_psi.residuals_at_solve"
+  },
+  {
+   "name": "y_tau_p197s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "81.3",
+   "claimed": 81.3,
+   "recomputed": 81.26415094339623,
+   "rel_tol": 0.0006150061506765068,
+   "agrees": true,
+   "definition": "residuals_at_solve / relations, tau arm"
+  },
+  {
+   "name": "y_tau_psi_p197s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "80.2",
+   "claimed": 80.2,
+   "recomputed": 80.22222222222223,
+   "rel_tol": 0.0006234413971321696,
+   "agrees": true,
+   "definition": "residuals_at_solve / relations, tau-psi arm"
+  },
+  {
+   "name": "residuals_ratio_p197s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "1.988",
+   "claimed": 1.988,
+   "recomputed": 1.9884579870729455,
+   "rel_tol": 0.00025150905457746486,
+   "agrees": true,
+   "definition": "R tau / R tau-psi"
+  },
+  {
+   "name": "control_c_median_uniform_p197s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "`1.41·10^9`",
+   "claimed": 1410000000,
+   "recomputed": 1407631177,
+   "rel_tol": 0.0035460992943262414,
+   "agrees": true,
+   "definition": "median call_muls of the 3 registered (uniform) control calls"
+  },
+  {
+   "name": "control_c_median_decomposed_p197s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "`1.46·10^9`",
+   "claimed": 1460000000,
+   "recomputed": 1460790175,
+   "rel_tol": 0.003424657537671233,
+   "agrees": true,
+   "definition": "median call_muls of the 3 supplementary (decomposable) control calls"
+  },
+  {
+   "name": "residuals_tau_p269s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "3493",
+   "claimed": 3493,
+   "recomputed": 3493,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "tau.residuals_at_solve"
+  },
+  {
+   "name": "residuals_tau_psi_p269s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "1986",
+   "claimed": 1986,
+   "recomputed": 1986,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "tau_psi.residuals_at_solve"
+  },
+  {
+   "name": "y_tau_p269s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "43.1",
+   "claimed": 43.1,
+   "recomputed": 43.123456790123456,
+   "rel_tol": 0.0011600928085846868,
+   "agrees": true,
+   "definition": "residuals_at_solve / relations, tau arm"
+  },
+  {
+   "name": "y_tau_psi_p269s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "48.4",
+   "claimed": 48.4,
+   "recomputed": 48.4390243902439,
+   "rel_tol": 0.0010330578522727274,
+   "agrees": true,
+   "definition": "residuals_at_solve / relations, tau-psi arm"
+  },
+  {
+   "name": "residuals_ratio_p269s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "1.759",
+   "claimed": 1.759,
+   "recomputed": 1.7588116817724069,
+   "rel_tol": 0.0002842524164297897,
+   "agrees": true,
+   "definition": "R tau / R tau-psi"
+  },
+  {
+   "name": "control_c_median_uniform_p269s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "`1.44·10^9`",
+   "claimed": 1440000000,
+   "recomputed": 1436982620,
+   "rel_tol": 0.0034722222256944445,
+   "agrees": true,
+   "definition": "median call_muls of the 3 registered (uniform) control calls"
+  },
+  {
+   "name": "control_c_median_decomposed_p269s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "`1.44·10^9`",
+   "claimed": 1440000000,
+   "recomputed": 1438477845,
+   "rel_tol": 0.0034722222256944445,
+   "agrees": true,
+   "definition": "median call_muls of the 3 supplementary (decomposable) control calls"
+  },
+  {
+   "name": "residuals_tau_p269s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "8564",
+   "claimed": 8564,
+   "recomputed": 8564,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "tau.residuals_at_solve"
+  },
+  {
+   "name": "residuals_tau_psi_p269s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "5364",
+   "claimed": 5364,
+   "recomputed": 5364,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "tau_psi.residuals_at_solve"
+  },
+  {
+   "name": "y_tau_p269s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "127.8",
+   "claimed": 127.8,
+   "recomputed": 127.82089552238806,
+   "rel_tol": 0.00039123630712050084,
+   "agrees": true,
+   "definition": "residuals_at_solve / relations, tau arm"
+  },
+  {
+   "name": "y_tau_psi_p269s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "157.8",
+   "claimed": 157.8,
+   "recomputed": 157.76470588235293,
+   "rel_tol": 0.0003168567810519645,
+   "agrees": true,
+   "definition": "residuals_at_solve / relations, tau-psi arm"
+  },
+  {
+   "name": "residuals_ratio_p269s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "1.597",
+   "claimed": 1.597,
+   "recomputed": 1.5965697240865027,
+   "rel_tol": 0.0003130870385097057,
+   "agrees": true,
+   "definition": "R tau / R tau-psi"
+  },
+  {
+   "name": "control_c_median_uniform_p269s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "`1.38·10^9`",
+   "claimed": 1380000000,
+   "recomputed": 1384247743,
+   "rel_tol": 0.00362318840942029,
+   "agrees": true,
+   "definition": "median call_muls of the 3 registered (uniform) control calls"
+  },
+  {
+   "name": "control_c_median_decomposed_p269s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A",
+   "printed": "`1.41·10^9`",
+   "claimed": 1410000000,
+   "recomputed": 1411332779,
+   "rel_tol": 0.0035460992943262414,
+   "agrees": true,
+   "definition": "median call_muls of the 3 supplementary (decomposable) control calls"
+  },
+  {
+   "name": "residuals_ratio_per_curve_min",
+   "source": "note §9.30 G2.101 (\"per curve the residuals ratio is 1.36-2.56\")",
+   "printed": "1.36",
+   "claimed": 1.36,
+   "recomputed": 1.361035758323058,
+   "rel_tol": 0.003676470591911765,
+   "agrees": true,
+   "definition": "least R tau / R tau-psi"
+  },
+  {
+   "name": "residuals_ratio_per_curve_max",
+   "source": "note §9.30 G2.101",
+   "printed": "2.56",
+   "claimed": 2.56,
+   "recomputed": 2.5616438356164384,
+   "rel_tol": 0.001953125001953125,
+   "agrees": true,
+   "definition": "largest R tau / R tau-psi"
+  },
+  {
+   "name": "residuals_tau_pooled",
+   "source": "note §9.30 (\"residuals 40,749 / 23,345\")",
+   "printed": "40,749",
+   "claimed": 40749,
+   "recomputed": 40749,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "sum of R tau"
+  },
+  {
+   "name": "residuals_tau_psi_pooled",
+   "source": "note §9.30",
+   "printed": "23,345",
+   "claimed": 23345,
+   "recomputed": 23345,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "sum of R tau-psi"
+  },
+  {
+   "name": "residuals_ratio_pooled",
+   "source": "note §9.30 (\"(1.75)\"; G2.101 band [1.6, 2.4])",
+   "printed": "1.75",
+   "claimed": 1.75,
+   "recomputed": 1.745512957806811,
+   "rel_tol": 0.00285714286,
+   "agrees": true,
+   "definition": "sum R tau / sum R tau-psi"
+  },
+  {
+   "name": "y_tau_pooled",
+   "source": "note §9.30 (\"y 98.4 / 110.1\")",
+   "printed": "98.4",
+   "claimed": 98.4,
+   "recomputed": 98.42753623188406,
+   "rel_tol": 0.0005081300818089431,
+   "agrees": true,
+   "definition": "sum R / sum relations, tau"
+  },
+  {
+   "name": "y_tau_psi_pooled",
+   "source": "note §9.30",
+   "printed": "110.1",
+   "claimed": 110.1,
+   "recomputed": 110.11792452830188,
+   "rel_tol": 0.0004541326071752953,
+   "agrees": true,
+   "definition": "sum R / sum relations, tau-psi"
+  },
+  {
+   "name": "y_ratio_pooled",
+   "source": "note §9.30 (\"(1.12)\"; G2.101 band [0.8, 1.25])",
+   "printed": "1.12",
+   "claimed": 1.12,
+   "recomputed": 1.1187715221162968,
+   "rel_tol": 0.00446428571875,
+   "agrees": true,
+   "definition": "pooled y tau-psi / y tau"
+  },
+  {
+   "name": "walks_correct",
+   "source": "note §9.30 (\"all 640 walks correct\")",
+   "printed": "640",
+   "claimed": 640,
+   "recomputed": 640,
+   "rel_tol": 0.000000000001,
+   "agrees": true,
+   "definition": "walks with correct = true"
+  },
+  {
+   "name": "control_c_uniform_min",
+   "source": "note §9.30 G2.102 (\"1.36-1.44·10⁹ (uniform)\")",
+   "printed": "1.36·10⁹",
+   "claimed": 1360000000,
+   "recomputed": 1364410169,
+   "rel_tol": 0.003676470591911765,
+   "agrees": true,
+   "definition": "least per-curve median, registered control"
+  },
+  {
+   "name": "control_c_uniform_max",
+   "source": "note §9.30 G2.102",
+   "printed": "1.44·10⁹",
+   "claimed": 1440000000,
+   "recomputed": 1436982620,
+   "rel_tol": 0.0034722222256944445,
+   "agrees": true,
+   "definition": "largest per-curve median, registered control"
+  },
+  {
+   "name": "control_c_decomposed_min",
+   "source": "note §9.30 G2.102 (\"1.37-1.48·10⁹ (decomposed)\")",
+   "printed": "1.37·10⁹",
+   "claimed": 1370000000,
+   "recomputed": 1371495972,
+   "rel_tol": 0.0036496350401459855,
+   "agrees": true,
+   "definition": "least per-curve median, supplementary control"
+  },
+  {
+   "name": "control_c_decomposed_max",
+   "source": "note §9.30 G2.102",
+   "printed": "1.48·10⁹",
+   "claimed": 1480000000,
+   "recomputed": 1483722562,
+   "rel_tol": 0.0033783783817567573,
+   "agrees": true,
+   "definition": "largest per-curve median, supplementary control"
+  },
+  {
+   "name": "s_model_tau_psi_p53s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`5.53·10^12`",
+   "claimed": 5530000000000,
+   "recomputed": 5532709740832.295,
+   "rel_tol": 0.0009041591329113925,
+   "agrees": true,
+   "definition": "R tau-psi * C + R tau-psi * g + 16 LA tau-psi (C the median of the 3 registered control calls)"
+  },
+  {
+   "name": "rho_psi_i_p53s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`3.17·10^5`",
+   "claimed": 317000,
+   "recomputed": 317451.375,
+   "rel_tol": 0.0015772870678233439,
+   "agrees": true,
+   "definition": "mean of the 16 <±psi> walks, E25 arithmetic, fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "dist_tau_psi_0gae_p53s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.74·10^7`",
+   "claimed": 17400000,
+   "recomputed": 17428526.623431053,
+   "rel_tol": 0.002873563221264368,
+   "agrees": true,
+   "definition": "S_model / rho_psi_i"
+  },
+  {
+   "name": "dist_tau_psi_0.1gae_p53s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.92·10^7`",
+   "claimed": 19200000,
+   "recomputed": 19152253.090705253,
+   "rel_tol": 0.0026041666692708334,
+   "agrees": true,
+   "definition": "(S_model + 0.1*97*R*E19 entries per residual) / (rho + 0.1*97*mean steps)"
+  },
+  {
+   "name": "dist_tau_psi_1gae_p53s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`3.19·10^7`",
+   "claimed": 31900000,
+   "recomputed": 31854525.41770454,
+   "rel_tol": 0.0015673981206896553,
+   "agrees": true,
+   "definition": "as above at 1 GAE"
+  },
+  {
+   "name": "s_model_tau_p53s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`7.53·10^12`",
+   "claimed": 7530000000000,
+   "recomputed": 7530215813230.243,
+   "rel_tol": 0.0006640106248339974,
+   "agrees": true,
+   "definition": "the same model on the tau arm"
+  },
+  {
+   "name": "rho_neg_i_p53s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`3.31·10^5`",
+   "claimed": 331000,
+   "recomputed": 331237.8125,
+   "rel_tol": 0.0015105740196374624,
+   "agrees": true,
+   "definition": "mean of the 16 negation walks, E25 arithmetic"
+  },
+  {
+   "name": "dist_tau_0gae_p53s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`2.27·10^7`",
+   "claimed": 22700000,
+   "recomputed": 22733563.406895895,
+   "rel_tol": 0.002202643174008811,
+   "agrees": true,
+   "definition": "S_model tau / rho_neg_i"
+  },
+  {
+   "name": "e19_ratio_same_p_p53s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`7.92·10^6`",
+   "claimed": 7920000,
+   "recomputed": 7917370.398862928,
+   "rel_tol": 0.0006313131319444445,
+   "agrees": true,
+   "definition": "mean over E19's two seeds at p of total_muls / rho_matched_muls"
+  },
+  {
+   "name": "e19_over_e28_p53s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "0.45",
+   "claimed": 0.45,
+   "recomputed": 0.4542765186024819,
+   "rel_tol": 0.011111111122222224,
+   "agrees": true,
+   "definition": "E19 measured S/rho / E28 modelled S/rho (0 GAE)"
+  },
+  {
+   "name": "dist_tau_psi_iii_0gae_p53s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`2.55·10^7`",
+   "claimed": 25500000,
+   "recomputed": 25533982.63493002,
+   "rel_tol": 0.0019607843156862746,
+   "agrees": true,
+   "definition": "S_model / rho_psi_iii (E27's walk (iii): Karatsuba, batched)"
+  },
+  {
+   "name": "s_model_tau_psi_p53s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`4.07·10^11`",
+   "claimed": 407000000000,
+   "recomputed": 406790624209.5052,
+   "rel_tol": 0.0012285012297297297,
+   "agrees": true,
+   "definition": "R tau-psi * C + R tau-psi * g + 16 LA tau-psi (C the median of the 3 registered control calls)"
+  },
+  {
+   "name": "rho_psi_i_p53s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`3.58·10^5`",
+   "claimed": 358000,
+   "recomputed": 358482.3125,
+   "rel_tol": 0.0013966480460893857,
+   "agrees": true,
+   "definition": "mean of the 16 <±psi> walks, E25 arithmetic, fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "dist_tau_psi_0gae_p53s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.13·10^6`",
+   "claimed": 1130000,
+   "recomputed": 1134757.866776217,
+   "rel_tol": 0.004424778765486726,
+   "agrees": true,
+   "definition": "S_model / rho_psi_i"
+  },
+  {
+   "name": "dist_tau_psi_0.1gae_p53s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.24·10^6`",
+   "claimed": 1240000,
+   "recomputed": 1237207.8019372565,
+   "rel_tol": 0.004032258068548387,
+   "agrees": true,
+   "definition": "(S_model + 0.1*97*R*E19 entries per residual) / (rho + 0.1*97*mean steps)"
+  },
+  {
+   "name": "dist_tau_psi_1gae_p53s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.96·10^6`",
+   "claimed": 1960000,
+   "recomputed": 1958213.4324035447,
+   "rel_tol": 0.0025510204107142857,
+   "agrees": true,
+   "definition": "as above at 1 GAE"
+  },
+  {
+   "name": "s_model_tau_p53s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.04·10^12`",
+   "claimed": 1040000000000,
+   "recomputed": 1042052717424.349,
+   "rel_tol": 0.0048076923125,
+   "agrees": true,
+   "definition": "the same model on the tau arm"
+  },
+  {
+   "name": "rho_neg_i_p53s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`3.37·10^5`",
+   "claimed": 337000,
+   "recomputed": 337323.75,
+   "rel_tol": 0.0014836795267062317,
+   "agrees": true,
+   "definition": "mean of the 16 negation walks, E25 arithmetic"
+  },
+  {
+   "name": "dist_tau_0gae_p53s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`3.09·10^6`",
+   "claimed": 3090000,
+   "recomputed": 3089176.8439795566,
+   "rel_tol": 0.0016181229789644016,
+   "agrees": true,
+   "definition": "S_model tau / rho_neg_i"
+  },
+  {
+   "name": "e19_ratio_same_p_p53s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`7.92·10^6`",
+   "claimed": 7920000,
+   "recomputed": 7917370.398862928,
+   "rel_tol": 0.0006313131319444445,
+   "agrees": true,
+   "definition": "mean over E19's two seeds at p of total_muls / rho_matched_muls"
+  },
+  {
+   "name": "e19_over_e28_p53s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "6.98",
+   "claimed": 6.98,
+   "recomputed": 6.97714519605467,
+   "rel_tol": 0.0007163323789398282,
+   "agrees": true,
+   "definition": "E19 measured S/rho / E28 modelled S/rho (0 GAE)"
+  },
+  {
+   "name": "dist_tau_psi_iii_0gae_p53s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.66·10^6`",
+   "claimed": 1660000,
+   "recomputed": 1661083.48263695,
+   "rel_tol": 0.003012048195783133,
+   "agrees": true,
+   "definition": "S_model / rho_psi_iii (E27's walk (iii): Karatsuba, batched)"
+  },
+  {
+   "name": "s_model_tau_psi_p101s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.76·10^12`",
+   "claimed": 1760000000000,
+   "recomputed": 1759834399457.21,
+   "rel_tol": 0.0028409090937500004,
+   "agrees": true,
+   "definition": "R tau-psi * C + R tau-psi * g + 16 LA tau-psi (C the median of the 3 registered control calls)"
+  },
+  {
+   "name": "rho_psi_i_p101s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`7.62·10^5`",
+   "claimed": 762000,
+   "recomputed": 762093.25,
+   "rel_tol": 0.0006561679796587927,
+   "agrees": true,
+   "definition": "mean of the 16 <±psi> walks, E25 arithmetic, fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "dist_tau_psi_0gae_p101s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`2.31·10^6`",
+   "claimed": 2310000,
+   "recomputed": 2309211.3720430015,
+   "rel_tol": 0.002164502166666667,
+   "agrees": true,
+   "definition": "S_model / rho_psi_i"
+  },
+  {
+   "name": "dist_tau_psi_0.1gae_p101s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`2.47·10^6`",
+   "claimed": 2470000,
+   "recomputed": 2468006.5780111314,
+   "rel_tol": 0.0020242915000000003,
+   "agrees": true,
+   "definition": "(S_model + 0.1*97*R*E19 entries per residual) / (rho + 0.1*97*mean steps)"
+  },
+  {
+   "name": "dist_tau_psi_1gae_p101s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`3.45·10^6`",
+   "claimed": 3450000,
+   "recomputed": 3445165.7108540633,
+   "rel_tol": 0.001449275363768116,
+   "agrees": true,
+   "definition": "as above at 1 GAE"
+  },
+  {
+   "name": "s_model_tau_p101s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`3.17·10^12`",
+   "claimed": 3170000000000,
+   "recomputed": 3172167872987.0503,
+   "rel_tol": 0.0015772870678233439,
+   "agrees": true,
+   "definition": "the same model on the tau arm"
+  },
+  {
+   "name": "rho_neg_i_p101s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`6.85·10^5`",
+   "claimed": 685000,
+   "recomputed": 684994.4375,
+   "rel_tol": 0.0007299270080291971,
+   "agrees": true,
+   "definition": "mean of the 16 negation walks, E25 arithmetic"
+  },
+  {
+   "name": "dist_tau_0gae_p101s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`4.63·10^6`",
+   "claimed": 4630000,
+   "recomputed": 4630939.609618437,
+   "rel_tol": 0.0010799136079913609,
+   "agrees": true,
+   "definition": "S_model tau / rho_neg_i"
+  },
+  {
+   "name": "e19_ratio_same_p_p101s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`6.09·10^6`",
+   "claimed": 6090000,
+   "recomputed": 6087201.042171732,
+   "rel_tol": 0.0008210180632183909,
+   "agrees": true,
+   "definition": "mean over E19's two seeds at p of total_muls / rho_matched_muls"
+  },
+  {
+   "name": "e19_over_e28_p101s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "2.64",
+   "claimed": 2.64,
+   "recomputed": 2.636051907533382,
+   "rel_tol": 0.0018939393958333336,
+   "agrees": true,
+   "definition": "E19 measured S/rho / E28 modelled S/rho (0 GAE)"
+  },
+  {
+   "name": "dist_tau_psi_iii_0gae_p101s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`3.37·10^6`",
+   "claimed": 3370000,
+   "recomputed": 3370561.075419733,
+   "rel_tol": 0.0014836795267062317,
+   "agrees": true,
+   "definition": "S_model / rho_psi_iii (E27's walk (iii): Karatsuba, batched)"
+  },
+  {
+   "name": "s_model_tau_psi_p101s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`6.59·10^11`",
+   "claimed": 659000000000,
+   "recomputed": 658719350492.8684,
+   "rel_tol": 0.0007587253421851291,
+   "agrees": true,
+   "definition": "R tau-psi * C + R tau-psi * g + 16 LA tau-psi (C the median of the 3 registered control calls)"
+  },
+  {
+   "name": "rho_psi_i_p101s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`7.55·10^5`",
+   "claimed": 755000,
+   "recomputed": 754583.3125,
+   "rel_tol": 0.0006622516562913908,
+   "agrees": true,
+   "definition": "mean of the 16 <±psi> walks, E25 arithmetic, fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "dist_tau_psi_0gae_p101s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`8.73·10^5`",
+   "claimed": 873000,
+   "recomputed": 872957.74976851,
+   "rel_tol": 0.0005727376867124857,
+   "agrees": true,
+   "definition": "S_model / rho_psi_i"
+  },
+  {
+   "name": "dist_tau_psi_0.1gae_p101s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`9.35·10^5`",
+   "claimed": 935000,
+   "recomputed": 935035.0048748361,
+   "rel_tol": 0.0005347593588235295,
+   "agrees": true,
+   "definition": "(S_model + 0.1*97*R*E19 entries per residual) / (rho + 0.1*97*mean steps)"
+  },
+  {
+   "name": "dist_tau_psi_1gae_p101s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.32·10^6`",
+   "claimed": 1320000,
+   "recomputed": 1317521.964555479,
+   "rel_tol": 0.0037878787916666673,
+   "agrees": true,
+   "definition": "as above at 1 GAE"
+  },
+  {
+   "name": "s_model_tau_p101s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.62·10^12`",
+   "claimed": 1620000000000,
+   "recomputed": 1620093626131.9736,
+   "rel_tol": 0.0030864197561728396,
+   "agrees": true,
+   "definition": "the same model on the tau arm"
+  },
+  {
+   "name": "rho_neg_i_p101s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`8.24·10^5`",
+   "claimed": 824000,
+   "recomputed": 823757.5,
+   "rel_tol": 0.0006067961171116505,
+   "agrees": true,
+   "definition": "mean of the 16 negation walks, E25 arithmetic"
+  },
+  {
+   "name": "dist_tau_0gae_p101s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.97·10^6`",
+   "claimed": 1970000,
+   "recomputed": 1966711.8370782344,
+   "rel_tol": 0.002538071068527919,
+   "agrees": true,
+   "definition": "S_model tau / rho_neg_i"
+  },
+  {
+   "name": "e19_ratio_same_p_p101s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`6.09·10^6`",
+   "claimed": 6090000,
+   "recomputed": 6087201.042171732,
+   "rel_tol": 0.0008210180632183909,
+   "agrees": true,
+   "definition": "mean over E19's two seeds at p of total_muls / rho_matched_muls"
+  },
+  {
+   "name": "e19_over_e28_p101s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "6.97",
+   "claimed": 6.97,
+   "recomputed": 6.973076353106355,
+   "rel_tol": 0.0007173601154949786,
+   "agrees": true,
+   "definition": "E19 measured S/rho / E28 modelled S/rho (0 GAE)"
+  },
+  {
+   "name": "dist_tau_psi_iii_0gae_p101s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.27·10^6`",
+   "claimed": 1270000,
+   "recomputed": 1274283.4974889033,
+   "rel_tol": 0.003937007877952756,
+   "agrees": true,
+   "definition": "S_model / rho_psi_iii (E27's walk (iii): Karatsuba, batched)"
+  },
+  {
+   "name": "s_model_tau_psi_p149s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`3.18·10^12`",
+   "claimed": 3180000000000,
+   "recomputed": 3176640897136.3735,
+   "rel_tol": 0.0015723270455974844,
+   "agrees": true,
+   "definition": "R tau-psi * C + R tau-psi * g + 16 LA tau-psi (C the median of the 3 registered control calls)"
+  },
+  {
+   "name": "rho_psi_i_p149s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.18·10^6`",
+   "claimed": 1180000,
+   "recomputed": 1181886.6875,
+   "rel_tol": 0.004237288139830509,
+   "agrees": true,
+   "definition": "mean of the 16 <±psi> walks, E25 arithmetic, fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "dist_tau_psi_0gae_p149s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`2.69·10^6`",
+   "claimed": 2690000,
+   "recomputed": 2687771.1126908464,
+   "rel_tol": 0.00185873606133829,
+   "agrees": true,
+   "definition": "S_model / rho_psi_i"
+  },
+  {
+   "name": "dist_tau_psi_0.1gae_p149s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`2.86·10^6`",
+   "claimed": 2860000,
+   "recomputed": 2857176.71739314,
+   "rel_tol": 0.0017482517500000002,
+   "agrees": true,
+   "definition": "(S_model + 0.1*97*R*E19 entries per residual) / (rho + 0.1*97*mean steps)"
+  },
+  {
+   "name": "dist_tau_psi_1gae_p149s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`3.85·10^6`",
+   "claimed": 3850000,
+   "recomputed": 3853151.697925124,
+   "rel_tol": 0.0012987013,
+   "agrees": true,
+   "definition": "as above at 1 GAE"
+  },
+  {
+   "name": "s_model_tau_p149s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`5.91·10^12`",
+   "claimed": 5910000000000,
+   "recomputed": 5906954284753,
+   "rel_tol": 0.0008460236895093063,
+   "agrees": true,
+   "definition": "the same model on the tau arm"
+  },
+  {
+   "name": "rho_neg_i_p149s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.25·10^6`",
+   "claimed": 1250000,
+   "recomputed": 1245474.4375,
+   "rel_tol": 0.004000000004,
+   "agrees": true,
+   "definition": "mean of the 16 negation walks, E25 arithmetic"
+  },
+  {
+   "name": "dist_tau_0gae_p149s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`4.74·10^6`",
+   "claimed": 4740000,
+   "recomputed": 4742734.260054213,
+   "rel_tol": 0.0010548523217299578,
+   "agrees": true,
+   "definition": "S_model tau / rho_neg_i"
+  },
+  {
+   "name": "e19_ratio_same_p_p149s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`3.74·10^6`",
+   "claimed": 3740000,
+   "recomputed": 3744380.782975969,
+   "rel_tol": 0.0013368983970588235,
+   "agrees": true,
+   "definition": "mean over E19's two seeds at p of total_muls / rho_matched_muls"
+  },
+  {
+   "name": "e19_over_e28_p149s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "1.39",
+   "claimed": 1.39,
+   "recomputed": 1.3931174292692297,
+   "rel_tol": 0.003597122305755396,
+   "agrees": true,
+   "definition": "E19 measured S/rho / E28 modelled S/rho (0 GAE)"
+  },
+  {
+   "name": "dist_tau_psi_iii_0gae_p149s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`3.92·10^6`",
+   "claimed": 3920000,
+   "recomputed": 3919207.208031241,
+   "rel_tol": 0.0012755102053571428,
+   "agrees": true,
+   "definition": "S_model / rho_psi_iii (E27's walk (iii): Karatsuba, batched)"
+  },
+  {
+   "name": "s_model_tau_psi_p149s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`9.77·10^11`",
+   "claimed": 977000000000,
+   "recomputed": 976592774109.355,
+   "rel_tol": 0.0005117707272262027,
+   "agrees": true,
+   "definition": "R tau-psi * C + R tau-psi * g + 16 LA tau-psi (C the median of the 3 registered control calls)"
+  },
+  {
+   "name": "rho_psi_i_p149s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.08·10^6`",
+   "claimed": 1080000,
+   "recomputed": 1075339.8125,
+   "rel_tol": 0.004629629634259259,
+   "agrees": true,
+   "definition": "mean of the 16 <±psi> walks, E25 arithmetic, fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "dist_tau_psi_0gae_p149s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`9.08·10^5`",
+   "claimed": 908000,
+   "recomputed": 908171.3173428655,
+   "rel_tol": 0.0005506607935022028,
+   "agrees": true,
+   "definition": "S_model / rho_psi_i"
+  },
+  {
+   "name": "dist_tau_psi_0.1gae_p149s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`9.65·10^5`",
+   "claimed": 965000,
+   "recomputed": 964827.0573992548,
+   "rel_tol": 0.0005181347155440415,
+   "agrees": true,
+   "definition": "(S_model + 0.1*97*R*E19 entries per residual) / (rho + 0.1*97*mean steps)"
+  },
+  {
+   "name": "dist_tau_psi_1gae_p149s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.30·10^6`",
+   "claimed": 1300000,
+   "recomputed": 1301022.3055996208,
+   "rel_tol": 0.0038461538500000007,
+   "agrees": true,
+   "definition": "as above at 1 GAE"
+  },
+  {
+   "name": "s_model_tau_p149s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`2.20·10^12`",
+   "claimed": 2200000000000,
+   "recomputed": 2202946559242.6313,
+   "rel_tol": 0.002272727275,
+   "agrees": true,
+   "definition": "the same model on the tau arm"
+  },
+  {
+   "name": "rho_neg_i_p149s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.11·10^6`",
+   "claimed": 1110000,
+   "recomputed": 1112811.375,
+   "rel_tol": 0.00450450450900901,
+   "agrees": true,
+   "definition": "mean of the 16 negation walks, E25 arithmetic"
+  },
+  {
+   "name": "dist_tau_0gae_p149s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.98·10^6`",
+   "claimed": 1980000,
+   "recomputed": 1979622.6105638356,
+   "rel_tol": 0.002525252527777778,
+   "agrees": true,
+   "definition": "S_model tau / rho_neg_i"
+  },
+  {
+   "name": "e19_ratio_same_p_p149s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`3.74·10^6`",
+   "claimed": 3740000,
+   "recomputed": 3744380.782975969,
+   "rel_tol": 0.0013368983970588235,
+   "agrees": true,
+   "definition": "mean over E19's two seeds at p of total_muls / rho_matched_muls"
+  },
+  {
+   "name": "e19_over_e28_p149s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "4.12",
+   "claimed": 4.12,
+   "recomputed": 4.122989475081977,
+   "rel_tol": 0.001213592234223301,
+   "agrees": true,
+   "definition": "E19 measured S/rho / E28 modelled S/rho (0 GAE)"
+  },
+  {
+   "name": "dist_tau_psi_iii_0gae_p149s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.32·10^6`",
+   "claimed": 1320000,
+   "recomputed": 1324557.0594498457,
+   "rel_tol": 0.0037878787916666673,
+   "agrees": true,
+   "definition": "S_model / rho_psi_iii (E27's walk (iii): Karatsuba, batched)"
+  },
+  {
+   "name": "s_model_tau_psi_p197s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`6.55·10^12`",
+   "claimed": 6550000000000,
+   "recomputed": 6545244114236.906,
+   "rel_tol": 0.0007633587793893131,
+   "agrees": true,
+   "definition": "R tau-psi * C + R tau-psi * g + 16 LA tau-psi (C the median of the 3 registered control calls)"
+  },
+  {
+   "name": "rho_psi_i_p197s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`2.46·10^6`",
+   "claimed": 2460000,
+   "recomputed": 2456989.3125,
+   "rel_tol": 0.0020325203272357727,
+   "agrees": true,
+   "definition": "mean of the 16 <±psi> walks, E25 arithmetic, fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "dist_tau_psi_0gae_p197s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`2.66·10^6`",
+   "claimed": 2660000,
+   "recomputed": 2663928.6060129763,
+   "rel_tol": 0.00187969925,
+   "agrees": true,
+   "definition": "S_model / rho_psi_i"
+  },
+  {
+   "name": "dist_tau_psi_0.1gae_p197s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`2.81·10^6`",
+   "claimed": 2810000,
+   "recomputed": 2807684.885385786,
+   "rel_tol": 0.0017793594323843418,
+   "agrees": true,
+   "definition": "(S_model + 0.1*97*R*E19 entries per residual) / (rho + 0.1*97*mean steps)"
+  },
+  {
+   "name": "dist_tau_psi_1gae_p197s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`3.61·10^6`",
+   "claimed": 3610000,
+   "recomputed": 3610384.4125070795,
+   "rel_tol": 0.001385041552631579,
+   "agrees": true,
+   "definition": "as above at 1 GAE"
+  },
+  {
+   "name": "s_model_tau_p197s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.22·10^13`",
+   "claimed": 12200000000000,
+   "recomputed": 12162163368250.703,
+   "rel_tol": 0.0040983606598360665,
+   "agrees": true,
+   "definition": "the same model on the tau arm"
+  },
+  {
+   "name": "rho_neg_i_p197s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.99·10^6`",
+   "claimed": 1990000,
+   "recomputed": 1988728,
+   "rel_tol": 0.002512562816582915,
+   "agrees": true,
+   "definition": "mean of the 16 negation walks, E25 arithmetic"
+  },
+  {
+   "name": "dist_tau_0gae_p197s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`6.12·10^6`",
+   "claimed": 6120000,
+   "recomputed": 6115548.91782622,
+   "rel_tol": 0.0008169934648692811,
+   "agrees": true,
+   "definition": "S_model tau / rho_neg_i"
+  },
+  {
+   "name": "e19_ratio_same_p_p197s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`3.87·10^6`",
+   "claimed": 3870000,
+   "recomputed": 3866948.1907147905,
+   "rel_tol": 0.0012919896653746771,
+   "agrees": true,
+   "definition": "mean over E19's two seeds at p of total_muls / rho_matched_muls"
+  },
+  {
+   "name": "e19_over_e28_p197s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "1.45",
+   "claimed": 1.45,
+   "recomputed": 1.4515960307593747,
+   "rel_tol": 0.003448275865517242,
+   "agrees": true,
+   "definition": "E19 measured S/rho / E28 modelled S/rho (0 GAE)"
+  },
+  {
+   "name": "dist_tau_psi_iii_0gae_p197s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`3.88·10^6`",
+   "claimed": 3880000,
+   "recomputed": 3879817.9275798714,
+   "rel_tol": 0.001288659795103093,
+   "agrees": true,
+   "definition": "S_model / rho_psi_iii (E27's walk (iii): Karatsuba, batched)"
+  },
+  {
+   "name": "s_model_tau_psi_p197s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`3.05·10^12`",
+   "claimed": 3050000000000,
+   "recomputed": 3048948899372.0913,
+   "rel_tol": 0.0016393442639344264,
+   "agrees": true,
+   "definition": "R tau-psi * C + R tau-psi * g + 16 LA tau-psi (C the median of the 3 registered control calls)"
+  },
+  {
+   "name": "rho_psi_i_p197s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.82·10^6`",
+   "claimed": 1820000,
+   "recomputed": 1824552.25,
+   "rel_tol": 0.0027472527500000004,
+   "agrees": true,
+   "definition": "mean of the 16 <±psi> walks, E25 arithmetic, fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "dist_tau_psi_0gae_p197s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.67·10^6`",
+   "claimed": 1670000,
+   "recomputed": 1671066.9148401157,
+   "rel_tol": 0.0029940119790419165,
+   "agrees": true,
+   "definition": "S_model / rho_psi_i"
+  },
+  {
+   "name": "dist_tau_psi_0.1gae_p197s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.76·10^6`",
+   "claimed": 1760000,
+   "recomputed": 1762476.3811252029,
+   "rel_tol": 0.0028409090937500004,
+   "agrees": true,
+   "definition": "(S_model + 0.1*97*R*E19 entries per residual) / (rho + 0.1*97*mean steps)"
+  },
+  {
+   "name": "dist_tau_psi_1gae_p197s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`2.28·10^6`",
+   "claimed": 2280000,
+   "recomputed": 2282013.926091847,
+   "rel_tol": 0.0021929824583333335,
+   "agrees": true,
+   "definition": "as above at 1 GAE"
+  },
+  {
+   "name": "s_model_tau_p197s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`6.06·10^12`",
+   "claimed": 6060000000000,
+   "recomputed": 6062707101960.161,
+   "rel_tol": 0.0008250825090759077,
+   "agrees": true,
+   "definition": "the same model on the tau arm"
+  },
+  {
+   "name": "rho_neg_i_p197s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.88·10^6`",
+   "claimed": 1880000,
+   "recomputed": 1881355.5,
+   "rel_tol": 0.002659574470744681,
+   "agrees": true,
+   "definition": "mean of the 16 negation walks, E25 arithmetic"
+  },
+  {
+   "name": "dist_tau_0gae_p197s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`3.22·10^6`",
+   "claimed": 3220000,
+   "recomputed": 3222520.731440794,
+   "rel_tol": 0.0015527950326086957,
+   "agrees": true,
+   "definition": "S_model tau / rho_neg_i"
+  },
+  {
+   "name": "e19_ratio_same_p_p197s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`3.87·10^6`",
+   "claimed": 3870000,
+   "recomputed": 3866948.1907147905,
+   "rel_tol": 0.0012919896653746771,
+   "agrees": true,
+   "definition": "mean over E19's two seeds at p of total_muls / rho_matched_muls"
+  },
+  {
+   "name": "e19_over_e28_p197s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "2.31",
+   "claimed": 2.31,
+   "recomputed": 2.3140594529003478,
+   "rel_tol": 0.002164502166666667,
+   "agrees": true,
+   "definition": "E19 measured S/rho / E28 modelled S/rho (0 GAE)"
+  },
+  {
+   "name": "dist_tau_psi_iii_0gae_p197s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`2.43·10^6`",
+   "claimed": 2430000,
+   "recomputed": 2434868.880530179,
+   "rel_tol": 0.002057613170781893,
+   "agrees": true,
+   "definition": "S_model / rho_psi_iii (E27's walk (iii): Karatsuba, batched)"
+  },
+  {
+   "name": "s_model_tau_psi_p269s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`2.85·10^12`",
+   "claimed": 2850000000000,
+   "recomputed": 2853867085704.311,
+   "rel_tol": 0.0017543859666666669,
+   "agrees": true,
+   "definition": "R tau-psi * C + R tau-psi * g + 16 LA tau-psi (C the median of the 3 registered control calls)"
+  },
+  {
+   "name": "rho_psi_i_p269s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`4.08·10^6`",
+   "claimed": 4080000,
+   "recomputed": 4081584.625,
+   "rel_tol": 0.0012254901973039216,
+   "agrees": true,
+   "definition": "mean of the 16 <±psi> walks, E25 arithmetic, fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "dist_tau_psi_0gae_p269s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`6.99·10^5`",
+   "claimed": 699000,
+   "recomputed": 699205.6634631974,
+   "rel_tol": 0.0007153075829756795,
+   "agrees": true,
+   "definition": "S_model / rho_psi_i"
+  },
+  {
+   "name": "dist_tau_psi_0.1gae_p269s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`7.32·10^5`",
+   "claimed": 732000,
+   "recomputed": 731658.082662366,
+   "rel_tol": 0.0006830601099726776,
+   "agrees": true,
+   "definition": "(S_model + 0.1*97*R*E19 entries per residual) / (rho + 0.1*97*mean steps)"
+  },
+  {
+   "name": "dist_tau_psi_1gae_p269s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`9.09·10^5`",
+   "claimed": 909000,
+   "recomputed": 909484.9953591921,
+   "rel_tol": 0.000550055006050605,
+   "agrees": true,
+   "definition": "as above at 1 GAE"
+  },
+  {
+   "name": "s_model_tau_p269s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`5.02·10^12`",
+   "claimed": 5020000000000,
+   "recomputed": 5019415627193.195,
+   "rel_tol": 0.000996015937250996,
+   "agrees": true,
+   "definition": "the same model on the tau arm"
+  },
+  {
+   "name": "rho_neg_i_p269s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`2.54·10^6`",
+   "claimed": 2540000,
+   "recomputed": 2544330.4375,
+   "rel_tol": 0.001968503938976378,
+   "agrees": true,
+   "definition": "mean of the 16 negation walks, E25 arithmetic"
+  },
+  {
+   "name": "dist_tau_0gae_p269s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.97·10^6`",
+   "claimed": 1970000,
+   "recomputed": 1972784.491044786,
+   "rel_tol": 0.002538071068527919,
+   "agrees": true,
+   "definition": "S_model tau / rho_neg_i"
+  },
+  {
+   "name": "e19_ratio_same_p_p269s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`4.04·10^6`",
+   "claimed": 4040000,
+   "recomputed": 4041222.4409688385,
+   "rel_tol": 0.0012376237636138616,
+   "agrees": true,
+   "definition": "mean over E19's two seeds at p of total_muls / rho_matched_muls"
+  },
+  {
+   "name": "e19_over_e28_p269s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "5.78",
+   "claimed": 5.78,
+   "recomputed": 5.779733563587686,
+   "rel_tol": 0.0008650519039792388,
+   "agrees": true,
+   "definition": "E19 measured S/rho / E28 modelled S/rho (0 GAE)"
+  },
+  {
+   "name": "dist_tau_psi_iii_0gae_p269s1",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.02·10^6`",
+   "claimed": 1020000,
+   "recomputed": 1017861.5644084102,
+   "rel_tol": 0.004901960789215686,
+   "agrees": true,
+   "definition": "S_model / rho_psi_iii (E27's walk (iii): Karatsuba, batched)"
+  },
+  {
+   "name": "s_model_tau_psi_p269s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`7.43·10^12`",
+   "claimed": 7430000000000,
+   "recomputed": 7425156846227.337,
+   "rel_tol": 0.0006729475107671602,
+   "agrees": true,
+   "definition": "R tau-psi * C + R tau-psi * g + 16 LA tau-psi (C the median of the 3 registered control calls)"
+  },
+  {
+   "name": "rho_psi_i_p269s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`4.24·10^6`",
+   "claimed": 4240000,
+   "recomputed": 4243494.875,
+   "rel_tol": 0.0011792452841981132,
+   "agrees": true,
+   "definition": "mean of the 16 <±psi> walks, E25 arithmetic, fp_muls - verify_fp_muls"
+  },
+  {
+   "name": "dist_tau_psi_0gae_p269s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.75·10^6`",
+   "claimed": 1750000,
+   "recomputed": 1749773.9634308706,
+   "rel_tol": 0.00285714286,
+   "agrees": true,
+   "definition": "S_model / rho_psi_i"
+  },
+  {
+   "name": "dist_tau_psi_0.1gae_p269s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.84·10^6`",
+   "claimed": 1840000,
+   "recomputed": 1837688.1642542304,
+   "rel_tol": 0.0027173913070652174,
+   "agrees": true,
+   "definition": "(S_model + 0.1*97*R*E19 entries per residual) / (rho + 0.1*97*mean steps)"
+  },
+  {
+   "name": "dist_tau_psi_1gae_p269s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`2.32·10^6`",
+   "claimed": 2320000,
+   "recomputed": 2318718.1764278766,
+   "rel_tol": 0.002155172415948276,
+   "agrees": true,
+   "definition": "as above at 1 GAE"
+  },
+  {
+   "name": "s_model_tau_p269s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`1.19·10^13`",
+   "claimed": 11900000000000,
+   "recomputed": 11854781171989.113,
+   "rel_tol": 0.004201680676470588,
+   "agrees": true,
+   "definition": "the same model on the tau arm"
+  },
+  {
+   "name": "rho_neg_i_p269s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`3.08·10^6`",
+   "claimed": 3080000,
+   "recomputed": 3083719,
+   "rel_tol": 0.0016233766250000003,
+   "agrees": true,
+   "definition": "mean of the 16 negation walks, E25 arithmetic"
+  },
+  {
+   "name": "dist_tau_0gae_p269s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`3.84·10^6`",
+   "claimed": 3840000,
+   "recomputed": 3844313.042786685,
+   "rel_tol": 0.0013020833346354167,
+   "agrees": true,
+   "definition": "S_model tau / rho_neg_i"
+  },
+  {
+   "name": "e19_ratio_same_p_p269s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`4.04·10^6`",
+   "claimed": 4040000,
+   "recomputed": 4041222.4409688385,
+   "rel_tol": 0.0012376237636138616,
+   "agrees": true,
+   "definition": "mean over E19's two seeds at p of total_muls / rho_matched_muls"
+  },
+  {
+   "name": "e19_over_e28_p269s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "2.31",
+   "claimed": 2.31,
+   "recomputed": 2.3095682787764247,
+   "rel_tol": 0.002164502166666667,
+   "agrees": true,
+   "definition": "E19 measured S/rho / E28 modelled S/rho (0 GAE)"
+  },
+  {
+   "name": "dist_tau_psi_iii_0gae_p269s2",
+   "source": "experiments/33_tau_stage_a/tables.md, Stage A2",
+   "printed": "`2.55·10^6`",
+   "claimed": 2550000,
+   "recomputed": 2547147.9789812714,
+   "rel_tol": 0.0019607843156862746,
+   "agrees": true,
+   "definition": "S_model / rho_psi_iii (E27's walk (iii): Karatsuba, batched)"
+  },
+  {
+   "name": "dist_walk_i_0gae_min",
+   "source": "note §9.30 A2 (\"6.99·10⁵-1.74·10⁷x ... at 0 GAE\")",
+   "printed": "6.99·10⁵",
+   "claimed": 699000,
+   "recomputed": 699205.6634631974,
+   "rel_tol": 0.0007153075829756795,
+   "agrees": true,
+   "definition": "least modelled S/rho, tau-psi vs <±psi> walk (i)"
+  },
+  {
+   "name": "dist_walk_i_0gae_max",
+   "source": "note §9.30 A2",
+   "printed": "1.74·10⁷",
+   "claimed": 17400000,
+   "recomputed": 17428526.623431053,
+   "rel_tol": 0.002873563221264368,
+   "agrees": true,
+   "definition": "largest"
+  },
+  {
+   "name": "dist_walk_i_0.1gae_min",
+   "source": "note §9.30 A2 (\"7.32·10⁵-1.92·10⁷ at 0.1\")",
+   "printed": "7.32·10⁵",
+   "claimed": 732000,
+   "recomputed": 731658.082662366,
+   "rel_tol": 0.0006830601099726776,
+   "agrees": true,
+   "definition": "least at 0.1 GAE"
+  },
+  {
+   "name": "dist_walk_i_0.1gae_max",
+   "source": "note §9.30 A2",
+   "printed": "1.92·10⁷",
+   "claimed": 19200000,
+   "recomputed": 19152253.090705253,
+   "rel_tol": 0.0026041666692708334,
+   "agrees": true,
+   "definition": "largest at 0.1 GAE"
+  },
+  {
+   "name": "dist_walk_i_1gae_min",
+   "source": "note §9.30 A2 (\"9.09·10⁵-3.19·10⁷ at 1\")",
+   "printed": "9.09·10⁵",
+   "claimed": 909000,
+   "recomputed": 909484.9953591921,
+   "rel_tol": 0.000550055006050605,
+   "agrees": true,
+   "definition": "least at 1 GAE"
+  },
+  {
+   "name": "dist_walk_i_1gae_max",
+   "source": "note §9.30 A2",
+   "printed": "3.19·10⁷",
+   "claimed": 31900000,
+   "recomputed": 31854525.41770454,
+   "rel_tol": 0.0015673981206896553,
+   "agrees": true,
+   "definition": "largest at 1 GAE"
+  },
+  {
+   "name": "dist_walk_iii_0gae_min",
+   "source": "note §9.30 A2 (\"against E27's walk (iii) 1.02·10⁶-2.55·10⁷\"; distance remaining \">= 1.0·10⁶x\")",
+   "printed": "1.02·10⁶",
+   "claimed": 1020000,
+   "recomputed": 1017861.5644084102,
+   "rel_tol": 0.004901960789215686,
+   "agrees": true,
+   "definition": "least modelled S/rho against walk (iii)"
+  },
+  {
+   "name": "dist_walk_iii_0gae_max",
+   "source": "note §9.30 A2",
+   "printed": "2.55·10⁷",
+   "claimed": 25500000,
+   "recomputed": 25533982.63493002,
+   "rel_tol": 0.0019607843156862746,
+   "agrees": true,
+   "definition": "largest against walk (iii)"
+  },
+  {
+   "name": "tau_vs_taupsi_min",
+   "source": "note §9.30 A2 (\"1.30-2.82x below the tau arm against the negation walk\")",
+   "printed": "1.30",
+   "claimed": 1.3,
+   "recomputed": 1.304388138945303,
+   "rel_tol": 0.0038461538500000002,
+   "agrees": true,
+   "definition": "(S tau / rho neg) / (S tau-psi / rho psi), per curve"
+  },
+  {
+   "name": "tau_vs_taupsi_max",
+   "source": "note §9.30 A2",
+   "printed": "2.82",
+   "claimed": 2.82,
+   "recomputed": 2.8214652628434025,
+   "rel_tol": 0.001773049647163121,
+   "agrees": true,
+   "definition": "largest"
+  },
+  {
+   "name": "e19_over_e28_min",
+   "source": "note §9.30 A2 / G2.103 (\"0.45-6.98x per curve\")",
+   "printed": "0.45",
+   "claimed": 0.45,
+   "recomputed": 0.4542765186024819,
+   "rel_tol": 0.011111111122222224,
+   "agrees": true,
+   "definition": "least E19 S/rho_neg / E28 S_model/rho_psi"
+  },
+  {
+   "name": "e19_over_e28_max",
+   "source": "note §9.30 A2",
+   "printed": "6.98",
+   "claimed": 6.98,
+   "recomputed": 6.97714519605467,
+   "rel_tol": 0.0007163323789398282,
+   "agrees": true,
+   "definition": "largest"
+  },
+  {
+   "name": "e19_over_e28_by_size_p53",
+   "source": "note §9.30 A2 (\"by size (geometric mean of the two seeds) 1.77, 4.29, 2.39, 1.83, 3.65\")",
+   "printed": "1.77",
+   "claimed": 1.77,
+   "recomputed": 1.780323911384596,
+   "rel_tol": 0.0028248587598870057,
+   "agrees": false,
+   "definition": "geometric mean of the two seeds' E19/E28"
+  },
+  {
+   "name": "e19_over_e28_by_size_p101",
+   "source": "note §9.30 A2 (\"by size (geometric mean of the two seeds) 1.77, 4.29, 2.39, 1.83, 3.65\")",
+   "printed": "4.29",
+   "claimed": 4.29,
+   "recomputed": 4.287352472328573,
+   "rel_tol": 0.0011655011666666668,
+   "agrees": true,
+   "definition": "geometric mean of the two seeds' E19/E28"
+  },
+  {
+   "name": "e19_over_e28_by_size_p149",
+   "source": "note §9.30 A2 (\"by size (geometric mean of the two seeds) 1.77, 4.29, 2.39, 1.83, 3.65\")",
+   "printed": "2.39",
+   "claimed": 2.39,
+   "recomputed": 2.3966243966108443,
+   "rel_tol": 0.0020920502112970712,
+   "agrees": false,
+   "definition": "geometric mean of the two seeds' E19/E28"
+  },
+  {
+   "name": "e19_over_e28_by_size_p197",
+   "source": "note §9.30 A2 (\"by size (geometric mean of the two seeds) 1.77, 4.29, 2.39, 1.83, 3.65\")",
+   "printed": "1.83",
+   "claimed": 1.83,
+   "recomputed": 1.8327791783985747,
+   "rel_tol": 0.0027322404398907106,
+   "agrees": true,
+   "definition": "geometric mean of the two seeds' E19/E28"
+  },
+  {
+   "name": "e19_over_e28_by_size_p269",
+   "source": "note §9.30 A2 (\"by size (geometric mean of the two seeds) 1.77, 4.29, 2.39, 1.83, 3.65\")",
+   "printed": "3.65",
+   "claimed": 3.65,
+   "recomputed": 3.653585813723491,
+   "rel_tol": 0.0013698630150684934,
+   "agrees": true,
+   "definition": "geometric mean of the two seeds' E19/E28"
+  },
+  {
+   "name": "e28_best_over_e31a_worst_p101",
+   "source": "note §9.30 G2.103 (\">= 16.6x at p = 101, >= 52x at 197, >= 21x at 269, only 3.3x at 149\")",
+   "printed": "16.6",
+   "claimed": 16.6,
+   "recomputed": 16.570725198335573,
+   "rel_tol": 0.0030120481957831326,
+   "agrees": true,
+   "definition": "least E28 tau-psi S_model/rho (walk i) at p over the largest E31 solver-A S/rho at p (both arms, both seeds)"
+  },
+  {
+   "name": "e28_best_over_e31a_worst_p149",
+   "source": "note §9.30 G2.103 (\">= 16.6x at p = 101, >= 52x at 197, >= 21x at 269, only 3.3x at 149\")",
+   "printed": "3.3",
+   "claimed": 3.3,
+   "recomputed": 3.2518629240491106,
+   "rel_tol": 0.01515151516666667,
+   "agrees": true,
+   "definition": "least E28 tau-psi S_model/rho (walk i) at p over the largest E31 solver-A S/rho at p (both arms, both seeds)"
+  },
+  {
+   "name": "e31a_worst_p149",
+   "source": "note §9.30 G2.103 (\"E31 A's worst row at p = 149 (2.79·10⁵)\")",
+   "printed": "2.79·10⁵",
+   "claimed": 279000,
+   "recomputed": 279277.2446299923,
+   "rel_tol": 0.0017921146971326166,
+   "agrees": true,
+   "definition": "largest E31 solver-A S/rho at p = 149"
+  },
+  {
+   "name": "e28_best_over_e31a_worst_p197",
+   "source": "note §9.30 G2.103 (\">= 16.6x at p = 101, >= 52x at 197, >= 21x at 269, only 3.3x at 149\")",
+   "printed": "52",
+   "claimed": 52,
+   "recomputed": 51.569573470985176,
+   "rel_tol": 0.009615384625,
+   "agrees": true,
+   "definition": "least E28 tau-psi S_model/rho (walk i) at p over the largest E31 solver-A S/rho at p (both arms, both seeds)"
+  },
+  {
+   "name": "e28_best_over_e31a_worst_p269",
+   "source": "note §9.30 G2.103 (\">= 16.6x at p = 101, >= 52x at 197, >= 21x at 269, only 3.3x at 149\")",
+   "printed": "21",
+   "claimed": 21,
+   "recomputed": 21.248266966091318,
+   "rel_tol": 0.023809523833333335,
+   "agrees": true,
+   "definition": "least E28 tau-psi S_model/rho (walk i) at p over the largest E31 solver-A S/rho at p (both arms, both seeds)"
+  },
+  {
+   "name": "dist_remaining_model_walk_i",
+   "source": "note §9.30 (\"Distance remaining (model): >= 7·10⁵x the matched rho in E25's arithmetic\")",
+   "printed": "7·10⁵",
+   "claimed": 700000,
+   "recomputed": 699205.6634631974,
+   "rel_tol": 0.0714285715,
+   "agrees": true,
+   "definition": "least modelled S/rho against walk (i); printed with one significant figure, the exact least is 6.99·10⁵"
+  }
+ ],
+ "number_theory_stage0": [
+  {
+   "p": 53,
+   "n": 1971577,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 38,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": true,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": false
+  },
+  {
+   "p": 53,
+   "n": 1972441,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 70,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": true,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": false
+  },
+  {
+   "p": 53,
+   "n": 1972177,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 62,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 53,
+   "n": 1972441,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 70,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": true,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": false
+  },
+  {
+   "p": 53,
+   "n": 1971577,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 38,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": true,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": false
+  },
+  {
+   "p": 53,
+   "n": 1972441,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 70,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": true,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": false
+  },
+  {
+   "p": 53,
+   "n": 1972441,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 70,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": true,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": false
+  },
+  {
+   "p": 53,
+   "n": 1971241,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 10,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 101,
+   "n": 26010961,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 62,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 101,
+   "n": 26012209,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 94,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 101,
+   "n": 26014489,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 134,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 101,
+   "n": 26014489,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 134,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 101,
+   "n": 26010169,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 26,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 101,
+   "n": 26012209,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 94,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 101,
+   "n": 26017921,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 178,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 101,
+   "n": 26016241,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 158,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 149,
+   "n": 123211681,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 82,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 149,
+   "n": 123210049,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 14,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 149,
+   "n": 123212809,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 106,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 149,
+   "n": 123215329,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 146,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 149,
+   "n": 123214489,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 134,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 149,
+   "n": 123214489,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 134,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 149,
+   "n": 123212809,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 106,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 149,
+   "n": 123215329,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 146,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 197,
+   "n": 376516897,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 82,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 197,
+   "n": 376543777,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 338,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 197,
+   "n": 376536241,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 290,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 197,
+   "n": 376516897,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 82,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 197,
+   "n": 376520257,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 142,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 197,
+   "n": 376536241,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 290,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 197,
+   "n": 376524241,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 190,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 197,
+   "n": 376520257,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 142,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 269,
+   "n": 1309024441,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 358,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 269,
+   "n": 1308996121,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 122,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 269,
+   "n": 1308998641,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 158,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 269,
+   "n": 1308993241,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 58,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 269,
+   "n": 1309028881,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 382,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 269,
+   "n": 1309025161,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 362,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": true,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": false
+  },
+  {
+   "p": 269,
+   "n": 1309028881,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 382,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 269,
+   "n": 1309000321,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 178,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  }
+ ],
+ "number_theory_stage_a": [
+  {
+   "p": 53,
+   "n": 1971577,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 38,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": true,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": false
+  },
+  {
+   "p": 53,
+   "n": 1972441,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 70,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": true,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": false
+  },
+  {
+   "p": 101,
+   "n": 26010961,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 62,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 101,
+   "n": 26012209,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 94,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 149,
+   "n": 123211681,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 82,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 149,
+   "n": 123210049,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 14,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 197,
+   "n": 376516897,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 82,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 197,
+   "n": 376543777,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 338,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 269,
+   "n": 1309024441,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 358,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  },
+  {
+   "p": 269,
+   "n": 1308996121,
+   "h": 4,
+   "n_prime": true,
+   "hasse": true,
+   "gls_twist_order_shape": true,
+   "t2": 122,
+   "untwisted_base_change_shape": false,
+   "j_in_fp_possible": false,
+   "ordinary": true,
+   "cm_by_q_i_possible": false,
+   "cm_by_q_sqrt_minus3_possible": false,
+   "structure_ok": true,
+   "order_screen_rules_out_j_in_fp": true
+  }
+ ],
+ "stage_a": [
+  {
+   "p": 53,
+   "seed": 1,
+   "n": 1971577,
+   "log": 48026,
+   "cols_tau": 8,
+   "cols_tau_psi": 4,
+   "residuals_tau": 5519,
+   "residuals_tau_psi": 4055,
+   "residuals_ratio": 1.361035758323058,
+   "y_tau": 613.2222222222222,
+   "y_tau_psi": 811,
+   "decs_per_decomposed_target_median": 8,
+   "generation_muls_per_target": 6534.790948275862,
+   "la_ops_tau": 1563,
+   "la_ops_tau_psi": 435,
+   "control_c_median_uniform": 1364410169,
+   "control_c_mean_uniform": 1368226264.3333333,
+   "control_c_median_decomposed": 1371495972,
+   "rho_psi_i": 317451.375,
+   "rho_neg_i": 331237.8125,
+   "rho_psi_iii": 216680.25,
+   "rho_neg_iii": 226318.4375,
+   "steps_psi": 724.3125,
+   "steps_neg": 1147.625,
+   "e19_entries_per_residual_same_p": 17332803.72793354,
+   "e19_ratio_same_p_mean_of_seeds": 7917370.398862928
+  },
+  {
+   "p": 53,
+   "seed": 2,
+   "n": 1972441,
+   "log": 714931,
+   "cols_tau": 16,
+   "cols_tau_psi": 8,
+   "residuals_tau": 748,
+   "residuals_tau_psi": 292,
+   "residuals_ratio": 2.5616438356164384,
+   "y_tau": 44,
+   "y_tau_psi": 32.44444444444444,
+   "decs_per_decomposed_target_median": 8,
+   "generation_muls_per_target": 6522.032552083333,
+   "la_ops_tau": 3747,
+   "la_ops_tau_psi": 913,
+   "control_c_median_uniform": 1393112004,
+   "control_c_mean_uniform": 2004968495,
+   "control_c_median_decomposed": 1375149190,
+   "rho_psi_i": 358482.3125,
+   "rho_neg_i": 337323.75,
+   "rho_psi_iii": 244894.75,
+   "rho_neg_iii": 230514.8125,
+   "steps_psi": 1030.5,
+   "steps_neg": 1223.75,
+   "e19_entries_per_residual_same_p": 17332803.72793354,
+   "e19_ratio_same_p_mean_of_seeds": 7917370.398862928
+  },
+  {
+   "p": 101,
+   "seed": 1,
+   "n": 26010961,
+   "log": 17446142,
+   "cols_tau": 24,
+   "cols_tau_psi": 12,
+   "residuals_tau": 2273,
+   "residuals_tau_psi": 1261,
+   "residuals_ratio": 1.80253766851705,
+   "y_tau": 90.92,
+   "y_tau_psi": 97,
+   "decs_per_decomposed_target_median": 8,
+   "generation_muls_per_target": 7762.772569444444,
+   "la_ops_tau": 10509,
+   "la_ops_tau_psi": 3139,
+   "control_c_median_uniform": 1395578557,
+   "control_c_mean_uniform": 1435135292.6666667,
+   "control_c_median_decomposed": 1421761771,
+   "rho_psi_i": 762093.25,
+   "rho_neg_i": 684994.4375,
+   "rho_psi_iii": 522119.125,
+   "rho_neg_iii": 469639.0625,
+   "steps_psi": 3634.1875,
+   "steps_neg": 4280.375,
+   "e19_entries_per_residual_same_p": 17006465.29601057,
+   "e19_ratio_same_p_mean_of_seeds": 6087201.042171732
+  },
+  {
+   "p": 101,
+   "seed": 2,
+   "n": 26012209,
+   "log": 13900721,
+   "cols_tau": 32,
+   "cols_tau_psi": 16,
+   "residuals_tau": 1183,
+   "residuals_tau_psi": 481,
+   "residuals_ratio": 2.4594594594594597,
+   "y_tau": 35.84848484848485,
+   "y_tau_psi": 28.294117647058822,
+   "decs_per_decomposed_target_median": 8,
+   "generation_muls_per_target": 7781.394736842105,
+   "la_ops_tau": 17635,
+   "la_ops_tau_psi": 4923,
+   "control_c_median_uniform": 1369470954,
+   "control_c_mean_uniform": 1386792082.6666667,
+   "control_c_median_decomposed": 1396591975,
+   "rho_psi_i": 754583.3125,
+   "rho_neg_i": 823757.5,
+   "rho_psi_iii": 516933.125,
+   "rho_neg_iii": 565217.6875,
+   "steps_psi": 3583.8125,
+   "steps_neg": 5677.75,
+   "e19_entries_per_residual_same_p": 17006465.29601057,
+   "e19_ratio_same_p_mean_of_seeds": 6087201.042171732
+  },
+  {
+   "p": 149,
+   "seed": 1,
+   "n": 123211681,
+   "log": 72634176,
+   "cols_tau": 36,
+   "cols_tau_psi": 18,
+   "residuals_tau": 4288,
+   "residuals_tau_psi": 2306,
+   "residuals_ratio": 1.8594969644405899,
+   "y_tau": 115.89189189189189,
+   "y_tau_psi": 121.36842105263158,
+   "decs_per_decomposed_target_median": 8,
+   "generation_muls_per_target": 8508.530083955224,
+   "la_ops_tau": 21379,
+   "la_ops_tau_psi": 5467,
+   "control_c_median_uniform": 1377546049,
+   "control_c_mean_uniform": 1377308424,
+   "control_c_median_decomposed": 1403761706,
+   "rho_psi_i": 1181886.6875,
+   "rho_neg_i": 1245474.4375,
+   "rho_psi_iii": 810531.5,
+   "rho_neg_iii": 855428.5,
+   "steps_psi": 6467.625,
+   "steps_neg": 9638.875,
+   "e19_entries_per_residual_same_p": 16964528.231318437,
+   "e19_ratio_same_p_mean_of_seeds": 3744380.782975969
+  },
+  {
+   "p": 149,
+   "seed": 2,
+   "n": 123210049,
+   "log": 40183489,
+   "cols_tau": 48,
+   "cols_tau_psi": 24,
+   "residuals_tau": 1570,
+   "residuals_tau_psi": 696,
+   "residuals_ratio": 2.2557471264367814,
+   "y_tau": 32.04081632653061,
+   "y_tau_psi": 27.84,
+   "decs_per_decomposed_target_median": 8,
+   "generation_muls_per_target": 8510.145625,
+   "la_ops_tau": 36849,
+   "la_ops_tau_psi": 10369,
+   "control_c_median_uniform": 1403141789,
+   "control_c_mean_uniform": 1394629181.6666667,
+   "control_c_median_decomposed": 1483722562,
+   "rho_psi_i": 1075339.8125,
+   "rho_neg_i": 1112811.375,
+   "rho_psi_iii": 737297.625,
+   "rho_neg_iii": 764126.9375,
+   "steps_psi": 5727.9375,
+   "steps_neg": 8345.125,
+   "e19_entries_per_residual_same_p": 16964528.231318437,
+   "e19_ratio_same_p_mean_of_seeds": 3744380.782975969
+  },
+  {
+   "p": 197,
+   "seed": 1,
+   "n": 376516897,
+   "log": 370933638,
+   "cols_tau": 42,
+   "cols_tau_psi": 21,
+   "residuals_tau": 8804,
+   "residuals_tau_psi": 4738,
+   "residuals_ratio": 1.8581680033769523,
+   "y_tau": 204.74418604651163,
+   "y_tau_psi": 215.36363636363637,
+   "decs_per_decomposed_target_median": 8,
+   "generation_muls_per_target": 9024.974864130434,
+   "la_ops_tau": 28419,
+   "la_ops_tau_psi": 9210,
+   "control_c_median_uniform": 1381427017,
+   "control_c_mean_uniform": 1408023549.3333333,
+   "control_c_median_decomposed": 1407275662,
+   "rho_psi_i": 2456989.3125,
+   "rho_neg_i": 1988728,
+   "rho_psi_iii": 1686997.75,
+   "rho_neg_iii": 1367234.1875,
+   "steps_psi": 15497.25,
+   "steps_neg": 16885.75,
+   "e19_entries_per_residual_same_p": 16868837.81375398,
+   "e19_ratio_same_p_mean_of_seeds": 3866948.1907147905
+  },
+  {
+   "p": 197,
+   "seed": 2,
+   "n": 376543777,
+   "log": 189646397,
+   "cols_tau": 52,
+   "cols_tau_psi": 26,
+   "residuals_tau": 4307,
+   "residuals_tau_psi": 2166,
+   "residuals_ratio": 1.9884579870729455,
+   "y_tau": 81.26415094339623,
+   "y_tau_psi": 80.22222222222223,
+   "decs_per_decomposed_target_median": 8,
+   "generation_muls_per_target": 9031.640854779413,
+   "la_ops_tau": 45209,
+   "la_ops_tau_psi": 12966,
+   "control_c_median_uniform": 1407631177,
+   "control_c_mean_uniform": 1408101577.6666667,
+   "control_c_median_decomposed": 1460790175,
+   "rho_psi_i": 1824552.25,
+   "rho_neg_i": 1881355.5,
+   "rho_psi_iii": 1252202.5,
+   "rho_neg_iii": 1293320.75,
+   "steps_psi": 10975.4375,
+   "steps_neg": 15834.875,
+   "e19_entries_per_residual_same_p": 16868837.81375398,
+   "e19_ratio_same_p_mean_of_seeds": 3866948.1907147905
+  },
+  {
+   "p": 269,
+   "seed": 1,
+   "n": 1309024441,
+   "log": 747702865,
+   "cols_tau": 80,
+   "cols_tau_psi": 40,
+   "residuals_tau": 3493,
+   "residuals_tau_psi": 1986,
+   "residuals_ratio": 1.7588116817724069,
+   "y_tau": 43.123456790123456,
+   "y_tau_psi": 48.4390243902439,
+   "decs_per_decomposed_target_median": 8,
+   "generation_muls_per_target": 9614.43721590909,
+   "la_ops_tau": 109519,
+   "la_ops_tau_psi": 31757,
+   "control_c_median_uniform": 1436982620,
+   "control_c_mean_uniform": 1420197879.3333333,
+   "control_c_median_decomposed": 1438477845,
+   "rho_psi_i": 4081584.625,
+   "rho_neg_i": 2544330.4375,
+   "rho_psi_iii": 2803787.0625,
+   "rho_neg_iii": 1749827.8125,
+   "steps_psi": 27033.125,
+   "steps_neg": 22251.5,
+   "e19_entries_per_residual_same_p": 16835043.136197723,
+   "e19_ratio_same_p_mean_of_seeds": 4041222.4409688385
+  },
+  {
+   "p": 269,
+   "seed": 2,
+   "n": 1308996121,
+   "log": 1185793031,
+   "cols_tau": 66,
+   "cols_tau_psi": 33,
+   "residuals_tau": 8564,
+   "residuals_tau_psi": 5364,
+   "residuals_ratio": 1.5965697240865027,
+   "y_tau": 127.82089552238806,
+   "y_tau_psi": 157.76470588235293,
+   "decs_per_decomposed_target_median": 8,
+   "generation_muls_per_target": 9620.490555037313,
+   "la_ops_tau": 69441,
+   "la_ops_tau_psi": 21779,
+   "control_c_median_uniform": 1384247743,
+   "control_c_mean_uniform": 2057371584.6666667,
+   "control_c_median_decomposed": 1411332779,
+   "rho_psi_i": 4243494.875,
+   "rho_neg_i": 3083719,
+   "rho_psi_iii": 2915086.5625,
+   "rho_neg_iii": 2121313.75,
+   "steps_psi": 28211,
+   "steps_neg": 27651.5625,
+   "e19_entries_per_residual_same_p": 16835043.136197723,
+   "e19_ratio_same_p_mean_of_seeds": 4041222.4409688385
+  }
+ ],
+ "stage_a2_model": [
+  {
+   "p": 53,
+   "seed": 1,
+   "s_model_tau_psi": 5532709740832.295,
+   "s_model_tau": 7530215813230.243,
+   "dist_tau_psi_walk_i": [
+    17428526.623431053,
+    19152253.090705253,
+    31854525.41770454
+   ],
+   "dist_tau_negwalk_i_0gae": 22733563.406895895,
+   "dist_tau_psi_walk_iii_band": [
+    {
+     "weight": "0",
+     "ic": 5532709740832.295,
+     "rho": 216680.25,
+     "ic_over_rho": 25533982.63493002
+    },
+    {
+     "weight": "0.1",
+     "ic": 6214469576264.969,
+     "rho": 223706.08125,
+     "ic_over_rho": 27779618.424051978
+    },
+    {
+     "weight": "1",
+     "ic": 12350308095159.035,
+     "rho": 286938.5625,
+     "ic_over_rho": 43041646.224038064
+    }
+   ],
+   "e19_over_e28": 0.4542765186024819,
+   "sensitivity_c_mean_of_3_calls": 1368226264.3333333,
+   "sensitivity_dist_walk_i_0gae_with_c_mean": 17477271.93624208,
+   "sensitivity_e19_over_e28_with_c_mean": 0.4530095101653091
+  },
+  {
+   "p": 53,
+   "seed": 2,
+   "s_model_tau_psi": 406790624209.5052,
+   "s_model_tau": 1042052717424.349,
+   "dist_tau_psi_walk_i": [
+    1134757.866776217,
+    1237207.8019372565,
+    1958213.4324035447
+   ],
+   "dist_tau_negwalk_i_0gae": 3089176.8439795566,
+   "dist_tau_psi_walk_iii_band": [
+    {
+     "weight": "0",
+     "ic": 406790624209.5052,
+     "rho": 244894.75,
+     "ic_over_rho": 1661083.48263695
+    },
+    {
+     "weight": "0.1",
+     "ic": 455884057488.50415,
+     "rho": 254890.6,
+     "ic_over_rho": 1788547.939737692
+    },
+    {
+     "weight": "1",
+     "ic": 897724956999.4949,
+     "rho": 344853.25,
+     "ic_over_rho": 2603208.631496136
+    }
+   ],
+   "e19_over_e28": 6.97714519605467,
+   "sensitivity_c_mean_of_3_calls": 2004968495,
+   "sensitivity_dist_walk_i_0gae_with_c_mean": 1633142.5545061035,
+   "sensitivity_e19_over_e28_with_c_mean": 4.847935887175083
+  },
+  {
+   "p": 101,
+   "seed": 1,
+   "s_model_tau_psi": 1759834399457.21,
+   "s_model_tau": 3172167872987.0503,
+   "dist_tau_psi_walk_i": [
+    2309211.3720430015,
+    2468006.5780111314,
+    3445165.7108540633
+   ],
+   "dist_tau_negwalk_i_0gae": 4630939.609618437,
+   "dist_tau_psi_walk_iii_band": [
+    {
+     "weight": "0",
+     "ic": 1759834399457.21,
+     "rho": 522119.125,
+     "ic_over_rho": 3370561.075419733
+    },
+    {
+     "weight": "0.1",
+     "ic": 1967852381018.4224,
+     "rho": 557370.74375,
+     "ic_over_rho": 3530598.624137818
+    },
+    {
+     "weight": "1",
+     "ic": 3840014215069.335,
+     "rho": 874635.3125,
+     "ic_over_rho": 4390417.537674407
+    }
+   ],
+   "e19_over_e28": 2.636051907533382,
+   "sensitivity_c_mean_of_3_calls": 1435135292.6666667,
+   "sensitivity_dist_walk_i_0gae_with_c_mean": 2374664.049488533,
+   "sensitivity_e19_over_e28_with_c_mean": 2.5633946172229387
+  },
+  {
+   "p": 101,
+   "seed": 2,
+   "s_model_tau_psi": 658719350492.8684,
+   "s_model_tau": 1620093626131.9736,
+   "dist_tau_psi_walk_i": [
+    872957.74976851,
+    935035.0048748361,
+    1317521.964555479
+   ],
+   "dist_tau_negwalk_i_0gae": 1966711.8370782344,
+   "dist_tau_psi_walk_iii_band": [
+    {
+     "weight": "0",
+     "ic": 658719350492.8684,
+     "rho": 516933.125,
+     "ic_over_rho": 1274283.4974889033
+    },
+    {
+     "weight": "0.1",
+     "ic": 738066415624.465,
+     "rho": 551696.10625,
+     "ic_over_rho": 1337813.349166564
+    },
+    {
+     "weight": "1",
+     "ic": 1452190001808.8335,
+     "rho": 864562.9375,
+     "ic_over_rho": 1679681.072158883
+    }
+   ],
+   "e19_over_e28": 6.973076353106355,
+   "sensitivity_c_mean_of_3_calls": 1386792082.6666667,
+   "sensitivity_dist_walk_i_0gae_with_c_mean": 883998.8936033291,
+   "sensitivity_e19_over_e28_with_c_mean": 6.885982647963812
+  },
+  {
+   "p": 149,
+   "seed": 1,
+   "s_model_tau_psi": 3176640897136.3735,
+   "s_model_tau": 5906954284753,
+   "dist_tau_psi_walk_i": [
+    2687771.1126908464,
+    2857176.71739314,
+    3853151.697925124
+   ],
+   "dist_tau_negwalk_i_0gae": 4742734.260054213,
+   "dist_tau_psi_walk_iii_band": [
+    {
+     "weight": "0",
+     "ic": 3176640897136.3735,
+     "rho": 810531.5,
+     "ic_over_rho": 3919207.208031241
+    },
+    {
+     "weight": "0.1",
+     "ic": 3556106857520.1504,
+     "rho": 873267.4625,
+     "ic_over_rho": 4072185.224146205
+    },
+    {
+     "weight": "1",
+     "ic": 6971300500974.145,
+     "rho": 1437891.125,
+     "ic_over_rho": 4848281.194429199
+    }
+   ],
+   "e19_over_e28": 1.3931174292692297,
+   "sensitivity_c_mean_of_3_calls": 1377308424,
+   "sensitivity_dist_walk_i_0gae_with_c_mean": 2687307.4783544964,
+   "sensitivity_e19_over_e28_with_c_mean": 1.3933577802822712
+  },
+  {
+   "p": 149,
+   "seed": 2,
+   "s_model_tau_psi": 976592774109.355,
+   "s_model_tau": 2202946559242.6313,
+   "dist_tau_psi_walk_i": [
+    908171.3173428655,
+    964827.0573992548,
+    1301022.3055996208
+   ],
+   "dist_tau_negwalk_i_0gae": 1979622.6105638356,
+   "dist_tau_psi_walk_iii_band": [
+    {
+     "weight": "0",
+     "ic": 976592774109.355,
+     "rho": 737297.625,
+     "ic_over_rho": 1324557.0594498457
+    },
+    {
+     "weight": "0.1",
+     "ic": 1091123697104.6321,
+     "rho": 792858.61875,
+     "ic_over_rho": 1376189.4886441026
+    },
+    {
+     "weight": "1",
+     "ic": 2121902004062.1252,
+     "rho": 1292907.5625,
+     "ic_over_rho": 1641186.1648942325
+    }
+   ],
+   "e19_over_e28": 4.122989475081977,
+   "sensitivity_c_mean_of_3_calls": 1394629181.6666667,
+   "sensitivity_dist_walk_i_0gae_with_c_mean": 902661.6406479928,
+   "sensitivity_e19_over_e28_with_c_mean": 4.148155426531689
+  },
+  {
+   "p": 197,
+   "seed": 1,
+   "s_model_tau_psi": 6545244114236.906,
+   "s_model_tau": 12162163368250.703,
+   "dist_tau_psi_walk_i": [
+    2663928.6060129763,
+    2807684.885385786,
+    3610384.4125070795
+   ],
+   "dist_tau_negwalk_i_0gae": 6115548.91782622,
+   "dist_tau_psi_walk_iii_band": [
+    {
+     "weight": "0",
+     "ic": 6545244114236.906,
+     "rho": 1686997.75,
+     "ic_over_rho": 3879817.9275798714
+    },
+    {
+     "weight": "0.1",
+     "ic": 7320512283784.1,
+     "rho": 1837321.075,
+     "ic_over_rho": 3984340.235026205
+    },
+    {
+     "weight": "1",
+     "ic": 14297925809708.844,
+     "rho": 3190231,
+     "ic_over_rho": 4481783.861328174
+    }
+   ],
+   "e19_over_e28": 1.4515960307593747,
+   "sensitivity_c_mean_of_3_calls": 1408023549.3333333,
+   "sensitivity_dist_walk_i_0gae_with_c_mean": 2715216.729064319,
+   "sensitivity_e19_over_e28_with_c_mean": 1.4241766225591008
+  },
+  {
+   "p": 197,
+   "seed": 2,
+   "s_model_tau_psi": 3048948899372.0913,
+   "s_model_tau": 6062707101960.161,
+   "dist_tau_psi_walk_i": [
+    1671066.9148401157,
+    1762476.3811252029,
+    2282013.926091847
+   ],
+   "dist_tau_negwalk_i_0gae": 3222520.731440794,
+   "dist_tau_psi_walk_iii_band": [
+    {
+     "weight": "0",
+     "ic": 3048948899372.0913,
+     "rho": 1252202.5,
+     "ic_over_rho": 2434868.880530179
+    },
+    {
+     "weight": "0.1",
+     "ic": 3403366555606.625,
+     "rho": 1358664.24375,
+     "ic_over_rho": 2504935.69052286
+    },
+    {
+     "weight": "1",
+     "ic": 6593125461717.43,
+     "rho": 2316819.9375,
+     "ic_over_rho": 2845765.1606847974
+    }
+   ],
+   "e19_over_e28": 2.3140594529003478,
+   "sensitivity_c_mean_of_3_calls": 1408101577.6666667,
+   "sensitivity_dist_walk_i_0gae_with_c_mean": 1671625.3465561708,
+   "sensitivity_e19_over_e28_with_c_mean": 2.3132864063597465
+  },
+  {
+   "p": 269,
+   "seed": 1,
+   "s_model_tau_psi": 2853867085704.311,
+   "s_model_tau": 5019415627193.195,
+   "dist_tau_psi_walk_i": [
+    699205.6634631974,
+    731658.082662366,
+    909484.9953591921
+   ],
+   "dist_tau_negwalk_i_0gae": 1972784.491044786,
+   "dist_tau_psi_walk_iii_band": [
+    {
+     "weight": "0",
+     "ic": 2853867085704.311,
+     "rho": 2803787.0625,
+     "ic_over_rho": 1017861.5644084102
+    },
+    {
+     "weight": "0.1",
+     "ic": 3178180723688.6514,
+     "rho": 3066008.375,
+     "ic_over_rho": 1036585.7933080993
+    },
+    {
+     "weight": "1",
+     "ic": 6097003465547.713,
+     "rho": 5426000.1875,
+     "ic_over_rho": 1123664.4406304148
+    }
+   ],
+   "e19_over_e28": 5.779733563587686,
+   "sensitivity_c_mean_of_3_calls": 1420197879.3333333,
+   "sensitivity_dist_walk_i_0gae_with_c_mean": 691038.6160963919,
+   "sensitivity_e19_over_e28_with_c_mean": 5.848041407291101
+  },
+  {
+   "p": 269,
+   "seed": 2,
+   "s_model_tau_psi": 7425156846227.337,
+   "s_model_tau": 11854781171989.113,
+   "dist_tau_psi_walk_i": [
+    1749773.9634308706,
+    1837688.1642542304,
+    2318718.1764278766
+   ],
+   "dist_tau_negwalk_i_0gae": 3844313.042786685,
+   "dist_tau_psi_walk_iii_band": [
+    {
+     "weight": "0",
+     "ic": 7425156846227.337,
+     "rho": 2915086.5625,
+     "ic_over_rho": 2547147.9789812714
+    },
+    {
+     "weight": "0.1",
+     "ic": 8301097608638.214,
+     "rho": 3188733.2625,
+     "ic_over_rho": 2603258.7003310733
+    },
+    {
+     "weight": "1",
+     "ic": 16184564470336.102,
+     "rho": 5651553.5625,
+     "ic_over_rho": 2863737.252306383
+    }
+   ],
+   "e19_over_e28": 2.3095682787764247,
+   "sensitivity_c_mean_of_3_calls": 2057371584.6666667,
+   "sensitivity_dist_walk_i_0gae_with_c_mean": 2600637.7898423495,
+   "sensitivity_e19_over_e28_with_c_mean": 1.553935137277928
+  }
+ ],
+ "e19_by_size_over_e28": [
+  {
+   "p": 53,
+   "geometric_mean": 1.780323911384596
+  },
+  {
+   "p": 101,
+   "geometric_mean": 4.287352472328573
+  },
+  {
+   "p": 149,
+   "geometric_mean": 2.3966243966108443
+  },
+  {
+   "p": 197,
+   "geometric_mean": 1.8327791783985747
+  },
+  {
+   "p": 269,
+   "geometric_mean": 3.653585813723491
+  }
+ ],
+ "e31_comparison": [
+  {
+   "p": 101,
+   "e28_best_row": 872957.74976851,
+   "e31_a_worst_row": 52680.72092923207,
+   "factor": 16.570725198335573,
+   "ten_x_holds": true
+  },
+  {
+   "p": 149,
+   "e28_best_row": 908171.3173428655,
+   "e31_a_worst_row": 279277.2446299923,
+   "factor": 3.2518629240491106,
+   "ten_x_holds": false
+  },
+  {
+   "p": 197,
+   "e28_best_row": 1671066.9148401157,
+   "e31_a_worst_row": 32404.125191772542,
+   "factor": 51.569573470985176,
+   "ten_x_holds": true
+  },
+  {
+   "p": 269,
+   "e28_best_row": 699205.6634631974,
+   "e31_a_worst_row": 32906.47960038401,
+   "factor": 21.248266966091318,
+   "ten_x_holds": true
+  }
+ ],
+ "medians": {
+  "e28_tau_psi_walk_i_0gae": 1710420.4391354932,
+  "e31_a_all_20_rows": 21495.810972001615,
+  "e31_a_matched_sizes_16_rows": 25874.963527630425,
+  "ratio_all": 79.56994231868354,
+  "ratio_matched_sizes": 66.10329855379433
+ },
+ "model_fidelity_e19": [
+  {
+   "p": 53,
+   "seed": 1,
+   "measured_over_model_median_c": 1.170197507513482,
+   "measured_over_model_mean_c": 1.0000083777736652
+  },
+  {
+   "p": 53,
+   "seed": 2,
+   "measured_over_model_median_c": 1.1358065039701257,
+   "measured_over_model_mean_c": 1.0000066166365815
+  },
+  {
+   "p": 101,
+   "seed": 1,
+   "measured_over_model_median_c": 1.0745375083018556,
+   "measured_over_model_mean_c": 1.000005808768863
+  },
+  {
+   "p": 101,
+   "seed": 2,
+   "measured_over_model_median_c": 1.065635849563093,
+   "measured_over_model_mean_c": 1.0000056840871347
+  },
+  {
+   "p": 149,
+   "seed": 1,
+   "measured_over_model_median_c": 1.0639810356466113,
+   "measured_over_model_mean_c": 1.0000050501643543
+  },
+  {
+   "p": 149,
+   "seed": 2,
+   "measured_over_model_median_c": 1.067909105696198,
+   "measured_over_model_mean_c": 1.0000063200007503
+  },
+  {
+   "p": 197,
+   "seed": 1,
+   "measured_over_model_median_c": 1.0428618202429256,
+   "measured_over_model_mean_c": 1.0000031881884504
+  },
+  {
+   "p": 197,
+   "seed": 2,
+   "measured_over_model_median_c": 1.037085600680248,
+   "measured_over_model_mean_c": 1.0000048985595542
+  },
+  {
+   "p": 269,
+   "seed": 1,
+   "measured_over_model_median_c": 1.0324094879214583,
+   "measured_over_model_mean_c": 1.000002209753305
+  },
+  {
+   "p": 269,
+   "seed": 2,
+   "measured_over_model_median_c": 1.0289930939483265,
+   "measured_over_model_mean_c": 1.000003959362946
+  }
+ ],
+ "controls_g2_102_within30": [
+  {
+   "p": 53,
+   "seed": 1,
+   "uniform_over_e19": 0.9942048331295915,
+   "decomposed_over_e19": 0.9993680455925764
+  },
+  {
+   "p": 53,
+   "seed": 2,
+   "uniform_over_e19": 1.0151190008227289,
+   "decomposed_over_e19": 1.0020300361542107
+  },
+  {
+   "p": 101,
+   "seed": 1,
+   "uniform_over_e19": 1.000958992405254,
+   "decomposed_over_e19": 1.0197385325263846
+  },
+  {
+   "p": 101,
+   "seed": 2,
+   "uniform_over_e19": 0.9822336832050522,
+   "decomposed_over_e19": 1.0016858521402916
+  },
+  {
+   "p": 149,
+   "seed": 1,
+   "uniform_over_e19": 0.9813178549530217,
+   "decomposed_over_e19": 0.9999930145326955
+  },
+  {
+   "p": 149,
+   "seed": 2,
+   "uniform_over_e19": 0.9995514063402648,
+   "decomposed_over_e19": 1.0569544611188832
+  },
+  {
+   "p": 197,
+   "seed": 1,
+   "uniform_over_e19": 0.9812570241097693,
+   "decomposed_over_e19": 0.9996178670336702
+  },
+  {
+   "p": 197,
+   "seed": 2,
+   "uniform_over_e19": 0.9998703969079475,
+   "decomposed_over_e19": 1.037630365071461
+  },
+  {
+   "p": 269,
+   "seed": 1,
+   "uniform_over_e19": 1.0181350228497168,
+   "decomposed_over_e19": 1.0191944239296966
+  },
+  {
+   "p": 269,
+   "seed": 2,
+   "uniform_over_e19": 0.9807711574472444,
+   "decomposed_over_e19": 0.9999615243750959
+  }
+ ],
+ "gae_band_walk_iii": {
+  "definition": "IC: S_model(w) = R C + R g + 16 LA + w * 97 * R * (E19's Macaulay entries per residual at the same p), the producer's band, one native operation per Macaulay entry; rho: E27's <±psi> walk (iii) (Karatsuba products, batched inversions, the cheapest arithmetic built; the walk is the same walk as (i), checked in A.6) + w * 97 * mean steps. GAE = 97 F_p multiplications (E25's affine addition), as E27's validation. Medians over the 10 curves.",
+  "weights": [
+   {
+    "weight": "0",
+    "ic_median": 2951407992538.201,
+    "rho_median": 773914.5625,
+    "ic_over_rho_min": 1017861.5644084102,
+    "ic_over_rho_max": 25533982.63493002,
+    "rho_below_ic_on_all_10_rows": true
+   },
+   {
+    "weight": "0.1",
+    "ic_median": 3290773639647.638,
+    "rho_median": 833063.040625,
+    "ic_over_rho_min": 1036585.7933080993,
+    "ic_over_rho_max": 27779618.424051978,
+    "rho_below_ic_on_all_10_rows": true
+   },
+   {
+    "weight": "1",
+    "ic_median": 6345064463632.571,
+    "rho_median": 1365399.34375,
+    "ic_over_rho_min": 1123664.4406304148,
+    "ic_over_rho_max": 43041646.224038064,
+    "rho_below_ic_on_all_10_rows": true
+   }
+  ],
+  "order_holds_across_band": true
+ },
+ "measured_vs_modelled": {
+  "measured": "Stage 0 (40 curves: psi, lambda, T and line checks, h, density, columns); Stage A (10 curves: columns, residuals to the logarithm R, relations, y, decompositions per target, generation cost g, LA, both logarithms, 640 walks in two arithmetics); the registered solve-cost control (30 weighted-D4 calls on uniform targets: C, agreement 0 = 0) and the supplementary control (30 calls on decomposable targets: C, exact agreement). All replayed.",
+  "modelled": "Stage A2: S_model = R C + R g + 16 LA for each arm, S_model / rho at 0, 0.1 and 1 GAE (IC native operations borrowed from E19's Macaulay entries per residual), E19/E28, and every comparison with E31 A built on them (G2.103). Recomputed from the measured inputs above, not replayed: no end-to-end run with the D4 solve exists."
+ },
+ "errata": [
+  {
+   "id": "E1",
+   "claim": "§9.30 A2: \"by size (geometric mean of the two seeds) 1.77, 4.29, 2.39, 1.83, 3.65\"",
+   "recomputed": "geometric mean of the two seeds' E19/E28: 1.7803, 4.2874, 2.3966, 1.8328, 3.6536; the printed figures are the geometric means of the 2-decimal per-curve values (1.7723, 4.2896, 2.3931, 1.8302, 3.6540)",
+   "effect": "none on any verdict: p = 53 reads 1.78 and p = 149 reads 2.40; both stay inside [1.4, 4.0], and p = 101 stays above 4.0 (4.287)"
+  },
+  {
+   "id": "E2",
+   "claim": "§9.30 G2.103: \">= 52x at 197\"",
+   "recomputed": "51.5696",
+   "effect": "none: the >= 10x clause holds at p = 197 either way; the bound should read >= 51.6x"
+  },
+  {
+   "id": "E3",
+   "claim": "§9.30: \"Distance remaining (model): >= 7·10⁵x the matched rho in E25's arithmetic\"",
+   "recomputed": "least modelled S/rho against walk (i) = 6.9921e5",
+   "effect": "rounding only: the least row is 6.99·10⁵, so >= 7·10⁵ is not strictly true; >= 1.0·10⁶ against walk (iii) holds (1.018·10⁶)"
+  },
+  {
+   "id": "E4",
+   "claim": "§9.30 G2.103: \"holds ... by a factor ≈ 100 between medians\"",
+   "recomputed": "median E28 tau-psi S_model/rho (walk i) 1.7104e6; against the median of all 20 E31 solver-A rows 79.6x, of the 16 at matched sizes 66.1x, of arm A 59.9x, of arm B 111.5x",
+   "effect": "none on a verdict; \"≈ 100\" holds as an order of magnitude (60-112 by pooling); the note does not say which rows the median is over"
+  },
+  {
+   "id": "E5",
+   "claim": "§9.26/§9.30 Stage A2: S_model prices every residual at the control's median call C",
+   "recomputed": "E19's measured S is priced at the mean call (reruns and high-degree tails); the same formula with the median call under-prices E19's own measured rows by 1.029-1.170x (with the mean call 1.000-1.000x). With E28's 3-call mean instead of the median, E19/E28 by size becomes 1.482, 4.201, 2.404, 1.815, 3.015 (p = 101: 4.201 against 4.287)",
+   "effect": "a bias of the registered model in E28's favour (its S_model is optimistic), not an arithmetic error: G2.103's per-curve and p = 101 falsifications and the >= 10x failure at p = 149 stand under either pricing; the registered quantity (median) is what is verified"
+  }
+ ],
+ "verdicts_recomputed": [
+  {
+   "id": "G2.100",
+   "note": "holds",
+   "recomputed": "40 curves, every psi/lambda/T/line check true, h = 4 on 40, density pooled 0.500-0.521 in [0.3, 0.7], 2/4 abscissae (4/8 points with ±) a column; own arithmetic confirms j in F_p2 \\ F_p on all 40"
+  },
+  {
+   "id": "G2.101",
+   "note": "holds (pooled, as registered)",
+   "recomputed": "cols 2.00 on 10/10; decompositions per decomposed target median 8 on 10/10; y ratio pooled 1.1188 in [0.8, 1.25]; residuals ratio pooled 1.7455 in [1.6, 2.4] (per curve 1.361-2.562); logs on 20/20 arms"
+  },
+  {
+   "id": "G2.102",
+   "note": "holds, with the disclosed deviation",
+   "recomputed": "registered: 30/30 calls solved, 0 = 0 decompositions (negative control only); supplementary: 30/30 solved with the oracle's exact set; C / C_E19 in [0.981, 1.057] within ±30 %"
+  },
+  {
+   "id": "G2.103",
+   "note": "falsified",
+   "recomputed": "per curve E19/E28 0.454-6.977 (outside [1.4, 4.0] on several curves); by size p = 101 4.287 > 4.0; best E28 row / worst E31 A row at p = 149 = 3.252 < 10"
+  }
+ ],
+ "registered_control_deviation": {
+  "disclosed": true,
+  "where": "§9.30 \"One deviation, recorded\" and G2.102's verdict (\"holds, with the deviation above\"); tables.md lists both controls side by side; the supplementary control's code (--stage c) is in 0e4fccce1, committed after the registered run (dfd1e7a39) and before its own run",
+  "why_the_registered_control_was_vacuous": "3 uniform targets per curve against decomposition rates of targets_decomposed / residuals: the expected number of decomposable targets in the 30 registered draws was 0.447, so 0 was the likely outcome by design; the registered check was a negative control (30/30 calls returned no decomposition where the oracle had none), not an agreement test",
+  "adequacy": "Adequate for G2.102's agreement clause: 30 calls on targets the exact oracle decomposes (3 per curve, all 10 curves, families of 2 and 8 decompositions), every one solved and returning exactly the oracle's set, plus the registered 30 as negative controls. Selecting targets by the oracle does not bias an exact-set comparison. Limits: 3 positive calls per curve is a small sample, so it shows agreement on these 30 calls, not in general; the model's C comes from the registered (uniform) calls, as registered, and the decomposable-target calls cost 1.37-1.48·10⁹, slightly more",
+  "verdict": "disclosed and adequate, with the sample-size caveat"
+ },
+ "cost_model_checks": [
+  {
+   "check": "unit declared",
+   "holds": true,
+   "detail": "F_p multiplications; LA as mod-n multiplications at 16 F_p multiplications each; generation measured per target; GAE = 97"
+  },
+  {
+   "check": "optimistic assumptions flagged",
+   "holds": false,
+   "detail": "the median-call pricing is not flagged as optimistic in §9.30 (E5)"
+  },
+  {
+   "check": "total = per-attempt cost x attempts",
+   "holds": true,
+   "detail": "attempts are the measured residuals to the log R (not an inverse probability), so no success probability is assumed; the per-attempt cost is the median, see E5"
+  },
+  {
+   "check": "memory reported alongside time",
+   "holds": false,
+   "detail": "not reported; op counts only"
+  }
+ ],
+ "pre_registration": "§9.26 committed 4845b32c7 (2026-10-30T18:44:54Z) before E28's code 789dc2ff6 (18:58:13Z) and records dfd1e7a39 (21:38:33Z); its text at HEAD f23c53871 equals the registered text (git diff of the section: one trailing blank line)",
+ "limitations": [
+  "S is a model (Stage A2): no end-to-end run with the D4 solve exists (no Stage B, by registration). The validation gate cannot show a modelled S as a measured row; this report's status is fail for that reason alone.",
+  "The model prices every residual at the median of 3 control calls; E19's measured S is priced at the mean call. On E19's own rows the median-based formula under-prices the measured S (E5), so S_model is optimistic for E28.",
+  "The band's native operations for the IC side are E19's Macaulay entries per residual at the same p (borrowed: E28 ran no Macaulay solve on its residuals); the rho side's are the walk's steps. GAE = 97 F_p multiplications.",
+  "The comparison with E19 is across different curves at the same p (E19's curves vs E28's GLS twists), as registered.",
+  "Operation counts only. The replay ran locally in the validator's 4-vCPU container, not on isolab-eks; no wall time is compared or claimed.",
+  "Memory is not reported by the producer or recomputed here (op-count study)."
+ ],
+ "comparator_controls": {
+  "all_hold": true,
+  "cases": [
+   {
+    "control": "record against itself",
+    "fields_compared": 777,
+    "mismatches": 0,
+    "expected": "0 mismatches",
+    "holds": true
+   },
+   {
+    "control": "residuals_at_solve 5519 -> 5520",
+    "mismatches": 1,
+    "expected": "exactly 1 mismatch",
+    "holds": true
+   },
+   {
+    "control": "generation_muls_per_target last digit",
+    "mismatches": 1,
+    "expected": "exactly 1 mismatch",
+    "holds": true
+   },
+   {
+    "control": "visit_digest + 1 (beyond f64 precision)",
+    "mismatches": 1,
+    "expected": "exactly 1 mismatch",
+    "holds": true
+   },
+   {
+    "control": "tau.correct true -> false",
+    "mismatches": 1,
+    "expected": "exactly 1 mismatch",
+    "holds": true
+   }
+  ]
+ }
+}

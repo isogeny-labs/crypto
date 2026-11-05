@@ -379,6 +379,18 @@ fn measurement(
         return Ok(());
     }
     let raw: Value = read_json(dir, &artifact.path)?;
+    if matches!(
+        raw["schema"].as_str(),
+        Some("crypto.ml-dataset.phase-start/v2" | "crypto.ml-dataset.phase-metrics/v2")
+    ) {
+        let (kind, raw) = super::telemetry::checked::restricted_record(dir, &artifact.path)?;
+        return streams.measurements.push(&format!("{attempt}/{}",artifact.path),&json!({
+            "schema":"crypto.ml-dataset.coverage-measurement/v2","attempt":attempt,"cell_index":index,
+            "manifest_bound":sealed,"kind":kind,"source_artifact":artifact,"raw":raw,
+            "training_cost_eligible":false,"whole_worker_retired_instructions":null,
+            "whole_worker_coverage_verified":false,"independently_verified":false,"consumer_v2_admitted":false,
+            "platform_admitted":false,"clock_valid_for_comparison":false,"interpreted_as_whole_solve_instructions":false}));
+    }
     if ![
         "crypto.ml-dataset.phase-start/v1",
         "crypto.ml-dataset.phase-metrics/v1",
@@ -863,6 +875,76 @@ mod tests {
                 protocol,
             }
         }
+        fn checked_cell(&self, index: u64) -> PathBuf {
+            let dir = self.source.join("cells").join(format!("{index:012}"));
+            fs::create_dir_all(&dir).unwrap();
+            storage::write_json(&dir, "plan.json", "restricted-frozen-plan", &self.plan).unwrap();
+            storage::write_json(&dir, "run.json", "restricted-run-binding", &self.binding).unwrap();
+            storage::write_bytes(
+                &dir,
+                "protocol.json",
+                "restricted-frozen-protocol",
+                "json",
+                &self.protocol,
+            )
+            .unwrap();
+            storage::write_json(
+                &dir,
+                "config.json",
+                "restricted-provenance",
+                &self.plan.cell(index).unwrap(),
+            )
+            .unwrap();
+            storage::write_json(
+                &dir,
+                "attempt.json",
+                "attempt-provenance",
+                &json!({
+                    "schema":"crypto.ml-dataset.attempt/v1", "cell_index":index,
+                    "plan_sha256":self.binding["plan_sha256"], "started_unix_nanos":"1"
+                }),
+            )
+            .unwrap();
+            for path in ["stdout.log", "stderr.log"] {
+                storage::write_bytes(&dir, path, "process-log", "utf8", b"").unwrap();
+            }
+            super::super::telemetry::checked::install_policy(&dir).unwrap();
+            let binding = super::super::capture::AttemptBinding::from_cell_files(&dir).unwrap();
+            storage::write_json(
+                &dir,
+                "capture-binding.json",
+                "partial-capture-binding",
+                &binding,
+            )
+            .unwrap();
+            storage::write_json(
+                &dir,
+                "capture-limits.json",
+                "partial-capture-limits",
+                &super::super::capture::capture_limits(64).unwrap(),
+            )
+            .unwrap();
+            dir
+        }
+        fn seal_checked(&self, dir: &Path, index: u64, outcome: Value) -> CellManifest {
+            storage::write_json(
+                dir,
+                "worker-process.json",
+                "process-provenance",
+                &json!({"software_fixture":true}),
+            )
+            .unwrap();
+            let manifest = CellManifest {
+                schema: "crypto.ml-dataset.cell/v1".into(),
+                cell_index: index,
+                plan_sha256: self.binding["plan_sha256"].as_str().unwrap().into(),
+                config: self.plan.cell(index).unwrap(),
+                outcome,
+                artifacts: super::super::collect_cell_artifacts(dir).unwrap(),
+            };
+            storage::write_json(dir, "manifest.json", "cell-manifest", &manifest).unwrap();
+            manifest
+        }
         fn sealed(&self, index: u64) {
             let dir = self.source.join("cells").join(format!("{index:012}"));
             fs::create_dir_all(&dir).unwrap();
@@ -941,6 +1023,51 @@ mod tests {
             };
             storage::write_json(&dir, "manifest.json", "cell-manifest", &manifest).unwrap();
         }
+        // Test-only opt-in export of the already verified sealed fixture. This
+        // never changes acquisition, solver inputs, runtime dispatch or claims.
+        fn retain_checked(&self, name: &str) {
+            let Some(root) = std::env::var_os("CRYPTO_ML_CHECKED_FIXTURE_DIR") else {
+                return;
+            };
+            let root = PathBuf::from(root);
+            assert!(root.is_absolute());
+            let destination = root.join(name);
+            fs::create_dir(&destination).unwrap();
+            let cell = "cells/000000000000";
+            let manifest: CellManifest =
+                super::super::read_json(&self.source.join(cell).join("manifest.json")).unwrap();
+            let mut paths = std::collections::BTreeSet::from([
+                "run.json".to_owned(),
+                "plan.json".to_owned(),
+                "protocol.json".to_owned(),
+                format!("{cell}/manifest.json"),
+            ]);
+            paths.extend(
+                manifest
+                    .artifacts
+                    .iter()
+                    .map(|a| format!("{cell}/{}", a.path)),
+            );
+            assert!(paths.len() <= 256);
+            let mut total = 0u64;
+            for relative in paths {
+                let source = storage::contained_path(&self.source, &relative, false).unwrap();
+                let metadata = fs::symlink_metadata(&source).unwrap();
+                assert!(metadata.is_file());
+                total = total.checked_add(metadata.len()).unwrap();
+                assert!(total <= 32 * 1024 * 1024);
+                let bytes = fs::read(&source).unwrap();
+                assert_eq!(bytes.len() as u64, metadata.len());
+                storage::write_bytes(
+                    &destination,
+                    &relative,
+                    "retained-test-fixture",
+                    "native",
+                    &bytes,
+                )
+                .unwrap();
+            }
+        }
         fn partial(&self, index: u64, retained: bool) {
             let dir = if retained {
                 self.source
@@ -969,6 +1096,356 @@ mod tests {
             .unwrap();
         }
     }
+    #[test]
+    fn checked_actual_worker_seal_verify_and_report_use_mock_counters() {
+        use super::super::telemetry::checked;
+        let f = Fixture::new();
+        let dir = f.checked_cell(0);
+        let (result, opens) = checked::tests::with_mock_counters(|| {
+            super::super::worker(&f.plan.cell(0).unwrap(), &dir)
+        });
+        result.unwrap();
+        assert!(
+            dir.join("live/committed.json").is_file(),
+            "actual worker must use bound capture"
+        );
+        assert_eq!(
+            opens, 4,
+            "all four real worker phases must use the mock factory"
+        );
+        let expected_roles = checked::validate_directory(&dir).unwrap();
+        assert_eq!(expected_roles.len(), 9);
+        let registry: Vec<Artifact> =
+            super::super::read_json(&dir.join("worker-artifacts.json")).unwrap();
+        // Check the worker's own output before supervisor recovery could fill
+        // omitted entries and hide a regression at the registry boundary.
+        for (path, role) in expected_roles {
+            let registered: Vec<_> = registry.iter().filter(|a| a.path == path).collect();
+            assert_eq!(registered.len(), 1, "missing or duplicate {path}");
+            let artifact = registered[0];
+            let bytes = fs::read(dir.join(&path)).unwrap();
+            assert_eq!(artifact.role, role);
+            assert_eq!(artifact.encoding, "json");
+            assert_eq!(artifact.sha256, super::super::digest(&bytes));
+            assert_eq!(artifact.bytes, bytes.len() as u64);
+        }
+        assert_eq!(
+            registry
+                .iter()
+                .filter(|a| checked::role(&a.path).is_some())
+                .count(),
+            9
+        );
+        storage::verify_manifest(&dir, &registry).unwrap();
+        let outcome: Value = super::super::read_json(&dir.join("result.json")).unwrap();
+        assert_eq!(outcome["known_answer_verified"], true);
+        assert_eq!(outcome["factor_base_verified"], true);
+        f.seal_checked(&dir, 0, outcome);
+        super::super::verify_cell(&dir, true).unwrap();
+        let output = f.root.join("checked-report");
+        report_run(&f.source, &output).unwrap();
+        let rows = jsonl(&output.join("measurements.jsonl"));
+        let phases: Vec<_> = rows
+            .iter()
+            .filter(|row| row["schema"] == "crypto.ml-dataset.coverage-measurement/v2")
+            .collect();
+        assert_eq!(phases.len(), 8);
+        for row in phases {
+            assert_eq!(row["manifest_bound"], true);
+            assert_eq!(row["kind"], "native_phase_record");
+            for flag in [
+                "training_cost_eligible",
+                "whole_worker_coverage_verified",
+                "independently_verified",
+                "consumer_v2_admitted",
+                "platform_admitted",
+                "clock_valid_for_comparison",
+                "interpreted_as_whole_solve_instructions",
+            ] {
+                assert_eq!(row[flag], false, "{flag}");
+            }
+            assert_eq!(row["whole_worker_retired_instructions"], Value::Null);
+            let artifact = &row["source_artifact"];
+            let bytes = fs::read(dir.join(artifact["path"].as_str().unwrap())).unwrap();
+            assert_eq!(artifact["sha256"], super::super::digest(&bytes));
+            assert_eq!(artifact["bytes"], bytes.len());
+        }
+        // Restricted phase/report fields must not affect the public projection.
+        let checked_export = f.root.join("checked-export");
+        super::super::export::export(&f.source, &checked_export).unwrap();
+        let public_features = fs::read(checked_export.join("features.jsonl")).unwrap();
+        f.retain_checked("sealed-worker");
+        let mut manifest: CellManifest =
+            super::super::read_json(&dir.join("manifest.json")).unwrap();
+        manifest.artifacts.retain(|a| {
+            a.path != checked::POLICY_PATH
+                && !a.path.starts_with("telemetry/")
+                && a.path != "capture-binding.json"
+                && a.path != "capture-limits.json"
+        });
+        fs::remove_file(dir.join("capture-binding.json")).unwrap();
+        fs::remove_file(dir.join("capture-limits.json")).unwrap();
+        fs::remove_file(dir.join(checked::POLICY_PATH)).unwrap();
+        fs::remove_dir_all(dir.join("telemetry")).unwrap();
+        fs::write(
+            dir.join("manifest.json"),
+            serde_json::to_vec_pretty(&manifest).unwrap(),
+        )
+        .unwrap();
+        let legacy_export = f.root.join("without-diagnostics-export");
+        super::super::export::export(&f.source, &legacy_export).unwrap();
+        assert_eq!(
+            fs::read(legacy_export.join("features.jsonl")).unwrap(),
+            public_features
+        );
+    }
+
+    #[test]
+    fn checked_registryless_start_only_survives_seal_verify_and_report() {
+        use super::super::telemetry::checked::{self, types::Phase};
+        let f = Fixture::new();
+        let dir = f.checked_cell(0);
+        let binding = super::super::capture::AttemptBinding::from_cell_files(&dir).unwrap();
+        checked::tests::write_phase(&dir, &binding, Phase::CurveConstruction, true);
+        assert!(!dir.join("worker-artifacts.json").exists());
+        let manifest = f.seal_checked(&dir, 0, json!({"status":"timeout", "known_answer_verified":false,"factor_base_verified":false,"solver_completed":false}));
+        let start = manifest
+            .artifacts
+            .iter()
+            .find(|a| a.path == Phase::CurveConstruction.path(true))
+            .unwrap();
+        assert_eq!(start.role, "phase-start");
+        assert_eq!(start.encoding, "json");
+        super::super::verify_cell(&dir, false).unwrap();
+        let output = f.root.join("start-report");
+        report_run(&f.source, &output).unwrap();
+        let rows = jsonl(&output.join("measurements.jsonl"));
+        let start = rows
+            .iter()
+            .find(|row| row["schema"] == "crypto.ml-dataset.coverage-measurement/v2")
+            .unwrap();
+        assert_eq!(start["kind"], "interrupted_or_unfinished");
+        assert_eq!(start["raw"]["schema"], "crypto.ml-dataset.phase-start/v2");
+        assert_eq!(start["training_cost_eligible"], false);
+        assert_eq!(start["whole_worker_retired_instructions"], Value::Null);
+        f.retain_checked("sealed-registryless-prefix");
+    }
+
+    #[test]
+    fn checked_corrupt_partial_is_unpromoted_and_sealed_corruption_is_rejected() {
+        use super::super::telemetry::checked::{self, types::Phase};
+        let f = Fixture::new();
+        let dir = f.checked_cell(0);
+        let binding = super::super::capture::AttemptBinding::from_cell_files(&dir).unwrap();
+        checked::tests::write_phase(&dir, &binding, Phase::CurveConstruction, true);
+        let path = Phase::CurveConstruction.path(true);
+        let mut start: Value = super::super::read_json(&dir.join(&path)).unwrap();
+        start["binding"]["config_sha256"] = json!("0".repeat(64));
+        fs::write(dir.join(&path), serde_json::to_vec(&start).unwrap()).unwrap();
+        let artifacts = super::super::collect_cell_artifacts(&dir).unwrap();
+        assert_eq!(
+            artifacts.iter().find(|a| a.path == path).unwrap().role,
+            "unregistered-partial-artifact"
+        );
+        let output = f.root.join("corrupt-partial-report");
+        report_run(&f.source, &output).unwrap();
+        let rows = jsonl(&output.join("measurements.jsonl"));
+        assert_eq!(rows.len(), 1);
+        assert_eq!(rows[0]["kind"], "unreadable_partial_telemetry");
+        assert_eq!(rows[0]["raw"], Value::Null);
+        f.seal_checked(
+            &dir,
+            0,
+            json!({"status":"timeout", "known_answer_verified":false,"factor_base_verified":false}),
+        );
+        assert!(super::super::verify_cell(&dir, false).is_err());
+        assert!(report_run(&f.source, &f.root.join("corrupt-sealed-report")).is_err());
+    }
+
+    #[test]
+    fn checked_actual_worker_rejects_binding_and_policy_before_counter_open() {
+        use super::super::telemetry::checked;
+        for corrupt_policy in [false, true] {
+            let f = Fixture::new();
+            let dir = f.checked_cell(0);
+            let mut config = f.plan.cell(0).unwrap();
+            if corrupt_policy {
+                fs::write(dir.join(checked::POLICY_PATH), b"{}\n").unwrap();
+            } else {
+                config.work_limit += 1;
+            }
+            let (result, opens) =
+                checked::tests::with_mock_counters(|| super::super::worker(&config, &dir));
+            assert!(result.is_err());
+            assert_eq!(opens, 0);
+            assert!(!dir.join("telemetry").exists());
+            assert!(!dir.join("worker-artifacts.json").exists());
+        }
+    }
+    #[test]
+    fn checked_capture_context_mutations_fail_sealed_verification() {
+        use super::super::telemetry::checked::{self, types::Phase};
+        for mutation in [
+            "binding",
+            "limits",
+            "unknown_limits",
+            "omitted",
+            "relocated",
+            "wrong_role",
+            "wrong_encoding",
+            "policy_removed",
+        ] {
+            let f = Fixture::new();
+            let dir = f.checked_cell(0);
+            let binding = super::super::capture::AttemptBinding::from_cell_files(&dir).unwrap();
+            checked::tests::write_phase(&dir, &binding, Phase::CurveConstruction, true);
+            let mut manifest = f.seal_checked(
+                &dir,
+                0,
+                json!({"status":"timeout","known_answer_verified":false,
+                    "factor_base_verified":false,"solver_completed":false}),
+            );
+            super::super::verify_cell(&dir, false).unwrap();
+            match mutation {
+                "binding" | "limits" | "unknown_limits" => {
+                    let path = if mutation == "binding" {
+                        "capture-binding.json"
+                    } else {
+                        "capture-limits.json"
+                    };
+                    let mut value: Value = super::super::read_json(&dir.join(path)).unwrap();
+                    match mutation {
+                        "binding" => value["attempt_sha256"] = json!("0".repeat(64)),
+                        "limits" => {
+                            // Still structurally valid: only the frozen derivation differs.
+                            value["max_payload_count"] = json!(4095);
+                            let limits: super::super::capture::CaptureLimits =
+                                serde_json::from_value(value.clone()).unwrap();
+                            limits.validate().unwrap();
+                        }
+                        _ => value["unregistered_limit"] = json!(1),
+                    }
+                    let bytes = serde_json::to_vec(&value).unwrap();
+                    fs::write(dir.join(path), &bytes).unwrap();
+                    let artifact = manifest
+                        .artifacts
+                        .iter_mut()
+                        .find(|a| a.path == path)
+                        .unwrap();
+                    artifact.sha256 = super::super::digest(&bytes);
+                    artifact.bytes = bytes.len() as u64;
+                }
+                "omitted" => manifest
+                    .artifacts
+                    .retain(|a| a.path != "capture-binding.json"),
+                "relocated" => {
+                    fs::rename(
+                        dir.join("capture-binding.json"),
+                        dir.join("renamed-binding.json"),
+                    )
+                    .unwrap();
+                    manifest
+                        .artifacts
+                        .iter_mut()
+                        .find(|a| a.path == "capture-binding.json")
+                        .unwrap()
+                        .path = "renamed-binding.json".into();
+                }
+                "wrong_role" => {
+                    manifest
+                        .artifacts
+                        .iter_mut()
+                        .find(|a| a.path == "capture-binding.json")
+                        .unwrap()
+                        .role = "unregistered-partial-artifact".into();
+                }
+                "wrong_encoding" => {
+                    manifest
+                        .artifacts
+                        .iter_mut()
+                        .find(|a| a.path == "capture-limits.json")
+                        .unwrap()
+                        .encoding = "native".into();
+                }
+                "policy_removed" => {
+                    // Remove all phase diagnostics too: no surviving phase schema
+                    // may hide a missing capture-to-policy admission check.
+                    fs::remove_file(dir.join(checked::POLICY_PATH)).unwrap();
+                    fs::remove_dir_all(dir.join("telemetry")).unwrap();
+                    manifest.artifacts.retain(|a| {
+                        a.path != checked::POLICY_PATH && !a.path.starts_with("telemetry/")
+                    });
+                }
+                _ => unreachable!(),
+            }
+            // Every mutation remains valid under plain artifact hash checking.
+            storage::verify_manifest(&dir, &manifest.artifacts).unwrap();
+            fs::write(
+                dir.join("manifest.json"),
+                serde_json::to_vec_pretty(&manifest).unwrap(),
+            )
+            .unwrap();
+            assert!(
+                super::super::verify_cell(&dir, false).is_err(),
+                "{mutation}"
+            );
+        }
+    }
+
+    #[test]
+    fn checked_capture_context_rejected_before_counter_open() {
+        use super::super::telemetry::checked;
+        for mutation in [
+            "binding",
+            "limits",
+            "unknown_limits",
+            "missing_limits",
+            "missing_policy",
+        ] {
+            let f = Fixture::new();
+            let dir = f.checked_cell(0);
+            match mutation {
+                "binding" => {
+                    let mut value: Value =
+                        super::super::read_json(&dir.join("capture-binding.json")).unwrap();
+                    value["source_commit"] = json!("c".repeat(40));
+                    fs::write(
+                        dir.join("capture-binding.json"),
+                        serde_json::to_vec(&value).unwrap(),
+                    )
+                    .unwrap();
+                }
+                "limits" | "unknown_limits" => {
+                    let mut value: Value =
+                        super::super::read_json(&dir.join("capture-limits.json")).unwrap();
+                    if mutation == "limits" {
+                        value["max_payload_count"] = json!(4095);
+                        let limits: super::super::capture::CaptureLimits =
+                            serde_json::from_value(value.clone()).unwrap();
+                        limits.validate().unwrap();
+                    } else {
+                        value["unregistered_limit"] = json!(1);
+                    }
+                    fs::write(
+                        dir.join("capture-limits.json"),
+                        serde_json::to_vec(&value).unwrap(),
+                    )
+                    .unwrap();
+                }
+                "missing_limits" => fs::remove_file(dir.join("capture-limits.json")).unwrap(),
+                "missing_policy" => fs::remove_file(dir.join(checked::POLICY_PATH)).unwrap(),
+                _ => unreachable!(),
+            }
+            let (result, opens) = checked::tests::with_mock_counters(|| {
+                super::super::worker(&f.plan.cell(0).unwrap(), &dir)
+            });
+            assert!(result.is_err(), "{mutation}");
+            assert_eq!(opens, 0, "{mutation}");
+            assert!(!dir.join("telemetry").exists(), "{mutation}");
+            assert!(!dir.join("worker-artifacts.json").exists(), "{mutation}");
+        }
+    }
+
     impl Drop for Fixture {
         fn drop(&mut self) {
             let _ = fs::remove_dir_all(&self.root);

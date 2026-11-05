@@ -1,0 +1,498 @@
+{
+  "analysis": {
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [],
+    "script": null,
+    "unmasked_at": null
+  },
+  "arms": [
+    {
+      "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+      "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+      "id": "koblitz23-m4-f6-untwisted",
+      "role": "candidate"
+    },
+    {
+      "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+      "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+      "id": "koblitz23-m4-f6-twisted",
+      "role": "candidate"
+    },
+    {
+      "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+      "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+      "id": "koblitz23-m4-bsgs-untwisted",
+      "role": "baseline"
+    },
+    {
+      "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+      "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+      "id": "koblitz23-m4-bsgs-twisted",
+      "role": "baseline"
+    }
+  ],
+  "backend": "local",
+  "created": "2026-10-31T02:45:05.558203+00:00",
+  "export_id": "koblitz23-m4-f6-bsgs-mnt-4-20261031",
+  "files": [
+    {
+      "bytes": 4201,
+      "kind": "raw",
+      "path": "experiment-rows.jsonl",
+      "sha256": "7e3fe899f15aa4e6f349b1d582d87e0e0ebde0b3a74309ef4ca1a5fd06a16b02"
+    },
+    {
+      "bytes": 23479,
+      "kind": "protocol",
+      "path": "protocol.json",
+      "sha256": "0cff54326c907476c85f5c78bb8eaf5094807a1453cb027d0d16e20b0492ffea"
+    },
+    {
+      "bytes": 476,
+      "kind": "raw",
+      "path": "plan.json",
+      "sha256": "91e001cd6dfbea0f4e3a76c1a1fcb2843211e1cf482576498843488e4339e84d"
+    },
+    {
+      "bytes": 635,
+      "kind": "receipt",
+      "path": "preflight.json",
+      "sha256": "288741ab5a80cbbf16d648ee75e6502550707b6819900418aeb538b86c26d3c7"
+    },
+    {
+      "bytes": 12919,
+      "kind": "other",
+      "path": "make_experiment_export.py",
+      "sha256": "33ace84727141d4a6e7a13b69ec29243f426d35f2d51a53e3fa1b12af7032a7d"
+    }
+  ],
+  "flow": {
+    "attempted": 4,
+    "completed": 4,
+    "excluded": [],
+    "interrupted": 0,
+    "not_completed": 0,
+    "planned": 4,
+    "resumed": 0
+  },
+  "host": {
+    "class_id": null,
+    "path": null,
+    "sha256": null,
+    "summary": {
+      "cpu_model": null,
+      "hypervisor": null,
+      "isolation_tier_max": null,
+      "kernel": null,
+      "logical_cpus": null,
+      "memory_bytes": null
+    }
+  },
+  "notes": [
+    {
+      "by": "deterministic receipt projection",
+      "kind": "observation",
+      "text": "All four fixed native cells passed verify, report and export. F6 cells 0 and 2 completed a bounded geometric four-sum over retained pair domains, with no PDP witness or scalar label; native negative exhaustiveness is not independently certified."
+    },
+    {
+      "by": "deterministic receipt projection",
+      "kind": "observation",
+      "text": "BSGS cells 1 and 3 independently recovered and replayed an ECDLP scalar. Wrapper durations are diagnostic and wall_valid is false for all rows; retired hardware instructions and first/last fall degrees are unavailable."
+    },
+    {
+      "by": "deterministic receipt projection",
+      "kind": "observation",
+      "text": "Each restricted local archive and custody pointer matches the Git-ready checkpoint and has producer fresh S3 GET receipts. This export does not perform a new remote readback."
+    }
+  ],
+  "producer": {
+    "model": null,
+    "role": "executor",
+    "runtime": "codex_cli",
+    "session": "T-1074"
+  },
+  "protocol": {
+    "path": "protocol.json",
+    "protocol_id": "ML-DATASET-KOBLITZ23-M4-F6-BSGS-20261031",
+    "sha256": "929fd272db3cdfd0475bb5a7dd3f467bd4e0e41011d1b9c7934c7dd9fe865de3",
+    "version": 2
+  },
+  "reviews_dir": "reviews",
+  "runs": [
+    {
+      "arm": "koblitz23-m4-f6-untwisted",
+      "artifacts": [
+        {
+          "bytes": 338,
+          "kind": "receipt",
+          "path": "/mnt/spot-codex-state/tmp/ml-dataset-koblitz-m4-f6-bsgs-20261031/shard-00/attempt-start.json",
+          "sha256": "91d4fee7bc165c3cf7e4ad62a7c0836e142f20e0741bcfc23ca704b1c2b75529"
+        },
+        {
+          "bytes": 2064,
+          "kind": "receipt",
+          "path": "/mnt/spot-codex-state/tmp/ml-dataset-koblitz-m4-f6-bsgs-20261031/shard-00/local-status.json",
+          "sha256": "07347a84374c197e09e32894b7b6e938ce8b3e9353288511ed74cf8eea969afe"
+        },
+        {
+          "bytes": 2492,
+          "kind": "receipt",
+          "path": "/mnt/spot-codex-state/tmp/ml-dataset-koblitz-m4-f6-bsgs-20261031/shard-00/runner/receipt.json",
+          "sha256": "4207992251f6e66ea9390ded5b71ac29f460cb923b77aaccf94f63221e325e56"
+        },
+        {
+          "bytes": 9975,
+          "kind": "checkpoint_manifest",
+          "path": "/mnt/spot-codex-state/tmp/ml-dataset-koblitz-m4-f6-bsgs-20261031/shard-00/runner/attempt/cells/000000000000/manifest.json",
+          "sha256": "24a84319f454956cac328f689248a6cbef80a8b8f55bc590e227a9f472a8c318"
+        },
+        {
+          "bytes": 3525,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-00.json",
+          "sha256": "04a9bf57f6e411d22d2f7eadc6fd5dadff94243f4ca6765d5edf5ffe96f65731"
+        },
+        {
+          "bytes": 2850,
+          "kind": "checkpoint_manifest",
+          "path": "/mnt/spot-codex-state/tmp/ml-dataset-koblitz-m4-f6-bsgs-20261031/custody/shard-00.json",
+          "sha256": "13fd18b837d49b045ccab774920ccd493db38a9b93f9e31bd059d08914f63e2c"
+        },
+        {
+          "bytes": 38240,
+          "kind": "raw",
+          "path": "/mnt/spot-codex-state/tmp/ml-dataset-koblitz-m4-f6-bsgs-20261031/archives/shard-00.tar.gz",
+          "sha256": "dd72cecad83567ff3767c6a9fb0e1c110838bfa9277a62ada2be07d55224f811"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000000",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T02:42:50.695941+00:00",
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "f6-pair-domain-retained": 1,
+          "independent-ecdlp-solve": 0,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_artifact_replay_group_add_calls": 36,
+          "native_native_pair_count": 36,
+          "observed-wall-ns": "617680219"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 0.617680219,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-00",
+      "seed": 20261031,
+      "started_at": "2026-10-31T02:42:50.078260+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; F6 pair-domain artifact or BSGS scalar replay by native verifier"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "koblitz23-m4-bsgs-untwisted",
+      "artifacts": [
+        {
+          "bytes": 338,
+          "kind": "receipt",
+          "path": "/mnt/spot-codex-state/tmp/ml-dataset-koblitz-m4-f6-bsgs-20261031/shard-01/attempt-start.json",
+          "sha256": "03b385dbc3cce2a6e15bc9b22f768627dae4c2052a9e97b61294e9071ed9fa9f"
+        },
+        {
+          "bytes": 2066,
+          "kind": "receipt",
+          "path": "/mnt/spot-codex-state/tmp/ml-dataset-koblitz-m4-f6-bsgs-20261031/shard-01/local-status.json",
+          "sha256": "42e37f88540d89fe4c50a23c35b0bbe0a9e08a4b1c86edc3705b4b7a13249a7e"
+        },
+        {
+          "bytes": 2494,
+          "kind": "receipt",
+          "path": "/mnt/spot-codex-state/tmp/ml-dataset-koblitz-m4-f6-bsgs-20261031/shard-01/runner/receipt.json",
+          "sha256": "707031a5aec3b806c30eb16727a3f154b1f34b1b776c43d52bb9e71519b8c97f"
+        },
+        {
+          "bytes": 10778,
+          "kind": "checkpoint_manifest",
+          "path": "/mnt/spot-codex-state/tmp/ml-dataset-koblitz-m4-f6-bsgs-20261031/shard-01/runner/attempt/cells/000000000001/manifest.json",
+          "sha256": "480f51871e50bd1e115170688d86715e5e60c8f729c5d13273f3e81cbc8a5244"
+        },
+        {
+          "bytes": 3528,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-01.json",
+          "sha256": "889de4a7c7f8f8ba4eeda53559df33d7e9fa63c066b024f2ee135bcba5c6e5ca"
+        },
+        {
+          "bytes": 2853,
+          "kind": "checkpoint_manifest",
+          "path": "/mnt/spot-codex-state/tmp/ml-dataset-koblitz-m4-f6-bsgs-20261031/custody/shard-01.json",
+          "sha256": "767b1e98a473817c439c4f28f44e0537499043804bb125ecf6e9087623ef0e8b"
+        },
+        {
+          "bytes": 234986,
+          "kind": "raw",
+          "path": "/mnt/spot-codex-state/tmp/ml-dataset-koblitz-m4-f6-bsgs-20261031/archives/shard-01.tar.gz",
+          "sha256": "b3830d7088ebfdbfb4b5bd8b7bd644470c412f2a44dacaaa4cd6fb3befce911a"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000001",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T02:44:35.372903+00:00",
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "f6-pair-domain-retained": 0,
+          "independent-ecdlp-solve": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_baby_entries": 1448,
+          "native_giant_probes": 798,
+          "native_group_add_api_calls_search": 2245,
+          "native_scalar_verification_calls": 1,
+          "observed-wall-ns": "13181444694"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 13.181444694,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-01",
+      "seed": 20261031,
+      "started_at": "2026-10-31T02:44:22.191458+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; F6 pair-domain artifact or BSGS scalar replay by native verifier"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "koblitz23-m4-f6-twisted",
+      "artifacts": [
+        {
+          "bytes": 338,
+          "kind": "receipt",
+          "path": "/mnt/spot-codex-state/tmp/ml-dataset-koblitz-m4-f6-bsgs-20261031/shard-02/attempt-start.json",
+          "sha256": "5a8b9f7fa00050ea5a40dc2177515ee17dd82fb8af6187d581ce44b1e8b9dbff"
+        },
+        {
+          "bytes": 2063,
+          "kind": "receipt",
+          "path": "/mnt/spot-codex-state/tmp/ml-dataset-koblitz-m4-f6-bsgs-20261031/shard-02/local-status.json",
+          "sha256": "2bd2806ed8e4ac585ee08dcdb446d064e035cecd30547b225c84241cedfdc616"
+        },
+        {
+          "bytes": 2492,
+          "kind": "receipt",
+          "path": "/mnt/spot-codex-state/tmp/ml-dataset-koblitz-m4-f6-bsgs-20261031/shard-02/runner/receipt.json",
+          "sha256": "6b5c7bd2f6e40d9c3147a644405bc8af2be22dbe21891e68d8856b50e8745001"
+        },
+        {
+          "bytes": 9975,
+          "kind": "checkpoint_manifest",
+          "path": "/mnt/spot-codex-state/tmp/ml-dataset-koblitz-m4-f6-bsgs-20261031/shard-02/runner/attempt/cells/000000000002/manifest.json",
+          "sha256": "64277f522f8562d148e3c83e28b37dbdfcc5b407c4fcab4614dcd15b55407735"
+        },
+        {
+          "bytes": 3524,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-02.json",
+          "sha256": "0756ab433fc3c466b9067bc89cc9dbda2cd6a20ec0ea6d88fcf0f94fe01b486f"
+        },
+        {
+          "bytes": 2849,
+          "kind": "checkpoint_manifest",
+          "path": "/mnt/spot-codex-state/tmp/ml-dataset-koblitz-m4-f6-bsgs-20261031/custody/shard-02.json",
+          "sha256": "9b0d07f6145ef60e54ab4c528de100dead8da0aa4ef831a7c9f7089aa0d6464d"
+        },
+        {
+          "bytes": 38309,
+          "kind": "raw",
+          "path": "/mnt/spot-codex-state/tmp/ml-dataset-koblitz-m4-f6-bsgs-20261031/archives/shard-02.tar.gz",
+          "sha256": "6b28bad50fae3d73f083258bc5b1201778676409636d5fc91b564f0a34dd544a"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000002",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T02:44:45.094466+00:00",
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "f6-pair-domain-retained": 1,
+          "independent-ecdlp-solve": 0,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_artifact_replay_group_add_calls": 36,
+          "native_native_pair_count": 36,
+          "observed-wall-ns": "471509815"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 0.471509815,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-02",
+      "seed": 20261031,
+      "started_at": "2026-10-31T02:44:44.622955+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; F6 pair-domain artifact or BSGS scalar replay by native verifier"
+      },
+      "warmup": false,
+      "worker": null
+    },
+    {
+      "arm": "koblitz23-m4-bsgs-twisted",
+      "artifacts": [
+        {
+          "bytes": 338,
+          "kind": "receipt",
+          "path": "/mnt/spot-codex-state/tmp/ml-dataset-koblitz-m4-f6-bsgs-20261031/shard-03/attempt-start.json",
+          "sha256": "4f794e6e1e742ac1a1c5b371fc1c5dac370a43d58e25a48775d5e83c4db045ae"
+        },
+        {
+          "bytes": 2065,
+          "kind": "receipt",
+          "path": "/mnt/spot-codex-state/tmp/ml-dataset-koblitz-m4-f6-bsgs-20261031/shard-03/local-status.json",
+          "sha256": "b0e59a3ad5efa6274ea7cfeee6be23051b755f491348f0a38f34a4090af43201"
+        },
+        {
+          "bytes": 2494,
+          "kind": "receipt",
+          "path": "/mnt/spot-codex-state/tmp/ml-dataset-koblitz-m4-f6-bsgs-20261031/shard-03/runner/receipt.json",
+          "sha256": "968a7d4e29f0f9a87e62adb8c714c24728477a60d920f49d7e860b790844b2f7"
+        },
+        {
+          "bytes": 10775,
+          "kind": "checkpoint_manifest",
+          "path": "/mnt/spot-codex-state/tmp/ml-dataset-koblitz-m4-f6-bsgs-20261031/shard-03/runner/attempt/cells/000000000003/manifest.json",
+          "sha256": "c25e774a1d70620113009cd615f125ce12721167b3e0af747c9ed231c544d976"
+        },
+        {
+          "bytes": 3527,
+          "kind": "checkpoint_manifest",
+          "path": "checkpoints/shard-03.json",
+          "sha256": "ea93e673252795e0bd1f13242a208f04b3bd3264b6997c8b245cc87415a25598"
+        },
+        {
+          "bytes": 2852,
+          "kind": "checkpoint_manifest",
+          "path": "/mnt/spot-codex-state/tmp/ml-dataset-koblitz-m4-f6-bsgs-20261031/custody/shard-03.json",
+          "sha256": "cb87f9ed21e6838518bcab17c3adcdf42cf6b0fb41d5184de02a6110bbe0005b"
+        },
+        {
+          "bytes": 229471,
+          "kind": "raw",
+          "path": "/mnt/spot-codex-state/tmp/ml-dataset-koblitz-m4-f6-bsgs-20261031/archives/shard-03.tar.gz",
+          "sha256": "f3a6de101521803ab659a324e2328844a5a75a9477281757a52fc82d341c895e"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "native-cell-000000000003",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-10-31T02:45:05.558203+00:00",
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [],
+        "contended": null,
+        "tier": "none"
+      },
+      "measurements": {
+        "counted": {
+          "f6-pair-domain-retained": 0,
+          "independent-ecdlp-solve": 1,
+          "sealed-cell-verified": 1
+        },
+        "counters": {
+          "native_baby_entries": 2049,
+          "native_giant_probes": 141,
+          "native_group_add_api_calls_search": 2189,
+          "native_scalar_verification_calls": 1,
+          "observed-wall-ns": "12621156590"
+        },
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 12.62115659,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "shard-03",
+      "seed": 20261031,
+      "started_at": "2026-10-31T02:44:52.937045+00:00",
+      "status": "succeeded",
+      "verification": {
+        "status": "verified",
+        "verifier": "crypto dataset verify; F6 pair-domain artifact or BSGS scalar replay by native verifier"
+      },
+      "warmup": false,
+      "worker": null
+    }
+  ],
+  "schema": "experiment.export/v1",
+  "source": {
+    "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+    "dirty": false,
+    "repo": "crypto"
+  }
+}

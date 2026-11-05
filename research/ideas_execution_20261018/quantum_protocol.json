@@ -1,0 +1,23 @@
+{
+  "schema": "quantum-classical-boundary-protocol/v1",
+  "item": 20,
+  "scope": "Native resource arithmetic and exact modular postprocessing diagnostic; incomplete Shor pipeline",
+  "frozen_before_execution": true,
+  "primary_sources": [
+    {"id":"RNSL2017", "url":"https://arxiv.org/abs/1706.06752", "model":"prime-field logical-qubit bound 9n+2ceil(log2(n))+10; Toffoli bound 448n^3log2(n)+4090n^3"},
+    {"id":"HJNRS2020", "url":"https://arxiv.org/abs/2001.09580", "model":"two (n+1)-bit exponent registers; section 2 and classical public-point doubling setup"}
+  ],
+  "field_bits": [192,224,256,384,521],
+  "shots": [1,2,4,8,16],
+  "assumed_independent_success_probability_per_shot": [0.25,0.5,0.75],
+  "classical_setup": "2*n point doublings prepare P,2P,...,2^nP and Q,2Q,...,2^nQ once; cached compressed coordinates modeled as 2*(n+1)*(ceil(n/8)+1) bytes",
+  "postprocessing": "Exact congruence a+b*d=0 mod prime r with synthetic known d; extended Euclid and multiply reduce, count Euclid divisions. This is not the power-of-two noisy Fourier sample recovery algorithm.",
+  "diagnostic_modulus": "2305843009213693951 (2^61-1, known prime)",
+  "diagnostic_secrets": [1,17,20261018],
+  "diagnostic_b": [0,1,2,17,65537,104729],
+  "validation": "Recovered d equals synthetic d and satisfies original congruence; b=0 is rejected. Composite noninvertible denominator covered by unit test.",
+  "excluded": ["actual point-table construction and measured timings", "full power-of-two Fourier postprocessing and lattice/rational recovery", "elliptic-curve verification", "QFT and classical feed-forward latency", "fault tolerance, physical qubits, quantum scheduling", "quantum simulation or quantum execution"],
+  "units": "Classical operation counts, coordinate bytes, logical qubits, and Toffoli bounds are separate. No wall-time conversion.",
+  "output": "quantum_boundary.json",
+  "claims": "Resource accounting and algebraic diagnostic only; no quantum experiment, completed Shor resource estimate, or security claim."
+}

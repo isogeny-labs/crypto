@@ -1,0 +1,9 @@
+# Independent review: weighted doubling UInt64 composition
+
+No blocking discrepancy was found at the stated source-word and normalized polynomial scope. The literal raw dbl body preserves source multiplication/addition/subtraction association. In particular, source literal5 is retained rather than silently assuming5<p: literal5_mul_reduce bounds5*a below2^64 for canonical a and p<2^31, then proves replacement by5%p before applying expression composition. This covers the p=5 boundary.
+
+All six output words are canonical and decode to the weighted field formula. The normalized divisibility theorem composes that result with the field doubling theorem under decoded nonzero z,w,y, nonzero2 and the normalized point equation. Output nonzero conclusions in this theorem are field-decoded weights. The separate self guard theorem correctly excludes inverse before selecting doubling; the zero-y theorem preserves inverse precedence. No differently weighted converse is asserted.
+
+All manifest hashes matched. Fresh private source, producer controls, separate axiom readback and reviewer controls exit0. Only propext, Classical.choice and Quot.sound appear. Reviewer controls exercise raw5 at p2147483647,a2147483646; zero w causing inverse despite nonzero y; all-coefficient nonzero p7 canonical payload; and raw5 contribution changing from0 mod5 to5 mod7 at x1. The producer full-premise p5 fixture invokes the normalized theorem; f=X5+1 in characteristic5 is polynomial validity evidence, not smooth-curve geometry. Harmless unused-simp/tactic warnings are retained.
+
+Field.n1,tablesNone and ordinary execution/counter headroom remain source-mapping conditions. Compiler/counter semantics, class-sum equality and whole-walk closure are outside scope. Producer sources were not modified. No scientific trials or cost measurements were performed.

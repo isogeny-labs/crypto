@@ -1,0 +1,13 @@
+# Field CRT interpolant and residual divisibility
+
+Five main declarations compile, composing the previously checked explicit norm/slope certificates with field inversion. support_bezout constructs an explicit IsCoprime witness from norm nonzero. numerator_composition transports the slope numerator across Ua. ordinate_congruences constructs V=Va+C(norm^-1)*(C(s0)+C(s1)*X)*Ua and proves Ua|(V-Va) and Ub|(V-Vb), with source coefficient differences retained literally. residual_of_congruence transports an input residual along a polynomial congruence. product_residual then proves Ua*Ub | f-V^2 from both input residuals.
+
+The field theorem needs norm!=0, not s1!=0. Therefore the zero-slope guard case is correctly included in interpolation, while the optimized shortcut's nonzero leading coefficient still needs its separate guard. No smoothness or quintic assumption is needed for these algebraic lemmas. They do not identify divisor classes or establish native word/batched inversion correspondence.
+
+Fresh checks: FastCRTInterpolation-attempt-yBbS6D4U, FastCRTInterpolationControls-attempt-yDqxdZnQ and FastCRTInterpolationReadback-attempt-dzC1133H exit0 with unchanged bindings. Ten exact named readbacks contain only propext, Classical.choice and Quot.sound. ExpectedFailure-attempt-ZBytktON rejects 0=1 with exit1. Existing pinned compiler and imported caches remain trusted dependencies; no independent replay/review is claimed.
+
+Five controls check repeated-root Ua=X^2 coprime to Ub=X^2+1, the explicit V=1-X^3, full product-divisibility theorem for f=X^5-X^4-X^3+1 with actual input residual witnesses, zero-slope interpolation, and exclusion of zero norm. The fixture is a polynomial-algebra control; no nonsingularity claim is made.
+
+Retained failures: attempts7RPIII8U and7P3mU9CJ of the main module used unavailable linear_combination; a Ruby text-edit command failed because Ruby was not installed, so the second run repeated unchanged source. The corrected main proof uses explicit calc/ring identities and existing certificates. Controls attempt1X5aj7fo encountered ambiguous support in simplifier arguments (Polynomial.support versus FastCRT.support); qualification fixed it. No theorem hypothesis or conclusion was weakened.
+
+Next joints: quotient degree/leading coefficient under s1!=0 and deg f=5; native canonical-word batching and coefficient wiring; normalized output identity with generic reduction; general divisor-class interpretation. Native intended scope remains prime p<2^31, Field.n=1 and diagnostic tables absent. The mathematical theorem here is over an arbitrary field. No repository edits, cloud operations, scientific workloads or cost measurement. Frozen 1,260-target scope and existing expired campaign budget unchanged.

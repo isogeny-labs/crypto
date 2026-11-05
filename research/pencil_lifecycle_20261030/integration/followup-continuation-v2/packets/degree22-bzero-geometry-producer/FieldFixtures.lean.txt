@@ -1,0 +1,66 @@
+import BZero
+import Mathlib.Algebra.Field.ZMod
+set_option autoImplicit false
+set_option maxHeartbeats 2000000
+namespace BZeroControls
+open Polynomial MixedCancellation BZero
+instance : Fact (Nat.Prime 5) := ⟨by decide⟩
+instance : Fact (Nat.Prime 2) := ⟨by decide⟩
+@[simp] theorem five_zero : (5:ZMod 5)=0 := by decide
+def a : D2 (ZMod 5) := ⟨1,0,4,0,2,3⟩
+theorem an : nq a= -1 ∧ nr a=0 ∧ ns a=1 ∧ nt a=0 := by
+ norm_num [nq,nr,ns,nt,a]
+ constructor
+ · rw [←one_div]
+   apply (div_eq_iff (by decide : (4:ZMod 5)≠0)).2
+   decide
+ · apply (div_eq_iff (by decide : (24:ZMod 5)≠0)).2
+   decide
+theorem va : validTwo (WeightedDoubling.curve (0:ZMod 5) (-1) 1 0) a := by
+ unfold validTwo
+ rw [an.1,an.2.1,an.2.2.1,an.2.2.2]
+ refine ⟨X^3+X^2+X+1,?_⟩
+ simp [MixedCancellation.support,ordinate,WeightedDoubling.curve] <;> ring
+theorem hg : IsCoprime (WeightedDoubling.curve (0:ZMod 5) (-1) 1 0)
+ (WeightedDoubling.curve (0:ZMod 5) (-1) 1 0).derivative := by
+ refine ⟨4,3*(X^4+C 3*X^3+C 4*X^2+C 3*X+C 3),?_⟩
+ norm_num [WeightedDoubling.curve,derivative_add,derivative_mul,derivative_X_pow]
+ simp only [five_zero,C_0,zero_mul,zero_add,Polynomial.C_ofNat]
+ have h5 : (5:(ZMod 5)[X])=0 := CharP.cast_eq_zero _ 5
+ calc
+  _ = (2*(X:(ZMod 5)[X])^5+3*X^4+3*X^3+2*X^2+X-2)*5+1 := by ring
+  _ = 1 := by rw [h5]; ring
+example : sourceB a=0 ∧ (point a).x=4 ∧ (point a).y=4 ∧ (point a).z=3 ∧ (point a).w=3 := by decide
+example : validPoint (WeightedDoubling.curve (0:ZMod 5) (-1) 1 0) (point a) :=
+ (extraction _ a (by decide) (by decide) (by decide) (by decide) (by decide) va).2.2
+example : (point a).y≠0 :=
+ (doubling 0 (-1) 1 0 a (by decide) (by decide) (by decide) (by decide) (by decide) va hg).1
+-- Singular input still has a valid extracted point, but the doubling denominator vanishes.
+def singular : D2 ℚ := ⟨0,0,1,0,1,1⟩
+theorem vs : validTwo (WeightedDoubling.curve (0:ℚ) 0 0 0) singular := by
+ refine ⟨X^3-1,?_⟩
+ norm_num [validTwo,nq,nr,ns,nt,singular,MixedCancellation.support,ordinate,WeightedDoubling.curve]
+ <;> ring
+example : sourceB singular=0 ∧ singular.s≠0 ∧ (point singular).y=0 ∧
+ (WeightedDoubling.output 0 0 0 0 (point singular).x (point singular).y (point singular).z (point singular).w).w=0 := by
+ norm_num [sourceB,point,singular,WeightedDoubling.output]
+-- Characteristic two: original validTwo and branch conditions do not ensure extracted validity.
+def bad : D2 (ZMod 2) := ⟨1,1,1,0,1,1⟩
+noncomputable def badf : (ZMod 2)[X] := X^5+X^2+X+1
+theorem vb : validTwo badf bad := by
+ have h2 : (2 : (ZMod 2)[X])=0 := CharP.cast_eq_zero _ 2
+ refine ⟨X^3+X^2+1,?_⟩
+ norm_num [validTwo,nq,nr,ns,nt,bad,badf,MixedCancellation.support,ordinate]
+ ring_nf
+ simp [h2]
+example : sourceB bad=0 ∧ bad.s≠0 ∧ (point bad).x=1 ∧ (point bad).y=1 := by decide
+example : ¬validPoint badf (point bad) := by
+ intro h
+ obtain ⟨g,heq⟩ := h
+ have he := congrArg (Polynomial.eval (1:ZMod 2) : (ZMod 2)[X] → ZMod 2) heq
+ norm_num [badf,WeightedAdd11.ny,WeightedAdd11.nx,point,bad] at he
+ have h3 : (3:ZMod 2)=1 := by decide
+ simp [h3] at he
+example : ¬((2:ZMod 2)≠0) := by decide
+example : sourceB (⟨0,0,0,0,1,1⟩ : D2 ℚ)=0 ∧ (point (⟨0,0,0,0,1,1⟩ : D2 ℚ)).z=0 := by norm_num [sourceB,point]
+end BZeroControls

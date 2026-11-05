@@ -1,0 +1,14 @@
+import Controls
+namespace ReviewerRing
+open GraphRingWord
+theorem headroom_endpoint :
+ (9223372036854775807 : Nat)+9223372036854775807=18446744073709551614 := by decide
+theorem sub_endpoint : sub 9223372036854775808 0 9223372036854775807=1 := by decide
+theorem neg_large_modulus : neg 18446744073709551615 18446744073709551614=1 := by decide
+theorem maximal_product_wide : mul 18446744073709551557 18446744073709551615 18446744073709551615=3364 := by decide
+theorem maximal_product_narrow : ((18446744073709551615 : UInt64)*18446744073709551615)%18446744073709551557=1 := by decide
+theorem sign_two_not_multiplication : signed 17 2 1=16 ∧ signed 17 2 1≠2 := by decide
+theorem sign_one_retains_noncanonical : signed 17 1 18=18 := by decide
+theorem literal_underflow : neg 17 18=0 := by decide
+theorem modulus_one_wide : mul 1 18446744073709551615 18446744073709551615=0 := by decide
+end ReviewerRing

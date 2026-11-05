@@ -90,6 +90,15 @@ establish why a candidate was skipped.
 
 ## Resolution and history
 
+2026-10-26: R08's two-hour allocation is confirmed finished at
+2026-10-25 07:52:38 UTC with native exit 0 and no new factor. The saved
+collection file has 10,441,117 raw rows. Fresh product/prime replay remains
+partial with the same 444-bit residual; FactorDB still has no proper split.
+The [completion explanation](../research/nist_skipped_curve_dissection_20261021/factorization/rounds/R08-20261025/reports/completion-20261026T2122Z/REPORT.md)
+and [prospective filtering submission](../backlog/XP-20261026-nist-p256-checkpoint-filter/README.md)
+distinguish raw collection from R07's older 92-survivor result. New filtering
+and matrix rank remain unverified. No collection process remains running.
+
 2026-10-21: PARI completed six targets. ECM found additional prime factors
 of all three remaining target lineages. All 100 final B1=3000000 curves
 per residual completed without a new factor. Unresolved.

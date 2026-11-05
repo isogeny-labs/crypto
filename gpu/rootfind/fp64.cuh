@@ -1,4 +1,4 @@
-/* fp64.cuh -- Montgomery arithmetic mod an odd prime p < 2^62 on one
+/* fp64.cuh -- Montgomery arithmetic mod an odd prime p < 2^63 on one
  * 64-bit word, for CUDA devices and for host emulation of the same code.
  *
  * This is a line-for-line mirror of `Fp64` in
@@ -26,8 +26,11 @@
  *   which keeps the kernel well under the 255-register ceiling and lets
  *   ptxas place >= 8 warps per scheduler on sm_120.  Register pressure
  *   comes from the batched-inversion scratch, not from the field.
- * - p < 2^62 means a + b < 2^63 and t + m*p < 2^128 never overflow, the
- *   same bound `prime_fast::MAX_BITS` enforces on the CPU.
+ * - For p < 2^63, a+b < 2^64 and REDC input T < p*2^64 gives
+ *   T+m*p < 2*p*2^64 < 2^128. The high-word sum is <2p<2^64.
+ *   See HAC 14.32/14.33. The mirrored Rust engine retains its stricter
+ *   MAX_BITS guard; widening this documented arithmetic domain changes
+ *   no operation or value for existing callers.
  */
 #ifndef GPU_ROOTFIND_FP64_CUH
 #define GPU_ROOTFIND_FP64_CUH
@@ -46,7 +49,7 @@
  * (it lands in the constant parameter bank, which is broadcast to every
  * thread for free). */
 struct Fp64Ctx {
-    uint64_t p;      /* odd prime, 3 < p < 2^62 */
+    uint64_t p;      /* odd prime, 3 < p < 2^63 */
     uint64_t n_inv;  /* -p^-1 mod 2^64 */
     uint64_t one;    /* R mod p  (Montgomery 1) */
     uint64_t r2;     /* R^2 mod p (canonical -> Montgomery) */

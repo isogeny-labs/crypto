@@ -1,0 +1,35 @@
+Explicit excerpt, not the complete raw output. Raw SHA256: 86acd43c1324f3f008f19b527b24a03fe26eb9aa3750e3214e92389e1f32d240
+
+    Finished `release` profile [optimized] target(s) in 0.46s
+     Running unittests src/lib.rs (target/release/deps/crypto_lib-2d9e4dc6e286cf2e)
+
+running 5356 tests
+test asymmetric::ec_elgamal::tests::decrypt_large_message_bounded ... ignored, slow: 1M-entry BSGS table; run with --ignored
+test asymmetric::ec_elgamal::tests::decrypt_rejects_invalid_ciphertext_points ... ok
+test asymmetric::ec_elgamal::tests::checked_encrypt_rejects_invalid_public_key_and_plaintext_collision ... ok
+test asymmetric::ec_elgamal::tests::encrypt_decrypt_roundtrip_small ... ignored, slow: 5 × P-256 affine scalar mul + 5 × BSGS; run with --ignored
+test asymmetric::ec_elgamal::tests::encrypt_is_probabilistic ... ignored, slow: two P-256 encrypts + two BSGS decrypts; run with --ignored
+test asymmetric::ec_elgamal::tests::encrypted_vote_tally ... ignored, slow: 10 P-256 ballots + tally + BSGS decrypt; run with --ignored
+test asymmetric::ec_elgamal::tests::homomorphic_add_plain ... ignored, slow: P-256 affine scalar mul; run with --ignored
+test asymmetric::ec_elgamal::tests::homomorphic_add_two_ciphertexts ... ignored, slow: P-256 affine scalar mul; run with --ignored
+
+[... middle omitted; complete raw file is NOT_UPLOADED ...]
+
+test zk::stark_v2::tests::rejects_proof_reused_for_another_boundary ... ok
+test zk::stark_v2::tests::rejects_query_count_or_blowup_mismatch ... ok
+test zk::stark_v2::tests::rejects_swapped_queries ... ok
+test zk::stark_v2::tests::rejects_tampered_fri_final_layer ... ok
+test zk::bulletproofs::tests::range_prove_verify_small ... ok
+test zk::stark_v2::tests::rejects_trace_with_broken_transition ... ok
+test zk::stark_v2::tests::rejects_wrong_air ... ok
+test zk::stark_v2::tests::rejects_truncated_fri ... ok
+test zk::stark_v2::tests::rejects_wrong_ood_comp_z_and_air_inconsistent_at_z ... ok
+test zk::stark_v2::tests::rejects_wrong_public_values ... ok
+test zk::stark_v2::tests::rejects_wrong_ood_f_z ... ok
+test zk::stark_v2::tests::stark_v2_prove_verify_doubling_fast ... ok
+test zk::stark_v2::tests::stark_v2_prove_verify_doubling_default ... ok
+test zk::stark::tests::grinding_fails_at_sized_query_count ... ok
+error: test failed, to rerun pass `--lib`
+
+Caused by:
+  process didn't exit successfully: `/workspace/crypto/target/release/deps/crypto_lib-2d9e4dc6e286cf2e` (signal: 15, SIGTERM: termination signal)

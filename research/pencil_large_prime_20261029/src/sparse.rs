@@ -5,10 +5,16 @@ use crate::meter;
 use std::cmp::Ordering;
 use std::collections::{btree_map, BTreeMap};
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-#[cfg_attr(feature = "producer", derive(serde::Serialize))]
-#[cfg_attr(feature = "producer", serde(transparent))]
+#[derive(Clone, Copy, Debug, Eq)]
+#[cfg_attr(feature = "reporting", derive(serde::Serialize))]
+#[cfg_attr(feature = "reporting", serde(transparent))]
 struct Key(usize);
+impl PartialEq for Key {
+    fn eq(&self, rhs: &Self) -> bool {
+        meter::charge(|c| c.map_key_comparisons += 1);
+        self.0 == rhs.0
+    }
+}
 impl Ord for Key {
     fn cmp(&self, rhs: &Self) -> Ordering {
         meter::charge(|c| c.map_key_comparisons += 1);
@@ -22,8 +28,8 @@ impl PartialOrd for Key {
 }
 
 #[derive(Debug, PartialEq, Eq)]
-#[cfg_attr(feature = "producer", derive(serde::Serialize))]
-#[cfg_attr(feature = "producer", serde(transparent))]
+#[cfg_attr(feature = "reporting", derive(serde::Serialize))]
+#[cfg_attr(feature = "reporting", serde(transparent))]
 pub struct TrackedMap<V>(BTreeMap<Key, V>);
 
 impl<V> Default for TrackedMap<V> {
@@ -49,7 +55,9 @@ impl<V> TrackedMap<V> {
     }
     pub fn get(&self, key: &usize) -> Option<&V> {
         meter::charge(|c| c.map_calls += 1);
-        self.0.get(&Key(*key))
+        let result = self.0.get(&Key(*key));
+        meter::charge(|c| c.map_entry_visits += u128::from(result.is_some()));
+        result
     }
     pub fn contains_key(&self, key: &usize) -> bool {
         meter::charge(|c| c.map_calls += 1);
@@ -57,15 +65,26 @@ impl<V> TrackedMap<V> {
     }
     pub fn insert(&mut self, key: usize, value: V) -> Option<V> {
         meter::charge(|c| c.map_calls += 1);
-        self.0.insert(Key(key), value)
+        let previous = self.0.insert(Key(key), value);
+        if previous.is_none() {
+            meter::collection(0, 0, 1, 0);
+        } else {
+            meter::charge(|c| c.map_entry_visits += 1);
+        }
+        previous
     }
     pub fn remove(&mut self, key: &usize) -> Option<V> {
         meter::charge(|c| c.map_calls += 1);
-        self.0.remove(&Key(*key))
+        let result = self.0.remove(&Key(*key));
+        meter::charge(|c| c.map_entry_visits += u128::from(result.is_some()));
+        result
     }
     pub fn first_key_value(&self) -> Option<(&usize, &V)> {
         meter::charge(|c| c.map_calls += 1);
-        self.0.first_key_value().map(|(k, v)| (&k.0, v))
+        self.0.first_key_value().map(|(k, v)| {
+            meter::charge(|c| c.map_entry_visits += 1);
+            (&k.0, v)
+        })
     }
     pub fn iter(&self) -> Iter<'_, V> {
         Iter(self.0.iter())
@@ -142,6 +161,37 @@ impl<V, const N: usize> From<[(usize, V); N]> for TrackedMap<V> {
 mod tests {
     use super::*;
     #[test]
+    fn actual_returned_entries_and_new_entries_are_disjoint() {
+        let mut m = TrackedMap::new();
+        meter::reset();
+        assert_eq!(m.insert(1, 10u64), None);
+        assert_eq!(m.insert(1, 20), Some(10));
+        assert_eq!(m.get(&1), Some(&20));
+        assert_eq!(m.get(&2), None);
+        assert!(m.contains_key(&1)); // presence only, not an exposed-entry visit
+        assert_eq!(m.first_key_value(), Some((&1, &20)));
+        assert_eq!(m.remove(&1), Some(20));
+        assert_eq!(m.remove(&1), None);
+        assert_eq!(m.first_key_value(), None);
+        let c = meter::snapshot();
+        assert_eq!(c.collection_elements_initialized, 1);
+        assert_eq!(c.map_entry_visits, 4); // replacement, get, first, removal
+        assert_eq!(c.collection_elements_copied, 0); // values moved or borrowed here
+    }
+
+    #[test]
+    fn key_equality_has_one_event_without_an_ordering_event() {
+        meter::reset();
+        assert!(Key(7) == Key(7));
+        assert!(Key(7) != Key(8));
+        assert_eq!(meter::snapshot().map_key_comparisons, 2);
+        let left: TrackedMap<u64> = [(7, 1)].into();
+        let right: TrackedMap<u64> = [(7, 1)].into();
+        meter::reset();
+        assert_eq!(left, right);
+        assert_eq!(meter::snapshot().map_key_comparisons, 1);
+    }
+    #[test]
     fn counted_lookup_and_iteration_preserve_numeric_keys() {
         let mut m = TrackedMap::new();
         m.insert(17, 91u64);
@@ -163,7 +213,7 @@ mod tests {
         assert!(m.is_empty());
     }
     #[test]
-    #[cfg(feature = "producer")]
+    #[cfg(feature = "reporting")]
     fn serialization_keeps_schema_without_counting_output() {
         let m: TrackedMap<u64> = [(17, 91), (2, 5)].into();
         meter::reset();

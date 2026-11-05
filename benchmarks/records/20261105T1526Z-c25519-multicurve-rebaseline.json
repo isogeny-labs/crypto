@@ -1,0 +1,150 @@
+{
+  "branch": "claude/curve25519-multicurve",
+  "closed_utc": "2026-11-05T15:42:48+00:00",
+  "commands": [
+    {
+      "argv": [
+        "bash",
+        "/tmp/claude-0/-home-user/7090ac5e-504f-5c77-9ce6-a4093590be55/scratchpad/runmc.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-05T15:41:03+00:00",
+      "wall_s": 46.766
+    }
+  ],
+  "commit": "74f637d816babae0796d3adf8fe4fb8daf581399",
+  "commit_dirty": false,
+  "created_utc": "2026-11-05T15:26:06+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v236-x86_64-with-glibc2.39"
+  },
+  "id": "20261105T1526Z-c25519-multicurve-rebaseline",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "s_w0_mean5curves_k20",
+      "note": "mean over five family curves, 24 targets each",
+      "reference": 1.66,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 2.601
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "s_w0_mean5curves_k24",
+      "note": "mean over five family curves, 24 targets each",
+      "reference": 1.193,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 2.111
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "s_w0_mean5curves_k28",
+      "note": "mean over five family curves, 24 targets each",
+      "reference": 1.04,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 1.869
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 5,
+      "name": "s_w0_mean5curves_k32",
+      "note": "mean over five family curves, 24 targets each",
+      "reference": 1.013,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 1.93
+    }
+  ],
+  "problem": "ic:curve25519-family-k20-32",
+  "raw": [
+    {
+      "bytes": 11288,
+      "path": "research/curve25519_autolab_20261104/multicurve/band-k20.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/15/15f4fb74ed829cbbabc2bbc4437ed7a41dc175724c215748a84b12bb314e0bea",
+      "sha256": "15f4fb74ed829cbbabc2bbc4437ed7a41dc175724c215748a84b12bb314e0bea",
+      "uploaded": false
+    },
+    {
+      "bytes": 11370,
+      "path": "research/curve25519_autolab_20261104/multicurve/band-k24.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1b/1b3bcfa227d742e164efa4aae67bd115b9a7649531e1b7002b55ef8112e558ce",
+      "sha256": "1b3bcfa227d742e164efa4aae67bd115b9a7649531e1b7002b55ef8112e558ce",
+      "uploaded": false
+    },
+    {
+      "bytes": 11356,
+      "path": "research/curve25519_autolab_20261104/multicurve/band-k28.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/83/83d25b57eeb10839e3671ec317cb051f765c241c56c3ec805cdda33414443735",
+      "sha256": "83d25b57eeb10839e3671ec317cb051f765c241c56c3ec805cdda33414443735",
+      "uploaded": false
+    },
+    {
+      "bytes": 11430,
+      "path": "research/curve25519_autolab_20261104/multicurve/band-k32.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/92/92c47215009f612d39eed14716ee829e028d1c0addee9db7cf64e8093152ee55",
+      "sha256": "92c47215009f612d39eed14716ee829e028d1c0addee9db7cf64e8093152ee55",
+      "uploaded": false
+    },
+    {
+      "bytes": 2509,
+      "path": "research/curve25519_autolab_20261104/multicurve/verify-k20.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/6e/6e4c21b20aeb2ef7da079ce9d44ee896d0fdaa9b5e80c525b7f3934077039451",
+      "sha256": "6e4c21b20aeb2ef7da079ce9d44ee896d0fdaa9b5e80c525b7f3934077039451",
+      "uploaded": false
+    },
+    {
+      "bytes": 2509,
+      "path": "research/curve25519_autolab_20261104/multicurve/verify-k24.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/76/76a4eb7bd171eee54c8bdb439f9328725481032e460e472b46310da78d14980b",
+      "sha256": "76a4eb7bd171eee54c8bdb439f9328725481032e460e472b46310da78d14980b",
+      "uploaded": false
+    },
+    {
+      "bytes": 2507,
+      "path": "research/curve25519_autolab_20261104/multicurve/verify-k28.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ed/edf30d401360b511823cd44699ea59343749ed669cfb4a9618ae12a74e011fa9",
+      "sha256": "edf30d401360b511823cd44699ea59343749ed669cfb4a9618ae12a74e011fa9",
+      "uploaded": false
+    },
+    {
+      "bytes": 2509,
+      "path": "research/curve25519_autolab_20261104/multicurve/verify-k32.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/1b/1b342cfce52924fb1f3aaeb35e798b910734d3c4e28b52e68e115d12f20bd3cd",
+      "sha256": "1b342cfce52924fb1f3aaeb35e798b910734d3c4e28b52e68e115d12f20bd3cd",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/curve25519_autolab_20261104/multicurve/REPORT.pdf",
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "c25519-multicurve-rebaseline",
+  "status": "measured",
+  "summary": "Multi-curve re-baseline: incumbents cost 1.57x / 1.78x / 1.80x / 1.91x matched rho over five family curves at k = 20 / 24 / 28 / 32; per-curve spread about 0.2",
+  "validation": null
+}

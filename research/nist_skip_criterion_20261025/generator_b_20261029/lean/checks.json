@@ -1,0 +1,63 @@
+{
+  "kind": "conditional-lean-checks/v1",
+  "compiler": "Lean 4.34.1",
+  "compiler_commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+  "compiler_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+  "source": {
+    "path": "lean/CurveEquation.lean",
+    "sha256": "e9a98fc9435516fab293108dbdbc46a8d1954ec07323918a9c61d21fd430ea6f"
+  },
+  "auditor": {
+    "path": "tools/lean/AuditAxioms.lean",
+    "sha256": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929",
+    "repository_base": "aefabc8be8df6d220a19a0716db3ee900ff96046",
+    "modified": false
+  },
+  "shared_library": {
+    "repository": "aburan28/crypto-lean",
+    "revision": "148f5dc389b341401e06d76abe7783c4ccf42f2e",
+    "toolchain": "leanprover/lean4:v4.35.0",
+    "imported": false
+  },
+  "build": {
+    "command": "/workspace/nist-profile-lean-tools/lean-4.34.1-linux/bin/lean --threads=1 --memory=1024 -o /workspace/nist-generator-lean-development-001/CurveEquation.olean CurveEquation.lean",
+    "cwd": "/workspace/crypto-pr/research/nist_skip_criterion_20261025/generator_b_20261029/lean",
+    "status": 0,
+    "output": "lean/kernel-build.txt"
+  },
+  "audit": {
+    "command": "PATH=/workspace/nist-profile-lean-tools/lean-4.34.1-linux/bin:$PATH LEAN_PATH=/workspace/nist-generator-lean-development-004 /workspace/nist-profile-lean-tools/lean-4.34.1-linux/bin/lean --threads=1 --memory=4096 --run tools/lean/AuditAxioms.lean CurveEquation",
+    "cwd": "/workspace/crypto-pr",
+    "status": 0,
+    "output": "lean/axiom-audit.txt",
+    "explicit_theorems": 5,
+    "audited_declarations": 6,
+    "failing": 0,
+    "compiler_trusted": 0
+  },
+  "attempts": [
+    {
+      "id": "001",
+      "build_status": 0,
+      "audit_status": 1,
+      "reason": "auditor kernel memory limit 1024 MiB"
+    },
+    {
+      "id": "002",
+      "audit_status": 1,
+      "reason": "child lean executable absent on PATH"
+    },
+    {
+      "id": "003",
+      "audit_status": 1,
+      "reason": "auditor interpreter memory limit 2048 MiB"
+    },
+    {
+      "id": "004",
+      "audit_status": 0,
+      "reason": "explicit compiler PATH and 4096 MiB ceiling"
+    }
+  ],
+  "lean4checker_fresh": false,
+  "whole_repository_gate_run": false
+}

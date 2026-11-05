@@ -1,0 +1,19 @@
+.............................................F................
+======================================================================
+FAIL: test_gate_passes_on_the_committed_tree (__main__.Committed.test_gate_passes_on_the_committed_tree)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/crypto-pr/scripts/test_validation_gate.py", line 529, in test_gate_passes_on_the_committed_tree
+    self.assertEqual(g.check(REPO), [])
+AssertionError: Lists differ: ['leaderboard board:icv1-fp10-t5-192cb216:[25706 chars]ile"] != []
+
+First list contains 166 additional elements.
+First extra element 0:
+'leaderboard board:icv1-fp10-t5-192cb216:docs/ic/runs/ic-boundary-ledger-round5-2026-09-22.json: unvalidated: VALIDATION.json is missing; sweep verdict validated_with_caveats, pricing_ok=False, rho_reference_ok=True, replay_ok=True, recomputed_ok=True, protocol_frozen_ok=partial (recognized, not passing); row is not in the pre-gate freeze'
+
+Diff is 28392 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 62 tests in 0.344s
+
+FAILED (failures=1)

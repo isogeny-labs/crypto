@@ -1,0 +1,75 @@
+{
+  "kind": "frozen-native-parameter-run-plan/v1",
+  "source_revision": "6eb320e17a0e8582f1769b66086d118ae797fd21",
+  "protocol": "protocol.json",
+  "narrative": "PROTOCOL.md",
+  "source_bindings": {
+    "path": "../generator_b_20261029/source.sha256",
+    "sha256": "add8438a92e5f8a091e43d2ae63dbe1c77a61436aedf1eabfc4f360600bdabd9"
+  },
+  "input_bindings": {
+    "path": "../generator_b_20261029/input.sha256",
+    "sha256": "7b73fdd57e0a7a9a3b368b0db027175934d377a95291db44d85bbd72a2646e0c"
+  },
+  "binaries": [
+    {
+      "path": "/workspace/nist-generator-controls-build-002/analyze",
+      "sha256": "60658d827cea06a77e7d0e6162af1418858761c96c5061a60e263d4c7a9093a8"
+    },
+    {
+      "path": "/workspace/nist-generator-controls-build-002/verify",
+      "sha256": "b8a293701b9794ace1bb9b15a0470600f19fa4636a3d58ac4453ed8d6c1f2b53"
+    }
+  ],
+  "libraries": [
+    {
+      "path": "/workspace/tools/sage_skeleton_env/lib/libpari-gmp-tls.so.2.17.3",
+      "sha256": "415ae1211996efbcd5f0b38013ba03360556e1cc04336dbd5b4db804d3b8059b"
+    },
+    {
+      "path": "/workspace/tools/sage_skeleton_env/lib/libgmp.so.10.5.0",
+      "sha256": "71a072c91addce36c8abd431c35a0662f942bd373b04305f06d4878066323f87"
+    },
+    {
+      "path": "/workspace/tools/sage_skeleton_env/lib/libcrypto.so.3",
+      "sha256": "e5d4fdb07d258de9d336e2efb9595b14c6e7678fdbe457fda8870449b8803acd"
+    }
+  ],
+  "launcher": {
+    "path": "run.sh",
+    "sha256": "7b6f8a36329150c7633880ac9a45bf9ad3580b05625b2d3c5491fe3ffac7743e"
+  },
+  "preparation": {
+    "sha256": "0faf2c0e9a2cf12a3e448dff158483cb2ecb9d0210ba6174c7bc48c4f7608d7a",
+    "object": "s3://setec-astronomy-artifacts/store/sha256/0f/0faf2c0e9a2cf12a3e448dff158483cb2ecb9d0210ba6174c7bc48c4f7608d7a",
+    "all_full_get_bytes_verified": true,
+    "all_preparation_members_verified": true
+  },
+  "backend": "local",
+  "argv": [
+    "sh",
+    "research/nist_skip_criterion_20261025/generator_b_execution_20261029/run.sh"
+  ],
+  "env": {
+    "GB_ANALYZER": "/workspace/nist-generator-controls-build-002/analyze",
+    "GB_VERIFIER": "/workspace/nist-generator-controls-build-002/verify",
+    "GB_RUN": "/workspace/nist-generator-production-run-001",
+    "NIST_CHECKPOINT_WRAPPER": "/tmp/nist-checkpoint-run"
+  },
+  "native_environment": {
+    "PATH": "/usr/bin:/bin",
+    "LANG": "C",
+    "LC_ALL": "C",
+    "other_variables": "none"
+  },
+  "native_phase_limits": {
+    "positive_seconds": 30,
+    "production_seconds": 300,
+    "verification_seconds": 300,
+    "address_bytes": 805306368
+  },
+  "attempts": 1,
+  "automatic_retries": false,
+  "clock_or_performance_claim": false,
+  "whole_census_retained": 21
+}

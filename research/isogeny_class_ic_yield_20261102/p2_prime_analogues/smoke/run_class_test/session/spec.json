@@ -1,0 +1,107 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=372",
+          "linalg": "incremental-gauss-full-rank",
+          "max_trials": "9992",
+          "oracle": "mitm:m=2"
+        }
+      },
+      "name": "m2-main",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=408",
+          "linalg": "incremental-gauss-full-rank",
+          "max_trials": "9992",
+          "oracle": "mitm:m=2"
+        }
+      },
+      "name": "m2-pc",
+      "role": "candidate"
+    }
+  ],
+  "description": "research/isogeny_class_ic_yield_20261102/p2_prime_analogues: class c24B (D=-414651, h=300, p=13834393, n=13826983); same prime-abscissa FB size 372 on every curve, mitm m=2, attempt cap 9992; arms main, aa (identical repeat), pc (FB x1.2^(1/2) = planted +20% yield); the last curves are u-scaled isomorphic models.",
+  "label": "P2 yield c24B m=2: yield on every curve of one isogeny class, |F|=372",
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "alternate",
+    "rounds": 2,
+    "seed": 103,
+    "timeout_seconds": 3600,
+    "warmup": 1
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 1746437,
+        "b": 2044199,
+        "group_order": 13826983,
+        "gx": 1,
+        "gy": 441086,
+        "kind": "prime_explicit",
+        "p": 13834393,
+        "r": 13826983
+      },
+      {
+        "a": 12202489,
+        "b": 6790859,
+        "group_order": 13826983,
+        "gx": 1,
+        "gy": 3613434,
+        "kind": "prime_explicit",
+        "p": 13834393,
+        "r": 13826983
+      },
+      {
+        "a": 9528269,
+        "b": 2037978,
+        "group_order": 13826983,
+        "gx": 1,
+        "gy": 66206,
+        "kind": "prime_explicit",
+        "p": 13834393,
+        "r": 13826983
+      },
+      {
+        "a": 3657376,
+        "b": 13305290,
+        "group_order": 13826983,
+        "gx": 2,
+        "gy": 220156,
+        "kind": "prime_explicit",
+        "p": 13834393,
+        "r": 13826983
+      },
+      {
+        "a": 11573843,
+        "b": 7355966,
+        "group_order": 13826983,
+        "gx": 1,
+        "gy": 4402308,
+        "kind": "prime_explicit",
+        "p": 13834393,
+        "r": 13826983
+      },
+      {
+        "a": 12123114,
+        "b": 10636145,
+        "group_order": 13826983,
+        "gx": 2,
+        "gy": 527502,
+        "kind": "prime_explicit",
+        "p": 13834393,
+        "r": 13826983
+      }
+    ],
+    "target_seed": 20261102,
+    "targets_per_curve": 1
+  }
+}

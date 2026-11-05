@@ -22,6 +22,7 @@ pub enum ChainBuildError {
 
 /// Worst-case SAT variable count for the field-product circuit, before a
 /// finite-coordinate domain. The bound is exact for the all-affine pattern.
+/// Defined through m = 15, the widest supported summand count.
 pub fn chain_s3_max_variables(n: u32, m: usize) -> Option<u64> {
     // m=15 uses only 13 intermediate-identity bits. Keep this explicit
     // bound below the u32 mask width; build() checks its allocation cap
@@ -299,6 +300,8 @@ pub struct ChainedS3Encoding {
     orbit_choice_wires: Vec<FrobeniusOrbitChoiceWires>,
     first_pair_exchangeable: bool,
     first_pair_ordered: bool,
+    all_summands_exchangeable: bool,
+    all_summands_ordered: bool,
 }
 
 impl ChainedS3Encoding {
@@ -393,6 +396,8 @@ impl ChainedS3Encoding {
             orbit_choice_wires: Vec::new(),
             first_pair_exchangeable: false,
             first_pair_ordered: false,
+            all_summands_exchangeable: false,
+            all_summands_ordered: false,
         })
     }
 
@@ -422,6 +427,7 @@ impl ChainedS3Encoding {
         }
         self.domain_installed = true;
         self.first_pair_exchangeable = true;
+        self.all_summands_exchangeable = true;
         Ok(required)
     }
 
@@ -492,6 +498,7 @@ impl ChainedS3Encoding {
         }
         self.domain_installed = true;
         self.first_pair_exchangeable = true;
+        self.all_summands_exchangeable = true;
         Ok(required)
     }
 
@@ -556,6 +563,7 @@ impl ChainedS3Encoding {
             });
         }
         self.first_pair_exchangeable = sorted_domains[0] == sorted_domains[1];
+        self.all_summands_exchangeable = sorted_domains.windows(2).all(|w| w[0] == w[1]);
         for (block, representatives) in self.blocks[..self.m].iter().zip(&sorted_domains) {
             self.orbit_choice_wires.push(add_frobenius_orbit_domain(
                 &mut self.solver,
@@ -580,7 +588,7 @@ impl ChainedS3Encoding {
     /// node depends only on its output. This is optional so ordered and
     /// unrestricted searches remain separate sweep arms.
     pub fn order_first_pair(&mut self, max_variables: u32) -> Result<(), ChainBuildError> {
-        if self.first_pair_ordered || !self.first_pair_exchangeable {
+        if self.first_pair_ordered || self.all_summands_ordered || !self.first_pair_exchangeable {
             return Err(ChainBuildError::Unsupported);
         }
         let extra = self.n - 1;
@@ -593,6 +601,69 @@ impl ChainedS3Encoding {
         }
         add_lex_leq(&mut self.solver, &self.blocks[0], &self.blocks[1]);
         self.first_pair_ordered = true;
+        Ok(())
+    }
+
+    /// Restrict the affine intermediate `y_step` (the x-coordinate of the
+    /// partial sum after summand `step + 1`, `1 <= step <= m - 2`) to a
+    /// finite set of codes, by the same trie as a summand domain. The caller
+    /// must pass a set that contains every value the intermediate can take
+    /// in a decomposition (for example all x-coordinates of sums of
+    /// `step + 1` base points, or of `R` minus sums of `m - step - 1`), so
+    /// that no decomposition is lost. Refused for an identity step, whose
+    /// block is fixed to zero, and before the summand domain is installed.
+    pub fn constrain_intermediate(
+        &mut self,
+        step: usize,
+        codes: &[BigUint],
+        max_domain_clauses: usize,
+    ) -> Result<usize, ChainBuildError> {
+        if !self.domain_installed
+            || step == 0
+            || step + 2 > self.m
+            || (self.identity_mask & (1 << (step - 1))) != 0
+        {
+            return Err(ChainBuildError::Unsupported);
+        }
+        let required =
+            finite_domain_clause_count(codes, self.n, 1).ok_or(ChainBuildError::Unsupported)?;
+        if required > max_domain_clauses {
+            return Err(ChainBuildError::DomainClauseCap {
+                required,
+                maximum: max_domain_clauses,
+            });
+        }
+        let mut codes = codes.to_vec();
+        codes.sort_unstable();
+        codes.dedup();
+        let block = self.blocks[self.m + step - 1].clone();
+        add_coordinate_domain(&mut self.solver, &block, &codes, self.n as usize);
+        Ok(required)
+    }
+
+    /// Keep one representative of every summand permutation:
+    /// `x_1 <= x_2 <= ... <= x_m` as unsigned codes. A decomposition
+    /// `R = P_1 + ... + P_m` has a chain witness in every summand order, its
+    /// partial sums landing in some identity pattern, so a caller that
+    /// searches every pattern loses no decomposition; it only stops searching
+    /// the `m!` reorderings of each one. Requires one shared summand domain.
+    /// Optional, like [`Self::order_first_pair`], so the arms stay separate.
+    pub fn order_all_summands(&mut self, max_variables: u32) -> Result<(), ChainBuildError> {
+        if self.first_pair_ordered || self.all_summands_ordered || !self.all_summands_exchangeable {
+            return Err(ChainBuildError::Unsupported);
+        }
+        let extra = u64::from(self.n - 1) * (self.m as u64 - 1);
+        let required = u64::from(self.solver.n_vars()) + extra;
+        if required > u64::from(max_variables) || required > i32::MAX as u64 {
+            return Err(ChainBuildError::VariableCap {
+                required,
+                maximum: max_variables,
+            });
+        }
+        for i in 0..self.m - 1 {
+            add_lex_leq(&mut self.solver, &self.blocks[i], &self.blocks[i + 1]);
+        }
+        self.all_summands_ordered = true;
         Ok(())
     }
 
@@ -1101,9 +1172,13 @@ mod tests {
         assert_eq!(chain_s3_max_variables(83, 4), Some(63_578));
         assert_eq!(chain_s3_max_variables(83, 5), Some(84_743));
         assert_eq!(chain_s3_max_variables(83, 6), Some(105_908));
+        assert_eq!(chain_s3_max_variables(83, 9), Some(169_403));
+        assert_eq!(chain_s3_max_variables(83, 10), Some(190_568));
         assert_eq!(chain_s3_max_variables(83, 7), Some(127_073));
         assert_eq!(chain_s3_max_variables(83, 15), Some(296_393));
         assert_eq!(chain_s3_max_variables(83, 16), None);
+        assert_eq!(chain_s3_max_variables(1, 4), None);
+        assert_eq!(chain_s3_max_variables(128, 4), None);
     }
 
     #[test]

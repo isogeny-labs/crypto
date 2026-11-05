@@ -10,12 +10,14 @@ publish = false
 path = "src/lib.rs"
 
 [dependencies]
+libc = { version = "0.2", optional = true }
 five-leads-study = { path = "../five_leads_e2e_20261019/native", optional = true }
 serde = { version = "1", features = ["derive"], optional = true }
 serde_json = { version = "1", optional = true }
 
 [features]
-producer = ["dep:five-leads-study", "dep:serde", "dep:serde_json"]
+reporting = ["dep:serde", "dep:serde_json"]
+producer = ["dep:five-leads-study", "dep:libc", "reporting"]
 
 [[bin]]
 name = "pencil-symbolic"

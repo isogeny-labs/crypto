@@ -1,0 +1,58 @@
+{
+  "config": {
+    "extra_relations": 64,
+    "fb_size": 8,
+    "max_relation_attempts": 64,
+    "max_trials_per_relation": 5000
+  },
+  "ic": {
+    "scalar": "190",
+    "stages": {
+      "factor_base_ms": 0.32937500000000003,
+      "factor_base_size": 8,
+      "linear_algebra_ms": 0.053459,
+      "relation_attempts_exhausted": 0,
+      "relations_collected": 72,
+      "relations_ms": 8.173333,
+      "total_ms": 8.637792,
+      "trials_per_relation_max": 11,
+      "trials_per_relation_median": 2.0,
+      "trials_per_relation_min": 1,
+      "trials_total": 180,
+      "verify_ms": 0.016375
+    }
+  },
+  "input": {
+    "a": 1,
+    "b": 19,
+    "cofactor": 1,
+    "curve_order": 281,
+    "generator": [
+      3,
+      7
+    ],
+    "n": 281,
+    "p": 271,
+    "target": [
+      231,
+      54
+    ]
+  },
+  "isogeny_route": null,
+  "operation": "solve-prime",
+  "rho": {
+    "max_steps": 1000000,
+    "scalar": "190",
+    "verified": true,
+    "wall_ms": 0.062792
+  },
+  "schema_version": 1,
+  "software": {
+    "arch": "aarch64",
+    "field_backend": "aarch64:pmull",
+    "os": "macos",
+    "version": "0.1.0"
+  },
+  "status": "complete",
+  "verified": true
+}

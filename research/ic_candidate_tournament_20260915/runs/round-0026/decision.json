@@ -1,0 +1,183 @@
+{
+  "arithmetic_operation_speedup": null,
+  "beats_rho": false,
+  "beats_rho_strict": false,
+  "beats_rho_strict_definition": "Winner/rho upper paired 95% limits and every cell ratio < 1 in both instructions and native process wall, on confirmation and replay. beats_rho alone is the confirmation point estimate of rho/winner exceeding one.",
+  "classification": "engineering",
+  "confirmation": {
+    "candidate": "batch16",
+    "candidate_over_baseline": 0.6299656545673873,
+    "ci95": [
+      0.5775378781221964,
+      0.6763254846298824
+    ],
+    "eligible": true,
+    "independent_curve_blocks": 5,
+    "native_wall_candidate_over_baseline": 0.7622426415069098,
+    "native_wall_ci95": [
+      0.7401160220201368,
+      0.7827701990277026
+    ],
+    "native_wall_per_cell": {
+      "n13a0": 0.7216141624095195,
+      "n17a1": 0.7572842091468744,
+      "n19a0": 0.7683787703893916,
+      "n19a1": 0.7712625470073428,
+      "n23a0": 0.794556260440732
+    },
+    "native_wall_status": "paired cold-process timing; nested curve/target bootstrap",
+    "paired_cases": 60,
+    "per_cell": {
+      "n13a0": 0.5321123924191625,
+      "n17a1": 0.6202027584878015,
+      "n19a0": 0.6579207988412393,
+      "n19a1": 0.6565415993901376,
+      "n23a0": 0.6960035122152776
+    },
+    "speedup": 1.587388126241143
+  },
+  "family_wide_or_complexity_claim": false,
+  "independent_replay": "fresh processes, frozen executable, same final cases; independent native group and rank checker",
+  "instruction_speedup": 1.587388126241143,
+  "objective": "incumbent",
+  "parity_definition": "Both candidate/rho upper paired 95% limits and every cell ratio <= 1.10, instructions and native process wall, confirmation and replay.",
+  "provisional_challenger": "batch16",
+  "reasons": [],
+  "replay": {
+    "candidate": "batch16",
+    "candidate_over_baseline": 0.6299614326911928,
+    "ci95": [
+      0.5775368360437851,
+      0.6763218098469954
+    ],
+    "eligible": true,
+    "independent_curve_blocks": 5,
+    "native_wall_candidate_over_baseline": 0.758731689160206,
+    "native_wall_ci95": [
+      0.7362046765771565,
+      0.7792408699739838
+    ],
+    "native_wall_per_cell": {
+      "n13a0": 0.7166695295204072,
+      "n17a1": 0.7522396260234534,
+      "n19a0": 0.7682511751541452,
+      "n19a1": 0.7690668154261336,
+      "n23a0": 0.7894028009671193
+    },
+    "native_wall_status": "paired cold-process timing; nested curve/target bootstrap",
+    "paired_cases": 60,
+    "per_cell": {
+      "n13a0": 0.5321075618598352,
+      "n17a1": 0.6201900667048262,
+      "n19a0": 0.6579235221513097,
+      "n19a1": 0.6565431794589468,
+      "n23a0": 0.6959961954844239
+    },
+    "speedup": 1.5873987646005627
+  },
+  "rho_comparison": {
+    "candidate": "rho",
+    "candidate_over_baseline": 0.05466563831983406,
+    "ci95": [
+      0.0470316806274229,
+      0.06252009404257437
+    ],
+    "eligible": true,
+    "independent_curve_blocks": 5,
+    "native_wall_candidate_over_baseline": 0.2273588372192889,
+    "native_wall_ci95": [
+      0.20484229892507613,
+      0.25829819105478913
+    ],
+    "native_wall_per_cell": {
+      "n13a0": 0.2882947425209433,
+      "n17a1": 0.2285888362807414,
+      "n19a0": 0.21862805188554094,
+      "n19a1": 0.21811989763014075,
+      "n23a0": 0.19331532685124037
+    },
+    "native_wall_status": "paired cold-process timing; nested curve/target bootstrap",
+    "paired_cases": 60,
+    "per_cell": {
+      "n13a0": 0.048416511108720625,
+      "n17a1": 0.04254541797835463,
+      "n19a0": 0.061730501833547266,
+      "n19a1": 0.05986564412647781,
+      "n23a0": 0.06412809890729698
+    },
+    "speedup": 18.29302704103201
+  },
+  "rho_over_winner": 0.0867755851822974,
+  "rho_parity": false,
+  "rho_verdict_scope": "observed complete instruction cost; no asymptotic crossover claim",
+  "scope": "bounded public-hash ECDLP configuration tournament",
+  "status": "promoted",
+  "unit": "valgrind-3.22-amd64-Ir",
+  "winner": "batch16",
+  "winner_over_rho": {
+    "confirmation": {
+      "candidate": "batch16",
+      "candidate_over_baseline": 11.523978753922643,
+      "ci95": [
+        10.71823713558604,
+        13.016270299350452
+      ],
+      "eligible": true,
+      "independent_curve_blocks": 5,
+      "native_wall_candidate_over_baseline": 3.3525973779137614,
+      "native_wall_ci95": [
+        2.864534546571429,
+        3.823255958422435
+      ],
+      "native_wall_per_cell": {
+        "n13a0": 2.50304308743021,
+        "n17a1": 3.312866111347694,
+        "n19a0": 3.5145479446144616,
+        "n19a1": 3.535956853946214,
+        "n23a0": 4.11015656845542
+      },
+      "native_wall_status": "paired cold-process timing; nested curve/target bootstrap",
+      "paired_cases": 60,
+      "per_cell": {
+        "n13a0": 10.99030847605457,
+        "n17a1": 14.577427792655262,
+        "n19a0": 10.657953188446204,
+        "n19a1": 10.96691782022867,
+        "n23a0": 10.853331442452614
+      },
+      "speedup": 0.08677558518229742
+    },
+    "replay": {
+      "candidate": "batch16",
+      "candidate_over_baseline": 11.523907380992881,
+      "ci95": [
+        10.718050945070347,
+        13.01619521766406
+      ],
+      "eligible": true,
+      "independent_curve_blocks": 5,
+      "native_wall_candidate_over_baseline": 3.3464194435612535,
+      "native_wall_ci95": [
+        2.864245022096604,
+        3.796992871704253
+      ],
+      "native_wall_per_cell": {
+        "n13a0": 2.49562455158388,
+        "n17a1": 3.3078175948616444,
+        "n19a0": 3.543908234720062,
+        "n19a1": 3.5319096350032115,
+        "n23a0": 4.061523972587258
+      },
+      "native_wall_status": "paired cold-process timing; nested curve/target bootstrap",
+      "paired_cases": 60,
+      "per_cell": {
+        "n13a0": 10.990176819289465,
+        "n17a1": 14.577408903234668,
+        "n19a0": 10.657931250484365,
+        "n19a1": 10.966907249831765,
+        "n23a0": 10.853172227422405
+      },
+      "speedup": 0.08677612262394299
+    }
+  }
+}

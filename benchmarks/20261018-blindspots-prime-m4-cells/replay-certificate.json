@@ -1,0 +1,454 @@
+{
+ "schema": "replay-certificate/v1",
+ "item": "BLINDSPOT-14",
+ "evidence_directory": "benchmarks/20261018-blindspots-prime-m4-cells",
+ "status": "verified",
+ "independent": true,
+ "independence_basis": "Fresh build (rustc, per card, same build argv as the original cards) and fresh run on 2026-10-22 by executor sessions other than the one that produced the recorded 2026-10-18 rows, as stated in the assessment dispatch; cards written by the experiment-director lane. Same instrument source (sha256 pinned below, also the sha256 of examples/blindspots_14_prime_m4.rs at the recorded commit 397d5ade...). Same host class is not claimed to be a different machine; neither the receipts nor this script can show the executor identity, which rests on the dispatch statement.",
+ "scalars_verified": true,
+ "scalars_scope": "All 281 compared rows (selftest lines counted as rows): the sample in replay/PLAN.md: matched rho, arm (a) T_dec and full IC at 16 and 28 bits (design cells bx = 8 and bx = 63) and 16-bit bx = 3; arm (b) T_dec at 16-bit bx = 3, 4, 5; arm (b) full IC at 16-bit bx = 3 and bx = 4 runs 0-1; arm (b) 28-bit design-cell T_dec run to the nonzero cap; arm (b) 16-bit design-cell T_dec target 0 (cell, setup and target-0 rows); the deep selftest text. Every key but `ms` compared exactly, with no tolerance. Not replayed (see replay/PLAN.md 'What was dropped, and why'): 20 and 24 bits, 16-bit ladder bx = 6, 7, arm (b) T_dec bx = 8 targets 1-4 and planted targets, arm (b) full IC bx = 4 runs 2-15, arms (c) and (d) (`reuse-pkm`, `reach`). Timing fields (`ms`, selftest timing text, receipt seconds) are descriptive and excluded.",
+ "comparison_rule": "research/blindspots_20261018/14-prime-m4-cells/replay/PLAN.md, 'What must match exactly': drop `ms` from each row; exact equality row by row in file order of every key (the PLAN.md-listed keys, and any other key); partial replays compare the corresponding subset; selftest line-equal after stripping timing text with last line SELFTEST OK; every receipt command exit 0; receipt card sha256 equals the card file.",
+ "compare_script": {
+  "path": "research/blindspots_20261018/14-prime-m4-cells/replay/compare_replay.py",
+  "sha256": "b4df3670c966cac0485e2e67be49fa583aeab6f2d8e92be81896db6df85b8944"
+ },
+ "instrument": {
+  "path": "research/blindspots_20261018/instruments/blindspots_14_prime_m4.rs",
+  "sha256": "f6696fc0cafff9120189072a7785452422d68c7944a2812d4667e27c8872b376"
+ },
+ "total_rows_compared": 281,
+ "total_listed_key_values_compared": 3259,
+ "total_mismatches": 0,
+ "mismatches": [],
+ "failures": [],
+ "runs": [
+  {
+   "card_id": "CARD-BLINDSPOT-14-R01",
+   "card": "research/blindspots_20261018/14-prime-m4-cells/replay/card-r01.yaml",
+   "card_sha256": "8694e98fe44b2b4c12b556ceb84298fae7b1b1a4429f704336fa6f8f3a7c51a1",
+   "receipt": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/receipt-card-r01.json",
+   "receipt_sha256": "d8f8911143148c4c775399117327f7b94cecb2afd777171e5de1c8045d2393fd",
+   "commit": "e59a91a29ca9321d6efa976b7813ac36735ddf6c",
+   "status": "completed",
+   "commands": [
+    {
+     "id": "make-dirs",
+     "exit_code": 0
+    },
+    {
+     "id": "build",
+     "exit_code": 0
+    },
+    {
+     "id": "selftest",
+     "exit_code": 0
+    },
+    {
+     "id": "rho-b16",
+     "exit_code": 0
+    },
+    {
+     "id": "rho-b28",
+     "exit_code": 0
+    },
+    {
+     "id": "tdec-a-b16",
+     "exit_code": 0
+    },
+    {
+     "id": "tdec-a-b28",
+     "exit_code": 0
+    },
+    {
+     "id": "tdec-a-b16-bx3",
+     "exit_code": 0
+    },
+    {
+     "id": "fullic-a-b16",
+     "exit_code": 0
+    },
+    {
+     "id": "fullic-a-b28",
+     "exit_code": 0
+    },
+    {
+     "id": "fullic-a-b16-bx3",
+     "exit_code": 0
+    },
+    {
+     "id": "remove-bin",
+     "exit_code": 0
+    },
+    {
+     "id": "remove-bin-dir",
+     "exit_code": 0
+    }
+   ],
+   "files": [
+    {
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/card-r01-selftest.stdout.log",
+     "replay_sha256": "4ed3c1e88b5c5b8b85fbb115eb804b8df3e999e28b7e119cae6c4e790db381de",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/card-01-selftest.stdout.log",
+     "recorded_sha256": "26b2dee1c6dc4e98b62a26896aa7981f180045b1149e24934eef9a886d2a213b",
+     "comparison": "line-equal after stripping timing text; last line SELFTEST OK",
+     "lines_recorded": 36,
+     "lines_replayed": 36,
+     "rows_compared": 36,
+     "last_line_replay": "SELFTEST OK (19.4s)",
+     "last_line_recorded": "SELFTEST OK (21.7s)",
+     "mismatches": [],
+     "command_id": "selftest"
+    },
+    {
+     "command_id": "rho-b16",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/rho-b16.jsonl",
+     "replay_sha256": "0ccb27d777c4c2c49ffb2bd0a6229b64a3963c73c99596f7c9112ff08d762f71",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-b16.jsonl",
+     "recorded_sha256": "82a53bc6a5bdd95f24995996f2c86470dfcca5d898c687ff57aef86f9d514d46",
+     "plan_rows": "16 rho rows",
+     "rows_expected_by_plan": 16,
+     "rows_recorded_total": 16,
+     "rows_replayed_total": 16,
+     "rows_recorded_selected": 16,
+     "rows_replayed_selected": 16,
+     "listed_key_values_compared": 160,
+     "rows_compared": 16,
+     "rows_equal": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "rho-b28",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/rho-b28.jsonl",
+     "replay_sha256": "75486f28f1b9c08b4249675ed2d53019271d16e4f701a27ba2cda65108f27e17",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/rho-b28.jsonl",
+     "recorded_sha256": "9ee54d450af8a7d7c339a66827d8bc4c46cad121e977a0de47cbee8ae1be9ecc",
+     "plan_rows": "16 rho rows",
+     "rows_expected_by_plan": 16,
+     "rows_recorded_total": 16,
+     "rows_replayed_total": 16,
+     "rows_recorded_selected": 16,
+     "rows_replayed_selected": 16,
+     "listed_key_values_compared": 160,
+     "rows_compared": 16,
+     "rows_equal": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "tdec-a-b16",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-a-b16.jsonl",
+     "replay_sha256": "657f50cd5ce16426cf5771189143ad45173aa15f467cabb828fc601554d7a586",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16.jsonl",
+     "recorded_sha256": "3f7a10de292c5c26a6a9e288b8c45d8082b1e51e9b839e3bb0af2a2c81488eb3",
+     "plan_rows": "cell, setup, 16 random + 4 planted tdec",
+     "rows_expected_by_plan": 22,
+     "rows_recorded_total": 22,
+     "rows_replayed_total": 22,
+     "rows_recorded_selected": 22,
+     "rows_replayed_selected": 22,
+     "listed_key_values_compared": 234,
+     "rows_compared": 22,
+     "rows_equal": 22,
+     "mismatches": []
+    },
+    {
+     "command_id": "tdec-a-b28",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-a-b28.jsonl",
+     "replay_sha256": "ac0b26532f2a84302cbdb420e7928d3e99354c2c9f11d61852817261602e3468",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b28.jsonl",
+     "recorded_sha256": "58017ad73cc398326542e78648c174e0f0a3637b251dd614cc6a46d61e3651b1",
+     "plan_rows": "cell, setup, 16 random + 4 planted tdec",
+     "rows_expected_by_plan": 22,
+     "rows_recorded_total": 22,
+     "rows_replayed_total": 22,
+     "rows_recorded_selected": 22,
+     "rows_replayed_selected": 22,
+     "listed_key_values_compared": 234,
+     "rows_compared": 22,
+     "rows_equal": 22,
+     "mismatches": []
+    },
+    {
+     "command_id": "tdec-a-b16-bx3",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-a-b16-bx3.jsonl",
+     "replay_sha256": "2787237b02d28bc2bf7faf73c5b8ff2c764ca8cfd8bd3a7321c1bd625a6f08da",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-a-b16-bx3.jsonl",
+     "recorded_sha256": "65aa3cca6f0b90ede018f1c621cf22d6abd5f4aedd0639f6f81d1eb01ccaaf23",
+     "plan_rows": "cell, setup, 16 random + 4 planted tdec",
+     "rows_expected_by_plan": 22,
+     "rows_recorded_total": 22,
+     "rows_replayed_total": 22,
+     "rows_recorded_selected": 22,
+     "rows_replayed_selected": 22,
+     "listed_key_values_compared": 234,
+     "rows_compared": 22,
+     "rows_equal": 22,
+     "mismatches": []
+    },
+    {
+     "command_id": "fullic-a-b16",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-a-b16.jsonl",
+     "replay_sha256": "fbfdfedb785ba777f3e66296cd5a4dd4c5cdd7f1922425e99e1f333bc7419693",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16.jsonl",
+     "recorded_sha256": "017b0d28297507bf45607468939b5cb76ccb81a50a82d8be0e2f81a11e82920e",
+     "plan_rows": "16 fullic rows",
+     "rows_expected_by_plan": 16,
+     "rows_recorded_total": 16,
+     "rows_replayed_total": 16,
+     "rows_recorded_selected": 16,
+     "rows_replayed_selected": 16,
+     "listed_key_values_compared": 288,
+     "rows_compared": 16,
+     "rows_equal": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "fullic-a-b28",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-a-b28.jsonl",
+     "replay_sha256": "eae6b1c4ad1f354225db6771b1b2122388d0f9864fa4042852422ebec67f20d3",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b28.jsonl",
+     "recorded_sha256": "6e6d1181f844079e1baa9ee7c6ff9a6155606f8a2a36fa8224a30271ffd07afd",
+     "plan_rows": "16 fullic rows",
+     "rows_expected_by_plan": 16,
+     "rows_recorded_total": 16,
+     "rows_replayed_total": 16,
+     "rows_recorded_selected": 16,
+     "rows_replayed_selected": 16,
+     "listed_key_values_compared": 288,
+     "rows_compared": 16,
+     "rows_equal": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "fullic-a-b16-bx3",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-a-b16-bx3.jsonl",
+     "replay_sha256": "be3bde1384918f4606473f436794f6cccaf9b1c71628c78245212956f0016b5f",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-a-b16-bx3.jsonl",
+     "recorded_sha256": "d2ca21b8012e87398abd2ff49ae9c51fed8fd0fde138c3017d51cb4f0d40ac67",
+     "plan_rows": "16 fullic rows",
+     "rows_expected_by_plan": 16,
+     "rows_recorded_total": 16,
+     "rows_replayed_total": 16,
+     "rows_recorded_selected": 16,
+     "rows_replayed_selected": 16,
+     "listed_key_values_compared": 288,
+     "rows_compared": 16,
+     "rows_equal": 16,
+     "mismatches": []
+    }
+   ],
+   "rows_compared": 182,
+   "mismatches": []
+  },
+  {
+   "card_id": "CARD-BLINDSPOT-14-R02",
+   "card": "research/blindspots_20261018/14-prime-m4-cells/replay/card-r02.yaml",
+   "card_sha256": "34c3d0434815886b1552687b782429dc91a6fcf8c5b8939a505aa1dce9adc6f0",
+   "receipt": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/receipt-card-r02.json",
+   "receipt_sha256": "3cf3c63fad458ab165c6bab70ce829ece61c0528a2128d6d223c7b0a5a447faa",
+   "commit": "44578da212c808280f071d2fb0c45bc47ed905e2",
+   "status": "completed",
+   "commands": [
+    {
+     "id": "make-dirs",
+     "exit_code": 0
+    },
+    {
+     "id": "build",
+     "exit_code": 0
+    },
+    {
+     "id": "tdec-b-b16-bx3",
+     "exit_code": 0
+    },
+    {
+     "id": "tdec-b-b16-bx4",
+     "exit_code": 0
+    },
+    {
+     "id": "tdec-b-b16-bx5",
+     "exit_code": 0
+    },
+    {
+     "id": "fullic-b-b16-bx3",
+     "exit_code": 0
+    },
+    {
+     "id": "fullic-b-b16-bx4-r00-02",
+     "exit_code": 0
+    },
+    {
+     "id": "remove-bin",
+     "exit_code": 0
+    },
+    {
+     "id": "remove-bin-dir",
+     "exit_code": 0
+    }
+   ],
+   "files": [
+    {
+     "command_id": "tdec-b-b16-bx3",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-b-b16-bx3.jsonl",
+     "replay_sha256": "9746f862c8ff63e29b9e10a2ffb4387aa172fbc9ac7227ac12aea8be7b369d73",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx3.jsonl",
+     "recorded_sha256": "c29f8cacad14b7dcd203c36670e65a05e929189219f6e79b3234a1a66e0c3a17",
+     "plan_rows": "cell, setup, 16 random + 2 planted tdec",
+     "rows_expected_by_plan": 20,
+     "rows_recorded_total": 20,
+     "rows_replayed_total": 20,
+     "rows_recorded_selected": 20,
+     "rows_replayed_selected": 20,
+     "listed_key_values_compared": 263,
+     "rows_compared": 20,
+     "rows_equal": 20,
+     "mismatches": []
+    },
+    {
+     "command_id": "tdec-b-b16-bx4",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-b-b16-bx4.jsonl",
+     "replay_sha256": "aa268d5db1cfb46ede8ad5723f363f6c50a321274bb78612dde5afab8d62b76a",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx4.jsonl",
+     "recorded_sha256": "23cc29cc019f7ce7e9ce1743a0daf524f0b49e17614490efa573cbbc452aada9",
+     "plan_rows": "cell, setup, 16 random + 2 planted tdec",
+     "rows_expected_by_plan": 20,
+     "rows_recorded_total": 20,
+     "rows_replayed_total": 20,
+     "rows_recorded_selected": 20,
+     "rows_replayed_selected": 20,
+     "listed_key_values_compared": 263,
+     "rows_compared": 20,
+     "rows_equal": 20,
+     "mismatches": []
+    },
+    {
+     "command_id": "tdec-b-b16-bx5",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-b-b16-bx5.jsonl",
+     "replay_sha256": "4247596de5aaa6451668e228fe5f8e1f79a23ca6cebbe24b789eee2139cc989e",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx5.jsonl",
+     "recorded_sha256": "17ed214ab54cb403a76ad45b13aed036c027977811fd7cceb5ca0c7880901b7d",
+     "plan_rows": "cell, setup, 16 random + 2 planted tdec",
+     "rows_expected_by_plan": 20,
+     "rows_recorded_total": 20,
+     "rows_replayed_total": 20,
+     "rows_recorded_selected": 20,
+     "rows_replayed_selected": 20,
+     "listed_key_values_compared": 263,
+     "rows_compared": 20,
+     "rows_equal": 20,
+     "mismatches": []
+    },
+    {
+     "command_id": "fullic-b-b16-bx3",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-b-b16-bx3.jsonl",
+     "replay_sha256": "a43fa5a778fb7740e3d9ad9406327de812b01aefb3a7334df77def773e720b66",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-b-b16-bx3.jsonl",
+     "recorded_sha256": "6169acdaa182e92ca4c576275d00a99b227a8404e59ba357ebb256f9257a0947",
+     "plan_rows": "16 fullic rows",
+     "rows_expected_by_plan": 16,
+     "rows_recorded_total": 16,
+     "rows_replayed_total": 16,
+     "rows_recorded_selected": 16,
+     "rows_replayed_selected": 16,
+     "listed_key_values_compared": 288,
+     "rows_compared": 16,
+     "rows_equal": 16,
+     "mismatches": []
+    },
+    {
+     "command_id": "fullic-b-b16-bx4-r00-02",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/fullic-b-b16-bx4-r00-02.jsonl",
+     "replay_sha256": "c9cce4d70f23933982cb24bf527ba6f6b00e920192087faa188d9cda4a6bd404",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/fullic-b-b16-bx4-r00-06.jsonl",
+     "recorded_sha256": "f69a9ca2081a58d4cca531755715ee9feb210ab77761cd9912df9cf5b9d47596",
+     "plan_rows": "first two rows (run 0, 1) of the recorded r00-06 file",
+     "rows_expected_by_plan": 2,
+     "rows_recorded_total": 6,
+     "rows_replayed_total": 2,
+     "rows_recorded_selected": 2,
+     "rows_replayed_selected": 2,
+     "listed_key_values_compared": 36,
+     "rows_compared": 2,
+     "rows_equal": 2,
+     "mismatches": [],
+     "comparison": "subset: first two rows (run 0, 1) of the recorded r00-06 file"
+    }
+   ],
+   "rows_compared": 78,
+   "mismatches": []
+  },
+  {
+   "card_id": "CARD-BLINDSPOT-14-R03",
+   "card": "research/blindspots_20261018/14-prime-m4-cells/replay/card-r03.yaml",
+   "card_sha256": "1022f9c7a2dacd7c0e7343e3274ff3567967cc7f27ba7f7779d37c43785d2993",
+   "receipt": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/receipt-card-r03.json",
+   "receipt_sha256": "43a56b52b6e60023216e4a98d804e1b3332b2169277db63161794027ab22d894",
+   "commit": "e5559cb2704e5a545eef1ca7a3ebf562e33b5a00",
+   "status": "completed",
+   "commands": [
+    {
+     "id": "make-dirs",
+     "exit_code": 0
+    },
+    {
+     "id": "build",
+     "exit_code": 0
+    },
+    {
+     "id": "tdec-b-b28-bx63",
+     "exit_code": 0
+    },
+    {
+     "id": "tdec-b-b16-bx8-t00-01",
+     "exit_code": 0
+    },
+    {
+     "id": "remove-bin",
+     "exit_code": 0
+    },
+    {
+     "id": "remove-bin-dir",
+     "exit_code": 0
+    }
+   ],
+   "files": [
+    {
+     "command_id": "tdec-b-b28-bx63",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-b-b28-bx63.jsonl",
+     "replay_sha256": "77f176bb413a64e3896173936c8f365691ea8b0c8dca29c5703ad9d3f484ed55",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b28-bx63.jsonl",
+     "recorded_sha256": "76c85ec21b16baba2d21aca6e68adfe1c857453818f33aefc1285ce51babc3d2",
+     "plan_rows": "cell, setup, 16 random tdec",
+     "rows_expected_by_plan": 18,
+     "rows_recorded_total": 18,
+     "rows_replayed_total": 18,
+     "rows_recorded_selected": 18,
+     "rows_replayed_selected": 18,
+     "listed_key_values_compared": 235,
+     "rows_compared": 18,
+     "rows_equal": 18,
+     "mismatches": []
+    },
+    {
+     "command_id": "tdec-b-b16-bx8-t00-01",
+     "replay_file": "research/blindspots_20261018/14-prime-m4-cells/replay/raw/tdec-b-b16-bx8-t00-01.jsonl",
+     "replay_sha256": "a87ec39dae16b4c14534550d8cb0f42a6219d6cf827d59c09c1cb839b1001c0a",
+     "reproduces_recorded_file": "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx8-t00-05.jsonl",
+     "recorded_sha256": "b4759c68e67cf5385be6ca21628a1f7f3d8cb9bf7c88c3f496cc144e2d01cbce",
+     "plan_rows": "cell, setup, tdec target 0 of the recorded t00-05 file",
+     "rows_expected_by_plan": 3,
+     "rows_recorded_total": 7,
+     "rows_replayed_total": 3,
+     "rows_recorded_selected": 3,
+     "rows_replayed_selected": 3,
+     "listed_key_values_compared": 25,
+     "rows_compared": 3,
+     "rows_equal": 3,
+     "mismatches": [],
+     "comparison": "subset: cell, setup, tdec target 0 of the recorded t00-05 file"
+    }
+   ],
+   "rows_compared": 21,
+   "mismatches": []
+  }
+ ]
+}

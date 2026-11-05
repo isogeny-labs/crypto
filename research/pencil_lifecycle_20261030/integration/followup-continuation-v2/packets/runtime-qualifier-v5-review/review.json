@@ -1,0 +1,17 @@
+{
+  "schema": "software.source-review/v1",
+  "verdict": "v5_validated_at_amended_source_scope",
+  "reviewed_versions": {
+    "v4": "26adeff79d735aed824ce4917fc1749a521a3d32c71c0025f5e6157d48bafd06",
+    "v5": "d8f0f669ecba02ba5158a1c91c72b798b84882eb6c9583a6838c5e1510c6c3e2"
+  },
+  "matched_files": 29,
+  "v4_finding": "extra literal gate receipt permitted in negative payload",
+  "v5_resolution": "reject gate schema in all remaining stdout/stderr",
+  "negative_output_scope": "exact exit, required substring, no success JSON; not byte equality",
+  "execution_count": 0,
+  "actual_kernel_qualification": false,
+  "boundary": "after startup, before tested exec",
+  "operational_unknown": "gate mount parent may appear in strict docker diff; no observed failure",
+  "admission_granted": false
+}

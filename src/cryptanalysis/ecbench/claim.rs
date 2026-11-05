@@ -346,6 +346,10 @@ impl Implementation {
                     h(include_bytes!("../ic_framework/plugins.rs")),
                 ),
                 (
+                    "ic_explicit_x".into(),
+                    h(include_bytes!("../ic_framework/explicit_base.rs")),
+                ),
+                (
                     "ic_solvers".into(),
                     h(include_bytes!("../ic_framework/solvers.rs")),
                 ),
@@ -467,7 +471,7 @@ fn method_record(
             "construction": {
                 "family": fb.family,
                 "params": fb.params,
-                "builder": "ic_framework::plugins",
+                "builder": if fb.family == "explicit-x" { "ic_framework::explicit_base" } else { "ic_framework::plugins" },
                 "points_sha256": fb.points_sha256,
                 "solver_columns": columns.json(),
             },

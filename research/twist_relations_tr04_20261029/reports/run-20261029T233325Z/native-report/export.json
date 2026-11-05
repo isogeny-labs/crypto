@@ -1,0 +1,227 @@
+{
+  "analysis": {
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "bytes": 475,
+        "kind": "analysis",
+        "path": "comparisons.json",
+        "sha256": "ded8f1caf6451bbede305969f729bab9fe1a27ed7ddab0c3a8b6fc2b05d1d61d"
+      },
+      {
+        "bytes": 119,
+        "kind": "analysis",
+        "path": "graph-data.json",
+        "sha256": "3573cfe6bec8cfaab39150c904f04f7a289c3cd9f1c395e19a3f2be696ac563f"
+      },
+      {
+        "bytes": 1030,
+        "kind": "report",
+        "path": "recorded-values.svg",
+        "sha256": "75226a23ce9bfc13d108c9df680127285ec1e459ba6c9e9ab94490407dd45185"
+      },
+      {
+        "bytes": 2904,
+        "kind": "report",
+        "path": "REPORT.md",
+        "sha256": "2ba9256f8a22c675e623723e7fd38c289469052f23cd12e3e3926e9a68bf3759"
+      },
+      {
+        "bytes": 4265,
+        "kind": "report",
+        "path": "report.pdf",
+        "sha256": "e47744de9a3c00188d320f75d4131d45f5e1f843de941429a8ebe6641039a511"
+      },
+      {
+        "bytes": 3514,
+        "kind": "analysis",
+        "path": "report.pdf-commands.txt",
+        "sha256": "21697453c9167bf90cf6439fe21afe65b753b86c31bdcdc1049f90252be26fd2"
+      }
+    ],
+    "script": {
+      "bytes": 63857,
+      "kind": "analysis",
+      "path": "source-records/dbff251e6ede8244f1ff6f9519d88830be5c3076ed9ae8d906d4fb6abe37b923-tr04_report.rs",
+      "sha256": "dbff251e6ede8244f1ff6f9519d88830be5c3076ed9ae8d906d4fb6abe37b923"
+    },
+    "unmasked_at": null
+  },
+  "arms": [
+    {
+      "binary_sha256": null,
+      "commit": null,
+      "id": "random",
+      "role": "baseline"
+    },
+    {
+      "binary_sha256": null,
+      "commit": null,
+      "id": "progression",
+      "role": "reference"
+    },
+    {
+      "binary_sha256": null,
+      "commit": null,
+      "id": "twist_l1",
+      "role": "candidate"
+    },
+    {
+      "binary_sha256": null,
+      "commit": null,
+      "id": "twist_l2",
+      "role": "candidate"
+    },
+    {
+      "binary_sha256": null,
+      "commit": null,
+      "id": "twist_l3",
+      "role": "candidate"
+    },
+    {
+      "binary_sha256": null,
+      "commit": null,
+      "id": "twist_l4",
+      "role": "candidate"
+    },
+    {
+      "binary_sha256": null,
+      "commit": null,
+      "id": "collision_avoid",
+      "role": "reference"
+    },
+    {
+      "binary_sha256": null,
+      "commit": null,
+      "id": "planted_rank",
+      "role": "control_positive"
+    },
+    {
+      "binary_sha256": null,
+      "commit": null,
+      "id": "b2_negative",
+      "role": "control_negative"
+    }
+  ],
+  "backend": "manual",
+  "backend_record": {
+    "actual_rows": 0,
+    "execution_metadata": [],
+    "finite_census_complete": false,
+    "missing_run_ids": [
+      "p7/random",
+      "p7/progression",
+      "p7/collision_avoid",
+      "p7/twist_l1",
+      "p7/twist_l2",
+      "p7/twist_l3",
+      "p7/twist_l4",
+      "p7/planted_rank",
+      "p7/b2_negative",
+      "p11/random",
+      "p11/progression",
+      "p11/collision_avoid",
+      "p11/twist_l1",
+      "p11/twist_l2",
+      "p11/twist_l3",
+      "p11/twist_l4",
+      "p11/planted_rank",
+      "p11/b2_negative",
+      "p19/random",
+      "p19/progression",
+      "p19/collision_avoid",
+      "p19/twist_l1",
+      "p19/twist_l2",
+      "p19/twist_l3",
+      "p19/twist_l4",
+      "p19/planted_rank",
+      "p19/b2_negative"
+    ],
+    "protocol_expected_rows": 27,
+    "raw_paths": "Portable listed files are retained under source-records. Full raw case/cache artifacts remain separate; original manifest paths/hashes and relocation provenance are retained.",
+    "summary_error": "summary manifest is incomplete or protocol differs"
+  },
+  "created": "2026-10-30T00:32:30Z",
+  "export_id": "TR04-20261030T003230Z",
+  "files": [
+    {
+      "bytes": 49150,
+      "kind": "protocol",
+      "path": "source-records/a9e631608a486eac8e6be711cbe621f8bfdff84fa49b22d741e7c50f6d3b60fe-protocol.json",
+      "sha256": "a9e631608a486eac8e6be711cbe621f8bfdff84fa49b22d741e7c50f6d3b60fe"
+    },
+    {
+      "bytes": 3007,
+      "kind": "summary",
+      "path": "source-records/a8fad0c6333a802bca4a35e0b4e36a38d72aa730e8a500877acc355db8c94e8d-manifest.json",
+      "sha256": "a8fad0c6333a802bca4a35e0b4e36a38d72aa730e8a500877acc355db8c94e8d"
+    },
+    {
+      "bytes": 1071,
+      "kind": "summary",
+      "path": "source-records/417ba92e2cb2d8defc69ba3b7fc102aea91df98ddc5e3c420884d1430705c874-shard-inputs.json",
+      "sha256": "417ba92e2cb2d8defc69ba3b7fc102aea91df98ddc5e3c420884d1430705c874"
+    },
+    {
+      "bytes": 1652,
+      "kind": "receipt",
+      "path": "source-records/provenance.json",
+      "sha256": "6ed194873538cdda3cf0a97bfd1f5ccbaac28c6d5027f7d40a496f7c271e57da"
+    }
+  ],
+  "flow": {
+    "attempted": 0,
+    "completed": 0,
+    "excluded": [],
+    "interrupted": 0,
+    "not_completed": 0,
+    "planned": 0,
+    "resumed": 0
+  },
+  "host": {
+    "class_id": null,
+    "path": null,
+    "sha256": null,
+    "summary": {
+      "cpu_model": null,
+      "hypervisor": null,
+      "isolation_tier_max": null,
+      "kernel": null,
+      "logical_cpus": null,
+      "memory_bytes": null
+    }
+  },
+  "notes": [
+    {
+      "by": "tr04-report",
+      "kind": "observation",
+      "text": "Exact finite operation-counter audit only. Generic decomposition (bounded by sqrt(r); cannot beat rho). Primitive work counters are not independently recomputed; allocator/cache/branch/RNG-internal and byte-peak costs are unpriced. No physical runtime, complete GAE, ECDLP speedup, statistical interval or general-curve claim. Failed selector/rank mass is retained. Audit DP/trie/cache acceleration is not free algorithm work."
+    },
+    {
+      "by": "tr04-report",
+      "kind": "observation",
+      "text": "Protocol expects27 rows; missing/unattempted IDs: p7/random, p7/progression, p7/collision_avoid, p7/twist_l1, p7/twist_l2, p7/twist_l3, p7/twist_l4, p7/planted_rank, p7/b2_negative, p11/random, p11/progression, p11/collision_avoid, p11/twist_l1, p11/twist_l2, p11/twist_l3, p11/twist_l4, p11/planted_rank, p11/b2_negative, p19/random, p19/progression, p19/collision_avoid, p19/twist_l1, p19/twist_l2, p19/twist_l3, p19/twist_l4, p19/planted_rank, p19/b2_negative. Counter independence=false; wall_valid=false. PDF generated; external visual inspection required."
+    }
+  ],
+  "producer": {
+    "model": null,
+    "role": "reporter",
+    "runtime": "native-rust",
+    "session": null
+  },
+  "protocol": {
+    "path": "source-records/a9e631608a486eac8e6be711cbe621f8bfdff84fa49b22d741e7c50f6d3b60fe-protocol.json",
+    "protocol_id": "TR04-exhaustive-twist-relations-20261029",
+    "sha256": "a142ce49dbc23c78d49b10572aaf6228960f43803472abb9e735536677d2c0ce",
+    "version": 3
+  },
+  "reviews_dir": "reviews",
+  "runs": [],
+  "schema": "experiment.export/v1",
+  "source": {
+    "commit": null,
+    "dirty": null,
+    "repo": "isogeny-labs/crypto"
+  }
+}

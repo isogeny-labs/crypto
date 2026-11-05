@@ -1,0 +1,4 @@
+build: git apply research/pkm_radix_grading_20261104/build_prune.diff; CARGO_BUILD_JOBS=1 CARGO_PROFILE_RELEASE_CODEGEN_UNITS=64 CARGO_PROFILE_RELEASE_OPT_LEVEL=1 cargo build --release --no-default-features --example pkm_tower_pilot; prune reverted after build
+opt_level: 1 (opt-level 3 OOM-killed / container restart on this host)
+source_commit: f551e14e6a58af6a7b116e764e5a44bed0617232
+host: local-ccr-2vcpu, 7.8 GiB

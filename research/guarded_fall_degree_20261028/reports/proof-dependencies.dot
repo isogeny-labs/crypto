@@ -9,7 +9,7 @@ digraph proof {
   growing [label="Growing explicit membership cardinality B\nlinear degree bounds, not bit-complexity bounds", fillcolor="#e4f3e7"];
   native [label="Native sparse replay\nu64 and arbitrary-precision backends", fillcolor="#e9eef8"];
   large [label="Four public standard prime-curve fixtures\n256 / 256 / 384 / 521 bits; cap 5", fillcolor="#e4f3e7"];
-  lean [label="Lean: ordinary closure + uniform V4 obstruction\nexact pair / V5 / syzygy quotient still open", fillcolor="#fff2d7"];
+  lean [label="Lean: COMPLETE prime-field guarded B=3 pair (4,5)\nV5 construction + V4 obstruction + graded Koszul", fillcolor="#c7e8d1"];
   boolupper [label="Fully Boolean binary one-auxiliary chain\nd_F <= 3 ell + 1 via affine specialization", fillcolor="#e4f3e7"];
   primebits [label="Bit-restricted Fp lookup inputs\nd_F <= 3 ell + 2; extra hypotheses", fillcolor="#e4f3e7"];
   boolean [label="Growing Boolean lower bounds / exact degrees\ncardinality lower-bound transfer UNPROVED", fillcolor="#fce5e5"];
@@ -22,6 +22,6 @@ digraph proof {
   binary -> growing;
   local -> native [label="finite instances"];
   native -> large [label="separate producer, replay, curve checks"];
-  local -> lean [label="lower proof and dependencies checked"];
+  local -> lean [label="complete central theorem checked"];
   growing -> boolean [style=dashed, label="missing lower-bound transfer"];
 }

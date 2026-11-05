@@ -1,0 +1,8 @@
+digraph G {rankdir=TB;ranksep=.28;nodesep=.25;node [shape=box,fontname="DejaVu Sans",fontsize=11,style="rounded,filled",fillcolor="#e8f3f7"]; a[label="Actual E(F13)[7] source Q
+Phi to T(F13)[7]"];b[label="S3 plus two membership inputs
+all 16 bases / original and reduced"];c[label="Macaulay rows and ideal witnesses
+retained variant keeps smaller witnesses"];d[label="Unit / GB checks inside cap
+no reference-root stopping test"];e[label="Extract constrained roots
+check all actual sign lifts"];f[label="Admissible public setup logs
+recover and check ORIGINAL scalar"];x[label="Cap or setup blocked
+retain outcome, admit no scalar",fillcolor="#fff0da"];{rank=same;a;b;c;} {rank=same;d;e;f;} a->b->c; c->d; d->e->f;d->x[style=dashed];e->x[style=dashed];}

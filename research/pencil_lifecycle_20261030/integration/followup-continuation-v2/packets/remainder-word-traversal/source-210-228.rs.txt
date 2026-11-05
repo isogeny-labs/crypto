@@ -1,0 +1,19 @@
+    pub fn mul(&self, a: u64, b: u64) -> u64 {
+        if let Some(t) = &self.tables {
+            return if a == 0 || b == 0 {
+                0
+            } else {
+                t.0[((t.1[a as usize] + t.1[b as usize]) % (self.size() - 1)) as usize]
+            };
+        }
+        if self.p == 2 {
+            self.count(|c| c.m += 1);
+            return binary_mul(a, b, self.modulus, self.n);
+        }
+        if self.n == 1 {
+            return self.bm(a, b);
+        }
+        if self.n == 2 {
+            let (x, y, u, v) = (a % self.p, a / self.p, b % self.p, b / self.p);
+            let z = self.bm(x, u);
+            let w = self.bm(y, v);
