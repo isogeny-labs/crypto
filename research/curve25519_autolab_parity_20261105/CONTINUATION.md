@@ -591,3 +591,57 @@ Current-head PR checks and delivery remain, followed by full-width Autolab/ecben
 ### Errors
 
 No final focused or library test failures reported. All earlier failed attempts and exact scope boundaries remain preserved. [pcc:unverified]
+
+## 2026-11-05T18:05:31Z — published component and next branch
+
+### What was done
+
+Published commit a9864459c793875edd5ab4f3f3065ebf499f7bcc on codex/curve25519-wide-relations-20261105 and opened regular PR https://github.com/isogeny-labs/crypto/pull/3488. Auto-merge enabled at18:01:37Z. Initial exact-head readback: required gate/size/artifacts running, PCC gate passed, PR open. The desktop attachment call ended cancelled without confirmation. No duplicate attachment or CI run was submitted. Created codex/curve25519-exact-transport-20261105 at the published commit; first PR head remains untouched. [pcc:unverified]
+
+### Decisions made
+
+Continue exact transport integration on the new branch. Conductor reported exact_scalar.rs, ecbench/mod.rs and the study scope clear. No subscription/scheduled check-in tool is exposed in this runtime; check PR3488 at the repository cadence (about50minutes after the initial readback), not on each goal continuation. [pcc:unverified]
+
+### Open threads
+
+First PR checks/merge remain pending. Move the tested codec into ecbench and connect it to full-width workload/result/reference interfaces. Current source tests cover the published component; new changes require their own checks. PCC registration remains reserved by T-1649 as last read. [pcc:unverified]
+
+### Errors
+
+The app attachment request was cancelled before a response. GitHub creation and auto-merge requests succeeded; no app attachment success is claimed. [pcc:unverified]
+
+## 2026-11-05T18:08:59Z — exact-scalar module registered
+
+### What was done
+
+Added ecbench::exact_scalar with the candidate type and seven tests, wired through ecbench/mod.rs. Tests now reference the real canonical codec and use the crate fixture root. Decimal parsing bounds significant digits before BigUint allocation while retaining leading-zero compatibility. A native harness compiled the current module with an exact compat_u128 extraction and reported seven passed, zero failed, 0.46 seconds, including all 3204 retained records/9612 fields. Preserved source hashes and logs under transport-integration/. [pcc:unverified]
+
+### Decisions made
+
+This registers the type without changing any workload order, target or solver-result consumer yet. Continue by widening those actual interfaces, preserving legacy wire bytes and target laws. Do not claim this registration makes full-size workloads executable. [pcc:unverified]
+
+### Open threads
+
+Session43442 runs CARGO_TARGET_DIR=/tmp/curve25519-autolab-target CARGO_BUILD_JOBS=2 timeout1200 cargo check --release --lib --offline --locked. Log /tmp/curve25519-exact-transport-check-20261105.log. It reached Checking crypto; terminal result pending. PR3488 remains on its published head with auto-merge enabled; next normal check-in about18:51Z, not on every continuation. [pcc:unverified]
+
+### Errors
+
+No native module test failures reported; no whole-library type-check result yet. [pcc:unverified]
+
+## Exact-scalar module type-check completed
+
+### What was done
+
+Session43442 exited0; cargo check --release --lib completed in3m10s. Retained terminal log/hash. Native seven-test module check is recorded separately. [pcc:unverified]
+
+### Decisions made
+
+Checkpoint this locally before widening SolveReport.recovered and its solver/runner adapters. Preserve JSON encoding and use explicit checked legacy conversions. The existing full suite validates the prior published component; this stage has a type-check and standalone native tests only. [pcc:unverified]
+
+### Open threads
+
+Widen result transport and then actual workload orders/targets and rho. Full new integration gate required before another push. PR3488 check-in remains at the recorded cadence. [pcc:unverified]
+
+### Errors
+
+No type-check error reported. [pcc:unverified]
