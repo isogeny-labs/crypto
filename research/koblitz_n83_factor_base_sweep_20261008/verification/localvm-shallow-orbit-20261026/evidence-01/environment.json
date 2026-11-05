@@ -1,0 +1,17 @@
+{
+  "docker_cleanup": "PASS_no_n83_chain_search_containers_after_panel",
+  "host_memory_bytes": 51539607552,
+  "host_model": "Mac16,7",
+  "native_build": {
+    "command": "PATH=/Users/adamburan/.cargo/bin:$PATH CARGO_TARGET_DIR=/Volumes/SSD990/llm/tmp/n83-karatsuba-arm64-target cargo zigbuild --release --example koblitz_n83_factor_base_export --target aarch64-unknown-linux-musl --no-default-features --locked --offline",
+    "exit_code": 0,
+    "toolchain": "rustc 1.98.0 via rustup, Zig 0.16.0"
+  },
+  "schema": "n83.localvm-shallow-orbit-evidence/v1",
+  "source_commit": "88893c8deb6fa19e490c945f5d89d2a7220bf8c8",
+  "vm": "Colima 0.10.3, macOS Virtualization.Framework, aarch64, 2 vCPU, 6 GiB RAM, Ubuntu kernel 6.8.0-117, Docker server 29.5.2, virtiofs, 20 GiB data disk, 12 GiB root disk",
+  "worker_sha256": {
+    "arm64": "7e6069ae87c836e41355a990732ac3622e862aa9989e2c4b023d18e489aa5f5d",
+    "rosetta": "a1d29a516aafd247c352e6de24a85927a7c0f5b4e403ad6f39e4eb993ffc6967"
+  }
+}
