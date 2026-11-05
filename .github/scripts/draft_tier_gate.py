@@ -244,7 +244,9 @@ def norm(doc):
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--apply", action="store_true")
+    mode = ap.add_mutually_exclusive_group()
+    mode.add_argument("--apply", action="store_true")
+    mode.add_argument("--check", action="store_true", help="Check without editing (default)")
     args = ap.parse_args()
     missing, failed, changed = [], [], []
     for path in sorted(WORKFLOWS.glob("*.y*ml")):
