@@ -345,7 +345,6 @@ fn sub(a: u64, b: u64, p: u64) -> u64 {
 struct Scratch {
     prefix: Vec<u64>,
     denominators: Vec<u64>,
-    numerators: Vec<u64>,
     output: Vec<Point>,
 }
 impl Scratch {
@@ -366,30 +365,28 @@ impl Scratch {
         let mul = |a, b| mul(a, b, p, reciprocal);
         self.prefix.clear();
         self.denominators.clear();
-        self.numerators.clear();
         let mut product = 1;
         let mut first_active = None;
         for (i, point) in points.iter().enumerate() {
-            let (num, den) = match *point {
+            let den = match *point {
                 None => {
                     self.output[i] = target;
-                    (0, 0)
+                    0
                 }
                 Some((xx, yy)) => {
                     let yy = sub(0, yy, p);
                     if x == xx && (y + yy == 0 || y + yy == p) {
                         self.output[i] = None;
-                        (0, 0)
+                        0
                     } else if x == xx {
-                        ((3 * mul(x, x) + curve.coefficients().0) % p, 2 * y % p)
+                        2 * y % p
                     } else {
-                        (sub(yy, y, p), sub(xx, x, p))
+                        sub(xx, x, p)
                     }
                 }
             };
             self.prefix.push(product);
             self.denominators.push(den);
-            self.numerators.push(num);
             if den != 0 {
                 if first_active.is_none() {
                     // The first nonzero factor needs no multiplication by one.
@@ -419,8 +416,16 @@ impl Scratch {
                 inverse = mul(inverse, den);
                 iz
             };
-            let slope = mul(self.numerators[i], iz);
-            let xx = points[i].unwrap().0;
+            // The reverse pass already needs the original x coordinate.
+            // Derive the numerator here instead of storing a second stream
+            // of field elements through the batch-inversion passes.
+            let (xx, yy) = points[i].unwrap();
+            let num = if x == xx {
+                (3 * mul(x, x) + curve.coefficients().0) % p
+            } else {
+                sub(sub(0, yy, p), y, p)
+            };
+            let slope = mul(num, iz);
             let nx = sub(sub(mul(slope, slope), x, p), xx, p);
             self.output[i] = Some((nx, sub(mul(slope, sub(x, nx, p)), y, p)));
         }
