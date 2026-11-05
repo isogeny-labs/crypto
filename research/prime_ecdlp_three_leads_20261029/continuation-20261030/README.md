@@ -2,8 +2,8 @@
 
 ## Current continuation — 2026-11-05
 
-PR2949 merged on November 1; its maintenance has stopped. Unpublished history
-is preserved on `codex/pkm-certificates-accounting-20261105` for a separate PR.
+PR2949 merged on November 1; its maintenance has stopped. Previously unpublished history is preserved and published on
+`codex/pkm-certificates-accounting-20261105` in [PR3452](https://github.com/isogeny-labs/crypto/pull/3452).
 No rebase or force-push. All original G1–G6 acceptance criteria remain unchanged.
 
 **Implemented and tested G2 progress:** validation reference counts are retained;

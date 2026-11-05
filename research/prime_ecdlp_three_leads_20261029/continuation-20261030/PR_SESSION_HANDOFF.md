@@ -318,3 +318,36 @@ and unchanged binaries reverified. Next publication is a new regular PR; PR2949
 stays merged. If main integration changes source/dependencies, review both parents
 and rerun affected checks before auto-merge. No previous receipt validates that
 future integration. Preserve every receipt and both append-only log/index sides.
+
+## 2026-11-05T07:14:41.647642+00:00 — Publish preserved continuation as PR3452
+
+### What was done (commands, files, features)
+
+Normal-pushed new branch and opened regular PR3452, independent certificates/
+five Lean contracts/retained count ownership. PR2949 remains merged and is no
+longer maintained. Published9e64c6c952576cfdd3ce293f9d5debe464aecc30 matches
+tested source objects; metadata changes no tested Rust/Lean code. Current main
+2d33e9c06 reports CONFLICTING. Initial snapshot only reviewSUCCESS/migrate
+IN_PROGRESS; required gate,size,artifacts absent, not passed. AutoMergeRequest
+null. No native jobs running; no duplicate/fullsuite rerun.
+
+### Decisions made (and why)
+
+Prepare one Copilot-first request to merge main without rebase/force-push;
+preserve every frozen input/receipt/report and both append-only log/index sides.
+No editing conflicted files while request pending. Actual merged source/deps
+require fresh affected validation, exacthead3checks/reviews/threads andSHAguard
+before auto-merge. User's resolution/validation condition keeps auto paused.
+
+### Open threads (unfinished, pick up next time)
+
+Post prepared request; collect response on bounded schedule. Reasonable wait
+begins with this fresh request, not earlier PR2949 requests. If cannotact or
+noresponse after reasonablewait, record fallback and ordinary-merge into same
+branch, never side-select frozen evidence. All six scientific goals incomplete.
+
+### Errors (what went wrong, how it was handled)
+
+PR conflicts are unverified integration work, not failures hidden by old
+receipts. Inherited chain-bound assertion/JVcap and absent artifact transport
+remain concrete blockers. No scientific/resource/access/gate change.
