@@ -16,7 +16,8 @@ use std::time::Instant;
 use rand::{rngs::StdRng, Rng, SeedableRng};
 
 use crate::cryptanalysis::ic_boundary::{
-    addmod, mulmod, CountedGroup, FactorBase, GroupOps, KSumTable, PairTable,
+    addmod, mulmod, CountedGroup, FactorBase, GroupOps, KSumTable, PairTable, KSUM_INDEX_BITS,
+    KSUM_MAX_K,
 };
 use crate::cryptanalysis::ic_measurement::{self as measurement, Phase};
 
@@ -108,6 +109,64 @@ fn check_base_parameters<G: CountedGroup>(
     Ok(size)
 }
 
+/// The refusals [`prepare`] and [`prepare_ksum`] raise before any group
+/// operation, as a pure function of the subgroup order and the parameters
+/// (the generator is nonidentity on every instance ecbench builds): what the
+/// planner needs to refuse, at plan time, a run that would error on every
+/// execution.  `ksum` is `Some(k)` for [`prepare_ksum`].
+pub fn plan_check(r: u64, params: &Parameters, ksum: Option<u32>) -> Result<(), String> {
+    let size = u64::try_from(params.size).map_err(|_| "base size does not fit u64")?;
+    if r < 3 || size == 0 || size > (r - 1) / 2 {
+        return Err("known-log size must lie in 1..=(r-1)/2 for an odd prime r".into());
+    }
+    if params.base_multiplier == 0 || params.base_multiplier >= r {
+        return Err("known-log base_multiplier must lie in 1..r".into());
+    }
+    match ksum {
+        None => {
+            let pair_work = size
+                .checked_add(1)
+                .and_then(|next| size.checked_mul(next))
+                .ok_or("known-log pair work overflows u64")?;
+            if pair_work > params.max_pair_work {
+                return Err(format!(
+                    "known-log pair construction needs {pair_work} attempts, above max_pair_work={}",
+                    params.max_pair_work
+                ));
+            }
+            if size > u64::from(u32::MAX) / 2 {
+                return Err("known-log signed base exceeds the pair-table index width".into());
+            }
+        }
+        Some(k) => {
+            let sums = ksum_sum_bound(size, k);
+            if sums > params.max_pair_work {
+                return Err(format!(
+                    "known-log {k}-sum table needs about {sums} sums, above max_sums={}",
+                    params.max_pair_work
+                ));
+            }
+            if !(3..=KSUM_MAX_K).contains(&k) {
+                return Err(format!("a k-sum table needs k = 3, 4 or 5, not {k}"));
+            }
+            if 2 * size >= 1 << KSUM_INDEX_BITS {
+                return Err(format!(
+                    "a k-sum table packs base indices in {KSUM_INDEX_BITS} bits; the base has {} points",
+                    2 * size
+                ));
+            }
+        }
+    }
+    Ok(())
+}
+
+/// `2^(k-1)·C(size, k)`, saturating: the sums a `k`-sum table builds.
+fn ksum_sum_bound(size: u64, k: u32) -> u64 {
+    let combinations =
+        (0..u64::from(k.min(size as u32))).fold(1u64, |c, i| c.saturating_mul(size - i) / (i + 1));
+    combinations.saturating_mul(1u64 << k.saturating_sub(1).min(63))
+}
+
 pub fn prepare<G: CountedGroup>(
     g: &G,
     generator: G::Elt,
@@ -180,9 +239,7 @@ pub fn prepare_ksum<G: CountedGroup>(
     k: u32,
 ) -> Result<Prepared<G::Elt>, String> {
     let size = check_base_parameters(g, generator, r, &params)?;
-    let combinations =
-        (0..u64::from(k.min(size as u32))).fold(1u64, |c, i| c.saturating_mul(size - i) / (i + 1));
-    let sums = combinations.saturating_mul(1u64 << k.saturating_sub(1).min(63));
+    let sums = ksum_sum_bound(size, k);
     if sums > params.max_pair_work {
         return Err(format!(
             "known-log {k}-sum table needs about {sums} sums, above max_pair_work={}",
@@ -500,6 +557,47 @@ mod tests {
         }
         assert!(saw_exhaustion);
         assert!(recover(g, &prepared, i.generator_point(), 7, 0).is_err());
+    }
+
+    /// `plan_check` refuses exactly what `prepare` / `prepare_ksum` refuse
+    /// before any work, so the planner's refusal and the run's agree.
+    #[test]
+    fn plan_check_agrees_with_prepare_and_prepare_ksum() {
+        let i = roster_prime_instance(10).unwrap();
+        let g = &i.curve;
+        let mut checked = 0;
+        for size in [0usize, 1, 4, 20, 60, i.r as usize, i.r as usize / 2] {
+            for base_multiplier in [0u64, 1, 7, i.r - 1, i.r] {
+                for max_pair_work in [10u64, 400, 5000] {
+                    let params = Parameters {
+                        size,
+                        base_seed: 3,
+                        base_multiplier,
+                        max_pair_work,
+                    };
+                    let plan = plan_check(i.r, &params, None).is_ok();
+                    let run = prepare(g, i.generator_point(), i.r, params).is_ok();
+                    assert_eq!(plan, run, "pair {params:?}");
+                    for k in [0u32, 2, 3, 4, 5, 6] {
+                        let plan = plan_check(i.r, &params, Some(k)).is_ok();
+                        let run = prepare_ksum(g, i.generator_point(), i.r, params, k).is_ok();
+                        assert_eq!(plan, run, "ksum k = {k} {params:?}");
+                        checked += 1;
+                    }
+                }
+            }
+        }
+        assert!(checked > 100);
+        // The packed-index limit needs a base too large to build here.
+        let wide = Parameters {
+            size: 2048,
+            base_seed: 3,
+            base_multiplier: 1,
+            max_pair_work: u64::MAX,
+        };
+        let err = plan_check(1 << 40, &wide, Some(3)).unwrap_err();
+        assert!(err.contains("packs base indices"), "{err}");
+        plan_check(1 << 40, &Parameters { size: 2047, ..wide }, Some(3)).unwrap();
     }
 
     #[test]

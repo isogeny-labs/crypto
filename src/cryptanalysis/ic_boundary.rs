@@ -7225,8 +7225,8 @@ impl PairTable {
 
 /// Largest arity a [`KSumTable`] builds, and the bits each packed summand
 /// index takes in an entry (`KSUM_MAX_K · KSUM_INDEX_BITS ≤ 64`).
-const KSUM_MAX_K: u32 = 5;
-const KSUM_INDEX_BITS: u32 = 12;
+pub const KSUM_MAX_K: u32 = 5;
+pub const KSUM_INDEX_BITS: u32 = 12;
 
 /// **A table of every signed `k`-sum of a base** (`k = 3`, `4` or `5`), keyed by
 /// the sum's abscissa as [`PairTable`] is, so one probe decides a
@@ -7465,7 +7465,7 @@ impl KSumTable {
 /// Largest seed count and coefficient bound a [`WSumTable`] builds, and
 /// the largest number of entries it agrees to try.
 const WSUM_MAX_C: usize = 8;
-const WSUM_MAX_B: u64 = 255;
+pub const WSUM_MAX_B: u64 = 255;
 const WSUM_MAX_ENTRIES: u64 = 1 << 26;
 
 /// **A coefficient-box table over `C` seed points** (`wsum`, proposal P3):
@@ -7781,6 +7781,53 @@ impl<E: Copy + PartialEq> WSumTable<E> {
     }
 }
 
+/// The refusals of [`WalkTable::build_with`] that depend on the subgroup
+/// order and the parameters alone (not on the base or the generator), so the
+/// planner can refuse a `wwalk` arm that would error on every run.  Returns
+/// `(T, T_max, w, coefficient bound)`.
+pub fn wwalk_plan_check(
+    r: u64,
+    x: f64,
+    jumps: usize,
+    opts: WalkOpts,
+) -> Result<(u64, u64, u64, u64), String> {
+    if !(x > 0.0 && x <= WWALK_MAX_X) {
+        return Err(format!("wwalk: x is in (0, {WWALK_MAX_X}], not {x}"));
+    }
+    if !(WWALK_MIN_JUMPS..=WWALK_MAX_JUMPS).contains(&jumps) {
+        return Err(format!(
+            "wwalk: jumps is from {WWALK_MIN_JUMPS} to {WWALK_MAX_JUMPS}, not {jumps}"
+        ));
+    }
+    if opts.grow > 2 {
+        return Err(format!("wwalk: grow is 0, 1 or 2, not {}", opts.grow));
+    }
+    if opts.grow == 2 && !opts.g_jumps {
+        return Err("wwalk: grow=2 needs g=1 (without G the free rows are homogeneous)".into());
+    }
+    let t = (x * (r as f64).sqrt()).round() as u64;
+    if t < 2 {
+        return Err(format!(
+            "wwalk: x={x} gives a table of {t} entries at r={r}"
+        ));
+    }
+    let t_max = t * (1 + u64::from(opts.grow));
+    if t_max > WWALK_MAX_ENTRIES {
+        return Err(format!(
+            "wwalk: {t_max} entries exceed the 2^26 table limit (x={x}, r={r})"
+        ));
+    }
+    let w = ((1.2 * (t as f64).sqrt()).round() as u64).max(2);
+    // Every coefficient is at most 1 + t_max·w: it must pack in 32 bits.
+    let bound = 1 + t_max * w;
+    if bound >= 1 << 32 {
+        return Err(format!(
+            "wwalk: coefficients up to {bound} do not fit the 32-bit packing (x={x}, r={r})"
+        ));
+    }
+    Ok((t, t_max, w, bound))
+}
+
 /// Largest table a [`WalkTable`] agrees to build, and the jump-count range.
 const WWALK_MAX_ENTRIES: u64 = 1 << 26;
 const WWALK_MIN_JUMPS: usize = 2;
@@ -7933,25 +7980,12 @@ impl<E: Copy + PartialEq> WalkTable<E> {
         opts: WalkOpts,
         seed: u64,
     ) -> Result<Self, String> {
-        if !(x > 0.0 && x <= WWALK_MAX_X) {
-            return Err(format!("wwalk: x is in (0, {WWALK_MAX_X}], not {x}"));
-        }
-        if !(WWALK_MIN_JUMPS..=WWALK_MAX_JUMPS).contains(&jumps) {
-            return Err(format!(
-                "wwalk: jumps is from {WWALK_MIN_JUMPS} to {WWALK_MAX_JUMPS}, not {jumps}"
-            ));
-        }
+        let (t, t_max, w, bound) = wwalk_plan_check(r, x, jumps, opts)?;
         if fb.abscissa_list.len() != 2 {
             return Err(format!(
                 "wwalk: needs exactly 2 seeds (base abscissae); the base has {}",
                 fb.abscissa_list.len()
             ));
-        }
-        if opts.grow > 2 {
-            return Err(format!("wwalk: grow is 0, 1 or 2, not {}", opts.grow));
-        }
-        if opts.grow == 2 && !opts.g_jumps {
-            return Err("wwalk: grow=2 needs g=1 (without G the free rows are homogeneous)".into());
         }
         let gen = if opts.g_jumps {
             let q = generator.ok_or_else(|| "wwalk: g=1 needs the generator".to_string())?;
@@ -7963,26 +7997,6 @@ impl<E: Copy + PartialEq> WalkTable<E> {
             None
         };
         let grow = opts.grow > 0;
-        let t = (x * (r as f64).sqrt()).round() as u64;
-        if t < 2 {
-            return Err(format!(
-                "wwalk: x={x} gives a table of {t} entries at r={r}"
-            ));
-        }
-        let t_max = t * (1 + u64::from(opts.grow));
-        if t_max > WWALK_MAX_ENTRIES {
-            return Err(format!(
-                "wwalk: {t_max} entries exceed the 2^26 table limit (x={x}, r={r})"
-            ));
-        }
-        let w = ((1.2 * (t as f64).sqrt()).round() as u64).max(2);
-        // Every coefficient is at most 1 + t_max·w: it must pack in 32 bits.
-        let bound = 1 + t_max * w;
-        if bound >= 1 << 32 {
-            return Err(format!(
-                "wwalk: coefficients up to {bound} do not fit the 32-bit packing (x={x}, r={r})"
-            ));
-        }
         let start = Instant::now();
         let seeds: [usize; 2] = [0, 1].map(|c| {
             let a = fb.abscissa_list[c];

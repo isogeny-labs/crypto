@@ -2578,6 +2578,18 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
             return Err(format!("`batch` must be in 1..=65536, not {batch}"));
         }
     }
+    if id == "ic.known_log_mitm2_v1" || id == "ic.known_log_ksum_v1" {
+        known_log_applicable(m, inst, curve)?;
+    }
+    if id == "ic.tensor_contraction_v1" {
+        tensor_contraction_applicable(m, inst)?;
+    }
+    if id == "rho.preprocessing" {
+        preprocessing_applicable(m)?;
+    }
+    if id.starts_with("ic.pipeline") {
+        pipeline_components_applicable(m, inst)?;
+    }
     if id.starts_with("ic.cm_folded_") && !matches!(inst, Instance::Prime(_)) {
         return Err("CM folded controls require a prime-field instance".into());
     }
@@ -2701,6 +2713,142 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
     }
 }
 
+/// The refusals `solve_known_log` raises before any work, on the curve's
+/// subgroup order and the method's parameters (`known_log::plan_check`);
+/// the pair-table method also runs on one-word binary curves only besides
+/// the prime ones.
+fn known_log_applicable(
+    m: &ResolvedMethod,
+    inst: &Instance,
+    curve: &CurveFacts,
+) -> Result<(), String> {
+    let ksum = m.id == "ic.known_log_ksum_v1";
+    if !matches!(inst, Instance::Prime(_) | Instance::Binary(_)) {
+        return Err(format!(
+            "`{}` runs on single-word prime and binary curves only; {} is {}",
+            m.id, curve.slug, curve.family
+        ));
+    }
+    if param_u64(m, "max_trials")? == 0 {
+        return Err("known-log max_trials must be positive".into());
+    }
+    let r = u64::try_from(curve.r).map_err(|_| "known-log needs an order below 2^64")?;
+    let params = super::known_log::Parameters {
+        size: usize::try_from(param_u64(m, "size")?).map_err(|_| "base size exceeds usize")?,
+        base_seed: param_u64(m, "base_seed")?,
+        base_multiplier: param_u64(m, "base_multiplier")?,
+        max_pair_work: param_u64(m, if ksum { "max_sums" } else { "max_pair_work" })?,
+    };
+    let k = if ksum {
+        Some(u32::try_from(param_u64(m, "k")?).map_err(|_| "k exceeds u32")?)
+    } else {
+        None
+    };
+    super::known_log::plan_check(r, &params, k)
+}
+
+/// `ic.tensor_contraction_v1` on a prime curve: the parameter and
+/// prime-order refusals `solve_tensor_contraction` raises on every run.
+fn tensor_contraction_applicable(m: &ResolvedMethod, inst: &Instance) -> Result<(), String> {
+    if usize::try_from(param_u64(m, "m")?).map_or(true, |v| v < 2) {
+        return Err("ic.tensor_contraction_v1 needs m ≥ 2".into());
+    }
+    if usize::try_from(param_u64(m, "max_restarts")?).map_or(true, |v| v == 0) {
+        return Err("ic.tensor_contraction_v1 needs max_restarts ≥ 1".into());
+    }
+    if let Instance::Prime(i) = inst {
+        if i.cofactor != 1 || i.group_order != i.r {
+            return Err(format!(
+                "ic.tensor_contraction_v1 needs a prime-order curve (cofactor 1); {} has cofactor {}",
+                i.name, i.cofactor
+            ));
+        }
+    }
+    Ok(())
+}
+
+/// The plan-time refusals of the pipeline's prime-only components added
+/// since 2026-10-28: the `wsum` and `wwalk` oracles and the `prime-interval`
+/// base run on single-word prime curves only, and their parameter
+/// refusals (`ic_boundary::{wwalk_plan_check, WSUM_MAX_B}`, the interval's
+/// own `t`/`lo` rule) do not depend on the run.  What is known only once the
+/// base is built (its column count against `wwalk`'s two seeds, `wsum`'s
+/// table bound) is still refused by the run.
+fn pipeline_components_applicable(m: &ResolvedMethod, inst: &Instance) -> Result<(), String> {
+    use crate::cryptanalysis::ic_boundary::{wwalk_plan_check, WalkOpts, WSUM_MAX_B};
+    use crate::cryptanalysis::ic_framework::pkm_semaev::PrimeIntervalBase;
+    let (Some(fb_spec), Some(or_spec)) = (m.params.get("factor_base"), m.params.get("oracle"))
+    else {
+        return Ok(());
+    };
+    let (fb_name, fb) = Params::parse_spec(fb_spec)?;
+    let (or_name, or) = Params::parse_spec(or_spec)?;
+    let prime_only = fb_name == "prime-interval" || matches!(or_name.as_str(), "wsum" | "wwalk");
+    if !prime_only {
+        return Ok(());
+    }
+    let Instance::Prime(i) = inst else {
+        return Err(format!(
+            "`{}` with factor base `{fb_name}` and oracle `{or_name}` runs on single-word prime curves only",
+            m.id
+        ));
+    };
+    if fb_name == "prime-interval" {
+        PrimeIntervalBase::interval(&fb, i.curve.p)?;
+    }
+    match or_name.as_str() {
+        "wsum" => {
+            let b = or.u64("coef").map_err(|e| format!("wsum: {e}"))?;
+            if !(1..=WSUM_MAX_B).contains(&b) {
+                return Err(format!("wsum: coef is from 1 to {WSUM_MAX_B}, not {b}"));
+            }
+        }
+        "wwalk" => {
+            let x: f64 = or
+                .get("x")
+                .ok_or_else(|| "wwalk: missing parameter `x`".to_string())?
+                .parse()
+                .map_err(|_| format!("wwalk: parameter `x` is not a number: `{}`", or.0["x"]))?;
+            let jumps = usize::try_from(or.u64_or("jumps", 16).map_err(|e| format!("wwalk: {e}"))?)
+                .map_err(|_| "wwalk: jumps too large".to_string())?;
+            // `seed=run` is the run's own seed; any other value is a number.
+            if or.get("seed") != Some("run") {
+                or.u64_or("seed", 0).map_err(|e| format!("wwalk: {e}"))?;
+            }
+            let grow = match or.get("grow") {
+                None => 0u8,
+                Some("true" | "yes") => 1,
+                Some(v) => v
+                    .parse::<u8>()
+                    .ok()
+                    .filter(|g| *g <= 2)
+                    .ok_or_else(|| format!("wwalk: grow is 0, 1 or 2, not `{v}`"))?,
+            };
+            let opts = WalkOpts {
+                g_jumps: or.flag("g"),
+                grow,
+            };
+            wwalk_plan_check(i.r, x, jumps, opts)?;
+        }
+        _ => {}
+    }
+    Ok(())
+}
+
+/// `rho.preprocessing`: the parameter refusals of `solve_preprocessing`.
+fn preprocessing_applicable(m: &ResolvedMethod) -> Result<(), String> {
+    if param_u64(m, "entries")? == 0 {
+        return Err("rho.preprocessing needs entries > 0".into());
+    }
+    if param_u64(m, "dp_bits")? > 40 {
+        return Err("rho.preprocessing dp_bits must lie in 0..=40".into());
+    }
+    param_u64(m, "table_seed")?;
+    param_u64(m, "precompute_cap")?;
+    param_u64(m, "cap_multiple")?;
+    Ok(())
+}
+
 fn three_leads_applicable(
     m: &ResolvedMethod,
     inst: &Instance,
@@ -2777,7 +2925,20 @@ fn koblitz_batched_applicable(m: &ResolvedMethod, i: &BinaryInstance) -> Result<
             kc.n
         ));
     }
-    KoblitzBatchedParams::from_method(&m.params, 0).map(|_| ())
+    let p = KoblitzBatchedParams::from_method(&m.params, 0)?;
+    // The base is drawn from the order-r subgroup, which has r − 1 points
+    // besides the identity: a larger base is never reached, and the run
+    // gives up after 1024·points draws.
+    if kc.subgroup_order <= num_bigint::BigUint::from(p.factor_base_points) {
+        return Err(format!(
+            "`ic.koblitz_batched` factor_base_points = {} exceeds the {} nonidentity points of the order-{} subgroup of {}",
+            p.factor_base_points,
+            &kc.subgroup_order - 1u32,
+            kc.subgroup_order,
+            kc.label()
+        ));
+    }
+    Ok(())
 }
 
 /// The refusal of a [`Applies::PrimeOnly`] method on any other instance.
@@ -8427,7 +8588,7 @@ mod accounting_rules_tests {
 
     /// The `j = 0` curve of the deep-dive review (`y² = x³ + 2` over
     /// `F_4194397`, prime order `r = 1048627`): `A = 6`.
-    fn j0() -> CurveSpec {
+    pub(super) fn j0() -> CurveSpec {
         CurveSpec::PrimeExplicit {
             p: 4194397,
             a: 0,
@@ -8442,7 +8603,7 @@ mod accounting_rules_tests {
     /// A `j = 1728` curve `y² = x³ + ax` over a prime `p ≡ 1 (mod 4)` below
     /// `2^14`, found by counting points, with a prime subgroup order
     /// `r ≡ 1 (mod 4)` and a cofactor of at most 8: `A = 4`.
-    fn j1728() -> CurveSpec {
+    pub(super) fn j1728() -> CurveSpec {
         use crate::cryptanalysis::ic_boundary::{PrimeCurve, PrimePoint};
         use crate::cryptanalysis::residual_walk::is_prime_u64;
         for p in (8000u64..16384).filter(|&p| p % 4 == 1 && is_prime_u64(p)) {
@@ -9804,6 +9965,201 @@ mod accounting_tests {
         }
     }
 
+    /// The run-time refusals of the 2026-10-28..11-05 methods are refused at
+    /// plan time: no arm that would error on every execution is accepted, and
+    /// the accepted ones (the registry-wide test runs them) are not refused.
+    #[test]
+    fn plan_refuses_what_the_new_methods_would_refuse_at_run_time() {
+        let prime = json!({"kind": "prime_search", "bits": 14, "seed": 5});
+        let kob = json!({"kind": "koblitz", "a": 1, "n": 17});
+        // A cofactor-4 curve: no prime-order group for the tensor toy.
+        let j0 = json!({"kind": "prime_explicit", "p": 4194397, "a": 0, "b": 2,
+            "group_order": 4194508, "r": 1048627, "gx": 2359468, "gy": 1145958});
+        let ksum = |size: &str, k: &str, mult: &str, sums: &str| {
+            json!({"size": size, "k": k, "base_seed": "1", "base_multiplier": mult,
+                   "max_sums": sums, "max_trials": "10"})
+        };
+        plan_arm(
+            prime.clone(),
+            "ic.known_log_ksum_v1",
+            ksum("12", "3", "1", "100000"),
+        )
+        .unwrap();
+        for (params, needle) in [
+            (ksum("12", "2", "1", "100000"), "k = 3, 4 or 5"),
+            (ksum("12", "6", "1", "100000"), "k = 3, 4 or 5"),
+            (ksum("12", "3", "1", "10"), "above max_sums"),
+            (ksum("0", "3", "1", "100000"), "size must lie in"),
+            (ksum("999999999", "3", "1", "100000"), "size must lie in"),
+            (ksum("12", "3", "0", "100000"), "base_multiplier"),
+            (ksum("12", "3", "999999999", "100000"), "base_multiplier"),
+            // 2 x 2048 signed points need 13 index bits; the table packs 12.
+            (ksum("2048", "3", "1", "100000000000"), "packs base indices"),
+        ] {
+            // r = 2^14-ish curves are too small for size 2048: the order
+            // refusal is as good a refusal.
+            let err = plan_arm(prime.clone(), "ic.known_log_ksum_v1", params).unwrap_err();
+            assert!(
+                err.contains(needle) || err.contains("size must lie in"),
+                "{needle}: {err}"
+            );
+        }
+        let mitm2 = |size: &str, work: &str, trials: &str| json!({"size": size, "base_seed": "1", "max_pair_work": work, "max_trials": trials});
+        plan_arm(
+            prime.clone(),
+            "ic.known_log_mitm2_v1",
+            mitm2("8", "1000", "10"),
+        )
+        .unwrap();
+        plan_arm(
+            kob.clone(),
+            "ic.known_log_mitm2_v1",
+            mitm2("8", "1000", "10"),
+        )
+        .unwrap();
+        for (params, needle) in [
+            (mitm2("8", "10", "10"), "above max_pair_work"),
+            (mitm2("8", "1000", "0"), "max_trials must be positive"),
+            (mitm2("0", "1000", "10"), "size must lie in"),
+        ] {
+            let err = plan_arm(prime.clone(), "ic.known_log_mitm2_v1", params).unwrap_err();
+            assert!(err.contains(needle), "{needle}: {err}");
+        }
+        // ic.tensor_contraction_v1: prime order, m >= 2, max_restarts >= 1.
+        plan_arm(prime.clone(), "ic.tensor_contraction_v1", json!({"m": "3"})).unwrap();
+        let err = plan_arm(j0, "ic.tensor_contraction_v1", json!({"m": "3"})).unwrap_err();
+        assert!(err.contains("prime-order curve"), "{err}");
+        let err =
+            plan_arm(prime.clone(), "ic.tensor_contraction_v1", json!({"m": "1"})).unwrap_err();
+        assert!(err.contains("m ≥ 2"), "{err}");
+        let err = plan_arm(
+            prime.clone(),
+            "ic.tensor_contraction_v1",
+            json!({"m": "3", "max_restarts": "0"}),
+        )
+        .unwrap_err();
+        assert!(err.contains("max_restarts"), "{err}");
+        // rho.preprocessing.
+        plan_arm(prime.clone(), "rho.preprocessing", json!({"entries": "64"})).unwrap();
+        let err =
+            plan_arm(prime.clone(), "rho.preprocessing", json!({"entries": "0"})).unwrap_err();
+        assert!(err.contains("entries > 0"), "{err}");
+        let err = plan_arm(
+            prime.clone(),
+            "rho.preprocessing",
+            json!({"entries": "64", "dp_bits": "41"}),
+        )
+        .unwrap_err();
+        assert!(err.contains("dp_bits"), "{err}");
+        // The prime-only pipeline components: wwalk, wsum, prime-interval.
+        let pipe = |fb: &str, oracle: &str| json!({"factor_base": fb, "oracle": oracle});
+        plan_arm(
+            prime.clone(),
+            "ic.pipeline",
+            pipe("prime-abscissa:size=2", "wwalk:x=1,g=1,grow=2,seed=run"),
+        )
+        .unwrap();
+        plan_arm(
+            prime.clone(),
+            "ic.pipeline",
+            pipe("prime-abscissa:size=3", "wsum:coef=3"),
+        )
+        .unwrap();
+        plan_arm(
+            prime.clone(),
+            "ic.pipeline",
+            pipe("prime-interval:t=6", "mitm"),
+        )
+        .unwrap();
+        for (curve, fb, oracle, needle) in [
+            (
+                &kob,
+                "prime-abscissa:size=2",
+                "wwalk:x=1",
+                "prime curves only",
+            ),
+            (
+                &kob,
+                "prime-abscissa:size=3",
+                "wsum:coef=3",
+                "prime curves only",
+            ),
+            (&kob, "prime-interval:t=6", "mitm", "prime curves only"),
+            (&prime, "prime-abscissa:size=2", "wwalk:x=9", "x is in"),
+            (
+                &prime,
+                "prime-abscissa:size=2",
+                "wwalk",
+                "missing parameter `x`",
+            ),
+            (
+                &prime,
+                "prime-abscissa:size=2",
+                "wwalk:x=1,jumps=1",
+                "jumps is from",
+            ),
+            (
+                &prime,
+                "prime-abscissa:size=2",
+                "wwalk:x=1,jumps=65",
+                "jumps is from",
+            ),
+            (
+                &prime,
+                "prime-abscissa:size=2",
+                "wwalk:x=1,grow=3",
+                "grow is 0, 1 or 2",
+            ),
+            (
+                &prime,
+                "prime-abscissa:size=2",
+                "wwalk:x=1,grow=2",
+                "grow=2 needs g=1",
+            ),
+            (
+                &prime,
+                "prime-abscissa:size=2",
+                "wwalk:x=1,seed=abc",
+                "not a number",
+            ),
+            (
+                &prime,
+                "prime-abscissa:size=3",
+                "wsum:coef=0",
+                "coef is from 1 to",
+            ),
+            (
+                &prime,
+                "prime-abscissa:size=3",
+                "wsum:coef=256",
+                "coef is from 1 to",
+            ),
+            (
+                &prime,
+                "prime-abscissa:size=3",
+                "wsum",
+                "missing parameter `coef`",
+            ),
+            (&prime, "prime-interval:t=0", "mitm", "prime-interval"),
+            (&prime, "prime-interval:t=63", "mitm", "prime-interval"),
+            (
+                &prime,
+                "prime-interval:t=6,lo=99999999",
+                "mitm",
+                "prime-interval",
+            ),
+            (
+                &prime,
+                "prime-interval:t=6,size=3",
+                "mitm",
+                "unknown parameter",
+            ),
+        ] {
+            let err = plan_arm(curve.clone(), "ic.pipeline", pipe(fb, oracle)).unwrap_err();
+            assert!(err.contains(needle), "{fb} / {oracle}: {err}");
+        }
+    }
+
     /// `rho.signed_frobenius_strong_wordram` is priced after running its
     /// base, so the planner must look through `wordram_price::base_of` as it
     /// does through `full_price::base_of`.
@@ -10000,3 +10356,7 @@ mod tensor_contraction_tests {
         assert!(err.contains("m ≥ 2"), "{err}");
     }
 }
+
+#[cfg(test)]
+#[path = "registry_audit_tests.rs"]
+mod registry_audit_tests;
