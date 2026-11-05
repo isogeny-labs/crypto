@@ -1,0 +1,53 @@
+{
+  "checks": [
+    {
+      "argv": [
+        "python3",
+        "research/koblitz_modular_ic_20261018/rounds/121/verify121.py"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "y0_e1 independent F4 table supports match\ny0_e3 independent F4 table supports match\nTRANSLATE121_INDEPENDENT_PASS\n"
+    },
+    {
+      "argv": [
+        "python3",
+        "research/koblitz_modular_ic_20261018/rounds/121/generate_lean121.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "LEAN121_SOURCE_BINDING_PASS\n"
+    },
+    {
+      "argv": [
+        "lean",
+        "research/koblitz_modular_ic_20261018/rounds/121/lean/F4Newton121.lean"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "research/koblitz_modular_ic_20261018/rounds/121/translate121.py",
+        "/tmp/koblitz-r121-replay"
+      ],
+      "exit_code": 0,
+      "stderr": "",
+      "stdout": "TRANSLATE121_ALL_CHECKS_PASS\n"
+    }
+  ],
+  "files_sha256": {
+    "PROTOCOL.md": "560c9d9b27cacce90d0ee3b49e1e8e58b7651c585a25780feaf82f6bd13d48c0",
+    "generate_lean121.py": "86f0c4e1a0936ccb5f5b2c124d7e4708f51468c52f912a0eead534ff8354470d",
+    "lean/F4Newton121.lean": "2aca9eab89db46520005e6d542b39dc87dad9e161c27b0b123cdae967ac1b248",
+    "protocol.json": "dec4782e5433dfc86e1287c69c4ffea1a86795d7442811500d93eb6e7ab241b2",
+    "publication/report.pdf": "b7b88c3bba9be3c8699e78d8f7ac1997c11ef21b42fbae1183d67fee176a712f",
+    "result.json": "2baa0323bee345326da7196889598dd752a75ed6f20575a2b3348c856eb44053",
+    "translate121.py": "7f22e5980e82d42e36efeaca1255c6c2b18c2b2dad34952456fac036e24474bf",
+    "verify121.py": "b27de5ce19ea3fcce374046278f73578d2f4f8dd46c1eec7dbfa35580843f51e"
+  },
+  "replay_byte_identical": true
+}
