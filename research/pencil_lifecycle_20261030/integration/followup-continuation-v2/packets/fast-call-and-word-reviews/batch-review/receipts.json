@@ -1,0 +1,51 @@
+{
+  "commit": "5937d99b29e5027d99b7fda1be35569e44f01836",
+  "commands": "replay.sh",
+  "results": [
+    {
+      "module": "ExpectedFailure",
+      "exit": 1,
+      "stdout": "logs/ExpectedFailure.stdout",
+      "stderr": "logs/ExpectedFailure.stderr"
+    },
+    {
+      "module": "FastBatchControls",
+      "exit": 0,
+      "stdout": "logs/FastBatchControls.stdout",
+      "stderr": "logs/FastBatchControls.stderr"
+    },
+    {
+      "module": "FastBatchInverse",
+      "exit": 0,
+      "stdout": "logs/FastBatchInverse.stdout",
+      "stderr": "logs/FastBatchInverse.stderr"
+    },
+    {
+      "module": "FastBatchReadback",
+      "exit": 0,
+      "stdout": "logs/FastBatchReadback.stdout",
+      "stderr": "logs/FastBatchReadback.stderr"
+    },
+    {
+      "module": "Inversion",
+      "exit": 0,
+      "stdout": "logs/Inversion.stdout",
+      "stderr": "logs/Inversion.stderr"
+    },
+    {
+      "module": "ReviewerControls",
+      "exit": 0,
+      "stdout": "logs/ReviewerControls.stdout",
+      "stderr": "logs/ReviewerControls.stderr"
+    },
+    {
+      "module": "Wide",
+      "exit": 0,
+      "stdout": "logs/Wide.stdout",
+      "stderr": "logs/Wide.stderr"
+    }
+  ],
+  "binding_manifest": "before.sha256",
+  "bindings_check": "bindings-check.txt",
+  "harness_failure": "checker-premature-invocation.json"
+}

@@ -1,0 +1,35 @@
+Started UTC: 2026-10-21T14:52:10Z
+Command: bash run-native.sh FRESH_OUTPUT_DIRECTORY
+g++ (Debian 14.2.0-19) 14.2.0
+OpenSSL 3.5.7 9 Jun 2026 (Library: OpenSSL 3.5.7 9 Jun 2026)
+Linux x86_64
+1d582c4aafd40b62e54766c3bf4ef52a2fa96a0f
+source-and-evidence.tar.xz: OK
+PASS census p=5: 20 models
+PASS census p=7: 42 models
+PASS census p=11: 110 models
+PASS census p=13: 156 models
+PASS census p=17: 272 models
+PASS census p=19: 342 models
+PASS trace-zero p=5, n=2: kernel=3
+PASS trace-zero p=5, n=3: kernel=12
+PASS trace-zero p=5, n=5: kernel=341
+PASS trace-zero p=7, n=3: kernel=76
+PASS pairing/IC p=43: all 11 logs recovered
+PASS pairing/IC p=67: all 17 logs recovered
+PASS pairing/IC p=211: all 53 logs recovered
+PASS complete deterministic parity: 434 leaf fields
+PASS: 12 historical checksum records
+PASS: 3 independent native IC certificate checks
+PASS: 81 native scalar-pairing checks; 3219 bilinearity checks
+PASS: smooth/anomalous twist point counts
+PASS: 81 additional native IC certificates
+PASS: tower/simple basis; 2401 elements, 2475 points, 2025 group-law checks
+source.cpp: OK
+full.cpp: OK
+basis.cpp: OK
+json.hpp: OK
+audit-source.cpp: OK
+runner-source.sh: OK
+Native replay and independent certificate audit exit code: 0
+Finished UTC: 2026-10-21T14:52:36Z

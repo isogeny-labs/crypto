@@ -1,0 +1,53 @@
+import Normalized
+set_option autoImplicit false
+namespace MonicZeroTest
+open Polynomial ScaleTrim MonicRemainder MonicTermination
+
+theorem degree_lt_length (p : UInt64) (xs : List UInt64) :
+ (wordsPoly p xs).degree < (xs.length : WithBot Nat) := by
+ rw [degree_lt_iff_coeff_zero]
+ intro m hm
+ rw [wordsPoly_coefficient]
+ simp [List.getElem?_eq_none hm]
+
+theorem divisor_degree_lower (p : UInt64) [Fact p.toNat.Prime] (b : List UInt64)
+ (hm : b.getLast?=some 1) : ((b.length-1 : Nat) : WithBot Nat)≤(wordsPoly p b).degree := by
+ apply le_degree_of_ne_zero
+ rw [top_coefficient,hm]
+ simp
+
+theorem shorter_degree (p : UInt64) [Fact p.toNat.Prime] (b out : List UInt64)
+ (hm : b.getLast?=some 1) (hl : out.length<b.length) :
+ (wordsPoly p out).degree<(wordsPoly p b).degree := by
+ have hn : out.length≤b.length-1 := by omega
+ exact lt_of_lt_of_le (degree_lt_length p out)
+  (le_trans (by exact_mod_cast hn) (divisor_degree_lower p b hm))
+
+theorem shorter_divisible_empty (p : UInt64) [Fact p.toNat.Prime] (b out : List UInt64)
+ (hm : b.getLast?=some 1) (hc : Canon p out) (hn : Normal out)
+ (hl : out.length<b.length) (hd : wordsPoly p b∣wordsPoly p out) : out=[] := by
+ apply (zero_iff_empty p out hc hn).mp
+ exact eq_zero_of_dvd_of_degree_lt hd (shorter_degree p b out hm hl)
+
+theorem checked_empty_iff (p : UInt64) [Fact p.toNat.Prime] (b a : List UInt64)
+ (hp : 0<p.toNat) (hb : p.toNat<2^31) (hbs : Canon p b) (ha : Canon p a)
+ (hm : b.getLast?=some 1) (fuel : Nat) (hf : a.length≤fuel) :
+ checkedPrem p b a fuel=some [] ↔ wordsPoly p b∣wordsPoly p a := by
+ constructor
+ · intro h
+   exact (checked_success_sound p b a fuel hp hb hbs ha h).2.2
+ · intro hd
+   obtain ⟨out,ho,hc,ht,he⟩:=checked_total p b a hp hb hbs ha hm fuel hf
+   have hn:=checked_normal p b a out fuel hm ho
+   have hz : out=[] := by
+    rcases ht with h|h
+    · exact h
+    · exact shorter_divisible_empty p b out hm hc hn h (he.mpr hd)
+   simpa [hz] using ho
+
+theorem input_length_empty_iff (p : UInt64) [Fact p.toNat.Prime] (b a : List UInt64)
+ (hp : 0<p.toNat) (hb : p.toNat<2^31) (hbs : Canon p b) (ha : Canon p a)
+ (hm : b.getLast?=some 1) :
+ checkedPrem p b a a.length=some [] ↔ wordsPoly p b∣wordsPoly p a :=
+ checked_empty_iff p b a hp hb hbs ha hm a.length le_rfl
+end MonicZeroTest

@@ -1,0 +1,82 @@
+{
+  "schema": "formal-review/v1",
+  "component": "mutable-signed-graph-find",
+  "producer_head": "60346e7f2b831aa88f89d7967b9e74e21220422c",
+  "review_plan_commit": "6f7a9eec4f4920c3d6267892b906e761a186229c",
+  "machine_status": "passed",
+  "source_fidelity": "faithful_scoped",
+  "mathematical_review_outcome": "validated_scoped",
+  "producer_workflow_outcome": "needs_revision",
+  "counts": {
+    "main_theorems": 2,
+    "producer_controls": 8,
+    "reviewer_declarations": 15,
+    "axiom_readbacks": 25,
+    "producer_manifest_matches": 33
+  },
+  "gates": {
+    "dependency2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "main1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "reviewer2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "reviewer_readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  },
+  "gate_defect": {
+    "helper_sha256": "b2a556dc28d3f48a6ca10c9d7ebe41d7549dd4ea817b54efc385485dda3736e4",
+    "lean_exit": 1,
+    "wrapper_exit": 0,
+    "reproduction": "gate-negative-control/invocation.json",
+    "separate_repair_requested": true
+  },
+  "limits": [
+    "finite functional heaps",
+    "initial rank-decreasing forest and representation",
+    "arbitrary commutative-ring potentials",
+    "no native words/Vec/counters/stack bounds/union proof",
+    "no independent binary kernel rechecker"
+  ],
+  "scientific_execution": false,
+  "repo_edits": false,
+  "failures_retained": [
+    "dependency1 missing Product",
+    "reviewer1 equality instances and induction binder names"
+  ],
+  "source": {
+    "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/src/cryptanalysis/three_leads.rs",
+    "sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6",
+    "lines": "1580-1596"
+  },
+  "visual_inspection": {
+    "pages": [
+      1,
+      2
+    ],
+    "svg_embedded": true,
+    "result": "all pages and diagram inspected; no clipping or layout defects"
+  }
+}

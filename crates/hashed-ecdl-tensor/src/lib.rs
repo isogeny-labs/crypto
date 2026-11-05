@@ -15,6 +15,8 @@ mod serialization;
 
 pub mod arithmetic;
 pub mod binary;
+pub mod canonical;
+pub mod census;
 pub mod contraction;
 pub mod curve;
 pub mod encoding;
@@ -26,6 +28,7 @@ pub mod primality;
 pub mod reduction;
 pub mod ring;
 pub mod structured;
+pub mod structured_runner;
 pub mod weighted;
 pub mod width;
 

@@ -1,0 +1,34 @@
+  eliminant factor: 1 ^1
+  eliminant factor: v1^2*v2^2-71494 ^1
+  eliminant factor: v1^2*v2^2*v3^2-v1^2*v2^2-v1^2*v3^2-v2^2*v3^2-142986*v1*v2*v3+71494*v1^2+71494*v2^2+71494*v3^2-71494 ^1
+S3E (elimination of u1,u2,u3) = closed form: 11*v1^2*v2^2*v3^2-11*v1^2*v2^2-11*v1^2*v3^2-11*v2^2*v3^2+20*v1*v2*v3+v1^2+v2^2+v3^2-1
+E1Q: S3E = SI(v1^2, v2^2, v3^2) - 2(a-d) v1 v2 v3 checked (SI = d ABC - d(AB+AC+BC) + a(A+B+C) - a)
+S3E degree in v1: 2, total degree 6
+S3Esym(s,q,X) = -11*Sv^2*SX^2+11*Sq^2*SX^2+22*Sq*SX^2+Sv^2-11*Sq^2+20*Sq*SX+SX^2-2*Sq-1   (total degree 4)
+Montgomery model: A=629144 B=629146
+  Montgomery eliminant factor: 1 ^1
+  Montgomery eliminant factor: x1^2*x2^2-2*x1^2*x2*x3-2*x1*x2^2*x3+x1^2*x3^2-2*x1*x2*x3^2+x2^2*x3^2-157277*x1*x2*x3-2*x1*x2-2*x1*x3-2*x2*x3+1 ^1
+  Montgomery eliminant factor: -x1+x2 ^2
+S3M (elimination of y1,y2) = closed form: x1^2*x2^2-2*x1^2*x2*x3-2*x1*x2^2*x3+x1^2*x3^2-2*x1*x2*x3^2+x2^2*x3^2-157277*x1*x2*x3-2*x1*x2-2*x1*x3-2*x2*x3+1
+  quotient eliminant factor: 1 ^1
+  quotient eliminant factor: k1^2*k2^2-2*k1^2*k2*k3-2*k1*k2^2*k3+k1^2*k3^2-2*k1*k2*k3^2+k2^2*k3^2-157277*k1*k2*k3+8*k1*k2+8*k1*k3+8*k2*k3-157325*k1-157325*k2-157325*k3+377596 ^1
+S3Q(xi1,xi2,xi3) = k1^2*k2^2-2*k1^2*k2*k3-2*k1*k2^2*k3+k1^2*k3^2-2*k1*k2*k3^2+k2^2*k3^2-157277*k1*k2*k3+8*k1*k2+8*k1*k3+8*k2*k3-157325*k1-157325*k2-157325*k3+377596   (degree in xi1 2, total 4)
+S3M invariant under (x1,x2) -> (1/x1,1/x2) (translation of two points by T2): checked
+S3Msym = Sv^2*SX^2-2*Sv*Sq*SX-4*Sq*SX^2+Sq^2-2*Sv*SX-157277*Sq*SX-2*Sq+1
+S3Qsym = Sv^2*SX^2-2*Sv*Sq*SX-4*Sq*SX^2+Sq^2+8*Sv*SX-157277*Sq*SX-157325*Sv+8*Sq-157325*SX+377596
+order check: Q0=(-240076,2), 4Q0 != O, 196873*(4Q0) = O, #E*Q0 = O  =>  #E = 4*196873 = 787492
+g = 2: usable exponents at t=4: 14 (of 16), at t=5: 24 (of 32)
+instance m=3 t=4 tries=1: 3 4 146752 620329 | 241748 388249 641480 | 44699 251020 703433 | 709994 | 677483
+Montgomery instance tries=1: M 3 4 xR=116051 | x_i: 641480 544685 100025 | sep x: 426861
+m=3 t=4 TW: N=13 eqs=14 maxdeg=4 plant ok -> /tmp/claude-0/-home-user/8900182d-dd1d-52b2-9106-78048929cee5/scratchpad/edw/c7/g1/m3_t4_TW.ms
+m=3 t=4 TQ: N=13 eqs=14 maxdeg=4 plant ok -> /tmp/claude-0/-home-user/8900182d-dd1d-52b2-9106-78048929cee5/scratchpad/edw/c7/g1/m3_t4_TQ.ms
+instance m=3 t=5 tries=1: 3 5 373282 618819 | 203749 41596 1 | 168512 479489 240076 | 720881 | 592978
+Montgomery instance tries=1: M 3 5 xR=737661 | x_i: 387372 669610 462518 | sep x: 534333
+m=3 t=5 TW: N=16 eqs=17 maxdeg=4 plant ok -> /tmp/claude-0/-home-user/8900182d-dd1d-52b2-9106-78048929cee5/scratchpad/edw/c7/g1/m3_t5_TW.ms
+m=3 t=5 TQ: N=16 eqs=17 maxdeg=4 plant ok -> /tmp/claude-0/-home-user/8900182d-dd1d-52b2-9106-78048929cee5/scratchpad/edw/c7/g1/m3_t5_TQ.ms
+instance m=4 t=4 tries=1: 4 4 249257 326688 | 570203 686408 245037 544685 | 726864 262144 393602 44699 | 505858 7143 | 626227 520097
+Montgomery base at t=4 has 6 usable x (3 classes {x,1/x}) < m=4: TW/TQ skipped
+instance m=4 t=5 tries=1: 4 5 636430 758744 | 399061 116823 641480 582684 | 131863 258299 83000 617921 | 456871 51179 | 429727 484393
+Montgomery instance tries=1: M 4 5 xR=666578 | x_i: 641480 544685 669610 417470 | sep x: 235968 249232
+m=4 t=5 TW: N=22 eqs=23 maxdeg=4 plant ok -> /tmp/claude-0/-home-user/8900182d-dd1d-52b2-9106-78048929cee5/scratchpad/edw/c7/g1/m4_t5_TW.ms
+m=4 t=5 TQ: N=22 eqs=23 maxdeg=4 plant ok -> /tmp/claude-0/-home-user/8900182d-dd1d-52b2-9106-78048929cee5/scratchpad/edw/c7/g1/m4_t5_TQ.ms

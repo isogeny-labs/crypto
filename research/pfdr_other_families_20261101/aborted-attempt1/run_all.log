@@ -1,0 +1,97 @@
+built results/build/paircount
+selftest PASS (126 kernel-vs-brute + 9 near-2^32 key checks + 6 plant_internal + 12 order certifications (8 at 32 bits, 4 at 28 bits))
+jobs to run: 240 (already done: 0)
+  200/240
+  240/240
+design.json written: 30 cells, 40 plant entries
+jobs to run: 19887 (already done: 0)
+  200/19887
+  400/19887
+  600/19887
+  800/19887
+  1000/19887
+  1200/19887
+  1400/19887
+  1600/19887
+  1800/19887
+  2000/19887
+  2200/19887
+  2400/19887
+  2600/19887
+  2800/19887
+  3000/19887
+  3200/19887
+  3400/19887
+  3600/19887
+  3800/19887
+  4000/19887
+  4200/19887
+  4400/19887
+  4600/19887
+  4800/19887
+  5000/19887
+  5200/19887
+  5400/19887
+  5600/19887
+  5800/19887
+  6000/19887
+  6200/19887
+  6400/19887
+  6600/19887
+  6800/19887
+  7000/19887
+  7200/19887
+  7400/19887
+  7600/19887
+  7800/19887
+  8000/19887
+  8200/19887
+  8400/19887
+  8600/19887
+  8800/19887
+  9000/19887
+  9200/19887
+  9400/19887
+  9600/19887
+  9800/19887
+  10000/19887
+  10200/19887
+concurrent.futures.process._RemoteTraceback: 
+"""
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/concurrent/futures/process.py", line 255, in _process_worker
+    r = call_item.fn(*call_item.args, **call_item.kwargs)
+  File "/home/user/crypto/research/pfdr_other_families_20261101/implementation/run.py", line 352, in job
+    sb, meta = family_base(E, b, d, _rng("struct", block, bits, theta, d, c))
+               ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/crypto/research/pfdr_other_families_20261101/implementation/run.py", line 279, in family_base
+    return {1: dickson_base, 2: gp_base, 3: quad_base}[d](E, b, rng)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/home/user/crypto/research/pfdr_other_families_20261101/implementation/run.py", line 246, in dickson_base
+    return _fill(E, b, stream(), {"family": "dickson", "u": u, "x1": x1})
+  File "/home/user/crypto/research/pfdr_other_families_20261101/implementation/run.py", line 228, in _fill
+    raise RuntimeError("abscissa stream did not reach b points")
+RuntimeError: abscissa stream did not reach b points
+"""
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/user/crypto/research/pfdr_other_families_20261101/implementation/run.py", line 1247, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/crypto/research/pfdr_other_families_20261101/implementation/run.py", line 1243, in main
+    sys.exit(a.f(a) or 0)
+             ~~~^^^
+  File "/home/user/crypto/research/pfdr_other_families_20261101/implementation/run.py", line 1007, in cmd_census
+    _run_jobs(kernel, todo, os.path.join(a.out, f"{a.block}-jobs.jsonl"), nulls_only=False)
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/crypto/research/pfdr_other_families_20261101/implementation/run.py", line 395, in _run_jobs
+    f.write(json.dumps(fut.result(), sort_keys=True) + "\n")
+                       ~~~~~~~~~~^^
+  File "/usr/lib/python3.13/concurrent/futures/_base.py", line 453, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/usr/lib/python3.13/concurrent/futures/_base.py", line 402, in __get_result
+    raise self._exception
+RuntimeError: abscissa stream did not reach b points

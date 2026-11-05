@@ -1,0 +1,268 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "QT-degree-retained-20261030",
+  "created": "2026-10-30T09:01:22Z",
+  "protocol": {
+    "path": "../../DEGREE_RETAINED_20261030.protocol.json",
+    "sha256": "c3c798f4ea345129fbdb05756d434b2aa576d85b956b4fbfc8a4ce01217e7029",
+    "protocol_id": "QT-degree-retained-F13-20261030",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": null,
+    "role": "exact native constrained solver and independent point/witness/scalar replay"
+  },
+  "source": {
+    "repo": "isogeny-labs/crypto",
+    "commit": "2806746e472a2e7e87d4f3a723c9ee43f6a8a31c",
+    "dirty": false
+  },
+  "backend": "local",
+  "host": {
+    "path": null,
+    "sha256": null,
+    "class_id": null,
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": null
+    }
+  },
+  "arms": [
+    {
+      "id": "cpp",
+      "role": "reference",
+      "binary_sha256": "1a9ecf173d65e6d2fbf6786dd22cc8252940e07efcdbe64c99404fd2db7b8c6d",
+      "commit": "2806746e472a2e7e87d4f3a723c9ee43f6a8a31c"
+    },
+    {
+      "id": "rust",
+      "role": "candidate",
+      "binary_sha256": "efb12bd54c9d65adeb5a87df1faea0dbc2a84157bfa66c5ad49424510a240f16",
+      "commit": "2806746e472a2e7e87d4f3a723c9ee43f6a8a31c"
+    },
+    {
+      "id": "domain",
+      "role": "control_positive",
+      "binary_sha256": "efb12bd54c9d65adeb5a87df1faea0dbc2a84157bfa66c5ad49424510a240f16",
+      "commit": "2806746e472a2e7e87d4f3a723c9ee43f6a8a31c"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "retained-cpp",
+      "arm": "cpp",
+      "instance_id": "0",
+      "seed": 2381,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "blocked_setups": 172,
+          "capped_response_queries": 1196,
+          "configurations": 288,
+          "policy_target_cap_comparisons": 9720,
+          "source_targets": 1728,
+          "strict_joint_recovery_admitted": 192,
+          "strongest_source_distinct_targets": 0,
+          "strongest_source_joint_pair_records": 0,
+          "verified_recoveries": 696
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "exact deterministic arithmetic,no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "independent native arithmetic and rehashed control rejection"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "existing local host;two build workers",
+      "backend_ref": null
+    },
+    {
+      "run_id": "retained-rust",
+      "arm": "rust",
+      "instance_id": "0",
+      "seed": 2381,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "blocked_setups": 172,
+          "capped_response_queries": 1196,
+          "configurations": 288,
+          "policy_target_cap_comparisons": 9720,
+          "source_targets": 1728,
+          "strict_joint_recovery_admitted": 192,
+          "strongest_source_distinct_targets": 0,
+          "strongest_source_joint_pair_records": 0,
+          "verified_recoveries": 696
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "exact deterministic arithmetic,no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "independent native arithmetic and rehashed control rejection"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "existing local host;two build workers",
+      "backend_ref": null
+    },
+    {
+      "run_id": "retained-domain",
+      "arm": "domain",
+      "instance_id": "0",
+      "seed": 2381,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "blocked_setups": 172,
+          "capped_response_queries": 1196,
+          "configurations": 288,
+          "policy_target_cap_comparisons": 9720,
+          "source_targets": 1728,
+          "strict_joint_recovery_admitted": 192,
+          "strongest_source_distinct_targets": 0,
+          "strongest_source_joint_pair_records": 0,
+          "verified_recoveries": 696
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "exact deterministic arithmetic,no timing claim"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "independent native arithmetic and rehashed control rejection"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "existing local host;two build workers",
+      "backend_ref": null
+    }
+  ],
+  "flow": {
+    "planned": 3,
+    "attempted": 3,
+    "completed": 3,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "runs.tar.xz",
+      "sha256": "688a5a4b19bd0f09ab396183e5d3cc68be67c49e9114e9ca93f42041ba658c06",
+      "bytes": 37124,
+      "kind": "raw"
+    },
+    {
+      "path": "RUNS.sha256.xz",
+      "sha256": "fb37c340677055aa4261723caea015ee87949409d7e14cabaddbb03427c628e0",
+      "bytes": 35984,
+      "kind": "raw"
+    },
+    {
+      "path": "archive-receipt.json",
+      "sha256": "e10c1dd105722ad9468acc489f9d417c773cdf10deec367ca6598d7d1842e8df",
+      "bytes": 549,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../../native/degree-retained-audit/main.rs",
+      "sha256": "4ab389c25f713c1147242740c723316e9c9598db77fe5de774fd91ef53aa0055",
+      "bytes": 27638,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "exact native scope",
+      "text": "Three nested arm rows describe two native engine executions and their control set,not three independent experiments.288configurations repeat six source points under16policies,2encodings,9caps;not1728distinctDLPchallenges. No clock/cost/regularity result."
+    },
+    {
+      "kind": "observation",
+      "by": "retained failures",
+      "text": "Earlier compile failure and rejected full-producer/audit attempt are archived and not accepted. Corrected full replication protocol explicitly discloses earlier outcomes. Separate baseline and retained-witness instruments,no changed selection criteria."
+    }
+  ],
+  "reviews_dir": "reviews"
+}

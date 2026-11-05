@@ -1,0 +1,83 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp20-tm1050-4295f05e | 17.00 | inc | 32/32 | 2.581 | 2.698 | 3.752 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | rho-neg | 32/32 | 1.489 | 1.594 | 2.540 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | wwalk-x08-grow-n2 | 32/32 | 4.495 | 4.645 | 5.992 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | wwalk-x08-n2 | 32/32 | 5.254 | 5.575 | 8.458 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | wwalk-x10-grow-n2 | 32/32 | 5.568 | 5.744 | 7.330 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | wwalk-x10-n2 | 32/32 | 5.504 | 5.842 | 8.880 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | wwalk-x12-n2 | 32/32 | 4.539 | 4.669 | 5.845 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | wwalkg-x08-grow-n2 | 32/32 | 2.628 | 2.742 | 3.767 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | wwalkg-x08-n2 | 32/32 | 3.083 | 3.274 | 4.994 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | wwalkg-x10-grow-n2 | 32/32 | 3.303 | 3.394 | 4.206 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | wwalkg-x10-n2 | 32/32 | 2.931 | 3.085 | 4.472 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | wwalkg-x12-n2 | 32/32 | 2.569 | 2.661 | 3.490 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp20-tm1050-4295f05e | inc vs rho-neg | rho-neg < inc |
+| icv1-fp20-tm1050-4295f05e | inc vs wwalk-x08-grow-n2 | inc < wwalk-x08-grow-n2 |
+| icv1-fp20-tm1050-4295f05e | inc vs wwalk-x08-n2 | inc < wwalk-x08-n2 |
+| icv1-fp20-tm1050-4295f05e | inc vs wwalk-x10-grow-n2 | inc < wwalk-x10-grow-n2 |
+| icv1-fp20-tm1050-4295f05e | inc vs wwalk-x10-n2 | inc < wwalk-x10-n2 |
+| icv1-fp20-tm1050-4295f05e | inc vs wwalk-x12-n2 | inc < wwalk-x12-n2 |
+| icv1-fp20-tm1050-4295f05e | inc vs wwalkg-x08-grow-n2 | inc < wwalkg-x08-grow-n2 |
+| icv1-fp20-tm1050-4295f05e | inc vs wwalkg-x08-n2 | inc < wwalkg-x08-n2 |
+| icv1-fp20-tm1050-4295f05e | inc vs wwalkg-x10-grow-n2 | inc < wwalkg-x10-grow-n2 |
+| icv1-fp20-tm1050-4295f05e | inc vs wwalkg-x10-n2 | inc < wwalkg-x10-n2 |
+| icv1-fp20-tm1050-4295f05e | inc vs wwalkg-x12-n2 | wwalkg-x12-n2 < inc |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs wwalk-x08-grow-n2 | rho-neg < wwalk-x08-grow-n2 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs wwalk-x08-n2 | rho-neg < wwalk-x08-n2 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs wwalk-x10-grow-n2 | rho-neg < wwalk-x10-grow-n2 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs wwalk-x10-n2 | rho-neg < wwalk-x10-n2 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs wwalk-x12-n2 | rho-neg < wwalk-x12-n2 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs wwalkg-x08-grow-n2 | rho-neg < wwalkg-x08-grow-n2 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs wwalkg-x08-n2 | rho-neg < wwalkg-x08-n2 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs wwalkg-x10-grow-n2 | rho-neg < wwalkg-x10-grow-n2 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs wwalkg-x10-n2 | rho-neg < wwalkg-x10-n2 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs wwalkg-x12-n2 | rho-neg < wwalkg-x12-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x08-grow-n2 vs wwalk-x08-n2 | wwalk-x08-grow-n2 < wwalk-x08-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x08-grow-n2 vs wwalk-x10-grow-n2 | wwalk-x08-grow-n2 < wwalk-x10-grow-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x08-grow-n2 vs wwalk-x10-n2 | wwalk-x08-grow-n2 < wwalk-x10-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x08-grow-n2 vs wwalk-x12-n2 | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | wwalk-x08-grow-n2 vs wwalkg-x08-grow-n2 | wwalkg-x08-grow-n2 < wwalk-x08-grow-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x08-grow-n2 vs wwalkg-x08-n2 | wwalkg-x08-n2 < wwalk-x08-grow-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x08-grow-n2 vs wwalkg-x10-grow-n2 | wwalkg-x10-grow-n2 < wwalk-x08-grow-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x08-grow-n2 vs wwalkg-x10-n2 | wwalkg-x10-n2 < wwalk-x08-grow-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x08-grow-n2 vs wwalkg-x12-n2 | wwalkg-x12-n2 < wwalk-x08-grow-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x08-n2 vs wwalk-x10-grow-n2 | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | wwalk-x08-n2 vs wwalk-x10-n2 | wwalk-x08-n2 < wwalk-x10-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x08-n2 vs wwalk-x12-n2 | wwalk-x12-n2 < wwalk-x08-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x08-n2 vs wwalkg-x08-grow-n2 | wwalkg-x08-grow-n2 < wwalk-x08-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x08-n2 vs wwalkg-x08-n2 | wwalkg-x08-n2 < wwalk-x08-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x08-n2 vs wwalkg-x10-grow-n2 | wwalkg-x10-grow-n2 < wwalk-x08-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x08-n2 vs wwalkg-x10-n2 | wwalkg-x10-n2 < wwalk-x08-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x08-n2 vs wwalkg-x12-n2 | wwalkg-x12-n2 < wwalk-x08-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x10-grow-n2 vs wwalk-x10-n2 | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | wwalk-x10-grow-n2 vs wwalk-x12-n2 | wwalk-x12-n2 < wwalk-x10-grow-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x10-grow-n2 vs wwalkg-x08-grow-n2 | wwalkg-x08-grow-n2 < wwalk-x10-grow-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x10-grow-n2 vs wwalkg-x08-n2 | wwalkg-x08-n2 < wwalk-x10-grow-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x10-grow-n2 vs wwalkg-x10-grow-n2 | wwalkg-x10-grow-n2 < wwalk-x10-grow-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x10-grow-n2 vs wwalkg-x10-n2 | wwalkg-x10-n2 < wwalk-x10-grow-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x10-grow-n2 vs wwalkg-x12-n2 | wwalkg-x12-n2 < wwalk-x10-grow-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x10-n2 vs wwalk-x12-n2 | wwalk-x12-n2 < wwalk-x10-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x10-n2 vs wwalkg-x08-grow-n2 | wwalkg-x08-grow-n2 < wwalk-x10-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x10-n2 vs wwalkg-x08-n2 | wwalkg-x08-n2 < wwalk-x10-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x10-n2 vs wwalkg-x10-grow-n2 | wwalkg-x10-grow-n2 < wwalk-x10-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x10-n2 vs wwalkg-x10-n2 | wwalkg-x10-n2 < wwalk-x10-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x10-n2 vs wwalkg-x12-n2 | wwalkg-x12-n2 < wwalk-x10-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x12-n2 vs wwalkg-x08-grow-n2 | wwalkg-x08-grow-n2 < wwalk-x12-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x12-n2 vs wwalkg-x08-n2 | wwalkg-x08-n2 < wwalk-x12-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x12-n2 vs wwalkg-x10-grow-n2 | wwalkg-x10-grow-n2 < wwalk-x12-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x12-n2 vs wwalkg-x10-n2 | wwalkg-x10-n2 < wwalk-x12-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalk-x12-n2 vs wwalkg-x12-n2 | wwalkg-x12-n2 < wwalk-x12-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalkg-x08-grow-n2 vs wwalkg-x08-n2 | wwalkg-x08-grow-n2 < wwalkg-x08-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalkg-x08-grow-n2 vs wwalkg-x10-grow-n2 | wwalkg-x08-grow-n2 < wwalkg-x10-grow-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalkg-x08-grow-n2 vs wwalkg-x10-n2 | wwalkg-x08-grow-n2 < wwalkg-x10-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalkg-x08-grow-n2 vs wwalkg-x12-n2 | wwalkg-x12-n2 < wwalkg-x08-grow-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalkg-x08-n2 vs wwalkg-x10-grow-n2 | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | wwalkg-x08-n2 vs wwalkg-x10-n2 | wwalkg-x10-n2 < wwalkg-x08-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalkg-x08-n2 vs wwalkg-x12-n2 | wwalkg-x12-n2 < wwalkg-x08-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalkg-x10-grow-n2 vs wwalkg-x10-n2 | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | wwalkg-x10-grow-n2 vs wwalkg-x12-n2 | wwalkg-x12-n2 < wwalkg-x10-grow-n2 |
+| icv1-fp20-tm1050-4295f05e | wwalkg-x10-n2 vs wwalkg-x12-n2 | wwalkg-x12-n2 < wwalkg-x10-n2 |

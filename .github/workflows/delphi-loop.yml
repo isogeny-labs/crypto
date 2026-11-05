@@ -1,0 +1,45 @@
+name: delphi-loop
+
+# tools/delphi_loop: the lane's learning loop. Tests run without and with the
+# langsmith SDK; the second run binds every client call to the real signatures.
+
+on:
+  pull_request:
+    paths:
+      - 'tools/delphi_loop/**'
+      - 'tools/test_delphi_loop.py'
+      - 'tools/task_card.py'
+      - 'tools/token_prices.json'
+      - '.github/workflows/delphi-loop.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/delphi_loop/**'
+      - 'tools/test_delphi_loop.py'
+      - 'tools/task_card.py'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: delphi-loop-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Without langsmith
+        run: |
+          pip install PyYAML
+          python3 tools/test_delphi_loop.py
+      - name: With langsmith (signature binding)
+        run: |
+          pip install -r tools/delphi_loop/requirements.txt
+          python3 tools/test_delphi_loop.py

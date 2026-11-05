@@ -12,11 +12,11 @@ class AwsRunnerTest(unittest.TestCase):
     def setUp(self):
         self.allocation = {
             'schema': aws_runner.SCHEMA, 'stratum': 0,
-            'account_id': '590183823895', 'region': 'us-east-1',
+            'account_id': '590183823895', 'region': 'us-west-2',
             'instance_type': 'g5g.4xlarge', 'market': 'spot',
             'state': 'running', 'instance_id': 'i-0123456789abcdef0',
             'run_id': '20261026T190000Zdeadbeef',
-            'availability_zone': 'us-east-1d', 'image_id': 'ami-0123456789abcdef0',
+            'availability_zone': 'us-west-2c', 'image_id': 'ami-0123456789abcdef0',
             'source_head_sha': 'a' * 40,
             'source_archive_sha256': 'b' * 64,
             'source_manifest_sha256': 'c' * 64,
@@ -44,7 +44,7 @@ class AwsRunnerTest(unittest.TestCase):
 
     def test_rejects_cross_instance_or_zone(self):
         for key, other in [('instanceId', 'i-other'),
-                           ('availabilityZone', 'us-east-1a'),
+                           ('availabilityZone', 'us-west-2a'),
                            ('imageId', 'ami-other')]:
             with self.subTest(key=key):
                 identity = {**self.identity,

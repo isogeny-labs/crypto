@@ -1,0 +1,70 @@
+F4 COUNTER CHECK (p=53 seed 2): 1 thread f4_muls 6197337097 per-test sum 6178397570 (ratio 0.9969); 2 threads f4_muls 6197337097 per-test sum 11355981341 (ratio 1.8324); global f4_muls thread-independent: true; total_muls equal: true; relation digest equal: true
+REPRODUCTION with JV_LIN=sparse (p=1009 seed 1, 2 rayon threads): total_muls 452313823812 vs predecessor 452313823812 identical: true; lin_muls 113394312494 vs predecessor 113394312494 identical: true; solved true correct true
+MODEL expectations (random-walk theory): plain rho S = sqrt(pi/2) = 1.2533, r=32 adding 1.2734; negation rho S = sqrt(pi/4) = 0.8862, r=256 adding 0.8880
+MODEL stop-flag overshoot of rho_e_dp, (threads-1)*2^19/sqrt(l): p=251 4 threads 0.199, 2 threads 0.066, 1 thread 0; new primes 4 threads 0.0010
+RHO (no negation) rhodp study new primes (27 runs, 4 threads): n 27 mean 1.4754 sd 0.628 se 0.121; z vs 1.2734: +1.67; mean/expected 1.159; overshoot model 0.001 -> corrected mean 1.4744 (z +1.66)
+RHO (no negation) rhodp study calibration p=251 (16 runs, 4 threads): n 16 mean 1.5393 sd 0.666 se 0.166; z vs 1.2734: +1.60; mean/expected 1.209; overshoot model 0.199 -> corrected mean 1.3404 (z +0.40)
+RHO (no negation) rhodp study pooled (43 runs, 4 threads): n 43 mean 1.4992 sd 0.635 se 0.097; z vs 1.2734: +2.33; mean/expected 1.177; overshoot model 0.075 -> corrected mean 1.4245 (z +1.56)
+RHO (no negation) rhodp red-team null p=251 (2 threads): n 96 mean 1.2943 sd 0.671 se 0.069; z vs 1.2734: +0.31; mean/expected 1.016; overshoot model 0.066 -> corrected mean 1.2280 (z -0.66)
+RHO (no negation) rhodp red-team null p=251 (1 thread): n 24 mean 1.1504 sd 0.555 se 0.113; z vs 1.2734: -1.08; mean/expected 0.903; overshoot model 0.000 -> corrected mean 1.1504 (z -1.08)
+RHO (no negation) rho_e predecessor p=251 (32 runs, stored table): n 32 mean 1.2638 sd 0.558 se 0.099; z vs 1.2734: -0.10; mean/expected 0.993; overshoot model 0.000 -> corrected mean 1.2638 (z -0.10)
+RHO (no negation) rhodp red-team null pooled 1+2 threads: n 120 mean 1.2656 se 0.059
+  Welch study calibration: rhodp(4 threads) - rho_e at 251: diff +0.275 se 0.194 df 25.9 t +1.42; after overshoot correction diff +0.077 t +0.40
+  Welch rhodp null (2 threads) - rho_e predecessor at 251: diff +0.031 se 0.120 df 63.3 t +0.25
+  Welch rhodp study pooled (4 threads, 43) - rhodp null (2 threads): diff +0.205 se 0.119 df 85.1 t +1.73
+STRONG RHO rhostrong negation, study new primes (18 runs): n 18 steps/sqrt(l) mean 0.9601 sd 0.385 se 0.091 (z vs 0.8880: +0.79); s_harness mean 0.9599; s_tuned mean 0.3994 (tuned/harness 0.416); native/sqrt(l) mean 16.28; F_p adds per step 45.1
+STRONG RHO rhostrong negation, red-team p=251: n 64 steps/sqrt(l) mean 0.8641 sd 0.512 se 0.064 (z vs 0.8880: -0.37); s_harness mean 0.8694; s_tuned mean 0.3616 (tuned/harness 0.416); native/sqrt(l) mean 14.65; F_p adds per step 45.6
+STRONG RHO rhostrong negation, pooled study + red-team: n 82 steps/sqrt(l) mean 0.8851 sd 0.486 se 0.054 (z vs 0.8880: -0.05); s_harness mean 0.8893; s_tuned mean 0.3699 (tuned/harness 0.416); native/sqrt(l) mean 15.01; F_p adds per step 45.5
+STRONG RHO rhostrong NO negation, batch 1, r 32, red-team p=251: n 48 steps/sqrt(l) mean 1.4397 sd 0.660 se 0.095 (z vs 1.2734: +1.75); s_harness mean 1.4404; s_tuned mean 0.5570 (tuned/harness 0.387); native/sqrt(l) mean 7.20; F_p adds per step 42.0
+
+PER-PRIME RATIOS under alternative references (study rule: geo-mean over seeds / reference mean, 20000-resample percentile bootstrap; 'fixed' references carry no run uncertainty)
+p=1301 R1 rhodp this prime (study primary): ref mean 1.6509 (n 9) ratio 0.793 [0.587, 1.117] -> not resolved
+p=1301 R2 rhodp pooled 43 runs (study, all primes incl. calibration): ref mean 1.4992 (n 43) ratio 0.874 [0.737, 1.032] -> not resolved
+p=1301 R2b rhodp pooled 27 runs (study, new primes only): ref mean 1.4754 (n 27) ratio 0.888 [0.738, 1.070] -> not resolved
+p=1301 R3 plain rho theory 1.2733 (fixed, model): ref mean 1.2734 (n 0) ratio 1.029 [0.883, 1.173] -> not resolved
+p=1301 R4 rhostrong this prime, steps/sqrt(l) (study secondary): ref mean 0.9711 (n 6) ratio 1.349 [1.089, 1.699] -> above
+p=1301 R5 rhostrong negation pooled (study 18 + red-team 251), steps/sqrt(l): ref mean 0.8851 (n 82) ratio 1.480 [1.244, 1.759] -> above
+p=1301 R6 negation rho theory 0.8880 (fixed, model): ref mean 0.8880 (n 0) ratio 1.475 [1.267, 1.682] -> above
+p=1301 R7 rhostrong negation pooled, TUNED F_p-multiplication unit (s_tuned): ref mean 0.3699 (n 82) ratio 3.540 [2.971, 4.193] -> above
+p=1301 5a band w=0: cover S_w 1.310 (native 23.94/sqrt l, lower bound) | rhodp S_w 1.651 (4/step convention 1.651) | rhostrong S_w 0.971 | cover/rhodp 0.793 (0.793) | cover/rhostrong 1.349
+p=1301 5a band w=0.1: cover S_w 3.703 (native 23.94/sqrt l, lower bound) | rhodp S_w 1.816 (4/step convention 2.311) | rhostrong S_w 2.618 | cover/rhodp 2.039 (1.602) | cover/rhostrong 1.415
+p=1301 5a band w=1: cover S_w 25.245 (native 23.94/sqrt l, lower bound) | rhodp S_w 3.302 (4/step convention 8.255) | rhostrong S_w 17.436 | cover/rhodp 7.646 (3.058) | cover/rhostrong 1.448
+p=1301 crossover MODEL vs rhodp pooled (ref 1.499): ratio 0.874 -> p* = 1220 (slope -2.098, extrapolation)
+p=1301 crossover MODEL vs plain theory (ref 1.273): ratio 1.029 -> p* = 1319 (slope -2.098, extrapolation)
+p=1301 crossover MODEL vs negation pooled steps (ref 0.885): ratio 1.480 -> p* = 1568 (slope -2.098, extrapolation)
+p=1301 crossover MODEL vs negation tuned unit (ref 0.370): ratio 3.540 -> p* = 2377 (slope -2.098, extrapolation)
+
+p=1451 R1 rhodp this prime (study primary): ref mean 1.3947 (n 9) ratio 0.775 [0.647, 0.971] -> below
+p=1451 R2 rhodp pooled 43 runs (study, all primes incl. calibration): ref mean 1.4992 (n 43) ratio 0.721 [0.623, 0.851] -> below
+p=1451 R2b rhodp pooled 27 runs (study, new primes only): ref mean 1.4754 (n 27) ratio 0.733 [0.623, 0.878] -> below
+p=1451 R3 plain rho theory 1.2733 (fixed, model): ref mean 1.2734 (n 0) ratio 0.849 [0.771, 0.975] -> below
+p=1451 R4 rhostrong this prime, steps/sqrt(l) (study secondary): ref mean 1.0174 (n 6) ratio 1.063 [0.809, 1.476] -> not resolved
+p=1451 R5 rhostrong negation pooled (study 18 + red-team 251), steps/sqrt(l): ref mean 0.8851 (n 82) ratio 1.221 [1.042, 1.437] -> above
+p=1451 R6 negation rho theory 0.8880 (fixed, model): ref mean 0.8880 (n 0) ratio 1.217 [1.106, 1.398] -> above
+p=1451 R7 rhostrong negation pooled, TUNED F_p-multiplication unit (s_tuned): ref mean 0.3699 (n 82) ratio 2.922 [2.518, 3.453] -> above
+p=1451 5a band w=0: cover S_w 1.081 (native 19.71/sqrt l, lower bound) | rhodp S_w 1.395 (4/step convention 1.395) | rhostrong S_w 1.017 | cover/rhodp 0.775 (0.775) | cover/rhostrong 1.063
+p=1451 5a band w=0.1: cover S_w 3.052 (native 19.71/sqrt l, lower bound) | rhodp S_w 1.534 (4/step convention 1.953) | rhostrong S_w 2.742 | cover/rhodp 1.990 (1.563) | cover/rhostrong 1.113
+p=1451 5a band w=1: cover S_w 20.794 (native 19.71/sqrt l, lower bound) | rhodp S_w 2.789 (4/step convention 6.974) | rhostrong S_w 18.267 | cover/rhodp 7.454 (2.982) | cover/rhostrong 1.138
+p=1451 crossover MODEL vs rhodp pooled (ref 1.499): ratio 0.721 -> p* = 1242 (slope -2.098, extrapolation)
+p=1451 crossover MODEL vs plain theory (ref 1.273): ratio 0.849 -> p* = 1342 (slope -2.098, extrapolation)
+p=1451 crossover MODEL vs negation pooled steps (ref 0.885): ratio 1.221 -> p* = 1596 (slope -2.098, extrapolation)
+p=1451 crossover MODEL vs negation tuned unit (ref 0.370): ratio 2.922 -> p* = 2419 (slope -2.098, extrapolation)
+
+p=1601 R1 rhodp this prime (study primary): ref mean 1.3805 (n 9) ratio 0.587 [0.448, 0.812] -> below
+p=1601 R2 rhodp pooled 43 runs (study, all primes incl. calibration): ref mean 1.4992 (n 43) ratio 0.541 [0.426, 0.739] -> below
+p=1601 R2b rhodp pooled 27 runs (study, new primes only): ref mean 1.4754 (n 27) ratio 0.550 [0.425, 0.749] -> below
+p=1601 R3 plain rho theory 1.2733 (fixed, model): ref mean 1.2734 (n 0) ratio 0.637 [0.523, 0.878] -> below
+p=1601 R4 rhostrong this prime, steps/sqrt(l) (study secondary): ref mean 0.8917 (n 6) ratio 0.909 [0.649, 1.339] -> not resolved
+p=1601 R5 rhostrong negation pooled (study 18 + red-team 251), steps/sqrt(l): ref mean 0.8851 (n 82) ratio 0.916 [0.718, 1.239] -> not resolved
+p=1601 R6 negation rho theory 0.8880 (fixed, model): ref mean 0.8880 (n 0) ratio 0.913 [0.749, 1.260] -> not resolved
+p=1601 R7 rhostrong negation pooled, TUNED F_p-multiplication unit (s_tuned): ref mean 0.3699 (n 82) ratio 2.192 [1.710, 2.977] -> above
+p=1601 5a band w=0: cover S_w 0.811 (native 15.12/sqrt l, lower bound) | rhodp S_w 1.381 (4/step convention 1.381) | rhostrong S_w 0.892 | cover/rhodp 0.587 (0.587) | cover/rhostrong 0.910
+p=1601 5a band w=0.1: cover S_w 2.323 (native 15.12/sqrt l, lower bound) | rhodp S_w 1.519 (4/step convention 1.933) | rhostrong S_w 2.403 | cover/rhodp 1.530 (1.202) | cover/rhostrong 0.967
+p=1601 5a band w=1: cover S_w 15.932 (native 15.12/sqrt l, lower bound) | rhodp S_w 2.761 (4/step convention 6.903) | rhostrong S_w 16.010 | cover/rhodp 5.770 (2.308) | cover/rhostrong 0.995
+p=1601 crossover MODEL vs rhodp pooled (ref 1.499): ratio 0.541 -> p* = 1194 (slope -2.098, extrapolation)
+p=1601 crossover MODEL vs plain theory (ref 1.273): ratio 0.637 -> p* = 1291 (slope -2.098, extrapolation)
+p=1601 crossover MODEL vs negation pooled steps (ref 0.885): ratio 0.916 -> p* = 1535 (slope -2.098, extrapolation)
+p=1601 crossover MODEL vs negation tuned unit (ref 0.370): ratio 2.192 -> p* = 2327 (slope -2.098, extrapolation)
+
+COVER VARIANCE: 9 new-prime runs, corr(ln residual_ratio, ln S*(p/1451)^2) = 1.000; residual_ratio range 0.794-1.440; S range 0.665-1.494; cross_checked all zero: true
+COVER PHASE SHARES (new primes): f4 0.778, lin 0.215, LA 0.00041 of total_muls (means)
