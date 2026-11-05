@@ -576,4 +576,58 @@ mod tests {
         let cov = hit as f64 / reps as f64;
         assert!(cov < 0.90, "bootstrap coverage at K = 2 was {cov}");
     }
+
+    /// Evidence table for `research/ecbench_statistics_v2_20261105/`: coverage
+    /// and median interval width (log scale, `ln(hi/lo)`) of the linearised
+    /// t(K-1) interval against the percentile cluster bootstrap it replaced,
+    /// on the same Rayleigh-vs-uniform cluster model, at K = 2, 3, 4, 8.
+    /// Prints TSV on stderr; run with
+    /// `cargo test --release --lib stats::tests::coverage_table_for_report -- --ignored --nocapture`.
+    #[test]
+    #[ignore]
+    fn coverage_table_for_report() {
+        eprintln!("COVTSV\tK\treps\tmethod\tcoverage\tmedian_log_width\tmedian_width_ratio_scale");
+        for k in [2usize, 3, 4, 8] {
+            let reps = 2000usize;
+            let mut rng = Resampler::new(0xEC_BE_4C + k as u64);
+            let (mut hit_lin, mut hit_boot) = (0usize, 0usize);
+            let (mut w_lin, mut w_boot, mut a_lin, mut a_boot) = (vec![], vec![], vec![], vec![]);
+            for i in 0..reps {
+                let strata = draw_cluster_model(&mut rng, k, 3);
+                let clusters: Vec<(f64, f64)> = strata
+                    .iter()
+                    .map(|s| (s.iter().map(|p| p.0).sum(), s.iter().map(|p| p.1).sum()))
+                    .collect();
+                let l = linearised_ratio(&clusters).unwrap();
+                let (lo, hi) = l.ci95_log().unwrap();
+                hit_lin += (lo <= truth() && truth() <= hi) as usize;
+                w_lin.push((hi / lo).ln());
+                a_lin.push(hi - lo);
+                let stat = |s: &[Vec<(f64, f64)>]| {
+                    let (a, b) = s
+                        .iter()
+                        .flatten()
+                        .fold((0.0, 0.0), |acc, p| (acc.0 + p.0, acc.1 + p.1));
+                    Some(b / a)
+                };
+                let (lo, hi) = cluster_bootstrap_ci(&strata, 400, i as u64 + 1, stat).unwrap();
+                hit_boot += (lo <= truth() && truth() <= hi) as usize;
+                w_boot.push((hi / lo).ln());
+                a_boot.push(hi - lo);
+            }
+            let med = |v: &Vec<f64>| median(v).unwrap();
+            eprintln!(
+                "COVTSV\t{k}\t{reps}\tlinearised_t_log\t{:.4}\t{:.4}\t{:.4}",
+                hit_lin as f64 / reps as f64,
+                med(&w_lin),
+                med(&a_lin)
+            );
+            eprintln!(
+                "COVTSV\t{k}\t{reps}\tcluster_bootstrap_percentile\t{:.4}\t{:.4}\t{:.4}",
+                hit_boot as f64 / reps as f64,
+                med(&w_boot),
+                med(&a_boot)
+            );
+        }
+    }
 }
