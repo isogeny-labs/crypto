@@ -50,7 +50,9 @@ pub struct Prepared<E> {
 /// The target-blind table a known-log base is searched with: the
 /// two-summand pair table, or a `k`-sum table (`ic.known_log_ksum_v1`).
 enum Table {
-    Pair(PairTable),
+    // Boxed: the pair table is far larger than the k-sum table
+    // (clippy::large_enum_variant).
+    Pair(Box<PairTable>),
     KSum(KSumTable),
 }
 
@@ -164,7 +166,7 @@ pub fn prepare<G: CountedGroup>(
         logs,
         r,
         multiplier: params.base_multiplier,
-        table: Table::Pair(table),
+        table: Table::Pair(Box::new(table)),
     })
 }
 
