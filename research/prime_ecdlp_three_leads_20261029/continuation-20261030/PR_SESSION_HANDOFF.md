@@ -351,3 +351,62 @@ branch, never side-select frozen evidence. All six scientific goals incomplete.
 PR conflicts are unverified integration work, not failures hidden by old
 receipts. Inherited chain-bound assertion/JVcap and absent artifact transport
 remain concrete blockers. No scientific/resource/access/gate change.
+
+# Library-only validation handoff — 2026-11-05T09:56:50.462617+00:00
+
+Remote PR3452 last head3825529448f3140f579e613e9d4bf3589ad09e32 remains OPEN;
+auto paused. Local ordinary source mergebbf241b7e joins382552944 and main
+d30b9e0db. All407old study blobs preserved; both Oct30/Nov5 parent paragraphs
+(including multiplicities) and problem links preserved; prepared request entry
+appended exactlyonce. New std-only component source3210f04b3, receipts/report
+cd1f9febb, fixture/library-only recipe5579f755b. All new local history UNPUSHED;
+no rebase/force. Current core Rust/Lean source objects unchanged during jobs.
+
+FIRSTCOLLECT existing library-only job, NO DUPLICATE/OLD RECIPE RESTART:
+/workspace/pkm-pr3452-main-20261105/library-after-fixture/,supervisor16391,SID/PGID16391,parent1,nointeractiveexecsession.
+Status snapshot:validation/main-d30b9e0db-20261105/library-only-status-20261105T095650Z.json; actual phase/status above.
+Recipe/bindings under validation/main-d30b9e0db-20261105/library-after-fixture/.
+21objectguard includes original17,2localCargo dependencytrees andstandalone
+component plusrestoredfixture (original17 +2dependencies +1component +1fixture).
+Library --no-run then timeout2400 cargo test --release --lib --locked -j2
+-- --test-threads=1; capAFTERbuild. Readactualdeclaredcount andgeneratedbinary.
+Missingterminal/deadprocess=incomplete;wrapper124isnotCargoexit. Large rawlogs
+>64KiB outsideGit:finalhash/bytes/path/boundedexcerpt/NOT_UPLOADED, no split/compress.
+
+Old6743TERMINAL101:26examplesPASS,strictclippy2errors;7laterphasesNOT_REACHED.
+Unused solve_one_with_trace(Pencil/native_solver.rs1351),custody.rs713boolcomparison;
+alllib/dependencyinputs byteequalmain. Do not suppress or patcharound.
+Old11957TERMINAL101:fmt/CLIbuild/actualcheckpointrefusalmessage+exit1/backlogPASS;
+librarycompile missingtrackedfixture;librarytestNOT_REACHED,countunknown. Restored
+fixture pkm_iso_t6_g4_target3.record.json exactGit865150d97...,no testdataedit.
+Newjob runs ONLY librarychecks; failedstrictlint/PCCstillblockaggregate.
+
+G2component prerequisites/durable_attempt.rs:std-only,nolauncher/notdriverwired,
+5nativefaultcontrols/strictclippy0. Futurequalifiedsupervisor/driver/interruption/
+resume/remoteintegrationandcompletecounterpricingopen. G6newPCCbindingsof5existing
+contracts:48d13a,f5ef23,1d3b07,b52ab0,d6264e;localverifier0,standing2/unverified.
+FreshchangedLean gate18decls/0trusted,modulekernel0againstimports,not--fresh.
+Mathlibd13f23b723b8a846827a245b89c10fc7d3f11612,Lean4.34.1. No new mathsource.
+
+MainnewAGENTS requiresPCCrecords/tags;useofficialtool,nofakesignatures/keychanges.
+Main95ledgerentriesexactprefix retained;failed2-entrysparseinitialization archived
+andcorrectedfromexactindexbasebeforeofficialappend. Localcanary/tests/prefix0;
+benchrec37recordsgate0after404exacttrackedinputsmaterialized. GlobalPCC13OLDclaims
+stillfaillegacyevidence_dir/rawpathescape;sharedtool/frozenrecordsunchanged.
+Namedproblems pcc-legacy-validator-relative-path-binding andpkm-main-strict-lint-inherited.
+Newlocaltests/resultsareunsignedobservations,[pcc:unverified];noscientificpanel.
+
+Beforepublishing:collectoutcomes/newimmutablereceipt,updatesactiveREADME/log/report
+ifneeded,inspecteverynewPDFpage,commit,failfastPRdelta checks versusd30. Old0840Z
+reportstalerunningphrasecorrectedby0932version/statusJSON;bothpreserved. Required
+exactheadgate,size,artifacts/applicablereviews/threads+SHAguard;autoONLYafterreview/
+validation. Nofutureheadqualifiedbyoldreceipts. No CIwait/fastpoll,nonewermain
+chasing/sourceeditwhilejobactive. StopoldPRmaintenance ifmerged/closed.
+
+AllG1-G6originalacceptancekept:G1-G3/G6partial,G4/G5unrun,0scientificpanels,
+comparison_admissible=false,allmetricnull. No scientific/funding/lease/IAM/quota/
+poolchanges/gatebypass. Fullpanelcardstillblocked/unfunded/unimplementedatpin.
+Managedruntimeidentities/secrets/capabilitiesabsent;approvedconnection-name
+questionpending,neversecretvalues. Conductorabsent127,documentedwarn/allowfallback,
+noreservationclaimed. Actualnewworkresetsunchangedcount0;rearm~1hfornewactivity,
+unchanged~4h,stopafter3unchanged/userstop.

@@ -1,5 +1,29 @@
 # G1–G6 continuation: independently check useful rank and target recovery
 
+## Current follow-up — 2026-11-05T09:56:50.462617+00:00
+
+G2 local attempt-record primitive:5fault-control tests and strictlint locally
+exit0; G6 exact statement bindings:5local PCC verifier exits0, standings
+unsigned/unverified. Fresh changed-gate audit reports18declarations/0trusted,
+module replay0 against imports, not --fresh. [pcc:unverified]
+
+Native job6743 ended101 at strictlint after26examples. Job11957 finished101
+at library compile because a tracked include_str fixture was off disk; its
+formatter/CLIrefusal/backlog milestones are retained. The exact fixture blob
+865150d97b350d7de7807388a20c6949fd811c36 was restored, with no tracked-byte edit.
+NEW library-only supervisor16391 now has status: **library build active**; declared count
+unknown (execution not yet declared).
+[Latest snapshot](validation/main-d30b9e0db-20261105/library-only-status-20261105T095650Z.json). No old recipe restarted,
+no example/lint/control rerun, no failed gate waived. [pcc:unverified]
+
+Auto-merge remains paused. Strictlint2errors and13inheritedPCC failures remain
+concrete blockers. Local merge/component/report commits are unpushed pending
+remaining outcomes/review; PR3452 remotehead382552 is unchanged at last check.
+[Component/proof report,09:32snapshot](continuation-20261105T0932Z.pdf) retains
+its dated scope;11957 subsequently terminated and is not current backgroundwork.
+Original scientific acceptance/metrics remain unchanged in goal-state.json.
+
+
 ## Latest local work — 2026-11-05
 
 [Current corrected report](continuation-20261105T0932Z.pdf) and [attempt-record diagram](attempt-record-flow-20261105.svg).
