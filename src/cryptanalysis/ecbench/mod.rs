@@ -67,6 +67,7 @@ pub mod diagnostic_preflight;
 pub mod diagnostic_resources;
 pub mod diagnostic_runtime;
 pub mod diagnostics;
+pub mod exact_scalar;
 pub mod ext;
 pub mod fbm;
 pub mod fp4;

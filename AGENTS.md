@@ -67,6 +67,77 @@ implementing, running experiments, or making recommendations.
   search scope and evidence gaps before proceeding. Never invent citations or
   treat an unsuccessful search as proof that no prior work exists.
 
+## Knowledge base first
+
+Owner instruction, 2026-11-05. The shared `research-kb` MCP server indexes
+this repository, `crypto-autoresearcher`, `cryptanalysis`, `crypto-lean`,
+`cryptologic-archives` and the paper collection: about 22k sources, 151k
+passages and 1.7k Lean declarations. It is the fastest way to find prior work,
+negative results, open problems, technique notes and exact theorem statements.
+Query it before scanning the 100k-file tree, before proposing a lead, and
+before any novelty or “not tried” claim.
+
+**Mandatory triggers.** Query the KB when the task is any of:
+
+- a literature, prior-art or “has this been tried?” question;
+- a new lead, mechanism, factor base, summation polynomial, solver, coordinate,
+  isogeny or scaling assumption;
+- a “first”, “best”, “not known”, “no effect”, “negative result” or novelty
+  claim;
+- a cross-repository question (crypto ↔ crypto-autoresearcher ↔ cryptanalysis ↔
+  crypto-lean);
+- a subagent handoff, so the child starts from the sources already found rather
+  than repeating the search.
+
+**Minimum protocol.** Use the MCP tools; do not guess names.
+
+1. `kb_status` once. Record `revision` and `last_refresh`. If `ready` is false
+   or the refresh is older than the work you rely on, say so and use the
+   fallback.
+2. `search_knowledge` with two to four distinct queries: the exact mechanism,
+   the negative form, the application, and the adjacent field. Add `repo=` when
+   the owning repository is known and `source_type=` to separate papers,
+   internal notes and formal sources.
+3. `search_theorems` for every Lean-backed statement. Quote the declaration
+   name, environment digest and `verification`; `source-only` is not a proof.
+4. Open the best one to three hits with `get_source` (metadata plus every
+   origin) and `get_context` (bounded excerpt); `find_related` on one hit to
+   find the sibling lead or the paper behind it.
+5. `recent_sources` before a survey or a “what changed?” question. It is
+   ordered by ingestion time, not publication date.
+
+**Read the hit, not the score.** A score is relevance, not truth. Check
+`claim_status`, `authority`, `evidence_level`, `superseded`/`superseded_by`
+and `origins[].repo/path/git_commit`; then read the primary file or paper.
+A repository summary is a pointer to the committed evidence, not a replacement
+for it. `hybrid_current=false` means lexical search is current and the optional
+semantic index is not built: use exact terms, identifiers and phrases. No
+result does not prove absence; state the queries, repositories and source types
+searched, and the gap.
+
+**Record the receipt.** In the task notes, session-log entry or PR body, add a
+“Sources checked (KB)” line with the `source_id` (or `document_id`), the
+`repo:path` and what it changed in the plan. If the KB was unavailable, say
+which tool failed and what you used instead. A subagent prompt carries the
+queries already run and the source IDs already accepted.
+
+**Fallback.** If the MCP server is not loaded in this runtime, use the same
+catalog through the repository wrapper, which sets the catalog and registry
+that a bare CLI run lacks: `scripts/research-kb status`,
+`scripts/research-kb search "<query>" --top-k 8`,
+`scripts/research-kb theorems "<name>"`,
+`scripts/research-kb brief "<question>"`. If neither is available, use the
+lead atlas and repository paths, and mark the KB review as unavailable in the
+handoff. The `research-kb` skill has query recipes, the result fields that
+matter and a worked receipt.
+
+The adoption audit is `scripts/kb_usage_report.py`; it counts dated
+session-log entries carrying a receipt (or an explicit `KB unavailable`). Run
+`python3 scripts/kb_usage_report.py --since 2026-11-05` after a batch of
+sessions and keep `docs/knowledge-base-usage-baseline.json` as the before
+mark. It reports; it is not a quota and never blocks a null or negative
+result.
+
 ## Standing workflow rules (from the owner)
 
 - **Run experiments on EKS Spot by default** (owner, 2026-10-25). For an
@@ -270,6 +341,11 @@ protocol calls for that comparison. Per-oracle classification:
   leads, and run `--match "<idea>"` before proposing an ECDLP mechanism. A
   result that lands here updates the lead it advances in the same PR or the
   next atlas review (skill `lead-atlas` there).
+- **Prior art, negative results and internal notes, by query:** the shared
+  `research-kb` MCP server (AGENTS.md “Knowledge base first”; skill
+  `research-kb`). It indexes this repository and its siblings, including the
+  lead atlas, technique notes, decisions, papers and Lean declarations. Query
+  it before `rg`-ing `research/` or claiming that something was not tried.
 - **Curve facts, by query instead of by file scan:** the curve database
   ecdb (MCP server `ecdb` in `.mcp.json`, or HTTP). See "Querying the curve
   database (ecdb)" below and [ecdb/docs/AGENTS.md](ecdb/docs/AGENTS.md).

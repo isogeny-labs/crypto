@@ -87,6 +87,13 @@ NAMED_BUDGET_EXCEPTIONS = {
         # The workflow's pull_request budget expression evaluates to 45.
         "reason": "ecbench harness; cancelled at the 25-minute cap on #2135, #2149 and #2153 (2026-10-18)",
     },
+    (".github/workflows/ecbench.yml", "evidence_audit_pr"): {
+        "timeout": 40,
+        # Each of the 16 shards spends ~8-10 min listing and pulling sessions
+        # before it audits; shard 8 of run 42063872441 was cancelled at the
+        # 25-minute cap mid-audit and took 24.3 min in run 42055249527.
+        "reason": "ecbench committed-evidence integrity audit shard; cancelled at the 25-minute cap on #2902 (2026-11-05)",
+    },
     (".github/workflows/release.yml", "isogeny"): {
         "timeout": 45,
         # The workflow's pull_request budget expression evaluates to 45.
