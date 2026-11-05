@@ -105,3 +105,12 @@ Branch on the quadratic character of each separator, adding X_c = n_j·z_c² wit
   - D_E1Q(4,5) finishes ≤ 6 (T and E1 are ≥ 7 there): the excess stays at least 1 below T at m = 4 as t grows.
   - D = 7: the quotient's gain at m = 4 vanishes at t = 5.
   - Cut off again: undecided.
+
+
+## 2026-11-05 16:45 UTC update
+- Branch claude/ic-packed-filter-20261029 at ac2aba788 (pushed): main merged (71af85024); README/PDF/figure, two VALIDATION.json (valid),
+  benchmarks row, leaderboard component, lab browser, timeline non-numeric entry, progress metrics, session log done.
+- Remaining: curve registry for the 6 study slugs (needs crate build); native Rust port of validation/code (background agent,
+  pushes to the branch); then open the crypto PR (ready, auto-merge MERGE) and subscribe.
+- #2826: background agent re-merging main and redoing Codex F2-F5 in /dev/shm/wt-sr; then reply/resolve the five Codex threads.
+- crypto-autoresearcher #2754 merged 2026-10-30.
