@@ -755,3 +755,39 @@ Full-library91773 remains live; latest progress above2175/6193. PR3488 readback 
 ### Errors
 
 Native first build selected num-bigint without rand and failed on imported field-test APIs. Corrected selection by Cargo fingerprint features; attempt2 exited0 with5 passed/0 failed. No production source change was needed for that harness failure. [pcc:unverified]
+
+## 2026-11-05T18:49:21.531479+00:00 — workload replay and checkpoint
+
+### What was done
+
+Local checkpoint59939389294e records the workload candidate and earlier entrypoint receipt. Added a portable hash-checking native replay helper; its fresh invocation exited0 and reported5 passed/0 failed. Retained replay dependency hashes, commands, logs and receipt. [pcc:unverified]
+
+### Decisions made
+
+Replay imports actual arithmetic with the same documented ledger extraction/shim scope. Keep this separate from actual-crate and cloud results. [pcc:unverified]
+
+### Open threads
+
+Full library91773 remains live in existing long-running Semaev tests; no failure seen. PR3488 check due around18:51Z. Current source gate still covers result transport, not the unregistered candidate. [pcc:unverified]
+
+### Errors
+
+No replay error reported. [pcc:unverified]
+
+## 2026-11-05T18:50:40.471844+00:00 — relation/probe PR merged
+
+### What was done
+
+GitHub fetch_pr3488 returned merged=true, closed, original heada9864459c793875edd5ab4f3f3065ebf499f7bcc, merge commitfab26948518b438673d3b7d43b546e2e23895906. Saved reduced readback. Combined legacy-status API returned an empty list; this is not a check-run inventory. [pcc:unverified]
+
+### Decisions made
+
+No further polling of merged PR3488. Publish the exact-transport branch only after its active full-library gate succeeds. Current local HEAD59939389294e contains result transport and the unregistered workload candidate; replay helper/logs are the remaining local checkpoint. [pcc:unverified]
+
+### Open threads
+
+Full-library session91773 is still live with original timeout1800, log /tmp/curve25519-transport-stage2-library-tests.log. At18:50Z its latest numbered progress was2175/6193, followed by ongoing dots in the long Semaev section and no failure text. No duplicate test run. Next implementation is the actual full-width workload/Instance registration after current source delivery. [pcc:unverified]
+
+### Errors
+
+No PR-status error. No signed PCC standing inferred from merge or native tests. [pcc:unverified]
