@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261105T1759Z-ic-packed-filter-p32",
+  "latest_record": "20261105T1826Z-ic-aimed-gather-registry-binding-20261105",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 40,
+    "measured": 41,
     "open": 0
   },
   "repo": "crypto",
@@ -1263,6 +1263,29 @@
       ],
       "problem": "ic:curve25519-family-k32",
       "unit": "S"
+    },
+    {
+      "better": "neutral",
+      "first": 211.0,
+      "latest": 211.0,
+      "latest_derived": {},
+      "metric": "raw_pins_reverified",
+      "points": [
+        {
+          "commit": "19b5e74b9af6",
+          "date": "2026-11-05",
+          "derived": {},
+          "n": null,
+          "record": "20261105T1826Z-ic-aimed-gather-registry-binding-20261105",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Custody rebinding of the historical aimed-gather row to this PR's registry; no measurement was rerun. [pcc:unverified]",
+          "value": 211.0
+        }
+      ],
+      "problem": "registry-rebinding:ic-aimed-gather",
+      "unit": "count"
     }
   ],
   "units": {
