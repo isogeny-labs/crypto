@@ -1,0 +1,15 @@
+import WordAdd11
+import Doubling
+set_option autoImplicit false
+namespace PencilWordRefinement
+
+theorem literal5_mul_reduce (p a : UInt64) (hp : 0<p.toNat) (hb : p.toNat<2^31)
+ (ha : a.toNat<p.toNat) : (5*a)%p = ((5%p)*a)%p := by
+ have h5 : 5*a.toNat < 2^64 := by omega
+ have hr : (5%p).toNat<p.toNat := by rw [UInt64.toNat_mod]; exact Nat.mod_lt _ hp
+ apply UInt64.toNat_inj.mp
+ rw [UInt64.toNat_mod,UInt64.toNat_mul,show (5:UInt64).toNat=5 from rfl,Nat.mod_eq_of_lt h5]
+ rw [uint64_mul_mod p (5%p) a hb hr ha]
+ simp only [UInt64.toNat_mod,show (5:UInt64).toNat=5 from rfl]
+ omega
+end PencilWordRefinement

@@ -7,6 +7,16 @@ tests, Clippy, and Compute Sanitizer memcheck passed (zero memory errors).
 See [the validation record](VALIDATION.md) for revisions, outcomes and limits;
 no end-to-end speedup is established.
 
+The [v11 scaling panel](../../research/explicit_relations_e2e_20261030/reports/run-20261030T1550Z/report.typ)
+completed both fixed 62-bit targets with exact 12-byte rows, a wide prefix
+index and queried CUB sort scratch. All 12 prescribed executions passed fresh
+CPU replay and scalar-corruption rejection. The measured source is
+`d44b59149f468357e86186f956ecb7e323f38915`; later source is not an exact replay.
+The current 63-bit arithmetic extension and optional negative prefilter are
+implemented but still pending GPU validation. See [FIELD63.md](FIELD63.md),
+[NEGATIVE-FILTER.md](NEGATIVE-FILTER.md) and the separately frozen
+[v15 plan](../../research/explicit_relations_e2e_20261030/FILTER-PANEL.md).
+
 Block normalization now uses a product tree with 765 source-level field
 multiplications per 256-lane block, replacing 4608 in the previous dual scan
 (both still pay one inversion and the same affine conversions). A matched
@@ -45,13 +55,15 @@ subexponential or measured speed claim. See the
 ## Domain and representation
 
 The native CUDA service accepts nonsingular short-Weierstrass curves with
-prime `5 <= p < 2^62`, validated by deterministic u64 Miller-Rabin. Inputs
+prime `5 <= p < 2^63`, validated by deterministic u64 Miller-Rabin. The wider
+source domain is distinct from the validated 62-bit frontier above. Inputs
 are canonical `(x,y)` pairs. Infinity is permitted only as a target or sum.
 It is a distinct full point key, not a special x value. The service finds
 relations in the full curve group and does not assert prime order or cofactor
 one. Binary fields and 256-bit fields are outside this service's scope.
 
-The hash-construction mode requires `p < 2^62`, prime `2p <= s <= 4p` with `s < 2^63`,
+The hash-construction mode requires `p < 2^63`, prime `2p <= s <= 4p` with `s`
+representable as a u64,
 `0 < alpha < s`, `beta < s`, and `0 < tau <= s`. It enumerates
 `z = alpha^-1 (t-beta) mod s` for `0 <= t < tau`, discards `z >= 2p`,
 and lifts `x=z/2` with y parity `z mod 2`. It never closes signed hash bases
@@ -59,7 +71,7 @@ under negation. Every `(slot, point)` remains a distinct matrix column.
 
 The Rust reduction retains its original exhaustive tiny-curve constructor
 and 512-column default. The standalone driver now uses an exact order witness:
-prime `5 <= p < 2^62`, prime `r < 2^63`, a nonzero on-curve P with `[r]P=O`,
+prime `5 <= p < 2^63`, prime `r < 2^63`, a nonzero on-curve P with `[r]P=O`,
 and a unique multiple of r in the integer Hasse interval. Ambiguous large
 orders are rejected. Tonelli–Shanks avoids an O(p) root table. There are 2–8
 slots; explicit limits allow up to 16384 columns and 2^24 hash candidates.
@@ -112,15 +124,25 @@ make test                  # host arithmetic, protocol driver and reduction
 make all ARCH=sm_120        # select the actual GPU architecture
 make test-cuda ARCH=sm_120   # exercises default and optional cached variants
 make cuda-cached ARCH=sm_120 # optional build/explicit-relations-cached service
+make cuda-dense-cub ARCH=sm_120 build/paper-driver # large-table configuration used by v11
 compute-sanitizer --tool memcheck build/explicit-relations-cuda --self-test
 compute-sanitizer --tool racecheck build/explicit-relations-cuda --self-test
 compute-sanitizer --tool synccheck build/explicit-relations-cuda --self-test
 ```
 
-`make syntax` produces no executable. The test fixture fields are 97 and
-211; their equations are `y²=x³+2x+3` and `y²=x³+7`, respectively. The paper
+These commands belong on the GPU builder; they are not instructions to build
+the root crypto package in a constrained workspace. `cuda-dense-cub` produces
+`build/explicit-relations-dense-cub`, which can be passed as `SERVICE` below.
+For an exact historical panel, check out its recorded commit and use its
+frozen launcher. The newer `cuda-persistent`, `cuda-right-cache` and
+`cuda-filter` targets are distinct configurations, not automatic substitutes.
+
+`make syntax` produces no executable. The complete small fixture fields are
+97 and 211; their equations are `y²=x³+2x+3` and `y²=x³+7`, respectively. The paper
 driver fixture uses the latter's order-199 full group and generator `(3,33)`.
 They are public software fixtures, not benchmark results or deployed curves.
+Separate boundary fixtures exercise the wider arithmetic domain; those tests
+do not by themselves establish a complete recovery at that size.
 
 The C++ test compares every affine target and infinity, validates hashes
 against a complete point scan, tests both square-root congruence classes,
@@ -159,7 +181,7 @@ response lines are flushed. Use a dedicated service process per curve.
 
 | Command | Meaning / response |
 | --- | --- |
-| `curve p a b max_rows chunk_rows` | Required first; `READY 1`. Caps in `1..2^31`, chunk no larger than cap. |
+| `curve p a b max_rows chunk_rows` | Required first; `READY 1`. Caps in `1..2^32`, chunk no larger than cap. Actual allocations remain subject to memory admission. |
 | `xs n x0 ...` | Strict distinct x list, `n <= max_rows/2`; `BASE npoints x y ...`, sorted by full coordinates, both signs. A missing lift is an error. |
 | `hash s alpha beta tau` | Signed base construction, `tau <= max_rows`; same `BASE` response, possibly empty. |
 | `bases m n0 x y ... n1 x y ...` | 2–8 sorted, distinct signed point lists; `PREPARED split left_rows right_rows`. Empty slot lists are allowed and certify no relation. |

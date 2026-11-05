@@ -1,0 +1,24 @@
+import MixedDispatch
+import WordMixed
+set_option autoImplicit false
+instance : Fact (Nat.Prime 2) := ⟨by decide⟩
+open Polynomial MixedCancellation MixedDispatcher
+-- Characteristic-two equal ordinates must select cancellation before positive branches.
+example : (dispatch (1:ZMod 2) 0 0 0 ⟨0,1,1,1⟩ ⟨0,0,0,1,1,1⟩).2=.cancellation := by
+ norm_num [dispatch,rawK,rawW3,rawY3]
+-- Invoke aggregate totality on original-valid characteristic-two input.
+example : ∃ (v : Value (ZMod 2)) (tag : Tag),
+ dispatch 1 0 0 0 ⟨0,1,1,1⟩ ⟨0,0,0,1,1,1⟩=(some v,tag) ∧
+ valid (MixedGeneric.curve 1 0 0 0) v ∧ tag≠.mismatch := by
+ apply source_order_total_valid
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num [validPoint,WeightedAdd11.nx,WeightedAdd11.ny]
+   refine ⟨X^4,?_⟩;simp [MixedGeneric.curve];ring
+ · norm_num [validTwo,nq,nr,ns,nt,MixedCancellation.support,ordinate]
+   refine ⟨X^3,?_⟩;simp [MixedGeneric.curve];ring
+-- Invalid input retains explicit None; the totality theorem's premise is essential.
+example : dispatch (1:ℚ) 0 0 0 ⟨0,2,1,1⟩ ⟨0,0,0,1,1,1⟩=(none,.mismatch) := by
+ norm_num [dispatch,rawK,rawW3,rawY3]

@@ -1,0 +1,276 @@
+{
+  "schema": "research.proof-packet-status/v1",
+  "task": "T-1174",
+  "main_declarations": 17,
+  "control_declarations": 15,
+  "readback": [
+    {
+      "name": "ScaleTrim.scale_nonzero",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.transform_computed_scale",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.listPoly_append",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.listPoly_zeros",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.words_append_zero",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.trim_preserves",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.trim_length",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "name": "ScaleTrim.trim_finished",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.pad_length",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.pad_preserves",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.trim_pad_preserves",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.trim_pad_capacity",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.listPoly_coefficient",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.wordsPoly_coefficient",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.wordsPoly_array",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.postprocessed_transform",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrim.postprocessed_capacity",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrimControls.empty",
+      "axioms": []
+    },
+    {
+      "name": "ScaleTrimControls.all_zero",
+      "axioms": []
+    },
+    {
+      "name": "ScaleTrimControls.trailing",
+      "axioms": []
+    },
+    {
+      "name": "ScaleTrimControls.internal",
+      "axioms": []
+    },
+    {
+      "name": "ScaleTrimControls.partial_fuel",
+      "axioms": []
+    },
+    {
+      "name": "ScaleTrimControls.pad_u",
+      "axioms": []
+    },
+    {
+      "name": "ScaleTrimControls.pad_v",
+      "axioms": []
+    },
+    {
+      "name": "ScaleTrimControls.over_capacity_excluded",
+      "axioms": []
+    },
+    {
+      "name": "ScaleTrimControls.no_silent_truncation",
+      "axioms": []
+    },
+    {
+      "name": "ScaleTrimControls.scale_zero_exponent",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrimControls.scale_two",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrimControls.scale_three",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrimControls.u_output",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrimControls.v_output",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ScaleTrimControls.zero_v",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    }
+  ],
+  "attempts": {
+    "scale1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "trim1": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "trim2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "bridge1": {
+      "native_exit_code": 1,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 1
+    },
+    "bridge2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  },
+  "claims": [
+    {
+      "claim": "computed scale supplies nonzero canonical a^m and T_m identity",
+      "domain": "prime1<p<2^31; canonical inputs; alpha nonzero; length<=6; m=0..5"
+    },
+    {
+      "claim": "last-zero/dropLast loop preserves polynomial and finishes",
+      "domain": "all UInt64 lists; polynomial preserved for any fuel; finished for fuel>=original length"
+    },
+    {
+      "claim": "zero padding preserves polynomial and reaches capacity",
+      "domain": "all lists for preservation; original length<=capacity for exact size"
+    },
+    {
+      "claim": "trimmed padded word transform represents T_m(f)",
+      "domain": "preceding arithmetic hypotheses; array/list polynomial bridge; exact storage capacity additionally requires original length<=capacity"
+    }
+  ],
+  "independent_source_fidelity_review": "pending",
+  "divisor_validity_composition": "pending",
+  "compiled_rust_equivalence": "not established",
+  "scientific_execution": false,
+  "cost_ratio": null
+}

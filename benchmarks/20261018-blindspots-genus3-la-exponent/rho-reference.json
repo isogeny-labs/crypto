@@ -1,0 +1,1084 @@
+{
+ "schema": "rho-reference/v1",
+ "item": "blindspots item 15, genus-3 IC-2LP linear-algebra arms at b = 20 against a matched negation-map Pollard rho",
+ "kind": "negation",
+ "protocol": "PROTOCOL.md 'Distance remaining' (round 4's measured negation-map rho), as amended before the runs by PROTOCOL-ADDENDUM-matched-rho.md (commit 7555a42a6c): round 4's rho_neg + canon on classes {P,-P} of E0(F_{q^3}), r = 64 adding walk, distinguished points, fruitless-cycle escape by doubling, 16 walks per curve (target 0 = the IC target k), b = 20, curves 0-3, decision rule 'Decision rule (frozen)' of the addendum",
+ "unit": "GAE: one generic affine E0(F_{q^3}) addition = c_add = 81 F_q-mult-eq (60 M_q + 1 I_q at ceil(log2 q) = 21), measured in each process; every arm's counted cost M_q + ceil(log2 q) I_q is divided by c_add and every native op (13 NAT counters, plus m_ell and i_ell for IC per the frozen PROTOCOL classification) is priced at w GAE",
+ "binary_or_process": "research/blindspots_20261018/instruments/blindspots_15b_genus3_la_rho.rs (sha256 79a821504c5b7a4639470d8e04dfd35fc6ad1a91d34bacee466461f36811e991), built per card with rustc -C opt-level=3 -C codegen-units=1; one process per curve runs the four IC arms then the 16 rho walks (cards matched-rho-cards/card-m00..m03.yaml, receipts raw/matched/receipt-card-m00..m03.json)",
+ "matches_protocol": true,
+ "strongest_available": true,
+ "same_unit": true,
+ "same_binary_or_process": true,
+ "gae_band": {
+  "0": {
+   "ic": 112352522.62037037,
+   "rho": 296890566.33989197
+  },
+  "0.1": {
+   "ic": 653439101.9953704,
+   "rho": 415182901.693017
+  },
+  "1": {
+   "ic": 5523218316.370371,
+   "rho": 1479813919.871142
+  }
+ },
+ "gae_band_note": "best IC arm = a (r2:lpsgebw2@8): lowest mean S at w = 0.1 and 1 (all four arms tie at w = 0 because the LA phase is entirely mod-ell products, which the frozen classification prices as native). ic = mean over curves 0-3 of the arm's S(w) in GAE; rho = mean over the 64 correct walks of S(w) in GAE.",
+ "order_holds_across_band": false,
+ "order_verdict": {
+  "a": "unresolved: order changes inside the band",
+  "d": "unresolved: order changes inside the band",
+  "b": "unresolved: order changes inside the band",
+  "c": "unresolved: order changes inside the band"
+ },
+ "order_rule": "addendum M: 'IC below rho' only if the aggregate ratio (geometric mean over curves of S_IC / mean_16 S_rho) is below 1 at w = 0, 0.1 and 1 with each 95 % bootstrap upper end below 1; 'IC above rho' the mirror; otherwise unresolved",
+ "per_arm": {
+  "a": {
+   "arm": "r2:lpsgebw2@8",
+   "band": {
+    "0": {
+     "ic_S_mean_gae": 112352522.62037037,
+     "rho_S_mean_gae": 296890566.33989197,
+     "pooled_ratio": 0.3784307598771757,
+     "pooled_ratio_boot95": [
+      0.25260692859551,
+      0.5540828169818385
+     ],
+     "pooled_ratio_t95_rho_mean_only": [
+      0.32435896262031394,
+      0.4541370232371958
+     ],
+     "geomean_ratio_frozen": 0.4072609599638839,
+     "geomean_ratio_boot95": [
+      0.26686667678906373,
+      0.5581707505321087
+     ],
+     "geomean_ratio_t95_over_curves_df3": [
+      0.2082772275322366,
+      0.7963496128496941
+     ],
+     "rho_S_sd_gae": 198135270.62353015,
+     "rho_S_mean_se_gae": 24766908.82794127
+    },
+    "0.1": {
+     "ic_S_mean_gae": 653439101.9953704,
+     "rho_S_mean_gae": 415182901.693017,
+     "pooled_ratio": 1.5738584111503662,
+     "pooled_ratio_boot95": [
+      1.0522220142422796,
+      2.3026725662339764
+     ],
+     "pooled_ratio_t95_rho_mean_only": [
+      1.3489767402485318,
+      1.888717820210935
+     ],
+     "geomean_ratio_frozen": 1.693754758600279,
+     "geomean_ratio_boot95": [
+      1.1118329393229083,
+      2.3176997292638455
+     ],
+     "geomean_ratio_t95_over_curves_df3": [
+      0.8682332956698418,
+      3.304187015850166
+     ],
+     "rho_S_sd_gae": 277082788.66405267,
+     "rho_S_mean_se_gae": 34635348.58300658
+    },
+    "1": {
+     "ic_S_mean_gae": 5523218316.370371,
+     "rho_S_mean_gae": 1479813919.871142,
+     "pooled_ratio": 3.732373538459023,
+     "pooled_ratio_boot95": [
+      2.496026381666593,
+      5.45590435694278
+     ],
+     "pooled_ratio_t95_rho_mean_only": [
+      3.1990622589199074,
+      4.479073782746612
+     ],
+     "geomean_ratio_frozen": 4.016704067963691,
+     "geomean_ratio_boot95": [
+      2.636785905757861,
+      5.4978633402622705
+     ],
+     "geomean_ratio_t95_over_curves_df3": [
+      2.0598425505957056,
+      7.832594566477979
+     ],
+     "rho_S_sd_gae": 987610451.0317384,
+     "rho_S_mean_se_gae": 123451306.3789673
+    }
+   },
+   "order": {
+    "frozen_rule_statistic": "geometric mean over curves of S_IC / mean_16 S_rho, hierarchical bootstrap",
+    "ic_below_rho_all_w": false,
+    "ic_above_rho_all_w": false,
+    "pooled_ic_below_rho_all_w": false,
+    "pooled_ic_above_rho_all_w": false,
+    "order_holds_across_band": false,
+    "verdict": "unresolved: order changes inside the band",
+    "pooled_crossover_w_gae_per_native_op": 0.043647245989936835,
+    "per_curve_crossover_w": {
+     "c0": 0.032390618014080746,
+     "c1": 0.021451471507462738,
+     "c2": 0.021689892669833375,
+     "c3": 0.11794255915243694
+    }
+   },
+   "sensitivities_not_the_frozen_rule": {
+    "sensitivity_rho_plus_3_native_per_step_pooled_ratio": {
+     "0": 0.3784307598771757,
+     "0.1": 1.296061486035558,
+     "1": 2.330753040639222
+    },
+    "sensitivity_model_efficient_rho_pooled_ratio": {
+     "0": 0.5129626128351144,
+     "0.1": 2.1333639027605535,
+     "1": 5.059229548322071
+    },
+    "sensitivity_B_m_ell_counted_at_c_ell_1": {
+     "0": {
+      "geomean_ratio": 0.6445244169095329,
+      "geomean_ratio_boot95": [
+       0.4227040429716844,
+       0.882066251883547
+      ],
+      "pooled_ratio": 0.5988980362445507
+     },
+     "0.1": {
+      "geomean_ratio": 0.48915268827502745,
+      "geomean_ratio_boot95": [
+       0.320890959218278,
+       0.6694382800173455
+      ],
+      "pooled_ratio": 0.4545251116820444
+     },
+     "1": {
+      "geomean_ratio": 0.20860170665067043,
+      "geomean_ratio_boot95": [
+       0.13693928204712125,
+       0.2851757175115567
+      ],
+      "pooled_ratio": 0.19383920458423015
+     }
+    },
+    "break_even_fq_mult_per_m_ell": {
+     "0": 2.8193265248447754,
+     "0.1": 4.459980784005158,
+     "1": 19.2258691164486
+    }
+   },
+   "per_curve": {
+    "c0": {
+     "ic_S_gae": {
+      "0": 112549949.96296297,
+      "0.1": 654490302.562963,
+      "1": 5531953475.962963
+     },
+     "rho_S_mean_gae": {
+      "0": 255158182.7060185,
+      "0.1": 356822179.10601854,
+      "1": 1271798146.7060184
+     },
+     "ratio": {
+      "0": 0.4410987285194684,
+      "0.1": 1.8342197903805237,
+      "1": 4.349710282477473
+     },
+     "ic_counted_fq": 9116545947,
+     "ic_native_ops": 5419403526,
+     "ic_m_ell": 5310285692,
+     "ic_i_ell": 40696,
+     "ic_nat_counters": 109077138
+    },
+    "c1": {
+     "ic_S_gae": {
+      "0": 112215384.4074074,
+      "0.1": 655880383.8074074,
+      "1": 5548865378.407408
+     },
+     "rho_S_mean_gae": {
+      "0": 210820801.62345678,
+      "0.1": 294818420.2484568,
+      "1": 1050796987.8734568
+     },
+     "ratio": {
+      "0": 0.5322785206358966,
+      "0.1": 2.224692687976102,
+      "1": 5.280625508488453
+     },
+     "ic_counted_fq": 9089446137,
+     "ic_native_ops": 5436649994,
+     "ic_m_ell": 5325169183,
+     "ic_i_ell": 41092,
+     "ic_nat_counters": 111439719
+    },
+    "c2": {
+     "ic_S_gae": {
+      "0": 112497739.18518518,
+      "0.1": 649736545.2851852,
+      "1": 5484885800.185185
+     },
+     "rho_S_mean_gae": {
+      "0": 210806500.6273148,
+      "0.1": 294798428.38356483,
+      "1": 1050725778.1898148
+     },
+     "ratio": {
+      "0": 0.5336540327286687,
+      "0.1": 2.2040027446815533,
+      "1": 5.2200925436839665
+     },
+     "ic_counted_fq": 9112316874,
+     "ic_native_ops": 5372388061,
+     "ic_m_ell": 5266485550,
+     "ic_i_ell": 40485,
+     "ic_nat_counters": 105862026
+    },
+    "c3": {
+     "ic_S_gae": {
+      "0": 112147016.92592593,
+      "0.1": 653649176.325926,
+      "1": 5527168610.925926
+     },
+     "rho_S_mean_gae": {
+      "0": 510776780.4027778,
+      "0.1": 714292579.0340278,
+      "1": 2545934766.7152777
+     },
+     "ratio": {
+      "0": 0.21956169745518062,
+      "0.1": 0.9151000521521407,
+      "1": 2.1709780954273965
+     },
+     "ic_counted_fq": 9083908371,
+     "ic_native_ops": 5415021594,
+     "ic_m_ell": 5305367646,
+     "ic_i_ell": 40674,
+     "ic_nat_counters": 109613274
+    }
+   }
+  },
+  "d": {
+   "arm": "r2:lpsgebw2*",
+   "band": {
+    "0": {
+     "ic_S_mean_gae": 112352522.62037037,
+     "rho_S_mean_gae": 296890566.33989197,
+     "pooled_ratio": 0.3784307598771757,
+     "pooled_ratio_boot95": [
+      0.25260692859551,
+      0.5540828169818385
+     ],
+     "pooled_ratio_t95_rho_mean_only": [
+      0.32435896262031394,
+      0.4541370232371958
+     ],
+     "geomean_ratio_frozen": 0.4072609599638839,
+     "geomean_ratio_boot95": [
+      0.26686667678906373,
+      0.5581707505321087
+     ],
+     "geomean_ratio_t95_over_curves_df3": [
+      0.2082772275322366,
+      0.7963496128496941
+     ],
+     "rho_S_sd_gae": 198135270.62353015,
+     "rho_S_mean_se_gae": 24766908.82794127
+    },
+    "0.1": {
+     "ic_S_mean_gae": 664740444.1703705,
+     "rho_S_mean_gae": 415182901.693017,
+     "pooled_ratio": 1.6010785643139858,
+     "pooled_ratio_boot95": [
+      1.0715307477610891,
+      2.3413997066182963
+     ],
+     "pooled_ratio_t95_rho_mean_only": [
+      1.3723075260572037,
+      1.9213835212579704
+     ],
+     "geomean_ratio_frozen": 1.7230523013701318,
+     "geomean_ratio_boot95": [
+      1.1322296252726702,
+      2.355738179283973
+     ],
+     "geomean_ratio_t95_over_curves_df3": [
+      0.8844887528874318,
+      3.3566387628614183
+     ],
+     "rho_S_sd_gae": 277082788.66405267,
+     "rho_S_mean_se_gae": 34635348.58300658
+    },
+    "1": {
+     "ic_S_mean_gae": 5636231738.120371,
+     "rho_S_mean_gae": 1479813919.871142,
+     "pooled_ratio": 3.80874356054926,
+     "pooled_ratio_boot95": [
+      2.5501994321352766,
+      5.567645004837255
+     ],
+     "pooled_ratio_t95_rho_mean_only": [
+      3.264519923557254,
+      4.570722424075634
+     ],
+     "geomean_ratio_frozen": 4.0989058350922,
+     "geomean_ratio_boot95": [
+      2.693916344646828,
+      5.603661981335915
+     ],
+     "geomean_ratio_t95_over_curves_df3": [
+      2.105459978675257,
+      7.979742771232341
+     ],
+     "rho_S_sd_gae": 987610451.0317384,
+     "rho_S_mean_se_gae": 123451306.3789673
+    }
+   },
+   "order": {
+    "frozen_rule_statistic": "geometric mean over curves of S_IC / mean_16 S_rho, hierarchical bootstrap",
+    "ic_below_rho_all_w": false,
+    "ic_above_rho_all_w": false,
+    "pooled_ic_below_rho_all_w": false,
+    "pooled_ic_above_rho_all_w": false,
+    "order_holds_across_band": false,
+    "verdict": "unresolved: order changes inside the band",
+    "pooled_crossover_w_gae_per_native_op": 0.04251092376595329,
+    "per_curve_crossover_w": {
+     "c0": 0.03152404854302067,
+     "c1": 0.021029660593912338,
+     "c2": 0.021134143075203116,
+     "c3": 0.1139104168911584
+    }
+   },
+   "sensitivities_not_the_frozen_rule": {
+    "sensitivity_rho_plus_3_native_per_step_pooled_ratio": {
+     "0": 0.3784307598771757,
+     "0.1": 1.3184770933795313,
+     "1": 2.3784437820310913
+    },
+    "sensitivity_model_efficient_rho_pooled_ratio": {
+     "0": 0.5129626128351144,
+     "0.1": 2.170260800077025,
+     "1": 5.162749056319776
+    },
+    "sensitivity_B_m_ell_counted_at_c_ell_1": {
+     "0": {
+      "geomean_ratio": 0.6412556020313904,
+      "geomean_ratio_boot95": [
+       0.42068624817414874,
+       0.8776017358669727
+      ],
+      "pooled_ratio": 0.5958606183596827
+     },
+     "0.1": {
+      "geomean_ratio": 0.5350430392317937,
+      "geomean_ratio_boot95": [
+       0.35120284159052506,
+       0.7318336778771235
+      ],
+      "pooled_ratio": 0.49716652390484545
+     },
+     "1": {
+      "geomean_ratio": 0.34325736037256277,
+      "geomean_ratio_boot95": [
+       0.2255006965593926,
+       0.4698207608086978
+      ],
+      "pooled_ratio": 0.31896025970315584
+     }
+    },
+    "break_even_fq_mult_per_m_ell": {
+     "0": 2.8587115148807016,
+     "0.1": 4.234059915636405,
+     "1": 16.612195522437737
+    }
+   },
+   "per_curve": {
+    "c0": {
+     "ic_S_gae": {
+      "0": 112549949.96296297,
+      "0.1": 666593127.762963,
+      "1": 5652981727.962963
+     },
+     "rho_S_mean_gae": {
+      "0": 255158182.7060185,
+      "0.1": 356822179.10601854,
+      "1": 1271798146.7060184
+     },
+     "ratio": {
+      "0": 0.4410987285194684,
+      "0.1": 1.8681381561904138,
+      "1": 4.444873380736003
+     },
+     "ic_counted_fq": 9116545947,
+     "ic_native_ops": 5540431778,
+     "ic_m_ell": 5245101748,
+     "ic_i_ell": 38265,
+     "ic_nat_counters": 295291765
+    },
+    "c1": {
+     "ic_S_gae": {
+      "0": 112215384.4074074,
+      "0.1": 665100348.0074074,
+      "1": 5641065020.407408
+     },
+     "rho_S_mean_gae": {
+      "0": 210820801.62345678,
+      "0.1": 294818420.2484568,
+      "1": 1050796987.8734568
+     },
+     "ratio": {
+      "0": 0.5322785206358966,
+      "0.1": 2.255966053433491,
+      "1": 5.368368091560173
+     },
+     "ic_counted_fq": 9089446137,
+     "ic_native_ops": 5528849636,
+     "ic_m_ell": 5231370755,
+     "ic_i_ell": 38089,
+     "ic_nat_counters": 297440792
+    },
+    "c2": {
+     "ic_S_gae": {
+      "0": 112497739.18518518,
+      "0.1": 661655257.4851853,
+      "1": 5604072922.185185
+     },
+     "rho_S_mean_gae": {
+      "0": 210806500.6273148,
+      "0.1": 294798428.38356483,
+      "1": 1050725778.1898148
+     },
+     "ratio": {
+      "0": 0.5336540327286687,
+      "0.1": 2.24443278450691,
+      "1": 5.333525681495941
+     },
+     "ic_counted_fq": 9112316874,
+     "ic_native_ops": 5491575183,
+     "ic_m_ell": 5200207227,
+     "ic_i_ell": 37979,
+     "ic_nat_counters": 291329977
+    },
+    "c3": {
+     "ic_S_gae": {
+      "0": 112147016.92592593,
+      "0.1": 665613043.425926,
+      "1": 5646807281.925926
+     },
+     "rho_S_mean_gae": {
+      "0": 510776780.4027778,
+      "0.1": 714292579.0340278,
+      "1": 2545934766.7152777
+     },
+     "ratio": {
+      "0": 0.21956169745518062,
+      "0.1": 0.9318493051209722,
+      "1": 2.2179701364506452
+     },
+     "ic_counted_fq": 9083908371,
+     "ic_native_ops": 5534660265,
+     "ic_m_ell": 5238451389,
+     "ic_i_ell": 38227,
+     "ic_nat_counters": 296170649
+    }
+   }
+  },
+  "b": {
+   "arm": "r2:lpsgebw4x4@8",
+   "band": {
+    "0": {
+     "ic_S_mean_gae": 112352522.62037037,
+     "rho_S_mean_gae": 296890566.33989197,
+     "pooled_ratio": 0.3784307598771757,
+     "pooled_ratio_boot95": [
+      0.25260692859551,
+      0.5540828169818385
+     ],
+     "pooled_ratio_t95_rho_mean_only": [
+      0.32435896262031394,
+      0.4541370232371958
+     ],
+     "geomean_ratio_frozen": 0.4072609599638839,
+     "geomean_ratio_boot95": [
+      0.26686667678906373,
+      0.5581707505321087
+     ],
+     "geomean_ratio_t95_over_curves_df3": [
+      0.2082772275322366,
+      0.7963496128496941
+     ],
+     "rho_S_sd_gae": 198135270.62353015,
+     "rho_S_mean_se_gae": 24766908.82794127
+    },
+    "0.1": {
+     "ic_S_mean_gae": 905719015.7203704,
+     "rho_S_mean_gae": 415182901.693017,
+     "pooled_ratio": 2.1814940163168184,
+     "pooled_ratio_boot95": [
+      1.45804161590974,
+      3.1898984372411445
+     ],
+     "pooled_ratio_t95_rho_mean_only": [
+      1.8697899799333257,
+      2.6179144160048926
+     ],
+     "geomean_ratio_frozen": 2.3476750268494544,
+     "geomean_ratio_boot95": [
+      1.5406315509041264,
+      3.2133734801293667
+     ],
+     "geomean_ratio_t95_over_curves_df3": [
+      1.2029608724361378,
+      4.581676892392177
+     ],
+     "rho_S_sd_gae": 277082788.66405267,
+     "rho_S_mean_se_gae": 34635348.58300658
+    },
+    "1": {
+     "ic_S_mean_gae": 8046017453.620371,
+     "rho_S_mean_gae": 1479813919.871142,
+     "pooled_ratio": 5.437181895356813,
+     "pooled_ratio_boot95": [
+      3.635114057561852,
+      7.948247770677337
+     ],
+     "pooled_ratio_t95_rho_mean_only": [
+      4.660274009846283,
+      6.524946827688643
+     ],
+     "geomean_ratio_frozen": 5.851373783065081,
+     "geomean_ratio_boot95": [
+      3.8396305125200136,
+      8.011978530868047
+     ],
+     "geomean_ratio_t95_over_curves_df3": [
+      2.9989547935510155,
+      11.41683603326344
+     ],
+     "rho_S_sd_gae": 987610451.0317384,
+     "rho_S_mean_se_gae": 123451306.3789673
+    }
+   },
+   "order": {
+    "frozen_rule_statistic": "geometric mean over curves of S_IC / mean_16 S_rho, hierarchical bootstrap",
+    "ic_below_rho_all_w": false,
+    "ic_above_rho_all_w": false,
+    "pooled_ic_below_rho_all_w": false,
+    "pooled_ic_above_rho_all_w": false,
+    "order_holds_across_band": false,
+    "verdict": "unresolved: order changes inside the band",
+    "pooled_crossover_w_gae_per_native_op": 0.027335966219686897,
+    "per_curve_crossover_w": {
+     "c0": 0.020588210827236927,
+     "c1": 0.013810461460124882,
+     "c2": 0.013973411153225883,
+     "c3": 0.06755350175573938
+    }
+   },
+   "sensitivities_not_the_frozen_rule": {
+    "sensitivity_rho_plus_3_native_per_step_pooled_ratio": {
+     "0": 0.3784307598771757,
+     "0.1": 1.7964451926134088,
+     "1": 3.395353681653092
+    },
+    "sensitivity_model_efficient_rho_pooled_ratio": {
+     "0": 0.5129626128351144,
+     "0.1": 2.9570135124777797,
+     "1": 7.370096004899911
+    },
+    "sensitivity_B_m_ell_counted_at_c_ell_1": {
+     "0": {
+      "geomean_ratio": 0.7574228181607942,
+      "geomean_ratio_boot95": [
+       0.4967372987943326,
+       1.0366486992537052
+      ],
+      "pooled_ratio": 0.7038048228045333
+     },
+     "0.1": {
+      "geomean_ratio": 0.5698808363244514,
+      "geomean_ratio_boot95": [
+       0.37382849208705915,
+       0.7802818062168725
+      ],
+      "pooled_ratio": 0.5295389986886903
+     },
+     "1": {
+      "geomean_ratio": 0.23124226887389934,
+      "geomean_ratio_boot95": [
+       0.15177313322733044,
+       0.3162153674039672
+      ],
+      "pooled_ratio": 0.21487719784584391
+     }
+    },
+    "break_even_fq_mult_per_m_ell": {
+     "0": 1.9103220291458658,
+     "0.1": 3.022012145407114,
+     "1": 13.027223191758347
+    }
+   },
+   "per_curve": {
+    "c0": {
+     "ic_S_gae": {
+      "0": 112549949.96296297,
+      "0.1": 906883328.562963,
+      "1": 8055883735.962963
+     },
+     "rho_S_mean_gae": {
+      "0": 255158182.7060185,
+      "0.1": 356822179.10601854,
+      "1": 1271798146.7060184
+     },
+     "ratio": {
+      "0": 0.4410987285194684,
+      "0.1": 2.541555378746541,
+      "1": 6.334247110540188
+     },
+     "ic_counted_fq": 9116545947,
+     "ic_native_ops": 7943333786,
+     "ic_m_ell": 7834229459,
+     "ic_i_ell": 27189,
+     "ic_nat_counters": 109077138
+    },
+    "c1": {
+     "ic_S_gae": {
+      "0": 112215384.4074074,
+      "0.1": 910203752.0074074,
+      "1": 8092099060.407408
+     },
+     "rho_S_mean_gae": {
+      "0": 210820801.62345678,
+      "0.1": 294818420.2484568,
+      "1": 1050796987.8734568
+     },
+     "ratio": {
+      "0": 0.5322785206358966,
+      "0.1": 3.0873367791616877,
+      "1": 7.700915737095647
+     },
+     "ic_counted_fq": 9089446137,
+     "ic_native_ops": 7979883676,
+     "ic_m_ell": 7868416504,
+     "ic_i_ell": 27453,
+     "ic_nat_counters": 111439719
+    },
+    "c2": {
+     "ic_S_gae": {
+      "0": 112497739.18518518,
+      "0.1": 900031274.3851852,
+      "1": 7987833091.185185
+     },
+     "rho_S_mean_gae": {
+      "0": 210806500.6273148,
+      "0.1": 294798428.38356483,
+      "1": 1050725778.1898148
+     },
+     "ratio": {
+      "0": 0.5336540327286687,
+      "0.1": 3.053039594953833,
+      "1": 7.6022053108343695
+     },
+     "ic_counted_fq": 9112316874,
+     "ic_native_ops": 7875335352,
+     "ic_m_ell": 7769446274,
+     "ic_i_ell": 27052,
+     "ic_nat_counters": 105862026
+    },
+    "c3": {
+     "ic_S_gae": {
+      "0": 112147016.92592593,
+      "0.1": 905757707.925926,
+      "1": 8048253926.925926
+     },
+     "rho_S_mean_gae": {
+      "0": 510776780.4027778,
+      "0.1": 714292579.0340278,
+      "1": 2545934766.7152777
+     },
+     "ratio": {
+      "0": 0.21956169745518062,
+      "0.1": 1.268048604327971,
+      "1": 3.1612176526068847
+     },
+     "ic_counted_fq": 9083908371,
+     "ic_native_ops": 7936106910,
+     "ic_m_ell": 7826466463,
+     "ic_i_ell": 27173,
+     "ic_nat_counters": 109613274
+    }
+   }
+  },
+  "c": {
+   "arm": "r2:lpsgebl4@8",
+   "band": {
+    "0": {
+     "ic_S_mean_gae": 112352522.62037037,
+     "rho_S_mean_gae": 296890566.33989197,
+     "pooled_ratio": 0.3784307598771757,
+     "pooled_ratio_boot95": [
+      0.25260692859551,
+      0.5540828169818385
+     ],
+     "pooled_ratio_t95_rho_mean_only": [
+      0.32435896262031394,
+      0.4541370232371958
+     ],
+     "geomean_ratio_frozen": 0.4072609599638839,
+     "geomean_ratio_boot95": [
+      0.26686667678906373,
+      0.5581707505321087
+     ],
+     "geomean_ratio_t95_over_curves_df3": [
+      0.2082772275322366,
+      0.7963496128496941
+     ],
+     "rho_S_sd_gae": 198135270.62353015,
+     "rho_S_mean_se_gae": 24766908.82794127
+    },
+    "0.1": {
+     "ic_S_mean_gae": 1068740950.8453704,
+     "rho_S_mean_gae": 415182901.693017,
+     "pooled_ratio": 2.5741449045403826,
+     "pooled_ratio_boot95": [
+      1.7205977500323857,
+      3.7635756239736455
+     ],
+     "pooled_ratio_t95_rho_mean_only": [
+      2.2063367185083433,
+      3.0891173682243633
+     ],
+     "geomean_ratio_frozen": 2.7702248168847228,
+     "geomean_ratio_boot95": [
+      1.8168467888682718,
+      3.7944737516335763
+     ],
+     "geomean_ratio_t95_over_curves_df3": [
+      1.418535763484822,
+      5.409906280565981
+     ],
+     "rho_S_sd_gae": 277082788.66405267,
+     "rho_S_mean_se_gae": 34635348.58300658
+    },
+    "1": {
+     "ic_S_mean_gae": 9676236804.87037,
+     "rho_S_mean_gae": 1479813919.871142,
+     "pooled_ratio": 6.5388199657649855,
+     "pooled_ratio_boot95": [
+      4.372026320212632,
+      9.558563066019557
+     ],
+     "pooled_ratio_t95_rho_mean_only": [
+      5.604501252301541,
+      7.8469790809978965
+     ],
+     "geomean_ratio_frozen": 7.036896526606468,
+     "geomean_ratio_boot95": [
+      4.614588178530972,
+      9.642348179179596
+     ],
+     "geomean_ratio_t95_over_curves_df3": [
+      3.603764587890293,
+      13.74060694545945
+     ],
+     "rho_S_sd_gae": 987610451.0317384,
+     "rho_S_mean_se_gae": 123451306.3789673
+    }
+   },
+   "order": {
+    "frozen_rule_statistic": "geometric mean over curves of S_IC / mean_16 S_rho, hierarchical bootstrap",
+    "ic_below_rho_all_w": false,
+    "ic_above_rho_all_w": false,
+    "pooled_ic_below_rho_all_w": false,
+    "pooled_ic_above_rho_all_w": false,
+    "order_holds_across_band": false,
+    "verdict": "unresolved: order changes inside the band",
+    "pooled_crossover_w_gae_per_native_op": 0.022018721395916718,
+    "per_curve_crossover_w": {
+     "c0": 0.016672490516161972,
+     "c1": 0.011206248512139813,
+     "c2": 0.0113717936660598,
+     "c3": 0.05296541656787174
+    }
+   },
+   "sensitivities_not_the_frozen_rule": {
+    "sensitivity_rho_plus_3_native_per_step_pooled_ratio": {
+     "0": 0.3784307598771757,
+     "0.1": 2.119790475822366,
+     "1": 4.083292939562383
+    },
+    "sensitivity_model_efficient_rho_pooled_ratio": {
+     "0": 0.5129626128351144,
+     "0.1": 3.489251498683129,
+     "1": 8.863365587897391
+    },
+    "sensitivity_B_m_ell_counted_at_c_ell_1": {
+     "0": {
+      "geomean_ratio": 0.8303758367826434,
+      "geomean_ratio_boot95": [
+       0.5444621587501685,
+       1.1371915456670447
+      ],
+      "pooled_ratio": 0.7715946692326845
+     },
+     "0.1": {
+      "geomean_ratio": 0.6220480972906476,
+      "geomean_ratio_boot95": [
+       0.4079556535775606,
+       0.8519752997844158
+      ],
+      "pooled_ratio": 0.5780143987258269
+     },
+     "1": {
+      "geomean_ratio": 0.24587817953275848,
+      "geomean_ratio_boot95": [
+       0.1613689210292431,
+       0.33625659129378194
+      ],
+      "pooled_ratio": 0.22847761011923343
+     }
+    },
+    "break_even_fq_mult_per_m_ell": {
+     "0": 1.5809417531271557,
+     "0.1": 2.5009528486836174,
+     "1": 10.781052708691774
+    }
+   },
+   "per_curve": {
+    "c0": {
+     "ic_S_gae": {
+      "0": 112549949.96296297,
+      "0.1": 1069564456.8629631,
+      "1": 9682695018.962963
+     },
+     "rho_S_mean_gae": {
+      "0": 255158182.7060185,
+      "0.1": 356822179.10601854,
+      "1": 1271798146.7060184
+     },
+     "ratio": {
+      "0": 0.4410987285194684,
+      "0.1": 2.9974719047528025,
+      "1": 7.613389785196125
+     },
+     "ic_counted_fq": 9116545947,
+     "ic_native_ops": 9570145069,
+     "ic_m_ell": 9461040828,
+     "ic_i_ell": 27103,
+     "ic_nat_counters": 109077138
+    },
+    "c1": {
+     "ic_S_gae": {
+      "0": 112215384.4074074,
+      "0.1": 1076127607.0074074,
+      "1": 9751337610.407408
+     },
+     "rho_S_mean_gae": {
+      "0": 210820801.62345678,
+      "0.1": 294818420.2484568,
+      "1": 1050796987.8734568
+     },
+     "ratio": {
+      "0": 0.5322785206358966,
+      "0.1": 3.6501369422592598,
+      "1": 9.279944387870401
+     },
+     "ic_counted_fq": 9089446137,
+     "ic_native_ops": 9639122226,
+     "ic_m_ell": 9527655140,
+     "ic_i_ell": 27367,
+     "ic_nat_counters": 111439719
+    },
+    "c2": {
+     "ic_S_gae": {
+      "0": 112497739.18518518,
+      "0.1": 1060986195.1851852,
+      "1": 9597382299.185184
+     },
+     "rho_S_mean_gae": {
+      "0": 210806500.6273148,
+      "0.1": 294798428.38356483,
+      "1": 1050725778.1898148
+     },
+     "ratio": {
+      "0": 0.5336540327286687,
+      "0.1": 3.5990225626465238,
+      "1": 9.134050480534995
+     },
+     "ic_counted_fq": 9112316874,
+     "ic_native_ops": 9484884560,
+     "ic_m_ell": 9378995572,
+     "ic_i_ell": 26962,
+     "ic_nat_counters": 105862026
+    },
+    "c3": {
+     "ic_S_gae": {
+      "0": 112147016.92592593,
+      "0.1": 1068285544.3259261,
+      "1": 9673532290.925926
+     },
+     "rho_S_mean_gae": {
+      "0": 510776780.4027778,
+      "0.1": 714292579.0340278,
+      "1": 2545934766.7152777
+     },
+     "ratio": {
+      "0": 0.21956169745518062,
+      "0.1": 1.4955853885121135,
+      "1": 3.7995994309809262
+     },
+     "ic_counted_fq": 9083908371,
+     "ic_native_ops": 9561385274,
+     "ic_m_ell": 9451744911,
+     "ic_i_ell": 27089,
+     "ic_nat_counters": 109613274
+    }
+   }
+  }
+ },
+ "intervals": "pooled_ratio = mean IC S over 4 curves / mean rho S over 64 walks; geomean_ratio_frozen = the addendum's statistic. *_boot95: 2000 hierarchical resamples (curves with replacement, then walks with replacement within each drawn curve), percentile, random.Random(20261022); geomean t95: Student t on the 4 per-curve log ratios (df 3); pooled t95: Student t on the 64-walk rho mean only (df 63), IC mean held fixed",
+ "rho_model_secondary": {
+  "mean_model_fq": 17741164959.277966,
+  "mean_measured_counted_fq": 24048135873.53125,
+  "measured_over_model": 1.355499254346033,
+  "steps_over_model_mean": 1.3284020880103178,
+  "steps_over_model_t95": [
+   1.1614629182805785,
+   1.495341257740057
+  ],
+  "steps_per_fruitless_escape": 164.32238717287805,
+  "note": "round 4's walk checks for fruitless cycles only every L = 64 steps, so a walk caught in a 2-cycle bounces until the next saved point; with an escape every ~164 steps this plausibly accounts for most of the excess over the model"
+ },
+ "evidence": {
+  "booleans": {
+   "matches_protocol": "the walk is round 4's: canon and rho_neg equal round 4's text after dropping the nat( counter lines (checked here); dispatch from the stream copy after k; target 0 reproduces round 4's recorded cost and steps exactly on curves 0-2; cells, argv and rule frozen in addendum M, committed (7555a42a6c) before the card commit and every run commit",
+   "strongest_available": "j(E0) recomputed here from orders.csv for all four curves equals the recorded j; j has non-zero x and x^2 coefficients (not in F_q, so E0 is not a twist of a subfield curve and no Frobenius map acts on E0), j^q != j, j != 0, 1728 (Aut = {+-1}); negation is the strongest available symmetry",
+   "same_unit": "IC and rho are both counted by CNT[0] (M_q) and CNT[1] (I_q) through the same cost_units at ceil(log2 q) = 21 and converted by the same per-process c_add; rho's CNT[2], CNT[3] are 0; every native counter is emitted for every arm and priced at the same w",
+   "same_binary_or_process": "one build of the pinned 15b source per card; the IC arms and the rho walks run in the same process"
+  },
+  "symmetry": {
+   "c0": {
+    "j": [
+     1010728,
+     487071,
+     141473
+    ],
+    "ea": [
+     761490,
+     241610,
+     16685
+    ],
+    "eb": [
+     901661,
+     549420,
+     856389
+    ]
+   },
+   "c1": {
+    "j": [
+     995242,
+     541662,
+     1026254
+    ],
+    "ea": [
+     500465,
+     465884,
+     198903
+    ],
+    "eb": [
+     403148,
+     961744,
+     495873
+    ]
+   },
+   "c2": {
+    "j": [
+     349275,
+     449140,
+     938498
+    ],
+    "ea": [
+     201092,
+     238410,
+     989962
+    ],
+    "eb": [
+     461335,
+     1020276,
+     694645
+    ]
+   },
+   "c3": {
+    "j": [
+     424491,
+     527286,
+     817193
+    ],
+    "ea": [
+     819123,
+     105105,
+     761688
+    ],
+    "eb": [
+     54076,
+     588735,
+     745879
+    ]
+   }
+  },
+  "rho_per_curve": {
+   "c0": {
+    "c_add": 81,
+    "ell": 48039358085773759,
+    "cofactor": 24,
+    "rho_escapes_total": 24818636,
+    "rho_steps_total": 4078968418,
+    "rho_steps_over_model_mean": 1.3124622525205851,
+    "rho_native_per_step": 3.9878316665113243
+   },
+   "c1": {
+    "c_add": 81,
+    "ell": 48039358047105389,
+    "cofactor": 24,
+    "rho_escapes_total": 20506117,
+    "rho_steps_total": 3370157146,
+    "rho_steps_over_model_mean": 1.0843928139891017,
+    "rho_native_per_step": 3.987831545467049
+   },
+   "c2": {
+    "c_add": 81,
+    "ell": 28823614820268097,
+    "cofactor": 40,
+    "rho_escapes_total": 20508095,
+    "rho_steps_total": 3369930523,
+    "rho_steps_over_model_mean": 1.399850965331059,
+    "rho_native_per_step": 3.9878295262409478
+   },
+   "c3": {
+    "c_add": 81,
+    "ell": 144118074093906287,
+    "cofactor": 8,
+    "rho_escapes_total": 49699413,
+    "rho_steps_total": 8165480836,
+    "rho_steps_over_model_mean": 1.5169023202005252,
+    "rho_native_per_step": 3.9878273472198007
+   }
+  }
+ },
+ "limitations": [
+  "Toy scale: q = 2^20 + 7, group order about 2^60, b = 20 only (b = 16..19 not in addendum M).",
+  "One IC solve per curve (no IC walk-to-walk variation); intervals are over 4 curves and 16 rho walks per curve.",
+  "At w = 0 the LA phase is free (all of it is mod-ell products, priced as native by the frozen classification), so w = 0 is the most IC-favourable point of the band.",
+  "Rho's coefficient bookkeeping (two mod-ell additions per step, a negation on a canonical flip) is not in its native counters, while IC's mod-ell additions are; charging 3 native ops per step to rho (sensitivity field) only raises rho and does not change any order.",
+  "The matched rho is round 4's walk as frozen, not a tuned one: its mean steps are about 1.33x the sqrt(pi ell / 4) negation-map model over 64 walks (t95 excludes 1), consistent with fruitless 2-cycles being detected only every L = 64 steps (one escape per ~164 steps). This inflates rho and favours IC; a model-efficient rho raises IC/rho at every w (sensitivity field) and leaves the order verdict unchanged.",
+  "The order flip is a statement about the price of a mod-ell product: m_ell is about 98 % of each IC arm's native ops. Under the frozen classification (M_ell native, priced at w GAE = 0, 8.1, 81 F_q-mult-eq) the order changes near w = 0.02-0.04. Under the PROTOCOL's primary unit (M_ell counted at c_ell = 1 F_q-mult-eq; I_ell and NAT counters at w GAE; sensitivity B) every arm's point ratio is below 1 at every w, with bootstrap upper ends below 1 for arms a and d at every w, while the w = 0 intervals of arms b and c cross 1. The break-even price of one mod-ell product is about 1.6-2.9 F_q-mult-eq at w = 0 (field break_even_fq_mult_per_m_ell). Which classification governs is an owner decision (addendum M, 'Pricing'); this report applies the frozen one.",
+  "Clique removal is not instrumented; it is used only by arm e, which is not in this comparison.",
+  "Single-threaded counted operations on a shared host; no wall-time claim."
+ ],
+ "validator_script": {
+  "path": "benchmarks/20261018-blindspots-genus3-la-exponent/validate_item15_matched_rho.py",
+  "sha256": "1b70c87b6a17e3aff98c55fbecb17c366570876d9bf74d91dfd78cf0f8527e1d"
+ }
+}

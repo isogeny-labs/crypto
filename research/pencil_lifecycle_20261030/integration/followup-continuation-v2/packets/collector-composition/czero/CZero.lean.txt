@@ -1,0 +1,88 @@
+import ZeroTest
+set_option autoImplicit false
+namespace CZeroInterpolation
+open Polynomial
+variable {K : Type*} [Field K]
+noncomputable def support (q r : K) : K[X] := X^2+C q*X+C r
+noncomputable def ordinate (s t : K) : K[X] := C s*X+C t
+def bnum (q1 r1 q2 r2 : K) : K := (q1-q2)*(q2*r1-q1*r2)-(r1-r2)^2
+def anum (q1 r1 s1 t1 q2 r2 s2 t2 : K) : K :=
+ (q1-q2)*((t1-t2)*q2-(s1-s2)*r2)-(r1-r2)*(t1-t2)
+def cnum (q1 r1 s1 t1 q2 r2 s2 t2 : K) : K :=
+ (q1-q2)*(t1-t2)-(r1-r2)*(s1-s2)
+theorem numerator_q (q1 r1 s1 t1 q2 r2 s2 t2 : K) :
+ anum q1 r1 s1 t1 q2 r2 s2 t2*(q1-q2)-bnum q1 r1 q2 r2*(s1-s2)=
+ ((q1-q2)*q2-(r1-r2))*cnum q1 r1 s1 t1 q2 r2 s2 t2 := by
+ unfold anum bnum cnum;ring
+theorem numerator_r (q1 r1 s1 t1 q2 r2 s2 t2 : K) :
+ anum q1 r1 s1 t1 q2 r2 s2 t2*(r1-r2)-bnum q1 r1 q2 r2*(t1-t2)=
+ (q1-q2)*r2*cnum q1 r1 s1 t1 q2 r2 s2 t2 := by
+ unfold anum bnum cnum;ring
+theorem interpolation_coefficients (q1 r1 s1 t1 q2 r2 s2 t2 : K)
+ (hb:bnum q1 r1 q2 r2≠0) (hc:cnum q1 r1 s1 t1 q2 r2 s2 t2=0) :
+ (anum q1 r1 s1 t1 q2 r2 s2 t2/bnum q1 r1 q2 r2)*(q1-q2)=s1-s2 ∧
+ (anum q1 r1 s1 t1 q2 r2 s2 t2/bnum q1 r1 q2 r2)*(r1-r2)=t1-t2 := by
+ have hq:=numerator_q q1 r1 s1 t1 q2 r2 s2 t2
+ have hr:=numerator_r q1 r1 s1 t1 q2 r2 s2 t2
+ rw [hc,mul_zero] at hq hr
+ constructor
+ · rw [div_mul_eq_mul_div]
+   apply (div_eq_iff hb).mpr
+   simpa only [mul_comm] using sub_eq_zero.mp hq
+ · rw [div_mul_eq_mul_div]
+   apply (div_eq_iff hb).mpr
+   simpa only [mul_comm] using sub_eq_zero.mp hr
+
+theorem common_interpolant (q1 r1 s1 t1 q2 r2 s2 t2 : K)
+ (hb:bnum q1 r1 q2 r2≠0) (hc:cnum q1 r1 s1 t1 q2 r2 s2 t2=0) :
+ ordinate s1 t1-C (anum q1 r1 s1 t1 q2 r2 s2 t2/bnum q1 r1 q2 r2)*support q1 r1 =
+ ordinate s2 t2-C (anum q1 r1 s1 t1 q2 r2 s2 t2/bnum q1 r1 q2 r2)*support q2 r2 := by
+ let a:=anum q1 r1 s1 t1 q2 r2 s2 t2/bnum q1 r1 q2 r2
+ obtain ⟨hq,hr⟩:=interpolation_coefficients q1 r1 s1 t1 q2 r2 s2 t2 hb hc
+ change a*(q1-q2)=s1-s2 at hq
+ change a*(r1-r2)=t1-t2 at hr
+ change ordinate s1 t1-C a*support q1 r1=ordinate s2 t2-C a*support q2 r2
+ apply sub_eq_zero.mp
+ calc
+  (ordinate s1 t1-C a*support q1 r1)-(ordinate s2 t2-C a*support q2 r2) =
+   C (s1-s2-a*(q1-q2))*X+C (t1-t2-a*(r1-r2)) := by
+    simp only [ordinate,support,map_sub,map_mul];ring
+  _=0 := by rw [hq,hr];simp
+
+theorem bezout_numerator (q1 r1 q2 r2 : K) :
+ (C (q1-q2)*X+C ((q1-q2)*q2-(r1-r2)))*(support q1 r1-support q2 r2)-
+ C ((q1-q2)^2)*support q2 r2=C (bnum q1 r1 q2 r2) := by
+ simp only [support,bnum,map_sub,map_mul,map_pow];ring
+
+theorem support_bezout (q1 r1 q2 r2 : K) (hb:bnum q1 r1 q2 r2≠0) :
+ ∃ s t : K[X],s*support q1 r1+t*support q2 r2=1 := by
+ let l:K[X]:=C (q1-q2)*X+C ((q1-q2)*q2-(r1-r2))
+ refine ⟨C ((bnum q1 r1 q2 r2)⁻¹)*l,
+  -(C ((bnum q1 r1 q2 r2)⁻¹)*(l+C ((q1-q2)^2))),?_⟩
+ calc
+  _=C ((bnum q1 r1 q2 r2)⁻¹)*(l*(support q1 r1-support q2 r2)-C ((q1-q2)^2)*support q2 r2) := by ring
+  _=C ((bnum q1 r1 q2 r2)⁻¹)*C (bnum q1 r1 q2 r2) := by rw [show l*(support q1 r1-support q2 r2)-C ((q1-q2)^2)*support q2 r2=C (bnum q1 r1 q2 r2) from bezout_numerator q1 r1 q2 r2]
+  _=1 := by rw [←map_mul,inv_mul_cancel₀ hb];simp
+
+theorem support_coprime (q1 r1 q2 r2 : K) (hb:bnum q1 r1 q2 r2≠0) :
+ IsCoprime (support q1 r1) (support q2 r2) := support_bezout q1 r1 q2 r2 hb
+
+theorem residual_preserved (u v f : K[X]) (a : K) (h:u∣f-v^2) :
+ u∣f-(v-C a*u)^2 := by
+ rcases h with ⟨t,ht⟩
+ refine ⟨t+2*C a*v-(C a)^2*u,?_⟩
+ calc
+  f-(v-C a*u)^2=(f-v^2)+u*(2*C a*v-(C a)^2*u) := by ring
+  _=u*(t+2*C a*v-(C a)^2*u) := by rw [ht];ring
+
+theorem product_divides_residual (q1 r1 s1 t1 q2 r2 s2 t2 : K) (f:K[X])
+ (hb:bnum q1 r1 q2 r2≠0) (hc:cnum q1 r1 s1 t1 q2 r2 s2 t2=0)
+ (h1:support q1 r1∣f-(ordinate s1 t1)^2)
+ (h2:support q2 r2∣f-(ordinate s2 t2)^2) :
+ support q1 r1*support q2 r2∣f-(ordinate s1 t1-
+ C (anum q1 r1 s1 t1 q2 r2 s2 t2/bnum q1 r1 q2 r2)*support q1 r1)^2 := by
+ apply (support_coprime q1 r1 q2 r2 hb).mul_dvd
+ · exact residual_preserved _ _ _ _ h1
+ · rw [common_interpolant q1 r1 s1 t1 q2 r2 s2 t2 hb hc]
+   exact residual_preserved _ _ _ _ h2
+end CZeroInterpolation

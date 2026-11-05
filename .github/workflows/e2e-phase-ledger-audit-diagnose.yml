@@ -1,0 +1,124 @@
+name: Diagnose fixed E2E phase-ledger audit receipt
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      AWS_REGION: ${{ vars.ISOLAB_AWS_REGION }}
+      ISOLAB_BUCKET: ${{ vars.ISOLAB_RESULTS_BUCKET }}
+      ISOLAB_PROJECT: ${{ vars.ISOLAB_CODEBUILD_PROJECT }}
+      SCRIPT_PATH: research/e2e_phase_ledger_20261101/diagnostic/diagnose-target1-audit
+      SCRIPT_SHA256: f4fc1740115b745f548054af61b5571c215c7bec1513d3c4a2c35e124870d6f0
+      BUILDSPEC_PATH: research/e2e_phase_ledger_20261101/diagnostic/target1-audit-buildspec.yml
+      BUILDSPEC_SHA256: 10680f8ca6a9208488e94194e34ef91e49a2e0690113422bce74979adacc9b7b
+      JOB_NAME: gh-41343654905-1
+      LAUNCHER_ID: a518dca6-0894-4dce-bc3c-5bf02a165242
+      REQUEST_SHA256: 3516bd65ea320e1d5555def621f8130684312f8a9eef654dc89d5e28f790ce19
+      SOURCE_REVISION: 32303a6d51d7a43ce887cd9da8f6d82afea4793c
+      ECBENCH_SHA256: f3aab23417ece64cb3373e5c66d2c3be343e18c0e89347f626e0aea18ab1b774
+      ORIGINAL_WORKFLOW_RUN: '41343654905'
+      JOB_UID: d5c4f94f-7171-46a0-a14f-e5cb7e213dca
+      POD_UID: 9a1f74a1-2ae0-4dd3-ab1e-51fa771eca69
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Verify and test the fixed diagnostic payloads
+        run: |
+          set -euo pipefail
+          [[ $(sha256sum "$SCRIPT_PATH" | cut -d ' ' -f1) == "$SCRIPT_SHA256" ]]
+          [[ $(sha256sum "$BUILDSPEC_PATH" | cut -d ' ' -f1) == "$BUILDSPEC_SHA256" ]]
+          bash -n "$SCRIPT_PATH" \
+            research/e2e_phase_ledger_20261101/diagnostic/test-diagnose-target1-audit.sh
+          research/e2e_phase_ledger_20261101/diagnostic/test-diagnose-target1-audit.sh
+      - name: Obtain temporary diagnostic credentials
+        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5
+        with:
+          role-to-assume: ${{ vars.ISOLAB_TRIGGER_ROLE_ARN }}
+          role-session-name: e2e-audit-diagnose-${{ github.run_id }}
+          role-duration-seconds: 1800
+          aws-region: ${{ env.AWS_REGION }}
+          mask-aws-account-id: true
+      - name: Publish the reviewed hash-pinned diagnostic
+        run: |
+          set -euo pipefail
+          aws s3 cp "$SCRIPT_PATH" \
+            "s3://$ISOLAB_BUCKET/inputs/requests/$SCRIPT_SHA256.audit-diagnose" \
+            --only-show-errors
+          aws s3 cp "$BUILDSPEC_PATH" \
+            "s3://$ISOLAB_BUCKET/inputs/requests/$BUILDSPEC_SHA256.buildspec.yml" \
+            --only-show-errors
+      - name: Run the receipt-only CodeBuild diagnosis
+        run: |
+          set -euo pipefail
+          buildspec_arn="arn:aws:s3:::$ISOLAB_BUCKET/inputs/requests/$BUILDSPEC_SHA256.buildspec.yml"
+          jq -n --arg project "$ISOLAB_PROJECT" --arg token "$BUILDSPEC_SHA256" \
+            --arg buildspec "$buildspec_arn" \
+            '{projectName:$project,idempotencyToken:$token,buildspecOverride:$buildspec}' \
+            > "$RUNNER_TEMP/start-audit-diagnosis.json"
+          aws codebuild start-build \
+            --cli-input-json "file://$RUNNER_TEMP/start-audit-diagnosis.json" \
+            > "$RUNNER_TEMP/audit-build-start.json"
+          build_id=$(jq -er .build.id "$RUNNER_TEMP/audit-build-start.json")
+          [[ "$build_id" =~ ^isolab-experiment-launcher:([a-f0-9-]{36})$ ]]
+          diagnostic_id=${BASH_REMATCH[1]}
+
+          deadline=$((SECONDS+900))
+          status=IN_PROGRESS
+          while (( SECONDS < deadline )); do
+            aws codebuild batch-get-builds --ids "$build_id" \
+              > "$RUNNER_TEMP/audit-build.json"
+            status=$(jq -er --arg id "$build_id" '
+              .builds|select(length==1 and .[0].id==$id)|.[0].buildStatus
+            ' "$RUNNER_TEMP/audit-build.json")
+            [[ "$status" != IN_PROGRESS ]] && break
+            sleep 10
+          done
+          [[ "$status" == SUCCEEDED ]]
+
+          mkdir -p diagnosis
+          aws s3 cp \
+            "s3://$ISOLAB_BUCKET/runs/$JOB_NAME/launcher/$diagnostic_id/audit-summary.json" \
+            diagnosis/audit-summary.json --only-show-errors
+          jq -e --argjson workflow "$ORIGINAL_WORKFLOW_RUN" --arg job "$JOB_NAME" \
+            --arg launcher "$LAUNCHER_ID" --arg diagnostic "$diagnostic_id" \
+            --arg request "$REQUEST_SHA256" --arg source "$SOURCE_REVISION" \
+            --arg binary "$ECBENCH_SHA256" --arg job_uid "$JOB_UID" --arg pod "$POD_UID" '
+            .schema=="isolab.eks.audit-receipt-diagnosis/v1"
+            and .workflow_run==$workflow and .job_name==$job and .job_uid==$job_uid
+            and .pod_uid==$pod and .launcher_id==$launcher
+            and .diagnostic_launcher_id==$diagnostic and .request_sha256==$request
+            and .source_revision==$source and .ecbench_sha256==$binary
+            and .pod_exit_code==41 and .manifest_verified==true
+            and .classification=="native_audit_gate_exact_predicates"
+            and (.failed_predicates|type)=="array" and (.failed_predicates|length)>0
+            and all(.failed_predicates[];
+              .=="ok" or .=="regraded" or .=="records_bound"
+              or .=="records_positive" or .=="verified_records_equal_records"
+              or .=="replay_count_positive" or .=="all_replays_reproduced")
+            and .experiment_retry==false
+          ' diagnosis/audit-summary.json >/dev/null
+      - name: Summarize the exact failed predicates
+        run: |
+          set -euo pipefail
+          jq -r '"Target-1 native audit failed: **\(.failed_predicates|join(", "))**.\n\nNo experiment retry occurred. Raw records, problem text, timing values, stdout and stderr remain private."' \
+            diagnosis/audit-summary.json >> "$GITHUB_STEP_SUMMARY"
+          jq -c '{allowlisted_audit_diagnosis:.}' diagnosis/audit-summary.json
+      - name: Retain only the allowlisted audit diagnosis
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: e2e-phase-ledger-audit-diagnosis
+          path: diagnosis/audit-summary.json
+          if-no-files-found: error
+          retention-days: 30

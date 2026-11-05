@@ -726,10 +726,26 @@ impl Backend for BudgetedS3Backend {
     fn head(&self, key: &str) -> Result<Option<Meta>, String> {
         let key = self.key(key)?;
         let expected = self.context.expected(&self.bucket, &key)?;
-        self.context
-            .head_object(&self.bucket, &key, &expected, &self.scope)
+        let mut meta = self
+            .context
+            .head_object(&self.bucket, &key, &expected, &self.scope)?;
+        if let Some(meta) = meta.as_mut() {
+            if meta.sha256.is_none() {
+                // HEAD may omit digest metadata. Establish it from a bounded,
+                // charged full GET before satisfying Store's digest contract.
+                self.context.get_body(
+                    &self.bucket,
+                    &key,
+                    &expected,
+                    &self.scope,
+                    &mut std::io::sink(),
+                )?;
+                meta.sha256 = Some(expected.sha256.clone());
+            }
+        }
+        Ok(meta)
     }
-    fn put(&self, key: &str, src: &Path, digest: &str) -> Result<(), String> {
+    fn put(&self, key: &str, src: &Path, digest: &str) -> Result<bool, String> {
         let key = self.key(key)?;
         let (actual, bytes) = crate::store::hash_file(src)?;
         if actual != digest {
@@ -758,7 +774,11 @@ impl Backend for BudgetedS3Backend {
         )?;
         self.context
             .session
-            .verify_object(&reservation, &ticket, digest, bytes)
+            .verify_object(&reservation, &ticket, digest, bytes)?;
+        // The budgeted transport writes unconditionally and verifies the bytes
+        // it read back; it does not distinguish a writer that won a race, so it
+        // reports that this call performed the store.
+        Ok(true)
     }
     fn get(&self, key: &str, dest: &Path) -> Result<(), String> {
         let key = self.key(key)?;

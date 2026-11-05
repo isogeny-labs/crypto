@@ -1,0 +1,86 @@
+[
+  {
+    "branch": "add11",
+    "lines": "511\u2013530",
+    "guard": "same x; inverse first, equal second, otherwise distinct",
+    "status": "field ordinate alternatives and validity still to connect",
+    "source": "research/projective_law_followup_20261022/src/bin/projective_law_gate.rs"
+  },
+  {
+    "branch": "add12_generic",
+    "lines": "232\u2013290",
+    "guard": "K!=0",
+    "status": "output nonzero weights follow from factors; numerator validity open",
+    "source": "research/projective_law_followup_20261022/src/bin/projective_law_gate.rs"
+  },
+  {
+    "branch": "add12_complete",
+    "lines": "828\u2013878",
+    "guard": "K=0; inverse/equal; repeated support or distinct",
+    "status": "extracted point validity, tripling and secondary K guard open",
+    "source": "research/projective_law_followup_20261022/src/bin/projective_law_gate.rs"
+  },
+  {
+    "branch": "same_u_inverse",
+    "lines": "921\u2013924",
+    "guard": "q1c=q2c,r1c=r2c; v1c=-v2c",
+    "status": "identity invariant direct; class semantics separate",
+    "source": "research/projective_law_followup_20261022/src/bin/projective_law_gate.rs"
+  },
+  {
+    "branch": "same_u_equal",
+    "lines": "925\u2013928",
+    "guard": "same support and equal v after inverse excluded",
+    "status": "delegates doubling",
+    "source": "research/projective_law_followup_20261022/src/bin/projective_law_gate.rs"
+  },
+  {
+    "branch": "same_u_mixed",
+    "lines": "929\u2013953",
+    "guard": "same support, neither equal nor inverse",
+    "status": "existing weighted theorem excludes zero slope; extraction validity open",
+    "source": "research/projective_law_followup_20261022/src/bin/projective_law_gate.rs"
+  },
+  {
+    "branch": "shared_zero_q",
+    "lines": "961\u2013967",
+    "guard": "different support; B=0,dq=0",
+    "status": "new Lean field theorem excludes guard",
+    "source": "research/projective_law_followup_20261022/src/bin/projective_law_gate.rs"
+  },
+  {
+    "branch": "shared_cancel",
+    "lines": "968\u2013993",
+    "guard": "B=0,dq!=0,opposite shared ordinate",
+    "status": "extracted point validity and add11 closure open",
+    "source": "research/projective_law_followup_20261022/src/bin/projective_law_gate.rs"
+  },
+  {
+    "branch": "shared_positive",
+    "lines": "994\u20131007",
+    "guard": "equal shared ordinate, compose dbl and two additions",
+    "status": "mismatch and secondary None exclusions remain",
+    "source": "research/projective_law_followup_20261022/src/bin/projective_law_gate.rs"
+  },
+  {
+    "branch": "distinct_drop",
+    "lines": "1009\u20131030",
+    "guard": "B!=0,C=0",
+    "status": "weights nonzero algebraically; output validity open",
+    "source": "research/projective_law_followup_20261022/src/bin/projective_law_gate.rs"
+  },
+  {
+    "branch": "distinct_common",
+    "lines": "1031",
+    "guard": "B!=0,C!=0",
+    "status": "weights nonzero algebraically; full source/validity bridge open",
+    "source": "research/projective_law_followup_20261022/src/bin/projective_law_gate.rs"
+  },
+  {
+    "branch": "double",
+    "lines": "727\u2013827",
+    "guard": "B=0 split S; B!=0 split C",
+    "status": "extracted-point branch needs validity/nonzero ordinate; remaining weights factor",
+    "source": "research/projective_law_followup_20261022/src/bin/projective_law_gate.rs"
+  }
+]

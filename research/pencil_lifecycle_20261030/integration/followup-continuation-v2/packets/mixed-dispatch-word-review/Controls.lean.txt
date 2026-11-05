@@ -1,0 +1,87 @@
+import WordDispatch
+open Polynomial PencilWordRefinement FullMixed
+instance : Fact (7:UInt64).toNat.Prime := ⟨by decide⟩
+example : (dispatch 7 1 0 0 1 ⟨0,1,1,1⟩ ⟨0,1,0,1,1,1⟩).2=.common := by decide
+example : (dispatch 7 1 6 0 0 ⟨0,6,1,1⟩ ⟨6,0,0,1,1,1⟩).2=.cancellation := by decide
+example : (dispatch 7 1 6 0 0 ⟨0,1,1,1⟩ ⟨6,0,0,1,1,1⟩).2=.positiveDistinct := by decide
+example : (dispatch 7 1 0 0 0 ⟨0,1,1,1⟩ ⟨0,0,0,1,1,1⟩).2=.tripling := by decide
+example : (dispatch 7 0 0 0 0 ⟨0,0,1,1⟩ ⟨0,0,0,0,1,1⟩).2=.cancellation := by decide
+example : dispatch 7 1 0 0 0 ⟨0,2,1,1⟩ ⟨0,0,0,1,1,1⟩=(none,.mismatch) := by rfl
+example : ∃ v tag, dispatch 7 1 0 0 1 ⟨0,1,1,1⟩ ⟨0,1,0,1,1,1⟩=(some v,tag) ∧
+ valid 7 (MixedGeneric.curve (1:ZMod (7:UInt64).toNat) 0 0 1) v ∧ tag≠.mismatch := by
+ apply source_order_total_valid 7 (by decide) (by decide)
+ · decide
+ · decide
+ · decide
+ · decide
+ · unfold WordD1.canonical;decide
+ · unfold WeightedWord.canonical;decide
+ · decide
+ · decide
+ · decide
+ · decide
+ · norm_num [WordD1.normalizedValid,MixedCancellation.validPoint,WordD1.decode,WeightedAdd11.nx,WeightedAdd11.ny]
+   refine ⟨X^4+X^2,?_⟩;simp [MixedGeneric.curve];ring
+ · norm_num [WeightedWord.normalizedValid,MixedCancellation.validTwo,WeightedWord.decodeTwo,MixedCancellation.nq,MixedCancellation.nr,MixedCancellation.ns,MixedCancellation.nt,MixedCancellation.support,MixedCancellation.ordinate]
+   refine ⟨X^3,?_⟩;simp [MixedGeneric.curve];ring
+example : ∃ v tag, dispatch 7 1 0 0 0 ⟨0,1,1,1⟩ ⟨0,0,0,1,1,1⟩=(some v,tag) ∧
+ valid 7 (MixedGeneric.curve (1:ZMod (7:UInt64).toNat) 0 0 0) v ∧ tag≠.mismatch := by
+ apply source_order_total_valid 7 (by decide) (by decide)
+ · decide
+ · decide
+ · decide
+ · decide
+ · unfold WordD1.canonical;decide
+ · unfold WeightedWord.canonical;decide
+ · decide
+ · decide
+ · decide
+ · decide
+ · norm_num [WordD1.normalizedValid,MixedCancellation.validPoint,WordD1.decode,WeightedAdd11.nx,WeightedAdd11.ny]
+   refine ⟨X^4,?_⟩;simp [MixedGeneric.curve];ring
+ · norm_num [WeightedWord.normalizedValid,MixedCancellation.validTwo,WeightedWord.decodeTwo,MixedCancellation.nq,MixedCancellation.nr,MixedCancellation.ns,MixedCancellation.nt,MixedCancellation.support,MixedCancellation.ordinate]
+   refine ⟨X^3,?_⟩;simp [MixedGeneric.curve];ring
+
+example : ∃ v tag, dispatch 7 1 6 0 0 ⟨0,6,1,1⟩ ⟨6,0,0,1,1,1⟩=(some v,tag) ∧
+ valid 7 (MixedGeneric.curve (1:ZMod (7:UInt64).toNat) 6 0 0) v ∧ tag≠.mismatch := by
+ apply source_order_total_valid 7 (by decide) (by decide)
+ · decide
+ · decide
+ · decide
+ · decide
+ · unfold WordD1.canonical;decide
+ · unfold WeightedWord.canonical;decide
+ · decide
+ · decide
+ · decide
+ · decide
+ · norm_num [WordD1.normalizedValid,MixedCancellation.validPoint,WordD1.decode,WeightedAdd11.nx,WeightedAdd11.ny]
+   refine ⟨X^4-1,?_⟩
+   have h6 : (6:ZMod (7:UInt64).toNat)= -1 := by decide
+   simp [MixedGeneric.curve,h6];ring
+ · norm_num [WeightedWord.normalizedValid,MixedCancellation.validTwo,WeightedWord.decodeTwo,MixedCancellation.nq,MixedCancellation.nr,MixedCancellation.ns,MixedCancellation.nt,MixedCancellation.support,MixedCancellation.ordinate]
+   refine ⟨X^3+X^2+X+1,?_⟩
+   have h6 : (6:ZMod (7:UInt64).toNat)= -1 := by decide
+   simp [MixedGeneric.curve,h6];ring
+
+example : ∃ v tag, dispatch 7 1 6 0 0 ⟨0,1,1,1⟩ ⟨6,0,0,1,1,1⟩=(some v,tag) ∧
+ valid 7 (MixedGeneric.curve (1:ZMod (7:UInt64).toNat) 6 0 0) v ∧ tag≠.mismatch := by
+ apply source_order_total_valid 7 (by decide) (by decide)
+ · decide
+ · decide
+ · decide
+ · decide
+ · unfold WordD1.canonical;decide
+ · unfold WeightedWord.canonical;decide
+ · decide
+ · decide
+ · decide
+ · decide
+ · norm_num [WordD1.normalizedValid,MixedCancellation.validPoint,WordD1.decode,WeightedAdd11.nx,WeightedAdd11.ny]
+   refine ⟨X^4-1,?_⟩
+   have h6 : (6:ZMod (7:UInt64).toNat)= -1 := by decide
+   simp [MixedGeneric.curve,h6];ring
+ · norm_num [WeightedWord.normalizedValid,MixedCancellation.validTwo,WeightedWord.decodeTwo,MixedCancellation.nq,MixedCancellation.nr,MixedCancellation.ns,MixedCancellation.nt,MixedCancellation.support,MixedCancellation.ordinate]
+   refine ⟨X^3+X^2+X+1,?_⟩
+   have h6 : (6:ZMod (7:UInt64).toNat)= -1 := by decide
+   simp [MixedGeneric.curve,h6];ring

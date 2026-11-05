@@ -1,0 +1,15 @@
+# Concrete checkpoint scope for the follow-up
+
+The proposed branch is `codex/twist-collector-and-slope`. The prior upload authorization applies only to the old branch `codex/quadratic-twist-evidence-import` and cannot be transferred automatically.
+
+Requested additional scope, not yet authorized:
+
+    s3://setec-astronomy-artifacts/checkpoints/crypto/codex__twist-collector-and-slope/
+
+Only same-branch start, finish/failure and plan-change checkpoint writes through the CURRENT UNMODIFIED `scripts/checkpoint.sh` are proposed. This does not request arbitrary result assets, other branches, paid compute, an alternate uploader, broad AWS credential reuse or a gate exception. Existing private credential material must never enter Git, a PR, logs, archives or task metadata. No token values are read or copied here.
+
+[AGENTS.md, Resume checkpoints](../../AGENTS.md#resume-checkpoints-in-s3-before-every-run) requires Codex to run `scripts/checkpoint.sh gate` before a scientific launch and not launch on failure. The gate uploads. No scientific/proof run, gate call or upload is made on this new branch before authorization. A secure token's presence alone neither grants scope nor establishes a successful checkpoint.
+
+An automatic approval review rejected advancing the merged PR2381 worktree under the earlier stop-on-merge/preserve-branch instructions. That combined command was rejected before execution, including its proposed cache cleanup. The safer implementation uses a separate minimal worktree/branch from main and preserves the old worktree/head and all old records. No rejected old-branch operation is retried or disguised.
+
+Conductor CLI is unavailable in the present workspace, and the applicable connected-tool search exposes no coordinator. No task, lease, reservation or local replacement is claimed. New cards stay draft. Current source/proof/runtime/registry and signed PCC gates still apply after checkpoint scope is approved.

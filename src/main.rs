@@ -3255,7 +3255,7 @@ fn cmd_cryptanalysis(op: CryptanalysisOp) {
             };
             fn truncate(state: &mut [u8], bits: u32) {
                 let bytes = (bits as usize).div_ceil(8);
-                if bits % 8 != 0 {
+                if !bits.is_multiple_of(8) {
                     state[bytes - 1] &= 0xff >> (8 - bits % 8);
                 }
                 state[bytes..].fill(0);
@@ -3643,6 +3643,7 @@ fn load_hash_input(
     }
 }
 
+#[allow(clippy::large_enum_variant)]
 enum StreamingHash {
     Md(Merkle64),
     Sha1(crypto_lib::hash::sha1::Sha1),

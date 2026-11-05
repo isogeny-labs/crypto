@@ -1,0 +1,23 @@
+/var/tmp/pencil-find-count-20261101-v1/WordCounter.lean:11:74: warning: This simp argument is unused:
+  Nat.add_left_comm
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [ticks, ih, UInt64.toNat_add, Nat.add_mod, Nat.add_assoc, Nat.add_comm]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-find-count-20261101-v1/WordCounter.lean:14:87: error: unsolved goals
+c : UInt64
+a b : ℕ
+⊢ ((c.toNat % UInt64.size + a % UInt64.size % UInt64.size) % UInt64.size % UInt64.size +
+        b % UInt64.size % UInt64.size) %
+      UInt64.size =
+    (c.toNat % UInt64.size +
+        (a % UInt64.size % UInt64.size + b % UInt64.size % UInt64.size) % UInt64.size % UInt64.size) %
+      UInt64.size
+/var/tmp/pencil-find-count-20261101-v1/WordCounter.lean:16:29: warning: This simp argument is unused:
+  Nat.add_assoc
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [ticks_mod, Nat.add_mod]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

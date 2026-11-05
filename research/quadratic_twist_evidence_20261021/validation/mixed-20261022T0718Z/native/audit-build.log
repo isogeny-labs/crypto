@@ -1,0 +1,29 @@
+     Locking 16 packages to highest compatible versions
+      Adding num-bigint v0.4.8 (available: v0.5.1)
+   Compiling proc-macro2 v1.0.107
+   Compiling autocfg v1.5.1
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.27
+   Compiling num-traits v0.2.19
+   Compiling serde_core v1.0.229
+   Compiling zmij v1.0.23
+   Compiling syn v3.0.9
+   Compiling serde v1.0.229
+   Compiling serde_json v1.0.154
+   Compiling serde_derive v1.0.229
+   Compiling num-integer v0.1.47
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling num-bigint v0.4.8
+   Compiling hex v0.4.3
+   Compiling quadratic-twist-mixed-audit v0.1.0 (/workspace/crypto-next/research/quadratic_twist_evidence_20261021/native/mixed-audit)
+error[E0365]: `sha_backend` is only public within the crate, and cannot be re-exported outside
+ --> main.rs:6:24
+  |
+6 | pub mod hash { pub use crate::sha_backend as sha256; }
+  |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ re-export of crate public `sha_backend`
+  |
+  = note: consider declaring type or module `sha_backend` with `pub`
+
+For more information about this error, try `rustc --explain E0365`.
+error: could not compile `quadratic-twist-mixed-audit` (bin "quadratic-twist-mixed-audit") due to 1 previous error

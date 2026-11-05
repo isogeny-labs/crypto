@@ -1,0 +1,62 @@
+card: CARD-BLINDSPOT-07-03 (sha256 4fa260da96b8b61034779ac63acbac07bc11661002856395a5c47e71742a1f6d)
+commit: 6f1acb018185dc9ccbf664e76ab7461b60e90203
+receipt: research/blindspots_20261018/07-blocked-f4-degree-cells/raw/receipt-card-03.json sha256 d4c3dd736834c2d2d14f525d0ea886eaaded533ec3f051da9a340b04ce41a059
+status: completed
+command 1 (make-bin-dir): ["mkdir", "-p", "target/blindspots-07/card-03"] exit 0 (0.002 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 2 (build): ["prlimit", "--as=7516192768", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "target-cpu=native", "-o", "target/blindspots-07/card-03/b07", "examples/blindspots_07_blocked_closure.rs"] exit 0 (2.709 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 3 (r-13-4-4-d1): ["prlimit", "--as=7516192768", "target/blindspots-07/card-03/b07", "closure", "--m", "4", "--n", "13", "--ell", "4", "--basis", "2413,4258,5285,4071", "--xr", "3176", "--from", "3", "--to", "4", "--label", "r-13-4-4-d1", "--time-limit", "300", "--expect-solutions", "0"] exit 0 (93.033 s) succeeded
+  stdout sha256 9bca3e07a228a6cc7097a7c2296b50e39a544006578ded96971260dbccaeb3d6; last 4 lines:
+    {"tool":"b07","mode":"count","cell":"r-13-4-4-d1","solutions":0}
+    {"tool":"b07","cell":"r-13-4-4-d1","m":4,"n":13,"ell":4,"n_vars":42,"degree":3,"columns":12384,"status":"saturated","refuted":false,"rank":1799,"products":2656,"seed_rows":39,"chunks":4,"falls":64,"new_pivots":1799,"word_ops":2071844,"word_ops_forward":160712,"word_ops_block":1358509,"word_ops_pass":552623,"hits_forward":2808,"bytes_pass":2052784,"bytes_read_forward":1285696,"basis_bytes_peak":1573392,"rss_peak_kb":6924,"secs":0.009,"secs_forward":0.001,"secs_block":0.003,"secs_pass":0.002,"chunk_rows":4096,"tile_words":256,"order":2}
+    {"tool":"b07","cell":"r-13-4-4-d1","m":4,"n":13,"ell":4,"n_vars":42,"degree":4,"columns":124314,"status":"refuted","refuted":true,"rank":123774,"products":374374,"seed_rows":39,"chunks":93,"falls":11859,"new_pivots":123774,"word_ops":81648484442,"word_ops_forward":20823669087,"word_ops_block":12210632151,"word_ops_pass":48614183204,"hits_forward":39404741,"bytes_pass":55177925912,"bytes_read_forward":166589352696,"basis_bytes_peak":966744056,"rss_peak_kb":1153288,"secs":92.938,"secs_forward":23.027,"secs_block":9.149,"secs_pass":58.458,"chunk_rows":4096,"tile_words":256,"order":2}
+    {"tool":"b07","mode":"closure-summary","cell":"r-13-4-4-d1","closure_degree":4,"last_status":"refuted","rss_peak_kb":1152872}
+  stderr last 4 lines:
+      [21s] rank 77075 products 120460 pending 3719 basis 521 MiB vm 600 MiB rss-peak 598 MiB
+      [42s] rank 107938 products 226955 pending 3157 basis 795 MiB vm 853 MiB rss-peak 853 MiB
+      [62s] rank 112619 products 349818 pending 420 basis 844 MiB vm 921 MiB rss-peak 919 MiB
+      [85s] rank 120952 products 370297 pending 1473 basis 914 MiB vm 1021 MiB rss-peak 1022 MiB
+command 4 (r-13-4-4-d3): ["prlimit", "--as=7516192768", "target/blindspots-07/card-03/b07", "closure", "--m", "4", "--n", "13", "--ell", "4", "--basis", "1906,1086,4355,1168", "--xr", "4358", "--from", "3", "--to", "4", "--label", "r-13-4-4-d3", "--time-limit", "300", "--expect-solutions", "0"] exit 0 (88.68 s) succeeded
+  stdout sha256 2f201a4e0bf17193bd74e6824cb3b0427e14d8fd824e316900440b2ae38ea811; last 4 lines:
+    {"tool":"b07","mode":"count","cell":"r-13-4-4-d3","solutions":0}
+    {"tool":"b07","cell":"r-13-4-4-d3","m":4,"n":13,"ell":4,"n_vars":42,"degree":3,"columns":12384,"status":"saturated","refuted":false,"rank":1799,"products":2655,"seed_rows":39,"chunks":4,"falls":64,"new_pivots":1799,"word_ops":2180129,"word_ops_forward":155853,"word_ops_block":1426892,"word_ops_pass":597384,"hits_forward":2721,"bytes_pass":2053720,"bytes_read_forward":1246824,"basis_bytes_peak":1572736,"rss_peak_kb":6780,"secs":0.007,"secs_forward":0.001,"secs_block":0.003,"secs_pass":0.001,"chunk_rows":4096,"tile_words":256,"order":2}
+    {"tool":"b07","cell":"r-13-4-4-d3","m":4,"n":13,"ell":4,"n_vars":42,"degree":4,"columns":124314,"status":"refuted","refuted":true,"rank":123792,"products":374374,"seed_rows":39,"chunks":93,"falls":11878,"new_pivots":123792,"word_ops":87808676496,"word_ops_forward":19327557500,"word_ops_block":10830629669,"word_ops_pass":57650489327,"hits_forward":33919995,"bytes_pass":42817555448,"bytes_read_forward":154620460000,"basis_bytes_peak":966752080,"rss_peak_kb":1146560,"secs":88.600,"secs_forward":22.468,"secs_block":7.927,"secs_pass":56.311,"chunk_rows":4096,"tile_words":256,"order":2}
+    {"tool":"b07","mode":"closure-summary","cell":"r-13-4-4-d3","closure_degree":4,"last_status":"refuted","rss_peak_kb":1146560}
+  stderr last 3 lines:
+      [21s] rank 85870 products 190079 pending 1365 basis 605 MiB vm 671 MiB rss-peak 670 MiB
+      [45s] rank 109016 products 239214 pending 2908 basis 809 MiB vm 858 MiB rss-peak 858 MiB
+      [65s] rank 115157 products 358009 pending 293 basis 873 MiB vm 923 MiB rss-peak 934 MiB
+command 5 (r-13-4-4-d4): ["prlimit", "--as=7516192768", "target/blindspots-07/card-03/b07", "closure", "--m", "4", "--n", "13", "--ell", "4", "--basis", "7718,7444,1234,577", "--xr", "7868", "--from", "3", "--to", "4", "--label", "r-13-4-4-d4", "--time-limit", "300", "--expect-solutions", "0"] exit 0 (65.407 s) succeeded
+  stdout sha256 f1d89da0b22e4bdae4801f22b9b6533d7055dda5f8ecbb22a818ee2e5ef3b82f; last 4 lines:
+    {"tool":"b07","mode":"count","cell":"r-13-4-4-d4","solutions":0}
+    {"tool":"b07","cell":"r-13-4-4-d4","m":4,"n":13,"ell":4,"n_vars":42,"degree":3,"columns":12384,"status":"saturated","refuted":false,"rank":1799,"products":2654,"seed_rows":39,"chunks":4,"falls":64,"new_pivots":1799,"word_ops":2109350,"word_ops_forward":143500,"word_ops_block":1394925,"word_ops_pass":570925,"hits_forward":2456,"bytes_pass":2054272,"bytes_read_forward":1148000,"basis_bytes_peak":1575840,"rss_peak_kb":6892,"secs":0.012,"secs_forward":0.002,"secs_block":0.004,"secs_pass":0.002,"chunk_rows":4096,"tile_words":256,"order":2}
+    {"tool":"b07","cell":"r-13-4-4-d4","m":4,"n":13,"ell":4,"n_vars":42,"degree":4,"columns":124314,"status":"refuted","refuted":true,"rank":118547,"products":329318,"seed_rows":39,"chunks":82,"falls":10251,"new_pivots":118547,"word_ops":61002668464,"word_ops_forward":20686462517,"word_ops_block":7729285402,"word_ops_pass":32586920545,"hits_forward":41470100,"bytes_pass":40156823856,"bytes_read_forward":165491700136,"basis_bytes_peak":930014240,"rss_peak_kb":998100,"secs":65.299,"secs_forward":21.230,"secs_block":6.219,"secs_pass":36.171,"chunk_rows":4096,"tile_words":256,"order":2}
+    {"tool":"b07","mode":"closure-summary","cell":"r-13-4-4-d4","closure_degree":4,"last_status":"refuted","rss_peak_kb":998100}
+  stderr last 3 lines:
+      [21s] rank 76569 products 153200 pending 1895 basis 519 MiB vm 569 MiB rss-peak 583 MiB
+      [42s] rank 107593 products 272003 pending 1548 basis 792 MiB vm 861 MiB rss-peak 861 MiB
+      [62s] rank 116442 products 321166 pending 1694 basis 874 MiB vm 942 MiB rss-peak 943 MiB
+command 6 (r-13-4-4-d7): ["prlimit", "--as=7516192768", "target/blindspots-07/card-03/b07", "closure", "--m", "4", "--n", "13", "--ell", "4", "--basis", "4652,4542,7645,3678", "--xr", "4872", "--from", "3", "--to", "4", "--label", "r-13-4-4-d7", "--time-limit", "300", "--expect-solutions", "0"] exit 0 (73.52 s) succeeded
+  stdout sha256 951c816a702244bf87d6a2519a6c8a33e2322cc1911a2224a0f8d0dabb58b5b6; last 4 lines:
+    {"tool":"b07","mode":"count","cell":"r-13-4-4-d7","solutions":0}
+    {"tool":"b07","cell":"r-13-4-4-d7","m":4,"n":13,"ell":4,"n_vars":42,"degree":3,"columns":12384,"status":"saturated","refuted":false,"rank":1798,"products":2656,"seed_rows":39,"chunks":4,"falls":64,"new_pivots":1798,"word_ops":2137430,"word_ops_forward":172163,"word_ops_block":1417434,"word_ops_pass":547833,"hits_forward":2820,"bytes_pass":2053472,"bytes_read_forward":1377304,"basis_bytes_peak":1571552,"rss_peak_kb":6800,"secs":0.008,"secs_forward":0.001,"secs_block":0.003,"secs_pass":0.001,"chunk_rows":4096,"tile_words":256,"order":2}
+    {"tool":"b07","cell":"r-13-4-4-d7","m":4,"n":13,"ell":4,"n_vars":42,"degree":4,"columns":124314,"status":"refuted","refuted":true,"rank":123088,"products":407142,"seed_rows":39,"chunks":101,"falls":11771,"new_pivots":123088,"word_ops":48496392273,"word_ops_forward":14033660176,"word_ops_block":7148964151,"word_ops_pass":27313767946,"hits_forward":26869603,"bytes_pass":62708388000,"bytes_read_forward":112269281408,"basis_bytes_peak":964128576,"rss_peak_kb":1061276,"secs":73.439,"secs_forward":15.860,"secs_block":6.152,"secs_pass":49.558,"chunk_rows":4096,"tile_words":256,"order":2}
+    {"tool":"b07","mode":"closure-summary","cell":"r-13-4-4-d7","closure_degree":4,"last_status":"refuted","rss_peak_kb":1061276}
+  stderr last 3 lines:
+      [20s] rank 82819 products 145007 pending 3388 basis 574 MiB vm 647 MiB rss-peak 646 MiB
+      [42s] rank 111636 products 271982 pending 3072 basis 839 MiB vm 899 MiB rss-peak 899 MiB
+      [62s] rank 117228 products 390789 pending 594 basis 884 MiB vm 961 MiB rss-peak 959 MiB
+command 7 (ctl-19-7-3-d5): ["prlimit", "--as=7516192768", "target/blindspots-07/card-03/b07", "closure", "--m", "3", "--n", "19", "--ell", "7", "--basis", "329653,250842,349714,108170,521272,131570,307542", "--xr", "50138", "--from", "3", "--to", "4", "--label", "ctl-19-7-3-d5", "--time-limit", "300", "--expect-solutions", "0", "--expect-rank", "92838"] exit 0 (59.089 s) succeeded
+  stdout sha256 fbe663787ec47d8b74d5a7dc7650b48bba515c9832278f196702e29dbbd0f2bc; last 4 lines:
+    {"tool":"b07","mode":"count","cell":"ctl-19-7-3-d5","solutions":0}
+    {"tool":"b07","cell":"ctl-19-7-3-d5","m":3,"n":19,"ell":7,"n_vars":40,"degree":3,"columns":10701,"status":"saturated","refuted":false,"rank":2027,"products":2810,"seed_rows":38,"chunks":4,"falls":71,"new_pivots":2027,"word_ops":11217487,"word_ops_forward":676522,"word_ops_block":7356077,"word_ops_pass":3184888,"hits_forward":7945,"bytes_pass":2441624,"bytes_read_forward":5412176,"basis_bytes_peak":1762296,"rss_peak_kb":6672,"secs":0.011,"secs_forward":0.001,"secs_block":0.005,"secs_pass":0.002,"chunk_rows":4096,"tile_words":256,"order":2}
+    {"tool":"b07","cell":"ctl-19-7-3-d5","m":3,"n":19,"ell":7,"n_vars":40,"degree":4,"columns":102091,"status":"saturated","refuted":false,"rank":92838,"products":276231,"seed_rows":38,"chunks":70,"falls":7000,"new_pivots":92838,"word_ops":72083053936,"word_ops_forward":16154260276,"word_ops_block":7693621284,"word_ops_pass":48235172376,"hits_forward":34519227,"bytes_pass":24550473656,"bytes_read_forward":129234082208,"basis_bytes_peak":630080328,"rss_peak_kb":682748,"secs":58.731,"secs_forward":15.976,"secs_block":5.698,"secs_pass":35.819,"chunk_rows":4096,"tile_words":256,"order":2}
+    {"tool":"b07","mode":"closure-summary","cell":"ctl-19-7-3-d5","closure_degree":null,"last_status":"saturated","rss_peak_kb":682748}
+  stderr last 2 lines:
+      [20s] rank 64669 products 120341 pending 2600 basis 373 MiB vm 426 MiB rss-peak 425 MiB
+      [41s] rank 86575 products 243188 pending 394 basis 563 MiB vm 604 MiB rss-peak 614 MiB
+command 8 (remove-bin): ["rm", "-f", "target/blindspots-07/card-03/b07"] exit 0 (0.005 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+command 9 (remove-bin-dir): ["rmdir", "target/blindspots-07/card-03"] exit 0 (0.003 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:

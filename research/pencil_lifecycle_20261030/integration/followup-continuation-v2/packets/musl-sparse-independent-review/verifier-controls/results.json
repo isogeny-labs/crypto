@@ -1,0 +1,42 @@
+{
+  "checker_sha256": "dfaf28b5927423bd3d962cd3c21202db539b6f108bed9fb991de9e602fe4f32e",
+  "controls": [
+    {
+      "case": "valid",
+      "exit": 0,
+      "expected": 0,
+      "receipt": "/var/tmp/pencil-musl-sparse-independent-review-20261031/verifier-controls/valid.json"
+    },
+    {
+      "case": "wrong_bytes",
+      "exit": 1,
+      "expected": 1,
+      "receipt": "/var/tmp/pencil-musl-sparse-independent-review-20261031/verifier-controls/wrong_bytes.json"
+    },
+    {
+      "case": "wrong_exec",
+      "exit": 1,
+      "expected": 1,
+      "receipt": "/var/tmp/pencil-musl-sparse-independent-review-20261031/verifier-controls/wrong_exec.json"
+    },
+    {
+      "case": "missing",
+      "exit": 1,
+      "expected": 1,
+      "receipt": "/var/tmp/pencil-musl-sparse-independent-review-20261031/verifier-controls/missing.json"
+    },
+    {
+      "case": "symlink",
+      "exit": 1,
+      "expected": 1,
+      "receipt": "/var/tmp/pencil-musl-sparse-independent-review-20261031/verifier-controls/symlink.json"
+    },
+    {
+      "case": "untracked_extra",
+      "exit": 0,
+      "expected": 0,
+      "receipt": "/var/tmp/pencil-musl-sparse-independent-review-20261031/verifier-controls/untracked_extra.json"
+    }
+  ],
+  "limit": "selected-file identity checker intentionally does not reject untracked extras; external cleanliness gate required"
+}

@@ -1,0 +1,119 @@
+[
+  {
+    "Id": "sha256:347667d6ecc9294ab7bfcc83411fb47f7548c8d1ca5f7d315cca23fc4b115476",
+    "RepoTags": [
+      "pencil-local-base:467e8502-46d8-4ab9-a13b-8d2375dd2ca2"
+    ],
+    "RepoDigests": [],
+    "Parent": "sha256:b5b3ef81f27b30b2e00012ef15a7f20b486335bbbf59a81a2ad1e86688618d67",
+    "Comment": "",
+    "Created": "2026-10-31T03:34:22.459949538Z",
+    "Container": "9dd36948992291bb369edbce946be21e35f6d1278b3ac2bc3bd112a969c6b26f",
+    "ContainerConfig": {
+      "Hostname": "9dd369489922",
+      "Domainname": "",
+      "User": "1000:1000",
+      "AttachStdin": false,
+      "AttachStdout": false,
+      "AttachStderr": false,
+      "Tty": false,
+      "OpenStdin": false,
+      "StdinOnce": false,
+      "Env": [
+        {
+          "name": "PATH",
+          "sha256": "3df505b4bf853c456422990cd474612e074d20d307e66398a090b4bfa519348b"
+        },
+        {
+          "name": "HOME",
+          "sha256": "ae7d0074884ea604e7fd67c59e982510134609b8460d8bece95274f34f3bf668"
+        }
+      ],
+      "Cmd": [
+        "/bin/sh",
+        "-c",
+        "#(nop) ",
+        "LABEL isolab.local-assembly.phase=base"
+      ],
+      "Image": "sha256:b5b3ef81f27b30b2e00012ef15a7f20b486335bbbf59a81a2ad1e86688618d67",
+      "Volumes": null,
+      "WorkingDir": "/work",
+      "Entrypoint": null,
+      "OnBuild": null,
+      "Labels": {
+        "isolab.local-assembly.owner": "467e8502-46d8-4ab9-a13b-8d2375dd2ca2",
+        "isolab.local-assembly.phase": "base",
+        "org.opencontainers.image.revision": "3c592af96f3916fef3403e4cf173f22b6f7ef536",
+        "org.opencontainers.image.source": "https://github.com/aburan28/crypto"
+      }
+    },
+    "DockerVersion": "25.0.16",
+    "Author": "",
+    "Config": {
+      "Hostname": "",
+      "Domainname": "",
+      "User": "1000:1000",
+      "AttachStdin": false,
+      "AttachStdout": false,
+      "AttachStderr": false,
+      "Tty": false,
+      "OpenStdin": false,
+      "StdinOnce": false,
+      "Env": [
+        {
+          "name": "PATH",
+          "sha256": "3df505b4bf853c456422990cd474612e074d20d307e66398a090b4bfa519348b"
+        },
+        {
+          "name": "HOME",
+          "sha256": "ae7d0074884ea604e7fd67c59e982510134609b8460d8bece95274f34f3bf668"
+        }
+      ],
+      "Cmd": [
+        "/usr/local/bin/ecbench",
+        "--help"
+      ],
+      "Image": "sha256:b5b3ef81f27b30b2e00012ef15a7f20b486335bbbf59a81a2ad1e86688618d67",
+      "Volumes": null,
+      "WorkingDir": "/work",
+      "Entrypoint": null,
+      "OnBuild": null,
+      "Labels": {
+        "isolab.local-assembly.owner": "467e8502-46d8-4ab9-a13b-8d2375dd2ca2",
+        "isolab.local-assembly.phase": "base",
+        "org.opencontainers.image.revision": "3c592af96f3916fef3403e4cf173f22b6f7ef536",
+        "org.opencontainers.image.source": "https://github.com/aburan28/crypto"
+      }
+    },
+    "Architecture": "amd64",
+    "Os": "linux",
+    "Size": 535792872,
+    "GraphDriver": {
+      "Data": {
+        "LowerDir": "/var/lib/docker/overlay2/44a77a6ae9e529e1dd0270d6fd6564013d8cc967a2956fb819c722b0ac063203/diff:/var/lib/docker/overlay2/a7c3f23cc908c85c8686398399d8816d7d42e068c99b07f8f20639c9ed581a4e/diff:/var/lib/docker/overlay2/e08a7295fe26727e75e0768345f0881558bada22fd23c0db3fb06b1fc6d5ec38/diff:/var/lib/docker/overlay2/8588c26b29f8c19916348ba6f90878adfdb81155e00edd1b6cc8324e0c8b4c21/diff:/var/lib/docker/overlay2/a8c0f8b95e18c10ff676d0e8506d94b5ae3f20a89cea6116144537788f0ec524/diff:/var/lib/docker/overlay2/d9a29970af8670878a823e17f3379096addd2ef37e4b37fecd8dfdc2a03eee39/diff:/var/lib/docker/overlay2/e408b3d698dd3257ab3c28eeb5f88fc28d3249f30be2a3e4f4553d804162ae60/diff:/var/lib/docker/overlay2/fb97e3f4cb5227ea0c06dce1ae83b0def5064e990ba25a9398760e811bd6c4fe/diff:/var/lib/docker/overlay2/27358fb42485a85db4a1c946efc1103eb0697520ed9db0857d0e8703ec73907d/diff",
+        "MergedDir": "/var/lib/docker/overlay2/4d16fb90043023944564245f7b32e2ae2efc87f65bbe927a84ebf63c94cd9eb1/merged",
+        "UpperDir": "/var/lib/docker/overlay2/4d16fb90043023944564245f7b32e2ae2efc87f65bbe927a84ebf63c94cd9eb1/diff",
+        "WorkDir": "/var/lib/docker/overlay2/4d16fb90043023944564245f7b32e2ae2efc87f65bbe927a84ebf63c94cd9eb1/work"
+      },
+      "Name": "overlay2"
+    },
+    "RootFS": {
+      "Type": "layers",
+      "Layers": [
+        "sha256:a7f1338342af6f458d3f71d297f7eab630f50e15082a57f26f1dd0c99ebcf46e",
+        "sha256:3c13691c781aaa5c2f803309a8e0c4e16e766c4fb0d845346611ab0e9df70cd5",
+        "sha256:a256ee0545958efd2ef352855d981fc9937c8c406da2fef425e635384711ea4b",
+        "sha256:562057a12c2197efc298cb2b820c03cbc2b9b317361ca748e5c6e1113f887521",
+        "sha256:bad77c75da89d171a85e32cc9ab9919237beb26d12a0df327b99107f2cd8e7fb",
+        "sha256:4c005cd7b321e974793c7515809f4e22a5986ea2b059f9959b7d13fca4b40598",
+        "sha256:2e5601a9d87c9df8e236f226fb04fbb10ce88d68e6633f24405c475118a4b0c1",
+        "sha256:e0fa034e0f0c2ddba76c05524bbd1a67520376c7edf166e674472e7826d730d4",
+        "sha256:0874f9be4d2b0a27b54c618be092fdfd96921b18652003b681a14c9f23de47f2",
+        "sha256:bff7217a78d93c37eff24a8baa2859be2a2e9b7276e1e60c03b14bee47fb47da"
+      ]
+    },
+    "Metadata": {
+      "LastTagTime": "2026-10-31T03:34:22.47258339Z"
+    }
+  }
+]
