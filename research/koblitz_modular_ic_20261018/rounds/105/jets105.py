@@ -92,14 +92,24 @@ def local_f_support(fterms, shift):
     return sorted(out)
 
 
-def g_jets(gterms, shift):
+def full_g_jets(gterms):
     jets = [set() for _ in range(5)]
     for le, ye, den, exps in gterms:
-        if shift == 0 and ye != 0: continue
         for k in range(5):
             if sum(binom_parity(e - den, k) for e in exps) & 1:
-                toggle(jets[k], le)
+                toggle(jets[k], (le, ye))
     return [sorted(j) for j in jets]
+
+
+def project_g_jets(full, shift):
+    out = []
+    for support in full:
+        projected = set()
+        for le, ye in support:
+            if shift == 0 and ye != 0: continue
+            toggle(projected, le)
+        out.append(sorted(projected))
+    return out
 
 
 def divmod2(a, b):
@@ -129,13 +139,16 @@ def main():
     fterms, gterms = parse_source(data.decode("ascii"))
     f0 = local_f_support(fterms, 0)
     f1 = local_f_support(fterms, 1)
-    g0, g1 = g_jets(gterms, 0), g_jets(gterms, 1)
+    gfull = full_g_jets(gterms)
+    g0, g1 = project_g_jets(gfull, 0), project_g_jets(gfull, 1)
     if sorted(z for t, z in f0 if t == 0) != [3, 7]: raise ValueError("R101 f fiber mismatch")
+    if gfull[0] != [(0, 0), (8, 0), (16, 0)]: raise ValueError("R101 full G fiber mismatch")
     if g0[0] != [0, 8, 16] or g1[0] != [0, 8, 16]: raise ValueError("R101 G fiber mismatch")
     result = {"source_sha256": SOURCE_SHA256, "f_terms": len(fterms), "G_terms": len(gterms),
               "f_y0_support": f0, "f_y1_support": f1,
               "f_y0_min_t_by_z": {str(z): min(t for t, zz in f0 if zz == z) for z in range(8)},
               "f_y1_min_t_by_z": {str(z): min(t for t, zz in f1 if zz == z) for z in range(8)},
+              "G_full_jets": gfull,
               "G_y0_lambda_jets": g0, "G_y1_lambda_jets": g1,
               "G_y0_q_orders": [q_order(j) for j in g0], "G_y1_q_orders": [q_order(j) for j in g1]}
     output.mkdir(parents=True, exist_ok=True)
