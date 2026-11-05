@@ -6,13 +6,18 @@ observation and stays an unverified assertion until a CI-signed verdict exists
 
 | file | what it is | status |
 |---|---|---|
-| `validator_report.json` | Task A: headline recomputation (`pcc.validator-report/v1`), second pass: corrected text at `ea2fde0e` | **fail**: 3 of 120 items do not match, all the same R4-013 sentence (see "Second pass" below) |
+| `validator_report.json` | Task A: headline recomputation (`pcc.validator-report/v1`), third pass: corrected text at `3cb90671` | **pass**: 123 of 123 items match (see "Third pass" below) |
 | `replay_certificate.json` | Task B: re-execution and independent closure (`pcc.replay-certificate/v1`) | **verified** (`scalars_verified: true`; 17 run entries, 0 mismatches) |
 | `controls.json` | negative controls for the validator's own checkers | 8 of 8 planted defects caught |
 
-The sections from "Binding" to "Not checked" describe the first pass at `f96f4f4c`. That
-report (2 of 85 items failing) is preserved in git as the blob of `validator_report.json`
-at `ea2fde0e`. The second pass is described at the end.
+The sections from "Binding" to "Not checked" describe the first pass at `f96f4f4c`. Three
+reports exist:
+
+* first pass, 2 of 85 items failing: `validator_report.json` at `ea2fde0e`;
+* second pass, 3 of 120 failing: the same file at `3cb90671`;
+* third pass, binding, 123 of 123 matching: the current file.
+
+The second and third passes are described at the end.
 
 **Disposition (first pass).** The five headline claims in the dispatch recompute exactly, and the
 replay reproduces them [pcc:unverified]. Two other statements in README "Results" are
@@ -258,13 +263,52 @@ All 120 items match except these three. `replay_certificate.json` and `controls.
 unchanged; re-running the controls against the modified `recompute.py` gives a
 byte-identical `controls.json`.
 
+## Third pass: R4-013 corrected (commit `3cb90671`)
+
+`3cb90671` rewrites R4-013 in `lean-round4-20261104.json`, `WEAKNESSES.md` and
+`weakness.json` to "the iterated closure degree is exactly 4 (solver degree >= 4 under
+the containment property) on 24 fresh instances at n = 17 to 24", and re-renders the two
+corpus PDFs. The same commit holds the second-pass files, byte-identical to what the
+validator wrote (`validator_report.json` `631f8c66…`, `recompute.py` `096be45f…`,
+`README.md` `7451a4ed…`). No census data, results, source or crosscheck file changed.
+`replay_certificate.json` therefore stands at this commit.
+
+    python3 -I -B validation/recompute.py --commit 3cb9067133968daba8340c6cd4e2a46819ee6672 --claims corrected
+
+R4-013's degree-4 clause is now checked in whichever wording a document carries. Run at
+`ea2fde0e`, the script still reproduces the second-pass items exactly (names, claimed
+and recomputed values), apart from a longer note on two items. At `3cb90671` the new
+clause gives, in each of the three files:
+
+| item | claimed | recomputed |
+|---|---|---|
+| iterated closure degree exactly 4 on fresh instances (iter3 < k, iter4 = k) | 24 | 24 |
+| solver degree ≥ 4 under containment on fresh instances (iter3 < k) | 24 | 24 |
+
+**Result: pass, 123 of 123 items, 37 files pinned, no working-tree differences.** No
+sentence in the checked text remains unsupported. Remaining conditions, which do not
+fail the report:
+
+* R4-013's first clause ("the solver degree exceeds the first fall degree 2 on the 111
+  instances with n <= 44") states no condition, unlike its second clause. As an F4
+  bound it holds only under the containment property, which the corpus node's scope
+  states. For the one-shot Caminata–Gorla solving degree it holds on all 119 instances
+  via low2 < k and the Lean `SubspaceCriterion`. Neither Lean claim was reviewed here.
+* `pq2_rank/README.md` and `report.typ` still call containment "not formalised", while
+  `F4Containment.lean` now carries pending pcc claims. That wording is conservative, not
+  unsupported.
+* Not checked: `f4/` (msolve still running; held for a later dispatch), the
+  re-rendered `attack-graph.pdf` and `overview.pdf`, and signing.
+
 ## Reproduce
 
 From `research/ecdlp_weakness_census_20261104/pq2_rank` (each step pinned to one core):
 
     python3 -I -B validation/recompute.py      # first pass (f96f4f4c, original claims)
     python3 -I -B validation/recompute.py --commit ea2fde0e4ded41a08ed5d966c96f7383d61ab802 --claims corrected
-                                               # second pass; writes validator_report.json
+                                               # second pass
+    python3 -I -B validation/recompute.py --commit 3cb9067133968daba8340c6cd4e2a46819ee6672 --claims corrected
+                                               # third pass (binding); writes validator_report.json
     python3 -I -B validation/controls.py       # writes controls.json
     python3 -I -B validation/replay_compare.py # writes replay_certificate.json (needs the run directories)
 

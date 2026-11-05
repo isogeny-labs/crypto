@@ -1,17 +1,17 @@
 {
  "schema": "pcc.validator-report/v1",
- "validated_commit": "ea2fde0e4ded41a08ed5d966c96f7383d61ab802",
+ "validated_commit": "3cb9067133968daba8340c6cd4e2a46819ee6672",
  "claims": "corrected",
- "recompute_script_sha256": "096be45fc5c8a8f95d219aec3366494bb52048f9d4c6feb4483d6b6f607b3d5a",
- "head_at_recompute": "ea2fde0e4ded41a08ed5d966c96f7383d61ab802",
+ "recompute_script_sha256": "40a27cdbd6856b9ab09878b69a787cce38844a543723f50f6eee0f91fedc2760",
+ "head_at_recompute": "a34eb9059103248728e9b5672821d109db3b7169",
  "worktree_differs": [],
- "status": "fail",
+ "status": "pass",
  "validator": "validator (claude-opus-5-5; Claude Code session 01AXUKfUpk9rEJg4Yyo1QcZQ)",
- "produced_at": "2026-11-05T04:17:24Z",
+ "produced_at": "2026-11-05T04:20:58Z",
  "raw_data": [
   {
    "path": "docs/ecdlp-hardness-corpus/WEAKNESSES.md",
-   "sha256": "931fb9838483177656dd24827b946c2d497b4bd82738beef18c3442ae3e82592"
+   "sha256": "7d829d0f56072bc25917bf6676991681ae1d6015b1d13015188715c0fa55a4ec"
   },
   {
    "path": "docs/ecdlp-hardness-corpus/WEAKNESS_TRIAGE.md",
@@ -19,11 +19,11 @@
   },
   {
    "path": "docs/ecdlp-hardness-corpus/lean-round4-20261104.json",
-   "sha256": "0eac765892389ee54f5fe482508d9cce4fb945c0619ec06f4669e1f51d53fa81"
+   "sha256": "35e42aeeb34713ba6d8c704f6875956701eb0c6f5c68d89a997d6fd9ca831211"
   },
   {
    "path": "docs/ecdlp-hardness-corpus/weakness.json",
-   "sha256": "a1511cb4e0632e958a0f0d6a5cb7cd0a99140686d76d6129236d9e23b26393ce"
+   "sha256": "fc6d12d71cf46fddbf644f066127872fb5d5ebd4f73157a95a6f61e35cfd4ac4"
   },
   {
    "path": "research/ecdlp_weakness_census_20261104/README.md",
@@ -865,11 +865,18 @@
    "rel_tol": 0
   },
   {
-   "name": "WEAKNESSES.md.R4-013.solver_degree_exactly_4_on_fresh",
+   "name": "WEAKNESSES.md.R4-013.iterated_closure_exactly_4_on_fresh",
    "claimed": 24,
-   "recomputed": 0,
+   "recomputed": 24,
    "rel_tol": 0,
-   "note": "same sentence as corpus edge R4-013; see corpus.R4-013.solver_degree_exactly_4_on_fresh"
+   "note": "recomputed: fresh instances with iter3 < k and iter4 = k (d_iter = 4) in results/iter4_n17_20 and iter4_n21_24"
+  },
+  {
+   "name": "WEAKNESSES.md.R4-013.solver_degree_ge_4_under_containment_on_fresh",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 0,
+   "note": "recomputed: fresh instances with iter3 < k; a lower bound on F4's maximal step degree only under the containment property (separate Lean claim F4Containment, not validated here)"
   },
   {
    "name": "weakness.json.R4-013.solver_degree_exceeds_2_n_le_44",
@@ -878,11 +885,18 @@
    "rel_tol": 0
   },
   {
-   "name": "weakness.json.R4-013.solver_degree_exactly_4_on_fresh",
+   "name": "weakness.json.R4-013.iterated_closure_exactly_4_on_fresh",
    "claimed": 24,
-   "recomputed": 0,
+   "recomputed": 24,
    "rel_tol": 0,
-   "note": "same sentence as corpus edge R4-013; see corpus.R4-013.solver_degree_exactly_4_on_fresh"
+   "note": "recomputed: fresh instances with iter3 < k and iter4 = k (d_iter = 4) in results/iter4_n17_20 and iter4_n21_24"
+  },
+  {
+   "name": "weakness.json.R4-013.solver_degree_ge_4_under_containment_on_fresh",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 0,
+   "note": "recomputed: fresh instances with iter3 < k; a lower bound on F4's maximal step degree only under the containment property (separate Lean claim F4Containment, not validated here)"
   },
   {
    "name": "corpus.R4-013.solver_degree_exceeds_2_n_le_44",
@@ -892,14 +906,21 @@
    "note": "a lower bound on F4's maximal step degree only under the containment property (separate Lean claim, not validated here)"
   },
   {
-   "name": "corpus.R4-013.solver_degree_exactly_4_on_fresh",
+   "name": "corpus.R4-013.iterated_closure_exactly_4_on_fresh",
    "claimed": 24,
-   "recomputed": 0,
+   "recomputed": 24,
    "rel_tol": 0,
-   "note": "R4-013's subject is the solver degree. The census establishes the iterated closure degree d_iter = 4 exactly on 24 fresh instances, which gives solver degree >= 4 (under containment) and no upper bound. No artifact runs a solver on those 24 instances (f4/run_msolve.py was run on the main-sweep dumps f4/dumps, not on the iter4 sweeps; f4/ is in progress and was not validated). Instances where 'exactly 4' is established for the solver degree: 0. Supported wording: 'the iterated closure degree is exactly 4 (solver degree >= 4 under the containment property) on 24 fresh instances'."
+   "note": "recomputed: fresh instances with iter3 < k and iter4 = k (d_iter = 4) in results/iter4_n17_20 and iter4_n21_24"
+  },
+  {
+   "name": "corpus.R4-013.solver_degree_ge_4_under_containment_on_fresh",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 0,
+   "note": "recomputed: fresh instances with iter3 < k; a lower bound on F4's maximal step degree only under the containment property (separate Lean claim F4Containment, not validated here)"
   }
  ],
- "notes": "120 headline items recomputed; 3 do not match: WEAKNESSES.md.R4-013.solver_degree_exactly_4_on_fresh claimed 24 recomputed 0; weakness.json.R4-013.solver_degree_exactly_4_on_fresh claimed 24 recomputed 0; corpus.R4-013.solver_degree_exactly_4_on_fresh claimed 24 recomputed 0 Counts parsed directly from results/run.log by the validator's own parser; derived JSON/CSV files checked row by row against their source logs. Rounded claims (F_over_V) are compared at the precision stated in the README; exact values are in recomputed_exact. All inputs read from commit ea2fde0e4ded41a08ed5d966c96f7383d61ab802 (git object store). Working-tree copies differing from it: none. Repository HEAD at recompute time: ea2fde0e4ded41a08ed5d966c96f7383d61ab802.",
+ "notes": "123 headline items recomputed; 0 do not match:  Counts parsed directly from results/run.log by the validator's own parser; derived JSON/CSV files checked row by row against their source logs. Rounded claims (F_over_V) are compared at the precision stated in the README; exact values are in recomputed_exact. All inputs read from commit 3cb9067133968daba8340c6cd4e2a46819ee6672 (git object store). Working-tree copies differing from it: none. Repository HEAD at recompute time: a34eb9059103248728e9b5672821d109db3b7169.",
  "detail": {
   "main_log_header": [
    "pq2_rank census; seed 0x5eed20261104; pclmulqdq: true",

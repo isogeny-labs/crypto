@@ -122,6 +122,25 @@ def parse_log(p: Path):
 
 
 
+def r4013_exactly4(H, prefix, txt, d4exact, ge4):
+    """R4-013's degree-4 clause in whichever wording the document carries."""
+    old = text_num(txt, r"; exactly 4 on (\d+) fresh instances at n = 17 to 24")
+    if old is not None:  # the solver degree stated as exactly 4 (second pass: unsupported)
+        H(f"{prefix}.solver_degree_exactly_4_on_fresh", old, 0,
+          note=("R4-013's subject is the solver degree. The census establishes the iterated closure degree d_iter = 4 "
+                f"exactly on {d4exact} fresh instances, which gives solver degree >= 4 (under containment) and no upper "
+                "bound. No artifact runs a solver on those 24 instances (f4/run_msolve.py was run on the main-sweep dumps "
+                "f4/dumps, not on the iter4 sweeps; f4/ is in progress and was not validated). Instances where 'exactly 4' "
+                "is established for the solver degree: 0. Supported wording: 'the iterated closure degree is exactly 4 "
+                "(solver degree >= 4 under the containment property) on 24 fresh instances'."))
+        return
+    H(f"{prefix}.iterated_closure_exactly_4_on_fresh", text_num(txt, r"the iterated closure degree is exactly 4 \(solver degree >= 4 under the containment property\) on (\d+) fresh instances at n = 17 to 24"), d4exact,
+      note="recomputed: fresh instances with iter3 < k and iter4 = k (d_iter = 4) in results/iter4_n17_20 and iter4_n21_24")
+    H(f"{prefix}.solver_degree_ge_4_under_containment_on_fresh", text_num(txt, r"the iterated closure degree is exactly 4 \(solver degree >= 4 under the containment property\) on (\d+) fresh instances at n = 17 to 24"), ge4,
+      note="recomputed: fresh instances with iter3 < k; a lower bound on F4's maximal step degree only under the "
+           "containment property (separate Lean claim F4Containment, not validated here)")
+
+
 def read_own(p: Path) -> bytes:
     """A validator-generated file (validation/): from the commit when it is tracked there and the
     run is bound to a commit, otherwise from disk; pinned either way."""
@@ -212,6 +231,7 @@ def corrected_items(H, readme, L, by_mono, by_own, est, open_keys, d3, d4, rust_
     for tag in ("iter4_n17_20", "iter4_n21_24"):
         sweeps += json.loads(read_text(PKG / f"results/{tag}/pq2_rank.json"))["rows"]
     d4exact = sum(r["d_iter"] == "4" and r["iter3"] < r["k"] and r["iter4"] == r["k"] for r in sweeps)
+    ge4 = sum(r["iter3"] is not None and r["iter3"] < r["k"] for r in sweeps)
     lo1 = sum((r["n"] == 15 or 17 <= r["n"] <= 44) and r["iter3"] == 1 for r in L)
     lo1_17 = sum(17 <= r["n"] <= 44 and r["iter3"] == 1 for r in L)
     cen = read_text(PKG.parent / "README.md")
@@ -258,20 +278,11 @@ def corrected_items(H, readme, L, by_mono, by_own, est, open_keys, d3, d4, rust_
         tag = doc.rsplit("/", 1)[1]
         H(f"{tag}.R4-013.solver_degree_exceeds_2_n_le_44",
           text_num(txt, r"The solver degree exceeds the first fall degree 2 on the (\d+) instances with n <= 44"), len(est44))
-        H(f"{tag}.R4-013.solver_degree_exactly_4_on_fresh",
-          text_num(txt, r"; exactly 4 on (\d+) fresh instances at n = 17 to 24"), 0,
-          note="same sentence as corpus edge R4-013; see corpus.R4-013.solver_degree_exactly_4_on_fresh")
+        r4013_exactly4(H, f"{tag}.R4-013", txt, d4exact, ge4)
     H("corpus.R4-013.solver_degree_exceeds_2_n_le_44",
       text_num(e13, r"The solver degree exceeds the first fall degree 2 on the (\d+) instances with n <= 44"), len(est44),
       note="a lower bound on F4's maximal step degree only under the containment property (separate Lean claim, not validated here)")
-    H("corpus.R4-013.solver_degree_exactly_4_on_fresh",
-      text_num(e13, r"; exactly 4 on (\d+) fresh instances at n = 17 to 24"), 0,
-      note=("R4-013's subject is the solver degree. The census establishes the iterated closure degree d_iter = 4 "
-            f"exactly on {d4exact} fresh instances, which gives solver degree >= 4 (under containment) and no upper "
-            "bound. No artifact runs a solver on those 24 instances (f4/run_msolve.py was run on the main-sweep dumps "
-            "f4/dumps, not on the iter4 sweeps; f4/ is in progress and was not validated). Instances where 'exactly 4' "
-            "is established for the solver degree: 0. Supported wording: 'the iterated closure degree is exactly 4 "
-            "(solver degree >= 4 under the containment property) on 24 fresh instances'."))
+    r4013_exactly4(H, "corpus.R4-013", e13, d4exact, ge4)
 
 # ---------------------------------------------------------------------------
 
