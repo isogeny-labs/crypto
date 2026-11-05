@@ -367,6 +367,7 @@ class WorkflowPullStep(unittest.TestCase):
     def test_step_installs_the_aws_cli_when_absent(self):
         out, _ = wire_workflows.wire(self.WF, ["docs/x"])
         self.assertIn("if ! command -v aws >/dev/null; then", out)
+        self.assertIn('export ARTIFACTS_AWS="$RUNNER_TEMP/aws-bin/aws"', out)
         self.assertIn('export ARTIFACTS_AWS="$artifacts_cli_aws"', out)
         self.assertIn("awscli==1.46.2", out)
         self.assertTrue(out.endswith("      - run: make\n"))

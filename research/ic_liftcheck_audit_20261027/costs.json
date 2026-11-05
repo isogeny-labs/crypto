@@ -1,0 +1,317 @@
+{
+ "schema": "ic_liftcheck_audit/costs/v1",
+ "date": "2026-10-27",
+ "kind": "static code reading plus re-aggregation of already recorded values; no run was made",
+ "tree": {
+  "head": "fbccdb89e",
+  "sha256_prefix": {
+   "src/cryptanalysis/koblitz_index_calculus.rs": "07c5b07f15e2",
+   "src/cryptanalysis/ic_boundary.rs": "2ca11ecf0097",
+   "src/cryptanalysis/semaev_decomp.rs": "3277cf9cb262",
+   "examples/koblitz_orbit_dlp_fast.rs": "f36738cb44b0",
+   "src/bin/ic/price.rs": "fd77e71d27e6",
+   "src/bin/ecbench/structured_s4.rs": "b07ca084e27b"
+  }
+ },
+ "bitop_v1_weights": {
+  "formulas": "M=n^2+(n-1)^2+4(n-1); S=4(n-1); A=n; I=10n^2; affine add = I+2M+S+9A (docs/units/BITOPS.md; bitop_tally call in lift_candidate)",
+  "n47": {
+   "M": 4509,
+   "S": 184,
+   "A": 47,
+   "I": 22090,
+   "add": 31715
+  },
+  "n83": {
+   "M": 13941,
+   "S": 328,
+   "A": 83,
+   "I": 68890,
+   "add": 97847
+  }
+ },
+ "P1_incumbent_pair_table_n47": {
+  "source_counts": "research/ic_tool_program/rule/v7/runs/k1n47/T01-R1.price.json counts/pass/collect: trials 2460, summands_scanned 403440, relations_collected 56; recipe collection_window 164; build tier folded, 5264 points, 56 signed orbits",
+  "summands_per_relation": 7204.29,
+  "per_summand_bitop": 18523.6,
+  "per_summand_formula": "batched add: 3M (Montgomery) + 1M (lambda) + 1S + 6A + I/1024",
+  "stages_bitop_per_relation": [
+   {
+    "stage": "scan: R - P_k, canonical key, filter",
+    "bitop": 133449107,
+    "share_pct": 97.346,
+    "theorem_redundant": false
+   },
+   {
+    "stage": "hit: recover_pair_tagged (94 signed-orbit members)",
+    "bitop": 1763306,
+    "share_pct": 1.286,
+    "theorem_redundant": false
+   },
+   {
+    "stage": "independent re-verification (verify_collected_relation: 2 adds + [a]G)",
+    "bitop": 1806486,
+    "share_pct": 1.318,
+    "theorem_redundant": false,
+    "note": "assumes 36.6-bit double-and-add in generic arithmetic; bitop undercounts its wall cost"
+   },
+   {
+    "stage": "fast re-add check (decompose_fast_scan, 2 adds)",
+    "bitop": 63430,
+    "share_pct": 0.046,
+    "theorem_redundant": false
+   },
+   {
+    "stage": "finish_lazy (y of the hit)",
+    "bitop": 4650,
+    "share_pct": 0.003,
+    "theorem_redundant": false
+   }
+  ],
+  "total_bitop": 137086979
+ },
+ "P1_recorded_wall_shares_rule_v7_median_over_rows": {
+  "source": "research/ic_tool_program/rule/v7/runs/k*/T*-R{1,2}.price.json, 68 rows per size, median of the per-row median",
+  "n": [
+   41,
+   47,
+   53,
+   57,
+   59,
+   61
+  ],
+  "online_target_relation_check_pct_of_online_wall": [
+   0.099,
+   0.469,
+   0.057,
+   0.23,
+   0.062,
+   0.02
+  ],
+  "online_recovery_check_pct_of_online_wall": [
+   0.34,
+   0.88,
+   0.15,
+   0.63,
+   0.14,
+   0.05
+  ],
+  "setup_verify_lap_pct_of_cold_setup": [
+   4.5,
+   7.3,
+   2.1,
+   5.3,
+   2.1,
+   0.7
+  ],
+  "setup_collect_lap_pct_of_cold_setup": [
+   62.4,
+   35.0,
+   58.6,
+   45.1,
+   57.5,
+   82.6
+  ],
+  "setup_select_lap_pct_of_cold_setup": [
+   8.1,
+   16.7,
+   5.6,
+   14.4,
+   5.9,
+   2.1
+  ],
+  "note": "key 'setup_verify_lap' is the recorded lap name; it is the push lap (verify + dedup + LogSystem::push), an upper bound for verification alone"
+ },
+ "P1_select_n47": {
+  "abscissae_drawn": 108,
+  "lifts_found": 56,
+  "note": "52 of 108 draws (uniform in F_q^*, not in V) did not lift: the twist half; share of the select lap not quantified"
+ },
+ "P2_frobenius_pair_table_recorded": {
+  "source": "research/**/records.jsonl with oracle mitm-frobenius*",
+  "records": 6252,
+  "lookups": 806360309,
+  "canonicalisations": 806346541,
+  "relations": 56006,
+  "frobfold_mismatches": 0,
+  "confirm_adds_per_relation": 1,
+  "summand_adds_per_relation": 14416,
+  "summand_adds_note": "pooled mean 14,416 (rev1: 14,398); dominated by few rows: median row 96 adds per relation (confirm add about 1%), max 25,000,644"
+ },
+ "P3_n83_s3_root_path": {
+  "source": "research/n83_parallel_target_cancel_20261017/results/serial_targets_result.jsonl (128 targets) and *_cancel_targets_result.jsonl (384 rows total)",
+  "ns_per_probe_aggregate": 295.9,
+  "probes_total_serial": 86474156,
+  "probes_per_target_mean": 675579,
+  "relation_check_share_aggregate_pct": 0.0193,
+  "relation_check_share_min_pct": 0.0005,
+  "relation_check_share_max_pct": 11.7,
+  "relation_check_share_median_pct": 0.023,
+  "candidate_bitop": 154015,
+  "probe_bitop": 77008,
+  "candidate_formula": "11M + I/166 + 3A (prepare 2M, batch inverse 3M, finish 6M)",
+  "trace_test_bitop_est": 166,
+  "trace_test_share_pct": 0.108,
+  "lift_bitop_per_relation_est": 2550000,
+  "lift_share_pct": 0.0049,
+  "trace_test_note": "constraint on the exceptional path is the start-up assert at koblitz_orbit_dlp_fast.rs ~6321 (solver roots == library s3_x_roots); finish returns to s3_x_roots before the trace test; koblitz_fast_arith.rs 999-1065 tests the library function",
+  "price_omissions": "candidate price omits linear-map squarings and half-trace apply; P1 per-summand price omits canonical key and filter probe; both conservative for 'small'"
+ },
+ "P4_semaev_roots_lift_candidate_n47": {
+  "points_with_x_bitop": 45534,
+  "points_with_x_formula": "27A + 3M + 47S + 1I (bitop_tally call in lift_candidate)",
+  "dfs_adds_worst_m3": 14,
+  "dfs_bitop_worst_m3": 444010,
+  "code_path": "lift_candidate (7301) -> points_with_x (1374) -> binary_semaev::solve_artin_schreier (191): full absolute trace first, then half-trace",
+  "trace_pass_bitop_n47": {
+   "formula": "(n-1) S + (n-1) A = 46*184 + 46*47",
+   "value": 10626
+  },
+  "y_recovery_bitop_n47": {
+   "bitop_tally_comment_figure": 45534,
+   "note": "the tally counts only n-1 squarings and (n-1)/2+1 additions for half-trace and its check, so it omits the trace pass",
+   "with_trace_pass": 56160
+  },
+  "trace_pass_share_pct": {
+   "of_y_recovery_with_trace_pass": 18.9,
+   "of_tally_figure": 23.3
+  },
+  "claim_class": "D/E (derived from source and BITOPS weights; not measured)",
+  "per_relation_denominator": "NOT computed: solver cost per root and roots per relation are unrecorded for n=47. The trace pass is above 1% of y-recovery, so no claim that it is below 1% of a relation is made",
+  "superseded": "rev1 value 231 units / 0.51% was points_with_x_fast, which lift_candidate does not call; withdrawn"
+ },
+ "P5_structured_s4_recorded": {
+  "source": "research/ic_algebraic_crossover_20261023/pipeline-runs/structured-n{7,13,23}-20261025-01/records.jsonl",
+  "rows": [
+   {
+    "n": 13,
+    "run": "a",
+    "form": "direct",
+    "algebraic_roots": 60,
+    "lift_failures": 28,
+    "relations": 7,
+    "gae": 12736,
+    "adds": 580,
+    "doubles": 511
+   },
+   {
+    "n": 13,
+    "run": "a",
+    "form": "symmetric",
+    "algebraic_roots": 1902,
+    "nonsplitting_roots": 1851,
+    "lift_failures": 0,
+    "relations": 7,
+    "gae": 5769,
+    "adds": 583,
+    "doubles": 511
+   },
+   {
+    "n": 13,
+    "run": "b",
+    "form": "direct",
+    "algebraic_roots": 35,
+    "lift_failures": 6,
+    "relations": 4,
+    "gae": 4017,
+    "adds": 302,
+    "doubles": 332
+   },
+   {
+    "n": 13,
+    "run": "b",
+    "form": "symmetric",
+    "algebraic_roots": 533,
+    "nonsplitting_roots": 476,
+    "lift_failures": 0,
+    "relations": 4,
+    "gae": 1887,
+    "adds": 290,
+    "doubles": 332
+   },
+   {
+    "n": 23,
+    "run": "a",
+    "form": "direct",
+    "algebraic_roots": 72,
+    "lift_failures": 9,
+    "relations": 11,
+    "gae": 30191386,
+    "adds": 43608,
+    "doubles": 1277
+   },
+   {
+    "n": 23,
+    "run": "a",
+    "form": "symmetric",
+    "algebraic_roots": 10484,
+    "nonsplitting_roots": 10473,
+    "lift_failures": 0,
+    "relations": 11,
+    "gae": 6172421,
+    "adds": 43614,
+    "doubles": 1277
+   },
+   {
+    "n": 7,
+    "run": "a",
+    "form": "direct",
+    "algebraic_roots": 24,
+    "lift_failures": 24,
+    "relations": 0,
+    "gae": 103886,
+    "adds": 103693,
+    "doubles": 193
+   },
+   {
+    "n": 7,
+    "run": "a",
+    "form": "symmetric",
+    "algebraic_roots": 142,
+    "nonsplitting_roots": 142,
+    "lift_failures": 0,
+    "relations": 0,
+    "gae": 103886,
+    "adds": 103693,
+    "doubles": 193
+   }
+  ],
+  "n23_direct_group_work_pct_of_phase_gae_upper_bound": 0.149,
+  "n23_symmetric_group_work_pct_of_phase_gae_upper_bound": 0.727,
+  "denominators": {
+   "n23_targets_tried": 42811,
+   "n23_solver_calls": 42395,
+   "n23_scalar_mults_phase": 66,
+   "note": "rev1 used 66 (scalar_mults) as targets"
+  },
+  "n23_direct_lift_failures_per_target": 0.00021022634369671347,
+  "predicted_rate_per_target_rev1": 0.0001,
+  "lift_failure_mechanism": "binary_subspace_factor_base loops idx in 1..(1<<l) so x=0 is not in x_index; lift_abscissae returns None via x_index.get(x)? before any addition. Failed lifts cost 0 additions, consistent with 580 vs 583 and 43,608 vs 43,614. Read from source, not run.",
+  "anomaly_status": "WITHDRAWN: 9/42811 = 2.1e-4 per target is the same order as the 1e-4 prediction",
+  "omitted_rows": "n=23 run b direct arm timed out (seq 6, no cost record); n=23 run b symmetric (seq 7) and pair-table (seq 8) and n=7 run b rows not tabulated; rule: rows of run a that carry a gae cost record"
+ },
+ "revision": "2026-10-27 rev2: fixes B1-B4 of the review (P4 recomputed, P5 denominator, P1 wall provenance, push-lap label)",
+ "P1_recorded_wall_n47_T01_median_of_15_reps": {
+  "source": "research/ic_tool_program/rule/v7/runs/k1n47/T01-R1.price.json repetitions[0..14].setup_phases_ns (recomputed rev2)",
+  "collect_lap_ms_median": 7.63,
+  "push_lap_ms_median": 1.61,
+  "relations": 56,
+  "push_lap_share_of_cold_setup_pct": {
+   "min": 6.9,
+   "median": 7.3,
+   "max": 8.3
+  },
+  "push_lap_share_of_collect_plus_push_pct_median": 17.2,
+  "push_lap_contents": "FactorBaseLogSolver::push (koblitz_index_calculus.rs:13821): verify_collected_relation + de-duplication + LogSystem::push (relation_from_decomposition_with_mode, BigUint modpow lambda^k). Split NOT recorded, so the push lap is an UPPER BOUND on independent re-verification wall cost.",
+  "repetition0_only_values_ms": {
+   "collect": 7.42,
+   "push": 1.54
+  }
+ },
+ "claim_classes": {
+  "D": "derived from source and weights",
+  "R": "recomputed from recorded rows",
+  "E": "estimate / count model",
+  "T": "theorem (proved elsewhere)"
+ }
+}
