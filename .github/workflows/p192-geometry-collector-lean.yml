@@ -16,6 +16,9 @@ on:
       - research/p192_extension_cover_20261012/reports/run-20261026-four-anchor/**
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   pencil-and-four-cell:
     runs-on: ${{ (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_HIGHMEM_WORKFLOWS, '|p192-geometry-collector-lean.yml|') && 'crypto-eks-highmem' || (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)) && contains(vars.CRYPTO_EKS_WORKFLOWS, '|p192-geometry-collector-lean.yml|') && 'crypto-eks-linux' || 'ubuntu-latest' }}
