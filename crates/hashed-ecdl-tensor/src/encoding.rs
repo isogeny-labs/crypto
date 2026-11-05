@@ -94,14 +94,31 @@ pub struct PointWords {
 pub struct Encoder {
     vertices: Vec<Vertex>,
     uses: Vec<Vec<(usize, usize)>>,
+    signal_regions: Vec<Option<String>>,
     free: Vec<usize>,
     steps: Vec<Step>,
     interface: Vec<usize>,
+    semantic_region: Option<String>,
 }
 impl Encoder {
     /// Start an empty encoding.
     pub fn new() -> Self {
         Self::default()
+    }
+
+    pub(crate) fn set_semantic_region(&mut self, region: &str) -> Result<()> {
+        if region.is_empty() {
+            return Err(invalid("empty semantic region"));
+        }
+        self.semantic_region = Some(region.to_owned());
+        Ok(())
+    }
+
+    fn tagged_parameters(&self, mut parameters: Vec<(String, String)>) -> Vec<(String, String)> {
+        if let Some(region) = &self.semantic_region {
+            parameters.push(("semantic_region".into(), region.clone()));
+        }
+        parameters
     }
 
     fn fresh(&mut self, width: usize, free: bool, meter: &Meter) -> Result<Word> {
@@ -117,6 +134,7 @@ impl Encoder {
         for _ in 0..width {
             let signal = self.uses.len();
             self.uses.push(Vec::new());
+            self.signal_regions.push(self.semantic_region.clone());
             if free {
                 self.free.push(signal);
             }
@@ -197,11 +215,11 @@ impl Encoder {
             .join("/");
         let tag = PredicateTag::new(
             "encoder.constraint",
-            vec![
+            self.tagged_parameters(vec![
                 ("active_ports".into(), active.len().to_string()),
                 ("word_layout".into(), layout),
                 ("word_widths".into(), widths),
-            ],
+            ]),
         );
         meter.vector(self.vertices.len() + 1, "encoding vertices")?;
         let plan = words.to_vec();
@@ -268,12 +286,12 @@ impl Encoder {
             .join(",");
         let tag = PredicateTag::new(
             "encoder.define_relation",
-            vec![
+            self.tagged_parameters(vec![
                 ("active_ports".into(), active.len().to_string()),
                 ("input_words".into(), input_words.to_string()),
                 ("operation".into(), operation.name().into()),
                 ("word_widths".into(), widths),
-            ],
+            ]),
         );
         let program = PredicateProgram::define(words, input_words, operation)?;
         meter.vector(self.vertices.len() + 1, "encoding vertices")?;
@@ -1205,15 +1223,24 @@ impl Encoder {
     /// Freeze shared signals into ordinary edges and constant-degree equality
     /// trees. The optional witness metadata contains no user-supplied hints.
     pub fn finish(mut self, meter: &Meter) -> Result<Network> {
-        fn vertex(vertices: &mut Vec<Vertex>, arity: usize, equality: bool) -> usize {
+        fn vertex(
+            vertices: &mut Vec<Vertex>,
+            arity: usize,
+            equality: bool,
+            semantic_region: Option<&str>,
+        ) -> usize {
             let id = vertices.len();
+            let mut parameters = vec![("arity".into(), arity.to_string())];
+            if let Some(region) = semantic_region {
+                parameters.push(("semantic_region".into(), region.to_owned()));
+            }
             let tag = PredicateTag::new(
                 if equality {
                     "encoder.copy_equality"
                 } else {
                     "encoder.endpoint"
                 },
-                vec![("arity".into(), arity.to_string())],
+                parameters,
             );
             vertices.push(Vertex {
                 predicate: Arc::new(FnPredicate::tagged(arity, tag, move |bits, _| {
@@ -1246,9 +1273,17 @@ impl Encoder {
             vertices[b.0].edges[b.1] = edge;
             Ok(())
         }
+        if self.signal_regions.len() != self.uses.len() {
+            return Err(integrity("encoding semantic-region width"));
+        }
         let mut interface_vertices = Vec::new();
         for &signal in &self.interface {
-            let endpoint = vertex(&mut self.vertices, 1, false);
+            let endpoint = vertex(
+                &mut self.vertices,
+                1,
+                false,
+                self.signal_regions[signal].as_deref(),
+            );
             self.uses[signal].push((endpoint, 0));
             interface_vertices.push(endpoint);
         }
@@ -1256,7 +1291,12 @@ impl Encoder {
         let mut edge_signals = Vec::new();
         for (signal, uses) in self.uses.iter_mut().enumerate() {
             while uses.len() < 2 {
-                let endpoint = vertex(&mut self.vertices, 1, false);
+                let endpoint = vertex(
+                    &mut self.vertices,
+                    1,
+                    false,
+                    self.signal_regions[signal].as_deref(),
+                );
                 uses.push((endpoint, 0));
             }
             if uses.len() == 2 {
@@ -1271,7 +1311,12 @@ impl Encoder {
                         meter,
                     )?;
                 } else {
-                    let copy = vertex(&mut self.vertices, 2, true);
+                    let copy = vertex(
+                        &mut self.vertices,
+                        2,
+                        true,
+                        self.signal_regions[signal].as_deref(),
+                    );
                     connect(
                         &mut self.vertices,
                         &mut edges,
@@ -1292,7 +1337,12 @@ impl Encoder {
                     )?;
                 }
             } else {
-                let mut copy = vertex(&mut self.vertices, 3, true);
+                let mut copy = vertex(
+                    &mut self.vertices,
+                    3,
+                    true,
+                    self.signal_regions[signal].as_deref(),
+                );
                 connect(
                     &mut self.vertices,
                     &mut edges,
@@ -1323,7 +1373,12 @@ impl Encoder {
                             meter,
                         )?;
                     } else {
-                        let next = vertex(&mut self.vertices, 3, true);
+                        let next = vertex(
+                            &mut self.vertices,
+                            3,
+                            true,
+                            self.signal_regions[signal].as_deref(),
+                        );
                         connect(
                             &mut self.vertices,
                             &mut edges,
@@ -1360,6 +1415,7 @@ impl Encoder {
             signals: self.uses.len(),
             steps: self.steps,
             edge_signals,
+            signal_regions: self.signal_regions,
         };
         Ok(Network {
             vertices: self.vertices,
