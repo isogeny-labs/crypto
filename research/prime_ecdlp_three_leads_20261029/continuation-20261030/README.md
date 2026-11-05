@@ -1,5 +1,16 @@
 # G1–G6 continuation: independently check useful rank and target recovery
 
+## Reference-stage publication — 2026-11-05T23:40Z
+
+Sourcec933, guarded27-control evidence and the new inspected report were
+normal-pushed in1b661dbd8 to samePR3482. Its updated title/body describe the
+scalar and affine replay-work scope and actual failures. Exact1b661snapshot:
+OPEN/CONFLICTING/autooff, reviewSUCCESS/migrateIN_PROGRESS, required gate/size/
+artifactsABSENT, reviews[]. No requiredpassclaimed; laterpublicationmetadata
+changes no tested Rust/formal source. [Publication receipt](validation/reference-refusal-20261105/publication-1b661dbd8.json).
+PCC report-only request6664459966 remains; no frozen merge/rechain or oldPR
+maintenance. Allnativejobs terminal and22sourceobjects stillmatchc933. [pcc:unverified]
+
 ## Retained reference-stage work — 2026-11-05
 
 The replay caller now retains setup's affine counts and disjoint oracle request-
