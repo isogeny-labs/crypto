@@ -1348,6 +1348,7 @@ pub fn solve_one(
 /// Caller identity is asserted metadata, not authenticated source/workload custody.
 /// Failed trace attempts do not return complete phase/allocation cost accounting.
 /// Reading a pending tracked sparse constraint adds map-entry visits in elimination.
+#[allow(dead_code)]
 pub fn solve_one_with_trace(
     inst: &StudyInstance,
     target: Point,
@@ -1919,9 +1920,9 @@ mod finite_difference_integration_tests {
             let u = poly(&d.u[..=d.degree], x, p);
             let v = poly(&d.v[..d.degree], x, p);
             let branch = if u == 0 {
-                if 2 * v % p != 0 {
+                if !(2 * v).is_multiple_of(p) {
                     2
-                } else if (x.pow((5 - d.degree) as u32) + q) % p == 0 {
+                } else if (x.pow((5 - d.degree) as u32) + q).is_multiple_of(p) {
                     3
                 } else {
                     4

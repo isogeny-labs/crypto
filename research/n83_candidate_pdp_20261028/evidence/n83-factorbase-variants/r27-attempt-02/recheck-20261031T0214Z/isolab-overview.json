@@ -1,0 +1,44 @@
+{
+  "schema": "n83.scheduler-overview/v1",
+  "observed_at_utc": "2026-10-31T02:14:21Z",
+  "namespace": "isolab",
+  "configured_node_pool_limits": {
+    "cpu-l2-spot": {
+      "cpu": 32,
+      "memory": "128Gi"
+    },
+    "cpu-spot": {
+      "cpu": 32,
+      "memory": "128Gi"
+    }
+  },
+  "visible_job_count": 61,
+  "visible_job_states": {
+    "active": 2,
+    "pending": 1,
+    "succeeded": 29,
+    "failed": 29
+  },
+  "active_jobs": [
+    {
+      "job_name": "n83-fb-variants-r27-20261031-r2",
+      "uid": "ff190835-eced-4816-b7b6-7fe7d2f7937a",
+      "created_at": "2026-10-31T01:55:09Z",
+      "active_pods": 1
+    },
+    {
+      "job_name": "semaev-n47-rand02-d5-blocked-restore01-20261031",
+      "uid": "cfd628d5-3448-457f-bae9-c2f8e643a479",
+      "created_at": "2026-10-31T01:47:59Z",
+      "active_pods": 1
+    }
+  ],
+  "pending_jobs": [
+    {
+      "job_name": "sat-hpo-metal-qualification-20261030",
+      "uid": "e83a3ba3-36c4-4958-8d04-20b78c44d3dc",
+      "created_at": "2026-10-30T14:55:24Z"
+    }
+  ],
+  "notes": "Overview is namespace-scoped; configured NodePool limits are not available capacity. Current r27 Job event stream separately reports all eligible NodePools exhausted."
+}
