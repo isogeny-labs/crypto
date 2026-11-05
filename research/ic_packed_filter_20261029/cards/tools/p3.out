@@ -1,0 +1,64 @@
+== b=24
+  OK   ecbench plan spec-P24.json exit=0; 1344 executions
+     slugs: icv1-fp24-t217-e1fbffd2 icv1-fp24-tm567-4accd0e8 
+     arms (spec order): dgb:baseline:ECM1h7130702fe80a dgb-aa:control:ECM1h7130702fe80a dgbf:candidate:ECM1h72ec76c15b6d dgbf-edge:reference:ECM1h72ec76c15b6d 
+  OK   ecbench plan spec-P24-rho.json exit=0; 1344 executions
+     slugs: icv1-fp24-t217-e1fbffd2 icv1-fp24-tm567-4accd0e8 
+     arms (spec order): rho-neg:reference:ECM1hefea4e0ebe79 dgb:baseline:ECM1h7130702fe80a dgbf:candidate:ECM1h72ec76c15b6d rho-neg-aa:control:ECM1hefea4e0ebe79 
+  OK   workload lines of wall plan == counted plan
+  OK   wall arms names/roles in order dgb,dgb-aa,dgbf,dgbf-edge = baseline,control,candidate,reference
+  OK   dgb-aa method == dgb method; dgbf-edge method == dgbf method
+  OK   dgbf params == dgb params except oracle, oracle = dgb oracle + ',filter=1'
+  OK   dgb method (jq -S) == dg-blocked spec-P24.json dgb arm
+  OK   counted dgb arm (jq -S) == wall dgb arm
+  OK   counted dgbf arm (jq -S) == wall dgbf arm
+  OK   counted rho-neg arm (jq -S) == dg-blocked spec-P24-rho.json rho-neg arm
+  OK   counted rho-neg-aa arm (jq -S) == dg-blocked spec-P24-rho.json rho-neg-aa arm
+  OK   counted workloads == wall workloads
+  OK   counted measurement == wall measurement
+     counted arms: rho-neg:reference dgb:baseline dgbf:candidate rho-neg-aa:control
+     measurement: {"rounds":6,"warmup":1,"order":"alternate","seed":202610296248,"isolation_required":"L2","timeout_seconds":1800}
+     wall dgb-vs-dgb(dg-blocked) workloads equal: no-expected-fresh-curves
+== b=28
+  OK   ecbench plan spec-P28.json exit=0; 1344 executions
+     slugs: icv1-fp28-tm295-85243301 icv1-fp28-tm8273-f1778659 
+     arms (spec order): dgb:baseline:ECM1h0214efbf2ff5 dgb-aa:control:ECM1h0214efbf2ff5 dgbf:candidate:ECM1h517b28481d4b dgbf-edge:reference:ECM1h517b28481d4b 
+  OK   ecbench plan spec-P28-rho.json exit=0; 1344 executions
+     slugs: icv1-fp28-tm295-85243301 icv1-fp28-tm8273-f1778659 
+     arms (spec order): rho-neg:reference:ECM1hefea4e0ebe79 dgb:baseline:ECM1h0214efbf2ff5 dgbf:candidate:ECM1h517b28481d4b rho-neg-aa:control:ECM1hefea4e0ebe79 
+  OK   workload lines of wall plan == counted plan
+  OK   wall arms names/roles in order dgb,dgb-aa,dgbf,dgbf-edge = baseline,control,candidate,reference
+  OK   dgb-aa method == dgb method; dgbf-edge method == dgbf method
+  OK   dgbf params == dgb params except oracle, oracle = dgb oracle + ',filter=1'
+  OK   dgb method (jq -S) == dg-blocked spec-P28.json dgb arm
+  OK   counted dgb arm (jq -S) == wall dgb arm
+  OK   counted dgbf arm (jq -S) == wall dgbf arm
+  OK   counted rho-neg arm (jq -S) == dg-blocked spec-P28-rho.json rho-neg arm
+  OK   counted rho-neg-aa arm (jq -S) == dg-blocked spec-P28-rho.json rho-neg-aa arm
+  OK   counted workloads == wall workloads
+  OK   counted measurement == wall measurement
+     counted arms: rho-neg:reference dgb:baseline dgbf:candidate rho-neg-aa:control
+     measurement: {"rounds":6,"warmup":1,"order":"alternate","seed":202610296288,"isolation_required":"L2","timeout_seconds":1800}
+     wall dgb-vs-dgb(dg-blocked) workloads equal: no-expected-fresh-curves
+== b=32
+  OK   ecbench plan spec-P32.json exit=0; 1344 executions
+     slugs: icv1-fp32-t89141-95879fe3 icv1-fp32-tm68303-f902d2f0 
+     arms (spec order): dgb:baseline:ECM1h1ece5a06377d dgb-aa:control:ECM1h1ece5a06377d dgbf:candidate:ECM1h201ac28dd4c3 dgbf-edge:reference:ECM1h201ac28dd4c3 
+  OK   ecbench plan spec-P32-rho.json exit=0; 1344 executions
+     slugs: icv1-fp32-t89141-95879fe3 icv1-fp32-tm68303-f902d2f0 
+     arms (spec order): rho-neg:reference:ECM1hefea4e0ebe79 dgb:baseline:ECM1h1ece5a06377d dgbf:candidate:ECM1h201ac28dd4c3 rho-neg-aa:control:ECM1hefea4e0ebe79 
+  OK   workload lines of wall plan == counted plan
+  OK   wall arms names/roles in order dgb,dgb-aa,dgbf,dgbf-edge = baseline,control,candidate,reference
+  OK   dgb-aa method == dgb method; dgbf-edge method == dgbf method
+  OK   dgbf params == dgb params except oracle, oracle = dgb oracle + ',filter=1'
+  OK   dgb method (jq -S) == dg-blocked spec-P32.json dgb arm
+  OK   counted dgb arm (jq -S) == wall dgb arm
+  OK   counted dgbf arm (jq -S) == wall dgbf arm
+  OK   counted rho-neg arm (jq -S) == dg-blocked spec-P32-rho.json rho-neg arm
+  OK   counted rho-neg-aa arm (jq -S) == dg-blocked spec-P32-rho.json rho-neg-aa arm
+  OK   counted workloads == wall workloads
+  OK   counted measurement == wall measurement
+     counted arms: rho-neg:reference dgb:baseline dgbf:candidate rho-neg-aa:control
+     measurement: {"rounds":6,"warmup":1,"order":"alternate","seed":202610296328,"isolation_required":"L2","timeout_seconds":1800}
+     wall dgb-vs-dgb(dg-blocked) workloads equal: no-expected-fresh-curves
+P3_FAIL=0

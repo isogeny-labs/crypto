@@ -875,6 +875,43 @@ def prime_base_size_component() -> dict:
             "validated": not errs}
 
 
+def packed_filter_component() -> dict:
+    """The membership filter on the packed pair table, research/ic_packed_filter_20261029
+    (backlog XP-20261029-packed-filter, frozen protocol, decided at 32 bits): the corrected
+    whole-solve wall per charged GAE copied from the size's native `ecbench compare` output,
+    the bitop ratio from its `ecbench work` totals, and the counted S′ band against the
+    same-session rho.negation from the independent validator's j4.json. A wall component
+    speed-up at identical charged GAE; it moves no row of tables A-C. Its standing comes
+    from the study's VALIDATION.json (REVIEW-P32 (3.4))."""
+    study = "research/ic_packed_filter_20261029"
+    wall = load(f"{study}/P32/wall/analysis/compare-dgb__dgbf-w0.json")["wall"]
+    if wall.get("aa_arms") != ["dgb", "dgb-aa"] or wall.get("pairs") != 288 or wall.get("pairs_below_level"):
+        raise SystemExit(f"{study}: P32 wall comparison is not the frozen decision pair")
+    work = load(f"{study}/P32/wall/analysis/work_checks.json")
+    j4 = load(f"{study}/validation/code/out/j4.json")["P32-counted"]
+    ws = ("0.0", "0.1", "1.0")
+    band = {k: [j4[k][w]["ratio_b_over_a"] for w in ws] for k in ("dgbf/dgb", "dgb/rho-neg", "dgbf/rho-neg")}
+    if not (j4["dgb/rho-neg"]["strict_same_order_across_band_every_curve"]
+            and j4["dgbf/rho-neg"]["strict_same_order_across_band_every_curve"]):
+        raise SystemExit(f"{study}: rho-neg order does not hold across the band")
+    errs = gate.check_evidence_dir(REPO / study, REPO)
+    return {"study": study + "/", "readme": study + "/README.md", "report": study + "/REPORT.pdf",
+            "class": "engineering", "track": "generic (prime-table; docs/ic/SWEEPER.md, Tracks)",
+            "label": "whole-solve wall per charged GAE at N_inc, filtered against unfiltered packed table",
+            "candidate": "mitm-prime-blocked:m=2,filter=1", "incumbent": "mitm-prime-blocked:m=2", "bits": 32,
+            "pairs": wall["pairs"], "corrected": wall["corrected_ratio"], "corrected_ci95": wall["corrected_ci95"],
+            "bitop_ratio": float(work["ratio_dgbf_over_dgb_measured_verified_repr"]),
+            "sprime": band, "host": "c8a.2xlarge (AMD EPYC 9R45) on EKS, L2",
+            "other_sizes": ("At 24 bits the same comparison read a regression (1.0032 [1.0006, 1.0058]); "
+                            "28 bits is undecidable (infrastructure); see the README."),
+            "validation": ("validated with caveats: replay certificate, validator report and the matched rho reference "
+                           f"with the §5a band ({study}/VALIDATION.json); single session, not replicated. Caveats: the "
+                           "validator re-priced the bitops with its own code rather than re-running `ecbench work`; "
+                           "the image digest is bound through the binary hashes, not pod status")
+            if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
 def lazy_members_component() -> dict:
     """The lazy orbit-member index of research/ecbench_lazy_orbit_members_20261018:
     ratios copied from the study's saved ecbench comparisons (figures/ratios.json).
@@ -2385,6 +2422,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "linear_algebra_component": la_component(),
         "k4_v4_component": k4_v4_component(),
         "prime_base_size_component": prime_base_size_component(),
+        "packed_filter_component": packed_filter_component(),
         "lazy_members_component": lazy_members_component(),
         "generator_orbit_component": generator_orbit_component(),
         "lazy_columns2_component": lazy_columns2_component(),
@@ -3104,6 +3142,26 @@ def markdown(doc: dict) -> str:
     L += ["", "Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate.", "",
           pb["second_host"], "",
           f"[Report]({'../../' + pb['report']}) · [study](../../{pb['study']}).", "", pb["validation"], ""]
+    pf = doc["packed_filter_component"]
+    pf_s = {k: " / ".join(f"{x:.2f}" if "rho" in k else f"{x:.4f}" for x in v) for k, v in pf["sprime"].items()}
+    pf_c, (pf_lo, pf_hi) = pf["corrected"], pf["corrected_ci95"]
+    L += ["## Component speed-up: membership filter on the packed pair table (2026-10-29, engineering)", "",
+          f"Frozen protocol (backlog XP-20261029-packed-filter); track {pf['track']}. "
+          f"Label: {pf['label']}, `{pf['candidate']}` against `{pf['incumbent']}` at b = {pf['bits']}. "
+          "It moves no row of tables A–C and is ranked against nothing in them.", "",
+          f"- **Wall:** corrected {pf_c:.4f} [{pf_lo:.4f}, {pf_hi:.4f}], that is {100 * (1 - pf_c):.2f}% less wall "
+          f"per charged GAE (95%: {100 * (1 - pf_hi):.2f}% to {100 * (1 - pf_lo):.2f}%), at identical charged GAE.",
+          f"- **`bitop/v1`** {100 * (pf['bitop_ratio'] - 1):+.3f}%: the rise is build-side only; the probe-side "
+          "filter test is not counted separately; the build's pass over the empty slots is not counted.",
+          f"- **S′ `dgbf / dgb`** {pf_s['dgbf/dgb']} at w = 0 / 0.1 / 1: `dgbf`'s counted cost exceeds `dgb`'s at "
+          "w > 0 by that ratio; `table_insert_attempts` is unpriced on every IC arm, identically between `dgb` and "
+          "`dgbf`, a gap that predates this study; these figures decide nothing.",
+          f"- **Distance remaining at {pf['bits']} bits:** `dgbf / rho-neg` {pf_s['dgbf/rho-neg']} and "
+          f"`dgb / rho-neg` {pf_s['dgb/rho-neg']}. `rho-neg` is cheaper than both IC arms at every weight on every "
+          "curve, so the §5a band permits that ranking; `dgbf` is never ranked ahead of `dgb` in the counted unit.",
+          f"- **Scope:** {pf['host']}; two curves at {pf['bits']} bits; one session, {pf['pairs']} pairs.",
+          f"- **Other sizes:** {pf['other_sizes']}", "",
+          f"[README](../../{pf['readme']}) · [report PDF](../../{pf['report']}).", "", pf["validation"], ""]
     la = doc["linear_algebra_component"]
     L += ["## Linear-algebra engine, outside tables A–C", "",
           "The linear-algebra phase alone, on synthetic m = 3 relation matrices over a 62-bit prime "
@@ -4321,6 +4379,34 @@ def page(doc: dict, standalone: bool) -> str:
              f'<p>{esc(pb["second_host"])}</p>'
              f'<p>{gh(pb["report"], "Report")} · {gh(pb["study"], "study")}.</p>'
              f'<p class="muted">{esc(pb["validation"])}</p></section>')
+    pf = doc["packed_filter_component"]
+    pf_s = {k: " / ".join(f"{x:.2f}" if "rho" in k else f"{x:.4f}" for x in v) for k, v in pf["sprime"].items()}
+    pf_c, (pf_lo, pf_hi) = pf["corrected"], pf["corrected_ci95"]
+    P.append('<section class="card" id="packed-filter-component"><h2>Component speed-up · membership filter on the '
+             'packed pair table (2026-10-29) <span class="chip">engineering</span></h2>'
+             f'<p>Frozen protocol (backlog XP-20261029-packed-filter); track {esc(pf["track"])}. '
+             f'Label: {esc(pf["label"])}, <code>{esc(pf["candidate"])}</code> against '
+             f'<code>{esc(pf["incumbent"])}</code> at b = {pf["bits"]}. It moves no row of the priced tables and '
+             'is ranked against nothing in them.</p><ul>'
+             f'<li><b>Wall:</b> corrected {pf_c:.4f} [{pf_lo:.4f}, {pf_hi:.4f}], that is {100 * (1 - pf_c):.2f}% '
+             f'less wall per charged GAE (95%: {100 * (1 - pf_hi):.2f}% to {100 * (1 - pf_lo):.2f}%), at identical '
+             'charged GAE.</li>'
+             f'<li><b><code>bitop/v1</code></b> {100 * (pf["bitop_ratio"] - 1):+.3f}%: the rise is build-side only; '
+             'the probe-side filter test is not counted separately; the build&#39;s pass over the empty slots is '
+             'not counted.</li>'
+             f'<li><b>S′ <code>dgbf / dgb</code></b> {pf_s["dgbf/dgb"]} at w = 0 / 0.1 / 1: <code>dgbf</code>&#39;s '
+             'counted cost exceeds <code>dgb</code>&#39;s at w &gt; 0 by that ratio; <code>table_insert_attempts</code> '
+             'is unpriced on every IC arm, identically between <code>dgb</code> and <code>dgbf</code>, a gap that '
+             'predates this study; these figures decide nothing.</li>'
+             f'<li><b>Distance remaining at {pf["bits"]} bits:</b> <code>dgbf / rho-neg</code> {pf_s["dgbf/rho-neg"]} '
+             f'and <code>dgb / rho-neg</code> {pf_s["dgb/rho-neg"]}. <code>rho-neg</code> is cheaper than both IC arms '
+             'at every weight on every curve, so the §5a band permits that ranking; <code>dgbf</code> is never '
+             'ranked ahead of <code>dgb</code> in the counted unit.</li>'
+             f'<li><b>Scope:</b> {esc(pf["host"])}; two curves at {pf["bits"]} bits; one session, {pf["pairs"]} '
+             'pairs.</li>'
+             f'<li><b>Other sizes:</b> {esc(pf["other_sizes"])}</li></ul>'
+             f'<p>{gh(pf["readme"], "README")} · {gh(pf["report"], "report PDF")}.</p>'
+             f'<p class="muted">{esc(pf["validation"])}</p></section>')
     la = doc["linear_algebra_component"]
     P.append('<section class="card" id="linear-algebra-component"><h2>Linear-algebra engine, outside the priced tables</h2>'
              '<p>The linear-algebra phase alone, on synthetic m = 3 relation matrices over a 62-bit prime '

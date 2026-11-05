@@ -1380,6 +1380,15 @@ impl Instance {
         }
     }
 
+    /// Verify an exact scalar on a legacy instance. Reduction happens before
+    /// conversion, so no high bits are discarded. All current instance orders
+    /// fit u128; a future full-width instance must supply its own branch here.
+    pub fn mul_generator_exact(&self, k: super::exact_scalar::ExactScalar) -> Option<[String; 2]> {
+        let reduced = k.to_biguint() % num_bigint::BigUint::from(self.r());
+        let narrow = super::exact_scalar::ExactScalar::from_biguint(&reduced)?.checked_u128()?;
+        self.mul_generator_hex(narrow)
+    }
+
     /// `[k]G` as hex coordinates, computed by the instance's own counted
     /// double-and-add on a ledger nobody reads.  Used to build the
     /// target and, separately, to verify an answer.
@@ -1920,6 +1929,24 @@ impl Workload {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn exact_scalar_verification_preserves_high_bits_until_subgroup_reduction() {
+        use super::super::exact_scalar::ExactScalar;
+        let inst = CurveSpec::Koblitz { a: 0, n: 7 }.build().unwrap();
+        for scalar in [0u128, 1, 13, u64::MAX as u128, u128::MAX] {
+            assert_eq!(
+                inst.mul_generator_exact(scalar.into()),
+                inst.mul_generator_hex(scalar)
+            );
+        }
+        let wide = (num_bigint::BigUint::from(1u8) << 200usize)
+            * num_bigint::BigUint::from(inst.r())
+            + 13u8;
+        let exact = ExactScalar::from_biguint(&wide).unwrap();
+        assert!(exact.checked_u128().is_none());
+        assert_eq!(inst.mul_generator_exact(exact), inst.mul_generator_hex(13));
+    }
 
     #[test]
     fn prime_orbit_shapes_keep_the_requested_coefficients_and_freeze_explicitly() {
