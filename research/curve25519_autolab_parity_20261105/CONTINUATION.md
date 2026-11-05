@@ -719,3 +719,39 @@ Session46114 runs cargo check --release --offline --locked --bin ecbench --bin i
 ### Errors
 
 No test failure in this attempt. Earlier failed attempts remain archived. [pcc:unverified]
+
+## 2026-11-05T18:40:25.294308+00:00 — entrypoints pass; full library gate started
+
+### What was done
+
+Session46114 exited0: cargo check for ecbench and ic_autolab finished in2m04. Retained log/hash. Started full-library gate with timeout1800, two build jobs, two test threads, unchanged source. [pcc:unverified]
+
+### Decisions made
+
+Complete this result-transport delivery before the next workload-order implementation. No push until full gate terminal success. Keep existing PR3488 head unchanged. [pcc:unverified]
+
+### Open threads
+
+Full library test session91773, log /tmp/curve25519-transport-stage2-library-tests.log. Poll original handle, no duplicate run. Local checkpoint commit session11828 remains pending; poll before any next Git mutation. Its command stages result transport and candidate sampler, then commits with message Carry exact recovered scalars through ecbench reports and verification. Entry-point receipt and this final log entry were written after that staging and need a later commit. PR3488 cadence readback around18:51Z. [pcc:unverified]
+
+### Errors
+
+No entrypoint check error. Cloud admission unchanged: launcher AssumeRole denied, cap/reservation readback unconfirmed; no new cloud job. [pcc:unverified]
+
+## 2026-11-05T18:46:41.347870+00:00 — actual Curve25519 workload candidate
+
+### What was done
+
+Commit e843634c832b completed. Conductor cleared ecbench/study scopes. Added a separate candidate for exact Curve25519 coordinate validation, full-width generator multiplication, and new named planted/public target construction. Five native tests passed using actual curve/Fp256 source with extracted ledger/trait and unused Fp64 shim; retained sources, dependency hashes and both build attempts. [pcc:unverified]
+
+### Decisions made
+
+Keep candidate outside the current crate graph while full-library gate91773 runs. Reject mutated parameters and generator, preserve historical target laws. Wire into the actual workload/dispatch after the current result-transport delivery. [pcc:unverified]
+
+### Open threads
+
+Full-library91773 remains live; latest progress above2175/6193. PR3488 readback due about18:51Z. New adapter is not actual-crate dispatch yet. [pcc:unverified]
+
+### Errors
+
+Native first build selected num-bigint without rand and failed on imported field-test APIs. Corrected selection by Cargo fingerprint features; attempt2 exited0 with5 passed/0 failed. No production source change was needed for that harness failure. [pcc:unverified]
