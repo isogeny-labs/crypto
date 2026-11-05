@@ -1,0 +1,75 @@
+{
+  "schema": "n83.topform-attempt-file-layout/v1",
+  "candidate": "spike38",
+  "attempt": "02",
+  "root": "research/n83_candidate_pdp_20261028/evidence/n83-factorbase-variants/r38-attempt-01/top-form-20261105T1625Z-attempt-02",
+  "s3_root": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-02/",
+  "files": [
+    {
+      "path": "preflight.json",
+      "role": "frozen input/source/host/cost/launch binding"
+    },
+    {
+      "path": "protocol-binding.json",
+      "role": "frozen protocol and source binary binding"
+    },
+    {
+      "path": "run-spike38-topform.sh",
+      "role": "actual producer and S3 persistence process"
+    },
+    {
+      "path": "launch.sh",
+      "role": "13,000-second wall cap and wrapper receipt"
+    },
+    {
+      "path": "source-pdp.rs",
+      "role": "pdp source copied from frozen source commit"
+    },
+    {
+      "path": "source-top.rs",
+      "role": "top source copied from frozen source commit"
+    },
+    {
+      "path": "candidate-inputs/<case>/input.json",
+      "role": "generated input manifest with factor-base binding"
+    },
+    {
+      "path": "candidate-inputs/<case>/system.sing",
+      "role": "full generated PDP system"
+    },
+    {
+      "path": "top-certificates/<case>/*",
+      "role": "top-form Dreg certificate, if produced"
+    },
+    {
+      "path": "generate.log",
+      "role": "generation command output"
+    },
+    {
+      "path": "top-single.log",
+      "role": "top-form producer output"
+    },
+    {
+      "path": "top-replay.log",
+      "role": "fresh-process replay output"
+    },
+    {
+      "path": "terminal.json",
+      "role": "runner terminal status and exit code"
+    },
+    {
+      "path": "controller-status.json",
+      "role": "outer timeout/budget status"
+    },
+    {
+      "path": "manifest.sha256",
+      "role": "post-run file hashes"
+    },
+    {
+      "path": "S3_PERSISTENCE_INDEX.json",
+      "role": "all uploaded output paths, byte lengths and SHA-256 digests"
+    }
+  ],
+  "source_systems_expected": 48,
+  "preserve_failed_and_partial_outputs": true
+}
