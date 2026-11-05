@@ -1,0 +1,86 @@
+{
+  "schema": "pkm.local-attempt-record-check/v1",
+  "recorded_utc": "2026-11-05T09:11:29.855540+00:00",
+  "component_source_commit": "3210f04b39affe91c45884fd4aa990913f80db6c",
+  "source": "research/prime_ecdlp_three_leads_20261029/continuation-20261030/prerequisites/durable_attempt.rs",
+  "source_git_blob": "0d4acf23d34597507ecd2518e372d31f494eac51",
+  "source_sha256": "9bf8ca733598ac9886569661a895f83e1e04dc824dbfe5d44a002cb16c9839c7",
+  "commands": [
+    "rustc --edition 2021 --test -D warnings research/prime_ecdlp_three_leads_20261029/continuation-20261030/prerequisites/durable_attempt.rs -o /workspace/pkm-pr3452-main-20261105/journal/tests",
+    "/workspace/pkm-pr3452-main-20261105/journal/tests --test-threads=1",
+    "clippy-driver --edition 2021 --test -D warnings research/prime_ecdlp_three_leads_20261029/continuation-20261030/prerequisites/durable_attempt.rs -o /workspace/pkm-pr3452-main-20261105/journal/clippy-tests"
+  ],
+  "passed": 5,
+  "failed": 0,
+  "ignored": 0,
+  "tests_exit": 0,
+  "clippy_exit": 0,
+  "compiler_exit_evidence": "fail-fast shell continued to tests; complete wrapper exited0; no separately written compiler terminal",
+  "captures": {
+    "build.log": {
+      "raw_bytes": 0,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored_bytes": 0,
+      "stored_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_is_exact_prefix": true
+    },
+    "tests.log": {
+      "raw_bytes": 487,
+      "raw_sha256": "f0605c870a791582df026e2983a24c6c1cbca5351228d9c9d4a56d101abebf80",
+      "stored_bytes": 557,
+      "stored_sha256": "5430fcfb95877fb96bf3a6d00409d955b09c60a4c7e12897038280c0a620c3ad",
+      "raw_is_exact_prefix": true
+    },
+    "tests.exit": {
+      "raw_bytes": 2,
+      "raw_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "stored_bytes": 2,
+      "stored_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "raw_is_exact_prefix": true
+    },
+    "clippy.log": {
+      "raw_bytes": 0,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored_bytes": 0,
+      "stored_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_is_exact_prefix": true
+    },
+    "clippy.exit": {
+      "raw_bytes": 2,
+      "raw_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "stored_bytes": 2,
+      "stored_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "raw_is_exact_prefix": true
+    },
+    "started": {
+      "raw_bytes": 21,
+      "raw_sha256": "87f48590c4ac5acb1f74e4b232ee8ba0c85dadd53d4c7986d5acbbc6837f3aed",
+      "stored_bytes": 21,
+      "stored_sha256": "87f48590c4ac5acb1f74e4b232ee8ba0c85dadd53d4c7986d5acbbc6837f3aed",
+      "raw_is_exact_prefix": true
+    },
+    "finished": {
+      "raw_bytes": 21,
+      "raw_sha256": "5c3daff17cb557fd57110a75113f28653630e3a59c0e963b63dcc03aaadae8fe",
+      "stored_bytes": 21,
+      "stored_sha256": "5c3daff17cb557fd57110a75113f28653630e3a59c0e963b63dcc03aaadae8fe",
+      "raw_is_exact_prefix": true
+    }
+  },
+  "binaries": [
+    {
+      "path": "/workspace/pkm-pr3452-main-20261105/journal/tests",
+      "bytes": 7354824,
+      "sha256": "cf00747235df777705b49276cd28650d183da5b79e1d08693557a913a070dd0b"
+    },
+    {
+      "path": "/workspace/pkm-pr3452-main-20261105/journal/clippy-tests",
+      "bytes": 7355072,
+      "sha256": "e9e5aad43d3cd31839584cc77bfde54e708a29d8ba944f821f8406adda227dc7"
+    }
+  ],
+  "scope": "Linux local record mechanics only; no power-loss, hostile-directory, remote durability, driver/supervisor/resume or trusted execution qualification",
+  "active_native_source_untouched": true,
+  "pcc_standing": "unverified producer observations",
+  "scientific_panel": false
+}
