@@ -1,0 +1,430 @@
+diff --git a/src/cryptanalysis/curve25519_wide.rs b/src/cryptanalysis/curve25519_wide.rs
+index 8e3fcdb22d65..ed49479dd67f 100644
+--- a/src/cryptanalysis/curve25519_wide.rs
++++ b/src/cryptanalysis/curve25519_wide.rs
+@@ -26,6 +26,7 @@
+ //! `run_pipeline` can run on this curve.  This module makes the group side of
+ //! that extension real and testable in the meantime.
+ 
++use std::cell::Cell;
+ use std::collections::{BTreeMap, HashMap};
+ 
+ use num_bigint::BigUint;
+@@ -338,6 +339,20 @@ pub struct WideGauss {
+     /// Pivot column → (row, right-hand side), in increasing pivot order.
+     rows: BTreeMap<usize, (Vec<Fp256Elem>, Fp256Elem)>,
+     inconsistent: bool,
++    work: Cell<WideMatrixWork>,
++}
++
++/// Scalar-field API calls made by matrix insertion and recovery, modulo ell.
++/// These are native counts, not GAE. Inversions are counted as calls rather
++/// than their internal multiplications. Allocation, copies, comparisons and
++/// field construction are excluded and still require whole-process pricing.
++#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, serde::Serialize)]
++pub struct WideMatrixWork {
++    pub multiplications: u64,
++    pub additions: u64,
++    pub subtractions: u64,
++    pub inversions: u64,
++    pub conversions: u64,
+ }
+ 
+ impl WideGauss {
+@@ -347,9 +362,30 @@ impl WideGauss {
+             cols,
+             rows: BTreeMap::new(),
+             inconsistent: false,
++            work: Cell::new(WideMatrixWork::default()),
+         }
+     }
+ 
++    pub fn work(&self) -> WideMatrixWork {
++        self.work.get()
++    }
++
++    fn charge_matrix(&self, mul: usize, add: usize, sub: usize, inv: usize, convert: usize) {
++        let mut work = self.work.get();
++        for (counter, amount) in [
++            (&mut work.multiplications, mul),
++            (&mut work.additions, add),
++            (&mut work.subtractions, sub),
++            (&mut work.inversions, inv),
++            (&mut work.conversions, convert),
++        ] {
++            *counter = counter
++                .checked_add(u64::try_from(amount).expect("count fits u64"))
++                .expect("wide matrix operation counter overflow");
++        }
++        self.work.set(work);
++    }
++
+     pub fn rank(&self) -> usize {
+         self.rows.len()
+     }
+@@ -360,6 +396,7 @@ impl WideGauss {
+ 
+     /// Add one row `a·x = b` (mod `ℓ`); returns whether the rank grew.
+     pub fn add_row(&mut self, coeffs: &[BigUint], rhs: &BigUint) -> bool {
++        self.charge_matrix(0, 0, 0, 0, coeffs.len().min(self.cols) + 1);
+         let f = &self.field;
+         let mut row: Vec<Fp256Elem> = (0..self.cols)
+             .map(|i| {
+@@ -378,6 +415,7 @@ impl WideGauss {
+                 row[j] = f.sub(row[j], f.mul(factor, prow[j]));
+             }
+             b = f.sub(b, f.mul(factor, *pb));
++            self.charge_matrix(self.cols - col + 1, 0, self.cols - col + 1, 0, 0);
+         }
+         let Some(pivot) = (0..self.cols).find(|&j| !f.is_zero(row[j])) else {
+             if !f.is_zero(b) {
+@@ -390,6 +428,7 @@ impl WideGauss {
+             *x = f.mul(*x, inv);
+         }
+         b = f.mul(b, inv);
++        self.charge_matrix(self.cols - pivot + 1, 0, 0, 1, 0);
+         self.rows.insert(pivot, (row, b));
+         true
+     }
+@@ -408,9 +447,153 @@ impl WideGauss {
+                 acc = f.sub(acc, f.mul(row[j], x[j]));
+             }
+             x[col] = f.mul(acc, f.inv(row[col]).expect("normalized pivot"));
++            self.charge_matrix(self.cols - col, 0, self.cols - col - 1, 1, 0);
+         }
++        self.charge_matrix(0, 0, 0, 0, self.cols);
+         Some(x.into_iter().map(|v| f.to_biguint(v)).collect())
+     }
++
++    /// Recover one uniquely determined coordinate, without requiring the
++    /// other factor-base logarithms to be determined.
++    ///
++    /// Reduce the coordinate's unit row against the echelon rows. A zero
++    /// residual expresses that unit row as a linear combination of admitted
++    /// relations; the same combination of their right-hand sides is its
++    /// value. A nonzero residual means a free variable can change it.
++    /// This is an algebraic recovery candidate: the caller must still check
++    /// `[value]G = Q` before accepting a target logarithm.
++    pub fn solve_coordinate(&self, coordinate: usize) -> Option<BigUint> {
++        if self.inconsistent || coordinate >= self.cols {
++            return None;
++        }
++        let f = &self.field;
++        let mut residual = vec![f.zero(); self.cols];
++        residual[coordinate] = f.one();
++        let mut value = f.zero();
++        for (&col, (row, rhs)) in &self.rows {
++            let factor = residual[col];
++            if f.is_zero(factor) {
++                continue;
++            }
++            for j in col..self.cols {
++                residual[j] = f.sub(residual[j], f.mul(factor, row[j]));
++            }
++            value = f.add(value, f.mul(factor, *rhs));
++            self.charge_matrix(self.cols - col + 1, 1, self.cols - col, 0, 0);
++        }
++        residual.iter().all(|v| f.is_zero(*v)).then(|| {
++            self.charge_matrix(0, 0, 0, 0, 1);
++            f.to_biguint(value)
++        })
++    }
++
++    /// Recover a target coordinate and verify its actual Curve25519 point.
++    /// The group work of the final check is charged to `ops`; matrix work
++    /// accumulates in `work()`. This does not validate input relation witnesses.
++    pub fn recover_target(
++        &self,
++        coordinate: usize,
++        group: &Curve25519Wide,
++        target: WidePoint,
++        ops: &mut GroupOps,
++    ) -> Option<BigUint> {
++        if !group.on_curve(target) {
++            return None;
++        }
++        let scalar = self.solve_coordinate(coordinate)?;
++        (group.mul_biguint(ops, group.generator, &scalar) == target).then_some(scalar)
++    }
++}
++
++/// Public-input relation admission and target recovery over the actual curve.
++///
++/// The system stores no factor-base logarithms or planted target scalar.
++/// Rows must satisfy `sum coefficients[i] * base[i] = a*G + b*Q` before
++/// entering the matrix. This is a recovery stage, not a relation search;
++/// matrix field-operation counts are available separately from group work.
++pub struct WideRelationSystem<'a> {
++    group: &'a Curve25519Wide,
++    base: Vec<WidePoint>,
++    target: WidePoint,
++    matrix: WideGauss,
++}
++
++impl<'a> WideRelationSystem<'a> {
++    pub fn new(
++        group: &'a Curve25519Wide,
++        base: Vec<WidePoint>,
++        target: WidePoint,
++        ops: &mut GroupOps,
++    ) -> Result<Self, String> {
++        let canonical = Curve25519Wide::new();
++        if group.field.modulus() != canonical.field.modulus()
++            || group.a != canonical.a
++            || group.b != canonical.b
++            || group.generator != canonical.generator
++            || group.r != canonical.r
++            || group.cofactor != canonical.cofactor
++        {
++            return Err("relation system requires the canonical Curve25519 group".into());
++        }
++        for point in base.iter().chain(std::iter::once(&target)) {
++            if point.is_none() || !group.on_curve(*point) {
++                return Err("base and target must be nonidentity curve points".into());
++            }
++            if group.mul_biguint(ops, *point, &group.r).is_some() {
++                return Err("base and target must belong to the prime-order subgroup".into());
++            }
++        }
++        Ok(Self {
++            group,
++            matrix: WideGauss::new(base.len() + 1),
++            base,
++            target,
++        })
++    }
++
++    pub fn rank(&self) -> usize {
++        self.matrix.rank()
++    }
++
++    pub fn matrix_work(&self) -> WideMatrixWork {
++        self.matrix.work()
++    }
++
++    /// Verify a complete relation and return whether it increased rank.
++    /// Invalid input leaves the matrix unchanged; verification work is kept.
++    pub fn admit(
++        &mut self,
++        coefficients: &[BigUint],
++        a: &BigUint,
++        b: &BigUint,
++        ops: &mut GroupOps,
++    ) -> Result<bool, String> {
++        if coefficients.len() != self.base.len() {
++            return Err("relation coefficient count differs from the factor base".into());
++        }
++        let r = &self.group.r;
++        if coefficients.iter().chain([a, b]).any(|v| v >= r) {
++            return Err("relation scalars must be canonical modulo the subgroup order".into());
++        }
++        let mut lhs = None;
++        for (point, coefficient) in self.base.iter().zip(coefficients) {
++            let term = self.group.mul_biguint(ops, *point, coefficient);
++            lhs = self.group.add(ops, lhs, term);
++        }
++        let ag = self.group.mul_biguint(ops, self.group.generator, a);
++        let bq = self.group.mul_biguint(ops, self.target, b);
++        if lhs != self.group.add(ops, ag, bq) {
++            return Err("relation does not hold in the Curve25519 group".into());
++        }
++        let mut row = coefficients.to_vec();
++        row.push(if b.is_zero() { BigUint::zero() } else { r - b });
++        Ok(self.matrix.add_row(&row, a))
++    }
++
++    pub fn recover(&self, ops: &mut GroupOps) -> Option<BigUint> {
++        self.matrix
++            .recover_target(self.base.len(), self.group, self.target, ops)
++    }
+ }
+ 
+ /// Charge one affine addition's field tally, the unit `GroupOps` uses
+@@ -759,6 +942,9 @@ mod tests {
+         }
+         assert_eq!(g.rank(), n);
+         assert_eq!(g.solve().expect("full rank"), x);
++        for (column, expected) in x.iter().enumerate() {
++            assert_eq!(g.solve_coordinate(column).as_ref(), Some(expected));
++        }
+     }
+ 
+     #[test]
+@@ -774,6 +960,177 @@ mod tests {
+         ));
+         assert!(g.inconsistent());
+         assert_eq!(g.solve(), None);
++        assert_eq!(g.solve_coordinate(0), None);
++    }
++
++    #[test]
++    fn matrix_work_keeps_dependent_rows_and_recovery_cost() {
++        let mut matrix = WideGauss::new(2);
++        let row = |a, b| [BigUint::from(a), BigUint::from(b)];
++        assert!(matrix.add_row(&row(2u32, 3u32), &BigUint::from(5u32)));
++        assert!(!matrix.add_row(&row(4u32, 6u32), &BigUint::from(10u32)));
++        assert_eq!(
++            matrix.work(),
++            WideMatrixWork {
++                multiplications: 6,
++                additions: 0,
++                subtractions: 3,
++                inversions: 1,
++                conversions: 6,
++            }
++        );
++        // An underdetermined query still performs a row reduction.
++        assert_eq!(matrix.solve_coordinate(0), None);
++        assert_eq!(
++            matrix.work(),
++            WideMatrixWork {
++                multiplications: 9,
++                additions: 1,
++                subtractions: 5,
++                inversions: 1,
++                conversions: 6,
++            }
++        );
++        assert!(matrix.add_row(&row(0u32, 1u32), &BigUint::one()));
++        assert_eq!(matrix.solve_coordinate(0), Some(BigUint::one()));
++        assert_eq!(
++            matrix.work(),
++            WideMatrixWork {
++                multiplications: 16,
++                additions: 3,
++                subtractions: 8,
++                inversions: 2,
++                conversions: 10,
++            }
++        );
++        let before = matrix.work();
++        assert_eq!(matrix.solve_coordinate(2), None);
++        assert_eq!(matrix.work(), before);
++    }
++
++    #[test]
++    fn wide_target_recovery_does_not_require_all_base_logs() {
++        let ell: BigUint = L25519.parse().unwrap();
++        let large = (BigUint::one() << 200usize) + BigUint::from(17u32);
++        let target = &ell - BigUint::from(123u32);
++        let mut matrix = WideGauss::new(3);
++        // Two base logs x,y remain free subject to x + y = large.
++        // The difference of these rows determines z = target modulo ell.
++        assert!(matrix.add_row(
++            &[large.clone(), large.clone(), BigUint::from(1u32)],
++            &((&large * &large + &target) % &ell),
++        ));
++        assert!(matrix.add_row(
++            &[BigUint::one(), BigUint::one(), BigUint::from(0u32)],
++            &large,
++        ));
++        assert_eq!(matrix.rank(), 2);
++        assert_eq!(matrix.solve(), None);
++        assert_eq!(matrix.solve_coordinate(0), None);
++        assert_eq!(matrix.solve_coordinate(1), None);
++        assert_eq!(matrix.solve_coordinate(2), Some(target.clone()));
++        assert_eq!(matrix.solve_coordinate(3), None);
++        let group = Curve25519Wide::new();
++        let point = group.mul_biguint(&mut GroupOps::default(), group.generator, &target);
++        let mut verification = GroupOps::default();
++        assert_eq!(
++            matrix.recover_target(2, &group, point, &mut verification),
++            Some(target)
++        );
++        assert_eq!(verification.scalar_mults, 1);
++        assert!(verification.doubles > 128);
++        assert_eq!(
++            matrix.recover_target(2, &group, group.generator, &mut GroupOps::default()),
++            None,
++        );
++    }
++
++    #[test]
++    fn wide_coordinate_with_a_free_variable_is_not_recovered() {
++        let mut matrix = WideGauss::new(2);
++        assert!(matrix.add_row(&[BigUint::one(), BigUint::one()], &BigUint::from(5u32),));
++        // A pivot alone is insufficient: x = 5 - y still depends on y.
++        assert_eq!(matrix.solve_coordinate(0), None);
++        assert_eq!(matrix.solve_coordinate(1), None);
++        assert_eq!(WideGauss::new(0).solve_coordinate(0), None);
++    }
++
++    #[test]
++    fn checked_relations_recover_a_wide_target_at_deficient_rank() {
++        let group = Curve25519Wide::new();
++        let mut fixture_ops = GroupOps::default();
++        let secret = (BigUint::one() << 200usize) + BigUint::from(19u32);
++        let target = group.mul_biguint(&mut fixture_ops, group.generator, &secret);
++        let base = vec![
++            group.mul_u64(&mut fixture_ops, group.generator, 5),
++            group.mul_u64(&mut fixture_ops, group.generator, 7),
++        ];
++        let mut ops = GroupOps::default();
++        let mut system = WideRelationSystem::new(&group, base, target, &mut ops).unwrap();
++        let coefficients = [BigUint::one(), BigUint::one()];
++        let a = &group.r + BigUint::from(12u32) - &secret;
++        assert!(system
++            .admit(&coefficients, &a, &BigUint::one(), &mut ops)
++            .unwrap());
++        assert_eq!(system.recover(&mut ops), None);
++        let before_bad_row = ops.scalar_mults;
++        assert!(system
++            .admit(
++                &coefficients,
++                &(&a + BigUint::one()),
++                &BigUint::one(),
++                &mut ops
++            )
++            .is_err());
++        assert!(ops.scalar_mults > before_bad_row);
++        assert_eq!(system.rank(), 1);
++        assert!(system
++            .admit(
++                &coefficients,
++                &BigUint::from(12u32),
++                &BigUint::zero(),
++                &mut ops
++            )
++            .unwrap());
++        assert_eq!(system.rank(), 2); // Three columns, no complete base-log solution.
++        assert_eq!(system.recover(&mut ops), Some(secret));
++        assert!(!system
++            .admit(
++                &coefficients,
++                &BigUint::from(12u32),
++                &BigUint::zero(),
++                &mut ops
++            )
++            .unwrap());
++        assert!(system
++            .admit(&[], &BigUint::zero(), &BigUint::zero(), &mut ops)
++            .is_err());
++        assert!(system
++            .admit(&coefficients, &group.r, &BigUint::zero(), &mut ops)
++            .is_err());
++        assert_eq!(system.rank(), 2);
++    }
++
++    #[test]
++    fn checked_relations_reject_identity_and_torsion_inputs() {
++        let group = Curve25519Wide::new();
++        let mut ops = GroupOps::default();
++        assert!(WideRelationSystem::new(&group, vec![None], group.generator, &mut ops).is_err());
++        assert!(WideRelationSystem::new(&group, vec![], None, &mut ops).is_err());
++        // Montgomery (u,v)=(0,0), transported by x=u+A/3: nontrivial 2-torsion.
++        let f = &group.field;
++        let torsion = Some((
++            f.mul(f.from_u64(A25519), f.inv(f.from_u64(3)).unwrap()),
++            f.zero(),
++        ));
++        assert!(group.on_curve(torsion));
++        assert!(WideRelationSystem::new(&group, vec![torsion], group.generator, &mut ops).is_err());
++        assert!(WideRelationSystem::new(&group, vec![], torsion, &mut ops).is_err());
++        let mut changed_generator = group.clone();
++        changed_generator.generator = None;
++        assert!(
++            WideRelationSystem::new(&changed_generator, vec![], group.generator, &mut ops).is_err()
++        );
+     }
+ 
+     #[test]

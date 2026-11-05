@@ -1,0 +1,99 @@
+{
+  "schema": "source-review/v1",
+  "status": "source_consistent_with_recorded_limits",
+  "pcc": "unverified",
+  "reviewer": "/root/reconcile_norm_proofs",
+  "independence": {
+    "candidate_author": false,
+    "blind_to_design": false,
+    "preregistered_plan_commit": "aadc4e94b8"
+  },
+  "published_candidate_commit": "2e280f6b70",
+  "producer_commit": "df926cd122",
+  "candidate_sha256": "708bb29ce8348ca73ee6ef039ec52e0504a17d2d901a88b4ad2eb44795369b33",
+  "baseline_sha256": "7986123f9792c4ed05bdb17d0547fe7a377e29c2b900e98918837cd033bd27aa",
+  "core_sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6",
+  "patch_sha256": "2c20388f2c3f8faeb8e55094d0aa4810e870f22270a5a27427692421636f3057",
+  "runtime_validation": "unexecuted",
+  "compiler_runs": 0,
+  "target_runs": 0,
+  "findings": [
+    {
+      "id": "S1",
+      "location": "candidate-followup.rs:451-472",
+      "disposition": "source_consistent",
+      "observation": "Both labels change sign; new-minus-first gives k=-delta_a/delta_b; zero db never inverted."
+    },
+    {
+      "id": "S2",
+      "location": "candidate-followup.rs:489-505",
+      "disposition": "source_consistent",
+      "observation": "Vacant entry retains earliest processed normalized labels; duplicate lookup does not overwrite."
+    },
+    {
+      "id": "S3",
+      "location": "candidate-followup.rs:470-487,595-608",
+      "disposition": "source_consistent",
+      "observation": "Duplicate and identity/graph success paths all require original-curve scalar multiplication equality before Ok Outcome."
+    },
+    {
+      "id": "S4",
+      "location": "native-core-source.rs:55-63,1246-1266",
+      "disposition": "source_consistent",
+      "observation": "Field clone shares Rc counter; source verification is included before final phase snapshot."
+    },
+    {
+      "id": "S5",
+      "location": "candidate-followup.rs:203-211,459-468,474-482,687-690",
+      "disposition": "source_consistent",
+      "observation": "Observer errors propagate before successful Outcome; partial events alone cannot be accepted as a completed run."
+    },
+    {
+      "id": "S6",
+      "location": "candidate-followup.rs:238-247,360-366",
+      "disposition": "source_consistent",
+      "observation": "Default delegates false; optional label map is not allocated; no new Ring/source verification arithmetic on false branch. Runtime equivalence and overhead unmeasured."
+    },
+    {
+      "id": "L1",
+      "location": "candidate-followup.rs:274-318",
+      "disposition": "input_contract_limit",
+      "observation": "Family/curve assertions and tau happen before new point/order checks; malformed input can panic before Result Err. Bind valid fixtures and explicit panic receipts or move preflight in successor.",
+      "classification": "inherited assertions with new opt-in preflight ordering; no advertised total Err contract"
+    },
+    {
+      "id": "L2",
+      "location": "candidate-followup.rs:468,482,502,604,655",
+      "disposition": "accounting_limit",
+      "observation": "Failure paths return Err without Outcome/phases; full attempt costs need an outer receipt, including observer failure and panic.",
+      "classification": "prospective runtime accounting requirement; missing costs unknown"
+    },
+    {
+      "id": "L3",
+      "location": "candidate-followup.rs:651-655,680-683",
+      "disposition": "accounting_limit",
+      "observation": "Map counters and 24 value bytes exclude keys/tree/allocator/observer work. They are not measured total time or memory."
+    },
+    {
+      "id": "L4",
+      "location": "native-core-source.rs:1493-1526",
+      "disposition": "premise_limit",
+      "observation": "Prime assertion delegates scalar_constructor_prime; tau homomorphism and group-law correctness remain explicit mathematical/source premises. No independent arithmetic execution was performed."
+    }
+  ],
+  "next_controls": [
+    "positive same-sign and opposite-sign duplicate",
+    "redundant and conflicting zero denominator",
+    "source-target mismatch",
+    "first-label immutability",
+    "two-candidate ordering and restart continuity",
+    "observer errors at first-label/collision/verification/terminal",
+    "default stream and outcome equivalence",
+    "complete failed-attempt and setup accounting"
+  ],
+  "reference": {
+    "url": "https://cacr.uwaterloo.ca/hac/about/chap3.pdf",
+    "section": "3.6.3 Algorithm 3.60 pp106-107",
+    "used_for": "prime-order coefficient collision equation; no novelty or performance inference"
+  }
+}
