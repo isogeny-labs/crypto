@@ -82,7 +82,7 @@
       "instrument": {
         "repo": "isogeny-labs/crypto",
         "commit": "recorded in commit.txt at run time (this PR's head)",
-        "build": "CARGO_BUILD_JOBS=1 CARGO_PROFILE_RELEASE_CODEGEN_UNITS=64 CARGO_PROFILE_RELEASE_OPT_LEVEL=1 cargo build --release --no-default-features --example pkm_tower_pilot (opt-level 3 OOM on this host; counted metrics are build-independent and G0 checks them)",
+        "build": "see amendments[A1]",
         "binary_sha256": "recorded in binary.sha256 at run time",
         "flags": {
           "engine": "tower",
@@ -427,7 +427,20 @@
       "claim": "tower quotient = group algebra; square-free normal forms"
     }
   ],
-  "amendments": [],
+  "amendments": [
+    {
+      "id": "A1",
+      "date": "2026-11-04",
+      "filed_before_affected_data": true,
+      "text": "Instrument build from a pruned module list (build_prune.diff, deletions only in src/lib.rs and src/cryptanalysis/mod.rs; every compiled module is committed source). opt-level 3 if it fits this host's memory, else opt-level 1; recorded in build.txt. Counted metrics are build-independent; G0 regression decides admissibility.",
+      "files": [
+        "build_prune.diff",
+        "prune_closure.py",
+        "prune_modules.py"
+      ],
+      "build_prune_diff_sha256": "a80c0f6800ad87f37f701ce6be704c10da733476c022da9a5f4f634eef4676cc"
+    }
+  ],
   "freeze": {
     "status": "frozen",
     "protocol_sha256": "5cd90ce40c639df82aeb9b8a54cfbc484e544e481c18718d4f6ba2f01b3b53ee",

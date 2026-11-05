@@ -142,4 +142,21 @@ these needs a dated amendment below, stating whether it preceded the data it aff
 
 ## 8. Amendments
 
-None.
+**Amendment 1 (2026-11-04, filed before any study row; it changes how the instrument is built, not what it
+computes).** Under §3's opt-level-1 flags, the library build was also killed by this host's memory limit,
+with 2 jobs and 64 codegen units. The study binary is therefore built from a *pruned module list*:
+
+- `src/lib.rs` and `src/cryptanalysis/mod.rs` keep only the modules the pilot reaches. These are the
+  reference-scan closure of `prune_closure.py` from the pilot's imports, plus `aps_single_relation`, which the
+  compiler named. `prune_modules.py` makes the edit, and `build_prune.diff` is the exact result (deletions
+  only).
+- Every compiled module is the committed source, byte for byte. The prune is applied to the working tree for
+  the build, then reverted, and is never committed to `src/`.
+- Build:
+  `git apply research/pkm_radix_grading_20261104/build_prune.diff && CARGO_BUILD_JOBS=1
+  CARGO_PROFILE_RELEASE_CODEGEN_UNITS=64 cargo build --release --no-default-features --example pkm_tower_pilot`.
+  If that also runs out of memory, the same command with `CARGO_PROFILE_RELEASE_OPT_LEVEL=1`. `binary.sha256`
+  and `build.txt` record which was used.
+
+G0 is unchanged and decides admissibility: the binary must reproduce the committed `R-t9-t10` counts exactly.
+Nothing else in the protocol changes.
