@@ -1,0 +1,172 @@
+{
+  "schema": "hashed-ecdl.source-refinement-audit/v1",
+  "claim": "PCC-20261105-c0901e",
+  "standing": "unverified",
+  "source_revision": "f96a6d475896e06065eda55ccecf5f0132692423",
+  "status": "Written source-audit argument; not executable specification or checked proof",
+  "preconditions": [
+    "P>0, positive usize mode weights",
+    "valid graph/packing and aligned label arrays",
+    "positive radix; legal digit coordinate; mode.packet<K, mode.target<r",
+    "beta length equals mode count; usage/bounds lengths K*r from checked multiplication",
+    "W=sum beta_i*w_i < P; U_g=sum beta_i for g_i=g <= B_g"
+  ],
+  "source_sites": [
+    {
+      "id": "next_tuple",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/recursive.rs",
+      "anchor": "fn next_tuple(",
+      "line_start": 298,
+      "url": "https://github.com/isogeny-labs/crypto/blob/f96a6d475896e06065eda55ccecf5f0132692423/crates/hashed-ecdl-tensor/src/contraction/recursive.rs#L298"
+    },
+    {
+      "id": "evaluate_at",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/recursive.rs",
+      "anchor": "fn evaluate_at(",
+      "line_start": 324,
+      "url": "https://github.com/isogeny-labs/crypto/blob/f96a6d475896e06065eda55ccecf5f0132692423/crates/hashed-ecdl-tensor/src/contraction/recursive.rs#L324"
+    },
+    {
+      "id": "child",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "anchor": "pub(super) fn child(",
+      "line_start": 406,
+      "url": "https://github.com/isogeny-labs/crypto/blob/f96a6d475896e06065eda55ccecf5f0132692423/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L406"
+    },
+    {
+      "id": "packet_entry",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "anchor": "impl PacketTensor {",
+      "line_start": 275,
+      "url": "https://github.com/isogeny-labs/crypto/blob/f96a6d475896e06065eda55ccecf5f0132692423/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L275"
+    },
+    {
+      "id": "modes",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "anchor": "pub(super) fn modes(",
+      "line_start": 161,
+      "url": "https://github.com/isogeny-labs/crypto/blob/f96a6d475896e06065eda55ccecf5f0132692423/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L161"
+    },
+    {
+      "id": "ring_new",
+      "path": "crates/hashed-ecdl-tensor/src/ring.rs",
+      "anchor": "pub fn new(",
+      "line_start": 95,
+      "url": "https://github.com/isogeny-labs/crypto/blob/f96a6d475896e06065eda55ccecf5f0132692423/crates/hashed-ecdl-tensor/src/ring.rs#L95"
+    },
+    {
+      "id": "ring_lift",
+      "path": "crates/hashed-ecdl-tensor/src/ring.rs",
+      "anchor": "pub fn at_precision(",
+      "line_start": 126,
+      "url": "https://github.com/isogeny-labs/crypto/blob/f96a6d475896e06065eda55ccecf5f0132692423/crates/hashed-ecdl-tensor/src/ring.rs#L126"
+    },
+    {
+      "id": "digit",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/packing.rs",
+      "anchor": "pub(super) fn digit(",
+      "line_start": 19,
+      "url": "https://github.com/isogeny-labs/crypto/blob/f96a6d475896e06065eda55ccecf5f0132692423/crates/hashed-ecdl-tensor/src/contraction/packing.rs#L19"
+    },
+    {
+      "id": "existing_regression",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/recursive.rs",
+      "anchor": "fn weighted_enumeration_has_no_missing_or_repeated_monomials(",
+      "line_start": 565,
+      "url": "https://github.com/isogeny-labs/crypto/blob/f96a6d475896e06065eda55ccecf5f0132692423/crates/hashed-ecdl-tensor/src/contraction/recursive.rs#L565"
+    }
+  ],
+  "transitions": [
+    {
+      "id": "initialize",
+      "source_site": "evaluate_at",
+      "source_action": "beta=0; U=0; W=0",
+      "requires": "P>0; valid group lengths",
+      "review_obligation": "zero weighted and usage sums; initial tuple emitted",
+      "evidence_status": "unverified source argument"
+    },
+    {
+      "id": "increment",
+      "source_site": "next_tuple",
+      "source_action": "w_i<P-W AND U_g<B_g",
+      "requires": "invariant and in-range group key",
+      "review_obligation": "beta_i+=1; W+=w_i; U_g+=1 preserve both sums and bounds",
+      "evidence_status": "unverified source argument"
+    },
+    {
+      "id": "reset",
+      "source_site": "next_tuple",
+      "source_action": "increment predicate false",
+      "requires": "current coordinate contributes to both counters",
+      "review_obligation": "subtract beta_i*w_i and beta_i; clear beta_i; preserve residual sums",
+      "evidence_status": "unverified source argument"
+    },
+    {
+      "id": "carry",
+      "source_site": "next_tuple",
+      "source_action": "continue after reset",
+      "requires": "lower indices zero, higher indices unchanged",
+      "review_obligation": "test next coordinate against current residual budgets",
+      "evidence_status": "unverified source argument"
+    },
+    {
+      "id": "exhaust",
+      "source_site": "next_tuple",
+      "source_action": "all coordinates exhausted",
+      "requires": "each completed reset preserves invariant",
+      "review_obligation": "return false with zero state; caller stops without re-emitting",
+      "evidence_status": "unverified source argument"
+    },
+    {
+      "id": "limit",
+      "source_site": "next_tuple",
+      "source_action": "meter charge returns Err",
+      "requires": "charge occurs before current-coordinate mutations",
+      "review_obligation": "propagate Err; completed resets consistent; no complete total returned",
+      "evidence_status": "unverified source argument"
+    },
+    {
+      "id": "row_join",
+      "source_site": "child",
+      "source_action": "row_map predicate matches driver label-digit predicate",
+      "requires": "same graph/packing/coordinate/radix; valid indices",
+      "review_obligation": "selected row count R equals driver B_(p,g)",
+      "evidence_status": "unverified source argument"
+    },
+    {
+      "id": "incoming_join",
+      "source_site": "child",
+      "source_action": "retain every positive exponent with packet p,target g",
+      "requires": "modes.len=beta.len; no deduplication",
+      "review_obligation": "E=sum matching beta=U_(p,g)<=R and q<=E",
+      "evidence_status": "unverified source argument"
+    },
+    {
+      "id": "entry_sum",
+      "source_site": "packet_entry",
+      "source_action": "remaining=sum positive incoming exponents",
+      "requires": "conditional incoming join",
+      "review_obligation": "sum fits R; initial E>R false on this driver path",
+      "evidence_status": "unverified source argument"
+    },
+    {
+      "id": "semantic_bridge",
+      "source_site": "packet_entry",
+      "source_action": "target row factors affine in formal modes",
+      "requires": "exact coefficient extraction including signs and zero terms",
+      "review_obligation": "overfull target-degree caps need a faithful coefficient-semantics refinement",
+      "evidence_status": "unverified source argument"
+    }
+  ],
+  "remaining": [
+    "Faithful Rust usize/slice transition refinement and caller invariants",
+    "Coefficient DFS restoration, signs, contributions and formal coefficient semantics",
+    "Preparation/outgoing exponent bit costs and full ancestor-retention induction"
+  ],
+  "formal_status": {
+    "lean": "not run: lean/lake absent from PATH",
+    "declarations": [],
+    "identity_certificate": "not issued: no new algebraic identity claimed",
+    "kernel_axiom_audit": "not performed"
+  }
+}
