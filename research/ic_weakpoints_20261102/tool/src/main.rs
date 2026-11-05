@@ -7,6 +7,7 @@
 //!
 //! Every line printed on stdout is one JSON record. Counts only: no timings.
 mod curve;
+mod dlp;
 mod field;
 mod poly;
 mod summarize;
@@ -30,7 +31,9 @@ fn main() {
         Some("yield") => yield_cmd(&args),
         Some("pipeline") => pipeline(&args),
         Some("selftest") => selftest(),
+        Some("dlp") => dlp::run(&args),
         Some("summarize") => summarize::run(args.get(2).map(|s| s.as_str()).unwrap_or("data")),
+        Some("summarize-dlp") => summarize::run_dlp(args.get(2).map(|s| s.as_str()).unwrap_or("data")),
         _ => eprintln!("usage: ic-weakpoints algebra|yield|pipeline|selftest ..."),
     }
 }
@@ -162,7 +165,8 @@ fn decompose3(c: &Curve, fb: &Fb, r: &Pt, rng: &mut Rng) -> (Vec<Decomp>, u64) {
             }
         }
     }
-    let v: Vec<Decomp> = out.into_iter().collect();
+    let mut v: Vec<Decomp> = out.into_iter().collect();
+    v.sort(); // Amendment 3a: HashSet order is randomised per process; sort for a deterministic row order
     for d in &v {
         let mut acc: Pt = None;
         for &(i, s) in d {

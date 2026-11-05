@@ -2370,6 +2370,20 @@ pub struct LineSearch {
     pub best_index: u64,
     /// Every `F_p` multiplication of the search, the move of `G`, `Q` included.
     pub muls: u64,
+    /// `horner` (per-line Horner at `F_p` points) or `table` (one `χ(h)` table
+    /// over `F_q`, then additions and lookups per line).
+    pub mode: String,
+    /// The table mode enumerated every square-direction line up to equivalence.
+    pub exhaustive: bool,
+    /// `F_p` additions and table lookups the search performs and does not
+    /// count among `muls` (Horner: `2·deg + 1` and one per point; table: the
+    /// table build plus two and one per point of each line walked).
+    pub adds: u64,
+    pub lookups: u64,
+    /// `F_p` multiplications of the `χ(h)` table build (inside `muls`).
+    pub table_muls: u64,
+    /// Points `x ∈ F_q` whose `χ(h(x))` the search read or computed.
+    pub points: u64,
 }
 
 /// `#{s ∈ F_p : h′(s) a non-zero square of F_q}` for monic `h′ ∈ F_q[x]`.
@@ -2407,21 +2421,125 @@ fn line_count(f: &Fq, hp: &[E2], qr: &[bool]) -> usize {
 /// instance to the best one.  The returned spec has `line` set and `gj`,
 /// `qj` on the moved model; logarithms are unchanged (an isomorphism).
 pub fn search_fb_line(spec: &Spec, n: u64, seed: u64) -> (Spec, LineSearch) {
+    search_fb_line_mode(spec, n, seed, false)
+}
+
+/// Line search by `JV_FB_LINE=n` and `JV_FB_LINE_MODE=horner|table` (unset or
+/// `n = 0`: no search, `None`).  Returns the moved spec and the record.
+pub fn fb_line_from_env(spec: &Spec, seed: u64) -> (Spec, Option<LineSearch>) {
+    let n: u64 = std::env::var("JV_FB_LINE")
+        .ok()
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(0);
+    if n == 0 || spec.line.is_some() {
+        return (spec.clone(), None);
+    }
+    let table = match std::env::var("JV_FB_LINE_MODE").as_deref() {
+        Ok("table") => true,
+        Ok("horner") | Err(_) => false,
+        Ok(m) => panic!("JV_FB_LINE_MODE={m}: expected horner or table"),
+    };
+    let (s2, rep) = search_fb_line_mode(spec, n, seed, table);
+    (s2, Some(rep))
+}
+
+/// Number of square-direction lines `a·F_p + b` up to equivalence:
+/// `(p + 1)/2` directions (classes of `a = t²` modulo `F_p^×`) times `p`
+/// offsets (cosets of `a·F_p` in `F_q`).
+pub fn line_classes(p: u64) -> u64 {
+    p.div_ceil(2) * p
+}
+
+/// `χ(h(x))` for every `x = (x₀, x₁) ∈ F_q`, at index `x₀·p + x₁`: `true`
+/// iff `h(x)` is a non-zero square of `F_q`.  Horner with `F_q` products
+/// (five `F_p` products each, seven steps) and the norm (three), the square
+/// table of `F_p` as the native lookup.
+fn chi_table(f: &Fq, h: &[E2], qr: &[bool]) -> Vec<bool> {
+    let p = f.p;
+    let w = f.w;
+    let deg = h.len() - 1;
+    let mut out = vec![false; (p * p) as usize];
+    out.par_chunks_mut(p as usize)
+        .enumerate()
+        .for_each(|(x0, row)| {
+            let x0 = x0 as u64;
+            for (x1, slot) in row.iter_mut().enumerate() {
+                let x1 = x1 as u64;
+                let mut acc = h[deg];
+                for k in (0..deg).rev() {
+                    let m00 = mm(acc.0[0], x0, p);
+                    let m11 = mm(acc.0[1], x1, p);
+                    let r0 = am(m00, mm(w, m11, p), p);
+                    let r1 = am(mm(acc.0[0], x1, p), mm(acc.0[1], x0, p), p);
+                    acc = E2([am(r0, h[k].0[0], p), am(r1, h[k].0[1], p)]);
+                }
+                let n = sm(
+                    mm(acc.0[0], acc.0[0], p),
+                    mm(mm(acc.0[1], acc.0[1], p), w, p),
+                    p,
+                );
+                *slot = n != 0 && qr[n as usize];
+            }
+        });
+    out
+}
+
+/// `B` of the line `x = a·s + b`, `s ∈ F_p`, read from the table: two
+/// additions and one lookup per point.
+fn table_count(p: u64, chi: &[bool], a: &E2, b: &E2) -> usize {
+    let (mut x0, mut x1) = (b.0[0], b.0[1]);
+    let mut cnt = 0usize;
+    for _ in 0..p {
+        cnt += chi[(x0 * p + x1) as usize] as usize;
+        x0 = am(x0, a.0[0], p);
+        x1 = am(x1, a.0[1], p);
+    }
+    cnt
+}
+
+/// [`search_fb_line`] with the Horner count (`table = false`) or the `χ(h)`
+/// table (`table = true`).  Both draw the same candidate lines from the same
+/// stream, so for equal `n` they choose the same line.  In table mode,
+/// `n ≥ line_classes(p) + 1` enumerates every square-direction line up to
+/// equivalence instead (plain line first, then direction by direction).
+pub fn search_fb_line_mode(spec: &Spec, n: u64, seed: u64, table: bool) -> (Spec, LineSearch) {
     let f = Fq::new(spec.p);
     let p = spec.p;
     let f3 = Fq3::new(p);
     let cov = Cover::new(&f3, &spec.alpha).expect("cover");
     let h = cov.hx.clone();
+    let deg = (h.len() - 1) as u64;
     f.reset_muls();
     let mut qr = vec![false; p as usize];
     for x in 1..p {
         qr[mm(x, x, p) as usize] = true;
     }
     f.count_public((p - 1) / 2);
+    let mut rep = LineSearch {
+        mode: if table { "table" } else { "horner" }.to_string(),
+        ..Default::default()
+    };
+    let n = n.max(1);
+    let mut chi: Vec<bool> = Vec::new();
+    if table {
+        chi = chi_table(&f, &h, &qr);
+        let q = p * p;
+        // per point: `deg` steps of (product 5 + add 2 + add 2 → counted as
+        // 2 adds per product and 2 per coefficient add) and the norm (3, 1 add)
+        f.count_public(q * (deg * 5 + 3));
+        rep.table_muls = q * (deg * 5 + 3);
+        rep.adds += q * (deg * 4 + 1);
+        rep.lookups += q;
+        rep.points += q;
+    }
+    let exhaustive = table && n > line_classes(p);
+    rep.exhaustive = exhaustive;
     let mut rng = StdRng::seed_from_u64(seed ^ 0xFB_11AE);
     let mut best = (0usize, 0u64, E2::ONE, E2::ZERO, E2::ONE);
     let mut b_plain = 0;
-    for i in 0..n.max(1) {
+    let mut tried = 0u64;
+    let n_random = if exhaustive { 1 } else { n };
+    for i in 0..n_random {
         let (t, b) = if i == 0 {
             (E2::ONE, E2::ZERO)
         } else {
@@ -2433,12 +2551,23 @@ pub fn search_fb_line(spec: &Spec, n: u64, seed: u64) -> (Spec, LineSearch) {
             }
         };
         let a = f.mul(&t, &t);
-        let hp = if i == 0 {
-            h.clone()
+        tried += 1;
+        let c = if table {
+            rep.adds += 2 * p;
+            rep.lookups += p;
+            rep.points += p;
+            table_count(p, &chi, &a, &b)
         } else {
-            line_poly(&f, &h, &a, &b)
+            let hp = if i == 0 {
+                h.clone()
+            } else {
+                line_poly(&f, &h, &a, &b)
+            };
+            rep.adds += p * (2 * deg + 1);
+            rep.lookups += p;
+            rep.points += p;
+            line_count(&f, &hp, &qr)
         };
-        let c = line_count(&f, &hp, &qr);
         if i == 0 {
             b_plain = c;
         }
@@ -2446,20 +2575,65 @@ pub fn search_fb_line(spec: &Spec, n: u64, seed: u64) -> (Spec, LineSearch) {
             best = (c, i, a, b, t);
         }
     }
+    if exhaustive {
+        // directions: classes of t modulo F_p^× (t = (1, u) and (0, 1)), a = t²,
+        // keyed by a normalised to a leading 1; first t of a key is kept
+        let mut dirs: std::collections::BTreeMap<(u64, u64), (E2, E2)> = Default::default();
+        for u in 0..=p {
+            let t = if u < p { E2([1, u]) } else { E2([0, 1]) };
+            let a = f.mul(&t, &t);
+            let key = if a.0[0] != 0 {
+                f.count_public(17);
+                (1, mm(a.0[1], inv_mod(a.0[0], p), p))
+            } else {
+                (0, 1)
+            };
+            dirs.entry(key).or_insert((a, t));
+        }
+        assert_eq!(dirs.len() as u64, p.div_ceil(2), "square directions");
+        let dirs: Vec<(E2, E2)> = dirs.into_values().collect();
+        // (count, first-index) per direction, best offset u of each
+        let res: Vec<(usize, u64)> = dirs
+            .par_iter()
+            .map(|(a, _)| {
+                let a_prime = if a.0[1] == 0 { E2([0, 1]) } else { E2([1, 0]) };
+                let mut bst = (0usize, 0u64);
+                for u in 0..p {
+                    let b = E2([mm(a_prime.0[0], u, p), mm(a_prime.0[1], u, p)]);
+                    let c = table_count(p, &chi, a, &b);
+                    if c > bst.0 {
+                        bst = (c, u);
+                    }
+                }
+                bst
+            })
+            .collect();
+        for (d, (c, u)) in res.iter().enumerate() {
+            if *c > best.0 {
+                let (a, t) = dirs[d];
+                let a_prime = if a.0[1] == 0 { E2([0, 1]) } else { E2([1, 0]) };
+                let b = E2([mm(a_prime.0[0], *u, p), mm(a_prime.0[1], *u, p)]);
+                best = (*c, 1 + d as u64 * p + *u, a, b, t);
+            }
+        }
+        let lines = dirs.len() as u64 * p;
+        tried += lines;
+        rep.adds += 2 * p * lines;
+        rep.lookups += p * lines;
+        rep.points += p * lines;
+    }
     let (b_best, best_index, a, b, t) = best;
     let mut out = spec.clone();
-    if best_index != 0 {
+    if best_index != 0 && !(a == E2::ONE && b == E2::ZERO) {
         out.gj = line_div(&f, &spec.gj, &a, &b, &t);
         out.qj = line_div(&f, &spec.qj, &a, &b, &t);
         out.line = Some((a, b, t));
     }
-    let rep = LineSearch {
-        candidates: n.max(1),
-        b_plain,
-        b_best,
-        best_index,
-        muls: f.muls(),
-    };
+    rep.candidates = tried;
+    rep.b_plain = b_plain;
+    rep.b_best = b_best;
+    rep.best_index = best_index;
+    rep.muls = f.muls();
     (out, rep)
 }
 
@@ -4247,6 +4421,32 @@ mod tests {
             assert!(!jacq.is_identity(&a));
             done += 1;
         }
+    }
+
+    /// The χ(h) table search and the Horner search draw the same lines from
+    /// the same stream, so they agree on every B and on the chosen line; the
+    /// exhaustive enumeration finds a base at least as large.
+    #[test]
+    fn table_search_matches_horner_and_exhaustive_dominates() {
+        let spec = generate_spec(101, 3);
+        let (sh, h) = search_fb_line_mode(&spec, 40, 3, false);
+        let (st, t) = search_fb_line_mode(&spec, 40, 3, true);
+        assert_eq!(
+            (h.b_plain, h.b_best, h.best_index),
+            (t.b_plain, t.b_best, t.best_index)
+        );
+        assert_eq!(sh.line, st.line);
+        assert_eq!(h.candidates, t.candidates);
+        let (_, one) = search_fb_line_mode(&spec, 1, 3, true);
+        assert_eq!(one.b_plain, h.b_plain);
+        let (se, e) = search_fb_line_mode(&spec, line_classes(101) + 1, 3, true);
+        assert!(e.exhaustive && e.b_best >= t.b_best && e.b_best >= e.b_plain);
+        // the moved model's factor base has exactly b_best points
+        let ctx = Ctx::new(&se);
+        let mut rng = StdRng::seed_from_u64(1);
+        assert_eq!(factor_base(&ctx, &mut rng).len(), e.b_best);
+        let ctx = Ctx::new(&st);
+        assert_eq!(factor_base(&ctx, &mut rng).len(), t.b_best);
     }
 
     fn small_ctx(p: u64, seed: u64) -> (Spec, Ctx, Vec<BaseEl>, HashMap<u64, usize>, StdRng) {

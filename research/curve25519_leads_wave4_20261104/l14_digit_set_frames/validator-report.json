@@ -1,0 +1,174 @@
+{
+ "schema": "l14-validator-report/v1",
+ "validator": "validator (independent, Claude Mythos 5.1), workflow dispatch 2026-11-04",
+ "validated_at_utc": "2026-11-04T07:08:48Z",
+ "lead": "/home/user/crypto/research/curve25519_leads_wave4_20261104/l14_digit_set_frames",
+ "disposition": "validated",
+ "verdict": "pass_with_errata",
+ "binding": {
+  "frozen_commit": "5a800bb3d06c69b32f32195c3aebccdfb3fee31e",
+  "frozen_commit_time": "2026-11-04T06:32:32Z",
+  "head_at_validation": "1c1175180fabdc9b4a93007022f0d0bdb9b4a33f (refs/heads/claude/curve25519-index-calculus-i674j4)",
+  "method": "read-only git object reads (cat-file/ls-tree) plus python sha1 of on-disk blobs; no index, worktree or ref was touched",
+  "frozen_blobs_match_disk": {
+   "PROTOCOL.md": "04afec47b01be9eda1d78b5ed52bb0ab4b232a50",
+   "scripts/run.sh": "85555f8d6deafb29ed9a7bee4e14addeb86d41aa",
+   "scripts/digit_census.py": "1936f38bf54c380bdeccd83027a6823c8a0d7bdb",
+   "scripts/analyse.py": "284cc59e543c02565ac735705ff8d2989f5ec780",
+   "../../curve25519_frame_search_20261103/scripts/frame_census.py": "95362669c7a1dea2bd33fc6ede3355071d572047"
+  },
+  "uncommitted_artifacts_validated_by_sha256": {
+   "README.md": "ac9e6c4499e32ab1d065c09da611f191f483c30ccde86668c2c8d01551d7cb06",
+   "data/SHA256SUMS": "e31323a9d6f4751af804abfad420b75c0303da25ed8c9077be279861ac106bc9",
+   "data/k20_t4.json": "b2c74d29192dbb82b3092512466864809c6e102cdb7d09faddae6934b6767c84",
+   "data/k20_t5.json": "9826c8aa5a824a983e4abc91dd2441f770cb98c89351d08d14d15971ce476883",
+   "data/k20_t6.json": "b476fe5bfd0123173ee55ba9b8b36e19ac9fa1af9c955901573aff46596fef62",
+   "data/summary.json": "e756ff8cc60c03b4be09a17667e12166b124190990cd3d87d12b3edc316a7938",
+   "data/selected_digit_sets.json": "dbf51e569b9de91e9b3d6a4f3fe43a656caa1b879a410222e3848f3bac1cc1d0",
+   "data/analysis.txt": "f2fa9f06323a4f20b01f552bd00ac6b9becf3e1b0b3a91c24adc5ccb1f9104c8"
+  },
+  "note": "README.md and data/ are not in any commit (produced after the freeze, as the dispatch states); they are bound here by SHA-256. data/ files were untouched during validation (SHA256SUMS re-verified OK before and after)."
+ },
+ "environment": {
+  "python": "3.13.18",
+  "numpy": "2.5.3",
+  "host": "shared container, one process at a time"
+ },
+ "requirements": [
+  {
+   "id": "R1 data vs SHA256SUMS",
+   "status": "pass",
+   "evidence": "sha256sum -c data/SHA256SUMS: 11/11 OK (2 scripts, instrument, 3 census files, 5 derived files)."
+  },
+  {
+   "id": "R2 frozen scripts bound to commit",
+   "status": "pass",
+   "evidence": "PROTOCOL.md, run.sh, digit_census.py, analyse.py, frame_census.py on disk hash to the exact blobs of 5a800bb3 (see binding)."
+  },
+  {
+   "id": "R3 replay of the measurement with the same command",
+   "status": "pass",
+   "evidence": "python3 -I -B scripts/digit_census.py --k 20 --p 1048573 --A 926 --n 1049624 --t 4 5 6 --K 2000 --B 2000 --R 5 --seed-base 20261104 --out-dir <scratch>: output k20_t{4,5,6}.json byte-identical to data/ (sha256 b2c74d29\u2026, 9826c8aa\u2026, b476fe5b\u2026), so every count field matches; wall 9.6 s (not compared)."
+  },
+  {
+   "id": "R4 independent recomputation of coverage (certificate discipline)",
+   "status": "pass",
+   "evidence": "Own code (scratchpad indep_verify.py): own log table from a different generator (u=8), own pair enumeration; all 12,000 part-(a) rows, bits lo=0, 15 greedy finals and every per-step record reproduce covered/cols/J/distinct_x exactly (0 mismatches). Log-free certificate: affine P_i\u00b1P_j with x-only Montgomery-ladder [r]R=O test reproduces covered/cols for bits lo=0 (12/7, 42/11, 162/25), the three best translation frames (74/12, 248/24, 570/48) and all 15 greedy sets (e.g. 522/22, 1268/43)."
+  },
+  {
+   "id": "R5 curve/group facts",
+   "status": "pass",
+   "evidence": "#E by character sum = 1,049,624 = 8\u00b7131,203; r prime; legendre(A\u00b2\u22124) = \u22121 so E[2] rational rank 1 and E(F_p) cyclic of order 8r; log table has 524,812 = n/2 entries."
+  },
+  {
+   "id": "R6 rng streams and greedy selection rule",
+   "status": "pass",
+   "evidence": "Part-(a) draws (L; lo, c_1..c_t) replay from random.Random(20261104+t) in the recorded order; greedy replicate 0 at t=4,5,6 replayed with own evaluation and the frozen tie rule (max J, fewer cols, earlier candidate): same lo, same digits, same Legendre and label counters (30000/15096, 62000/31034, 126000/62902)."
+  },
+  {
+   "id": "R7 README numbers recomputed",
+   "status": "pass",
+   "evidence": "means/sd/max, ratios, medians, spread, covered/col, cost table, group ops (25.502 per label), KS, quantiles, mean cols, top-5, J\u2212covered, coset-0/4 counts, F4 model ratios 0.4355/0.4027, 6.9\u00d7, 17.1\u00d7/63.6\u00d7 mpt ratios, 4.2\u00b710\u2075\u00d7, 8.8\u00d7 seed-census ratio all reproduce; see recomputed."
+  },
+  {
+   "id": "R8 P1\u2013P9 decided by own code against PROTOCOL \u00a75 thresholds",
+   "status": "pass",
+   "evidence": "P1 T, P2 T, P3 F (0.734 at t=5), P4 T (2.105, 2.225), P5 F (above band), P6 T, P7 T, P8 T, P9 F (1.485 at t=5); identical to data/analysis.txt; analyse.py thresholds match PROTOCOL \u00a75 verbatim; lead_status OPEN follows from P4."
+  },
+  {
+   "id": "R9 reference cells cited by PROTOCOL/README",
+   "status": "pass",
+   "evidence": "torsion k20.json (seed 20261124): 19.26/10.94/78, 70.90/26.62/184, 270.54/67.54/582, Spearman(J,cov) 1.0000/1.0000/0.9999, J/cov 1.0000\u20131.0010; frame_search summary: bits_lo0 12/42/162, trans mean 18.93/69.776/271.048, oracle max 64/198/536; engine frame_t5_g3.json mpt 3,036,916.11 (bits@976503, 24 cols, 198 covered); bitsbest_t6_g4.json 45,194,767.3; T10 README: (5,3,1307) 22 cols/210/177,112; (5,4,1307) 52,816; (6,4,0) 710,094; seed census 4,592,473+2,342,798=6.94e6; T12 (t10_winner_ecbench README) rho-neg 17.1 [13.3,22.0] / 6.06e4 [4.55e4,8.07e4] / 3.78e5, K=16 targets."
+  },
+  {
+   "id": "R10 scope and failed-prediction honesty",
+   "status": "pass",
+   "evidence": "README reports P3/P5/P9 as failed with the raw values, keeps the frozen rules, makes no improvement or leaderboard claim, labels the F4-cost statements as model-only (mpt-unchanged assumption), and corrects PROTOCOL \u00a78's best-case distance (4.2e4\u00d7) to ~4e5\u00d7 because \u00a78 omitted the bits-form mpt penalty. Engine confirmation explicitly not done."
+  },
+  {
+   "id": "R11 controls / boundary",
+   "status": "pass",
+   "evidence": "Census-only lead (no DLP solve, no ecbench): the null (random digit sets vs random translation frames), the instrument check (bits lo=0 and the seed-20261124 mean), the equal-budget cost counters and the matched rho reference (T12) are all present and recomputed; no vs_rho claim is made."
+  }
+ ],
+ "recomputed": {
+  "t4": {
+   "bits_lo0": "12 (7 cols)",
+   "trans_mean_sd_max": "19.112 / 10.616 / 74 (L=250777, 12 cols)",
+   "digit_mean_sd_max": "18.822 / 10.686 / 74",
+   "mean_ratio": 0.98483,
+   "max_ratio": 1.0,
+   "greedy_rep0": "208 covered, 13 cols, J 208",
+   "greedy_all": "208/13, 202/12, 250/14, 164/12, 250/14",
+   "g_over_trmax": 2.8108,
+   "g_over_trmean": 10.883,
+   "spread": 1.5244,
+   "cov_per_col": "16.000 vs 6.167",
+   "cost": "greedy 30000 Leg / 15096 labels / 384,980.6 ops; trans 32000 / 15999 / 408,009.1",
+   "ks_D": 0.0255,
+   "pct_dev_ref_mean": -0.768
+  },
+  "t5": {
+   "bits_lo0": "42 (11 cols)",
+   "trans_mean_sd_max": "70.924 / 26.926 / 248 (L=815271, 24 cols)",
+   "digit_mean_sd_max": "70.157 / 26.019 / 182",
+   "mean_ratio": 0.98919,
+   "max_ratio": 0.73387,
+   "greedy_rep0": "522 covered, 22 cols, J 522",
+   "greedy_all": "522/22, 524/22, 582/21, 392/29, 474/23",
+   "g_over_trmax": 2.1048,
+   "g_over_trmean": 7.36,
+   "spread": 1.4847,
+   "cov_per_col": "23.727 vs 10.333",
+   "cost": "greedy 62000 / 31034 / 791,434.1; trans 64000 / 32054 / 817,446.3",
+   "ks_D": 0.0185,
+   "f4_model_ratio": 0.4355,
+   "pct_dev_ref_mean": 0.034
+  },
+  "t6": {
+   "bits_lo0": "162 (25 cols)",
+   "trans_mean_sd_max": "266.545 / 69.545 / 570 (L=889850, 48 cols)",
+   "digit_mean_sd_max": "270.497 / 68.919 / 594",
+   "mean_ratio": 1.01483,
+   "max_ratio": 1.04211,
+   "greedy_rep0": "1268 covered, 43 cols, J 1272",
+   "greedy_all": "1268/43, 1364/45, 1326/42, 1142/45, 1148/46",
+   "g_over_trmax": 2.2246,
+   "g_over_trmean": 4.757,
+   "spread": 1.1944,
+   "cov_per_col": "29.488 vs 11.875",
+   "cost": "greedy 126000 / 62902 / 1,604,137.0; trans 128000 / 63679 / 1,623,952.2",
+   "ks_D": 0.0355,
+   "f4_model_ratio": 0.4027,
+   "pct_dev_ref_mean": -1.477
+  },
+  "ks_crit_5pct": 0.04294,
+  "against_T10_winner": "(22/522\u00b73,036,916.11)/(22/210\u00b7177,112) = 6.898; with bits@976503 (24/198): 19.84; with this run's best translation (24/248): 15.84; 6.898 \u00d7 6.06e4 = 4.18e5",
+  "predictions": {
+   "P1": true,
+   "P2": true,
+   "P3": false,
+   "P4": true,
+   "P5": false,
+   "P6": true,
+   "P7": true,
+   "P8": true,
+   "P9": false
+  },
+  "coset_counts_generator_invariant": "rep0 coset0/coset4: t4 2/10 of 13, t5 16/1 of 22, t6 6/24 of 43 (README's 10/13, 16/22, 24/43 confirmed)"
+ },
+ "errata": [
+  "README 'Against the T10 winner': the bits mpt is written as 3,036,916 in the text and 3,036,910 in the formula; frame_t5_g3.json records 3,036,916.11 (bits_t5_g3.json: 3,036,911.76). The 6.9\u00d7 result is unaffected.",
+  "README '(the best translation frame at (5, 3) is 19.8\u00d7 behind)': 19.8\u00d7 uses the frame_search engine cell bits@976503 (24 columns, 198 covered), not this run's best translation frame (L=815271, 24 columns, 248 covered), which gives 15.8\u00d7 under the same model; the sentence should name the frame.",
+  "README 'The failed replicate (t = 5 rep 3 \u2026): step 1 gives 1 column and 0 covered': in the data it is step 0 (the base {lo}) that is (1 column, 0 covered); step 1 is (2, 2). The underlying claim (lo carries a point outside cosets 0/4) is correct.",
+  "README 'labels are \u2248 0.49 of the Legendre tests in both families': recomputed 0.4975\u20130.5032 (\u2248 0.50).",
+  "README 'All five replicates cost five times the rep-0 figure': exact sums are 150,000 / 309,999 / 629,998 Legendre (one abscissa collision each in t=5 rep 3 and t=6 rep 2) and 75,223 / 154,705 / 314,858 labels, within 0.4% of 5\u00d7 rep 0 but not equal.",
+  "README coset histograms: bins other than 0 and 4 depend on the generator frame_census.build picks (random.Random(1)) and are not stated as such; with another generator the odd bins permute (e.g. t=5 rep 0 [16,3,1,0,1,0,1,0] vs README [16,2,0,0,1,0,2,1]). Bins 0 and 4 and the fold-pair totals reproduce exactly; the mechanism claim stands.",
+  "README tables: 'sd' is the population standard deviation (numpy ddof=0), not stated; sample sd would be 10.619 / 26.933 / 69.562 for translation. Immaterial to any rule."
+ ],
+ "observations_not_findings": [
+  "The frozen cost model (Legendre symbols + [r]P labels) does not count the integer J-evaluation per candidate; the greedy performs t\u00d7 more candidate evaluations than the translation census. Consistent with PROTOCOL \u00a73 as frozen, so not a finding; the engine confirmation should price it if the comparison is ever made end to end.",
+  "P4's 1.3\u00d7 rule is met by every replicate at every t (minimum 392/248 = 1.58), so the lead's OPEN status does not hinge on the replicate-0 convention.",
+  "No ecbench session, DLP solve or vs_rho claim exists in this lead; the dispatch's 'verify --replay 1' step does not apply."
+ ]
+}

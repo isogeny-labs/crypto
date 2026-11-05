@@ -22,6 +22,7 @@ mod factor_bases;
 mod mcp;
 mod results;
 mod sql;
+mod viewer;
 mod write;
 
 pub const OPENAPI: &str = include_str!("../../openapi.yaml");
@@ -176,12 +177,17 @@ async fn openapi() -> impl IntoResponse {
     ([(header::CONTENT_TYPE, "application/yaml")], OPENAPI)
 }
 
-async fn index() -> Json<Value> {
+async fn index(headers: HeaderMap) -> axum::response::Response {
+    if viewer::wants_html(&headers) {
+        return viewer::to_viewer();
+    }
     Json(json!({
         "service": "ecdb",
         "openapi": "/openapi.yaml",
+        "viewer": "/viewer",
         "start_here": ["/v1/meta", "/v1/schema", "/v1/curves?limit=5", "/v1/curves/secp256k1"],
     }))
+    .into_response()
 }
 
 pub fn router(state: Shared) -> Router {
@@ -232,6 +238,7 @@ pub fn router(state: Shared) -> Router {
         .route("/", get(index))
         .route("/healthz", get(healthz))
         .route("/openapi.yaml", get(openapi))
+        .route("/viewer", get(viewer::page))
         .merge(reads)
         .merge(writes)
         .with_state(state);

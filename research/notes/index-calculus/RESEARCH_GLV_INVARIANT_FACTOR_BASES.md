@@ -5259,6 +5259,146 @@ every number comes from the Rust examples.  Host: the 4-vCPU container, local ru
 operation counts only, no wall-time claim.  Leaderboard, `benchmarks/` and the validation gate are not touched
 here; if V is ranked the main session arranges independent validation.
 
+### 9.51 E40 measured: storing the Macaulay rows from their lead cuts the cells per call `1.71×` with A's arithmetic unchanged — V is equal to A at `0` GAE and ahead at `0.1` (`1.25`–`1.26×`) and `1` GAE (`1.36`–`1.38×`) on all 32 rows; every prediction holds; ranked by the registered rule
+
+*2026-11-02.*  Pre-registration §9.50 (`5a0dd20af9`, after the Stage 0 count and before any solver code).  Code:
+`0787278d7b` (`src/cryptanalysis/macaulay_profile.rs`: `build_profile`, `echelon_profile`, controls, `profile_measure`;
+`QuarticSolve` gains two fields absent from the JSON when zero), `f2f31dbec1` (the `klein_v4` hook, committed alone:
+`Pivot::Profile`, `V4Solver::ChainProfile` = `chain-profile`, `chain_quotient` reads rows through their offset),
+`d6d00182c5` (record fields `macaulay_stored_entries`, `profile_offset_ops`, emitted only for V), `9b2a47238b`
+(harness `examples/e40_{stage_a,checks,tables}.rs`, `run_e2e.sh`, `identity.sh`), `86d0f86c25` (controls fix, below).
+Binaries built from clean exports of `9b2a47238b` (4,685 files) and `86d0f86c25` (4,687 files; `e40_checks_v2`), every
+file's blob checked, pinned by sha256 (`experiments/47_macaulay_entries/binary_sha256.txt`, `binary_commit.txt`).
+Records: `experiments/47_macaulay_entries/` (`stage0.*`, `identity*`, `checks*.{json,log}`, `stage_a.{json,log}`
+(sha256 in `stage_a.json.sha256`), `e2e/`, `tables.md`, `summary.json` from `examples/e40_tables.rs`).  Report:
+`research/e40_macaulay_entries_20261102/`.  Host: the 4-vCPU container shared with E39 and E41 (load `≈ 17`);
+isolab-eks unreachable, `conductor` not installed: **operation counts only, no wall-time claim.**  Runs: 320 control
+calls, Stage A 40,000 solves (4 solvers × 10,000 calls), 42 end-to-end runs (V on 10 GLS + 12 E24 records on
+E37's stream; A′ and V′ on 10 GLS records on `E40E0002`), 0 failures.
+
+**Identity (G2.204).**  Under the E40 binary, 7/7 existing configurations are byte-identical (wall times aside):
+`macaulay`, `chain`, `chain-sparsest`, `chain --karatsuba` against E33's hashes, and `chain-counted --karatsuba`
+(GLS `p = 101` s2, E24 `p = 101` s1) and `chain-fifo --karatsuba` with `--stream-salt E37E0001` against E37's
+stored records.  Stage A: on all 10,000 calls every solver returned the existing solver's solutions, degree,
+outcome and decomposition set; V returned A counted's fallback flag, every phase count and pivot digest; V's
+stored-cell counter equalled the measured lengths of its rows; and V's lead-scan reads were A counted's minus
+`Σ_r lead_r` exactly.  End to end: all 42 V and V′ records equal the A (resp. A′) record of the same row and stream
+in every field except the tag, wall times, `lead_scan_reads` and the two E40 fields — the same `total_muls`,
+relations, logs and walks.  Fallbacks are A's calls exactly (G2.215; 8,947 over the 32 rows).
+
+**Controls (G2.205).**  320 calls: P1 (lead cell dropped) detected 320/320, P2 (counter short by one per row)
+320/320, V = A counted on 320/320, E31's perturbed coefficient changed the solution set on 213/213 calls with a
+non-empty clean set.  *Disclosed harness fix:* the first `e40_checks` (`checks_v1.*`) compared the decomposition
+sets after the lift, which were empty on all 320 calls, so the perturbed-coefficient control was vacuous
+(`0/0`); §9.50 cites E31's control, which is defined on the solution set, and the harness was corrected
+(`86d0f86c25`) and rerun before any verdict was taken; P1, P2 and the identity counts are the same in both runs.
+
+**Stage A** (10 curves × 1,000 calls, stream `seed ^ 0xE40A_0001`, per-call means; `S` in schoolbook products):
+
+| quantity | per curve | prediction |
+|:--|:--|:--|
+| A's cells, calls without fallback | `176,064` on every call | — |
+| V's stored cells, calls without fallback | `102,826`–`102,827` (`102,749`–`102,827` per call) | `[1.02, 1.04]·10⁵` |
+| `macaulay_entries / stored` (clean calls) | `1.7122`–`1.7123` | `[1.69, 1.73]` |
+| V's offset operations | `22,340`–`22,489` | `[1.5, 3.0]·10⁴` |
+| lead-scan reads, A / V | `79,114`–`79,117` / `5,877`–`5,879` | V `[5.0, 7.0]·10³` |
+| `S_A / S_V` at `0` / `0.1` / `1` GAE | `1.000000` / `1.2447`–`1.2658` / `1.3534`–`1.3831` | `1` / `[1.18, 1.34]` / `[1.28, 1.48]`; kill `< 1.15` at `1` |
+| σ1 (lead scans priced) `S_A / S_V` at `0.1` / `1` | `1.5881`–`1.6305` / `1.8389`–`1.8968` | — |
+
+**End to end** (paired on E37's stream `0xE37E_0001`, Karatsuba for every arm; A and E25 = E37's records;
+`S_X(g) = total_muls + 97 g · cells`, cells = `macaulay_entries` for A and E25 and `macaulay_stored_entries +
+profile_offset_ops` for V; rho = walk (iii)):
+
+| quantity | `0` GAE | `0.1` GAE | `1` GAE | order, 32 rows |
+|:--|:--|:--|:--|:--|
+| `S_A / S_V` | `1.0000` (equal `total_muls`) | `1.2518`–`1.2618` | `1.3629`–`1.3807` | V equal at `0`, ahead at `0.1` and `1` on 32/32 |
+| `S_E25 / S_V` | `2.5054`–`2.5766` | `1.7455`–`1.8033` | `1.4105`–`1.4558` | V ahead at every weight on 32/32 |
+| σ1 `S_A / S_V` | `1.0000` | `1.6024`–`1.6217` | `1.8572`–`1.8921` | same order |
+| σ1 `S_E25 / S_V` | `2.5054`–`2.5766` | `2.0819`–`2.1472` | `1.9028`–`1.9640` | same order |
+| σ4 `S_A / S_V` (structural work priced) | `1.0000` | `1.2362`–`1.2449` | `1.3312`–`1.3461` | same order |
+| σ4 `S_E25 / S_V` | `2.5054`–`2.5766` | `1.6992`–`1.7516` | `1.3746`–`1.4144` | same order |
+| `S_V / rho` | `6.00·10³`–`1.98·10⁵` | `1.58·10⁴`–`5.41·10⁵` | `6.17·10⁴`–`2.36·10⁶` | rho ahead on 32/32 at every weight |
+| `S_A / rho` | `6.00·10³`–`1.98·10⁵` | `1.99·10⁴`–`6.80·10⁵` | `8.51·10⁴`–`3.24·10⁶` | — |
+
+**Negative control (G2.214).**  A′ (`chain-counted` on `E40E0002`) against A on E37's stream: A′ is ahead
+across the band on 10 rows and behind on 10, `S_A / S_A′` `0.373`–`2.15` (the residual count differs between
+streams): **not ranked**, as predicted.  V′ against A′ (paired on `E40E0002`): `1.0000` / `1.2506`–`1.2608` /
+`1.3613`–`1.3790`, order as registered on 20/20 rows, V′ records = A′'s outside the allowed fields.  The paired
+effect replicates on a second stream; the unpaired comparison does not manufacture a rank.
+
+**Distance to the matched rho, every row** (walk (iii): E27's on the GLS rows, E37's on E24's; `S_V/rho` at
+`0` equals `S_A/rho`):
+
+| set | p | seed | arm | A/V `0.1` | A/V `1` | E25/V `0` | E25/V `0.1` | E25/V `1` | V/rho `0` | V/rho `0.1` | V/rho `1` | A/rho `0.1` | A/rho `1` |
+|:--|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| GLS | 101 | 1 | A | `1.2518` | `1.3629` | `2.5054` | `1.7455` | `1.4105` | `5.90·10⁴` | `1.64·10⁵` | `7.75·10⁵` | `2.06·10⁵` | `1.06·10⁶` |
+| GLS | 101 | 1 | B | `1.2525` | `1.3637` | `2.5113` | `1.7485` | `1.4124` | `2.19·10⁴` | `6.10·10⁴` | `2.88·10⁵` | `7.64·10⁴` | `3.92·10⁵` |
+| GLS | 101 | 2 | A | `1.2527` | `1.3639` | `2.5158` | `1.7502` | `1.4131` | `2.82·10⁴` | `7.96·10⁴` | `4.05·10⁵` | `9.97·10⁴` | `5.52·10⁵` |
+| GLS | 101 | 2 | B | `1.2524` | `1.3636` | `2.5119` | `1.7487` | `1.4123` | `1.54·10⁴` | `4.35·10⁴` | `2.21·10⁵` | `5.45·10⁴` | `3.01·10⁵` |
+| GLS | 149 | 1 | A | `1.2563` | `1.3701` | `2.5375` | `1.7696` | `1.4286` | `1.98·10⁵` | `5.41·10⁵` | `2.36·10⁶` | `6.80·10⁵` | `3.24·10⁶` |
+| GLS | 149 | 1 | B | `1.2566` | `1.3705` | `2.5398` | `1.7708` | `1.4295` | `1.23·10⁵` | `3.37·10⁵` | `1.47·10⁶` | `4.23·10⁵` | `2.02·10⁶` |
+| GLS | 149 | 2 | A | `1.2557` | `1.3694` | `2.5384` | `1.7692` | `1.4272` | `9.94·10⁴` | `2.72·10⁵` | `1.19·10⁶` | `3.41·10⁵` | `1.63·10⁶` |
+| GLS | 149 | 2 | B | `1.2564` | `1.3703` | `2.5440` | `1.7721` | `1.4293` | `5.72·10⁴` | `1.57·10⁵` | `6.85·10⁵` | `1.97·10⁵` | `9.38·10⁵` |
+| GLS | 197 | 1 | A | `1.2570` | `1.3722` | `2.5522` | `1.7809` | `1.4351` | `3.70·10⁴` | `1.00·10⁵` | `4.26·10⁵` | `1.26·10⁵` | `5.84·10⁵` |
+| GLS | 197 | 1 | B | `1.2581` | `1.3736` | `2.5605` | `1.7854` | `1.4384` | `1.95·10⁴` | `5.28·10⁴` | `2.24·10⁵` | `6.64·10⁴` | `3.08·10⁵` |
+| GLS | 197 | 2 | A | `1.2549` | `1.3696` | `2.5373` | `1.7731` | `1.4293` | `1.75·10⁴` | `4.73·10⁴` | `2.02·10⁵` | `5.94·10⁴` | `2.77·10⁵` |
+| GLS | 197 | 2 | B | `1.2552` | `1.3700` | `2.5397` | `1.7743` | `1.4301` | `7.63·10³` | `2.06·10⁴` | `8.82·10⁴` | `2.59·10⁴` | `1.21·10⁵` |
+| GLS | 269 | 1 | A | `1.2603` | `1.3771` | `2.5717` | `1.7949` | `1.4466` | `3.32·10⁴` | `8.92·10⁴` | `3.64·10⁵` | `1.12·10⁵` | `5.02·10⁵` |
+| GLS | 269 | 1 | B | `1.2601` | `1.3767` | `2.5700` | `1.7940` | `1.4459` | `1.84·10⁴` | `4.93·10⁴` | `2.01·10⁵` | `6.21·10⁴` | `2.77·10⁵` |
+| GLS | 269 | 2 | A | `1.2603` | `1.3770` | `2.5766` | `1.7966` | `1.4468` | `1.91·10⁴` | `5.13·10⁴` | `2.10·10⁵` | `6.47·10⁴` | `2.89·10⁵` |
+| GLS | 269 | 2 | B | `1.2601` | `1.3768` | `2.5756` | `1.7960` | `1.4463` | `1.01·10⁴` | `2.70·10⁴` | `1.10·10⁵` | `3.41·10⁴` | `1.52·10⁵` |
+| GLS | 397 | 1 | A | `1.2598` | `1.3779` | `2.5663` | `1.7987` | `1.4497` | `1.14·10⁴` | `3.01·10⁴` | `1.17·10⁵` | `3.79·10⁴` | `1.62·10⁵` |
+| GLS | 397 | 1 | B | `1.2603` | `1.3786` | `2.5716` | `1.8014` | `1.4514` | `6.00·10³` | `1.58·10⁴` | `6.17·10⁴` | `1.99·10⁴` | `8.51·10⁴` |
+| GLS | 397 | 2 | A | `1.2604` | `1.3785` | `2.5579` | `1.7962` | `1.4505` | `2.50·10⁴` | `6.59·10⁴` | `2.58·10⁵` | `8.31·10⁴` | `3.56·10⁵` |
+| GLS | 397 | 2 | B | `1.2603` | `1.3785` | `2.5579` | `1.7962` | `1.4504` | `1.52·10⁴` | `4.01·10⁴` | `1.57·10⁵` | `5.05·10⁴` | `2.16·10⁵` |
+| E24 | 101 | 1 | — | `1.2548` | `1.3668` | `2.5339` | `1.7597` | `1.4196` | `5.96·10⁴` | `1.61·10⁵` | `6.31·10⁵` | `2.02·10⁵` | `8.62·10⁵` |
+| E24 | 101 | 2 | — | `1.2523` | `1.3635` | `2.5288` | `1.7542` | `1.4128` | `2.15·10⁴` | `5.80·10⁴` | `2.28·10⁵` | `7.26·10⁴` | `3.11·10⁵` |
+| E24 | 149 | 1 | — | `1.2561` | `1.3701` | `2.5515` | `1.7749` | `1.4294` | `3.10·10⁴` | `8.16·10⁴` | `2.96·10⁵` | `1.02·10⁵` | `4.05·10⁵` |
+| E24 | 149 | 2 | — | `1.2586` | `1.3731` | `2.5619` | `1.7815` | `1.4359` | `3.00·10⁴` | `7.91·10⁴` | `2.87·10⁵` | `9.96·10⁴` | `3.95·10⁵` |
+| E24 | 197 | 1 | — | `1.2592` | `1.3751` | `2.5665` | `1.7889` | `1.4414` | `7.22·10⁴` | `1.88·10⁵` | `6.72·10⁵` | `2.37·10⁵` | `9.24·10⁵` |
+| E24 | 197 | 2 | — | `1.2596` | `1.3755` | `2.5639` | `1.7885` | `1.4423` | `2.77·10⁴` | `7.21·10⁴` | `2.51·10⁵` | `9.08·10⁴` | `3.46·10⁵` |
+| E24 | 269 | 1 | — | `1.2599` | `1.3766` | `2.5672` | `1.7931` | `1.4455` | `2.28·10⁴` | `5.87·10⁴` | `2.01·10⁵` | `7.40·10⁴` | `2.77·10⁵` |
+| E24 | 269 | 2 | — | `1.2600` | `1.3768` | `2.5735` | `1.7955` | `1.4462` | `9.61·10³` | `2.47·10⁴` | `8.43·10⁴` | `3.12·10⁴` | `1.16·10⁵` |
+| E24 | 397 | 1 | — | `1.2603` | `1.3786` | `2.5669` | `1.7997` | `1.4512` | `7.90·10³` | `2.00·10⁴` | `6.65·10⁴` | `2.52·10⁴` | `9.16·10⁴` |
+| E24 | 397 | 2 | — | `1.2607` | `1.3791` | `2.5650` | `1.7995` | `1.4521` | `1.08·10⁴` | `2.73·10⁴` | `9.04·10⁴` | `3.44·10⁴` | `1.25·10⁵` |
+| E24 | 521 | 1 | — | `1.2615` | `1.3804` | `2.5679` | `1.8028` | `1.4551` | `1.06·10⁴` | `2.70·10⁴` | `8.91·10⁴` | `3.40·10⁴` | `1.23·10⁵` |
+| E24 | 521 | 2 | — | `1.2618` | `1.3807` | `2.5683` | `1.8033` | `1.4558` | `1.04·10⁴` | `2.65·10⁴` | `8.76·10⁴` | `3.34·10⁴` | `1.21·10⁵` |
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.204 | 7/7 existing configurations byte-identical; Stage A identity on 10,000/10,000 calls (outputs, fallback, phases, digest, stored counter, lead-scan relation); 42/42 end-to-end records equal A's/A′'s outside the allowed fields | **holds** |
+| G2.205 | P1 320/320, P2 320/320, perturbed coefficient 213/213 non-empty (after the disclosed harness fix) | **holds** |
+| G2.206 | stored `102,826`–`102,827`; ratio `1.7122`–`1.7123` | **holds** |
+| G2.207 | `22,340`–`22,489` | **holds** |
+| G2.208 | `1.000000` / `1.2447`–`1.2658` / `1.3534`–`1.3831`; kill not reached | **holds** |
+| G2.209 | V `5,877`–`5,879` (A `79,114`–`79,117`) | **holds** |
+| G2.210 | `1.0000` / `1.2518`–`1.2618` / `1.3629`–`1.3807`; never behind | **holds** |
+| G2.211 | `2.5054`–`2.5766` / `1.7455`–`1.8033` / `1.4105`–`1.4558`, ahead on 32/32 | **holds** |
+| G2.212 | rho ahead on 32/32 at every weight; `S_V/rho` at `1` GAE `6.17·10⁴`–`2.36·10⁶` | **holds** |
+| G2.213 | σ1 and σ4 change no order; σ1 `S_A/S_V` at `1` GAE `1.8572`–`1.8921` | **holds** |
+| G2.214 | A′ not ranked (10 ahead / 10 behind); V′/A′ in G2.210's bands on 20/20 rows | **holds** |
+| G2.215 | V falls back on exactly A's calls (Stage A and end to end) | **holds** |
+
+**What it says.**  The chain solve's Macaulay matrix had been allocated and zeroed in full, `393 × 448` cells a
+call, although the forward echelon by lead and the left-looking normal forms never read the `73,237` cells left of
+each row's lead (`41.6 %`); only the dense first lead scan read them, `93 %` of all lead-scan reads.  Storing each
+row from its lead (V) keeps A's arithmetic, pivots, outputs and records bit for bit and leaves `102,827` cells plus
+`≈ 22,400` charged offset operations a call.  **Under §9.50's ranking rule V is ranked ahead of A: equal at `0` GAE
+(not an improvement there), ahead by `1.25`–`1.26×` at `0.1` GAE and `1.36`–`1.38×` at `1` GAE on all 32 rows; and
+ahead of E25 at every weight.**  Class: **engineering** (a data-structure constant on the build; exponents
+unchanged).  Under the 2026-10-15 criterion it is a verified, measured improvement of the baseline at the
+positive weights of the band only.  It is the first change at the `1`-GAE end since E31: pivot rules (E33,
+E35–E38) moved it by `≤ 1.3 %`.  **Distance remaining:** best row GLS `p = 397` s1 arm B, `S_V/rho` `6.00·10³` /
+`1.58·10⁴` / `6.17·10⁴` (A `6.00·10³` / `1.99·10⁴` / `8.51·10⁴`); best E24 row `p = 397` s1, `7.90·10³` / `2.00·10⁴` /
+`6.65·10⁴`; rho is ahead of every row at every weight.  **Not done here:** the validation gate (independent replay,
+validator report, matched rho with the band), the leaderboard and `benchmarks/` — left to the main session.
+**Limits:** E25's and E24's curves, `p ≤ 521`, degree 11; one host, local runs; the `176,064`-cell figure for A is
+the registered model (A's memset of the prefix is real work, but cheap per cell in wall time; no wall-time claim
+is made either way).  **Next levers:** the stored tails themselves (`≈ 1.03·10⁵` cells, now `≈ 78 %` of the per-call `S_V` at
+`1` GAE); of these, `≈ 16,100` cells are rows outside the normal forms' dependency closure (Stage 0; removable only
+with the staircase known in advance, a trace-shaped lever with E21/E35's caveats), and the fill-free right end of
+high-degree rows is a candidate for a dynamically grown row (not measured).
+
 ### 9.52 E41 pre-registration: the order-24 walk's step shortfall — where it comes from, and whether a fix makes the matched reference cheaper across the band
 
 *Registered 2026-11-02, after Stage 0 (counts only) and before any fix code or registered run.*  E39 owns
@@ -5350,3 +5490,572 @@ sampling noise in a 16-seed design, the order-24 walk sits on its `√24` ceilin
 `√6`, no walk-level fix of the shortfall exists to make (F is not measurably cheaper), and the matched reference on
 E18's `j = 0` curves is stronger than E34 reported: E18's `ψ`-arm rows move further from rho; the GLS IC rows do
 not move.
+
+### 9.53 E41 measured: the order-24 walk's step shortfall was sampling noise; no walk fix to make (F not measurably cheaper); the corrected reference is resolved at every weight — E18's `ψ` rows move `1.76`/`1.42`/`1.28×` from rho against E29's walk; the GLS IC rows do not move
+
+*2026-11-02.*  Code `b0e307d9b8` (`Jumps` option in `src/cryptanalysis/twist24_shortfall.rs`, default `Jumps::E34`;
+`examples/e41_run.rs`), tables `examples/e41_tables.rs` at `5d15482969`; binaries from clean `git archive` exports,
+sha256 in `experiments/48_twist24_shortfall/binary_sha256.txt`.  Records and `tables.md`, `summary.json` there (the
+three records over 1 MiB are identified by `.sha256` files: the artifact store needs the `aws` CLI, which this
+container lacks).  Report `research/e41_twist24_shortfall_20261102/REPORT.pdf`.  Local, one core per process,
+operation counts only.
+
+**Stage 0** (§9.52): E34's stored walks put order 6 at `0.924 ± 0.046` and order 24 at `1.086 ± 0.045` of their ideal;
+fruitless cycles `< 10⁻⁴` of the ideal, redirects `1/r` in both orders, no distinguished-point losses, ties cost no
+step.  **Checks:** with the fix off, `1,280/1,280` E34 Stage R records recomputed byte-identical; `0` wrong logs in
+`7,424` walks; the broken fix F̸ flagged on `32/32`; F's added work exactly `32` additions and `64` mod-`n`
+operations on all `1,280` F walks, zero elsewhere.  **Steps / ideal** (`1,024` walks each, schoolbook): O6B
+`0.969 ± 0.016`, O24 `1.006 ± 0.016`, O24F `0.999 ± 0.016`, O24′ `0.987 ± 0.016`; steps ratio order 6 / order 24
+`1.927` (`1.965` against the A/A stream; E34 `1.701`).
+
+| pooled ratio (> 1: second arm cheaper) | arithmetic | 0 GAE [95 %] | 0.1 GAE [95 %] | 1 GAE [95 %] | resolved |
+|:--|:--|:--|:--|:--|:--|
+| O6B / O24 | schoolbook | `1.761` [`1.686`, `1.836`] | `1.418` [`1.356`, `1.481`] | `1.275` [`1.218`, `1.332`] | **yes** (8/8 curves) |
+| O6C / O24 | schoolbook | `1.696` [`1.623`, `1.768`] | `1.320` [`1.262`, `1.378`] | `1.162` [`1.110`, `1.214`] | **yes** (7/8; 1 unresolved) |
+| O24 / O24F (the fix) | schoolbook | `1.021` [`0.978`, `1.064`] | `1.019` [`0.975`, `1.064`] | `1.018` [`0.973`, `1.064`] | no |
+| O24 / O24′ (A/A floor) | schoolbook | `1.019` | `1.019` | `1.020` | — |
+| O6B / O24 | Karatsuba (32 walks) | `1.711` | `1.369` | `1.249` | yes |
+| O6C / O24 | Karatsuba | `1.635` | `1.267` | `1.137` | yes |
+| O24 / O24F | Karatsuba | `0.984` | `0.981` | `0.979` | no |
+
+E34, 16 walks: O6B / cheap `1.563`, `1.254`, `1.126`; O6C / cheap `1.505`, `1.167`, `1.026`.
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.216 | `1,280/1,280` byte-identical; no E41 commit touches `quartic_folds.rs` | **holds** |
+| G2.217 | `0` wrong logs in `7,424` walks | **holds** |
+| G2.218 | `32/32` flagged | **holds** |
+| G2.219 | O6B `0.969`, O24 `1.006`, steps ratio `1.927` | **falsified** (O6B below the registered `0.98`; ratio and O24 inside) |
+| G2.220 | A/A `1.019` / `1.019` / `1.020` | **holds** |
+| G2.221 | F `0.75 %` fewer steps (theory `0.8 %`); added work exact | **holds** |
+| G2.222 | O24 / O24F not resolved at any weight | **holds** (null: F is not measurably cheaper) |
+| G2.223 | `1.761` / `1.418` / `1.275`, resolved | **holds** |
+| G2.224 | `1.696` / `1.320` / `1.162`, resolved at `1` GAE | **holds** |
+| G2.225 | `7/8` curves | **holds** |
+| G2.226 | Karatsuba: the same orders | **holds** |
+| G2.227 | see below | derived |
+| G2.228 | `20` rows, factor `1` | derived |
+
+**E18's `ψ` rows (a reference correction).**  Against E29's order-6 walk, the band-ranked order-24 walk (O24) is
+`1.761×` (0 GAE), `1.418×` (0.1) and `1.275×` (1 GAE) cheaper, pooled, schoolbook (Karatsuba `1.711`, `1.369`, `1.249`).
+E18's `ψ`-arm distances to rho lengthen by these factors, not by E34's `1.563` / `1.254` / `1.126`.  The modelled
+handover (§9.3, `2^{146.0}`) moves later by `3.27` / `2.02` / `1.40` bits (E34: `2.58` / `1.31` / `0.68`).  The
+cheapest point estimates (`1.838` with O24L at 0 GAE, `1.446` and `1.298` with O24F) are not ranked against O24.
+
+**IC rows (E31 solver A/B with E27 products; the 20 GLS rows).**  Order 24 does not apply on these curves
+(`Aut = {±1}`, §9.33), and E41 changes no walk there.  Their matched reference stays walk (iii), so every distance is
+unchanged (factor `1`).  The old and new columns are listed side by side in `tables.md`: for example, `p = 101` seed 1
+arm A gives `7.664·10⁴`, `2.672·10⁵`, `1.371·10⁶` before and after; `p = 397` seed 1 arm A `1.103·10⁴`, `3.664·10⁴`,
+`1.563·10⁵`.  Rho is ahead of every row at every weight.
+
+**What it says.**  E34's step shortfall (`1.701` against `2`) was sampling noise in a 16-seed design: its order-6
+seeds ran `7.6 %` under the ideal and its order-24 seeds `8.6 %` over.  On fresh seeds both walks sit within a few
+per cent of their own ceiling, and no order-24-specific cause exceeds `0.1 %` of steps, so there is no walk defect
+to fix.  F targets the only systematic component, the r-adding excess common to both orders.  It cuts steps by
+`0.75 %` as theory predicts, but it is not measurably cheaper (null, as registered).  The order-6 walk ran `3 %`
+under its ideal on this stream (G2.219's falsified bound), so the steps ratio `1.927` is still below `2`; against
+the A/A stream it is `1.965`.  This is sampling, not a mechanism: Stage 0's fresh order-6 walks sat at `1.027`.
+The matched rho on E18's `j = 0` curves is the cheap order-24 walk, now **resolved at every weight** against both
+order-6 walks, including `1.162×` at `1` GAE against the cheap order-6 walk (E34's `1.026` was within noise).
+**Class: a reference correction and a re-measurement, not an index-calculus improvement.**  E18's rows move further
+from rho, and the GLS IC rows do not move.  The leaderboard, `benchmarks/` and the validation gate are left to the
+main session.  Unit tests were not run in this session, because release unit-test builds are excluded on this host.
+The identity run (`1,280/1,280`) covers what `e41_instrument_is_e34s_walk` asserts.
+
+### 9.49 E39 measured: no kill fired — F, S and H are ranked ahead of A and E25 at `0`, `0.1` and `1` GAE on all 32 rows; the structure-preserving F control C_F^post passed `P_post` on 320/320 calls
+
+*2026-11-02.*  Pre-registration §9.48 (`16d17d2462`, pushed before any E39 code).  Code `31f2a2999e` (`RuleCheck::bump_post`,
+off by default) and `e1cd726577` (examples `e39_checks`, `e39_stage_a`, `e39_tables`; `identity.sh`, `run_e2e.sh`).  Binaries
+built once (`cargo build --release -j 2`) from a clean `git archive` export of `e1cd726577` (4,678 files checked blob by
+blob, plus the five `include_str!` docs from the same commit), pinned by sha256
+(`experiments/46_pivot_rules_confirm3/binary_sha256.txt`, provenance in `binary_commit.txt`), run from pinned copies.
+Records: `experiments/46_pivot_rules_confirm3/` (`identity_existing.json`, `identity/`, `pilot.json`, `checks.json`,
+`stage_a.log` and `stage_a.json.sha256` — `stage_a.json`, 5.8 MB, not in Git — `e2e/`, `tables.md`, `summary.json` from
+`e39_tables`).  Report: `research/e39_pivot_rules_confirm3_20261102/` (`REPORT.typ`, `REPORT.pdf`, figures; `plot.py`
+plots recorded values only).  Host: the shared 4-vCPU container (other sessions ran on it at the same time); isolab-eks
+unreachable, `conductor` not installed: **operation counts only, no wall-time claim.**  Runs, in the registered order:
+identity, pilot P1, main controls, Stage A (90,000 solves), end to end (154 runs: 7 arms × (10 GLS + 12 E24 pipeline
+runs)), 0 failures.  No kill fired, no fallback control was used and nothing deviated from §9.48.
+
+**Identity (G2.191).**  21/21 byte-identical (canonical JSON without timings): E37's eleven configurations, E37's six
+stored end-to-end records at `p = 101` seed 2 on `0xE37E0001`, `e37_checks` (= E37's `checks.json`), `e37_walk_e24` (= E37's
+`walk_e24.json`, the E24 rho), and E38's `pilot.json` and `pilot_p2.json` from E38's unchanged `e38_checks`.  Stage A: on
+all 10,000 fresh calls every solver returned the existing solver's outputs, A's rule through E36's echelon equals A
+counted, and the same calls fall back for every chain solver.  End to end: all 128 F, S, H, B″ and L records equal the same
+row's A record apart from the registered fields.
+
+**Controls (G2.190, G2.192, G2.193).**  Pilot P1 (80 calls, 56 non-empty): every primary passes (positive 80/80 each;
+non-empty detection C_F 55/56, C_F^post 55/56, C_SH (S) 55/56, (H) 56/56).  Main run (stream `0xE39C_0001`, 320 calls, 194
+non-empty):
+
+| control | check | aimed | positive | detected (all) | non-empty detected | gate (`≥ 0.95`, `≥ 0.96`) |
+|:--|:--|--:|--:|--:|--:|:--|
+| C_F (i), E37's misfile | `P_ext` | 320 | 320 (strict 0; `P`, `T` changed 320) | 316 (`0.988`) | 192/194 (`0.990`) | met |
+| C_F^post (ii) | `P_post` | 320 | 320 (`P`, `T` intact 320; first diff at `r*` 320; NF read altered 320) | 271 (`0.847`) | 193/194 (`0.995`) | met |
+| C_SH (S) | strict | 320 | 320 | 276 (`0.863`) | 194/194 (`1.000`) | met |
+| C_SH (H) | strict | 320 | 320 | 280 (`0.875`) | 193/194 (`0.995`) | met |
+| C_0 (F, S, H, L), calibration | strict | 320 each | 320 each | 265–273 | 191–193/194 | met (not gating) |
+
+C_F^post's aims: `|V|` `161`–`240`, `l*` in columns `255`–`302`, `1`–`5` phase-1 reads at `l*`.  The perturbed coefficient
+changed 194/194 non-empty sets under each of F, S, H, L; F's and L's digests differ from A's on 320/320; no clean-run
+identity failure.  As registered, C_F^post is mechanically close to C_0; it shows the detector sees a content corruption of
+a pivot row F chose at a contested read column with the structure provably intact, and it does not test F's choice.
+
+**Stage A** (10 × 1,000 fresh calls, `0xE39A_0001`; per-call means).  Selection: F, L `0`; S `511.9`–`512.7`; H − S
+`333.95`–`334.00`.  `C_A/C_X`: F `1.471`–`1.548`, S `1.411`–`1.463`, H `1.503`–`1.563`; `C_A/C_L` `0.710`–`0.721`;
+`C_{B″}/C_F` `0.952`–`0.985`.  `S_A/S_X` at `1` GAE: F `1.0116`–`1.0128`, S `1.0077`–`1.0086`, H `1.0076`–`1.0083`, L
+`0.9856`–`0.9862`; σ1, σ2, σ3 at `1` GAE for F `1.0081`–`1.0089`, `1.0341`–`1.0360`, `1.0098`–`1.0110`.
+
+**End to end — band tables** (32 rows, paired on `0xE39E_0001`, Karatsuba products for every arm; `S(g) = total_muls +
+97 g (macaulay_entries + selection)`; values `S_ref / S_X`, above `1` means X is cheaper; ranges over the rows):
+
+| X | reference | `0` GAE | `0.1` GAE | `1` GAE | order (primary; σ1, σ2, σ3) |
+|:--|:--|:--|:--|:--|:--|
+| F | A | `1.4572`–`1.5372` | `1.0937`–`1.1064` | `1.0115`–`1.0130` | F ahead on 32/32 at every weight; same under σ1–σ3 |
+| F | E25 | `3.626`–`3.945` | `1.520`–`1.581` | `1.0439`–`1.0676` | F ahead on 32/32; same under σ1–σ3 |
+| F | B″ | `0.952`–`0.988` | `1.046`–`1.056` | `1.0668`–`1.0704` | unresolved (B″ ahead at `0`) |
+| S | A | `1.4017`–`1.4492` | `1.0825`–`1.0908` | `1.0077`–`1.0086` | S ahead on 32/32; same under σ1–σ3 |
+| S | E25 | `3.488`–`3.719` | `1.505`–`1.558` | `1.0400`–`1.0631` | S ahead on 32/32 |
+| S | B″ | `0.913`–`0.932` | `1.035`–`1.041` | `1.0628`–`1.0658` | unresolved |
+| H | A | `1.4971`–`1.5415` | `1.0957`–`1.1028` | `1.0076`–`1.0083` | H ahead on 32/32; same under σ1–σ3 |
+| H | E25 | `3.725`–`3.957` | `1.523`–`1.576` | `1.0399`–`1.0627` | H ahead on 32/32 |
+| H | B″ | `0.977`–`0.991` | `1.048`–`1.052` | `1.0627`–`1.0655` | unresolved |
+| B″ | A | `1.530`–`1.558` | `1.0459`–`1.0480` | `0.9464`–`0.9482` | unresolved (behind A at `1` GAE on 32/32) |
+| B″ | E25 | `3.807`–`4.008` | `1.454`–`1.497` | `0.9785`–`0.9974` | unresolved |
+| L | A | `0.7103`–`0.7246` | `0.9006`–`0.9053` | `0.9856`–`0.9863` | L behind on 32/32 (primary, σ1, σ3); under σ2 ahead at `1` GAE on 32/32 (accounting effect on A, predicted) |
+| L | E25 | `1.778`–`1.860` | `1.253`–`1.293` | `1.0173`–`1.0395` | L ahead of E25 on 32/32 (reported) |
+
+**Against the matched rho** (walk (iii); `rho(g) = rho + 97 g · steps`; `S_X / rho` ranges, rho ahead of every arm on every
+row at every weight): F `5.18·10³`–`2.32·10⁵` (`0`), `2.37·10⁴`–`1.09·10⁶` (`0.1`), `9.40·10⁴`–`5.62·10⁶` (`1` GAE); S
+`5.48·10³`–`2.43·10⁵`, `2.41·10⁴`–`1.10·10⁶`, `9.44·10⁴`–`5.64·10⁶`; H `5.15·10³`–`2.28·10⁵`, `2.38·10⁴`–`1.09·10⁶`,
+`9.44·10⁴`–`5.65·10⁶`; A `7.91·10³`–`3.47·10⁵`, `2.62·10⁴`–`1.19·10⁶`, `9.52·10⁴`–`5.69·10⁶`; E25 `2.03·10⁴`–`8.83·10⁵`,
+`3.75·10⁴`–`1.68·10⁶`, `1.00·10⁵`–`5.94·10⁶`; B″ `5.10·10³`–`2.24·10⁵`, `2.50·10⁴`–`1.14·10⁶`, `1.01·10⁵`–`6.01·10⁶`; L
+`1.09·10⁴`–`4.88·10⁵`, `2.90·10⁴`–`1.33·10⁶`, `9.66·10⁴`–`5.77·10⁶`.
+
+**Distance to the matched rho, every row** (`S_X / rho` at `0` and `1` GAE; `0.1` GAE and the E25, B″, L columns per row in
+`tables.md`):
+
+| set | p | seed | arm | F `0` | S `0` | H `0` | A `0` | F `1` | S `1` | H `1` | A `1` |
+|:--|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|
+| GLS | 101 | 1 | A | `7.98·10⁴` | `8.30·10⁴` | `7.77·10⁴` | `1.17·10⁵` | `2.06·10⁶` | `2.07·10⁶` | `2.07·10⁶` | `2.09·10⁶` |
+| GLS | 101 | 1 | B | `3.42·10⁴` | `3.56·10⁴` | `3.33·10⁴` | `5.01·10⁴` | `8.88·10⁵` | `8.91·10⁵` | `8.91·10⁵` | `8.98·10⁵` |
+| GLS | 101 | 2 | A | `2.62·10⁴` | `2.72·10⁴` | `2.55·10⁴` | `3.81·10⁴` | `7.31·10⁵` | `7.34·10⁵` | `7.34·10⁵` | `7.39·10⁵` |
+| GLS | 101 | 2 | B | `1.11·10⁴` | `1.16·10⁴` | `1.08·10⁴` | `1.64·10⁴` | `3.17·10⁵` | `3.18·10⁵` | `3.18·10⁵` | `3.20·10⁵` |
+| GLS | 149 | 1 | A | `2.32·10⁵` | `2.43·10⁵` | `2.28·10⁵` | `3.47·10⁵` | `5.62·10⁶` | `5.64·10⁶` | `5.65·10⁶` | `5.69·10⁶` |
+| GLS | 149 | 1 | B | `1.45·10⁵` | `1.52·10⁵` | `1.43·10⁵` | `2.17·10⁵` | `3.52·10⁶` | `3.53·10⁶` | `3.53·10⁶` | `3.56·10⁶` |
+| GLS | 149 | 2 | A | `4.51·10⁴` | `4.72·10⁴` | `4.42·10⁴` | `6.74·10⁴` | `1.09·10⁶` | `1.10·10⁶` | `1.10·10⁶` | `1.11·10⁶` |
+| GLS | 149 | 2 | B | `3.21·10⁴` | `3.36·10⁴` | `3.14·10⁴` | `4.79·10⁴` | `7.75·10⁵` | `7.78·10⁵` | `7.78·10⁵` | `7.84·10⁵` |
+| GLS | 197 | 1 | A | `2.12·10⁴` | `2.23·10⁴` | `2.09·10⁴` | `3.18·10⁴` | `4.93·10⁵` | `4.95·10⁵` | `4.96·10⁵` | `5.00·10⁵` |
+| GLS | 197 | 1 | B | `8.30·10³` | `8.72·10³` | `8.18·10³` | `1.24·10⁴` | `1.92·10⁵` | `1.93·10⁵` | `1.93·10⁵` | `1.95·10⁵` |
+| GLS | 197 | 2 | A | `1.35·10⁴` | `1.42·10⁴` | `1.33·10⁴` | `2.03·10⁴` | `3.19·10⁵` | `3.20·10⁵` | `3.20·10⁵` | `3.22·10⁵` |
+| GLS | 197 | 2 | B | `6.46·10³` | `6.79·10³` | `6.37·10³` | `9.72·10³` | `1.53·10⁵` | `1.53·10⁵` | `1.54·10⁵` | `1.55·10⁵` |
+| GLS | 269 | 1 | A | `2.86·10⁴` | `3.02·10⁴` | `2.83·10⁴` | `4.35·10⁴` | `6.46·10⁵` | `6.49·10⁵` | `6.49·10⁵` | `6.55·10⁵` |
+| GLS | 269 | 1 | B | `9.76·10³` | `1.03·10⁴` | `9.66·10³` | `1.48·10⁴` | `2.21·10⁵` | `2.21·10⁵` | `2.21·10⁵` | `2.23·10⁵` |
+| GLS | 269 | 2 | A | `1.41·10⁴` | `1.49·10⁴` | `1.40·10⁴` | `2.15·10⁴` | `3.20·10⁵` | `3.21·10⁵` | `3.21·10⁵` | `3.24·10⁵` |
+| GLS | 269 | 2 | B | `7.49·10³` | `7.90·10³` | `7.41·10³` | `1.14·10⁴` | `1.70·10⁵` | `1.70·10⁵` | `1.70·10⁵` | `1.72·10⁵` |
+| GLS | 397 | 1 | A | `9.37·10³` | `9.91·10³` | `9.32·10³` | `1.43·10⁴` | `2.00·10⁵` | `2.01·10⁵` | `2.01·10⁵` | `2.02·10⁵` |
+| GLS | 397 | 1 | B | `5.18·10³` | `5.48·10³` | `5.15·10³` | `7.91·10³` | `1.11·10⁵` | `1.11·10⁵` | `1.11·10⁵` | `1.12·10⁵` |
+| GLS | 397 | 2 | A | `1.43·10⁴` | `1.51·10⁴` | `1.42·10⁴` | `2.18·10⁴` | `3.08·10⁵` | `3.09·10⁵` | `3.09·10⁵` | `3.12·10⁵` |
+| GLS | 397 | 2 | B | `7.32·10³` | `7.75·10³` | `7.28·10³` | `1.12·10⁴` | `1.58·10⁵` | `1.59·10⁵` | `1.59·10⁵` | `1.60·10⁵` |
+| E24 | 101 | 1 | — | `2.06·10⁴` | `2.15·10⁴` | `2.01·10⁴` | `3.04·10⁴` | `4.33·10⁵` | `4.35·10⁵` | `4.35·10⁵` | `4.38·10⁵` |
+| E24 | 101 | 2 | — | `1.61·10⁴` | `1.67·10⁴` | `1.56·10⁴` | `2.35·10⁴` | `3.35·10⁵` | `3.36·10⁵` | `3.36·10⁵` | `3.39·10⁵` |
+| E24 | 149 | 1 | — | `2.46·10⁴` | `2.58·10⁴` | `2.41·10⁴` | `3.67·10⁴` | `4.74·10⁵` | `4.76·10⁵` | `4.76·10⁵` | `4.80·10⁵` |
+| E24 | 149 | 2 | — | `2.42·10⁴` | `2.54·10⁴` | `2.38·10⁴` | `3.63·10⁴` | `4.71·10⁵` | `4.73·10⁵` | `4.73·10⁵` | `4.77·10⁵` |
+| E24 | 197 | 1 | — | `2.36·10⁴` | `2.49·10⁴` | `2.33·10⁴` | `3.57·10⁴` | `4.51·10⁵` | `4.53·10⁵` | `4.53·10⁵` | `4.57·10⁵` |
+| E24 | 197 | 2 | — | `1.09·10⁴` | `1.15·10⁴` | `1.07·10⁴` | `1.65·10⁴` | `2.03·10⁵` | `2.03·10⁵` | `2.03·10⁵` | `2.05·10⁵` |
+| E24 | 269 | 1 | — | `1.19·10⁴` | `1.25·10⁴` | `1.17·10⁴` | `1.80·10⁴` | `2.17·10⁵` | `2.17·10⁵` | `2.17·10⁵` | `2.19·10⁵` |
+| E24 | 269 | 2 | — | `9.28·10³` | `9.79·10³` | `9.19·10³` | `1.41·10⁴` | `1.68·10⁵` | `1.69·10⁵` | `1.69·10⁵` | `1.71·10⁵` |
+| E24 | 397 | 1 | — | `5.37·10³` | `5.68·10³` | `5.34·10³` | `8.21·10³` | `9.40·10⁴` | `9.44·10⁴` | `9.44·10⁴` | `9.52·10⁴` |
+| E24 | 397 | 2 | — | `5.49·10³` | `5.81·10³` | `5.46·10³` | `8.40·10³` | `9.61·10⁴` | `9.65·10⁴` | `9.65·10⁴` | `9.73·10⁴` |
+| E24 | 521 | 1 | — | `6.87·10³` | `7.29·10³` | `6.86·10³` | `1.06·10⁴` | `1.21·10⁵` | `1.21·10⁵` | `1.21·10⁵` | `1.22·10⁵` |
+| E24 | 521 | 2 | — | `9.18·10³` | `9.73·10³` | `9.15·10³` | `1.41·10⁴` | `1.61·10⁵` | `1.62·10⁵` | `1.62·10⁵` | `1.63·10⁵` |
+
+**Health and A/A.**  Every log recovered and every walk correct in every record; unsolved at most `0.05 %`; fallbacks at
+most `1.30 %` (GLS `p = 101` seed 2 arm A, ceiling `1.60 %`); E24 `p = 101` seed 2 `1.13 %` against its ceiling `1.63 %`;
+the same fallback count for every chain arm on every row.  Against E37's stream, per row `|Δ S_A/S_F|` is at most
+`0.0111` (`0`), `0.0010` (`0.1`) and `8·10⁻⁵` (`1` GAE).  The absolute `S/rho` distances differ from E37's per row (the
+fresh stream draws a different number of targets and residuals), the paired ratios do not.
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.190 | every primary passed P1; no fallback used; C_F^post aimed 80/80 | **holds** |
+| G2.191 | 21/21 binary clauses; Stage A 10,000/10,000 for every solver, same fallback calls; 160/160 end-to-end records (32 rows × 5 arms) equal A's by the field rule | **holds** |
+| G2.192 | gating controls 320/320 positive; non-empty detection `0.990`, `0.995`, `1.000`, `0.995` (gate `0.96`); perturbation 194/194; digests 320/320 | **holds** |
+| G2.193 | C_F `P_ext` 320/320, strict 0/320; C_F^post aimed 320/320, `P_post`, `P`/`T` intact and first diff at `r*` on 320/320 | **holds** |
+| G2.194 | F, L `0`; S `511.9`–`512.7`; H − S `333.95`–`334.00` | **holds** |
+| G2.195 | `C_A/C_F` `1.471`–`1.548`, `C_A/C_S` `1.411`–`1.463`, `C_A/C_H` `1.503`–`1.563`, `C_L/C_A` `1.387`–`1.408`, `C_F/C_{B″}` `1.016`–`1.050` | **holds** |
+| G2.196 | F, S, H ahead of A at every weight on every curve, inside their `1` GAE bands; no order changed by σ1–σ3; L behind A at every weight | **holds** |
+| G2.197 | F, S, H inside every band on all 32 rows; `S_E25/S_F` at `0` GAE `3.626`–`3.945` | **holds** |
+| G2.198 | as above | **holds** |
+| G2.199 | B″ ahead of F, S, H at `0` GAE (`S_{B″}/S_F` `0.952`–`0.988`), behind at `0.1` and `1` | **holds** (unresolved) |
+| G2.200 | L behind A on 32/32 at every weight, inside its bands; ahead under σ2 at `1` GAE on 32/32 | **holds** |
+| G2.201 | G2.191 and G2.192 hold; F, S, H each ahead of A and E25 on 32/32 rows at `0`, `0.1`, `1` GAE | **holds — F, S and H are ranked ahead of A and E25 across the band on these 32 rows** |
+| G2.202 | max `|Δ|` `0.0111` / `0.0010` / `8·10⁻⁵` | **holds** |
+| G2.203 | rho ahead everywhere; `S_F/rho` `5.18·10³`–`2.32·10⁵` at `0` GAE, `9.40·10⁴`–`5.62·10⁶` at `1` GAE | **holds** |
+
+**What it says.**  On the third pre-registered attempt, with controls whose positive checks see what each defect
+corrupts, every gate held and the measurement repeated E36's and E37's: the rule that takes each bucket's first-arrived
+row (F), the static order (S) and the hybrid (H) are each ahead of solver A and of E25 at `0`, `0.1` and `1` GAE on all 32
+rows (E25's 20 GLS rows, E24's 12 curves), with the same relations, logs and walks.  Under the 2026-10-15 criterion this
+is a measured engineering improvement of the `k = 4` solve's echelon at this scope: per row, `1.46`–`1.54×` fewer solve
+multiplications for F at `0` GAE and `S_A/S_F` `1.0115`–`1.0130` at `1` GAE (about `1.1`–`1.3 %`), where the Macaulay entries remain almost all
+of `S`.  At `1` GAE F is the cheapest of the three; at `0` GAE H is.  None of F, S, H is ranked against B″ (B″ ahead at `0`
+GAE, behind at `0.1` and `1`).  **Distance remaining:** rho is ahead of every row of every arm at every weight; the closest
+row (GLS `p = 397` seed 1 arm B) has F at `5.18·10³×` rho at `0` GAE (A `7.91·10³×`) and `1.11·10⁵×` at `1` GAE (A
+`1.12·10⁵×`); on E24's curves `p = 397` seed 1 has F at `5.37·10³×` and `9.40·10⁴×`.  **Validated (2026-11-03):** independent rebuild and replay (31/31 runs, 1,037,565 fields identical), recompute
+(7,286 summary values, 0 disagreements) and gate `valid` (`research/e39_pivot_rules_confirm3_20261102/VALIDATION.json`).  Wall times were not measured.
+
+**Erratum (independent validation, 2026-11-03).** Corrected in place above: (E1) the end-to-end identity count is
+160/160 records (32 rows × 5 arms), not 128/128; (E2) S against E25 at `0.1` GAE, upper end `1.558`, not `1.559` (also in
+`REPORT.typ`); (E3) B″'s distance to rho at `0.1` GAE, upper end `1.14·10⁶`, not `1.16·10⁶`; (E4) L's at `0.1` GAE,
+`1.33·10⁶`, not `1.35·10⁶`.  (E5) "non-empty detection ≥ `0.990`" is a rounded minimum: 192/194 = `0.98969`, still above the
+`0.96` gate.  (E6) the identity check is unchanged with the call count also required equal across arms.  None changes a
+verdict.  Validator report: `research/e39_pivot_rules_confirm3_20261102/validator-report.json`.
+
+### 9.54 E42 pre-registration: V's stored tails reserved to the fill instead of the last column (W, `chain-tails`), every added operation charged
+
+*Registered 2026-11-03, after the Stage 0 counts below and before any W solver code or run.*  **Numbering:** E39 owns
+§9.48–§9.49 and G2.190–G2.203, E40 §9.50–§9.51 and G2.204–G2.215, E41 §9.52–§9.53 and G2.216–G2.229; E42 takes §9.54
+(this registration), §9.55 (results) and G2.230–G2.243; records `experiments/49_macaulay_tails/`, report
+`research/e42_macaulay_tails_20261103/`.  **Motivation.**  §9.51: after V the stored tails, `Σ_r (cols − lead_r) ≈
+102,827` cells a call, are `≈ 78 %` of `S_V` at `1` GAE.  §9.51 named three levers: the tails themselves (sparse rows, or
+rows grown as fill reaches them), rows the normal forms do not depend on, and the fill-free right end of high-degree rows.
+**Baseline:** V (`chain-profile`, E40, ranked ahead of A at `0.1` and `1` GAE, equal at `0`).  **Class, fixed in
+advance:** a variant with V's (= A's) arithmetic and outputs that stores fewer cells, every operation it adds charged, is
+*engineering* (a data-structure constant on the build of the `k = 4` solve).  It cannot move `S` at `0` GAE and is
+ranked only as stated under "Ranking".  Re-pricing work V already does would be accounting and is not proposed.
+
+**Stage 0 (counts only; done before this registration).**  Instrument `src/cryptanalysis/macaulay_tails.rs`
+(`stage0_tails`) and `examples/e42_stage0.rs`: it rebuilds each call's rows exactly as `build_profile` does and replays
+A's echelon (E33's `Lowest`: the same buckets, pivots, dense/sparse rule) on them, charging nothing; the replay
+reproduced `echelon_by_lead_counted`'s pivots and rows on every call.  v1 `9b061b9710` (binary sha256 `9693cc91…6f56`),
+v2 `38eac2b3ea` (adds static reserves and two-segment counts; sha256 `551b105e…9c75`), both built from clean exports
+(`experiments/49_macaulay_tails/export.sh`: 447 paths, 4,643 files, 0 blob mismatches).  200 calls on each of E25's ten
+GLS curves and E24's twelve curves (4,400 calls; stream `seed ^ 0xE42D_0000`; `stage0{,_v2}.{json,log}`).  Per call,
+ranges of the 22 curve means (ranges over all calls in brackets):
+
+| V's tail, per call | count |
+|:--|--:|
+| stored tail `Σ_r (cols − lead_r)` (V) | `102,825`–`102,831` |
+| build extent: each row to its last coefficient `= col(TM(fᵢ)·shift)` (`TM` the trailing monomial; `0` exceptions) | `81,300`–`81,400` |
+| final extent: grown on each update to the pivot row's last nonzero (`G`) | `82,737`–`82,801` |
+| oracle extent: to the rightmost column ever nonzero | equal to `G` on every curve |
+| **right end never nonzero** (tail − final extent) | `≈ 20,050` (`19.5 %`) |
+| tail cells ever nonzero / nonzero after the echelon | `36,775`–`36,893` / `31,348`–`31,658` |
+| tail cells V's build, echelon and reachability pass touch / under `G` | all `102,8xx` / `= G`'s extent |
+| row updates (dense branch) / growth events / growth cells | `4,180`–`4,216` (`3,395`–`3,443`) / `924`–`930` / `1,401`–`1,481` |
+| rows that grow; most growths of one row | `200`–`201`; `15` (`25`) |
+| growth cells by update column (eighths of `cols`, all calls) | `0.62`, `0.97`, `1.31`, `0.90`, `1.07`, `0.77`, `0.52`, `0.11` (`·10⁶`) |
+| cells copied by exact growth (re-allocate each time) | `2.00·10⁵`–`2.02·10⁵` |
+| static reserve to the end of the build end's weighted-degree block (`k = 1`): cells / re-allocations / copied | `86,138`–`86,202` / `59`–`62` / `8,120`–`8,721` |
+| reserve to the end of the next block (`k = 2`): cells / re-allocations / copied | `92,475`–`92,540` / `6.0`–`7.0` / `420`–`563` |
+| two segments (build range + an exactly grown overflow): overflow copies / split updates | `5,544`–`5,964` / `3,703`–`3,737` |
+| sparse rows: lower bound on merge index work, `Σ_updates (nnz_row(≥c) + nnz_pivot)` | `9.79·10⁵`–`9.97·10⁵` |
+| `G`'s cells on rows outside the normal forms' dependency closure | `12,557`–`12,599` |
+| dense-update cells the `axpy` runs over: V `Σ(cols − c)` / `G` `Σ(pivot end − c)` (unpriced, every arm) | `7.45·10⁵`–`7.58·10⁵` / `6.05·10⁵`–`6.15·10⁵` |
+
+**Which lever is real.**  (a) *Sparse rows:* only `36 %` of the tail is ever nonzero, but a sparse row's update is a
+merge, and its index work alone (`≥ 9.8·10⁵` a call) is `≈ 8×` V's whole priced build (`≈ 1.25·10⁵`): **closed**.
+(b) *Rows grown only as fill reaches them:* fill is small and late-arriving but frequent — `≈ 926` growth events a call,
+spread over the whole echelon, adding only `1.4 %` to the build extent.  A row stored exactly to its fill and
+re-allocated on growth copies `≈ 2·10⁵` cells a call (`2×` the tail): **closed** as stated.  The real content of (b) is
+the right end: `19.5 %` of V's tail is never nonzero, and `98 %` of the final extent is known at build (the column of
+`TM·shift`; the monomial order is multiplicative).  Every contiguous variant needs a fill check on each row update
+(`≈ 4,200` a call, charged).  Measured totals per call (cells + copies + the checks and lookups listed below): `k = 1`
+`≈ 100.1·10³`, two segments `≈ 98.6·10³` (with a split per update, before the splits its normal-form reads would add),
+**`k = 2` `≈ 98.5·10³`**, exact growth `≈ 2.9·10⁵`; V `≈ 102.8·10³`.  `k = 2` and two segments are within `0.1 %`;
+`k = 2` is taken because it is the lower and leaves every reader of a row unchanged.  (c) *Rows outside the dependency closure:* `≈ 12,600` cells under `G` (`16,100` under V);
+dropping them needs the staircase in advance (a shape trace, E21/E35's caveats): a ceiling, **not proposed**.  The lever
+is (b′): **reserve each row to the end of the weighted-degree block after the one holding its build end, and grow only on
+overflow**.  It is a small lever: the predicted gain is `≈ 4,400` charged operations a call (`≈ 3.5 %` of V's charged
+cells and operations).  The choice of `k = 2` was made on Stage 0's stream; Stage A and the end-to-end rows use fresh
+or registered streams.  **Atlas check.**  `tools/lead_atlas.py --brief` / `--match` (crypto-autoresearcher, reviewed
+2026-10-29; 213 crypto paths changed since, E40's among them): no lead covers the storage of the G2 `V₄` chain solve's
+Macaulay rows; nearest are `LEAD-ICP-prime-ic-constant-engineering` (open; constant engineering, under which E42 falls)
+and `LEAD-ICB-orbit-linear-algebra` (the relation matrix, not this solve).  In this note: E40 (§9.50–§9.51, the prefix);
+E21/E35 (shape traces, closed or not ranked).  Lever (b′) is none of these.
+
+**Variant W (`chain-tails`), fixed.**  V with one change of storage: each built row is allocated from its lead to
+`cap_r = B₂(δᵢ + wdeg(shift))`, where `δᵢ` is the least weighted degree in equation `i`'s nonzero support and `B₂(e)` is
+one past the last column of weighted degree `e − 1` (`cols` if `e ≤ 0`; a 12-entry table per degree `d`), i.e. the end
+of the block after the one holding the row's build end.  The echelon is V's (`echelon_profile`'s buckets, pivots,
+normalisation, branch rule `|nz|·8 > cols − c`, multiplications, digest); at each pivot normalisation the pivot's end
+`e_p = (last nonzero) + 1` is read from its nonzero list; before each row update the fill check `e_p > len_r` runs, and
+on overflow the row is re-allocated (its full old buffer copied, offset unchanged) to `B₁(e_p)` (one past the end of the
+block holding column `e_p − 1`); the dense `axpy` runs over `[c, e_p)`, the sparse update over the pivot's nonzeros, and
+lead scans after an update stop at the row's stored end.  The reachability pass and normal forms read a pivot row through
+its offset to its stored end (`chain_quotient` unchanged: cells beyond a row's end are zero).  Everything after, and the
+fallback (the existing solver, dense), are A's.  New code behind a new solver name; no existing solver's code path, count
+or output may change.  **Charged native operations of W (per call), each at `97 g`:** (i) *stored cells*
+`macaulay_stored_entries` = the cells of every buffer W allocates for a row: `Σ_r (cap_r − lead_r)` plus, per
+re-allocation, the new buffer's full length (copied cells included); on a fallback call A's `2 · rows · cols` replaces
+it (as V); (ii) *offset operations* `profile_offset_ops`, V's convention unchanged (they must equal V's on every call);
+(iii) *tail operations* `tail_extent_ops` (new field, emitted only for W): per equation that builds rows one per support
+term (the least-degree scan), per built row two (the shift's degree and the `B₂` lookup), per pivot normalisation one
+(its end), per row update one (the fill check), per re-allocation one; a fallback keeps the attempt's (ii) and (iii).
+**Band:** `S_W(g) = total_muls + 97 g (macaulay_stored_entries + profile_offset_ops + tail_extent_ops)`; `S_V`, `S_A`,
+`S_E25` and `rho(g)` as §9.50, `g ∈ {0, 0.1, 1}`.  **Unpriced counters, every arm (listed, not used for ranks):**
+lead-scan reads (W `≤` V); dense-update cell traffic (W `≈ 6.1·10⁵`, V `≈ 7.5·10⁵` a call; unpriced for every arm since
+E24); the per-call structural work common to A, V, W and E25 (§9.50's σ4 list); memory.  σ1 prices the lead scans for
+every arm, σ4 the structural work for every arm.
+
+**Arms and rows (fixed).**  V (`chain-profile`), W (`chain-tails`), A (`chain-counted`), E25 (`macaulay`), all with
+`--karatsuba`, and the matched rho, walk (iii) (E27's on the GLS rows, `experiments/32_walk_karatsuba/summary.json`;
+E37's on E24's curves, `experiments/44_pivot_rules_confirm/walk_e24.json`).  *End to end, paired:* W on E37's stream
+(`--stream-salt E37E0001`, `--rho-runs 16 --max-residuals 5000000`, `RAYON_NUM_THREADS=4`) on the 20 GLS rows
+(`quartic_pipeline_gls`, E25's ten curves × arms A, B) and the 12 E24 rows (`quartic_pipeline_v4`), compared with E40's
+stored V records (`experiments/47_macaulay_entries/e2e/`) and E37's A and E25 records of the same rows and stream.
+*Stage A:* E25's ten curves, base and precompute from E25's stream, the first 1,000 targets of stream
+`seed ^ 0xE42A_0001` per curve (10,000 calls), one thread; per call existing, A counted, V and W from the same
+per-target seed.
+
+**Identity (fixed).**  *Stage A, every call:* W returns A counted's (and V's) solutions, degree, outcome, decomposition
+set, fallback flag, every phase count and pivot digest; W's offset operations equal V's; W's stored-cell counter equals
+the measured `Σ` of its final row lengths plus the lengths of the buffers its re-allocations discarded; W's lead-scan
+reads are `≤` V's.  *End to end:* every W record equals E40's V record of the same row in every field except the solver
+tag, wall times, `lead_scan_reads`, `macaulay_stored_entries` and `tail_extent_ops` (so `total_muls`, relations, logs,
+walks and `profile_offset_ops` are equal), and equals E37's A record outside those fields and `profile_offset_ops`.
+*Existing configurations:* under the E42 binary, E40's seven configurations (§9.51) reproduce E40's references (wall times
+aside), and `chain-profile --karatsuba` with `--stream-salt E37E0001` (GLS `p = 101` seed 2; E24 `p = 101` seed 1) equals
+E40's stored V records outside wall times.
+
+**Controls (fixed).**  `e42_checks`, E25's ten curves, 32 calls each (320) on stream `seed ^ 0xE42C_0001`.
+*Positive P1 (broken W):* rows capped at their build end (`B₀`) and the fill check off, so fill beyond a row's end is
+dropped; detected when the Stage A identity fails against A counted; must be detected on 320/320.  *Positive P2 (broken
+count):* the stored-cell counter short by one per row; detected by the measured-length check; 320/320.  *Growth-path
+control G0 (must pass):* rows capped at their build end with the fill check on (`≈ 926` re-allocations a call), so W's
+re-allocation path, rare under `B₂`, runs on every call; G0 must equal A counted and pass the counter check on 320/320,
+with `[900, 960]` re-allocations per call (mean).  *Perturbed coefficient (E31's):* one coefficient of one equation moved
+by one changes W's solution set on every call with a non-empty clean set.  *Negative N (V against V′ on another
+stream):* V rerun on the 20 GLS rows with `--stream-salt E42E0002` (V′), compared with E40's V on E37's stream through
+the same tables and rank rule; and W on `E42E0002` (W′) against V′, paired.
+
+| id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|
+| G2.230 | identity (**kill**) | every identity check above holds on every Stage A call, every end-to-end record and every existing configuration | any failure (E42 stops; W negative) |
+| G2.231 | controls (**kill**) | P1 320/320, P2 320/320, G0 passes 320/320, perturbed coefficient on every non-empty call | any miss (E42 stops) |
+| G2.232 | W's stored cells per clean call (Stage A) | `[9.25, 9.35]·10⁴` on every curve; re-allocations per call (mean) `[4, 10]` | outside |
+| G2.233 | W's tail operations per call (Stage A mean) | `[5.3, 5.7]·10³`; offset operations equal V's exactly | outside |
+| G2.234 | per call, `S_V / S_W` (Stage A means, every curve) | exactly `1` at `0` GAE; `[1.015, 1.035]` at `0.1`; `[1.02, 1.05]` at `1` GAE.  **Kill** if `≤ 1.005` at `1` GAE on any curve or W is behind V at any weight on any curve (E42 stops before end to end) | outside; kill |
+| G2.235 | lead scans (σ1 input) | W's lead-scan reads `≤` V's on every call | any call above |
+| G2.236 | end to end, `S_V / S_W`, 32 rows | `1` exactly at `0` GAE; `[1.015, 1.035]` at `0.1`; `[1.02, 1.05]` at `1` GAE; W never behind V | outside; W behind V at any weight on any row |
+| G2.237 | end to end, `S_A / S_W` and `S_E25 / S_W`, 32 rows | `S_A/S_W`: `1` at `0`, `[1.27, 1.31]` at `0.1`, `[1.38, 1.45]` at `1`; `S_E25/S_W`: E40's `S_E25/S_V` at `0` exactly, `[1.77, 1.87]` at `0.1`, `[1.43, 1.53]` at `1` GAE | outside; any row `≤ 1` at a positive weight |
+| G2.238 | distance to rho (`S_W / rho`, walk (iii)) | rho ahead of every row at every weight; at `1` GAE `S_W / rho = (S_V / rho) / [1.02, 1.05]` | any row below rho |
+| G2.239 | σ1 and σ4 (every arm) | no order against V, A or E25 changes | an order changes |
+| G2.240 | negative control N | V′ is **not** ranked against V (its order differs across rows); W′ against V′ (paired) reproduces G2.236's bands and W′ equals V′ outside the allowed fields | V′ ranked; W′ outside G2.236's bands |
+| G2.241 | fallbacks | W falls back on exactly V's (= A's) calls | any difference |
+| G2.242 | slack of the reserve (Stage A calls, Stage 0's replay run on the same systems) | W's stored cells exceed the replay's fill extent `G` by `[9, 11]·10³` per clean call (mean, every curve) | outside |
+| G2.243 | dense-update cell traffic (unpriced, listed; the same replay) | `G`'s `axpy` cells `[5.9, 6.3]·10⁵` a call, V's `[7.3, 7.7]·10⁵` | outside (no rank depends on it) |
+
+**Ranking (fixed).**  W is ranked ahead of V if G2.230–G2.231 hold, `S_W(0) = S_V(0)` exactly and `S_W(g) < S_V(g)` at
+`g = 0.1` and `1` on every one of the 32 rows: W is then never behind V in the band and strictly ahead at both positive
+weights, reported as **ahead of V at `0.1` and `1` GAE, equal at `0` GAE** — not as an improvement at `0` GAE.  Against A
+the same weak rule; against E25 the ordinary rule (ahead at all three weights on every row).  Anything else is reported,
+unranked.  An end-to-end order is never inferred from Stage A.
+
+**What it would say.**  If the predictions hold, the chain solve's Macaulay rows stop at the block after their last
+coefficient instead of the last column: `≈ 9,800` fewer cells a call against `≈ 5,500` charged checks and lookups, so
+`S` falls `≈ 2–3 %` at `0.1` GAE and `≈ 3–4 %` at `1` GAE against V, nothing at `0` GAE.  It is a small, priced lever; the
+large one in the tails (sparse storage) is closed by its own index work.  Remaining after W: `≈ 82,800` cells of fill
+extent, of which `≈ 12,600` are rows outside the dependency closure (a trace-shaped ceiling), and `≈ 46,000` interior
+zeros that no contiguous format can drop.  Python only plots recorded values; every number comes from the Rust examples.
+Host: the 4-vCPU container shared with other agents, local runs (isolab-eks unreachable), operation counts only, no
+wall-time claim.  Leaderboard, `benchmarks/` and the validation gate are not touched here; if W is ranked the main session
+arranges independent validation.
+
+### 9.55 E42 measured: the controls kill fired on a mis-registered growth-control count (G0 re-allocated `≈ 246` times a call, registered `[900, 960]`); every correctness control passed 320/320; E42 stops, W not ranked by E42
+
+*2026-11-03.*  Pre-registration §9.54 (`e37d72e172`, pushed in the branch head before any W code).  Code `3858929530`
+(`macaulay_tails::{build_tails, echelon_tails}`, `QuarticSolve::tail_extent_ops`), `673433fef5` (the `klein_v4` hook,
+committed alone: `Pivot::Tails`, `V4Solver::ChainTails` = `chain-tails`), `efc700b36d` (record field `tail_extent_ops`,
+W only), `6dfe52f95e` (harness).  Binaries from a clean export of `6dfe52f95e` (447 paths, 4,645 files, 0 blob
+mismatches), sha256 in `experiments/49_macaulay_tails/binary_sha256.txt`.  Run: `e42_checks --calls 32` (320 calls,
+stream `seed ^ 0xE42C_0001`; `checks.{json,log}`), the first registered step.  Local, operation counts only.
+
+| control | result | registered |
+|:--|:--|:--|
+| W = A counted (outputs, fallback, phases, digest) | 320/320 | 320/320 |
+| W's counter = final lengths + discarded buffers | 320/320 (W re-allocations `5.9`–`6.4` a call) | — |
+| P1 (caps at the build end, fill check off) detected | 320/320 | 320/320 |
+| P2 (counter short by one per row) detected | 320/320 | 320/320 |
+| G0 (caps at the build end, fill check on) = A counted; counter | 320/320; 320/320 | 320/320 |
+| **G0 re-allocations per call (mean)** | **`241`–`247` per curve (`245.6` over 320 calls)** | **`[900, 960]`** |
+| perturbed coefficient changed the solution set | 190/190 non-empty | every non-empty |
+
+**Verdict.**  G2.231 as registered is **falsified**: the G0 clause "`[900, 960]` re-allocations per call" fails, and
+`e42_checks` (committed before the run) folds it into `g2_231_holds = false`.  The kill fires and **E42 stops: no
+Stage A, no end to end, W is not ranked by E42.**  *Why the number was wrong:* §9.54 took `≈ 926` from Stage 0's `k = 0`
+counter, which re-grows a row exactly to the pivot's end on every overflow; W's registered overflow rule (which G0 uses)
+re-grows to the end of the block holding the pivot's end (`B₁`), so later fill inside that block needs no further
+re-allocation.  The prediction was mis-derived; the control did what it was for (W's re-allocation path ran
+`≈ 246` times on every call, and G0 still equalled A and passed the counter check on 320/320).  Taking the per-call
+reading of the table ("G0 passes 320/320") instead would be a post-hoc choice of the favourable reading, so it is not
+taken.  Nothing else was run under §9.54.  The ranking question is carried by the successor registration E42b (§9.56),
+registered before any Stage A or end-to-end data exist, with this count corrected and the controls rerun on a fresh
+stream.
+
+### 9.56 E42b pre-registration: W against V once more, with the growth-control count derived from W's own overflow rule and the controls on a fresh stream
+
+*Registered 2026-11-03, after E42's kill (§9.55) and before any Stage A, end-to-end or E42b control run.*  **Numbering:**
+E42b takes §9.56 (this registration), §9.57 (results) and G2.244–G2.257; records stay in
+`experiments/49_macaulay_tails/` (E42b's files carry `_b` where E42 already wrote one), report
+`research/e42_macaulay_tails_20261103/`.  **What changes against §9.54, and nothing else:** (1) G0's re-allocation count
+is predicted from W's overflow rule, `[200, 300]` per call (mean; E42 measured `241`–`247` per curve on stream
+`seed ^ 0xE42C_0001`), and is a descriptive check, not a kill: the G0 kill is its per-call identity and counter check;
+(2) the controls run on a fresh stream, `seed ^ 0xE42C_0002`, with the same harness given that stream (`--salt`) and the
+same detection rules; (3) the binaries for Stage A and end to end are E42's, built before any run from a clean export of
+`6dfe52f95e` (sha256 in `binary_sha256.txt`); only `e42_checks` and `e42_tables` are rebuilt for the stream argument and
+the E42b ids.  Variant W, Stage 0, the lever, the atlas check, the arms, the rows (32 end-to-end rows on E37's stream
+paired with E40's V and E37's A and E25 records; Stage A on stream `seed ^ 0xE42A_0001`, never run), the identity
+checks, P1, P2, the perturbed coefficient, the negative control (V′, W′ on `E42E0002`, never run), the pricing (§9.54's
+`S_W(g) = total_muls + 97 g (macaulay_stored_entries + profile_offset_ops + tail_extent_ops)`), the unpriced counters,
+σ1, σ4 and the ranking rule are §9.54's, unchanged.
+
+| id | §9.54 id | quantity | prediction | falsified by |
+|:--|:--|:--|:--|:--|
+| G2.244 | G2.230 | identity (**kill**) | as G2.230 | any failure (E42b stops; W negative) |
+| G2.245 | G2.231 | controls (**kill**) | P1 320/320, P2 320/320, G0 = A counted and counter check 320/320, W = A counted 320/320, perturbed coefficient on every non-empty call | any miss (E42b stops) |
+| G2.246 | — | G0 re-allocations per call (mean, descriptive) | `[200, 300]` | outside (reported, not a kill) |
+| G2.247 | G2.232 | W's stored cells per clean call; re-allocations | `[9.25, 9.35]·10⁴`; `[4, 10]` | outside |
+| G2.248 | G2.233 | W's tail operations; offset operations = V's | `[5.3, 5.7]·10³`; equal on every call | outside |
+| G2.249 | G2.234 | Stage A `S_V / S_W` (**kill** as G2.234) | `1` / `[1.015, 1.035]` / `[1.02, 1.05]`; kill if `≤ 1.005` at `1` GAE or W behind V at any weight on any curve | outside; kill |
+| G2.250 | G2.235 | lead scans | W `≤` V on every call | any call above |
+| G2.251 | G2.236 | end to end `S_V / S_W`, 32 rows | `1` / `[1.015, 1.035]` / `[1.02, 1.05]`; never behind | outside; behind |
+| G2.252 | G2.237 | end to end `S_A / S_W`, `S_E25 / S_W` | `1` / `[1.27, 1.31]` / `[1.38, 1.45]`; E40's `S_E25/S_V` at `0` / `[1.77, 1.87]` / `[1.43, 1.53]` | outside; any row `≤ 1` at a positive weight |
+| G2.253 | G2.238 | distance to rho | rho ahead of every row at every weight | any row below rho |
+| G2.254 | G2.239 | σ1, σ4 | no order changes | an order changes |
+| G2.255 | G2.240 | negative control | V′ not ranked against V; W′/V′ in G2.251's bands; W′ = V′ outside the allowed fields | V′ ranked; outside |
+| G2.256 | G2.241 | fallbacks | W on exactly V's (= A's) calls | any difference |
+| G2.257 | G2.242–G2.243 | reserve slack; `axpy` cells (listed) | slack `[9, 11]·10³`; `G` `[5.9, 6.3]·10⁵`, V `[7.3, 7.7]·10⁵` | outside |
+
+**Ranking (fixed, §9.54's).**  W is ranked ahead of V if G2.244–G2.245 hold, `S_W(0) = S_V(0)` exactly and `S_W(g) <
+S_V(g)` at `g = 0.1` and `1` on every one of the 32 rows — reported as **ahead of V at `0.1` and `1` GAE, equal at `0`
+GAE**.  Against A the same weak rule; against E25 the ordinary rule.  An end-to-end order is never inferred from Stage A.
+**Disclosure.**  E42b exists because E42's own control-count prediction was wrong, not because any ranking data were
+seen: none had been taken.  The only E42 data seen are the 320 control calls on stream `0xE42C_0001` (all correctness
+checks passed), and E42b does not reuse them for any verdict.
+
+### 9.57 E42b measured: reserving V's Macaulay rows to the block after their build end cuts the cells per call from `102,827` to `≈ 92,970` at a charged `≈ 5,500` checks and lookups — W is equal to V at `0` GAE and ahead at `0.1` (`1.022`–`1.023×`) and `1` GAE (`1.032`–`1.034×`) on all 32 rows; every E42b prediction holds; ranked by the registered rule
+
+*2026-11-03.*  Pre-registration §9.56 (`95e9f95a05`, after E42's kill §9.55, before any Stage A or end-to-end data).
+Code as §9.55 (`3858929530`, `673433fef5`, `efc700b36d`, `6dfe52f95e`), E42b harness `6dddf03954` (`--salt`, verdict
+ids).  Binaries from clean exports, sha256 in `experiments/49_macaulay_tails/binary_sha256.txt`; tables
+`examples/e42_tables.rs` (`tables.md`, `summary.json`); report `research/e42_macaulay_tails_20261103/REPORT.pdf`.
+Host: the shared 4-vCPU container, local; **operation counts only, no wall-time claim.**  **Execution deviations
+(disclosed; no registered quantity touched):** two container restarts (01:13Z, 02:15Z) wiped `/dev/shm`.  Binaries were
+rebuilt from the same clean exports.  `quartic_pipeline_gls`, `quartic_pipeline_v4`, `e42_stage_a` and `e42_tables` came
+out byte-identical after the first restart.  `e42_checks_b` and, after the second restart, `quartic_pipeline_gls` (`3b0b198e…`)
+did not; the cause is not established.  Each of those was checked by replay before use: `checks_b.json` reproduced byte for
+byte, and two committed end-to-end records (V′ `p = 101` s1, W `p = 101` s1) reproduced identically outside timing.  The
+non-identical `quartic_pipeline_gls` produced only the 11 records written after 02:40Z (V′ `p = 397` s2, W′ ×10).  Stage A
+was rerun whole on its registered stream.  The end-to-end runs were restart-safe, and only missing records were rerun, with
+the registered seeds and salts.  A duplicate run of V′ `p = 397` s1 (two chains) was stopped and one record kept.
+
+**Controls (G2.245, G2.246; stream `0xE42C_0002`, 320 calls).**  W = A counted 320/320; counter (final lengths +
+discarded buffers) 320/320; P1 detected 320/320; P2 detected 320/320; G0 = A counted and counter 320/320, `246.3`
+re-allocations per call; perturbed coefficient changed 217/217 non-empty solution sets.  **Identity (G2.244).**  9/9
+existing configurations identical (E40's seven; V on GLS `p = 101` s2 and E24 `p = 101` s1 against E40's records);
+Stage A 10,000/10,000 calls on every identity check; 32/32 W records equal E40's V records outside the tag, timing, lead
+scans, stored cells and tail ops, and E37's A records outside those and the offset ops; 20/20 W′ records equal V′'s.
+
+**Stage A** (10 curves × 1,000 calls, stream `seed ^ 0xE42A_0001`): W's clean cells `92,948`–`92,983` per call (V
+`102,825`–`102,827`), re-allocations `6.07`–`6.53` per call, tail ops `5,470`–`5,504`, offset ops = V's, lead scans
+W ≤ V on every call (equal on average, `≈ 5,877`), slack over the fill extent `10,172`–`10,227`, fallbacks equal in A, V
+and W; `S_V / S_W` = `1.000000` / `1.0209`–`1.0232` / `1.0305`–`1.0338`; σ1 `1.0203`–`1.0225` / `1.0293`–`1.0324`.
+Dense-update cells (unpriced, every arm; Stage 0 replay on the same calls) V `744,936`–`756,368`, `G`
+`604,853`–`614,069`.
+
+**End to end** (32 rows, E37's stream `0xE37E_0001`, Karatsuba; V = E40's records, A and E25 = E37's; rho = walk (iii)):
+
+| quantity | `0` GAE | `0.1` GAE | `1` GAE | order, 32 rows |
+|:--|:--|:--|:--|:--|
+| `S_V / S_W` | `1.0000` (equal `total_muls`) | `1.0219`–`1.0230` | `1.0319`–`1.0338` | W equal at `0`, ahead at `0.1` and `1` |
+| `S_A / S_W` | `1.0000` | `1.2793`–`1.2908` | `1.4064`–`1.4273` | W equal at `0`, ahead at `0.1` and `1` |
+| `S_E25 / S_W` | `2.5054`–`2.5766` | `1.7839`–`1.8447` | `1.4555`–`1.5049` | W ahead at every weight |
+| σ1 `S_V / S_W` | `1.0000` | `1.0213`–`1.0223` | `1.0306`–`1.0323` | same order |
+| σ4 `S_V / S_W` | `1.0000` | `1.0206`–`1.0215` | `1.0291`–`1.0306` | same order |
+| σ1 / σ4 `S_A / S_W`, `S_E25 / S_W` | — | — | — | same orders (`tables.md`) |
+| `S_W / rho` | `6.00·10³`–`1.98·10⁵` | `1.55·10⁴`–`5.29·10⁵` | `5.97·10⁴`–`2.29·10⁶` | rho ahead on 32/32 at every weight |
+| `S_V / rho` | `6.00·10³`–`1.98·10⁵` | `1.58·10⁴`–`5.41·10⁵` | `6.17·10⁴`–`2.36·10⁶` | — |
+
+W's per-call cells end to end `93,887`–`99,141` (fallback calls charged A's `2 · rows · cols`, as V), tail ops
+`5,470`–`5,506`.  **Negative control (G2.255).**  V′ (V on `E42E0002`) against V on E37's stream: 6 rows ahead, 13
+behind, 1 unresolved, `S_V / S_V′` `0.574`–`2.284`: **not ranked**, as predicted.  W′ against V′ (paired):
+`1.0000` / `1.0217`–`1.0229` / `1.0316`–`1.0337`, order as registered on 20/20 rows.
+
+**Distance to the matched rho, every row** (walk (iii); `S_W / rho` at `0` equals `S_V / rho`):
+
+| set | p | seed | arm | V/W `0.1` | V/W `1` | A/W `0.1` | A/W `1` | E25/W `0` | E25/W `0.1` | E25/W `1` | W/rho `0` | W/rho `0.1` | W/rho `1` | V/rho `1` |
+|:--|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| GLS | 101 | 1 | A | `1.0219` | `1.0319` | `1.2793` | `1.4064` | `2.5054` | `1.7839` | `1.4555` | `5.9·10^4` | `1.61·10^5` | `7.51·10^5` | `7.75·10^5` |
+| GLS | 101 | 1 | B | `1.022` | `1.032` | `1.2801` | `1.4074` | `2.5113` | `1.787` | `1.4577` | `2.19·10^4` | `5.97·10^4` | `2.79·10^5` | `2.88·10^5` |
+| GLS | 101 | 2 | A | `1.022` | `1.0321` | `1.2803` | `1.4077` | `2.5158` | `1.7888` | `1.4584` | `2.82·10^4` | `7.79·10^4` | `3.92·10^5` | `4.05·10^5` |
+| GLS | 101 | 2 | B | `1.022` | `1.0321` | `1.28` | `1.4073` | `2.5119` | `1.7873` | `1.4576` | `1.54·10^4` | `4.26·10^4` | `2.14·10^5` | `2.21·10^5` |
+| GLS | 149 | 1 | A | `1.0224` | `1.0327` | `1.2844` | `1.4148` | `2.5375` | `1.8093` | `1.4752` | `1.98·10^5` | `5.29·10^5` | `2.29·10^6` | `2.36·10^6` |
+| GLS | 149 | 1 | B | `1.0224` | `1.0327` | `1.2847` | `1.4153` | `2.5398` | `1.8105` | `1.4762` | `1.23·10^5` | `3.29·10^5` | `1.42·10^6` | `1.47·10^6` |
+| GLS | 149 | 2 | A | `1.0223` | `1.0326` | `1.2837` | `1.414` | `2.5384` | `1.8087` | `1.4737` | `9.94·10^4` | `2.66·10^5` | `1.15·10^6` | `1.19·10^6` |
+| GLS | 149 | 2 | B | `1.0224` | `1.0327` | `1.2845` | `1.415` | `2.544` | `1.8118` | `1.476` | `5.72·10^4` | `1.53·10^5` | `6.63·10^5` | `6.85·10^5` |
+| GLS | 197 | 1 | A | `1.0224` | `1.0328` | `1.2852` | `1.4173` | `2.5522` | `1.8209` | `1.4822` | `3.7·10^4` | `9.8·10^4` | `4.12·10^5` | `4.26·10^5` |
+| GLS | 197 | 1 | B | `1.0225` | `1.033` | `1.2865` | `1.4189` | `2.5605` | `1.8256` | `1.4858` | `1.95·10^4` | `5.16·10^4` | `2.17·10^5` | `2.24·10^5` |
+| GLS | 197 | 2 | A | `1.0223` | `1.0326` | `1.2829` | `1.4143` | `2.5373` | `1.8126` | `1.476` | `1.75·10^4` | `4.63·10^4` | `1.96·10^5` | `2.02·10^5` |
+| GLS | 197 | 2 | B | `1.0223` | `1.0326` | `1.2832` | `1.4147` | `2.5397` | `1.8138` | `1.4767` | `7.63·10^3` | `2.02·10^4` | `8.54·10^4` | `8.82·10^4` |
+| GLS | 269 | 1 | A | `1.0228` | `1.0334` | `1.2891` | `1.423` | `2.5717` | `1.8358` | `1.4949` | `3.32·10^4` | `8.72·10^4` | `3.53·10^5` | `3.64·10^5` |
+| GLS | 269 | 1 | B | `1.0228` | `1.0333` | `1.2888` | `1.4226` | `2.57` | `1.8348` | `1.4941` | `1.84·10^4` | `4.82·10^4` | `1.95·10^5` | `2.01·10^5` |
+| GLS | 269 | 2 | A | `1.0228` | `1.0333` | `1.289` | `1.4229` | `2.5766` | `1.8375` | `1.495` | `1.91·10^4` | `5.02·10^4` | `2.03·10^5` | `2.1·10^5` |
+| GLS | 269 | 2 | B | `1.0228` | `1.0333` | `1.2888` | `1.4227` | `2.5756` | `1.8369` | `1.4945` | `1.01·10^4` | `2.64·10^4` | `1.07·10^5` | `1.1·10^5` |
+| GLS | 397 | 1 | A | `1.0228` | `1.0335` | `1.2884` | `1.424` | `2.5663` | `1.8396` | `1.4982` | `1.14·10^4` | `2.94·10^4` | `1.13·10^5` | `1.17·10^5` |
+| GLS | 397 | 1 | B | `1.0228` | `1.0335` | `1.2891` | `1.4248` | `2.5716` | `1.8425` | `1.5001` | `6·10^3` | `1.55·10^4` | `5.97·10^4` | `6.17·10^4` |
+| GLS | 397 | 2 | A | `1.0228` | `1.0335` | `1.2891` | `1.4247` | `2.5579` | `1.8371` | `1.4991` | `2.5·10^4` | `6.45·10^4` | `2.5·10^5` | `2.58·10^5` |
+| GLS | 397 | 2 | B | `1.0228` | `1.0335` | `1.289` | `1.4247` | `2.5579` | `1.8371` | `1.499` | `1.52·10^4` | `3.92·10^4` | `1.52·10^5` | `1.57·10^5` |
+| E24 | 101 | 1 | — | `1.0223` | `1.0324` | `1.2828` | `1.411` | `2.5339` | `1.7989` | `1.4656` | `5.96·10^4` | `1.57·10^5` | `6.11·10^5` | `6.31·10^5` |
+| E24 | 101 | 2 | — | `1.022` | `1.0319` | `1.2798` | `1.407` | `2.5288` | `1.7928` | `1.458` | `2.15·10^4` | `5.67·10^4` | `2.21·10^5` | `2.28·10^5` |
+| E24 | 149 | 1 | — | `1.0224` | `1.0327` | `1.2843` | `1.4148` | `2.5515` | `1.8146` | `1.4761` | `3.1·10^4` | `7.98·10^4` | `2.87·10^5` | `2.96·10^5` |
+| E24 | 149 | 2 | — | `1.0227` | `1.033` | `1.2871` | `1.4185` | `2.5619` | `1.8219` | `1.4834` | `3·10^4` | `7.73·10^4` | `2.78·10^5` | `2.87·10^5` |
+| E24 | 197 | 1 | — | `1.0227` | `1.0332` | `1.2878` | `1.4207` | `2.5665` | `1.8295` | `1.4893` | `7.22·10^4` | `1.84·10^5` | `6.5·10^5` | `6.72·10^5` |
+| E24 | 197 | 2 | — | `1.0227` | `1.0332` | `1.2882` | `1.4212` | `2.5639` | `1.8292` | `1.4902` | `2.77·10^4` | `7.05·10^4` | `2.43·10^5` | `2.51·10^5` |
+| E24 | 269 | 1 | — | `1.0228` | `1.0333` | `1.2886` | `1.4225` | `2.5672` | `1.8339` | `1.4937` | `2.28·10^4` | `5.74·10^4` | `1.95·10^5` | `2.01·10^5` |
+| E24 | 269 | 2 | — | `1.0228` | `1.0333` | `1.2887` | `1.4227` | `2.5735` | `1.8364` | `1.4944` | `9.61·10^3` | `2.42·10^4` | `8.16·10^4` | `8.43·10^4` |
+| E24 | 397 | 1 | — | `1.0228` | `1.0336` | `1.2891` | `1.4248` | `2.5669` | `1.8408` | `1.4998` | `7.9·10^3` | `1.96·10^4` | `6.43·10^4` | `6.65·10^4` |
+| E24 | 397 | 2 | — | `1.0229` | `1.0336` | `1.2896` | `1.4254` | `2.565` | `1.8407` | `1.5009` | `1.08·10^4` | `2.67·10^4` | `8.75·10^4` | `9.04·10^4` |
+| E24 | 521 | 1 | — | `1.0229` | `1.0337` | `1.2905` | `1.4269` | `2.5679` | `1.8442` | `1.5042` | `1.06·10^4` | `2.64·10^4` | `8.62·10^4` | `8.91·10^4` |
+| E24 | 521 | 2 | — | `1.023` | `1.0338` | `1.2908` | `1.4273` | `2.5683` | `1.8447` | `1.5049` | `1.04·10^4` | `2.59·10^4` | `8.48·10^4` | `8.76·10^4` |
+
+| id | result | verdict |
+|:--|:--|:--|
+| G2.244 | 9/9 configurations; Stage A 10,000/10,000; 32/32 + 20/20 records | **holds** |
+| G2.245 | P1, P2, G0, W = A all 320/320; perturbed 217/217 | **holds** |
+| G2.246 | G0 `246.3` re-allocations per call | **holds** (descriptive) |
+| G2.247 | `92,948`–`92,983`; `6.07`–`6.53` | **holds** |
+| G2.248 | `5,470`–`5,504`; offset ops equal on every call | **holds** |
+| G2.249 | `1` / `1.0209`–`1.0232` / `1.0305`–`1.0338`; kill not reached | **holds** |
+| G2.250 | W ≤ V on every call | **holds** |
+| G2.251 | `1` / `1.0219`–`1.0230` / `1.0319`–`1.0338`; never behind | **holds** |
+| G2.252 | A/W `1.2793`–`1.2908` / `1.4064`–`1.4273`; E25/W at `0` = E40's E25/V, `1.7839`–`1.8447` / `1.4555`–`1.5049` | **holds** |
+| G2.253 | rho ahead on 32/32 at every weight | **holds** |
+| G2.254 | σ1, σ4: no order changes | **holds** |
+| G2.255 | V′ not ranked; W′/V′ in bands; W′ = V′ outside allowed fields | **holds** |
+| G2.256 | fallbacks equal (Stage A and end to end) | **holds** |
+| G2.257 | slack `10,172`–`10,227`; `axpy` cells `G` `604,853`–`614,069`, V `744,936`–`756,368` | **holds** |
+
+**What it says.**  Under §9.56's ranking rule, **W is ranked ahead of V: equal at `0` GAE (no improvement there),
+ahead by `1.022`–`1.023×` at `0.1` GAE and `1.032`–`1.034×` at `1` GAE on all 32 rows.**  It is likewise ahead of A
+at the positive weights (`1.28`–`1.29×`, `1.41`–`1.43×`) and ahead of E25 at every weight.  **Class: engineering** (a
+data-structure constant on the build of the `k = 4` solve; exponents unchanged).  Under the 2026-10-15 criterion it is
+a verified, measured improvement of the baseline at the band's positive weights only.  It is small: `19.5 %` of V's tail
+is never nonzero, but W keeps about half of that as reserve slack (`≈ 10,200` cells) and pays `≈ 5,500` charged
+checks and lookups, so `≈ 4,350` charged operations a call remain (`3.5 %` of V's `≈ 1.25·10⁵`).  The large lever in
+the tails is closed by its own index work: only `36 %` of the tail is ever nonzero, but sparse merges cost
+`≥ 9.8·10⁵` operations a call.  **Distance remaining:** the best row, GLS `p = 397` s1 arm B, has `S_W / rho`
+`6.00·10³` / `1.55·10⁴` / `5.97·10⁴` (V `6.00·10³` / `1.58·10⁴` / `6.17·10⁴`); the best E24 row, `p = 397` s1, has
+`7.90·10³` / `1.96·10⁴` / `6.43·10⁴`.  Rho is ahead of every row at every weight.  **Limits:**
+
+- The gain exists only at positive band weights, and its size is set by the per-cell weight.  It prices a `u16` cell
+  and a fill check alike at `9.7` or `97` F_p multiplications; this is a sensitivity range, not a calibration.
+- Scope: E25's and E24's curves, `p ≤ 521`, degree 11.  The reserve rule (`k = 2`) was chosen on Stage 0's stream.
+- The dense-update cell traffic W saves (`≈ 1.4·10⁵` a call) is unpriced for every arm and is not claimed.
+- E42 itself was killed by a mis-derived control prediction (§9.55).
+
+**Not done here:** the validation gate, the leaderboard and `benchmarks/` — left to the main session.  **Next levers:**
+the reserve slack (`≈ 10,200` cells; a tighter static rule trades slack against re-allocation copies, see Stage 0's
+`k = 1`); the per-update fill check (`≈ 4,200`, the largest added cost); the `≈ 12,600` fill-extent cells on rows
+outside the dependency closure (a trace ceiling); the `≈ 46,000` interior zeros, which no contiguous format drops.
