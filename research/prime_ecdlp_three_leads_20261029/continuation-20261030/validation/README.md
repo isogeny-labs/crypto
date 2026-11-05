@@ -1,4 +1,15 @@
-# Validation: faade scoped pass/cap; a030 native compilation blocked
+# Validation evidence by pinned source
+
+**Current 2026-11-05:** [G2 source-c41 receipt](g2-counters-20261105/receipt.json)
+records 18 oracle tests, strict lint/format and rebuilt CLI/refusal PASS.
+Only example objects changed. [Source-b022 final receipt](repaired-main-cc5addeba/final-20261105/receipt.json)
+retains the source-identical library failure/cap: 5848 declared,2272 pass,1 fail,
+48 ignored,1 active,3526 not reached,wrapper124. No full-library pass. All jobs
+terminal; old running snapshots below are dated history, never current status.
+Formal objects exactly match the18-declaration/zero-trusted proof evidence.
+
+
+## Historical 2026-10-30 phase snapshots
 
 **20:25UTC:** [23 repaired-source example tests PASS](repaired-main-cc5addeba/examples-pass-20261030T2025Z/receipt.json); zero failures/ignored.
 Remaining native phases are pending in the existing run, not passed. No scientific result.
@@ -103,7 +114,7 @@ PR2949 merged on2026-11-01 as8b147fd36e71990d9f44eb2cbfa435aa769cefc5.
 Maintenance of that PR has stopped. All unpublished commits are preserved on
 `codex/pkm-certificates-accounting-20261105`; no rebase or force-push.
 
-The existing49719 run is terminal, not restarted. [Final receipt](validation/repaired-main-cc5addeba/final-20261105/receipt.json)
+The existing49719 run is terminal, not restarted. [Final receipt](repaired-main-cc5addeba/final-20261105/receipt.json)
 verifies17 unchanged source objects and all6 actual binaries. Repaired-source
 23examples, strict lint/format, CLIbuild/verified checkpoint refusal,
 backlog and library build pass. Full5848-case execution20:48:46–21:28:46UTC

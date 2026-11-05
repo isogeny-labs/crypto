@@ -2,7 +2,10 @@
 
 2026-11-05. This implements two emitter fixes identified in the historical
 G2_ACCOUNTING_AUDIT.md; it is not complete cost qualification or optimization.
-Native validation is pending when this source note is introduced.
+[Fresh native validation](validation/g2-counters-20261105/receipt.json) passes
+18 oracle tests, strict lint/format, CLI build and actual checkpoint-refusal
+message/expected exit1 on sourcec41dc4fb2. The unchanged library evidence
+remains failed/capped incomplete; no full-suite pass is claimed.
 
 ## Implemented changes
 
@@ -23,9 +26,9 @@ elimination stays modulo n. On the fixed development fixture p=17 and n=19.
 
 ## Nonoverlapping ownership
 
-| Block | Owner and interpretation | Must not be added to |
+| Block | Owner and interpretation | Aggregation/pricing rule |
 | --- | --- | --- |
-| validation reference | oracle validation, or cold setup's own validation call | helper arithmetic; each is a distinct implementation, not duplicate counters |
+| validation reference | oracle validation, or cold setup's own validation call | Separate from helper arithmetic; distinct implementations need their own units/calibrations |
 | per-attempt group/field | this attempt's query generation including identity RHS | the aggregate view of these same attempts |
 | aggregate group/field | sum of all query-generation attempts | whole-group calibration plus its nested field-call pricing |
 | helper/reference/scalar inverse calls | diagnostics; multiplication helpers already expand their Fermat powering | a whole-inverse price on top of those expanded leaves |

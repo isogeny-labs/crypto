@@ -1,5 +1,42 @@
 # G1–G6 continuation: independently check useful rank and target recovery
 
+## Current continuation — 2026-11-05
+
+PR2949 merged on November 1; its maintenance has stopped. Unpublished history
+is preserved on `codex/pkm-certificates-accounting-20261105` for a separate PR.
+No rebase or force-push. All original G1–G6 acceptance criteria remain unchanged.
+
+**Implemented and tested G2 progress:** validation reference counts are retained;
+query field/reduction counts are explicitly emitted per attempt and in aggregate,
+including identity attempts. [Ownership contract](G2_COUNTER_OWNERSHIP_20261105.md)
+separates coordinate p from scalar n and prevents treating overlapping counters
+as additive prices. [Fresh source-c41 receipt](validation/g2-counters-20261105/receipt.json):
+18 oracle tests pass (3 new counter controls), strict clippy/rustfmt and rebuilt
+CLI/checkpoint-refusal message + expected exit1 pass. No scientific panel ran.
+
+**Collected old job, without restart:** source-b022's library build passes;
+its 5,848-case execution records 2,272 passes, 1 inherited chain-bound failure,
+48 ignored, 1 JV case active at the 40-minute cap, and 3,526 not reached.
+Wrapper124 is not a known Cargo exit; no final suite summary/full pass.
+[Final source-b022 receipt](validation/repaired-main-cc5addeba/final-20261105/receipt.json)
+verifies 17 objects and 6 binaries. The unchanged library/legacy/backlog/formal
+objects retain that exact scope after the example-only G2 changes. The separate
+inherited assertion is reproduced, not changed/waived; the delimiter build
+failure alone is resolved. Raw 221,629-byte library log is NOT_UPLOADED with
+exact hash/path and bounded excerpt in the receipt.
+
+**Proof and scientific limits:** the exact unchanged Lean/gate/dependency objects
+retain the 18-declaration/zero-trusted audit and module replay against imports,
+not --fresh; no new proof run or Rust/cost verification is claimed. G1–G3/G6
+partial, G4/G5 unrun, zero scientific panels, comparison_admissible=false and
+all scientific metrics null. Complete coverage/pricing/journal/replay/runtime,
+external/scaling panels and Rust/polynomial/cost bridges remain open. No panel
+or funding/lease/IAM/quota/pool change; full-panel card stays blocked/unfunded/
+unimplemented at its historical pin. Checkpoint/artifact/lab identities remain
+absent. [Current two-page report](resume-20261105.pdf) and editable
+[ownership diagram](counter-ownership-20261105.svg) describe this prerequisite.
+
+
 ## 2026-11-05 terminal collection and separate continuation
 
 PR2949 merged on2026-11-01 as8b147fd36e71990d9f44eb2cbfa435aa769cefc5.

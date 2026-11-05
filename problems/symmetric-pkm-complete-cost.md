@@ -73,3 +73,14 @@ and execution blockers remain in force.
 2026-10-30: opened for the explicitly activated G1–G6 goal. The mixed-fiber PKM
 problem is related prior work, not the same symmetric presentation. Original
 receipt directories and scientific records are preserved. Unresolved.
+
+## 2026-11-05T07:09:35.071742+00:00 — G2 emitter progress; scientific acceptance unchanged
+
+The [new ownership contract](../research/prime_ecdlp_three_leads_20261029/continuation-20261030/G2_COUNTER_OWNERSHIP_20261105.md)
+implements retained validation counts and explicit per-attempt/aggregate query
+field/reduction emissions, including identity attempts. Source-c41's18oracle
+tests/strictlint/fmt/CLI refusal pass. Complete solver/root/logical pricing,
+durable failed-call records, replay/runtime/resume and external/scaling panels
+remain open. The inherited library assertion andJV cap do not establish a full
+suite pass. PR2949 merged; unpublished continuation preserved separately.
+G1-G3/G6partial,G4/G5unrun,0panels,comparison_admissible=false.
