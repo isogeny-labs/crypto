@@ -633,3 +633,15 @@ is separate from producer timing and is not free. Allocation/copy/branch/
 serialization/counter overhead, complete F4/root/logical coverage, process/
 resume accounting and calibration remain open. Complete pricing/admission
 are unchanged, with no scientific panel. [pcc:unverified]
+
+## Publication status correction — PR3452 merged
+
+A live prepublication check found PR3452 merged at2026-11-05T17:02:10Z as
+2dc51a00cb81bc2f5b4b516e9a08a642a99daae3. Its maintenance has stopped.
+The new sourcef866 replay accounting and reports remain separate on
+`codex/pkm-replay-accounting-20261105`; earlier same-PR plans above are historical.
+[Closure/both-parent review](validation/replay-accounting-20261105/pr3452-closure-and-separate-branch.json)
+preserves original histories and records landed maintainer re-chain operations.
+The local original ledger and current-main ledger still diverge; this session
+has not repeated/adopted a re-chain or integrated newer main code. The report
+and receipt validate sourcef866 only. [pcc:unverified]

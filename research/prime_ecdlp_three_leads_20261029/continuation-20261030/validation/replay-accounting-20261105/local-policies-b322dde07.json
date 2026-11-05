@@ -1,0 +1,56 @@
+{
+  "recorded_utc": "2026-11-05T17:16:31.256785+00:00",
+  "head": "b322dde07",
+  "base": "d30b9e0db7ec00c55330effef5f64532f97cd160",
+  "method": "sequential set-e; eachnextcheck reached; allsixchecks completed",
+  "checks": {
+    "scoped_whitespace": 0,
+    "size": 0,
+    "artifacts": 0,
+    "benchrec": 0,
+    "old_d30_prefix": 0,
+    "body_lint": 0
+  },
+  "captures": {
+    "artifacts.log": {
+      "bytes": 41,
+      "sha256": "30a8346d1f9f41872ce54a60a20c0c053f57632ebd6e32f1e9be5529224fa934",
+      "raw_utf8": "artifacts check: no data files committed\n"
+    },
+    "benchrec.log": {
+      "bytes": 52,
+      "sha256": "edb93f3fb65973557b2a971cbf34983528e61662e524059d93cf3382b2fedeb8",
+      "raw_utf8": "benchrec: OK, 37 record(s), progress report current\n"
+    },
+    "body-lint.log": {
+      "bytes": 25,
+      "sha256": "78860995516e3367bf95a303485b67d572a3b44e8a1165dc117ca264ddb7b3eb",
+      "raw_utf8": "lint-prose: 0 finding(s)\n"
+    },
+    "ledger-d30.log": {
+      "bytes": 30,
+      "sha256": "dacd66b0304fb41b95a450393e84c9cb64ad72860d3a930e37409805791737ff",
+      "raw_utf8": "ledger: 129 entries, chain ok\n"
+    },
+    "size.log": {
+      "bytes": 65,
+      "sha256": "322761bcb838f5da662927750da20634e40f03f900e2c31c260a13cd2d9a78ec",
+      "raw_utf8": "check-large-files: no added or modified file over 10485760 bytes\n"
+    },
+    "whitespace.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_utf8": ""
+    }
+  },
+  "scope": "localpolicies only; NOT currentmainprefix/globalPCC/nativeaggregate/remoteCI",
+  "old_d30_chain_entries": 129,
+  "new_separate_PR_body": {
+    "lint_exit": 0,
+    "findings": 0,
+    "sha256": "47c6c04bd52645fce5b314a8d9999e5b98baeb75e27382317d4398365fd3fc59",
+    "raw_utf8": "The independent PKM toy-DLP replay checker previously omitted its own scalar row-space audit work. This change retains caller-owned source-operation counts across successful replay and rejected certificates, while separating scalar modulus `n` from coordinate field `p`. Success records keep replay/v2 with additive work fields; replay rejection retains partial work. Parent modular/inverse diagnostics overlap integer children and must not be priced twice. Complete coverage and price remain unavailable. [pcc:unverified]\n\nThe earlier certificate/accounting/process-record work landed through PR3452 as2dc51a00c at2026-11-05T17:02:10Z; its maintenance has stopped. This separate branch preserves the new unpublished replay-accounting history without rebasing or force-pushing. The new receipt applies to its own sourcef866, not newer main code. [pcc:unverified]\n\nValidation on source `f866dd7a4578a5c02cb60ee7d3c2101f3b044cde`: 6 standalone rank controls and 23 oracle example tests pass (the six are included in the 23); strict standalone rank lint, formatting, CLI build and actual checkpoint-refusal message with expected exit1 pass. The final scoped Cargo lint and supervisor **FAIL101** on the unchanged inherited library unused-function and bool-comparison errors. Strict lint of the final Cargo example is not qualified. Exact 22-object/global-clean guards, phase terminals/captures and four fresh binary hashes are retained. PCC-20261105-f04c69 is unsigned/unverified. [pcc:unverified]\n\nEarlier unchanged scopes remain historical: the 6168-case library run capped40min with2166pass/2clock failures/45ignored/1PKM lift case unfinished/3954notreached; Cargo exit unknown, no full-suite pass. The raw213453-byte log remains NOT_UPLOADED with exact hash/path/excerpt. Legacy PCC13 failures and the current-main frozen ledger fork are unresolved. No test/assertion/lint/gate waiver was added. Formal/gate/dependency objects are identical to the earlier18-declaration/zero-trusted audit and kernel replay against imports, not --fresh; no redundant proof run is claimed. [pcc:unverified]\n\nIntegration remains blocked by frozen ledger divergence. The landed maintainer-authored945/e2 commits re-chained old branch events: event contents are retained ignoringseq/prev/hash, while31old entries differ in those chain/sequence fields after the common95entry prefix. This session preserves the original chain and has not copied/repeated that operation or inferred general permission. Currentmain c224878f1 contains no new relevant policy/tool reconciliation contract. A sanctioned provenance-preserving contract is still required before this session resolves frozen history. Copilot's old PR3452 request is historical/report-only; no maintenance or edits are requested on that closed PR. [pcc:unverified]\n\nAuto-merge stays paused. Require gate,size,artifacts SUCCESS on the exact current head, live applicable reviews/resolved threads and expected-head guard after reviewed/validated resolution. No required CI pass is claimed. Old992 migrate metadata failed prefetch but log fetch was empty, exact cause unknown; no old log substitutes for a new run. Current-main native changes have not been integrated/qualified. [pcc:unverified]\n\nOriginal G1-G6 acceptance remains: G1-G3/G6 partial, G4/G5 unrun, zero scientific panels, comparison_admissible=false, all cost/GAE/scaling metrics null. Full-panel card remains blocked/unfunded/unimplemented at its historical pin. No scientific panel, funding/lease/IAM/quota/pool/access changes or checkpoint/protocol/runtime bypass. Next G2 work is failed-internal-work retention, nonoverlapping charge coverage, full F4/root/logical and qualified whole-process/runtime-resume accounting.\n\nEvidence and reports: `research/prime_ecdlp_three_leads_20261029/continuation-20261030/G2_REPLAY_ACCOUNTING_20261105.md`, `validation/replay-accounting-20261105/receipt.json`, and the new two-page `replay-accounting-20261105.pdf` plus editable SVG. Prior source/evidence/receipts/reports are preserved. Canonical scientific/curve/performance graphs are unchanged because no admitted value, curve edge, phase price or reference changed. [pcc:unverified]\n"
+  },
+  "publication_change": "PR3452merged; newwork separate. OldsamePRbodylint hash remains prior snapshot.",
+  "pcc_standing": "unverified"
+}
