@@ -16,7 +16,7 @@
 //! See `docs/ic/FRAMEWORK.md`.
 
 use clap::Args;
-use crypto_lib::cryptanalysis::curve25519_wide::{scan_row, Curve25519Wide};
+use crypto_lib::cryptanalysis::curve25519_wide::scan_row;
 use crypto_lib::cryptanalysis::ic_framework::archive::{
     self, ArchiveInstance, BinaryArchiveBase, PrimeArchiveBase,
 };
@@ -592,7 +592,7 @@ fn matched_rho(instance: &Instance, seed: u64, repeats: usize, runs: usize) -> R
                 rule: "negation map (A = 2): the only eligible automorphism of this curve",
             }
         }
-        Instance::Wide255(_) => RhoReferences {
+        Instance::Wide255 => RhoReferences {
             matched: None,
             plain: None,
             candidates: Vec::new(),
@@ -889,7 +889,7 @@ enum Instance {
     Prime(PrimeInstance),
     Binary(BinaryInstance),
     /// The real 255-bit Curve25519 group (`--bits 255 --family curve25519`).
-    Wide255(Curve25519Wide),
+    Wide255,
 }
 
 impl Instance {
@@ -897,7 +897,7 @@ impl Instance {
         match self {
             Instance::Prime(i) => &i.name,
             Instance::Binary(i) => &i.name,
-            Instance::Wide255(_) => "curve25519-wide",
+            Instance::Wide255 => "curve25519-wide",
         }
     }
 }
@@ -1058,7 +1058,7 @@ fn build_instance(regime: &str, degree: u32, args: &BenchArgs) -> Result<Instanc
             // The real curve, over the generic Fp256 backend.  The relation
             // phase runs; no relation exists at this size, so the row is an
             // honest `exhausted` measurement.
-            Instance::Wide255(Curve25519Wide::new())
+            Instance::Wide255
         }
         "prime" => Instance::Prime(if args.family == "curve25519" {
             // The Curve25519-family miniatures keep Curve25519's structure
@@ -1213,7 +1213,7 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         let profile = match &inst {
             Instance::Prime(i) => CurveProfile::of_prime(i),
             Instance::Binary(i) => CurveProfile::of_binary(i),
-            Instance::Wide255(_) => return Err(
+            Instance::Wide255 => return Err(
                 "--auto has no planner profile for the 255-bit curve; give the stages explicitly"
                     .into(),
             ),
@@ -1293,13 +1293,13 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         None => build_instance(&regime, degree, &args)?,
     };
 
-    if let Instance::Wide255(_) = &instance {
+    if let Instance::Wide255 = &instance {
         return run_wide255(&specs, &args);
     }
 
     if regime == "archive" {
         regime = match &instance {
-            Instance::Prime(_) | Instance::Wide255(_) => "prime",
+            Instance::Prime(_) | Instance::Wide255 => "prime",
             Instance::Binary(i) if i.koblitz.is_some() => "koblitz",
             Instance::Binary(_) => "char2",
         }
@@ -1310,7 +1310,7 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
             calibration_for(&i.curve, &sample_prime_points(i), "prime", &i.name, i.r)
         }
         Instance::Binary(i) => calibration_for_binary(i, &regime),
-        Instance::Wide255(_) => unreachable!("the wide path returns before calibration"),
+        Instance::Wide255 => unreachable!("the wide path returns before calibration"),
     };
 
     let started = std::time::Instant::now();
@@ -1359,7 +1359,7 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         let outcome = match &instance {
             Instance::Prime(i) => run_prime(i, spec, &args, &calib, rho_s),
             Instance::Binary(i) => run_binary(i, spec, &args, &calib, rho_s, &mut frozen),
-            Instance::Wide255(_) => unreachable!("the wide path returns before the row loop"),
+            Instance::Wide255 => unreachable!("the wide path returns before the row loop"),
         };
         match outcome {
             Ok(mut got) => rows.append(&mut got),
