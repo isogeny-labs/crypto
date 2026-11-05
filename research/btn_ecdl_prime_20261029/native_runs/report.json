@@ -215,6 +215,574 @@
       }
     ]
   },
+  "derived_last_point": {
+    "counts_equal_and_match_brute_force": true,
+    "eccp131_log2_assignments": {
+      "derived": 262,
+      "original": 524
+    },
+    "free_bits": [
+      {
+        "d": 3,
+        "derived": 6,
+        "original": 12
+      },
+      {
+        "d": 4,
+        "derived": 8,
+        "original": 16
+      }
+    ],
+    "n": 16,
+    "note": "A2 := target - A1 is computed, not searched; same language (bijection), so counts are unchanged and free input bits halve (4d -> 2d). Steps are Meter diagnostics.",
+    "rows": [
+      {
+        "brute": 5,
+        "d": 3,
+        "derived": {
+          "backend": "Some(Functional)",
+          "count": "5",
+          "edges": 16919,
+          "free_input_bits": 6,
+          "functional_assignments": 43,
+          "ok": true,
+          "steps": 163933,
+          "witness": {
+            "a1": "Affine { x: 0, y: 4 }",
+            "a2": "Affine { x: 1, y: 3 }",
+            "found": true,
+            "ok": true,
+            "steps": 163933
+          }
+        },
+        "original": {
+          "backend": "Some(Functional)",
+          "count": "5",
+          "edges": 31624,
+          "free_input_bits": 12,
+          "functional_assignments": 295,
+          "ok": true,
+          "steps": 2379059
+        },
+        "p": 5,
+        "r": 7,
+        "step_ratio": 14.512386157759572,
+        "target": "Affine { x: 0, y: 1 }",
+        "threshold": "11"
+      },
+      {
+        "brute": 5,
+        "d": 3,
+        "derived": {
+          "backend": "Some(Functional)",
+          "count": "5",
+          "edges": 16919,
+          "free_input_bits": 6,
+          "functional_assignments": 43,
+          "ok": true,
+          "steps": 163933,
+          "witness": {
+            "a1": "Affine { x: 0, y: 1 }",
+            "a2": "Affine { x: 1, y: 2 }",
+            "found": true,
+            "ok": true,
+            "steps": 163933
+          }
+        },
+        "original": {
+          "backend": "Some(Functional)",
+          "count": "5",
+          "edges": 31624,
+          "free_input_bits": 12,
+          "functional_assignments": 295,
+          "ok": true,
+          "steps": 2379059
+        },
+        "p": 5,
+        "r": 7,
+        "step_ratio": 14.512386157759572,
+        "target": "Affine { x: 0, y: 4 }",
+        "threshold": "11"
+      },
+      {
+        "brute": 0,
+        "d": 3,
+        "derived": {
+          "backend": "Some(Functional)",
+          "count": "0",
+          "edges": 16919,
+          "free_input_bits": 6,
+          "functional_assignments": 41,
+          "ok": true,
+          "steps": 135637,
+          "witness": {
+            "found": false,
+            "ok": true
+          }
+        },
+        "original": {
+          "backend": "Some(Functional)",
+          "count": "0",
+          "edges": 31624,
+          "free_input_bits": 12,
+          "functional_assignments": 181,
+          "ok": true,
+          "steps": 1314140
+        },
+        "p": 5,
+        "r": 7,
+        "step_ratio": 9.688654275750716,
+        "target": "Affine { x: 0, y: 1 }",
+        "threshold": "5"
+      },
+      {
+        "brute": 2,
+        "d": 3,
+        "derived": {
+          "backend": "Some(Functional)",
+          "count": "2",
+          "edges": 16919,
+          "free_input_bits": 6,
+          "functional_assignments": 41,
+          "ok": true,
+          "steps": 146621,
+          "witness": {
+            "a1": "Affine { x: 0, y: 1 }",
+            "a2": "Affine { x: 1, y: 2 }",
+            "found": true,
+            "ok": true,
+            "steps": 146621
+          }
+        },
+        "original": {
+          "backend": "Some(Functional)",
+          "count": "2",
+          "edges": 31624,
+          "free_input_bits": 12,
+          "functional_assignments": 181,
+          "ok": true,
+          "steps": 1334996
+        },
+        "p": 5,
+        "r": 7,
+        "step_ratio": 9.105080445502349,
+        "target": "Affine { x: 0, y: 4 }",
+        "threshold": "5"
+      },
+      {
+        "brute": 11,
+        "d": 3,
+        "derived": {
+          "backend": "Some(Functional)",
+          "count": "11",
+          "edges": 17001,
+          "free_input_bits": 6,
+          "functional_assignments": 57,
+          "ok": true,
+          "steps": 262515,
+          "witness": {
+            "a1": "Affine { x: 4, y: 2 }",
+            "a2": "Affine { x: 3, y: 3 }",
+            "found": true,
+            "ok": true,
+            "steps": 262515
+          }
+        },
+        "original": {
+          "backend": "Some(Functional)",
+          "count": "11",
+          "edges": 31740,
+          "free_input_bits": 12,
+          "functional_assignments": 729,
+          "ok": true,
+          "steps": 6563062
+        },
+        "p": 7,
+        "r": 13,
+        "step_ratio": 25.000712340247222,
+        "target": "Affine { x: 1, y: 2 }",
+        "threshold": "17"
+      },
+      {
+        "brute": 11,
+        "d": 3,
+        "derived": {
+          "backend": "Some(Functional)",
+          "count": "11",
+          "edges": 17001,
+          "free_input_bits": 6,
+          "functional_assignments": 57,
+          "ok": true,
+          "steps": 262515,
+          "witness": {
+            "a1": "Affine { x: 4, y: 2 }",
+            "a2": "Affine { x: 2, y: 2 }",
+            "found": true,
+            "ok": true,
+            "steps": 262515
+          }
+        },
+        "original": {
+          "backend": "Some(Functional)",
+          "count": "11",
+          "edges": 31740,
+          "free_input_bits": 12,
+          "functional_assignments": 729,
+          "ok": true,
+          "steps": 6563062
+        },
+        "p": 7,
+        "r": 13,
+        "step_ratio": 25.000712340247222,
+        "target": "Affine { x: 1, y: 5 }",
+        "threshold": "17"
+      },
+      {
+        "brute": 2,
+        "d": 3,
+        "derived": {
+          "backend": "Some(Functional)",
+          "count": "2",
+          "edges": 17001,
+          "free_input_bits": 6,
+          "functional_assignments": 48,
+          "ok": true,
+          "steps": 203406,
+          "witness": {
+            "a1": "Affine { x: 2, y: 5 }",
+            "a2": "Affine { x: 4, y: 5 }",
+            "found": true,
+            "ok": true,
+            "steps": 203406
+          }
+        },
+        "original": {
+          "backend": "Some(Functional)",
+          "count": "2",
+          "edges": 31740,
+          "free_input_bits": 12,
+          "functional_assignments": 324,
+          "ok": true,
+          "steps": 2639459
+        },
+        "p": 7,
+        "r": 13,
+        "step_ratio": 12.976308466810222,
+        "target": "Affine { x: 1, y: 2 }",
+        "threshold": "8"
+      },
+      {
+        "brute": 2,
+        "d": 3,
+        "derived": {
+          "backend": "Some(Functional)",
+          "count": "2",
+          "edges": 17001,
+          "free_input_bits": 6,
+          "functional_assignments": 48,
+          "ok": true,
+          "steps": 203406,
+          "witness": {
+            "a1": "Affine { x: 3, y: 4 }",
+            "a2": "Affine { x: 4, y: 5 }",
+            "found": true,
+            "ok": true,
+            "steps": 203406
+          }
+        },
+        "original": {
+          "backend": "Some(Functional)",
+          "count": "2",
+          "edges": 31740,
+          "free_input_bits": 12,
+          "functional_assignments": 324,
+          "ok": true,
+          "steps": 2639459
+        },
+        "p": 7,
+        "r": 13,
+        "step_ratio": 12.976308466810222,
+        "target": "Affine { x: 1, y: 5 }",
+        "threshold": "8"
+      },
+      {
+        "brute": 9,
+        "d": 4,
+        "derived": {
+          "backend": "Some(Functional)",
+          "count": "9",
+          "edges": 29347,
+          "free_input_bits": 8,
+          "functional_assignments": 181,
+          "ok": true,
+          "steps": 455268,
+          "witness": {
+            "a1": "Affine { x: 0, y: 7 }",
+            "a2": "Affine { x: 5, y: 5 }",
+            "found": true,
+            "ok": true,
+            "steps": 455268
+          }
+        },
+        "original": {
+          "backend": "Some(Functional)",
+          "count": "9",
+          "edges": 56480,
+          "free_input_bits": 16,
+          "functional_assignments": 1981,
+          "ok": true,
+          "steps": 19748700
+        },
+        "p": 11,
+        "r": 11,
+        "step_ratio": 43.378186035478,
+        "target": "Affine { x: 0, y: 4 }",
+        "threshold": "23"
+      },
+      {
+        "brute": 9,
+        "d": 4,
+        "derived": {
+          "backend": "Some(Functional)",
+          "count": "9",
+          "edges": 29347,
+          "free_input_bits": 8,
+          "functional_assignments": 181,
+          "ok": true,
+          "steps": 455268,
+          "witness": {
+            "a1": "Affine { x: 0, y: 4 }",
+            "a2": "Affine { x: 5, y: 6 }",
+            "found": true,
+            "ok": true,
+            "steps": 455268
+          }
+        },
+        "original": {
+          "backend": "Some(Functional)",
+          "count": "9",
+          "edges": 56480,
+          "free_input_bits": 16,
+          "functional_assignments": 1981,
+          "ok": true,
+          "steps": 19748700
+        },
+        "p": 11,
+        "r": 11,
+        "step_ratio": 43.378186035478,
+        "target": "Affine { x: 0, y: 7 }",
+        "threshold": "23"
+      },
+      {
+        "brute": 2,
+        "d": 4,
+        "derived": {
+          "backend": "Some(Functional)",
+          "count": "2",
+          "edges": 29347,
+          "free_input_bits": 8,
+          "functional_assignments": 164,
+          "ok": true,
+          "steps": 389880,
+          "witness": {
+            "a1": "Affine { x: 2, y: 2 }",
+            "a2": "Affine { x: 7, y: 6 }",
+            "found": true,
+            "ok": true,
+            "steps": 389880
+          }
+        },
+        "original": {
+          "backend": "Some(Functional)",
+          "count": "2",
+          "edges": 56480,
+          "free_input_bits": 16,
+          "functional_assignments": 984,
+          "ok": true,
+          "steps": 9068321
+        },
+        "p": 11,
+        "r": 11,
+        "step_ratio": 23.25926182415102,
+        "target": "Affine { x: 0, y: 4 }",
+        "threshold": "11"
+      },
+      {
+        "brute": 3,
+        "d": 4,
+        "derived": {
+          "backend": "Some(Functional)",
+          "count": "3",
+          "edges": 29347,
+          "free_input_bits": 8,
+          "functional_assignments": 164,
+          "ok": true,
+          "steps": 397607,
+          "witness": {
+            "a1": "Affine { x: 2, y: 2 }",
+            "a2": "Affine { x: 10, y: 5 }",
+            "found": true,
+            "ok": true,
+            "steps": 397607
+          }
+        },
+        "original": {
+          "backend": "Some(Functional)",
+          "count": "3",
+          "edges": 56480,
+          "free_input_bits": 16,
+          "functional_assignments": 984,
+          "ok": true,
+          "steps": 9083208
+        },
+        "p": 11,
+        "r": 11,
+        "step_ratio": 22.84468834804216,
+        "target": "Affine { x: 0, y: 7 }",
+        "threshold": "11"
+      },
+      {
+        "brute": 17,
+        "d": 4,
+        "derived": {
+          "backend": "Some(Functional)",
+          "count": "17",
+          "edges": 29347,
+          "free_input_bits": 8,
+          "functional_assignments": 211,
+          "ok": true,
+          "steps": 653941,
+          "witness": {
+            "a1": "Affine { x: 4, y: 12 }",
+            "a2": "Affine { x: 9, y: 4 }",
+            "found": true,
+            "ok": true,
+            "steps": 653941
+          }
+        },
+        "original": {
+          "backend": "Some(Functional)",
+          "count": "17",
+          "edges": 56480,
+          "free_input_bits": 16,
+          "functional_assignments": 3991,
+          "ok": true,
+          "steps": 42651459
+        },
+        "p": 13,
+        "r": 19,
+        "step_ratio": 65.22218212346374,
+        "target": "Affine { x: 1, y: 4 }",
+        "threshold": "29"
+      },
+      {
+        "brute": 17,
+        "d": 4,
+        "derived": {
+          "backend": "Some(Functional)",
+          "count": "17",
+          "edges": 29347,
+          "free_input_bits": 8,
+          "functional_assignments": 211,
+          "ok": true,
+          "steps": 653941,
+          "witness": {
+            "a1": "Affine { x: 4, y: 12 }",
+            "a2": "Affine { x: 5, y: 6 }",
+            "found": true,
+            "ok": true,
+            "steps": 653941
+          }
+        },
+        "original": {
+          "backend": "Some(Functional)",
+          "count": "17",
+          "edges": 56480,
+          "free_input_bits": 16,
+          "functional_assignments": 3991,
+          "ok": true,
+          "steps": 42651459
+        },
+        "p": 13,
+        "r": 19,
+        "step_ratio": 65.22218212346374,
+        "target": "Affine { x: 1, y: 9 }",
+        "threshold": "29"
+      },
+      {
+        "brute": 6,
+        "d": 4,
+        "derived": {
+          "backend": "Some(Functional)",
+          "count": "6",
+          "edges": 29347,
+          "free_input_bits": 8,
+          "functional_assignments": 178,
+          "ok": true,
+          "steps": 530356,
+          "witness": {
+            "a1": "Affine { x: 4, y: 12 }",
+            "a2": "Affine { x: 9, y: 4 }",
+            "found": true,
+            "ok": true,
+            "steps": 530356
+          }
+        },
+        "original": {
+          "backend": "Some(Functional)",
+          "count": "6",
+          "edges": 56480,
+          "free_input_bits": 16,
+          "functional_assignments": 2314,
+          "ok": true,
+          "steps": 23810227
+        },
+        "p": 13,
+        "r": 19,
+        "step_ratio": 44.894800850749306,
+        "target": "Affine { x: 1, y: 4 }",
+        "threshold": "14"
+      },
+      {
+        "brute": 7,
+        "d": 4,
+        "derived": {
+          "backend": "Some(Functional)",
+          "count": "7",
+          "edges": 29347,
+          "free_input_bits": 8,
+          "functional_assignments": 178,
+          "ok": true,
+          "steps": 538083,
+          "witness": {
+            "a1": "Affine { x: 4, y: 12 }",
+            "a2": "Affine { x: 5, y: 6 }",
+            "found": true,
+            "ok": true,
+            "steps": 538083
+          }
+        },
+        "original": {
+          "backend": "Some(Functional)",
+          "count": "7",
+          "edges": 56480,
+          "free_input_bits": 16,
+          "functional_assignments": 2314,
+          "ok": true,
+          "steps": 23825114
+        },
+        "p": 13,
+        "r": 19,
+        "step_ratio": 44.27776755630637,
+        "target": "Affine { x: 1, y: 9 }",
+        "threshold": "14"
+      }
+    ],
+    "step_ratio_max": 65.22218212346374,
+    "step_ratio_min": 9.105080445502349,
+    "witnesses_found": 15,
+    "witnesses_ok": true
+  },
   "eccp131": {
     "derivation": "Functional backend visits 2^(free input bits); measured equal to 2^(4d) at d=3,4; two slots at d=131 give 4*131 = 524 free bits",
     "functional_backend_log2_assignments_per_contraction": 524,
@@ -612,5 +1180,13 @@
         "verified": true
       }
     ]
+  },
+  "upstream_pruning": {
+    "all_counts_ok": true,
+    "note": "crate change landed upstream (Counter::functional_pruning); measured here, not authored here",
+    "of": 16,
+    "pairs_matched": 16,
+    "step_ratio_max": 6.429402642451673,
+    "step_ratio_min": 1.4668543432928105
   }
 }

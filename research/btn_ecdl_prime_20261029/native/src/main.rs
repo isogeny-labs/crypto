@@ -220,6 +220,111 @@ fn counts(p: u64) -> Res<Vec<Value>> {
     Ok(out)
 }
 
+/// Two-slot decomposition network with the last point derived instead of
+/// searched: A1 is a free input point, A2 := target - A1 is computed by the
+/// encoder (defined signals, not free), and both must pass their hash
+/// predicate.  For the identity-free affine language of `decomposition_network`
+/// this is a bijection A1 <-> (A1, target - A1), so the count is unchanged
+/// while the free input bits drop from 4d to 2d.  Built only from the crate's
+/// public Encoder API; the crate is not modified.
+fn derived_network(
+    c: &Curve,
+    s: &BigUint,
+    thresholds: &[BigUint; 2],
+    seeds: &[(u64, u64); 2],
+    target: &Point,
+    m: &mut Meter,
+) -> Res<hashed_ecdl_tensor::network::Network> {
+    use hashed_ecdl_tensor::encoding::{Encoder, PointWords};
+    let q = c.modulus().clone();
+    let width = q.bits() as usize;
+    let mut enc = Encoder::new();
+    let a1 = enc.input_point(c, false, m).map_err(e)?;
+    let zero = Encoder::constant(width, &BigUint::zero()).map_err(e)?;
+    let neg = PointWords {
+        infinity: a1.infinity.clone(),
+        x: a1.x.clone(),
+        y: enc.modular_subtract(&zero, &a1.y, &q, m).map_err(e)?,
+    };
+    let t = Encoder::constant_point(c, target).map_err(e)?;
+    let a2 = enc.point_add(c, &t, &neg, m).map_err(e)?;
+    for (point, (tau, &(al, be))) in [&a1, &a2].into_iter().zip(thresholds.iter().zip(seeds)) {
+        enc.hash_member(c, point, s, &al.into(), &be.into(), tau, m).map_err(e)?;
+        enc.mark_point_interface(point, m).map_err(e)?;
+    }
+    enc.finish(m).map_err(e)
+}
+
+/// Original vs derived-last-point network on the same instances: exact counts
+/// (both against brute force), charged steps and visited assignments.
+fn counts2(p: u64) -> Res<Vec<Value>> {
+    let mut m = meter(u64::MAX / 2);
+    let (c, a, b, r) = curve_for(p, &mut m)?;
+    let s = hash_prime(p, &mut m)?;
+    let pts = affine_points(&c, p, a, b);
+    let seeds = [(1u64, 0u64), (3, 7)];
+    let mut out = Vec::new();
+    for threshold in [s.clone(), &s >> 1u8] {
+        let fb = bases(&c, &s, &threshold, &mut m)?;
+        for target in pts.iter().take(2) {
+            let mut brute = 0u64;
+            for a1 in &pts {
+                if !fb[0].contains(&c, a1, &mut m).map_err(e)? {
+                    continue;
+                }
+                for a2 in &pts {
+                    if fb[1].contains(&c, a2, &mut m).map_err(e)? && &c.add(a1, a2, &mut m).map_err(e)? == target {
+                        brute += 1;
+                    }
+                }
+            }
+            let mut rec = json!({ "p": p, "d": 64 - p.leading_zeros(), "r": r,
+                "threshold": threshold.to_string(), "target": format!("{target:?}"), "brute": brute });
+            let nets = [
+                ("original", reduction::decomposition_network(&c, &fb, target, &mut m).map_err(e)?),
+                ("derived", derived_network(&c, &s, &[threshold.clone(), threshold.clone()], &seeds, target, &mut m)?),
+            ];
+            for (name, net) in nets {
+                let mut cm = meter(20_000_000_000);
+                let mut counter = Counter::default();
+                let got = counter.count(&net, &vec![None; net.edge_count()], &mut cm).map_err(e)?;
+                rec[name] = json!({
+                    "count": got.to_string(), "ok": got.to_u64() == Some(brute),
+                    "steps": cm.used, "edges": net.edge_count(),
+                    "free_input_bits": net.input_bit_count(),
+                    "functional_assignments": counter.statistics.functional_assignments,
+                    "backend": format!("{:?}", counter.statistics.last_backend),
+                });
+            }
+            // Witness extraction (Lemma 1 prefix counts) on the derived
+            // network: decode A1, A2 from the interface word and check them
+            // with reference arithmetic and the crate's membership test.
+            let dnet = derived_network(&c, &s, &[threshold.clone(), threshold.clone()], &seeds, target, &mut m)?;
+            let mut wm = meter(20_000_000_000);
+            let mut wc = Counter::default();
+            let word = wc.witness(&dnet, &vec![None; dnet.edge_count()], &mut wm).map_err(e)?;
+            rec["derived"]["witness"] = match word {
+                None => json!({ "found": false, "ok": brute == 0 }),
+                Some(bits) => {
+                    let w = (64 - p.leading_zeros()) as usize;
+                    let num = |from: usize| -> u64 { (0..w).map(|i| (bits[from + i] as u64) << i).sum() };
+                    let a1 = pt(num(1), num(1 + w));
+                    let a2 = pt(num(2 + 2 * w), num(2 + 3 * w));
+                    let valid = bits.len() == 2 + 4 * w && !bits[0] && !bits[1 + 2 * w]
+                        && fb[0].contains(&c, &a1, &mut m).map_err(e)?
+                        && fb[1].contains(&c, &a2, &mut m).map_err(e)?
+                        && &c.add(&a1, &a2, &mut m).map_err(e)? == target;
+                    json!({ "found": true, "ok": valid && brute > 0, "a1": format!("{a1:?}"), "a2": format!("{a2:?}"), "steps": wm.used })
+                }
+            };
+            let (so, sd) = (rec["original"]["steps"].as_u64().unwrap_or(0), rec["derived"]["steps"].as_u64().unwrap_or(1));
+            rec["step_ratio"] = json!(so as f64 / sd.max(1) as f64);
+            out.push(rec);
+        }
+    }
+    Ok(out)
+}
+
 fn solve(p: u64, seed: u64, xi: u64) -> Res<Value> {
     let mut m = meter(200_000_000_000);
     let (c, _, _, r) = curve_for(p, &mut m)?;
@@ -409,6 +514,39 @@ fn report(dir: &str) -> Res<Value> {
         },
     });
 
+    // Upstream functional pruning: the same instances counted before
+    // (counts.jsonl, recorded on the earlier crate) and after
+    // (counts_pruned.jsonl, current crate), paired line by line.
+    let pruned = read_jsonl(&format!("{dir}/counts_pruned.jsonl")).unwrap_or_default();
+    let pairs: Vec<(u64, u64)> = counts.iter().zip(&pruned)
+        .filter(|(a, b)| a["p"] == b["p"] && a["threshold"] == b["threshold"] && a["target"] == b["target"] && a["count"] == b["count"])
+        .map(|(a, b)| (u(a, "steps"), u(b, "steps"))).collect();
+    let pr: Vec<f64> = pairs.iter().map(|(a, b)| *a as f64 / (*b).max(1) as f64).collect();
+    let pruning = json!({
+        "pairs_matched": pairs.len(), "of": counts.len(),
+        "all_counts_ok": !pruned.is_empty() && pruned.iter().all(|r| r["ok"] == json!(true)),
+        "step_ratio_min": pr.iter().cloned().fold(f64::INFINITY, f64::min),
+        "step_ratio_max": pr.iter().cloned().fold(0.0, f64::max),
+        "note": "crate change landed upstream (Counter::functional_pruning); measured here, not authored here",
+    });
+
+    // Derived-last-point reformulation (counts2.jsonl): original vs derived
+    // network on the same instances, current crate (with functional pruning).
+    let c2 = read_jsonl(&format!("{dir}/counts2.jsonl")).unwrap_or_default();
+    let ratios: Vec<f64> = c2.iter().filter_map(|r| r["step_ratio"].as_f64()).collect();
+    let derived = json!({
+        "n": c2.len(),
+        "counts_equal_and_match_brute_force": !c2.is_empty() && c2.iter().all(|r| r["original"]["ok"] == json!(true) && r["derived"]["ok"] == json!(true)),
+        "witnesses_ok": !c2.is_empty() && c2.iter().all(|r| r["derived"]["witness"]["ok"] == json!(true)),
+        "witnesses_found": c2.iter().filter(|r| r["derived"]["witness"]["found"] == json!(true)).count(),
+        "step_ratio_min": ratios.iter().cloned().fold(f64::INFINITY, f64::min),
+        "step_ratio_max": ratios.iter().cloned().fold(0.0, f64::max),
+        "free_bits": c2.iter().map(|r| (u(r, "d"), r["original"]["free_input_bits"].as_u64().unwrap_or(0), r["derived"]["free_input_bits"].as_u64().unwrap_or(0))).collect::<std::collections::BTreeSet<_>>().into_iter().map(|(d, o, v)| json!({"d": d, "original": o, "derived": v})).collect::<Vec<_>>(),
+        "rows": c2,
+        "eccp131_log2_assignments": { "original": 4 * 131, "derived": 2 * 131 },
+        "note": "A2 := target - A1 is computed, not searched; same language (bijection), so counts are unchanged and free input bits halve (4d -> 2d). Steps are Meter diagnostics.",
+    });
+
     // Extrapolation to ECCp-131 under the backend actually used (Functional):
     // one contraction visits 2^(free input bits) assignments, 4*131 for two
     // slots.  Pollard rho: sqrt(pi*n/4) group operations, n = 2^131.
@@ -444,6 +582,8 @@ fn report(dir: &str) -> Res<Value> {
                     "functional_assignments_equal_2_pow_4d": assignments_rule, "rows": per_count },
         "solves": { "n": solves.len(), "all_ok": !solves.is_empty() && solves.iter().all(|s| s["ok"] == json!(true)), "rows": solves },
         "setup_bottleneck": setup,
+        "upstream_pruning": pruning,
+        "derived_last_point": derived,
         "recursive_backend_used": any_recursion,
         "recursion_crossover": {
             "epsilon_denominator": EPSILON_DENOM,
@@ -474,6 +614,7 @@ fn main() {
     let result: Res<()> = match args.get(1).map(String::as_str) {
         Some("sizes") => nums(2).into_iter().try_for_each(|p| sizes(p).map(|r| println!("{r}"))),
         Some("counts") => nums(2).into_iter().try_for_each(|p| counts(p).map(|v| v.iter().for_each(|r| println!("{r}")))),
+        Some("counts2") => nums(2).into_iter().try_for_each(|p| counts2(p).map(|v| v.iter().for_each(|r| println!("{r}")))),
         Some("solve") => {
             let n = nums(2);
             solve(n[0], n[1], n[2]).map(|r| println!("{r}"))
@@ -482,7 +623,7 @@ fn main() {
         Some("report") => report(&args[2]).map(|r| println!("{}", serde_json::to_string_pretty(&r).unwrap())),
         Some("multtime") => multtime(&nums(2)),
         Some("primetime") => primetime(&nums(2)),
-        _ => Err("usage: btn-prime-scaling sizes P... | counts P... | solve P SEED XI | size-json FILE | report DIR | multtime W... | primetime W...".into()),
+        _ => Err("usage: btn-prime-scaling sizes P... | counts P... | counts2 P... | solve P SEED XI | size-json FILE | report DIR | multtime W... | primetime W...".into()),
     };
     if let Err(err) = result {
         eprintln!("error: {err}");

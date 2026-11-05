@@ -10,7 +10,8 @@ export CARGO_TARGET_DIR=/tmp/btn-target          # keep build artifacts off the 
 cargo build --release --manifest-path native/Cargo.toml
 B=$CARGO_TARGET_DIR/release/btn-prime-scaling
 $B sizes 5 11 17 37 67 131 257 521 1031 2053 4099 8209 16411 32771 65537 > native_runs/sizes.jsonl
-$B counts 5 7 11 13                                                       > native_runs/counts.jsonl
+$B counts 5 7 11 13                                                       > native_runs/counts.jsonl  # earlier crate; current crate -> counts_pruned.jsonl
+$B counts2 5 7 11 13                                                      > native_runs/counts2.jsonl
 $B solve 5 1 2; $B solve 5 2 1; $B solve 7 1 3                            > native_runs/solves.jsonl
 $B size-json ../../crates/hashed-ecdl-tensor/examples/eccp131-certified-hash.json > native_runs/eccp131_size.json
 $B report native_runs                                                      > native_runs/report.json
@@ -20,6 +21,7 @@ $B report native_runs                                                      > nat
 |---|---|
 | `sizes P...` | decomposition-network edges, vertices, max degree, interface bits per prime |
 | `counts P...` | `Counter::count` vs a brute-force decomposition count; backend; charged steps |
+| `counts2 P...` | original vs derived-last-point network: counts, steps, assignments, plus a checked Lemma-1 witness |
 | `solve P SEED XI` | `reduction::solve` with a known scalar, then `reduction::verify` |
 | `size-json FILE` | network size for a JSON problem (e.g. the bundled ECCp-131 input) |
 | `multtime W...` | time one Fourier integer-multiply network construction per bit width |
@@ -43,6 +45,17 @@ Each line of output is one JSON object. Curves are the first prime-order
   `eccp131-certified-hash.json` validates in ~13 ms and `size-json` builds the
   real ECCp-131 decomposition network in ~2.8 s: 1,684,796 edges (2^20.7),
   249,620 vertices, max degree 1,032, 526 interface bits (4·131 free + 2 flags).
+* **Fallback speed-ups (charged steps, same 16 instances).** The upstream
+  functional pruning (landed separately; `counts_pruned.jsonl` vs
+  `counts.jsonl`) cuts steps 1.5–6.4× with identical counts. On top of it, the
+  *derived last point* network (`counts2`) computes A2 = target − A1 with the
+  public `Encoder` API instead of searching it: a bijection on the same
+  language, so counts are identical to the original and to brute force on all
+  16 instances, free input bits halve (4d → 2d), Lemma-1 witnesses are found
+  and checked in 15 of 15 solvable instances, and charged steps fall a further
+  9.1–65.2×, growing with p. At ECCp-131 the fallback's worst case falls from
+  2^524 to 2^262 assignments per count, still far beyond rho's 2^65.3.
+  [pcc:unverified]
 * **Recursion crossover (headline).** `Counter::count` selects the recursive
   backend only when `lambda / 131072 >= 1` with `lambda = ceil(log2(2·edges))`
   (transcribed from `recursive.rs` `Setup::parameters`), i.e. at least
