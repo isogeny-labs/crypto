@@ -93,6 +93,9 @@ w = 0.1 and 2.28× ahead at w = 0.
   on the algebraic track has to change the base's coverage per column, not only the solver.
   Cross-lead arithmetic: L12's trace replay (0.474×, its own session) closes about one fifth of
   the decades between F4 and its grid limit.
+- The `[0.02382, 0.02384]` interval is conditional on the fixed 16 targets. The grid and F4 arms
+  share trials, relations and GAE and differ only by the solver, so the ratio is an arithmetic
+  stability check, not a method-level sampling interval.
 
 ## Run record and deviations
 

@@ -699,7 +699,7 @@ pub fn solve(
         })
         .collect();
     Ok(SolveReport {
-        recovered, exhausted: recovered.is_none(), phases,
+        recovered: recovered.map(crate::cryptanalysis::ecbench::exact_scalar::ExactScalar::from), exhausted: recovered.is_none(), phases,
         total_gae: audit_ops.gae() + verification_ops.gae(), automorphisms_used: 2, counters,
         unpriced: vec!["aps_f4_multiplications_uncharged".into(), "aps_root_multiplications_uncharged".into(), "APS core group/field operations, polynomial construction, allocation and hashing are not completely counted; absent solver reports leave diagnostic counts unknown. No complete S or bitop ranking is supported".into()],
         deterministic: false,

@@ -1,0 +1,83 @@
+--- a/src/cryptanalysis/curve25519_wide.rs
++++ b/src/cryptanalysis/curve25519_wide.rs
+@@ -625,10 +625,19 @@
+         return (0, 0);
+     }
+     let f = &curve.field;
+-    let Some((xq, _)) = q else { return (0, 0) };
++    let affine_from = |mut point: WidePoint, start: u64, ops: &mut GroupOps| {
++        for t in start..trials {
++            if point.is_some_and(|p| base.contains_key(&p.0)) { return (1, t); }
++            point = curve.add(ops, point, curve.generator);
++        }
++        (0, trials)
++    };
++    let Some((xq, _)) = q else { return affine_from(q, 0, ops) };
+     let Some((xg, _)) = curve.generator else {
+         return (0, 0);
+     };
++    if xq == xg { return affine_from(q, 0, ops); }
++    let stored_xg = xg;
+     if base.contains_key(&xq) {
+         return (1, 0);
+     }
+@@ -642,12 +651,18 @@
+         charge_add(ops);
+         return (0, 1);
+     };
++    if x1 == xg {
++        let p1 = curve.add(&mut scratch, q, curve.generator);
++        return affine_from(p1, 1, ops);
++    }
+     if base.contains_key(&x1) {
+         return (1, 1);
+     }
+     charge_add(ops); // t = 1 was not a hit
+-    let mut prev = (xq, f.one()); // t = 0
+-    let mut cur = (x1, f.one()); // t = 1
++    let shift = f.mul(f.from_u64(A25519), f.inv(f.from_u64(3)).expect("3"));
++    let xg = f.sub(xg, shift);
++    let mut prev = (f.sub(xq, shift), f.one()); // t = 0
++    let mut cur = (f.sub(x1, shift), f.one()); // t = 1
+     let mut idx = 2u64;
+     const BLOCK: u64 = 4096;
+     while idx < trials {
+@@ -672,10 +687,16 @@
+             let hit = if f.is_zero(z) {
+                 false
+             } else {
+-                base.contains_key(&f.mul(x, z))
++                base.contains_key(&f.add(f.mul(x, z), shift))
+             };
+             if hit {
+                 return (1, real);
++            }
++            if !f.is_zero(z) && f.add(f.mul(x, z), shift) == stored_xg {
++                let mut scratch = GroupOps::default();
++                let tg = curve.mul_u64(&mut scratch, curve.generator, real);
++                let point = curve.add(&mut scratch, q, tg);
++                return affine_from(point, real, ops);
+             }
+             charge_add(ops);
+             if real + 1 == trials {
+@@ -1154,3 +1175,20 @@
+         assert!(report["counted_gae"].as_f64().unwrap() > 1_000.0);
+     }
+ }
++
++#[test]
++fn projective_probe_handles_identity_and_batch_edges() {
++ let curve=Curve25519Wide::new(); let mut setup=GroupOps::default();
++ let mut base=HashMap::new();base.insert(curve.mul_u64(&mut setup,curve.generator,5).unwrap().0,0);
++ let mut failures=0;
++ for (offset,trials,base_scalar) in [(0i64,8u64,5u64),(-1,8,5),(-2,8,5),(-8,16,5),(-4105,4110,5),(-4103,4100,5),(-4103,4098,5),(1,8,5),(2,8,5),(3,8,5),(-4,10,5),(-4099,9100,5000),(-4098,9100,5000),(-4097,9100,5000),(0,0,5),(-1,0,5),(-2,1,5),(-4,3,5)] {
++  base.clear();base.insert(curve.mul_u64(&mut setup,curve.generator,base_scalar).unwrap().0,0);
++  let q=curve.mul_u64(&mut setup,curve.generator,offset.unsigned_abs());let q=if offset<0 {curve.neg(q)} else {q};
++  let mut p=q;let mut expected=(0,trials);let mut affine=GroupOps::default();
++  for t in 0..trials {if p.is_some_and(|p|base.contains_key(&p.0)){expected=(1,t);break;}p=curve.add(&mut affine,p,curve.generator);}
++  let mut fast=GroupOps::default();let actual=probe_hits_fast(&curve,q,&base,trials,&mut fast);
++  println!("offset={offset} trials={trials} base_scalar={base_scalar} affine={expected:?} fast={actual:?} affine_ops={affine:?} fast_ops={fast:?}");
++  if actual!=expected || fast!=affine {failures+=1;}
++ }
++ assert_eq!(failures,0);
++}

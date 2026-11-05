@@ -1,0 +1,14 @@
+{
+  "checked_utc": "2026-11-05T18:28:00Z",
+  "sources": [
+    {
+      "url": "https://docs.python.org/3/library/resource.html#resource.RLIMIT_AS",
+      "observation": "RLIMIT_AS bounds process virtual address space. Soft limits cannot exceed hard limits; an unprivileged process cannot raise a hard limit."
+    },
+    {
+      "url": "https://git-scm.com/docs/git-config#Documentation/git-config.txt-corepackedGitLimit",
+      "observation": "Git documents mapping windows and simultaneous mapped pack limits. A pack file can be mapped in regions, so total pack size alone does not prove a failed mapping size or establish root cause."
+    }
+  ],
+  "source_review_implication": "Inspect actual error and exact delta; do not assert every pack larger than RLIMIT_AS must fail."
+}

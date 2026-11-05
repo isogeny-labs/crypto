@@ -21,6 +21,40 @@ pub(super) fn fixture() -> Request {
 }
 
 #[test]
+fn validation_counts_survive_acceptance_refusal_and_serialization() {
+    let mut r = fixture();
+    let mut counts = reference::Counts::default();
+    r.validate_counted(&mut counts).unwrap();
+    assert_eq!(counts.point_tests, 1);
+    assert_eq!(counts.field_multiplications, 4);
+    assert_eq!(counts.field_additions, 2);
+    r.target = Point { x: 0, y: 0 }; // canonical but off this curve
+    assert!(r.validate_counted(&mut counts).is_err());
+    assert_eq!(counts.point_tests, 2);
+    assert_eq!(counts.field_multiplications, 8);
+    assert_eq!(counts.field_additions, 4);
+    r.target.x = r.p; // noncanonical: point test, no field arithmetic
+    assert!(r.validate_counted(&mut counts).is_err());
+    assert_eq!(counts.point_tests, 3);
+    assert_eq!(counts.field_multiplications, 8);
+    r.schema = "unknown".into();
+    let before = counts;
+    assert!(r.validate_counted(&mut counts).is_err());
+    assert_eq!(counts, before);
+
+    let mut r = fixture();
+    r.limits.solver_millis = 0;
+    let result = run(&r).unwrap();
+    assert_eq!(result.ledger.validation_reference_counts.point_tests, 1);
+    let value = serde_json::to_value(result).unwrap();
+    assert_eq!(
+        value["ledger"]["validation_reference_counts"]["field_multiplications"],
+        4
+    );
+    assert_eq!(value["comparison_admissible"], false);
+}
+
+#[test]
 fn complete_m4_sets_match_independent_affine_control_on_all_finite_targets() {
     // Fixed public development fixtures, not a measured or blind panel. The
     // second curve includes y=0 in this base; duplicate sign lifts must collapse.
