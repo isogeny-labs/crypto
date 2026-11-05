@@ -93,8 +93,8 @@ This is the one gating flip in the sample.
 Heavy-tail flag (largest run > 25% of an arm's total S). Counting `ecbench table` rows of the five sessions (`data/tables/new.*.md`):
 with 4 verified runs per row 71 of 71 rows are flagged, with 2 runs 6 of 6, with 8 runs 1 of 12, with 24 runs 1 of 12. With n runs the largest
 share is at least 1/n, so at n <= 4 the flag fires on every row and carries no information. In `compare`, the arm-level flag fires only in the K = 2
-pilot (top-run share 0.517 with 2 runs); none of the 16-40-workload arms is flagged (top shares 0.03 to 0.22). Recommendation, not
-implemented here: make the flag's threshold depend on n (or require n >= 8). `survivors only` flags: 3 rows in ghs panel-01 (those with
+pilot (top-run share 0.517 with 2 runs); none of the 16-40-workload arms is flagged (top shares 0.03 to 0.22). The same PR makes the
+threshold depend on n: the top run must also exceed 2/n of the total (more than 50% with 4 runs, never with 2; unchanged from 8 runs up), and the counts above are the flag before that change. `survivors only` flags: 3 rows in ghs panel-01 (those with
 unverified runs); the old table printed their means with no mark. `table` per-row intervals are now t(n-1) and marked `indicative` below five
 runs (for example rho-frob f2m15: old [2.605, 7.645], new [1.758, 10.635]).
 

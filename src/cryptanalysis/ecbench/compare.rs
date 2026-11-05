@@ -96,9 +96,17 @@ pub const MIN_WALL_PAIRS: usize = 5;
 /// An interval over fewer workloads than this is `indicative`.
 pub const INDICATIVE_BELOW_WORKLOADS: usize = 5;
 
-/// An arm whose largest run is more than this share of its total S has a
-/// heavy tail: the mean is carried by one run.
+/// An arm whose largest run is more than this share of its total S, and
+/// more than twice its equal share (`2/n`), has a heavy tail: the mean is
+/// carried by one run.  The second condition keeps the flag informative at
+/// small `n`, where one of four runs always holds at least a quarter; from
+/// eight runs up the share alone decides.
 pub const HEAVY_TAIL_SHARE: f64 = 0.25;
+
+/// The share above which the top run of `n` marks a heavy tail.
+pub fn heavy_tail_share(n: usize) -> f64 {
+    HEAVY_TAIL_SHARE.max(2.0 / n.max(1) as f64)
+}
 
 /// What the measured arm's tail looks like (verified runs only).
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -445,7 +453,7 @@ pub fn tail_diagnostics(runs: &[(String, f64)]) -> Option<TailDiagnostics> {
         max_over_median: (med > 0.0).then(|| top / med),
         top_run_share: share,
         top_run_id: top_id,
-        heavy_tail: share > HEAVY_TAIL_SHARE,
+        heavy_tail: share > heavy_tail_share(runs.len()),
     })
 }
 
@@ -2233,6 +2241,17 @@ mod tests {
         assert!((t.top_run_share - 30.0 / 38.0).abs() < 1e-12);
         assert_eq!(t.max_over_median, Some(30.0));
         assert!(tail_diagnostics(&[]).is_none());
+        // Four even runs hold a quarter each: not a tail.  One run carrying
+        // more than the other three together is.
+        let even: Vec<(String, f64)> = (0..4).map(|i| (format!("e{i}"), 1.0 + i as f64)).collect();
+        assert!(!tail_diagnostics(&even).unwrap().heavy_tail);
+        let mut lop = even.clone();
+        lop[3].1 = 7.0;
+        assert!(tail_diagnostics(&lop).unwrap().heavy_tail);
+        // Two runs can never show a tail; from eight runs up the share alone decides.
+        assert!(!tail_diagnostics(&even[..2]).unwrap().heavy_tail);
+        assert_eq!(heavy_tail_share(8), HEAVY_TAIL_SHARE);
+        assert_eq!(heavy_tail_share(4), 0.5);
     }
 
     #[test]
