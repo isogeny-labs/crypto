@@ -74,13 +74,17 @@
     "cpus_reserved": 1,
     "memory_limit_gib": 8,
     "s3_fetch_concurrency": 4,
-    "wall_timeout_seconds": 13000,
+    "wall_timeout_seconds": 12850,
     "kill_grace_seconds": 45,
     "attempts": 1,
     "retries": 0,
     "measurement_scope": "top-form quotient Dreg certificates/intervals only; no affine LFD/FFD claim",
     "build_timeout_seconds": 600,
-    "scientific_timeout_seconds": 12400
+    "scientific_timeout_seconds": 12850,
+    "wall_timeout_includes_build_seconds": false,
+    "build_completed_before_launch": true,
+    "build_wall_seconds": 108,
+    "one_cpu_enforcement": "taskset pins launch and all descendants to the first CPU in the invoking process allowed set"
   },
   "cost": {
     "observed_spot_usd_per_hour": 0.5321,
@@ -98,7 +102,7 @@
     "s3_prefix": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-03/results/",
     "prefix_empty_before_run": null,
     "prior_attempt": "attempt-01 preflight failed before any PDP system or top certificate was produced; preserved in Git; not overwritten.",
-    "capsule_s3_prefix": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-03/capsule-v2/",
+    "capsule_s3_prefix": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-03/capsule-v3/",
     "output_prefix_checked_empty_at_launch": true,
     "capsule_v1_prefix": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-03/"
   },
@@ -119,5 +123,5 @@
   "launch_script_sha256": "eb07f399cb5624487434f238c3c1406b6306827140c3c3df3a9c6eb3e6b06066",
   "runner_script_sha256": "55efb60709cc1fd518e937594e56f08852891ebfed4dc41943a3e02618cf93e9",
   "attempt": "03",
-  "failure_policy": "Preserve all build or run output; stop before scientific data generation unless both binary hashes match; never overwrite an earlier attempt."
+  "failure_policy": "Use the already-built binaries only after verifying both pinned hashes at launch. Stop on any mismatch; preserve all partial output. No retries; output prefix remains separate and fresh."
 }
