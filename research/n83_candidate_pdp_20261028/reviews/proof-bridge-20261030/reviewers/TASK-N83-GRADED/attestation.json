@@ -1,0 +1,76 @@
+{
+  "review_attestation": {
+    "task_id": "TASK-N83-GRADED",
+    "parent_archival_task": "T-995",
+    "review_date": "2026-10-30",
+    "producer_revision": "c64f02c176787dbf40d455f95b75bd2dd5bfe5bf",
+    "preregistered_plan_revision": "c92ca4f106a0",
+    "joints_owned": [
+      "block SLP and primitive decomposition",
+      "tensor sector degree and no truncation",
+      "free chain regularity/Koszul generation",
+      "selector-square lifting and finite-characteristic FFD conventions"
+    ],
+    "sources_read": [
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/graded/PRIME_LEFSCHETZ_ARGUMENT.md",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/graded/LEFSCHETZ_PROOF_MAP.md",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/graded/LefschetzBoundary.lean",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/graded/src/prime_linear_source_donor.rs",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/reviews/proof-bridge-20261030/checker-plan.json",
+      "https://arxiv.org/html/1604.06820",
+      "https://arxiv.org/html/2112.05579"
+    ],
+    "source_sha256": {
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/graded/PRIME_LEFSCHETZ_ARGUMENT.md": "31a7eb352373149428e47afbe5c03b9243cf9375aaf06ca34c5fbcf9d6fefdab",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/graded/LEFSCHETZ_PROOF_MAP.md": "91cbfac992caf4545d500b4fd130c97ee905527647d17f68c5ff1d2f64eeda01",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/graded/LefschetzBoundary.lean": "1278a3102c773081aafab2c7c193cc0fff49e9654f2dbd4884024f6cdc7d8f59",
+      "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-inputs/graded/src/prime_linear_source_donor.rs": "ce6042fcecc4e3d997acaa48b9af1426622a08e0a76c875673ccf1923d6a7b2f",
+      "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/reviews/proof-bridge-20261030/checker-plan.json": "fd92fc470a0c19455c0f1df386638de07dcffe0c702a5c9984dcf0dc73aeeea8"
+    },
+    "read_sibling_reports": false,
+    "blind_from_respected": null,
+    "verdicts": {
+      "block SLP and primitive decomposition": "holds",
+      "tensor sector degree and no truncation": "holds",
+      "free chain regularity/Koszul generation": "holds",
+      "selector-square lifting and finite-characteristic FFD conventions": "holds"
+    },
+    "verdict_scope": "Joint-level mathematical fidelity under the stated field, nonzero-weight, and exact-chain assumptions; no whole-claim vote.",
+    "whole_claim_vote": null,
+    "assumptions": [
+      "k is a field of characteristic greater than 27.",
+      "Each block has 27 selectors and every selector weight is nonzero.",
+      "The highest forms are exactly the selector squares and homogeneous chain displayed in the immutable proof and donor source.",
+      "Degree means ordinary polynomial degree with generator shifts on syzygy coordinates, not the auxiliary monomial-order weights.",
+      "For the finite-field convention, the exact base field has cardinality q=p=4835703278761981908090881."
+    ],
+    "mathematical_checks": [
+      "Direct primary-source verification of block maximal rank and the finite-field FFD convention.",
+      "Primitive complements, all-degree independence, exact string annihilators, and tensor-sector module maps.",
+      "Support-space injection for every sector through degree 16, including maximal primitive degrees and multi-block distributions.",
+      "All free-chain prefixes, endpoint indexing, regularity, and homogeneous Koszul multipliers in degrees 8 through 16.",
+      "Degree-preserving quartic/quartic, mixed square/quartic, and square/square lifting.",
+      "Explicit degree-17 terminal relation and projection proof of its non-Koszul character.",
+      "Explicit polynomial-ring small-characteristic counterexamples of degree p+2 for p=2,3,5,7,11,13; SLP failure for every prime p<=27."
+    ],
+    "machine_verification": {
+      "lean_source_inspected": true,
+      "lean_replayed_by_this_reviewer": false,
+      "polynomial_theorem_formalized": false,
+      "experiments_executed": false,
+      "actual_case_validator_executed": false,
+      "source_hashes_recomputed": true
+    },
+    "remaining_dependencies": [
+      "Exact saved-record source/hash binding, primality evidence, and nonzero normalization factors; referenced donor modules and per-case inputs are absent from the assigned snapshot.",
+      "Proof-assistant formalization of polynomial modules, support injection, regularity, lifting, and finite-field convention if formal assurance is required.",
+      "Explicitly distinguish ordinary shifted relation degree from the auxiliary monomial-order weights in downstream propositions."
+    ],
+    "producer_files_edited": false,
+    "cloud_jobs_launched": false,
+    "agents_spawned": false,
+    "commits_created": false,
+    "report_path": "/home/ec2-user/n83-candidate-recovery/proof-bridge-review-outputs/TASK-N83-GRADED/report.md",
+    "report_sha256": "b59d5cae277f2bb3e200ebd0191b83b18a25fce8bf4f9be95e3e0c7a016a20a7"
+  }
+}
