@@ -1,0 +1,61 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Curve25519 k=24 algebraic scale-up, chunk 4",
+  "description": "research/curve25519_algebraic_ecbench_scale_20261105/PROTOCOL.md (frozen before data). Public synthetic curve and target; no security claim.",
+  "arms": [
+    {
+      "method": {
+        "id": "rho.negation"
+      },
+      "name": "rho-neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-projected-abscissa:size=81,scan_cap=1296",
+          "oracle": "mitm:negation_folded=1"
+        }
+      },
+      "name": "proj-a",
+      "role": "baseline"
+    },
+    {
+      "name": "pkm-iso-t10-g9-tr",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-isogeny:t=10",
+          "oracle": "pkm-semaev:m=2,mode=full,guess=9,trace=1"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "isolation_required": "L0",
+    "order": "alternate_measured",
+    "rounds": 1,
+    "warmup": 0,
+    "seed": 2026110534,
+    "timeout_seconds": 3000
+  },
+  "workloads": {
+    "curves": [
+      {
+        "a": 16743506,
+        "b": 2381926,
+        "group_order": 16778792,
+        "gx": 109,
+        "gy": 3123379,
+        "kind": "prime_explicit",
+        "p": 16777213,
+        "r": 2097349
+      }
+    ],
+    "target_kind": "public",
+    "target_seed": 2026110524,
+    "targets_per_curve": 1
+  }
+}
