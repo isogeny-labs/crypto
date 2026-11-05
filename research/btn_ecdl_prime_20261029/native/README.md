@@ -21,7 +21,7 @@ $B report native_runs                                                      > nat
 |---|---|
 | `sizes P...` | decomposition-network edges, vertices, max degree, interface bits per prime |
 | `counts P...` | `Counter::count` vs a brute-force decomposition count; backend; charged steps |
-| `counts2 P...` | original vs derived-last-point network: counts, steps, assignments, plus a checked Lemma-1 witness |
+| `counts2 P...` | original vs derived-last-point variants (A1-only interface, hash-first) at four thresholds: counts, steps, checked witnesses, pinned overhead |
 | `solve P SEED XI` | `reduction::solve` with a known scalar, then `reduction::verify` |
 | `size-json FILE` | network size for a JSON problem (e.g. the bundled ECCp-131 input) |
 | `multtime W...` | time one Fourier integer-multiply network construction per bit width |
@@ -45,17 +45,20 @@ Each line of output is one JSON object. Curves are the first prime-order
   `eccp131-certified-hash.json` validates in ~13 ms and `size-json` builds the
   real ECCp-131 decomposition network in ~2.8 s: 1,684,796 edges (2^20.7),
   249,620 vertices, max degree 1,032, 526 interface bits (4·131 free + 2 flags).
-* **Fallback speed-ups (charged steps, same 16 instances).** The upstream
-  functional pruning (landed separately; `counts_pruned.jsonl` vs
-  `counts.jsonl`) cuts steps 1.5–6.4× with identical counts. On top of it, the
-  *derived last point* network (`counts2`) computes A2 = target − A1 with the
-  public `Encoder` API instead of searching it: a bijection on the same
-  language, so counts are identical to the original and to brute force on all
-  16 instances, free input bits halve (4d → 2d), Lemma-1 witnesses are found
-  and checked in 15 of 15 solvable instances, and charged steps fall a further
-  9.1–65.2×, growing with p. At ECCp-131 the fallback's worst case falls from
-  2^524 to 2^262 assignments per count, still far beyond rho's 2^65.3.
-  [pcc:unverified]
+* **Fallback speed-ups (charged steps).** The upstream functional pruning
+  (landed separately; `counts_pruned.jsonl` vs `counts.jsonl`) cuts steps
+  1.5–6.4× with identical counts on 16 instances. On top of it, `counts2`
+  builds the *derived last point* network with the public `Encoder`: A2 =
+  target − A1 is computed instead of searched (same language, free input bits
+  4d → 2d), only A1 is marked as interface (so the witness search may stop at
+  its first hit, with the same canonical witness), and A1's hash is checked
+  before A2 is built. On 32 instances (p = 5, 7, 11, 13; τ = s, s/2, s/4, s/8)
+  every variant's count equals the original and brute force, every witness is
+  checked, and charged steps fall 1.5–65.3× versus the pruned original, never
+  worse. Without hash-first the derived network was slightly worse on 2
+  instances (p = 7, τ = 2), where a fixed per-call overhead (~5 charged steps
+  per edge) dominates. At ECCp-131 the fallback's worst case falls from 2^524 to
+  2^262 assignments per count, still far beyond rho's 2^65.3. [pcc:unverified]
 * **Recursion crossover (headline).** `Counter::count` selects the recursive
   backend only when `lambda / 131072 >= 1` with `lambda = ceil(log2(2·edges))`
   (transcribed from `recursive.rs` `Setup::parameters`), i.e. at least

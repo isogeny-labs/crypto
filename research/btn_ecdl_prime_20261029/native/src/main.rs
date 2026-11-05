@@ -233,6 +233,25 @@ fn derived_network(
     thresholds: &[BigUint; 2],
     seeds: &[(u64, u64); 2],
     target: &Point,
+    mark_a2: bool,
+    m: &mut Meter,
+) -> Res<hashed_ecdl_tensor::network::Network> {
+    derived_network_ordered(c, s, thresholds, seeds, target, mark_a2, false, m)
+}
+
+/// `hash_a1_first`: check A1's factor-base hash before building A2, so an A1
+/// outside its base is rejected before the point addition is evaluated.  The
+/// constraint set (hence the language and every count) is unchanged; only the
+/// program's step order differs.
+#[allow(clippy::too_many_arguments)]
+fn derived_network_ordered(
+    c: &Curve,
+    s: &BigUint,
+    thresholds: &[BigUint; 2],
+    seeds: &[(u64, u64); 2],
+    target: &Point,
+    mark_a2: bool,
+    hash_a1_first: bool,
     m: &mut Meter,
 ) -> Res<hashed_ecdl_tensor::network::Network> {
     use hashed_ecdl_tensor::encoding::{Encoder, PointWords};
@@ -240,6 +259,10 @@ fn derived_network(
     let width = q.bits() as usize;
     let mut enc = Encoder::new();
     let a1 = enc.input_point(c, false, m).map_err(e)?;
+    if hash_a1_first {
+        let (al, be) = seeds[0];
+        enc.hash_member(c, &a1, s, &al.into(), &be.into(), &thresholds[0], m).map_err(e)?;
+    }
     let zero = Encoder::constant(width, &BigUint::zero()).map_err(e)?;
     let neg = PointWords {
         infinity: a1.infinity.clone(),
@@ -248,9 +271,16 @@ fn derived_network(
     };
     let t = Encoder::constant_point(c, target).map_err(e)?;
     let a2 = enc.point_add(c, &t, &neg, m).map_err(e)?;
-    for (point, (tau, &(al, be))) in [&a1, &a2].into_iter().zip(thresholds.iter().zip(seeds)) {
-        enc.hash_member(c, point, s, &al.into(), &be.into(), tau, m).map_err(e)?;
-        enc.mark_point_interface(point, m).map_err(e)?;
+    for (i, (point, (tau, &(al, be)))) in [&a1, &a2].into_iter().zip(thresholds.iter().zip(seeds)).enumerate() {
+        if !(hash_a1_first && i == 0) {
+            enc.hash_member(c, point, s, &al.into(), &be.into(), tau, m).map_err(e)?;
+        }
+        // With only A1 marked, every interface signal is a free input, so the
+        // functional witness search may stop at its first hit; A2 is then
+        // recovered by the caller as target - A1.
+        if i == 0 || mark_a2 {
+            enc.mark_point_interface(point, m).map_err(e)?;
+        }
     }
     enc.finish(m).map_err(e)
 }
@@ -264,7 +294,7 @@ fn counts2(p: u64) -> Res<Vec<Value>> {
     let pts = affine_points(&c, p, a, b);
     let seeds = [(1u64, 0u64), (3, 7)];
     let mut out = Vec::new();
-    for threshold in [s.clone(), &s >> 1u8] {
+    for threshold in [s.clone(), &s >> 1u8, &s >> 2u8, &s >> 3u8] {
         let fb = bases(&c, &s, &threshold, &mut m)?;
         for target in pts.iter().take(2) {
             let mut brute = 0u64;
@@ -282,7 +312,9 @@ fn counts2(p: u64) -> Res<Vec<Value>> {
                 "threshold": threshold.to_string(), "target": format!("{target:?}"), "brute": brute });
             let nets = [
                 ("original", reduction::decomposition_network(&c, &fb, target, &mut m).map_err(e)?),
-                ("derived", derived_network(&c, &s, &[threshold.clone(), threshold.clone()], &seeds, target, &mut m)?),
+                ("derived", derived_network(&c, &s, &[threshold.clone(), threshold.clone()], &seeds, target, true, &mut m)?),
+                ("derived_a1", derived_network(&c, &s, &[threshold.clone(), threshold.clone()], &seeds, target, false, &mut m)?),
+                ("derived_a1_hashfirst", derived_network_ordered(&c, &s, &[threshold.clone(), threshold.clone()], &seeds, target, false, true, &mut m)?),
             ];
             for (name, net) in nets {
                 let mut cm = meter(20_000_000_000);
@@ -299,7 +331,7 @@ fn counts2(p: u64) -> Res<Vec<Value>> {
             // Witness extraction (Lemma 1 prefix counts) on the derived
             // network: decode A1, A2 from the interface word and check them
             // with reference arithmetic and the crate's membership test.
-            let dnet = derived_network(&c, &s, &[threshold.clone(), threshold.clone()], &seeds, target, &mut m)?;
+            let dnet = derived_network(&c, &s, &[threshold.clone(), threshold.clone()], &seeds, target, true, &mut m)?;
             let mut wm = meter(20_000_000_000);
             let mut wc = Counter::default();
             let word = wc.witness(&dnet, &vec![None; dnet.edge_count()], &mut wm).map_err(e)?;
@@ -317,6 +349,47 @@ fn counts2(p: u64) -> Res<Vec<Value>> {
                     json!({ "found": true, "ok": valid && brute > 0, "a1": format!("{a1:?}"), "a2": format!("{a2:?}"), "steps": wm.used })
                 }
             };
+            // Baseline witness cost on the original network (all interface
+            // signals are inputs, so it already stops at the first hit).
+            let onet = reduction::decomposition_network(&c, &fb, target, &mut m).map_err(e)?;
+            let mut om = meter(20_000_000_000);
+            let ow = Counter::default().witness(&onet, &vec![None; onet.edge_count()], &mut om).map_err(e)?;
+            rec["original"]["witness"] = json!({ "found": ow.is_some(), "steps": om.used });
+            // A1-only interface: same canonical witness (A1 bits are the
+            // word's prefix and determine A2), early exit restored.
+            let anet = derived_network(&c, &s, &[threshold.clone(), threshold.clone()], &seeds, target, false, &mut m)?;
+            let mut am = meter(20_000_000_000);
+            let aw = Counter::default().witness(&anet, &vec![None; anet.edge_count()], &mut am).map_err(e)?;
+            rec["derived_a1"]["witness"] = match aw {
+                None => json!({ "found": false, "ok": brute == 0, "steps": am.used }),
+                Some(bits) => {
+                    let w = (64 - p.leading_zeros()) as usize;
+                    let num = |from: usize| -> u64 { (0..w).map(|i| (bits[from + i] as u64) << i).sum() };
+                    let a1 = pt(num(1), num(1 + w));
+                    let neg = match &a1 { Point::Affine { x, y } => Point::Affine { x: x.clone(), y: (BigUint::from(p) - y) % p }, Point::Infinity => Point::Infinity };
+                    let a2 = c.add(target, &neg, &mut m).map_err(e)?;
+                    let valid = bits.len() == 1 + 2 * w && !bits[0] && a2 != Point::Infinity
+                        && fb[0].contains(&c, &a1, &mut m).map_err(e)?
+                        && fb[1].contains(&c, &a2, &mut m).map_err(e)?
+                        && &c.add(&a1, &a2, &mut m).map_err(e)? == target;
+                    let same = rec["derived"]["witness"]["a1"] == json!(format!("{a1:?}"));
+                    json!({ "found": true, "ok": valid && brute > 0, "same_canonical_witness": same,
+                            "a1": format!("{a1:?}"), "a2": format!("{a2:?}"), "steps": am.used })
+                }
+            };
+            rec["derived"]["witness"]["steps"] = json!(wm.used);
+            // Fixed per-call overhead: pin every interface (input) edge of the
+            // A1-only network to the witness, so exactly one assignment remains.
+            if let Some(Value::String(_)) = rec["derived_a1"]["witness"].get("a1") {
+                let bits = Counter::default().witness(&anet, &vec![None; anet.edge_count()], &mut meter(20_000_000_000)).map_err(e)?.unwrap();
+                let mut pins = vec![None; anet.edge_count()];
+                for (&edge, &b) in anet.interface().iter().zip(&bits) { pins[edge] = Some(b); }
+                let mut pm = meter(20_000_000_000);
+                let mut pc = Counter::default();
+                let n = pc.count(&anet, &pins, &mut pm).map_err(e)?;
+                rec["derived_a1"]["pinned_count"] = json!({ "count": n.to_string(), "steps": pm.used,
+                    "assignments": pc.statistics.functional_assignments, "edges": anet.edge_count() });
+            }
             let (so, sd) = (rec["original"]["steps"].as_u64().unwrap_or(0), rec["derived"]["steps"].as_u64().unwrap_or(1));
             rec["step_ratio"] = json!(so as f64 / sd.max(1) as f64);
             out.push(rec);
@@ -534,6 +607,12 @@ fn report(dir: &str) -> Res<Value> {
     // network on the same instances, current crate (with functional pruning).
     let c2 = read_jsonl(&format!("{dir}/counts2.jsonl")).unwrap_or_default();
     let ratios: Vec<f64> = c2.iter().filter_map(|r| r["step_ratio"].as_f64()).collect();
+    let ratio = |r: &Value, a: &str, b: &str| r[a]["steps"].as_f64().unwrap_or(0.0) / r[b]["steps"].as_f64().unwrap_or(1.0).max(1.0);
+    let best: Vec<f64> = c2.iter().map(|r| ratio(r, "original", "derived_a1_hashfirst")).collect();
+    let hf: Vec<f64> = c2.iter().map(|r| ratio(r, "derived_a1", "derived_a1_hashfirst")).collect();
+    let fmin = |v: &[f64]| v.iter().cloned().fold(f64::INFINITY, f64::min);
+    let fmax = |v: &[f64]| v.iter().cloned().fold(0.0, f64::max);
+    let worse_derived = c2.iter().filter(|r| ratio(r, "original", "derived_a1") < 1.0).count();
     let derived = json!({
         "n": c2.len(),
         "counts_equal_and_match_brute_force": !c2.is_empty() && c2.iter().all(|r| r["original"]["ok"] == json!(true) && r["derived"]["ok"] == json!(true)),
@@ -541,6 +620,13 @@ fn report(dir: &str) -> Res<Value> {
         "witnesses_found": c2.iter().filter(|r| r["derived"]["witness"]["found"] == json!(true)).count(),
         "step_ratio_min": ratios.iter().cloned().fold(f64::INFINITY, f64::min),
         "step_ratio_max": ratios.iter().cloned().fold(0.0, f64::max),
+        "all_variants_exact": !c2.is_empty() && c2.iter().all(|r| ["original", "derived", "derived_a1", "derived_a1_hashfirst"].iter().all(|k| r[*k]["ok"] == json!(true))),
+        "a1_only_witnesses_ok": !c2.is_empty() && c2.iter().all(|r| r["derived_a1"]["witness"]["ok"] == json!(true)),
+        "a1_only_same_canonical_witness": c2.iter().filter(|r| r["derived_a1"]["witness"]["found"] == json!(true)).all(|r| r["derived_a1"]["witness"]["same_canonical_witness"] == json!(true)),
+        "best_ratio_min": fmin(&best), "best_ratio_max": fmax(&best),
+        "hashfirst_ratio_min": fmin(&hf), "hashfirst_ratio_max": fmax(&hf),
+        "derived_a1_worse_than_original": worse_derived,
+        "best_worse_than_original": best.iter().filter(|x| **x < 1.0).count(),
         "free_bits": c2.iter().map(|r| (u(r, "d"), r["original"]["free_input_bits"].as_u64().unwrap_or(0), r["derived"]["free_input_bits"].as_u64().unwrap_or(0))).collect::<std::collections::BTreeSet<_>>().into_iter().map(|(d, o, v)| json!({"d": d, "original": o, "derived": v})).collect::<Vec<_>>(),
         "rows": c2,
         "eccp131_log2_assignments": { "original": 4 * 131, "derived": 2 * 131 },

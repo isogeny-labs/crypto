@@ -106,21 +106,28 @@ determined. Computing it with the encoder instead of searching it is a
 bijection on the same identity-free language, so counts cannot change, while
 the free input bits halve
 (#D.at("free_bits").map(f => [d = #f.at("d"): #f.at("original") → #f.at("derived")]).join(", ")).
-Built only from the crate's public `Encoder` API; the crate is not modified.
+Two refinements on top: mark only A#sub[1] as the interface, so the crate's
+witness search may stop at its first hit (A#sub[1] is the word's prefix and
+fixes A#sub[2], so the canonical witness is unchanged); and check A#sub[1]'s
+factor-base hash before building A#sub[2] ("hash-first"), so an A#sub[1] outside
+its base is rejected before the point addition runs. All variants are built
+only from the crate's public `Encoder` API; the crate is not modified.
 
-- Counts equal to the original network and to brute force on all #D.at("n") instances: *#D.at("counts_equal_and_match_brute_force")*.
-- Lemma-1 witness extraction on the derived network: #D.at("witnesses_found") decompositions found, every one checked by reference arithmetic and the crate's membership test (the remaining instance has none, as brute force agrees): *#D.at("witnesses_ok")*.
-- Charged steps #calc.round(D.at("step_ratio_min"), digits: 1)–#calc.round(D.at("step_ratio_max"), digits: 1)× lower than the original network, on top of the pruning; the gain grows with p.
+Measured on #D.at("n") instances (p = 5, 7, 11, 13; two targets; hash
+thresholds τ = s, s/2, s/4, s/8, where s is the hash prime):
+- Every variant's count equals the original network and brute force: *#D.at("all_variants_exact")*.
+- Witnesses: on the fully marked derived network, #D.at("witnesses_found") found and each checked by reference arithmetic and `FactorBase::contains`; on the A#sub[1]-only interface, all checked (*#D.at("a1_only_witnesses_ok")*) and the same canonical witness in every solvable case (*#D.at("a1_only_same_canonical_witness")*).
+- Combined (derived, A#sub[1] interface, hash-first) versus the current pruned original: charged steps #calc.round(D.at("best_ratio_min"), digits: 1)–#calc.round(D.at("best_ratio_max"), digits: 1)× lower, worse on #D.at("best_worse_than_original") instances. Hash-first alone contributes #calc.round(D.at("hashfirst_ratio_min"), digits: 2)–#calc.round(D.at("hashfirst_ratio_max"), digits: 2)×, largest at small τ.
+- Limit: without hash-first, the derived network was worse than the original on #D.at("derived_a1_worse_than_original") instances (p = 7, τ = 2), where the original's own pruning leaves few assignments and a fixed per-call overhead (about 84k charged steps at d = 3, 140k at d = 4, roughly 5 per edge) dominates. The gain is largest when many assignments survive, i.e. at large τ and larger p.
 
 #table(
-  columns: 8,
-  [p], [threshold], [count], [free bits], [assignments (orig → derived)], [steps original], [steps derived], [ratio],
+  columns: 7,
+  [p], [τ], [count], [steps original], [steps derived], [steps combined], [combined ×],
   ..D.at("rows").map(r => (
-    str(r.at("p")), r.at("threshold"), r.at("derived").at("count"),
-    str(r.at("original").at("free_input_bits")) + " → " + str(r.at("derived").at("free_input_bits")),
-    str(r.at("original").at("functional_assignments")) + " → " + str(r.at("derived").at("functional_assignments")),
+    str(r.at("p")), r.at("threshold"), r.at("original").at("count"),
     str(r.at("original").at("steps")), str(r.at("derived").at("steps")),
-    str(calc.round(r.at("step_ratio"), digits: 1)) + "×",
+    str(r.at("derived_a1_hashfirst").at("steps")),
+    str(calc.round(r.at("original").at("steps") / r.at("derived_a1_hashfirst").at("steps"), digits: 1)) + "×",
   )).flatten()
 )
 
@@ -166,7 +173,7 @@ measured size; this report says nothing about its cost.
 == What this does not show
 
 No ECCp-131 scalar is computed or attempted, and nothing here approaches
-Pollard rho. The two fallback speed-ups above are measured in the crate's
+Pollard rho. The fallback speed-ups above are measured in the crate's
 charged steps on small curves, against the same code's earlier behaviour; they
 are not wall-clock benchmarks and not a comparison with rho. The construction
 and primality timings are unisolated diagnostics. The recursive backend's
