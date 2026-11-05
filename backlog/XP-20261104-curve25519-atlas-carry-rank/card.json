@@ -1,0 +1,80 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261104-curve25519-atlas-carry-rank",
+  "title": "Compare isogeny representatives, bounded carries and rank-selected supports",
+  "created": "2026-11-04",
+  "authors": ["native Curve25519 research lane"],
+  "status": "blocked",
+  "status_note": "Original panel preserved; no scientific launch or ready promotion. Admission and an independent verdict remain required.",
+  "blocked_on": [
+    "problem:problems/curve25519-atlas-panel-admission.md",
+    "note:Freeze exact inputs, measured runtime preflight, registry image digest and aggregate budget headroom before affected data.",
+    "note:Integrate independent verification and the backlog resumable-checkpoint contract before ready promotion; preserve the original fresh-job protocol pending a visible amendment."
+  ],
+  "links": {
+    "lead": "research/curve25519_atlas_carry_rank_20261104/followup-20261104T2136/README.md",
+    "notes": ["research/curve25519_atlas_carry_rank_20261104/PROTOCOL.md"],
+    "prs": [3424]
+  },
+  "question": "Which matched representation or training-selected support lowers the fixed-cell component cost while retaining every outcome?",
+  "decision_value": "A complete comparison determines which representative, multiplication encoding or support selection should enter the next fully priced pipeline. Null, higher-cost and censored results prevent unsupported promotion and identify the concrete solver or admission dependency to address next.",
+  "protocol": {"path": null, "blob": null},
+  "code": {
+    "repo": "crypto",
+    "commit": "5a7e0fa433aa01dfefee8ec7fcb7ad2e6765a957",
+    "branch": "codex/curve25519-atlas-completion-20261104",
+    "build": [
+      ["make", "-C", "research/curve25519_atlas_carry_rank_20261104", "build"],
+      ["cargo", "build", "--release", "--locked", "--manifest-path", "research/curve25519_atlas_carry_rank_20261104/control/Cargo.toml"]
+    ]
+  },
+  "resources": {
+    "cpus": 4,
+    "ram_gb": 4,
+    "disk_gb": 32,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Original per-cell 900-second deadline and aggregate USD 5 ceiling remain; runtime preflight, setup costs and live budget headroom are unknown. No estimate is fabricated."
+  },
+  "run": {
+    "argv": ["/usr/local/bin/atlas-control", "run", "/work/frozen-inputs/p{p}-seed{seed}", "{out}/solver-run", "/usr/local/bin/study", "/usr/local/bin/z3", "30", "/usr/local/bin/openssl-replay"],
+    "env": {},
+    "timeout_per_shard_s": 900
+  },
+  "shards": {
+    "count": 12,
+    "scheme": "list",
+    "params": {"items": [
+      {"vars": {"p": "2029", "seed": "13"}},
+      {"vars": {"p": "2029", "seed": "29"}},
+      {"vars": {"p": "2029", "seed": "47"}},
+      {"vars": {"p": "2029", "seed": "71"}},
+      {"vars": {"p": "8173", "seed": "13"}},
+      {"vars": {"p": "8173", "seed": "29"}},
+      {"vars": {"p": "8173", "seed": "47"}},
+      {"vars": {"p": "8173", "seed": "71"}},
+      {"vars": {"p": "32749", "seed": "13"}},
+      {"vars": {"p": "32749", "seed": "29"}},
+      {"vars": {"p": "32749", "seed": "47"}},
+      {"vars": {"p": "32749", "seed": "71"}}
+    ]},
+    "stop": "all"
+  },
+  "checkpoint": {"file": null, "resume_flag": null},
+  "outputs": {
+    "result_schema": "experiment.export/v1",
+    "verify": [],
+    "land": "research/curve25519_atlas_carry_rank_20261104"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "unassigned",
+    "tasks": ["XP-20261104-curve25519-atlas-carry-rank/shard-{k}"],
+    "ttl_s": 86400,
+    "env": {"name": "curve25519-atlas-native", "recipe": "Exact published native image plus frozen prepared input bundle; no task has been published."},
+    "exec": {"cpus": 4, "memory_mb": 4096, "timeout_s": 900, "sandbox": "auto", "publish": "runs/XP-20261104-curve25519-atlas-carry-rank"},
+    "funding": {"units": 131072, "rationale": "Low seed-card level for a finite component comparison with native implementation available and admission still blocked."}
+  },
+  "owner_hint": "authorized Iso Lab executor and independent verifier"
+}
