@@ -128,3 +128,33 @@ Raw221629bytes SHA25641ca32cee963b13adb6b5638abc52191de20f676b038874957a6b06e5e5
 remains NOT_UPLOADED; exact local path and bounded excerpt are in the receipt.
 No scientific acceptance has changed. The next implementation retains validation
 reference counts and explicitly emits query field/reduction counts with ownership.
+
+## Independent replay accounting — 2026-11-05
+
+The independent rightmost-pivot checker now retains scalar source-operation
+counts across coefficient and augmented row spaces, including rejected input
+and late certificate failures. Caller-owned affine setup/equation/completed
+oracle counts accompany successful replay v2 and rejected-replay partial-work
+reports. The checkpoint still precedes all input/replay work. Scalar modulus
+`n` is distinct from coordinate field `p`. [pcc:unverified]
+
+[Fresh receipt](replay-accounting-20261105/receipt.json), source
+`f866dd7a4578a5c02cb60ee7d3c2101f3b044cde`: 6 standalone rank tests and
+23 oracle example tests pass; standalone rank strict lint, formatting, CLI
+build and the actual checkpoint-refusal message with exit1 pass at their
+scope. Overall scoped Cargo lint and supervisor exit101 on the two unchanged
+inherited library errors. The Cargo example's strict lint remains unqualified;
+no earlier pass waives this failure. PCC-20261105-f04c69 is unsigned/unverified.
+Four fresh binary hashes and all22 guarded source objects are retained.
+[pcc:unverified]
+
+[Two-page report](../replay-accounting-20261105.pdf), [editable ownership diagram](../replay-accounting-20261105.svg)
+and [coverage contract](../G2_REPLAY_ACCOUNTING_20261105.md) describe source-call
+units and unknown work. Modular/inverse/iteration diagnostics overlap integer
+children, so do not sum/price both. Overflow makes scalar counts unavailable;
+failed internal setup/oracle work stays explicitly unknown. Replay audit work
+is separate from producer timing and is not free. Allocation/copy/branch/
+serialization/counter overhead, complete F4/root/logical coverage, process/
+resume accounting and calibration remain open. Complete pricing/admission
+are unchanged, with no scientific panel. [pcc:unverified]
+
