@@ -1,0 +1,2272 @@
+{
+  "assumption": "Legacy ratios were measured on another host (calibration.json: Intel Xeon @ 2.10 GHz; the icv1-f2m23-t5197-69e76b73 row: Apple M4 Pro under load). The tuned ratio multiplies them by this host's R = ns_add_reference / ns_add_tuned and by the class (b) speedup F measured here, which assumes that (unit time) / (reference addition time) carries across hosts; derivation.<row>.units.<unit>.host_drift is this host's own ratio divided by the legacy one, and `sensitivity` summarises it.",
+  "derivation": {
+    "char2/random-binary-n15-b524b": {
+      "R": 10.084331950905495,
+      "ns_per_add_reference": 174.21684,
+      "ns_per_add_tuned": 17.2759921875,
+      "units": {
+        "ns_per_as_solve": {
+          "F": null,
+          "F_measured": null,
+          "R": 10.084331950905495,
+          "class": "c",
+          "host_drift": 1.4285238489216263,
+          "new": 0.5415084570997233,
+          "old": 0.053698,
+          "why": "Artin-Schreier solve by a precomputed linear map, field-independent"
+        },
+        "ns_per_double": {
+          "F": null,
+          "F_measured": null,
+          "R": null,
+          "class": "a",
+          "host_drift": 0.9474605506368471,
+          "new": 0.994514,
+          "old": 0.994514,
+          "why": "counted group operation: a doubling is one reference addition's work and stays about 1 GAE"
+        },
+        "ns_per_frobenius": {
+          "F": null,
+          "F_measured": null,
+          "R": 10.084331950905495,
+          "class": "c",
+          "host_drift": 0.8531338261810831,
+          "new": 0.6294438317116192,
+          "old": 0.062418,
+          "why": "FastCurve::frobenius_k: Gf2::sqr, the tuned addition's own kernel"
+        },
+        "ns_per_lookup": {
+          "F": null,
+          "F_measured": null,
+          "R": 10.084331950905495,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.1163429377175967,
+          "old": 0.011537,
+          "why": "hash probe, field-independent"
+        },
+        "ns_per_row_op": {
+          "F": 1.0,
+          "F_measured": 0.8633877519713055,
+          "R": 10.084331950905495,
+          "class": "b",
+          "host_drift": 0.9080769353268907,
+          "new": 0.15099270230090797,
+          "old": 0.014973,
+          "why": "calibrate_row_ops: mulmod/submod (u128 %) modulo the subgroup order"
+        },
+        "ns_per_s4_pair": {
+          "F": null,
+          "F_measured": null,
+          "R": 10.084331950905495,
+          "class": "c",
+          "host_drift": null,
+          "new": 30.483170729495907,
+          "old": 3.022825,
+          "why": "SubspaceOracle::decompose: pclmulqdq Gf2 products with Gf2::batch_inv, already the tuned kernel"
+        },
+        "ns_per_word_xor": {
+          "F": null,
+          "F_measured": null,
+          "R": 10.084331950905495,
+          "class": "c",
+          "host_drift": 1.509413316771068,
+          "new": 0.022155277296139374,
+          "old": 0.002197,
+          "why": "64-bit XOR, field-independent"
+        }
+      }
+    },
+    "char2/random-binary-n18-b6507": {
+      "R": 12.396077378089656,
+      "ns_per_add_reference": 196.83494,
+      "ns_per_add_tuned": 15.87880859375,
+      "units": {
+        "ns_per_as_solve": {
+          "F": null,
+          "F_measured": null,
+          "R": 12.396077378089656,
+          "class": "c",
+          "host_drift": 1.5218163562265346,
+          "new": 0.4184915722843068,
+          "old": 0.03376,
+          "why": "Artin-Schreier solve by a precomputed linear map, field-independent"
+        },
+        "ns_per_double": {
+          "F": null,
+          "F_measured": null,
+          "R": null,
+          "class": "a",
+          "host_drift": 1.0223309303356298,
+          "new": 0.992807,
+          "old": 0.992807,
+          "why": "counted group operation: a doubling is one reference addition's work and stays about 1 GAE"
+        },
+        "ns_per_frobenius": {
+          "F": null,
+          "F_measured": null,
+          "R": 12.396077378089656,
+          "class": "c",
+          "host_drift": 0.8474696924157674,
+          "new": 0.6585292146336348,
+          "old": 0.053124,
+          "why": "FastCurve::frobenius_k: Gf2::sqr, the tuned addition's own kernel"
+        },
+        "ns_per_lookup": {
+          "F": null,
+          "F_measured": null,
+          "R": 12.396077378089656,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.11182501402774678,
+          "old": 0.009021,
+          "why": "hash probe, field-independent"
+        },
+        "ns_per_row_op": {
+          "F": 1.0,
+          "F_measured": 0.8445460523708967,
+          "R": 12.396077378089656,
+          "class": "b",
+          "host_drift": 0.9431062478173171,
+          "new": 0.1461993365971894,
+          "old": 0.011794,
+          "why": "calibrate_row_ops: mulmod/submod (u128 %) modulo the subgroup order"
+        },
+        "ns_per_s4_pair": {
+          "F": null,
+          "F_measured": null,
+          "R": 12.396077378089656,
+          "class": "c",
+          "host_drift": null,
+          "new": 35.93731917389118,
+          "old": 2.899088,
+          "why": "SubspaceOracle::decompose: pclmulqdq Gf2 products with Gf2::batch_inv, already the tuned kernel"
+        },
+        "ns_per_word_xor": {
+          "F": null,
+          "F_measured": null,
+          "R": 12.396077378089656,
+          "class": "c",
+          "host_drift": 1.444391267082547,
+          "new": 0.020713845298787815,
+          "old": 0.001671,
+          "why": "64-bit XOR, field-independent"
+        }
+      }
+    },
+    "char2/random-binary-n21-b1b6f3b": {
+      "R": 12.798417349060605,
+      "ns_per_add_reference": 215.34872,
+      "ns_per_add_tuned": 16.82619921875,
+      "units": {
+        "ns_per_as_solve": {
+          "F": null,
+          "F_measured": null,
+          "R": 12.798417349060605,
+          "class": "c",
+          "host_drift": 1.8022385191099104,
+          "new": 0.7744706290437043,
+          "old": 0.060513,
+          "why": "Artin-Schreier solve by a precomputed linear map, field-independent"
+        },
+        "ns_per_double": {
+          "F": null,
+          "F_measured": null,
+          "R": null,
+          "class": "a",
+          "host_drift": 0.9957471921516108,
+          "new": 1.004813,
+          "old": 1.004813,
+          "why": "counted group operation: a doubling is one reference addition's work and stays about 1 GAE"
+        },
+        "ns_per_frobenius": {
+          "F": null,
+          "F_measured": null,
+          "R": 12.798417349060605,
+          "class": "c",
+          "host_drift": 1.1112814390844978,
+          "new": 0.5408227219192541,
+          "old": 0.042257,
+          "why": "FastCurve::frobenius_k: Gf2::sqr, the tuned addition's own kernel"
+        },
+        "ns_per_lookup": {
+          "F": null,
+          "F_measured": null,
+          "R": 12.798417349060605,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.10423031089074956,
+          "old": 0.008144,
+          "why": "hash probe, field-independent"
+        },
+        "ns_per_row_op": {
+          "F": 1.0,
+          "F_measured": 0.8412205128056394,
+          "R": 12.798417349060605,
+          "class": "b",
+          "host_drift": 1.745953499864807,
+          "new": 0.13248921639747538,
+          "old": 0.010352,
+          "why": "calibrate_row_ops: mulmod/submod (u128 %) modulo the subgroup order"
+        },
+        "ns_per_s4_pair": {
+          "F": null,
+          "F_measured": null,
+          "R": 12.798417349060605,
+          "class": "c",
+          "host_drift": null,
+          "new": 36.031435556479714,
+          "old": 2.815304,
+          "why": "SubspaceOracle::decompose: pclmulqdq Gf2 products with Gf2::batch_inv, already the tuned kernel"
+        },
+        "ns_per_word_xor": {
+          "F": null,
+          "F_measured": null,
+          "R": 12.798417349060605,
+          "class": "c",
+          "host_drift": 2.1079508889229523,
+          "new": 0.018327333643854787,
+          "old": 0.001432,
+          "why": "64-bit XOR, field-independent"
+        }
+      }
+    },
+    "char2/random-binary-n24-b5fc9da": {
+      "R": 15.543642122462929,
+      "ns_per_add_reference": 244.433305,
+      "ns_per_add_tuned": 15.72561328125,
+      "units": {
+        "ns_per_as_solve": {
+          "F": null,
+          "F_measured": null,
+          "R": 15.543642122462929,
+          "class": "c",
+          "host_drift": 1.4296394031348625,
+          "new": 0.5485817614280841,
+          "old": 0.035293,
+          "why": "Artin-Schreier solve by a precomputed linear map, field-independent"
+        },
+        "ns_per_double": {
+          "F": null,
+          "F_measured": null,
+          "R": null,
+          "class": "a",
+          "host_drift": 1.3745516651881162,
+          "new": 1.004237,
+          "old": 1.004237,
+          "why": "counted group operation: a doubling is one reference addition's work and stays about 1 GAE"
+        },
+        "ns_per_frobenius": {
+          "F": null,
+          "F_measured": null,
+          "R": 15.543642122462929,
+          "class": "c",
+          "host_drift": 0.8530986525043981,
+          "new": 0.6230513508368041,
+          "old": 0.040084,
+          "why": "FastCurve::frobenius_k: Gf2::sqr, the tuned addition's own kernel"
+        },
+        "ns_per_lookup": {
+          "F": null,
+          "F_measured": null,
+          "R": 15.543642122462929,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.10527708809544142,
+          "old": 0.006773,
+          "why": "hash probe, field-independent"
+        },
+        "ns_per_row_op": {
+          "F": 1.0,
+          "F_measured": 0.8904288455966975,
+          "R": 15.543642122462929,
+          "class": "b",
+          "host_drift": 0.870864738034936,
+          "new": 0.15114637599882952,
+          "old": 0.009724,
+          "why": "calibrate_row_ops: mulmod/submod (u128 %) modulo the subgroup order"
+        },
+        "ns_per_s4_pair": {
+          "F": null,
+          "F_measured": null,
+          "R": 15.543642122462929,
+          "class": "c",
+          "host_drift": null,
+          "new": 44.40795238924475,
+          "old": 2.856985,
+          "why": "SubspaceOracle::decompose: pclmulqdq Gf2 products with Gf2::batch_inv, already the tuned kernel"
+        },
+        "ns_per_word_xor": {
+          "F": null,
+          "F_measured": null,
+          "R": 15.543642122462929,
+          "class": "c",
+          "host_drift": 1.4257258568283697,
+          "new": 0.020206734759201806,
+          "old": 0.0013,
+          "why": "64-bit XOR, field-independent"
+        }
+      }
+    },
+    "char2/random-binary-n27-b845462": {
+      "R": 16.194245832925645,
+      "ns_per_add_reference": 256.67013,
+      "ns_per_add_tuned": 15.84946484375,
+      "units": {
+        "ns_per_as_solve": {
+          "F": null,
+          "F_measured": null,
+          "R": 16.194245832925645,
+          "class": "c",
+          "host_drift": 1.5191046427955834,
+          "new": 1.201127213428095,
+          "old": 0.07417,
+          "why": "Artin-Schreier solve by a precomputed linear map, field-independent"
+        },
+        "ns_per_double": {
+          "F": null,
+          "F_measured": null,
+          "R": null,
+          "class": "a",
+          "host_drift": 0.997770964857207,
+          "new": 1.006677,
+          "old": 1.006677,
+          "why": "counted group operation: a doubling is one reference addition's work and stays about 1 GAE"
+        },
+        "ns_per_frobenius": {
+          "F": null,
+          "F_measured": null,
+          "R": 16.194245832925645,
+          "class": "c",
+          "host_drift": 0.9199375113464275,
+          "new": 0.5896324907768227,
+          "old": 0.03641,
+          "why": "FastCurve::frobenius_k: Gf2::sqr, the tuned addition's own kernel"
+        },
+        "ns_per_lookup": {
+          "F": null,
+          "F_measured": null,
+          "R": 16.194245832925645,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.11590221742624884,
+          "old": 0.007157,
+          "why": "hash probe, field-independent"
+        },
+        "ns_per_row_op": {
+          "F": 1.1220337286092457,
+          "F_measured": 1.1220337286092457,
+          "R": 16.194245832925645,
+          "class": "b",
+          "host_drift": 1.2556795347196401,
+          "new": 0.12292535263622308,
+          "old": 0.008517,
+          "why": "calibrate_row_ops: mulmod/submod (u128 %) modulo the subgroup order"
+        },
+        "ns_per_s4_pair": {
+          "F": null,
+          "F_measured": null,
+          "R": 16.194245832925645,
+          "class": "c",
+          "host_drift": null,
+          "new": 50.04638963140258,
+          "old": 3.090381,
+          "why": "SubspaceOracle::decompose: pclmulqdq Gf2 products with Gf2::batch_inv, already the tuned kernel"
+        },
+        "ns_per_word_xor": {
+          "F": null,
+          "F_measured": null,
+          "R": 16.194245832925645,
+          "class": "c",
+          "host_drift": 1.6005211831984354,
+          "new": 0.018202332316208426,
+          "old": 0.001124,
+          "why": "64-bit XOR, field-independent"
+        }
+      }
+    },
+    "koblitz/K_0 / GF(2^13)": {
+      "R": 10.003099691886694,
+      "ns_per_add_reference": 151.92911,
+      "ns_per_add_tuned": 15.188203125,
+      "units": {
+        "ns_per_as_solve": {
+          "F": null,
+          "F_measured": null,
+          "R": 10.003099691886694,
+          "class": "c",
+          "host_drift": 1.3709276810937687,
+          "new": 0.5118085957353827,
+          "old": 0.051165,
+          "why": "Artin-Schreier solve by a precomputed linear map, field-independent"
+        },
+        "ns_per_canon": {
+          "F": null,
+          "F_measured": null,
+          "R": 10.003099691886694,
+          "class": "c",
+          "host_drift": 0.9988132356745969,
+          "new": 0.6345766382539081,
+          "old": 0.063438,
+          "why": "FrobeniusCanon: Gf2 squarings and comparisons, the tuned kernel"
+        },
+        "ns_per_double": {
+          "F": null,
+          "F_measured": null,
+          "R": null,
+          "class": "a",
+          "host_drift": 0.9607985214088773,
+          "new": 0.993644,
+          "old": 0.993644,
+          "why": "counted group operation: a doubling is one reference addition's work and stays about 1 GAE"
+        },
+        "ns_per_frobenius": {
+          "F": null,
+          "F_measured": null,
+          "R": 10.003099691886694,
+          "class": "c",
+          "host_drift": 0.8029117090360701,
+          "new": 0.675719387286638,
+          "old": 0.067551,
+          "why": "FastCurve::frobenius_k: Gf2::sqr, the tuned addition's own kernel"
+        },
+        "ns_per_lookup": {
+          "F": null,
+          "F_measured": null,
+          "R": 10.003099691886694,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.11929696692544073,
+          "old": 0.011926,
+          "why": "hash probe, field-independent"
+        },
+        "ns_per_row_op": {
+          "F": 1.0,
+          "F_measured": 0.7586456788967834,
+          "R": 10.003099691886694,
+          "class": "b",
+          "host_drift": 0.8134899740540369,
+          "new": 0.16910240029134457,
+          "old": 0.016905,
+          "why": "calibrate_row_ops: mulmod/submod (u128 %) modulo the subgroup order"
+        },
+        "ns_per_word_xor": {
+          "F": null,
+          "F_measured": null,
+          "R": 10.003099691886694,
+          "class": "c",
+          "host_drift": 1.2678710267440927,
+          "new": 0.023047141690106944,
+          "old": 0.002304,
+          "why": "64-bit XOR, field-independent"
+        }
+      }
+    },
+    "koblitz/K_0 / GF(2^15)": {
+      "R": 10.587666844537006,
+      "ns_per_add_reference": 172.52843,
+      "ns_per_add_tuned": 16.2952265625,
+      "units": {
+        "ns_per_as_solve": {
+          "F": null,
+          "F_measured": null,
+          "R": 10.587666844537006,
+          "class": "c",
+          "host_drift": 1.4033091981033583,
+          "new": 0.5750267739936493,
+          "old": 0.054311,
+          "why": "Artin-Schreier solve by a precomputed linear map, field-independent"
+        },
+        "ns_per_canon": {
+          "F": null,
+          "F_measured": null,
+          "R": 10.587666844537006,
+          "class": "c",
+          "host_drift": 0.8460174757177124,
+          "new": 0.7043868875002025,
+          "old": 0.066529,
+          "why": "FrobeniusCanon: Gf2 squarings and comparisons, the tuned kernel"
+        },
+        "ns_per_double": {
+          "F": null,
+          "F_measured": null,
+          "R": null,
+          "class": "a",
+          "host_drift": 1.0055049028015979,
+          "new": 0.978255,
+          "old": 0.978255,
+          "why": "counted group operation: a doubling is one reference addition's work and stays about 1 GAE"
+        },
+        "ns_per_frobenius": {
+          "F": null,
+          "F_measured": null,
+          "R": 10.587666844537006,
+          "class": "c",
+          "host_drift": 0.8544934661040269,
+          "new": 0.6204372770898685,
+          "old": 0.0586,
+          "why": "FastCurve::frobenius_k: Gf2::sqr, the tuned addition's own kernel"
+        },
+        "ns_per_lookup": {
+          "F": null,
+          "F_measured": null,
+          "R": 10.587666844537006,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.11243043422213847,
+          "old": 0.010619,
+          "why": "hash probe, field-independent"
+        },
+        "ns_per_row_op": {
+          "F": 1.0,
+          "F_measured": 0.873312622966141,
+          "R": 10.587666844537006,
+          "class": "b",
+          "host_drift": 1.253069089011377,
+          "new": 0.15330941590889585,
+          "old": 0.01448,
+          "why": "calibrate_row_ops: mulmod/submod (u128 %) modulo the subgroup order"
+        },
+        "ns_per_s4_pair": {
+          "F": null,
+          "F_measured": null,
+          "R": 10.587666844537006,
+          "class": "c",
+          "host_drift": null,
+          "new": 27.951556933912986,
+          "old": 2.640011,
+          "why": "SubspaceOracle::decompose: pclmulqdq Gf2 products with Gf2::batch_inv, already the tuned kernel"
+        },
+        "ns_per_word_xor": {
+          "F": null,
+          "F_measured": null,
+          "R": 10.587666844537006,
+          "class": "c",
+          "host_drift": 1.339020897360385,
+          "new": 0.02157766502916642,
+          "old": 0.002038,
+          "why": "64-bit XOR, field-independent"
+        }
+      }
+    },
+    "koblitz/K_0 / GF(2^23)": {
+      "R": 14.825463950543629,
+      "ns_per_add_reference": 231.99274,
+      "ns_per_add_tuned": 15.64826171875,
+      "units": {
+        "ns_per_as_solve": {
+          "F": null,
+          "F_measured": null,
+          "R": 14.825463950543629,
+          "class": "c",
+          "host_drift": 0.7989809884601881,
+          "new": 1.7762981377704343,
+          "old": 0.119814,
+          "why": "Artin-Schreier solve by a precomputed linear map, field-independent"
+        },
+        "ns_per_canon": {
+          "F": null,
+          "F_measured": null,
+          "R": 14.825463950543629,
+          "class": "c",
+          "host_drift": 1.6343590087457986,
+          "new": 0.41315602937374984,
+          "old": 0.027868,
+          "why": "FrobeniusCanon: Gf2 squarings and comparisons, the tuned kernel"
+        },
+        "ns_per_double": {
+          "F": null,
+          "F_measured": null,
+          "R": null,
+          "class": "a",
+          "host_drift": 0.8430394917682612,
+          "new": 1.176715,
+          "old": 1.176715,
+          "why": "counted group operation: a doubling is one reference addition's work and stays about 1 GAE"
+        },
+        "ns_per_frobenius": {
+          "F": null,
+          "F_measured": null,
+          "R": 14.825463950543629,
+          "class": "c",
+          "host_drift": 1.4320055400008753,
+          "new": 0.38307516301809685,
+          "old": 0.025839,
+          "why": "FastCurve::frobenius_k: Gf2::sqr, the tuned addition's own kernel"
+        },
+        "ns_per_lookup": {
+          "F": null,
+          "F_measured": null,
+          "R": 14.825463950543629,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.0,
+          "old": 0.0,
+          "why": "hash probe, field-independent"
+        },
+        "ns_per_row_op": {
+          "F": 1.0,
+          "F_measured": 0.9975431252501868,
+          "R": 14.825463950543629,
+          "class": "b",
+          "host_drift": 0.9369904346167317,
+          "new": 0.14118289320102698,
+          "old": 0.009523,
+          "why": "calibrate_row_ops: mulmod/submod (u128 %) modulo the subgroup order"
+        },
+        "ns_per_word_xor": {
+          "F": null,
+          "F_measured": null,
+          "R": 14.825463950543629,
+          "class": "c",
+          "host_drift": 1.6822315797664482,
+          "new": 0.017256840038432784,
+          "old": 0.001164,
+          "why": "64-bit XOR, field-independent"
+        }
+      }
+    },
+    "koblitz/K_0 / GF(2^31)": {
+      "R": 18.29165680788623,
+      "ns_per_add_reference": 288.34289,
+      "ns_per_add_tuned": 15.76362890625,
+      "units": {
+        "ns_per_as_solve": {
+          "F": null,
+          "F_measured": null,
+          "R": 18.29165680788623,
+          "class": "c",
+          "host_drift": 1.7241111792084722,
+          "new": 1.4237859826122485,
+          "old": 0.077838,
+          "why": "Artin-Schreier solve by a precomputed linear map, field-independent"
+        },
+        "ns_per_canon": {
+          "F": null,
+          "F_measured": null,
+          "R": 18.29165680788623,
+          "class": "c",
+          "host_drift": 0.5845881697955926,
+          "new": 1.349576730942654,
+          "old": 0.073781,
+          "why": "FrobeniusCanon: Gf2 squarings and comparisons, the tuned kernel"
+        },
+        "ns_per_double": {
+          "F": null,
+          "F_measured": null,
+          "R": null,
+          "class": "a",
+          "host_drift": 1.0202522567917431,
+          "new": 0.990824,
+          "old": 0.990824,
+          "why": "counted group operation: a doubling is one reference addition's work and stays about 1 GAE"
+        },
+        "ns_per_frobenius": {
+          "F": null,
+          "F_measured": null,
+          "R": 18.29165680788623,
+          "class": "c",
+          "host_drift": 0.9456284804960571,
+          "new": 0.5692912348318432,
+          "old": 0.031123,
+          "why": "FastCurve::frobenius_k: Gf2::sqr, the tuned addition's own kernel"
+        },
+        "ns_per_lookup": {
+          "F": null,
+          "F_measured": null,
+          "R": 18.29165680788623,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.1374983842248808,
+          "old": 0.007517,
+          "why": "hash probe, field-independent"
+        },
+        "ns_per_row_op": {
+          "F": 1.0,
+          "F_measured": 0.8925541398184221,
+          "R": 18.29165680788623,
+          "class": "b",
+          "host_drift": 1.082182927263984,
+          "new": 0.12443814126405002,
+          "old": 0.006803,
+          "why": "calibrate_row_ops: mulmod/submod (u128 %) modulo the subgroup order"
+        },
+        "ns_per_s4_pair": {
+          "F": null,
+          "F_measured": null,
+          "R": 18.29165680788623,
+          "class": "c",
+          "host_drift": null,
+          "new": 53.89790328360864,
+          "old": 2.946584,
+          "why": "SubspaceOracle::decompose: pclmulqdq Gf2 products with Gf2::batch_inv, already the tuned kernel"
+        },
+        "ns_per_word_xor": {
+          "F": null,
+          "F_measured": null,
+          "R": 18.29165680788623,
+          "class": "c",
+          "host_drift": 1.785785376627356,
+          "new": 0.017834365387689073,
+          "old": 0.000975,
+          "why": "64-bit XOR, field-independent"
+        }
+      }
+    },
+    "koblitz/K_0 / GF(2^37)": {
+      "R": 20.28590921166473,
+      "ns_per_add_reference": 320.651205,
+      "ns_per_add_tuned": 15.80659765625,
+      "units": {
+        "ns_per_as_solve": {
+          "F": null,
+          "F_measured": null,
+          "R": 20.28590921166473,
+          "class": "c",
+          "host_drift": 1.8976979378370071,
+          "new": 1.7444056190202617,
+          "old": 0.085991,
+          "why": "Artin-Schreier solve by a precomputed linear map, field-independent"
+        },
+        "ns_per_canon": {
+          "F": null,
+          "F_measured": null,
+          "R": 20.28590921166473,
+          "class": "c",
+          "host_drift": 0.6026742234422514,
+          "new": 1.3845741614237528,
+          "old": 0.068253,
+          "why": "FrobeniusCanon: Gf2 squarings and comparisons, the tuned kernel"
+        },
+        "ns_per_double": {
+          "F": null,
+          "F_measured": null,
+          "R": null,
+          "class": "a",
+          "host_drift": 0.985021420413785,
+          "new": 0.995471,
+          "old": 0.995471,
+          "why": "counted group operation: a doubling is one reference addition's work and stays about 1 GAE"
+        },
+        "ns_per_frobenius": {
+          "F": null,
+          "F_measured": null,
+          "R": 20.28590921166473,
+          "class": "c",
+          "host_drift": 0.9950579029043433,
+          "new": 0.5408831973106167,
+          "old": 0.026663,
+          "why": "FastCurve::frobenius_k: Gf2::sqr, the tuned addition's own kernel"
+        },
+        "ns_per_lookup": {
+          "F": null,
+          "F_measured": null,
+          "R": 20.28590921166473,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.12137059481339008,
+          "old": 0.005983,
+          "why": "hash probe, field-independent"
+        },
+        "ns_per_row_op": {
+          "F": 1.3468567677743117,
+          "F_measured": 1.3468567677743117,
+          "R": 20.28590921166473,
+          "class": "b",
+          "host_drift": 1.8297624048066308,
+          "new": 0.0809112794266507,
+          "old": 0.005372,
+          "why": "calibrate_row_ops: mulmod/submod (u128 %) modulo the subgroup order"
+        },
+        "ns_per_word_xor": {
+          "F": null,
+          "F_measured": null,
+          "R": 20.28590921166473,
+          "class": "c",
+          "host_drift": 1.7852448368706983,
+          "new": 0.01616786964169679,
+          "old": 0.000797,
+          "why": "64-bit XOR, field-independent"
+        }
+      }
+    },
+    "koblitz/K_0 / GF(2^39)": {
+      "R": 21.312429216519188,
+      "ns_per_add_reference": 341.993725,
+      "ns_per_add_tuned": 16.0466796875,
+      "units": {
+        "ns_per_as_solve": {
+          "F": null,
+          "F_measured": null,
+          "R": 21.312429216519188,
+          "class": "c",
+          "host_drift": 1.7633774367232689,
+          "new": 1.9578023726878857,
+          "old": 0.091862,
+          "why": "Artin-Schreier solve by a precomputed linear map, field-independent"
+        },
+        "ns_per_canon": {
+          "F": null,
+          "F_measured": null,
+          "R": 21.312429216519188,
+          "class": "c",
+          "host_drift": 0.5186697761556041,
+          "new": 1.5698095988011538,
+          "old": 0.073657,
+          "why": "FrobeniusCanon: Gf2 squarings and comparisons, the tuned kernel"
+        },
+        "ns_per_double": {
+          "F": null,
+          "F_measured": null,
+          "R": null,
+          "class": "a",
+          "host_drift": 0.9511028708694934,
+          "new": 1.049355,
+          "old": 1.049355,
+          "why": "counted group operation: a doubling is one reference addition's work and stays about 1 GAE"
+        },
+        "ns_per_frobenius": {
+          "F": null,
+          "F_measured": null,
+          "R": 21.312429216519188,
+          "class": "c",
+          "host_drift": 0.9136204052280121,
+          "new": 0.5899919780009006,
+          "old": 0.027683,
+          "why": "FastCurve::frobenius_k: Gf2::sqr, the tuned addition's own kernel"
+        },
+        "ns_per_lookup": {
+          "F": null,
+          "F_measured": null,
+          "R": 21.312429216519188,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.1320731238547694,
+          "old": 0.006197,
+          "why": "hash probe, field-independent"
+        },
+        "ns_per_row_op": {
+          "F": 1.2488897960169376,
+          "F_measured": 1.2488897960169376,
+          "R": 21.312429216519188,
+          "class": "b",
+          "host_drift": 1.627819274686389,
+          "new": 0.09520619271465966,
+          "old": 0.005579,
+          "why": "calibrate_row_ops: mulmod/submod (u128 %) modulo the subgroup order"
+        },
+        "ns_per_word_xor": {
+          "F": null,
+          "F_measured": null,
+          "R": 21.312429216519188,
+          "class": "c",
+          "host_drift": 1.7374998712088452,
+          "new": 0.016623694788884966,
+          "old": 0.00078,
+          "why": "64-bit XOR, field-independent"
+        }
+      }
+    },
+    "koblitz/K_0 / GF(2^41)": {
+      "R": 21.11574069018368,
+      "ns_per_add_reference": 344.425775,
+      "ns_per_add_tuned": 16.311328125,
+      "units": {
+        "ns_per_as_solve": {
+          "F": null,
+          "F_measured": null,
+          "R": 21.11574069018368,
+          "class": "c",
+          "host_drift": 1.738911367906776,
+          "new": 2.132710925449242,
+          "old": 0.101001,
+          "why": "Artin-Schreier solve by a precomputed linear map, field-independent"
+        },
+        "ns_per_canon": {
+          "F": null,
+          "F_measured": null,
+          "R": 21.11574069018368,
+          "class": "c",
+          "host_drift": 0.6263537674885514,
+          "new": 1.5377538157626267,
+          "old": 0.072825,
+          "why": "FrobeniusCanon: Gf2 squarings and comparisons, the tuned kernel"
+        },
+        "ns_per_double": {
+          "F": null,
+          "F_measured": null,
+          "R": null,
+          "class": "a",
+          "host_drift": 0.9931482348989316,
+          "new": 1.004565,
+          "old": 1.004565,
+          "why": "counted group operation: a doubling is one reference addition's work and stays about 1 GAE"
+        },
+        "ns_per_frobenius": {
+          "F": null,
+          "F_measured": null,
+          "R": 21.11574069018368,
+          "class": "c",
+          "host_drift": 0.9601533352820749,
+          "new": 0.5491992996109873,
+          "old": 0.026009,
+          "why": "FastCurve::frobenius_k: Gf2::sqr, the tuned addition's own kernel"
+        },
+        "ns_per_lookup": {
+          "F": null,
+          "F_measured": null,
+          "R": 21.11574069018368,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.1339371431978351,
+          "old": 0.006343,
+          "why": "hash probe, field-independent"
+        },
+        "ns_per_row_op": {
+          "F": 1.3757544747642336,
+          "F_measured": 1.3757544747642336,
+          "R": 21.11574069018368,
+          "class": "b",
+          "host_drift": 2.0280318936643744,
+          "new": 0.07704937196943352,
+          "old": 0.00502,
+          "why": "calibrate_row_ops: mulmod/submod (u128 %) modulo the subgroup order"
+        },
+        "ns_per_word_xor": {
+          "F": null,
+          "F_measured": null,
+          "R": 21.11574069018368,
+          "class": "c",
+          "host_drift": 1.9115197979460423,
+          "new": 0.014759902742438392,
+          "old": 0.000699,
+          "why": "64-bit XOR, field-independent"
+        }
+      }
+    },
+    "koblitz/K_1 / GF(2^11)": {
+      "R": 8.677273300304417,
+      "ns_per_add_reference": 136.20943,
+      "ns_per_add_tuned": 15.69726171875,
+      "units": {
+        "ns_per_as_solve": {
+          "F": null,
+          "F_measured": null,
+          "R": 8.677273300304417,
+          "class": "c",
+          "host_drift": 1.414270402669667,
+          "new": 0.43126048302512954,
+          "old": 0.0497,
+          "why": "Artin-Schreier solve by a precomputed linear map, field-independent"
+        },
+        "ns_per_canon": {
+          "F": null,
+          "F_measured": null,
+          "R": 8.677273300304417,
+          "class": "c",
+          "host_drift": 1.0417814247281934,
+          "new": 0.5584432777876913,
+          "old": 0.064357,
+          "why": "FrobeniusCanon: Gf2 squarings and comparisons, the tuned kernel"
+        },
+        "ns_per_double": {
+          "F": null,
+          "F_measured": null,
+          "R": null,
+          "class": "a",
+          "host_drift": 1.0263556324671237,
+          "new": 0.981483,
+          "old": 0.981483,
+          "why": "counted group operation: a doubling is one reference addition's work and stays about 1 GAE"
+        },
+        "ns_per_frobenius": {
+          "F": null,
+          "F_measured": null,
+          "R": 8.677273300304417,
+          "class": "c",
+          "host_drift": 0.8049860786163842,
+          "new": 0.6715862443503607,
+          "old": 0.077396,
+          "why": "FastCurve::frobenius_k: Gf2::sqr, the tuned addition's own kernel"
+        },
+        "ns_per_lookup": {
+          "F": null,
+          "F_measured": null,
+          "R": 8.677273300304417,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.12877941304981785,
+          "old": 0.014841,
+          "why": "hash probe, field-independent"
+        },
+        "ns_per_row_op": {
+          "F": 1.0,
+          "F_measured": 0.9012847946704334,
+          "R": 8.677273300304417,
+          "class": "b",
+          "host_drift": 0.7901849993956199,
+          "new": 0.1710724431155016,
+          "old": 0.019715,
+          "why": "calibrate_row_ops: mulmod/submod (u128 %) modulo the subgroup order"
+        },
+        "ns_per_word_xor": {
+          "F": null,
+          "F_measured": null,
+          "R": 8.677273300304417,
+          "class": "c",
+          "host_drift": 1.2161179853671957,
+          "new": 0.0237757288428341,
+          "old": 0.00274,
+          "why": "64-bit XOR, field-independent"
+        }
+      }
+    },
+    "koblitz/K_1 / GF(2^17)": {
+      "R": 11.299412909593986,
+      "ns_per_add_reference": 174.48421,
+      "ns_per_add_tuned": 15.4418828125,
+      "units": {
+        "ns_per_as_solve": {
+          "F": null,
+          "F_measured": null,
+          "R": 11.299412909593986,
+          "class": "c",
+          "host_drift": 1.4572083648899077,
+          "new": 0.6744845553994843,
+          "old": 0.059692,
+          "why": "Artin-Schreier solve by a precomputed linear map, field-independent"
+        },
+        "ns_per_canon": {
+          "F": null,
+          "F_measured": null,
+          "R": 11.299412909593986,
+          "class": "c",
+          "host_drift": 0.7739539448218211,
+          "new": 0.8388345161695288,
+          "old": 0.074237,
+          "why": "FrobeniusCanon: Gf2 squarings and comparisons, the tuned kernel"
+        },
+        "ns_per_double": {
+          "F": null,
+          "F_measured": null,
+          "R": null,
+          "class": "a",
+          "host_drift": 0.9534803912393146,
+          "new": 1.042791,
+          "old": 1.042791,
+          "why": "counted group operation: a doubling is one reference addition's work and stays about 1 GAE"
+        },
+        "ns_per_frobenius": {
+          "F": null,
+          "F_measured": null,
+          "R": 11.299412909593986,
+          "class": "c",
+          "host_drift": 0.9190347113529598,
+          "new": 0.6006541914481971,
+          "old": 0.053158,
+          "why": "FastCurve::frobenius_k: Gf2::sqr, the tuned addition's own kernel"
+        },
+        "ns_per_lookup": {
+          "F": null,
+          "F_measured": null,
+          "R": 11.299412909593986,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.12012405864189367,
+          "old": 0.010631,
+          "why": "hash probe, field-independent"
+        },
+        "ns_per_row_op": {
+          "F": 1.0,
+          "F_measured": 0.907344732419756,
+          "R": 11.299412909593986,
+          "class": "b",
+          "host_drift": 0.8919218563820682,
+          "new": 0.15599969462985458,
+          "old": 0.013806,
+          "why": "calibrate_row_ops: mulmod/submod (u128 %) modulo the subgroup order"
+        },
+        "ns_per_word_xor": {
+          "F": null,
+          "F_measured": null,
+          "R": 11.299412909593986,
+          "class": "c",
+          "host_drift": 1.3504241459306163,
+          "new": 0.02207905282534665,
+          "old": 0.001954,
+          "why": "64-bit XOR, field-independent"
+        }
+      }
+    },
+    "koblitz/K_1 / GF(2^19)": {
+      "R": 12.58577294848271,
+      "ns_per_add_reference": 197.577265,
+      "ns_per_add_tuned": 15.6984609375,
+      "units": {
+        "ns_per_as_solve": {
+          "F": null,
+          "F_measured": null,
+          "R": 12.58577294848271,
+          "class": "c",
+          "host_drift": 1.5510377478126414,
+          "new": 0.7233798859869922,
+          "old": 0.057476,
+          "why": "Artin-Schreier solve by a precomputed linear map, field-independent"
+        },
+        "ns_per_canon": {
+          "F": null,
+          "F_measured": null,
+          "R": 12.58577294848271,
+          "class": "c",
+          "host_drift": 0.7694973013528781,
+          "new": 0.8752901654751785,
+          "old": 0.069546,
+          "why": "FrobeniusCanon: Gf2 squarings and comparisons, the tuned kernel"
+        },
+        "ns_per_double": {
+          "F": null,
+          "F_measured": null,
+          "R": null,
+          "class": "a",
+          "host_drift": 0.9879306177259568,
+          "new": 1.013927,
+          "old": 1.013927,
+          "why": "counted group operation: a doubling is one reference addition's work and stays about 1 GAE"
+        },
+        "ns_per_frobenius": {
+          "F": null,
+          "F_measured": null,
+          "R": 12.58577294848271,
+          "class": "c",
+          "host_drift": 0.9082025580722699,
+          "new": 0.6007818716958221,
+          "old": 0.047735,
+          "why": "FastCurve::frobenius_k: Gf2::sqr, the tuned addition's own kernel"
+        },
+        "ns_per_lookup": {
+          "F": null,
+          "F_measured": null,
+          "R": 12.58577294848271,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.1075831871636302,
+          "old": 0.008548,
+          "why": "hash probe, field-independent"
+        },
+        "ns_per_row_op": {
+          "F": 1.0,
+          "F_measured": 0.8526077187696012,
+          "R": 12.58577294848271,
+          "class": "b",
+          "host_drift": 0.9564539605186653,
+          "new": 0.1428736945111757,
+          "old": 0.011352,
+          "why": "calibrate_row_ops: mulmod/submod (u128 %) modulo the subgroup order"
+        },
+        "ns_per_word_xor": {
+          "F": null,
+          "F_measured": null,
+          "R": 12.58577294848271,
+          "class": "c",
+          "host_drift": 1.4739089807319772,
+          "new": 0.01988552125860268,
+          "old": 0.00158,
+          "why": "64-bit XOR, field-independent"
+        }
+      }
+    },
+    "koblitz/K_1 / GF(2^23)": {
+      "R": 14.75945566252608,
+      "ns_per_add_reference": 234.95589,
+      "ns_per_add_tuned": 15.9190078125,
+      "units": {
+        "ns_per_as_solve": {
+          "F": null,
+          "F_measured": null,
+          "R": 14.75945566252608,
+          "class": "c",
+          "host_drift": 1.5146482338038758,
+          "new": 0.9600583124803338,
+          "old": 0.065047,
+          "why": "Artin-Schreier solve by a precomputed linear map, field-independent"
+        },
+        "ns_per_canon": {
+          "F": null,
+          "F_measured": null,
+          "R": 14.75945566252608,
+          "class": "c",
+          "host_drift": 0.6676154825201392,
+          "new": 1.0275828221363907,
+          "old": 0.069622,
+          "why": "FrobeniusCanon: Gf2 squarings and comparisons, the tuned kernel"
+        },
+        "ns_per_double": {
+          "F": null,
+          "F_measured": null,
+          "R": null,
+          "class": "a",
+          "host_drift": 1.000349955607893,
+          "new": 1.000377,
+          "old": 1.000377,
+          "why": "counted group operation: a doubling is one reference addition's work and stays about 1 GAE"
+        },
+        "ns_per_frobenius": {
+          "F": null,
+          "F_measured": null,
+          "R": 14.75945566252608,
+          "class": "c",
+          "host_drift": 0.9607097157254083,
+          "new": 0.5765338570895937,
+          "old": 0.039062,
+          "why": "FastCurve::frobenius_k: Gf2::sqr, the tuned addition's own kernel"
+        },
+        "ns_per_lookup": {
+          "F": null,
+          "F_measured": null,
+          "R": 14.75945566252608,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.13023743676613012,
+          "old": 0.008824,
+          "why": "hash probe, field-independent"
+        },
+        "ns_per_row_op": {
+          "F": 1.0,
+          "F_measured": 0.9070171220658596,
+          "R": 14.75945566252608,
+          "class": "b",
+          "host_drift": 0.969608942572745,
+          "new": 0.13749908895209295,
+          "old": 0.009316,
+          "why": "calibrate_row_ops: mulmod/submod (u128 %) modulo the subgroup order"
+        },
+        "ns_per_word_xor": {
+          "F": null,
+          "F_measured": null,
+          "R": 14.75945566252608,
+          "class": "c",
+          "host_drift": 1.6778587665265392,
+          "new": 0.01769658733936877,
+          "old": 0.001199,
+          "why": "64-bit XOR, field-independent"
+        }
+      }
+    },
+    "koblitz/K_1 / GF(2^29)": {
+      "R": 16.711911382449777,
+      "ns_per_add_reference": 274.249255,
+      "ns_per_add_tuned": 16.41040625,
+      "units": {
+        "ns_per_as_solve": {
+          "F": null,
+          "F_measured": null,
+          "R": 16.711911382449777,
+          "class": "c",
+          "host_drift": 1.6094703023439394,
+          "new": 1.2188832566789745,
+          "old": 0.072935,
+          "why": "Artin-Schreier solve by a precomputed linear map, field-independent"
+        },
+        "ns_per_canon": {
+          "F": null,
+          "F_measured": null,
+          "R": 16.711911382449777,
+          "class": "c",
+          "host_drift": 0.6510087046619714,
+          "new": 1.1925452843402338,
+          "old": 0.071359,
+          "why": "FrobeniusCanon: Gf2 squarings and comparisons, the tuned kernel"
+        },
+        "ns_per_double": {
+          "F": null,
+          "F_measured": null,
+          "R": null,
+          "class": "a",
+          "host_drift": 0.9774245290213314,
+          "new": 1.0307,
+          "old": 1.0307,
+          "why": "counted group operation: a doubling is one reference addition's work and stays about 1 GAE"
+        },
+        "ns_per_frobenius": {
+          "F": null,
+          "F_measured": null,
+          "R": 16.711911382449777,
+          "class": "c",
+          "host_drift": 0.9437144031810301,
+          "new": 0.571681064570842,
+          "old": 0.034208,
+          "why": "FastCurve::frobenius_k: Gf2::sqr, the tuned addition's own kernel"
+        },
+        "ns_per_lookup": {
+          "F": null,
+          "F_measured": null,
+          "R": 16.711911382449777,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.1574262052226769,
+          "old": 0.00942,
+          "why": "hash probe, field-independent"
+        },
+        "ns_per_row_op": {
+          "F": 1.0,
+          "F_measured": 0.9067022975273912,
+          "R": 16.711911382449777,
+          "class": "b",
+          "host_drift": 1.051231491544129,
+          "new": 0.12360129658459855,
+          "old": 0.007396,
+          "why": "calibrate_row_ops: mulmod/submod (u128 %) modulo the subgroup order"
+        },
+        "ns_per_word_xor": {
+          "F": null,
+          "F_measured": null,
+          "R": 16.711911382449777,
+          "class": "c",
+          "host_drift": 1.6305676057784375,
+          "new": 0.01779818562230901,
+          "old": 0.001065,
+          "why": "64-bit XOR, field-independent"
+        }
+      }
+    },
+    "prime/bench-10bit": {
+      "R": 3.1643100793307055,
+      "ns_per_add_reference": 71.520305,
+      "ns_per_add_tuned": 22.6021796875,
+      "units": {
+        "ns_per_double": {
+          "F": null,
+          "F_measured": null,
+          "R": null,
+          "class": "a",
+          "host_drift": 1.0633821734312465,
+          "new": 0.961003,
+          "old": 0.961003,
+          "why": "counted group operation: a doubling is one reference addition's work and stays about 1 GAE"
+        },
+        "ns_per_inversion": {
+          "F": 3.627798609551128,
+          "F_measured": 3.627798609551128,
+          "R": 3.1643100793307055,
+          "class": "b",
+          "host_drift": 1.2383811915857517,
+          "new": 0.38216747645754684,
+          "new_if_inversions_not_batched": 1.386426639708352,
+          "old": 0.438145,
+          "why": "invmod / Gf2::inv, the reference addition's inversion; independent call sites share one inversion"
+        },
+        "ns_per_legendre": {
+          "F": null,
+          "F_measured": null,
+          "R": 3.1643100793307055,
+          "class": "c",
+          "host_drift": 2.60154009450837,
+          "new": 0.8142624197839323,
+          "old": 0.257327,
+          "why": "Jacobi symbol: integer remainders and shifts, no field multiplication"
+        },
+        "ns_per_lookup": {
+          "F": null,
+          "F_measured": null,
+          "R": 3.1643100793307055,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.0392627594643354,
+          "old": 0.012408,
+          "why": "hash probe, field-independent"
+        },
+        "ns_per_row_op": {
+          "F": 1.0,
+          "F_measured": 0.8673801487912681,
+          "R": 3.1643100793307055,
+          "class": "b",
+          "host_drift": 1.7837882086593535,
+          "new": 0.05245160387498578,
+          "old": 0.016576,
+          "why": "calibrate_row_ops: mulmod/submod (u128 %) modulo the subgroup order"
+        },
+        "ns_per_sqrt": {
+          "F": 1.2126972286841307,
+          "F_measured": 1.2126972286841307,
+          "R": 3.1643100793307055,
+          "class": "b",
+          "host_drift": 2.1862832389887905,
+          "new": 0.7889762190809455,
+          "old": 0.302369,
+          "why": "PrimeCurve::sqrt: powmod/Tonelli-Shanks over mulmod (u128 %), the reference addition's arithmetic"
+        },
+        "ns_per_word_xor": {
+          "F": null,
+          "F_measured": null,
+          "R": 3.1643100793307055,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.007474100407379126,
+          "old": 0.002362,
+          "why": "64-bit XOR, field-independent"
+        }
+      }
+    },
+    "prime/bench-12bit": {
+      "R": 3.545288325244829,
+      "ns_per_add_reference": 86.309795,
+      "ns_per_add_tuned": 24.3449296875,
+      "units": {
+        "ns_per_double": {
+          "F": null,
+          "F_measured": null,
+          "R": null,
+          "class": "a",
+          "host_drift": 0.8720280169761315,
+          "new": 1.140115,
+          "old": 1.140115,
+          "why": "counted group operation: a doubling is one reference addition's work and stays about 1 GAE"
+        },
+        "ns_per_inversion": {
+          "F": 4.1668521273092685,
+          "F_measured": 4.1668521273092685,
+          "R": 3.545288325244829,
+          "class": "b",
+          "host_drift": 0.8093431488550223,
+          "new": 0.5926593233508508,
+          "new_if_inversions_not_batched": 2.4695237622741644,
+          "old": 0.696565,
+          "why": "invmod / Gf2::inv, the reference addition's inversion; independent call sites share one inversion"
+        },
+        "ns_per_legendre": {
+          "F": null,
+          "F_measured": null,
+          "R": 3.545288325244829,
+          "class": "c",
+          "host_drift": 1.7324638306814115,
+          "new": 1.5135296747952456,
+          "old": 0.426913,
+          "why": "Jacobi symbol: integer remainders and shifts, no field multiplication"
+        },
+        "ns_per_lookup": {
+          "F": null,
+          "F_measured": null,
+          "R": 3.545288325244829,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.06043298479212335,
+          "old": 0.017046,
+          "why": "hash probe, field-independent"
+        },
+        "ns_per_row_op": {
+          "F": 1.0,
+          "F_measured": 0.8726511571197756,
+          "R": 3.545288325244829,
+          "class": "b",
+          "host_drift": 1.1310439673837227,
+          "new": 0.08216560222587416,
+          "old": 0.023176,
+          "why": "calibrate_row_ops: mulmod/submod (u128 %) modulo the subgroup order"
+        },
+        "ns_per_sqrt": {
+          "F": 1.196624725879913,
+          "F_measured": 1.196624725879913,
+          "R": 3.545288325244829,
+          "class": "b",
+          "host_drift": 1.3873831684096392,
+          "new": 1.5824855252612682,
+          "old": 0.534129,
+          "why": "PrimeCurve::sqrt: powmod/Tonelli-Shanks over mulmod (u128 %), the reference addition's arithmetic"
+        },
+        "ns_per_word_xor": {
+          "F": null,
+          "F_measured": null,
+          "R": 3.545288325244829,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.011447736002215554,
+          "old": 0.003229,
+          "why": "64-bit XOR, field-independent"
+        }
+      }
+    },
+    "prime/bench-14bit": {
+      "R": 3.7751574158398795,
+      "ns_per_add_reference": 84.509155,
+      "ns_per_add_tuned": 22.38559765625,
+      "units": {
+        "ns_per_double": {
+          "F": null,
+          "F_measured": null,
+          "R": null,
+          "class": "a",
+          "host_drift": 0.975510624717659,
+          "new": 1.123766,
+          "old": 1.123766,
+          "why": "counted group operation: a doubling is one reference addition's work and stays about 1 GAE"
+        },
+        "ns_per_inversion": {
+          "F": 4.657359719640689,
+          "F_measured": 4.657359719640689,
+          "R": 3.7751574158398795,
+          "class": "b",
+          "host_drift": 0.7900244568747423,
+          "new": 0.6024116845804314,
+          "new_if_inversions_not_batched": 2.805647914405793,
+          "old": 0.743187,
+          "why": "invmod / Gf2::inv, the reference addition's inversion; independent call sites share one inversion"
+        },
+        "ns_per_legendre": {
+          "F": null,
+          "F_measured": null,
+          "R": 3.7751574158398795,
+          "class": "c",
+          "host_drift": 1.675705105477534,
+          "new": 1.9193466575742322,
+          "old": 0.508415,
+          "why": "Jacobi symbol: integer remainders and shifts, no field multiplication"
+        },
+        "ns_per_lookup": {
+          "F": null,
+          "F_measured": null,
+          "R": 3.7751574158398795,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.059179367650705944,
+          "old": 0.015676,
+          "why": "hash probe, field-independent"
+        },
+        "ns_per_row_op": {
+          "F": 1.0,
+          "F_measured": 0.8785115346715472,
+          "R": 3.7751574158398795,
+          "class": "b",
+          "host_drift": 1.1943237037212908,
+          "new": 0.07827411386002406,
+          "old": 0.020734,
+          "why": "calibrate_row_ops: mulmod/submod (u128 %) modulo the subgroup order"
+        },
+        "ns_per_sqrt": {
+          "F": 1.2348518102413075,
+          "F_measured": 1.2348518102413075,
+          "R": 3.7751574158398795,
+          "class": "b",
+          "host_drift": 1.3902413205510091,
+          "new": 2.0374661473950426,
+          "old": 0.666454,
+          "why": "PrimeCurve::sqrt: powmod/Tonelli-Shanks over mulmod (u128 %), the reference addition's arithmetic"
+        },
+        "ns_per_word_xor": {
+          "F": null,
+          "F_measured": null,
+          "R": 3.7751574158398795,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.01129527098819292,
+          "old": 0.002992,
+          "why": "64-bit XOR, field-independent"
+        }
+      }
+    },
+    "prime/bench-16bit": {
+      "R": 4.152774409923748,
+      "ns_per_add_reference": 93.48583,
+      "ns_per_add_tuned": 22.51165625,
+      "units": {
+        "ns_per_double": {
+          "F": null,
+          "F_measured": null,
+          "R": null,
+          "class": "a",
+          "host_drift": 0.9476217612379764,
+          "new": 1.153611,
+          "old": 1.153611,
+          "why": "counted group operation: a doubling is one reference addition's work and stays about 1 GAE"
+        },
+        "ns_per_inversion": {
+          "F": 5.1395562118232,
+          "F_measured": 5.1395562118232,
+          "R": 4.152774409923748,
+          "class": "b",
+          "host_drift": 0.7991845354637689,
+          "new": 0.6156696459469329,
+          "new_if_inversions_not_batched": 3.1642687532575486,
+          "old": 0.761965,
+          "why": "invmod / Gf2::inv, the reference addition's inversion; independent call sites share one inversion"
+        },
+        "ns_per_legendre": {
+          "F": null,
+          "F_measured": null,
+          "R": 4.152774409923748,
+          "class": "c",
+          "host_drift": 1.6413587713474822,
+          "new": 2.2805998865698744,
+          "old": 0.549175,
+          "why": "Jacobi symbol: integer remainders and shifts, no field multiplication"
+        },
+        "ns_per_lookup": {
+          "F": null,
+          "F_measured": null,
+          "R": 4.152774409923748,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.06458810039754406,
+          "old": 0.015553,
+          "why": "hash probe, field-independent"
+        },
+        "ns_per_row_op": {
+          "F": 1.0,
+          "F_measured": 0.8763358590474861,
+          "R": 4.152774409923748,
+          "class": "b",
+          "host_drift": 1.0996176466830412,
+          "new": 0.08809280355771247,
+          "old": 0.021213,
+          "why": "calibrate_row_ops: mulmod/submod (u128 %) modulo the subgroup order"
+        },
+        "ns_per_sqrt": {
+          "F": 1.127014580961723,
+          "F_measured": 1.127014580961723,
+          "R": 4.152774409923748,
+          "class": "b",
+          "host_drift": 1.3190498374895223,
+          "new": 21.368868900961584,
+          "old": 5.799262,
+          "why": "PrimeCurve::sqrt: powmod/Tonelli-Shanks over mulmod (u128 %), the reference addition's arithmetic"
+        },
+        "ns_per_word_xor": {
+          "F": null,
+          "F_measured": null,
+          "R": 4.152774409923748,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.011935073654120852,
+          "old": 0.002874,
+          "why": "64-bit XOR, field-independent"
+        }
+      }
+    },
+    "prime/bench-18bit": {
+      "R": 4.434562666901508,
+      "ns_per_add_reference": 102.87418,
+      "ns_per_add_tuned": 23.19826953125,
+      "units": {
+        "ns_per_double": {
+          "F": null,
+          "F_measured": null,
+          "R": null,
+          "class": "a",
+          "host_drift": 1.0222454610556826,
+          "new": 1.098813,
+          "old": 1.098813,
+          "why": "counted group operation: a doubling is one reference addition's work and stays about 1 GAE"
+        },
+        "ns_per_inversion": {
+          "F": 5.529085761674626,
+          "F_measured": 5.529085761674626,
+          "R": 4.434562666901508,
+          "class": "b",
+          "host_drift": 0.7782796081912015,
+          "new": 0.6025024686891665,
+          "new_if_inversions_not_batched": 3.331287821003082,
+          "old": 0.75121,
+          "why": "invmod / Gf2::inv, the reference addition's inversion; independent call sites share one inversion"
+        },
+        "ns_per_legendre": {
+          "F": null,
+          "F_measured": null,
+          "R": 4.434562666901508,
+          "class": "c",
+          "host_drift": 1.7631325521441414,
+          "new": 2.2716091606829645,
+          "old": 0.512251,
+          "why": "Jacobi symbol: integer remainders and shifts, no field multiplication"
+        },
+        "ns_per_lookup": {
+          "F": null,
+          "F_measured": null,
+          "R": 4.434562666901508,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.0626648050459852,
+          "old": 0.014131,
+          "why": "hash probe, field-independent"
+        },
+        "ns_per_row_op": {
+          "F": 1.0,
+          "F_measured": 0.8726321565276308,
+          "R": 4.434562666901508,
+          "class": "b",
+          "host_drift": 1.1489478949464158,
+          "new": 0.07917468185485951,
+          "old": 0.017854,
+          "why": "calibrate_row_ops: mulmod/submod (u128 %) modulo the subgroup order"
+        },
+        "ns_per_sqrt": {
+          "F": 2.132411644223646,
+          "F_measured": 2.132411644223646,
+          "R": 4.434562666901508,
+          "class": "b",
+          "host_drift": 2.286825446990353,
+          "new": 1.6146760913472218,
+          "old": 0.776436,
+          "why": "PrimeCurve::sqrt: powmod/Tonelli-Shanks over mulmod (u128 %), the reference addition's arithmetic"
+        },
+        "ns_per_word_xor": {
+          "F": null,
+          "F_measured": null,
+          "R": 4.434562666901508,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.011317003925932649,
+          "old": 0.002552,
+          "why": "64-bit XOR, field-independent"
+        }
+      }
+    },
+    "prime/bench-20bit": {
+      "R": 4.553849057301232,
+      "ns_per_add_reference": 105.86863,
+      "ns_per_add_tuned": 23.2481640625,
+      "units": {
+        "ns_per_double": {
+          "F": null,
+          "F_measured": null,
+          "R": null,
+          "class": "a",
+          "host_drift": 1.0269130322016533,
+          "new": 1.081506,
+          "old": 1.081506,
+          "why": "counted group operation: a doubling is one reference addition's work and stays about 1 GAE"
+        },
+        "ns_per_inversion": {
+          "F": 6.1344769763569,
+          "F_measured": 6.1344769763569,
+          "R": 4.553849057301232,
+          "class": "b",
+          "host_drift": 0.8425137740404292,
+          "new": 0.5596374497197008,
+          "new_if_inversions_not_batched": 3.433083050412596,
+          "old": 0.753886,
+          "why": "invmod / Gf2::inv, the reference addition's inversion; independent call sites share one inversion"
+        },
+        "ns_per_legendre": {
+          "F": null,
+          "F_measured": null,
+          "R": 4.553849057301232,
+          "class": "c",
+          "host_drift": 1.7892548742856778,
+          "new": 2.5014019640812224,
+          "old": 0.549294,
+          "why": "Jacobi symbol: integer remainders and shifts, no field multiplication"
+        },
+        "ns_per_lookup": {
+          "F": null,
+          "F_measured": null,
+          "R": 4.553849057301232,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.05902243763168127,
+          "old": 0.012961,
+          "why": "hash probe, field-independent"
+        },
+        "ns_per_row_op": {
+          "F": 1.0,
+          "F_measured": 0.8781126554558911,
+          "R": 4.553849057301232,
+          "class": "b",
+          "host_drift": 1.1822382120741295,
+          "new": 0.0787223886535664,
+          "old": 0.017287,
+          "why": "calibrate_row_ops: mulmod/submod (u128 %) modulo the subgroup order"
+        },
+        "ns_per_sqrt": {
+          "F": 1.6550208772999029,
+          "F_measured": 1.6550208772999029,
+          "R": 4.553849057301232,
+          "class": "b",
+          "host_drift": 1.9586578364549927,
+          "new": 2.2032729651360112,
+          "old": 0.800743,
+          "why": "PrimeCurve::sqrt: powmod/Tonelli-Shanks over mulmod (u128 %), the reference addition's arithmetic"
+        },
+        "ns_per_word_xor": {
+          "F": null,
+          "F_measured": null,
+          "R": 4.553849057301232,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.010674222190314088,
+          "old": 0.002344,
+          "why": "64-bit XOR, field-independent"
+        }
+      }
+    },
+    "prime/generated-22bit-3290411": {
+      "R": 4.737142075238299,
+      "ns_per_add_reference": 107.240255,
+      "ns_per_add_tuned": 22.63817578125,
+      "units": {
+        "ns_per_double": {
+          "F": null,
+          "F_measured": null,
+          "R": null,
+          "class": "a",
+          "host_drift": 0.9730195624563186,
+          "new": 1.11657,
+          "old": 1.11657,
+          "why": "counted group operation: a doubling is one reference addition's work and stays about 1 GAE"
+        },
+        "ns_per_inversion": {
+          "F": 6.569856822474706,
+          "F_measured": 6.569856822474706,
+          "R": 4.737142075238299,
+          "class": "b",
+          "host_drift": 0.811248572507069,
+          "new": 0.5659609326824772,
+          "new_if_inversions_not_batched": 3.7182822948381204,
+          "old": 0.784921,
+          "why": "invmod / Gf2::inv, the reference addition's inversion; independent call sites share one inversion"
+        },
+        "ns_per_legendre": {
+          "F": null,
+          "F_measured": null,
+          "R": 4.737142075238299,
+          "class": "c",
+          "host_drift": 1.772570391304522,
+          "new": 2.6876033449602232,
+          "old": 0.567347,
+          "why": "Jacobi symbol: integer remainders and shifts, no field multiplication"
+        },
+        "ns_per_lookup": {
+          "F": null,
+          "F_measured": null,
+          "R": 4.737142075238299,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.06733847459951242,
+          "old": 0.014215,
+          "why": "hash probe, field-independent"
+        },
+        "ns_per_row_op": {
+          "F": 1.0,
+          "F_measured": 0.848040536503476,
+          "R": 4.737142075238299,
+          "class": "b",
+          "host_drift": 1.1600306700788616,
+          "new": 0.07950345544872436,
+          "old": 0.016783,
+          "why": "calibrate_row_ops: mulmod/submod (u128 %) modulo the subgroup order"
+        },
+        "ns_per_sqrt": {
+          "F": 1.3701068885862442,
+          "F_measured": 1.3701068885862442,
+          "R": 4.737142075238299,
+          "class": "b",
+          "host_drift": 1.7688795648503706,
+          "new": 2.655929090306423,
+          "old": 0.768165,
+          "why": "PrimeCurve::sqrt: powmod/Tonelli-Shanks over mulmod (u128 %), the reference addition's arithmetic"
+        },
+        "ns_per_word_xor": {
+          "F": null,
+          "F_measured": null,
+          "R": 4.737142075238299,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.010933323909649994,
+          "old": 0.002308,
+          "why": "64-bit XOR, field-independent"
+        }
+      }
+    },
+    "prime/generated-24bit-10935329": {
+      "R": 4.929373821076159,
+      "ns_per_add_reference": 113.02438,
+      "ns_per_add_tuned": 22.92875,
+      "units": {
+        "ns_per_double": {
+          "F": null,
+          "F_measured": null,
+          "R": null,
+          "class": "a",
+          "host_drift": 1.0029705471306805,
+          "new": 1.085001,
+          "old": 1.085001,
+          "why": "counted group operation: a doubling is one reference addition's work and stays about 1 GAE"
+        },
+        "ns_per_inversion": {
+          "F": 7.218252920321165,
+          "F_measured": 7.218252920321165,
+          "R": 4.929373821076159,
+          "class": "b",
+          "host_drift": 0.8891459506795814,
+          "new": 0.546127892644236,
+          "new_if_inversions_not_batched": 3.9420892559481,
+          "old": 0.799714,
+          "why": "invmod / Gf2::inv, the reference addition's inversion; independent call sites share one inversion"
+        },
+        "ns_per_legendre": {
+          "F": null,
+          "F_measured": null,
+          "R": 4.929373821076159,
+          "class": "c",
+          "host_drift": 1.886675615946511,
+          "new": 2.8323935507212554,
+          "old": 0.574595,
+          "why": "Jacobi symbol: integer remainders and shifts, no field multiplication"
+        },
+        "ns_per_lookup": {
+          "F": null,
+          "F_measured": null,
+          "R": 4.929373821076159,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.06821760430987296,
+          "old": 0.013839,
+          "why": "hash probe, field-independent"
+        },
+        "ns_per_row_op": {
+          "F": 1.0,
+          "F_measured": 0.8876875281284611,
+          "R": 4.929373821076159,
+          "class": "b",
+          "host_drift": 1.2443904053942914,
+          "new": 0.07701160720667283,
+          "old": 0.015623,
+          "why": "calibrate_row_ops: mulmod/submod (u128 %) modulo the subgroup order"
+        },
+        "ns_per_sqrt": {
+          "F": 1.3647679261002776,
+          "F_measured": 1.3647679261002776,
+          "R": 4.929373821076159,
+          "class": "b",
+          "host_drift": 1.777375403443882,
+          "new": 16.878954760003584,
+          "old": 4.673181,
+          "why": "PrimeCurve::sqrt: powmod/Tonelli-Shanks over mulmod (u128 %), the reference addition's arithmetic"
+        },
+        "ns_per_word_xor": {
+          "F": null,
+          "F_measured": null,
+          "R": 4.929373821076159,
+          "class": "c",
+          "host_drift": null,
+          "new": 0.010647447453524504,
+          "old": 0.00216,
+          "why": "64-bit XOR, field-independent"
+        }
+      }
+    }
+  },
+  "fallback": "An instance with no entry here keeps the factors measured on the host for that run, and the report names the units that fell back, so a row priced the old way says so.",
+  "flags": {
+    "icv1-f2m23-t5197-69e76b73": "legacy ratios from an Apple M4 Pro under load 30-150, not the Xeon of every other row"
+  },
+  "gae_definition": "tuned-batched-affine-add/v1",
+  "host": "Intel(R) Xeon(R) Processor @ 2.80GHz",
+  "instances": {
+    "char2/random-binary-n15-b524b": {
+      "ns_per_as_solve": 0.5415084570997233,
+      "ns_per_double": 0.994514,
+      "ns_per_frobenius": 0.6294438317116192,
+      "ns_per_lookup": 0.1163429377175967,
+      "ns_per_row_op": 0.15099270230090797,
+      "ns_per_s4_pair": 30.483170729495907,
+      "ns_per_word_xor": 0.022155277296139374
+    },
+    "char2/random-binary-n18-b6507": {
+      "ns_per_as_solve": 0.4184915722843068,
+      "ns_per_double": 0.992807,
+      "ns_per_frobenius": 0.6585292146336348,
+      "ns_per_lookup": 0.11182501402774678,
+      "ns_per_row_op": 0.1461993365971894,
+      "ns_per_s4_pair": 35.93731917389118,
+      "ns_per_word_xor": 0.020713845298787815
+    },
+    "char2/random-binary-n21-b1b6f3b": {
+      "ns_per_as_solve": 0.7744706290437043,
+      "ns_per_double": 1.004813,
+      "ns_per_frobenius": 0.5408227219192541,
+      "ns_per_lookup": 0.10423031089074956,
+      "ns_per_row_op": 0.13248921639747538,
+      "ns_per_s4_pair": 36.031435556479714,
+      "ns_per_word_xor": 0.018327333643854787
+    },
+    "char2/random-binary-n24-b5fc9da": {
+      "ns_per_as_solve": 0.5485817614280841,
+      "ns_per_double": 1.004237,
+      "ns_per_frobenius": 0.6230513508368041,
+      "ns_per_lookup": 0.10527708809544142,
+      "ns_per_row_op": 0.15114637599882952,
+      "ns_per_s4_pair": 44.40795238924475,
+      "ns_per_word_xor": 0.020206734759201806
+    },
+    "char2/random-binary-n27-b845462": {
+      "ns_per_as_solve": 1.201127213428095,
+      "ns_per_double": 1.006677,
+      "ns_per_frobenius": 0.5896324907768227,
+      "ns_per_lookup": 0.11590221742624884,
+      "ns_per_row_op": 0.12292535263622308,
+      "ns_per_s4_pair": 50.04638963140258,
+      "ns_per_word_xor": 0.018202332316208426
+    },
+    "koblitz/K_0 / GF(2^13)": {
+      "ns_per_as_solve": 0.5118085957353827,
+      "ns_per_canon": 0.6345766382539081,
+      "ns_per_double": 0.993644,
+      "ns_per_frobenius": 0.675719387286638,
+      "ns_per_lookup": 0.11929696692544073,
+      "ns_per_row_op": 0.16910240029134457,
+      "ns_per_word_xor": 0.023047141690106944
+    },
+    "koblitz/K_0 / GF(2^15)": {
+      "ns_per_as_solve": 0.5750267739936493,
+      "ns_per_canon": 0.7043868875002025,
+      "ns_per_double": 0.978255,
+      "ns_per_frobenius": 0.6204372770898685,
+      "ns_per_lookup": 0.11243043422213847,
+      "ns_per_row_op": 0.15330941590889585,
+      "ns_per_s4_pair": 27.951556933912986,
+      "ns_per_word_xor": 0.02157766502916642
+    },
+    "koblitz/K_0 / GF(2^23)": {
+      "ns_per_as_solve": 1.7762981377704343,
+      "ns_per_canon": 0.41315602937374984,
+      "ns_per_double": 1.176715,
+      "ns_per_frobenius": 0.38307516301809685,
+      "ns_per_lookup": 0.0,
+      "ns_per_row_op": 0.14118289320102698,
+      "ns_per_word_xor": 0.017256840038432784
+    },
+    "koblitz/K_0 / GF(2^31)": {
+      "ns_per_as_solve": 1.4237859826122485,
+      "ns_per_canon": 1.349576730942654,
+      "ns_per_double": 0.990824,
+      "ns_per_frobenius": 0.5692912348318432,
+      "ns_per_lookup": 0.1374983842248808,
+      "ns_per_row_op": 0.12443814126405002,
+      "ns_per_s4_pair": 53.89790328360864,
+      "ns_per_word_xor": 0.017834365387689073
+    },
+    "koblitz/K_0 / GF(2^37)": {
+      "ns_per_as_solve": 1.7444056190202617,
+      "ns_per_canon": 1.3845741614237528,
+      "ns_per_double": 0.995471,
+      "ns_per_frobenius": 0.5408831973106167,
+      "ns_per_lookup": 0.12137059481339008,
+      "ns_per_row_op": 0.0809112794266507,
+      "ns_per_word_xor": 0.01616786964169679
+    },
+    "koblitz/K_0 / GF(2^39)": {
+      "ns_per_as_solve": 1.9578023726878857,
+      "ns_per_canon": 1.5698095988011538,
+      "ns_per_double": 1.049355,
+      "ns_per_frobenius": 0.5899919780009006,
+      "ns_per_lookup": 0.1320731238547694,
+      "ns_per_row_op": 0.09520619271465966,
+      "ns_per_word_xor": 0.016623694788884966
+    },
+    "koblitz/K_0 / GF(2^41)": {
+      "ns_per_as_solve": 2.132710925449242,
+      "ns_per_canon": 1.5377538157626267,
+      "ns_per_double": 1.004565,
+      "ns_per_frobenius": 0.5491992996109873,
+      "ns_per_lookup": 0.1339371431978351,
+      "ns_per_row_op": 0.07704937196943352,
+      "ns_per_word_xor": 0.014759902742438392
+    },
+    "koblitz/K_1 / GF(2^11)": {
+      "ns_per_as_solve": 0.43126048302512954,
+      "ns_per_canon": 0.5584432777876913,
+      "ns_per_double": 0.981483,
+      "ns_per_frobenius": 0.6715862443503607,
+      "ns_per_lookup": 0.12877941304981785,
+      "ns_per_row_op": 0.1710724431155016,
+      "ns_per_word_xor": 0.0237757288428341
+    },
+    "koblitz/K_1 / GF(2^17)": {
+      "ns_per_as_solve": 0.6744845553994843,
+      "ns_per_canon": 0.8388345161695288,
+      "ns_per_double": 1.042791,
+      "ns_per_frobenius": 0.6006541914481971,
+      "ns_per_lookup": 0.12012405864189367,
+      "ns_per_row_op": 0.15599969462985458,
+      "ns_per_word_xor": 0.02207905282534665
+    },
+    "koblitz/K_1 / GF(2^19)": {
+      "ns_per_as_solve": 0.7233798859869922,
+      "ns_per_canon": 0.8752901654751785,
+      "ns_per_double": 1.013927,
+      "ns_per_frobenius": 0.6007818716958221,
+      "ns_per_lookup": 0.1075831871636302,
+      "ns_per_row_op": 0.1428736945111757,
+      "ns_per_word_xor": 0.01988552125860268
+    },
+    "koblitz/K_1 / GF(2^23)": {
+      "ns_per_as_solve": 0.9600583124803338,
+      "ns_per_canon": 1.0275828221363907,
+      "ns_per_double": 1.000377,
+      "ns_per_frobenius": 0.5765338570895937,
+      "ns_per_lookup": 0.13023743676613012,
+      "ns_per_row_op": 0.13749908895209295,
+      "ns_per_word_xor": 0.01769658733936877
+    },
+    "koblitz/K_1 / GF(2^29)": {
+      "ns_per_as_solve": 1.2188832566789745,
+      "ns_per_canon": 1.1925452843402338,
+      "ns_per_double": 1.0307,
+      "ns_per_frobenius": 0.571681064570842,
+      "ns_per_lookup": 0.1574262052226769,
+      "ns_per_row_op": 0.12360129658459855,
+      "ns_per_word_xor": 0.01779818562230901
+    },
+    "prime/bench-10bit": {
+      "ns_per_double": 0.961003,
+      "ns_per_inversion": 0.38216747645754684,
+      "ns_per_legendre": 0.8142624197839323,
+      "ns_per_lookup": 0.0392627594643354,
+      "ns_per_row_op": 0.05245160387498578,
+      "ns_per_sqrt": 0.7889762190809455,
+      "ns_per_word_xor": 0.007474100407379126
+    },
+    "prime/bench-12bit": {
+      "ns_per_double": 1.140115,
+      "ns_per_inversion": 0.5926593233508508,
+      "ns_per_legendre": 1.5135296747952456,
+      "ns_per_lookup": 0.06043298479212335,
+      "ns_per_row_op": 0.08216560222587416,
+      "ns_per_sqrt": 1.5824855252612682,
+      "ns_per_word_xor": 0.011447736002215554
+    },
+    "prime/bench-14bit": {
+      "ns_per_double": 1.123766,
+      "ns_per_inversion": 0.6024116845804314,
+      "ns_per_legendre": 1.9193466575742322,
+      "ns_per_lookup": 0.059179367650705944,
+      "ns_per_row_op": 0.07827411386002406,
+      "ns_per_sqrt": 2.0374661473950426,
+      "ns_per_word_xor": 0.01129527098819292
+    },
+    "prime/bench-16bit": {
+      "ns_per_double": 1.153611,
+      "ns_per_inversion": 0.6156696459469329,
+      "ns_per_legendre": 2.2805998865698744,
+      "ns_per_lookup": 0.06458810039754406,
+      "ns_per_row_op": 0.08809280355771247,
+      "ns_per_sqrt": 21.368868900961584,
+      "ns_per_word_xor": 0.011935073654120852
+    },
+    "prime/bench-18bit": {
+      "ns_per_double": 1.098813,
+      "ns_per_inversion": 0.6025024686891665,
+      "ns_per_legendre": 2.2716091606829645,
+      "ns_per_lookup": 0.0626648050459852,
+      "ns_per_row_op": 0.07917468185485951,
+      "ns_per_sqrt": 1.6146760913472218,
+      "ns_per_word_xor": 0.011317003925932649
+    },
+    "prime/bench-20bit": {
+      "ns_per_double": 1.081506,
+      "ns_per_inversion": 0.5596374497197008,
+      "ns_per_legendre": 2.5014019640812224,
+      "ns_per_lookup": 0.05902243763168127,
+      "ns_per_row_op": 0.0787223886535664,
+      "ns_per_sqrt": 2.2032729651360112,
+      "ns_per_word_xor": 0.010674222190314088
+    },
+    "prime/generated-22bit-3290411": {
+      "ns_per_double": 1.11657,
+      "ns_per_inversion": 0.5659609326824772,
+      "ns_per_legendre": 2.6876033449602232,
+      "ns_per_lookup": 0.06733847459951242,
+      "ns_per_row_op": 0.07950345544872436,
+      "ns_per_sqrt": 2.655929090306423,
+      "ns_per_word_xor": 0.010933323909649994
+    },
+    "prime/generated-24bit-10935329": {
+      "ns_per_double": 1.085001,
+      "ns_per_inversion": 0.546127892644236,
+      "ns_per_legendre": 2.8323935507212554,
+      "ns_per_lookup": 0.06821760430987296,
+      "ns_per_row_op": 0.07701160720667283,
+      "ns_per_sqrt": 16.878954760003584,
+      "ns_per_word_xor": 0.010647447453524504
+    }
+  },
+  "legacy_host": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+  "method": "ratio_new = ratio_old x R / F; R = reference/tuned addition on this host (sweep), F = measured field speedup for class (b) units, 1 for class (c), class (a) unchanged. Generated by `gae-reference retable`.",
+  "regenerate": "gae-reference field --from-calibration > research/tuned_gae_20261020/sweep/field.jsonl; gae-reference retable",
+  "sensitivity": {
+    "as_solve": {
+      "max": 1.8976979378370071,
+      "median": 1.5191046427955834,
+      "min": 0.7989809884601881,
+      "rows": 17
+    },
+    "canon": {
+      "max": 1.6343590087457986,
+      "median": 0.7694973013528781,
+      "min": 0.5186697761556041,
+      "rows": 12
+    },
+    "double": {
+      "max": 1.3745516651881162,
+      "median": 0.9931482348989316,
+      "min": 0.8430394917682612,
+      "rows": 25
+    },
+    "frobenius": {
+      "max": 1.4320055400008753,
+      "median": 0.9190347113529598,
+      "min": 0.8029117090360701,
+      "rows": 17
+    },
+    "inversion": {
+      "max": 1.2383811915857517,
+      "median": 0.811248572507069,
+      "min": 0.7782796081912015,
+      "rows": 8
+    },
+    "legendre": {
+      "max": 2.60154009450837,
+      "median": 1.772570391304522,
+      "min": 1.6413587713474822,
+      "rows": 8
+    },
+    "row_op": {
+      "max": 2.0280318936643744,
+      "median": 1.1310439673837227,
+      "min": 0.7901849993956199,
+      "rows": 25
+    },
+    "sqrt": {
+      "max": 2.286825446990353,
+      "median": 1.777375403443882,
+      "min": 1.3190498374895223,
+      "rows": 8
+    },
+    "word_xor": {
+      "max": 2.1079508889229523,
+      "median": 1.6005211831984354,
+      "min": 1.2161179853671957,
+      "rows": 17
+    }
+  },
+  "sources": {
+    "field": {
+      "path": "research/tuned_gae_20261020/sweep/field.jsonl",
+      "sha256": "7810155befb98cd74870558492d08094160c1ec93bee0300a0dc10d594a0f13e"
+    },
+    "legacy_calibration": {
+      "path": "docs/ic/calibration.json",
+      "sha256": "f0c0a873dc7b27c8baa86c5ac1debe9643d799e93ce0110175d0622cc8f7fff2"
+    },
+    "legacy_full_prices": {
+      "path": "src/cryptanalysis/ecbench/full_prices.json",
+      "sha256": "3838bb9174e4c6f908db61484aa08ebb65442c9df362e72159702f39d179b5e1"
+    },
+    "sweep": {
+      "path": "research/tuned_gae_20261020/sweep/gae_reference.jsonl",
+      "sha256": "af60671875d75f69498286a104709e7965ec0b01dd1c937c9ef4e732edad27a9"
+    }
+  },
+  "unit": "ns_per_<native unit> / ns_per_tuned_add, dimensionless (double stays a counted group operation)",
+  "what": "Calibration ratios of the boundary ledger re-expressed in the tuned unit: nanoseconds per native operation divided by nanoseconds per tuned batched affine addition. Same schema as calibration.json; not read by Calibration::pin until the switch in research/tuned_gae_20261020/SWITCH_PLAN.md is made."
+}
