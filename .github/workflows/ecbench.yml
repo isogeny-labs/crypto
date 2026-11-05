@@ -305,7 +305,7 @@ jobs:
       - name: Unit tests
         run: cargo test --release --lib ecbench
       - name: Integration tests
-        run: cargo test --release --test ecbench --test aps_ecbench
+        run: cargo test --release --test ecbench --test aps_ecbench --test aps_export_bridge
       - name: Exact n-1 and large-prime integration tests
         run: cargo test --release --test ecbench_large_prime
       - name: Build
