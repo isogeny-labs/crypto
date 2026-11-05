@@ -1,0 +1,146 @@
+{
+  "schema": "native-point-hash.launch-readiness-draft/v1",
+  "standing": "Producer observations only; no signed PCC verdict or measurement result.",
+  "recorded_at": "2026-11-05T06:22:29.685275+00:00",
+  "study_id": "XP-20261105-native-point-hashing",
+  "launch_requested": true,
+  "source_revision_inspected": "42f1564f967e1bfb45413bd56bb2fbaa16d1c0cb",
+  "main_revision_inspected": "2d33e9c068c0f2b3226893017c8ea48548cc0749",
+  "requested_scope": "Five component studies followed by native ECBench confirmation; first stage is the 1920 timed arm-batch point-table pilot.",
+  "state": "blocked_before_submission",
+  "read_only_checks": [
+    {
+      "name": "aws_caller",
+      "argv": [
+        "aws",
+        "sts",
+        "get-caller-identity",
+        "--region",
+        "us-east-2",
+        "--no-cli-pager",
+        "--cli-connect-timeout",
+        "5",
+        "--cli-read-timeout",
+        "10"
+      ],
+      "nonsecret_env": {
+        "AWS_EC2_METADATA_DISABLED": "true",
+        "AWS_MAX_ATTEMPTS": "1"
+      },
+      "exit_code": 253,
+      "stdout": "",
+      "stderr": "\naws: [ERROR]: An error occurred (NoCredentials): Unable to locate credentials. You can configure credentials by running \"aws login\".\n"
+    },
+    {
+      "name": "github_experiment_workflow",
+      "argv": [
+        "gh",
+        "api",
+        "repos/isogeny-labs/crypto/actions/workflows/isolab-experiment.yml",
+        "--jq",
+        "{id,name,state,path}"
+      ],
+      "nonsecret_env": {},
+      "exit_code": 0,
+      "stdout": "{\"id\":390723163,\"name\":\"Iso Lab experiment\",\"path\":\".github/workflows/isolab-experiment.yml\",\"state\":\"active\"}\n",
+      "stderr": ""
+    },
+    {
+      "name": "github_checkpoint_workflow",
+      "argv": [
+        "gh",
+        "api",
+        "repos/isogeny-labs/crypto/actions/workflows/isolab-source-checkpoint.yml",
+        "--jq",
+        "{id,name,state,path}"
+      ],
+      "nonsecret_env": {},
+      "exit_code": 1,
+      "stdout": "{\"message\":\"Not Found\",\"documentation_url\":\"https://docs.github.com/rest/actions/workflows#get-a-workflow\",\"status\":\"404\"}",
+      "stderr": "gh: Not Found (HTTP 404)\n"
+    },
+    {
+      "name": "checkpoint_control_files_on_main",
+      "argv": [
+        "git",
+        "ls-tree",
+        "2d33e9c068c0f2b3226893017c8ea48548cc0749",
+        ".github/workflows/isolab-source-checkpoint.yml",
+        "taskq/deploy/eks-karpenter/checkpoint-source"
+      ],
+      "nonsecret_env": {},
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "cloud_runtime_observation": {
+    "observations_current": true,
+    "network_policy": {
+      "mode": "unrestricted",
+      "state": "enforced"
+    },
+    "secrets": [],
+    "runtime_variables": [],
+    "outbound_identities": [],
+    "oic_manifest_configured": false,
+    "source": "cloud_environment.environment_status and selector-presence inspection during this launch request"
+  },
+  "blockers": [
+    {
+      "id": "study_implementation",
+      "state": "incomplete",
+      "detail": "card.run.argv still names unimplemented-native-point-hash-study; native driver and independent exact checker are absent.",
+      "next": "Implement and qualify the planned arms and checker without taking scientific measurements."
+    },
+    {
+      "id": "protocol",
+      "state": "unfrozen",
+      "detail": "The backlog card has no canonical protocol/blob, driver/checker manifest, frozen analysis or complete qualification-attempt flow.",
+      "next": "Complete and freeze the actual first-study canonical protocol and analysis before data."
+    },
+    {
+      "id": "merged_source",
+      "state": "pending",
+      "detail": "PR 2984 is open and unmergeable; the protected ledger/journal exception remains unanswered.",
+      "next": "Resolve through the existing review/owner process; do not rewrite protected files."
+    },
+    {
+      "id": "budget",
+      "state": "unknown",
+      "account_headroom": null,
+      "lane_charged_plus_reserved_headroom": null,
+      "whole_job_dollar_cap": null,
+      "next": "Read current account/lane budgets and prices through an already authorized runner; admit a finite whole-job envelope before spending."
+    },
+    {
+      "id": "aws_execution",
+      "state": "no_configured_identity",
+      "next": "Use an existing authenticated connection/runner; never use chat credentials or provision an identity implicitly."
+    },
+    {
+      "id": "source_checkpoint",
+      "state": "no_current_readback",
+      "detail": "Checkpoint control files are absent from inspected main and workflow lookup returns 404. No upload was attempted.",
+      "next": "Qualify the maintained checkpoint transport and retain exact current-source write/readback after budget admission."
+    },
+    {
+      "id": "native_image_execution",
+      "state": "not_admitted",
+      "image_digest": null,
+      "native_binary_sha256": null,
+      "next": "Publish/admit the exact tested source image through the maintained authenticated route, then require native L2/A-A/replay."
+    }
+  ],
+  "submission": {
+    "submitted": false,
+    "github_dispatch_id": null,
+    "codebuild_id": null,
+    "job_uid": null,
+    "pod_uid": null,
+    "results_uri": null
+  },
+  "scientific_data_taken": false,
+  "original_frozen_panel": "unchanged; this request does not substitute or modify the 1728-attempt panel",
+  "stop_rule_source": ".agents/skills/isolab-eks/SKILL.md: Stop new launches when the budget is exhausted or its remaining balance is unknown."
+}

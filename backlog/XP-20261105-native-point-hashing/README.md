@@ -1,10 +1,14 @@
 # Native point hashing: proposed experiments
 
-Design date: 2026-11-05. Status: **draft; no measurements taken, no job posted**.
-The [card](card.json) is deliberately unready: the driver, independent checker,
+Design date: 2026-11-05. Status: **launch requested; blocked before submission**.
+The [launch-readiness record](launch-readiness-20261105.json) retains the
+read-only admission checks and next actions. The [card](card.json) is unready:
+the driver, independent checker,
 canonical protocols, power analysis and execution admission remain to be built
 or completed. Numbers below specify proposed workloads and limits, not results
-or runtime predictions. This request is to devise experiments.
+or runtime predictions. The initial request was experiment design; the later
+launch request authorizes execution once the implementation and admission
+prerequisites are satisfied. No paid build or scientific submission was made.
 
 ## Question and deliverables
 
