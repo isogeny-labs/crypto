@@ -1,4 +1,3 @@
-use crypto_lib::cryptanalysis::ecbench::exact_scalar::ExactScalar;
 use std::collections::BTreeMap;
 use std::path::Path;
 use std::process::Command;

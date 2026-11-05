@@ -57,9 +57,9 @@ use crate::cryptanalysis::ecbench::methods::{
     MethodSpec, PhaseRecord, ResolvedMethod, SolveReport,
 };
 use crate::cryptanalysis::ecbench::record::{
-    check_line_seal, child_main, expected_automorphisms, f4_accounting_note, f6_tree_note, floor_s,
-    from_str_legacy_floats, grade_for_version, json_roundtrip, ChildInput, Grade, GradeInput,
-    Record, CHILD_INPUT_SCHEMA,
+    check_line_seal, child_main, expected_automorphisms, f4_accounting_note, f6_tree_note,
+    f6_tree_version, floor_s, from_str_legacy_floats, grade_for_version, json_roundtrip,
+    ChildInput, Grade, GradeInput, Record, CHILD_INPUT_SCHEMA, F6_TREE_VERSION,
 };
 use crate::cryptanalysis::ecbench::runner::{read_session, PlanDoc, Session};
 use crate::cryptanalysis::ecbench::spec::{plan, Arm, Execution, Level, Plan, Spec};
@@ -607,6 +607,21 @@ pub fn replay_record(dir: &Path, seq: u64) -> Result<(bool, String), String> {
 /// compared field wins and is named in the detail; if none does, the detail
 /// is the current accounting's.
 pub fn replay_with_accounting(
+    input_json: &str,
+    r: &Record,
+    host: &HostCapsule,
+    session: &crate::cryptanalysis::ecbench::runner::Session,
+) -> (bool, String) {
+    // A session recorded before the F6-IC few-candidate closure searched the
+    // older tree; replay it with that tree (every legacy profile predates it).
+    let older_tree = f6_tree_version(&session.accounting_versions) < F6_TREE_VERSION;
+    crate::cryptanalysis::koblitz_index_calculus::set_f6_tree_v1(older_tree);
+    let result = replay_with_accounting_inner(input_json, r, host, session);
+    crate::cryptanalysis::koblitz_index_calculus::set_f6_tree_v1(false);
+    result
+}
+
+fn replay_with_accounting_inner(
     input_json: &str,
     r: &Record,
     host: &HostCapsule,

@@ -7524,6 +7524,17 @@ fn partial_support_enabled() -> bool {
         && *ENABLED.get_or_init(|| std::env::var("KIC_F6_PARTIAL_SUPPORT").as_deref() != Ok("0"))
 }
 
+thread_local! {
+    static F6_TREE_V1: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Search F6-IC trees as before the few-candidate closure (tree v1,
+/// `ecbench::record::F6_TREE_KEY`), on this thread: the audit turns this on
+/// to replay a session that recorded an older tree version.
+pub fn set_f6_tree_v1(on: bool) {
+    F6_TREE_V1.with(|c| c.set(on));
+}
+
 /// Largest number of base codes a summand's assigned bits may leave for
 /// the gate to close the node exactly (the few-candidate closure in
 /// [`F6GeometricGate::decide`]); default 64, `KIC_F6_FEW_CANDIDATES=0`
@@ -7535,7 +7546,15 @@ fn partial_support_enabled() -> bool {
 /// the pair-index arm.  The lookups being identical says the algebra
 /// ruled out no candidate on those cells; this arm is the pair-index
 /// meet-in-the-middle scan once the closure is on.
+///
+/// Off while [`set_f6_tree_v1`] is in force (a replay of a record made before
+/// the closure existed) and under the `pre-1646` legacy accounting.
 fn few_candidate_limit() -> usize {
+    if F6_TREE_V1.with(|c| c.get())
+        || crate::cryptanalysis::koblitz_groebner::legacy_pre_1646_active()
+    {
+        return 0;
+    }
     static LIMIT: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
     *LIMIT.get_or_init(|| {
         std::env::var("KIC_F6_FEW_CANDIDATES")
@@ -22099,6 +22118,49 @@ mod tests {
             }
         }
         assert!(hits > 0, "no target decomposed");
+    }
+
+    /// A replay of a session recorded before the few-candidate closure
+    /// (`set_f6_tree_v1`), and the `pre-1646` legacy accounting, search the
+    /// older tree: the same relations, with the closure's shrinking of the
+    /// tree undone (the control: the current tree is smaller).
+    #[test]
+    fn f6_tree_v1_and_pre_1646_turn_the_few_candidate_closure_off() {
+        use crate::cryptanalysis::koblitz_groebner::set_legacy_pre_1646;
+        let kc = KoblitzCurve::new(0, 9).unwrap();
+        let fb = build_standard_subspace_factor_base(&kc, 4).unwrap();
+        let index_of = fb.index_map();
+        let st = FieldStructure::new(kc.n, &kc.curve.irreducible);
+        let engine = SolverEngine::InheritedF4 { max_degree: 3 };
+        let run = || {
+            let mut reductions = 0usize;
+            let mut found = Vec::new();
+            for scalar in 1..=24u32 {
+                let target = kc.mul(kc.generator(), &BigUint::from(scalar));
+                let (f6, stats) = groebner_decompose_f6_ic_pair_index(
+                    &kc, &fb, &index_of, &st, &target, 3, engine, 20_000,
+                );
+                assert!(!stats.exhausted, "target={scalar}");
+                reductions += stats.reductions;
+                found.push(f6);
+            }
+            (reductions, found)
+        };
+        let (current, current_found) = run();
+        set_f6_tree_v1(true);
+        let (v1, v1_found) = run();
+        set_f6_tree_v1(false);
+        // With tree v1 off again, the pre-1646 accounting still has no closure.
+        assert!(few_candidate_limit() > 0);
+        set_legacy_pre_1646(true);
+        let closure_under_legacy = few_candidate_limit();
+        set_legacy_pre_1646(false);
+        assert!(
+            current < v1,
+            "control: the closure did not shrink the tree ({current} vs {v1})"
+        );
+        assert_eq!(v1_found, current_found);
+        assert_eq!(closure_under_legacy, 0);
     }
 
     #[test]

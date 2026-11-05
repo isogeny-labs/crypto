@@ -78,10 +78,16 @@ pub const F6_TREE_KEY: &str = "f6_ic_tree";
 ///   group operations, fewer word XORs.
 pub const F6_TREE_VERSION: u32 = 2;
 
+/// The F6-IC tree version a session recorded; a session without the key
+/// predates it and searched tree v1.
+pub fn f6_tree_version(recorded: &BTreeMap<String, u32>) -> u32 {
+    recorded.get(F6_TREE_KEY).copied().unwrap_or(1)
+}
+
 /// What to add to a failed replay of an F6-IC record, given the versions its
 /// session recorded; `None` when the tree version is the one charged now.
 pub fn f6_tree_note(recorded: &BTreeMap<String, u32>) -> Option<String> {
-    let v = recorded.get(F6_TREE_KEY).copied().unwrap_or(1);
+    let v = f6_tree_version(recorded);
     (v != F6_TREE_VERSION).then(|| {
         format!(
             "recorded under F6-IC tree v{v}, this binary closes nodes under v{F6_TREE_VERSION} \
