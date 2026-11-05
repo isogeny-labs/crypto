@@ -440,3 +440,4 @@ All local validation jobs are terminal. Continue local G2 driver bookkeeping
 with mock work only; qualified production supervisor/resume remains open.
 Auto-merge stays paused and unpublished history is preserved.
 
+<!-- Terminal collection above supersedes earlier active-run snapshots. -->

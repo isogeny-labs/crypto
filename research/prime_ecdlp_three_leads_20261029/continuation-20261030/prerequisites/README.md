@@ -37,3 +37,37 @@ Primary sources read before implementation:
 Native fault controls cover abandoned/pending-only attempts; all four terminal
 labels; duplicate and publication collisions; mismatched/torn/oversize records;
 and invalid bindings/I/O failures. No scientific panel is part of these checks.
+
+## Local callback driver and read-only retry inventory
+
+`attempt_driver.rs` now composes the record primitive with caller-supplied gate
+and work callbacks. Attempt creation precedes gate evaluation; refusal omits
+work. Gate/work errors publish Failed when possible, while retaining a second
+publication error if recording also fails. A panic is not converted into a
+success/failure receipt: missing terminal remains unfinished. The inventory
+reads every explicitly supplied unique ID without rewriting old attempts;
+counts and uninterrupted timing are unavailable. It is not an exhaustive scan
+and cannot establish that the caller supplied every historical attempt.
+
+[Native receipt](../validation/main-d30b9e0db-20261105/attempt-driver-checks/receipt.json)
+records11passes (6new driver controls plus5record controls), strict standalone
+clippy and rustfmt exit0. Failure injection covers gate/work errors, failed
+creation before callbacks, pending publication collision preserving both errors,
+mock unwind and separate retry, and invalid/duplicate/mismatched inventory.
+These are unsigned producer observations. [pcc:unverified]
+
+The callback Permit value is supplied data, not proof of checkpoint/protocol/
+runtime qualification. This module starts no process, implements no deadline,
+reaping, remote persistence or actual resume, and is not wired into the PKM CLI.
+Inventory operates within the same trusted-local-directory assumptions as the
+record primitive. Hostile-root/symlink races and process/power-loss durability
+are unqualified. A Completed label still verifies no scalar, relation or count.
+
+Sources reviewed before implementation: the existing G2 audit and durable record
+contract; Rust catch_unwind notes (unwind only, not abort; not a generic exception
+mechanism) <https://doc.rust-lang.org/std/panic/fn.catch_unwind.html>; Child::wait
+and try_wait reaping contracts <https://doc.rust-lang.org/std/process/struct.Child.html#method.wait>.
+Normal callback errors use Result; only the unit test catches a mock unwind.
+Next integrate an actual gated native child under a qualified supervisor,
+preserve observed reaping/deadlines and all failed/unfinished work, then qualify
+interruption/resume without claiming one continuous clock.

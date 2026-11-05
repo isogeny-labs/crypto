@@ -1,5 +1,20 @@
 # G1–G6 continuation: independently check useful rank and target recovery
 
+## New G2 bookkeeping component — 2026-11-05
+
+[Local callback driver](prerequisites/attempt_driver.rs) now records an attempt
+before calling the supplied gate, omits work on refusal, preserves callback and
+publication errors independently, and inventories explicitly named interrupted/
+retry attempts without inferred zero work or a continuous clock.11native tests
+(6new driver controls+5existing record controls), strict standalone clippy and
+format check log exit0. [Receipt](validation/main-d30b9e0db-20261105/attempt-driver-checks/receipt.json).
+These are unsigned producer observations. [pcc:unverified]
+
+This component starts no process and treats Permit as supplied data, not actual
+checkpoint/protocol/runtime admission. Production child integration/reaping/
+deadlines and interruption/resume qualification remain the next step.
+
+
 ## Terminal library collection — 2026-11-05T11:37:33.353524+00:00
 
 The existing16391 job is terminal124, not running or restarted. The6168-case
