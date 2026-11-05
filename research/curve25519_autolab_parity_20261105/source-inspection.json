@@ -1,0 +1,16 @@
+{
+  "schema": "curve25519.autolab.source-inspection/v1",
+  "source_commit": "99ce97787286c77c27a1df8cc8ddf4d8b958a133",
+  "objective": "run autolab until achieving parity with rho forcurve25519",
+  "goal_status": "active",
+  "classification": "source inspection; no scientific run",
+  "files_sha256": {
+    "src/bin/ic_autolab.rs": "29ea8d40510355b042223854a167dc81d5dc8031f4d0af2a1d86e788493bd759",
+    "src/cryptanalysis/ecbench/workload.rs": "a3fe4b738e781934c6ae7bfc49daa8397d0e00a3e02a4d4df4d9289486f3edfd",
+    "research/curve25519_autolab_20261104/ledger.json": "b3eddeadd0acb6ce4cebdbba93d20088325a26bff17ae70b460c8e7bfe3858c6"
+  },
+  "scientific_trials_launched": 0,
+  "builds_launched": 0,
+  "parity_verified": false,
+  "next_action": "Trace the existing wide-field and wide-scalar pipeline and implement missing actual-Curve25519 admission, dispatch, accounting and replay interfaces before a fresh bounded comparison."
+}
