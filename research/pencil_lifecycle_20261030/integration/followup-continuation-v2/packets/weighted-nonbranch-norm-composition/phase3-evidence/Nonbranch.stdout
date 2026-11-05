@@ -1,0 +1,70 @@
+/var/tmp/nonbranch-norm-lean-y_14_gol/Nonbranch.lean:40:2: error: unsolved goals
+case h₁
+K : Type u_1
+inst✝ : Field K
+a3 a2 a1 a0 x0 y0 : K
+h : y0 ^ 2 = fAt a3 a2 a1 a0 x0
+n : K[X]
+k : K
+⊢ (Ideal.Quotient.lift (affineIdeal a3 a2 a1 a0)
+        (MvPolynomial.eval₂Hom (RingHom.id K) fun i => if i = 0 then x0 else y0) ⋯)
+      ((algebraMap K (A a3 a2 a1 a0)) k) =
+    k
+/var/tmp/nonbranch-norm-lean-y_14_gol/Nonbranch.lean:55:49: error: unsolved goals
+K : Type u_1
+inst✝ : Field K
+a3 a2 a1 a0 x0 y0 b : K
+h : y0 ^ 2 = fAt a3 a2 a1 a0 x0
+n : K[X]
+hn : eval x0 n = b * y0
+t : A a3 a2 a1 a0 := (affineEval a3 a2 a1 a0) n - (algebraMap K (A a3 a2 a1 a0)) b * ybar a3 a2 a1 a0
+⊢ b * y0 -
+      (Ideal.Quotient.lift (affineIdeal a3 a2 a1 a0)
+            (MvPolynomial.eval₂Hom (RingHom.id K) fun i => if i = 0 then x0 else y0) ⋯)
+          ((algebraMap K (A a3 a2 a1 a0)) b) *
+        y0 =
+    0
+/var/tmp/nonbranch-norm-lean-y_14_gol/Nonbranch.lean:82:1: error: ring failed, ring expressions not equal
+K : Type u_1
+inst✝ : Field K
+a3 a2 a1 a0 x0 y0 b : K
+h : y0 ^ 2 = fAt a3 a2 a1 a0 x0
+n u1 u2 U : K[X]
+hnorm : n ^ 2 - u1 * u2 * U = C (b ^ 2) * quintic a3 a2 a1 a0
+hc : (germEval a3 a2 a1 a0 x0 y0 h) (C (b ^ 2)) = (iota a3 a2 a1 a0 x0 y0 h) b ^ 2
+hh :
+  (germEval a3 a2 a1 a0 x0 y0 h) n ^ 2 -
+      (germEval a3 a2 a1 a0 x0 y0 h) u1 * (germEval a3 a2 a1 a0 x0 y0 h) u2 * (germEval a3 a2 a1 a0 x0 y0 h) U =
+    (germEval a3 a2 a1 a0 x0 y0 h) (C b) ^ 2 * pointY a3 a2 a1 a0 x0 y0 h ^ 2
+⊢ -((iota a3 a2 a1 a0 x0 y0 h) b ^ 2 * pointY a3 a2 a1 a0 x0 y0 h ^ 2) +
+      pointY a3 a2 a1 a0 x0 y0 h ^ 2 * (germEval a3 a2 a1 a0 x0 y0 h) (C b) ^ 2 =
+    0
+/var/tmp/nonbranch-norm-lean-y_14_gol/Nonbranch.lean:80:36: warning: This simp argument is unused:
+  hc
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [map_sub, map_pow, map_mul] at hh
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/nonbranch-norm-lean-y_14_gol/Nonbranch.lean:98:1: warning: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+/var/tmp/nonbranch-norm-lean-y_14_gol/Nonbranch.lean:99:1: warning: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+/var/tmp/nonbranch-norm-lean-y_14_gol/Nonbranch.lean:101:3: error: Type mismatch: After simplification, term
+  scalar_unit a3 a2 a1 a0 x0 y0 2 h h2
+ has type
+  ¬2 = 0
+but is expected to have type
+  IsUnit 2

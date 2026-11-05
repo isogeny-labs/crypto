@@ -1,5 +1,8 @@
 # Prime-field ECDLP: three leads and checked structural proofs
 
+**20:25UTC:** [23 repaired-source example tests PASS](continuation-20261030/validation/repaired-main-cc5addeba/examples-pass-20261030T2025Z/receipt.json); zero failures/ignored.
+Remaining native phases are pending in the existing run, not passed. No scientific result.
+
 2026-10-29. Development and formalization follow-up. This directory contains no
 new admitted performance result and makes no ECDLP speedup or security claim.
 
@@ -7,6 +10,26 @@ The requested work is (1) complete and measure symmetric PKM decomposition,
 (2) independently replay the five-sum experiment, and (3) test a Hecke-derived
 known-log base on arbitrary targets, with Lean proofs of feasible mathematics.
 Implementation tests and formal proofs are distinct from those scientific panels.
+
+**Latest20:04UTC:** [repaired-main integration and fresh native qualification](continuation-20261030/repair-20261030T2004Z.md)
+preserve all evidence/histories. Native validation is compiling, not passed;
+formal source/gate objects exactly match the existing18-declaration/zero-trusted
+audit. All six scientific goals remain incomplete.
+
+**Earlier18:37UTC integration:** [sourcea030 and fresh validation](continuation-20261030/validation/integration-0cc5/README.md)
+preserve both log/index histories. The changed Lean gate passes18 declarations
+with zero trusted exceptions; native compilation stopped at inherited error101, before tests. The
+earlier faade library run capped incomplete; [final receipt](continuation-20261030/validation/native-final-faade/receipt.json).
+
+**2026-10-30 continuation:** [independent scalar replay and five Lean contracts](continuation-20261030/README.md)
+strengthen useful-rank and target-recovery checks. Fresh proof audit passes18
+declarations with zero trusted exceptions; fresh native integration is pending.
+G1–G3/G6 remain partial and G4/G5 unrun; no performance comparison is admitted.
+
+At17:03UTC, [23 fresh example tests and scoped checks pass](continuation-20261030/validation/scoped-20261030T1703Z/receipt.json);
+the5646-case library execution remains active. Newer remote0cc5 changes source/
+dependencies and requires its own affected validation. [G2's accounting gap map](continuation-20261030/G2_ACCOUNTING_AUDIT.md)
+now identifies concrete lost/overlapping counter paths; full pricing stays open.
 
 The research ranking remains: **symmetric PKM for a possible algebraic exponent
 improvement; five-sum for demonstrated generic implementation progress; Hecke
