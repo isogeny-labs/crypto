@@ -1,0 +1,24 @@
+{
+  "schema": "native-registry-failure-diagnostics/v1",
+  "pr": 3463,
+  "parent": "27659da53896712b3a6a35de5e7981eb228e2c1a",
+  "main": "3a7882f5d5bddbca3afa8ee3cb708e485cc5ac62",
+  "failed_job": 127232654455,
+  "workflow_original_git_blob": "7ad25bbbbc3be35e049a808f5c54748f8b75b054",
+  "actual_log": {
+    "metadata_unit_tests": "43 passed",
+    "failure": "test-metadata.sh registry-update jq predicate printed false",
+    "native_archive_artifact_id": 13411884960
+  },
+  "change": "On failure only, print existing registry update and compare existing emitted catalog to registry and aliases; examples bounded to20 with full counts and full artifacts retained",
+  "preserved": [
+    "every original workflow step/command/timeout",
+    "all assertions and rejection controls",
+    "two test namespace substitutions",
+    "field-source trigger paths",
+    "entire frozen metadata producer/test script/catalog/evidence",
+    "both full parent journals"
+  ],
+  "validation": "new-head actual CI required; diagnostic output has not yet run; archive extraction blocked by unavailable execution workspace",
+  "standing": "unverified"
+}
