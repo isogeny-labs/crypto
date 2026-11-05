@@ -11,3 +11,6 @@ Execute pre/compiler/post once in order; preserve every failure and native exit.
 
 ## Errors
 Missing manifests were restored byte-identically from retained archives, not regenerated. Cluster quota access remains denied; this existing formal replay uses its original host backend.
+
+## Completed attempt
+Pre-custody failed at280.005seconds withworkdeadline, outerexit1, zero compilerinvocations. Declared16736files are not checkedcount; actualprogresswasnotretained. Preservednative/sysunit receipts. Charged300secondsconservatively undernewcampaign; nooldrecord rewritten. Separatecontinuationimplementation/prospectivereview is beingprepared. [pcc:unverified]

@@ -1,0 +1,30 @@
+{
+  "schema": "formal.replay-attempt/v1",
+  "status": "pre_custody_timeout",
+  "task": "T-1622",
+  "execution_attempts": 1,
+  "pre_elapsed_seconds": 280.00502252799924,
+  "outer_exit": 1,
+  "native_error": [
+    "AssertionError('work deadline')"
+  ],
+  "compiler_invocations": 0,
+  "pre_files_expected": 16736,
+  "pre_bytes_expected": 3111892318,
+  "pre_files_completed": null,
+  "pre_bytes_completed": null,
+  "compiler_status": "not_started_precondition_failed",
+  "post_status": "not_required_no_compiler_started",
+  "phase_budget_seconds": 300,
+  "conservative_campaign_debit_seconds": 300,
+  "campaign_ceiling_seconds": 46800,
+  "remaining_after_this_attempt_seconds": 46500,
+  "remaining_is_bound_not_admission": true,
+  "absolute_deadline_utc": "2026-11-06T04:00:00Z",
+  "dollar_facts_gate_waived_by_owner": true,
+  "native_receipt_sha256": "16d0f055b2c7891aaeb60746d8e4710c305af36ab4d351a9189832950a3ee981",
+  "filesystem": "NFS4 at /home/ec2-user; observed separately",
+  "cause_scope": "The wrapper work-deadline assertion fired; no completed per-file progress was preserved. NFS location and CPU time do not by themselves prove the exact bottleneck.",
+  "machine_proof_status": "not_verified",
+  "cohort_targets_run": 0
+}
