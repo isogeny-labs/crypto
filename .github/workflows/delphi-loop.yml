@@ -5,6 +5,7 @@ name: delphi-loop
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'tools/delphi_loop/**'
       - 'tools/test_delphi_loop.py'
@@ -28,6 +29,7 @@ concurrency:
 
 jobs:
   test:
+    if: ${{ !github.event.pull_request.draft }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
