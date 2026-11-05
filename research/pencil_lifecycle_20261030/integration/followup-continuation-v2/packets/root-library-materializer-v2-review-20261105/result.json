@@ -1,0 +1,45 @@
+{
+  "schema": "independent-source-delta-review/v1",
+  "status": "scoped_source_corrections_checked",
+  "pcc": "unverified",
+  "producer_commit": "64afb6b895",
+  "published_ancestor_of": "79588ee0ee",
+  "source_sha256": "d99f29d81de5efdc6b5277181a713295ff174182ea173beb7ed43813efae34bb",
+  "helper_sha256": "2d506f0e676ff1db54036adc061680dd7f911b809b4519630fc02ff1606f9507",
+  "test_sha256": "0cbce90fac793f54bae7f018d716cbedd4c05209dad6be4d510531e9bea9fc68",
+  "preread_plan_sha256": "00ac02dc7b8f91e869f1cba76d7df9c5728233c5fa7b729eb255e181be30e038",
+  "prior_findings_commit": "ed2db1be72",
+  "findings": [
+    {
+      "id": "M1",
+      "disposition": "source_correction_checked",
+      "locations": "materialize_safety.py:4-9; materialize.py:116-117,167-168",
+      "observation": "One read supplies hashed/copied bytes; destination and manifest equal approved digest; initial bound inputs rechecked before manifest."
+    },
+    {
+      "id": "M2",
+      "disposition": "source_correction_checked",
+      "locations": "materialize_safety.py:11-25; materialize.py:49-51,174-176",
+      "observation": "Group cleanup no longer depends on leader poll; wait timeout2s, absence probe and retained errors; outer cgroup confirmation still required."
+    }
+  ],
+  "mock_controls": {
+    "exit_code": 0,
+    "tests": 6,
+    "status": "passed",
+    "outer_elapsed_seconds": 0.873887004,
+    "timeout_seconds": 10,
+    "kill_grace_seconds": 2,
+    "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderr_sha256": "dcd2147edfda2291b456dfb6d9f3021f0fed07760d5a1c8869fc5446f30e28fe",
+    "scope": "In-memory bytes and fake process/kill function; no materializer body imported or executed"
+  },
+  "materializer_runs": 0,
+  "compiler_runs": 0,
+  "remaining": [
+    "Concrete reviewed and published preparation.json",
+    "Bounded outer supervisor with unit InvocationID and cgroup terminal evidence",
+    "Live runtime qualification and full library validation"
+  ],
+  "producer_manifest_rechecked_after_controls": true
+}
