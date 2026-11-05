@@ -17,7 +17,7 @@ frozen), output [`results.json`](results.json). Every number below is a counted 
 - **Validity.** C1, C2 and the A/A check all pass.
   - G0 at 4 threads reproduces the committed `R-t9-t10` rows exactly. This is the Amendment 2 setting.
   - Every graded row decides every system as the unit row does.
-  - Every planted row is solved.
+  - Every planted row is solved [pcc:unverified].
   - A1 is bit-identical to `L2-t8-r4`.
 - **Attribution: `shape` for both radices.** The shape-matched null control gives the same verdicts as the
   tower, with ratios equal to three digits. The gain belongs to the system's shape (`S₃`'s support on this
