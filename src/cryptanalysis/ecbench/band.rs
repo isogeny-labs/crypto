@@ -197,7 +197,7 @@ pub fn priced_gae(r: &Record, w: f64) -> Result<Option<f64>, String> {
 
 /// `priced_S(w)`.
 pub fn priced_s(r: &Record, w: f64) -> Result<Option<f64>, String> {
-    let sq = (r.workload.curve.r as f64).sqrt();
+    let sq = (r.workload.curve.r.to_f64()).sqrt();
     Ok(priced_gae(r, w)?.map(|g| g / sq))
 }
 
@@ -303,7 +303,7 @@ pub fn band(records: &[Record], weights: &[f64]) -> Result<BandReport, String> {
         }
         rows.push(BandRow {
             curve: curve.clone(),
-            log2_r: (rs[0].workload.curve.r as f64).log2(),
+            log2_r: (rs[0].workload.curve.r.to_f64()).log2(),
             arm: arm.clone(),
             runs: rs.len() as u64,
             verified: ok.len() as u64,

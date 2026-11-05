@@ -56,7 +56,7 @@ use std::cell::RefCell;
 
 use num_bigint::BigUint;
 
-use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+use crate::cryptanalysis::koblitz_strong_rho::{NarrowRhoScalar, RhoScalar};
 
 use crate::cryptanalysis::ic_boundary::{
     pivot_inversion_steps, IncrementalGauss, RelationSolver, RowStatus,
@@ -379,7 +379,7 @@ impl RelationSolver for StructuredGauss {
 /// column rank, where the echelon matrices pin the target as soon as it
 /// lies in the row space, so it can take a few more relations; the
 /// sessions report both.
-pub struct Wiedemann<S: RhoScalar = u64> {
+pub struct Wiedemann<S: NarrowRhoScalar = u64> {
     modulus: S,
     cols: usize,
     rows: Vec<Vec<(usize, S)>>,
@@ -416,7 +416,7 @@ impl<S> Default for WiedemannState<S> {
     }
 }
 
-impl<S: RhoScalar> Wiedemann<S> {
+impl<S: NarrowRhoScalar> Wiedemann<S> {
     pub fn new(cols: usize, modulus: S) -> Self {
         Self {
             modulus,

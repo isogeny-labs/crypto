@@ -697,7 +697,7 @@ fn solver_prims(s: &SolverStats) -> Option<Vec<(Prim, u128)>> {
 
 /// The field of a curve, from its facts.
 pub fn widths_of(curve: &CurveFacts) -> Result<Widths, String> {
-    let r_bits = 128 - curve.r.leading_zeros();
+    let r_bits = curve.r.bits();
     let field = match curve.family.as_str() {
         "prime" => Field::Prime {
             bits: curve.field_bits.ok_or("prime curve without field_bits")?,
@@ -958,7 +958,7 @@ pub fn price(x: &Priceable) -> Result<WorkBlock, String> {
             log2_bitops: (gates > 0).then(|| bitops::log2(gates)),
         });
     }
-    let r = x.curve.r as f64;
+    let r = x.curve.r.to_f64();
     let add = widths.gates(GroupAdd).map_err(|e| e.to_string())? as f64;
     let floor =
         (std::f64::consts::PI * r / (2.0 * x.curve.automorphisms_available as f64)).sqrt() * add;
@@ -1012,7 +1012,7 @@ pub fn bitop_view(
     let mut v = r.clone();
     let add = w.widths.gates(Prim::GroupAdd).map_err(|e| e.to_string())? as f64;
     let total: f64 = w.bitops.parse().map_err(|_| "bitops is not an integer")?;
-    let sqrt_r = (r.workload.curve.r as f64).sqrt();
+    let sqrt_r = (r.workload.curve.r.to_f64()).sqrt();
     v.cost.unit = bitops::UNIT.into();
     if r.cost.total_gae.is_some() {
         v.cost.total_gae = Some(total);
@@ -1074,7 +1074,7 @@ pub fn work_line(r: &crate::cryptanalysis::ecbench::record::Record) -> WorkLine 
         params: r.method.params.clone(),
         curve: r.workload.curve.slug.clone(),
         family: r.workload.curve.family.clone(),
-        log2_r: (r.workload.curve.r as f64).log2(),
+        log2_r: (r.workload.curve.r.to_f64()).log2(),
         status: r.outcome.status.clone(),
         warmup: r.warmup,
         total_gae: r.cost.total_gae,
@@ -1125,7 +1125,7 @@ pub fn summarise(
             );
             params.insert(key.clone(), r.method.params.clone());
             by.entry(key).or_default().push((
-                (r.workload.curve.r as f64).log2(),
+                (r.workload.curve.r.to_f64()).log2(),
                 price_record(&r),
                 r.workload.curve.slug.clone(),
             ));
@@ -1513,7 +1513,7 @@ pub fn work_line_v2(r: &crate::cryptanalysis::ecbench::record::Record) -> WorkLi
         params: r.method.params.clone(),
         curve: r.workload.curve.slug.clone(),
         family: r.workload.curve.family.clone(),
-        log2_r: (r.workload.curve.r as f64).log2(),
+        log2_r: (r.workload.curve.r.to_f64()).log2(),
         status: r.outcome.status.clone(),
         warmup: r.warmup,
         total_gae: r.cost.total_gae,
@@ -1550,9 +1550,9 @@ mod tests {
             construction: String::new(),
             field_degree: (family != "prime").then_some(bits),
             field_bits: (family == "prime").then_some(bits),
-            group_order: r,
-            r,
-            cofactor: 1,
+            group_order: (r).into(),
+            r: r.into(),
+            cofactor: (1u64).into(),
             generator: [String::new(), String::new()],
             automorphisms_available: aut,
             registered: false,

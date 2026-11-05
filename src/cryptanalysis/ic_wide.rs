@@ -48,7 +48,7 @@ use crate::cryptanalysis::ic_framework::{
     SolverReport,
 };
 use crate::cryptanalysis::koblitz_sparse_la::SparseCoreSolver;
-use crate::cryptanalysis::koblitz_strong_rho::RhoScalar;
+use crate::cryptanalysis::koblitz_strong_rho::{NarrowRhoScalar, RhoScalar};
 
 fn s_of<S: RhoScalar>(v: u128) -> S {
     S::from_biguint(&BigUint::from(v)).expect("fits the scalar")
@@ -57,8 +57,11 @@ fn s_of<S: RhoScalar>(v: u128) -> S {
 /// `rng.gen_range(lo..hi)`, drawn as a `u64` while `hi` fits one, so a
 /// `u128` run on a one-word order draws what the one-word code draws.
 fn gen_below<S: RhoScalar>(rng: &mut StdRng, lo: S, hi: S) -> S {
-    match (u64::try_from(lo.to_u128()), u64::try_from(hi.to_u128())) {
-        (Ok(l), Ok(h)) => s_of(u128::from(rng.gen_range(l..h))),
+    match (
+        lo.checked_u128().and_then(|v| u64::try_from(v).ok()),
+        hi.checked_u128().and_then(|v| u64::try_from(v).ok()),
+    ) {
+        (Some(l), Some(h)) => s_of(u128::from(rng.gen_range(l..h))),
         _ => rng.gen_range(lo..hi),
     }
 }
@@ -410,7 +413,7 @@ pub fn rho_negation<G: CountedGroup, S: RhoScalar>(
         steps_over_expected: walked as f64 / expected,
         wall_ns,
         verified: recovered.is_some(),
-        recovered: recovered.and_then(|d| u64::try_from(d.to_u128()).ok()),
+        recovered: recovered.and_then(|d| d.checked_u128().and_then(|v| u64::try_from(v).ok())),
         counters,
     };
     (res, recovered)
@@ -431,7 +434,7 @@ pub struct WideRun<S> {
 /// `ctx` carries the curve; its one-word fields are not read (the base
 /// and the oracle ignore them), and `r`, `h` come as `S`.
 #[allow(clippy::too_many_arguments)]
-pub fn run_f2m4<S: RhoScalar>(
+pub fn run_f2m4<S: NarrowRhoScalar>(
     ctx: &InstanceCtx<CurveB>,
     inst: &BinCurve,
     spec: &PipelineSpec,
@@ -816,7 +819,7 @@ pub fn run_f2m4<S: RhoScalar>(
         useful_rank: None,
         cost_qualification: None,
         verify: ver,
-        recovered: recovered.and_then(|d| u64::try_from(d.to_u128()).ok()),
+        recovered: recovered.and_then(|d| d.checked_u128().and_then(|v| u64::try_from(v).ok())),
         verified,
         total_gae,
         s,
@@ -867,6 +870,15 @@ mod tests {
                 assert_eq!(a.steps, b.steps);
                 assert_eq!(a.walks, b.walks);
                 assert_eq!(a.counters, b.counters);
+                // Exact scalars must preserve legacy draw streams and trajectories.
+                use crate::cryptanalysis::ecbench::exact_scalar::ExactScalar;
+                let (exact, recovered) =
+                    rho_negation::<CurveB, ExactScalar>(c, inst.generator, q, r.into(), s, 1 << 40);
+                assert_eq!(recovered, Some(d.into()));
+                assert_eq!(exact.group_ops, b.group_ops);
+                assert_eq!(exact.steps, b.steps);
+                assert_eq!(exact.walks, b.walks);
+                assert_eq!(exact.counters, b.counters);
                 // The u128 instantiation walks the same values too.
                 let (w, dw) =
                     rho_negation::<CurveB, u128>(c, inst.generator, q, u128::from(r), s, 1 << 40);

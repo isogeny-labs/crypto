@@ -143,8 +143,7 @@ pub struct ArmSummary {
 pub struct WorkloadRow {
     pub workload_id: String,
     pub slug: String,
-    #[serde(with = "crate::cryptanalysis::ecbench::canonical::compat_u128")]
-    pub r: u128,
+    pub r: super::exact_scalar::ExactScalar,
     pub floor_s: f64,
     /// Matched pairs on this workload (censored ones included).
     pub pairs: u64,
@@ -605,7 +604,7 @@ fn run_cost(r: &Record, c: &ArmCensor) -> Option<(f64, bool)> {
             if let Some(s) = r.cost.s {
                 return Some((s, true));
             }
-            let sqrt_r = (r.workload.curve.r as f64).sqrt();
+            let sqrt_r = (r.workload.curve.r.to_f64()).sqrt();
             let lb = match (c.max_ns_per_gae, c.max_overhead_ns) {
                 (Some(k), Some(o)) if sqrt_r > 0.0 => {
                     (r.time.process_wall_ns.saturating_sub(o) as f64 / k) / sqrt_r
@@ -1071,7 +1070,7 @@ pub fn compare_loaded_weighted(
             let c = ratio_report(&strata, resamples, seed);
             CurveRatio {
                 slug: slug.clone(),
-                log2_r: (mine[0].r as f64).log2(),
+                log2_r: (mine[0].r.to_f64()).log2(),
                 workloads: mine.len() as u64,
                 pairs: c.pairs as u64,
                 ratio_b_over_a: c.ratio,
@@ -2040,7 +2039,7 @@ mod tests {
         v["time"]["process_wall_ns"] = json!(wall_ns + 1_000_000);
         v["algorithm_seed"] = json!(format!("{round}"));
         let mut r: Record = serde_json::from_value(v).unwrap();
-        let sqrt_r = (r.workload.curve.r as f64).sqrt();
+        let sqrt_r = (r.workload.curve.r.to_f64()).sqrt();
         r.cost.s = s;
         r.cost.total_gae = s.map(|s| s * sqrt_r);
         r.boundaries.ratio_to_floor = s.map(|s| s / r.boundaries.floor_s);

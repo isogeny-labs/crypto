@@ -29,6 +29,7 @@
 //! explicitly requested local route (counted units only, no wall-time claim).
 
 use clap::{Parser, Subcommand};
+use crypto_lib::cryptanalysis::ecbench::exact_scalar::ExactScalar;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
@@ -267,7 +268,7 @@ struct Incumbent {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 struct SizeInfo {
     k: u32,
-    r: u64,
+    r: ExactScalar,
     log2_r: f64,
     n_a: u64,
     curve: Value,
@@ -2943,7 +2944,7 @@ mod tests {
             "20".to_string(),
             SizeInfo {
                 k: 20,
-                r: 131203,
+                r: 131203u64.into(),
                 log2_r: 17.0,
                 n_a: 32,
                 curve: json!({"kind": "prime_explicit", "p": 1048573}),
@@ -3113,7 +3114,7 @@ mod tests {
             "24".into(),
             SizeInfo {
                 k: 24,
-                r: 2097349,
+                r: 2097349u64.into(),
                 log2_r: 21.0,
                 n_a: 81,
                 curve: json!({}),
@@ -3169,7 +3170,7 @@ mod tests {
                 k.to_string(),
                 SizeInfo {
                     k,
-                    r,
+                    r: r.into(),
                     log2_r: l2,
                     n_a: na,
                     curve: json!({}),
@@ -3190,7 +3191,7 @@ mod tests {
             "32".into(),
             SizeInfo {
                 k: 32,
-                r: 536884639,
+                r: 536884639u64.into(),
                 log2_r: 29.0,
                 n_a: 512,
                 curve: json!({}),
@@ -3447,6 +3448,20 @@ mod tests {
             Class::Inadmissible,
             "an A/A interval excluding 1 voids the session"
         );
+    }
+
+    #[test]
+    fn size_orders_preserve_legacy_numbers_and_full_curve25519_values() {
+        let legacy = json!({"k":20,"r":131203,"log2_r":17.0,"n_a":32,
+            "curve":{"kind":"prime_explicit","p":1048573}});
+        let size: SizeInfo = serde_json::from_value(legacy.clone()).unwrap();
+        assert_eq!(serde_json::to_value(&size).unwrap(), legacy);
+        let order = crypto_lib::cryptanalysis::curve25519_wide::L25519;
+        let wide = json!({"k":255,"r":order,"log2_r":252.0,"n_a":32,
+            "curve":{"kind":"curve25519"}});
+        let size: SizeInfo = serde_json::from_value(wide.clone()).unwrap();
+        assert_eq!(size.r.bits(), 253);
+        assert_eq!(serde_json::to_value(size).unwrap(), wide);
     }
 
     #[test]

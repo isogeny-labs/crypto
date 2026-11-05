@@ -934,7 +934,8 @@ pub fn audit_match(dir: &Path) -> Result<Vec<String>, String> {
             .and_then(|v| v.get("k"))
             .and_then(|v| parse_scalar_hex(v));
         let verified = k.is_some_and(|k| {
-            k < workload.curve.r && inst.mul_generator_hex(k).as_ref() == Some(&workload.target)
+            super::exact_scalar::ExactScalar::from(k) < workload.curve.r
+                && inst.mul_generator_hex(k).as_ref() == Some(&workload.target)
         });
         if verified != receipt.independently_verified || (!verified && receipt.status == "verified")
         {
@@ -1158,7 +1159,7 @@ mod tests {
             "#!/bin/sh\nif [ \"$1\" = selftest ]; then echo 'selftest OK'; exit 0; fi\nsleep 1\necho 'ECBENCH_CURVE p={} a={} b={} r={} gx={} gy={} cofactor={}'\necho 'ECBENCH_RESULT k=0x{:064x} baby_steps=100 giant_steps=50 seed_ops=10 device_seconds=0.1 host_seconds=0.2 setup_seconds=0.02 candidate_verification_seconds=0.01 transfer_seconds=0.01 h2d_bytes=64 d2h_bytes=64 d2d_bytes=0'\n",
             prime.curve.p, prime.curve.a, prime.curve.b, prime.r,
             prime.generator.0, prime.generator.1, prime.cofactor,
-            workload.planted.unwrap()
+            workload.planted.unwrap().checked_u128().expect("legacy GPU fixture")
         )).unwrap();
         std::fs::set_permissions(&driver, std::fs::Permissions::from_mode(0o700)).unwrap();
         let telemetry = root.join("telemetry.sh");

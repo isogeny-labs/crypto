@@ -173,10 +173,6 @@ pub fn field_of(curve: &CurveFacts) -> Result<Field, String> {
     }
 }
 
-fn bits(r: u128) -> u32 {
-    128 - r.leading_zeros()
-}
-
 /// Every unit of [`UNITS`] as its budget over `C`.
 pub fn ratios(field: Field, r_bits: u32) -> BTreeMap<String, f64> {
     let c = reference_costs(field).point as f64;
@@ -210,14 +206,14 @@ pub fn describe(field: Field, r_bits: u32) -> Value {
 
 /// [`describe`] for a built curve.
 pub fn describe_curve(curve: &CurveFacts) -> Result<Value, String> {
-    Ok(describe(field_of(curve)?, bits(curve.r)))
+    Ok(describe(field_of(curve)?, curve.r.bits()))
 }
 
 /// Reprice a report of the base method in place, as
 /// [`full_price::reprice`] does with the measured table.
 pub fn reprice(rep: &mut SolveReport, family: &str, curve: &CurveFacts) -> Result<(), String> {
     let field = field_of(curve)?;
-    let r_bits = bits(curve.r);
+    let r_bits = curve.r.bits();
     let units = ratios(field, r_bits);
     let by_counter = full_price::reprice_with(rep, family, &units);
     let mut pricing = describe(field, r_bits);

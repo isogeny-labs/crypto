@@ -28,7 +28,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::cryptanalysis::ecbench::audit::AuditReport;
-use crate::cryptanalysis::ecbench::canonical::{compat_u128, sha256_hex, short_id};
+use crate::cryptanalysis::ecbench::canonical::{sha256_hex, short_id};
 use crate::cryptanalysis::ecbench::methods::expected_s;
 use crate::cryptanalysis::ecbench::record::{floor_s, Record};
 use crate::cryptanalysis::ecbench::runner::{read_records, read_session, PlanDoc};
@@ -234,8 +234,7 @@ pub struct MethodRef {
 pub struct SizeRow {
     pub slug: String,
     pub log2_r: f64,
-    #[serde(with = "compat_u128")]
-    pub r: u128,
+    pub r: super::exact_scalar::ExactScalar,
     pub field_bits: u32,
     pub automorphisms_available: u32,
     pub floor_s: f64,
@@ -851,7 +850,7 @@ pub fn memory_entries(r: &Record) -> Option<f64> {
         .iter()
         .find_map(|k| r.counters.get(*k))
         .copied()?;
-    Some(entries as f64 / (r.workload.curve.r as f64).sqrt())
+    Some(entries as f64 / (r.workload.curve.r.to_f64()).sqrt())
 }
 
 /// Every counter the unit does not charge, summed, per `√r`.
@@ -867,7 +866,7 @@ pub fn uncharged_work(r: &Record) -> f64 {
         .filter(|(k, _)| k.ends_with("_uncharged"))
         .map(|(_, v)| *v)
         .sum();
-    total as f64 / (r.workload.curve.r as f64).sqrt()
+    total as f64 / (r.workload.curve.r.to_f64()).sqrt()
 }
 
 /// The primitive-level axes: modular multiplications, squarings and
@@ -899,7 +898,7 @@ pub fn field_axis(r: &Record, axis: &str) -> Option<f64> {
         "field_invs" => f.invs,
         _ => return None,
     };
-    Some(count as f64 / (r.workload.curve.r as f64).sqrt())
+    Some(count as f64 / (r.workload.curve.r.to_f64()).sqrt())
 }
 
 /// What `bound fit` reads besides the sessions.
@@ -1225,7 +1224,7 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
         let declared = expected_s(&method.id, a);
         sizes.push(SizeRow {
             slug: slug.clone(),
-            log2_r: (any.workload.curve.r as f64).log2(),
+            log2_r: (any.workload.curve.r.to_f64()).log2(),
             r: any.workload.curve.r,
             field_bits: field_size(any).unwrap_or(0),
             automorphisms_available: a,
@@ -1260,7 +1259,7 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
     let verified: Vec<&Record> = recs.iter().filter(|r| r.counts()).collect();
     let mut strata: Vec<Vec<(f64, f64)>> = Vec::new();
     for row in &sizes {
-        let ln_r = (row.r as f64).ln();
+        let ln_r = (row.r.to_f64()).ln();
         strata.push(
             verified
                 .iter()
@@ -1339,7 +1338,7 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
                             .gates(crate::cryptanalysis::bitops::Prim::GroupAdd)
                             .ok()? as f64;
                         let g = r.cost.total_gae?;
-                        (g > 0.0).then(|| ((row.r as f64).ln(), (g / add).ln()))
+                        (g > 0.0).then(|| ((row.r.to_f64()).ln(), (g / add).ln()))
                     })
                     .collect()
             })
@@ -1518,7 +1517,7 @@ pub fn bound_from_sessions(inputs: &FitInputs) -> Result<Bound, String> {
                 for p in r.phases.iter().filter(|p| p.name == name) {
                     sum += p.gae;
                     if p.gae > 0.0 {
-                        pts.push(((row.r as f64).ln(), p.gae.ln()));
+                        pts.push(((row.r.to_f64()).ln(), p.gae.ln()));
                     }
                 }
             }

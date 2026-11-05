@@ -791,3 +791,219 @@ Full-library session91773 is still live with original timeout1800, log /tmp/curv
 ### Errors
 
 No PR-status error. No signed PCC standing inferred from merge or native tests. [pcc:unverified]
+
+## 2026-11-05T18:59:19.841704+00:00 — separate workload integration checkout
+
+### What was done
+
+Created /home/ec2-user/crypto-curve25519-workload-20261105 on codex/curve25519-workload-20261105 at51ae0683ef662077b5dd5f186f77dc3703074f97. Native sparse read-tree exited0. App attachment listing did not return and its read-only call was terminated. Conductor cleared ecbench/study scopes. Original result-transport checkout remains unchanged for live full-library91773. [pcc:unverified]
+
+### Decisions made
+
+Integrate exact workload orders and scalar transport here while retaining old source for its gate/publication. Preserve old target laws through u128, add new bounded rejection law above it. [pcc:unverified]
+
+### Open threads
+
+Apply the prepared exact-order patch, compile and resolve all consumers, then register the actual Curve25519 instance/target adapter. Original full-library91773 still live, no duplicate run. [pcc:unverified]
+
+### Errors
+
+Sparse setup required read-tree after --no-checkout; successful terminal result confirmed before source edits. [pcc:unverified]
+
+## 2026-11-05T19:08:45.396216+00:00 — actual workload/order integration type-check
+
+### What was done
+
+Widened CurveFacts orders, planted scalar transport and comparison/price consumers; registered ExactScalar sampling and actual Curve25519 workload modules. Added CurveSpec/Instance constructor, exact target construction, identity facts and verification. Library check attempt3 exited0 after resolving narrow conversions, new exhaustive matches and five sparse include inputs. Added a construction/replay regression; test execution remains pending. [pcc:unverified]
+
+### Decisions made
+
+Preserve legacy target laws and record encodings. Actual full-width solver adapters are next; until connected, applicability and direct solver entry explicitly return unsupported rather than narrow coordinates. Removed unused narrow bit helper. Restore missing tracked test inputs from the unchanged gate checkout before compiling tests. [pcc:unverified]
+
+### Open threads
+
+Compile/run actual-crate workload tests and adapt legacy test boundaries. Original transport full gate completed6063/0/130; publication proceeds in original checkout. [pcc:unverified]
+
+### Errors
+
+First order check failed on missing sparse inputs and narrow consumers; second found three exhaustive-match cases and an ambiguous double conversion. Both retained under /tmp/curve25519-workload-orders-check*.log. [pcc:unverified]
+
+## 2026-11-05T19:15:44.301077+00:00 — workload test compile adapters corrected
+
+### What was done
+
+Order library check attempt3 passed. First test compilation exited101 on six missing concat-include diagnostics and four legacy test adapters. Restored40 direct includes/record inputs plus7 concat inputs from tracked unchanged files in the gate checkout; retained input hashes. Corrected legacy narrow test conversions, expected-order comparison and a SizeRow constructor. Added exact float/checked-conversion regression. [pcc:unverified]
+
+### Decisions made
+
+Rerun the actual Curve25519 workload construction test against these corrected sources. Existing 64/128-bit fixture expectations remain unchanged as values; conversions are explicit. [pcc:unverified]
+
+### Open threads
+
+Original result-transport source is published as PR3495, head722cf1bab65a6413558c00bb8654687b346da2ac, auto-merge enabled19:10:59Z, initial checks running. Next normal check about20:01Z; no repeated CI polling. App attachment call did not return and was terminated without confirmed attachment. Actual full-width solver adapters remain next after workload tests. [pcc:unverified]
+
+### Errors
+
+Retained all failed checks and first test compilation under workload-integration/. No cloud trial launched. [pcc:unverified]
+
+## 2026-11-05T19:30Z — actual Curve25519 workload test passed
+
+### What was done
+
+Actual-crate construction/replay regression passed1/0,6204 filtered after10m17 compilation; terminal exit0 recorded with source hashes and log under workload-integration. Prepared an unregistered exact rho scalar arithmetic/sampling module. Conductor scopes for ic_wide.rs and koblitz_strong_rho.rs were clear at19:19. [pcc:unverified]
+
+### Decisions made
+
+Generalize shared rho scalar conversions with checked narrowing; retain a separate narrow-only bound for legacy binary IC and claw routines. Keep native u64/u128 random streams unchanged. Exact scalar modular API counts remain unpriced. [pcc:unverified]
+
+### Open threads
+
+Integrate and validate exact rho arithmetic, then connect a bounded full-width solver adapter. PR3495 next scheduled check20:01Z. [pcc:unverified]
+
+### Errors
+
+No new test failure. Earlier compile failures retained. Cloud admission remains unavailable as recorded previously; no experiment submitted. [pcc:unverified]
+
+## 2026-11-05T19:31Z — rho conversion boundary checked
+
+### What was done
+
+Registered exact scalar arithmetic and generalized shared rho exports. First library check found an additional legacy narrowing consumer in Wiedemann diagonal sampling. Conductor cleared linalg.rs before editing. [pcc:unverified]
+
+### Decisions made
+
+Constrain legacy Wiedemann to NarrowRhoScalar, matching its existing sampling domain. Add a distinct explicitly capped Curve25519 reference adapter with no inherited square-root-sized default. Extend seeded trajectory regression across the exact scalar backend. [pcc:unverified]
+
+### Open threads
+
+Type-check the correction and adapter, then run native regression tests. [pcc:unverified]
+
+### Errors
+
+First check exited101; retained exact-rho-check-attempt1.log. [pcc:unverified]
+
+## 2026-11-05T19:33:38.824003+00:00 — bounded Curve25519 reference adapter type-check
+
+### What was done
+
+Library check attempt2 exited0 after constraining legacy Wiedemann. Added rho.curve25519_bounded with required max_steps, exact recovered values, field counters and unpriced scalar API counters. Added actual adapter replay/exhaustion/input-rejection tests and exact-versus-u64 trajectory checks. [pcc:unverified]
+
+### Decisions made
+
+Expose existing walk cap as an iteration stop threshold: at most17 counted walk operations can cross it; setup and verification are additional and counted. Restrict threshold to1000000. Input validation occurs before solver timing. [pcc:unverified]
+
+### Open threads
+
+Compile and execute focused tests; new tests are pending. This is a bounded reference adapter, not an index-calculus trial. [pcc:unverified]
+
+### Errors
+
+No additional library error. First failed check preserved. [pcc:unverified]
+
+## 2026-11-05T19:36:33.927832+00:00 — Autolab manifest boundary
+
+### What was done
+
+Verified native test session43449 remains live compiling. Inspected Autolab: SizeInfo.r remainsu64 and arm method generation fixes ic.pipeline. Conductor cleared src/bin/ic_autolab.rs. [pcc:unverified]
+
+### Decisions made
+
+Widen manifest order with ExactScalar and preserve existing small JSON encodings. Prepare a bounded full-width pair-decomposition collector feeding WideRelationSystem; no trial or comparative claim is made by implementation tests. [pcc:unverified]
+
+### Open threads
+
+Complete native reference validation, collector construction and Autolab routing. [pcc:unverified]
+
+### Errors
+
+No new failures observed. [pcc:unverified]
+
+## 2026-11-05T19:39:57.997222+00:00 — full-width relation collector component checks
+
+### What was done
+
+Standalone native pair collector passed3/0 tests: signed repeated-summand public-input recovery including r-2 above128bits, deterministic bounded exhaustion with exact random coefficients, and malformed inputs/resource limits. Snapshot and native build/replay evidence retained in next-integration/pair-collector/attempt1. [pcc:unverified]
+
+### Decisions made
+
+Add bounded factor-base construction from lifted x coordinates with cofactor clearing, retaining G as the one publicly known base logarithm. Keep this module unregistered while the actual-crate rho test compiles; test it independently against actual curve and matrix source. [pcc:unverified]
+
+### Open threads
+
+Run factor-base checks and integrate the resulting complete bounded collector into ecbench and Autolab. [pcc:unverified]
+
+### Errors
+
+No new native failures. Standalone harness uses extracted GroupOps/CountedGroup declarations and an unused Fp64 primality shim, as recorded by replay.py; it is not an actual-crate dispatch test. [pcc:unverified]
+
+## 2026-11-05T19:42:07.493005+00:00 — bounded public factor-base construction checked
+
+### What was done
+
+Pair collector attempt2 passed4/0 native tests, adding reproducible cofactor-cleared public lifts, subgroup checks and explicit factor-base exhaustion. README describes algorithm, fixture scope, accounting gaps and portable replay. Attempt1 source and both attempts' evidence preserved. [pcc:unverified]
+
+### Decisions made
+
+Retain this as the generic two-summand pipeline component. Integrate actual-crate dispatch after the current rho compilation finishes, and carry explicit bounded reference configuration into Autolab without rewriting miniature history. [pcc:unverified]
+
+### Open threads
+
+Native actual-crate test session43449 remains live; Autolab exact-order serde test is written but pending. [pcc:unverified]
+
+### Errors
+
+No new failures. No cloud experiment submitted. [pcc:unverified]
+
+## 2026-11-05T19:43:33.559532+00:00 — validation processes reconciled
+
+### What was done
+
+Native library test session43449 remains live compiling, log /tmp/curve25519-exact-rho-tests-attempt1.log. Autolab test session3990 is live waiting on that target-directory build lock, log /tmp/curve25519-autolab-exact-manifest-tests.log; it is queued, not a duplicate library test. Recorded the exact Autolab source hash and command. Corrected all four legacy SizeInfo test constructor conversions. [pcc:unverified]
+
+### Decisions made
+
+Do not change registered library source until the current build and queued binary build have consumed their snapshots. Candidate collector remains outside the registered module graph; its four native checks passed. [pcc:unverified]
+
+### Open threads
+
+Read terminal outcomes, run exact-rho scalar and one-word trajectory tests against the resulting library test binary, then register the collector, connect explicit Autolab methods/reference selection, and complete the required full-library gate before publication. PR3495 followup remains due20:01Z. [pcc:unverified]
+
+### Errors
+
+No new failures observed; queued build lock is expected serialization. [pcc:unverified]
+
+## 2026-11-05T19:47:06.785618+00:00 — actual reference and exact scalar checks passed
+
+### What was done
+
+Actual-crate Curve25519 tests completed28/0/1ignored after11m10 compilation. Explicit exact scalar tests passed3/0; legacy trajectory equivalence passed1/0, covering nine seeded curves/traces with identical group work and counters. Rechecked every frozen library source hash; all match. Logs and receipt retained under workload-integration. [pcc:unverified]
+
+### Decisions made
+
+Add explicit collector stage observations for the measured adapter, preserving the standalone no-op path. Keep the queued Autolab build's registered source unchanged until it completes. [pcc:unverified]
+
+### Open threads
+
+Autolab session3990 now compiling, rather than waiting on the lock. Next connect collector dispatch and reference configuration. [pcc:unverified]
+
+### Errors
+
+No new failures. [pcc:unverified]
+
+## 2026-11-05T19:47:58.048298+00:00 — fixed-source checkpoint for measured integration
+
+### What was done
+
+Collector stage-observation regression passed; attempt3 native suite5/0. Library actual-curve28/0/1ignored, scalar3/0 and trajectory1/0 results retained. Autolab session3990 still compiling the widened manifest source. [pcc:unverified]
+
+### Decisions made
+
+Checkpoint current source locally before further registered edits. Continue collector dispatch in a separate checkout from this checkpoint so the Autolab build and subsequent full-library gate have stable source. No push until the required gate passes. [pcc:unverified]
+
+### Open threads
+
+Autolab terminal result, full library gate and publication; collector dispatch and explicit bounded Autolab reference/candidate configuration. [pcc:unverified]
+
+### Errors
+
+No new failures. [pcc:unverified]

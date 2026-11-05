@@ -1599,7 +1599,7 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
         // Every derived figure must follow from the record's own counts:
         // a hand-edited S, ratio or flag fails here even if resealed.
         let floor = floor_s(r.boundaries.automorphisms_available);
-        let sqrt_r = (w.curve.r as f64).sqrt();
+        let sqrt_r = (w.curve.r.to_f64()).sqrt();
         // The floor's `A` follows the rule the record names (none: the first
         // rule), so a record written before `j = 0` and `j = 1728` curves got
         // their own count still recomputes to the floor it was written with.

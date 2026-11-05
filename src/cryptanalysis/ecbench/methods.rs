@@ -544,6 +544,14 @@ pub fn registry() -> &'static [MethodDecl] {
             params: RHO_PARAMS,
         },
         MethodDecl {
+            id: "rho.curve25519_bounded",
+            family: "rho",
+            summary: "explicitly capped Curve25519 negation-map reference with exact scalars and native field counters",
+            entry: "ic_wide::rho_negation<Curve25519Wide, ExactScalar>",
+            applies: Applies::Any,
+            params: &[ParamDecl { name: "max_steps", default: None, help: "walk-operation stop threshold, 0 through 1000000; one iteration can overshoot by at most 17 operations; setup and verification are counted separately" }],
+        },
+        MethodDecl {
             id: "rho.negation",
             family: "rho",
             summary: "tuned walk on {P, −P} (A = 2) with Wiener–Zuccherato look-ahead and cycle escape",
@@ -1951,6 +1959,60 @@ fn class_setup_detail(setup: GroupOps) -> Value {
         "scalar_mults": setup.scalar_mults, "gae": setup.gae()}})
 }
 
+fn curve25519_cap(m: &ResolvedMethod) -> Result<u64, String> {
+    let cap: u64 = m
+        .params
+        .get("max_steps")
+        .ok_or("Curve25519 requires explicit max_steps")?
+        .parse()
+        .map_err(|_| "Curve25519 max_steps must be a nonnegative integer")?;
+    if cap > 1_000_000 {
+        return Err("Curve25519 max_steps must be at most 1000000".into());
+    }
+    Ok(cap)
+}
+
+fn solve_curve25519_bounded(
+    m: &ResolvedMethod,
+    curve: &crate::cryptanalysis::curve25519_wide::Curve25519Wide,
+    target: &[String; 2],
+    seed: u64,
+) -> Result<SolveReport, String> {
+    let cap = curve25519_cap(m)?;
+    let target = super::curve25519_workload::decode(curve, target)?;
+    let r = ExactScalar::from_biguint(&curve.r).ok_or("subgroup order exceeds 256 bits")?;
+    super::exact_rho_scalar::take_work();
+    let start = Instant::now();
+    measurement::begin_online(Phase::RhoSolve);
+    let (result, recovered) =
+        crate::cryptanalysis::ic_wide::rho_negation(curve, curve.generator, target, r, seed, cap);
+    measurement::end_online();
+    let wall = start.elapsed().as_nanos() as u64;
+    let scalar = super::exact_rho_scalar::take_work();
+    let field_ops = field_ops_of(curve, &[result.group_ops]);
+    let mut report = rho_report(result, wall, field_ops);
+    report.recovered = recovered;
+    report.exhausted = recovered.is_none();
+    for (name, count) in [
+        ("scalar_modular_adds_uncharged", scalar.modular_adds),
+        ("scalar_modular_subs_uncharged", scalar.modular_subs),
+        ("scalar_modular_muls_uncharged", scalar.modular_muls),
+        ("scalar_modular_inverses_uncharged", scalar.modular_inverses),
+        ("scalar_sampling_draws_uncharged", scalar.wide_sample_draws),
+    ] {
+        report.counters.insert(name.into(), count);
+    }
+    report.unpriced = unpriced_of(&report.counters);
+    report.detail["scalar_backend"] = json!("ExactScalar with BigUint modular arithmetic");
+    report.detail["walk_operation_stop_threshold"] = json!(cap);
+    report.detail["maximum_iteration_overshoot"] = json!(17);
+    report.detail["scalar_count_scope"] =
+        json!("API calls; allocation and internal BigUint word work are not priced");
+    report.detail["target_validation"] =
+        json!("canonical coordinates, on-curve and subgroup checks before the solver window");
+    Ok(report)
+}
+
 fn rho_report(res: RhoResult, wall: u64, field_ops: Option<FieldOps>) -> SolveReport {
     let c = &res.counters;
     let get = |k: &str| c.get(k).copied().unwrap_or(0);
@@ -2565,6 +2627,19 @@ fn parse_hex(s: &str) -> Result<u64, String> {
 /// non-prime instance. An arm that cannot run is a spec error, not a session of `error`
 /// records that `compare` then reports as incomplete.
 pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Result<(), String> {
+    if matches!(inst, Instance::Curve25519(_)) {
+        if m.id == "rho.curve25519_bounded" {
+            curve25519_cap(m)?;
+            return Ok(());
+        }
+        return Err(format!(
+            "`{}` has no registered full-width Curve25519 solver adapter yet",
+            m.id
+        ));
+    }
+    if m.id == "rho.curve25519_bounded" {
+        return Err("rho.curve25519_bounded requires Curve25519".into());
+    }
     let id = full_price::base_of(&m.id)
         .or(wordram_price::base_of(&m.id))
         .unwrap_or(m.id.as_str());
@@ -2809,6 +2884,9 @@ pub fn solve_measured(
     target: &[String; 2],
     seed: u64,
 ) -> Result<SolveReport, String> {
+    if matches!(inst, Instance::Curve25519(_)) || m.id == "rho.curve25519_bounded" {
+        applicable(m, inst, curve)?;
+    }
     hyper_ic_variant_guard(m, inst, curve)?;
     let d = decl(&m.id).ok_or("unregistered method")?;
     three_leads_applicable(m, inst, curve)?;
@@ -2848,7 +2926,9 @@ pub fn solve_measured(
     // The phase clock: the methods open and close the online window, the
     // session turns it into exclusive phase times.
     let session = measurement::Session::begin().ok();
-    let mut rep = if let Instance::Wide(wi) = inst {
+    let mut rep = if let Instance::Curve25519(wi) = inst {
+        solve_curve25519_bounded(m, wi, target, seed)?
+    } else if let Instance::Wide(wi) = inst {
         let (tx, ty) = (parse_hex_wide(&target[0])?, parse_hex_wide(&target[1])?);
         solve_wide(m, wi, tx, ty, seed)?
     } else if let Instance::F2m4(i) = inst {
@@ -2979,6 +3059,9 @@ fn solve_inner(
         return solve_neg_strong(m, i, target, seed);
     }
     match (inst, d.family) {
+        (Instance::Curve25519(_), _) => {
+            Err("full-width Curve25519 solver adapter is not registered".into())
+        }
         (Instance::Binary(i), _) if m.id.starts_with("jacobian_image.") => {
             solve_jacobian_image(m, i, FastPoint::affine(tx, ty), seed)
         }
@@ -5011,7 +5094,10 @@ fn strong_run_v2<F: RhoField, S: RhoScalar>(
     let (recovered, c, walk_steps, walks, fruitless, capped, wasted, entries, automorphisms, lost) =
         match &outcome {
             Ok(o) => (
-                Some(o.scalar.to_u128()),
+                Some(
+                    ExactScalar::from_biguint(&o.scalar.to_biguint())
+                        .ok_or("recovered scalar exceeds 256 bits")?,
+                ),
                 o.charges,
                 o.walk_steps,
                 o.walks,
@@ -5231,7 +5317,10 @@ fn strong_run<F: RhoField, S: RhoScalar>(
         counters.insert("fruitless_escapes".to_string(), o.escapes);
     }
     Ok(SolveReport {
-        recovered: Some(ExactScalar::from(o.scalar.to_u128())),
+        recovered: Some(
+            ExactScalar::from_biguint(&o.scalar.to_biguint())
+                .ok_or("recovered scalar exceeds 256 bits")?,
+        ),
         exhausted: false,
         total_gae: setup.gae + search.gae,
         phases: vec![setup, search],
@@ -7483,6 +7572,9 @@ pub fn dump_factor_base(
         return Err("factor-base dumps cover prime and binary curves".into());
     }
     match &inst {
+        Instance::Curve25519(_) => {
+            Err("no full-width Curve25519 factor-base plug-in is registered".into())
+        }
         Instance::Prime(i) => {
             let abscissa = PrimeAbscissaBase { instance: i };
             let explicit = crate::cryptanalysis::ic_framework::explicit_base::PrimeExplicitXBase;
@@ -8647,7 +8739,12 @@ mod accounting_rules_tests {
             ],
         );
         let rep = run(&f4, &inst, &facts, 4242, 6);
-        assert_eq!(rep.recovered, Some(ExactScalar::from(4242 % facts.r)));
+        assert_eq!(
+            rep.recovered,
+            Some(ExactScalar::from(
+                4242 % facts.r.checked_u128().expect("legacy test order")
+            ))
+        );
         let solver = rep.solver.as_ref().expect("solver block");
         let fc = solver
             .degree_of_regularity_forecast
@@ -8659,7 +8756,10 @@ mod accounting_rules_tests {
         assert!(fc.cost.columns > 0);
         assert_eq!(fc.cost.hope_ratio_band.len(), 3);
         let floor = fc.cost.rho_floor_group_additions.unwrap();
-        let expected = (std::f64::consts::PI * facts.r as f64 / (2.0 * 34.0)).sqrt();
+        let expected = (std::f64::consts::PI
+            * (facts.r.checked_u128().expect("legacy test order") as f64)
+            / (2.0 * 34.0))
+            .sqrt();
         assert!((floor - expected).abs() < 1e-6, "{floor} vs {expected}");
         assert_eq!(fc.semi_regular_degree, solver.semi_regular_degree);
         assert!(fc.certified_degree_of_regularity.is_none());
@@ -8745,9 +8845,14 @@ mod accounting_rules_tests {
         for i in 0..runs {
             let k = 12_345 + 40_503 * u128::from(i);
             let rep = run(&m, &inst, &facts, k, 100 + i);
-            assert_eq!(rep.recovered, Some(ExactScalar::from(k % facts.r)));
+            assert_eq!(
+                rep.recovered,
+                Some(ExactScalar::from(
+                    k % facts.r.checked_u128().expect("legacy test order")
+                ))
+            );
             assert!(rep.automorphisms_used <= facts.automorphisms_available);
-            s += rep.total_gae / (facts.r as f64).sqrt();
+            s += rep.total_gae / (facts.r.checked_u128().expect("legacy test order") as f64).sqrt();
         }
         let ratio = s / runs as f64 / floor;
         assert!(ratio > 1.0, "mean S over the A = 6 floor is {ratio}");
@@ -8766,7 +8871,7 @@ mod accounting_rules_tests {
             (j1728(), "rho.quartic", "rho.quartic_v2"),
         ] {
             let (inst, facts) = built(&spec);
-            let k = 4321u128 % facts.r;
+            let k = 4321u128 % facts.r.checked_u128().expect("legacy test order");
             let frozen = run(&method(old, &[]), &inst, &facts, k, 7);
             let v2 = run(&method(new, &[]), &inst, &facts, k, 7);
             assert_eq!(frozen.recovered, Some(ExactScalar::from(k)));
@@ -8866,7 +8971,7 @@ mod accounting_rules_tests {
                 curves.push(&prime);
             }
             for (inst, facts) in curves {
-                let r = facts.r;
+                let r = facts.r.checked_u128().expect("legacy test order");
                 for (j, k) in [3u128, r - 2, r / 3 + 5, r / 2 + 11]
                     .into_iter()
                     .enumerate()
@@ -8950,7 +9055,7 @@ mod accounting_rules_tests {
                 unreachable!()
             };
             let (g, gen) = (&p.curve, p.generator_point());
-            for k in 1..facts.r as u64 {
+            for k in 1..facts.r.checked_u128().expect("legacy test order") as u64 {
                 let mut scratch = GroupOps::default();
                 let q = g.mul(&mut scratch, gen, k);
                 for seed in 0..4u64 {
@@ -9149,13 +9254,18 @@ mod accounting_rules_tests {
                     k,
                     i,
                 );
-                assert_eq!(v.recovered, Some(ExactScalar::from(k % facts.r)));
+                assert_eq!(
+                    v.recovered,
+                    Some(ExactScalar::from(
+                        k % facts.r.checked_u128().expect("legacy test order")
+                    ))
+                );
                 assert_phases_sum("strong_v2", &v);
                 old += o.total_gae;
                 new += v.total_gae;
             }
             assert!(new * 2.0 < old, "n={n}: v1 {old}, v2 {new}");
-            let floor_ops = ((facts.r as f64).sqrt()
+            let floor_ops = ((facts.r.checked_u128().expect("legacy test order") as f64).sqrt()
                 * crate::cryptanalysis::ecbench::record::floor_s(facts.automorphisms_available))
                 * runs as f64;
             assert!(old / floor_ops > 2.0, "n={n}: frozen set-up dominates");
@@ -9496,7 +9606,9 @@ mod accounting_rules_tests {
             let rep = run(&method(id, params), inst, facts, 4242, 6);
             assert_eq!(
                 rep.recovered,
-                Some(ExactScalar::from(4242 % facts.r)),
+                Some(ExactScalar::from(
+                    4242 % facts.r.checked_u128().expect("legacy test order")
+                )),
                 "{id}"
             );
             assert_phases_sum(id, &rep);
@@ -9510,7 +9622,7 @@ mod accounting_rules_tests {
             (j1728(), "rho.quartic", "rho.quartic_v2"),
         ] {
             let (inst, facts) = built(&spec);
-            let k = 4242 % facts.r;
+            let k = 4242 % facts.r.checked_u128().expect("legacy test order");
             let rep = run(&method(id, &[]), &inst, &facts, k, 6);
             assert_eq!(rep.recovered, Some(ExactScalar::from(k)), "{id}");
             assert_phases_sum(id, &rep);
@@ -9953,7 +10065,8 @@ mod neg_strong_tests {
             let (inst, facts) = f2m4(m, 1);
             applicable(&strong, &inst, &facts).unwrap();
             for seed in 0..4u64 {
-                let k = (17 + 1009 * u128::from(seed) + u128::from(m)) % facts.r;
+                let k = (17 + 1009 * u128::from(seed) + u128::from(m))
+                    % facts.r.checked_u128().expect("legacy test order");
                 let target = inst.mul_generator_hex(k).unwrap();
                 let a = solve(&strong, &inst, &facts, &target, seed).unwrap();
                 let b = solve(&plain, &inst, &facts, &target, seed).unwrap();
@@ -9996,9 +10109,9 @@ mod neg_strong_tests {
             &[("lanes", "8"), ("dp_bits", "6"), ("step_cap_factor", "0")],
         );
         let (inst, facts) = f2m4(17, 1);
-        assert!(u64::try_from(facts.r).is_err());
+        assert!(u64::try_from(facts.r.checked_u128().expect("legacy test order")).is_err());
         applicable(&strong, &inst, &facts).unwrap();
-        let k = (u128::MAX / 5) % facts.r;
+        let k = (u128::MAX / 5) % facts.r.checked_u128().expect("legacy test order");
         let target = inst.mul_generator_hex(k).unwrap();
         let rep = solve(&strong, &inst, &facts, &target, 3).unwrap();
         assert!(rep.counters["walk_steps"] >= 1_000_000);
@@ -10103,5 +10216,69 @@ mod tensor_contraction_tests {
         let target = [format!("0x{:x}", t.x), format!("0x{:x}", t.y)];
         let err = solve(&m, &inst, &facts, &target, 1).unwrap_err();
         assert!(err.contains("m ≥ 2"), "{err}");
+    }
+}
+
+#[cfg(test)]
+mod curve25519_bounded_tests {
+    use super::*;
+    use crate::cryptanalysis::ecbench::workload::CurveSpec;
+
+    fn method(cap: u64) -> ResolvedMethod {
+        resolve(&MethodSpec {
+            id: "rho.curve25519_bounded".into(),
+            params: BTreeMap::from([("max_steps".into(), cap.to_string())]),
+        })
+        .unwrap()
+    }
+
+    #[test]
+    fn bounded_curve25519_reference_replays_and_counts_setup_when_exhausted() {
+        let spec = CurveSpec::Curve25519;
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let Instance::Curve25519(curve) = &inst else {
+            unreachable!()
+        };
+        let target = super::super::curve25519_workload::encode(curve, curve.generator).unwrap();
+        for cap in [0, 32] {
+            let m = method(cap);
+            applicable(&m, &inst, &facts).unwrap();
+            let a = solve(&m, &inst, &facts, &target, 7).unwrap();
+            let b = solve(&m, &inst, &facts, &target, 7).unwrap();
+            assert_eq!(a.counters, b.counters);
+            assert_eq!(a.recovered, b.recovered);
+            assert_eq!(a.total_gae, b.total_gae);
+            assert_eq!(a.total_gae, a.phases.iter().map(|p| p.gae).sum::<f64>());
+            assert!(a.field_ops.is_some());
+            assert!(a.phases.iter().any(|p| p.name == "setup" && p.gae > 0.0));
+            assert!(a.counters["scalar_sampling_draws_uncharged"] > 0);
+            assert!(a
+                .unpriced
+                .iter()
+                .any(|v| v == "scalar_modular_adds_uncharged"));
+            // The existing walk stops at iteration boundaries: up to 16
+            // look-ahead additions and one escape can cross the threshold.
+            assert!(a.counters["walk_operations"] <= cap + 17);
+            if cap == 0 {
+                assert_eq!(a.counters["walk_operations"], 0);
+                assert!(a.exhausted);
+                assert!(a.recovered.is_none());
+            }
+            if let Some(k) = a.recovered {
+                assert_eq!(inst.mul_generator_exact(k), Some(target.clone()));
+            }
+        }
+        assert!(applicable(&method(1_000_001), &inst, &facts).is_err());
+        assert!(resolve(&MethodSpec {
+            id: "rho.curve25519_bounded".into(),
+            params: BTreeMap::new()
+        })
+        .is_err());
+        let bad = ["0x0".into(), "0x0".into()];
+        assert!(solve(&method(0), &inst, &facts, &bad, 7).is_err());
+        let narrow_spec = CurveSpec::PrimeSearch { bits: 10, seed: 1 };
+        let narrow = narrow_spec.build().unwrap();
+        assert!(applicable(&method(0), &narrow, &narrow.facts(&narrow_spec)).is_err());
     }
 }
