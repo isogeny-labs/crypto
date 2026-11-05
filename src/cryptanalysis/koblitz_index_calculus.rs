@@ -7514,10 +7514,14 @@ pub fn reset_f6_ic_pair_index_cache() {
 }
 
 /// `KIC_F6_PARTIAL_SUPPORT=0` turns the gate's partial support test off, as
-/// a same-binary control; read once per process.
+/// a same-binary control; read once per process.  The gate before #1646
+/// (`e49afb98f`, 2026-10-11) had no partial support test: it refuted only on
+/// a summand whose every bit was fixed, so the legacy accounting
+/// (`ecbench::legacy`, `pre-1646`) leaves it off.
 fn partial_support_enabled() -> bool {
     static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
-    *ENABLED.get_or_init(|| std::env::var("KIC_F6_PARTIAL_SUPPORT").as_deref() != Ok("0"))
+    !crate::cryptanalysis::koblitz_groebner::legacy_pre_1646_active()
+        && *ENABLED.get_or_init(|| std::env::var("KIC_F6_PARTIAL_SUPPORT").as_deref() != Ok("0"))
 }
 
 /// Largest number of base codes a summand's assigned bits may leave for
@@ -22115,6 +22119,44 @@ mod tests {
             missed += usize::from(expected.is_none());
         }
         assert!(missed > 0);
+    }
+
+    /// The legacy `pre-1646` accounting (`ecbench::legacy`) reproduces the
+    /// F6-IC gate as it was before #1646 added the partial support test:
+    /// no partial check is made, and the relation found is the same.  The
+    /// current gate makes them (the control: the test would pass vacuously
+    /// if the base never reached a partially assigned summand).
+    #[test]
+    fn legacy_pre_1646_gate_makes_no_partial_support_checks() {
+        use crate::cryptanalysis::koblitz_groebner::set_legacy_pre_1646;
+        let kc = KoblitzCurve::new(0, 9).unwrap();
+        let fb = build_standard_subspace_factor_base(&kc, 2).unwrap();
+        let index_of = fb.index_map();
+        let st = FieldStructure::new(kc.n, &kc.curve.irreducible);
+        let engine = SolverEngine::InheritedF4 { max_degree: 3 };
+        let run = |legacy: bool| {
+            set_legacy_pre_1646(legacy);
+            let mut checks = 0u64;
+            let mut found = Vec::new();
+            for scalar in 1..=32u32 {
+                let target = kc.mul(kc.generator(), &BigUint::from(scalar));
+                let (f6, stats) =
+                    groebner_decompose_f6_ic(&kc, &fb, &index_of, &st, &target, 2, engine, 20_000);
+                assert!(!stats.exhausted && !stats.unsupported, "target={scalar}");
+                checks += stats.geometric_partial_support_checks;
+                found.push(f6.is_some());
+            }
+            set_legacy_pre_1646(false);
+            (checks, found)
+        };
+        let (current_checks, current_found) = run(false);
+        let (legacy_checks, legacy_found) = run(true);
+        assert!(
+            current_checks > 0,
+            "control: the current gate never checked"
+        );
+        assert_eq!(legacy_checks, 0);
+        assert_eq!(legacy_found, current_found);
     }
 
     /// lit2026 W5: the gate-first order (`KIC_F6_GATE_FIRST`) and the

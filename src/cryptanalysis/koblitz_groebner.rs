@@ -5273,7 +5273,8 @@ fn legacy_rref_kernel() -> bool {
 // engine counts: the row echelon form of a root went through the Four
 // Russians kernel of `gf2_elim` (before, the column-at-a-time kernel's word
 // XORs), and a child asked the node oracle before specialising its bases
-// (before, after).  Committed records made before then charge the old
+// (before, after); the same change added the F6-IC gate's partial support
+// refutation, which the pre-#1646 gate did not have.  Committed records made before then charge the old
 // accounting; the replay audit turns this on for them (`ecbench::legacy`).
 // Per thread.
 thread_local! {
@@ -5285,6 +5286,11 @@ thread_local! {
 /// `false` restores the normal choice.
 pub fn set_legacy_pre_1646(on: bool) {
     LEGACY_PRE_1646.with(|c| c.set(on));
+}
+
+/// Whether [`set_legacy_pre_1646`] is in force on this thread.
+pub(crate) fn legacy_pre_1646_active() -> bool {
+    LEGACY_PRE_1646.with(|c| c.get())
 }
 
 /// Reduced row echelon form, which is unique: whichever kernel runs, the

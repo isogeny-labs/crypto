@@ -3,6 +3,7 @@ use std::collections::BTreeMap;
 use std::path::Path;
 use std::process::Command;
 
+use crypto_lib::cryptanalysis::ecbench::exact_scalar::ExactScalar;
 use crypto_lib::cryptanalysis::ecbench::methods::{resolve, solve as ecbench_solve, MethodSpec};
 use crypto_lib::cryptanalysis::ecbench::workload::{CurveSpec, Workload};
 use crypto_lib::cryptanalysis::ecbench_large_prime::orbit::LambdaPowers;
