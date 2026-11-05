@@ -1108,6 +1108,7 @@ fn export_with_graph_projector(
     let mut algebraic_unknown_suffixes = 0u64;
     let mut algebraic_degree_reductions = 0u64;
     let mut prefix_occurrences = 0u64;
+    let mut affine_identity_records=0u64;
     let mut feature_occurrences = 0u64;
     let mut sealed = 0u64;
     let mut unsealed = 0u64;
@@ -1165,6 +1166,16 @@ fn export_with_graph_projector(
             if manifest_sha!=before_manifest_sha {return Err("source manifest changed during export admission".into());}
             let target_id =
                 super::digest(format!("{source_run_sha}\n{manifest_sha}\n{cell_index}").as_bytes());
+            if super::solvers::needs_affine_row_replay(&manifest.config,&manifest.outcome,&manifest.artifacts) {
+                let record=super::affine_replay_caller::with_current(|session|session.ok_or("affine export requires retained replay invocation")?.project(&dir,&manifest))?;
+                let(group,partition)=split_for_size(manifest.config.n as u64);
+                let record_id=super::digest(format!("{target_id}\naffine-unit-identity-record").as_bytes());
+                // Restricted-only identity labels; no witness or consequence enters public inputs.
+                prefix_records.push(&record_id,&json!({"schema":"ml-dataset.restricted-prefix-record/v1",
+                    "record_id":record_id,"source_target_id":target_id,"feature_id":null,
+                    "split_component":group,"split":partition,"record":record}))?;
+                affine_identity_records+=1;
+            }
             let wants_boolean=manifest.config.channels.as_ref().is_some_and(|c|c.boolean_consequence.is_some());
             let retained_boolean=manifest.artifacts.iter().any(|a|a.path=="binary-m3-boolean-check.json" || a.path=="binary-m3-boolean-anchor.json");
             if boolean_projection.is_some() || wants_boolean || retained_boolean {
@@ -1586,6 +1597,12 @@ fn export_with_graph_projector(
         "prime_chain_graph_occurrences":prime_chain_graph_occurrences,
         "prefix_feature_occurrences":prefix_occurrences,"unique_prefix_feature_rows":unique_prefix_features,
         "restricted_prefix_record_rows":prefix_record_rows});
+    if affine_identity_records>0 {
+        manifest["affine_unit_identities"]=json!({"schema":"ml-dataset.affine-unit-identity-export/v1",
+            "verified_restricted_records":affine_identity_records,"public_consequence_features":0,
+            "restricted_file":"restricted/prefix-records.jsonl","finite_identity_training_admitted":true,
+            "causal_solver_training_admitted":false,"full_span_search":false,"degree_labels_available":false});
+    }
     if boolean_record_count>0 {
         manifest["boolean_equations"]=json!({"schema":"ml-dataset.boolean-equation-export/v1",
             "verified_nonzero":boolean_nonzero,"verified_zero":boolean_zero,"unknown":boolean_unknown,"rejected":boolean_rejected,

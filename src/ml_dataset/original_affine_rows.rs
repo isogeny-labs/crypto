@@ -394,6 +394,46 @@ mod owned_tests {
         }
     }
     #[test]
+    fn actual_affine_caller_session_verifies_projects_and_keeps_failed_owner(){
+        for twist in [false,true]{
+            let(owner,fixture,mut artifacts)=genuine_owned_fixture(twist,false);
+            let root=&fixture.root; let config=&fixture.config;
+            assert!(root.join("public.json").is_file());
+            assert_eq!(owner.failure(),None);
+            let before=owner.sink.committed_event_count();
+            let published=owner.publish();
+            assert_eq!(published.failure(),None);
+            assert!(published.publication.committed);
+            assert_eq!(published.publication.ack.as_ref().unwrap().event_count,before+1);
+            let output=solvers::WorkerSolveOutput::from_original_affine_rows(published);
+            let mut retained=solvers::WorkerResidualCustody::default();
+            let outcome=crate::ml_dataset::finish_retained_worker_output(&root,&mut artifacts,output,Ok(()),&mut retained).unwrap();
+            artifacts.push(crate::ml_dataset::storage::write_json(&root,"result.json","solver-outcome",&outcome).unwrap());
+            assert!(retained.affine_rows.as_ref().unwrap().publication.committed);
+            assert_eq!(outcome["status"],"partial");
+            let receipt=root.join("affine-invocation-receipt.json");let policy=root.join("affine-policy.json");
+            let run_sha=crate::store::hash_file(&root.join("run.json")).unwrap().0;
+            let body=serde_json::json!({"schema":"crypto.ml-dataset.affine-replay-policy/v1","mode":"checked_affine_unit_identity_v1",
+                "run_sha256":run_sha,"receipt_path":receipt,"cell_indices":[0],"seconds":120,
+                "work_per_cell":1_000_000_000_000u64,"bytes_per_cell":8_000_000_000u64,"stream_bytes_per_cell":134217728,
+                "payload_bytes_per_cell":134217728,"aggregate_work":1_000_010_000_000u64,"aggregate_bytes":8_100_000_000u64});
+            std::fs::write(&policy,serde_json::to_vec(&body).unwrap()).unwrap();
+            let manifest=crate::ml_dataset::CellManifest{schema:"crypto.ml-dataset.cell/v1".into(),cell_index:0,
+                plan_sha256:fixture.binding.plan_sha256.clone(),config:config.clone(),outcome,artifacts};
+            let mut session=crate::ml_dataset::affine_replay_caller::Session::from_policy(root,&policy,&receipt).unwrap();
+            session.verify(root,&manifest).unwrap();
+            let first=session.project(root,&manifest).unwrap();let second=session.project(root,&manifest).unwrap();assert_eq!(first,second);
+            assert_eq!(first["finite_identity_training_admitted"],true);assert_eq!(first["causal_solver_training_admitted"],false);
+            let path=root.join("live/payloads").join(receipt::path(1,0));let mut bytes=std::fs::read(&path).unwrap();bytes.push(b' ');std::fs::write(&path,bytes).unwrap();
+            assert!(session.project(root,&manifest).is_err());assert!(session.verify(root,&manifest).is_err());
+            session.write_receipt(&receipt,false).unwrap();
+            let report:Value=serde_json::from_slice(&std::fs::read(receipt).unwrap()).unwrap();
+            assert_eq!(report["slots"][0]["finite_identity_projections"],2);assert_eq!(report["slots"][0]["failed"],true);
+            assert_eq!(report["slots"][0]["verdict"],"rejected");assert_eq!(report["verification_returned_ok"],false);
+            assert!(report["slots"][0]["charged"][0].as_u64().unwrap()>0);
+        }
+    }
+    #[test]
     fn same_affine_owner_revalidates_actual_bytes_and_retains_sticky_failure(){
         for twist in [false,true]{
             let(owner,fixture,mut artifacts)=genuine_owned_fixture(twist,false);
@@ -416,6 +456,13 @@ mod owned_tests {
             let checked=super::super::affine_central::verify_affine_row(&root,&config,&outcome,&artifacts,policy,super::super::affine_central::RowLimits{expansion:c.expansion,audit:c.audit,checker:c.checker});
             match checked {Ok(super::super::affine_central::RowOutcome::Verified(mut v))=>{
                 let before=v.usage();v.revalidate(&root,&config,&outcome,&artifacts).unwrap();assert!(v.usage().0>before.0);
+                let first=v.project_identity().unwrap();let projection_usage=v.usage();
+                let second=v.project_identity().unwrap();assert_eq!(first,second);assert!(v.usage().0>projection_usage.0);
+                assert_eq!(first["finite_identity_training_admitted"],true);
+                assert_eq!(first["causal_solver_training_admitted"],false);assert_eq!(first["solver_completed"],false);
+                assert!(first.get("scalar").is_none());assert!(first.get("witness").is_none());
+                assert!(first["wire"].as_str().unwrap().starts_with("BQI1"));
+                
                 let path=root.join("live/payloads").join(receipt::path(1,0));
                 let mut bytes=std::fs::read(&path).unwrap();bytes.push(b' ');std::fs::write(&path,bytes).unwrap();
                 assert!(v.revalidate(&root,&config,&outcome,&artifacts).is_err());let failed=v.usage();

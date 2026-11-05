@@ -535,6 +535,7 @@ mod tests {
         }
         fn args(&self) -> DatasetArgs {
             DatasetArgs {
+                affine_replay_policy:None,affine_replay_receipt:None,
                 sat_replay_policy: Some(self.policy.clone()),
                 sat_replay_receipt: Some(self.receipt.clone()),
                 command: DatasetCommand::Verify {

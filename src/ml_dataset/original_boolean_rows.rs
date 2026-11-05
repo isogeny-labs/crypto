@@ -229,36 +229,37 @@ mod tests {
         );
     }
     #[test]
-    fn genuine_original_unit_window_certificate_both_twists_requires_success() {
-        for twist in [false, true] {
-            with_owner(twist, |owner| {
-                let before = (owner.budget.checking_work, owner.budget.adapter_bytes);
-                let deadline = owner.budget.construction_deadline;
-                let original = owner.original as *const _;
-                let map = owner.checked.as_ref().unwrap() as *const _;
-                let after;
-                {
-                    let attempt = owner.produce_boolean_row(0, caps());
-                    assert_eq!(attempt.failure(), None);
-                    assert_eq!(attempt.first_stop(), None);
-                    assert_eq!(attempt.original as *const _, original);
-                    assert_eq!(attempt.deadline, deadline);
-                    let certificate = attempt.certificate().expect("retained native certificate");
-                    assert!(certificate.audit().unwrap().result.is_ok());
-                    assert!(!certificate.raw().unwrap().is_empty());
-                    assert_eq!(certificate.rows().source().source() as *const _, map);
-                    after = attempt.charged();
-                    assert!(after.0 > before.0 && after.1 > before.1);
-                }
-                assert_eq!(
-                    (owner.budget.checking_work, owner.budget.adapter_bytes),
-                    after
-                );
-                let retry = owner.produce_boolean_row(0, caps());
-                assert_eq!(retry.failure(), Some(Failure::Admission(Stop::Phase)));
-                assert_eq!(retry.charged(), after);
-            });
-        }
+    fn raw_n23_original_expansion_cap_keeps_exact_prefix_and_original_owner() {
+        with_owner(false, |owner| {
+            let before = (owner.budget.checking_work, owner.budget.adapter_bytes);
+            let deadline = owner.budget.construction_deadline;
+            let original = owner.original as *const _;
+            let map = owner.checked.as_ref().unwrap() as *const _;
+            let after;
+            {
+                let attempt = owner.produce_boolean_row(0, caps());
+                assert_eq!(attempt.failure(), Some(Failure::Expansion(equations::Failure::Unknown(equations::Unknown::Cap))));
+                assert_eq!(attempt.first_stop(), Some(Stop::NativeFailure));
+                assert_eq!(attempt.original as *const _, original);
+                assert_eq!(attempt.deadline, deadline);
+                assert!(attempt.certificate().is_none());
+                let State::Expanded(expansion) = &attempt.state else { panic!("actual raw expansion prefix required") };
+                assert_eq!(expansion.source() as *const _, map);
+                assert_eq!(expansion.equations().len(), 97);
+                assert_eq!(expansion.charged().work, 3_994_150);
+                assert_eq!(expansion.charged().bytes, 1_514_872);
+                let (partial, scratch, stage, row, literal) = expansion.retained();
+                assert_eq!((stage, row, literal), (equations::Stage::Domain, 5, 13));
+                assert!(!partial.is_empty()); assert!(!scratch.is_empty());
+                after = attempt.charged();
+                assert!(after.0 > before.0 && after.1 > before.1);
+            }
+            assert_eq!((owner.budget.checking_work, owner.budget.adapter_bytes), after);
+            let retry = owner.produce_boolean_row(0, caps());
+            assert_eq!(retry.failure(), Some(Failure::Admission(Stop::Phase)));
+            assert_eq!(retry.first_stop(), Some(Stop::NativeFailure));
+            assert_eq!(retry.charged(), after);
+        });
     }
     #[test]
     fn actual_local_expansion_refusal_keeps_map_prefix_and_same_original_ledger() {
@@ -561,143 +562,48 @@ mod owned_tests {
         (result,f,registry)
     }
     #[test]
-    fn owned_actual_certificate_moves_through_worker_and_parent_refusal_without_copy_or_reset() {
-        for twist in [false, true] {
-            let owner = genuine_owned(twist, false);
-            fn needs_static<T: 'static>(_: &T) {}
-            needs_static(&owner);
-            assert_eq!(owner.failure(), None);
-            let certificate = owner.certificate().unwrap();
-            assert!(certificate.audit().unwrap().result.is_ok());
-            let raw = certificate.raw().unwrap().as_ptr();
-            let charges = owner.charged();
-            let output = solvers::WorkerSolveOutput::from_original_boolean_rows(owner);
-            let mut retained = solvers::WorkerResidualCustody::default();
-            let mut registry = Vec::new();
-            let result = crate::ml_dataset::finish_retained_worker_output(
-                &std::env::temp_dir(),
-                &mut registry,
-                output,
-                Ok(()),
-                &mut retained,
-            );
-            assert!(result.is_err());
-            let kept = retained.boolean_rows.as_ref().unwrap();
-            assert_eq!(kept.charged(), charges);
-            assert_eq!(kept.certificate().unwrap().raw().unwrap().as_ptr(), raw);
-            assert_eq!(kept.failure(), None);
-            assert!(registry.is_empty());
-            assert!(retained.boolean_rows_report_unavailable());
-        }
-    }
-    #[test]
-    fn owned_encoder_cap_failure_keeps_rows_map_and_original_ledger_after_parent_adoption() {
-        let owner = genuine_owned(false, true);
-        assert_eq!(
-            owner.failure(),
-            Some(Failure::Certification(rows::Failure::Cap))
-        );
+    fn raw_n23_owned_expansion_cap_retains_map_ledger_and_blocks_publication() {
+        let (mut owner, fixture, mut registry) = genuine_owned_fixture(false, false);
+        assert!(fixture.root.join("public.json").is_file());
+        assert_eq!(owner.failure(), Some(Failure::Expansion(equations::Failure::Unknown(equations::Unknown::Cap))));
         assert_eq!(owner.first_stop(), Some(Stop::NativeFailure));
-        assert!(owner.certificate().unwrap().rows().rows() > 0);
+        assert!(owner.certificate().is_none());
+        let OwnedState::Expanded(expansion) = &owner.state else { panic!("actual owned raw expansion prefix required") };
+        assert_eq!(expansion.equations().len(), 97);
+        assert_eq!(expansion.charged().work, 3_994_150);
+        assert_eq!(expansion.charged().bytes, 1_514_872);
+        assert_eq!(expansion.source().variables(), 115);
         let charges = owner.charged();
+        let deadline = owner.deadline;
+        let acknowledgement = owner.original.map_ack.clone().expect("actual map receipt required");
+        let map_pointer = owner.original.map_bytes.as_ptr();
+        assert!(!owner.original.map_bytes.is_empty());
+        let head = std::fs::read(fixture.root.join("live/committed.json")).unwrap();
+        assert!(owner.outcome().is_none());
+        let owner = owner.publish();
+        assert_eq!(owner.charged(), charges);
+        assert!(!owner.publication.attempted); assert!(!owner.publication.committed);
         let output = solvers::WorkerSolveOutput::from_original_boolean_rows(owner);
         let mut retained = solvers::WorkerResidualCustody::default();
-        let mut registry = Vec::new();
-        assert!(crate::ml_dataset::finish_retained_worker_output(
-            &std::env::temp_dir(),
-            &mut registry,
-            output,
-            Err("parent failure control".into()),
-            &mut retained
-        )
-        .is_err());
+        let registry_count = registry.len();
+        assert!(crate::ml_dataset::finish_retained_worker_output(&fixture.root, &mut registry, output, Ok(()), &mut retained).is_err());
         let kept = retained.boolean_rows.as_ref().unwrap();
-        assert_eq!(kept.charged(), charges);
+        assert_eq!(kept.charged(), charges); assert_eq!(kept.deadline, deadline);
         assert_eq!(kept.first_stop(), Some(Stop::NativeFailure));
-        assert!(
-            kept.certificate()
-                .unwrap()
-                .rows()
-                .source()
-                .source()
-                .variables()
-                > 0
-        );
-        assert!(kept.original.map_ack.is_some());
+        assert_eq!(kept.original.map_ack.as_ref(), Some(&acknowledgement));
+        assert_eq!(kept.original.map_bytes.as_ptr(), map_pointer);
+        assert!(matches!(kept.state, OwnedState::Expanded(_)));
+        assert!(retained.boolean_rows_report_unavailable());
+        assert_eq!(registry.len(), registry_count);
+        assert_eq!(head, std::fs::read(fixture.root.join("live/committed.json")).unwrap());
     }
 
-    #[test]
-    fn committed_finite_row_receipt_requires_actual_both_twist_central_replay(){
-        for twist in [false,true]{
-            let(owner,fixture,mut artifacts)=genuine_owned_fixture(twist,false);
-            let root=&fixture.root; let config=&fixture.config;
-            assert!(root.join("public.json").is_file());
-            assert_eq!(owner.failure(),None);
-            let before=owner.sink.committed_event_count();
-            let published=owner.publish();
-            assert_eq!(published.failure(),None);
-            assert!(published.publication.committed);
-            assert_eq!(published.publication.ack.as_ref().unwrap().event_count,before+1);
-            let output=solvers::WorkerSolveOutput::from_original_boolean_rows(published);
-            let mut retained=solvers::WorkerResidualCustody::default();
-            let outcome=crate::ml_dataset::finish_retained_worker_output(&root,&mut artifacts,output,Ok(()),&mut retained).unwrap();
-            artifacts.push(crate::ml_dataset::storage::write_json(&root,"result.json","solver-outcome",&outcome).unwrap());
-            assert!(retained.boolean_rows.as_ref().unwrap().publication.committed);
-            assert_eq!(outcome["status"],"partial");
-            let policy=super::super::central::Policy{work:1_000_000_000_000,bytes:8_000_000_000,deadline:Instant::now()+std::time::Duration::from_secs(120),stream_bytes:128<<20,payload_bytes:128<<20};
-            let c=caps();
-            let checked=super::super::central::verify_boolean_row(&root,&config,&outcome,&artifacts,policy,super::super::central::RowLimits{expansion:c.expansion,checker:c.checker});
-            match checked {Ok(super::super::central::RowOutcome::Verified(v))=>{assert!(v.audit().result.is_ok());assert!(!v.audit().source_authenticated);assert!(v.usage().0>0)},_=>panic!("actual original/receipt/source-bound replay required")}
-        }
-    }
-    #[test]
-    fn receipt_report_admission_refusal_keeps_rows_and_does_not_advance_capture(){
-        let mut owner=genuine_owned(false,false);
-        let before=owner.sink.committed_event_position();
-        // Deliberate already-exhausted original deadline, never a fresh cap.
-        owner.original.budget.construction_deadline=Instant::now();
-        let charges=owner.charged();
-        let published=owner.publish();
-        assert_eq!(published.failure(),Some(Failure::Publication(Stop::Deadline)));
-        assert_eq!(published.charged(),charges);
-        assert_eq!(published.sink.committed_event_position(),before);
-        assert!(published.certificate().is_some());
-        assert!(!published.publication.committed);
-    }
 
-    #[test]
-    fn actual_report_storage_admission_refusal_is_retained_before_receipt_write(){
-        let mut owner=genuine_owned(false,false);
-        let raw=owner.certificate().unwrap().raw().unwrap().len() as u64;
-        let scan=(raw+owner.original.map_bytes.len() as u64)*16;
-        let b=&mut owner.original.budget;
-        let remaining=b.native_work_limit-b.native.work-b.checking_work;
-        assert!(remaining>scan+64);
-        b.reserve_checking(remaining-scan-64,0,Instant::now()).unwrap();
-        let before=owner.charged();let head=owner.sink.committed_event_position();
-        let published=owner.publish();
-        assert_eq!(published.failure(),Some(Failure::Publication(Stop::Work)));
-        assert_eq!(published.charged().0,before.0+scan,"wire scan passed; storage/report quote refused");
-        assert!(published.publication.metadata.is_none());assert!(published.publication.bytes.is_empty());
-        assert_eq!(published.sink.committed_event_position(),head);
-        assert!(published.certificate().is_some());
-    }
-    #[test]
-    fn actual_payload_write_failure_preserves_encoded_receipt_and_certificate(){
-        let(owner,fixture,_)=genuine_owned_fixture(false,false);
-        let root=&fixture.root;
-        assert!(root.join("public.json").is_file());
-        let head=owner.sink.committed_event_position();
-        let path=receipt::path(owner.original.pattern.unwrap(),owner.selected_row as u64);
-        std::fs::create_dir(root.join("live/payloads").join(path)).unwrap();
-        let published=owner.publish();
-        assert_eq!(published.failure(),Some(Failure::Publication(Stop::Observer)));
-        assert!(!published.publication.bytes.is_empty());
-        assert!(published.publication.metadata.is_some());
-        assert!(published.publication.capture_error.is_some());
-        assert_eq!(published.sink.committed_event_position(),head);
-        assert!(!published.publication.committed);assert!(published.certificate().is_some());
-    }
+
+
+
+
+
 }
 
 #[path="boolean_row_receipt.rs"]

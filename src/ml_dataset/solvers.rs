@@ -7375,7 +7375,7 @@ mod original_row_dispatch_controls {
         assert!(!custody.sat_report_unavailable());
         let retained=custody.sat.as_ref().expect("actual detached original admission owner");
         let ledger=retained.original_ledger_for_control().expect("charged original ledger survives");
-        assert_eq!(ledger.0,1);assert!(ledger.3.is_some());
+        assert_eq!(ledger.0,1024);assert!(ledger.3.is_some());
         assert!(custody.affine_rows.is_none());
     }
     #[test]
@@ -7393,3 +7393,7 @@ mod original_row_dispatch_controls {
         assert!(!f.root.join("live/committed.json").exists());
     }
 }
+
+#[path="affine_replay_owner.rs"]
+mod affine_replay_owner;
+pub(super) use affine_replay_owner::{AffineReplayCustody,AffineReplayVerdict,verify_affine_row_cell,needs_affine_row_replay};

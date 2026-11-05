@@ -39,6 +39,10 @@ pub struct DatasetArgs {
     pub sat_replay_policy: Option<PathBuf>,
     #[arg(long, global=true, requires="sat_replay_policy")]
     pub sat_replay_receipt: Option<PathBuf>,
+    #[arg(long,global=true,requires="affine_replay_receipt",conflicts_with="sat_replay_policy")]
+    pub affine_replay_policy:Option<PathBuf>,
+    #[arg(long,global=true,requires="affine_replay_policy")]
+    pub affine_replay_receipt:Option<PathBuf>,
     #[command(subcommand)]
     pub command: DatasetCommand,
 }
@@ -1001,7 +1005,7 @@ fn fetch_budget_object(
 }
 
 pub fn run(args: &DatasetArgs) -> Result<(), String> {
-    sat_replay_caller::invoke(args, || run_dispatch(args))
+    sat_replay_caller::invoke(args, || affine_replay_caller::invoke(args, || run_dispatch(args)))
 }
 fn run_dispatch(args: &DatasetArgs) -> Result<(), String> {
     match &args.command {
@@ -1755,6 +1759,7 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
     let result = (|| {
         // Gate independently authorized replay before dispatch, not after generating evidence.
         sat_replay_caller::authorize_generation(&plan, &binding)?;
+        affine_replay_caller::authorize_generation(&plan,&binding)?;
         storage::write_json(&out, "run.json", "run-binding", &binding)?;
         storage::write_json(&out, "plan.json", "frozen-plan", &plan)?;
         storage::write_bytes(&out, "protocol.json", "frozen-protocol", "json", &protocol)?;
@@ -1786,6 +1791,7 @@ fn generate(a: &GenerateArgs) -> Result<(), String> {
                 ));
             }
             sat_replay_caller::authorize_cell_dispatch(index, &config)?;
+            affine_replay_caller::authorize_cell_dispatch(index,&config)?;
             let scope = cell_budget_scope(context.as_ref(), envelope.as_ref(), &plan_sha, index)?;
             fs::create_dir(&dir).map_err(|e| e.to_string())?;
             sync_dir(&cells)?;
@@ -2720,6 +2726,8 @@ fn verify_cell(dir:&Path,replay:bool)->Result<CellManifest,String>{
 }
 #[path = "sat_replay_caller.rs"]
 mod sat_replay_caller;
+#[path="affine_replay_caller.rs"]
+mod affine_replay_caller;
 fn verify_cell_with_boolean_projection(dir:&Path,replay:bool,project:bool)
     ->Result<(CellManifest,Option<solvers::BooleanProjection>),String>{
     sat_replay_caller::with_current(|session| verify_cell_with_replay_session(dir,replay,project,session))
@@ -2762,13 +2770,19 @@ fn verify_cell_with_replay_session(dir:&Path,replay:bool,project:bool,sat_sessio
         return Err("cell provenance differs from frozen plan".into());
     }
     solvers::verify_requested_channel_disposition(&manifest.config, &manifest.outcome)?;
-    if manifest.config.channels.as_ref().is_some_and(|c|c.affine_boolean_row.is_some())
-        || manifest.outcome["adapter_id"]=="original-affine-unit-row-v1"
-        || manifest.artifacts.iter().any(|a|a.role=="boolean-original-affine-unit-row"||a.path.contains("boolean-affine-original-pattern-")) {
-        return Err("affine row requires explicit cumulative CLI replay and projection integration".into());
+    let affine_present=solvers::needs_affine_row_replay(&manifest.config,&manifest.outcome,&manifest.artifacts);
+    if manifest.config.channels.as_ref().is_some_and(|c|c.affine_boolean_row.is_some()) && !affine_present {
+        if manifest.outcome["strategy"]!="original-affine-unit-row-unsupported"||manifest.outcome["status"]!="unsupported"
+            ||manifest.outcome["solver_completed"]!=false||manifest.outcome["full_span_search"]!=false {
+            return Err("unsupported affine request carries an execution claim".into());
+        }
     }
 
-    if solvers::needs_sat_initial_replay(&manifest.config,&manifest.outcome,&manifest.artifacts) {
+    if affine_present {
+        affine_replay_caller::with_current(|session|session.ok_or("explicit cumulative affine replay policy required")?.verify(dir,&manifest))?;
+    }
+
+    if !affine_present && solvers::needs_sat_initial_replay(&manifest.config,&manifest.outcome,&manifest.artifacts) {
         let session=sat_session.ok_or("explicit independently bounded SAT replay policy required")?;
         session.verify(dir,&manifest)?;
     }
@@ -2791,6 +2805,12 @@ fn verify_cell_with_replay_session(dir:&Path,replay:bool,project:bool,sat_sessio
     // strategy labels or disabling optional known-answer replay.
     let channel_present=manifest.config.channels.as_ref().is_some_and(|c|c.boolean_consequence.is_some())
         || manifest.artifacts.iter().any(|a|a.path=="binary-m3-boolean-check.json" || a.path=="binary-m3-boolean-anchor.json");
+    if affine_present && (solvers::is_ordinary_m3_native_source(&manifest.outcome,&manifest.artifacts)
+        || solvers::is_koblitz_m3_native_source(&manifest.outcome,&manifest.artifacts)
+        || manifest.artifacts.iter().any(|a|a.role=="boolean-original-unit-row"||a.path.contains("boolean-original-pattern-"))) {
+        return Err("mixed affine and legacy row/native evidence".into());
+    }
+    if !affine_present {
     if project && channel_present {
         solvers::verify_ordinary_m3_cell_with_projection(dir,&manifest.config,&manifest.outcome,&manifest.artifacts,&mut boolean_projection)?;
     } else {
@@ -2800,6 +2820,7 @@ fn verify_cell_with_replay_session(dir:&Path,replay:bool,project:bool,sat_sessio
         &manifest.outcome,
         &manifest.artifacts,
     )?;    }
+    }
 
     let wide_prime_replay = solvers::verify_prime_f4_wide(
         dir,
@@ -7372,7 +7393,7 @@ mod channel_plan_tests {
         fs::create_dir(&path).unwrap();
         let request_path=path.join("request.json");let plan_path=path.join("plan.json");
         fs::write(&request_path,serde_json::to_vec(&request()).unwrap()).unwrap();
-        run(&DatasetArgs{sat_replay_policy:None,sat_replay_receipt:None,command:DatasetCommand::Plan(PlanArgs{
+        run(&DatasetArgs{affine_replay_policy:None,affine_replay_receipt:None,sat_replay_policy:None,sat_replay_receipt:None,command:DatasetCommand::Plan(PlanArgs{
             channels:Some(request_path),out:plan_path.clone(),n:"23-31,47-61".into(),m:"2-15".into(),
             families:"binary,koblitz,prime".into(),solvers:"f4,f5,sat".into(),curve_seeds:1,generators:1,keys:1,
             seed:20261027,factor_base_size:4,factor_base_policies:None,degree_bound:3,work_limit:16384,

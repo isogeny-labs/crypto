@@ -492,6 +492,18 @@ fn verify_mode(
         }
     }
 }
+// The private verification entrypoint chooses the mode. Receipt metadata and
+// outcome labels cannot switch it. Affine mode requires the same explicit v3
+// producer profile plus a valid, unambiguous request.
+fn replay_profile_supported(config: &CaseConfig, affine_mode: bool) -> bool {
+    if affine_mode {
+        super::affine_worker::supported(config)
+            && config.channels.as_ref().is_some_and(|request| request.validate().is_ok())
+    } else {
+        profile(&config.family, config.n, config.m) && config.solver == "sat"
+    }
+}
+
 fn run(
     dir: &Path,
     config: &CaseConfig,
@@ -500,8 +512,12 @@ fn run(
 ) -> Result<bool, String> {
     // Fixed report/join memory is reserved before helpers can produce Strings.
 
-    if !profile(&config.family, config.n, config.m) || config.solver != "sat" {
-        return Err("unsupported original SAT profile".into());
+    if !replay_profile_supported(config, f.row_mode.is_some()) {
+        return Err(if f.row_mode.is_some() {
+            "unsupported original affine-row profile"
+        } else {
+            "unsupported original SAT profile"
+        }.into());
     }
     if artifacts.len() > 4096 {
         return Err("artifact count cap".into());
@@ -2072,5 +2088,90 @@ impl VerifiedRow {
                 f.budget.fail(Stop::NativeFailure)
             }
         }
+    }
+}
+
+impl VerifiedRow {
+ pub(in crate::ml_dataset::solvers) fn project_identity(&mut self)->Result<Value,Stop>{
+  let f=&mut self.frame;
+  let raw_len=f.row_mode.as_ref().and_then(|r|r.arithmetic.as_ref()).ok_or(Stop::InvalidLimits)?.raw().len() as u64;
+  let work=raw_len.checked_mul(64).and_then(|n|n.checked_add(65536)).ok_or(Stop::Overflow)?;
+  let bytes=raw_len.checked_mul(32).and_then(|n|n.checked_add(65536)).ok_or(Stop::Overflow)?;
+  f.budget.reserve_checking(work,bytes,Instant::now())?;
+  let row=f.row_mode.as_ref().ok_or(Stop::InvalidLimits)?;
+  let metadata=&row.stored.as_ref().ok_or(Stop::InvalidLimits)?.metadata;
+  let arithmetic=row.arithmetic.as_ref().ok_or(Stop::InvalidLimits)?;
+  if arithmetic.failure().is_some(){return f.budget.fail(Stop::InvalidLimits)}
+  let wire=std::str::from_utf8(arithmetic.raw()).map_err(|_|Stop::Serialization)?;
+  let result=serde_json::json!({"schema":"ml-dataset.restricted-affine-unit-identity/v1","status":"checked_finite_identity",
+    "encoding":metadata.encoding,"original_binding":metadata.original_binding,"pattern":metadata.pattern,"row":metadata.row,
+    "wire":wire,"producer_totals":metadata.totals,"producer_limits":metadata.limits,
+    "finite_identity_training_admitted":true,"causal_solver_training_admitted":false,"solver_completed":false,
+    "full_span_search":false,"scalar_recovered_without_witness":false});
+  DecodeBudget::check(&mut f.budget,Instant::now())?;Ok(result)
+ }
+}
+
+#[cfg(test)]
+mod affine_profile_controls {
+    use super::*;
+    fn requested() -> CaseConfig {
+        serde_json::from_value(serde_json::json!({
+            "family":"binary", "n":23, "m":3, "twist":false,
+            "curve_seed":0, "generator_index":0, "key_index":0, "seed":42,
+            "factor_base_size":4, "factor_base_policy":{"kind":"legacy"},
+            "degree_bound":3, "work_limit":16384, "solver":"f4",
+            "channels":{"schema":"crypto.ml-dataset.channel-requests/v3",
+                "affine_boolean_row":{"mode":"affine_unit_row","pattern":1,"row_index":0}}
+        })).unwrap()
+    }
+    #[test]
+    fn explicit_affine_f4_f5_profiles_require_the_private_affine_mode() {
+        for solver in ["f4", "f5"] {
+            let mut config=requested(); config.solver=solver.into();
+            assert!(super::super::affine_worker::supported(&config));
+            assert!(replay_profile_supported(&config,true));
+            assert!(!replay_profile_supported(&config,false));
+        }
+        let mut legacy=requested(); legacy.solver="sat".into(); legacy.channels=None;
+        assert!(replay_profile_supported(&legacy,false));
+        assert!(!replay_profile_supported(&legacy,true));
+    }
+    // Rejection may occur in strict wire decoding before the typed profile guard.
+    fn assert_affine_pipeline_rejects(value: Value, label: &str) {
+        match serde_json::from_value::<CaseConfig>(value) {
+            Err(_) => (),
+            Ok(config) => assert!(!replay_profile_supported(&config, true), "{label}"),
+        }
+    }
+    #[test]
+    fn affine_mode_rejects_missing_ambiguous_and_incompatible_requests() {
+        let original=requested();
+        let mut missing=requested(); missing.channels=None;
+        assert!(!replay_profile_supported(&missing,true));
+        let mut malformed=serde_json::to_value(&original).unwrap();
+        malformed["channels"]=serde_json::Value::Null;
+        assert_affine_pipeline_rejects(malformed, "explicit null channels");
+        let mut value=serde_json::to_value(&original).unwrap();
+        value["channels"]["sat_initial"]=serde_json::json!({"mode":"capture_and_check_initial"});
+        assert_affine_pipeline_rejects(value, "ambiguous SAT and affine request");
+        for (field,replacement) in [
+            ("solver",serde_json::json!("sat")),
+            ("solver",serde_json::json!("enumerate")),
+            ("family",serde_json::json!("prime")),
+            ("m",serde_json::json!(16)),
+            ("n",serde_json::json!(32)),
+            ("work_limit",serde_json::json!(0)),
+            ("factor_base_size",serde_json::json!(0)),
+        ] {
+            let mut value=serde_json::to_value(&original).unwrap();value[field]=replacement;
+            assert_affine_pipeline_rejects(value, field);
+        }
+        for version in ["crypto.ml-dataset.channel-requests/v1","crypto.ml-dataset.channel-requests/v2"] {
+            let mut value=serde_json::to_value(&original).unwrap();value["channels"]["schema"]=version.into();
+            assert_affine_pipeline_rejects(value, version);
+        }
+        let mut value=serde_json::to_value(&original).unwrap();value["channels"]["affine_boolean_row"]["pattern"]=2.into();
+        assert_affine_pipeline_rejects(value, "unsupported affine pattern");
     }
 }
