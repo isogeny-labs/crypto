@@ -515,10 +515,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     if args[1] == "verify-toy-dlp" && args.len() == 4 {
         let r: pipeline::Request = serde_json::from_slice(&std::fs::read(&args[2])?)?;
         let record: serde_json::Value = serde_json::from_slice(&std::fs::read(&args[3])?)?;
-        println!(
-            "{}",
-            serde_json::to_string(&pipeline::replay(&r, &record)?)?
-        );
+        let mut accounting = pipeline::ReplayAccounting::new(&r);
+        match pipeline::replay_counted(&r, &record, &mut accounting) {
+            Ok(certificate) => println!("{}", serde_json::to_string(&certificate)?),
+            Err(error) => {
+                eprintln!(
+                    "{}",
+                    serde_json::json!({"schema":"pkm.toy-dlp-replay-failure/v1",
+                    "error":&error,"partial_replay_work":accounting.report()})
+                );
+                return Err(error.into());
+            }
+        }
         return Ok(());
     }
     let r = read_request(&args[2])?;
