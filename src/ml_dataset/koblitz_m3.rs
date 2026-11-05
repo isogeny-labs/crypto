@@ -14852,4 +14852,4 @@ mod ordinary_terminal_nested_guard_tests {
 
 // Draft original-bound SAT preparation; runtime activation remains separate.
 #[path = "sat_original_owner.rs"]
-mod sat_original_owner;
+pub(super) mod sat_original_owner;

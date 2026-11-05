@@ -2082,12 +2082,81 @@ pub(super) fn verify_live_committed_prefix_visit_at_head_preflight(
 ) -> Result<Option<VerifiedLivePrefix>, String> {
     verify_live_committed_prefix_visit_bound(cell_dir, binding, limits, Some(expected), visit)
 }
+/// Optional owner-aware read callbacks. The head callback must authenticate its
+/// raw file; payload callbacks must verify exact bytes and SHA256. The traversal
+/// still enforces the admitted head and actual contiguous endpoint independently.
+pub(super) enum OwnedReplayRequest<'a> {
+    Head(&'a Path),
+    Record(RecordPhase, &'a [u8]),
+    Payload(&'a Path, &'a Artifact),
+}
+pub(super) struct VerifiedReplayPayload {
+    path: String,
+    sha256: String,
+    bytes: u64,
+}
+pub(super) enum OwnedReplayReply {
+    Head(CommittedHead),
+    Payload(VerifiedReplayPayload),
+    Done,
+}
+pub(super) fn verify_replay_payload_bytes(
+    artifact: &Artifact,
+    raw: &[u8],
+) -> Result<VerifiedReplayPayload, String> {
+    if raw.len() as u64 != artifact.bytes || super::digest(raw) != artifact.sha256 {
+        return Err("bounded payload verification mismatch".into());
+    }
+    Ok(VerifiedReplayPayload {
+        path: artifact.path.clone(),
+        sha256: artifact.sha256.clone(),
+        bytes: artifact.bytes,
+    })
+}
+pub(super) fn verify_live_committed_prefix_owned(
+    cell_dir: &Path,
+    binding: &AttemptBinding,
+    limits: &CaptureLimits,
+    expected: &CommittedHead,
+    request: &mut impl FnMut(OwnedReplayRequest<'_>) -> Result<OwnedReplayReply, String>,
+) -> Result<Option<VerifiedLivePrefix>, String> {
+    verify_live_committed_prefix_owned_inner(cell_dir, binding, limits, Some(expected), request)
+}
 fn verify_live_committed_prefix_visit_bound(
     cell_dir: &Path,
     binding: &AttemptBinding,
     limits: &CaptureLimits,
     expected: Option<&CommittedHead>,
     visit: &mut impl FnMut(RecordPhase, &[u8]) -> Result<(), String>,
+) -> Result<Option<VerifiedLivePrefix>, String> {
+    verify_live_committed_prefix_owned_inner(cell_dir, binding, limits, expected, &mut |request| {
+        match request {
+            OwnedReplayRequest::Head(root) => Ok(OwnedReplayReply::Head(read_json(
+                root,
+                "committed.json",
+                limits.metadata_reserve_bytes,
+            )?)),
+            OwnedReplayRequest::Record(phase, line) => {
+                visit(phase, line)?;
+                Ok(OwnedReplayReply::Done)
+            }
+            OwnedReplayRequest::Payload(root, artifact) => {
+                storage::verify_manifest(root, std::slice::from_ref(artifact))?;
+                Ok(OwnedReplayReply::Payload(VerifiedReplayPayload {
+                    path: artifact.path.clone(),
+                    sha256: artifact.sha256.clone(),
+                    bytes: artifact.bytes,
+                }))
+            }
+        }
+    })
+}
+fn verify_live_committed_prefix_owned_inner(
+    cell_dir: &Path,
+    binding: &AttemptBinding,
+    limits: &CaptureLimits,
+    expected: Option<&CommittedHead>,
+    request: &mut impl FnMut(OwnedReplayRequest<'_>) -> Result<OwnedReplayReply, String>,
 ) -> Result<Option<VerifiedLivePrefix>, String> {
     binding.validate()?;
     limits.validate()?;
@@ -2103,7 +2172,10 @@ fn verify_live_committed_prefix_visit_bound(
     if !head_path.exists() {
         return Ok(None);
     }
-    let head: CommittedHead = read_json(&live, "committed.json", limits.metadata_reserve_bytes)?;
+    let head = match request(OwnedReplayRequest::Head(&live))? {
+        OwnedReplayReply::Head(head) => head,
+        _ => return Err("owned head callback omitted head".into()),
+    };
     if expected.is_some_and(|admitted| admitted != &head) {
         return Err("capture head differs from admitted replay endpoint".into());
     }
@@ -2136,14 +2208,30 @@ fn verify_live_committed_prefix_visit_bound(
         if cursor.event_count >= head.event_count || line.len() as u64 > limits.max_event_bytes {
             return Err("committed event exceeds configured record bounds".into());
         }
-        visit(RecordPhase::BeforeRecordDecode, &line)?;
+        if !matches!(
+            request(OwnedReplayRequest::Record(
+                RecordPhase::BeforeRecordDecode,
+                &line,
+            ))?,
+            OwnedReplayReply::Done
+        ) {
+            return Err("unexpected head from record callback".into());
+        }
         let (hash, payload) = check_record(
             &line,
             &binding_sha,
             cursor.event_count + 1,
             &cursor.last_event_sha256,
         )?;
-        visit(RecordPhase::Authenticated, &line)?;
+        if !matches!(
+            request(OwnedReplayRequest::Record(
+                RecordPhase::Authenticated,
+                &line,
+            ))?,
+            OwnedReplayReply::Done
+        ) {
+            return Err("unexpected head from record callback".into());
+        }
         cursor.event_count += 1;
         cursor.byte_end += line.len() as u64;
         cursor.last_event_sha256 = hash;
@@ -2175,7 +2263,16 @@ fn verify_live_committed_prefix_visit_bound(
         return Err("verified prefix does not match committed watermark".into());
     }
     for (_, payload) in payloads.values() {
-        storage::verify_manifest(&live, std::slice::from_ref(payload))?;
+        match request(OwnedReplayRequest::Payload(&live, payload))? {
+            OwnedReplayReply::Payload(verified)
+                if verified.path == payload.path
+                    && verified.sha256 == payload.sha256
+                    && verified.bytes == payload.bytes =>
+            {
+                ()
+            }
+            _ => return Err("missing or mismatched bounded payload proof".into()),
+        }
     }
     Ok(Some(VerifiedLivePrefix {
         payloads: payloads.into_values().collect(),
@@ -3234,6 +3331,60 @@ mod tests {
                 .unwrap()
                 .ends_with(b"{torn")
         );
+    }
+
+    #[test]
+    fn owned_prefix_requires_exact_payload_proof_and_admitted_head() {
+        let f = Fixture::new();
+        let mut emitter = f.emitter();
+        let payload =
+            ArtifactPayload::json("basis.json", "exposed-basis", &json!({"rows":[1,2]})).unwrap();
+        emitter.payload(&payload).unwrap();
+        let head: CommittedHead =
+            read_json(&f.live(), "committed.json", limits().metadata_reserve_bytes).unwrap();
+        for mode in 0..5 {
+            let mut payload_visits = 0;
+            let result = verify_live_committed_prefix_owned(
+                &f.cell(),
+                &binding(),
+                &limits(),
+                &head,
+                &mut |request| {
+                    match request {
+                        OwnedReplayRequest::Head(_) => {
+                            let mut observed = head.clone();
+                            if mode == 4 {
+                                observed.byte_end += 1;
+                            }
+                            Ok(OwnedReplayReply::Head(observed))
+                        }
+                        OwnedReplayRequest::Record(_, _) => Ok(OwnedReplayReply::Done),
+                        OwnedReplayRequest::Payload(root, artifact) => {
+                            payload_visits += 1;
+                            if mode == 1 {
+                                return Ok(OwnedReplayReply::Done);
+                            }
+                            let mut raw = fs::read(root.join(&artifact.path)).unwrap();
+                            if mode == 2 {
+                                raw[0] ^= 1;
+                            }
+                            let mut proof = verify_replay_payload_bytes(artifact, &raw)?;
+                            // A proof for another descriptor must not authorize this one.
+                            if mode == 3 {
+                                proof.path.push_str(".other");
+                            }
+                            Ok(OwnedReplayReply::Payload(proof))
+                        }
+                    }
+                },
+            );
+            if mode == 0 {
+                assert_eq!(result.unwrap().unwrap().payloads.len(), 1);
+            } else {
+                assert!(result.is_err(), "mode {mode} must reject");
+            }
+            assert_eq!(payload_visits, if mode == 4 { 0 } else { 1 });
+        }
     }
 
     #[test]
