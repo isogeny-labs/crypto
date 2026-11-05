@@ -544,7 +544,7 @@ fn every_registered_method_is_run_skipped_or_exempt_and_its_phases_sum() {
             }
         };
         // Transfers and walks recover the planted log on these fixtures.
-        if rep.recovered != Some(k) && !may_exhaust(id) {
+        if rep.recovered != Some(ExactScalar::from(k)) && !may_exhaust(id) {
             problems.push(format!("{tag}: recovered {:?}, planted {k}", rep.recovered));
         }
         let gap = phase_gap(&rep);
