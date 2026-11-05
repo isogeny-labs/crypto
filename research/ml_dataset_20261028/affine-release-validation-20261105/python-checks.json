@@ -1,0 +1,18 @@
+{
+  "schema": "software-validation-observation/v1",
+  "acceptance_analyzer": {
+    "passed": 11,
+    "failed": 0,
+    "python": "/home/ec2-user/prime-sat-research-venv/bin/python",
+    "command": "-B -m unittest discover -s research/ml_dataset_20261028/sat-cli-acceptance-20261105 -p test_*.py -v"
+  },
+  "custody_contract": {
+    "passed": 4,
+    "failed": 0
+  },
+  "binding_parser": {
+    "passed": 13,
+    "failed": 0
+  },
+  "preserved_environment_failure": "System Python jsonschema lacks Draft202012Validator; rerun in existing project environment passed."
+}
