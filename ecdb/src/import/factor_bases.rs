@@ -7,7 +7,12 @@
 //!   plug-in strings, store paths and the points;
 //! - the orbit-aware large-prime receipts and the SECG small-x yield files,
 //!   whose bases have no FB1 id (ecdb mints an FBS1 spec id for them);
-//! - the cryptanalysis factor-base archive index (`experiments/fb-archive/`).
+//! - the cryptanalysis factor-base archive index (`experiments/fb-archive/`);
+//! - the n83 design grid (`research/koblitz_n83_factor_base_sweep_20261008/design.json`):
+//!   its 1,050 base specs as FBS1 specs, grouped under `factor_base_design`;
+//! - the IC tool program's candidate manifests and sealed claims
+//!   (`research/ic_tool_program/rule/*/`): one `pointset` base per usable
+//!   point set and one `ic_claim` per curve x target x round x rule version.
 //!
 //! FB1 and FBM1 ids are recomputed from their preimages with the ecbench
 //! canonical JSON codec; the result is stored in `digest_verified`, and a
@@ -23,6 +28,8 @@ pub const PACK: &str = "factor-bases";
 const CATALOG_DIR: &str = "research/ecbench_factor_bases_20261013";
 const LARGE_PRIME_DIR: &str = "research/orbit_aware_large_prime_20261011";
 const SECG_DIR: &str = "research/secg_small_x_20261014/data";
+const N83_DESIGN: &str = "research/koblitz_n83_factor_base_sweep_20261008/design.json";
+const IC_TOOL_RULES: &str = "research/ic_tool_program/rule";
 const ARCHIVE_DIR: &str = "experiments/fb-archive";
 const FB_SCHEMA: &str = "ecbench.factor_base/v1";
 const FBM_SCHEMA: &str = "ecbench.factor_base_measurement/v1";
@@ -308,6 +315,38 @@ fn collect_archive(repo_root: &Path, rows: &mut Vec<Value>) {
     }
 }
 
+/// The n83 factor-base design grid: one row for the design (base specs inline).
+fn collect_designs(repo_root: &Path, rows: &mut Vec<Value>) {
+    if let Some(d) = read_doc(&repo_root.join(N83_DESIGN)) {
+        rows.push(json!({ "kind": "design", "path": N83_DESIGN, "doc": d }));
+    }
+}
+
+/// The IC tool program: every rule version's candidate manifests and sealed claims.
+fn collect_ic_claims(repo_root: &Path, rows: &mut Vec<Value>) {
+    let root = repo_root.join(IC_TOOL_RULES);
+    let Ok(rd) = std::fs::read_dir(&root) else { return };
+    let mut versions: Vec<String> = rd.flatten().map(|e| e.file_name().to_string_lossy().to_string()).collect();
+    versions.sort();
+    for v in versions {
+        let base = root.join(&v);
+        for p in files_under(&base.join("manifests").join("candidates"), &|n| n.ends_with(".json")) {
+            if let Some(d) = read_doc(&p) {
+                rows.push(json!({ "kind": "ic_candidate", "rule_version": v, "path": rel(repo_root, &p),
+                                  "candidate_id": d["candidate_id"], "record_sha256": d["record_sha256"],
+                                  "curve": d["record"]["curve"], "factor_base": d["record"]["factor_base"] }));
+            }
+        }
+        for p in files_under(&base.join("claims"), &|n| n.ends_with(".claim.json")) {
+            let Some(d) = read_doc(&p) else { continue };
+            let file = p.file_name().unwrap_or_default().to_string_lossy().trim_end_matches(".claim.json").to_string();
+            let dir = p.parent().and_then(|q| q.file_name()).unwrap_or_default().to_string_lossy().to_string();
+            rows.push(json!({ "kind": "ic_claim", "rule_version": v, "row_key": format!("{dir}/{file}"),
+                              "path": rel(repo_root, &p), "claim": d["claim"], "validation": d["validation"] }));
+        }
+    }
+}
+
 pub fn collect(repo_root: &Path) -> Result<Vec<Value>> {
     let mut rows = Vec::new();
     collect_ecbench(repo_root, &mut rows);
@@ -315,6 +354,8 @@ pub fn collect(repo_root: &Path) -> Result<Vec<Value>> {
     collect_large_prime(repo_root, &mut rows);
     collect_secg(repo_root, &mut rows);
     collect_archive(repo_root, &mut rows);
+    collect_designs(repo_root, &mut rows);
+    collect_ic_claims(repo_root, &mut rows);
     Ok(rows)
 }
 
@@ -380,6 +421,52 @@ ON CONFLICT (source, source_key) DO NOTHING";
 
 /// Links that need rows other importers wrote: leaderboard rows by FB1 id,
 /// and the PS1 labels of the sibling factor-base records by archive digest.
+const DESIGN_SQL: &str = "
+INSERT INTO ec.factor_base_design (study, schema, path, curve_models, base_spec_count, solver_axes, solver_radices,
+       solver_tuple_count, total_tuple_count, disposition_counts, coverage, outside_grid, objective, runtime_claim_gate,
+       record, provenance_id)
+SELECT r.study, r.schema, r.path, r.curve_models, r.base_spec_count, r.solver_axes, r.solver_radices, r.solver_tuple_count,
+       r.total_tuple_count, r.disposition_counts, r.coverage, r.outside_grid, r.objective, r.runtime_claim_gate, r.record, $2::bigint
+FROM jsonb_to_recordset($1::jsonb) AS r(study text, schema text, path text, curve_models text[], base_spec_count int,
+     solver_axes jsonb, solver_radices int[], solver_tuple_count bigint, total_tuple_count bigint, disposition_counts jsonb,
+     coverage text, outside_grid text, objective jsonb, runtime_claim_gate text, record jsonb)
+ON CONFLICT (study) DO NOTHING";
+
+const MEMBER_SQL: &str = "
+INSERT INTO ec.factor_base_design_member (design_id, ordinal, factor_base_id, spec)
+SELECT d.id, r.ordinal, fb.id, r.spec
+FROM jsonb_to_recordset($1::jsonb) AS r(study text, ordinal int, key text, spec jsonb)
+JOIN ec.factor_base_design d ON d.study = r.study
+JOIN ec.factor_base fb ON fb.scheme = 'spec' AND fb.key = r.key
+ON CONFLICT DO NOTHING";
+
+const CLAIM_SQL: &str = "
+INSERT INTO ec.ic_claim (program, rule_version, row_key, run_id, candidate_id, candidate_manifest_sha256, factor_base_id,
+       curve_id, curve_slug, ec1, n, a, log2_r, workload_id, target_index, round, timing_class, record_class,
+       ic_online_wall_ms, rho_online_wall_ms, online_speedup, s_ic_online, s_rho_online, s_setup, s_ic_cold, s_rho_cold,
+       cold_ratio_ic_over_rho, ic_online_operations,
+       rho_online_operations, ic_scalar_verified, rho_scalar_verified, verdict, validation_status, independent_validation,
+       ic_online_phase_ms, rho_online_phase_ms, units, claim_boundary, report_path, source_path, record, provenance_id)
+SELECT 'ic_tool_program', r.rule_version, r.row_key, r.run_id, r.candidate_id, r.candidate_manifest_sha256,
+       (SELECT fb.id FROM ec.factor_base fb WHERE fb.scheme = 'pointset' AND fb.key = r.fb_key),
+       (SELECT c.id FROM ec.curve c WHERE c.icv1_slug = r.curve_slug),
+       r.curve_slug, r.ec1, r.n, r.a, r.log2_r, r.workload_id, r.target_index, r.round, r.timing_class, r.record_class,
+       r.ic_online_wall_ms, r.rho_online_wall_ms, r.online_speedup, r.s_ic_online, r.s_rho_online, r.s_setup,
+       r.s_ic_cold, r.s_rho_cold, r.cold_ratio_ic_over_rho,
+       r.ic_online_operations, r.rho_online_operations, r.ic_scalar_verified, r.rho_scalar_verified, r.verdict,
+       r.validation_status, r.independent_validation, r.ic_online_phase_ms, r.rho_online_phase_ms, r.units,
+       r.claim_boundary, r.report_path, r.source_path, r.record, $2::bigint
+FROM jsonb_to_recordset($1::jsonb) AS r(rule_version text, row_key text, run_id text, candidate_id text,
+     candidate_manifest_sha256 text, fb_key text, curve_slug text, ec1 text, n int, a int, log2_r double precision,
+     workload_id text, target_index int, round int, timing_class text, record_class text,
+     ic_online_wall_ms double precision, rho_online_wall_ms double precision, online_speedup double precision,
+     s_ic_online double precision, s_rho_online double precision, s_setup double precision, s_ic_cold double precision,
+     s_rho_cold double precision, cold_ratio_ic_over_rho double precision, ic_online_operations bigint,
+     rho_online_operations bigint, ic_scalar_verified boolean, rho_scalar_verified boolean, verdict text,
+     validation_status text, independent_validation boolean, ic_online_phase_ms jsonb, rho_online_phase_ms jsonb,
+     units jsonb, claim_boundary text, report_path text, source_path text, record jsonb)
+ON CONFLICT (program, rule_version, row_key) DO NOTHING";
+
 const LINK_SQL: &str = "
 UPDATE ec.ic_board_row b SET factor_base_id = fb.id
   FROM ec.factor_base fb
@@ -414,6 +501,14 @@ fn fb1_row(curve_slug: &str, ec1: &Value, facts: &Value, store_path: Option<Stri
     })
 }
 
+/// Target index and round of a tool-program claim row (`k0n41/T07-R2` -> (7, 2)).
+fn target_round(row_key: &str) -> (Option<i64>, Option<i64>) {
+    let file = row_key.rsplit('/').next().unwrap_or_default();
+    let mut it = file.split('-');
+    let num = |x: Option<&str>, p: char| x.and_then(|x| x.strip_prefix(p)).and_then(|x| x.parse::<i64>().ok());
+    (num(it.next(), 'T'), num(it.next(), 'R'))
+}
+
 pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
     let (rows, sha) = pack::load_or(ctx, PACK, || collect(&ctx.repo_root))?;
     let mut report = Report {
@@ -429,6 +524,7 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
     let (mut fbs, mut aliases, mut points, mut fbms, mut runs, mut results) =
         (Vec::new(), Vec::new(), Vec::new(), Vec::new(), Vec::new(), Vec::new());
     let mut specs: BTreeMap<String, Value> = BTreeMap::new();
+    let (mut designs, mut members, mut candidates, mut claim_rows) = (Vec::new(), Vec::new(), Vec::new(), Vec::new());
     let mut fb_verified = [0u64; 3];
     for r in &rows {
         match r["kind"].as_str().unwrap_or_default() {
@@ -519,10 +615,121 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
                 aliases.push(json!({ "scheme": "fbarchive", "key": a["factor_base_sha256"], "kind": "archive_alias",
                                      "value": a["cited_sha256"] }));
             }
+            "design" => {
+                let d = &r["doc"];
+                let study = d["study"].as_str().unwrap_or_default().to_string();
+                let models: Vec<String> = d["curve_models"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .filter_map(|m| m.as_str().map(String::from))
+                    .collect();
+                for (ordinal, spec) in d["base_specs"].as_array().into_iter().flatten().enumerate() {
+                    let Some(curve) = spec["a"].as_u64().and_then(|a| models.get(a as usize)) else {
+                        report.problem(format!("{study} base spec {ordinal}: no curve model for a = {}", spec["a"]));
+                        continue;
+                    };
+                    let family = spec["family"].as_str().unwrap_or_default();
+                    let params = json!({ "closure": spec["closure"], "parameter": super::s(&spec["parameter"]),
+                                         "parameter_unit": spec["parameter_unit"], "seed": super::s(&spec["seed"]) });
+                    let (key, full) = spec_id(curve, family, &params)?;
+                    let size = int(&spec["parameter"]);
+                    let unit = spec["parameter_unit"].as_str().unwrap_or_default();
+                    specs.entry(key.clone()).or_insert_with(|| {
+                        json!({ "scheme": "spec", "key": key, "digest": full, "digest_verified": Value::Null,
+                                "curve_ref": curve, "curve_slug": curve, "curve_name": curve, "family": family, "params": params,
+                                "description": format!("{family}, {} {unit}, closure {} (design grid {study}, not run as such)",
+                                                       spec["parameter"], spec["closure"].as_str().unwrap_or("?")),
+                                "columns": if unit == "orbit_columns" { size.clone() } else { Value::Null },
+                                "dimension": if unit == "binary_dimension" { size } else { Value::Null },
+                                "record": { "schema": SPEC_SCHEMA, "curve": curve, "family": family, "params": params } })
+                    });
+                    members.push(json!({ "study": study, "ordinal": ordinal, "key": key, "spec": spec }));
+                }
+                let mut record = d.clone();
+                if let Some(o) = record.as_object_mut() {
+                    o.remove("base_specs");
+                }
+                designs.push(json!({
+                    "study": study, "schema": d["schema"], "path": r["path"], "curve_models": models,
+                    "base_spec_count": d["base_spec_count"], "solver_axes": d["solver_axes"],
+                    "solver_radices": d["solver_radices"], "solver_tuple_count": d["solver_tuple_count"],
+                    "total_tuple_count": d["total_tuple_count"], "disposition_counts": d["disposition_counts"],
+                    "coverage": d["coverage"], "outside_grid": d["outside_grid"], "objective": d["objective"],
+                    "runtime_claim_gate": d["runtime_claim_gate"], "record": record,
+                }));
+            }
+            "ic_candidate" => candidates.push(r.clone()),
+            "ic_claim" => claim_rows.push(r.clone()),
             other => report.problem(format!("unknown pack row kind {other:?}")),
         }
     }
     fbs.extend(specs.into_values());
+    // IC tool-program candidates: a factor base per usable point set, named
+    // on the curve slug its claims use (the manifest's EC1 is the kb form).
+    let mut slug_of: BTreeMap<String, String> = BTreeMap::new();
+    for c in &claim_rows {
+        if let (Some(id), Some(slug)) = (c["claim"]["candidate_id"].as_str(), c["claim"]["curve"].as_str()) {
+            slug_of.insert(id.to_string(), slug.to_string());
+        }
+    }
+    let mut fb_of: BTreeMap<String, String> = BTreeMap::new();
+    for c in &candidates {
+        let fbr = &c["factor_base"];
+        let inv = &fbr["inventory"];
+        let (Some(id), Some(set)) = (c["candidate_id"].as_str(), inv["usable_set_sha256"].as_str()) else {
+            report.problem(format!("{}: candidate without a usable_set_sha256", c["path"]));
+            continue;
+        };
+        fb_of.insert(id.to_string(), set.to_string());
+        let slug = slug_of.get(id).cloned();
+        let construction = &fbr["construction"];
+        let mut params = Map::new();
+        for (k, v) in construction.as_object().into_iter().flatten().filter(|(k, _)| *k != "kind") {
+            params.insert(k.clone(), json!(super::s(v).unwrap_or_else(|| v.to_string())));
+        }
+        fbs.push(json!({
+            "scheme": "pointset", "key": set, "digest": set, "digest_verified": Value::Null,
+            "curve_ref": slug, "curve_slug": slug, "ec1": c["curve"]["curve_id"],
+            "family": construction["kind"].as_str().unwrap_or("unknown"), "params": params,
+            "description": format!("{} usable points, {} columns, quotient {}", inv["usable_point_count"],
+                                   inv["effective_columns"], inv["quotient"].as_str().unwrap_or("?")),
+            "signed_points": int(&inv["usable_point_count"]), "columns": int(&inv["effective_columns"]),
+            "quotient_rule": inv["quotient"], "record": fbr,
+        }));
+        aliases.push(json!({ "scheme": "pointset", "key": set, "kind": "ic1_candidate", "value": id }));
+        aliases.push(json!({ "scheme": "pointset", "key": set, "kind": "geometric_set_sha256", "value": inv["geometric_set_sha256"] }));
+    }
+    let f = |v: &Value| if v.is_number() { v.clone() } else { Value::Null };
+    let claims: Vec<Value> = claim_rows
+        .iter()
+        .map(|c| {
+            let k = &c["claim"];
+            let (dir_t, round) = target_round(c["row_key"].as_str().unwrap_or_default());
+            let ops = &k["operation_accounting"];
+            json!({
+                "rule_version": c["rule_version"], "row_key": c["row_key"], "run_id": k["run_id"],
+                "candidate_id": k["candidate_id"], "candidate_manifest_sha256": k["candidate_manifest_sha256"],
+                "fb_key": k["candidate_id"].as_str().and_then(|id| fb_of.get(id)),
+                "curve_slug": k["curve"], "ec1": k["curve_id"], "n": int(&k["n"]), "a": int(&k["a"]),
+                "log2_r": f(&k["log2_r"]), "workload_id": k["workload_id"], "target_index": dir_t, "round": round,
+                "timing_class": k["timing_class"], "record_class": k["record_class"],
+                "ic_online_wall_ms": f(&k["ic_online_wall_ms"]), "rho_online_wall_ms": f(&k["rho_online_wall_ms"]),
+                "online_speedup": f(&k["online_speedup"]), "s_ic_online": f(&k["units"]["s_ic_online"]),
+                "s_rho_online": f(&k["units"]["s_rho_online"]), "s_setup": f(&k["units"]["s_setup"]),
+                "s_ic_cold": f(&k["units"]["s_ic_cold"]), "s_rho_cold": f(&k["units"]["s_rho_cold"]),
+                "cold_ratio_ic_over_rho": f(&k["units"]["cold_ratio_ic_over_rho"]),
+                "ic_online_operations": int(&ops["ic_online_operations"]),
+                "rho_online_operations": int(&ops["rho_online_operations"]),
+                "ic_scalar_verified": k["ic_scalar_verified"].as_bool(), "rho_scalar_verified": k["rho_scalar_verified"].as_bool(),
+                "verdict": k["verdict"], "validation_status": c["validation"]["status"],
+                "independent_validation": k["independent_validation"].as_bool(),
+                "ic_online_phase_ms": k["ic_online_phase_ms"], "rho_online_phase_ms": k["rho_online_phase_ms"],
+                "units": k["units"], "claim_boundary": k["claim_boundary"], "report_path": k["report"],
+                "source_path": c["path"], "record": { "claim": k, "validation": c["validation"] },
+            })
+        })
+        .collect();
     // Duplicate keys in one statement would make ON CONFLICT DO UPDATE fail: keep the first of each.
     let mut seen = std::collections::BTreeSet::new();
     fbs.retain(|f| seen.insert((f["scheme"].to_string(), f["key"].to_string())));
@@ -536,6 +743,11 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
     report.count("ecbench_runs_linked", bulk1(ctx.client, RUN_SQL, &runs).await?);
     report.count("ecbench_runs_with_fb1", runs.len() as u64);
     report.count("results", bulk(ctx.client, RESULT_SQL, &results, prov).await?);
+    report.count("designs", bulk(ctx.client, DESIGN_SQL, &designs, prov).await?);
+    report.count("design_members", bulk1(ctx.client, MEMBER_SQL, &members).await?);
+    report.count("ic_claims", bulk(ctx.client, CLAIM_SQL, &claims, prov).await?);
+    report.count("ic_claims_read", claims.len() as u64);
+    report.count("ic_candidates_read", candidates.len() as u64);
     ctx.client.batch_execute(LINK_SQL).await?;
     let linked: i64 = ctx
         .client
@@ -577,6 +789,12 @@ mod tests {
         let v = json!({"b": [1, "é\u{7f}"], "a": {"y": null, "x": true}});
         assert_eq!(canonical(&v).unwrap(), "{\"a\":{\"x\":true,\"y\":null},\"b\":[1,\"\\u00e9\\u007f\"]}");
         assert!(canonical(&json!({"f": 1.5})).is_err());
+    }
+
+    #[test]
+    fn claim_rows_name_target_and_round() {
+        assert_eq!(target_round("k0n41/T07-R2"), (Some(7), Some(2)));
+        assert_eq!(target_round("summary"), (None, None));
     }
 
     #[test]

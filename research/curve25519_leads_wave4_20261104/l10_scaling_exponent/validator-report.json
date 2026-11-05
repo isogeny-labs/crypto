@@ -1,0 +1,311 @@
+{
+ "schema": "validator-report/v1",
+ "lead": "research/curve25519_leads_wave4_20261104/l10_scaling_exponent",
+ "validated_at_utc": "2026-11-04T07:02:04Z",
+ "validator": "validator (Claude, independent session; did not produce the lead)",
+ "verdict": "pass_with_errata",
+ "disposition": "validated",
+ "commit": {
+  "protocol_frozen_at": "5a800bb3d06c69b32f32195c3aebccdfb3fee31e",
+  "head_at_validation": "1c1175180fabdc9b4a93007022f0d0bdb9b4a33f",
+  "frozen_blob_identity": {
+   "PROTOCOL.md": "141a45160057e18915e24f9aea00950bf7ed5092 (committed == worktree)",
+   "scripts/run.sh": "07aaeeb5f985fd7fcf494ecba657a916055d5d8b (committed == worktree)",
+   "scripts/analyze.py": "42a143596458a4575e16a49ac24704798a1ec13c (committed == worktree)",
+   "scripts/select_seeds.py": "c38c1ad5e8d1426e39fc246367a0054305b12f98 (committed == worktree)",
+   "selection/seeds.json": "6972fdbab7a5679e9a1639afdd3565ea1213d176 (committed in 1c117518 at 06:37:29Z, after the run; sha256 pinned in frozen PROTOCOL.md and run.sh and matches)"
+  },
+  "timeline_utc": "PROTOCOL/scripts committed 06:32:32; run 06:33:21-06:35:45 (data/env.txt); seeds.json committed 06:37:29; README written 06:39",
+  "untracked_artifacts": "README.md, data/, analysis/ are not committed and are locally excluded via .git/info/exclude; pinned below by sha256",
+  "git_use": "read-only inspection only (status, log, diff, rev-parse, hash-object); no git writes"
+ },
+ "artifact_hashes_sha256": {
+  "README.md": "5234dbc1427d52ff8dd93a8865d6eb1812cc61fbdea12cccb984cad327da0557",
+  "PROTOCOL.md": "09b53f4542963767d797255428d70806e35020cd927d0271cda1a58076a07c9c",
+  "scripts/run.sh": "b62f1dea22fccabcfa09f41b0805383a0eb1c29cf64e61503fb5be08a56791ac",
+  "scripts/analyze.py": "4d712fbc9b14d00fc6cd35f5b28c8247e037b9a67531a47f44d77a4d8804b2c2",
+  "scripts/select_seeds.py": "711789f4888652c1ea2ab5e0f9bf1ec93375afe663c10f1dc83e2c9c873bdd83",
+  "selection/seeds.json": "1e6195046fbd445a3551a6726ac4df7e3ee08976f3814590ac904909e3338f7d (= frozen value in PROTOCOL.md/run.sh)",
+  "data/SHA256SUMS": "aeb16aad00d4bb6e748516929cc5980377cd537a797282e4f3cc239a8b5fbb6c (124 entries, sha256sum -c: 124 OK, 0 failed)",
+  "analysis/summary.json": "6590e8d4b6801f71115d2a61537913552c987095185f52c776ad1ebbbc45b129 (= analysis/SHA256SUMS, = README)",
+  "data/env.txt": "c8098256afdb6330ec90092114fc39a46aaf3121623e10b33dfb3d2770635b2c",
+  "data/run.log": "8fcf39d5b928f3bf757013c2cc52a39db2e6a173c0dfaa730c614bd35d9d34b8",
+  "binary /home/user/ctarget/release/curve25519_family": "ba1e3c0518eae58ae39a9b08e1f757c7e9fe1eb02c86b158b883244bc6a5ecef (= frozen; = T10 env.txt)",
+  "census k16/k18/k20/k22/k24.jsonl": "3935c968…/4e670176…/bc74d8ac…/11903b11…/39c75436… (all = frozen values in run.sh and = curve25519_isogeny_seed_20261103/data/SHA256SUMS)"
+ },
+ "checks": [
+  {
+   "requirement": "data vs SHA256SUMS",
+   "status": "pass",
+   "evidence": "data/SHA256SUMS: 124/124 OK; analysis/SHA256SUMS: OK; no *.try* files; no data.interrupted.*; 40 stderr files all 0 bytes; 40 .status files all try=1 rc=0"
+  },
+  {
+   "requirement": "frozen protocol/scripts unchanged since 5a800bb3",
+   "status": "pass",
+   "evidence": "git diff 5a800bb3 -- PROTOCOL.md scripts/ is empty; blob ids identical"
+  },
+  {
+   "requirement": "instrument identity",
+   "status": "pass",
+   "evidence": "binary sha256 matches frozen value, data/binary.sha256, and T10's data/env.txt; census and seeds.json hashes match"
+  },
+  {
+   "requirement": "re-run of measurement cells with the same command",
+   "status": "pass",
+   "evidence": "4 cells re-run sequentially (k16_t4_g3_s1786, k20_t5_g4_s1307, k16_t7_g6_s278, k18_t5_g4_s0) with the frozen 12-argument f4cost command; all 49-51 non-wall fields identical to the stored JSONs (0 differences); wall 0.88/2.10/12.47/2.39 s vs stored 0.48/1.77/10.19/1.45 s. No ecbench chunks exist in this lead (verify --replay not applicable)"
+  },
+  {
+   "requirement": "P0 instrument reproduction vs T10 raw data",
+   "status": "pass",
+   "evidence": "7 k=20 cells compared field-by-field with research/curve25519_leads_wave3_20261103/t10_seed_and_guess/data/cells/{t5_g4_s0,t5_g4_s1307,t5_g3_s1307,t6_g5_s0,t6_g5_s1308,t6_g4_s1308,t7_g6_s1594}.json: 0 non-wall differences; same binary sha256 and target seeds 202611150{5,6,7}"
+  },
+  {
+   "requirement": "seed selection S*(k,t) and seed-0 rows",
+   "status": "pass",
+   "evidence": "independent argmax J/columns over the 5 census files (2,000 seeds per (k,t), seeds 0..1999 complete) reproduces all 20 S* seeds, columns, covered_points and J and all seed-0 rows in seeds.json and PROTOCOL §2.2; one exact top tie (k24 t4) resolved by the stated rule"
+  },
+  {
+   "requirement": "P1 census consistency",
+   "status": "pass",
+   "evidence": "f4cost columns/covered_points equal seeds.json in 40/40 cells"
+  },
+  {
+   "requirement": "cell self-consistency",
+   "status": "pass",
+   "evidence": "40/40: k,t,guess,form,lo,m=2,mode=full,lifts=false,max_nnz_cap=30000000,trace=false,targets_done=targets_requested=100,capped=false,undecided=0; mpt == f4_muladds/100; hits==hits_verified==hits_exact"
+  },
+  {
+   "requirement": "README 40-cell table",
+   "status": "pass",
+   "evidence": "all 40 rows parsed and recomputed from raw JSONs: cols, covered, deg, mpt, nat_tot, hits exact; E_0/E_0.1/E_1 agree to the 5 printed digits"
+  },
+  {
+   "requirement": "P2 k-invariance",
+   "status": "pass",
+   "evidence": "max/min mpt: t4g3 1.0053, t5g4 1.0273, t6g5 1.0508, t7g6 1.0915 (all <= 1.10, 5/5 k each); non-deciding t5g3 1.0187, t6g4 1.0538; point predictions (<=1.0001 / <=1.03) missed in all four series, as the README states"
+  },
+  {
+   "requirement": "P3 seed control",
+   "status": "pass",
+   "evidence": "10/10 ratios in [0.9807, 1.0000]"
+  },
+  {
+   "requirement": "P4 optimal t",
+   "status": "pass",
+   "evidence": "argmin t=4 and second t=5 at all 5 k under E_1 frozen, E_0, E_1 D5, E_0.1 D5; E(t5)/E(t4) frozen E_1 2.163/2.251/1.779/1.658/1.787 (all >= 1.5); E_0 2.396/2.544/2.044/1.905/2.050"
+  },
+  {
+   "requirement": "P5 exponent",
+   "status": "pass",
+   "evidence": "OLS ln E_best on ln r: frozen w=1 b=1.0297 a=7.968 rmse=0.0725 slopes 0.894/1.179/0.971/1.029; w=0.1 1.0312; w=0 1.0315; D5 w=0.1/1 1.0315/1.0315; fixed-t (w=1) 1.030/0.980/1.002/0.937, (w=0) 1.032/0.988/1.030/0.997; with r_18 corrected (erratum E1) b unchanged to 4 decimals"
+  },
+  {
+   "requirement": "P6 gap grows",
+   "status": "pass",
+   "evidence": "E_best/(1.5 sqrt r) w=1 frozen 2.417e5 < 4.166e5 < 1.070e6 < 2.054e6 < 4.277e6; D5 1.468e5 < 2.562e5 < 6.577e5 < 1.263e6 < 2.630e6; w=0.1 frozen 1.554e4/2.708e4/6.952e4/1.335e5/2.779e5; D5 1.459e4/2.547e4/6.540e4/1.256e5/2.615e5; slope r^0.530 (r^0.532 D5); still strictly increasing with r_18 corrected"
+  },
+  {
+   "requirement": "inconclusive rule",
+   "status": "pass",
+   "evidence": "20/20 primary cells present, rc=0, uncapped, undecided=0"
+  },
+  {
+   "requirement": "g(t) table, step ratios, t-growth argument",
+   "status": "pass",
+   "evidence": "g values, g(t+1)/g(t) 1.57-2.54 (median 2.01, n=15), g(4) 2111-2706, cols*mpt growth 4.02-9.46, covered growth 2.00-4.91, needed 8-19x, cols/cov at S*(k,4) 0.138/0.120/0.154/0.148/0.154 all reproduced"
+  },
+  {
+   "requirement": "exploratory E1-E4",
+   "status": "pass",
+   "evidence": "E1 seed-0 ratios t5 2.10/6.32/2.39/3.47/2.13, t6 2.21/1.75/2.01/1.60/1.40; E2 3.352-3.382 (t5), 4.834-4.868 (t6); E3 nat_pt/mpt 0.041-0.833 %; nat_pt=224 at t5 g4 for k>=20 (= T10's 224 per target, confirming D5)"
+  },
+  {
+   "requirement": "totals and sizing",
+   "status": "pass_with_errata",
+   "evidence": "sum f4_muladds = 852,770,849 (exact); run envelope 06:33:21-06:35:45 = 144 s; sum wall_s = 139.8 s; per-cell wall_s 0.48-11.50 s (erratum E3)"
+  },
+  {
+   "requirement": "upstream citations",
+   "status": "pass",
+   "evidence": "T10 README (52,816.0; 177,112.0; 146,464.0; 710,095.08; 417,161.31; argmin G=t-1 in all 6 series; G=t refused; 36 cells, t in {5,6,7}, cell wall 1-25 s), T4 replication README (710,091.9/710,094.0/710,096.0; 177,112.0 at k20,k24), t7_t0_frames README (17,592.0 for isogeny@595 and @1093 at t4 G3), T12 README (rho-neg 32/32 S=1.544/1.654/2.651; winner 6.06e4x behind rho-neg at w=0.1, 17.1x at w=0) all match the PROTOCOL/README citations"
+  },
+  {
+   "requirement": "curve constants (A, p, r)",
+   "status": "fail -> erratum E1",
+   "evidence": "binary `family 16,18,20,22,24` gives #E = 8*8209 / 8*32887 / 8*131203 / 8*524731 / 8*2097349; census coverage_exact implies r = 8209/32887/131203/524731/2097349 in every row; independent check (r prime, 8r in Hasse window, 5 random points with ord(8P)=r) confirms these; r_18 = 32719 used by PROTOCOL §2.1, analyze.py, select_seeds.py, seeds.json is wrong (8*32719*P != O for 209/209 points on A=78, p=262133)"
+  },
+  {
+   "requirement": "reporting contract (one table, one unit, ratio, phases, §5a band, reference priced)",
+   "status": "pass_with_errata",
+   "evidence": "one 40-row table in F4 mul-adds; ratio column vs rho GAE; w in {0,0.1,1}; phases stated (F4 model only; LA, group ops, seed search, slack excluded); rho reference fixed at S=1.5 for all w by the brief rather than priced at w (erratum E7); class 'exploratory engine measurement', 'rho remains ahead', no leaderboard claim; no m=83/ECC2K-130 content"
+  },
+  {
+   "requirement": "scope and failed-prediction honesty",
+   "status": "pass",
+   "evidence": "P2 point predictions reported as missed with mechanism; P4 point predictions attributed to w=0 and both scales shown; D1-D6 deviations recorded; D5 (nat scale) disclosed with corrected values and no script edit; no extra cells/seeds/t; follow-ups (t=3, seed 0 at t=4,7) listed as needing a new protocol; the brief's default 't=5' and the preregistered alternative both stated"
+  },
+  {
+   "requirement": "certificates",
+   "status": "not_applicable",
+   "evidence": "no discrete-log solve, relation or closure is claimed; counted-unit engine measurement only; hits are hits_verified in-engine and are not relation claims"
+  },
+  {
+   "requirement": "large files / store",
+   "status": "pass",
+   "evidence": "largest file 20,130 bytes; no data file over 64 KiB"
+  }
+ ],
+ "reruns": {
+  "command": "/home/user/ctarget/release/curve25519_family f4cost <k> <form> <t> <G> 100 <2026111500+t> 3600 2 full 0 30000000",
+  "cells": [
+   "k16_t4_g3_s1786",
+   "k20_t5_g4_s1307",
+   "k16_t7_g6_s278",
+   "k18_t5_g4_s0"
+  ],
+  "non_wall_fields_compared": [
+   51,
+   49,
+   51,
+   49
+  ],
+  "differences": [
+   0,
+   0,
+   0,
+   0
+  ],
+  "outputs": "/tmp/claude-0/-home-user/89ca8f69-b480-5417-bbfb-508279d3c6a2/scratchpad/rerun/",
+  "host_note": "run sequentially while another session's ecbench process was active (counts are deterministic; wall times not used)"
+ },
+ "recomputed": {
+  "E_best_by_k_E0": {
+   "16": 19814000.0,
+   "18": 69071000.0,
+   "20": 355100000.0,
+   "22": 1363700000.0,
+   "24": 5676400000.0
+  },
+  "E_best_by_k_E1_frozen": {
+   "16": 32849000.0,
+   "18": 113050000.0,
+   "20": 581170000.0,
+   "22": 2231900000.0,
+   "24": 9290300000.0
+  },
+  "E_best_by_k_E1_D5": {
+   "16": 19945000.0,
+   "18": 69511000.0,
+   "20": 357360000.0,
+   "22": 1372400000.0,
+   "24": 5712500000.0
+  },
+  "E_best_k18_with_r18_32887": {
+   "E0": 69426000.0,
+   "E1_frozen": 113630000.0,
+   "E1_D5": 69868000.0
+  },
+  "b": {
+   "frozen_w1": 1.029678,
+   "frozen_w0.1": 1.0312,
+   "w0": 1.0315,
+   "D5_w0.1": 1.0315,
+   "D5_w1": 1.0315,
+   "with_r18_corrected_frozen_w1": 1.0297
+  },
+  "predictions": {
+   "P0": "held (7/7 rel diff 0.0)",
+   "P1": "held (40/40)",
+   "P2": "held (1.0053/1.0273/1.0508/1.0915; point predictions missed)",
+   "P3": "held (0.9807-1.0000)",
+   "P4": "held",
+   "P5": "held (b=1.0297)",
+   "P6": "held"
+  },
+  "P6_ratios_w1_frozen": [
+   241700.0,
+   416640.0,
+   1069600.0,
+   2054000.0,
+   4276600.0
+  ],
+  "P6_ratios_w1_frozen_r18_corrected": [
+   241700.0,
+   417710.0,
+   1069600.0,
+   2054000.0,
+   4276600.0
+  ],
+  "t4_gain_over_T10_winner_k20_E0": 2.0444,
+  "projected_distance_w0.1": 29600.0,
+  "sum_f4_muladds": 852770849,
+  "sum_wall_s": 139.8,
+  "run_envelope_s": 144,
+  "rho_pricing_factors_vs_T12": {
+   "w0.1": 1.103,
+   "w1": 1.767
+  }
+ },
+ "errata": [
+  {
+   "id": "E1",
+   "severity": "moderate (numbers), none (verdicts)",
+   "where": "PROTOCOL.md §2.1 and §2.4, scripts/analyze.py R dict, scripts/select_seeds.py R dict, selection/seeds.json 'r' for k18 cells, README E_best table and distance table (k=18 row), all 8 k=18 rows of the 40-cell table",
+   "finding": "r_18 = 32719 is not the prime-order subgroup size of the k=18 miniature (A=78, p=262133). The correct value is r_18 = 32887 (#E = 8*32887 = 263096): the frozen binary's own `family` table, the census (coverage_exact = covered_points/32887 in all 8,000 k18 rows), research/curve25519_frame_search_20261103/confirm/k18.json and the T4 replication PROTOCOL all carry 32887, and an independent order check confirms it (32719 fails 8rP=O for 209/209 points). The error is local to L10.",
+   "effect": "all k=18 E values and E_best(18) are 0.513 % low (E_0 6.9071e7 -> 6.9426e7; E_1 frozen 1.1305e8 -> 1.1363e8; E_1 D5 6.9511e7 -> 6.9868e7); sqrt(r_18) 180.9 -> 181.3; 1.5 sqrt(r_18) 271.3 -> 272.0; k18 distance ratios 4.166e5 -> 4.177e5 (w=1 frozen), 2.562e5 -> 2.569e5 (D5), 2.708e4 -> 2.715e4 (w=0.1 frozen), 2.547e4 -> 2.554e4 (D5); local slope 18->20 1.179 -> 1.180; b unchanged to 4 decimals; within-k ratios (P4), mpt series (P2, P3), g(t) and all hits unaffected; P4, P5, P6 verdicts unchanged."
+  },
+  {
+   "id": "E2",
+   "severity": "disclosed by producer (README D5); recorded as a protocol/script defect",
+   "where": "scripts/analyze.py nat_of(); PROTOCOL §1 and §3",
+   "finding": "The frozen analysis adds the 100-target total of native.*_uncharged to the per-target mpt (e.g. 22,400 vs 224 per target at t5 g4), contrary to PROTOCOL §1's per-target definition; the frozen E_0.1/E_1 columns and the P4/P5/P6 decisions therefore price nat at 100x (E_1 overstated by up to 1.83x at k16 t7). PROTOCOL §3's statement that the w values 'agree to < 1 %' holds for b but not for the frozen E_w. Confirmed: corrected (per-target) values give b = 1.0315, E(t5)/E(t4) 2.39-2.54 / 1.90-2.05, P6 strictly increasing; no verdict changes."
+  },
+  {
+   "id": "E3",
+   "severity": "minor (sizing text only)",
+   "where": "README 'Instrument and run'",
+   "finding": "'per-cell wall 1-11 s' and 'the whole run took 144 s wall': wall_s in the JSONs ranges 0.48-11.50 s and sums to 139.8 s; 144 s is the env.txt start/end envelope including runner overhead."
+  },
+  {
+   "id": "E4",
+   "severity": "minor (mechanism wording)",
+   "where": "README P2 bullet and 'Hit-rate note on P2'",
+   "finding": "'mpt is identical to the last digit across all cells with hits = 0' and '710,096.0 at k >= 20' do not hold for the t6 G4 (G = t-2) series: hits = 0 at k = 20, 22, 24 with mpt 710,095.08 / 710,096.0 / 710,096.0 (spread 1.3e-6; the T4 replication had documented the same seed-dependent variation). The statement holds for the four primary G = t-1 series."
+  },
+  {
+   "id": "E5",
+   "severity": "trivial",
+   "where": "README hit-rate note",
+   "finding": "'<= 8 % downward bias at k = 16' should read 8.4 % (t = 7: 388,472.09 / 424,021.45 = 0.916), as the Answer section states; the bias in E_best(16) (t = 4) is 0.53 %."
+  },
+  {
+   "id": "E6",
+   "severity": "minor (documentation)",
+   "where": "PROTOCOL.md header",
+   "finding": "The frozen file still says 'Status: design, not yet frozen ... frozen when its commit hash is recorded here'; the hash was never recorded in the file. The freeze is nonetheless established by commit 5a800bb3 (blob ids identical) and recorded in the README."
+  },
+  {
+   "id": "E7",
+   "severity": "minor (reporting contract; conservative direction)",
+   "where": "README 'Distance remaining' table; PROTOCOL §2.1 rho reference",
+   "finding": "AGENTS §5a prices the reference arm's unpriced native work at w as well; the brief/protocol fixed rho-neg S = 1.5 at every w while T12 measured 1.544 / 1.654 / 2.651 at w = 0 / 0.1 / 1 (k = 20). The w = 0.1 and w = 1 distance columns are therefore 1.10x and 1.77x larger than against the T12-priced reference (constant factors; P6 monotonicity and the r^0.53 slope unaffected). The README discloses the heuristic but not the factor."
+  },
+  {
+   "id": "E8",
+   "severity": "trivial",
+   "where": "PROTOCOL §2.4 predicted table, E(t=7) column",
+   "finding": "The t = 7 predictions (1.69e8, 6.52e8, 2.49e9, 9.37e9, 4.06e10) correspond to the seed-0 prior mpt(7,6) = 423,619.64, not the seed-1594 value 417,161.31 also listed in §2.3 (which gives 1.67e8, 6.48e8, 2.47e9, 9.30e9, 4.04e10). No decision depends on t = 7."
+  }
+ ],
+ "observations": [
+  "The wave-4 brief text (rho-neg S = 1.5 fixture, brief items i-iv, 't = 5' default, '4-core host') is not in the repository; the frozen PROTOCOL.md (committed 49 s before the run) is the binding validated here.",
+  "P5's b ~ 1 is largely a consequence of the model (r enters E explicitly) given P2's mpt k-invariance and the bounded census cols/cov spread; the README says so. The measured content is P0-P3 and the hit-rate artefact; nothing here is an end-to-end or cross-method ranking.",
+  "data/env.txt records the frozen census hashes (echoed constants), not the measured ones; the run.sh gate makes them equal and the validator re-verified the five census files.",
+  "nproc reports 4 at validation time vs 3 recorded during the run (README E4); irrelevant to counts.",
+  "README/data/analysis are untracked and locally git-excluded; whoever commits them should carry the hashes recorded in this report."
+ ],
+ "not_done": [
+  "Did not re-run all 40 cells (4 re-run as dispatched; 7 more cross-checked bit-for-bit against T10's raw data).",
+  "Did not verify the T12 ecbench session itself (validated separately); its figures were checked against its README only."
+ ]
+}

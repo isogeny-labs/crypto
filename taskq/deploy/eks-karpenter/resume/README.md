@@ -187,7 +187,10 @@ well as `isolab-eks-mcp`, restart the connection and inspect its live tool list.
 
 The request binds a logical name, exact base image/source/binary, exact recovery
 image, original L2 spec, c8a.2xlarge, checkpoint interval (30..900 seconds), maximum
-restores (1..5), and the original absolute UTC deadline. Computation is UID/GID
+restores (1..5), and the original absolute UTC deadline. A separate, not yet
+live-qualified [command mode](CONTROLLER.md#command-mode) runs a trusted native
+command instead of ecbench, allows up to 50 restores, uploads its outputs and
+skips replay and the fresh epoch. Computation is UID/GID
 1000 without capabilities or supplementary groups. Timing is forced to L0 and
 cannot pass the ordinary L2 gate. It is replayed for correctness before exactly
 one distinct fresh benchmark epoch. Supported workloads are trusted native CPU

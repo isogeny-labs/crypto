@@ -1,0 +1,21 @@
+{
+ "created_at": "2026-11-04T06:25:05Z",
+ "id": "PCC-20261104-a35b19",
+ "kind": "theorem",
+ "producer": {
+  "commit": "19e565e33bfda1089d8b6337e9aee1798ef22591",
+  "model": "claude-mythos-5-1",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "9d3792de232343692045d9aac3a97c11cde0e5e9277ad8aa69a04aed6667b8b7",
+   "kind": "lean",
+   "project": "research/ecdlp_weakness_lean_20261104/lean",
+   "theorem": "TransparentEncoding.zero_operation_dlog"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Lean v4.34.1 / Mathlib v4.34.1; statement fidelity per research/ecdlp_weakness_lean_20261104/README.md",
+ "statement": "With a transparent encoding enc(x g) = x of a cyclic group, the output enc(h) is a discrete logarithm of h, with no group operation."
+}

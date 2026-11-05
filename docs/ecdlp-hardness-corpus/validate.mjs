@@ -43,7 +43,7 @@ const allowedKinds = new Set([
 ]);
 const allowedStatuses = new Set([
   "definition", "assumed", "proved_external", "proved_internal_unreviewed",
-  "algorithm", "conditional", "measured", "heuristic", "open"
+  "algorithm", "conditional", "measured", "heuristic", "open", "refuted", "proved_external_unread"
 ]);
 const allowedModels = new Set([
   "mathematical", "classical_unrestricted", "generic_group",
@@ -53,11 +53,11 @@ const allowedModels = new Set([
 const allowedRelations = new Set([
   "defines", "reduces_to", "hardness_implies", "upper_bounds", "lower_bounds",
   "attacks_when", "enables", "conditions", "instantiates", "model_bridge",
-  "does_not_cover", "obstructs", "leaves_open", "measures", "qualifies"
+  "does_not_cover", "obstructs", "leaves_open", "measures", "qualifies", "refutes"
 ]);
 const allowedEvidenceClasses = new Set([
   "theorem", "algorithm", "conditional_theorem", "asymptotic_heuristic",
-  "concrete_estimate", "measurement", "assumption", "definition", "open"
+  "concrete_estimate", "measurement", "assumption", "definition", "open", "counterexample"
 ]);
 
 for (const source of corpus.sources ?? []) {
@@ -98,6 +98,64 @@ for (const node of corpus.nodes ?? []) {
   }
 }
 
+const inventoryPath = path.join(here, "galbraith-2018-inventory.json");
+requireValue(fs.existsSync(inventoryPath), "missing Galbraith book inventory");
+if (fs.existsSync(inventoryPath)) {
+  const inventory = JSON.parse(fs.readFileSync(inventoryPath, "utf8"));
+  requireValue(inventory.schema === "ecdlp.galbraith-book-inventory/v1", "wrong Galbraith inventory schema");
+  requireValue(inventory.source?.id === "S-GALBRAITH-MPKC-2018", "wrong Galbraith inventory source id");
+  requireValue(inventory.source?.sha256 === "ca75ee62b96daa0d46faaa2d4dc28205683455ad3a2a48586b9b39299c25022d", "wrong Galbraith PDF digest");
+  requireValue(inventory.source?.pdf_pages === 696, "wrong Galbraith PDF page count");
+  requireValue(Array.isArray(inventory.results), "Galbraith results must be an array");
+  requireValue(Array.isArray(inventory.sections), "Galbraith sections must be an array");
+  requireValue(inventory.results?.length === 717, "Galbraith inventory must contain 717 labeled results");
+  requireValue(inventory.sections?.length === 375, "Galbraith inventory must contain 375 sections");
+
+  const inventoryIds = uniqueIds(inventory.results ?? [], "Galbraith results");
+  const resultKeys = new Set();
+  const algorithmNumbers = [];
+  for (const result of inventory.results ?? []) {
+    const key = `${result.type}:${result.number}`;
+    requireValue(!resultKeys.has(key), `Galbraith results: duplicate label ${key}`);
+    resultKeys.add(key);
+    requireValue(Number.isInteger(result.pdf_page) && result.pdf_page >= 1 && result.pdf_page <= 696, `${result.id}: invalid PDF page`);
+    requireValue(typeof result.chapter === "string" && result.chapter.length > 0, `${result.id}: missing chapter`);
+    requireValue(["ecdlp_core", "protocol_context", "mathematical_dependency", "background"].includes(result.relevance), `${result.id}: invalid relevance`);
+    if (result.type === "Algorithm") algorithmNumbers.push(Number(result.number));
+  }
+  algorithmNumbers.sort((left, right) => left - right);
+  requireValue(algorithmNumbers.join(",") === Array.from({ length: 29 }, (_, index) => index + 1).join(","), "Galbraith algorithms must be numbered 1 through 29");
+
+  const sectionNumbers = new Set();
+  for (const section of inventory.sections ?? []) {
+    requireValue(!sectionNumbers.has(section.number), `Galbraith sections: duplicate ${section.number}`);
+    sectionNumbers.add(section.number);
+    requireValue(Number.isInteger(section.pdf_page) && section.pdf_page >= 1 && section.pdf_page <= 696, `Galbraith section ${section.number}: invalid PDF page`);
+  }
+  requireValue(inventory.counts?.labeled_results === inventory.results?.length, "Galbraith labeled-result count is stale");
+  requireValue(inventory.counts?.sections === inventory.sections?.length, "Galbraith section count is stale");
+  requireValue(inventoryIds.size === inventory.results?.length, "Galbraith result IDs are not unique");
+  for (const dimension of ["type", "chapter", "relevance"]) {
+    const actual = {};
+    for (const result of inventory.results ?? []) actual[result[dimension]] = (actual[result[dimension]] ?? 0) + 1;
+    requireValue(JSON.stringify(actual, Object.keys(actual).sort()) === JSON.stringify(inventory.counts?.[`by_${dimension}`], Object.keys(actual).sort()), `Galbraith counts by ${dimension} are stale`);
+  }
+
+  const galbraithSource = corpus.sources.find(source => source.id === "S-GALBRAITH-MPKC-2018");
+  requireValue(galbraithSource?.sha256 === inventory.source?.sha256, "Galbraith source ledger and inventory digests differ");
+
+  for (const node of corpus.nodes ?? []) {
+    if (!node.source_refs.includes("S-GALBRAITH-MPKC-2018")) continue;
+    requireValue(Array.isArray(node.source_locations) && node.source_locations.length > 0, `${node.id}: Galbraith-backed node lacks a source locator`);
+    for (const location of node.source_locations ?? []) {
+      const labels = [...location.matchAll(/(Definition|Theorem|Lemma|Proposition|Corollary|Conjecture|Heuristic|Algorithm)\s+((?:[0-9]+|A)(?:\.[0-9]+)*|[0-9]+)/g)];
+      for (const [, type, number] of labels) {
+        requireValue(resultKeys.has(`${type}:${number}`), `${node.id}: unknown Galbraith locator ${type} ${number}`);
+      }
+    }
+  }
+}
+
 for (const edge of corpus.edges ?? []) {
   requireValue(nodeIds.has(edge.from), `${edge.id}: unknown from node ${edge.from}`);
   requireValue(nodeIds.has(edge.to), `${edge.id}: unknown to node ${edge.to}`);
@@ -109,7 +167,7 @@ for (const edge of corpus.edges ?? []) {
 for (const target of corpus.research_targets ?? []) {
   requireValue(["working", "ready", "blocked", "open"].includes(target.status), `${target.id}: unknown target status ${target.status}`);
   requireValue(Number.isInteger(target.priority) && target.priority >= 1, `${target.id}: invalid priority`);
-  for (const key of ["objective", "acceptance", "next_step"]) {
+  for (const key of ["label", "objective", "acceptance", "next_step"]) {
     requireValue(typeof target[key] === "string" && target[key].length > 0, `${target.id}: missing ${key}`);
   }
   for (const dep of target.depends_on ?? []) requireValue(nodeIds.has(dep), `${target.id}: unknown dependency ${dep}`);
@@ -120,6 +178,67 @@ const sourceVerification = new Map((corpus.sources ?? []).map(source => [source.
 for (const node of corpus.nodes ?? []) {
   if (node.status === "proved_external") {
     requireValue(node.source_refs.some(ref => sourceVerification.get(ref) === "primary_read"), `${node.id}: externally proved claim lacks a primary-read source`);
+  }
+  if (node.status === "proved_external_unread") {
+    requireValue(node.source_refs.some(ref => ["metadata_only", "secondary_only", "primary_read"].includes(sourceVerification.get(ref))), `${node.id}: unread external theorem needs a cited publication source`);
+    requireValue((node.source_locations ?? []).length > 0, `${node.id}: unread external theorem needs a source location (theorem number, section or page)`);
+  }
+}
+
+// Proof-linkage layer: formalization state, repository citations, refutations, taint.
+const repoRoot = path.resolve(here, "../..");
+const formalStates = new Set(["kernel_checked", "lean_written_unchecked", "native_exact", "stated_open", "none"]);
+const citationUses = new Set(["depends", "reports", "measures", "mention"]);
+for (const node of corpus.nodes ?? []) {
+  if (node.formal !== undefined) {
+    requireValue(formalStates.has(node.formal.state), `${node.id}: unknown formal state ${node.formal.state}`);
+    requireValue(Array.isArray(node.formal.artifacts), `${node.id}: formal.artifacts must be an array`);
+    for (const artifact of node.formal.artifacts ?? []) {
+      const full = path.resolve(repoRoot, artifact.path ?? "");
+      requireValue(fs.existsSync(full), `${node.id}: missing formal artifact ${artifact.path}`);
+      if (node.formal.state === "kernel_checked" && artifact.path?.endsWith(".lean") && fs.existsSync(full)) {
+        requireValue(!/\bsorry\b|native_decide/.test(fs.readFileSync(full, "utf8")), `${node.id}: kernel_checked artifact ${artifact.path} contains sorry or native_decide`);
+      }
+    }
+    if (["kernel_checked", "lean_written_unchecked"].includes(node.formal.state)) {
+      requireValue(node.formal.artifacts.some(artifact => artifact.path.endsWith(".lean")), `${node.id}: Lean formal state without a .lean artifact`);
+    }
+  }
+  const citedPaths = new Set();
+  for (const citation of node.cited_by ?? []) {
+    requireValue(citationUses.has(citation.use), `${node.id}: unknown citation use ${citation.use}`);
+    requireValue(fs.existsSync(path.resolve(repoRoot, citation.path ?? "")), `${node.id}: cited_by path missing ${citation.path}`);
+    requireValue(!citedPaths.has(citation.path), `${node.id}: duplicate cited_by path ${citation.path}`);
+    citedPaths.add(citation.path);
+  }
+  for (const pattern of node.citation_patterns ?? []) {
+    try { new RegExp(pattern, "i"); } catch (error) { errors.push(`${node.id}: bad citation pattern ${pattern}: ${error.message}`); }
+  }
+  if (node.status === "refuted") {
+    requireValue((corpus.edges ?? []).some(edge => edge.relation === "refutes" && edge.to === node.id), `${node.id}: refuted claim has no refutes edge`);
+  }
+}
+const nodeStatus = new Map((corpus.nodes ?? []).map(node => [node.id, node.status]));
+for (const edge of corpus.edges ?? []) {
+  if (edge.relation === "refutes") {
+    requireValue(nodeStatus.get(edge.to) === "refuted", `${edge.id}: refutes a node whose status is not refuted`);
+    requireValue(nodeStatus.get(edge.from) !== "refuted" && nodeStatus.get(edge.from) !== "open", `${edge.id}: refutation must come from an established node`);
+  }
+}
+// Taint: nothing reached from a refuted claim through a support edge may be presented as established.
+const supportRelations = new Set(["conditions", "enables", "model_bridge"]);
+const establishedStatuses = new Set(["proved_external", "proved_external_unread", "proved_internal_unreviewed", "algorithm", "measured"]);
+for (const root of (corpus.nodes ?? []).filter(node => node.status === "refuted")) {
+  const seen = new Set([root.id]);
+  const queue = [root.id];
+  while (queue.length > 0) {
+    const current = queue.shift();
+    for (const edge of corpus.edges ?? []) {
+      if (edge.from !== current || !supportRelations.has(edge.relation) || seen.has(edge.to)) continue;
+      seen.add(edge.to);
+      queue.push(edge.to);
+      requireValue(!establishedStatuses.has(nodeStatus.get(edge.to)), `${edge.to}: status ${nodeStatus.get(edge.to)} but it depends on refuted ${root.id} (via ${edge.id})`);
+    }
   }
 }
 

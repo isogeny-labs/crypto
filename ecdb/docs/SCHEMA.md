@@ -260,6 +260,33 @@ Other polynomials sit beside the object they define:
 - `ec.ic_board_row.factor_base_id` links a leaderboard row whose
   `factor_base` names an FB1 id.
 
+### Design grids and IC tool-program claims (`0012`)
+
+- `ec.factor_base_design` holds a planned factor-base × solver grid: the n83
+  sweep, `research/koblitz_n83_factor_base_sweep_20261008/design.json`. It
+  stores the solver axes, the tuple counts, and the per-tuple disposition
+  counts, which say why tuples were or were not run. All of these are design
+  coverage, never results.
+- `ec.factor_base_design_member` places each of the design's 1,050 base specs
+  at its ordinal, as a `spec` factor base (FBS1). The specs sit on the two
+  Koblitz models over GF(2^83), and a spec's `a` selects the model.
+- `ec.factor_base` gains scheme `pointset`: an IC tool-program candidate's
+  base, keyed by the SHA-256 of its usable point set. Its candidate labels
+  (IC1…, one per rule version) and the geometric-set digest are aliases.
+- `ec.ic_claim` holds one sealed claim per rule version × curve × target ×
+  round (`research/ic_tool_program/rule/*/claims/`):
+  - IC and rho online wall time and `online_speedup`;
+  - the producer's S costs, including `s_setup`, `s_ic_cold`, `s_rho_cold`
+    and `cold_ratio_ic_over_rho`;
+  - native operation counts, the verdict, and the claim validator's status.
+
+  `online_speedup` leaves out the IC reusable set-up.
+  `cold_ratio_ic_over_rho` includes it, and is the figure to quote: the
+  distance remaining to rho.
+- `ec.v_ic_claim_summary` aggregates per rule version and candidate: claim
+  and pass counts, the geometric mean of the online speedup and of the cold
+  ratio, and mean S per phase.
+
 ## 4. Coverage of the brief
 
 | Asked for | Where it lives |
@@ -366,6 +393,15 @@ These tables exist and still wait for a producer:
 | `factor_base_alias` | 13,726 aliases: plug-in strings, catalog ids, store paths, archive aliases, file digests |
 
 The leaderboard's `factor_base` fields are recipe links, not FB1 records, so no `ic_board_row` links yet.
+
+Migration 0012 adds the following on top of that load:
+
+| Table | Rows |
+|:--|:--|
+| `factor_base_design` | 1, the n83 sweep: 1,050 base specs × 43,200 solver tuples = 45,360,000 tuples, each with its disposition |
+| `factor_base_design_member` | 1,050, each a `spec` factor base on one of the two GF(2^83) Koblitz models |
+| `factor_base`, scheme `pointset` | 6 tool-program bases (n = 41, 47, 53, 57, 59, 61), each under 4 or 5 candidate labels across rule versions |
+| `ic_claim` | 2,040: rule versions v3, v6, v7, v8 and v8c, each with 6 curves × 34 targets × 2 rounds. All 2,040 pass the claim validator, and 2,038 are faster online. Cold, set-up included, rho stays cheaper on every claim: the lowest cold ratio IC / rho is 1.63. Under v8c the per-curve geometric mean runs from 3.80 (n = 47) to 12.79 (n = 61). |
 
 ## 6. Query recipes
 
