@@ -1,0 +1,38 @@
+option(redSB);short=0;
+poly A49=subst(prime49_1[2],v,0);poly B49=(prime49_1[2]+A49)/v;
+poly nRest49=prime49_1[3]+n;
+if(A49+B49*v!=prime49_1[2] || subst(A49,v,0)!=A49 || subst(B49,v,0)!=B49 || subst(A49,n,0)!=A49 || subst(B49,n,0)!=B49 || subst(nRest49,n,0)!=nRest49){ERROR("LAMBDA49_TRIANGULAR_STRUCTURE");quit;}
+ring lambdaField49=(2,u),(t),dp;
+option(redSB);short=0;
+map extract49=genericCertificate49,0,t,0;
+poly a49=extract49(A49);poly b49=extract49(B49);
+poly minimal49=a49^2+a49*b49+(u^3+u)*b49^2;
+if(deg(minimal49)!=32){ERROR("LAMBDA49_MINIMAL_DEGREE");quit;}
+minimal49=minimal49/leadcoef(minimal49);
+ideal minStd49=std(ideal(minimal49));ideal inverseIdeal49=minimal49,b49;
+ideal inverseStd49=std(inverseIdeal49);
+if(inverseStd49[1]!=1){ERROR("LAMBDA49_DENOMINATOR_NOT_UNIT");quit;}
+ideal one49=1;matrix inverseLift49=lift(inverseIdeal49,one49);
+poly inverseB49=inverseLift49[2,1];
+if(reduce(inverseB49*b49+1,minStd49)!=0){ERROR("LAMBDA49_INVERSE_CERTIFICATE");quit;}
+poly vValue49=reduce(a49*inverseB49,minStd49);
+map recover49=genericCertificate49,0,t,vValue49;
+poly nValue49=reduce(recover49(nRest49),minStd49);
+map sourceForward49=affine49,nValue49,t,vValue49,u;
+if(size(reduce(sourceForward49(sourceIdeal49),minStd49))!=0){ERROR("LAMBDA49_FORWARD_IDENTITIES");quit;}
+setring genericCertificate49;
+ideal genericStd49=std(prime49_1);
+map lambdaBack49=lambdaField49,l;
+if(reduce(lambdaBack49(minimal49),genericStd49)!=0 || reduce(lambdaBack49(vValue49)+v,genericStd49)!=0 || reduce(lambdaBack49(nValue49)+n,genericStd49)!=0){ERROR("LAMBDA49_REVERSE_IDENTITIES");quit;}
+if(reduce(lambdaBack49(nValue49+1)+n,genericStd49)==0){ERROR("LAMBDA49_CORRUPTION_ACCEPTED");quit;}
+setring lambdaField49;
+poly integral49=u^128*subst(minimal49,t,t/u^4);
+if(deg(integral49)!=32 || leadcoef(integral49)!=1){ERROR("LAMBDA49_SCALED_MONIC_DEGREE");quit;}
+int term49;
+for(term49=1;term49<=size(integral49);term49++){if(denominator(leadcoef(integral49[term49]))!=1){ERROR("LAMBDA49_NOT_INTEGRAL");quit;}}
+link lambdaOut49="ASCII:w lambda-integral49.sing";open(lambdaOut49);
+write(lambdaOut49,"ring lambdaIntegral49=2,(t,u),dp;ideal lambdaSource49;lambdaSource49[1]="+string(integral49)+";");close(lambdaOut49);
+link fieldOut49="ASCII:w lambda-field49.sing";open(fieldOut49);
+write(fieldOut49,"ring lambdaCertificate49=(2,u),(t),dp;poly minimal49="+string(minimal49)+";poly vValue49="+string(vValue49)+";poly nValue49="+string(nValue49)+";poly inverseB49="+string(inverseB49)+";");close(fieldOut49);
+print("LAMBDA49_RESULT lambda_primitive=true degree=32 inverse_lift_checked=true two_way_identities=true corrupted_inverse_rejected=true scale_u_power=4 integral_plane_model=true normalization_performed=false");
+print("LAMBDA49_ALL_CHECKS_PASS");quit;

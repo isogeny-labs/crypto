@@ -1,0 +1,146 @@
+LIB "linalg.lib";
+proc require68(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+proc dump68(link out,string name,matrix M){
+ int a;int b;write(out,"matrix "+name+"["+string(nrows(M))+"]["+string(ncols(M))+"];");
+ for(a=1;a<=nrows(M);a++){for(b=1;b<=ncols(M);b++){if(M[a,b]!=0){write(out,name+"["+string(a)+","+string(b)+"]="+string(M[a,b])+";");}}}
+}
+execute(read("../../../67/runs/third-frobenius67-01/third-lattice-polynomial67.sing"));
+require68(nrows(inclusion67)==32 && ncols(inclusion67)==32 && nrows(basisV367)==32 && ncols(basisV367)==32,"FROB68_SAVED_POLYNOMIAL_SHAPES");
+matrix inclusion68=lift(module(basisV367),module(inclusion67));
+require68(basisV367*inclusion68==inclusion67,"FROB68_COMPLETE_ORDER_INCLUSION");
+module quotientGB68=std(module(inclusion68));int quotientLength68=vdim(quotientGB68);
+require68(quotientLength68==8,"FROB68_COMPLETE_V3_ORDER_QUOTIENT");
+module quotientModule68=kbase(quotientGB68);matrix quotientQ68=matrix(quotientModule68);
+require68(nrows(quotientQ68)==32 && ncols(quotientQ68)==8,"FROB68_ALL_8_QUOTIENT_CLASSES");
+link quotientOut68="ASCII:w quotient-basis68.sing";open(quotientOut68);
+write(quotientOut68,"ring fourthPolynomial68=2,(u),dp;short=0;");
+dump68(quotientOut68,"inclusion68",inclusion68);dump68(quotientOut68,"quotientQ68",quotientQ68);close(quotientOut68);
+execute(read("../../../67/runs/third-frobenius67-01/third-lattice-field67.sing"));
+map polyToField68=thirdLatticePolynomial67,u;
+matrix inclusionField68=polyToField68(inclusion68);
+matrix Qfield68=polyToField68(quotientQ68);
+require68(V3coordinates67*V3inverse67==unitmat(32) && V3inverse67*V3coordinates67==unitmat(32),"FROB68_SAVED_V3_TWO_SIDED_INVERSE");
+require68(V3inverse67==inclusionField68,"FROB68_SAVED_POLYNOMIAL_INCLUSION_MATCH");
+execute(read("../../../52/source-data/rr-table50.sing"));
+intmat squareSlots68[32][1];int p68;int i68;int j68;int k68;
+for(p68=1;p68<=528;p68++){
+ if(parents50[p68,1]==parents50[p68,2]){j68=parents50[p68,1];require68(j68>=1 && j68<=32 && squareSlots68[j68,1]==0,"FROB68_UNIQUE_SQUARE_SLOTS");squareSlots68[j68,1]=p68;}
+}
+matrix squareSource68[32][32];
+for(j68=1;j68<=32;j68++){
+ require68(squareSlots68[j68,1]>0,"FROB68_ALL_SQUARE_SLOTS");
+ for(i68=1;i68<=32;i68++){squareSource68[i68,j68]=table50[i68,squareSlots68[j68,1]];}
+}
+setring thirdLatticeField67;
+map tableToField68=tablePidCertificate50,u;
+matrix square68=tableToField68(squareSource68);
+matrix sourceColumns68=V3coordinates67*Qfield68;
+matrix sourceSquares68[32][8];
+for(i68=1;i68<=32;i68++){for(j68=1;j68<=8;j68++){sourceSquares68[i68,j68]=sourceColumns68[i68,j68]^2;}}
+matrix squareImage68=V3inverse67*square68*sourceSquares68;
+string rationalCode68="matrix numeratorRows68[32][8];matrix denominatorRows68[32][8];";
+number coefficient68;int nonzero68=0;
+for(i68=1;i68<=32;i68++){for(j68=1;j68<=8;j68++){
+ require68(diff(squareImage68[i68,j68],q)==0,"FROB68_SCALAR_RATIONAL_COORDINATE");
+ if(squareImage68[i68,j68]!=0){
+  coefficient68=leadcoef(squareImage68[i68,j68]);
+  require68(numerator(coefficient68)/denominator(coefficient68)==coefficient68,"FROB68_RATIONAL_NUMERATOR_DENOMINATOR");
+  rationalCode68=rationalCode68+"numeratorRows68["+string(i68)+","+string(j68)+"]="+string(numerator(coefficient68))+";denominatorRows68["+string(i68)+","+string(j68)+"]="+string(denominator(coefficient68))+";";
+  nonzero68++;
+ }
+}}
+ring binaryRing68=2,(u),dp;short=0;execute(rationalCode68);
+matrix remainderRows68[32][8];list denominators68;intvec offsets68;
+poly common68;poly den68;poly exactQuotient68;poly numerator68;poly remainder68;ideal principal68;
+int rows68=0;int degree68;
+for(i68=1;i68<=32;i68++){
+ common68=1;
+ for(j68=1;j68<=8;j68++){
+  if(numeratorRows68[i68,j68]!=0){den68=denominatorRows68[i68,j68];require68(den68!=0,"FROB68_NONZERO_DENOMINATOR");common68=(common68*den68)/gcd(common68,den68);}
+ }
+ require68(common68!=0,"FROB68_NONZERO_COMMON_DENOMINATOR");
+ denominators68[i68]=common68;offsets68[i68]=rows68;degree68=deg(common68);
+ if(common68!=1){principal68=std(ideal(common68));}
+ for(j68=1;j68<=8;j68++){
+  remainder68=0;
+  if(numeratorRows68[i68,j68]!=0){
+   den68=denominatorRows68[i68,j68];exactQuotient68=common68/den68;
+   require68(exactQuotient68*den68==common68,"FROB68_EXACT_ROW_CLEARING");
+   numerator68=numeratorRows68[i68,j68]*exactQuotient68;
+   if(common68!=1){remainder68=reduce(numerator68,principal68);}
+  }
+  require68(remainder68==0 || deg(remainder68)<degree68,"FROB68_COMPLETE_REMAINDER_BOUND");
+  remainderRows68[i68,j68]=remainder68;
+ }
+ rows68=rows68+degree68;
+}
+matrix binaryMap68[rows68+1][8];matrix terms68;poly rebuilt68;int exponent68;
+for(i68=1;i68<=32;i68++){for(j68=1;j68<=8;j68++){
+ remainder68=remainderRows68[i68,j68];rebuilt68=0;
+ if(remainder68!=0){terms68=coef(remainder68,u);for(k68=1;k68<=ncols(terms68);k68++){
+  exponent68=deg(terms68[1,k68]);
+  require68(terms68[1,k68]==u^exponent68 && terms68[2,k68]==1,"FROB68_BINARY_MONOMIAL_COEFFICIENTS");
+  binaryMap68[offsets68[i68]+exponent68+1,j68]=1;
+  rebuilt68=rebuilt68+terms68[1,k68]*terms68[2,k68];
+ }}
+ require68(rebuilt68==remainder68,"FROB68_EVERY_REMAINDER_RECONSTRUCTION");
+}}
+int rank68=mat_rk(binaryMap68);int kernelDimension68=8-rank68;
+require68(rank68>=0 && kernelDimension68>=0,"FROB68_BINARY_RANK_BOUND");
+link kernelOut68="ASCII:w square-kernel68.sing";open(kernelOut68);
+write(kernelOut68,"ring fourthBinary68=2,(u),dp;short=0;");
+dump68(kernelOut68,"numeratorRows68",numeratorRows68);dump68(kernelOut68,"denominatorRows68",denominatorRows68);
+dump68(kernelOut68,"remainderRows68",remainderRows68);dump68(kernelOut68,"binaryMap68",binaryMap68);
+write(kernelOut68,"int rank68="+string(rank68)+";int kernelDimension68="+string(kernelDimension68)+";");
+matrix kernelBasis68=matrix(syz(module(binaryMap68)));
+require68(nrows(kernelBasis68)==8 && ncols(kernelBasis68)==kernelDimension68 && mat_rk(kernelBasis68)==kernelDimension68,"FROB68_COMPLETE_KERNEL_DIMENSION");
+require68(binaryMap68*kernelBasis68==matrix(0,rows68+1,kernelDimension68),"FROB68_ALL_KERNEL_PRODUCTS");
+for(i68=1;i68<=8;i68++){for(j68=1;j68<=kernelDimension68;j68++){require68(kernelBasis68[i68,j68]==0 || kernelBasis68[i68,j68]==1,"FROB68_KERNEL_OVER_F2");}}
+int changedKernel68=0;
+if(rank68>0 && kernelDimension68>0){
+ int changeColumn68=0;
+ for(i68=1;i68<=rows68+1;i68++){for(j68=1;j68<=8;j68++){if(changeColumn68==0 && binaryMap68[i68,j68]!=0){changeColumn68=j68;}}}
+ require68(changeColumn68>0,"FROB68_NONZERO_CHANGED_KERNEL_COLUMN");
+ matrix badKernel68=kernelBasis68;badKernel68[changeColumn68,1]=badKernel68[changeColumn68,1]+1;
+ require68(binaryMap68*badKernel68!=matrix(0,rows68+1,kernelDimension68),"FROB68_CHANGED_KERNEL_REJECTED");changedKernel68=1;
+}
+dump68(kernelOut68,"kernelBasis68",kernelBasis68);close(kernelOut68);
+map polyToBinary68=thirdLatticePolynomial67,u;
+matrix Jbinary68=polyToBinary68(inclusion68);matrix Qbinary68=polyToBinary68(quotientQ68);
+matrix survivorPoly68=Qbinary68*kernelBasis68;
+matrix combined68[32][32+kernelDimension68];
+for(i68=1;i68<=32;i68++){
+ for(j68=1;j68<=32;j68++){combined68[i68,j68]=Jbinary68[i68,j68];}
+ for(j68=1;j68<=kernelDimension68;j68++){combined68[i68,32+j68]=survivorPoly68[i68,j68];}
+}
+module moduleV468=std(module(combined68));int quotientLength468=vdim(moduleV468);
+require68(quotientLength468==rank68,"FROB68_KERNEL_LATTICE_LENGTH_IDENTITY");
+matrix basisV468=matrix(moduleV468);
+require68(nrows(basisV468)==32 && ncols(basisV468)==32,"FROB68_FULL_FOURTH_PID_BASIS");
+require68(mat_rk(matrix(reduce(module(combined68),moduleV468)))==0 && mat_rk(matrix(reduce(module(basisV468),std(module(combined68)))))==0,"FROB68_BOTH_FOURTH_MODULE_INCLUSIONS");
+link polynomialOut68="ASCII:w fourth-lattice-polynomial68.sing";open(polynomialOut68);
+write(polynomialOut68,"ring fourthLatticePolynomial68=2,(u),dp;short=0;");
+dump68(polynomialOut68,"inclusion68",Jbinary68);dump68(polynomialOut68,"quotientQ68",Qbinary68);
+dump68(polynomialOut68,"kernelBasis68",kernelBasis68);dump68(polynomialOut68,"basisV468",basisV468);close(polynomialOut68);
+setring thirdLatticeField67;
+map binaryToField68=binaryRing68,u;
+matrix V4basisField68=binaryToField68(basisV468);
+matrix V4coordinates68=V3coordinates67*V4basisField68;
+matrix V4inverse68=lift(module(V4coordinates68),module(unitmat(32)));
+require68(V4coordinates68*V4inverse68==unitmat(32) && V4inverse68*V4coordinates68==unitmat(32),"FROB68_BOTH_FOURTH_BASIS_INVERSES");
+for(i68=1;i68<=32;i68++){for(j68=1;j68<=32;j68++){
+ if(V4inverse68[i68,j68]!=0){coefficient68=leadcoef(V4inverse68[i68,j68]);require68(denominator(coefficient68)==1,"FROB68_ORDER_INSIDE_FOURTH_LATTICE");}
+}}
+matrix V4squared68[32][32];for(i68=1;i68<=32;i68++){for(j68=1;j68<=32;j68++){V4squared68[i68,j68]=V4coordinates68[i68,j68]^2;}}
+matrix squareInV368=V3inverse67*square68*V4squared68;
+for(i68=1;i68<=32;i68++){for(j68=1;j68<=32;j68++){
+ if(squareInV368[i68,j68]!=0){coefficient68=leadcoef(squareInV368[i68,j68]);require68(denominator(coefficient68)==1,"FROB68_EVERY_V4_BASIS_SQUARE_IN_V3");}
+}}
+matrix changedInverse68=V4inverse68;changedInverse68[1,1]=changedInverse68[1,1]+1;
+require68(V4coordinates68*changedInverse68!=unitmat(32),"FROB68_CHANGED_INVERSE_REJECTED");
+link fieldOut68="ASCII:w fourth-lattice-field68.sing";open(fieldOut68);
+write(fieldOut68,"ring fourthLatticeField68=(2,u),(q),dp;short=0;");
+dump68(fieldOut68,"V4coordinates68",V4coordinates68);dump68(fieldOut68,"V4inverse68",V4inverse68);
+dump68(fieldOut68,"squareInV368",squareInV368);close(fieldOut68);
+print("FROB68_RESULT order_rank=32 old_quotient=8 square_columns=8 binary_rows="+string(rows68)+" square_rank="+string(rank68)+" survivor_dimension="+string(kernelDimension68)+" new_quotient_length="+string(quotientLength468)+" rational_nonzero_entries="+string(nonzero68)+" fourth_basis_columns=32 changed_kernel_rejected="+string(changedKernel68)+" changed_inverse_rejected=1");
+print("FOURTH_FROBENIUS68_ALL_CHECKS_PASS");quit;

@@ -1,0 +1,40 @@
+proc require57(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../space57-02/complete-space57.sing"));
+int dimension57=ncols(kernel57);
+execute(read("../../../52/source-data/relative-infinity50.sing"));
+execute(read("../../../50/runs/rr-field50-01/rr-field50.sing"));
+map geometry57=relativeInfinity50,l,v/u^2,1/u;
+ideal sourceIdeal57=geometry57(relativeInfinityIdeal50);ideal sourceGB57=std(sourceIdeal57);
+require57(vdim(sourceGB57)==32,"FIELD57_FULL_SOURCE_DEGREE32");
+map coefficients57=completeSpace57,0;
+matrix K57=coefficients57(kernel57);matrix controls57=coefficients57(controlColumns57);matrix small57=coefficients57(smallControls57);
+require57(nrows(K57)==68 && ncols(K57)==dimension57,"FIELD57_FULL_KERNEL_SHAPE");
+poly numeratorA57=(1+u)*v+1+u^3+u^4;
+poly actualA57=numeratorA57/u^4;poly actualB57=((1+u)*v+1)*((1+u)*v+1+u^3)/u^7;
+poly inverseA57=u*((1+u)*v+u+u^3+u^4)/(u^5+u^3+1);
+require57(reduce(actualA57*inverseA57+1,sourceGB57)==0,"FIELD57_EXACT_GENERIC_A_INVERSE");
+ideal expected57=1,actualA57,l,actualB57;poly value57;poly reconstructed57;int i57;int j57;int k57;
+for(j57=1;j57<=4;j57++){
+ value57=0;for(i57=1;i57<=68;i57++){value57=value57+controls57[i57,j57]*rrValues50[i57];}
+ require57(reduce(value57+expected57[j57],sourceGB57)==0,"FIELD57_FOUR_ACTUAL_DESCENDED_CONTROLS");
+}
+ideal completeValues57;ideal dividedValues57;
+for(j57=1;j57<=dimension57;j57++){
+ value57=0;for(i57=1;i57<=68;i57++){value57=value57+K57[i57,j57]*rrValues50[i57];}
+ completeValues57[j57]=reduce(value57,sourceGB57);
+ dividedValues57[j57]=reduce(value57*inverseA57,sourceGB57);
+ require57(reduce(actualA57*dividedValues57[j57]+completeValues57[j57],sourceGB57)==0,"FIELD57_ALL_DIVIDED_SECTION_PRODUCTS");
+}
+for(j57=1;j57<=3;j57++){
+ reconstructed57=0;for(k57=1;k57<=dimension57;k57++){reconstructed57=reconstructed57+small57[k57,j57]*completeValues57[k57];}
+ require57(reduce(reconstructed57+expected57[j57],sourceGB57)==0,"FIELD57_EXACT_SMALL_SPACE_CONTROLS");
+}
+require57(reduce(actualA57*(dividedValues57[1]+1)+completeValues57[1],sourceGB57)!=0,"FIELD57_CHANGED_DIVIDED_SECTION_REJECTED");
+link out57="ASCII:w field-space57.sing";open(out57);
+write(out57,"ring fieldSpace57=(2,u),(l,v),dp;short=0;ideal sourceIdeal57;");
+for(i57=1;i57<=size(sourceIdeal57);i57++){write(out57,"sourceIdeal57["+string(i57)+"]="+string(sourceIdeal57[i57])+";");}
+write(out57,"poly actualA57="+string(actualA57)+";poly inverseA57="+string(inverseA57)+";ideal completeValues57;ideal dividedValues57;");
+for(j57=1;j57<=dimension57;j57++){write(out57,"completeValues57["+string(j57)+"]="+string(completeValues57[j57])+";");write(out57,"dividedValues57["+string(j57)+"]="+string(dividedValues57[j57])+";");}
+close(out57);
+print("FIELD57_RESULT source_degree=32 complete_sections="+string(dimension57)+" divided_sections="+string(dimension57)+" full_A_inverse=1 actual_descended_controls=4 changed_section_rejected=1");
+print("FIELD57_ALL_CHECKS_PASS");quit;

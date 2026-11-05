@@ -1,0 +1,568 @@
+{
+  "schema": "koblitz.round-results/v1",
+  "round": 44,
+  "runs": [
+    {
+      "attempt": "point12-02",
+      "kind": "native",
+      "status": "accepted",
+      "native_exit": 0,
+      "source_revision": "0c1ecaffbcf93a7b07259e443ca6b68e546cc30e",
+      "observations": [
+        "POINT44_RESULT case=1 base_degree=12 twist=0 kernel_dimension=5 source_dimension=10 physical_dimension=20 AS_trace=1 Frobenius_d_deck_step=9 source_tuple_period=120 all_source_equations=5 all_registered_units=8 deck_iterates=10 corrupt_nu=rejected Tate_order=11",
+        "POINT44_RESULT case=1 base_degree=12 twist=1 kernel_dimension=5 source_dimension=10 physical_dimension=20 AS_trace=1 Frobenius_d_deck_step=9 source_tuple_period=120 all_source_equations=5 all_registered_units=8 deck_iterates=10 corrupt_nu=rejected Tate_order=11",
+        "POINT44_RESULT case=2 base_degree=12 twist=0 kernel_dimension=5 source_dimension=10 physical_dimension=20 AS_trace=1 Frobenius_d_deck_step=3 source_tuple_period=120 all_source_equations=5 all_registered_units=8 deck_iterates=10 corrupt_nu=rejected Tate_order=11",
+        "POINT44_RESULT case=2 base_degree=12 twist=1 kernel_dimension=5 source_dimension=10 physical_dimension=20 AS_trace=1 Frobenius_d_deck_step=3 source_tuple_period=120 all_source_equations=5 all_registered_units=8 deck_iterates=10 corrupt_nu=rejected Tate_order=11"
+      ]
+    },
+    {
+      "attempt": "resume-twist436-01",
+      "kind": "native",
+      "status": "accepted",
+      "native_exit": 0,
+      "source_revision": "5b78c6b4661aad5a322377f27f71603da57d9a82",
+      "observations": [
+        "RESUME44_SOURCE_RESULT case=1 base_degree=436 twist=1 kernel_dimension=5 source_dimension=10 physical_dimension=20 AS_trace=1 Frobenius_d_deck_step=3 source_tuple_period=4360 period_method=reused_base_generation_plus_AS_irreducibility Frobenius_method=certified_quadratic_recurrence all_source_equations=5 all_registered_units=8 deck_iterates=10 corrupt_nu=rejected Tate_order=11 source_checks=reused_complete_point436_03_stage completed_new_checks=Frobenius_sign_and_orientation"
+      ]
+    },
+    {
+      "attempt": "control12-01",
+      "kind": "native",
+      "status": "accepted",
+      "native_exit": 0,
+      "source_revision": "a8ae24dd59952f27bb61bea35aa0fe947025cc8a",
+      "observations": [
+        "CONTROL44_RESULT source_polynomials=13 point_algebras=4 complete_value_comparisons=52 source_residuals=20 registered_unit_inverses=32 all_original_polynomial_reconstructions=13"
+      ]
+    },
+    {
+      "attempt": "matrix-control12-01",
+      "kind": "native",
+      "status": "accepted",
+      "native_exit": 0,
+      "source_revision": "962f273359bdc2ec541df8bfc7e4458a3ef5b90f",
+      "observations": [
+        "MCONTROL44_RESULT inverse_comparisons=32 original_matrix_rows=all actual_quotient_products=all"
+      ]
+    },
+    {
+      "attempt": "period-control12-01",
+      "kind": "native",
+      "status": "accepted",
+      "native_exit": 0,
+      "source_revision": "093e32f5437bff1d69bd381ab3db16eef8c90ec6",
+      "observations": [
+        "PERIOD44_RESULT accepted_source_blocks=4 base_tuple_period=60 orientation_sign=checked derived_source_period=120 agrees_with_old_full_period_scan=true"
+      ]
+    },
+    {
+      "attempt": "frobenius-control12-02",
+      "kind": "native",
+      "status": "accepted",
+      "native_exit": 0,
+      "source_revision": "d32d89b755813a4bac6e7f2011a3b2e986644e56",
+      "observations": [
+        "FROB44_RESULT source_blocks=4 actual_coordinate_comparisons=16 explicit_sign_comparisons=4 independent_trace_matches=4 all_quotient_maps=checked"
+      ]
+    },
+    {
+      "attempt": "trace12-01",
+      "kind": "native",
+      "status": "accepted",
+      "native_exit": 0,
+      "source_revision": "349e72b520d25cc59cc6011a70a8ff49601b5498",
+      "observations": [
+        "TRACE44_RESULT case=1 base_degree=12 absolute_kernel_degree=60 source_orientation_trace=1 Tate_twist_trace=1 seven_kernel_trace=0 exact_decomposition=checked both_trace_routes=equal",
+        "TRACE44_RESULT case=2 base_degree=12 absolute_kernel_degree=60 source_orientation_trace=1 Tate_twist_trace=1 seven_kernel_trace=0 exact_decomposition=checked both_trace_routes=equal"
+      ]
+    },
+    {
+      "attempt": "trace436-01",
+      "kind": "native",
+      "status": "accepted",
+      "native_exit": 0,
+      "source_revision": "349e72b520d25cc59cc6011a70a8ff49601b5498",
+      "observations": [
+        "TRACE44_RESULT case=1 base_degree=436 absolute_kernel_degree=2180 source_orientation_trace=1 Tate_twist_trace=1 seven_kernel_trace=0 exact_decomposition=checked both_trace_routes=equal"
+      ]
+    },
+    {
+      "attempt": "filter83-01",
+      "kind": "native",
+      "status": "accepted",
+      "native_exit": 0,
+      "source_revision": "827ca39230187e27df56a4a60448a58dd130f816",
+      "observations": [
+        "FILTER44_RESULT base_degree=83 root=1 twist=0 orientation_trace=1 retained_split=0 actual_Frobenius_sign=checked source_class_nonzero_asserted=false",
+        "FILTER44_RESULT base_degree=83 root=1 twist=1 orientation_trace=0 retained_split=1 actual_Frobenius_sign=checked source_class_nonzero_asserted=false",
+        "FILTER44_RESULT base_degree=83 root=2 twist=0 orientation_trace=1 retained_split=0 actual_Frobenius_sign=checked source_class_nonzero_asserted=false",
+        "FILTER44_RESULT base_degree=83 root=2 twist=1 orientation_trace=0 retained_split=1 actual_Frobenius_sign=checked source_class_nonzero_asserted=false",
+        "FILTER44_RESULT base_degree=83 root=3 twist=0 orientation_trace=1 retained_split=0 actual_Frobenius_sign=checked source_class_nonzero_asserted=false",
+        "FILTER44_RESULT base_degree=83 root=3 twist=1 orientation_trace=0 retained_split=1 actual_Frobenius_sign=checked source_class_nonzero_asserted=false",
+        "FILTER44_RESULT base_degree=83 root=4 twist=0 orientation_trace=1 retained_split=0 actual_Frobenius_sign=checked source_class_nonzero_asserted=false",
+        "FILTER44_RESULT base_degree=83 root=4 twist=1 orientation_trace=0 retained_split=1 actual_Frobenius_sign=checked source_class_nonzero_asserted=false",
+        "FILTER44_RESULT base_degree=83 root=5 twist=0 orientation_trace=1 retained_split=0 actual_Frobenius_sign=checked source_class_nonzero_asserted=false",
+        "FILTER44_RESULT base_degree=83 root=5 twist=1 orientation_trace=0 retained_split=1 actual_Frobenius_sign=checked source_class_nonzero_asserted=false"
+      ]
+    },
+    {
+      "attempt": "filter284-01",
+      "kind": "native",
+      "status": "accepted",
+      "native_exit": 0,
+      "source_revision": "827ca39230187e27df56a4a60448a58dd130f816",
+      "observations": [
+        "FILTER44_RESULT base_degree=284 root=1 twist=0 orientation_trace=1 retained_split=0 actual_Frobenius_sign=checked source_class_nonzero_asserted=false",
+        "FILTER44_RESULT base_degree=284 root=1 twist=1 orientation_trace=1 retained_split=0 actual_Frobenius_sign=checked source_class_nonzero_asserted=false",
+        "FILTER44_RESULT base_degree=284 root=2 twist=0 orientation_trace=1 retained_split=0 actual_Frobenius_sign=checked source_class_nonzero_asserted=false",
+        "FILTER44_RESULT base_degree=284 root=2 twist=1 orientation_trace=1 retained_split=0 actual_Frobenius_sign=checked source_class_nonzero_asserted=false",
+        "FILTER44_RESULT base_degree=284 root=3 twist=0 orientation_trace=1 retained_split=0 actual_Frobenius_sign=checked source_class_nonzero_asserted=false",
+        "FILTER44_RESULT base_degree=284 root=3 twist=1 orientation_trace=1 retained_split=0 actual_Frobenius_sign=checked source_class_nonzero_asserted=false",
+        "FILTER44_RESULT base_degree=284 root=4 twist=0 orientation_trace=1 retained_split=0 actual_Frobenius_sign=checked source_class_nonzero_asserted=false",
+        "FILTER44_RESULT base_degree=284 root=4 twist=1 orientation_trace=1 retained_split=0 actual_Frobenius_sign=checked source_class_nonzero_asserted=false",
+        "FILTER44_RESULT base_degree=284 root=5 twist=0 orientation_trace=1 retained_split=0 actual_Frobenius_sign=checked source_class_nonzero_asserted=false",
+        "FILTER44_RESULT base_degree=284 root=5 twist=1 orientation_trace=1 retained_split=0 actual_Frobenius_sign=checked source_class_nonzero_asserted=false"
+      ]
+    },
+    {
+      "attempt": "point12-01",
+      "kind": "native",
+      "status": "rejected",
+      "native_exit": 0,
+      "reason": "reserved Singular kernel identifier; late marker rejected",
+      "mathematical_refutation": false
+    },
+    {
+      "attempt": "point436-01",
+      "kind": "native",
+      "status": "rejected",
+      "native_exit": 124,
+      "reason": "1200s timeout during full source evaluation",
+      "mathematical_refutation": false
+    },
+    {
+      "attempt": "point436-02",
+      "kind": "native",
+      "status": "rejected",
+      "native_exit": 124,
+      "reason": "1200s timeout after quotient-first source evaluation; full source not certified",
+      "mathematical_refutation": false
+    },
+    {
+      "attempt": "frobenius-control12-01",
+      "kind": "native",
+      "status": "rejected",
+      "native_exit": 0,
+      "reason": "nested-list conversion error in control; late marker rejected",
+      "mathematical_refutation": false
+    },
+    {
+      "attempt": "point436-03",
+      "kind": "native",
+      "status": "partial",
+      "native_exit": 124,
+      "reason": "1200s timeout after complete geometry checks for both forms and full first-block Frobenius/period; missing twisted Frobenius completed by resume-twist436-01",
+      "completed_full_source_blocks": 1,
+      "completed_geometry_source_blocks": 2,
+      "mathematical_refutation": false
+    },
+    {
+      "attempt": "lean44-01",
+      "kind": "Lean",
+      "status": "accepted",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "audited_declarations": 4,
+      "named_mathematical_theorems": 3
+    },
+    {
+      "attempt": "trace-lean44-01",
+      "kind": "Lean",
+      "status": "accepted",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "audited_declarations": 1,
+      "named_mathematical_theorems": 1
+    },
+    {
+      "attempt": "quadratic-lean44-01",
+      "kind": "Lean",
+      "status": "accepted",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "audited_declarations": 4,
+      "named_mathematical_theorems": 1
+    },
+    {
+      "attempt": "odd-lean44-02",
+      "kind": "Lean",
+      "status": "accepted",
+      "compile_exit": 0,
+      "audit_exit": 0,
+      "audited_declarations": 2,
+      "named_mathematical_theorems": 2
+    },
+    {
+      "attempt": "odd-lean44-01",
+      "kind": "Lean",
+      "status": "rejected",
+      "compile_exit": 1,
+      "reason": "unavailable Mathlib.Tactic.Omega object; replaced by pinned ring tactic in fresh attempt"
+    }
+  ],
+  "source_blocks": [
+    {
+      "case": "1",
+      "base_degree": "12",
+      "twist": "0",
+      "kernel_dimension": "5",
+      "source_dimension": "10",
+      "physical_dimension": "20",
+      "AS_trace": "1",
+      "Frobenius_d_deck_step": "9",
+      "source_tuple_period": "120",
+      "all_source_equations": "5",
+      "all_registered_units": "8",
+      "deck_iterates": "10",
+      "corrupt_nu": "rejected",
+      "Tate_order": "11"
+    },
+    {
+      "case": "1",
+      "base_degree": "12",
+      "twist": "1",
+      "kernel_dimension": "5",
+      "source_dimension": "10",
+      "physical_dimension": "20",
+      "AS_trace": "1",
+      "Frobenius_d_deck_step": "9",
+      "source_tuple_period": "120",
+      "all_source_equations": "5",
+      "all_registered_units": "8",
+      "deck_iterates": "10",
+      "corrupt_nu": "rejected",
+      "Tate_order": "11"
+    },
+    {
+      "case": "2",
+      "base_degree": "12",
+      "twist": "0",
+      "kernel_dimension": "5",
+      "source_dimension": "10",
+      "physical_dimension": "20",
+      "AS_trace": "1",
+      "Frobenius_d_deck_step": "3",
+      "source_tuple_period": "120",
+      "all_source_equations": "5",
+      "all_registered_units": "8",
+      "deck_iterates": "10",
+      "corrupt_nu": "rejected",
+      "Tate_order": "11"
+    },
+    {
+      "case": "2",
+      "base_degree": "12",
+      "twist": "1",
+      "kernel_dimension": "5",
+      "source_dimension": "10",
+      "physical_dimension": "20",
+      "AS_trace": "1",
+      "Frobenius_d_deck_step": "3",
+      "source_tuple_period": "120",
+      "all_source_equations": "5",
+      "all_registered_units": "8",
+      "deck_iterates": "10",
+      "corrupt_nu": "rejected",
+      "Tate_order": "11"
+    },
+    {
+      "case": "1",
+      "base_degree": "436",
+      "twist": "1",
+      "kernel_dimension": "5",
+      "source_dimension": "10",
+      "physical_dimension": "20",
+      "AS_trace": "1",
+      "Frobenius_d_deck_step": "3",
+      "source_tuple_period": "4360",
+      "period_method": "reused_base_generation_plus_AS_irreducibility",
+      "Frobenius_method": "certified_quadratic_recurrence",
+      "all_source_equations": "5",
+      "all_registered_units": "8",
+      "deck_iterates": "10",
+      "corrupt_nu": "rejected",
+      "Tate_order": "11",
+      "source_checks": "reused_complete_point436_03_stage",
+      "completed_new_checks": "Frobenius_sign_and_orientation"
+    },
+    {
+      "case": "1",
+      "base_degree": "436",
+      "twist": "0",
+      "kernel_dimension": "5",
+      "source_dimension": "10",
+      "physical_dimension": "20",
+      "AS_trace": "1",
+      "Frobenius_d_deck_step": "3",
+      "source_tuple_period": "4360",
+      "period_method": "base_field_generation_plus_AS_irreducibility",
+      "Frobenius_method": "certified_quadratic_recurrence",
+      "all_source_equations": "5",
+      "all_registered_units": "8",
+      "deck_iterates": "10",
+      "corrupt_nu": "rejected",
+      "Tate_order": "11"
+    }
+  ],
+  "independent_trace_cases": [
+    {
+      "case": "1",
+      "base_degree": "12",
+      "absolute_kernel_degree": "60",
+      "source_orientation_trace": "1",
+      "Tate_twist_trace": "1",
+      "seven_kernel_trace": "0",
+      "exact_decomposition": "checked",
+      "both_trace_routes": "equal"
+    },
+    {
+      "case": "2",
+      "base_degree": "12",
+      "absolute_kernel_degree": "60",
+      "source_orientation_trace": "1",
+      "Tate_twist_trace": "1",
+      "seven_kernel_trace": "0",
+      "exact_decomposition": "checked",
+      "both_trace_routes": "equal"
+    },
+    {
+      "case": "1",
+      "base_degree": "436",
+      "absolute_kernel_degree": "2180",
+      "source_orientation_trace": "1",
+      "Tate_twist_trace": "1",
+      "seven_kernel_trace": "0",
+      "exact_decomposition": "checked",
+      "both_trace_routes": "equal"
+    }
+  ],
+  "retained_source_filter_controls": [
+    {
+      "base_degree": "83",
+      "root": "1",
+      "twist": "0",
+      "orientation_trace": "1",
+      "retained_split": "0",
+      "actual_Frobenius_sign": "checked",
+      "source_class_nonzero_asserted": "false"
+    },
+    {
+      "base_degree": "83",
+      "root": "1",
+      "twist": "1",
+      "orientation_trace": "0",
+      "retained_split": "1",
+      "actual_Frobenius_sign": "checked",
+      "source_class_nonzero_asserted": "false"
+    },
+    {
+      "base_degree": "83",
+      "root": "2",
+      "twist": "0",
+      "orientation_trace": "1",
+      "retained_split": "0",
+      "actual_Frobenius_sign": "checked",
+      "source_class_nonzero_asserted": "false"
+    },
+    {
+      "base_degree": "83",
+      "root": "2",
+      "twist": "1",
+      "orientation_trace": "0",
+      "retained_split": "1",
+      "actual_Frobenius_sign": "checked",
+      "source_class_nonzero_asserted": "false"
+    },
+    {
+      "base_degree": "83",
+      "root": "3",
+      "twist": "0",
+      "orientation_trace": "1",
+      "retained_split": "0",
+      "actual_Frobenius_sign": "checked",
+      "source_class_nonzero_asserted": "false"
+    },
+    {
+      "base_degree": "83",
+      "root": "3",
+      "twist": "1",
+      "orientation_trace": "0",
+      "retained_split": "1",
+      "actual_Frobenius_sign": "checked",
+      "source_class_nonzero_asserted": "false"
+    },
+    {
+      "base_degree": "83",
+      "root": "4",
+      "twist": "0",
+      "orientation_trace": "1",
+      "retained_split": "0",
+      "actual_Frobenius_sign": "checked",
+      "source_class_nonzero_asserted": "false"
+    },
+    {
+      "base_degree": "83",
+      "root": "4",
+      "twist": "1",
+      "orientation_trace": "0",
+      "retained_split": "1",
+      "actual_Frobenius_sign": "checked",
+      "source_class_nonzero_asserted": "false"
+    },
+    {
+      "base_degree": "83",
+      "root": "5",
+      "twist": "0",
+      "orientation_trace": "1",
+      "retained_split": "0",
+      "actual_Frobenius_sign": "checked",
+      "source_class_nonzero_asserted": "false"
+    },
+    {
+      "base_degree": "83",
+      "root": "5",
+      "twist": "1",
+      "orientation_trace": "0",
+      "retained_split": "1",
+      "actual_Frobenius_sign": "checked",
+      "source_class_nonzero_asserted": "false"
+    },
+    {
+      "base_degree": "284",
+      "root": "1",
+      "twist": "0",
+      "orientation_trace": "1",
+      "retained_split": "0",
+      "actual_Frobenius_sign": "checked",
+      "source_class_nonzero_asserted": "false"
+    },
+    {
+      "base_degree": "284",
+      "root": "1",
+      "twist": "1",
+      "orientation_trace": "1",
+      "retained_split": "0",
+      "actual_Frobenius_sign": "checked",
+      "source_class_nonzero_asserted": "false"
+    },
+    {
+      "base_degree": "284",
+      "root": "2",
+      "twist": "0",
+      "orientation_trace": "1",
+      "retained_split": "0",
+      "actual_Frobenius_sign": "checked",
+      "source_class_nonzero_asserted": "false"
+    },
+    {
+      "base_degree": "284",
+      "root": "2",
+      "twist": "1",
+      "orientation_trace": "1",
+      "retained_split": "0",
+      "actual_Frobenius_sign": "checked",
+      "source_class_nonzero_asserted": "false"
+    },
+    {
+      "base_degree": "284",
+      "root": "3",
+      "twist": "0",
+      "orientation_trace": "1",
+      "retained_split": "0",
+      "actual_Frobenius_sign": "checked",
+      "source_class_nonzero_asserted": "false"
+    },
+    {
+      "base_degree": "284",
+      "root": "3",
+      "twist": "1",
+      "orientation_trace": "1",
+      "retained_split": "0",
+      "actual_Frobenius_sign": "checked",
+      "source_class_nonzero_asserted": "false"
+    },
+    {
+      "base_degree": "284",
+      "root": "4",
+      "twist": "0",
+      "orientation_trace": "1",
+      "retained_split": "0",
+      "actual_Frobenius_sign": "checked",
+      "source_class_nonzero_asserted": "false"
+    },
+    {
+      "base_degree": "284",
+      "root": "4",
+      "twist": "1",
+      "orientation_trace": "1",
+      "retained_split": "0",
+      "actual_Frobenius_sign": "checked",
+      "source_class_nonzero_asserted": "false"
+    },
+    {
+      "base_degree": "284",
+      "root": "5",
+      "twist": "0",
+      "orientation_trace": "1",
+      "retained_split": "0",
+      "actual_Frobenius_sign": "checked",
+      "source_class_nonzero_asserted": "false"
+    },
+    {
+      "base_degree": "284",
+      "root": "5",
+      "twist": "1",
+      "orientation_trace": "1",
+      "retained_split": "0",
+      "actual_Frobenius_sign": "checked",
+      "source_class_nonzero_asserted": "false"
+    }
+  ],
+  "construction_counts": {
+    "actual_source_blocks": 6,
+    "exact_orientation_trace_cases": 3,
+    "orientation_filter_control_blocks": 20,
+    "source_equations_each": 5,
+    "registered_units_each": 8,
+    "deck_iterates_each": 10,
+    "max_actual_source_tuple_degree": 4360
+  },
+  "geometric_deduction": {
+    "mixed_projector": "(1-sigma)*(5-N5)",
+    "ordinary12_and436_sign_equals_fifth_Frobenius_power": true,
+    "their_F32_closed_divisor_mixed_contribution_zero": "under retained finite-source/proper/moduli binding; not a Picard solve",
+    "trace_zero_alone_implies_nonzero_class": false
+  },
+  "formal": {
+    "audited_declarations": 11,
+    "named_mathematical_theorems": 7,
+    "generated_declarations": 4,
+    "native_arrays_formalized": false,
+    "finite_field_generation_formalized": false,
+    "proper_geometry_formalized": false,
+    "independent_semantic_review": false
+  },
+  "scope": {
+    "complete_collector_principal_divisors_evaluated": false,
+    "arbitrary_ordinary_picard_images_evaluated": false,
+    "chosen_Koblitz_model_isogeny_evaluated": false,
+    "larger_n_geometric_transfer_evaluated": false,
+    "full_quotient_saturation": false,
+    "proper_polarized_embedding": false,
+    "node187_coupled_divisor_closed": false
+  },
+  "performance_measured": false,
+  "IC_relation_rank": null,
+  "public_input_recoveries": 0,
+  "independent_scientific_replay": false
+}

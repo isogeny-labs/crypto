@@ -1,0 +1,107 @@
+LIB "linalg.lib";
+proc require63(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../../../52/source-data/marked23-field51.sing"));
+string baseEquation63=string(f23);string bString63=string(b23);string cString63=string(c23);string rString63=string(r23);string sString63=string(s23);string deltaString63=string(discriminant23);
+execute(read("../../../51/runs/base23-struct51-03/marked23-triangular51.sing"));
+execute("poly boundBase63="+baseEquation63+";poly actualB63="+bString63+";poly actualC63="+cString63+";poly actualR63="+rString63+";poly actualS63="+sString63+";poly actualDelta63="+deltaString63+";");
+intvec baseLeading63=leadexp(f51);intvec lambdaLeading63=leadexp(G51);
+require63(boundBase63==f51,"GEN112_ACTUAL_BASE_SOURCE_BINDING");
+require63(subst(f51,n,0)==f51 && subst(f51,l,0)==f51 && baseLeading63[3]==7 && leadcoef(f51)==1,"GEN112_MONIC_DEGREE7_BASE");
+require63(subst(G51,n,0)==G51 && lambdaLeading63[2]==16 && lambdaLeading63[3]==0 && leadcoef(G51)==1,"GEN112_MONIC_DEGREE16_LAMBDA");
+require63(diff(N51,n)==1 && N51==n+subst(N51,n,0),"GEN112_ACTUAL_MONIC_LINEAR_NU");
+ideal sourceIdeal63=f51,G51,N51;ideal GB63=std(sourceIdeal63);
+require63(dim(GB63)==0 && vdim(GB63)==112,"GEN112_COMPLETE_SOURCE_DIMENSION");
+ideal basis63;int i63;int j63;int pos63;
+for(j63=0;j63<7;j63++){for(i63=0;i63<16;i63++){pos63=1+i63+16*j63;basis63[pos63]=l^i63*y^j63;require63(reduce(basis63[pos63],GB63)==basis63[pos63],"GEN112_ALL112_STANDARD_MONOMIALS");}}
+def sourceRing63=basering;
+ring parityRing63=2,(x),dp;short=0;
+setring sourceRing63;
+proc splitCoefficient63(number c){
+ string ns=string(numerator(c));string ds=string(denominator(c));
+ setring parityRing63;
+ execute("poly numerator63="+ns+";poly denominator63="+ds+";");
+ require63(denominator63!=0,"SPLIT63_NONZERO_RATIONAL_DENOMINATOR");
+ poly p=numerator63*denominator63;poly even=0;poly odd=0;poly rebuilt=0;int j;int exponent;
+ if(p!=0){
+  matrix parts=coef(p,x);
+  for(j=1;j<=ncols(parts);j++){
+   exponent=deg(parts[1,j]);require63(parts[1,j]==x^exponent && parts[2,j]==1,"SPLIT63_BINARY_MONOMIAL_COEFFICIENT");
+   rebuilt=rebuilt+parts[1,j]*parts[2,j];
+   if(exponent%2==0){even=even+x^(exponent div 2);}else{odd=odd+x^((exponent-1) div 2);}
+  }
+ }
+ require63(rebuilt==p && even^2+x*odd^2==p,"SPLIT63_COMPLETE_POLYNOMIAL_PARITY_IDENTITY");
+ string es=string(even);string os=string(odd);ds=string(denominator63);
+ setring sourceRing63;
+ number e;number o;execute("e=("+es+")/("+ds+");o=("+os+")/("+ds+");");
+ require63(e^2+x*o^2==c,"SPLIT63_RATIONAL_COEFFICIENT_IDENTITY");
+ list ans=e,o;return(ans);
+}
+
+proc pairMul63(list a,list b){list z=reduce(a[1]*b[1]+x*a[2]*b[2],GB63),reduce(a[1]*b[2]+a[2]*b[1],GB63);return(z);}
+list yPowers63;
+proc generator63(poly P,int which){
+ poly t=y;if(which==2){t=l;}poly a=0;poly b=0;poly c=0;poly d=0;poly p=P;intvec ex;int power;list scalar;list pair;
+ while(p!=0){
+  ex=leadexp(p);require63(ex[1]==0,"GEN112_GENERATOR_HAS_NO_NU_TERM");
+  scalar=splitCoefficient63(leadcoef(p));pair=poly(scalar[1]),poly(scalar[2]);
+  if(which==3){require63(ex[2]==0,"GEN112_BASE_POLYNOMIAL_HAS_NO_LAMBDA");}
+  else{require63(which==2 && ex[3]<7,"GEN112_LAMBDA_COEFFICIENT_BASE_REDUCTION");pair=pairMul63(pair,yPowers63[ex[3]+1]);}
+  power=ex[which] div 2;
+  if(ex[which]%2==0){a=a+pair[1]*t^power;b=b+pair[2]*t^power;}
+  else{c=c+pair[1]*t^power;d=d+pair[2]*t^power;}
+  p=p-lead(p);
+ }
+ require63(reduce(a^2+x*b^2+t*c^2+x*t*d^2+P,GB63)==0,"GEN112_COMPLETE_POLYNOMIAL_GROUPING");
+ poly q=reduce(diff(P,t),GB63);require63(q!=0 && reduce(q+c^2+x*d^2,GB63)==0,"GEN112_DERIVATIVE_IDENTITY_AND_NONZERO");
+ ideal inversion=q,f51,G51,N51;matrix inverseCertificate63=lift(inversion,ideal(1));poly qi=reduce(inverseCertificate63[1,1],GB63);
+ require63(reduce(q*qi,GB63)==1,"GEN112_ACTUAL_DERIVATIVE_INVERSE");
+ poly g=reduce((a*c+x*b*d)*qi,GB63);poly h=reduce((a*d+b*c)*qi,GB63);
+ require63(reduce(g^2+x*h^2+t,GB63)==0,"GEN112_ACTUAL_GENERATOR_FORMULA");
+ list bundle=a,b,c,d,q,qi,g,h;return(bundle);
+}
+proc saveBundle63(list bundle,string name,string file){
+ link cache63="ASCII:w "+file;open(cache63);
+ write(cache63,"// Retained actual degree112 source; compare every cached equation before use.");
+ write(cache63,"ideal cachedSource63;list "+name+";");int i;
+ for(i=1;i<=size(sourceIdeal63);i++){write(cache63,"cachedSource63["+string(i)+"]="+string(sourceIdeal63[i])+";");}
+ for(i=1;i<=8;i++){write(cache63,name+"["+string(i)+"]="+string(bundle[i])+";");}
+ close(cache63);return(1);
+}
+list yBundle63=generator63(f51,3);saveBundle63(yBundle63,"baseGenerator63","generator112-base63.sing");list yPair63=yBundle63[7],yBundle63[8];list temp63=poly(1),poly(0);yPowers63[1]=temp63;
+for(i63=2;i63<=7;i63++){temp63=pairMul63(temp63,yPair63);yPowers63[i63]=temp63;}
+print("GEN112_BASE_GENERATOR_PASS");
+list lambdaBundle63=generator63(G51,2);saveBundle63(lambdaBundle63,"lambdaGenerator63","generator112-lambda63.sing");list lambdaPair63=lambdaBundle63[7],lambdaBundle63[8];list lambdaPowers63;temp63=poly(1),poly(0);lambdaPowers63[1]=temp63;
+for(i63=2;i63<=16;i63++){temp63=pairMul63(temp63,lambdaPair63);lambdaPowers63[i63]=temp63;}
+list basisPairs63;
+for(j63=1;j63<=7;j63++){for(i63=1;i63<=16;i63++){
+ pos63=i63+16*(j63-1);temp63=pairMul63(lambdaPowers63[i63],yPowers63[j63]);basisPairs63[pos63]=temp63;
+ require63(reduce(temp63[1]^2+x*temp63[2]^2+basis63[pos63],GB63)==0,"GEN112_ALL112_GENERATED_BASIS_PAIRS");
+}}
+print("GEN112_ALL112_BASIS_PAIRS_PASS");
+link out63="ASCII:w generator112-functions63.sing";open(out63);write(out63,"// Requires retained marked23 actual source ring and sourceIdeal63.");write(out63,"list inputs63;list evenParts63;list oddParts63;");
+int count63=0;int coefficientChecks63=0;
+proc evaluate63(poly f,string family,int index){
+ poly p=reduce(f,GB63);poly g=0;poly h=0;intvec ex;int pos;list scalar;list pair;
+ while(p!=0){
+  ex=leadexp(p);require63(ex[1]==0 && ex[2]<16 && ex[3]<7,"GEN112_CANONICAL_INPUT_COORDINATES");pos=1+ex[2]+16*ex[3];
+  scalar=splitCoefficient63(leadcoef(p));coefficientChecks63++;
+  pair=poly(scalar[1]),poly(scalar[2]);pair=pairMul63(pair,basisPairs63[pos]);g=g+pair[1];h=h+pair[2];p=p-lead(p);
+ }
+ g=reduce(g,GB63);h=reduce(h,GB63);require63(reduce(g^2+x*h^2+f,GB63)==0,"GEN112_EVERY_WHOLE_SOURCE_IDENTITY");
+ count63++;
+ if(family=="control"){
+  if(index==1){require63(g==1 && h==0,"GEN112_CONSTANT_CONTROL");}
+  if(index==2){require63(g==0 && h==1,"GEN112_PARAMETER_CONTROL");require63(reduce((g+1)^2+x*h^2+f,GB63)!=0,"GEN112_CHANGED_ROOT_REJECTED");}
+  if(index==3){require63(g==x && h==0,"GEN112_PARAMETER_SQUARE_CONTROL");}
+ }
+ write(out63,"inputs63["+string(count63)+"]="+string(reduce(f,GB63))+";evenParts63["+string(count63)+"]="+string(g)+";oddParts63["+string(count63)+"]="+string(h)+";");
+ print("GEN112_PROGRESS id="+string(count63)+" family="+family+" index="+string(index));return(1);
+}
+for(i63=1;i63<=112;i63++){evaluate63(basis63[i63],"basis",i63);}
+evaluate63(1,"control",1);evaluate63(x,"control",2);evaluate63(x^2,"control",3);
+list named63=actualB63,actualC63,actualR63,actualS63,actualDelta63,n,yBundle63[5],lambdaBundle63[5],C51;
+for(i63=1;i63<=9;i63++){evaluate63(named63[i63],"source",i63);}
+require63(count63==124,"GEN112_ALL124_FUNCTIONS");close(out63);
+print("GEN112_RESULT source_degree=112 standard_monomials=112 generated_basis_pairs=112 whole_source_identities=124 generator_formulas=2 derivative_inverses=2 rational_coefficient_checks="+string(coefficientChecks63)+" changed_root_rejected=1");
+print("GENERATOR112_ALL_CHECKS_PASS");quit;

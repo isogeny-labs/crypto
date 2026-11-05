@@ -1,0 +1,33 @@
+// Compose two accepted source memberships; no inversion search.
+proc require53(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../../../51/runs/line51-01/qr-line-certificate51.sing"));
+execute(read("../../../51/runs/collision51-01/collision-certificate51.sing"));
+execute(read("../../../52/runs/normline52-01/normline-certificate52.sing"));
+ring unitSource53=(2,b,c),(t,n,l),lp;short=0;
+map lineMap53=QRlineCertificate51,t,n,l;
+ideal lineSource53=lineMap53(source51);poly psi7Line53=lineMap53(psi7_51);
+matrix torsionLift53=lineMap53(torsionLift51);
+map collisionMap53=collisionCertificate51,t;
+poly delta53=collisionMap53(delta51);poly psi353=collisionMap53(psi3_51);
+poly psi753=collisionMap53(psi7_51);poly U53=collisionMap53(U51);poly V53=collisionMap53(V51);
+map normMap53=normLineCertificate52,0,0,0,t,l,n;
+poly alpha53=normMap53(alpha52);
+require53(psi7Line53==psi753,"ALPHA53_PSI7_DONOR_AGREEMENT");
+require53(matrix(lineSource53)*torsionLift53==matrix(ideal(psi753)),"ALPHA53_TORSION_FULL_PRODUCT");
+require53(psi353*U53+psi753*V53==delta53^16,"ALPHA53_BEZOUT_FULL_PRODUCT");
+require53(alpha53==lineSource53[3],"ALPHA53_ACTUAL_NORM_COEFFICIENT");
+ideal source53=lineSource53[1],lineSource53[2],psi353,alpha53;
+matrix witness53[4][1];
+witness53[1,1]=V53*torsionLift53[1,1];witness53[2,1]=V53*torsionLift53[2,1];
+witness53[3,1]=U53;witness53[4,1]=V53*torsionLift53[3,1];
+require53(matrix(source53)*witness53==matrix(ideal(delta53^16)),"ALPHA53_COMPOSED_FULL_PRODUCT");
+matrix corrupt53=witness53;corrupt53[3,1]=corrupt53[3,1]+1;
+require53(matrix(source53)*corrupt53!=matrix(ideal(delta53^16)),"ALPHA53_CORRUPTION_DETECTED");
+// Preserve the full witness before the separate quotient check.
+link out53="ASCII:w alpha-unit-certificate53.sing";
+write(out53,"ring alphaUnitCertificate53=(2,b,c),(t,n,l),lp;short=0;ideal source53="+string(source53)+";poly delta53="+string(delta53)+";matrix witness53[4][1];");
+int i53;for(i53=1;i53<=4;i53++){write(out53,"witness53["+string(i53)+",1]="+string(witness53[i53,1])+";");}close(out53);
+ideal sourceGB53=std(ideal(source53[1],source53[2],source53[3]));
+require53(vdim(sourceGB53)==64,"ALPHA53_NONZERO_RANK64_QUOTIENT");
+print("ALPHA53_FULL_WITNESS_SAVED");
+print("ALPHAUNIT53_ALL_CHECKS_PASS");quit;

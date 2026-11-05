@@ -1,0 +1,46 @@
+ring integralCandidate50=2,(t,u),dp;short=0;ideal candidateIdeal50;candidateIdeal50[1]=t^32+(u^8+1)*t^24+(u^41+u^39+u^37+u^32+u^31+u^30+u^19+u^17+u^16+u^14+u^13+u^11)*t^20+(u^53+u^52+u^51+u^50+u^48+u^45+u^41+u^38+u^36+u^35+u^32+u^31+u^30+u^29+u^28+u^27+u^26+u^25+u^21+u^15+u^12+u^11)*t^17+(u^64+u^54+u^53+u^50+u^49+u^45+u^43+u^40+u^39+u^38+u^36+u^30+u^21+u^19+u^18+u^17+u^16+u^15+u^14+u^13+u^12+u^8+1)*t^16+(u^73+u^71+u^69+u^65+u^64+u^62+u^59+u^57+u^56+u^54+u^53+u^48+u^47+u^46+u^45+u^41+u^40+u^38+u^37+u^35)*t^12+(u^85+u^84+u^83+u^82+u^80+u^76+u^75+u^74+u^71+u^69+u^66+u^65+u^64+u^63+u^62+u^61+u^54+u^50+u^49+u^47+u^45+u^44+u^43+u^39+u^36+u^35)*t^9+(u^86+u^84+u^82+u^81+u^77+u^75+u^74+u^72+u^71+u^69+u^64+u^62+u^61+u^59+u^57+u^56+u^55+u^52+u^51+u^50+u^49+u^48+u^47+u^46+u^44+u^43+u^42+u^41+u^40+u^39+u^38+u^37+u^36+u^24)*t^8+(u^94+u^90+u^87+u^86+u^82+u^81+u^80+u^77+u^76+u^75+u^71+u^70+u^66+u^65+u^64+u^62+u^61+u^60+u^59+u^58)*t^5+(u^105+u^103+u^101+u^97+u^96+u^95+u^94+u^93+u^92+u^90+u^89+u^88+u^87+u^86+u^82+u^81+u^80+u^79+u^78+u^77+u^74+u^73+u^67+u^66+u^61+u^60+u^59+u^56+u^55+u^54+u^49+u^47)*t^4+(u^109+u^108+u^107+u^106+u^105+u^104+u^102+u^101+u^100+u^97+u^94+u^92+u^87+u^86+u^85+u^84+u^83+u^81+u^78+u^77+u^75+u^74+u^73+u^72+u^71+u^67)*t^2+(u^117+u^116+u^115+u^114+u^112+u^108+u^107+u^106+u^104+u^100+u^99+u^98+u^96+u^93+u^92+u^90+u^89+u^88+u^87+u^83+u^82+u^81+u^75+u^72+u^71+u^70+u^69+u^67+u^65+u^62+u^61+u^58+u^57+u^56)*t+(u^128+u^118+u^117+u^114+u^113+u^111+u^109+u^108+u^107+u^102+u^99+u^98+u^96+u^95+u^93+u^92+u^90+u^86+u^85+u^83+u^81+u^80+u^77+u^74+u^71+u^70+u^68+u^67+u^63+u^61+u^60+u^56+u^48);
+ring relativeFinite50=2,(t,v,u),wp(4,2,1);short=0;ideal relativeIdeal50;relativeIdeal50[1]=v^2+v+u^3+u;relativeIdeal50[2]=t^16+(u^8+1)*t^8*v+(u^32+u^24+u^20+u^14+u^11+u^10+u^9+u^6+u^4+u^3+u^2+u+1)*t^8+(u^41+u^39+u^37+u^32+u^31+u^30+u^19+u^17+u^16+u^14+u^13+u^11)*t^4*v+(u^42+u^39+u^37+u^34+u^31+u^28+u^26+u^25+u^24+u^23+u^22+u^21+u^19+u^18+u^17+u^16+u^15+u^14+u^12+u^11)*t^4+(u^53+u^52+u^51+u^50+u^48+u^45+u^41+u^38+u^36+u^35+u^32+u^31+u^30+u^29+u^28+u^27+u^26+u^25+u^21+u^15+u^12+u^11)*t*v+(u^54+u^47+u^46+u^43+u^42+u^41+u^34+u^33+u^31+u^30+u^28+u^23+u^22+u^20+u^15+u^11)*t+(u^54+u^53+u^50+u^49+u^48+u^45+u^43+u^40+u^39+u^38+u^36+u^30+u^24+u^21+u^19+u^18+u^17+u^16+u^15+u^14+u^13+u^12+u^8+1)*v+(u^64+u^56+u^55+u^53+u^52+u^51+u^50+u^49+u^45+u^44+u^40+u^37+u^35+u^33+u^32+u^31+u^29+u^28+u^26+u^25+u^24+u^22+u^20+u^17+u^16+u^12+u^11+u^10+u^9+u^6+u^4+u^3+u^2+u+1);poly relativeB50=(u^8+1)*t^8+(u^41+u^39+u^37+u^32+u^31+u^30+u^19+u^17+u^16+u^14+u^13+u^11)*t^4+(u^53+u^52+u^51+u^50+u^48+u^45+u^41+u^38+u^36+u^35+u^32+u^31+u^30+u^29+u^28+u^27+u^26+u^25+u^21+u^15+u^12+u^11)*t+(u^54+u^53+u^50+u^49+u^48+u^45+u^43+u^40+u^39+u^38+u^36+u^30+u^24+u^21+u^19+u^18+u^17+u^16+u^15+u^14+u^13+u^12+u^8+1);
+ring parameterSaturation50=2,(t,v,u),wp(4,2,1);short=0;int contentPower50=8;poly parameter50=u^8+1;poly witness50=t^4*v*u^33+t*v*u^45+t*v*u^44+t^4*v*u^31+t*v*u^43+t*v*u^42+v*u^46+t^4*v*u^29+v*u^45+t*v*u^40+v*u^42+t^4*v*u^25+v*u^41+t^4*v*u^24+t*v*u^36+v*u^40+t*v*u^35+t^4*v*u^22+t*v*u^34+v*u^38+t^4*v*u^21+t*v*u^33+t*v*u^32+v*u^35+t*v*u^30+v*u^34+t^4*v*u^17+v*u^33+t^8*v+t^4*v*u^16+v*u^31+t^4*v*u^14+t*v*u^26+t^4*v*u^13+t*v*u^25+v*u^28+t^4*v*u^11+t*v*u^23+v*u^27+v*u^26+t*v*u^21+v*u^25+t*v*u^20+t*v*u^19+v*u^23+v*u^22+v*u^20+t*v*u^15+v*u^19+v*u^18+v*u^17+t*v*u^12+v*u^16+t*v*u^11+v*u^15+v*u^14+v*u^13+v*u^12+v;poly planeNumerator50=t^16+t^8*u^32+u^64+t^4*u^42+t*u^54+t^8*u^24+u^56+t^4*u^39+u^55+t^4*u^37+u^53+t^8*u^20+u^52+t*u^47+u^51+t^4*u^34+t*u^46+u^50+u^49+t^4*u^31+t*u^43+t^8*u^14+t*u^42+t*u^41+u^45+t^4*u^28+u^44+t^8*u^11+t^8*u^10+t^4*u^26+t^8*u^9+t^4*u^25+t^4*u^24+u^40+t^4*u^23+t^8*u^6+t^4*u^22+t*u^34+t^4*u^21+t*u^33+u^37+t^8*u^4+t^8*u^3+t^4*u^19+t*u^31+u^35+t^8*u^2+t^4*u^18+t*u^30+t^8*u+t^4*u^17+u^33+t^8+t^4*u^16+t*u^28+u^32+t^4*u^15+u^31+t^4*u^14+u^29+t^4*u^12+u^28+t^4*u^11+t*u^23+t*u^22+u^26+u^25+t*u^20+u^24+u^22+u^20+t*u^15+u^17+u^16+t*u^11+u^12+u^11+u^10+u^9+u^6+u^4+u^3+u^2+u+1;poly sourceGenerator50=t^16+t^8*u^32+u^64+t^4*v*u^41+t*v*u^53+t^4*u^42+t*v*u^52+t*u^54+t^4*v*u^39+t*v*u^51+t^8*u^24+t*v*u^50+v*u^54+u^56+t^4*v*u^37+t^4*u^39+v*u^53+u^55+t*v*u^48+t^4*u^37+u^53+t^8*u^20+v*u^50+u^52+t*v*u^45+t*u^47+v*u^49+u^51+t^4*v*u^32+t^4*u^34+t*u^46+v*u^48+u^50+t^4*v*u^31+u^49+t^4*v*u^30+t^4*u^31+t*v*u^41+t*u^43+v*u^45+t^8*u^14+t*u^42+t*u^41+v*u^43+u^45+t^4*u^28+t*v*u^38+u^44+t^8*u^11+t^8*v*u^8+t^8*u^10+t^4*u^26+t*v*u^36+v*u^40+t^8*u^9+t^4*u^25+t*v*u^35+v*u^39+t^4*u^24+v*u^38+u^40+t^4*u^23+t^8*u^6+t^4*u^22+t*v*u^32+t*u^34+v*u^36+t^4*v*u^19+t^4*u^21+t*v*u^31+t*u^33+u^37+t^8*u^4+t*v*u^30+t^8*u^3+t^4*v*u^17+t^4*u^19+t*v*u^29+t*u^31+u^35+t^8*v+t^8*u^2+t^4*v*u^16+t^4*u^18+t*v*u^28+t*u^30+t^8*u+t^4*u^17+t*v*u^27+u^33+t^8+t^4*v*u^14+t^4*u^16+t*v*u^26+t*u^28+v*u^30+u^32+t^4*v*u^13+t^4*u^15+t*v*u^25+u^31+t^4*u^14+t^4*v*u^11+u^29+t^4*u^12+u^28+t^4*u^11+t*v*u^21+t*u^23+t*u^22+v*u^24+u^26+u^25+t*u^20+u^24+v*u^21+u^22+t*v*u^15+v*u^19+v*u^18+u^20+t*u^15+v*u^17+t*v*u^12+v*u^16+t*v*u^11+v*u^15+u^17+v*u^14+u^16+t*u^11+v*u^13+v*u^12+u^12+u^11+v*u^8+u^10+u^9+u^6+u^4+u^3+v+u^2+u+1;
+short=0;
+poly primitiveB50=witness50/v;
+if(primitiveB50*v!=witness50 || subst(primitiveB50,v,0)!=primitiveB50 || contentPower50!=8){ERROR("LOCAL50_SOURCE_WITNESS_SHAPE");quit;}
+map actualSource50=relativeFinite50,t,v,u;
+ideal actualRelations50=actualSource50(relativeIdeal50);
+if(parameter50*witness50+planeNumerator50!=sourceGenerator50 || sourceGenerator50!=actualRelations50[2]){ERROR("LOCAL50_SOURCE_SATURATION_PRODUCT");quit;}
+poly originalB50=parameter50*primitiveB50;
+poly integralLeft50=witness50^2+primitiveB50*witness50+(u^3+u)*primitiveB50^2;
+if(integralLeft50!=primitiveB50^2*actualRelations50[1]){ERROR("LOCAL50_MONIC_INTEGRAL_WITNESS");quit;}
+poly secondColumn50=(u^3+u)*originalB50+(planeNumerator50+originalB50)*v;
+if(v*sourceGenerator50+secondColumn50!=originalB50*actualRelations50[1]){ERROR("LOCAL50_MODULE_PRESENTATION");quit;}
+ring localPlane50=2,(t,u),wp(4,1);option(redSB);short=0;
+map planeFromWitness50=parameterSaturation50,t,0,u;
+poly localA50=planeFromWitness50(planeNumerator50);poly localH50=planeFromWitness50(parameter50);poly localBprime50=planeFromWitness50(primitiveB50);poly localB50=localH50*localBprime50;
+if(lead(localA50)!=t^16 || localH50!=(u+1)^8){ERROR("LOCAL50_MONIC_BLOCK_INPUT");quit;}
+map planeEquation50=integralCandidate50,t,u;
+ideal actualPlane50=planeEquation50(candidateIdeal50);
+matrix presentation50[2][2]=localA50,(u^3+u)*localB50,localB50,localA50+localB50;
+if(det(presentation50)!=actualPlane50[1]){ERROR("LOCAL50_PRESENTATION_DETERMINANT");quit;}
+ideal block50=localA50,localH50;ideal blockStd50=std(block50);
+int blockDimension50=vdim(blockStd50);
+if(blockDimension50!=128){ERROR("LOCAL50_BLOCK_DIMENSION");quit;}
+print("LOCAL50_STAGE source_module_presentation_checked=true block_F2_dimension=128 CRT_unit_begin=true");
+ideal unitInput50=localA50,localH50,localBprime50;ideal unitStd50=std(unitInput50);
+if(unitStd50[1]!=1){ERROR("LOCAL50_CRT_NOT_COMAXIMAL");quit;}
+ideal one50=1;matrix unitLift50=lift(unitInput50,one50);
+if(nrows(unitLift50)!=3 || ncols(unitLift50)!=1 || unitLift50[1,1]*localA50+unitLift50[2,1]*localH50+unitLift50[3,1]*localBprime50!=1){ERROR("LOCAL50_FULL_UNIT_PRODUCT");quit;}
+if((unitLift50[1,1]+1)*localA50+unitLift50[2,1]*localH50+unitLift50[3,1]*localBprime50==1){ERROR("LOCAL50_CORRUPTED_UNIT_ACCEPTED");quit;}
+link localOut50="ASCII:w local-block50.sing";open(localOut50);
+write(localOut50,"ring localBlockCertificate50=2,(t,u),wp(4,1);short=0;poly A50="+string(localA50)+";poly h50="+string(localH50)+";poly Bprime50="+string(localBprime50)+";ideal unitCoefficients50;ideal powerRemainders50;");
+int index50;
+for(index50=1;index50<=3;index50++){write(localOut50,"unitCoefficients50["+string(index50)+"]="+string(unitLift50[index50,1])+";");}
+poly powerRemainder50;
+for(index50=0;index50<=8;index50++){
+ powerRemainder50=reduce((u+1)^index50,blockStd50);
+ if(index50<8 && powerRemainder50==0){ERROR("LOCAL50_EARLY_PARAMETER_ANNIHILATION");quit;}
+ if(index50==8 && powerRemainder50!=0){ERROR("LOCAL50_PARAMETER_NOT_ANNIHILATED");quit;}
+ write(localOut50,"powerRemainders50["+string(index50+1)+"]="+string(powerRemainder50)+";");
+ print("LOCAL50_PARAMETER_POWER exponent="+string(index50)+" zero="+string(powerRemainder50==0));
+}
+close(localOut50);
+print("LOCAL50_RESULT monic_integral_witness=true source_module_presentation=true plane_determinant_product=true CRT_comaximal_product=true block_F2_dimension=128 exact_parameter_exponent=8");
+print("LOCAL50_ALL_CHECKS_PASS");quit;

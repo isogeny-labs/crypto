@@ -1,0 +1,91 @@
+LIB "linalg.lib";
+proc require63(int ok,string tag){if(!ok){ERROR(tag);quit;}}
+execute(read("../../../62/runs/kernel62-01/mixed-kernel62.sing"));
+proc constantCode63(matrix M,string name){
+ string code="matrix "+name+"["+string(nrows(M))+"]["+string(ncols(M))+"];";int i;int j;
+ for(i=1;i<=nrows(M);i++){for(j=1;j<=ncols(M);j++){
+  require63(M[i,j]==0 || M[i,j]==1,"HALF63_ALL_MATRIX_ENTRIES_F2");
+  if(M[i,j]==1){code=code+name+"["+string(i)+","+string(j)+"]=1;";}
+ }}return(code);
+}
+require63(nrows(kernelBasis62)==76 && ncols(kernelBasis62)==10,"HALF63_ACTUAL_MIXED_KERNEL_DIMENSION");
+string mixedKernelCode63=constantCode63(kernelBasis62,"mixedInclusion63");
+execute(read("../../../62/runs/kernel62-01/cubic-kernel62.sing"));
+require63(nrows(kernelBasis62)==324 && ncols(kernelBasis62)==128,"HALF63_ACTUAL_CUBIC_KERNEL_DIMENSION");
+string cubicKernelCode63=constantCode63(kernelBasis62,"cubicInclusion63");
+execute(read("../../../61/runs/cubic61-02/cubic-space61.sing"));
+execute(mixedKernelCode63);execute(cubicKernelCode63);
+// The retained R61 bundle stores the mixed constant and its ambient inclusion.
+// Reconstruct the ambient constant rather than referring to an unsaved symbol.
+matrix oneAmbient61=kernel61*oneMixed61;
+require63(sigmaAmbient61*oneAmbient61==oneAmbient61 && oneAmbient61!=matrix(0,324,1),"HALF63_RECONSTRUCTED_AMBIENT_ONE");
+proc restricted63(matrix K,matrix S,matrix one,string family){
+ int d=ncols(K);int ambient=nrows(K);require63(nrows(S)==ambient && ncols(S)==ambient && mat_rk(K)==d,"HALF63_INCLUSION_AND_ACTION_DIMENSIONS");
+ matrix recovery=transpose(lift(module(transpose(K)),module(unitmat(d))));
+ require63(recovery*K==unitmat(d),"HALF63_ACTUAL_INCLUSION_LEFT_INVERSE");
+ matrix action=lift(module(K),module(S*K));
+ require63(K*action==S*K && action*action==unitmat(d),"HALF63_COMPLETE_INVOLUTION_RESTRICTION");
+ matrix N=action+unitmat(d);require63(N*N==matrix(0,d,d),"HALF63_NILPOTENT_TRACE_OPERATOR");
+ matrix fixed=matrix(syz(module(N)));int fixedDimension=mat_rk(fixed);int traceRank=mat_rk(N);
+ require63(ncols(fixed)==fixedDimension && fixedDimension+traceRank==d && N*fixed==matrix(0,d,fixedDimension),"HALF63_COMPLETE_FIXED_TRACE_DIMENSIONS");
+ matrix oneCoordinates=lift(module(K),module(one));
+ require63(K*oneCoordinates==one && action*oneCoordinates==oneCoordinates,"HALF63_SOURCE_CONSTANT_COORDINATES");
+ matrix remainder=matrix(reduce(module(oneCoordinates),std(module(N))));
+ int traceable=(mat_rk(remainder)==0);matrix particular[d][1];matrix separator[1][d];
+ if(traceable){particular=lift(module(N),module(oneCoordinates));require63(N*particular==oneCoordinates,"HALF63_TRACE_ONE_PREIMAGE");}
+ else{
+  module combined=module(N),module(oneCoordinates);matrix augmented=matrix(combined);matrix target[d+1][1];target[d+1,1]=1;
+  separator=transpose(lift(module(transpose(augmented)),module(target)));
+  require63(separator*N==matrix(0,1,d) && separator*oneCoordinates==unitmat(1),"HALF63_COMPLETE_TRACE_ONE_SEPARATOR");
+  matrix badSeparator=separator;int position=0;int q;for(q=1;q<=d;q++){if(position==0 && oneCoordinates[q,1]==1){position=q;}}
+  require63(position>0,"HALF63_NONZERO_CONSTANT_COORDINATE");badSeparator[1,position]=badSeparator[1,position]+1;
+  require63(badSeparator*oneCoordinates!=unitmat(1),"HALF63_CHANGED_SEPARATOR_REJECTED");
+ }
+ matrix changed=action;changed[1,1]=changed[1,1]+1;
+ require63(K*changed!=S*K,"HALF63_CHANGED_ACTION_REJECTED");
+ string code=constantCode63(K,family+"Inclusion63")+constantCode63(recovery,family+"Recovery63")+constantCode63(action,family+"Action63")+constantCode63(fixed,family+"Fixed63")+constantCode63(oneCoordinates,family+"One63")+constantCode63(particular,family+"Particular63")+constantCode63(separator,family+"Separator63");
+ code=code+"int "+family+"Traceable63="+string(traceable)+";";
+ print("HALF63_LINEAR family="+family+" ambient="+string(ambient)+" root_dimension="+string(d)+" fixed_dimension="+string(fixedDimension)+" trace_rank="+string(traceRank)+" one_traceable="+string(traceable));
+ return(code);
+}
+string mixedCode63=restricted63(mixedInclusion63,sigmaMixed61,oneMixed61,"mixed");
+string cubicCode63=restricted63(cubicInclusion63,sigmaAmbient61,oneAmbient61,"cubic");
+execute(read("../../../61/runs/field61-01/field-space61.sing"));
+ideal GB63=std(sourceIdeal61);require63(dim(GB63)==0 && vdim(GB63)==32,"HALF63_ACTUAL_SOURCE_DIMENSION");
+require63(reduce(actualA61,GB63)!=0,"HALF63_NONTRIVIAL_SOURCE_INVOLUTION");
+int i63;for(i63=1;i63<=size(sourceIdeal61);i63++){require63(reduce(subst(sourceIdeal61[i63],l,l+actualA61),GB63)==0,"HALF63_ACTUAL_SOURCE_INVOLUTION");}
+require63(reduce(subst(subst(l,l,l+actualA61),l,l+actualA61)+l,GB63)==0,"HALF63_SOURCE_INVOLUTION_SQUARE");
+execute(mixedCode63);execute(cubicCode63);
+proc checkRoots63(matrix K,matrix action,matrix fixed,matrix one,matrix particular,matrix separator,int traceable,string family,int ambient,string file){
+ execute(read(file));int d=ncols(K);int i;int j;poly expected;poly g;poly image;poly sigmaImage;poly fImage;poly oneFunction=0;poly traceFunction=0;
+ require63(size(squareInputs62)==d && size(squareRoots62)==d,"HALF63_COMPLETE_ACTUAL_ROOT_LISTS");
+ for(j=1;j<=d;j++){
+  expected=0;image=0;fImage=0;
+  for(i=1;i<=ambient;i++){if(K[i,j]!=0){if(ambient==76){expected=expected+completeValues61[i];}else{expected=expected+cubicValues61[i];}}}
+  expected=reduce(expected,GB63);g=reduce(squareRoots62[j],GB63);
+  require63(g!=0 && reduce(squareInputs62[j]+expected,GB63)==0 && reduce(g^2+expected,GB63)==0,"HALF63_EVERY_ROOT_REBOUND_TO_ACTUAL_SOURCE");
+  for(i=1;i<=d;i++){if(action[i,j]!=0){image=image+squareRoots62[i];fImage=fImage+squareInputs62[i];}}
+  sigmaImage=reduce(subst(g,l,l+actualA61),GB63);
+  require63(reduce(sigmaImage+image,GB63)==0 && reduce(subst(expected,l,l+actualA61)+fImage,GB63)==0,"HALF63_EVERY_ACTUAL_ROOT_AND_SQUARE_INVOLUTION");
+  oneFunction=oneFunction+one[j,1]*g;traceFunction=traceFunction+particular[j,1]*g;
+ }
+ require63(reduce(oneFunction,GB63)==1,"HALF63_ACTUAL_CONSTANT_ROOT");
+ if(traceable){require63(reduce(subst(traceFunction,l,l+actualA61)+traceFunction,GB63)==1,"HALF63_ACTUAL_TRACE_ONE_FUNCTION");}
+ else{require63(separator*(action+unitmat(d))==matrix(0,1,d) && separator*one==unitmat(1),"HALF63_SOURCE_BOUND_LINEAR_TRACE_SEPARATOR");}
+ link out="ASCII:w half-"+family+"63.sing";open(out);
+ write(out,"// Requires actual FIELD61; complete source equations and restricted operators follow.");write(out,"ideal halfSource63;list halfRoots63;list halfInputs63;list fixedRoots63;");
+ for(i=1;i<=size(sourceIdeal61);i++){write(out,"halfSource63["+string(i)+"]="+string(sourceIdeal61[i])+";");}
+ write(out,constantCode63(K,"halfInclusion63")+constantCode63(action,"halfAction63")+constantCode63(fixed,"halfFixed63")+constantCode63(separator,"halfTraceSeparator63"));
+ write(out,"int oneTraceable63="+string(traceable)+";poly traceOneFunction63="+string(reduce(traceFunction,GB63))+";");
+ for(i=1;i<=d;i++){write(out,"halfRoots63["+string(i)+"]="+string(squareRoots62[i])+";halfInputs63["+string(i)+"]="+string(squareInputs62[i])+";");}
+ for(j=1;j<=ncols(fixed);j++){
+  image=0;for(i=1;i<=d;i++){image=image+fixed[i,j]*squareRoots62[i];}image=reduce(image,GB63);
+  require63(reduce(subst(image,l,l+actualA61)+image,GB63)==0,"HALF63_EVERY_ACTUAL_FIXED_ROOT");
+  write(out,"fixedRoots63["+string(j)+"]="+string(image)+";");
+ }
+ close(out);
+ print("HALF63_RESULT family="+family+" root_dimension="+string(d)+" whole_source_root_bindings="+string(d)+" source_involution_identities="+string(2*d)+" actual_fixed_roots="+string(ncols(fixed))+" one_traceable="+string(traceable));return(1);
+}
+checkRoots63(mixedInclusion63,mixedAction63,mixedFixed63,mixedOne63,mixedParticular63,mixedSeparator63,mixedTraceable63,"mixed",76,"../../../62/runs/kernel62-01/mixed-roots62.sing");
+checkRoots63(cubicInclusion63,cubicAction63,cubicFixed63,cubicOne63,cubicParticular63,cubicSeparator63,cubicTraceable63,"cubic",324,"../../../62/runs/kernel62-01/cubic-roots62.sing");
+print("HALF_DESCENT63_ALL_CHECKS_PASS");quit;

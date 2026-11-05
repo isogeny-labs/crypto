@@ -1,0 +1,180 @@
+execute(read("../../source-data/marked23-field51.sing"));
+string fText52=string(f23);string bText52=string(b23);string cText52=string(c23);
+int checked52=0;int pattern88_52=0;int pattern214_52=0;int odd11_52=0;
+execute(read("../fibers23-52-02/fibers23-certificate52.sing"));
+setring field7Certificate52;short=0;
+int index52;int factorIndex52;number x;number root52;number observedB52;number observedC52;
+number bValue52;number cValue52;number A52;number Delta52;
+poly actualF52;poly actualB52;poly actualC52;poly observedG52;poly expectedG52;poly rebuilt52;
+ideal factors52;intvec powers52;list checkFactors52;ideal irreducibleFactors52;
+for(index52=1;index52<=224;index52++){
+ string suffix52="7_"+string(index52);
+ execute("x=x"+suffix52+";root52=y"+suffix52+";observedB52=b"+suffix52+";observedC52=c"+suffix52+";observedG52=G"+suffix52+";factors52=factors"+suffix52+";powers52=powers"+suffix52+";");
+ execute("actualF52="+fText52+";actualB52="+bText52+";actualC52="+cText52+";");
+ if(subst(actualF52,y,root52)!=0 || subst(diff(actualF52,y),y,root52)==0){ERROR("FRESH52_SMOOTH_BASE_POINT");quit;}
+ bValue52=leadcoef(subst(actualB52,y,root52));cValue52=leadcoef(subst(actualC52,y,root52));
+ if(bValue52!=observedB52 || cValue52!=observedC52){ERROR("FRESH52_ACTUAL_B_C_BINDING");quit;}
+ A52=1+cValue52;Delta52=bValue52^3*(bValue52+cValue52*A52^3);
+ expectedG52=l^16+A52^8*l^8+Delta52*l^4+A52^3*Delta52*l+bValue52^4*(bValue52^4+bValue52*cValue52*A52^3+cValue52^2*A52^4)+A52^16;
+ if(A52*Delta52==0 || observedG52!=expectedG52 || gcd(observedG52,diff(observedG52,l))!=1){ERROR("FRESH52_ACTUAL_MONIC_SEPARABLE_G");quit;}
+ rebuilt52=1;
+ for(factorIndex52=1;factorIndex52<=size(factors52);factorIndex52++){
+  rebuilt52=rebuilt52*factors52[factorIndex52]^powers52[factorIndex52];
+  if(factorIndex52>1){
+   if(powers52[factorIndex52]!=1){ERROR("FRESH52_REPEATED_FACTOR");quit;}
+   checkFactors52=factorize(factors52[factorIndex52]);irreducibleFactors52=checkFactors52[1];
+   if(size(irreducibleFactors52)!=2 || deg(irreducibleFactors52[2])!=deg(factors52[factorIndex52])){ERROR("FRESH52_FACTOR_IRREDUCIBILITY");quit;}
+   if(7==11 && deg(factors52[factorIndex52])%2==1){odd11_52++;}
+  }
+ }
+ if(rebuilt52!=observedG52 || deg(observedG52)!=16 || leadcoef(observedG52)!=1){ERROR("FRESH52_COMPLETE_FACTOR_PRODUCT");quit;}
+ if(size(factors52)==3){
+  if(deg(factors52[2])==8 && deg(factors52[3])==8){pattern88_52++;}
+  if((deg(factors52[2])==2 && deg(factors52[3])==14) || (deg(factors52[2])==14 && deg(factors52[3])==2)){pattern214_52++;}
+ }
+ checked52++;
+}
+print("FRESH52_FIELD m=7 cases=224 complete=true");
+setring field8Certificate52;short=0;
+int index52;int factorIndex52;number x;number root52;number observedB52;number observedC52;
+number bValue52;number cValue52;number A52;number Delta52;
+poly actualF52;poly actualB52;poly actualC52;poly observedG52;poly expectedG52;poly rebuilt52;
+ideal factors52;intvec powers52;list checkFactors52;ideal irreducibleFactors52;
+for(index52=1;index52<=264;index52++){
+ string suffix52="8_"+string(index52);
+ execute("x=x"+suffix52+";root52=y"+suffix52+";observedB52=b"+suffix52+";observedC52=c"+suffix52+";observedG52=G"+suffix52+";factors52=factors"+suffix52+";powers52=powers"+suffix52+";");
+ execute("actualF52="+fText52+";actualB52="+bText52+";actualC52="+cText52+";");
+ if(subst(actualF52,y,root52)!=0 || subst(diff(actualF52,y),y,root52)==0){ERROR("FRESH52_SMOOTH_BASE_POINT");quit;}
+ bValue52=leadcoef(subst(actualB52,y,root52));cValue52=leadcoef(subst(actualC52,y,root52));
+ if(bValue52!=observedB52 || cValue52!=observedC52){ERROR("FRESH52_ACTUAL_B_C_BINDING");quit;}
+ A52=1+cValue52;Delta52=bValue52^3*(bValue52+cValue52*A52^3);
+ expectedG52=l^16+A52^8*l^8+Delta52*l^4+A52^3*Delta52*l+bValue52^4*(bValue52^4+bValue52*cValue52*A52^3+cValue52^2*A52^4)+A52^16;
+ if(A52*Delta52==0 || observedG52!=expectedG52 || gcd(observedG52,diff(observedG52,l))!=1){ERROR("FRESH52_ACTUAL_MONIC_SEPARABLE_G");quit;}
+ rebuilt52=1;
+ for(factorIndex52=1;factorIndex52<=size(factors52);factorIndex52++){
+  rebuilt52=rebuilt52*factors52[factorIndex52]^powers52[factorIndex52];
+  if(factorIndex52>1){
+   if(powers52[factorIndex52]!=1){ERROR("FRESH52_REPEATED_FACTOR");quit;}
+   checkFactors52=factorize(factors52[factorIndex52]);irreducibleFactors52=checkFactors52[1];
+   if(size(irreducibleFactors52)!=2 || deg(irreducibleFactors52[2])!=deg(factors52[factorIndex52])){ERROR("FRESH52_FACTOR_IRREDUCIBILITY");quit;}
+   if(8==11 && deg(factors52[factorIndex52])%2==1){odd11_52++;}
+  }
+ }
+ if(rebuilt52!=observedG52 || deg(observedG52)!=16 || leadcoef(observedG52)!=1){ERROR("FRESH52_COMPLETE_FACTOR_PRODUCT");quit;}
+ if(size(factors52)==3){
+  if(deg(factors52[2])==8 && deg(factors52[3])==8){pattern88_52++;}
+  if((deg(factors52[2])==2 && deg(factors52[3])==14) || (deg(factors52[2])==14 && deg(factors52[3])==2)){pattern214_52++;}
+ }
+ checked52++;
+}
+print("FRESH52_FIELD m=8 cases=264 complete=true");
+execute(read("../largefibers23-52-01/large-fibers23-certificate52.sing"));
+setring field10Certificate52;short=0;
+int index52;int factorIndex52;number x;number root52;number observedB52;number observedC52;
+number bValue52;number cValue52;number A52;number Delta52;
+poly actualF52;poly actualB52;poly actualC52;poly observedG52;poly expectedG52;poly rebuilt52;
+ideal factors52;intvec powers52;list checkFactors52;ideal irreducibleFactors52;
+for(index52=1;index52<=880;index52++){
+ string suffix52="10_"+string(index52);
+ execute("x=x"+suffix52+";root52=y"+suffix52+";observedB52=b"+suffix52+";observedC52=c"+suffix52+";observedG52=G"+suffix52+";factors52=factors"+suffix52+";powers52=powers"+suffix52+";");
+ execute("actualF52="+fText52+";actualB52="+bText52+";actualC52="+cText52+";");
+ if(subst(actualF52,y,root52)!=0 || subst(diff(actualF52,y),y,root52)==0){ERROR("FRESH52_SMOOTH_BASE_POINT");quit;}
+ bValue52=leadcoef(subst(actualB52,y,root52));cValue52=leadcoef(subst(actualC52,y,root52));
+ if(bValue52!=observedB52 || cValue52!=observedC52){ERROR("FRESH52_ACTUAL_B_C_BINDING");quit;}
+ A52=1+cValue52;Delta52=bValue52^3*(bValue52+cValue52*A52^3);
+ expectedG52=l^16+A52^8*l^8+Delta52*l^4+A52^3*Delta52*l+bValue52^4*(bValue52^4+bValue52*cValue52*A52^3+cValue52^2*A52^4)+A52^16;
+ if(A52*Delta52==0 || observedG52!=expectedG52 || gcd(observedG52,diff(observedG52,l))!=1){ERROR("FRESH52_ACTUAL_MONIC_SEPARABLE_G");quit;}
+ rebuilt52=1;
+ for(factorIndex52=1;factorIndex52<=size(factors52);factorIndex52++){
+  rebuilt52=rebuilt52*factors52[factorIndex52]^powers52[factorIndex52];
+  if(factorIndex52>1){
+   if(powers52[factorIndex52]!=1){ERROR("FRESH52_REPEATED_FACTOR");quit;}
+   checkFactors52=factorize(factors52[factorIndex52]);irreducibleFactors52=checkFactors52[1];
+   if(size(irreducibleFactors52)!=2 || deg(irreducibleFactors52[2])!=deg(factors52[factorIndex52])){ERROR("FRESH52_FACTOR_IRREDUCIBILITY");quit;}
+   if(10==11 && deg(factors52[factorIndex52])%2==1){odd11_52++;}
+  }
+ }
+ if(rebuilt52!=observedG52 || deg(observedG52)!=16 || leadcoef(observedG52)!=1){ERROR("FRESH52_COMPLETE_FACTOR_PRODUCT");quit;}
+ if(size(factors52)==3){
+  if(deg(factors52[2])==8 && deg(factors52[3])==8){pattern88_52++;}
+  if((deg(factors52[2])==2 && deg(factors52[3])==14) || (deg(factors52[2])==14 && deg(factors52[3])==2)){pattern214_52++;}
+ }
+ checked52++;
+}
+print("FRESH52_FIELD m=10 cases=880 complete=true");
+setring field11Certificate52;short=0;
+int index52;int factorIndex52;number x;number root52;number observedB52;number observedC52;
+number bValue52;number cValue52;number A52;number Delta52;
+poly actualF52;poly actualB52;poly actualC52;poly observedG52;poly expectedG52;poly rebuilt52;
+ideal factors52;intvec powers52;list checkFactors52;ideal irreducibleFactors52;
+for(index52=1;index52<=2442;index52++){
+ string suffix52="11_"+string(index52);
+ execute("x=x"+suffix52+";root52=y"+suffix52+";observedB52=b"+suffix52+";observedC52=c"+suffix52+";observedG52=G"+suffix52+";factors52=factors"+suffix52+";powers52=powers"+suffix52+";");
+ execute("actualF52="+fText52+";actualB52="+bText52+";actualC52="+cText52+";");
+ if(subst(actualF52,y,root52)!=0 || subst(diff(actualF52,y),y,root52)==0){ERROR("FRESH52_SMOOTH_BASE_POINT");quit;}
+ bValue52=leadcoef(subst(actualB52,y,root52));cValue52=leadcoef(subst(actualC52,y,root52));
+ if(bValue52!=observedB52 || cValue52!=observedC52){ERROR("FRESH52_ACTUAL_B_C_BINDING");quit;}
+ A52=1+cValue52;Delta52=bValue52^3*(bValue52+cValue52*A52^3);
+ expectedG52=l^16+A52^8*l^8+Delta52*l^4+A52^3*Delta52*l+bValue52^4*(bValue52^4+bValue52*cValue52*A52^3+cValue52^2*A52^4)+A52^16;
+ if(A52*Delta52==0 || observedG52!=expectedG52 || gcd(observedG52,diff(observedG52,l))!=1){ERROR("FRESH52_ACTUAL_MONIC_SEPARABLE_G");quit;}
+ rebuilt52=1;
+ for(factorIndex52=1;factorIndex52<=size(factors52);factorIndex52++){
+  rebuilt52=rebuilt52*factors52[factorIndex52]^powers52[factorIndex52];
+  if(factorIndex52>1){
+   if(powers52[factorIndex52]!=1){ERROR("FRESH52_REPEATED_FACTOR");quit;}
+   checkFactors52=factorize(factors52[factorIndex52]);irreducibleFactors52=checkFactors52[1];
+   if(size(irreducibleFactors52)!=2 || deg(irreducibleFactors52[2])!=deg(factors52[factorIndex52])){ERROR("FRESH52_FACTOR_IRREDUCIBILITY");quit;}
+   if(11==11 && deg(factors52[factorIndex52])%2==1){odd11_52++;}
+  }
+ }
+ if(rebuilt52!=observedG52 || deg(observedG52)!=16 || leadcoef(observedG52)!=1){ERROR("FRESH52_COMPLETE_FACTOR_PRODUCT");quit;}
+ if(size(factors52)==3){
+  if(deg(factors52[2])==8 && deg(factors52[3])==8){pattern88_52++;}
+  if((deg(factors52[2])==2 && deg(factors52[3])==14) || (deg(factors52[2])==14 && deg(factors52[3])==2)){pattern214_52++;}
+ }
+ checked52++;
+}
+print("FRESH52_FIELD m=11 cases=2442 complete=true");
+if(checked52!=3810 || pattern88_52!=774 || pattern214_52!=924 || odd11_52!=2024){ERROR("FRESH52_ALL_CASE_COUNTS");quit;}
+execute(read("../normline52-01/normline-certificate52.sing"));
+poly A52=1+c;poly actualH52=x+t;poly kernelDen52=A52*t+b;
+poly point52=y^2+A52*x*y+b*y+x^3+b*x^2;poly kernel52=w^2+kernelDen52*w+t^3+b*t^2;
+poly actualPsi52=t^4+A52^2*t^3+A52*b*t^2+b^2*t+b^3;
+if(matrix(source52)!=matrix(ideal(point52,kernel52,actualPsi52)) || H52!=actualH52){ERROR("FRESH52_ACTUAL_NORM_SOURCE");quit;}
+poly plusSlope52=y+w;poly minusSlope52=y+w+kernelDen52;
+poly xp52=plusSlope52^2+A52*plusSlope52*actualH52+(b+x+t)*actualH52^2;
+poly xm52=minusSlope52^2+A52*minusSlope52*actualH52+(b+x+t)*actualH52^2;
+poly yp52=plusSlope52*(x*actualH52^2+xp52)+(y+b)*actualH52^3+A52*xp52*actualH52;
+poly ym52=minusSlope52*(x*actualH52^2+xm52)+(y+b)*actualH52^3+A52*xm52*actualH52;
+poly actualNorm52=(y+l*x+n)*(yp52+l*xp52*actualH52+n*actualH52^3)*(ym52+l*xm52*actualH52+n*actualH52^3);
+poly actualX52=x*actualH52^2+xp52+xm52;
+poly actualY52=reduce(y*actualH52^3+yp52+ym52+kernelDen52*actualH52^3,std(ideal(kernel52)));
+poly actualAlpha52=t^3+(b+l^2+A52*l)*t^2+(A52*n+b*l)*t+n^2+b*n;
+if(actualNorm52!=normNumerator52 || actualX52!=X52 || actualY52!=Y52 || actualAlpha52!=alpha52){ERROR("FRESH52_ACTUAL_NORM_FUNCTION_BINDING");quit;}
+if(matrix(source52)*lift52!=matrix(ideal(residual52)) || residual52!=normNumerator52+alpha52*Y52*H52^3+beta52*X52*H52^4+gamma52*H52^6){ERROR("FRESH52_FULL_NORM_PRODUCT");quit;}
+poly psi52=source52[3];
+if(matrix(ideal(psi52))*signLift52!=matrix(signResiduals52)){ERROR("FRESH52_SIGN_PRODUCTS");quit;}
+ideal actualSign52=subst(subst(alpha52,l,l+1+c),n,n+b)+alpha52,subst(subst(beta52,l,l+1+c),n,n+b)+beta52+(1+c)*alpha52,subst(subst(gamma52,l,l+1+c),n,n+b)+gamma52+b*alpha52;
+if(matrix(actualSign52)!=matrix(signResiduals52)){ERROR("FRESH52_SIGN_RESIDUAL_BINDING");quit;}
+execute(read("../annihilator52-01/annihilator-certificate52.sing"));
+execute(read("../filtration52-02/filtration-certificate52.sing"));
+setring filtrationCertificate52;short=0;option(redSB);
+map ann52=annihilatorCertificate52,u;matrix final52=ann52(final52);matrix recovery52=ann52(recovery52);
+matrix I52[32][32];int i52;int k52;int branch52;int bound52;poly prime52;module combined52;matrix basis52;matrix forward52;matrix reverse52;
+for(i52=1;i52<=32;i52++){I52[i52,i52]=1;}
+if(final52*recovery52!=u^5*(u+1)^9*I52){ERROR("FRESH52_RECOVERY_PRODUCT");quit;}
+module standard52=std(module(final52));module zero52=reduce(module(u^4*(u+1)^120*I52),standard52);module one52=reduce(module(u^60*(u+1)^8*I52),standard52);
+if(size(zero52)==0 || size(one52)==0 || matrix(zero52)!=matrix(ann52(zeroRemainder52)) || matrix(one52)!=matrix(ann52(oneRemainder52))){ERROR("FRESH52_SCALAR_MINIMALITY");quit;}
+for(branch52=0;branch52<=1;branch52++){
+ if(branch52==0){prime52=u;bound52=5;}else{prime52=u+1;bound52=9;}
+ for(k52=1;k52<=bound52;k52++){
+  string suffix52=string(branch52)+"_"+string(k52);
+  execute("basis52=basis"+suffix52+";forward52=forward"+suffix52+";reverse52=reverse"+suffix52+";");
+  combined52=module(final52),module(prime52^k52*I52);
+  if(matrix(combined52)*forward52!=basis52 || basis52*reverse52!=matrix(combined52)){ERROR("FRESH52_FULL_FILTRATION_PRODUCTS");quit;}
+  int expectedLength52;if(branch52==0){expectedLength52=lengthsZero52[k52+1];}else{expectedLength52=lengthsOne52[k52+1];}
+  if(vdim(std(module(basis52)))!=expectedLength52){ERROR("FRESH52_FILTRATION_DIMENSION");quit;}
+ }
+}
+print("FRESH52_RESULT complete_specializations=3810 all_stored_factors_irreducible=true norm_and_three_sign_products=true least_scalar_minimality=true full_filtration_products=28");
+print("FRESH52_ALL_CHECKS_PASS");quit;

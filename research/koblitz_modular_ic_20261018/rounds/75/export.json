@@ -1,0 +1,31 @@
+{
+  "schema": "experiment.export/v1",
+  "experiment_id": "KOBLITZ-R75-FINITE-UNIFORMIZER-CLASSES",
+  "claim_class": "exact_computation",
+  "protocols": [
+    {
+      "attempt": "rational-uniform75-01",
+      "path": "runs/rational-uniform75-01/protocol.json",
+      "sha256": "39294777f115e3922f709362f69b717ef8efee44e9aaa16937bc619fc2d4f686",
+      "frozen_revision": "8ce71feb71aaf07faa574c0306af7810214370c3"
+    },
+    {
+      "attempt": "five-uniform75-01",
+      "path": "runs/five-uniform75-01/protocol.json",
+      "sha256": "39294777f115e3922f709362f69b717ef8efee44e9aaa16937bc619fc2d4f686",
+      "frozen_revision": "8ce71feb71aaf07faa574c0306af7810214370c3"
+    }
+  ],
+  "raw_archive": "runs.tar.xz; content address in .artifacts.json after custody publication",
+  "results": {
+    "path": "results.json",
+    "sha256": "2a566362166c01cd1d1145f1c4744a88680259307380ec016e56e4e616a727a9"
+  },
+  "flow": {
+    "accepted": 2,
+    "rejected": 0,
+    "interrupted": 0
+  },
+  "canonical_schema_validation": "unavailable in selected Git index and disk; manual contract/source-byte checks only",
+  "notes": "Complete 192-candidate searches certify finite-fiber uniformizer classes at six ramified branches; six unramified branches use base primes. Global lifts and valuations separate."
+}

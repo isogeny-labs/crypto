@@ -1,0 +1,9 @@
+proc baseTuplePeriod44(poly bb,poly cc,poly kpoly,int d){
+ ideal baseRel44=std(ideal(kpoly,Z,T));int n44=5*d;intvec primes44;
+ if(d==12){primes44=2,3,5;}else{if(d==436){primes44=2,5,109;}else{ERROR("PERIOD44_UNREGISTERED_DEGREE");}}
+ poly bf44=bb;poly cf44=cc;int k44;int i44;intvec hits44;int remaining44=n44;int prime44;int trial44;for(i44=1;i44<=size(primes44);i44++){prime44=primes44[i44];if(prime44<2){ERROR("PERIOD44_BAD_PRIME");}for(trial44=2;trial44*trial44<=prime44;trial44++){if(prime44%trial44==0){ERROR("PERIOD44_COMPOSITE_DIVISOR");}}while(remaining44%prime44==0){remaining44=remaining44 div prime44;}}if(remaining44!=1){ERROR("PERIOD44_INCOMPLETE_DIVISORS");}
+
+ for(k44=1;k44<=n44;k44++){bf44=reduce(bf44^2,baseRel44);cf44=reduce(cf44^2,baseRel44);for(i44=1;i44<=size(primes44);i44++){if(k44==n44 div primes44[i44]){if(bf44==bb && cf44==cc){ERROR("PERIOD44_NOT_GENERATING_BASE");}hits44[i44]=1;}}}
+ if(bf44!=bb || cf44!=cc){ERROR("PERIOD44_BASE_RETURN");}for(i44=1;i44<=size(primes44);i44++){if(hits44[i44]!=1){ERROR("PERIOD44_MISSING_DIVISOR");}}
+ return(n44);
+}
