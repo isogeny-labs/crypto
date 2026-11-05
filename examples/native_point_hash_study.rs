@@ -1,7 +1,7 @@
 //! First point-table study: one explicitly supplied native two-slot batch.
 //! `run INPUT OUTPUT` executes a batch; `check INPUT OUTPUT` replays answers
 //! with the existing word-field arithmetic. Output clocks carry no L2 admission.
-//! This instrument does not launch jobs, establish complete pricing or freeze a
+//! This instrument submits no cloud jobs, establishes no complete pricing or frozen
 //! protocol. Development tests use only the fixed public curve over F_17.
 
 use crypto_lib::cryptanalysis::ic_boundary::{CountedGroup, GroupOps, PrimeCurve, PrimePoint};
@@ -23,10 +23,13 @@ use std::io::{Read, Write};
 use std::path::Path;
 use std::time::Instant;
 
+#[path = "native_point_hash_study/pilot.rs"]
+mod pilot;
+
 type Result<T> = std::result::Result<T, String>;
 const MAX_INPUT_BYTES: u64 = 1_048_576;
 
-#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
 #[serde(rename_all = "snake_case")]
 enum Arm {
     Current,
@@ -661,11 +664,24 @@ fn write_new(path: &Path, value: &impl Serialize) -> Result<()> {
         .open(path)
         .map_err(|e| e.to_string())?;
     serde_json::to_writer(&mut file, value).map_err(|e| e.to_string())?;
-    file.write_all(b"\n").map_err(|e| e.to_string())
+    file.write_all(b"\n").map_err(|e| e.to_string())?;
+    file.sync_all().map_err(|e| e.to_string())
 }
 fn main() {
     let args: Vec<_> = std::env::args_os().collect();
     let result = (|| -> Result<()> {
+        if args.get(1).and_then(|s| s.to_str()).is_some_and(|s| {
+            [
+                "make-plan",
+                "make-development-plan",
+                "check-plan",
+                "execute-plan",
+                "analyze-plan",
+            ]
+            .contains(&s)
+        }) {
+            return pilot::cli(&args);
+        }
         if args.len() != 4 {
             return Err("usage: native_point_hash_study run|check INPUT OUTPUT".into());
         }

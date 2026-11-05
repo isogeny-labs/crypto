@@ -7,11 +7,11 @@
     "Codex planning lane"
   ],
   "status": "blocked",
-  "status_note": "Launch requested, still blocked. The first-study six-arm batch runner and word-arithmetic answer replay adapter are implemented with development controls. Full orchestration, independent audit, complete inventories, frozen canonical protocol/analysis, merged-source qualification and cloud/budget/image admission remain pending. No scientific job or timed batch has run.",
+  "status_note": "The compact 32-context/2368-attempt recipe, balanced schedule, fail-stop fresh-process executor and paired diagnostic analyzer have development qualification. The canonical protocol is valid but unfrozen. Native L2/host/resource and full inventory/external/masked-export integration, independent audit, merged-source qualification and cloud/budget/checkpoint admission remain pending; the production pilot has not run.",
   "blocked_on": [
     "pr:2984 native integration and combined-source qualification",
     "problem:problems/native-ecbench-pcc-ledger-fork.md protected canonical ledger decision",
-    "note:Finish full native study orchestration, independent audit, complete inventories and canonical frozen protocols",
+    "note:Finish native L2/host/resource and full inventory/external/masked-export integration, independent audit and canonical freeze",
     "note:Current account/lane budget, exact-source S3 readback and native image/execution admission required"
   ],
   "links": {
@@ -20,7 +20,8 @@
       "research/hashed_ecdl_ecbench_20261030/README.md",
       "docs/hashed-ecdl-functional-plan.md",
       "backlog/XP-20261105-native-point-hashing/launch-readiness-20261105.json",
-      "research/native_point_hashing_20261105/README.md"
+      "research/native_point_hashing_20261105/README.md",
+      "research/native_point_hashing_20261105/pilot-v1/PROTOCOL.md"
     ],
     "prs": [
       2984
@@ -59,9 +60,10 @@
   "run": {
     "argv": [
       "native_point_hash_study",
-      "run",
-      "UNFROZEN_BATCH_INPUT.json",
-      "{out}/batch.json"
+      "execute-plan",
+      "research/native_point_hashing_20261105/pilot-v1/pilot-plan.json",
+      "{out}/pilot",
+      "ORIGINAL_ABSOLUTE_UNIX_DEADLINE"
     ],
     "env": {},
     "timeout_per_shard_s": 1800
@@ -77,12 +79,13 @@
     "resume_flag": null
   },
   "outputs": {
-    "result_schema": "native-point-hash.batch-record/v1",
+    "result_schema": "native-point-hash.pilot-analysis/v1",
     "verify": [
       "native_point_hash_study",
-      "check",
-      "UNFROZEN_BATCH_INPUT.json",
-      "{out}/batch.json"
+      "analyze-plan",
+      "research/native_point_hashing_20261105/pilot-v1/pilot-plan.json",
+      "{out}/pilot",
+      "{out}/analysis.json"
     ],
     "land": "research/native_point_hashing_20261105"
   },
@@ -94,8 +97,8 @@
     ],
     "ttl_s": 3600,
     "env": {
-      "name": "unimplemented-digest-pinned-native-study",
-      "recipe": "unimplemented-full-orchestrator-and-admitted-image; single-batch example exists"
+      "name": "pending-admitted-native-point-pilot-image",
+      "recipe": "native_point_hash_study execute-plan; exact source/image/native L2 admission pending"
     },
     "exec": {
       "cpus": 4,

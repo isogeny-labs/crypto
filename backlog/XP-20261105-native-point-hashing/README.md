@@ -3,10 +3,12 @@
 Design date: 2026-11-05. Status: **launch requested; blocked before submission**.
 The [launch-readiness record](launch-readiness-20261105.json) retains the
 read-only admission checks and next actions. The [card](card.json) is unready:
-the [first-study batch instrument](../../research/native_point_hashing_20261105/README.md)
-now supplies six native arms and a word-arithmetic answer replay adapter.
-Full study orchestration, independent audit, canonical protocols, power analysis
-and execution admission remain to be built or completed. Numbers below specify proposed workloads and limits, not results
+the [first-study software](../../research/native_point_hashing_20261105/pilot-v1/PROTOCOL.md)
+now supplies six native arms, a fixed compact recipe, balanced schedule,
+fresh-process execution, failure ledger and paired diagnostic analysis.
+Independent audit, complete inventory/pricing, masking/export, canonical freeze,
+power and execution admission remain to be built or completed.
+Numbers below specify proposed workloads and limits, not results
 or runtime predictions. The initial request was experiment design; the later
 launch request authorizes execution once the implementation and admission
 prerequisites are satisfied. No paid build or scientific submission was made.
@@ -113,6 +115,12 @@ same 256 queries. Record cumulative prefixes at **1, 4, 16, 64 and 256** queries
 This is 32 contexts x 6 arms x 10 rounds = **1,920 timed arm-batches**, including
 1,536 measured batches. Instrumented passes, checker fixtures and external
 controls are additional attempts; their counts must be fixed before readiness.
+
+The [implemented pilot recipe](../../research/native_point_hashing_20261105/pilot-v1/pilot-plan.json)
+now explicitly adds 192 per-context control batches, 64 forced-collision batches
+and 192 counted diagnostic batches: **2,368 planned attempts**. This preserves
+the 1,920 timed/warmup batches. Runtime calibration and external references
+remain separate costed prerequisites; this recipe does not claim they ran.
 
 Plot total `preparation + queries + checks` against query count and memory.
 Report the earliest *observed* prefix with lower cumulative cost than A, with uncertainty;

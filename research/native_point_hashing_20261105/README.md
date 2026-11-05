@@ -1,10 +1,18 @@
 # Native point-table study instrument: development qualification
 
-The [batch example](../../examples/native_point_hash_study.rs) supplies the six
-arms of the first [planned study](../../backlog/XP-20261105-native-point-hashing/README.md).
+The [batch example](../../examples/native_point_hash_study.rs) and its
+[pilot module](../../examples/native_point_hash_study/pilot.rs) supply the six
+arms and orchestration of the first [planned study](../../backlog/XP-20261105-native-point-hashing/README.md).
 The requested studies have **not run**. This directory contains development
 qualification only. No scientific batch, cloud build or measurement job was
 submitted. The original frozen 1,728-attempt panel is unchanged.
+
+Current pilot software, fixed input recipe and development qualification are
+described in [pilot-v1/PROTOCOL.md](pilot-v1/PROTOCOL.md) and
+[pilot-v1/qualification.json](pilot-v1/qualification.json). The original
+batch-only `qualification.json`, `source.sha256` and `development.tar.xz` below
+remain historical evidence for commit `8c90746a23b2943a94f75558033958f31f91199e`;
+check out that commit when replaying those older source hashes.
 
 ## Implemented scope
 
@@ -101,12 +109,19 @@ do not treat the final manifest as an identity for the initial receipts.
 
 ## Remaining before the requested studies
 
-The six-arm **single-batch** instrument is only one part of the first pilot.
-The full 1,920 timed-batch orchestration, fresh-process interleaving, complete
-fixed input/attempt manifests, instrumented passes, full field/hash/allocation
-inventory, external references, calibrated costs, masking and frozen analysis
-are still pending. The actual canonical protocol must be completed and frozen
-before data. A digest-pinned image must include this example and earn native
+The six-arm single-batch instrument now has a compact fixed 32-context recipe,
+2,368-attempt schedule (the original 1,920 timed/warmup batches plus explicit
+controls and counted passes), fresh-process execution, durable failure ledger
+and paired diagnostic analysis. The [canonical draft](pilot-v1/protocol.json)
+passes structural/cross-reference validation but remains unfrozen. The real CLI
+development control completed 76 counts-only F17 children; no 12/16-bit solver
+batch was run. Current receipts are in [pilot-v1](pilot-v1/qualification.json).
+These are unregistered producer observations. [pcc:unverified]
+
+Full field/hash/allocation inventory, external references, calibrated costs,
+masking/canonical export and native host/resource admission remain pending.
+The actual canonical protocol must be completed and frozen before data.
+A digest-pinned image must include this example and earn native
 L2/A/A admission; the generic deployed ECBench fixture cannot substitute.
 
 The canonical-key/projective study, natural-reuse cache study, label-safe
