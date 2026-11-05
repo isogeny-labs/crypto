@@ -95,6 +95,7 @@ def main():
         with tempfile.TemporaryDirectory(prefix=f'n83-ffd-spike38-{cid}-') as td:
             case_root=pathlib.Path(td); (case_root/cid).mkdir(); (case_root/'inputs.json').write_text(json.dumps([item],indent=2)+'\n'); os.symlink(inputs/cid/'system.sing',case_root/cid/'system.sing')
             case_out=out/'certificates'/cid
+            case_out.parent.mkdir(parents=True,exist_ok=True)
             cmd,elapsed=run_cmd([a.fall,'run',case_root,case_out],60,env)
             row.update({'run_exit_code':cmd.returncode,'run_elapsed_wall_seconds':elapsed,'run_stdout':cmd.stdout,'run_stderr':cmd.stderr})
             cert=case_out/f'{cid}.json';
