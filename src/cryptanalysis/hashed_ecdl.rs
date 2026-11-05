@@ -2,8 +2,8 @@
 //!
 //! This implements affine-hashed factor bases and the index-calculus reduction,
 //! with a separate complete tensor implementation exported as [`tensor`].
-//! This bounded reference's default oracle enumerates group decompositions (generic
-//! decomposition, bounded by sqrt(r); cannot beat rho). No subexponential or
+//! This bounded reference's default oracle enumerates group decompositions
+//! (generic decomposition). No subexponential or
 //! performance claim is made. Cofactor-one prime-field curves below 2^63 are
 //! supported using an exact prime-order witness; the original constructor
 //! retains its small-field exhaustive check. Answers carry replayable certificates.

@@ -1,0 +1,79 @@
+import ComponentMap
+set_option autoImplicit false
+namespace ComponentMap
+open UnionSize
+variable {n : Nat}
+def fiber (owner : Fin n→Fin n) (root : Fin n) : Finset (Fin n) :=
+ Finset.univ.filter (fun x=>owner x=root)
+def SizeValid (owner : Fin n→Fin n) (sizes : Sizes n) : Prop :=
+ ∀ root,owner root=root → (sizeAt sizes root).toNat=(fiber owner root).card
+
+theorem fibers_disjoint (owner : Fin n→Fin n) (c p : Fin n) (hd : c≠p) :
+ Disjoint (fiber owner c) (fiber owner p) := by
+ apply Finset.disjoint_left.mpr
+ intro x hc hp
+ simp only [fiber,Finset.mem_filter,Finset.mem_univ,true_and] at hc hp
+ exact hd (hc.symm.trans hp)
+
+theorem merged_parent_fiber (owner : Fin n→Fin n) (c p : Fin n) :
+ fiber (merged owner c p) p=fiber owner c ∪ fiber owner p := by
+ ext x
+ simp only [fiber,Finset.mem_filter,Finset.mem_univ,true_and,Finset.mem_union,merged,Set.mem_setOf_eq]
+ split <;> simp_all
+
+theorem merged_other_fiber (owner : Fin n→Fin n) (c p root : Fin n)
+ (hc : root≠c) (hp : root≠p) :
+ fiber (merged owner c p) root=fiber owner root := by
+ ext x
+ simp only [fiber,Finset.mem_filter,Finset.mem_univ,true_and,merged,Set.mem_setOf_eq]
+ split <;> simp_all [Ne.symm hc,Ne.symm hp]
+
+theorem root_size_preserved (owner : Fin n→Fin n) (sizes : Sizes n) (c p : Fin n)
+ (hc : owner c=c) (hp : owner p=p) (hd : c≠p)
+ (hv : SizeValid owner sizes) (hn : n<USize.size) :
+ SizeValid (merged owner c p) (update sizes c p) := by
+ intro root hr
+ by_cases he : root=p
+ · subst root
+   rw [update_parent]
+   have hb := UnionSize.disjoint_sum_bound (fiber owner c) (fiber owner p) (fibers_disjoint owner c p hd)
+   rw [UnionSize.add_exact _ _ n (by rw [hv p hp,hv c hc];omega) hn,hv p hp,hv c hc]
+   rw [merged_parent_fiber,Finset.card_union_of_disjoint (fibers_disjoint owner c p hd)]
+   omega
+ · have hor : owner root=root := by
+     unfold merged at hr
+     split at hr
+     · exact False.elim (he hr.symm)
+     · exact hr
+   have hrc : root≠c := by
+     intro h;subst root
+     have hpc : p=c := by simpa [merged,hc] using hr
+     exact hd hpc.symm
+   rw [update_other sizes c p root he,merged_other_fiber owner c p root hrc he]
+   exact hv root hor
+
+variable {K : Type*} [Field K]
+theorem find_preserves_sizes (s t : GraphFind.State K n) (owner : Fin n→Fin n) (sizes : Sizes n)
+ (x r : Fin n) (p : SignedGraphAlgebra.Potential K)
+ (run : GraphFind.Run s x t r p) (hm : Valid s owner) (hs : SizeValid owner sizes) :
+ Valid t owner ∧ SizeValid owner sizes ∧ owner x=r := by
+ have h:=run_preserves_owner s t owner x r p run hm
+ exact ⟨h.1,hs,h.2.1⟩
+
+theorem attach_preserves_sizes (s : GraphFind.State K n) (owner : Fin n→Fin n) (sizes : Sizes n)
+ (c p : Fin n) (pot : SignedGraphAlgebra.Potential K)
+ (hm : Valid s owner) (hs : SizeValid owner sizes)
+ (hc : s.parent c=c) (hp : s.parent p=p) (hd : c≠p) (hn : n<USize.size) :
+ Valid (GraphFind.compress s c p pot) (merged owner c p) ∧
+ SizeValid (merged owner c p) (update sizes c p) := by
+ exact ⟨attach_preserves_owner s owner c p pot hm hc hp hd,
+ root_size_preserved owner sizes c p ((hm.2 c).mpr hc) ((hm.2 p).mpr hp) hd hs hn⟩
+
+theorem owner_is_returned_root (s : GraphFind.State K n) (owner : Fin n→Fin n)
+ (rank : Fin n→Nat) (hf : GraphFind.Forest s rank) (hm : Valid s owner) (x : Fin n) :
+ ∃ t pot,GraphFind.Run s x t (owner x) pot := by
+ obtain ⟨t,r,pot,hr⟩:=GraphFind.run_exists s rank hf x
+ have he:owner x=r := (run_preserves_owner s t owner x r pot hr hm).2.1
+ rw [←he] at hr
+ exact ⟨t,pot,hr⟩
+end ComponentMap

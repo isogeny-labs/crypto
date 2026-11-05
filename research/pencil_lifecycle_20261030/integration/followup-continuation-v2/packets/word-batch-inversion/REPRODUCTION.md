@@ -1,0 +1,1 @@
+Restore archived .lean.txt sources as .lean into a new private directory. Adapt check.sh and dependencies.txt source-host paths with exact pinned compiler/helper bytes. Keep fresh outputs separate from archived producer attempts. This source-and-receipt packet reuses existing dependency caches; it is not a self-contained toolchain. Independent review pending.

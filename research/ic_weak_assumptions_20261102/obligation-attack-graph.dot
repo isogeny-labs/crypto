@@ -1,0 +1,33 @@
+digraph obligations {
+  graph [rankdir=LR, bgcolor="white", pad="0.25", nodesep="0.45", ranksep="0.75", fontname="DejaVu Sans"];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=10, color="#334155", fontcolor="#0f172a", margin="0.10,0.07"];
+  edge [fontname="DejaVu Sans", fontsize=9, color="#64748b", fontcolor="#475569", arrowsize=0.7];
+
+  tensor [label="1  Tensor theorem/code\nBigUint guards: implemented\nCost certificate: open", fillcolor="#dbeafe"];
+  yield [label="2  Fixed yield + rank\nNamed batch: custody hold\nClean native successor: open", fillcolor="#fef3c7"];
+  arity [label="3  Arity-3 Fp\nUnit trail proof kernel: implemented\nCDCL(T) binding: open", fillcolor="#dcfce7"];
+  pkm [label="4  PKM\nDual certificate target: exact\nGrowing lower bound: open", fillcolor="#f3e8ff"];
+  wagner [label="5  Wagner W\nStatistic and nulls: exact\nNative frozen producer: open", fillcolor="#ffe4e6"];
+  xedni [label="6  Xedni\nSelector quantifiers: fixed\nHeight/minimal-disc bridge: open", fillcolor="#e0f2fe"];
+
+  solve [label="solver / contraction cost", fillcolor="#f8fafc"];
+  variance [label="target-wise variance", fillcolor="#f8fafc"];
+  rank [label="terminal relation rank", fillcolor="#f8fafc"];
+  geometry [label="geometry / lift semantics", fillcolor="#f8fafc"];
+  interface [label="non-generic interface", fillcolor="#f8fafc"];
+  e2e [label="complete ECDLP cost", fillcolor="#cbd5e1", penwidth=1.5];
+
+  tensor -> solve [label="conditional theorem"];
+  arity -> solve [label="proof-eligible search"];
+  pkm -> solve [label="closure lower bound"];
+  yield -> variance;
+  yield -> rank;
+  wagner -> interface [label="bucket-selected gain"];
+  xedni -> geometry [label="selected lifts"];
+
+  solve -> e2e;
+  variance -> e2e;
+  rank -> e2e;
+  geometry -> e2e;
+  interface -> e2e;
+}

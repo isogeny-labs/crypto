@@ -1,0 +1,15 @@
+# Point sieve finite-difference source result
+
+Implemented a separate native finite-difference candidate and proved its polynomial sequence identity. The corrected source-extraction check passed 6,398 full SieveResult pairs, preserving candidate sets, scalar counters and ordered buckets. The producer source remains unchanged; full-crate integration and independent source/proof review are next gates.
+
+The candidate initializes U=u0, D=u1+u2, E=u2+u2 and V=v0, using active coefficient slices and canonical modular addition. It captures U,V then advances before either continue branch. The unchanged sieve body therefore observes the same x,u(x),v(x) sequence, including zero roots and exceptional denominator branches.
+
+The first native attempt compiled but failed in the original complement routine after 2.858138 seconds: low-degree synthetic h truncated its numerator construction. The authorized successor changed only fixture h to v²-u*(x^(5-degree)+qconst) and coverage to actual q(x), ensuring degree-five h. It passed in 2.464313 seconds. Both immutable freezes, sources, receipts and raw logs are retained. These are arithmetic branch fixtures, not nonsingular curve claims.
+
+The passing suite checked 6,386 monic degree-zero/one/two pairs over p=3,5,7 plus 12 poisoned inactive-tail pairs. All five branch classes were observed: ordinary 22,232; empty rational-y 12,812; zero u with nonzero slope 5,366; zero u/zero slope/zero q 267; zero u/zero slope/nonzero q 753. It also checked 20,207 coefficient sequences at 134,067 x values, 32 boundary transitions at p=2^63, and rejection of three wrong recurrences.
+
+Real arithmetic and symbolic meter implementations were copied unchanged. Every full pair checked the predicted evaluation delta: (2d+1)*p additions and multiplications become 3*p+2 additions and zero evaluation multiplications; coefficient visits become 2d+1 from (2d+1)*p. Other counters agree. Degree-zero and degree-one addition increases and the final unused advance remain included. These are exact operation counts, not timing measurements.
+
+One separate Lean attempt passed in 34.286188 seconds under a 300-second/8GiB ceiling. Eighteen named declarations cover ring initial/step/iteration identities, degree padding, ordered evaluations, a generic equal-input branch fold, UInt64 canonical-add refinement at p<=2^63 and four controls. All named axioms are standard; three malformed audit inputs and a deliberately false polynomial value were rejected. All 28,797 recursive dependency/toolchain hashes remained unchanged.
+
+The native extraction preserves original function bodies, meter and TrackedSet. Its wrapper omits ArithmeticCounts serialization derive and supplies the Divisor field shape; it does not validate engine constructors or the full producer crate. The Lean ring recurrence and word-add refinement are proved, while a complete iterative UInt64 state refinement and Rust compiler/array-mutation correspondence are not supplied by the generic fold theorem. No scientific cohort, bottleneck or speedup claim is made.

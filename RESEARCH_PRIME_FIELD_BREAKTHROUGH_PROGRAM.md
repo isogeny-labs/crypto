@@ -328,6 +328,27 @@ baseline it is measured against.
    `S_{m+1}(g(t_1), …)` with higher degree, worse by §2.2), subgroups,
    arithmetic progressions. *Falsifier:* count solutions of the combined
    system over `F̄_p` for a toy `p`; if it is `≥ B^{m−1}`, the lever is dead.
+
+   *Correction (2026-10-31; the sentence above is kept as written).* That count cannot
+   decide the lever. For a base whose membership splits over `F_p`, the closure count for a
+   target is the number of size-`m` multisets of the base that sum to it, and its mean over
+   targets is exactly `C(B+m−1, m)/N` for every base (`KN-FIND-007`; measured exactly in 288
+   cells, `EV-FBG-001`), about `1/(m!·B^{m−1})` of the threshold at `B^m ≈ N`. The maximum
+   reaches `B^{m−1}` only for concentrated bases such as `{kP}`, which lower coverage. What
+   decides the lever is the solving degree of the per-equation presentation, since any size-`B`
+   description has scheme degree at least `B` (`IDEA-20260801-021`). The tower thread
+   (`research/notes/index-calculus/RESEARCH_PKM_TOWER_ORACLE.md`; atlas lead
+   `LEAD-ICP-pkm-tower-algebraic-oracle`) and the digit presentation
+   (`LEAD-ICP-digit-presentation-solving-degree`) hold it. Derivation, evidence map and the
+   recorded degrees: [`research/lever2_closure_20261031/REPORT.md`](research/lever2_closure_20261031/REPORT.md).
+   *Measured (2026-11-01).* The literal count was then run exactly at toy primes
+   (`research/lever2_exact_count_20261101/REPORT.md`; protocol frozen before the rows): 5,760
+   instances, `m = 2, 3`, `p` up to 4.2·10⁶. None of the 1,800 instances of the five §4.2
+   families (subgroup coset, progression, interval, cubic image, Dickson image) reaches `B^{m−1}`,
+   none differs from 400 size-matched random bases on the largest count or on coverage (90 tests
+   at a Bonferroni level, none rejected), and the `x(kP)` control fires in every instance with a
+   coverage collapse. The count is not fired by any candidate and does not separate them from
+   random; the solving degree remains the open question.
 3. **Transfer to a structured setting.** Isogenies to curves with
    exploitable endomorphisms, covers by higher-genus curves over `F_p`,
    lifts to characteristic 0 (anomalous only). This repository's isogeny
@@ -372,8 +393,10 @@ baseline it is measured against.
   spanned by `rank(E(Q))` unknowns, and the target still has to be written
   as a bounded combination of the generators — an `r`-dimensional
   bounded-coefficient DLP that is generic again. This is Silverman's xedni
-  calculus; Jacobson–Koblitz–Silverman–Stein–Teske (2000) showed it does not
-  beat rho.
+  calculus; under explicit height/discriminant and Lang assumptions,
+  Jacobson–Koblitz–Silverman–Stein–Teske (2000) derive a strong asymptotic
+  obstruction. The unconditional selected-lift and probability interfaces
+  remain separate proof obligations.
 - **Embedding into an extension to buy a subfield.** `E(F_p) ⊂ E(F_{p^n})`
   makes the subfield factor base `x ∈ F_p` algebraic, but Gaudry's cost
   there is `Õ(p^{2−2/n})` against the original `√p`: `p` for `n = 2`,

@@ -1,0 +1,34 @@
+import FallbackWordDivisions
+set_option autoImplicit false
+namespace FallbackGeometry
+variable {R : Type*} [CommRing R]
+
+theorem norm_identity (A B a b f x y z : R) :
+ f*(x*A+y*B+z*(a+b))^2-(x*A*b+y*B*a+z*(a*b+f))^2 =
+ (x*x*A*A+2*x*z*A*a)*(f-b*b)+
+ (y*y*B*B+2*y*z*B*b)*(f-a*a)-
+ z*z*(f-a*a)*(f-b*b)+2*x*y*A*B*(f-a*b) := by ring
+
+theorem norm_product_divides (A B a b f x y z : R)
+ (ha : A ∣ f-a*a) (hb : B ∣ f-b*b) :
+ A*B ∣ f*(x*A+y*B+z*(a+b))^2-(x*A*b+y*B*a+z*(a*b+f))^2 := by
+ obtain ⟨qa,hqa⟩ := ha
+ obtain ⟨qb,hqb⟩ := hb
+ refine ⟨x*x*A*qb+y*y*B*qa-z*z*qa*qb+2*x*y*(f-a*b)+2*x*z*a*qb+2*y*z*b*qa,?_⟩
+ rw [norm_identity,hqa,hqb]
+ ring
+
+theorem quotient_valid {K : Type*} [CommRing K] [IsDomain K] (A B a b f x y z d u w : K)
+ (hd : d ≠ 0) (ha : A ∣ f-a*a) (hb : B ∣ f-b*b)
+ (hD : d=x*A+y*B+z*(a+b))
+ (hN : x*A*b+y*B*a+z*(a*b+f)=w*d) (hU : A*B=u*(d*d)) :
+ u ∣ f-w*w := by
+ obtain ⟨k,hk⟩ := norm_product_divides A B a b f x y z ha hb
+ rw [←hD,hN] at hk
+ refine ⟨k,?_⟩
+ apply mul_left_cancel₀ (mul_ne_zero hd hd)
+ calc
+  (d*d)*(f-w*w)=f*d^2-(w*d)^2 := by ring
+  _ = A*B*k := hk
+  _ = (d*d)*(u*k) := by rw [hU]; ring
+end FallbackGeometry

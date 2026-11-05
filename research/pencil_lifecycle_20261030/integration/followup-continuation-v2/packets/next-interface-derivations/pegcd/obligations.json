@@ -1,0 +1,21 @@
+{
+ "schema":"pencil.source-obligations/v1",
+ "status":"derived_plan_not_implemented_or_executed",
+ "source":"/home/ec2-user/crypto-pencil-signed-graph-20261029/src/cryptanalysis/three_leads.rs",
+ "published_basis":"5cd0a45205e0896a5987364ccde900ec0813f477",
+ "scientific_execution":false,"proof_execution":false,"full_target_scope":1260,
+ "scope":["odd prime","n=1","no tables","p<2^31","canonical normalized words"],
+ "recommended_milestone":"Two literal pegcd calls discharge both exact divisions at fallback1049 and1059",
+ "obligations":[
+  {"id":"G0","target":"NonmonicStoredResult","lines":[849,880],"dependencies":["NonmonicDivision.divide_total","NonmonicStorage.word_projection","NonmonicStorage.word_good","QuotientStorage.finish_normal"],"statement":"Sufficient fuel yields stored canonical/normal q,r, A=QB+R and r empty or shorter than actual divisor","new_bridge":"Assemble generic stored total-result interface, not only exact quotient endpoint","controls":["nonexact remainder","initially shorter numerator","separate insufficient inner fuel"]},
+  {"id":"G1","target":"PolynomialScaleWord","lines":[825,834,920,925],"statement":"Literal map mul then trim preserves canonicality and decodes to scalar multiplication for arbitrary list length","new_bridge":"Existing bounded affine-transform scaling is not a general-length EEA map theorem","controls":["nonunit final leading coefficient","zero Bezout register","omitted S/T scaling"]},
+  {"id":"G2","target":"PegcdState.step_preserves","lines":[900,918],"dependencies":["G0","ProductPolynomial.product_correct","ResidualWord.sub_correct"],"statement":"Six-register transition preserves both Bezout rows, common divisors and canonical normal remainders","new_bridge":"Sequential register mutations tied to old s0,s1,t0,t1, not disconnected Bezout identity","controls":["new-s0 reused wrongly","wrong subtraction sign","shared polynomial factor"]},
+  {"id":"G3","target":"PegcdTotal","lines":[900,928],"dependencies":["G1","G2"],"statement":"Outer fuel initial b.length, inner fuel current r0.length give terminal nonzero r0 and monic normalized Bezout/gcd certificate","new_bridge":"No both-zero inputs; final unwrap and inversion derived safe","controls":["a zero b nonzero","b zero a nonzero","both zero","outer fuel one too small"]},
+  {"id":"G4","target":"GuardedPolynomialFailures","lines":[851,855,888,891,920],"statement":"Represent empty-divisor, inverse-zero, inexact quotient and empty-final-unwrap failures in source order","new_bridge":"Raw arithmetic models currently do not reproduce malformed-entry behavior","controls":["empty numerator plus zero-leading divisor","pegcd([],[])","pegcd([0],[])","pmonic([0])"]},
+  {"id":"G5","target":"CantorFallbackExact","lines":[1045,1059],"dependencies":["G3","NonmonicStorage.word_exact"],"statement":"From valid Mumford inputs derive D squared divides UaUb and D divides exact native numerator N, then both word pexact calls succeed","derivation":"D|Ua,Ub,Va+Vb; F+VaVb=(F-Va squared)+Va(Va+Vb)","controls":["inverse point pair with empty Va+Vb","shared support","switch Va+Vb sign","replace F by -F"]},
+  {"id":"G6","target":"CantorFallbackValidity","lines":[1049,1060],"dependencies":["G5"],"statement":"Computed U,V satisfy U divides F-V squared; U nonzero, monic after normalization and V degree below U","new_bridge":"Two exact divisions alone do not establish Mumford validity","controls":["doubling degree1 point","noncoprime degree2 inputs","wrong vnum cross-term"]},
+  {"id":"G7","target":"BoundedReduce","lines":[990,1002,948,956],"dependencies":["G6"],"statement":"For degree<=2 inputs and monic quintic F, initial degU<=4; at most one reduction iteration yields Divisor::from bounds and preserved divisibility","derivation":"degV<degU; deg(F-V squared)<=max(5,2degV); odd-degree F is not a square","controls":["degU3","degU4 with degree3 V","zero quotient rejected","wrong ordinate sign"]}
+ ],
+ "controls_status":"prospective algebraically derived expectations, not executed results",
+ "remaining_after_milestone":["Mumford validity composition","bounded reduction","divisor-class interpretation","native memory and counter semantics","extension/table/binary dispatch"]
+}

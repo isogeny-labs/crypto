@@ -5,7 +5,8 @@ not say which curves are *alike*: that every Koblitz curve shares one CM
 field and one descended Frobenius whatever its degree, that a curve over
 `GF(2^18)` is the quadratic twist of one, or how far `Z[π]` sits below the
 maximal order. [`traits.json`](traits.json) records those traits for every
-registry curve and for the curves of the other sources in
+curve of the catalog (the registry rows [`cover-catalog.json`](cover-catalog.json)
+names; see "Keeping it current") and for the curves of the other sources in
 [`trait-sources.json`](trait-sources.json), each value with how well it is
 established, and
 `curve_traits` groups curves by them across sizes or ranks curves by
@@ -17,7 +18,7 @@ cargo build --release --bin curve_traits
 ./target/release/curve_traits show ECC2K-130                # one record (slug, standard name or legacy spelling)
 ./target/release/curve_traits group --by cm,descent --min-sizes 2
 ./target/release/curve_traits similar ECC2K-130 --other-sizes --top 10
-./target/release/curve_traits build                         # registry + sources + hints → traits.json
+./target/release/curve_traits build                         # catalog rows + sources + hints → traits.json
 ./target/release/curve_traits check                         # CI: traits.json is current
 ./target/release/curve_traits unfactored                    # composites left unsplit (input of factor-hints.gp)
 ```
@@ -277,21 +278,29 @@ over a field of the target's size.
 
 ## Current catalogue and earlier classification panel
 
-The generated index covers every registered model. It includes the
+The retained generated index covers the registry snapshot used for its run. It includes the
 100 independently verified large-prime isogeny codomains. Each record retains
 the status of its order certificate and every derived trait. Models whose
 coordinate/order adapter is unavailable explicitly report `not_evaluated`;
 Curve25519 is one such record. A complete catalogue entry does not by itself
 certify its coordinates or group order.
 
-In the regenerated file (20,639 registry curves and 176 source curves: 175
-walked curves of the P-256 and P-224 isogeny classes and the ECC2K-130
-degree-263 descendant), `End(E)` is proved for 19,893 curves and probable
-for 915; none is bounded, 6 remain unknown because a 125- to 153-digit composite of `Δ`
-is unsplit, and one record is not applicable. Of the 1,371
-curves over `GF(p^k)`, `k > 1`, 1,365 have a certified order (9 by generator,
-1,356 by point orders: 530 proved, 826 probable); one is bounded (its point
-orders stay below `4√q`) and five are not evaluated.
+The 2026-10-21 [native quadratic-twist catalog](sources/quadratic-twist-native-20261021.json)
+adds 1,921 registered models, including 963 extension-field models and 27 selected
+EC1 subgroup representations. Those finite replay and identity records are linked
+from the [study](../../research/quadratic_twist_evidence_20261021/README.md).
+The generated trait-classification panel below has not been rerun for these
+additions; its totals remain the earlier snapshot. Registration alone does not
+assign a new endomorphism-ring or volcano-level classification.
+
+In the regenerated file (the 2,574 catalog curves and 180 source curves: 175
+walked curves of the P-256 and P-224 isogeny classes, the ECC2K-130
+degree-263 descendant and the four prime-field Hecke `X₀(11)` records),
+`End(E)` is proved for 1,833 curves and probable
+for 915; none is bounded and 6 remain unknown because a 125- to 152-digit
+composite of `Δ` is unsplit. Of the 1,324
+curves over `GF(p^k)`, `k > 1`, 1,319 have a certified order (9 by generator,
+1,310 by point orders: 484 proved, 826 probable) and five are not evaluated.
 Per-prime level methods and bounds, and the individual `End(E)` statuses,
 remain recorded in `traits.json`. P-256's `Δ` factors with
 the committed hints as `−3·5·456597257999·p81·p136` (squarefree), so
@@ -348,11 +357,20 @@ Besides the registry, the build reads every file named in
   proved volcano levels feed `endomorphism.levels`.
 - **`ic-crosswalk`**: the entries of [`ic/curves.yaml`](ic/curves.yaml) that
   are not registry models (today the ECC2K-130 degree-263 descendant at
-  level 1). The binary model `y² + xy = x³ + a₂x² + a₄x + a₆` is taken to
-  the registry form by `y ↦ y + a₄` (`b = a₆ + a₄²`, `G ↦ (x, y + a₄)`);
-  its proved `End(E)` discriminant and volcano level are kept. The file is
+  level 1 and the four prime-field Hecke `X₀(11)` records over
+  `GF(11587)`, `GF(163567)`, `GF(231559)` and `GF(1032607)`). The binary
+  model `y² + xy = x³ + a₂x² + a₄x + a₆` is taken to the registry form by
+  `y ↦ y + a₄` (`b = a₆ + a₄²`, `G ↦ (x, y + a₄)`). A prime-field entry is a
+  generalized Weierstrass model `y² + a₁xy + a₃y = x³ + a₂x² + a₄x + a₆`
+  over `GF(p)`, `p > 3`; it is taken to `y² = x³ + Ax + B` by `A = −27c₄`,
+  `B = −54c₆` and `(x, y) ↦ (36x + 3b₂, 108(2y + a₁x + a₃))`, and the reader
+  refuses it unless `p` is a probable prime, the model is non-singular,
+  `q + 1 − t` is the stated order, `r·h` is that order and the generator
+  lies on both the stated and the short model. A proved `End(E)`
+  discriminant and volcano level are kept. The file is
   read by a strict YAML-subset reader that refuses anything it does not
-  understand, including a repeated key inside an entry it reads.
+  understand, including a repeated key inside an entry it reads; lists may
+  be written indented under their key or at its column.
 
 These slugs are computed identities, not registrations (`source.registered`
 is `false`): cite them in prose only after registering them (`AGENTS.md`
@@ -407,9 +425,20 @@ mv /tmp/hints.txt docs/curves/factor-hints.txt
 
 ## Keeping it current
 
-`traits.json` is derived from `registry.json`, the factor hints, the source
-manifest and its files; the file records each input's SHA-256. When any of
-them changes, rebuild it in the same pull request:
+`traits.json` is derived from the catalog rows of `registry.json`, the factor
+hints, the source manifest and its files. The catalog is the set of registry
+rows [`cover-catalog.json`](cover-catalog.json) names (the 2,572 rows the
+registry held before the isogeny-volcano census was swept into it, plus the two
+mixed-twist IC curves whose trait records the `transfer-audit` registry sweep
+pins: 2,574). The file
+records `catalog_rows_sha256`, the SHA-256 of those rows in registry order
+(sorted-key compact JSON of `{schema_version, curves}`), and the SHA-256 of
+every other input. A registry row the manifest does not name does not change
+it, so a research sweep that adds registry curves no longer stales the file;
+an edited catalog row, or a manifest slug the registry lacks, does. Tracking
+a further curve is an explicit change: add its slug to the manifest (and bump
+`count`). When the catalog or any other input changes, rebuild the file in the
+same pull request:
 
 ```bash
 cargo run --release --bin curve_traits -- build

@@ -1,0 +1,73 @@
+import AffineUnique
+import StoredControls
+set_option autoImplicit false
+namespace AffineControls
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest DivisorArrayCopy StoredInput AffineDispatch
+
+def f5 : List UInt64 := [0,0,0,0,0,1]
+def fs : List UInt64 := [0,0,0,1,0,1]
+def otherZero : Stored := ⟨2,#[1,0,1],#[0,0]⟩
+
+theorem identity_precedence : classify 17 identity identity=.leftIdentity ∧
+ Runs 17 f5 identity identity .leftIdentity identity ∧
+ Runs 17 f5 StoredControls.pointZero identity .rightIdentity StoredControls.pointZero := by
+ exact ⟨by decide,Runs.left rfl,Runs.right (by decide) rfl⟩
+
+theorem branch_partition_controls :
+ classify 17 StoredControls.pointZero StoredControls.supportZero=.degreeFallback ∧
+ classify 17 StoredControls.supportZero StoredControls.supportZero=.normZero ∧
+ classify 17 StoredControls.supportZero otherZero=.slopeZero ∧
+ classify 17 StoredControls.a StoredControls.b=.fast := by decide
+
+theorem f5_decode : wordsPoly 17 f5=(X:Polynomial (ZMod (17:UInt64).toNat))^5 := by
+ norm_num [f5,wordsPoly,listPoly]
+
+theorem fs_decode : wordsPoly 17 fs=(X:Polynomial (ZMod (17:UInt64).toNat))^5+X^3 := by
+ norm_num [fs,wordsPoly,listPoly];ring
+
+theorem slope_inputs : WellFormed 17 (wordsPoly 17 fs) StoredControls.supportZero ∧
+ WellFormed 17 (wordsPoly 17 fs) otherZero := by
+ rw [fs_decode]
+ constructor
+ · refine ⟨by decide,by decide,by decide,by unfold Stored.canonical Canon StoredControls.supportZero;simp,by decide,?_⟩
+   refine ⟨X^3+X,?_⟩
+   norm_num [up,vp,StoredControls.supportZero,trimFuel,wordsPoly,listPoly];ring
+ · refine ⟨by decide,by decide,by decide,by unfold Stored.canonical Canon otherZero;simp,by decide,?_⟩
+   refine ⟨X^3,?_⟩
+   norm_num [up,vp,otherZero,trimFuel,wordsPoly,listPoly];ring
+
+theorem fallback_degree_execution : ∃ out,
+ Runs 17 f5 StoredControls.pointZero StoredControls.supportZero .degreeFallback out ∧
+ WellFormed 17 (wordsPoly 17 f5) out := by
+ have h:=total_preserving_execution 17 f5 StoredControls.pointZero StoredControls.supportZero
+  (by decide) (by decide) (by simp [Canon,f5]) (by rw [f5_decode];simp)
+  (by rw [f5_decode];exact StoredControls.degree_one_trim.1)
+  (by rw [f5_decode];exact StoredControls.degree_two_trim.1)
+ simpa only [branch_partition_controls.1] using h
+
+theorem fallback_norm_execution : ∃ out,
+ Runs 17 f5 StoredControls.supportZero StoredControls.supportZero .normZero out ∧
+ WellFormed 17 (wordsPoly 17 f5) out := by
+ have h:=total_preserving_execution 17 f5 StoredControls.supportZero StoredControls.supportZero
+  (by decide) (by decide) (by simp [Canon,f5]) (by rw [f5_decode];simp)
+  (by rw [f5_decode];exact StoredControls.degree_two_trim.1)
+  (by rw [f5_decode];exact StoredControls.degree_two_trim.1)
+ simpa only [branch_partition_controls.2.1] using h
+
+theorem fallback_slope_execution : ∃ out,
+ Runs 17 fs StoredControls.supportZero otherZero .slopeZero out ∧ WellFormed 17 (wordsPoly 17 fs) out := by
+ have hd : (wordsPoly 17 fs).natDegree=5 := by
+  rw [fs_decode,natDegree_add_eq_left_of_natDegree_lt (by simp only [natDegree_X_pow];decide),natDegree_X_pow]
+ have h:=total_preserving_execution 17 fs StoredControls.supportZero otherZero
+  (by decide) (by decide) (by simp [Canon,fs]) hd slope_inputs.1 slope_inputs.2
+ simpa only [branch_partition_controls.2.2.1] using h
+
+theorem fast_execution : ∃ out,
+ Runs 17 FastCallControls.fwords StoredControls.a StoredControls.b .fast out ∧
+ WellFormed 17 (wordsPoly 17 FastCallControls.fwords) out := by
+ have h:=total_preserving_execution 17 FastCallControls.fwords StoredControls.a StoredControls.b
+  (by decide) (by decide) (by simp [Canon,FastCallControls.fwords])
+  (by rw [FastCallControls.fixture_decoding];exact FastPayloadControls.curve_degree)
+  StoredControls.actual_inputs_valid.1 StoredControls.actual_inputs_valid.2
+ simpa only [branch_partition_controls.2.2.2] using h
+end AffineControls
