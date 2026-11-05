@@ -3,7 +3,8 @@
 Exact local computation. Pin R127–R128 results and R128 source by SHA-256.
 Use the full R128 expansion `F(s,u)=f23(a+s,90+u)` over F128. Since the
 coefficient of `s` at `(0,0)` is 84, solve `F(s(u),u)=0` in `F128[[u]]`
-through `u^127` by a complete fixed-point lift; verify the residual and
+through `u^127` by a complete fixed-point lift with at most 130 updates;
+verify the residual and
 the first nonzero coefficient. Independently reconstruct F from the tracked
 R51 source and solve coefficient by coefficient. Only if both match and the
 leading term is `6u²`, certify the single normalized base branch with
@@ -17,3 +18,8 @@ process with zero cloud cost; source/protocol published before result data.
 
 Prior sources: R51, R127–R128, [Stacks normal curve/DVR criterion](https://stacks.math.columbia.edu/tag/0B8Y),
 and [Stacks simple-root lifting](https://stacks.math.columbia.edu/tag/04GE).
+
+Amendment 01: the first source used a 16-update cap and stopped with
+`fixed point did not converge`, before output. Higher odd powers of `s`
+permit only bounded linear gains in precision per update; 130 gives an
+explicit cap above the 128 retained coefficients. Preserve the failed run.

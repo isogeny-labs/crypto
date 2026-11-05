@@ -42,7 +42,7 @@ def main(dest):
         inv[k]=f.gf_mul(inv[0],value)
     assert conv(rows[1],inv)==[1]+[0]*(M-1)
     s=[0]*M
-    for iteration in range(16):
+    for iteration in range(p['max_fixed_point_iterations']):
         powers=[[1]+[0]*(M-1),s]
         for _ in range(2,8):powers.append(conv(powers[-1],s))
         rhs=rows[0][:]
