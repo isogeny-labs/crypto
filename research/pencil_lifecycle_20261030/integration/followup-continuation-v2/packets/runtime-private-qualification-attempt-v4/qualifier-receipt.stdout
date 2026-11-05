@@ -1,0 +1,21 @@
+{
+  "schema": "software.runtime-qualification-supervisor/v2",
+  "passed_cases": [
+    "Q0"
+  ],
+  "failure": "Stop: gate release transport failed",
+  "cleanup_complete": true,
+  "elapsed_seconds": 5.554405689006671,
+  "cap_seconds": 300,
+  "image_id": "sha256:3a2bb98af4743c888d969c9df00f0769a64e3704e57e97e937769d384e3c8409",
+  "binary_sha256": "d0e2d1426115f5efecced07c298d691e1bcc7d5378015f992edc615dc9384f5b",
+  "private_endpoint_sha256": "4f624fc35a1492433e07fa92daa61aab75c698c803d148ed5d4e4d4dbc09eaff",
+  "host_preexec_ancestry": [],
+  "preexec_pids_observations": [],
+  "effective_pids_observed_before_each_tested_exec": false,
+  "effective_before_container_start_proved": false,
+  "qualification_complete": false,
+  "status": "failed",
+  "scientific_execution": false,
+  "note": "Held gate release requires host PID/cgroup ancestry within owned service. Effective pids.max is observed after container startup and before tested exec by a no-fork PID1 gate; no earlier or continuous-enforcement claim."
+}
