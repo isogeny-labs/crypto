@@ -233,6 +233,32 @@ pub fn build(root: &EvidenceRoot, request_path: &str) -> Result<Value> {
     let mut rows = Vec::new();
     let mut audits = Vec::new();
     let mut missing = Vec::new();
+    let require_ir = protocol["extensions"]["aps_export"]["require_inclusive_ir"] == true;
+    if !req["require_inclusive_ir"].is_null() {
+        require(
+            req["require_inclusive_ir"].is_boolean()
+                && req["require_inclusive_ir"] == json!(require_ir),
+            "instruction requirement differs from frozen protocol",
+        )?;
+    }
+    require(
+        req["inclusive_profiles"].is_null() || req["inclusive_profiles"].is_array(),
+        "instruction bindings must be an array",
+    )?;
+    let mut profile_slots = BTreeMap::new();
+    if let Some(bindings) = req["inclusive_profiles"].as_array() {
+        for binding in bindings {
+            let seq = integer(&binding["seq"])?;
+            require(
+                records.contains_key(&seq)
+                    && profile_slots.insert(seq, text(&binding["path"])?).is_none(),
+                "duplicate or recordless instruction binding",
+            )?;
+        }
+    }
+    let mut missing_ir = Vec::new();
+    let mut ir_audits = Vec::new();
+    let mut ir_files = Vec::new();
     for (&seq, ex) in &slots {
         let a = &pa[integer(&ex["arm"])? as usize];
         let w = &workloads[integer(&ex["workload"])? as usize];
@@ -249,6 +275,7 @@ pub fn build(root: &EvidenceRoot, request_path: &str) -> Result<Value> {
         let mut verification = "no_claim";
         let mut verifier = Value::Null;
         let mut backend = Value::Null;
+        let mut counted = serde_json::Map::new();
         let (run_id, outcome) = if let Some(r) = records.get(&seq) {
             require(
                 r["arm"] == a["name"]
@@ -271,8 +298,11 @@ pub fn build(root: &EvidenceRoot, request_path: &str) -> Result<Value> {
             if !ev["status"].is_null() {
                 require(ev["status"] == outcome, "history/record status mismatch")?;
             }
-            if r["method"]["id"] == "ic.aps_v1" {
-                if r["detail"]["schema"] == "ecbench.aps/v1" {
+            if text(&r["method"]["id"])?.starts_with("ic.aps_") {
+                if matches!(
+                    r["detail"]["schema"].as_str(),
+                    Some("ecbench.aps/v1" | "ecbench.aps/v2" | "ecbench.aps/v3")
+                ) {
                     let metric = audit::metrics(r)?;
                     let math = audit::mathematical(r, audit::MAX_ORACLE_CANDIDATES)?;
                     if outcome == "succeeded" {
@@ -323,8 +353,33 @@ pub fn build(root: &EvidenceRoot, request_path: &str) -> Result<Value> {
                     )?;
                 }
             }
+            if let Some(path) = profile_slots.get(&seq) {
+                require(
+                    integer(&ev["resumed"])? == 0,
+                    "inclusive cost across a restore needs separate lost-work accounting",
+                )?;
+                let (ir, pins) = crate::inclusive::read(root, path, r)?;
+                require(
+                    ir["source_commit"] == req["source"]["commit"]
+                        && ir["protocol_sha256"] == protocol["freeze"]["protocol_sha256"],
+                    "profile source/protocol differs from frozen export",
+                )?;
+                for key in ["method_ir", "independent_scalar_check_ir", "total_ir"] {
+                    counted.insert(key.into(), ir[key].clone());
+                }
+                if !ir["method_online_ir"].is_null() {
+                    counted.insert("method_online_ir".into(), ir["method_online_ir"].clone());
+                }
+                ir_files.extend(pins);
+                ir_audits.push(json!({"seq":seq,"audit":ir}));
+            } else if require_ir {
+                missing_ir.push(seq);
+            }
             (text(&r["record_id"])?.to_owned(), outcome.to_owned())
         } else {
+            if require_ir {
+                missing_ir.push(seq);
+            }
             let s = text(&ev["status"])?;
             require(
                 matches!(
@@ -338,9 +393,15 @@ pub fn build(root: &EvidenceRoot, request_path: &str) -> Result<Value> {
                 s.to_owned(),
             )
         };
-        rows.push(json!({"run_id":run_id,"arm":a["name"],"instance_id":w["workload_id"],"seed":ex["algorithm_seed"],"replicate":ex["round"],"warmup":ex["warmup"],"status":outcome,"outcome_class":if matches!(outcome.as_str(),"succeeded"|"failed"){"completed"}else{"not_completed"},"attempts":ev["attempts"],"resumed":ev["resumed"],"checkpoint":ev["checkpoint"],"measurements":{"counted":{},"wall_seconds":wall,"wall_valid":false,"cpu_user_seconds":user,"cpu_sys_seconds":sys,"max_rss_bytes":rss,"counters":counters},"isolation":{"tier":tier,"contended":null,"blockers":["packaging does not independently qualify wall clocks"]},"verification":{"status":verification,"verifier":verifier},"exclusion":{"excluded":false,"rule":null},"artifacts":if records.contains_key(&seq){vec![records_pin.clone()]}else{vec![]},"started_at":ev["started_at"],"finished_at":ev["finished_at"],"worker":null,"backend_ref":backend}));
+        rows.push(json!({"run_id":run_id,"arm":a["name"],"instance_id":w["workload_id"],"seed":ex["algorithm_seed"],"replicate":ex["round"],"warmup":ex["warmup"],"status":outcome,"outcome_class":if matches!(outcome.as_str(),"succeeded"|"failed"){"completed"}else{"not_completed"},"attempts":ev["attempts"],"resumed":ev["resumed"],"checkpoint":ev["checkpoint"],"measurements":{"counted":counted,"wall_seconds":wall,"wall_valid":false,"cpu_user_seconds":user,"cpu_sys_seconds":sys,"max_rss_bytes":rss,"counters":counters},"isolation":{"tier":tier,"contended":null,"blockers":["packaging does not independently qualify wall clocks"]},"verification":{"status":verification,"verifier":verifier},"exclusion":{"excluded":false,"rule":null},"artifacts":if records.contains_key(&seq){vec![records_pin.clone()]}else{vec![]},"started_at":ev["started_at"],"finished_at":ev["finished_at"],"worker":null,"backend_ref":backend}));
     }
     let mut files = Vec::new();
+    let mut seen_ir = BTreeSet::new();
+    for pin in ir_files {
+        if seen_ir.insert(text(&pin["path"])?.to_string()) {
+            files.push(pin);
+        }
+    }
     for (name, kind) in [
         (request_path, "receipt"),
         (protocol_path, "protocol"),
@@ -362,7 +423,12 @@ pub fn build(root: &EvidenceRoot, request_path: &str) -> Result<Value> {
     } else {
         Value::Null
     };
-    let export = json!({"schema":"experiment.export/v1","export_id":req["export_id"],"created":req["created"],"protocol":{"path":protocol_path,"sha256":protocol["freeze"]["protocol_sha256"],"protocol_id":protocol["protocol_id"],"version":protocol["version"]},"producer":req["producer"],"source":req["source"],"backend":"ecbench","host":{"path":null,"sha256":null,"class_id":null,"summary":{"cpu_model":null,"logical_cpus":null,"memory_bytes":null,"kernel":null,"hypervisor":null,"isolation_tier_max":null}},"arms":arms,"flow":flow(&rows),"runs":rows,"files":files,"analysis":{"script":script_pin,"blinded":false,"blinding_key_sha256":null,"outputs":[],"unmasked_at":null},"notes":[],"reviews_dir":"reviews","backend_record":{"schema":"aps.export-binding/v1","request_path":request_path,"plan_sha256":plan_pin["sha256"],"planned_execution_slots":executions.len(),"missing_execution_slots":missing,"audits":audits,"wall_qualified":false,"native_work_accounting_complete":false,"costs_attested":false,"execution_attested":false,"protocol_design_validated":false,"flow_scope":"Canonical flow counts represented rows; the full frozen population and every unobserved slot are retained separately. No attempt is fabricated."}});
+    let mut export = json!({"schema":"experiment.export/v1","export_id":req["export_id"],"created":req["created"],"protocol":{"path":protocol_path,"sha256":protocol["freeze"]["protocol_sha256"],"protocol_id":protocol["protocol_id"],"version":protocol["version"]},"producer":req["producer"],"source":req["source"],"backend":"ecbench","host":{"path":null,"sha256":null,"class_id":null,"summary":{"cpu_model":null,"logical_cpus":null,"memory_bytes":null,"kernel":null,"hypervisor":null,"isolation_tier_max":null}},"arms":arms,"flow":flow(&rows),"runs":rows,"files":files,"analysis":{"script":script_pin,"blinded":false,"blinding_key_sha256":null,"outputs":[],"unmasked_at":null},"notes":[],"reviews_dir":"reviews","backend_record":{"schema":"aps.export-binding/v1","request_path":request_path,"plan_sha256":plan_pin["sha256"],"planned_execution_slots":executions.len(),"missing_execution_slots":missing,"audits":audits,"wall_qualified":false,"native_work_accounting_complete":false,"costs_attested":false,"execution_attested":false,"protocol_design_validated":false,"flow_scope":"Canonical flow counts represented rows; the full frozen population and every unobserved slot are retained separately. No attempt is fabricated."}});
+    if require_ir || !profile_slots.is_empty() {
+        export["backend_record"]["inclusive_ir_required"] = json!(require_ir);
+        export["backend_record"]["missing_inclusive_ir_slots"] = json!(missing_ir);
+        export["backend_record"]["inclusive_ir_audits"] = json!(ir_audits);
+    }
     validate_schema(&export, false)?;
     Ok(export)
 }
@@ -382,7 +448,14 @@ pub fn check(root: &EvidenceRoot, e: &Value) -> Result<()> {
     require(
         array(&e["backend_record"]["missing_execution_slots"])?.is_empty(),
         "export retains unobserved planned slots; complete-population audit is pending",
-    )
+    )?;
+    if e["backend_record"]["inclusive_ir_required"] == true {
+        require(
+            array(&e["backend_record"]["missing_inclusive_ir_slots"])?.is_empty(),
+            "complete instruction cost unavailable; partial/censored rows remain retained",
+        )?;
+    }
+    Ok(())
 }
 
 pub fn digest(v: &Value) -> Result<String> {

@@ -155,3 +155,30 @@ four-size protocol/analysis, external solver comparison and maintained run
 admission still need their own evidence. Earlier dated statements that source
 upload approval is missing are superseded by the Oct30 approval; configured
 authentication and a successful current-source checkpoint are still required.
+
+## Four-lead implementation and instruction boundary (2026-11-06)
+
+The [cost/lead continuation](../research/aps_cost_leads_20261106/HANDOFF.md)
+tracks all four requested steps: readiness, approved source checkpoint,
+baseline measurement and the four lead comparisons. New `ic.aps_v3` paths
+implement checked F4 trace reuse, the two-variable nonhorizontal line chart
+plus required horizontal coverage, unequal profiles/arbitrary coordinate
+guessing and retained-base full/frontier controls. Literal cell and coverage
+history is retained for the separate reader. These are implementation
+deliverables, not performance observations [pcc:unverified].
+
+The optional inclusive instruction reader binds raw profile parts, the
+unprofiled/profiled mathematical trajectory and a separately profiled scalar
+check in one Ir unit. It retains missing profiles and failures and refuses
+qualification when required evidence is absent. The declared frame excludes
+process startup, input loading, record serialization and post-run full-set
+audit; complete GAE pricing and signed execution standing remain open
+[pcc:unverified].
+
+The [protocol continuation](../research/aps_cost_leads_20261106/PROTOCOL.md)
+preserves four held-out size classes and the disjoint pilot, controls,
+accounting, replay/export and run-admission requirements. It is not frozen.
+The source upload is approved but still lacks secure authentication; no
+checkpoint upload, runtime pilot, benchmark or scaling panel has occurred.
+T9/research and T10/authblocked checkpoint remain open. The independently
+denied full native-ledger/shared-log/host-detail publications remain excluded.

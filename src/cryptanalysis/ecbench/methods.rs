@@ -507,6 +507,14 @@ pub fn registry() -> &'static [MethodDecl] {
             params: super::prime_orbit::PARAMS,
         },
         MethodDecl {
+            id: super::aps::ID_V3,
+            family: "ic",
+            summary: "APS explicit profiles, hybrid variable, two-parameter line chart, certified trace reuse and new-tuple growth; complete pricing is unestablished",
+            entry: "ecbench::aps::solve",
+            applies: Applies::PrimeOnly,
+            params: super::aps::PARAMS_V3,
+        },
+        MethodDecl {
             id: super::aps::ID_V2,
             family: "ic",
             summary: "ic.aps_v1 with its core work counted: the module's own group-operation calls, square roots and polynomial-construction multiplications are `*_uncharged` counters (listed by name in `unpriced`, which carries no prose), beside the F4 and root tallies; GAE still prices only the independent check, so the total is a lower bound",
