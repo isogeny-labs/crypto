@@ -1,31 +1,26 @@
-# Resume: crypto @ claude/dreg-lfd-theory-scaling
+# Resume: crypto @ perf/solve-profile-20261106
 
 ## Goal
-User request (2026-11-05): find ways to reduce the degree of regularity / total solve time of the
-descended Semaev system. Three phases, chosen by the user: (1) theory and scaling survey, done
-(PR #3512); (2) the l = 9 guess-saturation test; (3) a multilinear closure engine prototype.
+Lane 2 of the 2026-11-06 parallel workflow: profile where a complete index-calculus solve spends its time (prime-field ecbench ic.pipeline mitm-prime-batch:m=2 at 28 and 32 bits with targets walk and walk-prime-batch-4/8/16; Koblitz compact-orbit examples/koblitz_orbit_dlp_fast_online at n=41). Phases: relation collection, table build, linear algebra, descent. Output: study dir research/ic_solve_profile_20261106 with hotspot table, phase bars, ranked Amdahl list, PDF; PR ready for review, no auto-merge, no merge.
 
 ## Lead / hypothesis
-LEAD-ICE-descent-closure-degree-at-scale / LEAD-ICE-hybrid-guess-determine-l7. The recorded k*
-(guesses that hold degree 4) is 0, 1-2 and 4 at l = 6, 7 and 8. K_marginal predicts 7 at l = 9.
-Saturation (k* <= 5) would revive the guess route.
+Explains cost only, claims no speedup. Hypothesis: relation collection (target walk + guard/probe) dominates the prime pipeline; the "137 ns floor" (crypto#2844 / PR #2806 diagnosis) is inflated by the diagnostic's own clock reads. Kill: if timer-off perf attribution of the probe/guard matches the timer counters within error, the bias is small.
 
 ## Spec
-research/dreg_guess_scaling_20261106/PREREGISTRATION.md (frozen at commit 37129b4253).
+Inputs: ecbench ProfileInput JSON built from research/ecbench_ic_asm_euclid_20261103/data/spec-p32-batch-arms.json pattern; 28-bit curve prime_search seed 59297, base 512; 32-bit seed 20261018202 base 1024. Host has no hardware PMU (perf cpu-clock sampling only): cycles/IPC are refused, not estimated.
 
 ## State
-Gate A passed. The 4 positive controls refute at degree 4. Whole-summand runs: l = 7 and 8 done; l = 9 has 14 of 16 done, all degree 4 for nonzero x1. S5.d1.b0 refutes at degree 4 (a surprise against K_marginal). The remaining 129 branches are moving to a RunPod pod (PREREGISTRATION Amendment 1, owner chose the cloud route; $30 cap).
+Sparse worktree /home/user/wt/solve-profile; release build (line-tables-only debug) on /dev/shm/target-solve under flock; Cargo.toml locally stripped of bin/example sections (do not commit it).
 
 ## Next steps
-1. Launch: research/koblitz_ic_leads_build_20261024/pod/upload_launch.py run --name dreg-s5-l9 --vcpu 64 --flavors cpu3g --disk 40 --max-seconds 18000 <the 4 input files>, then push them.
-2. Fetch https://<pod>-8000.proxy.runpod.net/runs/ when STATUS reads ALLDONE; copy the records into runs/; stop the pod.
-3. Score both preregistrations, then write RESULTS, the graph and the PDF, the session log, and update PR #3512.
+1. Wait for build; run ecbench exec children under the CPU lock, interleaved, repeated.
+2. tools/profile.sh cpu per target; analyse; write study dir, session log, PR.
 
 ## Runs in flight
-RunPod pod dreg-s5-l9 (id recorded in runs/queue.log once created).
+None yet.
 
 ## Stop and success conditions
-About 12 h of container time at most. The decision rule is in the PREREGISTRATION.
+Stop if checkpoint push fails or the CPU lock cannot be obtained; report that plainly.
 
 ## Open questions
-Whether pe_closure fits about 196k columns in 15 GB.
+walk-prime-batch-32 is not on main (4/8/16 only).
