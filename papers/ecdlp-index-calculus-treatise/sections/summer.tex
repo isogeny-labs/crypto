@@ -10,8 +10,10 @@ recorded 1{,}402 coordinator decisions on ECDLP and index calculus:
 \end{itemize}
 Each decision names a verdict, the hypotheses and experiments it rules on,
 and the evidence it cites. The dated index
-(\art{research/ecdlp_jul_sep_index_20261029/}: \texttt{INDEX.json},
-\texttt{INDEX.tsv}, and the generator \texttt{build\_index.py}) lays these
+(\art{research/ecdlp_jul_sep_index_20261029/}: \texttt{SUMMARY.json} and
+the generator \texttt{build\_index.py} are committed; \texttt{INDEX.json}
+and \texttt{INDEX.tsv} are in the artefact store, named by digest in
+\texttt{.artifacts.json}) lays these
 out together with the run-data path of each experiment. A decision is
 counted as ECDLP work if its goal is one of 19 ECDLP goals or, when it names
 no goal, if a target or evidence identifier carries an ECDLP family token.
@@ -31,12 +33,32 @@ of 7 September holds 672 decisions, most of them approvals of frozen stage-0
 contracts.}\label{fig:julsep}
 \end{figure}
 
-Most of this activity was process (Figure~\ref{fig:julsep}). Of the
-1{,}402 decisions, 561 approve a contract, 267 revise one and 124 expand
-one. About 157 carry an outcome on a hypothesis (support, reject, weaken,
-inconclusive, supersede, pause or replicate). This chapter reports
-those outcomes by theme, with decision identifiers so that each can be
-traced. All results are at toy or derivation tier unless a scale is given.
+Most of this activity was process (Figure~\ref{fig:julsep},
+Table~\ref{tab:fr-julsep}). Of the 1{,}402 decisions, 558 carry the verdict
+\texttt{approve}, 265 \texttt{revise} and 124 \texttt{expand}. 152 carry
+one of the eight outcome verdicts (support, support\_scoped, weaken,
+reject\_scoped, inconclusive, supersede, pause, replicate), and seven more
+an outcome verdict with a suffix such as \texttt{weaken\_h\_yield}. The
+outcomes are reported below by theme, with decision identifiers so that
+each can be traced.
+
+\begin{table}[t]
+\centering\small
+\input{figures/tab-fr-julsep}
+\caption[]{ECDLP coordinator decisions by verdict class and month. Classes
+follow the index's own plotting rule (\texttt{plot\_index.py}):
+\texttt{approve*} and \texttt{revise*} are verdicts with that prefix,
+\texttt{amend} and \texttt{refine} count as revisions, each outcome verdict
+is matched exactly, and \emph{other} holds every remaining verdict string
+(203, mostly free-text decisions of August). Oct-dated: decisions filed
+under late-September names with October dates, left out of the
+July--September counts. Counted by \art{figures/make_tab_fr.py} from the
+committed summary; the per-decision \texttt{INDEX.json} and \texttt{INDEX.tsv}
+are held in the artefact store (\art{research/ecdlp_jul_sep_index_20261029/.artifacts.json}).
+Source: \art{research/ecdlp_jul_sep_index_20261029/SUMMARY.json}. Data:
+\art{figures/data-fr-julsep.json}.}
+\label{tab:fr-julsep}
+\end{table} All results are at toy or derivation tier unless a scale is given.
 None moved an exponent on a prime field.
 
 \section{July: the first baseline and two retracted wins}
@@ -63,7 +85,7 @@ Two supports followed on 26 July, and both were overturned the next day:
 \end{itemize}
 In the same week a generic-group classifier (\texttt{EXP-GGM-001}) had its
 support revoked (\texttt{DEC-20260727-007}). It was a lookup table, and its
-nine runs were byte-identical. Fixed-curve preprocessing showed no robust
+nine runs were byte-identical. Fixed-curve preprocessing showed no consistent
 gain over 72 runs (\texttt{DEC-20260726-001}, paused). A subresultant
 degree exponent was measured at $\beta_{\rm deg}=0.5985$ against a gate of
 $0.3$ (\texttt{DEC-20260728-003}, weakened).
@@ -290,7 +312,7 @@ Sep & re-selected DP table & \texttt{DEC-20260906-1f5b71} & weaken & $0.65$--$0.
 July--September 2026, with the number it recorded. Every row is
 discussed above. Verdicts are the ledger's, shortened: ``weaken'' includes
 \texttt{weaken\_h\_yield}, and ``supersede claim'' replaced the earlier
-BKK support. Index: \art{research/ecdlp_jul_sep_index_20261029/INDEX.json}.}
+BKK support. Index: \art{research/ecdlp_jul_sep_index_20261029/} (\texttt{INDEX.json}, artefact store).}
 \label{tab:summer}
 \end{table}
 
