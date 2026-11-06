@@ -132,9 +132,39 @@ The 31 duplicates are merge artifacts: whole dated blocks copied into the same
 file. The audit now counts an exact repeated heading once and reports the
 skipped count, so the number above is the deduplicated one.
 
+## PR-body channel, 2026-11-06
+
+Session logs are not the only record. `scripts/kb_pr_evidence.py` reads a
+`gh pr list` export and reports the merged-PR channel separately, so an
+availability gap is not misread as a usage gap. The weekly workflow now
+exports the PRs and reports both.
+
+Merged `crypto` PRs since 2026-11-05:
+
+| measure | value |
+|:--|--:|
+| merged PRs | 119 |
+| bodies with `Sources checked` | 7 |
+| bodies with a `source:` id | 1 |
+| bodies mentioning the KB | 12 |
+| availability-only (declared unavailable, no receipt) | 5 |
+| used but unrecorded | 0 |
+
+All seven receipt PRs belong to sessions that also have a log receipt, so the
+two channels agree where both exist. The five availability-only PRs say the
+KB server was absent from their container (`#3563`, `#3526`, `#3519`,
+`#3514`, `#3513`); `#3570` separately flags that KB queries were not done.
+None shows a session using the KB without recording it.
+
+The blind spot was therefore not unrecorded use. It was availability: some
+containers cannot reach the catalog, and those sessions said so in the PR
+rather than the session log. The metric now sees both channels; making the
+catalog reachable from those containers is the next separate problem.
+
 ## What the audit does not see
 
-- Pull-request bodies and chat answers (the PR-body field is a later step).
+- Pull-request bodies in the coverage number: they are reported separately by
+  `scripts/kb_pr_evidence.py`, not mixed into log coverage.
 - Work in repositories not checked out beside this one.
 - Whether the session read the source it cited; the receipt is a pointer, and
   the evidence rules still apply.
