@@ -1,60 +1,101 @@
 Pollard rho remains the fastest known algorithm for the discrete logarithm
 on elliptic curves of cryptographic shape. Index calculus could in
 principle exploit more structure, but it has never beaten rho there. This
-treatise collects everything a four-month research programme
-(July-October 2026) learned about why. Every number is drawn from
-committed evidence and carries its boundary: oracle stage, complete solve,
-cold one-target cost, or online cost.
+treatise collects everything a research programme of July to early
+November 2026 learned about why. Every number is drawn from committed
+evidence and carries its boundary: oracle stage, complete solve, cold
+one-target cost, or online cost. No proof-carrying claim covers a result
+here unless one is named: a measured figure is its producer's reported
+value, "validated" means only that a validation file names it, and
+"kernel-checked" means that a Lean kernel accepted it.
 
-Theory. We give the Galois group of Semaev's summation cover. It is
-(Z/2)^{m-2} for every curve, field and characteristic, with arithmetic
-monodromy equal to geometric. We also give an exact factorisation law for
-its fibres over F_q. Two consequences follow:
+Theory. We give, in a draft proof upheld by an integrity audit (the
+separability lemma in characteristic 2 still awaits an expert check), the
+Galois group of Semaev's summation cover. It is (Z/2)^(m - 2) for every
+curve, field and characteristic, with arithmetic monodromy equal to
+geometric. We also give an exact factorisation law for its fibres over
+F_q. Two consequences follow:
+
 - fibre statistics are constant on the factor-base locus;
-- at fixed factor-base size the mean decomposition yield is fixed.
-So levers that rely on curve-dependent monodromy or on raising mean
-yield at matched base size are closed without experiment. Coverage, oracle
-cost and solving difficulty remain free.
 
-On fall degrees, we prove for the binary Weil descent of S_3 that:
-- the first fall degree is 2 for every n, including Semaev's chained
-  systems, where 4 was stated;
-- the last fall degree is at most k+2, or (t-1)k+t for chains.
-We also certify that the last fall degree is at least 5 on named
-instances at n=33-45 and in the m=t=3 chain, with certificates that
-an independent program checks. Every F4 run on those systems therefore
-exceeds degree 4, and Semaev's Assumption~1 fails as stated. For an
-explicit-membership chain we prove (d_ff,d_F)=(4,5) exactly at
-B=3 for every p>3, and \max(5,B+1)<= d_F<=3B-4 in general. For PKM
-Kummer towers we prove a constant first fall degree of 4 and show that the
-last fall degree depends on the presentation, not the ideal. Throughout,
-the first fall degree is a constant of the presentation and the last is
-not.
+- at fixed factor-base size the mean decomposition yield is fixed.
+
+So levers that rely on curve-dependent monodromy or on raising mean yield
+at matched base size are closed without experiment. Coverage, oracle cost
+and solving difficulty remain free.
+
+On fall degrees, we prove for the binary Weil descent of S₃ that:
+
+- the first fall degree (Caminata–Gorla) is 2 for every n whenever every
+    descended equation has degree 2, as on every instance computed,
+    including Semaev's chained systems, where 4 was stated;
+
+- the last fall degree is at most k + 2, or (t-1)k + t for chains.
+
+We also certify that the last fall degree is at least 5 on named instances
+at n = 33–45 and in the m = t = 3 chain, with certificates that an
+independent program checks. Every F4 run on those systems therefore
+exceeds degree 4, and Semaev's Assumption 1 fails as stated. For an
+explicit-membership chain we prove (d_ff, d_F) = (4,5) exactly at
+B = 3 for every p > 3, and max (5,B+1) ≤ d_F ≤ 3B - 4 in general. For
+PKM Kummer towers we prove a constant first fall degree of 4 and show that
+the last fall degree depends on the presentation, not the ideal.
+Throughout, the first fall degree is a constant of the presentation and
+the last is not. A hardness audit refutes the literal Petit–Quisquater
+Assumption 2 on all 119 census instances, and a left-kernel theorem,
+kernel-checked in the producer's compile, shows that one target needs no
+rank heuristic; the census numbers are unverified assertions. A generic
+collision floor, derived in the generic group model and checked by Monte
+Carlo, shows that a single-target index calculus whose base logarithms are
+unknown costs at least 1.5× rho, and 1.875× with two base elements, the
+constant at which the measured generic incumbent sits.
 
 Algorithms. The programme engineered:
-- root-finding and meet-in-the-middle decomposition oracles, two to
-  five orders of magnitude cheaper than Gröbner solves where they apply;
-- inherited and gated F4 engines, and an F_p F4 at msolve parity;
-- compact Frobenius-orbit and known-logarithm-closed factor bases;
-- FGHR's D_4 symmetry at k=4, cutting one decomposition
-  370-481x;
-- double-large-prime genus-3 index calculus after the cubic GHS
-  transfer, from q^{1.91} to q^{1.36};
-- Diem's plane-quartic index calculus on the same family, at
-  exponent ~1.
 
-Frontier. A priced campaign of 4,848 executions found no index
-calculus below rho on any prime or prime-degree binary curve at any
-weight of a pricing band applied to every arm. The distance at a matched
-reference is 4.7-18x on Koblitz curves of 37-47 bits and
-10.5-102x on prime curves of 20-40 bits. Only in weak
-extension-field families does index calculus reach or cross rho:
-- genus 3 via GHS: below the strongest rho at one size, unresolved
-  at the others;
-- plane quartics: 0.005x a negation rho at q~2^{21};
-- Joux-Vitse covers: 1.6-2.0x;
-- k=4 in characteristic two: unsupported beyond m=15.
+- root-finding and meet-in-the-middle decomposition oracles, about
+    400–5 ⋅ 10⁴× cheaper per decomposition than F4 where they apply;
+
+- inherited and gated F4 engines, and an F_p F4 at msolve parity;
+
+- compact Frobenius-orbit and known-logarithm-closed factor bases;
+
+- FGHR's D₄ symmetry at k = 4, cutting one decomposition 370–481×;
+
+- double-large-prime genus-3 index calculus after the cubic GHS
+    transfer, from a fitted q^(1.91) to q^(1.37) (local exponent 1.356 at
+    q = 2²², still above 4/3);
+
+- Diem's plane-quartic index calculus on the same family, at exponent
+     ≈ 1.
+
+Frontier. A priced campaign of 4,848 executions found no index calculus
+below rho on any prime or prime-degree binary curve at any weight of a
+pricing band applied to every arm. On Koblitz curves of 37–47 bits the gap
+to a matched rho is 3.4–11.5× on the validated board (rule v7), and
+4.7–18× against the same-binary rho of rule v8. On prime curves the
+validated rows are 5.5–13.5× at 10–24 bits; the campaign's two-summand
+pair table is 10.5–102× at 20–40 bits; the closest prime arms, generic
+collision searches at rho's exponent, are 1.3–1.7× at 36–42 bits (w = 0).
+Only in weak extension-field families does index calculus reach or cross
+rho:
+
+- genus 3 via GHS: below the strongest rho at q = 2¹⁶ under the
+    registered unit price, above it at the protocol's sensitivity price,
+    unresolved at the other sizes (no validation file);
+
+- plane quartics: 0.005× a negation rho at q ≈ 2²¹ (no validation file);
+
+- Joux–Vitse covers: the sieve route at 0.0065× a matched negation rho
+    in group additions (0.016× in F_p multiplications, at most 0.12×
+    across the band) at p = 1511, on the weak class only, validated as
+    accounting (VAL-20261103-c31c76, no pcc claim); the plain Nagao arm is
+    above a matched negation rho at p = 1301 and 1451 and unresolved at
+    1601, so its extrapolated crossing near p ≈ 1330 does not hold;
+
+- k = 4 in characteristic two: 5.2× rho at m = 15 after corrections; a
+    crossover near m ≈ 17.6 is an extrapolation.
+
 Every online win was retired by an equal-advice audit against
-Bernstein-Lange rho. We record the corrections that matching references,
+Bernstein–Lange rho. We record the corrections that matching references,
 pricing native work and replaying records forced. Nothing here concerns a
 deployed curve or key recovery.

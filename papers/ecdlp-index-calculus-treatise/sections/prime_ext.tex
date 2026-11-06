@@ -22,9 +22,12 @@ inside its system.
 
 The chapter has one result that matters for the distance to rho and one
 correction. The residual collectors of \S\ref{sec:pg-residual} are the
-prime-field arms closest to rho that the programme measured: $1.3$--$1.7\times$
-matched rho at $w=0$ on 36--42-bit curves, with no growth of that distance
-over the measured sizes. They are generic collision searches with rho's
+prime-field arms closest to rho that the programme measured: $1.54$--$1.64\times$
+matched rho at $w=0$ on 36--37-bit curves with a validator report, and
+$1.3$--$1.7\times$ on 36--42-bit curves as the producer reports them, with no
+growth of that distance over the measured sizes. The Curve25519 walk tables
+of \S\ref{sec:c25519} are at about the same distance ($1.6$--$1.9\times$,
+unverified). They are generic collision searches with rho's
 exponent, not index calculus with a better one. Their large gains at
 $w>0$ were a pricing artefact, withdrawn when the owner chose option~B on
 1 November (\S\ref{sec:pg-bytes}).
@@ -92,7 +95,7 @@ closest to the farthest.
 \toprule
 Arm & Bits & IC/rho ($w=0$) & Standing \\
 \midrule
-Residual collector \texttt{res1eq} (\S\ref{sec:pg-residual}) & 36--42 & $1.32$--$1.72$ & validator report (36--37 bits); producer \\
+Residual collector \texttt{res1eq} (\S\ref{sec:pg-residual}) & 36--42 & $1.32$--$1.72$ & validator report at 36--37 bits ($1.54$--$1.64$); producer at 36--42 bits \\
 Residual collector \texttt{res1dp} & 36--42 & $1.92$--$2.27$ & as above \\
 Residual collector \texttt{res2} & 36 & $2.6$ & improvement-log row, no validator \\
 Residual collector \texttt{res4} & 20.6--32 & $3.78$--$4.94$ & producer \\
@@ -102,7 +105,7 @@ Table~B pair table (Chapter~\ref{sec:prime}) & 10--24 & $5.47$--$13.5$ & validat
 Cofactor-cleared base, $h=32$ (\S\ref{sec:pg-cofactor}) & census & $9.80$ & \texttt{invalid\_controls} \\
 $k=4$ sum table (Chapter~\ref{ch:distance}) & 20--40 & $5.3$--$13.1$ & no validation \\
 Kummer tower, P-224 shape (\S\ref{sec:pa-pkm}) & 20--28 & $18$--$78$ & producer \\
-Kummer tower (Chapter~\ref{sec:prime}) & 20--30 & $28$--$159$ & producer \\
+Kummer tower (Chapter~\ref{sec:prime}) & 20--30 & $29$--$159$ & producer \\
 Packed pair table with filter (\S\ref{sec:pg-engineering}) & 32 & $31.47$ & validated with caveats \\
 \bottomrule
 \end{tabularx}
@@ -280,7 +283,7 @@ The ranking survived: $k=5$ is below the tuned incumbent on all 16 curves
 and in the pooled test at all three weights. Its toy-tier exponent of
 $0.496$ is a finite-size fit over 20--32 bits; the generic law does not
 allow a limit below $1/2$. Tuned for $w=0$, the incumbent
-is 8--13\% cheaper, and $k=5$ is still $0.25$--$0.49$ of it. A train-frozen
+is 8--13\% cheaper, and $k=5$ is still $2.2$--$4.6\times$ cheaper than it. A train-frozen
 rule chose $k=5$ at every size; at 20 bits $k=4$ is cheaper at $w=0$ and
 $0.1$ and the two are unresolved at $w=1$.
 
@@ -545,9 +548,12 @@ $2\times$ at every weight for \texttt{res1dp}. They are measured constant
 improvements of the generic track over the pair-table incumbent, at rho's
 exponent. By the curve-free null and \texttt{KeyedInvariance.lean} they
 are birthday searches on $\ZZ/r$, and the Shoup bound applies to them; the
-remaining factor is a constant, and closing it would produce rho under
-another name, as the parity bound of \S\ref{sec:c25519} shows for the
-analogous collision-based Curve25519 arms.
+remaining factor is a constant. Whether the parity bound of
+\S\ref{sec:c25519} (at least $1.5\times$ rho with one unknown base
+logarithm) applies to them is open: the cells with a validator report
+($1.54$ and $1.64$) are above it, but the producer-reported $1.32$ (p36) and
+$1.39$ (p42) of the scale study are below it, and no source states the
+collectors' number of unknown base logarithms or reconciles the two.
 
 \section{Cofactor-cleared bases}\label{sec:pg-cofactor}
 
@@ -1231,20 +1237,15 @@ of \S\ref{sec:pt-tensor} records the screen as
 \paragraph{Twelve leads.} On 31 October twelve prime-field leads, L01--L12,
 were evaluated and then reviewed by skeptic agents, whose digest is
 authoritative on standing (\art{research/ic_prime_eth_leads_20261031/SYNTHESIS.md};
-the raw lead directories are on an external volume, and nothing in the
-synthesis was re-run). Table~\ref{tab:pa-eth} gives the standing after
-review. The synthesis's verdict is that nothing moved the exponent
-question: every result is a constant, a known negative or an unfinished
-harness, and the SAT and propagation lane for prime fields ``should be
-closed for exponent purposes''. One item is untested: a CaDiCaL
-\texttt{ExternalPropagator} with $\FF_p$ Gaussian elimination. The
-synthesis also records feasibility: $m=3$ prime SAT is censored above
-$b\approx12$ in every lead that tried it, so only the $b=6$ and $b=9$
-diagonal cells are uncensored. Its closing statement names the two places where, for
-the prime-field exponent question, anything remained open after that day:
-the Kummer-tower cells at $m\ge4$ (\S\ref{sec:pa-pkm}) and the
-contraction exponent $s/\sqrt{\log s}$ of the tensor route
-(\S\ref{sec:pt-tensor}). Neither was touched by the twelve leads.
+\art{research/ic_prime_eth_leads_20261031/leads/SKEPTIC_DIGEST.md}).
+Table~\ref{tab:pa-eth} gives the standing of each lead after review; the
+full account of what the leads measured, the refutations and the
+synthesis's feasibility limits is in \S\ref{sec:tn-leads}. The synthesis's
+verdict is that nothing moved the exponent question, and that the SAT and
+propagation lane for prime fields ``should be closed for exponent
+purposes''; it leaves open the Kummer-tower cells at $m\ge4$
+(\S\ref{sec:pa-pkm}) and the contraction exponent of the tensor route
+(\S\ref{sec:pt-tensor}).
 
 \begin{table}[t]
 \centering\small
@@ -1255,7 +1256,7 @@ Lead & Headline after skeptic review & Standing \\
 L01 char-2 gadget & slope about $2.58$ bits of conflicts per window bit, against a bar of $0.5$; CPU $3\times$ worse at $\ell=7$ & constant only \\
 L03 sparse-parity bases & paired ratio to a size-matched null $1.000\pm0.0003$, $b\le22$ & constant only \\
 L04 backdoor census & offset $2\log_2(\mathrm{cap})-1$ at $m=3$: enumeration moved into the propagator & contested; cap-bounded statement only \\
-L05 policy pilot & reference slope $2.17$ $[1.93,2.38]$; renaming is null by construction & refuted as closed \\
+L05 policy pilot & reference slope $2.17$ $[1.93,2.38]$; renaming is null by construction & refuted as stated (the claim ``closed''); policy question untested \\
 L06 contraction width & MMD+ lower bound 15--51 against enumeration $2$--$10.7$ at $b\le16$ & refuted as closed; narrow claim stands \\
 L07 base second moment & hashed bases $1.000\pm0.005$ of null; shared negation-closed window $0.713/0.833/0.916$ at $m=4$ & contested; constant only \\
 L08 Koblitz transfer & true margin about $1.4\times$, not $3.42\times$; binary only & refuted as stated \\
@@ -1271,14 +1272,9 @@ record. Source: \art{research/ic_prime_eth_leads_20261031/SYNTHESIS.md}.}
 \label{tab:pa-eth}
 \end{table}
 
-The review corrected the lead document in eight places. Two matter beyond
-the lane. The statement that black-box contraction ``never beat[s] rho
-whatever D.1's constant is'' needs an outside assumption $c\ge1$ on an
-unspecified constant; Lean proves $g>16c$, and the general threshold is
-$\log_2b>256c^2$. The figure of about $10^5b$ edges per point addition is
-$9$--$30\times$ high: the measured network has 3{,}364 edges per slot-bit
-for the freed binary gadget and 11.9k edges per bit for the $m=2$ prime
-network at $b=131$. Neither changes an exponent argument.
+The review corrected the lead document in eight places; the corrected
+sentences are in \S\ref{sec:tn-corrections}, and none changes an exponent
+argument.
 
 \section{Small-root reach}\label{sec:pa-smallroot}
 
@@ -1431,14 +1427,9 @@ search strategies below the recursion's onset without measuring any. Its
 ECCp-131 fixture uses a certified hash modulus
 $s=3102808443644027376164572183694178153449$.
 
-\paragraph{Census and elimination.} The skeptic-reviewed leads of
-\S\ref{sec:pa-sat} include two that bear on this route. L09 found that no
-encoding in its census is admitted by D.1 (margin $-16.1$ to $-16.3$ bits;
-admission needs $\lambda\ge2^{85}$), and that with D.1's constant set to 1
-the ratio $s/\sqrt{\log_2s}$ is $37\times$ to $41{,}000\times$ the
-enumeration exponent. L06 found that plain tree-decomposition dynamic
-programming on the school multiplier CNF loses to enumeration at $b\le16$
-(lower bound 15--51 against 2--10.7). The elimination campaign of 1
+\paragraph{Census and elimination.} Two of the skeptic-reviewed leads, the
+L09 admission census and the L06 width bound, bear on this route; their
+numbers are in \S\ref{sec:tn-leads}. The elimination campaign of 1
 November (\art{research/prime_ic_elimination_20261101/}) re-fetched both
 PDFs at their pinned commits, matched the hashes, and kept the route at
 rank~1 of its frozen register: the native finite fallback is rejected;
@@ -1559,7 +1550,7 @@ reduced grevlex basis (\art{research/ecgfp5_quotient_bw_finish_20261102/};
 no amendments). The eliminant equals msolve's coefficient for coefficient,
 the stability check passes on 4{,}920 chains, and the planted point is
 recovered at every prime. Whole-solve CPU falls $1.83$, $1.97$ and
-$1.72\times$ at the three primes, below the frozen $1.5\times$ bar, so the
+$1.72\times$ at the three primes, clearing the frozen $1.5\times$ bar, so the
 finish is the new per-system baseline; the finish alone is $3.15$--$4.12\times$
 cheaper and the F4 work is unchanged. The new $c_{\rm cyc}$ is $2^{45.43}$,
 $2^{45.58}$ and $2^{45.84}$, below the \cls{close} line by $0.57$, $0.42$ and
@@ -1709,10 +1700,13 @@ provenance and class-group statistics, and none bears on ECDLP hardness.
 
 On every prime curve measured, rho with negation is cheaper than every
 index-calculus arm, generic or algebraic. The generic track's best arms are
-the residual collectors at $1.3$--$1.7\times$ rho ($w=0$), a constant at
-rho's exponent with no growth over 36--42 bits; the $k$-sum tables are
-$5.4$--$11.0\times$ rho and above baby-step giant-step. The algebraic track
-has no priced prime baseline beyond the Kummer-tower rows, and its degree
+the residual collectors at $1.3$--$1.7\times$ rho ($w=0$; $1.54$--$1.64$ in
+the cells with a validator report), a constant at rho's exponent with no
+growth over 36--42 bits; the $k$-sum tables are
+$5.4$--$11.0\times$ rho and above baby-step giant-step. The algebraic track's
+priced prime rows are the Kummer-tower rows and the Curve25519 F4 arms; the
+best of the latter, with a validator report, is still $1.83\cdot10^4\times$
+rho at $w=0.1$, and the cost scales as $r^{1.03}$ (\S\ref{sec:c25519}). Its degree
 studies show growth or input-pinned degrees in every presentation, with
 matrices that grow when degrees do not. The one claimed sub-exponential
 route is external, conditional on an unverified theorem, infeasible at
@@ -1731,7 +1725,7 @@ The chapters state these corrections and withdrawals:
 \item the cofactor-cleared prime base is \texttt{invalid\_controls}, not a
   win (\S\ref{sec:pg-cofactor});
 \item $N=64$ at 20 bits is unresolved, and the 24- and 28-bit base
-  selections are relabellings (\S\ref{sec:pg-engineering});
+  selections are relabellings (Chapter~\ref{ch:distance});
 \item the small-root margin of $-0.048$ is superseded by about $-0.6$
   (\texttt{CORR-20261024-b2a799}, \S\ref{sec:pa-smallroot});
 \item the September statement that no $m=5$ EcGFp5 degree was measured is

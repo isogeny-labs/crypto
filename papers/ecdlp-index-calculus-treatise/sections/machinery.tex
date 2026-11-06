@@ -257,8 +257,11 @@ Definition~\ref{def:domain} requires.
   panels is below its strongest matched reference. The closest markers are
   $2.28\times$ rho for inherited F4 on one tiny random-binary cell, $2.59\times$
   for the prime residual collector at 36 bits (\S\ref{sec:pg-residual}) and
-  $3.43\times$ on the admitted Koblitz ladder; the report states that these
-  are different studies and units, not entries of one table.
+  $3.43\times$ on Table~A's rule-v7 Koblitz ladder, whose rho reference
+  was $0.57$--$0.85$ of the strong walk per step, so that figure understates
+  the gap by about $1.7$--$2.0\times$ (\S\ref{sec:tablea},
+  \S\ref{sec:kc-rho}); the report states that these are different studies
+  and units, not entries of one table.
 \item \emph{Engines on the current binary.} The pair-index F6 reduces
   inherited-F6 work to $0.2792$ $[0.246,0.317]$ and is still $139.30$
   $[85.48,227.02]\times$ strong rho end to end; the prime PKM F4, F5, F6 and
@@ -289,7 +292,9 @@ index-calculus baseline. At $n=29$ and one factor-base column the IC arm
 reads $S=0.546$, $0.611$ and $1.196$ at $w=0,0.1,1$ against $1.569$ for
 \texttt{rho-frob}, a paired ratio of $0.366$ $[0.241,0.523]$. The directory
 carries a \texttt{VALIDATION.json} with a replay certificate and a passing
-validator report, and its own scope statement says what the crossing is.
+validator report (a validation-gate pass; no pcc claim, so an unverified
+assertion under the 4 November rule), and its own scope statement says what
+the crossing is.
 \begin{itemize}
 \item At one column the pipeline is a Frobenius-folded baby-step
   giant-step with a known generator-orbit column, not a factor base with
@@ -520,7 +525,7 @@ $2\times$ is the support cut at column 19: a CI recheck on the same four
 seeds passed every cell, with one-thread medians of $3.006$--$3.049\times$
 (lower bounds $2.970$--$3.024$) and two-thread medians of $2.415$--$2.476\times$,
 the candidate's counted reduction XORs being $28.08$--$28.10\%$ of the
-reference's (\art{research/f5_support_cut19_final_recheck_20261003/README.md}).
+reference's (\art{research/f5_support_cut19_final_recheck_20261003/RESULT.md}).
 The README calls it a recheck, not an independent second holdout. Its
 predecessor, the support split, cut reduction word operations to $33.7\%$
 but its ARM64 timings were non-promoting, with one seed's lower bound at
@@ -613,7 +618,7 @@ reads $1.0000$ on all five curves.
 \centering\small
 \begin{tabular}{@{}llrcrr@{}}
 \toprule
-Curve & $\dim V$ & default/off & 95\% interval & targets up/down & $S$/strong rho, off$\to$default \\
+Curve & $\dim V$ & default/off & 95\% interval & targets up/down & $S$/frozen strong rho, off$\to$default \\
 \midrule
 $n=11$, K1 & 4 & $1.0958$ & $[1.0940,1.0980]$ & 24/0 & $7.17\to7.86$ \\
 $n=13$, K0 & 5 & $1.0699$ & $[1.0646,1.0759]$ & 24/0 & $36.9\to39.5$ \\
@@ -632,7 +637,7 @@ or 1~GAE the ratio is $0.9755$. Source:
 \noindent The default is a regression at $n=11$ and 13 and a $4.1\%$
 engineering gain at $n=19$; at $n=17$ the whole gain comes from a different
 gate (\#1891's root-rank gate). Every priced F4 arm sits $7$ to $1{,}250$
-times the strong rho, and the harvest moves that by at most $10\%$. The
+times the frozen strong rho, and the harvest moves that by at most $10\%$. The
 correction is listed in Chapter~\ref{ch:corrections}.
 
 \paragraph{Determinism.} The cross-host drift of \S\ref{sec:corrections}
@@ -644,7 +649,7 @@ excluded the within-host sources and left the instruction-set path, later
 confirmed as the cause.
 
 \paragraph{The priced distance.} With its word XORs priced, inherited F4 is
-about $22$--$33\times$ the strong rho at $n=13$, and the complete pair table
+about $22$--$33\times$ the frozen strong rho at $n=13$, and the complete pair table
 is $17$--$22\times$ cheaper than F4 on the same cells; the atlas records the
 whole Boolean-engine line as \emph{closed, dominated} by the pair-table
 oracle on Koblitz and random binary curves up to $n=31$, $m\le4$
@@ -660,8 +665,6 @@ meet-in-the-middle floor at $m=3$ and $m=4$, with the slope-difference
 interval above zero.
 
 \section{F6-IC: from closure to lookup}\label{sec:bo-f6}
-Its results for binary decomposition are in \S\ref{sec:bd-f6}.
-
 
 F6-IC adds to inherited F4 a factor-base domain gate and meet-in-the-middle
 leaves (Chapter~\ref{sec:groebner}). Its record after 5 October is a single
@@ -670,9 +673,10 @@ argument in three steps.
 \paragraph{Step 1: the closure is charged, and loses.} On the $E_0$ ladder
 (eight public targets per size, 72 verified runs per arm and size, word XORs
 counted but not charged, geometric additions charged) F6-IC's $S$ was
-$54.75\times$ (37.81--84.22) the same-target rho at $m=13$ and $2{,}091\times$
-at $m=19$, against inherited F4's $1.105$ and $1.582$; at $m=23$ the two IC
-arms were $2.72$ and $2.09\times$, and at $m=31$ both hit the 3{,}600-second
+$54.75\times$ (37.81--84.22) the same-target rho at field degree $n=13$
+(the source writes $m$ for the degree) and $2{,}091\times$ at $n=19$, against
+inherited F4's $1.105$ and $1.582$; at $n=23$ the two IC arms were $2.72$ and
+$2.09\times$, and at $n=31$ both hit the 3{,}600-second
 cap on the first target, so the protocol reached no decision
 (\art{research/f6_ic_ecbench_ladder_20261005/RESULT.md}). The frozen strong
 rho of that ladder carried its set-up (\S\ref{sec:em-accounting}), and the
@@ -692,10 +696,13 @@ about $1.6\%$ of the online window
 \paragraph{Step 3: the few-candidate closure makes the algebra vanish.} On
 5 November the gate was changed to run the exact one-fixed closure as soon
 as a summand's assigned bits leave at most 64 base codes, deciding the whole
-subtree (\art{research/f6_few_candidates_20261105/README.md}; nine Koblitz
+subtree; the change is now on by default
+(\texttt{KIC\_F6\_FEW\_CANDIDATES=64}; \texttt{=0} is the same-binary
+control) (\art{research/f6_few_candidates_20261105/README.md}; nine Koblitz
 cells, $5\times3$ rounds, L0).
 \begin{itemize}
-\item Verdicts and indices are identical in both arms; F6-IC process CPU
+\item Verdicts and indices are identical in both arms (80 target--engine
+  pairs); F6-IC process CPU
   falls $2.67$--$10.29\times$ (median of five; worst round pairing at least
   $1.66$), word XORs $1.84$--$10.13\times$, and nodes from 204--1{,}049
   reductions per cell to 5--16. Inherited F4, with no gate, is unchanged
@@ -762,8 +769,6 @@ crossbred, exhaustive search, every F4 variant, F5, F6 and every
 root-finding variant rho-led in their cells (\S\ref{sec:em-frontier}).
 
 \section{Native-XOR SAT}\label{sec:bo-sat}
-The ceiling these engines place on learned guidance is in \S\ref{sec:bd-sat}.
-
 
 SAT engines with native XOR reasoning (CryptoMiniSat-style Gaussian
 elimination, WDSat~\cite{trimoska2020}) are the literature's fastest point-decomposition
@@ -815,28 +820,18 @@ identity: the CNF-XOR model of the point decomposition is a complete
 enumerator of $V^m$ modulo $S_m$, with no pruning above the leaves, so its
 next step is to price conflicts and fit their growth against $2^{m\ell}/m!$
 (\art{crypto-autoresearcher:knowledge/leads/ecdlp/ic-engine/LEAD-ICE-sat-xor-pdp-oracle.yaml};
-lead disposition \emph{open, next step}). A separate preregistered study
-measured that identity directly and the most a learned component could
-gain from it (\art{research/pdp_ml_sat_ceiling_20261027/README.md};
-symmetrised $\Sem4$, $m=3$, native CDCL+XOR, 4{,}200 labels all agreeing with
-exhaustive search). A refutation costs $0.963$ ($n=15$, $\ell=5$) and $0.998$
-($n=17$, $\ell=6$) conflicts per sorted factor-base triple, every refutation
-within $4.1\%$ of its family median: the search is an enumerator. A perfect
-predictor of unsatisfiable targets would raise relations per conflict
-$5.2$--$9.0\times$, but no feature group reached a test AUC distinguishable
-from $0.5$, while a positive control with labels flipped at rate $0.25$ reached
-$0.72$--$0.79$; the study closed by its rule: the ceiling is real and the
-signal is not. Until conflicts are priced the
+lead disposition \emph{open, next step}). The identity is measured directly
+in \S\ref{sec:bd-sat}: about one conflict per sorted triple, and no
+learnable signal. Until conflicts are priced the
 row is unranked, and statistics version~2 flags such arms as upper bounds on
 the wall statistic (\S\ref{sec:em-stats}). Prime-field SAT and SMT
 presentations are in \S\ref{sec:pa-sat}.
 
 \section{The $n=83$ engine campaign}\label{sec:bo-n83}
-The decomposition results at $n=83$ are in \S\ref{sec:n83l-sat}.
-
 
 Degree 83 was the largest Koblitz target with a working pipeline
-(\S\ref{sec:n83}). Its engine history has three layers.
+(\S\ref{sec:n83}). Its engine history has three layers; the decomposition
+results after the field-table correction are in \S\ref{sec:n83l-sat}.
 
 \paragraph{October 4--5: F6 components on the $a=0$ field.} About two dozen
 preregistered micro-studies kept kernel components and failed every
@@ -891,39 +886,13 @@ every earlier $n=83$ engine refutation is void
 \end{itemize}
 
 \paragraph{October 31 to November 1: chained SAT becomes a lookup.} Six
-frozen-protocol studies on the same fixture (L0, 4-vCPU host, 0 soundness
-flags in every study) extended the chained-$\Sem3$ SAT encoding to $m=9$
-(Table~\ref{tab:bo-chain}).
-
-\begin{table}[t]
-\centering\small
-\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.28\linewidth}>{\raggedright}X>{\raggedright\arraybackslash}p{0.2\linewidth}@{}}
-\toprule
-Step & Result & Study \\
-\midrule
-All-summand ordering & $m=2$: conflicts $0.50$--$0.60\times$ (public); median $12.8\to6.2$\,s & \texttt{order} \\
-Root-finder tables in front of SAT & $m=3$: every public target refuted with 0 conflicts (0.38\,s); $m=4$: median 156 conflicts, 0.98\,s; $m\ge5$ capped & \texttt{order} \\
-Meet-in-the-middle lookup ($|B|^d$ build) & public targets refuted with 0 conflicts at $m=5$--8; build 0.68\,s ($d=3$) to 958.8\,s ($d=5$); $m=9$ capped & \texttt{meet} \\
-Witness rebuilt from the lookup hit & planted 5 of 5 at $m=5$--8 with 0 solver calls (0.91--81.5\,s) & \texttt{rebuild} \\
-Indexed lookup, rebuild by peeling & $m=8$: $78.4\to39.7$\,s; $m=9$: 3/3 refuted, 5/5 verified in 54\,s; 372{,}406{,}144 depth-5 fingerprints & \texttt{indexed} \\
-Parallel back enumeration (4 threads) & $m=8$: $41.7\to11.4$\,s; $m=9$: $57.0\to13.7$\,s & \texttt{parallel} \\
-Parallel depth-5 build & $1{,}006.8\to287.7$\,s, $3.50\times$ & \texttt{parbuild} \\
-\bottomrule
-\end{tabularx}
-\caption[]{Chained-$\Sem3$ decomposition on the $n=83$ fixture, decomposition
-stage only. Sources: \art{research/n83_chain_sat_<step>_<date>/README.md}
-for \texttt{order} (31 October) and \texttt{meet}, \texttt{rebuild},
-\texttt{indexed}, \texttt{parallel}, \texttt{parbuild} (1 November).}
-\label{tab:bo-chain}
-\end{table}
-
-\noindent By the last step no decided target makes a single SAT solver call:
-the decisions are made by a $|B|^d$ table and a back enumeration of cost
-about $|B|^{m-d}$ per query, which is a generic meet in the middle. Every
-README states that this is a decomposition-stage measurement with no
-complete DLP and no matched-rho comparison, and the registry counts the
-lookup outside its 79+24 (\S\ref{sec:em-inventory}). The matched strong rho
-on this fixture solves the whole DLP in about 1.5\,s online.
+frozen-protocol follow-ups extended chained SAT to $m=9$ by putting
+root-finder tables and a $|B|^d$ meet-in-the-middle lookup in front of it;
+by the last step no decided target makes a SAT call
+(Table~\ref{tab:n83l-sat}, \S\ref{sec:n83l-sat}). The engine became a
+generic meet in the middle. These are decomposition-stage measurements with
+no complete DLP and no matched-rho comparison, and the registry counts the
+lookup outside its 79+24 (\S\ref{sec:em-inventory}).
 
 \section{What the Boolean engines settle}\label{sec:bo-summary}
 
@@ -934,8 +903,10 @@ Across the four families the record is consistent.
   representation. The largest complete-call factor is the F5 support cut
   ($3.0\times$); most preregistered candidates failed a $1.05$ gate.
 \item Priced inside a whole solve, the algebraic engines are $22$--$33\times$
-  (inherited F4, $n=13$) to $10^2$--$10^4\times$ rho, and the gap grows with
-  $m$ (\S\ref{sec:bo-inherited}).
+  (inherited F4, $n=13$) to $10^2$--$10^4\times$ the frozen strong rho, and the
+  gap grows with $m$ (\S\ref{sec:bo-inherited}). Against the v2 reference of
+  \S\ref{sec:em-accounting} these distances are roughly $3$--$5\times$ larger
+  at $n=13$--19.
 \item Where an engine became much faster on index-calculus systems---F6-IC
   with the few-candidate closure, chained SAT with tables and lookups---it did
   so by becoming the meet-in-the-middle oracle, whose relation cost is
@@ -1114,10 +1085,12 @@ existing solve (E25's) by its $P_2$-chain solve with identical decompositions
 on every call: solver~A cut the multiplications per call $2.62$--$2.69\times$
 and solver~B (sparsest pivots) $4.99$--$5.32\times$. End to end, $S_{E25}/S_A$
 is $2.50$--$2.56\times$ at 0~GAE, $1.39$--$1.43\times$ at 0.1 and
-$1.034$--$1.053\times$ at 1, so A is ranked ahead across the band; B, with its
-selection pass priced, falls behind E25 at 0.1 and 1~GAE and is unresolved
+$1.034$--$1.053\times$ at 1, so A is ranked ahead across the band. B is ahead of E25 at every weight
+as E31 counted it, but with its selection pass priced (E33, below) it falls
+behind E25 at 1~GAE and is unresolved
 (\art{research/e31_chain_solve_20261024/}; validated, \texttt{VAL-20261024-24ef8b},
-\art{benchmarks/20261024-e31-chain-solve/VALIDATION.json}). E32 then measured
+\art{benchmarks/20261024-e31-chain-solve/VALIDATION.json}; validation-gate
+pass, no pcc claim, so an unverified assertion under the 4 November rule). E32 then measured
 the distance over eleven sizes, $\log_2n=22.6$--$42.4$, 33 paired curves:
 rho is ahead on every curve at every weight, the best curve is $1{,}143\times$
 from rho at 0~GAE, the fitted slope of the distance is $-0.243$
@@ -1208,7 +1181,9 @@ distance in kind. The best rows of the table sit at $S_X/\text{rho}$ of
 $5.15\cdot10^3$ (H, 0~GAE) to about $6\cdot10^3$ (V and W, 0~GAE), rising to
 $5.97\cdot10^4$--$9.4\cdot10^4$ at 1~GAE; the worst rows reach
 $2.3\cdot10^5$ at 0~GAE and $7.0\cdot10^6$ at 1~GAE. Measured against the success criterion E31,
-E39 and E40 are verified improvements of the index-calculus baseline (E39
+E39 and E40 are validation-gate improvements of the index-calculus baseline
+(no pcc claim exists for any of them, so each is an unverified assertion
+under the 4 November rule; E39
 across the whole band, E40 at positive weights), each a constant on one
 stage; measured against rho they leave the gap where E32's ladder put it,
 closing as $n^{-1/4}$ with an extrapolated crossover near $2^{85}$--$2^{98}$.
@@ -1296,92 +1271,28 @@ Each kind of tool has its own way of being wrong, and the record below is
 mostly about those.
 
 \section{Closure and guess instruments}\label{sec:in-closure}
-What these instruments measured at $\ell=8$ is in \S\ref{sec:bd-guess}.
-
 
 \S\ref{sec:binary} reports the closure-degree measurements to 24 October: a
 MutantXL-style closure refutes the chained $m=3$ descent systems at degree
 3--4 where XL needs 5--7, stays at degree 4 up to $\ell=6$, and rises past 4
 at $(m,\ell)=(3,7)$; guessing one or two variables restores degree 4 there at
-$1/116$--$1/260$ of the projected degree-5 cost; and the ECC2K-130 $m=4$ row
-is $+8.43$ bits over rho if the number of guesses $k$ stays flat in $\ell$ and
-$+58.27$ if it grows linearly, ``which only a run at $\ell=8$ can separate''.
-The $\ell=8$ runs have since been made (Chapter~\ref{ch:corrections} lists
-the staleness). This section reports them, with the instrument's own
-controls.
+$1/116$--$1/260$ of the projected degree-5 cost. The $\ell=8$ guessed-variable
+series that followed (four guesses suffice, three do not for one set, the
+$(22,7)$ null, the invariant guesses, and what they price for ECC2K-130) is
+reported in \S\ref{sec:bd-guess} and Table~\ref{tab:bd-guess}. This section
+describes the instrument and the control lesson behind every row of that
+table.
 
 \paragraph{The instrument.} \texttt{dreg\_closure} builds the Macaulay
 closure of one draw's system degree by degree, records the closure and XL
 ranks, the columns and the word operations at each degree, and scores a draw
 as refuting at the first degree whose closure contains the constant.
 \texttt{dreg\_score} scores the records against a preregistration. Every
-study below fixes a cell, draws unsatisfiable and satisfiable systems from a
+study of Table~\ref{tab:bd-guess} fixes a cell, draws unsatisfiable and satisfiable systems from a
 seed, and runs three controls: an identity control that reproduces an
 earlier committed record field for field, a positive control (a guess set
 known to refute), and a negative or null control that must \emph{not}
 refute.
-
-\paragraph{Four guesses suffice at $\ell=8$.} At $(m,n,\ell)=(3,22,8)$, with
-$N=46$ unknowns and 44 equations, guessing variables 7, 15, 23 and 24 (one
-coordinate per summand and one intermediate coordinate) made all 64 branches
-of four unsatisfiable draws refute at degree 4
-(\art{research/dreg_closure_guess_20261022/RESULTS.md}; 68 processes, peak
-10.6\,GB, $124{,}314$ degree-4 columns per branch). The registered verdict
-favours the rule $k=m(\ell-7)+1=4$ over $k=m(\ell-6)=6$. The study states its
-limits: $k=4$ is an upper bound (the smallest count the container could fit
-under its column cap), it is one guess set, and the unspecialised $\ell=8$
-system was not measured at degree 4.
-
-\paragraph{Three do not, for that set.} Guessing only the top coordinate of
-each summand (variables 7, 15, 23) refuted on one of four draws; on the
-other three the first branch saturated degree 4 without the constant
-(closure ranks $128{,}213$--$129{,}893$ of $136{,}698$ columns)
-(\art{research/dreg_closure_guess3_20261023/RESULTS.md}). Whether the fourth
-variable or merely a fourth guess mattered is not separated.
-
-\paragraph{The null holds.} The unspecialised $(22,7)$ system does not refute
-at degree 4 on 4 of 4 draws, while its guessed versions do
-(\art{research/dreg_closure_null22_7_20261028/RESULTS.md}). A scorer defect
-found in review (it scored only the files it was given) was fixed and the
-verdict regenerated unchanged.
-
-\paragraph{Invariant guesses.} A guess need not fix a raw coordinate; it can
-fix a linear invariant of the summand-swap symmetry.
-\begin{itemize}
-\item The invariant guess $a_7+b_7$ is never worse than the raw guess, but
-  does not reliably suffice at $\ell=8$; three of the satisfiable draw's
-  branches ran out of memory, and the soundness rule was replaced after the
-  data, a disclosed post hoc amendment
-  (\art{research/dreg_invariant_guess_20261029/RESULTS.md}).
-\item On eight fresh unsatisfiable draws, preregistered, the invariant
-  guess beats the raw guess on 5 of 5 discordant draws ($p=0.031$)
-  (\art{research/dreg_invariant_guess_more_20261029/RESULTS.md}).
-\item A second invariant on the pair, in place of $c_7$, was never better on
-  any of 12 draws (\art{research/dreg_invariant_pair_guess_20261029/RESULTS.md});
-  the summand-swap invariant alone does not refute below degree 4 at
-  $\ell=6$ (\art{research/dreg_pair_invariant_20261028/RESULTS.md}).
-\item An invariant guess on the second link matches the raw guess on $x_3$:
-  6 against 7 of 12 draws, no detected difference
-  (\art{research/dreg_second_link_guess_20261105/RESULTS.md}). This result
-  carries claim \texttt{PCC-20261106-607061} and is an unverified assertion
-  until a pcc verdict exists.
-\end{itemize}
-
-\paragraph{What the $\ell=8$ results price.} The guess study derives the
-consequence for ECC2K-130's $m=4$ row, at the cell where that row is priced
-($\ell=33$, $N=2\cdot131+4\cdot33=394$, $w=1$): the ratio of the degree-5 oracle
-to the guessed degree-4 oracle, $\binom{394}{\le5}/(2^k\binom{394-k}{\le4})$,
-is $78.2$ at $k=0$, $5.09$ at $k=4$, $1.30$ at $k=6$ and $0.66$ at $k=7$, so the
-hybrid beats degree 5 only if $k\le6$ at $\ell=33$. Both registered growth
-rules give $k\approx105$--$108$ there. The measurements---$k\approx1$ at $\ell=7$
-on 5 of 8 draws, $k\le4$ at $\ell=8$ on 4 of 4---do not exclude a bounded $k$,
-and the invariant guess lowers $k$ on some draws. Even a bounded $k$ only
-recovers the degree-4 row, $2^{+7.62}$ over rho in unconverted units, and the
-free-oracle floor of \S\ref{sec:gf-collision} still binds every row
-(\art{research/dreg_closure_guess_20261022/RESULTS.md}). The $\ell=9$ cell
-($N\ge49$) that would show whether $k$ grows at all needs a larger host; a
-high-arity discriminator has a frozen protocol (version 4) and a blocked
-launch (\art{research/dreg_high_arity_20261101/README.md}).
 
 \paragraph{A null control that failed.} The specialisation study of 17
 October is the counter-example that justifies the controls. Fixing one
@@ -1394,28 +1305,17 @@ structural finding.
 
 \section{The linearization-excess rule}\label{sec:in-excess}
 
-For two summands there is a structural number that predicts the solving
-degree before any solve. On the ECC2K-130 family $y^2+xy=x^3+1$ over
-$\FF_{2^n}$, with factor base the points whose abscissa lies in a subspace
-$V$, let $V^{(2)}$ be the span of products of pairs of elements of $V$ and
-$e=n-\dim V-\dim V^{(2)}$ the \emph{linearization excess}. Over 656 factor
-bases (seven families, nine fields) the closure solving degree is
-\[
-  D=2+[e<-3.5]+[e<-8.5],
-\]
-with mean absolute error $0.06$ degrees, $0.08$ when each field size is held
-out in turn (\art{cryptanalysis:experiments/pdp-degree-heuristics/README.md}).
-For prime $n$, $\dim V^{(2)}\ge2\ell-1$, attained below $n-1$ only by
-geometric progressions $c\cdot\mathrm{span}\{1,g,\dots,g^{\ell-1}\}$; where
-the rule puts a random base one degree higher, progressions are $15$--$40\times$
-cheaper per query and per relation, at the same yield. The study also finds
-that the homogeneous degree of regularity is exactly $\ell+1$ (the top parts
-are bilinear), so it is the wrong proxy, and that for three summands the
-formulation, not the base, decides whether the base matters. None of it is an
-index-calculus result: every row is a decomposition-stage profile on small
-fields. The atlas lead that would transfer it---rank candidate bases of equal
-size by $e$ inside the $m=3,4$ closure cells above and measure degree and
-charged cost with a random control---is \emph{open, unexamined}
+For two summands a structural number, the linearization excess
+$e=n-\dim V-\dim V^{(2)}$ of a subspace factor base $V$, predicts the
+closure solving degree before any solve, $D=2+[e<-3.5]+[e<-8.5]$ over 656
+bases at mean absolute error $0.06$; the rule, the progression bases it
+singles out and the $m=3$ formulation point are stated in full in
+\S\ref{sec:bt-fbselect} (\art{cryptanalysis:experiments/pdp-degree-heuristics/README.md}).
+None of it is an index-calculus result: every row is a decomposition-stage
+profile on small fields. The atlas lead that would transfer it---rank
+candidate bases of equal size by $e$ inside the $m=3,4$ closure cells of
+\S\ref{sec:bd-guess} and measure degree and charged cost with a random
+control---is \emph{open, unexamined}
 (\art{crypto-autoresearcher:knowledge/leads/ecdlp/ic-engine/LEAD-ICE-linearization-excess-fb-prior.yaml}).
 
 \section{Presentations as an instrument}\label{sec:in-presentation}
@@ -1661,7 +1561,7 @@ E31 chain solve (validated) & $S$ $1.03$--$2.56\times$ lower across band & $4.42
 E39 arrival-order pivots (validated) & ahead of A at every weight & $5.15\cdot10^3\times$ at best \\
 E40 lead-stored rows (validated) & ahead of A at $w>0$ only & $6.00\cdot10^3\times$ at best \\
 Generator-orbit base, Koblitz (validated) & $1.26$--$3.20\times$ & below rho only at $n=29$, one column (BSGS) \\
-Harvest default, inherited F4 & $+9.6\%$ to $-4.1\%$ by size & $7$--$1{,}250\times$ \\
+Harvest default, inherited F4 & $+9.6\%$ to $-4.1\%$ by size & $7$--$1{,}250\times$ (frozen strong) \\
 \addlinespace
 \multicolumn{3}{@{}l}{\emph{Accounting and instrument changes}} \\
 Accounting v2 & references resized & gap larger \\
@@ -1684,8 +1584,12 @@ Three conclusions follow, each with its scope.
   sign depends on a price. That is a statement about the instrument, made
   by the instrument's own audits.
 \item \emph{Engine gains are real and small against the gap.} The largest
-  verified end-to-end engine change in this part is a factor of about 5,
-  against distances to rho of $10^2$ (Koblitz, binary, prime) to $10^3$--$10^6$
+  end-to-end engine change in this part is a factor of about 5 (the
+  \texttt{f4\_fp} cover pipeline; producer-reported, lower-bound
+  comparison). The largest validated ones are the generator-orbit base
+  ($1.26$--$3.20\times$) and E31 ($2.50$--$2.56\times$ at 0~GAE,
+  $1.03$--$1.05\times$ at 1~GAE), both validation-gate passes without a pcc
+  claim. These stand against distances to rho of $10^2$ (Koblitz, binary, prime) to $10^3$--$10^6$
   ($\FF_{p^4}$). On the binary and prime lines no engine change moved the
   distance's slope.
 \item \emph{Where an engine got fast, it became generic.} F6-IC's closure

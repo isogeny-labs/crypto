@@ -1,14 +1,17 @@
 # Index Calculus for the Elliptic-Curve Discrete Logarithm: Theory, Algorithms, and a Measured Frontier
 
-`treatise.tex` (built: [`treatise.pdf`](treatise.pdf), 87 pages) is the
+`treatise.tex` (built: [`treatise.pdf`](treatise.pdf), 268 pages) is the
 programme's comprehensive document on ECDLP index calculus, current to
-2026-10-29.
+2026-11-06.
 
 **Status:** research draft, anonymized, not peer-reviewed, not submitted.
 It synthesises committed evidence. Its one new computation is a
 re-verification of one closure certificate (Chapter 6). Every number cites a
 committed artefact (Appendix A); plotted values and their sources are in
-`figures/data-*.json`.
+`figures/data-*.json`. The source survey behind the November expansion is in
+[`survey/`](survey/) (`INDEX.md`, digests, verification logs); the
+independent review of 6 November (132 findings, each re-verified against its
+source before it was applied or skipped) is in [`survey/review/`](survey/review/).
 
 ## How it relates to the other papers here
 
