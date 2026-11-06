@@ -227,3 +227,16 @@ shell and `jq` logic, not ecbench's real output; the field names are those of
   `ea8e9ef7` (`src/` is absent).
 - Contents of tracked, non-materialized files in `research/`, `backlog/`,
   `docs/ic/` and `benchmarks/` for F3.
+
+## F4 local smoke run (main session, 2026-11-06 ~04:05Z)
+
+A development check, not a measurement; no wall time from it is read or reported.
+
+- **Binary:** `/dev/shm/v3a1-untrusted/x/usr/local/bin/ecbench`, sha256 `73362eed…`, extracted from the pinned image.
+- **Spec:** `prefreeze-smoke-spec-v6.json`: fp28, seed 2026110628902, 1 target, 1 round, at L0. Arms: incumbent and candidate (`layout=lines`), each under `targets=walk` and `targets=stride-renew`, with `prime-abscissa:size=407` and `max_trials=26479085`.
+- **Command:** `ecbench run --spec prefreeze-smoke-spec-v6.json --out /dev/shm/v6smoke/session`.
+- **Result:** 4 of 4 verified. Counted S was identical within each pair: walk 16.289 / 16.289, stride-renew 21.066 / 21.066. All four were graded L2 on the local host, so every solve exceeded the 1 ms minimum.
+- **Field-by-field comparison** of each incumbent/candidate record pair, flattened (331 and 327 fields):
+  - Of the fields that differ, none is a counted operation or a native counter.
+  - The rest are identity (arm, role, label, record/run id, seq, method id and sha, oracle param, fbm_id), wall and phase timing (`*_ns`), isolation telemetry, and memory/scheduling effects (max_rss_kib, minor_faults, irq ticks, user/sys ns).
+- **Conclusion:** `layout=lines` changes no counted or native counter under either target mode. `ALLOWED_NATIVE = []` in `analyze-v6.sh` is correct as written, so its sha256 stays unchanged. **F4: pass.**
