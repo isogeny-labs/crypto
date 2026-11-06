@@ -735,3 +735,88 @@ jobs:
           chmod +x target/release/ecbench
           bash .github/scripts/ecbench-audit-sessions.sh "$RUNNER_TEMP/ecbench-sessions.txt"
           echo 'PR evidence validation: every committed ecbench session with complete inputs (by schema) hash/seal/answer audited; four hash-pinned scratch sessions lacking spec/host capsules remain incomplete. Fresh smoke sessions exercise deterministic replay; exhaustive historical replay belongs to the manual exhaustive lane.' >> "$GITHUB_STEP_SUMMARY"
+
+  # A pull request audits every committed session with --replay 0, so a change
+  # to what a registered method counts used to merge green while the committed
+  # records of that method stopped replaying (c653ede60b, 2026-11-03: the
+  # native pencil point sieve's ledger; found days later).  This job replays,
+  # through the ordinary verifier (same comparator, same legacy profiles), the
+  # frozen sentinel records of docs/ecbench/replay-sentinels.json: the cheapest
+  # replayable committed record of every method id.  It also fails when a
+  # method id of a committed session has no sentinel, so a new method gets one
+  # in the PR that adds its first session.
+  replay_sentinels_pr:
+    if: ${{ !github.event.pull_request.draft && (github.event_name == 'pull_request' || github.event_name == 'merge_group' || github.event_name == 'push') && needs.scope.outputs.ecbench_replay != 'false' }}
+    needs: [scope, harness]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/scripts/
+            /docs/ecbench/replay-sentinels.json
+            /tools/artifacts/
+            /.artifacts/
+      # Coverage needs only each session's session.json and spec.json (plain
+      # text in git); records are fetched for the sentinel sessions alone.
+      - name: List committed ecbench sessions and check sentinel coverage
+        run: |
+          list="$RUNNER_TEMP/ecbench-sessions.txt"
+          mapfile -t candidates < <(git ls-tree -r --name-only HEAD | sed -n 's#/session\.json$##p')
+          test "${#candidates[@]}" -gt 0 || { echo '::error::no session.json in the tree'; exit 1; }
+          for d in "${candidates[@]}"; do printf '/%s/session.json\n/%s/spec.json\n' "$d" "$d"; done \
+            | git sparse-checkout add --stdin
+          : > "$list"
+          for d in "${candidates[@]}"; do
+            test -f "$d/session.json" || { echo "::error::$d/session.json was not checked out"; exit 1; }
+            if jq -e '.schema == "ecbench.session/v1"' "$d/session.json" > /dev/null; then
+              echo "$d" >> "$list"
+            fi
+          done
+          test -s "$list" || { echo '::error::no committed ecbench sessions found'; exit 1; }
+          echo "$(wc -l < "$list") committed ecbench sessions (by schema)"
+      - uses: actions/download-artifact@v4
+        if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+        with:
+          name: ecbench-pr-audit-bin
+          path: target/release
+      # The harness job uploads its binary on pull requests and merge groups
+      # only; a push to main builds it here (rust-cache shared with harness).
+      - uses: dtolnay/rust-toolchain@stable
+        if: github.event_name == 'push'
+      - uses: Swatinem/rust-cache@v2
+        if: github.event_name == 'push'
+        with:
+          shared-key: ecbench
+      - name: Build ecbench (push)
+        if: github.event_name == 'push'
+        run: |
+          git sparse-checkout add /Cargo.toml /Cargo.lock /.cargo/ /build.rs /rust-toolchain* /src/ /tests/ /examples/ /benches/ /tools/factor-base/ /tools/volcano-cli/ /isogeny_algos/ /docs/ /rustfmt.toml /clippy.toml /experiments/koblitz-s3-pair-query-20261007-v4/baseline.rs /experiments/koblitz-s3-pair-query-20261007-v4/candidate.rs
+          node .github/scripts/ci-scope.mjs --materialize
+          cargo build --release --bin ecbench
+      - name: Every method id of a committed session has a replay sentinel
+        run: |
+          chmod +x target/release/ecbench
+          ./target/release/ecbench sentinels check --list "$RUNNER_TEMP/ecbench-sessions.txt" \
+            --manifest docs/ecbench/replay-sentinels.json
+      - name: Pull the sentinel sessions from the artifact store
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          ./target/release/ecbench sentinels plan --manifest docs/ecbench/replay-sentinels.json | cut -f1 > "$RUNNER_TEMP/sentinel-sessions.txt"
+          printf '/%s/\n' $(cat "$RUNNER_TEMP/sentinel-sessions.txt") | git sparse-checkout add --stdin
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            "$RUNNER_TEMP/artifacts-awscli/bin/python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+          fi
+          mapfile -t sessions < "$RUNNER_TEMP/sentinel-sessions.txt"
+          python3 tools/artifacts/artifacts.py pull --jobs 16 "${sessions[@]}"
+      - name: Replay the sentinel records
+        run: bash .github/scripts/ecbench-replay-sentinels.sh replay docs/ecbench/replay-sentinels.json ./target/release/ecbench
