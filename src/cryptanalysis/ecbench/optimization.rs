@@ -582,6 +582,24 @@ const POLICIES: &[PolicyDecl] = &[
         FrontierEligible,
         StandardBand
     ),
+    policy!(
+        "cheon.pminus1_comb",
+        ImplementationAb,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
+        "cheon.pminus1_naive",
+        ImplementationAb,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
+        "cheon.pplus1_comb",
+        ImplementationAb,
+        SpecializedDomain,
+        StandardBand
+    ),
 ];
 
 fn parameter_role(name: &str) -> Option<ParameterRole> {
