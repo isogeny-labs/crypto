@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -88,6 +89,27 @@ class UsageReportTest(unittest.TestCase):
         self.assertEqual(data["totals"]["receipts"], 2)
         self.assertEqual(data["totals"]["unique_source_ids"], 1)
         self.assertEqual(json.loads(json.dumps(data))["totals"]["coverage"], 2 / 3)
+
+    def test_ref_reads_committed_logs(self):
+        subprocess.run(["git", "init", "-q", "-b", "main", str(self.root)], check=True)
+        subprocess.run(["git", "-C", str(self.root), "config", "user.email", "test@example.com"], check=True)
+        subprocess.run(["git", "-C", str(self.root), "config", "user.name", "Test"], check=True)
+        subprocess.run(["git", "-C", str(self.root), "add", "."], check=True)
+        subprocess.run(["git", "-C", str(self.root), "commit", "-q", "-m", "logs"], check=True)
+
+        # Dirty the working tree: a measurement of committed history must not
+        # see this edit, while the default read must.
+        dirty = "## 2026-11-05T10:00:00Z — uncommitted\n\n- no receipt here\n"
+        (self.root / "docs" / "session-logs" / "2026-11-05.md").write_text(dirty)
+
+        work = kb.audit_root(self.root, None)
+        committed = kb.audit_root(self.root, None, "HEAD")
+        self.assertEqual((work["entries"], work["receipts"]), (2, 1))
+        self.assertEqual((committed["entries"], committed["receipts"]), (3, 2))
+        self.assertEqual(committed["unique_source_ids"], 1)
+
+        missing = kb.main(["--root", str(self.root), "--ref", "no-such-ref"])
+        self.assertEqual(missing, 2)
 
     def test_fail_under(self):
         with tempfile.TemporaryDirectory() as out:
