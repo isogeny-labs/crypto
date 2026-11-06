@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 here = os.path.dirname(os.path.abspath(__file__))
 data = json.load(open(os.path.join(here, "plot-data.json")))
 cells = data["cells"]
-names = ["s₄", "s₃", "s₂", "s₁", "L2·1", "L2·2", "L2·3", "L3·1", "L3·2", "L3·3"]
+names = ["1·a", "1·b", "1·c", "1·d", "2·a", "2·b", "2·c", "3·a", "3·b", "3·c"]  # link · slot; arm I: s coordinates, then e₁+x₃, e₂+x₄; arm R: x₂, x₃, x₄ coordinates
 
 fig, ax = plt.subplots(figsize=(10, 6.4))
 for row, c in enumerate(cells):
