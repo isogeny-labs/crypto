@@ -86,6 +86,34 @@ The delta from the 0.9% pre-policy mark (1 receipt in 114 entries) is +10.8
 points. Later sessions now record receipts on their own, not just the policy
 entries, so the number is beginning to measure habit rather than the template.
 
+## Diagnosis: usage gap, not a recording gap (2026-11-06)
+
+Committed `main`, entries dated 2026-11-05 or later:
+
+| measure | value |
+|:--|--:|
+| entries as written | 139 |
+| exact duplicate headings | 31 |
+| unique entries | 108 |
+| receipts | 14 |
+| unique entries without a receipt | 94 |
+| of those, entries that mention the KB at all | 2 |
+| of those, entries with a query or `source:` signal | 0 |
+
+The receiptless entries are overwhelmingly merge, custody, CI and verification
+work. Only two mention the KB in prose, and neither records a query or a
+source. So the crypto gap is not a recording gap: sessions are largely not
+querying the catalog in the first place.
+
+One client-side asymmetry the logs support: the Claude Code hook printed the
+reminder, while `scripts/relay.py session-start`, which Codex also runs,
+printed nothing unless a runtime handoff was pending. The reminder now comes
+from the relay for every runtime, and the Claude-only echo is removed.
+
+The 31 duplicates are merge artifacts: whole dated blocks copied into the same
+file. They are reported here rather than silently dropped; deduplicating exact
+headings in the tool is a separate change because the script is locked.
+
 ## What the audit does not see
 
 - Pull-request bodies and chat answers (the PR-body field is a later step).
