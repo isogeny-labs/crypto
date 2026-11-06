@@ -93,3 +93,22 @@ or signing flow to get green. Further canonical claim registration is pending
 safe artifact publication; this diagnostic has no new signed claim. Keep the
 PR open and the pending conflicted journal untouched. The new blocker resets
 the unchanged-follow-up count to zero.
+
+## 2026-11-06T04:25:20Z autofix prerequisite failure
+
+At unchanged head `59be5d91`, the autofix bot added `needs-human`.
+[Target job 127675114591](https://github.com/isogeny-labs/crypto/actions/runs/42151281026/job/127675114591)
+failed its `Require ANTHROPIC_API_KEY` step with exit 1. Checkout, model attempts
+and commit/push were skipped, so this is an external autofix prerequisite
+failure. It is not a component test result or a reply to the separate Copilot
+request, which remains unanswered. Only `review` and `migrate` have successful
+current-head check runs; no `gate`/`size`/`artifacts` result was returned.
+[pcc:unverified]
+
+Leave repository secret/configuration, labels, shared PCC verification and
+signing, artifact policy and the pending conflicted journal unchanged. Preserve
+the existing ledger and evidence; new canonical claim registration remains
+pending safe artifact/PCC integration. Keep the regular PR open with auto-merge
+disabled, and re-arm about four hours later with zero unchanged follow-ups.
+No build, benchmark or scientific launch was attempted for this check.
+[pcc:unverified]
