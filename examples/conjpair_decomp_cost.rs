@@ -449,6 +449,239 @@ fn solve_one(
     )
 }
 
+// ── solutions at infinity (study lift_dense_conjugate_pair_infinity_20261106) ──
+
+type P5 = HashMap<[u8; 5], u64>;
+
+fn p5_mul(a: &P5, b: &P5, p: u64, muls: &mut u64) -> P5 {
+    let mut out: P5 = HashMap::with_capacity(a.len() * 2);
+    for (ma, ca) in a {
+        for (mb, cb) in b {
+            let m: [u8; 5] = core::array::from_fn(|i| ma[i] + mb[i]);
+            let e = out.entry(m).or_insert(0);
+            *e = (*e + ca * cb) % p;
+            *muls += 1;
+        }
+    }
+    out.retain(|_, v| *v != 0);
+    out
+}
+
+/// Random A ∈ GL₅(F_p).
+fn random_gl5(p: u64, rng: &mut StdRng) -> [[u64; 5]; 5] {
+    loop {
+        let a: [[u64; 5]; 5] =
+            core::array::from_fn(|_| core::array::from_fn(|_| rng.gen_range(0..p)));
+        let mut m: Vec<Vec<u64>> = a.iter().map(|r| r.to_vec()).collect();
+        let mut ok = true;
+        for c in 0..5 {
+            let Some(r) = (c..5).find(|&r| m[r][c] != 0) else {
+                ok = false;
+                break;
+            };
+            m.swap(r, c);
+            let iv = inv_mod(m[c][c], p);
+            for r2 in 0..5 {
+                if r2 != c && m[r2][c] != 0 {
+                    let k = m[r2][c] * iv % p;
+                    for j in 0..5 {
+                        m[r2][j] = (m[r2][j] + p * p - k * m[c][j]) % p;
+                    }
+                }
+            }
+        }
+        if ok {
+            return a;
+        }
+    }
+}
+
+/// Homogenise each component to degree 8 with e₀, substitute
+/// (e₀..e₄) = A·(y₀..y₄), dehomogenise at y₀ = 1.  Counted F_p muls in `muls`.
+fn projective_transform(
+    comps: &[HashMap<[u8; 4], u64>],
+    a: &[[u64; 5]; 5],
+    p: u64,
+    muls: &mut u64,
+) -> Vec<HashMap<[u8; 4], u64>> {
+    // powers L_j^n of the linear forms L_j = Σ_k a[j][k] y_k
+    let mut pw: Vec<Vec<P5>> = vec![];
+    for row in a.iter() {
+        let mut l: P5 = HashMap::new();
+        for k in 0..5 {
+            if row[k] != 0 {
+                let mut m = [0u8; 5];
+                m[k] = 1;
+                l.insert(m, row[k]);
+            }
+        }
+        let mut v: Vec<P5> = vec![HashMap::from([([0u8; 5], 1u64)])];
+        for n in 1..=8 {
+            let next = p5_mul(&v[n - 1], &l, p, muls);
+            v.push(next);
+        }
+        pw.push(v);
+    }
+    // the union of monomials over all components
+    let mut monos: Vec<[u8; 4]> = comps.iter().flat_map(|c| c.keys().copied()).collect();
+    monos.sort();
+    monos.dedup();
+    let mut out: Vec<HashMap<[u8; 4], u64>> = vec![HashMap::new(); comps.len()];
+    for m in monos {
+        let deg: u8 = m.iter().sum();
+        assert!(deg <= 8);
+        let ex = [8 - deg, m[0], m[1], m[2], m[3]];
+        let mut prod: P5 = HashMap::from([([0u8; 5], 1u64)]);
+        for (j, &e) in ex.iter().enumerate() {
+            if e > 0 {
+                prod = p5_mul(&prod, &pw[j][e as usize], p, muls);
+            }
+        }
+        for (ci, comp) in comps.iter().enumerate() {
+            let Some(&c) = comp.get(&m) else { continue };
+            for (pm, pc) in &prod {
+                let key = [pm[1], pm[2], pm[3], pm[4]]; // y0 = 1
+                let e = out[ci].entry(key).or_insert(0);
+                *e = (*e + c * pc) % p;
+                *muls += 1;
+            }
+        }
+    }
+    for o in out.iter_mut() {
+        o.retain(|_, v| *v != 0);
+    }
+    out
+}
+
+/// Numbers of 1-, 2- and 3-point multisets of the factor base summing to r.
+fn short_decomps(curve: &Curve4, fb: &[(u64, Pt4)], r: &Pt4) -> [usize; 3] {
+    let idx: HashMap<Pt4, Vec<usize>> =
+        fb.iter()
+            .enumerate()
+            .fold(HashMap::new(), |mut m, (i, (_, pt))| {
+                m.entry(*pt).or_default().push(i);
+                m
+            });
+    let n1 = idx.get(r).map(|v| v.len()).unwrap_or(0);
+    let mut n2 = 0;
+    for i in 0..fb.len() {
+        if let Some(js) = idx.get(&curve.sub(r, &fb[i].1)) {
+            n2 += js.iter().filter(|&&j| j >= i).count();
+        }
+    }
+    let mut n3 = 0;
+    for i in 0..fb.len() {
+        for j in i..fb.len() {
+            let need = curve.sub(r, &curve.add(&fb[i].1, &fb[j].1));
+            if let Some(ks) = idx.get(&need) {
+                n3 += ks.iter().filter(|&&k| k >= j).count();
+            }
+        }
+    }
+    [n1, n2, n3]
+}
+
+#[allow(clippy::too_many_arguments)]
+fn solve_inf(
+    curve: &Curve4,
+    h: &SymmetrisedS5,
+    fb: &[(u64, Pt4)],
+    r: &Pt4,
+    x0: &E4,
+    u: &E4,
+    label: &str,
+    transform: Option<&[[u64; 5]; 5]>,
+    seed: u64,
+) -> String {
+    let f = &curve.f;
+    let p = f.p;
+    let t0 = Instant::now();
+    let before = f.muls();
+    let comps0 = h.weil_restrict(f, &r.x);
+    let weil = f.muls() - before;
+    let mut tf_muls = 0u64;
+    let comps: Vec<HashMap<[u8; 4], u64>> = match transform {
+        Some(a) => projective_transform(&comps0, a, p, &mut tf_muls),
+        None => comps0.to_vec(),
+    };
+    let mut st = QuarticSolve::default();
+    let opts = PlainOptions {
+        chains: true,
+        sparsest: true,
+    };
+    let mut rng = StdRng::seed_from_u64(seed);
+    let sols = solve_system4_with(&comps, opts, 8, 29, p, &mut rng, &mut st, false, None, None);
+    st.weil_muls += weil;
+    st.close_public();
+    let total = st.total_muls + tf_muls;
+    let ms = t0.elapsed().as_secs_f64() * 1e3;
+    let mut solver: HashSet<[u64; 4]> = HashSet::new();
+    let mut at_inf = 0usize;
+    let n_e = sols.as_ref().map(|s| s.len()).unwrap_or(0);
+    if let Some(ys) = &sols {
+        for y in ys {
+            let e: Option<[u64; 4]> = match transform {
+                None => Some(*y),
+                Some(a) => {
+                    let v: [u64; 5] = core::array::from_fn(|j| {
+                        (a[j][0] + (1..5).map(|k| a[j][k] * y[k - 1] % p).sum::<u64>()) % p
+                    });
+                    if v[0] == 0 {
+                        at_inf += 1;
+                        None
+                    } else {
+                        let iv = inv_mod(v[0], p);
+                        Some(core::array::from_fn(|i| v[i + 1] * iv % p))
+                    }
+                }
+            };
+            if let Some(e) = e {
+                // self-check: a mapped-back solution satisfies the original system
+                for c in comps0.iter() {
+                    let val = c.iter().fold(0u64, |acc, (m, v)| {
+                        let mut t = *v;
+                        for k in 0..4 {
+                            t = t * pow_mod(e[k], m[k] as u64, p) % p;
+                        }
+                        (acc + t) % p
+                    });
+                    assert_eq!(val, 0, "solution does not satisfy the original system");
+                }
+                if let Some(ts) = split_brute(&e, p) {
+                    let lifts = ts
+                        .iter()
+                        .all(|&t| f.is_square(&curve.rhs(&f.add(x0, &f.scale(u, t)))));
+                    if lifts {
+                        solver.insert(ts);
+                    }
+                }
+            }
+        }
+    }
+    let oracle = mitm(curve, fb, r);
+    let short = short_decomps(curve, fb, r);
+    let mut sv: Vec<_> = solver.iter().collect();
+    sv.sort();
+    format!(
+        "{{\"kind\":\"inf\",{label},\"transform\":{},\"solved\":{},\"outcome\":\"{}\",\"rows\":{},\"cols\":{},\"pivots\":{},\"dim\":{},\"total_muls\":{total},\"transform_muls\":{tf_muls},\"solver_muls\":{},\"e_solutions\":{n_e},\"at_infinity\":{at_inf},\"solver_decomps\":{},\"oracle_decomps\":{},\"match\":{},\"short1\":{},\"short2\":{},\"short3\":{},\"decomps\":\"{:?}\",\"wall_ms\":{ms:.0}}}",
+        transform.is_some(),
+        sols.is_some(),
+        st.outcome.replace('"', "'"),
+        st.rows,
+        st.cols,
+        st.pivots,
+        st.dim,
+        st.total_muls,
+        solver.len(),
+        oracle.len(),
+        solver == oracle,
+        short[0],
+        short[1],
+        short[2],
+        sv
+    )
+}
+
 // ── summarizer (PROTOCOL rules K1–K3 and A1's M1) ────────────────────────
 
 fn jrows(path: &str) -> Vec<serde_json::Value> {
@@ -760,6 +993,7 @@ fn main() {
     let mut only_arm: Option<String> = None;
     let mut only_curve: Option<usize> = None;
     let mut only_failing = false;
+    let mut inf = false;
     let mut i = 0;
     while i < args.len() {
         match args[i].as_str() {
@@ -789,6 +1023,7 @@ fn main() {
                 only_curve = Some(args[i].parse().unwrap())
             }
             "--only-decomposable" => only_failing = true,
+            "--inf" => inf = true,
             o => panic!("unknown {o}"),
         }
         i += 1;
@@ -901,6 +1136,44 @@ fn main() {
                 if only_failing && mitm(&curve, fb, r).is_empty() {
                     continue;
                 }
+                if inf {
+                    let lab = format!("\"p\":{p},\"curve\":{ci},\"arm\":\"{arm}\",\"target\":\"{name}\",\"fb_points\":{}", fb.len());
+                    let row1 = solve_inf(
+                        &curve,
+                        h,
+                        fb,
+                        r,
+                        &x0,
+                        &u,
+                        &format!("{lab},\"set\":\"R1\""),
+                        None,
+                        0xdec0 + ci as u64,
+                    );
+                    eprintln!("{row1}");
+                    writeln!(fh, "{row1}").unwrap();
+                    let mut arng = StdRng::seed_from_u64(
+                        0x9150
+                            + ci as u64 * 31
+                            + name.len() as u64
+                            + if arm == "conj" { 0 } else { 7 },
+                    );
+                    let a5 = random_gl5(p, &mut arng);
+                    let row2 = solve_inf(
+                        &curve,
+                        h,
+                        fb,
+                        r,
+                        &x0,
+                        &u,
+                        &format!("{lab},\"set\":\"R2\""),
+                        Some(&a5),
+                        0xdec0 + ci as u64,
+                    );
+                    eprintln!("{row2}");
+                    writeln!(fh, "{row2}").unwrap();
+                    fh.flush().unwrap();
+                    continue;
+                }
                 for &md in &macdegs {
                     let label = if macdegs == [29] {
                         format!("\"p\":{p},\"curve\":{ci},\"arm\":\"{arm}\",\"target\":\"{name}\",\"fb_points\":{}", fb.len())
@@ -929,6 +1202,57 @@ fn main() {
                         ),
                         29,
                     );
+                    writeln!(fh, "{row2}").unwrap();
+                    fh.flush().unwrap();
+                }
+            }
+        }
+        if inf {
+            // R3: targets planted as 3-point sums, from a separate stream
+            let mut prng = StdRng::seed_from_u64(0x3f1a_7e00 + ci as u64);
+            for (arm, x0, u, h, fb) in [
+                ("conj", cx0, cu, &h_conj, &fb_conj),
+                ("std", E4::ZERO, E4::ONE, &h_std, &fb_std),
+            ] {
+                for k in 0..2 {
+                    let mut r = Pt4::INF;
+                    let mut pts = vec![];
+                    for _ in 0..3 {
+                        let i = prng.gen_range(0..fb.len());
+                        pts.push(fb[i].0);
+                        r = curve.add(&r, &fb[i].1);
+                    }
+                    pts.sort();
+                    if r.inf {
+                        continue;
+                    }
+                    let lab = format!("\"p\":{p},\"curve\":{ci},\"arm\":\"{arm}\",\"target\":\"planted3_{k}{:?}\",\"fb_points\":{}", pts, fb.len());
+                    let row1 = solve_inf(
+                        &curve,
+                        h,
+                        fb,
+                        &r,
+                        &x0,
+                        &u,
+                        &format!("{lab},\"set\":\"R3\""),
+                        None,
+                        0xdec0 + ci as u64,
+                    );
+                    eprintln!("{row1}");
+                    writeln!(fh, "{row1}").unwrap();
+                    let a5 = random_gl5(p, &mut prng);
+                    let row2 = solve_inf(
+                        &curve,
+                        h,
+                        fb,
+                        &r,
+                        &x0,
+                        &u,
+                        &format!("{lab},\"set\":\"R3\""),
+                        Some(&a5),
+                        0xdec0 + ci as u64,
+                    );
+                    eprintln!("{row2}");
                     writeln!(fh, "{row2}").unwrap();
                     fh.flush().unwrap();
                 }
