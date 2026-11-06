@@ -1288,6 +1288,178 @@ fn summarize_inf(inf_rows: &str, a1_rows: &str, main_rows: &str, out: &str, clai
     print!("{md}");
 }
 
+/// `--summarize-a2 <a2 rows> <inf rows> <out dir> [claimed]`: Amendment A2's
+/// rule M3 and the Q2 re-check; writes A2_SUMMARY.md, a2_summary.json and
+/// validator-report-a2.json (pins both row files).
+fn summarize_a2(a2_rows: &str, inf_rows: &str, out: &str, claimed: Option<&str>) {
+    use sha2::{Digest, Sha256};
+    use std::fmt::Write as _;
+    let a2 = jrows(a2_rows);
+    let inf = jrows(inf_rows);
+    let a2s: Vec<&serde_json::Value> = a2.iter().filter(|r| s(r, "kind") == "inf").collect();
+    let first = |c: u64, arm: &str, t: &str| {
+        inf.iter()
+            .find(|r| {
+                s(r, "kind") == "inf"
+                    && b(r, "transform")
+                    && u(r, "curve") == c
+                    && s(r, "arm") == arm
+                    && s(r, "target") == t
+            })
+            .map(|r| u(r, "dim"))
+    };
+    let mut targets: Vec<(u64, String, String)> = vec![];
+    for r in &a2s {
+        let k = (
+            u(r, "curve"),
+            s(r, "arm").to_string(),
+            s(r, "target").to_string(),
+        );
+        if !targets.contains(&k) {
+            targets.push(k);
+        }
+    }
+    let mut md = String::new();
+    let mut tab = String::new();
+    let mut verdicts = vec![];
+    let mut vals: Vec<(String, f64)> = vec![];
+    let mut q2_bad = 0usize;
+    let mut control_ok = true;
+    for (c, arm, t) in &targets {
+        let d0 = first(*c, arm, t).expect("first-A row for this target");
+        let rows: Vec<_> = a2s
+            .iter()
+            .filter(|r| u(r, "curve") == *c && s(r, "arm") == arm && s(r, "target") == t)
+            .collect();
+        let dims: Vec<u64> = rows.iter().map(|r| u(r, "dim")).collect();
+        for r in &rows {
+            if !b(r, "match") {
+                q2_bad += 1;
+            }
+            writeln!(
+                tab,
+                "| {c} | {arm} | {t} | {} | {} | {} | {} | {}/{} | {:.4e} | {} |",
+                u(r, "a_index"),
+                u(r, "a_seed"),
+                u(r, "dim"),
+                u(r, "at_infinity"),
+                u(r, "solver_decomps"),
+                u(r, "oracle_decomps"),
+                u(r, "total_muls") as f64,
+                s(r, "outcome")
+            )
+            .unwrap();
+        }
+        let short_name = t.split('[').next().unwrap();
+        let verdict = if d0 == 4096 {
+            let ok = dims.iter().all(|&d| d == 4096);
+            control_ok &= ok;
+            format!(
+                "control (first A gave 4,096): A_j dims {dims:?}, {}",
+                if ok { "all 4,096" } else { "NOT all 4,096" }
+            )
+        } else if dims.iter().any(|&d| d == 4096) {
+            "chart-dependent: some A_j reaches 4,096".to_string()
+        } else if dims.iter().all(|&d| d == d0) {
+            "chart-independent: every A_j gives the first A's dimension".to_string()
+        } else {
+            "mixed: dimensions differ, none reaches 4,096".to_string()
+        };
+        vals.push((
+            format!("a2_c{c}_{arm}_{short_name}_min_dim"),
+            *dims.iter().min().unwrap() as f64,
+        ));
+        vals.push((
+            format!("a2_c{c}_{arm}_{short_name}_max_dim"),
+            *dims.iter().max().unwrap() as f64,
+        ));
+        verdicts.push(format!("curve {c} {arm} {t}: first A dim {d0}; {verdict}"));
+    }
+    vals.push(("a2_solves".into(), a2s.len() as f64));
+    vals.push(("a2_q2_violations".into(), q2_bad as f64));
+    writeln!(md, "# Amendment A2: fresh random charts (coded rule M3)\n").unwrap();
+    writeln!(
+        md,
+        "- **Q2 re-check** (solver = oracle on every A2 solve): **{}** ({q2_bad} violations)",
+        if q2_bad == 0 { "PASS" } else { "FAIL" }
+    )
+    .unwrap();
+    writeln!(
+        md,
+        "- **Control** (`planted3_1` stays at 4,096): **{}**\n\nM3:\n",
+        if control_ok { "PASS" } else { "FAIL" }
+    )
+    .unwrap();
+    for v in &verdicts {
+        writeln!(md, "- {v}").unwrap();
+    }
+    writeln!(md, "\n| curve | arm | target | j | A seed | dim | at ∞ | solver/oracle | total_muls | outcome |\n|--:|:--|:--|--:|--:|--:|--:|--:|--:|:--|\n{tab}").unwrap();
+    std::fs::create_dir_all(out).unwrap();
+    std::fs::write(format!("{out}/A2_SUMMARY.md"), &md).unwrap();
+    std::fs::write(
+        format!("{out}/a2_summary.json"),
+        format!(
+            "{{\"Q2\":{},\"control\":{control_ok},\"values\":{{{}}}}}\n",
+            q2_bad == 0,
+            vals.iter()
+                .map(|(k, v)| format!("\"{k}\":{v}"))
+                .collect::<Vec<_>>()
+                .join(",")
+        ),
+    )
+    .unwrap();
+    let sha = |p: &str| hex::encode(Sha256::digest(std::fs::read(p).unwrap()));
+    let claimed_map: HashMap<String, f64> = claimed
+        .map(|p| {
+            std::fs::read_to_string(p)
+                .unwrap()
+                .lines()
+                .filter_map(|l| {
+                    let t = l.trim().trim_end_matches(',');
+                    let (k, v) = t.split_once(':')?;
+                    Some((
+                        k.trim().trim_matches('"').to_string(),
+                        v.trim().parse().ok()?,
+                    ))
+                })
+                .collect()
+        })
+        .unwrap_or_default();
+    let mut status_ok = claimed.is_some();
+    let heads: Vec<String> = vals
+        .iter()
+        .filter_map(|(k, v)| {
+            let c = claimed_map.get(k)?;
+            if c != v {
+                status_ok = false;
+            }
+            Some(format!(
+                "    {{\"name\": \"{k}\", \"claimed\": {c}, \"recomputed\": {v}, \"rel_tol\": 0}}"
+            ))
+        })
+        .collect();
+    if heads.is_empty() {
+        status_ok = false;
+    }
+    let rel = |p: &str| {
+        std::path::Path::new(p)
+            .file_name()
+            .unwrap()
+            .to_string_lossy()
+            .to_string()
+    };
+    std::fs::write(
+        format!("{out}/validator-report-a2.json"),
+        format!(
+            "{{\n  \"schema\": \"validator-report\",\n  \"status\": \"{}\",\n  \"study\": \"research/lift_dense_conjugate_pair_infinity_20261106\",\n  \"recomputed_by\": {{\"tool\": \"examples/conjpair_decomp_cost.rs --summarize-a2\"}},\n  \"note\": \"Producer-run recompute of Amendment A2 from the pinned rows; unsigned, so independence is not established.\",\n  \"raw_data\": [\n    {{\"path\": \"{}\", \"sha256\": \"{}\"}},\n    {{\"path\": \"{}\", \"sha256\": \"{}\"}}\n  ],\n  \"headline\": [\n{}\n  ]\n}}\n",
+            if status_ok { "pass" } else { "fail" },
+            rel(a2_rows), sha(a2_rows), rel(inf_rows), sha(inf_rows), heads.join(",\n")
+        ),
+    )
+    .unwrap();
+    print!("{md}");
+}
+
 /// Amendment A2: transformed solves at Macaulay degree 29 with `n` fresh
 /// matrices A_j (j = 1..n), each from its own seed, independent of the R2/R3
 /// draws. Only targets with a decomposition into at most 3 factor-base points.
@@ -1339,6 +1511,15 @@ fn a2_solves(
 
 fn main() {
     let args: Vec<String> = env::args().skip(1).collect();
+    if args.first().map(|s| s.as_str()) == Some("--summarize-a2") {
+        summarize_a2(
+            &args[1],
+            &args[2],
+            &args[3],
+            args.get(4).map(|s| s.as_str()),
+        );
+        return;
+    }
     if args.first().map(|s| s.as_str()) == Some("--summarize-inf") {
         summarize_inf(
             &args[1],
