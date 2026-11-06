@@ -15,7 +15,9 @@ fn mr(n: &BigUint) -> bool {
     if n < &two {
         return false;
     }
-    for p in [2u32, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53] {
+    for p in [
+        2u32, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53,
+    ] {
         let bp = BigUint::from(p);
         if n == &bp {
             return true;
@@ -31,7 +33,9 @@ fn mr(n: &BigUint) -> bool {
         d >>= 1;
         s += 1;
     }
-    'w: for a in [2u32, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53] {
+    'w: for a in [
+        2u32, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53,
+    ] {
         let mut x = BigUint::from(a).modpow(&d, n);
         if x == BigUint::one() || x == nm1 {
             continue;
@@ -241,7 +245,10 @@ fn main() {
             found += 1;
         }
         if found == 0 {
-            println!("{}\t{}\t{}\t-\t-\t-\t-\t-\t-\tno parameters found in {} tries", f.name, f.ubits, f.deg_p, tries);
+            println!(
+                "{}\t{}\t{}\t-\t-\t-\t-\t-\t-\tno parameters found in {} tries",
+                f.name, f.ubits, f.deg_p, tries
+            );
         }
     }
 }
