@@ -110,6 +110,16 @@ So any lower bound that matters must be on `d_F`, not `d_ff`.
 | any `n`-independent bound | **none proved** for the subspace factor base; HKYY §6 explain why: the big-field system is not zero-dimensional until the subspace constraint (degree `2^{n'}`) is added | — |
 | quasi-subfield variant: replace `V` by the roots of `X^{q^{n'}} − λ(X)`, `deg λ = q^{n'·α}` small | not a fall-degree bound at all: Thm 3.2 prices Rojas' resultant method, `m!·q^{n−n'm+n'}·Õ(m^{5.188}(3d)^{4.876 m²} + m q^{2n'})`, under a zero-dimensionality assumption; `RESEARCH_QUASI_SUBFIELD.md` shows the needed `λ` do not exist in the useful range | Huang–Kosters–Petit–Yeo–Yun, JMC 2020, Thm 3.2 |
 
+**Correction, 2026-11-06 (derived, not machine-checked; `[pcc:unverified]`).** The
+injective-projection hypothesis in the row above is not a real obstacle. A generic
+coordinate `t = X_1 + c·X_2` separates every pair of the at most `s` solutions unless
+`c` is one of at most `C(s,2)` bad values. An `F_{2^n}`-linear change of the `X`
+descends to an invertible `F_2`-linear change of variables, which in characteristic 2
+fixes the field-equation ideal. The last fall degree is invariant under such a change
+(HKYY Prop. 2.6). So the bound `d_{F'} ≤ 4n' + 6` holds whenever `C(s,2) < 2^n` (and
+the ideal is radical), without the projection condition. It stays linear in `n'`, so no
+cost estimate moves. Details: `research/dreg_guess_scaling_20261106/SURVEY.md` §1.
+
 So the only *proved* upper bounds on the last fall degree of the actual
 index-calculus system are linear in `n`, i.e. they certify nothing better
 than exponential cost. The subexponential claims (Petit–Quisquater
