@@ -420,6 +420,31 @@ mod tests {
         assert_eq!(r.coordinate_sets, expected.coordinate_sets);
     }
     #[test]
+    fn two_variable_chart_matches_the_certified_saturated_orbit_system() {
+        let c = FastCurve::new("aps-existing-cubic-development", 103, 0, 5, 97);
+        let g = c.point(2, 42);
+        let q = c.mul(Some(g), 17).unwrap();
+        let seeds = sample_base(&c, g, q, &[1, 1, 1], Labels::Guaranteed, 20261026, 1000).unwrap();
+        let b = orbit_base(&c, g, q, &seeds, 56, 35).unwrap();
+        let plan = line_chart(&c, g, q, &b, Some((56, 35))).unwrap();
+        assert_eq!(plan.len(), 1);
+        assert_eq!(plan[0].system.variables(), 2);
+        let actual =
+            visit_plan(&plan, 103, 24, Duration::from_secs(10), None, |_| Ok(false)).unwrap();
+        let original = build_pruned_line_system(&c, g, q, &b, 56, 35).unwrap();
+        assert_eq!(original.variables(), 3);
+        let expected = solve_system(&original, 103, 24, Duration::from_secs(10)).unwrap();
+        assert!(actual.complete && expected.complete);
+        assert!(!actual.coordinate_sets.is_empty());
+        assert_eq!(actual.coordinate_sets, expected.coordinate_sets);
+        let recovered = RecoveryContext::new(&c, g, q, &b)
+            .unwrap()
+            .recover_observed(&actual.coordinate_sets, |_| {})
+            .unwrap()
+            .unwrap();
+        assert_eq!(recovered.logarithm, 17);
+    }
+    #[test]
     fn unequal_profiles_and_each_guessed_variable_preserve_all_roots() {
         let (c, g, q) = curve();
         let b = sample_base(&c, g, q, &[1, 3, 2], Labels::Random, 31, 1000).unwrap();

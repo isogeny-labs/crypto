@@ -96,6 +96,21 @@ fn actual_chart_and_unequal_hybrids_pass_independent_full_set_reader() {
     }
 }
 #[test]
+fn unequal_four_point_profiles_restore_each_original_guessed_coordinate() {
+    for encoding in ["expanded4", "split4"] {
+        for guess in ["0", "1", "2", "3"] {
+            check(&produced(
+                &[
+                    ("encoding", encoding),
+                    ("subset_profile", "1,2,1,2"),
+                    ("guess", guess),
+                ],
+                20261026,
+            ));
+        }
+    }
+}
+#[test]
 fn growth_keeps_coverage_chain_and_rejects_partial_old_certificate() {
     let r = produced(
         &[
