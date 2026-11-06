@@ -5,6 +5,10 @@
 //!
 //!   cargo run --release --example conjpair_decomp_cost -- \
 //!       --p 29 --curves 2 --out <rows.jsonl> [--aa]
+//! Infinity continuation: `--inf --chart-seed 1 --only-target common0 --no-r3`.
+//! Seed zero retains the original chart stream. Output paths are write-once;
+//! `--skip-existing FILE` resumes a complete JSONL prefix, appending when
+//! FILE and `--out` identify the same path and copying history otherwise.
 //!
 //! The solver is called through its public API only; this example builds the
 //! curve with full 2-torsion, the factor-base lines, the symmetrised S₅ of
@@ -14,8 +18,11 @@
 
 use std::collections::{HashMap, HashSet};
 use std::env;
-use std::fs::File;
+use std::path::Path;
+
 use std::io::Write;
+
+mod conjpair_resume;
 use std::time::Instant;
 
 use crypto_lib::cryptanalysis::gaudry_quartic::{
@@ -593,6 +600,7 @@ fn solve_inf(
     transform: Option<&[[u64; 5]; 5]>,
     seed: u64,
     macaulay_degree: u8,
+    chart_seed: u64,
 ) -> String {
     let f = &curve.f;
     let p = f.p;
@@ -674,7 +682,7 @@ fn solve_inf(
     let short = short_decomps(curve, fb, r);
     let mut sv: Vec<_> = solver.iter().collect();
     sv.sort();
-    format!(
+    let row = format!(
         "{{\"kind\":\"inf\",{label},\"transform\":{},\"solved\":{},\"outcome\":\"{}\",\"rows\":{},\"cols\":{},\"pivots\":{},\"dim\":{},\"total_muls\":{total},\"transform_muls\":{tf_muls},\"solver_muls\":{},\"e_solutions\":{n_e},\"at_infinity\":{at_inf},\"solver_decomps\":{},\"oracle_decomps\":{},\"match\":{},\"short1\":{},\"short2\":{},\"short3\":{},\"decomps\":\"{:?}\",\"wall_ms\":{ms:.0}}}",
         transform.is_some(),
         sols.is_some(),
@@ -691,7 +699,13 @@ fn solve_inf(
         short[1],
         short[2],
         sv
-    )
+    );
+    let mut record: serde_json::Value = serde_json::from_str(&row).unwrap();
+    record["macaulay_degree"] = macaulay_degree.into();
+    record["chart_seed"] = if transform.is_some() { chart_seed } else { 0 }.into();
+    record["solver_seed"] = seed.into();
+    record["chart_matrix"] = serde_json::to_value(transform).unwrap();
+    record.to_string()
 }
 
 // ── summarizer (PROTOCOL rules K1–K3 and A1's M1) ────────────────────────
@@ -1318,8 +1332,11 @@ fn main() {
     let mut only_curve: Option<usize> = None;
     let mut only_failing = false;
     let mut inf = false;
+    let mut chart_seed = 0u64;
+    let mut only_target: Option<String> = None;
+    let mut no_r3 = false;
+    let mut resume_path: Option<String> = None;
     // Resume: skip solves already recorded in this rows file.
-    let mut done_keys: HashSet<String> = HashSet::new();
     let mut i = 0;
     while i < args.len() {
         match args[i].as_str() {
@@ -1350,23 +1367,35 @@ fn main() {
             }
             "--only-decomposable" => only_failing = true,
             "--inf" => inf = true,
+            "--chart-seed" => {
+                i += 1;
+                chart_seed = args[i].parse().unwrap();
+            }
+            "--only-target" => {
+                i += 1;
+                only_target = Some(args[i].clone());
+            }
+            "--no-r3" => no_r3 = true,
             "--skip-existing" => {
                 i += 1;
-                if let Ok(t) = std::fs::read_to_string(&args[i]) {
-                    for l in t.lines().filter(|l| l.contains("\"kind\":\"inf\"")) {
-                        let v: serde_json::Value = serde_json::from_str(l).unwrap();
-                        done_keys.insert(format!(
-                            "{}|{}|{}|{}|{}",
-                            v["curve"], v["arm"], v["target"], v["set"], v["transform"]
-                        ));
-                    }
-                }
+                resume_path = Some(args[i].clone());
             }
             o => panic!("unknown {o}"),
         }
         i += 1;
     }
-    let mut fh = File::create(&out).unwrap();
+    assert!(
+        inf || (chart_seed == 0 && only_target.is_none() && !no_r3 && resume_path.is_none()),
+        "chart selection/resume flags require --inf"
+    );
+    let (mut fh, done_keys) =
+        conjpair_resume::open_output(Path::new(&out), resume_path.as_deref().map(Path::new))
+            .expect("refused unsafe output/resume");
+    let completed = |ci: usize, arm: &str, name: &str, set: &str, transformed: bool, md: u8| {
+        let row = serde_json::json!({"p":p,"curve":ci,"arm":arm,"target":name,"set":set,
+            "transform":transformed,"macaulay_degree":md,"chart_seed":chart_seed});
+        done_keys.contains(&conjpair_resume::key(&row).unwrap())
+    };
     let mut rng = StdRng::seed_from_u64(0x20261106_c0de);
     let mut done = 0;
     let mut ci = 0;
@@ -1463,7 +1492,7 @@ fn main() {
                 targets.push((format!("common{ti}"), *t));
             }
             for (name, r) in &targets {
-                if r.inf {
+                if r.inf || only_target.as_deref().is_some_and(|t| t != name) {
                     continue;
                 }
                 if only_arm.as_deref().is_some_and(|a| a != arm)
@@ -1476,14 +1505,14 @@ fn main() {
                 }
                 if inf && macdegs != [29] {
                     let lab = format!("\"p\":{p},\"curve\":{ci},\"arm\":\"{arm}\",\"target\":\"{name}\",\"fb_points\":{}", fb.len());
-                    let mut arng = StdRng::seed_from_u64(
-                        0x9150
-                            + ci as u64 * 31
-                            + name.len() as u64
-                            + if arm == "conj" { 0 } else { 7 },
-                    );
+                    let mut arng = StdRng::seed_from_u64(conjpair_resume::chart_stream_seed(
+                        chart_seed, ci, name, arm,
+                    ));
                     let a5 = random_gl5(p, &mut arng);
                     for &md in &macdegs {
+                        if completed(ci, arm, name, "A1", true, md) {
+                            continue;
+                        }
                         let row = solve_inf(
                             &curve,
                             h,
@@ -1495,6 +1524,7 @@ fn main() {
                             Some(&a5),
                             0xdec0 + ci as u64,
                             md,
+                            chart_seed,
                         );
                         eprintln!("{row}");
                         writeln!(fh, "{row}").unwrap();
@@ -1504,50 +1534,44 @@ fn main() {
                 }
                 if inf {
                     let lab = format!("\"p\":{p},\"curve\":{ci},\"arm\":\"{arm}\",\"target\":\"{name}\",\"fb_points\":{}", fb.len());
-                    let k1 = format!("{ci}|\"{arm}\"|\"{name}\"|\"R1\"|false");
-                    let k2 = format!("{ci}|\"{arm}\"|\"{name}\"|\"R2\"|true");
-                    if done_keys.contains(&k1) && done_keys.contains(&k2) {
-                        continue;
+                    if !completed(ci, arm, name, "R1", false, 29) {
+                        let row1 = solve_inf(
+                            &curve,
+                            h,
+                            fb,
+                            r,
+                            &x0,
+                            &u,
+                            &format!("{lab},\"set\":\"R1\""),
+                            None,
+                            0xdec0 + ci as u64,
+                            29,
+                            chart_seed,
+                        );
+                        eprintln!("{row1}");
+                        writeln!(fh, "{row1}").unwrap();
                     }
-                    assert!(
-                        !done_keys.contains(&k1) && !done_keys.contains(&k2),
-                        "partial pair: rerun both"
-                    );
-                    let row1 = solve_inf(
-                        &curve,
-                        h,
-                        fb,
-                        r,
-                        &x0,
-                        &u,
-                        &format!("{lab},\"set\":\"R1\""),
-                        None,
-                        0xdec0 + ci as u64,
-                        29,
-                    );
-                    eprintln!("{row1}");
-                    writeln!(fh, "{row1}").unwrap();
-                    let mut arng = StdRng::seed_from_u64(
-                        0x9150
-                            + ci as u64 * 31
-                            + name.len() as u64
-                            + if arm == "conj" { 0 } else { 7 },
-                    );
+                    let mut arng = StdRng::seed_from_u64(conjpair_resume::chart_stream_seed(
+                        chart_seed, ci, name, arm,
+                    ));
                     let a5 = random_gl5(p, &mut arng);
-                    let row2 = solve_inf(
-                        &curve,
-                        h,
-                        fb,
-                        r,
-                        &x0,
-                        &u,
-                        &format!("{lab},\"set\":\"R2\""),
-                        Some(&a5),
-                        0xdec0 + ci as u64,
-                        29,
-                    );
-                    eprintln!("{row2}");
-                    writeln!(fh, "{row2}").unwrap();
+                    if !completed(ci, arm, name, "R2", true, 29) {
+                        let row2 = solve_inf(
+                            &curve,
+                            h,
+                            fb,
+                            r,
+                            &x0,
+                            &u,
+                            &format!("{lab},\"set\":\"R2\""),
+                            Some(&a5),
+                            0xdec0 + ci as u64,
+                            29,
+                            chart_seed,
+                        );
+                        eprintln!("{row2}");
+                        writeln!(fh, "{row2}").unwrap();
+                    }
                     fh.flush().unwrap();
                     continue;
                 }
@@ -1584,7 +1608,7 @@ fn main() {
                 }
             }
         }
-        if inf && macdegs == [29] {
+        if inf && macdegs == [29] && !no_r3 {
             // R3: targets planted as 3-point sums, from a separate stream
             let mut prng = StdRng::seed_from_u64(0x3f1a_7e00 + ci as u64);
             for (arm, x0, u, h, fb) in [
@@ -1605,49 +1629,109 @@ fn main() {
                     }
                     let lab = format!("\"p\":{p},\"curve\":{ci},\"arm\":\"{arm}\",\"target\":\"planted3_{k}{:?}\",\"fb_points\":{}", pts, fb.len());
                     let tname = format!("planted3_{k}{:?}", pts);
-                    let k1 = format!("{ci}|\"{arm}\"|\"{tname}\"|\"R3\"|false");
-                    let k2 = format!("{ci}|\"{arm}\"|\"{tname}\"|\"R3\"|true");
-                    if done_keys.contains(&k1) && done_keys.contains(&k2) {
-                        // keep the random stream identical: the transform matrix is drawn here
-                        let _ = random_gl5(p, &mut prng);
+                    // Consume the legacy matrix draw even when filtering or resuming.
+                    let legacy_a = random_gl5(p, &mut prng);
+                    let a5 = if chart_seed == 0 {
+                        legacy_a
+                    } else {
+                        let mut arng = StdRng::seed_from_u64(
+                            chart_seed
+                                .wrapping_add(ci as u64 * 31)
+                                .wrapping_add(k as u64)
+                                .wrapping_add(if arm == "conj" { 0 } else { 7 }),
+                        );
+                        random_gl5(p, &mut arng)
+                    };
+                    if only_arm.as_deref().is_some_and(|a| a != arm)
+                        || only_curve.is_some_and(|c| c != ci)
+                        || only_target.as_deref().is_some_and(|t| t != tname)
+                        || (only_failing && mitm(&curve, fb, &r).is_empty())
+                    {
                         continue;
                     }
-                    assert!(
-                        !done_keys.contains(&k1) && !done_keys.contains(&k2),
-                        "partial pair: rerun both"
-                    );
-                    let row1 = solve_inf(
-                        &curve,
-                        h,
-                        fb,
-                        &r,
-                        &x0,
-                        &u,
-                        &format!("{lab},\"set\":\"R3\""),
-                        None,
-                        0xdec0 + ci as u64,
-                        29,
-                    );
-                    eprintln!("{row1}");
-                    writeln!(fh, "{row1}").unwrap();
-                    let a5 = random_gl5(p, &mut prng);
-                    let row2 = solve_inf(
-                        &curve,
-                        h,
-                        fb,
-                        &r,
-                        &x0,
-                        &u,
-                        &format!("{lab},\"set\":\"R3\""),
-                        Some(&a5),
-                        0xdec0 + ci as u64,
-                        29,
-                    );
-                    eprintln!("{row2}");
-                    writeln!(fh, "{row2}").unwrap();
+                    if !completed(ci, arm, &tname, "R3", false, 29) {
+                        let row1 = solve_inf(
+                            &curve,
+                            h,
+                            fb,
+                            &r,
+                            &x0,
+                            &u,
+                            &format!("{lab},\"set\":\"R3\""),
+                            None,
+                            0xdec0 + ci as u64,
+                            29,
+                            chart_seed,
+                        );
+                        eprintln!("{row1}");
+                        writeln!(fh, "{row1}").unwrap();
+                    }
+                    if !completed(ci, arm, &tname, "R3", true, 29) {
+                        let row2 = solve_inf(
+                            &curve,
+                            h,
+                            fb,
+                            &r,
+                            &x0,
+                            &u,
+                            &format!("{lab},\"set\":\"R3\""),
+                            Some(&a5),
+                            0xdec0 + ci as u64,
+                            29,
+                            chart_seed,
+                        );
+                        eprintln!("{row2}");
+                        writeln!(fh, "{row2}").unwrap();
+                    }
                     fh.flush().unwrap();
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod chart_tests {
+    use super::*;
+
+    #[test]
+    fn transformed_polynomial_matches_homogeneous_evaluation() {
+        let p = 29;
+        let mut rng = StdRng::seed_from_u64(17);
+        let a = random_gl5(p, &mut rng);
+        let polynomial = HashMap::from([([0, 0, 0, 0], 3), ([2, 1, 0, 0], 7), ([0, 0, 0, 8], 11)]);
+        let mut muls = 0;
+        let transformed = projective_transform(&[polynomial.clone()], &a, p, &mut muls);
+        for y in [[0, 0, 0, 0], [1, 2, 3, 4], [28, 8, 7, 19]] {
+            let v: [u64; 5] = core::array::from_fn(|j| {
+                (a[j][0] + (1..5).map(|k| a[j][k] * y[k - 1] % p).sum::<u64>()) % p
+            });
+            let expected = polynomial.iter().fold(0, |acc, (m, c)| {
+                let mut term =
+                    c * pow_mod(v[0], 8 - m.iter().map(|x| *x as u64).sum::<u64>(), p) % p;
+                for k in 0..4 {
+                    term = term * pow_mod(v[k + 1], m[k] as u64, p) % p;
+                }
+                (acc + term) % p
+            });
+            let actual = transformed[0].iter().fold(0, |acc, (m, c)| {
+                let term = (0..4).fold(*c, |t, k| t * pow_mod(y[k], m[k] as u64, p) % p);
+                (acc + term) % p
+            });
+            assert_eq!(actual, expected);
+        }
+    }
+
+    #[test]
+    fn independently_seeded_charts_are_recordably_distinct() {
+        let matrix = |offset| {
+            let mut rng = StdRng::seed_from_u64(conjpair_resume::chart_stream_seed(
+                offset, 1, "common0", "conj",
+            ));
+            random_gl5(29, &mut rng)
+        };
+        assert_eq!(matrix(0), matrix(0));
+        assert_ne!(matrix(0), matrix(1));
+        assert_ne!(matrix(1), matrix(2));
     }
 }

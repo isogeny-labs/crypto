@@ -1,0 +1,110 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261106-radix-depth-followup",
+  "title": "Qualify radix grading at depths 10 through 12",
+  "created": "2026-11-06",
+  "authors": [
+    "Codex research lane"
+  ],
+  "status": "blocked",
+  "status_note": "Prepared only; no lease or scientific job. Reconnect existing checkpoint/AWS capability, bind a command image, and verify live budget before admission.",
+  "blocked_on": [
+    "problem:problems/arity-completion-launch-gates.md shared checkpoint/command-route dependency",
+    "note:Frozen source/image/binary binding and live shared-budget headroom required"
+  ],
+  "links": {
+    "lead": "research/lead_followup_20261106/PROTOCOL.md",
+    "notes": [
+      "research/lead_followup_20261106/README.md"
+    ],
+    "prs": []
+  },
+  "question": "Qualify radix grading at depths 10 through 12?",
+  "decision_value": "The chart panel distinguishes chart exclusion from a persistent quotient deficit while checking complete decompositions. The radix panel tests whether the counted-work reduction persists on larger identical systems. Failed/capped cells remain unknown and direct the next implementation step.",
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "blob": "c68cd744320562ed1e9d281a00c5faa91164fb98"
+  },
+  "code": {
+    "repo": "crypto",
+    "branch": "codex/conjugate-radix-followup-20261106",
+    "commit": null,
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--example",
+        "conjpair_decomp_cost",
+        "--example",
+        "pkm_tower_pilot"
+      ],
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--locked",
+        "--manifest-path",
+        "research/lead_followup_20261106/native/Cargo.toml"
+      ]
+    ]
+  },
+  "resources": {
+    "cpus": 4,
+    "ram_gb": 64,
+    "disk_gb": 20,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Finite deadline bound, not a forecast. Shared proposed USD 20 ceiling across both cards including all build/idle/failure work; live allowance required."
+  },
+  "run": {
+    "argv": [
+      "bash",
+      "research/lead_followup_20261106/worker.sh",
+      "radix",
+      "{out}/payload"
+    ],
+    "env": {},
+    "timeout_per_shard_s": 36000
+  },
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "lead-followup-raw/v1",
+    "verify": [],
+    "land": "research/lead_followup_20261106"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "unconfigured",
+    "tasks": [
+      "XP-20261106-radix-depth-followup"
+    ],
+    "ttl_s": 39600,
+    "env": {
+      "name": "crypto-rust",
+      "recipe": "Pinned UID-1000 command image containing exact binaries, bash and coreutils; admission receipt required."
+    },
+    "exec": {
+      "cpus": 4,
+      "memory_mb": 65536,
+      "timeout_s": 36000,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261106-radix-depth-followup"
+    },
+    "funding": {
+      "units": 131072,
+      "rationale": "Proposed lower seed tier for bounded continuations of existing owner-requested leads; unleased and unpublished."
+    },
+    "notes": "No automatic retry or spending authorization beyond current live lab budget; share ceiling with sibling follow-up card."
+  }
+}
