@@ -659,7 +659,14 @@ tracks, the same row is $+45.71$ bits, and the measured conversion
 $K=4$--$16$ rho steps per touch raises both (\S\ref{sec:ladder2}). With the
 hybrid, the row is $+8.43$ bits if the number of guesses stays flat in $\ell$
 and $+58.27$ bits if it grows linearly; one value of $\ell$ cannot separate
-them, and the run at $\ell=8$ that would did not complete. In no scenario does
+them. Pre-registered $m=3$ runs at $(n,\ell)=(22,8)$ have since completed.
+Four guessed variables bring all four unsatisfiable draws back to degree 4,
+and one three-variable set fails on three of the four draws. That makes the
+count 0 at $\ell=6$, about 1 at $\ell=7$ and at most 4 at $\ell=8$, which
+still does not decide whether it stays bounded or grows. At the priced
+$m=4$, $\ell=33$ cell the hybrid beats degree 5 only if the count is at most
+6 (\art{research/dreg_closure_guess_20261022/},
+\art{research/dreg_closure_guess3_20261023/}). In no scenario does
 the row go below the degree-4 floor of $+7.62$ bits, so the route does not
 reach rho.
 
@@ -673,7 +680,7 @@ planted decomposition in any of 96 cells with $\beta\ge0.20$ at 24--56 bits,
 with positive controls passing below, so the $\beta=1/4$ ceiling stands at
 multiplicity $\le3$.
 
-\paragraph{A third family approaches rho: the Joux--Vitse cover.} The
+\paragraph{A third family crosses rho: the Joux--Vitse cover.} The
 genus-3 cover of $E(\FF_{p^6})$ over $\FF_{p^2}$ with Nagao decompositions
 (full rational 2-torsion; a weak class, not prime-order curves) ran at
 $p=53$--$1009$, three seeds per prime, every logarithm checked. The gap to
@@ -685,8 +692,10 @@ the cover arm does not emit its unpriced F4 and Wiedemann work, so it cannot be
 ranked under the band; and rho cannot be run at $p\ge503$ (subgroups of
 $2^{52}$--$2^{58}$), so those ratios use the pooled rho constant $S=1.344$
 measured at $p\le251$. If that constant kept falling at its (insignificant)
-point trend, the ratio at $p=1009$ would be about 20\% higher. A separate sieve arm on the same cover read far lower ratios, but its
-comparisons are withheld by review (\S\ref{sec:transfer}).
+point trend, the ratio at $p=1009$ would be about 20\% higher. A separate sieve arm on the same cover was later measured against a
+matched negation rho at $p=1511$ and validated. It is $0.0065\times$ rho
+($155\times$ $[125,184]$ below it), and the order holds across the band
+(\S\ref{sec:transfer}).
 
 \paragraph{Covers: censuses and a repriced counterfactual.} Measuring the
 cost of one relation trial (a Cantor addition plus a smoothness test) on a

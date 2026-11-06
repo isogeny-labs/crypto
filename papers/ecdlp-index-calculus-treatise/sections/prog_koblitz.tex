@@ -324,6 +324,18 @@ In order:
   closest cold Koblitz figure at $n=83$ and is still above rho; the two
   pipelines' numbers are not comparable with each other.
 \end{itemize}
+\paragraph{An instrument correction (24 October).} Every Weil-descent engine
+the programme ran at $n=83$ had silently returned ``proved UNSAT'' on
+planted relations: matrix F4 and F5, inherited F4, F6-IC and its pair
+index, crossbred, three SAT-descent encodings and MQ-FES. The field table
+is truncated to one 64-bit word, so earlier $n=83$ engine refutations are
+void. The descent builders now refuse such a field, under a regression
+test. After the fix, chained-$\Sem3$ full-width SAT is the only decomposer
+that runs at $n=83$. It decides only $m=2$, at 17.3\,s per public query,
+which projects to $2^{75.3}\times$ rho. The $m=4$ root finder solves the
+complete logarithm in 175--189\,s against strong rho's 1.509\,s, which is
+$116$--$125\times$ rho (\art{research/n83_msweep_20261024/}).
+
 The open pull requests at the time of writing include further $n=83$ work
 ($m=4$ queries on a retained 16{,}627-column base, AWS replays, shared-binary
 panels); none is on \texttt{main} (the programme record~\cite{icprogram2026}).
