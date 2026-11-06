@@ -272,10 +272,24 @@ jobs:
           test "${#artifact_sessions[@]}" -gt 0
           python3 tools/artifacts/artifacts.py pull --jobs 16 "${artifact_sessions[@]}"
       - name: Committed sessions are evidence and are never edited
-        if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+        if: github.event_name == 'pull_request' || github.event_name == 'merge_group' || github.event_name == 'schedule'
         env:
           BASE: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}
+          EVENT: ${{ github.event_name }}
         run: |
+          if [ "$EVENT" = schedule ]; then
+            # The weekly lane diffs against main as of the previous weekly
+            # run (7 days back on first-parent history), so a pointer-only
+            # edit that selected no PR audit is still caught within a week
+            # (sheriff SHF-20261106-a114e7, PPX-5).
+            git fetch --no-tags --shallow-since="$(date -u -d '9 days ago' +%Y-%m-%d)" origin "$GITHUB_SHA"
+            BASE=$(git rev-list -1 --first-parent --before="$(date -u -d '7 days ago' +%Y-%m-%dT%H:%M:%SZ)" "$GITHUB_SHA")
+            if [ -z "$BASE" ]; then
+              echo "::error::weekly lane: no main commit 7 days back to diff committed sessions against" >&2
+              exit 1
+            fi
+            echo "weekly lane: committed sessions diffed against $BASE"
+          fi
           git fetch --no-tags --depth=1 origin "$BASE"
           mapfile -t sessions < "$RUNNER_TEMP/ecbench-sessions.txt"
           # Every session directory by schema, plus any session.json or

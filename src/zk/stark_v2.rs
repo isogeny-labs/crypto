@@ -591,6 +591,12 @@ struct ProverKnobs {
     /// Add 1 to every value of FRI layer 1 (re-committed): an
     /// inconsistent intermediate layer.
     fri_shift_layer1: bool,
+    /// Keep every FRI layer but the last honest and replace only the
+    /// final layer with copies of its first value (re-committed, the
+    /// transcript re-derived): the final-layer root check and every
+    /// intermediate fold pass, and only the last-layer fold comparison
+    /// can reject.
+    fri_const_final: bool,
 }
 
 /// **Prove** the AIR is satisfied by an executed trace.  The prover
@@ -733,12 +739,19 @@ fn prove_with(air: &AirV2, config: &StarkConfig, knobs: &ProverKnobs) -> Option<
     if !final_size.is_power_of_two() || final_size > lde_size {
         return None;
     }
-    let fri = if knobs.fri_zero_tail || knobs.fri_shift_layer1 {
+    let fri = if knobs.fri_zero_tail || knobs.fri_shift_layer1 || knobs.fri_const_final {
         let honest = fri_commit_to(fri_input, &h_lde, &mut transcript.clone(), final_size);
         let mut layers = honest.layers;
+        if knobs.fri_const_final {
+            let last = layers.last_mut()?;
+            let c = last[0].clone();
+            last.iter_mut().for_each(|v| *v = c.clone());
+        }
         for (k, layer) in layers.iter_mut().enumerate().skip(1) {
             for v in layer.iter_mut() {
-                if knobs.fri_zero_tail {
+                if knobs.fri_const_final {
+                    break;
+                } else if knobs.fri_zero_tail {
                     *v = BigUint::from(0u32);
                 } else if k == 1 {
                     *v = fr_add(v, &one);
@@ -888,7 +901,7 @@ fn check_gated(
             return Err(Reject::Composition);
         }
         // ... and FRI's first layer is the DEEP combination of the
-        // opened f(x) and Comp(x) with the OOD claims.
+        // opened f(x), f(ω·x) and Comp(x) with the OOD claims.
         let deep = deep_at(x, &fx.1, &f_wx.1, &comp.1, &z, ood, &coeffs);
         let (fri_pos, fri_open) = &proof.fri_openings[i];
         if *fri_pos != p
@@ -1414,9 +1427,12 @@ mod tests {
         absorb_composition_draw_z(&mut t, &proof.composition_commit, air.n, l)
     }
 
-    /// Does the prover's FRI end in a constant final layer, i.e. is the
-    /// committed FRI input of degree `< n` (the prover keeps the layers)?
-    fn fri_input_low_degree(p: &StarkProofV2) -> bool {
+    /// Does the prover's FRI end in a constant final layer (the prover
+    /// keeps the layers)?  For an honest prover this says the committed
+    /// FRI input has degree `< n`; for a cheating prover that rewrites
+    /// later layers (`fri_zero_tail`, `fri_const_final`) it says only
+    /// that the last layer is constant, not that layer 0 is low degree.
+    fn fri_final_layer_constant(p: &StarkProofV2) -> bool {
         let last = p.fri.layers.last().unwrap();
         last.iter().all(|v| *v == last[0])
     }
@@ -1465,7 +1481,7 @@ mod tests {
                 })
                 .collect();
             assert_eq!(proof.ood.comp_z, Poly::interpolate(&pts).evaluate(&z));
-            assert!(fri_input_low_degree(&proof));
+            assert!(fri_final_layer_constant(&proof));
         }
     }
 
@@ -1523,7 +1539,7 @@ mod tests {
             let p = prove_with(&a, &c, &k).unwrap();
             // Control: the claim passes the AIR check at z; only the
             // DEEP quotient's degree exposes it.
-            assert!(!fri_input_low_degree(&p), "DEEP quotient low degree");
+            assert!(!fri_final_layer_constant(&p), "DEEP quotient low degree");
             assert_eq!(check(&a, &c, &p), Err(Reject::Fri(FriReject::FinalLayer)));
         }
     }
@@ -1542,7 +1558,7 @@ mod tests {
         // A wrong Comp(z) leaves a pole in the DEEP quotient too, but the
         // AIR check at z fires first.
         let p = prove_with(&air, &cfg, &knobs(|k| k.ood_wrong_comp_z = true)).unwrap();
-        assert!(!fri_input_low_degree(&p));
+        assert!(!fri_final_layer_constant(&p));
         assert_eq!(check(&air, &cfg, &p), Err(Reject::OodAir));
         for k in [
             knobs(|k| k.composition_zero = true),
@@ -1551,7 +1567,7 @@ mod tests {
             let p = prove_with(&air, &cfg, &k).unwrap();
             // Control: the committed composition and its DEEP quotient
             // are low degree, so only the AIR check at z rejects.
-            assert!(fri_input_low_degree(&p), "control {k:?}");
+            assert!(fri_final_layer_constant(&p), "control {k:?}");
             assert_eq!(check(&air, &cfg, &p), Err(Reject::OodAir), "{k:?}");
         }
         let fa = false_output_air();
@@ -1624,7 +1640,7 @@ mod tests {
         let cfg = StarkConfig::fast();
         let fa = false_output_air();
         let p = prove(&fa, &cfg).unwrap();
-        assert!(!fri_input_low_degree(&p));
+        assert!(!fri_final_layer_constant(&p));
         assert_eq!(
             check(&fa, &cfg, &p),
             Err(Reject::Fri(FriReject::FinalLayer))
@@ -1635,32 +1651,37 @@ mod tests {
             knobs(|k| k.fri_on_composition = true),
         ] {
             let p = prove_with(&air, &cfg, &k).unwrap();
-            assert!(fri_input_low_degree(&p), "control {k:?}");
+            assert!(fri_final_layer_constant(&p), "control {k:?}");
             assert_eq!(check(&air, &cfg, &p), Err(Reject::Deep), "{k:?}");
         }
         for c in [StarkConfig::fast(), StarkConfig::default()] {
             let p = prove_with(&air, &c, &knobs(|k| k.trace_degree_n = true)).unwrap();
-            assert!(!fri_input_low_degree(&p));
+            assert!(!fri_final_layer_constant(&p));
             assert_eq!(check(&air, &c, &p), Err(Reject::Fri(FriReject::FinalLayer)));
             let unadjusted = knobs(|k| {
                 k.trace_degree_n = true;
                 k.skip_degree_adjust = true;
             });
             let p = prove_with(&air, &c, &unadjusted).unwrap();
-            assert!(fri_input_low_degree(&p), "control: bound < n alone passes");
+            assert!(fri_final_layer_constant(&p), "control: bound < n alone passes");
             assert_eq!(check(&air, &c, &p), Err(Reject::Deep));
         }
     }
 
     // FRI gates isolated (sheriff case SHF-20261028-0f3f64, crypto-
     // autoresearcher research/sheriff/SHF-20261028-0f3f64, findings
-    // S2N-1 and S2N-2): each proof passes every gate but the one named.
+    // S2N-1 and S2N-2; SHF-20261106-a114e7 ZKX-1): each proof below is
+    // built at the size-1-per-gate standard, so it passes every gate but
+    // the one its test asserts, except where a test says otherwise (the
+    // β/2 over-folded proof of the depth-gate test also fails the
+    // final-layer root check once the depth gate is off).
 
-    /// S2N-1: fold consistency.  The false statement 1 -> 12345 with its
-    /// real (not low-degree) DEEP table as FRI layer 0, so the DEEP gate
-    /// passes, and all-zero layers after it, so the final-layer root
-    /// check passes; only fold consistency rejects.  Also a true
-    /// statement whose intermediate layer 1 is shifted by 1.
+    /// S2N-1: intermediate fold consistency.  The false statement
+    /// 1 -> 12345 with its real (not low-degree) DEEP table as FRI layer
+    /// 0, so the DEEP gate passes, and all-zero layers after it, so the
+    /// final-layer root check passes; only the intermediate fold
+    /// comparison rejects.  Also a true statement whose intermediate
+    /// layer 1 is shifted by 1.
     #[test]
     fn rejects_fri_fold_inconsistency() {
         let cfg = StarkConfig::fast();
@@ -1671,13 +1692,58 @@ mod tests {
         // constant (zero) final layer.
         assert_eq!(p.fri.layer_roots[0], honest.fri.layer_roots[0]);
         assert_eq!(p.fri.layer_roots.len(), honest.fri.layer_roots.len());
-        assert!(fri_input_low_degree(&p) && !fri_input_low_degree(&honest));
+        assert!(fri_final_layer_constant(&p) && !fri_final_layer_constant(&honest));
         assert_eq!(p.fri.final_constant, big(0));
-        assert_eq!(check(&fa, &cfg, &p), Err(Reject::Fri(FriReject::Fold)));
+        assert_eq!(
+            check(&fa, &cfg, &p),
+            Err(Reject::Fri(FriReject::FoldLayer))
+        );
         let air = two_boundary_air();
         let p = prove_with(&air, &cfg, &knobs(|k| k.fri_shift_layer1 = true)).unwrap();
-        assert!(fri_input_low_degree(&p), "control: final layer untouched");
-        assert_eq!(check(&air, &cfg, &p), Err(Reject::Fri(FriReject::Fold)));
+        assert!(fri_final_layer_constant(&p), "control: final layer untouched");
+        assert_eq!(
+            check(&air, &cfg, &p),
+            Err(Reject::Fri(FriReject::FoldLayer))
+        );
+    }
+
+    /// ZKX-1 (SHF-20261106-a114e7, the residual of S2N-1): the last-layer
+    /// fold comparison alone.  The false statement 1 -> 12345 with every
+    /// FRI layer honest except the final one, which is replaced by
+    /// copies of a constant.  Layer 0 is the real DEEP table (the DEEP
+    /// gate passes), the folding challenges are unchanged (they depend
+    /// only on the honest roots before the last), every intermediate
+    /// fold is honest, and the final root is the constant-layer root,
+    /// so only the comparison of the last fold with the final constant
+    /// can reject.  Deleting that comparison makes `check` return
+    /// `Ok(())` here and this test fail.
+    #[test]
+    fn rejects_fri_last_fold_against_final_constant() {
+        let cfg = StarkConfig::fast();
+        let fa = false_output_air();
+        let honest = prove(&fa, &cfg).unwrap();
+        let p = prove_with(&fa, &cfg, &knobs(|k| k.fri_const_final = true)).unwrap();
+        let folds = honest.fri.layer_roots.len() - 1;
+        assert!(folds >= 1);
+        // Controls: same depth; every root before the last is the honest
+        // one (so the same α challenges and the same layer 0); the honest
+        // final layer is not constant, the forged one is; and the forged
+        // final root is exactly the root of a constant layer.
+        assert_eq!(p.fri.layer_roots.len(), honest.fri.layer_roots.len());
+        assert_eq!(p.fri.layer_roots[..folds], honest.fri.layer_roots[..folds]);
+        assert!(fri_final_layer_constant(&p) && !fri_final_layer_constant(&honest));
+        let last = p.fri.layers.last().unwrap();
+        let constant_root = MerkleTree::from_leaves(
+            &last.iter().map(reduced_bytes).collect::<Vec<_>>(),
+        )
+        .root();
+        assert_eq!(p.fri.layer_roots[folds], constant_root);
+        assert_eq!(p.fri.final_constant, last[0]);
+        assert_eq!(
+            check(&fa, &cfg, &p),
+            Err(Reject::Fri(FriReject::FoldFinal))
+        );
+        assert!(!verify(&fa, &cfg, &p));
     }
 
     /// S2N-2: the verifier-fixed FRI depth (log₂ n folds).  The false

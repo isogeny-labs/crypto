@@ -222,9 +222,11 @@ invalid-curve attack on an unvalidated ECDH oracle
 (\art{research/p224_attack/}). The CryptoPro-B and CP6-782 work is
 constructive: GLV-2 scalar multiplication $1.25$--$1.50\times$ faster via
 isogeny-chain endomorphisms (\art{research/cryptopro_b_chain_sweep_20261006/},
-\art{research/endo_native_bench_20261016/}). Cheon's attack with auxiliary
-inputs beats rho from 24 bits up, but only for the DLP with auxiliary inputs
-(\art{research/torsion_auxiliary_inputs_20260918/}).
+\art{research/endo_native_bench_20261016/}). For the DLP with auxiliary
+inputs only, Cheon's $p-1$ algorithm with fixed-base comb tables beats rho
+from 24 bits up (24--48 bits, three seeds per size) and the naive variant
+from 32 bits; the $p+1$ variant is slower than rho at every measured size
+(24--40 bits) (\art{research/torsion_auxiliary_inputs_20260918/}).
 
 \section{Literature claims that did not survive}
 
