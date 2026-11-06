@@ -1101,3 +1101,12 @@ F4_F2_MAX_ROWS=2000000 F4_F2_MAX_COLS=200000 \
   difference (p = 1.0)
   (`research/dreg_second_link_guess_20261105/RESULTS.md`). Unverified
   assertion until a pcc verdict exists.
+
+## One invariant guess per link at m = 4, degree 3 (2026-11-06)
+
+- At m = 4, ℓ = 5, with k = 10 guesses, placing them on the three links'
+  swap invariants makes degree 3 refute on 1,888 of 8,192 branches, against
+  1,312 for raw guesses in the same places. By draw the split is 4 against 3,
+  so the registered two-sided verdict is no detected difference (p = 1.0)
+  (`research/dreg_m4_link_guess_d3_20261106/RESULTS.md`). Unverified
+  assertion until a pcc verdict exists.
