@@ -685,7 +685,7 @@ jobs:
           if-no-files-found: error
 
   exhaustive_replay:
-    if: ${{ always() && !cancelled() && needs.replay_plan.result == 'success' }}
+    if: ${{ always() && !cancelled() && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && needs.replay_plan.result == 'success' }}
     needs: [replay_plan, harness]
     runs-on: ubuntu-24.04
     timeout-minutes: 350
@@ -937,7 +937,7 @@ jobs:
     if: ${{ !github.event.pull_request.draft && (github.event_name == 'pull_request' || github.event_name == 'merge_group' || github.event_name == 'push') && needs.scope.outputs.ecbench_replay != 'false' }}
     needs: [scope, harness]
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
