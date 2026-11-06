@@ -78,6 +78,18 @@ native append-only ledger stay private [pcc:unverified].
 
 ## Remaining admission
 
+Native statement `PCC-20261106-55ef66` pins the source-linked
+[report checks](validation/report-checks.json) and
+[development-policy receipt](validation/development-policy.json). It has
+**unverified** standing. The report's three pages were inspected individually;
+Markdown/TeX semantic text agrees after removing only table-layout commands
+from a private reader copy. The actual rendered TeX/PDF was not changed by
+that comparison. Scoped formatting, actionlint, twelve administrative custody
+tests and local size/artifact policies passed. Whole-repository curve-name
+lint stopped on a missing tracked sparse file; the unchanged native
+added-line checker separately found no task findings. This is not a complete
+whole-repository validation or a hosted-check result [pcc:unverified].
+
 No source checkpoint, profiler session, performance pilot or EKS experiment
 is asserted here. The source-only gate needs its actual bounded native
 admission and hosted outcome. Complete pricing/accounting, independent
