@@ -159,6 +159,17 @@ So the plan should be built only when the search space is large relative to
 the network: off is better through d = 5 here, and at d = 6 pruning already
 wins at a small threshold. A size-based rule, not a blanket switch.
 
+*A held-out rule for the pruning plan.* From the measurements above, build the
+plan only when $2^"free bits" dot 8 >= "edges"$. Tested on the crate's own
+`decomposition_network` (the derived last slot since \#3522) and on the general
+construction, including sizes not used to choose it (d = #R.at("derived_last_point").at("pruning_rule").at("held_out_d").map(str).join(", ")):
+#let PR = R.at("derived_last_point").at("pruning_rule")
+the rule picks the cheaper option in #PR.at("correct") of #PR.at("n") cases, is never more than
+#calc.round((PR.at("worst_rule_vs_best") - 1) * 100, digits: 1)% above the best, and counts agree with and without the plan in every case
+(*#PR.at("all_counts_agree")*). Where it switches the plan off on the crate's network it saves
+#PR.at("crate_gain_when_off").map(x => str(calc.round(x, digits: 2)) + "×").join(", "). At cryptographic sizes the rule always builds the
+plan, so it only helps small instances.
+
 *Dropping a duplicated validity check ("lean").* `input_point` validates
 A#sub[1] (canonical coordinates, on the curve), and `point_add` then validates
 −A#sub[1], which holds exactly when A#sub[1] is valid (same x; y made canonical by

@@ -21,6 +21,7 @@ $B report native_runs                                                      > nat
 |---|---|
 | `sizes P...` | decomposition-network edges, vertices, max degree, interface bits per prime |
 | `counts P...` | `Counter::count` vs a brute-force decomposition count; backend; charged steps |
+| `rulecheck P...` | held-out check of the pruning-plan size rule on the crate and general networks |
 | `lean P...` | lean A1 vs combined derived network, pruning on/off, brute force, checked witness |
 | `overhead P...`, `prunetest P...` | fixed per-call cost split (pruning plan vs rest); pruning on/off crossover at larger d |
 | `counts2 P...` | original vs derived-last-point variants (A1-only interface, hash-first) at four thresholds: counts, steps, checked witnesses, pinned overhead |
@@ -69,6 +70,13 @@ Each line of output is one JSON object. Curves are the first prime-order
   its pruning (off costs it 1.47–35.6×). `prunetest` locates the crossover: off
   still wins at d = 5 (1.17×, 1.03×), while at d = 6 pruning wins at a small
   threshold (0.85). A size-based rule, not a blanket switch. [pcc:unverified]
+* **Held-out pruning-plan rule.** `rulecheck` tests "build the plan only
+  when 2^(free bits) · 8 ≥ edges" on the crate's own `decomposition_network`
+  (derived last slot since #3522) and the general network, including d = 7, 8
+  which were not used to choose it: right in 11 of 12 cases, never more than
+  1% above the best, counts agree in every case; where it switches the plan
+  off on the crate's network it saves 1.28–3.84×. At cryptographic sizes it
+  always builds the plan. [pcc:unverified]
 * **Lean A1 (duplicate validity check removed).** `point_add` already
   validates −A1, which holds exactly when A1 is valid, so A1 can come from raw
   input words instead of `input_point` (15–16% fewer edges). `lean`: 32

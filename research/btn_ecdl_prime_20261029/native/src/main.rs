@@ -556,6 +556,50 @@ fn lean(p: u64) -> Res<Vec<Value>> {
     Ok(out)
 }
 
+/// Held-out check of a pruning-plan rule: build the plan only when
+/// 2^(free input bits) * 8 >= edges.  Counts each network with pruning on and
+/// off (counts must agree) and records whether the rule picks the cheaper.
+/// Networks: the crate's `decomposition_network` (derived last slot since
+/// #3522) and the general construction via the semantic-cut entry point.
+fn rulecheck(p: u64) -> Res<Vec<Value>> {
+    let mut m = meter(u64::MAX / 2);
+    let (c, a, b, _) = curve_for(p, &mut m)?;
+    let s = hash_prime(p, &mut m)?;
+    let pts = affine_points(&c, p, a, b);
+    let general_ok = p <= 13; // 4d free bits: keep the unpruned general count tractable
+    let mut out = Vec::new();
+    for threshold in [s.clone(), &s >> 3u8] {
+        let fb = bases(&c, &s, &threshold, &mut m)?;
+        let mut nets = vec![("crate", reduction::decomposition_network(&c, &fb, &pts[0], &mut m).map_err(e)?)];
+        if general_ok {
+            nets.push(("general", reduction::decomposition_network_with_semantic_cut(&c, &fb, &pts[0], &mut m).map_err(e)?.0));
+        }
+        for (name, net) in nets {
+            let free = net.input_bit_count().unwrap_or(0);
+            let rule_on = free >= 64 || (1u128 << free) * 8 >= net.edge_count() as u128;
+            let mut rec = json!({ "p": p, "d": 64 - p.leading_zeros(), "threshold": threshold.to_string(),
+                "network": name, "free_input_bits": free, "edges": net.edge_count(), "rule_builds_plan": rule_on });
+            let mut counts = Vec::new();
+            for pruning in [true, false] {
+                let mut cm = meter(500_000_000_000);
+                let mut counter = Counter::default();
+                counter.functional_pruning = pruning;
+                let n = counter.count(&net, &vec![None; net.edge_count()], &mut cm).map_err(e)?;
+                counts.push(n.clone());
+                rec[if pruning { "pruning" } else { "no_pruning" }] = json!({ "count": n.to_string(), "steps": cm.used });
+            }
+            let (on, off) = (rec["pruning"]["steps"].as_u64().unwrap(), rec["no_pruning"]["steps"].as_u64().unwrap());
+            rec["agree"] = json!(counts[0] == counts[1]);
+            rec["cheaper"] = json!(if on <= off { "pruning" } else { "no_pruning" });
+            rec["rule_correct"] = json!(rule_on == (on <= off));
+            rec["rule_vs_best"] = json!((if rule_on { on } else { off }) as f64 / on.min(off) as f64);
+            println!("{rec}");
+            out.push(rec);
+        }
+    }
+    Ok(out)
+}
+
 fn solve(p: u64, seed: u64, xi: u64) -> Res<Value> {
     let mut m = meter(200_000_000_000);
     let (c, _, _, r) = curve_for(p, &mut m)?;
@@ -785,6 +829,18 @@ fn report(dir: &str) -> Res<Value> {
                 "gain_large_threshold_min": fmin(&lg), "gain_large_threshold_max": fmax(&lg),
                 "note": "small = tau <= s/4, large = tau >= s/2; gain = best(hash-first) / best(lean) over pruning on/off" })
     };
+    let rule = read_jsonl(&format!("{dir}/rulecheck.jsonl")).unwrap_or_default();
+    let rule_summary = json!({
+        "rule": "build the functional pruning plan only when 2^(free input bits) * 8 >= edges",
+        "n": rule.len(),
+        "correct": rule.iter().filter(|r| r["rule_correct"] == json!(true)).count(),
+        "all_counts_agree": !rule.is_empty() && rule.iter().all(|r| r["agree"] == json!(true)),
+        "worst_rule_vs_best": rule.iter().filter_map(|r| r["rule_vs_best"].as_f64()).fold(0.0, f64::max),
+        "held_out_d": rule.iter().filter(|r| u(r, "d") >= 7).map(|r| u(r, "d")).collect::<std::collections::BTreeSet<_>>(),
+        "crate_gain_when_off": rule.iter().filter(|r| r["network"] == json!("crate") && r["rule_builds_plan"] == json!(false))
+            .map(|r| r["pruning"]["steps"].as_f64().unwrap_or(0.0) / r["no_pruning"]["steps"].as_f64().unwrap_or(1.0)).collect::<Vec<_>>(),
+        "rows": rule,
+    });
     let derived = json!({
         "n": c2.len(),
         "counts_equal_and_match_brute_force": !c2.is_empty() && c2.iter().all(|r| r["original"]["ok"] == json!(true) && r["derived"]["ok"] == json!(true)),
@@ -809,6 +865,7 @@ fn report(dir: &str) -> Res<Value> {
         "overhead": read_jsonl(&format!("{dir}/overhead.jsonl")).unwrap_or_default(),
         "prune_crossover": read_jsonl(&format!("{dir}/prunetest.jsonl")).unwrap_or_default(),
         "lean": lean_summary,
+        "pruning_rule": rule_summary,
         "free_bits": c2.iter().map(|r| (u(r, "d"), r["original"]["free_input_bits"].as_u64().unwrap_or(0), r["derived"]["free_input_bits"].as_u64().unwrap_or(0))).collect::<std::collections::BTreeSet<_>>().into_iter().map(|(d, o, v)| json!({"d": d, "original": o, "derived": v})).collect::<Vec<_>>(),
         "rows": c2,
         "eccp131_log2_assignments": { "original": 4 * 131, "derived": 2 * 131 },
@@ -886,6 +943,7 @@ fn main() {
         Some("overhead") => nums(2).into_iter().try_for_each(|p| overhead(p).map(|r| println!("{r}"))),
         Some("prunetest") => nums(2).into_iter().try_for_each(|p| prunetest(p).map(|_| ())),
         Some("lean") => nums(2).into_iter().try_for_each(|p| lean(p).map(|_| ())),
+        Some("rulecheck") => nums(2).into_iter().try_for_each(|p| rulecheck(p).map(|_| ())),
         Some("solve") => {
             let n = nums(2);
             solve(n[0], n[1], n[2]).map(|r| println!("{r}"))
