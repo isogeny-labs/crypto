@@ -917,5 +917,78 @@
     }
    ]
   }
+ },
+ "k41_reconciliation": {
+  "_comment": "Why pipeline/rho at k41 reads 14.072 in README section 3 and 12.931 from band means. Values copied from the comparison JSONs; the band prices G - C + w(U + n_C) (band.rs), dropping C, the GAE a pinned calibration row put on native work, at w = 0; calibration.json has a row koblitz/K_0 / GF(2^41) and none for GF(2^47), 2^53, 2^57, 2^59, 2^61. On k47, k57, k53, k59, k61 the comparison means equal the band means.",
+  "rho_pipeline": {
+   "comparison_id": "ECC1h78e1350f5b35",
+   "a_mean_s_rho": 0.15394999384463992,
+   "b_mean_s_pipeline": 2.1663906149760837,
+   "ops_ratio_b_over_a": 14.072040932735064,
+   "ops_ci95": [
+    11.029299523546227,
+    17.95420784337366
+   ],
+   "ops_ci_method": "linearised_t",
+   "band_weights": [
+    0.0,
+    0.1,
+    1.0
+   ],
+   "band_ratio_b_over_a": [
+    12.931455021600787,
+    14.06459034792846,
+    17.43621259470955
+   ],
+   "band_note": "point ratios of totals; rank only where the order holds at every weight"
+  },
+  "pipeline_descent": {
+   "comparison_id": "ECC1hc0af22207ad9",
+   "ops_ratio_b_over_a": 1.4713372976365833,
+   "band_ratio_b_over_a": [
+    1.601112840250111,
+    null,
+    null
+   ]
+  },
+  "band_file_mean_s_w0": {
+   "descent": 3.1874913130641658,
+   "pipeline": 1.990797420977679,
+   "pipeline71": 2.109092492090945,
+   "rho": 0.15394999384463992
+  },
+  "calibration_row": "koblitz/K_0 / GF(2^41)",
+  "sources": [
+   {
+    "repo": "crypto",
+    "path": "research/ic_planner_exhaustive_20261026/sessions/K-k41/comparisons/rho__pipeline.json",
+    "ref": "origin/main",
+    "blob": "345d0d0cb225c2ced9a45da98045d257b4f862a5"
+   },
+   {
+    "repo": "crypto",
+    "path": "research/ic_planner_exhaustive_20261026/sessions/K-k41/comparisons/pipeline__descent.json",
+    "ref": "origin/main",
+    "blob": "e7077167ba38027de038a0f56b791cdadeda8869"
+   },
+   {
+    "repo": "crypto",
+    "path": "research/ic_planner_exhaustive_20261026/analysis/band-K-k41.json",
+    "ref": "origin/main",
+    "blob": "be00cb4741ec456eafa1597b86fe0d6c49bcd6a2"
+   },
+   {
+    "repo": "crypto",
+    "path": "src/cryptanalysis/ecbench/band.rs",
+    "ref": "origin/main",
+    "blob": "b2a685ae74f7e92145ca014435adbd9e3310ce27"
+   },
+   {
+    "repo": "crypto",
+    "path": "docs/ic/calibration.json",
+    "ref": "origin/main",
+    "blob": "a758ad524639e5a38bc2d69281dcd57dbcde421e"
+   }
+  ]
  }
 }
