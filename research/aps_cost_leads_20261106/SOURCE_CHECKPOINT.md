@@ -57,6 +57,14 @@ artifact; no detailed host capsule is produced.
 
 ## Outcome and continuation
 
+The snapshot contains a deterministic local `.gitignore` that exposes only
+the selected source paths, its selection and that ignore file. This retains
+tracked lockfiles that the repository's general ignore rules would omit
+after copying. The helper still requires exact equality between the reviewed
+payload and the stock uploader's untracked-file enumeration. Repository
+ignore rules, the standard checkpoint script and all publication exclusions
+remain unchanged.
+
 Only normalized custody/gate receipts are retained as GitHub artifacts.
 The source archive, standard metadata, token and raw gate log are excluded
 from that artifact. A zero gate exit with the stock receipt records the

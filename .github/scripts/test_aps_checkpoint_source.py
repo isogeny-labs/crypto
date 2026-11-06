@@ -18,7 +18,7 @@ spec.loader.exec_module(custody)
 
 
 class CustodyTests(unittest.TestCase):
-    def repository(self, root, ledger_change=False, extra_manifest=False):
+    def repository(self, root, ledger_change=False, extra_manifest=False, ignored_source=False):
         def git(*args):
             return subprocess.check_output(["git", "-C", str(root), *args], text=True,
                                            stderr=subprocess.DEVNULL).strip()
@@ -26,7 +26,7 @@ class CustodyTests(unittest.TestCase):
         git("config", "user.name", "synthetic custody fixture")
         git("config", "user.email", "custody@example.invalid")
         git("remote", "add", "origin", "https://github.com/isogeny-labs/crypto.git")
-        for name, body in [(".gitignore", ".resume/\n"), ("pcc/ledger.jsonl", "synthetic baseline\n"),
+        for name, body in [(".gitignore", ".resume/\n**/Cargo.lock\n"), ("pcc/ledger.jsonl", "synthetic baseline\n"),
                            ("scripts/checkpoint.sh", "synthetic source; never executed\n")]:
             file = root / name
             file.parent.mkdir(parents=True, exist_ok=True)
@@ -41,6 +41,8 @@ class CustodyTests(unittest.TestCase):
         data = {custody.ADMISSION: json.dumps(admission),
                 custody.STUDY + "CHECKPOINT_RESUME.md": "synthetic SOURCE_COMMIT resume\n",
                 "src/cryptanalysis/f4_fp/reuse.rs": "synthetic source fixture\n"}
+        if ignored_source:
+            data["tools/aps-export/Cargo.lock"] = "synthetic tracked lockfile\n"
         files = []
         for name, body in data.items():
             file = root / name
@@ -56,6 +58,8 @@ class CustodyTests(unittest.TestCase):
         if ledger_change:
             (root / "pcc/ledger.jsonl").write_text("synthetic changed ledger\n")
         git("add", ".")
+        if ignored_source:
+            git("add", "-f", "tools/aps-export/Cargo.lock")
         git("commit", "-qm", "synthetic selected source")
         source = git("rev-parse", "HEAD")
         git("update-ref", "refs/remotes/origin/source", source)
@@ -202,6 +206,22 @@ class CustodyTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "native ledger differs"):
                 custody.prepare(root, source)
             self.assertFalse((root / custody.CAPTURE).exists())
+
+    def test_tracked_source_ignored_when_copied_still_enters_the_exact_snapshot(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source, _ = self.repository(root, ignored_source=True)
+            with patch.dict(os.environ, {"CHECKPOINT_UPLOAD_TOKEN": ""}):
+                value = custody.prepare(root, source)
+            self.assertEqual(value["source_files"], 4)
+            lock = custody.CAPTURE + "/tools/aps-export/Cargo.lock"
+            actual = subprocess.check_output(
+                ["git", "-C", str(root), "ls-files", "--others", "--exclude-standard"],
+                text=True).splitlines()
+            self.assertIn(lock, actual)
+            self.assertEqual((root / lock).read_bytes(),
+                             (root / "tools/aps-export/Cargo.lock").read_bytes())
+            self.assertFalse((root / custody.CAPTURE / "pcc").exists())
 
     def test_unpushed_history_is_refused_before_any_payload_is_created(self):
         with tempfile.TemporaryDirectory() as directory:

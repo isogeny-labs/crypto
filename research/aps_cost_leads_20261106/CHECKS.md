@@ -78,6 +78,16 @@ native append-only ledger stay private [pcc:unverified].
 
 ## Remaining admission
 
+The first hosted source-checkpoint job stopped in its exact-payload preflight;
+the standard gate was skipped and no upload/authentication outcome followed.
+The repository ignores copied nested lockfiles. The new regression reproduces
+that refusal, then all 13 custody cases pass after the snapshot receives
+exact path-specific ignore exceptions. Native statement
+`PCC-20261106-21c262` pins
+[this administrative repair](validation/source-custody-repair.json), standing
+**unverified**. The earlier 12-case receipt is preserved at its own source
+boundary; a new upload needs a fresh fenced admission [pcc:unverified].
+
 Native statement `PCC-20261106-55ef66` pins the source-linked
 [report checks](validation/report-checks.json) and
 [development-policy receipt](validation/development-policy.json). It has

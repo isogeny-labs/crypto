@@ -2,6 +2,19 @@
 
 ## Current authoring continuation
 
+PR3583 was opened regular and auto-merge off at source
+`89c9f5258f1f10a5c8ad4434a572b7f8dd9fcbd4`, tree
+`022013f87adc0fc120b051ec7fc031a4cd3f244b`. Its first source-only workflow
+failed the exact-payload preflight before the standard gate: a copied tracked
+lockfile became ignored. The actual completed job permitted early native
+release of its matching T10 capture fence; no transfer was running and the
+matching local capture flag was cleared before editing. A regression
+reproduced the refusal, then 13 custody tests passed after deterministic,
+path-specific capture-local ignore exceptions. Exact payload equality and
+all exclusions remain mandatory. Native statement `PCC-20261106-21c262`
+has unverified standing; see `validation/source-custody-repair.json`.
+Authentication and a later upload remain unobserved [pcc:unverified].
+
 The final native scratch-session driver completed at source `413a93`: eight
 new public tests, the existing four public APS and three bridge tests, ten
 example cases and strict final-target Rust 1.98/stable lints passed. The

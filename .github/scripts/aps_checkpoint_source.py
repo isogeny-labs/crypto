@@ -194,11 +194,18 @@ def prepare(root, source):
         dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(src, dest)
     shutil.copyfile(root / SELECTION, root / CAPTURE / "CHECKPOINT_SELECTION.json")
+    # A tracked source such as tools/aps-export/Cargo.lock can become ignored
+    # when copied into the untracked snapshot. Keep only the reviewed paths
+    # visible to the stock uploader, without changing repository ignore rules.
+    capture_names = {name for name, _ in files} | {"CHECKPOINT_SELECTION.json"}
+    ignore = ["# Exact reviewed source snapshot; payload closure is checked below.",
+              "!/**/", "!/.gitignore"] + ["!/" + name for name in sorted(capture_names)]
+    (root / CAPTURE / ".gitignore").write_text("\n".join(ignore) + "\n")
     resume = (root / STUDY / "CHECKPOINT_RESUME.md").read_text().replace("SOURCE_COMMIT", source)
     (root / ".resume").mkdir()
     (root / ".resume/RESUME.md").write_text(resume)
     actual = set(git(root, "ls-files", "--others", "--exclude-standard").splitlines())
-    expected = {CAPTURE + "/" + name for name, _ in files} | {CAPTURE + "/CHECKPOINT_SELECTION.json"}
+    expected = {CAPTURE + "/" + name for name in capture_names} | {CAPTURE + "/.gitignore"}
     require(actual == expected, "untracked payload differs from reviewed source capture")
     return {"schema": "aps.source-checkpoint-preflight/v1", "source_commit": source,
             "selection_sha256": digest(manifest_bytes), "source_files": len(files),
