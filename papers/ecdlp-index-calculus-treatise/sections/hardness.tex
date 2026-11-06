@@ -1,0 +1,903 @@
+\chapter{What index-calculus hardness rests on}\label{ch:hardness}
+
+Chapter~\ref{ch:falldegree} studied one quantity, the solving degree of the
+point-decomposition system, and showed that its first fall degree does not
+bound it. A complexity claim for elliptic-curve index calculus needs more
+than a degree. It needs a bounded solver cost, a decomposition yield with a
+known distribution, relations of sufficient rank, a usable geometry, an
+interface that no generic algorithm reproduces, and an end-to-end
+composition of all of these. Each of the subexponential claims in the
+literature discharges some of these obligations by proof and the rest by an
+assumption. This chapter records, assumption by assumption, what the
+programme proved, refuted, measured or left open between 2 and
+4~November~2026.
+
+The work falls into four kinds:
+\begin{itemize}
+\item a typed obligation chain and a reanalysis of committed evidence
+  (\art{research/ic_weak_assumptions_20261102/});
+\item exact measurements of six weak points on Weil-descent systems
+  (\art{research/ic_weakpoints_20261102/});
+\item exact censuses against five named heuristics
+  (\art{research/ecdlp_weakness_census_20261104/}) and Lean~4 theorems
+  aimed at the same nodes (\art{research/ecdlp_weakness_lean_20261104/},
+  \art{research/lean_attacks_20261102/},
+  \art{research/inside_gap_n4_20261102/});
+\item a claim graph of the hardness literature and a triage of its weak
+  points (\art{docs/ecdlp-hardness-corpus/WEAKNESS_TRIAGE.md}).
+\end{itemize}
+
+\paragraph{Standing.} None of this work is an ecbench session, a leaderboard
+row or a validated result. No validator report or replay certificate exists
+for any census or measurement below. Every measured number in this chapter
+is therefore an unverified assertion of its producer under the
+proof-carrying-claims rule; the census README marks its numbers
+\texttt{[pcc:unverified]}. The Lean results are stated with their exact
+formal status in \S\ref{sec:hd-lean}: ``kernel-checked'' is used only where
+a Lean kernel accepted the declaration and its source contains no
+\texttt{sorry}, \texttt{admit}, \texttt{native\_decide} or user axiom. The
+corpus records every internal theorem here as
+\texttt{proved\_internal\_unreviewed}: no external reviewer has read the
+statements against the literature they address. Nothing in this chapter
+changes a row of Tables~A--C, and none of it is a measured improvement of the
+index-calculus baseline.
+
+\section{Six serial obligations}\label{sec:hd-chain}
+
+The weak-assumption programme of 2~November
+(\art{research/ic_weak_assumptions_20261102/README.md}; literature pass and
+reanalysis of committed records, no new run) writes an index-calculus
+security argument as a chain of six obligations. The chain is serial in the
+sense that matters: failure of any one edge invalidates the complexity
+claim, whatever the others show. Its machine-readable form,
+\texttt{obligations.json}, is checked by \texttt{audit.py}, a fail-closed
+gate that refuses to promote a route while any field is missing. It covers
+naive prime-field Semaev, generic pair tables, Kummer (PKM) towers, the
+proposed arity-three hybrid solver, Wagner filters, the hashed-base tensor
+route (\S\ref{sec:pt-tensor}) and xedni. The route-by-route reading for prime
+fields is in \S\ref{sec:pg-obligations}; Table~\ref{tab:hd-chain} lists the
+obligations with the proxy usually offered for each and the section of this
+chapter that bears on it.
+
+\begin{table}[tbp]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.16\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.22\linewidth}>{\raggedright\arraybackslash}p{0.2\linewidth}@{}}
+\toprule
+Obligation & What it needs & Proxy often used instead & Here \\
+\midrule
+Solution geometry & dimension and radicality of the full system, rational lifts, exceptional charts, target strata & \texttt{zero\_dim=true} on a random target & \S\ref{sec:hd-weakpoints} (W5) \\
+\addlinespace
+Solver growth & maximal matrix dimensions, nonzeros, arithmetic and memory, with timeouts and out-of-memory exits kept & first fall degree; a stable solving degree & \S\ref{sec:hd-chain}, \S\ref{sec:hd-pq2}, Chapter~\ref{ch:falldegree} \\
+\addlinespace
+Yield and variance & rational decompositions per natural target: distribution, zero mass, multiplicity, solver failures & the mean count $B^m/r$ & \S\ref{sec:hd-yield} \\
+\addlinespace
+Relation rank & rank growth, dead columns, full-rank probability & raw row count & \S\ref{sec:hd-rank} \\
+\addlinespace
+Non-generic interface & a coordinate predicate whose useful candidates no generic table reproduces at equal cost & ``uses coordinates'' & \S\ref{sec:hd-generic} \\
+\addlinespace
+End-to-end composition & one parameter family charging set-up, failed queries, collection, verification, linear algebra, descent, memory & product of the separate bounds & \S\ref{sec:hd-weakpoints} (W6) \\
+\bottomrule
+\end{tabularx}
+\caption[]{The six obligations of an index-calculus complexity claim, after
+\art{research/ic_weak_assumptions_20261102/README.md}. The README's table
+also states, per obligation, the ``strongest next falsifier''; the right
+column points to the evidence in this chapter.}
+\label{tab:hd-chain}
+\end{table}
+
+\paragraph{A stable degree does not certify cost.} The reanalysis extracted
+the committed PKM $m=4$ random-target F4 rows, two per cell
+(\art{research/ic_weak_assumptions_20261102/evidence-summary.json}, key
+\texttt{pkm\_m4\_random\_f4}; \texttt{extract\_existing.py --check}
+recomputes it from the JSONL records):
+\begin{itemize}
+\item at $N=8,12,16$ the solving degrees are $6,7,7$;
+\item the maximal column counts are $1{,}049$, $9{,}452$ and $76{,}837$;
+\item the maximal multiply-add counts are $48{,}447{,}128$,
+  $85{,}477{,}602{,}933$ and $27{,}048{,}206{,}854{,}510$, that is
+  $4.84\cdot10^7$, $8.55\cdot10^{10}$ and $2.70\cdot10^{13}$.
+\end{itemize}
+From $N=8$ to $N=16$ the columns grow $73.25$-fold and the arithmetic
+$558{,}304$-fold, although the last two degrees are equal. Three cells are
+not an asymptotic fit. They are a direct counterexample to reading a
+bounded degree as a bounded cost: the cost of a Gröbner computation at a
+fixed degree $d$ is governed by the number of monomials of degree $\le d$ in
+the variables of the system, and that number grows with $N$. The same six
+rows are all \texttt{inconsistent=true}: their ideal is the unit ideal. So
+the \texttt{zero\_dim} flag on a random target refutes a decomposition and
+says nothing about the geometry of a successful one. The planted toy rows at
+$N=8,12$ are consistent, with finite bases of 28 and 49 elements, and are the
+positive control. The README's reading is that the useful theoretical target
+for PKM is now a lower bound on the last fall or closure degree, or on the
+matrix width, and not another first-fall plot; the $N=20$ cell is projected
+at 240--380\,GB and is not to be launched to reconfirm the trend. The
+solving-degree data of the Kummer towers themselves are in
+\S\ref{sec:fd-pkm} and \S\ref{sec:pa-pkm}.
+
+\paragraph{The follow-up.} The same day's follow-up
+(\art{research/ic_weak_assumptions_20261102/FOLLOWUP.md}) added an
+arbitrary-precision mirror of the tensor route's D.4 admission guards and a
+finite-field unit-explanation proof kernel for the arity-three canonical
+representation, which it describes as validated implementation artefacts.
+It took no scientific run. Its status line per lane: the tensor route's
+predicate cost and aggregate complexity remain uncertified; the PKM
+closure-dual target is an exact nullspace certificate but no growing
+certificate has been found; the Wagner bucket statistic $W$ has no frozen
+native producer; for xedni no theorem comparing the selected height with the
+global minimal discriminant is proved.
+
+\section{Six weak points measured on Weil-descent systems}\label{sec:hd-weakpoints}
+
+The obligations were then measured, as exact counts, on one family where
+every one of them can be computed: Gaudry--Diem descent for
+$E:y^2=x^3+ax+b$ with random $a,b\in\FF_{p^n}$, $n\in\{2,3\}$, factor base
+$\{P:x(P)\in\FF_p\}$, groups up to $2^{28}$ for the complete solves
+(\art{research/ic_weakpoints_20261102/README.md}; protocol frozen before
+data, \texttt{PROTOCOL.md} with Amendments 1--3a; native Rust tool, standard
+library only, one 4-vCPU container). The README states that it is not an
+ecbench session, not a leaderboard row and not admitted by the validation
+gate, and reports no wall time. Table~\ref{tab:hd-weakpoints} lists the six
+points in the README's numbering.
+
+\begin{table}[tbp]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.17\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.2\linewidth}@{}}
+\toprule
+Weak point & Measured (exact counts) & Producer's reading \\
+\midrule
+W1 solving degree, matrix growth & $n=3$: solving degree 10 in 88/88 systems, $p=31$ to $1{,}073{,}741{,}789$ ($2^5$--$2^{30}$); Macaulay matrix $252\times286$ at that degree, $c(3)=1.03$--$1.07\cdot10^6$ $\FF_p$ multiplications (dense, an upper bound for F4); no first fall in 87/88. $n=2$: degree 3, $6\times10$, about 87 multiplications & a $p$-independent constant $c(n)$; its size, not its growth, is the question \\
+\addlinespace
+W2 non-generic filter & not addressable on this family (the subfield base is the structure; $\FF_p$ is untouched) & open; the prime-field question \\
+\addlinespace
+W3 yield mean and variance & 20 curves, 2{,}000 or 6{,}000 targets: mean$/\lambda_{\rm pred}=0.88$--$1.19$ ($\lambda=F^3/6N$); $P(0)=e^{-\rm mean}$ to three decimals; dispersion interval contains 1 on 19/20 curves; the two heavy tails are subfield targets $x_R\in\FF_p$ & Poisson; drop subfield targets \\
+\addlinespace
+W4 relation rank & 15/15 complete solves return the correct $\log Q$; rank shortfall 0 on 7 curves, 1--3 on 7, 6 on one; cofactor scaling, duplicated rows and dropped signs as controls & not a blocker at this scope \\
+\addlinespace
+W5 geometry & zero-dimensional 176/176; quotient dimension $64$ (Bézout) on 87/88, 4 at $n=2$; at $p\le127$, 24 targets: 32 rational solutions, of which 5 genuine and 27 non-split ($84\%$), 2 singular, no positive-dimensional component & benign; about five rejections per relation \\
+\addlinespace
+W6 end-to-end cost against matched rho & complete toy solves, $\ell=2^{12}$--$2^{25}$; IC/rho (negation map, analytic $\sqrt{\pi\ell/4}$): $0.29$--$3.4$ at $w=0$, $2.8\cdot10^4$--$3.2\cdot10^5$ at $w=0.1$, $1.5\cdot10^5$--$1.7\cdot10^6$ at $w=1$; rho ahead on 7 curves, 8 unresolved, IC ahead on none & 4--5 orders of magnitude remaining at $w\ge0.1$ \\
+\bottomrule
+\end{tabularx}
+\caption[]{The six weak points on Gaudry--Diem descent over $\FF_{p^n}$,
+$n\in\{2,3\}$, as reported in
+\art{research/ic_weakpoints_20261102/README.md}. Unverified producer
+figures; not an ecbench session; not admitted by the validation gate. The
+eight unresolved curves are unresolved only because $w=0$ makes the Gröbner
+work free.}
+\label{tab:hd-weakpoints}
+\end{table}
+
+The README's reading is that on this family W3, W4 and W5 are cleared, with
+cheap filters for their failure modes (subfield targets, duplicate rows,
+spurious solutions), that W1 is a constant and not a growth, and that the
+factor-base size is a seventh, required lever. Its derived figures, which
+are models and not measurements:
+\begin{itemize}
+\item \emph{No large primes.} With $\tau=3.50$ trials per $p$,
+  $c(3)=1.06\cdot10^6$ and $3.97$ nonzeros per row, the best factor-base
+  fraction gives IC/rho $\to684$ at $w=0.1$ and $3{,}761$ at $w=1$, constant
+  for groups of $2^{60}$ and more. Without large primes $n=3$ balances at
+  $p^{3/2}$, rho's exponent, so the gap is a constant proportional to
+  $\sqrt{w\,c(3)}$.
+\item \emph{Double large primes.} At $|{\rm FB}_r|\approx p^r/2$ the fitted
+  exponent of trials to a square system is $1.27\pm0.04$ at $r=2/3$
+  (theory $4/3$, rho $1.5$), from $p\le2039$; $\log Q$ was correct in
+  105/105 reached cells. Extrapolated with $c(3)$ and the measured row
+  weights, 2LP reaches IC/rho of 58, 7.7 and about 1 at $2^{96}$, $2^{132}$
+  and $2^{180}$ at $w=0.1$, and 319, 42 and 5.3 at $2^{96}$, $2^{132}$ and
+  $2^{180}$ at $w=1$, where it does not cross 1 by $2^{240}$. The band
+  therefore ranks IC ahead nowhere up to $2^{240}$: above $2^{180}$ the order
+  flips between $w=0.1$ and $w=1$. The README calls this crossover
+  optimistic: the fits are extended by up to 70 bits, and the 2LP slopes at
+  $r=3/4$ and $5/6$ are probably pre-asymptotic.
+\end{itemize}
+For the theory of this chapter the result is that, on the one family where
+the theorems of Gaudry and Diem apply, the obligations other than W1 and W6
+hold at toy size, and the distance that remains is a constant set by the
+cost of one decomposition. For prime fields, where W2 is the open
+obligation, the family says nothing.
+
+\section{Petit--Quisquater Assumption~2}\label{sec:hd-pq2}
+
+Petit and Quisquater~\cite{petit2012} derived their heuristic
+$2^{c\,n^{2/3}\log n}$ for binary curves (\S\ref{sec:theory}) from an
+assumption that the corpus records as
+\texttt{HEUR-GB-PQ-ASSUMPTION-2}: the degree of regularity, read as the
+maximal degree a Gröbner solver reaches, of a Weil-descended summation
+system equals its first fall degree up to $o(1)$. At $m=2$ the first fall
+degree of the descended $\Sem3$ system is 2 for every $n$ (Kosters and
+Yeo~\cite{kosters2015notes}, Corollary~4.11; Corollary~\ref{cor:ffd2} in
+our Caminata--Gorla convention), so the literal reading predicts solving
+degree 2. Kousidis and Wiemers~\cite{kousidis2019} read the assumption as
+$D_{\rm reg}=m^2-m+1+o(1)$, which is $3+o(1)$ at $m=2$. Degrees are
+integers, so ``$+o(1)$'' means eventual equality, and a lower bound that
+exceeds the predicted value for infinitely many $n$ refutes that reading
+for the family.
+
+\begin{theorem}[Subspace criterion; kernel-checked]\label{thm:hd-subspace}
+Let $K$ be a field, $I\subseteq K[x]$ an ideal with $1\notin I$, and $\prec$
+a degree-compatible monomial order. Suppose $I$ contains $k$ polynomials
+whose leading monomials are $k$ distinct variables. If a Gröbner basis of
+$I$ lies in a finite-dimensional subspace $S$, then
+$k\le\dim_K\bigl(S\cap K[x]_{\le1}\bigr)$. In particular, if $S$ is the span
+of the Macaulay rows of degree $\le d$ and $\dim(S\cap K[x]_{\le1})<k$, no
+Gröbner basis of $I$ lies in $S$.
+\end{theorem}
+
+The Lean declarations are
+\texttt{SolvingDegreeBound.linear\_count\_of\_gb\_in\_subspace} and
+\texttt{SolvingDegreeBound.no\_gb\_in\_rows\_of\_low\_lt}
+(\art{research/ecdlp_weakness_lean_20261104/lean/SubspaceCriterion.lean}).
+Its degree-2 special case, \texttt{solving\_degree\_ge\_three} in
+\texttt{SolvingDegreeBound.lean}, adds the rank--nullity count
+$\dim(\operatorname{span}F\cap K[x]_{\le1})+\operatorname{rank}(\operatorname{top}_2F)\le\abs F$:
+for generators of degree 2, field equations included, if
+$k+\operatorname{rank}(\operatorname{top}_2F)>\abs F$ then the solving degree
+is at least 3. A non-vacuity instance over $\FF_2$ is
+$F=\{x_0^2+x_0,\,x_1^2+x_1,\,x_0x_1+x_0+x_1\}$, with $k=2$, rank 3 and
+$\abs F=3$. A further declaration, \texttt{not\_tendsto\_of\_frequently\_gap},
+proves that an integer gap of at least 1 infinitely often is not $o(1)$.
+
+Write $d_{\rm lin}$ for the least $d$ at which the degree-$\le d$ Macaulay
+row space contains $k$ independent polynomials of degree $\le1$, and
+$d_{\rm iter}$ for the same quantity computed on the iterated degree-$d$
+closure (every multiple of a newly found polynomial that stays within degree
+$d$ is added until the rank stops growing). By Theorem~\ref{thm:hd-subspace},
+$d_{\rm lin}$ is a lower bound on the Caminata--Gorla one-shot solving degree
+(Proposition~\ref{prop:bridges} relates it to the last fall degree), and
+$d_{\rm iter}$ is a lower bound on F4's maximal step degree under the
+containment property that F4's output at maximal step degree $D$ lies in the
+degree-$D$ closure. That property is argued in the census README and is not
+formalised. The number $k$ of linear consequences is computed as
+$N-\operatorname{affdim}(Z)$ from the enumerated solution set $Z$; the
+Boolean Nullstellensatz step behind it is kernel-checked only for $\abs Z=1$
+(\texttt{BooleanNullstellensatz.linear\_mem\_of\_unique\_zero}), and the
+general affine-span case is not formalised.
+
+\paragraph{The census.} \texttt{pq2\_rank}
+(\art{research/ecdlp_weakness_census_20261104/pq2_rank/README.md}; Rust, no
+dependencies, seed \texttt{0x5eed20261104}) computes these quantities
+exactly over $\FF_2$, with no Gröbner run, on the curve
+$y^2+xy=x^3+ax^2+b$ with a random $\lceil n/2\rceil$-dimensional factor-base
+subspace and a target with a non-empty solution set. Each instance checks,
+on 20 random assignments, that the descended equations agree with a direct
+$\Sem3$ evaluation. The main sweep was stopped during $n=47$, before the
+binary wrote its own JSON; a script copied the log lines and recomputes
+nothing. $n=48$--$56$ were not reached. Table~\ref{tab:hd-pq2} gives the
+results.
+
+\begin{table}[tbp]
+\centering\small
+\begin{tabular}{@{}lrlll@{}}
+\toprule
+$n$ & instances & iterated degree 3 reaches $k$ & $d_{\rm iter}$ & $d_{\rm lin}$ \\
+\midrule
+8--14 & 21 & 21 & 3 & 4 (20), $>4$ (1) \\
+15 & 3 & 0 (\texttt{iter3}$\,=1$) & 4 & $>4$ \\
+16 & 3 & 3 & 3 & $>4$ \\
+17--20 & 12 & 0 (\texttt{iter3}$\,=1$) & $>3$ & $>4$ \\
+21--44 & 72 & 0 (\texttt{iter3}$\,=1$) & $>3$ & $>3$ \\
+45--47 & 8 & not run & -- & $>3$ \\
+\midrule
+17--24 (fresh) & 24 & 0 & 4 (24/24) & \\
+\bottomrule
+\end{tabular}
+\caption[]{\texttt{pq2\_rank}: exact degree lower bounds for the $m=2$
+descended $\Sem3$ system over $\FF_{2^n}$, 119 instances in the main sweep.
+The last row is two separate degree-4 sweeps at $n=17$--20 and 21--24 on
+fresh instances. At every $n$, \texttt{low2}$\,=1$; \texttt{low3}$\,=1$ for
+every $n\ge9$. Unverified census figures. Source:
+\art{research/ecdlp_weakness_census_20261104/pq2_rank/README.md}.}
+\label{tab:hd-pq2}
+\end{table}
+
+\begin{itemize}
+\item \emph{Literal Assumption~2 fails on all 119 instances:}
+  $d_{\rm iter}\ge3$ everywhere, against the predicted first fall degree 2.
+\item \emph{The Kousidis--Wiemers value is not reached} at any of the 87
+  instances with $n=15$ or $17\le n\le44$: the iterated degree-3 closure
+  reaches only one of the $k$ linear consequences. On the 24 fresh instances
+  at $n=17$--24 the iterated degree is exactly 4.
+\item \emph{Cross-checks.} A pure-Python closure by naive saturation, sharing
+  no code with the Rust one, agrees on five dumped instances at $n=14$--18,
+  at degrees 3 and 4. A same-seed rerun for $n=8$--40 reproduces the log
+  line for line; it also gives $\abs{F'}/\abs V$ between $0.84$ and $1.31$
+  (mean $1.021$) over 99 instances, and $0.997$--$1.004$ for $n\ge30$.
+\end{itemize}
+
+What this does and does not settle. A finite range cannot refute an $o(1)$
+statement. It refutes the literal reading on every instance computed, and
+shows that the asymptotic value 3 is not reached anywhere from $n=17$ to 44.
+The bound on F4's step degree rests on the unformalised containment
+property; the bound on the one-shot solving degree is a kernel-checked
+criterion applied to an unverified computation. The measured degree sits
+above the value the subexponential binary heuristics assume, which removes
+support from them; it does not support a subexponential algorithm. The
+corpus node that records the census, \texttt{MEAS-PQ2-DLIN-CENSUS},
+obstructs \texttt{HEUR-GB-PQ-ASSUMPTION-2}, which remains a heuristic in the
+corpus. The certified binary instances of Theorem~\ref{thm:lfd5} reach
+$d_{\tilde F}\ge5$ at $n=33$--45 on random subspaces of dimension
+$\lceil n/2\rceil$; together the two give a lower bound of 4 at $n=17$--24 by
+census and of 5 at $n\ge33$ by certificate. What remains open is the same as
+in \S\ref{sec:fd-summary}: a proof that the bound grows with $n$.
+
+\section{Semaev's Assumption~1}\label{sec:hd-semaev}
+
+Semaev~\cite{semaev2015} states two degree assumptions for his chained
+systems over $\FF_{2^n}$. Assumption~1 (\S4.5) asserts $d_{F4}\le4$ for any
+subspace of dimension $k=\lceil n/m\rceil$ and any $2\le t\le m$, supported,
+as the corpus records, by 2{,}300 Magma systems with $t=m$, $n\le21$,
+$m\le6$. Corollary~\ref{cor:assump} refutes it as stated, in the cells
+$(35,2,2,18)$, $(45,2,2,23)$ with Semaev's own default subspace, and
+$(19,3,3,7)$, $(21,3,3,7)$ inside his tables' range. The revision of the
+paper (ePrint 2015/310, 10 April 2015) replaces it with a growth condition on
+the regularity degree that the corpus records as
+$o(\sqrt{n/\ln n})$ (\texttt{HEUR-SP-SEMAEV15-WEAK-REGULARITY}), sufficient
+for the $2^{c\sqrt{n\ln n}}$ asymptotic and not for the FIPS-curve
+conclusions. Nothing the programme proved bears on that weaker condition:
+only a growing lower bound would.
+
+His first-fall-degree assumption $d_{F4}\le d_{\rm ff}$ (\S4.4), applied to
+his own $t=2$ cells with his statement that the first fall degree ``is always
+4'', was tested on 200 instances of the ten cells of his Table~2
+(\art{research/semaev_t2_trace_20261102/REPORT.md}; protocol frozen; exact
+standard-library arithmetic). The first fall degree is 2 on 200/200, each
+with an explicit trace certificate: with $\lambda=z^{-2}$,
+\[
+  \operatorname{Tr}\bigl(z^{-2}\Sem3(x_1,x_2,z)\bigr)
+  =\operatorname{Tr}(x_1)+\operatorname{Tr}(x_2)+\operatorname{Tr}(Bz^{-2}),
+\]
+a constant combination of the coordinate equations of degree $\le1$, the
+Kosters--Yeo identity in Semaev's coordinates. None of the 200 systems has a
+solution in $V\times V$ (brute force). The degree at which a Macaulay
+computation proves this is 2 on 154 instances and 3 on 46, never 4. So the
+statement ``first fall degree always 4'' is refuted, while the inference that
+these rows refute $d_{F4}\le d_{\rm ff}$ splits: the sharp assumption fails on
+46/200, where 3 exceeds 2, and Semaev's reported $d_{F4}=4$ exceeds what the
+systems require. The corpus inference that had read the rows as a refutation
+everywhere is corrected in Chapter~\ref{ch:corrections}. The
+\texttt{RT-SP-SEMAEV-A1-N45} target of the triage, an exact F4 run in the
+$n=45$ cell, is still listed as open.
+
+\section{Nagao's Lemma~4: four cells and three repairs}\label{sec:hd-nagao}
+
+Nagao's ePrint 2015/984~\cite{nagao2015}, which the corpus records as
+``polynomial-time binary ECDLP under FFDA'' (status conditional), bounds the
+first fall degree $d_F$ by a ``fake'' first fall degree $d'_F$ computed
+modulo the field equations (Lemma~4: $d_F\le d'_F$). Remark~\ref{rem:defs}
+gives the equality-reading counterexample over $\FF_2$. The lemma's verdict
+depends on two choices: the reading of Definitions~5 and~6 (``equality'':
+the maximal degree of the products is exactly $d$; ``literal $\ge$'') and
+the placement of the field equations (outside or inside the generating set).
+Table~\ref{tab:hd-nagao} lists the four cells and the three candidate repairs
+tested after the refutation.
+
+\begin{table}[tbp]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.24\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.24\linewidth}@{}}
+\toprule
+Statement & Result & Formal status \\
+\midrule
+Lemma~4, equality, outside & refuted: $\{X^2Y,XY+X\}$, $d'_F=2<d_F=3$ (Remark~\ref{rem:defs}) & two implementations \\
+Lemma~4, equality, inside & refuted & corpus record \\
+Lemma~4, literal $\ge$, outside & refuted ($d_F=3$, $d'_F=2$) & corpus record \\
+Lemma~4, literal $\ge$, inside & \emph{theorem}: every fake fall is a true fall at the same degree, so $d_F\le d'_F$, over any field & kernel-checked (Mathlib) \\
+\addlinespace
+A1: $d_F\le f(d'_F)$, outside & refuted: $W_k=\{X^kY,XY+X\}$ has $d'_F=2$, $d_F=k+1$ & $k=3$ kernel-checked; all $k$ by hand proof \\
+A2: $d_F\le d'_F+1$, inside & refuted: $\{YZ+1,XZ+X+1\}$, $d'_F=1$, $d_F=3$; 10{,}752 of 521{,}731 pairs have gap 2 & native, two implementations \\
+Inside gap, $n\ge2$ & $d_F-d'_F\le3$, tight ($\{XYW+XY+W,XZW+XW+1\}$); unbounded for $n=1$ & key identity kernel-checked in two variables \\
+A3: $d'_F\le d_F$ when the reduced generators are independent & survives: 0 counterexamples in 25{,}536 and 322{,}896 independent triples & census only \\
+\bottomrule
+\end{tabularx}
+\caption[]{Nagao's Lemma~4 over $\FF_2$ by reading and placement, and the
+candidate repairs. Sources:
+\art{docs/ecdlp-hardness-corpus/WEAKNESS_TRIAGE.md} (W4),
+\art{research/ecdlp_weakness_lean_20261104/lean/NagaoLiteralInside.lean},
+\art{research/lean_attacks_20261102/REPORT.md},
+\art{research/inside_gap_n4_20261102/REPORT.md}.}
+\label{tab:hd-nagao}
+\end{table}
+
+\paragraph{The fourth cell.} \texttt{NagaoLiteralInside.lemma4\_literal\_inside}
+proves, for any field, any family $F$ and any finite family $E$ of
+``field equations'' placed among the generators, that $d_F\le d'_F$
+whenever a fake fall exists. The proof lifts a fake fall: replace the sum by a
+least-degree representative modulo $\langle E\rangle$ and pay the difference
+with multiples of $E$, which is allowed because $E$ is inside. The file's
+comment records why the argument fails outside, or under the equality
+reading, where the added multiples can push the maximal degree above $d$. The
+reading axis is now complete, refuted in three cells and proved in the
+fourth. Which cell Nagao meant is a question of the source text: the triage
+lists a fresh PDF-level transcription of Definitions~5 and~6 as owed.
+
+\paragraph{A1: outside, the fake degree bounds nothing.} Modulo the field
+equations $X^kY\mapsto XY$, so every $W_k$ has the reduced system of the
+original witness and $d'_F=2$. With the field equations outside,
+$X^{k-1}(XY+X)+X^kY=X^k$ is a fall at $k+1$, and no fall exists below it, so
+$d_F=k+1$: the native table gives $3,4,\ldots,8$ for $k=2,\ldots,7$, and 3
+for every $k$ with the field equations inside
+(\art{research/lean_attacks_20261102/results/family.txt}).
+\texttt{IcNegative.FakeDegreeGap.gap\_two\_witnessW3} kernel-checks $k=3$
+($d'_F=2$, $d_F=4$) in core Lean with \texttt{decide +kernel}; the
+repository proof gate passed it in run 41399938870 (target
+\art{papers/ic-negative-results/lean} PASS, 40 theorems, 0 trusted). The
+all-$k$ statement is the hand proof plus the table.
+
+\paragraph{A2 and the inside gap.} The census of all 521{,}731 pairs of
+degree $\le2$ in three variables (\art{research/lean_attacks_20261102/results/p3gap.txt})
+finds gap 2 inside on 10{,}752 pairs; the witness $\{YZ+1,XZ+X+1\}$ has a
+fake fall at 1 and, inside, the true fall
+$Z(XZ+X+1)+X(Z^2+Z)=Z$ at 3. Two implementations agree (a Rust census and a
+Python brute force over every admissible multiplier tuple); the witness has
+three variables and is outside the two-variable Lean encoding. The open
+question this left was answered the same day
+(\art{research/inside_gap_n4_20261102/REPORT.md}; protocol frozen): for
+$n\ge2$ variables, $d_F(F\cup S_{\rm fe})\le4$ for every system, because
+$Y^2(X^2+X)+X^2(Y^2+Y)=XY^2+X^2Y$ is a fall at 4 built from the field
+equations alone, so the inside gap is at most 3; a gap-3 witness in four
+variables was found in a sample of $2{,}000{,}000$ pairs, and for $n=1$ the
+family $\{X^k,X^k+1\}$ has gap $k-1$. \texttt{InsideGap.lean} states the
+field-equation fall in two variables in core Lean; the gate passed it in
+run 41484047855 (44 theorems, 4 new, 0 trusted). The step ``zero multipliers
+on further generators leave the fall intact'' is argued, and the
+four-variable witnesses are native only. The consequence is that
+inside-placement $d_F$ under the equality reading is degenerate: it never
+exceeds 4 in two or more variables, through the trivial falls among field
+equations that Ding--Hodges and Petit--Quisquater exclude from their first
+fall degree. No estimate can take its degree from that quantity without
+first removing them.
+
+\paragraph{A3 and Nagao's Proposition~5.} The reverse repair, $d'_F\le d_F$
+outside when the reduced generators are linearly independent, has no
+counterexample among the triples tested: 266 counterexamples among the
+dependent triples of degree $\le2$ in two variables, none among the 25{,}536
+independent ones, and none among the 325{,}500 multilinear triples in three
+variables (\art{research/lean_attacks_20261102/REPORT.md}). Nothing here
+touches Nagao's Proposition~5 or the paper's own applications, which check
+unreduced degrees instance by instance; only a bound through $d'_F$ alone is
+ruled out, and only outside.
+
+\section{Relation rank and the left kernel}\label{sec:hd-rank}
+
+The corpus node \texttt{HEUR-RELATION-RANK} conditions sparse linear algebra
+and, through it, marked three externally proved results as resting on a
+heuristic: Theorem~1 of Gaudry, Thomé, Thériault and
+Diem~\cite{gtthd2007}, Diem's small-genus theorem~\cite{diem2006} and the
+GHS Weil-descent attack~\cite{ghs2002}. These are 4 of the 17 status
+inflations of \S\ref{sec:hd-corpus}. Galbraith and Gaudry~\cite{galbraith2016}
+(\S6.2) already note that target-dependent relations are easier to analyse
+rigorously than relations reused across targets. The triage wrote the
+argument out (W2) and the Lean round of 4~November formalised its finite core.
+
+\begin{theorem}[Left-kernel relations; kernel-checked]\label{thm:hd-leftkernel}
+Let $K$ be a field and $M\in K^{n\times B}$ a relation matrix with
+$a_i+b_ix=\sum_jM_{ij}f_j$ for $i=1,\ldots,n$, where $f_j$ are the
+factor-base logarithms and $x$ the unknown logarithm.
+\begin{enumerate}
+\item If $n>B$, a nonzero $\lambda\in K^n$ with $\lambda M=0$ exists, for
+  every $M$.
+\item For any such $\lambda$,
+  $\sum_i\lambda_ia_i+x\sum_i\lambda_ib_i=0$; hence
+  $x=-\sum\lambda_ia_i/\sum\lambda_ib_i$ whenever $\sum\lambda_ib_i\ne0$.
+\item Let $K$ be finite with $q$ elements and let $\Lambda$ be any
+  function of the vector of relation logarithms $\ell=(a_i+b_ix)_i$ alone
+  whose value is always a nonzero vector. Exactly $q^{2n-1}$ of the $q^{2n}$ pairs
+  $(a,b)$ give $\Lambda(\ell)\cdot b=0$: the failure density is exactly $1/q$.
+\end{enumerate}
+\end{theorem}
+
+The declarations are \texttt{LeftKernel.exists\_left\_kernel},
+\texttt{left\_kernel\_identity}, \texttt{left\_kernel\_recovers} and
+\texttt{card\_bad\_pairs} (stated without subtraction as
+$\abs{\rm bad}\cdot q=q^{2n}$) in
+\art{research/ecdlp_weakness_lean_20261104/lean/LeftKernel.lean}. Two steps
+are not formalised: that a decomposition of $R_i=a_iP+b_iQ$ gives the row
+$M_i$ (true by the definition of the factor-base logarithms), and the
+reduction from uniform $(a_i,b_i)$ to the counting statement, which is the
+uniform-measure statement itself. The consequence for the corpus: for a
+single target, with relations drawn from target-dependent points, index
+calculus needs no rank condition at all, and the four inflation rows are edge
+errors in the graph, not fragile theorems. Removing the heuristic
+\emph{strengthens} the closures that rest on it, such as the GHS and
+two-summand closures. The triage's own toy check (12 seeds at $p=10007$,
+every matrix 2--7 short of full rank, left-kernel recovery correct 12/12) was
+run in scratch space and is labelled there as an illustration, not evidence.
+
+The heuristic stays load-bearing where relations are reused across targets:
+right-kernel amortisation, multi-target batches, and PKM's surplus of
+$\Delta=10$ relations (\texttt{HEUR-PF-PKM-RANK-DELTA}).
+\texttt{rank\_deficit}
+(\art{research/ecdlp_weakness_census_20261104/rank_deficit/README.md};
+results in \texttt{results/tables.md}) measures that regime exactly: ten
+prime-order curves, two per $p\in\{1009,2003,4001,8009,16001\}$, small-$x$
+bases with $B$ closest to $\sqrt r$ ($B=32$ to 126), rows $aG=P_1+P_2$, five
+samples each.
+\begin{itemize}
+\item With negation pairs merged into $B/2$ unknowns, $\Delta=10$ gave full
+  rank in all five samples on 2 of the 10 curves; on the other eight the
+  largest deficit at $\Delta=10$ is 1--3. At $\Delta=40$ four curves still
+  have a deficit in some sample, at most 2. On four curves no tested
+  $\Delta\le40$ gives full rank in all five samples.
+\item On the unmerged $B$ columns no tested $\Delta\le40$ gives deficit 0 in
+  all five samples on any curve.
+\item Free relations $P_1+P_2=P_3$ among factor-base points span only 3 to
+  15 of the $B/2$ merged unknowns.
+\end{itemize}
+At these sizes PKM's ``$\Delta=10$ suffices'' is contradicted
+(\texttt{MEAS-RANK-DEFICIT-CENSUS} obstructs \texttt{HEUR-PF-PKM-RANK-DELTA}).
+The census README also states that the unmerged deficit is ``at least about
+$B/4$ at every $\Delta$''; its own table does not show this (at $\Delta=40$
+the minimum unmerged deficit over five samples is 0 or 1 on seven curves), so
+that sentence is not used here. The measured complete solves agree with the
+theorem: on the descent family 15/15 solves returned the correct logarithm
+with rank shortfalls up to 6 (\S\ref{sec:hd-weakpoints}), and the 842 prime
+$m=2$ rows of the reanalysis report rank 842, a correctness control and not
+a rank law, since each episode stopped before a full matrix was collected
+(\art{research/ic_weak_assumptions_20261102/evidence-summary.json}).
+
+\section{Yield: the mean is a theorem, the shape is a heuristic}\label{sec:hd-yield}
+
+The corpus node \texttt{HEUR-DECOMPOSITION-PROBABILITY} has the largest
+impact on the frontier of the attack graph (13). Its mean, $B^m/r$, follows
+by counting: \texttt{MeanCount.sum\_card\_reps} kernel-checks that the
+ordered representation counts over all targets sum to $\abs F^m$, the
+ordered form of Proposition~\ref{prop:conservation}. Only the shape is
+heuristic: Poisson zero mass, variance, independence between targets,
+rationality and visibility to the solver. The triage (W3) splits the node in
+two. Over $\FF_{q^n}$ with $n$ fixed, Diem's rigorous results bypass the
+heuristic. Over prime fields it is genuinely heuristic. Under the
+left-kernel formulation the cost needs only the fraction of points that
+decompose, a set size, exact on small fields.
+
+\paragraph{Prime field, $m=2$.} \texttt{pf\_yield}
+(\art{research/ecdlp_weakness_census_20261104/pf_yield/results/table.md})
+enumerates every target on 18 prime-order curves, $p$ from 2003 to 80021,
+with three base shapes (small $x$; random; random closed under negation) at
+$\mu=B^2/r$ near $0.5$, 1 and 2: 162 rows. With ordered pairs the
+decomposable fraction is $0.55$--$0.78$ of $1-e^{-\mu}$. With unordered
+pairs $U(R)$, of mean $\mu/2$, $P(U\ge1)$ matches $1-e^{-\overline U}$: the
+mean absolute deviation of the ratio is $0.011$, $0.007$ and $0.011$ for the
+three shapes. The variance-to-mean ratio of $U$ is not Poisson for the bases
+index calculus uses: averaged over 54 rows it is $1.455$ for small $x$ and
+$1.447$ for the random negation-closed base, against $0.981$ (range
+$0.91$--$1.01$) for the random base that is not closed under negation. The
+overdispersion follows closure under negation, through $U(R)=U(-R)$, which
+couples targets in pairs, and not the small-$x$ shape. The heuristic's zero
+class is right once the pairing convention is stated; its variance is off by
+a factor of about $1.45$.
+
+\paragraph{The descent family and the $1/n!$ proportion.} On the
+Gaudry--Diem family of \S\ref{sec:hd-weakpoints} the yield is Poisson:
+mean$/\lambda_{\rm pred}=0.88$--$1.19$ and $P(0)=e^{-\rm mean}$, the heavy
+tails being subfield targets. \texttt{ext\_decomp}
+(\art{research/ecdlp_weakness_census_20261104/ext_decomp/results/table_primary.md})
+measures the $n$-fold decomposable fraction over $\FF_{q^n}$ with factor base
+$x\in\FF_q$ against the survey value $1/n!$: $0.350$--$0.413$ at $n=2$
+($q=101,211,401$) and $0.101$--$0.165$ at $n=3$ ($q=23,41,61$), that is
+$0.70$--$0.83$ and $0.61$--$0.99$ of $1/n!$ (the README's summary,
+$0.70$--$0.99$ for both, overstates the lower end at $n=3$). The $n=4$ rows
+have factor bases of 10--18 points and scatter widely. For control curves
+defined over $\FF_q$ the premise fails: the factor base is $E(\FF_q)$ or lies
+in a small subgroup, and the fraction is $0.0003$--$0.002$ at $n=3$. The
+$1/n!$ is the mean of Proposition~\ref{prop:conservation} and carries the
+hypothesis that the curve is not defined over the subfield.
+
+\paragraph{A withdrawn closure.} The triage first argued by a dimension
+count that the trace pull-back (base-change $E/\FF_p$ to $\FF_{p^n}$,
+decompose over points with $x$ in an $\FF_p$-subspace $V$, pull back by the
+trace) cannot give a small factor base, and withdrew the argument on
+4~November: the count bounds $\abs{F'}$, not $\abs{\operatorname{Tr}(F')}$.
+\texttt{trace\_pullback}
+(\art{research/ecdlp_weakness_census_20261104/trace_pullback/results/summary_table.md})
+computes the trace image of every one-dimensional subspace for ten curves,
+$p=103$ to 2003, over $\FF_{p^2}$: the smallest image is $0.319$--$0.389$ of
+$\#E(\FF_p)$, attained at $V=\FF_p\cdot i$ on every curve, and two-point
+decomposition over it covers every target. The lead
+\texttt{GAP-PF-TRACE-PULLBACK-FACTOR-BASE} is narrowed, not closed: higher
+extension degrees and higher-dimensional $V$ are not covered.
+
+\section{Waiting times: marginals suffice, hazards are not implied}\label{sec:hd-hazard}
+
+The Jacobson--Koblitz--Silverman--Stein--Teske obstruction to xedni,
+audited in Lean on 1~November (\art{research/jksst_xedni_audit_20261101/};
+see Chapter~\ref{ch:corrections} for the correction of the treatise's earlier
+``closed'' wording), derives a linear expected waiting time from a
+conditional-hazard recurrence $(1-\varepsilon)s(n)\le s(n+1)$ on the survival
+masses $s(n)=P(\tau>n)$, and listed the recurrence for repeated adaptive
+trials as open. The triage (W7) promoted that free-text assumption to a
+node, \texttt{ASM-XEDNI-HAZARD-RECURRENCE}.
+
+\begin{theorem}[Marginals suffice; kernel-checked]\label{thm:hd-hazard}
+Let $\mu$ be a probability mass on a finite set, $\tau$ a stopping time, and
+$S_t$ the event that trial $t$ succeeds, with $\tau\le n$ implying some
+$S_t$, $1\le t\le n$. Trials may be correlated or adaptive.
+\begin{enumerate}
+\item If $\mu(S_t)\le\varepsilon$ for every $t\le N$, then
+  $s(n)\ge1-n\varepsilon$ for all $n\le N$.
+\item If moreover $N\varepsilon\le1/2$, then
+  $\mathbb E[\min(\tau,N)]\ge N/2$.
+\item The converse inference fails: on three equally likely outcomes, outcome
+  $k$ succeeding at trial $k+1$, every trial has marginal success mass at
+  most $1/3$, the recurrence with $\varepsilon=1/3$ fails at $n=1$
+  ($\tfrac23\cdot\tfrac23=\tfrac49>\tfrac13=s(2)$), and still
+  $\mathbb E[\min(\tau,3)]=2$.
+\end{enumerate}
+\end{theorem}
+
+The declarations are \texttt{survival\_ge\_of\_marginals},
+\path{truncated_expectation_ge_half_horizon_of_marginals},
+\texttt{marginals\_U}, \texttt{marginals\_do\_not\_give\_hazard} and
+\texttt{wait\_U} in
+\art{research/ecdlp_weakness_lean_20261104/lean/HazardSeparation.lean}.
+Part~2 is the conclusion of the JKSST audit's
+\texttt{truncated\_expectation\_ge\_half\_horizon} without its hazard
+hypothesis; part~3 refutes the corpus inference
+\texttt{CLAIM-MARGINAL-IMPLIES-HAZARD}. The open bridge for xedni is
+therefore a per-trial marginal bound for the adaptive trial actually run
+(\texttt{ASM-XEDNI-TRIAL-MARGINAL}: each trial succeeds with marginal
+probability at most the one-shot bound $C_0/p$), a weaker and more natural
+premise than a history-uniform hazard bound. This strengthens the
+obstruction; it does not reopen xedni, and it leaves the other conditional
+links of the JKSST chain (heights and discriminants, Lang's conjecture,
+selected lifts, useful relations, cofactors) as they were.
+
+\section{Generic bounds and what they cover}\label{sec:hd-generic}
+
+The non-generic-interface obligation exists because a generic algorithm
+cannot beat $\sqrt r$ (\S\ref{sec:gf-shoup}). Two Lean results this autumn
+fix the scope of that statement.
+
+\paragraph{Shoup's bound is relative to random encodings.}
+\path{TransparentEncoding.dlog_identity_encoding} and
+\path{zero_operation_dlog}
+(\art{research/ecdlp_weakness_lean_20261104/lean/TransparentEncoding.lean})
+prove that with the identity encoding of $\ZZ/r$ the logarithm is the
+encoding, read with zero group operations. This refutes the corpus claim
+\texttt{CLAIM-SHOUP-ALL-ALGORITHMS} (``every algorithm needs
+$\Omega(\sqrt r)$'') and qualifies the bound and ``BSGS is optimal'' as
+generic-model statements. It is a scope statement, not an attack: it is the
+reason every subexponential claim must name an encoding property, and the
+reason the obligation of Table~\ref{tab:hd-chain} asks for a coordinate
+predicate that no generic table reproduces. The generic-interface audit of
+1~November (\art{docs/ecdlp-hardness-corpus/GENERIC_INTERFACE_AUDIT.md};
+an internal argument, not a reviewed theorem) sorts the programme's oracles:
+subtract, meet-in-the-middle, $k$-sum and pair-enumeration oracles are
+generic table algorithms once their set-up is charged; the root-finding
+oracles return the same relations as group subtraction, with
+representation-specific set-up; Frobenius-orbit methods need an augmented
+interface with a cheap known-scalar automorphism; and F4/F5/SAT, Weil-descent,
+PKM-tower and small-root lattice oracles are coordinate-algebraic, so Shoup's
+and the Corrigan-Gibbs--Kogan~\cite{cgk2018} bounds do not exclude them. Only
+the last group can discharge the obligation. The weak-assumption reanalysis
+credits the PKM/F4 and compact Boolean predicates with a genuinely
+coordinate-algebraic interface; none of them yet has a solver cost that
+discharges the obligations after it (\S\ref{sec:hd-chain},
+\S\ref{sec:pg-gate}).
+
+\paragraph{Rho is conductor-blind in distribution.} The conductor-gap
+programme asked whether the depth of $\operatorname{End}(E)$ in an isogeny
+volcano changes the cost of rho. The theorem that answers it in distribution
+is \art{research/conductor_gap_rho_large_sample_20261018/lean/RepresentationHashInvariance.lean}.
+
+\begin{theorem}[Representation-hash invariance; checked by the producer]\label{thm:hd-rhoinv}
+Let $\varphi:G\to H$ be a bijection compatible with binary operations on
+$G$ and $H$. For an $r$-adding walk $w=(h,c)$ on $G$, with partition
+$h:G\to\{0,\ldots,r-1\}$, multipliers $c$ and step $x\mapsto x\cdot c(h(x))$,
+let $\varphi_*w=(h\circ\varphi^{-1},\varphi\circ c)$. Then the trajectory of
+$\varphi_*w$ from $\varphi(x)$ is $\varphi$ of the trajectory of $w$ from
+$x$; the rho length (first repeat, capped at the budget) is the same at every
+budget; and $w\mapsto\varphi_*w$ is a bijection of walk spaces.
+\end{theorem}
+
+No group axiom is used. Read outside Lean, the push-forward of the uniform
+distribution on walks under a bijection is uniform, so over a uniformly
+random partition the cost distribution of rho is the same on the crater and
+on the floor, and on every curve of an isogeny class of prime order (abstract
+groups of equal prime order are isomorphic). The conductor, the
+$j$-invariant or any invariant that is not an invariant of the group can
+enter only through the one fixed hash an implementation uses; whether
+ecbench's fixed partition does so is an empirical question, and the
+measurements are in \S\ref{sec:rv-isogeny}. Formal status: 11 theorems in
+core Lean~4.34.1 without Mathlib or a Lake project; the committed
+\texttt{build.log} of 18~October reports \texttt{[propext, Quot.sound]} for
+the three audited declarations and no \texttt{sorryAx}. The file is not
+among the targets of proof-gate run 41399938870. Nothing about curves,
+isogenies, endomorphism rings or conductors is formalised, and the file says
+nothing about index calculus or about the cost of computing the connecting
+isogeny. It complements \texttt{GenericInvariance.lean} of
+\art{research/conductor_gap_cm_pairs_20261010/lean}, which covers only
+algorithms whose control flow depends on equality answers (the gate run above
+passes that project with 60 theorems); see also \S\ref{sec:mr-lean}.
+
+\section{The hardness corpus}\label{sec:hd-corpus}
+
+\art{docs/ecdlp-hardness-corpus/} is a typed claim graph of what supports
+elliptic-curve discrete-log security: definitions, assumptions, reductions,
+algorithms, model lower bounds, conditional attacks, heuristics,
+measurements, obstructions and open obligations, each with its model and
+scope, and every edge typed (\texttt{supports}, \texttt{conditions},
+\texttt{obstructs}, \texttt{qualifies}, \ldots). The triage of
+3~November (\art{docs/ecdlp-hardness-corpus/WEAKNESS_TRIAGE.md}) read the
+assembled version of 1~November, 583 claims, 950 edges and 236 sources, and
+marks its own findings \texttt{[pcc:unverified]}. The generated
+\texttt{stats.tsv} on the current main branch counts 608 nodes, 32 of them
+refuted and 68 \texttt{proved\_internal\_unreviewed}; the corpus README's
+``current snapshot'' still gives an older 525. Counts below are the
+triage's.
+
+\begin{table}[tbp]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.27\linewidth}X r@{}}
+\toprule
+Check & What it finds & Count \\
+\midrule
+Status inflation & proved, algorithm or measured claims whose support closure reaches an open, heuristic or assumed claim & 17 \\
+Unwired dependence & a claim's assumption text invokes a heuristic node with no edge to it & 11 \\
+Live obstruction & an established claim obstructs, qualifies or does not cover a claim that still supports others & 49 \\
+Route closure on weak support & an \texttt{obstructs} edge whose obstruction rests on an assumed, heuristic or open claim & 16 \\
+Hidden shared assumption & the same assumption text on 3 or more nodes, never a node itself & 18 clusters \\
+Source contagion & a primary source with a refuted claim and other live claims & 21 \\
+Model-scope leap & a generic-model or measured claim supporting a broader one without a model bridge & 9 \\
+\bottomrule
+\end{tabularx}
+\caption[]{Structural checks of the hardness corpus (version of
+1~November: 583 claims, 950 edges, 236 sources), as counted by
+\texttt{weakness.mjs} and reported in
+\art{docs/ecdlp-hardness-corpus/WEAKNESS_TRIAGE.md}. It then ranks 246
+attackable claims by impact times breakability and keeps a separate hygiene
+queue of 100; the triage states that the scores are a heuristic, not
+evidence.}
+\label{tab:hd-corpus}
+\end{table}
+
+The triage's findings, W1--W7, are the targets of the censuses and Lean
+modules of this chapter:
+\begin{itemize}
+\item \emph{W1: the first-fall pillar is obstructed and still load-bearing.}
+  \texttt{HEUR-FIRST-FALL-DEGREE} has four incoming \texttt{obstructs} edges
+  from established claims and still conditions seven claims, among them the
+  ECC2K-130 $2^{86}$ projection, Nagao's complexity, the PKM algebraic route
+  and binary Weil descent. Its siblings \texttt{HEUR-GB-SEMIREG-ASSUMPTION}
+  (six \texttt{obstructs} edges) and \texttt{HEUR-GB-PQ-ASSUMPTION-2} (four)
+  head the attack queue with it. Because the graph keeps them at
+  ``heuristic'', the seven conditional estimates read as one discharged
+  condition away from usable, which overstates them
+  (\S\ref{sec:hd-pq2}).
+\item \emph{W2: relation rank} (\S\ref{sec:hd-rank}).
+\item \emph{W3: yield}, two regimes in one node (\S\ref{sec:hd-yield}).
+\item \emph{W4: the Lemma~4 refutation rests on a reading choice}, and two
+  internal papers disagreed about it; the wording of
+  \art{papers/ic-negative-results/} was corrected on 4~November to the
+  four-cell table (\S\ref{sec:hd-nagao}).
+\item \emph{W5: eleven unwired dependences} understate the impact of the top
+  frontier nodes; refuting the heuristic would not reach them.
+\item \emph{W7: route closures on weak support.} Xedni is closed twice, both
+  softly; lifted index calculus is closed by three heuristics; the naive
+  prime-field Semaev method is closed by a lower bound conditional on a
+  statistical conjecture validated only to about 25-bit primes; the
+  quasi-subfield routes are closed by results resting on the yield
+  heuristic. Rank-only closures are not reopenings, by W2.
+\end{itemize}
+The triage states that W1--W7 change no claim's status by themselves; the
+Lean and census rounds added nodes and edges. Its recommended order puts
+corpus and proof work first (re-wire the Weil-descent chain to the
+left-kernel theorem, add the eleven edges, transcribe Nagao's definitions)
+and lists the remaining measurements (YYTK's conjecture past 25 bits,
+Semaev's $n=45$ cell, the per-trial xedni marginal) as runs that go through
+the experiment route and the validation gate before any number enters the
+corpus.
+
+\section{Formal status}\label{sec:hd-lean}
+
+Table~\ref{tab:hd-lean} gathers the formal artefacts of this chapter with
+what a kernel has checked and what is only stated or argued. The degree-four
+lower bound of the guarded chain (\texttt{GuardedModel}, Theorem~\ref{thm:guarded})
+and the other fall-degree identities are in \S\ref{sec:fd-guarded}; the
+seven theorems of the Semaev-alternatives audit, which correct an oracle gate
+to $s<m-3$, are in \S\ref{sec:pg-gate}.
+
+\begin{table}[tbp]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.27\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.27\linewidth}@{}}
+\toprule
+Artefact & Kernel-checked & Not formalised \\
+\midrule
+\path{ecdlp_weakness_lean_20261104} (Lean and Mathlib v4.34.1): \texttt{LeftKernel}, \texttt{HazardSeparation}, \texttt{SolvingDegreeBound}, \texttt{SubspaceCriterion}, \texttt{MeanCount}, \texttt{BooleanNullstellensatz}, \texttt{NagaoLiteralInside}, \texttt{TransparentEncoding}, \texttt{ProtocolCountermodels} & Theorems~\ref{thm:hd-subspace}, \ref{thm:hd-leftkernel}, \ref{thm:hd-hazard}; the fourth Lemma~4 cell; the mean count; the $\abs Z=1$ Nullstellensatz; 45 \texttt{\#print axioms} lines in \texttt{AxiomAudit.lean} & F4 containment; $k=N-\operatorname{affdim}Z$ for $\abs Z>1$; that PQ's ``maximal degree'' is the Caminata--Gorla solving degree; relation-to-row step \\
+\addlinespace
+\texttt{IcNegative.FakeDegreeGap} & $W_3$: $d'_F=2$, $d_F=4$ (gate run 41399938870) & $W_k$ for all $k$ (hand proof) \\
+\addlinespace
+\texttt{IcNegative.InsideGap} & the field-equation fall at 4 in two variables (gate run 41484047855) & zero multipliers on further generators; four-variable witnesses \\
+\addlinespace
+\path{RepresentationHashInvariance} (core Lean 4.34.1) & Theorem~\ref{thm:hd-rhoinv}, 11 theorems; producer's \texttt{build.log} & curves, isogenies, conductors; the fixed hash \\
+\bottomrule
+\end{tabularx}
+\caption[]{Formal status of the results of this chapter.}
+\label{tab:hd-lean}
+\end{table}
+
+For the 4~November project the exact status is as follows. Its README says
+each module was compiled with \texttt{lake env lean -o} against the Mathlib
+v4.34.1 cache, that a full local \texttt{lake build} was not possible for lack
+of disk, and that CI's \texttt{lean-proof-gate} runs the full build and the
+transitive axiom audit. The triage records that every theorem audited after
+round~3 (35) depends only on \texttt{propext}, \texttt{Classical.choice} and
+\texttt{Quot.sound}. A search of the committed sources finds no
+\texttt{sorry}, \texttt{admit}, \texttt{native\_decide} or \texttt{axiom}.
+No proof-gate run identifier is recorded for this project in its directory or
+in the corpus fragments, which say the gate ``runs on the landing PR'' or
+``on main after merge''; the pcc claim records are described as pending CI
+signing. The corpus marks the nodes \texttt{kernel\_checked} with status
+\texttt{proved\_internal\_unreviewed}. The theorems are general statements
+of linear algebra, counting and finite probability; their bearing on the
+literature is through the bridges named in the right column, which are
+argued, not proved.
+
+\section{What the literature's subexponential claims now rest on}\label{sec:hd-ledger}
+
+Table~\ref{tab:hd-ledger} sets the claims of \S\ref{sec:theory} and the two
+recent prime-field claims against the obligations of
+Table~\ref{tab:hd-chain}, with what is proved, refuted, conditional and open.
+Statuses in the second column are the corpus's.
+
+\begin{table}[tbp]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.2\linewidth}>{\raggedright\arraybackslash}p{0.13\linewidth}X@{}}
+\toprule
+Claim & Corpus status & What this programme established \\
+\midrule
+Diem 2011: subexponential ECDLP over $\FF_{q^n}$ for $n$ growing with $\log q$~\cite{diem2011} & proved (external) & Untouched. Its scope, as the corpus records it: for fixed $n$ the bound is exponential, and for $q=2$, $n$ prime it is $e^{O(n^2)}$, far above rho. For the rigorous Weil-descent chain (GTTD, Diem 2006, GHS) the rank step needs no heuristic for single targets (Theorem~\ref{thm:hd-leftkernel}). \\
+\addlinespace
+Petit--Quisquater 2012: $2^{c\,n^{2/3}\log n}$ for binary curves~\cite{petit2012} & heuristic premise & Literal Assumption~2 fails on 119/119 instances; the $m=2$ Kousidis--Wiemers value 3 is not reached at $n=17$--44; $d_{\tilde F}\ge5$ certified at $n=33$--45. The $o(1)$ form is not refuted: no growing lower bound. \\
+\addlinespace
+Semaev 2015: $2^{c\sqrt{n\ln n}}$, $c\approx1.69$~\cite{semaev2015} & conditional & Assumption~1 ($d_{F4}\le4$) refuted as stated in four cells; ``first fall degree always 4'' refuted at $t=2$ (200/200 have 2). The revised growth condition is open. \\
+\addlinespace
+Nagao 2015/984: polynomial time under FFDA~\cite{nagao2015} & conditional & Lemma~4 refuted in three reading--placement cells, proved in the fourth; A1 and the $+1$ form of A2 refuted; inside gap bounded by 3 because inside $d_F\le4$ is degenerate; A3 survives on the triples tested. The complexity claim rests on the first-fall heuristic of W1. \\
+\addlinespace
+PKM 2016: prime-field algebraic route~\cite{pkm2016} & conditional & $m=4$ solving degrees $6,7,7$ above the threshold 4 and work $\times558{,}304$ from $N=8$ to 16; $\Delta=10$ contradicted at $p\le16001$ in the right-kernel regime; no cheap root-finding algorithm. \\
+\addlinespace
+Hashed-base Boolean tensor contraction (Akshima et al.\ v0.2) & conditional & The only inspected route with an explicit end-to-end subexponential bound; conditional on the pinned contraction theorem; predicate cost and aggregate complexity uncertified (\S\ref{sec:pt-tensor}). \\
+\addlinespace
+Xedni and lifted index calculus & obstruction conditional & JKSST is a chain of conditional links; the waiting-time link needs only per-trial marginals (Theorem~\ref{thm:hd-hazard}); the marginal bound for the adaptive trial is open. \\
+\bottomrule
+\end{tabularx}
+\caption[]{The subexponential claims and the obligations they discharge.
+Corpus statuses from \art{docs/ecdlp-hardness-corpus/}; the right column
+summarises \S\S\ref{sec:hd-chain}--\ref{sec:hd-generic}. Census figures
+are unverified; Lean results as in Table~\ref{tab:hd-lean}.}
+\label{tab:hd-ledger}
+\end{table}
+
+Read by kind:
+\begin{itemize}
+\item \emph{Proved here.} Five general statements, all kernel-checked and
+  unreviewed: the subspace criterion, the left-kernel theorem with its exact
+  $1/q$ failure density, the marginal waiting-time bound with its separation,
+  the fourth Lemma~4 cell, and representation-hash invariance of rho. None
+  is a lower bound on an index-calculus algorithm. Two of them
+  \emph{remove} a heuristic: the rank heuristic from the rigorous
+  Weil-descent chain, and the hazard recurrence from the xedni obstruction.
+\item \emph{Refuted.} Literal readings, all at the level of a stated
+  assumption: Semaev's Assumption~1 and his $t=2$ first-fall statement;
+  Nagao's Lemma~4 in three cells, and the repairs A1 and A2 ($+1$);
+  Petit--Quisquater Assumption~2 read literally, on every instance computed;
+  PKM's $\Delta=10$ at toy sizes; the corpus inferences
+  \texttt{CLAIM-MARGINAL-IMPLIES-HAZARD} and
+  \texttt{CLAIM-SHOUP-ALL-ALGORITHMS}.
+\item \emph{Conditional.} Every subexponential claim for binary or prime
+  fields remains conditional: on an asymptotic degree assumption
+  (Petit--Quisquater's $o(1)$, Semaev's revised growth condition), on a
+  first-fall heuristic (Nagao, PKM), or on an external theorem (the tensor
+  route).
+\item \emph{Open.} A last-fall or solving-degree lower bound that grows with
+  $n$ for any presentation (\S\ref{sec:fd-summary}); a per-trial marginal
+  bound for adaptive xedni lifts; the trace pull-back beyond
+  one-dimensional $V$ over $\FF_{p^2}$; a non-generic prime-field predicate
+  with a simulator-or-separation proof; and whether ecbench's fixed rho hash
+  sees the conductor.
+\end{itemize}
+The direction is consistent. Each refutation removes support from a
+subexponential claim, and none supplies one; each theorem either confines a
+heuristic to a narrower regime or shows a closure to be stronger than its
+stated support. On the only family where every obligation was measured, the
+Gaudry--Diem descent, the distance to matched rho at toy size is 4--5 orders
+of magnitude at $w\ge0.1$, and IC is ahead nowhere in the band.
