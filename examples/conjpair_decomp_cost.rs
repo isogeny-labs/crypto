@@ -592,6 +592,7 @@ fn solve_inf(
     label: &str,
     transform: Option<&[[u64; 5]; 5]>,
     seed: u64,
+    macaulay_degree: u8,
 ) -> String {
     let f = &curve.f;
     let p = f.p;
@@ -610,7 +611,18 @@ fn solve_inf(
         sparsest: true,
     };
     let mut rng = StdRng::seed_from_u64(seed);
-    let sols = solve_system4_with(&comps, opts, 8, 29, p, &mut rng, &mut st, false, None, None);
+    let sols = solve_system4_with(
+        &comps,
+        opts,
+        8,
+        macaulay_degree,
+        p,
+        &mut rng,
+        &mut st,
+        false,
+        None,
+        None,
+    );
     st.weil_muls += weil;
     st.close_public();
     let total = st.total_muls + tf_muls;
@@ -1136,6 +1148,34 @@ fn main() {
                 if only_failing && mitm(&curve, fb, r).is_empty() {
                     continue;
                 }
+                if inf && macdegs != [29] {
+                    let lab = format!("\"p\":{p},\"curve\":{ci},\"arm\":\"{arm}\",\"target\":\"{name}\",\"fb_points\":{}", fb.len());
+                    let mut arng = StdRng::seed_from_u64(
+                        0x9150
+                            + ci as u64 * 31
+                            + name.len() as u64
+                            + if arm == "conj" { 0 } else { 7 },
+                    );
+                    let a5 = random_gl5(p, &mut arng);
+                    for &md in &macdegs {
+                        let row = solve_inf(
+                            &curve,
+                            h,
+                            fb,
+                            r,
+                            &x0,
+                            &u,
+                            &format!("{lab},\"set\":\"A1\",\"macaulay_degree\":{md}"),
+                            Some(&a5),
+                            0xdec0 + ci as u64,
+                            md,
+                        );
+                        eprintln!("{row}");
+                        writeln!(fh, "{row}").unwrap();
+                        fh.flush().unwrap();
+                    }
+                    continue;
+                }
                 if inf {
                     let lab = format!("\"p\":{p},\"curve\":{ci},\"arm\":\"{arm}\",\"target\":\"{name}\",\"fb_points\":{}", fb.len());
                     let row1 = solve_inf(
@@ -1148,6 +1188,7 @@ fn main() {
                         &format!("{lab},\"set\":\"R1\""),
                         None,
                         0xdec0 + ci as u64,
+                        29,
                     );
                     eprintln!("{row1}");
                     writeln!(fh, "{row1}").unwrap();
@@ -1168,6 +1209,7 @@ fn main() {
                         &format!("{lab},\"set\":\"R2\""),
                         Some(&a5),
                         0xdec0 + ci as u64,
+                        29,
                     );
                     eprintln!("{row2}");
                     writeln!(fh, "{row2}").unwrap();
@@ -1207,7 +1249,7 @@ fn main() {
                 }
             }
         }
-        if inf {
+        if inf && macdegs == [29] {
             // R3: targets planted as 3-point sums, from a separate stream
             let mut prng = StdRng::seed_from_u64(0x3f1a_7e00 + ci as u64);
             for (arm, x0, u, h, fb) in [
@@ -1237,6 +1279,7 @@ fn main() {
                         &format!("{lab},\"set\":\"R3\""),
                         None,
                         0xdec0 + ci as u64,
+                        29,
                     );
                     eprintln!("{row1}");
                     writeln!(fh, "{row1}").unwrap();
@@ -1251,6 +1294,7 @@ fn main() {
                         &format!("{lab},\"set\":\"R3\""),
                         Some(&a5),
                         0xdec0 + ci as u64,
+                        29,
                     );
                     eprintln!("{row2}");
                     writeln!(fh, "{row2}").unwrap();

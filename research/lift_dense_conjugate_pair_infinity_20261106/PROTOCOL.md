@@ -105,4 +105,23 @@ recorded `st.outcome` strings say.
 
 ## Amendments
 
-(none)
+**A1 (2026-11-06, the owner's request; registered before its own data, after
+the first R1/R2 solves).**
+
+- **What prompted it.** On curve 1's two conj targets that failed before
+  (planted, `common0`), the transformed solve at Macaulay degree 29 succeeds
+  and recovers every oracle decomposition. But its quotient dimension is
+  4,095 and 4,094, not the 4,096 that Q1-b predicts.
+- **Follow-up.** Re-solve those transformed systems, with the same A, at
+  Macaulay degrees 30, 31 and 32 (`--inf --macdeg 30,31,32 --only-arm conj
+  --only-curve 1 --only-decomposable`), recording dim, outcome, cost and
+  decompositions.
+- **Rule M2.** If dim reaches 4,096 at some degree ≤ 32, the 29-degree
+  shortfall is truncation: the regularity is higher after the transform, as
+  a point of higher multiplicity would cause. If dim stays below 4,096
+  through degree 32, the shortfall is not truncation. The candidates are
+  then a point the random chart still misses, or a non-zero-dimensional
+  component. Those are reported, not decided.
+- **Q1-b.** The verdict stays as registered on the degree-29 data.
+- **Scheduling.** These solves start only after the main run finishes,
+  because degree 32 needs about 7.5 GB.
