@@ -1495,8 +1495,23 @@ impl Instance {
         seed: u64,
         index: u64,
     ) -> Option<([String; 2], u64)> {
+        self.hash_to_subgroup_counted(curve, seed, index, &mut HashWork::default())
+    }
+
+    /// [`Instance::hash_to_subgroup`], also tallying into `work` what the
+    /// derivation did, including the draws that found no point. Only the
+    /// prime-field branch fills `work.draws`, `sqrt_field_muls` and
+    /// `on_curve_checks`; every branch adds its cofactor multiplications to
+    /// `work.group_ops`. The result is the same function of the inputs.
+    pub fn hash_to_subgroup_counted(
+        &self,
+        curve: &CurveFacts,
+        seed: u64,
+        index: u64,
+        work: &mut HashWork,
+    ) -> Option<([String; 2], u64)> {
         let model = model_hash(curve);
-        let mut scratch = GroupOps::default();
+        let scratch = &mut work.group_ops;
         if let Instance::Fp4(_)
         | Instance::Fp4Torsion(_)
         | Instance::F2m4(_)
@@ -1541,13 +1556,17 @@ impl Instance {
                 Instance::Prime(i) => {
                     let c = &i.curve;
                     let x = h % c.p;
-                    let Some(y) = c.sqrt(c.rhs(x)) else { continue };
+                    work.draws += 1;
+                    let Some(y) = c.sqrt_counted(c.rhs(x), &mut work.sqrt_field_muls) else {
+                        continue;
+                    };
                     let y = if flip && y != 0 { c.p - y } else { y };
                     let p = PrimePoint::affine(x, y);
+                    work.on_curve_checks += 1;
                     if !c.is_on_curve(p) {
                         continue;
                     }
-                    let q = c.mul(&mut scratch, p, i.cofactor);
+                    let q = c.mul(scratch, p, i.cofactor);
                     if !q.infinity {
                         return Some(([format!("0x{:x}", q.x), format!("0x{:x}", q.y)], counter));
                     }
@@ -1590,7 +1609,7 @@ impl Instance {
                     };
                     let k = CountedGroup::key(c, &pt);
                     let pt = if (k & 1 == 1) != flip { pt } else { c.neg(&pt) };
-                    let q: Pt4 = CountedGroup::mul(c, &mut scratch, pt, i.cofactor);
+                    let q: Pt4 = CountedGroup::mul(c, scratch, pt, i.cofactor);
                     if !q.inf {
                         return Some((
                             [
@@ -1620,7 +1639,7 @@ impl Instance {
                     let k = CountedGroup::key(c, &pt);
                     let pt = if (k & 1 == 1) != flip { pt } else { c.neg(&pt) };
                     let cof = u64::try_from(i.cofactor).expect("a small cofactor");
-                    let q: PtB = CountedGroup::mul(c, &mut scratch, pt, cof);
+                    let q: PtB = CountedGroup::mul(c, scratch, pt, cof);
                     if !q.inf {
                         return Some((
                             [
@@ -1642,7 +1661,7 @@ impl Instance {
                         continue;
                     };
                     let g = BinaryGroup(&i.fast);
-                    let q = g.mul(&mut scratch, p, i.cofactor);
+                    let q = g.mul(scratch, p, i.cofactor);
                     if !q.infinity {
                         return Some(([format!("0x{:x}", q.x), format!("0x{:x}", q.y)], counter));
                     }
@@ -1651,6 +1670,19 @@ impl Instance {
         }
         None
     }
+}
+
+/// What one [`Instance::hash_to_subgroup_counted`] call did: the cofactor
+/// multiplications' group operations, and, on a prime field, the draws (each
+/// one SHA-256 hash, one curve-equation evaluation and one square-root
+/// attempt), the modular multiplications of those square roots and the
+/// on-curve checks. Nothing here is priced by the derivation itself.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct HashWork {
+    pub group_ops: GroupOps,
+    pub draws: u64,
+    pub sqrt_field_muls: u64,
+    pub on_curve_checks: u64,
 }
 
 /// ICV1's last field: the first 12 hex digits of the model hash.
