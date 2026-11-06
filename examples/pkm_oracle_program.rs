@@ -3,6 +3,8 @@
 //! Native unit tests are development checks, never an admitted timing panel.
 #[path = "pkm_oracle_program/algebra.rs"]
 mod algebra;
+#[path = "pkm_oracle_program/native_work.rs"]
+mod native_work;
 #[path = "pkm_oracle_program/pipeline.rs"]
 mod pipeline;
 #[path = "pkm_oracle_program/rank_reference.rs"]
@@ -121,6 +123,7 @@ impl Phase {
 
 #[derive(Default, Debug, Serialize)]
 struct Ledger {
+    f4_native_work: native_work::Work,
     validation: Phase,
     validation_reference_counts: reference::Counts,
     construction: Phase,
@@ -284,104 +287,111 @@ fn run(r: &Request) -> Result<Report, String> {
         let solve = Instant::now();
         let mut callbacks = 0;
         let mut verifier = reference::Curve::new(r);
-        let result = f4_fp::solve_visit(&polys, n, r.p, &opts, &vec![None; n], |assignment| {
-            callbacks += 1;
-            let before = algebra::counts();
-            let decode = Instant::now();
-            let roots = if r.arm == Arm::SymmetricS5 {
-                let mut polynomial = vec![0; r.m + 1];
-                polynomial[r.m] = 1;
-                for k in 1..=r.m {
-                    polynomial[r.m - k] = if k % 2 == 0 {
-                        assignment[k - 1]
-                    } else {
-                        algebra::subm(0, assignment[k - 1], r.p)
-                    };
-                }
-                poly_roots_fp_counted_until(
-                    &polynomial,
-                    r.p,
-                    0x504b4d,
-                    &mut ledger.decode_root_multiplications,
-                    deadline,
-                )
-            } else {
-                Some((0..r.m).map(|i| assignment[i * r.t]).collect())
-            };
-            let Some(mut roots) = roots else {
-                ledger.root_decode.finish(decode, before);
-                cutoff = Some("root_decode_deadline");
-                return true;
-            };
-            roots.sort_unstable();
-            let distinct = roots.windows(2).all(|w| w[0] != w[1]);
-            let valid = roots.len() == r.m
-                && distinct
-                && roots.iter().all(|&w| algebra::powm(w, 1 << r.t, r.p) == 1);
-            ledger.root_decode.finish(decode, before);
-            if valid {
+        let result = ledger.f4_native_work.solve_visit(
+            &polys,
+            n,
+            r.p,
+            &opts,
+            &vec![None; n],
+            |assignment| {
+                callbacks += 1;
                 let before = algebra::counts();
-                let lift = Instant::now();
-                let mut lifted = Vec::new();
-                for w in roots {
-                    let x = algebra::mulm(r.g, w, r.p);
-                    let x2 = algebra::mulm(x, x, r.p);
-                    let x3 = algebra::mulm(x2, x, r.p);
-                    let ax = algebra::mulm(r.a, x, r.p);
-                    let rhs = algebra::addm(x3, ax, r.p);
-                    let rhs = algebra::addm(rhs, r.b, r.p);
-                    let Some(y) = algebra::sqrtm(rhs, r.p) else {
-                        lifted.clear();
-                        break;
-                    };
-                    lifted.push(point(&curve, Point { x, y }));
-                }
-                ledger.lift.finish(lift, before);
-                if lifted.len() == r.m {
-                    for signs in 0..1usize << r.m {
-                        let before = algebra::counts();
-                        let sign_start = Instant::now();
-                        ledger.signed_tuples += 1;
-                        let mut sum = None;
-                        let mut witness = Vec::new();
-                        for (i, &q) in lifted.iter().enumerate() {
-                            let q = if signs >> i & 1 == 0 { q } else { curve.neg(q) };
-                            sum = curve.add(sum, Some(q));
-                            ledger.point_addition_calls += 1;
-                            witness.push(coords(&curve, q));
-                        }
-                        witness.sort_unstable();
-                        let hit = sum == Some(point(&curve, r.target));
-                        ledger.signs.finish(sign_start, before);
-                        if hit {
+                let decode = Instant::now();
+                let roots = if r.arm == Arm::SymmetricS5 {
+                    let mut polynomial = vec![0; r.m + 1];
+                    polynomial[r.m] = 1;
+                    for k in 1..=r.m {
+                        polynomial[r.m - k] = if k % 2 == 0 {
+                            assignment[k - 1]
+                        } else {
+                            algebra::subm(0, assignment[k - 1], r.p)
+                        };
+                    }
+                    poly_roots_fp_counted_until(
+                        &polynomial,
+                        r.p,
+                        0x504b4d,
+                        &mut ledger.decode_root_multiplications,
+                        deadline,
+                    )
+                } else {
+                    Some((0..r.m).map(|i| assignment[i * r.t]).collect())
+                };
+                let Some(mut roots) = roots else {
+                    ledger.root_decode.finish(decode, before);
+                    cutoff = Some("root_decode_deadline");
+                    return true;
+                };
+                roots.sort_unstable();
+                let distinct = roots.windows(2).all(|w| w[0] != w[1]);
+                let valid = roots.len() == r.m
+                    && distinct
+                    && roots.iter().all(|&w| algebra::powm(w, 1 << r.t, r.p) == 1);
+                ledger.root_decode.finish(decode, before);
+                if valid {
+                    let before = algebra::counts();
+                    let lift = Instant::now();
+                    let mut lifted = Vec::new();
+                    for w in roots {
+                        let x = algebra::mulm(r.g, w, r.p);
+                        let x2 = algebra::mulm(x, x, r.p);
+                        let x3 = algebra::mulm(x2, x, r.p);
+                        let ax = algebra::mulm(r.a, x, r.p);
+                        let rhs = algebra::addm(x3, ax, r.p);
+                        let rhs = algebra::addm(rhs, r.b, r.p);
+                        let Some(y) = algebra::sqrtm(rhs, r.p) else {
+                            lifted.clear();
+                            break;
+                        };
+                        lifted.push(point(&curve, Point { x, y }));
+                    }
+                    ledger.lift.finish(lift, before);
+                    if lifted.len() == r.m {
+                        for signs in 0..1usize << r.m {
                             let before = algebra::counts();
-                            let verify = Instant::now();
-                            let correct = verifier.verify(r, &witness);
-                            ledger.verification.finish(verify, before);
-                            if !correct {
-                                verification_failure = true;
-                                return true;
+                            let sign_start = Instant::now();
+                            ledger.signed_tuples += 1;
+                            let mut sum = None;
+                            let mut witness = Vec::new();
+                            for (i, &q) in lifted.iter().enumerate() {
+                                let q = if signs >> i & 1 == 0 { q } else { curve.neg(q) };
+                                sum = curve.add(sum, Some(q));
+                                ledger.point_addition_calls += 1;
+                                witness.push(coords(&curve, q));
                             }
-                            ledger.independently_verified_hits += 1;
-                            if !found.insert(witness) {
-                                ledger.duplicate_witness_hits += 1;
-                            }
-                            if found.len() >= r.limits.max_witnesses {
-                                cutoff = Some("witness_limit");
-                                return true;
+                            witness.sort_unstable();
+                            let hit = sum == Some(point(&curve, r.target));
+                            ledger.signs.finish(sign_start, before);
+                            if hit {
+                                let before = algebra::counts();
+                                let verify = Instant::now();
+                                let correct = verifier.verify(r, &witness);
+                                ledger.verification.finish(verify, before);
+                                if !correct {
+                                    verification_failure = true;
+                                    return true;
+                                }
+                                ledger.independently_verified_hits += 1;
+                                if !found.insert(witness) {
+                                    ledger.duplicate_witness_hits += 1;
+                                }
+                                if found.len() >= r.limits.max_witnesses {
+                                    cutoff = Some("witness_limit");
+                                    return true;
+                                }
                             }
                         }
                     }
+                } else {
+                    ledger.rejected_root_sets += 1;
                 }
-            } else {
-                ledger.rejected_root_sets += 1;
-            }
-            if callbacks >= r.limits.max_assignments {
-                cutoff = Some("assignment_limit");
-                return true;
-            }
-            false
-        })?;
+                if callbacks >= r.limits.max_assignments {
+                    cutoff = Some("assignment_limit");
+                    return true;
+                }
+                false
+            },
+        )?;
         let inclusive_ns = solve.elapsed().as_nanos();
         ledger.solve_excluding_callbacks.elapsed_ns = inclusive_ns
             .checked_sub(ledger.callbacks_ns())
@@ -486,6 +496,18 @@ fn replay_counted(
         return Err("status does not match completion/output".into());
     }
     let ledger = &record["ledger"];
+    if let Some(native) = ledger.get("f4_native_work") {
+        native_work::check_report(native)?;
+        let visited = !record["visitor"].is_null();
+        if native["attempted"] != visited
+            || native["result_state"] != if visited { "returned" } else { "not_called" }
+            || native["callbacks_seen"]
+                .as_u64()
+                .is_some_and(|seen| visited && record["visitor"]["solutions_visited"] != seen)
+        {
+            return Err("native window visitor binding mismatch".into());
+        }
+    }
     let number = |v: &serde_json::Value| {
         v.as_u64()
             .map(u128::from)
