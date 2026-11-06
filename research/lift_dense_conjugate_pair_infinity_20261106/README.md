@@ -209,4 +209,4 @@ python3 research/lift_dense_conjugate_pair_infinity_20261106/fig.py out/   # lay
 
 | claim | standing | content |
 |:--|:--|:--|
-| `PCC-PENDING` | not covered (unsigned) | rule counts, cost band, A1 degrees ([`validator-report.json`](reports/run-20261106T1550Z/validator-report.json), values in [`claimed.json`](claimed.json)) |
+| `PCC-20261106-e1a9d3` | not covered (unsigned) | rule counts, cost band, A1 degrees ([`validator-report.json`](reports/run-20261106T1550Z/validator-report.json), values in [`claimed.json`](claimed.json)) |
