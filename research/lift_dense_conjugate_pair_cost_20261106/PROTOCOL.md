@@ -145,3 +145,16 @@ added:
   alongside.
 
 This amendment is committed before `run-smallh` is executed.
+
+**A2 (2026-11-06, after A1's data; post-hoc analysis, no rule changed).**
+
+- The A1 cells show Y(conj)/Y(std) ≈ 36, about 2·(k_c/k_s)⁴. As a result
+  Y1, Y2 and Y4 fail **above** their bands.
+- Explanation, derived after the data: on a conjugate-pair line,
+  x − e_c = u(t − γ) with t − γ ∈ K₀, a square in K. So χ(x − e_c) is
+  constant on the line, and the factor base lies in one coset of the
+  index-2 subgroup of the 2-descent map in the e_c coordinate.
+- So 4-sums lie in that subgroup, which contains ⟨P⟩. That doubles the
+  hit rate on odd-order targets relative to unconstrained lines.
+- The verdicts stay FAIL as registered. A1 ran from directory
+  `reports/run-20261106T0514Z/` (start ≈ 05:14 UTC).
