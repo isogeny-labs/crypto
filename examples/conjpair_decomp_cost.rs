@@ -449,8 +449,303 @@ fn solve_one(
     )
 }
 
+// ── summarizer (PROTOCOL rules K1–K3 and A1's M1) ────────────────────────
+
+fn jrows(path: &str) -> Vec<serde_json::Value> {
+    std::fs::read_to_string(path)
+        .unwrap()
+        .lines()
+        .map(|l| serde_json::from_str(l).unwrap())
+        .collect()
+}
+fn u(v: &serde_json::Value, k: &str) -> u64 {
+    v[k].as_u64()
+        .unwrap_or_else(|| v[k].to_string().parse().unwrap_or(0))
+}
+fn b(v: &serde_json::Value, k: &str) -> bool {
+    v[k].as_bool().unwrap_or(false)
+}
+fn s<'a>(v: &'a serde_json::Value, k: &str) -> &'a str {
+    v[k].as_str().unwrap_or("")
+}
+
+/// `--summarize <main rows> <a1 rows> <out dir>`: SUMMARY.md, summary.json,
+/// validator-report.json (pins both row files by SHA-256).
+fn summarize(main_rows: &str, a1_rows: &str, out: &str, claimed: Option<&str>) {
+    use sha2::{Digest, Sha256};
+    use std::fmt::Write as _;
+    let rows = jrows(main_rows);
+    let a1 = jrows(a1_rows);
+    let solves: Vec<&serde_json::Value> = rows
+        .iter()
+        .filter(|r| s(r, "kind") == "solve" && !b(r, "aa"))
+        .collect();
+    let aas: Vec<&serde_json::Value> = rows.iter().filter(|r| b(r, "aa")).collect();
+    let controls_ok = rows
+        .iter()
+        .filter(|r| s(r, "kind") == "control")
+        .all(|r| b(r, "std_H_equals_precompute"));
+    let mut md = String::new();
+    let mut vals: Vec<(String, f64)> = vec![];
+    // K1
+    let k1_bad: Vec<String> = solves
+        .iter()
+        .filter(|r| u(r, "dim") != 4096 || u(r, "rows") != 41780 || u(r, "cols") != 40920)
+        .map(|r| {
+            format!(
+                "curve {} {} {} (dim {})",
+                u(r, "curve"),
+                s(r, "arm"),
+                s(r, "target"),
+                u(r, "dim")
+            )
+        })
+        .collect();
+    // K3
+    let k3_bad: Vec<String> = solves
+        .iter()
+        .filter(|r| !b(r, "match"))
+        .map(|r| {
+            format!(
+                "curve {} {} {}: solver {} vs oracle {}",
+                u(r, "curve"),
+                s(r, "arm"),
+                s(r, "target"),
+                u(r, "solver_decomps"),
+                u(r, "oracle_decomps")
+            )
+        })
+        .collect();
+    // K2 per common target
+    let mut k2_rows = String::new();
+    let mut k2_ok = true;
+    for c in [1u64, 2] {
+        for t in ["common0", "common1"] {
+            let g = |arm: &str| {
+                solves
+                    .iter()
+                    .find(|r| u(r, "curve") == c && s(r, "arm") == arm && s(r, "target") == t)
+                    .copied()
+            };
+            if let (Some(a), Some(z)) = (g("conj"), g("std")) {
+                let ratio = u(a, "total_muls") as f64 / u(z, "total_muls") as f64;
+                let both = b(a, "solved") && b(z, "solved") && b(a, "match") && b(z, "match");
+                if !(0.9..=1.1).contains(&ratio) || !both {
+                    k2_ok = false;
+                }
+                writeln!(
+                    k2_rows,
+                    "| {c} | {t} | {:.4e} ({}) | {:.4e} ({}) | {ratio:.3} |",
+                    u(a, "total_muls") as f64,
+                    if b(a, "match") { "ok" } else { "FAILED" },
+                    u(z, "total_muls") as f64,
+                    if b(z, "match") { "ok" } else { "FAILED" }
+                )
+                .unwrap();
+                vals.push((format!("ratio_c{c}_{t}_x1000"), (ratio * 1000.0).round()));
+            }
+        }
+    }
+    let med = |arm: &str| {
+        let mut v: Vec<f64> = solves
+            .iter()
+            .filter(|r| s(r, "arm") == arm)
+            .map(|r| u(r, "total_muls") as f64)
+            .collect();
+        v.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        let n = v.len();
+        if n % 2 == 1 {
+            v[n / 2]
+        } else {
+            (v[n / 2 - 1] + v[n / 2]) / 2.0
+        }
+    };
+    let med_ratio = med("conj") / med("std");
+    let k2_med_ok = (0.95..=1.05).contains(&med_ratio);
+    let aa_ok = aas.iter().all(|a| {
+        solves.iter().any(|r| {
+            u(r, "curve") == u(a, "curve")
+                && s(r, "arm") == s(a, "arm")
+                && s(r, "target") == s(a, "target")
+                && u(r, "total_muls") == u(a, "total_muls")
+        })
+    });
+    vals.push(("k1_violations".into(), k1_bad.len() as f64));
+    vals.push(("k3_violations".into(), k3_bad.len() as f64));
+    vals.push(("median_ratio_x1000".into(), (med_ratio * 1000.0).round()));
+    vals.push(("solves".into(), solves.len() as f64));
+    // A1 / M1
+    let mut a1_tab = String::new();
+    let mut m1: Vec<String> = vec![];
+    let a1s: Vec<&serde_json::Value> = a1.iter().filter(|r| s(r, "kind") == "solve").collect();
+    let mut targets: Vec<(u64, String)> = a1s
+        .iter()
+        .map(|r| (u(r, "curve"), s(r, "target").to_string()))
+        .collect();
+    targets.dedup();
+    for (c, t) in &targets {
+        let mut first_ok: Option<(u64, u64)> = None;
+        for r in a1s
+            .iter()
+            .filter(|r| u(r, "curve") == *c && s(r, "target") == t)
+        {
+            let ok = b(r, "solved") && b(r, "match");
+            writeln!(
+                a1_tab,
+                "| {c} | {t} | {} | {} | {} | {:.4e} | {}/{} | {} |",
+                u(r, "macaulay_degree"),
+                u(r, "rows"),
+                u(r, "dim"),
+                u(r, "total_muls") as f64,
+                u(r, "solver_decomps"),
+                u(r, "oracle_decomps"),
+                if ok { "ok" } else { "FAILED" }
+            )
+            .unwrap();
+            if ok && first_ok.is_none() {
+                first_ok = Some((u(r, "macaulay_degree"), u(r, "total_muls")));
+            }
+        }
+        let std_cost = solves
+            .iter()
+            .filter(|r| u(r, "curve") == *c && s(r, "arm") == "std")
+            .map(|r| u(r, "total_muls") as f64)
+            .sum::<f64>()
+            / solves
+                .iter()
+                .filter(|r| u(r, "curve") == *c && s(r, "arm") == "std")
+                .count() as f64;
+        match first_ok {
+            Some((d, m)) => {
+                m1.push(format!("curve {c} {t}: first working degree {d}, {:.4e} muls = {:.2}× the std arm's mean degree-29 cost on that curve", m as f64, m as f64 / std_cost));
+                vals.push((format!("m1_c{c}_degree"), d as f64));
+            }
+            None => {
+                m1.push(format!("curve {c} {t}: no degree ≤ 32 works"));
+                vals.push((format!("m1_c{c}_degree"), 0.0));
+            }
+        }
+    }
+    let v = |x: bool| if x { "PASS" } else { "FAIL" };
+    writeln!(md, "# Summary (coded rules, PROTOCOL.md)\n").unwrap();
+    writeln!(
+        md,
+        "- Control: std H equals `SymmetrisedS5::precompute` on every curve: **{}**",
+        v(controls_ok)
+    )
+    .unwrap();
+    writeln!(
+        md,
+        "- **K1** (rows 41,780, cols 40,920, dim 4,096 on every solve): **{}** {:?}",
+        v(k1_bad.is_empty()),
+        k1_bad
+    )
+    .unwrap();
+    writeln!(md, "- **K2** (common-target ratio in [0.9, 1.1] with both solves correct): **{}**; median ratio over all solves {med_ratio:.3} (band [0.95, 1.05]: **{}**)", v(k2_ok), v(k2_med_ok)).unwrap();
+    writeln!(
+        md,
+        "- **K3** (solver = oracle on every solve): **{}** {:?}",
+        v(k3_bad.is_empty()),
+        k3_bad
+    )
+    .unwrap();
+    writeln!(
+        md,
+        "- **A/A** (repeated solve, identical count): **{}**\n",
+        v(aa_ok)
+    )
+    .unwrap();
+    writeln!(md, "## Common targets\n\n| curve | target | conj total_muls | std total_muls | conj/std |\n|--:|:--|--:|--:|--:|\n{k2_rows}").unwrap();
+    writeln!(md, "## All solves (Macaulay degree 29)\n\n| curve | arm | target | dim | total_muls | solver/oracle | ok |\n|--:|:--|:--|--:|--:|--:|:--|").unwrap();
+    for r in &solves {
+        writeln!(
+            md,
+            "| {} | {} | {} | {} | {:.4e} | {}/{} | {} |",
+            u(r, "curve"),
+            s(r, "arm"),
+            s(r, "target"),
+            u(r, "dim"),
+            u(r, "total_muls") as f64,
+            u(r, "solver_decomps"),
+            u(r, "oracle_decomps"),
+            if b(r, "match") { "ok" } else { "FAILED" }
+        )
+        .unwrap();
+    }
+    writeln!(md, "\n## Amendment A1: decomposable conj targets at Macaulay degree 30–32\n\n| curve | target | degree | rows | dim | total_muls | solver/oracle | ok |\n|--:|:--|--:|--:|--:|--:|--:|:--|\n{a1_tab}\nM1:\n").unwrap();
+    for l in &m1 {
+        writeln!(md, "- {l}").unwrap();
+    }
+    std::fs::create_dir_all(out).unwrap();
+    std::fs::write(format!("{out}/SUMMARY.md"), &md).unwrap();
+    let js = format!(
+        "{{\"K1\":{},\"K2\":{k2_ok},\"K2_median\":{k2_med_ok},\"K3\":{},\"AA\":{aa_ok},\"control\":{controls_ok},\"values\":{{{}}}}}\n",
+        k1_bad.is_empty(),
+        k3_bad.is_empty(),
+        vals.iter().map(|(k, v)| format!("\"{k}\":{v}")).collect::<Vec<_>>().join(",")
+    );
+    std::fs::write(format!("{out}/summary.json"), &js).unwrap();
+    let sha = |p: &str| hex::encode(Sha256::digest(std::fs::read(p).unwrap()));
+    // claimed values come from a separate file written from the README
+    let claimed_map: HashMap<String, f64> = claimed
+        .map(|p| {
+            std::fs::read_to_string(p)
+                .unwrap()
+                .lines()
+                .filter_map(|l| {
+                    let t = l.trim().trim_end_matches(',');
+                    let (k, v) = t.split_once(':')?;
+                    Some((
+                        k.trim().trim_matches('"').to_string(),
+                        v.trim().parse().ok()?,
+                    ))
+                })
+                .collect()
+        })
+        .unwrap_or_default();
+    let mut status_ok = claimed.is_some();
+    let heads: Vec<String> = vals
+        .iter()
+        .filter_map(|(k, v)| {
+            let c = claimed_map.get(k)?;
+            if c != v {
+                status_ok = false;
+            }
+            Some(format!(
+                "    {{\"name\": \"{k}\", \"claimed\": {c}, \"recomputed\": {v}, \"rel_tol\": 0}}"
+            ))
+        })
+        .collect();
+    if heads.is_empty() {
+        status_ok = false;
+    }
+    let rel = |p: &str| {
+        std::path::Path::new(p)
+            .file_name()
+            .unwrap()
+            .to_string_lossy()
+            .to_string()
+    };
+    let rep = format!(
+        "{{\n  \"schema\": \"validator-report\",\n  \"status\": \"{}\",\n  \"study\": \"research/lift_dense_conjugate_pair_decomp_20261106\",\n  \"recomputed_by\": {{\"tool\": \"examples/conjpair_decomp_cost.rs --summarize\"}},\n  \"note\": \"Producer-run recompute of the summary values from the pinned rows; unsigned, so independence is not established.\",\n  \"raw_data\": [\n    {{\"path\": \"{}\", \"sha256\": \"{}\"}},\n    {{\"path\": \"{}\", \"sha256\": \"{}\"}}\n  ],\n  \"headline\": [\n{}\n  ]\n}}\n",
+        if status_ok { "pass" } else { "fail" },
+        rel(main_rows), sha(main_rows), rel(a1_rows), sha(a1_rows), heads.join(",\n")
+    );
+    std::fs::write(format!("{out}/validator-report.json"), rep).unwrap();
+    print!("{md}");
+}
+
 fn main() {
     let args: Vec<String> = env::args().skip(1).collect();
+    if args.first().map(|s| s.as_str()) == Some("--summarize") {
+        summarize(
+            &args[1],
+            &args[2],
+            &args[3],
+            args.get(4).map(|s| s.as_str()),
+        );
+        return;
+    }
     let (mut p, mut ncurves, mut out, mut aa) = (29u64, 2usize, String::from("rows.jsonl"), false);
     // Amendment A1: Macaulay degrees to try, and an optional restriction to
     // one arm / one curve index (curves are still built in order so that the
