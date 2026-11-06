@@ -15,14 +15,22 @@ use serde_json::{json, Value};
 use std::collections::BTreeMap;
 
 fn produced(changes: &[(&str, &str)], seed: u64) -> Value {
+    let orbit = changes
+        .iter()
+        .any(|(key, value)| *key == "orbit" && *value == "cubic");
+    let (p, a, b, n, gx, gy, k) = if orbit {
+        (103, 0, 5, 97, 2, 42, 17)
+    } else {
+        (101, 59, 6, 107, 78, 4, 37)
+    };
     let spec = CurveSpec::PrimeExplicit {
-        p: 101,
-        a: 59,
-        b: 6,
-        group_order: 107,
-        r: 107,
-        gx: 78,
-        gy: 4,
+        p,
+        a,
+        b,
+        group_order: n,
+        r: n,
+        gx,
+        gy,
     };
     let instance = spec.build().unwrap();
     let facts = instance.facts(&spec);
@@ -31,7 +39,7 @@ fn produced(changes: &[(&str, &str)], seed: u64) -> Value {
     };
     let q = inst
         .curve
-        .mul(&mut GroupOps::default(), inst.generator_point(), 37);
+        .mul(&mut GroupOps::default(), inst.generator_point(), k);
     let target = [format!("{:x}", q.x), format!("{:x}", q.y)];
     let mut params: BTreeMap<String, String> = [
         ("encoding", "partitioned3"),
@@ -66,12 +74,12 @@ fn produced(changes: &[(&str, &str)], seed: u64) -> Value {
     let report = methods::solve(&method, &instance, &facts, &target, seed).unwrap();
     assert_eq!(
         report.recovered.as_ref().map(ToString::to_string),
-        Some("37".into()),
+        Some(k.to_string()),
         "{}",
         report.detail
     );
     let r = json!({"schema":"ecbench.record/v1","record_id":"", "workload":{"curve_spec":spec,"curve":facts,"target":target},
-        "method":method,"algorithm_seed":seed.to_string(),"outcome":{"status":"verified","recovered":"37"},
+        "method":method,"algorithm_seed":seed.to_string(),"outcome":{"status":"verified","recovered":k.to_string()},
         "detail":report.detail,"phases":report.phases,"online":report.online,"counters":report.counters,
         "time":{"solve_wall_ns":report.solve_wall_ns,"method_call_wall_ns":null}});
     let mut r = r;
@@ -109,6 +117,45 @@ fn unequal_four_point_profiles_restore_each_original_guessed_coordinate() {
             ));
         }
     }
+}
+#[test]
+fn actual_certified_orbit_chart_matches_the_saturated_producer_and_reader() {
+    let mut changes = vec![
+        ("labels", "random"),
+        ("subset_profile", "1,1,1"),
+        ("orbit", "cubic"),
+        ("beta", "56"),
+        ("lambda", "35"),
+        ("prune", "true"),
+        ("encoding", "line3"),
+    ];
+    let original = produced(&changes, 20261026);
+    changes.last_mut().unwrap().1 = "line_chart3";
+    let chart = produced(&changes, 20261026);
+    check(&original);
+    check(&chart);
+    assert_eq!(
+        original["detail"]["attempts"][0]["base"],
+        chart["detail"]["attempts"][0]["base"]
+    );
+    assert_eq!(
+        original["detail"]["attempts"][0]["algebra"]["coordinate_sets"],
+        chart["detail"]["attempts"][0]["algebra"]["coordinate_sets"]
+    );
+    assert_eq!(
+        original["detail"]["attempts"][0]["system"]["variables"]
+            .as_array()
+            .unwrap()
+            .len(),
+        3
+    );
+    assert_eq!(
+        chart["detail"]["attempts"][0]["system"]["variables"]
+            .as_array()
+            .unwrap()
+            .len(),
+        2
+    );
 }
 #[test]
 fn growth_keeps_coverage_chain_and_rejects_partial_old_certificate() {

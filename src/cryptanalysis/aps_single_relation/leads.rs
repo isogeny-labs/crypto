@@ -424,7 +424,12 @@ mod tests {
         let c = FastCurve::new("aps-existing-cubic-development", 103, 0, 5, 97);
         let g = c.point(2, 42);
         let q = c.mul(Some(g), 17).unwrap();
-        let seeds = sample_base(&c, g, q, &[1, 1, 1], Labels::Guaranteed, 20261026, 1000).unwrap();
+        let overlapping =
+            sample_base(&c, g, q, &[1, 1, 1], Labels::Guaranteed, 20261026, 1000).unwrap();
+        assert!(orbit_base(&c, g, q, &overlapping, 56, 35).is_err());
+        // Reuse the established non-overlapping cubic fixture. The different
+        // guaranteed-label draw above is a real refusal, not a valid base.
+        let seeds = sample_base(&c, g, q, &[1, 1, 1], Labels::Random, 20261026, 1000).unwrap();
         let b = orbit_base(&c, g, q, &seeds, 56, 35).unwrap();
         let plan = line_chart(&c, g, q, &b, Some((56, 35))).unwrap();
         assert_eq!(plan.len(), 1);
