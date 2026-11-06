@@ -82,11 +82,15 @@ descents are named as open by Huang, Kosters and Yeo~\cite{hky2015} and by
 Kousidis and Wiemers~\cite{kousidis2019}, and Kosters and
 Yeo~\cite{kosters2015notes} show that the first fall degree of the descent
 of $\Sem3$ is usually 2, through a trace identity. Chapter~\ref{ch:falldegree}
-proves and certifies what the programme could add. Our own measurements on toy fields (\S\ref{sec:binary-descent}) find
-first and last fall degrees of 3--4 at every reachable size while the
-solving degree grows with $\ell$ and stays within one of the semi-regular
-prediction; closure algorithms refute a degree or two earlier but rise too.
-That supports no subexponential claim and refutes none.
+proves and certifies what the programme could add. Early toy
+measurements (\S\ref{sec:binary-descent}) found last fall degrees of
+3--4 at small $\ell$ while the solving degree grows with $\ell$ and stays
+within one of the semi-regular prediction; closure algorithms refute a
+degree or two earlier but rise too. Chapter~\ref{ch:falldegree} then proves
+a first fall degree of 2 for the $m=2$ descent (under the degree-2
+hypothesis met on every instance computed), finds a last fall degree of
+exactly 5 at $n=35$, and certifies $\ge5$ on named instances at
+$n=33$--45. Neither supports or refutes a subexponential claim.
 
 \section{Subfield (Koblitz) curves}
 
@@ -111,8 +115,8 @@ fast evaluation of $\Sem m$ through iterated resultants, and in a second
 variant by summing $m-1$ factor-base points and testing membership of the
 result---the same mechanism as the two-summand root-finding oracle of
 \S\ref{sec:rootfinding}. All of these remain exponential and slower than
-rho; a 2024 analysis again concludes that no subexponential prime-field
-method is known.
+rho; a 2024 analysis (Hu, IACR ePrint 2024/1923, an unrefereed preprint)
+again concludes that no subexponential prime-field method is known.
 
 \section{Lower bounds}
 
@@ -121,7 +125,10 @@ structure. With preprocessing, Corrigan-Gibbs and
 Kogan~\cite{cgk2018} show $S\,T^2=\tilde\Omega(\varepsilon N)$ for $S$ bits
 of advice and online time $T$; this is the bound against which the
 retained-set-up (online) results of \S\ref{sec:koblitz} must be read. A
-2026 structured-generic-group bound shows that an algorithm exploiting
-structure on only a $\delta$ fraction of elements needs
-$\Omega(\min(\sqrt q,1/\delta))$ time---for index calculus, the
-decomposable set must be dense \emph{and} cheaply testable.
+2026 structured-generic-group bound (Corrigan-Gibbs, Henzinger and Wu,
+IACR ePrint 2026/384; recorded at abstract level, body not read) states
+that an algorithm exploiting structure on only a $\delta$ fraction of
+elements needs $\Omega(\min(\sqrt q,1/\delta))$ time---for index
+calculus, the decomposable set would have to be dense \emph{and} cheaply
+testable. Whether it covers coordinate access is an open lead
+(\S\ref{sec:um-oracles}).

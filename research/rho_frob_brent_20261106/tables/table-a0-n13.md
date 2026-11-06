@@ -1,0 +1,5 @@
+| session | arm | method | curve | log2 r | verified | mean S | 95% interval | theory S | S / theory | S / floor | S / reference | lower bound | med wall ms | levels | flags |
+|---|---|---|---|---:|---:|---:|---|---:|---:|---:|---:|---|---:|---|---|
+| ECBS1h94944b3ac7a3 | rho-frob | rho.signed_frobenius_full | icv1-f2m13-t181-515ee569 | 10.97 | 96/96 | 1.989 | [1.919, 2.062] | 0.246 | 8.092 | 8.092 | 1.000 | no | 0.156 | L0×96 | fixed set-up is 57% of S (over 10%); log2 r = 11.0 is below the calibrated range (2^39); S has not reached its constant |
+| ECBS1h94944b3ac7a3 | rho-frob-v2 | rho.signed_frobenius_v2_full | icv1-f2m13-t181-515ee569 | 10.97 | 96/96 | 2.770 | [2.226, 3.448] | 0.246 | 11.271 | 11.271 | 1.393 | no | 0.158 | L0×96 | fixed set-up is 41% of S (over 10%); log2 r = 11.0 is below the calibrated range (2^39); S has not reached its constant |
+| ECBS1h94944b3ac7a3 | rho-frob-aa | rho.signed_frobenius_full | icv1-f2m13-t181-515ee569 | 10.97 | 96/96 | 1.989 | [1.919, 2.062] | 0.246 | 8.092 | 8.092 | 1.000 | no | 0.154 | L0×96 | fixed set-up is 57% of S (over 10%); log2 r = 11.0 is below the calibrated range (2^39); S has not reached its constant |

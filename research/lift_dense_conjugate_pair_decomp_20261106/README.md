@@ -88,6 +88,8 @@ Every statement below is an unverified assertion of this session
   missing, or sit at infinity or in a degenerate component, on those
   targets.
 
+![counted cost per solve and solver correctness](reports/run-20261106T0643Z/fig1_decomp.png)
+
 ## What this means for the cost of the family
 
 - **Per trial.** Equal cost, measured, about 1.1·10¹¹ F_p multiplications
@@ -131,4 +133,4 @@ cargo build --release --example conjpair_decomp_cost
 
 | claim | standing | content |
 |:--|:--|:--|
-| CLAIM_ID | not covered (unsigned) | per-solve costs, shapes, solver/oracle agreement, A1 degrees ([`validator-report.json`](reports/run-20261106T0643Z/validator-report.json)) |
+| `PCC-20261106-d88645` | not covered (unsigned) | per-solve costs, shapes, solver/oracle agreement, A1 degrees ([`validator-report.json`](reports/run-20261106T0643Z/validator-report.json)) |

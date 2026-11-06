@@ -374,10 +374,11 @@ Theorem~\ref{thm:lfd5} contradicts it in three cells:
 \begin{itemize}
 \item $(n,m,t,k)=(35,2,2,18)$, with random subspaces;
 \item $(45,2,2,23)$, with his own default subspace;
-\item $(19,3,3,7)$ and $(21,3,3,7)$, inside the parameter range of his
-  tables, where his polynomial subspace gives 4 and random subspaces do
-  not.
+\item $(19,3,3,7)$, inside the parameter range of his tables, where his
+  polynomial subspace gives 4 and random subspaces do not.
 \end{itemize}
+Implementation~A alone also gives $1\notin W_4$ at $(21,3,3,7)$, with no
+checked certificate.
 \end{corollary}
 
 Table~\ref{tab:fd-chain} lists the chain instances. With Semaev's
@@ -432,7 +433,7 @@ of the systems, carried by a certificate any reader can check. With
 Corollary~\ref{cor:ffd2} it makes the separation between first and last
 fall degree rigorous on named instances. What remains open is the same
 as before: a proof that $d_{\tilde F}\to\infty$. Semaev's asymptotics
-survive if the regularity degree is $o(\sqrt{n\ln n})$, so only a growing
+survive if the regularity degree is $o(\sqrt{n/\ln n})$, so only a growing
 lower bound bears on the subexponential claim.
 
 \paragraph{Re-verification.} For this treatise, the T33a certificate was
@@ -645,7 +646,8 @@ null). None was observed in $n$ at a fixed base.
     4).
   \item It is certified on named binary instances: $\ge5$ against 2, at
     $n=33$--$45$ and in the $m=t=3$ chain.
-  \item It is measured for Kummer towers (6 against 4 at $t=10$).
+  \item It is session-reported for Kummer towers (6 against 4 at $t=10$;
+    raw data not committed).
   \end{itemize}
   Any complexity argument that substitutes the first fall degree for the
   solving degree is unsupported for these systems.

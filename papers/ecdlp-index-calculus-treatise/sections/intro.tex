@@ -14,7 +14,7 @@ should exploit the most structure. The question is \emph{where it crosses
 rho}: on which curves, at which sizes, under which accounting.
 
 This treatise records what one research programme learned about that
-question between July and October 2026. The programme spanned three
+question between July and early November 2026. The programme spanned three
 repositories (\texttt{crypto}, \texttt{crypto-autoresearcher},
 \texttt{cryptanalysis}), several thousand commits and several hundred
 preregistered studies. Two companion documents organise the same work
@@ -34,7 +34,9 @@ This document organises it as a treatise:
 \end{itemize}
 It runs no new experiment. It re-verified one certificate
 (\S\ref{sec:fd-binary}), adds no improvement of its own, and cites the
-committed artefact behind every number.
+committed artefact behind every number; the one exception, the
+session-reported Kummer-tower last fall degrees of \S\ref{sec:fd-pkm}, is
+labelled where it is used.
 
 \section*{The argument in brief}
 
@@ -47,7 +49,8 @@ moves.
 
 \paragraph{2. What is fixed for every curve (Chapter~\ref{ch:cover}).} The
 Galois group of the summation cover is $(\ZZ/2)^{m-2}$ for every curve,
-field and characteristic. Its fibres over $\FF_q$ split by an exact law,
+field and characteristic (a draft proof upheld by an integrity audit; the
+separability lemma in characteristic 2 awaits an expert check). Its fibres over $\FF_q$ split by an exact law,
 and they split completely on the factor-base locus. The mean decomposition
 yield at fixed base size is a double count. Three consequences follow:
 \begin{itemize}
@@ -62,7 +65,9 @@ problem lives.
 \paragraph{3. How hard is the decomposition system (Chapter~\ref{ch:falldegree})?}
 Every subexponential claim for prime-degree binary curves assumes that the
 solving degree stays near the first fall degree. In three presentations we
-prove that the first fall degree is a constant of the presentation, and
+prove that the first fall degree is a constant of the presentation (for
+binary Weil descent, whenever every descended equation has degree 2, as
+on every instance computed), and
 show that the last fall degree, which equals the solving degree for
 unsatisfiable systems, is not bounded by it:
 \begin{itemize}
@@ -70,40 +75,76 @@ unsatisfiable systems, is not bounded by it:
   exactly at $B=3$);
 \item it is certified to differ, by independently checked closure
   certificates, for binary Weil descent ($\ge5$ against 2 at $n=33$--$45$);
-\item it is measured to differ for prime-field Kummer towers (6 against 4).
+\item it is reported to differ for prime-field Kummer towers (6 against 4,
+  session-reported; the raw data were not committed).
 \end{itemize}
 A proof that the last fall degree grows without bound remains the open
 problem, as Huang, Kosters and Yeo~\cite{hky2015} and Kousidis and
 Wiemers~\cite{kousidis2019} left it.
 
-\paragraph{4. What engineering bought (Part~\ref{part:algorithms}).}
-Root-finding oracles made the decomposition step two to five orders of
-magnitude cheaper where they apply. Gröbner engines improved one to two
-orders in counted work. Factor bases closed under maps of known logarithm
-cut linear algebra by constant factors. On the cold one-target frontier
+\paragraph{4. What hardness rests on (Chapter~\ref{ch:hardness}).} An
+index-calculus complexity claim is a chain of six obligations: solver
+growth, yield, relation rank, geometry, a non-generic interface and
+end-to-end composition. The literal Petit--Quisquater Assumption~2 fails
+on all 119 census instances; a kernel-checked left-kernel theorem shows
+that a single target needs no rank condition; PKM's ``$\Delta=10$
+suffices'' is contradicted at toy sizes; Nagao's Lemma~4 is refuted in
+three reading--placement cells and proved in the fourth. These are census
+and derivation results, unverified assertions except where a Lean kernel
+checked them, and none moves a row of Tables~A--C.
+
+\paragraph{5. What engineering bought (Part~\ref{part:algorithms}).}
+Root-finding oracles made the decomposition step between about $400\times$
+and $5\cdot10^4\times$ cheaper per decomposition against F4 where they
+apply (up to $10^5$ in wall time against the PDP baseline). Gröbner engines
+improved one to two orders in counted work. Factor bases closed under maps
+of known logarithm cut linear algebra by constant factors. On the cold
+one-target frontier
 none of this changed the conclusion: the stages these changes leave alone
 (relation yield per probe, table set-up) now dominate.
 
-\paragraph{5. Where index calculus wins (Chapter~\ref{ch:extension} and
+\paragraph{6. Where index calculus wins (Chapter~\ref{ch:extension} and
 Chapter~\ref{sec:transfer}).} Only in weak extension-field families does
 the measured cost cross or approach a fairly priced rho:
 \begin{itemize}
 \item $E_0/\FF_{q^3}$ through a genus-3 GHS cover, by double-large-prime
   hyperelliptic index calculus or by Diem's plane-quartic index calculus;
-\item the Joux--Vitse cover of $E(\FF_{p^6})$;
-\item possibly $k=4$ over $\FF_{(2^m)^4}$.
+\item the Joux--Vitse cover of $E(\FF_{p^6})$, whose sieve route is
+  $0.0065\times$ a matched negation rho at $p=1511$ (validated as
+  accounting, weak class only), while its plain Nagao arm is above
+  matched rho at $p=1301$ and $1451$ and unresolved at $1601$, so its
+  extrapolated crossing near $p\approx1330$ does not hold;
+\item possibly $k=4$ over $\FF_{(2^m)^4}$, at $5.2\times$ rho at $m=15$
+  after corrections, with an extrapolated crossover only.
 \end{itemize}
 These are known theoretical results. The contribution here is matched,
-priced, verified measurement. None of these families is deployed.
+priced and replayed measurement, validated in one case. None of these families is deployed.
 
-\paragraph{6. What the measurements say (Part~\ref{part:frontier}).} At a
+\paragraph{7. The rho side (Part~\ref{part:rho}).} Every distance is a
+ratio to rho, so the denominator gets its own part. A collision floor,
+derived in the generic group model and checked by Monte Carlo, shows that a
+single-target index calculus with $F$ base elements of unknown logarithm
+costs at least $1.5$, $1.875$ and $2.188\times$ rho for $F=1,2,3$; the
+measured generic incumbent, near $1.8\times$, sits at the $F=2$ constant
+(Proposition~\ref{prop:collisionfloor}). Chapters~\ref{ch:matchedrho}
+and~\ref{ch:rhovariants} ask how well rho itself was measured and varied.
+
+\paragraph{8. What the measurements say (Part~\ref{part:frontier}).} At a
 matched reference, rho is cheaper on every prime and prime-degree binary
-curve measured: $4.7$--$18\times$ on Koblitz curves of 37--47 bits, and
-$10.5$--$102\times$ on prime curves of 20--40 bits, with the gap widening as
-$r^{1/6}$. Every apparent online win disappeared against Bernstein--Lange
-rho with equal advice~\cite{bl2012}. Matching the reference, pricing native
-work and replaying records each moved recorded gaps upward. Chapter~\ref{ch:audit}
-lists every such correction.
+curve measured. On Koblitz curves of 37--47 bits the gap is
+$3.4$--$11.5\times$ on the validated board (rule v7) and $4.7$--$18\times$
+against rule v8's same-binary rho. On prime curves the validated rows are
+$5.5$--$13.5\times$ at 10--24 bits; the two-summand pair table is
+$10.5$--$102\times$ at 20--40 bits, its gap widening as about $r^{1/6}$;
+the generic $k$-sum table ($5.3$--$13.1\times$, no validation) narrows
+that growth to about $r^{0.02}$ against rho's $r^{1/2}$, but its limit is
+baby-step giant-step; and the closest prime arms, generic residual
+collectors, are $1.3$--$1.7\times$ at 36--42 bits ($w=0$). Every apparent online win disappeared against
+Bernstein--Lange rho with equal advice~\cite{bl2012}. Matching the
+reference, pricing native work and replaying records moved most recorded
+gaps upward. Chapter~\ref{ch:audit} lists the corrections that moved the
+leaderboard, and Appendix~\ref{ch:corrections} the remaining corrections,
+retractions and withdrawn readings.
 
 \section*{Conventions}
 
@@ -115,6 +156,11 @@ lists every such correction.
   describes an improvement, and IC over rho when it describes a distance.
   Each sentence says which.
 \item \emph{Intervals.} Intervals are 95\%, as the source recorded them.
+\item \emph{Standing.} No proof-carrying (\texttt{pcc}) claim covers a
+  result in this treatise unless one is named. A measured figure is the
+  producer's reported value, an unverified assertion, unless a
+  \texttt{VALIDATION.json} is named, and ``validated'' means only that. A
+  theorem is ``kernel-checked'' only where a Lean kernel accepted it.
 \item \emph{Change classes.} Every change is an \cls{advance} (an exponent
   or crossover moves under complete accounting), \cls{engineering} (a
   constant moves), \cls{relabelling} or \cls{accounting}. Against rho, the

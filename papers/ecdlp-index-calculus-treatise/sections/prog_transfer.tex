@@ -49,7 +49,8 @@ $17.6$--$19.6\times$ ($\abs H=4$) over 1{,}128 systems---but a correction
 the next day showed that at a matched number of \emph{columns} the saving
 disappears; it was the cost of a redundant orbit base. A combined Weil
 descent used $234$--$529\times$ the F4 operations of the blind system
-(\art{research/isogeny_conductor_gap_round3_20261011/}).
+(\art{research/isogeny_conductor_gap_round3_20261011/}). The later rounds and
+the full correction trail are in \S\ref{sec:iso-conductor}.
 
 \paragraph{Fibre-aware index calculus.} Isogeny fibres are torsors whose
 arithmetic is controlled by one cohomology class
@@ -77,8 +78,9 @@ and a $\sqrt{\text{\'elu}}$ kernel cost exponent $0.822$ $[0.805,0.838]$;
 these speed up curve arithmetic, not the discrete logarithm.
 
 \paragraph{Covers, 21--24 October.} The Joux--Vitse genus-3 cover of
-$E(\FF_{p^6})$ is now within $1.6$--$2.0\times$ of a pooled rho constant at
-$p=1009$; measuring the per-trial cost on a genus-255 binary Jacobian
+$E(\FF_{p^6})$ was, on 24 October, within $1.6$--$2.0\times$ of a pooled rho
+constant at $p=1009$ (a lower bound, superseded in November by a matched
+negation rho, \S\ref{sec:jac-jv}); measuring the per-trial cost on a genus-255 binary Jacobian
 turned the $N=130$ GHS counterfactual's modelled margin negative ($-1.83$
 bits); and two censuses bound what covers exist at toy sizes (genus floor 13
 for odd-order $E/\FF_{q^4}$; a $2^{-l}$ genus-3 fraction over
@@ -241,36 +243,29 @@ Smith's isogeny and runs the whole route at toy sizes. The program's closing
 note lists what stays open (\art{research/plane_quartic_program_20261018/CLOSING.md}).
 
 \paragraph{Joux--Vitse: two arms of one cover.} The Joux--Vitse cover of
-$E(\FF_{p^6})$ (full rational 2-torsion, a weak class) has been measured
-with two solvers, and their comparisons with rho do not agree. The
-\emph{plain Nagao arm} with a sparse-FGLM linear stage is $1.59$--$1.98\times$
-a pooled rho constant at $p=1009$ and closes as about $p^{-2}$
-(\art{research/jv_cover_p_scaling_20261024/}; \S\ref{sec:ladder3}); it is a
-lower-bound comparison and current. The \emph{sieve arm}
-(\texttt{jv\_cover --exp sieve}) measured $0.024$ $[0.019,0.031]$ of a strong
-rho at $p=1009$ and $0.0042$ at $p=1823$ on 19 October, but its 20 October
-review withheld every comparison (no numeric acceptance for the controls,
-uncharged rho hashes, incomplete accounting;
-\art{research/jv_sieve_strong_rho_20261019/}); a replication with fixed
-thresholds failed its acceptance rule and is in an open pull request, and a
-prospective re-run is registered and has not run. A 9 October whole-route
-replay from a non-weak challenge curve, through an isogeny walk to a weak
-curve and its cover, read $0.058$ of a pooled, unmatched rho at $p=1009$ on
-one seed per prime, with an earlier revision of the solver whose source
-includes the sieve module (\art{research/jv_cover_e2e_30bit_20261009/RESULT.md}).
-The roughly thirtyfold gap between the arms at $p=1009$ is unexplained on
-\texttt{main}. The cover-decomposition note still states a measured sieve
-crossover near $p\approx430$
-(\art{research/notes/index-calculus/RESEARCH_COVER_DECOMPOSITION_LEDGER.md}
-\S11) with no erratum; it should be read through the review. Leaderboard
-Table~D, the historical study, is withheld. On the method side, the
-sparse-FGLM stage made the plain arm $1.28\times$ cheaper end to end
-(\art{research/jv_cover_sparse_fglm_20261018/}); relation collection is
-$99.99\%$ of $S$ (\art{research/ic_cover_leads_20261018/}); depth-1 isogeny
-classes hold no weak curve over 4{,}871{,}062 curves, while 86--95\% of
-deeper classes hold one (\art{research/jv_weak_class_law_20261007/}); and
-the $(n-1)$-decomposition variant is $4.5\cdot10^7$--$1.8\cdot10^8\times$
-rho (\art{research/joux_vitse_n1_20261015/}).
+$E(\FF_{p^6})$ (full rational 2-torsion, $\#E=4\ell$, a weak class) has been
+measured with two solvers, and their comparisons with rho do not agree.
+The full account, with the limitations and the history, is in
+\S\ref{sec:jac-jv}. The \emph{sieve arm} at $p=1511$ ($\ell=2^{61.4}$)
+costs $0.00647$ $[0.00545,0.00799]$ of a matched negation rho in group
+additions and $0.0156$ $[0.0131,0.0192]$ in textbook $\FF_p$ multiplications:
+rho is $155\times$ and $64\times$ dearer, and the order holds across the
+band. An independent validator passed it (\texttt{VAL-20261103-c31c76};
+\art{research/jv_sieve_negrho_20261102/}). It has no \texttt{pcc} claim
+record, so under the proof-carrying-claims rule it is a validation-gate
+result whose statement is an unverified assertion. It is the programme's
+one validated measurement of index calculus below a matched rho; the
+validator classes it as accounting, not an improvement, and it holds on the
+weak class only. The \emph{plain Nagao arm} was $1.59$--$1.98\times$ a pooled
+rho constant at $p=1009$ on 24 October, a lower bound
+(\art{research/jv_cover_p_scaling_20261024/}). Against a matched negation rho
+it is above rho at $p=1301$ and 1451 and unresolved at 1601 in group
+additions, and above at all three primes in $\FF_p$ multiplications
+(\art{research/jv_cover_negrho_rescore_20261101/}). A factor-base line search
+takes it below rho in additions but not in multiplications; the modelled
+crossings move to $p^*\approx1185$ (additions) and $1799$ (multiplications),
+without a validation file. The roughly thirtyfold gap between the two arms
+is unexplained.
 
 \paragraph{Cover censuses.} The minimal cubic GHS genus over an isogeny
 class follows $\#E(K)\bmod4$: 13 for odd order, 5 for $2\bmod4$, 3 for

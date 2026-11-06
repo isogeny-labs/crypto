@@ -45,7 +45,7 @@ Every statement below is an unverified assertion of this session
 | 13 | 36.6 | 13.3 | 19.5 | 11.5 | 1.88 |
 | 101 | 35.8 | 18.5 | 17.2 | 17.2 | 2.07 |
 
-- **The conjugate-pair base solves every curve** [pcc:unverified] (claim `PCC-20261106-395bd4`). It recovers the secret on
+- **The conjugate-pair base solves every curve** [pcc:unverified] (claim `PCC-20261106-a9d73a`). It recovers the secret on
   32/32 small-cofactor curves and on 32/32 curves of the main run.
 - **Relations per trial are about 36× the standard base.** That is about
   twice the lift-density prediction (k_c/k_s)⁴ ≈ 2⁴. The `std` arm itself
@@ -148,4 +148,4 @@ cd cpcost && cargo build --release && cargo test --release && cd ..
 
 | claim | standing | content |
 |:--|:--|:--|
-| `PCC-20261106-395bd4` | not covered (unsigned) | A1 yields, trial ratios and solves ([`validator-report.json`](reports/run-20261106T0514Z/validator-report.json), values in [`claimed.json`](claimed.json)) |
+| `PCC-20261106-a9d73a` | not covered (unsigned) | A1 yields, trial ratios and solves ([`validator-report.json`](reports/run-20261106T0514Z/validator-report.json), values in [`claimed.json`](claimed.json)) |
