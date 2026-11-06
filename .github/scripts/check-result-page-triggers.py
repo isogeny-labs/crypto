@@ -35,12 +35,6 @@ ALLOWED = {
     ".github/workflows/curve-names.yml": {
         "reason": "scripts/check_curve_names.py scans every Markdown and HTML file, both pages included",
     },
-    ".github/workflows/ecc2k130-n13-oaware-sat-benchmark.yml": {
-        # Does not read the pages. Its FROZEN.json pins the workflow's exact
-        # bytes and its ci_replay.py asserts that pin, so this line cannot be
-        # edited out without re-sealing frozen evidence.
-        "reason": "workflow bytes are pinned by its frozen evidence (FROZEN.json workflow_sha256)",
-    },
 }
 
 
