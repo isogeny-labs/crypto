@@ -146,4 +146,4 @@ cd conjpair && cargo build --release && cargo test --release && cd ..
 
 | claim | standing | content |
 |:--|:--|:--|
-| CLAIM_ID | not covered (unsigned) | line counts, behaviour, dead and collision tallies ([`validator-report.json`](reports/run-20261106T0417Z/validator-report.json), values in [`claimed.json`](claimed.json)) |
+| `PCC-20261106-707cc0` | not covered (unsigned) | line counts, behaviour, dead and collision tallies ([`validator-report.json`](reports/run-20261106T0417Z/validator-report.json), values in [`claimed.json`](claimed.json)) |
