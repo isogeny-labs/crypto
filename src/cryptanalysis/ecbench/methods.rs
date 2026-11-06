@@ -45,7 +45,7 @@ use crate::cryptanalysis::ecbench::koblitz_descent::{
 };
 use crate::cryptanalysis::ecbench::negation_strong::NegStrongParams;
 use crate::cryptanalysis::ecbench::wordram_price;
-use crate::cryptanalysis::ecbench::workload::{CurveFacts, Instance, WideInstance};
+use crate::cryptanalysis::ecbench::workload::{CurveFacts, HashWork, Instance, WideInstance};
 use crate::cryptanalysis::ecbench_large_prime::{
     self as large_prime, SolveConfig as LargePrimeConfig,
 };
@@ -304,6 +304,10 @@ const POOLED_PARAMS: &[ParamDecl] = &[
 /// `POOLED_COMPANION_INDEX + j`, far from any workload's own index.
 const POOLED_COMPANION_INDEX: u64 = 1 << 40;
 
+/// `ic.residual_batch`'s successor: the frozen id derives `P0` outside its
+/// total (README §9); this id charges that derivation in a `base_point` phase.
+const RESIDUAL_BATCH_V2: &str = "ic.residual_batch_v2";
+
 /// Index of `ic.residual_batch`'s base point `P0` under the same public
 /// law: one point, hashed to `⟨G⟩`, below the companions' range.
 const RESIDUAL_BATCH_BASE_INDEX: u64 = (1 << 40) - 1;
@@ -493,6 +497,14 @@ pub fn registry() -> &'static [MethodDecl] {
             params: super::prime_orbit::PARAMS,
         },
         MethodDecl {
+            id: super::aps::ID_V2,
+            family: "ic",
+            summary: "ic.aps_v1 with its core work counted: the module's own group-operation calls, square roots and polynomial-construction multiplications are `*_uncharged` counters (listed by name in `unpriced`, which carries no prose), beside the F4 and root tallies; GAE still prices only the independent check, so the total is a lower bound",
+            entry: "ecbench::aps::solve",
+            applies: Applies::PrimeOnly,
+            params: super::aps::PARAMS,
+        },
+        MethodDecl {
             id: super::aps::ID,
             family: "ic",
             summary: "bounded APS summation-polynomial instrument: exclusive cold/online wall accounting, retained failures, separate affine witness checks; native operation pricing is incomplete",
@@ -500,6 +512,7 @@ pub fn registry() -> &'static [MethodDecl] {
             applies: Applies::PrimeOnly,
             params: super::aps::PARAMS,
         },
+        MethodDecl{id:"ic.three_leads_genus2_pencil_symbolic_v3",family:"ic",summary:"ic.three_leads_genus2_pencil_symbolic_v2 with its ledger lifted into counters: the same solve and the same group-only GAE, with the native, symbolic and logical work as `*_uncharged` counters and `unpriced` listing exactly those counters; allocation stays unobserved (a detail field); cost remains a lower bound",entry:"three_leads::pencil::solve",applies:Applies::Any,params:THREE_LEADS_PENCIL_PARAMS},
         MethodDecl{id:"ic.three_leads_genus2_pencil_symbolic_v2",family:"ic",summary:"Point-driven pencil with signed symbolic elimination; cold setup per target; cost remains explicitly incomplete",entry:"three_leads::pencil::solve",applies:Applies::Any,params:THREE_LEADS_PENCIL_PARAMS},
         MethodDecl{id:"ic.three_leads_genus2_choice2_v1",family:"ic",summary:"Two-choice component-directed genus2 relation walk; both candidate additions, roots and valid relation insertions charged",entry:"three_leads_followup::solve_genus2_choice2",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
         MethodDecl{id:"ic.three_leads_genus2_projective_chart_v1",family:"ic",summary:"Two-choice genus2 collector with charged projective CRT numerator chart, one normalization and complete exceptional Cantor fallback",entry:"three_leads_followup::solve_genus2_projective",applies:Applies::Any,params:THREE_LEADS_RHO_PARAMS},
@@ -573,6 +586,14 @@ pub fn registry() -> &'static [MethodDecl] {
             // the rho family's online window and pricing describe it.
             family: "rho",
             summary: "the residual collector's structure in the Kuhn–Struik batch of rho.multitarget_pooled: the same targets, walker, table and charging, plus one base point P0 of unknown logarithm in every relation (an index-calculus column, B = 1); the first target needs two independent equations (d_1 and log P0), later ones one collision; log P0 and every d_i checked; S is the whole batch's operations over √r",
+            entry: "ic_boundary::ic_residual_batch_with(NegationClasses, RhoWalk::negation())",
+            applies: Applies::PrimeOnly,
+            params: POOLED_PARAMS,
+        },
+        MethodDecl {
+            id: RESIDUAL_BATCH_V2,
+            family: "rho",
+            summary: "ic.residual_batch with the derivation of its base point P0 inside the total: the cofactor multiplication's group operations are the `base_point` phase, and the SHA-256 draws, the square roots' modular multiplications and the on-curve checks are `*_uncharged` counters listed in `unpriced`; the batch solve is `ic.residual_batch` unchanged",
             entry: "ic_boundary::ic_residual_batch_with(NegationClasses, RhoWalk::negation())",
             applies: Applies::PrimeOnly,
             params: POOLED_PARAMS,
@@ -2346,8 +2367,10 @@ fn solve_residual_batch(
         companions.push(xy);
     }
     targets.push(target);
+    let v2 = m.id == RESIDUAL_BATCH_V2;
+    let mut base_work = HashWork::default();
     let (base_xy, _) = inst
-        .hash_to_subgroup(curve, seed, RESIDUAL_BATCH_BASE_INDEX)
+        .hash_to_subgroup_counted(curve, seed, RESIDUAL_BATCH_BASE_INDEX, &mut base_work)
         .ok_or("no public base point on this curve")?;
     let base = PrimePoint::affine(parse_hex(&base_xy[0])?, parse_hex(&base_xy[1])?);
     let t = Instant::now();
@@ -2365,10 +2388,32 @@ fn solve_residual_batch(
     );
     measurement::end_online();
     let wall = t.elapsed().as_nanos() as u64;
-    let f = field_ops_of(&i.curve, &[res.group_ops]);
+    // `_v2` charges the base point's cofactor multiplication; the frozen id
+    // derives it outside the total and its field tally.
+    let f = if v2 {
+        field_ops_of(&i.curve, &[res.group_ops, base_work.group_ops])
+    } else {
+        field_ops_of(&i.curve, &[res.group_ops])
+    };
     let mut rep = pooled_report(res, wall, f);
     rep.detail["companions"] = json!(companions);
     rep.detail["base_point"] = json!(base_xy);
+    if v2 {
+        let ops = base_work.group_ops;
+        rep.phases.insert(0, ops_phase("base_point", ops));
+        rep.total_gae += ops.gae();
+        rep.counters
+            .insert("base_point_hash_draws_uncharged".into(), base_work.draws);
+        rep.counters.insert(
+            "base_point_sqrt_field_multiplications_uncharged".into(),
+            base_work.sqrt_field_muls,
+        );
+        rep.counters.insert(
+            "base_point_on_curve_checks_uncharged".into(),
+            base_work.on_curve_checks,
+        );
+        rep.unpriced = unpriced_of(&rep.counters);
+    }
     Ok(rep)
 }
 
@@ -2570,7 +2615,7 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
         .unwrap_or(m.id.as_str());
     three_leads_applicable(m, inst, curve)?;
     hyper_ic_variant_guard(m, inst, curve)?;
-    if id == "rho.multitarget_pooled" || id == "ic.residual_batch" {
+    if id == "rho.multitarget_pooled" || id == "ic.residual_batch" || id == RESIDUAL_BATCH_V2 {
         let batch = param_u64(m, "batch")?;
         if !(1..=65_536).contains(&batch) {
             return Err(format!("`batch` must be in 1..=65536, not {batch}"));
@@ -2610,7 +2655,7 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
         return Ok(());
     }
     match inst {
-        Instance::Prime(i) if id == super::aps::ID => super::aps::applicable(m, i),
+        Instance::Prime(i) if super::aps::is_aps(id) => super::aps::applicable(m, i),
         Instance::Genus2(_) | Instance::Quartic(_) | Instance::Ghs(_) => {
             jacobian_applicable(id, m.params.get("inner").map(String::as_str), inst, curve)
         }
@@ -3054,7 +3099,7 @@ pub fn solve_measured(
         Some(Err(e)) => rep.online_error = Some(e.to_string()),
         None => rep.online_error = Some("a measurement session was already active".into()),
     }
-    if m.id == "ic.three_leads_genus2_pencil_symbolic_v2" {
+    if super::three_leads::is_pencil_symbolic(&m.id) {
         if let Some(window) = &mut rep.online {
             let sum = window
                 .phases_ns
@@ -3143,10 +3188,10 @@ fn solve_inner(
         (Instance::Binary(i), _) if m.id.starts_with("jacobian_image.") => {
             solve_jacobian_image(m, i, FastPoint::affine(tx, ty), seed)
         }
-        (Instance::Prime(i), _) if m.id == "ic.residual_batch" => {
+        (Instance::Prime(i), _) if m.id == "ic.residual_batch" || m.id == RESIDUAL_BATCH_V2 => {
             solve_residual_batch(m, inst, curve, i, PrimePoint::affine(tx, ty), seed)
         }
-        (Instance::Prime(i), _) if m.id == super::aps::ID => {
+        (Instance::Prime(i), _) if super::aps::is_aps(&m.id) => {
             super::aps::solve(m, i, PrimePoint::affine(tx, ty), seed)
         }
         (Instance::Prime(i), _) if m.id == super::prime_orbit::ID => {
