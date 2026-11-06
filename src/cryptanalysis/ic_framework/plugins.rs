@@ -5494,6 +5494,7 @@ mod free_rows_probe {
     //! Frobenius-folded pair table's build-time key collisions give on the
     //! frozen orbit panel, and their rank over the column unknowns mod r.
     use super::*;
+    use crate::cryptanalysis::ic_boundary::koblitz_instance;
     use crate::cryptanalysis::koblitz_fast::FrobeniusCanon;
     use num_traits::ToPrimitive;
     use std::collections::HashMap;
