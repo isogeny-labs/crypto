@@ -77,8 +77,8 @@ apparent early fall of the degree fired identically when the Semaev form
 was replaced by a random polynomial but not when the factor-base
 constraints were, so it came from the factor base, not from the summation
 polynomial (\art{ar:experiments/EXP-PFDR-4bfc6f/analysis.md}). A separate repository asked the
-underlying question directly---is there any coordinate-defined subset of
-$E(\FF_p)$ that interacts with addition better than a random subset?---and
+underlying question directly, whether any coordinate-defined subset of
+$E(\FF_p)$ interacts with addition better than a random subset, and
 found none on toy curves (\texttt{ecdlp-prime-field-smallness},
 \art{README.md} at \texttt{4f20be9b36}).
 
@@ -105,7 +105,7 @@ $m=4$, $N=12$ without moving $D$ (round 6). The torus and split Dickson
 presentations give the same $D$ in every cell, and the Kummer $D$ does not
 depend on the 2-adic valuation (\art{research/pkm_dickson_torus_20261015/}).
 At $m=3$, $N=21$ two engines finished every degree-7 step without reaching
-the unit ideal and stopped inside degree 8 on memory---the native
+the unit ideal and stopped inside degree 8 on memory: the native
 \texttt{f4\_fp\_tower} at a 317\,GB matrix cap after a 67\,GB peak, msolve at
 99.6\,GiB on 16 threads (\art{research/pkm_lead1_m3n21_20261016/},
 \art{research/pkm_m3_n21_msolve_20261018/}). That implies $D\ge8$ at
@@ -292,6 +292,55 @@ gives $1.889\times$. \texttt{wwalk} has $F=2$, so its $1.8$--$1.9\times$
 is this floor, not an implementation constant. Parity needs $F=0$, which
 is rho under another name.
 
+Table~\ref{tab:pf-c25519-multi} and Figure~\ref{fig:pf-c25519} give the
+multi-curve re-baseline per curve: the ledger curve and four siblings by
+the same selection rule at each $k$, 12 targets $\times$ 2 rounds per
+curve, 720 of 720 records audited per size. At $w=0$ every per-curve
+ratio lies between $1.44$ and $2.13$. At $w=1$, where rho's
+canonicalisations are priced, the ratios fall to $0.95$--$1.64$. Rho is
+cheaper across the band on 19 of 20 curves; on one $k=24$ curve the order
+is unresolved inside the band ($1.52$ at $w=0$, $0.95$ at $w=1$).
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}rlrrlrrl@{}}
+\toprule
+$k$ & Incumbent & $S_{\rm inc}$ & $S_{\rm rho}$ & per-curve inc/rho, $w=0$ & mean & $w=0.1$ & $w=1$ [range] \\
+\midrule
+20 & \texttt{wsum2g-b15-n2} & $2.601$ & $1.660$ & 1.59, 1.57, 1.44, 1.56, 1.69 & $1.57$ & $1.53$ & $1.32$ $[1.17,1.43]$ \\
+24 & \texttt{wwalkGg-x09-sr-n2} & $2.111$ & $1.193$ & 1.52, 1.82, 2.10, 1.73, 1.75 & $1.78$ & $1.67$ & $1.12$ $[0.95,1.35]$ \\
+28 & \texttt{wwalkGg-x09-sr-n2} & $1.869$ & $1.040$ & 1.80, 1.62, 1.88, 1.94, 1.78 & $1.80$ & $1.68$ & $1.11$ $[1.02,1.18]$ \\
+32 & \texttt{wwalkG-x06-sr-n2} & $1.930$ & $1.013$ & 2.13, 1.87, 1.92, 1.69, 1.95 & $1.91$ & $1.83$ & $1.46$ $[1.21,1.64]$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Curve25519-rule miniatures, five family curves per $k$:
+ledger incumbent against \texttt{rho-neg} on each curve. $S$ columns:
+means over the five curves at $w=0$, as the source tabulates them.
+Per-curve ratios and their means at each weight are derived from the
+per-curve band means by a short script; \art{figures/make_fig_pf_c25519.py}
+repeats the computation for Figure~\ref{fig:pf-c25519}.
+All arms are $F=2$ collision designs (\texttt{wsum2}, \texttt{wwalk}).
+Standing: unverified (statement claim \texttt{PCC-20261105-37a78d}).
+Source: \art{research/curve25519_autolab_20261104/multicurve/band-k*.json};
+extracted in \art{figures/data-pf-c25519.json}.}
+\label{tab:pf-c25519-multi}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-pf-c25519.pdf}
+\caption[]{Walk-table and coefficient-box incumbents over matched
+\texttt{rho-neg} on five Curve25519-rule curves per $k$ (open markers: one
+curve; lines: mean of five) at $w=0$, $0.1$ and $1$. Dotted: the
+collision floors $1.5$ ($F=1$) and $1.875$ ($F=2$) of the generic-group
+derivation in \art{research/curve25519_rho_parity_bound_20261104/}, which is
+not a formal theorem and bounds the $w=0$ count. Dashed: parity. Standing
+unverified (\texttt{PCC-20261105-37a78d}). Data
+\art{figures/data-pf-c25519.json}.}
+\label{fig:pf-c25519}
+\end{figure}
+
 \paragraph{Algebraic track.} Semaev summation decided by F4
 (\art{research/curve25519_algebraic_ecbench_20261102/}) ran end to end at
 $k=20$ at $18.2\times$, $9.55\cdot10^5\times$ and $5.85\cdot10^6\times$ rho
@@ -359,9 +408,11 @@ Sources: \art{research/curve25519_scale_guess_trace_20261105/},
 \art{research/curve25519_scale_lifts_20261105/},
 \art{research/curve25519_scale_m3_t0_20261105/}.
 
-\paragraph{What this settles.} On every Curve25519 miniature, track, size
-and weight measured, rho with negation is ahead of every index-calculus
-arm. The generic gap grows with $k$. Collision-based variants sit at a
+\paragraph{What this settles.} On every Curve25519 miniature, track and
+size measured, rho with negation is ahead of every index-calculus arm at
+$w=0$. Across the band the order holds everywhere except one $k=24$
+sibling curve of the multi-curve re-baseline, where it is unresolved
+(Table~\ref{tab:pf-c25519-multi}). The generic gap grows with $k$. Collision-based variants sit at a
 derived floor near $1.9\times$, and the algebraic gap grows as about
 $r^{1/2}$. No study makes or implies a statement about the 255-bit curve,
 and none weakens its security. No Curve25519 row is on the leaderboard or
@@ -415,7 +466,7 @@ baseline binary. Workstream W12 implemented the zero-minor
 guess-and-determine attack (Mahalanobis, arXiv~2607.09814v2): it solved
 48/48 planted targets on 16--26-bit curves, but its search phases scale
 with slope $0.905$ $[0.769,1.021]$ in $\log_2 r$ and its cost over rho
-grows from $260\times$ to $6{,}715\times$---exhaustive in $r$, as the
+grows from $260\times$ to $6{,}715\times$. The search is exhaustive in $r$, as the
 source's own table says. A second flagged ePrint (Hu, 2025/015) did not
 specify an implementable algorithm and is recorded as blocked. On the
 generic side, W11 cut BSGS from $16.75$ to $3.71$ multiplication
