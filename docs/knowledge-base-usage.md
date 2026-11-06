@@ -34,7 +34,11 @@ python3 scripts/kb_usage_report.py --ref origin/main --since 2026-11-05
 `.github/workflows/kb-usage-report.yml` runs the audit weekly and on demand in
 `crypto`. It writes the table to the step summary, uploads the JSON as an
 artifact and uses `--ref HEAD`. It is advisory: no pull request is blocked and
-`--fail-under` is not wired in. Its first run (2026-11-06) reported `crypto`
+`--fail-under` is not wired in.
+
+The script and its tests are shared byte-identically by the three repositories
+(`docs/shared-code.lock.json`), so each repository runs the same workflow
+against its own logs. Its first run (2026-11-06) reported `crypto`
 alone at 135 entries, 11 receipts and 8.1%, which matches the local
 `--ref` measurement at that commit.
 
