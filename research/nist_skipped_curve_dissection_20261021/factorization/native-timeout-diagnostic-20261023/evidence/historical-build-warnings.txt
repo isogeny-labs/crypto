@@ -1,0 +1,18 @@
+5498-factor/nfs/nfs_sieving.c: In function ‘nfs_sieve_dispatch’:
+5499:factor/nfs/nfs_sieving.c:1328:76: warning: format ‘%s’ expects argument of type ‘char *’, but argument 3 has type ‘uint32_t’ {aka ‘unsigned int’} [-Wformat=]
+5500: 1328 |                         printf("nfs: thread %d halting, nfs timeout of %1.4sec exceeded\n", tid, fobj->nfs_obj.timeout);
+5501-      |                                                                        ~~~~^                     ~~~~~~~~~~~~~~~~~~~~~
+5502-      |                                                                            |                                  |
+5503-      |                                                                            char *                             uint32_t {aka unsigned int}
+--
+7192-      |                                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+7193: 1238 |                                                 "nfs timeout of %1.4f sec, exiting\n", t_time, fobj->nfs_obj.timeout);
+7194-      |                                                                                                ~~~~~~~~~~~~~~~~~~~~~
+7195-      |                                                                                                             |
+7196-      |                                                                                                             uint32_t {aka unsigned int}
+--
+7198-factor/nfs/nfs.c:1238:69: note: format string is defined here
+7199: 1238 |                                                 "nfs timeout of %1.4f sec, exiting\n", t_time, fobj->nfs_obj.timeout);
+7200-      |                                                                 ~~~~^
+7201-      |                                                                     |
+7202-      |                                                                     double

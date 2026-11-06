@@ -1,0 +1,20 @@
+digraph law {
+  graph [label="Gurler–Hisil weighted genus-2 law: source-audited branch families\n2026-10-25 · not a universal proof", labelloc=t, fontsize=18, ranksep=0.7, nodesep=0.4];
+  node [shape=box, style="rounded,filled", fillcolor="#eaf2fa", fontname="Helvetica"];
+  edge [fontname="Helvetica"];
+  input [label="Reduced divisor pair\nvalid weights Z,W ≠ 0"];
+  id [label="Identity input\nreturn other"];
+  d11 [label="1+1: inverse / double / distinct\nEqs. (13)–(14)"];
+  d12 [label="1+2: K=0 or K≠0\nEqs. (15)–(18)"];
+  d22 [label="2+2: same u or different u"];
+  same [label="Same u: inverse / double / mixed\nEq. (19)–(20); cited doubling law"];
+  shared [label="Different u, B=0: shared root\nEq. (21); compose point branches"];
+  drop [label="Different u, B≠0, C=0\nEq. (11); degree drop"];
+  common [label="Different u, B,C≠0\nEq. (12); cited common law"];
+  output [label="Weighted output\nno operation-boundary inversion", fillcolor="#e5f5e8"];
+  boundary [label="Optional collector normalization\ncharged field inversions", fillcolor="#fff0de"];
+  input -> {id d11 d12 d22};
+  d22 -> {same shared drop common};
+  {id d11 d12 same shared drop common} -> output;
+  output -> boundary [style=dashed];
+}

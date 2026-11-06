@@ -47,13 +47,20 @@ pub struct CostModel {
     /// Decomposition of a point of `E(F_{p^k})` over a factor base from
     /// `F_p` solves the Semaev system `S_(k+1)`, whose solution count is the
     /// Bézout bound `D = 2^(k(k-1))`.  Where no measured cost is recorded the
-    /// solve is priced at `D^e` `F_p` multiplications with this exponent
-    /// (FGLM is cubic in `D`, so 3 is a floor for a generic system).
+    /// solve is priced at `D^e` `F_p` multiplications with this exponent: the
+    /// cost of a dense FGLM-style eigen step on a generic system.  It is an
+    /// estimate, not a lower bound.  The chain eigen step costs `0.72 D^3` on
+    /// plain `S_5`, and the `D_4`-symmetric `k = 4` oracle (#1792) measured
+    /// about `2^26` against `D^3 = 2^36`, by lowering `D`.
     pub extension_decomposition_degree_exponent: f64,
-    /// Measured `F_p` multiplications per decomposition `C_k`, `(k, C_k)`:
-    /// `C_3 = 0.876e6` (`RESEARCH_RESIDUAL_WALKS.md` §11.8) and
-    /// `C_4 = 1.227e12` (§11.17, plain `S_5`; the `D_4`-symmetric form needs
-    /// rational 2-torsion and is not the generic price).  Both lie above `D^3`.
+    /// Measured `F_p` multiplications per decomposition `C_k`, `(k, C_k)`,
+    /// used as measured (never raised to `D^e`): `C_3 = 0.876e6`
+    /// (`RESEARCH_RESIDUAL_WALKS.md` §11.8) and `C_4 = 8.69e10`, plain `S_5`
+    /// with sparsest pivots, the chain eigen step and shape replay, the mean
+    /// over 12 replayed decompositions with fallbacks charged
+    /// (`research/s5_plain_c4_options_20261019/`; §11.17's committed solver
+    /// measured `1.213e12`, 13.9× more).  The `D_4`-symmetric form needs
+    /// rational 2-torsion and is not the generic price.
     pub extension_measured_solve_mults: Vec<(u32, f64)>,
 }
 
@@ -82,7 +89,7 @@ impl Default for CostModel {
             hyperelliptic_ic_genus_polynomial_exponent: 2.0,
             enge_gaudry_c: std::f64::consts::SQRT_2,
             extension_decomposition_degree_exponent: 3.0,
-            extension_measured_solve_mults: vec![(3, 0.876e6), (4, 1.227e12)],
+            extension_measured_solve_mults: vec![(3, 0.876e6), (4, 8.69e10)],
         }
     }
 }
@@ -331,15 +338,15 @@ impl CostModel {
     }
 
     /// `log2` of the `F_p` multiplications in one `S_(k+1)` decomposition:
-    /// the measured `C_k` where recorded, never below `D^e` with
+    /// the measured `C_k` where recorded, otherwise the estimate `D^e` with
     /// `D = 2^(k(k-1))`.
     pub fn log2_extension_solve_mults(&self, k: u32) -> f64 {
         let k_f = f64::from(k);
-        let floor = self.extension_decomposition_degree_exponent * k_f * (k_f - 1.0);
+        let estimate = self.extension_decomposition_degree_exponent * k_f * (k_f - 1.0);
         self.extension_measured_solve_mults
             .iter()
             .find(|&&(kk, _)| kk == k)
-            .map_or(floor, |&(_, c)| c.log2().max(floor))
+            .map_or(estimate, |&(_, c)| c.log2())
     }
 
     /// `log2` of the decomposition attempts: `p^(2 - 2/k)` relations
@@ -600,18 +607,25 @@ mod tests {
     #[test]
     fn extension_ic_charges_measured_solves_and_k_factorial_trials() {
         let m = CostModel::default();
-        // Measured C_3, C_4 lie above D^3 = 2^(3k(k-1)).
+        // Measured C_3, C_4 are charged as measured.
         assert!((m.log2_extension_solve_mults(3) - 0.876e6f64.log2()).abs() < 1e-9);
-        assert!((m.log2_extension_solve_mults(4) - 1.227e12f64.log2()).abs() < 1e-9);
-        assert!(m.log2_extension_solve_mults(3) > 18.0);
-        assert!(m.log2_extension_solve_mults(4) > 36.0);
-        // Unmeasured k: the D^3 floor.
+        assert!((m.log2_extension_solve_mults(4) - 8.69e10f64.log2()).abs() < 1e-9);
+        // Unmeasured k: the D^3 estimate.
         assert!((m.log2_extension_solve_mults(6) - 90.0).abs() < 1e-9);
+        // D^3 is not a floor on a measured solve: the D_4-symmetric k = 4
+        // oracle (#1792) measured about 2^26 against D^3 = 2^36, and a
+        // measured price below D^3 is charged as it is.
+        let d4 = CostModel {
+            extension_measured_solve_mults: vec![(4, 6.89e7)],
+            ..CostModel::default()
+        };
+        assert!((d4.log2_extension_solve_mults(4) - 6.89e7f64.log2()).abs() < 1e-9);
+        assert!(d4.log2_extension_solve_mults(4) < 36.0);
         // k! trials per relation.
         let t = m.log2_extension_trials(40.0, 5) - (2.0 - 2.0 / 5.0) * 40.0;
         assert!((t - 120f64.log2()).abs() < 1e-9);
         let total = m.log2_extension_ic(40.0, 4);
-        let expect = 1.5 * 40.0 + 24f64.log2() + 1.227e12f64.log2() + m.log2_field_mult(40.0);
+        let expect = 1.5 * 40.0 + 24f64.log2() + 8.69e10f64.log2() + m.log2_field_mult(40.0);
         assert!((total - expect).abs() < 1e-9);
     }
 

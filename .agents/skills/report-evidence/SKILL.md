@@ -5,6 +5,18 @@ description: Preserve user requirements and report experimental evidence without
 
 # Report evidence
 
+## Lead with the result
+
+Owner instruction, 2026-10-30: report the construction, implementation,
+improvement, or checked observation first, at its actual scope. A verified
+component is progress. Give the supporting checks and the next technical step.
+State a material dependency once where it affects a decision.
+
+Routine progress reports and handoffs do not need an overall ECDLP verdict or
+a rho comparison. Include those only in an explicitly scoped evaluation, a
+required comparison table, or a specific factual correction. Continue useful
+authorized work through open dependencies.
+
 ## Preserve the request
 
 - Record the user's requested deliverables, parameters, workload, comparison, and acceptance criteria before changing them. Use a concise requirement-to-evidence table for substantial tasks.
@@ -12,18 +24,19 @@ description: Preserve user requirements and report experimental evidence without
 - Use routine implementation judgment to carry out the request, not to redefine it. If an actual blocker prevents the requested run, name it and keep the original requirement open. Label any smaller diagnostic separately; it does not discharge the requested experiment.
 - Do not silently weaken a mathematical argument, its hypotheses, a specification, test, acceptance threshold, or validation gate. Proposed corrections must identify the original statement, the issue, and the exact change.
 
-## State limits honestly
+## State actionable dependencies
 
 - Distinguish assistance restrictions, unavailable tools/access, resource limits, implementation gaps, untested hypotheses, and proved mathematical obstructions.
 - If a higher-priority restriction prevents assistance, state that boundary explicitly. Never fabricate a mathematical impossibility, runtime estimate, failed experiment, or missing capability to disguise it.
 - Honor higher-priority instructions and actual authorization limits. This skill does not authorize bypasses. Explain any resulting scope limitation; do not pretend the substitute fulfills the original request.
-- Say "not established" or "not implemented" when that is the evidence. Claim impossibility only with a relevant proof and its exact assumptions. Failure within a search budget is not proof of nonexistence.
+- Name a missing implementation, measurement, or proof concretely, with the next check or construction. Scope an impossibility result to its proof and assumptions; record a bounded search with its actual coverage.
 
 ## Run and preserve evidence
 
 - Retain exact commands, code revisions, inputs, seeds, environment, budgets, raw outputs, exit status, and validation results. Preserve unsuccessful attempts, timeouts, OOMs, duplicates, regressions, and missing measurements.
 - Follow the requested accounting interval and comparison. Identify setup, online work, verification, and excluded costs; never silently change the denominator or replace a single-target result with a batch average.
 - Keep correctness checks. Flag invalid results and implementation defects without suppressing them or promoting them as successes. Do not report a planned or launched run as completed.
+- Leave the run's data as one `experiment.export/v1` beside the raw records (`experiment-protocol` skill), its `flow` block (planned, attempted, completed, excluded by rule) in the report, and cite any `review-run` record another runner filed; a row resumed after a Spot interruption keeps its counts and has no clock.
 
 ## Separate measurement from interpretation
 
@@ -37,15 +50,16 @@ description: Preserve user requirements and report experimental evidence without
 
 - Mark each requirement as verified complete, implemented but unverified, partial, blocked, or not attempted, with evidence or the precise gap.
 - Use "complete" only when all requested acceptance criteria are satisfied, or explicitly qualify which narrower deliverable is complete. A merged PR and passing tests do not establish broader mathematical coverage.
-- Before finishing, compare the actual deliverable to the original request and disclose every remaining gap. Never imply work is continuing after the turn unless a real running job or scheduled task exists.
+- Before finishing, compare the deliverable to the current request and name its remaining dependencies. Keep the broader research objective in the work plan rather than repeating its status after each component. State background progress only when a real running job or scheduled task exists.
 - Correct an earlier misleading claim explicitly; preserve the historical evidence and explain what changed.
 
 ## Reporting pattern
 
 For substantial work, provide:
-1. Requested scope and actual execution.
-2. Observed results and validation, with reproducible evidence.
-3. Requirement status and exact blockers or deviations.
+
+1. Result or completed component, with its exact scope.
+2. Supporting checks or measurements and reproducible evidence.
+3. A material dependency or deviation, when present, and the next technical step.
 4. Interpretation only when requested, clearly separated.
 
-Example: "Baseline 120 ms; candidate 80 ms; measured ratio 1.50 on the stated workload. End-to-end cost was not measured." Do not replace this with "a massive general speedup."
+Example: "The polynomial evaluator improved from 120 ms to 80 ms on the matched workload, a 1.50x component speedup, with identical outputs. Next, integrate it into the extractor and measure the complete solve."

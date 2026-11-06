@@ -10,6 +10,8 @@
 use std::collections::{HashMap, HashSet};
 use std::hash::{BuildHasherDefault, Hasher};
 
+use crate::cryptanalysis::pq_groebner_f2::Mask;
+
 /// Hash salt.  Zero in every non-test build, so production hashing is
 /// unchanged; tests set it to prove that no counted quantity depends on
 /// hash layout (and so on the table implementation of a given ISA).
@@ -52,6 +54,11 @@ impl Hasher for FxHasher {
     #[inline]
     fn write_u64(&mut self, x: u64) {
         self.0 = (self.0.rotate_left(5) ^ x).wrapping_mul(0x51_7c_c1_b7_27_22_0a_95);
+    }
+    #[inline]
+    fn write_u128(&mut self, x: u128) {
+        self.write_u64(x as u64);
+        self.write_u64((x >> 64) as u64);
     }
     #[inline]
     fn write_usize(&mut self, x: usize) {
@@ -107,17 +114,29 @@ impl Hasher for MaskHasher {
         mixed = (mixed ^ (mixed >> 27)).wrapping_mul(0x94d049bb133111eb);
         self.0 = mixed ^ (mixed >> 31);
     }
+
+    /// A 128-bit mask (`wide-vars`): its two halves through the same
+    /// finaliser, so every input bit still reaches every output bit.
+    #[inline]
+    fn write_u128(&mut self, value: u128) {
+        self.write_u64(value as u64);
+        self.write_u64((value >> 64) as u64);
+    }
 }
 
 /// Monomial mask → value, hashed by [`MaskHasher`].
-pub(crate) type MaskMap<V> = HashMap<u64, V, BuildHasherDefault<MaskHasher>>;
+pub(crate) type MaskMap<V> = HashMap<Mask, V, BuildHasherDefault<MaskHasher>>;
 
 /// A monomial-mask set with the same high-bit mixing as [`MaskMap`].
-pub(crate) type MaskSet = HashSet<u64, BuildHasherDefault<MaskHasher>>;
+pub(crate) type MaskSet = HashSet<Mask, BuildHasherDefault<MaskHasher>>;
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[allow(unused_imports)]
+    use crate::cryptanalysis::pq_groebner_f2::{
+        bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+    };
 
     #[test]
     fn maps_behave_like_std_maps() {
@@ -148,8 +167,8 @@ mod tests {
         assert!(low.len() > 200, "{}", low.len());
         let mut m: MaskMap<usize> = MaskMap::default();
         for i in 0..4096u64 {
-            m.insert(i << 20, i as usize);
+            m.insert(mask_from64(i << 20), i as usize);
         }
-        assert!((0..4096u64).all(|i| m[&(i << 20)] == i as usize));
+        assert!((0..4096u64).all(|i| m[&mask_from64(i << 20)] == i as usize));
     }
 }

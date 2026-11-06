@@ -1,0 +1,19 @@
+{
+  "schema":"prime61.proof-map/v1",
+  "toolchain":"leanprover/lean4:v4.34.1",
+  "source":"proof/GenusSpan.lean",
+  "formalization":"partial: finite arithmetic and conditional natural-number implications, not the class-group/CM bridges",
+  "checks":[
+    {"claim":"Exact prime-discriminant product","declarations":["Prime61Genus.factor_product"],"status":"kernel checked; primality remains native"},
+    {"claim":"Eight discriminants and ramified represented norm coprimality","declarations":["Prime61Genus.form_discriminants","Prime61Genus.ramified_represented_norm_coprime"],"status":"kernel checked"},
+    {"claim":"The specified masks span exactly the 16 even-parity patterns","declarations":["Prime61Genus.all_selected_masks_have_even_parity","Prime61Genus.complete_even_pattern_cover","Prime61Genus.no_odd_pattern_in_span","Prime61Genus.even_pattern_count"],"status":"kernel checked for the specified masks; norm-to-mask bridge remains native/standard mathematics"},
+    {"claim":"LCM equals 545296208; a positive natural divisible by 16 and 68162026 is at least that large; an additional matching upper bound forces equality","declarations":["Prime61Genus.combined_divisor_arithmetic","Prime61Genus.subgroup_size_lower_bound","Prime61Genus.conditional_size_equality"],"status":"kernel checked with explicit divisibility/upper-bound premises"},
+    {"claim":"Universal integer discriminant residual polynomial identity","declarations":["Prime61Genus.discriminant_polynomial_identity"],"identity_certificate":"IDC1h5d70c781a75cea1c","status":"kernel checked; companion native certificate records reduction to F_(2^61-1)"}
+  ],
+  "missing_bridges":["deterministic primality and Euler/reciprocity interpretation in Lean","proper ideal classes and well-defined multiplicative genus characters","the prior exact class-power certificate in Lean","the ordinary maximal-order CM class action","an unconditional whole-class-number upper certificate"],
+  "axiom_gate":"results/proof-gate.log: PASS, 11 theorems, 0 extra trusted",
+  "standard_foundations_used":["propext","Quot.sound"],
+  "lean4checker":"not installed",
+  "full_class_number_certified":false,
+  "full_class_generation_certified":false
+}

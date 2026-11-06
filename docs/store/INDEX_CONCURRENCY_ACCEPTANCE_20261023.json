@@ -1,0 +1,46 @@
+{
+  "schema": "crypto.store-index-concurrency-acceptance/v1",
+  "checked_at_utc": "2026-10-24T03:58:00.917532+00:00",
+  "source_commit": "e19302e68f38677b23608691863b0e9f379f3061",
+  "binary_sha256": "10913120e06d367c696103fc8c801030fca96c4c65577796e6a9c114453e7254",
+  "backend": "isolated file:// store with one shared index and cache",
+  "checks": {
+    "separate_process_parallel_pushes": 12,
+    "distinct_names_retained_after_pushes": 12,
+    "remote_download_verify_checked_before_removals": 12,
+    "remote_download_verify_problems_before_removals": 0,
+    "separate_process_parallel_removals": 6,
+    "names_remaining_after_removals": 6,
+    "remote_objects_retained_after_index_removals": 12,
+    "remaining_remote_download_statuses": [
+      "bytes_ok",
+      "bytes_ok",
+      "bytes_ok",
+      "bytes_ok",
+      "bytes_ok",
+      "bytes_ok"
+    ],
+    "same_name_race_exit_codes": [
+      0,
+      1
+    ],
+    "same_name_race_index_entries": 1,
+    "same_name_race_remote_objects": 1,
+    "same_name_race_loser_reported_conflict": true,
+    "stale_handle_regression_passed": true
+  },
+  "validation": {
+    "release_crypto_binary_tests_passed": 26,
+    "release_crypto_binary_tests_failed": 0,
+    "release_library_tests_passed": 4490,
+    "release_library_tests_failed": 0,
+    "release_library_tests_ignored": 119,
+    "rustfmt_check": "passed",
+    "git_diff_check": "passed"
+  },
+  "limits": {
+    "same_local_index_path_required": true,
+    "distinct_git_checkout_indexes_not_merged": true,
+    "s3_backend_concurrent_pushes_not_exercised_here": true
+  }
+}

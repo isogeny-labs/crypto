@@ -1,0 +1,42 @@
+{
+  "kind": "nist-skip-search-round/v1",
+  "start_date_utc": "2026-10-25",
+  "report_date_utc": "2026-10-26",
+  "base_commit": "9d7f1590cb6d70a0bb3baa30245a85701687e138",
+  "protocol_commit": "a1240d3",
+  "curves": 21,
+  "published": 10,
+  "skipped": 11,
+  "feature_counts": [
+    1062,
+    1100,
+    4282
+  ],
+  "separate_informative_cohort": {
+    "curves": 19,
+    "published": 8,
+    "skipped": 11,
+    "feature_count": 1118
+  },
+  "rng_models": 52520,
+  "repository": "isogeny-labs/crypto",
+  "pull_request": 2378,
+  "publication_status": "source and summaries published in PR 2378; large artifact upload blocked by unavailable S3 credentials after installing a temporary AWS client",
+  "historical_mechanism_established": false,
+  "ordinary_input_attack_established": false,
+  "independent_host_replay": false,
+  "lean_formalization": false,
+  "inputs_sha256": "6f81154db862f892fd521c32e590d6830a56d9e8dd830edc8f36c27d5d7edb2b",
+  "historical_inputs_sha256": "f425dc7c323bdbe6660fc599d1c625e1851a0e30d2a83d38a1c62d35e002f8fe",
+  "recorded_rules": "results/criterion-truth-table.tsv",
+  "factor_targets": {
+    "requested": 84,
+    "complete_with_proven_factors": 80,
+    "incomplete": 4,
+    "per_target_initial_timeout_seconds": 30,
+    "workers": 2
+  },
+  "feature_run_per_curve_timeout_seconds": 120,
+  "environment": "validation/environment.txt",
+  "workflow_attempts": "validation/workflow-checks.txt"
+}

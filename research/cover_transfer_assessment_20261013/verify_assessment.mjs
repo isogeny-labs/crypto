@@ -5,6 +5,9 @@ import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { catalogSnapshotBytes, legacyFormulaSnapshotBytes } from "../../scripts/catalog_snapshot.mjs";
+
+const expectedCatalogCommit = "728304718cb0ab6df70da620a908a5f76f175293";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(process.argv[2] ?? path.resolve(here, "../.."));
@@ -14,7 +17,9 @@ const reportPath = path.join(curvesDir, "covers.json");
 const graphPath = path.join(curvesDir, "cover-links.yaml");
 const assessmentPath = path.join(curvesDir, "cover-transfer-assessments.json");
 
-const readJson = (file) => JSON.parse(fs.readFileSync(file, "utf8"));
+const readJson = (file) => JSON.parse(catalogSnapshotBytes(
+  root, path.relative(root, file).split(path.sep).join("/"), expectedCatalogCommit,
+).toString("utf8"));
 const registry = readJson(registryPath);
 const report = readJson(reportPath);
 const graph = readJson(graphPath);
@@ -363,13 +368,13 @@ function check(condition, message) {
   }
 }
 
-check(registry.curves.length === 2572, "unexpected registry row count");
-check(report.curves.length === 2572, "unexpected cover-report row count");
-check(graph.curves.length === 2572, "unexpected graph curve-node count");
-check(Object.keys(graph.maps).length === 2572, "unexpected CV1 map count");
-check(Object.keys(graph.covers).length === 2570, "unexpected HC1 cover count");
+check(registry.curves.length === 15791, "unexpected registry row count");
+check(report.curves.length === 15791, "unexpected cover-report row count");
+check(graph.curves.length === 15791, "unexpected graph curve-node count");
+check(Object.keys(graph.maps).length === 15791, "unexpected CV1 map count");
+check(Object.keys(graph.covers).length === 15789, "unexpected HC1 cover count");
 
-const registryBytes = fs.readFileSync(registryPath);
+const registryBytes = catalogSnapshotBytes(root, "docs/curves/registry.json", expectedCatalogCommit);
 check(report.registry_sha256 === sha256(registryBytes), "covers.json registry digest mismatch");
 check(graph.registry_sha256 === report.registry_sha256, "cover-links registry digest mismatch");
 
@@ -482,15 +487,15 @@ check(
   "graph model hashes are not a unique exact copy of the registry model hashes",
 );
 
-check(representationCount === 977, "unexpected EC1 representation count");
-check(ec1Aliases.size === 977, "unexpected unique EC1 count");
-check(curveUids.size === 977, "unexpected unique curve-UID count");
+check(representationCount === 979, "unexpected EC1 representation count");
+check(ec1Aliases.size === 979, "unexpected unique EC1 count");
+check(curveUids.size === 979, "unexpected unique curve-UID count");
 check(
-  mapReferenceCounts.size === 2572 && [...mapReferenceCounts.values()].every((count) => count === 1),
+  mapReferenceCounts.size === 15791 && [...mapReferenceCounts.values()].every((count) => count === 1),
   "CV1 references are not bijective with curve nodes",
 );
 check(
-  coverReferenceCounts.size === 2570 &&
+  coverReferenceCounts.size === 15789 &&
     [...coverReferenceCounts.values()].every((count) => count === 1 || count === 2) &&
     [...coverReferenceCounts.values()].filter((count) => count === 2).length === 2,
   "unexpected HC1 sharing pattern",
@@ -785,9 +790,9 @@ for (const coverResult of report.curves) {
 }
 
 check(constructionCounts.binary_cubic_pullback_v1 === 165, "unexpected binary-construction count");
-check(constructionCounts.prime_quadratic_pullback_v1 === 2407, "unexpected odd-construction count");
+check(constructionCounts.prime_quadratic_pullback_v1 === 15626, "unexpected odd-construction count");
 check(arithmeticChecks.binary === 165, "unexpected binary arithmetic-replay count");
-check(arithmeticChecks.prime === 1083, "unexpected prime-field arithmetic-replay count");
+check(arithmeticChecks.prime === 14302, "unexpected prime-field arithmetic-replay count");
 check(arithmeticChecks.extension === 1324, "unexpected extension-field arithmetic-replay count");
 check(
   arithmeticChecks.normalized_target === 30,
@@ -795,7 +800,6 @@ check(
 );
 
 const expectedStatusVocabulary = ["unknown", "supported", "refuted", "not_applicable"];
-const expectedCatalogCommit = "8e4c99759fd8d9594ed207d793b07b59ebaf19f7";
 const expectedRootKeys = [
   "assessment_date",
   "catalog_commit",
@@ -848,7 +852,7 @@ const expectedSubgroupClaimIds = [
 ].sort();
 const expectedTemplateStatuses = {
   "map.advantage.unknown": "unknown",
-  "map.binary-arbitrary-pushforward.refuted": "refuted",
+  "map.binary-arbitrary-pushforward.supported": "supported",
   "map.binary-composition.supported": "supported",
   "map.binary-construction.supported": "supported",
   "map.binary-jacobian.supported": "supported",
@@ -898,7 +902,7 @@ const expectedProfiles = {
       pullback_point_classes: "map.binary-pullback.supported",
       independent_pullback_homomorphism_oracle: "map.independent-oracle.unknown",
       pushforward_point_divisors: "map.binary-typed-pushforward.supported",
-      arbitrary_jacobian_pushforward: "map.binary-arbitrary-pushforward.refuted",
+      arbitrary_jacobian_pushforward: "map.binary-arbitrary-pushforward.supported",
       composition_on_typed_domain: "map.binary-composition.supported",
       alternate_target_model_map: "map.direct-target.not-applicable",
       field_extension_or_descent: "map.same-field.not-applicable",
@@ -1022,10 +1026,10 @@ const expectedControlStatuses = {
 };
 const expectedSemanticDigests = {
   claim_contract: "36a2bb9524810994c02633462e71ae08ac88da6fbb520df72e66e05150628634",
-  result_templates: "1a4955b6d4dd016e0cad661afde21257ae6845904904917568414f2ae601f05e",
-  profiles: "807800e78066e8c3b0caa6634072a585cf4ae924a40b13817d9ca7a3c0aa3710",
-  controls: "f5e73ff82f722d7f3f435e3c4d238b856d2b613111a28012dffa5b8ef5e7d3c6",
-  open_obligations: "ba227bbd94320d317ccfbf71b1e0dd3f05854e7aa4e62693472dfdf34c8f2373",
+  result_templates: "a762cc8659726c43b7ce84bd1750b4cd6c108c216031ec318452140dbb7aebc9",
+  profiles: "8fbcabe05bc436d528bdafabc5514d45d80355337ec6f74edd6db0b3ebc8fde1",
+  controls: "2ecc0db58b61a77891ddb1ed14924d70f9a101bb3791114859e83aa92279e06f",
+  open_obligations: "98cf42d30763b94c73d6b62c8c3b3901bc0556eb3c9be5067ea97798a447a53a",
   global_cost_accounting:
     "b3b77a401d4dd76cabfc9a65d5a738fcfb977fd1a3abc2db3733c41820304619",
 };
@@ -1055,6 +1059,7 @@ const requiredSourceArtifactPaths = [
   "docs/curves/cover-transfer-assessment.schema.json",
   "docs/curves/fixed-f8-genus3-order-certificate.json",
   "scripts/build_cover_transfer_assessments.mjs",
+  "scripts/catalog_snapshot.mjs",
   "src/bin/curve_cover_check/checker.rs",
   "src/bin/curve_cover_check/models.rs",
   "src/bin/curve_cover_check/links.rs",
@@ -1117,10 +1122,10 @@ for (const relativePath of [
     const committedBytes = execFileSync(
       "git",
       ["show", `${assessment.catalog_commit}:${relativePath}`],
-      { cwd: root, encoding: "buffer", maxBuffer: 32 * 1024 * 1024 },
+      { cwd: root, encoding: "buffer", maxBuffer: 128 * 1024 * 1024 },
     );
     check(
-      sha256(committedBytes) === sha256(fs.readFileSync(path.join(root, relativePath))),
+      sha256(committedBytes) === sha256(catalogSnapshotBytes(root, relativePath, expectedCatalogCommit)),
       `catalog file ${relativePath} does not match catalog_commit ${assessment.catalog_commit}`,
     );
   } catch (error) {
@@ -1135,9 +1140,10 @@ check(
   "assessment status vocabulary changed",
 );
 for (const [section, expectedDigest] of Object.entries(expectedSemanticDigests)) {
+  const actualDigest = sha256(canonicalJson(assessment[section]));
   check(
-    sha256(canonicalJson(assessment[section])) === expectedDigest,
-    `authoritative semantic digest mismatch for ${section}`,
+    actualDigest === expectedDigest,
+    `authoritative semantic digest mismatch for ${section}: expected ${expectedDigest}, got ${actualDigest}`,
   );
 }
 
@@ -1161,11 +1167,17 @@ for (const artifact of sourceArtifacts) {
   check(absolute !== null, "unsafe source-artifact path " + String(artifact.path));
   check(absolute !== null && fs.existsSync(absolute), "missing source artifact " + String(artifact.path));
   if (absolute !== null && fs.existsSync(absolute)) {
-    check(
-      /^[0-9a-f]{64}$/u.test(artifact.sha256) &&
-        sha256(fs.readFileSync(absolute)) === artifact.sha256,
-      "source-artifact digest mismatch for " + artifact.path,
-    );
+    try {
+      const bytes = Object.hasOwn(artifact, "source_commit")
+        ? legacyFormulaSnapshotBytes(root, artifact.path, artifact.source_commit)
+        : catalogSnapshotBytes(root, artifact.path, expectedCatalogCommit);
+      check(
+        /^[0-9a-f]{64}$/u.test(artifact.sha256) && sha256(bytes) === artifact.sha256,
+        "source-artifact digest mismatch for " + artifact.path,
+      );
+    } catch (error) {
+      check(false, `unreadable pinned source artifact ${artifact.path}: ${error.message}`);
+    }
   }
 }
 for (const requiredPath of requiredSourceArtifactPaths) {
@@ -1661,10 +1673,10 @@ for (const [mapUid, context] of mapContexts) {
   });
 }
 
-check(expectedFieldBindings.size === 509, "unexpected declared-field context count");
-check(fieldUidByLabel.size === 509, "declared-field labels are not bijective with field contexts");
-check(expectedJacobianBindings.size === 2570, "unexpected Jacobian-context count");
-check(expectedTypedMapBindings.size === 2572, "unexpected typed-map binding count");
+check(expectedFieldBindings.size === 557, "unexpected declared-field context count");
+check(fieldUidByLabel.size === 557, "declared-field labels are not bijective with field contexts");
+check(expectedJacobianBindings.size === 15789, "unexpected Jacobian-context count");
+check(expectedTypedMapBindings.size === 15791, "unexpected typed-map binding count");
 check(
   canonicalJson(actualFieldBindings) === canonicalJson(sortedRecord(expectedFieldBindings)),
   "typed declared-field bindings are not the exact independently derived set",
@@ -1830,10 +1842,10 @@ check(
 
 const expectedPredicateCounts = {
   binary_cubic_same_field: 165,
-  odd_prime_quadratic_direct_same_field: 1053,
+  odd_prime_quadratic_direct_same_field: 14272,
   odd_prime_quadratic_normalized_same_field: 30,
   odd_extension_quadratic_direct_same_field: 1324,
-  linked_subgroup_degree3: 140,
+  linked_subgroup_degree3: 142,
   linked_subgroup_degree2: 837,
 };
 const actualPredicateCounts = {};
@@ -1876,7 +1888,7 @@ const expectedExactOverlays = {
     },
     evidence_additions: [
       "research/hyperelliptic_cover_infrastructure_20261006/evidence.json#subgroup_transfer",
-      "src/binary_ecc/cover_transfer.rs#subgroup_status_and_arbitrary_pushforward_boundary",
+      "src/binary_ecc/cover_transfer.rs#subgroup_status_general_pushforward_and_projector",
     ],
   },
   "map.prime-fp827-degree2": {
@@ -2175,9 +2187,9 @@ check(
   typeof coverage.scope_note === "string" && coverage.scope_note.trim().length > 0,
   "coverage scope_note is empty",
 );
-check(coverage.assessed_maps === 2572 && coverage.unassessed_maps === 0, "map coverage is incomplete");
+check(coverage.assessed_maps === 15791 && coverage.unassessed_maps === 0, "map coverage is incomplete");
 check(
-  coverage.assessed_subgroups === 977 && coverage.unassessed_subgroups === 0,
+  coverage.assessed_subgroups === 979 && coverage.unassessed_subgroups === 0,
   "subgroup coverage is incomplete",
 );
 
@@ -2406,8 +2418,8 @@ for (const [kind, relativePath] of Object.entries(reportArtifacts)) {
   if (kind === "context_graph_source") {
     const contents = bytes.toString("utf8");
     for (const marker of [
-      "509 fields / 2,570 Jacobian contexts / 2,572 maps",
-      "current-source test: 2,572 / 2,572",
+      "557 fields / 15,789 Jacobian contexts / 15,791 maps",
+      "current-source test: 15,791 / 15,791",
       "746 inside / 1,354 outside old allowlist",
     ]) {
       check(contents.includes(marker), `context graph lacks current marker: ${marker}`);

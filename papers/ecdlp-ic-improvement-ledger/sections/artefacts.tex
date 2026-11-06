@@ -1,0 +1,82 @@
+\section{Artefacts}\label{app:artefacts}
+
+Every number in this paper is copied from a committed artefact. The paper
+ran no measurement. Plotted values, each with its source, are in
+\art{papers/ecdlp-ic-improvement-ledger/figures/data.json}. The table below
+lists the main sources by section; the text names the rest where they are
+used. ``Benchmarks row'' means the row of that slug in
+\art{benchmarks/README.md}, whose copy of the evidence is under
+\art{benchmarks/<slug>/}.
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+\toprule
+Section & Sources \\
+\midrule
+\S\ref{sec:model} & \art{docs/ic/LEADERBOARD.md} (phase table);
+  \art{research/n83_cold_base_confirm_20261021/RESULT.md} \\
+\S\ref{sec:measure} & \art{docs/ecbench/README.md}; \art{docs/ic/calibration.json};
+  \art{AGENTS.md} \S5a; \art{docs/VALIDATION_GATE.md} \\
+\S\ref{sec:oracle} & \art{RESEARCH_SEMAEV_ROOTFIND_VS_GROEBNER.md};
+  \art{research/pdp_root_finder_20261012/};
+  \art{research/binary_mitm_oracle_l9_l10_20261015/};
+  \art{research/binary_mitm_oracle_l11_l12_20261016/};
+  \art{research/f4_f5_f6_cross_family_20261011/};
+  \art{research/f4_fp_msolve_parity_20261011/};
+  \art{research/f6_gate_first_x86_20261016/};
+  \art{research/ic_improve3_20261015/02-harvest-gate};
+  \art{research/ic_m3_algebraic_vs_mitm_20261014/};
+  \art{research/arm64_f4_defaults_20261022/} \\
+\S\ref{sec:basis} & \art{docs/ic/COMPACT_ORBIT_PRODUCER.md};
+  \art{research/ecbench_frontier_20261013/};
+  \art{research/greedy_factor_base_yield_20261014/};
+  \art{research/n83_cold_base_confirm_20261021/};
+  \art{research/pkm_tower_ecbench_20261013/}; benchmarks rows
+  \texttt{20261014-frobenius-orbit-ic-vs-rho},
+  \texttt{20261015-ic-improve2-02-freerel-production},
+  \texttt{20261014-rootfind-stride-targets} \\
+\S\ref{sec:setup} & \art{crypto-autoresearcher:research/sheriff/SHF-20261016-3caa6f/findings.yaml};
+  \art{research/ic_oracle_setup_blocked_20261020/};
+  \art{research/la_engines_20261014/};
+  \art{research/ic_linalg_pipeline_20261019/};
+  \art{research/sparse_la_timing_20261018/};
+  \art{research/jv_cover_sparse_fglm_20261018/} \\
+\S\ref{sec:families} & \art{research/ic_improve_20261014/};
+  \art{research/ic_improve3_20261015/};
+  \art{research/ic_improve4_20261015/};
+  \art{research/gaudry_quartic_d4_20261013/};
+  \art{research/gaudry_quartic_d4_cost_20261014/};
+  \art{research/gaudry_quartic_d4_char2_20261015/};
+  \art{research/joux_vitse_n1_20261015/} \\
+\S\ref{sec:distance} & \art{research/ic_tool_program/rule/v8/};
+  \art{research/ic_frontier_campaign_20261015/};
+  \art{research/ic_planner_validation_20261020/};
+  \art{research/n83_e2e_holdout_20261016/};
+  \art{research/eccp131_bsgs_ic_20261020/} \\
+\S\ref{sec:audit} & \art{research/validation_sweep_20261019/};
+  \art{research/f4_pricing_jump_20261018/};
+  \art{research/volcano_ecdlp_census_20261017/}; benchmarks rows
+  \texttt{20261014-ic-next10-09-equal-advice},
+  \texttt{20261016-n83-precomputed-rho-control},
+  \texttt{20261014-n71-n83-hosted-single-target},
+  \texttt{20261015-u64-rootbatch} \\
+\S\ref{sec:gate} & \art{docs/ic/leaderboard.json};
+  \art{docs/ic/validation/PRE_GATE.json}; \art{benchmarks/PRE_GATE.json};
+  \art{benchmarks/20261017-isogeny-volcano-cost-v2/VALIDATION.json};
+  \art{benchmarks/20261017-volcano-ecdlp-census/VALIDATION.json} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\paragraph{Derived values.} The paper derives a value only by taking a
+reciprocal or a quotient of two recorded values. Each derived value is
+listed here:
+\begin{itemize}
+\item every ratio written $1/s$ in Figure~\ref{fig:ratchet} or
+  Table~\ref{tab:ledger}, which is the reciprocal of a recorded speed-up $s$;
+\item K1107 over K1103, $113.755/114.950=0.990$, with its interval
+  $1-[1.433,0.957]/114.950$;
+\item the before values of Figure~\ref{fig:audit}: $1/13.94$, $1/18.528$,
+  $1/12.29$ and $16.7/14.4$, and the after value $421.4/14.4$;
+\item the genus-three chained $0.44\times$, taken from the source.
+\end{itemize}

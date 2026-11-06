@@ -1,0 +1,13 @@
+digraph lead {
+  graph [rankdir=LR,bgcolor="white",pad=0.2,nodesep=0.2,ranksep=0.35];
+  node [shape=box,style="rounded,filled",fontname="DejaVu Sans",fontsize=10,fillcolor="#edf2f7",color="#778899"];
+  recipe [label="Exact shape recipe\nand signed point set"];
+  support [label="Target-subgroup support\nindependent finite census"];
+  control [label="Positive control in E[r]\nnew CLI gate",fillcolor="#e0f0e4"];
+  train [label="Matched F4 probes\nverified witnesses + rank"];
+  hold [label="Fresh holdout\nGP yield/support lead",fillcolor="#e0f0e4"];
+  price [label="Complete pricing +\nregularity certificate\nNOT established",fillcolor="#fff0dc"];
+  next [label="Draft: cofactor-aware bases\nand rank-aware witnesses",style="rounded,dashed",fillcolor="white"];
+  recipe -> support -> control -> train -> hold -> price;
+  support -> next [style=dashed]; train -> next [style=dashed];
+}

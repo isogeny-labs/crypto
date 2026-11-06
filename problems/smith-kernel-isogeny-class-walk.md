@@ -1,13 +1,13 @@
 # Enlarging Smith's 18.57% by isogeny walks: only the rationality conditions can move
 
-- **Status:** `open` (the 2026-10-13 decision step is done: class-level success
-  is near the ceiling, so the walk is worth costing; the walk itself is not
-  built or priced)
+- **Status:** `open` (the walk via the elliptic side is built and priced,
+  2026-10-25: short in the isogeny graph, `Θ(p)` as a sampled walk; no
+  hyperelliptic-to-hyperelliptic walk exists to compare)
 - **Kind:** implementation gap; empirical bottleneck (walk cost unknown)
 - **Affected work:** [weak isogeny classes study, 2026-10-13](../research/weak_isogeny_classes_20261013/REPORT.md),
   lead 2; [Smith Prop. 2/4 native study, 2026-10-14](../research/smith_prop24_native_20261014/REPORT.pdf)
 - **Next action owner:** unassigned
-- **Last updated:** 2026-10-16
+- **Last updated:** 2026-10-25
 
 ## Problem
 
@@ -61,6 +61,23 @@ open.
     are smaller (median 108 vs 348 models at `p = 7`, 420 vs 1,860 at
     `p = 11`). The two conditions are neither class invariants nor
     independent across class members.
+- **Observed (2026-10-25, W3a, [study](../research/smith_elliptic_walk_20261018/REPORT.pdf),
+  protocol frozen at `eba0a48fbf`):** the walk on the elliptic side. Start
+  from `E/F_{p^3}` with a `(3,5)` Joux-Vitse/Momose-Chao descent to `H`, move
+  `E` by rational 2-isogenies, re-descend and run `full_success`.
+  - Exhaustive at `p = 7..31`: every descended `H` has a rational tractable
+    subgroup. `full_success` holds for 0.53-0.61 of them, against 0.1857 for
+    random `H`, so the 0.43-0.50 class ceiling above does not bound this
+    locus.
+  - A failing weak `E` has a passing weak `E'` in its 2-isogeny component in
+    74-98% of cases. That `E'` is on average 1.5-3.6 steps away (maximum
+    3-11). Passing is not constant on components.
+  - Sampled walks at `p = 2^10..2^20`: the frozen fit's `o(p)` label is a
+    censoring artifact. Post hoc, successful walks at `p = 3 mod 4` scale as
+    `p^1.07` [0.95, 1.19] tested nodes. Each step costs about 2-3 k `F_p`
+    multiplications, a descent 2-4 k and a Smith call 25-61 k (derived).
+  - At `p = 1 mod 4` the full-2-torsion walk branches or dead-ends, by the
+    sign of `-1`, and is usually trapped in closed sets of 6-30 classes.
 - **Missing capability:** explicit `(2,2,2)` or `(l,l,l)` isogenies between
   hyperelliptic genus-3 Jacobians, with their cost. (Native Proposition 2 and 4
   tests: done 2026-10-14.)
@@ -151,6 +168,22 @@ open.
   Still open: Smith's Remark 5 alternative (descending `X` when the trigonal
   map is not rational, which would raise the direct rate to 31.13% under his
   hypotheses) as a route that needs no walk.
+- **W3a done (2026-10-25,
+  [study](../research/smith_elliptic_walk_20261018/REPORT.pdf)):** the
+  elliptic-side walk is short in the graph at `p <= 31`, but `Θ~(p)` as a
+  sampled walk. JV-weak nodes have density about `c/p`. General `(3,5)`-weak
+  curves are also about `1/p` of all classes (`2p^2` models against `~2p^3`
+  classes), so a general weakness test alone would not obviously help. The
+  walk's cost does not vanish against `Õ(q)` index calculus.
+  **Next discriminating step:** measure whether weak and passing curves
+  cluster in the 2-isogeny graph beyond density `1/p`, and whether the
+  distance to a passing `E` grows like `log p`. In the Q1 graphs
+  (`research/smith_elliptic_walk_20261018/data/exhaustive/graph_p*.json`)
+  the explored components are about 4x enriched in weak curves at `p = 31`
+  (derived). Test whether that persists at larger `p`, on larger exhaustive
+  or sampled components. Only if it does is a general weakness test with a
+  short search worth building. Also open: a walk policy that avoids the
+  `p = 1 mod 4` traps, and why the descended locus passes at about 0.55.
 - **Outcomes:** short walks with cheap steps make the extension a practical
   enlargement of Smith's weak set; long or expensive walks bound it as a
   counting fact only.
@@ -175,3 +208,9 @@ open.
   with Prop. 2 this accounts for about three quarters of the clustering.
 - 2026-10-16: the Prop. 4 sign bias shrinks like `1/√p` (`β` bounded at
   `p = 101, 1009, 10007`); the clustering is a small-prime effect.
+- 2026-10-25: W3a frozen protocol run. On the descended locus Smith passes at
+  0.53-0.61. Exhaustive closure under elliptic 2-isogenies reaches 74-98% at
+  `p <= 31`, at distances of 1.5-3.6 steps. Sampled walks are `Θ(p)` to the
+  first pass (post hoc; the frozen `o(p)` label is a censoring artifact) and
+  are trapped at `p = 1 mod 4`. Unresolved; next step is to measure whether
+  weak and passing curves cluster beyond `1/p`.

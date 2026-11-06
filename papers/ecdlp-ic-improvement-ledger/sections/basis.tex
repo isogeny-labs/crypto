@@ -1,0 +1,87 @@
+\section{The ratchet, II: factor base and relation yield}\label{sec:basis}
+
+This section covers $N$ and $\rho_{\mathrm{yield}}$ in~\eqref{eq:cost}. On
+Koblitz curves these terms are the main target, because the curve's
+Frobenius gives the factor base structure the index calculus can use.
+
+\subsection{Compact Frobenius orbits}
+
+On $y^2+xy=x^3+ax^2+1$ over $\FF_{2^n}$ the Frobenius $\pi$ acts on the
+subgroup as a scalar $\lambda$. A $\pi$-invariant base splits into orbits
+with $\log\pi^k(P)=\lambda^k\log P$, so the unknowns collapse by about
+$n$~\cite{ggmp2020}. The programme's \emph{compact signed-Frobenius orbit}
+base stores one representative per orbit and no pair table
+(\art{docs/ic/COMPACT_ORBIT_PRODUCER.md}). It is the best measured Koblitz
+construction:
+\begin{itemize}
+\item in the ecbench factor-base suite at $n=17$ it is $9.985\times$
+  matched signed-Frobenius rho, against $18.7\times$ for full orbits and
+  $47\times$ for subspace bases (\art{research/ecbench_frontier_20261013/});
+\item in the priced frontier campaign it is $3.8$--$15\times$ rho at $w=0$
+  and $4.9$--$17.8\times$ at $w=0.1$ on eight Koblitz curves
+  (\art{research/ic_frontier_campaign_20261015/});
+\item fully priced against fully priced signed-Frobenius rho, its best cell
+  is $1.566$ $[0.992,2.347]$. That interval reaches 1, but the ratio is
+  never below 1, and the fitted gap grows as $r^{0.165\,[0.117,0.213]}$
+  (benchmarks row \texttt{20261014-frobenius-orbit-ic-vs-rho}; 2{,}816 of
+  2{,}816 records verified).
+\end{itemize}
+
+\subsection{Free relations and re-randomised targets}
+
+\begin{itemize}
+\item \emph{Free relations.} Self-collisions in the root table are used as
+  homogeneous rows. In production at $n=41,53,61$ this gives $0.960$
+  $[0.946,0.976]$ counted and $0.941$ in wall. A census closes the lever,
+  though: at $n=61$, $K=600$ the self-collisions span only 49 of the 599
+  relations needed. Full rank from free relations alone would need
+  $K\approx2{,}050$ (benchmarks row
+  \texttt{20261014-ic-next10-09-equal-advice}).
+\item \emph{\texttt{stride-renew} targets.} Re-randomising the target
+  combination at a fixed stride instead of walking it gives $0.531$
+  $[0.506,0.557]$ at Koblitz $n=13$. The result is $4.7\times$ strong rho
+  at $n=19$ (benchmarks row \texttt{20261014-rootfind-stride-targets}).
+\end{itemize}
+
+\subsection{Choosing the base}
+
+\begin{itemize}
+\item \emph{Greedy coverage.} A base chosen greedily to maximise
+  decomposable coverage needs $4.46$ expected trials instead of $5.29$ on
+  $K_0/2^{13}$, a ratio of $0.843$. The gain decays with size: $1.090$ at
+  $r=2^{16}$ and $1.0000$ at $r=2^{39}$
+  (\art{research/greedy_factor_base_yield_20261014/}). It is a real stage
+  improvement that does not reach cryptographic sizes.
+\item \emph{$n=83$ base selection.} At Koblitz $n=83$ the cold pipeline's
+  base was re-selected on 16 fresh public points under a frozen protocol.
+  Base K1107/root11 has a mean cold process of $113.755$\,s against
+  $114.950$\,s for K1103. That is a paired reduction of $1.195$\,s
+  $[0.957,1.433]$, and every one of the 16 per-point differences favours
+  K1107. All 64 IC arms and 16 rho arms were admitted on a GitHub Tier~1
+  host, and a second local verifier reproduced the analysis exactly
+  (\art{research/n83_cold_base_confirm_20261021/RESULT.md}). It is small
+  ($0.990\times$) but verified, and it is the current $n=83$ cold baseline.
+  Rho was measured online only in this study (geometric mean
+  $2{,}334.964$\,ms), so it has no cold IC/rho ratio of its own. The last
+  cold ratio at $n=83$ is the earlier holdout's $55.368$ (K1120,
+  \S\ref{sec:distance}).
+\item \emph{Kummer-tower bases over $\FF_p$.} The $\mu_{2^t}$ bases of
+  Petit, Kosters and Messeng~\cite{pkm2016} cost the same as a plain base
+  of the same size to within 1\% (ratios $0.999$--$1.012$) under root
+  finding. Their structure helps an algebraic solver, not a table
+  (\art{research/pkm_tower_ecbench_20261013/}). This is a null result.
+\end{itemize}
+
+\paragraph{Refuted or neutral.} Three bases or filters did not help:
+\begin{itemize}
+\item a cyclotomic $\gamma$-weighted base, at $1.022$ $[1.021,1.023]$;
+\item a trace-zero pre-filter, at $1.00003$, which is vacuous on odd order;
+\item symmetrised $u$-frame bases, which saved $0.76$--$0.84\times$ at
+  $n=17,23$ but cost $4.01\times$ at $n=31$
+  (\art{research/koblitz_symmetrised_e2e_20260927/}).
+\end{itemize}
+
+\paragraph{Reading.} Every change in this section is \cls{engineering} in
+the constant. None changes how the relation count scales with $r$, and the
+Koblitz gap to rho still grows as roughly $r^{1/6}$ (\S\ref{sec:distance}).
+The open lever is the yield per probe at fixed $N$.

@@ -1,8 +1,47 @@
+# Generated N83 report assets carry binary bytes and should not be line-diffed.
+docs/hashed-ecdl.pdf binary
+benchmarks/20261017-n83-finalist/*.pdf binary
+benchmarks/20261017-n83-finalist/*.svg binary
+research/n83_e2e_finalist_results_20261017/*.pdf binary
+research/n83_e2e_finalist_results_20261017/*.svg binary
+benchmarks/20261017-n83-lower-k-screen/*.pdf binary
+benchmarks/20261017-n83-lower-k-screen/*.svg binary
+research/n83_k992_cold_followup_20261017/local_screen/*.pdf binary
+research/n83_k992_cold_followup_20261017/local_screen/*.svg binary
+benchmarks/20261017-n83-k992-layout-screen/*.pdf binary
+benchmarks/20261017-n83-k992-layout-screen/*.png binary
+benchmarks/20261017-n83-k992-layout-screen/*.svg binary
+research/n83_k992_layout_screen_20261017/*.pdf binary
+research/n83_k992_layout_screen_20261017/*.png binary
+research/n83_k992_layout_screen_20261017/*.svg binary
+research/n83_k992_layout_screen_20261017/*.tar.gz binary
+benchmarks/20261017-n83-k1000-extension/*.pdf binary
+benchmarks/20261017-n83-k1000-extension/*.png binary
+benchmarks/20261017-n83-k1000-extension/*.svg binary
+research/n83_k1000_extension_20261017/*.pdf binary
+research/n83_k1000_extension_20261017/*.png binary
+research/n83_k1000_extension_20261017/*.svg binary
+research/n83_k1000_extension_20261017/*.tar.gz binary
+benchmarks/20261026-n83-d18-solver-gates/*.pdf binary
+research/koblitz_n83_factor_base_sweep_20261008/reports/*/*.pdf binary
+research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/attempt-*/*.pdf binary
+research/koblitz_n83_factor_base_sweep_20261008/verification/d18-full-orbit-20261025/native-cadence-replay-20261026/attempt-*/evidence/*.log -whitespace
 # Preserve solver output byte-for-byte; upstream tools intentionally pad fields.
 research/weak_curve_leaderboard_20261012/validation/ghs128_*.log -whitespace
 research/weak_curve_leaderboard_20261012/reports/run-*/*.svg -whitespace
 research/weak_curve_leaderboard_20261012/reports/run-*/*.log -whitespace
+# Generated study assets and verbatim native compiler/test diagnostics.
+research/ecbench_known_log_targets_20261021/**/*.pdf binary
+research/ecbench_known_log_targets_20261021/**/*.png binary
+benchmarks/20261021-known-log-arbitrary-targets/**/*.pdf binary
+benchmarks/20261021-known-log-arbitrary-targets/**/*.png binary
+research/ecbench_known_log_targets_20261021/**/*.svg -whitespace
+benchmarks/20261021-known-log-arbitrary-targets/**/*.svg -whitespace
+research/ecbench_known_log_targets_20261021/verification/*.log -whitespace
 # Canonical catalog data is rebuilt by the repository's metadata tools.
+docs/backend-leaderboard/REPLAY_PLAN.json linguist-generated=true
+docs/backend-leaderboard/REPRODUCING.md linguist-generated=true
+docs/backend-leaderboard/reproduction.lock.json linguist-generated=true
 docs/browser/data.json linguist-generated=true
 docs/curves/registry.json linguist-generated=true
 docs/curves/covers.json linguist-generated=true
@@ -209,6 +248,28 @@ research/secg_small_x_20261014/graphs/*.svg -diff -whitespace
 benchmarks/20261014-secg-small-x-s3-cost/*.pdf binary
 benchmarks/20261014-secg-small-x-s3-cost/*.png binary
 benchmarks/20261014-secg-small-x-s3-cost/*.svg -diff -whitespace
+research/ic_acct1_cover_bitop_20261021/*.pdf binary
+research/ic_acct1_cover_bitop_20261021/figures/*.png binary
+research/ic_acct1_cover_bitop_20261021/figures/*.svg -diff -whitespace
 # Exact Certicom challenge workflow report and retained fixed-stage state.
 research/eccp131_bsgs_ic_20261020/*.pdf binary
 research/eccp131_bsgs_ic_20261020/*.sqlite3 binary
+# Certicom 131-bit stage benchmark media.
+benchmarks/20261023-certicom-131-stage-bench/*.pdf binary
+benchmarks/20261023-certicom-131-stage-bench/*.png binary
+benchmarks/20261023-certicom-131-stage-bench/*.svg -diff -whitespace
+research/certicom_131_stage_bench_20261023/*.pdf binary
+research/certicom_131_stage_bench_20261023/*.png binary
+research/certicom_131_stage_bench_20261023/*.svg -diff -whitespace
+
+# Generated GHS research figures and report artifacts.
+research/ghs_generalized_20261024/*.pdf binary
+research/ghs_generalized_20261024/*.svg -diff -whitespace
+benchmarks/20261024-ghs-quadratic-controls/*.pdf binary
+benchmarks/20261024-ghs-quadratic-controls/*.svg -diff -whitespace
+research/notes/index-calculus/reports/run-20261024T2112Z/*.pdf binary
+*.pdf binary
+*.png binary
+research/five_leads_e2e_20261019/reports/**/*.svg -whitespace
+benchmarks/20261020-five-leads-followup-operations/*.svg -whitespace
+benchmarks/20261019-five-leads-choice2-costs/*.svg -whitespace

@@ -60,3 +60,11 @@ Later 2026-10-13: The one-lane native walk matched every paired relation and ans
 2026-10-14: The synchronized 4/8/16-lane collector and fixed-stride B48 coverage controls completed five frozen L0 sessions, all verified and replayed. The train-selected B48 did not establish a holdout B optimum, and the stride panels did not resolve a coverage bias against exact uniform occupancy. Missing sealed field-operation counters, unequal target-pinned probe budgets, inaccessible L2 workers and absent independent-host replay keep the stated exit criteria open. The prior kernel-only and one-lane observations remain immutable historical records.
 
 Later 2026-10-14: The equal-prefix addendum first measured a reused-target exploratory panel, then a separately frozen eight-fresh-target confirmation. Both showed an early stride-23 independent-rank surplus; the fresh primary effect was smaller and diminished by 8,192 probes. The exact equal-probe control now exists, while complete native pricing, isolated wall and independent-host replay remain open.
+
+
+## 2026-10-19 generalized all-roots conditional-cell follow-up
+
+The [new cycle](../research/autolab_cycle_20261019_v3/REPORT.md) proves exact fixed-sum pair recovery and adaptive empty affine cells of dimension65 on GF(2^83), d18. These are conditional first-S3 components. They do not resolve the full339-coordinate hard root set, its2^101 outer (p,s) grid, all requested field families, or the matched full all-roots F4/F5/F6 performance gate. No speed ratio is inferred from cells or timeouts. Existing unrelated pipeline evidence and exit criteria above remain unchanged.
+
+Next discriminating experiment: [draft union/residual card](../backlog/XP-20261019-adaptive-pair-cell-union/README.md). Construct an exact disjoint union/residual partition, independently compare every small literal-S3 root, and freeze state/output/work caps before another changed hard solve. Unblock original completeness only with full ordered original tuples and a coverage certificate; unblock speed claims only with the unchanged20-input genuine-matched-baseline gate. Native component tests pass; legacy sparse Python-suite validation remains incomplete as documented in [validation](../research/autolab_cycle_20261019_v3/VALIDATION.md). This record remains open.
+

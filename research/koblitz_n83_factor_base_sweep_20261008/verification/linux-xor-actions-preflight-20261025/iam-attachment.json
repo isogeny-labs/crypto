@@ -1,0 +1,73 @@
+{
+  "allowed_input_count": 11,
+  "allowed_inputs": [
+    {
+      "decision": "allowed",
+      "resource": "arn:aws:s3:::crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/linux-xor-panel-20261025/inputs/hash_5_1.xcnf"
+    },
+    {
+      "decision": "allowed",
+      "resource": "arn:aws:s3:::crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/linux-xor-panel-20261025/inputs/gray_5_1.xcnf"
+    },
+    {
+      "decision": "allowed",
+      "resource": "arn:aws:s3:::crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/linux-xor-panel-20261025/inputs/hash_4_2.xcnf"
+    },
+    {
+      "decision": "allowed",
+      "resource": "arn:aws:s3:::crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/linux-xor-panel-20261025/inputs/gray_4_2.xcnf"
+    },
+    {
+      "decision": "allowed",
+      "resource": "arn:aws:s3:::crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/linux-xor-panel-20261025/inputs/archives/s3-3888e2597fd3519807c9d722f49f83329c93ce5cb0929501cf7cb7cbc3cab1a0.jsonl.gz"
+    },
+    {
+      "decision": "allowed",
+      "resource": "arn:aws:s3:::crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/linux-xor-panel-20261025/inputs/archives/s3-966a0493c96674f0af6d184615ed05309d08fba5c7342957b4186cd50366dc47.jsonl.gz"
+    },
+    {
+      "decision": "allowed",
+      "resource": "arn:aws:s3:::crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/linux-xor-panel-20261025/inputs/archives/s3-b4dda45e6c3edfca673db6f3f82c16cce8c860f5e62c092155258df399a0363e.jsonl.gz"
+    },
+    {
+      "decision": "allowed",
+      "resource": "arn:aws:s3:::crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/linux-xor-panel-20261025/inputs/exports/hash_5_1/export.json"
+    },
+    {
+      "decision": "allowed",
+      "resource": "arn:aws:s3:::crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/linux-xor-panel-20261025/inputs/exports/gray_5_1/export.json"
+    },
+    {
+      "decision": "allowed",
+      "resource": "arn:aws:s3:::crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/linux-xor-panel-20261025/inputs/exports/hash_4_2/export.json"
+    },
+    {
+      "decision": "allowed",
+      "resource": "arn:aws:s3:::crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/linux-xor-panel-20261025/inputs/exports/gray_4_2/export.json"
+    }
+  ],
+  "denied_probes": [
+    {
+      "action": "s3:GetObject",
+      "decision": "implicitDeny",
+      "resource": "arn:aws:s3:::crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/linux-xor-panel-20261025/outputs/probe.zip"
+    },
+    {
+      "action": "s3:ListBucket",
+      "decision": "implicitDeny",
+      "resource": "arn:aws:s3:::crypto-autoresearcher"
+    },
+    {
+      "action": "s3:PutObject",
+      "decision": "explicitDeny",
+      "resource": "arn:aws:s3:::crypto-autoresearcher/factor-bases/icv1/etc/koblitz_n83_factor_base_sweep_20261008/linux-xor-panel-20261025/inputs/hash_5_1.xcnf"
+    }
+  ],
+  "managed_policy_arn": "arn:aws:iam::590183823895:policy/N83XorPanelExactInputRead20261025",
+  "policy_sha256": "3d1ed462598ee875515db2840433daf8193497ae7cf105e107a07ac4cc832dc6",
+  "schema": "n83.iam-exact-input-read/v1",
+  "selected_best_total_runtime": null,
+  "source_manifest_sha256": "f8238367cb5f1caba91aaf8311f1026a9f24ec867f87afa47aafd3563c8c34a1",
+  "status": "PASS_11_INPUTS_ALLOWED_OUTPUT_AND_WRITES_DENIED",
+  "user_arn": "arn:aws:iam::590183823895:user/rho-gh-snapshot-readonly-20261024"
+}

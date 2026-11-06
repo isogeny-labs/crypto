@@ -1,0 +1,58 @@
+{
+  "schema": "rho-rebased-worker-validation-v1",
+  "status": "partial_validation_pending_base_repair_and_full_suite",
+  "main_commit": "e063d98475589d9aba7ae265a8cba830927e3156",
+  "rho_commit_before_final_start_fix": "9069bd688b14839047f5c6ca3820f2b06ff5f976",
+  "temporary_build_repair_commit": "37bcf08a699cf570908990357e7079c580281e5e",
+  "temporary_build_repair_merged_into_rho_branch": false,
+  "source_sha256": {
+    "job_rs": "f62d8fcb066e0780e6fd6035767dcc7457217cce92812a8b76059c16c6cce05d",
+    "walk_rs": "fdefcf5ea40cc7e2a7eadd71cd2bd140635cc87a4f3215761f4b3ad0dc4d6a6c",
+    "worker_rs": "49d98c29aeecb2f87cb18c2138207b8fa570f74e5fb4e8bf58ac8f937a6ca47f"
+  },
+  "main_only_compile": {
+    "status": "failed_before_tests",
+    "errors": 26,
+    "log": "rebased-main-compile-failed.log",
+    "log_sha256": "eb1fc4bc87d1fa90f018da53a2c4ea29e1de8f8edc5f14560aeadae05a0a2d85"
+  },
+  "combined_source_rho_tests": {
+    "status": "passed",
+    "command": "cargo test --offline --release --lib cryptanalysis::pollard_collab",
+    "passed": 44,
+    "failed": 0,
+    "log": "rebased-rho-collab-44.log",
+    "log_sha256": "658f0c5ffd7f9e21fa52c6ea4b0c8eea07fa1453a12af2a1507abdf9ae4d2e5f"
+  },
+  "combined_source_full_suite_first_attempt": {
+    "status": "censored_interrupted",
+    "recorded_failed_test": "cryptanalysis::jv_cover::tests::replayed_f4_agrees_with_the_full_solver_and_the_oracle",
+    "completed_test_count": 4496,
+    "remaining_test": "cryptanalysis::koblitz_sym_s4::tests::symmetric_solver_agrees_with_chain_and_brute_force",
+    "log": "rebased-full-censored.log",
+    "log_sha256": "895f2aefe93af2454dda3e97ff2004e5e0b5fd425f02f5602b6e41a53ef18fbd"
+  },
+  "focused_failed_test_replay": {
+    "status": "passed",
+    "seconds": "36.74",
+    "log": "rebased-jv-replay.log",
+    "log_sha256": "336241a8058d35ce77ee7a188482b75f6a0fcd2e08d625d601302ef943089425"
+  },
+  "combined_source_four_thread_attempt": {
+    "status": "censored_interrupted_after_upstream_repair_changed",
+    "recorded_passed_tests": 1089,
+    "recorded_failed_tests": 0,
+    "log": "rebased-full-fourthreads-censored.log",
+    "log_sha256": "20bdaaa899689401490f6e2d36571e1f9dc87830c9f25b70bd3c35b3d6c8048a"
+  },
+  "local_profile": {
+    "status": "exact_replay_passed_local_timing_diagnostic",
+    "walk_steps": 10152,
+    "transcript_blake3": "7ea1107534b3fc8e1ab9e6a348c69069fd9b180b2e88702c0142ecf0e464e0ef",
+    "json": "local-rebased-4x8192-dp12.json",
+    "json_sha256": "d796ece9ff1a0f1dbaeb70ecbcc4237462de212f48257df13cccb61014a0045d",
+    "build_log": "local-rebased-build.log",
+    "build_log_sha256": "493defa251d2faced554ded10c70b90a47a69fe48616d9744a951dbc520c3f8b"
+  },
+  "qualified_worker_speedup": null
+}

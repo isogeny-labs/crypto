@@ -1,0 +1,416 @@
+{
+ "isolation": {
+  "records": 59,
+  "contended": [],
+  "nonzero_exit": [],
+  "refused_by_gate": [
+   "gate_walk131"
+  ]
+ },
+ "arms_steps_per_s": {
+  "k130_a": {
+   "samples": [
+    9666000.0,
+    10308000.0,
+    9723000.0,
+    11582000.0,
+    11230000.0,
+    11697000.0,
+    11082000.0
+   ],
+   "n": 7,
+   "median": 11082000.0,
+   "min": 9666000.0,
+   "max": 11697000.0
+  },
+  "k130_b": {
+   "samples": [
+    9340000.0,
+    9962000.0,
+    9683000.0,
+    11084000.0,
+    12061000.0,
+    10316000.0,
+    10186000.0
+   ],
+   "n": 7,
+   "median": 10186000.0,
+   "min": 9340000.0,
+   "max": 12061000.0
+  },
+  "old_prime": {
+   "samples": [
+    1243279,
+    1276019,
+    1281075,
+    1284375,
+    1286989,
+    1257141,
+    1262521
+   ],
+   "n": 7,
+   "median": 1276019,
+   "min": 1243279,
+   "max": 1286989
+  },
+  "old_clmul": {
+   "samples": [
+    9020715,
+    9049111,
+    6768823,
+    6492617,
+    9023075,
+    8275590,
+    9024034
+   ],
+   "n": 7,
+   "median": 9020715,
+   "min": 6492617,
+   "max": 9049111
+  },
+  "new_prime64": {
+   "samples": [
+    5046568,
+    3850004,
+    4960446,
+    3077375,
+    4378958,
+    4893701,
+    4998039
+   ],
+   "n": 7,
+   "median": 4893701,
+   "min": 3077375,
+   "max": 5046568
+  },
+  "new_clmul3": {
+   "samples": [
+    6440857,
+    7670576,
+    7505733,
+    6732364,
+    5251581,
+    6922831,
+    7976954
+   ],
+   "n": 7,
+   "median": 6922831,
+   "min": 5251581,
+   "max": 7976954
+  },
+  "pv131": {
+   "samples": [
+    14047645,
+    15293783,
+    12514290,
+    15055883,
+    15075322,
+    15059891,
+    14572798
+   ],
+   "n": 7,
+   "median": 15055883,
+   "min": 12514290,
+   "max": 15293783
+  },
+  "bs131": {
+   "samples": [
+    12301488,
+    11462124,
+    10603069,
+    12093815,
+    10503281,
+    10782748,
+    12125032,
+    11272484,
+    9929632,
+    9476094,
+    7481159,
+    10527147,
+    9926890,
+    12046605,
+    10822728,
+    12264233,
+    12197869,
+    12312826,
+    12271268,
+    12253532,
+    12308583
+   ],
+   "n": 21,
+   "median": 11462124,
+   "min": 7481159,
+   "max": 12312826
+  }
+ },
+ "derived": {
+  "k130_reference_median_both_positions": 10312000.0,
+  "aa_ratio_k130_b_over_a": 0.9191481682006858,
+  "ratio_to_k130": {
+   "k130_a": 1.0746702870442204,
+   "k130_b": 0.9877812257564003,
+   "old_prime": 0.12374117532971296,
+   "old_clmul": 0.8747784134988363,
+   "new_prime64": 0.4745637121799845,
+   "new_clmul3": 0.6713373739332816,
+   "pv131": 1.4600352017067495,
+   "bs131": 1.111532583397983
+  },
+  "speedup_vs_old_same_session": {
+   "ECCp-131 mont64 / old 32-bit": 3.8351317652793573,
+   "ECCp-131 avx512x8 / old 32-bit": 11.799105655950264,
+   "ECC2-131 clmul3 / old clmul": 0.7674370601443455,
+   "ECC2-131 bitsliced / old clmul": 1.2706447327068864
+  },
+  "formula": "ratio = median(arm samples) / median(ECC2K-130 client samples, both positions); speedup = median(new) / median(old)",
+  "core_years": {
+   "ECC2K-130 client": {
+    "log2_expected_steps": 60.80903656396743,
+    "rate": 10312000.0,
+    "core_years": 6207.220051006501
+   },
+   "ECC2-131 old clmul": {
+    "log2_expected_steps": 64.82574806473616,
+    "rate": 9020715,
+    "core_years": 114854.95336118269
+   },
+   "ECC2-131 bitsliced": {
+    "log2_expected_steps": 64.82574806473616,
+    "rate": 11462124,
+    "core_years": 90391.08289262278
+   },
+   "ECCp-131 old 32-bit": {
+    "log2_expected_steps": 64.91949482088863,
+    "rate": 1276019,
+    "core_years": 866471.2082915978
+   },
+   "ECCp-131 avx512x8": {
+    "log2_expected_steps": 64.91949482088863,
+    "rate": 15055883,
+    "core_years": 73435.32921536628
+   }
+  },
+  "core_years_formula": "2^log2_expected_steps / rate / (365.25*86400)"
+ },
+ "gates": [
+  {
+   "source": "gate_walk131",
+   "kind": "gate",
+   "gate": "G1",
+   "arm": "ECCp-131/mont64",
+   "cases": 20000,
+   "mismatches": 0
+  },
+  {
+   "source": "gate_walk131",
+   "kind": "gate",
+   "gate": "G2",
+   "arm": "ECCp-131/mont64",
+   "pairs": 368,
+   "mismatches": 0
+  },
+  {
+   "source": "gate_walk131",
+   "kind": "setup",
+   "arm": "ECCp-131/mont64",
+   "starts": 512,
+   "rejected_degenerate": 0
+  },
+  {
+   "source": "gate_walk131",
+   "kind": "gate",
+   "gate": "G3G4",
+   "arm": "ECCp-131/mont64",
+   "lanes": 512,
+   "configs": 8,
+   "gate_steps": 64,
+   "pass": true
+  },
+  {
+   "source": "gate_walk131",
+   "kind": "exceptional",
+   "arm": "ECCp-131/mont64",
+   "zero_denominator_events": 0
+  },
+  {
+   "source": "gate_walk131",
+   "kind": "gate",
+   "gate": "G1",
+   "arm": "ECC2-131/clmul3",
+   "cases": 20000,
+   "mismatches": 0
+  },
+  {
+   "source": "gate_walk131",
+   "kind": "gate",
+   "gate": "G2",
+   "arm": "ECC2-131/clmul3",
+   "pairs": 368,
+   "mismatches": 0
+  },
+  {
+   "source": "gate_walk131",
+   "kind": "setup",
+   "arm": "ECC2-131/clmul3",
+   "starts": 512,
+   "rejected_degenerate": 0
+  },
+  {
+   "source": "gate_walk131",
+   "kind": "gate",
+   "gate": "G3G4",
+   "arm": "ECC2-131/clmul3",
+   "lanes": 512,
+   "configs": 8,
+   "gate_steps": 64,
+   "pass": true
+  },
+  {
+   "source": "gate_walk131",
+   "kind": "exceptional",
+   "arm": "ECC2-131/clmul3",
+   "zero_denominator_events": 0
+  },
+  {
+   "source": "gate_bs131",
+   "kind": "gate",
+   "gate": "G1",
+   "arm": "ECC2-131/bitsliced512",
+   "products": 10240,
+   "squares": 1024,
+   "inversions": 1024,
+   "mismatches": 0
+  },
+  {
+   "source": "gate_bs131",
+   "kind": "setup",
+   "arm": "ECC2-131/bitsliced512",
+   "starts": 16384,
+   "rejected_degenerate": 0
+  },
+  {
+   "source": "gate_bs131",
+   "kind": "gate",
+   "gate": "G2",
+   "arm": "ECC2-131/bitsliced512",
+   "lanes_checked": 4096,
+   "mismatches": 0,
+   "exceptional": 0
+  },
+  {
+   "source": "gate_bs131",
+   "kind": "gate",
+   "gate": "G3G4",
+   "arm": "ECC2-131/bitsliced512",
+   "slots": 8,
+   "iterations": 24,
+   "sampled_lanes": 592,
+   "off_curve": 0,
+   "matches_8_slot_run": true,
+   "exceptional": 0
+  },
+  {
+   "source": "gate_bs131",
+   "kind": "gate",
+   "gate": "G3G4",
+   "arm": "ECC2-131/bitsliced512",
+   "slots": 16,
+   "iterations": 24,
+   "sampled_lanes": 592,
+   "off_curve": 0,
+   "matches_8_slot_run": true,
+   "exceptional": 0
+  },
+  {
+   "source": "gate_bs131",
+   "kind": "gate",
+   "gate": "G3G4",
+   "arm": "ECC2-131/bitsliced512",
+   "slots": 32,
+   "iterations": 24,
+   "sampled_lanes": 592,
+   "off_curve": 0,
+   "matches_8_slot_run": true,
+   "exceptional": 0
+  },
+  {
+   "source": "gate_bs131",
+   "kind": "profile",
+   "arm": "ECC2-131/bitsliced512",
+   "slot_mul_us": 6.89,
+   "slot_mux_us": 1.4,
+   "slot_canon_us": 0.25,
+   "slot_inv_us": 55.88,
+   "mul_ns_per_lane": 13.46
+  },
+  {
+   "source": "gate_pv131",
+   "kind": "gate",
+   "gate": "G1",
+   "arm": "ECCp-131/avx512x8",
+   "products": 8192,
+   "inversions": 512,
+   "mismatches": 0
+  },
+  {
+   "source": "gate_pv131",
+   "kind": "setup",
+   "arm": "ECCp-131/avx512x8",
+   "starts": 512,
+   "rejected_degenerate": 0
+  },
+  {
+   "source": "gate_pv131",
+   "kind": "gate",
+   "gate": "G2",
+   "arm": "ECCp-131/avx512x8",
+   "lanes_checked": 512,
+   "mismatches": 0
+  },
+  {
+   "source": "gate_pv131",
+   "kind": "gate",
+   "gate": "G3G4",
+   "arm": "ECCp-131/avx512x8",
+   "slots": 16,
+   "iterations": 24,
+   "sampled_lanes": 128,
+   "off_curve": 0,
+   "matches_16_slot_run": true
+  },
+  {
+   "source": "gate_pv131",
+   "kind": "gate",
+   "gate": "G3G4",
+   "arm": "ECCp-131/avx512x8",
+   "slots": 32,
+   "iterations": 24,
+   "sampled_lanes": 128,
+   "off_curve": 0,
+   "matches_16_slot_run": true
+  },
+  {
+   "source": "gate_pv131",
+   "kind": "gate",
+   "gate": "G3G4",
+   "arm": "ECCp-131/avx512x8",
+   "slots": 64,
+   "iterations": 24,
+   "sampled_lanes": 128,
+   "off_curve": 0,
+   "matches_16_slot_run": true
+  },
+  {
+   "source": "gate_pv131",
+   "kind": "profile",
+   "arm": "ECCp-131/avx512x8",
+   "dependent_vmul_ns": 71.85,
+   "vmul_ns_per_lane": 8.98
+  }
+ ],
+ "expected_log2_steps": {
+  "ECCp-131": 64.91949482088863,
+  "ECC2K-130": 60.80903656396743,
+  "ECC2-131": 64.82574806473616
+ }
+}

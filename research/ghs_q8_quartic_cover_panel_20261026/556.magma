@@ -1,0 +1,35 @@
+K<a> := GF(8);
+print "field", DefiningPolynomial(K);
+P<x,y,z> := PolynomialRing(K, 3);
+F := (1)*x^4 +
+     (1+a+a^2)*x^3*y +
+     (1)*x^3*z +
+     (a^2)*x^2*y^2 +
+     (1+a^2)*x^2*y*z +
+     (a^2)*x^2*z^2 +
+     (1+a+a^2)*x*y^3 +
+     (1+a^2)*x*y^2*z +
+     (1+a)*x*y*z^2 +
+     (1+a)*x*z^3 +
+     (1+a)*y^4 +
+     (a^2)*y^3*z +
+     (a+a^2)*y^2*z^2 +
+     (a)*y*z^3 +
+     (a+a^2)*z^4;
+C := Curve(ProjectiveSpace(P), F);
+print "rational_points", #RationalPoints(C);
+print "smooth", IsNonsingular(C);
+B, beta := AutomorphismGroupOfPlaneQuartic(C : explicit:=true);
+print "base_automorphism_order", #B;
+print "base_group_name", GroupName(B);
+for i in [1..Ngens(B)] do
+    print "base_generator_order", Order(B.i);
+    print "base_generator_matrix", beta(B.i);
+end for;
+A, phi := AutomorphismGroupOfPlaneQuartic(C : geometric:=true, explicit:=true);
+print "geometric_automorphism_order", #A;
+print "geometric_group_name", GroupName(A);
+for i in [1..Ngens(A)] do
+    print "geometric_generator_order", Order(A.i);
+    print "geometric_generator_matrix", phi(A.i);
+end for;

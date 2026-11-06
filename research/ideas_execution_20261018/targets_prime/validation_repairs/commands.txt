@@ -1,0 +1,20 @@
+Working directory: /workspace/crypto
+
+CARGO_HOME=/workspace/toolchains/cargo RUSTUP_HOME=/workspace/toolchains/rustup /workspace/toolchains/cargo/bin/cargo build --release --bin curve_traits --jobs 2
+RAYON_NUM_THREADS=2 target/release/curve_traits build --out research/ideas_execution_20261018/targets_prime/validation_repairs/traits.generated.json
+/tmp/ideas-verify-trait-coverage docs/curves/traits.json research/ideas_execution_20261018/targets_prime/validation_repairs/traits.generated.json
+mv research/ideas_execution_20261018/targets_prime/validation_repairs/traits.generated.json docs/curves/traits.json
+target/release/curve_traits show ECC2K-130 --json
+target/release/curve_traits similar ECC2K-130 --other-sizes --top 5 --json
+target/release/curve_traits group --by cm,descent --min-sizes 2 --json
+/tmp/ideas-refresh-crosswalk-digest docs/curves/traits.json research/ideas_execution_20261018/targets_prime/validation_repairs/crosswalk-before.yaml research/ideas_execution_20261018/targets_prime/validation_repairs/crosswalk-incremental-refresh.json
+/tmp/ideas-verify-trait-coverage /tmp/ideas-traits-before.json docs/curves/traits.json
+RAYON_NUM_THREADS=2 target/release/curve_traits check
+
+For each cargo test below: CARGO_HOME=/workspace/toolchains/cargo RUSTUP_HOME=/workspace/toolchains/rustup
+/workspace/toolchains/cargo/bin/cargo test --release --lib curve_traits::query --jobs 2
+/workspace/toolchains/cargo/bin/cargo test --release --lib trace_of_a_decides_whether_the_descent_exists --jobs 2
+/workspace/toolchains/cargo/bin/cargo test --release --lib --jobs 2
+
+Native Rust helper sources: transfer_model_drift.rs, verify_trait_coverage.rs, refresh_crosswalk_digest.rs.
+Compiled directly with rustc --edition=2021 -O, -L dependency=target/release/deps, the current libcrypto_lib-3e0b38c24aa5646f.rlib and libserde_json-458049281485fb75.rlib, and -L native for each target/release/build/*/out directory. Binaries are /tmp/ideas-transfer-model-drift, /tmp/ideas-verify-trait-coverage and /tmp/ideas-refresh-crosswalk-digest. Build logs are retained beside the sources.

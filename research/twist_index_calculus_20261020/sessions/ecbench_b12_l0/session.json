@@ -1,0 +1,52 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1hb42cab033348",
+  "label": "Mixed twist IC native controls B=12",
+  "spec_id": "ECS1h6016b77af125",
+  "spec_sha256": "6016b77af1259573d64bf3446781d817d94fa496991b214475259f7114b21d0e",
+  "env_class_id": "ECBENV2haaac4d6494a4",
+  "host_sha256": "f336043a86f025ea48d3bb0ffc797f192b3ce7891183aa5621baaf2755f97107",
+  "plan_sha256": "1d1fba4415c10056361b85a0e6fd04551c2ec14ac1444c502cff1438878d89b3",
+  "binary_sha256": "56a532e119bb6e58df188afc25d6bc8495fd345a643a8c541f136481f1090324",
+  "git_commit": null,
+  "git_dirty": null,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": false,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 2,
+  "child_env_sha256": "b55b7c2e33878d57b1c04f6181d7e95e3fbb9c9eccd9339df8308e1e04b4749c",
+  "child_env": {
+    "HOME": "/home/ec2-user",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/home/ec2-user/.elan/bin:/home/ec2-user/.cargo/bin:/home/ec2-user/.local/bin:/home/ec2-user/bin:/var/lib/spot-codex/home/packages/standalone/releases/0.163.0-x86_64-unknown-linux-musl/codex-path:/var/lib/spot-codex/home/tmp/arg0-linux/codex-arg0WAfOoC:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1792559745797,
+  "finished_unix_ms": 1792559758420,
+  "status": "complete",
+  "executions_planned": 324,
+  "records_written": 324,
+  "records_sha256": "fc3390ccbac9197fa0977fa272efcfdbbd13fa1974186abebe01788d9e75a704",
+  "status_counts": {
+    "verified": 324
+  }
+}

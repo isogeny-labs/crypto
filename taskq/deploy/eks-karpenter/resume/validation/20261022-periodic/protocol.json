@@ -1,0 +1,104 @@
+{
+  "schema": "isolab.recovery.qualification/v1",
+  "frozen_at": "2026-10-22T05:17:12.180469+00:00",
+  "request": {
+    "schema": "isolab.eks.resumable/v1",
+    "run_name": "ecbench-periodic-20261022-a",
+    "deadline_unix_seconds": 1792649832,
+    "build": {
+      "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:67eea58f5d4a7a8882b55f089c6063bb49fad58d40260ee9b0ceb349fc0e4581",
+      "source_revision": "cb2ec6873f30b683f7885b53c410d69965f02c20",
+      "ecbench_sha256": "583e62f0836eae43330c4b36bbe3d145dacb01de3132436c71f6924445c6a5a9"
+    },
+    "runtime_image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:5f8809b2531682312e6763518f882edfcb3bbf2cdf0c953851983a9e4364db1f",
+    "spec": {
+      "schema": "ecbench.spec/v1",
+      "label": "Periodic CRIU checkpoint rotation and distinct fresh L2 epoch qualification",
+      "description": "Isolation and correctness validation after a computation-only restore; independent fresh warmup and A/A. No algorithm speed claim.",
+      "workloads": {
+        "curves": [
+          {
+            "kind": "prime_search",
+            "bits": 32,
+            "seed": 59297
+          }
+        ],
+        "targets_per_curve": 2,
+        "target_seed": 20261002
+      },
+      "arms": [
+        {
+          "name": "rho-neg",
+          "role": "reference",
+          "method": {
+            "id": "rho.negation"
+          }
+        },
+        {
+          "name": "rho-plain",
+          "role": "baseline",
+          "method": {
+            "id": "rho.plain"
+          }
+        },
+        {
+          "name": "rho-neg-aa",
+          "role": "control",
+          "method": {
+            "id": "rho.negation"
+          }
+        }
+      ],
+      "measurement": {
+        "rounds": 600,
+        "warmup": 1,
+        "order": "alternate",
+        "seed": 1,
+        "isolation_required": "L2",
+        "timeout_seconds": 120
+      }
+    },
+    "instance_type": "c8a.2xlarge",
+    "checkpoint_interval_seconds": 30,
+    "max_restores": 2
+  },
+  "source_revision": "e05ccbc73fbfaa9fec5af6f32d60de1bdcb275f8",
+  "controller": {
+    "key": "inputs/recovery-controllers/7f317f2477ceea88ce5ab7a4e30420f82254f6b0a41b1199ce868e26cc8d710c.zip",
+    "version": "Z5cPG690z2Com27bGSD.I2wHMePzE6Il",
+    "sha256": "7f317f2477ceea88ce5ab7a4e30420f82254f6b0a41b1199ce868e26cc8d710c"
+  },
+  "runtime": {
+    "schema": "isolab.recovery.runtime/v1",
+    "bucket": "isolab-results-104186811093-us-east-2",
+    "key": "inputs/recovery-runtime/7b9ae73f6312bd0c892eeb104ebdd01a4d190f84ce8cadb1bc9107a9dd83795e.tar.gz",
+    "version": "5wTgGb1iqNFkwI8vj0d6GPmv_nWSaAGk",
+    "sha256": "7b9ae73f6312bd0c892eeb104ebdd01a4d190f84ce8cadb1bc9107a9dd83795e",
+    "source_archive_sha256": "c973ff02b635f143fda1c37d0cffc5968cdf373bd7c8e86f0aa970653e993166",
+    "source_revision": "e05ccbc73fbfaa9fec5af6f32d60de1bdcb275f8",
+    "qualification": "Periodic generation-intent fix: 18 native controller tests passed; live multi-generation qualification pending"
+  },
+  "steps": [
+    "Submit immutable request through native harness",
+    "Observe at least two committed snapshot/archive generations with monotonically increasing generation intent",
+    "If still active after generation 2, stop only this controller, confirm terminal and resubmit identical request; do not terminate any worker",
+    "Require native computation replay and one distinct fresh L2 epoch",
+    "Independently download and verify every S3 payload hash"
+  ],
+  "acceptance": {
+    "committed_generations_minimum": 2,
+    "fresh_l2_records": 3606,
+    "native_measured_replays": 3600,
+    "aa_admitted": true,
+    "payload_hashes": 19,
+    "timing_retries": 0
+  },
+  "limits": {
+    "deadline_seconds": 3600,
+    "standard_spot_account_vcpus": 96,
+    "lab_nodepool_vcpus": 64,
+    "instance_type": "c8a.2xlarge"
+  },
+  "claim": "Infrastructure correctness and isolation only; no algorithm performance claim",
+  "prior_evidence": "Worker-loss qualification E/F remains frozen; this run qualifies the corrected periodic generation transition."
+}

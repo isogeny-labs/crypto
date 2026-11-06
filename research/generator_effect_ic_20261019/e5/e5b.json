@@ -1,0 +1,1610 @@
+{
+  "calibration": {
+    "abscissa_fb_native_ops_per_B": 3.056656504065044,
+    "abscissa_la_row_ops_per_B_times_relations": 0.05260929315655964,
+    "abscissa_relations_per_base_element": 0.5535346798780487,
+    "adds_per_trial": 0.958934429056591,
+    "bsgs_giant_steps_measured_over_model": 1.0334890767348777,
+    "c_sm_gae_per_scalar_mult_per_bit": 1.3729519562742418,
+    "hit_rate_measured_over_model": 0.9734342151299464,
+    "ks_factor": 1.1283791670955126,
+    "measured_runs": 384,
+    "rho_neg_s_at_w": [
+      1.0436367595902156,
+      1.1367561840300164,
+      1.9748310039882273
+    ],
+    "unpriced_ops_per_trial": 2.0,
+    "verify_scalar_mults_per_key": 1.0026785172602073,
+    "walk_overhead_scalar_mults_per_key": 34.43854697516634
+  },
+  "curves": [
+    {
+      "by_w": [
+        {
+          "equal_B": {
+            "log2_B": 64.0,
+            "log2_S_T1": {
+              "abscissa": 32.34782976042596,
+              "bsgs_equal_memory": 32.0,
+              "knownlog_random": 32.0,
+              "rho_neg": 0.06161966561959385
+            },
+            "log2_break_even_T": {
+              "abscissa_vs_rho_indep": 32.2862100949649,
+              "abscissa_vs_rho_ks": null,
+              "bsgs_equal_memory_vs_rho_indep": 31.938380334463567,
+              "bsgs_equal_memory_vs_rho_ks": null,
+              "knownlog_random_vs_rho_indep": 31.93838033453894,
+              "knownlog_random_vs_rho_ks": null
+            },
+            "log2_distance_to_rho_T1": {
+              "abscissa": 32.286210094806364,
+              "bsgs_equal_memory": 31.938380334380405,
+              "knownlog_random": 31.938380334380405
+            },
+            "log2_online_probes_per_key": {
+              "abscissa_first_key": 126.18559022247388,
+              "abscissa_further_key": 63.03884461025371,
+              "bsgs_equal_memory": 62.04752314055465,
+              "knownlog_random": 63.03884461025371
+            },
+            "log2_table_entries": 128.0,
+            "online_per_key_knownlog_over_bsgs_equal_memory": 1.906366551023134
+          },
+          "optimal_B": [
+            {
+              "abscissa": {
+                "log2_B": 63.041698109454515,
+                "log2_S_per_key": 31.668358698194076,
+                "log2_table_entries": 126.08339621890903
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 95.48917436028341,
+                "log2_S_per_key": 0.09756547144431861
+              },
+              "bsgs_opt": {
+                "log2_M": 95.0237615919983,
+                "log2_S_per_key": 0.02376157027732526
+              },
+              "knownlog_random": {
+                "log2_B": 47.74458718014171,
+                "log2_S_per_key": 0.48917434199541526,
+                "log2_online_probes_per_key": 95.54967024997029,
+                "log2_table_entries": 95.48917436028341
+              },
+              "ks_regime_ok": true,
+              "log2_T": 0.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 31.606739032574485,
+                "bsgs_opt_to_rho_ks": -0.03785809534226854,
+                "knownlog_random_to_bsgs_equal_memory": 0.39160887055109656,
+                "knownlog_random_to_rho_indep": 0.42755467637582134,
+                "knownlog_random_to_rho_ks": 0.42755467637582134
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.06161966561959385
+              },
+              "rho_ks": {
+                "log2_S_per_key": 0.06161966561959385
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 63.041698109454515,
+                "log2_S_per_key": 23.668358698194076,
+                "log2_table_entries": 126.08339621890903
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 99.48917436857064,
+                "log2_S_per_key": -3.902434525971264
+              },
+              "bsgs_opt": {
+                "log2_M": 99.02376157442376,
+                "log2_S_per_key": -3.976238429722675
+              },
+              "knownlog_random": {
+                "log2_B": 49.74458718428532,
+                "log2_S_per_key": -3.510825658005189,
+                "log2_online_probes_per_key": 91.54967024168306,
+                "log2_table_entries": 99.48917436857064
+              },
+              "ks_regime_ok": true,
+              "log2_T": 8.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 27.432487097310645,
+                "bsgs_opt_to_rho_ks": -0.21211003060610945,
+                "knownlog_random_to_bsgs_equal_memory": 0.391608867966075,
+                "knownlog_random_to_rho_indep": -3.572445323624783,
+                "knownlog_random_to_rho_ks": 0.2533027411113765
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.06161966561959385
+              },
+              "rho_ks": {
+                "log2_S_per_key": -3.7641283991165655
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 63.041698109454515,
+                "log2_S_per_key": 15.66835869819409,
+                "log2_table_entries": 126.08339621890903
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 103.48917437471187,
+                "log2_S_per_key": -7.9024345240560905
+              },
+              "bsgs_opt": {
+                "log2_M": 103.02376157442376,
+                "log2_S_per_key": -7.976238429722675
+              },
+              "knownlog_random": {
+                "log2_B": 51.74458718735593,
+                "log2_S_per_key": -7.5108256580053405,
+                "log2_online_probes_per_key": 87.54967023554184,
+                "log2_table_entries": 103.48917437471187
+              },
+              "ks_regime_ok": true,
+              "log2_T": 16.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 23.432487097310656,
+                "bsgs_opt_to_rho_ks": -0.21211003060610945,
+                "knownlog_random_to_bsgs_equal_memory": 0.3916088660507503,
+                "knownlog_random_to_rho_indep": -7.572445323624934,
+                "knownlog_random_to_rho_ks": 0.25330274111122547
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.06161966561959385
+              },
+              "rho_ks": {
+                "log2_S_per_key": -7.764128399116566
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 63.041698109454515,
+                "log2_S_per_key": -0.3316413010198614,
+                "log2_table_entries": 126.08339621890903
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 111.48917434024324,
+                "log2_S_per_key": -15.902434534805323
+              },
+              "bsgs_opt": {
+                "log2_M": 111.02376157442376,
+                "log2_S_per_key": -15.976238429722676
+              },
+              "knownlog_random": {
+                "log2_B": 55.74458717012162,
+                "log2_S_per_key": -15.510825658005388,
+                "log2_online_probes_per_key": 79.54967027001047,
+                "log2_table_entries": 111.48917434024324
+              },
+              "ks_regime_ok": true,
+              "log2_T": 32.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 15.432487098096704,
+                "bsgs_opt_to_rho_ks": -0.21211003060610945,
+                "knownlog_random_to_bsgs_equal_memory": 0.39160887679993583,
+                "knownlog_random_to_rho_indep": -15.572445323624981,
+                "knownlog_random_to_rho_ks": 0.2533027411111779
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.06161966561959385
+              },
+              "rho_ks": {
+                "log2_S_per_key": -15.764128399116565
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 63.041749631947525,
+                "log2_S_per_key": -16.33158978927704,
+                "log2_table_entries": 126.08349926389505
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 119.48917436748806,
+                "log2_S_per_key": -23.902434526308873
+              },
+              "bsgs_opt": {
+                "log2_M": 119.02376157442376,
+                "log2_S_per_key": -23.976238429722674
+              },
+              "knownlog_random": {
+                "log2_B": 59.74458718374403,
+                "log2_S_per_key": -23.51082565800539,
+                "log2_online_probes_per_key": 71.54967024276564,
+                "log2_table_entries": 119.48917436748806
+              },
+              "ks_regime_ok": true,
+              "log2_T": 48.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 7.432538609839527,
+                "bsgs_opt_to_rho_ks": -0.21211003060610945,
+                "knownlog_random_to_bsgs_equal_memory": 0.3916088683034833,
+                "knownlog_random_to_rho_indep": -23.572445323624983,
+                "knownlog_random_to_rho_ks": 0.25330274111117496
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.06161966561959385
+              },
+              "rho_ks": {
+                "log2_S_per_key": -23.764128399116565
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 63.823598548547366,
+                "log2_S_per_key": -31.217444475940486,
+                "log2_table_entries": 127.64719709709473
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 127.48917435362443,
+                "log2_S_per_key": -31.902434530632323
+              },
+              "bsgs_opt": {
+                "log2_M": 127.0237615919983,
+                "log2_S_per_key": -31.976238429722674
+              },
+              "knownlog_random": {
+                "log2_B": 63.74458717681222,
+                "log2_S_per_key": -31.51082565800539,
+                "log2_online_probes_per_key": 63.54967025662928,
+                "log2_table_entries": 127.48917435362443
+              },
+              "ks_regime_ok": false,
+              "log2_T": 64.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 0.5466839231760787,
+                "bsgs_opt_to_rho_ks": -0.21211003060610906,
+                "knownlog_random_to_bsgs_equal_memory": 0.39160887262693234,
+                "knownlog_random_to_rho_indep": -31.572445323624983,
+                "knownlog_random_to_rho_ks": 0.25330274111117496
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.06161966561959385
+              },
+              "rho_ks": {
+                "log2_S_per_key": -31.764128399116565
+              }
+            }
+          ],
+          "optimal_B_log2_break_even_T": {
+            "abscissa_vs_rho_indep": 31.606739033172996,
+            "abscissa_vs_rho_ks": null,
+            "bsgs_vs_rho_indep": 0.0,
+            "bsgs_vs_rho_ks": 0.0,
+            "knownlog_random_vs_rho_indep": 0.8551093527514205,
+            "knownlog_random_vs_rho_ks": null
+          },
+          "w": 0.0
+        },
+        {
+          "equal_B": {
+            "log2_B": 64.0,
+            "log2_S_T1": {
+              "abscissa": 32.518455541736714,
+              "bsgs_equal_memory": 32.137503523749935,
+              "knownlog_random": 32.137503523749935,
+              "rho_neg": 0.1849228524617535
+            },
+            "log2_break_even_T": {
+              "abscissa_vs_rho_indep": 32.33353268945086,
+              "abscissa_vs_rho_ks": null,
+              "bsgs_equal_memory_vs_rho_indep": 31.952580671372164,
+              "bsgs_equal_memory_vs_rho_ks": null,
+              "knownlog_random_vs_rho_indep": 31.952580671464084,
+              "knownlog_random_vs_rho_ks": null
+            },
+            "log2_distance_to_rho_T1": {
+              "abscissa": 32.33353268927496,
+              "bsgs_equal_memory": 31.95258067128818,
+              "knownlog_random": 31.95258067128818
+            },
+            "log2_online_probes_per_key": {
+              "abscissa_first_key": 126.18559022247388,
+              "abscissa_further_key": 63.03884461025371,
+              "bsgs_equal_memory": 62.04752314055465,
+              "knownlog_random": 63.03884461025371
+            },
+            "log2_table_entries": 128.0,
+            "online_per_key_knownlog_over_bsgs_equal_memory": 2.0945159765949435
+          },
+          "optimal_B": [
+            {
+              "abscissa": {
+                "log2_B": 63.08569046944696,
+                "log2_S_per_key": 31.897661219110145,
+                "log2_table_entries": 126.17138093889392
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 95.5570700346874,
+                "log2_S_per_key": 0.2576704270761442
+              },
+              "bsgs_opt": {
+                "log2_M": 95.02376159678386,
+                "log2_S_per_key": 0.16126509402726028
+              },
+              "knownlog_random": {
+                "log2_B": 47.7785350173437,
+                "log2_S_per_key": 0.6945735384616301,
+                "log2_online_probes_per_key": 95.4817745755663,
+                "log2_table_entries": 95.5570700346874
+              },
+              "ks_regime_ok": true,
+              "log2_T": 0.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 31.71273836664839,
+                "bsgs_opt_to_rho_ks": -0.023657758434493286,
+                "knownlog_random_to_bsgs_equal_memory": 0.4369031113854857,
+                "knownlog_random_to_rho_indep": 0.5096506859998765,
+                "knownlog_random_to_rho_ks": 0.5096506859998765
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.1849228524617535
+              },
+              "rho_ks": {
+                "log2_S_per_key": 0.1849228524617535
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 63.08569046944696,
+                "log2_S_per_key": 23.897661219110145,
+                "log2_table_entries": 126.17138093889392
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 99.55707004015773,
+                "log2_S_per_key": -3.7423295709890283
+              },
+              "bsgs_opt": {
+                "log2_M": 99.02376159654119,
+                "log2_S_per_key": -3.83873490597274
+              },
+              "knownlog_random": {
+                "log2_B": 49.77853502007886,
+                "log2_S_per_key": -3.305426461538907,
+                "log2_online_probes_per_key": 91.48177457009598,
+                "log2_table_entries": 99.55707004015773
+              },
+              "ks_regime_ok": true,
+              "log2_T": 8.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 27.538486431384552,
+                "bsgs_opt_to_rho_ks": -0.1979096936983341,
+                "knownlog_random_to_bsgs_equal_memory": 0.4369031094501215,
+                "knownlog_random_to_rho_indep": -3.4903493140006603,
+                "knownlog_random_to_rho_ks": 0.33539875073549924
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.1849228524617535
+              },
+              "rho_ks": {
+                "log2_S_per_key": -3.640825212274406
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 63.08569046944696,
+                "log2_S_per_key": 15.897661219110157,
+                "log2_table_entries": 126.17138093889392
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 103.557070049489,
+                "log2_S_per_key": -7.742329567688601
+              },
+              "bsgs_opt": {
+                "log2_M": 103.02376159844863,
+                "log2_S_per_key": -7.83873490597274
+              },
+              "knownlog_random": {
+                "log2_B": 51.7785350247445,
+                "log2_S_per_key": -7.305426461539041,
+                "log2_online_probes_per_key": 87.4817745607647,
+                "log2_table_entries": 103.557070049489
+              },
+              "ks_regime_ok": true,
+              "log2_T": 16.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 23.538486431384563,
+                "bsgs_opt_to_rho_ks": -0.19790969369833375,
+                "knownlog_random_to_bsgs_equal_memory": 0.43690310614955935,
+                "knownlog_random_to_rho_indep": -7.490349314000794,
+                "knownlog_random_to_rho_ks": 0.3353987507353649
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.1849228524617535
+              },
+              "rho_ks": {
+                "log2_S_per_key": -7.640825212274406
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 63.08569046944696,
+                "log2_S_per_key": -0.10233878012740195,
+                "log2_table_entries": 126.17138093889392
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 111.55707002510078,
+                "log2_S_per_key": -15.7423295763146
+              },
+              "bsgs_opt": {
+                "log2_M": 111.02376160139463,
+                "log2_S_per_key": -15.83873490597274
+              },
+              "knownlog_random": {
+                "log2_B": 55.77853501255039,
+                "log2_S_per_key": -15.305426461539083,
+                "log2_online_probes_per_key": 79.48177458515292,
+                "log2_table_entries": 111.55707002510078
+              },
+              "ks_regime_ok": true,
+              "log2_T": 32.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 15.538486432147003,
+                "bsgs_opt_to_rho_ks": -0.19790969369833375,
+                "knownlog_random_to_bsgs_equal_memory": 0.4369031147755158,
+                "knownlog_random_to_rho_indep": -15.490349314000836,
+                "knownlog_random_to_rho_ks": 0.3353987507353225
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.1849228524617535
+              },
+              "rho_ks": {
+                "log2_S_per_key": -15.640825212274406
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 63.0857404022677,
+                "log2_S_per_key": -16.102288815353564,
+                "log2_table_entries": 126.1714808045354
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 119.55707003641572,
+                "log2_S_per_key": -23.742329572312556
+              },
+              "bsgs_opt": {
+                "log2_M": 119.02376159557144,
+                "log2_S_per_key": -23.83873490597274
+              },
+              "knownlog_random": {
+                "log2_B": 59.77853501820786,
+                "log2_S_per_key": -23.305426461539085,
+                "log2_online_probes_per_key": 71.48177457383798,
+                "log2_table_entries": 119.55707003641572
+              },
+              "ks_regime_ok": true,
+              "log2_T": 48.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 7.538536396920843,
+                "bsgs_opt_to_rho_ks": -0.19790969369833375,
+                "knownlog_random_to_bsgs_equal_memory": 0.4369031107734718,
+                "knownlog_random_to_rho_indep": -23.490349314000838,
+                "knownlog_random_to_rho_ks": 0.3353987507353197
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.1849228524617535
+              },
+              "rho_ks": {
+                "log2_S_per_key": -23.640825212274407
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 63.85831694576102,
+                "log2_S_per_key": -31.004176247704805,
+                "log2_table_entries": 127.71663389152204
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 127.55707004158336,
+                "log2_S_per_key": -31.742329570484788
+              },
+              "bsgs_opt": {
+                "log2_M": 127.02376159874916,
+                "log2_S_per_key": -31.83873490597274
+              },
+              "knownlog_random": {
+                "log2_B": 63.77853502079168,
+                "log2_S_per_key": -31.305426461539085,
+                "log2_online_probes_per_key": 63.48177456867035,
+                "log2_table_entries": 127.55707004158336
+              },
+              "ks_regime_ok": false,
+              "log2_T": 64.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 0.6366489645696013,
+                "bsgs_opt_to_rho_ks": -0.1979096936983341,
+                "knownlog_random_to_bsgs_equal_memory": 0.43690310894570356,
+                "knownlog_random_to_rho_indep": -31.490349314000838,
+                "knownlog_random_to_rho_ks": 0.3353987507353205
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.1849228524617535
+              },
+              "rho_ks": {
+                "log2_S_per_key": -31.640825212274407
+              }
+            }
+          ],
+          "optimal_B_log2_break_even_T": {
+            "abscissa_vs_rho_indep": 31.71273836727319,
+            "abscissa_vs_rho_ks": null,
+            "bsgs_vs_rho_indep": 0.0,
+            "bsgs_vs_rho_ks": 0.0,
+            "knownlog_random_vs_rho_indep": 1.0193013719995205,
+            "knownlog_random_vs_rho_ks": null
+          },
+          "w": 0.1
+        },
+        {
+          "equal_B": {
+            "log2_B": 64.0,
+            "log2_S_T1": {
+              "abscissa": 33.52125526216952,
+              "bsgs_equal_memory": 33.0,
+              "knownlog_random": 33.0,
+              "rho_neg": 0.981729200054391
+            },
+            "log2_break_even_T": {
+              "abscissa_vs_rho_indep": 32.539526062373646,
+              "abscissa_vs_rho_ks": null,
+              "bsgs_equal_memory_vs_rho_indep": 32.018270800033505,
+              "bsgs_equal_memory_vs_rho_ks": null,
+              "knownlog_random_vs_rho_indep": 32.01827080020413,
+              "knownlog_random_vs_rho_ks": null
+            },
+            "log2_distance_to_rho_T1": {
+              "abscissa": 32.53952606211513,
+              "bsgs_equal_memory": 32.01827079994561,
+              "knownlog_random": 32.01827079994561
+            },
+            "log2_online_probes_per_key": {
+              "abscissa_first_key": 126.18559022247388,
+              "abscissa_further_key": 63.03884461025371,
+              "bsgs_equal_memory": 62.04752314055465,
+              "knownlog_random": 63.03884461025371
+            },
+            "log2_table_entries": 128.0,
+            "online_per_key_knownlog_over_bsgs_equal_memory": 2.9411883916680845
+          },
+          "optimal_B": [
+            {
+              "abscissa": {
+                "log2_B": 63.24327102268127,
+                "log2_S_per_key": 33.092359448764356,
+                "log2_table_entries": 126.48654204536254
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 95.80196119431349,
+                "log2_S_per_key": 1.2241926980986004
+              },
+              "bsgs_opt": {
+                "log2_M": 95.0237615919983,
+                "log2_S_per_key": 1.0237615702773253
+              },
+              "knownlog_random": {
+                "log2_B": 47.900980597156746,
+                "log2_S_per_key": 1.8019611682760268,
+                "log2_online_probes_per_key": 95.23688341594021,
+                "log2_table_entries": 95.80196119431349
+              },
+              "ks_regime_ok": true,
+              "log2_T": 0.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 32.11063024870997,
+                "bsgs_opt_to_rho_ks": 0.04203237022293436,
+                "knownlog_random_to_bsgs_equal_memory": 0.5777684701774264,
+                "knownlog_random_to_rho_indep": 0.8202319682216359,
+                "knownlog_random_to_rho_ks": 0.8202319682216359
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.981729200054391
+              },
+              "rho_ks": {
+                "log2_S_per_key": 0.981729200054391
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 63.24327102268127,
+                "log2_S_per_key": 25.092359448764356,
+                "log2_table_entries": 126.48654204536254
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 99.80196117513688,
+                "log2_S_per_key": -2.775807311346627
+              },
+              "bsgs_opt": {
+                "log2_M": 99.02376157442376,
+                "log2_S_per_key": -2.976238429722675
+              },
+              "knownlog_random": {
+                "log2_B": 49.90098058756844,
+                "log2_S_per_key": -2.1980388317242445,
+                "log2_online_probes_per_key": 91.23688343511682,
+                "log2_table_entries": 99.80196117513688
+              },
+              "ks_regime_ok": true,
+              "log2_T": 8.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 27.936378313446124,
+                "bsgs_opt_to_rho_ks": -0.13221956504090654,
+                "knownlog_random_to_bsgs_equal_memory": 0.5777684796223824,
+                "knownlog_random_to_rho_indep": -3.179768031778636,
+                "knownlog_random_to_rho_ks": 0.6459800329575236
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.981729200054391
+              },
+              "rho_ks": {
+                "log2_S_per_key": -2.8440188646817686
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 63.24327102268127,
+                "log2_S_per_key": 17.092359448764366,
+                "log2_table_entries": 126.48654204536254
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 103.80196119473709,
+                "log2_S_per_key": -6.775807301692764
+              },
+              "bsgs_opt": {
+                "log2_M": 103.02376157442376,
+                "log2_S_per_key": -6.976238429722675
+              },
+              "knownlog_random": {
+                "log2_B": 51.900980597368545,
+                "log2_S_per_key": -6.198038831724312,
+                "log2_online_probes_per_key": 87.23688341551662,
+                "log2_table_entries": 103.80196119473709
+              },
+              "ks_regime_ok": true,
+              "log2_T": 16.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 23.936378313446134,
+                "bsgs_opt_to_rho_ks": -0.13221956504090654,
+                "knownlog_random_to_bsgs_equal_memory": 0.5777684699684514,
+                "knownlog_random_to_rho_indep": -7.179768031778703,
+                "knownlog_random_to_rho_ks": 0.6459800329574561
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.981729200054391
+              },
+              "rho_ks": {
+                "log2_S_per_key": -6.844018864681768
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 63.24327102268127,
+                "log2_S_per_key": 1.0923594494479145,
+                "log2_table_entries": 126.48654204536254
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 111.8019611871049,
+                "log2_S_per_key": -14.775807305451917
+              },
+              "bsgs_opt": {
+                "log2_M": 111.02376157442376,
+                "log2_S_per_key": -14.976238429722676
+              },
+              "knownlog_random": {
+                "log2_B": 55.90098059355245,
+                "log2_S_per_key": -14.198038831724334,
+                "log2_online_probes_per_key": 79.23688342314881,
+                "log2_table_entries": 111.8019611871049
+              },
+              "ks_regime_ok": true,
+              "log2_T": 32.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 15.936378314129684,
+                "bsgs_opt_to_rho_ks": -0.13221956504090654,
+                "knownlog_random_to_bsgs_equal_memory": 0.5777684737275831,
+                "knownlog_random_to_rho_indep": -15.179768031778725,
+                "knownlog_random_to_rho_ks": 0.6459800329574348
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.981729200054391
+              },
+              "rho_ks": {
+                "log2_S_per_key": -14.844018864681768
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 63.24331578711575,
+                "log2_S_per_key": -14.907595755526707,
+                "log2_table_entries": 126.4866315742315
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 119.80196119909112,
+                "log2_S_per_key": -22.775807299548234
+              },
+              "bsgs_opt": {
+                "log2_M": 119.02376157442376,
+                "log2_S_per_key": -22.976238429722674
+              },
+              "knownlog_random": {
+                "log2_B": 59.90098059954556,
+                "log2_S_per_key": -22.198038831724336,
+                "log2_online_probes_per_key": 71.23688341116258,
+                "log2_table_entries": 119.80196119909112
+              },
+              "ks_regime_ok": true,
+              "log2_T": 48.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 7.936423109155061,
+                "bsgs_opt_to_rho_ks": -0.13221956504090654,
+                "knownlog_random_to_bsgs_equal_memory": 0.5777684678238979,
+                "knownlog_random_to_rho_indep": -23.179768031778725,
+                "knownlog_random_to_rho_ks": 0.6459800329574336
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.981729200054391
+              },
+              "rho_ks": {
+                "log2_S_per_key": -22.844018864681768
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 63.98297224602098,
+                "log2_S_per_key": -29.866040611509877,
+                "log2_table_entries": 127.96594449204196
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 127.80196116809896,
+                "log2_S_per_key": -30.77580731481308
+              },
+              "bsgs_opt": {
+                "log2_M": 127.0237615919983,
+                "log2_S_per_key": -30.976238429722674
+              },
+              "knownlog_random": {
+                "log2_B": 63.90098058404948,
+                "log2_S_per_key": -30.198038831724336,
+                "log2_online_probes_per_key": 63.236883442154756,
+                "log2_table_entries": 127.80196116809896
+              },
+              "ks_regime_ok": false,
+              "log2_T": 64.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 0.9779782531718911,
+                "bsgs_opt_to_rho_ks": -0.13221956504090637,
+                "knownlog_random_to_bsgs_equal_memory": 0.5777684830887451,
+                "knownlog_random_to_rho_indep": -31.179768031778725,
+                "knownlog_random_to_rho_ks": 0.6459800329574336
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.981729200054391
+              },
+              "rho_ks": {
+                "log2_S_per_key": -30.844018864681768
+              }
+            }
+          ],
+          "optimal_B_log2_break_even_T": {
+            "abscissa_vs_rho_indep": 32.11063024944801,
+            "abscissa_vs_rho_ks": null,
+            "bsgs_vs_rho_indep": 0.08406474044586759,
+            "bsgs_vs_rho_ks": null,
+            "knownlog_random_vs_rho_indep": 1.640463936443092,
+            "knownlog_random_vs_rho_ks": null
+          },
+          "w": 1.0
+        }
+      ],
+      "curve": "P-192",
+      "log2_r": 192.0
+    },
+    {
+      "by_w": [
+        {
+          "equal_B": {
+            "log2_B": 74.66666666666667,
+            "log2_S_T1": {
+              "abscissa": 37.68116309375929,
+              "bsgs_equal_memory": 37.333333333333336,
+              "knownlog_random": 37.333333333333336,
+              "rho_neg": 0.06161966561959385
+            },
+            "log2_break_even_T": {
+              "abscissa_vs_rho_indep": 37.619543428143636,
+              "abscissa_vs_rho_ks": null,
+              "bsgs_equal_memory_vs_rho_indep": 37.27171366771581,
+              "bsgs_equal_memory_vs_rho_ks": null,
+              "knownlog_random_vs_rho_indep": 37.27171366771768,
+              "knownlog_random_vs_rho_ks": null
+            },
+            "log2_distance_to_rho_T1": {
+              "abscissa": 37.6195434281397,
+              "bsgs_equal_memory": 37.27171366771374,
+              "knownlog_random": 37.27171366771374
+            },
+            "log2_online_probes_per_key": {
+              "abscissa_first_key": 147.51892355580722,
+              "abscissa_further_key": 73.70551127692038,
+              "bsgs_equal_memory": 72.71418980722132,
+              "knownlog_random": 73.70551127692038
+            },
+            "log2_table_entries": 149.33333333333334,
+            "online_per_key_knownlog_over_bsgs_equal_memory": 1.906366551023132
+          },
+          "optimal_B": [
+            {
+              "abscissa": {
+                "log2_B": 73.70836477076622,
+                "log2_S_per_key": 37.00169203152741,
+                "log2_table_entries": 147.41672954153245
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 111.48917434735955,
+                "log2_S_per_key": 0.09756546741393805
+              },
+              "bsgs_opt": {
+                "log2_M": 111.02376157442376,
+                "log2_S_per_key": 0.023761570277324943
+              },
+              "knownlog_random": {
+                "log2_B": 55.744587173679776,
+                "log2_S_per_key": 0.48917434199461235,
+                "log2_online_probes_per_key": 111.54967026289417,
+                "log2_table_entries": 111.48917434735955
+              },
+              "ks_regime_ok": true,
+              "log2_T": 0.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 36.94007236590782,
+                "bsgs_opt_to_rho_ks": -0.037858095342268874,
+                "knownlog_random_to_bsgs_equal_memory": 0.39160887458067434,
+                "knownlog_random_to_rho_indep": 0.4275546763750184,
+                "knownlog_random_to_rho_ks": 0.4275546763750184
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.06161966561959385
+              },
+              "rho_ks": {
+                "log2_S_per_key": 0.06161966561959385
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 73.70836477076622,
+                "log2_S_per_key": 29.001692031527412,
+                "log2_table_entries": 147.41672954153245
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 115.4891743570773,
+                "log2_S_per_key": -3.902434529555527
+              },
+              "bsgs_opt": {
+                "log2_M": 115.02376157442376,
+                "log2_S_per_key": -3.976238429722675
+              },
+              "knownlog_random": {
+                "log2_B": 57.74458717853865,
+                "log2_S_per_key": -3.5108256580053903,
+                "log2_online_probes_per_key": 107.5496702531764,
+                "log2_table_entries": 115.4891743570773
+              },
+              "ks_regime_ok": true,
+              "log2_T": 8.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 32.76582043064398,
+                "bsgs_opt_to_rho_ks": -0.21211003060610945,
+                "knownlog_random_to_bsgs_equal_memory": 0.3916088715501365,
+                "knownlog_random_to_rho_indep": -3.572445323624984,
+                "knownlog_random_to_rho_ks": 0.2533027411111755
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.06161966561959385
+              },
+              "rho_ks": {
+                "log2_S_per_key": -3.7641283991165655
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 73.70836477076622,
+                "log2_S_per_key": 21.001692031527412,
+                "log2_table_entries": 147.41672954153245
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 119.48917436768357,
+                "log2_S_per_key": -7.902434526247902
+              },
+              "bsgs_opt": {
+                "log2_M": 119.0237615919983,
+                "log2_S_per_key": -7.976238429722675
+              },
+              "knownlog_random": {
+                "log2_B": 59.74458718384179,
+                "log2_S_per_key": -7.51082565800539,
+                "log2_online_probes_per_key": 103.54967024257013,
+                "log2_table_entries": 119.48917436768357
+              },
+              "ks_regime_ok": true,
+              "log2_T": 16.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 28.765820430643977,
+                "bsgs_opt_to_rho_ks": -0.21211003060610906,
+                "knownlog_random_to_bsgs_equal_memory": 0.39160886824251134,
+                "knownlog_random_to_rho_indep": -7.572445323624985,
+                "knownlog_random_to_rho_ks": 0.25330274111117496
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.06161966561959385
+              },
+              "rho_ks": {
+                "log2_S_per_key": -7.764128399116566
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 73.70836477076622,
+                "log2_S_per_key": 5.001692031527894,
+                "log2_table_entries": 147.41672954153245
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 127.48917437162373,
+                "log2_S_per_key": -15.902434525019142
+              },
+              "bsgs_opt": {
+                "log2_M": 127.0237615919983,
+                "log2_S_per_key": -15.976238429722676
+              },
+              "knownlog_random": {
+                "log2_B": 63.74458718581187,
+                "log2_S_per_key": -15.510825658005391,
+                "log2_online_probes_per_key": 95.54967023862997,
+                "log2_table_entries": 127.48917437162373
+              },
+              "ks_regime_ok": true,
+              "log2_T": 32.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 20.76582043064446,
+                "bsgs_opt_to_rho_ks": -0.21211003060610906,
+                "knownlog_random_to_bsgs_equal_memory": 0.39160886701375114,
+                "knownlog_random_to_rho_indep": -15.572445323624985,
+                "knownlog_random_to_rho_ks": 0.25330274111117496
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.06161966561959385
+              },
+              "rho_ks": {
+                "log2_S_per_key": -15.764128399116565
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 73.70836481865379,
+                "log2_S_per_key": -10.9983079367806,
+                "log2_table_entries": 147.41672963730758
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 135.48917434602703,
+                "log2_S_per_key": -23.902434533001617
+              },
+              "bsgs_opt": {
+                "log2_M": 135.02376159199827,
+                "log2_S_per_key": -23.976238429722674
+              },
+              "knownlog_random": {
+                "log2_B": 67.74458717301351,
+                "log2_S_per_key": -23.51082565800539,
+                "log2_online_probes_per_key": 87.54967026422668,
+                "log2_table_entries": 135.48917434602703
+              },
+              "ks_regime_ok": true,
+              "log2_T": 48.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 12.765820462335967,
+                "bsgs_opt_to_rho_ks": -0.21211003060610945,
+                "knownlog_random_to_bsgs_equal_memory": 0.3916088749962255,
+                "knownlog_random_to_rho_indep": -23.572445323624986,
+                "knownlog_random_to_rho_ks": 0.2533027411111747
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.06161966561959385
+              },
+              "rho_ks": {
+                "log2_S_per_key": -23.764128399116565
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 73.71043429944405,
+                "log2_S_per_key": -26.996235471636144,
+                "log2_table_entries": 147.4208685988881
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 143.48917435601476,
+                "log2_S_per_key": -31.902434529886886
+              },
+              "bsgs_opt": {
+                "log2_M": 143.02376159199827,
+                "log2_S_per_key": -31.976238429722674
+              },
+              "knownlog_random": {
+                "log2_B": 71.74458717800738,
+                "log2_S_per_key": -31.51082565800539,
+                "log2_online_probes_per_key": 79.54967025423895,
+                "log2_table_entries": 143.48917435601476
+              },
+              "ks_regime_ok": false,
+              "log2_T": 64.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 4.76789292748042,
+                "bsgs_opt_to_rho_ks": -0.21211003060610945,
+                "knownlog_random_to_bsgs_equal_memory": 0.3916088718814967,
+                "knownlog_random_to_rho_indep": -31.572445323624986,
+                "knownlog_random_to_rho_ks": 0.2533027411111747
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.06161966561959385
+              },
+              "rho_ks": {
+                "log2_S_per_key": -31.764128399116565
+              }
+            }
+          ],
+          "optimal_B_log2_break_even_T": {
+            "abscissa_vs_rho_indep": 36.94007236592267,
+            "abscissa_vs_rho_ks": null,
+            "bsgs_vs_rho_indep": 0.0,
+            "bsgs_vs_rho_ks": 0.0,
+            "knownlog_random_vs_rho_indep": 0.8551093527500363,
+            "knownlog_random_vs_rho_ks": null
+          },
+          "w": 0.0
+        },
+        {
+          "equal_B": {
+            "log2_B": 74.66666666666667,
+            "log2_S_T1": {
+              "abscissa": 37.85178887507005,
+              "bsgs_equal_memory": 37.47083685708327,
+              "knownlog_random": 37.47083685708327,
+              "rho_neg": 0.1849228524617535
+            },
+            "log2_break_even_T": {
+              "abscissa_vs_rho_indep": 37.66686602261266,
+              "abscissa_vs_rho_ks": null,
+              "bsgs_equal_memory_vs_rho_indep": 37.2859140046236,
+              "bsgs_equal_memory_vs_rho_ks": null,
+              "knownlog_random_vs_rho_indep": 37.28591400462588,
+              "knownlog_random_vs_rho_ks": null
+            },
+            "log2_distance_to_rho_T1": {
+              "abscissa": 37.666866022608296,
+              "bsgs_equal_memory": 37.28591400462152,
+              "knownlog_random": 37.28591400462152
+            },
+            "log2_online_probes_per_key": {
+              "abscissa_first_key": 147.51892355580722,
+              "abscissa_further_key": 73.70551127692038,
+              "bsgs_equal_memory": 72.71418980722132,
+              "knownlog_random": 73.70551127692038
+            },
+            "log2_table_entries": 149.33333333333334,
+            "online_per_key_knownlog_over_bsgs_equal_memory": 2.0945159765949413
+          },
+          "optimal_B": [
+            {
+              "abscissa": {
+                "log2_B": 73.75235712988075,
+                "log2_S_per_key": 37.23099455244348,
+                "log2_table_entries": 147.5047142597615
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 111.55707004406318,
+                "log2_S_per_key": 0.2576704303923126
+              },
+              "bsgs_opt": {
+                "log2_M": 111.02376159878597,
+                "log2_S_per_key": 0.16126509402726028
+              },
+              "knownlog_random": {
+                "log2_B": 55.77853502203159,
+                "log2_S_per_key": 0.6945735384609174,
+                "log2_online_probes_per_key": 111.48177456619052,
+                "log2_table_entries": 111.55707004406318
+              },
+              "ks_regime_ok": true,
+              "log2_T": 0.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 37.046071699981724,
+                "bsgs_opt_to_rho_ks": -0.023657758434493286,
+                "knownlog_random_to_bsgs_equal_memory": 0.4369031080686049,
+                "knownlog_random_to_rho_indep": 0.509650685999164,
+                "knownlog_random_to_rho_ks": 0.509650685999164
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.1849228524617535
+              },
+              "rho_ks": {
+                "log2_S_per_key": 0.1849228524617535
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 73.75235712988075,
+                "log2_S_per_key": 29.230994552443477,
+                "log2_table_entries": 147.5047142597615
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 115.55707004373298,
+                "log2_S_per_key": -3.7423295697244785
+              },
+              "bsgs_opt": {
+                "log2_M": 115.02376159657084,
+                "log2_S_per_key": -3.8387349059727396
+              },
+              "knownlog_random": {
+                "log2_B": 57.77853502186649,
+                "log2_S_per_key": -3.3054264615390854,
+                "log2_online_probes_per_key": 107.48177456652073,
+                "log2_table_entries": 115.55707004373298
+              },
+              "ks_regime_ok": true,
+              "log2_T": 8.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 32.871819764717884,
+                "bsgs_opt_to_rho_ks": -0.19790969369833375,
+                "knownlog_random_to_bsgs_equal_memory": 0.43690310818539346,
+                "knownlog_random_to_rho_indep": -3.490349314000839,
+                "knownlog_random_to_rho_ks": 0.3353987507353207
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.1849228524617535
+              },
+              "rho_ks": {
+                "log2_S_per_key": -3.640825212274406
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 73.75235712988075,
+                "log2_S_per_key": 21.230994552443477,
+                "log2_table_entries": 147.5047142597615
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 119.5570700356241,
+                "log2_S_per_key": -7.742329572592554
+              },
+              "bsgs_opt": {
+                "log2_M": 119.02376159897946,
+                "log2_S_per_key": -7.83873490597274
+              },
+              "knownlog_random": {
+                "log2_B": 59.77853501781205,
+                "log2_S_per_key": -7.305426461539086,
+                "log2_online_probes_per_key": 103.48177457462961,
+                "log2_table_entries": 119.5570700356241
+              },
+              "ks_regime_ok": true,
+              "log2_T": 16.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 28.871819764717884,
+                "bsgs_opt_to_rho_ks": -0.1979096936983341,
+                "knownlog_random_to_bsgs_equal_memory": 0.4369031110534677,
+                "knownlog_random_to_rho_indep": -7.49034931400084,
+                "knownlog_random_to_rho_ks": 0.3353987507353197
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.1849228524617535
+              },
+              "rho_ks": {
+                "log2_S_per_key": -7.640825212274406
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 73.75235712988075,
+                "log2_S_per_key": 5.2309945524439465,
+                "log2_table_entries": 147.5047142597615
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 127.55707000843671,
+                "log2_S_per_key": -15.742329582208605
+              },
+              "bsgs_opt": {
+                "log2_M": 127.02376159900604,
+                "log2_S_per_key": -15.83873490597274
+              },
+              "knownlog_random": {
+                "log2_B": 63.778535004218355,
+                "log2_S_per_key": -15.305426461539087,
+                "log2_online_probes_per_key": 95.481774601817,
+                "log2_table_entries": 127.55707000843671
+              },
+              "ks_regime_ok": true,
+              "log2_T": 32.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 20.871819764718353,
+                "bsgs_opt_to_rho_ks": -0.19790969369833375,
+                "knownlog_random_to_bsgs_equal_memory": 0.43690312066951864,
+                "knownlog_random_to_rho_indep": -15.49034931400084,
+                "knownlog_random_to_rho_ks": 0.33539875073531944
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.1849228524617535
+              },
+              "rho_ks": {
+                "log2_S_per_key": -15.640825212274406
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 73.75235714118458,
+                "log2_S_per_key": -10.769005416816336,
+                "log2_table_entries": 147.50471428236915
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 135.5570700246654,
+                "log2_S_per_key": -23.742329576468595
+              },
+              "bsgs_opt": {
+                "log2_M": 135.0237616000514,
+                "log2_S_per_key": -23.83873490597274
+              },
+              "knownlog_random": {
+                "log2_B": 67.7785350123327,
+                "log2_S_per_key": -23.305426461539085,
+                "log2_online_probes_per_key": 87.48177458558831,
+                "log2_table_entries": 135.5570700246654
+              },
+              "ks_regime_ok": true,
+              "log2_T": 48.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 12.87181979545807,
+                "bsgs_opt_to_rho_ks": -0.19790969369833375,
+                "knownlog_random_to_bsgs_equal_memory": 0.4369031149295089,
+                "knownlog_random_to_rho_indep": -23.49034931400084,
+                "knownlog_random_to_rho_ks": 0.33539875073531944
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.1849228524617535
+              },
+              "rho_ks": {
+                "log2_S_per_key": -23.640825212274407
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 73.75436471764655,
+                "log2_S_per_key": -26.766995064147437,
+                "log2_table_entries": 147.5087294352931
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 143.5570700277416,
+                "log2_S_per_key": -31.74232957538056
+              },
+              "bsgs_opt": {
+                "log2_M": 143.02376159864792,
+                "log2_S_per_key": -31.83873490597274
+              },
+              "knownlog_random": {
+                "log2_B": 71.7785350138708,
+                "log2_S_per_key": -31.305426461539085,
+                "log2_online_probes_per_key": 79.48177458251212,
+                "log2_table_entries": 143.5570700277416
+              },
+              "ks_regime_ok": false,
+              "log2_T": 64.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 4.873830148126969,
+                "bsgs_opt_to_rho_ks": -0.19790969369833375,
+                "knownlog_random_to_bsgs_equal_memory": 0.43690311384147323,
+                "knownlog_random_to_rho_indep": -31.490349314000838,
+                "knownlog_random_to_rho_ks": 0.3353987507353197
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.1849228524617535
+              },
+              "rho_ks": {
+                "log2_S_per_key": -31.640825212274407
+              }
+            }
+          ],
+          "optimal_B_log2_break_even_T": {
+            "abscissa_vs_rho_indep": 37.04607169999723,
+            "abscissa_vs_rho_ks": null,
+            "bsgs_vs_rho_indep": 0.0,
+            "bsgs_vs_rho_ks": 0.0,
+            "knownlog_random_vs_rho_indep": 1.0193013719983264,
+            "knownlog_random_vs_rho_ks": null
+          },
+          "w": 0.1
+        },
+        {
+          "equal_B": {
+            "log2_B": 74.66666666666667,
+            "log2_S_T1": {
+              "abscissa": 38.854588595502854,
+              "bsgs_equal_memory": 38.333333333333336,
+              "knownlog_random": 38.333333333333336,
+              "rho_neg": 0.981729200054391
+            },
+            "log2_break_even_T": {
+              "abscissa_vs_rho_indep": 37.872859395454874,
+              "abscissa_vs_rho_ks": null,
+              "bsgs_equal_memory_vs_rho_indep": 37.35160413328113,
+              "bsgs_equal_memory_vs_rho_ks": null,
+              "knownlog_random_vs_rho_indep": 37.351604133285356,
+              "knownlog_random_vs_rho_ks": null
+            },
+            "log2_distance_to_rho_T1": {
+              "abscissa": 37.87285939544846,
+              "bsgs_equal_memory": 37.35160413327894,
+              "knownlog_random": 37.35160413327894
+            },
+            "log2_online_probes_per_key": {
+              "abscissa_first_key": 147.51892355580722,
+              "abscissa_further_key": 73.70551127692038,
+              "bsgs_equal_memory": 72.71418980722132,
+              "knownlog_random": 73.70551127692038
+            },
+            "log2_table_entries": 149.33333333333334,
+            "online_per_key_knownlog_over_bsgs_equal_memory": 2.9411883916680837
+          },
+          "optimal_B": [
+            {
+              "abscissa": {
+                "log2_B": 73.90993767464201,
+                "log2_S_per_key": 38.425692782097684,
+                "log2_table_entries": 147.81987534928402
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 111.80196118951315,
+                "log2_S_per_key": 1.2241926957342433
+              },
+              "bsgs_opt": {
+                "log2_M": 111.02376157442376,
+                "log2_S_per_key": 1.0237615702773248
+              },
+              "knownlog_random": {
+                "log2_B": 55.900980594756575,
+                "log2_S_per_key": 1.8019611682756667,
+                "log2_online_probes_per_key": 111.23688342074055,
+                "log2_table_entries": 111.80196118951315
+              },
+              "ks_regime_ok": true,
+              "log2_T": 0.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 37.443963582043295,
+                "bsgs_opt_to_rho_ks": 0.042032370222934046,
+                "knownlog_random_to_bsgs_equal_memory": 0.5777684725414235,
+                "knownlog_random_to_rho_indep": 0.8202319682212758,
+                "knownlog_random_to_rho_ks": 0.8202319682212758
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.981729200054391
+              },
+              "rho_ks": {
+                "log2_S_per_key": 0.981729200054391
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 73.90993767464201,
+                "log2_S_per_key": 30.425692782097688,
+                "log2_table_entries": 147.81987534928402
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 115.80196119087043,
+                "log2_S_per_key": -2.775807303597244
+              },
+              "bsgs_opt": {
+                "log2_M": 115.02376157442376,
+                "log2_S_per_key": -2.976238429722675
+              },
+              "knownlog_random": {
+                "log2_B": 57.900980595435215,
+                "log2_S_per_key": -2.1980388317243347,
+                "log2_online_probes_per_key": 107.23688341938328,
+                "log2_table_entries": 115.80196119087043
+              },
+              "ks_regime_ok": true,
+              "log2_T": 8.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 33.269711646779456,
+                "bsgs_opt_to_rho_ks": -0.13221956504090654,
+                "knownlog_random_to_bsgs_equal_memory": 0.5777684718729097,
+                "knownlog_random_to_rho_indep": -3.1797680317787256,
+                "knownlog_random_to_rho_ks": 0.6459800329574338
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.981729200054391
+              },
+              "rho_ks": {
+                "log2_S_per_key": -2.8440188646817686
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 73.90993767464201,
+                "log2_S_per_key": 22.425692782097688,
+                "log2_table_entries": 147.81987534928402
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 119.80196119805396,
+                "log2_S_per_key": -6.775807300059077
+              },
+              "bsgs_opt": {
+                "log2_M": 119.0237615919983,
+                "log2_S_per_key": -6.976238429722675
+              },
+              "knownlog_random": {
+                "log2_B": 59.90098059902698,
+                "log2_S_per_key": -6.198038831724335,
+                "log2_online_probes_per_key": 103.23688341219975,
+                "log2_table_entries": 119.80196119805396
+              },
+              "ks_regime_ok": true,
+              "log2_T": 16.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 29.269711646779456,
+                "bsgs_opt_to_rho_ks": -0.13221956504090637,
+                "knownlog_random_to_bsgs_equal_memory": 0.5777684683347415,
+                "knownlog_random_to_rho_indep": -7.179768031778726,
+                "knownlog_random_to_rho_ks": 0.6459800329574336
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.981729200054391
+              },
+              "rho_ks": {
+                "log2_S_per_key": -6.844018864681768
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 73.90993767464201,
+                "log2_S_per_key": 6.425692782098108,
+                "log2_table_entries": 147.81987534928402
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 127.8019611647747,
+                "log2_S_per_key": -14.775807316450408
+              },
+              "bsgs_opt": {
+                "log2_M": 127.0237615919983,
+                "log2_S_per_key": -14.976238429722676
+              },
+              "knownlog_random": {
+                "log2_B": 63.90098058238735,
+                "log2_S_per_key": -14.198038831724336,
+                "log2_online_probes_per_key": 95.23688344547901,
+                "log2_table_entries": 127.8019611647747
+              },
+              "ks_regime_ok": true,
+              "log2_T": 32.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 21.269711646779875,
+                "bsgs_opt_to_rho_ks": -0.13221956504090637,
+                "knownlog_random_to_bsgs_equal_memory": 0.5777684847260719,
+                "knownlog_random_to_rho_indep": -15.179768031778726,
+                "knownlog_random_to_rho_ks": 0.6459800329574333
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.981729200054391
+              },
+              "rho_ks": {
+                "log2_S_per_key": -14.844018864681768
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 73.90993771693417,
+                "log2_S_per_key": -9.574307190342896,
+                "log2_table_entries": 147.81987543386833
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 135.80196117810146,
+                "log2_S_per_key": -22.775807309886456
+              },
+              "bsgs_opt": {
+                "log2_M": 135.02376159199827,
+                "log2_S_per_key": -22.976238429722674
+              },
+              "knownlog_random": {
+                "log2_B": 67.90098058905073,
+                "log2_S_per_key": -22.198038831724336,
+                "log2_online_probes_per_key": 87.23688343215224,
+                "log2_table_entries": 135.80196117810146
+              },
+              "ks_regime_ok": true,
+              "log2_T": 48.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 13.269711674338872,
+                "bsgs_opt_to_rho_ks": -0.13221956504090654,
+                "knownlog_random_to_bsgs_equal_memory": 0.5777684781621203,
+                "knownlog_random_to_rho_indep": -23.179768031778725,
+                "knownlog_random_to_rho_ks": 0.6459800329574331
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.981729200054391
+              },
+              "rho_ks": {
+                "log2_S_per_key": -22.844018864681768
+              }
+            },
+            {
+              "abscissa": {
+                "log2_B": 73.91173818074432,
+                "log2_S_per_key": -25.57250446532623,
+                "log2_table_entries": 147.82347636148864
+              },
+              "bsgs_equal_memory_to_knownlog": {
+                "log2_M": 143.80196118014044,
+                "log2_S_per_key": -30.775807308882182
+              },
+              "bsgs_opt": {
+                "log2_M": 143.02376159199827,
+                "log2_S_per_key": -30.976238429722674
+              },
+              "knownlog_random": {
+                "log2_B": 71.90098059007022,
+                "log2_S_per_key": -30.198038831724336,
+                "log2_online_probes_per_key": 79.23688343011328,
+                "log2_table_entries": 143.80196118014044
+              },
+              "ks_regime_ok": false,
+              "log2_T": 64.0,
+              "log2_distance": {
+                "abscissa_to_rho_ks": 5.27151439935554,
+                "bsgs_opt_to_rho_ks": -0.13221956504090654,
+                "knownlog_random_to_bsgs_equal_memory": 0.5777684771578467,
+                "knownlog_random_to_rho_indep": -31.179768031778725,
+                "knownlog_random_to_rho_ks": 0.6459800329574333
+              },
+              "rho_indep": {
+                "log2_S_per_key": 0.981729200054391
+              },
+              "rho_ks": {
+                "log2_S_per_key": -30.844018864681768
+              }
+            }
+          ],
+          "optimal_B_log2_break_even_T": {
+            "abscissa_vs_rho_indep": 37.443963582061606,
+            "abscissa_vs_rho_ks": null,
+            "bsgs_vs_rho_indep": 0.0840647404458679,
+            "bsgs_vs_rho_ks": null,
+            "knownlog_random_vs_rho_indep": 1.6404639364425506,
+            "knownlog_random_vs_rho_ks": null
+          },
+          "w": 1.0
+        }
+      ],
+      "curve": "P-224",
+      "log2_r": 224.0
+    }
+  ],
+  "schema": "generator_effect_e5b/v1",
+  "sources": [
+    {
+      "measured_runs": 192,
+      "path": "research/generator_effect_ic_20261019/dryrun/records/d2-c1-phase-records.jsonl"
+    },
+    {
+      "measured_runs": 192,
+      "path": "research/generator_effect_ic_20261019/dryrun/records/d2-c2-phase-records.jsonl"
+    },
+    {
+      "path": "research/generator_effect_ic_20261019/dryrun/records/../summary2.json",
+      "use": "hit-rate calibration"
+    }
+  ],
+  "status": "MODEL, not a measurement and not a feasibility claim; constants from a 24-bit scratch dry run (PROTOCOL.md not frozen)",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ]
+}

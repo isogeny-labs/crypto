@@ -1,0 +1,53 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "fp4 D4 ladder 2026-10-23 (A: p = 101, 397): the weighted+chains+sparsest+replay D4 decomposition end to end on E(F_(p^4)) against negation rho",
+  "description": "PROTOCOL: research/fp4_d4_ladder_20261023/PROTOCOL.md. ic-d4-new is ic.pipeline with the real gaudry-d4 solver (weighted, chains, sparsest, replay; unsolved systems charged) on the fghr y-line; rho-neg is the reference. row_ops, lookups and sqrt solves are calibration-priced as in solve_ic_fp4; the AGENTS.md 5a band prices the rest at 0, 0.1 and 1 GAE.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "fp4_torsion",
+        "p": 101,
+        "seed": 1,
+        "max_cofactor": 16
+      },
+      {
+        "kind": "fp4_torsion",
+        "p": 397,
+        "seed": 1,
+        "max_cofactor": 16
+      }
+    ],
+    "targets_per_curve": 2,
+    "target_seed": 202610230101
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "ic-d4-new",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "fghr-y-line:zero=1",
+          "oracle": "gaudry-d4:macaulay=26,weighted=1,chains=1,sparsest=1,replay=1,charge_unsolved=1",
+          "max_trials": "200000",
+          "linalg": "incremental-gauss"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "shuffle",
+    "seed": 202610230102,
+    "isolation_required": "L0",
+    "timeout_seconds": 36000
+  }
+}

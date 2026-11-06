@@ -1,0 +1,171 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "E3b ladder (E3b-PROTOCOL frozen before runs), curve e3-c6",
+ "description": "research/generator_effect_ic_20261019/E3b-PROTOCOL.md: grid reference on prime-kummer:t=4..9 against known-log:scalars=random with mitm:m=3 at equal B, rho-neg; full solves.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 15161857,
+    "a": 15161854,
+    "b": 9333862,
+    "group_order": 15163639,
+    "r": 15163639,
+    "gx": 1,
+    "gy": 258217
+   }
+  ],
+  "targets_per_curve": 8,
+  "target_seed": 20261019,
+  "target_kind": "planted_shared"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "sem-grid-t4",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=4",
+     "oracle": "pkm-semaev:m=3,engine=exhaustive"
+    }
+   }
+  },
+  {
+   "name": "kl-mitm3-t4",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "known-log:size=10,scalars=random",
+     "oracle": "mitm:m=3,negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "sem-grid-t5",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=5",
+     "oracle": "pkm-semaev:m=3,engine=exhaustive"
+    }
+   }
+  },
+  {
+   "name": "kl-mitm3-t5",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "known-log:size=18,scalars=random",
+     "oracle": "mitm:m=3,negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "sem-grid-t6",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=6",
+     "oracle": "pkm-semaev:m=3,engine=exhaustive"
+    }
+   }
+  },
+  {
+   "name": "kl-mitm3-t6",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "known-log:size=30,scalars=random",
+     "oracle": "mitm:m=3,negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "sem-grid-t7",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=7",
+     "oracle": "pkm-semaev:m=3,engine=exhaustive"
+    }
+   }
+  },
+  {
+   "name": "kl-mitm3-t7",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "known-log:size=61,scalars=random",
+     "oracle": "mitm:m=3,negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "sem-grid-t8",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=8",
+     "oracle": "pkm-semaev:m=3,engine=exhaustive"
+    }
+   }
+  },
+  {
+   "name": "kl-mitm3-t8",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "known-log:size=129,scalars=random",
+     "oracle": "mitm:m=3,negation_folded=1"
+    }
+   }
+  },
+  {
+   "name": "sem-grid-t9",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-kummer:t=9",
+     "oracle": "pkm-semaev:m=3,engine=exhaustive"
+    }
+   }
+  },
+  {
+   "name": "kl-mitm3-t9",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "known-log:size=253,scalars=random",
+     "oracle": "mitm:m=3,negation_folded=1"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261019,
+  "isolation_required": "L0",
+  "timeout_seconds": 86400
+ }
+}

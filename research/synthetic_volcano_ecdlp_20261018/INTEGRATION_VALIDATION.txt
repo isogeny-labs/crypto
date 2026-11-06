@@ -1,0 +1,51 @@
+INTEGRATION RECORD — SYNTHETIC DATA ONLY
+
+Base commit: 4f9ea9480b17250880161859815b284a598bfb6b (aburan28/crypto main)
+Branch: codex/synthetic-volcano-ecdlp-30-40-50
+Original data date and seed: 2026-10-18 / 20261018
+Integration date: 2026-10-19 UTC
+
+The native simulator and native CSV auditor are copied byte-for-byte from the
+previously delivered standalone artifact. Repository integration changes the
+plot import to use the canonical renderer, adds an explicit v3 synthetic
+presentation flag, archives the original data and adds thin build/CI scripts.
+No real cryptographic computation or measured benchmark is introduced.
+
+Conductor coordination:
+  The requested pre-edit conductor check was attempted and returned exit 127:
+  conductor: command not found. This runtime has no configured Conductor
+  control plane and .conductor/WORKFLOW.md is not tracked in this repository.
+  docs/CONDUCTOR.md explicitly documents the warn-and-allow fallback before
+  installation. No control plane, task lease, or coordination pass is claimed.
+  Scope: this new study, tools/volcano-diagram, and the new path-scoped workflow.
+
+Per-check execution results are appended during integration before commit.
+bash tools/check.sh
+986 simulator assertions passed; cryptographic correctness not applicable.
+50 simulator assertions passed; cryptographic correctness not applicable.
+2930 simulator assertions passed; cryptographic correctness not applicable.
+SYNTHETIC: 130410 raw rows; 161 abstract vertices per component; 986 structural/accounting checks passed. No EC computations performed.
+CSV audit passed: 130410 raw rows, 78246 curve summaries, 1944 strategy summaries, 486 pilot selections. No cryptographic correctness claim.
+SYNTHETIC: 130410 raw rows; 161 abstract vertices per component; 986 structural/accounting checks passed. No EC computations performed.
+runs.tar.xz: OK
+CSV audit passed: 130410 raw rows, 78246 curve summaries, 1944 strategy summaries, 486 pilot selections. No cryptographic correctness claim.
+PASS: synthetic model contracts, ten-target summaries, frozen-record audit and replay
+
+Other integration checks:
+  PASS: original native C++ source files match the standalone artifact byte-for-byte.
+  PASS: actionlint 1.7.12 on .github/workflows/synthetic-volcano.yml.
+  PASS: fresh full synthetic run renders through the canonical v3 renderer,
+        producing the PDF, SVG/PNG figures and self-contained explorer.
+  PASS: canonical renderer's original v2 example renders successfully.
+  PASS: git diff --check.
+
+Root Rust-library check (not a pass):
+  An initial cargo test --release --lib attempt could not compile because
+  19 include-time research fixtures were outside the sparse checkout. The
+  repository CI helper then materialized 116 compile-time inputs.
+  A second attempt used the unchanged root Rust library and a 180-second
+  execution limit. It exited 124 while compiling crypto (lib test); no
+  Rust test results were produced. Root-library validation is therefore
+  incomplete, not passed. No Rust sources or Cargo manifests are changed
+  by this PR. The full original and bounded-attempt logs are retained under
+  validation/. The study's native and rendering checks above completed.

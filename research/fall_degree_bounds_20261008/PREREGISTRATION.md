@@ -184,3 +184,651 @@ from each record's stored `x_3` and `b`. It keeps the stored linear part,
 stored echelon basis of `span(F) ∩ R_{≤1}`, `deg_le1`. No draw was rerun
 and no seed changed. `score.py` reports both the as-run verdicts and the
 Amendment 1 verdicts, and `RESULTS.md` quotes both.
+
+## Amendment 2 (2026-10-12, before any E3 cell runs): E5 engine, its validation scope, E3 seeds
+
+**Engine.** E5 is `examples/hky_last_fall_degree.rs`, native Rust.
+
+- **Closure.** The mutant closure `V_{F,c}` uses the Boolean convention of §0 ("multiply
+  `g` by `m` only if `deg m + deg g ≤ c`"). It is computed by a work queue over a
+  leading-monomial echelon basis.
+- **Ideal side.** It does not use Sage's Gröbner basis. With the field equations the
+  Boolean ideal is radical, so `I = I(S)` for the exact solution set `S`. `S` is
+  enumerated by solving `S₃ = 0` as a quadratic in `X₂` for each `X₁ ∈ V`. So
+  `dim (I ∩ R_{≤c})` is a rank on `S`.
+- **`DG`.** It is the top degree of the minimal non-standard monomials of `S` in Sage's
+  deglex, found by a Buchberger–Möller scan.
+- **Early stop.** The engine stops at `e₀`, where Sage continued to `cmax`. `d_last`
+  depends only on degrees `≤ e₀`.
+
+**Validation scope (a deviation from E5's text, disclosed).**
+- The Sage records store `(n, x₃, b)`, but not the random subspace basis. So "reproduce
+  every Sage cell" is possible only for the `subfield` cells, where `V = F_{2^{n/2}}` is
+  fixed by `n`. Closure and ideal dimensions are invariant under a change of basis of `V`.
+- On those 32 records (`n = 8, 10, 12, 14`; rand and sat) the engine matches Sage exactly:
+  `DG`, `d_last`, `e₀`, and the closure, ideal and plain dimensions at every degree both
+  computed. The modulus is NTL's sparse irreducible, which is Sage's `minimal_weight`.
+  Output: `e5/replay_subfield.jsonl`.
+- The random-base Sage cells are compared by distribution only: the native E3 run
+  includes `n = 18, 20, 22`, overlapping `TABLE.md`.
+
+**E3 as run.** The cells are as registered: random base, 8 draws each, `rand` and `sat`,
+at `n ∈ {22, 24, 26, 28, 32}`. Overlap cells at `n ∈ {18, 20}` are added for the
+comparison above; they are not part of P3a or P3b.
+- Seeds: `hky_last_fall_degree cell --seed 20261012`, so draw `s` uses
+  `20261012·1000 + s`.
+- `cmax = 6`. A draw with no `e₀ ≤ 6` is reported censored.
+- Scoring follows §E3 unchanged: P3a, P3b, the LOG/LIN comparison, and the kill
+  condition. The LOG and LIN fits use the per-`n` median `d_F` on `n ≤ 22`, mixing the
+  Sage `TABLE.md` cells at `n ≤ 16` with native ones at `n = 18–22`. They are scored on
+  `n ∈ {24…32}`.
+- Nothing from any random-base E3 cell has been seen. Two timing draws with seed 1 at
+  `n = 22` and `26` were discarded unseen.
+
+## Amendment 3 (2026-10-12, before any E4 draw is measured): E4 as run, and an exploratory extension
+
+**E4 as registered.** E4 is the four `m = 3` cells, using their committed unsatisfiable
+draws (`solutions = 0`), rebuilt exactly from the recorded `v_basis` and `x_r` with
+`koblitz_groebner::build_decomposition_system` (`b = 1`, `find_irreducible_sparse(n)`):
+
+| cell | records |
+|:--|:--|
+| (5, 2), (7, 2), (7, 3) | `research/dreg_fixed_surplus_20260923/runs/cell-*-7.jsonl` |
+| (5, 3) | `research/dreg_ell_grid_20260925/runs/cell-5-3-7.jsonl` |
+
+- **What is measured.** These systems have no solutions, so `I = (1)` and `d_F` is the
+  first `c` with `1 ∈ V_{F,c}`, the polynomial-calculus refutation degree (ledger §1).
+- **Engine.** The E5 engine computes it with the same closure, stopping once `1` enters.
+- **Scoring.** P4a and P4b are scored exactly as registered. P4c (the direct-`S₄`
+  first-fall bound) is not run here and is reported not tested.
+
+**Exploratory extension (not registered for scoring; reported separately and labelled).**
+The same measurement is taken on the committed unsatisfiable draws of:
+
+| `m` | cells | `cmax` | records |
+|:--|:--|:--|:--|
+| 3 | (9, 3), (11, 4) | 6 | `dreg_fixed_surplus_20260923` |
+| 3 | (13, 4) | 5 | `dreg_fixed_surplus_20260923` |
+| 4 | (5, 2), (7, 2) | 6 | `research/dreg_m4_chain_20261006` |
+| 4 | (9, 3) | 5 | `research/dreg_m4_chain_20261006` |
+
+- **The question.** Does `d_F` stay below `D*` as `ℓ` grows (`D*` = 5, 6, 6 at `m = 3`;
+  6 and `≥ 7` at `m = 4`)?
+- **Reading rule.** Fixed now: "`d_F` flat while `D*` rises" needs `d_F ≤ D* − 2` at the
+  largest `ℓ` measured, for both `m`. Otherwise the reading is "`d_F` tracks `D*`".
+- **Censoring.** A draw not refuted by `cmax` is censored (`d_F > cmax`).
+
+Nothing from any E4 or extension draw has been computed.
+
+## Amendment 4 (2026-10-12, before any E6 draw is measured): E6, `d_F` beyond the ladder's reach
+
+**Why.** On every E4 and extension draw (`m = 3`, ℓ = 2–4; `m = 4`, ℓ = 2–3; 32 draws,
+each cross-checked by an independent implementation, `examples/hky_crosscheck.rs`), `d_F`
+is 3 or 4. Meanwhile the plain refutation degree `D*` rises from 5 to `≥ 7`. E6 asks
+whether `d_F` stays at 4 where `N`, `ℓ` and `m` are larger. It also asks the question that
+matters for relation finding: satisfiable targets (HKY Prop 2.8 solves at
+`max(d_F, #solutions)`).
+
+**Part A (committed draws).** `m = 3`, cells (13, 5) and (15, 5), with `N = 28, 30`. These
+are the four unsatisfiable draws each in `research/dreg_fixed_surplus_20260923/runs/cell-1{3,5}-5-6.u*.jsonl`,
+with recorded `D* ≥ 7`. `cmax = 5`.
+
+**Part B (new draws).** Drawn exactly as `dreg_ladder` draws them: `ladder_sample` with
+`cell_seed(20261012, n, ℓ, m)`, keeping the first 4 draws with no solutions. `cmax = 4`;
+a draw not refuted by degree 4 is reported as `d_F ≥ 5`.
+
+| `m` | cell | `N` |
+|--:|:--|--:|
+| 3 | (18, 6) | 36 |
+| 4 | (13, 4) | 42 |
+| 5 | (10, 2) | 40 |
+
+**Part C (satisfiable draws).** `m = 3`, using the committed satisfiable draws
+(`solutions > 0`) of cells (7, 3), (9, 3) and (11, 4), up to 4 per cell.
+- `d_F` uses the record's own definition: `d_last` from closure dimensions against
+  `dim (I(S) ∩ R_{≤c})`, with `DG` from the standard monomials of `S`.
+- `S` is enumerated from the chain and checked against every equation.
+- `cmax = 5`.
+
+**Reading rule (fixed now; exploratory, not part of the registered E3/E4 scoring).**
+
+| reading | condition |
+|:--|:--|
+| **`d_F` bounded at toy size** | every A and B draw has `d_F ≤ 4`, **and** every C draw has `d_last ≤ 4` |
+| **`d_F` grows** | the median `d_F` of some A or B cell is `≥ 5`, or some C cell's median `d_last` is `≥ 5` |
+| **mixed** | otherwise |
+
+Even "bounded" is evidence at toy size only. The ledger's conditional (§2.2) says `d_F`
+must eventually be `ω(m²)` unless ECDLP over `F_{2^n}` is subexponential.
+
+Nothing from any E6 draw has been computed. Part B's draws have not been generated.
+
+## Amendment 5 (2026-10-12, before any control is measured): E6 Part D, structure-matched random controls
+
+**Why.** Every Semaev draw measured so far has `d_F ∈ {3, 4}`. Without a control, "`d_F = 4`"
+could be a property of any system of this shape at these sizes, rather than of Semaev
+systems.
+
+**Controls.** `koblitz_bench::random_control_system(n_vars, n_vars + 4, 3, terms_per_eq, seed)`,
+the `dreg_ladder` control construction. It has degree 3 and the Semaev cell's own term
+density. With 4 more equations than unknowns it is unsatisfiable with high probability:
+- every control is checked unsatisfiable by exhaustive evaluation over `F₂^N`;
+- a satisfiable one is skipped and logged.
+
+The shapes are the committed ladder controls' `(n_vars, terms_per_eq)`:
+
+| cell | `n_vars` | `terms_per_eq` |
+|:--|--:|--:|
+| `n5l2` | 11 | 14 |
+| `n7l3` | 16 | 39 |
+| `n11l4` | 23 | 83 |
+| `n13l5` | 28 | `ladder_terms_per_eq(13, 5, 20261012)` |
+
+- **Draws:** 4 controls per shape, seeds `20261012·100 + t`.
+- **Measurement:** `d_F` is the first `c` with `1 ∈ V_{F,c}`, with `cmax = 5`.
+
+**Reading rule (fixed now).** The control is more constrained than the Semaev system
+(`N + 4` equations against Semaev's `2n`).
+
+| reading | condition |
+|:--|:--|
+| **"Semaev-specific"** | the control's median `d_F` is `≥` the Semaev cell's median `d_F` + 1 at every shape |
+| **"generic at toy size"** | the control's median `d_F ≤ 4` at every shape |
+| **mixed** | otherwise |
+
+Nothing from any control has been computed.
+
+## Amendment 6 (2026-10-12, after Part D's controls turned out satisfiable; before any `d_last` on them)
+
+**What happened.** All 12 Part D controls (shapes `n5l2`, `n7l3`, `n11l4`; 4 seeds each)
+have 1 or 2 solutions by exhaustive evaluation. `random_control_system` plants a root. So
+Part D as registered, which needs unsatisfiable controls, is **not testable**. The closure
+dimensions were computed and are recorded (`e6/D_controls_small.jsonl`). The refutation
+degree is undefined for these systems.
+
+**Part D′ (replacement).** Use the same 12 controls, plus 4 at the `n13l5` shape. Compute
+`d_last` exactly as Part C does for satisfiable Semaev draws:
+- the solution set `S` by exhaustive evaluation over `F₂^N`;
+- `dim (I(S) ∩ R_{≤c})` and `DG` from `S`;
+- `e₀` and `d_last` as in `lfd_fast.sage`;
+- `cmax = 6`.
+
+The comparison is Part C's satisfiable Semaev draws, where `d_last = 4` on all 6.
+
+**Reading rule (fixed now).**
+
+| reading | condition |
+|:--|:--|
+| **"Semaev-specific"** | every shape has control median `d_last ≥ 5` |
+| **"generic at toy size"** | every shape has control median `d_last ≤ 4` |
+| **mixed** | otherwise |
+
+## Amendment 7 (2026-10-18, before any E7 draw is generated): E7, `d_F` at `m ≥ 5` and `N` up to 60
+
+**Why.** E6 reached `N = 40` at `m = 5` and only `ℓ = 2`. Every draw so far has `d_F ≤ 4`.
+The HKYY conditional needs `d_F = ω(m²)` eventually. So the question is whether `d_F`
+starts to move once `m ≥ 5` and `ℓ ≥ 3`, and as `N` grows toward the limit of dense
+linear algebra.
+
+**Engine.** `examples/hky_par.rs`. It computes the same mutant closure as
+`hky_last_fall_degree` (Amendment 2), with different mechanics:
+- columns are ranked by the combinatorial number system;
+- candidates are reduced against the basis in parallel, chunk by chunk;
+- the residues are eliminated against each other in parallel.
+
+**Gate (must pass on the exact binary that runs E7, before any E7 draw):**
+1. `e7/validate.sh` reproduces `d_F` and every per-degree closure dimension of the
+   validated engine. That covers 24 committed draws: `m = 3` cells (5,2), (7,3), (11,4),
+   (13,4), (13,5), and `m = 4` (9,3). Required: `AGREE 24 DISAGREE 0`.
+2. `newcells --cells 5:10:2 --seed 20261012 --keep 4 --cmax 4` must reproduce
+   `e6/B_5-10-2.rerun.jsonl`: the same four draws, the same `d_F` (4, 3, 4, 4) and the same
+   closure dimensions.
+
+If either check fails, E7 does not run.
+
+**E6 Part B completion.** The m = 4 (13, 4) cell was lost to two container restarts. It
+is rerun with this engine. The cell, seed, `keep` and `cmax` are as in Amendment 4, and
+the output goes to `e6/B_4-13-4.par.jsonl`. It is scored under Amendment 4's rule.
+
+**E7 cells.** Draws are made as in E6 Part B:
+- `ladder_sample` with `cell_seed(20261012, n, ℓ, m)`;
+- keep the first 4 draws with no solutions;
+- `cmax = 4`, and a draw not refuted by degree 4 is reported as `d_F ≥ 5`.
+
+Unknowns: `N = (m − 2)·n + m·ℓ`. Memory is dominated by the degree-4 echelon basis, about
+`(#columns)²/16` bytes.
+
+| tier | `m` | `(n, ℓ)` | `N` | columns `≤ 4` | basis memory |
+|:--|--:|:--|--:|--:|--:|
+| local (4 cores, 15 GB) | 6 | (8, 2) | 44 | 149 986 | ≈ 1.4 GB |
+| local | 5 | (11, 3) | 48 | 213 053 | ≈ 2.8 GB |
+| local | 6 | (9, 2) | 48 | 213 053 | ≈ 2.8 GB |
+| large host (≥ 64 GB) | 5 | (13, 3) | 54 | 342 541 | ≈ 7.3 GB |
+| large host | 6 | (10, 3) | 58 | 456 838 | ≈ 13 GB |
+| large host | 5 | (15, 3) | 60 | 523 686 | ≈ 17 GB |
+
+- The local tier runs now.
+- The large-host tier runs only on a host with at least 64 GB of RAM, using the same
+  binary build and the same gate.
+- If no such host is available, the large tier is reported as **not run**. It is not
+  extrapolated.
+- `N ≈ 100` is out of reach of a dense degree-4 closure: about 4.1 million columns and a
+  ≈ 1 TB basis. It is not registered here, and would need a sparse or structured method.
+
+**Reading rule (fixed now; exploratory, like E6).**
+
+| reading | condition |
+|:--|:--|
+| **`d_F` bounded through `m = 6`** | every E7 draw that ran has `d_F ≤ 4` |
+| **`d_F` grows** | some E7 cell has median `d_F ≥ 5` |
+| **mixed** | otherwise |
+
+- Each tier is read separately, and so is the pooled set.
+- "Bounded" here is still evidence at toy size, for the same reason as in E6. A bounded
+  reading does not contradict the HKYY conditional, which constrains asymptotics only.
+- Wall time and per-degree closure dimensions are recorded. They are not scored.
+
+Nothing from any E7 cell has been computed, and no E7 draw has been generated.
+
+## Amendment 8 (2026-10-19, after the E7 local tier; before any draw of the cell it moves)
+
+- **Observation.** The local tier finished well inside its budget. The N = 48 cells took
+  90–553 s per draw on 4 threads, and no draw needed more than 15 GB.
+- **Change.** The m = 5, (13, 3), N = 54 cell moves from the large-host tier to the local
+  tier. Its dense basis is ≈ 7.3 GB, which fits the 15 GB host.
+- **Unchanged:**
+  - the binary (sha256 `24cf10d6…`, which passed the Amendment 7 gate);
+  - the draw rule, `keep = 4` and `cmax = 4`;
+  - the reading rule.
+- **Peak memory.** It is recorded with `/usr/bin/time -v` if available.
+- **If the run is killed** by memory or by a container restart, the cell is reported as
+  **not completed**, together with whatever draws finished. A finished draw is never
+  rerun selectively.
+- **Still large-host.** (6, 10, 3) N = 58 and (5, 15, 3) N = 60 stay in the large-host tier.
+
+No draw of the (13, 3) m = 5 cell has been generated.
+
+## Amendment 9 (2026-10-25, before any draw of the cells below): E8, `d_F` against `m` at fixed `(n, ℓ)`
+
+**Why.** HKYY's growth requirement is in `m`, not in `N`. E3–E7 mostly raised `N` by raising
+`n` or `ℓ`. E8 holds `(n, ℓ)` fixed and raises `m` alone. `N = (m − 2)·n + m·ℓ`, so the
+(8, 2) ladder runs `N = 14, 24, 34, 44, 54` for `m = 3 … 7`. The (6, 2) ladder runs
+`N = 10 … 52` for `m = 3 … 8`.
+
+**Engine and gate.** The same binary as E7 (`hky_par`, sha256 `24cf10d6…`, which passed the
+Amendment 7 gate); the gate is not rerun.
+
+**Cells.** Draws as in E6 Part B: `ladder_sample` with `cell_seed(20261012, n, ℓ, m)`, keep
+the first 4 draws with no solutions, `cmax = 4` (a draw not refuted by degree 4 is
+`d_F ≥ 5`).
+
+| ladder | `m` values | cells `(m:n:ℓ)` |
+|:--|:--|:--|
+| (8, 2) | 3, 4, 5 | 3:8:2, 4:8:2, 5:8:2 (6:8:2 is E7, not rerun) |
+| (8, 2) | 7 | 7:8:2 (`N = 54`) |
+| (6, 2) | 3 … 8 | 3:6:2, 4:6:2, 5:6:2, 6:6:2, 7:6:2, 8:6:2 (`N = 52`) |
+
+**Reading rule (fixed now; exploratory).** Per ladder, using the median `d_F` of each `m`
+(the E7 (8, 2), m = 6 median is 4):
+
+| reading | condition |
+|:--|:--|
+| **`d_F` flat in `m`** | every median `d_F ≤ 4` and the medians are non-decreasing in `m` with a spread of at most 1 |
+| **`d_F` grows in `m`** | some median `d_F ≥ 5`, or the medians rise by 2 or more across the ladder |
+| **mixed** | otherwise |
+
+- A cell that runs out of memory or time is reported as **not completed**, with any draws
+  that finished. A finished draw is never rerun selectively.
+- A cell with no draw free of solutions in 1000 draws is reported as such.
+
+**Not in this amendment.**
+- `N = 58–60` (large-host tier of Amendment 7) stays **not run**. `AWS_SECRET_ACCESS_KEY`
+  and a region are absent. `e7/aws_large_tier.sh` is prepared but has not been run.
+- `N ≈ 100` needs a sparse closure engine (about 4.1M columns at degree 4). It is scoped
+  in `e8/N100_SCOPING.md` and is not measured.
+
+Nothing from any E8 cell has been computed.
+
+## Amendment 10 (2026-10-27, before any draw of the cells below): E9, the large-host tier; E10, the balanced diagonal `mℓ = n`
+
+**Why.**
+- **E9.** Amendment 7's large-host tier, (6, 10, 3) `N = 58` and (5, 15, 3) `N = 60`, was
+  never run because no AWS route existed. Lab-account credentials are now present, and the
+  `ephemeral` one-command Spot runner (`taskq/deploy/ephemeral`) is deployed in it.
+- **E10.** HKYY's growth requirement is along `m ≈ n^{1/3}`, `n' = n/m`. That is, the
+  factor base is balanced: `mℓ ≈ n`. E8 raised `m` at `n ≤ 8` with `ℓ = 2`, so `mℓ ≥ n`
+  there, and the field was small. E10 instead holds `mℓ = n` and raises `n` along each `m`,
+  as far as a dense degree-4 closure reaches (`N ≤ 60`).
+
+**Route and measurement class.** The output is a count (`d_F`, closure dimensions), not a
+timing, so this is a `search`-class job. It runs on `ephemeral` Spot instances in the lab
+account. The Iso Lab EKS request contracts accept only `ecbench` specs from outside the
+cluster, so they cannot run this binary. Wall times are recorded but not scored, and are
+valid only as rough indications (no isolation level).
+
+**Engine change.** `examples/hky_par.rs` now counts solutions with
+`chained_solution_count_fast` (one Artin–Schreier lookup per link) instead of a scan of
+`F_{2^n}`. The scan costs about `2^{(m−1)ℓ+n}`, which is infeasible at `n ≥ 20`. The count is
+exact: the unit test `fast_chained_count_matches_the_reference` holds it to the scan at
+`m = 3 … 6`. So the same draws are kept. The closure code is unchanged.
+
+**Gate (on the exact binary each instance builds, before any E9/E10 draw on that
+instance).** If any part fails, that instance runs no cell.
+0. `cargo test --release --lib -- fast_chained_count_matches_the_reference chained_count`
+   passes (the counter equals the scan; run on the instance, because the local host lacks
+   the disk to build the test target).
+1. `e7/validate.sh`: `AGREE 24 DISAGREE 0`.
+2. `newcells --cells 5:10:2` reproduces `e6/B_5-10-2.rerun.jsonl` (draw, `d_F`,
+   `v_basis`, `x_r`, closure dimensions).
+3. New, for the counter change: `newcells --cells 3:18:6` reproduces
+   `e6/B_3-18-6.jsonl`, and `newcells --cells 4:8:2,5:8:2` reproduces
+   `e8/E8_4-8-2.jsonl` and `e8/E8_5-8-2.jsonl`, on the same fields.
+
+**Draw rule.** As E6 Part B and E7–E8: `ladder_sample` with `cell_seed(20261012, n, ℓ, m)`;
+keep the first 4 draws with no solutions; `cmax = 4`, and a draw not refuted at degree 4
+is `d_F ≥ 5`.
+
+**Cells.** `N = (m − 2)·n + m·ℓ`.
+
+| experiment | `m` | `(n, ℓ)` | `N` | columns `≤ 4` | basis, formula |
+|:--|--:|:--|--:|--:|--:|
+| E9 | 6 | (10, 3) | 58 | 456,838 | ≈ 13 GB |
+| E9 (also E10, `m = 5`) | 5 | (15, 3) | 60 | 523,686 | ≈ 17 GB |
+| E10 | 3 | (21, 7) | 42 | 124,314 | ≈ 1.0 GB |
+| E10 | 3 | (24, 8) | 48 | 213,053 | ≈ 2.8 GB |
+| E10 | 3 | (27, 9) | 54 | 342,541 | ≈ 7.3 GB |
+| E10 | 4 | (12, 3) | 36 | 66,712 | ≈ 0.3 GB |
+| E10 | 4 | (16, 4) | 48 | 213,053 | ≈ 2.8 GB |
+| E10 | 4 | (20, 5) | 60 | 523,686 | ≈ 17 GB |
+| E10 | 6 | (12, 2) | 60 | 523,686 | ≈ 17 GB |
+
+The measured peak is about 1.7× the formula (E7, `N = 54`). Instances need ≥ 64 GB.
+
+Earlier diagonal points, read with E10 but not rerun:
+- `m = 3`: (9, 3), (15, 5) and (18, 6);
+- `m = 4`: (8, 2);
+- `m = 5`: (10, 2).
+
+**Reading rules (fixed now; exploratory).**
+- **E9:** Amendment 7's rule, read for the large tier and pooled with E7.
+- **E10**, per `m` ladder along the diagonal, by the median `d_F` of each cell:
+
+| reading | condition |
+|:--|:--|
+| **`d_F` flat on the diagonal** | every median `d_F ≤ 4` |
+| **`d_F` grows on the diagonal** | some median `d_F ≥ 5` |
+| **mixed** | otherwise |
+
+- **Cross-`m` reading at fixed `N`.** At `N = 48`, compare (3, 24, 8) and (4, 16, 4).
+  At `N = 60`, compare (4, 20, 5), (5, 15, 3) and (6, 12, 2). The reading is "rises with
+  `m`" if the median strictly increases with `m` at a fixed `N`. Otherwise it is "not
+  rising".
+- A cell that runs out of memory or time is **not completed**, with whatever draws finished.
+- A Spot interruption is an infrastructure failure. The interrupted job is relaunched once,
+  from scratch, on the same commit. The computation is deterministic, so the relaunch
+  makes the same draws. The interrupted attempt's partial outputs are kept and must agree
+  with the relaunch. A second interruption makes the remaining cells **not completed**.
+- A cell with no draw free of solutions in 1000 draws is reported as such.
+- Nothing is extrapolated beyond `N = 60` here. `N ≈ 100` is a separate engine (E11) with
+  its own validation, and is registered separately before any `N ≈ 100` draw.
+
+Nothing from any E9 or E10 cell has been computed, and no E9 or E10 draw has been generated.
+
+## Amendment 11 (2026-10-27, after E9 and E10 were read; before any draw below): E12, the exact `d_F` at (3, 21, 7), and ℓ against `m` and `n`
+
+**Why.** E10 read `d_F ≥ 5` on every draw of (3, 21, 7), (3, 24, 8) and (3, 27, 9). Every
+other E9/E10 cell, up to `N = 60`, read `≤ 4`. That includes (4, 20, 5), (5, 15, 3) and
+(6, 12, 2). The censored cells are exactly the cells with `ℓ ≥ 7`, and all of them have
+`m = 3` and sit on the diagonal. Three questions follow:
+1. What is the exact `d_F` there?
+2. At `m = 3` and fixed `N`, is the jump driven by `ℓ` or by `n`?
+3. Does `ℓ = 7` at `m = 4` also censor?
+
+**Hypothesis registered now (H_ℓ):** the median `d_F` of a cell is `≥ 5` iff `ℓ ≥ 7`,
+whatever `m` and `n` are, at the sizes below.
+
+**Route.** Same as Amendment 10: `ephemeral` Spot in the lab account, source shipped as a
+`git archive` of the frozen commit. Counts only; wall time is recorded and not scored.
+
+**E12a: degree 5 at (3, 21, 7).**
+- Engine: `hky_par`, the same closure, `newcells --cells 3:21:7 --seed 20261012 --keep 2
+  --cmax 5`. These are the first two of the four E10 draws: draws 0 and 1, which are
+  regenerated, not copied.
+- Degree `≤ 5` has 974,982 columns, so the basis is ≈ 59 GB by formula and ≈ 100 GB
+  measured-scaled. One 256 GB host.
+- Output: per draw, `d_F = 5`, or `d_F ≥ 6` (the degree-5 closure stops without 1).
+- The degree-4 dimensions must equal E10's record for the same draw. If not, the draw is
+  void.
+- Gate: Amendment 10's gates 0–3 on the exact binary.
+
+**E12b: `m = 3`, ℓ against `n` at about fixed `N`.**
+- Engine: `hky_par newcells`, `cmax = 4`, `keep = 4`, seed 20261012.
+- Cells, below the diagonal (`mℓ < n`, so unsatisfiable draws are common):
+
+| cell | `N` | `ℓ` |
+|:--|--:|--:|
+| 3:30:4 | 42 | 4 |
+| 3:27:5 | 42 | 5 |
+| 3:24:6 | 42 | 6 |
+| 3:24:7 | 45 | 7 |
+
+- Gate: Amendment 10's gates 0–3.
+
+**E12c: ℓ = 7 at `m = 4`, (4, 28, 7), `N = 84`.**
+- Engine: `hky_window` (E11), policy `w1x`, built with `--features wide-vars`.
+  `newcells --cells 4:28:7 --seed 20261012 --keep 4 --policies w1x`.
+- The engine now counts solutions with `chained_solution_count_fast`, because the scan is
+  infeasible at `n = 28`. It is exact.
+- Output per draw:
+  - "`d_F ≤ 3`" if the full degree-3 closure holds 1;
+  - "`d_F = 4` certified" if it does not, and the restricted degree-4 closure reaches 1;
+  - otherwise "inconclusive (`≥ 4`)".
+- The engine cannot certify `d_F ≥ 5`.
+- W(1) has 817,860 columns, so the basis is ≈ 42 GB by formula. One 128 GB host.
+- Gate, on the exact wide build:
+  - unit tests (gate 0);
+  - `ladder --policies w1x` reproduces `e11/validate_final/` (`d_f_le3`, `d_f_window`,
+    `w1x.cols`, `w1x.dim`, degree-2/3 dims) on `B_3-18-6`, `B_4-13-4`, `E7_6-8-2` and
+    `E8_7-8-2`;
+  - `newcells --cells 4:16:4 --keep 4 --policies w1x` reproduces the draws and those
+    fields of `e11/scaling/window_4-16-4.jsonl`. This also checks the counter change
+    at `m = 4`.
+
+**Reading rules (fixed now).**
+
+| part | reading | condition |
+|:--|:--|:--|
+| **E12a** | **"`d_F = 5`"** | both draws read 5 |
+| | **"`d_F ≥ 6`"** | both draws are censored at 5 |
+| | **"split"** | otherwise |
+| **E12b** | **"consistent with H_ℓ"** | 3:30:4, 3:27:5 and 3:24:6 have median `≤ 4`, and 3:24:7 has median `≥ 5` |
+| | **"`n`-driven"** | 3:30:4 and 3:27:5 both have median `≥ 5` |
+| | **"mixed"** | otherwise |
+| **E12c** | **"H_ℓ refuted at `m = 4`"** | at least 2 of the finished draws are "`d_F = 4` certified" |
+| | **"no reading"** | otherwise. An inconclusive draw is not evidence for `≥ 5`. |
+
+- A cell or draw that runs out of time or memory is **not completed**, with whatever
+  finished.
+- A Spot interruption gets one relaunch from scratch on the same archive.
+
+Nothing from any E12 cell has been computed, and no E12 draw has been generated.
+
+## Amendment 12 (2026-10-27, after E12b r1 and r2 were read; before any draw below): finish E12b cell 3:24:7 On-Demand
+
+**Why.** Both E12b attempts finished 3:30:4, 3:27:5 and 3:24:6, each with all four draws
+at `d_F = 4`. Both were then Spot-reclaimed after draw 0 of 3:24:7, which read `≥ 5`.
+r2 equals r1 on every non-timing field. Amendment 11's one relaunch is used, so 3:24:7 is
+not completed, and the E12b reading cannot be decided (`RESULTS.md`, E12 section).
+The user asked on 2026-10-27 to finish 3:24:7 On-Demand.
+
+**Disclosed before this run:** the 13 r1/r2 draws above, including draw 0 of 3:24:7.
+
+**Run (E12b-OD).**
+- Cell 3:24:7 only (`N = 45`), from scratch: `hky_par newcells`, `cmax = 4`, `keep = 4`,
+  seed 20261012. Same frozen archive `fd-src-371035216942.tgz` (sha256 `4ae808ac…`) and
+  `e12/run_par.sh`, without the Lean step.
+- Host: `ephemeral --on-demand`, m7i.4xlarge or any x86 type with ≥ 16 vCPU and ≥ 32 GB.
+  Counts only; wall time is recorded and not scored.
+- Gates: Amendment 10's gates 0–3 on the exact binary. **Gate 4:** draw 0 must equal the
+  r1/r2 record on every non-timing field; otherwise the run is void.
+- An interruption or failure of any kind ends the run as **not completed**. There is no
+  further relaunch without a new amendment.
+
+**Reading (fixed now).** Amendment 11's E12b rules, with 3:24:7's median taken over the
+four E12b-OD draws and the other three cells as recorded in r2:
+- **"consistent with H_ℓ":** 3:24:7 has median `≥ 5`. The median is `lowerMedian` in
+  `lean/FallDegree/Rule.lean`, the 2nd smallest of 4, with a censored value recorded as the
+  cap plus one. So this needs at least 3 of the 4 draws at `≥ 5`.
+- **"mixed":** otherwise. "`n`-driven" is already excluded.
+
+**Not in scope.** E12a and E12c stay not completed under Amendment 11. Rerunning them
+needs its own amendment.
+
+## Amendment 13 (2026-10-28 UTC, 2026-10-27 Pacific): one new E12a/E12c attempt
+
+**Authorization and disclosure.** The user has now explicitly requested launch of
+the unfinished E12 follow-ups. All earlier E9/E10 results, the E11 engineering
+record, and the interrupted E12 attempts have been read. This amendment is frozen
+and committed before any new draw. It permits one additional from-scratch attempt
+for E12a and E12c only; earlier interruptions and results remain unchanged.
+
+**Scientific contract.** Amendment 11's cells, seed `20261012`, sample counts,
+engines, gates, and reading rules are unchanged. Source remains archive
+`fd-src-371035216942.tgz`, SHA-256
+`4ae808ac57920d93f599936c34513167befc93d865495defcae29fb16a18fb8f`, source commit
+`371035216942660c4615dfbb88d85a14afaf5c16`. Every host verifies the archive before
+extracting it. The original `run_par.sh` and `run_window.sh` execute unchanged.
+
+| Part | Cell | Engine and draws | Host | Hard lifetime |
+| --- | --- | --- | --- | --- |
+| E12a | `3:21:7`, N=42 | `hky_par`, cap 5, first 2 unsatisfiable draws | `r7i.8xlarge`, 32 vCPU, 256 GiB | 48 h |
+| E12c | `4:28:7`, N=84 | `hky_window`, `wide-vars`, `w1x`, 4 draws | `r7i.4xlarge`, 16 vCPU, 128 GiB | 48 h |
+
+**Execution.** Existing ephemeral Spot backend in `us-east-1`, one instance per
+part, concurrent where admitted, no `--keep`, no automatic retry. This uses 48
+vCPUs against the observed 64-vCPU regional standard-Spot quota. Hardware identity,
+source, binary digests, gates, status, and raw outputs are retained. Values are
+exact-computation observations; all times are diagnostic, with no performance or
+statistical comparison. CPU changes cannot justify a speed claim.
+
+**Interruption policy.** These frozen engines have no resumable mid-closure
+checkpoint. The existing runner saves available outputs on exit or interruption;
+this is partial-output preservation, not process recovery. A reclaim, timeout,
+OOM, gate failure, or other failure ends that part as not completed. No further
+relaunch is authorized by this amendment. The command stops ten minutes before
+the hard lifetime to allow uploads; deadline shutdown and the existing reaper
+remain enabled. The user-requested bounded attempt is not replaced by a new
+checkpoint-engine development project.
+
+**Admission.** Run each part's original gates before its cell. E12a still requires
+degree-4 dimensions to equal the E10 records for draws 0 and 1. E12c window failure
+remains inconclusive and cannot certify degree at least 5. A launcher receipt or
+exit code is not evidence of completed draws; full output counts and the original
+gates must be checked before any reading.
+
+**E12b stays pending.** Amendment 12 requires On-Demand. The current role explicitly
+denies it through `SpotOnlyEC2Launch`. The question of a new Spot attempt has been
+put to the user and has not been answered when this amendment is written. E12b is
+not authorized by Amendment 13; any change is recorded separately before launch.
+
+Launch scripts, the resource plan and receipts are stored under
+`e12/continuation-20261028/`. All prior attempts remain separate.
+
+## Amendment 14 (2026-10-28 UTC): E12a pre-execution capacity alternatives
+
+The Amendment 13 E12a submission
+`20261028-020921-fd-e12a-20261028-r3-4358b0` exhausted the configured zones with
+`InsufficientInstanceCapacity` or `Unsupported`. Its durable status is `error`;
+EC2 enumeration found no instance for that job. No solver, gate, or draw ran.
+E12c has been submitted separately and is not relaunched by this amendment.
+
+To fulfill the same user-requested E12a launch, allow at most two additional
+capacity submissions, in this fixed order: `r6a.8xlarge`, then `r6i.8xlarge`.
+Both are x86 hosts with 32 vCPU and 256 GiB. Source archive, seed, two draws,
+degree cap 5, gates, 48-hour lifetime, and scientific readings are unchanged.
+This amendment is committed before either fallback submission.
+
+Each alternative requires the preceding submission's durable `error` status
+to identify a no-Spot-capacity failure and a fresh EC2 check to find no instance
+for it. Preserve every failed submission in a separate receipt. If any instance
+is created, stop trying alternatives; there is only one admitted solver attempt.
+An ambiguous launch, any other error, or a started job's interruption/failure
+does not authorize an alternative. No additional instances beyond this ordered
+list are authorized here. The wrapper enforces separate receipt directories and
+the absence-of-instance check. This infrastructure amendment adds no new draw,
+changes no scientific acceptance rule, and makes no timing comparison.
+
+## Amendment 15 (2026-10-27 Pacific, 2026-10-28 UTC): one E12b Spot continuation
+
+The user explicitly selected one new Spot attempt for E12b after the current
+role denied On-Demand. This supersedes Amendment 12's market requirement for
+this attempt only. The earlier partial results and On-Demand denial stay in the
+record. Current EC2 enumeration finds only the admitted E12a/E12c jobs, and the
+two earlier E12b jobs have durable `interrupted` status. No On-Demand E12b job was
+launched. This amendment is committed and pushed before the new submission.
+
+- **One attempt:** cell `3:24:7` (N=45), from scratch, cap 4, four unsatisfiable
+  draws, seed `20261012`, using the unchanged `e12/run_par.sh` without Lean.
+- **Frozen source:** `fd-src-371035216942.tgz`, SHA-256
+  `4ae808ac57920d93f599936c34513167befc93d865495defcae29fb16a18fb8f`, commit
+  `371035216942660c4615dfbb88d85a14afaf5c16`.
+- **Host and budget:** one `m7i.4xlarge` Spot instance in `us-east-1`, 16 vCPU,
+  64 GiB, maximum lifetime 24 hours, no `--keep`. Together with E12a/E12c this
+  uses 64 vCPU against the observed 64-vCPU quota. Timing remains diagnostic.
+- **Gates:** original gates 0–3 on the exact binary, then Amendment 12's gate 4:
+  draw 0 must equal the r2 reference on every non-timing field. The known timing
+  fields are the top-level and per-degree `secs`; all other fields are compared,
+  including thread count. The r2 reference is
+  `e12/run-b2/out/E_3-24-7.jsonl`, SHA-256
+  `589c5045361c9a9138baecae629ea91512c35a87efbc022f31780d2d3a91574a`.
+  Earlier reconciliation established r1/r2 non-timing equality. Reference bytes
+  and a completion checker travel separately from the frozen source archive and
+  are hashed in the launch receipt. Neither changes the solver.
+- **Completion:** require all four draws numbered 0–3, the expected cell/seed,
+  zero solutions for each, successful cell exit, original gate completion, and
+  gate 4 equality. Missing or failed checks prevent a completed reading even if
+  the original wrapper exits zero. Preserve all raw outputs and checker logs.
+- **Reading:** retain Amendment 12's lower-median rule, substituting these four
+  new Spot draws for the unrun On-Demand draws; the other three cells remain r2.
+  At least three of four draws at `>=5` are required for consistency with H_ell.
+  A partial cell receives no reading. No independent implementation claim is made.
+- **Stopping:** no resumable mid-closure checkpoint and no automatic relaunch.
+  Reclaim, timeout, OOM, gate failure, or another failure ends this attempt as
+  not completed. The command stops ten minutes before the hard deadline for
+  output upload; existing deadline shutdown/reaper protections remain enabled.
+
+Submission uses selection `b-spot` in `e12/continuation-20261028/launch.sh`,
+with a separate receipt directory. This amendment does not relaunch E12a/E12c
+or authorize any further E12b attempt.
+
+## Amendment 16 (2026-10-27 Pacific, 2026-10-28 UTC): persist live E12 output files
+
+The user requested assurance that datasets are persisted to S3. Inspection found
+the existing runner uploads its main log every 15 seconds, but uploads `/work/out`
+only on exit or Spot notice. At inspection E12b already had partial draw data,
+while E12a/E12c's new-cell output files were empty. Immediate file snapshots were
+requested through SSM command `fe4fcb90-c33a-4440-a0cd-de464130bf0c` to protect
+existing bytes before installing a periodic uploader. No solver was restarted.
+
+For the three admitted continuation job IDs, install a low-priority systemd
+oneshot/timer that captures `/work/out` and available host/resource metadata to
+`s3://ephemeral-runs-104186811093-us-east-1/jobs/<job>/snapshots/` about once per
+minute. Each unique archive has a SHA-256 manifest published after S3 verifies
+the archive checksum; `snapshots/latest.json` points to the newest committed
+snapshot. Archive and manifest writes are conditional on absence. The existing
+final upload under `out/` is unchanged and cannot be overwritten by this helper.
+
+The helper validates the local job ID, refuses other jobs, respects its original
+deadline, and uses a lock to prevent overlapping uploads. Failed uploads are
+reported in the existing job log and retried by the timer; this is an artifact
+upload retry, never a solver retry. The timer does not extend instance lifetime.
+No engine, draw, seed, gate, scientific reading, or compute budget changes.
+All timings remain diagnostic; additional file I/O precludes a timing comparison.
+
+Snapshots capture live files and may contain a partial last record. They are not
+atomic solver-memory checkpoints and do not enable mid-closure resume. Each
+saved archive's bytes are independently verifiable; only complete draw records
+and all original gates can support a later scientific reading. Preserve the
+initial snapshots, installation receipts, readback hashes, and uploader source
+under `e12/continuation-20261028/`. The observed bucket lifecycle expires `cache/`
+objects only; it defines no expiration for these `jobs/` keys.

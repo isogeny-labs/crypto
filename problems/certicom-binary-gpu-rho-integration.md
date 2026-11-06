@@ -68,5 +68,11 @@ These conditions would establish runnable, validated implementations and qualifi
   but its device run was rejected before launch by a zero AWS GPU vCPU quota;
   no device or performance result is recorded.
 
+- 2026-10-22: Single-core CPU baseline for the three 131-bit targets ([study](../research/certicom131_rho_ic_bench_20261022/README.md)): batched-inversion walks on the exact ECC2-131 and ECCp-131 groups with checked arithmetic (8.50 M and 1.23 M steps/s). No CUDA result; the device replay above remains open.
+
+- 2026-10-23: Single-core CPU parity study ([study](../research/certicom131_rho_parity_20261023/README.md)): ECCp-131 AVX-512 walk 15.06 M and ECC2-131 bitsliced walk 11.46 M steps/s against 10.3 M for the ECC2K-130 client in one isolated session, all gates passing. No CUDA result; the device replay above remains open.
+
+- 2026-10-23: CUDA port of both walks ([study](../research/certicom131_cuda_port_20261023/README.md)): per-thread code gated on the CPU against the header arithmetic, kernels compile for sm_80 to sm_90 (and retargeted sm_120). No device parity result and no GPU rate: `walk_cuda` has not run on a GPU. Running it is the next step on the first CUDA machine.
+
 Partially resolved.  Completing the two-curve host arithmetic does not
 complete the requested GPU and durable campaign integration.

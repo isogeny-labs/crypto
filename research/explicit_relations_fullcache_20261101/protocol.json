@@ -1,0 +1,467 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "EXPLICIT-RELATIONS-FULLCACHE-LARGE-20261101",
+  "version": 1,
+  "created": "2026-11-01",
+  "repository": "crypto",
+  "study_dir": "research/explicit_relations_fullcache_20261101",
+  "authors": [
+    "Codex"
+  ],
+  "links": {
+    "small_stratum": "protocol-small.json"
+  },
+  "question": "Does an uninstrumented full-cache query specialization preserve matched complete recoveries and change descriptive cold/query cost on the original RTX4090 workloads?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Every reported recovery is independently replayed from a serialized certificate and corrupted-scalar certificates are rejected.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C2",
+      "text": "Shared-host per-row times and baseline-repeat spread describe the fixed workloads; no population inference or certified timing advantage.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "b",
+      "role": "baseline",
+      "description": "Unchanged generic persistent affine full-cache queries",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "bash",
+            "research/explicit_relations_fullcache_20261101/run.sh"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "ER_TABLE_DIAGNOSTICS": "defined",
+          "ER_COMPACT_ROWS": "defined",
+          "ER_QUERY_CACHED": "defined",
+          "ER_WIDE_INDEX": "defined",
+          "ER_DENSE_ROWS": "defined",
+          "ER_CUB_SORT": "defined",
+          "ER_QUERY_PERSISTENT": "defined",
+          "ER_RIGHT_FULL_CACHE": "defined",
+          "ER_NEGATIVE_FILTER": "defined",
+          "ER_AFFINE_QUERY": "defined"
+        },
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "slots": 12,
+        "max_rows": 4294967296,
+        "chunk_rows": 1048576,
+        "max_columns": 16384,
+        "max_work": 17179869184,
+        "max_trials": 16,
+        "attempts_per_column": 128,
+        "threshold_formula": "ceil(7R/5)+1",
+        "field_bits": 63
+      }
+    },
+    {
+      "id": "v",
+      "role": "candidate",
+      "description": "Uninstrumented dedicated full-cache query kernel",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "bash",
+            "research/explicit_relations_fullcache_20261101/run.sh"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "ER_TABLE_DIAGNOSTICS": "defined",
+          "ER_COMPACT_ROWS": "defined",
+          "ER_QUERY_CACHED": "defined",
+          "ER_WIDE_INDEX": "defined",
+          "ER_DENSE_ROWS": "defined",
+          "ER_CUB_SORT": "defined",
+          "ER_QUERY_PERSISTENT": "defined",
+          "ER_RIGHT_FULL_CACHE": "defined",
+          "ER_NEGATIVE_FILTER": "defined",
+          "ER_AFFINE_QUERY": "defined",
+          "ER_QUERY_FULL_CACHE": "defined"
+        },
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "slots": 12,
+        "max_rows": 4294967296,
+        "chunk_rows": 1048576,
+        "max_columns": 16384,
+        "max_work": 17179869184,
+        "max_trials": 16,
+        "attempts_per_column": 128,
+        "threshold_formula": "ceil(7R/5)+1",
+        "field_bits": 63
+      }
+    },
+    {
+      "id": "x",
+      "role": "control_aa",
+      "description": "Identical baseline binary repeated",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "bash",
+            "research/explicit_relations_fullcache_20261101/run.sh"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "ER_TABLE_DIAGNOSTICS": "defined",
+          "ER_COMPACT_ROWS": "defined",
+          "ER_QUERY_CACHED": "defined",
+          "ER_WIDE_INDEX": "defined",
+          "ER_DENSE_ROWS": "defined",
+          "ER_CUB_SORT": "defined",
+          "ER_QUERY_PERSISTENT": "defined",
+          "ER_RIGHT_FULL_CACHE": "defined",
+          "ER_NEGATIVE_FILTER": "defined",
+          "ER_AFFINE_QUERY": "defined"
+        },
+        "env": {},
+        "threads": 1
+      },
+      "parameters": {
+        "slots": 12,
+        "max_rows": 4294967296,
+        "chunk_rows": 1048576,
+        "max_columns": 16384,
+        "max_work": 17179869184,
+        "max_trials": 16,
+        "attempts_per_column": 128,
+        "threshold_formula": "ceil(7R/5)+1",
+        "field_bits": 63
+      },
+      "same_instrument_as": "b"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "All successful public-input recoveries must satisfy scalar multiplication and complete independent certificate replay; existing tiny known-answer reduction controls run first."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Each successful certificate is copied with scalar incremented modulo r; a fresh verifier must reject with exit1, not timeout. Invalid curves/order witnesses are tested before measurement."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "full_cache_kernel",
+        "levels": [
+          "generic_affine",
+          "specialized_affine"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source_and_build",
+        "treatment": "fixed",
+        "value": "One frozen source, CUDA13.2 -O3 -std=c++17 -arch=sm_89",
+        "how": "One frozen source and flags; only ER_QUERY_FULL_CACHE differs. Identical arithmetic, driver, cache, index, filter and budgets. Baseline generic kernel source unchanged. All setup charged."
+      },
+      {
+        "name": "inputs",
+        "treatment": "fixed",
+        "value": "Deterministic PARI52/63-bit fixtures; p=precprime(2^bits) at52 and precprime(2^63-2^34) at63. Public-coordinate targets and seeds101/202; unchanged row/work limits; no target scalar.",
+        "how": "No target scalar is generated or supplied. Curve order is checked with prime torsion witness and unique Hasse multiple before solving."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Same full RTX4090 and pod for all rows. Record device identity, GPU state, CPU affinity and CPUinfo; shared host earns only L0."
+      },
+      {
+        "name": "memory_layout",
+        "treatment": "randomized",
+        "how": "Fresh-process ASLR; identical cache/filter/index policies and reserve25%. Every successful cell requires complete right cache."
+      },
+      {
+        "name": "order",
+        "treatment": "crossed",
+        "how": "Large stratum: one b/v/x round for seed101, x/v/b for202. Same worker first executes the separately frozen 52-bit five-round control stratum. Original two large complete-recovery fixtures remain unchanged."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Frozen Rust analyzer validates complete attempted rungs and labels, preserves failures, and plots all rows. No inferential timing analysis."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-aa",
+        "arms": [
+          "b",
+          "x"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "C-kernel",
+        "arms": [
+          "b",
+          "v"
+        ],
+        "differs_in": [
+          "full_cache_kernel"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-complete",
+        "arms": [
+          "b",
+          "v",
+          "x"
+        ],
+        "differs_in": [],
+        "design": "absolute",
+        "threshold": "All success certificates replay, corrupt scalars fail, and certificate bytes match across formulas/repeats."
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Alternate b/v/x and x/v/b across round+seed. Large stratum has one round per seed; small stratum has five. Baseline repeat is the identical executable. Fixed before data.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "seeds": [],
+      "nonce": null,
+      "note": "Exactly101 and202 for each arm and rung; target-coordinate start1009*seed; solver uses same seed for hash/trial RNG."
+    },
+    "instance_sampling": {
+      "rule": "Use the exact preceding affine-study public 63-bit curve and two targets, bound by curves.txt SHA256 64e5335d0a39eb574afb3072208ac6237425d484d17c69634e55c112fcf4d9c5. Generator checks regenerated PARI data byte-identically. Seeds101/202 and target-coordinate start1009*seed; no target scalar supplied.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Descriptive frontier accounting; no masked or inferential timing claim.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 2,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Two fixed public targets, one baseline/candidate/baseline-repeat round each; exact correctness and descriptive L0 timing only. No significance, confidence interval or population inference."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": 18000,
+      "measured_on": "Previous affine panel recorded ~2645s and1191s for the two large affine recoveries. Three arms total about11508s; small controls add about180s and preflight. Estimate only. Both strata share one18000s worker/18300s controller cap and one RTX4090<=0.90/hour."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "recoveries",
+        "name": "Independently replayed recovery",
+        "unit": "recoveries",
+        "kind": "exact",
+        "definition": "One iff solver succeeded, fresh verifier replay passed and corrupted-scalar replay failed; otherwise zero. Public target scalar never generated.",
+        "source": "rows.csv recoveries",
+        "aggregation": "sum",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "wall_seconds",
+        "name": "Complete execution and audit",
+        "unit": "seconds",
+        "kind": "timed",
+        "definition": "Outer native clock from target-coordinate construction through solver startup/recovery/shutdown, independent replay, negative-control replay and certificate comparisons. Includes validation overhead.",
+        "source": "rows.csv wall_seconds",
+        "aggregation": "per_row",
+        "resolution": "steady_clock",
+        "uncertainty": "range"
+      },
+      {
+        "id": "solver_seconds",
+        "name": "Cold complete recovery",
+        "unit": "seconds",
+        "kind": "timed",
+        "definition": "Outer clock from target-coordinate construction through driver startup, curve validation, service startup, bases, relation collection, elimination, in-process certificate replay, serialization and process teardown. Additional independent replay excluded and recorded separately.",
+        "source": "rows.csv solver_seconds",
+        "aggregation": "per_row",
+        "resolution": "steady_clock",
+        "uncertainty": "range"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "monotonic",
+    "counters": [
+      "recoveries",
+      "attempts",
+      "relations"
+    ],
+    "record": [
+      "All raw certificates and logs",
+      "Source/binary hashes",
+      "GPU identity and state",
+      "Stage clocks and outer complete execution clock",
+      "Bound failures and unattempted higher rungs",
+      "Row representation and conservative admission bytes; no measured peak VRAM claim",
+      "TABLE diagnostics require full cache and positive filter storage on every successful cell. Query visits include speculative scheduling work; no total measured field-operation count."
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "runpod",
+    "queue": "Secure Cloud full RTX 4090",
+    "placement": {
+      "gpu": "NVIDIA GeForce RTX 4090",
+      "count": 1,
+      "container_disk_gb": 40
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 18000,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Execute the separately frozen 52-bit stratum first (30cells); only if all complete and verify execute all six cells of this 63-bit stratum. No retry, no larger rung, preserve incomplete/failed/timeouts; worker18000/controller18300 seconds shared across both protocols.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Per solve52bits180s,63bits7200s;fresh replay60s,fixture180s,worker18000/controller18300. Any preflight/sanitizer failure stops before data; preserve partial records.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Any wrong recovery, accepted corrupted scalar, certificate-byte mismatch, missing planned cell without declared stop, failed sanitizer or unexpected process error invalidates the run. Explicit timeout/limits are retained."
+  ],
+  "decision_rule": {
+    "text": "Report exact recoveries and counts, per-row cold and query clocks, candidate divided by mean(b,x), and abs(b-x)/mean(b,x) separately for each size/seed. No pooled inferential claim; L0 times are descriptive. No causal comparison to older panels.",
+    "comparison_ids": [
+      "C-complete"
+    ],
+    "threshold": "every reported recovery independently replayed; all attempted rung cells accounted for",
+    "statistic": "Exact recoveries; descriptive per-input paired cold/oracle ratios, baseline repeat spread, median/minimum across available rounds",
+    "interval": "Baseline repeat range per fixed input; not a confidence interval",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Per fixed size/seed candidate_seconds/mean(b,x); baseline AA relative spread abs(b-x)/mean(b,x). Ratios only when all three recoveries verify.",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "analyze.rs",
+      "sha256": "e829db66babdc3dca3121fc3bc793e54de679a878f98c9703f3cdfd227e8e681"
+    },
+    "inputs": [
+      "rows.csv"
+    ],
+    "outputs": [
+      "summary.txt",
+      "scaling.svg",
+      "analysis.log",
+      "ratios.csv",
+      "statistics.csv"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Every solver execution against field bits, including bounded failures"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Claiming a largest possible ECDLP size from a finite timed ladder",
+    "Treating L0 times as certified speedups",
+    "Hiding unsuccessful trials or higher unattempted rungs",
+    "Claiming a tensor or subexponential backend from generic MITM",
+    "Supplying the target scalar to recovery"
+  ],
+  "literature": [
+    {
+      "ref": "research/explicit_relations_affine_20261030 and research/explicit_relations_profile_20261031/RESULTS.md",
+      "provenance": "internal",
+      "claim": "Previous complete recoveries define fixed workloads; stage diagnostic mixes specialization and instrumentation and is not a production speedup.",
+      "verified_by": "Read prior source, raw row table, query profile and arithmetic helpers before implementation2026-11-01."
+    },
+    {
+      "ref": "https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html",
+      "provenance": "retrieved",
+      "claim": "Assess realistic workloads and retain invariant data; optimization must be checked on complete workloads.",
+      "verified_by": "Read NVIDIA primary guide assessment, profiling and memory guidance2026-11-01."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "bb1be4eae5085c4da849b21ca7bf22c3747f84a7995cd5a57ac9b22dae64ad8d",
+    "commit": "736dd1f4fff3451115772f08b1e593a6070b9440",
+    "frozen_at": "2026-11-01T03:57:20Z",
+    "filed_before_affected_data": true
+  }
+}

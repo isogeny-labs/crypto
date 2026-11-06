@@ -54,12 +54,11 @@ use crypto_lib::cryptanalysis::koblitz_factor_base_search::{
 use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     koblitz_signed_frobenius_rho_with_progress, point_key, points_with_x, CollectedRelation,
     ColumnCoverage, DecompositionStrategy, FactorBaseLogTable, FactorBaseSelectionCost,
-    FrobeniusFactorBase, KoblitzCurve, KoblitzSignedRhoOptions, PairSumTable, ProbeBudget,
-    ProjectedFactorBase, RelationCollector, RelationWorkUnit,
+    FoldedDuplicates, FrobeniusFactorBase, KoblitzCurve, KoblitzSignedRhoOptions, PairSumTable,
+    ProbeBudget, ProjectedFactorBase, RelationCollector, RelationWorkUnit,
 };
 use crypto_lib::cryptanalysis::koblitz_sparse_la::SparseSolveOptions;
 use num_bigint::BigUint;
-use num_traits::Zero;
 use rand::{rngs::StdRng, Rng, SeedableRng};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
@@ -1032,43 +1031,18 @@ fn with_tier(mut summary: Value, pair: Option<&PairSumTable>) -> Value {
 /// one, so it is a fair central estimate rather than a bound in either
 /// direction.
 fn probe_budget(c: &KoblitzCurve, fb: &FrobeniusFactorBase, p: &WorkflowParams) -> ProbeBudget {
-    let points = fb.points.len() as u128;
     // The same condition `CollectionReport` reports under.
     let scans_summands = p.summands == 3 && p.solver == Solver::PairTable;
-    let summands_scanned = if scans_summands {
-        let window = p
-            .collection_window
-            .map(u128::from)
-            .unwrap_or(points)
-            .min(points);
-        (p.collection.unit_trials as u128)
-            .saturating_mul(p.collection.units as u128)
-            .saturating_mul(window)
-            .min(u64::MAX as u128) as u64
-    } else {
-        0
-    };
-
-    // Multisets of `m` summands from the base: the largest set of
-    // points one probe can hit, and the denominator of the floor.
-    let m = u32::from(p.descent_summands.unwrap_or(p.summands));
-    let mut reachable = BigUint::from(1u32);
-    for i in 0..m {
-        reachable *= BigUint::from(points + i as u128);
-        reachable /= BigUint::from(i + 1);
-    }
-    let per_target = if reachable.is_zero() {
-        0u64
-    } else {
-        let probes = &c.subgroup_order / reachable;
-        probes.to_u64_digits().first().copied().unwrap_or(0).max(1)
-    };
-    let descent_probes = per_target.saturating_mul(p.targets.len() as u64);
-
-    ProbeBudget {
-        summands_scanned,
-        descent_probes,
-    }
+    ProbeBudget::for_run(
+        c,
+        fb.points.len(),
+        scans_summands,
+        p.collection_window,
+        p.collection.unit_trials,
+        p.collection.units,
+        p.descent_summands.unwrap_or(p.summands),
+        p.targets.len(),
+    )
 }
 
 pub(crate) fn build_pair_table(
@@ -1104,6 +1078,28 @@ pub(crate) fn build_pair_table(
         }
     ));
     table
+}
+
+/// [`build_pair_table`], and with the fold the pairs of base points whose
+/// sums share a key (`PairSumTable::free_relations`).  The same tier and the
+/// same table; `None` for the harvest where the tier is not the partitioned
+/// fold.  Used by `ic price` under `KIC_FREE_RELATIONS=1`.
+pub(crate) fn build_pair_table_harvest(
+    c: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    p: &WorkflowParams,
+) -> Option<(PairSumTable, Option<FoldedDuplicates>)> {
+    let budget = p
+        .pair_table_bytes
+        .map(u128::from)
+        .unwrap_or(PairSumTable::DEFAULT_BYTE_BUDGET);
+    match p.pair_table_tier.unwrap_or(PairTableTier::Auto) {
+        PairTableTier::Auto => {
+            PairSumTable::build_within_for_harvest(c, fb, budget, probe_budget(c, fb, p))
+        }
+        PairTableTier::Folded => PairSumTable::build_folded_within_harvest(c, fb, budget),
+        _ => build_pair_table(c, fb, p).map(|table| (table, None)),
+    }
 }
 
 /// Which representation of the pair table a run should build.

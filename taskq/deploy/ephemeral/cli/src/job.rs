@@ -209,6 +209,7 @@ pub struct JobSpec {
     pub artifacts: Vec<String>,
     pub cache: bool,
     pub cargo_dir: String,
+    pub resume_job: String,
 }
 
 #[cfg(test)]

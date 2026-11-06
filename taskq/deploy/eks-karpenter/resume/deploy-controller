@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Authorized administrator deployment; existing cluster/quota/pool are unchanged.
+set -euo pipefail
+here=$(cd "$(dirname "$0")" && pwd)
+: "${ISOLAB_RECOVERY_WORKDIR:?}" "${KUBECONFIG:?}"
+[[ "$ISOLAB_RECOVERY_WORKDIR" == /* ]] || exit 2
+[[ $(aws sts get-caller-identity --query Account --output text) == 104186811093 ]] || exit 2
+export AWS_REGION=us-east-2
+mkdir -p "$ISOLAB_RECOVERY_WORKDIR"
+package=$(mktemp -d "$ISOLAB_RECOVERY_WORKDIR/package.XXXXXX")
+mkdir -p "$package/bin" "$package/deploy/remote" "$package/resume"
+cargo +1.99.1 build --locked --release --manifest-path "$here/controller/Cargo.toml" --target x86_64-unknown-linux-musl
+cargo +1.99.1 build --locked --release --manifest-path "$here/../mcp/Cargo.toml" --target-dir "$ISOLAB_RECOVERY_WORKDIR/mcp-target"
+install -m755 "$here/controller/target/x86_64-unknown-linux-musl/release/isolab-eks-recovery" "$package/bin/"
+install -m755 "$ISOLAB_RECOVERY_WORKDIR/mcp-target/release/isolab-eks-mcp" "$package/bin/"
+install -m755 "$(command -v kubectl)" "$package/bin/"
+install -m755 "$here/../submit-job" "$package/deploy/"
+install -m755 "$here/../remote/verify-build" "$package/deploy/remote/"
+install -m755 "$here/run-controller" "$package/resume/"
+cp "$here/buildspec.yml" "$package/resume/"
+(cd "$package" && sha256sum bin/* deploy/submit-job deploy/remote/* resume/* > SHA256SUMS && zip -q -X -r controller.zip bin deploy resume SHA256SUMS)
+digest=$(sha256sum "$package/controller.zip" | cut -d' ' -f1)
+key="inputs/recovery-controllers/$digest.zip"
+bucket=isolab-results-104186811093-us-east-2
+aws s3 cp "$package/controller.zip" "s3://$bucket/$key" --only-show-errors
+version=$(aws s3api head-object --bucket "$bucket" --key "$key" --query VersionId --output text)
+[[ "$version" != null && "$version" != None && -n "$version" ]] || exit 2
+aws cloudformation describe-stacks --stack-name isolab-remote-launcher --query 'Stacks[0]' > "$ISOLAB_RECOVERY_WORKDIR/remote-stack.json"
+vpc=$(jq -r '.Parameters[]|select(.ParameterKey=="VpcId")|.ParameterValue' "$ISOLAB_RECOVERY_WORKDIR/remote-stack.json")
+subnets=$(jq -r '.Parameters[]|select(.ParameterKey=="PrivateSubnets")|.ParameterValue' "$ISOLAB_RECOVERY_WORKDIR/remote-stack.json")
+sg=$(jq -r '.Parameters[]|select(.ParameterKey=="ClusterSecurityGroup")|.ParameterValue' "$ISOLAB_RECOVERY_WORKDIR/remote-stack.json")
+trigger=$(jq -r '.Outputs[]|select(.OutputKey=="TriggerRoleArn")|.OutputValue|split("/")[-1]' "$ISOLAB_RECOVERY_WORKDIR/remote-stack.json")
+kubectl --kubeconfig "$KUBECONFIG" apply -f "$here/namespace.yaml"
+kubectl --kubeconfig "$KUBECONFIG" apply -f "$here/rbac.yaml"
+aws cloudformation deploy --stack-name isolab-recovery-controller --template-file "$here/bridge.yaml" \
+  --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset \
+  --parameter-overrides "LauncherKey=$key" "LauncherVersion=$version" "VpcId=$vpc" \
+  "PrivateSubnets=$subnets" "ClusterSecurityGroup=$sg" "TriggerRoleName=$trigger"
+aws cloudformation describe-stacks --stack-name isolab-recovery-controller --query 'Stacks[0].Outputs' > "$ISOLAB_RECOVERY_WORKDIR/outputs.json"
+jq -n --arg key "$key" --arg version "$version" --arg sha "$digest" '{key:$key,version:$version,sha256:$sha}' > "$ISOLAB_RECOVERY_WORKDIR/controller-source.json"
+cat "$ISOLAB_RECOVERY_WORKDIR/outputs.json"

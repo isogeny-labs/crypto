@@ -427,6 +427,24 @@ fn main() {
         })
     };
     let (plant_level, plant_curve) = (plant("--plant-level"), plant("--plant-curve"));
+    // `--n0 FILE`: divide each IC-yield run's relations by its workload's
+    // N0/r (research/generator_effect_ic_20261019, E3a). The numerator, not
+    // the denominator, so (num, den) pairs stay exchangeable under the null.
+    let n0: Option<HashMap<(u64, u64, u64, u64, u64), f64>> = get("--n0").map(|path| {
+        let doc: Value = serde_json::from_str(&read_text(&path)).unwrap();
+        doc["rows"]
+            .as_array()
+            .unwrap_or_else(|| die("--n0 takes generator-n0 census output"))
+            .iter()
+            .map(|r| {
+                let u = |k: &str| r[k].as_u64().unwrap();
+                (
+                    (u("p"), u("a"), u("b"), u("gx"), u("gy")),
+                    r["n0_over_r_m2"].as_f64().unwrap(),
+                )
+            })
+            .collect()
+    });
 
     // Sidecars: (p, a, b, gx, gy) → (class, vertex, model, level). Each
     // sidecar file is one class (two classes may share p).
@@ -507,7 +525,13 @@ fn main() {
                 r["counters"]["targets_tried"].as_f64(),
             ) {
                 // A planted yield effect scales relations per trial.
-                let k = base.num / s;
+                let mut k = base.num / s;
+                if let Some(n0) = &n0 {
+                    let key = (key("p"), key("a"), key("b"), key("gx"), key("gy"));
+                    k /= n0
+                        .get(&key)
+                        .unwrap_or_else(|| die(&format!("--n0: no N0 for workload {key:?}")));
+                }
                 ic_yield.entry(arm.clone()).or_default().push(Run {
                     num: rel * k,
                     den: tr,
@@ -611,7 +635,7 @@ fn main() {
     }
 
     let out = json!({
-        "schema": "volcano-stats/v1", "vertical_statistic": vmode, "alternative": alternative, "margin": margin, "boot": boot, "perm": perms, "seed": seed,
+        "schema": "volcano-stats/v1", "n0_adjusted": n0.is_some(), "vertical_statistic": vmode, "alternative": alternative, "margin": margin, "boot": boot, "perm": perms, "seed": seed,
         "classes": class_names, "skipped_unmatched_records": skipped, "unverified": unverified,
         "metrics": metrics, "bsgs_exactness": exact, "pairs": pairs,
         "argv": std::env::args().collect::<Vec<_>>(),

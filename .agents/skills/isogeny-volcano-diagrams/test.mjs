@@ -17,4 +17,7 @@ const a=render({...graph,metric,range:[0,4]});assert.equal(a.nodes,3);assert.equ
 const constant=render({run_id:'constant',metric,nodes:[node('x',0,13,100),node('y',6,13,100)],edges:[]});assert.deepEqual(constant.range,[13,13]);assert.equal((constant.svg.match(/fill="rgb\(128,174,197\)"/g)??[]).length,2);checks+=2;
 assert.throws(()=>render({...graph,metric,range:[1,4]}),/outside/);assert.throws(()=>render({...graph,nodes:[...graph.nodes,graph.nodes[0]]}),/unique/);assert.throws(()=>render({...graph,edges:[edge('a','unknown')]}),/endpoint/);checks+=3;
 const unsafe=render({run_id:'escape',nodes:[node('<script>',0)],edges:[]});assert(!unsafe.svg.includes('<script>'));checks++;
+const narrow=render({run_id:'narrow-real-operation-range',metric,nodes:[node('lo',0,359188416,100),node('hi',1,359188419.04,100)],edges:[]});
+assert.match(narrow.svg,/359,188,416 to 359,188,419/);assert.match(narrow.svg,/span 3.04/);checks+=2;
 console.log(JSON.stringify({passed:true,checks,depths:[0,1,4,8,20],surface_cycles:true,loops:true,parallel_maps:true,missing_and_zero_distinct:true,constant_and_shared_ranges:true}));
+

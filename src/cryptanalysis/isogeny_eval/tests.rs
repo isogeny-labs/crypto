@@ -13,16 +13,26 @@
 //!   `Φ_ℓ(j, j') = 0`, and `j ∈ {0, 1728}` domains.
 //! - Counters: positive, deterministic, exact per-image Vélu cost, and the
 //!   uncounted field gives the same results.
+//! - NTT: equal to schoolbook and Karatsuba at 20/50/62/63-bit `p` for many
+//!   lengths (edge lengths around powers of two, unbalanced, squares, the
+//!   all-`(p−1)` worst case), exact word counts, NTT-prime constants, and
+//!   √élu results identical under every [`PolyMul`].
 
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
 
-use super::counted_fp::{is_prime_u64, NoCount, OpCounter, OpTally, PrimeField};
+use super::counted_fp::{
+    is_prime_u64, CompleteTally, NoCount, OpCounter, OpTally, PolyMul, PrimeField,
+};
 use super::montgomery::{batch_to_affine, is_kernel_generator, ladder, xadd, MontgomeryCurve, XZ};
+use super::ntt::{mul_ntt, ntt_mul_add_cost, ntt_mul_cost, MAX_LOG2_LEN, NTT_PRIMES};
 use super::poly::{self, MonicDivisor, ProductTree};
-use super::small_degree::{isomorphisms, kernel_x_coordinates, ShortWeierstrass, SmallIsogeny};
+use super::small_degree::{
+    isomorphisms, kernel_orbit, kernel_representatives, kernel_x_coordinates, ShortWeierstrass,
+    SmallIsogeny,
+};
 use super::sqrt_velu::sqrt_velu;
 use super::velu::{kernel_polynomial, velu};
 use super::IsogenyEvalError;
@@ -110,6 +120,157 @@ fn karatsuba_matches_schoolbook() {
             assert_eq!(poly::mul(&f, &a, &b), naive_mul(&f, &a, &b), "{la}x{lb}");
         }
     }
+}
+
+fn pow_mod(a: u64, mut e: u64, q: u64) -> u64 {
+    let (mut r, mut b) = (1u128, a as u128 % q as u128);
+    while e > 0 {
+        if e & 1 == 1 {
+            r = r * b % q as u128;
+        }
+        b = b * b % q as u128;
+        e >>= 1;
+    }
+    r as u64
+}
+
+#[test]
+fn ntt_primes_are_ntt_friendly_and_large_enough() {
+    let mut log2_q = 0.0;
+    for (&q, g) in NTT_PRIMES.iter().zip([3u64, 5, 7]) {
+        assert!(is_prime_u64(q));
+        assert!(q > 1 << 61 && q < 1 << 62);
+        assert!((q - 1).trailing_zeros() >= MAX_LOG2_LEN);
+        // g is a non-residue, so g^((q−1)/2^k) has order exactly 2^k.
+        assert_eq!(pow_mod(g, (q - 1) / 2, q), q - 1);
+        log2_q += (q as f64).log2();
+    }
+    // Q > 2^57 · 2^126: no coefficient of a product of lengths ≤ 2^54 wraps.
+    assert!(log2_q > 183.0);
+    // Every q_i < 2 q_j (Garner's cross-reductions use one subtraction).
+    for &a in &NTT_PRIMES {
+        for &b in &NTT_PRIMES {
+            assert!(a < 2 * b);
+        }
+    }
+}
+
+#[test]
+fn ntt_matches_schoolbook_and_karatsuba() {
+    let mut rng = StdRng::seed_from_u64(0x5e3);
+    let mut primes: Vec<u64> = [20u32, 50, 62, 63]
+        .iter()
+        .map(|&b| random_prime(&mut rng, b))
+        .collect();
+    // The largest prime below 2^63 and the smallest allowed prime.
+    primes.push((1u64 << 63) - 25);
+    primes.push(5);
+    let lens: &[(usize, usize)] = &[
+        (1, 1),
+        (1, 9),
+        (2, 2),
+        (3, 5),
+        (7, 1),
+        (31, 33),
+        (32, 32),
+        (33, 32),
+        (63, 64),
+        (64, 65),
+        (100, 1),
+        (127, 129),
+        (255, 257),
+        (256, 256),
+        (512, 513),
+        (1000, 37),
+        (1024, 1),
+        (1500, 700),
+    ];
+    for &p in &primes {
+        assert!(is_prime_u64(p), "{p}");
+        let f = PrimeField::counted(p).unwrap();
+        for (k, &(la, lb)) in lens.iter().enumerate() {
+            let worst = k % 3 == 0;
+            let draw = |rng: &mut StdRng, n: usize| -> Vec<u64> {
+                (0..n)
+                    .map(|_| if worst { p - 1 } else { rng.gen_range(0..p) })
+                    .collect()
+            };
+            let a = draw(&mut rng, la);
+            let b = draw(&mut rng, lb);
+            let want = poly::mul_schoolbook(&f, &a, &b);
+            assert_eq!(
+                poly::mul_karatsuba(&f, &a, &b),
+                want,
+                "kara {la}x{lb} p={p}"
+            );
+            let before = f.tally();
+            let got = mul_ntt(&f, &a, &b);
+            let used = f.tally().since(before);
+            assert_eq!(got, want, "ntt {la}x{lb} p={p}");
+            let (w, m) = ntt_mul_cost(la, lb, false);
+            assert_eq!((used.word, used.mul, used.inv), (w, m, 0));
+            // Squaring path (same slice) and its count.
+            let before = f.tally();
+            let sq = mul_ntt(&f, &a, &a);
+            let used = f.tally().since(before);
+            assert_eq!(sq, poly::mul_schoolbook(&f, &a, &a), "sqr {la} p={p}");
+            assert_eq!((used.word, used.mul), ntt_mul_cost(la, la, true));
+        }
+        assert!(mul_ntt(&f, &[], &[1, 2]).is_empty());
+    }
+}
+
+#[test]
+fn poly_mul_follows_the_field_choice() {
+    let mut rng = StdRng::seed_from_u64(0x5e4);
+    let p = random_prime(&mut rng, 61);
+    let a: Vec<u64> = (0..1200).map(|_| rng.gen_range(0..p)).collect();
+    // 1200 × 800: the NTT's count is the smaller (ratio 0.58).
+    let b: Vec<u64> = (0..800).map(|_| rng.gen_range(0..p)).collect();
+    let small: Vec<u64> = (0..poly::NTT_THRESHOLD - 1)
+        .map(|_| rng.gen_range(0..p))
+        .collect();
+    let mut outs = Vec::new();
+    for (m, ntt_big, ntt_small) in [
+        (PolyMul::Karatsuba, false, false),
+        (PolyMul::Auto, true, false),
+        (PolyMul::Ntt, true, true),
+    ] {
+        let f = PrimeField::counted(p).unwrap().with_poly_mul(m);
+        assert_eq!(f.poly_mul(), m);
+        let c = poly::mul(&f, &a, &b);
+        assert_eq!(f.tally().word > 0, ntt_big, "{m:?}");
+        f.reset_counts();
+        let _ = poly::mul(&f, &a, &small);
+        assert_eq!(f.tally().word > 0, ntt_small, "{m:?}");
+        outs.push(c);
+    }
+    assert_eq!(PrimeField::new(p).unwrap().poly_mul(), PolyMul::Auto);
+    assert!(outs.windows(2).all(|w| w[0] == w[1]));
+    // Above the length threshold, Auto still takes Karatsuba when its count
+    // is the smaller for the shape (1200 × 259: ratio 1.13 from padding).
+    let mid: Vec<u64> = (0..poly::NTT_THRESHOLD + 3)
+        .map(|_| rng.gen_range(0..p))
+        .collect();
+    let f = PrimeField::counted(p).unwrap();
+    let c = poly::mul(&f, &a, &mid);
+    assert_eq!(f.tally().word, 0);
+    assert_eq!(
+        f.tally().mul,
+        poly::karatsuba_cost(a.len(), mid.len()),
+        "Auto chose Karatsuba"
+    );
+    assert_eq!(c, poly::mul_karatsuba(&f, &a, &mid));
+    // Karatsuba under `PolyMul::Karatsuba` counts exactly what
+    // `mul_karatsuba` counts.
+    let f = PrimeField::counted(p)
+        .unwrap()
+        .with_poly_mul(PolyMul::Karatsuba);
+    let _ = poly::mul_karatsuba(&f, &a, &b);
+    let t1 = f.tally();
+    f.reset_counts();
+    let _ = poly::mul(&f, &a, &b);
+    assert_eq!(f.tally(), t1);
 }
 
 #[test]
@@ -329,6 +490,31 @@ fn sqrt_velu_agrees_with_velu_and_library() {
 }
 
 #[test]
+fn sqrt_velu_is_unchanged_by_the_multiplication_algorithm() {
+    let mut rng = StdRng::seed_from_u64(0x5e5);
+    for &ell in &[11u64, 101, 1009, 10007] {
+        for bits in [50u32, 61] {
+            let inst = cm_instance(ell, bits, &mut rng);
+            let xs: Vec<u64> = (0..3).map(|_| rng.gen_range(2..inst.p)).collect();
+            let mut outs = Vec::new();
+            let mut tallies = Vec::new();
+            for m in [PolyMul::Karatsuba, PolyMul::Auto, PolyMul::Ntt] {
+                let f = PrimeField::counted(inst.p).unwrap().with_poly_mul(m);
+                let out = sqrt_velu(&f, &inst.curve, ell, inst.kernel_x, &xs).unwrap();
+                outs.push(out);
+                tallies.push(f.tally());
+            }
+            assert!(outs.windows(2).all(|w| w[0] == w[1]), "ℓ = {ell}");
+            assert_eq!(tallies[0].word, 0);
+            assert!(tallies[2].word > 0);
+            let plain = PrimeField::new(inst.p).unwrap();
+            let slow = velu(&plain, &inst.curve, ell, inst.kernel_x, &xs).unwrap();
+            assert_eq!(outs[0].0, slow, "ℓ = {ell}");
+        }
+    }
+}
+
+#[test]
 fn x_only_images_respect_differential_addition() {
     let mut rng = StdRng::seed_from_u64(5);
     for ell in [5u64, 11, 101] {
@@ -406,7 +592,8 @@ fn counters_are_positive_deterministic_and_free_when_off() {
         two.since(one),
         OpTally {
             mul: 4 * d + 4,
-            inv: 1
+            inv: 1,
+            word: 0
         }
     );
     assert_eq!(two.mul_equivalents(91), two.mul + 91 * two.inv);
@@ -430,16 +617,18 @@ fn check_small(f: &PrimeField, e: &ShortWeierstrass, ell: u64, x0: u64, rng: &mu
     assert_eq!(dual.codomain(), e, "dual lands on the same model");
     assert_eq!(dual.degree(), ell);
     assert_eq!(phi_at(f.p(), ell, e.j_invariant(f), cod.j_invariant(f)), 0);
-    if ell == 3 {
+    if ell >= 3 {
         let lf = lib_field(f.p());
-        let lib = lib_kernel::velu_codomain(
-            &lf,
-            &Model {
-                a: lf.from_u64(e.a),
-                b: lf.from_u64(e.b),
-            },
-            &vec![lf.from_u64(f.neg(x0)), lf.one()],
-        );
+        let model = Model {
+            a: lf.from_u64(e.a),
+            b: lf.from_u64(e.b),
+        };
+        let mut h = vec![lf.one()];
+        for xi in kernel_orbit(f, e, ell, x0).unwrap() {
+            h = lib_poly::mul(&lf, &h, &vec![lf.from_u64(f.neg(xi)), lf.one()]);
+        }
+        let lib = lib_kernel::velu_codomain(&lf, &model, &h);
+        assert!(lib_kernel::verify_kernel(&lf, &model, ell, &h).is_ok());
         assert_eq!((lib_u64(&lf, &lib.a), lib_u64(&lf, &lib.b)), (cod.a, cod.b));
     }
     for _ in 0..6 {
@@ -517,8 +706,12 @@ fn small_degree_special_j_and_errors() {
     assert_eq!(isomorphisms(&f, &e0, &e1728), Vec::<u64>::new());
     // Errors.
     assert_eq!(
+        SmallIsogeny::new(&f, &e1728, 11, 0),
+        Err(IsogenyEvalError::InvalidDegree(11))
+    );
+    assert_eq!(
         SmallIsogeny::new(&f, &e1728, 5, 0),
-        Err(IsogenyEvalError::InvalidDegree(5))
+        Err(IsogenyEvalError::NotAKernelPoint)
     );
     assert_eq!(
         SmallIsogeny::new(&f, &e1728, 2, 1),
@@ -536,6 +729,249 @@ fn small_degree_counts_are_deterministic() {
     let pt = e.point_from_x(&f, 3, 1000);
     let start = f.tally();
     let img = phi.eval(&f, pt);
-    assert_eq!(f.tally().since(start), OpTally { mul: 7, inv: 1 });
+    assert_eq!(
+        f.tally().since(start),
+        OpTally {
+            mul: 7,
+            inv: 1,
+            word: 0
+        }
+    );
     assert!(phi.codomain().contains(&f, img));
+}
+
+#[test]
+fn karatsuba_cost_is_the_counted_cost() {
+    let mut rng = StdRng::seed_from_u64(0x5e5);
+    let p = random_prime(&mut rng, 61);
+    let f = PrimeField::counted(p).unwrap();
+    let mut shapes = vec![
+        (0usize, 5usize),
+        (1, 1),
+        (24, 24),
+        (25, 24),
+        (25, 25),
+        (49, 24),
+    ];
+    for _ in 0..60 {
+        shapes.push((rng.gen_range(1..1500), rng.gen_range(1..1500)));
+    }
+    shapes.extend([
+        (512, 512),
+        (513, 257),
+        (1024, 1023),
+        (4096, 300),
+        (2047, 2048),
+    ]);
+    for (la, lb) in shapes {
+        let a: Vec<u64> = (0..la).map(|_| rng.gen_range(0..p)).collect();
+        let b: Vec<u64> = (0..lb).map(|_| rng.gen_range(0..p)).collect();
+        f.reset_counts();
+        let _ = poly::mul_karatsuba(&f, &a, &b);
+        assert_eq!(f.tally().mul, poly::karatsuba_cost(la, lb), "{la}x{lb}");
+        assert_eq!(poly::karatsuba_cost(la, lb), poly::karatsuba_cost(lb, la));
+    }
+}
+
+// ------------------------------------------------- ℓ ∈ {5, 7} ----
+
+#[test]
+fn degree_five_and_seven_isogenies_and_certified_duals() {
+    let mut rng = StdRng::seed_from_u64(62);
+    for bits in [30u32, 50] {
+        let p = random_prime(&mut rng, bits);
+        let f = PrimeField::new(p).unwrap();
+        for ell in [5u64, 7] {
+            let mut done = 0;
+            let mut tries = 0;
+            while done < 2 {
+                tries += 1;
+                assert!(tries < 20_000, "no rational {ell}-kernel found");
+                let (a, b) = (rng.gen_range(1..p), rng.gen_range(1..p));
+                let Ok(e) = ShortWeierstrass::new(&f, a, b) else {
+                    continue;
+                };
+                let roots = kernel_x_coordinates(&f, &e, ell).unwrap();
+                let reps = kernel_representatives(&f, &e, ell).unwrap();
+                assert_eq!(roots.len(), reps.len() * (ell as usize - 1) / 2);
+                for x0 in reps {
+                    let orbit = kernel_orbit(&f, &e, ell, x0).unwrap();
+                    assert_eq!(orbit.len(), (ell as usize - 1) / 2);
+                    for &xi in &orbit {
+                        assert!(roots.contains(&xi), "orbit abscissas are roots of f_ℓ");
+                    }
+                    let dual_rational = p % ell == 1 || p % ell == ell - 1;
+                    // Frobenius acts on ker φ by λ = ±1 (rational abscissas)
+                    // and on ker φ̂ by p/λ, so φ̂ has rational kernel
+                    // abscissas exactly when p ≡ ±1 (mod ℓ).
+                    let phi = SmallIsogeny::new(&f, &e, ell, x0).unwrap();
+                    assert_eq!(
+                        phi.dual(&f).is_ok(),
+                        dual_rational,
+                        "p mod {ell} = {}",
+                        p % ell
+                    );
+                    if dual_rational {
+                        check_small(&f, &e, ell, x0, &mut rng);
+                    }
+                    // Any orbit member generates the same kernel and isogeny.
+                    let other = SmallIsogeny::new(&f, &e, ell, orbit[orbit.len() - 1]).unwrap();
+                    assert_eq!(
+                        other.codomain(),
+                        SmallIsogeny::new(&f, &e, ell, x0).unwrap().codomain()
+                    );
+                    done += 1;
+                }
+            }
+        }
+    }
+}
+
+// ------------------------------------------------- addition tally ----
+
+/// A mixed workload over `f` touching every counted code path: schoolbook,
+/// Karatsuba, the NTT (squares and products), Newton reciprocals and
+/// remainders, product and remainder trees, inversions, and √élu.
+fn addition_workload<C: OpCounter>(f: &PrimeField<C>, inst: &Inst) -> Vec<u64> {
+    let mut rng = StdRng::seed_from_u64(0xadd5);
+    let p = f.p();
+    let mut out = Vec::new();
+    for &(la, lb) in &[
+        (5usize, 7usize),
+        (40, 40),
+        (300, 280),
+        (600, 600),
+        (900, 40),
+    ] {
+        let a: Vec<u64> = (0..la).map(|_| rng.gen_range(0..p)).collect();
+        let b: Vec<u64> = (0..lb).map(|_| rng.gen_range(0..p)).collect();
+        out.extend(poly::mul(f, &a, &b));
+        out.extend(poly::mul(f, &a, &a));
+        out.extend(poly::mul_karatsuba(f, &a, &b));
+        out.extend(mul_ntt(f, &a, &b));
+    }
+    let mut b: Vec<u64> = (0..150).map(|_| rng.gen_range(0..p)).collect();
+    b.push(1);
+    let a: Vec<u64> = (0..700).map(|_| rng.gen_range(0..p)).collect();
+    out.extend(MonicDivisor::new(b).unwrap().rem(f, &a));
+    let xs: Vec<u64> = (0..37).map(|_| rng.gen_range(0..p)).collect();
+    out.extend(ProductTree::new(f, &xs).evaluate(f, &a));
+    out.extend(poly::inv_series(f, &[3, 5, 7, 11], 200).unwrap());
+    let ximg = [12345u64, 678910];
+    let (ev, _) = sqrt_velu(f, &inst.curve, 101, inst.kernel_x, &ximg).unwrap();
+    out.extend(ev.images.iter().flatten().copied());
+    out
+}
+
+#[test]
+fn additions_are_opt_in_and_leave_frozen_counts_unchanged() {
+    let mut rng = StdRng::seed_from_u64(0xadd);
+    let inst = cm_instance(101, 61, &mut rng);
+    let plain = PrimeField::counted(inst.p).unwrap();
+    let with = PrimeField::counted_with_adds(inst.p).unwrap();
+    let none = PrimeField::new(inst.p).unwrap();
+    let r_plain = addition_workload(&plain, &inst);
+    let r_with = addition_workload(&with, &inst);
+    let r_none = addition_workload(&none, &inst);
+    // Same results, same M, W, I with and without additions requested.
+    assert_eq!(r_plain, r_with);
+    assert_eq!(r_plain, r_none);
+    let (t0, t1) = (plain.complete_tally(), with.complete_tally());
+    assert_eq!(t0.ops, t1.ops);
+    assert_eq!(t0.ops.mul_equivalents(91), t1.ops.mul_equivalents(91));
+    // Not requested: zero.  Requested: positive, in both domains.
+    assert_eq!((t0.adds.add, t0.adds.word_add), (0, 0));
+    assert!(t1.adds.add > 0 && t1.adds.word_add > 0);
+    assert!(t0.ops.word > 0, "the workload must reach the NTT");
+    // Deterministic.
+    let again = PrimeField::counted_with_adds(inst.p).unwrap();
+    let _ = addition_workload(&again, &inst);
+    assert_eq!(again.complete_tally(), t1);
+    // `a = 0` is Meq; the weight is linear in the additions.
+    assert_eq!(t1.weighted(91, 0.0), t1.ops.mul_equivalents(91) as f64);
+    assert_eq!(
+        t1.weighted(91, 0.5),
+        t1.ops.mul_equivalents(91) as f64 + 0.5 * (t1.adds.add + t1.adds.word_add) as f64
+    );
+    // reset clears the additions too.
+    with.reset_counts();
+    assert_eq!(with.complete_tally(), CompleteTally::default());
+}
+
+#[test]
+fn addition_counts_of_products_are_exact() {
+    let mut rng = StdRng::seed_from_u64(0xadd2);
+    // p < 2^61 < every NTT prime: no input reductions happen.
+    let p = random_prime(&mut rng, 60);
+    let f = PrimeField::counted_with_adds(p).unwrap();
+    // Schoolbook: la·lb − (la + lb − 1) additions, no word additions.
+    for (la, lb) in [(1usize, 1usize), (1, 9), (5, 7), (24, 24), (3, 100)] {
+        let a: Vec<u64> = (0..la).map(|_| rng.gen_range(0..p)).collect();
+        let b: Vec<u64> = (0..lb).map(|_| rng.gen_range(0..p)).collect();
+        f.reset_counts();
+        let _ = poly::mul_schoolbook(&f, &a, &b);
+        let t = f.add_tally();
+        assert_eq!((t.add, t.word_add), ((la * lb - (la + lb - 1)) as u64, 0));
+    }
+    // A hand count: (a0 + a1 Z)(b0 + b1 Z) = 4 products, 1 addition.
+    f.reset_counts();
+    let _ = poly::mul_schoolbook(&f, &[1, 2], &[3, 4]);
+    assert_eq!((f.tally().mul, f.add_tally().add), (4, 1));
+    // Karatsuba: its additions are the F_p add/sub calls plus the schoolbook
+    // leaves; a (25 × 25) product splits once and is recounted by hand:
+    // two sums of 12/13-term halves (12 + 13 adds), z0, z2, z1 schoolbooks,
+    // two subtractions of the length-(2·13−1) middle product from z1, and
+    // three add_into accumulations.
+    // Rather than restate the recursion, check the total is positive and
+    // equals the sum over an independent run.
+    let a: Vec<u64> = (0..64).map(|_| rng.gen_range(0..p)).collect();
+    f.reset_counts();
+    let r1 = poly::mul_karatsuba(&f, &a, &a);
+    let t1 = f.complete_tally();
+    let g = PrimeField::counted_with_adds(p).unwrap();
+    let r2 = poly::mul_karatsuba(&g, &a, &a);
+    assert_eq!(r1, r2);
+    assert_eq!(t1, g.complete_tally());
+    assert!(t1.adds.add > 0 && t1.adds.word_add == 0);
+    // NTT: exactly the data-independent formula, plus at most the 2n
+    // conditional Garner subtractions (p < 2^61, so inputs need none).
+    for (la, lb, sq) in [
+        (1usize, 1usize, false),
+        (3, 5, false),
+        (64, 64, true),
+        (100, 37, false),
+        (300, 300, false),
+        (513, 513, true),
+    ] {
+        let a: Vec<u64> = (0..la).map(|_| rng.gen_range(0..p)).collect();
+        let b: Vec<u64> = (0..lb).map(|_| rng.gen_range(0..p)).collect();
+        f.reset_counts();
+        let _ = if sq {
+            mul_ntt(&f, &a, &a)
+        } else {
+            mul_ntt(&f, &a, &b)
+        };
+        let t = f.add_tally();
+        let (wa, fa) = ntt_mul_add_cost(la, if sq { la } else { lb }, sq);
+        let n = (la + if sq { la } else { lb } - 1) as u64;
+        assert_eq!(t.add, fa, "{la}x{lb}");
+        assert!(
+            t.word_add >= wa && t.word_add <= wa + 2 * n,
+            "{la}x{lb}: {} not in [{wa}, {}]",
+            t.word_add,
+            wa + 2 * n
+        );
+    }
+    // Under PolyMul::Auto the choice of algorithm, hence M and W, does not
+    // depend on whether additions are counted.
+    for (la, lb) in [(255usize, 255usize), (256, 256), (600, 600), (2048, 300)] {
+        let a: Vec<u64> = (0..la).map(|_| rng.gen_range(0..p)).collect();
+        let b: Vec<u64> = (0..lb).map(|_| rng.gen_range(0..p)).collect();
+        let c = PrimeField::counted(p).unwrap();
+        let d = PrimeField::counted_with_adds(p).unwrap();
+        assert_eq!(poly::mul(&c, &a, &b), poly::mul(&d, &a, &b));
+        let (tc, td) = (c.tally(), d.tally());
+        assert_eq!((tc.mul, tc.word, tc.inv), (td.mul, td.word, td.inv));
+        assert_eq!(c.add_tally(), Default::default());
+    }
 }

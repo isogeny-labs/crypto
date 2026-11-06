@@ -1,0 +1,11 @@
+{"schema": "ecbench.spec/v1", "label": "genus-2 Jacobians: rho, BSGS and ADH/Gaudry index calculus",
+ "workloads": {"curves": [{"kind": "genus2_search", "p_bits": 10, "seed": 1, "max_cofactor": 16},
+                          {"kind": "genus2_search", "p_bits": 12, "seed": 1, "max_cofactor": 16}],
+               "targets_per_curve": 4, "target_seed": 20261025},
+ "arms": [
+  {"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}},
+  {"name": "rho-plain", "role": "candidate", "method": {"id": "rho.plain"}},
+  {"name": "bsgs-neg", "role": "candidate", "method": {"id": "bsgs.negation"}},
+  {"name": "ic-hec", "role": "candidate", "method": {"id": "ic.hyperelliptic"}},
+  {"name": "rho-neg-aa", "role": "control", "method": {"id": "rho.negation"}}],
+ "measurement": {"rounds": 3, "warmup": 1, "seed": 20261025, "isolation_required": "L0", "timeout_seconds": 600}}

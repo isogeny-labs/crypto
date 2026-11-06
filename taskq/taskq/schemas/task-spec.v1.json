@@ -96,6 +96,18 @@
         }
       }
     },
+    "checkpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file"],
+      "description": "For a resumable command. The program atomically writes file and file.sha256 in TASKQ_CHECKPOINT_DIR; on retry TASKQ_RESUME_FILE points to the newest verified prior attempt.",
+      "properties": {
+        "file": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$"
+        }
+      }
+    },
     "benchmark": {
       "type": "object",
       "additionalProperties": false,

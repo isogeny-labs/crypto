@@ -1,0 +1,51 @@
+\documentclass[10pt]{article}
+\usepackage[margin=0.74in]{geometry}
+\usepackage{amsmath,amssymb,booktabs,graphicx,url}
+\title{N18: Geometric Kummer Projection Certificate}
+\author{Exact frozen-model audit}
+\date{25 October 2026}
+\begin{document}\maketitle
+\noindent The declared $C_1/C_2$ charts are a linear image of the classical
+genus-2 Kummer embedding. For $s=x_1+x_2=-a_1$, $t=x_1x_2=a_0$,
+$y_i=b_1x_i+b_0$, and the frozen monic quintic, the corrected symmetric
+polynomial is
+\[
+F_0=2f_0+f_1s+2f_2t+f_3st+2f_4t^2+f_5st^2.
+\]
+Since $F_0-f(x_1)-f(x_2)=-(x_1-x_2)^2
+[f_2+f_3s+f_4s^2+f_5s(s^2-t)]$, the classical fourth coordinate is
+\[
+\kappa_4=\frac{F_0-2y_1y_2}{(x_1-x_2)^2}
+=b_1^2-f_2-f_3s-f_4s^2-f_5s(s^2-t).
+\]
+This is the published general-Kummer Mumford coordinate in Chung--Costello--Smith
+(CCS), \S6.3. Their \S7.4 linear map $\tau=MD$ is exactly the source $C_1$
+on all 21 frozen models; the $C_2$ direct chart is an exact change of basis.
+
+\begin{center}\begin{tabular}{lr}\toprule Evidence & Result\\\midrule
+Universal coefficient-basis identities & 6 / 6 exact over $\mathbb Z[s,t]$\\
+Published $\tau=C_1$ matrices & 21 / 21 exact fields\\
+Valid branch-point divisor checks & 21 / 21 exact fields\\
+Nonzero $\det C_1$ and $\det C_2$ & 21 / 21 each\\
+Degree-one and identity limits & written algebraic derivation\\
+Zero-output fallback integration & open\\
+New 1,260-target collector / rho ratio & not run / null\\\bottomrule\end{tabular}\end{center}
+
+\noindent Sending the second point to the odd-degree infinity and scaling
+by its inverse $x$-coordinate gives $(0,1,x_1,x_1^2)$; the further limit
+$x_1\to\infty$ gives $(0,0,0,1)$. These are written limits, not machine
+checks. $C_1$ maps the latter to the theta-null identity. N16 supplies
+nonzero polynomial continuation on colliding and $a_0=0$ classes.
+
+\noindent M\"uller's p.5 printed $F_0$ has $f_5st$, lacking one $t$;
+Arnth-Jensen--Flynn Eq. (4.2) independently prints $f_5st^2$. The exact
+certificate uses the corrected expression. CCS \S7.3 gives rational theta
+xADD; denominator clearing preserves the output identity wherever its
+cleared vector is nonzero. An all-zero output remains undefined. N11's
+public signed labels permit a total Jacobian recomputation fallback, but
+that path is not yet integrated or cold-priced. No new collector was run.
+
+\begin{center}\includegraphics[width=0.94\linewidth]{research/kummer_differential_collector_20261022/n18-geometric-embedding/status-graph.png}\end{center}
+\noindent The 21-row CSV, native producer, separate validator, protocol and
+primary-source digests accompany this packet.
+\end{document}

@@ -1,0 +1,103 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "conductor gap ell=8209, D=-19, hard kernel: crater vs 3 floors vs isomorphic twins, 1024 shared targets",
+ "description": "Large-sample rho retest of research/conductor_gap_cm_pairs_20261010 at ell=8209 under fresh seeds (ell=8209: four shards a-d of 1024 shared targets each, distinct target seeds, 4096 per curve in all); rho.plain is the sqrt(2) positive control; twins are the representation-noise negative control. Curve roles, in order: crater, floor1, floor2, floor3, crater-twin(u=3), floor1-twin(u=3).",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 320092037,
+    "a": 254576120,
+    "b": 276414759,
+    "gx": 1,
+    "gy": 23879176,
+    "r": 320091991,
+    "group_order": 320091991
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 320092037,
+    "a": 101186781,
+    "b": 57596093,
+    "gx": 0,
+    "gy": 112219098,
+    "r": 320091991,
+    "group_order": 320091991
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 320092037,
+    "a": 64570613,
+    "b": 54195252,
+    "gx": 0,
+    "gy": 5368294,
+    "r": 320091991,
+    "group_order": 320091991
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 320092037,
+    "a": 234001141,
+    "b": 79995391,
+    "gx": 5,
+    "gy": 53527325,
+    "r": 320091991,
+    "group_order": 320091991
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 320092037,
+    "a": 134775352,
+    "b": 168468038,
+    "gx": 9,
+    "gy": 4553678,
+    "r": 320091991,
+    "group_order": 320091991
+   },
+   {
+    "kind": "prime_explicit",
+    "p": 320092037,
+    "a": 193828336,
+    "b": 55494950,
+    "gx": 0,
+    "gy": 149087313,
+    "r": 320091991,
+    "group_order": 320091991
+   }
+  ],
+  "target_kind": "planted_shared",
+  "target_seed": 2026101804,
+  "targets_per_curve": 1024
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "rho-plain",
+   "role": "baseline",
+   "method": {
+    "id": "rho.plain"
+   }
+  },
+  {
+   "name": "rho-neg-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.negation"
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 1,
+  "warmup": 0,
+  "order": "alternate",
+  "seed": 20261018,
+  "isolation_required": "L2",
+  "timeout_seconds": 120
+ }
+}

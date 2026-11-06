@@ -1,0 +1,97 @@
+{
+  "schema": "pencil-native-preparation-receipt/v1",
+  "status": "passed_run_free_validation",
+  "observed_at_utc": "2026-10-29T22:41:51Z",
+  "repository_head_at_validation": "7d2629acab6fa3285e3091f2c3b459df62c0b533",
+  "source_state": "uncommitted_standalone_crate",
+  "rust_toolchain": {
+    "release": "1.99.1",
+    "commit": "58cf8f9c35b355199727627d07ae34a4e2846d67",
+    "host": "x86_64-unknown-linux-gnu"
+  },
+  "source_sha256": {
+    "Cargo.toml": "0d5fafc970dbb9b9d9fea33fcd0344c130c7184f732858b26fa1b2290c0a200e",
+    "Cargo.lock": "22228eb5115c49911bc588d440baf7528eba4a6dd69eda763598b52308225726",
+    "README.md": "028fa02346a36a8f9a1fd7f2ae1f43b1802e263d41f736dcda82228404641642",
+    "src/lib.rs": "31b4ec4a26899c990103747ac800becfb10eeca2c2e3d1001a7ac9a52734d231",
+    "src/main.rs": "42b328416d52f0416ed700446fd0f948a5a6d2da75aba9ba30985b9861bb0eed"
+  },
+  "retained_input_sha256": {
+    "../validation_inputs/manifest.json": "3fd89cb47c5e1b2fb5e91edd298da6865513bbd5e36c422acd67284f96a099b4",
+    "../prepared_specs/manifest.json": "31ac091fac15821fd86fbb3019e7a625376e3f86ae7da62a84bf60e654169179",
+    "source_archive_declared_sha256": "550f7178e30b60db62931a752b0c179beeef7ea99a96cf94486ff8aee631d339"
+  },
+  "pinned_ecbench": {
+    "path_at_validation": "/home/ec2-user/pencil-build-40919051188/ecbench",
+    "sha256": "adb19f3eed3f0365cf84a3dd2c605c5cc91f9b7903f8792a4c6ce510b1797dc3"
+  },
+  "native_preparation_binary_sha256": "054a65c4054e4cb66a65be0e2d47142b059983845696d024e44dbe1911a41d0d",
+  "software_checks": [
+    {
+      "command": "cargo +1.99.1 fmt --all -- --check",
+      "passed": true
+    },
+    {
+      "command": "cargo +1.99.1 test --release --locked",
+      "passed": true,
+      "tests_passed": 3,
+      "tests_failed": 0,
+      "log": "cargo-test-release-locked.log",
+      "log_sha256": "da539312932a97283da9c57c874a9b7f27f2d8b63f7682c8083e6f32d3ef7f2e"
+    },
+    {
+      "command": "cargo +1.99.1 clippy --release --all-targets --locked -- -D warnings",
+      "passed": true,
+      "log": "cargo-clippy-release-locked.log",
+      "log_sha256": "a604bc8e912529f04e351f65cf3bcd92ba6d7a84a3f2a4a0e2df4afe7035fb50"
+    },
+    {
+      "command": "cargo +1.99.1 build --release --locked",
+      "passed": true,
+      "log": "cargo-build-release-locked.log",
+      "log_sha256": "41b275ba0e321232ed10809e55c6d617e716250147b0ceaa7a95e4bc7d906fd4"
+    }
+  ],
+  "archive_plan_parity": {
+    "passed": true,
+    "result": "archive-parity-result.json",
+    "result_sha256": "26cab0d6c02fd49ee9e5cc805039d101e76c70939616732f6d268edb26f7e2f0",
+    "expected_workloads": 1260,
+    "observed_workloads": 1260,
+    "exact_retained_plan_bytes": true,
+    "identity_fields": [
+      "workload_id",
+      "target",
+      "target_seed",
+      "target_index",
+      "first_algorithm_seed",
+      "bits"
+    ]
+  },
+  "prepared_plan_parity": {
+    "passed": true,
+    "result": "prepared-parity-result.json",
+    "result_sha256": "13ef6ce70992a0649208eebad3b4bb6dc845fa020ea50d167bcb472ed2185a72",
+    "cohort_targets": 1260,
+    "cohort_planned_executions": 22680,
+    "cohort_measured_executions": 18900,
+    "cohort_warmup_executions": 3780,
+    "gate_targets": 61,
+    "gate_planned_executions": 1098,
+    "exact_retained_plan_bytes": true,
+    "prepared_specs_and_manifest_exact_retained_bytes": true
+  },
+  "archive_extraction_validation": {
+    "synthetic_native_zstd_tar_test_passed": true,
+    "projection_excludes_planted_answer": true,
+    "actual_frozen_archive_reextracted_in_this_validation": false,
+    "reason": "The frozen archive payload was not present locally; its retained hash-bound projection and all generated native plans were checked instead."
+  },
+  "execution_boundary": {
+    "ecbench_subcommand": "plan --doc",
+    "solver_executions_performed": 0,
+    "cohorts_launched": 0,
+    "cloud_jobs_launched": 0
+  },
+  "claim_boundary": "This receipt validates the native preparation implementation and run-free plan parity. It does not attest an empirical run, a timing or memory result, an unknown-scalar recovery, a cost ratio, or a source build for the pinned ecbench binary."
+}

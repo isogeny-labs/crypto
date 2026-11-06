@@ -1,0 +1,126 @@
+{
+  "dlp_instances": [
+    {
+      "JV_LIN": "sparse",
+      "card": "R3-D1",
+      "p": 53,
+      "seed": 1
+    },
+    {
+      "JV_LIN": "fast",
+      "card": "R3-D2",
+      "p": 53,
+      "seed": 1
+    }
+  ],
+  "k_per_family": {
+    "dense": 4,
+    "gaudry-d4": 3,
+    "gaudry-s4": 3,
+    "gaudry-s5": 1,
+    "jv-nagao": 3
+  },
+  "nonce": "390ee4d7e27df3970a4bddaa8a10b09ea36962f5d9e9f12e81fdf86330c1faac",
+  "procedure": "R3-C systems: within each family, ordered by sha256(nonce:R3-C:family:label), the first k taken. R3-D: per card, the (p, seed) with the smallest sha256(nonce:card:p:seed).",
+  "reached_by": "the full R3-C card command (one process, every family), so every system keeps its recorded index si and its counts are comparable exactly",
+  "sampled_systems": [
+    {
+      "delta": 64,
+      "family": "jv-nagao",
+      "label": "p53-3",
+      "p": 53,
+      "si": 3
+    },
+    {
+      "delta": 64,
+      "family": "jv-nagao",
+      "label": "p101-9c",
+      "p": 101,
+      "si": 21
+    },
+    {
+      "delta": 64,
+      "family": "jv-nagao",
+      "label": "p53-7",
+      "p": 53,
+      "si": 7
+    },
+    {
+      "delta": 64,
+      "family": "gaudry-s4",
+      "label": "p1039-2",
+      "p": 1039,
+      "si": 58
+    },
+    {
+      "delta": 64,
+      "family": "gaudry-s4",
+      "label": "p1039-6",
+      "p": 1039,
+      "si": 62
+    },
+    {
+      "delta": 64,
+      "family": "gaudry-s4",
+      "label": "p8191-1",
+      "p": 8191,
+      "si": 65
+    },
+    {
+      "delta": 512,
+      "family": "gaudry-d4",
+      "label": "p4093-3",
+      "p": 4093,
+      "si": 91
+    },
+    {
+      "delta": 512,
+      "family": "gaudry-d4",
+      "label": "p1033-1",
+      "p": 1033,
+      "si": 81
+    },
+    {
+      "delta": 512,
+      "family": "gaudry-d4",
+      "label": "p4093-5",
+      "p": 4093,
+      "si": 93
+    },
+    {
+      "delta": 4096,
+      "family": "gaudry-s5",
+      "label": "p13-0",
+      "p": 13,
+      "si": 96
+    },
+    {
+      "delta": 729,
+      "family": "dense",
+      "label": "n6-d3-p32-2",
+      "p": 4294967291,
+      "si": 234
+    },
+    {
+      "delta": 32,
+      "family": "dense",
+      "label": "n5-d2-p31-0",
+      "p": 2147483647,
+      "si": 193
+    },
+    {
+      "delta": 64,
+      "family": "dense",
+      "label": "n3-d4-p32-0",
+      "p": 4294967291,
+      "si": 133
+    },
+    {
+      "delta": 64,
+      "family": "dense",
+      "label": "n6-d2-p16-0",
+      "p": 65521,
+      "si": 217
+    }
+  ]
+}

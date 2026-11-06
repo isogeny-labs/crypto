@@ -1,0 +1,83 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-14-03
+experiment_id: BLINDSPOT-14
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+# Arm (b), 16-bit curve, bx = 7 targets 9-17 (including the 2 planted); p-ladder bx = 5 and 6 on the 20-, 24- and 28-bit curves (16 random + 2 planted).
+
+receipt: research/blindspots_20261018/14-prime-m4-cells/raw/receipt-card-03.json
+binds:
+  - {path: examples/blindspots_14_prime_m4.rs, sha256: f6696fc0cafff9120189072a7785452422d68c7944a2812d4667e27c8872b376}
+commands:
+  - id: make-dirs
+    argv: ["mkdir", "-p", "research/blindspots_20261018/14-prime-m4-cells/raw", "target/blindspots-14/card-03"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: build
+    argv: ["prlimit", "--as=4294967296", "rustc", "--edition", "2021", "-C", "opt-level=3", "-C", "codegen-units=1", "-C", "target-cpu=native", "-o", "target/blindspots-14/card-03/b14", "examples/blindspots_14_prime_m4.rs"]
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/14-prime-m4-cells/raw/card-03-build.stdout.log
+    stderr: research/blindspots_20261018/14-prime-m4-cells/raw/card-03-build.stderr.log
+  - id: tdec-b-b16-bx7-t09-18
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-14/card-03/b14", "tdec", "--bits", "16", "--arms", "b", "--bx", "7", "--targets", "16", "--planted", "2", "--check", "--t0", "9", "--t1", "18", "--bcap-madds", "100000000000", "--bcap-nnz", "120000000", "--bdeadline-s", "300", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx7-t09-18.jsonl"]
+    timeout_seconds: 300
+    success_exit_codes: [0]
+    stderr: research/blindspots_20261018/14-prime-m4-cells/raw/card-03-tdec-b-b16-bx7-t09-18.stderr.log
+    outputs: [research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b16-bx7-t09-18.jsonl]
+  - id: tdec-b-b20-bx5
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-14/card-03/b14", "tdec", "--bits", "20", "--arms", "b", "--bx", "5", "--targets", "16", "--planted", "2", "--check", "--bcap-madds", "100000000000", "--bcap-nnz", "120000000", "--bdeadline-s", "120", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b20-bx5.jsonl"]
+    timeout_seconds: 100
+    success_exit_codes: [0]
+    stderr: research/blindspots_20261018/14-prime-m4-cells/raw/card-03-tdec-b-b20-bx5.stderr.log
+    outputs: [research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b20-bx5.jsonl]
+  - id: tdec-b-b20-bx6
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-14/card-03/b14", "tdec", "--bits", "20", "--arms", "b", "--bx", "6", "--targets", "16", "--planted", "2", "--check", "--bcap-madds", "100000000000", "--bcap-nnz", "120000000", "--bdeadline-s", "120", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b20-bx6.jsonl"]
+    timeout_seconds: 100
+    success_exit_codes: [0]
+    stderr: research/blindspots_20261018/14-prime-m4-cells/raw/card-03-tdec-b-b20-bx6.stderr.log
+    outputs: [research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b20-bx6.jsonl]
+  - id: tdec-b-b24-bx5
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-14/card-03/b14", "tdec", "--bits", "24", "--arms", "b", "--bx", "5", "--targets", "16", "--planted", "2", "--check", "--bcap-madds", "100000000000", "--bcap-nnz", "120000000", "--bdeadline-s", "120", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b24-bx5.jsonl"]
+    timeout_seconds: 100
+    success_exit_codes: [0]
+    stderr: research/blindspots_20261018/14-prime-m4-cells/raw/card-03-tdec-b-b24-bx5.stderr.log
+    outputs: [research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b24-bx5.jsonl]
+  - id: tdec-b-b24-bx6
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-14/card-03/b14", "tdec", "--bits", "24", "--arms", "b", "--bx", "6", "--targets", "16", "--planted", "2", "--check", "--bcap-madds", "100000000000", "--bcap-nnz", "120000000", "--bdeadline-s", "120", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b24-bx6.jsonl"]
+    timeout_seconds: 100
+    success_exit_codes: [0]
+    stderr: research/blindspots_20261018/14-prime-m4-cells/raw/card-03-tdec-b-b24-bx6.stderr.log
+    outputs: [research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b24-bx6.jsonl]
+  - id: tdec-b-b28-bx5
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-14/card-03/b14", "tdec", "--bits", "28", "--arms", "b", "--bx", "5", "--targets", "16", "--planted", "2", "--check", "--bcap-madds", "100000000000", "--bcap-nnz", "120000000", "--bdeadline-s", "120", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b28-bx5.jsonl"]
+    timeout_seconds: 100
+    success_exit_codes: [0]
+    stderr: research/blindspots_20261018/14-prime-m4-cells/raw/card-03-tdec-b-b28-bx5.stderr.log
+    outputs: [research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b28-bx5.jsonl]
+  - id: tdec-b-b28-bx6
+    argv: ["prlimit", "--as=4294967296", "target/blindspots-14/card-03/b14", "tdec", "--bits", "28", "--arms", "b", "--bx", "6", "--targets", "16", "--planted", "2", "--check", "--bcap-madds", "100000000000", "--bcap-nnz", "120000000", "--bdeadline-s", "120", "--out", "research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b28-bx6.jsonl"]
+    timeout_seconds: 100
+    success_exit_codes: [0]
+    stderr: research/blindspots_20261018/14-prime-m4-cells/raw/card-03-tdec-b-b28-bx6.stderr.log
+    outputs: [research/blindspots_20261018/14-prime-m4-cells/raw/tdec-b-b28-bx6.jsonl]
+  - id: remove-bin
+    argv: ["rm", "-f", "target/blindspots-14/card-03/b14"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+  - id: remove-bin-dir
+    argv: ["rmdir", "target/blindspots-14/card-03"]
+    timeout_seconds: 10
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-14
+background: false
+write_scope:
+  - research/blindspots_20261018/14-prime-m4-cells/raw/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto. Run the command through the Bash tool with timeout 600000."

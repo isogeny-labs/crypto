@@ -309,6 +309,13 @@ the corrected MMT definition.
 - **The cyclic bound is a necessary condition.**  It assumes prime-cyclic
   degree 131 and a base of genus ≤ 1; it does not show that covers meeting it
   carry `A`.
+  *Update 2026-10-18:* bases of any genus are treated in
+  [`research/cover_decomposition_gap_search_20261018/`](../../cover_decomposition_gap_search_20261018/README.md)
+  §4: inside the window the only cyclic case is an unramified cover of a
+  genus-3 curve with `#Jac(F_2) = 131`, and a complete native census
+  (`examples/unramified_cyclic_cover_census.rs`) finds no genus-3 curve over
+  `F_2` with that Jacobian order.  So no carrier of `A` below genus 394 has a
+  geometric automorphism of order 131.
 - **The modular genus uses the split-cusp fact.**  It is validated at five
   levels, not proved here.  Without it the range is `[508,799,809, 509,348,929]`.
 - **Extrapolated costs are `L(1/2, √2)`.**  Calibrated against the exact model

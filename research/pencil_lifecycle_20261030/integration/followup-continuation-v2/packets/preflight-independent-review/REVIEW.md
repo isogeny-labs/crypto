@@ -1,0 +1,15 @@
+# Independent preflight source-fidelity review
+
+The proposed host correction applies cleanly to a private copy. Source tracing supports the exact-byte inventory and session/context joins of the integrated preflight. No new blocking discrepancy was found within its explicitly non-admitting software-validation scope.
+
+The old host gate recomputed only the short environment ID (first 12 digest hex characters). It did not compare the supplied full env_class_sha256 against the canonical class digest. The patch introduces recompute_class_identity, returning the existing short_id tuple, retains historical version selection and public recompute_class behavior, and compares both fields in preflight. Its new mutation changes the last digest character before rebuilding dependent hashes, so rejection targets this full-digest check rather than a stale outer hash.
+
+Inventory checks exactly nine routes and four frozen artifacts by raw SHA256, including certificate route joins and the separate upper gate. Preparation uses an exact field set and checks clock flags, offset ordering, derived durations, session and owner values. Session ID is derived using the actual producer formula; plan, host, launch, preparation and owner joins bind exact bytes. Child contexts are rebuilt with prepare_lifecycle_child and compared as complete envelopes, then checked as an ordered unique subset with exact generated leaf names. Actual-subset success is distinct from all-future-session completion.
+
+The file adapter hashes and parses the same bounded in-memory bytes. It rejects duplicate path strings, duplicate device/inode identities, final-component symlinks, nonregular files and aggregate overflow. O_NOFOLLOW does not prohibit parent-directory symlinks or '..'; this is a bounded evidence reader, not a filesystem confinement boundary. No authority or sandbox claim is made. Subsequent file mutation does not change the checked buffer but later execution custody remains external.
+
+The Clap DiagnosticPreflight variant dispatches check_file and propagates errors. The initial literal-string search did not locate the generated kebab-case name; subsequent enum/dispatch tracing confirms the integration. No missing CLI defect remains.
+
+Both stages keep scientific_execution_admitted=false; static inventory also keeps software_bindings_complete=false. The file report always states owner_authentication_verified=false and external_owner_verification_required=true. Self-supplied owner fields cannot authenticate provenance, and the full host digest cannot attest a live host. These boundaries are explicit rather than inferred admission.
+
+Review is independent source tracing and private patch application only, with no reviewer Rust build, root edit or scientific run. Parent owns the in-progress release build and qualification gates. Sources consulted: repository prospective preflight-review/PLAN.md; canonical::short_id; runner session/preparation and prepare_lifecycle_child producer; DiagnosticLaunch and ChildEnvelope validation; host capture and versioned class definitions. No new cryptographic or performance result is claimed.

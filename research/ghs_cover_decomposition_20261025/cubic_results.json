@@ -1,0 +1,86 @@
+{
+  "base_curve_equation_enumeration_checked": true,
+  "cover": "v^2+u^2*v=u^7+u^4+d*u, d^2=z+1",
+  "elliptic_factor_coefficients_low_to_high": [
+    8,
+    -3,
+    1
+  ],
+  "elliptic_order": 6,
+  "embedding_invariance_checked": true,
+  "factor_resultant": 72,
+  "fixture": "src/binary_ecc/cover_transfer.rs; GF(8), z^3+z+1, a=1, b=z+1 (word 3)",
+  "genus3_frobenius_coefficients_low_to_high": [
+    512,
+    -192,
+    192,
+    -48,
+    24,
+    -3,
+    1
+  ],
+  "integral_bezout_identity": "3*X*P_E(X)+(9-3*X)*(X^2+8)=72",
+  "jacobian_order": 486,
+  "map": "(u,v)->(u^3,u*v+d), degree 3",
+  "point_counts": [
+    {
+      "extension_degree": 1,
+      "field_size": 8,
+      "three_embedding_counts": [
+        6,
+        6,
+        6
+      ]
+    },
+    {
+      "extension_degree": 2,
+      "field_size": 64,
+      "three_embedding_counts": [
+        104,
+        104,
+        104
+      ]
+    },
+    {
+      "extension_degree": 3,
+      "field_size": 512,
+      "three_embedding_counts": [
+        558,
+        558,
+        558
+      ]
+    }
+  ],
+  "power_sums": [
+    3,
+    -39,
+    -45
+  ],
+  "prym_factor_coefficients_low_to_high": [
+    64,
+    0,
+    16,
+    0,
+    1
+  ],
+  "prym_factorization_over_Z": [
+    {
+      "coefficients_low_to_high": [
+        8,
+        0,
+        1
+      ],
+      "multiplicity": 2
+    }
+  ],
+  "prym_order": 81,
+  "schema": "cubic-cover-prym-audit/v1",
+  "source_group_placement": "The canonical pullback is annihilated by [3]id-pull*push, conditional on the checked norm-pullback identity; the Prym order alone is not a transfer map.",
+  "supersingular_elliptic_curve": "y^2+y=x^3 over GF(8)",
+  "supersingular_elliptic_curve_order": 9,
+  "supersingular_elliptic_factor_coefficients_low_to_high": [
+    8,
+    0,
+    1
+  ]
+}

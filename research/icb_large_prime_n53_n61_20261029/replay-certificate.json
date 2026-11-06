@@ -1,0 +1,61 @@
+{
+ "independent": true,
+ "method": "ecbench verify --replay-all on every session: every measured deterministic run re-executed in a fresh process with identical counts, every recovered scalar checked against its target",
+ "runs": [
+  {
+   "ok": true,
+   "receipt": "verify/n53-s1.verify.json",
+   "receipt_sha256": "4662a48da5b1fe659906677591e339ae8a65419f42b23f980c7d359750493205",
+   "recorded_by": "ecbench e0b8ac52",
+   "records": 240,
+   "replayed_by": "ecbench e0b8ac52 (same binary; every arm of a session runs in that session's binary)",
+   "replays": 240,
+   "reproduced": 240,
+   "run": "sessions/n53-s1",
+   "session_id": "ECBS1he3d16dfa3fd0",
+   "verified_records": 240
+  },
+  {
+   "ok": true,
+   "receipt": "verify/n53-s2.verify.json",
+   "receipt_sha256": "325571dd20eb47da4a9e6739708a032dc3fc38512242ad3982c64092fdbabe54",
+   "recorded_by": "ecbench e0b8ac52",
+   "records": 240,
+   "replayed_by": "ecbench e0b8ac52 (same binary; every arm of a session runs in that session's binary)",
+   "replays": 240,
+   "reproduced": 240,
+   "run": "sessions/n53-s2",
+   "session_id": "ECBS1h8d85cf7fb957",
+   "verified_records": 240
+  },
+  {
+   "ok": true,
+   "receipt": "verify/n61-s1.verify.json",
+   "receipt_sha256": "c8c01923f1799fcfe773c1819f6fd292886f950153f87848f89700f9ac01aaf1",
+   "recorded_by": "ecbench e0b8ac52",
+   "records": 72,
+   "replayed_by": "ecbench e0b8ac52 (same binary; every arm of a session runs in that session's binary)",
+   "replays": 72,
+   "reproduced": 72,
+   "run": "sessions/n61-s1",
+   "session_id": "ECBS1hfa970ce213ae",
+   "verified_records": 72
+  },
+  {
+   "ok": true,
+   "receipt": "verify/n61-s2.verify.json",
+   "receipt_sha256": "838d238ba3ea4e212554cf9cedb0e78cd00672860e7ca9ad8bbd014f7477b5a9",
+   "recorded_by": "ecbench e0b8ac52",
+   "records": 60,
+   "replayed_by": "ecbench e0b8ac52 (same binary; every arm of a session runs in that session's binary)",
+   "replays": 60,
+   "reproduced": 60,
+   "run": "sessions/n61-s2",
+   "session_id": "ECBS1h73249a282e37",
+   "verified_records": 60
+  }
+ ],
+ "scalars_verified": true,
+ "schema": "validation-gate/v1 replay certificate",
+ "status": "verified"
+}

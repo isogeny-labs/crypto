@@ -1,0 +1,4198 @@
+{
+  "analysis": {
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "bytes": 336305,
+        "kind": "summary",
+        "path": "evidence/results.json",
+        "sha256": "c106b5993831e9ac16a2954ef1a4f3d2dc3c8fb536a9e24ac101df8ae6bc6f39"
+      }
+    ],
+    "script": {
+      "bytes": 25895,
+      "kind": "analysis",
+      "path": "src/main.rs",
+      "sha256": "616ea1cdf52e3c7f8a475b06ddeef12ec634b6fe80dc7be4e5d531be6b7425bc"
+    },
+    "unmasked_at": null
+  },
+  "arms": [
+    {
+      "binary_sha256": "ca46e694853481bc82b91356d98f89eed089b7c84cf795dfb6b06c2deaa65672",
+      "commit": "7aea9c439d52db15a0e967d66720800805146e3e",
+      "id": "koblitz",
+      "image_digest": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:194ec662a87c1aca1be0a0420b230a45766da3b5217c79e8d05fdd03086d7de3",
+      "role": "reference"
+    },
+    {
+      "binary_sha256": "ca46e694853481bc82b91356d98f89eed089b7c84cf795dfb6b06c2deaa65672",
+      "commit": "7aea9c439d52db15a0e967d66720800805146e3e",
+      "id": "binary",
+      "image_digest": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:194ec662a87c1aca1be0a0420b230a45766da3b5217c79e8d05fdd03086d7de3",
+      "role": "candidate"
+    },
+    {
+      "binary_sha256": "ca46e694853481bc82b91356d98f89eed089b7c84cf795dfb6b06c2deaa65672",
+      "commit": "7aea9c439d52db15a0e967d66720800805146e3e",
+      "id": "prime",
+      "image_digest": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:194ec662a87c1aca1be0a0420b230a45766da3b5217c79e8d05fdd03086d7de3",
+      "role": "candidate"
+    }
+  ],
+  "backend": "isolab-k8s",
+  "created": "2026-10-27",
+  "export_id": "N83-IC-DEGREE-M2-M9-20261027-V2",
+  "files": [
+    {
+      "bytes": 336305,
+      "kind": "raw",
+      "path": "evidence/results.json",
+      "sha256": "c106b5993831e9ac16a2954ef1a4f3d2dc3c8fb536a9e24ac101df8ae6bc6f39"
+    },
+    {
+      "bytes": 124209,
+      "kind": "raw",
+      "path": "evidence/inputs.json",
+      "sha256": "67c84280824036652fc47702a5a15ceedf3acfe3511361c7f236198e79957bb3"
+    },
+    {
+      "bytes": 44226,
+      "kind": "summary",
+      "path": "evidence/observations.json",
+      "sha256": "0596714c99b7323d379e56e90260eb707e2ba6ec3e17a82182ab256b528ced5d"
+    },
+    {
+      "bytes": 57742,
+      "kind": "other",
+      "path": "evidence/raw-manifest.sha256",
+      "sha256": "44c2d6d49bbf0bada640519d8789639a1fabbe6f597494b12401685baef216af"
+    },
+    {
+      "bytes": 4120,
+      "kind": "raw",
+      "path": "evidence/controls.jsonl",
+      "sha256": "f8161cc6e715600461090ee62d8b6f904012da55a0aeda7fa2f663e0e52dee29"
+    },
+    {
+      "bytes": 4409,
+      "kind": "other",
+      "path": "evidence/singular-version.txt",
+      "sha256": "59d21bc71d5027f7e564b9b299ebc0452ce37a16c8b4a286134776c05ef5fa8b"
+    },
+    {
+      "bytes": 315,
+      "kind": "receipt",
+      "path": "request-v2.json",
+      "sha256": "db0db9a6cc8605fac0ae01b4c04257b7441780e171fb91d1d9094fc5a17a2232"
+    },
+    {
+      "bytes": 852,
+      "kind": "receipt",
+      "path": "submission-v2.json",
+      "sha256": "1dd85e841a4235f4d5f0b27f55b7f797521bec83d8a9c773a19da3061b6b8342"
+    },
+    {
+      "bytes": 5346,
+      "kind": "receipt",
+      "path": "terminal-v2.json",
+      "sha256": "be759f5457899294982f8f3c3ba111b9d20d19566ead61cbb20b451946c97bd4"
+    },
+    {
+      "bytes": 881,
+      "kind": "receipt",
+      "path": "evidence/storage.json",
+      "sha256": "5d1b9031bd3cd1c586570822bde246cf1b51ff71055b90d07e41f278a1dda727"
+    },
+    {
+      "bytes": 18144,
+      "kind": "analysis",
+      "path": "src/bin/report.rs",
+      "sha256": "586a5798a4af391918168341365fbe4f581b82f4d53225a2f85441f31448c4bf"
+    }
+  ],
+  "flow": {
+    "attempted": 96,
+    "completed": 43,
+    "excluded": [],
+    "interrupted": 0,
+    "not_completed": 53,
+    "planned": 96,
+    "resumed": 0
+  },
+  "host": {
+    "class_id": "eks-spot-L0",
+    "path": "evidence/host.txt",
+    "sha256": "20516a59c15c2ea4b7d67cd31449ec992c6ec9964cfeb322a9152ad989f5e471",
+    "summary": {
+      "cpu_model": "Intel(R) Xeon(R) 6975P-C",
+      "hypervisor": "Amazon EC2",
+      "isolation_tier_max": "L0",
+      "kernel": "Linux n83-degree-m2-m9-20261027-v2-vhksd 6.18.54-121.166.amzn2023.x86_64 #2 SMP PREEMPT_DYNAMIC Tue Oct  6 23:11:34 UTC 2026 x86_64 GNU/Linux",
+      "logical_cpus": 8,
+      "memory_bytes": null,
+      "spot": true
+    }
+  },
+  "notes": [
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "96 recorded attempts; 0 completed computations, 0 finite top-form degrees and 53 resource limits. Modes are different computations, not independent replicates. V1 startup failed before target data; receipt retained separately."
+    }
+  ],
+  "producer": {
+    "model": null,
+    "role": "producer",
+    "runtime": "codex",
+    "session": "n83-degree-m2-m9-20261027-v2"
+  },
+  "protocol": {
+    "path": "protocol-v2.json",
+    "protocol_id": "N83-IC-DEGREE-M2-M9-20261027",
+    "sha256": "3098c2c81a50ed9825f0ac6fa56c40d627583c15a7b4062e317847386f096396",
+    "version": 2
+  },
+  "reviews_dir": "reviews",
+  "runs": [
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m2-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.006302492,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m2-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m2-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.016125142,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m2-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m2-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.006326464,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m2-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m2-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.016653059,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m2-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m2-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.00630206,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m2-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m2-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.016124552,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m2-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m2-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.00632703,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m2-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m2-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.016652642,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m2-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m2-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.012628608,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m2-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m2-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.012436417,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m2-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m2-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.007783418,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m2-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m2-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "1",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.006995095,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m2-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m3-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.005682302,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m3-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m3-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.005465036,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m3-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m3-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.023539875,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m3-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m3-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.027741797,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m3-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m3-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.005988063,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m3-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m3-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.007811642,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m3-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m3-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.025522603,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m3-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m3-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.030294409,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m3-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m3-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.005248851,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m3-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m3-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "2",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.004500383,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m3-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m3-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 4.340808914,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m3-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m3-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "3",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 5.087663956,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m3-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m4-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.019322855,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m4-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m4-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.015239198,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m4-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m4-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.056689741,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m4-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m4-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.053044679,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m4-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m4-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.018094627,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m4-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m4-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.01540794,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m4-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m4-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.049367619,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m4-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m4-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.049494476,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m4-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m4-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 21.001503054,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m4-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m4-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "4",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 24.186158448,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m4-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m4-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 3.52755397,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m4-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m4-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "5",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 6.69378449,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m4-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m5-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.043870051,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m5-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m5-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.0367059,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m5-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m5-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.095428674,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m5-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m5-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.066885437,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m5-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m5-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.032974953,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m5-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m5-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.031720231,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m5-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m5-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.09228729,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m5-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m5-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.074540862,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m5-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m5-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 6.12344751,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m5-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m5-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "6",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 6.547325853,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m5-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m5-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 3.065223561,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m5-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m5-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "7",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 4.587837751,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m5-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m6-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.045999697,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m6-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m6-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.039119273,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m6-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m6-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 29.313963983,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m6-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m6-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.090649523,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m6-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m6-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.042838508,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m6-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m6-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.04940849,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m6-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m6-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 30.317236688,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m6-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m6-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.089753865,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m6-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m6-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 3.261860974,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m6-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m6-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "8",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 3.598300455,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m6-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m6-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 2.807352658,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m6-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m6-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "9",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 3.234001122,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m6-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m7-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.068906395,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m7-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m7-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.075546417,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m7-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m7-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 30.581733691,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m7-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m7-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 27.184482557,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m7-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m7-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.075570551,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m7-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m7-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.073626638,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m7-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m7-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 29.271987447,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m7-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m7-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 26.561635536,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m7-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m7-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 3.467013207,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m7-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m7-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "10",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 3.400994711,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m7-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m7-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 3.414601475,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m7-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m7-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "11",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 3.47187472,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m7-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m8-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.083964535,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m8-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m8-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.07737006,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m8-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m8-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "13",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 35.117799392,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m8-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m8-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "13",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 36.305307304,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m8-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m8-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.088251268,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m8-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m8-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.048887375,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m8-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m8-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "13",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 35.59912358,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m8-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m8-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "13",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 35.202779361,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m8-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m8-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 3.204182268,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m8-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m8-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "12",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 3.286359062,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m8-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m8-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "13",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 3.21949587,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m8-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m8-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "13",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 3.2947412,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m8-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m9-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "14",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 28.211341025,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m9-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m9-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "14",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 27.388687571,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m9-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m9-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "15",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 38.342620161,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "koblitz-m9-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "koblitz",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/koblitz-m9-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "15",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 37.78172566,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "koblitz-m9-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m9-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "14",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 28.108855133,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m9-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m9-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "14",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 27.04207922,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m9-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m9-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "15",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 39.383579784,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "binary-m9-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "binary",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/binary-m9-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "15",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 40.103463504,
+        "wall_valid": false
+      },
+      "outcome_class": "not_completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "binary-m9-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "timeout",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m9-planted/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "14",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 2.416279614,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m9-planted-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m9-planted/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "14",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 4.23797214,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m9-planted-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m9-natural/top/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "15",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 3.130634921,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "prime-m9-natural-top",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    },
+    {
+      "arm": "prime",
+      "artifacts": [],
+      "attempts": 1,
+      "backend_ref": "s3://isolab-results-104186811093-us-east-2/runs/n83-degree-m2-m9-20261027-v2/25e3489a-612a-4d40-aaa4-93a1b963ff30/inputs/prime-m9-natural/affine/result.json",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": null,
+      "instance_id": "15",
+      "isolation": {
+        "blockers": [
+          "Ordinary Spot VM process; no timing qualification"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {},
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": 5.333218458,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 1,
+      "resumed": 0,
+      "run_id": "prime-m9-natural-affine",
+      "seed": 20261027,
+      "started_at": null,
+      "status": "failed",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer COMPLETE/error checks, affine input reduction and planted witness; not independent replay"
+      },
+      "warmup": false,
+      "worker": "n83-degree-m2-m9-20261027-v2-vhksd"
+    }
+  ],
+  "schema": "experiment.export/v1",
+  "source": {
+    "commit": "7f1032135285980420b0be1799f9deec361c74e3",
+    "dirty": false,
+    "repo": "crypto"
+  }
+}

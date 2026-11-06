@@ -1,0 +1,526 @@
+{
+  "bootstrap": {
+    "interval": "percentile 90%",
+    "resamples": 10000,
+    "seed": 20261019
+  },
+  "curves": [
+    {
+      "arms": {
+        "ic-abscissa": {
+          "by_weight": [
+            {
+              "phases_s": {
+                "factor_base": 0.0,
+                "linear_algebra": 0.0,
+                "oracle_setup": 14.417053201619918,
+                "relations": 4.7133978774236915,
+                "verify": 0.010753899499195531
+              },
+              "relations_probe_s": 0.0,
+              "relations_target_draw_s": 4.7133978774236915,
+              "s_ci90": [
+                18.819526826062894,
+                19.44802183935368
+              ],
+              "s_mean": 19.1412049785428,
+              "w": 0.0
+            },
+            {
+              "phases_s": {
+                "factor_base": 0.02123468409047499,
+                "linear_algebra": 0.04860485191308027,
+                "oracle_setup": 14.417053201619918,
+                "relations": 5.536170406637293,
+                "verify": 0.010753899499195531
+              },
+              "relations_probe_s": 0.8227725292135993,
+              "relations_target_draw_s": 4.7133978774236915,
+              "s_ci90": [
+                19.649573173409973,
+                20.40382586638992
+              ],
+              "s_mean": 20.033817043759953,
+              "w": 0.1
+            },
+            {
+              "phases_s": {
+                "factor_base": 0.21234684090474973,
+                "linear_algebra": 0.48604851913080266,
+                "oracle_setup": 14.417053201619918,
+                "relations": 12.941123169559685,
+                "verify": 0.010753899499195531
+              },
+              "relations_probe_s": 8.227725292135995,
+              "relations_target_draw_s": 4.7133978774236915,
+              "s_ci90": [
+                27.07188580266679,
+                28.971858734919998
+              ],
+              "s_mean": 28.067325630714343,
+              "w": 1.0
+            }
+          ],
+          "relations_found": 3762.0,
+          "runs": 32,
+          "targets_per_run_mean": 12054.65625,
+          "targets_tried": 385749.0,
+          "verified": 32,
+          "yield": 0.009752455612328223,
+          "yield_ci90": [
+            0.009452200348277796,
+            0.010062705831041607
+          ]
+        },
+        "ic-knownlog": {
+          "by_weight": [
+            {
+              "phases_s": {
+                "factor_base": 0.06964430151859967,
+                "linear_algebra": 0.0,
+                "oracle_setup": 14.417053201619918,
+                "relations": 4.117452613509942,
+                "verify": 0.010753899499195531
+              },
+              "relations_probe_s": 0.0,
+              "relations_target_draw_s": 4.117452613509942,
+              "s_ci90": [
+                17.65204594313039,
+                19.718800334580934
+              ],
+              "s_mean": 18.614904016147644,
+              "w": 0.0
+            },
+            {
+              "phases_s": {
+                "factor_base": 0.06964430151859967,
+                "linear_algebra": 0.0,
+                "oracle_setup": 14.417053201619918,
+                "relations": 4.840728101543582,
+                "verify": 0.010753899499195531
+              },
+              "relations_probe_s": 0.7232754880336418,
+              "relations_target_draw_s": 4.117452613509942,
+              "s_ci90": [
+                18.201994815872684,
+                20.640121470782557
+              ],
+              "s_mean": 19.338179504181294,
+              "w": 0.1
+            },
+            {
+              "phases_s": {
+                "factor_base": 0.06964430151859967,
+                "linear_algebra": 0.0,
+                "oracle_setup": 14.417053201619918,
+                "relations": 11.350207493846359,
+                "verify": 0.010753899499195531
+              },
+              "relations_probe_s": 7.232754880336417,
+              "relations_target_draw_s": 4.117452613509942,
+              "s_ci90": [
+                23.034810053072466,
+                29.066243406417403
+              ],
+              "s_mean": 25.847658896484067,
+              "w": 1.0
+            }
+          ],
+          "relations_found": 32.0,
+          "runs": 32,
+          "targets_per_run_mean": 10598.90625,
+          "targets_tried": 339165.0,
+          "verified": 32,
+          "yield": 0.00009434935798210311,
+          "yield_ci90": [
+            0.00007315840853027044,
+            0.00012657176421262473
+          ]
+        },
+        "rho-neg": {
+          "by_weight": [
+            {
+              "phases_s": {
+                "factor_base": 0.0,
+                "linear_algebra": 0.0,
+                "oracle_setup": 0.0,
+                "relations": 0.0,
+                "verify": 0.0
+              },
+              "relations_probe_s": 0.0,
+              "relations_target_draw_s": 0.0,
+              "s_ci90": [
+                0.9713289025830912,
+                1.3002189956001546
+              ],
+              "s_mean": 1.134483054409676,
+              "w": 0.0
+            },
+            {
+              "phases_s": {
+                "factor_base": 0.0,
+                "linear_algebra": 0.0,
+                "oracle_setup": 0.0,
+                "relations": 0.0,
+                "verify": 0.0
+              },
+              "relations_probe_s": 0.0,
+              "relations_target_draw_s": 0.0,
+              "s_ci90": [
+                1.0598778766340071,
+                1.4168027882066123
+              ],
+              "s_mean": 1.2353350015781235,
+              "w": 0.1
+            },
+            {
+              "phases_s": {
+                "factor_base": 0.0,
+                "linear_algebra": 0.0,
+                "oracle_setup": 0.0,
+                "relations": 0.0,
+                "verify": 0.0
+              },
+              "relations_probe_s": 0.0,
+              "relations_target_draw_s": 0.0,
+              "s_ci90": [
+                1.8272027452650978,
+                2.4800007179399737
+              ],
+              "s_mean": 2.1430025260941523,
+              "w": 1.0
+            }
+          ],
+          "relations_found": 0.0,
+          "runs": 32,
+          "targets_per_run_mean": 0.0,
+          "targets_tried": 0.0,
+          "verified": 32,
+          "yield": null,
+          "yield_ci90": [
+            null,
+            null
+          ]
+        }
+      },
+      "knownlog_over_abscissa": {
+        "s_ratios": [
+          {
+            "online_s_ratio": 0.8738513722558833,
+            "online_s_ratio_ci90": [
+              0.6723570437129602,
+              1.1070476172431927
+            ],
+            "total_s_ratio": 0.9725042930690552,
+            "total_s_ratio_ci90": [
+              0.9218835568344417,
+              1.0302562800510535
+            ],
+            "w": 0.0
+          },
+          {
+            "online_s_ratio": 0.8746256002944995,
+            "online_s_ratio_ci90": [
+              0.6658150630694587,
+              1.1114230018660018
+            ],
+            "total_s_ratio": 0.9652768347609857,
+            "total_s_ratio_ci90": [
+              0.9076943309469023,
+              1.0300667119496905
+            ],
+            "w": 0.1
+          },
+          {
+            "online_s_ratio": 0.8771671729718684,
+            "online_s_ratio_ci90": [
+              0.6639689290404283,
+              1.1318843554134388
+            ],
+            "total_s_ratio": 0.9209163436718291,
+            "total_s_ratio_ci90": [
+              0.8193851655323567,
+              1.0313208111303527
+            ],
+            "w": 1.0
+          }
+        ],
+        "yield_ratio": 0.00967442065184431,
+        "yield_ratio_ci90": [
+          0.007449362689212685,
+          0.013008850769035653
+        ]
+      },
+      "log2_r": 23.032552438447762,
+      "r": 8580037.0,
+      "rho_neg_s_mean_by_weight": [
+        1.134483054409676,
+        1.2353350015781235,
+        2.1430025260941523
+      ],
+      "session_dir": "/tmp/claude-501/dry-c1"
+    },
+    {
+      "arms": {
+        "ic-abscissa": {
+          "by_weight": [
+            {
+              "phases_s": {
+                "factor_base": 0.0,
+                "linear_algebra": 0.0,
+                "oracle_setup": 15.512304417815127,
+                "relations": 4.652107308263489,
+                "verify": 0.008816856980215629
+              },
+              "relations_probe_s": 0.0,
+              "relations_target_draw_s": 4.652107308263489,
+              "s_ci90": [
+                19.86996893194464,
+                20.481357620014748
+              ],
+              "s_mean": 20.17322858305883,
+              "w": 0.0
+            },
+            {
+              "phases_s": {
+                "factor_base": 0.019819489911420088,
+                "linear_algebra": 0.040639676328009126,
+                "oracle_setup": 15.512304417815127,
+                "relations": 5.484770610991633,
+                "verify": 0.008816856980215629
+              },
+              "relations_probe_s": 0.8326633027281437,
+              "relations_target_draw_s": 4.652107308263489,
+              "s_ci90": [
+                20.71339516978114,
+                21.425864262124627
+              ],
+              "s_mean": 21.0663510520264,
+              "w": 0.1
+            },
+            {
+              "phases_s": {
+                "factor_base": 0.19819489911420082,
+                "linear_algebra": 0.4063967632800912,
+                "oracle_setup": 15.512304417815127,
+                "relations": 12.978740335544927,
+                "verify": 0.008816856980215629
+              },
+              "relations_probe_s": 8.326633027281437,
+              "relations_target_draw_s": 4.652107308263489,
+              "s_ci90": [
+                28.195881189548995,
+                29.996841562356636
+              ],
+              "s_mean": 29.104453272734556,
+              "w": 1.0
+            }
+          ],
+          "relations_found": 4098.0,
+          "runs": 32,
+          "targets_per_run_mean": 15527.9375,
+          "targets_tried": 496894.0,
+          "verified": 32,
+          "yield": 0.008247231803966238,
+          "yield_ci90": [
+            0.008043159547775092,
+            0.008460046222033682
+          ]
+        },
+        "ic-knownlog": {
+          "by_weight": [
+            {
+              "phases_s": {
+                "factor_base": 0.06409821500445735,
+                "linear_algebra": 0.0,
+                "oracle_setup": 15.512304417815127,
+                "relations": 3.933726228359324,
+                "verify": 0.008816856980215629
+              },
+              "relations_probe_s": 0.0,
+              "relations_target_draw_s": 3.933726228359324,
+              "s_ci90": [
+                18.54936802474638,
+                20.56926637749144
+              ],
+              "s_mean": 19.51894571815912,
+              "w": 0.0
+            },
+            {
+              "phases_s": {
+                "factor_base": 0.06409821500445735,
+                "linear_algebra": 0.0,
+                "oracle_setup": 15.512304417815127,
+                "relations": 4.638318816719906,
+                "verify": 0.008816856980215629
+              },
+              "relations_probe_s": 0.7045925883605819,
+              "relations_target_draw_s": 3.933726228359324,
+              "s_ci90": [
+                19.05271250011644,
+                21.521894250032712
+              ],
+              "s_mean": 20.2235383065197,
+              "w": 0.1
+            },
+            {
+              "phases_s": {
+                "factor_base": 0.06409821500445735,
+                "linear_algebra": 0.0,
+                "oracle_setup": 15.512304417815127,
+                "relations": 10.979652111965143,
+                "verify": 0.008816856980215629
+              },
+              "relations_probe_s": 7.045925883605817,
+              "relations_target_draw_s": 3.933726228359324,
+              "s_ci90": [
+                23.693861594975328,
+                29.70198809712757
+              ],
+              "s_mean": 26.564871601764935,
+              "w": 1.0
+            }
+          ],
+          "relations_found": 32.0,
+          "runs": 32,
+          "targets_per_run_mean": 13141.9375,
+          "targets_tried": 420542.0,
+          "verified": 32,
+          "yield": 0.00007609228091367806,
+          "yield_ci90": [
+            0.00005930637487930226,
+            0.00010316058234148732
+          ]
+        },
+        "rho-neg": {
+          "by_weight": [
+            {
+              "phases_s": {
+                "factor_base": 0.0,
+                "linear_algebra": 0.0,
+                "oracle_setup": 0.0,
+                "relations": 0.0,
+                "verify": 0.0
+              },
+              "relations_probe_s": 0.0,
+              "relations_target_draw_s": 0.0,
+              "s_ci90": [
+                0.8311982964542447,
+                1.0730584283316809
+              ],
+              "s_mean": 0.9527904647707545,
+              "w": 0.0
+            },
+            {
+              "phases_s": {
+                "factor_base": 0.0,
+                "linear_algebra": 0.0,
+                "oracle_setup": 0.0,
+                "relations": 0.0,
+                "verify": 0.0
+              },
+              "relations_probe_s": 0.0,
+              "relations_target_draw_s": 0.0,
+              "s_ci90": [
+                0.9081480024220697,
+                1.169071654154257
+              ],
+              "s_mean": 1.0381773664819096,
+              "w": 0.1
+            },
+            {
+              "phases_s": {
+                "factor_base": 0.0,
+                "linear_algebra": 0.0,
+                "oracle_setup": 0.0,
+                "relations": 0.0,
+                "verify": 0.0
+              },
+              "relations_probe_s": 0.0,
+              "relations_target_draw_s": 0.0,
+              "s_ci90": [
+                1.5708253197470483,
+                2.0537410033972616
+              ],
+              "s_mean": 1.8066594818823027,
+              "w": 1.0
+            }
+          ],
+          "relations_found": 0.0,
+          "runs": 32,
+          "targets_per_run_mean": 0.0,
+          "targets_tried": 0.0,
+          "verified": 32,
+          "yield": null,
+          "yield_ci90": [
+            null,
+            null
+          ]
+        }
+      },
+      "knownlog_over_abscissa": {
+        "s_ratios": [
+          {
+            "online_s_ratio": 0.8458715365375175,
+            "online_s_ratio_ci90": [
+              0.6323307165755607,
+              1.0875470724693495
+            ],
+            "total_s_ratio": 0.9675667748369655,
+            "total_s_ratio_ci90": [
+              0.9172082818566426,
+              1.0217989135483418
+            ],
+            "w": 0.0
+          },
+          {
+            "online_s_ratio": 0.8459200296333452,
+            "online_s_ratio_ci90": [
+              0.6256879802695504,
+              1.0902029904401476
+            ],
+            "total_s_ratio": 0.9599924664966776,
+            "total_s_ratio_ci90": [
+              0.9022559752967912,
+              1.022474413183367
+            ],
+            "w": 0.1
+          },
+          {
+            "online_s_ratio": 0.8460766567611081,
+            "online_s_ratio_ci90": [
+              0.6179135710094356,
+              1.0975287301836731
+            ],
+            "total_s_ratio": 0.9127425055137959,
+            "total_s_ratio_ci90": [
+              0.8094252345823487,
+              1.0211303917932797
+            ],
+            "w": 1.0
+          }
+        ],
+        "yield_ratio": 0.009226402594514677,
+        "yield_ratio_ci90": [
+          0.007173137608315734,
+          0.012620674229359944
+        ]
+      },
+      "log2_r": 23.72887763252725,
+      "r": 13902853.0,
+      "rho_neg_s_mean_by_weight": [
+        0.9527904647707545,
+        1.0381773664819096,
+        1.8066594818823027
+      ],
+      "session_dir": "/tmp/claude-501/dry-c2"
+    }
+  ],
+  "schema": "generator_effect_dryrun_summary/v1",
+  "status": "SCRATCH dry run, not data; PROTOCOL.md not frozen",
+  "weights_gae_per_unpriced_op": [
+    0.0,
+    0.1,
+    1.0
+  ]
+}

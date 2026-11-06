@@ -21,7 +21,9 @@ use crypto_lib::cryptanalysis::matrix_f5_f2::{
     canonical_row_space_fingerprint, matrix_f5_f2_with_form_timed, F5OutputForm,
 };
 use crypto_lib::cryptanalysis::pq_f4_f2::groebner_basis_f4;
-use crypto_lib::cryptanalysis::pq_groebner_f2::{groebner_basis_f2_stats, F2BoolMono, F2BoolPoly};
+use crypto_lib::cryptanalysis::pq_groebner_f2::{
+    groebner_basis_f2_stats, mask_from64, F2BoolMono, F2BoolPoly,
+};
 use serde_json::json;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
@@ -47,8 +49,10 @@ fn system(n: usize, m: usize, seed: u64) -> Vec<F2BoolPoly> {
             let chosen: Vec<u64> = monos.iter().copied().filter(|_| rnd() & 1 == 1).collect();
             // fix the constant so the planted point is a zero
             let val = chosen.iter().filter(|&&t| t & planted == t).count() & 1;
-            let mut terms: Vec<F2BoolMono> =
-                chosen.into_iter().map(F2BoolMono::from_mask).collect();
+            let mut terms: Vec<F2BoolMono> = chosen
+                .into_iter()
+                .map(|m| F2BoolMono::from_mask(mask_from64(m)))
+                .collect();
             if val == 1 {
                 // toggles the constant term: `from_monos` cancels pairs
                 terms.push(F2BoolMono::from_mask(0));

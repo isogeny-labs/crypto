@@ -1,0 +1,167 @@
+{
+  "schema": "research.proof-packet-status/v1",
+  "task": "T-1213",
+  "kind": "polynomial_residual_acceptance",
+  "main_declarations": 6,
+  "control_declarations": 8,
+  "readback": [
+    {
+      "name": "ResidualAcceptance.monic_list_natDegree",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ResidualAcceptance.monic_list",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ResidualAcceptance.shape_valid",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ResidualAcceptance.acceptance_iff_divisibility",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ResidualAcceptance.accepted_valid",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ResidualAcceptance.complete_valid_test",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ResidualAcceptanceControls.identity",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ResidualAcceptanceControls.linear",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ResidualAcceptanceControls.nondivisible",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ResidualAcceptanceControls.quadratic",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ResidualAcceptanceControls.degree_guard",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ResidualAcceptanceControls.top_guard",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ResidualAcceptanceControls.fuel_reject",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "name": "ResidualAcceptanceControls.zero_residual",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    }
+  ],
+  "checks": {
+    "guards2": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "acceptance1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "controls1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    },
+    "readback1": {
+      "native_exit_code": 0,
+      "input_bindings_unchanged": true,
+      "gate_exit_code": 0
+    }
+  },
+  "failed_attempts": [
+    "guards1"
+  ],
+  "residual_producer": {
+    "path": "/var/tmp/pencil-residual-construction-20261101-v1",
+    "main_declarations": 5,
+    "control_and_helper_declarations": 12,
+    "readbacks": 17
+  },
+  "independent_review": {
+    "path": "/var/tmp/independent-residual-review-20261101",
+    "main_declarations": 11,
+    "producer_controls": 20,
+    "reviewer_controls": 6,
+    "readbacks": 37,
+    "model_fidelity": "faithful_scoped",
+    "native_bridge": "partial",
+    "full_review_workflow_complete": false
+  },
+  "full_review_workflow_complete": false,
+  "compiled_rust_equivalence": "not proved",
+  "scientific_execution": false,
+  "cost_ratio": null,
+  "upstream_compiled_dependencies": "retained trust boundary"
+}

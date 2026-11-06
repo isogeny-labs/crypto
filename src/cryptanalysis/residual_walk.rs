@@ -191,6 +191,7 @@ impl FixedFactor {
 
 /// `base^e mod p`.
 pub fn pow_mod(mut base: u64, mut e: u64, p: u64) -> u64 {
+    super::jv_bitops::hook_pow(p, e);
     let mut acc = 1u64 % p;
     base %= p;
     while e > 0 {
@@ -215,6 +216,7 @@ pub fn pow_mod(mut base: u64, mut e: u64, p: u64) -> u64 {
 /// this was first written with.  It walks the same sequence, so it
 /// returns the same value for every input, units or not.
 pub fn inv_mod(a: u64, p: u64) -> u64 {
+    super::jv_bitops::hook_inv(p);
     let (mut old_r, mut r) = (a % p, p);
     // |s_{i−1}| and |s_i|, with s_i = (−1)^i·|s_i| (s_1 = 0).
     let (mut old_s, mut s) = (1u64, 0u64);

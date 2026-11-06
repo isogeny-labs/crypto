@@ -1,0 +1,24 @@
+   Compiling pencil-native-canonical-export v0.1.0 (/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_canonical_export)
+    Finished `release` profile [optimized] target(s) in 2.15s
+     Running tests/historical_hash.rs (target/release/deps/historical_hash-3f32051f8f765a5f)
+
+running 1 test
+test preserved_historical_canonical_protocol_hash_matches ... FAILED
+
+failures:
+
+---- preserved_historical_canonical_protocol_hash_matches stdout ----
+
+thread 'preserved_historical_canonical_protocol_hash_matches' (2368573) panicked at tests/historical_hash.rs:8:2:
+assertion `left == right` failed
+  left: "e00941ff8f17bb41091fcc11fcef11ff5137325da3127e7c85b1a461b56bd036"
+ right: "0f5e18e3ac9b6510d81b7dad67e2498a4c0d71dd41a66d6d8fd3e55a50b3f594"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    preserved_historical_canonical_protocol_hash_matches
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `--test historical_hash`

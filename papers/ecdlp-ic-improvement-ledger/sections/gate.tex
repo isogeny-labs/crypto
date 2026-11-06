@@ -1,0 +1,57 @@
+\section{Validation status}\label{sec:gate}
+
+As of 23 October 2026, \textbf{no index-calculus leaderboard row has passed
+the validation gate.} All 28 rows of the leaderboard's tables A--C render as
+``unvalidated (pre-gate)''
+(\art{docs/ic/leaderboard.json}, \texttt{validation\_gate.status\_counts};
+frozen in \art{docs/ic/validation/PRE_GATE.json}). In
+\art{benchmarks/README.md}, 116 rows are frozen as pre-gate
+(\art{benchmarks/PRE_GATE.json}). Two rows carry a complete
+\texttt{VALIDATION.json}, and both are null results for IC:
+\begin{itemize}
+\item \texttt{20261017-isogeny-volcano-cost-v2}. Rho is below IC on 7{,}760
+  of 7{,}760 curve models, and the per-model minimum IC/rho is $17.38$ at
+  $w=0$.
+\item \texttt{20261017-volcano-ecdlp-census}. IC/rho is $42.4$ and $61.5$
+  at $w=0$ on two volcanoes, and $84.9$ on the third volcano's $j=0$ crater
+  against the cubic-automorphism rho.
+\end{itemize}
+Both pass \texttt{scripts/validation\_gate.py evidence}.
+
+The repository-wide validation sweep is a screen, not the gate. It
+returned these verdicts on 55 leaderboard lines
+(\art{research/validation_sweep_20261019/A-leaderboard/}):
+\begin{itemize}
+\item 1 \texttt{validated}: the standing-rho Callgrind row, which is not an
+  IC row;
+\item 45 \texttt{validated\_with\_caveats};
+\item 8 \texttt{unvalidated}: the F6 ladder and the F4/F5/F6
+  cross-family rows, whose replay reproduced 24 of 72 records, and the
+  retired $n=61$ online row;
+\item 1 \texttt{contradicted}.
+\end{itemize}
+Its verdicts use a schema the gate does not read, so they change no row's
+standing.
+
+\paragraph{What each kind of row needs.} Read against
+\S\S\ref{sec:oracle}--\ref{sec:distance}, the evidence most of the ledger
+lacks is clear:
+\begin{itemize}
+\item \emph{Rows with a matched rho but no independent replay}: rule v8,
+  the campaign, the planner and K1107. They need a second-host replay
+  certificate and an independent validator report.
+\item \emph{Rows without a matched rho in their unit}: genus three after
+  round two, and $k=4$ over $\FF_{p^4}$. They need a rho run in the same
+  binary and unit before their distance can be stated.
+\item \emph{Rows whose counter is ISA-dependent}: everything with F4 word
+  XORs. They need the method identity to record the BMI2 path before a
+  replay can pass.
+\item \emph{Stage-only rows}: oracle, set-up and linear-algebra ratios. By
+  the gate's rule they are component sections and do not need to enter
+  tables A--C.
+\end{itemize}
+Every improvement reported here is therefore a \emph{measured, verified}
+improvement in the success criterion's sense: answers checked, protocol
+frozen before timing, receipts committed. None is yet a \emph{validated}
+row in the gate's sense. We regard closing that difference as the first
+item of work, ahead of any new optimisation (\S\ref{sec:next}).

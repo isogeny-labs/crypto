@@ -1,0 +1,177 @@
+{
+  "job": {
+    "created_at": "2026-10-28T06:08:41Z",
+    "job_name": "ml-dataset-4c94f1d-pilot-002-20261028",
+    "state": "failed",
+    "status": {
+      "conditions": [
+        {
+          "lastProbeTime": "2026-10-28T06:09:48Z",
+          "lastTransitionTime": "2026-10-28T06:09:48Z",
+          "message": "Job has reached the specified backoff limit",
+          "reason": "BackoffLimitExceeded",
+          "status": "True",
+          "type": "FailureTarget"
+        },
+        {
+          "lastProbeTime": "2026-10-28T06:09:48Z",
+          "lastTransitionTime": "2026-10-28T06:09:48Z",
+          "message": "Job has reached the specified backoff limit",
+          "reason": "BackoffLimitExceeded",
+          "status": "True",
+          "type": "Failed"
+        }
+      ],
+      "failed": 1,
+      "ready": 0,
+      "startTime": "2026-10-28T06:08:41Z",
+      "terminating": 0,
+      "uncountedTerminatedPods": {}
+    },
+    "uid": "641ed2d6-ce1b-4e86-a113-3874ccf176c7"
+  },
+  "pods": [
+    {
+      "name": "ml-dataset-4c94f1d-pilot-002-20261028-ln7dr",
+      "node": "ip-10-84-162-72.us-east-2.compute.internal",
+      "status": {
+        "allocatedResources": {
+          "cpu": "2",
+          "ephemeral-storage": "10Gi",
+          "memory": "4Gi"
+        },
+        "conditions": [
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-10-28T06:09:47Z",
+            "observedGeneration": 1,
+            "status": "False",
+            "type": "PodReadyToStartContainers"
+          },
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-10-28T06:09:30Z",
+            "observedGeneration": 1,
+            "status": "True",
+            "type": "Initialized"
+          },
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-10-28T06:09:46Z",
+            "observedGeneration": 1,
+            "reason": "PodFailed",
+            "status": "False",
+            "type": "Ready"
+          },
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-10-28T06:09:46Z",
+            "observedGeneration": 1,
+            "reason": "PodFailed",
+            "status": "False",
+            "type": "ContainersReady"
+          },
+          {
+            "lastProbeTime": null,
+            "lastTransitionTime": "2026-10-28T06:09:30Z",
+            "observedGeneration": 1,
+            "status": "True",
+            "type": "PodScheduled"
+          }
+        ],
+        "containerStatuses": [
+          {
+            "allocatedResources": {
+              "cpu": "2",
+              "ephemeral-storage": "10Gi",
+              "memory": "4Gi"
+            },
+            "containerID": "containerd://af406c929a990d8fffcbda7a1fa4bbfa1b371d083ee327bdadd19e72eff7ec28",
+            "image": "sha256:b581c0bf58ea15cdf1e195f81693b2bcb21408af13b290ca51cdaa480c7d8c7b",
+            "imageID": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:f4833af338f0fc0ca59c534be350918ce565d1c48f0c691d1dcb00260511f1d1",
+            "lastState": {},
+            "name": "task",
+            "ready": false,
+            "resources": {
+              "limits": {
+                "cpu": "2",
+                "ephemeral-storage": "10Gi",
+                "memory": "4Gi"
+              },
+              "requests": {
+                "cpu": "2",
+                "ephemeral-storage": "10Gi",
+                "memory": "4Gi"
+              }
+            },
+            "restartCount": 0,
+            "started": false,
+            "state": {
+              "terminated": {
+                "containerID": "containerd://af406c929a990d8fffcbda7a1fa4bbfa1b371d083ee327bdadd19e72eff7ec28",
+                "exitCode": 1,
+                "finishedAt": "2026-10-28T06:09:39Z",
+                "reason": "Error",
+                "startedAt": "2026-10-28T06:09:35Z"
+              }
+            },
+            "user": {
+              "linux": {
+                "gid": 1000,
+                "supplementalGroups": [
+                  1000
+                ],
+                "uid": 1000
+              }
+            },
+            "volumeMounts": [
+              {
+                "mountPath": "/work",
+                "name": "work"
+              },
+              {
+                "mountPath": "/tmp",
+                "name": "tmp"
+              },
+              {
+                "mountPath": "/var/run/secrets/eks.amazonaws.com/serviceaccount",
+                "name": "aws-iam-token",
+                "readOnly": true,
+                "recursiveReadOnly": "Disabled"
+              }
+            ]
+          }
+        ],
+        "hostIP": "10.84.162.72",
+        "hostIPs": [
+          {
+            "ip": "10.84.162.72"
+          }
+        ],
+        "observedGeneration": 1,
+        "phase": "Failed",
+        "podIP": "10.84.174.19",
+        "podIPs": [
+          {
+            "ip": "10.84.174.19"
+          }
+        ],
+        "qosClass": "Guaranteed",
+        "resources": {
+          "limits": {
+            "memory": "4Gi"
+          },
+          "requests": {
+            "cpu": "1999m",
+            "memory": "4Gi"
+          }
+        },
+        "startTime": "2026-10-28T06:09:30Z"
+      },
+      "uid": "102c9d7f-f0ab-444e-a203-0112a69335d9"
+    }
+  ],
+  "schema": "crypto.ml-dataset.launch-terminal/v1",
+  "retained_stderr": "dataset: aws head-object failed (exit status: 254): aws: [ERROR]: An error occurred (403) when calling the HeadObject operation: Forbidden (S3 also answers 403 for an absent key when the caller lacks s3:ListBucket; check the credentials and the bucket policy)",
+  "observation": "Job failed during remote publication. No success or cloud roundtrip is established. Retain Job/Pod logs; do not delete before full diagnostics are archived."
+}

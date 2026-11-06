@@ -35,7 +35,7 @@ stage() {  # name timeout args...
   log "B-$name" "end exit=$rc"
 }
 log run "start; waiting for round 2 all done"
-until grep -q "all done" "$D2/progress.txt" 2>/dev/null; do sleep 60; done
+until grep -qE "^all( [^ ]+)? done" "$D2/progress.txt" 2>/dev/null; do sleep 60; done
 session A-n13 SPEC-A-n13.json
 session A-n19 SPEC-A-n19.json
 session C-n15 SPEC-C-n15.json

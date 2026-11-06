@@ -42,7 +42,14 @@ The `minimal` profile is the root files, the dot-directories (`.github/`,
 - every `include_str!`/`include_bytes!` target and every `#[path = "…"]`
   module, with its directory (they must exist to compile);
 - every `research/` path a string literal in `src/` or `tests/` names
-  (`cargo test` reads them).
+  (`cargo test` reads them);
+- every crate `Cargo.toml` depends on by path (`name = { path = "…" }`),
+  followed transitively. Each gets its manifest, lockfile, build script,
+  `src/` and declared target directories, but not its data. Cargo reads
+  every path dependency's manifest, so one excluded `Cargo.toml` breaks the
+  whole workspace build. Until 2026-11-02 the heavy
+  `research/pencil_large_prime_20261029` lost its manifest this way, in both
+  profiles. The `harness` profile emits the same rules.
 
 Every other directory, the rest of `research/` included, stays off disk until
 named with `add --path` (end a directory with `/`). Use it for code, docs and
@@ -121,6 +128,14 @@ Pass one whenever you start a session on this repository:
 Sessions started by hand from the web or the app take whatever clone options
 their cloud environment's settings offer; a repository file cannot set them.
 
+## Sibling repositories
+
+`scripts/setup-workstation.sh` clones missing sibling repositories as partial
+clones. Files over `CLONE_BLOB_LIMIT` (default `1m`) remain off disk until a
+command needs them; `git sparse-checkout disable` fetches them all. Set
+`CLONE_FULL=1` to clone every file. The script reports the skipped paths and
+keeps the normal full clone as the fallback when partial-clone setup fails.
+
 ## Off disk is not absent
 
 An excluded file stays in `HEAD` and in the index; `git ls-files` lists it.
@@ -134,6 +149,12 @@ they run, and studies whose verifiers hash their files in place need their
 whole directory.
 
 ## CI
+
+The `large-files` check uses a blobless sparse checkout and rejects changed
+blobs over 10 MiB. It honors the reviewed `.github/large-files-allowed.txt`
+exceptions and the owner/reviewer `large-file-ok` label; unavailable changed
+blobs fail closed. The per-job sparse-checkout lists remain independent of the
+local profiles below.
 
 CI jobs keep their own per-job `sparse-checkout:` lists in
 `.github/workflows/` and are unaffected by the profiles. On 2026-10-16 the

@@ -1,5 +1,9 @@
 //! Exact reference checks and opt-in, paired kernel measurements.
 use super::*;
+#[allow(unused_imports)]
+use crate::cryptanalysis::pq_groebner_f2::{
+    bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
+};
 use serde_json::json;
 use std::{hint::black_box, time::Instant};
 
@@ -128,7 +132,9 @@ fn macaulay_row_count_matches_the_materialised_rows() {
         let mut polys: Vec<F2BoolPoly> = (0..n_vars)
             .map(|_| {
                 let monos: Vec<F2BoolMono> = (0..6)
-                    .map(|_| F2BoolMono::from_mask(next() & next() & ((1 << n_vars) - 1)))
+                    .map(|_| {
+                        F2BoolMono::from_mask(mask_from64(next() & next() & ((1 << n_vars) - 1)))
+                    })
                     .collect();
                 F2BoolPoly::from_monos(monos, n_vars)
             })
@@ -436,7 +442,7 @@ fn masked_multiplier_schedule_matches_the_full_schedule() {
 
 #[test]
 fn cached_layout_requires_exact_column_support() {
-    let columns = vec![3u64, 2, 1, 0];
+    let columns: Vec<Mask> = vec![3, 2, 1, 0];
     let layout = F4ColumnLayout::new(columns);
     assert!(pack_rows_with_layout(&[vec![3, 0], vec![2, 1]], &layout, true).is_some());
     assert!(pack_rows_with_layout(&[vec![3, 0], vec![2]], &layout, true).is_none());
@@ -545,7 +551,7 @@ fn cached_layouts_obey_changed_matrix_caps() {
         }
         return;
     };
-    let polynomial = |masks: &[u64]| {
+    let polynomial = |masks: &[Mask]| {
         vec![F2BoolPoly::from_monos(
             masks.iter().copied().map(F2BoolMono::from_mask).collect(),
             2,
@@ -674,7 +680,7 @@ fn fused_flat_packing_matches_materialized_rows() {
         .is_none());
 
         let mut extra_columns = layout.columns.clone();
-        extra_columns.push(1u64 << 63);
+        extra_columns.push(1 << 63);
         let extra = F4ColumnLayout::new(extra_columns);
         assert!(pack_polynomials_nested_fused::<false>(
             &polynomials,
@@ -770,18 +776,18 @@ fn paired_inherited_root_fused_packing_benchmark() {
 
 #[test]
 fn fast_column_index_matches_standard_hashing() {
-    let mut columns = Vec::new();
+    let mut columns: Vec<Mask> = Vec::new();
     let mut state = 0x9e3779b97f4a7c15u64;
     for _ in 0..2048 {
         state = state.wrapping_add(0x9e3779b97f4a7c15);
         let mut value = state;
         value = (value ^ (value >> 30)).wrapping_mul(0xbf58476d1ce4e5b9);
         value = (value ^ (value >> 27)).wrapping_mul(0x94d049bb133111eb);
-        columns.push(value ^ (value >> 31));
+        columns.push(mask_from64(value ^ (value >> 31)));
     }
     columns.sort_unstable();
     columns.dedup();
-    let standard: std::collections::HashMap<u64, usize> = columns
+    let standard: std::collections::HashMap<Mask, usize> = columns
         .iter()
         .enumerate()
         .map(|(column, &monomial)| (monomial, column))

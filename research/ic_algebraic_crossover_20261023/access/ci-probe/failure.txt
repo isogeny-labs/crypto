@@ -1,0 +1,20 @@
+ecdlp-access-probe	Read identity and deployed launcher configuration	﻿2026-10-25T04:09:06.3223842Z ##[group]Run set -euo pipefail
+ecdlp-access-probe	Read identity and deployed launcher configuration	2026-10-25T04:09:06.3224081Z [36;1mset -euo pipefail[0m
+ecdlp-access-probe	Read identity and deployed launcher configuration	2026-10-25T04:09:06.3224249Z [36;1mmkdir -p "$RUNNER_TEMP/ic-access"[0m
+ecdlp-access-probe	Read identity and deployed launcher configuration	2026-10-25T04:09:06.3224543Z [36;1maws sts get-caller-identity > "$RUNNER_TEMP/ic-access/identity.json"[0m
+ecdlp-access-probe	Read identity and deployed launcher configuration	2026-10-25T04:09:06.3224864Z [36;1mtaskq/deploy/ephemeral/ephemeral config > "$RUNNER_TEMP/ic-access/launcher.json"[0m
+ecdlp-access-probe	Read identity and deployed launcher configuration	2026-10-25T04:09:06.3225126Z [36;1mjq -n --arg source "$GITHUB_SHA" \[0m
+ecdlp-access-probe	Read identity and deployed launcher configuration	2026-10-25T04:09:06.3225405Z [36;1m  '{schema:"ic-cloud-access/v1",source:$source,status:"launcher_readable",paid_launch:false}' \[0m
+ecdlp-access-probe	Read identity and deployed launcher configuration	2026-10-25T04:09:06.3225691Z [36;1m  > "$RUNNER_TEMP/ic-access/receipt.json"[0m
+ecdlp-access-probe	Read identity and deployed launcher configuration	2026-10-25T04:09:06.3225884Z [36;1mcat "$RUNNER_TEMP/ic-access/receipt.json"[0m
+ecdlp-access-probe	Read identity and deployed launcher configuration	2026-10-25T04:09:06.3444655Z shell: /usr/bin/bash -e {0}
+ecdlp-access-probe	Read identity and deployed launcher configuration	2026-10-25T04:09:06.3444827Z env:
+ecdlp-access-probe	Read identity and deployed launcher configuration	2026-10-25T04:09:06.3444954Z   AWS_DEFAULT_REGION: us-east-1
+ecdlp-access-probe	Read identity and deployed launcher configuration	2026-10-25T04:09:06.3445106Z   AWS_REGION: us-east-1
+ecdlp-access-probe	Read identity and deployed launcher configuration	2026-10-25T04:09:06.3445363Z   AWS_ACCESS_KEY_ID: ***
+ecdlp-access-probe	Read identity and deployed launcher configuration	2026-10-25T04:09:06.3445604Z   AWS_SECRET_ACCESS_KEY: ***
+ecdlp-access-probe	Read identity and deployed launcher configuration	2026-10-25T04:09:06.3445787Z   XDG_CACHE_HOME: /home/runner/work/_temp/ic-launcher-cache
+ecdlp-access-probe	Read identity and deployed launcher configuration	2026-10-25T04:09:06.3445985Z ##[endgroup]
+ecdlp-access-probe	Read identity and deployed launcher configuration	2026-10-25T04:09:09.8039620Z ephemeral: cannot read SSM parameter /ephemeral/config in us-east-1 (deployed? right region/profile?):
+ecdlp-access-probe	Read identity and deployed launcher configuration	2026-10-25T04:09:09.8046997Z aws: [ERROR]: An error occurred (AccessDeniedException) when calling the GetParameter operation: User: *** is not authorized to perform: ssm:GetParameter on resource: arn:aws:ssm:us-east-1:***:parameter/ephemeral/config with an explicit deny in an identity-based policy
+ecdlp-access-probe	Read identity and deployed launcher configuration	2026-10-25T04:09:09.8057852Z ##[error]Process completed with exit code 1.

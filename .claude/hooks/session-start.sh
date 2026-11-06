@@ -28,6 +28,22 @@ case "${WORKSPACE_OFFLINE:-0}" in
   *) echo "WORKSPACE_OFFLINE must be 0 or 1" >&2; exit 2 ;;
 esac
 
+# The ECDLP lead atlas lives in aburan28/crypto-autoresearcher
+# (knowledge/leads/ecdlp/). It says what has already been tried across this
+# repository and its siblings, and whether anything changed since the last
+# review. Printed before the remote-only setup, so a local session sees it too.
+# Never fatal.
+atlas_repo="$(dirname "${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}")/crypto-autoresearcher"
+if [ -f "$atlas_repo/tools/lead_atlas.py" ]; then
+  python3 "$atlas_repo/tools/lead_atlas.py" --brief 2>/dev/null || true
+else
+  echo "ECDLP lead atlas: clone aburan28/crypto-autoresearcher next to this checkout and run python3 tools/lead_atlas.py --brief. It records every lead already tried here, so check it before proposing an ECDLP idea."
+fi
+
+# The shared research KB indexes this repository and its siblings. Remind the
+# session before it starts a survey; the MCP server is registered globally.
+echo "Research KB: query it before a survey, lead proposal or novelty claim (AGENTS.md \"Knowledge base first\"; skill research-kb)."
+
 if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then
   exit 0
 fi
@@ -115,15 +131,19 @@ fi
 # restored from the cache only re-checks. Workspace is the directory holding
 # this checkout, where attached sibling repositories sit; of the missing ones
 # only cryptanalysis (~1.5 GB) is cloned, since the others are attached when a
-# session needs them (CRYPTO_SETUP_CLONE overrides). SageMath (~8 GiB, several
-# minutes) installs detached, so the session does not wait on it and the hook
-# stays inside its timeout; it skips itself below 10 GiB free.
+# session needs them (CRYPTO_SETUP_CLONE overrides). The git credential helper
+# reads GH_APP_*, GH_SERVICE_TOKEN or GH_TOKEN when git needs them
+# (GITHUB_LAZY). SageMath, the lean sagelib + maxima build (~3.6 GB, several
+# minutes), installs detached, so the session does not wait on it and the hook
+# stays inside its timeout; it skips itself below 4 GiB free. This is the same
+# setup as scripts/cloud-setup.sh, the environment's setup-script line, for
+# containers restored from a cache built before that line ran.
 # CRYPTO_WORKSTATION_SETUP=0 turns all of this off. Never fatal.
 setup_summary="workstation setup off"
 if [ "${CRYPTO_WORKSTATION_SETUP:-1}" != 0 ]; then
   setup="$repo/scripts/setup-workstation.sh"
   workspace="$(dirname "$repo")"
-  if CLONE_REPOS="${CRYPTO_SETUP_CLONE-cryptanalysis}" "$setup" --workspace "$workspace" \
+  if GITHUB_LAZY=1 CLONE_REPOS="${CRYPTO_SETUP_CLONE-cryptanalysis}" "$setup" --workspace "$workspace" \
       --skip conductor,cairn,control-plane,sage; then
     setup_summary="workstation setup ran"
   else
@@ -131,7 +151,7 @@ if [ "${CRYPTO_WORKSTATION_SETUP:-1}" != 0 ]; then
   fi
   if [ "${CRYPTO_SETUP_SAGE:-1}" != 0 ] && ! command -v sage >/dev/null \
       && [ ! -x /opt/conda-sage/bin/sage ]; then
-    setsid nohup "$setup" --only sage >"$state/sage-install.log" 2>&1 3>&- </dev/null &
+    SAGE_LEAN=1 setsid nohup "$setup" --only sage >"$state/sage-install.log" 2>&1 3>&- </dev/null &
     setup_summary="$setup_summary; SageMath install started in the background ($state/sage-install.log)"
   fi
   [ -x /opt/conda-sage/bin/sage ] && [ -n "${CLAUDE_ENV_FILE:-}" ] \

@@ -1,6 +1,6 @@
 """Presentation only: plot native checkpoint statistics without recomputing them.
 
-Usage: NATIVE_SUMMARY_DIR CHECKPOINT_DIR FRESH_REPORT RUN_ID
+Usage: NATIVE_SUMMARY_DIR CHECKPOINT_DIR FRESH_REPORT RUN_ID [CONTEXT_NOTE_TYP]
 """
 import json
 import sys
@@ -9,6 +9,7 @@ import typst
 
 summary_dir, checkpoint, out = map(Path, sys.argv[1:4])
 run_id = sys.argv[4]
+context_note = Path(sys.argv[5]).read_text() if len(sys.argv) > 5 else ''
 doc = json.loads((summary_dir / "summary.json").read_text())
 inv = json.loads((checkpoint / "inventory.json").read_text())
 assert inv["ok"] and inv["outcome_totals"] == doc["outcome_totals"]
@@ -71,10 +72,10 @@ These pooled counts span different subgroups/bases and are accounting totals,
 not a common success probability. Multiple outcomes and all missing/censored
 observations remain distinct. Stratum samples are not complete populations.
 
-The environment returned without the previous worker. One in-flight attempt
-was preserved and marked interrupted by the unchanged driver's zero-job stop;
-it is excluded from accepted means. Exact termination cause was not observed.
-No sealed session, binary, queue or mathematical budget was changed.
+Earlier interrupted attempts remain preserved and excluded from accepted
+means; their termination causes were not observed. The current checkpoint's
+context note identifies its stop or recovery. No sealed session, binary,
+queue or mathematical budget was changed.
 
 The native inventory checks record seals, receipt/file hashes, ledger/queue
 identities and exact existing successful/exhausted replay coverage. This is
@@ -115,6 +116,9 @@ finite-field backends remain open. Original C's r=7 k=1 diagnostic is separate.
 Complete graph topology is for the declared fields and finite prime degrees,
 not every other prime or infinitely many compositions.
 '''
+if context_note:
+    (out/'context-note.typ').write_text(context_note)
+    source += '\n' + context_note
 (out/'report.typ').write_text(source)
 typst.compile(str(out/'report.typ'),output=str(out/'report.pdf'))
 (out/'figure.typ').write_text('#set page(width:1100pt,height:740pt,margin:0pt)\n#image("all-strata-yield.svg",width:100%)\n')

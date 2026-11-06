@@ -1,0 +1,53 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1hfe37f1753f1f",
+  "label": "harvest re-measure icv1-f2m11-t67-05f5aa36: root linear-row harvest off / default / gpv at m=3, off / default at m=2 (control)",
+  "spec_id": "ECS1hf15e9a84c3fb",
+  "spec_sha256": "f15e9a84c3fbdad5f078cbaa3d89c15065faba5516271e4f938aa635edf8aa89",
+  "env_class_id": "ECBENV3h83a865bb2efe",
+  "host_sha256": "778b43767c8acff6779c8346d13986cec8954c31cdfec34e2bc1c5fdcb1c1e2e",
+  "plan_sha256": "78177289bd2fe37e012f89fcae1f40884b76545191e0d8ad269cff2d0fcaede3",
+  "binary_sha256": "aa246d23df49391ccb13e0a659f10a6cd77e4677bb0c04331c2cbbefe8c9a2db",
+  "git_commit": null,
+  "git_dirty": null,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/f4-harvest-remeasure.lock",
+    "wait_for_lock": false,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1792878076858,
+  "finished_unix_ms": 1792878091509,
+  "status": "complete",
+  "executions_planned": 144,
+  "records_written": 144,
+  "records_sha256": "943f1264c76849877b6ee1ecb1ea743684a8b2c30a3f4010342852abeba97f19",
+  "status_counts": {
+    "verified": 144
+  },
+  "last_seq": 143
+}

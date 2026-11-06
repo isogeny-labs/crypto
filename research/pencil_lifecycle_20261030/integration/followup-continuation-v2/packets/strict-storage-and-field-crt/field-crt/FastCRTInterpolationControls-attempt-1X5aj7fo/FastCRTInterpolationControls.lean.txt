@@ -1,0 +1,31 @@
+import FastCRTInterpolation
+set_option autoImplicit false
+namespace FastCRTInterpolationControls
+open Polynomial FastCRT
+noncomputable def fixture : ℚ[X] := X^5-X^4-X^3+1
+
+theorem repeated_support_coprime : IsCoprime (support (0:ℚ) 0) (support 0 1) :=
+ support_bezout 0 0 0 1 (by norm_num [norm])
+
+theorem explicit_interpolant : interpolant (0:ℚ) 0 0 1 0 1 1 1=1-X^3 := by
+ norm_num [interpolant,slope,numerator,slopeZero,slopeOne,norm,delta,support]
+ ring
+
+theorem complete_fixture :
+ support (0:ℚ) 0*support 0 1 ∣ fixture-(interpolant 0 0 0 1 0 1 1 1)^2 := by
+ apply product_residual
+ · norm_num [norm]
+ · refine ⟨X^3-X^2-X,?_⟩
+   simp only [fixture,delta,support,map_zero,map_one]
+   ring
+ · refine ⟨X^3-X^2-2*X,?_⟩
+   simp only [fixture,delta,support,map_zero,map_one]
+   ring
+
+theorem zero_slope_still_interpolates :
+ support (0:ℚ) 0 ∣ interpolant 0 0 0 1 0 1 0 1-delta 0 1 ∧
+ support (0:ℚ) 1 ∣ interpolant 0 0 0 1 0 1 0 1-delta 0 1 :=
+ ordinate_congruences 0 0 0 1 0 1 0 1 (by norm_num [norm])
+
+theorem zero_norm_excluded : ¬ norm (0:ℚ) 0 0 0 ≠ 0 := by norm_num [norm]
+end FastCRTInterpolationControls

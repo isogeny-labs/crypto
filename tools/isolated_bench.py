@@ -60,6 +60,8 @@ import threading
 import time
 from pathlib import Path
 
+import result_switches
+
 DEFAULT_LOCK = '/tmp/crypto-bench.lock'
 TICK = os.sysconf('SC_CLK_TCK')
 
@@ -379,6 +381,9 @@ def main(argv: list[str] | None = None) -> int:
             record = {'schema': 'isolated-bench/1', 'mode': args.mode, 'label': args.label,
                       'host': host(), 'reserved_cpus': sorted(cpus), 'threads_moved': len(moved),
                       'left_on_reserved': unmovable_on(cpus, mine), 'preflight': pre}
+            # R9: the result-affecting environment the command inherits (additive;
+            # `schema` stays isolated-bench/1 because verifiers compare it exactly).
+            record['result_switches'] = result_switches.record(os.environ)
             if inherited is not None:
                 record['affinity_widened_from'] = inherited
             if args.mode == 'run':

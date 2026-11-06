@@ -6,7 +6,7 @@
 
 use crypto_lib::cryptanalysis::koblitz_groebner::matrix_f4_f2_counted;
 use crypto_lib::cryptanalysis::matrix_f5_f2::{matrix_f5_f2, F5Criterion};
-use crypto_lib::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
+use crypto_lib::cryptanalysis::pq_groebner_f2::{mask_from64, F2BoolMono, F2BoolPoly};
 use serde_json::json;
 use std::alloc::{GlobalAlloc, Layout, System};
 use std::collections::BTreeMap;
@@ -169,7 +169,7 @@ fn criterion_digest(criterion: &F5Criterion, m: usize, n_vars: usize, degree: u3
     let mut hash = blake3::Hasher::new();
     for i in 0..m {
         for &multiplier in &multipliers {
-            hash.update(&[u8::from(criterion.prunes(i, multiplier))]);
+            hash.update(&[u8::from(criterion.prunes(i, mask_from64(multiplier)))]);
         }
     }
     hash.finalize().to_hex().to_string()
@@ -209,9 +209,15 @@ fn system(vars: &[usize], m: usize, seed: u64) -> Vec<F2BoolPoly> {
             let mut terms: Vec<F2BoolMono> = monos
                 .iter()
                 .filter(|_| next() & 1 != 0)
-                .map(|&mask| F2BoolMono::from_mask(mask))
+                .map(|&mask| F2BoolMono::from_mask(mask_from64(mask)))
                 .collect();
-            if terms.iter().filter(|t| t.mask & planted == t.mask).count() % 2 == 1 {
+            if terms
+                .iter()
+                .filter(|t| t.mask & mask_from64(planted) == t.mask)
+                .count()
+                % 2
+                == 1
+            {
                 terms.push(F2BoolMono::from_mask(0));
             }
             let poly = F2BoolPoly::from_monos(terms, n_vars);
@@ -346,7 +352,7 @@ fn main() {
         let expected_f4 = matrix_f4_f2_counted(&polys, n_vars, degree).unwrap();
         let expected_f5 = matrix_f5_f2(&polys, n_vars, degree).unwrap();
         assert_eq!(expected_f4.0, expected_f5.0);
-        let expected_criterion = F5Criterion::new(&polys, n_vars, degree, mask);
+        let expected_criterion = F5Criterion::new(&polys, n_vars, degree, mask_from64(mask));
         for repeat in 0..repeats {
             let label = profile_label(profile, case, seed, repeat, "f4");
             let (f4, audit) = audited(label.as_deref(), || {
@@ -379,7 +385,7 @@ fn main() {
             );
             let label = profile_label(profile, case, seed, repeat, "criterion");
             let (criterion, audit) = audited(label.as_deref(), || {
-                F5Criterion::new(&polys, n_vars, degree, mask)
+                F5Criterion::new(&polys, n_vars, degree, mask_from64(mask))
             });
             assert_eq!(criterion.pruned_count(), expected_criterion.pruned_count());
             assert_eq!(criterion.word_ops(), expected_criterion.word_ops());

@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "field_characteristic": 7,
+  "cubic_nonresidue": 2,
+  "curve_nodes": [
+    {
+      "ref": "f7c2/root",
+      "a": [3, 6, 4],
+      "b": [4, 4, 6]
+    },
+    {
+      "ref": "f7c2/velu3",
+      "a": [3, 5, 6],
+      "b": [4, 4, 6]
+    }
+  ],
+  "edges": [
+    {
+      "id": "velu3-kernel-453-252",
+      "source_curve_ref": "f7c2/root",
+      "target_curve_ref": "f7c2/velu3",
+      "degree": 3,
+      "kernel_generator": [[4, 5, 3], [2, 5, 2]]
+    }
+  ],
+  "routes": [
+    {
+      "id": "root-to-velu3",
+      "edge_ids": ["velu3-kernel-453-252"]
+    }
+  ]
+}

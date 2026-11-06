@@ -1,0 +1,346 @@
+{
+  "baseline": {
+    "algorithm": "Pollard rho on <G>",
+    "convention": "sqrt(pi r / 4) elliptic group operations (jacobian_transfer::cost); isogeny_degree_search::rho_reference uses sqrt(pi r / 2), a factor sqrt 2 higher, and is not used",
+    "equivalence_class_reason": "negation and the 2^1-Frobenius: E is defined over F_(2^1), so classes have size 2*15/1 = 30 (upper bound on the speedup)",
+    "equivalence_class_size": 30,
+    "log2_cost_of_one_group_operation": 9.514,
+    "log2_group_operations": 2.149,
+    "log2_r": 9.553,
+    "log2_total": 11.664,
+    "log2_total_without_automorphisms": 14.117
+  },
+  "candidate": {
+    "id": "isogeny:class_invariants",
+    "label": "isogeny moves: class invariants, volcano structure and the identity-path comparison",
+    "transfer_type": "isogeny_move"
+  },
+  "carried": true,
+  "checks": [
+    {
+      "evidence": "over F_q isogenous curves have equal trace, #E, r, embedding degree and twist order (audit-curve, section 2): no generic attack changes along an isogeny",
+      "name": "class_invariants_are_shared",
+      "result": "PASS"
+    },
+    {
+      "evidence": "d_K = -7: units of O_K are +-1 unless d_K is -3 or -4",
+      "name": "class_members_have_only_negation_as_automorphism",
+      "result": "PASS"
+    },
+    {
+      "evidence": "End(E) = O_K is established (status Proved): f_E = 1, so E is on the crater of every volcano and no isogeny can lower f_E; conductor gap g = f_pi / f_E = f_pi (7 bits). Moves go down the volcano, away from the maximal order",
+      "name": "end_ring_conductor_f_E",
+      "result": "PASS"
+    }
+  ],
+  "costs": {
+    "destination_solver": "RhoOnIsogenousCurve",
+    "log2_baseline": 11.664,
+    "log2_cost_ratio": 0.346,
+    "log2_total": 12.01,
+    "repo_ratio_log2": 2.107,
+    "rows": [
+      {
+        "formula": "finding a path to a representative with a cheaper destination: no such representative is identified, so the walk is not priced",
+        "log2": null,
+        "phase": "map_construction",
+        "status": "not_evaluated"
+      },
+      {
+        "formula": "one Velu evaluation at degree 7: log2(4 (l-1)/2) + log2 M(n); VELU_MULTS_PER_KERNEL_POINT is a placeholder",
+        "log2": 9.777,
+        "phase": "transfer_evaluation",
+        "status": "modeled"
+      },
+      {
+        "formula": "destination solver is rho, as on E",
+        "log2": null,
+        "phase": "relation_collection",
+        "status": "not_applicable"
+      },
+      {
+        "formula": "see relation_collection",
+        "log2": null,
+        "phase": "linear_algebra",
+        "status": "not_applicable"
+      },
+      {
+        "formula": "Pollard rho on the same r over the same field: every class member has the same order, so the matched baseline is unchanged (identity path)",
+        "log2": 11.664,
+        "phase": "destination_solve_unsplit",
+        "status": "modeled"
+      },
+      {
+        "formula": "the dual isogeny composition is [deg]; the logarithm transfers by a known multiple of d, recovery is one modular inversion of deg modulo r",
+        "log2": 0.0,
+        "phase": "descent_back_mapping",
+        "status": "modeled"
+      }
+    ],
+    "solvers_considered": [
+      [
+        "RhoOnIsogenousCurve",
+        11.664
+      ]
+    ],
+    "total_is_lower_bound": true,
+    "unit": "log2 bit operations (frozen formula model; measured rows say so)"
+  },
+  "curve": {
+    "family": "binary",
+    "field": {
+      "a": "0x0",
+      "b": "0x1",
+      "degree": 15,
+      "kind": "binary",
+      "log2_size": 15,
+      "model": "y^2+xy=x^3+a*x^2+b",
+      "modulus": "0x8003"
+    },
+    "instance_checks": [
+      {
+        "evidence": "modulus irreducible (Rabin), coefficients canonical, b != 0 (ordinary binary model)",
+        "name": "field_and_curve",
+        "result": "PASS"
+      },
+      {
+        "evidence": "G affine, y^2+xy = x^3+ax^2+b",
+        "name": "generator_on_curve",
+        "result": "PASS"
+      },
+      {
+        "evidence": "r passes Miller-Rabin to bases 2..53 (Proved); [r]G = O, G != O, so G has exact order r",
+        "name": "subgroup_order_is_prime_and_annihilates_generator",
+        "result": "PASS"
+      },
+      {
+        "evidence": "#E = cofactor * r = q + 1 - t, Hasse bound holds, two seeded random points are annihilated by #E (evidence for the recorded order, not a point-count proof)",
+        "name": "order_consistency",
+        "result": "PASS"
+      },
+      {
+        "evidence": "curve_traits::compute run live on this instance",
+        "name": "traits_record",
+        "result": "PASS"
+      }
+    ],
+    "name": "toy-k0-n15",
+    "registered": false,
+    "slug": "unregistered-toy-k0-n15",
+    "subgroup": {
+      "cofactor": "44",
+      "generator": [
+        "0x4cd2",
+        "0x5e36"
+      ],
+      "order": "33044",
+      "r": "751",
+      "r_log2": 9.553,
+      "trace": "-275"
+    }
+  },
+  "executed": null,
+  "invariants": {
+    "anomalous": false,
+    "embedding": {
+      "complement_bits": 5,
+      "degree": "25",
+      "lower_bound": null,
+      "status": "proved"
+    },
+    "endomorphism": {
+      "conductor": "1",
+      "conductor_divides": "1",
+      "contains": [
+        "Z[π]",
+        "Z[π_1] (Frobenius of GF(2^1))"
+      ],
+      "levels": [
+        {
+          "depth": 1,
+          "ell": "89",
+          "level": 0,
+          "level_at_most": 0,
+          "method": "f₀ is prime to ℓ"
+        }
+      ],
+      "maximal": true,
+      "status": "proved"
+    },
+    "frobenius": {
+      "class_number": 1,
+      "class_number_status": "proved",
+      "cm_disc": "-7",
+      "conductor": "89",
+      "conductor_bits": 7,
+      "conductor_fraction": 0.821855,
+      "conductor_primes": [
+        [
+          "89",
+          1
+        ]
+      ],
+      "conductor_unfactored": [],
+      "disc": "-55447",
+      "disc_primes": [
+        [
+          "7",
+          1
+        ],
+        [
+          "89",
+          2
+        ]
+      ],
+      "disc_status": "proved",
+      "disc_unfactored": [],
+      "status": "proved"
+    },
+    "order_check": {
+      "method": "exhaustive point count",
+      "status": "proved"
+    },
+    "ordinary": true,
+    "small_primes": [
+      {
+        "depth": 0,
+        "ell": 2,
+        "rational_isogenies": null,
+        "splitting": "split"
+      },
+      {
+        "depth": 0,
+        "ell": 3,
+        "rational_isogenies": 0,
+        "splitting": "inert"
+      },
+      {
+        "depth": 0,
+        "ell": 5,
+        "rational_isogenies": 0,
+        "splitting": "inert"
+      },
+      {
+        "depth": 0,
+        "ell": 7,
+        "rational_isogenies": 1,
+        "splitting": "ramified"
+      },
+      {
+        "depth": 0,
+        "ell": 11,
+        "rational_isogenies": 2,
+        "splitting": "split"
+      },
+      {
+        "depth": 0,
+        "ell": 13,
+        "rational_isogenies": 0,
+        "splitting": "inert"
+      },
+      {
+        "depth": 0,
+        "ell": 17,
+        "rational_isogenies": 0,
+        "splitting": "inert"
+      },
+      {
+        "depth": 0,
+        "ell": 19,
+        "rational_isogenies": 0,
+        "splitting": "inert"
+      },
+      {
+        "depth": 0,
+        "ell": 23,
+        "rational_isogenies": 2,
+        "splitting": "split"
+      },
+      {
+        "depth": 0,
+        "ell": 29,
+        "rational_isogenies": 2,
+        "splitting": "split"
+      },
+      {
+        "depth": 0,
+        "ell": 31,
+        "rational_isogenies": 0,
+        "splitting": "inert"
+      }
+    ],
+    "subfield": {
+      "base_trace": "-1",
+      "base_trace_sign_free": false,
+      "definition_degree": 1,
+      "j_field_degree": 1,
+      "method": "unique Hasse-bounded root of V_{n/k}(t_k, 2^k) = t_n",
+      "status": "proved"
+    },
+    "twist": {
+      "cofactor": "154",
+      "largest_prime_bits": 8,
+      "order": "32494",
+      "status": "proved"
+    }
+  },
+  "lead_class": "boundary",
+  "map": {
+    "construction_status": "not evaluated",
+    "degrees": {
+      "small_degrees_walkable": [
+        7,
+        11,
+        23,
+        29
+      ]
+    },
+    "destination": "E' in the F_q-isogeny class of E",
+    "explicit_formulas": "Velu formulas for kernel polynomials of degree l; no destination curve is selected",
+    "field_of_definition": "F_q (q = 2^15)",
+    "source": "E",
+    "type": "F_q-rational isogenies of degree l coprime to r"
+  },
+  "notes": [
+    "C*(E) = min over representatives of (path + transfer + best attack): the identity path gives the baseline, and a priced move adds a transfer term to the same destination cost"
+  ],
+  "obligations": {
+    "computational_advantage": "refuted",
+    "existence": "supported",
+    "explicit_construction": "unknown",
+    "map_correctness": "unknown",
+    "scaling_support": "unknown",
+    "subgroup_preservation": "supported"
+  },
+  "open_obligations": [
+    "End(E) certificate (f_E, D_E) to place E on its volcano; the conductor-gap mechanism has no priced advantage here (problems/conductor-gap-upper-floor-and-cost.md)",
+    "a destination representative with a concrete cheaper attack; none is identified, so the path search is not priced"
+  ],
+  "references": [
+    "audit-curve skill, sections 2-4 (crypto-autoresearcher)",
+    "docs/endomorphism-rules.md",
+    "src/cryptanalysis/curve_traits (Frobenius discriminant, conductor, volcano levels)"
+  ],
+  "schema": "transfer-audit/certificate/v1",
+  "subgroup_preservation": {
+    "antecedents": [
+      {
+        "evidence": "walkable degrees [7, 11, 23, 29]; r has 10 bits",
+        "name": "gcd(l, r) = 1 for every walkable l <= 31",
+        "result": "PASS"
+      }
+    ],
+    "argument": "a separable isogeny of degree l has a kernel of order l; if gcd(l, r) = 1 the kernel meets <G> trivially and phi is injective on <G>, with image of order r. For an inseparable Frobenius step the degree is a power of the characteristic, which is coprime to r",
+    "executed": null,
+    "image_order": "751",
+    "kernel_meets_subgroup": false,
+    "method": "arithmetic: gcd(deg phi, r) = 1",
+    "status": "arithmetic"
+  },
+  "tool": "transfer-audit/1",
+  "verdict": "no weakness found in scope",
+  "verdict_basis": [
+    "the map is not constructed (existence or construction missing)",
+    "priced route costs 2^0.3 times the matched baseline or more"
+  ]
+}

@@ -1,0 +1,16 @@
+G1 (Amendment 5; 3600 s, ulimit -v 15000000, experiment lane) against C2 (Amendment 4; 3600 s, ulimit -v 13000000, experiments-2): the same m = 4, t = 4 systems.
+Produced by: fb_designs_slope compare-rows C2 G1
+
+compare-rows
+  A = research/factor_base_designs_20261015/runs/C2-A0-m4-t4.jsonl
+  B = research/factor_base_designs_20261015/runs/G1-A0-m4.jsonl
+  shared 2: identical 2, status differs 0, disagree 0
+  only in A: none
+  only in B: none
+
+compare-rows
+  A = research/factor_base_designs_20261015/runs/C2-A11-m4-t4.jsonl
+  B = research/factor_base_designs_20261015/runs/G1-A11-m4.jsonl
+  shared 2: identical 2, status differs 0, disagree 0
+  only in A: none
+  only in B: A11 m=4 t=5 target=0; A11 m=4 t=5 target=1

@@ -1,0 +1,22 @@
+{
+  "schema": "software-validation-plan/v1",
+  "purpose": "Validate reviewed polynomial-size-cap handling without replacing earlier-source receipts",
+  "source_binding": "Exact committed revision passed once to frozen driver; every phase checks runtime source before and after",
+  "driver_store_name": "evidence/ml-dataset-prime-prefix-20261030/validate_prefix_cap_fix_pipeline.sh",
+  "sequence": [
+    "dataset release tests, including polynomial-cap regression and malformed-input controls",
+    "explicit ignored 360-case endpoint test",
+    "strict maintained Clippy",
+    "release CLI build",
+    "retained curve/twist CLI export and immutable retries into a fresh directory",
+    "archive frozen binary and CLI outputs",
+    "full serialized release library suite"
+  ],
+  "stop_on_any_failure": true,
+  "automatic_retries": false,
+  "archive_each_finished_phase": true,
+  "fresh_s3_byte_readback_required": true,
+  "full_suite_summary_rule": "Final outer summary plus exit receipt; nested subprocess summaries are not totals",
+  "scientific_samples_added": 0,
+  "verified_cloud_dataset_cells": 0
+}

@@ -1,0 +1,104 @@
+--- a/taskq/deploy/eks-karpenter/resume/fresh-owner/src/main.rs
++++ b/taskq/deploy/eks-karpenter/resume/fresh-owner/src/main.rs
+@@ -423,11 +423,51 @@
+ extern "C" fn interrupted(signal: i32) {
+     SIGNAL.store(signal, std::sync::atomic::Ordering::Relaxed);
+ }
++// Capture once before validation; never recapture remaining time after a clock step.
++struct StopBound {
++    anchor: std::time::Instant,
++    stop: std::time::Duration,
++    remaining: std::time::Duration,
++}
++impl StopBound {
++    fn remaining(
++        stop: std::time::Duration,
++        wall: std::time::Duration,
++    ) -> Result<std::time::Duration, String> {
++        stop.checked_sub(wall)
++            .filter(|d| !d.is_zero())
++            .ok_or_else(|| "owner stop expired".into())
++    }
++    fn capture(stop_seconds: u64) -> Result<Self, String> {
++        let anchor = std::time::Instant::now();
++        let wall = std::time::SystemTime::now()
++            .duration_since(std::time::UNIX_EPOCH)
++            .map_err(error)?;
++        let stop = std::time::Duration::from_secs(stop_seconds);
++        Ok(Self {
++            anchor,
++            stop,
++            remaining: Self::remaining(stop, wall)?,
++        })
++    }
++    fn reached_at(&self, wall: std::time::Duration, elapsed: std::time::Duration) -> bool {
++        wall >= self.stop || elapsed >= self.remaining
++    }
++    fn reached(&self) -> bool {
++        let elapsed = std::time::Instant::now().checked_duration_since(self.anchor);
++        let wall = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH);
++        match (wall, elapsed) {
++            (Ok(wall), Some(elapsed)) => self.reached_at(wall, elapsed),
++            _ => true,
++        }
++    }
++}
+ #[allow(
+     clippy::zombie_processes,
+     reason = "direct child is explicitly reaped with wait4; unobserved reap is partial evidence"
+ )]
+ fn observe(c: &Config, config_sha: &str) -> Result<i32, String> {
++    let stop = StopBound::capture(c.stop_utc_seconds)?;
+     validate(c)?;
+     let begin = Clock::read()?;
+     let mut cmd = Command::new(&c.binary);
+@@ -440,6 +480,9 @@
+                 Ok(())
+             }
+         });
++    }
++    if stop.reached() {
++        return Err("owner stop expired before child spawn".into());
+     }
+     let child = cmd.spawn().map_err(error)?;
+     let pid = i32::try_from(child.id()).map_err(error)?;
+@@ -494,7 +537,7 @@
+             break;
+         }
+         let signal = SIGNAL.load(std::sync::atomic::Ordering::Relaxed);
+-        if killed.is_none() && (signal != 0 || now().map_or(true, |v| v >= c.stop_utc_seconds)) {
++        if killed.is_none() && (signal != 0 || stop.reached()) {
+             // Deadline is a hard process-group stop; no new grace allowance is minted.
+             unsafe {
+                 libc::kill(-pid, libc::SIGKILL);
+@@ -735,3 +778,30 @@
+         fs::remove_dir_all(p).unwrap();
+     }
+ }
++
++#[cfg(test)]
++mod monotonic_stop_tests {
++    use super::StopBound;
++    use std::time::{Duration, Instant};
++    #[test]
++    fn immutable_bound_survives_wall_rollback_and_forward_step() {
++        let b = StopBound {
++            anchor: Instant::now(),
++            stop: Duration::from_secs(100),
++            remaining: Duration::from_millis(1500),
++        };
++        assert!(!b.reached_at(Duration::from_secs(98), Duration::from_millis(1499)));
++        assert!(b.reached_at(Duration::from_secs(1), Duration::from_millis(1500)));
++        assert!(b.reached_at(Duration::from_secs(100), Duration::ZERO));
++        assert_eq!(b.remaining, Duration::from_millis(1500));
++    }
++    #[test]
++    fn admission_preserves_fractional_remaining_and_rejects_expiry() {
++        assert_eq!(
++            StopBound::remaining(Duration::from_secs(100), Duration::from_millis(99875)).unwrap(),
++            Duration::from_millis(125)
++        );
++        assert!(StopBound::remaining(Duration::from_secs(100), Duration::from_secs(100)).is_err());
++        assert!(StopBound::remaining(Duration::from_secs(100), Duration::from_secs(101)).is_err());
++    }
++}

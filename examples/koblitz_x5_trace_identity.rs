@@ -32,6 +32,7 @@ use crypto_lib::cryptanalysis::koblitz_index_calculus::{
 use crypto_lib::cryptanalysis::koblitz_symmetrised::{
     build_chained_symmetrised_system, random_subspace_containing_one_in,
 };
+use crypto_lib::cryptanalysis::pq_groebner_f2::mask_low64;
 use crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly;
 use num_bigint::BigUint;
 use rand::rngs::StdRng;
@@ -62,7 +63,7 @@ fn quad_null_space(eqs: &[&F2BoolPoly]) -> Vec<Vec<bool>> {
     for e in eqs {
         for t in e.terms.iter().filter(|t| t.mask.count_ones() == 2) {
             let k = cols.len();
-            cols.entry(t.mask).or_insert(k);
+            cols.entry(mask_low64(t.mask)).or_insert(k);
         }
     }
     let nc = cols.len();
@@ -73,7 +74,7 @@ fn quad_null_space(eqs: &[&F2BoolPoly]) -> Vec<Vec<bool>> {
         .map(|(i, e)| {
             let mut v = vec![false; nc + nr];
             for t in e.terms.iter().filter(|t| t.mask.count_ones() == 2) {
-                v[cols[&t.mask]] ^= true;
+                v[cols[&mask_low64(t.mask)]] ^= true;
             }
             v[nc + i] = true;
             v
@@ -98,7 +99,7 @@ fn quad_null_space(eqs: &[&F2BoolPoly]) -> Vec<Vec<bool>> {
 }
 
 fn term_set(p: &F2BoolPoly) -> BTreeSet<u64> {
-    p.terms.iter().map(|t| t.mask).collect()
+    p.terms.iter().map(|t| mask_low64(t.mask)).collect()
 }
 
 struct Check {

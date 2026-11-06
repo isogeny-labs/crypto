@@ -1,0 +1,32 @@
+import WordMixed
+open PencilWordRefinement Polynomial
+instance : Fact (7:UInt64).toNat.Prime := ⟨by decide⟩
+example : let a : WordD1 := ⟨0,0,3,2⟩
+ let b : WeightedWord := ⟨0,0,0,0,2,3⟩
+ let c := (mixedWords 7 a b).point
+ c.canonical 7 ∧ c.z ≠ 0 ∧ c.w ≠ 0 ∧ c.normalizedValid 7 0 := by
+ have hh := mixed_word_branch_invariant 7 0 (⟨0,0,3,2⟩:WordD1) (⟨0,0,0,0,2,3⟩:WeightedWord)
+   (by decide) (by decide) (by dsimp [WordD1.canonical]; decide)
+   (by dsimp [WeightedWord.canonical]; decide) (by decide) (by decide) (by decide) (by decide)
+   (by norm_num [WordD1.normalizedValid,WordD1.decode,WeightedAdd11.nx,WeightedAdd11.ny])
+   (by norm_num [WeightedWord.normalizedValid])
+ exact hh.2 (by decide)
+
+open MixedCancellation
+example : let a : WeightedAdd11.Input ℚ := ⟨9,-486,3,2⟩
+ let b : D2 ℚ := ⟨-4,0,24,0,2,3⟩
+ classify a b = .cancellation ∧ (other a b).z ≠ 0 ∧ (other a b).w ≠ 0 ∧ validPoint (X^2) (other a b) := by
+ apply cancellation_preserves
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num
+ · norm_num [validPoint,WeightedAdd11.nx,WeightedAdd11.ny]
+   refine ⟨X+1,?_⟩; ring
+ · norm_num [validTwo,nq,nr,ns,nt,MixedCancellation.support,ordinate]
+ · norm_num [rawK]
+ · norm_num [rawW3,rawY3]
+example : mixedClassifyWord 7 ⟨0,1,1,1⟩ ⟨0,0,0,0,1,1⟩ = .mismatch := by decide
+example : mixedClassifyWord 5 ⟨0,0,3,2⟩ ⟨0,0,0,0,2,3⟩ = .cancellation := by decide
+example : (mixedWords 7 ⟨0,0,0,2⟩ ⟨0,0,0,0,2,3⟩).point.z=0 := by decide
+example : (mixedWords 7 ⟨2,4,3,2⟩ ⟨3,0,3,0,2,3⟩).point.y=0 := by decide

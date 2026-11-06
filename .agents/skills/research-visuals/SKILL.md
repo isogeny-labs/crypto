@@ -5,6 +5,21 @@ description: Produce and refresh evidence-linked diagrams, graphs, reports, and 
 
 # Research visuals and reports
 
+## Report progress at the working scope
+
+Owner instruction, 2026-10-30: lead with the construction, implementation,
+verified identity, or measured improvement and its supporting checks.
+State the relevant assumptions and costs. Name a material remaining dependency
+once and give the next technical step.
+
+Routine reports and updates do not need an overall ECDLP verdict or a rho
+comparison. Include those in an explicitly scoped evaluation, a required
+comparison table, or a specific factual correction. Describe limitations as
+the particular construction's domain, costs, and open dependencies. Recognize
+completed components as progress at their stated scope.
+
+## When to use this skill
+
 Use this skill at three points (AGENTS.md "Research searches must leave
 visual reports"):
 
@@ -41,9 +56,10 @@ PR as the run's records; failed and timed-out runs included.
   references and controls, and the paths of the raw records. Label every
   number measured or derived, and show how a derived one was computed. State
   missing data as missing.
-- **Observations only.** No speedup, win, or significance language beyond
-  what the harness's own comparison admitted, with its scope; wall time only
-  where the harness admitted it. Interpretation belongs to the result PR.
+- **Describe the run.** Lead with the outcomes and checks. Report component
+  and pipeline comparisons at the scope admitted by the harness, including
+  wall time where its measurement conditions permit it. Interpretation
+  belongs to the result PR.
 - **Graph.** At least one quantitative graph of the recorded values (arms
   side by side, per-round values, a quantity against a parameter), with
   units, sample size, uncertainty where recorded, and the session or run id
@@ -173,7 +189,17 @@ rather than forking it.
 ## Reports in S3
 
 Once a report is on `main`, `.github/workflows/reports-s3.yml` copies it to
-`s3://crypto-autoresearcher/reports/crypto/<repository path>` with a per-push
-manifest (`docs/reports-s3.md`). It takes everything under
-`docs/ic/measurement/reports/` and `research/**/reports/` and every PDF under
-`research/`, so keep reports at those paths. Sessions never upload to S3.
+`s3://setec-astronomy-artifacts/reports/crypto/<repository path>` (region
+`us-east-2`) with a per-push manifest (`docs/reports-s3.md`). It takes
+everything under `docs/ic/measurement/reports/` and `research/**/reports/` and
+every PDF under `research/`, so keep reports at those paths.
+
+Sessions never upload, overwrite or delete in that prefix; the workflow is the
+only writer. To read a published report, list or copy it down and check it
+against the manifest's SHA-256:
+
+```sh
+aws s3 ls s3://setec-astronomy-artifacts/reports/crypto/<repository path> --region us-east-2
+aws s3 cp s3://setec-astronomy-artifacts/reports/crypto/<repository path> . --region us-east-2
+aws s3 presign s3://setec-astronomy-artifacts/reports/crypto/<repository path> --expires-in 604800 --region us-east-2
+```

@@ -1,0 +1,69 @@
+{
+  "schema": "isolab.premerge-integration.protocol/v1",
+  "recorded_at": "2026-10-21T02:15:18.105752+00:00",
+  "pr": 2342,
+  "reviewed_head": "abe6b1b52fe976a05b9382655be21b2db2af2034",
+  "build_run": 39527210297,
+  "inputs": {
+    "source_revision": "e862ee96a5d1109ef284a8ddf8e21528d2f988af",
+    "spec_path": "taskq/deploy/eks-karpenter/l2-validation.json",
+    "instance_type": "m8a.2xlarge",
+    "seconds": "900"
+  },
+  "spec_sha256": "98655bb3358b3c3e25c437c2cdf279c958c6e9b8d992c679b094d8e5725137aa",
+  "image_repository": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks",
+  "launcher_version": "pRWlVT3_CleWD0cEpJq4mkA2H2AdbFm6",
+  "purpose": "Pre-merge review-hold validation: GitHub-built artifact, trusted local publisher using ephemeral EKS Docker, remote launcher; full GitHub main Action remains a separate required post-merge validation",
+  "acceptance": [
+    "GitHub builds selected source commit without AWS identity",
+    "Trusted reviewed publisher pushes immutable ECR digest; full main-only GitHub publication remains a separate post-merge requirement",
+    "EKS task image and binary match GitHub artifact and request",
+    "108 verified L2 executions; 90 matching native measured replays; admitted A/A controls",
+    "Every downloaded S3 manifest hash matches; source, spec, Job UID and Pod UID agree"
+  ],
+  "retries": 0,
+  "pod_resources": {
+    "cpu": 4,
+    "memory": "4Gi"
+  },
+  "nodepool_limits": {
+    "cpu": 64,
+    "memory": "256Gi"
+  },
+  "accounting": "900-second EKS deadline includes provisioning; GitHub build and publisher are separate non-measurement setup",
+  "prior_dispatches": [
+    {
+      "id": 39462747363,
+      "head": "00b190f50022cb71c349b2fe54d1bc7004345dde",
+      "status": "GitHub returned HTTP 500, read API shows queued with zero jobs; cancellation rejected with HTTP 409 not yet queued",
+      "measurement_started": false
+    },
+    {
+      "id": 39522178889,
+      "head": "e862ee96a5d1109ef284a8ddf8e21528d2f988af",
+      "status": "cancelled before build because queued on saturated hosted pool; replaced by run 39526663839 using the same source and updated workflow",
+      "measurement_started": false
+    },
+    {
+      "id": 39526663839,
+      "head": "9770b2b29e69245985c0c83564cf01e66c469454",
+      "status": "contracts passed; build started through dedicated queue; cancelled when superseded by the separate unprivileged source-builder queue",
+      "measurement_started": false
+    }
+  ],
+  "supersedes_protocol_sha256": "85372869044b5cd4f25fc52916dcf759d8f458f05876e14efc68a923a9a93092",
+  "supersession_reason": "Bound CI to 48 vCPUs within the existing 96-vCPU regional quota and route ordinary gates to a dedicated high-memory node; benchmark source, inputs, resources and acceptance unchanged; successful source build retained",
+  "build_workflow_revision": "c317f4b344d7fe49dd296e3e50ae9f429e9187ec",
+  "capacity_plan": {
+    "standard_spot_quota_vcpus": 96,
+    "ci_pool_total_vcpus": 48,
+    "harness_host_vcpus": 32,
+    "system_vcpus": 4,
+    "benchmark_worker_vcpus": 8,
+    "planned_used_vcpus": 92
+  },
+  "job_name": "pr2342-abe6b1b52f-premerge-20261021",
+  "publisher_workflow": "not a GitHub publishing job; uses reviewed publish-image from abe6b1b52fe976a05b9382655be21b2db2af2034",
+  "supersedes_premerge_protocol_sha256": "fdd70d39979365f74419533ef6ce0883a3d87dda2d8f66efe338d1e8f2118b37",
+  "premerge_supersession_reason": "Clarify this additional pre-merge run uses harness publication; full post-merge Action acceptance remains unchanged; no EKS benchmark submitted yet"
+}

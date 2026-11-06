@@ -38,13 +38,14 @@ accessConfig:
     - principalARN: arn:aws:iam::104186811093:role/KarpenterNodeRole-isolab
       type: EC2_LINUX
 managedNodeGroups:
-  - name: system
-    instanceType: t3.medium
+  - name: system-spot
+    instanceTypes: [t3.medium, t3a.medium, m6a.large, m6i.large]
+    spot: true
     amiFamily: AmazonLinux2023
     privateNetworking: true
     minSize: 2
     desiredCapacity: 2
-    maxSize: 2
+    maxSize: 3
     volumeSize: 30
     volumeType: gp3
     volumeEncrypted: true

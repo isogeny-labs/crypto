@@ -209,7 +209,14 @@ primary `table_bytes=5711008`; one-target schema slice has measured IC/BL
 online walls; panel median `BL/IC ≈ 0.044`. Claim-check `FAIL` /
 `SCHEMA_INCOMPLETE` remains fail-closed (missing IC1 manifests, co-measured
 `same_resource_envelope`, replay certs, `rho_policy`, declared BL phases).
-See `evidence/20261016-n61-bl-ic-pair-l1024/SCHEMA_GAPS.json`. Do not invent
+See `evidence/20261016-n61-bl-ic-pair-l1024/SCHEMA_GAPS.json`.
+
+Co-measured follow-up (`--co-measure`): run `20261017T211500Z-n61-bl-ic-comeasure`
+reuses the archived public points, remeasures BL (phase timers) and IC in one
+session, and `claim-check --stage vs_rho` is **PASS** for the one-target row
+(`evidence/20261017-n61-bl-ic-comeasure-l1024/`). Status stays
+`PENDING_INDEPENDENT_VALIDATION`. Do not promote the ledger.
+ Do not invent
 those fields; do not promote `boundary_targets.json`.
 
 One run:

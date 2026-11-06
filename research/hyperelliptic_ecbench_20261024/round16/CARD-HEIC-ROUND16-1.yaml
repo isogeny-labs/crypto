@@ -1,0 +1,205 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-HEIC-ROUND16-1
+experiment_id: HEIC-ROUND16
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+bus_address: executor-mechanical-heic-round16
+background: false
+commit: 575fea487c827989b2835bd4e17dffe5bfd13c96
+write_scope:
+  - research/hyperelliptic_ecbench_20261024/sessions/
+  - research/hyperelliptic_ecbench_20261024/round16/run1/
+receipt: research/hyperelliptic_ecbench_20261024/round16/run1/receipt.json
+must_not_exist:
+  - research/hyperelliptic_ecbench_20261024/sessions/r16
+  - research/hyperelliptic_ecbench_20261024/sessions/r16.audit.json
+  - research/hyperelliptic_ecbench_20261024/round16/run1/receipt.json
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd1.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd1.stderr
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd2.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd2.stderr
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd3.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd3.stderr
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd4.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd4.stderr
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd5.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd6.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd7.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd8.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd9.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd10.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd11.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd12.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd13.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd14.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd15.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd16.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd17.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd18.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd19.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd20.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd21.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd22.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd23.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd24.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd25.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd26.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd27.stdout
+  - research/hyperelliptic_ecbench_20261024/round16/run1/cmd28.stdout
+binds:
+  - path: /tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r16/ecbench
+    sha256: a267fe64c989968521c1fcc19fd40c9b000f96a7b4934be54225fed7b5823fef
+  - path: research/hyperelliptic_ecbench_20261024/spec-r16.json
+    sha256: 60fb0a9e17d36a77942506e39e6932e2b21ce3993596426010499fa3135afa7f
+commands:
+  - id: r16-run
+    argv: ["/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r16/ecbench", "run", "--wait", "--spec", "research/hyperelliptic_ecbench_20261024/spec-r16.json", "--out", "research/hyperelliptic_ecbench_20261024/sessions/r16", "--cpus", "none", "--lock", "/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r16/bench.lock"]
+    timeout_seconds: 7200
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd1.stdout
+    stderr: research/hyperelliptic_ecbench_20261024/round16/run1/cmd1.stderr
+  - id: r16-verify
+    argv: ["/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r16/ecbench", "verify", "--dir", "research/hyperelliptic_ecbench_20261024/sessions/r16", "--replay-all", "--out", "research/hyperelliptic_ecbench_20261024/sessions/r16.audit.json", "--exit-code"]
+    timeout_seconds: 7200
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd2.stdout
+    stderr: research/hyperelliptic_ecbench_20261024/round16/run1/cmd2.stderr
+  - id: r16-compare
+    argv: ["/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r16/ecbench", "compare", "--dir", "research/hyperelliptic_ecbench_20261024/sessions/r16", "--a", "rho-plain", "--b", "rho-neg", "--save"]
+    timeout_seconds: 3600
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd3.stdout
+    stderr: research/hyperelliptic_ecbench_20261024/round16/run1/cmd3.stderr
+  - id: r16-table
+    argv: ["/tmp/claude-0/-home-user/3f26b2c1-a4c8-591a-a1d4-67483220b91c/scratchpad/r16/ecbench", "table", "--dir", "research/hyperelliptic_ecbench_20261024/sessions/r16"]
+    timeout_seconds: 3600
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd4.stdout
+    stderr: research/hyperelliptic_ecbench_20261024/round16/run1/cmd4.stderr
+  - id: r16-run-lines
+    argv: ["wc", "-l", "research/hyperelliptic_ecbench_20261024/round16/run1/cmd1.stdout"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd5.stdout
+  - id: r16-run-lines-1-20
+    argv: ["sed", "-n", "1,20p", "research/hyperelliptic_ecbench_20261024/round16/run1/cmd1.stdout"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd6.stdout
+  - id: r16-run-lines-21-40
+    argv: ["sed", "-n", "21,40p", "research/hyperelliptic_ecbench_20261024/round16/run1/cmd1.stdout"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd7.stdout
+  - id: r16-run-lines-41-60
+    argv: ["sed", "-n", "41,60p", "research/hyperelliptic_ecbench_20261024/round16/run1/cmd1.stdout"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd8.stdout
+  - id: r16-run-lines-61-80
+    argv: ["sed", "-n", "61,80p", "research/hyperelliptic_ecbench_20261024/round16/run1/cmd1.stdout"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd9.stdout
+  - id: r16-run-lines-81-100
+    argv: ["sed", "-n", "81,100p", "research/hyperelliptic_ecbench_20261024/round16/run1/cmd1.stdout"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd10.stdout
+  - id: r16-verify-lines
+    argv: ["wc", "-l", "research/hyperelliptic_ecbench_20261024/round16/run1/cmd2.stdout"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd11.stdout
+  - id: r16-verify-lines-1-20
+    argv: ["sed", "-n", "1,20p", "research/hyperelliptic_ecbench_20261024/round16/run1/cmd2.stdout"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd12.stdout
+  - id: r16-verify-lines-21-40
+    argv: ["sed", "-n", "21,40p", "research/hyperelliptic_ecbench_20261024/round16/run1/cmd2.stdout"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd13.stdout
+  - id: r16-verify-lines-41-60
+    argv: ["sed", "-n", "41,60p", "research/hyperelliptic_ecbench_20261024/round16/run1/cmd2.stdout"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd14.stdout
+  - id: r16-verify-lines-61-80
+    argv: ["sed", "-n", "61,80p", "research/hyperelliptic_ecbench_20261024/round16/run1/cmd2.stdout"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd15.stdout
+  - id: r16-verify-lines-81-100
+    argv: ["sed", "-n", "81,100p", "research/hyperelliptic_ecbench_20261024/round16/run1/cmd2.stdout"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd16.stdout
+  - id: r16-compare-lines
+    argv: ["wc", "-l", "research/hyperelliptic_ecbench_20261024/round16/run1/cmd3.stdout"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd17.stdout
+  - id: r16-compare-lines-1-20
+    argv: ["sed", "-n", "1,20p", "research/hyperelliptic_ecbench_20261024/round16/run1/cmd3.stdout"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd18.stdout
+  - id: r16-compare-lines-21-40
+    argv: ["sed", "-n", "21,40p", "research/hyperelliptic_ecbench_20261024/round16/run1/cmd3.stdout"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd19.stdout
+  - id: r16-compare-lines-41-60
+    argv: ["sed", "-n", "41,60p", "research/hyperelliptic_ecbench_20261024/round16/run1/cmd3.stdout"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd20.stdout
+  - id: r16-compare-lines-61-80
+    argv: ["sed", "-n", "61,80p", "research/hyperelliptic_ecbench_20261024/round16/run1/cmd3.stdout"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd21.stdout
+  - id: r16-compare-lines-81-100
+    argv: ["sed", "-n", "81,100p", "research/hyperelliptic_ecbench_20261024/round16/run1/cmd3.stdout"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd22.stdout
+  - id: r16-table-lines
+    argv: ["wc", "-l", "research/hyperelliptic_ecbench_20261024/round16/run1/cmd4.stdout"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd23.stdout
+  - id: r16-table-lines-1-20
+    argv: ["sed", "-n", "1,20p", "research/hyperelliptic_ecbench_20261024/round16/run1/cmd4.stdout"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd24.stdout
+  - id: r16-table-lines-21-40
+    argv: ["sed", "-n", "21,40p", "research/hyperelliptic_ecbench_20261024/round16/run1/cmd4.stdout"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd25.stdout
+  - id: r16-table-lines-41-60
+    argv: ["sed", "-n", "41,60p", "research/hyperelliptic_ecbench_20261024/round16/run1/cmd4.stdout"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd26.stdout
+  - id: r16-table-lines-61-80
+    argv: ["sed", "-n", "61,80p", "research/hyperelliptic_ecbench_20261024/round16/run1/cmd4.stdout"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd27.stdout
+  - id: r16-table-lines-81-100
+    argv: ["sed", "-n", "81,100p", "research/hyperelliptic_ecbench_20261024/round16/run1/cmd4.stdout"]
+    timeout_seconds: 60
+    success_exit_codes: [0]
+    stdout: research/hyperelliptic_ecbench_20261024/round16/run1/cmd28.stdout
+stop_when:
+  - "python3 tools/task_card.py run prints a line that starts with IMPEDIMENT"
+  - "python3 tools/task_card.py run exits with status 2"
+  - "the dispatch text differs from the text python3 tools/task_card.py prompt prints for this card"
+  - "the directory research/hyperelliptic_ecbench_20261024/sessions/r16 already exists before the command starts"
+notes: "Command 1 runs the frozen ecbench binary on the frozen spec with --cpus none, which records the conditions and pins no core, so the session is level L0. This session reports counted group operations only, which are deterministic in the seed and hold at any isolation level; isolation gates wall-clock figures, which this session does not report. Command 2 replays every measured run and exits 1 if the audit finds a problem. Command 3 compares arm rho-neg against arm rho-plain and saves the comparison inside the session directory. Command 4 prints the table. Commands 5 to 28 only print the line count and the first 100 lines of the standard output of commands 1 to 4 in 20-line windows. Return all of it verbatim and compute nothing."

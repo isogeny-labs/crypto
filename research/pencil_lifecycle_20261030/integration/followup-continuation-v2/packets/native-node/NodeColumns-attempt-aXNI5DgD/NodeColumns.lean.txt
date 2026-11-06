@@ -1,0 +1,51 @@
+import NodeWords
+set_option autoImplicit false
+namespace NativeNode
+open SignedWord
+variable {n : Nat}
+def Vec (α : Type*) (n : Nat) := {xs : Array α // xs.size=n}
+def get {α : Type*} (xs : Vec α n) (i : Fin n) : α := xs.val[i.val]'(by rw [xs.property];exact i.isLt)
+def push {α : Type*} (xs : Vec α n) (x : α) : Vec α (n+1) := ⟨xs.val.push x,by simp [xs.property]⟩
+@[simp] theorem at_old {α : Type*} (xs : Vec α n) (x : α) (i : Fin n) :
+ get (push xs x) i.castSucc=get xs i := by
+ simp only [get,push]
+ rw [Array.getElem_push_lt (by rw [xs.property];exact i.isLt)]
+ rfl
+@[simp] theorem at_new {α : Type*} (xs : Vec α n) (x : α) :
+ get (push xs x) (Fin.last n)=x := by
+ simp only [get,push,Fin.val_last]
+ rw [Array.getElem_push];simp [xs.property]
+structure Columns (n : Nat) where
+ parent : Vec USize n
+ size : Vec USize n
+ pot : Vec Pot n
+ fixed : Vec (Option (UInt64 × UInt64)) n
+-- Successful return-state model of the four sequential pushes.
+def append (s : Columns n) : Columns (n+1) :=
+ ⟨push s.parent (USize.ofNat n),push s.size 1,push s.pot ident,push s.fixed none⟩
+def Bounded (s : Columns n) : Prop := ∀i,(get s.parent i).toNat<n
+theorem new_index_exact (hn : n<USize.size) : (USize.ofNat n).toNat=n := by
+ simp [USize.toNat_ofNat,Nat.mod_eq_of_lt hn]
+theorem append_bounded (s : Columns n) (hs : Bounded s) (hn : n<USize.size) :
+ Bounded (append s) := by
+ intro i
+ refine Fin.lastCases ?_ (fun j => ?_) i
+ · simp only [append,at_new,new_index_exact hn];omega
+ · simpa only [append,at_old] using Nat.lt_succ_of_lt (hs j)
+def toWord (s : Columns n) (hs : Bounded s) : UnionState n :=
+ ⟨⟨fun i=>⟨(get s.parent i).toNat,hs i⟩,get s.pot⟩,get s.fixed⟩
+theorem append_refines (s : Columns n) (hs : Bounded s) (hn : n<USize.size) :
+ toWord (append s) (append_bounded s hs hn)=insertWord (toWord s hs) := by
+ apply congrArg₂ UnionState.mk
+ · apply congrArg₂ SignedWord.State.mk
+   · funext i
+     refine Fin.lastCases ?_ (fun j => ?_) i
+     · apply Fin.ext;simp [toWord,append,insertWord,new_index_exact hn]
+     · apply Fin.ext;simp [toWord,append,insertWord]
+   · funext i
+     refine Fin.lastCases ?_ (fun j => ?_) i <;> simp [toWord,append,insertWord]
+ · funext i
+   refine Fin.lastCases ?_ (fun j => ?_) i <;> simp [toWord,append,insertWord]
+theorem sizes_refine (s : Columns n) :
+ (append s).size=ComponentMap.insertSizes s.size := by rfl
+end NativeNode

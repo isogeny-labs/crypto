@@ -1,0 +1,252 @@
+{
+  "sources": [
+    {
+      "id": "S-DISPROVE-20261102",
+      "title": "Exact disproofs of two attack-graph targets (reverse Lemma 4 repair; last fall vs BFS d_reg)",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "research/disprove_easy_targets_20261102/PROTOCOL.md (frozen before computing), reverse_census.rs, salizzoni_ex39.py, results/, and the Lean modules papers/ic-negative-results/lean/IcNegative/Lemma4Reverse.lean and research/disprove_easy_targets_20261102/lean/SalizzoniEx39.lean.",
+      "repository_path": "research/disprove_easy_targets_20261102/PROTOCOL.md"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "CLAIM-LEMMA4-REVERSE-GENERAL",
+      "label": "Reverse repair d'_F <= d_F (outside), unrestricted",
+      "kind": "structural_theorem",
+      "status": "refuted",
+      "model": "algebraic_coordinate",
+      "statement": "For every system over F_2, with the field equations outside the generating set, the fake first fall degree is at most the true first fall degree (equality reading).",
+      "scope": "Proposed in this corpus as a repair of Nagao's refuted Lemma 4 (GAP-LEMMA4-REVERSE). Refuted by systems whose reduced generators are linearly dependent; the form with linearly independent reduced generators survives (GAP-LEMMA4-REVERSE, MEAS-LEMMA4-REVERSE-CENSUS).",
+      "assumptions": [
+        "Equality reading",
+        "Field equations outside"
+      ],
+      "source_refs": [
+        "S-DISPROVE-20261102",
+        "S-IC-NEGATIVE"
+      ],
+      "tags": [
+        "first-fall-degree",
+        "fake-degree",
+        "refuted",
+        "candidate-repair"
+      ],
+      "formula": "d'_F <= d_F",
+      "evidence_class": "counterexample",
+      "non_implications": [
+        "Says nothing about systems with linearly independent reduced generators",
+        "Does not affect the refutation of Nagao's Lemma 4 itself (d_F <= d'_F)"
+      ]
+    },
+    {
+      "id": "CEX-LEMMA4-REVERSE-R",
+      "label": "Witness R {X, X^2+X}: d_F = 2, no fake fall",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "statement": "Over F_2, f_1 = X, f_2 = X^2 + X: with the field equations outside, X*f_1 + f_2 = X is a fall at degree 2 and none exists below, so d_F = 2; f_2 reduces to 0 modulo the field equations, leaving one effective generator, so no fake fall exists at any degree (d'_F = infinity).",
+      "scope": "Exact. Hand proof in the Lean docstring; native census instrument; core-Lean decide +kernel module, kernel-checked by the repository proof gate. Degenerate by construction: one generator is a field equation.",
+      "assumptions": [
+        "Equality reading"
+      ],
+      "source_refs": [
+        "S-DISPROVE-20261102"
+      ],
+      "tags": [
+        "counterexample",
+        "first-fall-degree",
+        "lean"
+      ],
+      "evidence_class": "counterexample",
+      "formal": {
+        "state": "kernel_checked",
+        "artifacts": [
+          {
+            "path": "papers/ic-negative-results/lean/IcNegative/Lemma4Reverse.lean",
+            "decl": "IcNegative.Lemma4Reverse.reverse_fails_witnessR"
+          },
+          {
+            "path": "research/disprove_easy_targets_20261102/reverse_census.rs",
+            "decl": "census"
+          }
+        ],
+        "notes": "Encoding bridges as in Lemma4Witness (mask completeness; reduction a ring homomorphism), argued not formalised. fake_noFall covers every degree by a degree bound in the quotient. lean-proof-gate run 41396053760 (commit d722ba45e): papers/ic-negative-results/lean PASS, 32 theorems, 0 trusted (8 from Lemma4Reverse)."
+      },
+      "cited_by": [
+        {
+          "path": "research/disprove_easy_targets_20261102/PROTOCOL.md",
+          "use": "reports"
+        },
+        {
+          "path": "research/disprove_easy_targets_20261102/REPORT.md",
+          "use": "reports"
+        }
+      ]
+    },
+    {
+      "id": "MEAS-LEMMA4-REVERSE-CENSUS",
+      "label": "Reverse-repair census: 0 nondegenerate counterexamples in 531,497 pairs",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "Exact census of unordered pairs (dmax 6): P1 multilinear deg <= 2, n = 3: 7875 pairs, 0 reverse counterexamples outside (reproduces the prior census); P2 all deg <= 2, n = 2: 1891 pairs, 204 counterexamples; P3 all deg <= 2, n = 3: 521731 pairs, 7126 counterexamples. Every counterexample has linearly dependent reduced generators and no fake fall; none has linearly independent reduced generators.",
+      "scope": "Pairs only; degree <= 2; n <= 3; F_2; equality reading. Inside placement for reference: 14336 pairs with d_F < d'_F both finite in P3.",
+      "assumptions": [],
+      "source_refs": [
+        "S-DISPROVE-20261102"
+      ],
+      "tags": [
+        "census",
+        "first-fall-degree",
+        "exact"
+      ],
+      "evidence_class": "measurement",
+      "cited_by": [
+        {
+          "path": "research/disprove_easy_targets_20261102/results/p1.txt",
+          "use": "measures"
+        },
+        {
+          "path": "research/disprove_easy_targets_20261102/results/p2.txt",
+          "use": "measures"
+        },
+        {
+          "path": "research/disprove_easy_targets_20261102/results/p3.txt",
+          "use": "measures"
+        }
+      ]
+    },
+    {
+      "id": "CLAIM-GB-LFD-LE-DREG-BFS",
+      "label": "'last fall <= d_reg' with BFS d_reg",
+      "kind": "structural_theorem",
+      "status": "refuted",
+      "model": "algebraic_coordinate",
+      "statement": "For every polynomial system, the last fall degree is at most the degree of regularity d_reg in the Bardet-Faugere-Salvy sense (least d with (F^top)_d = R_d).",
+      "scope": "The reading of HKYY's true statement (CLAIM-GB-LFD-LE-DREG, where 'degree of regularity' is a solving degree) with the BFS definition substituted; repeated in later introductions. Refuted by Salizzoni Ex. 3.9: last fall 3 > d_reg 2.",
+      "assumptions": [],
+      "source_refs": [
+        "S-DISPROVE-20261102",
+        "S-CAMINATA-GORLA-2021"
+      ],
+      "tags": [
+        "degree-of-regularity",
+        "last-fall-degree",
+        "refuted",
+        "reading-sensitive"
+      ],
+      "formula": "d_lastfall <= d_reg (BFS)",
+      "evidence_class": "counterexample"
+    },
+    {
+      "id": "THM-SALIZZONI-EX39-EXACT",
+      "label": "Salizzoni Ex. 3.9 (k=2) checked exactly: d_x = d_y = 3, d_reg = 2",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "statement": "For F = {x^2 + y, y^2 + x, xy} over F_2, F_3, F_5 and Q: (F^top)_2 = R_2 and (F^top)_1 = 0, so d_reg = 2; x, y are not in V_{F,2} and are in V_{F,3}; V_{F,d} = (x, y) cap R_{<=d} for d = 3..6. Hence last fall degree 3 (Caminata-Gorla Thm 2.9 with the reduced Groebner basis {x, y}).",
+      "scope": "Exact linear algebra (salizzoni_ex39.py); the F_2 memberships and the top parts are also kernel-checked in core Lean (repository proof gate). The Thm 2.9 step is cited, not formalised.",
+      "assumptions": [],
+      "source_refs": [
+        "S-DISPROVE-20261102",
+        "S-CAMINATA-GORLA-2021"
+      ],
+      "tags": [
+        "exact",
+        "last-fall-degree",
+        "degree-of-regularity",
+        "lean"
+      ],
+      "evidence_class": "theorem",
+      "formal": {
+        "state": "kernel_checked",
+        "artifacts": [
+          {
+            "path": "research/disprove_easy_targets_20261102/lean/SalizzoniEx39.lean",
+            "decl": "SalizzoniEx39.x_mem_V3"
+          },
+          {
+            "path": "research/disprove_easy_targets_20261102/lean/SalizzoniEx39.lean",
+            "decl": "SalizzoniEx39.not_mem_V2"
+          },
+          {
+            "path": "research/disprove_easy_targets_20261102/salizzoni_ex39.py",
+            "decl": "check"
+          }
+        ],
+        "notes": "lean-proof-gate run 41396053760 (commit d722ba45e): SalizzoniEx39.lean PASS, 4 theorems, 0 trusted."
+      },
+      "cited_by": [
+        {
+          "path": "research/disprove_easy_targets_20261102/results/salizzoni_ex39.txt",
+          "use": "measures"
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "DP-001",
+      "from": "CEX-LEMMA4-REVERSE-R",
+      "to": "CLAIM-LEMMA4-REVERSE-GENERAL",
+      "relation": "refutes",
+      "statement": "Witness R has d_F = 2 outside and no fake fall at any degree.",
+      "source_refs": [
+        "S-DISPROVE-20261102"
+      ]
+    },
+    {
+      "id": "DP-002",
+      "from": "CLAIM-LEMMA4-REVERSE-GENERAL",
+      "to": "GAP-LEMMA4-REVERSE",
+      "relation": "qualifies",
+      "statement": "The unrestricted repair is refuted; the open form keeps the hypothesis that the reduced generators are linearly independent.",
+      "source_refs": [
+        "S-DISPROVE-20261102"
+      ]
+    },
+    {
+      "id": "DP-003",
+      "from": "MEAS-LEMMA4-REVERSE-CENSUS",
+      "to": "GAP-LEMMA4-REVERSE",
+      "relation": "measures",
+      "statement": "No counterexample with linearly independent reduced generators among 531,497 pairs (degree <= 2, n <= 3).",
+      "source_refs": [
+        "S-DISPROVE-20261102"
+      ]
+    },
+    {
+      "id": "DP-004",
+      "from": "CEX-GB-SALIZZONI-EX39",
+      "to": "CLAIM-GB-LFD-LE-DREG-BFS",
+      "relation": "refutes",
+      "statement": "Last fall degree 3 > 2 = BFS d_reg for {x^2 + y, y^2 + x, xy}.",
+      "source_refs": [
+        "S-DISPROVE-20261102",
+        "S-CAMINATA-GORLA-2021"
+      ]
+    },
+    {
+      "id": "DP-005",
+      "from": "CLAIM-GB-LFD-LE-DREG-BFS",
+      "to": "CLAIM-GB-LFD-LE-DREG",
+      "relation": "qualifies",
+      "statement": "HKYY's inequality holds only with their meaning of 'degree of regularity' (a solving degree); with the BFS meaning it fails.",
+      "source_refs": [
+        "S-DISPROVE-20261102"
+      ]
+    },
+    {
+      "id": "DP-006",
+      "from": "THM-SALIZZONI-EX39-EXACT",
+      "to": "CEX-GB-SALIZZONI-EX39",
+      "relation": "qualifies",
+      "statement": "Confirms the inferred last-fall value by exact computation over F_2, F_3, F_5 and Q.",
+      "source_refs": [
+        "S-DISPROVE-20261102"
+      ]
+    }
+  ],
+  "research_targets": []
+}

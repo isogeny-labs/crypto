@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# A hardware-counter permission denial without perf's usual wording. Software
+# timers still work. Recording deliberately stops after exposing the event.
+case "$1" in
+  --version) echo 'perf version fixture' ;;
+  stat)
+    case "$*" in
+      *cycles*) echo 'hardware monitoring unavailable for this account' >&2; exit 255 ;;
+      *) echo '1,,task-clock,100,100.00,,' ;;
+    esac ;;
+  record) printf '%s\n' "$@"; exit 1 ;;
+esac

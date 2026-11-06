@@ -6,7 +6,8 @@ installs taskq onto it:
 | file | creates |
 |---|---|
 | `network.tf` | VPC across 3 AZs, private and public subnets, one NAT gateway |
-| `eks.tf` | EKS 1.31 with three managed node groups: `system` (t3.large), `cpu` (c7i.2xlarge) and `gpu` (g7e.2xlarge, RTX PRO 6000 Blackwell, sm_120). The worker groups run the kubelet's **static CPU manager**, so a Guaranteed worker pod owns its cores and its timings are comparable. Also the EFS CSI driver with its IAM role |
+| `eks.tf` | EKS 1.36 with a small Spot managed node group for Karpenter and cluster services; no On-Demand node group. Also the EFS CSI driver with its IAM role |
+| `karpenter.tf` | Karpenter controller, IAM, Pod Identity, EventBridge to SQS interruption queue, and Spot-only CPU/GPU NodePools |
 | `redis.tf` | ElastiCache Redis 7.1: cluster mode disabled, a primary and a replica, Multi-AZ failover, TLS, encryption at rest, a generated AUTH token, reachable only from the cluster nodes' security group |
 | `efs.tf` | encrypted EFS results volume with a mount target per AZ, reachable only from the nodes; `prevent_destroy` |
 | `kubernetes.tf` | the `taskq` namespace, the `taskq-redis` Secret (URL and password) and the `efs-sc` StorageClass |
@@ -48,43 +49,33 @@ and never commit it. `.gitignore` here excludes state, `terraform.tfvars` and
 
 `pools` in `terraform.tfvars` defines one worker Deployment per entry:
 
-* `node_group` is `cpu` or `gpu`. It picks the node selector and tolerations.
+* `node_group` is `cpu` or `gpu`. It picks the Spot NodePool selector and tolerations.
 * `cpu`/`memory` are both the request and the limit, which is Guaranteed QoS.
 * `gpus` adds `nvidia.com/gpu`.
 * `image` overrides the default worker image, for example with the cryptanalysis toolchain images.
 * `keda` sets that pool's scaler bounds when `enable_keda = true`.
 
-The example tfvars has three pools:
+The example tfvars has two CPU pools, each with KEDA minimum replicas zero:
 
 * `cpu`, for crypto and crypto-autoresearcher jobs;
-* `ca-cpu`, for cryptanalysis `ca` jobs;
-* `ca-gpu-sm120`, which starts at 0 replicas.
+* `ca-cpu`, for cryptanalysis `ca` jobs.
 
 Size nodes for **one worker pod each**. A c7i.2xlarge has 8 vCPU and 16 GiB.
 After kube-reserved and system-reserved, a 6 CPU / 12 GiB pod fills it.
 
 ## Scaling and cost
 
-* **No node autoscaler is installed.** The EKS module also ignores
-  `desired_size` after a node group is created, so changing tfvars does not
-  resize a live group. Resize it directly, then match the pool replicas:
-
-  ```sh
-  aws eks update-nodegroup-config --cluster-name taskq \
-      --nodegroup-name <cpu group name from the console or `aws eks list-nodegroups`> \
-      --scaling-config minSize=0,maxSize=20,desiredSize=6
-  ```
-
-* **KEDA scales pods, not nodes.** Without Karpenter or Cluster Autoscaler,
-  pods KEDA adds sit Pending until nodes exist. It is off by default.
-* **The GPU group starts at 0 nodes.** To use it:
-  1. Scale the group to 1.
-  2. Set `ca-gpu-sm120` replicas to 1 and apply.
-  3. Scale back to 0 when the queue is empty: a g7e bills every hour it runs.
+* **KEDA scales worker pods from zero; Karpenter creates Spot nodes for Pending pods.**
+  Both CPU and GPU NodePools specify `karpenter.sh/capacity-type: spot`, with
+  no On-Demand fallback. If Spot has no eligible capacity, work waits.
+* **The GPU NodePool starts with zero nodes.** Set `gpu_spot_instance_types`
+  to enable it and configure a KEDA pool. Karpenter consolidates empty nodes.
+* **Pin `karpenter_ami_alias` to a tested release** before deployment. The
+  example's `@latest` is for planning and can replace nodes when the AMI updates.
 * **Costs while the stack is up:**
   * the EKS control plane;
   * the NAT gateway;
-  * 2 t3.large system nodes, plus the c7i nodes;
+  * 1-3 Spot system nodes, plus Spot workers while jobs run;
   * 2 ElastiCache nodes;
   * EFS storage.
 

@@ -1,0 +1,609 @@
+{
+ "_comment": "Inputs of examples/ic_planner_exhaustive_lean_certs.rs (scripts/lean_certificates.sh). Arm-to-multiplier maps are the studies' own designs (PROTOCOL.md and derive.jq of each); every number comes from the band files.",
+ "studies": [
+  {
+   "id": "prime21",
+   "bands": {
+    "A-r24": "research/ic_planner_exhaustive_20261026/analysis/rebands/ic_planner_weight_rule_20261021--A-r24.json",
+    "A-r26": "research/ic_planner_exhaustive_20261026/analysis/rebands/ic_planner_weight_rule_20261021--A-r26.json",
+    "A-r28": "research/ic_planner_exhaustive_20261026/analysis/rebands/ic_planner_weight_rule_20261021--A-r28.json",
+    "B-h21": "research/ic_planner_exhaustive_20261026/analysis/rebands/ic_planner_weight_rule_20261021--B-h21.json",
+    "B-h22": "research/ic_planner_exhaustive_20261026/analysis/rebands/ic_planner_weight_rule_20261021--B-h22.json",
+    "B-h24": "research/ic_planner_exhaustive_20261026/analysis/rebands/ic_planner_weight_rule_20261021--B-h24.json",
+    "B-h29": "research/ic_planner_exhaustive_20261026/analysis/rebands/ic_planner_weight_rule_20261021--B-h29.json"
+   },
+   "refs": [
+    "m100",
+    "v1",
+    "rho-neg"
+   ],
+   "families": [
+    {
+     "name": "prime",
+     "bands": [
+      "A-r24",
+      "A-r26",
+      "A-r28"
+     ],
+     "grid": [
+      {
+       "m": 0.5,
+       "arms": "m050"
+      },
+      {
+       "m": 0.71,
+       "arms": "m071"
+      },
+      {
+       "m": 1,
+       "arms": "m100"
+      },
+      {
+       "m": 1.41,
+       "arms": "m141"
+      },
+      {
+       "m": 2,
+       "arms": "m200"
+      },
+      {
+       "m": 2.83,
+       "arms": "m283"
+      },
+      {
+       "m": 4,
+       "arms": "m400"
+      }
+     ],
+     "expect": {
+      "path": "research/ic_planner_weight_rule_20261021/analysis/derivation.json",
+      "rule": "rule"
+     }
+    }
+   ]
+  },
+  {
+   "id": "binkob",
+   "bands": {
+    "A-b21": "research/ic_planner_exhaustive_20261026/analysis/rebands/ic_planner_weight_rule_binkob_20261026--A-b21.json",
+    "A-b23": "research/ic_planner_exhaustive_20261026/analysis/rebands/ic_planner_weight_rule_binkob_20261026--A-b23.json",
+    "A-b25": "research/ic_planner_exhaustive_20261026/analysis/rebands/ic_planner_weight_rule_binkob_20261026--A-b25.json",
+    "A-k23": "research/ic_planner_exhaustive_20261026/analysis/rebands/ic_planner_weight_rule_binkob_20261026--A-k23.json",
+    "A-k31": "research/ic_planner_exhaustive_20261026/analysis/rebands/ic_planner_weight_rule_binkob_20261026--A-k31.json",
+    "A-k37": "research/ic_planner_exhaustive_20261026/analysis/rebands/ic_planner_weight_rule_binkob_20261026--A-k37.json",
+    "B-hk19": "research/ic_planner_exhaustive_20261026/analysis/rebands/ic_planner_weight_rule_binkob_20261026--B-hk19.json",
+    "B-hk23": "research/ic_planner_exhaustive_20261026/analysis/rebands/ic_planner_weight_rule_binkob_20261026--B-hk23.json",
+    "B-hk39": "research/ic_planner_exhaustive_20261026/analysis/rebands/ic_planner_weight_rule_binkob_20261026--B-hk39.json"
+   },
+   "refs": [
+    "plan",
+    "rho"
+   ],
+   "families": [
+    {
+     "name": "binary",
+     "bands": [
+      "A-b21",
+      "A-b23",
+      "A-b25"
+     ],
+     "grid": [
+      {
+       "m": 0.25,
+       "arms": "dm2"
+      },
+      {
+       "m": 0.5,
+       "arms": "dm1"
+      },
+      {
+       "m": 1,
+       "arms": "plan"
+      },
+      {
+       "m": 2,
+       "arms": "dp1"
+      },
+      {
+       "m": 4,
+       "arms": "dp2"
+      }
+     ],
+     "expect": {
+      "path": "research/ic_planner_weight_rule_binkob_20261026/analysis/derivation.json",
+      "rule": "rule.binary"
+     }
+    },
+    {
+     "name": "koblitz",
+     "bands": [
+      "A-k23",
+      "A-k31",
+      "A-k37"
+     ],
+     "grid": [
+      {
+       "m": 0.5,
+       "arms": {
+        "A-k23": "c2",
+        "A-k31": "c1",
+        "A-k37": "c5"
+       }
+      },
+      {
+       "m": 0.71,
+       "arms": {
+        "A-k23": "c2",
+        "A-k31": "c1",
+        "A-k37": "c7"
+       }
+      },
+      {
+       "m": 1,
+       "arms": {
+        "A-k23": "plan",
+        "A-k31": "plan",
+        "A-k37": "plan"
+       }
+      },
+      {
+       "m": 1.41,
+       "arms": {
+        "A-k23": "c4",
+        "A-k31": "c3",
+        "A-k37": "c14"
+       }
+      },
+      {
+       "m": 2,
+       "arms": {
+        "A-k23": "c6",
+        "A-k31": "c4",
+        "A-k37": "c20"
+       }
+      },
+      {
+       "m": 2.83,
+       "arms": {
+        "A-k23": "c8",
+        "A-k31": "c6",
+        "A-k37": "c28"
+       }
+      },
+      {
+       "m": 4,
+       "arms": {
+        "A-k23": "c12",
+        "A-k31": "c8",
+        "A-k37": "c40"
+       }
+      }
+     ],
+     "expect": {
+      "path": "research/ic_planner_weight_rule_binkob_20261026/analysis/derivation.json",
+      "rule": "rule.koblitz"
+     }
+    }
+   ]
+  },
+  {
+   "id": "residual",
+   "bands": {
+    "p21": "research/ic_planner_exhaustive_20261026/analysis/rebands/ic_prime_residual_lp_20261026--p21.json",
+    "p22": "research/ic_planner_exhaustive_20261026/analysis/rebands/ic_prime_residual_lp_20261026--p22.json",
+    "p24": "research/ic_planner_exhaustive_20261026/analysis/rebands/ic_prime_residual_lp_20261026--p24.json",
+    "p26": "research/ic_planner_exhaustive_20261026/analysis/rebands/ic_prime_residual_lp_20261026--p26.json",
+    "p28": "research/ic_planner_exhaustive_20261026/analysis/rebands/ic_prime_residual_lp_20261026--p28.json",
+    "p32": "research/ic_planner_exhaustive_20261026/analysis/rebands/ic_prime_residual_lp_20261026--p32.json"
+   },
+   "refs": [
+    "plan",
+    "rho"
+   ],
+   "families": [
+    {
+     "name": "res_p21",
+     "bands": [
+      "p21"
+     ],
+     "grid": [
+      {
+       "m": 4,
+       "arms": "res4"
+      },
+      {
+       "m": 8,
+       "arms": "res8"
+      },
+      {
+       "m": 16,
+       "arms": "res16"
+      },
+      {
+       "m": 32,
+       "arms": "res32"
+      },
+      {
+       "m": 64,
+       "arms": "res64"
+      }
+     ]
+    },
+    {
+     "name": "res_p22",
+     "bands": [
+      "p22"
+     ],
+     "grid": [
+      {
+       "m": 4,
+       "arms": "res4"
+      },
+      {
+       "m": 8,
+       "arms": "res8"
+      },
+      {
+       "m": 16,
+       "arms": "res16"
+      },
+      {
+       "m": 32,
+       "arms": "res32"
+      },
+      {
+       "m": 64,
+       "arms": "res64"
+      }
+     ]
+    },
+    {
+     "name": "res_p24",
+     "bands": [
+      "p24"
+     ],
+     "grid": [
+      {
+       "m": 4,
+       "arms": "res4"
+      },
+      {
+       "m": 8,
+       "arms": "res8"
+      },
+      {
+       "m": 16,
+       "arms": "res16"
+      },
+      {
+       "m": 32,
+       "arms": "res32"
+      },
+      {
+       "m": 64,
+       "arms": "res64"
+      }
+     ]
+    },
+    {
+     "name": "res_p26",
+     "bands": [
+      "p26"
+     ],
+     "grid": [
+      {
+       "m": 4,
+       "arms": "res4"
+      },
+      {
+       "m": 8,
+       "arms": "res8"
+      },
+      {
+       "m": 16,
+       "arms": "res16"
+      },
+      {
+       "m": 32,
+       "arms": "res32"
+      },
+      {
+       "m": 64,
+       "arms": "res64"
+      }
+     ]
+    },
+    {
+     "name": "res_p28",
+     "bands": [
+      "p28"
+     ],
+     "grid": [
+      {
+       "m": 4,
+       "arms": "res4"
+      },
+      {
+       "m": 8,
+       "arms": "res8"
+      },
+      {
+       "m": 16,
+       "arms": "res16"
+      },
+      {
+       "m": 32,
+       "arms": "res32"
+      },
+      {
+       "m": 64,
+       "arms": "res64"
+      }
+     ]
+    },
+    {
+     "name": "res_p32",
+     "bands": [
+      "p32"
+     ],
+     "grid": [
+      {
+       "m": 4,
+       "arms": "res4"
+      },
+      {
+       "m": 8,
+       "arms": "res8"
+      },
+      {
+       "m": 16,
+       "arms": "res16"
+      },
+      {
+       "m": 32,
+       "arms": "res32"
+      },
+      {
+       "m": 64,
+       "arms": "res64"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "routing",
+   "bands": {
+    "k47": "research/ic_planner_exhaustive_20261026/analysis/rebands/ic_koblitz_descent_routing_20261026--k47.json",
+    "k41": "research/ic_planner_exhaustive_20261026/analysis/rebands/ic_koblitz_descent_routing_20261026--k41.json",
+    "k53": "research/ic_planner_exhaustive_20261026/analysis/rebands/ic_koblitz_descent_routing_20261026--k53.json"
+   },
+   "refs": [
+    "pipeline",
+    "rho"
+   ]
+  },
+  {
+   "id": "exhR",
+   "bands": {
+    "R-p16": "research/ic_planner_exhaustive_20261026/analysis/band-R-p16.json",
+    "R-p18": "research/ic_planner_exhaustive_20261026/analysis/band-R-p18.json",
+    "R-p36": "research/ic_planner_exhaustive_20261026/analysis/band-R-p36.json",
+    "R-p37": "research/ic_planner_exhaustive_20261026/analysis/band-R-p37.json"
+   },
+   "refs": [
+    "plan",
+    "rho"
+   ],
+   "families": [
+    {
+     "name": "prime_heldout",
+     "bands": [
+      "R-p16",
+      "R-p18",
+      "R-p36",
+      "R-p37"
+     ],
+     "grid": [
+      {
+       "m": 1,
+       "arms": "plan"
+      },
+      {
+       "m": 1.41,
+       "arms": "m141"
+      }
+     ]
+    },
+    {
+     "name": "res_R-p16",
+     "bands": [
+      "R-p16"
+     ],
+     "grid": [
+      {
+       "m": 2,
+       "arms": "res2"
+      },
+      {
+       "m": 4,
+       "arms": "res4"
+      },
+      {
+       "m": 8,
+       "arms": "res8"
+      },
+      {
+       "m": 16,
+       "arms": "res16"
+      },
+      {
+       "m": 32,
+       "arms": "res32"
+      }
+     ]
+    },
+    {
+     "name": "res_R-p18",
+     "bands": [
+      "R-p18"
+     ],
+     "grid": [
+      {
+       "m": 2,
+       "arms": "res2"
+      },
+      {
+       "m": 4,
+       "arms": "res4"
+      },
+      {
+       "m": 8,
+       "arms": "res8"
+      },
+      {
+       "m": 16,
+       "arms": "res16"
+      },
+      {
+       "m": 32,
+       "arms": "res32"
+      }
+     ]
+    },
+    {
+     "name": "res_R-p36",
+     "bands": [
+      "R-p36"
+     ],
+     "grid": [
+      {
+       "m": 2,
+       "arms": "res2"
+      },
+      {
+       "m": 4,
+       "arms": "res4"
+      },
+      {
+       "m": 8,
+       "arms": "res8"
+      },
+      {
+       "m": 16,
+       "arms": "res16"
+      },
+      {
+       "m": 32,
+       "arms": "res32"
+      }
+     ]
+    },
+    {
+     "name": "res_R-p37",
+     "bands": [
+      "R-p37"
+     ],
+     "grid": [
+      {
+       "m": 2,
+       "arms": "res2"
+      },
+      {
+       "m": 4,
+       "arms": "res4"
+      },
+      {
+       "m": 8,
+       "arms": "res8"
+      },
+      {
+       "m": 16,
+       "arms": "res16"
+      },
+      {
+       "m": 32,
+       "arms": "res32"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "exhB",
+   "bands": {
+    "B-hb19": "research/ic_planner_exhaustive_20261026/analysis/band-B-hb19.json",
+    "B-hb23": "research/ic_planner_exhaustive_20261026/analysis/band-B-hb23.json",
+    "B-hb25": "research/ic_planner_exhaustive_20261026/analysis/band-B-hb25.json",
+    "B-hb27": "research/ic_planner_exhaustive_20261026/analysis/band-B-hb27.json"
+   },
+   "refs": [
+    "plan",
+    "rho"
+   ],
+   "families": [
+    {
+     "name": "binary_heldout",
+     "bands": [
+      "B-hb19",
+      "B-hb23",
+      "B-hb25",
+      "B-hb27"
+     ],
+     "grid": [
+      {
+       "m": 0.5,
+       "arms": "dm1"
+      },
+      {
+       "m": 1,
+       "arms": "plan"
+      },
+      {
+       "m": 2,
+       "arms": "dp1"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "exhK",
+   "bands": {
+    "K-k47": "research/ic_planner_exhaustive_20261026/analysis/band-K-k47.json",
+    "K-k57": "research/ic_planner_exhaustive_20261026/analysis/band-K-k57.json",
+    "K-k41": "research/ic_planner_exhaustive_20261026/analysis/band-K-k41.json",
+    "K-k53": "research/ic_planner_exhaustive_20261026/analysis/band-K-k53.json",
+    "K-k59": "research/ic_planner_exhaustive_20261026/analysis/band-K-k59.json",
+    "K-k61": "research/ic_planner_exhaustive_20261026/analysis/band-K-k61.json"
+   },
+   "refs": [
+    "pipeline",
+    "rho"
+   ],
+   "families": [
+    {
+     "name": "koblitz_heldout",
+     "bands": [
+      "K-k47",
+      "K-k57",
+      "K-k41",
+      "K-k53",
+      "K-k59",
+      "K-k61"
+     ],
+     "grid": [
+      {
+       "m": 0.71,
+       "arms": "pipeline71"
+      },
+      {
+       "m": 1,
+       "arms": "pipeline"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

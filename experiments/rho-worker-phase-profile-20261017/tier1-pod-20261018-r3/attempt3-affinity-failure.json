@@ -1,0 +1,57 @@
+{
+  "affected_processes": [
+    {
+      "affinity": [
+        2,
+        3,
+        4,
+        5,
+        26,
+        27,
+        28,
+        29
+      ],
+      "cmdline": "gotty -w --random-url-length 32 -r --ws-origin .* -p 19123 env TERM=xterm bash --rcfile /root/.runpod-web-terminal.bashrc",
+      "pid": 8862,
+      "ppid": 1
+    },
+    {
+      "affinity": [
+        2,
+        3,
+        4,
+        5,
+        26,
+        27,
+        28,
+        29
+      ],
+      "cmdline": "bash --rcfile /root/.runpod-web-terminal.bashrc",
+      "pid": 8906,
+      "ppid": 8862
+    },
+    {
+      "affinity": [
+        2,
+        3,
+        4,
+        5,
+        26,
+        27,
+        28,
+        29
+      ],
+      "cmdline": "bash --rcfile /root/.runpod-web-terminal.bashrc",
+      "pid": 8909,
+      "ppid": 8862
+    }
+  ],
+  "decision": "stop_partial_panel_and_retain_all_arms",
+  "measurement_cpu": 5,
+  "measurement_sibling": 29,
+  "observed_at_unix": 1792361658.575141,
+  "pod_id": "94uxi8f876o5gz",
+  "reason": "web-terminal process tree retained measured-core affinity after prior process pinning snapshot",
+  "result_id": "71140a63e64f415bbf438ad40d302a7b",
+  "schema": "rho-worker-pod-affinity-failure-v1"
+}

@@ -1,0 +1,448 @@
+{
+ "_comment": "Recorded values only, copied from the named sources. make_figures.py lays them out and computes nothing.",
+ "binary_m2": {
+  "_source": "crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/summary.md (per-instance closure W_d refutation; d_LFD exact unless marked >=); first fall degree 2 for every n is Cor. 2.2 of theorem-dossier.md (proved)",
+  "random_V": {
+   "n": [
+    11,
+    13,
+    15,
+    17,
+    19,
+    21,
+    23,
+    25,
+    27,
+    29,
+    31,
+    33,
+    35,
+    37,
+    39
+   ],
+   "dLFD": [
+    3,
+    3,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    5,
+    5,
+    5
+   ],
+   "lower_bound_only": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true,
+    true,
+    true
+   ],
+   "instances": [
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    2,
+    2,
+    2,
+    2
+   ]
+  },
+  "polynomial_V": {
+   "n": [
+    17,
+    19,
+    21,
+    23,
+    25,
+    27,
+    29,
+    31,
+    33,
+    35,
+    41,
+    43,
+    45
+   ],
+   "dLFD_values": [
+    [
+     3
+    ],
+    [
+     3
+    ],
+    [
+     3,
+     4
+    ],
+    [
+     4
+    ],
+    [
+     4
+    ],
+    [
+     4
+    ],
+    [
+     4
+    ],
+    [
+     4
+    ],
+    [
+     4
+    ],
+    [
+     4
+    ],
+    [
+     4
+    ],
+    [
+     4
+    ],
+    [
+     5
+    ]
+   ],
+   "lower_bound_only": [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    true
+   ],
+   "instances": [
+    6,
+    4,
+    4,
+    4,
+    4,
+    4,
+    3,
+    3,
+    3,
+    2,
+    1,
+    1,
+    1
+   ]
+  },
+  "upper_bound_note": "d_LFD <= k+2 with k = ceil(n/2) (Thm 2.5, proved)"
+ },
+ "prime_kummer_m2": {
+  "_source_ours": "crypto:research/prime_fall_degree_20261027/RESTART.md and DERIVED.md (median d_F per t, Kummer m=2, p=2013265921; numbers reported by the session, raw data never committed); ffd=4 for t>=2 is D3 (written proof); certificate degree 2t+2 is D4",
+  "t": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10
+  ],
+  "dF_session_reported": [
+   3,
+   4,
+   4,
+   4,
+   4,
+   5,
+   5,
+   5,
+   5,
+   6
+  ],
+  "ffd_proved": [
+   null,
+   4,
+   4,
+   4,
+   4,
+   4,
+   4,
+   4,
+   4,
+   4
+  ],
+  "_source_pkm": "Petit-Kosters-Messeng, PKC 2016, Table 4 (prime case, p-1 subgroups), corrected degree of regularity D_av^corr, n1 = 1..11",
+  "pkm_n1": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11
+  ],
+  "pkm_Dcorr": [
+   4.0,
+   4.0,
+   4.0,
+   4.0,
+   4.0,
+   5.0,
+   5.0,
+   5.0,
+   5.0,
+   6.0,
+   6.0
+  ]
+ },
+ "genus3_vs_rho": {
+  "_source": "crypto:research/ghs3_vs_rho_20261023/TABLES.md (per-instance table; IC/R_ideal at w=0, c_ell=1; and the c_ell=9 sensitivity)",
+  "rows": [
+   {
+    "log2q": 14,
+    "curve": 0,
+    "log2ell": 39.01,
+    "ic_over_R_ideal": 0.998,
+    "ic_over_R_meas": 0.96,
+    "ic_over_R_ideal_cl9": 4.497
+   },
+   {
+    "log2q": 14,
+    "curve": 1,
+    "log2ell": 39.01,
+    "ic_over_R_ideal": 0.957,
+    "ic_over_R_meas": 1.031,
+    "ic_over_R_ideal_cl9": 4.186
+   },
+   {
+    "log2q": 14,
+    "curve": 2,
+    "log2ell": 37.42,
+    "ic_over_R_ideal": 1.623,
+    "ic_over_R_meas": 1.626,
+    "ic_over_R_ideal_cl9": 6.903
+   },
+   {
+    "log2q": 15,
+    "curve": 0,
+    "log2ell": 42.0,
+    "ic_over_R_ideal": 0.929,
+    "ic_over_R_meas": 0.858,
+    "ic_over_R_ideal_cl9": 4.516
+   },
+   {
+    "log2q": 15,
+    "curve": 1,
+    "log2ell": 41.0,
+    "ic_over_R_ideal": 1.285,
+    "ic_over_R_meas": 1.314,
+    "ic_over_R_ideal_cl9": 6.154
+   },
+   {
+    "log2q": 15,
+    "curve": 2,
+    "log2ell": 41.0,
+    "ic_over_R_ideal": 1.274,
+    "ic_over_R_meas": 1.223,
+    "ic_over_R_ideal_cl9": 6.054
+   },
+   {
+    "log2q": 16,
+    "curve": 0,
+    "log2ell": 46.0,
+    "ic_over_R_ideal": 0.697,
+    "ic_over_R_meas": 0.895,
+    "ic_over_R_ideal_cl9": 3.267
+   },
+   {
+    "log2q": 16,
+    "curve": 1,
+    "log2ell": 46.0,
+    "ic_over_R_ideal": 0.71,
+    "ic_over_R_meas": 0.613,
+    "ic_over_R_ideal_cl9": 3.321
+   },
+   {
+    "log2q": 16,
+    "curve": 2,
+    "log2ell": 46.0,
+    "ic_over_R_ideal": 0.696,
+    "ic_over_R_meas": 0.623,
+    "ic_over_R_ideal_cl9": 3.228
+   },
+   {
+    "log2q": 17,
+    "curve": 0,
+    "log2ell": 45.0,
+    "ic_over_R_ideal": 2.392,
+    "ic_over_R_meas": 2.674,
+    "ic_over_R_ideal_cl9": 12.418
+   },
+   {
+    "log2q": 17,
+    "curve": 1,
+    "log2ell": 49.0,
+    "ic_over_R_ideal": 0.608,
+    "ic_over_R_meas": 0.613,
+    "ic_over_R_ideal_cl9": 3.147
+   },
+   {
+    "log2q": 17,
+    "curve": 2,
+    "log2ell": 45.0,
+    "ic_over_R_ideal": 2.394,
+    "ic_over_R_meas": 2.362,
+    "ic_over_R_ideal_cl9": 12.305
+   },
+   {
+    "log2q": 18,
+    "curve": 0,
+    "log2ell": 51.0,
+    "ic_over_R_ideal": 0.794,
+    "ic_over_R_meas": 0.58,
+    "ic_over_R_ideal_cl9": 4.142
+   },
+   {
+    "log2q": 18,
+    "curve": 1,
+    "log2ell": 49.0,
+    "ic_over_R_ideal": 1.599,
+    "ic_over_R_meas": 2.387,
+    "ic_over_R_ideal_cl9": 8.34
+   },
+   {
+    "log2q": 18,
+    "curve": 2,
+    "log2ell": 48.0,
+    "ic_over_R_ideal": 2.272,
+    "ic_over_R_meas": 1.962,
+    "ic_over_R_ideal_cl9": 11.875
+   },
+   {
+    "log2q": 19,
+    "curve": 0,
+    "log2ell": 52.68,
+    "ic_over_R_ideal": 1.172,
+    "ic_over_R_meas": 1.179,
+    "ic_over_R_ideal_cl9": 5.959
+   },
+   {
+    "log2q": 19,
+    "curve": 1,
+    "log2ell": 52.0,
+    "ic_over_R_ideal": 1.488,
+    "ic_over_R_meas": 1.096,
+    "ic_over_R_ideal_cl9": 7.561
+   },
+   {
+    "log2q": 19,
+    "curve": 2,
+    "log2ell": 55.0,
+    "ic_over_R_ideal": 0.524,
+    "ic_over_R_meas": 0.6,
+    "ic_over_R_ideal_cl9": 2.662
+   },
+   {
+    "log2q": 20,
+    "curve": 0,
+    "log2ell": 55.42,
+    "ic_over_R_ideal": 1.169,
+    "ic_over_R_meas": 0.981,
+    "ic_over_R_ideal_cl9": 5.761
+   },
+   {
+    "log2q": 20,
+    "curve": 1,
+    "log2ell": 55.42,
+    "ic_over_R_ideal": 1.172,
+    "ic_over_R_meas": 1.079,
+    "ic_over_R_ideal_cl9": 5.766
+   },
+   {
+    "log2q": 20,
+    "curve": 2,
+    "log2ell": 54.68,
+    "ic_over_R_ideal": 1.511,
+    "ic_over_R_meas": 1.463,
+    "ic_over_R_ideal_cl9": 7.413
+   }
+  ]
+ },
+ "quartic_n4v2": {
+  "_source": "crypto:research/quartic_n4v2_20261020/README.md (fitted exponents of cold M-eq at w=0, full range, 95% bootstrap)",
+  "arms": [
+   "B0",
+   "S",
+   "L",
+   "D",
+   "DL1",
+   "DL",
+   "rho plain",
+   "rho-neg"
+  ],
+  "exp": [
+   1.209,
+   1.211,
+   1.212,
+   1.035,
+   0.938,
+   0.983,
+   1.504,
+   1.543
+  ],
+  "lo": [
+   1.204,
+   1.203,
+   1.204,
+   1.028,
+   0.927,
+   0.975,
+   1.47,
+   1.494
+  ],
+  "hi": [
+   1.214,
+   1.218,
+   1.22,
+   1.042,
+   0.95,
+   0.993,
+   1.532,
+   1.583
+  ]
+ }
+}

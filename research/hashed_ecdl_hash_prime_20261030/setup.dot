@@ -1,0 +1,20 @@
+digraph setup {
+  rankdir=TB;
+  graph [bgcolor="white", pad="0.2", nodesep="0.3", ranksep="0.35"];
+  node [shape=box, style="rounded,filled", fillcolor="#edf4fb", color="#395b80", fontname="Helvetica", fontsize=11];
+  edge [color="#395b80", fontname="Helvetica", fontsize=10];
+  proofs [label="Untrusted proof input: p, r and auxiliary s\nPocklington dependencies, factors and witness"];
+  verify [label="Exact proof verification\nF divides n-1; F^2 > n; Fermat and gcd checks"];
+  context [label="Private immutable checked-prime context\nWidth and work policy checked on reuse"];
+  curve [label="Curve and target validation"];
+  base [label="Fixed s in [2p,4p]\nFactor-base construction and certificate replay"];
+  network [label="Fourier / point / hash network construction"];
+  search [label="Exact leaf search / source recursion guard\nNo practical crossover established", fillcolor="#fff1df", color="#9a692d"];
+  fallback [label="Uncovered value\nExact primality (AKS above u64)", fillcolor="#fff1df", color="#9a692d"];
+  proofs -> verify -> context;
+  context -> curve;
+  context -> base;
+  curve -> base;
+  base -> network -> search;
+  context -> fallback [style=dashed, label="not certified"];
+}

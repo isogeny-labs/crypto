@@ -1,0 +1,47 @@
+# The EC2NodeClass of the gha-xmem pool: the gha class with a big, fast root
+# volume, because the node's local disk holds the checkpoint generations (two at
+# once, plus the build) before they are copied to S3. gp3 allows up to
+# 16000 IOPS and 1000 MiB/s: at 125 MiB/s (the default) writing a 200 GB state
+# takes 27 minutes, at 1000 MiB/s about 3.
+apiVersion: karpenter.k8s.aws/v1
+kind: EC2NodeClass
+metadata:
+  name: gha-xmem
+spec:
+  amiFamily: AL2023
+  amiSelectorTerms:
+    - id: ami-082b570a48503ea93 # EKS 1.36 AL2023, v20261012, us-east-2; keep equal to nodepool.yaml
+  role: KarpenterNodeRole-isolab
+  subnetSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: isolab
+  securityGroupSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: isolab
+  metadataOptions:
+    httpEndpoint: enabled
+    httpProtocolIPv6: disabled
+    httpPutResponseHopLimit: 1
+    httpTokens: required
+  blockDeviceMappings:
+    - deviceName: /dev/xvda
+      ebs:
+        volumeSize: 1200Gi
+        volumeType: gp3
+        iops: 16000
+        throughput: 1000
+        encrypted: true
+        deleteOnTermination: true
+  kubelet:
+    kubeReserved:
+      cpu: 500m
+      memory: 512Mi
+      ephemeral-storage: 1Gi
+    systemReserved:
+      cpu: 500m
+      memory: 512Mi
+      ephemeral-storage: 1Gi
+  tags:
+    project: isolab
+    workload: github-actions-checkpointed
+    managed-by: karpenter

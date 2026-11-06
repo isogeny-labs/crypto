@@ -1,0 +1,335 @@
+Diff in /private/tmp/crypto-n83-k16627/examples/n83_precomputed_rho.rs:100:
+     fn parse(bytes: &[u8]) -> Result<Self, String> {
+         let c: Self =
+             serde_json::from_slice(bytes).map_err(|e| format!("invalid strict config: {e}"))?;
+-        let wall_ok = c.budget_wall_seconds.is_none_or(|s| s.is_finite() && s > 0.0);
++        let wall_ok = c
++            .budget_wall_seconds
++            .is_none_or(|s| s.is_finite() && s > 0.0);
+         let bytes_ok = c.budget_table_bytes.is_none_or(|b| b >= ENTRY_BYTES);
+         let some_budget = c.budget_wall_seconds.is_some() || c.budget_table_bytes.is_some();
+         if c.backend != "fold"
+Diff in /private/tmp/crypto-n83-k16627/examples/n83_precomputed_rho.rs:136:
+             .strip_prefix('[')
+             .and_then(|l| l.strip_suffix(']'))
+             .ok_or(format!("line {i}: expected a JSON array"))?;
+-        let parts: Vec<&str> = inner.split(',').map(|p| p.trim().trim_matches('"')).collect();
++        let parts: Vec<&str> = inner
++            .split(',')
++            .map(|p| p.trim().trim_matches('"'))
++            .collect();
+         if parts.len() != 2 {
+             return Err(format!("line {i}: expected two coordinates"));
+         }
+Diff in /private/tmp/crypto-n83-k16627/examples/n83_precomputed_rho.rs:145:
+             if part.is_empty() || !part.bytes().all(|b| b.is_ascii_digit()) {
+                 return Err(format!("line {i}: coordinates must be decimal"));
+             }
+-            *slot = part.parse::<u128>().map_err(|_| format!("line {i}: bad coordinate"))?;
++            *slot = part
++                .parse::<u128>()
++                .map_err(|_| format!("line {i}: bad coordinate"))?;
+             if *slot >> 83 != 0 {
+-                return Err(format!("line {i}: coordinate is not a canonical field word"));
++                return Err(format!(
++                    "line {i}: coordinate is not a canonical field word"
++                ));
+             }
+         }
+         out.push(point);
+Diff in /private/tmp/crypto-n83-k16627/examples/n83_precomputed_rho.rs:175:
+         || curve.cofactor.to_u64() != Some(1_128_547_018)
+         || point_strings(curve.generator())? != [LEGACY_G[0].to_string(), LEGACY_G[1].to_string()]
+     {
+-        return Err("constructor does not match the exact legacy n83 a1 curve and generator".into());
++        return Err(
++            "constructor does not match the exact legacy n83 a1 curve and generator".into(),
++        );
+     }
+     Ok(())
+ }
+Diff in /private/tmp/crypto-n83-k16627/examples/n83_precomputed_rho.rs:305:
+             .chunks_mut(per_thread)
+             .enumerate()
+             .map(|(t, chunk)| {
+-                let seed = derive_seed(b"n83-bl-table-walks-v1\0", config.table_seed, &t.to_le_bytes());
++                let seed = derive_seed(
++                    b"n83-bl-table-walks-v1\0",
++                    config.table_seed,
++                    &t.to_le_bytes(),
++                );
+                 scope.spawn(move || {
+                     let mut stats = DpWalkStats::default();
+-                    let written = precompute_thread(rho, jumps, config, seed, deadline, chunk, &mut stats);
++                    let written =
++                        precompute_thread(rho, jumps, config, seed, deadline, chunk, &mut stats);
+                     (written, stats)
+                 })
+             })
+Diff in /private/tmp/crypto-n83-k16627/examples/n83_precomputed_rho.rs:474:
+                     let candidate = mul_mod(sub_mod(hit_a, state.a, r), inv, r);
+                     if rho.scalar_mul(rho.generator(), candidate) == q {
+                         scalar = Some(candidate);
+-                        source = if from_table { "precomputed_table" } else { "own_walks" };
++                        source = if from_table {
++                            "precomputed_table"
++                        } else {
++                            "own_walks"
++                        };
+                         return true;
+                     }
+                     counts.failed_candidates += 1;
+Diff in /private/tmp/crypto-n83-k16627/examples/n83_precomputed_rho.rs:527:
+     let config_bytes = fs::read(config_path).map_err(|e| format!("read config: {e}"))?;
+     let config = Config::parse(&config_bytes)?;
+     let targets_bytes = fs::read(targets_path).map_err(|e| format!("read targets: {e}"))?;
+-    let targets = parse_targets(std::str::from_utf8(&targets_bytes).map_err(|_| "targets not UTF-8")?)?;
++    let targets =
++        parse_targets(std::str::from_utf8(&targets_bytes).map_err(|_| "targets not UTF-8")?)?;
+     let mut out = fs::OpenOptions::new()
+         .write(true)
+         .create_new(true)
+Diff in /private/tmp/crypto-n83-k16627/examples/n83_precomputed_rho.rs:613:
+     // ---- per-target online ---------------------------------------------
+     let mut all_ok = true;
+     for (index, coords) in targets.iter().enumerate() {
+-        let q = RawPointG::Affine { x: coords[0], y: coords[1] };
++        let q = RawPointG::Affine {
++            x: coords[0],
++            y: coords[1],
++        };
+         let seed = derive_seed(
+             b"n83-bl-online-v1\0",
+             config.online_seed,
+Diff in /private/tmp/crypto-n83-k16627/examples/n83_precomputed_rho.rs:705:
+ 
+     #[test]
+     fn targets_parse_numbers_and_strings_and_refuse_bad_rows() {
+-        let t = parse_targets("[6274346871052084705058109, 7777137791885914859810330]\n[\"1\",\"2\"]\n").unwrap();
++        let t = parse_targets(
++            "[6274346871052084705058109, 7777137791885914859810330]\n[\"1\",\"2\"]\n",
++        )
++        .unwrap();
+         assert_eq!(t.len(), 2);
+         assert_eq!(t[1], [1, 2]);
+         assert!(parse_targets("").is_err());
+Diff in /private/tmp/crypto-n83-k16627/examples/n83_precomputed_rho.rs:722:
+         let bytes = String::from_utf8(ok.to_vec()).unwrap();
+         for bad in [
+             bytes.replace("fold", "wide"),
+-            bytes.replace("\"budget_wall_seconds\":640.0", "\"budget_wall_seconds\":-1.0"),
+-            bytes.replace("\"budget_wall_seconds\":640.0", "\"budget_wall_seconds\":null"),
++            bytes.replace(
++                "\"budget_wall_seconds\":640.0",
++                "\"budget_wall_seconds\":-1.0",
++            ),
++            bytes.replace(
++                "\"budget_wall_seconds\":640.0",
++                "\"budget_wall_seconds\":null",
++            ),
+             bytes.replace("\"budget_table_bytes\":null", "\"budget_table_bytes\":3"),
+             bytes.replace("\"online_seed\":2", "\"online_seed\":2,\"scalar\":3"),
+         ] {
+Diff in /private/tmp/crypto-n83-k16627/examples/n83_precomputed_rho_analyze.rs:36:
+ fn as_u128(v: &Value) -> Option<u128> {
+     match v {
+         Value::String(s) => s.parse().ok(),
+-        Value::Number(n) => n.as_u64().map(u128::from).or_else(|| n.to_string().parse().ok()),
++        Value::Number(n) => n
++            .as_u64()
++            .map(u128::from)
++            .or_else(|| n.to_string().parse().ok()),
+         _ => None,
+     }
+ }
+Diff in /private/tmp/crypto-n83-k16627/examples/n83_precomputed_rho_analyze.rs:210:
+         .find(|r| r["kind"] == "compact_orbit_dlp_summary")
+         .ok_or("IC summary missing")?;
+     if rows.len() != targets.len() {
+-        return Err(format!("IC rows {} != targets {}", rows.len(), targets.len()));
++        return Err(format!(
++            "IC rows {} != targets {}",
++            rows.len(),
++            targets.len()
++        ));
+     }
+     let mut arm = Arm {
+         name: "ic".into(),
+Diff in /private/tmp/crypto-n83-k16627/examples/n83_precomputed_rho_analyze.rs:231:
+             .ok_or("IC online time missing")?;
+         arm.online_ms.push(ms);
+         arm.scalars.push(row["recovered_scalar"].as_u64());
+-        arm.statuses.push(if row["group_verified"] == true { "PRODUCER_VERIFIED".into() } else { "PRODUCER_UNVERIFIED".into() });
++        arm.statuses.push(if row["group_verified"] == true {
++            "PRODUCER_VERIFIED".into()
++        } else {
++            "PRODUCER_UNVERIFIED".into()
++        });
+         let probes = row["probes"].as_f64();
+         let roots = row["root_calls"].as_f64().unwrap_or(0.0);
+         let checks = row["relation_checks"].as_f64().unwrap_or(1.0);
+Diff in /private/tmp/crypto-n83-k16627/examples/n83_precomputed_rho_analyze.rs:238:
+-        arm.counts.push(probes.map(|p| (4.0 * checks + 1.0, p + roots)));
++        arm.counts
++            .push(probes.map(|p| (4.0 * checks + 1.0, p + roots)));
+     }
+     let timing = &summary["timing_ms"];
+     let process = timing["process_total"].as_f64();
+Diff in /private/tmp/crypto-n83-k16627/examples/n83_precomputed_rho_analyze.rs:278:
+         if as_u128(&q[0]) != Some(t[0]) || as_u128(&q[1]) != Some(t[1]) {
+             return Err(format!("{path}: target differs"));
+         }
+-        arm.online_ms.push(r["online_ms"].as_f64().ok_or("rho online_ms missing")?);
+-        arm.scalars.push(r["recovered_scalar"].as_str().and_then(|s| s.parse().ok()));
+-        arm.statuses.push(r["status"].as_str().unwrap_or("MISSING").into());
++        arm.online_ms
++            .push(r["online_ms"].as_f64().ok_or("rho online_ms missing")?);
++        arm.scalars
++            .push(r["recovered_scalar"].as_str().and_then(|s| s.parse().ok()));
++        arm.statuses
++            .push(r["status"].as_str().unwrap_or("MISSING").into());
+         let c = &r["outcome"]["charges_setup_and_solve"];
+         let g = c["group_additions"].as_f64();
+-        let u = ["canonicalizations", "partition_hashes", "table_queries", "table_inserts"]
+-            .iter()
+-            .map(|k| c[*k].as_f64())
+-            .sum::<Option<f64>>();
++        let u = [
++            "canonicalizations",
++            "partition_hashes",
++            "table_queries",
++            "table_inserts",
++        ]
++        .iter()
++        .map(|k| c[*k].as_f64())
++        .sum::<Option<f64>>();
+         arm.counts.push(g.zip(u));
+     }
+     Ok(arm)
+Diff in /private/tmp/crypto-n83-k16627/examples/n83_precomputed_rho_analyze.rs:302:
+     let end = records.iter().find(|r| r["record"] == "end").cloned();
+     let rows: Vec<&Value> = records.iter().filter(|r| r["record"] == "target").collect();
+     if rows.len() != targets.len() {
+-        return Err(format!("{name}: rows {} != targets {}", rows.len(), targets.len()));
++        return Err(format!(
++            "{name}: rows {} != targets {}",
++            rows.len(),
++            targets.len()
++        ));
+     }
+     let mut arm = Arm {
+         name: name.into(),
+Diff in /private/tmp/crypto-n83-k16627/examples/n83_precomputed_rho_analyze.rs:317:
+         if as_u128(&q[0]) != Some(t[0]) || as_u128(&q[1]) != Some(t[1]) {
+             return Err(format!("{name}: target order differs"));
+         }
+-        arm.online_ms.push(row["online_ms"].as_f64().ok_or("online_ms missing")?);
+-        arm.scalars.push(row["recovered_scalar"].as_str().and_then(|s| s.parse().ok()));
+-        arm.statuses.push(row["status"].as_str().unwrap_or("MISSING").into());
++        arm.online_ms
++            .push(row["online_ms"].as_f64().ok_or("online_ms missing")?);
++        arm.scalars.push(
++            row["recovered_scalar"]
++                .as_str()
++                .and_then(|s| s.parse().ok()),
++        );
++        arm.statuses
++            .push(row["status"].as_str().unwrap_or("MISSING").into());
+         let w = &row["online_walks"];
+         let (steps, walks, escapes, dps) = (
+             w["steps"].as_f64().unwrap_or(0.0),
+Diff in /private/tmp/crypto-n83-k16627/examples/n83_precomputed_rho_analyze.rs:327:
+             w["escapes"].as_f64().unwrap_or(0.0),
+             w["distinguished"].as_f64().unwrap_or(0.0),
+         );
+-        arm.counts.push(Some((steps + escapes + walks, (steps + escapes + walks) + steps + dps)));
++        arm.counts.push(Some((
++            steps + escapes + walks,
++            (steps + escapes + walks) + steps + dps,
++        )));
+     }
+     let info = json!({
+         "setup_ms": setup["setup_ns"].as_f64().map(|n| n / 1e6),
+Diff in /private/tmp/crypto-n83-k16627/examples/n83_precomputed_rho_analyze.rs:364:
+     let (bl_b, b_info) = load_bl(&format!("{job}/bl_b"), "bl_b_memory_matched", &targets)?;
+     // Amendment 1 (run 2 onward): time-matched to the measured IC setup wall.
+     let a2 = if fs::metadata(format!("{job}/bl_a2/records.jsonl")).is_ok() {
+-        Some(load_bl(&format!("{job}/bl_a2"), "bl_a2_wall_equal", &targets)?)
++        Some(load_bl(
++            &format!("{job}/bl_a2"),
++            "bl_a2_wall_equal",
++            &targets,
++        )?)
+     } else {
+         None
+     };
+Diff in /private/tmp/crypto-n83-k16627/examples/n83_precomputed_rho_analyze.rs:376:
+     // for these public points (read only after every arm has finished).
+     let reference: Option<Vec<u64>> = fs::read_to_string(format!("{job}/reference_scalars.txt"))
+         .ok()
+-        .map(|t| t.lines().filter(|l| !l.trim().is_empty()).map(|l| l.trim().parse().unwrap()).collect());
++        .map(|t| {
++            t.lines()
++                .filter(|l| !l.trim().is_empty())
++                .map(|l| l.trim().parse().unwrap())
++                .collect()
++        });
+     // Independent replay and cross-arm agreement.
+     let mut verification = Vec::new();
+     let mut all_ok = true;
+Diff in /private/tmp/crypto-n83-k16627/examples/n83_precomputed_rho_analyze.rs:392:
+                 agree &= agreed.is_none_or(|a| a == d);
+                 agreed = Some(d);
+             }
+-            row[&arm.name] = json!({"recovered_scalar": d.map(|d| d.to_string()), "generic_replay": ok});
++            row[&arm.name] =
++                json!({"recovered_scalar": d.map(|d| d.to_string()), "generic_replay": ok});
+         }
+         all_ok &= agree;
+         row["arms_agree"] = json!(agree);
+Diff in /private/tmp/crypto-n83-k16627/examples/n83_precomputed_rho_analyze.rs:431:
+         analysis["setup"]["bl_a2_wall_equal"] = a2_info.clone();
+         analysis["paired"]["ic_over_bl_a2"] = paired(&ic, a2_arm, 25);
+     }
+-    fs::write(out, format!("{}\n", serde_json::to_string_pretty(&analysis).unwrap()))
+-        .map_err(|e| e.to_string())?;
++    fs::write(
++        out,
++        format!("{}\n", serde_json::to_string_pretty(&analysis).unwrap()),
++    )
++    .map_err(|e| e.to_string())?;
+     Ok(all_ok)
+ }
+ 
+Diff in /private/tmp/crypto-n83-k16627/examples/n83_precomputed_rho_analyze.rs:475:
+ 
+     #[test]
+     fn generic_replay_accepts_the_answer_and_rejects_others() {
+-        let curve = Curve { curve: KoblitzCurve::new(1, 83).unwrap() };
++        let curve = Curve {
++            curve: KoblitzCurve::new(1, 83).unwrap(),
++        };
+         // Hosted workload 0 of gha-38597929540-1 (public target, both arms' answer).
+         let q = [6274346871052084705058109u128, 7777137791885914859810330];
+         assert!(curve.verify(4565490491554819, q));
+Diff in /private/tmp/crypto-n83-k16627/research/conductor_gap_cm_orbits_20261015/native/ecbench_next.rs:1:
+ //! Isolated build entry point; the active primary executable is never replaced.
+ #[path = "../../../src/bin/ecbench.rs"]
+ mod driver;
+-fn main() -> std::process::ExitCode { driver::main() }
++fn main() -> std::process::ExitCode {
++    driver::main()
++}
+ 
+Diff in /private/tmp/crypto-n83-k16627/src/cryptanalysis/jacobian_transfer/cost.rs:582:
+         // above 10 g^2 at genus 2, 3.320 bits at genus 32.
+         let m = CostModel::default();
+         for (g, mults) in [(2.0f64, 164.7f64), (6.0, 1354.9), (32.0, 102282.5)] {
+-            assert!((m.log2_jacobian_op_mults(g.log2()) - mults.log2()).abs() < 1e-9, "{g}");
++            assert!(
++                (m.log2_jacobian_op_mults(g.log2()) - mults.log2()).abs() < 1e-9,
++                "{g}"
++            );
+         }
+         let at = |g: f64| m.log2_jacobian_op_mults(g.log2()) - (10.0 * g * g).log2();
+         assert!((at(2.0) - 2.041).abs() < 0.01);

@@ -1,0 +1,35 @@
+{
+  "status": "verified",
+  "independent": true,
+  "scalars_verified": true,
+  "independence_basis": "ecbench verify --replay-all: separate auditor process re-executes every deterministic (ic.pipeline) run from the session files, recomputes derived figures and re-checks [d]G=Q (docs/ecbench/README.md section 9: the receipt SHA-256 is the repository replay certificate). Same binary and host as the producer; NOT a cross-host replay (ecbench-independent-runner not run). Randomised rho runs (rho-strong, rho-strong-aa) are verified ([d]G=Q) but not replayed.",
+  "runs": [
+    {
+      "session": "sessions/n13",
+      "audit": "audit-n13.json",
+      "audit_sha256": "e9988da8e5960856ae5fef7a864bcde8e0db06f53ff1ea38eb45456e2d073556",
+      "records": 192,
+      "verified_records": 192,
+      "replays_reproduced": 96,
+      "problems": 0
+    },
+    {
+      "session": "sessions/n19",
+      "audit": "audit-n19.json",
+      "audit_sha256": "ae4c9b6e72dd23ade11be64064b46353d2b2ea951f1588b31c77ea83d50becf2",
+      "records": 192,
+      "verified_records": 192,
+      "replays_reproduced": 96,
+      "problems": 0
+    },
+    {
+      "session": "sessions/n23",
+      "audit": "audit-n23.json",
+      "audit_sha256": "b5c60e7db299b46c04d964cfbc73cd81c6c220e67bf43bf61feba793e298fd1c",
+      "records": 192,
+      "verified_records": 192,
+      "replays_reproduced": 96,
+      "problems": 0
+    }
+  ]
+}

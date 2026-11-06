@@ -1,0 +1,2941 @@
+{
+  "args": "{\"out\":\"research/b_weak_class_battery_20261022/run\",\"nulls\":8000,\"holdout\":1000,\"plants\":100,\"tries\":4000,\"label\":\"b-weak-class-null/v1\",\"alpha\":0.05,\"detect_fraction\":0.8,\"curves\":[],\"real\":true}",
+  "tests": 85,
+  "alpha": 0.05,
+  "threshold": 0.0005882352941176471,
+  "min_attainable_p": 0.00012498437695288088,
+  "flagged": [],
+  "uncorrected_below_0_05": 2,
+  "curves": [
+    {
+      "curve": "P-192",
+      "bits": 192,
+      "seed_hex": "3045ae6fc8422f64ed579528d38120eae12196d5",
+      "null_draws": 8000,
+      "mean_seeds_per_draw": 12.109125,
+      "real_b_hex": "64210519e59c80e70fa7e9ab72243049feb8deecc146b9b1",
+      "real_c_hex": "3099d2bbbfcb2538542dcd5fb078b6ef5f3d6fe2c745de65",
+      "rows": [
+        {
+          "stat": "jac_b",
+          "family": "A",
+          "null": {
+            "median": 0.707107,
+            "q025": 0.0,
+            "q975": 2.12132,
+            "q999": 3.181981,
+            "max": 3.712311
+          },
+          "plant": {
+            "description": "target quantity is a quadratic residue modulo each of the first 32 odd primes (Chinese remaindering)",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 46,
+            "below_0_01": 4
+          },
+          "real": {
+            "value": 1.06066,
+            "p": 0.3230846144231971,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.323)"
+        },
+        {
+          "stat": "jac_c",
+          "family": "A",
+          "null": {
+            "median": 0.707107,
+            "q025": 0.0,
+            "q975": 2.12132,
+            "q999": 3.181981,
+            "max": 3.889087
+          },
+          "plant": {
+            "description": "target quantity is a quadratic residue modulo each of the first 32 odd primes (Chinese remaindering)",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 1,
+            "below_0_05": 42,
+            "below_0_01": 8
+          },
+          "real": {
+            "value": 0.353553,
+            "p": 0.7842769653793276,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.784)"
+        },
+        {
+          "stat": "jac_j",
+          "family": "A",
+          "null": {
+            "median": 0.707107,
+            "q025": 0.0,
+            "q975": 2.12132,
+            "q999": 3.005204,
+            "max": 4.065864
+          },
+          "plant": {
+            "description": "target quantity is a quadratic residue modulo each of the first 32 odd primes (Chinese remaindering)",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 28,
+            "below_0_01": 5
+          },
+          "real": {
+            "value": 0.707107,
+            "p": 0.5301837270341208,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.530)"
+        },
+        {
+          "stat": "jac_disc",
+          "family": "A",
+          "null": {
+            "median": 0.707107,
+            "q025": 0.0,
+            "q975": 2.12132,
+            "q999": 3.005204,
+            "max": 3.535534
+          },
+          "plant": {
+            "description": "target quantity is a quadratic residue modulo each of the first 32 odd primes (Chinese remaindering)",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 3,
+            "below_0_05": 46,
+            "below_0_01": 14
+          },
+          "real": {
+            "value": 1.06066,
+            "p": 0.32095988001499814,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.321)"
+        },
+        {
+          "stat": "depth_b",
+          "family": "B",
+          "null": {
+            "median": 0.0,
+            "q025": 0.0,
+            "q975": 1.0,
+            "q999": 1.0,
+            "max": 1.0
+          },
+          "plant": {
+            "description": "b = r^g, with g the product of 2^12 and the available 3,5,7,11,13,17 parts of G",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 0,
+            "detect_rate": 0.0,
+            "min_p": 0.4970628671416073,
+            "median_p": 0.4970628671416073,
+            "passed": false
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 0,
+            "below_0_01": 0
+          },
+          "real": {
+            "value": 1.0,
+            "p": 0.4970628671416073,
+            "flagged": false
+          },
+          "verdict": "positive control failed: inconclusive"
+        },
+        {
+          "stat": "depth_disc",
+          "family": "B",
+          "null": {
+            "median": 0.0,
+            "q025": 0.0,
+            "q975": 0.0,
+            "q999": 0.0,
+            "max": 0.0
+          },
+          "plant": {
+            "description": "b² − 4 = v^g, same g; b a square root of v^g + 4",
+            "constructed": 0,
+            "requested": 100,
+            "detected": 0,
+            "detect_rate": 0.0,
+            "min_p": null,
+            "median_p": null,
+            "passed": false
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 0,
+            "below_0_01": 0
+          },
+          "real": {
+            "value": 0.0,
+            "p": 1.0,
+            "flagged": false
+          },
+          "verdict": "positive control failed: inconclusive"
+        },
+        {
+          "stat": "hw_b",
+          "family": "C",
+          "null": {
+            "median": 0.721688,
+            "q025": 0.0,
+            "q975": 2.165064,
+            "q999": 3.319764,
+            "max": 3.752777
+          },
+          "plant": {
+            "description": "each bit of the target set with probability 3/4",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 56,
+            "below_0_01": 7
+          },
+          "real": {
+            "value": 0.433013,
+            "p": 0.72190976127984,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.722)"
+        },
+        {
+          "stat": "run_b",
+          "family": "C",
+          "null": {
+            "median": 8.0,
+            "q025": 5.0,
+            "q975": 12.0,
+            "q999": 16.0,
+            "max": 19.0
+          },
+          "plant": {
+            "description": "a run of 40 one-bits at a random position",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 1,
+            "below_0_05": 42,
+            "below_0_01": 8
+          },
+          "real": {
+            "value": 8.0,
+            "p": 0.5228096487939008,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.523)"
+        },
+        {
+          "stat": "naf_b",
+          "family": "C",
+          "null": {
+            "median": 0.795495,
+            "q025": 0.0,
+            "q975": 2.12132,
+            "q999": 3.181981,
+            "max": 4.507806
+          },
+          "plant": {
+            "description": "b with 24 non-adjacent signed digits",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 1,
+            "below_0_05": 59,
+            "below_0_01": 4
+          },
+          "real": {
+            "value": 0.795495,
+            "p": 0.5196850393700787,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.520)"
+        },
+        {
+          "stat": "hw_c",
+          "family": "C",
+          "null": {
+            "median": 0.651217,
+            "q025": 0.072357,
+            "q975": 2.243081,
+            "q999": 3.256086,
+            "max": 3.97966
+          },
+          "plant": {
+            "description": "each bit of the target set with probability 3/4",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 99,
+            "detect_rate": 0.99,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 35,
+            "below_0_01": 8
+          },
+          "real": {
+            "value": 2.098366,
+            "p": 0.04436945381827272,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.044)"
+        },
+        {
+          "stat": "run_c",
+          "family": "C",
+          "null": {
+            "median": 8.0,
+            "q025": 5.0,
+            "q975": 12.0,
+            "q999": 17.0,
+            "max": 23.0
+          },
+          "plant": {
+            "description": "a run of 40 one-bits at a random position",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 1,
+            "below_0_05": 42,
+            "below_0_01": 3
+          },
+          "real": {
+            "value": 8.0,
+            "p": 0.5163104611923509,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.516)"
+        },
+        {
+          "stat": "smooth_b",
+          "family": "D",
+          "null": {
+            "median": 13.40833,
+            "q025": 0.0,
+            "q975": 41.806084,
+            "q999": 59.591923,
+            "max": 76.215891
+          },
+          "plant": {
+            "description": "target quantity a product of primes below 2^16",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 4,
+            "below_0_05": 54,
+            "below_0_01": 12
+          },
+          "real": {
+            "value": 29.594285,
+            "p": 0.11823522059742532,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.118)"
+        },
+        {
+          "stat": "smooth_c",
+          "family": "D",
+          "null": {
+            "median": 13.266054,
+            "q025": 0.0,
+            "q975": 42.297326,
+            "q999": 63.753,
+            "max": 95.467412
+          },
+          "plant": {
+            "description": "target quantity a product of primes below 2^16",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 53,
+            "below_0_01": 10
+          },
+          "real": {
+            "value": 33.463855,
+            "p": 0.07336582927134108,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.073)"
+        },
+        {
+          "stat": "smooth_j",
+          "family": "D",
+          "null": {
+            "median": 13.612062,
+            "q025": 0.0,
+            "q975": 41.474014,
+            "q999": 65.150393,
+            "max": 79.979169
+          },
+          "plant": {
+            "description": "target quantity a product of primes below 2^16",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 54,
+            "below_0_01": 11
+          },
+          "real": {
+            "value": 0.0,
+            "p": 1.0,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 1.000)"
+        },
+        {
+          "stat": "hw_j",
+          "family": "E",
+          "null": {
+            "median": 0.721688,
+            "q025": 0.0,
+            "q975": 2.165064,
+            "q999": 3.319764,
+            "max": 4.041452
+          },
+          "plant": {
+            "description": "each bit of the target set with probability 3/4",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 47,
+            "below_0_01": 8
+          },
+          "real": {
+            "value": 0.433013,
+            "p": 0.7089113860767404,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.709)"
+        },
+        {
+          "stat": "run_j",
+          "family": "E",
+          "null": {
+            "median": 8.0,
+            "q025": 5.0,
+            "q975": 12.0,
+            "q999": 18.0,
+            "max": 21.0
+          },
+          "plant": {
+            "description": "a run of 40 one-bits at a random position",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 39,
+            "below_0_01": 5
+          },
+          "real": {
+            "value": 7.0,
+            "p": 0.7902762154730658,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.790)"
+        },
+        {
+          "stat": "d3",
+          "family": "F",
+          "null": {
+            "median": 0.0,
+            "q025": 0.0,
+            "q975": 0.0,
+            "q999": 0.0,
+            "max": 0.0
+          },
+          "plant": {
+            "description": "rejection sampling of null draws with the maximum d3 seen in the null panel",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 0,
+            "detect_rate": 0.0,
+            "min_p": 1.0,
+            "median_p": 1.0,
+            "passed": false
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 0,
+            "below_0_01": 0
+          },
+          "real": {
+            "value": 0.0,
+            "p": 1.0,
+            "flagged": false
+          },
+          "verdict": "positive control failed: inconclusive"
+        }
+      ],
+      "seconds": [
+        [
+          "null_panel",
+          59.16974927
+        ],
+        [
+          "holdout",
+          6.210927382
+        ],
+        [
+          "plants",
+          23.821212712
+        ]
+      ]
+    },
+    {
+      "curve": "P-224",
+      "bits": 224,
+      "seed_hex": "bd71344799d5c7fcdc45b59fa3b9ab8f6a948bc5",
+      "null_draws": 8000,
+      "mean_seeds_per_draw": 9.591625,
+      "real_b_hex": "b4050a850c04b3abf54132565044b0b7d7bfd8ba270b39432355ffb4",
+      "real_c_hex": "5b056c7e11dd68f40469ee7f3c7a7d74f7d121116506d031218291fb",
+      "rows": [
+        {
+          "stat": "jac_b",
+          "family": "A",
+          "null": {
+            "median": 0.707107,
+            "q025": 0.0,
+            "q975": 2.12132,
+            "q999": 3.181981,
+            "max": 4.065864
+          },
+          "plant": {
+            "description": "target quantity is a quadratic residue modulo each of the first 32 odd primes (Chinese remaindering)",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 25,
+            "below_0_01": 3
+          },
+          "real": {
+            "value": 0.883883,
+            "p": 0.42032245969253845,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.420)"
+        },
+        {
+          "stat": "jac_c",
+          "family": "A",
+          "null": {
+            "median": 0.707107,
+            "q025": 0.0,
+            "q975": 2.12132,
+            "q999": 3.181981,
+            "max": 4.242641
+          },
+          "plant": {
+            "description": "target quantity is a quadratic residue modulo each of the first 32 odd primes (Chinese remaindering)",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 48,
+            "below_0_01": 10
+          },
+          "real": {
+            "value": 0.707107,
+            "p": 0.532058492688414,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.532)"
+        },
+        {
+          "stat": "jac_j",
+          "family": "A",
+          "null": {
+            "median": 0.707107,
+            "q025": 0.0,
+            "q975": 2.298097,
+            "q999": 3.358757,
+            "max": 3.889087
+          },
+          "plant": {
+            "description": "target quantity is a quadratic residue modulo each of the first 32 odd primes (Chinese remaindering)",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 34,
+            "below_0_01": 8
+          },
+          "real": {
+            "value": 0.353553,
+            "p": 0.7861517310336208,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.786)"
+        },
+        {
+          "stat": "jac_disc",
+          "family": "A",
+          "null": {
+            "median": 0.707107,
+            "q025": 0.0,
+            "q975": 2.12132,
+            "q999": 3.005204,
+            "max": 3.889087
+          },
+          "plant": {
+            "description": "target quantity is a quadratic residue modulo each of the first 32 odd primes (Chinese remaindering)",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 27,
+            "below_0_01": 4
+          },
+          "real": {
+            "value": 0.883883,
+            "p": 0.41807274090738655,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.418)"
+        },
+        {
+          "stat": "depth_b",
+          "family": "B",
+          "null": {
+            "median": 2.0,
+            "q025": 0.0,
+            "q975": 7.321928,
+            "q999": 12.321928,
+            "max": 14.994353
+          },
+          "plant": {
+            "description": "b = r^g, with g the product of 2^12 and the available 3,5,7,11,13,17 parts of G",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 2,
+            "below_0_05": 47,
+            "below_0_01": 11
+          },
+          "real": {
+            "value": 0.0,
+            "p": 1.0,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 1.000)"
+        },
+        {
+          "stat": "depth_disc",
+          "family": "B",
+          "null": {
+            "median": 2.584963,
+            "q025": 1.0,
+            "q975": 8.087463,
+            "q999": 12.321928,
+            "max": 13.906891
+          },
+          "plant": {
+            "description": "b² − 4 = v^g, same g; b a square root of v^g + 4",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 2,
+            "below_0_05": 46,
+            "below_0_01": 8
+          },
+          "real": {
+            "value": 3.321928,
+            "p": 0.41394825646794153,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.414)"
+        },
+        {
+          "stat": "hw_b",
+          "family": "C",
+          "null": {
+            "median": 0.668153,
+            "q025": 0.0,
+            "q975": 2.271721,
+            "q999": 3.207135,
+            "max": 3.741657
+          },
+          "plant": {
+            "description": "each bit of the target set with probability 3/4",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 42,
+            "below_0_01": 8
+          },
+          "real": {
+            "value": 0.668153,
+            "p": 0.5458067741532309,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.546)"
+        },
+        {
+          "stat": "run_b",
+          "family": "C",
+          "null": {
+            "median": 8.0,
+            "q025": 5.0,
+            "q975": 13.0,
+            "q999": 17.0,
+            "max": 20.0
+          },
+          "plant": {
+            "description": "a run of 40 one-bits at a random position",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 30,
+            "below_0_01": 12
+          },
+          "real": {
+            "value": 10.0,
+            "p": 0.19310086239220098,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.193)"
+        },
+        {
+          "stat": "naf_b",
+          "family": "C",
+          "null": {
+            "median": 0.654654,
+            "q025": 0.081832,
+            "q975": 2.291288,
+            "q999": 3.3551,
+            "max": 4.091585
+          },
+          "plant": {
+            "description": "b with 24 non-adjacent signed digits",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 1,
+            "below_0_05": 34,
+            "below_0_01": 7
+          },
+          "real": {
+            "value": 0.409159,
+            "p": 0.714660667416573,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.715)"
+        },
+        {
+          "stat": "hw_c",
+          "family": "C",
+          "null": {
+            "median": 0.602685,
+            "q025": 0.066965,
+            "q975": 2.209843,
+            "q999": 3.147353,
+            "max": 3.950932
+          },
+          "plant": {
+            "description": "each bit of the target set with probability 3/4",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 1,
+            "below_0_05": 39,
+            "below_0_01": 14
+          },
+          "real": {
+            "value": 0.066965,
+            "p": 1.0,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 1.000)"
+        },
+        {
+          "stat": "run_c",
+          "family": "C",
+          "null": {
+            "median": 8.0,
+            "q025": 6.0,
+            "q975": 13.0,
+            "q999": 17.0,
+            "max": 21.0
+          },
+          "plant": {
+            "description": "a run of 40 one-bits at a random position",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 27,
+            "below_0_01": 6
+          },
+          "real": {
+            "value": 7.0,
+            "p": 0.8351456067991501,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.835)"
+        },
+        {
+          "stat": "smooth_b",
+          "family": "D",
+          "null": {
+            "median": 13.476113,
+            "q025": 0.0,
+            "q975": 42.019111,
+            "q999": 66.271561,
+            "max": 78.058859
+          },
+          "plant": {
+            "description": "target quantity a product of primes below 2^16",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 49,
+            "below_0_01": 7
+          },
+          "real": {
+            "value": 4.807355,
+            "p": 0.8015248093988252,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.802)"
+        },
+        {
+          "stat": "smooth_c",
+          "family": "D",
+          "null": {
+            "median": 13.56403,
+            "q025": 0.0,
+            "q975": 41.97487,
+            "q999": 62.609721,
+            "max": 71.958417
+          },
+          "plant": {
+            "description": "target quantity a product of primes below 2^16",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 50,
+            "below_0_01": 12
+          },
+          "real": {
+            "value": 19.591166,
+            "p": 0.30658667666541684,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.307)"
+        },
+        {
+          "stat": "smooth_j",
+          "family": "D",
+          "null": {
+            "median": 13.331337,
+            "q025": 0.0,
+            "q975": 40.871857,
+            "q999": 65.551364,
+            "max": 85.274789
+          },
+          "plant": {
+            "description": "target quantity a product of primes below 2^16",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 55,
+            "below_0_01": 15
+          },
+          "real": {
+            "value": 0.0,
+            "p": 1.0,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 1.000)"
+        },
+        {
+          "stat": "hw_j",
+          "family": "E",
+          "null": {
+            "median": 0.668153,
+            "q025": 0.0,
+            "q975": 2.13809,
+            "q999": 3.207135,
+            "max": 4.008919
+          },
+          "plant": {
+            "description": "each bit of the target set with probability 3/4",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 47,
+            "below_0_01": 10
+          },
+          "real": {
+            "value": 0.534522,
+            "p": 0.643169603799525,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.643)"
+        },
+        {
+          "stat": "run_j",
+          "family": "E",
+          "null": {
+            "median": 8.0,
+            "q025": 6.0,
+            "q975": 12.0,
+            "q999": 17.0,
+            "max": 21.0
+          },
+          "plant": {
+            "description": "a run of 40 one-bits at a random position",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 50,
+            "below_0_01": 7
+          },
+          "real": {
+            "value": 11.0,
+            "p": 0.09961254843144607,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.100)"
+        },
+        {
+          "stat": "d3",
+          "family": "F",
+          "null": {
+            "median": 1.0,
+            "q025": 0.0,
+            "q975": 4.0,
+            "q999": 4.0,
+            "max": 4.0
+          },
+          "plant": {
+            "description": "rejection sampling of null draws with the maximum d3 seen in the null panel",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 0,
+            "detect_rate": 0.0,
+            "min_p": 0.06274215723034621,
+            "median_p": 0.06274215723034621,
+            "passed": false
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 0,
+            "below_0_01": 0
+          },
+          "real": {
+            "value": 4.0,
+            "p": 0.06274215723034621,
+            "flagged": false
+          },
+          "verdict": "positive control failed: inconclusive"
+        }
+      ],
+      "seconds": [
+        [
+          "null_panel",
+          87.775309448
+        ],
+        [
+          "holdout",
+          6.721397682
+        ],
+        [
+          "plants",
+          25.002740846
+        ]
+      ]
+    },
+    {
+      "curve": "P-256",
+      "bits": 256,
+      "seed_hex": "c49d360886e704936a6678e1139d26b7819f7e90",
+      "null_draws": 8000,
+      "mean_seeds_per_draw": 9.646375,
+      "real_b_hex": "5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b",
+      "real_c_hex": "7efba1662985be9403cb055c75d4f7e0ce8d84a9c5114abcaf3177680104fa0d",
+      "rows": [
+        {
+          "stat": "jac_b",
+          "family": "A",
+          "null": {
+            "median": 0.707107,
+            "q025": 0.0,
+            "q975": 2.12132,
+            "q999": 3.181981,
+            "max": 3.712311
+          },
+          "plant": {
+            "description": "target quantity is a quadratic residue modulo each of the first 32 odd primes (Chinese remaindering)",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 43,
+            "below_0_01": 8
+          },
+          "real": {
+            "value": 1.237437,
+            "p": 0.24796900387451568,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.248)"
+        },
+        {
+          "stat": "jac_c",
+          "family": "A",
+          "null": {
+            "median": 0.707107,
+            "q025": 0.0,
+            "q975": 2.12132,
+            "q999": 3.005204,
+            "max": 3.358757
+          },
+          "plant": {
+            "description": "target quantity is a quadratic residue modulo each of the first 32 odd primes (Chinese remaindering)",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 40,
+            "below_0_01": 7
+          },
+          "real": {
+            "value": 0.0,
+            "p": 1.0,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 1.000)"
+        },
+        {
+          "stat": "jac_j",
+          "family": "A",
+          "null": {
+            "median": 0.707107,
+            "q025": 0.0,
+            "q975": 2.12132,
+            "q999": 3.181981,
+            "max": 3.712311
+          },
+          "plant": {
+            "description": "target quantity is a quadratic residue modulo each of the first 32 odd primes (Chinese remaindering)",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 28,
+            "below_0_01": 2
+          },
+          "real": {
+            "value": 0.353553,
+            "p": 0.7876515435570554,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.788)"
+        },
+        {
+          "stat": "jac_disc",
+          "family": "A",
+          "null": {
+            "median": 0.707107,
+            "q025": 0.0,
+            "q975": 2.12132,
+            "q999": 3.181981,
+            "max": 3.712311
+          },
+          "plant": {
+            "description": "target quantity is a quadratic residue modulo each of the first 32 odd primes (Chinese remaindering)",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 37,
+            "below_0_01": 7
+          },
+          "real": {
+            "value": 0.176777,
+            "p": 0.9273840769903762,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.927)"
+        },
+        {
+          "stat": "depth_b",
+          "family": "B",
+          "null": {
+            "median": 1.0,
+            "q025": 0.0,
+            "q975": 6.228819,
+            "q999": 10.316282,
+            "max": 11.316282
+          },
+          "plant": {
+            "description": "b = r^g, with g the product of 2^12 and the available 3,5,7,11,13,17 parts of G",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 0,
+            "detect_rate": 0.0,
+            "min_p": 0.0007499062617172854,
+            "median_p": 0.0007499062617172854,
+            "passed": false
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 42,
+            "below_0_01": 10
+          },
+          "real": {
+            "value": 3.321928,
+            "p": 0.1976002999625047,
+            "flagged": false
+          },
+          "verdict": "positive control failed: inconclusive"
+        },
+        {
+          "stat": "depth_disc",
+          "family": "B",
+          "null": {
+            "median": 1.0,
+            "q025": 1.0,
+            "q975": 6.672425,
+            "q999": 9.731319,
+            "max": 11.316282
+          },
+          "plant": {
+            "description": "b² − 4 = v^g, same g; b a square root of v^g + 4",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 0,
+            "detect_rate": 0.0,
+            "min_p": 0.0006249218847644045,
+            "median_p": 0.0006249218847644045,
+            "passed": false
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 39,
+            "below_0_01": 5
+          },
+          "real": {
+            "value": 2.584963,
+            "p": 0.4439445069366329,
+            "flagged": false
+          },
+          "verdict": "positive control failed: inconclusive"
+        },
+        {
+          "stat": "hw_b",
+          "family": "C",
+          "null": {
+            "median": 0.625,
+            "q025": 0.0,
+            "q975": 2.25,
+            "q999": 3.375,
+            "max": 3.875
+          },
+          "plant": {
+            "description": "each bit of the target set with probability 3/4",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 51,
+            "below_0_01": 8
+          },
+          "real": {
+            "value": 0.75,
+            "p": 0.48831396075490563,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.488)"
+        },
+        {
+          "stat": "run_b",
+          "family": "C",
+          "null": {
+            "median": 8.0,
+            "q025": 6.0,
+            "q975": 13.0,
+            "q999": 17.0,
+            "max": 22.0
+          },
+          "plant": {
+            "description": "a run of 40 one-bits at a random position",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 32,
+            "below_0_01": 12
+          },
+          "real": {
+            "value": 6.0,
+            "p": 0.9855018122734658,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.986)"
+        },
+        {
+          "stat": "naf_b",
+          "family": "C",
+          "null": {
+            "median": 0.612372,
+            "q025": 0.076547,
+            "q975": 2.21985,
+            "q999": 3.291502,
+            "max": 4.056967
+          },
+          "plant": {
+            "description": "b with 24 non-adjacent signed digits",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 1,
+            "below_0_05": 58,
+            "below_0_01": 11
+          },
+          "real": {
+            "value": 0.842012,
+            "p": 0.43332083489563805,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.433)"
+        },
+        {
+          "stat": "hw_c",
+          "family": "C",
+          "null": {
+            "median": 0.688847,
+            "q025": 0.062622,
+            "q975": 2.31703,
+            "q999": 3.193744,
+            "max": 3.569478
+          },
+          "plant": {
+            "description": "each bit of the target set with probability 3/4",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 37,
+            "below_0_01": 8
+          },
+          "real": {
+            "value": 0.313112,
+            "p": 0.7956505436820397,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.796)"
+        },
+        {
+          "stat": "run_c",
+          "family": "C",
+          "null": {
+            "median": 8.0,
+            "q025": 6.0,
+            "q975": 13.0,
+            "q999": 17.0,
+            "max": 22.0
+          },
+          "plant": {
+            "description": "a run of 40 one-bits at a random position",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 32,
+            "below_0_01": 5
+          },
+          "real": {
+            "value": 10.0,
+            "p": 0.21247344081989752,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.212)"
+        },
+        {
+          "stat": "smooth_b",
+          "family": "D",
+          "null": {
+            "median": 13.420881,
+            "q025": 0.0,
+            "q975": 42.027406,
+            "q999": 63.813975,
+            "max": 82.108625
+          },
+          "plant": {
+            "description": "target quantity a product of primes below 2^16",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 38,
+            "below_0_01": 7
+          },
+          "real": {
+            "value": 5.61471,
+            "p": 0.7774028246469191,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.777)"
+        },
+        {
+          "stat": "smooth_c",
+          "family": "D",
+          "null": {
+            "median": 13.38869,
+            "q025": 0.0,
+            "q975": 41.720796,
+            "q999": 62.476749,
+            "max": 79.962971
+          },
+          "plant": {
+            "description": "target quantity a product of primes below 2^16",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 1,
+            "below_0_05": 44,
+            "below_0_01": 9
+          },
+          "real": {
+            "value": 39.498831,
+            "p": 0.03362079740032496,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.034)"
+        },
+        {
+          "stat": "smooth_j",
+          "family": "D",
+          "null": {
+            "median": 13.273359,
+            "q025": 0.0,
+            "q975": 42.123963,
+            "q999": 62.594933,
+            "max": 73.9768
+          },
+          "plant": {
+            "description": "target quantity a product of primes below 2^16",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 57,
+            "below_0_01": 7
+          },
+          "real": {
+            "value": 0.0,
+            "p": 1.0,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 1.000)"
+        },
+        {
+          "stat": "hw_j",
+          "family": "E",
+          "null": {
+            "median": 0.625,
+            "q025": 0.0,
+            "q975": 2.25,
+            "q999": 3.25,
+            "max": 4.0
+          },
+          "plant": {
+            "description": "each bit of the target set with probability 3/4",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 50,
+            "below_0_01": 9
+          },
+          "real": {
+            "value": 0.375,
+            "p": 0.7419072615923009,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.742)"
+        },
+        {
+          "stat": "run_j",
+          "family": "E",
+          "null": {
+            "median": 8.0,
+            "q025": 6.0,
+            "q975": 13.0,
+            "q999": 17.0,
+            "max": 21.0
+          },
+          "plant": {
+            "description": "a run of 40 one-bits at a random position",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 1,
+            "below_0_05": 33,
+            "below_0_01": 8
+          },
+          "real": {
+            "value": 8.0,
+            "p": 0.6291713535808025,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.629)"
+        },
+        {
+          "stat": "d3",
+          "family": "F",
+          "null": {
+            "median": 1.0,
+            "q025": 0.0,
+            "q975": 4.0,
+            "q999": 4.0,
+            "max": 4.0
+          },
+          "plant": {
+            "description": "rejection sampling of null draws with the maximum d3 seen in the null panel",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 0,
+            "detect_rate": 0.0,
+            "min_p": 0.0647419072615923,
+            "median_p": 0.0647419072615923,
+            "passed": false
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 0,
+            "below_0_01": 0
+          },
+          "real": {
+            "value": 1.0,
+            "p": 0.5980502437195351,
+            "flagged": false
+          },
+          "verdict": "positive control failed: inconclusive"
+        }
+      ],
+      "seconds": [
+        [
+          "null_panel",
+          34.175493948
+        ],
+        [
+          "holdout",
+          3.854681346
+        ],
+        [
+          "plants",
+          14.371995705
+        ]
+      ]
+    },
+    {
+      "curve": "P-384",
+      "bits": 384,
+      "seed_hex": "a335926aa319a27a1d00896a6773a4827acdac73",
+      "null_draws": 8000,
+      "mean_seeds_per_draw": 11.838125,
+      "real_b_hex": "b3312fa7e23ee7e4988e056be3f82d19181d9c6efe8141120314088f5013875ac656398d8a2ed19d2a85c8edd3ec2aef",
+      "real_c_hex": "79d1e655f868f02fff48dcdee14151ddb80643c1406d0ca10dfe6fc52009540a495e8042ea5f744f6e184667cc722483",
+      "rows": [
+        {
+          "stat": "jac_b",
+          "family": "A",
+          "null": {
+            "median": 0.707107,
+            "q025": 0.0,
+            "q975": 2.12132,
+            "q999": 3.181981,
+            "max": 3.535534
+          },
+          "plant": {
+            "description": "target quantity is a quadratic residue modulo each of the first 32 odd primes (Chinese remaindering)",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 1,
+            "below_0_05": 38,
+            "below_0_01": 8
+          },
+          "real": {
+            "value": 0.53033,
+            "p": 0.6540432445944256,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.654)"
+        },
+        {
+          "stat": "jac_c",
+          "family": "A",
+          "null": {
+            "median": 0.707107,
+            "q025": 0.0,
+            "q975": 2.12132,
+            "q999": 3.181981,
+            "max": 4.065864
+          },
+          "plant": {
+            "description": "target quantity is a quadratic residue modulo each of the first 32 odd primes (Chinese remaindering)",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 1,
+            "below_0_05": 37,
+            "below_0_01": 9
+          },
+          "real": {
+            "value": 0.53033,
+            "p": 0.6467941507311586,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.647)"
+        },
+        {
+          "stat": "jac_j",
+          "family": "A",
+          "null": {
+            "median": 0.707107,
+            "q025": 0.0,
+            "q975": 2.12132,
+            "q999": 3.181981,
+            "max": 3.889087
+          },
+          "plant": {
+            "description": "target quantity is a quadratic residue modulo each of the first 32 odd primes (Chinese remaindering)",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 36,
+            "below_0_01": 9
+          },
+          "real": {
+            "value": 1.06066,
+            "p": 0.32608423947006626,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.326)"
+        },
+        {
+          "stat": "jac_disc",
+          "family": "A",
+          "null": {
+            "median": 0.707107,
+            "q025": 0.0,
+            "q975": 2.12132,
+            "q999": 3.181981,
+            "max": 3.535534
+          },
+          "plant": {
+            "description": "target quantity is a quadratic residue modulo each of the first 32 odd primes (Chinese remaindering)",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 46,
+            "below_0_01": 12
+          },
+          "real": {
+            "value": 1.06066,
+            "p": 0.32345956755405575,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.323)"
+        },
+        {
+          "stat": "depth_b",
+          "family": "B",
+          "null": {
+            "median": 0.0,
+            "q025": 0.0,
+            "q975": 1.0,
+            "q999": 1.0,
+            "max": 1.0
+          },
+          "plant": {
+            "description": "b = r^g, with g the product of 2^12 and the available 3,5,7,11,13,17 parts of G",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 0,
+            "detect_rate": 0.0,
+            "min_p": 0.49556305461817274,
+            "median_p": 0.49556305461817274,
+            "passed": false
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 0,
+            "below_0_01": 0
+          },
+          "real": {
+            "value": 1.0,
+            "p": 0.49556305461817274,
+            "flagged": false
+          },
+          "verdict": "positive control failed: inconclusive"
+        },
+        {
+          "stat": "depth_disc",
+          "family": "B",
+          "null": {
+            "median": 0.0,
+            "q025": 0.0,
+            "q975": 0.0,
+            "q999": 0.0,
+            "max": 0.0
+          },
+          "plant": {
+            "description": "b² − 4 = v^g, same g; b a square root of v^g + 4",
+            "constructed": 0,
+            "requested": 100,
+            "detected": 0,
+            "detect_rate": 0.0,
+            "min_p": null,
+            "median_p": null,
+            "passed": false
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 0,
+            "below_0_01": 0
+          },
+          "real": {
+            "value": 0.0,
+            "p": 1.0,
+            "flagged": false
+          },
+          "verdict": "positive control failed: inconclusive"
+        },
+        {
+          "stat": "hw_b",
+          "family": "C",
+          "null": {
+            "median": 0.714435,
+            "q025": 0.0,
+            "q975": 2.245366,
+            "q999": 3.572173,
+            "max": 4.184545
+          },
+          "plant": {
+            "description": "each bit of the target set with probability 3/4",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 45,
+            "below_0_01": 7
+          },
+          "real": {
+            "value": 0.612372,
+            "p": 0.578177727784027,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.578)"
+        },
+        {
+          "stat": "run_b",
+          "family": "C",
+          "null": {
+            "median": 9.0,
+            "q025": 6.0,
+            "q975": 13.0,
+            "q999": 18.0,
+            "max": 20.0
+          },
+          "plant": {
+            "description": "a run of 40 one-bits at a random position",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 47,
+            "below_0_01": 3
+          },
+          "real": {
+            "value": 7.0,
+            "p": 0.9547556555430571,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.955)"
+        },
+        {
+          "stat": "naf_b",
+          "family": "C",
+          "null": {
+            "median": 0.75,
+            "q025": 0.0,
+            "q975": 2.25,
+            "q999": 3.375,
+            "max": 4.6875
+          },
+          "plant": {
+            "description": "b with 24 non-adjacent signed digits",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 48,
+            "below_0_01": 4
+          },
+          "real": {
+            "value": 0.5625,
+            "p": 0.6432945881764779,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.643)"
+        },
+        {
+          "stat": "hw_c",
+          "family": "C",
+          "null": {
+            "median": 0.664269,
+            "q025": 0.051098,
+            "q975": 2.299393,
+            "q999": 3.21915,
+            "max": 3.627931
+          },
+          "plant": {
+            "description": "each bit of the target set with probability 3/4",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 36,
+            "below_0_01": 9
+          },
+          "real": {
+            "value": 1.07305,
+            "p": 0.2968378952630921,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.297)"
+        },
+        {
+          "stat": "run_c",
+          "family": "C",
+          "null": {
+            "median": 9.0,
+            "q025": 6.0,
+            "q975": 13.0,
+            "q999": 17.0,
+            "max": 20.0
+          },
+          "plant": {
+            "description": "a run of 40 one-bits at a random position",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 53,
+            "below_0_01": 2
+          },
+          "real": {
+            "value": 12.0,
+            "p": 0.08648918885139358,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.086)"
+        },
+        {
+          "stat": "smooth_b",
+          "family": "D",
+          "null": {
+            "median": 13.419829,
+            "q025": 0.0,
+            "q975": 42.630203,
+            "q999": 63.353524,
+            "max": 75.861938
+          },
+          "plant": {
+            "description": "target quantity a product of primes below 2^16",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 1,
+            "below_0_05": 51,
+            "below_0_01": 8
+          },
+          "real": {
+            "value": 4.643856,
+            "p": 0.8127734033245845,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.813)"
+        },
+        {
+          "stat": "smooth_c",
+          "family": "D",
+          "null": {
+            "median": 12.953105,
+            "q025": 0.0,
+            "q975": 41.357992,
+            "q999": 63.819562,
+            "max": 79.080088
+          },
+          "plant": {
+            "description": "target quantity a product of primes below 2^16",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 62,
+            "below_0_01": 17
+          },
+          "real": {
+            "value": 14.42213,
+            "p": 0.44844394450693664,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.448)"
+        },
+        {
+          "stat": "smooth_j",
+          "family": "D",
+          "null": {
+            "median": 13.497353,
+            "q025": 0.0,
+            "q975": 42.143493,
+            "q999": 62.277482,
+            "max": 80.758487
+          },
+          "plant": {
+            "description": "target quantity a product of primes below 2^16",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 52,
+            "below_0_01": 12
+          },
+          "real": {
+            "value": 19.544491,
+            "p": 0.3052118485189351,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.305)"
+        },
+        {
+          "stat": "hw_j",
+          "family": "E",
+          "null": {
+            "median": 0.714435,
+            "q025": 0.0,
+            "q975": 2.245366,
+            "q999": 3.47011,
+            "max": 3.878359
+          },
+          "plant": {
+            "description": "each bit of the target set with probability 3/4",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 1,
+            "below_0_05": 36,
+            "below_0_01": 5
+          },
+          "real": {
+            "value": 1.428869,
+            "p": 0.1679790026246719,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.168)"
+        },
+        {
+          "stat": "run_j",
+          "family": "E",
+          "null": {
+            "median": 9.0,
+            "q025": 6.0,
+            "q975": 13.0,
+            "q999": 19.0,
+            "max": 22.0
+          },
+          "plant": {
+            "description": "a run of 40 one-bits at a random position",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 45,
+            "below_0_01": 8
+          },
+          "real": {
+            "value": 8.0,
+            "p": 0.7874015748031497,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.787)"
+        },
+        {
+          "stat": "d3",
+          "family": "F",
+          "null": {
+            "median": 0.0,
+            "q025": 0.0,
+            "q975": 0.0,
+            "q999": 0.0,
+            "max": 0.0
+          },
+          "plant": {
+            "description": "rejection sampling of null draws with the maximum d3 seen in the null panel",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 0,
+            "detect_rate": 0.0,
+            "min_p": 1.0,
+            "median_p": 1.0,
+            "passed": false
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 0,
+            "below_0_01": 0
+          },
+          "real": {
+            "value": 0.0,
+            "p": 1.0,
+            "flagged": false
+          },
+          "verdict": "positive control failed: inconclusive"
+        }
+      ],
+      "seconds": [
+        [
+          "null_panel",
+          96.753973365
+        ],
+        [
+          "holdout",
+          10.965681884
+        ],
+        [
+          "plants",
+          46.061393711
+        ]
+      ]
+    },
+    {
+      "curve": "P-521",
+      "bits": 521,
+      "seed_hex": "d09e8800291cb85396cc6717393284aaa0da64ba",
+      "null_draws": 8000,
+      "mean_seeds_per_draw": 9.689625,
+      "real_b_hex": "51953eb9618e1c9a1f929a21a0b68540eea2da725b99b315f3b8b489918ef109e156193951ec7e937b1652c0bd3bb1bf073573df883d2c34f1ef451fd46b503f00",
+      "real_c_hex": "b48bfa5f420a34949539d2bdfc264eeeeb077688e44fbf0ad8f6d0edb37bd6b533281000518e19f1b9ffbe0fe9ed8a3c2200b8f875e523868c70c1e5bf55bad637",
+      "rows": [
+        {
+          "stat": "jac_b",
+          "family": "A",
+          "null": {
+            "median": 0.707107,
+            "q025": 0.0,
+            "q975": 2.12132,
+            "q999": 3.181981,
+            "max": 4.242641
+          },
+          "plant": {
+            "description": "target quantity is a quadratic residue modulo each of the first 32 odd primes (Chinese remaindering)",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 34,
+            "below_0_01": 6
+          },
+          "real": {
+            "value": 1.767767,
+            "p": 0.08198975128108986,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.082)"
+        },
+        {
+          "stat": "jac_c",
+          "family": "A",
+          "null": {
+            "median": 0.707107,
+            "q025": 0.0,
+            "q975": 2.12132,
+            "q999": 3.181981,
+            "max": 4.772971
+          },
+          "plant": {
+            "description": "target quantity is a quadratic residue modulo each of the first 32 odd primes (Chinese remaindering)",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 38,
+            "below_0_01": 5
+          },
+          "real": {
+            "value": 0.883883,
+            "p": 0.42219722534683163,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.422)"
+        },
+        {
+          "stat": "jac_j",
+          "family": "A",
+          "null": {
+            "median": 0.707107,
+            "q025": 0.0,
+            "q975": 2.12132,
+            "q999": 3.181981,
+            "max": 3.889087
+          },
+          "plant": {
+            "description": "target quantity is a quadratic residue modulo each of the first 32 odd primes (Chinese remaindering)",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 1,
+            "below_0_05": 39,
+            "below_0_01": 12
+          },
+          "real": {
+            "value": 0.707107,
+            "p": 0.5360579927509062,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.536)"
+        },
+        {
+          "stat": "jac_disc",
+          "family": "A",
+          "null": {
+            "median": 0.707107,
+            "q025": 0.0,
+            "q975": 2.12132,
+            "q999": 3.358757,
+            "max": 4.065864
+          },
+          "plant": {
+            "description": "target quantity is a quadratic residue modulo each of the first 32 odd primes (Chinese remaindering)",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 1,
+            "below_0_05": 34,
+            "below_0_01": 7
+          },
+          "real": {
+            "value": 0.883883,
+            "p": 0.41169853768278963,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.412)"
+        },
+        {
+          "stat": "depth_b",
+          "family": "B",
+          "null": {
+            "median": 1.584963,
+            "q025": 0.0,
+            "q975": 7.228819,
+            "q999": 11.316282,
+            "max": 14.775713
+          },
+          "plant": {
+            "description": "b = r^g, with g the product of 2^12 and the available 3,5,7,11,13,17 parts of G",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.0003749531308586427,
+            "median_p": 0.0003749531308586427,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 49,
+            "below_0_01": 6
+          },
+          "real": {
+            "value": 1.0,
+            "p": 0.770153730783652,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.770)"
+        },
+        {
+          "stat": "depth_disc",
+          "family": "B",
+          "null": {
+            "median": 2.584963,
+            "q025": 1.0,
+            "q975": 7.228819,
+            "q999": 11.316282,
+            "max": 13.190751
+          },
+          "plant": {
+            "description": "b² − 4 = v^g, same g; b a square root of v^g + 4",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 55,
+            "below_0_01": 9
+          },
+          "real": {
+            "value": 2.584963,
+            "p": 0.6454193225846769,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.645)"
+        },
+        {
+          "stat": "hw_b",
+          "family": "C",
+          "null": {
+            "median": 0.657162,
+            "q025": 0.043811,
+            "q975": 2.234351,
+            "q999": 3.198188,
+            "max": 4.074404
+          },
+          "plant": {
+            "description": "each bit of the target set with probability 3/4",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 1,
+            "below_0_05": 45,
+            "below_0_01": 11
+          },
+          "real": {
+            "value": 0.043811,
+            "p": 1.0,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 1.000)"
+        },
+        {
+          "stat": "run_b",
+          "family": "C",
+          "null": {
+            "median": 9.0,
+            "q025": 7.0,
+            "q975": 14.0,
+            "q999": 19.0,
+            "max": 20.0
+          },
+          "plant": {
+            "description": "a run of 40 one-bits at a random position",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 27,
+            "below_0_01": 0
+          },
+          "real": {
+            "value": 8.0,
+            "p": 0.8748906386701663,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.875)"
+        },
+        {
+          "stat": "naf_b",
+          "family": "C",
+          "null": {
+            "median": 0.697542,
+            "q025": 0.053657,
+            "q975": 2.199939,
+            "q999": 3.165766,
+            "max": 3.970621
+          },
+          "plant": {
+            "description": "b with 24 non-adjacent signed digits",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 45,
+            "below_0_01": 9
+          },
+          "real": {
+            "value": 0.375599,
+            "p": 0.7520309961254843,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.752)"
+        },
+        {
+          "stat": "hw_c",
+          "family": "C",
+          "null": {
+            "median": 0.701646,
+            "q025": 0.0,
+            "q975": 2.192645,
+            "q999": 3.33282,
+            "max": 3.946761
+          },
+          "plant": {
+            "description": "each bit of the target set with probability 3/4",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 52,
+            "below_0_01": 3
+          },
+          "real": {
+            "value": 0.964764,
+            "p": 0.3479565054368204,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.348)"
+        },
+        {
+          "stat": "run_c",
+          "family": "C",
+          "null": {
+            "median": 9.0,
+            "q025": 7.0,
+            "q975": 14.0,
+            "q999": 18.0,
+            "max": 23.0
+          },
+          "plant": {
+            "description": "a run of 40 one-bits at a random position",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 38,
+            "below_0_01": 10
+          },
+          "real": {
+            "value": 13.0,
+            "p": 0.06274215723034621,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.063)"
+        },
+        {
+          "stat": "smooth_b",
+          "family": "D",
+          "null": {
+            "median": 13.549303,
+            "q025": 0.0,
+            "q975": 42.646906,
+            "q999": 65.989672,
+            "max": 83.447502
+          },
+          "plant": {
+            "description": "target quantity a product of primes below 2^16",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 1,
+            "below_0_05": 62,
+            "below_0_01": 10
+          },
+          "real": {
+            "value": 29.175587,
+            "p": 0.11736032995875516,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.117)"
+        },
+        {
+          "stat": "smooth_c",
+          "family": "D",
+          "null": {
+            "median": 13.332037,
+            "q025": 0.0,
+            "q975": 42.365653,
+            "q999": 64.497829,
+            "max": 74.937226
+          },
+          "plant": {
+            "description": "target quantity a product of primes below 2^16",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 48,
+            "below_0_01": 11
+          },
+          "real": {
+            "value": 1.584963,
+            "p": 0.9268841394825647,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.927)"
+        },
+        {
+          "stat": "smooth_j",
+          "family": "D",
+          "null": {
+            "median": 13.381678,
+            "q025": 0.0,
+            "q975": 40.860927,
+            "q999": 62.310608,
+            "max": 83.821369
+          },
+          "plant": {
+            "description": "target quantity a product of primes below 2^16",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 1,
+            "below_0_05": 59,
+            "below_0_01": 10
+          },
+          "real": {
+            "value": 6.266787,
+            "p": 0.7467816522934633,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.747)"
+        },
+        {
+          "stat": "hw_j",
+          "family": "E",
+          "null": {
+            "median": 0.657162,
+            "q025": 0.043811,
+            "q975": 2.321972,
+            "q999": 3.461053,
+            "max": 4.42489
+          },
+          "plant": {
+            "description": "each bit of the target set with probability 3/4",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 36,
+            "below_0_01": 8
+          },
+          "real": {
+            "value": 0.131432,
+            "p": 0.930758655168104,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.931)"
+        },
+        {
+          "stat": "run_j",
+          "family": "E",
+          "null": {
+            "median": 9.0,
+            "q025": 7.0,
+            "q975": 14.0,
+            "q999": 18.0,
+            "max": 22.0
+          },
+          "plant": {
+            "description": "a run of 40 one-bits at a random position",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 100,
+            "detect_rate": 1.0,
+            "min_p": 0.00012498437695288088,
+            "median_p": 0.00012498437695288088,
+            "passed": true
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 35,
+            "below_0_01": 9
+          },
+          "real": {
+            "value": 7.0,
+            "p": 0.9857517810273716,
+            "flagged": false
+          },
+          "verdict": "within the null distribution (p = 0.986)"
+        },
+        {
+          "stat": "d3",
+          "family": "F",
+          "null": {
+            "median": 1.0,
+            "q025": 0.0,
+            "q975": 4.0,
+            "q999": 4.0,
+            "max": 4.0
+          },
+          "plant": {
+            "description": "rejection sampling of null draws with the maximum d3 seen in the null panel",
+            "constructed": 100,
+            "requested": 100,
+            "detected": 0,
+            "detect_rate": 0.0,
+            "min_p": 0.0647419072615923,
+            "median_p": 0.0647419072615923,
+            "passed": false
+          },
+          "holdout": {
+            "draws": 1000,
+            "below_threshold": 0,
+            "below_0_05": 0,
+            "below_0_01": 0
+          },
+          "real": {
+            "value": 0.0,
+            "p": 1.0,
+            "flagged": false
+          },
+          "verdict": "positive control failed: inconclusive"
+        }
+      ],
+      "seconds": [
+        [
+          "null_panel",
+          334.262213344
+        ],
+        [
+          "holdout",
+          45.540285476
+        ],
+        [
+          "plants",
+          137.960912887
+        ]
+      ]
+    }
+  ]
+}

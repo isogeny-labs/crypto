@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 260">
+  <rect width="900" height="260" fill="#fff"/>
+  <g font-family="DejaVu Sans, sans-serif" font-size="19" fill="#17283b">
+    <text x="30" y="32" font-weight="bold">Fixed input and Q range; one bounded native control per binary</text>
+    <rect x="30" y="58" width="405" height="140" rx="10" fill="#fce9e8" stroke="#aa4038"/>
+    <text x="50" y="88" font-weight="bold">Original timeout path</text>
+    <text x="50" y="120">uint32_t passed to string conversion</text>
+    <text x="50" y="151">Native executable: exit 139</text>
+    <text x="50" y="180">Extracted statement: exit 139</text>
+    <rect x="465" y="58" width="405" height="140" rx="10" fill="#e9f3ed" stroke="#347451"/>
+    <text x="485" y="88" font-weight="bold">Corrected timeout path</text>
+    <text x="485" y="120">unsigned integer conversion</text>
+    <text x="485" y="151">Native executable: exit 0</text>
+    <text x="485" y="180">Integer timeout logged; no new factor</text>
+    <text x="30" y="230" font-size="16">Run 2026-10-23 · 1 s native limit · 30 s outer bound · no production backtrace</text>
+  </g>
+</svg>

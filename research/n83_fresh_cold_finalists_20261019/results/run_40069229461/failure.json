@@ -1,0 +1,43 @@
+{
+  "schema": "n83.fresh-cold-shared-binary-capacity-failure/v1",
+  "run_id": 40069229461,
+  "run_attempt": 1,
+  "head_sha": "8282e76b12fe3e682ab948a8fd6efa847dd3220c",
+  "conclusion": "failure",
+  "failure_stage": "host_capacity_preflight_before_source_or_target_children",
+  "selected_best_total_runtime": null,
+  "shared_build": {
+    "job_id": 120798858630,
+    "conclusion": "success",
+    "artifact_id": 12553574268,
+    "artifact_zip_sha256": "ee816762d2c496e9754cb68c0274b581f4e292844570aac4cf01e71e3a0b06d4",
+    "ic_binary_sha256": "4be33ac0a9ce5bc1d9f0206c5ccb58e24bbac1e75d40f43a40ffbaf7e827026e",
+    "rho_binary_sha256": "4ed1335f55240ff98470caf0096b9c0cbb3da0a01b157ce88bc83cf886f761e9"
+  },
+  "strata": [
+    {
+      "stratum": 0,
+      "job_id": 120824884263,
+      "artifact_id": 12554949396,
+      "artifact_zip_sha256": "a43401cf4eb66a0dffc4660847697269efad0ce0c29d00f3e6a6baec456f978a",
+      "preflight_status": "REJECTED_HOST_CAPACITY",
+      "visible_cpu_count": 2,
+      "mem_total_kib": 8128876,
+      "disk_free_bytes": 3926208512,
+      "source_receipt_exists": false,
+      "target_children_started": 0
+    },
+    {
+      "stratum": 1,
+      "job_id": 120824884312,
+      "artifact_id": 12554244881,
+      "artifact_zip_sha256": "70c0994de3569cb017b8d59e9ad71e76967a6b068ee9a9c2b820e5abdd0a0ac0",
+      "preflight_status": "REJECTED_HOST_CAPACITY",
+      "visible_cpu_count": 2,
+      "mem_total_kib": 8128876,
+      "disk_free_bytes": 3926368256,
+      "source_receipt_exists": false,
+      "target_children_started": 0
+    }
+  ]
+}

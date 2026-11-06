@@ -1,0 +1,107 @@
+{
+  "item": 15,
+  "title": "Stack D4 with double large primes at k4",
+  "original_requirement": "Execute D4 plus double large primes at k=4, with the complete factorial comparison and all costs.",
+  "acceptance_criteria": [
+    "Same input trial streams; neither/D4/2LP/both arms, setup and phase costs.",
+    "Count partial relations,graph processing,dependencies,filtering and final algebra; verified logarithms.",
+    "Report combined measured gain or regression; do not multiply separate constants/exponents."
+  ],
+  "source_bindings": [
+    {
+      "repository": "crypto",
+      "path": "examples/ic_improve_01_d4_2lp.rs"
+    },
+    {
+      "repository": "crypto",
+      "path": "examples/ic_improve2_04_d4_2lp_fix.rs"
+    },
+    {
+      "repository": "crypto",
+      "path": "research/ic_improve_20261014/01-d4-2lp/PROTOCOL.md"
+    },
+    {
+      "repository": "crypto",
+      "path": "research/ic_improve_20261014/01-d4-2lp/README.md"
+    },
+    {
+      "repository": "crypto",
+      "path": "research/ic_improve_20261014/01-d4-2lp/ecbench/spec-d4-2lp.json"
+    }
+  ],
+  "source_supported_commands": [
+    {
+      "repo": "crypto",
+      "argv": [
+        "target/release/examples/ic_improve_01_d4_2lp",
+        "train",
+        "--p",
+        "521",
+        "--seed",
+        "4",
+        "--json",
+        "FRESH/train.jsonl"
+      ],
+      "purpose": "One original training cell. Full training: p in {101,181,269,397,521,769,1033}, seeds 4 and 5; full test: those primes plus 1301, seeds 1 through 3.",
+      "kind": "scientific_trial",
+      "full_parameters": {
+        "training_primes": [
+          101,
+          181,
+          269,
+          397,
+          521,
+          769,
+          1033
+        ],
+        "training_seeds": [
+          4,
+          5
+        ],
+        "test_primes": [
+          101,
+          181,
+          269,
+          397,
+          521,
+          769,
+          1033,
+          1301
+        ],
+        "test_seeds": [
+          1,
+          2,
+          3
+        ]
+      }
+    },
+    {
+      "repo": "crypto",
+      "argv": [
+        "target/release/ecbench",
+        "verify",
+        "--dir",
+        "research/ic_improve_20261014/01-d4-2lp/ecbench/session-20261014-d4-2lp",
+        "--replay",
+        "12",
+        "--out",
+        "FRESH/replay.json"
+      ],
+      "purpose": "Replay the existing session into a fresh audit artifact without overwriting the prior receipt.",
+      "kind": "independent_replay"
+    }
+  ],
+  "remaining_gaps": [
+    "The original stacked study already ran: its source README reports whole-cost ratio 1.025 [1.016, 1.037] over 24 test curves. This is prior evidence, not a new run in this campaign.",
+    "Reproduce the full original protocol only into fresh outputs after checking prior and off-main coverage. A complete neither/D4/2LP/both factorial may require an additional baseline arm.",
+    "Read the round-2 fix and production protocol before selecting the current incumbent."
+  ],
+  "dependencies": [],
+  "existing_evidence_notes": [
+    "The source README reports 36 verified ecbench runs and 12 reproduced replays; the oracle was unpriced, so these ecbench comparisons were explicitly diagnostic."
+  ],
+  "preparation_status": "source_bound",
+  "scientific_completion_status": "not_claimed_by_this_preparation",
+  "execution_note": "Commands are source bindings, not launch receipts; preserve original trials and output to a fresh location through the applicable runner. No official approval or status transition is implied.",
+  "original_audit_text": "Stack D₄ with double large primes at k = 4. The 18× constant and the exponent gain were never run together."
+}

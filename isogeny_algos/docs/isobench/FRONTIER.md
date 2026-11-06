@@ -104,3 +104,11 @@ Model: cost = C * 2^(alpha * size).
 | bfs | frontier | oracle_calls | 0.480 [0.418, 0.542] | 0.25 | 4 | 1439 @ 24 [863, 2044] | `path-supersingular-bfs.json` |
 | ghs | frontier | oracle_calls | 0.487 [0.428, 0.545] | 0.25 | 4 | 3184 @ 24 [1970, 5034] | `path-supersingular-ghs.json` |
 | delfs_galbraith | dominated by bfs | oracle_calls | 0.558 [0.510, 0.626] | 0.25 | 4 | 5774 @ 24 [4709, 7198] | `path-supersingular-delfs_galbraith.json` |
+
+## radical.chain (bits=61 ell=7)
+
+Model: cost = C * size^alpha.
+
+| method | status | unit | alpha (95% CI) | declared | sizes | mean cost at largest size (95% CI) | bound |
+|:--|:--|:--|:--|--:|--:|:--|:--|
+| radical | frontier | fme | 0.972 [0.972, 0.972] | 1 | 4 | 3472 @ 16 [3472, 3472] | `radical-7-radical.json` |

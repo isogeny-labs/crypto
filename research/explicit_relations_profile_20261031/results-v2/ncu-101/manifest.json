@@ -1,0 +1,99 @@
+{
+  "schema": "profile/v1",
+  "kind": "manifest",
+  "subcommand": "ncu",
+  "label": "",
+  "status": "unsupported",
+  "reason": "ERR_NVGPUCTRPERM: the driver withholds GPU performance counters from this user (NVreg_RestrictProfilingToAdminUsers=0, or run with the provider's profiling capability)",
+  "started_utc": "2026-10-31T07:48:27Z",
+  "wall_seconds": 2.772,
+  "cwd": "/work/crypto",
+  "command": [
+    "bash",
+    "/work/crypto/research/explicit_relations_profile_20261031/replay.sh",
+    "/work/crypto/gpu/explicit-relations/build/explicit-relations-affine",
+    "/work/crypto/research/explicit_relations_profile_20261031/results-v1/101.commands"
+  ],
+  "isolation": "none",
+  "binary": {
+    "path": "/usr/bin/bash",
+    "sha256": "bc5945feb8bd26203ebfafea5ce1878bb2e32cb8fb50ab7ae395cfb1e1aaaef1",
+    "bytes": 1446024
+  },
+  "git": {
+    "commit": "b50e30d47458881eba10d802b7f972a9f56541bd",
+    "dirty_tracked_files": 0
+  },
+  "tools": {
+    "ncu": {
+      "path": "/usr/local/cuda/bin/ncu",
+      "version": "Version 2026.1.1.0 (build 37634170) (public-release)"
+    }
+  },
+  "host": {
+    "hostname": "06e7f73f7de0",
+    "cpu_model": "AMD EPYC 75F3 32-Core Processor",
+    "cpu_features": [
+      "adx",
+      "aes",
+      "avx2",
+      "bmi2",
+      "pclmulqdq",
+      "popcnt",
+      "sha_ni",
+      "vpclmulqdq"
+    ],
+    "kernel": "6.8.0-138-generic",
+    "arch": "x86_64",
+    "logical_cpus": 128,
+    "mem_kib": 528168028,
+    "event_sources": [
+      "breakpoint",
+      "cpu",
+      "ibs_fetch",
+      "ibs_op",
+      "kprobe",
+      "msr",
+      "power",
+      "software",
+      "tracepoint",
+      "uprobe"
+    ],
+    "hardware_pmu": true,
+    "perf_event_paranoid": "4",
+    "kptr_restrict": "1",
+    "gpus": [
+      {
+        "index": 0,
+        "name": "NVIDIA GeForce RTX 4090",
+        "driver": "595.91.07",
+        "compute_cap": "8.9",
+        "max_sm_clock_mhz": 3105,
+        "max_mem_clock_mhz": 10501,
+        "power_limit_w": 450.00,
+        "memory_mib": 24564,
+        "persistence": "Enabled"
+      }
+    ]
+  },
+  "ncu": {
+    "kernel_regex": "search_right_persistent",
+    "launch_skip": 0,
+    "launch_count": 1,
+    "set": "",
+    "sections": [
+      "SpeedOfLight",
+      "LaunchStats",
+      "Occupancy",
+      "ComputeWorkloadAnalysis",
+      "MemoryWorkloadAnalysis",
+      "SchedulerStats",
+      "WarpStateStats",
+      "InstructionStats",
+      "SourceCounters"
+    ],
+    "clock_control": "base",
+    "cache_control": "all",
+    "replay": "kernel (ncu default): every profiled launch is replayed, so its duration is not a throughput figure"
+  }
+}

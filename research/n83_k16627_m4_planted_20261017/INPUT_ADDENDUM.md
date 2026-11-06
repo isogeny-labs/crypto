@@ -1,0 +1,3 @@
+# Pre-run retained-object digest clarification
+
+This addendum was written before any planted worker run. The [frozen protocol](PROTOCOL.md) requires the exact K=16,627 object and point-set digest from the capacity gate. The selected manifest row identifies the relative object as `objects/1aa70cc1571f4cb25af42936699378329128a869f2ae8ad35efb375663d4e59d.jsonl.gz` and its `point_set_blake3` as `564c6bb72b346b73112240bb0bddc4ef68b7525f7ef2556d6046e52c32f976e0`. The planted worker now rejects either mismatch after the existing full replay. This pins the already-specified input; it does not alter the target, arms or caps.

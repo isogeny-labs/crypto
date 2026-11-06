@@ -1,0 +1,91 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "PKM Kummer-tower IC on Solinas vs Proth curves, 24-bit p, t=9",
+  "description": "Preregistered (PROTOCOL.md 4): ic.pipeline with the Kummer tower base on a P-224-topology Solinas curve (p = 2^n - 2^k + 1) and on the prior ladder Proth curve of the same bit size, the harness mitm table oracle and the root-finding oracle, against rho with the negation map, eight one-target workloads per curve. All IC arms charge every group operation.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 16760833,
+        "a": 10096653,
+        "b": 5158538,
+        "group_order": 16763924,
+        "r": 4190981,
+        "gx": 4235082,
+        "gy": 5867282
+      },
+      {
+        "kind": "prime_explicit",
+        "p": 10940417,
+        "a": 10128206,
+        "b": 867458,
+        "group_order": 10937713,
+        "r": 10937713,
+        "gx": 3240781,
+        "gy": 414610
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 202610220024
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "ic-mitm",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-kummer:t=9",
+          "oracle": "mitm:m=3,negation_folded=1",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "ic-rootfind",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-kummer:t=9",
+          "oracle": "rootfind-mitm:m=3",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "ic-mitm-tf4",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-kummer:t=12",
+          "oracle": "mitm:m=3,negation_folded=1",
+          "max_trials": "200000"
+        }
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 3,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 203610220024,
+    "isolation_required": "L2",
+    "timeout_seconds": 3600
+  }
+}

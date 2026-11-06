@@ -1,0 +1,22 @@
+--- a/factor/nfs/nfs_sieving.c
++++ b/factor/nfs/nfs_sieving.c
+@@ -1325,7 +1325,7 @@
+ 	{
+ 		if (fobj->VFLAG >= 0)
+ 		{
+-			printf("nfs: thread %d halting, nfs timeout of %1.4sec exceeded\n", tid, fobj->nfs_obj.timeout);
++			printf("nfs: thread %d halting, nfs timeout of %u sec exceeded\n", tid, (unsigned)fobj->nfs_obj.timeout);
+ 		}
+ 		tdata->work_fcn_id = tdata->num_work_fcn;
+ 		return;
+--- a/factor/nfs/nfs.c
++++ b/factor/nfs/nfs.c
+@@ -1235,7 +1235,7 @@
+ 				if (fobj->VFLAG >= 0)
+ 				{
+ 					printf("nfs: elapsed time of %6.4f seconds exceeds specified "
+-						"nfs timeout of %1.4f sec, exiting\n", t_time, fobj->nfs_obj.timeout);
++						"nfs timeout of %u sec, exiting\n", t_time, (unsigned)fobj->nfs_obj.timeout);
+ 				}
+ 				nfs_state = NFS_STATE_EXIT;
+ 			}

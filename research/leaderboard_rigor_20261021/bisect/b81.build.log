@@ -1,0 +1,51 @@
+   Compiling crypto v0.1.0 (/tmp/bisect-wt-b81)
+warning: unused import: `crate::cryptanalysis::binary_semaev::binary_semaev_s3`
+   --> src/cryptanalysis/semaev_sat.rs:105:5
+    |
+105 | use crate::cryptanalysis::binary_semaev::binary_semaev_s3;
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `projected`
+    --> src/cryptanalysis/koblitz_index_calculus.rs:8802:10
+     |
+8802 |     let (projected, _) = project_by_frobenius_orbits_generic(kc, fb);
+     |          ^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_projected`
+     |
+     = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused variable: `a`
+    --> src/cryptanalysis/koblitz_index_calculus.rs:9810:21
+     |
+9810 |                 let a = sample_relation_scalar(r, &mut rng);
+     |                     ^ help: if this is intentional, prefix it with an underscore: `_a`
+
+warning: unused variable: `b`
+    --> src/cryptanalysis/koblitz_index_calculus.rs:9811:21
+     |
+9811 |                 let b = sample_relation_scalar(r, &mut rng);
+     |                     ^ help: if this is intentional, prefix it with an underscore: `_b`
+
+warning: static `ALL_FACTORS_MEMO` is never used
+   --> src/cryptanalysis/koblitz_index_calculus.rs:527:8
+    |
+527 | static ALL_FACTORS_MEMO: std::sync::OnceLock<std::sync::Mutex<HashMap<u32, Vec<u64>>>> =
+    |        ^^^^^^^^^^^^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `memo_get` is never used
+   --> src/cryptanalysis/koblitz_index_calculus.rs:530:4
+    |
+530 | fn memo_get(
+    |    ^^^^^^^^
+
+warning: function `memo_put` is never used
+   --> src/cryptanalysis/koblitz_index_calculus.rs:541:4
+    |
+541 | fn memo_put(
+    |    ^^^^^^^^
+
+warning: `crypto` (lib) generated 7 warnings (run `cargo fix --lib -p crypto` to apply 4 suggestions)
+    Finished `release` profile [optimized] target(s) in 3m 32s

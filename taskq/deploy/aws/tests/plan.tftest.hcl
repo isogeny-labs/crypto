@@ -35,6 +35,9 @@ mock_provider "aws" {
   }
 }
 mock_provider "kubernetes" {}
+mock_provider "aws" {
+  alias = "us_east_1"
+}
 mock_provider "helm" {}
 mock_provider "random" {}
 mock_provider "tls" {}
@@ -45,6 +48,7 @@ mock_provider "null" {}
 variables {
   cluster_endpoint_public_access_cidrs = ["203.0.113.0/24"]
   enable_keda                          = true
+  gpu_spot_instance_types              = ["g7e.2xlarge"]
   pools = [
     { name = "cpu", queues = ["cpu"], replicas = 2, node_group = "cpu", cpu = "6", memory = "12Gi",
     keda = { max_replicas = 20 } },
@@ -77,9 +81,9 @@ run "plans_with_gpu_and_keda" {
 run "cpu_only_without_keda" {
   command = plan
   variables {
-    enable_keda = false
-    gpu_node    = { enabled = false, instance_type = "g7e.2xlarge", min_size = 0, desired_size = 0, max_size = 4 }
-    pools       = [{ name = "cpu", queues = ["cpu"], replicas = 1, node_group = "cpu", cpu = "6", memory = "12Gi" }]
+    enable_keda             = false
+    gpu_spot_instance_types = []
+    pools                   = [{ name = "cpu", queues = ["cpu"], replicas = 1, node_group = "cpu", cpu = "6", memory = "12Gi" }]
   }
   assert {
     condition     = length(helm_release.nvidia_device_plugin) == 0 && length(helm_release.keda) == 0

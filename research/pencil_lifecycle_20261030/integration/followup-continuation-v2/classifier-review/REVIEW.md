@@ -1,0 +1,9 @@
+# Independent bounded word-classifier review
+
+The exact candidate `WordClassifier.lean` SHA256 8f34856f7007fc10327f5c786facc618b8e8dae377231abec24e5e67cd2fd476 supports its value-level classifier claim under the printed assumptions. The review plan preceded candidate inspection. Five modules were freshly compiled with private output objects: CanonicalResidue, UInt64Residue, NatClassifier, WordClassifier and separate Readback; all exit0. The five named readbacks use only propext, Classical.choice and Quot.sound (subsets per declaration in stdout).
+
+Negation avoids underflow because b%p<p. Subtraction's addition is below2p and hence below2^64 under p<2^31. Canonical inputs make Nat/word equality agree with field equality. The same inverse-first, equality-second, zero-subtraction-third order occurs in the Rust add22_weighted fragment; overlapping all-zero predicates take inverse. The theorem classifies supplied cleared ordinates, not yet their complete cross-scaling computation.
+
+The current and historical Field add/neg/sub fragments are byte-identical: SHA256089c4b52e1e53a6874d4aa012046d854d48477b44a0a20a8f5cf3ba0e62103f6. Their Rust specialization needs Field.n=1 and p odd; source-mapping-addendum.json now states this explicitly. The n=1 negation loop reduces to the modeled expression, with its final multiplier p also bounded. Counter mutation is excluded; actual calls require counter headroom. The sameUDouble constructor means delegation to double22_weighted, not proof of its returned payload or branch label.
+
+The addendum closes the structured external-mapping omission without changing theorem bytes. No proof of compiler translation, all reachable-input validity, cross-scaled expression composition, counter-state semantics, or returned group law follows. No scientific executions or ratios were evaluated.

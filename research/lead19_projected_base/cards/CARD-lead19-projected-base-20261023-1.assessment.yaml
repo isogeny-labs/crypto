@@ -1,0 +1,23 @@
+execution_assessment:
+  card_id: CARD-lead19-projected-base-20261023-1
+  card_sha256: 3d655e8f6376fe93ac94c03f179191d06db12532a746b448b3c3f364d32def9b
+  receipt: research/lead19_projected_base/cards/CARD-lead19-projected-base-20261023-1.receipt.json
+  receipt_sha256: bb2e3b717d2360118a629037c4aac127a7377fd1a962a4fb588fac1ad29b5c86
+  relay_verbatim: true          # check_relay() result: relay_verbatim true, missing_lines [], status completed
+  verify_findings: []           # check_relay() result, copied
+  outcome: executed_as_specified
+  failure_class: null
+  stopped_at_step: null         # receipt status completed, commands_total 3, exit 0 on all three
+  recommendation: proceed_to_review
+  reasons:
+    - "tools/task_card.py check-relay (CLI) printed two lint findings and exited 1 before reaching the relay check: commands[1].argv and commands[2].argv name research/lead19_projected_base/char2.json and prime24.json, which now exist on disk and which binds does not pin. These two files are the card's own --out arguments and are listed in the card's must_not_exist, so they exist because the card ran; the card file sha256 on disk (3d655e8f...def9b) equals the receipt's card_sha256. I then called check_relay() of tools/task_card.py directly on the same card and report: relay_verbatim true, missing_lines [], verify_findings [], status completed."
+    - "Receipt commands: build exit 0, run-char2 exit 0, run-prime24 exit 0, each attempts 1, timed_out false. The argv in the receipt equal the card's argv for all three commands (read side by side)."
+    - "Digests on disk equal the receipt: run-char2.stdout e85e6619...4818, run-char2.stderr b3f9dda5...0c40, run-prime24.stdout cc222cf5...25ae, run-prime24.stderr 84c9f4a9...81f0d (sha256sum of the four files under research/lead19_projected_base/receipts/)."
+    - "target/release/ic sha256 on disk 373c0f1d02abc29465c4d434754f5e9c732e3ff82bcb836364d1655ca2d1e2ec equals the card bind and the receipt's build output. PROTOCOL.md sha256 on disk 0a1f10c2cf7f7203683795ba83e50524205525b9bf6761a60f90f2fcb46019ca equals its bind."
+    - "Output JSONs read by key: char2.json status complete, all_verified true; prime24.json status complete, all_verified true."
+    - "Observation, no interpretation: host.git_commit is present as a key and its value is null in both char2.json and prime24.json. The card pins HEAD 6783523a3b75266db669d6138decdf142d14e16d and git rev-parse HEAD prints the same value; PROTOCOL.md does not mention git_commit, so no stated requirement is checked against it. Reported for the Coordinator."
+    - "git status --porcelain --untracked-files=all (first run) listed only untracked paths, all under research/lead19_projected_base/ (card, receipt, executor-report.txt, receipts/ four files, char2.json, prime24.json, analysis.json, analysis.md, reports/run-20261023T2154Z/ four files). target/ is ignored by git (git check-ignore: .gitignore:1:/target), so it does not list. Written by the main session after the run, inside the write scope: analysis.json, analysis.md, reports/ and the .executor-report.txt (file mtimes 21:56 for the analysis files, after the receipt at 21:55)."
+    - "A later git status --porcelain (same session, minutes after the first) also lists the tracked file research/lead19_projected_base/plot_lead19.py as modified (mtime 21:58:14, after the receipt at 21:55; git diff --stat 18 insertions, 8 deletions: an added --commit option and a panel-layout change). It is inside the write scope. It was not part of the card's argv and the card's commands do not name it, so it is not a card-run write; it is a main-session edit after the run, recorded here as such. Nothing outside research/lead19_projected_base/ and target/ is modified."
+    - "The executor's report states it ran no other commands. The receipt lists exactly three commands, the card's. The receipt's dirty_before is the card file alone; dirty_after adds only the two output JSONs and the four stdout/stderr files."
+  inferential_validity: not_assessed
+  interpretation: not_assessed

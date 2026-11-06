@@ -1,0 +1,40 @@
+\section{Conclusion}\label{sec:conclusion}
+
+Over four months the programme made elliptic-curve index calculus much
+cheaper against itself.
+\begin{itemize}
+\item The decomposition oracle is two to five orders of magnitude cheaper
+  where root finding applies.
+\item The Gr\"obner engines are one to two orders cheaper in counted work,
+  and the $\FF_p$ engine matches msolve.
+\item The $n=83$ cold pipeline is $3.24\times$ faster after its set-up was
+  stacked.
+\item Two extension-field families moved their exponents: genus three
+  after cubic GHS from $q^{1.91}$ to a local $q^{1.36}$, and $k=4$ with
+  $D_4$ symmetry to a gap closing as $n^{-1/4}$.
+\end{itemize}
+By the success criterion each of these is a success.
+
+Against rho, the honest summary is shorter. Cold, with a matched reference,
+rho is cheaper on every elliptic curve the programme measured:
+\begin{itemize}
+\item $4.67$--$18.07\times$ on Koblitz curves of 37--47 bits;
+\item $10.5$--$102\times$ on prime curves of 20--40 bits;
+\item $55\times$ at Koblitz $n=83$.
+\end{itemize}
+On the families that are not deployed shapes, the gap is $1.15\times$
+(genus three) and $4.3\times$ ($k=4$, one target). Every apparent win over
+rho in the record disappeared once the reference was given equal advice,
+priced alike, or matched in the same binary. Corrections of this kind
+lengthened the measured distance more than any single improvement
+shortened it.
+
+Two things follow. First, the stage the programme improved most is no
+longer the stage that dominates. Relation yield per probe and table set-up
+now set the cost, and the next gains must come from there. Second, the
+nearest approaches are on families where a fitted exponent is below rho's,
+and both make a falsifiable prediction at sizes the harness can reach: a
+$k=4$ crossover near $n\approx2^{68}$, and a genus-three crossover at
+$q\le2^{22}$ once its rho is measured. Testing those two predictions, with
+every row validated, is the work that would turn the ratchet into an
+advance.

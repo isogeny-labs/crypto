@@ -41,6 +41,7 @@ use crypto_lib::cryptanalysis::koblitz_index_calculus::{
     FrobeniusFactorBase, KoblitzCurve,
 };
 use crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly;
+use crypto_lib::cryptanalysis::pq_groebner_f2::{mask_low64, masks_low64};
 use num_bigint::BigUint;
 use rand::rngs::StdRng;
 use rand::{Rng, SeedableRng};
@@ -109,7 +110,7 @@ fn bench_arm(eqs: &[F2BoolPoly], nv: usize, spec: &str) -> Arm {
     roots.sort_unstable();
     roots.dedup();
     Arm {
-        roots,
+        roots: masks_low64(&roots),
         cpu,
         splits: st.splits,
         reductions: st.reductions,
@@ -216,7 +217,7 @@ fn arm_json(name: &str, a: &Arm) -> String {
 }
 
 fn support(p: &F2BoolPoly) -> u64 {
-    p.terms.iter().fold(0u64, |a, t| a | t.mask)
+    p.terms.iter().fold(0u64, |a, t| a | mask_low64(t.mask))
 }
 
 /// Root features with the harvest off: free variables at the root's first

@@ -5,7 +5,8 @@ not say which curves are *alike*: that every Koblitz curve shares one CM
 field and one descended Frobenius whatever its degree, that a curve over
 `GF(2^18)` is the quadratic twist of one, or how far `Z[π]` sits below the
 maximal order. [`traits.json`](traits.json) records those traits for every
-registry curve and for the curves of the other sources in
+curve of the catalog (the registry rows [`cover-catalog.json`](cover-catalog.json)
+names; see "Keeping it current") and for the curves of the other sources in
 [`trait-sources.json`](trait-sources.json), each value with how well it is
 established, and
 `curve_traits` groups curves by them across sizes or ranks curves by
@@ -17,7 +18,7 @@ cargo build --release --bin curve_traits
 ./target/release/curve_traits show ECC2K-130                # one record (slug, standard name or legacy spelling)
 ./target/release/curve_traits group --by cm,descent --min-sizes 2
 ./target/release/curve_traits similar ECC2K-130 --other-sizes --top 10
-./target/release/curve_traits build                         # registry + sources + hints → traits.json
+./target/release/curve_traits build                         # catalog rows + sources + hints → traits.json
 ./target/release/curve_traits check                         # CI: traits.json is current
 ./target/release/curve_traits unfactored                    # composites left unsplit (input of factor-hints.gp)
 ```
@@ -164,8 +165,40 @@ secp256k1.
   `h(O_f) ≤ n` (class numbers from counting reduced forms and the
   conductor formula). Of the orders between `Z[π]` and `O_K` the levels
   allow, the walks keep those consistent with all of this: a level they
-  all share is decided (a floor this way needs no point over an extension
+  all share is decided (class-group orders exactly, by composing forms, up to
+  `|Δ| < 2^80`; an open walk is lengthened to the next such order) (a floor this way needs no point over an extension
   at all), and a resolved level outside them stops the build.
+
+- on a prime-field curve with `p < 2^63`, a level still open at
+  `ℓ ≤ 19` is settled by **descending walks**
+  ([`walk.rs`](../../src/cryptanalysis/curve_traits/walk.rs),
+  `height_above_floor`; Kohel, Fouquet–Morain). With `ℓ | v`, every vertex
+  of the `ℓ`-volcano above the floor has `ℓ + 1` rational `ℓ`-isogenies
+  and a floor vertex exactly one. Below the crater one edge goes up and
+  `ℓ` go down, so a walk on `j`-invariants that never steps back along
+  the edge it arrived by keeps going down once it has. From each rational
+  neighbour of `j(E)` (roots of `Φ_ℓ(j, Y)` in `GF(p)`, `Φ_2` to `Φ_19`)
+  the walk runs until a vertex with a single rational `ℓ`-isogeny; the
+  shortest such walk has length exactly the height `h` above the floor,
+  and the level is `depth − h`. A level above the bound the other tests
+  reached stops the build. The test compares it with a breadth-first
+  search of the `Φ_ℓ` graph in PARI/GP on 40 random curves.
+
+- a **stored level certificate**
+  ([`level-certificates.json`](level-certificates.json)), where one exists,
+  before any search: the points the depth-1 point test would look for,
+  found offline by
+  [`search.gp`](../../research/curve_traits_level_certificates_20261023/search.gp)
+  (PARI/GP) and only checked by `curve_traits`
+  (`points.rs`, `verify_level_certificate`). A certificate gives a monic
+  `g` of degree `m` over `GF(q)` (`m = k`, or `k/2` on the quadratic twist
+  for even `k`), the twisting element `d`, and the points, all in the
+  tower basis `GF(q)[w]/(g)`; the build checks that `g` is irreducible
+  (Ben-Or), that `d` is a non-square (its norm to `GF(q)` is, by Euler's
+  criterion), the group order from the trace, that each point is on the
+  curve, and its order: a point of order `ℓ^v`, `ℓ^v ∥ N`, makes the
+  `ℓ`-part cyclic (the floor); two independent points of order `ℓ` make it
+  rank 2 (the crater). A certificate that fails stops the build.
 
 When every prime is resolved, `conductor` is exact and `end_order` is
 `maximal` or `non-maximal`; otherwise `End(E)` stays `bounded` between
@@ -245,30 +278,31 @@ over a field of the target's size.
 
 ## Current catalogue and earlier classification panel
 
-The generated index covers every registered model. It includes the
+The retained generated index covers the registry snapshot used for its run. It includes the
 100 independently verified large-prime isogeny codomains. Each record retains
 the status of its order certificate and every derived trait. Models whose
 coordinate/order adapter is unavailable explicitly report `not_evaluated`;
 Curve25519 is one such record. A complete catalogue entry does not by itself
 certify its coordinates or group order.
 
-In the current file (2572 registry curves and 176 from the sources: 175
-walked curves of the P-256 and P-224 isogeny classes and the ECC2K-130
-degree-263 descendant), `End(E)` is established for 2700 curves (1150
-maximal, 1550 non-maximal) and unresolved for 34; 14 have a `Δ` that did
-not factor. Of the 1324 curves over `GF(p^k)`, `k > 1`, 1319 have a
-certified order (9 by generator, 1310 by point orders: 484 proved, 826
-probable). The levels behind it: 1306 decided by the scalar test on `E[ℓ]`
-(787 floors, 519 craters at depth 1), 1265 by the prime-power tests (486 one
-above the floor, 370 craters, 409 in between), 74 by the depth-1 point test
-(58 floors, 16 craters; 6 of them on binary curves), 388 by isogeny walks
-(204 craters, 166 floors, 18 in between), 19 by `j(E) = j(O_K)` in a field
-of class number 1, 13 walker certificates (each agreeing with the test), 111
-from a certified `End(E)`, 243 where `f₀` is already prime to `ℓ`. What
-stays open: 34 levels, all but two on `GF(p^k)` curves whose `|d_K|` is far
-too large for a walk (13 the tests only bound, 19 at depth 1 beyond the
-point test's budget), and two on binary curves (`ℓ = 31` at depth 1 over
-`GF(2^47)`, `ℓ = 31543` over `GF(2^61)`). P-256's `Δ` factors with
+The 2026-10-21 [native quadratic-twist catalog](sources/quadratic-twist-native-20261021.json)
+adds 1,921 registered models, including 963 extension-field models and 27 selected
+EC1 subgroup representations. Those finite replay and identity records are linked
+from the [study](../../research/quadratic_twist_evidence_20261021/README.md).
+The generated trait-classification panel below has not been rerun for these
+additions; its totals remain the earlier snapshot. Registration alone does not
+assign a new endomorphism-ring or volcano-level classification.
+
+In the regenerated file (the 2,574 catalog curves and 180 source curves: 175
+walked curves of the P-256 and P-224 isogeny classes, the ECC2K-130
+degree-263 descendant and the four prime-field Hecke `X₀(11)` records),
+`End(E)` is proved for 1,833 curves and probable
+for 915; none is bounded and 6 remain unknown because a 125- to 152-digit
+composite of `Δ` is unsplit. Of the 1,324
+curves over `GF(p^k)`, `k > 1`, 1,319 have a certified order (9 by generator,
+1,310 by point orders: 484 proved, 826 probable) and five are not evaluated.
+Per-prime level methods and bounds, and the individual `End(E)` statuses,
+remain recorded in `traits.json`. P-256's `Δ` factors with
 the committed hints as `−3·5·456597257999·p81·p136` (squarefree), so
 `v = 1`, `d_K = Δ` and `End(E) = O_K`, probable through its 136-bit prime
 (the 81-bit one is below the Miller–Rabin proof bound); every walked curve
@@ -323,11 +357,20 @@ Besides the registry, the build reads every file named in
   proved volcano levels feed `endomorphism.levels`.
 - **`ic-crosswalk`**: the entries of [`ic/curves.yaml`](ic/curves.yaml) that
   are not registry models (today the ECC2K-130 degree-263 descendant at
-  level 1). The binary model `y² + xy = x³ + a₂x² + a₄x + a₆` is taken to
-  the registry form by `y ↦ y + a₄` (`b = a₆ + a₄²`, `G ↦ (x, y + a₄)`);
-  its proved `End(E)` discriminant and volcano level are kept. The file is
+  level 1 and the four prime-field Hecke `X₀(11)` records over
+  `GF(11587)`, `GF(163567)`, `GF(231559)` and `GF(1032607)`). The binary
+  model `y² + xy = x³ + a₂x² + a₄x + a₆` is taken to the registry form by
+  `y ↦ y + a₄` (`b = a₆ + a₄²`, `G ↦ (x, y + a₄)`). A prime-field entry is a
+  generalized Weierstrass model `y² + a₁xy + a₃y = x³ + a₂x² + a₄x + a₆`
+  over `GF(p)`, `p > 3`; it is taken to `y² = x³ + Ax + B` by `A = −27c₄`,
+  `B = −54c₆` and `(x, y) ↦ (36x + 3b₂, 108(2y + a₁x + a₃))`, and the reader
+  refuses it unless `p` is a probable prime, the model is non-singular,
+  `q + 1 − t` is the stated order, `r·h` is that order and the generator
+  lies on both the stated and the short model. A proved `End(E)`
+  discriminant and volcano level are kept. The file is
   read by a strict YAML-subset reader that refuses anything it does not
-  understand, including a repeated key inside an entry it reads.
+  understand, including a repeated key inside an entry it reads; lists may
+  be written indented under their key or at its column.
 
 These slugs are computed identities, not registrations (`source.registered`
 is `false`): cite them in prose only after registering them (`AGENTS.md`
@@ -382,9 +425,20 @@ mv /tmp/hints.txt docs/curves/factor-hints.txt
 
 ## Keeping it current
 
-`traits.json` is derived from `registry.json`, the factor hints, the source
-manifest and its files; the file records each input's SHA-256. When any of
-them changes, rebuild it in the same pull request:
+`traits.json` is derived from the catalog rows of `registry.json`, the factor
+hints, the source manifest and its files. The catalog is the set of registry
+rows [`cover-catalog.json`](cover-catalog.json) names (the 2,572 rows the
+registry held before the isogeny-volcano census was swept into it, plus the two
+mixed-twist IC curves whose trait records the `transfer-audit` registry sweep
+pins: 2,574). The file
+records `catalog_rows_sha256`, the SHA-256 of those rows in registry order
+(sorted-key compact JSON of `{schema_version, curves}`), and the SHA-256 of
+every other input. A registry row the manifest does not name does not change
+it, so a research sweep that adds registry curves no longer stales the file;
+an edited catalog row, or a manifest slug the registry lacks, does. Tracking
+a further curve is an explicit change: add its slug to the manifest (and bump
+`count`). When the catalog or any other input changes, rebuild the file in the
+same pull request:
 
 ```bash
 cargo run --release --bin curve_traits -- build

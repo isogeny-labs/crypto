@@ -1,0 +1,33 @@
+# Review proposal only. Replace the issuer subject after inspecting actual RBAC.
+# Do not apply while the exact resource/lifetime and budget gates remain open.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ml-dataset-one-cell-grant-20261031
+  namespace: isolab
+data: {}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ml-dataset-one-cell-issuer-20261031
+  namespace: isolab
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames: ["ml-dataset-one-cell-grant-20261031"]
+    verbs: ["get", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ml-dataset-one-cell-issuer-20261031
+  namespace: isolab
+subjects:
+  - kind: ServiceAccount
+    name: __REVIEWED_TRUSTED_ISSUER__
+    namespace: isolab
+roleRef:
+  kind: Role
+  name: ml-dataset-one-cell-issuer-20261031
+  apiGroup: rbac.authorization.k8s.io

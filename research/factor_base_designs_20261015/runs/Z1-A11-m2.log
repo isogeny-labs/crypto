@@ -1,0 +1,41 @@
+== A11 m=2 p1: commit ad791be5b0f7bda1f000814656117f277a0bf73f, budget 300 s, grace 120 s, ulimit -v 13000000, started 2026-10-20T15:58:11Z
+
+thread 'main' (2344) panicked at examples/fb_designs_slope.rs:884:9:
+plant_x0: no target with x_R = 0 after 50331712 trials
+stack backtrace:
+   0: __rustc::rust_begin_unwind
+   1: core::panicking::panic_fmt
+   2: fb_designs_slope::draw_target
+   3: fb_designs_slope::build_system
+   4: fb_designs_slope::main
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+A11  m=2 t= 2 target=0 b=NaN |V|=null n_vars=null n_eqs=null D=null reached=null 13.0 s aborted (child exited: exit status: 101; stderr: note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace. |    4: fb_designs_slope::main |    3: fb_designs_slope::build_system)
+
+thread 'main' (2360) panicked at examples/fb_designs_slope.rs:884:9:
+plant_x0: no target with x_R = 0 after 50331712 trials
+stack backtrace:
+   0: __rustc::rust_begin_unwind
+   1: core::panicking::panic_fmt
+   2: fb_designs_slope::draw_target
+   3: fb_designs_slope::build_system
+   4: fb_designs_slope::main
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+A11  m=2 t= 2 target=1 b=NaN |V|=null n_vars=null n_eqs=null D=null reached=null 13.3 s aborted (child exited: exit status: 101; stderr: note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace. |    4: fb_designs_slope::main |    3: fb_designs_slope::build_system)
+-- A11 m=2: a system at t = 2 hit a limit or failed; the series stops
+== A11 m=2: ended 2026-10-20T15:58:37Z
+== A11 m=2 p1: commit e047338764dace77e3d91fa5397349ef6e37dd8d, budget 300 s, grace 120 s, ulimit -v 13000000, started 2026-10-20T16:14:02Z
+A11  m=2 t= 3 target=0 b=3.000 |V|=8 n_vars=12 n_eqs=13 D=3 reached=3 0.0 s ok
+A11  m=2 t= 3 target=1 b=3.000 |V|=8 n_vars=12 n_eqs=13 D=3 reached=3 0.0 s ok
+A11  m=2 t= 4 target=0 b=4.000 |V|=16 n_vars=15 n_eqs=16 D=3 reached=3 0.0 s ok
+A11  m=2 t= 4 target=1 b=4.000 |V|=16 n_vars=15 n_eqs=16 D=3 reached=3 0.0 s ok
+A11  m=2 t= 5 target=0 b=5.000 |V|=32 n_vars=18 n_eqs=19 D=4 reached=4 0.1 s ok
+A11  m=2 t= 5 target=1 b=5.000 |V|=32 n_vars=18 n_eqs=19 D=4 reached=4 0.1 s ok
+A11  m=2 t= 6 target=0 b=6.000 |V|=64 n_vars=21 n_eqs=22 D=4 reached=4 0.5 s ok
+A11  m=2 t= 6 target=1 b=6.000 |V|=64 n_vars=21 n_eqs=22 D=4 reached=4 0.6 s ok
+A11  m=2 t= 7 target=0 b=7.000 |V|=128 n_vars=24 n_eqs=25 D=4 reached=4 5.1 s ok
+A11  m=2 t= 7 target=1 b=7.000 |V|=128 n_vars=24 n_eqs=25 D=4 reached=4 5.1 s ok
+A11  m=2 t= 8 target=0 b=8.000 |V|=256 n_vars=27 n_eqs=28 D=4 reached=4 22.0 s ok
+A11  m=2 t= 8 target=1 b=8.000 |V|=256 n_vars=27 n_eqs=28 D=4 reached=4 23.9 s ok
+A11  m=2 t= 9 target=0 b=9.000 |V|=512 n_vars=30 n_eqs=31 D=4 reached=4 94.4 s ok
+A11  m=2 t= 9 target=1 b=9.000 |V|=512 n_vars=30 n_eqs=31 D=4 reached=4 89.7 s ok
+== A11 m=2: ended 2026-10-20T16:18:05Z

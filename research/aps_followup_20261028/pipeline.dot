@@ -1,0 +1,22 @@
+digraph APSFollowup {
+  graph [rankdir=TB, bgcolor="white", pad="0.22", nodesep="0.28", ranksep="0.32", fontname="Helvetica", label="APS follow-up: correctness paths (no measured speedup)", labelloc=t, fontsize=15];
+  node [shape=box, style="rounded,filled", fillcolor="#eff6ff", color="#466387", fontname="Helvetica", fontsize=11, margin="0.12,0.08"];
+  edge [color="#52677f", fontname="Helvetica", fontsize=10];
+  labels [label="Known labels R = uG + vQ\nCheck curve, subgroup and labels"];
+  coordinate [label="Coordinate encodings\nExact V_i domain tags"];
+  line [label="Two-parameter line y=tX+c\nMonic cubic H(t,c) divides F_V"];
+  certificate [label="Optional j=0 pruning\nCheck full orbit and propagated labels\nAdd t*z-1=0", fillcolor="#f4efff"];
+  roots [label="Native F4 + substitution\nFinite coordinate domains; factor other univariates\nShared cooperative deadline"];
+  original [label="Evaluate original equations\nDecode and deduplicate coordinates"];
+  exhaustive [label="Exhaustive mode\nCompare complete sets with legacy scan\nand independent point-addition oracle", fillcolor="#eaf7ed"];
+  informative [label="Streaming mode\nCheck signed point sum; reject B=0\nVerify dG=Q before stopping", fillcolor="#eaf7ed"];
+  complete [label="Enumeration complete\nor explicit timeout/incomplete status", fillcolor="#fff4dd"];
+  witness [label="Verified witness; enumeration partial\nKeep visited sets and aggregate diagnostics", fillcolor="#fff4dd"];
+  labels -> coordinate; labels -> line;
+  line -> certificate [label="only certified propagated labels"];
+  coordinate -> roots; line -> roots [label="unpruned control"]; certificate -> roots;
+  roots -> original;
+  original -> exhaustive; original -> informative;
+  exhaustive -> complete; informative -> witness;
+  informative -> roots [label="uninformative: continue", style=dashed];
+}

@@ -1,0 +1,15 @@
+card_id: CARD-bitop-ladder-20261019-3
+relay_verbatim: not_verified_by_tool
+outcome: executed_as_specified
+stopped_at_step: null
+recommendation: proceed_to_analysis
+reasons:
+  - "Receipt cards/CARD-bitop-ladder-20261019-3.receipt.json (sha256 6c168e145f6a668b541835080ab0b269946419eaf66853d892fcb836fbdcc02d): status completed, one command train-panel, exit_code 0, attempts 1, timed_out false, seconds 371.613, commit 73b1e2e0841ee2a4fea103f4f0946f12ab6b1a22, argv equal to the card's."
+  - "cards/CARD-bitop-ladder-20261019-3.run.stdout sha256 matches the receipt's stdout_sha256; it holds 19 DONE lines (P16..P34) and no RUN FAILED or VERIFY FAILED line; stderr empty."
+  - "All 19 output digests in the receipt equal the sha256 of sessions/train-P<b>/verify.json on disk; every one has ok true, session_status complete, problems empty, and spec.json byte-identical to specs/train-P<b>.json."
+  - "git status --porcelain shows tracked modifications only in select.py and make_specs.py (edited by the main session after the runs, per the dispatch), and untracked files only under research/bitop_ladder_20261019/; nothing outside write_scope."
+  - "python3 tools/task_card.py check-relay could not run: the card's binds[0] (PROTOCOL.md, b7334bc8...) no longer matches the file on disk (867247a2...), because Deviation 2 was added at 21:54:50 after the run. The bound hash does match the file at commit 73b1e2e08, the card's commit. The relay was therefore compared by hand: every figure the dispatch quotes for this card (exit 0, 371.613 s, receipt sha256, DONE lines, verify.json hash prefixes) equals the receipt. The executor's full returned text was not provided, so unedited relay is not confirmed."
+interpretation: not_assessed
+observations:
+  - "Card 3 receipt lists dirty_before and dirty_after as empty although card 2's receipt listed the two card yamls as dirty_before; the tool's dirty check is not explained here and does not affect the outputs."
+relay_note: "Per the coordinator (compile dispatch of 2026-10-19): the relay was the verbatim prompt text plus one appended dispatch note (Bash timeout 7200000, PROTOCOL.md Deviation 1). Recorded from the dispatch, not checked by tool."

@@ -1,12 +1,8 @@
 name: Native endomorphism search
 
 on:
-  pull_request:
-    paths:
-      - 'tools/endomorphism-search/**'
-      - 'research/endomorphism_search_20261005/**'
-      - 'src/hash/sha256.rs'
-      - '.github/workflows/endomorphism-search.yml'
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:

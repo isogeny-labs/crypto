@@ -1,0 +1,157 @@
+{
+    "Changes": [
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Modify",
+                "LogicalResourceId": "Project",
+                "PhysicalResourceId": "isolab-recovery-controller",
+                "ResourceType": "AWS::CodeBuild::Project",
+                "Replacement": "Conditional",
+                "Scope": [
+                    "Properties"
+                ],
+                "Details": [
+                    {
+                        "Target": {
+                            "Attribute": "Properties",
+                            "Name": "SourceVersion",
+                            "RequiresRecreation": "Conditionally",
+                            "Path": "/Properties/SourceVersion",
+                            "BeforeValue": "FhkDu4kbpsBNUbxuDW16EYHRfTX3OQZe",
+                            "AfterValue": "Fz9bO0_vOwOm_qUhALJ4zOxuCUopZwmg",
+                            "AttributeChangeType": "Modify"
+                        },
+                        "Evaluation": "Dynamic",
+                        "ChangeSource": "DirectModification"
+                    },
+                    {
+                        "Target": {
+                            "Attribute": "Properties",
+                            "Name": "SourceVersion",
+                            "RequiresRecreation": "Conditionally",
+                            "Path": "/Properties/SourceVersion",
+                            "BeforeValue": "FhkDu4kbpsBNUbxuDW16EYHRfTX3OQZe",
+                            "AfterValue": "Fz9bO0_vOwOm_qUhALJ4zOxuCUopZwmg",
+                            "AttributeChangeType": "Modify"
+                        },
+                        "Evaluation": "Static",
+                        "ChangeSource": "ParameterReference",
+                        "CausingEntity": "LauncherVersion"
+                    },
+                    {
+                        "Target": {
+                            "Attribute": "Properties",
+                            "Name": "Source",
+                            "RequiresRecreation": "Conditionally",
+                            "Path": "/Properties/Source/Location",
+                            "BeforeValue": "isolab-results-104186811093-us-east-2/inputs/recovery-controllers/8342118dc5dd243ce9a3a2057e74e092de8b6170563df9459c9afc2c9c6f1bc9.zip",
+                            "AfterValue": "isolab-results-104186811093-us-east-2/inputs/recovery-controllers/0bd84d4009064968365f03518adbca1bf6fd6c27eeed24721721e20018a9e85a.zip",
+                            "AttributeChangeType": "Modify"
+                        },
+                        "Evaluation": "Dynamic",
+                        "ChangeSource": "DirectModification"
+                    },
+                    {
+                        "Target": {
+                            "Attribute": "Properties",
+                            "Name": "Source",
+                            "RequiresRecreation": "Conditionally",
+                            "Path": "/Properties/Source/Location",
+                            "BeforeValue": "isolab-results-104186811093-us-east-2/inputs/recovery-controllers/8342118dc5dd243ce9a3a2057e74e092de8b6170563df9459c9afc2c9c6f1bc9.zip",
+                            "AfterValue": "isolab-results-104186811093-us-east-2/inputs/recovery-controllers/0bd84d4009064968365f03518adbca1bf6fd6c27eeed24721721e20018a9e85a.zip",
+                            "AttributeChangeType": "Modify"
+                        },
+                        "Evaluation": "Static",
+                        "ChangeSource": "ParameterReference",
+                        "CausingEntity": "LauncherKey"
+                    }
+                ],
+                "BeforeContext": "{\"Properties\":{\"Description\":\"Reconcile trusted resumable computation, then one fresh ordinary L2 epoch\",\"VpcConfig\":{\"Subnets\":[\"subnet-0ed67dc1e1b83132d\",\"subnet-0fef4d36a1f2a37ff\",\"subnet-023ccd74a57eb5a51\"],\"VpcId\":\"vpc-04bee1e26f609d01c\",\"SecurityGroupIds\":[\"sg-00970b3243dc64a9c\"]},\"AutoRetryLimit\":\"2\",\"SourceVersion\":\"FhkDu4kbpsBNUbxuDW16EYHRfTX3OQZe\",\"Source\":{\"Type\":\"S3\",\"BuildSpec\":\"resume/buildspec.yml\",\"Location\":\"isolab-results-104186811093-us-east-2/inputs/recovery-controllers/8342118dc5dd243ce9a3a2057e74e092de8b6170563df9459c9afc2c9c6f1bc9.zip\"},\"Name\":\"isolab-recovery-controller\",\"Artifacts\":{\"Type\":\"NO_ARTIFACTS\"},\"LogsConfig\":{\"CloudWatchLogs\":{\"Status\":\"ENABLED\",\"GroupName\":\"/aws/codebuild/isolab-recovery-controller\"}},\"ServiceRole\":\"arn:aws:iam::104186811093:role/isolab-recovery-controller-Role-L8mks6myTPFt\",\"QueuedTimeoutInMinutes\":\"10\",\"ConcurrentBuildLimit\":\"1\",\"Environment\":{\"Type\":\"LINUX_CONTAINER\",\"PrivilegedMode\":\"false\",\"EnvironmentVariables\":[{\"Value\":\"\",\"Name\":\"ISOLAB_RECOVERY_REQUEST_KEY\"}],\"Image\":\"aws/codebuild/standard:7.0\",\"ComputeType\":\"BUILD_GENERAL1_SMALL\"},\"TimeoutInMinutes\":\"1500\"}}",
+                "AfterContext": "{\"Properties\":{\"Description\":\"Reconcile trusted resumable computation, then one fresh ordinary L2 epoch\",\"VpcConfig\":{\"Subnets\":[\"subnet-0ed67dc1e1b83132d\",\"subnet-0fef4d36a1f2a37ff\",\"subnet-023ccd74a57eb5a51\"],\"VpcId\":\"vpc-04bee1e26f609d01c\",\"SecurityGroupIds\":[\"sg-00970b3243dc64a9c\"]},\"AutoRetryLimit\":\"2\",\"SourceVersion\":\"Fz9bO0_vOwOm_qUhALJ4zOxuCUopZwmg\",\"Source\":{\"Type\":\"S3\",\"BuildSpec\":\"resume/buildspec.yml\",\"Location\":\"isolab-results-104186811093-us-east-2/inputs/recovery-controllers/0bd84d4009064968365f03518adbca1bf6fd6c27eeed24721721e20018a9e85a.zip\"},\"Name\":\"isolab-recovery-controller\",\"Artifacts\":{\"Type\":\"NO_ARTIFACTS\"},\"LogsConfig\":{\"CloudWatchLogs\":{\"Status\":\"ENABLED\",\"GroupName\":\"/aws/codebuild/isolab-recovery-controller\"}},\"ServiceRole\":\"arn:aws:iam::104186811093:role/isolab-recovery-controller-Role-L8mks6myTPFt\",\"QueuedTimeoutInMinutes\":\"10\",\"ConcurrentBuildLimit\":\"1\",\"Environment\":{\"Type\":\"LINUX_CONTAINER\",\"PrivilegedMode\":\"false\",\"EnvironmentVariables\":[{\"Value\":\"\",\"Name\":\"ISOLAB_RECOVERY_REQUEST_KEY\"}],\"Image\":\"aws/codebuild/standard:7.0\",\"ComputeType\":\"BUILD_GENERAL1_SMALL\"},\"TimeoutInMinutes\":\"1500\"}}"
+            }
+        },
+        {
+            "Type": "Resource",
+            "ResourceChange": {
+                "Action": "Modify",
+                "LogicalResourceId": "TriggerPolicy",
+                "PhysicalResourceId": "isola-Trigg-eZXkKAgyTPPI",
+                "ResourceType": "AWS::IAM::Policy",
+                "Replacement": "False",
+                "Scope": [
+                    "Properties"
+                ],
+                "Details": [
+                    {
+                        "Target": {
+                            "Attribute": "Properties",
+                            "Name": "PolicyDocument",
+                            "RequiresRecreation": "Never",
+                            "Path": "/Properties/PolicyDocument/Statement/1/Resource/1",
+                            "BeforeValue": "arn:aws:codebuild:us-east-2:104186811093:project/isolab-recovery-controller",
+                            "AfterValue": "{{changeSet:KNOWN_AFTER_APPLY}}",
+                            "AttributeChangeType": "Modify"
+                        },
+                        "Evaluation": "Static",
+                        "ChangeSource": "DirectModification"
+                    }
+                ],
+                "BeforeContext": "{\"Properties\":{\"PolicyDocument\":{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":[\"codebuild:StartBuild\",\"codebuild:BatchGetBuilds\",\"codebuild:StopBuild\"],\"Resource\":[\"arn:aws:codebuild:us-east-2:104186811093:project/isolab-recovery-controller\",\"arn:aws:codebuild:us-east-2:104186811093:build/isolab-recovery-controller:*\"],\"Effect\":\"Allow\"},{\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::isolab-results-104186811093-us-east-2/inputs/recovery-requests/*\",\"Effect\":\"Allow\"},{\"Action\":[\"s3:GetObject\",\"s3:GetObjectVersion\"],\"Resource\":[\"arn:aws:s3:::isolab-results-104186811093-us-east-2/inputs/recovery-runtime/*\",\"arn:aws:s3:::isolab-results-104186811093-us-east-2/recovery/runs/*/state.json\",\"arn:aws:s3:::isolab-results-104186811093-us-east-2/recovery/runs/*/benchmark-result.json\",\"arn:aws:s3:::isolab-results-104186811093-us-east-2/recovery/runs/*/computation-result.json\"],\"Effect\":\"Allow\"}]},\"Roles\":[\"isolab-remote-launcher-GitHubRole-FaCZneVBkF6D\"],\"PolicyName\":\"isolab-recovery-trigger\"}}",
+                "AfterContext": "{\"Properties\":{\"PolicyDocument\":{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":[\"codebuild:StartBuild\",\"codebuild:BatchGetBuilds\",\"codebuild:StopBuild\"],\"Resource\":[\"{{changeSet:KNOWN_AFTER_APPLY}}\",\"arn:aws:codebuild:us-east-2:104186811093:build/isolab-recovery-controller:*\"],\"Effect\":\"Allow\"},{\"Action\":\"s3:PutObject\",\"Resource\":\"arn:aws:s3:::isolab-results-104186811093-us-east-2/inputs/recovery-requests/*\",\"Effect\":\"Allow\"},{\"Action\":[\"s3:GetObject\",\"s3:GetObjectVersion\"],\"Resource\":[\"arn:aws:s3:::isolab-results-104186811093-us-east-2/inputs/recovery-runtime/*\",\"arn:aws:s3:::isolab-results-104186811093-us-east-2/recovery/runs/*/state.json\",\"arn:aws:s3:::isolab-results-104186811093-us-east-2/recovery/runs/*/benchmark-result.json\",\"arn:aws:s3:::isolab-results-104186811093-us-east-2/recovery/runs/*/computation-result.json\"],\"Effect\":\"Allow\"}]},\"Roles\":[\"isolab-remote-launcher-GitHubRole-FaCZneVBkF6D\"],\"PolicyName\":\"isolab-recovery-trigger\"}}"
+            }
+        }
+    ],
+    "ChangeSetName": "pencil-source-20261029T2340Z",
+    "ChangeSetId": "arn:aws:cloudformation:us-east-2:104186811093:changeSet/pencil-source-20261029T2340Z/7a351943-9891-4488-b85d-3df5dc174b01",
+    "StackId": "arn:aws:cloudformation:us-east-2:104186811093:stack/isolab-recovery-controller/79087900-cd67-11f1-a438-06eb04ac751d",
+    "StackName": "isolab-recovery-controller",
+    "Description": "Approved package source key/version update only; preserve existing infrastructure and role bindings",
+    "Parameters": [
+        {
+            "ParameterKey": "ClusterSecurityGroup",
+            "ParameterValue": "sg-02a621bab6b0d9e64"
+        },
+        {
+            "ParameterKey": "PrivateSubnets",
+            "ParameterValue": "subnet-0ed67dc1e1b83132d,subnet-0fef4d36a1f2a37ff,subnet-023ccd74a57eb5a51"
+        },
+        {
+            "ParameterKey": "VpcId",
+            "ParameterValue": "vpc-04bee1e26f609d01c"
+        },
+        {
+            "ParameterKey": "LauncherVersion",
+            "ParameterValue": "Fz9bO0_vOwOm_qUhALJ4zOxuCUopZwmg"
+        },
+        {
+            "ParameterKey": "LauncherKey",
+            "ParameterValue": "inputs/recovery-controllers/0bd84d4009064968365f03518adbca1bf6fd6c27eeed24721721e20018a9e85a.zip"
+        },
+        {
+            "ParameterKey": "TriggerRoleName",
+            "ParameterValue": "isolab-remote-launcher-GitHubRole-FaCZneVBkF6D"
+        }
+    ],
+    "CreationTime": "2026-10-29T23:40:12.532000+00:00",
+    "ExecutionStatus": "AVAILABLE",
+    "Status": "CREATE_COMPLETE",
+    "StatusReason": null,
+    "NotificationARNs": [],
+    "RollbackConfiguration": {},
+    "Capabilities": [
+        "CAPABILITY_NAMED_IAM"
+    ],
+    "Tags": null,
+    "ParentChangeSetId": null,
+    "IncludeNestedStacks": false,
+    "RootChangeSetId": null,
+    "OnStackFailure": null,
+    "ImportExistingResources": null,
+    "StackDriftStatus": null,
+    "DeploymentMode": null,
+    "DeploymentConfig": {
+        "Mode": "STANDARD",
+        "DisableRollback": false
+    }
+}

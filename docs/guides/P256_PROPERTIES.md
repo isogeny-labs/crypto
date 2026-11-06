@@ -192,6 +192,18 @@ Module: `cryptanalysis::solinas_correlations`.
 Verdict: no measurable scalar-output bit correlation from the
 Solinas reduction structure at `10⁶` samples.
 
+### Correction 2026-10-22 to 5.1
+
+The z-scores behind the recorded null result used a standard error too large by
+about `sqrt(3)` (maximum |z| 2.46 at `N = 10^6`). Recalibrated on the same seed,
+the maximum is 4.26, still below the 6.11 multiple-comparison threshold, so the
+null verdict stands. The statement above that "all correlations are within the
+`3σ` envelope" cannot hold for 131,072 pairs under any null (about 350 exceed 3σ
+by chance) and is superseded by this correction; the experiment is bit pairs of
+a random 512-bit input and its Solinas reduction, not scalar versus `k·G`
+coordinates. Details: `research/solinas_correlation_recalibration_20261022/`
+and the correction in `research/notes/cm-isogeny/RESEARCH_P256.md`.
+
 ### 5.2  Embedding-degree probe
 
 ```

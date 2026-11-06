@@ -1,0 +1,820 @@
+{
+  "schema": "fall-degree-proof-map/v1",
+  "verification_date": "2026-10-29",
+  "formalization_status": "complete for the exact ordinary guarded three-abscissa prime-field pair (4,5); other presentations remain separately scoped",
+  "toolchain": "leanprover/lean4:v4.34.1",
+  "lean_commit": "5045d0056413266e57c625dcd7c365b10e377c52",
+  "mathlib_revision": "d13f23b723b8a846827a245b89c10fc7d3f11612",
+  "source": "FallDegreeIdentities.lean",
+  "verified": [
+    {
+      "declaration": "FallDegreeIdentities.quadratic_resultant_bezout",
+      "hypotheses": "R is a commutative ring; A,B,C,D,u are arbitrary elements",
+      "claim": "explicit scalar quadratic-resultant expression has the displayed Bezout identity",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FallDegreeIdentities.common_root_implies_resultant_zero",
+      "hypotheses": "R is a commutative ring; u^2+A*u+B=0 and u^2+C*u+D=0",
+      "claim": "the explicit scalar resultant expression is zero",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FallDegreeIdentities.odd_linear_remainder",
+      "hypotheses": "R is a commutative ring",
+      "claim": "the odd construction cancels u^2 and yields its displayed linear remainder",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FallDegreeIdentities.odd_resultant_cancellation",
+      "hypotheses": "R is a commutative ring",
+      "claim": "the staged scalar-cancellation expression equals minus two times the resultant expression",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FallDegreeIdentities.odd_full_construction",
+      "hypotheses": "R is a commutative ring",
+      "claim": "the unreduced full odd expression equals minus two times the resultant expression",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FallDegreeIdentities.inverse_guard_divided_difference",
+      "hypotheses": "R is a commutative ring and gx-gy=d*q",
+      "claim": "v*(gx-gy)-q*(v*d-1)=q",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FallDegreeIdentities.cubic_missing_root",
+      "hypotheses": "R is a commutative ring; cubic coefficients and x,y arbitrary",
+      "claim": "the exact missing-root cubic identity",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FallDegreeIdentities.char_two_resultant_integer_lift",
+      "hypotheses": "R is any commutative ring; no characteristic assumption",
+      "claim": "the characteristic-two construction equals its scalar expression plus the explicit integer multiple 2*(E^2*u^2+A*E^2*u+E*J*u), where E=A+C and J=B+D",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "declaration": "FallDegreeIdentities.char_two_square_sum",
+      "hypotheses": "R is a commutative ring with CharP R 2",
+      "claim": "(A+C)^2=A^2+C^2",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "declaration": "FallDegreeIdentities.binary_s3_as_quadratic",
+      "hypotheses": "R is a commutative ring with CharP R 2",
+      "claim": "the binary S3 expression collects as the specified quadratic in u",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "declaration": "FallDegreeIdentities.char_two_resultant_cancellation",
+      "hypotheses": "R is a commutative ring with CharP R 2",
+      "claim": "the displayed characteristic-two cancellation equals the scalar resultant expression",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "declaration": "FallDegreeIdentities.char_two_resultant_agrees",
+      "hypotheses": "R is a commutative ring with CharP R 2",
+      "claim": "the subtraction and addition versions of the scalar resultant expression agree",
+      "axioms": [
+        "propext"
+      ]
+    },
+    {
+      "declaration": "PrimeBitLocal.quadratic_linear_cancellation",
+      "hypotheses": "Arbitrary commutative ring",
+      "claim": "H(u)-u*(u-alpha)-(A+alpha)*(u-alpha)=alpha^2+A*alpha+B",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ],
+      "source": "PrimeBitLocal.lean"
+    },
+    {
+      "declaration": "PrimeBitLocal.odd_s3_diagonal",
+      "hypotheses": "Arbitrary commutative ring",
+      "claim": "The explicit odd S3(t,t,u) formula is linear in u with the stated cubic coefficient and constant term",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ],
+      "source": "PrimeBitLocal.lean"
+    },
+    {
+      "declaration": "PrimeBitLocal.diagonal_constant_relation",
+      "hypotheses": "Arbitrary commutative ring",
+      "claim": "The diagonal constant equals (3*t^2+a)^2-8*t*(t^3+a*t+b)",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ],
+      "source": "PrimeBitLocal.lean"
+    },
+    {
+      "declaration": "PrimeBitLocal.odd_s3_at_cubic_root",
+      "hypotheses": "Arbitrary commutative ring; t^3+a*t+b=0",
+      "claim": "S3(t,t,u)=(3*t^2+a)^2",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ],
+      "source": "PrimeBitLocal.lean"
+    },
+    {
+      "declaration": "PrimeBitLocal.derivative_ne_zero_at_cubic_root",
+      "hypotheses": "Arbitrary commutative ring; t^3+a*t+b=0 and 4*a^3+27*b^2 != 0",
+      "claim": "3*t^2+a != 0",
+      "axioms": [
+        "propext",
+        "Quot.sound"
+      ],
+      "source": "PrimeBitLocal.lean"
+    },
+    {
+      "declaration": "PrimeBitLocal.odd_s3_diagonal_ne_zero",
+      "hypotheses": "Field; cubic root with explicitly nonzero derivative",
+      "claim": "The diagonal S3 specialization is nonzero",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "source": "PrimeBitLocal.lean"
+    },
+    {
+      "declaration": "PrimeBitLocal.odd_s3_diagonal_ne_zero_of_discriminant",
+      "hypotheses": "Field; t^3+a*t+b=0 and 4*a^3+27*b^2 != 0",
+      "claim": "The diagonal S3 specialization is nonzero",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "source": "PrimeBitLocal.lean"
+    },
+    {
+      "declaration": "PrimeBitLocal.normalized_quadratic_linear_refutation",
+      "hypotheses": "Field; alpha^2+A*alpha+B != 0",
+      "claim": "Multiplying the quadratic-linear cancellation by the evaluation's inverse yields one",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "source": "PrimeBitLocal.lean"
+    },
+    {
+      "declaration": "FilteredClosure.least",
+      "source": "FilteredClosure.lean",
+      "hypotheses": "Field K; arbitrary variable type σ, input set F and degree d; V is a coefficient submodule containing eligible inputs and closed under all products of actual total degree <=d; p is Derivable F d",
+      "claim": "Every derivable p belongs to V.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FilteredClosure.lastFallBound_iff_refutation",
+      "source": "FilteredClosure.lean",
+      "hypotheses": "Field K; arbitrary F,d; 1 belongs to Ideal.span F",
+      "claim": "LastFallBound F d iff 1 is Derivable F d, with the ordinary max(d,totalDegree p) convention.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FilteredClosure.closed_at_four_of_low_part",
+      "source": "FilteredClosure.lean",
+      "hypotheses": "Field K; ideal I, coefficient submodule W; every member of W of degree <=3 lies in I; every member of I of degree <=4 lies in W; p in W and degree(q*p)<=4",
+      "claim": "q*p belongs to W, for arbitrary polynomial q, including zero and constants.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "ThreePointRigidity.quadratic_leading_zero",
+      "source": "ThreePointRigidity.lean",
+      "hypotheses": "Field K; three distinct a,b,c; A*t^2+B*t+C vanishes at each",
+      "claim": "A=0.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "ThreePointRigidity.quartic_weights_zero",
+      "source": "ThreePointRigidity.lean",
+      "hypotheses": "Field K with 6!=0; distinct a,b,c; all guarded-grid scalar equalities displayed in the source hold for arbitrary r,c1,c2,l0,lx,ly,lz,lv",
+      "claim": "Both quartic weights c1,c2 vanish.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "AffineCoefficient.affine_expansion",
+      "source": "AffineCoefficient.lean",
+      "hypotheses": "Field K; finite variable type σ; totalDegree p<=1",
+      "claim": "p equals its explicitly given constant-plus-linear coefficient expansion.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "AffineCoefficient.square_coefficient_degree",
+      "source": "AffineCoefficient.lean",
+      "hypotheses": "Field K; p in MvPolynomial (Fin 5) K with totalDegree p<=3",
+      "claim": "The coefficient of u^2 under finSuccEquiv has total degree <=1 in the remaining four variables.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GridLower.coefficient_affine",
+      "source": "GridLower.lean",
+      "hypotheses": "Field K; five-variable p with totalDegree p<=3; u left formal and x,y,z,v specialized to x,y,z,1/(x-y)",
+      "claim": "One fixed affine expression in x,y,z,1/(x-y) gives the specialized u^2 coefficient for every x,y,z.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GridLower.low_part",
+      "source": "GridLower.lean",
+      "hypotheses": "Field K with 6!=0; distinct a,b,c; i vanishes on guarded grid; p=i+c1*f1+c2*f2 with degree p<=3; f1,f2 have specialized u^2 coefficients (x-y)^2,(z-r)^2",
+      "claim": "p vanishes on the guarded grid with u left formal.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GridLower.not_refutable_four",
+      "source": "GridLower.lean",
+      "hypotheses": "Field K with 6!=0; distinct a,b,c; f1,f2 have the displayed u^2 coefficients; each input is f1, f2, or vanishes on the guarded grid",
+      "claim": "1 is not derivable at degree four.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedModel.no_degree_four_refutation",
+      "source": "GuardedModel.lean",
+      "hypotheses": "Every field K with 6!=0; pairwise distinct a,b,c; arbitrary alpha,beta,r; exactly GuardedModel.inputs (the six original polynomials), variable order u,x,y,z,v",
+      "claim": "1 is not in ordinary V(F,4); no curve or satisfiability assumption is used.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedModel.no_refutation_below_five",
+      "source": "GuardedModel.lean",
+      "hypotheses": "Same six-input field/distinctness hypotheses; natural d<5",
+      "claim": "1 is not in ordinary V(F,d).",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedModel.lastFall_lower",
+      "source": "GuardedModel.lean",
+      "hypotheses": "Same six-input field/distinctness hypotheses; additionally 1 in Ideal.span F; natural d<5",
+      "claim": "LastFallBound F d is false. The rational-unsatisfiability-to-unit-ideal bridge is not assumed proved.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedModel.pairDifference_derivable",
+      "source": "GuardedModel.lean",
+      "hypotheses": "Arbitrary field K and alpha,beta,a,b,c,r; exactly the six original inputs",
+      "claim": "The explicit quadratic divided difference belongs to V(F,4), by degree-checked derivation rules.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FirstFallCore.guardTop_ne_zero",
+      "source": "FirstFallCore.lean",
+      "hypotheses": "Arbitrary field K; five-variable polynomial ring",
+      "claim": "v*(x-y) is a nonzero polynomial.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FirstFallCore.cubic_guard_top_injective",
+      "source": "FirstFallCore.lean",
+      "hypotheses": "Arbitrary field K; scalar a,b,c, polynomial L; a*x^3+b*y^3+c*z^3+L*v*(x-y)=0",
+      "claim": "a=b=c=0 and L=0; no weighted syzygy/Koszul definition is claimed.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FirstFallCore.degree_four_top_relation",
+      "source": "FirstFallCore.lean",
+      "hypotheses": "Arbitrary field K; the explicit x,y,v top forms",
+      "claim": "v*x^3-v*y^3-(x^2+x*y+y^2)*v*(x-y)=0.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "FirstFallCore.lifted_guard_relation",
+      "source": "FirstFallCore.lean",
+      "hypotheses": "Arbitrary field K; any monic cubic coefficients; g and Q exactly as defined in the statement",
+      "claim": "v*(g(x)-g(y))-Q*(v*(x-y)-1)=Q.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "CubicArithmetic.inverseCoeff_normalizes",
+      "source": "CubicArithmetic.lean",
+      "hypotheses": "Field K; three distinct a,b,c; coefficient triple A has nonzero values at a,b,c",
+      "claim": "The explicitly constructed interpolation inverse normalizes A modulo the split monic cubic.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "CubicNormalization.monic_normalization",
+      "source": "CubicNormalization.lean",
+      "hypotheses": "Field K; distinct a,b,c; the leading coefficient is nonzero at all three; t,u have total degree <=1; the split cubic is derivable at degree5 and the quadratic family at degree4",
+      "claim": "The explicitly normalized monic family is derivable at degree5 by staged multiplication/reduction.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GridClosure.grid_refutation",
+      "source": "GridClosure.lean",
+      "hypotheses": "Field K; distinct a,b,c; degree<=1 states w,z; both split cubics and scalar reduced grid polynomial are derivable at degree5; its values on the nine-point grid are all nonzero",
+      "claim": "An explicit degree-five derivation of one follows from constructed interpolation and legal scalar-grid shifts.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "AffineGrid.affine_shiftW_derivable",
+      "source": "AffineGrid.lean",
+      "hypotheses": "Field K; degree<=1 states w,z,u; affine coefficient grid F has F(2,2)=0; the affine grid and w cubic are derivable at degree5",
+      "claim": "The reduced w-shift is derivable at degree5, with actual intermediate total-degree bounds.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "AffineGrid.affine_shiftZ_derivable",
+      "source": "AffineGrid.lean",
+      "hypotheses": "Field K; degree<=1 states w,z,u; affine coefficient grid F has F(2,2)=0; the affine grid and z cubic are derivable at degree5",
+      "claim": "The reduced z-shift is derivable at degree5, with actual intermediate total-degree bounds.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "StagedResultant.resultGrid_derivable",
+      "source": "StagedResultant.lean",
+      "hypotheses": "Field K; distinct a,b,c; degree<=1 states w,z,u; both split cubics and the two displayed monic quadratic families are derivable at degree5",
+      "claim": "The scalar result grid, with values -2*quadRes, is derivable at degree5 without a nonvanishing premise.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "StagedResultant.monic_refutation",
+      "source": "StagedResultant.lean",
+      "hypotheses": "The resultGrid_derivable hypotheses; 2!=0; quadRes is nonzero at every pair of base roots",
+      "claim": "The complete algebraic degree-five construction derives one.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedReduction.q1_derivable",
+      "source": "GuardedReduction.lean",
+      "hypotheses": "Arbitrary field K and alpha,beta,a,b,c,r; exactly the original six generators",
+      "claim": "The explicitly reduced first quadratic family is derived at degree4.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedReduction.q2_derivable",
+      "source": "GuardedReduction.lean",
+      "hypotheses": "Arbitrary field K and alpha,beta,a,b,c,r; exactly the original six generators",
+      "claim": "The second quadratic family is derived at degree4.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "RationalFibers.split_monic",
+      "source": "RationalFibers.lean",
+      "hypotheses": "Field K; x!=y; Y^2=x^3+alpha*x+beta and Z^2=y^3+alpha*y+beta",
+      "claim": "Explicit rational roots split the specialized monic quadratic, including repeated roots and two-torsion.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "RationalFibers.target_outside_base",
+      "source": "RationalFibers.lean",
+      "hypotheses": "Field K; a!=b; rational ordinate lifts for each member of {a,b,c}; NoSolution for the six original generators",
+      "claim": "The target abscissa r is outside the base.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedFibers.scalar_resultant_nonzero",
+      "source": "GuardedFibers.lean",
+      "hypotheses": "Field K; distinct a,b,c; w,z in the base; rational ordinate lifts for each base element; NoSolution for the six original generators",
+      "claim": "The explicit scalar resultant of the normalized families is nonzero at (w,z).",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedLastFall.upper_five",
+      "source": "GuardedLastFall.lean",
+      "hypotheses": "Field K with 2!=0; distinct a,b,c; rational base lifts; NoSolution for the original six generators",
+      "claim": "One is derived at degree5; no unit-ideal or resultant-nonzero premise is supplied.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedLastFall.exact_last_five",
+      "source": "GuardedLastFall.lean",
+      "hypotheses": "Field K with 6!=0; distinct a,b,c; rational base lifts; NoSolution for the original six generators",
+      "claim": "The ordinary last-fall bound is attained minimally at5; the unit ideal follows from the constructed refutation.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedTops.generator_degrees",
+      "source": "GuardedTops.lean",
+      "hypotheses": "Arbitrary field K and scalar parameters; the actual indexed original six generators",
+      "claim": "Their actual total degrees are (3,3,3,4,4,2).",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedTops.generator_tops",
+      "source": "GuardedTops.lean",
+      "hypotheses": "Arbitrary field K and scalar parameters; the actual indexed original six generators",
+      "claim": "The actual leading homogeneous components are the displayed cubic, quartic and guard top forms.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "WeightedFirstFall.exact_first_four",
+      "source": "WeightedFirstFall.lean",
+      "hypotheses": "Arbitrary field K and scalar parameters; the original indexed odd-S3 presentation and explicit graded top-syzygy/Koszul convention",
+      "claim": "The first non-Koszul homogeneous top relation is attained minimally at degree4.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "WeightedFirstFall.witness_lift_ne_zero",
+      "source": "WeightedFirstFall.lean",
+      "hypotheses": "Arbitrary field K and scalar parameters; the displayed homogeneous witness for the actual generators",
+      "claim": "Its lift to the inhomogeneous inputs is nonzero.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "WeightedFirstFall.witness_lift_degree",
+      "source": "WeightedFirstFall.lean",
+      "hypotheses": "Arbitrary field K and scalar parameters; the displayed homogeneous witness for the actual generators",
+      "claim": "Its lift has ordinary total degree <=3, a genuine degree fall from4.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedExactPair.generator_range",
+      "source": "GuardedExactPair.lean",
+      "hypotheses": "Arbitrary field K and scalar parameters",
+      "claim": "The indexed family for first fall has exactly the input set used for last fall.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedExactPair.exact_pair",
+      "source": "GuardedExactPair.lean",
+      "hypotheses": "Field K with 6!=0; distinct a,b,c; rational base lifts; NoSolution for the original six generators",
+      "claim": "The exact ordinary homogeneous-top/Koszul first-fall and ordinary last-fall pair is (4,5).",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedExactPair.exact_pair_rational_curve",
+      "source": "GuardedExactPair.lean",
+      "hypotheses": "Field K with 6!=0; distinct a,b,c; 4*alpha^3+27*beta^2!=0; Y^2=r^3+alpha*r+beta; rational base lifts; NoSolution for the original six generators",
+      "claim": "The exact ordinary pair (4,5) holds under the original nonsingular short-Weierstrass and rational-target hypotheses.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedExactPair.prime_six_ne_zero",
+      "source": "GuardedExactPair.lean",
+      "hypotheses": "Natural prime p with p>3",
+      "claim": "6 is nonzero in ZMod p.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    },
+    {
+      "declaration": "GuardedExactPair.exact_pair_prime",
+      "source": "GuardedExactPair.lean",
+      "hypotheses": "Every natural prime p>3; alpha,beta,a,b,c,r,Y in ZMod p; distinct a,b,c; nonzero discriminant expression; affine rational target; rational base lifts; NoSolution for the original six generators",
+      "claim": "The complete original prime-field exact-pair theorem: first fall4 and last fall5, both with attainment and minimality.",
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ]
+    }
+  ],
+  "not_formalized": [
+    "The group-law/signed-point interpretation of polynomial solutions; not needed by the exact-pair theorem whose UNSAT premise is explicitly polynomial NoSolution.",
+    "Growing-factor-base and characteristic-two last-fall upper bounds.",
+    "The fully Boolean one-auxiliary upper bound: assignment localization, affine-system certificates, and 3*ell+1 cap.",
+    "Standard large-curve parameter provenance, affine group arithmetic, primality instantiations, and public small-multiple UNSAT witnesses for the numerical fixtures.",
+    "The complete prime-field bit-restricted upper theorem with 3*ell+2 cap."
+  ],
+  "forbidden_proof_shortcuts": "No sorry, admit, custom axiom, native_decide, or kernel bypass is used.",
+  "logs": {
+    "direct_compile": "compile.log",
+    "lake_build": "build.log",
+    "fresh_recheck": "fresh-check.log",
+    "additional_local_module": {
+      "lake_build": "prime-bit-build.log",
+      "fresh_recheck": "prime-bit-fresh-check.log"
+    }
+  },
+  "additional_sources": [
+    {
+      "source": "PrimeBitLocal.lean",
+      "sha256": "d93729a96a0e92c5ad381980ff6ed0d0ba1219f14e13beb24e9addb61a7bfb01",
+      "receipt": "prime-bit-verification.json",
+      "checked_theorems": 8
+    },
+    {
+      "source": "FilteredClosure.lean",
+      "sha256": "f77b185b4115b1ba46d6edd17dbfe39bc4e8330fa9617a2c8e20024c70ff607e",
+      "receipt": "exact-pair-validation/verification.json"
+    },
+    {
+      "source": "ThreePointRigidity.lean",
+      "sha256": "2a06366b68ba946d024b32ead944cafc0e85b176caff0ac19ad05811fae6a04b",
+      "receipt": "exact-pair-validation/verification.json"
+    },
+    {
+      "source": "AffineCoefficient.lean",
+      "sha256": "cb9b113d9b49c53121c62f1d157aebf765051c42d5b9e435159a75e57c322747",
+      "receipt": "exact-pair-validation/verification.json"
+    },
+    {
+      "source": "GridLower.lean",
+      "sha256": "017c24637ea02a3b2910c9f704d51a9abc06bbf68904f31d2b162b23203bd72c",
+      "receipt": "exact-pair-validation/verification.json"
+    },
+    {
+      "source": "GuardedModel.lean",
+      "sha256": "ebf8b4982c5d14aa117c9eb641ad36b04449e4cbd653741797f3b4807780f73d",
+      "receipt": "exact-pair-validation/verification.json"
+    },
+    {
+      "source": "FirstFallCore.lean",
+      "sha256": "286a398fc8dacb1079e62d978b11fca7b67440cac2b90d7ee8b4f77ba9dfc191",
+      "receipt": "exact-pair-validation/verification.json"
+    },
+    {
+      "source": "CubicArithmetic.lean",
+      "sha256": "557c484439052d72ace49509302796a86b2a67bb3bf64044a877a2b7e5c77368",
+      "receipt": "complete-exact-pair-validation/verification.json"
+    },
+    {
+      "source": "CubicNormalization.lean",
+      "sha256": "00cc2e41b873d6616d4980f30461f70245c37cff0bcc3ed8474ccd4f5f40216b",
+      "receipt": "complete-exact-pair-validation/verification.json"
+    },
+    {
+      "source": "GridArithmetic.lean",
+      "sha256": "ff1c5bef89610871da4ede6ba1057d012f258f68c75c19150bc0598d940b8108",
+      "receipt": "complete-exact-pair-validation/verification.json"
+    },
+    {
+      "source": "GridClosure.lean",
+      "sha256": "abdc7140763c9273ff7acc39d0baab46b21fb8d56287cf138ad7c61b48e030d1",
+      "receipt": "complete-exact-pair-validation/verification.json"
+    },
+    {
+      "source": "AffineGrid.lean",
+      "sha256": "3f565debb15625fe34e4909b5b5a78a8f358bf24d930b0e44777bcafd6e9d080",
+      "receipt": "complete-exact-pair-validation/verification.json"
+    },
+    {
+      "source": "StagedResultant.lean",
+      "sha256": "3ea8b098a852b5c1108aa2c568cb15d17f790447220d92bf60919fe5823cc65b",
+      "receipt": "complete-exact-pair-validation/verification.json"
+    },
+    {
+      "source": "GuardedReduction.lean",
+      "sha256": "41e5f2a342496b355ea6e3b3b2dc0eb08a49cae2e154434c56ab0e66716ccd50",
+      "receipt": "complete-exact-pair-validation/verification.json"
+    },
+    {
+      "source": "RationalFibers.lean",
+      "sha256": "67bf77528301153a9aa2e36404620dd347592871be7f80e41cabf5f4354f73d1",
+      "receipt": "complete-exact-pair-validation/verification.json"
+    },
+    {
+      "source": "GuardedFibers.lean",
+      "sha256": "f64c4984a0070734acdc3925fc2d0eba8638574a4d622b1adfdddb43bae3603c",
+      "receipt": "complete-exact-pair-validation/verification.json"
+    },
+    {
+      "source": "GuardedLastFall.lean",
+      "sha256": "d71b9273b69f0825505d7c7b18073bc963b15defc33bf210c4d4db6d9cbc5002",
+      "receipt": "complete-exact-pair-validation/verification.json"
+    },
+    {
+      "source": "GuardedTops.lean",
+      "sha256": "6d42cba39ad9b7f45e3b63c35f3a24a2b56e779e217b4496a573e93272f4d5bf",
+      "receipt": "complete-exact-pair-validation/verification.json"
+    },
+    {
+      "source": "WeightedFirstFall.lean",
+      "sha256": "5aaad7a33770a77deddf436fc3bfe25b5ca42b1d766ad7df4fc1192d84a773ae",
+      "receipt": "complete-exact-pair-validation/verification.json"
+    },
+    {
+      "source": "GuardedExactPair.lean",
+      "sha256": "abca11df178a17ad52c35c15d6ca59ef4f92c3a5689aca61107f2b4ca81a631a",
+      "receipt": "complete-exact-pair-validation/verification.json"
+    }
+  ],
+  "current_progress": {
+    "report": "complete-exact-pair.md",
+    "claims": "complete-exact-pair-claims.json",
+    "receipt": "complete-exact-pair-validation/verification.json"
+  },
+  "historical_progress": [
+    {
+      "report": "exact-pair-progress.md",
+      "claims": "exact-pair-claims.json",
+      "receipt": "exact-pair-validation/verification.json"
+    }
+  ],
+  "central_theorem": {
+    "declaration": "GuardedExactPair.exact_pair_prime",
+    "source": "GuardedExactPair.lean",
+    "request_complete": true,
+    "scope": "Original six-input inverse-guarded ordinary-ring prime-field model; p prime >3; distinct base; nonsingular short-Weierstrass and rational target/base lifts; polynomial NoSolution"
+  },
+  "remaining_obligations_for_requested_exact_pair": [],
+  "discharged_prior_obligations": [
+    {
+      "obligation": "Degree-five monic reduction, normalization and intermediate total-degree bounds",
+      "proof": "CubicNormalization.monic_normalization and GuardedReduction.q1_derivable; explicit cubic identities replace general division infrastructure"
+    },
+    {
+      "obligation": "Scalar resultant extraction, interpolation and grid invertibility",
+      "proof": "StagedResultant.resultGrid_derivable and GridClosure.grid_refutation; finite coefficient arrays and exact identities replace an assumed quotient isomorphism"
+    },
+    {
+      "obligation": "Rational roots and unit-ideal bridge",
+      "proof": "RationalFibers.split_monic, GuardedFibers.scalar_resultant_nonzero and GuardedLastFall.upper_five; the derived one implies Ideal.span F contains one"
+    },
+    {
+      "obligation": "Mathlib resultant API identification and algebraic-closure converse",
+      "proof": "Unnecessary for the direct proof: quadRes_split proves the scalar product identity at explicit rational roots"
+    },
+    {
+      "obligation": "Weighted top-syzygy/Koszul definition and exact first fall",
+      "proof": "WeightedFirstFall defines the actual graded top map and classical Koszul combinations; exact_first_four proves minimality and witness_lift_ne_zero/degree prove a genuine fall"
+    }
+  ]
+}

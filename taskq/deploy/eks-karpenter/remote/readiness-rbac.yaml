@@ -5,11 +5,11 @@ metadata:
 rules:
   - apiGroups: [karpenter.sh]
     resources: [nodepools]
-    resourceNames: [cpu-spot]
+    resourceNames: [cpu-spot, cpu-l2-spot]
     verbs: [get]
   - apiGroups: [karpenter.k8s.aws]
     resources: [ec2nodeclasses]
-    resourceNames: [cpu]
+    resourceNames: [cpu, cpu-l2]
     verbs: [get]
 ---
 apiVersion: rbac.authorization.k8s.io/v1

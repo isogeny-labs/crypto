@@ -1,0 +1,81 @@
+{
+ "schema": "replay-certificate/v1",
+ "status": "verified",
+ "independent": true,
+ "scalars_verified": false,
+ "scalars_note": "replayed natively; all_verified true and the 32 recovered scalars equal the archive; NOT independently checked as [d]G = Q because the archive holds no target points. `scalars_verified` is therefore false.",
+ "what": "Seeded sample (3 per curve, 27 runs, seed ic_validation_gate_20261024 frozen in PROTOCOL.md before the draw) of the archived isolated main-comparison price runs, re-executed with `ic price --params` on the current binary, compared on counts, recovered scalars and all_verified.",
+ "runs_replayed": 27,
+ "runs_identical": 27,
+ "extra_counters_in_new_binary": [
+  "logs.linear_algebra.filter.row_ops",
+  "logs.linear_algebra.row_ops",
+  "logs.linear_algebra.wiedemann"
+ ],
+ "runs": [
+  {
+   "slug": "icv1-f2m19-tm797-9c54981b",
+   "dir": "k1n19",
+   "sampled_runs": 3,
+   "identical": 3,
+   "recovered_scalars_per_run": 32
+  },
+  {
+   "slug": "icv1-f2m23-tm5197-1f85e9e1",
+   "dir": "k1n23",
+   "sampled_runs": 3,
+   "identical": 3,
+   "recovered_scalars_per_run": 32
+  },
+  {
+   "slug": "icv1-f2m45-tm6236725-40939294",
+   "dir": "k1n45",
+   "sampled_runs": 3,
+   "identical": 3,
+   "recovered_scalars_per_run": 32
+  },
+  {
+   "slug": "icv1-f2m37-tm534059-32aad96b",
+   "dir": "k0n37",
+   "sampled_runs": 3,
+   "identical": 3,
+   "recovered_scalars_per_run": 32
+  },
+  {
+   "slug": "icv1-f2m43-tm998717-e2e742b0",
+   "dir": "k1n43",
+   "sampled_runs": 3,
+   "identical": 3,
+   "recovered_scalars_per_run": 32
+  },
+  {
+   "slug": "icv1-f2m47-t22705043-f4e44623",
+   "dir": "k1n47",
+   "sampled_runs": 3,
+   "identical": 3,
+   "recovered_scalars_per_run": 32
+  },
+  {
+   "slug": "icv1-f2m41-tm2308219-7f48b14a",
+   "dir": "k0n41",
+   "sampled_runs": 3,
+   "identical": 3,
+   "recovered_scalars_per_run": 32
+  },
+  {
+   "slug": "icv1-f2m53-tm56619371-dac20a85",
+   "dir": "k0n53",
+   "sampled_runs": 3,
+   "identical": 3,
+   "recovered_scalars_per_run": 32
+  },
+  {
+   "slug": "icv1-f2m61-t158598901-ab42b6c5",
+   "dir": "k0n61",
+   "sampled_runs": 3,
+   "identical": 3,
+   "recovered_scalars_per_run": 32
+  }
+ ],
+ "detail": "../raw/replay_C_summary.json"
+}

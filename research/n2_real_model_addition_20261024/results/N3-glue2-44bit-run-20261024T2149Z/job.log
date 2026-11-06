@@ -1,0 +1,31 @@
+glue2 bits 44 h 4 inst 3 done
+glue2 bits 44 h 4 inst 2 done
+glue2 bits 44 h 4 inst 1 done
+glue2 bits 44 h 4 inst 0 done
+glue2 bits 44 h 1 inst 3 done
+glue2 bits 44 h 1 inst 2 done
+glue2 bits 44 h 1 inst 1 done
+glue2 bits 44 h 1 inst 0 done
+== Jglue (original formulas, replay of H2) ==
+H2 bits 44 h 1 Jglue: steps/p 0.4583 (s.e. 0.0135, 40 runs) | mean cost (I=3M, w=0) 1.0273e8 | rho theory 0.8860
+H2 bits 44 h 1 R: steps/p 0.9271 (s.e. 0.0759, 40 runs) | mean cost (I=3M, w=0) 6.3362e7 | rho theory 0.8860
+H2 bits 44 h 4 Jglue: steps/p 0.3452 (s.e. 0.0169, 40 runs) | mean cost (I=3M, w=0) 7.6547e7 | rho theory 0.4430
+H2 bits 44 h 4 R: steps/p 0.4409 (s.e. 0.0394, 40 runs) | mean cost (I=3M, w=0) 2.9939e7 | rho theory 0.4430
+H2 bits 44 h 1: Jglue/rho cost ratio (measured, I=3M, w=0) 1.621
+H2 bits 44 h 4: Jglue/rho cost ratio (measured, I=3M, w=0) 2.557
+H2 Jglue: measured per Jacobian op 41.2M + 1.00I
+H2 band bits 44 h 1: Jglue/rho in [0.735, 1.735] over 12 cells (IC cheaper in 6) -> unresolved
+H2 band bits 44 h 4: Jglue/rho in [1.159, 2.715] over 12 cells (IC cheaper in 0) -> rho cheaper in every cell
+H2 all answers verified: true
+== Jglue2 (second-generation formulas) ==
+H2 bits 44 h 1 Jglue: steps/p 0.4583 (s.e. 0.0135, 40 runs) | mean cost (I=3M, w=0) 7.9187e7 | rho theory 0.8860
+H2 bits 44 h 1 R: steps/p 0.9271 (s.e. 0.0759, 40 runs) | mean cost (I=3M, w=0) 6.3362e7 | rho theory 0.8860
+H2 bits 44 h 4 Jglue: steps/p 0.3452 (s.e. 0.0169, 40 runs) | mean cost (I=3M, w=0) 5.9003e7 | rho theory 0.4430
+H2 bits 44 h 4 R: steps/p 0.4409 (s.e. 0.0394, 40 runs) | mean cost (I=3M, w=0) 2.9939e7 | rho theory 0.4430
+H2 bits 44 h 1: Jglue/rho cost ratio (measured, I=3M, w=0) 1.250
+H2 bits 44 h 4: Jglue/rho cost ratio (measured, I=3M, w=0) 1.971
+H2 Jglue: measured per Jacobian op 30.2M + 1.00I
+H2 band bits 44 h 1: Jglue/rho in [0.735, 1.407] over 12 cells (IC cheaper in 6) -> unresolved
+H2 band bits 44 h 4: Jglue/rho in [1.159, 2.197] over 12 cells (IC cheaper in 0) -> rho cheaper in every cell
+H2 all answers verified: true
+done in 547.4s

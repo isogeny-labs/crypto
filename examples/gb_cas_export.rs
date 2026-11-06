@@ -34,6 +34,7 @@
 //! external tools are run by `research/gb_cas_comparison_20261011/run.sh`.
 
 use crypto_lib::cryptanalysis::f4_fp::{f4, F4Options, Ordering, Poly};
+use crypto_lib::cryptanalysis::pq_groebner_f2::mask_low64;
 use crypto_lib::cryptanalysis::pq_groebner_f2::F2BoolPoly;
 use serde_json::json;
 use std::collections::hash_map::DefaultHasher;
@@ -288,7 +289,7 @@ fn run_bool(dump: &Path, outdir: &Path) {
         let occurring = system
             .iter()
             .flat_map(|p| p.terms.iter())
-            .fold(0u64, |a, t| a | t.mask);
+            .fold(0u64, |a, t| a | mask_low64(t.mask));
         if occurring.count_ones() as usize != n {
             continue; // not a root: some variable already assigned
         }

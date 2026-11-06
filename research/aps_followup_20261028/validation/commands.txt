@@ -1,0 +1,13 @@
+Source: REPO, baseline 6187036c049b6de2b1521b014f575952e4f1705c.
+Branch: codex/aps-leads-1-4-20261028.
+Final development checks use CARGO_BUILD_JOBS=2 and release opt-level 3;
+CARGO_PROFILE_RELEASE_CODEGEN_UNITS=256 changes build partitioning only.
+The focused correctness CI has the same codegen setting. No timing comparison.
+Full suite: cargo test --release --locked --lib -- --test-threads=2.
+Example: cargo test --release --locked --example aps_single_relation_check.
+CI-version lint: cargo +1.98.0 clippy --release --locked --lib --tests --example aps_single_relation_check -- -D warnings.
+Other lint: cargo clippy --release --locked --lib --tests --example aps_single_relation_check -- -D warnings (Rust 1.99.1), passed.
+Both pinned Lean gates audited Line.lean: seven standard-foundation theorems.
+CHECKPOINT UPLOAD REJECTED by automatic approval review. Do not retry/bypass;
+no performance experiment launched. Complete-cost accounting/replay/protocol
+work also remains open in the earlier blocked panel card.

@@ -12,6 +12,7 @@
 
 use num_bigint::BigUint;
 
+use super::checkpoint;
 use super::curve::{self, Model, OrderAudit};
 use super::field::Field;
 use super::kernel::{self, EdgeError};
@@ -303,6 +304,70 @@ fn a_short_p224_walk_reverifies_from_its_records() {
 }
 
 #[test]
+fn walk_checkpoint_resumes_completed_expansion_batches() {
+    let config = WalkConfig {
+        primes: vec![3, 5],
+        max_curves: 12,
+        ..WalkConfig::default()
+    };
+    let pool = rayon::ThreadPoolBuilder::new()
+        .num_threads(1)
+        .build()
+        .unwrap();
+    let mut uninterrupted = Walk::new(StartCurve::p224(), config.clone()).unwrap();
+    pool.install(|| uninterrupted.run());
+
+    let path = std::env::temp_dir().join(format!(
+        "walk-ckpt-{}-{}.ckpt",
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+    ));
+    let mut interrupted = Walk::new(StartCurve::p224(), config.clone()).unwrap();
+    let mut batches = 0usize;
+    let first = pool.install(|| {
+        interrupted.run_with_progress(Some(&mut |walk, final_batch| {
+            if !final_batch {
+                checkpoint::save(&path, "p224-3-5", walk)?;
+                batches += 1;
+                return Err("interrupted after a completed batch".into());
+            }
+            Ok(())
+        }))
+    });
+    assert!(first.is_err());
+    assert_eq!(batches, 1);
+    let mut resumed = Walk::new(StartCurve::p224(), config).unwrap();
+    checkpoint::load(&path, "p224-3-5", &mut resumed).unwrap();
+    pool.install(|| resumed.run());
+    let ids: Vec<_> = (0..resumed.nodes.len())
+        .map(|i| resumed.node_ids(i))
+        .collect();
+    let routes = RouteIndex::build(&resumed, &ids);
+    let replay = resumed.routes_json(&ids, &routes).json();
+    let original_ids: Vec<_> = (0..uninterrupted.nodes.len())
+        .map(|i| uninterrupted.node_ids(i))
+        .collect();
+    let original_routes = RouteIndex::build(&uninterrupted, &original_ids);
+    assert_eq!(
+        replay,
+        uninterrupted
+            .routes_json(&original_ids, &original_routes)
+            .json()
+    );
+
+    let mut bytes = std::fs::read(&path).unwrap();
+    *bytes.last_mut().unwrap() ^= 1;
+    std::fs::write(&path, bytes).unwrap();
+    assert!(checkpoint::load(&path, "p224-3-5", &mut resumed)
+        .unwrap_err()
+        .contains("checksum mismatch"));
+    std::fs::remove_file(path).unwrap();
+}
+
+#[test]
 fn detectors_class_audits_and_queued_shards_agree() {
     use super::queue;
     let config = WalkConfig {
@@ -325,6 +390,21 @@ fn detectors_class_audits_and_queued_shards_agree() {
     let text = w.routes_json(&ids, &routes).json();
     // The root's detectors: P-224 is an a = -3 model with a valid generator.
     let one = queue::run_shard(&text, &w.start, 0, 1, 0).unwrap();
+    let mut saved = Vec::new();
+    let interrupted =
+        queue::run_shard_resume(&text, &w.start, 0, 1, 0, &[], &mut |done, _, line| {
+            if done == 2 {
+                return Err("interrupted after one committed curve".into());
+            }
+            saved.push(line.to_string());
+            Ok(())
+        });
+    assert!(interrupted.err().unwrap().contains("interrupted"));
+    assert_eq!(saved.len(), 1);
+    let resumed =
+        queue::run_shard_resume(&text, &w.start, 0, 1, 0, &saved, &mut |_, _, _| Ok(())).unwrap();
+    assert_eq!(resumed.jsonl, one.jsonl);
+    assert_eq!(resumed.metrics.json(), one.metrics.json());
     let root: serde_json::Value = serde_json::from_str(one.jsonl.lines().next().unwrap()).unwrap();
     assert_eq!(root["traits"]["a_minus_3_model"]["value"], true);
     assert_eq!(root["traits"]["generator_valid"]["value"], true);

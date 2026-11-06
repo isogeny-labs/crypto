@@ -1,0 +1,58 @@
+{
+ "session": "ECBS1hfd5bf1885227",
+ "receipt_ok": false,
+ "replayed": 168,
+ "identical": 72,
+ "differs": 96,
+ "auditor_binary_sha256": "3d1c375efb1afe18aeaff69fcffe2c9144a82045d506acc90c2dcdead55c35c7",
+ "by_arm": {
+  "ic-f4-m2": {
+   "differs": 24
+  },
+  "ic-f4-m3": {
+   "differs": 24
+  },
+  "ic-rootfind-m2": {
+   "differs": 24
+  },
+  "ic-rootfind-m3": {
+   "differs": 24
+  },
+  "rho-frob": {
+   "identical": 24
+  },
+  "rho-strong": {
+   "identical": 24
+  },
+  "rho-strong-aa": {
+   "identical": 24
+  }
+ },
+ "detail_by_arm": {
+  "ic-f4-m2": {
+   "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms": 24
+  },
+  "ic-f4-m3": {
+   "differs in total_gae, phase counts, phase gae, unpriced, determinism or automorphisms": 24
+  },
+  "ic-rootfind-m2": {
+   "differs in phase counts": 24
+  },
+  "ic-rootfind-m3": {
+   "differs in phase counts": 24
+  }
+ },
+ "records_with_solver_block_by_arm": {
+  "ic-f4-m2": 24,
+  "ic-f4-m3": 24
+ },
+ "arm_methods": {
+  "rho-strong": "rho.signed_frobenius_strong",
+  "rho-frob": "rho.signed_frobenius",
+  "ic-f4-m3": "ic.pipeline",
+  "ic-rootfind-m3": "ic.pipeline",
+  "ic-f4-m2": "ic.pipeline",
+  "ic-rootfind-m2": "ic.pipeline",
+  "rho-strong-aa": "rho.signed_frobenius_strong"
+ }
+}

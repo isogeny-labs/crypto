@@ -1,0 +1,78 @@
+Factor-base designs, Amendment 7 (X1, X2 on a 64 GiB host): rows from research/factor_base_designs_20261015/runs
+(V = min(cgroup_kB − 524288, MemTotal_kB − 524288). A system's limit is attributable only if its
+ row is a ulimit -v malloc failure or timeout, kernel capture succeeded, and no OOM event was recorded.
+ Operation counts are host-independent; wall times and peak_rss_kb are descriptive only.)
+
+════ X1: A0 m = 4, t = 4, p1, budget 14400 s + grace 600 s
+  pre-flight: cell X1-A0-m4-t4
+  pre-flight: date 2026-10-21T00:56:04Z
+  pre-flight: commit fab81e175f405c502e4c38b85100be1ac39aa767
+  pre-flight: binary_sha256 19a5d11bb8db6d06afd4f358a3205a28358d80dd629aa314fabdd2755a9bd72c
+  pre-flight: MemTotal_kB 64774300
+  pre-flight: cgroup_path /system.slice/cloud-final.service
+  pre-flight: cgroup_file /sys/fs/cgroup/system.slice/cloud-final.service/memory.max
+  pre-flight: cgroup_limit_kB unlimited
+  pre-flight: nproc 8
+  pre-flight: V_kB 64250012
+  pre-flight: kernel 7.0.0-1014-aws
+  pre-flight: product r7i.2xlarge
+  pre-flight: model name	: Intel(R) Xeon(R) Platinum 8488C
+  kernel log (runs/X1-A0-m4-t4.dmesg.txt): 0 OOM event lines; capture UNVERIFIED
+  A0 t=4 target 0: status aborted, D null, max_cols null, field_ops null, time 1915.9 s, peak_rss_kb 60667848, ulimit_v_kb 64250012, budget 14400 s (memory allocation failed under ulimit -v 64250012 (signal: 6 (SIGABRT) (core dumped)))  →  limit memory, NOT ATTRIBUTABLE
+  A0 t=4 target 1: status aborted, D null, max_cols null, field_ops null, time 1873.7 s, peak_rss_kb 60713840, ulimit_v_kb 64250012, budget 14400 s (memory allocation failed under ulimit -v 64250012 (signal: 6 (SIGABRT) (core dumped)))  →  limit memory, NOT ATTRIBUTABLE
+  identity: 2 of 2 X1 systems match C2's A0 systems, 2 match L1's (cell_seed, target_seed, n_vars, n_eqs, planted_x, x_r, curve, set)
+  prior attempt A0 t=4 target 0: aborted at 536.9 s under ulimit -v 13000000, peak_rss_kb null
+  prior attempt A0 t=4 target 1: aborted at 512.8 s under ulimit -v 13000000, peak_rss_kb null
+  prior attempt A0 t=4 target 0: aborted at 516.7 s under ulimit -v 14500000, peak_rss_kb 12835532
+  prior attempt A0 t=4 target 1: aborted at 539.7 s under ulimit -v 14500000, peak_rss_kb 12891360
+
+════ X2: A11 m = 4, t = 5, p1, budget 14400 s + grace 600 s
+  pre-flight: cell X2-A11-m4-t5
+  pre-flight: date 2026-10-21T00:56:08Z
+  pre-flight: commit fab81e175f405c502e4c38b85100be1ac39aa767
+  pre-flight: binary_sha256 19a5d11bb8db6d06afd4f358a3205a28358d80dd629aa314fabdd2755a9bd72c
+  pre-flight: MemTotal_kB 64774296
+  pre-flight: cgroup_path /system.slice/cloud-final.service
+  pre-flight: cgroup_file /sys/fs/cgroup/system.slice/cloud-final.service/memory.max
+  pre-flight: cgroup_limit_kB unlimited
+  pre-flight: nproc 8
+  pre-flight: V_kB 64250008
+  pre-flight: kernel 7.0.0-1014-aws
+  pre-flight: product r7i.2xlarge
+  pre-flight: model name	: Intel(R) Xeon(R) Platinum 8488C
+  kernel log (runs/X2-A11-m4-t5.dmesg.txt): 0 OOM event lines; capture UNVERIFIED
+  A11 t=5 target 0: status aborted, D null, max_cols null, field_ops null, time 6011.1 s, peak_rss_kb 62919616, ulimit_v_kb 64250008, budget 14400 s (memory allocation failed under ulimit -v 64250008 (signal: 6 (SIGABRT) (core dumped)))  →  limit memory, NOT ATTRIBUTABLE
+  A11 t=5 target 1: status aborted, D null, max_cols null, field_ops null, time 6024.0 s, peak_rss_kb 62849712, ulimit_v_kb 64250008, budget 14400 s (memory allocation failed under ulimit -v 64250008 (signal: 6 (SIGABRT) (core dumped)))  →  limit memory, NOT ATTRIBUTABLE
+  identity: 2 of 2 X2 systems match L2's systems, 2 match L2r's
+  prior attempt A11 t=5 target 0: aborted at 97.3 s under ulimit -v 14500000, peak_rss_kb 13974324
+  prior attempt A11 t=5 target 1: aborted at 108.0 s under ulimit -v 14500000, peak_rss_kb 13974336
+  prior attempt A11 t=5 target 0: aborted at 130.0 s under ulimit -v 13483220, peak_rss_kb 13311580
+  prior attempt A11 t=5 target 1: aborted at 131.8 s under ulimit -v 13483220, peak_rss_kb 13286088
+
+════ σ and κ at m = 4, p1
+
+── A0 m = 4 p1 (F4 via C1, X1's t = 4 cell)
+  t   b      D per system   max_cols per system   field_ops per system        status
+  2   2.000  [6, 6]         [1911, 1911]          [63703685, 63704352]        ok,ok
+  3   3.000  [7, 7]         [21619, 21619]        [111465267887, 111465240139] ok,ok
+  4   4.000  []             []                    []                          aborted,aborted
+  completed cells 2: κ = Δlog₂ field_ops/Δb = 10.773 against m − 1 = 3  →  inconclusive (fewer than 3 completed cells);  σ = 1.0000  →  inconclusive (fewer than 3 completed cells)
+
+── A11 m = 4 p1 (F4 via C1, C2's t = 4 cell, X2's t = 5 cell)
+  t   b      D per system   max_cols per system   field_ops per system        status
+  2   2.000  [3, 3]         [34, 34]              [941, 941]                  ok,ok
+  3   3.000  [5, 5]         [2159, 2159]          [33417634, 33402245]        ok,ok
+  4   4.000  [6, 6]         [88740, 88740]        [863032546892, 863026754688] ok,ok
+  5   5.000  []             []                    []                          aborted,aborted
+  completed cells 3: κ = Δlog₂ field_ops/Δb = 14.886 against m − 1 = 3  →  cost-unfavourable (κ ≥ m − 1);  σ = 1.5000  →  no middle ground at this arity (σ ≥ 0.5)
+
+════ R1: does A11's constant factor survive at m = 4, t = 4?
+  R1: NOT DECIDED (comparison incomplete or limit attribution unverified; see X1 above)
+  A0 m = 4: 2 completed cells: κ = 10.773 (inconclusive (fewer than 3 completed cells)), σ = 1.0000 (inconclusive (fewer than 3 completed cells))
+
+════ R2: A11 at m = 4, t = 5
+  R2: NOT DECIDED (a limit is not attributable; see X2 above)
+
+════ Predictions scorecard (Amendment 7)
+  X1: A0 does not complete; binding limit time (a timeout at 14400 s): limits [memory, memory]  →  not decided (limit not attributable)
+  X2: A11 does not complete; binding limit memory: limits [memory, memory]  →  not decided (limit not attributable)

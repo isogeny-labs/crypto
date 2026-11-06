@@ -6,18 +6,61 @@ import sqlite3
 import tempfile
 from types import SimpleNamespace
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import codex_recovery as recovery
 
 
 class EnrollmentTests(unittest.TestCase):
+    def test_desktop_server_is_reused_without_spawning_competitor(self):
+        with patch.object(recovery, 'Client') as connect, patch.object(recovery.subprocess, 'Popen') as spawn:
+            process, client = recovery.start_app_server(Path('/private/socket'), ['codex'], {})
+            self.assertIsNone(process)
+            self.assertIs(client, connect.return_value)
+            client.initialize.assert_called_once()
+            spawn.assert_not_called()
+
+    def test_missing_socket_starts_supervised_server(self):
+        with patch.object(recovery, 'Client', side_effect=FileNotFoundError), \
+                patch.object(recovery.subprocess, 'Popen') as spawn:
+            process, client = recovery.start_app_server(Path('/private/socket'), ['codex'], {})
+            self.assertIs(process, spawn.return_value)
+            self.assertIsNone(client)
+
+    def test_stale_active_inventory_cannot_restart_completed_or_failed_turns(self):
+        client = Mock()
+        for status in ['completed', 'failed', 'interrupted', 'inProgress']:
+            client.request.return_value = {'data': [{'status': status}]}
+            self.assertEqual(recovery.interrupted_turn(client, {'id': 'saved'}),
+                             status in {'interrupted', 'inProgress'})
+        client.request.return_value = {'data': []}
+        self.assertFalse(recovery.interrupted_turn(client, {'id': 'saved'}))
+        client.request.assert_called_with('thread/turns/list',
+            {'threadId': 'saved', 'limit': 1, 'sortDirection': 'desc'})
+
+    def test_unavailable_enrollment_is_retained_without_blocking_saved_chats(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            local = Path(tmp)
+            with sqlite3.connect(local/'state_5.sqlite') as db:
+                db.execute('CREATE TABLE threads (id TEXT, archived INTEGER DEFAULT 0)')
+                db.execute("INSERT INTO threads (id) VALUES ('saved')")
+                db.execute("INSERT INTO threads VALUES ('archived', 1)")
+            saved = {'id': 'saved', 'source': 'vscode', 'status': {'type': 'active'}}
+            missing = {'id': 'missing', 'source': 'vscode', 'status': {'type': 'active'}}
+            unavailable, archived = [], []
+            parents, empty = recovery.persisted_parents(
+                local, [missing, saved, dict(saved, id='archived')], {'files': {}}, unavailable, archived)
+            self.assertEqual(parents, [saved])
+            self.assertEqual(empty, [])
+            self.assertEqual(unavailable, [missing])
+            self.assertEqual(archived, ['archived'])
+
     def test_empty_idle_tabs_are_omitted_but_missing_work_fails_closed(self):
         with tempfile.TemporaryDirectory() as tmp:
             local = Path(tmp)
             with sqlite3.connect(local/'state_5.sqlite') as db:
-                db.execute('CREATE TABLE threads (id TEXT)')
-                db.execute("INSERT INTO threads VALUES ('saved')")
+                db.execute('CREATE TABLE threads (id TEXT, archived INTEGER DEFAULT 0)')
+                db.execute("INSERT INTO threads (id) VALUES ('saved')")
             saved = {'id':'saved','source':'vscode','status':{'type':'active'}}
             empty = {'id':'empty','source':'vscode','status':{'type':'idle'}}
             manifest = {'files':{}}

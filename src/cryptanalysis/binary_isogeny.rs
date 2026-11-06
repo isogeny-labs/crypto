@@ -41,7 +41,7 @@
 use crate::binary_ecc::{F2mElement, F2mPoly, IrreduciblePoly};
 use crate::cryptanalysis::ec_trapdoor::{magic_number_full, mmt_condition_8, FieldTower};
 use crate::cryptanalysis::ghs_descent::ECurve;
-use crate::cryptanalysis::modular_polynomial::{phi_2, phi_3, ModularPolynomial};
+use crate::cryptanalysis::modular_polynomial::{phi_2, phi_3, phi_exact, ModularPolynomial};
 use num_bigint::BigInt;
 use num_traits::{Signed, Zero};
 use std::collections::{HashMap, HashSet, VecDeque};
@@ -71,6 +71,7 @@ fn modular_polynomial_lookup(l: u32) -> Option<ModularPolynomial> {
     match l {
         2 => Some(phi_2()),
         3 => Some(phi_3()),
+        5 | 7 | 11 | 13 => phi_exact(l),
         _ => None,
     }
 }
@@ -111,7 +112,7 @@ pub fn phi_l_mod2_monomials(l: u32) -> Option<Vec<(u32, u32)>> {
 /// evaluated at the field element `j_val`.
 pub fn phi_l_mod2_in_x(l: u32, j_val: &F2mElement, m: u32, irr: &IrreduciblePoly) -> F2mPoly {
     let phi = modular_polynomial_lookup(l)
-        .unwrap_or_else(|| panic!("Φ_{} not in table; only l ∈ {{2, 3}} supported", l));
+        .unwrap_or_else(|| panic!("Φ_{} not in table; l ∈ {{2, 3, 5, 7, 11, 13}} supported", l));
     let coeffs_bits = phi_l_coeffs_mod2(&phi);
 
     // Group by X-degree.  For each degree i, accumulate Σ_j j_val^j over

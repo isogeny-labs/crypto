@@ -1,0 +1,381 @@
+{
+  "schema": "envoy-fpga-validation-summary/v1",
+  "date": "2026-10-18",
+  "run_batch": "envoy-fpga-20261018-rtl-live",
+  "repository": "aburan28/crypto",
+  "pull_request": 2122,
+  "parent_commit": "3c81607c87c4b896e78a49eb6b7f252c0131a96e",
+  "evidence_publication_parent_commit": "573dbd6a2894ce82e3faffd4dbcc0c88ce4de48c",
+  "original_base_commit": "c6d64436a33359320ad9d5b42c4acebee2968b9a",
+  "request": "Continue the Envoy extension for classical and post-quantum FPGA crypto offload on AWS F2, including ML-DSA, ML-KEM, FN-DSA and broader schemes.",
+  "implemented_this_iteration": [
+    "Keccak-f1600, SHAKE128/256 byte streams, canonical modular multiplication, and forward/inverse ML-KEM/ML-DSA NTT RTL",
+    "Native C++ independent RTL oracles and generic-synthesis replay",
+    "Distinct FpgaHttp/PqHttp protobuf factory configuration types and migrated examples",
+    "A fully linked minimal Envoy build profile and native live HTTP test harness",
+    "Scoped core/RTL CI, source-linked report, diagram, PDF and raw evidence"
+  ],
+  "validation": [
+    {
+      "name": "source RTL lint and functional suite",
+      "result": "passed",
+      "groups": 15,
+      "exit_code": 0
+    },
+    {
+      "name": "generic synthesis",
+      "result": "passed",
+      "exit_code": 0
+    },
+    {
+      "name": "synthesized-Verilog functional replay",
+      "result": "passed",
+      "groups": 15,
+      "exit_code": 0
+    },
+    {
+      "name": "existing host/TLS/PQ regression suites",
+      "result": "passed",
+      "groups": 36,
+      "exit_code": 0
+    },
+    {
+      "name": "fully linked minimal Envoy",
+      "result": "passed",
+      "exit_code": 0
+    },
+    {
+      "name": "installed production source identity",
+      "result": "passed",
+      "exit_code": 0
+    },
+    {
+      "name": "actual Envoy HTTP listener",
+      "result": "passed",
+      "groups": 5,
+      "exit_code": 0
+    },
+    {
+      "name": "new workflow syntax",
+      "result": "passed",
+      "exit_code": 0
+    },
+    {
+      "name": "required root Rust library regression",
+      "result": "failed before tests",
+      "exit_code": 101
+    }
+  ],
+  "raw_evidence": {
+    "status": "Published with explicit owner approval",
+    "archive_filename": "runs.tar.xz",
+    "archive_bytes": 105016,
+    "archive_sha256": "6da6e639242ec7af7a790a94eec96226623e7d6911be469e523d8ad35a2b2118",
+    "detailed_manifest_filename": "run-manifest.json",
+    "detailed_manifest_bytes": 32697,
+    "detailed_manifest_sha256": "75f27554293e32b314a7fa4f72842666d302e4cac25b183f79973368cb7379d6",
+    "detailed_manifest_scope": "Frozen execution-era project snapshot and all 66 raw records; documentation and report PDF publication updates are identified by this summary manifest."
+  },
+  "reproduction_guides": [
+    "README.md",
+    "docs/validation.md",
+    "docs/rtl-kernels.md"
+  ],
+  "historical_not_rerun": [
+    "Oct 17 exhaustive 262 liboqs modes",
+    "Oct 17 AddressSanitizer/UndefinedBehaviorSanitizer suites"
+  ],
+  "remaining": [
+    "Complete hardware ML-KEM/ML-DSA controllers, sampling, packing and polynomial products",
+    "Classical cryptographic RTL",
+    "Entropy, key custody, FPC1 dispatch and F2 shell/AFI",
+    "Physical FPGA resource/timing and F2 operation",
+    "Hardware/CPU workload measurements",
+    "TLS KEM key-share offload",
+    "Final FN-DSA, stateful LMS/XMSS and comprehensive FPGA scheme coverage",
+    "Full default Envoy build selection and actual Envoy TLS listener validation"
+  ],
+  "performance": "No algorithm runtime, speedup, FPGA timing or physical resource claim. Generic synthesis counts and build times are tooling diagnostics.",
+  "module_files": [
+    {
+      "path": ".gitignore",
+      "bytes": 30,
+      "sha256": "de5200857beacc0a3634e9cfedb0c2a52105ea4266c90d09356a0a070fef4629"
+    },
+    {
+      "path": "BUILD",
+      "bytes": 1708,
+      "sha256": "f95153fd74eb3584a553100ee2a1de97665286eb9d84c9a6ee09b5382058ce2e"
+    },
+    {
+      "path": "config.proto",
+      "bytes": 364,
+      "sha256": "0b880f06dc8599cc3b46a3b8d97f5383705b73f02eb8004caa527bd1ac01d1e4"
+    },
+    {
+      "path": "docs/fpga-abi.md",
+      "bytes": 11543,
+      "sha256": "2113573d70d3db2ac8400c9876adfcffe9abdda00eb2f715b61b2e6eb985dacb"
+    },
+    {
+      "path": "docs/post-quantum.md",
+      "bytes": 11659,
+      "sha256": "fc48d5d76ce68e61db12e12a51b6cad01ff55ae04d56b7434c46676968780d96"
+    },
+    {
+      "path": "docs/reports/2026-10-18/architecture.dot",
+      "bytes": 2130,
+      "sha256": "4a389ab6d84d0bfebc2e3a6bc58907246c90d3a2a5ff335b852476dba1883e06"
+    },
+    {
+      "path": "docs/reports/2026-10-18/architecture.pdf",
+      "bytes": 20352,
+      "sha256": "35034a846438712a8a74ad1961ac4bc58412e37de3d9f22919cab16e23537840"
+    },
+    {
+      "path": "docs/reports/2026-10-18/architecture.svg",
+      "bytes": 10890,
+      "sha256": "6d75b52886cafe2f6e810f60f8509dd3490f585dba0537fec5937ee81d6bb291"
+    },
+    {
+      "path": "docs/reports/2026-10-18/README.md",
+      "bytes": 7450,
+      "sha256": "3b93285c0ff49f5ed2b7c40850e77d5239e3d55438f3e62194454efb25fdb859"
+    },
+    {
+      "path": "docs/reports/2026-10-18/report.pdf",
+      "bytes": 159964,
+      "sha256": "46834205e60b47fdc47d168bfead59a2ee55d1da694e409ebc99ed355ab33e6c"
+    },
+    {
+      "path": "docs/reports/2026-10-18/report.tex",
+      "bytes": 6531,
+      "sha256": "1cf86d957bdadbd507e96f16fc5ac67a8bf1809a3ed53ff0518919949ed1c480"
+    },
+    {
+      "path": "docs/rtl-kernels.md",
+      "bytes": 7898,
+      "sha256": "202f6b86f7c3591590f5cb4dcaf3d76d313b5e6fe932103ba66df6d6102277dd"
+    },
+    {
+      "path": "docs/validation.md",
+      "bytes": 11031,
+      "sha256": "2656c801b6bc050061d55eb30bc9e8894a79ac8d6bd7c3cfbea5db72204270b7"
+    },
+    {
+      "path": "envoy/extension.cc",
+      "bytes": 15621,
+      "sha256": "6d8435751701baab4c0a432cceb3aa5b95c1bc7a743a81f65344cab4fdb394bf"
+    },
+    {
+      "path": "envoy/minimal_build_config/BUILD.bazel",
+      "bytes": 77,
+      "sha256": "8cdea94d8c7624c671139f0ea5ded589bae6eb1acd608b47157f3dbba7c9e6e4"
+    },
+    {
+      "path": "envoy/minimal_build_config/extensions_build_config.bzl",
+      "bytes": 1574,
+      "sha256": "756db18e1a314c442e90642d4265fdcd2c41e08154c4dda575d0f20889ab37ee"
+    },
+    {
+      "path": "envoy/minimal_build_config/WORKSPACE",
+      "bytes": 39,
+      "sha256": "857cc2887f8cef556b90e3d6371f245c85aa507c3bbb85d686e40937ba83de0b"
+    },
+    {
+      "path": "envoy/pq_filter.cc",
+      "bytes": 15092,
+      "sha256": "48d0cd15ed0adf84da8180a76491af9bfdd2bd040cf93eda6738d40ceefe2833"
+    },
+    {
+      "path": "examples/envoy.yaml",
+      "bytes": 3196,
+      "sha256": "04cf740636e3a6c8d168ef076e640aabb739370a3faecbc4a74567aa3b355b4f"
+    },
+    {
+      "path": "examples/pq-software.yaml",
+      "bytes": 2572,
+      "sha256": "9a72012286473118dfa7abb5260caecde8ed36d0f15b078f7664b3db0fefa7e0"
+    },
+    {
+      "path": "include/fpga/boringssl.h",
+      "bytes": 1676,
+      "sha256": "542f8b7d1f11a7fee2fc497c236894d3c6c6ff8def5043ffce2aef9c4c95a0f9"
+    },
+    {
+      "path": "include/fpga/crypto.h",
+      "bytes": 3976,
+      "sha256": "0cf59c54fbe226e7e2ef793a24ced85005e3336f45a2b03e343d30e543944831"
+    },
+    {
+      "path": "include/fpga/mailbox.h",
+      "bytes": 1949,
+      "sha256": "4e1c9795366e56b8daa48ce0424fef0b9f101a8f0d0698f58b1398c873bcaa1f"
+    },
+    {
+      "path": "include/fpga/pq_plugin.h",
+      "bytes": 819,
+      "sha256": "39492b53648d079ba7f324ddae808ebeedfc0788978623afff7722a9fd9e55c3"
+    },
+    {
+      "path": "include/fpga/pq.h",
+      "bytes": 1653,
+      "sha256": "e94817338ee4747b8122e75d30013327c3ba893dceebc8b2481742ad13d46c1f"
+    },
+    {
+      "path": "Makefile",
+      "bytes": 6850,
+      "sha256": "1aa1de0631263f023b3a37f6bc4ceec8ea212aa3d177141c92dfa564c0f7fc85"
+    },
+    {
+      "path": "pq/oqs_plugin.cc",
+      "bytes": 10481,
+      "sha256": "ddd2aa52e69fd2c3c4a16f6d7fe302b8bdfa652047e3d285dc1f37a1971e5948"
+    },
+    {
+      "path": "pq/plugin.map",
+      "bytes": 46,
+      "sha256": "2f2e8d6ff9e9f9a5f5b60e7f81cf50411ee63e7e992bda5e4030aca251eeb16f"
+    },
+    {
+      "path": "README.md",
+      "bytes": 11700,
+      "sha256": "0479597a3da32890eda01c78d526664a1c6b8ddfdc829dd8907ee72750fc4664"
+    },
+    {
+      "path": "rtl/keccak_f1600.sv",
+      "bytes": 3996,
+      "sha256": "ce07203e3b6748a8eb9f5649bd2605db5b655c90a9a9c92cd16de062b36ea6e3"
+    },
+    {
+      "path": "rtl/lattice_modmul.sv",
+      "bytes": 3131,
+      "sha256": "0901d6c40ddad128a8d7e6dd1ed0a191b4237cadfd330d6b9ba6a6a67367a6fc"
+    },
+    {
+      "path": "rtl/lattice_ntt.sv",
+      "bytes": 9685,
+      "sha256": "c3d31d61b2af22e74af6e32ea6f7cbd260b421a4a66e97e93125024a8ef396e8"
+    },
+    {
+      "path": "rtl/shake_stream.sv",
+      "bytes": 5452,
+      "sha256": "4088cd9382452830f27f996a55655007d1ebb055831a1b1181fb02891c512b8a"
+    },
+    {
+      "path": "src/aws_pci.cc",
+      "bytes": 3507,
+      "sha256": "e1767d6d18d3c75fb0161a1c875a2abb6184814c8b481e793647059ddad54c71"
+    },
+    {
+      "path": "src/boringssl_private_key.cc",
+      "bytes": 3634,
+      "sha256": "904254b9b23e9645dff28a88535bbd20ff4c846b80012a6bd10965ce00f23a9b"
+    },
+    {
+      "path": "src/boringssl_records.cc",
+      "bytes": 8176,
+      "sha256": "31ef524c98092ee81c410392faad7f4cd99a39ce80616b4ba627d1e815333182"
+    },
+    {
+      "path": "src/crypto.cc",
+      "bytes": 9089,
+      "sha256": "c55eb047045527c9fb25278fbc0e4e724edf156ed10653e22041d1cc8b1ab46c"
+    },
+    {
+      "path": "src/mailbox.cc",
+      "bytes": 9588,
+      "sha256": "0246445d3493aee8c199816ef37bcc9dedfc894975befb6298d74be8b3753e49"
+    },
+    {
+      "path": "src/pq_codec.cc",
+      "bytes": 7988,
+      "sha256": "cb271d501ce90962b99f890108dcbd68c8dd0d32d298f6f2b81489f073dd0c67"
+    },
+    {
+      "path": "src/pq_loader.cc",
+      "bytes": 3099,
+      "sha256": "1a83567525a3982a8099b8894bbbbd7f3036faa88d877ac9fcb5376222e6a19b"
+    },
+    {
+      "path": "tests/core_test.cc",
+      "bytes": 8773,
+      "sha256": "129d0f7b9861368a60ffc42f97b9b66cb5e000d56c7173502896696a12cf945f"
+    },
+    {
+      "path": "tests/emulated_registers.h",
+      "bytes": 5665,
+      "sha256": "0c2380261dc84bbd7cc39b5fb972d9edc30b701e94519c1f3a1bbd9b8047720e"
+    },
+    {
+      "path": "tests/envoy_http_test.cc",
+      "bytes": 15116,
+      "sha256": "9b4a9176d2baa120d55f5b3dfaac159cad7bb9e9b8e88c70a2224814e640acac"
+    },
+    {
+      "path": "tests/pq_test.cc",
+      "bytes": 11163,
+      "sha256": "7ef26209dfb6b221997f5ed5fba65ac389ac7b1231d6f88591734ef00d304255"
+    },
+    {
+      "path": "tests/pq_tls_test.cc",
+      "bytes": 7563,
+      "sha256": "14e3349a53971a9d98aea621ca1dc3ce982ca0048081d65834f4c70f4bc4580d"
+    },
+    {
+      "path": "tests/rtl/crypto_kernels_top.sv",
+      "bytes": 2480,
+      "sha256": "0c5fb169715ed7eb6d87e1c8400adfa9d7bf4bb8e98e757b7a9e4e538611fcb6"
+    },
+    {
+      "path": "tests/rtl_test.cc",
+      "bytes": 22631,
+      "sha256": "b51442d3f022ae8629bf5443ff76dc9a1289468f338e70d8fa9cdb8e93bf4796"
+    },
+    {
+      "path": "tests/software_backend.cc",
+      "bytes": 5134,
+      "sha256": "e8e0b1cdc14a0dabb8b44f79839f285127cc3b950600cfd70a88c65def77f8bb"
+    },
+    {
+      "path": "tests/software_backend.h",
+      "bytes": 682,
+      "sha256": "f214361d56ce36e89b02056ec981b27903e7996e25201c16c9f5f19bc9afcef0"
+    },
+    {
+      "path": "tests/test.h",
+      "bytes": 1029,
+      "sha256": "33ae848c5539d548c780151632ae5088a3494b21a8ea83186ec5a6c1b0c65426"
+    },
+    {
+      "path": "tests/tls_test.cc",
+      "bytes": 10123,
+      "sha256": "b66c9aef86df7e1e6a46382f66fc05b91e579f37b802f0377b8aaaee66ada0f6"
+    },
+    {
+      "path": "tools/build_pq.py",
+      "bytes": 2319,
+      "sha256": "ae869a37b91258341dcf730cb1815f051e94265fd871cd76e2969b0c46dcd1ae"
+    },
+    {
+      "path": "tools/check_rtl_synth.ys",
+      "bytes": 693,
+      "sha256": "dc2e10fed0e68bc60c5da19240446ab5faca13137a8c52d9d149470025c7909e"
+    },
+    {
+      "path": "tools/install_envoy.py",
+      "bytes": 1945,
+      "sha256": "d2a0714d422118d208e39da91790ed87d9e689ce6dfdac738f4c0188554515be"
+    },
+    {
+      "path": "tools/test_boringssl.py",
+      "bytes": 1877,
+      "sha256": "0ab0bc99e3911a7563c34b7d86cc624263097b68ddfb91ee103f824bff3635b4"
+    }
+  ],
+  "workflow": {
+    "path": ".github/workflows/envoy-fpga-crypto.yml",
+    "bytes": 1485,
+    "sha256": "cfc562c15d3aa6c6e959eba5719a2d67966cbb7ba66923185c50bfbe9a9feda4"
+  }
+}

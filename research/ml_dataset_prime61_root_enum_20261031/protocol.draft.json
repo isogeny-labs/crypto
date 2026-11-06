@@ -1,0 +1,622 @@
+{
+  "amendments": [],
+  "analysis_plan": {
+    "blinded": false,
+    "frozen_before_data": true,
+    "inputs": [
+      "runner receipt.json",
+      "config bytes",
+      "clean-build receipt"
+    ],
+    "outputs": [
+      "exact terminal classification, native replay scope and counted counters; command-scoped elapsed nanoseconds are diagnostic only"
+    ],
+    "script": null
+  },
+  "arms": [
+    {
+      "description": "One fixed prime p=2^61-1 n61 m2 root cell, twist=false, generator index0 and key index0; both methods of this twist share the same public input.",
+      "id": "prime61-root-untwisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 2,
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "prime",
+        "field_size_bits": 61,
+        "generators": 1,
+        "keys": 1,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 2026103103,
+        "shard_count": 4,
+        "shard_indices": "mixed-radix selected indices 0..3",
+        "solver": "root",
+        "trace_mib": 64,
+        "twists": false,
+        "work_limit": 20000
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "One fixed prime p=2^61-1 n61 m2 root cell, twist=true, generator index0 and key index0; both methods of this twist share the same public input.",
+      "id": "prime61-root-twisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 2,
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "prime",
+        "field_size_bits": 61,
+        "generators": 1,
+        "keys": 1,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 2026103103,
+        "shard_count": 4,
+        "shard_indices": "mixed-radix selected indices 0..3",
+        "solver": "root",
+        "trace_mib": 64,
+        "twists": true,
+        "work_limit": 20000
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "One fixed prime p=2^61-1 n61 m2 enumerate cell, twist=false, generator index0 and key index0; both methods of this twist share the same public input.",
+      "id": "prime61-enumerate-untwisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 2,
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "prime",
+        "field_size_bits": 61,
+        "generators": 1,
+        "keys": 1,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 2026103103,
+        "shard_count": 4,
+        "shard_indices": "mixed-radix selected indices 0..3",
+        "solver": "enumerate",
+        "trace_mib": 64,
+        "twists": false,
+        "work_limit": 20000
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "One fixed prime p=2^61-1 n61 m2 enumerate cell, twist=true, generator index0 and key index0; both methods of this twist share the same public input.",
+      "id": "prime61-enumerate-twisted",
+      "instrument": {
+        "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--bin",
+            "crypto"
+          ]
+        ],
+        "commit": "c41bec150e16e4c4f9a00634002b633b821de262",
+        "env": {
+          "LANG": "C.UTF-8",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "arity": 2,
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "family": "prime",
+        "field_size_bits": 61,
+        "generators": 1,
+        "keys": 1,
+        "max_cases_per_shard": 1,
+        "memory_mib": 2048,
+        "outer_generate_timeout_seconds": 90,
+        "seconds_per_case": 30,
+        "seed": 2026103103,
+        "shard_count": 4,
+        "shard_indices": "mixed-radix selected indices 0..3",
+        "solver": "enumerate",
+        "trace_mib": 64,
+        "twists": true,
+        "work_limit": 20000
+      },
+      "role": "candidate"
+    }
+  ],
+  "authors": [
+    "ML dataset ordinary binary paired-method campaign"
+  ],
+  "claims": [
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "fixed-population-accounting",
+      "text": "All four fixed plan indices have at most one native attempt; censored, failed, unsupported and interrupted cells remain in the denominator."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "mersenne-modulus-identity",
+      "text": "A constructed prime curve is labelled as the requested n61 case only after its public artifact records p=2^61-1 and native verification passes."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "native-method-evidence",
+      "text": "Root and enumerate artifacts are retained at their actual bounded native verification scope; neither a timeout nor a partial domain is promoted to a negative PDP result."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "ecdlp-recovery",
+      "text": "An ECDLP solve is labelled only if a scalar was independently recovered without the construction witness and replayed on the declared generator and target."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [
+        "single-arm-receipt"
+      ],
+      "id": "custody",
+      "text": "Each terminal shard retains its stage receipts and restricted archive with S3 PUT and fresh GET/hash, or its exact failed custody stage."
+    },
+    {
+      "class": "out_of_scope",
+      "decided_by": [],
+      "id": "excluded-inference",
+      "text": "No method speed ranking, exhaustive n61 search, general PDP negative, complete root execution cost, instruction count, exact fall degree, or broader curve-matrix conclusion is inferred."
+    }
+  ],
+  "controls": {
+    "aa": {
+      "comparison": null,
+      "not_applicable_reason": "Absolute software coverage, replay and custody; no comparative performance claim or timing-effect inference.",
+      "present": false
+    },
+    "negative": {
+      "arm": null,
+      "not_applicable_reason": "Exact accounting of the fixed selected population; no detector false-positive or null-population inference.",
+      "null_population": null,
+      "present": false
+    },
+    "positive": {
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "No detector sensitivity or comparative claim; this is fixed-cell administrative coverage and native replay. A completed root is not an ECDLP control.",
+      "present": false
+    }
+  },
+  "created": "2026-10-31",
+  "decision_rule": {
+    "comparison_ids": [
+      "single-arm-receipt"
+    ],
+    "effect_size_measure": "Not applicable: no comparison",
+    "interval": "Not applicable: exact fixed-population accounting without inferential interval",
+    "multiple_comparison_correction": "none",
+    "statistic": "Exact counts by method, twist, modulus identity and native terminal status; verified artifact, independent scalar recovery and S3 readback-complete counts",
+    "text": "Account all four fixed cells. Promote only exact verified method and modulus claims. Retain all timeout, unsupported, partial and failed outcomes. Durable requires archive PUT and fresh GET/hash match.",
+    "verdict_vocabulary": [
+      "verified_method_artifact_and_durable",
+      "verified_ecdlp_and_durable",
+      "verified_custody_pending",
+      "partial",
+      "unsupported",
+      "failed",
+      "timed_out",
+      "interrupted",
+      "invalid_receipt",
+      "unattempted"
+    ]
+  },
+  "execution": {
+    "backend": "local",
+    "checkpoint": {
+      "after_restore": {
+        "counted_units": "valid",
+        "wall_time": "invalid"
+      },
+      "grace_seconds": 5,
+      "interval_seconds": 1,
+      "policy": "application",
+      "restore_validation": "application_managed"
+    },
+    "measurement_class": "search",
+    "placement": {
+      "immediate_s3_custody": true,
+      "local_only": true,
+      "local_xfs_output": true,
+      "one_shard_at_a_time": true,
+      "single_worker": true
+    },
+    "queue": null,
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    },
+    "timeout_seconds": 90
+  },
+  "extensions": {
+    "ml_dataset_prime61_root_enum": {
+      "binary_sha256": "b8e0881ec5e46f60c23e6bbb49ad7c3677b9168199f5787b68d89169bfaaa77e",
+      "expected_prime_modulus": "2305843009213693951",
+      "export_mapping": {
+        "arms": "solver by twist, four arms",
+        "instance_ids": [
+          "g0k0"
+        ],
+        "rows_expected": 4,
+        "twist_identity_note": "Methods share input within twist; twists are distinct curves."
+      },
+      "label_scope": "bounded root/enumerate native evidence; scalar only on independent replay",
+      "no_cloud_worker_submission": true,
+      "output_filesystem": "xfs",
+      "output_root": "/mnt/spot-codex-state/tmp/ml-dataset-prime61-root-enum-20261031",
+      "plan_axes": {
+        "curve_seeds": 1,
+        "degree_bound": 3,
+        "factor_base_size": 8,
+        "families": [
+          "prime"
+        ],
+        "generators": 1,
+        "keys": 1,
+        "m": [
+          2
+        ],
+        "n": [
+          61
+        ],
+        "seed": 2026103103,
+        "solvers": [
+          "root",
+          "enumerate"
+        ],
+        "twists": [
+          false,
+          true
+        ],
+        "work_limit": 20000
+      },
+      "planned_cells": 4,
+      "s3_content_addressed_prefix": "s3://setec-astronomy-artifacts/store/sha256",
+      "s3_logical_name_namespace": "restricted/ml-dataset-prime61-root-enum-20261031",
+      "schema": "ml-dataset.prime61-root-enum-pilot/v1",
+      "selected_shards": "0..3 inclusive",
+      "shard_count": 4,
+      "source_commit": "c41bec150e16e4c4f9a00634002b633b821de262"
+    }
+  },
+  "freeze": {
+    "commit": null,
+    "filed_before_affected_data": false,
+    "frozen_at": null,
+    "protocol_sha256": null,
+    "status": "draft"
+  },
+  "inadmissible": [
+    "replacing a seed or shard after failure",
+    "rerunning an attempted shard",
+    "dropping failed, timed-out, interrupted or unsupported attempts",
+    "using restricted witness material as public ML features",
+    "calling a known-answer scalar an independently recovered ECDLP without native replay",
+    "promoting a bounded partial/UNSAT outcome to a full negative PDP result",
+    "promoting missing S3 readback as durable",
+    "claiming solver speedup from shared-host clocks",
+    "claiming complete root execution cost or an exhaustive n61 negative from bounded traces"
+  ],
+  "invalidation_rules": [
+    "Pinned binary, plan or protocol digest changes invalidate new admission.",
+    "Existing attempt marker or live worker blocks another attempt for that shard.",
+    "Missing or failed native verify prevents method certificate or solution promotion.",
+    "Missing fresh S3 GET and hash match prevents durability promotion.",
+    "Censored, unsupported or partial method artifacts retain their exact native outcome and no scalar label."
+  ],
+  "literature": [
+    {
+      "claim": "Official protocol schema and freeze/checker contract",
+      "provenance": "internal",
+      "ref": "isogeny-labs/crypto-autoresearcher@f755085ff951888dbe64682c210c9ef7d167b40c:docs/experiment-protocol.md",
+      "verified_by": "pinned local tooling source"
+    },
+    {
+      "claim": "Prime n61 modulus selection and bounded root capability",
+      "provenance": "internal",
+      "ref": "src/ml_dataset/curves.rs:630-641; crypto dataset capabilities",
+      "verified_by": "source inspection and pinned native capabilities; native modulus and certificate still checked per cell"
+    },
+    {
+      "claim": "Dataset construction, leakage boundaries and S3 custody contract",
+      "provenance": "internal",
+      "ref": "docs/ml-dataset/DESIGN.md; docs/ml-dataset/OPERATIONS.md",
+      "verified_by": "retained repository contract and prior local campaign receipts"
+    },
+    {
+      "claim": "External method novelty or performance",
+      "provenance": "internal",
+      "ref": "not assessed for this software coverage protocol",
+      "verified_by": "no novelty or performance claim; external literature review remains outside this pilot"
+    }
+  ],
+  "measurement": {
+    "clock": "monotonic",
+    "isolation_required": "none",
+    "order": "sequential",
+    "record": [
+      "source_commit",
+      "binary_sha256_before/after",
+      "plan/protocol SHA-256 before/after",
+      "shard index",
+      "argv",
+      "exit status",
+      "timeout classification",
+      "monotonic command interval",
+      "stdout/stderr hashes",
+      "native verify/report/export status",
+      "archive SHA-256 and bytes",
+      "S3 PUT and fresh GET receipt",
+      "method and twist",
+      "native counters and artifact roles",
+      "independent ECDLP scalar-recovery status"
+    ],
+    "timed_primary_justification": null,
+    "warmups": 0
+  },
+  "metrics": {
+    "primary": [
+      {
+        "aggregation": "per_row",
+        "definition": "Frozen native generate shard retains its manifest and passes dataset verify; failed or incomplete attempts remain recorded.",
+        "id": "sealed-cell-verified",
+        "kind": "exact",
+        "name": "Sealed cell verification",
+        "resolution": "1",
+        "source": "generated cell manifest and crypto dataset verify receipt",
+        "uncertainty": "none_exact",
+        "unit": "Boolean"
+      },
+      {
+        "aggregation": "per_row",
+        "definition": "Solver recovers scalar without witness and native verify replays scalar times declared generator equals target.",
+        "id": "independent-ecdlp-solve",
+        "kind": "exact",
+        "name": "Independent ECDLP solve",
+        "resolution": "1",
+        "source": "native solver outcome and crypto dataset verify receipt",
+        "uncertainty": "none_exact",
+        "unit": "Boolean"
+      },
+      {
+        "aggregation": "per_row",
+        "definition": "Restricted archive and pointer have successful S3 PUT and fresh GET byte-equality receipts.",
+        "id": "durable-cell",
+        "kind": "exact",
+        "name": "Restricted archive durable",
+        "resolution": "1",
+        "source": "per-shard custody and checkpoint receipts",
+        "uncertainty": "none_exact",
+        "unit": "Boolean"
+      }
+    ],
+    "secondary": [
+      {
+        "aggregation": "per_row",
+        "definition": "Instant duration around full dataset generate timeout process spawn through wait; includes parent and cell work, excludes runner receipt writes.",
+        "id": "observed-wall-ns",
+        "kind": "timed",
+        "name": "Observed wrapper command duration",
+        "resolution": "1 nanosecond clock representation",
+        "source": "runner receipt.observed_wall_nanoseconds",
+        "uncertainty": "none_exact",
+        "unit": "nanoseconds"
+      }
+    ]
+  },
+  "protocol_id": "ML-DATASET-PRIME61-ROOT-ENUM-20261031",
+  "question": "Can four fixed prime-field n61 m2 root/enumerate cells across both twists retain exact native outcomes, specific modulus identity, and durable custody?",
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Deterministic mixed-radix order pairs root and enumerate on each public twist input; no timing-effect comparison is made.",
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Mechanical exact receipt and hash validation only.",
+      "unmasked_at": null
+    },
+    "instance_sampling": {
+      "independent_of_arm": true,
+      "rule": "One fixed generator/key draw on each twist. Root and enumerate share the public curve, generator and target within a twist; opposite twists are distinct curves. All four outcomes are retained."
+    },
+    "seed_derivation": {
+      "method": "explicit_list",
+      "note": "Native plan seed fixed before data; curve seed index0.",
+      "seeds": [
+        2026103103
+      ]
+    }
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "graphs": [],
+    "report_dir": "reports",
+    "review_schema": "experiment.review/v1"
+  },
+  "repository": "crypto",
+  "sample_size": {
+    "instances": 1,
+    "power": {
+      "alpha": 0.05,
+      "correction": "none",
+      "method": "exact",
+      "note": "One public instance per twist shared by two methods; four fixed cells, exact administrative accounting only, no inferential effect or power claim.",
+      "passes": true,
+      "tests_in_family": 1
+    },
+    "preflight_runtime": {
+      "estimated_total_seconds": 90.0,
+      "fixed_seconds": 10.0,
+      "measured_on": "Planning allowance: four cells each under a 90s outer cap; not a measured runtime estimate.",
+      "per_sample_seconds": 80.0,
+      "threads": 1
+    },
+    "replicates": 1,
+    "warmups": 0
+  },
+  "schema": "experiment.protocol/v1",
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "All four plan indices0..3, one native attempt each; retain every outcome and no replacement."
+    },
+    {
+      "kind": "budget",
+      "preregistered": true,
+      "rule": "Each generate has30s inner and90s outer cap; finite finalization and S3 stage caps. Stop on failed custody and resume only finalization; require at least8GiB XFS free before a new attempt. Overall campaign2h ceiling."
+    }
+  ],
+  "study_dir": "research/ml_dataset_prime61_root_enum_20261031",
+  "variable_ledger": {
+    "aa_not_applicable": "No comparative timing or advantage claim.",
+    "comparisons": [
+      {
+        "arms": [
+          "prime61-root-untwisted",
+          "prime61-root-twisted",
+          "prime61-enumerate-untwisted",
+          "prime61-enumerate-twisted"
+        ],
+        "design": "absolute",
+        "differs_in": [],
+        "id": "single-arm-receipt",
+        "threshold": "All four indices accounted; specific modulus and method claims require native replay, and durability requires fresh S3 archive readback."
+      }
+    ],
+    "crosses_map": false,
+    "factors": [
+      {
+        "how": "Pinned clean source c41bec15, binary SHA b8e0881e, preflight and per-attempt hash checks.",
+        "name": "instrument",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Prime n61 m2, one curve seed, root/enumerate and both twists; one shared generator/key draw per twist.",
+        "name": "curve-and-method",
+        "treatment": "crossed"
+      },
+      {
+        "how": "RAYON_NUM_THREADS=1 and one generate command at a time.",
+        "name": "threads",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Shared host conditions retained as context; no timing-effect inference.",
+        "name": "host-and-contention",
+        "treatment": "measured"
+      },
+      {
+        "how": "30s inner worker and 90s outer generate cap per shard.",
+        "name": "timeout",
+        "treatment": "fixed"
+      },
+      {
+        "how": "All four frozen indices retained regardless of outcome.",
+        "name": "analyst-selection",
+        "treatment": "fixed"
+      },
+      {
+        "how": "One predeclared local XFS root, 8GiB free-space floor, restricted S3 custody per cell.",
+        "name": "output-filesystem",
+        "treatment": "fixed"
+      }
+    ],
+    "independent": []
+  },
+  "version": 1
+}

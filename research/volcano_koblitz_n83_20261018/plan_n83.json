@@ -1,0 +1,11 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "plan only: the Koblitz crater K_0 over F_2^83 (the m = 83 gate curve of AGENTS.md section 8a)",
+  "description": "Not run. Used only to record the registry's r, A and slug for the n = 83 crater; rho at this size costs about 2^41 group operations.",
+  "workloads": {"curves": [{"kind": "koblitz", "a": 0, "n": 83}], "targets_per_curve": 1, "target_seed": 20261018},
+  "arms": [
+    {"name": "rho-frob-strong", "role": "reference", "method": {"id": "rho.signed_frobenius_strong"}},
+    {"name": "rho-neg", "role": "baseline", "method": {"id": "rho.negation"}}
+  ],
+  "measurement": {"rounds": 1, "warmup": 0, "order": "alternate", "seed": 1, "isolation_required": "L0", "timeout_seconds": 60}
+}

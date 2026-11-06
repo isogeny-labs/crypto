@@ -1,0 +1,93 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-ghs3-vs-rho-20261023-1
+experiment_id: ghs3_vs_rho_20261023
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: 6bf8d5c2f51dbdd1b134b11a02396e1e4ac76b68
+receipt: research/ghs3_vs_rho_20261023/cards/CARD-ghs3-vs-rho-20261023-1.receipt.json
+binds:
+- path: research/ghs3_vs_rho_20261023/PROTOCOL.md
+  sha256: 7be20934c0b1b13bf011176798c399c59af029e164869e98afd64c038a48b2b3
+- path: research/ghs3_vs_rho_20261023/run.sh
+  sha256: 69e7c8e25bbb82abb04e21c6ee8854a8dbe81bcadbb95847e10488ce967e82c1
+- path: examples/ghs3_vs_rho_20261023.rs
+  sha256: 4eab656ab9e1987a52669f569d3504147044a3276e35962d211f8eed7563effc
+- path: Cargo.toml
+  sha256: def239e6a4e217a3059fc5b6740d658fa353f6cb023b685aeb2c40e528e94bfc
+- path: Cargo.lock
+  sha256: bf9f2d9eae5f6bfea66b0473d44bf77d63141dcc335fad01b30c420be444ea42
+- path: target/release/examples/ghs3_vs_rho_20261023
+  sha256: 7847d102657f0dcd7586c26ec9536813454180d3ef1bd55614da97953183278d
+- path: /usr/bin/gp
+  sha256: c9673623cad2eaa7cfe402e7b7d833f1f703689a09837026b6386aaafba6deec
+must_not_exist:
+- research/ghs3_vs_rho_20261023/raw
+commands:
+- id: build
+  argv:
+  - cargo
+  - build
+  - --release
+  - --example
+  - ghs3_vs_rho_20261023
+  cwd: .
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/ghs3_vs_rho_20261023/receipts/build.stdout
+  stderr: research/ghs3_vs_rho_20261023/receipts/build.stderr
+- id: run
+  argv:
+  - sh
+  - research/ghs3_vs_rho_20261023/run.sh
+  cwd: .
+  timeout_seconds: 36000
+  success_exit_codes:
+  - 0
+  stdout: research/ghs3_vs_rho_20261023/receipts/run.stdout
+  stderr: research/ghs3_vs_rho_20261023/receipts/run.stderr
+- id: raw-sha256
+  argv:
+  - sha256sum
+  - research/ghs3_vs_rho_20261023/raw/b14_c0.jsonl
+  - research/ghs3_vs_rho_20261023/raw/b14_c1.jsonl
+  - research/ghs3_vs_rho_20261023/raw/b14_c2.jsonl
+  - research/ghs3_vs_rho_20261023/raw/b15_c0.jsonl
+  - research/ghs3_vs_rho_20261023/raw/b15_c1.jsonl
+  - research/ghs3_vs_rho_20261023/raw/b15_c2.jsonl
+  - research/ghs3_vs_rho_20261023/raw/b16_c0.jsonl
+  - research/ghs3_vs_rho_20261023/raw/b16_c1.jsonl
+  - research/ghs3_vs_rho_20261023/raw/b16_c2.jsonl
+  - research/ghs3_vs_rho_20261023/raw/b17_c0.jsonl
+  - research/ghs3_vs_rho_20261023/raw/b17_c1.jsonl
+  - research/ghs3_vs_rho_20261023/raw/b17_c2.jsonl
+  - research/ghs3_vs_rho_20261023/raw/b18_c0.jsonl
+  - research/ghs3_vs_rho_20261023/raw/b18_c1.jsonl
+  - research/ghs3_vs_rho_20261023/raw/b18_c2.jsonl
+  - research/ghs3_vs_rho_20261023/raw/b19_c0.jsonl
+  - research/ghs3_vs_rho_20261023/raw/b19_c1.jsonl
+  - research/ghs3_vs_rho_20261023/raw/b19_c2.jsonl
+  - research/ghs3_vs_rho_20261023/raw/b20_c0.jsonl
+  - research/ghs3_vs_rho_20261023/raw/b20_c1.jsonl
+  - research/ghs3_vs_rho_20261023/raw/b20_c2.jsonl
+  cwd: .
+  timeout_seconds: 600
+  success_exit_codes:
+  - 0
+  stdout: research/ghs3_vs_rho_20261023/receipts/raw.sha256
+  stderr: research/ghs3_vs_rho_20261023/receipts/raw-sha256.stderr
+  outputs:
+  - research/ghs3_vs_rho_20261023/receipts/raw.sha256
+bus_address: executor-mechanical-ghs3-vs-rho
+background: true
+write_scope:
+- research/ghs3_vs_rho_20261023/raw/
+- research/ghs3_vs_rho_20261023/receipts/
+- research/ghs3_vs_rho_20261023/cards/
+- target/
+stop_when:
+- Any command in the card exits with a status other than 0.
+- The tool exits with status 2 and prints an IMPEDIMENT line.
+- The tool prints a line that begins with "command" and ends with "FAILED".
+notes: Other experiments run on this host at the same time. Operation counts are the claim; wall time is an observation. Do not rerun, retry or repair any command; relay what the tool prints, unchanged.

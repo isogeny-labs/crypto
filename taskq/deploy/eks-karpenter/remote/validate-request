@@ -2,11 +2,11 @@
 set -euo pipefail
 [[ $# == 1 && -f "$1" ]] || { echo 'Usage: validate-request REQUEST.json' >&2; exit 2; }
 [[ $(wc -c < "$1") -le 65536 ]] || { echo 'Request exceeds 64 KiB' >&2; exit 2; }
-jq -e '
+jq -e --arg repository "${ISOLAB_IMAGE_REPOSITORY:-104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks}" '
   type=="object" and (keys-["schema","job","provenance"]|length)==0
   and .schema=="isolab.eks.request/v1"
   and (.job|type)=="object"
-  and (.job|keys-["job_name","spec","instance_type","memory","seconds"]|length)==0
+  and (.job|keys-["job_name","spec","instance_type","memory","seconds","build"]|length)==0
   and all(.job[]; .!=null and .!=false)
   and (.job.job_name|type)=="string"
   and (.job.job_name|test("^[a-z0-9]([-a-z0-9]*[a-z0-9])?$"))
@@ -20,8 +20,23 @@ jq -e '
   and ((.job.instance_type // "c8a.2xlarge")|test("^[a-z][a-z0-9-]*\\.[a-z0-9]+$"))
   and ((.job|has("spec")|not) or (.job.spec|type)=="object")
   and ((has("provenance")|not) or (.provenance|type)=="object")
-  and ((.provenance // {}|keys-["harness","source_revision","run_url"]|length)==0)
+  and ((.provenance // {}|keys-["harness","source_revision","workflow_revision","run_url"]|length)==0)
   and (all((.provenance // {})[]; type=="string" and length<=2048))
+  and ((.job|has("build")|not) or (
+    (.job.build|type)=="object"
+    and (.job.build|keys)==["ecbench_sha256","image_uri","source_revision"]
+    and (.job.build.image_uri|type)=="string"
+    and (.job.build.image_uri|split("@sha256:")[0])==$repository
+    and (.job.build.image_uri|length)==($repository|length)+72
+    and (.job.build.image_uri|test("@sha256:[a-f0-9]{64}$"))
+    and (.job.build.source_revision|type)=="string"
+    and (.job.build.source_revision|test("^[a-f0-9]{40}$"))
+    and (.job.build.source_revision|length)==40
+    and (.job.build.ecbench_sha256|type)=="string"
+    and (.job.build.ecbench_sha256|test("^[a-f0-9]{64}$"))
+    and (.job.build.ecbench_sha256|length)==64
+    and .job.build.source_revision==.provenance.source_revision
+  ))
 ' "$1" >/dev/null || { echo 'Invalid isolab.eks.request/v1 request' >&2; exit 2; }
 # Materialize defaults consistently for every client. Specs remain literal JSON.
 jq '.job.instance_type //= "c8a.2xlarge" | .job.seconds //= 900 | .job.memory //= "4Gi"' "$1"

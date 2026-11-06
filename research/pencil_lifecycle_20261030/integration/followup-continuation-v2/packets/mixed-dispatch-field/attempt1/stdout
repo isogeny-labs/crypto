@@ -1,0 +1,67 @@
+/var/tmp/pencil-mixed-dispatch-field-20261031-v1/MixedDispatch.lean:32:66: error: unsolved goals
+K : Type u_1
+inst✝¹ : Field K
+inst✝ : DecidableEq K
+a0 a1 a2 a3 : K
+a : WeightedAdd11.Input K
+b : D2 K
+haz : a.z ≠ 0
+haw : a.w ≠ 0
+hbz : b.z ≠ 0
+hbw : b.w ≠ 0
+ha : validPoint (MixedGeneric.curve a0 a1 a2 a3) a
+hb : validTwo (MixedGeneric.curve a0 a1 a2 a3) b
+hk : rawK a b = 0
+hc : ¬a.y * rawW3 b = -(rawY3 a b * a.w)
+hp : a.y * rawW3 b = rawY3 a b * a.w
+he : a.x * (b.z * b.z) = (other a b).x
+left✝² : classify a b = Branch.positiveCoincidence
+left✝¹ : 2 ≠ 0
+left✝ : a.y ≠ 0
+hz : (MixedTripling.rawOutput a1 a2 a3 a).z ≠ 0
+hw : (MixedTripling.rawOutput a1 a2 a3 a).w ≠ 0
+hv : validTwo (MixedGeneric.curve a0 a1 a2 a3) (MixedTripling.rawOutput a1 a2 a3 a)
+⊢ ¬rawY3 a b * a.w = -(rawY3 a b * a.w)
+/var/tmp/pencil-mixed-dispatch-field-20261031-v1/MixedDispatch.lean:34:120: error: unsolved goals
+K : Type u_1
+inst✝¹ : Field K
+inst✝ : DecidableEq K
+a0 a1 a2 a3 : K
+a : WeightedAdd11.Input K
+b : D2 K
+haz : a.z ≠ 0
+haw : a.w ≠ 0
+hbz : b.z ≠ 0
+hbw : b.w ≠ 0
+ha : validPoint (MixedGeneric.curve a0 a1 a2 a3) a
+hb : validTwo (MixedGeneric.curve a0 a1 a2 a3) b
+hk : rawK a b = 0
+hc : ¬a.y * rawW3 b = -(rawY3 a b * a.w)
+hp : a.y * rawW3 b = rawY3 a b * a.w
+he : ¬a.x * (b.z * b.z) = (other a b).x
+left✝² : classify a b = Branch.positiveCoincidence
+left✝¹ : 2 ≠ 0
+left✝ : a.y ≠ 0
+hd :
+  MixedGeneric.dispatch (other a b) (MixedPositiveDistinct.doubled a0 a1 a2 a3 a) a3 =
+    some (MixedGeneric.output (other a b) (MixedPositiveDistinct.doubled a0 a1 a2 a3 a) a3)
+hz : (MixedGeneric.output (other a b) (MixedPositiveDistinct.doubled a0 a1 a2 a3 a) a3).z ≠ 0
+hw : (MixedGeneric.output (other a b) (MixedPositiveDistinct.doubled a0 a1 a2 a3 a) a3).w ≠ 0
+hv :
+  validTwo (MixedGeneric.curve a0 a1 a2 a3)
+    (MixedGeneric.output (other a b) (MixedPositiveDistinct.doubled a0 a1 a2 a3 a) a3)
+⊢ ¬rawY3 a b * a.w = -(rawY3 a b * a.w)
+/var/tmp/pencil-mixed-dispatch-field-20261031-v1/MixedDispatch.lean:32:87: warning: This simp argument is unused:
+  hc
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [dispatch, hk, hp, he]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-mixed-dispatch-field-20261031-v1/MixedDispatch.lean:34:141: warning: This simp argument is unused:
+  hc
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [dispatch, hk, hp, he, hd]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`

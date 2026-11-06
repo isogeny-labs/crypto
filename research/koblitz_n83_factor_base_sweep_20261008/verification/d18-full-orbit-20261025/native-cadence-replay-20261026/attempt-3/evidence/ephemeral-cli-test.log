@@ -1,0 +1,23 @@
+warning: stripping debug info with `rust-objcopy` failed: signal: 6 (SIGABRT)
+  |
+  = note: dyld[68151]: Library not loaded: @rpath/libLLVM.dylib
+            Referenced from: <D6B3C499-A2AF-3E42-8F77-C42BD658AAB5> /Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/lib/rustlib/aarch64-apple-darwin/bin/rust-objcopy
+            Reason: tried: '/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/lib/rustlib/aarch64-apple-darwin/bin/../lib/libLLVM.dylib' (no such file), '/Users/adamburan/.rustup/toolchains/1.99.1-aarch64-apple-darwin/lib/rustlib/aarch64-apple-darwin/bin/../lib/libLLVM.dylib' (no such file), '/private/tmp/n83-ephemeral-cli-target/debug/deps/libLLVM.dylib' (no such file), '/Users/adamburan/lib/libLLVM.dylib' (no such file), '/usr/local/lib/libLLVM.dylib' (no such file), '/usr/lib/libLLVM.dylib' (no such file, not in dyld cache)
+          
+
+warning: `ephemeral` (bin "ephemeral" test) generated 1 warning
+    Finished `test` profile [unoptimized] target(s) in 0.43s
+     Running unittests src/main.rs (/private/tmp/n83-ephemeral-cli-target/debug/deps/ephemeral-d6e938fe3694340b)
+
+running 8 tests
+test job::tests::exit_statuses ... ok
+test job::tests::spans ... ok
+test tests::runner_is_embedded ... ok
+test job::tests::misc ... ok
+test job::tests::slugs_match_tr ... ok
+test tests::run_args_need_the_separator ... ok
+test job::tests::quoting_round_trips_through_bash ... ok
+test job::tests::user_data_arms_deadline_first ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+

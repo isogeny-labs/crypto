@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package envoy.extensions.fpga_crypto.v3;
+
+import "google/protobuf/struct.proto";
+
+// Separate message types give Envoy an unambiguous factory-by-type mapping.
+// Each filter validates the fields and bounds of its value at startup.
+message FpgaHttp {
+  google.protobuf.Struct value = 1;
+}
+
+message PqHttp {
+  google.protobuf.Struct value = 1;
+}

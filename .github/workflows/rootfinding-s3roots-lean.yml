@@ -7,10 +7,8 @@ name: Root-finding S3Roots Lean proof
 # keeping the audit log as an artifact. Sheriff case SHF-20261016-3caa6f,
 # finding L6.
 on:
-  pull_request:
-    paths:
-      - '.github/workflows/rootfinding-s3roots-lean.yml'
-      - 'papers/rootfinding-decomposition/lean/**'
+  # Not a pull-request check. The merge set is gate, size, and artifacts.
+  # This runs when the matching change is on main, or on its schedule.
   push:
     branches: [main]
     paths:
@@ -53,7 +51,7 @@ jobs:
         run: |
           set -o pipefail
           lake env lean AxiomAudit.lean | tee /tmp/axioms.txt
-          test "$(grep -cE "depends on axioms|does not depend on any axioms" /tmp/axioms.txt)" -eq 3
+          test "$(grep -cE "depends on axioms|does not depend on any axioms" /tmp/axioms.txt)" -eq 7
           if grep -vE "^AXIOM_AUDIT\||does not depend on any axioms|depends on axioms: \[(propext|Classical.choice|Quot.sound)(, (propext|Classical.choice|Quot.sound))*\]" /tmp/axioms.txt; then
             echo "unexpected axiom"; exit 1; fi
       - name: Keep the audit log

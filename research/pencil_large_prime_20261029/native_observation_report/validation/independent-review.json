@@ -1,0 +1,91 @@
+{
+  "schema": "pencil-native-observation-report-independent-review/v1",
+  "created_utc": "2026-10-30T02:58:30Z",
+  "review_kind": "read-only source, contract, retained software-fixture, and visual output review",
+  "root": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_large_prime_20261029/native_observation_report",
+  "source": {
+    "lib_sha256": "0d5539900f3cf5fb997a0d3a39a66f96cdcc1211db77c253afd531c17f33bc26",
+    "main_sha256": "827b768717fbfa27030ee179dee341c7606aecc5a11ac11b275cbb8a959abdad",
+    "cargo_toml_sha256": "896019ed85cd8c683e2afd865123e5047999f937722213d5a8bc2b53d1f44423",
+    "cargo_lock_sha256": "1a2dea45c319e71070da788aa1068f58e2b8045f0cec4faccb213c5b8ba66338",
+    "manifest_sha256": "75bc44962ab9a372bc9a815941c75a9a8b757c12cc4bddd3a1bb44c3718b6c92"
+  },
+  "producer_validation": {
+    "receipt_sha256": "7fa9c70039fec6592c115dceb353a5086f21126bec4004d2ae781095c6ea6103",
+    "test_log_sha256": "6cddba3a00a60502db6c0b21398017c71f6ec227bcc8b25642e2c78742384aa3",
+    "clippy_log_sha256": "d1b46c4c53e57d5be77d26fc7b65614c310389c98c595dfd30697bce4e2bccc3",
+    "fmt_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observed": {
+      "tests_passed": 8,
+      "tests_failed": 0,
+      "clippy_passed": true,
+      "fmt_passed": true,
+      "solver_executions": 0,
+      "empirical_observations": 0
+    }
+  },
+  "reviewed_properties": [
+    "expected_executions equals 18 times positive expected_workloads using checked arithmetic",
+    "expected_measured_pairs equals 5 times expected_workloads using checked arithmetic",
+    "observed executions plus explicit missing row count equals expected executions",
+    "exact 36-cell cross product with no duplicate price cell",
+    "admitted plus missing-or-ineligible pairs equals the exact per-cell denominator",
+    "complete flag is equivalent to full admission and both exact ratio fields are non-null exactly when complete",
+    "top-level and per-cell qualified ratios are explicitly null",
+    "outcome count sum equals observed executions",
+    "partial admitted sums remain diagnostic JSON and are not rendered as complete ratios",
+    "PDF and SVG labels describe count coverage, exact fractions, nulls, and no performance, uncertainty, statistical, mathematical, speed, or timing qualification",
+    "failure and missing outcomes remain explicit and are never rewritten as zero-valued ratios",
+    "caller source commit is labeled caller-supplied rather than authenticated"
+  ],
+  "initial_findings_and_resolution": [
+    {
+      "finding": "renderer accepted self-consistent non-18/5 geometry",
+      "resolution": "fixed with checked positive workload times 18 executions and times 5 measured pairs; negative tests added"
+    },
+    {
+      "finding": "complete cells could retain null ratios and incomplete cells needed iff-null enforcement",
+      "resolution": "fixed with exact complete/non-null equivalence for algorithm and calibration ratios; negative tests added"
+    },
+    {
+      "finding": "qualified timing ratios could be carried despite observation-only scope",
+      "resolution": "fixed by requiring top-level qualified_ratios and every cell qualified_ratio to be explicit null; negative tests added"
+    },
+    {
+      "finding": "single-pass LaTeX retained longtable rerun warnings",
+      "resolution": "fixed with two no-shell-escape passes; final logs have no longtable/rerun/overfull/error warnings; prior outputs retained"
+    }
+  ],
+  "artifacts": {
+    "all_missing": {
+      "pdf_sha256": "6a4ede9ee3d8a45683ffc636b6e6f64c664dab5ddf153e11f44049332b085d9d",
+      "svg_sha256": "24c9ae655d3bf3e1f0f2c9a440add21c8f383489442a5bd565271e783bfa3b32",
+      "json_sha256": "7d9d4642a3a9e648dd65a0bc03c99e1e69df5b7c37ec694329cf3dfde6d9b0f3",
+      "observed": 0,
+      "missing": 18,
+      "complete_cells": 0,
+      "null_ratio_cells": 36
+    },
+    "mixed": {
+      "pdf_sha256": "a51770169c4df335288a5d542d216cc370fe7c9338bc532d43a90f91ecea054c",
+      "svg_sha256": "70688f8a77b116b9c92da1c45c8a872154fa08bc6a2a0b53fc50458dfbca82c7",
+      "json_sha256": "951c1703629ce1397818bf9f9e948d178cbf8370890695e78199a8c4207e3265",
+      "observed": 18,
+      "missing": 0,
+      "complete_cells": 2,
+      "null_ratio_cells": 34
+    }
+  },
+  "visual_inspection": {
+    "pdf_pages_inspected": 4,
+    "svg_outputs_inspected": 2,
+    "clipping_observed": false,
+    "labels_truthful_within_fixture_scope": true,
+    "latex_final_warning_scan": "no Longtable Warning, Rerun LaTeX, rerunfilecheck Warning, Overfull, or LaTeX Error"
+  },
+  "findings": [],
+  "conclusion": "No remaining concrete defect found in the requested bounded renderer scope. The renderer presents source-bound native analysis observations; it does not authenticate the input, recompute pricing or admission, qualify timing, establish a speedup, or provide independent mathematical evidence.",
+  "mutations_performed_by_reviewer": 0,
+  "cloud_actions": 0,
+  "trial_executions": 0
+}

@@ -1,0 +1,7173 @@
+{
+  "status": "complete",
+  "seed": 20261108,
+  "experiments": [
+    {
+      "status": "passed",
+      "scalar": 49,
+      "p": 7,
+      "r": 373,
+      "seconds": 44.06006092399912,
+      "source_curve": "Elliptic Curve defined by y^2 = x^3 + (4*z^2+3*z+3)*x + (4*z^2+5*z+2) over Finite Field in z of size 7^3",
+      "source_field": {
+        "characteristic": 7,
+        "degree": 3,
+        "order": 343,
+        "modulus": "x^3 + 6*x^2 + 4"
+      },
+      "source_generator": {
+        "x": "5*z + 4",
+        "y": "4*z^2 + z"
+      },
+      "source_target": {
+        "x": "6*z^2 + 3*z + 5",
+        "y": "4*z^2 + 5"
+      },
+      "quartic": "X^2*Y^2 + 2*X*Y^3 + 3*Y^4 + 3*X^3*Z - 2*X*Y^2*Z + Y^3*Z + X^2*Z^2 + 3*X*Y*Z^2 - 2*Y^2*Z^2 + 2*X*Z^3 - Y*Z^3 - 3*Z^4",
+      "isogeny_steps": 1,
+      "isogeny_kernels": [
+        "x + 5*z^2 + 5*z + 1"
+      ],
+      "obstruction_walk": [
+        {
+          "curve": "Elliptic Curve defined by y^2 = x^3 + (3*z^2+6*z+4)*x + (4*z^2+5*z+2) over Finite Field in z of size 7^3",
+          "steps": 1,
+          "kernels_tested": 1,
+          "usable": true
+        }
+      ],
+      "setup_seconds": 29.86821709299693,
+      "sections_seconds": 3.4718022310007655,
+      "section_certificate": {
+        "diagonal_constraint_rank": 112,
+        "section_dimension": 8,
+        "sampled_curve_points": 192,
+        "extension_field_point_enumeration_used": false,
+        "exact_diagonal_identities_verified": 8,
+        "maximum_total_degree": 8
+      },
+      "interpolation_holdouts": 12,
+      "chart_failures": [
+        {
+          "attempt": 0,
+          "multiplier": 1,
+          "reason": "evaluation pole"
+        }
+      ],
+      "source_randomization_multiplier": 155,
+      "inversions": [
+        {
+          "seconds": 1.290075970999169,
+          "ordered_solutions": 12,
+          "groebner_basis_length": 12,
+          "equations": 11,
+          "algorithm": "base-field symmetric-section polynomial inversion"
+        },
+        {
+          "seconds": 0.9992483580026601,
+          "ordered_solutions": 6,
+          "groebner_basis_length": 12,
+          "equations": 11,
+          "algorithm": "base-field symmetric-section polynomial inversion"
+        },
+        {
+          "seconds": 0.9751347680030449,
+          "ordered_solutions": 6,
+          "groebner_basis_length": 12,
+          "equations": 11,
+          "algorithm": "base-field symmetric-section polynomial inversion"
+        }
+      ],
+      "target_solver": {
+        "scalar": 49,
+        "seconds": 4.0507760620021145,
+        "line_phase_seconds": 1.1167796320005436,
+        "line_attempts": 28,
+        "distinct_lines": 17,
+        "split_lines": 6,
+        "line_rank": 6,
+        "line_relations_checked_in_jacobian": 3,
+        "trials": 6,
+        "smooth_relations": 3,
+        "factor_base_size": 7,
+        "linear_system_rank": 9,
+        "independent_relations": [
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              2,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                2,
+                3
+              ],
+              "parameter_Q": [
+                1,
+                0,
+                6
+              ],
+              "restriction_coefficients": [
+                0,
+                0,
+                5,
+                4
+              ],
+              "finite_roots": [
+                [
+                  4,
+                  1
+                ],
+                [
+                  0,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              1,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              1
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                3,
+                5
+              ],
+              "parameter_Q": [
+                1,
+                0,
+                0
+              ],
+              "restriction_coefficients": [
+                0,
+                1,
+                2,
+                6
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  5,
+                  1
+                ],
+                [
+                  4,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              2,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                1,
+                4
+              ],
+              "parameter_Q": [
+                1,
+                3,
+                3
+              ],
+              "restriction_coefficients": [
+                0,
+                0,
+                3
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 2
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              1,
+              1,
+              2,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                2,
+                3
+              ],
+              "parameter_Q": [
+                1,
+                6,
+                3
+              ],
+              "restriction_coefficients": [
+                0,
+                0,
+                2,
+                4
+              ],
+              "finite_roots": [
+                [
+                  3,
+                  1
+                ],
+                [
+                  0,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              2,
+              0,
+              1,
+              0,
+              0,
+              1
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                3,
+                3
+              ],
+              "parameter_Q": [
+                1,
+                0,
+                0
+              ],
+              "restriction_coefficients": [
+                0,
+                2,
+                3,
+                2
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  1,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              1,
+              3,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                5,
+                5
+              ],
+              "parameter_Q": [
+                1,
+                2,
+                3
+              ],
+              "restriction_coefficients": [
+                0,
+                0,
+                0,
+                1
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  3
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "smooth_divisor",
+            "a": 298,
+            "b": 317,
+            "counts": [
+              1,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0
+            ],
+            "rhs": 298
+          },
+          {
+            "kind": "smooth_divisor",
+            "a": 352,
+            "b": 359,
+            "counts": [
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rhs": 352
+          },
+          {
+            "kind": "smooth_divisor",
+            "a": 273,
+            "b": 49,
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              2
+            ],
+            "rhs": 273
+          }
+        ],
+        "algorithm": "line-assisted rational-point index calculus",
+        "claim": "Exact geometric relations plus target DLP; not full optimized Diem or an exponent claim"
+      },
+      "target_solver_used": true,
+      "target_group_enumeration_used": false,
+      "source_log_used_in_transfer": false,
+      "all_image_coordinates_in_base_field": true,
+      "limits": [
+        "Bounded retries, not a universal exceptional-chart proof.",
+        "Line-assisted solver is not the full Diem large-prime implementation.",
+        "Small-field experiments do not establish an asymptotic or practical advantage."
+      ],
+      "source_pollard_rho": {
+        "runs": [
+          {
+            "scalar": 49,
+            "seconds": 0.005338828999811085,
+            "group_additions": 36,
+            "restarts": 0,
+            "seed": 20261115,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 49,
+            "seconds": 0.007366204998106696,
+            "group_additions": 144,
+            "restarts": 0,
+            "seed": 20261116,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 49,
+            "seconds": 0.006034265999915078,
+            "group_additions": 102,
+            "restarts": 0,
+            "seed": 20261117,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 49,
+            "seconds": 0.0069350680023489986,
+            "group_additions": 72,
+            "restarts": 0,
+            "seed": 20261118,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 49,
+            "seconds": 0.007070202998875175,
+            "group_additions": 39,
+            "restarts": 0,
+            "seed": 20261119,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          }
+        ],
+        "median_seconds": 0.0069350680023489986
+      },
+      "source_bsgs": {
+        "scalar": 49,
+        "seconds": 0.0006011459990986623,
+        "group_additions": 22,
+        "baby_steps": 20,
+        "algorithm": "BSGS",
+        "interval_size": 373
+      },
+      "basic_target_comparison": {
+        "scalar": 49,
+        "seconds": 13.973544549000508,
+        "trials": 31,
+        "smooth_relations": 11,
+        "factor_base_size": 7,
+        "linear_system_rank": 8,
+        "independent_relations": [
+          {
+            "a": 65,
+            "b": 154,
+            "factor_base_coefficients": [
+              1,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 1
+          },
+          {
+            "a": 336,
+            "b": 340,
+            "factor_base_coefficients": [
+              0,
+              0,
+              2,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rank": 2
+          },
+          {
+            "a": 298,
+            "b": 317,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0
+            ],
+            "rank": 3
+          },
+          {
+            "a": 352,
+            "b": 359,
+            "factor_base_coefficients": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rank": 4
+          },
+          {
+            "a": 273,
+            "b": 49,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              2
+            ],
+            "rank": 5
+          },
+          {
+            "a": 314,
+            "b": 39,
+            "factor_base_coefficients": [
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 6
+          },
+          {
+            "a": 353,
+            "b": 84,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              3,
+              0,
+              0
+            ],
+            "rank": 7
+          },
+          {
+            "a": 38,
+            "b": 37,
+            "factor_base_coefficients": [
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "rank": 8
+          }
+        ],
+        "algorithm": "basic rational-point smooth-divisor index calculus",
+        "claim": "Actual target Jacobian DLP; not an optimized Diem solver or speedup claim"
+      },
+      "generation_scalar_verified_only_after_solve": true
+    },
+    {
+      "status": "passed",
+      "scalar": 369,
+      "p": 13,
+      "r": 2137,
+      "seconds": 46.49163604699788,
+      "source_curve": "Elliptic Curve defined by y^2 = x^3 + (10*z^2+6*z+12)*x + (7*z^2+7*z+5) over Finite Field in z of size 13^3",
+      "source_field": {
+        "characteristic": 13,
+        "degree": 3,
+        "order": 2197,
+        "modulus": "x^3 + 2*x + 11"
+      },
+      "source_generator": {
+        "x": "10*z^2 + 3*z + 5",
+        "y": "6*z^2 + z"
+      },
+      "source_target": {
+        "x": "8*z^2 + 5*z + 3",
+        "y": "2*z^2 + 10*z + 11"
+      },
+      "quartic": "X^2*Y^2 + 2*X*Y^3 + 5*Y^4 + 4*X^3*Z + 6*X^2*Y*Z + 6*X*Y^2*Z + 6*Y^3*Z + 2*X^2*Z^2 + X*Y*Z^2 + 4*Y^2*Z^2 - X*Z^3 - Y*Z^3 + 5*Z^4",
+      "isogeny_steps": 0,
+      "isogeny_kernels": [],
+      "obstruction_walk": [
+        {
+          "curve": "Elliptic Curve defined by y^2 = x^3 + (10*z^2+6*z+12)*x + (7*z^2+7*z+5) over Finite Field in z of size 13^3",
+          "steps": 0,
+          "kernels_tested": 5,
+          "usable": true
+        }
+      ],
+      "setup_seconds": 22.322975918999873,
+      "sections_seconds": 3.579922719000024,
+      "section_certificate": {
+        "diagonal_constraint_rank": 112,
+        "section_dimension": 8,
+        "sampled_curve_points": 192,
+        "extension_field_point_enumeration_used": false,
+        "exact_diagonal_identities_verified": 8,
+        "maximum_total_degree": 8
+      },
+      "interpolation_holdouts": 12,
+      "chart_failures": [],
+      "source_randomization_multiplier": 1,
+      "inversions": [
+        {
+          "seconds": 1.2831171850011742,
+          "ordered_solutions": 12,
+          "groebner_basis_length": 12,
+          "equations": 11,
+          "algorithm": "base-field symmetric-section polynomial inversion"
+        },
+        {
+          "seconds": 1.1492302580008982,
+          "ordered_solutions": 12,
+          "groebner_basis_length": 12,
+          "equations": 11,
+          "algorithm": "base-field symmetric-section polynomial inversion"
+        },
+        {
+          "seconds": 1.2289825940024457,
+          "ordered_solutions": 12,
+          "groebner_basis_length": 12,
+          "equations": 11,
+          "algorithm": "base-field symmetric-section polynomial inversion"
+        }
+      ],
+      "target_solver": {
+        "scalar": 369,
+        "seconds": 12.450173467997956,
+        "line_phase_seconds": 1.6444831129992963,
+        "line_attempts": 91,
+        "distinct_lines": 53,
+        "split_lines": 12,
+        "line_rank": 11,
+        "line_relations_checked_in_jacobian": 3,
+        "trials": 20,
+        "smooth_relations": 4,
+        "factor_base_size": 13,
+        "linear_system_rank": 15,
+        "independent_relations": [
+          {
+            "kind": "line",
+            "counts": [
+              1,
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                0,
+                1,
+                10
+              ],
+              "parameter_Q": [
+                1,
+                4,
+                1
+              ],
+              "restriction_coefficients": [
+                0,
+                7,
+                7,
+                7
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  9,
+                  1
+                ],
+                [
+                  3,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                0,
+                1,
+                10
+              ],
+              "parameter_Q": [
+                1,
+                4,
+                3
+              ],
+              "restriction_coefficients": [
+                0,
+                7,
+                6,
+                7
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  10,
+                  1
+                ],
+                [
+                  4,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                7,
+                1
+              ],
+              "parameter_Q": [
+                1,
+                7,
+                6
+              ],
+              "restriction_coefficients": [
+                0,
+                4,
+                2,
+                6
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  10,
+                  1
+                ],
+                [
+                  7,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                4,
+                1
+              ],
+              "parameter_Q": [
+                1,
+                8,
+                4
+              ],
+              "restriction_coefficients": [
+                0,
+                2,
+                0,
+                8
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  9,
+                  1
+                ],
+                [
+                  4,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              1,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                0,
+                1,
+                10
+              ],
+              "parameter_Q": [
+                1,
+                11,
+                2
+              ],
+              "restriction_coefficients": [
+                0,
+                3,
+                6,
+                7
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  9,
+                  1
+                ],
+                [
+                  5,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                0,
+                1,
+                10
+              ],
+              "parameter_Q": [
+                1,
+                7,
+                0
+              ],
+              "restriction_coefficients": [
+                0,
+                0,
+                0,
+                7
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  3
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                1,
+                12
+              ],
+              "parameter_Q": [
+                1,
+                0,
+                0
+              ],
+              "restriction_coefficients": [
+                0,
+                9,
+                11,
+                6
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  8,
+                  1
+                ],
+                [
+                  1,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                8,
+                4
+              ],
+              "parameter_Q": [
+                1,
+                3,
+                0
+              ],
+              "restriction_coefficients": [
+                0,
+                0,
+                1
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 2
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              1,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                10,
+                12
+              ],
+              "parameter_Q": [
+                1,
+                3,
+                0
+              ],
+              "restriction_coefficients": [
+                0,
+                10,
+                12
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  10,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 2
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              2,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                7,
+                1
+              ],
+              "parameter_Q": [
+                1,
+                10,
+                12
+              ],
+              "restriction_coefficients": [
+                0,
+                5,
+                9
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  11,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 2
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              1,
+              2,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                11,
+                2
+              ],
+              "parameter_Q": [
+                1,
+                10,
+                6
+              ],
+              "restriction_coefficients": [
+                0,
+                5,
+                9,
+                6
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  9,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "smooth_divisor",
+            "a": 2123,
+            "b": 1365,
+            "counts": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rhs": 2123
+          },
+          {
+            "kind": "smooth_divisor",
+            "a": 1654,
+            "b": 918,
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3,
+              0,
+              0
+            ],
+            "rhs": 1654
+          },
+          {
+            "kind": "smooth_divisor",
+            "a": 387,
+            "b": 246,
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              1
+            ],
+            "rhs": 387
+          },
+          {
+            "kind": "smooth_divisor",
+            "a": 878,
+            "b": 1324,
+            "counts": [
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 878
+          }
+        ],
+        "algorithm": "line-assisted rational-point index calculus",
+        "claim": "Exact geometric relations plus target DLP; not full optimized Diem or an exponent claim"
+      },
+      "target_solver_used": true,
+      "target_group_enumeration_used": false,
+      "source_log_used_in_transfer": false,
+      "all_image_coordinates_in_base_field": true,
+      "limits": [
+        "Bounded retries, not a universal exceptional-chart proof.",
+        "Line-assisted solver is not the full Diem large-prime implementation.",
+        "Small-field experiments do not establish an asymptotic or practical advantage."
+      ],
+      "source_pollard_rho": {
+        "runs": [
+          {
+            "scalar": 369,
+            "seconds": 0.015317354002036154,
+            "group_additions": 144,
+            "restarts": 0,
+            "seed": 20261121,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 369,
+            "seconds": 0.010265860000799876,
+            "group_additions": 144,
+            "restarts": 0,
+            "seed": 20261122,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 369,
+            "seconds": 0.0068013529999007005,
+            "group_additions": 69,
+            "restarts": 0,
+            "seed": 20261123,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 369,
+            "seconds": 0.007936085003166227,
+            "group_additions": 192,
+            "restarts": 0,
+            "seed": 20261124,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 369,
+            "seconds": 0.009278677000111202,
+            "group_additions": 252,
+            "restarts": 0,
+            "seed": 20261125,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          }
+        ],
+        "median_seconds": 0.009278677000111202
+      },
+      "source_bsgs": {
+        "scalar": 369,
+        "seconds": 0.0018971380013681483,
+        "group_additions": 54,
+        "baby_steps": 47,
+        "algorithm": "BSGS",
+        "interval_size": 2137
+      },
+      "basic_target_comparison": {
+        "scalar": 369,
+        "seconds": 38.13252270799785,
+        "trials": 69,
+        "smooth_relations": 17,
+        "factor_base_size": 13,
+        "linear_system_rank": 14,
+        "independent_relations": [
+          {
+            "a": 1545,
+            "b": 1591,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 1
+          },
+          {
+            "a": 1929,
+            "b": 963,
+            "factor_base_coefficients": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rank": 2
+          },
+          {
+            "a": 1678,
+            "b": 1656,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3
+            ],
+            "rank": 3
+          },
+          {
+            "a": 2122,
+            "b": 1079,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              1,
+              1,
+              0,
+              0
+            ],
+            "rank": 4
+          },
+          {
+            "a": 519,
+            "b": 227,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "rank": 5
+          },
+          {
+            "a": 1351,
+            "b": 1617,
+            "factor_base_coefficients": [
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 6
+          },
+          {
+            "a": 1730,
+            "b": 1917,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 7
+          },
+          {
+            "a": 2123,
+            "b": 1365,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rank": 8
+          },
+          {
+            "a": 1654,
+            "b": 918,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              3,
+              0,
+              0
+            ],
+            "rank": 9
+          },
+          {
+            "a": 387,
+            "b": 246,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              1
+            ],
+            "rank": 10
+          },
+          {
+            "a": 878,
+            "b": 1324,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 11
+          },
+          {
+            "a": 1673,
+            "b": 2060,
+            "factor_base_coefficients": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            "rank": 12
+          },
+          {
+            "a": 1301,
+            "b": 380,
+            "factor_base_coefficients": [
+              0,
+              0,
+              1,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 13
+          },
+          {
+            "a": 1588,
+            "b": 1774,
+            "factor_base_coefficients": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rank": 14
+          }
+        ],
+        "algorithm": "basic rational-point smooth-divisor index calculus",
+        "claim": "Actual target Jacobian DLP; not an optimized Diem solver or speedup claim"
+      },
+      "generation_scalar_verified_only_after_solve": true
+    },
+    {
+      "status": "passed",
+      "scalar": 1313,
+      "p": 19,
+      "r": 6871,
+      "seconds": 41.408708153998305,
+      "source_curve": "Elliptic Curve defined by y^2 = x^3 + (17*z^2+6)*x + (5*z^2+3*z) over Finite Field in z of size 19^3",
+      "source_field": {
+        "characteristic": 19,
+        "degree": 3,
+        "order": 6859,
+        "modulus": "x^3 + 4*x + 17"
+      },
+      "source_generator": {
+        "x": "6*z^2 + 13*z + 1",
+        "y": "13*z^2 + 18*z + 17"
+      },
+      "source_target": {
+        "x": "9*z^2 + 4*z + 15",
+        "y": "18*z^2 + 5*z + 12"
+      },
+      "quartic": "X^2*Y^2 + 2*X*Y^3 - 8*Y^4 - 6*X^3*Z - 7*X^2*Y*Z - 2*X*Y^2*Z - 5*Y^3*Z + 2*X^2*Z^2 - X*Y*Z^2 - 3*Y^2*Z^2 - 6*X*Z^3 - 3*Y*Z^3 + 7*Z^4",
+      "isogeny_steps": 1,
+      "isogeny_kernels": [
+        "x + 10*z^2 + 11*z + 11"
+      ],
+      "obstruction_walk": [
+        {
+          "curve": "Elliptic Curve defined by y^2 = x^3 + (2*z^2+11*z+7)*x + (6*z^2+13*z+2) over Finite Field in z of size 19^3",
+          "steps": 1,
+          "kernels_tested": 1,
+          "usable": true
+        }
+      ],
+      "setup_seconds": 18.676559687999543,
+      "sections_seconds": 4.043488018000062,
+      "section_certificate": {
+        "diagonal_constraint_rank": 112,
+        "section_dimension": 8,
+        "sampled_curve_points": 192,
+        "extension_field_point_enumeration_used": false,
+        "exact_diagonal_identities_verified": 8,
+        "maximum_total_degree": 8
+      },
+      "interpolation_holdouts": 12,
+      "chart_failures": [
+        {
+          "attempt": 0,
+          "multiplier": 1,
+          "reason": "evaluation pole"
+        },
+        {
+          "attempt": 1,
+          "multiplier": 303,
+          "reason": "evaluation pole"
+        },
+        {
+          "attempt": 2,
+          "multiplier": 4855,
+          "reason": "Inversion chart has fiber dimension -1; a common-scalar retry is required"
+        }
+      ],
+      "source_randomization_multiplier": 2144,
+      "inversions": [
+        {
+          "seconds": 1.6013858970000001,
+          "ordered_solutions": 12,
+          "groebner_basis_length": 12,
+          "equations": 11,
+          "algorithm": "base-field symmetric-section polynomial inversion"
+        },
+        {
+          "seconds": 0.7922369170009915,
+          "ordered_solutions": 6,
+          "groebner_basis_length": 12,
+          "equations": 11,
+          "algorithm": "base-field symmetric-section polynomial inversion"
+        },
+        {
+          "seconds": 1.2501422649984306,
+          "ordered_solutions": 12,
+          "groebner_basis_length": 12,
+          "equations": 11,
+          "algorithm": "base-field symmetric-section polynomial inversion"
+        }
+      ],
+      "target_solver": {
+        "scalar": 1313,
+        "seconds": 9.107428455001354,
+        "line_phase_seconds": 2.571356544001901,
+        "line_attempts": 44,
+        "distinct_lines": 36,
+        "split_lines": 20,
+        "line_rank": 19,
+        "line_relations_checked_in_jacobian": 3,
+        "trials": 8,
+        "smooth_relations": 2,
+        "factor_base_size": 19,
+        "linear_system_rank": 21,
+        "independent_relations": [
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              3,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                3,
+                13
+              ],
+              "parameter_Q": [
+                1,
+                4,
+                6
+              ],
+              "restriction_coefficients": [
+                0,
+                11
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 3
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              2
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                14,
+                0
+              ],
+              "parameter_Q": [
+                1,
+                10,
+                0
+              ],
+              "restriction_coefficients": [
+                0,
+                13,
+                6,
+                8
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  2,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              1,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                18,
+                16
+              ],
+              "parameter_Q": [
+                1,
+                14,
+                0
+              ],
+              "restriction_coefficients": [
+                0,
+                4,
+                2
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  17,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 2
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                6,
+                1
+              ],
+              "parameter_Q": [
+                1,
+                17,
+                3
+              ],
+              "restriction_coefficients": [
+                0,
+                10,
+                0,
+                1
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  16,
+                  1
+                ],
+                [
+                  3,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                11,
+                16
+              ],
+              "parameter_Q": [
+                1,
+                0,
+                0
+              ],
+              "restriction_coefficients": [
+                0,
+                18,
+                6,
+                8
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  17,
+                  1
+                ],
+                [
+                  6,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                13,
+                18
+              ],
+              "parameter_Q": [
+                1,
+                14,
+                0
+              ],
+              "restriction_coefficients": [
+                0,
+                6,
+                12,
+                18
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  8,
+                  1
+                ],
+                [
+                  4,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                0,
+                11
+              ],
+              "parameter_Q": [
+                1,
+                5,
+                11
+              ],
+              "restriction_coefficients": [
+                0,
+                2,
+                1,
+                2
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  5,
+                  1
+                ],
+                [
+                  4,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                1,
+                12
+              ],
+              "parameter_Q": [
+                1,
+                10,
+                8
+              ],
+              "restriction_coefficients": [
+                0,
+                2,
+                2,
+                10
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  17,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                1,
+                12
+              ],
+              "parameter_Q": [
+                1,
+                10,
+                0
+              ],
+              "restriction_coefficients": [
+                0,
+                0,
+                1
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 2
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              1,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                5,
+                17
+              ],
+              "parameter_Q": [
+                1,
+                9,
+                3
+              ],
+              "restriction_coefficients": [
+                0,
+                2,
+                9,
+                4
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  17,
+                  1
+                ],
+                [
+                  14,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                2,
+                10
+              ],
+              "parameter_Q": [
+                1,
+                9,
+                3
+              ],
+              "restriction_coefficients": [
+                0,
+                2,
+                1,
+                9
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  11,
+                  1
+                ],
+                [
+                  10,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                0,
+                11
+              ],
+              "parameter_Q": [
+                1,
+                10,
+                8
+              ],
+              "restriction_coefficients": [
+                0,
+                13,
+                13,
+                13
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  11,
+                  1
+                ],
+                [
+                  7,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                5,
+                17
+              ],
+              "parameter_Q": [
+                1,
+                10,
+                8
+              ],
+              "restriction_coefficients": [
+                0,
+                9,
+                18,
+                11
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  6,
+                  1
+                ],
+                [
+                  1,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                5,
+                17
+              ],
+              "parameter_Q": [
+                1,
+                0,
+                0
+              ],
+              "restriction_coefficients": [
+                0,
+                12,
+                6,
+                12
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  5,
+                  1
+                ],
+                [
+                  4,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                2,
+                10
+              ],
+              "parameter_Q": [
+                1,
+                10,
+                0
+              ],
+              "restriction_coefficients": [
+                0,
+                15,
+                1,
+                13
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  8,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                6,
+                1
+              ],
+              "parameter_Q": [
+                1,
+                0,
+                0
+              ],
+              "restriction_coefficients": [
+                0,
+                13,
+                16,
+                18
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  9,
+                  1
+                ],
+                [
+                  7,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                2,
+                10
+              ],
+              "parameter_Q": [
+                1,
+                18,
+                16
+              ],
+              "restriction_coefficients": [
+                0,
+                3,
+                13,
+                7
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  7,
+                  1
+                ],
+                [
+                  2,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                11,
+                16
+              ],
+              "parameter_Q": [
+                1,
+                5,
+                17
+              ],
+              "restriction_coefficients": [
+                0,
+                0,
+                12,
+                16
+              ],
+              "finite_roots": [
+                [
+                  4,
+                  1
+                ],
+                [
+                  0,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                2,
+                10
+              ],
+              "parameter_Q": [
+                1,
+                6,
+                13
+              ],
+              "restriction_coefficients": [
+                0,
+                7,
+                18,
+                16
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  13,
+                  1
+                ],
+                [
+                  12,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "smooth_divisor",
+            "a": 6289,
+            "b": 1980,
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 6289
+          },
+          {
+            "kind": "smooth_divisor",
+            "a": 5339,
+            "b": 5904,
+            "counts": [
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              1,
+              0
+            ],
+            "rhs": 5339
+          }
+        ],
+        "algorithm": "line-assisted rational-point index calculus",
+        "claim": "Exact geometric relations plus target DLP; not full optimized Diem or an exponent claim"
+      },
+      "target_solver_used": true,
+      "target_group_enumeration_used": false,
+      "source_log_used_in_transfer": false,
+      "all_image_coordinates_in_base_field": true,
+      "limits": [
+        "Bounded retries, not a universal exceptional-chart proof.",
+        "Line-assisted solver is not the full Diem large-prime implementation.",
+        "Small-field experiments do not establish an asymptotic or practical advantage."
+      ],
+      "source_pollard_rho": {
+        "runs": [
+          {
+            "scalar": 1313,
+            "seconds": 0.011087674000009429,
+            "group_additions": 222,
+            "restarts": 0,
+            "seed": 20261127,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 1313,
+            "seconds": 0.011817205999250291,
+            "group_additions": 174,
+            "restarts": 0,
+            "seed": 20261128,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 1313,
+            "seconds": 0.013206356001319364,
+            "group_additions": 528,
+            "restarts": 0,
+            "seed": 20261129,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 1313,
+            "seconds": 0.0126355690008495,
+            "group_additions": 225,
+            "restarts": 0,
+            "seed": 20261130,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 1313,
+            "seconds": 0.008332170997164212,
+            "group_additions": 162,
+            "restarts": 0,
+            "seed": 20261131,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          }
+        ],
+        "median_seconds": 0.011817205999250291
+      },
+      "source_bsgs": {
+        "scalar": 1313,
+        "seconds": 0.0018878369992307853,
+        "group_additions": 98,
+        "baby_steps": 83,
+        "algorithm": "BSGS",
+        "interval_size": 6871
+      },
+      "basic_target_comparison": {
+        "scalar": 1313,
+        "seconds": 389.25379169000007,
+        "trials": 293,
+        "smooth_relations": 71,
+        "factor_base_size": 19,
+        "linear_system_rank": 20,
+        "independent_relations": [
+          {
+            "a": 191,
+            "b": 3480,
+            "factor_base_coefficients": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rank": 1
+          },
+          {
+            "a": 5504,
+            "b": 2420,
+            "factor_base_coefficients": [
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            "rank": 2
+          },
+          {
+            "a": 5892,
+            "b": 6300,
+            "factor_base_coefficients": [
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "rank": 3
+          },
+          {
+            "a": 1591,
+            "b": 5125,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "rank": 4
+          },
+          {
+            "a": 218,
+            "b": 642,
+            "factor_base_coefficients": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 5
+          },
+          {
+            "a": 3482,
+            "b": 5032,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            "rank": 6
+          },
+          {
+            "a": 4619,
+            "b": 5078,
+            "factor_base_coefficients": [
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            "rank": 7
+          },
+          {
+            "a": 4792,
+            "b": 340,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            "rank": 8
+          },
+          {
+            "a": 6005,
+            "b": 2844,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "rank": 9
+          },
+          {
+            "a": 4671,
+            "b": 5399,
+            "factor_base_coefficients": [
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 10
+          },
+          {
+            "a": 6293,
+            "b": 766,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0
+            ],
+            "rank": 11
+          },
+          {
+            "a": 1105,
+            "b": 1766,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0
+            ],
+            "rank": 12
+          },
+          {
+            "a": 4033,
+            "b": 1487,
+            "factor_base_coefficients": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 13
+          },
+          {
+            "a": 1620,
+            "b": 2480,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 14
+          },
+          {
+            "a": 3450,
+            "b": 6028,
+            "factor_base_coefficients": [
+              0,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 15
+          },
+          {
+            "a": 1463,
+            "b": 2883,
+            "factor_base_coefficients": [
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0
+            ],
+            "rank": 16
+          },
+          {
+            "a": 1972,
+            "b": 4141,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            "rank": 17
+          },
+          {
+            "a": 2417,
+            "b": 207,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 18
+          },
+          {
+            "a": 4827,
+            "b": 6473,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 19
+          },
+          {
+            "a": 6791,
+            "b": 4704,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rank": 20
+          }
+        ],
+        "algorithm": "basic rational-point smooth-divisor index calculus",
+        "claim": "Actual target Jacobian DLP; not an optimized Diem solver or speedup claim"
+      },
+      "generation_scalar_verified_only_after_solve": true
+    },
+    {
+      "status": "passed",
+      "scalar": 11954,
+      "p": 31,
+      "r": 29641,
+      "seconds": 96.22591356200064,
+      "source_curve": "Elliptic Curve defined by y^2 = x^3 + (4*z^2+21*z+22)*x + (11*z^2+28*z+11) over Finite Field in z of size 31^3",
+      "source_field": {
+        "characteristic": 31,
+        "degree": 3,
+        "order": 29791,
+        "modulus": "x^3 + x + 28"
+      },
+      "source_generator": {
+        "x": "7*z^2 + 26*z + 5",
+        "y": "10"
+      },
+      "source_target": {
+        "x": "11*z^2 + 16*z + 30",
+        "y": "17*z^2 + 22*z + 17"
+      },
+      "quartic": "X^2*Y^2 + 11*X*Y^3 + 15*Y^4 + X^3*Z - 10*X^2*Y*Z - 14*X*Y^2*Z - Y^3*Z - 9*X^2*Z^2 - 11*X*Y*Z^2 + 13*Y^2*Z^2 + 13*X*Z^3 - 6*Y*Z^3 - 8*Z^4",
+      "isogeny_steps": 0,
+      "isogeny_kernels": [],
+      "obstruction_walk": [
+        {
+          "curve": "Elliptic Curve defined by y^2 = x^3 + (4*z^2+21*z+22)*x + (11*z^2+28*z+11) over Finite Field in z of size 31^3",
+          "steps": 0,
+          "kernels_tested": 3,
+          "usable": true
+        }
+      ],
+      "setup_seconds": 41.90462354999909,
+      "sections_seconds": 7.556142808000004,
+      "section_certificate": {
+        "diagonal_constraint_rank": 112,
+        "section_dimension": 8,
+        "sampled_curve_points": 192,
+        "extension_field_point_enumeration_used": false,
+        "exact_diagonal_identities_verified": 8,
+        "maximum_total_degree": 8
+      },
+      "interpolation_holdouts": 12,
+      "chart_failures": [],
+      "source_randomization_multiplier": 1,
+      "inversions": [
+        {
+          "seconds": 1.9531517750001512,
+          "ordered_solutions": 6,
+          "groebner_basis_length": 12,
+          "equations": 11,
+          "algorithm": "base-field symmetric-section polynomial inversion"
+        },
+        {
+          "seconds": 2.277394296001148,
+          "ordered_solutions": 12,
+          "groebner_basis_length": 16,
+          "equations": 11,
+          "algorithm": "base-field symmetric-section polynomial inversion"
+        },
+        {
+          "seconds": 2.1688593439976103,
+          "ordered_solutions": 12,
+          "groebner_basis_length": 12,
+          "equations": 11,
+          "algorithm": "base-field symmetric-section polynomial inversion"
+        }
+      ],
+      "target_solver": {
+        "scalar": 11954,
+        "seconds": 30.880743136000092,
+        "line_phase_seconds": 7.373576287001924,
+        "line_attempts": 87,
+        "distinct_lines": 75,
+        "split_lines": 31,
+        "line_rank": 31,
+        "line_relations_checked_in_jacobian": 3,
+        "trials": 10,
+        "smooth_relations": 2,
+        "factor_base_size": 31,
+        "linear_system_rank": 33,
+        "independent_relations": [
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                13,
+                7
+              ],
+              "parameter_Q": [
+                1,
+                14,
+                23
+              ],
+              "restriction_coefficients": [
+                0,
+                15,
+                16
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  1,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 2
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                9,
+                8
+              ],
+              "parameter_Q": [
+                1,
+                24,
+                9
+              ],
+              "restriction_coefficients": [
+                0,
+                6,
+                29,
+                14
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  21,
+                  1
+                ],
+                [
+                  19,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                13,
+                7
+              ],
+              "parameter_Q": [
+                1,
+                2,
+                22
+              ],
+              "restriction_coefficients": [
+                0,
+                28,
+                22,
+                16
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  14,
+                  1
+                ],
+                [
+                  4,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                15,
+                26
+              ],
+              "parameter_Q": [
+                1,
+                16,
+                5
+              ],
+              "restriction_coefficients": [
+                0,
+                13,
+                14,
+                4
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  11,
+                  1
+                ],
+                [
+                  1,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                28,
+                1
+              ],
+              "parameter_Q": [
+                1,
+                29,
+                15
+              ],
+              "restriction_coefficients": [
+                0,
+                5,
+                8,
+                24
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  21,
+                  1
+                ],
+                [
+                  20,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                24,
+                9
+              ],
+              "parameter_Q": [
+                1,
+                0,
+                30
+              ],
+              "restriction_coefficients": [
+                0,
+                28,
+                26,
+                15
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  17,
+                  1
+                ],
+                [
+                  4,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              1,
+              0,
+              1,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                19,
+                9
+              ],
+              "parameter_Q": [
+                1,
+                2,
+                5
+              ],
+              "restriction_coefficients": [
+                0,
+                21,
+                23,
+                5
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  26,
+                  1
+                ],
+                [
+                  19,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                29,
+                2
+              ],
+              "parameter_Q": [
+                1,
+                17,
+                10
+              ],
+              "restriction_coefficients": [
+                0,
+                25,
+                23,
+                17
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  20,
+                  1
+                ],
+                [
+                  6,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                0,
+                12
+              ],
+              "parameter_Q": [
+                1,
+                22,
+                2
+              ],
+              "restriction_coefficients": [
+                0,
+                12,
+                1,
+                29
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  24,
+                  1
+                ],
+                [
+                  23,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                20,
+                27
+              ],
+              "parameter_Q": [
+                1,
+                0,
+                10
+              ],
+              "restriction_coefficients": [
+                0,
+                0,
+                20,
+                26
+              ],
+              "finite_roots": [
+                [
+                  4,
+                  1
+                ],
+                [
+                  0,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              1,
+              1,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                15,
+                26
+              ],
+              "parameter_Q": [
+                1,
+                24,
+                26
+              ],
+              "restriction_coefficients": [
+                0,
+                4,
+                2,
+                8
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  27,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                28,
+                1
+              ],
+              "parameter_Q": [
+                1,
+                27,
+                27
+              ],
+              "restriction_coefficients": [
+                0,
+                0,
+                12,
+                2
+              ],
+              "finite_roots": [
+                [
+                  25,
+                  1
+                ],
+                [
+                  0,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                4,
+                8
+              ],
+              "parameter_Q": [
+                1,
+                13,
+                3
+              ],
+              "restriction_coefficients": [
+                0,
+                24,
+                12,
+                22
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  28,
+                  1
+                ],
+                [
+                  25,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                0,
+                12
+              ],
+              "parameter_Q": [
+                1,
+                14,
+                23
+              ],
+              "restriction_coefficients": [
+                0,
+                19,
+                9,
+                14
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  4,
+                  1
+                ],
+                [
+                  2,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                23,
+                22
+              ],
+              "parameter_Q": [
+                1,
+                0,
+                0
+              ],
+              "restriction_coefficients": [
+                0,
+                22,
+                14,
+                14
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  23,
+                  1
+                ],
+                [
+                  7,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                24,
+                9
+              ],
+              "parameter_Q": [
+                1,
+                14,
+                23
+              ],
+              "restriction_coefficients": [
+                0,
+                20,
+                14,
+                30
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  28,
+                  1
+                ],
+                [
+                  17,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                13,
+                7
+              ],
+              "parameter_Q": [
+                1,
+                29,
+                2
+              ],
+              "restriction_coefficients": [
+                0,
+                3,
+                20,
+                8
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  12,
+                  1
+                ],
+                [
+                  1,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                4,
+                8
+              ],
+              "parameter_Q": [
+                1,
+                16,
+                5
+              ],
+              "restriction_coefficients": [
+                0,
+                27,
+                26,
+                28
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  12,
+                  1
+                ],
+                [
+                  7,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                27,
+                27
+              ],
+              "parameter_Q": [
+                1,
+                2,
+                22
+              ],
+              "restriction_coefficients": [
+                0,
+                30,
+                30,
+                24
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  20,
+                  1
+                ],
+                [
+                  2,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                13,
+                3
+              ],
+              "parameter_Q": [
+                1,
+                29,
+                15
+              ],
+              "restriction_coefficients": [
+                0,
+                0,
+                28,
+                26
+              ],
+              "finite_roots": [
+                [
+                  18,
+                  1
+                ],
+                [
+                  0,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                17,
+                10
+              ],
+              "parameter_Q": [
+                1,
+                29,
+                15
+              ],
+              "restriction_coefficients": [
+                0,
+                2,
+                7,
+                8
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  25,
+                  1
+                ],
+                [
+                  9,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                24,
+                26
+              ],
+              "parameter_Q": [
+                1,
+                14,
+                23
+              ],
+              "restriction_coefficients": [
+                0,
+                18,
+                3,
+                10
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  8,
+                  1
+                ],
+                [
+                  1,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              2,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                12,
+                26
+              ],
+              "parameter_Q": [
+                1,
+                0,
+                12
+              ],
+              "restriction_coefficients": [
+                0,
+                23,
+                23,
+                29
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  29,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                2,
+                5
+              ],
+              "parameter_Q": [
+                1,
+                14,
+                23
+              ],
+              "restriction_coefficients": [
+                0,
+                10,
+                22,
+                20
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  28,
+                  1
+                ],
+                [
+                  5,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                20,
+                27
+              ],
+              "parameter_Q": [
+                1,
+                0,
+                30
+              ],
+              "restriction_coefficients": [
+                0,
+                16,
+                18,
+                7
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  12,
+                  2
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                22,
+                2
+              ],
+              "parameter_Q": [
+                1,
+                17,
+                10
+              ],
+              "restriction_coefficients": [
+                0,
+                4,
+                7
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  26,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 2
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                4,
+                8
+              ],
+              "parameter_Q": [
+                1,
+                24,
+                26
+              ],
+              "restriction_coefficients": [
+                0,
+                25,
+                22,
+                12
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  18,
+                  1
+                ],
+                [
+                  6,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                24,
+                27
+              ],
+              "parameter_Q": [
+                1,
+                27,
+                27
+              ],
+              "restriction_coefficients": [
+                0,
+                3,
+                1,
+                23
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  29,
+                  1
+                ],
+                [
+                  6,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                17,
+                24
+              ],
+              "parameter_Q": [
+                1,
+                2,
+                22
+              ],
+              "restriction_coefficients": [
+                0,
+                3,
+                18,
+                6
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  19,
+                  1
+                ],
+                [
+                  9,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                24,
+                9
+              ],
+              "parameter_Q": [
+                1,
+                24,
+                3
+              ],
+              "restriction_coefficients": [
+                0,
+                8,
+                20,
+                26
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  26,
+                  1
+                ],
+                [
+                  9,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "line",
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              1
+            ],
+            "rhs": 0,
+            "certificate": {
+              "parameter_P": [
+                1,
+                0,
+                12
+              ],
+              "parameter_Q": [
+                1,
+                0,
+                10
+              ],
+              "restriction_coefficients": [
+                0,
+                17,
+                14,
+                1
+              ],
+              "finite_roots": [
+                [
+                  0,
+                  1
+                ],
+                [
+                  25,
+                  1
+                ],
+                [
+                  23,
+                  1
+                ]
+              ],
+              "infinity_multiplicity": 1
+            }
+          },
+          {
+            "kind": "smooth_divisor",
+            "a": 2066,
+            "b": 16276,
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0
+            ],
+            "rhs": 2066
+          },
+          {
+            "kind": "smooth_divisor",
+            "a": 3756,
+            "b": 7286,
+            "counts": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rhs": 3756
+          }
+        ],
+        "algorithm": "line-assisted rational-point index calculus",
+        "claim": "Exact geometric relations plus target DLP; not full optimized Diem or an exponent claim"
+      },
+      "target_solver_used": true,
+      "target_group_enumeration_used": false,
+      "source_log_used_in_transfer": false,
+      "all_image_coordinates_in_base_field": true,
+      "limits": [
+        "Bounded retries, not a universal exceptional-chart proof.",
+        "Line-assisted solver is not the full Diem large-prime implementation.",
+        "Small-field experiments do not establish an asymptotic or practical advantage."
+      ],
+      "source_pollard_rho": {
+        "runs": [
+          {
+            "scalar": 11954,
+            "seconds": 0.022679988000163576,
+            "group_additions": 474,
+            "restarts": 0,
+            "seed": 20261139,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 11954,
+            "seconds": 0.04667979400255717,
+            "group_additions": 663,
+            "restarts": 0,
+            "seed": 20261140,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 11954,
+            "seconds": 0.024568933997215936,
+            "group_additions": 207,
+            "restarts": 0,
+            "seed": 20261141,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 11954,
+            "seconds": 0.015339551002398366,
+            "group_additions": 180,
+            "restarts": 0,
+            "seed": 20261142,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          },
+          {
+            "scalar": 11954,
+            "seconds": 0.021504118001757888,
+            "group_additions": 432,
+            "restarts": 0,
+            "seed": 20261143,
+            "walk_table_size": 16,
+            "algorithm": "16-adding Pollard rho with Floyd collision detection",
+            "count_scope": "Walk additions only; wall time also includes table setup and verification"
+          }
+        ],
+        "median_seconds": 0.022679988000163576
+      },
+      "source_bsgs": {
+        "scalar": 11954,
+        "seconds": 0.008494191999488976,
+        "group_additions": 242,
+        "baby_steps": 173,
+        "algorithm": "BSGS",
+        "interval_size": 29641
+      },
+      "basic_target_comparison": {
+        "scalar": 11954,
+        "seconds": 507.96054027300124,
+        "trials": 324,
+        "smooth_relations": 69,
+        "factor_base_size": 31,
+        "linear_system_rank": 32,
+        "independent_relations": [
+          {
+            "a": 13751,
+            "b": 19335,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0
+            ],
+            "rank": 1
+          },
+          {
+            "a": 19403,
+            "b": 3144,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rank": 2
+          },
+          {
+            "a": 12485,
+            "b": 5212,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 3
+          },
+          {
+            "a": 21522,
+            "b": 20533,
+            "factor_base_coefficients": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 4
+          },
+          {
+            "a": 19,
+            "b": 27058,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 5
+          },
+          {
+            "a": 15155,
+            "b": 15497,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 6
+          },
+          {
+            "a": 13295,
+            "b": 3916,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1
+            ],
+            "rank": 7
+          },
+          {
+            "a": 17256,
+            "b": 19339,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 8
+          },
+          {
+            "a": 1379,
+            "b": 21951,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 9
+          },
+          {
+            "a": 7310,
+            "b": 22268,
+            "factor_base_coefficients": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 10
+          },
+          {
+            "a": 21156,
+            "b": 9494,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 11
+          },
+          {
+            "a": 24649,
+            "b": 14250,
+            "factor_base_coefficients": [
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0
+            ],
+            "rank": 12
+          },
+          {
+            "a": 11165,
+            "b": 16499,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 13
+          },
+          {
+            "a": 18453,
+            "b": 319,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0
+            ],
+            "rank": 14
+          },
+          {
+            "a": 988,
+            "b": 21075,
+            "factor_base_coefficients": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 15
+          },
+          {
+            "a": 27107,
+            "b": 7794,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 16
+          },
+          {
+            "a": 24999,
+            "b": 26335,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 17
+          },
+          {
+            "a": 11456,
+            "b": 9992,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              2,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 18
+          },
+          {
+            "a": 16809,
+            "b": 5195,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 19
+          },
+          {
+            "a": 22120,
+            "b": 4617,
+            "factor_base_coefficients": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 20
+          },
+          {
+            "a": 6674,
+            "b": 20157,
+            "factor_base_coefficients": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 21
+          },
+          {
+            "a": 27654,
+            "b": 4863,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 22
+          },
+          {
+            "a": 25656,
+            "b": 651,
+            "factor_base_coefficients": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 23
+          },
+          {
+            "a": 6936,
+            "b": 25955,
+            "factor_base_coefficients": [
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 24
+          },
+          {
+            "a": 20440,
+            "b": 28967,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rank": 25
+          },
+          {
+            "a": 3260,
+            "b": 670,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 26
+          },
+          {
+            "a": 9526,
+            "b": 7734,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "rank": 27
+          },
+          {
+            "a": 23841,
+            "b": 2704,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 28
+          },
+          {
+            "a": 13823,
+            "b": 19440,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 29
+          },
+          {
+            "a": 24976,
+            "b": 26163,
+            "factor_base_coefficients": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 30
+          },
+          {
+            "a": 8173,
+            "b": 25237,
+            "factor_base_coefficients": [
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 31
+          },
+          {
+            "a": 8832,
+            "b": 28134,
+            "factor_base_coefficients": [
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              0,
+              0
+            ],
+            "rank": 32
+          }
+        ],
+        "algorithm": "basic rational-point smooth-divisor index calculus",
+        "claim": "Actual target Jacobian DLP; not an optimized Diem solver or speedup claim"
+      },
+      "generation_scalar_verified_only_after_solve": true
+    }
+  ]
+}

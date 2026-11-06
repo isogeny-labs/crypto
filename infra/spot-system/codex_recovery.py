@@ -28,17 +28,49 @@ def resumable(thread):
             and not thread['status'].get('activeFlags'))
 
 
-def persisted_parents(local, threads, manifest):
+def interrupted_turn(client, thread):
+    latest = client.request('thread/turns/list',
+                            {'threadId': thread['id'], 'limit': 1, 'sortDirection': 'desc'})
+    turns = latest.get('data', [])
+    return bool(turns and turns[0].get('status') in {'interrupted', 'inProgress'})
+
+
+def start_app_server(socket, command, environment):
+    # The desktop may reconnect and launch the same local app server first.
+    # Adopt that authenticated local connection instead of creating a competing
+    # server or terminating the user's active connection on supervisor exit.
+    try:
+        client = Client(socket)
+    except (OSError, EOFError):
+        return subprocess.Popen(command, env=environment, cwd='/home/ec2-user'), None
+    try:
+        client.initialize()
+    except Exception:
+        client.close()
+        raise
+    return None, client
+
+
+def persisted_parents(local, threads, manifest, unavailable=None, archived=None):
     with sqlite3.connect('file:' + str(local / 'state_5.sqlite') + '?mode=ro', uri=True) as db:
-        persisted = {row[0] for row in db.execute('SELECT id FROM threads')}
+        persisted = dict(db.execute('SELECT id, archived FROM threads'))
     parents, empty = [], []
     for thread in threads:
         if not isinstance(thread.get('source'), str):
+            continue
+        if persisted.get(thread['id']):
+            if archived is not None:
+                archived.append(thread['id'])
             continue
         if thread['id'] not in persisted:
             has_rollout = any(thread['id'] in name for name in manifest['files'])
             if thread.get('status', {}).get('type') == 'idle' and not has_rollout:
                 empty.append(thread['id'])
+                continue
+            if unavailable is not None:
+                # Preserve unresolved enrollment for inspection without killing
+                # the app server and every other recoverable chat.
+                unavailable.append(thread)
                 continue
             raise ValueError('Enrolled work has no persisted thread: ' + thread['id'])
         parents.append(thread)
@@ -158,24 +190,23 @@ def main(args):
         raise ValueError('Enrolled Codex binary is unavailable')
     environment = os.environ.copy()
     environment.update(HOME='/home/ec2-user', CODEX_HOME='/home/ec2-user/.codex')
-    process = subprocess.Popen(['runuser', '-u', 'ec2-user', '--', str(binary),
-                                *config.get('codex_arguments', []),
-                                'app-server', '--listen', 'unix://'], env=environment,
-                               cwd='/home/ec2-user')
     socket = local/'app-server-control/app-server-control.sock'
-    client = None
+    process, client = start_app_server(socket,
+        ['runuser', '-u', 'ec2-user', '--', str(binary),
+         *config.get('codex_arguments', []), 'app-server', '--listen', 'unix://'], environment)
     try:
-        for _ in range(60):
-            if process.poll() is not None:
-                raise RuntimeError('Codex app-server exited during startup')
-            try:
-                client = Client(socket)
-                client.initialize()
-                break
-            except (OSError, EOFError):
-                stop.wait(1)
         if client is None:
-            raise TimeoutError('Codex app-server did not become ready')
+            for _ in range(60):
+                if process.poll() is not None:
+                    raise RuntimeError('Codex app-server exited during startup')
+                try:
+                    client = Client(socket)
+                    client.initialize()
+                    break
+                except (OSError, EOFError):
+                    stop.wait(1)
+            if client is None:
+                raise TimeoutError('Codex app-server did not become ready')
         # Dependent experiment recovery needs the home mount before it can
         # start. Release that ordering barrier before continuing agent turns.
         notify_ready()
@@ -208,7 +239,11 @@ def main(args):
                 stop.wait(5)
             if stop.is_set():
                 return
-        parents, omitted_empty = persisted_parents(local, threads, manifest)
+        unavailable, archived = [], []
+        parents, omitted_empty = persisted_parents(local, threads, manifest, unavailable, archived)
+        if unavailable:
+            atomic_json(durable / ('codex-unavailable-' + owner + '.json'),
+                        {'owner': owner, 'observed': int(time.time()), 'threads': unavailable})
         resumed = []
         for thread in parents:
             # Spawned children belong to their original parent; starting them
@@ -221,6 +256,10 @@ def main(args):
                                                        'excludeTurns': True})['thread']
             resumed.append(thread['id'])
             if resumable(thread) and current.get('status', {}).get('type') != 'active':
+                # Retained inventory can outlive a completed/failed turn. Only
+                # continue work whose persisted turn was actually interrupted.
+                if not interrupted_turn(client, thread):
+                    continue
                 client.request('turn/start', {'threadId': thread['id'], 'input': [{'type':'text',
                     'text':'Continue the existing user-authorized task after this Spot host migration. '
                            'First reconcile saved artifacts and any external jobs or side effects '
@@ -234,12 +273,14 @@ def main(args):
             expression_attribute_values={':yes':{'BOOL':True}, ':owner':{'S':owner}})
         notify_ready()
         while not stop.is_set():
-            if process.poll() is not None:
+            if process is not None and process.poll() is not None:
                 raise RuntimeError('Codex app-server exited')
             active = client.inventory()
             saved = snapshot(local, root, active, include_auth=True)
             report('running', pending=any(t.get('status',{}).get('type') == 'active' for t in active),
-                   loaded=len(active), resumed=len(resumed), omitted_empty=omitted_empty, server_pid=process.pid,
+                   loaded=len(active), resumed=len(resumed), omitted_empty=omitted_empty, server_pid=process.pid if process is not None else None,
+                   unavailable_threads=[t['id'] for t in unavailable],
+                   archived_threads=archived,
                    snapshot_prune_errors=saved['prune_errors'])
             stop.wait(config.get('snapshot_interval_seconds', 60))
         # Retain a final committed generation before the OS stops the process.
@@ -247,7 +288,7 @@ def main(args):
     finally:
         if client:
             client.close()
-        if process.poll() is None:
+        if process is not None and process.poll() is None:
             process.terminate()
             try:
                 process.wait(timeout=30)

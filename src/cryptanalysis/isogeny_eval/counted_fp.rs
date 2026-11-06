@@ -9,8 +9,34 @@
 //! The unit is the one of the round-4 measurements
 //! (`research/isogeny_fibers_20261010/round4/16_3_vertical_margin`): `M`
 //! counts every product in `F_p`, including each `a_i·b_j` inside polynomial
-//! arithmetic (see [`super::poly`]); additions and subtractions are free;
-//! `I` is one extended-Euclid inversion.
+//! arithmetic (see [`super::poly`]); additions and subtractions are free unless
+//! asked for (below);
+//! `I` is one extended-Euclid inversion.  Products done by the NTT
+//! ([`super::ntt`]) are counted as *word multiplications* (`W`, one
+//! Montgomery product modulo a 62-bit NTT prime) plus the `M` of their CRT
+//! reconstruction; [`OpTally::mul_equivalents`] converts `W` at
+//! [`super::ntt::NTT_WORD_COST_IN_M`]` = 1` `M` each.
+//!
+//! **Additions (opt-in, round 7).**  A field built by
+//! [`PrimeField::counted_with_adds`] additionally tallies additions and
+//! subtractions in an [`AddTally`] (read with [`PrimeField::add_tally`] or
+//! [`PrimeField::complete_tally`]); [`OpTally`] itself is unchanged.  One *addition*
+//! is one modular addition, subtraction or negation of canonical residues
+//! (the add/sub plus its conditional correction counts once), whether done
+//! by [`PrimeField::add`], [`PrimeField::sub`], [`PrimeField::neg`] or fused
+//! inside a polynomial product.  `add` is the count in `F_p` (including the
+//! `n − 1` accumulations per schoolbook output coefficient, and the two
+//! `u128` accumulations per output coefficient of the NTT's CRT
+//! reconstruction); `word_add` is the count of additions and subtractions
+//! modulo the NTT primes (butterflies, Garner differences, conditional
+//! input reductions).  A plain [`PrimeField::counted`] field leaves both at
+//! zero and its `M`, `W`, `I` are exactly those of the frozen round-4 to
+//! round-6 measurements; [`OpTally::mul_equivalents`] never includes
+//! additions.  [`CompleteTally::weighted`] prices them at `a·M` each.
+//!
+//! Which polynomial multiplication runs is a property of the field
+//! ([`PolyMul`], default [`PolyMul::Auto`]); [`PrimeField::with_poly_mul`]
+//! selects [`PolyMul::Karatsuba`] to reproduce the round-4 counts.
 //!
 //! Elements are plain `u64` values in canonical form `0 ≤ a < p`.  Every
 //! method assumes canonical inputs (checked by `debug_assert!` only) and
@@ -25,6 +51,37 @@ pub trait OpCounter {
     fn count_mul(&self, n: u64);
     /// One inversion in `F_p` happened.
     fn count_inv(&self);
+    /// `n` word multiplications modulo an NTT prime happened (inside
+    /// [`super::ntt::mul_ntt`]).  The default records them as `n` `M`
+    /// (the stated conversion, [`super::ntt::NTT_WORD_COST_IN_M`]).
+    #[inline]
+    fn count_word_mul(&self, n: u64) {
+        self.count_mul(n.saturating_mul(super::ntt::NTT_WORD_COST_IN_M));
+    }
+    /// `n` additions, subtractions or negations in `F_p` happened.  The
+    /// default records nothing (additions are free unless a counter asks).
+    #[inline]
+    fn count_add(&self, _n: u64) {}
+    /// `n` additions or subtractions modulo an NTT prime happened (inside
+    /// [`super::ntt::mul_ntt`]).  The default records nothing.
+    #[inline]
+    fn count_word_add(&self, _n: u64) {}
+}
+
+/// How [`super::poly::mul`] multiplies polynomials over a [`PrimeField`].
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum PolyMul {
+    /// Karatsuba with schoolbook below
+    /// [`super::poly::KARATSUBA_THRESHOLD`] (the round-4 arithmetic; its
+    /// counts equal those of round-4 lead 16.3).
+    Karatsuba,
+    /// The three-prime NTT ([`super::ntt::mul_ntt`]) when the shorter
+    /// operand has at least [`super::poly::NTT_THRESHOLD`] coefficients,
+    /// Karatsuba otherwise.
+    #[default]
+    Auto,
+    /// The NTT for every product (for tests and measurements).
+    Ntt,
 }
 
 /// The counter that counts nothing (zero-sized, free).
@@ -36,14 +93,25 @@ impl OpCounter for NoCount {
     fn count_mul(&self, _n: u64) {}
     #[inline(always)]
     fn count_inv(&self) {}
+    #[inline(always)]
+    fn count_word_mul(&self, _n: u64) {}
+    #[inline(always)]
+    fn count_add(&self, _n: u64) {}
+    #[inline(always)]
+    fn count_word_add(&self, _n: u64) {}
 }
 
 /// Running multiplication and inversion counts (single-threaded, via
-/// [`Cell`]).
+/// [`Cell`]), and, if asked for with [`OpCounts::with_adds`], additions.
 #[derive(Clone, Debug, Default)]
 pub struct OpCounts {
     mul: Cell<u64>,
     inv: Cell<u64>,
+    word: Cell<u64>,
+    add: Cell<u64>,
+    word_add: Cell<u64>,
+    /// Whether additions are tallied (off by default).
+    adds_on: bool,
 }
 
 impl OpCounter for OpCounts {
@@ -55,32 +123,132 @@ impl OpCounter for OpCounts {
     fn count_inv(&self) {
         self.inv.set(self.inv.get().wrapping_add(1));
     }
+    #[inline]
+    fn count_word_mul(&self, n: u64) {
+        self.word.set(self.word.get().wrapping_add(n));
+    }
+    #[inline]
+    fn count_add(&self, n: u64) {
+        if self.adds_on {
+            self.add.set(self.add.get().wrapping_add(n));
+        }
+    }
+    #[inline]
+    fn count_word_add(&self, n: u64) {
+        if self.adds_on {
+            self.word_add.set(self.word_add.get().wrapping_add(n));
+        }
+    }
 }
 
 impl OpCounts {
+    /// Counters that also tally additions (see the module documentation).
+    pub fn with_adds() -> Self {
+        OpCounts {
+            adds_on: true,
+            ..Default::default()
+        }
+    }
+
+    /// Whether additions are being tallied.
+    pub fn counts_adds(&self) -> bool {
+        self.adds_on
+    }
+
     /// The counts so far.
     pub fn snapshot(&self) -> OpTally {
         OpTally {
             mul: self.mul.get(),
             inv: self.inv.get(),
+            word: self.word.get(),
         }
     }
 
-    /// Set both counts to zero.
+    /// The addition counts so far (zero unless built by
+    /// [`OpCounts::with_adds`]).
+    pub fn add_snapshot(&self) -> AddTally {
+        AddTally {
+            add: self.add.get(),
+            word_add: self.word_add.get(),
+        }
+    }
+
+    /// Set all counts to zero.
     pub fn reset(&self) {
         self.mul.set(0);
         self.inv.set(0);
+        self.word.set(0);
+        self.add.set(0);
+        self.word_add.set(0);
     }
 }
 
-/// A frozen pair of counts: `mul` multiplications or squarings and `inv`
-/// inversions in `F_p`.
+/// Frozen counts: `mul` multiplications or squarings and `inv` inversions
+/// in `F_p`, `word` NTT word multiplications, and, only for a field built
+/// with [`PrimeField::counted_with_adds`], `add` additions in `F_p` and
+/// `word_add` additions modulo the NTT primes (zero otherwise).
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub struct OpTally {
-    /// Multiplications and squarings (`M`).
+    /// Multiplications and squarings in `F_p` (`M`).
     pub mul: u64,
     /// Inversions (`I`).
     pub inv: u64,
+    /// Word multiplications modulo the NTT primes (`W`, zero unless the NTT
+    /// ran).
+    pub word: u64,
+}
+
+/// Frozen addition counts (see the module documentation): `add` additions,
+/// subtractions and negations in `F_p`, `word_add` additions and
+/// subtractions modulo the NTT primes.  Both are zero unless the field was
+/// built with [`PrimeField::counted_with_adds`].
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct AddTally {
+    /// `A`: additions, subtractions and negations in `F_p`.
+    pub add: u64,
+    /// `WA`: additions and subtractions modulo the NTT primes.
+    pub word_add: u64,
+}
+
+impl AddTally {
+    /// The additions done since `earlier` (saturating at zero).
+    pub fn since(self, earlier: AddTally) -> AddTally {
+        AddTally {
+            add: self.add.saturating_sub(earlier.add),
+            word_add: self.word_add.saturating_sub(earlier.word_add),
+        }
+    }
+
+    /// `A + WA`: every counted addition, each of the same weight.
+    pub fn total(&self) -> u64 {
+        self.add.saturating_add(self.word_add)
+    }
+}
+
+/// [`OpTally`] and [`AddTally`] together.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct CompleteTally {
+    /// `M`, `W`, `I` (unchanged by whether additions are counted).
+    pub ops: OpTally,
+    /// `A`, `WA`.
+    pub adds: AddTally,
+}
+
+impl CompleteTally {
+    /// The operations done since `earlier`.
+    pub fn since(self, earlier: CompleteTally) -> CompleteTally {
+        CompleteTally {
+            ops: self.ops.since(earlier.ops),
+            adds: self.adds.since(earlier.adds),
+        }
+    }
+
+    /// `Meq + a·(A + WA)`: the multiplication equivalents with every
+    /// addition priced at `a` `M` (`a = 0` gives
+    /// [`OpTally::mul_equivalents`]).
+    pub fn weighted(&self, inv_cost: u64, a: f64) -> f64 {
+        self.ops.mul_equivalents(inv_cost) as f64 + a * self.adds.total() as f64
+    }
 }
 
 impl OpTally {
@@ -89,13 +257,18 @@ impl OpTally {
         OpTally {
             mul: self.mul.saturating_sub(earlier.mul),
             inv: self.inv.saturating_sub(earlier.inv),
+            word: self.word.saturating_sub(earlier.word),
         }
     }
 
-    /// `M + inv_cost·I`: one number in multiplication equivalents.  The
-    /// round-4 reports used `inv_cost = 91` (the Fermat cost at 61 bits).
+    /// `M + W·NTT_WORD_COST_IN_M + inv_cost·I`: one number in
+    /// multiplication equivalents (`W` at one `M` each, see
+    /// [`super::ntt`]).  The round-4 reports used `inv_cost = 91` (the
+    /// Fermat cost at 61 bits) and had `W = 0`.
     pub fn mul_equivalents(&self, inv_cost: u64) -> u64 {
-        self.mul.saturating_add(inv_cost.saturating_mul(self.inv))
+        self.mul
+            .saturating_add(self.word.saturating_mul(super::ntt::NTT_WORD_COST_IN_M))
+            .saturating_add(inv_cost.saturating_mul(self.inv))
     }
 }
 
@@ -110,6 +283,7 @@ pub struct PrimeField<C = NoCount> {
     /// `< p` can absorb before it must be reduced (at least 4 for `p < 2^63`).
     fold: usize,
     counter: C,
+    poly_mul: PolyMul,
 }
 
 /// Deterministic Miller–Rabin for every `u64` (the first twelve primes as
@@ -173,12 +347,33 @@ impl PrimeField<OpCounts> {
         Self::with_counter(p, OpCounts::default())
     }
 
+    /// Like [`PrimeField::counted`], and additionally tallies additions
+    /// ([`AddTally`]).  `M`, `W` and `I` are the
+    /// same as with [`PrimeField::counted`] for the same computation.
+    pub fn counted_with_adds(p: u64) -> Option<Self> {
+        Self::with_counter(p, OpCounts::with_adds())
+    }
+
     /// The counts so far.
     pub fn tally(&self) -> OpTally {
         self.counter.snapshot()
     }
 
-    /// Reset the counts to zero.
+    /// The addition counts so far (all zero unless the field was built by
+    /// [`PrimeField::counted_with_adds`]).
+    pub fn add_tally(&self) -> AddTally {
+        self.counter.add_snapshot()
+    }
+
+    /// [`PrimeField::tally`] and [`PrimeField::add_tally`] together.
+    pub fn complete_tally(&self) -> CompleteTally {
+        CompleteTally {
+            ops: self.tally(),
+            adds: self.add_tally(),
+        }
+    }
+
+    /// Reset the counts (including the addition counts) to zero.
     pub fn reset_counts(&self) {
         self.counter.reset();
     }
@@ -193,7 +388,24 @@ impl<C: OpCounter> PrimeField<C> {
         }
         let pm1 = (p - 1) as u128;
         let fold = ((u128::MAX - p as u128) / (pm1 * pm1)).min(1 << 20) as usize;
-        Some(PrimeField { p, fold, counter })
+        Some(PrimeField {
+            p,
+            fold,
+            counter,
+            poly_mul: PolyMul::default(),
+        })
+    }
+
+    /// The same field with polynomial multiplication `m` (see [`PolyMul`]).
+    pub fn with_poly_mul(mut self, m: PolyMul) -> Self {
+        self.poly_mul = m;
+        self
+    }
+
+    /// The polynomial multiplication [`super::poly::mul`] uses.
+    #[inline]
+    pub fn poly_mul(&self) -> PolyMul {
+        self.poly_mul
     }
 
     /// The modulus `p`.
@@ -212,6 +424,15 @@ impl<C: OpCounter> PrimeField<C> {
     #[inline]
     pub fn count_muls(&self, n: u64) {
         self.counter.count_mul(n);
+    }
+
+    /// Record `n` additions done outside [`PrimeField::add`] and
+    /// [`PrimeField::sub`] (for example the accumulations fused into
+    /// schoolbook polynomial multiplication).  Free unless additions are
+    /// counted.
+    #[inline]
+    pub fn count_adds(&self, n: u64) {
+        self.counter.count_add(n);
     }
 
     /// Products a `u128` accumulator can absorb between reductions.
@@ -242,6 +463,7 @@ impl<C: OpCounter> PrimeField<C> {
     #[inline]
     pub fn add(&self, a: u64, b: u64) -> u64 {
         debug_assert!(a < self.p && b < self.p);
+        self.counter.count_add(1);
         let s = a + b;
         if s >= self.p {
             s - self.p
@@ -254,6 +476,7 @@ impl<C: OpCounter> PrimeField<C> {
     #[inline]
     pub fn sub(&self, a: u64, b: u64) -> u64 {
         debug_assert!(a < self.p && b < self.p);
+        self.counter.count_add(1);
         if a >= b {
             a - b
         } else {
@@ -265,6 +488,7 @@ impl<C: OpCounter> PrimeField<C> {
     #[inline]
     pub fn neg(&self, a: u64) -> u64 {
         debug_assert!(a < self.p);
+        self.counter.count_add(1);
         if a == 0 {
             0
         } else {

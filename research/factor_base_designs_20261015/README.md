@@ -62,11 +62,54 @@ Status vocabulary:
 | 9 | Weighted-homogeneous towers | open | — | E9 |
 | 10 | Split `S₃` chain + towers | open | — | E10 |
 
+#### Prime-field arms measured: status at close-out (2026-10-19)
+
+Scored by κ = Δlog₂ field_ops / Δb against the break-even `m − 1`
+(Amendments 4 and 5). Every number is copied from
+[`runs/analysis-amendment4.txt`](runs/analysis-amendment4.txt) (p₁ series;
+"cells" = completed cells in the series; "n/r" = not run at that `m`). Verdicts
+are read at the sizes measured and are not extrapolated beyond them. The
+status is **cost-unfavourable** at `m = 2, 3` for every arm below, and at
+`m = 4` for A11, the only arm other than A0 measured there. No arm was run at
+`m = 4` except A0 and A11, so "`m ≤ 4`" is claimed only for A11.
+
+| arm | `m = 2`: κ (cells) vs 1 | `m = 3`: κ (cells) vs 2 | `m = 4`: κ (cells) vs 3 | status |
+|:--|:--|:--|:--|:--|
+| A0 (Kummer tower, incumbent) | 3.593 (8) | 7.468 (3) | 10.773 (2) | cost-unfavourable at `m = 2, 3`; **inconclusive** at `m = 4` (2 cells; its `t = 4` cell exhausts memory at 13 GB (C2) and again at 14.5 GB (L1, Amendment 5)) |
+| N (A0's null) | 3.596 (8) | 7.772 (3) | n/r | cost-unfavourable at `m = 2, 3` |
+| A1z | 6.050 (5) | 8.905 (3) | n/r | cost-unfavourable at `m = 2, 3` |
+| A1g | 5.809 (5) | 9.189 (3) | n/r | cost-unfavourable at `m = 2, 3` |
+| A4 | 4.902 (6) | 8.028 (3) | n/r | cost-unfavourable at `m = 2, 3` |
+| A11 | 3.995 (8) | 8.769 (4) | 14.886 (3) | cost-unfavourable at `m = 2, 3, 4` |
+| N11 (A11's shape null) | 4.014 (8) | 8.582 (3) | n/r | cost-unfavourable at `m = 2, 3` |
+| H1 | 3.535 (8) | 7.660 (3) | n/r | cost-unfavourable at `m = 2, 3` |
+| H2 | 3.923 (8) | 9.158 (3) | n/r | cost-unfavourable at `m = 2, 3` |
+
+Where σ and κ disagree, κ is the score: A1z and A1g sit at `D = 8` (their
+input degree) and A11 has a flat `D`, yet their κ is at or above A0's
+(Amendment 7). Designs 2, 3, 5–10 and 12–16 were not measured and keep their
+"open" status above.
+
+**Observation, not a claim: κ/(m − 1) by arm and arity.** Each quotient was
+recomputed from the κ and `m − 1` in `runs/analysis-amendment4.txt`:
+
+| arm | `m = 2` | `m = 3` | `m = 4` |
+|:--|:--|:--|:--|
+| A0 | 3.593 / 1 = 3.59 (8 cells) | 7.468 / 2 = 3.73 (3 cells) | 10.773 / 3 = 3.59 (2 cells, **inconclusive**) |
+| A11 | 3.995 / 1 = 3.995 (8 cells) | 8.769 / 2 = 4.38 (4 cells) | 14.886 / 3 = 4.96 (3 cells) |
+
+For A0 the quotient is 3.59, 3.73, 3.59; for A11 it is 3.995, 4.38, 4.96. The
+A0 values rest on 8, 3 and 2 cells, and the `m = 4` value is below the
+preregistered 3-cell floor. Each κ is a least-squares slope over 2–8 points
+of one series on one prime, with no interval recorded. Nothing is
+extrapolated: no value is stated for `m > 4`, for larger `t`, or for a deployed
+size, and the quotients are not a hypothesis test or a fitted law.
+
 ### Changing the equation
 
 | # | design | status | Lean | experiment |
 |:--|:--|:--|:--|:--|
-| 11 | Norm-divisibility chain over a Kummer fibre (prime) | **open: better presentation, no slope change** (§5: replicates on p₂; equals its own shape null; growth per bit no flatter, steeper at `m = 4`; cost-unfavourable on measured `field_ops`; `m = 4`, t ≥ 4 comparison needs > 14 GB, Amendments 5–6) | `chain_sound` (soundness at each root), `pencil_norm_factor` (the `m = 2` norm factorization), `norm_chain_excess` (one more equation than unknown, every `m`) | A11, F1–F4, C1–C4, L1, L2, L2r |
+| 11 | Norm-divisibility chain over a Kummer fibre (prime) | **open: better presentation, no slope change** (§5: replicates on p₂; equals its own shape null; growth per bit no flatter, steeper at `m = 4`; cost-unfavourable on measured `field_ops`; `m = 4`, t ≥ 4 comparison needs > 64 GB, Amendments 5, 6 and 12) | `chain_sound` (soundness at each root), `pencil_norm_factor` (the `m = 2` norm factorization), `norm_chain_excess` (one more equation than unknown, every `m`) | A11, F1–F4, C1–C4, L1, L2, L2r, H64-A0, H64-A11 |
 | 12 | Binary norm chain as an auxiliary-variable solver input (credits `research/nagao_relations/` open item 1) | open | `chain_sound` applies verbatim | E12 |
 | 13 | Algebraic large prime (partial divisibility) | open | — | E13 |
 
@@ -258,17 +301,214 @@ Each row now records the child's peak RSS.
 - **Reading:** this host cannot measure either open `m = 4` cell. Settling
   whether A11's constant factor survives at `m = 4`, `t ≥ 4` needs a host
   with well over 15 GB (the independent lab runner, not reachable from these
-  containers). No recorded verdict changed.
+  containers). No recorded verdict changed. Amendment 12, below, reran both
+  cells on 64 GiB hosts.
+
+### Amendment 12: the two `m = 4` cells on a 64 GiB host (run-20261021T0056Z)
+
+**Numbering note, 2026-10-26 (renames only; changes no rule, threshold, prediction, row or byte of any record).** This amendment was registered and run as “Amendment 7” with cells X1 and X2 (run records `runs/X1-A0-m4-t4.*`, `runs/X2-A11-m4-t5.*`, runner `scripts/run_amendment7.sh`, flag `analyze --amendment7`). `main` meanwhile gained its own Amendments 7 and 8 and its own X1 cell, so on merging `main` it is renumbered **Amendment 12** with cells **H64-A0** (was X1) and **H64-A11** (was X2); files are renamed with `git mv` to `runs/H64-A0-m4-t4.*`, `runs/H64-A11-m4-t5.*`, `scripts/run_amendment12.sh`, flag `--amendment12`. The renamed records are byte-identical inside, so they still name the old cells: the instance logs, `*.dmesg.txt` and `*.preflight.txt` say X1 or X2. The raw outputs remain under the old S3 prefix `s3://crypto-autoresearcher/lab-results/factor-base-designs-a7/fab81e175/`, whose keys are unchanged.
+
+Frozen rows, pre-flight files, kernel-log sentinel files and instance logs are in
+`runs/H64-A0-*` and `runs/H64-A11-*`. The original analysis and
+[historical report](reports/run-20261021T0056Z/REPORT.pdf) are preserved.
+The [2026-10-21 review correction](reports/review-20261021/README.md) supersedes
+their kernel-log attribution and resident-working-set claims.
+
+Both cells ran on AWS EC2 `r7i.2xlarge` hosts (64 GiB, 8 vCPU). Their pre-flight
+records report an unlimited leaf memory cgroup and `ulimit -v` of approximately
+64,250,012 KiB (H64-A0) and 64,250,008 KiB (H64-A11), about 61.27 GiB.
+These are virtual-address-space caps (the Linux records label KiB as `kB`).
+
+- **H64-A0, A0 at `m = 4`, `t = 4`:** both processes reported allocation failure
+  and SIGABRT at 1916 s and 1874 s; observed peak RSS was
+  60,667,848 and 60,713,840 KiB.
+- **H64-A11, A11 at `m = 4`, `t = 5`:** both processes reported allocation failure
+  and SIGABRT at 6011 s and 6024 s; observed peak RSS was
+  62,919,616 and 62,849,712 KiB.
+- **Evidence limit:** the historical runner suppressed kernel-log read errors.
+  Its “no kernel OOM lines” sentinels do not establish successful capture.
+  Strict R1/R2 attribution and the prediction scorecard therefore remain
+  undecided under the registered kernel-log control. The allocation failures,
+  timings and RSS observations remain recorded; no cost comparison is available.
+- **Interpretation:** exhausting a virtual-address-space cap does not prove that
+  the minimum resident working set exceeds 64 GB. Required address space and
+  required resident memory remain distinct and unmeasured. The prior completed
+  cells' recorded verdicts are unchanged.
+
+The repaired `scripts/run_amendment12.sh` requires readable kernel logs before
+starting, retains the before/after captures and errors, preserves a producer's
+failure status, and refuses an existing cell's evidence prefix. `analyze12`
+requires a successful-capture marker and rejects every recorded OOM event,
+including events without a “Killed process” line. The full captured ring is
+retained, so an earlier OOM event can conservatively withhold attribution.
+No new host allocation or experimental execution was made for this correction.
+
+### Amendment 13: registered, not yet run (EKS high-memory runner)
+
+**Numbering note, 2026-10-26 (renames only; changes no rule, threshold, prediction or row).** This amendment was registered as “Amendment 8” with cells E1 and E2, runner `scripts/run_amendment8.sh` and flag `analyze --amendment8`. `main` has its own Amendment 8 and its own E1 cell (twisted Edwards), so on merging `main` it is renumbered **Amendment 13** with cells **K8S-A0** (was E1) and **K8S-A11** (was E2); the runner is `scripts/run_amendment13.sh`, the flag `--amendment13`, the row prefixes `K8S-A0-` and `K8S-A11-`, and the workflow artifact `fb-designs-amendment13-<cell>-<run_id>-<attempt>`. The amendment it builds on, registered as “Amendment 7” with cells X1 and X2, is now Amendment 12 with cells H64-A0 and H64-A11. No E row, K8S row or workflow run exists, so no record or artifact carries an old name.
+
+
+Amendment 13 registers both cells again (K8S-A0, K8S-A11) on the repository's
+`crypto-eks-highmem` GitHub Actions runner (Karpenter Spot node, 120 GiB pod
+limit, so V ≈ 125.3 GB). It is started by hand with
+`.github/workflows/fb-designs-m4-highmem.yml` (`workflow_dispatch`) when a
+high-memory Spot node is available. The runner is
+`scripts/run_amendment13.sh`, and the analysis is `analyze --amendment13`.
+Predictions: K8S-A0 memory-bound near 3450 s, K8S-A11 a timeout at 14 400 s near
+90 GB. No E row exists yet.
+
+### Amendment 14: registered (256 GiB EC2 host, R256-A0 and R256-A11)
+
+Amendment 13's EKS runner could not start: the ARC controller's GitHub token
+cannot reach `isogeny-labs/crypto` (404 on the runner registration call), and
+the owner did not replace it. Amendment 14 registers the same two cells on one
+EC2 `r7i.8xlarge` (256 GiB), run one after the other, with
+`scripts/run_amendment14.sh`, analysis `analyze --amendment14`. Predictions:
+R256-A0 memory-bound near 6100 s, R256-A11 a timeout at 14 400 s near 90 GB.
+Amendment 13 stays registered, with no rows. No R256 row exists yet.
+
+### Amendment 15: registered (checkpointed R256 run)
+
+Amendment 14's first attempts produced no row: two failed builds and a Spot
+reclaim that destroyed about 73 min of R256-A0. Amendment 15 adds checkpoint and
+resume to the F4 engine (`F4Options::checkpointing`, off by default), a
+`--checkpoint-every` flag to the study binary, a persistent Spot request that
+replaces a reclaimed host and resumes from S3, and a self-test that must pass
+before any cell runs. It changes no cell, seed, rule or prediction; see
+PREREGISTRATION.md, Amendment 15. Evidence that a resumed system gives the
+uninterrupted row: `tests/f4_checkpoint_resume.rs` and, on the host,
+`scripts/selftest_checkpoint.sh` (its output goes to the run's report).
+
+### Amendments 14 and 15: results (2026-10-27)
+
+The two `m = 4` cells ran on one 256 GiB EC2 host (rows `runs/R256-*`, report
+`reports/run-20261027T1318Z/REPORT.pdf`, analysis `runs/analysis-amendment14.txt`).
+R256-A0 (A0, `t = 4`): both systems completed (D = 7, 3.235e13 counted operations,
+121 GB), so A0 at `m = 4` has three cells: κ = 9.477, σ = 0.5, cost-unfavourable.
+R1: A11 survives at `t = 4`. R256-A11 (A11, `t = 5`): both systems hit the 14 400 s
+budget (D = 6 reached, 9e13 operations so far, 223 and 217 GB), not measurable
+within 4 h; the three-cell verdict stands (κ = 14.886, cost-unfavourable).
+Amendment 14's prediction for A0 (memory-bound) did not hold; for A11 the timeout held
+and the 90 GB peak did not. The run needed the checkpointing of Amendment 15; the
+report records what it did and what it did not (four of the seven A0 segments were
+lost because no checkpoint existed yet). No improvement over any baseline.
+
+### Amendment 16: snapshots inside a step (tooling)
+
+After the R256 run lost four of seven A0 segments to reclaims before any
+checkpoint existed, the F4 engine can snapshot a step's dense row reduction
+(`F4Options::checkpointing_in_step`, `run --checkpoint-in-step-every`; wide
+arithmetic only). Tested for exact equality of every counted field against the
+uninterrupted run (`tests/f4_checkpoint_resume.rs`) and gated on the host by the
+self-test. Validated at the scale of A0 m = 4, t = 4 by run V16
+(`reports/run-20261027T1710Z/REPORT.pdf`): killed once inside a step and resumed,
+the row equals R256-A0 target 0 in every counted field; snapshots of 20 to 44 GB
+wrote in 27 to 48 s; +18 % F4 time. See PREREGISTRATION.md, Amendment 16.
+
+### Close-out of the prime-field slope line (2026-10-19)
+
+Observations only; no new run. Sources: `runs/analysis-amendment4.txt`,
+[`reports/review-20261019T1632Z/REVIEW.pdf`](reports/review-20261019T1632Z/REVIEW.pdf)
+(κ against `m − 1`, per arm, with cell counts), and the status table and
+κ/(m − 1) observation in §2.
+
+- **Statuses.** Every prime-field arm with at least 3 completed cells is
+  cost-unfavourable at the sizes measured: `m = 2, 3` for all of them, and
+  `m = 4` for A11 (κ = 14.886 vs 3, 3 cells). A0 at `m = 4` is
+  **inconclusive** (κ = 10.773, 2 cells).
+- **Amendment 7** makes κ the primary score for every later round, with the
+  `m − 1` break-even and Amendment 4's thresholds; σ is secondary. It changes
+  no verdict here.
+- **Owed, still open:**
+  - A0's third `m = 4` cell (`t = 4`): it exhausted memory at 13 GB (C2)
+    and again at 14.5 GB in a 4 h budget (L1, Amendment 5). It needs a host
+    with well over 15 GB, i.e. the lab runner (isolab), which these containers
+    cannot reach. Until it completes, A0 at `m = 4` stays inconclusive and the
+    A0-versus-A11 comparison at `m = 4` has 2 against 3 cells.
+  - The Mathlib cyclicity bridges behind K7 and K8: not attempted. The
+    Mathlib cache did not fit the container's disk beside the toolchain
+    (§4), and the disk is shared with concurrent work.
+  - The novelty audit: written in
+    [`NOVELTY_AUDIT.md`](NOVELTY_AUDIT.md) for A11, A1, A4 and H1/H2 only.
+    It is a search of the sources it lists, not a proof of absence. Designs
+    outside those four were not audited.
+
+### Amendment 8: E-K1, a Gauss-period window in `s = x + 1/x` (run-20261019T1712Z)
+
+Rows: `runs/K1-*.jsonl` (306). Check log: `runs/K1-check.txt`. Analysis:
+`runs/analysis-amendment8.txt`. Run report:
+[`reports/run-20261019T1712Z/REPORT.pdf`](reports/run-20261019T1712Z/REPORT.pdf).
+Amendment 8 was registered before any row and follows the κ-primary rule of
+Amendment 7. Instrument: the repository's Boolean F4
+(`pq_f4_f2::groebner_basis_f4`) on the Weil restriction of each system;
+`field_ops` is its count of 64-bit XORs. Curve `K_0` over `F_{2^n}`,
+`n = 11, 23`; arms S (Gauss window in `s`), X (same window in `x`), XR
+(random `x`-window), U (random `u`-frame), NS (null of S's shape), PC
+(positive control, `m = 3`).
+
+- **The `s`-line polynomial is Semaev's `S_{m+1}` in `x`** (exact, checked on a
+  degree-exact grid at both `n`, `m = 2, 3`). So S and X have the same
+  equations. They differ in the target value and in which points the window
+  holds.
+- **R1: every decided series is cost-unfavourable** (prediction held). 14
+  series with at least 3 completed cells: κ = 2.42–3.93 at `m = 2` (break-even
+  1; 10 series) and 6.15–18.71 at `m = 3` (break-even 2; XR and U at both `n`).
+  S: κ = 3.93 (`n = 11`) and 2.79 (`n = 23`) at `m = 2`.
+- **R4: S does not advance** at `m = 2` for either `n` (cost-unfavourable). At
+  `m = 3` it is inconclusive: the direct degree-6 systems complete only
+  `ℓ = 4, 5` (time or the 1 GiB matrix cap at `ℓ = 6`), so S, X and NS have 2
+  cells.
+- **R2, S against X: differs** at `m = 2`, though D is within ±1 at every
+  shared cell. κ differs by 0.35 (`n = 11`) and 0.37 (`n = 23`), above the 0.25
+  margin. P2 failed.
+- **R3, S against XR: tied** at both `n`. **Against U:** S's κ is higher at
+  `n = 11` (3.93 vs 3.64) and lower at `n = 23` (2.79 vs 3.08). The level at
+  equal `ℓ` favours U at `n = 11` (U at least 2× cheaper in 6 of 9 cells).
+- **R5, null: mixed** at `m = 2` for both `n`. NS is not harder than S in D:
+  at `n = 23` it is lower at `ℓ = 3–6`, higher by 1 at `ℓ = 8` and equal in the
+  other six cells; at `n = 11` it differs only at `ℓ = 3, 4`. P6 failed.
+- **R6, positive control: detected.** At `m = 3` the random `x`-window's direct
+  `S_4` (degree 6) costs 132–390× the `u`-frame's `field_ops` in all 4 shared
+  cells (D 7 vs 5).
+- **R7, Gauss `x`-window against random:** cheaper at `n = 23`, `m = 2` (random
+  window 30–170× dearer at `ℓ = 7–11`, 6 of 11 cells at least 2×), not at
+  `n = 11` (1 of 9). P7 failed as registered (all four `(n, m)`).
+- **Trace replay: 250 of 250** completed systems reproduce D, `max_cols`,
+  `max_rows` and `steps` (and `field_ops`) from their seed.
+- **Registration slips:** P8 failed on XR (its random `ℓ = 3` window was
+  plantable at `m = 3`); the erratum is in `PREREGISTRATION.md`.
+- **Reading:** a window in `s` at the Gauss-period dimensions does not change
+  the cost curve of the Boolean F4 beyond the arm-to-arm spread in κ (about
+  0.4); no arm is cost-favourable at `m ≤ 3`, `n ≤ 23`. This is a toy-size
+  diagnostic of one engine, not a statement about `n = 131`.
 
 ## 6. What this round does not establish
 
 - No design here is shown to reduce any cost. The Lean theorems show that
   presentations are correct, that some designs are empty or neutral in the
   mean, and what the break-even means *within the cost model*. The question
-  that matters, `σ` on real systems, is the experiments' job.
-- "Never seen before" means not in `docs/ic/factor-base-encyclopedia/` or
-  `research/nagao_relations/`, plus a literature check from memory. The
-  closest prior work: Petit–Kosters–Messeng 2016 (towers), Nagao and
-  Joux–Vitse (Riemann–Roch decompositions), FPPR 2012, Petit–Quisquater
-  2012, Huang–Kosters–Yeo 2015, Bachoc–Serra–Zémor 2017. A novelty audit is
-  owed before any design is described as new outside this repository.
+  that matters, the measured cost (κ, Amendment 7) on real systems, is the experiments' job.
+- "Never seen before" is not claimed. [`NOVELTY_AUDIT.md`](NOVELTY_AUDIT.md)
+  (2026-10-19) searched the literature for A11, A1, A4 and H1/H2 from
+  abstracts, slides and snippets, with no full text read: A11, A4 and H1/H2
+  are **partly prior** (closest: Petit–Kosters–Messeng 2016, Nagao,
+  Joux–Vitse, Gaudry, Diem), and A1 is **not found in the sources checked**
+  (its encoding is elementary and A1z's set is PKM's). The other designs were
+  not audited, and a full-text reading is owed before any status is quoted
+  outside this repository.
+- **Measured scope.** The prime-field verdicts are cost-unfavourable at the
+  sizes and `m` listed in §2 (`m ≤ 3` for most arms, `m ≤ 4` for A11). A0 at
+  `m = 4` is inconclusive. Nothing is extrapolated to `m > 4` or deployed
+  sizes, and the κ/(m − 1) quotients are an observation, not a claim.
+- **Owed.**
+  - A0's third `m = 4` cell (`t = 4`): exhausted memory at 13 GB (C2) and at
+    14.5 GB (L1, Amendment 5); it needs a host with well over 15 GB (the lab
+    runner, isolab), which these containers cannot reach.
+  - The Mathlib cyclicity bridges behind K7 and K8 (`F_{2^n}^*` cyclic; a
+    group of prime order is cyclic): still owed. The Mathlib cache did not fit
+    the container's disk beside the toolchain, and the disk is shared, so it
+    was not attempted.
+  - Full-text reading behind `NOVELTY_AUDIT.md`, and an audit of the designs it
+    does not cover.
+  - Experiments E2, E3, E5–E10, E12–E16, E-K1, E-K4, E-K6 (unrun), and a
+    formalization of the K3 theorem.

@@ -1,0 +1,254 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-ext-endo-rho-20261023-2
+experiment_id: ext_endo_rho_20261023
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: 16b4fcca2b308e5ef7308d43dbd4e751479f7b1f
+receipt: research/ext_endo_rho_20261023/cards/CARD-ext-endo-rho-20261023-2.receipt.json
+binds:
+- path: research/ext_endo_rho_20261023/PROTOCOL.md
+  sha256: b93b2c16025f88812b22ccf43e6b4283b4c14a4d78a95f0401d6c7eb248eac6e
+- path: research/ext_endo_rho_20261023/specs/SPEC-subfield-fp3.json
+  sha256: efc57e8d49e18a24086e9d13a97dbe780a52ff2499aabb5f7f613b1e384ea2bb
+- path: research/ext_endo_rho_20261023/specs/SPEC-gls-fp2.json
+  sha256: aacf7e8c9020caf65d8b250286cce75cc56f2992bd314d50a80028c4078f7ba2
+- path: ./target/release/ecbench
+  sha256: 87bac3448d63e3c1dcd841a2d23b565c09477c855eda0febf11a03d9931d148f
+must_not_exist:
+- research/ext_endo_rho_20261023/sessions/subfield-fp3
+- research/ext_endo_rho_20261023/sessions/gls-fp2
+- research/ext_endo_rho_20261023/sessions/subfield-fp3.audit.json
+- research/ext_endo_rho_20261023/sessions/gls-fp2.audit.json
+commands:
+- id: build-ecbench
+  argv:
+  - cargo
+  - build
+  - --release
+  - --bin
+  - ecbench
+  cwd: .
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/ext_endo_rho_20261023/receipts/card2-build-ecbench.stdout
+  stderr: research/ext_endo_rho_20261023/receipts/card2-build-ecbench.stderr
+- id: run-subfield-fp3
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --wait
+  - --allow-busy
+  - --cpus
+  - auto
+  - --spec
+  - research/ext_endo_rho_20261023/specs/SPEC-subfield-fp3.json
+  - --out
+  - research/ext_endo_rho_20261023/sessions/subfield-fp3
+  cwd: .
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/ext_endo_rho_20261023/receipts/card2-run-subfield-fp3.stdout
+  stderr: research/ext_endo_rho_20261023/receipts/card2-run-subfield-fp3.stderr
+- id: verify-subfield-fp3
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ext_endo_rho_20261023/sessions/subfield-fp3
+  - --replay
+  - '16'
+  - --out
+  - research/ext_endo_rho_20261023/sessions/subfield-fp3.audit.json
+  cwd: .
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/ext_endo_rho_20261023/receipts/card2-verify-subfield-fp3.stdout
+  stderr: research/ext_endo_rho_20261023/receipts/card2-verify-subfield-fp3.stderr
+  outputs:
+  - research/ext_endo_rho_20261023/sessions/subfield-fp3.audit.json
+- id: compare-subfield-fp3-aa
+  argv:
+  - ./target/release/ecbench
+  - compare
+  - --dir
+  - research/ext_endo_rho_20261023/sessions/subfield-fp3
+  - --a
+  - rho-neg-aa
+  - --b
+  - rho-neg
+  cwd: .
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/ext_endo_rho_20261023/sessions/subfield-fp3.compare-rho-neg-aa__rho-neg.txt
+  stderr: research/ext_endo_rho_20261023/receipts/card2-compare-subfield-fp3-aa.stderr
+  outputs:
+  - research/ext_endo_rho_20261023/sessions/subfield-fp3.compare-rho-neg-aa__rho-neg.txt
+- id: compare-subfield-fp3-plain
+  argv:
+  - ./target/release/ecbench
+  - compare
+  - --dir
+  - research/ext_endo_rho_20261023/sessions/subfield-fp3
+  - --a
+  - rho-plain
+  - --b
+  - rho-neg
+  cwd: .
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/ext_endo_rho_20261023/sessions/subfield-fp3.compare-rho-plain__rho-neg.txt
+  stderr: research/ext_endo_rho_20261023/receipts/card2-compare-subfield-fp3-plain.stderr
+  outputs:
+  - research/ext_endo_rho_20261023/sessions/subfield-fp3.compare-rho-plain__rho-neg.txt
+- id: compare-subfield-fp3-cand
+  argv:
+  - ./target/release/ecbench
+  - compare
+  - --dir
+  - research/ext_endo_rho_20261023/sessions/subfield-fp3
+  - --a
+  - rho-neg
+  - --b
+  - rho-frob
+  cwd: .
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/ext_endo_rho_20261023/sessions/subfield-fp3.compare-rho-neg__rho-frob.txt
+  stderr: research/ext_endo_rho_20261023/receipts/card2-compare-subfield-fp3-cand.stderr
+  outputs:
+  - research/ext_endo_rho_20261023/sessions/subfield-fp3.compare-rho-neg__rho-frob.txt
+- id: table-subfield-fp3
+  argv:
+  - ./target/release/ecbench
+  - table
+  - --dir
+  - research/ext_endo_rho_20261023/sessions/subfield-fp3
+  cwd: .
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/ext_endo_rho_20261023/sessions/subfield-fp3.table.md
+  stderr: research/ext_endo_rho_20261023/receipts/card2-table-subfield-fp3.stderr
+  outputs:
+  - research/ext_endo_rho_20261023/sessions/subfield-fp3.table.md
+- id: run-gls-fp2
+  argv:
+  - ./target/release/ecbench
+  - run
+  - --wait
+  - --allow-busy
+  - --cpus
+  - auto
+  - --spec
+  - research/ext_endo_rho_20261023/specs/SPEC-gls-fp2.json
+  - --out
+  - research/ext_endo_rho_20261023/sessions/gls-fp2
+  cwd: .
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/ext_endo_rho_20261023/receipts/card2-run-gls-fp2.stdout
+  stderr: research/ext_endo_rho_20261023/receipts/card2-run-gls-fp2.stderr
+- id: verify-gls-fp2
+  argv:
+  - ./target/release/ecbench
+  - verify
+  - --dir
+  - research/ext_endo_rho_20261023/sessions/gls-fp2
+  - --replay
+  - '16'
+  - --out
+  - research/ext_endo_rho_20261023/sessions/gls-fp2.audit.json
+  cwd: .
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/ext_endo_rho_20261023/receipts/card2-verify-gls-fp2.stdout
+  stderr: research/ext_endo_rho_20261023/receipts/card2-verify-gls-fp2.stderr
+  outputs:
+  - research/ext_endo_rho_20261023/sessions/gls-fp2.audit.json
+- id: compare-gls-fp2-aa
+  argv:
+  - ./target/release/ecbench
+  - compare
+  - --dir
+  - research/ext_endo_rho_20261023/sessions/gls-fp2
+  - --a
+  - rho-neg-aa
+  - --b
+  - rho-neg
+  cwd: .
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/ext_endo_rho_20261023/sessions/gls-fp2.compare-rho-neg-aa__rho-neg.txt
+  stderr: research/ext_endo_rho_20261023/receipts/card2-compare-gls-fp2-aa.stderr
+  outputs:
+  - research/ext_endo_rho_20261023/sessions/gls-fp2.compare-rho-neg-aa__rho-neg.txt
+- id: compare-gls-fp2-plain
+  argv:
+  - ./target/release/ecbench
+  - compare
+  - --dir
+  - research/ext_endo_rho_20261023/sessions/gls-fp2
+  - --a
+  - rho-plain
+  - --b
+  - rho-neg
+  cwd: .
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/ext_endo_rho_20261023/sessions/gls-fp2.compare-rho-plain__rho-neg.txt
+  stderr: research/ext_endo_rho_20261023/receipts/card2-compare-gls-fp2-plain.stderr
+  outputs:
+  - research/ext_endo_rho_20261023/sessions/gls-fp2.compare-rho-plain__rho-neg.txt
+- id: compare-gls-fp2-cand
+  argv:
+  - ./target/release/ecbench
+  - compare
+  - --dir
+  - research/ext_endo_rho_20261023/sessions/gls-fp2
+  - --a
+  - rho-neg
+  - --b
+  - rho-gls
+  cwd: .
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/ext_endo_rho_20261023/sessions/gls-fp2.compare-rho-neg__rho-gls.txt
+  stderr: research/ext_endo_rho_20261023/receipts/card2-compare-gls-fp2-cand.stderr
+  outputs:
+  - research/ext_endo_rho_20261023/sessions/gls-fp2.compare-rho-neg__rho-gls.txt
+- id: table-gls-fp2
+  argv:
+  - ./target/release/ecbench
+  - table
+  - --dir
+  - research/ext_endo_rho_20261023/sessions/gls-fp2
+  cwd: .
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/ext_endo_rho_20261023/sessions/gls-fp2.table.md
+  stderr: research/ext_endo_rho_20261023/receipts/card2-table-gls-fp2.stderr
+  outputs:
+  - research/ext_endo_rho_20261023/sessions/gls-fp2.table.md
+bus_address: executor-mechanical-ext-endo-rho
+background: true
+write_scope:
+- research/ext_endo_rho_20261023/sessions/
+- research/ext_endo_rho_20261023/receipts/
+- research/ext_endo_rho_20261023/cards/
+- target/
+stop_when:
+- Any command in the card exits with a status other than 0.
+- The tool exits with status 2 and prints an IMPEDIMENT line.
