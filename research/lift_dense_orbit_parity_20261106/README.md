@@ -153,4 +153,4 @@ cd orbit && cargo build --release && cargo test --release && cd ..
 
 | claim | standing | content |
 |:--|:--|:--|
-| `PCC-20261106-2ae3b9` | not covered (unsigned) | O1–O5 counts and the dead-point tallies ([`validator-report.json`](reports/run-20261106T0306Z/validator-report.json), headline values in [`claimed.json`](claimed.json)) |
+| `PCC-20261106-3e6fc4` | not covered (unsigned) | O1–O5 counts and the dead-point tallies ([`validator-report.json`](reports/run-20261106T0306Z/validator-report.json), headline values in [`claimed.json`](claimed.json)) |

@@ -1165,24 +1165,41 @@ pub fn compute(dir: &str) -> (String, String, Summary) {
             continue;
         }
         let (mut fa, mut fd, mut exp) = (0u64, 0u64, 0f64);
-        for l in dec.iter().filter(|l| jnum(l, "p") == p && jnum(l, "n") == n as u64) {
+        for l in dec
+            .iter()
+            .filter(|l| jnum(l, "p") == p && jnum(l, "n") == n as u64)
+        {
             let cv = curves
                 .iter()
-                .find(|c| jget(c, "arm") == Some("descent") && jnum(c, "p") == p && jnum(c, "n") == n as u64 && jnum(c, "curve") == jnum(l, "curve"))
+                .find(|c| {
+                    jget(c, "arm") == Some("descent")
+                        && jnum(c, "p") == p
+                        && jnum(c, "n") == n as u64
+                        && jnum(c, "curve") == jnum(l, "curve")
+                })
                 .unwrap();
             let (ell, ord) = (jnum(cv, "ell"), jnum(cv, "orderE"));
             let mut lv = 1u64;
             while ord % (lv * ell) == 0 {
                 lv *= ell;
             }
-            let (lifted, dp, dobs, mm) = (jnum(l, "lifted"), jnum(l, "dead_pred"), jnum(l, "dead_obs"), jnum(l, "dead_mismatch"));
+            let (lifted, dp, dobs, mm) = (
+                jnum(l, "lifted"),
+                jnum(l, "dead_pred"),
+                jnum(l, "dead_obs"),
+                jnum(l, "dead_mismatch"),
+            );
             // mm = fd + fa, dobs - dp = fd - fa
             let fd_l = (mm + dobs - dp) / 2;
             fd += fd_l;
             fa += mm - fd_l;
             exp += (lifted - dp) as f64 / lv as f64;
         }
-        put(&format!("posthoc_pred_dead_obs_alive_{p}_{n}"), fa as f64, &mut vals);
+        put(
+            &format!("posthoc_pred_dead_obs_alive_{p}_{n}"),
+            fa as f64,
+            &mut vals,
+        );
         writeln!(ph, "| {p} | {n} | {fa} | {fd} | {exp:.1} |").unwrap();
     }
     // O5
@@ -1362,11 +1379,22 @@ fn validate(dir: &str, claimed: &str) {
             "    {{\"name\": \"{k}\", \"claimed\": {v}, \"recomputed\": {got}, \"rel_tol\": 0}}"
         ));
     }
+    // rows.jsonl lives in the artifact store (AGENTS.md section 13); the
+    // committed manifest pins it. Check the local copy against that pin and
+    // pin the manifest itself as the raw data.
     let data = std::fs::read(format!("{dir}/rows.jsonl")).unwrap();
+    let rows_sha = sha::sha256_hex(&data);
+    let manifest = std::fs::read(format!("{dir}/.artifacts.json")).expect(".artifacts.json");
+    let mtext = String::from_utf8_lossy(&manifest).to_string();
+    if !mtext.contains(&rows_sha) {
+        eprintln!("rows.jsonl sha256 {rows_sha} is not the manifest's pin");
+        ok = false;
+    }
     let rep = format!(
-        "{{\n  \"schema\": \"validator-report\",\n  \"status\": \"{}\",\n  \"study\": \"research/lift_dense_orbit_parity_20261106\",\n  \"recomputed_by\": {{\"tool\": \"research/lift_dense_orbit_parity_20261106/orbit (orbit validate)\", \"command\": \"orbit validate <run> claimed.json\"}},\n  \"note\": \"Producer-run recompute of README headline numbers from the pinned raw rows; unsigned, so independence is not established.\",\n  \"raw_data\": [\n    {{\"path\": \"rows.jsonl\", \"sha256\": \"{}\"}}\n  ],\n  \"headline\": [\n{}\n  ]\n}}\n",
+        "{{\n  \"schema\": \"validator-report\",\n  \"status\": \"{}\",\n  \"study\": \"research/lift_dense_orbit_parity_20261106\",\n  \"recomputed_by\": {{\"tool\": \"research/lift_dense_orbit_parity_20261106/orbit (orbit validate)\", \"command\": \"orbit validate <run> claimed.json\"}},\n  \"note\": \"Producer-run recompute of README headline numbers from the pinned raw rows; unsigned, so independence is not established.\",\n  \"raw_data\": [\n    {{\"path\": \".artifacts.json\", \"sha256\": \"{}\", \"pins\": {{\"rows.jsonl\": \"{}\"}}}}\n  ],\n  \"headline\": [\n{}\n  ]\n}}\n",
         if ok { "pass" } else { "fail" },
-        sha::sha256_hex(&data),
+        sha::sha256_hex(&manifest),
+        rows_sha,
         heads.join(",\n")
     );
     std::fs::write(format!("{dir}/validator-report.json"), rep).unwrap();
