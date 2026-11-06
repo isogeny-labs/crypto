@@ -1317,9 +1317,66 @@ What CI replays (`.github/workflows/ecbench.yml`):
   smoke session replays 8 runs; and four sessions written before the
   class set-up fix replay 8 runs each, which must pass through the
   pre-fix reconstruction ([`CLASS_SETUP_AUDIT.md`](CLASS_SETUP_AUDIT.md));
-- **weekly, and on demand**: the same integrity audit, plus every
-  measured run replayed for the sessions under `research/ecbench_*/sessions`,
-  the binary-curve comparison and the n37 compact-orbit notes.
+- **every pull request, merge group and push to main that touches ecbench
+  or method code** (the `ecbench_replay` scope): the *replay sentinels*, one
+  committed record per registered method id, replayed by `ecbench verify
+  --replay-seq` (the same comparator and legacy profiles as every other
+  replay; `replay_sentinels_pr`, `.github/scripts/ecbench-replay-sentinels.sh`),
+  so a change to what a method counts fails in its own PR instead of
+  silently ending the replay of that method's committed records (the
+  2026-11-03 change to the native pencil point sieve's ledger did exactly
+  that). See "Replay sentinels" below;
+- **weekly, and on demand**: the same integrity audit, plus every measured
+  run replayed, rotated. Each scheduled run replays the 169 core sessions
+  (those under `research/ecbench_*/sessions`, the binary-curve comparison and
+  the n37 compact-orbit notes) and one quarter of every other committed
+  session found by schema: quarter = ISO week number mod 4, so each session
+  is replayed once every 4 weeks (the step summary names the quarter and its
+  session count). A session's quarter is a greedy assignment by recorded
+  solver time, computed by `.github/scripts/ecbench-replay-plan.sh`; when
+  sessions are added a session may move quarter, so its interval is then 3 to
+  7 weeks. The
+  hash-pinned incomplete and defective sessions are not replayed; the
+  sessions in `LONG_SESSIONS.tsv` (a verified run over 3.5 h of recorded
+  solve wall: at the 1.4x upper replay ratio that plus setup is the 350-minute
+  job timeout) are replayed only by a manual run with `long=true`. A manual
+  run takes `quarter` (0-3 or `all`).
+
+#### Replay sentinels
+
+`docs/ecbench/replay-sentinels.json` freezes, for every method id that a
+committed session's `spec.json` plans, the replayable record (`ecbench::audit::
+replay_candidates`, the audit's own predicate: measured, deterministic method,
+reproducible outcome, in its plan slot) of least cost over all committed
+sessions, cost being the recorded solve wall plus 2 µs per byte of the
+session's `records.jsonl` (the session is integrity-audited whole before its
+record replays). The choice is a pure function of the committed data (ties by
+session path, then `seq`), never a random draw. A method with no replayable
+record is listed under `unreplayable` with the reason. A record that already
+fails to replay for a reason older than the pull request (it would block every
+PR and show no regression) is listed under `known_failures` with its reason and
+skipped for the next-cheapest record; the four `three_leads_e2e_20261018`
+genus-smoke records are the only ones. The manifest names each
+sentinel's session id and `records.jsonl` hash, so a changed session is
+noticed.
+
+- `ecbench sentinels check --list L` fails when a method id of a committed
+  session has neither a sentinel nor an `unreplayable` entry (a new method
+  gets its sentinel in the PR that commits its first session), when a
+  sentinel's session changed or vanished, and on stale entries;
+- `.github/scripts/ecbench-replay-sentinels.sh replay` runs `ecbench verify
+  --dir D --replay 0 --replay-seq N …` per sentinel session and names the
+  differing fields of any record that no longer reproduces;
+- to regenerate after adding sessions or methods: hydrate, then
+  `ecbench-replay-sentinels.sh scan LIST OUT` over the committed-session list
+  and `ecbench sentinels build --list LIST --candidates OUT/candidates.jsonl
+  --out docs/ecbench/replay-sentinels.json --previous docs/ecbench/replay-sentinels.json`
+  (`--known-failure SESSION:SEQ:REASON` adds one).
+
+A fix that deliberately changes a method's count does not edit the committed
+records (they are evidence); it adds a legacy replay profile
+(`legacy.rs`, as for the pencil `_v2` records) or a new method id, and the
+sentinel replay is the check that the profile reproduces them.
 
 A replay that disagrees reports what differs (`differs in total_gae,
 phase counts, …`). One that agrees reports `identical`, or names the
