@@ -3,6 +3,7 @@
 use super::methods::{PhaseRecord, ResolvedMethod, SolveReport};
 use super::workload::{CurveFacts, CurveSpec};
 use crate::cryptanalysis::curve_id;
+use crate::cryptanalysis::ecbench::exact_scalar::ExactScalar;
 use crate::cryptanalysis::ic_boundary::FieldOps;
 use crate::cryptanalysis::ic_measurement::{self as measurement, Phase};
 use crate::cryptanalysis::three_leads::{
@@ -17,6 +18,14 @@ use std::time::Instant;
 #[path = "pencil.rs"]
 mod pencil;
 pub(crate) use pencil::ScopedPencilProgress;
+
+/// The frozen pencil id and the id that reports the same solve with its
+/// ledger lifted into counters (README §9). Both run [`pencil`].
+pub(crate) const PENCIL_SYMBOLIC_V2: &str = "ic.three_leads_genus2_pencil_symbolic_v2";
+pub(crate) const PENCIL_SYMBOLIC_V3: &str = "ic.three_leads_genus2_pencil_symbolic_v3";
+pub(crate) fn is_pencil_symbolic(id: &str) -> bool {
+    id == PENCIL_SYMBOLIC_V2 || id == PENCIL_SYMBOLIC_V3
+}
 
 fn coefficients(mut x: u64, p: u64, n: usize) -> Vec<u64> {
     (0..n)
@@ -118,7 +127,7 @@ pub fn solve(
     seed: u64,
 ) -> Result<SolveReport, String> {
     applicable(m, inst)?;
-    if m.id == "ic.three_leads_genus2_pencil_symbolic_v2" {
+    if is_pencil_symbolic(&m.id) {
         if let Some(result) = pencil::with_active_progress(|sink| {
             pencil::solve_with_progress(m, inst, target, seed, Some(sink))
         })? {
@@ -276,7 +285,7 @@ pub fn solve(
         .collect();
     let detail = json!({"engine":out.detail,"study_family":inst.family,"arithmetic_price":{"square_per_multiply":0.75,"inversion_per_multiply":10,"source_addition":price,"meaning":"declared operation-count conversion; not a wall-time price"},"native_phases":out.phases,"verification":"solver has no planted scalar; fresh source kP checked here and again by ecbench parent"});
     let mut report = SolveReport {
-        recovered: out.recovered.map(u128::from),
+        recovered: out.recovered.map(ExactScalar::from),
         exhausted: out.exhausted,
         phases,
         total_gae: arithmetic(out.counts) / unit,
@@ -339,7 +348,7 @@ pub fn solve(
 /// Refusals that are independent of the target and seed. The planner calls
 /// this before a session is admitted, and [`solve`] repeats it as a backstop.
 pub fn applicable(m: &ResolvedMethod, inst: &StudyInstance) -> Result<(), String> {
-    if m.id != "ic.three_leads_genus2_pencil_symbolic_v2" {
+    if !is_pencil_symbolic(&m.id) {
         m.params["trial_cap"]
             .parse::<u64>()
             .map_err(|_| "invalid trial_cap")?;

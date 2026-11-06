@@ -1,0 +1,8 @@
+stage,position,condition,failure_behavior,cost_scope
+metadata,before construction,"family, odd field, 13<p<2^31, p mod 4=3, n=2, modulus=1, 2<r<=2^63",Err,integer comparisons; unmeasured
+primality,before construction,is_prime(p) and is_prime(r),Err,new public guards outside field counters; unmeasured
+representation,before construction,nonzero canonical coordinates and coefficients; p squared fits u64,Err,integer comparisons; unmeasured
+curve identity,after constructor before transfer,source coefficients match,Err,existing constructor costs retained
+source points,before transfer,"valid G and Q, rG=O",Err,new named phase; relocated existing checks
+transfer images,after transfer,images nonzero,Err,transfer internal panic surfaces remain
+default path,unchanged ordering,all opt-in guards bypassed,original assertions,no added field operations in false branch

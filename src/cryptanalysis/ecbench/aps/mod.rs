@@ -20,6 +20,15 @@ use std::{
 };
 
 pub const ID: &str = "ic.aps_v1";
+/// `ic.aps_v1`'s counts are frozen (README §9). `ic.aps_v2` runs the same
+/// instrument and counts the core work the frozen id leaves in a prose
+/// `unpriced` entry; its `unpriced` names counters only.
+pub const ID_V2: &str = "ic.aps_v2";
+
+/// Both ids run [`solve`].
+pub fn is_aps(id: &str) -> bool {
+    id == ID || id == ID_V2
+}
 pub const PARAMS: &[ParamDecl] = &[
     ParamDecl {
         name: "encoding",
@@ -451,6 +460,10 @@ pub fn solve(
     q: PrimePoint,
     seed: u64,
 ) -> Result<SolveReport, String> {
+    let v2 = m.id == ID_V2;
+    // The core's group-operation and polynomial tallies are per thread: start
+    // from zero, before the plan-time checks `applicable` repeats in the solve.
+    core::reset_core_work();
     let mut clock = Clock::new();
     applicable(m, inst)?;
     let c = Config::parse(m)?;
@@ -667,6 +680,17 @@ pub fn solve(
         "aps_legacy_root_count_unknown_attempts".into(),
         missing_roots,
     );
+    if v2 {
+        let work = core::core_work();
+        counters.insert("aps_core_scalar_mults_uncharged".into(), work.scalar_mults);
+        counters.insert("aps_core_combines_uncharged".into(), work.combines);
+        counters.insert("aps_core_point_adds_uncharged".into(), work.point_adds);
+        counters.insert("aps_core_square_roots_uncharged".into(), work.lifts);
+        counters.insert(
+            "aps_core_expression_multiplications_uncharged".into(),
+            work.expression_multiplications,
+        );
+    }
     let phases = elapsed
         .iter()
         .map(|(name, &ns)| {
@@ -698,27 +722,67 @@ pub fn solve(
             }
         })
         .collect();
+    let mut detail = json!({
+        "schema": if v2 { "ecbench.aps/v2" } else { "ecbench.aps/v1" },
+        "outcome": outcome,
+        "target_error": target_error,
+        "attempts": attempts,
+        "wall_accounting_complete": true,
+        "native_work_accounting_complete": false,
+        "costs_attested": false,
+        "complete_sets_independently_audited": false,
+        "independent_witness_backend": "ic_boundary::PrimeCurve ordinary-residue affine",
+        "post_run_serialization_in_algorithm_clock": false,
+        "post_run_aggregation_in_algorithm_clock": false,
+    });
+    if v2 {
+        // Work no counter can hold, recorded as fields and not as `unpriced`
+        // entries: there is no allocation observer in this build.
+        detail["uncounted_work"] = json!({
+            "allocation_observer_available": false,
+            "classes": [
+                "heap allocation",
+                "hashing and ordered-map operations",
+                "polynomial additions, subtractions and term collection",
+                "field arithmetic of divisor decoding and modular recovery",
+                "field operations inside each counted group-operation call",
+            ],
+        });
+    }
     Ok(SolveReport {
-        recovered, exhausted: recovered.is_none(), phases,
-        total_gae: audit_ops.gae() + verification_ops.gae(), automorphisms_used: 2, counters,
-        unpriced: vec!["aps_f4_multiplications_uncharged".into(), "aps_root_multiplications_uncharged".into(), "APS core group/field operations, polynomial construction, allocation and hashing are not completely counted; absent solver reports leave diagnostic counts unknown. No complete S or bitop ranking is supported".into()],
+        recovered: recovered.map(crate::cryptanalysis::ecbench::exact_scalar::ExactScalar::from),
+        exhausted: recovered.is_none(),
+        phases,
+        total_gae: audit_ops.gae() + verification_ops.gae(),
+        automorphisms_used: 2,
+        counters,
+        unpriced: if v2 {
+            // Counter names only. The two `*_unknown_*` counters say for how
+            // many attempts a solver report was absent, so its counts are
+            // missing from the F4/root tallies above.
+            [
+                "aps_core_combines_uncharged",
+                "aps_core_expression_multiplications_uncharged",
+                "aps_core_point_adds_uncharged",
+                "aps_core_scalar_mults_uncharged",
+                "aps_core_square_roots_uncharged",
+                "aps_f4_multiplications_uncharged",
+                "aps_legacy_root_count_unknown_attempts",
+                "aps_root_multiplications_uncharged",
+                "aps_unreported_algebra_attempts",
+            ]
+            .map(String::from)
+            .into()
+        } else {
+            vec!["aps_f4_multiplications_uncharged".into(), "aps_root_multiplications_uncharged".into(), "APS core group/field operations, polynomial construction, allocation and hashing are not completely counted; absent solver reports leave diagnostic counts unknown. No complete S or bitop ranking is supported".into()]
+        },
         deterministic: false,
-        nondeterminism: vec!["cooperative wall deadline may change returned roots/attempt outcomes".into()],
+        nondeterminism: vec![
+            "cooperative wall deadline may change returned roots/attempt outcomes".into(),
+        ],
         solve_wall_ns: wall,
         online: Some(online),
-        detail: json!({
-            "schema": "ecbench.aps/v1",
-            "outcome": outcome,
-            "target_error": target_error,
-            "attempts": attempts,
-            "wall_accounting_complete": true,
-            "native_work_accounting_complete": false,
-            "costs_attested": false,
-            "complete_sets_independently_audited": false,
-            "independent_witness_backend": "ic_boundary::PrimeCurve ordinary-residue affine",
-            "post_run_serialization_in_algorithm_clock": false,
-            "post_run_aggregation_in_algorithm_clock": false,
-        }),
+        detail,
         ..Default::default()
     })
 }

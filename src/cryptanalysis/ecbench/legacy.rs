@@ -14,6 +14,7 @@
 //! | #1640 (`31dd89b67`, 2026-10-11): `docs/ic/calibration.json` gains the row `koblitz/K_0 / GF(2^23)` | native units of that curve are priced by count; before, they were listed unpriced |
 //! | linear harvest on by default (`d1d034d94`, `9e69f57ef`, 2026-10-15) | the root basis' linear rows are appended and the node re-eliminated, so the search and its word count change |
 //! | F6-IC gate-first on by default (`d72e8b04d`) | refuted nodes skip their specialisations |
+//! | #1646 also: the F6-IC gate's partial support test (`geometric_partial_support_*`) | a node with a summand's bits partly fixed is refuted by the gate where the reduction used to find it infeasible, so splits, reductions, `infeasible_branches` and `geometric_refutations` differ |
 //!
 //! Both generations are committed evidence under the same id and the same
 //! parameters, so the id cannot tell them apart.  The *record* can: it is
@@ -242,7 +243,7 @@ pub const PRE_1646_BINARIES: [Producer; 3] = [
     (
         "712a58bb4ae2ba9da32ed4170d6b4c775453a3b0cdf46fd28760559a249cebad",
         "",
-        "f6_ic_ecbench_ladder_20261005/sessions/{n13,n19}",
+        "f6_ic_ecbench_ladder_20261005/sessions/{n7,n13,n19,n23}",
     ),
     (
         "b2596e9db8b79a11479ae22b4d12570114501b841c22716929f61012fd9d3845",

@@ -7514,10 +7514,54 @@ pub fn reset_f6_ic_pair_index_cache() {
 }
 
 /// `KIC_F6_PARTIAL_SUPPORT=0` turns the gate's partial support test off, as
-/// a same-binary control; read once per process.
+/// a same-binary control; read once per process.  The gate before #1646
+/// (`e49afb98f`, 2026-10-11) had no partial support test: it refuted only on
+/// a summand whose every bit was fixed, so the legacy accounting
+/// (`ecbench::legacy`, `pre-1646`) leaves it off.
 fn partial_support_enabled() -> bool {
     static ENABLED: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
-    *ENABLED.get_or_init(|| std::env::var("KIC_F6_PARTIAL_SUPPORT").as_deref() != Ok("0"))
+    !crate::cryptanalysis::koblitz_groebner::legacy_pre_1646_active()
+        && *ENABLED.get_or_init(|| std::env::var("KIC_F6_PARTIAL_SUPPORT").as_deref() != Ok("0"))
+}
+
+thread_local! {
+    static F6_TREE_V1: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Search F6-IC trees as before the few-candidate closure (tree v1,
+/// `ecbench::record::F6_TREE_KEY`), on this thread: the audit turns this on
+/// to replay a session that recorded an older tree version.
+pub fn set_f6_tree_v1(on: bool) {
+    F6_TREE_V1.with(|c| c.set(on));
+}
+
+/// Largest number of base codes a summand's assigned bits may leave for
+/// the gate to close the node exactly (the few-candidate closure in
+/// [`F6GeometricGate::decide`]); default 64, `KIC_F6_FEW_CANDIDATES=0`
+/// turns it off as a same-binary control.  Read once per process.
+///
+/// `research/f6_few_candidates_20261105`: on nine Koblitz cells every
+/// verdict and index is unchanged, the pair lookups and group additions
+/// are identical, and the tree shrinks to the root: 2.6–10× less CPU on
+/// the pair-index arm.  The lookups being identical says the algebra
+/// ruled out no candidate on those cells; this arm is the pair-index
+/// meet-in-the-middle scan once the closure is on.
+///
+/// Off while [`set_f6_tree_v1`] is in force (a replay of a record made before
+/// the closure existed) and under the `pre-1646` legacy accounting.
+fn few_candidate_limit() -> usize {
+    if F6_TREE_V1.with(|c| c.get())
+        || crate::cryptanalysis::koblitz_groebner::legacy_pre_1646_active()
+    {
+        return 0;
+    }
+    static LIMIT: std::sync::OnceLock<usize> = std::sync::OnceLock::new();
+    *LIMIT.get_or_init(|| {
+        std::env::var("KIC_F6_FEW_CANDIDATES")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(64)
+    })
 }
 
 /// F6-IC's target-specific geometric branch oracle. It may close a branch
@@ -7535,6 +7579,13 @@ struct F6GeometricGate<'a> {
     /// partial support test: a summand whose assigned bits match none of
     /// them cannot be a base point whatever its free bits become.
     codes: Vec<u64>,
+    /// The x-coordinate (as a `by_x` key) of each code in `codes`, for the
+    /// few-candidate closure.
+    x_of_code: HashMap<u64, BigUint>,
+    /// Nodes the few-candidate closure decided, and the candidate
+    /// x-coordinates it closed.
+    few_candidate_closures: u64,
+    few_candidate_xs: u64,
     fast: Option<F6FastGeometry>,
     batch_fast: bool,
     pair_index_enabled: bool,
@@ -7577,6 +7628,7 @@ impl<'a> F6GeometricGate<'a> {
         let encoder = F6CoordinateEncoder::new(&fb.subspace_basis)?;
         let mut by_x: HashMap<BigUint, Vec<usize>> = HashMap::new();
         let mut codes: Vec<u64> = Vec::with_capacity(fb.points.len());
+        let mut x_of_code: HashMap<u64, BigUint> = HashMap::new();
         for (index, point) in fb.points.iter().enumerate() {
             if index_of.get(&point_key(point)) != Some(&index) {
                 return None;
@@ -7584,7 +7636,9 @@ impl<'a> F6GeometricGate<'a> {
             let BinaryPoint::Affine { x, .. } = point else {
                 continue;
             };
-            codes.push(encoder.encode(x)?);
+            let code = encoder.encode(x)?;
+            codes.push(code);
+            x_of_code.entry(code).or_insert_with(|| x.to_biguint());
             by_x.entry(x.to_biguint()).or_default().push(index);
         }
         codes.sort_unstable();
@@ -7646,6 +7700,9 @@ impl<'a> F6GeometricGate<'a> {
             encoder,
             by_x,
             codes,
+            x_of_code,
+            few_candidate_closures: 0,
+            few_candidate_xs: 0,
             fast,
             batch_fast: true,
             pair_index_enabled: false,
@@ -8048,6 +8105,9 @@ impl<'a> F6GeometricGate<'a> {
 
     fn decide(&mut self, assignment: &[Option<bool>], defined_mask: Mask) -> NodeOracleDecision {
         let mut fixed = Vec::with_capacity(self.vars.len());
+        // Each incomplete summand's assigned bits, for the few-candidate
+        // closure.
+        let mut partial: Vec<(usize, u64, u64)> = Vec::new();
         for (i, vars) in self.vars.iter().enumerate() {
             let mut x = F2mElement::zero(self.kc.n);
             let mut complete = true;
@@ -8089,6 +8149,9 @@ impl<'a> F6GeometricGate<'a> {
                     return NodeOracleDecision::Refute;
                 }
             }
+            if !complete {
+                partial.push((i, assigned_mask, assigned_code));
+            }
             if complete {
                 self.support_checks += 1;
                 let key = x.to_biguint();
@@ -8102,6 +8165,47 @@ impl<'a> F6GeometricGate<'a> {
         // is capped at 256 points; with a pair index a call is two lookups,
         // and the cap does not apply.
         let indexed = self.pair_index_enabled && self.fast.is_some();
+        // Few-candidate closure: before any summand is complete, a summand
+        // whose assigned bits leave at most `few_candidate_limit()` base
+        // codes is closed exactly, one candidate x-coordinate at a time,
+        // by the same one-fixed closure a complete summand gets.  A
+        // decomposition extending this node has that summand at one of
+        // those x-coordinates, so the subtree holds a decomposition iff
+        // one of the closures finds one: the answer is the subtree's.
+        let limit = few_candidate_limit();
+        if self.vars.len() == 3 && fixed.is_empty() && indexed && limit > 0 {
+            let best = partial
+                .iter()
+                .filter(|&&(_, mask, _)| mask != 0)
+                .map(|&(i, mask, code)| {
+                    let n = self
+                        .codes
+                        .iter()
+                        .filter(|&&c| c & mask == code)
+                        .take(limit + 1)
+                        .count();
+                    (n, i, mask, code)
+                })
+                .min();
+            if let Some((n, i, mask, code)) = best {
+                if n <= limit {
+                    self.few_candidate_closures += 1;
+                    let xs: Vec<BigUint> = self
+                        .codes
+                        .iter()
+                        .filter(|&&c| c & mask == code)
+                        .map(|c| self.x_of_code[c].clone())
+                        .collect();
+                    for x in xs {
+                        self.few_candidate_xs += 1;
+                        if self.close_one_fixed(&(i, x), assignment, defined_mask) {
+                            return NodeOracleDecision::Witness;
+                        }
+                    }
+                    return NodeOracleDecision::Refute;
+                }
+            }
+        }
         if self.vars.len() == 3 && fixed.len() == 1 && (self.fb.points.len() <= 256 || indexed) {
             return if self.close_one_fixed(&fixed[0], assignment, defined_mask) {
                 NodeOracleDecision::Witness
@@ -21986,6 +22090,79 @@ mod tests {
         );
     }
 
+    /// The few-candidate closure (default on in the pair-index arm) decides
+    /// every target as exhaustive enumeration does, and every witness it
+    /// returns closes the group identity.
+    #[test]
+    fn f6_ic_few_candidate_closure_matches_exact_enumeration() {
+        let kc = KoblitzCurve::new(0, 9).unwrap();
+        let fb = build_standard_subspace_factor_base(&kc, 4).unwrap();
+        let index_of = fb.index_map();
+        let st = FieldStructure::new(kc.n, &kc.curve.irreducible);
+        let engine = SolverEngine::InheritedF4 { max_degree: 3 };
+        let mut hits = 0usize;
+        for scalar in 1..=40u32 {
+            let target = kc.mul(kc.generator(), &BigUint::from(scalar));
+            let expected = enumerate_decompose(&kc, &fb, &index_of, &target, 3);
+            let (found, stats) = groebner_decompose_f6_ic_pair_index(
+                &kc, &fb, &index_of, &st, &target, 3, engine, 20_000,
+            );
+            assert!(!stats.exhausted, "target={scalar}");
+            assert_eq!(found.is_some(), expected.is_some(), "target={scalar}");
+            if let Some(indices) = found {
+                hits += 1;
+                let sum = indices
+                    .iter()
+                    .fold(BinaryPoint::Infinity, |acc, &i| kc.add(&acc, &fb.points[i]));
+                assert_eq!(sum, target);
+            }
+        }
+        assert!(hits > 0, "no target decomposed");
+    }
+
+    /// A replay of a session recorded before the few-candidate closure
+    /// (`set_f6_tree_v1`), and the `pre-1646` legacy accounting, search the
+    /// older tree: the same relations, with the closure's shrinking of the
+    /// tree undone (the control: the current tree is smaller).
+    #[test]
+    fn f6_tree_v1_and_pre_1646_turn_the_few_candidate_closure_off() {
+        use crate::cryptanalysis::koblitz_groebner::set_legacy_pre_1646;
+        let kc = KoblitzCurve::new(0, 9).unwrap();
+        let fb = build_standard_subspace_factor_base(&kc, 4).unwrap();
+        let index_of = fb.index_map();
+        let st = FieldStructure::new(kc.n, &kc.curve.irreducible);
+        let engine = SolverEngine::InheritedF4 { max_degree: 3 };
+        let run = || {
+            let mut reductions = 0usize;
+            let mut found = Vec::new();
+            for scalar in 1..=24u32 {
+                let target = kc.mul(kc.generator(), &BigUint::from(scalar));
+                let (f6, stats) = groebner_decompose_f6_ic_pair_index(
+                    &kc, &fb, &index_of, &st, &target, 3, engine, 20_000,
+                );
+                assert!(!stats.exhausted, "target={scalar}");
+                reductions += stats.reductions;
+                found.push(f6);
+            }
+            (reductions, found)
+        };
+        let (current, current_found) = run();
+        set_f6_tree_v1(true);
+        let (v1, v1_found) = run();
+        set_f6_tree_v1(false);
+        // With tree v1 off again, the pre-1646 accounting still has no closure.
+        assert!(few_candidate_limit() > 0);
+        set_legacy_pre_1646(true);
+        let closure_under_legacy = few_candidate_limit();
+        set_legacy_pre_1646(false);
+        assert!(
+            current < v1,
+            "control: the closure did not shrink the tree ({current} vs {v1})"
+        );
+        assert_eq!(v1_found, current_found);
+        assert_eq!(closure_under_legacy, 0);
+    }
+
     #[test]
     fn f6_ic_proves_exact_small_base_misses() {
         let kc = KoblitzCurve::new(0, 9).unwrap();
@@ -22004,6 +22181,44 @@ mod tests {
             missed += usize::from(expected.is_none());
         }
         assert!(missed > 0);
+    }
+
+    /// The legacy `pre-1646` accounting (`ecbench::legacy`) reproduces the
+    /// F6-IC gate as it was before #1646 added the partial support test:
+    /// no partial check is made, and the relation found is the same.  The
+    /// current gate makes them (the control: the test would pass vacuously
+    /// if the base never reached a partially assigned summand).
+    #[test]
+    fn legacy_pre_1646_gate_makes_no_partial_support_checks() {
+        use crate::cryptanalysis::koblitz_groebner::set_legacy_pre_1646;
+        let kc = KoblitzCurve::new(0, 9).unwrap();
+        let fb = build_standard_subspace_factor_base(&kc, 2).unwrap();
+        let index_of = fb.index_map();
+        let st = FieldStructure::new(kc.n, &kc.curve.irreducible);
+        let engine = SolverEngine::InheritedF4 { max_degree: 3 };
+        let run = |legacy: bool| {
+            set_legacy_pre_1646(legacy);
+            let mut checks = 0u64;
+            let mut found = Vec::new();
+            for scalar in 1..=32u32 {
+                let target = kc.mul(kc.generator(), &BigUint::from(scalar));
+                let (f6, stats) =
+                    groebner_decompose_f6_ic(&kc, &fb, &index_of, &st, &target, 2, engine, 20_000);
+                assert!(!stats.exhausted && !stats.unsupported, "target={scalar}");
+                checks += stats.geometric_partial_support_checks;
+                found.push(f6.is_some());
+            }
+            set_legacy_pre_1646(false);
+            (checks, found)
+        };
+        let (current_checks, current_found) = run(false);
+        let (legacy_checks, legacy_found) = run(true);
+        assert!(
+            current_checks > 0,
+            "control: the current gate never checked"
+        );
+        assert_eq!(legacy_checks, 0);
+        assert_eq!(legacy_found, current_found);
     }
 
     /// lit2026 W5: the gate-first order (`KIC_F6_GATE_FIRST`) and the
