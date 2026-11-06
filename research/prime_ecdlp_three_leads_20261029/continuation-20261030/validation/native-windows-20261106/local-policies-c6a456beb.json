@@ -1,0 +1,94 @@
+{
+  "recorded_utc": "2026-11-06T02:02:25.994933+00:00",
+  "head": "c6a456beb229e8d4c25124b1143d9963e829eb60",
+  "base": "d30b9e0db7ec00c55330effef5f64532f97cd160",
+  "checks": {
+    "whitespace": {
+      "command": [
+        "git",
+        "diff",
+        "--check",
+        "d30b9e0db7ec00c55330effef5f64532f97cd160",
+        "c6a456beb229e8d4c25124b1143d9963e829eb60"
+      ],
+      "exit": 0,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_utf8": ""
+    },
+    "size": {
+      "command": [
+        "scripts/check-large-files.sh",
+        "d30b9e0db7ec00c55330effef5f64532f97cd160",
+        "c6a456beb229e8d4c25124b1143d9963e829eb60"
+      ],
+      "exit": 0,
+      "bytes": 65,
+      "sha256": "322761bcb838f5da662927750da20634e40f03f900e2c31c260a13cd2d9a78ec",
+      "raw_utf8": "check-large-files: no added or modified file over 10485760 bytes\n"
+    },
+    "artifacts": {
+      "command": [
+        "python3",
+        "tools/artifacts/artifacts.py",
+        "check",
+        "d30b9e0db7ec00c55330effef5f64532f97cd160",
+        "c6a456beb229e8d4c25124b1143d9963e829eb60"
+      ],
+      "exit": 0,
+      "bytes": 41,
+      "sha256": "30a8346d1f9f41872ce54a60a20c0c053f57632ebd6e32f1e9be5529224fa934",
+      "raw_utf8": "artifacts check: no data files committed\n"
+    },
+    "benchrec": {
+      "command": [
+        "python3",
+        "tools/benchrec.py",
+        "gate"
+      ],
+      "exit": 0,
+      "bytes": 52,
+      "sha256": "edb93f3fb65973557b2a971cbf34983528e61662e524059d93cf3382b2fedeb8",
+      "raw_utf8": "benchrec: OK, 37 record(s), progress report current\n"
+    },
+    "ledger-old-d30": {
+      "command": [
+        "python3",
+        "tools/pcc/pcc.py",
+        "ledger",
+        "verify",
+        "--base",
+        "d30b9e0db7ec00c55330effef5f64532f97cd160"
+      ],
+      "exit": 0,
+      "bytes": 30,
+      "sha256": "dc98b712090471c1ec6eb48a64ad44965d8136de8fb369812a685f5074b1a699",
+      "raw_utf8": "ledger: 147 entries, chain ok\n"
+    },
+    "body-lint": {
+      "command": [
+        "python3",
+        "tools/pcc/pcc.py",
+        "lint-prose",
+        "/workspace/pkm-native-windows-20261106/pr-body.md"
+      ],
+      "exit": 0,
+      "bytes": 25,
+      "sha256": "78860995516e3367bf95a303485b67d572a3b44e8a1165dc117ca264ddb7b3eb",
+      "raw_utf8": "lint-prose: 0 finding(s)\n"
+    }
+  },
+  "current_main_snapshot_prefix": {
+    "base": "c224878f19c01aa8954695c7bd20e42ad86379ef",
+    "exit": 1,
+    "raw_utf8": "ledger[95]: differs from the base branch (history rewritten)\nledger: 147 entries, BROKEN\n",
+    "scope": "unresolvedfrozenfork, notwaived"
+  },
+  "body": {
+    "sha256": "cc005062ddbbc8e3cc3834bb60359c3518b8e2d5ee776c1c6962ac340c5b8da9",
+    "raw_utf8": "This continuation retains previously omitted PKM work across scalar replay, affine checks, helper/encoding paths and now observed native F4 windows. The oracle emits the provider's process-wide native total and staircase subset around solve_visit and actual visitor callbacks. Checked subtraction/aggregation separates observed callback/outside windows and preserves Result-refusal state in a caller-held owner. Replay checks metadata arithmetic and visitor-attempt/callback binding; older missing-field records remain readable. [pcc:unverified]\n\nThese are incomplete PROCESS-WIDE observations, not isolated solver costs. Concurrent work may contaminate them, relaxed reads are not transactional, and valid-looking differences do not rule out a full provider wrap. Outside callback windows are not exclusive solver attribution. Stair is already included in native total; inclusive aliases callback plus outside parts, so do not add overlapping views. Provider-overflow/solver-attribution qualifications and complete coverage remainfalse, priced_total=null and comparison_admissible=false. Metadata consistency is not execution proof. [pcc:unverified]\n\nObserved validation on source `cd76e762319d7d7f0cb1239c157e8f81e753d68b`: **36 oracle tests pass**,0failed/ignored, including4new controls plus32prior. A real nested F4 call inside a visitor contributes positive callback-native work and is not charged again outside callbacks. Other controls cover refused input/owner reuse/not-called state, observed backwards/inconsistent/overflow deltas, tampering and integrated visitor/legacy-record binding. Formatting/CLIbuild0 and actual checkpoint-refusal MESSAGE+expectedexit1 pass before controlled nonexistent input/replay-envelope emission. PCC-20261106-496201 is unsigned/unverified. [pcc:unverified]\n\n**Overall validation remains FAIL101.** Final scoped Cargo clippy and supervisor fail on unchanged inherited library unused solve_one_with_trace and custody bool_comparison; final Cargo example strictlint remains unqualified. No suppression/test/assertion/ignore/gate waiver. The fresh recipe guards22committed objects and alltrackedcleanliness beforeeachphase; exact small phase captures/terminals and2freshbinaryhashes with stable copies are retained.8unchangedbinaries, oldraw/formal/gate/Mathlib objects are rechecked. Shared F4/root/Cargo/deps/fixtures/formal/process inputs unchanged; no duplicate old library/process/Lean run. [pcc:unverified]\n\nA concrete root-counter source gap remains: linear andp2 shortcuts in poly_roots_fp_counted_until omit supplied multiplication-accumulator updates, with inverse/addition/control work also incomplete. The p2 case is outside currentPKM p>11; linear cases matter. This step does NOT fix the shared core or call root counts complete. Solver-tree root multiplications and callback root multiplications are distinct execution phases, not aliases. A later shared-core fix requires fresh affected source validation. [pcc:unverified]\n\nThe caller-held native owner retains Result-refusal observations, but the upper producer run API may still drop its local ledger on Err; no durable failed-process/crash/resume claim follows. Returned means Result::Ok, including incomplete/capped reports, not recovered scalar. Legacy solve_excluding_callbacks timers subtract named callback phase clocks, not all observer/wrapper work. No timing denominator or calibrated cost/performance result is introduced. Earlier helper/encoder fields remain partial: two producer/replay executions both need charging, while inverse/sqrt diagnostics overlap children within one execution. Shared encoder comparison is consistency, not independent cost completeness. [pcc:unverified]\n\nOlder failed/capped receipts remain immutable at ownsource, including6168-case library cap/clock2failure with Cargoexitunknown/no fullpass and213453-byte rawlog NOT_UPLOADED. LegacyPCC13 failures remain at recorded scope. The unchanged formal/gate/Mathlib objects retain earlier18declaration/0trusted audit and module replay against imports, not --fresh; no new theorem or Rust/polynomial/complete-cost bridge is claimed. [pcc:unverified]\n\nIntegration remains blocked by frozen PCC divergence after95common entries. The original chain is preserved; landed maintainer945/e2 re-chain operations were recorded, not copied/repeated or treated as a general contract. Copilot6664459966 is REPORT-ONLY/no edits about a sanctioned provenance-preserving contract. No ordinary main merge, frozen side-selection/rechain/claim rewrite or shared verifier/keyring patch occurred. PR3452/2949 are merged; their maintenance stopped. Auto-merge stays paused. Require exact-current-head gate,size,artifactsSUCCESS, applicable live reviews/resolvedthreads and expectedSHAguard after reviewed/validated resolution. Absent/pending/old checks do not qualify changedsource. [pcc:unverified]\n\nOriginal G1-G6 unchanged: G1-G3/G6 partial,G4/G5 unrun,zero scientific panels,all cost/GAE/scaling metrics null. Full-panel historical card remains blocked/unfunded/unimplemented. No scientific panel,funding/lease/IAM/quota/pool/access changes or checkpoint/protocol/runtime bypass. Remaining full native/root/logical coverage, complete pricing/journal and qualified runtime/resume stay open.\n\nStudy: `research/prime_ecdlp_three_leads_20261029/continuation-20261030/`. New `G2_NATIVE_WINDOWS_20261106.md`, `validation/native-windows-20261106/{start,receipt,delivery-review}.json`, and the inspected two-page `native-windows-20261106.pdf`/editable SVG describe source scope and concrete root gap. All prior reports/evidence preserved. Canonical scientific/curve/performance views unchanged because no admitted metric/curveedge/phaseprice/reference changed. [pcc:unverified]\n",
+    "lint0actuallyobserved": true
+  },
+  "limits": "localoldbasepolicies,NOTcurrentmainprefix/globalPCC/nativeaggregate/GitHubCI",
+  "pcc_standing": "unverified"
+}
