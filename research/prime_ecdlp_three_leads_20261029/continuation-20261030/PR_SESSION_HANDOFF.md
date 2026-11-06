@@ -786,3 +786,14 @@ The p2 case is outside currentPKM p>11; linear cases matter. This source review
 is not a shared-core fix. A future root change needs fresh affected core and
 integration validation. Scientific acceptance/metrics remain unchanged and the
 frozen PCC fork remains unresolved; no ordinary merge or waiver was attempted.
+
+## Native-window publication — 2026-11-06
+
+Sourcecd76 and fresh36-control/report evidence were normal-pushed inf2b07f5fa
+to samePR3482. Exactf2bsnapshot: OPEN/CONFLICTING/autooff, auxiliary review/
+migrateSUCCESS, required gate/size/artifactsABSENT,reviews[]. No requiredpass
+claimed; latermetadata changes no testedRust/formal source. All22objects still
+matchcd76. [Publication receipt](validation/native-windows-20261106/publication-f2b07f5fa.json).
+Allnativejobs terminal; root shortcut gap staysopen, no frozenledgerresolution,
+oldPRmaintenance or scientificpanel. Native counts remain observed process
+classes, not isolated solver costs or full-wrap/price qualified. [pcc:unverified]
