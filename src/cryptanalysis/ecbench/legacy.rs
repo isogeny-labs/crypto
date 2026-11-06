@@ -351,6 +351,54 @@ pub const PRE_PENCIL_FD_BINARIES: [Producer; 1] = [(
     "ecbench_registry_optimization_20261101/execution/smoke-three-leads-corrected (the pencil-symbolic arm)",
 )];
 
+/// Binaries whose `rho.three_leads_*_v1` / `ic.three_leads_genus2_v1` records
+/// predate the cost-accounting counters of `543a54b4b1` (2026-10-29).
+pub const PRE_COST_ACCOUNTING_BINARIES: [Producer; 1] = [(
+    "20d3124321263bd165016a19abb1f455a51194824a541c1dca1476166b800503",
+    "ec11365f3bc792af31f07c00c7f160b66f4f0dcd",
+    "three_leads_e2e_20261018/correctness/genus-smoke-session-v2",
+)];
+
+/// The methods whose adapters gained [`COST_ACCOUNTING_COUNTERS`].
+pub const COST_ACCOUNTING_METHODS: [&str; 4] = [
+    "rho.three_leads_plain_v1",
+    "rho.three_leads_negation_v1",
+    "rho.three_leads_jacobian_v1",
+    "ic.three_leads_genus2_v1",
+];
+
+/// Counters `543a54b4b1` ("source-bound mathematical cost accounting")
+/// added to the three-lead adapters: the adapter ledger's digest words
+/// (all four methods) and the rho engine's hash and entry-visit meters.  They
+/// are uncharged observations; nothing priced moves, and the replay's values
+/// are the same on every run.
+pub const COST_ACCOUNTING_COUNTERS: [&str; 11] = [
+    "adapter_accounting_sha256_word_0",
+    "adapter_accounting_sha256_word_1",
+    "adapter_accounting_sha256_word_2",
+    "adapter_accounting_sha256_word_3",
+    "rho_hash_policy_rust_default_v1",
+    "rho_observed_hash_bytes_v1",
+    "rho_observed_hash_calls_v1",
+    "rho_semantic_elements_copied_v1",
+    "rho_semantic_elements_initialized_v1",
+    "rho_semantic_entry_visits_v1",
+    "rho_semantic_key_comparisons_v1",
+];
+
+/// Whether `name` is a counter a three-lead record may predate.
+pub fn is_cost_accounting_counter(name: &str) -> bool {
+    COST_ACCOUNTING_COUNTERS.contains(&name)
+}
+
+/// Whether `r` may be compared without the counters it predates: one of the
+/// four three-lead methods, written by a binary on
+/// [`PRE_COST_ACCOUNTING_BINARIES`].
+pub fn admits_pre_cost_accounting(r: &crate::cryptanalysis::ecbench::record::Record) -> bool {
+    COST_ACCOUNTING_METHODS.contains(&r.method.id.as_str())
+        && listed(&PRE_COST_ACCOUNTING_BINARIES, r)
+}
+
 fn listed(list: &[Producer], r: &crate::cryptanalysis::ecbench::record::Record) -> bool {
     list.iter()
         .any(|&(binary, _, _)| r.binary_sha256.as_deref() == Some(binary))
@@ -489,5 +537,161 @@ mod tests {
             .iter()
             .filter(|p| p.harvest_r3)
             .all(|p| p.name == "pre-r8-harvest"));
+    }
+
+    /// The committed `genus-smoke-session-v2` records (seq 0-3, binary
+    /// `20d31243...`): replayed today, each method reports the committed
+    /// counters unchanged and, besides them, exactly the cost-accounting
+    /// counters of `543a54b4b1`, which the comparator leaves out for a record
+    /// that lacks them ([`admits_pre_cost_accounting`]).
+    #[test]
+    fn three_leads_smoke_v2_replays_without_cost_accounting_counters() {
+        use crate::cryptanalysis::ecbench::record::child_main;
+        let cases: [(&str, &[(&str, u64)]); 4] = [
+            (
+                r#"{"schema":"ecbench.child_input/v1","curve":{"kind":"three_leads","p":311,"n":2,"modulus":1,"a":72941,"b":95583,"group_order":96704,"r":1511,"gx":1878,"gy":77655,"family":"scholten","parameter":0},"target_seed":202610181260,"target_index":0,"expected_workload_id":"Wc3c64df7f21b","method":{"id":"rho.three_leads_jacobian_v1","params":{"trial_cap":"47900"}},"expected_method_id":"ECM1h8f8f7a965ae9","algorithm_seed":15266473421741453717}"#,
+                &[
+                    ("canonicalisations_uncharged", 34),
+                    ("cycle_escape_doublings", 0),
+                    ("field_additions_uncharged", 98560),
+                    ("field_inversions", 1706),
+                    ("field_multiplications", 56056),
+                    ("field_squarings", 1278),
+                    ("hash_probes_uncharged", 34),
+                    ("jacobian_additions", 523),
+                    ("linear_bit_operations_uncharged", 0),
+                    ("logical_collision_table_bytes", 3640),
+                    ("lookahead_rejected_additions", 0),
+                    ("partition_hashes_uncharged", 47),
+                    ("random_restarts", 0),
+                    ("rng_draws_uncharged", 34),
+                    ("scalar_adds_uncharged", 100),
+                    ("scalar_inversions_uncharged", 1),
+                    ("scalar_muls_uncharged", 1),
+                    ("source_add_inversions", 1),
+                    ("source_add_multiplications", 9),
+                    ("source_add_squarings", 4),
+                    ("source_ec_additions", 15),
+                    ("square_root_calls", 0),
+                    ("stored_collision_points", 33),
+                    ("walk_steps", 33),
+                ],
+            ),
+            (
+                r#"{"schema":"ecbench.child_input/v1","curve":{"kind":"three_leads","p":311,"n":2,"modulus":1,"a":72941,"b":95583,"group_order":96704,"r":1511,"gx":1878,"gy":77655,"family":"scholten","parameter":0},"target_seed":202610181260,"target_index":0,"expected_workload_id":"Wc3c64df7f21b","method":{"id":"rho.three_leads_negation_v1","params":{"trial_cap":"47900"}},"expected_method_id":"ECM1h32f6753a22d9","algorithm_seed":15266473421741453717}"#,
+                &[
+                    ("canonicalisations_uncharged", 42),
+                    ("cycle_escape_doublings", 0),
+                    ("field_additions_uncharged", 31630),
+                    ("field_inversions", 509),
+                    ("field_multiplications", 9461),
+                    ("field_squarings", 2646),
+                    ("hash_probes_uncharged", 40),
+                    ("jacobian_additions", 0),
+                    ("linear_bit_operations_uncharged", 0),
+                    ("logical_collision_table_bytes", 2296),
+                    ("lookahead_rejected_additions", 2),
+                    ("partition_hashes_uncharged", 66),
+                    ("random_restarts", 0),
+                    ("rng_draws_uncharged", 34),
+                    ("scalar_adds_uncharged", 140),
+                    ("scalar_inversions_uncharged", 1),
+                    ("scalar_muls_uncharged", 1),
+                    ("source_add_inversions", 1),
+                    ("source_add_multiplications", 9),
+                    ("source_add_squarings", 4),
+                    ("source_ec_additions", 544),
+                    ("square_root_calls", 0),
+                    ("stored_collision_points", 39),
+                    ("walk_steps", 39),
+                ],
+            ),
+            (
+                r#"{"schema":"ecbench.child_input/v1","curve":{"kind":"three_leads","p":311,"n":2,"modulus":1,"a":72941,"b":95583,"group_order":96704,"r":1511,"gx":1878,"gy":77655,"family":"scholten","parameter":0},"target_seed":202610181260,"target_index":0,"expected_workload_id":"Wc3c64df7f21b","method":{"id":"ic.three_leads_genus2_v1","params":{"independent":"0","trial_cap":"47900","unique_relations":"1"}},"expected_method_id":"ECM1hb80894a0fe31","algorithm_seed":15266473421741453717}"#,
+                &[
+                    ("duplicate_relation_divisors", 1),
+                    ("field_additions_uncharged", 105698),
+                    ("field_inversions", 1818),
+                    ("field_multiplications", 62067),
+                    ("field_squarings", 3838),
+                    ("first_graph_cycle_trial", 32),
+                    ("graph_cycles", 2),
+                    ("graph_operations_uncharged", 58),
+                    ("hash_probes_uncharged", 75),
+                    ("jacobian_additions", 563),
+                    ("large_prime_nodes", 39),
+                    ("linear_bit_operations_uncharged", 0),
+                    ("logical_graph_bytes", 3408),
+                    ("negative_cycles", 2),
+                    ("processed_divisors", 46),
+                    ("rng_draws_uncharged", 36),
+                    ("scalar_adds_uncharged", 389),
+                    ("scalar_inversions_uncharged", 3),
+                    ("scalar_muls_uncharged", 5),
+                    ("source_add_inversions", 1),
+                    ("source_add_multiplications", 9),
+                    ("source_add_squarings", 4),
+                    ("source_ec_additions", 15),
+                    ("split_relations", 25),
+                    ("square_root_calls", 45),
+                    ("zero_target_coefficients", 0),
+                ],
+            ),
+            (
+                r#"{"schema":"ecbench.child_input/v1","curve":{"kind":"three_leads","p":311,"n":2,"modulus":1,"a":72941,"b":95583,"group_order":96704,"r":1511,"gx":1878,"gy":77655,"family":"scholten","parameter":0},"target_seed":202610181260,"target_index":0,"expected_workload_id":"Wc3c64df7f21b","method":{"id":"rho.three_leads_plain_v1","params":{"trial_cap":"47900"}},"expected_method_id":"ECM1h8e2cc46abd4f","algorithm_seed":15266473421741453717}"#,
+                &[
+                    ("canonicalisations_uncharged", 64),
+                    ("cycle_escape_doublings", 0),
+                    ("field_additions_uncharged", 32514),
+                    ("field_inversions", 531),
+                    ("field_multiplications", 9659),
+                    ("field_squarings", 2734),
+                    ("hash_probes_uncharged", 64),
+                    ("jacobian_additions", 0),
+                    ("linear_bit_operations_uncharged", 0),
+                    ("logical_collision_table_bytes", 4592),
+                    ("lookahead_rejected_additions", 0),
+                    ("partition_hashes_uncharged", 63),
+                    ("random_restarts", 0),
+                    ("rng_draws_uncharged", 34),
+                    ("scalar_adds_uncharged", 130),
+                    ("scalar_inversions_uncharged", 1),
+                    ("scalar_muls_uncharged", 1),
+                    ("source_add_inversions", 1),
+                    ("source_add_multiplications", 9),
+                    ("source_add_squarings", 4),
+                    ("source_ec_additions", 566),
+                    ("square_root_calls", 0),
+                    ("stored_collision_points", 63),
+                    ("walk_steps", 63),
+                ],
+            ),
+        ];
+        for (input, committed) in cases {
+            let rep = child_main(input).report.expect("replay");
+            let kept: std::collections::BTreeMap<String, u64> = rep
+                .counters
+                .iter()
+                .filter(|(k, _)| !is_cost_accounting_counter(k))
+                .map(|(k, v)| (k.clone(), *v))
+                .collect();
+            let want: std::collections::BTreeMap<String, u64> =
+                committed.iter().map(|(k, v)| (k.to_string(), *v)).collect();
+            assert_eq!(kept, want, "{input}");
+            for name in rep.counters.keys().filter(|k| !want.contains_key(*k)) {
+                assert!(is_cost_accounting_counter(name), "unexpected extra {name}");
+            }
+            assert!(rep
+                .counters
+                .contains_key("adapter_accounting_sha256_word_0"));
+        }
+    }
+
+    #[test]
+    fn cost_accounting_list_is_closed() {
+        assert_eq!(PRE_COST_ACCOUNTING_BINARIES.len(), 1);
+        assert_eq!(COST_ACCOUNTING_METHODS.len(), 4);
+        assert!(!is_cost_accounting_counter("field_multiplications"));
+        assert!(!is_cost_accounting_counter("walk_steps"));
     }
 }
