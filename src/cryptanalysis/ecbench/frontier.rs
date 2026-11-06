@@ -42,14 +42,20 @@ const REPORTED_AXES: &[&str] = &["ops", "memory", "uncharged"];
 /// bound carries and the three field-operation axes a bound carries when
 /// its runs counted them.
 pub fn is_axis(name: &str) -> bool {
-    REPORTED_AXES.contains(&name) || FIELD_AXES.contains(&name)
+    REPORTED_AXES.contains(&name) || FIELD_AXES.contains(&name) || name == ORACLE_AXIS
 }
+
+/// The axis of a domain whose problem provides an oracle: its queries per
+/// `sqrt(r)`.  Dominance in such a domain always reads it, so a method that
+/// is cheaper in `ops` only by querying is not set above one that does not.
+pub const ORACLE_AXIS: &str = "oracle_queries";
 
 /// The axis vocabulary, for error messages.
 pub fn axis_names() -> String {
     REPORTED_AXES
         .iter()
         .chain(FIELD_AXES.iter())
+        .chain([ORACLE_AXIS].iter())
         .copied()
         .collect::<Vec<_>>()
         .join(", ")
@@ -228,8 +234,9 @@ fn entry_of(b: &Bound, axes: &[String]) -> Entry {
         .map(String::as_str)
         .chain(REPORTED_AXES.iter().copied())
         .chain(FIELD_AXES.iter().copied())
+        .chain([ORACLE_AXIS])
     {
-        if FIELD_AXES.contains(&name) && !b.dimensions.contains_key(name) {
+        if (FIELD_AXES.contains(&name) || name == ORACLE_AXIS) && !b.dimensions.contains_key(name) {
             continue;
         }
         ax.entry(name.to_string())
@@ -392,6 +399,12 @@ pub fn build_v1(bounds: &[Bound], axes: &[String]) -> Result<Frontier, String> {
     }
     let mut domains = Vec::new();
     for (domain_id, (domain, bs)) in by_domain {
+        // A domain with an oracle reads the oracle axis whatever was asked.
+        let mut domain_axes = axes.to_vec();
+        if domain.envelope.oracle.is_some() && !domain_axes.iter().any(|a| a == ORACLE_AXIS) {
+            domain_axes.push(ORACLE_AXIS.to_string());
+        }
+        let axes = &domain_axes[..];
         let mut entries: Vec<Entry> = bs.iter().map(|b| entry_of(b, axes)).collect();
         let snapshot = entries.clone();
         for e in entries.iter_mut() {
@@ -826,6 +839,12 @@ pub fn build(bounds: &[Bound], axes: &[String]) -> Result<Frontier, String> {
     }
     let mut domains = Vec::new();
     for (domain_id, (domain, bs)) in by_domain {
+        // A domain with an oracle reads the oracle axis whatever was asked.
+        let mut domain_axes = axes.to_vec();
+        if domain.envelope.oracle.is_some() && !domain_axes.iter().any(|a| a == ORACLE_AXIS) {
+            domain_axes.push(ORACLE_AXIS.to_string());
+        }
+        let axes = &domain_axes[..];
         let (ranked, unranked): (Vec<&Bound>, Vec<&Bound>) = bs
             .iter()
             .copied()
@@ -1070,16 +1089,30 @@ fn render_markdown_v2(f: &Frontier, records_dir: &str) -> String {
         FIELD_AXES
             .iter()
             .copied()
+            .chain([ORACLE_AXIS])
             .filter(|a| d.entries.iter().any(|e| e.axes.contains_key(*a)))
             .collect()
     };
+    if f.domains.iter().any(|d| d.domain.envelope.oracle.is_some()) {
+        out.push_str("A domain with an `oracle` is the DLP with that auxiliary-input oracle, not the plain ECDLP, and its `oracle queries` column (static-DH queries per `√r`, zero for a method that queries nothing) is an axis of dominance there: a method whose `ops` are lower only because it was handed the oracle's answers does not displace one that was not.\n\n");
+    }
     if f.domains.iter().any(|d| !field_cols(d).is_empty()) {
         out.push_str("`field muls`, `field sqrs` and `field invs` are the modular multiplications, squarings and inversions behind the group operations, per `√r`. A row showing `unknown` there did not count them; unknown is not zero.\n\n");
     }
     for d in &f.domains {
         out.push_str(&format!(
-            "## {} · {} · {} targets · {} · tier {}\n\n",
-            d.domain.problem, d.domain.family, d.domain.target_kind, d.domain.unit, d.domain.tier
+            "## {} · {} · {} targets · {} · tier {}{}\n\n",
+            d.domain.problem,
+            d.domain.family,
+            d.domain.target_kind,
+            d.domain.unit,
+            d.domain.tier,
+            d.domain
+                .envelope
+                .oracle
+                .as_ref()
+                .map(|o| format!(" · oracle {o}"))
+                .unwrap_or_default()
         ));
         out.push_str(&format!(
             "Domain `{}`. Floor: {}. {}; {}.\n\n",
@@ -1244,16 +1277,30 @@ pub fn render_markdown_v1(f: &Frontier, records_dir: &str) -> String {
         FIELD_AXES
             .iter()
             .copied()
+            .chain([ORACLE_AXIS])
             .filter(|a| d.entries.iter().any(|e| e.axes.contains_key(*a)))
             .collect()
     };
+    if f.domains.iter().any(|d| d.domain.envelope.oracle.is_some()) {
+        out.push_str("A domain with an `oracle` is the DLP with that auxiliary-input oracle, not the plain ECDLP, and its `oracle queries` column (static-DH queries per `√r`, zero for a method that queries nothing) is an axis of dominance there: a method whose `ops` are lower only because it was handed the oracle's answers does not displace one that was not.\n\n");
+    }
     if f.domains.iter().any(|d| !field_cols(d).is_empty()) {
         out.push_str("`field muls`, `field sqrs` and `field invs` are the modular multiplications, squarings and inversions behind the group operations, per `√r`: the primitive level, counted today for the prime-field group law the generic walks and tables run on. A row showing `unknown` there did not count them; unknown is not zero.\n\n");
     }
     for d in &f.domains {
         out.push_str(&format!(
-            "## {} · {} · {} targets · {} · tier {}\n\n",
-            d.domain.problem, d.domain.family, d.domain.target_kind, d.domain.unit, d.domain.tier
+            "## {} · {} · {} targets · {} · tier {}{}\n\n",
+            d.domain.problem,
+            d.domain.family,
+            d.domain.target_kind,
+            d.domain.unit,
+            d.domain.tier,
+            d.domain
+                .envelope
+                .oracle
+                .as_ref()
+                .map(|o| format!(" · oracle {o}"))
+                .unwrap_or_default()
         ));
         out.push_str(&format!(
             "Domain `{}`. Floor: {}. Ops leader: `{}`; memory leader: `{}`.\n\n",
@@ -1538,6 +1585,8 @@ mod tests {
             declared_ratio_to_floor: None,
             memory_entries_per_sqrt_r: Some(sz.3),
             uncharged_per_sqrt_r: Some(uncharged),
+            oracle_queries: None,
+            oracle_server_group_ops: None,
             levels: BTreeMap::new(),
             axes,
             band: vec![point(0.0), point(0.1), point(1.0)],
@@ -1594,6 +1643,7 @@ mod tests {
                 entry: "x".into(),
             },
             level: "exponent".into(),
+            oracle: None,
             sizes: sizes.iter().map(|z| size_row(z, uncharged)).collect(),
             fit: Fit {
                 size_parameter: "r".into(),
