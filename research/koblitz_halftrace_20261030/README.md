@@ -1,5 +1,11 @@
 # Native cached halftrace integration
 
+[Requested status report — 6 November 2026 (PDF)](reports/status-20261106/REPORT.pdf)
+summarizes the Rust implementation, source-bound validation, frozen comparison
+and remaining requirements in three pages. Its [editable source](reports/status-20261106/REPORT.typ),
+[evidence snapshot](reports/status-20261106/SNAPSHOT.json) and diagram are retained
+beside the PDF. This is a report of existing work, with no new experiment.
+
 This change integrates the missing one-word cached lifting path into the
 existing Rust Koblitz factor-base builder. It does not import a new Python
 solver, replace the repository's mature index-calculus implementation, or
