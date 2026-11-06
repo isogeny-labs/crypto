@@ -253,7 +253,39 @@ review withheld every comparison (no numeric acceptance for the controls,
 uncharged rho hashes, incomplete accounting;
 \art{research/jv_sieve_strong_rho_20261019/}); a replication with fixed
 thresholds failed its acceptance rule and is in an open pull request, and a
-prospective re-run is registered and has not run. A 9 October whole-route
+prospective re-run is registered and has not run.
+
+\paragraph{The sieve arm against a matched negation rho (2 November).} A
+frozen protocol re-measured the sieve arm at $p=1511$ ($\ell=2^{61.4}$)
+against a matched negation-map rho: 16 new rho runs pooled with 126 earlier
+ones under a frozen homogeneity rule, with the sieve rows of the 19 October
+study unchanged and reproduced by a second build. The sieve route costs
+$0.00647$ $[0.00545,0.00799]$ of rho in group additions and $0.0156$
+$[0.0131,0.0192]$ in textbook $\FF_p$ multiplications (seeds 17--24, 95\%
+bootstrap intervals). Rho is therefore $155\times$ $[125,184]$ and
+$64\times$ $[52,76]$ more expensive. Charging the cover's unemitted F4,
+descent and linear-algebra work at its upper bound leaves the ratio at
+$0.107$--$0.123$ for $w=0.1$ and $1$. The order holds across the band in
+every cell, for both seed sets and both rho references. An independent
+validator passed the comparison (\texttt{VAL-20261103-c31c76}), with these
+limitations:
+\begin{itemize}
+\item the replay is sampled: 1 of the 16 new rho runs, 1 of the 126 pooled
+  runs and 2 of the 16 cover rows;
+\item the cover's F4, descent and linear-algebra additions are not emitted,
+  so only an upper-bound proxy prices them;
+\item memory is not reported for either arm;
+\item the run was local, not on the isolated lab.
+\end{itemize}
+The validator classifies the result as accounting, not an improvement to
+any method: it is a matched measurement of an existing solver
+(\art{research/jv_sieve_negrho_20261102/}). It is the programme's one
+validated measurement of index calculus below a matched rho. It holds on
+the weak class only, says nothing about prime-order curves, and is not
+extrapolated. The roughly thirtyfold gap between the two arms is still
+unexplained.
+
+A 9 October whole-route
 replay from a non-weak challenge curve, through an isogeny walk to a weak
 curve and its cover, read $0.058$ of a pooled, unmatched rho at $p=1009$ on
 one seed per prime, with an earlier revision of the solver whose source
