@@ -3,77 +3,22 @@
 # file (one directory per line) and require each replay to reproduce the
 # record bit for bit (`ecbench verify --replay-all --allow-interrupted
 # --exit-code`).  An interrupted session is evidence of the interruption:
-# every per-record check applies, only completeness does not.
-#
-# Excluded, because they cannot be replayed whole: the hash-pinned incomplete
-# scratch sessions (no spec or host capsule; INCOMPLETE_SESSIONS.tsv) and the
-# owner-dispositioned defective sessions (verify fails by design; they are
-# checked against their pinned defect by ecbench-audit-sessions.sh and
-# DEFECTIVE_SESSIONS.tsv).  Both lists are read as the audit script reads them.
-#
-# Usage: ecbench-replay-sessions.sh LIST [ECBENCH] [INCOMPLETE_TSV] [DEFECTIVE_TSV]
-# REPLAY_SHARD=K/N replays only shard K (0-based) of N, so N jobs together
-# replay the whole list.  A replay costs about what the recorded run cost, so
-# shards are balanced by the recorded solver wall time of the verified records
-# (sum of time.solve_wall_ns; record bytes, a .gz file counting 8x, when a
-# session has none): largest session first, each into the lightest shard so
-# far, ties to the lower shard and sessions in list order, so every shard
-# computes the same assignment.  REPLAY_JOBS sets the parallelism (default: nproc).
-# Every failing session is named, then the script exits 1.
+# every per-record check applies, only completeness does not.  Which sessions
+# go in the list is decided by ecbench-replay-plan.sh (weekly rotation) or
+# LONG_SESSIONS.tsv (on request); this script replays what it is given.
+# Usage: ecbench-replay-sessions.sh LIST [ECBENCH]
+# REPLAY_JOBS sets the parallelism (default: nproc).  Every failing session is
+# named, then the script exits 1.
 set -euo pipefail
-shard=${REPLAY_SHARD:-0/1}
-shard_k=${shard%/*}; shard_n=${shard#*/}
-if [[ ! "$shard_k" =~ ^[0-9]+$ || ! "$shard_n" =~ ^[1-9][0-9]*$ || "$shard_k" -ge "$shard_n" ]]; then
-  echo "::error::REPLAY_SHARD must be K/N with 0 <= K < N, got $shard" >&2; exit 1
-fi
-list=${1:?usage: ecbench-replay-sessions.sh LIST [ECBENCH] [INCOMPLETE_TSV] [DEFECTIVE_TSV]}
+list=${1:?usage: ecbench-replay-sessions.sh LIST [ECBENCH]}
 ecbench=${2:-./target/release/ecbench}
-incomplete=${3:-docs/ecbench/INCOMPLETE_SESSIONS.tsv}
-defective=${4:-docs/ecbench/DEFECTIVE_SESSIONS.tsv}
-test -s "$list" || { echo "::error::$list is empty" >&2; exit 1; }
-test -s "$incomplete" || { echo "::error::$incomplete is missing" >&2; exit 1; }
-test -s "$defective" || { echo "::error::$defective is missing" >&2; exit 1; }
-excluded=$(mktemp)
-cut -f1 "$incomplete" "$defective" | grep -v '^#' | grep -v '^$' | sort -u > "$excluded"
-weights=$(mktemp)
-index=0
-skipped=0
-while IFS= read -r dir; do
-  if grep -Fxq "$dir" "$excluded"; then
-    skipped=$((skipped + 1))
-    continue
-  fi
-  rec=
-  for c in records.jsonl records.jsonl.gz ecbench_records.jsonl.gz; do
-    if [[ -f "$dir/$c" ]]; then rec="$dir/$c"; break; fi
-  done
-  weight=0
-  if [[ -n "$rec" ]]; then
-    if [[ "$rec" == *.gz ]]; then reader=(gzip -dc "$rec"); else reader=(cat "$rec"); fi
-    # milliseconds of recorded solver wall time over the verified records
-    weight=$("${reader[@]}" | { grep -F '"status":"verified"' || true; } | { grep -oP '"solve_wall_ns":\K[0-9]+' || true; } \
-      | awk '{ s += $1 } END { printf "%d", s / 1e6 }')
-  fi
-  if [[ "${weight:-0}" -le 0 ]]; then
-    weight=$(find "$dir" -maxdepth 1 -type f -printf '%s %f\n' | awk '{ b += ($2 ~ /\.gz$/) ? 8 * $1 : $1 } END { printf "%d", b / 1e6 + 1 }')
-  fi
-  printf '%s\t%s\t%s\n' "$weight" "$index" "$dir" >> "$weights"
-  index=$((index + 1))
-done < "$list"
-mine=$(mktemp)
-replayed=0
-while IFS= read -r dir; do
-  printf '%s\0' "$dir" >> "$mine"
-  replayed=$((replayed + 1))
-done < <(sort -t $'\t' -k1,1nr -k2,2n "$weights" | awk -F '\t' -v n="$shard_n" -v k="$shard_k" '
-  { best = 0; for (i = 1; i < n; i++) if (load[i] < load[best]) best = i
-    load[best] += $1; if (best == k) print $3 }')
-rm -f "$weights" "$excluded"
+test -f "$list" || { echo "::error::$list is missing" >&2; exit 1; }
+count=$(grep -c . "$list" || true)
 failed=$(mktemp)
 export ecbench failed
-echo "shard $shard: replaying $replayed of $index sessions ($skipped excluded: incomplete scratch or pinned defective)"
-if [[ "$replayed" -gt 0 ]]; then
-xargs -0 -P "${REPLAY_JOBS:-$(nproc)}" -n 1 bash -c '
+echo "replaying $count sessions"
+if [[ "$count" -gt 0 ]]; then
+tr '\n' '\0' < "$list" | xargs -0 -P "${REPLAY_JOBS:-$(nproc)}" -n 1 bash -c '
   out="$failed.$$"
   dir=$1
   # Gzip-compressed records are replayed from a decompressed copy, as the
@@ -93,9 +38,8 @@ xargs -0 -P "${REPLAY_JOBS:-$(nproc)}" -n 1 bash -c '
     printf "%s\n" "$msg" >> "$failed"
   fi
   rm -rf "$out.json" "$out.err" "$out.session"
-' replay < "$mine"
+' replay
 fi
-rm -f "$mine"
 if [ -s "$failed" ]; then
   echo "::error::committed ecbench sessions that do not replay exactly on this host:" >&2
   cat "$failed" >&2
@@ -103,7 +47,7 @@ if [ -s "$failed" ]; then
   exit 1
 fi
 rm -f "$failed"
-summary="shard $shard: $replayed of $index committed ecbench sessions replay every measured run exactly (--replay-all --allow-interrupted); $skipped excluded (hash-pinned incomplete scratch or pinned defective)"
+summary="$count committed ecbench sessions replay every measured run exactly (--replay-all --allow-interrupted)"
 echo "$summary"
 if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
   echo "$summary" >> "$GITHUB_STEP_SUMMARY"
