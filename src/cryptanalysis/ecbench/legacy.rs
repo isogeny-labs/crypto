@@ -15,6 +15,7 @@
 //! | linear harvest on by default (`d1d034d94`, `9e69f57ef`, 2026-10-15) | the root basis' linear rows are appended and the node re-eliminated, so the search and its word count change |
 //! | F6-IC gate-first on by default (`d72e8b04d`) | refuted nodes skip their specialisations |
 //! | #1646 also: the F6-IC gate's partial support test (`geometric_partial_support_*`) | a node with a summand's bits partly fixed is refuted by the gate where the reduction used to find it infeasible, so splits, reductions, `infeasible_branches` and `geometric_refutations` differ |
+//! | `c653ede60b` (2026-11-03): the native pencil's point sieve evaluates `u` and `v` by finite differences instead of Horner | `ic.three_leads_genus2_pencil_symbolic_v2` binds its whole arithmetic and meter ledger into `pencil_replay_ledger_sha256_word_*`; the sieve charges `2 deg + 1` fewer base multiplications, additions and entry visits per point, so the digest differs ([`PRE_PENCIL_FD`]) |
 //!
 //! Both generations are committed evidence under the same id and the same
 //! parameters, so the id cannot tell them apart.  The *record* can: it is
@@ -60,6 +61,9 @@ pub struct Profile {
     pub pre_1646: bool,
     /// The pinned calibration table before #1640 added rows to it.
     pub calibration_before_1640: bool,
+    /// The native pencil's point sieve as it counted before the
+    /// finite-difference evaluation (`c653ede60b`, 2026-11-03).
+    pub pencil_peval_sieve: bool,
 }
 
 /// The accounting of the code through 2026-10-14, when the committed
@@ -73,6 +77,7 @@ pub const PRE_2043: Profile = Profile {
     no_gate_first: true,
     pre_1646: false,
     calibration_before_1640: false,
+    pencil_peval_sieve: false,
 };
 
 /// The same accounting but for the one switch #1774 flipped, for records
@@ -92,8 +97,22 @@ pub const PRE_1646: Profile = Profile {
     ..PRE_2043
 };
 
+/// The accounting of the native pencil before `c653ede60b` (2026-11-03),
+/// when the committed `smoke-three-leads-corrected` session was recorded;
+/// every other switch is the current one.
+pub const PRE_PENCIL_FD: Profile = Profile {
+    name: "pre-pencil-fd",
+    exact_word_xor_unit: false,
+    lazy_rewrite: false,
+    no_linear_harvest: false,
+    no_gate_first: false,
+    pre_1646: false,
+    calibration_before_1640: false,
+    pencil_peval_sieve: true,
+};
+
 /// Profiles tried, in order, after the current accounting fails.
-pub const PROFILES: [Profile; 3] = [PRE_2043, PRE_2043_PRICED, PRE_1646];
+pub const PROFILES: [Profile; 4] = [PRE_2043, PRE_2043_PRICED, PRE_1646, PRE_PENCIL_FD];
 
 /// A profile in force; the previous state returns when it drops.
 pub struct Guard {
@@ -108,6 +127,7 @@ impl Profile {
         set_legacy_pre_1646(self.pre_1646);
         set_legacy_calibration_before_1640(self.calibration_before_1640);
         set_legacy_no_linear_harvest(self.no_linear_harvest);
+        crate::cryptanalysis::ecbench::three_leads::set_legacy_peval_sieve(self.pencil_peval_sieve);
         if self.no_gate_first {
             set_gate_first(Some(false));
         }
@@ -122,6 +142,7 @@ impl Drop for Guard {
         set_legacy_pre_1646(false);
         set_legacy_calibration_before_1640(false);
         set_legacy_no_linear_harvest(false);
+        crate::cryptanalysis::ecbench::three_leads::set_legacy_peval_sieve(false);
         set_gate_first(None);
     }
 }
@@ -285,6 +306,14 @@ pub const PRE_ENDOMORPHISM_A1_BINARIES: [Producer; 1] = [(
     "ext_endo_rho_20261023/sessions/{gls-fp2,subfield-fp3}",
 )];
 
+/// Binaries whose `ic.three_leads_genus2_pencil_symbolic_v2` records replay
+/// under [`PRE_PENCIL_FD`].
+pub const PRE_PENCIL_FD_BINARIES: [Producer; 1] = [(
+    "7e1de5126fba7432b07cc5c1929f6f67a510e9e2dfb290700f2325f0f5bbbe52",
+    "",
+    "ecbench_registry_optimization_20261101/execution/smoke-three-leads-corrected (the pencil-symbolic arm)",
+)];
+
 fn listed(list: &[Producer], r: &crate::cryptanalysis::ecbench::record::Record) -> bool {
     list.iter()
         .any(|&(binary, _, _)| r.binary_sha256.as_deref() == Some(binary))
@@ -300,6 +329,10 @@ pub fn admits(profile: &Profile, r: &crate::cryptanalysis::ecbench::record::Reco
         "pre-2043" => &PRE_2043_BINARIES,
         "pre-2043-priced" => &PRE_2043_PRICED_BINARIES,
         "pre-1646" => &PRE_1646_BINARIES,
+        "pre-pencil-fd" => {
+            return r.method.id == "ic.three_leads_genus2_pencil_symbolic_v2"
+                && listed(&PRE_PENCIL_FD_BINARIES, r);
+        }
         _ => return false,
     };
     r.method.id.starts_with("ic.")
@@ -326,12 +359,13 @@ mod tests {
 
     #[test]
     fn producer_lists_hold_full_digests_and_commits() {
-        let lists: [&[Producer]; 5] = [
+        let lists: [&[Producer]; 6] = [
             &PRE_2043_BINARIES,
             &PRE_2043_PRICED_BINARIES,
             &PRE_1646_BINARIES,
             &SETUP_DESCRIPTOR_BINARIES,
             &PRE_ENDOMORPHISM_A1_BINARIES,
+            &PRE_PENCIL_FD_BINARIES,
         ];
         for list in lists {
             for &(binary, commit, sessions) in list {
@@ -350,10 +384,56 @@ mod tests {
     fn every_profile_has_a_producer_list() {
         for profile in PROFILES {
             assert!(
-                matches!(profile.name, "pre-2043" | "pre-2043-priced" | "pre-1646"),
+                matches!(
+                    profile.name,
+                    "pre-2043" | "pre-2043-priced" | "pre-1646" | "pre-pencil-fd"
+                ),
                 "{} has no list in `admits`",
                 profile.name
             );
         }
+    }
+
+    /// The committed `smoke-three-leads-corrected` pencil run (seq 17, record
+    /// `ECR1h72c4f2eb9383`): current accounting digests a different ledger,
+    /// and [`PRE_PENCIL_FD`] restores the committed words exactly while every
+    /// priced count stays equal.
+    #[test]
+    fn pencil_v2_replays_under_pre_pencil_fd() {
+        use crate::cryptanalysis::ecbench::record::child_main;
+        const INPUT: &str = r#"{"schema":"ecbench.child_input/v1","curve":{"kind":"three_leads","p":739,"n":2,"modulus":1,"a":493102,"b":193650,"group_order":546352,"r":34147,"gx":433246,"gy":59741,"family":"scholten","parameter":0},"target_seed":202611010401,"target_index":0,"expected_workload_id":"W31eacde65f3a","method":{"id":"ic.three_leads_genus2_pencil_symbolic_v2","params":{"matrix_coefficient_cap":"1000000","small_denominator":"2"}},"expected_method_id":"ECM1h19e20f371d0b","algorithm_seed":15960260229690381936}"#;
+        let words = |rep: &crate::cryptanalysis::ecbench::methods::SolveReport| -> Vec<u64> {
+            (0..4)
+                .map(|i| rep.counters[&format!("pencil_replay_ledger_sha256_word_{i}")])
+                .collect()
+        };
+        let committed = [
+            8986753758802388029u64,
+            15214680913145604671,
+            11668939617327607350,
+            5607756320428304536,
+        ];
+        let now = child_main(INPUT).report.expect("current accounting");
+        let old = {
+            let _in_force = PRE_PENCIL_FD.enter();
+            child_main(INPUT).report.expect("pre-pencil-fd accounting")
+        };
+        let after = child_main(INPUT).report.expect("guard restored");
+        assert_eq!(words(&old), committed);
+        assert_ne!(words(&now), committed);
+        assert_eq!(words(&after), words(&now), "the guard leaves no profile");
+        assert_eq!(now.recovered, old.recovered);
+        assert_eq!(now.total_gae.to_bits(), old.total_gae.to_bits());
+        assert_eq!(now.phases[0].native["group_field_multiplications"], 148362);
+    }
+
+    #[test]
+    fn pre_pencil_fd_is_offered_only_to_its_producer_and_id() {
+        assert_eq!(PRE_PENCIL_FD_BINARIES.len(), 1);
+        assert_eq!(PROFILES.last().map(|p| p.name), Some("pre-pencil-fd"));
+        assert!(PROFILES
+            .iter()
+            .filter(|p| p.pencil_peval_sieve)
+            .all(|p| p.name == "pre-pencil-fd"));
     }
 }
