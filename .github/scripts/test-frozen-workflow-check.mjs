@@ -20,8 +20,12 @@ const lockPath = 'research/archive/Cargo.lock';
 const originalFreeze = 'research/rotation/FROZEN.json';
 const inputViewManifest = '.github/scripts/n53-historical-cargo-lock-view-v1.json';
 const sha = value => createHash('sha256').update(value).digest('hex');
+const extraWorkflow = '.github/workflows/other-check.yml';
+const extraManifest = 'research/other/FROZEN.json';
+const historicalExtra = 'name: frozen other workflow\n';
+const extraSpec = `${extraWorkflow}|${extraManifest}|pointer:/workflow_sha256/other-check.yml`;
 
-async function fixture(run, { withPinnedInput = false, manifestFormat = 'files-relative' } = {}) {
+async function fixture(run, { withPinnedInput = false, manifestFormat = 'files-relative', extra = false } = {}) {
   const cwd = mkdtempSync(path.join(os.tmpdir(), 'crypto-frozen-fixture-'));
   const write = (file, text) => {
     const target = path.join(cwd, file);
@@ -38,6 +42,10 @@ async function fixture(run, { withPinnedInput = false, manifestFormat = 'files-r
     const frozenSourceBytes = JSON.stringify({ source_sha256: { cargo_lock: sha(historicalLock) } }) + '\n';
     write(originalFreeze, frozenSourceBytes);
     write(study + '/input.json', '{"evidence":"unchanged"}\n');
+    if (extra) {
+      write(extraWorkflow, historicalExtra);
+      write(extraManifest, JSON.stringify({ workflow_sha256: { 'other-check.yml': sha(historicalExtra) } }) + '\n');
+    }
     write(study + '/check.mjs', [
       "import assert from 'node:assert/strict';",
       "import { readFileSync, writeFileSync } from 'node:fs';",
@@ -46,19 +54,25 @@ async function fixture(run, { withPinnedInput = false, manifestFormat = 'files-r
       'assert.equal(readFileSync(' + JSON.stringify(lockPath) + ", 'utf8'), "
         + JSON.stringify(withPinnedInput ? historicalLock : currentLock) + ');',
       "assert.equal(readFileSync('Cargo.lock', 'utf8'), " + JSON.stringify(currentLock) + ');',
+      ...(extra ? ['assert.equal(readFileSync(' + JSON.stringify(extraWorkflow) + ", 'utf8'), "
+        + JSON.stringify(historicalExtra) + ');'] : []),
       'writeFileSync(process.argv[2], process.cwd());',
     ].join('\n') + '\n');
     const files = Object.fromEntries(['input.json', 'check.mjs'].map(file => [file, sha(readFileSync(path.join(cwd, study, file)))]));
     files[workflow] = sha(historicalWorkflow);
-    const freeze = manifestFormat === 'sha256-root'
-      ? { sha256: Object.fromEntries(Object.entries(files).map(([file, digest]) =>
-        [file.startsWith('.github/') ? file : study + '/' + file, digest])) }
-      : { files };
+    const keyFreeze = keyPath => keyPath.split('.').reduceRight(
+      (value, key) => ({ [key]: value }), sha(historicalWorkflow));
+    const freeze = manifestFormat.startsWith('key:') ? { ...keyFreeze(manifestFormat.slice(4)), other: 'kept' }
+      : manifestFormat === 'sha256-root'
+        ? { sha256: Object.fromEntries(Object.entries(files).map(([file, digest]) =>
+          [file.startsWith('.github/') ? file : study + '/' + file, digest])) }
+        : { files };
     write(manifest, JSON.stringify(freeze) + '\n');
     git('add', '.');
     git('-c', 'user.name=CI fixture', '-c', 'user.email=ci-fixture@example.invalid', 'commit', '-qm', 'original freeze');
     const revision = git('rev-parse', 'HEAD');
     write(workflow, liveWorkflow);
+    if (extra) write(extraWorkflow, 'name: current other workflow\n');
     write('src/current.rs', liveSource);
     write('Cargo.lock', currentLock);
     write(lockPath, currentLock);
@@ -83,6 +97,7 @@ async function fixture(run, { withPinnedInput = false, manifestFormat = 'files-r
       'research/archive', 'research/rotation', 'Cargo.lock'],
       command: [process.execPath, study + '/check.mjs', marker] };
     if (withPinnedInput) options.inputViewManifest = inputViewManifest;
+    if (extra) options.extraWorkflows = [extraSpec];
     await run({ cwd, write, options, current, marker, withPinnedInput });
   } finally {
     rmSync(cwd, { recursive: true, force: true });
@@ -290,4 +305,108 @@ test('a changed original source manifest rejects the pinned input view', async (
     await assert.rejects(async () => withFrozenWorkflow(options), /original freeze manifest changed/);
     assert.equal(existsSync(marker), false);
   }, { withPinnedInput: true });
+});
+
+test('a key-pinned workflow is overlaid from history while the live checkout is retained', async () => {
+  await fixture(async ({ cwd, options, marker }) => {
+    assert.equal(await withFrozenWorkflow(options), 0);
+    assert.equal(existsSync(readFileSync(marker, 'utf8')), false);
+    assert.equal(readFileSync(path.join(cwd, workflow), 'utf8'), liveWorkflow);
+  }, { manifestFormat: 'key:workflow_sha256' });
+});
+
+test('a nested key path reaches the workflow digest through the CLI', async () => {
+  await fixture(async ({ cwd, options, marker }) => {
+    const helper = fileURLToPath(new URL('./frozen-workflow-check.mjs', import.meta.url));
+    execFileSync(process.execPath, [helper, '--workflow', workflow, '--revision', options.revision,
+      '--manifest', manifest, '--manifest-format', 'key:first.workflow_sha256', '--root', study,
+      '--root', 'src', '--root', 'research/archive', '--root', 'research/rotation',
+      '--root', 'Cargo.lock', '--', ...options.command],
+    { cwd, stdio: ['ignore', 'pipe', 'pipe'] });
+    assert.equal(existsSync(readFileSync(marker, 'utf8')), false);
+    assert.equal(readFileSync(path.join(cwd, workflow), 'utf8'), liveWorkflow);
+  }, { manifestFormat: 'key:first.workflow_sha256' });
+});
+
+test('a key that does not hold the workflow digest fails before the validator runs', async () => {
+  await fixture(async ({ options, marker }) => {
+    for (const manifestFormat of ['key:missing_sha256', 'key:other', 'key:workflow_sha256.deeper']) {
+      assert.throws(() => withFrozenWorkflow({ ...options, manifestFormat }),
+        /historical workflow does not match its frozen digest/, manifestFormat);
+    }
+    for (const manifestFormat of ['key:', 'key:a..b', 'key:../x', 'key:a b']) {
+      assert.throws(() => withFrozenWorkflow({ ...options, manifestFormat }),
+        /invalid frozen manifest key path/, manifestFormat);
+    }
+    assert.equal(existsSync(marker), false);
+  }, { manifestFormat: 'key:workflow_sha256' });
+});
+
+test('a key pin cannot be moved to the live workflow by rewriting the manifest', async () => {
+  await fixture(async ({ cwd, write, options, marker }) => {
+    write(manifest, JSON.stringify({ workflow_sha256: sha(liveWorkflow), other: 'kept' }) + '\n');
+    assert.throws(() => withFrozenWorkflow(options), /original frozen manifest changed/);
+    assert.equal(existsSync(marker), false);
+    assert.equal(readFileSync(path.join(cwd, workflow), 'utf8'), liveWorkflow);
+  }, { manifestFormat: 'key:workflow_sha256' });
+});
+
+test('an extra workflow is overlaid from history through a JSON Pointer pin', async () => {
+  await fixture(async ({ cwd, options, marker }) => {
+    assert.equal(await withFrozenWorkflow(options), 0);
+    assert.equal(existsSync(readFileSync(marker, 'utf8')), false);
+    assert.equal(readFileSync(path.join(cwd, extraWorkflow), 'utf8'), 'name: current other workflow\n');
+  }, { extra: true });
+});
+
+test('extra workflows pass through the CLI and are required by the validator', async () => {
+  await fixture(async ({ cwd, options, marker }) => {
+    const helper = fileURLToPath(new URL('./frozen-workflow-check.mjs', import.meta.url));
+    const base = [helper, '--workflow', workflow, '--revision', options.revision, '--manifest', manifest,
+      '--root', study, '--root', 'src', '--root', 'research/archive', '--root', 'research/rotation',
+      '--root', 'Cargo.lock'];
+    execFileSync(process.execPath, [...base, '--extra-workflow', extraSpec, '--', ...options.command],
+      { cwd, stdio: ['ignore', 'pipe', 'pipe'] });
+    assert.equal(existsSync(readFileSync(marker, 'utf8')), false);
+    rmSync(marker);
+    // Without the overlay the validator sees the live extra workflow and fails.
+    assert.throws(() => execFileSync(process.execPath, [...base, '--', ...options.command],
+      { cwd, stdio: ['ignore', 'pipe', 'pipe'] }));
+    assert.equal(existsSync(marker), false);
+  }, { extra: true });
+});
+
+test('an extra workflow pin is held to the same custody as the main one', async () => {
+  await fixture(async ({ cwd, write, options, marker }) => {
+    const pointer = `${extraWorkflow}|${extraManifest}|pointer:/workflow_sha256/missing.yml`;
+    assert.throws(() => withFrozenWorkflow({ ...options, extraWorkflows: [pointer] }),
+      /historical workflow does not match its frozen digest: .github\/workflows\/other-check.yml/);
+    for (const spec of ['no-separators', `${extraWorkflow}||key:a`, `${extraWorkflow}|${extraManifest}`]) {
+      assert.throws(() => withFrozenWorkflow({ ...options, extraWorkflows: [spec] }), /expected --extra-workflow/, spec);
+    }
+    assert.throws(() => withFrozenWorkflow({ ...options,
+      extraWorkflows: [`${extraWorkflow}|${extraManifest}|pointer:workflow_sha256`] }), /invalid frozen manifest key path/);
+    assert.throws(() => withFrozenWorkflow({ ...options, extraWorkflows: [`${workflow}|${manifest}|files-relative`] }),
+      /each workflow may be overlaid once/);
+    write(extraManifest, JSON.stringify({ workflow_sha256: { 'other-check.yml': sha('name: current other workflow\n') } }) + '\n');
+    assert.throws(() => withFrozenWorkflow(options), /original frozen manifest changed/);
+    assert.equal(existsSync(marker), false);
+    assert.equal(readFileSync(path.join(cwd, extraWorkflow), 'utf8'), 'name: current other workflow\n');
+  }, { extra: true });
+});
+
+test('a JSON Pointer reads names with dots and escapes, and only own fields', async () => {
+  await fixture(async ({ options }) => {
+    for (const pointer of ['pointer:/workflow_sha256/other-check.yml', 'pointer:/workflow_sha256/other-check~2yml']) {
+      const spec = `${extraWorkflow}|${extraManifest}|${pointer}`;
+      if (pointer.includes('~2')) {
+        assert.throws(() => withFrozenWorkflow({ ...options, extraWorkflows: [spec] }), /invalid frozen manifest key path/);
+      } else {
+        assert.equal(await withFrozenWorkflow({ ...options, extraWorkflows: [spec] }), 0);
+      }
+    }
+    assert.throws(() => withFrozenWorkflow({ ...options,
+      extraWorkflows: [`${extraWorkflow}|${extraManifest}|pointer:/constructor`] }),
+    /historical workflow does not match its frozen digest/);
+  }, { extra: true });
 });
