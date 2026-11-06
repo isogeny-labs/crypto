@@ -105,4 +105,26 @@ ratio (11.5 at q = 13, 17.2 at q = 101).
 
 ## Amendments
 
-(none)
+**A1 (2026-11-06, registered after the first main-run solves and before its
+own data).**
+
+- **What prompted it.** On curve 1 the conj arm's two decomposable targets,
+  the planted one and `common0`, gave quotient dimension 4,090 instead of
+  4,096 at Macaulay degree 29. The solver returned no solution there,
+  although the oracle found 3 and 2 decompositions. The conj target with no
+  decomposition (`common1`) gave dimension 4,096 and solved. The std arm gave
+  4,096 and solved on all three targets.
+- **Follow-up.** Re-solve every conj-arm target that the oracle says
+  decomposes, on every curve of the main run, at Macaulay degrees 30, 31 and
+  32. Use the same curves, H and targets (`--only-arm conj
+  --only-decomposable --macdeg 30,31,32`). Record shape, dim, solved, match
+  and total_muls.
+- **Rule M1.** The lowest degree at which the solve succeeds and matches the
+  oracle is the working degree on conjugate-pair lines. Its cost, against
+  the std arm's degree-29 cost on the same curve, is the per-solve cost
+  ratio that replaces K2's for decomposable targets.
+- **Ceiling.** If no degree up to 32 works, conjugate-pair lines are
+  reported as not solvable by this solver design. In that case the
+  relation-phase cost advantage is not established.
+- **Memory.** Degree 32 needs about 7.5 GB, so the follow-up runs only after
+  the main run finishes.

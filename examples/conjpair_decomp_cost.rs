@@ -383,6 +383,7 @@ fn solve_one(
     u: &E4,
     rng: &mut StdRng,
     label: &str,
+    macaulay_degree: u8,
 ) -> String {
     let f = &curve.f;
     let p = f.p;
@@ -395,7 +396,18 @@ fn solve_one(
         chains: true,
         sparsest: true,
     };
-    let sols = solve_system4_with(&comps, opts, 8, 29, p, rng, &mut st, false, None, None);
+    let sols = solve_system4_with(
+        &comps,
+        opts,
+        8,
+        macaulay_degree,
+        p,
+        rng,
+        &mut st,
+        false,
+        None,
+        None,
+    );
     st.weil_muls += weil;
     st.close_public();
     let ms = t0.elapsed().as_secs_f64() * 1e3;
@@ -440,6 +452,13 @@ fn solve_one(
 fn main() {
     let args: Vec<String> = env::args().skip(1).collect();
     let (mut p, mut ncurves, mut out, mut aa) = (29u64, 2usize, String::from("rows.jsonl"), false);
+    // Amendment A1: Macaulay degrees to try, and an optional restriction to
+    // one arm / one curve index (curves are still built in order so that the
+    // random stream, and hence curves and targets, are unchanged).
+    let mut macdegs: Vec<u8> = vec![29];
+    let mut only_arm: Option<String> = None;
+    let mut only_curve: Option<usize> = None;
+    let mut only_failing = false;
     let mut i = 0;
     while i < args.len() {
         match args[i].as_str() {
@@ -456,6 +475,19 @@ fn main() {
                 out = args[i].clone()
             }
             "--aa" => aa = true,
+            "--macdeg" => {
+                i += 1;
+                macdegs = args[i].split(',').map(|v| v.parse().unwrap()).collect()
+            }
+            "--only-arm" => {
+                i += 1;
+                only_arm = Some(args[i].clone())
+            }
+            "--only-curve" => {
+                i += 1;
+                only_curve = Some(args[i].parse().unwrap())
+            }
+            "--only-decomposable" => only_failing = true,
             o => panic!("unknown {o}"),
         }
         i += 1;
@@ -560,12 +592,26 @@ fn main() {
                 if r.inf {
                     continue;
                 }
-                let label = format!("\"p\":{p},\"curve\":{ci},\"arm\":\"{arm}\",\"target\":\"{name}\",\"fb_points\":{}", fb.len());
-                let mut srng = StdRng::seed_from_u64(0xdec0 + ci as u64);
-                let row = solve_one(&curve, h, fb, r, &x0, &u, &mut srng, &label);
-                eprintln!("{row}");
-                writeln!(fh, "{row}").unwrap();
-                fh.flush().unwrap();
+                if only_arm.as_deref().is_some_and(|a| a != arm)
+                    || only_curve.is_some_and(|c| c != ci)
+                {
+                    continue;
+                }
+                if only_failing && mitm(&curve, fb, r).is_empty() {
+                    continue;
+                }
+                for &md in &macdegs {
+                    let label = if macdegs == [29] {
+                        format!("\"p\":{p},\"curve\":{ci},\"arm\":\"{arm}\",\"target\":\"{name}\",\"fb_points\":{}", fb.len())
+                    } else {
+                        format!("\"p\":{p},\"curve\":{ci},\"arm\":\"{arm}\",\"target\":\"{name}\",\"fb_points\":{},\"macaulay_degree\":{md}", fb.len())
+                    };
+                    let mut srng = StdRng::seed_from_u64(0xdec0 + ci as u64);
+                    let row = solve_one(&curve, h, fb, r, &x0, &u, &mut srng, &label, md);
+                    eprintln!("{row}");
+                    writeln!(fh, "{row}").unwrap();
+                    fh.flush().unwrap();
+                }
                 if aa && name == "common0" {
                     let mut srng2 = StdRng::seed_from_u64(0xdec0 + ci as u64);
                     let row2 = solve_one(
@@ -576,7 +622,11 @@ fn main() {
                         &x0,
                         &u,
                         &mut srng2,
-                        &format!("{label},\"aa\":true"),
+                        &format!(
+                            "\"p\":{p},\"curve\":{ci},\"arm\":\"{arm}\",\"target\":\"{name}\",\"fb_points\":{},\"aa\":true",
+                            fb.len()
+                        ),
+                        29,
                     );
                     writeln!(fh, "{row2}").unwrap();
                     fh.flush().unwrap();
