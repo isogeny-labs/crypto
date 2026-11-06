@@ -243,3 +243,89 @@ fn first_informative_chart_retains_partial_coverage() {
         .iter()
         .any(|a| a["algebra"]["stopped_early"] == true));
 }
+
+#[test]
+fn native_v3_session_keeps_static_audit_distinct_from_count_replay() {
+    use std::process::Command;
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    // A synthetic correctness fixture, not a pilot, profile or timing panel.
+    let sample = produced(
+        &[("encoding", "line_chart3"), ("stop", "first_informative")],
+        20261026,
+    );
+    let spec = json!({"schema":"ecbench.spec/v1","label":"APS v3 native correctness only",
+        "workloads":{"curves":[sample["workload"]["curve_spec"]],
+            "targets_per_curve":1,"target_seed":20261106,"target_kind":"public"},
+        "measurement":{"rounds":1,"warmup":0,"order":"alternate_measured",
+            "seed":20261106,"isolation_required":"L0","timeout_seconds":120},
+        "arms":[{"name":"rho","role":"reference","method":{"id":"rho.negation_v2"}},
+            {"name":"aps-v3","role":"candidate","method":{
+                "id":"ic.aps_v3","params":sample["method"]["params"]}}]});
+    let dir = std::env::temp_dir().join(format!(
+        "aps-v3-native-unit-{}-{}",
+        std::process::id(),
+        SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+    ));
+    std::fs::create_dir(&dir).unwrap();
+    let input = dir.join("spec.json");
+    let session = dir.join("session");
+    std::fs::write(&input, serde_json::to_vec_pretty(&spec).unwrap()).unwrap();
+    let exe = env!("CARGO_BIN_EXE_ecbench");
+    let run = Command::new(exe)
+        .args(["run", "--spec"])
+        .arg(&input)
+        .arg("--out")
+        .arg(&session)
+        .args(["--cpus", "none", "--lock"])
+        .arg(dir.join("unit.lock"))
+        .arg("--quiet")
+        .output()
+        .unwrap();
+    assert!(
+        run.status.success(),
+        "unit session retained at {}: {}",
+        dir.display(),
+        String::from_utf8_lossy(&run.stderr)
+    );
+    let text = std::fs::read_to_string(session.join("records.jsonl")).unwrap();
+    let records: Vec<Value> = text
+        .lines()
+        .map(|line| audit::record_line(line).unwrap())
+        .collect();
+    assert_eq!(records.len(), 2);
+    for record in &records {
+        assert_eq!(record["outcome"]["status"], "verified");
+        assert!(record["workload"]["planted"].is_null());
+    }
+    let aps = records
+        .iter()
+        .find(|r| r["method"]["id"] == "ic.aps_v3")
+        .unwrap();
+    assert_eq!(aps["detail"]["schema"], "ecbench.aps/v3");
+    assert_eq!(aps["cost"]["deterministic"], false);
+    assert_eq!(aps["cost"]["lower_bound"], true);
+    check(aps);
+    let verify = Command::new(exe)
+        .args(["verify", "--dir"])
+        .arg(&session)
+        .args(["--replay-all", "--exit-code"])
+        .output()
+        .unwrap();
+    assert!(
+        verify.status.success(),
+        "unit audit retained at {}: {} {}",
+        dir.display(),
+        String::from_utf8_lossy(&verify.stdout),
+        String::from_utf8_lossy(&verify.stderr)
+    );
+    let receipt: Value = serde_json::from_slice(&verify.stdout).unwrap();
+    assert_eq!(receipt["ok"], true);
+    let replays = receipt["replays"].as_array().unwrap();
+    assert_eq!(replays.len(), 1);
+    assert!(replays.iter().all(|r| r["record_id"] != aps["record_id"]));
+    std::fs::remove_dir_all(dir).unwrap();
+}
