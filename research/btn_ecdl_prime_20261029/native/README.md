@@ -76,7 +76,10 @@ Each line of output is one JSON object. Curves are the first prime-order
   which were not used to choose it: right in 11 of 12 cases, never more than
   1% above the best, counts agree in every case; where it switches the plan
   off on the crate's network it saves 1.28–3.84×. At cryptographic sizes it
-  always builds the plan. [pcc:unverified]
+  always builds the plan. It does not generalise: as a crate default it broke
+  `tests/structured.rs` (isogeny-fibre network, arity 3, over its 500M-step
+  budget with the plan off), because size alone cannot predict the
+  per-assignment cost. Dropped from the crate. [pcc:unverified]
 * **Lean A1 (duplicate validity check removed).** `point_add` already
   validates −A1, which holds exactly when A1 is valid, so A1 can come from raw
   input words instead of `input_point` (15–16% fewer edges). `lean`: 32

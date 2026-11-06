@@ -170,6 +170,14 @@ the rule picks the cheaper option in #PR.at("correct") of #PR.at("n") cases, is 
 #PR.at("crate_gain_when_off").map(x => str(calc.round(x, digits: 2)) + "×").join(", "). At cryptographic sizes the rule always builds the
 plan, so it only helps small instances.
 
+*It does not generalise.* Added to the crate as a default (`Counter`), the rule
+broke the crate's own `tests/structured.rs` test: on the isogeny-fibre
+`Prepared` network at arity 3 it switched the plan off and the count exceeded
+its 500,000,000-step budget, because pruning skips almost everything there and
+each unpruned assignment is far more expensive. A rule that sees only the
+network's size cannot know the per-assignment evaluation cost, so it holds for
+decomposition networks only. The crate change was dropped, not pushed.
+
 *Dropping a duplicated validity check ("lean").* `input_point` validates
 A#sub[1] (canonical coordinates, on the curve), and `point_add` then validates
 −A#sub[1], which holds exactly when A#sub[1] is valid (same x; y made canonical by
