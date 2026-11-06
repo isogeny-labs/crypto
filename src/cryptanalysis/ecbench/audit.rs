@@ -711,6 +711,12 @@ fn compare_replay(
                 .retain(|k, _| !legacy::is_setup_descriptor(k) || rec.native.contains_key(k));
         }
     }
+    // The three-lead adapters' cost-accounting counters are compared only
+    // where the record has them (`legacy::admits_pre_cost_accounting`).
+    if legacy::admits_pre_cost_accounting(r) {
+        rep.counters
+            .retain(|k, _| !legacy::is_cost_accounting_counter(k) || r.counters.contains_key(k));
+    }
     let rep = &rep;
     let mut diffs = Vec::new();
     if rep.recovered.map(|k| k.to_string()) != r.outcome.recovered {
