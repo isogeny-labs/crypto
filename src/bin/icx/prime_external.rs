@@ -517,10 +517,17 @@ mod tests {
             rho_steps: 0,
             route_file: None,
             route_id: None,
+            project_cofactor: false,
         };
         let report = solve_file(&args).unwrap();
         assert_eq!(report["status"], "complete");
         assert_eq!(report["ic"]["scalar"], "190");
+        // The opt-in cofactor-projected factor base recovers the same scalar.
+        args.project_cofactor = true;
+        let projected = solve_file(&args).unwrap();
+        assert_eq!(projected["status"], "complete");
+        assert_eq!(projected["ic"]["scalar"], "190");
+        args.project_cofactor = false;
         assert_eq!(report["operation"], "solve-prime-file");
         assert_eq!(
             report["input_artifact"]["bytes"],
