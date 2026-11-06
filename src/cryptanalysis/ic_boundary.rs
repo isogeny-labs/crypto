@@ -892,6 +892,22 @@ fn powmod(mut a: u64, mut e: u64, m: u64) -> u64 {
     r
 }
 
+/// [`powmod`] adding its multiplications to `muls`.
+fn powmod_counted(mut a: u64, mut e: u64, m: u64, muls: &mut u64) -> u64 {
+    let mut r = 1u64 % m;
+    a %= m;
+    while e > 0 {
+        if e & 1 == 1 {
+            *muls += 1;
+            r = mulmod(r, a, m);
+        }
+        *muls += 1;
+        a = mulmod(a, a, m);
+        e >>= 1;
+    }
+    r
+}
+
 /// Modular inverse by the extended Euclidean algorithm: `a⁻¹ mod m` in
 /// `[0, m)`, `None` when `gcd(a, m) ≠ 1`.
 ///
@@ -4488,16 +4504,24 @@ impl PrimeCurve {
     /// A square root modulo `p` (Tonelli–Shanks), or `None` for a
     /// non-residue.
     pub fn sqrt(&self, n: u64) -> Option<u64> {
+        self.sqrt_counted(n, &mut 0)
+    }
+
+    /// [`PrimeCurve::sqrt`], adding to `muls` the modular multiplications it
+    /// performs (squarings included: every `mulmod` call, the ones inside
+    /// its exponentiations too). The result is `sqrt`'s, step for step.
+    pub fn sqrt_counted(&self, n: u64, muls: &mut u64) -> Option<u64> {
         let p = self.p;
         let n = n % p;
         if n == 0 {
             return Some(0);
         }
         if p % 4 == 3 {
-            let r = powmod(n, (p + 1) / 4, p);
+            let r = powmod_counted(n, (p + 1) / 4, p, muls);
+            *muls += 1;
             return (mulmod(r, r, p) == n).then_some(r);
         }
-        if powmod(n, (p - 1) / 2, p) != 1 {
+        if powmod_counted(n, (p - 1) / 2, p, muls) != 1 {
             return None;
         }
         let mut q = p - 1;
@@ -4507,13 +4531,13 @@ impl PrimeCurve {
             s += 1;
         }
         let mut z = 2u64;
-        while powmod(z, (p - 1) / 2, p) != p - 1 {
+        while powmod_counted(z, (p - 1) / 2, p, muls) != p - 1 {
             z += 1;
         }
         let mut m = s;
-        let mut c = powmod(z, q, p);
-        let mut t = powmod(n, q, p);
-        let mut r = powmod(n, q.div_ceil(2), p);
+        let mut c = powmod_counted(z, q, p, muls);
+        let mut t = powmod_counted(n, q, p, muls);
+        let mut r = powmod_counted(n, q.div_ceil(2), p, muls);
         loop {
             if t == 1 {
                 return Some(r);
@@ -4521,14 +4545,16 @@ impl PrimeCurve {
             let mut i = 0u32;
             let mut tt = t;
             while tt != 1 {
+                *muls += 1;
                 tt = mulmod(tt, tt, p);
                 i += 1;
                 if i == m {
                     return None;
                 }
             }
-            let b = powmod(c, 1u64 << (m - i - 1), p);
+            let b = powmod_counted(c, 1u64 << (m - i - 1), p, muls);
             m = i;
+            *muls += 3;
             c = mulmod(b, b, p);
             t = mulmod(t, c, p);
             r = mulmod(r, b, p);
