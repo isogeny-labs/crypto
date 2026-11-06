@@ -40,25 +40,30 @@ both records and mark Ir missing for that pair; never reseal it as a match.
 
 Keep four field-size classes inside the supported `p <= 65521` cap.
 The maintained `prime_search` constructor accepts at least eight bits, so
-the proposed classes are **8, 10, 12 and 14 bits**. Before main-data freeze,
+the proposed classes are **8, 10, 12 and 14 bits**. Before any performance
+or EKS session, including a pilot,
 generate and review exact explicit curve, prime subgroup, generator and
 target identities, independently validate them and register the curves.
 Draw curves independently of arm; do not select them for observed solver
 success. Cubic-orbit comparisons use a separately declared shape stratum,
-with the same exact curve and certified beta/lambda in both arms.
+with the same exact curve and certified beta/lambda in both arms. Freeze the
+held-out panel and separate disjoint pilot design before either is executed.
 
 Pilot workloads must be disjoint from the held-out main workloads. After
-the successful source checkpoint and pilot admission, time one call per
+the successful source checkpoint and all accounting/replay/export,
+frozen-protocol and run-admission gates, time one call per
 arm per size, unprofiled and profiled, retaining every outcome. The pilot
 must establish the executable/image, fixed and per-call cost, memory cap,
 oracle-work bound, profile size, trace acceptance/refusal rates and whether
-all arms can finish within identical budgets. Choose the finite main budget
-from that receipt. No numerical runtime estimate is supplied before a pilot.
+all arms can finish within identical budgets. An initial finite budget and
+runtime estimate are prerequisites, not values supplied by this draft. The
+pilot may support a prospective, reviewed amendment to the untouched main
+panel; it does not excuse launching an unfrozen performance experiment.
 
 The main design retains at least eight independent targets per curve, five
 measured rounds and one warmup, interleaved arm order and paired seeds.
 These are minimum population requirements, not a power calculation.
-Before freezing, justify power for the declared effect threshold and test,
+Before the initial freeze, justify power for the declared effect threshold and test,
 freeze native analysis code and its digest, and mask arm labels until that
 analysis has run. A changed sample size or budget is a versioned amendment
 filed before the affected data, never a silent replacement.
@@ -73,7 +78,8 @@ stopping policy and label law unless the contrast explicitly varies one.
 | --- | --- | --- | --- |
 | Registry continuity | `ic.aps_v2` | v3, all leads off | Identical six-encoding parameters and literal equations; classify any transcript-only overhead separately |
 | F4 trace family | v3 trace off | v3 trace certified | Same cell order and seeded bases; cold learning and all refusals/fallback charged; no cross-target warm cache |
-| Line chart | original three-variable line divisor | two-variable nonhorizontal chart plus horizontal cell | Same full labeled base; same global-sign convention; prune only on the existing certificate |
+| Ordinary line chart | `line3`, two variables including horizontal lines | two-variable nonhorizontal chart plus one-variable horizontal cell | Same full labeled base and global-sign convention; pruning off |
+| Certified pruned line chart | saturated `line3`, three variables | two-variable nonhorizontal chart | Same propagated-orbit certificate and labeled base in both arms; horizontal omission uses the same certificate |
 | Unequal profile | equal partition sizes | unequal sizes of the same total | Same sampling law and total population; freeze each profile; measure relation yield as well as cost |
 | Elimination choice | no guessed coordinate | explicit guessed coordinate 0, 1 or 2 | Same unequal profile, coordinate equations and deadline; this is distinct from the profile contrast |
 | Retained growth | `growth=retained_full` | `growth=frontier` | Same initial base and nested draw law; retain all old setup and failed work |
@@ -123,7 +129,8 @@ subexponential claim or extrapolation beyond this four-size toy range.
 An incomplete outcome or absent required profile blocks a speed ranking;
 it does not disappear from the export. Freeze the effect threshold,
 uncertainty method, resampling rule, multiplicity correction and fixed-N stop
-rule after the disjoint pilot and before main data. An unpowered null is
+rule before any measurement; any pilot-supported revision must be filed
+before the affected main data. An unpowered null is
 inconclusive. A failed positive control stops the affected experiment.
 
 ## Admission checklist
@@ -134,10 +141,13 @@ inconclusive. A failed positive control stops the affected experiment.
 2. Source-built tested/pushed image; exact registered ladder and independent
    oracle budget; complete protocol-design and metric audit. This native
    exporter's schema/hash checks alone do not admit a design or execution.
-3. Reviewed, schema-valid pilot protocol filed before its data; finite
-   budget, source checkpoint and maintained EKS admission. No local fallback.
-4. Pilot receipt, fixed native analysis, full-run population/power/budget,
-   frozen `experiment.protocol/v1`, plan pin and exact seeds before main data.
+3. Reviewed, schema-valid frozen held-out four-size panel and separate pilot
+   protocol, finite budgets/runtime estimates, population/power, fixed native
+   analysis, plan pins and exact seeds before any performance/EKS session.
+   A pilot is not an exception to these gates. No local fallback.
+4. Pilot receipt and any prospective, reviewed amendment to the untouched
+   main panel; preserve its initial and amended `experiment.protocol/v1`
+   objects. No amendment may relabel or discard observed held-out outcomes.
 5. L2/A-A, source/S3, replay/export and required interruption/recovery checks.
    Every denial on private ledger, shared full logs and host/build details
    remains in force. Do not package them in the source checkpoint.

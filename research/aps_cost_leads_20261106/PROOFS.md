@@ -39,6 +39,11 @@ No `sorry`, custom research axiom or native kernel bypass is used in this
 source. Independent signed proof standing is not supplied by a producer
 build [pcc:unverified].
 
+Native claim `PCC-20261106-40dd8e` binds the exact three declarations;
+[declaration pins](validation/frontier-bindings.json) retain their original
+source boundary. The native verifier and kernel gate are distinct from signed
+standing, which remains **unverified** [pcc:unverified].
+
 ## Nonhorizontal line chart and exceptions
 
 On `y^2=x^3+ax+b` in odd characteristic, substituting `y=t x+c` gives
