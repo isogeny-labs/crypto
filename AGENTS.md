@@ -135,8 +135,12 @@ The adoption audit is `scripts/kb_usage_report.py`; it counts dated
 session-log entries carrying a receipt (or an explicit `KB unavailable`). Run
 `python3 scripts/kb_usage_report.py --since 2026-11-05` after a batch of
 sessions and keep `docs/knowledge-base-usage-baseline.json` as the before
-mark. It reports; it is not a quota and never blocks a null or negative
-result.
+mark. `--ref origin/main` measures committed history.
+`.github/workflows/kb-usage-report.yml` runs it weekly and on demand,
+report-only. It is not a quota and never blocks a null or negative result.
+Retrieval quality is measured separately by `scripts/kb_retrieval_probe.py`
+against `docs/kb-retrieval-queries.json`; see `docs/knowledge-base-retrieval.md`.
+Change the index or ranking only against that measurement.
 
 ## Standing workflow rules (from the owner)
 

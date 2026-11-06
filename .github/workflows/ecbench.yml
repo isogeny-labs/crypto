@@ -328,6 +328,10 @@ jobs:
       # the records give (docs/bounds/README.md §8).
       - name: Bound records re-derive, challenges check, the frontier is current
         run: |
+          # A record may cite evidence outside research/ecbench_*/ (an audit
+          # receipt beside its sessions): check out every path the records name.
+          jq -r '[.. | objects | select(has("path")) | .path | strings] | .[]' \
+            docs/bounds/records/*.json | sort -u | sed 's#^#/#' | git sparse-checkout add --stdin
           ./target/release/ecbench bound check --root . --record docs/bounds/records/*.json
           ./target/release/ecbench challenge check --file docs/bounds/challenges/*.json
           ./target/release/ecbench frontier build --bounds docs/bounds/records \
@@ -577,22 +581,24 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 40
     # Retain all 16 byte-balanced logical audits, sequentially packed into
-    # four execution lanes. Each lane lists/hydrates once and invokes the
+    # five execution lanes. Each lane lists/hydrates once and invokes the
     # unchanged auditor once per assigned original K/16 value. The grouping
-    # separates long shards observed in run 42122136071, without changing
+    # uses maximum observed weights from three real runs, without changing
     # session assignment, verification, assertions, runner or either timeout.
     strategy:
       fail-fast: false
       matrix:
         include:
           - lane: 0
-            shards: '4 2 14'
+            shards: '4 15'
           - lane: 1
-            shards: '8 5 7 0 15'
+            shards: '1 13 10'
           - lane: 2
-            shards: '11 9 3 13'
+            shards: '14 9 5 7'
           - lane: 3
-            shards: '1 12 6 10'
+            shards: '8 12 6 0'
+          - lane: 4
+            shards: '2 11 3'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -651,7 +657,7 @@ jobs:
           name: ecbench-pr-audit-bin
           path: target/release
       - name: Validate committed evidence integrity on pull requests
-        # Every original shard runs exactly once across the four lanes.
+        # Every original shard runs exactly once across the five lanes.
         # Preserve failures while finishing the other shards in that lane;
         # fail-fast:false keeps the other lanes running as before.
         timeout-minutes: 30

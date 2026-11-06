@@ -1,0 +1,52 @@
+{
+  "schema": "kb-retrieval/v1",
+  "note": "Fixed query set for scripts/kb_retrieval_probe.py. Each query is phrased as a researcher would ask it, without the record identifier, and expects the named source. Chosen before the baseline run from distinctive record titles across the three repositories; do not add a query after seeing a failure it would hide.",
+  "top_k": 5,
+  "queries": [
+    {
+      "query": "Height-compressing global lifts elliptic surfaces",
+      "repo": "crypto-autoresearcher",
+      "path": "knowledge/leads/ecdlp/exotic/LEAD-EXO-global-lift-height.yaml"
+    },
+    {
+      "query": "Prime-to-p jets canonical Teichmuller lifts p-adic formal-group digits",
+      "repo": "crypto-autoresearcher",
+      "path": "knowledge/leads/ecdlp/exotic/LEAD-EXO-padic-jet-canonical-lift.yaml"
+    },
+    {
+      "query": "Graphical Algebraic Geometry holant Semaev decomposition chain",
+      "repo": "crypto-autoresearcher",
+      "path": "knowledge/leads/ecdlp/exotic/LEAD-EXO-gag-holant-semaev-chain.yaml"
+    },
+    {
+      "query": "Quadratic-phase Gowers U3 correlation small-x predicate discrete log",
+      "repo": "crypto-autoresearcher",
+      "path": "knowledge/leads/ecdlp/exotic/LEAD-EXO-quadratic-phase-small-x-leakage.yaml"
+    },
+    {
+      "query": "Miller functions S-unit descent pairing-free Miller cocycles",
+      "repo": "crypto-autoresearcher",
+      "path": "knowledge/leads/ecdlp/exotic/LEAD-EXO-miller-pairing-cocycle.yaml"
+    },
+    {
+      "query": "Growth of Groebner solving degree for prime-field summation-polynomial systems",
+      "repo": "crypto-autoresearcher",
+      "path": "knowledge/open-problems/KN-OPEN-002.md"
+    },
+    {
+      "query": "Universal algebraic-factor-base no-go prime-field index calculus",
+      "repo": "crypto-autoresearcher",
+      "path": "knowledge/open-problems/KN-OPEN-020.md"
+    },
+    {
+      "query": "ECDLP lead atlas already tried",
+      "repo": "crypto-autoresearcher",
+      "path": "knowledge/leads/ecdlp/README.md"
+    },
+    {
+      "query": "curve identity across repositories ecdb comparisons",
+      "repo": "crypto-autoresearcher",
+      "path": "docs/curve-identities.md"
+    }
+  ]
+}
