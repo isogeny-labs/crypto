@@ -688,7 +688,10 @@ jobs:
     if: ${{ always() && !cancelled() && needs.replay_plan.result == 'success' }}
     needs: [replay_plan, harness]
     runs-on: ubuntu-24.04
-    timeout-minutes: 350
+    # replay_plan only succeeds on workflow_dispatch and schedule, so this lane
+    # keeps 350 minutes there; any other event gets the routine 25-minute cap
+    # that .github/scripts/check-pr-budgets.py can prove.
+    timeout-minutes: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && 350 || 25 }}
     strategy:
       fail-fast: false
       matrix:
@@ -921,7 +924,8 @@ jobs:
     if: ${{ !github.event.pull_request.draft && (github.event_name == 'pull_request' || github.event_name == 'merge_group' || github.event_name == 'push') && needs.scope.outputs.ecbench_replay != 'false' }}
     needs: [scope, harness]
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    # Routine PR and merge-group runs get the 25-minute cap; push to main keeps 30.
+    timeout-minutes: ${{ github.event_name == 'push' && 30 || 25 }}
     steps:
       - uses: actions/checkout@v4
         with:

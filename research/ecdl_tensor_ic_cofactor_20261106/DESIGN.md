@@ -1,8 +1,29 @@
 # Fixed-cofactor extension of `ecdl-tensor-ic`: design notes (2026-11-06)
 
-**Status: plan for review. No code has been written.** The owner approved
-starting these notes on 2026-11-06. Implementation waits for review of this
-plan.
+**Status: implemented.** The owner approved the plan on 2026-11-06 and asked
+for the implementation, which is in `crates/ecdl-tensor-ic/src/cofactor.rs`,
+`pointgadget.rs` and `solver.rs`, with tests in `tests/cofactor_test.rs`. The
+open questions were settled on the plan's defaults:
+
+- the hash is evaluated on A_i, and the bases are sized from r;
+- there is no new ecbench arm;
+- `order` keeps meaning r.
+
+Deviations from the plan as written:
+
+- **Curve.** `Curve` is unchanged. The cofactor and `in_subgroup` live on a
+  new `CofactorCurve`, because adding a field to `Curve` would have forced an
+  edit of the ecbench arm's struct literal, and that edit would change the
+  IC candidate identity for no reason.
+- **Whole-point membership.** In the whole-point network, membership moved
+  into the projection vertex: A_i = [c]S_i is emitted only for a member of
+  F_i, and a support vertex enumerates S_i over E. This keeps every edge at
+  two endpoints, and function inputs must be bound before the vertex reads
+  them.
+- **Shapes.** `GadgetShapes` is unchanged. The cofactor shape is a separate
+  `cofactor_shape`, so the `ecdlscale` table stays byte-identical.
+
+The plan as reviewed follows.
 
 ## Source and scope
 
