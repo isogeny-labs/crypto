@@ -66,3 +66,30 @@ An earlier description update used an unavailable cached draft value. The full
 description is restored through a guarded file-based update. No test or
 benchmark was rerun for this metadata repair. Conductor is still absent; no
 scope lease is claimed. [pcc:unverified]
+
+## 2026-11-06T00:23:15Z artifact/PCC blocker
+
+The metadata repair's ledger append crossed 64 KiB. Artifact bot commit
+`d732452c3f4d95e926ae4c59c9ef0bbdde5c1e5a` replaces the tracked ledger
+with `pcc/.artifacts.json` and an ignore rule. Its sole parent is the metadata
+repair, so this is not Copilot's requested merge. The manifest's SHA-256 is
+`b17a36101ed15ac778e8f8c3f8cec4785e591c1738d506dceb26c59e847d8340`,
+matching the exact 65,851 parent bytes. An ignored working copy restored from
+that parent passes local artifact and ledger checks; remote availability is
+not established. [pcc:unverified]
+
+A small fixture using the unchanged PCC tool rejects the missing head ledger
+against main's 150-entry baseline, then accepts the restored 155-entry ledger.
+See `followups/20261106T002315Z/ledger-storage-diagnostic.txt`. Current main's
+PCC workflow has no hydration step; the signing job also stages the ledger
+directly. Artifact-aware head/base retrieval and signed appends need coordinated
+integration before a clean checkout preserves those protections. This is an
+observed integration blocker, not a CI result or a repaired gate.
+[pcc:unverified]
+
+Preserve the ledger manifest and retained parent bytes. Do not force-add the
+ignored file, exempt it from storage policy, or change the shared PCC verifier
+or signing flow to get green. Further canonical claim registration is pending
+safe artifact publication; this diagnostic has no new signed claim. Keep the
+PR open and the pending conflicted journal untouched. The new blocker resets
+the unchanged-follow-up count to zero.
