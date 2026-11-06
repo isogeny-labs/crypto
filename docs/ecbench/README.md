@@ -1318,8 +1318,9 @@ What CI replays (`.github/workflows/ecbench.yml`):
   class set-up fix replay 8 runs each, which must pass through the
   pre-fix reconstruction ([`CLASS_SETUP_AUDIT.md`](CLASS_SETUP_AUDIT.md));
 - **weekly, and on demand**: the same integrity audit, plus every
-  measured run replayed for the sessions under `research/ecbench_*/sessions`,
-  the binary-curve comparison and the n37 compact-orbit notes.
+  measured run replayed for every committed session found by schema (the
+  hash-pinned incomplete scratch sessions and the pinned defective sessions
+  excepted), split over 40 shards by recorded solver time.
 
 A replay that disagrees reports what differs (`differs in total_gae,
 phase counts, …`). One that agrees reports `identical`, or names the

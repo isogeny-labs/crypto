@@ -32,12 +32,17 @@ name: ecbench
 # `running`), is accepted by --allow-interrupted as evidence of the
 # interruption: every per-record check still applies.
 #
-# The sessions under research/ecbench_*/sessions, the binary-curve
-# comparison, and the n37 compact-orbit note sessions are also re-audited
-# in the manual exhaustive lane with every measured run replayed: their counts
-# were recorded on another host and architecture and must reproduce here
-# bit for bit, so a change that alters what a registered method counts
-# fails here.
+# Every complete or interrupted committed session found by schema (the list
+# above, minus the hash-pinned incomplete scratch sessions in
+# docs/ecbench/INCOMPLETE_SESSIONS.tsv and the owner-dispositioned defective
+# ones in docs/ecbench/DEFECTIVE_SESSIONS.tsv, which fail verify by design and
+# are checked against their pinned defect instead) is also re-audited in the
+# weekly/manual lane with every measured run replayed, wherever it lives in the
+# tree: their counts were recorded on another host and architecture and must
+# reproduce here bit for bit, so a change that alters what a registered method
+# counts fails here.  The replay is split over the `exhaustive_replay` matrix
+# (shards balanced by recorded solver time, .github/scripts/ecbench-replay-sessions.sh) because
+# the whole set does not fit one job's 6-hour limit.
 on:
   pull_request:
     branches: [main]
@@ -311,7 +316,7 @@ jobs:
       - name: Build
         run: cargo build --release --bin ecbench
       - uses: actions/upload-artifact@v4
-        if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+        if: github.event_name == 'pull_request' || github.event_name == 'merge_group' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
         with:
           name: ecbench-pr-audit-bin
           path: target/release/ecbench
@@ -500,9 +505,10 @@ jobs:
       - name: Audit with replays
         run: ./target/release/ecbench verify --dir "$RUNNER_TEMP/prime" --replay 8 --exit-code --out "$RUNNER_TEMP/prime-audit.json" > /dev/null
       # The pre-2026-10-18 class set-up reconstruction is admitted only for
-      # the producer binaries in audit::PRE_CLASS_SETUP_BINARIES; these
-      # sessions are outside the weekly all-run replay, so replay a sample
-      # of each here and require that the reconstruction was what passed.
+      # the producer binaries in audit::PRE_CLASS_SETUP_BINARIES; the weekly
+      # exhaustive_replay job replays these sessions in full, so every pull
+      # request replays a sample of each here and requires that the
+      # reconstruction was what passed.
       # (docs/ecbench/CLASS_SETUP_AUDIT.md; the negative controls are in
       # tests/ecbench.rs.)
       - name: Pre-fix quartic and cubic records replay under the closed producer list
@@ -551,19 +557,6 @@ jobs:
       - name: Audit complete and interrupted sessions; pin incomplete scratch evidence
         if: (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')
         run: bash .github/scripts/ecbench-audit-sessions.sh "$RUNNER_TEMP/ecbench-sessions.txt"
-      - name: Committed evidence reproduces exhaustively on this host
-        if: (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule')
-        run: |
-          shopt -s nullglob
-          for d in research/ecbench_*/sessions/*/ \
-            research/ghs_curve_comparison_20261009/sessions/*/ \
-            research/notes/ecc2k130/cold_compact_orbit_ic_20261003/sessions/*/ \
-            research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/sessions/*/; do
-            echo "auditing $d"
-            # An interrupted session is evidence of the interruption: every
-            # integrity check applies to it, only completeness does not.
-            ./target/release/ecbench verify --dir "$d" --replay-all --allow-interrupted --exit-code > /dev/null
-          done
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -574,6 +567,89 @@ jobs:
             ${{ runner.temp }}/claim
             ${{ runner.temp }}/claim.json
           if-no-files-found: ignore
+
+  # Weekly/manual exhaustive replay of every committed ecbench session (the
+  # header comment says which).  Replay costs about what the recorded run
+  # cost, so the whole set does not fit one job: shards, each
+  # with its own checkout and artifact pull, replay the binary the harness job
+  # built.  Estimate (2026-11-06 census of 1433 replayable sessions): 200 h of
+  # recorded solver wall time, a replay costing 0.2-1.4x its record, two vCPUs
+  # per runner: about 100-130 runner-hours in all, ~3 h per shard of 40 with the
+  # heaviest unit (one 7.5 h-of-solver session, parallel inside) near 4 h, plus
+  # ~10 min of setup per shard.  Shards are balanced by recorded solver time
+  # (ecbench-replay-sessions.sh).
+  exhaustive_replay:
+    if: ${{ always() && !cancelled() && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && needs.harness.result == 'success' }}
+    needs: [scope, harness]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /.github/scripts/
+            /docs/ecbench/INCOMPLETE_SESSIONS.tsv
+            /docs/ecbench/DEFECTIVE_SESSIONS.tsv
+            /research/ecbench_*/
+            /research/ghs_curve_comparison_20261009/
+            /research/notes/ecc2k130/cold_compact_orbit_ic_20261003/
+            /research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/
+            /tools/artifacts/
+            /.artifacts/
+      - name: Check out and list every committed ecbench session
+        run: |
+          list="$RUNNER_TEMP/ecbench-sessions.txt"
+          mapfile -t candidates < <(git ls-tree -r --name-only HEAD | sed -n 's#/session\.json$##p')
+          test "${#candidates[@]}" -gt 0 || { echo '::error::no session.json in the tree'; exit 1; }
+          printf '/%s/\n' "${candidates[@]}" | git sparse-checkout add --stdin
+          : > "$list"
+          for d in "${candidates[@]}"; do
+            test -f "$d/session.json" || { echo "::error::$d/session.json was not checked out"; exit 1; }
+            if jq -e '.schema == "ecbench.session/v1"' "$d/session.json" > /dev/null; then
+              echo "$d" >> "$list"
+            fi
+          done
+          test -s "$list" || { echo '::error::no committed ecbench sessions found'; exit 1; }
+          echo "$(wc -l < "$list") committed ecbench sessions (by schema)" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Pull every discovered committed session from the artifact store
+        shell: bash
+        working-directory: ${{ github.workspace }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ARTIFACTS_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.ARTIFACTS_AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.ARTIFACTS_AWS_REGION || 'us-west-2' }}
+        run: |
+          if ! command -v aws >/dev/null; then
+            python3 -m venv "$RUNNER_TEMP/artifacts-awscli"
+            artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/bin/python"
+            artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/bin/aws"
+            if [ -d "$RUNNER_TEMP/artifacts-awscli/Scripts" ]; then
+              artifacts_cli_python="$RUNNER_TEMP/artifacts-awscli/Scripts/python.exe"
+              artifacts_cli_aws="$RUNNER_TEMP/artifacts-awscli/Scripts/aws.exe"
+            fi
+            "$artifacts_cli_python" -m pip install --disable-pip-version-check awscli==1.46.2
+            export ARTIFACTS_AWS="$artifacts_cli_aws"
+          fi
+          mapfile -t artifact_sessions < "$RUNNER_TEMP/ecbench-sessions.txt"
+          test "${#artifact_sessions[@]}" -gt 0
+          python3 tools/artifacts/artifacts.py pull --jobs 16 "${artifact_sessions[@]}"
+      - uses: actions/download-artifact@v4
+        with:
+          name: ecbench-pr-audit-bin
+          path: target/release
+      - name: Replay every measured run of this shard's sessions
+        env:
+          REPLAY_SHARD: ${{ matrix.shard }}/40
+        run: |
+          chmod +x target/release/ecbench
+          bash .github/scripts/ecbench-replay-sessions.sh "$RUNNER_TEMP/ecbench-sessions.txt"
 
   evidence_audit_pr:
     if: ${{ !github.event.pull_request.draft && (github.event_name == 'pull_request' || github.event_name == 'merge_group') && needs.scope.outputs.ecbench_replay != 'false' }}
