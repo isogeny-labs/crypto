@@ -93,24 +93,99 @@ not a measured crossing (Chapter~\ref{ch:glvprogramme}). The earlier
 single-point models of \S\ref{sec:gaudry} are superseded.
 
 \paragraph{Characteristic two.} Over $\FF_{(2^m)^4}$ the gap closes with
-size. IC over the negation-map rho model is:
+size (Table~\ref{tab:pf-d4} and Figure~\ref{fig:pf-d4}, two targets per
+size up to $m=12$). IC over rho's theoretical $S=0.886$ falls from
+$5{,}080$ and $4{,}124$ at $m=6$ to $6.06$ at $m=14$, a single target. The
+fitted slope over $m\ge8$ (seven points) is $-0.248$ in $\log_2 n$, which
+is Gaudry's $n^{-1/4}$. The extrapolated crossover was $n\approx2^{68.1}$,
+where rho takes about $2^{34}$ steps, so it could be tested directly. The
+follow-up study ran $m=15$--$18$: $m=15$ completed in a clean session at
+$3.61$ and $3.67\times$ rho's theoretical cost; the $m=16$ and $m=17$
+records come from sessions killed by container restarts and were not
+replayed, and $m=18$ produced no record
+(\art{research/gaudry_k4_char2_crossover_20261015/README.md}). The ratio to
+the same-session rho run scatters more than the ratio to theory, because
+one rho run is a single draw: at $m=15$ it is $19.1$ on one target and
+$3.8$ on the other.
 
-\smallskip
-\begin{tabular}{@{}lrrrrr@{}}
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrrrrrrrl@{}}
 \toprule
-$m$ & 6 & 8 & 10 & 12 & 14 \\
-$\log_2 n$ & 24 & 32 & 40 & 48 & 56 \\
+$m$ & $\log_2 n$ & $h$ & IC $S$ & trials/rel. & rho $S$ & IC/rho theory & IC/rho run & Session \\
 \midrule
-IC / rho model & 5{,}080 & 648 & 80.6 & 49.7 & 6.06 \\
-IC / measured rho & 4{,}427 & 919 & 98.9 & 47.2 & 4.27 \\
+6 & 24 & 14 & $4{,}501$ & 386 & --- & $5{,}080$ & $4{,}427$ & clean \\
+ & &  & $3{,}654$ & 363 & --- & $4{,}124$ & $2{,}781$ & clean \\
+8 & 32 & 6 & $573.9$ & 247 & --- & $648$ & $919$ & clean \\
+ & &  & $459.6$ & 191 & --- & $519$ & $438$ & clean \\
+10 & 40 & 2 & $71.4$ & 179 & --- & $80.6$ & $98.9$ & clean \\
+ & &  & $73.4$ & 183 & --- & $82.9$ & $38.4$ & clean \\
+12 & 48 & 10 & $44.0$ & 182 & --- & $49.7$ & $47.2$ & clean \\
+ & &  & $42.6$ & 177 & --- & $48.1$ & $50.3$ & clean \\
+14 & 56 & 2 & $5.37$ & 186 & --- & $6.06$ & $4.27$ & clean \\
+15 & 60 & 2 & $3.198$ & --- & 0.168 & $3.61$ & $19.1$ & clean \\
+ & &  & $3.253$ & --- & 0.856 & $3.67$ & $3.8$ & clean \\
+16 & 64 & 2 & $1.482$ & --- & 0.899 & $1.67$ & $1.65$ & interrupted \\
+17 & 68 & 2 & $0.849$ & --- & 1.361 & $0.96$ & $0.62$ & IC interrupted \\
 \bottomrule
 \end{tabular}
-\smallskip
+\caption[]{$k=4$ index calculus over $\FF_{(2^m)^4}$ with the
+Frobenius-reduced $D_4$ oracle, one row per target. $h$: cofactor.
+IC/rho theory: IC $S$ over $0.886$. IC/rho run: over the same session's
+rho run on that target (rho $S$ is listed where the source gives it).
+$m\le14$: ladder sessions \texttt{ECBS1h4d63e1551dc1} (24/24 verified) and
+\texttt{ECBS1hb9229e3a0f30} (3/3). $m=15$--$17$: the crossover study; the
+interrupted rows pass every \texttt{ecbench verify} check except session
+completeness and record count, and are indicated, not established.
+Producer-reported; no validation file; the red team's verdict on the
+crossover is ``not survived (unsupported), not refuted''. Sources:
+\art{research/gaudry_quartic_d4_char2_20261015/README.md},
+\art{research/gaudry_k4_char2_crossover_20261015/README.md}; extracted in
+\art{figures/data-pf-d4.json}.}
+\label{tab:pf-d4}
+\end{table}
 
-\noindent These are first targets; $m=14$ is a single target. The fitted
-slope is $-0.248$ in $\log_2 n$, which is Gaudry's $n^{-1/4}$. The
-extrapolated crossover was $n\approx2^{68}$, where rho takes about $2^{34}$
-steps, so it could be tested directly.
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-pf-d4.pdf}
+\caption[]{$k=4$ over $\FF_{(2^m)^4}$: IC over rho per target, against
+rho's theoretical $S=0.886$ (circles) and against the same-session rho run
+(squares). Open markers: interrupted sessions ($m=16,17$), not replayed.
+Dashed: parity. Data \art{figures/data-pf-d4.json}
+(Table~\ref{tab:pf-d4}).}
+\label{fig:pf-d4}
+\end{figure}
+
+The same study replaced the dense incremental elimination, whose
+\texttt{row\_ops} grew as $\abs{\Fb}^3$, with a Wiedemann solve on a
+singleton-filtered core, which grows as $\abs{\Fb}^2$
+(Table~\ref{tab:pf-d4-la}). The sparse solver loses at $m=8$ and $10$ and
+wins from $m=12$; trials per relation are unchanged within $0.4\%$. Linear
+algebra stays below $0.08\%$ of $S$ at these sizes.
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}rlrrrrrr@{}}
+\toprule
+$m$ & Workload & dense \texttt{row\_ops} & Wiedemann & ratio & trials ratio & LA \% dense & LA \% Wied. \\
+\midrule
+8 & \texttt{Wa195d33f5d8a} & $11{,}370$ & $69{,}871$ & $0.16$ & $1.0000$ & $0.0004$ & $0.0024$ \\
+8 & \texttt{Wf87c59c61bdd} & $14{,}252$ & $86{,}869$ & $0.16$ & $1.0000$ & $0.0007$ & $0.0046$ \\
+10 & \texttt{W845d6165060e} & $718{,}813$ & $1{,}536{,}771$ & $0.47$ & $1.0000$ & $0.0074$ & $0.0159$ \\
+10 & \texttt{Wc69dfe4568cc} & $536{,}268$ & $1{,}423{,}931$ & $0.38$ & $1.0000$ & $0.0056$ & $0.0148$ \\
+12 & \texttt{W255399ed9512} & $32{,}211{,}708$ & $22{,}221{,}501$ & $1.45$ & $1.0008$ & $0.0754$ & $0.0520$ \\
+12 & \texttt{W739a83ada978} & $27{,}959{,}816$ & $21{,}700{,}171$ & $1.29$ & $1.0040$ & $0.0692$ & $0.0535$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Dense against Wiedemann linear algebra in the $k=4$,
+characteristic-two pipeline, paired within one clean session (Part~D,
+18/18 verified). ratio: dense over Wiedemann \texttt{row\_ops}; trials ratio: Wiedemann over dense. LA \%: share of the arm's counted $S$. Producer-reported;
+no validation file. Source:
+\art{research/gaudry_k4_char2_crossover_20261015/raw/summary.json}
+(\texttt{part\_d}); extracted in \art{figures/data-pf-d4.json}.}
+\label{tab:pf-d4-la}
+\end{table}
 
 \paragraph{The red-team verdict.} An adversarial review tested that
 crossover (\art{research/gaudry_k4_char2_redteam_20261026/REPORT.md}). Its

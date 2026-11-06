@@ -4,147 +4,148 @@ For a subgroup $\langle G\rangle$ of prime order $r$ on an elliptic curve
 $E/\FF_q$, Pollard rho~\cite{pollard1978,vanoorschot1999} computes discrete
 logarithms in about $\sqrt{\pi r/(2A)}$ group operations, where $A$ is the
 number of efficiently computable automorphisms~\cite{wiener1998,gallant2000}.
-No algorithm is known to beat it on curves of cryptographic shape.
+No algorithm is known to beat it on curves of cryptographic shape. Index
+calculus, subexponential for finite-field logarithms, reached elliptic
+curves through Semaev's summation polynomials~\cite{semaev2004} and the
+extension-field analyses of Gaudry~\cite{gaudry2009} and
+Diem~\cite{diem2011}. The question here is where it crosses rho: on which
+curves, at which sizes, under which accounting.
 
-Index calculus breaks finite-field discrete logarithms in subexponential
-time. It reached elliptic curves through Semaev's summation
-polynomials~\cite{semaev2004} and the extension-field analyses of
-Gaudry~\cite{gaudry2009} and Diem~\cite{diem2011}. It is the method that
-should exploit the most structure. The question is \emph{where it crosses
-rho}: on which curves, at which sizes, under which accounting.
+This treatise records the answer one research programme reached between
+July and 6 November 2026 across three repositories (\texttt{crypto},
+\texttt{crypto-autoresearcher}, \texttt{cryptanalysis}).
+Table~\ref{tab:fm-glance} and Figure~\ref{fig:fm-glance} give its volume
+by month. A chronological programme record~\cite{icprogram2026} and an
+improvement ledger~\cite{icledger2026} organise the same work by date and
+by incumbent; this document organises it by theory, algorithms, measured
+frontier and open problems. It runs no new experiment, re-verifies one
+certificate (\S\ref{sec:fd-binary}) and cites a committed artefact for
+every number except the session-reported Kummer-tower last fall degrees of
+\S\ref{sec:fd-pkm}, which are labelled where used.
 
-This treatise records what one research programme learned about that
-question between July and early November 2026. The programme spanned three
-repositories (\texttt{crypto}, \texttt{crypto-autoresearcher},
-\texttt{cryptanalysis}), several thousand commits and several hundred
-preregistered studies. Two companion documents organise the same work
-differently:
-\begin{itemize}
-\item a programme record~\cite{icprogram2026}, chronological and
-  exhaustive, with study catalogues;
-\item an improvement ledger~\cite{icledger2026}, organised as a ratchet of
-  incumbents.
-\end{itemize}
-This document organises it as a treatise:
-\begin{itemize}
-\item the theory that constrains index calculus on elliptic curves;
-\item the algorithms engineered against those constraints;
-\item the measured frontier against a fairly priced rho;
-\item what remains open.
-\end{itemize}
-It runs no new experiment. It re-verified one certificate
-(\S\ref{sec:fd-binary}), adds no improvement of its own, and cites the
-committed artefact behind every number; the one exception, the
-session-reported Kummer-tower last fall degrees of \S\ref{sec:fd-pkm}, is
-labelled where it is used.
+\begin{table}[t]
+\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\input{figures/tab-fm-glance.tex}
+\caption[]{The programme by month. Ledger columns: decisions, distinct
+experiments and run directories of the \texttt{crypto-autoresearcher}
+ledger, 19 July--30 September, copied from
+\art{research/ecdlp_jul_sep_index_20261029/SUMMARY.json} (its seven
+October-dated rows are late-September files and are left out). Other
+columns are counted at \texttt{origin/main} \texttt{05f73826}: top-level
+\art{research/} directories by the date in their name ($^a$25 undated);
+ecbench session capsules by start time, with their sealed records;
+admitted rows of \art{benchmarks/README.md}, with the number whose
+directory holds a \texttt{VALIDATION.json}; rows removed to
+\art{benchmarks/ARCHIVE.json}; \texttt{validation-gate/v1} files
+($^b$4 undated; benchmark copies counted separately); \texttt{pcc} claim
+records. Counting rules and blob hashes:
+\art{figures/data-fm-glance.json}; table built by
+\art{figures/make_tab_fm.py}. Totals are sums of the rows.}
+\label{tab:fm-glance}
+\end{table}
+
+\begin{figure}[t]\centering
+\includegraphics[width=\linewidth]{figures/fig-fm-glance.pdf}
+\caption[Programme counts by month]{Monthly counts of Table~\ref{tab:fm-glance}, log scale. Ledger
+series stop at 30 September because the index ends there; repository
+series start in September because the study directories, ecbench (from 2
+October) and the validation gate (from 19 October) start then. Data:
+\art{figures/data-fm-glance.json}; plot:
+\art{figures/make_fig_fm_glance.py}.}
+\label{fig:fm-glance}
+\end{figure}
 
 \section*{The argument in brief}
 
-\paragraph{1. Where the cost lives (Part~\ref{part:foundations}).} An index
-calculus pays for factor-base set-up, relation collection, linear algebra
-and the target's descent. Relation collection costs
-(trials per relation) $\times$ (cost of one decomposition). Chapter~\ref{ch:model}
-writes this out and maps every lever the programme pulled to the term it
-moves.
+\paragraph{1. Where the cost lives (Part~\ref{part:foundations}).}
+Relation collection costs (trials per relation) $\times$ (cost of one
+decomposition). Chapter~\ref{ch:model} writes the cold cost as four terms,
+maps each lever to the term it moves, and gives measured per-operation
+costs. On the 19 validated leaderboard rows, set-up and relation
+collection take $98.2$--$99.98\%$ of cold $S$ and linear algebra at most
+$0.41\%$ (Table~\ref{tab:fm-phases}).
 
 \paragraph{2. What is fixed for every curve (Chapter~\ref{ch:cover}).} The
-Galois group of the summation cover is $(\ZZ/2)^{m-2}$ for every curve,
-field and characteristic (a draft proof upheld by an integrity audit; the
-separability lemma in characteristic 2 awaits an expert check). Its fibres over $\FF_q$ split by an exact law,
-and they split completely on the factor-base locus. The mean decomposition
-yield at fixed base size is a double count. Three consequences follow:
-\begin{itemize}
-\item no curve has anomalous monodromy to exploit;
-\item no fibre census can find an anomalous relation rate;
-\item no factor-base geometry can raise mean yield.
-\end{itemize}
-The design space that remains is the cost of the oracle, the algebraic
-difficulty of the decomposition system, the linear algebra, and where the
-problem lives.
+summation cover has Galois group $(\ZZ/2)^{m-2}$ for every curve, field and
+characteristic (a draft proof upheld by an integrity audit; the
+characteristic-2 separability lemma awaits an expert check). Its fibres
+over $\FF_q$ split completely on the factor-base locus, and the mean yield
+at fixed base size is a double count. No curve has anomalous monodromy, no
+fibre census can find an anomalous relation rate, and no factor-base
+geometry can raise mean yield. Oracle cost, the difficulty of the
+decomposition system, the linear algebra and the choice of field remain
+free.
 
-\paragraph{3. How hard is the decomposition system (Chapter~\ref{ch:falldegree})?}
-Every subexponential claim for prime-degree binary curves assumes that the
-solving degree stays near the first fall degree. In three presentations we
-prove that the first fall degree is a constant of the presentation (for
-binary Weil descent, whenever every descended equation has degree 2, as
-on every instance computed), and
-show that the last fall degree, which equals the solving degree for
-unsatisfiable systems, is not bounded by it:
-\begin{itemize}
-\item it is proved to differ for an explicit-membership chain ($(4,5)$
-  exactly at $B=3$);
-\item it is certified to differ, by independently checked closure
-  certificates, for binary Weil descent ($\ge5$ against 2 at $n=33$--$45$);
-\item it is reported to differ for prime-field Kummer towers (6 against 4,
-  session-reported; the raw data were not committed).
-\end{itemize}
-A proof that the last fall degree grows without bound remains the open
-problem, as Huang, Kosters and Yeo~\cite{hky2015} and Kousidis and
-Wiemers~\cite{kousidis2019} left it.
+\paragraph{3. How hard the decomposition system is
+(Chapter~\ref{ch:falldegree}).} Every subexponential claim for
+prime-degree binary curves assumes that the solving degree stays near the
+first fall degree. In three presentations the first fall degree is a
+constant of the presentation (for binary Weil descent, whenever every
+descended equation has degree 2, as on every instance computed). The last
+fall degree, which equals the solving degree of an unsatisfiable system,
+exceeds it: by proof for an explicit-membership chain ($(4,5)$ at $B=3$);
+by independently checked closure certificates for binary Weil descent
+($\ge5$ against 2 at $n=33$--$45$); by session report for prime-field
+Kummer towers (6 against 4; raw data not committed). Whether it grows
+without bound is open, as Huang, Kosters and Yeo~\cite{hky2015} and
+Kousidis and Wiemers~\cite{kousidis2019} left it.
 
 \paragraph{4. What hardness rests on (Chapter~\ref{ch:hardness}).} An
-index-calculus complexity claim is a chain of six obligations: solver
-growth, yield, relation rank, geometry, a non-generic interface and
-end-to-end composition. The literal Petit--Quisquater Assumption~2 fails
-on all 119 census instances; a kernel-checked left-kernel theorem shows
-that a single target needs no rank condition; PKM's ``$\Delta=10$
-suffices'' is contradicted at toy sizes; Nagao's Lemma~4 is refuted in
-three reading--placement cells and proved in the fourth. These are census
-and derivation results, unverified assertions except where a Lean kernel
-checked them, and none moves a row of Tables~A--C.
+index-calculus complexity claim chains six obligations: solver growth,
+yield, relation rank, geometry, a non-generic interface and end-to-end
+composition. The literal Petit--Quisquater Assumption~2 fails on all 119
+census instances; a kernel-checked left-kernel theorem shows that a single
+target needs no rank condition; PKM's ``$\Delta=10$ suffices'' fails at toy
+sizes; Nagao's Lemma~4 is refuted in three reading--placement cells and
+proved in the fourth. Except where a Lean kernel checked them these are
+unverified assertions, and none moves a row of Tables~A--C.
 
 \paragraph{5. What engineering bought (Part~\ref{part:algorithms}).}
-Root-finding oracles made the decomposition step between about $400\times$
-and $5\cdot10^4\times$ cheaper per decomposition against F4 where they
-apply (up to $10^5$ in wall time against the PDP baseline). Gröbner engines
-improved one to two orders in counted work. Factor bases closed under maps
-of known logarithm cut linear algebra by constant factors. On the cold
-one-target frontier
-none of this changed the conclusion: the stages these changes leave alone
-(relation yield per probe, table set-up) now dominate.
+Root-finding oracles cut the cost of one decomposition $400$--$5\cdot10^4
+\times$ against F4 where they apply (up to $10^5$ in wall time against the
+PDP baseline). Gr\"obner engines improved one to two orders in counted
+work. Factor bases closed under maps of known logarithm cut linear algebra
+by constant factors. On the cold one-target frontier the stages these
+changes leave alone (relation yield per probe, table set-up) now dominate.
 
 \paragraph{6. Where index calculus wins (Chapter~\ref{ch:extension} and
 Chapter~\ref{sec:transfer}).} Only in weak extension-field families does
-the measured cost cross or approach a fairly priced rho:
-\begin{itemize}
-\item $E_0/\FF_{q^3}$ through a genus-3 GHS cover, by double-large-prime
-  hyperelliptic index calculus or by Diem's plane-quartic index calculus;
-\item the Joux--Vitse cover of $E(\FF_{p^6})$, whose sieve route is
-  $0.0065\times$ a matched negation rho at $p=1511$ (validated as
-  accounting, weak class only), while its plain Nagao arm is above
-  matched rho at $p=1301$ and $1451$ and unresolved at $1601$, so its
-  extrapolated crossing near $p\approx1330$ does not hold;
-\item possibly $k=4$ over $\FF_{(2^m)^4}$, at $5.2\times$ rho at $m=15$
-  after corrections, with an extrapolated crossover only.
-\end{itemize}
-These are known theoretical results. The contribution here is matched,
-priced and replayed measurement, validated in one case. None of these families is deployed.
+the measured cost reach a fairly priced rho: $E_0/\FF_{q^3}$ through a
+genus-3 GHS cover, by double-large-prime hyperelliptic or Diem's
+plane-quartic index calculus; the Joux--Vitse cover of $E(\FF_{p^6})$,
+whose sieve route is $0.0065\times$ a matched negation rho at $p=1511$
+(validated as accounting, weak class only); and possibly $k=4$ over
+$\FF_{(2^m)^4}$, at $5.2\times$ rho at $m=15$ with an extrapolated
+crossover only. The plain Nagao arm of the Joux--Vitse cover is above
+matched rho at $p=1301$ and $1451$ and unresolved at $1601$, so its
+extrapolated crossing near $p\approx1330$ does not hold. These algorithms
+are known; the contribution is matched, priced and replayed measurement,
+validated in one case, on undeployed families.
 
-\paragraph{7. The rho side (Part~\ref{part:rho}).} Every distance is a
-ratio to rho, so the denominator gets its own part. A collision floor,
-derived in the generic group model and checked by Monte Carlo, shows that a
-single-target index calculus with $F$ base elements of unknown logarithm
-costs at least $1.5$, $1.875$ and $2.188\times$ rho for $F=1,2,3$; the
-measured generic incumbent, near $1.8\times$, sits at the $F=2$ constant
+\paragraph{7. The rho side (Part~\ref{part:rho}).} A collision floor,
+derived in the generic group model and checked by Monte Carlo, puts a
+single-target index calculus with $F$ base elements of unknown logarithm at
+$1.5$, $1.875$ and $2.188\times$ rho or more for $F=1,2,3$; the measured
+generic incumbent, near $1.8\times$, sits at the $F=2$ constant
 (Proposition~\ref{prop:collisionfloor}). Chapters~\ref{ch:matchedrho}
-and~\ref{ch:rhovariants} ask how well rho itself was measured and varied.
+and~\ref{ch:rhovariants} examine how rho itself was measured and varied.
 
 \paragraph{8. What the measurements say (Part~\ref{part:frontier}).} At a
-matched reference, rho is cheaper on every prime and prime-degree binary
-curve measured. On Koblitz curves of 37--47 bits the gap is
-$3.4$--$11.5\times$ on the validated board (rule v7) and $4.7$--$18\times$
-against rule v8's same-binary rho. On prime curves the validated rows are
-$5.5$--$13.5\times$ at 10--24 bits; the two-summand pair table is
-$10.5$--$102\times$ at 20--40 bits, its gap widening as about $r^{1/6}$;
-the generic $k$-sum table ($5.3$--$13.1\times$, no validation) narrows
-that growth to about $r^{0.02}$ against rho's $r^{1/2}$, but its limit is
-baby-step giant-step; and the closest prime arms, generic residual
-collectors, are $1.3$--$1.7\times$ at 36--42 bits ($w=0$). Every apparent online win disappeared against
-Bernstein--Lange rho with equal advice~\cite{bl2012}. Matching the
-reference, pricing native work and replaying records moved most recorded
-gaps upward. Chapter~\ref{ch:audit} lists the corrections that moved the
-leaderboard, and Appendix~\ref{ch:corrections} the remaining corrections,
-retractions and withdrawn readings.
+matched reference rho is cheaper on every prime and prime-degree binary
+curve measured. The validated gaps are $3.4$--$11.5\times$ on Koblitz
+curves of 37--47 bits (rule v7; $4.7$--$18\times$ against rule v8's
+same-binary rho) and $5.5$--$13.5\times$ on prime curves of 10--24 bits.
+The unvalidated two-summand pair table is $10.5$--$102\times$ at 20--40
+bits, its gap widening as about $r^{1/6}$; the generic $k$-sum table
+($5.3$--$13.1\times$, no validation) narrows that growth to about
+$r^{0.02}$, with baby-step giant-step as its limit; the generic residual
+collectors are $1.3$--$1.7\times$ at 36--42 bits ($w=0$). An equal-advice
+audit against Bernstein--Lange rho~\cite{bl2012} retired every online win.
+Matching the reference, pricing native work and replaying records moved
+most recorded gaps upward: 65 benchmark rows left the admitted table, 56 of
+them as incomplete (Table~\ref{tab:fm-standing}). Chapter~\ref{ch:audit}
+lists the corrections that moved the leaderboard and
+Appendix~\ref{ch:corrections} the rest.
 
 \section*{Conventions}
 
@@ -152,27 +153,25 @@ retractions and withdrawn readings.
 \item \emph{Unit.} Costs are group-addition equivalents per $\sqrt r$
   ($S$) unless a family uses its own counted unit, such as $\FF_q$
   multiplications.
-\item \emph{Ratios.} ``$X\times$'' is baseline over candidate when it
-  describes an improvement, and IC over rho when it describes a distance.
-  Each sentence says which.
+\item \emph{Ratios.} ``$X\times$'' is baseline over candidate for an
+  improvement and IC over rho for a distance; each sentence says which.
 \item \emph{Intervals.} Intervals are 95\%, as the source recorded them.
-\item \emph{Standing.} No proof-carrying (\texttt{pcc}) claim covers a
-  result in this treatise unless one is named. A measured figure is the
-  producer's reported value, an unverified assertion, unless a
-  \texttt{VALIDATION.json} is named, and ``validated'' means only that. A
-  theorem is ``kernel-checked'' only where a Lean kernel accepted it.
-\item \emph{Change classes.} Every change is an \cls{advance} (an exponent
-  or crossover moves under complete accounting), \cls{engineering} (a
-  constant moves), \cls{relabelling} or \cls{accounting}. Against rho, the
-  programme produced no \cls{advance} on any prime-order curve of
-  cryptographic shape.
+\item \emph{Standing.} No \texttt{pcc} claim covers a result here unless
+  one is named. A measured figure without a named \texttt{VALIDATION.json}
+  is its producer's reported value, an unverified assertion; ``validated''
+  means only that such a file names it. A theorem is ``kernel-checked''
+  only where a Lean kernel accepted it.
+\item \emph{Change classes.} A change is an \cls{advance} (an exponent or
+  crossover moves under complete accounting), \cls{engineering} (a constant
+  moves), \cls{relabelling} or \cls{accounting}. Against rho the programme
+  produced no \cls{advance} on any prime-order curve of cryptographic
+  shape.
 \item \emph{Paths.} Artefact paths are relative to the \texttt{crypto}
-  repository, unless prefixed \texttt{crypto-autoresearcher:} or
+  repository unless prefixed \texttt{crypto-autoresearcher:} or
   \texttt{cryptanalysis:}.
 \end{itemize}
 
-\paragraph{What this treatise does not claim.} No speed-up on a deployed
-curve, no key recovery, no asymptotic sub-rho algorithm for prime fields,
-and no statement about the security of ECC2K-130, P-256 or secp256k1. The
-programme's GPU Pollard-rho work on ECC2K-130 is published separately (IACR
-ePrint 2026/2469) and is not repeated here.
+\paragraph{Scope.} No speed-up on a deployed curve, no key recovery, no
+asymptotic sub-rho algorithm for prime fields, and no statement about the
+security of ECC2K-130, P-256 or secp256k1. The programme's GPU Pollard-rho
+work on ECC2K-130 is published separately (IACR ePrint 2026/2469).
