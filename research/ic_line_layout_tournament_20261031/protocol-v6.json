@@ -717,7 +717,7 @@
           "counted": "ac231ee6303942e3d491daa2c31e07216a72cf227e15015778aa7ffe829bb2a2"
         },
         "budget_usd_ceiling": 5,
-        "budget_note": "USD 5 ceiling for v6, separate from v4/v5, failed attempts included; expected spend about USD 1-2. Worst case 0.25 + 4 x 1 + 1 = about 5.25 c8a.2xlarge node-hours plus 4-6 CodeBuild launcher builds. The ceiling assumes at most about USD 0.6 per node-hour, which is an unchecked assumption: the launch card records the actual on-demand and Spot list prices, and if 5.25 node-hours at that price plus CodeBuild could exceed USD 5 the director returns to the coordinator before launch. The USD 5 ceiling is owner-decided 2026-11-06 (decision section 12.4 choice 4).",
+        "budget_note": "USD 5 ceiling for v6, separate from v4/v5, failed attempts included; expected spend about USD 1-2. Worst case (decision section 13.3(c)): each of the four jobs runs to its deadline once and is rerun once on host loss, 2 x (0.25 + 1 + 1 + 1) = 6.5 c8a.2xlarge node-hours plus the CodeBuild launcher builds. The AWS price list was not read: the launch card records the actual on-demand and Spot list prices, and if 6.5 node-hours at the on-demand price plus CodeBuild could exceed USD 5 (above about USD 0.72 per node-hour) the director returns to the coordinator before launch. The USD 5 ceiling is owner-decided 2026-11-06 (decision section 12.4 choice 4).",
         "concurrency_note": "The two wall requests are submitted back to back. The L2 NodePool cap (about 8 vCPU) can admit them one after the other instead of side by side; that serial admission is an observation, not a deviation, and each still runs on its own fresh L2 node and decides alone. The counted job is submitted after both wall jobs have written job-exit.json.",
         "launcher_note": "remote/run-request exports the launcher bin/ on PATH (PR #3517); launch from a main checkout that contains it"
       },
@@ -765,7 +765,7 @@
       "preregistered": true
     },
     {
-      "rule": "Budget: USD 5 ceiling for the qualification, both wall jobs, the counted job, host-loss reruns and failed attempts. The launch card records the actual c8a.2xlarge on-demand and Spot list prices; if the worst case of 5.25 node-hours plus CodeBuild could exceed USD 5 at those prices, return to the coordinator before launch.",
+      "rule": "Budget: USD 5 ceiling for the qualification, both wall jobs, the counted job, host-loss reruns and failed attempts. The launch card records the actual c8a.2xlarge on-demand and Spot list prices; if the worst case of 6.5 node-hours (each of the four jobs run to its deadline once and rerun once on host loss; decision section 13.3(c)) at the on-demand price plus CodeBuild could exceed USD 5, return to the coordinator before launch.",
       "kind": "budget",
       "preregistered": true
     }
@@ -783,7 +783,7 @@
     "a spec that fails run-ecbench's pre-check, or a wall or qualification job that exits 43, invalidates that job"
   ],
   "decision_rule": {
-    "text": "C-wall is supported only if, in each of the two independent wall sessions, all of the following hold: ecbench verify --replay-all exits 0 with no wrong or unpaired row; ops.ratio_b_over_a == 1 and ops.ci95 == [1,1] for candidate against incumbent and the record-level parity of claim C-parity holds; wall.status is admitted and wall.pairs_below_level is 0 and the job exited 0; wall.aa_ci95 of the incumbent-against-candidate comparison (which must show aa_arms equal to {incumbent, incumbent-aa} and self_aa false) and wall.aa_ci95 of the job's control-comparison.json (pc-fb2x against incumbent-aa) are each non-null, contain 1 and lie within [0.9,1.1] (the direct incumbent against incumbent-aa comparison is a self-A/A, descriptive only); pc-fb2x against incumbent has ops.ratio_b_over_a > 1, wall.status admitted and wall.total_wall_ci95[0] > 1; and total_wall_ci95[1] < 1, corrected_ci95[1] < 1 and outside_noise is true. Otherwise the verdict is within_control_distribution, invalid_measurement, or inconclusive as mapped by analyze-v6.sh. The counted-session rule decides only the validation-gate inputs.",
+    "text": "C-wall is supported only if, in each of the two independent wall sessions, all of the following hold: ecbench verify --replay-all exits 0 with no wrong or unpaired row; ops.ratio_b_over_a == 1 and ops.ci95 == [1,1] for candidate against incumbent and the record-level parity of claim C-parity holds; wall.status is admitted and wall.pairs_below_level is 0 and the job exited 0; wall.aa_ci95 of the incumbent-against-candidate comparison (which must show aa_arms equal to {incumbent, incumbent-aa} and self_aa false) and wall.aa_ci95 of the job's control-comparison.json (pc-fb2x against incumbent-aa) are each non-null, contain 1 and lie within [0.9,1.1] (the direct incumbent against incumbent-aa comparison is a self-A/A, descriptive only); pc-fb2x against incumbent has ops.ratio_b_over_a > 1, wall.status admitted and wall.total_wall_ci95[0] > 1; and total_wall_ci95[1] < 1, corrected_ci95[1] < 1 and outside_noise is true. Otherwise the verdict is within_control_distribution, invalid_measurement, or inconclusive as mapped by analyze-v6.sh, whose precedence is adopted as frozen (decision section 13.3(a)): per session, any failed replay, parity, admission, A/A or positive-control gate gives invalid_measurement; else wholly-below-1 intervals outside the noise give supported_within_scope; else outside_noise false gives within_control_distribution; else inconclusive (a valid session with intervals wholly above 1 is inconclusive and its direction is reported descriptively); overall, both supported gives supported_within_scope, else any invalid_measurement, else any inconclusive, else within_control_distribution. The counted-session rule decides only the validation-gate inputs; its comparisons use the pinned binary's default resample seed 20261002 (decision section 13.3(b)).",
     "comparison_ids": [
       "C-layout"
     ],
@@ -858,7 +858,7 @@
       "ref": "research/prime_base_oracle_tuning_20261029/sessions/holdout-P28/spec.json",
       "provenance": "internal",
       "claim": "the 28-bit incumbent merged on origin/main is prime-abscissa:size=407, mitm:negation_folded=1, max_trials 26479085 with no targets key, and its plan expands to targets walk; docs/ic/leaderboard.json carries the n_inc 407 row",
-      "verified_by": "Claude experiment director read both with git show on the local origin/main ref fde9b7d3 on 2026-11-06 (prefreeze-checks-v6.md F2); no fetch"
+      "verified_by": "Claude experiment director read both with git show on the local origin/main ref fde9b7d3 on 2026-11-06 (prefreeze-checks-v6.md F2); the main session then fetched origin/main 23cf569058, whose 12 later commits touch neither the recipe nor ic_framework, and #2826 is unmerged (decision section 13.3(d))"
     },
     {
       "ref": "backlog/XP-20261029-packed-filter/PROTOCOL.md",
@@ -897,8 +897,13 @@
     ],
     "remaining_unverified": [
       "F7 (anchored grading strings of the noise-rerun clause against ea8e9ef7) is not run because the owner did not adopt the clause",
-      "F6 checked the pc-fb2x against incumbent-aa admission only; analyze-v6.sh also requires the incumbent-against-candidate comparison to show aa_arms {incumbent, incumbent-aa} and self_aa false, which no pre-freeze check ran (a candidate comparison is outside F6's scope)",
-      "the origin/main state was read from the local ref fde9b7d3 without a fetch"
+      "F6 checked the pc-fb2x against incumbent-aa admission only; the coordinator requires pre-freeze check F6b (decision section 13.1: compare --a incumbent --b pc-fb2x shape and gate-field presence, record-field presence with PROJ parity at cells 6, and verify-output fields, on the F6 session, types and booleans only) to pass before the freeze",
+      "resolved: origin/main confirmed at 23cf569058 (decision section 13.3(d))"
+    ],
+    "coordinator_decisions_revision_2": [
+      "DEC-20261106-662e33 section 13: freeze approved, conditional on F6b PASS",
+      "F6 development seeds 2026110628904 (curve), 2026110628905 (targets), 2026110628906 (measurement): development-only, never v6 evidence, never reused as scientific seeds",
+      "verdict mapping adopted as frozen; counted bootstrap seed = pinned default 20261002; AWS price unread, governed by the launch-card rule with the 6.5 node-hour worst case"
     ],
     "owner_choices": [
       "1 (owner-decided 2026-11-06): the walk incumbent, prime-abscissa:size=407, mitm:negation_folded=1, targets=walk, max_trials=26479085, at fp28",

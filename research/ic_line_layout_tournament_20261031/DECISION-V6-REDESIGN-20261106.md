@@ -1,15 +1,15 @@
 # Line-layout tournament: coordinator decision on the version 6 redesign (2026-11-06)
 
-**Revised: see §12, Revision 1 (2026-11-06).** It supersedes the parts of
-§3.2–§3.6, §6, §8 and §9 it names. Where they conflict, §12 governs.
+**Revised: see §12, Revision 1 (2026-11-06), and §13, Revision 2 / freeze
+approval (2026-11-06).** Each supersedes the earlier parts it names. Where they
+conflict, the later section governs.
 
-**Status: recommendation for owner sign-off.** This file is not an approval to
-dispatch. Nothing runs until (a) the owner signs off on this design or amends
-it, (b) the experiment director freezes protocol version 6 as specified in §9,
-and (c) that freeze is merged. The ledger copy of this decision has an id to
-allocate (`DEC-20261106-<allocate>`). This engagement could edit only this one
-file, so it could not run `tools/allocate_id.py`. The main session allocates
-the id and mirrors the YAML block of §11 into `ledger/decisions/` with this file.
+**Status: the owner signed off on 2026-11-06. Freeze is approved, conditional
+on pre-freeze check F6b (§13).** This file is not by itself a dispatch
+authorization. Nothing runs until (a) F6b is recorded as PASS, (b) the main
+session freezes protocol version 6, and (c) that freeze is merged. The ledger
+id is `DEC-20261106-662e33`. The main session mirrors the YAML blocks of §11,
+§12 and §13 into `ledger/decisions/DEC-20261106-662e33.yaml`.
 
 ## 1. What the decision rests on
 
@@ -634,7 +634,7 @@ paths and one archival task.
 
 ```yaml
 coordinator_decision:
-  id: DEC-20261106-<allocate>   # allocate with tools/allocate_id.py --next coordinator_decision --date 20261106, confirm with --check
+  id: DEC-20261106-662e33
   date: 2026-11-06
   status: recommendation_pending_owner_signoff
   context: >-
@@ -887,7 +887,7 @@ under its own protocol, not a mid-design switch.
 
 ```yaml
 coordinator_decision_revision:
-  revises: DEC-20261106-<allocate>   # same record; allocate once, mirror both blocks
+  revises: DEC-20261106-662e33
   revision: 1
   date: 2026-11-06
   decision: revise
@@ -905,4 +905,200 @@ coordinator_decision_revision:
   next_actions:
     - "Owner: sign off on §12.4."
     - "Director: update the specs, analyze-v6.sh and prefreeze-checks-v6.md per §12.5; rerun F1 and run F6 (and F7 if adopted); return them for coordinator review before the freeze."
+```
+
+## 13. Revision 2 / freeze approval (2026-11-06)
+
+**Owner sign-off, 2026-11-06, relayed by the main session.** In the owner's
+words: "Use walk, accept the B1/B2 fixes, freeze and run v6". Under §12.4 this
+means:
+
+- the `walk` incumbent;
+- `pc-fb2x` as the structural reference, with rho in a counted-only L2 session;
+- the noise-rerun clause is **not** adopted;
+- the USD 5 ceiling and the ea8e9ef7 pin stand.
+
+**What was reviewed.** Branch `claude/ic-line-layout-v6-draft-20261106`, head
+`73668416fd`:
+
+- `PROTOCOL-V6.md` and `protocol-v6.json` (draft);
+- `analyze-v6.sh` (sha256 `23e614ad…`);
+- `prefreeze-checks-v6.md`.
+
+F1 passes for `walk` (plan counts 576 / 48 / 576). F4 passed. F6 passed:
+`self_aa` false, `aa_pairs` 5, `aa_ci95` non-null, `aa_arms` {`incumbent`,
+`incumbent-aa`}. The main session fetched `origin/main` at `23cf569058`. None
+of the 12 commits after `fde9b7d3` touches the incumbent recipe or
+`ic_framework`, and #2826 is unmerged.
+
+The package matches §3 as revised by §12. The B1/B2 fixes, the counted
+acceptance rule, the sealing, the stopping rule without a noise rerun, and the
+claim boundary are all applied as decided.
+
+### 13.1 Item 1: the untested gate shape is a required pre-freeze check (F6b)
+
+**Decision: required.**
+
+The A/A gate in `analyze-v6.sh` requires the `--a incumbent --b candidate`
+comparison to show `self_aa` false and `aa_arms` {`incumbent`,
+`incumbent-aa`}. No run has exercised that shape. If the real `compare` output
+differs, every session would come out `invalid_measurement`, and the frozen
+script could not be repaired after data without an amendment.
+
+Two other gates rest on field names that only stubs have exercised:
+
+- The record-level parity projection reads `.outcome.recovered`,
+  `.workload.workload_id`, `.round` and `.warmup`. If a projected field name is
+  wrong, it resolves to null on both arms. The parity check would then pass
+  vacuously on that field rather than fail.
+- The replay gate reads the `verify --out` fields.
+
+All of this can be checked on the existing F6 session without running anything
+new and without any candidate wall data. If `/dev/shm/v6f6/f6/session` is gone,
+F6 is re-run first, byte-identical to its recorded spec.
+
+**F6b reads the F6 session** (`/dev/shm/v6f6/f6/session`, pinned binary
+`73362eed…`) and records only types and booleans, never a ratio or interval
+value:
+
+1. **Shape of the incumbent-vs-candidate comparison, using `pc-fb2x` as the
+   stand-in B arm.** Run `ecbench compare --dir <F6> --a incumbent --b pc-fb2x
+   --json`. A is `incumbent`, which has a twin; B has no twin. That is the
+   candidate comparison's shape without the candidate. It must show:
+   - `wall.self_aa == false`;
+   - `wall.aa_pairs >= 5`;
+   - `wall.aa_ci95` non-null;
+   - `(wall.aa_arms | sort) == ["incumbent","incumbent-aa"]`.
+
+   It must also show that every field the gates of `analyze-v6.sh` read exists
+   and is non-null, with the right type:
+   - `ops`: `status`, `same_seeds`, `unpaired_runs`, `ratio_b_over_a`, `ci95`;
+   - `wall`: `status`, `pairs`, `pairs_below_level`, `total_wall_ratio`,
+     `total_wall_ci95`, `corrected_ratio`, `corrected_ci95`, `outside_noise`.
+2. **Record fields.** Every F6 record has non-null values for:
+   - `.arm`;
+   - `.outcome.recovered`, `.outcome.status` and `.outcome.matches_target`;
+   - `.cost.total_gae` and `.cost.unpriced`;
+   - `.workload.workload_id`;
+   - a numeric `.round` and a boolean `.warmup`;
+   - a non-empty `.phases[]`, each phase carrying `name`, `adds` and `gae`.
+
+   Then the script's `PROJ` and `record_parity` logic, unmodified apart from
+   `cells` = 6 (the F6 cell count), runs over the F6 incumbent and candidate
+   records. It must return parity true. This reads counted fields only, as F4
+   did.
+3. **Replay fields.** `ecbench verify --dir <F6> --replay-all --exit-code --out
+   <tmp>` exits 0. The replay jq of `analyze-v6.sh` passes on its output once
+   the 576-record count is left out.
+
+**Outcome rules:**
+
+- **Pass:** the director appends the F6b commands and their boolean output to
+  `prefreeze-checks-v6.md`, and the freeze proceeds. `analyze-v6.sh` stays
+  unchanged, so its sha256 `23e614ad…` holds.
+- **Fail:** there is no freeze. The failing field goes back to the coordinator.
+  A script fix is a re-review, not a silent edit.
+
+### 13.2 Item 2: F6 development seeds
+
+**Decision:** F6's curve seed 2026110628904, target seed 2026110628905 and
+measurement seed 2026110628906 are development-only seeds, accepted as used.
+
+- They are not used by any v6 job and may not be reused as scientific seeds.
+- F6 and F6b outputs are never v6 evidence, are not pooled, and are not
+  reported as performance.
+
+### 13.3 Item 3: the open values in PROTOCOL-V6.md §0
+
+**(a) Verdict-mapping precedence.** The director's mapping is adopted as
+frozen.
+
+- **Per session:**
+  - any failed replay, parity, admission, A/A or positive-control gate gives
+    `invalid_measurement`;
+  - otherwise, an effect wholly below 1 and outside the noise gives
+    `supported_within_scope`;
+  - otherwise, `outside_noise` false gives `within_control_distribution`;
+  - otherwise, `inconclusive`.
+- **Overall:**
+  - both sessions supported gives supported;
+  - otherwise, any `invalid_measurement` gives `invalid_measurement`;
+  - otherwise, any `inconclusive` gives `inconclusive`;
+  - otherwise, `within_control_distribution`.
+- **A regression maps to `inconclusive`.** The vocabulary has no "regression"
+  verdict, so a valid session with `outside_noise` true and intervals wholly
+  above 1 maps to `inconclusive`. The report must then state the direction and
+  the intervals descriptively.
+
+**(b) Counted bootstrap seed.** The counted comparisons use the pinned binary's
+default resample seed, 20261002, as recorded in the protocol. The binary is
+pinned, so this default cannot drift. Counted candidate/incumbent ratios are
+exact, so the seed affects only the rho-distance intervals. No script change.
+
+**(c) AWS price list not read.** I accept this as an assumption under a
+stop-before-launch rule, with the worst case corrected.
+
+- **Corrected worst case.** Without the noise rerun, each of the four jobs runs
+  to its deadline once and is rerun once on host loss: 2 × (0.25 + 1 + 1 + 1) =
+  6.5 c8a.2xlarge node-hours. The draft's 5.25 node-hours included a noise-rerun
+  slot and left out per-job host-loss reruns.
+- **Launch-card rule.** The launch card records the c8a.2xlarge on-demand and
+  Spot list prices in us-east-2. If 6.5 × the on-demand price, plus the
+  CodeBuild launcher cost, could exceed USD 5, the director returns to the
+  coordinator before any launch. That is the case above about USD 0.72 per
+  node-hour.
+
+**(d) Main ref.** The incumbent recipe is confirmed against `origin/main`
+`23cf569058`, the coordinator's fetch of 2026-11-06. The literature entry and
+the `remaining_unverified` list are updated to that ref. The launch runs from
+a `main` checkout that contains #3517.
+
+### 13.4 Approval
+
+**Decision: `approve` for freeze**, under the standing authorization in
+AGENTS.md and the owner's sign-off. It is conditional on F6b passing (§13.1).
+
+Once F6b is recorded as PASS, the main session may:
+
+- run `experiment_protocol.py freeze` on `protocol-v6.json`;
+- remove or trim its `extensions` block as the draft notice says;
+- recompute the spec and request hashes on the frozen commit;
+- merge the freeze.
+
+Dispatch then follows `PROTOCOL-V6.md` §5 exactly: one qualification, then on
+a pass the two wall sessions, then the counted companion. Each launch uses a
+frozen director card relayed unchanged to the executor, after the publication
+receipt and the `scripts/checkpoint.sh` gate. Capacity and runnability: four
+jobs on one existing route, image and binary, within the USD 5 ceiling, under
+the launch-card price rule.
+
+```yaml
+coordinator_decision_revision:
+  revises: DEC-20261106-662e33
+  revision: 2
+  date: 2026-11-06
+  decision: approve        # freeze approval, conditional on F6b
+  owner_signoff: "2026-11-06: Use walk, accept the B1/B2 fixes, freeze and run v6 (noise-rerun clause not adopted; USD 5 ceiling and ea8e9ef7 pin stand)"
+  target_ids: [IC-LINE-LAYOUT-E2E-FP28-V6-20261106]
+  condition: "pre-freeze check F6b (§13.1) recorded as PASS in prefreeze-checks-v6.md before experiment_protocol.py freeze runs; on failure, no freeze and return to coordinator"
+  item_decisions:
+    item1: "F6b required: compare --a incumbent --b pc-fb2x on the F6 session (aa shape and presence of gate fields), record-field presence plus PROJ parity on F6 records, and the verify-output fields; types and booleans only, no ratio values"
+    item2: "F6 seeds 2026110628904/905/906 accepted as development-only; never v6 evidence; never reused as scientific seeds"
+    item3a: "the director's verdict mapping and precedence adopted; a regression maps to inconclusive and is described in the report"
+    item3b: "counted bootstrap seed = pinned binary's default 20261002"
+    item3c: "AWS price unread: launch-card rule; corrected worst case 6.5 node-hours; return before launch if 6.5 x on-demand price + CodeBuild could exceed USD 5"
+    item3d: "incumbent confirmed against origin/main 23cf569058; #2826 unmerged"
+  evidence_refs:
+    - research/ic_line_layout_tournament_20261031/PROTOCOL-V6.md
+    - research/ic_line_layout_tournament_20261031/protocol-v6.json
+    - research/ic_line_layout_tournament_20261031/analyze-v6.sh
+    - research/ic_line_layout_tournament_20261031/prefreeze-checks-v6.md
+  limitations:
+    - "F6 and F6b grade L2 on the local host, not on a c8a node; the qualification is the c8a check."
+    - "The pc-fb2x stand-in tests the comparison shape that the candidate comparison is expected to share; the candidate comparison itself is first run on scientific data."
+  knowledge_promotion: not_warranted   # protocol approval, no evidence transition
+  next_actions:
+    - "Director: run F6b and append it to prefreeze-checks-v6.md (one snapshot archive of that file)."
+    - "Main session, on F6b PASS: run experiment_protocol.py freeze on protocol-v6.json, commit and merge the freeze with this file and ledger/decisions/DEC-20261106-662e33.yaml; push, then open or refresh the PR with auto-merge."
+    - "Then, per PROTOCOL-V6.md §5: publication receipt, checkpoint gate, director card for the qualification, executor-mechanical launch; only on a pass, the two wall sessions, then the counted companion; then analyze-v6.sh, independent validator, evidence-review decision."
 ```

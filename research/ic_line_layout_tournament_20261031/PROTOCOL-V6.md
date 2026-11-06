@@ -54,7 +54,25 @@ deadline or pin.
   counter under `walk` or `stride-renew`, so `ALLOWED_NATIVE` stays `[]`). `walk`
   probes the repeat guard less often than `stride-renew`, so the guard's
   contribution may be smaller; the coordinator's prior is kept.
-- **Still open, noted for the coordinator.** (a) F6 tested only the `pc-fb2x`
+- **Coordinator decisions on the open items (decision §13, Revision 2 /
+  freeze approval, 2026-11-06; `DEC-20261106-662e33`).**
+  - (a) Pre-freeze check **F6b is required** before the freeze (decision
+    §13.1). On the F6 session it checks three things:
+    - `compare --a incumbent --b pc-fb2x`: the A/A shape, and that every gate
+      field is present;
+    - the record fields, and `PROJ` parity with cells = 6;
+    - the `verify --out` fields.
+
+    Only types and booleans are recorded. If F6b fails, there is no freeze.
+  - (b) The `origin/main` state is confirmed at `23cf569058` (coordinator
+    fetch).
+  - The F6 seeds 2026110628904/905/906 are development-only.
+  - The section 6 verdict mapping is adopted as frozen.
+  - The counted bootstrap seed is the pinned default, 20261002.
+  - The budget worst case is 6.5 node-hours, under the launch-card price rule.
+
+  The original notes follow for the record.
+- **Still open, noted for the coordinator (resolved above).** (a) F6 tested only the `pc-fb2x`
   against `incumbent-aa` admission. `analyze-v6.sh` also requires the `--a
   incumbent --b candidate` comparison to show `aa_arms` {`incumbent`,
   `incumbent-aa`} and `self_aa` false; no pre-freeze check ran a comparison
@@ -315,7 +333,9 @@ sessions must pass.
 - **Decision:** `total_wall_ci95[1] < 1`, `corrected_ci95[1] < 1` and
   `outside_noise == true` (with the ratios below 1).
 
-**Verdict mapping (proposal, not stated by the decision; see section 0).** Per session: any failed
+**Verdict mapping (adopted as frozen by decision §13.3(a); a valid session with
+intervals wholly above 1 maps to `inconclusive` and the report states its
+direction descriptively).** Per session: any failed
 replay, parity, admission, A/A or positive-control gate gives
 `invalid_measurement`; otherwise the decision gates passing gives
 `supported_within_scope`; `outside_noise` false gives
@@ -389,10 +409,12 @@ is absent from this sparse checkout.
 | Wall session, each of 2 | 576 | about 1,240-1,500 s | 3,600 s |
 | Counted companion | 576 | about 1,200-1,300 s | 3,600 s |
 
-Worst case 0.25 + 4 x 1 + 1 = about 5.25 c8a.2xlarge node-hours plus 4-6
-CodeBuild builds. USD 5 ceiling, expected USD 1-2, on the assumption of at most
-about USD 0.6 per node-hour (the worst case includes a noise-rerun slot that is not
-adopted, so it is conservative). The USD 5 ceiling and the `ea8e9ef7` / `73362eed`
+Worst case (decision §13.3(c)): each of the four jobs runs to its deadline once
+and is rerun once on host loss, 2 x (0.25 + 1 + 1 + 1) = 6.5 c8a.2xlarge
+node-hours plus the CodeBuild launcher builds. USD 5 ceiling, expected USD 1-2.
+The launch card returns to the coordinator before any launch if 6.5 x the
+on-demand price plus CodeBuild could exceed USD 5 (above about USD 0.72 per
+node-hour). The USD 5 ceiling and the `ea8e9ef7` / `73362eed`
 pin are owner-decided 2026-11-06 as drafted. The AWS price list was not read for
 this draft. The
 launch card records the actual on-demand and Spot prices; if the worst case could
