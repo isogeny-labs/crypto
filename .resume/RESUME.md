@@ -1,37 +1,31 @@
-# Resume: crypto @ main e87fa18a73 (IC line-layout tournament v6, V6-AMENDMENT-1 merged in #3531)
+# Resume: crypto @ claude/dreg-lfd-theory-scaling
 
 ## Goal
-Run IC-LINE-LAYOUT-E2E-FP28-V6-20261106. It tests whether `layout=lines` lowers the fp28 IC wall time against the walk incumbent at equal counted cost.
+User request (2026-11-05): find ways to reduce the degree of regularity / total solve time of the
+descended Semaev system. Three phases, chosen by the user: (1) theory and scaling survey, done
+(PR #3512); (2) the l = 9 guess-saturation test; (3) a multilinear closure engine prototype.
 
 ## Lead / hypothesis
-Candidate: `mitm:negation_folded=1,layout=lines` against the incumbent `prime-abscissa:size=407`, `mitm:negation_folded=1`, `targets=walk`, `max_trials=26479085`.
-- Confirm: both wall sessions pass analyze-v6.sh.
-- Kill: per the PROTOCOL-V6.md stopping rule.
+LEAD-ICE-descent-closure-degree-at-scale / LEAD-ICE-hybrid-guess-determine-l7. The recorded k*
+(guesses that hold degree 4) is 0, 1-2 and 4 at l = 6, 7 and 8. K_marginal predicts 7 at l = 9.
+Saturation (k* <= 5) would revive the guess route.
 
 ## Spec
-- Protocol: research/ic_line_layout_tournament_20261031/protocol-v6.json, frozen (sha256 12415faa…, commit 7c173e5a1d, merged in PR 3527 as f352040f06).
-- Decision: DEC-20261106-662e33.
-- Specs: spec-fp28-v6{,-qual,-counted}.json. Launch requests: launch-v6/.
-- Pinned image: ea8e9ef7 / ecbench 73362eed.
+research/dreg_guess_scaling_20261106/PREREGISTRATION.md (frozen at commit 37129b4253).
 
 ## State
-- Qualification passed (§5.1). Wall s1 and s2 exit 0, both on node ip-10-84-67-216, data SEALED (S3 runs/ic-line-v6-s{1,2}-20261106/).
-- Counted companion ic-line-v6-counted-20261106: exit 42 (accepted by §7), audit OK, node ip-10-84-72-222.
-- V6-AMENDMENT-1 frozen (protocol_sha256 2aedaaf8…) and merged in #3531 at 05:33Z. The owner approved launching s3 after the merge.
-- A worker restart at about 05:50Z wiped /dev/shm: the old cards, clones and downloads are gone. Work now lives in the session scratchpad v6/ on the main disk.
+Gate A passed. The 4 positive controls refute at degree 4. Whole-summand runs: l = 7 and 8 done; l = 9 has 14 of 16 done, all degree 4 for nonzero x1. S5.d1.b0 refutes at degree 4 (a surprise against K_marginal). The remaining 129 branches are moving to a RunPod pod (PREREGISTRATION Amendment 1, owner chose the cloud route; $30 cap).
 
 ## Next steps
-1. Director rewrites card-s3 for the new paths; launch ic-line-v6-s3-20261106 via executor-mechanical.
-2. After s3 has written job-exit.json: node check, then analyze-v6.sh on (s1,s2) and (s3,s1), validator, report and results PR.
+1. Launch: research/koblitz_ic_leads_build_20261024/pod/upload_launch.py run --name dreg-s5-l9 --vcpu 64 --flavors cpu3g --disk 40 --max-seconds 18000 <the 4 input files>, then push them.
+2. Fetch https://<pod>-8000.proxy.runpod.net/runs/ when STATUS reads ALLDONE; copy the records into runs/; stop the pod.
+3. Score both preregistrations, then write RESULTS, the graph and the PDF, the session log, and update PR #3512.
 
 ## Runs in flight
-- None at checkpoint time; s3 is about to launch.
+RunPod pod dreg-s5-l9 (id recorded in runs/queue.log once created).
 
 ## Stop and success conditions
-- Budget: USD 5 ceiling, rolling hard-bound check (§14.1). Spend so far USD 0.155.
-- The qualification requires all executions at L2 and a minimum solve of at least 5 ms.
-- Never redispatch a consumed registration, and never auto-retry an ambiguous submission.
+About 12 h of container time at most. The decision rule is in the PREREGISTRATION.
 
 ## Open questions
-- Work is in the session scratchpad on the main disk (about 7 GB free); /dev/shm does not survive restarts.
-- /home/user/crypto-autoresearcher is half-switched, pending the owner.
+Whether pe_closure fits about 196k columns in 15 GB.

@@ -840,14 +840,34 @@ a sign-folded pair index stores one representative per pair-sum abscissa
 and is $1.261$--$1.618\times$ faster on bases of 258--4{,}054 points
 (\art{research/f6_n83_sign_fold_20261004/RESULT.md}); an ARM64 PMULL
 implementation of the degree-83 arithmetic made exact queries
-$6.11$--$6.87\times$ faster and the index build $1.40$--$3.05\times$ faster at
-258--1{,}048 points but $0.912\times$ at 4{,}054
-(\art{research/f6_n83_pmull_xonly_20261005/RESULT.md}). The same days found
+$6.11$--$6.87\times$ faster at 258--1{,}048 points and $3.00\times$ at 4{,}054,
+and the index build $1.40$--$3.05\times$ faster at 258--1{,}048 points but
+$0.912\times$ at 4{,}054 (Figure~\ref{fig:bin-pmull};
+\art{research/f6_n83_pmull_xonly_20261005/RESULT.md}). The same days found
 a correctness barrier: the union-of-charts SAT path held each allowed
 abscissa in a \texttt{u64} and extracted only the first 64-bit word, so
 abscissae differing above bit 63 were indistinguishable and an
 \textsc{unsat} answer could not prove absence of a decomposition
 (\art{research/f6_n83_domain_20261004/RESULT.md}). It was fixed in that path.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-bin-pmull.pdf}
+\caption[ARM64 PMULL arithmetic for the $n=83$ F6 query]{ARM64 PMULL arithmetic for the $n=83$ F6 x-only four-summand query
+(field $z^{83}+z^{45}+z^2+z+1$, curve \texttt{icv1-f2m83-tm6151469093347-debefd74}).
+(a)~Exact query time per run (light markers) and median (joined) for the
+x-only baseline and the packed PMULL candidate, against the number of usable
+base points: three runs per arm at 258 and 1{,}048 points, two at 4{,}054.
+(b)~Baseline over candidate time: ratio of medians for the query and the index
+build, and the two adjacent interleaved query pairs at 4{,}054 points
+($2.674\times$, $3.372\times$). Medians and ratios are derived from the per-run
+values in \texttt{figures/data-bin-pmull.json}. Every run returned the same
+\texttt{no\_witness} outcome; a planted control recovered its witness with both
+methods. One unisolated arm64 macOS host, no paired rho run: an exploratory
+component diagnostic, not a controlled speed-up, with no end-to-end IC effect
+measured (\art{research/f6_n83_pmull_xonly_20261005/RESULT.md}).}
+\label{fig:bin-pmull}
+\end{figure}
 
 The algebraic gates of the same days ended open or negative. On the
 registered K0 curve a standard dimension-18 subspace gives $261{,}447$
@@ -1143,7 +1163,7 @@ Read across the table, the band does the ranking work it was built for.
   improvement across the band.
 \item \emph{A pivot order that is not a property of the curve.} If B's
   choices were fixed per curve they could be learned once and replayed,
-  as in Joux--Vitse F4 trace reuse~\cite{jouxvitse2012}. E35 found that no
+  as in Joux--Vitse F4 trace reuse~\cite{jouxvitse2011f4}. E35 found that no
   call's pivot sequence equals its curve's trace and that 997--1{,}000 of
   1{,}000 sequences per curve are distinct; in contested columns B's row
   agrees with the trace in $69.8$--$88.4\%$ of cases, and another curve's
@@ -1190,7 +1210,7 @@ closing as $n^{-1/4}$ with an extrapolated crossover near $2^{85}$--$2^{98}$.
 
 \section{Trace replay as a component speed-up}\label{sec:fe-trace}
 
-Joux and Vitse's observation~\cite{jouxvitse2012} is that the F4 runs of one
+Joux and Vitse's observation~\cite{jouxvitse2011f4} is that the F4 runs of one
 decomposition family share their sequence of useful rows, so one run can be
 recorded and later runs replayed. The programme tried it on four objects.
 \begin{itemize}
