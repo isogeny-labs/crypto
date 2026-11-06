@@ -881,14 +881,13 @@
   ],
   "amendments": [],
   "freeze": {
-    "status": "draft",
-    "protocol_sha256": null,
-    "commit": null,
-    "frozen_at": null,
-    "filed_before_affected_data": null
+    "status": "frozen",
+    "protocol_sha256": "12415faa3330276b6ccbed718a03bc598d9717576c332577024ebc4e9752543c",
+    "commit": "7c173e5a1d418dce4c734c43a25718a71107a36c",
+    "frozen_at": "2026-11-06T04:25:05Z",
+    "filed_before_affected_data": true
   },
   "extensions": {
-    "draft_notice": "DRAFT for coordinator review, revised under Revision 1 (DECISION-V6-REDESIGN-20261106.md section 12). The owner decided the section 12.4 choices on 2026-11-06 (walk incumbent, B1 and B2 fixes, noise-rerun clause not adopted, USD 5 ceiling and ea8e9ef7 pin as drafted). freeze.status stays draft with a null protocol_sha256 until the coordinator freezes it; remove this extensions block (or keep only what the coordinator decides) at the freeze.",
     "native_counters_allowed_to_change": "none: pre-freeze check F4 found no counted or native counter changed by layout=lines under walk or stride-renew; analyze-v6.sh ALLOWED_NATIVE is []",
     "findings_resolved_by_revision_1": [
       "B1: qualification is 2 targets x 4 arms x (1 warmup + 5 rounds) = 48 executions and 10 A/A pairs, which passes run-ecbench's rounds >= 5 pre-check; the counted session is at L2 only under the exit 0/42/43 acceptance clause",
