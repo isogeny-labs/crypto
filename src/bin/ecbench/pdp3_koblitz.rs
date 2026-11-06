@@ -1291,6 +1291,46 @@ mod committed_replays {
         }
     }
 
+    /// Recorded 2026-10-24, before repair R8 (`59fcca75d4`, 2026-10-26)
+    /// narrowed the default linear harvest from `gpv OR rank >= 331` to the
+    /// rank gate: the `f4-m3-default` arm (every sixth seq from 2) harvests
+    /// fewer root rows today and counts fewer solver operations; the other
+    /// arms (`off`, `gpv`, m = 2) never differed.
+    #[test]
+    fn f4_default_harvest_record_replays_under_the_pre_r8_harvest_accounting() {
+        let rel = "research/f4_harvest_remeasure_20261024/sessions/K1n11";
+        for seq in [2, 8, 140] {
+            if let Some((ok, detail)) = replay(rel, seq) {
+                assert!(
+                    ok && detail.contains("pre-r8-harvest"),
+                    "seq {seq}: {detail}"
+                );
+            }
+        }
+        for seq in [1, 3, 4, 5] {
+            if let Some((ok, detail)) = replay(rel, seq) {
+                assert!(ok && detail == "identical", "seq {seq}: {detail}");
+            }
+        }
+    }
+
+    /// The profile excuses nothing the record does not reproduce, and is
+    /// offered to its producer alone.
+    #[test]
+    fn the_pre_r8_harvest_accounting_does_not_excuse_a_changed_count_or_binary() {
+        let rel = "research/f4_harvest_remeasure_20261024/sessions/K1n11";
+        if let Some((ok, detail)) = replay_edited(rel, 2, |r| {
+            *r.phases[2].native.get_mut("solver_ops").unwrap() += 1;
+        }) {
+            assert!(!ok, "{detail}");
+        }
+        if let Some((ok, detail)) = replay_edited(rel, 2, |r| {
+            r.binary_sha256 = Some("0".repeat(64));
+        }) {
+            assert!(!ok, "{detail}");
+        }
+    }
+
     #[test]
     fn window_negfold_without_a_divisor_is_the_original_third_window() {
         let rel = "research/ecbench_rootfind_parity_20261013/sessions/cycle1";
