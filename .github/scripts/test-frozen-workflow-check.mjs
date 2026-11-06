@@ -50,10 +50,13 @@ async function fixture(run, { withPinnedInput = false, manifestFormat = 'files-r
     ].join('\n') + '\n');
     const files = Object.fromEntries(['input.json', 'check.mjs'].map(file => [file, sha(readFileSync(path.join(cwd, study, file)))]));
     files[workflow] = sha(historicalWorkflow);
-    const freeze = manifestFormat === 'sha256-root'
-      ? { sha256: Object.fromEntries(Object.entries(files).map(([file, digest]) =>
-        [file.startsWith('.github/') ? file : study + '/' + file, digest])) }
-      : { files };
+    const keyFreeze = keyPath => keyPath.split('.').reduceRight(
+      (value, key) => ({ [key]: value }), sha(historicalWorkflow));
+    const freeze = manifestFormat.startsWith('key:') ? { ...keyFreeze(manifestFormat.slice(4)), other: 'kept' }
+      : manifestFormat === 'sha256-root'
+        ? { sha256: Object.fromEntries(Object.entries(files).map(([file, digest]) =>
+          [file.startsWith('.github/') ? file : study + '/' + file, digest])) }
+        : { files };
     write(manifest, JSON.stringify(freeze) + '\n');
     git('add', '.');
     git('-c', 'user.name=CI fixture', '-c', 'user.email=ci-fixture@example.invalid', 'commit', '-qm', 'original freeze');
@@ -290,4 +293,48 @@ test('a changed original source manifest rejects the pinned input view', async (
     await assert.rejects(async () => withFrozenWorkflow(options), /original freeze manifest changed/);
     assert.equal(existsSync(marker), false);
   }, { withPinnedInput: true });
+});
+
+test('a key-pinned workflow is overlaid from history while the live checkout is retained', async () => {
+  await fixture(async ({ cwd, options, marker }) => {
+    assert.equal(await withFrozenWorkflow(options), 0);
+    assert.equal(existsSync(readFileSync(marker, 'utf8')), false);
+    assert.equal(readFileSync(path.join(cwd, workflow), 'utf8'), liveWorkflow);
+  }, { manifestFormat: 'key:workflow_sha256' });
+});
+
+test('a nested key path reaches the workflow digest through the CLI', async () => {
+  await fixture(async ({ cwd, options, marker }) => {
+    const helper = fileURLToPath(new URL('./frozen-workflow-check.mjs', import.meta.url));
+    execFileSync(process.execPath, [helper, '--workflow', workflow, '--revision', options.revision,
+      '--manifest', manifest, '--manifest-format', 'key:first.workflow_sha256', '--root', study,
+      '--root', 'src', '--root', 'research/archive', '--root', 'research/rotation',
+      '--root', 'Cargo.lock', '--', ...options.command],
+    { cwd, stdio: ['ignore', 'pipe', 'pipe'] });
+    assert.equal(existsSync(readFileSync(marker, 'utf8')), false);
+    assert.equal(readFileSync(path.join(cwd, workflow), 'utf8'), liveWorkflow);
+  }, { manifestFormat: 'key:first.workflow_sha256' });
+});
+
+test('a key that does not hold the workflow digest fails before the validator runs', async () => {
+  await fixture(async ({ options, marker }) => {
+    for (const manifestFormat of ['key:missing_sha256', 'key:other', 'key:workflow_sha256.deeper']) {
+      assert.throws(() => withFrozenWorkflow({ ...options, manifestFormat }),
+        /historical workflow does not match its frozen digest/, manifestFormat);
+    }
+    for (const manifestFormat of ['key:', 'key:a..b', 'key:../x', 'key:a b']) {
+      assert.throws(() => withFrozenWorkflow({ ...options, manifestFormat }),
+        /invalid frozen manifest key path/, manifestFormat);
+    }
+    assert.equal(existsSync(marker), false);
+  }, { manifestFormat: 'key:workflow_sha256' });
+});
+
+test('a key pin cannot be moved to the live workflow by rewriting the manifest', async () => {
+  await fixture(async ({ cwd, write, options, marker }) => {
+    write(manifest, JSON.stringify({ workflow_sha256: sha(liveWorkflow), other: 'kept' }) + '\n');
+    assert.throws(() => withFrozenWorkflow(options), /original frozen manifest changed/);
+    assert.equal(existsSync(marker), false);
+    assert.equal(readFileSync(path.join(cwd, workflow), 'utf8'), liveWorkflow);
+  }, { manifestFormat: 'key:workflow_sha256' });
 });

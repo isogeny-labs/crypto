@@ -133,13 +133,23 @@ export function withFrozenWorkflow({ cwd = process.cwd(), workflow, revision, ma
   const manifestBytes = readFileSync(path.join(cwd, manifest));
   if (!manifestBytes.equals(fromGit(manifest))) throw new Error('original frozen manifest changed');
   const frozen = JSON.parse(manifestBytes.toString('utf8'));
-  if (!['files-relative', 'sha256-root'].includes(manifestFormat)) {
+  // `key:a.b` names the one field of a study's own FROZEN.json that pins the
+  // workflow (e.g. key:workflow_sha256). Those validators hash their other
+  // inputs themselves, so the digest map holds the workflow alone.
+  const keyPath = manifestFormat.startsWith('key:') ? manifestFormat.slice(4) : null;
+  if (keyPath === null && !['files-relative', 'sha256-root'].includes(manifestFormat)) {
     throw new Error('unsupported frozen manifest format');
+  }
+  if (keyPath !== null && !/^[A-Za-z0-9_]+(\.[A-Za-z0-9_]+)*$/.test(keyPath)) {
+    throw new Error('invalid frozen manifest key path');
   }
   // Both layouts retain the original manifest and every original input digest.
   // Root-relative sha256 maps occur in the native-m3 archive; opting in changes
   // path interpretation only, never the bytes admitted by the historical gate.
-  const digests = manifestFormat === 'sha256-root' ? frozen.sha256 : frozen.files;
+  const digests = keyPath !== null
+    ? { [workflow]: keyPath.split('.').reduce((node, key) =>
+      (node && typeof node === 'object' && !Array.isArray(node) ? node[key] : undefined), frozen) }
+    : manifestFormat === 'sha256-root' ? frozen.sha256 : frozen.files;
   if (!digests || typeof digests !== 'object' || Array.isArray(digests)) {
     throw new Error('invalid frozen input digest map');
   }
