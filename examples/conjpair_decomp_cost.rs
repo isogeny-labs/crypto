@@ -1006,6 +1006,8 @@ fn main() {
     let mut only_curve: Option<usize> = None;
     let mut only_failing = false;
     let mut inf = false;
+    // Resume: skip solves already recorded in this rows file.
+    let mut done_keys: HashSet<String> = HashSet::new();
     let mut i = 0;
     while i < args.len() {
         match args[i].as_str() {
@@ -1036,6 +1038,18 @@ fn main() {
             }
             "--only-decomposable" => only_failing = true,
             "--inf" => inf = true,
+            "--skip-existing" => {
+                i += 1;
+                if let Ok(t) = std::fs::read_to_string(&args[i]) {
+                    for l in t.lines().filter(|l| l.contains("\"kind\":\"inf\"")) {
+                        let v: serde_json::Value = serde_json::from_str(l).unwrap();
+                        done_keys.insert(format!(
+                            "{}|{}|{}|{}|{}",
+                            v["curve"], v["arm"], v["target"], v["set"], v["transform"]
+                        ));
+                    }
+                }
+            }
             o => panic!("unknown {o}"),
         }
         i += 1;
@@ -1178,6 +1192,15 @@ fn main() {
                 }
                 if inf {
                     let lab = format!("\"p\":{p},\"curve\":{ci},\"arm\":\"{arm}\",\"target\":\"{name}\",\"fb_points\":{}", fb.len());
+                    let k1 = format!("{ci}|\"{arm}\"|\"{name}\"|\"R1\"|false");
+                    let k2 = format!("{ci}|\"{arm}\"|\"{name}\"|\"R2\"|true");
+                    if done_keys.contains(&k1) && done_keys.contains(&k2) {
+                        continue;
+                    }
+                    assert!(
+                        !done_keys.contains(&k1) && !done_keys.contains(&k2),
+                        "partial pair: rerun both"
+                    );
                     let row1 = solve_inf(
                         &curve,
                         h,
@@ -1269,6 +1292,18 @@ fn main() {
                         continue;
                     }
                     let lab = format!("\"p\":{p},\"curve\":{ci},\"arm\":\"{arm}\",\"target\":\"planted3_{k}{:?}\",\"fb_points\":{}", pts, fb.len());
+                    let tname = format!("planted3_{k}{:?}", pts);
+                    let k1 = format!("{ci}|\"{arm}\"|\"{tname}\"|\"R3\"|false");
+                    let k2 = format!("{ci}|\"{arm}\"|\"{tname}\"|\"R3\"|true");
+                    if done_keys.contains(&k1) && done_keys.contains(&k2) {
+                        // keep the random stream identical: the transform matrix is drawn here
+                        let _ = random_gl5(p, &mut prng);
+                        continue;
+                    }
+                    assert!(
+                        !done_keys.contains(&k1) && !done_keys.contains(&k2),
+                        "partial pair: rerun both"
+                    );
                     let row1 = solve_inf(
                         &curve,
                         h,
