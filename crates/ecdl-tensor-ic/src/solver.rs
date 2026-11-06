@@ -6,11 +6,12 @@ use std::time::{Duration, Instant};
 use num_bigint::BigUint;
 use rand::rngs::StdRng;
 
+use crate::cofactor::{cofactor_factor_bases, cofactor_relation_network, CofactorCurve};
 use crate::curve::{Curve, Point, INFINITY};
 use crate::field::{add_mod, inv_mod, mul_mod, rand_below, sub_mod};
 use crate::gadgets::{bits_uint, concat, Arith, ArithRef};
 use crate::linalg::left_kernel_vector_sparse;
-use crate::pointgadget::gadget_relation_network;
+use crate::pointgadget::{gadget_cofactor_relation_network, gadget_relation_network};
 use crate::relation::{
     mitm_find_relation, new_factor_bases, new_windowed_factor_bases, relation_network, FactorBases,
 };
@@ -67,6 +68,12 @@ pub struct Solver {
     /// `opcount` tally is running. 0 means one per available core, 1 forces
     /// the sequential path. The results do not depend on it.
     pub threads: usize,
+    /// Cofactor c ≥ 1 of a fixed-cofactor curve (Rust only; 1 means the
+    /// group has prime order, as in Go). For c > 1 the group has order
+    /// c · curve.order, `curve.g` and Q lie in the order-r subgroup, factor
+    /// bases are restricted to it and every slot takes a free point S_i with
+    /// A_i = [c]S_i (see `crate::cofactor`). Coordinate windows are refused.
+    pub cofactor: u64,
     /// Logf, if set, receives progress messages (already formatted; Go passes
     /// format + args).
     pub logf: Option<Box<dyn Fn(&str)>>,
@@ -162,6 +169,7 @@ impl Solver {
             window_bits: 0,
             mitm: false,
             threads: 0,
+            cofactor: 1,
             logf: None,
             arith: None,
         }
@@ -193,6 +201,26 @@ impl Solver {
         if q.inf {
             return (Ok(0), st);
         }
+        let cc = CofactorCurve {
+            curve: c,
+            cofactor: self.cofactor.max(1),
+        };
+        if cc.cofactor > 1 {
+            if self.window_bits > 0 {
+                return (
+                    Err(Error::new(
+                        "ecdl: coordinate windows are not supported with a cofactor",
+                    )),
+                    st,
+                );
+            }
+            if !cc.in_subgroup(q) {
+                return (
+                    Err(Error::new("ecdl: Q is not in the prime-order subgroup")),
+                    st,
+                );
+            }
+        }
         let max_restarts = if self.max_restarts == 0 {
             8
         } else {
@@ -207,7 +235,9 @@ impl Solver {
             // The coordinate window is a membership constraint on an affine
             // hash, so it applies whether or not the relation search uses
             // gadgets: it only changes how the sets are built and checked.
-            let fb = if self.gadgets || self.window_bits > 0 {
+            let fb = if cc.cofactor > 1 {
+                cofactor_factor_bases(&cc, self.m, &mut self.rng, self.gadgets)
+            } else if self.gadgets || self.window_bits > 0 {
                 new_windowed_factor_bases(&c, self.m, &mut self.rng, self.window_bits)
             } else {
                 new_factor_bases(&c, self.m, &mut self.rng)
@@ -372,12 +402,21 @@ impl Solver {
         let net: Network;
         let a: Vec<Vec<usize>>;
         let decode: Box<dyn Fn(&[bool]) -> Option<Point>>;
+        let cc = CofactorCurve {
+            curve: c,
+            cofactor: self.cofactor.max(1),
+        };
         if self.gadgets {
             if self.arith.is_none() {
                 self.arith = Some(Arith::new(&BigUint::from(c.p)));
             }
             let ar = self.arith.as_ref().unwrap().clone();
-            let (n, pts) = gadget_relation_network(&c, &ar, fb, r);
+            let (n, pts) = if cc.cofactor > 1 {
+                let (n, _, pts) = gadget_cofactor_relation_network(&cc, &ar, fb, r);
+                (n, pts)
+            } else {
+                gadget_relation_network(&c, &ar, fb, r)
+            };
             net = n;
             a = pts
                 .iter()
@@ -398,7 +437,12 @@ impl Solver {
                 }
             });
         } else {
-            let (n, blocks) = relation_network(&c, fb, r);
+            let (n, blocks) = if cc.cofactor > 1 {
+                let (n, _, blocks) = cofactor_relation_network(&cc, fb, r);
+                (n, blocks)
+            } else {
+                relation_network(&c, fb, r)
+            };
             net = n;
             a = blocks;
             decode = Box::new(move |vals: &[bool]| c.decode_point(vals));

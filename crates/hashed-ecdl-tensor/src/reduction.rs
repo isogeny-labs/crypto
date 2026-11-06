@@ -8,7 +8,7 @@
 use crate::arithmetic::{floor_root, hash_prime_by, inverse, random_below, RandomSource};
 use crate::contraction::Counter;
 use crate::curve::{Curve, Point};
-use crate::encoding::Encoder;
+use crate::encoding::{Encoder, PointWords};
 use crate::network::Network;
 use crate::{integrity, invalid, overflow, BigUint, Error, Meter, Result};
 use num_integer::Integer;
@@ -144,6 +144,69 @@ pub fn decomposition_network_with_semantic_cut(
     decomposition_network_impl(curve, bases, target, true, meter)
 }
 
+/// The same language as the general construction, with the last slot computed
+/// instead of searched: slots `0..m-1` are free input points, and
+/// `A_m = target - (A_1 + ... + A_{m-1})` is built from them, then held to its
+/// own hash predicate and marked as interface like every other slot. Each
+/// assignment of the general network maps to exactly one here (its last point is
+/// determined by the others), so counts and the canonical witness are unchanged,
+/// while the free input bits drop from `2*w*m` to `2*w*(m-1)`. `hash_member`
+/// still rejects an identity last slot, as the general network does.
+fn derived_last_slot_network(
+    curve: &Curve,
+    bases: &[FactorBase],
+    target: &Point,
+    meter: &mut Meter,
+) -> Result<Network> {
+    let (last, free) = bases
+        .split_last()
+        .ok_or_else(|| invalid("decomposition target or arity"))?;
+    let mut encoder = Encoder::new();
+    let mut sum = Encoder::constant_point(curve, &Point::Infinity)?;
+    for base in free {
+        let point = encoder.input_point(curve, false, meter)?;
+        encoder.hash_member(
+            curve,
+            &point,
+            &base.prime,
+            &base.seed.alpha,
+            &base.seed.beta,
+            &base.threshold,
+            meter,
+        )?;
+        encoder.mark_point_interface(&point, meter)?;
+        sum = encoder.point_add(curve, &sum, &point, meter)?;
+    }
+    let width = curve.modulus().bits() as usize;
+    let negated = PointWords {
+        infinity: sum.infinity.clone(),
+        x: sum.x.clone(),
+        y: encoder.modular_subtract(
+            &Encoder::constant(width, &BigUint::zero())?,
+            &sum.y,
+            curve.modulus(),
+            meter,
+        )?,
+    };
+    let point = encoder.point_add(
+        curve,
+        &Encoder::constant_point(curve, target)?,
+        &negated,
+        meter,
+    )?;
+    encoder.hash_member(
+        curve,
+        &point,
+        &last.prime,
+        &last.seed.alpha,
+        &last.seed.beta,
+        &last.threshold,
+        meter,
+    )?;
+    encoder.mark_point_interface(&point, meter)?;
+    encoder.finish(meter)
+}
+
 fn decomposition_network_impl(
     curve: &Curve,
     bases: &[FactorBase],
@@ -153,6 +216,12 @@ fn decomposition_network_impl(
 ) -> Result<(Network, Vec<usize>)> {
     if bases.len() < 2 || !curve.in_subgroup(target, meter)? {
         return Err(invalid("decomposition target or arity"));
+    }
+    if !semantic_cut && curve.cofactor().is_one() {
+        return Ok((
+            derived_last_slot_network(curve, bases, target, meter)?,
+            Vec::new(),
+        ));
     }
     let mut encoder = Encoder::new();
     if semantic_cut {
@@ -943,6 +1012,96 @@ mod tests {
             contract_functional_boundary(&repeated, &left_vertices, 16, 20, &mut meter).unwrap();
         assert_eq!(receipt, repeated_receipt);
         assert_eq!(rewired_tensor, repeated_tensor);
+    }
+
+    #[test]
+    fn derived_last_slot_matches_general_network_and_brute_force() {
+        let mut meter = Meter::new(Limits {
+            steps: 20_000_000_000,
+            vector: 20_000_000,
+            bits: 1_000_000,
+        });
+        let curve = crate::curve::tiny(&mut meter);
+        // Every subgroup point: the generator's multiples, identity included.
+        let mut points = vec![Point::Infinity];
+        let mut next = curve.generator().clone();
+        while next != Point::Infinity {
+            points.push(next.clone());
+            next = curve.add(&next, curve.generator(), &mut meter).unwrap();
+        }
+        let seeds = [(7u8, 3u8), (2, 1), (3, 4)];
+        let mut checked = 0;
+        // Three slots only at the smallest threshold and a few targets: the
+        // general network's three free points make larger cases slow.
+        for (slots, thresholds, targets) in [
+            (2usize, &[11u8, 5, 2][..], points.len()),
+            (3, &[2u8][..], 3),
+        ] {
+            for &threshold in thresholds {
+                let bases: Vec<_> = seeds[..slots]
+                    .iter()
+                    .map(|&(alpha, beta)| {
+                        FactorBase::new(
+                            &curve,
+                            11u8.into(),
+                            threshold.into(),
+                            HashSeed {
+                                alpha: alpha.into(),
+                                beta: beta.into(),
+                            },
+                            &mut meter,
+                        )
+                        .unwrap()
+                    })
+                    .collect();
+                for target in points.iter().take(targets) {
+                    // Independent count: ordered tuples of base points summing to target.
+                    let members: Vec<Vec<Point>> = bases
+                        .iter()
+                        .map(|base| {
+                            points
+                                .iter()
+                                .filter(|p| base.contains(&curve, p, &mut meter).unwrap())
+                                .cloned()
+                                .collect()
+                        })
+                        .collect();
+                    let mut brute = 0u64;
+                    let mut stack = vec![(0usize, Point::Infinity)];
+                    while let Some((slot, partial)) = stack.pop() {
+                        if slot == slots {
+                            brute += u64::from(&partial == target);
+                            continue;
+                        }
+                        for point in &members[slot] {
+                            stack.push((slot + 1, curve.add(&partial, point, &mut meter).unwrap()));
+                        }
+                    }
+                    let derived =
+                        decomposition_network(&curve, &bases, target, &mut meter).unwrap();
+                    let (general, _) =
+                        decomposition_network_with_semantic_cut(&curve, &bases, target, &mut meter)
+                            .unwrap();
+                    assert!(derived.input_bit_count() < general.input_bit_count());
+                    let count = |network: &Network, meter: &mut Meter| {
+                        Counter::default()
+                            .count(network, &vec![None; network.edge_count()], meter)
+                            .unwrap()
+                    };
+                    let derived_count = count(&derived, &mut meter);
+                    assert_eq!(derived_count, count(&general, &mut meter));
+                    assert_eq!(derived_count, BigUint::from(brute));
+                    let witness = |network: &Network, meter: &mut Meter| {
+                        Counter::default()
+                            .witness(network, &vec![None; network.edge_count()], meter)
+                            .unwrap()
+                    };
+                    assert_eq!(witness(&derived, &mut meter), witness(&general, &mut meter));
+                    checked += 1;
+                }
+            }
+        }
+        assert_eq!(checked, 3 * points.len() + 3);
     }
 
     #[test]

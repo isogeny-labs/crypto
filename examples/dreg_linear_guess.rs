@@ -14,6 +14,12 @@
 //! arguments: `e₁[k] := c + Σ x₃`'s coordinate-`k` terms, that is
 //! `x_{3ℓ+k} := c + Σ_{t : v_t has bit k} x_{2ℓ+t}`, read from the draw's basis.
 //!
+//! `--link j:k=c` (any m, 2 ≤ j ≤ m − 1) fixes coordinate `k` of
+//! `e_{j−1} + x_{j+1}`, the swap invariant of link `j`:
+//! `x_{mℓ+(j−2)n+k} := c + Σ_{t : v_t has bit k} x_{jℓ+t}`. `k` may be `topI`,
+//! the I-th largest coordinate with at least two such `t` on the draw; the
+//! resolved coordinates are written to the record's `link` field.
+//!
 //! ```sh
 //! cargo run --release --example dreg_linear_guess -- --to 4 --max-cols 140000 \
 //!     --draw 0 --sum 15=7+0 --fix 23=0,24=0 --check \
@@ -184,6 +190,15 @@ fn main() {
         let (k, c) = kv.split_once('=').expect("--link2 k=c");
         (k.parse().expect("coordinate"), c == "1")
     });
+    // `--link j:k=c,…` (any m ≥ 3, 2 ≤ j ≤ m − 1): coordinate k of
+    // e_{j−1} + x_{j+1}, the swap invariant of link j. `k` is a number, or
+    // `topI`: the I-th largest coordinate whose basis set T_k has at least two
+    // members on this draw (resolved per draw; I counts from 1).
+    let links: Vec<(usize, String, bool)> = parse_list(flag("--link"), |kv| {
+        let (jk, c) = kv.split_once('=').expect("--link j:k=c");
+        let (j, k) = jk.split_once(':').expect("--link j:k=c");
+        (j.parse().expect("link"), k.to_string(), c == "1")
+    });
     let valued = [
         "--max-cols",
         "--to",
@@ -193,6 +208,7 @@ fn main() {
         "--link2",
         "--engine",
         "--batch",
+        "--link",
     ];
     let files: Vec<&String> = args
         .iter()
@@ -204,9 +220,21 @@ fn main() {
         .collect();
     // A single source is written `[j, i, c]` (the form earlier records use),
     // several `[j, [i…], c]`.
-    let guesses_json = |sums: &[Sum]| {
+    let guesses_json = |sums: &[Sum], resolved: &[(usize, usize, bool)]| {
+        let link = if resolved.is_empty() {
+            String::new()
+        } else {
+            format!(
+                r#","link":[{}]"#,
+                resolved
+                    .iter()
+                    .map(|(j, k, c)| format!("[{j},{k},{}]", *c as u8))
+                    .collect::<Vec<_>>()
+                    .join(",")
+            )
+        };
         format!(
-            r#""fixed":[{}],"sums":[{}],"link2":[{}]"#,
+            r#""fixed":[{}],"sums":[{}],"link2":[{}]{link}"#,
             fixes
                 .iter()
                 .map(|(v, b)| format!("[{v},{}]", *b as u8))
@@ -263,6 +291,46 @@ fn main() {
                     "--link2 {k}: no basis vector has bit {k}"
                 );
                 sums.push(((3 * ell + k) as u32, sources, c));
+            }
+            // T_k of the draw's basis: the summand coordinates t whose basis
+            // vector has bit k.
+            let t_of = |k: usize| -> Vec<usize> {
+                (0..ell)
+                    .filter(|&t| basis[t].raw_bits().first().copied().unwrap_or(0) >> k & 1 == 1)
+                    .collect()
+            };
+            let eligible: Vec<usize> = (0..n as usize)
+                .rev()
+                .filter(|&k| t_of(k).len() >= 2)
+                .collect();
+            let mut resolved = Vec::new();
+            for (j, spec, c) in &links {
+                let j = *j;
+                assert!(
+                    (2..m).contains(&j),
+                    "--link {j}: needs 2 <= j <= m - 1 (m = {m})"
+                );
+                let k = match spec.strip_prefix("top") {
+                    Some(i) => {
+                        let i: usize = i.parse().expect("--link j:topI");
+                        assert!(i >= 1, "--link j:topI counts from 1");
+                        *eligible.get(i - 1).unwrap_or_else(|| {
+                            panic!(
+                                "--link {j}:{spec}: only {} coordinates have |T_k| >= 2",
+                                eligible.len()
+                            )
+                        })
+                    }
+                    None => spec.parse().expect("--link j:k"),
+                };
+                assert!(k < n as usize, "--link {j}:{k}: needs k < n");
+                let sources: Vec<u32> = t_of(k).iter().map(|&t| (j * ell + t) as u32).collect();
+                assert!(
+                    !sources.is_empty(),
+                    "--link {j}:{k}: no basis vector has bit {k}"
+                );
+                sums.push(((m * ell + (j - 2) * n as usize + k) as u32, sources, *c));
+                resolved.push((j, k, *c));
             }
             // The substituted variables must be distinct and never fixed or used
             // as a source, or the order of substitution would matter.
@@ -357,7 +425,7 @@ fn main() {
                 sys.n_vars,
                 v["outcome"],
                 if pe { "pe" } else { "dense" },
-                guesses_json(&sums),
+                guesses_json(&sums, &resolved),
                 identity.map_or("null".to_string(), |c| c.to_string()),
                 closure.map_or("null".to_string(), |d| d.to_string()),
                 scan.iter().map(degree_json).collect::<Vec<_>>().join(",")
