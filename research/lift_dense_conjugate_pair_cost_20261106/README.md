@@ -18,7 +18,7 @@ Every statement below is an unverified assertion of this session
 **Setup.**
 
 - E : y² = (x−e₁)(x−e₂)(x−e₃) over K = F_{q⁴}, so full 2-torsion; q = 13
-  and 101. P has prime order ℓ, Q = [s]P, and each trial decomposes
+  and 101 [pcc:unverified]. P has prime order ℓ, Q = [s]P, and each trial decomposes
   R = [a]P + [b]Q into m = 4 factor-base points (Gaudry–Diem).
 - Every relation of a trial is found exactly, by meet-in-the-middle.
   Relations are collected until the system has full rank. Then s is solved
@@ -45,7 +45,7 @@ Every statement below is an unverified assertion of this session
 | 13 | 36.6 | 13.3 | 19.5 | 11.5 | 1.88 |
 | 101 | 35.8 | 18.5 | 17.2 | 17.2 | 2.07 |
 
-- **The conjugate-pair base solves every curve.** It recovers the secret on
+- **The conjugate-pair base solves every curve** [pcc:unverified] (claim `PCC-20261106-328211`). It recovers the secret on
   32/32 small-cofactor curves and on 32/32 curves of the main run.
 - **Relations per trial are about 36× the standard base.** That is about
   twice the lift-density prediction (k_c/k_s)⁴ ≈ 2⁴. The `std` arm itself
@@ -75,7 +75,7 @@ Every statement below is an unverified assertion of this session
 | 101 | 2.50 | 12.0 | 16/16 | 13/16 | 13/16 |
 
 - On curves with a large cofactor (q = 13: h ≥ 84; q = 101: h > 10⁵), ⟨P⟩
-  has only a few hundred elements. Targets repeat and relations stop adding
+  has only a few hundred elements [pcc:unverified]. Targets repeat and relations stop adding
   rank, so `std` and `rand` hit the 20,000-trial cap.
 - Their pooled relations per trial is then dominated by those repeats. That
   is why Y1 and Y2 fail there with ratios of only 2.5–2.8. The ratio is
@@ -148,4 +148,4 @@ cd cpcost && cargo build --release && cargo test --release && cd ..
 
 | claim | standing | content |
 |:--|:--|:--|
-| CLAIM_ID | not covered (unsigned) | A1 yields, trial ratios and solves ([`validator-report.json`](reports/run-20261106T0514Z/validator-report.json), values in [`claimed.json`](claimed.json)) |
+| `PCC-20261106-328211` | not covered (unsigned) | A1 yields, trial ratios and solves ([`validator-report.json`](reports/run-20261106T0514Z/validator-report.json), values in [`claimed.json`](claimed.json)) |
