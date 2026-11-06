@@ -1,0 +1,2004 @@
+% binary_ext.tex -- binary and Koblitz expansion: four chapters that follow
+% Chapter~\ref{sec:koblitz} (sections/prog_koblitz.tex) and
+% Chapter~\ref{sec:binary} (sections/prog_binary.tex).
+% New labels: ch:koblitzconst, ch:n83late, ch:binarydegree, ch:binarytargets
+% and the sec:kc-*, sec:n83l-*, sec:bd-*, sec:bt-*, tab:kc-*, tab:n83l-*,
+% tab:bd-*, tab:bt-*, prop:kc-* labels below.
+
+\chapter{Koblitz structure and pipeline constants}\label{ch:koblitzconst}
+
+Chapter~\ref{sec:koblitz} records what the programme built on Koblitz
+curves $E_a: y^2+xy=x^3+ax^2+1$ over $\FF_{2^n}$: the compact-orbit
+producer, the online ladder, Table~A and the priced routes to ECC2K-130.
+This chapter records why the Frobenius structure buys a constant and nothing
+more, and what each constant inside the pipeline was measured to be after
+the leaderboard rules of \S\ref{sec:tablea}. It has nine parts:
+\begin{itemize}
+\item the orbit-fold closure statement and the measurements that bound it
+  (\S\ref{sec:kc-closure});
+\item non-linear Frobenius-stable bases at prime degree
+  (\S\ref{sec:kc-nonlinear}) and the unrun $\tau$-Horner chain
+  (\S\ref{sec:kc-horner});
+\item the matched rho reference as it applies to Koblitz rows
+  (\S\ref{sec:kc-rho});
+\item the routing between the one-target descent and the pipeline plan
+  (\S\ref{sec:kc-routing});
+\item large primes (\S\ref{sec:kc-largeprime}), cofactors and torsion
+  (\S\ref{sec:kc-torsion}), free relations (\S\ref{sec:kc-free}) and batch
+  index calculus (\S\ref{sec:kc-batch}).
+\end{itemize}
+Table~\ref{tab:kc-summary} lists the constants in one place.
+
+\paragraph{Standing of the numbers.} Under the 4 November rule that every
+producer may be sabotaging the work, a figure here is either cited with its
+evidence standing or is a producer-reported, unverified assertion. One study
+in this chapter carries a \texttt{VALIDATION.json}: the large-prime
+component result of \S\ref{sec:kc-largeprime}, whose file, validator report
+and replay certificate were written by the producer in the same commit and
+have no independent review. No other study in the chapter has a validation
+file or a proof-carrying claim, so every other number is a producer-reported
+measurement or derivation, labelled as such where the source does. Costs
+are in counted $S=\text{GAE}/\sqrt r$ unless stated, against the strongest
+Koblitz rho the source ran (\texttt{rho.signed\_frobenius\_strong} unless
+named otherwise), with the \S5a band $w=0,0.1,1$ where the source prices it.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.26\linewidth}>{\raggedright}X>{\raggedright\arraybackslash}p{0.27\linewidth}@{}}
+\toprule
+Lever & Measured effect & Distance to matched rho \\
+\midrule
+Frobenius-orbit fold & exactly $n$ on relations, $n^2$ on linear algebra; $\log_2 n$ bits at matched $\abs\Fb$ & IC/rho $2.96$ ($n=13$) to $18.2$ ($n=41$) \\
+Orbit fold, priced as a generic base & $D_{\text{nofold}}=0.56$ bits $[-0.51,1.52]$ & $22.6$--$33.0$ bits (formula) \\
+Trace-spectrum stable base & $10.2$--$12.5\times$ a random subspace per attempt & closed \\
+Hamming ball $B_3$ & $0.27$--$0.43$ of random subspaces per attempt; a sparsity effect & not decided \\
+Descent vs pipeline & descent $1.31$--$2.04\times$ the pipeline & pipeline $9.5$--$24\times$ \\
+Two large primes, $m=3$ table & $0.604$ ($n=53$), $0.559$ ($n=61$) of the plain $m=3$ table & $30$--$64\times$ \\
+Two large primes vs \texttt{ic-compact} & $0.985$--$1.183$ at $w=0$; null & $4.9$--$28\times$ \\
+Orbit-aware large primes & more verified relations at $n=17,29,31$; none at $23$ & toy \\
+Torsion anchors & none at $n=41$; $13.3\times$ dearer at $n=31$; $7.5\times$ dearer at $n=37$ & $\sim9{,}700\times$ at $n=41$ \\
+Free relations & $0.960\times$ (S3 root pipeline); $+5$--$9\%$ (pair-table pipeline) & unchanged \\
+Batch, 32 targets & Table~C $3.62$--$14.9\times$ batch rho & pre-gate \\
+Many-target crossover (accounting) & $G=\min_k$ IC$(k)$/batch rho$(k)$ $=3.0$--$4.1$, $n=41$--$61$ & $G>1$ at every $k$ (clock units) \\
+\bottomrule
+\end{tabularx}
+\caption[]{Koblitz constants measured after the leaderboard rules, with the
+distance each leaves to the matched rho. Every row is producer-reported;
+the two-large-prime row on the $m=3$ table carries a producer-written
+\texttt{VALIDATION.json}. Sources are in the section of each row.}
+\label{tab:kc-summary}
+\end{table}
+
+\section{The orbit fold is exactly $n$}\label{sec:kc-closure}
+
+Chapter~\ref{sec:koblitz} gives the construction of the invariant and
+compact-orbit bases. The obstruction that ends the lead is recorded in the
+lead atlas as a proof, with the ledger hypothesis \texttt{H-FROB-6774fb}
+marked supported (\texttt{DEC-20260923-e6cd5d}). It is stated here as the
+atlas states it; the treatise does not re-prove it.
+
+\begin{proposition}[Orbit-fold closure; recorded in the ledger, not re-proved here]\label{prop:kc-closure}
+Let $E/\FF_q$ be attacked over $\FF_{q^n}$, let $\sigma$ be the $q$-power
+Frobenius of $\FF_{q^n}$ and $\pi$ the Frobenius endomorphism of $E$.
+\begin{enumerate}
+\item The base $\{P: x(P)\in V\}$ for an $\FF_q$-subspace $V$ is
+  $\pi$-stable exactly when $V$ is $\sigma$-stable.
+\item The $\sigma$-stable subspaces form a lattice fixed by the
+  factorisation of $X^n-1$ over $\FF_q$.
+\item Folding the base into $\pi$-orbits cuts the relations needed by
+  exactly $n$ and linear algebra by $n^2$, and by no more.
+\item For prime $n$ with $\operatorname{ord}_n(2)=n-1$ (as for $n=131$ and
+  $163$) the only stable subspaces over $\FF_2$ have dimension $0$, $1$,
+  $n-1$ or $n$, so no stable subspace of useful dimension exists.
+\end{enumerate}
+\end{proposition}
+
+Part~4 is the replicated ledger hypothesis \texttt{H-BINSTD-b1f016}. Rho
+receives the matching $\sqrt{2n}$ from the same automorphism group, so the
+fold changes no gap between index calculus and the matched rho
+(\art{crypto-autoresearcher:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-frobenius-orbit-factor-base.yaml}).
+
+\paragraph{The decomposition step gets nothing extra.} A pilot in the
+companion repository (exploratory, ``not program evidence'' by its own
+label) enumerated every decomposition of 4{,}000 targets per cell at $m=2$
+and 1{,}500 at $m=3$, on Koblitz curves at $n=11,13,17,19,23$, for three
+bases: the programme's polynomial base $V_{\text{poly}}$, a window of
+conjugates of a normal element $V_{\text{nb}}$, and a union of random
+$\tau$-orbits $V_{\text{orb}}$ matched in size
+(\art{crypto-autoresearcher:analysis/ecdlp2m-iteration-20261009/tau-factor-base-pilot/README.md}).
+It split the gain into a counting term (orbits per point, $\log_2 g$) and a
+yield term (distinct projected relations per attempt over the birthday value
+$\binom{\abs\Fb}{m}/r$).
+\begin{itemize}
+\item $V_{\text{orb}}$ has $g=n$ in every cell, so it buys exactly
+  $\log_2n$ bits of structure. Its yield at matched $\abs\Fb$ is within
+  $\pm0.1$ bit of the birthday value in every $m=2$ cell with at least 11
+  orbits ($+0.01$, $-0.09$, $0.00$ at $n=23$).
+\item $V_{\text{nb}}$ buys about 1 bit, not $\log_2n$: $g=1.93$--$2.02$ at
+  $n=23$, because a window and its shift share a $(k-1)$-dimensional
+  subspace.
+\item $V_{\text{poly}}$ has a free coincidence of $0.03$--$0.5$ bit that
+  shrinks with $n$ ($0.06$--$0.10$ bit at $n=23$).
+\item At $m=3$, few-orbit cells lose yield to duplicated projected rows
+  (decompositions that differ by the kernel identity $\tau^2-t_1\tau+2=0$):
+  65\% of $m=3$ decompositions duplicate with one orbit, $0.2\%$ with
+  22--45 orbits. This is the only place where the $\tau$-structure of a base
+  changes its yield, and it lowers it.
+\end{itemize}
+Over the populated cells the $V_{\text{orb}}$ gain is $3.81$ bits mean
+($[2.89,4.52]$) at $m=2$ and $3.08$ ($[1.89,4.38]$) at $m=3$, against
+$\log_2n=3.46$--$4.52$.
+
+\paragraph{The 28 October recheck.} An external toy study
+(\texttt{fb-koblitz-orbit}, $n=15$ and $31$, four resolved cells; its
+repository is not among the sources read here, so the figures are as the
+atlas records them) compared the best stable subspace base with the
+cost-model choice of non-stable base. The stable base wins by $D=4.73$
+bits $[3.44,6.10]$, all of it the orbit credit ($\log_2n=3.91$ and $4.95$);
+priced as a generic base the difference is $D_{\text{nofold}}=0.56$ bits
+$[-0.51,1.52]$, whose interval contains zero. The atlas notes that the
+protocol was frozen by timestamp only, its stored hash matching no text it
+holds. The stable arm's formula gap to matched rho is $22.6$--$33.0$ bits.
+
+\paragraph{The constant in counted cost.} The fully priced ecbench ladder of
+14 October (\art{research/ecbench_frobenius_orbit_vs_rho_20261014/README.md};
+2{,}816 records verified, 2{,}112 replayed identically, every A/A ratio
+exactly $1.000$) prices every native counter of the orbit pipeline and of
+two signed-Frobenius rho arms. Table~\ref{tab:kc-orbit} gives the panel. The
+paired ratio IC/rho grows with $r$ at slope $\beta=0.165$ $[0.117,0.213]$
+per $\ln r$ once $n$ is in the fit, against the model value $1/6$; the
+study's class is ``engineering, constant-only''. Index calculus is below the
+signed-Frobenius rho on no curve; on two curves ($n=17$, $29$) the interval
+reaches 1, where rho's own spread is wide. Against the negation-folded
+subspace base the orbit base costs $0.065$ $[0.059,0.071]$ at $n=23$, which
+is the constant the fold buys inside index calculus.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrrrrll@{}}
+\toprule
+$a$ & $n$ & $\log_2r$ & cofactor & $S$ rho-frob & orbit/rho-frob & orbit/negfold \\
+\midrule
+0 & 13 & 10.97 & 4 & 2.025 & $2.956$ $[2.552,3.242]$ & $0.511$ \\
+1 & 17 & 16.00 & 2 & 1.524 & $1.719$ $[0.810,2.980]$ & $0.234$ \\
+0 & 19 & 17.00 & 4 & 0.835 & $2.805$ $[2.295,3.236]$ & $0.148$ \\
+0 & 23 & 21.00 & 4 & 0.416 & $3.847$ $[3.035,4.819]$ & $0.065$ \\
+1 & 29 & 15.37 & 12{,}646 & 1.665 & $1.566$ $[0.992,2.347]$ & --- \\
+0 & 31 & 20.46 & 1{,}492 & 0.394 & $3.664$ $[2.907,4.476]$ & --- \\
+0 & 37 & 27.78 & 596 & 0.253 & $5.048$ $[4.335,6.086]$ & --- \\
+0 & 41 & 39.00 & 4 & 0.133 & $18.16$ $[15.67,21.55]$ & --- \\
+\bottomrule
+\end{tabular}
+\caption[]{Frobenius-orbit index calculus against the signed-Frobenius rho,
+every native operation priced; 16 fresh public targets $\times$ 3 rounds
+per curve, L0. Orbit/rho-frob: paired ratio with cluster-bootstrap 95\%
+interval; orbit/negfold: against the negation-folded subspace base where it
+was run. Source:
+\art{research/ecbench_frobenius_orbit_vs_rho_20261014/README.md}.}
+\label{tab:kc-orbit}
+\end{table}
+
+\section{Non-linear stable bases at prime degree}\label{sec:kc-nonlinear}
+
+Part~4 of Proposition~\ref{prop:kc-closure} rules out stable subspaces at
+$n=131$, but non-linear stable sets exist: trace-spectrum sets
+$V_E=\{x:\operatorname{Tr}(x^e)=0,\ e\in E\}$, Hamming balls in a normal
+basis, multiplicative subgroups, $\tau$-adic patterns over an orbit union,
+and $\FF_2$-points of low-dimensional abelian varieties
+(Couveignes--Lercier). If one kept the $n$-fold orbit gain with a membership
+test no dearer than a subspace's, it would restore the Koblitz lever at
+$n=131$. The lead is open
+(\art{crypto-autoresearcher:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-nonlinear-frob-stable-bases.yaml}).
+Its Hamming-ball and trace-spectrum measurements live in an external
+repository (\texttt{aburan28/ml-cryptanalysis}, pull request 53, open when
+the atlas was last reviewed) that is not among the sources read for this
+treatise, so every figure below is as the atlas records it. All are
+per-attempt CryptoMiniSat conflict ratios at matched $\abs\Fb$ on toy
+fields, with no orbit credit applied, no complete logarithm and no rho
+comparison.
+\begin{itemize}
+\item \emph{Trace-spectrum bases: closed.} $V_E$ costs $R=10.2$
+  $[8.6,11.8]$ (curve RC-1, $n=17$), $11.6$ $[8.3,15.4]$ (Koblitz
+  $n=19$) and $12.5$ $[10.7,14.4]$ (Koblitz $n=17$, $a_2=1$) times a random
+  subspace, above the lead's $2\times$ band.
+\item \emph{Hamming ball $B_3$: not decided.} Against the mean of 8 matched
+  random subspaces ($T=16$ per workload) $R=0.27$ $[0.13,0.46]$ and $0.32$
+  $[0.14,0.55]$ at $n=19$ ($a_2=0,1$), $0.43$ $[0.20,0.76]$ (RC-1) and
+  $0.29$ $[0.11,0.54]$ at $n=17$. All eight point estimates lie at
+  $0.20$--$0.52$, but only three intervals exclude $0.5$, so the lead's rule
+  does not decide. An earlier $n=19$ value of $1.10$ came from one noisy
+  subspace denominator. The saving sits in the satisfiable stratum
+  (satisfiable targets about $5\times$ cheaper, unsatisfiable ones the
+  same).
+\item \emph{Stability against sparsity.} A second run ($T=32$, weights
+  $w=2$--$4$) found the per-attempt saving to be a sparsity effect: balls in
+  a random basis read $R=0.22$--$0.40$, and the normal-basis ball against
+  the random-basis ball is $D=+0.20$ bits $[-0.05,+0.45]$, with the null
+  gate failed. The exact yield $P_{\text{sys}}$ is higher for the stable
+  ball at $w=2$ ($\times1.76$ in 8 of 8 units, 48 bases per class); the
+  derived per-relation benefit of $-0.66$ bits $[-1.10,-0.24]$ is post hoc.
+\item \emph{Encoding at $n=131$, size only.} $\abs{B_6}=2^{32.6}$; a Sinz
+  cardinality counter needs 780 auxiliary variables and 1{,}684 clauses per
+  block (a totaliser 485 and 1{,}817), against 98 native XORs for a
+  33-dimensional subspace. No solver price at $n=131$ exists.
+\item \emph{Other stable families.} Cyclotomic-sparse bases are
+  yield-neutral at $n=23$ (\S\ref{sec:frontier});
+  an orbit-union base buys exactly $\log_2n$ ($7.03$ bits at $n=131$); a
+  $\tau$-adic base over an orbit union is a $\Gamma_w$-orbit quotient that
+  reaches rho only at $w\ge13$ (\texttt{EV-BINSTD-1e1815}, neutral,
+  preliminary); for Couveignes--Lercier abelian varieties, dimensions 1--4
+  are excluded and dimensions 5--6 hit an impediment
+  (\texttt{EV-FROB-a85eaf}, inconclusive; \texttt{EV-BINSTD-2d41c3},
+  preliminary support at dimension 5).
+\end{itemize}
+The lead's own next step is a frozen run with at least 20 normal and 20
+random bases per class at $w=2$, cost per relation as the primary; until
+then the only non-linear branch that is still open is the Hamming ball, and
+its measured saving is not yet attributable to stability.
+
+\section{The $\tau$-Horner chain: an accounting test that has not run}\label{sec:kc-horner}
+
+Writing a target as a $\tau$-adic Horner sum
+$R=\tau^{m-1}P_1+\dots+\tau P_{m-1}+P_m$ over one base makes ordered tuples
+distinct relations. The approved ledger hypothesis \texttt{H-FROB-855915}
+claims $m!$ times the distinct-relation yield of the plain chain at an
+unchanged descended shape. It has never run
+(\art{crypto-autoresearcher:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-tau-horner-chain.yaml}).
+The discriminating comparison (\texttt{IDEA-20261018-f2cd4d}) prices the
+cost per distinct relation of the plain, symmetry-broken and Horner chains
+at matched core size, $n\in\{17,19,23\}$, $m\in\{2,3\}$, with a size-matched
+ordinary-curve null. Its reading is fixed in advance: Horner cheaper than
+the symmetry-broken chain is a constant $m!$ advance for collection; equal
+cost means the Horner $m!$ is the symmetry-breaking $m!$ relabelled, which
+the success criterion counts as accounting, not an improvement.
+
+\section{The matched rho reference on Koblitz rows}\label{sec:kc-rho}
+
+Chapter~\ref{ch:matchedrho} records how the strong signed-Frobenius
+reference was calibrated, engineered and checked, and
+Chapter~\ref{ch:rhovariants} the walk variants and the volcano levels. Four
+Koblitz-specific facts are not there.
+
+\paragraph{The rule-v4 reference is not provably the strongest.} Rule v4
+(\S\ref{sec:ladder3}) prices rho in the same process on the same point at
+the canonical batched step. Its admissibility check ran the parallel walk
+\texttt{ParallelRho} against the strong fixture on targets T01--T08 at six
+sizes (\art{research/ic_tool_program/rule/v4/README.md}): per step the
+parallel walk was $1.02$, $1.20$, $1.08$, $0.75$, $0.92$ and $1.08$ times the
+fixture at $n=47$, 57, 41, 53, 59 and 61, so admissibility failed at four
+sizes. On a host without GFNI its 16-lane canonicalisation is slower, and at
+three sizes its processes ran beside other jobs. The validation gate
+(\art{research/ic_validation_gate_20261024/README.md}) wrote no
+\texttt{VALIDATION.json} for rule v4 because \texttt{strongest\_available}
+could not be set true: on 46 readable pairs the strong fixture needed
+$0.845\pm0.08$ of \texttt{ParallelRho}'s steps. The canonical-step gap does
+not depend on either walk; it reads $9.89$, $9.20$, $16.57$, $27.17$,
+$24.25$ and $42.12$ at those sizes, $1.76$--$1.94\times$ the as-built gap,
+reproducing the validation sweep's $1.67$--$1.96$.
+
+\paragraph{The Frobenius fold in rho is measured.} The volcano-layer study
+(\art{research/volcano_koblitz_layers_20261018/RESULT.md}, all sessions
+audited, L0) ran rho on Koblitz craters and their level-1 neighbours at
+$n=19,23,37,41,61$. Level-1 over crater for the negation walk contains 1
+at every size ($1.089$ $[0.993,1.195]$ at $n=19$ to $0.837$ $[0.625,1.073]$
+at $n=61$); the plain walk excludes 1 once in ten intervals ($n=41$,
+$1.152$ $[1.021,1.304]$). On the crater the signed-Frobenius solver over
+the negation solver is $2.153$ at $n=19$ and $0.864$ at $n=23$, where fixed
+overhead dominates, $0.264$ at $n=37$ and $0.150$ $[0.132,0.170]$ at
+$n=41$, against the ideal $1/\sqrt n=0.156$: about a $\sqrt n$ gain from
+$n\ge41$, the share of the automorphism group that the atlas credits to rho
+against the fold of Proposition~\ref{prop:kc-closure}. The study retracts an earlier ``$\pm8\%$''
+statement as wrong. At $n=83$ the same tool built $\Phi_{6473}(X,j_0)$ from
+9{,}864 CRT primes (606{,}365-bit coefficients, 8{,}590\,s on three
+threads), reduced it modulo 2 and factored it into 78 Frobenius orbits of
+size 83, finding all 6{,}474 level-1 $j$-invariants
+(\art{research/volcano_koblitz_n83_20261018/RESULT.md}).
+
+\paragraph{No counted 131-bit reference.} The rho lead records that no
+131-bit signed-Frobenius walk exists in the counted harness, so no
+ECC2K-130 index-calculus lane has a matched counted rho
+(\art{crypto-autoresearcher:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-koblitz-rho-reference.yaml}).
+The throughput client of \S\ref{sec:ecc2k130} (13.2 million steps per
+second on one core) is a wall-time walk, and every ECC2K-130 distance in
+this treatise is a model against $2^{60.81}$.
+
+\paragraph{The step price, cross-checked.} The cryptanalysis repository's
+normal-basis canonicalisation makes signed-Frobenius rho $4.1\times$
+cheaper per step, which by itself reverses an apparent index-calculus win
+there (the atlas cites
+\art{cryptanalysis:papers/frobenius-orbits/sec-abstract.tex}, not read for
+this chapter). The strengthening is accounting: it widens every Koblitz gap
+and changes no index-calculus count.
+
+\section{Routing: the one-target descent against the pipeline plan}\label{sec:kc-routing}
+
+Table~A, as the routing study quotes it, prices the ledger \S23
+one-target Koblitz pipeline at $4.7$--$11.8\times$ rho (a range that matches
+no single rule revision of Table~\ref{tab:prog_koblitz-tablea}(a)), but in
+mixed units: counted index-calculus work
+against rho in canonical step units, which charge rho its
+canonicalisation. ecbench gained \texttt{ic.koblitz\_descent}, the \S23
+pipeline charged in counted group operations, with logs and native counts
+identical to \texttt{ic price --single-target} on the same seeds, so the
+descent and the planner's own recipe (\texttt{compact-orbit-scan} with
+\texttt{mitm-frobenius-counted:m=2}) can be run in one unit against
+\texttt{rho.signed\_frobenius\_strong}
+(\art{research/ic_koblitz_descent_routing_20261026/README.md}; protocol
+frozen in \texttt{cd3af7078}; 288 of 288 runs verified, 12 exact replays per
+audit). The six-size retest
+(\art{research/ic_planner_exhaustive_20261026/README.md}; protocol frozen in
+\texttt{0ca110399}; 3{,}328 records verified, band verdicts restated in
+integers and checked by Lean's \texttt{decide}) is in
+Table~\ref{tab:kc-routing}.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lrlll@{}}
+\toprule
+Curve & $\log_2r$ & descent/pipeline & pipeline/rho & descent/rho \\
+\midrule
+k47 ($a=1$, $n=47$) & 36.64 & $1.313$ $[1.199,1.437]$ & $10.8$ $[8.5,13.7]$ & $14.2$ $[11.4,17.6]$ \\
+k57 & 38.00 & $1.626$ $[1.544,1.712]$ & $12.1$ $[8.5,17.2]$ & $19.6$ $[14.4,26.7]$ \\
+k41 ($a=0$, $n=41$) & 39.00 & $1.471$ $[1.420,1.524]$ & $14.1$ $[11.0,18.0]$ & $20.7$ $[16.0,26.9]$ \\
+k53 & 44.26 & $1.462$ $[1.410,1.515]$ & $20.0$ $[16.6,24.1]$ & $29.3$ $[23.9,35.8]$ \\
+k59 & 44.52 & $1.443$ $[1.382,1.507]$ & $22.9$ $[17.8,29.5]$ & $33.1$ $[26.5,41.3]$ \\
+k61 & 47.21 & $2.039$ $[1.977,2.103]$ & $21.4$ $[17.9,25.6]$ & $43.6$ $[36.4,52.1]$ \\
+\bottomrule
+\end{tabular}
+\caption[]{The \S23 descent against the \texttt{ic.pipeline} plan, counted
+$S$ at $w=0$, 24 pairs per curve, cluster 95\% intervals; rho is
+\texttt{rho.signed\_frobenius\_strong}. The first study (k47, k41, k53) read
+descent/pipeline $1.421$, $1.489$, $1.409$ and pipeline/rho $9.46$, $16.19$,
+$23.99$. Source:
+\art{research/ic_planner_exhaustive_20261026/README.md}.}
+\label{tab:kc-routing}
+\end{table}
+
+\begin{itemize}
+\item \emph{Routing.} The descent costs $1.31$--$2.04\times$ the pipeline at
+  all six sizes, every interval above 1, so the planner keeps
+  \texttt{ic.pipeline} for Koblitz curves at $\log_2r\ge36$.
+\item \emph{Where the descent's cost goes.} At k41, relation collection is
+  about 2.05 M GAE and the pair table 0.27 M, while the online descent is
+  1.0 k--184 k GAE per target; the precomputation is reusable, so a
+  many-target comparison needs batch rho (\S\ref{sec:rv-batch}).
+\item \emph{Why Table~A read lower.} \texttt{rho.signed\_frobenius\_strong}
+  folds by $2n$ and is charged only group operations, so its counted $S$ is
+  $0.11$--$0.14$; in that unit the Table~A descent figures read $13$--$34\times$
+  rho (first study), not $4.7$--$11.8\times$. The study left re-pricing
+  Table~A to the owner, and no row moved.
+\item \emph{Growth.} Descent/rho rises at every step, $14.2$ to $43.6$;
+  pipeline/rho rises from $10.8$ to $22.9$ and reads $21.4$ at k61, a literal
+  failure of the preregistered ``grows with $\log_2r$'' with overlapping
+  intervals.
+\item \emph{Band.} \texttt{ecbench band} cannot price
+  \texttt{ic.koblitz\_descent} above $w=0$: four native categories (field
+  arithmetic outside the group law, hashing, the modular combination,
+  declined AVX-512 lanes) have no count, so the descent is ``not ranked'' at
+  $w=0.1$ and 1.
+\item \emph{Weight rule.} The same retest withdrew the Koblitz planner rule
+  (base $0.71c_0$ at $w\ge0.3$): held out at $36.6$--$47.2$ bits, the smaller
+  base was dearer at every weight on every curve, $1.06$--$1.17\times$ at
+  $w=1$, although it had been cheaper ($0.80$--$0.88\times$) on 18--26-bit
+  hold-outs. \texttt{ic-planner/4} keeps the counted optimum $c_0$.
+\end{itemize}
+
+Figure~\ref{fig:bin-routing} plots the three ratios of
+Table~\ref{tab:kc-routing} against group size. Table~\ref{tab:bin-routing-band}
+gives the band means behind them at all six weights. At every curve and
+weight \texttt{ecbench band} ranks rho below \texttt{pipeline} and
+\texttt{pipeline} below \texttt{pipeline71}. The pipeline-to-rho ratio of
+band means (derived) rises with $w$ on every curve, from $10.8$--$22.9$ at
+$w=0$ to $17.4$--$27.2$ at $w=1$. At $w=0$ it equals the cluster ratio of
+Table~\ref{tab:kc-routing} on five curves; at k41 it reads $12.9$ against
+$14.1$ $[11.0,18.0]$, inside the interval. The source does not say which
+estimator gives the difference.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.75\linewidth]{figures/fig-bin-routing.pdf}
+\caption[]{Koblitz routing retest, counted $S$ at $w=0$, 24 pairs per curve,
+cluster 95\% intervals as reported; rho is
+\texttt{rho.signed\_frobenius\_strong}. The descent stays above the pipeline
+(green, every interval above 1) and both stay above rho. Data:
+\art{figures/data-bin-routing.json}, copied from
+\art{research/ic_planner_exhaustive_20261026/README.md}, \S3; plot:
+\art{figures/make_fig_bin_routing.py}. Standing: producer-reported; the
+directory has no \texttt{VALIDATION.json}.}
+\label{fig:bin-routing}
+\end{figure}
+
+\begin{table}[t]
+\centering\small
+\input{figures/tab-bin-routing-band}
+\caption[]{Band means of counted $S$ in the routing retest, 24 verified runs
+per arm and curve, at the six weights of \texttt{ecbench band} (GAE per
+unpriced native operation). \texttt{pipeline71} is the withdrawn smaller
+base $0.71c_0$. The descent has four uncounted native categories and is
+priced only at $w=0$. Data: \art{figures/data-bin-routing.json}, from
+\art{research/ic_planner_exhaustive_20261026/analysis/band-K-k41.json} and
+the five sibling \texttt{band-K-*.json} files.}
+\label{tab:bin-routing-band}
+\end{table}
+
+\section{Large primes on Koblitz curves}\label{sec:kc-largeprime}
+
+Large primes appear in this treatise on the genus-3 and extension-field
+routes (Chapters~\ref{ch:extension} and~\ref{sec:transfer}). On Koblitz
+curves there are four studies, and the two late-October ones appear to
+disagree.
+
+\paragraph{Two large primes beat the plain $m=3$ table.} The
+two-large-prime collector
+(\texttt{mitm-frobenius-counted:m=3,large\_primes=2,lp\_domain\_factor=c},
+already on \texttt{main}) was run on the classic single-target
+compact-orbit pair-table pipeline at $n=53$ and 61, against the plain
+$m=3$ table over the same envelope and against the best plain table in the
+bracket (\art{research/icb_large_prime_n53_n61_20261029/README.md},
+\art{research/icb_large_prime_n53_n61_20261029/report.html}). Every run
+verified; the A/A arm and the collector switched off
+(\texttt{large\_primes=0}) reproduce the plain arm counter for counter;
+\texttt{ecbench verify --replay-all} replayed every session (612 replays).
+The benchmarks entry carries a \texttt{VALIDATION.json} whose rho reference
+is the session's own \texttt{rho.signed\_frobenius\_strong} arm, marked
+\texttt{strongest\_available} and \texttt{order\_holds\_across\_band}
+(\art{benchmarks/20261029-icb-large-prime/VALIDATION.json}); it, the
+validator report and the replay certificate were written by the producer in
+one commit, so the row is producer-validated, not independently reviewed,
+and it carries no pcc claim (an unverified assertion under the 4 November
+rule).
+The validation file calls it a component result, not a leaderboard row.
+Table~\ref{tab:kc-lp} gives the best arms.
+
+\begin{table}[t]
+\centering\small\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}llllll@{}}
+\toprule
+$n$ ($\log_2r$) & best plain $m=3$ & best two-LP & paired ratio & ratio $w=0/0.1/1$ & arm/rho $w=0/0.1/1$ \\
+\midrule
+53 (44.3) & 440 cols, $S=6.38$ & \texttt{lp2-k40-c10}, $3.86$ & $0.604$ $[0.599,0.610]$ & $0.604/0.635/0.730$ & $30/31/35$ \\
+61 (47.2) & 880 cols, $S=7.62$ & \texttt{lp2-k60-c10}, $4.26$ & $0.559$ $[0.535,0.578]$ & $0.559/0.623/0.831$ & $47/52/64$ \\
+\addlinespace
+\multicolumn{6}{@{}l}{Tuned double large prime against \texttt{ic-compact}, holdout (96 targets per curve)} \\
+\midrule
+$n$ ($\log_2r$) & selected cell & & $w=0$ & $w=0.1$ & $w=1$ \\
+\midrule
+37 (27.8) & $K=1$, $c=10$ & & $1.001$ $[0.945,1.061]$ & $0.793$ $[0.751,0.838]$ & $0.570$ $[0.536,0.603]$ \\
+43 (32.1) & $K=1$, $c=20$ & & $0.985$ $[0.928,1.051]$ & $0.937$ $[0.885,0.995]$ & $0.866$ $[0.819,0.919]$ \\
+41 (39.0) & $K=1$, $c=160$ & & $1.183$ $[1.155,1.213]$ & $1.112$ $[1.084,1.143]$ & $0.955$ $[0.922,0.989]$ \\
+47 (36.6) & $K=3$, $c=20$ & & $1.095$ $[1.060,1.132]$ & $1.067$ $[1.032,1.102]$ & $1.015$ $[0.980,1.052]$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Two large primes on Koblitz curves. Top: against the plain $m=3$
+Frobenius pair table, 16 workloads at $n=53$, 3 at $n=61$
+(\art{research/icb_large_prime_n53_n61_20261029/README.md}). Bottom: the
+tuned double-large-prime arm over the frozen \texttt{ic-compact} baseline,
+paired ratio of sums with two-stage cluster bootstrap; every verdict
+``unresolved inside the band''
+(\art{research/ic_koblitz_dlp_tuning_20261023/REPORT.md}).}
+\label{tab:kc-lp}
+\end{table}
+
+The order survives the band for the best arms; others win at $w=0$ and lose
+at $w=1$ (\texttt{lp2-k20-c10} at $n=53$: $0.61/0.78/1.28$), because their
+native work exceeds the group operations they save. One large prime is worse
+than the plain table at equal envelope ($1.73$ $[1.64,1.82]$ and $1.47$
+$[1.42,1.52]$ at $n=53$). The optimal large-prime base stays at 40--60
+columns while the plain optimum moves from 440 to 880. Memory is not in
+$S$: at $n=53$ both best arms use about 315\,MiB; at $n=61$ the two-LP arm
+uses 604\,MiB against 1{,}149\,MiB. The $n=61$ interval is over three
+workloads, and the column optimum was found on the same curves as the
+confirmation.
+
+Table~\ref{tab:bin-lp-arms} lists every arm of both sizes, including the
+first $n=61$ session (4 workloads), whose best plain table is $K=660$ and
+whose best two-LP arm \texttt{lp2-k40-c10} reads $0.513$ $[0.497,0.526]$ of it.
+Figure~\ref{fig:bin-lp} plots each arm's paired ratio to the matched rho
+against its column count. Every arm in all three sessions lies between
+$32.9\times$ and $249\times$ rho at $w=0$. The A/A arm and the switched-off
+collector (\texttt{lp0-k440}) reproduce \texttt{plain-k440} exactly, ratio
+$1.0$ $[1.0,1.0]$.
+
+\begin{table}[t]
+\centering\scriptsize\setlength{\tabcolsep}{4pt}
+\input{figures/tab-bin-lp-arms}
+\caption[]{Every arm of the large-prime study on the compact-orbit $m=3$
+Frobenius pair table. $S$: band means at $w=0$, 0.1, 1. Paired ratios with
+95\% intervals as committed: against \texttt{rho-strong}
+(\texttt{rho.signed\_frobenius\_strong}) and against the session's best
+plain table. \texttt{plain-K}: plain table with $K$ columns;
+\texttt{lpL-kK-cC}: $L$ large primes, $K$ columns, domain factor $c$. A/A
+rows (\texttt{-aa}) are omitted; they equal their parents. Producer-validated
+component result, no pcc claim. Data: \art{figures/data-bin-lp.json}, from
+\art{research/icb_large_prime_n53_n61_20261029/results.json} and
+\texttt{band/\{n53-all,n61-s1,n61-s2\}.json}.}
+\label{tab:bin-lp-arms}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-bin-lp.pdf}
+\caption[]{Large primes on the Koblitz $m=3$ pair table: paired ratio of each
+arm's counted $S$ to the matched \texttt{rho.signed\_frobenius\_strong} at
+$w=0$, 95\% intervals, against factor-base columns (log scales). The dashed
+line is ratio 1. Two-large-prime arms with domain factor $c=10$ are filled,
+$c=3$, 20 and 30 open. Data: \art{figures/data-bin-lp.json}; plot:
+\art{figures/make_fig_bin_lp.py}.}
+\label{fig:bin-lp}
+\end{figure}
+
+\paragraph{Tuned double large primes do not beat the compact baseline.} The
+preregistered tuning study of 23--28 October
+(\art{research/ic_koblitz_dlp_tuning_20261023/REPORT.md}; protocol frozen in
+\texttt{327afb04f}, Amendments 1--3 before the data they affect) tuned the
+same oracle family's $(K,c)$ on a train panel and compared it on 96 held-out
+targets per curve with the frozen baseline \texttt{ic-compact}. Its class is
+\emph{null}: no curve beats the baseline at every weight, and at $n=41$ and
+47 the arm is worse at $w=0$ and $0.1$ (Table~\ref{tab:kc-lp}). The $w>0$
+gain at $n=37$ and 43 comes from the arm leaving fewer unpriced native
+operations, not from a lower count at $w=0$. The positive control shows the
+instrument sees a real double-large-prime effect: at $n=41$ with $K=10$
+columns, double-LP over the plain $m=3$ oracle is $0.0316$ $[0.0267,0.0374]$
+at $w=0$, $31.6\times$ cheaper. The only train-side win ($n=43$, $0.893$)
+shrank to $0.985$ on holdout, a winner's-curse loss of about 9 points. Both
+arms stay $4.9$--$28\times$ the matched rho at every weight.
+Table~\ref{tab:bin-dlp-band} gives the per-curve band means and the
+distance to the matched \texttt{rho.frob}, and Figure~\ref{fig:bin-dlp}
+plots both ratios across the band.
+
+\begin{table}[t]
+\centering\scriptsize\setlength{\tabcolsep}{4pt}
+\input{figures/tab-bin-dlp-band}
+\caption[]{Tuned double large prime against \texttt{ic-compact}, 96
+held-out targets per curve, all verified. $S$: band means. Distance to the
+matched \texttt{rho.frob} at the same weight, 95\% intervals, as reported.
+A/A arms equal their parents and are omitted. Data:
+\art{figures/data-bin-dlp.json}, from
+\art{research/ic_koblitz_dlp_tuning_20261023/REPORT.md} and
+\texttt{bands/holdout-n\{37,41,43,47\}.band.json}.}
+\label{tab:bin-dlp-band}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-bin-dlp.pdf}
+\caption[]{Tuned double large prime on held-out targets, across the GAE
+band. Left: double-LP $S$ over \texttt{ic-compact} $S$, paired ratio of
+sums, two-stage cluster bootstrap 95\% intervals; every verdict
+``unresolved inside the band''. Right: each arm over the matched
+\texttt{rho.frob} (log scale); the dashed line is ratio 1. Data:
+\art{figures/data-bin-dlp.json}; plot: \art{figures/make_fig_bin_dlp.py}.}
+\label{fig:bin-dlp}
+\end{figure}
+
+\paragraph{Why the two studies disagree.} The two studies do not state a
+reconciliation. Their own protocols and the routing study supply one, and
+it is an inference from unpaired sessions, not a measurement:
+\begin{itemize}
+\item \emph{Different baselines.} The large-prime study's comparator is the
+  plain $m=3$ oracle \texttt{mitm-frobenius-counted:m=3}
+  (\art{research/icb_large_prime_n53_n61_20261029/PROTOCOL.md}). The tuning
+  study's comparator \texttt{ic-compact} is
+  \texttt{compact-orbit-scan:columns=Kb} with the $m=2$ oracle
+  \texttt{mitm-frobenius-counted:m=2}
+  (\art{research/ic_koblitz_dlp_tuning_20261023/PROTOCOL.md}). The
+  double-LP collector is an $m=3$ oracle in both.
+\item \emph{The $m=3$ plain table is the weaker arm.} On the same curves the
+  $m=2$ pipeline is cheaper than the best two-LP arm. At $n=53$
+  (\texttt{icv1-f2m53-tm56619371-dac20a85} in both studies) the pipeline
+  reads $S=2.728$, $24.0\times$ rho, in the routing study and $20.0\times$
+  in the retest, against $3.856$ and $30\times$ for \texttt{lp2-k40-c10};
+  at $n=61$ (\texttt{icv1-f2m61-t158598901-ab42b6c5}) the pipeline reads
+  $21.4\times$ rho against $47\times$ for \texttt{lp2-k60-c10}. The plain
+  $m=3$ table reads $49\times$ and $85\times$ there.
+\item \emph{So both results hold.} The double large prime roughly halves
+  the cost of the $m=3$ table, which is the same direction and mechanism as
+  the tuning study's positive control ($31.6\times$ at $K=10$), and leaves
+  it at or above the $m=2$ compact pipeline, which is what the tuning study
+  found by direct pairing at $n=37$--$47$.
+\end{itemize}
+The large-prime study itself says its result does not touch Table~A, whose
+aimed $m=3$ collection with an $m=2$ descent reads $7.03\times$ ($n=53$)
+and $11.5\times$ ($n=61$) of its own reference; the collector has not been
+combined with that recipe, and stage~0 of the experiment that would do so
+(\texttt{EXP-BINSTD-e066d8}) has not run
+(\art{crypto-autoresearcher:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-large-prime-variants.yaml}).
+The tuning study's own next step is to draw the large-prime domain from a
+structured set (small $\ZZ[\tau]$-norm multipliers) rather than raw orbits,
+since its selected cells sit at the $K=1$ edge where the domain does all the
+work.
+
+\paragraph{Orbit-aware large primes.} Quotienting the large-prime vertices
+by signed Frobenius orbits, with the $\pm\lambda^k$ phase kept, gave more
+independently verified relations than the plain double large prime from the
+same relation stream at $n=17$, 29 and 31 on every seed, a small and not
+clearly nonzero gain at $n=19$, and none at $n=23$
+(\art{research/orbit_aware_large_prime_20261011/RESULTS.md}; measured
+26 October). The gain tracks the number of orbit collisions among the fixed
+large primes, which a random model predicts at $n=17$, 19, 29 and which is
+far above the model at $n=31$ for a reason not found. All 17{,}865 emitted
+relations passed both replays. Online CPU does not separate the arms, so
+CPU per relation falls only through yield; at $n=17$, for example, 9.2
+independent relations per cell against 6.2 (10.8 against 6.4 emitted), at
+$0.181$ against $0.275$\,ms of CPU per independent relation. The scale is toy ($r$ between $2^{15}$ and $2^{21}$).
+
+\paragraph{The 131-bit Certicom curves.} Symmetry breaking and double large
+primes at $m=2$ on ECC2-131 and ECCp-131 are in \S\ref{sec:bt-ecc2-131}:
+the binary symmetric oracle steps $28.7\times$ faster than the per-point
+baseline and the distance to rho stays about $2^{22}$ steps by the $m=2$
+exponent.
+
+\section{Cofactors, torsion anchors and quotients}\label{sec:kc-torsion}
+
+The cofactor-projected base of LEAD-19 and its Table~B cuts are in
+\S\ref{sec:binary}; the prime-field cofactor-clearing A/B and its
+\texttt{invalid\_controls} verdict are in \S\ref{sec:pg-cofactor}. Two
+further Koblitz results are a measured reversal and a closed quotient.
+
+\paragraph{Torsion anchors: a generalisation withdrawn twice.} The $m=2$
+cycle-stop study (\art{research/ic_m2_cycle_leads_20261030/REPORT.md},
+exploratory, no frozen protocol) stated that torsion-randomised anchors
+make large-cofactor curves workable, solving $a=0$, $n=37$ (cofactor 596)
+in 26 and 31\,s where the ladder stopped at 99\,s, and that they cost
+$1.5\times$ ($n=23$) to $16\times$ ($n=31$) on cofactor-4 curves. Two frozen
+follow-ups of 1 November corrected both readings:
+\begin{itemize}
+\item \emph{$n=41$, cofactor 4}
+  (\art{research/ic_m2_torsion_n41_20261101/REPORT.md}; protocol frozen in
+  \texttt{baa2fcfa8}; eight paired targets, 16 of 16 runs verified). The
+  paired geometric mean of trials, torsion on over off, is $0.98$
+  $[0.64,1.43]$; the per-pair ratios run from $0.30$ to $2.60$. No
+  difference is detected. A post-hoc replicate at $n=31$ (32 pairs) gives
+  $13.3\times$ more trials with torsion on, $[10.3,17.5]$. The $n=31$ figure
+  is real; the generalisation to cofactor-4 curves is not.
+\item \emph{$n=37$, cofactor 596}
+  (\art{research/ic_m2_torsion_n37_20261101/REPORT.md}; protocol frozen in
+  \texttt{7893863417}; eight pairs). Torsion anchors make the solve about
+  $7.5\times$ dearer: off over on is $0.134$ $[0.082,0.205]$ in trials, with
+  all eight pairs below 1. The relation rate is the same (about 17{,}000
+  trials per relation in both arms); without torsion the relation graph
+  stays in components of 3--5 columns and a cycle closes after about 126
+  relations, with torsion components grow to about 117 columns and the
+  first equation needs about 885. The ladder's failure at $n=37$ came from
+  its 90\% coverage stop, not from the cofactor.
+\end{itemize}
+So torsion anchors helped nowhere they were measured. The family's
+distance is set by the method, not by anchors: against the same-process
+strong rho the $m=2$ cycle variant is about $9{,}700\times$ slower at
+$n=41$, and $7{,}700\times$ in mean wall at $n=37$ without torsion. Both
+follow-ups are exploratory, on one shared four-vCPU container, with no
+replay certificate.
+
+\paragraph{Three summands on the same curve.} Three companion studies on the
+$a=0$, $n=37$ curve (cofactor 596) ask whether more summands help the
+cycle stop; all are exploratory, local, with no replay certificate or
+validator report. With the same stop, relations with three summands cost
+$26$--$43\times$ more decomposer calls than two-summand relations at every
+base size tested ($42.9$ $[31.5,68.2]$ at $d=12$, $K=2{,}011$), and all 18
+pairs have $m=3$ dearer; the frozen prediction held
+(\art{research/ic_m3_cycle_n37_20261101/REPORT.md}). Feeding the stop a
+mixture of two-summand and ``2+1'' three-summand relations, at eight
+mixture fractions $q$ over six seeds, is monotone in $q$ and never below
+$q=0$, again as predicted (\art{research/ic_mix_cycle_n37_20261103/REPORT.md}).
+A direct $\Sem4$ solve at $m=3$ cannot run at $n=37$: a linear oracle is
+determined only for $\ell\le1$, and heuristic XL and an F4/F6 extrapolation
+put it far out of reach; that report is analysis only, with no new run
+(\art{research/ic_s4_direct_n37_20261101/REPORT.md}). None of the three moves
+the gap to rho.
+
+\paragraph{Cofactor and 2-torsion quotients: closed.} The atlas records a
+proof (\art{crypto-autoresearcher:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-cofactor-torsion-quotients.yaml}).
+On ECC2K-130 $\gcd(4,\ell)=1$, so every full-translation homomorphic
+cofactor quotient reduces to the order-$\ell$ projection rho already uses;
+exactly sum-compatible filters on $E(\FF_{2^{131}})$ carry 2 bits (the
+cofactor), so Wagner's $k$-tree has no quotient to work in; and the
+corrected $\iota$-stable classification ($V_d=b^{1/4}\FF_{2^d}$) empties the
+cell (subspace base, 2-torsion quotient) on every prime-degree standardised
+curve. The production 2-torsion census added no relations. A September
+study measured the same bound from the other side: the invariants used by
+translation-invariant bases on $y^2+xy=x^3+1$ are pullbacks by $1+\tau$,
+$1-\tau$ and $[2]$, held on all 10{,}238 points at $n=7,11,13$, and each
+kernel has at most 4 points, so they change a decomposition by at most 2
+bits per summand (\art{research/cheap_closures_20261007/README.md}).
+
+\section{Free relations}\label{sec:kc-free}
+
+Pair-table self-collisions give relations with right-hand side zero: four
+base points that sum to $O$, verified as exact group identities
+(\art{RESEARCH_FREE_RELATIONS_CENSUS_20261012.md}). The relations exist and
+are highly correlated (Table~\ref{tab:kc-free}): the 588 nontrivial rows at
+$n=61$, $K=600$ touch 168 of 600 columns, and the 72 at $n=83$ span six
+dimensions.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrrrrr@{}}
+\toprule
+$n$ & $K$ & collisions & verified nontrivial & homogeneous rank & needed \\
+\midrule
+61 & 600 & 10{,}188 & 588 & 49 & 599 \\
+61 & 1{,}200 & 12{,}732 & 4{,}800 & 746 & 1{,}199 \\
+61 & 1{,}500 & 10{,}924 & 6{,}000 & 1{,}197 & 1{,}499 \\
+83 & 600 & 9{,}672 & 72 & 6 & 599 \\
+\bottomrule
+\end{tabular}
+\caption[]{Free relations from pair-table self-collisions: the rank they
+reach against the $K-1$ the rank stage needs. Source:
+\art{RESEARCH_FREE_RELATIONS_CENSUS_20261012.md}.}
+\label{tab:kc-free}
+\end{table}
+
+\begin{itemize}
+\item \emph{Rank law.} Rank grows about as $K^4$ with a small constant, so a
+  free rank stage needs $K\approx1{,}500$--$1{,}900$ at $n=61$ and
+  $K\approx2{,}600$ at $n=83$, where the census scan and the $K^2$ linear
+  algebra already exceed the guided rank stage (13.1\,s at $n=61$, 4.8\,min
+  on 12 threads at $n=83$), before 36\,GB of memory at $n=83$.
+\item \emph{In the S3-root pipeline.} On by default for $n\le63$, the
+  harvest costs $0.960\times$ $[0.946,0.976]$ of the tuned incumbent pooled
+  over $n=41$, 53, 61, in S3 root solves per complete solve; wall time
+  agrees, $0.941\times$
+  (\art{research/ic_improve_20261015/02-freerel-production/README.md}).
+\item \emph{In the pair-table pipeline.} Under rule v4 the harvest is
+  correct (6{,}187 relations, none rejected, in 510 runs) but yields 2--11
+  relations per solve against 58--327 needed, cuts trials 0.5--9\%, and makes
+  the build $1.4$--$1.55\times$ slower: the cold cost rises by $5.3$--$8.8\%$
+  at every size ($1.053$--$1.088$ over 72 pairs per size). The $0.960$ does
+  not transfer, because that pipeline costs 59\,s per solve at $n=61$
+  against 3.7\,s here (\art{research/ic_tool_program/rule/v4/README.md}).
+\end{itemize}
+
+\section{Batch index calculus and restart portfolios}\label{sec:kc-batch}
+
+The many-target accounting correction and its batch-rho reference are in
+\S\ref{sec:rv-batch}; Table~C is in \S\ref{sec:tablea}. The lead records
+two statements that bound the route
+(\art{crypto-autoresearcher:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-multi-target-and-portfolio.yaml}):
+\begin{itemize}
+\item \emph{The generic multi-instance bound covers set-up.} $L$ logarithms
+  cost at least about $\sqrt{Lr/\abs{\mathrm{Aut}}}$ for a generic-oracle
+  index calculus including its set-up, and Kuhn--Struik batch rho attains
+  it; the $L^{-1}$ amortisation applies only to the online part, after a
+  set-up that obeys the same bound. This is the multi-target form of the
+  Corrigan-Gibbs--Kogan bound~\cite{cgk2018} of \S\ref{sec:theory}.
+\item \emph{A restart portfolio cannot beat pure rho} when the
+  index-calculus cost concentrates at a floor ratio of at least 1. The
+  ledger hypothesis \texttt{H-BINSTD-32867d} is marked supported as a scoped
+  observational hold, strength preliminary (\texttt{EV-BINSTD-2d34cb}); its
+  instrument was a deterministic closure, a controlled null rather than a
+  solver.
+\end{itemize}
+The four-target union column of the September batch thread is a rare-event
+linearisation, not a batch speed-up. Table~C's 32-target rows stay
+$3.62$--$14.9\times$ batch rho, with the reference taken from a different
+session (S20) at the canonical step, and all nine failed the 24 October
+gate.
+
+\paragraph{The many-target crossover.} A 30 October accounting study asked
+directly whether amortising relation collection over $k$ targets ever makes
+compact-orbit index calculus cheaper than Kuhn--Struik batch rho
+(\art{research/ic_many_target_crossover_20261030/README.md}; nothing was run,
+every number is extracted from recorded runs). With $G=\min_k
+\mathrm{IC}(k)/\text{batch rho}(k)$ as the distance remaining, it never does:
+in clock-priced \texttt{ic price} units (same process, both arms) $G=3.0$--$4.1$
+at $n=41$--$61$ for the best swept recipe and $3.7$--$6.8$ for the recipe tuned
+for $k=32$, flat to rising above $2^{36}$. On the \S5a count band, with IC at
+its emitted additions only (a lower bound), $G$ stays above 1 at $n=41$, 43,
+53 and 61 ($3.1$--$4.8$ at $w=0$, $1.6$--$2.4$ at $w=1$), so the order holds
+across the band there; at $n\le45$ and $n=47$ unemitted descent and
+construction work leaves the sizes unresolved by counts. At $n=83$, in wall
+and CPU seconds only, $G=4.8$--$5.1$ for K3300. The study classes itself as
+accounting and audit, not an improvement of the IC baseline; it has no
+validation file.
+
+\chapter{The $n=83$ campaign after 21 October}\label{ch:n83late}
+
+\S\ref{sec:n83} covers degree 83 to 21 October, and \S\ref{sec:bo-n83} the
+24 October field-table correction, after which every Weil-descent engine's earlier
+$n=83$ refutation is void. Forty-one study directories were added from
+24 October to 1 November. None of them admits a new IC/rho ratio, and none
+is a leaderboard or \texttt{benchmarks/} row. They fall into eight groups
+(Table~\ref{tab:n83l-groups}), which this chapter takes in four parts:
+\begin{itemize}
+\item factor-base selection, index capacity and controls on the pipeline
+  curve (\S\ref{sec:n83l-pipeline});
+\item decomposition at $n=83$ after the correction
+  (\S\ref{sec:n83l-sat});
+\item certified degree bounds for the descended systems
+  (\S\ref{sec:n83l-degree});
+\item the genus-3 image transfer (\S\ref{sec:n83l-genus3}).
+\end{itemize}
+
+\paragraph{Two curves, three families.} Degree 83 means two different
+targets in these studies, and their numbers must not be mixed.
+\begin{itemize}
+\item \emph{The pipeline curve} \texttt{EC1N83Ckb1a1haacb69ee9f37},
+  $y^2+xy=x^3+x^2+1$ ($a=1$), has a 53-bit subgroup of order
+  $8{,}569{,}786{,}107{,}849{,}059$ and a cofactor of about
+  $1.1\cdot10^9$. Every K-series base, every online and cold time and the
+  matched precomputed-rho control are on this curve.
+\item \emph{The primary curve} $y^2+xy=x^3+1$ ($a=0$, modulus
+  $z^{83}+z^{45}+z^2+z+1$, trace $-6{,}151{,}469{,}093{,}347$) has the 81-bit
+  subgroup $r=2{,}417{,}851{,}639{,}230{,}796{,}216{,}685{,}689$ and cofactor
+  4. The genus-3 transfer and the sixteen factor-base designs target it.
+\item \emph{The degree sweeps} use full-curve affine bases on three
+  families at the same size: the Koblitz curve, a general binary curve and an
+  83-bit prime curve, with no subgroup filter.
+\end{itemize}
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{0.22\linewidth}r>{\raggedright}X>{\raggedright\arraybackslash}p{0.2\linewidth}@{}}
+\toprule
+Group & Dirs & What it established & Status \\
+\midrule
+Nearby grid K1102--K1120 & 4 & 19 exact prefix bases; 16-point confirmation admitted 112 of 112 IC/rho rows; no base selected & Tier~1 cloud; \textsc{bounded\_unknown} selection \\
+Current-source K-series & 10 & K2304--K5500 bases reconstruct exactly; one K2304 run completes; K3596 and K4405 capped & local controls \\
+Index capacity layouts & 7 & four-byte, split and fingerprint root indices; K5500 in 25.61--28.61\,GiB of allocations & allocations calculated, not measured \\
+Cross-family bridge & 2 & 16 sealed points; never dispatched (Spot quota) & no timing \\
+Precomputed-rho control & 1 & rho faster online in all three matched arms & Table~\ref{tab:distance-n83} \\
+Decomposition engines & 7 & chained-$\Sem3$ SAT decides $m=2$--9 on a 167-point base with tables and a meet & stage diagnostic \\
+Degree certificates & 7 & first fall 2; exact top-form degrees 28 and 111--609; no regularity computed & producer certificates \\
+Genus-3 image & 3 & executable transfer; Prym coprime to $r$; degree-2 fibres carry no information & structural, negative \\
+\bottomrule
+\end{tabularx}
+\caption[]{The 41 $n=83$ study directories of 24 October--1 November, by
+group. ``Tier~1'' is the benchmark-contract host tier the $n=83$ protocols name
+(\art{research/n83_cold_neighborhood_20261016/PROTOCOL.md}); the tier file
+they cite, \texttt{docs/IC\_BENCHMARK\_TIERS.md}, is on neither
+repository's branch read for this treatise. Sources: the \texttt{research/n83\_*}
+directories cited in this chapter.}
+\label{tab:n83l-groups}
+\end{table}
+
+\section{Factor-base selection on the pipeline curve}\label{sec:n83l-pipeline}
+
+\paragraph{The nearby grid.} The ordered K1120 producer dump fixes every
+complete signed-Frobenius orbit prefix from K1102 to K1120; all 19 candidate
+manifests were reconstructed from it, and K1104, K1107 and K1120 match their
+published dumps byte for byte
+(\art{research/n83_nearby_full_grid_20261024/README.md}). The same-point
+Tier~1 screen of all 19 (84 children: 60 IC and 24 rho, each IC block
+bracketed by K1107 and a rho control) failed its frozen 4\,GiB disk gate on
+the first two hosted attempts, with 2.26 and 2.93\,GiB free and zero
+measured children (\art{research/n83_nearby_grid_tier1_20261024/README.md});
+an AWS Spot variant was blocked by the provider's Spot instance quota
+(\texttt{Client.MaxSpotInstanceCountExceeded}, status
+\texttt{BLOCKED\_PROVIDER\_SPOT\_QUOTA};
+\art{research/n83_nearby_grid_aws_tier1_20261024/admission_20261024.json}).
+A later hosted screen run (GitHub run 40150483792) supplied the
+confirmation's candidate set.
+
+\paragraph{The 16-point confirmation.} Sixteen fresh public points, sealed
+before the screen result was inspected, were run on seven candidates in two
+eight-point Tier~1 strata (AMD EPYC 7763 and Intel Xeon Platinum 8573C
+runners), each IC run paired with a same-point rho
+(\art{research/n83_nearby_grid_confirm16_20261024/RESULT.md}). The
+independent verifier admitted 112 of 112 rows, and a local replay of the raw
+artifacts reproduced the hosted aggregate byte for byte.
+Table~\ref{tab:n83l-confirm} gives the panel. K1115 has the lowest
+geometric-mean online time ($47.114$\,ms) and K1111 the lowest mean cold
+process ($159.263$\,s), but the frozen sign-flip rule with Bonferroni
+$\alpha=0.05/21$ returned \textsc{bounded\_unknown} for both metrics (K1115
+against K1111 online, $p=0.959$; K1111 against K1116 cold, $p=0.773$). No
+base was selected. The rho/IC column is an online reading with set-up
+excluded and a table-less rho, the comparison \S\ref{sec:koblitz} retired;
+on the same panel the cold IC process takes 159--166\,s, while the
+same-point table-less rho online times at point 0 are
+1{,}455--3{,}715\,ms.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrrrr@{}}
+\toprule
+K & base points & online, ms (geo.\ mean) & cold, s (mean) & median rho/IC online \\
+\midrule
+1103 & 183{,}098 & 142.358 & 162.320 & 16.632 \\
+1107 & 183{,}762 & 72.916 & 160.806 & 28.414 \\
+1109 & 184{,}094 & 99.303 & 165.435 & 14.045 \\
+1110 & 184{,}260 & 77.205 & 165.329 & 28.296 \\
+1111 & 184{,}426 & 48.226 & 159.263 & 45.384 \\
+1115 & 185{,}090 & 47.114 & 165.754 & 27.967 \\
+1116 & 185{,}256 & 58.977 & 159.395 & 56.961 \\
+\bottomrule
+\end{tabular}
+\caption[]{The nearby-grid confirmation on the pipeline curve: 16 fresh
+public points, two Tier~1 strata, 112 admitted IC/rho rows. Base points are
+$166K$ subgroup-usable points in $K$ folded columns. The rho/IC column is
+online only, against a rho with no table, set-up excluded. Source:
+\art{research/n83_nearby_grid_confirm16_20261024/RESULT.md}.}
+\label{tab:n83l-confirm}
+\end{table}
+
+\paragraph{A local five-base screen.} On one new public point, five
+finalists each ran two fresh cold processes in forward and reverse order
+(\art{research/n83_local_five_base_screen_20261024/RESULT.md}). Median cold
+times were 66.2\,s (K992/root11, 164{,}672 points), 62.7\,s (K1024), 65.8\,s
+(K1107), 119.7\,s (K2304) and 383.6\,s (K3300/wide3), with pair spreads of
+4.7--19.1\%; the two same-point rho controls took 2.015 and 0.989\,s with
+different seeds. Every hash, base, rank, relation and scalar replayed, and
+no winner was selected because the K1024--K1107 gap (3.1\,s) is smaller than
+the within-arm spread.
+
+\paragraph{The K-series, re-identified.} The large bases of 14--21 October
+were reconstructed from current-source parent dumps: the first 2{,}304,
+3{,}300, 3{,}450 and 3{,}500 orbits of the K3596 dump (596{,}936 points)
+and the first 4{,}300 and 4{,}405 of the K5500 dump (913{,}000 points)
+reproduce the historical K2304 (382{,}464 points), K3300 wide3 (547{,}800),
+K3450 wide3 (572{,}700), K3500 root4 (581{,}000), K4300 (713{,}800) and
+K4405 (731{,}230) bases exactly, by ordered-dump and point-set SHA-256 and
+the producer's BLAKE3 base hash
+(\art{research/n83_k2304_current_source_prefix_20261025/},
+\art{research/n83_k3300_current_source_prefix_20261025/},
+\art{research/n83_crossfamily_current_20261025/README.md},
+\art{research/n83_k4300_k4405_current_source_prefix_20261025/}). Full-process
+controls on an earlier public point then gave
+(Table~\ref{tab:n83l-controls}) one completed large base and three that did
+not finish on the hosts available.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright}Xrr>{\raggedright\arraybackslash}p{0.22\linewidth}@{}}
+\toprule
+Base & Host and cap & Wall, s & Peak RSS & Outcome \\
+\midrule
+K2304 root11 & local, 1{,}200\,s, 12\,GiB & 438.5 & 5.93\,GB & completed; independent replay passed; target stage 420.2\,ms \\
+K1107 root4 & local macOS ARM64, 1{,}200\,s & 438.9 & 9.94\,GB & completed; replay passed; online 46.3\,ms \\
+K3596 root4 & busy 48\,GiB macOS, 1{,}200\,s & 792.5; 1{,}201.0 & 0.80; 9.58\,GB & SIGTERM after CPU starvation; time cap \\
+K4405 wide3 & local, 1{,}200\,s & 873.2 & 11.68\,GB & stopped by hand under host swap \\
+K4405 wide3 & Linux Pod, 64\,GiB cgroup & --- & --- & not started; approved GPU pair out of capacity \\
+\bottomrule
+\end{tabularx}
+\caption[]{Full-process controls on the pipeline curve, one earlier public
+point each (fixture zero), outside the sealed bridge points; correctness and
+resource controls, not Tier~1 pairs. K1107 root4 uses a fixed 8\,GiB root
+table for 101{,}708{,}823 distinct roots. Sources:
+\art{research/n83_k2304_current_source_control_20261026/README.md},
+\art{research/n83_root4_small_control_20261025/README.md},
+\art{research/n83_k3596_current_source_full_20261025/README.md},
+\art{research/n83_k4405_current_source_full_control_20261026/README.md},
+\art{research/n83_k4405_linux_control_20261026/README.md}.}
+\label{tab:n83l-controls}
+\end{table}
+
+\paragraph{Index capacity.} Seven directories made the root index fit
+larger bases. Each is an opt-in layout with an exact-key replay rule (a
+candidate slot reconstructs and compares the full 83-bit root before a hit
+is accepted), and each stops at calculated allocations for K5500:
+\begin{itemize}
+\item \emph{Exact four-byte slots} (31-bit state index and a root selector
+  in one \texttt{u32}): principal allocations of $32{,}062{,}766{,}258$
+  bytes, 29.86\,GiB, for K5500
+  (\art{research/n83_k5500_fourbyte_20261025/README.md}).
+\item \emph{ID31 four-byte slots} at the K5500/K4549 split: 12\,GiB of
+  tables instead of 15, and state, table and Bloom arrays of 27.86\,GiB
+  against 30.86\,GiB for five-byte ID31
+  (\art{research/n83_fourbyte_id31_20261027/README.md}).
+\item \emph{A relative-ID split} (primary $2^{31}$ and extension $2^{30}$
+  slots, 1{,}255{,}377{,}750 eleven-byte states): 25.61\,GiB of principal
+  allocations, 4.25\,GiB below monolithic ID31
+  (\art{research/n83_k5500_split4_20261025/README.md}).
+\item \emph{Fingerprint sidecars.} A two-bit sidecar brings the ID31 layout
+  to 28.61\,GiB, still 2.25\,GiB below five-byte ID31, with the packing and
+  capacity arithmetic proved in Lean~4.34.1
+  (\art{research/n83_fourbyte_fp2_20261027/README.md}). A one-byte sidecar
+  kept every digest identical and built the index faster in ABBA order on a
+  shared ARM64 host: geometric-mean baseline over filtered ratios of
+  $1.831$ (K128), $1.347$ (K512) and $1.505$ (K1024), with a K2048 baseline
+  that drifted 42\% between bookends
+  (\art{research/n83_k5500_fp8_20261025/README.md}).
+\end{itemize}
+Two whole-process ABBA controls on the K1107 base read the sidecars:
+the one-byte sidecar gave baseline over fingerprint $1.677$ for the full
+process and $2.157$ for one-target online, with a 15.3\% baseline drift
+between bookends (\art{research/n83_fp8_e2e_control_20261025/README.md});
+the two-bit sidecar gave whole-process ratios of $1.017$ and $1.294$ in the
+two orders on a host whose load average ran from 22 to 276
+(\art{research/n83_fourbyte_pair_20261027/README.md}). Both are local
+diagnostics that the Tier~1 gate would not admit.
+
+\paragraph{The bridge that did not run.} The cross-family bridge sealed 16
+new public points for a same-point Tier~1 comparison of the small-base and
+wide-base selections, with its nomination rule frozen before either panel
+reported (\art{research/n83_crossfamily_bridge_20261025/README.md}). Its
+current-source panel (K3450 wide3 and K3500 root4, two \texttt{g5g.4xlarge}
+Spot instances, a \$4.20 cap) moved from \texttt{us-east-1d}, which failed
+its placement-score gate, to \texttt{us-west-2c}; the README still records
+that the panel has not dispatched or selected a winner
+(\art{research/n83_crossfamily_current_20261025/README.md},
+\art{research/n83_crossfamily_current_20261025/AWS_WEST2_ADDENDUM.md}).
+
+\paragraph{The control that did run.} The matched precomputed-rho
+reproduction of 28 October on K1107/root11 found rho faster online in all
+three matched arms (Table~\ref{tab:distance-n83}), every interval above 1,
+over 16 targets with every scalar replayed
+(\art{research/n83_k1107_bl_reproduction_20261028/RESULT.md}). Its plain
+table-less rho, a positive control only, reads rho/IC $10.7$
+$[6.33,88.8]$ online, the same kind of reading as the rho/IC column of
+Table~\ref{tab:n83l-confirm}.
+
+\section{Decomposition at $n=83$ after the correction}\label{sec:n83l-sat}
+
+After the 24 October field-table correction (\S\ref{sec:bo-n83}, which also
+describes the engines) chained-$\Sem3$
+full-width SAT was the only decomposer that ran at $n=83$, and it decided
+only $m=2$. Six preregistered follow-ups of 31 October--1 November extended
+it on the pinned pipeline-curve fixture, with the factor base the Frobenius
+union of $\mathrm{span}(1,z)$, 167 points
+(\art{research/n83_chain_sat_meet_20261101/PROTOCOL.md}). Each cell has
+three public targets (not expected to decompose) and two or five planted
+ones. Table~\ref{tab:n83l-sat} gives the sequence. Every run had zero
+soundness flags: no planted target was refuted and every witness re-adds in
+the group.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright}X>{\raggedright\arraybackslash}X@{}}
+\toprule
+Study & Change & Outcome \\
+\midrule
+order (31 Oct) & all-summand ordering; root-finder tables & $m=2$: conflicts halved (median public 13{,}461 $\to$ 7{,}195; 12.8 $\to$ 6.2\,s); $m=3$: tables refute every public target with 0 conflicts and find both planted; $m=4$: public refuted, no planted witness in 120\,s; $m\ge5$: capped \\
+meet (1 Nov) & a meet-in-the-middle lookup for the middle intermediate & $m=5$--8: public 3/3 refuted with 0 conflicts (median 0.80--76.7\,s), planted 0/2; $m=9$: capped; builds 0.68\,s ($m=5,6$), 26.1--27.2\,s ($m=7,8$), 958.8\,s ($m=9$) \\
+rebuild (1 Nov) & rebuild the planted witness from the lookup hit & $m=5$--8: planted 5/5 with 0 solver calls (median 0.91--81.5\,s) \\
+indexed (1 Nov) & indexed lookup, rebuild by peeling & $m=8$: 78.4 $\to$ 39.7\,s; $m=9$: from cap to 3/3 and 5/5 (54.1\,s), depth-5 set of 372{,}406{,}144 fingerprints in 999\,s \\
+parallel (1 Nov) & 4-thread back enumeration & $m=8$: 41.7 $\to$ 11.4\,s; $m=9$: 57.0 $\to$ 13.7\,s; verdicts identical \\
+parbuild (1 Nov) & 4-thread depth-5 build & 1{,}006.8 and 993.4\,s $\to$ 287.7 and 283.3\,s, $3.50\times$ \\
+\bottomrule
+\end{tabularx}
+\caption[]{Chained-$\Sem3$ SAT on the pipeline curve, $m=2$--9, 167-point
+base; decomposition stage only, L0 four-vCPU hosts. Sources:
+\art{research/n83_chain_sat_order_20261031/README.md},
+\art{research/n83_chain_sat_meet_20261101/README.md},
+\art{research/n83_chain_sat_rebuild_20261101/README.md},
+\art{research/n83_chain_sat_indexed_20261101/README.md},
+\art{research/n83_chain_sat_parallel_20261101/README.md},
+\art{research/n83_chain_sat_parbuild_20261101/README.md}.}
+\label{tab:n83l-sat}
+\end{table}
+
+The sequence turns SAT into a meet-in-the-middle with a SAT residue, and
+then removes the residue: once the lookup decides the middle intermediate,
+the public targets are refuted with zero conflicts because the lookup domain
+is empty on every one of them and non-empty (10--250 entries) on every
+planted one. The meet study states the cost as about $\abs{B}^{m-d}$ per
+query after a $\abs{B}^d$ build. That is the generic floor, and the
+improvements in Table~\ref{tab:n83l-sat} are constants of the enumeration
+(ordering, tables, peeling, threads). The matched rho on this curve is
+1.51\,s mean online. With 167 points and a 53-bit subgroup, a decomposition
+over this base is rare, so these are stage measurements: no relation
+collection, no complete logarithm and no rho ratio.
+
+Table~\ref{tab:bin-n83chain} gives the per-cell records of the first two
+studies, and Figure~\ref{fig:bin-n83chain} plots their decided-query times.
+In the order study no arm decides any of its five queries at $m=5$--9; the meet arm decides the public targets up to
+$m=8$ and nothing at $m=9$ in that study.
+
+\begin{table}[t]
+\centering\small\setlength{\tabcolsep}{4pt}
+\input{figures/tab-bin-n83chain}
+\caption[]{Chained-$\Sem3$ SAT at $n=83$ per cell: refuted public targets
+and planted witnesses found, with medians over decided queries (conflicts and
+wall seconds, as committed). A0--A3: arms of the order study (31 October),
+$m=2$--4; rows for $m=5$--9 decide nothing and are omitted. A2+meet$d$: the
+meet study (1 November), lookup depth $d$. Data:
+\art{figures/data-bin-n83chain.json}, from
+\art{research/n83_chain_sat_order_20261031/table.tsv} and
+\art{research/n83_chain_sat_meet_20261101/table.tsv}.}
+\label{tab:bin-n83chain}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-bin-n83chain.pdf}
+\caption[]{Chained-$\Sem3$ SAT at $n=83$: median wall time per decided query
+against $m$ (log scale), public targets refuted (filled, solid) and planted
+witnesses found (open, dotted). No point means no query in that cell was
+decided within the cap. Decomposition stage only, L0 four-vCPU host. Data:
+\art{figures/data-bin-n83chain.json}; plot:
+\art{figures/make_fig_bin_n83chain.py}.}
+\label{fig:bin-n83chain}
+\end{figure}
+
+\section{Certified degree bounds}\label{sec:n83l-degree}
+
+The descended $n=83$ systems were characterised exactly, not solved. Seven
+directories, all producer certificates with fresh-process replay and
+independent scientific review pending, give the following.
+
+\paragraph{Solvers do not finish.} The balanced degree sweep (Koblitz,
+general binary and prime; $m=2$--9; candidate domain $2^{\lfloor83/m\rfloor}$;
+a planted and a natural target per cell, two computations each) ran 96
+Singular attempts with 40\,s and 3\,GiB per solver: 53 hit the time limit,
+43 the memory limit, and no top-form or affine basis degree completed
+(\art{research/n83_ic_degree_sweep_20261027/README.md}). A fixed-base rerun
+at $\ell=27$, on full-curve bases that enumerate all $2^{27}=134{,}217{,}728$
+candidate $x$-values per curve
+(\art{research/n83_fixed_factor_base_20261028/README.md}), completed 4
+affine bases (all $m=2$, Koblitz and binary), with 63 time and 29 memory
+exits (\art{research/n83_fixed_degree_sweep_20261028/README.md}).
+
+\paragraph{First fall is 2 on binary curves.} On every retained input the
+Koblitz and general binary systems have certified first fall degree 2 at
+every $m=2$--9, planted and natural (32 exact witnesses; all 48 replays
+passed), consistent with Corollary~\ref{cor:ffd2}. On
+the prime curve the balanced presentation has the proof-assisted lower
+bounds 24, 17, 14, 12, 10, 9, 9, 8 for $m=2$--9
+(\art{research/n83_ic_degree_sweep_20261027/README.md}). The fixed
+$\ell=27$ catalogue certifies 48 first falls and 32 degree-two closures: at
+$m=2$ the binary systems have first and last fall 2 (a restricted global
+certificate; in each planted case $V_2$ has 53 independent linear
+constraints on 54 variables), at $m=3$--9 the last fall is unresolved with
+lower bound 2, and the prime systems have first fall at least 5
+(\art{research/n83_fixed_fall_catalog_20261028/README.md}). A later
+degree-four witness census raised the certified last-fall lower bound of
+the twelve retained $m=3$ Koblitz and binary systems from 3 to 4, with 249
+strict degree-four coordinate witnesses each
+(\art{research/n83_candidate_pdp_20261028/README.md}).
+
+\paragraph{Top-form degrees are large and exact.} The top-form graded
+quotient was bounded for all 48 fixed-base systems
+(\art{research/n83_top_quotient_20261028/README.md}) and the binary chain
+bounds were then closed exactly by a written overlap proof with native
+checks (\art{research/n83_candidate_pdp_20261028/README.md}).
+Table~\ref{tab:n83l-top} gives both. For the prime systems at $m\ge3$ the
+top quotient is positive-dimensional, with no finite first vanishing degree
+in the saved presentation; the source says this is not a claim of infinite
+regularity or about the affine ideal. At $m=2$ the binary systems have
+$\text{FFD}=\text{LFD}=2$ and top-form degree 28, which separates those
+quantities explicitly for these presentations.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rlr@{}}
+\toprule
+$m$ & certified bounds, Koblitz and binary & exact top-form degree \\
+\midrule
+2 & $28\le d_{\mathrm{reg}}\le55$ & 28 (prime: 42) \\
+3 & $82\le d_{\mathrm{reg}}\le165$ & 111 \\
+4 & $109\le d_{\mathrm{reg}}\le275$ & 194 \\
+5 & $136\le d_{\mathrm{reg}}\le385$ & 277 \\
+6 & $163\le d_{\mathrm{reg}}\le495$ & 360 \\
+7 & $190\le d_{\mathrm{reg}}\le605$ & 443 \\
+8 & $217\le d_{\mathrm{reg}}\le715$ & 526 \\
+9 & $244\le d_{\mathrm{reg}}\le825$ & 609 \\
+\bottomrule
+\end{tabular}
+\caption[]{Top-form degrees of the fixed $\ell=27$ descended systems at
+$n=83$, both targets. Bounds: certificates of 28 October; exact values:
+the overlap proof of 29 October, which closes every interval at
+$111+83(m-3)$ for $m\ge3$. Neither is an affine solving degree. Sources:
+\art{research/n83_top_quotient_20261028/README.md},
+\art{research/n83_candidate_pdp_20261028/README.md}.}
+\label{tab:n83l-top}
+\end{table}
+
+\paragraph{Encodings and candidate bases.} For the prime candidate
+interval a radix census over all 3{,}010 partitions of 27 (35 exact Hilbert
+records and 2{,}975 certified lower bounds) found the unique minimum exact
+first vanishing degree, 42, in the all-binary presentation, which excludes
+improvements within that presentation family
+(\art{research/n83_candidate_pdp_20261028/README.md}; the original radix
+protocol's unequal-arm accounting mismatch is recorded in a correction file).
+The same directory certifies $7\le\text{FFD}\le17$, conditionally, for 42
+prime $m=3$--9 systems. A separate design study lists sixteen factor-base
+constructions for the primary $a=0$ curve with a preregistered protocol and
+proof obligations, and no measurement
+(\art{research/n83_factor_base_designs_20261031/README.md}).
+
+\paragraph{Reading.} The binary systems fall at degree 2 and their top-form
+degree grows by 83 per summand. These are certified properties of
+specific presentations, not attack costs. They say nothing for or against a
+low affine solving degree, but they show that the descended $n=83$ systems
+are far outside the reach of the solvers that were run, which matches the
+96 and 92 unfinished attempts above.
+
+\section{The genus-3 image transfer}\label{sec:n83l-genus3}
+
+A same-field degree-3 cover $\phi: C\to E$ with $C$ of genus 3 descends to
+$\FF_2$: $E: y^2+xy=x^3+1$ and $C: v^2+u^2v=u^7+u$, with equal point counts
+over $\FF_2$, $\FF_4$ and $\FF_8$
+(\art{research/n83_jacobian_projector_20261031/RESULTS.md}). Three studies
+of 31 October--1 November asked whether pulling the $n=83$ instance into
+$\mathrm{Jac}(C)$ gives anything rho does not have.
+\begin{itemize}
+\item \emph{The transfer executes}
+  (\art{research/n83_genus3_image_solver_20261031/README.md}). The exact
+  $n=83$ pullbacks of $P$ and $Q=[37]P$ are reduced Mumford classes of exact
+  prime order $r$; typed certificates prove $\phi_*\phi^*=[3]$, so the
+  pullback is injective on the subgroup. Rho and BSGS in the Jacobian image
+  solved toy instances at $n=9,13,19,23$ without the planted scalar, all
+  400 destination attempts verified ($n=7$ failed and is retained). The
+  source and destination operation counts have no certified common unit, so
+  no advantage is promoted; the full-Jacobian genus-3 index calculus does
+  not apply to an image of order $r\approx q$, and its ambient $q^{4/3}$
+  ledger loses to source rho by about 70.17 exponent bits.
+\item \emph{The Prym shares nothing with the target}
+  (\art{research/n83_jacobian_projector_20261031/RESULTS.md}). With the
+  closed-point norm, $e=\phi^*\phi_*$ satisfies $e^2=[3]e$, and on
+  $r$-torsion $p=[3^{-1}\bmod r]e$ is a checked idempotent. At $n=83$ the
+  Prym has Frobenius polynomial
+  $X^4+q^2=(X^2-2^{42}X+q)(X^2+2^{42}X+q)$, with elliptic factors of traces
+  $\pm2^{42}$, neither equal to $E$'s trace, and
+  $\gcd(r,q+1\mp2^{42})=\gcd(r,q^2+1)=1$. There is no $r$-primary route
+  through the two-dimensional complement. The identities are checked in
+  Lean.
+\item \emph{Degree-2 fibres are tautological}
+  (\art{research/n83_image_closed_degree2_20261101/README.md}). On every odd
+  extension tested a generic rational fibre has closed points of degrees
+  $1+2$ whose elliptic labels are exactly $P$ and $[2]P$, so the projected
+  identity is $[3]P=P+[2]P$ and carries no logarithmic information. The
+  frozen information gate fails, so no collector or timing run is admitted;
+  ordinary ambient genus-3 collection and fixed bounded-degree branching
+  also fail the comparison with source rho. A growing-degree or adaptive
+  target-local router is left open.
+\end{itemize}
+This is the binary counterpart of the cover results of
+\S\ref{sec:transfer}: the map is real and certified, and the destination
+carries the same $r$-part and nothing that makes it cheaper.
+
+\chapter{Weil descent and degree, continued}\label{ch:binarydegree}
+
+\S\ref{sec:binary-descent} measures the degree of Weil-descended summation
+systems to 24 October: first and last fall degrees stay at 3--4, the
+refutation degree tracks $\ell$ within one of semi-regular, closure
+algorithms refute a degree or two earlier but rise past 4 at $m=3$,
+$\ell=7$, and guessing one or two variables restores degree 4 there.
+\S\ref{sec:frontier} adds the first $\ell=8$ runs: four guessed variables
+bring all four unsatisfiable $(22,8)$ draws back to degree 4, one
+three-variable set fails on three of four, and the hybrid beats degree 5 at
+the priced ECC2K-130 cell only if at most six guesses suffice. This chapter
+records what followed:
+\begin{itemize}
+\item which guessed coordinate matters at $\ell=8$, not only how many
+  (\S\ref{sec:bd-guess});
+\item the first measured degree-5 closure cell (\S\ref{sec:bd-degree5});
+\item the per-attempt criterion and the companion repository's closure and
+  SAT pilots (\S\ref{sec:bd-criterion});
+\item a direct check of Semaev's 2015 first-fall statement on his own cells
+  (\S\ref{sec:bd-semaev});
+\item the ceiling on learned SAT guidance (\S\ref{sec:bd-sat});
+\item the finding that F6-IC with a pair index is the meet-in-the-middle
+  scan (\S\ref{sec:bd-f6}).
+\end{itemize}
+Every result here is exact algebra or a counted stage diagnostic on toy
+fields, run on unisolated 4-core, 16\,GB containers (the RunPod degree-5
+cell excepted). None has a validation file. One carries a proof-carrying
+claim, recorded as unverified. Closure outcomes do not depend on the host;
+timings are indicative only.
+
+A desk evaluation bounds what any algebraic-oracle lever in this chapter
+could do to today's ladder rows. Of 28 candidate point-decomposition
+strategies checked against the lead atlas, 17 collide with existing leads,
+7 overlap partly and 4 have no match, rated least promising
+(\art{research/pdp_strategy_evaluation_20261031/README.md}). The ladder rows
+(random binary curves, cofactor $h=2$--$8$) are solved with a pair table and
+a walk, not with summation polynomials: on arm~B at the published rung the
+walk is 61--82\% of $S$ and the matrix at most 0.10\% (measured, \S3 of the
+source). On the committed algebraic-oracle rows the oracle's share of $S$ is
+exactly zero when native operations are unpriced, so an algebraic-oracle
+lever has a ceiling of $1.00\times$ on those rows (derived).
+
+\section{Guessing at $\ell=8$: which coordinate, not how many}\label{sec:bd-guess}
+
+All studies in this section use the frozen $m=3$, $(n,\ell)=(22,8)$ draws
+of 22 October ($N=46$ unknowns, 44 equations, surplus $-2$; unsatisfiable
+draws 0, 3, 5, 6) or fresh draws from the same generator, the MutantXL-style
+closure \texttt{dreg\_closure} or its guess variants, and a registered
+reading of each branch as refuting at degree 4 (the constant 1 appears) or
+not (degree 4 saturates without it); the instrument and its three controls
+are described in \S\ref{sec:in-closure}. Table~\ref{tab:bd-guess} lists them.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright}X>{\raggedright}X>{\raggedright\arraybackslash}p{0.2\linewidth}@{}}
+\toprule
+Study & Guess set (all set to 0) & Outcome & Verdict \\
+\midrule
+guess (22 Oct) & $x_7,x_{15},x_{23},x_{24}$: one top coordinate per summand and one intermediate & 64 of 64 branches refute at 4; suffices on 4 of 4 draws & four suffice (an upper bound) \\
+guess3 (23 Oct) & $x_7,x_{15},x_{23}$ & draws 0, 3, 5 fail at branch 0 (closure rank 129{,}221, 128{,}213, 129{,}893 of 136{,}698); draw 6 suffices & three do not suffice for this set \\
+null (28 Oct) & none, at $(22,7)$, $N=43$ & 4 of 4 draws do not refute at 4 & 12 of 12 unspecialised $\ell=7$ draws now fail \\
+invariant (29 Oct) & S3: $a_7+b_7$, $c_7$, $e_1[0]$; X3: $a_7$, $c_7$, $e_1[0]$ & S3 suffices on 2 of 4, X3 on 1 of 4; S3 never worse & mixed \\
+invariant, more (29 Oct) & S3 against X3 on 8 fresh draws & S3 5 of 8, X3 0 of 8; 5 of 5 discordant draws favour S3, $p=0.031$ & S3 better (preregistered) \\
+pair (29--30 Oct) & D3: $a_7+b_7$, $a_6+b_6$, $e_1[0]$ against S3 & D3 2 of 12, S3 7 of 12; 5 discordant, all S3; two-sided $p=0.0625$ & no detected difference \\
+second link (5 Nov) & L3: $a_7+b_7$, $(e_1+x_3)_{20}$, $e_1[0]$ against S3 & L3 6 of 12, S3 7 of 12; one discordant draw; $p=1.0$ & no detected difference; unverified claim \texttt{PCC-\allowbreak20261106-\allowbreak607061} \\
+\bottomrule
+\end{tabularx}
+\caption[]{Guessed-variable closures at $m=3$, $(n,\ell)=(22,8)$ (the null
+row at $(22,7)$), degree 4, unsatisfiable draws only; $a,b,c$ are the
+summands' coordinates and $s=a+b$ the swap invariant of the first link.
+``Suffices'' means every branch of the draw refutes at degree 4. Sources:
+\art{research/dreg_closure_guess_20261022/RESULTS.md},
+\art{research/dreg_closure_guess3_20261023/RESULTS.md},
+\art{research/dreg_closure_null22_7_20261028/RESULTS.md},
+\art{research/dreg_invariant_guess_20261029/RESULTS.md},
+\art{research/dreg_invariant_guess_more_20261029/RESULTS.md},
+\art{research/dreg_invariant_pair_guess_20261029/RESULTS.md},
+\art{research/dreg_second_link_guess_20261105/RESULTS.md}.}
+\label{tab:bd-guess}
+\end{table}
+
+Table~\ref{tab:bin-guess} gives the per-draw records of the first two
+studies, read from their committed run files.
+
+\begin{table}[t]
+\centering\small\setlength{\tabcolsep}{4pt}
+\input{figures/tab-bin-guess}
+\caption[]{Degree-4 closure records of the guess (22 October) and guess3
+(23 October) studies, $m=3$, $(n,\ell)=(22,8)$, per draw and guess set
+(variables fixed to every 0/1 pattern, one run per branch). The six-variable
+set is the positive control, the unguessed $\ell=7$ draw (N7) the identity
+and negative control. ``rank'' is the closure rank of a non-refuting branch;
+guess3 stopped a draw after its first non-refuting branch. Minimum and
+maximum seconds are taken over the runs (derived). Data:
+\art{figures/data-bin-guess.json}, from
+\texttt{research/dreg\_closure\_guess\_20261022/runs/*.jsonl} and
+\texttt{research/dreg\_closure\_guess3\_20261023/runs/*.jsonl} (the
+\texttt{invalid-cap-bug} runs excluded).}
+\label{tab:bin-guess}
+\end{table}
+
+\paragraph{What the series shows.} At equal guess count, guessing a
+coordinate of the swap invariant $s=x_1+x_2$ refutes at degree 4 on more
+draws than guessing a raw summand coordinate: preregistered on fresh draws,
+$p=0.031$ one-sided, and 6 of 6 discordant draws over both studies
+($p=0.016$, secondary). S3 suffices on 7 of 12 draws in all and X3 on 1 of
+12. This contradicts the summand-dimension reading proposed after the
+three-guess study: S3 leaves both summands at dimension 8 and suffices more
+often than X3, which lowers $x_1$ to dimension 7. Putting a second
+invariant guess on the same link (D3) is never better than the raw guess on
+$x_3$; putting it on the second link's invariant $e_1+x_3$ (L3) is as good
+as the raw guess on these 12 draws. The D3 failures all sit at branches 0
+and 4, where both top coordinates of $s$ vanish. Four guesses
+$\{7,15,23,24\}$ still suffice on every draw measured (68 processes, peak
+10.6\,GB, $124{,}314$ degree-4 columns per branch), and S3 fails on 5 of
+12. The guess study's registered verdict favours the rule $k=m(\ell-7)+1=4$
+over $k=m(\ell-6)=6$; $k=4$ is an upper bound, the smallest count the
+container could fit under its column cap.
+
+\paragraph{What it does not show.} Every row is one cell, $m=3$, with one
+guess set per arm. The unspecialised $\ell=8$ system is not measured at
+degree 4 (179{,}447 columns); ``does not refute'' means a closure degree of at
+least 5, and degree 5 is not measured here. The null study's 12 of 12
+unspecialised $\ell=7$ failures over $N=40$, 42, 43 and surplus $-2$, 0,
+$+1$ remove the one confound the earlier $\ell=7$ registration kept (a
+non-positive surplus), but cannot distinguish ``3 of 4'' from ``4 of 4''
+against the three-guess $\ell=8$ result; a scorer defect found in its review
+(it scored only the files it was given) was fixed and the verdict
+regenerated unchanged. The second-link study's own reading
+is that one invariant guess per link extends along the chain, so $m=4$ is
+its natural test; $m=4$ at $\ell=8$ has not run. The preregistered
+high-arity discriminator that would run it
+(\art{research/dreg_high_arity_20261101/README.md}) went through four
+protocol versions, each superseded before data by a source or manifest
+change on \texttt{main}; v4 is frozen and its launch is blocked.
+
+\paragraph{The price, unchanged.} The guess-then-degree-4 oracle costs
+$2^k\binom{N-k}{\le4}$ per target against $\binom{N}{\le5}$ for degree 5.
+At the priced ECC2K-130 cell ($m=4$, $\ell=33$, $N=2\cdot131+4\cdot33=394$,
+closure exponent $\omega_c=1$) the ratio $\binom{394}{\le5}/(2^k\binom{394-k}{\le4})$ is $78.2$ at
+$k=0$, $5.09$ at $k=4$, $1.30$ at $k=6$ and $0.66$ at $k=7$, recomputed in
+the three-guess study. Both registered growth rules give $k\approx105$--108
+there. The measurements ($k\approx1$ at $\ell=7$ on 5 of 8 draws, $k\le4$
+at $\ell=8$ on 4 of 4) do not exclude a bounded $k$, and the invariant guess
+lowers $k$ on some draws. Even a bounded $k$ gives at best the degree-4
+floor, $2^{+7.62}$ over rho in unconverted units ($+8.43$ bits under the
+flat-$k$ rule), and the free-oracle floor of \S\ref{sec:gf-collision} still
+binds every row. Nothing in the series measures $k$ at $m=4$, so the $+8.43$
+to $+58.27$-bit range of \S\ref{sec:frontier} stands.
+
+\paragraph{Other degree levers of the same weeks.} A preregistered
+invariant arm that adds the summand-swap invariant $p$ as a variable makes
+every equation quadratic but does not refute at degree 3 at $(22,6)$, where
+the plain system refutes at 4; its degree-4 matrix would have $5.1$--$5.5\times$
+the plain system's columns ($523{,}686$--$637{,}393$ against $102{,}091$), and at
+$(21,7)$ degree 4 is unmeasured
+(\art{research/dreg_pair_invariant_20261028/RESULTS.md}). The 17 October
+specialisation study, whose failed null control made it uninformative, is
+the control lesson of \S\ref{sec:in-closure}.
+
+\section{A measured degree-5 closure}\label{sec:bd-degree5}
+
+The descent rows of Table~\ref{tab:prog_koblitz-ecc2k130} price the $m=4$
+ECC2K-130 route at degree 4 ($+7.62$ bits, contradicted) and degree 5
+($+10.32$ bits with the closure exponent $\omega_c=1$, $+45.71$ with
+$\omega_c=2$). Until November no degree-5
+closure had been computed. The leads study of 24 October
+(\art{research/koblitz_ic_leads_build_20261024/README.md}; Amendment~1 post
+hoc, Amendments 2--7 frozen before the runs they govern) built four leads
+in Rust and, in Amendment~7 (4 November), measured cell C1.
+\begin{itemize}
+\item \emph{C1 refutes at degree 5.} On $m=3$, $(n,\ell)=(19,7)$, draws 0
+  and 3, the incremental engine \texttt{pe\_closure} (partial, low-first,
+  batch 64) found 1 in the degree-5 closure, so each draw's closure degree is
+  5. Draw 0: 607{,}530 of 760{,}099 columns filled at refutation (0.80),
+  31{,}632\,s, 52.6\,GB peak resident; draw 3: 606{,}973 columns, 31{,}888\,s,
+  52.5\,GB. Host: 32 vCPU AMD EPYC 9965 with 128\,GB (RunPod).
+\item \emph{Memory.} The dense engine aborted on the same draws at 424 and
+  423\,GB resident, more than twice its 217\,GB projection and about $8\times$
+  the incremental engine's measured peak, which was below the derived
+  73\,GB bound.
+\item \emph{Scope.} One cell, $m=3$ not $m=4$, two of four draws, no
+  satisfiable control (the owner chose draws 0 and 3). The study reads it as
+  support for the degree-5 rows of
+  \art{research/notes/ecc2k130/RESEARCH_ECC2K130_DESCENT_DEGREE.md} at
+  $\ell=7$, and it changes no cost row. C1 cost about \$53 of an \$80 cap
+  over six pods, of which only the last measured.
+\end{itemize}
+The other leads of the same study change no cost either. Partial
+enlargement (L2) does not reduce memory in general: in the registered
+order the basis fills 0.66--0.997 of the column space before 1 appears, and
+other queue orders and batch sizes keep every run at 0.61--1.00. MXL's
+variable restriction is the one exception, on $m=4$, $(11,5)$: all four
+draws refute at fill 0.38--0.45 with $1.8$--$2.5\times$ fewer products, none
+reaching the 0.25 payoff; elsewhere it does not help. The useful by-product
+is the incremental engine itself, which holds one row per column plus one
+chunk: 1.3--2.8\,GB resident at degree 4 against 1.9--4.2\,GB for the full
+order.
+
+\section{The per-attempt criterion and the closure pilots}\label{sec:bd-criterion}
+
+The companion repository's degree pilots of 9--14 October are labelled by
+their authors exploratory, ``not program evidence'', with no run record or
+ledger write. They are worth recording for the criterion they state and for
+three measurements that \S\ref{sec:binary-descent} does not have.
+
+\paragraph{The criterion.} If a failed decomposition attempt costs
+$2^{\alpha\ell}$, relation collection can beat rho only if $\alpha<m/2-1$
+(\art{crypto-autoresearcher:analysis/ecdlp2m-iteration-20261009/m3-closure-pilot/README.md}).
+A harvest of 411 measured rows and 1{,}554 per-target values from the
+repository found that SAT and enumeration solvers spend about $2^{m\ell}$
+per failed attempt
+(\art{crypto-autoresearcher:analysis/ecdlp2m-iteration-20261009/ctrial-harvest/README.md}):
+WDSat's unsatisfiable conflict count equals $2^{3\ell}/3!$ to within
+0.03--1\% for $\ell=5$--11, slope $2.9985$ bits per unit $\ell$
+$[2.9979,2.9992]$. At $m=3$ the budgets need $-1.7$ to $-3.1$ bits per unit
+$\ell$ against a measured $+3.36$; at $m=4$, $-0.12$ to $-0.61$ against
+$+2.32$ for meet-in-the-middle. Extrapolated to $n=131$ at the budget
+$\ell$, WDSat with symmetry breaking lies at least 91 bits outside every
+budget line, a Riemann--Roch $L(4O)$ oracle measured at $n=131$ at least
+55, and the $t=4$ chained meet-in-the-middle at least 52; $m=5$, 6 had no
+usable cells. Only a bounded-degree algebraic refutation could meet the
+criterion.
+
+\paragraph{The $m=4$ SAT exponent.} Run on the published
+Trimoska et al.~\cite{trimoska2020} object and configuration, the pilot
+reproduces $\alpha=2.981$ $[2.973,2.997]$ at $m=3$; on chained $\Sem3$ at
+$m=4$ with Gaussian elimination it measures $\alpha=4.328$
+$[4.315,4.340]$ ($4.310$ at fixed $n=17$), against the $\alpha<1$ the $m=4$
+budget needs
+(\art{crypto-autoresearcher:analysis/ecdlp2m-iteration-20261009/m4-sat-cost-pilot/README.md}).
+The pilot also found that WDSat's stock \texttt{-b} mode returns ``SAT'' with
+undefined bits on unsatisfiable $m=4$ instances.
+
+\paragraph{Closure degree stays at 4 on toy chains, and is local.}
+\begin{itemize}
+\item \emph{$m=3$.} The degree-4 mutant closure $W_4$ refutes 60 of 60
+  unsatisfiable chained-$\Sem3$ instances at $n=9$ and 40 of 40 at $n=11$,
+  with no false refutation of a satisfiable one, where plain Macaulay $M_4$
+  and $M_5$ refute none (plain needs degree 6 at $n=9$; semi-regular
+  predicts 7--11). A support-matched null is refuted and a dense null is
+  not, so the low-degree refutation follows the sparse, block-bilinear
+  support of the descended system, not Semaev's coefficients.
+\item \emph{$m=4$, 5.} $W_4$ refutes 25 of 25 at $m=4$, $n=7$; 10 of 10 at
+  $n=9$; 2 of 2 at $n=11$; 10 of 10 at $m=5$, $n=7$; and $W_3$ refutes 30
+  of 30 at $m=5$, $n=9$, $k=2$, while plain $M_4$ refutes nothing
+  (\art{crypto-autoresearcher:analysis/ecdlp2m-iteration-20261009/m45-closure-pilot/README.md}).
+\item \emph{Locality.} Restricting monomials to consecutive blocks
+  (locality 1) keeps the refutation on 124 of 135 unsatisfiable instances
+  with 39--69\% fewer columns at $m=3,4$; every miss refutes at locality 2,
+  and none needed locality 3. At $m=5$, $n=9$, $k=3$ locality 1 refutes none
+  of 10 and locality 2 all 5 tried
+  (\art{crypto-autoresearcher:analysis/ecdlp2m-iteration-20261009/block-local-closure-pilot/README.md}).
+\end{itemize}
+These are the toy-scale version of the MutantXL result of
+\S\ref{sec:binary-descent}, and they meet the same wall: the closure stays at
+degree 4 while the columns stay within a host's memory, and the
+$\ell=7$--8 cells of \S\ref{sec:bd-guess} and the degree-5 cell above are
+where it leaves degree 4.
+
+\section{Semaev 2015, \S4.5, on its own cells}\label{sec:bd-semaev}
+
+Chapter~\ref{ch:falldegree} proves that the binary $m=2$ descent and
+Semaev's chained system have first fall degree 2 for every $n$
+(Corollary~\ref{cor:ffd2}) and notes that Semaev states 4 in his
+\S4.5~\cite{semaev2015}. A frozen check of 2 November ran his own $t=2$
+cells of Table~2, $S_3(x_1,x_2,z)$ with $x_1,x_2\in V$ and random $z$ and
+$B$, 20 instances per cell and field polynomial, 200 in all
+(\art{research/semaev_t2_trace_20261102/REPORT.md}; exact
+$\FF_{2^n}$ and Boolean-ring arithmetic in standard-library Python; source
+arXiv:1504.01175v1).
+\begin{itemize}
+\item \emph{Refuted: ``the first fall degree \dots\ is always 4''.} On all 200
+  instances the first fall degree is 2, each with an explicit trace
+  certificate: with $\lambda=z^{-2}$,
+  $\operatorname{Tr}(z^{-2}S_3)=\operatorname{Tr}(x_1)+\operatorname{Tr}(x_2)+\operatorname{Tr}(Bz^{-2})$,
+  a constant combination of the coordinate equations of degree at most 1.
+\item \emph{Split: the corpus inference that these rows refute
+  $d_{F4}\le d_{\mathrm{ff}}$.} The least degree at which the Boolean
+  Macaulay span contains 1 is 2 on 154 instances and 3 on 46, never 4
+  (per cell: $(15,4)$ 18/2 and 19/1; $(15,5)$ 20/0 twice; $(16,4)$ 18/2 and
+  20/0; $(19,3)$ 6/14 and 4/16; $(21,3)$ 15/5 and 14/6). So the sharp
+  first-fall assumption fails on 46 of 200 instances, not everywhere, and
+  Semaev's reported $d_{F4}=4$ is Magma's step degree, not what the systems
+  require.
+\item \emph{Why.} The quadratic parts depend only on $x_1x_2\in V\cdot V$, of
+  dimension $2k-1<n$, so most $t=2$ systems are inconsistent at degree 2 or
+  3. None of the 200 has a solution in $V\times V$, which matches Semaev's
+  success probabilities of 0.0006--0.0155 for these rows.
+\end{itemize}
+It complements the Semaev 2015 audits of Chapter~\ref{ch:summer}, which
+tested eq.~(11) and the typed-image ratio but not the first-fall statement:
+on these cells the sharp assumption fails on 23\% of instances, and the
+stated first fall degree is wrong under Semaev's own definition.
+
+\section{The ceiling on learned SAT guidance}\label{sec:bd-sat}
+
+The SAT engines and encodings are described in \S\ref{sec:bo-sat}. The SAT
+survey dismissed ML-guided SAT without measuring it. A preregistered
+study of 27 October measured the most any learned component could gain
+inside a SAT point-decomposition oracle before anyone builds one
+(\art{research/pdp_ml_sat_ceiling_20261027/README.md}; protocol frozen in
+\texttt{8a85584fd}; symmetrised $\Sem4$, $m=3$, native CDCL+XOR, the
+Trimoska-corpus curves, uniform targets; cost in conflicts). It tested
+triage on target features or early solver telemetry, a fixed conflict
+cutoff, and learned static branching. All 4{,}200 labels agree with
+exhaustive sorted-triple search.
+\begin{itemize}
+\item \emph{The search is an enumerator.} A refutation costs $0.963$
+  ($n=15$, $\ell=5$; 3{,}000 targets) and $0.998$ ($n=17$, $\ell=6$; 1{,}200
+  targets) conflicts per sorted factor-base triple, every refutation within
+  4.1\% of its family median (5{,}781 and 45{,}649 conflicts).
+\item \emph{The prize is real.} A perfect unsatisfiability predictor,
+  charged its telemetry conflicts, would raise relations per conflict by
+  $5.2$--$9.0\times$.
+\item \emph{The signal is not.} Test AUC is within noise of 0.5 for every
+  feature group on both families and both splits; the permuted-label control
+  reads 0.45--0.54 and the positive control (labels flipped with probability
+  0.25) 0.72--0.79, so the learner works. The one interval that excludes
+  0.5 ($n=15$ telemetry at 512 conflicts, $0.556$ $[0.518,0.599]$) includes a
+  ``decided within 512 conflicts'' flag and gains $0.99\times$. Train-fitted
+  gains up to $4.7\times$ fall to about $1\times$ held out.
+\end{itemize}
+The study closed by its preregistered rule. A related instrument finding is recorded in the atlas: five ``unverified
+SAT answers'' of an earlier binary solver comparison were quadratic-twist
+decompositions (\texttt{EV-ICPERF-390707};
+\art{crypto-autoresearcher:knowledge/leads/ecdlp/ic-prime/LEAD-ICP-icperf-binary-pdp-solver.yaml}).
+
+\section{F6-IC with a pair index is the meet-in-the-middle scan}\label{sec:bd-f6}
+
+With the pair index, F6-IC is the pair-index meet-in-the-middle scan. The
+few-candidate closure of 5 November, now on by default, runs the exact
+one-fixed closure once a summand's assigned bits leave at most 64 base
+codes; it cuts F6-IC CPU $2.67$--$10.29\times$ while leaving the gate's pair
+lookups and group additions identical, so on these nine Koblitz cells the
+algebra was ruling out no candidate $x$-coordinate
+(\art{research/f6_few_candidates_20261105/README.md}). The full account,
+with its controls and the two companion items, is in \S\ref{sec:bo-f6}.
+
+\chapter{ECC2K-130, ECC2-131, factor-base selection, composite degree and GHS}\label{ch:binarytargets}
+
+The named binary targets are in \S\ref{sec:ecc2k130} (ECC2K-130) and
+\S\ref{sec:binary} (ECC2-131), with the priced routes of
+Table~\ref{tab:prog_koblitz-ecc2k130}. This chapter adds what those sections
+do not have:
+\begin{itemize}
+\item two independent budget tables and the isogeny-class census from the
+  \texttt{cryptanalysis} repository, the Torelli toy ladder, and the state of
+  the modular carrier search (\S\ref{sec:bt-ecc2k130});
+\item the ECC2-131 symmetry-breaking and stage measurements
+  (\S\ref{sec:bt-ecc2-131});
+\item factor-base selection by a structural law and by a learned cost
+  model, with the exact standing of the one validated claim
+  (\S\ref{sec:bt-fbselect});
+\item quasi-subfield polynomials at $n=131$ (\S\ref{sec:bt-qsp});
+\item composite-degree curves (\S\ref{sec:bt-composite});
+\item binary GHS and Weil-restriction screens outside the late-October cubic
+  catalogue (\S\ref{sec:bt-ghs}).
+\end{itemize}
+The \texttt{cryptanalysis} sources are read at the head of the branch
+\texttt{claude/cryptanalysis-repo-setup-p59kek} (22 October), not a
+\texttt{main} branch. None of the studies here carries a validation file in
+a repository read for this treatise.
+
+\section{ECC2K-130 beyond the priced routes}\label{sec:bt-ecc2k130}
+
+\paragraph{What one decomposition may cost.} Two \texttt{cryptanalysis}
+studies turned the ECC2K-130 cost model around: fix rho at $2^{60.81}$
+iterations on the $\langle-1,\tau\rangle$ classes, count one group addition
+as one rho iteration, and ask how much one decomposition may cost if the
+whole attack is to tie rho. The subspace version
+(\art{cryptanalysis:experiments/pdp-scaling/README.md}) finds no budget at
+$m=3$ (linear algebra alone exceeds rho), $2^{12.2}$ iterations at $m=4$,
+$\ell=29$ (about 0.5\,ms), $2^{32.8}$ at $m=5$, $\ell=28$ (about 12 minutes)
+and $2^{36.8}$ at $m=6$, $\ell=24$. Against these, its meet-in-the-middle
+decomposition costs $2^{58}$, $2^{84}$ and $2^{72}$ group additions per
+point, gaps of $+46$, $+51$ and $+35$ bits, and the fitted algebraic costs
+(SAT, F4) are near $2^{180}$ at $m=4$; SAT grows about 4 ($m=3$) and 7 ($m=4$)
+bits per extra dimension of the base. The Frobenius-quotient version
+(\art{cryptanalysis:experiments/frobenius-quotient-m4/README.md}) uses the
+one quotient that remains at $n=131$, the orbit quotient of the non-linear
+weight base $F_w=\{P: 1\le\mathrm{HW}(x(P))\le w\}$ in a normal basis
+(\S\ref{sec:kc-nonlinear}), with columns $B/131$ credited in full.
+Table~\ref{tab:bt-fq} gives its best weight per arity.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrrrrrr@{}}
+\toprule
+$m$ & $w$ & $\log_2B$ & $\log_2$ budget/attempt & required exponent in $B$ & MITM exponent & MITM gap, bits \\
+\midrule
+2 & --- & & \multicolumn{4}{l}{none: linear algebra alone exceeds rho at every $w$} \\
+3 & 6 & 31.6 & 0.5 & 0.01 & 2 & $+65.0$ \\
+4 & 6 & 31.6 & 31.1 & 0.98 & 2 & $+34.4$ \\
+5 & 5 & 27.2 & 40.6 & 1.49 & 3 & $+44.0$ \\
+6 & 4 & 22.5 & 45.3 & 2.01 & 3 & $+25.3$ \\
+8 & 3 & 17.5 & 50.3 & 2.87 & 4 & $+23.7$ \\
+12 & 2 & 12.1 & 52.9 & 4.38 & 6 & $+25.6$ \\
+\bottomrule
+\end{tabular}
+\caption[]{ECC2K-130 on the Frobenius-orbit quotient of the weight base:
+the most one decomposition may cost if the attack is to tie rho
+($2^{60.81}$), and the meet-in-the-middle floor against it. Arithmetic
+only (rows $m=7,9,10,11$ omitted). Source:
+\art{cryptanalysis:experiments/frobenius-quotient-m4/README.md}.}
+\label{tab:bt-fq}
+\end{table}
+
+The quotient raises the budget from $2^{12.2}$ to $2^{31.1}$ at $m=4$, which
+is the factor 131 on relations and $131^2$ on linear algebra that rho
+already collects through $\sqrt{2\cdot131}$. It does not remove the
+obstruction. A decomposition that uses only the group law needs
+$\abs{L_1}\abs{L_2}\ge\#E\approx2^{131}$, at least $2^{65.5}$ per attempt;
+a method that uses the $x$-coordinate algebra must reach the required
+exponent column, which is below $m/2$ for every $m$, against $m$
+(exhaustive, WDSat, FES), $m-1$ (hybrid) and $\lceil m/2\rceil$ (MITM, floored
+at $2^{65.5}$). At $m=4$ the required exponent is $0.98$: one decomposition
+would have to cost less than listing the base once. The same study measured
+$m=4$ on the weight base at toy size with CryptoMiniSat (chained $\Sem3$,
+weight as a cardinality bound): every completed instance at $n=9$--15
+returned a lifted, re-added decomposition with no spurious model and no
+oracle disagreement, and the descriptive slope of median CPU on $\log_2B$ over
+four uncensored cells is $1.34$.
+
+\paragraph{The isogeny class, by level.} The class of
+$E_0: y^2+xy=x^3+1$ over $\FF_{2^{131}}$ has four endomorphism levels,
+conductors 1, 263, $p$ and $263p$ with $p=146{,}505{,}763{,}881{,}528{,}721$
+(\art{cryptanalysis:experiments/ecc2k130-isogeny-class/README.md}):
+\begin{itemize}
+\item level 1 ($E_0$): native and effective rho $2^{60.81}$;
+\item level 263, 262 floor curves: native rho $2^{64.33}$, effective
+  $2^{60.81}$ through a verified 263-isogeny to $E_0$ costing at most
+  $2^{15.6}$ $\FF_q$-multiplications (the 262 $j$-invariants independently
+  rederived by V\'elu from $E_0[263]$, 262 of 262 matching);
+\item level $p$, $p+1\approx2^{57.0}$ curves, and level $263p$,
+  $262(p+1)\approx2^{65.1}$ curves: native $2^{64.33}$, effective in
+  $[2^{60.81},2^{64.33}]$.
+\end{itemize}
+No curve in the class is easier than $E_0$. The $p$-level interval would
+close only with a characteristic-2 higher-dimensional (Kani) isogeny
+pipeline, and constructing any such curve costs about $2^{70}$
+$\FF_q$-multiplications, more than solving natively on it. The treatise's
+262-curve figure and the $11.45\times$ negation-only penalty of
+\S\ref{sec:ecc2k130} are the level-263 row.
+
+\paragraph{A Jacobian carrier: the toy ladder.} \S\ref{sec:ecc2k130} leaves
+one hypothetical route open, a genus-130 Jacobian isogenous to the simple
+130-dimensional abelian variety that carries $\langle G\rangle$, and quotes
+the Torelli codimension 8{,}128 against it. A frozen toy test of that rarity
+heuristic (\art{research/ic_next10_20261014/10-torelli-toy/README.md})
+enumerated curves over $\FF_2$ whose Frobenius polynomial is divisible by
+the trace-zero part $A_n$ of $\mathrm{Res}_{\FF_{2^n}/\FF_2}(E_a)$:
+\begin{itemize}
+\item \emph{$n=5$: negative, with low power.} No genus-5 Jacobian
+  (hyperelliptic and trigonal completely, canonical curves by a uniform
+  sample of $2^{21}$ nets), and no plane quintic or hyperelliptic curve of
+  genus 6--8, carries $A_5$; but the heuristic predicts only about 0.42
+  classes per sign at genus 5.
+\item \emph{$n=7$: the literal reopen criterion is met, by structure $n=131$
+  lacks.} 1{,}536 hyperelliptic models of genus 7 (mass 0.5) per sign have
+  Jacobians isogenous to the full Weil restriction, against a prediction of
+  $2^{-14}$--$2^{-18}$. Here $\operatorname{ord}_7(2)=3$, $A_7$ splits into
+  two 3-dimensional factors, and genus $7=2^3-1$ is what GHS gives with
+  magic number 4 (the attribution to GHS is the author's interpretation).
+\item \emph{Calibration.} The heuristic is right to within
+  $2^{-3.5}$--$2^{+1.2}$ for the $A_3$ control at excess genus at most 3,
+  and under-predicts every structured class that occurs, by up to $2^{19}$
+  at $n=7$.
+\end{itemize}
+So the ECC2K-130 rarity argument rests on the absence of such structure at
+$n=131$ (no small magic numbers, a simple $A$), not on the number 8{,}128.
+The atlas lists $n=11$ and 13 as the next rungs
+(\art{crypto-autoresearcher:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-ecc2k130-jacobian-carrier.yaml}).
+
+\paragraph{The modular carrier search.} A separate line looks for a
+low-genus or modular carrier of the relevant CM factor through an explicit
+modular bridge (\art{research/koblitz_modular_ic_20261018/README.md}). It
+has run 26 rounds of exact constructions with Lean identities and no
+index-calculus rank. Round 22 computed the integral equivariant recovery on
+norm-zero targets (eight Smith factors 1, kernel rank 24); round 26 shows by
+exact diamond norms that the invariant quotient does not carry the intended
+CM factor under the retained bridge, and records the next Riemann--Roch
+space (degree 128, dimension 68 under the genus-61 bridge) whose basis is
+still required.
+
+\paragraph{The ranking of 23 October.} A leads survey of that date ranked
+six degree and closure leads and three rho-accounting items by planning
+cost against best-case effect, both judgements and not measurements
+(\art{research/ecc2k130_leads_survey_20261023/report.typ}). Its first lead,
+the matched null at $(22,7)$, ran on 28 October (\S\ref{sec:bd-guess}). It
+quotes the unconverted distances $+7.62$ bits ($m=4$, degree 4), $+10.32$
+(degree 5) and a free-oracle floor of $2^{56.46}$, and no lead moves a priced
+row below rho.
+
+\section{ECC2-131}\label{sec:bt-ecc2-131}
+
+ECC2-131 is a random binary curve over $\FF_{2^{131}}$ ($z^{131}+z^{13}+z^2+z+1$,
+cofactor 2, $a\notin\FF_2$, so no Frobenius saving), and 131 is prime, so
+there is no Weil descent to a subfield. \S\ref{sec:binary} gives its program,
+gates and degree falsifiers. Two measurements were added.
+
+\paragraph{Symmetry breaking and double large primes at $m=2$.} With the
+base $V_\ell=\{x:\deg x<\ell\}$ and a large-prime domain $V_{\ell'}$, the
+binary $\Sem3$ linearises in $e_1=x_1+x_2$ to $t^2+t=e_1^2+b/x_R^2$, and
+because $V_{\ell'}$ is closed under addition the symmetric oracle can sweep
+$e_1$ (each unordered pair once, one batched inversion) instead of lifting
+each $x_1$ with its own inversion
+(\art{research/certicom131_symlp_20261025/REPORT.typ}; single thread, seed
+20261025; IC step and rho step in the same field code and process).
+Table~\ref{tab:bt-symlp} gives the step rates. For ECCp-131 the interval
+$[0,B)$ is not closed under addition and each step needs two square roots,
+so the symmetric oracle is slower than its baseline. Direct relations (both
+abscissae in $V_\ell$) are about $5\cdot10^{-7}$ of decompositions on the
+binary calibration curves; the two-large-prime graph is what makes the bulk
+usable, and the planted pipeline recovers a logarithm through it on both
+real 131-bit groups.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}llrrrrr@{}}
+\toprule
+Family & Curve & $n$ & base M/s & sym M/s & sym/base & IC/rho step rate \\
+\midrule
+binary & ECC2-131 & 131 & 0.18 & 5.24 & $28.7\times$ & 1.20 \\
+binary & calibration & 127 & 0.36 & 7.59 & $20.8\times$ & 1.74 \\
+binary & calibration & 61 & 0.39 & 4.52 & $11.6\times$ & 1.04 \\
+prime & ECCp-131 & 131 & 0.17 & 0.09 & $0.6\times$ & 0.02 \\
+prime & calibration & 61 & 0.37 & 0.19 & $0.5\times$ & 0.03 \\
+\bottomrule
+\end{tabular}
+\caption[]{Decomposition-oracle step rates at $m=2$, single thread: the
+per-point baseline, the symmetric $e_1$ oracle, and the symmetric step rate
+over the rho adding-walk step rate on the same host. A step-rate ratio, not
+a cost ratio. Source:
+\art{research/certicom131_symlp_20261025/REPORT.typ}.}
+\label{tab:bt-symlp}
+\end{table}
+
+The study's derived cost model (every row computed, not measured) puts an
+$m=2$ solve at about $2^{2n/3}$ decomposition steps at the balancing
+dimension $d=(n+1)/3$, which agrees with the merged algebraic ladder's
+measured trial slope $0.647$ $[0.639,0.655]$, against rho's
+$\sqrt{\pi r/4}$: $\log_2$ steps $87.3$ against $64.8$ for ECC2-131 and $65.3$
+for ECCp-131, a distance of about $2^{22}$ steps before the linear-algebra
+floor, which the program gates place above rho for $m\le3$. Both
+accelerators are constants on the $2n/3$ exponent; they would matter at
+$m\ge4$, which the study does not reach.
+
+\paragraph{Stage rates.} On one isolated sibling pair of an Intel Xeon
+6975P-C host, five samples per cell
+(\art{research/certicom_131_stage_bench_20261023/REPORT.md}):
+\begin{itemize}
+\item rho state steps per second: 207{,}822 (ECC2K-130), 207{,}602
+  (ECC2-131), 87{,}055 (ECCp-131);
+\item full-field $\Sem3$ quadratic-root queries per second: 48{,}080,
+  48{,}186 and 9{,}522.
+\end{itemize}
+The two binary curves share the field polynomial and differ by $0.11\%$ in
+point updates; ECCp-131's generic rho step is $0.419\times$ and its root
+query $0.198\times$ ECC2K-130's. These are generic-binary CPU stage ratios,
+not solve costs; the optimised clients of \S\ref{sec:ecc2k130} and
+\S\ref{sec:binary} walk 8.5--13.2 million steps per second.
+
+\section{Factor-base selection}\label{sec:bt-fbselect}
+
+Named subspace properties (greedy coverage, cosets, geometric progressions,
+normal against polynomial bases) are exhausted at scale
+(\S\ref{sec:binary}, \S\ref{sec:frontier}). Two further results choose the
+base by the solving degree rather than by the yield.
+
+\paragraph{A structural law for $m=2$.} Over 656 factor bases (7 families,
+9 fields) on $y^2+xy=x^3+1$, the closure solving degree of the two-summand
+system is
+\[
+D=2+[e<-3.5]+[e<-8.5],\qquad e=n-\dim V-\dim V^{(2)},
+\]
+with $V^{(2)}$ the span of pairwise products, at mean absolute error 0.06
+degrees, 0.08 with each field size held out
+(\art{cryptanalysis:experiments/pdp-degree-heuristics/README.md}). For prime
+$n$, $\dim V^{(2)}\ge2\ell-1$, and below $n-1$ only geometric progressions
+$c\cdot\mathrm{span}\{1,g,\dots,g^{\ell-1}\}$ attain it; the literature's
+$\mathrm{span}\{1,z,\dots,z^{\ell-1}\}$ is one. Where the rule puts a random
+base a degree higher, the progressions are 15--40 times cheaper per query
+and per relation on average, up to 100; elsewhere 1.5--2 times; the yield is
+the same. Two further findings matter for pricing: the homogeneous degree of
+regularity of these systems is exactly $\ell+1$, because the two-summand
+top parts are bilinear across the variable blocks, while the solving degree
+is 2--4, so the semi-regular prediction misses by 0.5--1.2 degrees on
+average; and at $m=3$ the formulation decides whether the base matters (in
+the symmetric formulation the progression is 15--40$\times$ cheaper per query
+at $\ell=3$ at equal degree, and 500--1{,}500$\times$ where the random base
+needs one more degree). Every row is a decomposition-stage profile on small
+fields, not an index-calculus result.
+
+\paragraph{A learned cost model.} The lead
+(\art{crypto-autoresearcher:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-learned-cost-model-factor-base-selection.yaml},
+last reviewed 6 November) fits a gated log-linear (ridge) model of
+per-relation cost on structural features of $V$ (predicted exact yield,
+solving degree, trace and product-space statistics) and compares its pick
+from a pool with the hand rule ``lowest expected solving degree first''. The
+label producer is the structural-law experiment above. As the atlas records
+it:
+\begin{itemize}
+\item \emph{Stage.} $1.82$ bits per relation $[1.36,2.26]$ better than the
+  hand rule at $\ell\le4$ (13 cells), $1.13$ $[0.45,1.62]$ at $\ell=5$.
+\item \emph{Across curves, frozen, no refit.} $+1.84$ $[0.95,2.68]$ on
+  $a_2=1$ Koblitz curves; $+0.92$ $[0.54,1.34]$ on ordinary curves, not
+  confirmed on 16 fresh ordinary curves at $\ell=4$ ($+0.43$ $[0.15,0.74]$
+  against a $1.08$ threshold), where the hand rule already sits near the pool
+  best.
+\item \emph{End to end.} $0.93$ bits $[0.36,1.48]$ less counted cost per
+  verified logarithm over 9 cells ($n\le41$). At $\ell=4$ on ordinary
+  curves, $n=19$, the complete-logarithm check is a null with the sign
+  reversed: $-0.45$ $[-0.98,+0.04]$ bits at $w=0$.
+\item \emph{Native ecbench on the isolated EKS route}, 5 November: K1
+  ($a_2=1$) Koblitz curves, $\ell=3$, \texttt{ic.pipeline} with explicit
+  binary-subspace bases, 4 targets $\times$ 5 rounds per size, 192 of 192
+  records verified. $\log_2(S_{\text{rule}}/S_{\text{ridge}})$ in counted
+  complete-logarithm cost is $+1.83/+0.80/+0.80$ bits at $n=17$ and
+  $+0.96/+2.47/+2.47$ at $n=19$ for $w=0/0.1/1$, every interval's lower end
+  above 0. The ridge pick stays behind \texttt{rho.signed\_frobenius\_strong}
+  by $1.8/14.8/17.7$ bits ($n=17$) and $3.3/15.1/17.9$ ($n=19$). The
+  producer's first ``about 9 bits, identical across the band'' was a
+  pinned-calibration point and was corrected.
+\end{itemize}
+\emph{Standing, exactly.} The atlas lead on crypto-autoresearcher
+\texttt{main} (commit \texttt{8d61579904}, 6 November) records the EKS
+result as ``independently validated 2026-11-06 with VALIDATION.json, 160 of
+160 replays reproduced on a second CPU''. The experiment, its protocol, its
+validator report and that \texttt{VALIDATION.json} live in the external
+repository \texttt{aburan28/ml-cryptanalysis}
+(\texttt{experiments/fb-cost-model-curves-eks}), which this session could
+not open; the same atlas entry's evidence note says the validation is ``in
+a follow-up PR''. Nothing about the study is on \texttt{main} of
+\texttt{crypto} or \texttt{crypto-autoresearcher} except the atlas text. So
+for this treatise the validated claim is an unverified assertion recorded
+by the atlas: if it holds, it is the family's only validated, measured
+improvement over a binary index-calculus baseline, about 1--2.5 bits at toy
+size, $n=17$, 19, with its scaling in $n$ not yet measured (K1 $n=23$ was
+frozen on 6 November). It moves no row toward rho by more than the
+1.8--17.9 bits it leaves.
+
+\section{Quasi-subfield polynomials at $n=131$}\label{sec:bt-qsp}
+
+\S\ref{sec:binary} records the $\FF_{2^7}$ census that showed the HKPYY
+Lemma~4.1 bound~\cite{hkyy2018} tight. The cost side is closed by theorem
+(\art{crypto-autoresearcher:analysis/qsp-ecc2k130/README.md}; the atlas
+records it as a theorem from Euler and Petit's work):
+\begin{itemize}
+\item every linearised quasi-subfield polynomial has $\beta\ge3/4$, so under
+  the HKPYY cost model the exponent is at least $0.93$, at least $2^{122}$ at
+  $n=131$ against rho's $2^{60.81}$ ($2^{60.9}$ in the source);
+\item with $\FF_2$ coefficients only $X^2+X$ ($n'=1$) and $L_{\Phi_{131}}$
+  ($n'=130$, $\beta=0.99994$) exist at $n=131$;
+\item multiplicative quasi-subfield polynomials give $\abs V=264$ or $p+1$,
+  with $\beta\ge1.02$;
+\item the cost model needs $\beta\approx0.0958$ to reach rho's cost.
+\end{itemize}
+At toy size the yield is no better than random: at $n=31$, $k=15$, the QSP
+base $t^{15}+t^7+t^3+t+1$ ($\beta=0.964$) yields $0.214$ $(0.190$--$0.240)$
+against $0.204$--$0.230$ for random subspaces, and the route's kill criterion
+fired (\art{research/ic_next10_20261014/08-quasi-subfield/README.md}).
+
+\section{Composite degree}\label{sec:bt-composite}
+
+Composite $n$ is the one binary setting where a cost model puts index
+calculus below rho on time alone, and only for an unmeasured
+per-decomposition cost; under time$\times$memory the same model is worse on
+every row. Chapter~\ref{ch:obstructions} records the lift-dense
+twisted-line base on c2pnb208w1 and c2pnb368w1 ($+0.50$ bits, modelled), and
+\S\ref{sec:transfer} the GHS reachability of the Oakley curves.
+
+\paragraph{c2pnb: Gaudry--Diem $n=4$, as a cost model.} The five ANSI X9.62
+example curves c2pnb176v1, 208w1, 272w1, 304w1 and 368w1 have coefficients in
+$\FF_{2^{16}}$ and live over $\FF_{Q^4}$, $Q=2^{4k}$, $k=11,13,17,19,23$. A
+zero-experiment derivation
+(\art{crypto-autoresearcher:analysis/ecdlp2m-iteration-20261009/c1-gaudry-n4-c2pnb/README.md})
+prices Gaudry--Diem $n=4$~\cite{gaudry2009,diem2011} with a base of points
+with $x\in\FF_Q$ reduced modulo negation and $\pi_{16}$ ($N=Q/(2k)$ orbits)
+and double large primes~\cite{gtthd2007}, against matched rho of $78.10$,
+$93.98$, $125.78$, $141.71$ and $173.57$ bits. Under three metrics:
+\begin{itemize}
+\item \emph{time only:} below rho on all five rows for every per-decomposition
+  cost $c_{\text{trial}}\in[2^{15.5},2^{32.5}]$, by $+1.46$, $+5.80$, $+14.19$,
+  $+18.34$ and $+26.60$ bits at $c_{\text{trial}}=2^{30}$;
+\item \emph{time $\times$ memory against van Oorschot--Wiener:} worse on every
+  row, by 35--56 bits at $c_{\text{trial}}=2^{30}$;
+\item \emph{mesh area-time:} better only at 304w1 ($+1.28$) and 368w1
+  ($+0.97$), and only for $c_{\text{trial}}\le2^{27}$.
+\end{itemize}
+The verdict turns on $c_{\text{trial}}$, never measured at toy size, the
+per-worker FGLM memory ($D^2$ with $D=4096$, brief-supplied) and the
+linear-algebra constant; a toy ladder over $\FF_{2^4}$ lifted to $\FF_{2^{4k}}$,
+$k\in\{5,7,9,11,13\}$, about $2\cdot10^4$ decompositions, would pin all three
+and has not run. The atlas adds that the $\FF_{2^{16}}$-rational base is
+structurally empty in $G$ and that a naive trace-zero extrapolation is a
+regime-invalid trap
+(\art{crypto-autoresearcher:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-composite-degree-c2pnb.yaml}).
+
+\paragraph{Oakley groups 3 and 4: $n=5$.} The twisted line exists on both
+Oakley EC2N curves: a $u$ with $T(u)=T(c/u)=0$ was verified in $\FF_{2^N}$
+($N=155$ and 185, $n=5$), and all 200 sampled elements of $u\FF_q$ lift
+against 104 and 99 of 200 for the standard line, so as a Gaudry--Diem $n=5$
+base each decomposition trial would have $2^5=32$ times the relations of the
+standard base; on c2pnb176v1, 272w1 and 304w1 ($\operatorname{Tr}(a)=1$)
+none of 200 lift (\art{research/oakley_lift_dense_20261027/REPORT.typ}). This
+is a per-trial yield statement. Three approved Oakley contracts have no
+runs; the atlas prices the GHS genus-16 transfer at $+1.1$ bits (group 3) and
+$+10.9$ bits (group 4) of advantage after the 11 October magic-number
+correction, by formula
+(\art{crypto-autoresearcher:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-oakley-quintic-tower.yaml}).
+
+\section{Binary GHS and Weil-restriction screens}\label{sec:bt-ghs}
+
+The late-October cubic GHS catalogue over $\FF_4$, $\FF_8$ and $\FF_{16}$
+belongs to the transfer record (\S\ref{sec:transfer}). Four binary screens
+outside it bear on index calculus.
+
+\paragraph{Decomposition coverage at $n=2$ is $3/8$, not Poisson.} For
+generic $E/\FF_{q^n}$ and the base $x\in\FF_q$, the share of points that are
+a sum of $n$ base points was computed exactly over the whole group
+(\art{research/weil_descent_angles_20261018/REPORT.md}). In odd
+characteristic at $n=2$--5 it matches a random $x$-set of the same size
+(paired residual $\abs z\le0.94$). Binary $n=2$ is the exception: coverage
+tends to $3/8$, not the Poisson $1-e^{-1/2}=0.3935$ ($z=-4.72$), and the cause
+is proved. Every $x\in\FF_q$ has $\operatorname{Tr}_{\FF_{q^2}/\FF_2}(x)=0$,
+so the base lies in one coset of $2E$; the descended relation map is
+$\FF_2$-affine with image in the hyperplane $\operatorname{Tr}(w/x_3^2)=0$; so
+a point decomposes only if $\operatorname{Tr}(x_3)=\operatorname{Tr}(a)$, half
+the group, and inside that half the multiplicities are exactly
+$\mathrm{Bin}(2,1/2)$. Because attack targets lie in the odd-order subgroup
+inside $2E$, the relevant coverage is that of $2E$, exactly $3/4$ against
+$0.3935$; the study corrected its first reading (``neutral to slightly
+negative'', measured over the whole group) on this point. The identity holds
+on all 21 curves.
+
+\paragraph{IPsec group 3.} An archived search over the isogeny class of RFC
+2409 Oakley group 3 ($\FF_2[z]/(z^{155}+z^{62}+1)$, $N=12r$) screened 24{,}492
+Frobenius orbits and found no low-genus candidate in the implemented tests;
+the whole class was not enumerated and no resistance claim follows
+(\art{research/ghs_ipsec_isogeny_class_20261023/README.md}).
+
+\paragraph{Generalised binary GHS, explicitly.} Full nonzero-$c$ Hess screens
+at absolute degrees 6, 8, 10 and 12 (63, 255, 1{,}023 and 4{,}095 values) gave
+explicit maps and attack controls
+(\art{research/ghs_generalized_20261024/REPORT.md}). At degree 12, 147
+profiles have genus at most 2, including 15 of genus 1 over $\FF_{2^4}$, and the
+Weil bound ($\#\mathrm{Jac}\le25$ and $\le81$) rules out a homomorphism from
+the order-199 subgroup; the other 232 profiles are index-two genus-2
+profiles that a subfield change maps to one canonical form, presenting $P$ as
+$T-P$ for the 2-torsion point $T$. Every exact instance (subgroups of order
+19, 67, 43 and 199) verified end to end, and all belong to known
+GHS~\cite{ghs2002} and Hess families.
+
+\paragraph{A degree-73 descent at $n=37$.} A separable degree-73 isogeny of
+$y^2+xy=x^3+1$ over $\FF_{2^{37}}$ (74 rational cyclic kernels; a squarefree
+degree-36 kernel polynomial dividing the degree-2{,}664 division polynomial)
+was tested as a presentation change for the Boolean stage
+(\art{research/koblitz_isogeny_descent_37_results_20260925/RESULTS.md}). All
+128 systems completed and every planted decomposition verified on both
+curves, but the preregistered criterion (at least a 10\% F5 matrix XOR
+reduction in every cell, with no completion-degree increase) failed: the
+neighbour cut XORs by at least 10\% in 4 of 8 cells, regressed up to
+$2.00\times$, and raised the completion degree in 7 of 64 paired systems.
+The committed raw archive was found not to be gzip and was restored from the
+original workflow artifact; the result is unchanged.

@@ -374,10 +374,11 @@ Theorem~\ref{thm:lfd5} contradicts it in three cells:
 \begin{itemize}
 \item $(n,m,t,k)=(35,2,2,18)$, with random subspaces;
 \item $(45,2,2,23)$, with his own default subspace;
-\item $(19,3,3,7)$ and $(21,3,3,7)$, inside the parameter range of his
-  tables, where his polynomial subspace gives 4 and random subspaces do
-  not.
+\item $(19,3,3,7)$, inside the parameter range of his tables, where his
+  polynomial subspace gives 4 and random subspaces do not.
 \end{itemize}
+Implementation~A alone also gives $1\notin W_4$ at $(21,3,3,7)$, with no
+checked certificate.
 \end{corollary}
 
 Table~\ref{tab:fd-chain} lists the chain instances. With Semaev's
@@ -393,6 +394,80 @@ Certified codimensions as in Table~\ref{tab:fd-binary}; C21a and C21b have
 no checked certificate: $1\notin W_4$ by implementation~A alone. Source:
 \art{crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/instances_t3.json}.}
 \label{tab:fd-chain}
+\end{table}
+
+\paragraph{Per-instance records.} Tables~\ref{tab:bin-fd-inst-a}
+and~\ref{tab:bin-fd-inst-b} list all 93 committed $m=2$ instances behind
+Table~\ref{tab:fd-binary}, one row each, at the highest closure degree run.
+Table~\ref{tab:bin-fd-certs} lists the 13 certificate checks.
+Figure~\ref{fig:bin-fd-closure} plots the column count and the wall time per
+instance. At $D=4$ every recorded column count is a function of $k$ alone
+($n=39$ and $n=40$, both $k=20$, read 102{,}091), from 2{,}517 at $n=15$ to
+179{,}447 at $n=45$. The recorded wall time at the top degree runs from
+0.0\,s (R11b) to 2{,}001.3\,s (P43a). The certificate closures were rerun
+separately and their times differ from the survey run: P45a reads
+1{,}850.7\,s in \texttt{instances.json} and about 6{,}000\,s in
+\texttt{certificates.txt}. The source records no host for either.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-bin-fd-closure.pdf}
+\caption[]{Binary $\Sem3$ descent, $m=2$, $k=\lceil n/2\rceil$, one marker per
+instance (families offset horizontally by $\pm0.3$ for legibility). Left:
+monomial columns of the degree-4 closure matrix, instances run to $D=4$.
+Right: recorded wall time of the closure at the highest degree run (3 or 4),
+log scale; 0.0\,s values plotted at 0.05\,s. Filled markers refute
+($1\in W_D$), open markers do not ($d_{\tilde F}\ge5$). Host not recorded.
+Data: \art{figures/data-bin-fd-instances.json}, from
+\art{crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/instances.json};
+plot: \art{figures/make_fig_bin_fd_closure.py}.}
+\label{fig:bin-fd-closure}
+\end{figure}
+
+\begin{table}[p]
+\centering\scriptsize\setlength{\tabcolsep}{3.5pt}
+\input{figures/tab-bin-fd-instances-a}
+\caption[Per-instance closures, polynomial subspaces]{Per-instance closures
+of the binary $m=2$ descent, polynomial subspaces (P: curve-derived $z$; S:
+uniform $z$, Semaev's cell). $D$ is the highest closure degree run;
+$\dim W_D$ and the column count are as recorded; codim $=$ columns $-\dim W_D$
+(derived; given where $1\notin W_D$); ``$1\in W_D$'' marks refutation at
+$D$. Seconds: recorded wall time at degree $D$, host not recorded.
+$d_{\tilde F}$: last fall degree, exact or a lower bound. cert.: first eight
+hex digits of the SHA-256 of a VALID independent check of $1\notin W_4$
+(Table~\ref{tab:bin-fd-certs}). Laid out by
+\art{figures/make_fig_bin_tables.py} from
+\art{figures/data-bin-fd-instances.json}, which copies
+\art{crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/instances.json}
+and \art{crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/certificates.txt}.}
+\label{tab:bin-fd-inst-a}
+\end{table}
+
+\begin{table}[p]
+\centering\scriptsize\setlength{\tabcolsep}{3.5pt}
+\input{figures/tab-bin-fd-instances-b}
+\caption[Per-instance closures, random subspaces]{Per-instance closures of
+the binary $m=2$ descent, random subspaces (R: curve-derived $z$; U: uniform
+$z$; T: inside $\ker\operatorname{Tr}$). Columns as in
+Table~\ref{tab:bin-fd-inst-a}. R35a is listed as $\ge5$, as recorded in
+\texttt{instances.json}; Theorem~\ref{thm:lfdexact} makes it exactly 5 by
+branching (Lemma~\ref{lem:branch}). R39a and R39b have no certificate.}
+\label{tab:bin-fd-inst-b}
+\end{table}
+
+\begin{table}[t]
+\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\input{figures/tab-bin-fd-certs}
+\caption[]{The 13 VALID certificate checks of $1\notin W_4(F)$: $m=2$
+instances (Q: the two satisfiable random-subspace instances, with their
+Boolean solution counts) and the $m=t=3$ chain instances C19a, C19b.
+$\dim W_d$ is the cumulative dimension of $W_4\cap B_{\le d}$; ``codim
+$\ge$'' is the certified bound; closure and check seconds as recorded
+(P45a's closure time is given as about 6{,}000\,s in the source). Data:
+\art{figures/data-bin-fd-instances.json}, from
+\art{crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/certificates.txt}
+and \texttt{instances\_sat.json}.}
+\label{tab:bin-fd-certs}
 \end{table}
 
 \paragraph{What is new, and what is not.} That the degree of regularity
@@ -432,7 +507,7 @@ of the systems, carried by a certificate any reader can check. With
 Corollary~\ref{cor:ffd2} it makes the separation between first and last
 fall degree rigorous on named instances. What remains open is the same
 as before: a proof that $d_{\tilde F}\to\infty$. Semaev's asymptotics
-survive if the regularity degree is $o(\sqrt{n\ln n})$, so only a growing
+survive if the regularity degree is $o(\sqrt{n/\ln n})$, so only a growing
 lower bound bears on the subexponential claim.
 
 \paragraph{Re-verification.} For this treatise, the T33a certificate was
@@ -645,7 +720,8 @@ null). None was observed in $n$ at a fixed base.
     4).
   \item It is certified on named binary instances: $\ge5$ against 2, at
     $n=33$--$45$ and in the $m=t=3$ chain.
-  \item It is measured for Kummer towers (6 against 4 at $t=10$).
+  \item It is session-reported for Kummer towers (6 against 4 at $t=10$;
+    raw data not committed).
   \end{itemize}
   Any complexity argument that substitutes the first fall degree for the
   solving degree is unsupported for these systems.
