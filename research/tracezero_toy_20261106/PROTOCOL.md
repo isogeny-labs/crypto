@@ -134,3 +134,18 @@ Frozen before the replication data. The post hoc A4 run left one residual: k = 2
 - **Validity**: positive control excludes 0 and A/A half-width ≤ 0.05, as before.
 - **Reading**: replicated only if the k = 2 interval excludes 0 on the negative side. This
   tests one cell, so it says nothing about other (k, d) and no cost claim follows.
+
+## Amendment A6 (2026-11-06): pre-registered rerun without degenerate V
+
+Frozen before the data. A4/A5 and `explore_line_classes.py` explain the k = 2, d = 1 residual
+by degenerate V (V contains a nonzero g with g^p = g or g^p = −g). This run excludes them:
+`TZ_EXCL=1 TZ_SYM=1 TZ_SALT=rep2`, both V draws (trace and A/A) resampled until non-degenerate.
+For k = 3 only g ∈ F_p can occur; for d = 2 the whole span is checked.
+
+- **Runs**: (a) d = 1, k ∈ {2, 3}, p ∈ {17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61};
+  (b) d = 2, k ∈ {2, 3}, p ∈ {17, 19, 23, 29, 31}. 200 curves × 20 V-pairs; independent seeds.
+- **Statistics and rule**: as A1/A2, pooled over p ≥ 17 per (k, d) cell, symmetric null.
+- **Prediction**: if the explanation is complete, every (k, d) cell's Δcov_2 and Δcov_3 interval
+  contains 0 and the registered verdict is "no structure detected". If any interval excludes 0
+  the residual is not fully explained by degenerate V.
+- **Validity**: positive control excludes 0; A/A half-width ≤ 0.05.
