@@ -28,6 +28,8 @@ scientific session ran, and no scientific seed was consumed.
   µs. The rho-neg and rho-plain arms solve in 52.7–228.5 µs. The `ic-mitm` arm
   was refused in 6 of its 12 executions (549–996 µs over 6 below the minimum).
 
+Graph: [`reports/v3a2-qualification/solve-times-vs-l2-minimum.pdf`](reports/v3a2-qualification/solve-times-vs-l2-minimum.pdf) (also SVG and PNG; `summary.json` holds the numbers).
+
 ## Consequence for the design
 
 The 1.0 ms minimum belongs to the instrument, not to the host, and fp20 is too
