@@ -616,3 +616,195 @@ fn unsupported_configurations_are_rejected_even_without_attempts() {
     r["method"]["params"]["encoding"] = json!("expanded4");
     assert!(math(&r).is_err());
 }
+
+fn inclusive_tree() -> (tempfile::TempDir, Value) {
+    let d = tempfile::tempdir().unwrap();
+    let r = audit::record_line(&seal(fixture())).unwrap();
+    let mut profiled = r.clone();
+    profiled["time"]["user_ns"] = json!(21);
+    fs::write(d.path().join("profiled.jsonl"), seal(profiled)).unwrap();
+    let part = |name: &str, trigger: &str, ir: u64| {
+        let bytes = format!(
+            "desc: Trigger: Client Request: {trigger}\nevents: Ir\nsummary: {ir}\ntotals: {ir}\n"
+        );
+        fs::write(d.path().join(name), bytes.as_bytes()).unwrap();
+        json!({"path":name,"sha256":hash(bytes.as_bytes())})
+    };
+    let method = vec![
+        part("method.1", "ecbench_before_solve", 10),
+        part("method.2", "ecbench_before_online", 2),
+        part("method.3", "phase", 3),
+        part("method.4", "ecbench_online", 5),
+        part("method.5", "ecbench_solve", 7),
+    ];
+    let scalar = vec![
+        part("scalar.1", "ecbench_before_solve", 4),
+        part("scalar.2", "ecbench_solve", 11),
+    ];
+    let mut receipt = audit::scalar_record(&r).unwrap();
+    receipt["binary_sha256"] = json!("1".repeat(64));
+    write(d.path(), "scalar.json", &receipt);
+    let packet = json!({"schema":"aps.inclusive-ir/v1","record_id":r["record_id"],"scope":"method_plus_independent_scalar_check", "thread_mode":"combined",
+        "source_commit":"0".repeat(40),"protocol_sha256":"2".repeat(64),"binary_sha256":r["binary_sha256"],
+        "profiled_record":"profiled.jsonl","trajectory_sha256":inclusive::trajectory(&r).unwrap(),"method_parts":method,"scalar_parts":scalar,
+        "verifier_binary_sha256":"1".repeat(64),"verifier_receipt":"scalar.json"});
+    write(d.path(), "inclusive.json", &packet);
+    (d, r)
+}
+
+#[test]
+fn inclusive_method_and_scalar_cost_have_one_closed_unit() {
+    let (d, r) = inclusive_tree();
+    let root = EvidenceRoot::new(d.path()).unwrap();
+    let (v, pins) = inclusive::read(&root, "inclusive.json", &r).unwrap();
+    assert_eq!(v["method_ir"], 17);
+    assert_eq!(v["independent_scalar_check_ir"], 11);
+    assert_eq!(v["total_ir"], 28);
+    assert_eq!(v["method_online_ir"], 8);
+    assert_eq!(v["wall_qualified"], false);
+    assert_eq!(v["execution_attested"], false);
+    assert_eq!(pins.len(), 10);
+}
+#[test]
+fn profiling_cannot_change_a_search_trajectory() {
+    let (d, r) = inclusive_tree();
+    let mut replay: Value =
+        serde_json::from_str(&fs::read_to_string(d.path().join("profiled.jsonl")).unwrap())
+            .unwrap();
+    replay["counters"]["aps_attempts"] = json!(2);
+    fs::write(d.path().join("profiled.jsonl"), seal(replay)).unwrap();
+    assert!(inclusive::read(&EvidenceRoot::new(d.path()).unwrap(), "inclusive.json", &r).is_err());
+}
+#[test]
+fn missing_or_changed_ir_parts_cannot_be_filled_with_zero() {
+    let (d, r) = inclusive_tree();
+    let mut packet: Value =
+        serde_json::from_slice(&fs::read(d.path().join("inclusive.json")).unwrap()).unwrap();
+    packet["method_parts"].as_array_mut().unwrap().remove(2);
+    write(d.path(), "inclusive.json", &packet);
+    assert!(inclusive::read(&EvidenceRoot::new(d.path()).unwrap(), "inclusive.json", &r).is_err());
+    let (d, r) = inclusive_tree();
+    fs::write(d.path().join("scalar.2"), "changed").unwrap();
+    assert!(inclusive::read(&EvidenceRoot::new(d.path()).unwrap(), "inclusive.json", &r).is_err());
+}
+#[test]
+fn inclusive_counts_preserve_integers_above_binary64_precision() {
+    let (d, r) = inclusive_tree();
+    let mut p: Value =
+        serde_json::from_slice(&fs::read(d.path().join("inclusive.json")).unwrap()).unwrap();
+    let big = (1u64 << 53) + 100;
+    let raw = format!("desc: Trigger: Client Request: ecbench_solve\nevents: Ir\nsummary: {big}\n");
+    fs::write(d.path().join("method.5"), &raw).unwrap();
+    p["method_parts"][4]["sha256"] = json!(hash(raw.as_bytes()));
+    write(d.path(), "inclusive.json", &p);
+    let (v, _) =
+        inclusive::read(&EvidenceRoot::new(d.path()).unwrap(), "inclusive.json", &r).unwrap();
+    assert_eq!(v["method_ir"], (big + 10).to_string());
+    assert_eq!(v["total_ir"], (big + 21).to_string());
+}
+#[test]
+fn a_required_but_missing_cost_preserves_rows_and_blocks_qualification() {
+    let d = tree();
+    let mut p: Value =
+        serde_json::from_slice(&fs::read(d.path().join("protocol.json")).unwrap()).unwrap();
+    p["extensions"]["aps_export"]["require_inclusive_ir"] = json!(true);
+    p["freeze"]["protocol_sha256"] = json!(protocol_hash(&p).unwrap());
+    write(d.path(), "protocol.json", &p);
+    let e = build(&d).unwrap();
+    assert_eq!(e["runs"].as_array().unwrap().len(), 3);
+    assert_eq!(
+        e["backend_record"]["missing_inclusive_ir_slots"],
+        json!([0, 1, 2])
+    );
+    assert!(package::check(&EvidenceRoot::new(d.path()).unwrap(), &e).is_err());
+}
+#[test]
+fn an_unknown_aps_version_cannot_escape_audit() {
+    let mut r = fixture();
+    r["detail"]["schema"] = json!("ecbench.aps/unknown");
+    assert!(audit::metrics(&r).is_err());
+    assert!(math(&r).is_err());
+}
+
+#[test]
+fn native_export_reconstructs_all_instruction_rows_and_pins_the_frozen_protocol() {
+    let d = tree();
+    let (sample, _) = inclusive_tree();
+    let mut protocol: Value =
+        serde_json::from_slice(&fs::read(d.path().join("protocol.json")).unwrap()).unwrap();
+    protocol["extensions"]["aps_export"]["require_inclusive_ir"] = json!(true);
+    protocol["freeze"]["protocol_sha256"] = json!(protocol_hash(&protocol).unwrap());
+    write(d.path(), "protocol.json", &protocol);
+    let records = fs::read_to_string(d.path().join("records.jsonl")).unwrap();
+    let mut bindings = vec![];
+    for (seq, line) in records.lines().enumerate() {
+        let record = audit::record_line(line).unwrap();
+        let dir = format!("ir-{seq}");
+        fs::create_dir(d.path().join(&dir)).unwrap();
+        let mut packet: Value =
+            serde_json::from_slice(&fs::read(sample.path().join("inclusive.json")).unwrap())
+                .unwrap();
+        packet["record_id"] = record["record_id"].clone();
+        packet["protocol_sha256"] = protocol["freeze"]["protocol_sha256"].clone();
+        packet["trajectory_sha256"] = json!(inclusive::trajectory(&record).unwrap());
+        for key in ["method_parts", "scalar_parts"] {
+            for part in packet[key].as_array_mut().unwrap() {
+                let old = text(&part["path"]).unwrap().to_string();
+                let new = format!("{dir}/{old}");
+                fs::copy(sample.path().join(&old), d.path().join(&new)).unwrap();
+                part["path"] = json!(new);
+            }
+        }
+        let mut profiled = record.clone();
+        profiled["time"]["user_ns"] = json!(21);
+        let profile_path = format!("{dir}/profiled.jsonl");
+        fs::write(d.path().join(&profile_path), seal(profiled)).unwrap();
+        packet["profiled_record"] = json!(profile_path);
+        let mut receipt = audit::scalar_record(&record).unwrap();
+        receipt["binary_sha256"] = packet["verifier_binary_sha256"].clone();
+        let receipt_path = format!("{dir}/scalar.json");
+        write(d.path(), &receipt_path, &receipt);
+        packet["verifier_receipt"] = json!(receipt_path);
+        let path = format!("{dir}/inclusive.json");
+        write(d.path(), &path, &packet);
+        bindings.push(json!({"seq":seq,"path":path}));
+    }
+    let mut request: Value =
+        serde_json::from_slice(&fs::read(d.path().join("request.json")).unwrap()).unwrap();
+    request["inclusive_profiles"] = json!(bindings);
+    write(d.path(), "request.json", &request);
+    let export = build(&d).unwrap();
+    assert_eq!(export["runs"].as_array().unwrap().len(), 3);
+    for row in export["runs"].as_array().unwrap() {
+        assert_eq!(row["measurements"]["counted"]["total_ir"], 28);
+    }
+    let root = EvidenceRoot::new(d.path()).unwrap();
+    package::check(&root, &export).unwrap();
+    let mut bad: Value = root.json("ir-1/inclusive.json").unwrap();
+    bad["protocol_sha256"] = json!("f".repeat(64));
+    write(d.path(), "ir-1/inclusive.json", &bad);
+    assert!(build(&d).is_err());
+    bad["protocol_sha256"] = protocol["freeze"]["protocol_sha256"].clone();
+    bad["method_parts"] = root.json("ir-0/inclusive.json").unwrap()["method_parts"].clone();
+    write(d.path(), "ir-1/inclusive.json", &bad);
+    assert!(
+        build(&d).is_err(),
+        "a second execution cannot reuse the first execution's raw frame paths"
+    );
+}
+
+#[cfg(unix)]
+#[test]
+fn scalar_frame_cannot_alias_method_parts_through_local_symlinks() {
+    let (d, r) = inclusive_tree();
+    let mut packet: Value =
+        serde_json::from_slice(&fs::read(d.path().join("inclusive.json")).unwrap()).unwrap();
+    for (dst, src, index) in [("scalar.1", "method.1", 0), ("scalar.2", "method.5", 1)] {
+        fs::remove_file(d.path().join(dst)).unwrap();
+        std::os::unix::fs::symlink(src, d.path().join(dst)).unwrap();
+        packet["scalar_parts"][index]["sha256"] =
+            json!(hash(&fs::read(d.path().join(src)).unwrap()));
+    }
+    write(d.path(), "inclusive.json", &packet);
+    assert!(inclusive::read(&EvidenceRoot::new(d.path()).unwrap(), "inclusive.json", &r).is_err());
+}

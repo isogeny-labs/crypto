@@ -1,0 +1,279 @@
+{
+  "schema": "aps.final-component-checks/v1",
+  "standing": "unverified producer assertions",
+  "algorithm_reader_commit": "413a93d6f9940c855200468175174126136bb49c",
+  "algorithm_reader_tree": "7de87030db563d43eaaf746275b876c395534925",
+  "source_pins": {
+    "examples/aps_scalar_check.rs": "b1589d576e299f02a94cd46c09a44c5fb7e493a4146a36a4cdef4bb078823b76",
+    "src/cryptanalysis/aps_single_relation.rs": "261d9bc0fb8af0c7088ffb2df383bc6bfe4117a74f618950d25a697b94299c8a",
+    "src/cryptanalysis/aps_single_relation/leads.rs": "1d091f5c20daf2ca8eb16ee31a0ac90f24ad0ebda9dc81c27e07b39f0f335eac",
+    "src/cryptanalysis/ecbench/aps/mod.rs": "43bb07b98e8bf0aad94afa4313614a8a7f6e00669969d559630b80ce2c477585",
+    "src/cryptanalysis/ecbench/aps/tests.rs": "57031a027046ea8b817d5fb701a399814d3cd768548c985fbed4c65b5ef3d9e0",
+    "src/cryptanalysis/ecbench/callgrind.rs": "64ace681c6ecdca26895f7789164e9225d5d785ec9a620547888a5a44814a724",
+    "src/cryptanalysis/ecbench/methods.rs": "8ff59b55ceddad6d6edb80fc0e5f9264649214039efff2ef0c44576911392164",
+    "src/cryptanalysis/ecbench/optimization.rs": "872d24b5e82b6a6895f4ca8b678dac58e03e78f6a321398f9d767abea5583df7",
+    "src/cryptanalysis/ecbench/registry_audit_tests.rs": "00ff3936de48b473942fe3901a1b1aac42c9a37394c224b2d86d517d777e71af",
+    "src/cryptanalysis/f4_fp.rs": "9a917100358d9142be733131cfcdbb816c46dc1d9630c280c8990d7ec90b1ade",
+    "src/cryptanalysis/f4_fp/reuse.rs": "9db1f3bb6133bbd9cb97ce9e4118d1592f2c5a05ea50fe95fdd0d8fd6178318e",
+    "src/cryptanalysis/ic_measurement.rs": "b2bc883f7a7cfc194ebcba78991b9aca901285acebf01187f56bd3e6fe57f980",
+    "tests/aps_cost_leads.rs": "eeb976123b8acd27d3e2455ced38b15b5771a7afe047578866510579f77ec303",
+    "tools/aps-export/Cargo.lock": "d10588947f62d3a834540040a6fc044a124c6b9a7d496ad6480ba63aa6170379",
+    "tools/aps-export/Cargo.toml": "ad640ffa6ff591d38bae52ca5ca8493567d2ed1ecb5c8126b9ae0fcf8e0f7e43",
+    "tools/aps-export/src/audit.rs": "1d295d550ee008e93edd06c11638cacebdbdcec56f5c0c3fce3ad7b2024be5f8",
+    "tools/aps-export/src/audit/leads.rs": "2424457c2a49538fb1bb78366460a12d87fc37a184b388d96e6f60e0541fe60a",
+    "tools/aps-export/src/inclusive.rs": "360c846e5a2d554fa3d4bcffecadac15636345cfa2c1ed2de25b2e505d53be1d",
+    "tools/aps-export/src/lib.rs": "6933c3c32852d6abae708745cb2b14ea3fe680cc8453c63f4dfad96cf206d779",
+    "tools/aps-export/src/main.rs": "37cdf55f0a8dd8b2f27f98c3f2556fd211991cb4b8b4f05f21d9150d66b86626",
+    "tools/aps-export/src/package.rs": "4ab5d63c15784447fe9f1bad8313bb7b28492142f15739ba1d79e8e2ac08b4c5",
+    "tools/aps-export/src/tests.rs": "092f22a3b189130a8438fe733f5728356afe34fe5073726d85543d04ed910fcd"
+  },
+  "observations": [
+    {
+      "id": "nov6-native-session-final/leads",
+      "source_commit_at_driver_start": "413a93d6f9940c855200468175174126136bb49c",
+      "source_tree_at_driver_start": "7de87030db563d43eaaf746275b876c395534925",
+      "exit": 0,
+      "command": "cargo test --release --locked --config profile.release.package.crypto.codegen-units=256 --test aps_cost_leads -- --test-threads=2",
+      "profile_note": "default release; maintained 256 root codegen units for tests",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 8,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "private_log_sha256": "ab71f5d93208b8153a65548816c265e359591b0a4b6984f9b3b6097579729418",
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-native-session-final/existing-bridge",
+      "source_commit_at_driver_start": "413a93d6f9940c855200468175174126136bb49c",
+      "source_tree_at_driver_start": "7de87030db563d43eaaf746275b876c395534925",
+      "exit": 0,
+      "command": "cargo test --release --locked --config profile.release.package.crypto.codegen-units=256 --test aps_export_bridge --test aps_ecbench -- --test-threads=2",
+      "profile_note": "default release; maintained 256 root codegen units for tests",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "status": "ok",
+          "passed": 3,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "private_log_sha256": "7682fc52c512181248a9e1e4a8808323b5bed144a874643e1cc4e2c9fdc4f819",
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-native-session-final/examples",
+      "source_commit_at_driver_start": "413a93d6f9940c855200468175174126136bb49c",
+      "source_tree_at_driver_start": "7de87030db563d43eaaf746275b876c395534925",
+      "exit": 0,
+      "command": "cargo test --release --locked --config profile.release.package.crypto.codegen-units=256 --example aps_single_relation_check --example aps_scalar_check",
+      "profile_note": "default release; maintained 256 root codegen units for tests",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 0,
+          "failed": 0,
+          "ignored": 0
+        },
+        {
+          "status": "ok",
+          "passed": 10,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "private_log_sha256": "dd3ed9d731776d2819bbb03c28e9f222f25b0fa1da213036b59898c484155930",
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-native-session-final/lint-198",
+      "source_commit_at_driver_start": "413a93d6f9940c855200468175174126136bb49c",
+      "source_tree_at_driver_start": "7de87030db563d43eaaf746275b876c395534925",
+      "exit": 0,
+      "command": "cargo +1.98.0 clippy --release --locked --test aps_cost_leads -- -D warnings",
+      "profile_note": "default release; maintained 256 root codegen units for tests",
+      "test_summaries": [],
+      "private_log_sha256": "2f5bf6542b2b4358de6cd96380882ed1ea08ba3da739c0f57e5ec2461953b589",
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-native-session-final/lint-stable",
+      "source_commit_at_driver_start": "413a93d6f9940c855200468175174126136bb49c",
+      "source_tree_at_driver_start": "7de87030db563d43eaaf746275b876c395534925",
+      "exit": 0,
+      "command": "cargo clippy --release --locked --test aps_cost_leads -- -D warnings",
+      "profile_note": "default release; maintained 256 root codegen units for tests",
+      "test_summaries": [],
+      "private_log_sha256": "d22231246c6e840ab1a76ddf3bbd3354fa8f12b86cca37820263d9e293570c88",
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-integrated-closeout/registry",
+      "source_commit_at_driver_start": "01f4059d40363a4b4363ba4e02f212e77873eddf",
+      "source_tree_at_driver_start": "2c51399cc414366dc5aad22591d2cf7fd12cbd75",
+      "exit": 0,
+      "command": "cargo test --release --locked --config profile.release.package.crypto.codegen-units=256 --config profile.release.package.crypto.debug=\\\"line-tables-only\\\" --lib registry_audit_tests -- --test-threads=2",
+      "profile_note": "release; maintained 256 root codegen units; filtered unit tests add line-table debug info solely to obtain a distinct live artifact",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 7,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "private_log_sha256": "b54def4af2bb206e2b83d8ee502679b0628aee3684cb792d9d9860cf5d76e9fa",
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-integrated-closeout/optimization",
+      "source_commit_at_driver_start": "01f4059d40363a4b4363ba4e02f212e77873eddf",
+      "source_tree_at_driver_start": "2c51399cc414366dc5aad22591d2cf7fd12cbd75",
+      "exit": 0,
+      "command": "cargo test --release --locked --config profile.release.package.crypto.codegen-units=256 --config profile.release.package.crypto.debug=\\\"line-tables-only\\\" --lib optimization::tests -- --test-threads=2",
+      "profile_note": "release; maintained 256 root codegen units; filtered unit tests add line-table debug info solely to obtain a distinct live artifact",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 4,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "private_log_sha256": "90ff4e1a95fc84c00ea725fcfb13b92fe126e9fdc5292b6ee20fbea5b28a1438",
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-integrated-closeout/aps_single_relation",
+      "source_commit_at_driver_start": "01f4059d40363a4b4363ba4e02f212e77873eddf",
+      "source_tree_at_driver_start": "2c51399cc414366dc5aad22591d2cf7fd12cbd75",
+      "exit": 0,
+      "command": "cargo test --release --locked --config profile.release.package.crypto.codegen-units=256 --config profile.release.package.crypto.debug=\\\"line-tables-only\\\" --lib aps_single_relation -- --test-threads=2",
+      "profile_note": "release; maintained 256 root codegen units; filtered unit tests add line-table debug info solely to obtain a distinct live artifact",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 40,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "private_log_sha256": "22c587192fbd0b8e8e26219e198b1c28c156b08fbb0189d5798521feb400b384",
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-integrated-closeout/f4_fp",
+      "source_commit_at_driver_start": "01f4059d40363a4b4363ba4e02f212e77873eddf",
+      "source_tree_at_driver_start": "2c51399cc414366dc5aad22591d2cf7fd12cbd75",
+      "exit": 0,
+      "command": "cargo test --release --locked --config profile.release.package.crypto.codegen-units=256 --config profile.release.package.crypto.debug=\\\"line-tables-only\\\" --lib f4_fp -- --test-threads=2",
+      "profile_note": "release; maintained 256 root codegen units; filtered unit tests add line-table debug info solely to obtain a distinct live artifact",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 76,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "private_log_sha256": "a2af372021cd5c233a441562d79408ac7d798285c2f4e75697436f428c99e3f3",
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-integrated-closeout/ecbench-aps",
+      "source_commit_at_driver_start": "01f4059d40363a4b4363ba4e02f212e77873eddf",
+      "source_tree_at_driver_start": "2c51399cc414366dc5aad22591d2cf7fd12cbd75",
+      "exit": 0,
+      "command": "cargo test --release --locked --config profile.release.package.crypto.codegen-units=256 --config profile.release.package.crypto.debug=\\\"line-tables-only\\\" --lib ecbench::aps -- --test-threads=2",
+      "profile_note": "release; maintained 256 root codegen units; filtered unit tests add line-table debug info solely to obtain a distinct live artifact",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 14,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "private_log_sha256": "26ce4ebcee2445b63b2ec10da37a952185c0945236f99fd106001ab3409c285d",
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-integrated-closeout/ecbench-callgrind",
+      "source_commit_at_driver_start": "01f4059d40363a4b4363ba4e02f212e77873eddf",
+      "source_tree_at_driver_start": "2c51399cc414366dc5aad22591d2cf7fd12cbd75",
+      "exit": 0,
+      "command": "cargo test --release --locked --config profile.release.package.crypto.codegen-units=256 --config profile.release.package.crypto.debug=\\\"line-tables-only\\\" --lib ecbench::callgrind -- --test-threads=2",
+      "profile_note": "release; maintained 256 root codegen units; filtered unit tests add line-table debug info solely to obtain a distinct live artifact",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 5,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "private_log_sha256": "339e3dcc46172bcfa4e520ec069645840224b1f09926277f77252e6d22654f6f",
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-integrated-closeout/glv_invariant_base",
+      "source_commit_at_driver_start": "01f4059d40363a4b4363ba4e02f212e77873eddf",
+      "source_tree_at_driver_start": "2c51399cc414366dc5aad22591d2cf7fd12cbd75",
+      "exit": 0,
+      "command": "cargo test --release --locked --config profile.release.package.crypto.codegen-units=256 --config profile.release.package.crypto.debug=\\\"line-tables-only\\\" --lib glv_invariant_base -- --test-threads=2",
+      "profile_note": "release; maintained 256 root codegen units; filtered unit tests add line-table debug info solely to obtain a distinct live artifact",
+      "test_summaries": [
+        {
+          "status": "ok",
+          "passed": 15,
+          "failed": 0,
+          "ignored": 0
+        }
+      ],
+      "private_log_sha256": "8c17ff774ea73815297ab0ec9da5d2fc5260b4fdbc08fe3608b3ff70856381d7",
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-integrated-closeout/lint-198",
+      "source_commit_at_driver_start": "01f4059d40363a4b4363ba4e02f212e77873eddf",
+      "source_tree_at_driver_start": "2c51399cc414366dc5aad22591d2cf7fd12cbd75",
+      "exit": 0,
+      "command": "cargo +1.98.0 clippy --release --locked --lib --tests --example aps_single_relation_check --example aps_scalar_check -- -D warnings",
+      "profile_note": "release; maintained 256 root codegen units; filtered unit tests add line-table debug info solely to obtain a distinct live artifact",
+      "test_summaries": [],
+      "private_log_sha256": "6b971cda559ecd38b84afb55d28568d6b83c923a13b60629afd2a5ad5267cce8",
+      "performance_evidence": false
+    },
+    {
+      "id": "nov6-integrated-closeout/lint-stable",
+      "source_commit_at_driver_start": "01f4059d40363a4b4363ba4e02f212e77873eddf",
+      "source_tree_at_driver_start": "2c51399cc414366dc5aad22591d2cf7fd12cbd75",
+      "exit": 0,
+      "command": "cargo clippy --release --locked --lib --tests --example aps_single_relation_check --example aps_scalar_check -- -D warnings",
+      "profile_note": "release; maintained 256 root codegen units; filtered unit tests add line-table debug info solely to obtain a distinct live artifact",
+      "test_summaries": [],
+      "private_log_sha256": "a50f4a953f17e887d3844be51c0df233623b83d4462c96d5392c2671458d7fef",
+      "performance_evidence": false
+    }
+  ],
+  "boundary_notes": [
+    "The seven registry and four optimization tests rerun the introduced missing-inventory failures without changing their assertions or exemption lists.",
+    "The eighth public lead test runs a fresh native L0 correctness session, record sealing, separate reader and native static audit; rho alone receives count replay. This is not a performance, execution-proof or APS count-replay result.",
+    "The closeout driver starts at 01f4059d4. Its core, registry, optimization and other unit/lint inputs are unchanged by 413a93, which only adds the eighth public test. That new test separately passed both strict toolchain lints at 413a93.",
+    "Filtered unit tests use release optimization and line-table debug info, preserving the separately live old broad executable. No assertion configuration was relaxed.",
+    "The broad library run compiled ffd0bd0d and is still in flight. It has no final verdict here; targeted repair passes do not replace its outcome.",
+    "The separate standalone reader results remain at their AAC source boundary in completed-components.json; reader sources are unchanged at 413a93."
+  ],
+  "raw_logs_published": false,
+  "source_checkpoint_completed": false,
+  "benchmark_launched": false
+}

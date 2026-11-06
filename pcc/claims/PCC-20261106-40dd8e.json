@@ -1,0 +1,33 @@
+{
+ "created_at": "2026-11-06T18:31:05Z",
+ "id": "PCC-20261106-40dd8e",
+ "kind": "theorem",
+ "producer": {
+  "commit": "63f168e4aaad06dc1d6999d8e814891140c081ee",
+  "model": "codex",
+  "session": "aps-cost-leads-fenced-continuation-20261106"
+ },
+ "proofs": [
+  {
+   "decl_sha256": "218d7ffe2d66fefa2d30251c36b5d706aef8ac62177c8b4c5c8e4f45e49b3e7f",
+   "kind": "lean",
+   "path": "research/aps_cost_leads_20261106/lean/Frontier.lean",
+   "theorem": "APSLeads.first_failure"
+  },
+  {
+   "decl_sha256": "9b8209ba97bef807d6961ce6e840e85ee9961e30b80f98f641201431f24c8e4f",
+   "kind": "lean",
+   "path": "research/aps_cost_leads_20261106/lean/Frontier.lean",
+   "theorem": "APSLeads.frontier_cover"
+  },
+  {
+   "decl_sha256": "107c44c4fe28e3aad1df6996565109365cb7d16b8d647bf5ca5f195a2c7c5a54",
+   "kind": "lean",
+   "path": "research/aps_cost_leads_20261106/lean/Frontier.lean",
+   "theorem": "APSLeads.frontier_unique"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Three declarations in research/aps_cost_leads_20261106/lean/Frontier.lean; arbitrary finite coordinate-membership predicates with the explicit subset hypothesis",
+ "statement": "For a fixed finite tuple with coordinate-membership predicates old and new, pointwise old-subset-new implies the new-product-minus-old-product is the union of its first-new-coordinate regions, and the region index is unique. The file also proves existence of the first finite predicate failure. This claim is exactly the three pinned Lean declarations, not Rust/F4 correctness, sampling completeness, a full line-chart lifting theorem or a performance result."
+}

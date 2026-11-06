@@ -116,6 +116,7 @@ const POLICIES: &[PolicyDecl] = &[
     ),
     policy!("ic.aps_v1", NativeAdaptive, SpecializedDomain, StandardBand),
     policy!("ic.aps_v2", NativeAdaptive, SpecializedDomain, StandardBand),
+    policy!("ic.aps_v3", NativeAdaptive, SpecializedDomain, StandardBand),
     policy!(
         "ic.three_leads_genus2_pencil_symbolic_v2",
         NativeGrid,
@@ -618,6 +619,7 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         "attempts"
         | "budget_ms"
         | "cap_multiple"
+        | "growth_ceiling"
         | "matrix_coefficient_cap"
         | "max_pair_work"
         | "max_descent_ops"
@@ -637,6 +639,8 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "step_cap_factor"
         | "target_max_attempts"
         | "trial_cap"
+        | "trace_entries"
+        | "trace_words"
         | "unit_trials"
         | "units" => ResourceEnvelope,
         "baby"
@@ -662,6 +666,8 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "factor_base"
         | "factor_base_points"
         | "fb_size"
+        | "growth"
+        | "guess"
         | "independent"
         | "inner"
         | "jumps"
@@ -688,9 +694,11 @@ fn parameter_role(name: &str) -> Option<ParameterRole> {
         | "solver"
         | "stop"
         | "subset_size"
+        | "subset_profile"
         | "summands"
         | "table_scale"
         | "targets"
+        | "trace"
         | "unique_relations"
         | "walks" => Knob,
         _ => return None,
