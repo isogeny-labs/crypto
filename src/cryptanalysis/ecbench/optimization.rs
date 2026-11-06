@@ -439,6 +439,12 @@ const POLICIES: &[PolicyDecl] = &[
         FullPrice
     ),
     policy!(
+        "rho.signed_frobenius_v2_full",
+        ImplementationAb,
+        PricingSensitivity,
+        FullPrice
+    ),
+    policy!(
         "rho.signed_frobenius_strong_full",
         NativeGrid,
         PricingSensitivity,

@@ -412,6 +412,7 @@ const SKIPS: &[(&str, &str)] = &[
     ("ic.pipeline_full", "reprices a recorded ic.pipeline session (price-units, full_price); no solve of its own"),
     ("ic.pipeline_wordram", "reprices a recorded ic.pipeline session (price-units, wordram_price); no solve of its own"),
     ("rho.signed_frobenius_full", "reprices a recorded session (full_price)"),
+    ("rho.signed_frobenius_v2_full", "reprices a recorded session (full_price)"),
     ("rho.signed_frobenius_strong_full", "reprices a recorded session (full_price)"),
     ("rho.signed_frobenius_wordram", "reprices a recorded session (wordram_price)"),
     ("rho.signed_frobenius_strong_wordram", "reprices a recorded session (wordram_price)"),
