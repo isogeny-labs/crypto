@@ -1288,6 +1288,55 @@ fn summarize_inf(inf_rows: &str, a1_rows: &str, main_rows: &str, out: &str, clai
     print!("{md}");
 }
 
+/// Amendment A2: transformed solves at Macaulay degree 29 with `n` fresh
+/// matrices A_j (j = 1..n), each from its own seed, independent of the R2/R3
+/// draws. Only targets with a decomposition into at most 3 factor-base points.
+#[allow(clippy::too_many_arguments)]
+fn a2_solves(
+    curve: &Curve4,
+    h: &SymmetrisedS5,
+    fb: &[(u64, Pt4)],
+    r: &Pt4,
+    x0: &E4,
+    u: &E4,
+    ci: usize,
+    arm: &str,
+    name: &str,
+    ti: u64,
+    n: u64,
+    p: u64,
+    fh: &mut File,
+) {
+    if short_decomps(curve, fb, r).iter().sum::<usize>() == 0 {
+        return;
+    }
+    let lab = format!(
+        "\"p\":{p},\"curve\":{ci},\"arm\":\"{arm}\",\"target\":\"{name}\",\"fb_points\":{}",
+        fb.len()
+    );
+    for j in 1..=n {
+        let seed =
+            0xa2_0000 + ci as u64 * 10_000 + ti * 100 + j + if arm == "conj" { 0 } else { 50 };
+        let mut arng = StdRng::seed_from_u64(seed);
+        let a5 = random_gl5(p, &mut arng);
+        let row = solve_inf(
+            curve,
+            h,
+            fb,
+            r,
+            x0,
+            u,
+            &format!("{lab},\"set\":\"A2\",\"a_index\":{j},\"a_seed\":{seed},\"a\":\"{a5:?}\""),
+            Some(&a5),
+            0xdec0 + ci as u64,
+            29,
+        );
+        eprintln!("{row}");
+        writeln!(fh, "{row}").unwrap();
+        fh.flush().unwrap();
+    }
+}
+
 fn main() {
     let args: Vec<String> = env::args().skip(1).collect();
     if args.first().map(|s| s.as_str()) == Some("--summarize-inf") {
@@ -1318,6 +1367,9 @@ fn main() {
     let mut only_curve: Option<usize> = None;
     let mut only_failing = false;
     let mut inf = false;
+    // Amendment A2: number of fresh, independent transforms per curve target
+    // that has a short decomposition (0 = off).
+    let mut a2: u64 = 0;
     // Resume: skip solves already recorded in this rows file.
     let mut done_keys: HashSet<String> = HashSet::new();
     let mut i = 0;
@@ -1350,6 +1402,11 @@ fn main() {
             }
             "--only-decomposable" => only_failing = true,
             "--inf" => inf = true,
+            "--a2" => {
+                i += 1;
+                a2 = args[i].parse().unwrap();
+                inf = true;
+            }
             "--skip-existing" => {
                 i += 1;
                 if let Ok(t) = std::fs::read_to_string(&args[i]) {
@@ -1472,6 +1529,11 @@ fn main() {
                     continue;
                 }
                 if only_failing && mitm(&curve, fb, r).is_empty() {
+                    continue;
+                }
+                if a2 > 0 {
+                    let ti = targets.iter().position(|(n, _)| n == name).unwrap() as u64;
+                    a2_solves(&curve, h, fb, r, &x0, &u, ci, arm, name, ti, a2, p, &mut fh);
                     continue;
                 }
                 if inf && macdegs != [29] {
@@ -1605,6 +1667,31 @@ fn main() {
                     }
                     let lab = format!("\"p\":{p},\"curve\":{ci},\"arm\":\"{arm}\",\"target\":\"planted3_{k}{:?}\",\"fb_points\":{}", pts, fb.len());
                     let tname = format!("planted3_{k}{:?}", pts);
+                    if a2 > 0 {
+                        // consume R3's own transform draw so later targets are unchanged
+                        let _ = random_gl5(p, &mut prng);
+                        if only_arm.as_deref().is_some_and(|a| a != arm)
+                            || only_curve.is_some_and(|c| c != ci)
+                        {
+                            continue;
+                        }
+                        a2_solves(
+                            &curve,
+                            h,
+                            fb,
+                            &r,
+                            &x0,
+                            &u,
+                            ci,
+                            arm,
+                            &tname,
+                            10 + k as u64,
+                            a2,
+                            p,
+                            &mut fh,
+                        );
+                        continue;
+                    }
                     let k1 = format!("{ci}|\"{arm}\"|\"{tname}\"|\"R3\"|false");
                     let k2 = format!("{ci}|\"{arm}\"|\"{tname}\"|\"R3\"|true");
                     if done_keys.contains(&k1) && done_keys.contains(&k2) {
