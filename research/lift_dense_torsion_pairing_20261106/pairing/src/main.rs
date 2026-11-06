@@ -381,7 +381,8 @@ struct LineOut {
     tplus_ok: usize,
     x0_lifts: bool,
     raw: u64,
-    rows: u64,
+    rows: u64,     // PROTOCOL definition: distinct multisets {[2^e]P_i}
+    rows_vec: u64, // post hoc: distinct signed column vectors (after +/- cancellation)
 }
 
 fn measure(ctx: &Ctx, cv: &Curve, u: u64, e: u32, targets: &[Pt]) -> LineOut {
@@ -437,14 +438,19 @@ fn measure(ctx: &Ctx, cv: &Curve, u: u64, e: u32, targets: &[Pt]) -> LineOut {
         })
         .collect();
     let m = ctx.n as usize;
-    let (mut raw, mut rows) = (0u64, 0u64);
+    let (mut raw, mut rows, mut rows_vec) = (0u64, 0u64, 0u64);
+    let pp: Vec<Pt> = fb.iter().map(|&p| proj(p)).collect();
     for &r in targets {
         let mut found: Vec<Vec<usize>> = vec![];
         let mut chosen: Vec<usize> = vec![];
         rec(cv, &fb, &idx, m, 0, r, &mut chosen, &mut found);
         raw += found.len() as u64;
+        let mut msset: HashSet<Vec<Pt>> = HashSet::new();
         let mut rowset: HashSet<Vec<(u64, i64)>> = HashSet::new();
         for t in &found {
+            let mut ms: Vec<Pt> = t.iter().map(|&i| pp[i]).collect();
+            ms.sort_unstable();
+            msset.insert(ms);
             let mut acc: HashMap<u64, i64> = HashMap::new();
             for &i in t {
                 if let Some((x, s)) = pj[i] {
@@ -455,7 +461,8 @@ fn measure(ctx: &Ctx, cv: &Curve, u: u64, e: u32, targets: &[Pt]) -> LineOut {
             v.sort_unstable();
             rowset.insert(v);
         }
-        rows += rowset.len() as u64;
+        rows += msset.len() as u64;
+        rows_vec += rowset.len() as u64;
     }
     LineOut {
         k,
@@ -465,6 +472,7 @@ fn measure(ctx: &Ctx, cv: &Curve, u: u64, e: u32, targets: &[Pt]) -> LineOut {
         x0_lifts,
         raw,
         rows,
+        rows_vec,
     }
 }
 
@@ -583,8 +591,8 @@ fn run_curve(
         let tst = is_tstable(ctx, &cv, u);
         let valid = f.tr_rel(u, ctx.d) == 0 && f.tr_rel(f.mul(cv.rb, f.inv(u)), ctx.d) == 0;
         out.push(format!(
-            "{{\"kind\":\"line\",\"arm\":\"{arm}\",\"N\":{},\"d\":{},\"n\":{},\"curve\":{ci},\"role\":\"{role}\",\"u\":{u},\"tstable\":{tst},\"valid\":{valid},\"q1\":{},\"k\":{},\"cols\":{},\"pair_ok\":{},\"tplus_ok\":{},\"x0_lifts\":{},\"targets\":{nt},\"raw\":{},\"rows\":{}}}",
-            f.n, ctx.d, ctx.n, ctx.sub.len(), o.k, o.d_cols, o.pair_ok, o.tplus_ok, o.x0_lifts, o.raw, o.rows
+            "{{\"kind\":\"line\",\"arm\":\"{arm}\",\"N\":{},\"d\":{},\"n\":{},\"curve\":{ci},\"role\":\"{role}\",\"u\":{u},\"tstable\":{tst},\"valid\":{valid},\"q1\":{},\"k\":{},\"cols\":{},\"pair_ok\":{},\"tplus_ok\":{},\"x0_lifts\":{},\"targets\":{nt},\"raw\":{},\"rows\":{},\"rows_vec\":{}}}",
+            f.n, ctx.d, ctx.n, ctx.sub.len(), o.k, o.d_cols, o.pair_ok, o.tplus_ok, o.x0_lifts, o.raw, o.rows, o.rows_vec
         ));
     }
     out
@@ -761,6 +769,11 @@ fn summarize(dir: &str) {
         && p2_le_bad == 0
         && (p2_eq as f64) >= 0.9 * ts_all.len() as f64
         && pos_bad == 0;
+    for nn in 2..=4u64 {
+        let g: Vec<&&str> = ts_all.iter().filter(|l| jnum(l, "n") == nn).collect();
+        let eq = g.iter().filter(|l| jnum(l, "cols") == (jnum(l, "k") - 1) / 2).count();
+        writeln!(md, "- post hoc, n = {nn}: D = (k-1)/2 on {eq}/{} T-stable all-lift lines", g.len()).unwrap();
+    }
     let nts: Vec<&str> = lines.iter().copied().filter(|l| !jbool(l, "tstable")).collect();
     let nts_ok = nts.iter().filter(|l| jnum(l, "cols") + 2 >= jnum(l, "k")).count();
     let p2n = !nts.is_empty() && (nts_ok as f64) >= 0.95 * nts.len() as f64;
@@ -769,7 +782,7 @@ fn summarize(dir: &str) {
     write!(js, ",\"P2\":{{\"lines\":{},\"exact_bad\":{p2_exact_bad},\"le_bad\":{p2_le_bad},\"eq\":{p2_eq},\"pos_lines\":{},\"pos_bad\":{pos_bad},\"pass\":{p2}}},\"P2n\":{{\"lines\":{},\"ok\":{nts_ok},\"pass\":{p2n}}}", ts_all.len(), pos.len(), nts.len()).unwrap();
 
     // P3, P4 per cell
-    writeln!(md, "## P3 / P4 per cell (m = n; pooled over curves)\n\n| N | d | n | group | lines | k (mean) | D (mean) | raw | rows | raw/rows | rho = rows/(targets D) | rho / rho(std) |\n|--:|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|").unwrap();
+    writeln!(md, "## P3 / P4 per cell (m = n; pooled over curves)\n\n| N | d | n | group | lines | k (mean) | D (mean) | raw | rows | raw/rows | rho = rows/(targets D) | rho / rho(std) | rows_vec (post hoc) |\n|--:|--:|--:|:--|--:|--:|--:|--:|--:|--:|--:|--:|--:|").unwrap();
     let mut p3_bad: Vec<String> = vec![];
     let mut p4_bad: Vec<String> = vec![];
     let mut p3_pos_ok = true;
@@ -786,7 +799,7 @@ fn summarize(dir: &str) {
         ];
         let mut stat: Vec<Option<(f64, f64)>> = vec![];
         let mut rho_std = None;
-        let mut tmp: Vec<(usize, f64, f64, f64, f64, u64, u64, f64)> = vec![];
+        let mut tmp: Vec<(usize, f64, f64, f64, f64, u64, u64, f64, u64)> = vec![];
         for (gi, (_, pred)) in groups.iter().enumerate() {
             let g: Vec<&str> = in_cell.iter().copied().filter(|l| pred(l)).collect();
             if g.is_empty() {
@@ -795,6 +808,7 @@ fn summarize(dir: &str) {
             }
             let raw: u64 = g.iter().map(|l| jnum(l, "raw")).sum();
             let rws: u64 = g.iter().map(|l| jnum(l, "rows")).sum();
+            let rwv: u64 = g.iter().map(|l| jnum(l, "rows_vec")).sum();
             let kmean = g.iter().map(|l| jnum(l, "k") as f64).sum::<f64>() / g.len() as f64;
             let dmean = g.iter().map(|l| jnum(l, "cols") as f64).sum::<f64>() / g.len() as f64;
             // rho pooled: sum rows / sum (targets * D)
@@ -805,13 +819,13 @@ fn summarize(dir: &str) {
                 rho_std = Some(rho);
             }
             stat.push(Some((rr, rho)));
-            tmp.push((gi, g.len() as f64, kmean, dmean, rr, raw, rws, rho));
+            tmp.push((gi, g.len() as f64, kmean, dmean, rr, raw, rws, rho, rwv));
         }
         let mut cell_js = format!("{{\"N\":{nf},\"d\":{d},\"n\":{n}");
-        for (gi, cnt, kmean, dmean, rr, raw, rws, rho) in &tmp {
+        for (gi, cnt, kmean, dmean, rr, raw, rws, rho, rwv) in &tmp {
             let rel = rho_std.map(|s| rho / s);
-            writeln!(md, "| {nf} | {d} | {n} | {} | {} | {:.1} | {:.1} | {} | {} | {:.3} | {:.3e} | {} |", groups[*gi].0, *cnt as u64, kmean, dmean, raw, rws, rr, rho, rel.map(|r| format!("{r:.3}")).unwrap_or("n/a".into())).unwrap();
-            write!(cell_js, ",\"g{gi}\":{{\"lines\":{},\"raw\":{raw},\"rows\":{rws},\"raw_over_rows\":{rr:.6},\"rho\":{rho:.6e},\"rho_rel_std\":{}}}", *cnt as u64, rel.map(|r| format!("{r:.6}")).unwrap_or("null".into())).unwrap();
+            writeln!(md, "| {nf} | {d} | {n} | {} | {} | {:.1} | {:.1} | {} | {} | {:.3} | {:.3e} | {} | {} |", groups[*gi].0, *cnt as u64, kmean, dmean, raw, rws, rr, rho, rel.map(|r| format!("{r:.3}")).unwrap_or("n/a".into()), rwv).unwrap();
+            write!(cell_js, ",\"g{gi}\":{{\"lines\":{},\"raw\":{raw},\"rows\":{rws},\"rows_vec\":{rwv},\"raw_over_rows\":{rr:.6},\"rho\":{rho:.6e},\"rho_rel_std\":{}}}", *cnt as u64, rel.map(|r| format!("{r:.6}")).unwrap_or("null".into())).unwrap();
         }
         cell_js.push('}');
         cells_js.push(cell_js);
@@ -859,6 +873,21 @@ fn summarize(dir: &str) {
                 _ => f64::NAN,
             },
         ));
+    }
+    // post hoc (not a decision rule): rows_vec, the signed column vectors
+    writeln!(md, "\n### Post hoc: rows as signed column vectors (rows_vec), relative to std and to other valid lines\n\n| N | d | n | rho_vec(L_T)/rho_vec(std) | rho_vec(valid)/rho_vec(std) | rho_vec(L_T)/rho_vec(valid) | predicted L_T/valid = 2/2^(n-1) |\n|--:|--:|--:|--:|--:|--:|--:|").unwrap();
+    for &(nf, d) in CELLS {
+        let n = nf / d;
+        let rv = |role: &str| -> Option<f64> {
+            let g: Vec<&str> = lines.iter().copied().filter(|l| jnum(l, "N") as u32 == nf && jnum(l, "d") as u32 == d && jget(l, "role") == Some(role)).collect();
+            if g.is_empty() { return None; }
+            let num: u64 = g.iter().map(|l| jnum(l, "rows_vec")).sum();
+            let den: f64 = g.iter().map(|l| (jnum(l, "targets") * jnum(l, "cols")) as f64).sum();
+            Some(num as f64 / den)
+        };
+        let (t, v, s0) = (rv("L_T"), rv("valid"), rv("std"));
+        let f = |a: Option<f64>, b: Option<f64>| match (a, b) { (Some(a), Some(b)) if b > 0.0 => format!("{:.3}", a / b), _ => "n/a".into() };
+        writeln!(md, "| {nf} | {d} | {n} | {} | {} | {} | {:.3} |", f(t, s0), f(v, s0), f(t, v), 2.0 / (1u64 << (n - 1)) as f64).unwrap();
     }
     let p3 = p3_bad.is_empty() && p3_pos_ok;
     let p4 = p4_bad.is_empty();
