@@ -134,9 +134,14 @@ pub(super) fn metrics(r: &Value) -> Result<()> {
             previous.insert(field, after);
         }
         if !a["algebra"].is_null() {
-            let calls = previous["learned"] + previous["replay_attempts"]
-                - integer(&lead["trace_before"]["learned"])?
-                - integer(&lead["trace_before"]["replay_attempts"])?;
+            let learned_before = integer(&lead["trace_before"]["learned"])?;
+            let replay_before = integer(&lead["trace_before"]["replay_attempts"])?;
+            let calls = previous["learned"]
+                .checked_sub(learned_before)
+                .and_then(|n| {
+                    n.checked_add(previous["replay_attempts"].checked_sub(replay_before)?)
+                })
+                .ok_or("trace call counter overflow")?;
             if r["method"]["params"]["trace"] == "certified" {
                 require(
                     calls == integer(&a["algebra"]["solver_calls"])?,
@@ -157,7 +162,7 @@ pub(super) fn metrics(r: &Value) -> Result<()> {
         "trace certification work omitted",
     )?;
     require(
-        previous["accepted"] + previous["rejected"] == previous["replay_attempts"]
+        previous["accepted"].checked_add(previous["rejected"]) == Some(previous["replay_attempts"])
             && previous["fallbacks"] <= previous["rejected"],
         "invalid trace outcome partition",
     )?;

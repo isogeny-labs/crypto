@@ -220,6 +220,17 @@ fn plan_and_native_counter_tampering_are_rejected() {
     assert!(audit::metrics(&bad).is_err());
 }
 #[test]
+fn hostile_trace_totals_cannot_wrap_the_independent_reader() {
+    let mut bad = produced(&[("guess", "1"), ("subset_profile", "1,3,2")], 20261026);
+    let first = &mut bad["detail"]["attempts"][0];
+    assert!(!first["algebra"].is_null());
+    first["lead"]["trace_after"]["learned"] = json!(u64::MAX);
+    first["lead"]["trace_after"]["replay_attempts"] = json!(1);
+    assert!(audit::metrics(&bad)
+        .unwrap_err()
+        .contains("counter overflow"));
+}
+#[test]
 fn first_informative_chart_retains_partial_coverage() {
     let r = produced(
         &[("encoding", "line_chart3"), ("stop", "first_informative")],
