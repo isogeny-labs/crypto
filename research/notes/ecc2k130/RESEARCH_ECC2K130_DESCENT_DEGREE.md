@@ -691,6 +691,22 @@ pair, `a₆ + b₆`, on the same 12 draws.
   and the raw guess on the third summand still carries weight.
 - **What it is not.** No row moves.
 
+## An invariant guess on the second link (2026-11-05): as good as the raw guess on x₃
+
+`research/dreg_second_link_guess_20261105/` (pre-registered; `RESULTS.md`,
+`results.pdf`) replaces S3's raw `c₇` with coordinate 20 of the second link's
+swap invariant `e₁ + x₃`, on the same 12 draws. Unverified assertion until a
+pcc verdict exists.
+
+- **Result.** The new arm suffices on 6 of 12 draws, against S3's 7 of 12.
+  - One discordant draw (27), which favours S3. The registered two-sided sign
+    test gives p = 1.0, so the verdict is no detected difference.
+  - The arms agree on 11 of 12 draws.
+- **What it means.** Unlike a second invariant guess on the first link, an
+  invariant guess on the second link does not lose. One invariant guess per
+  link is a rule that extends along the chain, and m = 4 is its test.
+- **What it is not.** Not shown to be better than S3. No row moves.
+
 ## Reproducing
 
 ```sh
