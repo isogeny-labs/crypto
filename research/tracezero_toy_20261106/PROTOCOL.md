@@ -149,3 +149,12 @@ For k = 3 only g ∈ F_p can occur; for d = 2 the whole span is checked.
   contains 0 and the registered verdict is "no structure detected". If any interval excludes 0
   the residual is not fully explained by degenerate V.
 - **Validity**: positive control excludes 0; A/A half-width ≤ 0.05.
+
+## Amendment A7 (2026-11-06, before the A6 part (b) data; part (a) results seen)
+
+A6 part (b) hung with no rows: for k = 2, d = 2 the subspace V is the whole field F_{p²},
+which always contains F_p, so excluding degenerate V rejects every draw. That cell cannot be
+run under A6 and is dropped (this also means the earlier registered k = 2, d = 2 cell was
+V = F_{p²} on every draw, not a random subspace). Part (b) becomes k = 3, d = 2, p ∈
+{17, 19, 23, 29, 31}, otherwise as A6. Part (a) is unchanged and its results are reported
+as they came out (see README).
