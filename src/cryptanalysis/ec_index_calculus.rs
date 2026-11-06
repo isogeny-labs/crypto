@@ -851,7 +851,10 @@ pub fn build_factor_base(curve: &CurveParams, target_size: usize) -> Vec<FactorB
 /// the `1/h` of pairs whose torsion components cancel.  Entries are keyed by
 /// the x-coordinate of `[h]F`, canonicalised by the smaller y.  Points with
 /// `[h]F = O` are skipped.  Opt-in; [`build_factor_base`] is unchanged.
-pub fn build_factor_base_projected(curve: &CurveParams, target_size: usize) -> Vec<FactorBaseEntry> {
+pub fn build_factor_base_projected(
+    curve: &CurveParams,
+    target_size: usize,
+) -> Vec<FactorBaseEntry> {
     let mut out: Vec<FactorBaseEntry> = Vec::with_capacity(target_size);
     let mut seen = std::collections::HashSet::new();
     let a_fe = curve.a_fe();
@@ -866,7 +869,10 @@ pub fn build_factor_base_projected(curve: &CurveParams, target_size: usize) -> V
             .add(&curve.fe(curve.b.clone()))
             .value;
         if let Some(y) = sqrt_mod_p(&rhs_value, &curve.p) {
-            let f = Point::Affine { x: xf, y: curve.fe(y) };
+            let f = Point::Affine {
+                x: xf,
+                y: curve.fe(y),
+            };
             if let Point::Affine { x: px, y: py } = f.scalar_mul(&h, &a_fe) {
                 if seen.insert(px.value.clone()) {
                     let y_canon = if &py.value * &BigUint::from(2u32) < curve.p {
@@ -876,7 +882,10 @@ pub fn build_factor_base_projected(curve: &CurveParams, target_size: usize) -> V
                     };
                     out.push(FactorBaseEntry {
                         idx: out.len(),
-                        point: Point::Affine { x: px, y: curve.fe(y_canon) },
+                        point: Point::Affine {
+                            x: px,
+                            y: curve.fe(y_canon),
+                        },
                     });
                 }
             }
