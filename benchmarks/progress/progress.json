@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261105T2109Z-f6-parallel-split",
+  "latest_record": "20261106T0454Z-cheon-ecbench-medium",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 44,
+    "measured": 46,
     "open": 0
   },
   "repo": "crypto",
@@ -262,6 +262,162 @@
       ],
       "problem": "archive:icb-large-prime-n61-s2-20261029",
       "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.5739107759707482,
+      "latest": 0.5739107759707482,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "improvement_vs_previous_percent": 0.0,
+        "value_over_reference": 0.581373
+      },
+      "metric": "s_w0_cheon_pminus1_comb",
+      "points": [
+        {
+          "commit": "b83ccff8cee8",
+          "date": "2026-11-06",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.581373
+          },
+          "n": 48,
+          "record": "20261106T0450Z-cheon-ecbench",
+          "reference": 0.9871650926626283,
+          "reference_kind": "matched_rho",
+          "spread": [
+            0.44931907106131447,
+            0.721552417500526
+          ],
+          "summary": "Cheon DLPwAI arms in ecbench (research/cheon_ecbench_20261022): sessions ECBS1h293023c203b3, ECBS1h6323501e31ef, ECBS1ha367083f3e51, 320 runs. Recorded after the run, when the benchmark-record rule reached this branch; the commands are fresh sampled replay audits (6 runs per session, seed 20261106, all reproduced)",
+          "value": 0.5739107759707482
+        },
+        {
+          "commit": "b83ccff8cee8",
+          "date": "2026-11-06",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "improvement_vs_previous_percent": 0.0,
+            "value_over_reference": 0.581373
+          },
+          "n": 48,
+          "record": "20261106T0454Z-cheon-ecbench-medium",
+          "reference": 0.9871650926626283,
+          "reference_kind": "matched_rho",
+          "spread": [
+            0.44931907106131447,
+            0.721552417500526
+          ],
+          "summary": "Medium-tier re-run of the Cheon ecbench sessions (PROTOCOL frozen in b83ccff8ce): ECBS1he3401ce241ca, ECBS1hb3aa04e7a9c6, ECBS1h64874297871c, 272 runs, all replayed by ecbench verify --replay-all; counts identical run for run to research/cheon_ecbench_20261022; the 18 whole-session fit-v2 bounds are ranked by frontier procedure 2",
+          "value": 0.5739107759707482
+        }
+      ],
+      "problem": "dlpwai:static-dh-p224-shape",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 12.242619090615317,
+      "latest": 12.242619090615317,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "improvement_vs_previous_percent": 0.0,
+        "value_over_reference": 11.606556
+      },
+      "metric": "s_w0_cheon_pminus1_naive",
+      "points": [
+        {
+          "commit": "b83ccff8cee8",
+          "date": "2026-11-06",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 11.606556
+          },
+          "n": 40,
+          "record": "20261106T0450Z-cheon-ecbench",
+          "reference": 1.0548020315196973,
+          "reference_kind": "matched_rho",
+          "spread": [
+            9.38166820996826,
+            14.909373833480435
+          ],
+          "summary": "Cheon DLPwAI arms in ecbench (research/cheon_ecbench_20261022): sessions ECBS1h293023c203b3, ECBS1h6323501e31ef, ECBS1ha367083f3e51, 320 runs. Recorded after the run, when the benchmark-record rule reached this branch; the commands are fresh sampled replay audits (6 runs per session, seed 20261106, all reproduced)",
+          "value": 12.242619090615317
+        },
+        {
+          "commit": "b83ccff8cee8",
+          "date": "2026-11-06",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "improvement_vs_previous_percent": 0.0,
+            "value_over_reference": 11.606556
+          },
+          "n": 40,
+          "record": "20261106T0454Z-cheon-ecbench-medium",
+          "reference": 1.0548020315196973,
+          "reference_kind": "matched_rho",
+          "spread": [
+            9.38166820996826,
+            14.909373833480435
+          ],
+          "summary": "Medium-tier re-run of the Cheon ecbench sessions (PROTOCOL frozen in b83ccff8ce): ECBS1he3401ce241ca, ECBS1hb3aa04e7a9c6, ECBS1h64874297871c, 272 runs, all replayed by ecbench verify --replay-all; counts identical run for run to research/cheon_ecbench_20261022; the 18 whole-session fit-v2 bounds are ranked by frontier procedure 2",
+          "value": 12.242619090615317
+        }
+      ],
+      "problem": "dlpwai:static-dh-p224-shape",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.5818646872479218,
+      "latest": 0.5818646872479218,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "improvement_vs_previous_percent": 0.0,
+        "value_over_reference": 0.574551
+      },
+      "metric": "s_w0_cheon_pplus1_comb",
+      "points": [
+        {
+          "commit": "b83ccff8cee8",
+          "date": "2026-11-06",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.574551
+          },
+          "n": 48,
+          "record": "20261106T0450Z-cheon-ecbench",
+          "reference": 1.0127298580918396,
+          "reference_kind": "matched_rho",
+          "spread": [
+            0.417457320165278,
+            0.7720462475136465
+          ],
+          "summary": "Cheon DLPwAI arms in ecbench (research/cheon_ecbench_20261022): sessions ECBS1h293023c203b3, ECBS1h6323501e31ef, ECBS1ha367083f3e51, 320 runs. Recorded after the run, when the benchmark-record rule reached this branch; the commands are fresh sampled replay audits (6 runs per session, seed 20261106, all reproduced)",
+          "value": 0.5818646872479218
+        },
+        {
+          "commit": "b83ccff8cee8",
+          "date": "2026-11-06",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "improvement_vs_previous_percent": 0.0,
+            "value_over_reference": 0.574551
+          },
+          "n": 48,
+          "record": "20261106T0454Z-cheon-ecbench-medium",
+          "reference": 1.0127298580918396,
+          "reference_kind": "matched_rho",
+          "spread": [
+            0.417457320165278,
+            0.7720462475136465
+          ],
+          "summary": "Medium-tier re-run of the Cheon ecbench sessions (PROTOCOL frozen in b83ccff8ce): ECBS1he3401ce241ca, ECBS1hb3aa04e7a9c6, ECBS1h64874297871c, 272 runs, all replayed by ecbench verify --replay-all; counts identical run for run to research/cheon_ecbench_20261022; the 18 whole-session fit-v2 bounds are ranked by frontier procedure 2",
+          "value": 0.5818646872479218
+        }
+      ],
+      "problem": "dlpwai:static-dh-p224-shape",
+      "unit": "S"
     },
     {
       "better": "lower",
