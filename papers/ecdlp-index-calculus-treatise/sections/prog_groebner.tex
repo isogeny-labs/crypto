@@ -29,7 +29,7 @@ of engines (\art{docs/ic/GROEBNER_F4F5F6_AUDIT_20261010.md}, \S1; file names bel
 \paragraph{Correctness.} The audit pinned every engine against every
 other and against brute force (88+15+9+14+13+12+21+6 passing library
 tests in the touched modules), and found one soundness bug
-(\S\ref{sec:corrections}, item 6), two contract defects and several latent
+(\S\ref{sec:corrections}, item 7), two contract defects and several latent
 holes, all fixed with regression tests.
 
 \paragraph{Engineering results.} Figure~\ref{fig:engine} collects the
@@ -44,20 +44,20 @@ Change & Case & Measure & Ratio or value \\
 \midrule
 Matrix / inherited F4 & K13 & counted matrix work & $198.6\times$ \\
  & random-13 & & $222.1\times$ \\
- & $m=19$ & wall, matrix F4/F5 vs inherited F4 & timed out at 1{,}800\,s vs about 6\,s \\
+ & $n=19$ & wall, matrix F4/F5 vs inherited F4 & timed out at 1{,}800\,s vs about 6\,s \\
 \addlinespace
 F5 / F4 & K13 & word XORs & $0.6465$ \\
  & random-13 & & $0.6414$ \\
  & K13, random-13 & wall & $0.79$--$0.86$ \\
 \addlinespace
-F6-IC / inherited F4 & $m=13$ & word XORs & about $0.82$ \\
- & $m=19$ & & $0.77$--$0.78$ \\
+F6-IC / inherited F4 & $n=13$ & word XORs & about $0.82$ \\
+ & $n=19$ & & $0.77$--$0.78$ \\
  & --- & relation wall & $1.7$--$1.9\times$ faster \\
- & $m=13$ & $S$, group additions charged & $64.6$--$68.8\times$ \\
- & $m=19$ & & $1{,}303$--$1{,}353\times$ \\
+ & $n=13$ & $S$, group additions charged & $64.6$--$68.8\times$ \\
+ & $n=19$ & & $1{,}303$--$1{,}353\times$ \\
  & K13 & $S$, word XORs priced (\#1774) & $1{,}572.1/634.12\approx2.5\times$ \\
- & R13, $m=19$ & & lower bounds \\
- & $m=31$ & first target & both hit 3{,}600\,s cap \\
+ & R13, $n=19$ & & lower bounds \\
+ & $n=31$ & first target & both hit 3{,}600\,s cap \\
 \addlinespace
 Every echelon call to the Four-Russians kernel & oracle's own Macaulay matrices & speed-up & $1.75$--$3.22\times$ \\
 Word-level \texttt{pext}/\texttt{pdep} rewrite plan & $n=23$ & F4 and F6-IC faster & 10--14\% \\
@@ -91,7 +91,8 @@ Boolean decomposition systems, $n=17$, 8 targets & our oracle (decides) & time p
 \caption[]{Gr\"obner-engine engineering results, all \cls{engineering}
 with identical outputs. \emph{Change}: candidate / baseline where a slash
 is shown; \emph{Case}: target set or size (K13, random-13 and R13 as named
-in the sources; $m$ the number of summands; ``---'': no
+in the sources; $n$ the field degree, which the sources write $m$; $m$ the
+number of summands; ``---'': no
 case given); \emph{Measure}: the counted or timed quantity; \emph{Ratio or
 value}: as recorded. Groups, top to bottom, with sources: inherited versus
 matrix F4 (\art{research/f4_f5_f6_cross_family_20261011/}); F5 versus F4;
@@ -117,7 +118,7 @@ splitting trees may differ; only matrix F4 and F5 share a tree by
 construction. F6-IC's $S$ ratios, once its batched group additions are
 charged, are an accounting loss, not a frontier move. Those ratios used
 inherited F4 before its word XORs were priced (\#1774); priced, F6-IC is
-still a loss at K13, while the R13 and $m=19$ cells remain lower bounds.
+still a loss at K13, while the R13 and $n=19$ cells remain lower bounds.
 
 The $\FF_2$ engine campaigns (about 90 directories, 22 September--17
 October; the programme record~\cite{icprogram2026}, clusters ``boolean'',

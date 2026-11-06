@@ -36,6 +36,12 @@ python3 scripts/kb_usage_report.py --ref origin/main --since 2026-11-05
 artifact and uses `--ref HEAD`. It is advisory: no pull request is blocked and
 `--fail-under` is not wired in.
 
+The script and its tests are shared byte-identically by the three repositories
+(`docs/shared-code.lock.json`), so each repository runs the same workflow
+against its own logs. Its first run (2026-11-06) reported `crypto`
+alone at 135 entries, 11 receipts and 8.1%, which matches the local
+`--ref` measurement at that commit.
+
 ## What counts
 
 - **Entry**: a dated `##` session-log entry, or a `### <time> UTC` entry (the
@@ -44,6 +50,10 @@ artifact and uses `--ref HEAD`. It is advisory: no pull request is blocked and
   line that names `KB`, or `KB unavailable`.
 - **Source IDs**: `source:…`, `paper:…` and `lean:…` identifiers in the entry.
 - **Coverage**: receipts / entries in the selected date range.
+- **Duplicates**: an exact repeated heading (the whole heading line, including
+  the date and usually the time) counts once and is reported as `duplicates`.
+  Merge conflicts have copied whole dated blocks into one file; a repeat is the
+  same entry, not a second session.
 
 An unavailable receipt counts because the session recorded the attempt and the
 gap; pretending the KB was consulted is worse than saying it was down.
@@ -69,16 +79,44 @@ merge. Use it as the before mark, not a verdict.
 Committed `main`, entries dated 2026-11-05 or later, measured after the policy
 PRs merged:
 
-| repository | entries | receipts | coverage | unique source IDs |
-|:--|--:|--:|--:|--:|
-| `crypto` | 134 | 10 | 7.5% | 6 |
-| `crypto-autoresearcher` | 6 | 3 | 50.0% | 3 |
-| `cryptanalysis` | 3 | 2 | 66.7% | 5 |
-| **total** | **143** | **15** | **10.5%** | **6** |
+| repository | entries | duplicates | receipts | coverage | unique source IDs |
+|:--|--:|--:|--:|--:|--:|
+| `crypto` | 109 | 31 | 15 | 13.8% | 7 |
+| `crypto-autoresearcher` | 10 | 0 | 4 | 40.0% | 5 |
+| `cryptanalysis` | 4 | 0 | 3 | 75.0% | 5 |
+| **total** | **123** | **31** | **22** | **17.9%** | **7** |
 
-The delta from the 0.9% pre-policy mark (1 receipt in 114 entries) is +9.6
+The delta from the 0.9% pre-policy mark (1 receipt in 114 entries) is +17.0
 points. Later sessions now record receipts on their own, not just the policy
 entries, so the number is beginning to measure habit rather than the template.
+
+## Diagnosis: usage gap, not a recording gap (2026-11-06)
+
+Committed `main`, entries dated 2026-11-05 or later:
+
+| measure | value |
+|:--|--:|
+| entries as written | 140 |
+| exact duplicate headings | 31 |
+| unique entries | 109 |
+| receipts | 15 |
+| unique entries without a receipt | 94 |
+| of those, entries that mention the KB at all | 2 |
+| of those, entries with a query or `source:` signal | 0 |
+
+The receiptless entries are overwhelmingly merge, custody, CI and verification
+work. Only two mention the KB in prose, and neither records a query or a
+source. So the crypto gap is not a recording gap: sessions are largely not
+querying the catalog in the first place.
+
+One client-side asymmetry the logs support: the Claude Code hook printed the
+reminder, while `scripts/relay.py session-start`, which Codex also runs,
+printed nothing unless a runtime handoff was pending. The reminder now comes
+from the relay for every runtime, and the Claude-only echo is removed.
+
+The 31 duplicates are merge artifacts: whole dated blocks copied into the same
+file. The audit now counts an exact repeated heading once and reports the
+skipped count, so the number above is the deduplicated one.
 
 ## What the audit does not see
 

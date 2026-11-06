@@ -1,0 +1,482 @@
+{
+  "admissibility": {
+    "bounded": true,
+    "deterministic": true,
+    "reasons": [],
+    "status": "admissible",
+    "unpriced": [
+      "fp2_mul_uncharged",
+      "scalar_mulmod_uncharged",
+      "table_insert_uncharged",
+      "table_lookup_uncharged"
+    ]
+  },
+  "bound_id": "ECBND1hbab44fbc5232",
+  "constant": {
+    "declared_ratio_to_floor": null,
+    "ratio_to_floor": {
+      "ci95": [
+        0.4834228658293667,
+        0.8454028589463813
+      ],
+      "ci_method": "cluster",
+      "value": 0.656563991159101
+    },
+    "s": {
+      "ci95": [
+        0.417457320165278,
+        0.7720462475136465
+      ],
+      "ci_method": "cluster",
+      "value": 0.5818646872479218
+    }
+  },
+  "dimensions": {
+    "field_invs": {
+      "ci95": [
+        0.42537734296596225,
+        0.7498275017441387
+      ],
+      "known": true,
+      "lower_is_better": true,
+      "source": "field_ops.invs, workload.curve.r",
+      "statistic": "mean field inversions / sqrt(r) over verified runs",
+      "value": 0.5818646643060811
+    },
+    "field_muls": {
+      "ci95": [
+        0.8826712020479184,
+        1.6921565228796558
+      ],
+      "known": true,
+      "lower_is_better": true,
+      "source": "field_ops.muls, workload.curve.r",
+      "statistic": "mean field multiplications / sqrt(r) over verified runs",
+      "value": 1.2607508072840228
+    },
+    "field_sqrs": {
+      "ci95": [
+        0.4370248950552321,
+        0.8119405678160173
+      ],
+      "known": true,
+      "lower_is_better": true,
+      "source": "field_ops.sqrs, workload.curve.r",
+      "statistic": "mean field squarings / sqrt(r) over verified runs",
+      "value": 0.6142051571967012
+    },
+    "memory": {
+      "ci95": [
+        0.029449945426109236,
+        0.13646438345586165
+      ],
+      "known": true,
+      "lower_is_better": true,
+      "source": "first of counters.inserts_uncharged, counters.table_inserts_uncharged, counters.table_entries, counters.distinguished_points",
+      "statistic": "mean table entries / sqrt(r) over verified runs",
+      "value": 0.07053050229804453
+    },
+    "ops": {
+      "ci95": [
+        0.4834228658293667,
+        0.8454028589463813
+      ],
+      "known": true,
+      "lower_is_better": true,
+      "source": "cost.total_gae, workload.curve.r, automorphisms_available",
+      "statistic": "mean S / sqrt(pi / 2A) over verified runs",
+      "value": 0.656563991159101
+    },
+    "oracle_queries": {
+      "ci95": [
+        0.00010670034360430964,
+        0.0012340946876226644
+      ],
+      "known": true,
+      "lower_is_better": true,
+      "source": "counters.oracle_queries, workload.curve.r",
+      "statistic": "mean static-DH oracle queries / sqrt(r) over verified runs (0 for an arm that does not query)",
+      "value": 0.0005863091059254773
+    },
+    "uncharged": {
+      "ci95": [
+        0.08491408043603714,
+        0.16669795264283038
+      ],
+      "known": true,
+      "lower_is_better": true,
+      "source": "counters.*_uncharged",
+      "statistic": "mean sum of *_uncharged counters / sqrt(r) over verified runs",
+      "value": 0.12252121208580458
+    }
+  },
+  "domain": {
+    "envelope": {
+      "oracle": "static_dh:n+1:d=shape(0.21106,0.015)",
+      "precomputation": "none",
+      "targets": 1,
+      "threads": 1
+    },
+    "family": "prime",
+    "problem": "ecdlp.single_target",
+    "target_kind": "planted",
+    "tier": "medium",
+    "unit": "ecbench.gae"
+  },
+  "domain_id": "ECDOM1hda52cee5db35",
+  "fit": {
+    "alpha": 0.4276232260494994,
+    "alpha_agrees_with_declared": null,
+    "alpha_ci95": [
+      0.3885456855360758,
+      0.46015491783676327
+    ],
+    "ci_method": "cluster",
+    "declared_alpha": null,
+    "log2_c": 2.36273223719811,
+    "model": "gae = C * r^alpha",
+    "points": 48,
+    "r_squared": 0.9728551525601211,
+    "scaling_claim": true,
+    "size_parameter": "r",
+    "sizes": 6
+  },
+  "fit_options": {
+    "curves": [],
+    "oracle": "static_dh:n+1:d=shape(0.21106,0.015)",
+    "resamples": 2000,
+    "seed": 20261005,
+    "tier": "medium"
+  },
+  "improves_on": [],
+  "label": "cheon.pplus1_comb on the n+1 shaped curves",
+  "level": "exponent",
+  "method": {
+    "entry": "cheon_counted::cheon_pplus1",
+    "family": "cheon",
+    "id": "cheon.pplus1_comb",
+    "method_id": "ECM1hc0c1a4267a18",
+    "params": {
+      "d": "shape:0.21106:0.015"
+    }
+  },
+  "notes": "research/cheon_ecbench_20261022: tier medium (36 to 52/56-bit fields); the 32-bit toy size is outside the fit. Oracle queries are outside ops (axis oracle_queries).",
+  "oracle": {
+    "alpha": 0.16266820627082013,
+    "alpha_ci95": [
+      0.1457709384834593,
+      0.1888615061243823
+    ],
+    "label": "static_dh:n+1:d=shape(0.21106,0.015)",
+    "log2_c": 3.163405497679491,
+    "model": "static_dh",
+    "model_fit": "oracle_queries = C * r^alpha (per run, least squares on every verified run, two-stage bootstrap)",
+    "note": "queries are the problem's second resource: not in ops (gae), priced apart; the server spends one scalar multiplication by alpha per query",
+    "points": 48,
+    "r_squared": 0.9803810413050306,
+    "server_alpha": 0.1984890849554621,
+    "server_alpha_ci95": [
+      0.1778418573143058,
+      0.22842393954678877
+    ],
+    "server_log2_c": 7.551340051047847
+  },
+  "provenance": {
+    "audits": [
+      {
+        "ok": true,
+        "path": "research/cheon_ecbench_20261022/sessions/plus-20261022.audit.json",
+        "replays": 112,
+        "replays_reproduced": 112,
+        "session_id": "ECBS1ha367083f3e51",
+        "sha256": "74dbf4e2d313a38a24bb5404d0ec35a79403535a07785224ab51e3a9c027404c"
+      }
+    ],
+    "records": 48,
+    "sessions": [
+      {
+        "arm": "cheon-comb",
+        "binary_sha256": "0750e00f676c7bd5e225c8edd9ebb07e9b017a45f5e7bf1a2072ae009573f6e5",
+        "dir": "research/cheon_ecbench_20261022/sessions/plus-20261022",
+        "env_class_id": "ECBENV2h058cf76d2adc",
+        "git_commit": null,
+        "records_sha256": "8f4c064210372be67b2250c32756ba3081a5263794712c6b43c64f35976e8561",
+        "role": "candidate",
+        "session_id": "ECBS1ha367083f3e51",
+        "spec_id": "ECS1h3c46fa8c4fe9",
+        "status": "complete"
+      }
+    ],
+    "statuses": {
+      "verified": 48
+    },
+    "verified": 48
+  },
+  "schema": "ecbench.bound/v1",
+  "sizes": [
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": null,
+      "declared_s": null,
+      "field_bits": 36,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 8
+      },
+      "log2_r": 35.58496611635515,
+      "mean_gae": 204430.375,
+      "mean_s": 0.9004805308384234,
+      "memory_entries_per_sqrt_r": 0.22874709517590117,
+      "oracle_queries": 479.0,
+      "oracle_server_group_ops": 23950.0,
+      "r": 51539736719,
+      "ratio_to_floor": 1.0160834713731852,
+      "runs": 8,
+      "s_ci95": [
+        0.7861079192763094,
+        1.0068440097987719
+      ],
+      "slug": "icv1-fp36-tm129119-ba25e086",
+      "uncharged_per_sqrt_r": 0.2085597708957765,
+      "verified": 8,
+      "workloads": 8
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": null,
+      "declared_s": null,
+      "field_bits": 40,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 8
+      },
+      "log2_r": 39.584961867649426,
+      "mean_gae": 680969.0,
+      "mean_s": 0.7498888430040775,
+      "memory_entries_per_sqrt_r": 0.06416191256523068,
+      "oracle_queries": 795.0,
+      "oracle_server_group_ops": 44321.25,
+      "r": 824633358973,
+      "ratio_to_floor": 0.8461589480831587,
+      "runs": 8,
+      "s_ci95": [
+        0.5913963101307678,
+        0.9109109997496833
+      ],
+      "slug": "icv1-fp40-t361865-3168d4f0",
+      "uncharged_per_sqrt_r": 0.15863871830011886,
+      "verified": 8,
+      "workloads": 8
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": null,
+      "declared_s": null,
+      "field_bits": 44,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 8
+      },
+      "log2_r": 43.584962227314065,
+      "mean_gae": 2345071.375,
+      "mean_s": 0.6456030454242071,
+      "memory_entries_per_sqrt_r": 0.04864477769435726,
+      "oracle_queries": 1147.0,
+      "oracle_server_group_ops": 72261.0,
+      "r": 13194137032873,
+      "ratio_to_floor": 0.7284850266700932,
+      "runs": 8,
+      "s_ci95": [
+        0.5622025629523307,
+        0.7190804293249414
+      ],
+      "slug": "icv1-fp44-t2500477-898d2466",
+      "uncharged_per_sqrt_r": 0.13720237028982685,
+      "verified": 8,
+      "workloads": 8
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": null,
+      "declared_s": null,
+      "field_bits": 48,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 8
+      },
+      "log2_r": 47.58496258554062,
+      "mean_gae": 5802606.375,
+      "mean_s": 0.3993673627527302,
+      "memory_entries_per_sqrt_r": 0.035203561843257715,
+      "oracle_queries": 1979.0,
+      "oracle_server_group_ops": 137293.125,
+      "r": 211106244944429,
+      "ratio_to_floor": 0.4506378121480572,
+      "runs": 8,
+      "s_ci95": [
+        0.2974679209686668,
+        0.5135322650922161
+      ],
+      "slug": "icv1-fp48-tm12411381-a81a3368",
+      "uncharged_per_sqrt_r": 0.09196033218920273,
+      "verified": 8,
+      "workloads": 8
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": null,
+      "declared_s": null,
+      "field_bits": 52,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 8
+      },
+      "log2_r": 51.58496249501846,
+      "mean_gae": 25348349.375,
+      "mean_s": 0.4361533035067729,
+      "memory_entries_per_sqrt_r": 0.02388467351805834,
+      "oracle_queries": 3671.0,
+      "oracle_server_group_ops": 278537.125,
+      "r": 3377699707176467,
+      "ratio_to_floor": 0.4921463013369287,
+      "runs": 8,
+      "s_ci95": [
+        0.3246605309666434,
+        0.5350345143336718
+      ],
+      "slug": "icv1-fp52-t13351431-b09ac3d1",
+      "uncharged_per_sqrt_r": 0.07412247778046979,
+      "verified": 8,
+      "workloads": 8
+    },
+    {
+      "automorphisms_available": 2,
+      "declared_ratio_to_floor": null,
+      "declared_s": null,
+      "field_bits": 56,
+      "floor_s": 0.8862269254527579,
+      "levels": {
+        "L0": 8
+      },
+      "log2_r": 55.58496249329696,
+      "mean_gae": 83618997.375,
+      "mean_s": 0.35969503796132013,
+      "memory_entries_per_sqrt_r": 0.02254099299146178,
+      "oracle_queries": 4031.0,
+      "oracle_server_group_ops": 329030.375,
+      "r": 54043195250336543,
+      "ratio_to_floor": 0.4058723873431832,
+      "runs": 8,
+      "s_ci95": [
+        0.2751935854129168,
+        0.4451918177338346
+      ],
+      "slug": "icv1-fp56-t278109415-2d6157a8",
+      "uncharged_per_sqrt_r": 0.06464360305943263,
+      "verified": 8,
+      "workloads": 8
+    }
+  ],
+  "stages": [
+    {
+      "alpha": 0.19564942986469047,
+      "alpha_ci95": [
+        0.1753502142964304,
+        0.22259814858888075
+      ],
+      "mean_gae": 221179.0,
+      "name": "p+1:poly",
+      "share_of_gae": 0.011246349431810463,
+      "sizes_with_work": 6
+    },
+    {
+      "alpha": 0.06173327166041043,
+      "alpha_ci95": [
+        -0.01825542018454067,
+        0.16252903842387498
+      ],
+      "mean_gae": 35922.5,
+      "name": "p+1:step1:precompute",
+      "share_of_gae": 0.001826561235308105,
+      "sizes_with_work": 6
+    },
+    {
+      "alpha": 0.46327744413200284,
+      "alpha_ci95": [
+        0.43445962076961026,
+        0.4869343110496714
+      ],
+      "mean_gae": 9366334.5,
+      "name": "p+1:step1:baby",
+      "share_of_gae": 0.47625258583419644,
+      "sizes_with_work": 6
+    },
+    {
+      "alpha": 0.4445396793167193,
+      "alpha_ci95": [
+        0.3489982053084638,
+        0.5335228050191424
+      ],
+      "mean_gae": 10040919.5625,
+      "name": "p+1:step1:giant",
+      "share_of_gae": 0.510553398001512,
+      "sizes_with_work": 6
+    },
+    {
+      "alpha": 0.03611334242457789,
+      "alpha_ci95": [
+        0.024012707086643655,
+        0.04577042964128728
+      ],
+      "mean_gae": 409.4166666666667,
+      "name": "p+1:step2:shift",
+      "share_of_gae": 0.000020817721829560673,
+      "sizes_with_work": 6
+    },
+    {
+      "alpha": 0.07446582097319343,
+      "alpha_ci95": [
+        0.03485276352406709,
+        0.11010767502417085
+      ],
+      "mean_gae": 767.5,
+      "name": "p+1:step2:precompute",
+      "share_of_gae": 0.00003902528354371134,
+      "sizes_with_work": 6
+    },
+    {
+      "alpha": 0.10290746677002216,
+      "alpha_ci95": [
+        0.08286100785147486,
+        0.12508286246835906
+      ],
+      "mean_gae": 543.8333333333334,
+      "name": "p+1:step2:baby",
+      "share_of_gae": 0.00002765244304085344,
+      "sizes_with_work": 6
+    },
+    {
+      "alpha": 0.07301970156719001,
+      "alpha_ci95": [
+        0.024677174149064042,
+        0.12035846299482945
+      ],
+      "mean_gae": 595.0625,
+      "name": "p+1:step2:giant",
+      "share_of_gae": 0.000030257306565120168,
+      "sizes_with_work": 6
+    },
+    {
+      "alpha": 0.03582087868465099,
+      "alpha_ci95": [
+        0.029333241753600917,
+        0.0419997558323166
+      ],
+      "mean_gae": 65.9375,
+      "name": "p+1:verify",
+      "share_of_gae": 3.3527421936983276e-6,
+      "sizes_with_work": 6
+    }
+  ],
+  "verdict_id": null
+}

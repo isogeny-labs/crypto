@@ -439,6 +439,12 @@ const POLICIES: &[PolicyDecl] = &[
         FullPrice
     ),
     policy!(
+        "rho.signed_frobenius_v2_full",
+        ImplementationAb,
+        PricingSensitivity,
+        FullPrice
+    ),
+    policy!(
         "rho.signed_frobenius_strong_full",
         NativeGrid,
         PricingSensitivity,
@@ -580,6 +586,24 @@ const POLICIES: &[PolicyDecl] = &[
         "ic.large_prime_v2",
         NativeAdaptive,
         FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "cheon.pminus1_comb",
+        ImplementationAb,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
+        "cheon.pminus1_naive",
+        ImplementationAb,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
+        "cheon.pplus1_comb",
+        ImplementationAb,
+        SpecializedDomain,
         StandardBand
     ),
 ];

@@ -26,6 +26,9 @@ use crate::binary_ecc::{
     hcdlp_bsgs_counted, hcdlp_pollard_rho_counted, operation_tally::OperationTally, F2mElement,
     HcdlpGroupOps, OrdinaryBinaryCover,
 };
+use crate::cryptanalysis::cheon_counted::{
+    cheon_pminus1, cheon_pplus1, shape_divisor, Outcome as CheonOutcome, Side,
+};
 use crate::cryptanalysis::ecbench::canonical::{derive_u64, sha256_hex, short_id};
 use crate::cryptanalysis::ecbench::claw::{
     pair_claw, pair_claw_v2, pair_claw_wide, pair_claw_wide_v2, ClawOutcome, ClawShape,
@@ -44,6 +47,7 @@ use crate::cryptanalysis::ecbench::koblitz_descent::{
     self as koblitz_descent, DescentParams as KoblitzDescentParams,
 };
 use crate::cryptanalysis::ecbench::negation_strong::NegStrongParams;
+use crate::cryptanalysis::ecbench::oracle::StaticDhOracle;
 use crate::cryptanalysis::ecbench::wordram_price;
 use crate::cryptanalysis::ecbench::workload::{CurveFacts, HashWork, Instance, WideInstance};
 use crate::cryptanalysis::ecbench_large_prime::{
@@ -241,6 +245,12 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
             help: "per-call wall budget for an algebraic solver; nonzero makes the run nondeterministic",
         },
 ];
+
+const CHEON_PARAMS: &[ParamDecl] = &[ParamDecl {
+    name: "d",
+    default: None,
+    help: "the divisor of n - 1 (pminus1) or n + 1 (pplus1) the attack is built on, which sets both its cost and the number of oracle queries (d - 1 or 2d - 1): an integer, or `shape:RATIO:TOL` for the divisor with (n -/+ 1)/d prime and |log d / log n - RATIO| <= TOL closest to RATIO (cheon_counted::shape_divisor)",
+}];
 
 const STRONG_PARAMS: &[ParamDecl] = &[
     ParamDecl {
@@ -1100,6 +1110,14 @@ pub fn registry() -> &'static [MethodDecl] {
             params: RHO_PARAMS,
         },
         MethodDecl {
+            id: "rho.signed_frobenius_v2_full",
+            family: "rho",
+            summary: "rho.signed_frobenius_v2 (Brent cycle detection beside the cycle window) unchanged, with its canonicalisations and distinguished-point probes priced from src/cryptanalysis/ecbench/full_prices.json exactly as rho.signed_frobenius_full prices the legacy walk",
+            entry: "ic_boundary::signed_frobenius_rho_tuned_policy(WalkPolicy::v2()) + ecbench::full_price::reprice",
+            applies: Applies::KoblitzOnly,
+            params: RHO_PARAMS,
+        },
+        MethodDecl {
             id: "rho.signed_frobenius_strong_full",
             family: "rho",
             summary: "rho.signed_frobenius_strong unchanged, with its canonicalisations, partition hashes and table probes priced from src/cryptanalysis/ecbench/full_prices.json",
@@ -1230,6 +1248,30 @@ pub fn registry() -> &'static [MethodDecl] {
                     help: "direct Q query followed by at most this many total residual attempts",
                 },
             ],
+        },
+        MethodDecl {
+            id: "cheon.pminus1_comb",
+            family: "cheon",
+            summary: "Cheon's DLP with auxiliary inputs, n - 1 variant (EUROCRYPT 2006, theorem 1) with fixed-base comb tables, tables charged: given d | n - 1 and [alpha^d]G from d - 1 static-DH oracle queries, BSGS in the exponent in sqrt((n-1)/d) + sqrt(d) steps; mean ops about c (sqrt(n/d) + sqrt(d))",
+            entry: "cheon_counted::cheon_pminus1(comb = true)",
+            applies: Applies::Any,
+            params: CHEON_PARAMS,
+        },
+        MethodDecl {
+            id: "cheon.pminus1_naive",
+            family: "cheon",
+            summary: "the same n - 1 algorithm with a full double-and-add per step (the algorithm of cheon_attack.rs, counted in group operations); same oracle queries",
+            entry: "cheon_counted::cheon_pminus1(comb = false)",
+            applies: Applies::Any,
+            params: CHEON_PARAMS,
+        },
+        MethodDecl {
+            id: "cheon.pplus1_comb",
+            family: "cheon",
+            summary: "Cheon's n + 1 variant (theorem 2) through the norm-one torus of F_(n^2), comb tables charged: given d | n + 1 and [alpha^i]G for i <= 2d from 2d - 1 static-DH oracle queries, search in sqrt((n+1)/d) + d group operations of the polynomial sums; mean ops about c (sqrt(n/d) + d)",
+            entry: "cheon_counted::cheon_pplus1",
+            applies: Applies::Any,
+            params: CHEON_PARAMS,
         },
         MethodDecl {
             id: "ic.koblitz_descent",
@@ -1463,6 +1505,7 @@ pub fn expected_s(id: &str, a_available: u32) -> Option<f64> {
         "rho.signed_frobenius"
         | "rho.signed_frobenius_v2"
         | "rho.signed_frobenius_full"
+        | "rho.signed_frobenius_v2_full"
         | "rho.signed_frobenius_strong"
         | "rho.signed_frobenius_strong_v2"
         | "rho.signed_frobenius_strong_full"
@@ -3001,7 +3044,29 @@ pub fn solve(
     target: &[String; 2],
     seed: u64,
 ) -> Result<SolveReport, String> {
-    let mut rep = solve_measured(m, inst, curve, target, seed)?;
+    solve_with_oracle(m, inst, curve, target, seed, None)
+}
+
+/// Whether a method queries a static-DH oracle (the `cheon` family): the
+/// runner then builds [`crate::cryptanalysis::ecbench::oracle::PlantedStaticDh`]
+/// from the workload and passes it to [`solve_with_oracle`].
+pub fn needs_static_dh_oracle(id: &str) -> bool {
+    decl(id).is_some_and(|d| d.family == "cheon")
+}
+
+/// [`solve`], with the static-DH oracle of the workload for the methods
+/// that use one.  The oracle answers `P -> [alpha]P` and counts its
+/// queries; the planted scalar itself is never an argument.  A method that
+/// needs the oracle and gets none is refused.
+pub fn solve_with_oracle(
+    m: &ResolvedMethod,
+    inst: &Instance,
+    curve: &CurveFacts,
+    target: &[String; 2],
+    seed: u64,
+    oracle: Option<&dyn StaticDhOracle>,
+) -> Result<SolveReport, String> {
+    let mut rep = solve_measured(m, inst, curve, target, seed, oracle)?;
     complete(m, inst, curve, target, &mut rep)?;
     Ok(rep)
 }
@@ -3014,6 +3079,7 @@ pub fn solve_measured(
     curve: &CurveFacts,
     target: &[String; 2],
     seed: u64,
+    oracle: Option<&dyn StaticDhOracle>,
 ) -> Result<SolveReport, String> {
     hyper_ic_variant_guard(m, inst, curve)?;
     let d = decl(&m.id).ok_or("unregistered method")?;
@@ -3074,7 +3140,7 @@ pub fn solve_measured(
             // words; the u128 implementations (`ic_wide`, `rho_wide`).
             solve_f2m4_wide(m, i, curve, tx, ty, seed)?
         } else {
-            solve_inner(m, inst, curve, d, tx as u64, ty as u64, seed)?
+            solve_inner(m, inst, curve, d, tx as u64, ty as u64, seed, None)?
         }
     } else if matches!(
         inst,
@@ -3083,7 +3149,7 @@ pub fn solve_measured(
         solve_jacobian(m, inst, curve, target, seed)?
     } else {
         let (tx, ty) = (parse_hex(&target[0])?, parse_hex(&target[1])?);
-        solve_inner(m, inst, curve, run_d, tx, ty, seed)?
+        solve_inner(m, inst, curve, run_d, tx, ty, seed, oracle)?
     };
     if full.is_some() {
         full_price::reprice(&mut rep, d.family, &curve.slug)?;
@@ -3128,6 +3194,150 @@ pub fn solve_measured(
     Ok(rep)
 }
 
+/// `d` of a Cheon method: an integer, or `shape:RATIO:TOL`.
+fn cheon_d(m: &ResolvedMethod, n: u64, side: Side) -> Result<u64, String> {
+    let raw = m.params["d"].as_str();
+    if let Some(rest) = raw.strip_prefix("shape:") {
+        let (ratio, tol) = rest
+            .split_once(':')
+            .ok_or_else(|| format!("`d` = `{raw}`: expected shape:RATIO:TOL"))?;
+        let ratio: f64 = ratio.parse().map_err(|_| format!("bad ratio in `{raw}`"))?;
+        let tol: f64 = tol
+            .parse()
+            .map_err(|_| format!("bad tolerance in `{raw}`"))?;
+        shape_divisor(n, side, ratio, tol).ok_or_else(|| {
+            format!(
+                "no divisor of n {} 1 matches `{raw}` for n = {n}",
+                if side == Side::Minus { "-" } else { "+" }
+            )
+        })
+    } else {
+        raw.parse::<u64>()
+            .map_err(|_| format!("`d` = `{raw}` is not an integer or shape:RATIO:TOL"))
+    }
+}
+
+/// Cheon's algorithms with their auxiliary inputs read from the static-DH
+/// oracle: `d - 1` queries for `[alpha^d]G` (n - 1) or `2d - 1` for the
+/// powers up to `[alpha^(2d)]G` (n + 1), each answered from the previous
+/// answer, starting at the target.  The attacker's group operations are
+/// the unit's cost; the queries are a separate resource, reported in
+/// `counters.oracle_queries` with the server's work beside them and never
+/// folded into `total_gae`.
+fn solve_cheon(
+    m: &ResolvedMethod,
+    inst: &PrimeInstance,
+    target: PrimePoint,
+    oracle: Option<&dyn StaticDhOracle>,
+) -> Result<SolveReport, String> {
+    let oracle = oracle.ok_or_else(|| {
+        format!(
+            "`{}` queries a static-DH oracle, which a planted target provides and a public target does not",
+            m.id
+        )
+    })?;
+    let n = inst.r;
+    let g0 = inst.generator_point();
+    let plus = m.id == "cheon.pplus1_comb";
+    let side = if plus { Side::Plus } else { Side::Minus };
+    let d = cheon_d(m, n, side)?;
+    if !(1..=(1 << 24)).contains(&d) {
+        return Err(format!(
+            "d = {d} is outside 1..2^24 (the leaked powers are held in memory)"
+        ));
+    }
+    let before = oracle.queries();
+    // The leak: P_1 = Q, P_(i+1) = oracle(P_i).
+    let want = if plus { 2 * d } else { d };
+    let mut chain = Vec::with_capacity(if plus { want as usize + 1 } else { 2 });
+    let mut cur = target;
+    if plus {
+        chain.push(g0);
+        chain.push(target);
+    }
+    for _ in 1..want {
+        cur = oracle.query(cur);
+        if plus {
+            chain.push(cur);
+        }
+    }
+    let queries = oracle.queries() - before;
+    let t = Instant::now();
+    measurement::begin_online(Phase::RhoSolve);
+    let out: CheonOutcome = if plus {
+        cheon_pplus1(&inst.curve, n, d, &chain, None)
+    } else {
+        cheon_pminus1(
+            &inst.curve,
+            n,
+            d,
+            g0,
+            target,
+            cur,
+            m.id == "cheon.pminus1_comb",
+            None,
+        )
+    };
+    measurement::end_online();
+    let wall = t.elapsed().as_nanos() as u64;
+
+    let mut counters: BTreeMap<String, u64> = out.uncharged.clone();
+    let inserts = out
+        .uncharged
+        .get("table_insert_uncharged")
+        .copied()
+        .unwrap_or(0);
+    counters.insert("table_entries".into(), out.table_points + inserts);
+    counters.insert("comb_table_points".into(), out.table_points);
+    counters.insert("exponentiations".into(), out.exponentiations);
+    counters.insert("d".into(), d);
+    counters.insert("leaked_powers".into(), if plus { 2 * d } else { 2 });
+    counters.insert("oracle_queries".into(), queries);
+    let srv = oracle.server_ops();
+    counters.insert("oracle_server_group_ops".into(), srv.adds + srv.doubles);
+    let phases = out
+        .phase_ops
+        .iter()
+        .map(|(name, adds, doubles)| PhaseRecord {
+            name: name.clone(),
+            adds: *adds,
+            doubles: *doubles,
+            gae: (adds + doubles) as f64,
+            ..Default::default()
+        })
+        .collect();
+    let field_ops = Some(FieldOps::total(&[out.group_ops]));
+    Ok(SolveReport {
+        recovered: out.alpha.map(|a| ExactScalar::from(u128::from(a))),
+        exhausted: out.alpha.is_none(),
+        phases,
+        total_gae: out.ops as f64,
+        automorphisms_used: 1,
+        unpriced: unpriced_of(&counters),
+        counters,
+        deterministic: true,
+        nondeterminism: vec![],
+        solve_wall_ns: wall,
+        factor_base: None,
+        detail: json!({
+            "variant": if plus { "n+1" } else { "n-1" },
+            "d": d,
+            "comb": m.id != "cheon.pminus1_naive",
+            "oracle": {
+                "model": "static_dh",
+                "queries": queries,
+                "server_group_ops": {"adds": srv.adds, "doubles": srv.doubles},
+                "note": "queries are a separate resource: not in total_gae; the server spends one scalar multiplication by alpha per query",
+            },
+            "error": out.error,
+        }),
+        online: None,
+        online_error: None,
+        solver: None,
+        field_ops,
+    })
+}
+
 fn solve_inner(
     m: &ResolvedMethod,
     inst: &Instance,
@@ -3136,6 +3346,7 @@ fn solve_inner(
     tx: u64,
     ty: u64,
     seed: u64,
+    oracle: Option<&dyn StaticDhOracle>,
 ) -> Result<SolveReport, String> {
     if let Instance::ThreeLeads(i) = inst {
         return super::three_leads::solve(
@@ -3147,6 +3358,15 @@ fn solve_inner(
     }
     if let Instance::Wide(_) = inst {
         return Err("a wide instance goes through solve_wide".into());
+    }
+    if d.family == "cheon" {
+        let Instance::Prime(i) = inst else {
+            return Err(format!(
+                "`{}` runs on one-word prime-field curves only; {} is {}",
+                m.id, curve.slug, curve.family
+            ));
+        };
+        return solve_cheon(m, i, PrimePoint::affine(tx, ty), oracle);
     }
     if let Instance::Fp4(i) = inst {
         return solve_fp4(m, i, tx, ty, seed);
@@ -9569,7 +9789,7 @@ mod accounting_rules_tests {
             let (inst, facts) = built(&spec);
             let k = 4242u128;
             let target = inst.mul_generator_hex(k).unwrap();
-            let measured = solve_measured(&m, &inst, &facts, &target, 5).unwrap();
+            let measured = solve_measured(&m, &inst, &facts, &target, 5, None).unwrap();
             assert_eq!(measured.recovered, Some(ExactScalar::from(k)));
             let fb = measured
                 .factor_base
@@ -9605,7 +9825,7 @@ mod accounting_rules_tests {
             ],
         );
         let target = inst.mul_generator_hex(113).unwrap();
-        let measured = solve_measured(&m, &inst, &facts, &target, 19).unwrap();
+        let measured = solve_measured(&m, &inst, &facts, &target, 19, None).unwrap();
         assert!(measured.factor_base.is_none());
         let mut done = measured.clone();
         complete(&m, &inst, &facts, &target, &mut done).unwrap();
@@ -9733,6 +9953,7 @@ mod accounting_rules_tests {
             "ic.cm_folded_native_d43_v1",
             "ic.pipeline_full", // reprices ic.pipeline: full_price tests
             "rho.signed_frobenius_full",
+            "rho.signed_frobenius_v2_full",
             "rho.signed_frobenius_strong_full",
             "ic.large_prime", // large_prime_v2_charges_… test, both ids
             "ic.large_prime_v2",

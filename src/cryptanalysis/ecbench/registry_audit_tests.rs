@@ -412,10 +412,14 @@ const SKIPS: &[(&str, &str)] = &[
     ("ic.pipeline_full", "reprices a recorded ic.pipeline session (price-units, full_price); no solve of its own"),
     ("ic.pipeline_wordram", "reprices a recorded ic.pipeline session (price-units, wordram_price); no solve of its own"),
     ("rho.signed_frobenius_full", "reprices a recorded session (full_price)"),
+    ("rho.signed_frobenius_v2_full", "reprices a recorded session (full_price)"),
     ("rho.signed_frobenius_strong_full", "reprices a recorded session (full_price)"),
     ("rho.signed_frobenius_wordram", "reprices a recorded session (wordram_price)"),
     ("rho.signed_frobenius_strong_wordram", "reprices a recorded session (wordram_price)"),
     ("ic.trace_line_2lp", "needs a binary curve with n = 4d on a trace-selected subfield line; no instance small enough to build in a unit test"),
+    ("cheon.pminus1_comb", "DLP with auxiliary inputs: needs the runner's static-DH oracle and a curve with d | n-1 or n+1, so a plain solve refuses; covered by tests/ecbench_cheon.rs"),
+    ("cheon.pminus1_naive", "DLP with auxiliary inputs: needs the runner's static-DH oracle and a curve with d | n-1 or n+1, so a plain solve refuses; covered by tests/ecbench_cheon.rs"),
+    ("cheon.pplus1_comb", "DLP with auxiliary inputs: needs the runner's static-DH oracle and a curve with d | n-1 or n+1, so a plain solve refuses; covered by tests/ecbench_cheon.rs"),
 ];
 
 /// Frozen ids whose phases do not sum to their total on purpose, each with
