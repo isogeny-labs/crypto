@@ -1,7 +1,7 @@
 {
   "schema": "experiment.protocol/v1",
   "protocol_id": "IC-C1-DEFERRED-GUARD-FP28-20261106",
-  "version": 1,
+  "version": 2,
   "created": "2026-11-06",
   "repository": "crypto",
   "study_dir": "research/ic_c1_deferred_guard_fp28_20261106",
@@ -32,7 +32,10 @@
     ],
     "narrative": "research/ic_c1_deferred_guard_fp28_20261106/PROTOCOL.md",
     "prefreeze_checks": "research/ic_c1_deferred_guard_fp28_20261106/prefreeze-checks.md",
-    "prs": null
+    "prs": null,
+    "amendments": [
+      "research/ic_c1_deferred_guard_fp28_20261106/AMENDMENT-1.md"
+    ]
   },
   "question": "On fresh fp28 curves, does prime-abscissa:size=304 + mitm:negation_folded=1 + targets=stride-renew-deferred-guard have lower counted cost S than the walk incumbent (size=407, targets=walk) at every weight w in {0, 0.1, 1} of the section 5a band, on the ea8e9ef7 executable?",
   "claims": [
@@ -1310,12 +1313,28 @@
       "verified_by": null
     }
   ],
-  "amendments": [],
+  "amendments": [
+    {
+      "id": "C1-AMENDMENT-1",
+      "filed": "2026-11-06",
+      "filed_before_affected_data": true,
+      "reason": "PROTOCOL.md section 18 (revision 6) requires step S01-probe to confirm that the crypto checkout HEAD is the pinned source ea8e9ef71c3c82027dd9e01535302725519c3fca. That check cannot be met: the launcher scripts that run are the versions on main used by v6, which differ from the versions at ea8e9ef71c3c82027dd9e01535302725519c3fca: taskq/deploy/eks-karpenter/remote/launch-remote is 076ee44fac6ee5948d0836d9b8dccb53e8107eba02debd0f64e84d01a5166f45 there and de27df3830fb54589e5d030e416d2e6887f7d590bc03db2e50d7456449fc7362 on main; run-request is e9706cc618afed952d5d073866bb30f8b31302b1410f1d77a78784aac1fa2192 there and c4f75c585ca6c689bdbe3fa4840459df5347696db8901a3e23296239d21e6819 on main; current-run-request-buildspec.yml (35504896fd8e9eae15690bda0ddd11c2a453ec1c463b8cbeb3c1224f286f335e on main) does not exist at ea8e9ef71c3c82027dd9e01535302725519c3fca; validate-request is identical (dc6b59d32e937db5c049704102fe0d5ca0db7af9ac2bd8de67270bcafc230426). The build source is enforced elsewhere. Filed before any C1 session was launched or any C1 record read.",
+      "changes": [
+        "S01-probe checks the four launcher scripts under taskq/deploy/eks-karpenter/remote against implementation/remote-pins.sha256 (launch-remote de27df3830fb54589e5d030e416d2e6887f7d590bc03db2e50d7456449fc7362, validate-request dc6b59d32e937db5c049704102fe0d5ca0db7af9ac2bd8de67270bcafc230426, run-request c4f75c585ca6c689bdbe3fa4840459df5347696db8901a3e23296239d21e6819, current-run-request-buildspec.yml 35504896fd8e9eae15690bda0ddd11c2a453ec1c463b8cbeb3c1224f286f335e: the sha256 values the v6 launch card used), and launch_eks.sh re-checks them before every submission; S01 records the checkout HEAD but does not compare it with a pinned commit.",
+        "S01-probe recomputes the sha256 of every request the runbook binds, each of which must be present, against protocol.json extensions.requests; a bound request that is absent, or unknown to protocol.json, stops the session, and nothing is skipped because it is absent.",
+        "Build-source identity is unchanged in substance: it is enforced by the frozen requests' job.build (source_revision ea8e9ef71c3c82027dd9e01535302725519c3fca, image_uri 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:3c4ad8bf8ee1bd1fdc327cb4c0e2597a1fc5ef1cdd889aa21e1b1294bdd22914, ecbench_sha256 73362eed4165d6db20fe1d398baa8fabefa2497aff6e78dab9ed8f31af31dd01), restated in the runbook spec_bindings, and verified after each job by check_job.py (build-info.json source_revision and the launcher result.json build.image_uri).",
+        "No N, seed, curve, arm, weight, threshold, margin, accounting rule, decision mapping, budget or deadline changes. PROTOCOL.md is not edited."
+      ],
+      "supersedes_fields": [
+        "PROTOCOL.md section 18, step S01-probe: 'confirms the crypto checkout HEAD is the pinned source'"
+      ]
+    }
+  ],
   "freeze": {
     "status": "frozen",
-    "protocol_sha256": "43b1ca918c034433f3584f37db439613d11a618c0eec13d3d7831a1fa96d092f",
-    "commit": "339292abed16c2474e404e25f3b72d31b58bd9d8",
-    "frozen_at": "2026-11-06T10:11:25Z",
+    "protocol_sha256": "9844f78d435951cf9a5f19c9a89ff2a38656e58e94d632f577093db846f72166",
+    "commit": "4c44ad2ab582f0cd38b9fcf0dd0dd49df2800dd6",
+    "frozen_at": "2026-11-06T11:03:41Z",
     "filed_before_affected_data": true
   },
   "extensions": {
@@ -1395,6 +1414,16 @@
         "icv1-fp28-t14969-7ca8e8a5",
         "icv1-fp28-tm4717-89c926fe"
       ]
+    },
+    "c1_amendment_1": {
+      "file": "research/ic_c1_deferred_guard_fp28_20261106/AMENDMENT-1.md",
+      "file_sha256": "0dac23b1a0cd5128700f8b1ee136698c891f8ffbc36a8cef6b54a3cf0a09ef15",
+      "prior_freeze": {
+        "protocol_sha256": "43b1ca918c034433f3584f37db439613d11a618c0eec13d3d7831a1fa96d092f",
+        "commit": "339292abed16c2474e404e25f3b72d31b58bd9d8",
+        "frozen_at": "2026-11-06T10:11:25Z",
+        "reproducible_as": "experiment_protocol.py hash on this document with version set to 1, amendments set to [], links.amendments removed and extensions.c1_amendment_1 removed (verified to give the prior protocol_sha256)"
+      }
     }
   }
 }
