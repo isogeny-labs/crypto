@@ -1,0 +1,43 @@
+/var/tmp/pencil-mixed-tripling-20261031-v1/Tripling.lean:43:4: error(lean.dependsOnNoncomputable): failed to compile definition, consider marking it as 'noncomputable' because it depends on 'instAdd', which is 'noncomputable'
+/var/tmp/pencil-mixed-tripling-20261031-v1/Tripling.lean:51:156: warning: This simp argument is unused:
+  C_neg
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [MixedGeneric.curve, hermite, MixedCancellation.support, qout, rout, WeightedDoubling.value,
+    WeightedDoubling.deriv, halfSecond, C_add, C_sub, C_mul, C_pow, map_ofNat]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-mixed-tripling-20261031-v1/Tripling.lean:68:54: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  ?a + 0
+in the target expression
+  MixedGeneric.curve a0 a1 a2 a3 - hermite x y m A ^ 2 =
+    (X - C x) ^ 3 * MixedCancellation.support (qout x A) (rout a3 x m A) + 0 * (X - C x) ^ 2
+
+K : Type u_1
+inst✝ : Field K
+a0 a1 a2 a3 x y : K
+hp : WeightedDoubling.value a0 a1 a2 a3 x = y ^ 2
+hy : 2 * y ≠ 0
+m : K := WeightedDoubling.deriv a1 a2 a3 x / (2 * y)
+A : K := (halfSecond a2 a3 x - m ^ 2) / (2 * y)
+hd : WeightedDoubling.deriv a1 a2 a3 x - 2 * y * m = 0
+hh : halfSecond a2 a3 x - m ^ 2 - 2 * y * A = 0
+hi :
+  MixedGeneric.curve a0 a1 a2 a3 - hermite x y m A ^ 2 =
+    (X - C x) ^ 3 * MixedCancellation.support (qout x A) (rout a3 x m A) + 0 * (X - C x) ^ 2
+⊢ MixedCancellation.support
+      (qout x ((halfSecond a2 a3 x - (WeightedDoubling.deriv a1 a2 a3 x / (2 * y)) ^ 2) / (2 * y)))
+      (rout a3 x (WeightedDoubling.deriv a1 a2 a3 x / (2 * y))
+        ((halfSecond a2 a3 x - (WeightedDoubling.deriv a1 a2 a3 x / (2 * y)) ^ 2) / (2 * y))) ∣
+    MixedGeneric.curve a0 a1 a2 a3 -
+      ordinate
+          ((halfSecond a2 a3 x - (WeightedDoubling.deriv a1 a2 a3 x / (2 * y)) ^ 2) / (2 * y) *
+              qout x ((halfSecond a2 a3 x - (WeightedDoubling.deriv a1 a2 a3 x / (2 * y)) ^ 2) / (2 * y)) -
+            (WeightedDoubling.deriv a1 a2 a3 x / (2 * y) -
+              2 * ((halfSecond a2 a3 x - (WeightedDoubling.deriv a1 a2 a3 x / (2 * y)) ^ 2) / (2 * y)) * x))
+          ((halfSecond a2 a3 x - (WeightedDoubling.deriv a1 a2 a3 x / (2 * y)) ^ 2) / (2 * y) *
+              rout a3 x (WeightedDoubling.deriv a1 a2 a3 x / (2 * y))
+                ((halfSecond a2 a3 x - (WeightedDoubling.deriv a1 a2 a3 x / (2 * y)) ^ 2) / (2 * y)) -
+            (y - WeightedDoubling.deriv a1 a2 a3 x / (2 * y) * x +
+              (halfSecond a2 a3 x - (WeightedDoubling.deriv a1 a2 a3 x / (2 * y)) ^ 2) / (2 * y) * x ^ 2)) ^
+        2

@@ -1,0 +1,12 @@
+# Offline current-source controller/progress static qualification
+
+Both tools built successfully from a new private copy of the exact frozen root source. The captured controller cloud5b235809, supervisorc91ecbf2 and deadlineb7eaf3b0 matched root's requested identities. Progress main SHA256 e6c1029a0b65cc8e51dd58856fb428ea7ef2b9e11273a22d105066ec04e4e751. Every source/include dependency hash was rechecked against root after building; none changed. Root library/test jobs were not repeated or modified.
+
+The retained deploy-controller script specifies cargo+1.99.1 build--locked--release with x86_64-unknown-linux-musl. The tracked progress README specifies the same target/toolchain/profile; read through GIT_NO_LAZY_FETCH=1 without fetching or materializing shared files. Neither specifies additional Rust compiler flags. This qualification explicitly unset ambient RUSTFLAGS/CARGO_ENCODED_RUSTFLAGS/CARGO_BUILD_RUSTFLAGS, added offline mode, limited builds to2jobs and240seconds each, and used a new private target directory. It is new current-source qualification, not an assertion of byte reproduction of historical archives. Historical prepare_runtime.py was inspected for provenance only and never executed. No tool installation occurred.
+
+Controller build completed24.20seconds; progress6.69seconds. Bundles:
+- isolab-eks-recovery:2080560bytes, SHAb0403250273d2e06e58b18a745f221f2c8d9881979afbe027fdb5f8c237628a6.
+- isolab-criu-progress:745344bytes, SHA65509d5a2ed54622b36212efc6ddf2505f4d7dacde40ac640a9a9e5e6faf0273.
+Both have755mode and x86-64 ELF headers, with no INTERP or dynamic NEEDED entries. No binary was executed, so no supervisor/watchdog/namespace operation or solver could run. QUALIFICATION.json binds source, binary, log and receipt hashes; exact ELF inspection is retained.
+
+This is not a complete controller ZIP or runtime archive. CRIU4.2.1/tools/libraries, AWS/kubectl/MCP clients, executable/ancestor permissions, complete archive manifests and trusted image context remain to be combined under source-bound packaging review. No archive/image build/publication, cloud permission change, runtime namespace qualification, actual restore/replay or S3 readback occurred. A clean committed release identity, original prospective protocol/resource admission and full matched accounting remain separate. No performance or actual-worker-cost claim follows; original25200seconds and2026-10-30T22:08:40Z remain unchanged.

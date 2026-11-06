@@ -924,6 +924,26 @@ branches each, and runs the degree-4 closure on every branch.
 - **Memory.** Peak 7.04 GB under the 15 GB limit; the earlier 10.6 GB was one
   outlier (median 7.0 GB over 68 runs).
 
+## Result 17: the unspecialised (22, 7) system does not refute at degree 4
+
+`research/dreg_closure_null22_7_20261028/` was pre-registered. It measures the
+**matched null** for the three-guess set of Result 16: the unspecialised
+m = 3, (n, ℓ) = (22, 7) system, with the same N = 43 unknowns, 44 equations and
+136,698 degree-4 columns, on its first four unsatisfiable draws (surplus +1).
+
+- **Registered verdict: "N0 does not refute on at least 3 draws: the pure ℓ = 7
+  reading."** It does not refute on 4 of 4. Controls valid: the identity control
+  matches its committed record on every non-timing field, the dimension-6 control
+  refutes on 4 of 4, and neither satisfiable draw is refuted.
+- **With Results 12 and 13, 12 of 12 unspecialised ℓ = 7 draws do not refute,**
+  over N = 40, 42, 43 and surplus −2, 0, +1, so surplus is not what caused the
+  earlier ℓ = 7 failure.
+- **Reading.** The three-guess failure (Result 16) is what ℓ = 7 does. The pattern
+  fits `m·(ℓ−7)+1` guesses, 4 at ℓ = 8. The 3-set and this cell are an analogy:
+  3 of 4 and 4 of 4 failures are not distinguishable at four draws each.
+- **Not measured:** a three-variable set leaving one summand at dimension 8
+  (predicted to fail), degree 5 at ℓ = 7, ℓ = 9.
+
 ## Reproducing
 
 ```sh

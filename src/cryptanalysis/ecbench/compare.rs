@@ -96,9 +96,17 @@ pub const MIN_WALL_PAIRS: usize = 5;
 /// An interval over fewer workloads than this is `indicative`.
 pub const INDICATIVE_BELOW_WORKLOADS: usize = 5;
 
-/// An arm whose largest run is more than this share of its total S has a
-/// heavy tail: the mean is carried by one run.
+/// An arm whose largest run is more than this share of its total S, and
+/// more than twice its equal share (`2/n`), has a heavy tail: the mean is
+/// carried by one run.  The second condition keeps the flag informative at
+/// small `n`, where one of four runs always holds at least a quarter; from
+/// eight runs up the share alone decides.
 pub const HEAVY_TAIL_SHARE: f64 = 0.25;
+
+/// The share above which the top run of `n` marks a heavy tail.
+pub fn heavy_tail_share(n: usize) -> f64 {
+    HEAVY_TAIL_SHARE.max(2.0 / n.max(1) as f64)
+}
 
 /// What the measured arm's tail looks like (verified runs only).
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -297,12 +305,29 @@ pub struct WallResult {
     pub ci_method: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dof: Option<f64>,
-    /// End to end: `Σ solve_wall_B / Σ solve_wall_A` and its linearised
-    /// interval.  Carries the work variance; secondary.
+    /// Historical name for `Σ solve_wall_B / Σ solve_wall_A` and its
+    /// linearised interval. Carries the work variance; secondary. This is the
+    /// algorithm solve interval, not the complete cold method or process.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub total_wall_ratio: Option<f64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub total_wall_ci95: Option<(f64, f64)>,
+    /// Complete cold method call: setup, solve, in-child verification and
+    /// report completion, excluding workload construction and process launch.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub method_call_wall_ratio: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub method_call_wall_ci95: Option<(f64, f64)>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub method_call_wall_ci95_bootstrap: Option<(f64, f64)>,
+    /// Fork-to-reap process wall time, including workload reconstruction and
+    /// process overhead. This is the broadest end-to-end practicality figure.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub process_wall_ratio: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub process_wall_ci95: Option<(f64, f64)>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub process_wall_ci95_bootstrap: Option<(f64, f64)>,
     /// The two compared arms run one method: this comparison is itself an
     /// A/A control and has nothing to correct.
     #[serde(default)]
@@ -428,7 +453,7 @@ pub fn tail_diagnostics(runs: &[(String, f64)]) -> Option<TailDiagnostics> {
         max_over_median: (med > 0.0).then(|| top / med),
         top_run_share: share,
         top_run_id: top_id,
-        heavy_tail: share > HEAVY_TAIL_SHARE,
+        heavy_tail: share > heavy_tail_share(runs.len()),
     })
 }
 
@@ -524,6 +549,23 @@ fn ratio_of_sums(pairs: impl Iterator<Item = (f64, f64)>) -> Option<f64> {
         n += 1;
     }
     (n > 0 && sa > 0.0).then(|| sb / sa)
+}
+
+/// Target-clustered paired percentile bootstrap of a ratio of sums. It
+/// resamples workloads and their rounds while always keeping each arm's two
+/// observations together.
+fn paired_ratio_bootstrap(
+    by_workload: &BTreeMap<String, Vec<(f64, f64)>>,
+    resamples: usize,
+    seed: u64,
+) -> Option<(f64, f64)> {
+    let strata: Vec<Vec<(f64, f64)>> = by_workload.values().cloned().collect();
+    let stat = |sample: &[Vec<(f64, f64)>]| ratio_of_sums(sample.iter().flatten().copied());
+    if strata.len() >= 2 {
+        cluster_bootstrap_ci(&strata, resamples, seed, stat)
+    } else {
+        bootstrap_ci(&strata, resamples, seed, stat)
+    }
 }
 
 fn pair_ratio(pairs: impl Iterator<Item = Pair>) -> Option<f64> {
@@ -1444,6 +1486,14 @@ struct WallData {
     all: Vec<WallPair>,
     /// Pairs where both runs earned `required`.
     admitted: Vec<WallPair>,
+    all_method_call: Vec<(f64, f64)>,
+    admitted_method_call: Vec<(f64, f64)>,
+    all_method_call_by_workload: BTreeMap<String, Vec<(f64, f64)>>,
+    admitted_method_call_by_workload: BTreeMap<String, Vec<(f64, f64)>>,
+    all_process: Vec<(f64, f64)>,
+    admitted_process: Vec<(f64, f64)>,
+    all_process_by_workload: BTreeMap<String, Vec<(f64, f64)>>,
+    admitted_process_by_workload: BTreeMap<String, Vec<(f64, f64)>>,
     pairs: u64,
     below: u64,
 }
@@ -1461,10 +1511,18 @@ fn wall_data(recs: &[Record], a: &str, b: &str, required: Level) -> WallData {
     let mut d = WallData {
         all: Vec::new(),
         admitted: Vec::new(),
+        all_method_call: Vec::new(),
+        admitted_method_call: Vec::new(),
+        all_method_call_by_workload: BTreeMap::new(),
+        admitted_method_call_by_workload: BTreeMap::new(),
+        all_process: Vec::new(),
+        admitted_process: Vec::new(),
+        all_process_by_workload: BTreeMap::new(),
+        admitted_process_by_workload: BTreeMap::new(),
         pairs: 0,
         below: 0,
     };
-    for (_, (ra, rb)) in by {
+    for ((workload, _round), (ra, rb)) in by {
         let (Some(ra), Some(rb)) = (ra, rb) else {
             continue;
         };
@@ -1475,6 +1533,37 @@ fn wall_data(recs: &[Record], a: &str, b: &str, required: Level) -> WallData {
         let below = ra.isolation.level < required || rb.isolation.level < required;
         if below {
             d.below += 1;
+        }
+        let process = (
+            ra.time.process_wall_ns as f64,
+            rb.time.process_wall_ns as f64,
+        );
+        d.all_process.push(process);
+        d.all_process_by_workload
+            .entry(workload.clone())
+            .or_default()
+            .push(process);
+        if !below {
+            d.admitted_process.push(process);
+            d.admitted_process_by_workload
+                .entry(workload.clone())
+                .or_default()
+                .push(process);
+        }
+        if let (Some(a), Some(b)) = (ra.time.method_call_wall_ns, rb.time.method_call_wall_ns) {
+            let method_call = (a as f64, b as f64);
+            d.all_method_call.push(method_call);
+            d.all_method_call_by_workload
+                .entry(workload.clone())
+                .or_default()
+                .push(method_call);
+            if !below {
+                d.admitted_method_call.push(method_call);
+                d.admitted_method_call_by_workload
+                    .entry(workload)
+                    .or_default()
+                    .push(method_call);
+            }
         }
         if let (true, Some(ga), Some(gb)) = (ta > 0 && tb > 0, ra.cost.total_gae, rb.cost.total_gae)
         {
@@ -1632,6 +1721,12 @@ fn wall_compare(
         dof: None,
         total_wall_ratio: None,
         total_wall_ci95: None,
+        method_call_wall_ratio: None,
+        method_call_wall_ci95: None,
+        method_call_wall_ci95_bootstrap: None,
+        process_wall_ratio: None,
+        process_wall_ci95: None,
+        process_wall_ci95_bootstrap: None,
         self_aa: false,
         aa_selection: None,
         aa_ratio: None,
@@ -1666,6 +1761,24 @@ fn wall_compare(
         w.ns_per_gae_a = Some(f.ns_per_gae_a);
         w.ns_per_gae_b = Some(f.ns_per_gae_b);
     }
+    if let Some(ratio) = linearised_ratio(&data.all_method_call) {
+        w.method_call_wall_ratio = Some(ratio.estimate);
+        w.method_call_wall_ci95 = ratio.ci95_log();
+    }
+    w.method_call_wall_ci95_bootstrap = paired_ratio_bootstrap(
+        &data.all_method_call_by_workload,
+        resamples,
+        seed ^ 0x4D45_5448_4F44,
+    );
+    if let Some(ratio) = linearised_ratio(&data.all_process) {
+        w.process_wall_ratio = Some(ratio.estimate);
+        w.process_wall_ci95 = ratio.ci95_log();
+    }
+    w.process_wall_ci95_bootstrap = paired_ratio_bootstrap(
+        &data.all_process_by_workload,
+        resamples,
+        seed ^ 0x5052_4F43_4553_53,
+    );
     if data.below > 0 {
         w.reasons.push(format!(
             "{} of {} pairs did not reach {}",
@@ -1697,6 +1810,24 @@ fn wall_compare(
     w.dof = Some(fig.ratio.df);
     w.total_wall_ratio = fig.total.map(|t| t.estimate);
     w.total_wall_ci95 = fig.total.and_then(|t| t.ci95_log());
+    if let Some(ratio) = linearised_ratio(&data.admitted_method_call) {
+        w.method_call_wall_ratio = Some(ratio.estimate);
+        w.method_call_wall_ci95 = ratio.ci95_log();
+    }
+    w.method_call_wall_ci95_bootstrap = paired_ratio_bootstrap(
+        &data.admitted_method_call_by_workload,
+        resamples,
+        seed ^ 0x4D45_5448_4F44,
+    );
+    if let Some(ratio) = linearised_ratio(&data.admitted_process) {
+        w.process_wall_ratio = Some(ratio.estimate);
+        w.process_wall_ci95 = ratio.ci95_log();
+    }
+    w.process_wall_ci95_bootstrap = paired_ratio_bootstrap(
+        &data.admitted_process_by_workload,
+        resamples,
+        seed ^ 0x5052_4F43_4553_53,
+    );
 
     // The noise floor and bias correction.
     let mut arms: BTreeMap<String, (String, String)> = BTreeMap::new();
@@ -1913,6 +2044,7 @@ mod tests {
         } else {
             json!(wall_ns)
         });
+        v["time"]["method_call_wall_ns"] = json!(wall_ns + 500_000);
         v["time"]["process_wall_ns"] = json!(wall_ns + 1_000_000);
         v["algorithm_seed"] = json!(format!("{round}"));
         let mut r: Record = serde_json::from_value(v).unwrap();
@@ -2109,6 +2241,17 @@ mod tests {
         assert!((t.top_run_share - 30.0 / 38.0).abs() < 1e-12);
         assert_eq!(t.max_over_median, Some(30.0));
         assert!(tail_diagnostics(&[]).is_none());
+        // Four even runs hold a quarter each: not a tail.  One run carrying
+        // more than the other three together is.
+        let even: Vec<(String, f64)> = (0..4).map(|i| (format!("e{i}"), 1.0 + i as f64)).collect();
+        assert!(!tail_diagnostics(&even).unwrap().heavy_tail);
+        let mut lop = even.clone();
+        lop[3].1 = 7.0;
+        assert!(tail_diagnostics(&lop).unwrap().heavy_tail);
+        // Two runs can never show a tail; from eight runs up the share alone decides.
+        assert!(!tail_diagnostics(&even[..2]).unwrap().heavy_tail);
+        assert_eq!(heavy_tail_share(8), HEAVY_TAIL_SHARE);
+        assert_eq!(heavy_tail_share(4), 0.5);
     }
 
     #[test]
@@ -2278,6 +2421,16 @@ mod tests {
         let aa = c.wall.aa_ratio.unwrap();
         assert!((aa - 1.02).abs() < 0.02, "A/A ratio {aa}");
         assert!(c.wall.corrected_ratio.is_some());
+        assert!(c.wall.method_call_wall_ratio.is_some());
+        assert!(c.wall.method_call_wall_ci95.is_some());
+        assert!(c.wall.method_call_wall_ci95_bootstrap.is_some());
+        assert!(c.wall.process_wall_ratio.is_some());
+        assert!(c.wall.process_wall_ci95.is_some());
+        assert!(c.wall.process_wall_ci95_bootstrap.is_some());
+        assert!(
+            c.wall.process_wall_ratio.unwrap() < c.wall.total_wall_ratio.unwrap(),
+            "the fixed process overhead attenuates B/A"
+        );
         assert!(c.wall.legacy_ci95.is_some());
         assert!(c.wall.median_ratio.is_some());
         assert!(c.verdict.contains("INDICATIVE"), "{}", c.verdict);

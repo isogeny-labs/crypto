@@ -1,0 +1,69 @@
+/var/tmp/pencil-union-size-20261101-v1/SizeControls.lean:8:71: error: Tactic `decide` failed for proposition
+  child tied 0 1 = 0 ∧ parent tied 0 1 = 1
+because its `Decidable` instance
+  instDecidableAnd
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableAnd`, `instDecidableEqBool`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableLeBitVec`, `Bool.decEq`, `Nat.decEq`, `Nat.decLe`, `USize.decLe`, and `USize.decLe._aux_1`, reduction got stuck at the `Decidable` instance
+  match h : (↑(child tied 0 1)).beq ↑0 with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+/var/tmp/pencil-union-size-20261101-v1/SizeControls.lean:9:69: error: Tactic `decide` failed for proposition
+  child sizes 0 2 = 0 ∧ parent sizes 0 2 = 2
+because its `Decidable` instance
+  instDecidableAnd
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableAnd`, `instDecidableEqBool`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableLeBitVec`, `Bool.decEq`, `Nat.decEq`, `Nat.decLe`, `USize.decLe`, and `USize.decLe._aux_1`, reduction got stuck at the `Decidable` instance
+  match h : (↑(child sizes 0 2)).beq ↑0 with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+/var/tmp/pencil-union-size-20261101-v1/SizeControls.lean:10:70: error: Tactic `decide` failed for proposition
+  child sizes 2 0 = 0 ∧ parent sizes 2 0 = 2
+because its `Decidable` instance
+  instDecidableAnd
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableAnd`, `instDecidableEqBool`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableLeBitVec`, `Bool.decEq`, `Nat.decEq`, `Nat.decLe`, `USize.decLe`, and `USize.decLe._aux_1`, reduction got stuck at the `Decidable` instance
+  match h : (↑(child sizes 2 0)).beq ↑0 with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+/var/tmp/pencil-union-size-20261101-v1/SizeControls.lean:11:62: error: Tactic `decide` failed for proposition
+  sizeAt (update sizes 0 2) 2 = 5
+because its `Decidable` instance
+  instDecidableEqUSize (sizeAt (update sizes 0 2) 2) 5
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqBitVec`, `instDecidableEqBool`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableEqUSize`, `BitVec.decEq`, `Bool.decEq`, `Nat.decEq`, `Nat.decLe`, and `USize.decEq`, reduction got stuck at the `Decidable` instance
+  match h :
+    (↑(Fin.Internal.ofNat (2 ^ System.Platform.numBits) ⋯
+            ((sizeAt sizes 2).toBitVec.toNat + (sizeAt sizes 0).toBitVec.toNat))).beq
+      ↑(Fin.Internal.ofNat (2 ^ System.Platform.numBits) ⋯ 5) with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+/var/tmp/pencil-union-size-20261101-v1/SizeControls.lean:12:67: error: Tactic `decide` failed for proposition
+  sizeAt (update sizes 0 2) 0 = 2
+because its `Decidable` instance
+  instDecidableEqUSize (sizeAt (update sizes 0 2) 0) 2
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqBitVec`, `instDecidableEqBool`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableEqUSize`, `BitVec.decEq`, `Bool.decEq`, `Nat.decEq`, `Nat.decLe`, and `USize.decEq`, reduction got stuck at the `Decidable` instance
+  match h :
+    (↑(Fin.Internal.ofNat (2 ^ System.Platform.numBits) ⋯ 2)).beq
+      ↑(Fin.Internal.ofNat (2 ^ System.Platform.numBits) ⋯ 2) with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+/var/tmp/pencil-union-size-20261101-v1/SizeControls.lean:13:66: error: Tactic `decide` failed for proposition
+  sizeAt (update sizes 0 2) 1 = 1
+because its `Decidable` instance
+  instDecidableEqUSize (sizeAt (update sizes 0 2) 1) 1
+did not reduce to `isTrue` or `isFalse`.
+
+After unfolding the instances `decEq`, `instDecidableEqBitVec`, `instDecidableEqBool`, `instDecidableEqFin`, `instDecidableEqNat`, `instDecidableEqUSize`, `BitVec.decEq`, `Bool.decEq`, `Nat.decEq`, `Nat.decLe`, and `USize.decEq`, reduction got stuck at the `Decidable` instance
+  match h :
+    (↑(Fin.Internal.ofNat (2 ^ System.Platform.numBits) ⋯ 1)).beq
+      ↑(Fin.Internal.ofNat (2 ^ System.Platform.numBits) ⋯ 1) with
+  | true => isTrue ⋯
+  | false => isFalse ⋯
+/var/tmp/pencil-union-size-20261101-v1/SizeControls.lean:15:72: error: unsolved goals
+⊢ (USize.size - 1 + 1) % 2 ^ System.Platform.numBits = 0

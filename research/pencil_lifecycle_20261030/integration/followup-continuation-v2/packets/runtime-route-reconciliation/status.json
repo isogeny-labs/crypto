@@ -1,0 +1,23 @@
+{
+  "schema": "runtime.local-route-inspection/v1",
+  "route": "existing sudo -n docker",
+  "explicit_endpoint": "unix:///var/run/docker.sock",
+  "selectors_cleared_names": [],
+  "daemon_available": true,
+  "server_version": "25.0.16",
+  "pinned_upstream_image": "public.ecr.aws/aws-cli/aws-cli@sha256:b94fc7612d131f1a3cb76145ba3385c813ad7561ef2c2b60c89fbd5dfee93d39",
+  "pinned_upstream_present": false,
+  "final_ecbench_image_id": null,
+  "final_runtime_image_id": null,
+  "scope": "read-only existing route and single relevant pinned upstream image; final image bindings remain unset",
+  "actions_not_performed": [
+    "daemon changes",
+    "group changes",
+    "container actions",
+    "build",
+    "pull",
+    "push",
+    "cloud commands"
+  ],
+  "commands": 2
+}

@@ -1,0 +1,13 @@
+import CZero
+set_option autoImplicit false
+namespace CZeroControls
+open CZeroInterpolation Polynomial
+theorem nonzero_difference : bnum (1:ℚ) 2 0 1 = -2 ∧ anum (1:ℚ) 2 4 5 0 1 1 2 = -6 ∧ cnum (1:ℚ) 2 4 5 0 1 1 2 = 0 := by norm_num [bnum,anum,cnum]
+theorem equal_q_admitted : bnum (0:ℚ) 1 0 2 = -1 ∧ cnum (0:ℚ) 1 3 4 0 2 3 6 = 0 := by norm_num [bnum,cnum]
+theorem shared_root_boundary : bnum (1:ℚ) 0 2 0 = 0 := by norm_num [bnum]
+theorem nonzero_c_boundary : cnum (1:ℚ) 2 4 6 0 1 1 2 ≠ 0 := by norm_num [cnum]
+theorem identical_support_degenerate : bnum (1:ℚ) 2 1 2 = 0 ∧ cnum (1:ℚ) 2 4 5 1 2 7 8 = 0 := by norm_num [bnum,cnum]
+theorem explicit_common_interpolant :
+ ordinate (4:ℚ) 5-C 3*support 1 2=ordinate 1 2-C 3*support 0 1 := by
+ simp only [ordinate,support];norm_num;ring
+end CZeroControls

@@ -1,8 +1,9 @@
 # A curve-generic index-calculus engine: audit and design
 
-This document consolidates a full audit of every index-calculus (IC) code
-path in the `crypto` and `cryptanalysis` repositories, and specifies the
-`icx` engine and CLI built on top of it: one command that accepts **any
+This document records an engine design and its original audit. The
+[2026-10-17 CLI capability audit](CLI_CAPABILITY_AUDIT_20261017.md) checks
+the implemented commands against this design. Several commands and run
+regimes described below remain proposals. The intended `icx` CLI accepts **any
 standardized elliptic curve by name** — prime, binary (random and Koblitz),
 extension-field, and characteristic-three — verifies it, estimates its IC
 cost against the generic-attack boundary, and runs the pluggable pipeline at
@@ -37,13 +38,13 @@ and never conflates them:
 
 | regime | meaning | what a run produces |
 |---|---|---|
-| `attack` | IC is the relevant sub-exponential attack AND the instance is within the demonstrated end-to-end envelope | a verified logarithm, cost as `S = ops/√r` with a ratio to rho |
-| `scaled` | the named curve is out of envelope; the run executes on a same-family analogue at feasible size | a verified logarithm on the analogue + a labelled extrapolation to the named curve |
-| `estimate` | no feasible run (e.g. P-521); closed-form floors and fitted exponents only | a cost estimate with its heuristics stated, no solve claimed |
+| `attack` | Reserved for an exact named-curve run path; `icx run` does not currently select it | No current `icx` output |
+| `scaled` | `icx run` uses a feasible prime, binary, or Koblitz analogue regardless of the named curve's bit envelope | A result on the analogue, labelled with the named curve it studies |
+| `estimate` | Extension and characteristic-three families have no runnable `icx` pipeline | A cost estimate with its heuristics stated |
 
-"You can run `icx` against every standardized curve" is the completion
-criterion, and it is met by producing the *correct* one of these three
-outputs for each curve — not by pretending to solve what cannot be solved.
+"You can run `icx` against every standardized curve" remains a completion
+criterion. The current CLI can inspect and estimate catalog entries; its run
+path supports analogues for prime, binary, and Koblitz families.
 
 ## 2. What already exists (audit consolidation)
 
@@ -213,12 +214,13 @@ once the rate estimate stabilizes, and marked provisional before then.
 
 ### 3.4 The engine and CLI
 
-`icx <curve>` inspects; subcommands:
+`icx <curve>` inspects. The following list mixes implemented commands and
+design targets; `src/bin/icx.rs` is the executable command contract:
 
 - `icx list [--family F]` — every catalog curve, its field, regime, security.
 - `icx inspect <curve>` — full parameter verification (reuses `params.rs`
   checks, generalized past the 512-bit cap).
-- `icx estimate <curve> [--solver ...]` — boundary floors, family-optimum `S`,
+- `icx estimate <curve>` (implemented; `--solver` is proposed) — boundary floors, family-optimum `S`,
   fitted-exponent extrapolation; no solve.  For a curve over `F_{2^n}` it
   also prints the Kousidis–Wiemers form of the Petit–Quisquater heuristic at
   every `ω` bound in `cryptanalysis::matmul_exponent`, each labelled with its
@@ -228,15 +230,16 @@ once the rate estimate stabilizes, and marked provisional before then.
   (`research/notes/ecc2k130/RESEARCH_ECC2K130_IC_LITERATURE.md`, addendum of
   2026-10-07).
 - `icx run <curve> [--factor-base ...] [--oracle ...] [--solver ...]
-  [--linalg ...] [--regime auto|scaled|attack]` — runs the pipeline via the
-  framework at the feasible size, prints staged progress + ETA, verifies the
-  recovered logarithm, and reports `S` and the ratio to rho, with the regime
-  labelled.
-- `icx plan <curve>` — the analogue ladder and expected costs for a `scaled`
-  run, without running.
+  [--linalg ...]` (implemented for prime, binary, and Koblitz analogues) —
+  runs the framework on the selected analogue. `--regime` and exact
+  named-curve execution are proposed interfaces.
+- `icx plan <curve>` (proposed) — the analogue ladder and expected costs for
+  a `scaled` run, without running.
 
-All subcommands support `--json` for a machine-readable report carrying the
-provenance block (binary hash, git commit, host, dispatched backend).
+All implemented subcommands support `--json`. The current provenance block
+records package version, OS, architecture, and a host field-backend capability
+label. Binary hash, git commit, and actual backend dispatch are proposed
+provenance fields, not fields in the current report.
 
 ### 3.5 GPU/Metal offload
 

@@ -1,0 +1,243 @@
+{
+  "card_id": "CARD-BLINDSPOT-05-01",
+  "card_path": "research/blindspots_20261018/05-elimination-orders/card-01.yaml",
+  "card_sha256": "094f8078200d9eaf749dd0d2b17092e22cbbb5b3447327872e5b762cda2c0cba",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-05/card-01"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "target-cpu=native",
+        "-o",
+        "target/blindspots-05/card-01/b05",
+        "examples/blindspots_05_elimination_orders.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 4.156,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 4.156,
+      "stderr_sha256": "68c726b2922de2b59f9658ee1bf338ad10c01ad3911f3a25af38414155bbe22c",
+      "stderr_tail": [
+        "    |",
+        "458 | fn poly_degree(p: &Poly) -> u32 {",
+        "    |    ^^^^^^^^^^^",
+        "",
+        "warning: field `nv` is never read",
+        "   --> examples/blindspots_05_elimination_orders.rs:549:5",
+        "    |",
+        "548 | struct Order {",
+        "    |        ----- field in this struct",
+        "549 |     nv: usize,",
+        "    |     ^^",
+        "",
+        "warning: constant `FIXED_ARMS` is never used",
+        "    --> examples/blindspots_05_elimination_orders.rs:1334:7",
+        "     |",
+        "1334 | const FIXED_ARMS: [&str; 6] = [\"grevlex\", \"blkLI\", \"blkIL\", \"wdeg\", \"mindeg\", \"tw\"];",
+        "     |       ^^^^^^^^^^",
+        "",
+        "warning: 4 warnings emitted",
+        ""
+      ],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-05/card-01/b05",
+        "selftest",
+        "--controls",
+        "research/blindspots_20261018/07-blocked-f4-degree-cells/controls.tsv",
+        "--max-nv",
+        "26"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 10.005,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "selftest",
+      "index": 3,
+      "outputs": {},
+      "seconds": 10.005,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "4473dc68c09f9572bc4fd62698c0b1d0eefc5e87683cf0c7951dd271c01cad58",
+      "stdout_tail": [
+        "  control (m,n,l)=(4,6,2) nv=20 D_mat(grevlex)=3 D_sel=3 committed closure=3 msolve=3",
+        "  control (m,n,l)=(4,6,2) nv=20 D_mat(grevlex)=3 D_sel=3 committed closure=3 msolve=3",
+        "  control (m,n,l)=(4,7,2) nv=22 D_mat(grevlex)=4 D_sel=4 committed closure=4 msolve=4",
+        "  control (m,n,l)=(4,7,2) nv=22 D_mat(grevlex)=3 D_sel=3 committed closure=3 msolve=3",
+        "  control (m,n,l)=(4,7,2) nv=22 D_mat(grevlex)=4 D_sel=4 committed closure=4 msolve=4",
+        "  control (m,n,l)=(4,7,2) nv=22 D_mat(grevlex)=4 D_sel=4 committed closure=4 msolve=4",
+        "  control (m,n,l)=(4,8,2) nv=24 D_mat(grevlex)=4 D_sel=4 committed closure=4 msolve=4",
+        "  control (m,n,l)=(4,8,2) nv=24 D_mat(grevlex)=3 D_sel=3 committed closure=3 msolve=3",
+        "  control (m,n,l)=(4,8,2) nv=24 D_mat(grevlex)=4 D_sel=4 committed closure=4 msolve=4",
+        "  control (m,n,l)=(4,8,2) nv=24 D_mat(grevlex)=4 D_sel=4 committed closure=4 msolve=4",
+        "  control (m,n,l)=(3,7,4) nv=19 D_mat(grevlex)=4 D_sel=4 committed closure=4 msolve=-1",
+        "  control (m,n,l)=(3,7,4) nv=19 D_mat(grevlex)=4 D_sel=4 committed closure=4 msolve=-1",
+        "  control (m,n,l)=(3,7,4) nv=19 D_mat(grevlex)=4 D_sel=4 committed closure=4 msolve=-1",
+        "  control (m,n,l)=(3,7,4) nv=19 D_mat(grevlex)=4 D_sel=4 committed closure=4 msolve=-1",
+        "  control (m,n,l)=(3,8,4) nv=20 D_mat(grevlex)=4 D_sel=4 committed closure=4 msolve=-1",
+        "  control (m,n,l)=(3,8,4) nv=20 D_mat(grevlex)=4 D_sel=4 committed closure=4 msolve=-1",
+        "  control (m,n,l)=(3,8,4) nv=20 D_mat(grevlex)=4 D_sel=4 committed closure=4 msolve=-1",
+        "  control (m,n,l)=(3,8,4) nv=20 D_mat(grevlex)=4 D_sel=4 committed closure=4 msolve=-1",
+        "committed draws: 84 unsat draws refuted by the F4; D_mat(grevlex) equals the committed closure degree on 84, is below on 0, above on 0; equals msolve on 32 of 32",
+        "SELFTEST OK"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-05/card-01/b05",
+        "sens"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 9.511,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "sens",
+      "index": 4,
+      "outputs": {},
+      "seconds": 9.511,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "3785295ca7dc734c7f68f6af136940f9b7748d621c33ba225f2b1202442527a9",
+      "stdout_tail": [
+        "{\"sens_instance\":0,\"solutions\":0,\"blkYX_status\":\"refuted\",\"blkXY_status\":\"refuted\",\"blkYX_touches\":10863019,\"blkXY_touches\":734756834,\"blkYX_d_mat\":7,\"blkXY_d_mat\":10,\"ratio\":67.638,\"agree_with_brute_force\":true}",
+        "{\"sens_instance\":1,\"solutions\":0,\"blkYX_status\":\"refuted\",\"blkXY_status\":\"refuted\",\"blkYX_touches\":13903830,\"blkXY_touches\":155382905,\"blkYX_d_mat\":7,\"blkXY_d_mat\":10,\"ratio\":11.176,\"agree_with_brute_force\":true}",
+        "{\"sens_instance\":2,\"solutions\":0,\"blkYX_status\":\"refuted\",\"blkXY_status\":\"refuted\",\"blkYX_touches\":12518451,\"blkXY_touches\":155985796,\"blkYX_d_mat\":7,\"blkXY_d_mat\":10,\"ratio\":12.460,\"agree_with_brute_force\":true}",
+        "{\"sens_instance\":3,\"solutions\":0,\"blkYX_status\":\"refuted\",\"blkXY_status\":\"refuted\",\"blkYX_touches\":10375827,\"blkXY_touches\":375109388,\"blkYX_d_mat\":6,\"blkXY_d_mat\":10,\"ratio\":36.152,\"agree_with_brute_force\":true}",
+        "{\"sens_instance\":4,\"solutions\":0,\"blkYX_status\":\"refuted\",\"blkXY_status\":\"refuted\",\"blkYX_touches\":28149791,\"blkXY_touches\":647498662,\"blkYX_d_mat\":6,\"blkXY_d_mat\":10,\"ratio\":23.002,\"agree_with_brute_force\":true}",
+        "{\"sens_instance\":5,\"solutions\":0,\"blkYX_status\":\"refuted\",\"blkXY_status\":\"refuted\",\"blkYX_touches\":26379018,\"blkXY_touches\":526467262,\"blkYX_d_mat\":7,\"blkXY_d_mat\":9,\"ratio\":19.958,\"agree_with_brute_force\":true}",
+        "sensitivity: smallest block-order touches ratio over 6 planted instances = 11.176",
+        "SENS OK"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-05/card-01/b05"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rmdir",
+        "target/blindspots-05/card-01"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin-dir",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 6,
+  "commit": "cf5d1fd09fee84db3f0267dd6c25549fb718b0bc",
+  "dirty_after": [
+    "research/blindspots_20261018/05-elimination-orders/raw/card-01-sens.stderr.log",
+    "research/blindspots_20261018/05-elimination-orders/raw/card-01-sens.stdout.log"
+  ],
+  "dirty_before": [],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

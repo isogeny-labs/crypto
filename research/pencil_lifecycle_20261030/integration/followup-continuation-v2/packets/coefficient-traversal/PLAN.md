@@ -1,0 +1,4 @@
+# Cached-inverse coefficient traversal
+T-1167. Prove source ordered k then j traversal for arrays of length<=6, via size-indexed arrays and bounded events. Reuse a single inverse word across all steps. Prove size/canonicality and decoded sum of terms; include empty and degree-five schedules. No scientific execution.
+Sources: pinned Storage.lean, WordCoefficient.lean, Inversion.lean, Loop.lean; projective_law_gate.rs transform. Official Lean list traversal semantics https://lean-lang.org/doc/api/Init/Data/List/Control.html and Array.set semantics. This is a source logical model, not compiler equivalence. Independent fidelity review pending.
+Controls include complete nested schedule sizes0,3,6; zero/constant/full coefficient inputs; unchanged cached inverse witness; no dropped row. All failures retained, explicit modules and separate axiom readback, PDF/SVG/status.

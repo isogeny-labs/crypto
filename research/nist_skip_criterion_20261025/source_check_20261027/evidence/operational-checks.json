@@ -1,0 +1,50 @@
+{
+  "kind": "source-review-operational-checks/v1",
+  "date_utc": "2026-10-27T14:08:40.878Z",
+  "source_commit": "c8c94dd11a9cb908c761e823e6df2e63fd2b0806",
+  "inherited_main": "7e271266f86968843a9323e4a074f9a874448eb2",
+  "global_workflow_hydration": {
+    "status": 0,
+    "output": "workflow-hydration.txt",
+    "warnings": "Two checkout-path warnings; no missing-pull workflow failure"
+  },
+  "local_validation_gate": {
+    "status": 1,
+    "output": "validation-gate.txt",
+    "failed_rows_reported": 166,
+    "interpretation": "Current local gate fails with166 row diagnostics, including absent validation/archive files and rows outside the freeze; this is not a hosted/full-checkout pass and not the earlier missing-row-id error",
+    "gate_code_and_primary_input_trees_unchanged_vs_main": true,
+    "previous_missing_row_id_error": "Current artifact hydrated; the old error is not the current failure"
+  },
+  "syntax": "renderer and PDF checker pass",
+  "prior_evidence_bindings": {
+    "period_work": 123,
+    "freelip": 97,
+    "status": "all pass"
+  },
+  "new_scientific_execution": false,
+  "notes": [
+    "First B-benchmarks hydration hit an absent destination directory; created it and retried from the verified artifact cache",
+    "First rendering emitted a font-cache warning; redirected private cache, rebuilt and visually inspected final page",
+    "No unrelated validation/provenance records were changed"
+  ],
+  "gate_test_suite": {
+    "run": 62,
+    "passed": 61,
+    "failed": 1,
+    "output": "gate-tests.txt",
+    "failure": "test_gate_passes_on_the_committed_tree returns the same166 row diagnostics"
+  },
+  "primary_gate_files_checked": {
+    "working_tree_matches_HEAD": true,
+    "paths": [
+      "scripts/validation_gate.py",
+      "scripts/test_validation_gate.py",
+      "docs/ic/leaderboard.json",
+      "docs/ic/validation/PRE_GATE.json",
+      "benchmarks/README.md",
+      "benchmarks/PRE_GATE.json",
+      "benchmarks/ARCHIVE.json"
+    ]
+  }
+}

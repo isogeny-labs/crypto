@@ -7,6 +7,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use crypto_lib::cryptanalysis::cheon_counted::{find_shaped_curve, next_prime, Shaped, Side};
+use crypto_lib::cryptanalysis::ecbench::exact_scalar::ExactScalar;
 use crypto_lib::cryptanalysis::ecbench::methods::{
     needs_static_dh_oracle, resolve, solve, solve_with_oracle, MethodSpec,
 };
@@ -60,7 +61,11 @@ fn cheon_methods_recover_the_planted_log_and_count_the_oracle() {
 
             let oracle = PlantedStaticDh::new(&pi.curve, alpha as u64);
             let rep = solve_with_oracle(&m, &inst, &w.curve, &w.target, 1, Some(&oracle)).unwrap();
-            assert_eq!(rep.recovered, Some(alpha), "{id} target {index}");
+            assert_eq!(
+                rep.recovered,
+                Some(ExactScalar::from(alpha)),
+                "{id} target {index}"
+            );
             let d = rep.counters["d"];
             assert_eq!(d, s.d, "the shape rule picks the divisor the search froze");
             let want_queries = match side {
@@ -111,7 +116,7 @@ fn a_wrong_oracle_does_not_return_the_planted_log() {
         let alpha = w.planted.unwrap() as u64;
         let wrong = PlantedStaticDh::new(&pi.curve, alpha % (pi.r - 3) + 1);
         let rep = solve_with_oracle(&m, &inst, &w.curve, &w.target, 1, Some(&wrong)).unwrap();
-        assert_ne!(rep.recovered, w.planted, "{id}");
+        assert_ne!(rep.recovered, w.planted.map(ExactScalar::from), "{id}");
     }
 }
 

@@ -387,6 +387,10 @@ fn ic_rule(counter: &str) -> Option<Rule> {
         // A pair-table build's insert attempts (kept or not), and the
         // Frobenius table's orbit-index inserts.
         "table_insert_attempts" => HASH,
+        // A packed pair table's membership filter (`filter=1`): per stored
+        // entry, the key shift (one), the multiply-shift hash (two), the
+        // word index and bit shift (two) and the OR into the word (one).
+        "table_filter_bit_sets" => Prims(&[(WordOp, 6)]),
         // The Frobenius table's orbit pass: one canonicalisation a point.
         "orbit_canonicalisations" => Prims(&[(Canon, 1)]),
         // `FrobeniusCanon::new` inside the solve: the normal-element

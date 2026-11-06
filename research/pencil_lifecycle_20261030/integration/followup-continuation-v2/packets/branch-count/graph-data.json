@@ -1,0 +1,32 @@
+{
+  "kind": "exact_kernel_checked_control_values",
+  "unit": "counter increments per modeled edge",
+  "modulus": 7,
+  "cases": [
+    {
+      "label": "New anchor",
+      "theorem": "BranchControls.fresh_counts",
+      "counts": [
+        1,
+        1,
+        0
+      ]
+    },
+    {
+      "label": "Redundant constraint",
+      "theorem": "BranchControls.redundant_counts",
+      "counts": [
+        1,
+        0,
+        1
+      ]
+    }
+  ],
+  "series": [
+    "cycles",
+    "negative_cycles",
+    "zero_coefficient"
+  ],
+  "return_both": "None",
+  "uncertainty": "exact finite controls; no sampling"
+}

@@ -1,0 +1,88 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "R7.6: pooled multi-target rho against the single-target reference, four prime curve sizes",
+  "description": "rho.multitarget_pooled with batch L = 4, 16, 64, 256 (the record's target plus L-1 public companions on the same curve) against rho.negation (no A/A arm and no warm-up: operation counts are deterministic, and the session stays under the repository size policy) on the same record targets and seeds, on registered prime_search curves of 20, 24, 28 and 32 bits. Operation counts only (isolation_required L0); same-curve pooling, so it is the control arm of the class experiment, not the transported one.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_search",
+        "bits": 20,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 24,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 28,
+        "seed": 59297
+      },
+      {
+        "kind": "prime_search",
+        "bits": 32,
+        "seed": 59297
+      }
+    ],
+    "targets_per_curve": 16,
+    "target_seed": 20261031
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "pooled-L4",
+      "role": "candidate",
+      "method": {
+        "id": "rho.multitarget_pooled",
+        "params": {
+          "batch": "4"
+        }
+      }
+    },
+    {
+      "name": "pooled-L16",
+      "role": "candidate",
+      "method": {
+        "id": "rho.multitarget_pooled",
+        "params": {
+          "batch": "16"
+        }
+      }
+    },
+    {
+      "name": "pooled-L64",
+      "role": "candidate",
+      "method": {
+        "id": "rho.multitarget_pooled",
+        "params": {
+          "batch": "64"
+        }
+      }
+    },
+    {
+      "name": "pooled-L256",
+      "role": "candidate",
+      "method": {
+        "id": "rho.multitarget_pooled",
+        "params": {
+          "batch": "256"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 2,
+    "warmup": 0,
+    "order": "alternate_measured",
+    "seed": 1,
+    "isolation_required": "L0",
+    "timeout_seconds": 600
+  }
+}

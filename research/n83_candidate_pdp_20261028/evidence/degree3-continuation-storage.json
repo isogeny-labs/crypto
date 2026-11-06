@@ -1,0 +1,22 @@
+{
+  "schema": "n83.m3-continuation-storage/v1",
+  "run_prefix": "s3://setec-astronomy-artifacts/runs/n83-degree3-continuation-20261029-r1/local/",
+  "archive": {
+    "path": "degree3-continuation-archives/runs.tar.xz",
+    "kind": "raw",
+    "bytes": 285100024,
+    "sha256": "b6101a8e8a33b96ba6f6522802343eec2104b74e07b868279d4050765f059a4c"
+  },
+  "object": "s3://setec-astronomy-artifacts/store/sha256/b6/b6101a8e8a33b96ba6f6522802343eec2104b74e07b868279d4050765f059a4c",
+  "source_archive_sha256": "9ac65bee4f60275b40a9bf08827a3ba3b334630518ec6ba9d7f3f71d204cdf4b",
+  "source_commit": "bc39e12318d778a08bcbc8edc093db498cd75e74",
+  "parent_archive": {
+    "sha256": "37d67c62bc7a551c54485693a613a22384144ace1fdeb713802b19438b5e32d4",
+    "bytes": 1047336364,
+    "object": "s3://setec-astronomy-artifacts/store/sha256/37/37d67c62bc7a551c54485693a613a22384144ace1fdeb713802b19438b5e32d4",
+    "local_root": "/home/ec2-user/n83-candidate-recovery/degree3-m3-r1",
+    "schema": "n83.m3-degree-three-closure/v1"
+  },
+  "raw_file_count": 270,
+  "restoration": "Download suffix and parent archives to separate fresh directories; verify both manifests. For each successful producer, run instrument replay INPUT_ROOT ID V2_DIR PARENT/cases/KEY SUFFIX/cases/KEY; then recheck both manifests. Parent archive remains required and immutable."
+}

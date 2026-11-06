@@ -1,0 +1,11 @@
+# Private gate static-build attempt
+
+The single frozen software build reached the static link stage and failed: /usr/bin/ld could not find -lc. The installed GCC target is x86_64-amazon-linux. Compiler identity/version, exact command, source hash and failure output are retained. All launched compiler clients were reaped. No candidate binary or helper binary was produced, and no helper or whole-gate execution occurred.
+
+The reviewed source is gate.c SHA2566548d8d41a37975bb30c1a225583113ea6c25056753b3d455d90f1608d8e65bc. The attempted command used -static -O2 -Wall -Wextra -Werror with a60-second command ceiling and1GiB virtual-memory limit. The outer frozen validation envelope was TERM at175seconds plus5seconds kill reserve. The failure stopped the one-attempt sequence before ELF inspection or native helper controls. No retry occurred.
+
+The independent reviewer accepted the source/build recipe before execution. Native helper design includes the exact release_token/await_release functions,37 partial lengths and malformed/filetype/ownership controls, with only uid/gid explicitly interposed for unprivileged fixtures, plus a real15-second invalid-token timeout. These controls are implemented but were not executed because the preceding candidate build failed.
+
+Frozen plan refinements before execution added process-group termination and signal-safe PID registration with explicit uncertain-launch/reap receipts. Their previous unexecuted frozen records are preserved. The sole actual attempt is attempt1, retained as a content-addressed archive with member hashes and fresh remote byte readback. No Docker, systemd, namespaces, mounts, privilege escalation, image, cloud build or scientific trial was invoked.
+
+Read-only follow-up found the preserved private musl wrapper outside PATH; all364 prior toolchain hashes and resolved paths match. Selecting system GCC missed that existing toolchain; toolchain-discovery.json records the preparation error. A separate frozen and independently reviewed musl follow-up is now authorized; it will preserve this failed attempt. Current runtime/image admission and candidate promotion remain false. The qualifier-v2 token-mode correction is separately committed and does not imply successful gate compilation or native validation.

@@ -1,0 +1,7 @@
+# Fresh Job API-default correction
+
+Private incremental patch on computation-cutoff V3 cloud base 34cdc2bc. Pin omitted ObjectFieldSelector apiVersion=v1 in intended fresh manifest environment and downward volume selectors before submission/persistence, only when optional fresh_owner is present; legacy absent-owner construction is unchanged. Exact observed env, volumes, mounts, image, command, Job UID and reservation comparisons remain unchanged. Current downward volume defaultMode is already explicit 292; emptyDir volume sizes remain exact. No arbitrary volume or selector normalization is introduced.
+
+Validation: one API-shaped roundtrip fixture passes, including mutation rejection for selectors, apiVersion, request hash, mode, and injected volume. All-target Clippy passes in the private pre-rebase controller tree based on8054af25. Final rebase ontoV3 changes only insertion locations; combined V3 test execution remains root qualification. First compile missed copied schema; second test exposed accidental null fields from mutable JSON indexing. Both logs remain, implementation uses non-inserting get_mut traversal, final test-v3 passes.
+
+No cloud, image, scientific execution or shared source edit. Previously stored manifests without explicit selector versions are not rewritten; fail-closed reconciliation remains possible and requires explicit review. This correction supplies future manifest construction, not permission to reuse or restart a previous job.

@@ -1,0 +1,61 @@
+{
+  "schema": "prospective-source-review/v1",
+  "task": "T-1650",
+  "reviewed_commit": "79588ee0ee629dd9d247957bf8d6402bc6a6f855",
+  "freeze_sha256": "dfde7d96367f321f0d4446c205290622c545f3d4364d7796c392d632391267eb",
+  "status": "source_adequate_for_final_bounded_full_attempt",
+  "machine_status": "not_executed",
+  "findings": [],
+  "checks": {
+    "all_frozen_hashes_match": true,
+    "all_frozen_bytes_match_published_git": true,
+    "four_lean_texts_names_and_runtime_bindings_unchanged": true,
+    "closure_baseline_and_roots_unchanged": true,
+    "native_replay_only_workspace_changed": true,
+    "prior_receipt_hash_bindings_match": true,
+    "manager_gc_fallback_requires_exact_captured_invocation": true,
+    "manager_gc_fallback_requires_pid1_uid0_sameboot_unit_init_scope": true,
+    "manager_gc_fallback_requires_ordered_start_and_success": true,
+    "manager_gc_fallback_rejects_live_or_replacement_unit_and_remaining_cgroup": true,
+    "manager_receipt_saved_durably": true,
+    "journal_query_bounded_seconds": 2
+  },
+  "attacks": {
+    "arbitrary_empty_invocation": "rejected_without_manager_evidence",
+    "wrong_boot_unit_uid_pid_invocation": "filtered_out",
+    "missing_or_reversed_start_success": "rejected",
+    "live_replacement_or_remaining_cgroup": "rejected",
+    "partial_pre_reuse": "not_supported_fresh_workspace_full_pre",
+    "old_event_replay": "requires_exact_newly_captured_invocation_after_absent_unit_preflight; unique systemd invocation/exclusive unit ownership assumed"
+  },
+  "mock_controls": {
+    "producer_cases": 12,
+    "independently_source_inspected": true,
+    "independently_executed": false,
+    "live_qualification": false
+  },
+  "limits": {
+    "campaign_seconds": 46800,
+    "prior_charge_seconds": 1200,
+    "remaining_before_attempt_seconds": 45600,
+    "attempt_number": 3,
+    "total_attempt_ceiling": 3,
+    "phase_seconds": [
+      900,
+      600,
+      900
+    ],
+    "attempt_seconds": 2400,
+    "deadline": "2026-11-06T04:00:00Z",
+    "cpu": 1,
+    "ram_gib": 8,
+    "automatic_retries": 0
+  },
+  "scope_notes": [
+    "Timestamp ordering is checked; explicit numeric phase-window comparison is not implemented. Freshness instead uses the newly captured systemd invocation after absent-unit preflight, relying on unique manager IDs and exclusive unit ownership.",
+    "PID1 journal is primary runtime evidence; no novel mathematical claim or external literature premise is introduced.",
+    "Filesystem calls and uninterruptible I/O remain non-hard-realtime dependencies; unresolved owner stops overlap.",
+    "The original pre success and outer GC failure remain historical; this attempt repeats full pre and does not reset old clocks.",
+    "Actual complete pre/compiler/post receipts determine machine outcome; source review is not execution admission by itself."
+  ]
+}

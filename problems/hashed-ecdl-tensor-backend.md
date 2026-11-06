@@ -40,6 +40,23 @@ Explicit work policies can terminate a run with an unknown result.
   not mathematical impossibility or evidence that the theorem is false.
 - No timing, sub-rho result, security conclusion or practical attack follows
   from these development tests.
+- Follow-up software controls add exact prefix sampling (including the
+  nonparsimonious 1:2 projection case) and nine direct-versus-forced recursive
+  comparisons retaining both taper levels. See the
+  [sampling audit](../docs/hashed-ecdl-audit-20261029/README.md).
+  These bounded checks leave the general obligations below open.
+- The 2026-11-02 continuation independently mapped the source guards and major
+  recursive invariants to code and added a host-independent exact numeric
+  evaluator. At the first even nonzero-scale boundary `2^131071+2`, every D.4
+  numeric guard passes for degree two while the live graph representation is
+  unavailable. The concentrated remaining gaps are a typed predicate
+  description/evaluation-cost certificate and aggregate construction/space
+  accounting; arbitrary `FnPredicate` closures cannot supply either by type.
+- The follow-up source review makes the representation boundary explicit:
+  on a 64-bit build lambda is at most 64, so root_u=lambda/131072 is zero
+  for every publicly representable graph. Public calls therefore select a
+  finite-size fallback; only forced private controls enter the recursive
+  kernel. This is not a counterexample to the external asymptotic theorem.
 
 ## Obligations
 
@@ -59,6 +76,15 @@ Explicit work policies can terminate a run with an unknown result.
 
 ## Next discriminating step
 
+The [2026-11-04 entry-cost source audit](../research/hashed_ecdl_entry_cost_20261104/README.md)
+and [structured map](../research/hashed_ecdl_entry_cost_20261104/audit-map.json)
+isolate target-row usage, positive incoming exponents, preparation before the
+zero-entry shortcut, coefficient-choice traversal and aggregate retained data.
+These are unverified observations in statement PCC-20261104-1df881; the next
+local task is the usage/row-budget invariant and its bit/space ledger, followed
+by the full path induction. The operation meter is not an independent bit-cost
+or peak-memory certificate. Status stays open. [pcc:unverified]
+
 An independent reviewer should reproduce the direct-versus-recursive controls
 and audit the general invariants above from the pinned manuscript and source.
 Preserve the first disagreement with exact arithmetic as a regression fixture.
@@ -67,6 +93,28 @@ reconsidered. A practical timing study is a separate requested experiment with
 the existing compute, checkpoint, external-reference and measurement gates.
 
 ## Resolution and history
+
+2026-11-02 focused theorem/code continuation: the
+[requirement matrix and attack graph](../research/ic_weak_assumptions_20261102/FOLLOWUP.md)
+trace subdivision, degree admission, exact D.4 parameters, conditional-
+expectation packing, incidence, balance, child shrink, creation precision and
+Hermite shape checks into the implementation. The new
+[`admission` module](../crates/hashed-ecdl-tensor/src/admission.rs) independently
+mirrors numeric guards with `BigUint`; four boundary/fail-closed tests pass.
+This materially narrows but does not close the independent audit: mode and
+reconstruction correctness still lack a general formal proof, and the public
+predicate API has no enforceable uniform description/evaluation-cost
+certificate. No recursive performance result or ECDLP conclusion is claimed.
+
+2026-10-30 program assessment and theorem-bridge source review: the
+[dated assessment](../research/hashed_ecdl_leads_20261030/README.md) and
+[interface map](../research/hashed_ecdl_leads_20261030/BRIDGE.md) distinguish
+fixed-width formal counting endpoints from the required general implicit
+tensor statement. The native packet representation has no nested parent
+evaluator callback; coefficient extraction, preparation, mode enumeration,
+retained data and aggregate bit costs remain general audit obligations.
+This is source inspection, without a Lean/kernel check, experiment, new
+theorem, smaller-packet proof or performance claim. Status stays open.
 
 2026-10-30 checked hash-prime follow-up: retained verified auxiliary prime facts
 through factor-base construction and replay, with an optional explicit fixed

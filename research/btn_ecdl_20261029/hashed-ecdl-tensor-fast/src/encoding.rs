@@ -868,6 +868,71 @@ impl Encoder {
         Ok(PointWords { infinity, x, y })
     }
 
+    /// k -> k*G by double-and-add, each step one checked programme vertex.
+    /// The result is on the curve by construction, so no validity check is
+    /// needed for it.
+    pub fn scalar_mul_program(
+        &mut self,
+        curve: &Curve,
+        scalar: &Word,
+        generator: &Point,
+        meter: &Meter,
+    ) -> Result<PointWords> {
+        let width = curve.modulus().bits() as usize;
+        let g = Self::constant_point(curve, generator)?;
+        let mut acc = Self::constant_point(curve, &Point::Infinity)?;
+        for i in (0..scalar.width()).rev() {
+            let bit = Self::slice(scalar, i, 1);
+            let inputs = vec![
+                acc.infinity.clone(), acc.x.clone(), acc.y.clone(),
+                bit.clone(),
+                g.infinity.clone(), g.x.clone(), g.y.clone(),
+            ];
+            let c = curve.clone();
+            let out = self.define(
+                &inputs,
+                &[1, width, width],
+                Arc::new(move |v, work| {
+                    let read = |base: usize| -> Point {
+                        if v[base].is_zero() {
+                            Point::Affine { x: v[base + 1].clone(), y: v[base + 2].clone() }
+                        } else {
+                            Point::Infinity
+                        }
+                    };
+                    let a = read(0);
+                    let mut p = c.add(&a, &a, work)?;
+                    if !v[3].is_zero() {
+                        p = c.add(&p, &read(4), work)?;
+                    }
+                    match p {
+                        Point::Infinity => Ok(vec![BigUint::one(), BigUint::zero(), BigUint::zero()]),
+                        Point::Affine { x, y } => Ok(vec![BigUint::zero(), x, y]),
+                    }
+                }),
+                true,
+                meter,
+            )?;
+            let mut it = out.into_iter();
+            acc = PointWords { infinity: it.next().unwrap(), x: it.next().unwrap(), y: it.next().unwrap() };
+        }
+        Ok(acc)
+    }
+
+    /// Point negation: (x, y) -> (x, p - y), identity unchanged.
+    pub fn point_negate(
+        &mut self,
+        curve: &Curve,
+        a: &PointWords,
+        meter: &Meter,
+    ) -> Result<PointWords> {
+        let p = curve.modulus();
+        let width = p.bits() as usize;
+        let zero = Self::constant(width, &BigUint::zero())?;
+        let ny = self.modular_subtract(&zero, &a.y, p, meter)?;
+        Ok(PointWords { infinity: a.infinity.clone(), x: a.x.clone(), y: ny })
+    }
+
     /// Corollary 2's point-addition network. All expressions are evaluated
     /// unconditionally, including inactive branches. The inactive slope is zero,
     /// so auxiliary assignments remain unique in identity and inverse cases.

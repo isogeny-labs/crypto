@@ -1,0 +1,69 @@
+<!doctype html><meta charset=utf-8><title>Fused residual step with distinguished points</title>
+<style>body{font:13px/1.45 Helvetica,Arial,sans-serif;max-width:900px;margin:24px auto;color:#111}h1{font-size:20px}h2{font-size:15px;margin-top:22px}
+table{border-collapse:collapse;margin:8px 0}td,th{border:1px solid #ccc;padding:3px 8px;text-align:right}td:first-child,td:nth-child(2),th:first-child,th:nth-child(2){text-align:left}
+.ok{background:#e6f4ea}.no{background:#fdecea}code{background:#f3f3f3;padding:0 3px}</style>
+<h1>Residual collector: one addition per step, and distinguished points</h1><div style="background:#fff4d6;border:1px solid #e0b84a;padding:8px;margin:10px 0"><b>SUPERSEDED (w &gt; 0 figures).</b> The per-step distinguished-point test of <code>residual-fused-dp</code> was not in the priced counters when this study ran, so the w = 0.1 and w = 1 results and the distances to rho below understate priced work. The w = 0 figures are unaffected. Corrected, priced rerun: <code>research/ic_residual_dp_eq_20261101</code>.</div>
+<p><b>What was implemented.</b> Two target modes in <code>src/cryptanalysis/ic_framework/residual.rs</code>, both leaving the baseline path (<code>targets=residual</code>) unchanged:
+<code>residual-fused</code> takes one group addition per walk step from a precomputed table of <i>J<sub>j</sub> − P<sub>i</sub></i> (16·|F| setup additions, counted);
+<code>residual-fused-dp</code> adds distinguished points: one DP test per step (counted native op, the analogue of rho's per-step canonicalisation), and only residuals in a 2<sup>−b</sup> fraction
+(b = ⌊log₂ r / 2⌋ − 9; 0 for log₂ r &lt; 20, 8 for the 36–37-bit curves) are tested against F, probed and stored. Counts are in ecbench's counted unit; every answer verified by the harness; <code>ecbench verify --replay 12</code> audits OK (2048/2048 records per study).</p>
+<h2>Result 1 (study 1, <code>research/ic_residual_fused_20261031</code>): fused step</h2>
+<p>gae/step falls from 2.005 to 1.004. Fused/baseline counted S at w = 0: 0.56–0.92 (all intervals below 1, 12 cells); at w = 0.1: 0.91–1.13; at w = 1: 1.06–1.30. The preregistered rule (below 1 at w = 0, 0.1 and 1) is <b>not met</b>: the saving is real at w = 0 but the priced table work (about 2 lookups and 56 stored bytes per step) dominates at w ≥ 0.1.</p>
+<h2>Result 2 (study 2, <code>research/ic_residual_dp_20261101</code>): fused + distinguished points, paired by instance, 16 targets × 3 rounds</h2>
+<p>S(candidate)/S(baseline), 95% interval; green = interval below 1. p36, p37 are the DP-active curves (the claim); p16, p18 have b = 0, so the candidate equals the fused walk there (control).</p>
+<table><tr><th>curve</th><th>pair</th><th>w = 0</th><th>w = 0.1</th><th>w = 1</th></tr><tr><td>p36</td><td>res2dp / res2</td><td class="no">0.875 [0.747, 1.026]</td><td class="ok">0.329 [0.281, 0.386]</td><td class="ok">0.055 [0.047, 0.065]</td></tr><tr><td>p36</td><td>res4dp / res4</td><td class="ok">0.908 [0.852, 0.967]</td><td class="ok">0.265 [0.249, 0.282]</td><td class="ok">0.042 [0.039, 0.044]</td></tr><tr><td>p36</td><td>res8dp / res8</td><td class="ok">0.893 [0.837, 0.953]</td><td class="ok">0.181 [0.170, 0.193]</td><td class="ok">0.028 [0.026, 0.030]</td></tr><tr><td>p37</td><td>res2dp / res2</td><td class="ok">0.799 [0.720, 0.887]</td><td class="ok">0.298 [0.269, 0.331]</td><td class="ok">0.047 [0.043, 0.053]</td></tr><tr><td>p37</td><td>res4dp / res4</td><td class="ok">0.876 [0.799, 0.960]</td><td class="ok">0.253 [0.231, 0.278]</td><td class="ok">0.037 [0.034, 0.041]</td></tr><tr><td>p37</td><td>res8dp / res8</td><td class="ok">0.853 [0.784, 0.928]</td><td class="ok">0.170 [0.156, 0.185]</td><td class="ok">0.024 [0.022, 0.026]</td></tr><tr><td>p16</td><td>res2dp / res2</td><td class="ok">0.881 [0.850, 0.914]</td><td class="no">1.039 [0.973, 1.110]</td><td class="no">1.208 [1.103, 1.324]</td></tr><tr><td>p16</td><td>res4dp / res4</td><td class="ok">0.863 [0.821, 0.907]</td><td class="no">1.004 [0.921, 1.095]</td><td class="no">1.103 [0.988, 1.231]</td></tr><tr><td>p16</td><td>res8dp / res8</td><td class="ok">0.901 [0.871, 0.933]</td><td class="no">1.070 [0.993, 1.153]</td><td class="no">1.140 [1.043, 1.247]</td></tr><tr><td>p18</td><td>res2dp / res2</td><td class="ok">0.779 [0.732, 0.829]</td><td class="no">0.970 [0.885, 1.064]</td><td class="no">1.126 [1.006, 1.260]</td></tr><tr><td>p18</td><td>res4dp / res4</td><td class="ok">0.786 [0.744, 0.830]</td><td class="no">1.006 [0.925, 1.094]</td><td class="no">1.127 [1.023, 1.242]</td></tr><tr><td>p18</td><td>res8dp / res8</td><td class="ok">0.851 [0.812, 0.892]</td><td class="no">1.165 [1.079, 1.258]</td><td class="no">1.270 [1.167, 1.383]</td></tr></table>
+<p><b>Frozen rule C1</b> (all six DP-active cells below 1 at w = 0, 0.1, 1): <b>5 of 6 cells hold; C1 is not met strictly</b> — p36 res2 at w = 0 has interval [0.747, 1.026]. At w = 0.1 and w = 1 all six cells are far below 1 (0.17–0.33 and 0.024–0.055). A/A (res4 vs res4aa) = 1.0000 on every curve.</p>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 360" font-family="Helvetica,Arial,sans-serif"><rect width="980" height="360" fill="white"/><text x="50" y="14" font-size="13" font-weight="600">p36: mean S (counted ops / sqrt r) vs native-op price w</text>
+<line x1="50" x2="470" y1="287.4931310213138" y2="287.4931310213138" stroke="#ddd"/><text x="44" y="291.4931310213138" font-size="10" text-anchor="end">1</text>
+<line x1="50" x2="470" y1="235.97096267424033" y2="235.97096267424033" stroke="#ddd"/><text x="44" y="239.97096267424033" font-size="10" text-anchor="end">3</text>
+<line x1="50" x2="470" y1="179.5076496841936" y2="179.5076496841936" stroke="#ddd"/><text x="44" y="183.5076496841936" font-size="10" text-anchor="end">10</text>
+<line x1="50" x2="470" y1="127.98548133712016" y2="127.98548133712016" stroke="#ddd"/><text x="44" y="131.98548133712018" font-size="10" text-anchor="end">30</text>
+<line x1="50" x2="470" y1="71.52216834707345" y2="71.52216834707345" stroke="#ddd"/><text x="44" y="75.52216834707345" font-size="10" text-anchor="end">100</text>
+<line x1="50" x2="470" y1="20.0" y2="20.0" stroke="#ddd"/><text x="44" y="24.0" font-size="10" text-anchor="end">300</text>
+<text x="50.0" y="336" font-size="10" text-anchor="middle">0</text>
+<text x="134.0" y="336" font-size="10" text-anchor="middle">0.01</text>
+<text x="218.0" y="336" font-size="10" text-anchor="middle">0.03</text>
+<text x="302.0" y="336" font-size="10" text-anchor="middle">0.1</text>
+<text x="386.0" y="336" font-size="10" text-anchor="middle">0.3</text>
+<text x="470.0" y="336" font-size="10" text-anchor="middle">1</text>
+<text x="245.0" y="352" font-size="11" text-anchor="middle">w (GAE per unpriced native operation)</text>
+<polyline fill="none" stroke="#222" stroke-width="2.2" points="50.0,293.1 134.0,292.6 218.0,291.7 302.0,288.6 386.0,280.8 470.0,260.6"/>
+<text x="464.0" y="274.61202645804406" font-size="10" fill="#222" text-anchor="end">rho 1.8</text>
+<polyline fill="none" stroke="#c0392b" stroke-width="2.2" points="50.0,226.5 134.0,216.0 218.0,200.3 302.0,167.8 386.0,126.2 470.0,73.8"/>
+<text x="464.0" y="67.79929649116994" font-size="10" fill="#c0392b" text-anchor="end">res4 (baseline) 95.3</text>
+<polyline fill="none" stroke="#1f77b4" stroke-width="2.2" points="50.0,231.0 134.0,230.9 218.0,230.7 302.0,230.1 386.0,228.4 470.0,222.8"/>
+<text x="464.0" y="216.78862645110794" font-size="10" fill="#1f77b4" text-anchor="end">res4dp (fused+DP) 4.0</text>
+<polyline fill="none" stroke="#e69f00" stroke-width="2.2" points="50.0,250.1 134.0,231.1 218.0,207.2 302.0,166.2 386.0,120.2 470.0,65.9"/>
+<text x="464.0" y="59.881134385096104" font-size="10" fill="#e69f00" text-anchor="end">res4f (study 1, other seeds) 112.8</text><text x="540" y="14" font-size="13" font-weight="600">p37: mean S (counted ops / sqrt r) vs native-op price w</text>
+<line x1="540" x2="960" y1="287.4931310213138" y2="287.4931310213138" stroke="#ddd"/><text x="534" y="291.4931310213138" font-size="10" text-anchor="end">1</text>
+<line x1="540" x2="960" y1="235.97096267424033" y2="235.97096267424033" stroke="#ddd"/><text x="534" y="239.97096267424033" font-size="10" text-anchor="end">3</text>
+<line x1="540" x2="960" y1="179.5076496841936" y2="179.5076496841936" stroke="#ddd"/><text x="534" y="183.5076496841936" font-size="10" text-anchor="end">10</text>
+<line x1="540" x2="960" y1="127.98548133712016" y2="127.98548133712016" stroke="#ddd"/><text x="534" y="131.98548133712018" font-size="10" text-anchor="end">30</text>
+<line x1="540" x2="960" y1="71.52216834707345" y2="71.52216834707345" stroke="#ddd"/><text x="534" y="75.52216834707345" font-size="10" text-anchor="end">100</text>
+<line x1="540" x2="960" y1="20.0" y2="20.0" stroke="#ddd"/><text x="534" y="24.0" font-size="10" text-anchor="end">300</text>
+<text x="540.0" y="336" font-size="10" text-anchor="middle">0</text>
+<text x="624.0" y="336" font-size="10" text-anchor="middle">0.01</text>
+<text x="708.0" y="336" font-size="10" text-anchor="middle">0.03</text>
+<text x="792.0" y="336" font-size="10" text-anchor="middle">0.1</text>
+<text x="876.0" y="336" font-size="10" text-anchor="middle">0.3</text>
+<text x="960.0" y="336" font-size="10" text-anchor="middle">1</text>
+<text x="735.0" y="352" font-size="11" text-anchor="middle">w (GAE per unpriced native operation)</text>
+<polyline fill="none" stroke="#222" stroke-width="2.2" points="540.0,288.6 624.0,288.1 708.0,287.2 792.0,284.1 876.0,276.3 960.0,256.1"/>
+<text x="954.0" y="270.08165910214814" font-size="10" fill="#222" text-anchor="end">rho 2.0</text>
+<polyline fill="none" stroke="#c0392b" stroke-width="2.2" points="540.0,227.2 624.0,216.7 708.0,201.0 792.0,168.5 876.0,126.9 960.0,74.5"/>
+<text x="954.0" y="68.47185516988877" font-size="10" fill="#c0392b" text-anchor="end">res4 (baseline) 93.9</text>
+<polyline fill="none" stroke="#1f77b4" stroke-width="2.2" points="540.0,233.4 624.0,233.3 708.0,233.2 792.0,232.9 876.0,232.0 960.0,229.0"/>
+<text x="954.0" y="223.005892869402" font-size="10" fill="#1f77b4" text-anchor="end">res4dp (fused+DP) 3.5</text>
+<polyline fill="none" stroke="#e69f00" stroke-width="2.2" points="540.0,249.6 624.0,230.7 708.0,206.7 792.0,165.7 876.0,119.8 960.0,65.4"/>
+<text x="954.0" y="59.3943906843312" font-size="10" fill="#e69f00" text-anchor="end">res4f (study 1, other seeds) 114.0</text></svg>
+<p style="font-size:11px">Mean S per arm vs w (study-2 sessions for rho, res4, res4dp; res4f from study 1, different seeds, shown for context only).</p>
+<h2>Distance remaining to matched rho (S ratio rho → arm; 1.00 = parity)</h2>
+<table><tr><th>curve</th><th>arm</th><th>w = 0</th><th>w = 0.1</th><th>w = 1</th></tr><tr><td>p36</td><td>res4</td><td>4.14</td><td>13.14</td><td>53.70</td></tr><tr><td>p36</td><td>res4dp</td><td>3.76</td><td>3.48</td><td>2.24</td></tr><tr><td>p37</td><td>res4</td><td>3.70</td><td>11.76</td><td>48.06</td></tr><tr><td>p37</td><td>res4dp</td><td>3.24</td><td>2.98</td><td>1.78</td></tr></table>
+<p>The order holds across the band: rho is ahead at every weight. Baseline res4 was 4.1 / 13.1 / 53.7× (p36) and 3.7 / 11.8 / 48.1× (p37); res4dp is 3.76 / 3.48 / 2.24× and 3.24 / 2.98 / 1.78×. The w = 1 distance fell about 24–27×; the w = 0 distance fell about 9–12%.</p>
+<h2>Classification and caveats</h2>
+<ul><li>Class: <b>engineering</b> improvement of a generic collision search (lower priced native work: lookups and stored bytes), not a structural index-calculus advance; the curve-free-null conclusion of <code>ic_prime_residual_lp_20261026</code> carries over. It lowers the pipeline's counted cost against the frozen baseline on the same instances.</li>
+<li>The candidate does not merge L with −L after a collision, so it needs about 1.5× more steps than the fused no-DP walk (exploratory, 16–24 targets). A negation-equivariant step was tried and lost to short cycles (walks trapped until the cap); not part of either study.</li>
+<li>Run locally at isolation L0 (isolab-eks route unavailable here; counts are deterministic and carry no wall-clock claim). L2 specs are committed for a later isolab-eks replay.</li>
+<li>Only 4 curves, two DP-active, both ≈2^36; behaviour at larger r is not measured. No validation-gate artifacts (replay certificate, validator report, §5a-banded matched-rho <code>VALIDATION.json</code>) exist yet, so no leaderboard or <code>benchmarks/README.md</code> row is added.</li></ul>
+<h2>Sources</h2>
+<p>Teske, <i>On random walks for Pollard's rho method</i>, Math. Comp. 70 (2001) 809–825 (r-adding walks); Bos–Kleinjung–Lenstra, <i>On the use of the negation map in the Pollard rho method</i>, ANTS-IX, LNCS 6197 (2010) 66–82 (fruitless cycles; verified by search earlier in this session); van Oorschot–Wiener, <i>Parallel collision search with cryptanalytic applications</i>, J. Cryptology 12 (1999) 1–28 (distinguished points; cited from memory, not re-read). Repository: <code>research/ic_prime_residual_lp_20261026</code>, <code>research/ic_planner_exhaustive_20261026</code>.</p>

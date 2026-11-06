@@ -1,0 +1,71 @@
+{
+    "apiVersion": "v1",
+    "items": [
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-11-04T16:01:08Z",
+            "involvedObject": {
+                "apiVersion": "batch/v1",
+                "kind": "Job",
+                "name": "arity-koblitz-m56-20261104",
+                "namespace": "isolab",
+                "resourceVersion": "9857032",
+                "uid": "bfa5cf9f-649e-4616-bee3-0336322acde1"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-11-04T16:01:08Z",
+            "message": "Created pod: arity-koblitz-m56-20261104-k475v",
+            "metadata": {
+                "creationTimestamp": "2026-11-04T16:01:08Z",
+                "name": "arity-koblitz-m56-20261104.18e4e2ef3d829808",
+                "namespace": "isolab",
+                "resourceVersion": "9857036",
+                "uid": "6b9a3a6a-795a-4d84-b673-715cb0c0a5d2"
+            },
+            "reason": "SuccessfulCreate",
+            "reportingComponent": "job-controller",
+            "reportingInstance": "",
+            "source": {
+                "component": "job-controller"
+            },
+            "type": "Normal"
+        },
+        {
+            "apiVersion": "v1",
+            "count": 1,
+            "eventTime": null,
+            "firstTimestamp": "2026-11-04T16:07:45Z",
+            "involvedObject": {
+                "apiVersion": "batch/v1",
+                "kind": "Job",
+                "name": "arity-koblitz-m56-20261104",
+                "namespace": "isolab",
+                "resourceVersion": "9859271",
+                "uid": "bfa5cf9f-649e-4616-bee3-0336322acde1"
+            },
+            "kind": "Event",
+            "lastTimestamp": "2026-11-04T16:07:45Z",
+            "message": "Job has reached the specified backoff limit",
+            "metadata": {
+                "creationTimestamp": "2026-11-04T16:07:45Z",
+                "name": "arity-koblitz-m56-20261104.18e4e34b80d5bdc4",
+                "namespace": "isolab",
+                "resourceVersion": "9859275",
+                "uid": "7c0a73bd-f1c9-41ab-8de7-3f2a0ed25076"
+            },
+            "reason": "BackoffLimitExceeded",
+            "reportingComponent": "job-controller",
+            "reportingInstance": "",
+            "source": {
+                "component": "job-controller"
+            },
+            "type": "Warning"
+        }
+    ],
+    "kind": "List",
+    "metadata": {
+        "resourceVersion": ""
+    }
+}

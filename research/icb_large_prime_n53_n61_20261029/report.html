@@ -1,0 +1,151 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Large primes on the Koblitz compact-orbit pipeline</title>
+<style>body{font-family:Helvetica,Arial,sans-serif;max-width:1100px;margin:24px auto;color:#222;font-size:13px}
+table{border-collapse:collapse;margin:8px 0;font-size:12px}td,th{border:1px solid #ccc;padding:3px 6px;text-align:right}td:first-child,th:first-child{text-align:left}</style></head><body>
+<h1>One- and two-large-prime collectors on the Koblitz compact-orbit pipeline, n = 53 and 61 (2026-10-29)</h1>
+<p>Atlas lead <code>LEAD-ICB-large-prime-variants</code>. Same ecbench harness, same planted-log workloads, counted S = GAE / sqrt(r); the arms differ only in the oracle's large-prime parameters and column counts. See <code>PROTOCOL.md</code>.</p>
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="430" viewBox="0 0 1180 430" font-family="Helvetica,Arial,sans-serif" font-size="11">
+<rect width="1180" height="430" fill="#fff"/>
+<text x="48" y="26" font-size="14" fill="#222">n = 53 (log2 r = 44.3): counted S, mean over workloads</text>
+<line x1="48" y1="384.9" x2="558" y2="384.9" stroke="#e4e4e4"/>
+<text x="44" y="388.9" text-anchor="end" fill="#555">0.1</text>
+<line x1="48" y1="349.6" x2="558" y2="349.6" stroke="#e4e4e4"/>
+<text x="44" y="353.6" text-anchor="end" fill="#555">0.2</text>
+<line x1="48" y1="302.8" x2="558" y2="302.8" stroke="#e4e4e4"/>
+<text x="44" y="306.8" text-anchor="end" fill="#555">0.5</text>
+<line x1="48" y1="267.5" x2="558" y2="267.5" stroke="#e4e4e4"/>
+<text x="44" y="271.5" text-anchor="end" fill="#555">1</text>
+<line x1="48" y1="232.1" x2="558" y2="232.1" stroke="#e4e4e4"/>
+<text x="44" y="236.1" text-anchor="end" fill="#555">2</text>
+<line x1="48" y1="185.4" x2="558" y2="185.4" stroke="#e4e4e4"/>
+<text x="44" y="189.4" text-anchor="end" fill="#555">5</text>
+<line x1="48" y1="150.0" x2="558" y2="150.0" stroke="#e4e4e4"/>
+<text x="44" y="154.0" text-anchor="end" fill="#555">10</text>
+<line x1="48" y1="114.7" x2="558" y2="114.7" stroke="#e4e4e4"/>
+<text x="44" y="118.7" text-anchor="end" fill="#555">20</text>
+<line x1="137.0" y1="40" x2="137.0" y2="390" stroke="#f0f0f0"/>
+<text x="137.0" y="406" text-anchor="middle" fill="#555">100</text>
+<line x1="275.3" y1="40" x2="275.3" y2="390" stroke="#f0f0f0"/>
+<text x="275.3" y="406" text-anchor="middle" fill="#555">200</text>
+<line x1="458.1" y1="40" x2="458.1" y2="390" stroke="#f0f0f0"/>
+<text x="458.1" y="406" text-anchor="middle" fill="#555">500</text>
+<line x1="48" y1="371.8" x2="558" y2="371.8" stroke="#2a6fdb" stroke-dasharray="5 3"/>
+<text x="556" y="366.8" text-anchor="end" fill="#2a6fdb">rho (strong signed-Frobenius) 0.13</text>
+<polyline fill="none" stroke="#444" stroke-width="1.5" points="92.5,97.2 294.3,147.0 369.1,163.7 432.6,172.9 513.5,169.5"/>
+<circle cx="294.3" cy="118.7" r="4.5" fill="#c0392b"/>
+<text x="300.3" y="112.7" font-size="10" fill="#c0392b">1LP k20-c10</text>
+<circle cx="432.6" cy="153.0" r="4.5" fill="#c0392b"/>
+<text x="438.6" y="147.0" font-size="10" fill="#c0392b">1LP k40-c10</text>
+<circle cx="294.3" cy="198.1" r="4.5" fill="#1e8449"/>
+<text x="300.3" y="192.1" font-size="10" fill="#1e8449">2LP k20-c10</text>
+<circle cx="501.0" cy="181.1" r="4.5" fill="#1e8449"/>
+<text x="507.0" y="175.1" font-size="10" fill="#1e8449">2LP k20-c30</text>
+<circle cx="432.6" cy="198.6" r="4.5" fill="#1e8449"/>
+<text x="438.6" y="192.6" font-size="10" fill="#1e8449">2LP k40-c10</text>
+<circle cx="230.8" cy="174.6" r="4.5" fill="#1e8449"/>
+<text x="236.8" y="168.6" font-size="10" fill="#1e8449">2LP k40-c3</text>
+<circle cx="369.1" cy="195.8" r="4.5" fill="#1e8449"/>
+<text x="375.1" y="189.8" font-size="10" fill="#1e8449">2LP k80-c3</text>
+<circle cx="294.3" cy="147.0" r="4.5" fill="#444"/>
+<text x="300.3" y="141.0" font-size="10" fill="#444">k220</text>
+<circle cx="369.1" cy="163.7" r="4.5" fill="#444"/>
+<text x="375.1" y="157.7" font-size="10" fill="#444">k320</text>
+<circle cx="432.6" cy="172.9" r="4.5" fill="#444"/>
+<text x="438.6" y="166.9" font-size="10" fill="#444">k440</text>
+<circle cx="513.5" cy="169.5" r="4.5" fill="#444"/>
+<text x="519.5" y="163.5" font-size="10" fill="#444">k660</text>
+<circle cx="92.5" cy="97.2" r="4.5" fill="#444"/>
+<text x="98.5" y="91.2" font-size="10" fill="#444">k80</text>
+<text x="303.0" y="424" text-anchor="middle" fill="#222">envelope: plain columns, or k (1 + c) for a large-prime arm</text>
+<text x="638" y="26" font-size="14" fill="#222">n = 61 (log2 r = 47.2), bracket session (3 workloads)</text>
+<line x1="638" y1="364.1" x2="1148" y2="364.1" stroke="#e4e4e4"/>
+<text x="634" y="368.1" text-anchor="end" fill="#555">0.1</text>
+<line x1="638" y1="325.3" x2="1148" y2="325.3" stroke="#e4e4e4"/>
+<text x="634" y="329.3" text-anchor="end" fill="#555">0.2</text>
+<line x1="638" y1="274.0" x2="1148" y2="274.0" stroke="#e4e4e4"/>
+<text x="634" y="278.0" text-anchor="end" fill="#555">0.5</text>
+<line x1="638" y1="235.2" x2="1148" y2="235.2" stroke="#e4e4e4"/>
+<text x="634" y="239.2" text-anchor="end" fill="#555">1</text>
+<line x1="638" y1="196.3" x2="1148" y2="196.3" stroke="#e4e4e4"/>
+<text x="634" y="200.3" text-anchor="end" fill="#555">2</text>
+<line x1="638" y1="145.0" x2="1148" y2="145.0" stroke="#e4e4e4"/>
+<text x="634" y="149.0" text-anchor="end" fill="#555">5</text>
+<line x1="638" y1="106.2" x2="1148" y2="106.2" stroke="#e4e4e4"/>
+<text x="634" y="110.2" text-anchor="end" fill="#555">10</text>
+<line x1="769.4" y1="40" x2="769.4" y2="390" stroke="#f0f0f0"/>
+<text x="769.4" y="406" text-anchor="middle" fill="#555">500</text>
+<line x1="1028.8" y1="40" x2="1028.8" y2="390" stroke="#f0f0f0"/>
+<text x="1028.8" y="406" text-anchor="middle" fill="#555">1000</text>
+<line x1="638" y1="370.0" x2="1148" y2="370.0" stroke="#2a6fdb" stroke-dasharray="5 3"/>
+<text x="1146" y="365.0" text-anchor="end" fill="#2a6fdb">rho (strong signed-Frobenius) 0.09</text>
+<polyline fill="none" stroke="#444" stroke-width="1.5" points="721.5,98.8 873.3,115.5 981.0,121.4 1064.5,117.7"/>
+<circle cx="721.5" cy="153.3" r="4.5" fill="#1e8449"/>
+<text x="727.5" y="147.3" font-size="10" fill="#1e8449">2LP k40-c10</text>
+<circle cx="963.5" cy="146.0" r="4.5" fill="#1e8449"/>
+<text x="969.5" y="140.0" font-size="10" fill="#1e8449">2LP k40-c20</text>
+<circle cx="873.3" cy="154.0" r="4.5" fill="#1e8449"/>
+<text x="879.3" y="148.0" font-size="10" fill="#1e8449">2LP k60-c10</text>
+<circle cx="1064.5" cy="117.7" r="4.5" fill="#444"/>
+<text x="1070.5" y="111.7" font-size="10" fill="#444">k1100</text>
+<circle cx="721.5" cy="98.8" r="4.5" fill="#444"/>
+<text x="727.5" y="92.8" font-size="10" fill="#444">k440</text>
+<circle cx="873.3" cy="115.5" r="4.5" fill="#444"/>
+<text x="879.3" y="109.5" font-size="10" fill="#444">k660</text>
+<circle cx="981.0" cy="121.4" r="4.5" fill="#444"/>
+<text x="987.0" y="115.4" font-size="10" fill="#444">k880</text>
+<text x="893.0" y="424" text-anchor="middle" fill="#222">envelope: plain columns, or k (1 + c) for a large-prime arm</text>
+</svg>
+
+<h2>Findings</h2><ul>
+<li><b>Verdict: a verified constant-factor improvement of the classic compact-orbit pair-table pipeline by the double large prime; the single large prime loses; rho is still 30-55 times ahead.</b>
+At n = 53 the best plain table (320, 440 and 660 columns bracket it at 7.65, 6.38 and 6.83) costs S = 6.38; the two-large-prime
+collector with a 40-column base and a domain of ten times that (<code>lp2-k40-c10</code>, the same 440-column envelope) costs 3.86,
+a paired ratio of 0.604 [0.599, 0.610] over 16 workloads. At n = 61 the best plain table is 880 columns (S = 7.62, bracketed by 660 and 1100 columns);
+<code>lp2-k60-c10</code> costs 4.26 (paired 0.559 [0.535, 0.578] over 3 workloads).</li>
+<li><b>The order survives the pricing band for the best large-prime arms.</b> Native work (hash probes, eliminator row operations, the domain scan) is priced at 0, 0.1 and 1 GAE per operation for every arm, rho included.
+At n = 53 <code>lp2-k40-c10</code> against the best plain table: 0.604 / 0.635 / 0.730 (<code>ecbench band</code>: "lp2-k40-c10 &lt; plain-k440" holds across the band).
+At n = 61: <code>lp2-k60-c10</code> 0.559 / 0.623 / 0.831 and <code>lp2-k40-c20</code> 0.644 / 0.651 / 0.675.
+Other two-large-prime arms win at weight 0 and lose at weight 1 (<code>lp2-k20-c10</code> at n = 53: 0.61 / 0.78 / 1.28; <code>lp2-k40-c10</code> at n = 61: 0.57 / 0.71 / 1.18): their native work is larger than their saved group operations.</li>
+<li><b>The single large prime is worse than the plain table at equal envelope</b> (1.73 [1.64, 1.82] and 1.47 [1.42, 1.52] at n = 53), as at n = 41 in 2026-10-12.</li>
+<li><b>Distance to the matched strong signed-Frobenius rho (S / S<sub>rho</sub> at weights 0, 0.1, 1).</b> n = 53: best plain 49 / 49 / 48; best two-large-prime 30 / 31 / 35. n = 61: best plain (880 columns) 85 / 83 / 78; <code>lp2-k60-c10</code> 47 / 52 / 64, <code>lp2-k40-c20</code> 55 / 54 / 52. Rho is ahead of every arm at every weight; the gap is about halved, not closed.</li>
+<li><b>It is a constant, not an exponent.</b> The best-arm ratio is 0.60 at n = 53 and 0.56 at n = 61, and the optimal large-prime base stays 40-60 columns while the plain optimum moves from 440 to 880. Two sizes cannot fit a slope; nothing here says the ratio grows.</li>
+<li><b>Memory beside time</b> (median peak RSS of the harness's own measurement, wall time exploratory on a shared host): at n = 53 the best large-prime arm and the best plain table use the same memory (317 vs 313 MiB for <code>lp2-k40-c10</code> and <code>plain-k440</code>) and solve in a median 9.9 s against 13.3 s. At n = 61 <code>lp2-k60-c10</code> uses 604 MiB and 36.7 s against 1,149 MiB and 59.4 s for the best plain table (880 columns). Memory is not in S.</li>
+<li><b>What this is not.</b> The leaderboard's Table A recipe for these curves is a different pipeline (aimed m = 3 collection with an m = 2 descent, in its own unit) at 7.03x (n = 53) and 11.5x (n = 61) of its reference, below the 30-55x here; the large-prime collector was not combined with that recipe, so no Table A row moves. The gain is inside the classic single-target pipeline, whose cost is dominated by the pair-table build.</li>
+<li><b>Controls.</b> Every run verified (planted logarithm recovered, independent point check). The duplicate plain arm reproduces the plain arm's S exactly (A/A ratio 1.000 [1.000, 1.000]); the large-prime collector switched off (<code>large_primes=0</code>) reproduces it counter for counter. Replay certificate: <code>ecbench verify --replay-all</code> on every session.</li>
+<li><b>Limits.</b> Counted S is deterministic, so the two rounds of a workload repeat each other; the independent units are workloads: 16 at n = 53 (two sessions of eight), 4 and 3 at n = 61 (two sessions). The n = 61 intervals are over three workloads and should be read as such. The 40-60 column optimum was found on the same curves as the confirmation (a grid selected by a pilot of two repeats on separate seeds). n = 61 first session (grid edge at 660 columns) is kept as evidence; the bracket session supplies the best plain table.</li>
+</ul>
+
+<h2>n = 53, icv1-f2m53-tm56619371-dac20a85</h2><table><tr><th>arm</th><th>verified</th><th>mean S</th><th>paired S vs equal-envelope control (95% interval)</th><th>priced ratio vs control, w = 0 / 0.1 / 1</th><th>S / rho, w = 0 / 0.1 / 1</th><th>median RSS MiB</th><th>median solve wall s</th></tr><tr><td>lp2-k40-c10</td><td>32/32</td><td>3.856</td><td>0.604 [0.599, 0.610] vs plain-k440</td><td>0.604 / 0.635 / 0.730</td><td>29.8 / 31.1 / 35.1</td><td>317</td><td>9.9</td></tr>
+<tr><td>lp2-k20-c10</td><td>32/32</td><td>3.892</td><td>0.367 [0.358, 0.376] vs plain-k220</td><td>0.367 / 0.462 / 0.745</td><td>30.1 / 38.0 / 61.7</td><td>102</td><td>9.0</td></tr>
+<tr><td>lp2-k80-c3</td><td>32/32</td><td>4.073</td><td>0.532 [0.525, 0.540] vs plain-k320</td><td>0.532 / 0.635 / 0.942</td><td>31.5 / 37.6 / 55.9</td><td>189</td><td>10.1</td></tr>
+<tr><td>lp2-k20-c30</td><td>32/32</td><td>5.433</td><td>0.796 [0.790, 0.801] vs plain-k660</td><td>0.796 / 0.756 / 0.623</td><td>42.0 / 38.8 / 29.2</td><td>595</td><td>14.8</td></tr>
+<tr><td>lp2-k40-c3</td><td>32/32</td><td>6.174</td><td>0.581 [0.563, 0.596] vs plain-k220</td><td>0.582 / 0.762 / 1.295</td><td>47.7 / 62.6 / 107.2</td><td>70</td><td>13.3</td></tr>
+<tr><td>plain-k440</td><td>32/32</td><td>6.383</td><td>-</td><td>-</td><td>49.3 / 49.0 / 48.1</td><td>313</td><td>13.3</td></tr>
+<tr><td>plain-k440-aa</td><td>32/32</td><td>6.383</td><td>1.000 [1.000, 1.000] vs plain-k440</td><td>1.000 / 1.000 / 1.000</td><td>49.3 / 49.0 / 48.1</td><td>313</td><td>13.3</td></tr>
+<tr><td>plain-k660</td><td>32/32</td><td>6.828</td><td>-</td><td>-</td><td>52.8 / 51.3 / 46.9</td><td>596</td><td>16.9</td></tr>
+<tr><td>plain-k320</td><td>32/32</td><td>7.651</td><td>-</td><td>-</td><td>59.1 / 59.2 / 59.3</td><td>173</td><td>14.6</td></tr>
+<tr><td>lp1-k40-c10</td><td>32/32</td><td>9.435</td><td>1.474 [1.422, 1.525] vs plain-k440</td><td>1.478 / 1.955 / 3.422</td><td>72.9 / 95.8 / 164.6</td><td>317</td><td>24.3</td></tr>
+<tr><td>plain-k220</td><td>32/32</td><td>10.605</td><td>-</td><td>-</td><td>82.0 / 82.2 / 82.8</td><td>100</td><td>18.3</td></tr>
+<tr><td>lp1-k20-c10</td><td>32/32</td><td>18.490</td><td>1.728 [1.638, 1.823] vs plain-k220</td><td>1.744 / 2.315 / 4.017</td><td>142.9 / 190.2 / 332.4</td><td>102</td><td>42.2</td></tr>
+<tr><td>plain-k80</td><td>32/32</td><td>28.179</td><td>-</td><td>-</td><td>217.8 / 218.0 / 218.7</td><td>35</td><td>43.7</td></tr>
+<tr><td>rho-strong</td><td>32/32</td><td>0.129</td><td>-</td><td>-</td><td>-</td><td>30</td><td>0.1</td></tr>
+<tr><td>lp0-k440</td><td>32/32</td><td>6.383</td><td>1.000 [1.000, 1.000] vs plain-k440</td><td>1.000 / 1.000 / 1.000</td><td>49.3 / 49.0 / 48.1</td><td>313</td><td>13.4</td></tr></table>
+<h2>n = 61, session s1 (icv1-f2m61-t158598901-ab42b6c5, 4 workloads)</h2><table><tr><th>arm</th><th>verified</th><th>mean S</th><th>paired S vs equal-envelope control (95% interval)</th><th>priced ratio vs control, w = 0 / 0.1 / 1</th><th>S / rho, w = 0 / 0.1 / 1</th><th>median RSS MiB</th><th>median solve wall s</th></tr><tr><td>lp2-k40-c10</td><td>8/8</td><td>4.199</td><td>0.374 [0.364, 0.384] vs plain-k440</td><td>0.374 / 0.458 / 0.712</td><td>29.7 / 36.4 / 56.3</td><td>322</td><td>41.2</td></tr>
+<tr><td>lp2-k80-c3</td><td>8/8</td><td>6.350</td><td>-</td><td>-</td><td>45.0 / 58.3 / 98.3</td><td>191</td><td>56.8</td></tr>
+<tr><td>lp2-k20-c10</td><td>8/8</td><td>6.911</td><td>0.324 [0.312, 0.336] vs plain-k220</td><td>0.325 / 0.428 / 0.735</td><td>49.0 / 64.4 / 110.9</td><td>105</td><td>59.5</td></tr>
+<tr><td>plain-k660</td><td>8/8</td><td>8.178</td><td>-</td><td>-</td><td>57.9 / 57.4 / 55.9</td><td>601</td><td>65.9</td></tr>
+<tr><td>plain-k440</td><td>8/8</td><td>11.225</td><td>-</td><td>-</td><td>79.5 / 79.4 / 79.1</td><td>317</td><td>78.0</td></tr>
+<tr><td>plain-k440-aa</td><td>8/8</td><td>11.225</td><td>1.000 [1.000, 1.000] vs plain-k440</td><td>1.000 / 1.000 / 1.000</td><td>79.5 / 79.4 / 79.1</td><td>317</td><td>82.8</td></tr>
+<tr><td>plain-k220</td><td>8/8</td><td>21.271</td><td>-</td><td>-</td><td>150.7 / 150.7 / 151.0</td><td>102</td><td>135.2</td></tr>
+<tr><td>rho-strong</td><td>8/8</td><td>0.141</td><td>-</td><td>-</td><td>-</td><td>30</td><td>0.2</td></tr>
+<tr><td>lp0-k440</td><td>8/8</td><td>11.225</td><td>1.000 [1.000, 1.000] vs plain-k440</td><td>1.000 / 1.000 / 1.000</td><td>79.5 / 79.4 / 79.1</td><td>317</td><td>80.2</td></tr></table>
+<h2>n = 61, session s2: bracket of the plain optimum (3 other workloads)</h2><table><tr><th>arm</th><th>verified</th><th>mean S</th><th>paired S vs equal-envelope control (95% interval)</th><th>priced ratio vs control, w = 0 / 0.1 / 1</th><th>S / rho, w = 0 / 0.1 / 1</th><th>median RSS MiB</th><th>median solve wall s</th></tr><tr><td>lp2-k60-c10</td><td>6/6</td><td>4.262</td><td>0.503 [0.488, 0.513] vs plain-k660</td><td>0.503 / 0.553 / 0.707</td><td>47.4 / 51.6 / 64.4</td><td>603</td><td>36.7</td></tr>
+<tr><td>lp2-k40-c10</td><td>6/6</td><td>4.311</td><td>0.378 [0.371, 0.389] vs plain-k440</td><td>0.378 / 0.464 / 0.724</td><td>47.9 / 58.8 / 91.3</td><td>315</td><td>36.1</td></tr>
+<tr><td>lp2-k40-c20</td><td>6/6</td><td>4.909</td><td>0.644 [0.628, 0.654] vs plain-k880</td><td>0.644 / 0.651 / 0.675</td><td>54.5 / 54.0 / 52.3</td><td>1149</td><td>43.9</td></tr>
+<tr><td>plain-k880</td><td>6/6</td><td>7.620</td><td>-</td><td>-</td><td>84.7 / 82.9 / 77.5</td><td>1149</td><td>59.4</td></tr>
+<tr><td>plain-k1100</td><td>6/6</td><td>8.145</td><td>-</td><td>-</td><td>90.5 / 87.3 / 77.6</td><td>2254</td><td>72.8</td></tr>
+<tr><td>plain-k660</td><td>6/6</td><td>8.475</td><td>-</td><td>-</td><td>94.2 / 93.4 / 91.1</td><td>594</td><td>59.2</td></tr>
+<tr><td>plain-k440</td><td>6/6</td><td>11.400</td><td>-</td><td>-</td><td>126.7 / 126.5 / 126.2</td><td>310</td><td>72.4</td></tr>
+<tr><td>plain-k440-aa</td><td>6/6</td><td>11.400</td><td>1.000 [1.000, 1.000] vs plain-k440</td><td>1.000 / 1.000 / 1.000</td><td>126.7 / 126.5 / 126.2</td><td>310</td><td>72.0</td></tr>
+<tr><td>rho-strong</td><td>6/6</td><td>0.090</td><td>-</td><td>-</td><td>-</td><td>24</td><td>0.1</td></tr>
+<tr><td>lp0-k440</td><td>6/6</td><td>11.400</td><td>1.000 [1.000, 1.000] vs plain-k440</td><td>1.000 / 1.000 / 1.000</td><td>126.7 / 126.5 / 126.2</td><td>310</td><td>71.1</td></tr></table>
+</body></html>

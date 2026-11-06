@@ -1,0 +1,152 @@
+{
+  "schema": "runtime.driver.local-controls/v1",
+  "controls": [
+    {
+      "case": "success",
+      "passed": true,
+      "error": null,
+      "client_receipt": {
+        "argv": [
+          "/usr/bin/python3",
+          "-c",
+          "import sys;print('ok');print('diagnostic',file=sys.stderr)"
+        ],
+        "cap_seconds": 2,
+        "client_terminal_exit": 0,
+        "client_unknown": false,
+        "pid": 3388238,
+        "process_group": 3388238,
+        "elapsed_seconds": 0.04098504199646413
+      },
+      "pid_absent_after_call": true,
+      "child_started": true
+    },
+    {
+      "case": "nonzero",
+      "passed": true,
+      "error": null,
+      "client_receipt": {
+        "argv": [
+          "/usr/bin/python3",
+          "-c",
+          "import sys;sys.exit(7)"
+        ],
+        "cap_seconds": 2,
+        "client_terminal_exit": 7,
+        "client_unknown": false,
+        "pid": 3388239,
+        "process_group": 3388239,
+        "elapsed_seconds": 0.05197627600864507
+      },
+      "pid_absent_after_call": true,
+      "child_started": true
+    },
+    {
+      "case": "timeout",
+      "passed": true,
+      "error": "ValueError: client timeout",
+      "client_receipt": {
+        "argv": [
+          "/usr/bin/python3",
+          "-c",
+          "import time;time.sleep(5)"
+        ],
+        "cap_seconds": 0.2,
+        "client_terminal_exit": -15,
+        "client_unknown": false,
+        "pid": 3388240,
+        "process_group": 3388240,
+        "elapsed_seconds": 0.2069692450168077
+      },
+      "pid_absent_after_call": true,
+      "child_started": true
+    },
+    {
+      "case": "kill_escalation",
+      "passed": true,
+      "error": "ValueError: client timeout",
+      "client_receipt": {
+        "argv": [
+          "/usr/bin/python3",
+          "-c",
+          "import signal,time;signal.signal(signal.SIGTERM,signal.SIG_IGN);print('READY',flush=True);time.sleep(5)"
+        ],
+        "cap_seconds": 0.2,
+        "client_terminal_exit": -9,
+        "client_unknown": false,
+        "pid": 3388241,
+        "process_group": 3388241,
+        "elapsed_seconds": 1.2072606290166732
+      },
+      "pid_absent_after_call": true,
+      "child_started": true
+    },
+    {
+      "case": "output_limit",
+      "passed": true,
+      "error": "ValueError: output cap",
+      "client_receipt": {
+        "argv": [
+          "/usr/bin/python3",
+          "-c",
+          "import sys;sys.stdout.write('x'*(17*1024*1024));sys.stdout.flush()"
+        ],
+        "cap_seconds": 3,
+        "client_terminal_exit": 0,
+        "client_unknown": false,
+        "pid": 3388285,
+        "process_group": 3388285,
+        "elapsed_seconds": 0.05128445298760198
+      },
+      "pid_absent_after_call": true,
+      "child_started": true
+    },
+    {
+      "case": "pending_during",
+      "passed": true,
+      "error": "ValueError: interrupted",
+      "client_receipt": {
+        "argv": [
+          "/usr/bin/python3",
+          "-c",
+          "import time;time.sleep(5)"
+        ],
+        "cap_seconds": 2,
+        "client_terminal_exit": -15,
+        "client_unknown": false,
+        "pid": 3388287,
+        "process_group": 3388287,
+        "elapsed_seconds": 0.2063420039776247
+      },
+      "pid_absent_after_call": true,
+      "child_started": true
+    },
+    {
+      "case": "pending_before",
+      "passed": true,
+      "error": "ValueError: interrupted",
+      "client_receipt": null,
+      "pid_absent_after_call": null,
+      "child_started": false
+    },
+    {
+      "case": "expired_deadline",
+      "passed": true,
+      "error": "ValueError: deadline reserve",
+      "client_receipt": null,
+      "pid_absent_after_call": null,
+      "child_started": false
+    }
+  ],
+  "passed": true,
+  "source_hashes": {
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-replacement-assembler/assemble.py": "bd878d153ba497ceea6906f286488c7a473dc3f1e859c67606b89187a1259131",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-driver-controls/check.py": "31b0868464a2f1d4641f988d96d831b74baa5b358549f2cc3a3ba8b0ecb8cf4a",
+    "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-driver-controls/PLAN.md": "9ccf821bfa9477fec9095aec8e093a2c51f4adc1b16d2fd99ab6ec4cca80dc82"
+  },
+  "sources_unchanged": true,
+  "private_directory": "/var/tmp/runtime-driver-controls-hubx899p",
+  "docker_calls": 0,
+  "sudo_calls": 0,
+  "scientific_execution": false
+}

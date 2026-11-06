@@ -59,7 +59,9 @@ pub struct SpacesArgs {
     /// With `--space`: the Koblitz curve (0 or 1); the default is 0.
     #[arg(long, default_value_t = 0)]
     pub koblitz_a: u8,
-    /// With `--space`: the prime family (`generic`, `j0`, `j1728`, `d7`, `d8`).
+    /// With `--space`: the prime family (`generic`, `j0`, `j1728`, `d7`,
+    /// `d8`, or `curve25519` for the committed Curve25519-family
+    /// miniatures at 20, 24, 28 and 32 bits).
     #[arg(long, default_value = "generic")]
     pub family: String,
 }
@@ -72,7 +74,7 @@ pub struct RunArgs {
     /// `koblitz-*` spaces: 0 for `K_0` (the primary target), 1 for `K_1`.
     #[arg(long, default_value_t = 0)]
     pub koblitz_a: u8,
-    /// `prime-table`: `generic`, `j0`, `j1728`, `d7`, `d8`.
+    /// `prime-*`: `generic`, `j0`, `j1728`, `d7`, `d8`, or `curve25519`.
     #[arg(long, default_value = "generic")]
     pub family: String,
     /// `char2-algebraic`: the largest cofactor a random curve may have.
@@ -151,7 +153,7 @@ fn instance_for(
     let regime = match space {
         s if s.starts_with("koblitz") => "koblitz",
         "char2-algebraic" | "char2-algebraic-elim" => "char2",
-        "prime-table" | "prime-rootfind" => "prime",
+        "prime-table" | "prime-rootfind" | "prime-algebraic" => "prime",
         other => {
             return Err(format!(
                 "unknown space `{other}`; the spaces are {}",
@@ -334,4 +336,20 @@ fn show(a: ShowArgs) -> Result<Value, String> {
             "rung_log2_ratio": t.rungs.iter().map(|r| r.log2_ratio).collect::<Vec<_>>(),
         })).collect::<Vec<_>>(),
     }))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// `instance_for` keeps its own name-to-regime table; every space the
+    /// sweeper lists must resolve through it and build for its regime.
+    #[test]
+    fn every_listed_space_resolves_to_an_instance_and_builds() {
+        for &name in SPACE_NAMES {
+            let inst =
+                instance_for(name, 0, "generic", 8).unwrap_or_else(|e| panic!("{name}: {e}"));
+            space_for(name, &inst).unwrap_or_else(|e| panic!("{name}: {e}"));
+        }
+    }
 }
