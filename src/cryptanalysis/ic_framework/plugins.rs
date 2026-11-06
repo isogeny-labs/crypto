@@ -5487,3 +5487,284 @@ mod wwalk_pipeline_tests {
         }
     }
 }
+
+/// **`layout=lines` is a memory layout, not a different oracle.**  The
+/// opt-in cache-line pair index and prefetched relation guard (#3116)
+/// must leave every observable of the default (`map`) layout unchanged:
+/// the decomposition of every target, the counted group operations and
+/// native counters of the table build and of every probe, the relation
+/// stream the pipeline collects, and the solved logarithm.  Checked on
+/// several small prime-field curves and seeds, for both oracles that
+/// accept the option: `mitm:negation_folded=1` and `mitm-prime-batch:m=2`.
+#[cfg(test)]
+mod layout_lines_equality_tests {
+    use super::*;
+    use crate::cryptanalysis::ic_boundary::{
+        find_prime_order_curve, prime_factor_base, prime_instance_for, Calibration, CountedGroup,
+        PrimeCurve, PrimeInstance, PrimePoint, Relation,
+    };
+    use crate::cryptanalysis::ic_framework::stages::Targets;
+    use crate::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec, RunReport};
+    use rand::{rngs::StdRng, Rng, SeedableRng};
+
+    /// The two oracle specs that accept `layout`, as the CLI spells them.
+    const SPECS: [&str; 2] = ["mitm:negation_folded=1", "mitm-prime-batch:m=2"];
+
+    /// Small prime-field curves: four roster curves and two curves drawn
+    /// by `find_prime_order_curve` off the roster, with a base size each.
+    fn curves() -> Vec<(PrimeInstance, usize)> {
+        vec![
+            (prime_instance_for(14, 1), 16),
+            (prime_instance_for(16, 1), 24),
+            (prime_instance_for(18, 1), 32),
+            (prime_instance_for(20, 59297), 48),
+            (find_prime_order_curve(15, 20261106), 20),
+            (find_prime_order_curve(17, 3116), 28),
+        ]
+    }
+
+    fn oracle_for(name: &str) -> Box<dyn DecompositionOracle<PrimeCurve>> {
+        match name {
+            "mitm" => Box::new(MitmOracle::new(2)),
+            "mitm-prime-batch" => Box::new(PrimeBatchMitmOracle::new()),
+            other => panic!("no oracle {other}"),
+        }
+    }
+
+    /// `(name, default params, lines params)` for one spec string.
+    fn arms(spec: &str) -> (String, Params, Params) {
+        let (name, map) = Params::parse_spec(spec).unwrap();
+        let (_, lines) = Params::parse_spec(&format!("{spec},layout=lines")).unwrap();
+        assert_eq!(lines.get("layout"), Some("lines"));
+        assert_eq!(map.get("layout"), None);
+        (name, map, lines)
+    }
+
+    fn ctx(inst: &PrimeInstance, target: PrimePoint) -> InstanceCtx<'_, PrimeCurve> {
+        InstanceCtx {
+            group: &inst.curve,
+            generator: inst.generator_point(),
+            target,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: None,
+        }
+    }
+
+    /// The explicit `layout=map` spelling is the default, and the lines
+    /// layout is the only arm that turns the line guard on.
+    #[test]
+    fn layout_map_is_the_default_and_lines_selects_the_line_guard() {
+        let (inst, size) = curves().remove(1);
+        let fb = prime_factor_base(&inst, size);
+        let c = ctx(&inst, inst.generator_point());
+        for spec in SPECS {
+            let (name, map, lines) = arms(spec);
+            let (_, explicit) = Params::parse_spec(&format!("{spec},layout=map")).unwrap();
+            for (params, guard) in [(&map, false), (&explicit, false), (&lines, true)] {
+                let mut oracle = oracle_for(&name);
+                oracle
+                    .prepare(&c, &fb, params, &mut GroupOps::default())
+                    .unwrap();
+                assert_eq!(oracle.line_guard(), guard, "{spec} {params:?}");
+            }
+        }
+    }
+
+    /// Table build and every probe: same decompositions (as summand
+    /// indices and as the relations the pipeline is handed), same group
+    /// operations, same native counters, target by target.
+    #[test]
+    fn layout_lines_gives_identical_decompositions_and_counted_operations() {
+        for (inst, size) in curves() {
+            let fb = prime_factor_base(&inst, size);
+            let g = inst.generator_point();
+            let c = ctx(&inst, g);
+            for spec in SPECS {
+                let (name, map_params, line_params) = arms(spec);
+                let mut map = oracle_for(&name);
+                let mut lines = oracle_for(&name);
+                let mut map_build = GroupOps::default();
+                let mut line_build = GroupOps::default();
+                map.prepare(&c, &fb, &map_params, &mut map_build).unwrap();
+                lines
+                    .prepare(&c, &fb, &line_params, &mut line_build)
+                    .unwrap();
+                let label = format!("{} {spec}", inst.name);
+                assert!(!map.line_guard() && lines.line_guard(), "{label}");
+                assert_eq!(map_build, line_build, "{label}: build ops");
+                assert!(map_build.adds > 0, "{label}: the build counted nothing");
+                assert_eq!(
+                    map.setup_work_native(),
+                    lines.setup_work_native(),
+                    "{label}: build work"
+                );
+                assert_eq!(map.summands(), lines.summands(), "{label}");
+                for seed in [1u64, 7, 20261106] {
+                    let mut rng = StdRng::seed_from_u64(seed ^ inst.r);
+                    let mut map_ops = GroupOps::default();
+                    let mut line_ops = GroupOps::default();
+                    let mut map_ctr = OracleCounters::default();
+                    let mut line_ctr = OracleCounters::default();
+                    let mut hits = 0u64;
+                    let mut setup = GroupOps::default();
+                    for trial in 0..3000u64 {
+                        let (a, b) = (rng.gen_range(0..inst.r), rng.gen_range(0..inst.r));
+                        let point = inst.curve.mul(&mut setup, g, a);
+                        let point = inst.curve.add(
+                            &mut setup,
+                            point,
+                            inst.curve.mul(&mut GroupOps::default(), g, b),
+                        );
+                        lines.touch(&c, &point);
+                        let m = map.decompose(&c, &fb, &mut map_ops, &mut map_ctr, point);
+                        let l = lines.decompose(&c, &fb, &mut line_ops, &mut line_ctr, point);
+                        assert_eq!(m, l, "{label} seed {seed} trial {trial}");
+                        if let Some(w) = &m {
+                            hits += 1;
+                            let sum = w.iter().fold(None::<PrimePoint>, |acc, &i| {
+                                Some(match acc {
+                                    None => fb.points[i],
+                                    Some(s) => {
+                                        inst.curve.add(&mut GroupOps::default(), s, fb.points[i])
+                                    }
+                                })
+                            });
+                            assert_eq!(sum, Some(point), "{label}: a wrong decomposition");
+                        }
+                        let mr: Vec<Relation> = map.decompose_relations(
+                            &c,
+                            &fb,
+                            &mut map_ops,
+                            &mut map_ctr,
+                            point,
+                            a,
+                            b,
+                        );
+                        let lr: Vec<Relation> = lines.decompose_relations(
+                            &c,
+                            &fb,
+                            &mut line_ops,
+                            &mut line_ctr,
+                            point,
+                            a,
+                            b,
+                        );
+                        assert_eq!(mr, lr, "{label} seed {seed} trial {trial}: relations");
+                    }
+                    assert!(hits > 0, "{label} seed {seed}: no target decomposed");
+                    assert_eq!(map_ops, line_ops, "{label} seed {seed}: probe ops");
+                    assert_eq!(
+                        format!("{map_ctr:?}"),
+                        format!("{line_ctr:?}"),
+                        "{label} seed {seed}: probe counters"
+                    );
+                    assert!(map_ctr.lookups > 0, "{label}: no lookup counted");
+                }
+                assert_eq!(
+                    map.relation_counters(),
+                    lines.relation_counters(),
+                    "{label}: relation counters"
+                );
+            }
+        }
+    }
+
+    fn assert_same_run(map: &RunReport, lines: &RunReport, label: &str) {
+        assert_eq!(map.recovered, lines.recovered, "{label}: recovered");
+        assert_eq!(map.verified, lines.verified, "{label}: verified");
+        assert_eq!(map.exhausted, lines.exhausted, "{label}: exhausted");
+        let (fm, fl) = (&map.factor_base, &lines.factor_base);
+        assert_eq!(fm.columns, fl.columns, "{label}");
+        assert_eq!(fm.signed_points, fl.signed_points, "{label}");
+        assert_eq!(fm.cost.group_ops, fl.cost.group_ops, "{label}: base ops");
+        assert_eq!(fm.cost.native, fl.cost.native, "{label}: base native");
+        let (dm, dl) = (&map.decomposition, &lines.decomposition);
+        assert_eq!(dm.targets_tried, dl.targets_tried, "{label}: targets");
+        assert_eq!(dm.relations_found, dl.relations_found, "{label}: relations");
+        assert_eq!(dm.setup.group_ops, dl.setup.group_ops, "{label}: setup ops");
+        assert_eq!(dm.setup.native, dl.setup.native, "{label}: setup native");
+        assert_eq!(dm.setup.work_native, dl.setup.work_native, "{label}");
+        assert_eq!(dm.setup.gae, dl.setup.gae, "{label}: setup gae");
+        assert_eq!(
+            dm.cost.group_ops, dl.cost.group_ops,
+            "{label}: relation ops"
+        );
+        assert_eq!(dm.cost.native, dl.cost.native, "{label}: relation native");
+        assert_eq!(dm.cost.work_native, dl.cost.work_native, "{label}");
+        assert_eq!(dm.cost.gae, dl.cost.gae, "{label}: relation gae");
+        let (lm, ll) = (&map.linear_algebra, &lines.linear_algebra);
+        assert_eq!(
+            (lm.rows, lm.rank, lm.dependent, lm.work),
+            (ll.rows, ll.rank, ll.dependent, ll.work),
+            "{label}: linear algebra"
+        );
+        assert_eq!(lm.cost.native, ll.cost.native, "{label}");
+        assert_eq!(map.verify.group_ops, lines.verify.group_ops, "{label}");
+        assert_eq!(map.total_gae, lines.total_gae, "{label}: total gae");
+        assert_eq!(map.s, lines.s, "{label}: S");
+    }
+
+    /// End to end: the same relation counts, the same counted cost in
+    /// every phase, and the same solved logarithm, with walk, random and
+    /// batched-lane targets (the lane source is the one that prefetches).
+    #[test]
+    fn layout_lines_solves_the_same_logarithm_at_the_same_counted_cost() {
+        let calib = Calibration::default();
+        let mut solved = 0;
+        for (inst, size) in curves() {
+            let g = inst.generator_point();
+            for planted_seed in [11u64, 30_011, 20_261_106] {
+                let planted = planted_seed % inst.r;
+                let q = inst.curve.mul(&mut GroupOps::default(), g, planted);
+                let c = ctx(&inst, q);
+                for spec in SPECS {
+                    let (name, map_params, line_params) = arms(spec);
+                    for targets in [Targets::Walk, Targets::Random, Targets::WalkPrimeBatch16] {
+                        for seed in [7u64, 3116] {
+                            let run = |params: &Params| {
+                                let mut spec = PipelineSpec {
+                                    factor_base: "prime-abscissa".into(),
+                                    oracle: name.clone(),
+                                    oracle_params: params.clone(),
+                                    targets,
+                                    max_trials: 2_000_000,
+                                    seed,
+                                    ..Default::default()
+                                };
+                                spec.factor_base_params.set("size", size.to_string());
+                                let mut oracle = oracle_for(&name);
+                                run_pipeline(
+                                    &c,
+                                    &spec,
+                                    &PrimeAbscissaBase { instance: &inst },
+                                    oracle.as_mut(),
+                                    planted,
+                                    &calib,
+                                    None,
+                                )
+                                .unwrap()
+                            };
+                            let map = run(&map_params);
+                            let lines = run(&line_params);
+                            let label = format!(
+                                "{} {spec} {} seed {seed} planted {planted}",
+                                inst.name,
+                                targets.name()
+                            );
+                            assert_same_run(&map, &lines, &label);
+                            if map.verified {
+                                assert_eq!(map.recovered, Some(planted), "{label}");
+                                solved += 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // Six curves × three logs × two specs × three sources × two seeds.
+        assert_eq!(solved, 216, "every configuration should solve");
+    }
+}
