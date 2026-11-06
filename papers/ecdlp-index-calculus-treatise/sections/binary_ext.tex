@@ -383,6 +383,44 @@ $23.99$. Source:
   hold-outs. \texttt{ic-planner/4} keeps the counted optimum $c_0$.
 \end{itemize}
 
+Figure~\ref{fig:bin-routing} plots the three ratios of
+Table~\ref{tab:kc-routing} against group size. Table~\ref{tab:bin-routing-band}
+gives the band means behind them at all six weights. At every curve and
+weight \texttt{ecbench band} ranks rho below \texttt{pipeline} and
+\texttt{pipeline} below \texttt{pipeline71}. The pipeline-to-rho ratio of
+band means (derived) rises with $w$ on every curve, from $10.8$--$22.9$ at
+$w=0$ to $17.4$--$27.2$ at $w=1$. At $w=0$ it equals the cluster ratio of
+Table~\ref{tab:kc-routing} on five curves; at k41 it reads $12.9$ against
+$14.1$ $[11.0,18.0]$, inside the interval. The source does not say which
+estimator gives the difference.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.75\linewidth]{figures/fig-bin-routing.pdf}
+\caption[]{Koblitz routing retest, counted $S$ at $w=0$, 24 pairs per curve,
+cluster 95\% intervals as reported; rho is
+\texttt{rho.signed\_frobenius\_strong}. The descent stays above the pipeline
+(green, every interval above 1) and both stay above rho. Data:
+\art{figures/data-bin-routing.json}, copied from
+\art{research/ic_planner_exhaustive_20261026/README.md}, \S3; plot:
+\art{figures/make_fig_bin_routing.py}. Standing: producer-reported; the
+directory has no \texttt{VALIDATION.json}.}
+\label{fig:bin-routing}
+\end{figure}
+
+\begin{table}[t]
+\centering\small
+\input{figures/tab-bin-routing-band}
+\caption[]{Band means of counted $S$ in the routing retest, 24 verified runs
+per arm and curve, at the six weights of \texttt{ecbench band} (GAE per
+unpriced native operation). \texttt{pipeline71} is the withdrawn smaller
+base $0.71c_0$. The descent has four uncounted native categories and is
+priced only at $w=0$. Data: \art{figures/data-bin-routing.json}, from
+\art{research/ic_planner_exhaustive_20261026/analysis/band-K-k41.json} and
+the five sibling \texttt{band-K-*.json} files.}
+\label{tab:bin-routing-band}
+\end{table}
+
 \section{Large primes on Koblitz curves}\label{sec:kc-largeprime}
 
 Large primes appear in this treatise on the genus-3 and extension-field
@@ -452,6 +490,43 @@ uses 604\,MiB against 1{,}149\,MiB. The $n=61$ interval is over three
 workloads, and the column optimum was found on the same curves as the
 confirmation.
 
+Table~\ref{tab:bin-lp-arms} lists every arm of both sizes, including the
+first $n=61$ session (4 workloads), whose best plain table is $K=660$ and
+whose best two-LP arm \texttt{lp2-k40-c10} reads $0.513$ $[0.497,0.526]$ of it.
+Figure~\ref{fig:bin-lp} plots each arm's paired ratio to the matched rho
+against its column count. Every arm in all three sessions lies between
+$32.9\times$ and $249\times$ rho at $w=0$. The A/A arm and the switched-off
+collector (\texttt{lp0-k440}) reproduce \texttt{plain-k440} exactly, ratio
+$1.0$ $[1.0,1.0]$.
+
+\begin{table}[t]
+\centering\scriptsize\setlength{\tabcolsep}{4pt}
+\input{figures/tab-bin-lp-arms}
+\caption[]{Every arm of the large-prime study on the compact-orbit $m=3$
+Frobenius pair table. $S$: band means at $w=0$, 0.1, 1. Paired ratios with
+95\% intervals as committed: against \texttt{rho-strong}
+(\texttt{rho.signed\_frobenius\_strong}) and against the session's best
+plain table. \texttt{plain-K}: plain table with $K$ columns;
+\texttt{lpL-kK-cC}: $L$ large primes, $K$ columns, domain factor $c$. A/A
+rows (\texttt{-aa}) are omitted; they equal their parents. Producer-validated
+component result, no pcc claim. Data: \art{figures/data-bin-lp.json}, from
+\art{research/icb_large_prime_n53_n61_20261029/results.json} and
+\texttt{band/\{n53-all,n61-s1,n61-s2\}.json}.}
+\label{tab:bin-lp-arms}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-bin-lp.pdf}
+\caption[]{Large primes on the Koblitz $m=3$ pair table: paired ratio of each
+arm's counted $S$ to the matched \texttt{rho.signed\_frobenius\_strong} at
+$w=0$, 95\% intervals, against factor-base columns (log scales). The dashed
+line is ratio 1. Two-large-prime arms with domain factor $c=10$ are filled,
+$c=3$, 20 and 30 open. Data: \art{figures/data-bin-lp.json}; plot:
+\art{figures/make_fig_bin_lp.py}.}
+\label{fig:bin-lp}
+\end{figure}
+
 \paragraph{Tuned double large primes do not beat the compact baseline.} The
 preregistered tuning study of 23--28 October
 (\art{research/ic_koblitz_dlp_tuning_20261023/REPORT.md}; protocol frozen in
@@ -467,6 +542,34 @@ columns, double-LP over the plain $m=3$ oracle is $0.0316$ $[0.0267,0.0374]$
 at $w=0$, $31.6\times$ cheaper. The only train-side win ($n=43$, $0.893$)
 shrank to $0.985$ on holdout, a winner's-curse loss of about 9 points. Both
 arms stay $4.9$--$28\times$ the matched rho at every weight.
+Table~\ref{tab:bin-dlp-band} gives the per-curve band means and the
+distance to the matched \texttt{rho.frob}, and Figure~\ref{fig:bin-dlp}
+plots both ratios across the band.
+
+\begin{table}[t]
+\centering\scriptsize\setlength{\tabcolsep}{4pt}
+\input{figures/tab-bin-dlp-band}
+\caption[]{Tuned double large prime against \texttt{ic-compact}, 96
+held-out targets per curve, all verified. $S$: band means. Distance to the
+matched \texttt{rho.frob} at the same weight, 95\% intervals, as reported.
+A/A arms equal their parents and are omitted. Data:
+\art{figures/data-bin-dlp.json}, from
+\art{research/ic_koblitz_dlp_tuning_20261023/REPORT.md} and
+\texttt{bands/holdout-n\{37,41,43,47\}.band.json}.}
+\label{tab:bin-dlp-band}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-bin-dlp.pdf}
+\caption[]{Tuned double large prime on held-out targets, across the GAE
+band. Left: double-LP $S$ over \texttt{ic-compact} $S$, paired ratio of
+sums, two-stage cluster bootstrap 95\% intervals; every verdict
+``unresolved inside the band''. Right: each arm over the matched
+\texttt{rho.frob} (log scale); the dashed line is ratio 1. Data:
+\art{figures/data-bin-dlp.json}; plot: \art{figures/make_fig_bin_dlp.py}.}
+\label{fig:bin-dlp}
+\end{figure}
 
 \paragraph{Why the two studies disagree.} The two studies do not state a
 reconciliation. Their own protocols and the routing study supply one, and
@@ -965,6 +1068,37 @@ improvements in Table~\ref{tab:n83l-sat} are constants of the enumeration
 over this base is rare, so these are stage measurements: no relation
 collection, no complete logarithm and no rho ratio.
 
+Table~\ref{tab:bin-n83chain} gives the per-cell records of the first two
+studies, and Figure~\ref{fig:bin-n83chain} plots their decided-query times.
+In the order study no arm decides any of its five queries at $m=5$--9; the meet arm decides the public targets up to
+$m=8$ and nothing at $m=9$ in that study.
+
+\begin{table}[t]
+\centering\small\setlength{\tabcolsep}{4pt}
+\input{figures/tab-bin-n83chain}
+\caption[]{Chained-$\Sem3$ SAT at $n=83$ per cell: refuted public targets
+and planted witnesses found, with medians over decided queries (conflicts and
+wall seconds, as committed). A0--A3: arms of the order study (31 October),
+$m=2$--4; rows for $m=5$--9 decide nothing and are omitted. A2+meet$d$: the
+meet study (1 November), lookup depth $d$. Data:
+\art{figures/data-bin-n83chain.json}, from
+\art{research/n83_chain_sat_order_20261031/table.tsv} and
+\art{research/n83_chain_sat_meet_20261101/table.tsv}.}
+\label{tab:bin-n83chain}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-bin-n83chain.pdf}
+\caption[]{Chained-$\Sem3$ SAT at $n=83$: median wall time per decided query
+against $m$ (log scale), public targets refuted (filled, solid) and planted
+witnesses found (open, dotted). No point means no query in that cell was
+decided within the cap. Decomposition stage only, L0 four-vCPU host. Data:
+\art{figures/data-bin-n83chain.json}; plot:
+\art{figures/make_fig_bin_n83chain.py}.}
+\label{fig:bin-n83chain}
+\end{figure}
+
 \section{Certified degree bounds}\label{sec:n83l-degree}
 
 The descended $n=83$ systems were characterised exactly, not solved. Seven
@@ -1183,6 +1317,26 @@ summands' coordinates and $s=a+b$ the swap invariant of the first link.
 \label{tab:bd-guess}
 \end{table}
 
+Table~\ref{tab:bin-guess} gives the per-draw records of the first two
+studies, read from their committed run files.
+
+\begin{table}[t]
+\centering\small\setlength{\tabcolsep}{4pt}
+\input{figures/tab-bin-guess}
+\caption[]{Degree-4 closure records of the guess (22 October) and guess3
+(23 October) studies, $m=3$, $(n,\ell)=(22,8)$, per draw and guess set
+(variables fixed to every 0/1 pattern, one run per branch). The six-variable
+set is the positive control, the unguessed $\ell=7$ draw (N7) the identity
+and negative control. ``rank'' is the closure rank of a non-refuting branch;
+guess3 stopped a draw after its first non-refuting branch. Minimum and
+maximum seconds are taken over the runs (derived). Data:
+\art{figures/data-bin-guess.json}, from
+\texttt{research/dreg\_closure\_guess\_20261022/runs/*.jsonl} and
+\texttt{research/dreg\_closure\_guess3\_20261023/runs/*.jsonl} (the
+\texttt{invalid-cap-bug} runs excluded).}
+\label{tab:bin-guess}
+\end{table}
+
 \paragraph{What the series shows.} At equal guess count, guessing a
 coordinate of the swap invariant $s=x_1+x_2$ refutes at degree 4 on more
 draws than guessing a raw summand coordinate: preregistered on fresh draws,
@@ -1224,8 +1378,8 @@ At the priced ECC2K-130 cell ($m=4$, $\ell=33$, $N=2\cdot131+4\cdot33=394$,
 closure exponent $\omega_c=1$) the ratio $\binom{394}{\le5}/(2^k\binom{394-k}{\le4})$ is $78.2$ at
 $k=0$, $5.09$ at $k=4$, $1.30$ at $k=6$ and $0.66$ at $k=7$, recomputed in
 the three-guess study. Both registered growth rules give $k\approx105$--108
-there. The measurements---$k\approx1$ at $\ell=7$ on 5 of 8 draws, $k\le4$
-at $\ell=8$ on 4 of 4---do not exclude a bounded $k$, and the invariant guess
+there. The measurements ($k\approx1$ at $\ell=7$ on 5 of 8 draws, $k\le4$
+at $\ell=8$ on 4 of 4) do not exclude a bounded $k$, and the invariant guess
 lowers $k$ on some draws. Even a bounded $k$ gives at best the degree-4
 floor, $2^{+7.62}$ over rho in unconverted units ($+8.43$ bits under the
 flat-$k$ rule), and the free-oracle floor of \S\ref{sec:gf-collision} still
