@@ -256,6 +256,8 @@ def work(job):
 def curves_for(p, k, n):
     rnd = random.Random(seed("curves", p, k))
     seen, out = set(), []
+    nonsing = sum(1 for a in range(p) for b in range(p) if (4 * a ** 3 + 27 * b * b) % p)
+    n = min(n, nonsing)  # p = 11, 13 have fewer than 200 non-singular (a, b)
     while len(out) < n:
         a, b = rnd.randrange(p), rnd.randrange(p)
         if (4 * a ** 3 + 27 * b * b) % p == 0 or (a, b) in seen:

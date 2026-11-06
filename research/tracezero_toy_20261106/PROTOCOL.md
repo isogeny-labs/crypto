@@ -101,3 +101,10 @@ arm's draws take s = 3 random distinct non-identity points (skip if fewer exist)
 compute |S|, cov_2, cov_3 as before. The primary decision statistic is cov_2 and cov_3 of
 this small-base arm; the full-base statistics stay as secondary. The smoke run informed
 only this change and no decision threshold.
+
+## Amendment A3 (2026-11-06, before the registered run)
+
+The first launch hung: p = 11 and 13 have only 110 and 156 non-singular (a, b), fewer
+than the 200 curves registered, and the curve sampler looped. No row was written. For
+those primes all non-singular (a, b) are used. Both primes are below the p ≥ 17 pooling
+threshold, so no decision statistic is affected.
