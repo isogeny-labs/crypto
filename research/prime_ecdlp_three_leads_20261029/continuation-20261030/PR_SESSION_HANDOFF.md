@@ -705,3 +705,39 @@ artifactsABSENT, reviews[]. No requiredpassclaimed; laterpublicationmetadata
 changes no tested Rust/formal source. [Publication receipt](validation/reference-refusal-20261105/publication-1b661dbd8.json).
 PCC report-only request6664459966 remains; no frozen merge/rechain or oldPR
 maintenance. Allnativejobs terminal and22sourceobjects stillmatchc933. [pcc:unverified]
+
+## Helper and encoder accounting — 2026-11-06
+
+Replay now retains disjoint parameter-check/setup-constructor helper calls,
+including Result-error prefixes. New helper captures mark underlying or
+aggregate overflow unavailable. The raw relation encoder has a separate
+scalar-n/coordinate-p integer ledger; a coordinate-helper snapshot would
+miss that work. Producer output adds encoding diagnostics; replay compares
+them when present using the shared encoder, while older records remain
+readable. This checks consistency, not independent cost completeness.
+[pcc:unverified]
+
+[Fresh source-ab0 receipt](validation/helper-accounting-20261106/receipt.json)
+records32oracle tests passed,0failed/ignored:5new controls plus27prior. Format,
+CLIbuild and actual checkpoint-refusal message+expectedexit1 pass. Final scoped
+CargoClippy/supervisor remainFAIL101 on two inherited library errors; final
+Cargo example strictlint is unqualified. PCC-20261106-59b811 is an unsigned
+producer observation. All22objects,2fresh preserved binary copies,8unchanged
+binaries/oldraw/formal/Mathlib equivalence are bound by the
+[delivery review](validation/helper-accounting-20261106/delivery-review.json).
+No duplicate unchanged library/process/Lean runs. [pcc:unverified]
+
+[Coverage contract](G2_HELPER_ACCOUNTING_20261106.md), [inspected two-page report](helper-accounting-20261106.pdf)
+and [editable diagram](helper-accounting-20261106.svg) distinguish two executed
+paths from duplicate views of one path: charge producer and replay separately;
+do not add inverse/sqrt parent diagnostics to expanded children. The legacy
+completed-oracle view aliases attempted enumeration within replay. Atomic
+inverse/root pricing would require excluded-child attribution not yet emitted.
+No complete price, performance result or scientific panel is admitted.
+[pcc:unverified]
+
+Remaining: uninstrumented primality/discriminant/raw guards and logical/
+container work, full F4/root/native coverage, calibrated nonoverlapping pricing,
+whole-process/journal and qualified runtime/resume. Scientific metrics remain
+null and acceptance unchanged. Frozen ledger reconciliation still blocks merge;
+PR3452/2949 maintenance stays stopped. Continue on the current openPR3482.
