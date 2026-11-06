@@ -150,4 +150,19 @@ either fails, C4 and C5 are void.
 
 ## Amendments
 
-(none)
+**A1 (2026-11-06, after data; it changes no decision rule).** These are
+post-hoc analyses. The C1 and C3 verdicts stay FAIL as registered.
+
+1. **The 19-line (13,4) curve.** Two of its systems (one system and its
+   mirror) have nullity 3 instead of 2, which gives a pencil of q + 1
+   lines. The protocol's "none > 6" assumed the generic nullity.
+2. **The (101,2) curve.** It has j ∈ F_q by chance, so its k = n/2 systems
+   have nullity 2. The instrument's `half_k_lines` counts solution points
+   (projective points with w ≠ 0), not distinct lines. Modulo scaling and
+   shift those collapse to about one line (derived, not deduplicated in
+   code).
+3. **New tables.** A null-space dimension tally per cell, and the n = 6
+   behaviour count.
+4. **Before data.** BSGS was changed after a failing unit test and before
+   the run: it now uses exact point orders and returns None when the order
+   is ambiguous. That change is in the instrument commit `30a9b09fb5`.
