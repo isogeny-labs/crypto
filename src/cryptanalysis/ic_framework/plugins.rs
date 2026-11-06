@@ -5634,12 +5634,12 @@ mod free_rows_probe {
                             };
                             let mut row = vec![0u64; cols];
                             for &k in &[rep, j] {
-                                let col = fb.col_of[k] as usize;
+                                let col = fb.col_of[k];
                                 row[col] = (row[col] + fb.coef_of[k] % r) % r;
                             }
                             let lt = powmod(lambda, t as u64, r);
                             for &k in &[i0, j0] {
-                                let col = fb.col_of[k] as usize;
+                                let col = fb.col_of[k];
                                 let mut term = mulmod(lt, fb.coef_of[k] % r, r);
                                 if !s_neg {
                                     term = (r - term) % r;
