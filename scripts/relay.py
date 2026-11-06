@@ -471,6 +471,13 @@ def cmd_snapshot(args) -> int:
     return 0
 
 
+KB_REMINDER = (
+    "Research KB: query it before a survey, lead proposal, novelty or negative "
+    "claim, cross-repository question or subagent handoff (AGENTS.md \"Knowledge "
+    "base first\"; skill research-kb; fallback scripts/research-kb)."
+)
+
+
 def cmd_session_start(args) -> int:
     hook = read_hook()
     root_s = git(Path(hook.get("cwd") or "."), "rev-parse", "--show-toplevel")
@@ -478,11 +485,13 @@ def cmd_session_start(args) -> int:
         return 0
     root = Path(root_s)
     h = load(root)
-    if h.get("status") != "pending" or h.get("session_id") == hook.get("session_id"):
-        return 0
+    pending = h.get("status") == "pending" and h.get("session_id") != hook.get("session_id")
+    if pending:
+        msg = (f"A pending runtime handoff from {h.get('from')} ({h.get('reason')}, {h.get('written_utc')}) is in "
+               f"{root}/.resume/HANDOFF.md. " + takeover_prompt(root, h) + "\n\n" + KB_REMINDER)
+    else:
+        msg = KB_REMINDER
     runtime = args.runtime or detect_runtime(hook)
-    msg = (f"A pending runtime handoff from {h.get('from')} ({h.get('reason')}, {h.get('written_utc')}) is in "
-           f"{root}/.resume/HANDOFF.md. " + takeover_prompt(root, h))
     if runtime == "claude":
         print(json.dumps({"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": msg}}))
     else:
