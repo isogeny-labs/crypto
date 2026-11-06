@@ -4,6 +4,39 @@
 % measurement or proof that would settle it, per the repository's
 % "name the obstruction" rule.
 
+Table~\ref{tab:fm-open} lists each problem with the measurement or proof
+that would settle it and the value that measurement has now. The
+paragraphs after it give the experiment in full.
+
+\begin{table}[tbp]
+\centering\scriptsize
+\begin{tabularx}{\linewidth}{@{}r>{\raggedright}X>{\raggedright}p{0.33\linewidth}>{\raggedright\arraybackslash}p{0.13\linewidth}@{}}
+\toprule
+& settled by & current value (standing) & where \\
+\midrule
+1 & $d_{\rm ff}$, $d_F$ and solving degree of Weil-descended $\Sem{m+1}$, $m\ge3$, four or more $n$ per $(\ell,m)$ & $d_F\ge5$ at $n=33$--$45$ (certified, independently checked); $\ge4$ at $n=17$--$24$ (census, unverified) & Ch.~\ref{ch:falldegree}, \ref{ch:hardness} \\
+2 & per-arm cold exponents, crossover only where fits separate across the band & no arm below matched rho; validated gaps $3.43$--$11.51\times$ (Table~A), $5.47$--$13.46\times$ prime and $10.62$--$38.21\times$ binary (Table~B) & \art{docs/ic/leaderboard.json} \\
+3 & measured trials per relation against $m!\,r/N^{m-1}$ per base family & ECC2K-130 fit $C=0.27$ at $n=61$, $1.2$--$1.5$ at $n=71,73$, model $0.25$ (unvalidated) & \S\ref{sec:corrections}, item~3 \\
+4 & a sub-$N^2$ non-generic membership test for $\Sem4$ over $\FF_p$, or a counting argument against one & none known; generic $k$-sum exponent $0.521$; generic single-target floor $1.5\times$ rho & Ch.~\ref{ch:distance}; Prop.~\ref{prop:collisionfloor} \\
+5 & IC advice--time curve $(S,T)$ against preprocessing rho at equal $S$ & IC $53$--$317\times$ slower online than Bernstein--Lange rho with an equal or smaller table & \S\ref{sec:ladder} \\
+6 & $k=4$ replication, $m=14$--$17$, eight targets per arm, measured negation rho per rung & $5.2\times$ rho at $m=15$; crossover $m^*\approx17.6$ ($16.3$--$19.2$) extrapolated; E32 $1.5\cdot10^3\times$ at $2^{42.4}$ (validated) & Ch.~\ref{ch:extension}, \ref{ch:glvprogramme} \\
+7 & the shared-rank arm's uncounted work, counted & three categories uncounted; the arm is a lower bound & \S\ref{sec:frontier} \\
+8 & genus-3 GHS IC and negation rho at $q=2^{21}$--$2^{24}$, one cofactor, priced across the band & local exponent $1.356$ at $q=2^{22}$ (target ${<}4/3$); below the strongest rho at $q=2^{16}$ only under the registered price; $q=2^{23}$ exceeds the 4.5\,GB cap (no validation file) & \S\ref{sec:ladder2}, Ch.~\ref{sec:transfer} \\
+9 & N4~v2 on an isolated host with a replayable rho baseline & exponent $0.983$; $0.005\times$ rho near $q=2^{21}$ (L0, no validation file) & Ch.~\ref{sec:transfer} \\
+10 & a published index calculus (FGHR base, msolve, WDSat) as reference arm in ecbench & not run: no ratio against published IC at matched $(q,n,m)$ & \S\ref{sec:ladder3} \\
+11 & sieve and Nagao arms with F4, descent and linear-algebra additions emitted, at $p\approx1300$--$2000$ on the isolated lab & sieve $0.0065\times$ matched negation rho at $p=1511$ (validated as accounting); Nagao $1.405$, $1.160$, $0.870$ $[0.697,1.183]$ at $p=1301$, $1451$, $1601$ & \S\ref{sec:jac-jv} \\
+12 & a proof that $d_F$ grows with $n$ or $k$ & no growing bound; best certified value 5 & Ch.~\ref{ch:falldegree} \\
+13 & certificates for about 20 subspaces per $n$, $n=33$--$51$; guarded chain at $B=4$--$8$ & named instances only; guarded chain exact at $B=3$, $(4,5)$ & Ch.~\ref{ch:falldegree} \\
+14 & Kummer-tower stage A at $t=1$--$14$ with closure certificates & session values $d_F=3,4,4,4,4,5,5,5,5,6$ at $t=1$--$10$ (not committed); F4 extrapolated to 1.7\,h, 17\,h, 7 days at $t=12$--$14$ & \S\ref{sec:fd-pkm}; \art{research/prime_ic_program_20261029/} \\
+\bottomrule
+\end{tabularx}
+\caption[]{Open problems, the measurement or proof that settles each, and
+its current value. Values are copied from the sections named; standing is
+as stated there, and an entry without a validation file or certificate is
+a producer-reported value.}
+\label{tab:fm-open}
+\end{table}
+
 \paragraph{1. The solving degree of Weil-descended summation systems.}
 Every subexponential claim for prime-degree binary curves rests on a bound
 for this degree (\S\ref{sec:theory}). No growing lower bound is proved;
@@ -45,11 +78,12 @@ $0.521$ (Chapter~\ref{ch:distance}), and any membership structure built
 from group operations stays inside the $\sqrt r$ floor
 (\S\ref{sec:gf-shoup}); a single-target generic arm with unknown base
 logarithms costs at least $1.5\times$ rho
-(Proposition~\ref{prop:collisionfloor}). \emph{Question:} is there a
+(Proposition~\ref{prop:collisionfloor}). \emph{Open:} whether a
 sub-$N^2$ \emph{non-generic} (coordinate-algebraic) membership test for
-$\Sem4$ over a prime-field base---for example from the $D_m$-invariant
-coordinates of 2-torsion curves---whose cost escapes that floor? A negative
-answer with a counting argument would be as useful as a positive one.
+$\Sem4$ over a prime-field base exists whose cost escapes that floor, for
+example one built from the $D_m$-invariant coordinates of 2-torsion
+curves. A counting argument against one would settle the question as well
+as a construction.
 
 \paragraph{5. The preprocessing regime.} Index calculus with a retained
 table beats rho without one, and loses by $53$--$317\times$ to

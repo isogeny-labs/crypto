@@ -13,8 +13,8 @@ in place of the decomposition system, a learned component in the solver, a
 statistic that might show that a factor base is not random, a lift to
 another curve model or another field. The lead atlas files them as the
 \emph{exotic} family (\art{crypto-autoresearcher:knowledge/leads/ecdlp/exotic/}).
-This chapter maps the family, with one table of verdicts and standing, and
-then gives the lower bounds that most of the family runs into. The two
+The family is mapped below, with one table of verdicts and standing,
+followed by the lower bounds that most of the family runs into. The two
 lines with the most work behind them have their own chapters: the
 tensor-contraction route (Chapter~\ref{ch:tensor}) and the learning and
 pseudorandomness lines (Chapter~\ref{ch:learning}).
@@ -250,7 +250,7 @@ owner split the lead into two the same day:
 \item \emph{public-data ``oracles''} with no instance input (factor-base
   membership of a field element): not augmentations at all, 0 queries.
 \end{itemize}
-The key step is Lemma~3 of the holant note
+The step that carries the argument is Lemma~3 of the holant note
 (\art{crypto-autoresearcher:docs/reports/holant-h1-ggm-lemma-20261103/README.md}):
 on every curve the $x$-oracle cannot be simulated with $o(\sqrt{N'})$ group
 queries, $N'$ the largest prime factor of $N$. Two $x$-queries give $x(G)$
@@ -437,8 +437,7 @@ Akshima and coauthors, \emph{A Subexponential Time Algorithm for Elliptic
 Curve Discrete Logarithm}, version~0.2 (Bochum/MPI, pinned at
 \texttt{1ee44e56}), claims prime-field ECDLP in
 $2^{O(b/(\log b)^{1/4})}$, $b=\lceil\log_2p\rceil$, by hashed factor bases and
-exact Boolean tensor contraction. This chapter gives the full account of
-what the programme built and learned on that route: the dependence on the
+exact Boolean tensor contraction. What the programme built and learned on that route: the dependence on the
 external theorem, the prototype and the native implementation, the
 challenge attempts, the twelve prime-field leads and their refutations,
 and the finite-size situation. The summary is one sentence. \emph{Nothing
@@ -623,8 +622,8 @@ standing, and the synthesis reconciles the two
 (\art{research/ic_prime_eth_leads_20261031/SYNTHESIS.md};
 \art{research/ic_prime_eth_leads_20261031/leads/SKEPTIC_DIGEST.md}). The raw lead
 directories are on an external volume, and nothing in the synthesis was
-re-run. This section is the full account: it gives the standing per lead,
-what the leads measured and why six were refuted as stated;
+re-run. The standing per lead, what the leads measured and why six were refuted
+as stated follow;
 \S\ref{sec:pa-sat} summarises it for the prime-field chapter. The verdict of the synthesis is quoted: ``Nothing
 moved the exponent question for prime-field ECDLP index calculus. Every
 result is a constant, a known negative, or an unfinished harness.''
@@ -659,7 +658,7 @@ skeptic reconciliation; no lead has a validation record. Source:
 \end{table}
 
 Table~\ref{tab:tn-refuted} gives the six refutations. The other five run
-leads carry numbers that are worth keeping as harness constants.
+leads carry numbers kept as harness constants.
 \begin{itemize}
 \item \emph{L03, sparse-parity bases.} Every hashed base (Bochum's affine
   hash, dense, sparse weight 3, 5, 7, biregular, window) matches a
@@ -771,7 +770,7 @@ implementation would remain an exact enumerator with a tensor interface.
 
 \chapter{Learning, pseudorandomness and curve models}\label{ch:learning}
 
-This chapter collects three kinds of unconventional work that share one
+Three kinds of unconventional work share one
 methodological lesson: an instrument that sees nothing excludes only what
 it could have seen. The first is learning inside the decomposition oracle,
 where a preregistered study measured the most a learned component could gain
@@ -838,7 +837,7 @@ $0.52$ at $n=17$. A cutoff gains nothing because a witness found early is no
 more likely than one found late. Default VSIDS is at the floor: an order
 learned from VSIDS activity on training refutations is at least $10\times$
 worse on every held-out target, because the variables that take part in
-conflicts are not the ones worth deciding on.
+conflicts are not the ones that should be decided first.
 
 The study closed under its preregistered rule (no lever reached $1.5\times$
 with a lower bound above $1.2\times$ on both families; the largest held-out
