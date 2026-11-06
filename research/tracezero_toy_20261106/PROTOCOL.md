@@ -91,3 +91,13 @@ Changes (all before data):
 7. **Data**: per-curve rows go to the scratchpad and are pinned by SHA-256 in
    `summary.json`; they are over the 64 KiB data-file limit. The artifact store route is
    not available in this session.
+
+## Amendment A2 (2026-11-06, after a 32-row smoke run, before the registered run)
+
+The smoke run (4 curves × 3 V, p ∈ {11, 17}, outputs not kept) showed cov_2 = cov_3 = 1.0
+for nearly every arm: S + S already covers E(F_p). Under A1 item 6 most cells would be
+saturated. Added, with the same controls and decision rule: a **small-base arm**. From each
+arm's draws take s = 3 random distinct non-identity points (skip if fewer exist), then
+compute |S|, cov_2, cov_3 as before. The primary decision statistic is cov_2 and cov_3 of
+this small-base arm; the full-base statistics stay as secondary. The smoke run informed
+only this change and no decision threshold.
