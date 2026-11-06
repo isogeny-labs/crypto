@@ -1,5 +1,16 @@
 # G1–G6 continuation: independently check useful rank and target recovery
 
+## Helper-accounting publication — 2026-11-06
+
+Sourceab0, fresh32-control evidence and inspected helper/encoder report were
+normal-pushed ina583aed2a to samePR3482. Exacta583snapshot is OPEN/CONFLICTING/
+autooff; auxiliary review/migrateSUCCESS, required gate/size/artifactsABSENT,
+reviews[]. Those successes do not qualify the required checks. No newsource
+is validated by older receipts; all22bound objects still match testedab0.
+[Publication receipt](validation/helper-accounting-20261106/publication-a583aed2a.json).
+Later metadata changes no tested Rust/formal code. Allnativejobs terminal;
+no scientific execution or frozen-ledger resolution occurred. [pcc:unverified]
+
 ## Helper and encoder accounting — 2026-11-06
 
 Replay now retains disjoint parameter-check/setup-constructor helper calls,

@@ -741,3 +741,14 @@ container work, full F4/root/native coverage, calibrated nonoverlapping pricing,
 whole-process/journal and qualified runtime/resume. Scientific metrics remain
 null and acceptance unchanged. Frozen ledger reconciliation still blocks merge;
 PR3452/2949 maintenance stays stopped. Continue on the current openPR3482.
+
+## Helper-accounting publication — 2026-11-06
+
+Sourceab0, fresh32-control evidence and inspected helper/encoder report were
+normal-pushed ina583aed2a to samePR3482. Exacta583snapshot is OPEN/CONFLICTING/
+autooff; auxiliary review/migrateSUCCESS, required gate/size/artifactsABSENT,
+reviews[]. Those successes do not qualify the required checks. No newsource
+is validated by older receipts; all22bound objects still match testedab0.
+[Publication receipt](validation/helper-accounting-20261106/publication-a583aed2a.json).
+Later metadata changes no tested Rust/formal code. Allnativejobs terminal;
+no scientific execution or frozen-ledger resolution occurred. [pcc:unverified]
