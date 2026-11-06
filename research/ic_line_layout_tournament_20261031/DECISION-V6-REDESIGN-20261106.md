@@ -1,5 +1,8 @@
 # Line-layout tournament: coordinator decision on the version 6 redesign (2026-11-06)
 
+**Revised: see §12, Revision 1 (2026-11-06).** It supersedes the parts of
+§3.2–§3.6, §6, §8 and §9 it names. Where they conflict, §12 governs.
+
 **Status: recommendation for owner sign-off.** This file is not an approval to
 dispatch. Nothing runs until (a) the owner signs off on this design or amends
 it, (b) the experiment director freezes protocol version 6 as specified in §9,
@@ -684,4 +687,222 @@ coordinator_decision:
     - "Main session: allocate the DEC id, mirror this block to ledger/decisions/, and commit it with this file in one archive; push, then open or refresh the PR against main with auto-merge."
     - "After sign-off: one handoff to experiment-director to draft the §9 freeze and run F1-F4 (deliverables and completion gate in §10.1), with one snapshot archive of exactly those paths."
     - "Coordinator: review the draft, then freeze and merge before any dispatch. Then qualification -> two wall sessions -> counted companion -> analyze-v6.sh -> independent validator -> evidence-review decision."
+```
+
+## 12. Revision 1 (2026-11-06, before any v6 data)
+
+**Trigger.** The experiment director drafted v6 on branch
+`claude/ic-line-layout-v6-draft-20261106` and returned three findings. The
+sources are `prefreeze-checks-v6.md` (checks F1–F5 and the main session's F4
+smoke run) and `PROTOCOL-V6.md` §0.
+
+- **B1:** `run-ecbench` refuses `measurement.rounds < 5` and any isolation level
+  other than L2. The line is identical at HEAD and at `ea8e9ef7`.
+- **B2:** the launcher's native A/A admission compares the first `reference`
+  arm with the first `control` arm. With the §3.6 roles those two arms are
+  twins. The result is `self_aa` true, `aa_pairs` 0 and a null `aa_ci95`, so the
+  job exits 43. This is inferred from an existing session's `compare` output,
+  not from a run of the v6 spec.
+- **F2:** on `origin/main` (local ref `fde9b7d3`) the 28-bit incumbent is
+  N = 407 with `targets=walk`. `stride-renew` at N = 407 exists only on the
+  unmerged #2826 branch (commit `66e84640`).
+
+**New fact.** F4 passed in the main session's local smoke run with the pinned
+binary at fp28. Under both `walk` and `stride-renew`, `layout=lines` changed no
+counted or native counter: S was 16.289 / 16.289 and 21.066 / 21.066. All 4
+executions graded L2 locally, so every solve exceeded 1 ms. No wall value from
+the smoke run was read for this revision.
+
+This revision changes no threshold, effect criterion or claim boundary. It
+changes only design parameters, before any v6 data exists.
+
+### 12.1 B1: qualification shape, and L2 for the counted session
+
+**Qualification (replaces the shape in §3.5).** The director's option is
+adopted:
+
+- the same four wall arms, with the roles of §12.2;
+- 2 targets on the fresh qualification curve, with 1 warmup + 5 measured
+  rounds;
+- 48 executions and 10 A/A pairs.
+
+The pass conditions of §3.5 are unchanged: exit 0, audit OK, L2 accepted for
+every execution, minimum solve ≥ 5 ms, and the elapsed time × 576/48 ≤
+1,800 s. The 576/48 projection factor still holds.
+
+**Counted session (replaces the L1 option in §3.4).** It runs at
+`isolation_required: "L2"` only, and the L1 alternative is withdrawn. Rho
+executions at fp28 will be graded below L2, so the job is expected to exit 42.
+The §3.4 acceptance rule therefore governs, unchanged: exit 0, 42 or 43 is
+accepted only if
+
+- the audit is OK;
+- every execution is verified;
+- every measured replay is identical;
+- `invalid_outcomes` is `[]`;
+- the input spec and build match the freeze.
+
+No wall field of this session is read. The spec must still pass the launcher's
+pre-check: `rounds` 8, `warmup` 1, at least one `reference` arm and at least one
+`control` arm. The counted roles are `rho-neg` = reference, `rho-neg-aa` =
+control, `incumbent` = baseline and `candidate` = candidate. This settles gap 1
+of the draft.
+
+### 12.2 B2: roles that give the launcher a real A/A
+
+**Decision.** Keep the spec order `incumbent`, `incumbent-aa`, `candidate`,
+`pc-fb2x`, so the arms' block positions are unchanged from §3.6, and the
+`corrected_ratio` stays position-matched (`candidate` against `incumbent-aa`).
+Change only the roles:
+
+| Arm | Role in v6 (wall and qualification) | Role in §3.6 |
+|---|---|---|
+| `incumbent` | `baseline` | reference |
+| `incumbent-aa` | `control` (the first and only control) | control |
+| `candidate` | `candidate` | candidate |
+| `pc-fb2x` | `reference` (the first and only reference) | candidate |
+
+The launcher then runs `compare --a pc-fb2x --b incumbent-aa`.
+
+- **Why this should admit.** `pc-fb2x` has no twin, and `incumbent-aa`'s twin is
+  `incumbent`. This is the shape of the director's row
+  `--a rho-plain --b rho-neg-aa`, which gave `self_aa` false, `aa_pairs` 10 and a
+  non-null `aa_ci95`. The admission therefore carries the real
+  `incumbent`/`incumbent-aa` A/A interval. In each wall session it is also a
+  second reading of the positive control, which decides nothing.
+- **Why not make `candidate` the reference.** The launcher would then compute a
+  candidate-vs-control wall ratio inside the qualification. Keeping the
+  candidate out of the launcher's comparison means the qualification's
+  `control-comparison.json` holds no candidate wall data. The §3.5 sealing
+  stays intact without extra handling.
+- **Roles are structural only.** The decision reads arms by name in
+  `analyze-v6.sh`, never by role. This precedent comes from the packed-filter
+  protocol §2 (`dgbf-edge` as the structural reference). The §3.3 sentence
+  "role `candidate`, placed last" is replaced by this table, and the arm stays
+  last.
+
+**Consequence for `analyze-v6.sh`.**
+
+- The A/A gate reads `wall.aa_ci95` from the `--a incumbent --b candidate`
+  comparison, which must show `aa_arms` equal to {`incumbent`,
+  `incumbent-aa`} and `self_aa` false. It also reads the `wall.aa_ci95` of
+  `control-comparison.json`. Both must contain 1 and lie inside [0.9, 1.1].
+- The direct `--a incumbent --b incumbent-aa` comparison is a self-A/A. Its
+  `aa_*` fields may be null, so it is descriptive only. No gate may require a
+  field that a self-A/A nulls.
+- The decision, A/A and positive-control thresholds are unchanged.
+
+**New pre-freeze check F6 (local, development).** The B2 resolution is still an
+inference, so it is checked before the freeze.
+
+- **Spec:** the exact v6 wall arm set and roles, on a non-study fp28 curve
+  (seed 2026110628904), 1 target, 1 warmup + 5 measured rounds.
+- **Runs:** the same binary pre-check jq as `run-ecbench`, then a local run, then
+  only `ecbench compare --a pc-fb2x --b incumbent-aa --json`.
+- **Pass:** all of the following.
+  - The pre-check exits 0.
+  - `wall.self_aa` is false.
+  - `wall.aa_pairs` ≥ 5.
+  - `wall.aa_ci95` is non-null.
+  - `wall.aa_arms` equals {`incumbent`, `incumbent-aa`} as a set.
+- **Recorded:** only those five facts. No ratio or interval value is recorded,
+  and no comparison involving `candidate` is run.
+- **On failure:** the result comes back to the coordinator. There is no
+  fallback by default.
+
+F4 is already complete, so F6 is the only remaining pre-freeze run.
+
+### 12.3 F2: the incumbent is `targets=walk`
+
+**Decision.** The v6 incumbent is the recipe merged on `origin/main`:
+
+| Parameter | Value |
+|---|---|
+| `factor_base` | `prime-abscissa:size=407` |
+| `oracle` | `mitm:negation_folded=1` |
+| `targets` | `walk` |
+| `max_trials` | `26479085` |
+| others | defaults (`incremental-gauss`) |
+
+Sources: `research/prime_base_oracle_tuning_20261029/sessions/holdout-P28/spec.json`,
+whose plan expands to `targets: walk`, and the `n_inc 407` row in
+`docs/ic/leaderboard.json`. The candidate adds only `layout=lines`, and
+`pc-fb2x` is the same recipe at `size=814`. This replaces the §3.2 recipe.
+
+**Why not wait for #2826:**
+
+- An unmerged branch result is not the program's incumbent. Its validation
+  status is not on `main` either.
+- The layout question does not depend on the target source. F4 shows exact
+  parity under both target sources.
+- Waiting has no bound and buys nothing for this question.
+
+**The rule is fixed now.** The incumbent stays `walk` even if #2826 merges
+before the freeze. A `stride-renew` re-measurement would be a separate follow-up
+under its own protocol, not a mid-design switch.
+
+**Consequences:**
+
+- **Scope.** §4's scope reads `targets=walk`.
+- **Expected effect.** `walk` probes the repeat guard less often than
+  `stride-renew`. The `layout=lines` guard contribution may therefore be
+  smaller, and §5's prior is kept but its lower end is less likely.
+- **Runtime.** The smoke S is lower for `walk` (16.289 against 21.066), and its
+  solves were still graded L2 locally. The §3.1 floor and the §3.8 runtime
+  estimates still hold.
+- **Rerun F1.** The director re-runs `ecbench plan` on the three specs with
+  `targets` removed or set to `walk`, and records the new method ids.
+
+### 12.4 Owner choices (replaces §8; same four choices)
+
+1. **Size and incumbent.** Approve fp28 with the §12.3 incumbent (`walk`). The
+   alternative is to name another size or incumbent, or to wait for #2826 and
+   use `stride-renew`. I do not recommend waiting.
+2. **Positive control and rho.** Approve `pc-fb2x`, with the structural
+   `reference` role of §12.2, and rho moved to a counted-only L2 session.
+   Alternatives: keep rho as a wall control at fp40+, which is impractical
+   (§2), or drop the positive control, which I do not recommend.
+3. **Noise-rerun clause.** Adopt or decline the clause (§3.7). The director has
+   not yet checked its anchored grading strings against `ea8e9ef7`. If adopted,
+   that check becomes pre-freeze check F7.
+4. **Budget and pin.** Approve the USD 5 ceiling and keeping the
+   ea8e9ef7 / `73362eed` pin. The budget figures are unchanged, because the
+   execution counts are unchanged (48 / 576 / 576 / 576).
+
+### 12.5 Changes to the §9 freeze contents
+
+- **Qualification spec.** `spec-fp28-v6-qual.json` has 2 targets, `rounds` 5 and
+  `warmup` 1.
+- **Wall and qualification roles.** All three wall-bearing specs carry the
+  §12.2 roles in the §3.6 order.
+- **Counted spec.** `spec-fp28-v6-counted.json` is at L2 with the §12.1 roles.
+- **Targets.** Every IC arm uses `targets=walk`, or omits `targets`.
+- **Analysis script.** `analyze-v6.sh` reads A/A as §12.2 specifies. Its
+  `ALLOWED_NATIVE` stays `[]`, as F4 found, and its new sha256 is recorded.
+- **Pre-freeze record.** `prefreeze-checks-v6.md` records F1 rerun for `walk`,
+  F2 resolved by this revision, F4 passed, and F6 (and F7 if the clause is
+  adopted).
+- **Launcher-check invalidation rule.** Add: "a spec that fails `run-ecbench`'s
+  pre-check, or a wall or qualification job that exits 43, invalidates that job."
+
+```yaml
+coordinator_decision_revision:
+  revises: DEC-20261106-<allocate>   # same record; allocate once, mirror both blocks
+  revision: 1
+  date: 2026-11-06
+  decision: revise
+  findings_decided:
+    B1: "qualification = 2 targets x 4 arms x (1 warmup + 5 rounds) = 48 executions, 10 A/A pairs; counted session at L2 only, under the §3.4 exit 0/42/43 acceptance clause; L1 withdrawn"
+    B2: "keep the arm order; roles incumbent=baseline, incumbent-aa=control, candidate=candidate, pc-fb2x=reference; the launcher admits pc-fb2x against incumbent-aa with the real incumbent/incumbent-aa A/A; the A/A gate reads aa_ci95 from the candidate comparison and from control-comparison.json; new pre-freeze check F6 verifies the admission shape locally"
+    F2: "incumbent = prime-abscissa:size=407, mitm:negation_folded=1, targets=walk, max_trials=26479085 (merged on origin/main); do not wait for #2826; fixed even if #2826 merges before the freeze"
+  evidence_refs:
+    - research/ic_line_layout_tournament_20261031/prefreeze-checks-v6.md
+    - research/ic_line_layout_tournament_20261031/PROTOCOL-V6.md
+  unchanged: [thresholds, decision rule, claim boundary apart from targets=walk, execution counts, deadlines, USD 5 ceiling, ea8e9ef7 pin]
+  limitations:
+    - "B2's fix rests on the compare behaviour seen in one existing session until F6 passes."
+    - "The origin/main state was read from the local ref fde9b7d3 without a fetch."
+  next_actions:
+    - "Owner: sign off on §12.4."
+    - "Director: update the specs, analyze-v6.sh and prefreeze-checks-v6.md per §12.5; rerun F1 and run F6 (and F7 if adopted); return them for coordinator review before the freeze."
 ```
