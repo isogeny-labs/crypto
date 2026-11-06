@@ -5487,3 +5487,178 @@ mod wwalk_pipeline_tests {
         }
     }
 }
+
+#[cfg(test)]
+mod free_rows_probe {
+    //! Feasibility probe (not a result): how many target-free relations the
+    //! Frobenius-folded pair table's build-time key collisions give on the
+    //! frozen orbit panel, and their rank over the column unknowns mod r.
+    use super::*;
+    use crate::cryptanalysis::koblitz_fast::FrobeniusCanon;
+    use num_traits::ToPrimitive;
+    use std::collections::HashMap;
+
+    fn mulmod(a: u64, b: u64, r: u64) -> u64 {
+        ((a as u128 * b as u128) % r as u128) as u64
+    }
+    fn powmod(mut a: u64, mut e: u64, r: u64) -> u64 {
+        let mut acc = 1u64;
+        while e > 0 {
+            if e & 1 == 1 {
+                acc = mulmod(acc, a, r);
+            }
+            a = mulmod(a, a, r);
+            e >>= 1;
+        }
+        acc
+    }
+    fn rank(rows: &[Vec<u64>], cols: usize, r: u64) -> usize {
+        let mut piv: Vec<Option<Vec<u64>>> = vec![None; cols];
+        let mut rk = 0;
+        for row in rows {
+            let mut v = row.clone();
+            for c in 0..cols {
+                if v[c] == 0 {
+                    continue;
+                }
+                match &piv[c] {
+                    Some(p) => {
+                        let f = v[c];
+                        for k in c..cols {
+                            v[k] = (v[k] + r - mulmod(f, p[k], r)) % r;
+                        }
+                    }
+                    None => {
+                        let inv = powmod(v[c], r - 2, r);
+                        for k in c..cols {
+                            v[k] = mulmod(v[k], inv, r);
+                        }
+                        piv[c] = Some(v);
+                        rk += 1;
+                        break;
+                    }
+                }
+            }
+            if rk == cols {
+                break;
+            }
+        }
+        rk
+    }
+
+    #[test]
+    #[ignore]
+    fn frobenius_table_free_rows_probe() {
+        let panel: &[(u8, u32, usize)] = &[
+            (0, 13, 1),
+            (1, 17, 1),
+            (0, 19, 2),
+            (0, 23, 3),
+            (1, 29, 1),
+            (0, 31, 2),
+            (0, 37, 8),
+            (0, 41, 90),
+        ];
+        for &(a, n, c) in panel {
+            let inst = koblitz_instance(a, n).expect("instance");
+            let g = BinaryGroup(&inst.fast);
+            let ctx = InstanceCtx {
+                group: &g,
+                generator: inst.generator,
+                target: inst.generator,
+                r: inst.r,
+                cofactor: inst.cofactor,
+                group_order: inst.group_order,
+                name: inst.name.clone(),
+                field_degree: Some(inst.n),
+            };
+            let (_, params) = Params::parse_spec(&format!(
+                "compact-orbit-scan:columns={c},raw_x_cap=100000000"
+            ))
+            .unwrap();
+            let mut ops = GroupOps::default();
+            let fb = CompactOrbitScanBase { instance: &inst }
+                .build(&ctx, &params, &mut ops)
+                .unwrap();
+            let r = inst.r;
+            let lambda = (&inst.koblitz.as_ref().unwrap().lambda % r).to_u64().unwrap();
+            let canon = FrobeniusCanon::new(&inst.gf, inst.n).unwrap();
+            let f = fb.points.len();
+            let cols = fb.columns;
+            // Orbit representatives exactly as FrobeniusPairTable::build_inner.
+            let mut orbit_of = vec![0u32; f];
+            let mut reps: Vec<usize> = Vec::new();
+            let mut idx: HashMap<u64, u32> = HashMap::new();
+            for i in 0..f {
+                let key = canon.canon(fb.points[i].x);
+                let next = reps.len() as u32;
+                let id = *idx.entry(key).or_insert(next);
+                if id == next {
+                    reps.push(i);
+                }
+                orbit_of[i] = id;
+            }
+            let mut map: HashMap<u64, (usize, usize, u32, FastPoint)> = HashMap::new();
+            let (mut attempts, mut collisions, mut mismatches) = (0u64, 0u64, 0u64);
+            let mut rows: Vec<Vec<u64>> = Vec::new();
+            let mut ops2 = GroupOps::default();
+            for (orbit, &rep) in reps.iter().enumerate() {
+                for j in 0..f {
+                    if (orbit_of[j] as usize) < orbit {
+                        continue;
+                    }
+                    let u = g.add(&mut ops2, fb.points[rep], fb.points[j]);
+                    if u.infinity {
+                        continue;
+                    }
+                    attempts += 1;
+                    let (key, t_u) = canon.canon_with_shift(u.x);
+                    match map.get(&key) {
+                        None => {
+                            map.insert(key, (rep, j, t_u, u));
+                        }
+                        Some(&(i0, j0, t0, u0)) => {
+                            collisions += 1;
+                            let t = (t0 + n - t_u) % n;
+                            let v = inst.fast.frobenius_k(u0, t);
+                            let s_neg = if v == u {
+                                false
+                            } else if v == g.neg(u) {
+                                true
+                            } else {
+                                mismatches += 1;
+                                continue;
+                            };
+                            let mut row = vec![0u64; cols];
+                            for &k in &[rep, j] {
+                                let col = fb.col_of[k] as usize;
+                                row[col] = (row[col] + fb.coef_of[k] % r) % r;
+                            }
+                            let lt = powmod(lambda, t as u64, r);
+                            for &k in &[i0, j0] {
+                                let col = fb.col_of[k] as usize;
+                                let mut term = mulmod(lt, fb.coef_of[k] % r, r);
+                                if !s_neg {
+                                    term = (r - term) % r;
+                                }
+                                row[col] = (row[col] + term) % r;
+                            }
+                            if row.iter().any(|&x| x != 0) {
+                                rows.push(row);
+                            }
+                        }
+                    }
+                }
+            }
+            let rk = rank(&rows, cols, r);
+            println!(
+                "n{n} a{a} c{cols} |F| {f} reps {} entries {} attempts {attempts} collisions {collisions} nonzero rows {} rank {rk} (need {}) mismatches {mismatches} r 2^{:.1}",
+                reps.len(),
+                map.len(),
+                rows.len(),
+                cols.saturating_sub(1),
+                (r as f64).log2()
+            );
+        }
+    }
+}
