@@ -448,7 +448,9 @@ fn replay_counted(
     record: &serde_json::Value,
     work: &mut reference::CheckWork,
 ) -> Result<reference::Certificate, String> {
-    r.validate_counted(&mut work.validation)?;
+    let validation = &mut work.validation;
+    work.helper_validation
+        .capture(|| r.validate_counted(validation))?;
     if record["schema"] != "pkm.oracle-output/v1"
         || record["request_sha256"] != r.digest()
         || record["request"] != serde_json::to_value(r).map_err(|e| e.to_string())?

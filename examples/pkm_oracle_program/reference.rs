@@ -164,6 +164,7 @@ pub(super) struct Certificate {
 /// each stage. These legacy affine counters have no qualified overflow bound.
 #[derive(Clone, Copy, Default, Debug, PartialEq, Eq, serde::Serialize)]
 pub(super) struct CheckCounts {
+    pub helper_validation: super::algebra::Work,
     pub validation: Counts,
     pub witness_checks: Counts,
     pub enumeration: Counts,
@@ -171,6 +172,7 @@ pub(super) struct CheckCounts {
 
 impl CheckCounts {
     pub fn merge(&mut self, other: Self) {
+        self.helper_validation.merge(other.helper_validation);
         self.validation.merge(other.validation);
         self.witness_checks.merge(other.witness_checks);
         self.enumeration.merge(other.enumeration);
@@ -179,6 +181,7 @@ impl CheckCounts {
 
 /// Retained by the caller on every Result-returning refusal path.
 pub(super) struct CheckWork {
+    pub helper_validation: super::algebra::Work,
     pub validation: Counts,
     witnesses: Curve,
     enumeration: Curve,
@@ -187,6 +190,7 @@ pub(super) struct CheckWork {
 impl CheckWork {
     pub fn new(r: &Request) -> Self {
         Self {
+            helper_validation: super::algebra::Work::default(),
             validation: Counts::default(),
             witnesses: Curve::new(r),
             enumeration: Curve::new(r),
@@ -194,6 +198,7 @@ impl CheckWork {
     }
     pub fn counts(&self) -> CheckCounts {
         CheckCounts {
+            helper_validation: self.helper_validation,
             validation: self.validation,
             witness_checks: self.witnesses.counts,
             enumeration: self.enumeration.counts,
