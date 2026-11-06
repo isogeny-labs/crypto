@@ -36,6 +36,12 @@ python3 scripts/kb_usage_report.py --ref origin/main --since 2026-11-05
 artifact and uses `--ref HEAD`. It is advisory: no pull request is blocked and
 `--fail-under` is not wired in.
 
+The script and its tests are shared byte-identically by the three repositories
+(`docs/shared-code.lock.json`), so each repository runs the same workflow
+against its own logs. Its first run (2026-11-06) reported `crypto`
+alone at 135 entries, 11 receipts and 8.1%, which matches the local
+`--ref` measurement at that commit.
+
 ## What counts
 
 - **Entry**: a dated `##` session-log entry, or a `### <time> UTC` entry (the
@@ -71,12 +77,12 @@ PRs merged:
 
 | repository | entries | receipts | coverage | unique source IDs |
 |:--|--:|--:|--:|--:|
-| `crypto` | 134 | 10 | 7.5% | 6 |
+| `crypto` | 136 | 12 | 8.8% | 7 |
 | `crypto-autoresearcher` | 6 | 3 | 50.0% | 3 |
 | `cryptanalysis` | 3 | 2 | 66.7% | 5 |
-| **total** | **143** | **15** | **10.5%** | **6** |
+| **total** | **145** | **17** | **11.7%** | **7** |
 
-The delta from the 0.9% pre-policy mark (1 receipt in 114 entries) is +9.6
+The delta from the 0.9% pre-policy mark (1 receipt in 114 entries) is +10.8
 points. Later sessions now record receipts on their own, not just the policy
 entries, so the number is beginning to measure habit rather than the template.
 
