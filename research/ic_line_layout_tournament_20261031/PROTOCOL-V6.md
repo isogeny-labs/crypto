@@ -1,19 +1,70 @@
 # IC line-layout tournament, evidence version 6 (fp28)
 
-**Status: DRAFT. Not frozen.** The owner has not signed off on
-[`DECISION-V6-REDESIGN-20261106.md`](DECISION-V6-REDESIGN-20261106.md). The
+**Status: DRAFT (revised under Revision 1). Not frozen.** The coordinator's
+[`DECISION-V6-REDESIGN-20261106.md`](DECISION-V6-REDESIGN-20261106.md), section 12
+(Revision 1), supersedes the parts of sections 3.2-3.6, 6, 8 and 9 it names. The
+owner decided the section 12.4 choices on 2026-11-06 (table below). The
 machine-readable authority will be [`protocol-v6.json`](protocol-v6.json),
 `IC-LINE-LAYOUT-E2E-FP28-V6-20261106`, whose `freeze` block is `status: "draft"`
-with a null `protocol_sha256`. Nothing in this directory authorizes a dispatch.
-Nothing was dispatched, launched or run to write it.
+with a null `protocol_sha256` until the coordinator freezes it. Nothing in this
+directory authorizes a dispatch. Nothing was dispatched or launched to write it;
+the only runs are the local pre-freeze checks of
+[`prefreeze-checks-v6.md`](prefreeze-checks-v6.md).
+
+**Owner decisions (owner-decided 2026-11-06, relayed by the main session):**
+
+| Choice (decision section 12.4) | Outcome |
+|---|---|
+| 1. Size and incumbent | owner-decided 2026-11-06: fp28 with the `walk` incumbent (`prime-abscissa:size=407`, `mitm:negation_folded=1`, `targets=walk`, `max_trials` 26479085) |
+| 2. Positive control and rho | owner-decided 2026-11-06: `pc-fb2x` as the structural `reference` (the B2 fix); rho counted-only in an L2 session (the B1 fix) |
+| 3. Noise-rerun clause | owner-decided 2026-11-06: **not adopted**. Section 8 is kept as a record of the unadopted option; F7 is not run |
+| 4. Budget and pin | owner-decided 2026-11-06: the USD 5 ceiling and the `ea8e9ef7` / `73362eed` pin stand as drafted |
 
 This version does not complete, retry or pool v1, v2, v3a1 or v5. It asks a
 different question (fp28) from v3 to v5 (fp20).
 
-## 0. Findings the coordinator must resolve before the freeze
+## 0. Findings of the first draft, and their resolution by Revision 1
 
-These are facts found while drafting. The draft follows the decision text and
-does not hide them; none is resolved by a default chosen here.
+The first draft returned B1, B2 and B3 (with the F2 mismatch). The coordinator's
+Revision 1 (decision section 12) resolved them, and this draft applies that
+resolution. Revision 1 changes no threshold, effect criterion, execution count,
+deadline or pin.
+
+**Resolution applied in this draft:**
+
+- **B1 (section 12.1).** The qualification is 2 targets x 4 arms x (1 warmup + 5
+  measured rounds) = 48 executions and 10 A/A pairs, which passes `run-ecbench`'s
+  `rounds >= 5` pre-check; the 576/48 projection factor is unchanged. The counted
+  session is `isolation_required: "L2"` only (L1 withdrawn); its rho executions
+  will be graded below L2, so exit 42 is expected and the section 7 acceptance
+  rule governs.
+- **B2 (section 12.2).** The arm order is unchanged (`incumbent`, `incumbent-aa`,
+  `candidate`, `pc-fb2x`). Roles are now `incumbent` baseline, `incumbent-aa`
+  control, `candidate` candidate, `pc-fb2x` reference, so the launcher runs
+  `compare --a pc-fb2x --b incumbent-aa`, which carries the real
+  `incumbent`/`incumbent-aa` A/A interval. Roles are structural only;
+  `analyze-v6.sh` reads arms by name and reads A/A from `aa_ci95` (section 6).
+  **F6 passed** (`prefreeze-checks-v6.md`): on a non-study fp28 curve with the v6
+  arm set and roles, `self_aa` false, `aa_pairs` 5, `aa_ci95` non-null, `aa_arms`
+  {`incumbent`, `incumbent-aa`}.
+- **F2 / B3 (section 12.3).** The incumbent is the recipe merged on `origin/main`,
+  `targets=walk` (not `stride-renew`, which exists only on the unmerged #2826
+  branch). It stays `walk` even if #2826 merges before the freeze. F1 was rerun
+  for `walk` and passed; F4 passed (`layout=lines` changes no counted or native
+  counter under `walk` or `stride-renew`, so `ALLOWED_NATIVE` stays `[]`). `walk`
+  probes the repeat guard less often than `stride-renew`, so the guard's
+  contribution may be smaller; the coordinator's prior is kept.
+- **Still open, noted for the coordinator.** (a) F6 tested only the `pc-fb2x`
+  against `incumbent-aa` admission. `analyze-v6.sh` also requires the `--a
+  incumbent --b candidate` comparison to show `aa_arms` {`incumbent`,
+  `incumbent-aa`} and `self_aa` false; no pre-freeze check ran a comparison
+  involving `candidate` (F6 forbids it), so this rests on the same inferred
+  `compare` behaviour. (b) The origin/main state was read from the local ref
+  `fde9b7d3` without a fetch.
+
+**The first draft's findings, kept for the record (superseded where they conflict
+with the resolution above).** These are facts found while drafting; none was
+resolved by a default chosen by the director.
 
 **B1. The pinned launcher refuses the qualification spec as specified.**
 `taskq/deploy/eks-karpenter/run-ecbench` (the lines are identical at HEAD and at
@@ -55,29 +106,32 @@ which the drafting engagement forbids. Details: `prefreeze-checks-v6.md`.
 
 **Other gaps (each a value the decision does not state):**
 
-1. Role of `rho-neg` in the counted spec is not stated. The draft uses
-   `baseline`. No analysis and no launcher check reads it.
+1. Role of `rho-neg` in the counted spec: settled by Revision 1 (section 12.1):
+   `rho-neg` reference, `rho-neg-aa` control, `incumbent` baseline, `candidate`
+   candidate.
 2. The mapping from failed gates to `inconclusive`, `within_control_distribution`
    and `invalid_measurement`, and the overall precedence, is not stated. See
    section 6; the draft's mapping is a proposal.
-3. The native counters that `layout=lines` may change are unknown until F4 runs.
-   `ALLOWED_NATIVE` in `analyze-v6.sh` is `[]`. Filling it changes the script's
-   sha256, which `protocol-v6.json` records.
+3. The native counters that `layout=lines` may change: F4 found none, so
+   `ALLOWED_NATIVE` in `analyze-v6.sh` stays `[]`.
 4. The counted comparisons need a bootstrap seed. The draft passes none, so
    ecbench's default (20261002) applies; no new value is introduced.
 5. The qualification's per-execution timeout and order are not stated in section
    3.5. Section 9 item 7 gives 600 s and `alternate_measured` for the measurement
-   paragraph; the draft applies both to all three specs.
-6. The counted job cannot use L1: `run-ecbench` requires `L2`. `ecbench plan`
-   accepts L1, the launcher does not. The counted spec is L2 with the section 3.4
-   acceptance clause.
+   paragraph; the draft applies both to all three specs. With 5 measured rounds
+   `ecbench plan` warns that `alternate_measured` cannot be balanced (the spec
+   order is used once more than the reverse); this affects the sealed
+   qualification only.
+6. The counted job cannot use L1: `run-ecbench` requires `L2`. Settled by
+   Revision 1 (section 12.1): the counted spec is L2 only.
 7. Section 9 item 3 says "five distinct arms"; the three specs hold six distinct
    names (`incumbent`, `incumbent-aa`, `candidate`, `pc-fb2x`, `rho-neg`,
    `rho-neg-aa`). The protocol lists six.
 8. The AWS price list was not read. The budget ceiling stands on the decision's
-   assumption of at most about USD 0.6 per c8a.2xlarge node-hour.
-9. Owner choice 3 (noise-rerun clause) is open. This draft is written without
-   it; the clause text is in section 8.
+   assumption of at most about USD 0.6 per c8a.2xlarge node-hour (the USD 5
+   ceiling is owner-decided 2026-11-06 as drafted).
+9. Owner choice 3 (noise-rerun clause): owner-decided 2026-11-06, not adopted.
+   The clause text in section 8 is a record only.
 
 ## 1. Request and evidence map
 
@@ -95,7 +149,7 @@ which the drafting engagement forbids. Details: `prefreeze-checks-v6.md`.
 If supported, the claim is a constant-factor native engineering improvement in
 the generic-decomposition track, measured as complete verified solve wall time,
 for `mitm:negation_folded=1,layout=lines` against `mitm:negation_folded=1`, with
-`prime-abscissa:size=407` and `targets=stride-renew`, on two fresh public fp28
+`prime-abscissa:size=407` and `targets=walk`, on two fresh public fp28
 curves, on AMD `c8a.2xlarge`, with the `ea8e9ef7` executable, and with exactly
 identical counted GAE.
 
@@ -117,17 +171,22 @@ The verdict applies to the `ea8e9ef7` executable (25 files changed between
 source `ea8e9ef71c3c82027dd9e01535302725519c3fca`, ecbench sha256
 `73362eed4165d6db20fe1d398baa8fabefa2497aff6e78dab9ed8f31af31dd01`.
 
-**Arms** (all `ic.pipeline`, `max_trials` 26479085, `targets` stride-renew,
+**Arms** (all `ic.pipeline`, `max_trials` 26479085, `targets` walk,
 other parameters at the `ecbench plan` defaults, `linalg=incremental-gauss`):
 
 | Arm | Spec role | Factor base | Oracle | Specs |
 |---|---|---|---|---|
-| `incumbent` | reference | `prime-abscissa:size=407` | `mitm:negation_folded=1` | wall, qualification, counted |
-| `incumbent-aa` | control | same | same | wall, qualification |
+| `incumbent` | baseline | `prime-abscissa:size=407` | `mitm:negation_folded=1` | wall, qualification, counted |
+| `incumbent-aa` | control (first and only) | same | same | wall, qualification |
 | `candidate` | candidate | same | `mitm:negation_folded=1,layout=lines` | wall, qualification, counted |
-| `pc-fb2x` | candidate (last) | `prime-abscissa:size=814` | `mitm:negation_folded=1` | wall, qualification |
-| `rho-neg` | baseline | none | `rho.negation` | counted |
-| `rho-neg-aa` | control | none | `rho.negation` | counted |
+| `pc-fb2x` | reference (first and only; last in order) | `prime-abscissa:size=814` | `mitm:negation_folded=1` | wall, qualification |
+| `rho-neg` | reference (first and only) | none | `rho.negation` | counted |
+| `rho-neg-aa` | control (first and only) | none | `rho.negation` | counted |
+
+Roles are structural only (Revision 1, section 12.2); the decision reads arms by
+name. The launcher's admission runs `compare --a pc-fb2x --b incumbent-aa` in the
+wall and qualification jobs, and `--a rho-neg --b rho-neg-aa` (a self-A/A, so exit
+42 or 43 is expected and accepted) in the counted job.
 
 Wall and qualification order: `incumbent`, `incumbent-aa`, `candidate`,
 `pc-fb2x`. Counted order: `incumbent`, `candidate`, `rho-neg`, `rho-neg-aa`.
@@ -158,18 +217,19 @@ Curve slugs from `ecbench plan`: wall and counted `icv1-fp28-tm10425-13a2119a`
 `icv1-fp28-t10131-f8b12347`.
 
 **Sizes.** Wall: 2 curves x 8 targets x (1 + 8 rounds) x 4 arms = 576
-executions, 128 measured pairs per arm pair. Qualification: 48 executions.
-Counted: 576. All three specs: L2, `timeout_seconds` 600, `alternate_measured`.
+executions, 128 measured pairs per arm pair. Qualification: 2 targets x 4 arms x
+(1 + 5 rounds) = 48 executions, 10 A/A pairs. Counted: 576. All three specs: L2, `timeout_seconds` 600, `alternate_measured`.
 `ecbench plan` (the pinned binary) reports 576 / 48 / 576 executions, exit 0.
 
-**Files and hashes at drafting time** (recomputed by the coordinator at freeze):
+**Files and hashes after Revision 1** (the first draft's values are superseded;
+recomputed by the coordinator at freeze):
 
 | File | sha256 |
 |---|---|
-| `spec-fp28-v6.json` | `f7a614ab87fa63e717ec21a0fc8af2f25450b1869e6575f5f905b6dc77266f23` |
-| `spec-fp28-v6-qual.json` | `2526971066603ceeb18e4aabfbfad535cedb02f93b06f1dd5e2587e28e69ef9f` |
-| `spec-fp28-v6-counted.json` | `3c5df54e4550fb274f786aa549369910e89e55409f22769f0a9122020a70991c` |
-| `analyze-v6.sh` | see `protocol-v6.json` `analysis_plan.script.sha256` |
+| `spec-fp28-v6.json` | `0116954ff2646a81fa4383ef87125d445f2f3d3d4315a4ed49db9d0845515a81` |
+| `spec-fp28-v6-qual.json` | `c54ccf39c0d8ceb94e40a4c8c60cc626400b934caaae2d5d13fcda300649738d` |
+| `spec-fp28-v6-counted.json` | `ac231ee6303942e3d491daa2c31e07216a72cf227e15015778aa7ffe829bb2a2` |
+| `analyze-v6.sh` | `23e614ad0b7c74ba53a4fcd51097a44194987617661343b2243b6dec6d0f422e` (also `protocol-v6.json` `analysis_plan.script.sha256`) |
 
 ## 4. Requests and route
 
@@ -203,6 +263,11 @@ schema has no field for it.
    required: a single pod in `job-exit.json`. **Sealed:** no `ecbench compare`
    on the qualification, and no per-arm wall statistic or ratio, until both wall
    sessions have written `job-exit.json`. If any condition fails, v6 stops.
+   Under Revision 1 the qualification is 2 targets x 4 arms x (1 warmup + 5
+   rounds) = 48 executions with 10 A/A pairs; the count in the commands above is
+   unchanged. The launcher's own admission (`pc-fb2x` against `incumbent-aa`)
+   writes `control-comparison.json` into the qualification output; it is not read
+   (sealed) and a job that exits 43 is invalid (section 12.5).
 2. **Two wall sessions, once each,** only after a pass.
 3. **Counted companion, once,** after both wall sessions have written
    `job-exit.json`.
@@ -210,8 +275,11 @@ schema has no field for it.
 
 **Host loss.** A job that writes no `job-exit.json` is rerun once, whole, as the
 same request with the name suffixed `-r2`. A job that wrote `job-exit.json` with
-a non-zero code is never rerun, except under an adopted noise-rerun clause
-(section 8). No scientific retry, seed change, base or load-factor change,
+a non-zero code is never rerun: the noise-rerun clause is not adopted
+(owner-decided 2026-11-06; section 8). One execution graded below L2 (exit 42) or any
+other non-zero wall-session exit ends that session. A spec that fails
+`run-ecbench`'s pre-check, or a wall or qualification job that exits 43,
+invalidates that job. No scientific retry, seed change, base or load-factor change,
 threshold change or selective host replacement, ever.
 
 ## 6. Decision rule and analysis
@@ -228,18 +296,26 @@ sessions must pass.
   `ops.ci95 == [1,1]`. Record by record over 144 cells (warm-ups included): the
   recovered logarithm, `total_gae`, `cost.unpriced`, and each phase's `adds`,
   `doubles`, `scalar_mults`, `gae`, `native` and `work_native` must be equal.
-  Only the counters in `ALLOWED_NATIVE` (empty until F4) may differ.
+  Only the counters in `ALLOWED_NATIVE` may differ; F4 found none, so it is `[]`.
 - **Admission:** `wall.status == "admitted"`, `wall.pairs_below_level == 0`,
   `wall.pairs == 128`. The job exited 0 (read by the card, not by the script).
-- **A/A:** `incumbent-aa / incumbent` CI contains 1 and lies within [0.9, 1.1];
-  the candidate file's `wall.aa_ci95` is held to the same bounds, as in v3.
+- **A/A (Revision 1, section 12.2):** `wall.aa_ci95` of the `--a incumbent --b
+  candidate` comparison, which must show `aa_arms` equal to {`incumbent`,
+  `incumbent-aa`} and `self_aa` false, and `wall.aa_ci95` of the job's
+  `control-comparison.json` (written by `run-ecbench` into the job output
+  directory next to `session/`; `pc-fb2x` against `incumbent-aa`) must each be
+  non-null, contain 1 and lie within [0.9, 1.1]. The direct `--a incumbent --b
+  incumbent-aa` comparison is a self-A/A whose `aa_*` fields may be null;
+  `analyze-v6.sh` still writes it (`session-N-aa-self-descriptive.json`) but no
+  gate reads it. The analysis finds `control-comparison.json` at
+  `dirname SESSION/control-comparison.json`; a missing file fails the gate.
 - **Positive control:** `pc-fb2x / incumbent` has `ops.ratio_b_over_a > 1`,
   `wall.status == "admitted"`, `total_wall_ratio > 1` and
   `wall.total_wall_ci95[0] > 1`.
 - **Decision:** `total_wall_ci95[1] < 1`, `corrected_ci95[1] < 1` and
   `outside_noise == true` (with the ratios below 1).
 
-**Verdict mapping (proposal, see section 0).** Per session: any failed
+**Verdict mapping (proposal, not stated by the decision; see section 0).** Per session: any failed
 replay, parity, admission, A/A or positive-control gate gives
 `invalid_measurement`; otherwise the decision gates passing gives
 `supported_within_scope`; `outside_noise` false gives
@@ -248,14 +324,21 @@ sessions supported gives `supported_within_scope`; else any
 `invalid_measurement`; else any `inconclusive`; else
 `within_control_distribution`. The script exits 0 whatever the verdict and 2 on a
 usage error or a binary that is not the pinned one. It was exercised on synthetic
-records and stub compare output only.
+records and stub compare output only, including a missing or out-of-bounds
+`control-comparison.json`, a null or wrong-arm candidate `aa_*`, and a garbage
+direct self-A/A file (which must not matter).
 
 ## 7. Counted companion
 
+Revision 1 (sections 12.1 and 12.5): `isolation_required` is `L2` only, with roles
+`incumbent` baseline, `candidate` candidate, `rho-neg` reference and `rho-neg-aa`
+control. The rho executions will be graded below L2, so exit 42 is expected.
 `spec-fp28-v6-counted.json` uses the same curves, targets, rounds and
-measurement seed as the wall sessions; `ecbench plan --doc` shows identical
+measurement seed as the wall sessions; `ecbench plan --doc` showed identical
 `algorithm_seed` values for `incumbent` and `candidate` in both specs (288 of
-288 cells), so the IC records pair one-to-one. It supplies `compare --weight 0 /
+288 cells) in the first draft, and the seed does not depend on the target source
+or the roles, so the IC records pair one-to-one (`analyze-v6.sh` re-checks the
+pairing record by record). It supplies `compare --weight 0 /
 0.1 / 1` and `band --ranks` for incumbent and candidate against `rho-neg`, and a
 third check of counted parity. **Acceptance:** audit OK, every execution
 verified, every measured replay identical, `invalid_outcomes` `[]`, the input
@@ -264,11 +347,12 @@ those conditions. A failure blocks the validation gate and does not change the
 wall verdict. **No wall field of this session is read or reported.** The gap to
 rho is reported as counted S at w = 0, 0.1 and 1 only.
 
-## 8. Pending owner choice 3: the noise-rerun clause (not part of this draft)
+## 8. The noise-rerun clause: NOT adopted (owner-decided 2026-11-06)
 
-If the owner adopts it, add this verbatim to the stopping rules and the
-inadmissible list; otherwise one foreign task slice ends v6, as it ended
-dg-blocked P32. One whole rerun per wall session, named `<job>-nr`, is allowed
+The owner did not adopt this clause. It is not part of v6, F7 is not run, and one
+foreign task slice ends a wall session, as it ended dg-blocked P32. The text below
+is kept only as a record of the unadopted option; it is not a stopping rule and
+authorizes no rerun. One whole rerun per wall session, named `<job>-nr`, is allowed
 only if all of these hold, read from that session's `job-exit.json` and
 `l2-gate.json` after the `SHA256SUMS` check:
 
@@ -307,7 +391,10 @@ is absent from this sparse checkout.
 
 Worst case 0.25 + 4 x 1 + 1 = about 5.25 c8a.2xlarge node-hours plus 4-6
 CodeBuild builds. USD 5 ceiling, expected USD 1-2, on the assumption of at most
-about USD 0.6 per node-hour. The AWS price list was not read for this draft. The
+about USD 0.6 per node-hour (the worst case includes a noise-rerun slot that is not
+adopted, so it is conservative). The USD 5 ceiling and the `ea8e9ef7` / `73362eed`
+pin are owner-decided 2026-11-06 as drafted. The AWS price list was not read for
+this draft. The
 launch card records the actual on-demand and Spot prices; if the worst case could
 exceed USD 5 the director returns to the coordinator before launch.
 
@@ -331,5 +418,6 @@ A/A and `pc-fb2x`, a phase diagnostic, and the counted 5a rho band. A
 - `research/prime_base_oracle_tuning_20261029/` (`README.md`,
   `sessions/holdout-P28/spec.json`) and `docs/ic/leaderboard.json` on
   `origin/main`, and `research/ic_stride_renew_prime_20261029/README.md` with
-  `backlog/XP-20261029-stride-renew-prime/spec-P28.json` at commit `66e8464086`.
-- `prefreeze-checks-v6.md` for F1-F4.
+  `backlog/XP-20261029-stride-renew-prime/spec-P28.json` at commit `66e8464086`
+  (read for the first draft; v6 does not use `stride-renew`, Revision 1 section 12.3).
+- `prefreeze-checks-v6.md` for F1-F6 (F7 not run: the noise-rerun clause is not adopted).

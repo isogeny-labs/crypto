@@ -28,14 +28,14 @@
       "arms": [
         {
           "name": "incumbent",
-          "role": "reference",
+          "role": "baseline",
           "method": {
             "id": "ic.pipeline",
             "params": {
               "factor_base": "prime-abscissa:size=407",
               "oracle": "mitm:negation_folded=1",
               "max_trials": "26479085",
-              "targets": "stride-renew"
+              "targets": "walk"
             }
           }
         },
@@ -48,7 +48,7 @@
               "factor_base": "prime-abscissa:size=407",
               "oracle": "mitm:negation_folded=1",
               "max_trials": "26479085",
-              "targets": "stride-renew"
+              "targets": "walk"
             }
           }
         },
@@ -61,20 +61,20 @@
               "factor_base": "prime-abscissa:size=407",
               "oracle": "mitm:negation_folded=1,layout=lines",
               "max_trials": "26479085",
-              "targets": "stride-renew"
+              "targets": "walk"
             }
           }
         },
         {
           "name": "pc-fb2x",
-          "role": "candidate",
+          "role": "reference",
           "method": {
             "id": "ic.pipeline",
             "params": {
               "factor_base": "prime-abscissa:size=814",
               "oracle": "mitm:negation_folded=1",
               "max_trials": "26479085",
-              "targets": "stride-renew"
+              "targets": "walk"
             }
           }
         }

@@ -7,13 +7,19 @@
 #                  checked against the pinned value below (exit 2 on a mismatch).
 # OUT_DIR          written: per-session replay and compare files, verdict.json and,
 #                  with --counted, counted-*.json and counted-band.txt.
-# SESSION1/2       the `session/` directories of the two scientific wall jobs.
+# SESSION1/2       the `session/` directories of the two scientific wall jobs. The job's
+#                  own `control-comparison.json` (written by run-ecbench next to `session/`,
+#                  i.e. `dirname SESSION/control-comparison.json`) is read for the A/A gate.
 # COUNTED_SESSION  the `session/` directory of the counted companion job (optional).
 #
 # Preconditions that are NOT checked here and are read by the director's card
 # before this script runs (PROTOCOL-V6.md, "Reading order"): the SHA256SUMS check,
 # job-exit.json exit_code 0 from one pod for each wall job, input-spec.json equal
 # to the frozen spec and build-info.json equal to the frozen build.
+#
+# Roles in the frozen specs are structural only (decision section 12.2): incumbent=baseline,
+# incumbent-aa=control, candidate=candidate, pc-fb2x=reference. This script reads arms by
+# NAME, never by role.
 #
 # Exit status: 0 whenever the analysis ran to the end, whatever the verdict (read
 # verdict.json); 2 for a usage error or an ecbench binary that is not the pinned one.
@@ -108,7 +114,17 @@ for session in "$@"; do
   "$ecbench" verify --dir "$session" --replay-all --exit-code --out "$prefix-replay.json" >/dev/null 2>&1 || verify_rc=$?
   [[ -f "$prefix-replay.json" ]] || echo '{}' > "$prefix-replay.json"
   run_compare "$session" incumbent candidate "$SEED_CANDIDATE" "$prefix-candidate.json"
-  run_compare "$session" incumbent incumbent-aa "$SEED_AA" "$prefix-aa.json"
+  # Direct incumbent vs incumbent-aa is a self-A/A: its aa_* fields may be null, so this
+  # file is descriptive only and no gate reads it (decision section 12.2).
+  run_compare "$session" incumbent incumbent-aa "$SEED_AA" "$prefix-aa-self-descriptive.json"
+  # The launcher's own admission comparison (pc-fb2x against incumbent-aa), written by
+  # run-ecbench into the job output directory next to session/.
+  control_src="$(dirname "${session%/}")/control-comparison.json"
+  if [[ -f $control_src ]] && jq -e . "$control_src" >/dev/null 2>&1; then
+    cp "$control_src" "$prefix-control-comparison.json"
+  else
+    echo '{}' > "$prefix-control-comparison.json"
+  fi
   run_compare "$session" incumbent pc-fb2x "$SEED_POSITIVE" "$prefix-positive.json"
 
   g_replay=0
@@ -125,12 +141,16 @@ for session in "$@"; do
   g_admission=$(jq -e --argjson pairs "$WALL_PAIRS" '
     .wall.status == "admitted" and .wall.pairs_below_level == 0 and .wall.pairs == $pairs' \
     "$prefix-candidate.json" >/dev/null 2>&1 && echo 1 || echo 0)
+  # A/A gate (decision section 12.2): wall.aa_ci95 of the --a incumbent --b candidate comparison
+  # (which must show aa_arms = {incumbent, incumbent-aa} and self_aa false) and wall.aa_ci95 of
+  # control-comparison.json must each be non-null, contain 1 and lie inside [0.9, 1.1].
   g_aa=$(jq -s -e '
-    (.[0] | .ops.status == "ok" and .ops.ratio_b_over_a == 1 and .wall.status == "admitted"
-      and .wall.ci95[0] <= 1 and .wall.ci95[1] >= 1 and .wall.ci95[0] >= 0.9 and .wall.ci95[1] <= 1.1)
-    and (.[1] | .wall.aa_ci95[0] <= 1 and .wall.aa_ci95[1] >= 1
-      and .wall.aa_ci95[0] >= 0.9 and .wall.aa_ci95[1] <= 1.1)' \
-    "$prefix-aa.json" "$prefix-candidate.json" >/dev/null 2>&1 && echo 1 || echo 0)
+    def aa_ok: .wall.aa_ci95 != null
+      and .wall.aa_ci95[0] <= 1 and .wall.aa_ci95[1] >= 1
+      and .wall.aa_ci95[0] >= 0.9 and .wall.aa_ci95[1] <= 1.1;
+    (.[0] | .wall.self_aa == false and ((.wall.aa_arms // []) | sort) == ["incumbent", "incumbent-aa"] and aa_ok)
+    and (.[1] | aa_ok)' \
+    "$prefix-candidate.json" "$prefix-control-comparison.json" >/dev/null 2>&1 && echo 1 || echo 0)
   g_positive=$(gate "$prefix-positive.json" '
     .ops.status == "ok" and .ops.same_seeds == true and .ops.ratio_b_over_a > 1
     and .wall.status == "admitted" and .wall.total_wall_ratio > 1 and .wall.total_wall_ci95[0] > 1')
@@ -212,6 +232,6 @@ jq -n --arg verdict "$overall" --argjson sessions "$sessions_json" --argjson cou
   '{schema: "ic.line-layout.analysis/v6", protocol_id: "IC-LINE-LAYOUT-E2E-FP28-V6-20261106",
     ecbench_sha256: $sha, allowed_native_counters: $allowed,
     verdict: $verdict, sessions: $sessions, counted: $counted,
-    rule: "both independent L2 wall sessions must pass replay and audit, exact counted parity (ops and record level), admission, the incumbent A/A inside [0.9,1.1], the pc-fb2x positive control and wholly-below-1 total and corrected intervals outside the A/A noise; per-session verdict precedence: invalid_measurement, supported_within_scope, within_control_distribution, inconclusive; overall: all supported, else invalid_measurement, else inconclusive, else within_control_distribution"}' \
+    rule: "both independent L2 wall sessions must pass replay and audit, exact counted parity (ops and record level), admission, the A/A interval aa_ci95 of the incumbent-vs-candidate comparison (aa_arms incumbent and incumbent-aa, self_aa false) and of control-comparison.json each non-null, containing 1 and inside [0.9,1.1], the pc-fb2x positive control and wholly-below-1 total and corrected intervals outside the A/A noise; per-session verdict precedence: invalid_measurement, supported_within_scope, within_control_distribution, inconclusive; overall: all supported, else invalid_measurement, else inconclusive, else within_control_distribution"}' \
   > "$out/verdict.json"
 echo "$overall"

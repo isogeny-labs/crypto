@@ -1,4 +1,132 @@
-# Pre-freeze checks for protocol version 6 (draft)
+# Pre-freeze checks for protocol version 6 (draft, Revision 1)
+
+## Revision 1 record (2026-11-06; supersedes the first-draft results below where they conflict)
+
+Applied under `DECISION-V6-REDESIGN-20261106.md` section 12 (Revision 1). Owner
+choices (section 12.4), all owner-decided 2026-11-06: the `walk` incumbent; `pc-fb2x`
+as the structural reference with rho counted-only at L2; noise-rerun clause **not
+adopted**; the USD 5 ceiling and the `ea8e9ef7` / `73362eed` pin as drafted.
+Local only; no job, no launch, no scientific seed consumed. Binary
+`/dev/shm/v3a1-untrusted/x/usr/local/bin/ecbench`, `sha256sum` `73362eed4165d6db20fe1d398baa8fabefa2497aff6e78dab9ed8f31af31dd01`
+(the pinned value, checked before use). All run outputs are under `/dev/shm/v6f6/`.
+
+| Check | Result after Revision 1 |
+|---|---|
+| F1 plan, rerun for `targets=walk` | **PASS** (3 specs, exit 0 each; 576 / 48 / 576 executions) |
+| F2 incumbent | **Resolved by Revision 1 section 12.3**: the incumbent is `targets=walk` as merged on `origin/main`; the rule is fixed even if #2826 merges before the freeze |
+| F3 freshness | unchanged (PASS within the searchable scope); seeds 2026110628904, ...905, ...906 (F6) are additional development seeds; not used by any v6 job |
+| F4 counted smoke (L0) | **PASS** (main session, recorded below): no counted or native counter changed by `layout=lines` under `walk` or `stride-renew`; `ALLOWED_NATIVE = []` |
+| F5 launcher compatibility | B1 and B2 resolved: new specs pass the `run-ecbench` pre-check (rc 0 each) |
+| F6 admission shape of the B2 roles | **PASS** (below) |
+| F7 noise-rerun grading strings | **Not run**: the owner did not adopt the clause |
+| Protocol validator | **PASS**, 0 findings (rerun after the edits) |
+| `validate-request` on the 4 requests | **PASS**, exit 0 each (rerun after the edits) |
+
+### F1 rerun (walk)
+
+`ecbench plan --spec <spec>` with the pinned binary, the three Revision 1 specs.
+Every arm expanded; no parse error.
+
+| Spec | Spec id | Executions | Exit | sha256 of the spec file |
+|---|---|---|---|---|
+| `spec-fp28-v6.json` | `ECS1h2bfd66b7097d` | 576 | 0 | `0116954ff2646a81fa4383ef87125d445f2f3d3d4315a4ed49db9d0845515a81` |
+| `spec-fp28-v6-qual.json` | `ECS1hdb318130d787` | 48 | 0 | `c54ccf39c0d8ceb94e40a4c8c60cc626400b934caaae2d5d13fcda300649738d` |
+| `spec-fp28-v6-counted.json` | `ECS1hd826284e28f4` | 576 | 0 | `ac231ee6303942e3d491daa2c31e07216a72cf227e15015778aa7ffe829bb2a2` |
+
+Method ids (same across the specs that share an arm; `targets` is set explicitly to
+`walk`, and a spec with `targets` omitted expands to the same ids; checked on the
+qualification spec):
+
+| Arm | Method | Method id |
+|---|---|---|
+| `incumbent`, `incumbent-aa` | `ic.pipeline`, size 407, `mitm:negation_folded=1`, `walk`, `max_trials` 26479085, `linalg=incremental-gauss` | `ECM1h1729b9b88605` |
+| `candidate` | same with `oracle` `mitm:negation_folded=1,layout=lines` | `ECM1h4d5a6005f5c9` |
+| `pc-fb2x` | same as incumbent with `prime-abscissa:size=814` | `ECM1h5d5c4637a846` |
+| `rho-neg`, `rho-neg-aa` | `rho.negation` (`cap_multiple` 64) | `ECM1hefea4e0ebe79` (unchanged) |
+
+Roles after Revision 1, from the plan: wall and qualification `incumbent` baseline,
+`incumbent-aa` control, `candidate` candidate, `pc-fb2x` reference; counted
+`incumbent` baseline, `candidate` candidate, `rho-neg` reference, `rho-neg-aa` control.
+Workload slugs are unchanged: wall and counted `icv1-fp28-tm10425-13a2119a` (8) and
+`icv1-fp28-t15757-68bdca4a` (8); qualification `icv1-fp28-t10131-f8b12347` (2 workloads,
+2 targets). The plan warns that `alternate_measured` with 5 measured rounds cannot be
+balanced (the qualification spec only; sealed). The launcher pre-check `jq` of
+`run-ecbench` (identical at `ea8e9ef7` and at HEAD) exits 0 on all three specs. The
+four requests embed their specs JSON-equal (`jq -S -c`), and `validate-request` exits
+0 on each.
+
+### F6. Admission shape of the B2 roles (local development check)
+
+Fixed by decision section 12.2: the exact v6 wall arm set and roles on a non-study fp28
+curve (seed 2026110628904), 1 target, 1 warmup + 5 measured rounds. Values the decision
+does not give and the director chose for this development check only: target seed
+2026110628905, measurement seed 2026110628906, `isolation_required` L2 (the pre-check
+requires it), `alternate_measured`, `timeout_seconds` 600. Spec
+`/dev/shm/v6f6/f6/spec-f6.json` (sha256
+`895bc066871bee2e9301745ee8d200f9cdb916aacad67e94df98b1e618791580`); its `arms` are
+byte-identical (`jq -S -c`) to those of `spec-fp28-v6.json`.
+
+1. Pre-check (`run-ecbench`'s `jq -e`, the same expression): rc 0. Launcher arm
+   selection (`select(.role=="reference") | head -1`, same for `control`):
+   reference `pc-fb2x`, control `incumbent-aa`.
+2. Local run: `ecbench run --spec spec-f6.json --out /dev/shm/v6f6/f6/session --cpus auto`,
+   rc 0, 24 of 24 executions verified, all 24 graded L2 on this host.
+3. Only `ecbench compare --dir /dev/shm/v6f6/f6/session --a pc-fb2x --b incumbent-aa --json`
+   was run; no comparison involving `candidate` was run. Recorded facts only (no ratio or
+   interval value is recorded):
+
+| Condition | Observed | Pass |
+|---|---|---|
+| pre-check exits 0 | rc 0 | yes |
+| `wall.self_aa` is false | false | yes |
+| `wall.aa_pairs` >= 5 | 5 | yes |
+| `wall.aa_ci95` non-null | non-null | yes |
+| `wall.aa_arms` = {`incumbent`, `incumbent-aa`} as a set | `["incumbent","incumbent-aa"]` | yes |
+
+The launcher's exit-43 test (`status=="admitted" and pairs_below_level==0 and
+aa_pairs>=5 and aa_ci95!=null`) evaluates true on this output, so the B2 roles would
+admit. **F6: PASS.** Limit: one local run; the L2 grading here is the local host's, not
+the c8a node's. F6 does not test `analyze-v6.sh`'s further requirement that the
+`--a incumbent --b candidate` comparison shows `aa_arms` {`incumbent`, `incumbent-aa`}
+and `self_aa` false (a candidate comparison is outside F6's scope); that rests on the
+same `compare` behaviour as the earlier table (`--a rho-neg --b rho-plain`: `self_aa`
+false, `aa_pairs` 10, non-null `aa_ci95`).
+
+### `analyze-v6.sh` after Revision 1
+
+A/A is now read from `wall.aa_ci95` of the `--a incumbent --b candidate` comparison
+(`aa_arms` {`incumbent`, `incumbent-aa`}, `self_aa` false) and of the job's
+`control-comparison.json` (found at `dirname SESSION/control-comparison.json`), each
+non-null, containing 1 and inside [0.9, 1.1]. The direct `incumbent`/`incumbent-aa`
+comparison is written as `session-N-aa-self-descriptive.json` and gates nothing.
+`ALLOWED_NATIVE` stays `[]`. `bash -n` passes. Tested on synthetic records and a stub
+`ecbench` only (the pinned sha was substituted in a temporary copy): all gates true
+gives `supported_within_scope`; a control-comparison `aa_ci95` outside [0.9, 1.1], a
+missing control-comparison, a null `aa_ci95` with `self_aa` true, wrong `aa_arms`, and
+an `aa_ci95` of [0.89, 1.01] each give `invalid_measurement` (only the A/A gate false);
+a garbage direct self-A/A file changes nothing; `outside_noise` false gives
+`within_control_distribution`; the real script given the stub binary exits 2.
+
+### New hashes (Revision 1)
+
+| File | sha256 (first draft) | sha256 (Revision 1) |
+|---|---|---|
+| `spec-fp28-v6.json` | `f7a614ab…` | `0116954ff2646a81fa4383ef87125d445f2f3d3d4315a4ed49db9d0845515a81` |
+| `spec-fp28-v6-qual.json` | `25269710…` | `c54ccf39c0d8ceb94e40a4c8c60cc626400b934caaae2d5d13fcda300649738d` |
+| `spec-fp28-v6-counted.json` | `3c5df54e…` | `ac231ee6303942e3d491daa2c31e07216a72cf227e15015778aa7ffe829bb2a2` |
+| `analyze-v6.sh` | `9670550d…` | `23e614ad0b7c74ba53a4fcd51097a44194987617661343b2243b6dec6d0f422e` |
+| `launch-v6/request-qualification.json` | | `bb096cffa8425cd6ea422b7620ea01446b769ef736f1966fc96136848f64c9e3` |
+| `launch-v6/request-session-1.json` | | `ba6519cc98550e3bc087a8c07d997bfa226d788aad27d2f2919405166f151d42` |
+| `launch-v6/request-session-2.json` | | `5cabf2e370cca3fd4b83d18ebc25f1e9bce07906d976dfd7a6daab4f676f4307` |
+| `launch-v6/request-counted.json` | | `756614a64ef542555643dec357593de35b2cd80e8307a538ba115a0177648603` |
+
+`protocol-v6.json` (draft, `protocol_sha256` null) changes with every edit and is not
+listed; the coordinator hashes it at the freeze.
+
+---
+
+The sections below are the first draft's record. Where they say F2 is not satisfied,
+F4 not run, or B1/B2 blocking, Revision 1 and the table above supersede them.
 
 Run 2026-11-06 in `/dev/shm/c-v3`, branch `claude/ic-line-layout-v6-draft-20261106`,
 HEAD `9077665c840898c24281224d012cfd98c61ef658`. Local only. No `ecbench run`, no
