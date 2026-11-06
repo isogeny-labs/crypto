@@ -63,4 +63,8 @@ jq -e --arg run_sha "$run_sha" --arg buildspec \
 ' "$tmp/start.json" >/dev/null
 [[ -f "$tmp/s3/fixture-bucket/inputs/requests/$run_sha.run-request" ]]
 [[ -f "$tmp/s3/fixture-bucket/inputs/requests/$buildspec_sha.buildspec.yml" ]]
+# The override buildspec does not export the launcher's bin/; run-request must,
+# or isolab-eks-mcp is not found and every launch fails with exit 127.
+grep -Fq 'export PATH="${CODEBUILD_SRC_DIR:+$CODEBUILD_SRC_DIR/bin:}$PATH"' "$here/run-request" \
+  || { echo 'run-request does not put the launcher bin/ on PATH' >&2; exit 1; }
 printf 'Portable launch pins the reviewed run-request and 100-minute terminal bound\n'
