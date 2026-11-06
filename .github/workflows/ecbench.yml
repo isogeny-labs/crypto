@@ -275,7 +275,14 @@ jobs:
           list="$RUNNER_TEMP/ecbench-sessions.txt"
           mapfile -t candidates < <(git ls-tree -r --name-only HEAD | sed -n 's#/session\.json$##p')
           test "${#candidates[@]}" -gt 0 || { echo '::error::no session.json in the tree'; exit 1; }
-          printf '/%s/\n' "${candidates[@]}" | git sparse-checkout add --stdin
+          # Materialize all session directories and every bound-record path in
+          # one Git pass before artifact hydration changes the working tree.
+          {
+            printf '/%s/\n' "${candidates[@]}"
+            # Keep the exact original bound-record path selector.
+            jq -r '[.. | objects | select(has("path")) | .path | strings] | .[]' \
+              docs/bounds/records/*.json | sort -u | sed 's#^#/#'
+          } | git sparse-checkout add --stdin
           : > "$list"
           for d in "${candidates[@]}"; do
             test -f "$d/session.json" || { echo "::error::$d/session.json was not checked out"; exit 1; }
@@ -364,10 +371,6 @@ jobs:
       # the records give (docs/bounds/README.md §8).
       - name: Bound records re-derive, challenges check, the frontier is current
         run: |
-          # A record may cite evidence outside research/ecbench_*/ (an audit
-          # receipt beside its sessions): check out every path the records name.
-          jq -r '[.. | objects | select(has("path")) | .path | strings] | .[]' \
-            docs/bounds/records/*.json | sort -u | sed 's#^#/#' | git sparse-checkout add --stdin
           ./target/release/ecbench bound check --root . --record docs/bounds/records/*.json
           ./target/release/ecbench challenge check --file docs/bounds/challenges/*.json
           ./target/release/ecbench frontier build --bounds docs/bounds/records \
@@ -685,7 +688,7 @@ jobs:
           if-no-files-found: error
 
   exhaustive_replay:
-    if: ${{ always() && !cancelled() && needs.replay_plan.result == 'success' }}
+    if: ${{ always() && !cancelled() && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && needs.replay_plan.result == 'success' }}
     needs: [replay_plan, harness]
     runs-on: ubuntu-24.04
     timeout-minutes: 350
@@ -828,18 +831,25 @@ jobs:
     needs: [scope, harness]
     runs-on: ubuntu-24.04
     timeout-minutes: 40
-    # Setup (session listing and artifact pull) takes ~8-10 min per shard and
-    # the heaviest shard's audit ran past 15 min on 2026-11-05 (shard 8 of
-    # run 42063872441 was cancelled at the old 25-min cap), so the job allows
-    # 40 min and the validation step 30.
-    # The whole audit no longer fits one 2-vCPU hosted runner inside the PR
-    # cap: a shard of 273 MB of (decompressed) records took 15 min there, and
-    # there are ~3.2 GB in all. Sixteen jobs balanced by record bytes audit
-    # ~200 MB each.
+    # Retain all 16 byte-balanced logical audits, sequentially packed into
+    # five execution lanes. Each lane lists/hydrates once and invokes the
+    # unchanged auditor once per assigned original K/16 value. The grouping
+    # uses maximum observed weights from three real runs, without changing
+    # session assignment, verification, assertions, runner or either timeout.
     strategy:
       fail-fast: false
       matrix:
-        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+        include:
+          - lane: 0
+            shards: '4 15'
+          - lane: 1
+            shards: '1 13 10'
+          - lane: 2
+            shards: '14 9 5 7'
+          - lane: 3
+            shards: '8 12 6 0'
+          - lane: 4
+            shards: '2 11 3'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -898,14 +908,23 @@ jobs:
           name: ecbench-pr-audit-bin
           path: target/release
       - name: Validate committed evidence integrity on pull requests
-        # Sixteen byte-balanced shards keep per-run audit work within the PR cap;
-        # each shard verifies every assigned session and the matrix covers all.
+        # Every original shard runs exactly once across the five lanes.
+        # Preserve failures while finishing the other shards in that lane;
+        # fail-fast:false keeps the other lanes running as before.
         timeout-minutes: 30
         env:
-          AUDIT_SHARD: ${{ matrix.shard }}/16
+          AUDIT_SHARDS: ${{ matrix.shards }}
         run: |
           chmod +x target/release/ecbench
-          bash .github/scripts/ecbench-audit-sessions.sh "$RUNNER_TEMP/ecbench-sessions.txt"
+          audit_status=0
+          for shard in $AUDIT_SHARDS; do
+            if AUDIT_SHARD="$shard/16" bash .github/scripts/ecbench-audit-sessions.sh "$RUNNER_TEMP/ecbench-sessions.txt"; then
+              :
+            else
+              audit_status=1
+            fi
+          done
+          test "$audit_status" -eq 0
           echo 'PR evidence validation: every committed ecbench session with complete inputs (by schema) hash/seal/answer audited; four hash-pinned scratch sessions lacking spec/host capsules remain incomplete. Fresh smoke sessions exercise deterministic replay; exhaustive historical replay belongs to the manual exhaustive lane.' >> "$GITHUB_STEP_SUMMARY"
 
   # A pull request audits every committed session with --replay 0, so a change
@@ -921,7 +940,7 @@ jobs:
     if: ${{ !github.event.pull_request.draft && (github.event_name == 'pull_request' || github.event_name == 'merge_group' || github.event_name == 'push') && needs.scope.outputs.ecbench_replay != 'false' }}
     needs: [scope, harness]
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
         with:
