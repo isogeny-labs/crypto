@@ -90,6 +90,20 @@ The delta from the 0.9% pre-policy mark (1 receipt in 114 entries) is +17.0
 points. Later sessions now record receipts on their own, not just the policy
 entries, so the number is beginning to measure habit rather than the template.
 
+## Reminder window, 2026-11-06
+
+The cross-runtime reminder merged at 2026-11-06T04:29Z. Unique entries by date:
+
+| date | entries | receipts | coverage |
+|:--|--:|--:|--:|
+| 2026-11-05 | 110 | 18 | 16.4% |
+| 2026-11-06 | 9 | 2 | 22.2% |
+
+Both 2026-11-06 receipts belong to this programme's own audit entries. Of the
+three non-programme sessions with a timestamp after the merge, none recorded a
+receipt. One day and three sessions is not a trend; the number to watch is
+whether later sessions record receipts without the audit prompting them.
+
 ## Diagnosis: usage gap, not a recording gap (2026-11-06)
 
 Committed `main`, entries dated 2026-11-05 or later:

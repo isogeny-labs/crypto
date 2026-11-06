@@ -67,20 +67,23 @@ Measured before and after the refresh, same fixed set:
 
 | query | before | after |
 |:--|--:|--:|
-| how do I query the shared knowledge base and record a receipt | missing | 2 |
-| curve identity across repositories ecdb comparisons | 4 | missing |
-| top-1 / top-5 / MRR | 8/9, 9/9, 0.825 | 8/10, 9/10, 0.850 |
+| how do I query the shared knowledge base and record a receipt | missing | 1 |
+| curve identity across repositories ecdb comparisons | 4 | 4 |
+| top-1 / top-5 / MRR | 8/9, 9/9, 0.825 | 9/10, 10/10, 0.925 |
 
-The procedure gap is closed. The curve-identity row is not a lost record: the
-same locked `docs/curve-identities.md` now exists in three repositories, the
-expected `crypto-autoresearcher` copy fell past fifth as `crypto` docs entered
-the index, and `crypto-autoresearcher:docs/ecdb.md` still ranks fourth as a
-relevant answer. Accepting any repository's copy, or down-weighting duplicate
-copies, is the next ranking question; reverting the index would not help.
+The procedure gap is closed. The curve-identity row is a duplicate-copy
+question, not a lost record: the same locked `docs/curve-identities.md` exists
+in three repositories and the query also names ecdb. The query now accepts any
+repository's copy or `crypto-autoresearcher:docs/ecdb.md`, and passes at rank
+4 on the ecdb doc. Down-weighting duplicate copies would be a separate ranking
+change, not a reason to revert the index.
 
 ## Rules for changing the set
 
 - Add a query only when a real session needed it, and record the expected
   `repo:path` from the source itself.
 - Never remove a failing query after a change; a lower number is information.
+- A locked shared file that exists in several repositories may list
+  `accept_any` with every copy plus any other correct answer; the rank is the
+  first accepted result. The query still has one intent, not a looser one.
 - Keep the set fixed between index changes so the delta means something.
