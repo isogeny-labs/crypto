@@ -165,4 +165,20 @@ found none.
 
 ## Amendments
 
-(none)
+**A1 (2026-11-06, after data; it changes no decision rule).** These are
+recorded deviations, not new rules.
+
+1. The first run (`reports/run-20261106T0229Z/`) counted rows as signed
+   column vectors after ± cancellation. The frozen definition above is
+   distinct multisets {[2^e]P_i}. Commit `62a40ce4cf` adds the frozen
+   definition as `rows`, and every verdict uses it. The vector count is kept
+   as `rows_vec` and is reported only as post hoc. The first run is kept
+   unchanged and marked superseded.
+2. The positive control `poscontrol` (F_q with b ∈ F_q) has 0 relations at
+   n = 3 and 4. With Tr(a) = 0 the curve is F_{2^N}-isomorphic to
+   y² + xy = x³ + b over F_q, so its F_q-abscissae lie in two subgroups of
+   size about q. This is a design fault found after the data. Under the
+   rule above, P3 is void in those cells.
+3. Post-hoc tables, which are not decision rules:
+   - ρ_vec ratios, comparing L_T with the other valid lines in the same cell;
+   - P2 equality split by n.

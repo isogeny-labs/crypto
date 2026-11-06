@@ -943,7 +943,7 @@ fn svg(fig: &[(String, u32, f64, f64, f64)]) -> String {
         }
     };
     panel(&mut s, 50.0, "raw relations / distinct rows (m = n)", 8.0, &|c| vec![(c.2, "#2e86c1"), (c.3, "#95a5a6")], &|n| (1u64 << (n - 1)) as f64);
-    panel(&mut s, 470.0, "rows per column, L_T vs standard line", 4.0, &|c| vec![(c.4, "#2e86c1")], &|_| 2.0);
+    panel(&mut s, 470.0, "rows per column, L_T / standard line (registered rows)", 5.0, &|c| vec![(c.4, "#2e86c1")], &|_| 2.0);
     writeln!(s, "<rect x=\"50\" y=\"330\" width=\"10\" height=\"10\" fill=\"#2e86c1\"/><text x=\"64\" y=\"339\">L_T = b^(1/4) F_q (T-stable)</text><rect x=\"230\" y=\"330\" width=\"10\" height=\"10\" fill=\"#95a5a6\"/><text x=\"244\" y=\"339\">other valid lines</text><line x1=\"380\" y1=\"335\" x2=\"400\" y2=\"335\" stroke=\"#c0392b\" stroke-width=\"2\" stroke-dasharray=\"3,2\"/><text x=\"404\" y=\"339\">preregistered prediction (2^(n-1); 2)</text>").unwrap();
     s.push_str("</svg>\n");
     s
