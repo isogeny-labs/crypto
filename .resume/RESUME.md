@@ -21,18 +21,23 @@ matched, validated run. The aimed-subset gather (#2448) is among the changes.
 - Bench record: benchmarks/records/20261106T0330Z-ic-rule-v9.json (open).
 
 ## State
-Protocol committed (65a61d758c); no row run yet.
+First attempt (local) lost with its container at ~16:36 UTC; no rows survive.
+Protocol amendment 1 moves the run to Iso Lab EKS (rule/v9/launch/). Binaries
+rebuilt (hashes in rule/v9/binaries.sha256; both pins held locally). The
+isolab daily budget read 202.84/200 at 17:16 UTC 2026-11-06: no submission
+until it resets.
 
 ## Next steps
-1. `bash research/ic_tool_program/rule/v9/run.sh /tmp/claude-0/rulev9 benchmarks/records/20261106T0330Z-ic-rule-v9.json`
-   (resumable; log /tmp/claude-0/rulev9/rule9-run.log).
-2. Report/graph/PDF; validator (replay certificate + report); VALIDATION.json;
-   benchmarks entry + row; leaderboard Table A Koblitz rows from v9 if
-   validated; benchrec metric + close; pcc claims.
-3. After #3516 merges: push to aburan28/laughing-darwin-3qdnk2, open PR (ready, auto-merge).
+1. Publish the image: `research/ic_tool_program/rule/v9/launch/build-layer.sh /tmp/claude-0/rulev9 /tmp/claude-0/rulev9/layer rule-v9-20261106-<sha12>`;
+   commit launch/image.json; `make-request.sh 1`; commit; push; check-experiment-git.
+2. After 00:00 UTC: re-read DescribeBudgets (us-east-1); submit with
+   remote/launch-remote-command request-a1.json only if the day has room for USD 12.
+3. On a Spot loss: `make-request.sh 2 s3://…/runs/<job>/<pod-uid>/`.
+4. After the Job: download, check SHA256SUMS, claims/analyse/matched locally,
+   report/PDF, validator, VALIDATION.json, benchmarks row, leaderboard, PR.
 
 ## Runs in flight
-none (until step 1 starts)
+none
 
 ## Stop and success conditions
 Rule v8's stop rule (failed row check, logarithm differing from §23, failed

@@ -97,3 +97,49 @@ strong walk at some size (that size is then reported as not run for that run).
 `size` for `v9` and then for `v9c`; then for each run `reference`, `claims`
 and `analyse`; then `icprog rule matched --comparison v9`. Every step runs
 under `tools/benchrec.py run <record> -- …`.
+
+## Amendment 1 (2026-11-06, 17:20 UTC, before any row of the rerun)
+
+**What happened.** The first attempt ran locally from 03:32 UTC. Its
+background job was stopped by the session's two-hour limit at 05:32 UTC,
+resumed at 15:35 UTC, and then lost with its container, which was replaced
+at about 16:36 UTC. Its rows (sizes 1,47, 0,57, 0,41 and 0,53 for both runs,
+and part of 1,59) were never committed and no longer exist. No
+analysis was run on them; the only figures seen were the per-row "online
+speedup" lines the log printed. Nothing below is chosen on those lines: the
+question, the sizes, the arms, the order, the checks and the prediction are
+unchanged, and the rerun starts from an empty run tree.
+
+**Route: Iso Lab on EKS** (AGENTS.md §9a; [`launch/README.md`](launch/README.md)),
+replacing "Route: local". One `isolab.eks.command-request/v1` Job on a
+`c8a.2xlarge` Spot node (`cpu-l2-spot`, isolation profile `l2`, 4 CPUs,
+12 GiB) runs [`launch/job.sh`](launch/job.sh): `run.sh`'s steps in `run.sh`'s
+order (manifests, pins, the six sizes interleaved v9 then v9c, the reference
+checks), syncing the run trees to S3 every 60 s. `claims`, `analyse` and
+`matched` read only the rows and need git, so they run on the checkout after
+the rows are downloaded and their hashes checked against the pod's
+`SHA256SUMS`.
+
+- **The host** becomes the pod's node (AMD EPYC, recorded in each run's
+  `runs/host.json` and the Job's `host.txt`). Both runs still share one host
+  and one process order, so pairing by target holds. Command Jobs have no L2
+  admission, replay or A/A gate of the ecbench path; as in v8, the
+  comparison is the in-process pairing of the index calculus with its
+  matched rho, and the A/A repeats are §23's.
+- **A Spot loss** is resumed by a new Job whose command names the lost pod's
+  S3 prefix (`launch/make-request.sh`); `icprog rule size` resumes from the
+  rows a run tree holds. At most two resumptions; a size split by a loss is
+  reported as split.
+- **The binaries** are rebuilt from the same commits (the first attempt's
+  binaries were lost with the container). `isolated_bench`,
+  `koblitz_rho_fixture` and `icprog` reproduce the first attempt's hashes
+  exactly; the two `ic` builds do not (`ic-v9` `3ac9e26b…` → `fa00b978…`,
+  `ic-v9c` `0effb6dd…` → `38819b1a…`), as same-source rebuilds here have not
+  before (`research/arity_completion_20261104/launch/README.md`). Both pins
+  were checked locally against rule v8's rows and held (development check,
+  no row run). [`binaries.sha256`](binaries.sha256) now names the binaries
+  that run; the image carries them (`launch/image.json`).
+- **Bench record:** `tools/benchrec.py` cannot run inside the image, so the
+  record is opened on the checkout, the Job's downloaded tree is attached with
+  `add-raw` (raw data in S3 by SHA-256), and the local steps run under
+  `benchrec run`.
