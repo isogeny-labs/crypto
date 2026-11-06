@@ -433,7 +433,7 @@ fn ingest_lifecycle_v2(input: &ChildInput, line: &[u8]) -> Result<Value, String>
         &child.lifecycle_directory(),
         &child.envelope.prefix.identity,
     );
-    let candidate = child.envelope.arm.method == "ic.three_leads_genus2_pencil_symbolic_v2";
+    let candidate = super::three_leads::is_pencil_symbolic(&child.envelope.arm.method);
     let prefix = if candidate {
         Some(super::diagnostics::ingest(
             &child.output_root,

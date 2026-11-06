@@ -188,6 +188,76 @@ fn ledger_digest(candidate: &Value, setup: &Value) -> [u64; 4] {
     std::array::from_fn(|i| u64::from_be_bytes(hash[i * 8..i * 8 + 8].try_into().unwrap()))
 }
 
+/// Every deterministic count of a native result, as `*_uncharged` counters:
+/// the finite-field arithmetic of the pencil and its cold setup (`arithmetic`),
+/// the symbolic-graph meter (`semantic_counts`, cold setup and candidate
+/// summed), and the collector's and solver's logical work. None is priced.
+/// Keys are the ledger's own field names, so a count cannot be renamed here.
+fn ledger_counters(detail: &Value, setup: &Value) -> Result<BTreeMap<String, u64>, String> {
+    fn put(
+        out: &mut BTreeMap<String, u64>,
+        prefix: &str,
+        object: &Value,
+        keys: Option<&[&str]>,
+    ) -> Result<(), String> {
+        let map = object
+            .as_object()
+            .ok_or_else(|| format!("pencil ledger {prefix}: not an object"))?;
+        for (key, value) in map {
+            if keys.is_some_and(|k| !k.contains(&key.as_str())) {
+                continue;
+            }
+            let n = value
+                .as_u64()
+                .ok_or_else(|| format!("pencil ledger {prefix}{key}: not a u64"))?;
+            let slot = out.entry(format!("{prefix}{key}_uncharged")).or_insert(0);
+            *slot = slot
+                .checked_add(n)
+                .ok_or_else(|| format!("pencil ledger {prefix}{key}: overflow"))?;
+        }
+        Ok(())
+    }
+    let mut out = BTreeMap::new();
+    // `detail.arithmetic` already includes the cold setup's.
+    put(&mut out, "pencil_native_", &detail["arithmetic"], None)?;
+    put(
+        &mut out,
+        "pencil_symbolic_",
+        &setup["semantic_counts"],
+        None,
+    )?;
+    put(
+        &mut out,
+        "pencil_symbolic_",
+        &detail["symbolic"]["semantic_counts"],
+        None,
+    )?;
+    put(
+        &mut out,
+        "pencil_logical_",
+        &detail["symbolic"],
+        Some(&[
+            "submitted_rows",
+            "submitted_terms",
+            "admitted_rows",
+            "rejected_three_large",
+            "emitted_constraints",
+            "input_terms",
+            "pivot_lookups",
+            "coefficient_updates",
+            "normalization_multiplications",
+            "inversions",
+        ]),
+    )?;
+    for key in ["solver_nodes", "solver_node_order_ops"] {
+        let n = detail[key]
+            .as_u64()
+            .ok_or_else(|| format!("pencil ledger {key}: not a u64"))?;
+        out.insert(format!("pencil_logical_{key}_uncharged"), n);
+    }
+    Ok(out)
+}
+
 // Preserve each native result's private graph/solver owners through verification,
 // calibration and report accounting. No large graph clone or early owner drop.
 enum NativeResult {
@@ -310,12 +380,32 @@ pub(super) fn solve_with_progress(
         ("group_field_adds_uncharged".into(), group.field_adds),
         ("group_bit_ops_uncharged".into(), group.bit_ops),
     ]);
+    // `_v3` lifts the ledger into counters (README §9); `_v2` keeps its record.
+    let v3 = m.id == super::PENCIL_SYMBOLIC_V3;
+    if v3 {
+        counters.extend(ledger_counters(result.detail(), result.setup())?);
+    }
     for (i, word) in ledger_digest(result.detail(), result.setup())
         .into_iter()
         .enumerate()
     {
         counters.insert(format!("pencil_replay_ledger_sha256_word_{i}"), word);
     }
+    // v2 names three labels that are no counter; v3 names exactly its
+    // `_uncharged` counters, and allocation (no observer) is a detail field.
+    let unpriced: Vec<String> = if v3 {
+        counters
+            .keys()
+            .filter(|k| k.ends_with("_uncharged"))
+            .cloned()
+            .collect()
+    } else {
+        vec![
+            "pencil_native_and_symbolic_arithmetic".into(),
+            "pencil_logical_work".into(),
+            "allocation_observer_unavailable".into(),
+        ]
+    };
     let mut report = SolveReport {
         recovered: result.recovered().map(ExactScalar::from),
         exhausted: result.recovered().is_none(),
@@ -332,16 +422,12 @@ pub(super) fn solve_with_progress(
         total_gae: group_only_gae,
         automorphisms_used: 1,
         counters,
-        unpriced: vec![
-            "pencil_native_and_symbolic_arithmetic".into(),
-            "pencil_logical_work".into(),
-            "allocation_observer_unavailable".into(),
-        ],
+        unpriced,
         deterministic: true,
         nondeterminism: vec![],
         solve_wall_ns,
         factor_base: None,
-        detail: json!({"schema":"ecbench-pencil-symbolic/v2","candidate":result.take_detail(),
+        detail: json!({"schema":if v3 {"ecbench-pencil-symbolic/v3"} else {"ecbench-pencil-symbolic/v2"},"candidate":result.take_detail(),
             "cold_setup":result.take_setup(),"additional_source_verification":verifier_counts,
             "source_addition":source_add,"cost_status":"incomplete",
             "total_gae_scope":"counted group arithmetic only; lower bound",
