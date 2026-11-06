@@ -75,6 +75,15 @@ def test_claude_turn_snapshot_then_budget_failure(repo, tmp_path):
     assert json.loads(hops[-1])["to"] == "codex"
 
 
+def test_session_start_always_reminds_about_the_kb(repo):
+    start = {"hook_event_name": "SessionStart", "session_id": "s1", "cwd": str(repo)}
+    out = relay(repo, "--runtime", "codex", "session-start", stdin=json.dumps(start)).stdout
+    assert "Research KB" in out
+    out = relay(repo, "--runtime", "claude", "session-start", stdin=json.dumps(start)).stdout
+    payload = json.loads(out)
+    assert "Research KB" in payload["hookSpecificOutput"]["additionalContext"]
+
+
 def test_non_budget_api_error_stays_draft(repo):
     hook = {"hook_event_name": "StopFailure", "error": "server_error", "session_id": "s1", "cwd": str(repo)}
     relay(repo, "--runtime", "claude", "snapshot", stdin=json.dumps(hook))
