@@ -1,0 +1,96 @@
+{
+  "schema": "validation-gate/v1",
+  "replay_certificate": {
+    "path": "replay-certificate.json",
+    "sha256": "3a592bb612bb5c430a7f0f93bc3a006e761a69683eed48ec1416aa04d4c47431"
+  },
+  "validator_report": {
+    "path": "validator-report.json",
+    "sha256": "c4096781346a6d61d67778e74b5936708bbe706aa13650946900f212e35966dd"
+  },
+  "rho_reference": {
+    "kind": "negation",
+    "protocol": "PLAN s2/s4 and ANALYSIS_PLAN s9 name rho-neg (rho.negation) as the matched rho, paired with ic on the same (workload, target, round), and rho-cubic (rho.cubic, the order-6 automorphism fold) on the V5 j = 0 crater (census A3 F1). rho-neg is the strongest available on all 648 V6 vertices and the 63 non-crater V5 vertices (j not in {0, 1728}, prime fields); on the V5 crater (p = 1 and r = 1 mod 3) the strongest is rho-cubic, and the report compares IC with it there (89.3x / 98.2x / 141.2x at 0 / 0.1 / 1 GAE). H-T's denominator is rho-neg at j != 0 sources, the strongest there.",
+    "unit": "S (ecbench normalised group operations: total_gae / sqrt(r)), the unpriced native operations each arm names (cost.unpriced, from records.jsonl per A2.1) priced at 0 / 0.1 / 1 GAE on both arms",
+    "binary_or_process": "ecbench sha256 ac4bc5b26f858a4d8a374208297157840af25fb1dc25ea1c19dd41360735fb35 (runs/progress.jsonl header and every record); every arm, references included, in the same sessions",
+    "matches_protocol": true,
+    "strongest_available": true,
+    "same_unit": true,
+    "same_binary_or_process": true,
+    "order_holds_across_band": true,
+    "note": "gae_band: V6 pooled mean priced S of ic and rho-neg over (ic, rho-neg) pairs of the isogenous families (the Q1 population). gae_band_by_volcano adds V5 levels 1-6 (rho-neg) and V5crater (ic against rho-cubic, D + N pairs; rho-neg shown for reference). Rho is ahead at every price, every level of both volcanoes and on the crater; the ratio is the distance remaining, not a pass/fail.",
+    "gae_band": {
+      "0": {
+        "ic": 79.02238006945794,
+        "rho": 1.3081891205663683
+      },
+      "0.1": {
+        "ic": 93.19862171376643,
+        "rho": 1.4205357250385635
+      },
+      "1": {
+        "ic": 220.78479651254287,
+        "rho": 2.4316551652883196
+      }
+    },
+    "gae_band_by_volcano": {
+      "V6|0": {
+        "ic": 79.02238006945794,
+        "rho_neg": 1.3081891205663683,
+        "ratio": 60.40592971392847,
+        "n": 31680
+      },
+      "V6|0.1": {
+        "ic": 93.19862171376643,
+        "rho_neg": 1.4205357250385635,
+        "ratio": 65.6080801566862,
+        "n": 31680
+      },
+      "V6|1": {
+        "ic": 220.78479651254287,
+        "rho_neg": 2.4316551652883196,
+        "ratio": 90.79609628216531,
+        "n": 31680
+      },
+      "V5_levels_1-6|0": {
+        "ic": 57.25824518988723,
+        "rho_neg": 1.0745922858060726,
+        "ratio": 53.2836927513738,
+        "n": 12256
+      },
+      "V5_levels_1-6|0.1": {
+        "ic": 68.36635992474739,
+        "rho_neg": 1.1730132673551075,
+        "ratio": 58.282682581160245,
+        "n": 12256
+      },
+      "V5_levels_1-6|1": {
+        "ic": 168.3393925384887,
+        "rho_neg": 2.058802101296422,
+        "ratio": 81.76569881703826,
+        "n": 12256
+      },
+      "V5crater|0": {
+        "ic": 58.100360709645216,
+        "rho_cubic": 0.650445261284619,
+        "rho_neg": 1.0685410432854232,
+        "ic_over_cubic": 89.32398184421842,
+        "n": 2000
+      },
+      "V5crater|0.1": {
+        "ic": 69.37581305197928,
+        "rho_cubic": 0.7064331904701917,
+        "rho_neg": 1.1663385506710766,
+        "ic_over_cubic": 98.20576664270791,
+        "n": 2000
+      },
+      "V5crater|1": {
+        "ic": 170.85488413298583,
+        "rho_cubic": 1.2103245531403455,
+        "rho_neg": 2.046516117141954,
+        "ic_over_cubic": 141.16451962383186,
+        "n": 2000
+      }
+    }
+  }
+}
