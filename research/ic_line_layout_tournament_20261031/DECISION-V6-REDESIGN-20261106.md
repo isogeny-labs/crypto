@@ -1,7 +1,8 @@
 # Line-layout tournament: coordinator decision on the version 6 redesign (2026-11-06)
 
-**Revised: see §12, Revision 1 (2026-11-06), and §13, Revision 2 / freeze
-approval (2026-11-06).** Each supersedes the earlier parts it names. Where they
+**Revised: see §12, Revision 1 (2026-11-06), §13, Revision 2 / freeze
+approval (2026-11-06), and §14, Revision 3 budget-rule reading (2026-11-06).**
+Each supersedes the earlier parts it names. Where they
 conflict, the later section governs.
 
 **Status: the owner signed off on 2026-11-06. Freeze is approved, conditional
@@ -1101,4 +1102,119 @@ coordinator_decision_revision:
     - "Director: run F6b and append it to prefreeze-checks-v6.md (one snapshot archive of that file)."
     - "Main session, on F6b PASS: run experiment_protocol.py freeze on protocol-v6.json, commit and merge the freeze with this file and ledger/decisions/DEC-20261106-662e33.yaml; push, then open or refresh the PR with auto-merge."
     - "Then, per PROTOCOL-V6.md §5: publication receipt, checkpoint gate, director card for the qualification, executor-mechanical launch; only on a pass, the two wall sessions, then the counted companion; then analyze-v6.sh, independent validator, evidence-review decision."
+```
+
+## 14. Revision 3: budget-rule reading for the wall launch (2026-11-06)
+
+**Trigger.** The qualification `ic-line-v6-qual-20261106` passed every §5.1
+condition, as recorded in `QUALIFICATION-V6-20261106.md` on branch
+`claude/ic-line-layout-v6-results-20261106`. That record stays sealed. The
+director's wall card `/dev/shm/v6run/card-wall-1-2.md` is on HOLD under the
+§13.3(c) budget rule.
+
+The qualification card undercounted CodeBuild:
+
+- `launch-remote` starts every build with `timeoutInMinutesOverride` 100;
+- a build waits up to the job's `seconds` + 180 s;
+- the protocol's worst case is 8 builds.
+
+The director's figures, at the c8a.2xlarge on-demand price of USD 0.43108 per
+hour:
+
+| Bound | CodeBuild | Total with 6.5 node-hours (USD 2.80) |
+|---|---|---|
+| Hard bound | 8 builds × 100 min × USD 0.005 = USD 4.00 | USD 6.80 |
+| Job-length bound | USD 2.27 | USD 5.07 |
+
+USD 0.05 has been spent so far. This revision changes no scientific element of
+the frozen protocol. It fixes how the frozen budget rule is read.
+
+### 14.1 Decision: option (c), a rolling hard-bound gate checked before each launch
+
+**The bound that applies is the hard bound.** The §13.3(c) rule says
+"could exceed". The job-length bound assumes the launcher's wait loop always
+ends on time. The 100-minute build timeout is the only limit that holds when
+that loop does not end on time. Option (a) is therefore rejected. Under the
+protocol's full worst case even the job-length bound fails (USD 5.07).
+
+**Option (b) is also rejected.** Removing the counted job's `-r2` would change
+the frozen host-loss rule after launch. Nothing requires that, because actual
+spend is far below the bounds.
+
+**The rule.** Before each launch L, including any `-r2`, the card records
+`actual_spend + HB(L) + HB(every first-attempt job of PROTOCOL-V6.md §5 not yet
+launched)` and requires it to be at most USD 5.00.
+
+- `actual_spend`: billed CodeBuild minutes of every build launched so far, plus
+  node-hours from node creation to termination at the on-demand price, failed
+  attempts included.
+- `HB(job)` = (job `seconds` / 3600) × USD 0.43108 + 100 min × USD 0.005. That
+  is USD 0.931 for a 3,600 s job.
+
+If the gate fails, the director stops and returns to the coordinator before
+that launch. Nothing is skipped silently, and the frozen host-loss rule is not
+amended.
+
+**Why this is safe.** Pricing a Spot node at the on-demand rate leaves room for
+node time beyond the job deadline (provisioning and teardown). The gate also
+always reserves a full hard bound for the counted job, so wall-job reruns can
+never use up its share.
+
+**Applied to the current HOLD:**
+
+- **Two wall sessions, launched back to back:** 0.05 + 2 × 0.931 + 0.931
+  (counted job reserved) = USD 2.84, at most USD 5. **Pass.**
+- **Later `-r2` launches.** Even if every wall build and node ran to its hard
+  bound, a single `-r2` would still pass: 0.05 + 3 × 0.931 + 0.931 = USD 3.77.
+  Both wall `-r2`s and the counted job also fit: 0.05 + 5 × 0.931 = USD 4.70. A
+  counted `-r2` after all of that (USD 5.63) would fail and return to the
+  coordinator. Measured spend makes these cases far less likely: the
+  qualification build ran about 4 minutes, and a wall session projects to about
+  33 s of measurement.
+
+**Record of the miscount.** The qualification card's CodeBuild undercount is
+logged as an infrastructure accounting error. It had no effect: actual spend
+was about USD 0.05, and the qualification would also have passed this gate at
+launch.
+
+### 14.2 Concurrency reading: confirmed
+
+The director's reading matches `protocol-v6.json`
+`execution.placement.concurrency_note`, and this revision adds no rule.
+
+- The two wall requests are submitted back to back.
+- They may run side by side, or one after the other under the L2 NodePool cap.
+- Each runs on its own fresh L2 node and is decided on its own data alone.
+- The card records each job's Job, Pod and node identity. The validator checks
+  that they are distinct under the frozen host-epoch factor.
+
+### 14.3 HOLD
+
+**The HOLD may be lifted.** The wall card may proceed once it records the
+§14.1 gate line for the two-session launch (USD 2.84 ≤ USD 5.00) together with
+the actual-spend basis behind it. Every later launch records its own gate line
+first.
+
+```yaml
+coordinator_decision_revision:
+  revises: DEC-20261106-662e33
+  revision: 3
+  date: 2026-11-06
+  decision: approve        # budget-rule reading; wall launch released
+  target_ids: [IC-LINE-LAYOUT-E2E-FP28-V6-20261106]
+  rationale:
+    - "§13.3(c) says 'could exceed'; only the 100-min CodeBuild timeout bounds a build whose wait loop does not end on time, so the hard bound applies; the job-length reading (a) is rejected."
+    - "A rolling gate before each launch (actual spend + hard bound of this launch + hard bound of every unlaunched first attempt <= USD 5) keeps the owner's ceiling under the strictest bound without amending the frozen host-loss rule (b rejected)."
+    - "Wall launch now: 0.05 + 2 x 0.931 + 0.931 reserved for the counted job = USD 2.84; passes."
+  evidence_refs:
+    - research/ic_line_layout_tournament_20261031/QUALIFICATION-V6-20261106.md   # sealed; only its pass status and spend are used
+    - /dev/shm/v6run/card-wall-1-2.md
+    - research/ic_line_layout_tournament_20261031/protocol-v6.json
+  limitations:
+    - "On-demand price USD 0.43108/h as recorded by the director; Spot node time is priced at the on-demand rate to cover node lifetime beyond the deadline."
+  knowledge_promotion: not_warranted
+  next_actions:
+    - "Director: record the §14.1 gate line on the wall card, lift the HOLD, and relay the card unchanged to executor-mechanical for ic-line-v6-s1-20261106 and ic-line-v6-s2-20261106."
+    - "Before each later launch (any -r2, the counted job): record the gate line; if it fails, return to the coordinator."
+    - "Main session: mirror this block into ledger/decisions/DEC-20261106-662e33.yaml in the next ledger archive."
 ```
