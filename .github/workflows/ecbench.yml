@@ -579,20 +579,20 @@ jobs:
     # Retain all 16 byte-balanced logical audits, sequentially packed into
     # four execution lanes. Each lane lists/hydrates once and invokes the
     # unchanged auditor once per assigned original K/16 value. The grouping
-    # balances observed audit durations in run 42086855965, without changing
+    # separates long shards observed in run 42122136071, without changing
     # session assignment, verification, assertions, runner or either timeout.
     strategy:
       fail-fast: false
       matrix:
         include:
           - lane: 0
-            shards: '4'
+            shards: '4 2 14'
           - lane: 1
             shards: '8 5 7 0 15'
           - lane: 2
             shards: '11 9 3 13'
           - lane: 3
-            shards: '1 12 6 10 2 14'
+            shards: '1 12 6 10'
     steps:
       - uses: actions/checkout@v4
         with:
