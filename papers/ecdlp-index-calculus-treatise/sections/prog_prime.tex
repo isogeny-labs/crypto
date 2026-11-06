@@ -39,7 +39,10 @@ $[5.82,9.63]$ with a lane collector, all lower bounds
 (\art{research/ecbench_rootfinding_lanes_20261013/}); a planner that picks
 the base, stop rule and oracle beat every one-change alternative on six
 curves at $w=0$, the root-find-and-subtract variant by $171$--$439\times$
-(\art{research/ic_planner_validation_20261020/}). The frontier campaign's
+(\art{research/ic_planner_validation_20261020/}). The planner's three
+weight rules, which scaled the base or stop for $w>0$, failed out of sample
+on 26 October and were withdrawn (rule set \texttt{ic-planner/4};
+\art{research/ic_planner_exhaustive_20261026/}). The frontier campaign's
 two-summand prime arm goes from $10.5\times$ rho at 20 bits to $102\times$ at
 40 bits (\S\ref{sec:campaign}).
 

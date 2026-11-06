@@ -85,6 +85,19 @@ slots with no disagreement, and a parameter count reproduces $\alpha=3$
 The scope is one family ($\deg b\le10$, $p\le31$). A dimension-count theorem
 over all section shapes would be needed to close the route in general.
 
+The classic obstruction to xedni is also conditional. A kernel-checked Lean
+audit of Jacobson, Koblitz, Silverman, Stein and Teske's analysis
+(\art{research/jksst_xedni_audit_20261101/}) does three things:
+\begin{itemize}
+\item it repairs their conditional theorem;
+\item it refutes several overbroad readings of it;
+\item it leaves open the premises it rests on: Lang's height conjecture, a
+  uniform height--discriminant comparison, and the algorithm-specific
+  bridge from a one-shot relation probability to the actual attack.
+\end{itemize}
+The audit calls the result a strong conditional asymptotic obstruction for
+classic xedni, not a proof that the route is closed.
+
 \section{Twist points carry no relations}
 
 A curve and its quadratic twist share $x$-coordinates, and therefore share
