@@ -101,8 +101,11 @@ def padd(F, a, P, Q):
     return (x3, y3)
 
 
+SALT = os.environ.get("TZ_SALT", "")  # A5: independent seeds for the replication
+
+
 def seed(*parts):
-    h = hashlib.sha256("|".join(map(str, parts)).encode()).digest()
+    h = hashlib.sha256("|".join(map(str, (SALT,) + parts if SALT else parts)).encode()).digest()
     return int.from_bytes(h[:8], "big")
 
 
