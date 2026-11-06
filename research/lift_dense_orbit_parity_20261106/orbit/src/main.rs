@@ -1155,6 +1155,36 @@ pub fn compute(dir: &str) -> (String, String, Summary) {
         .unwrap();
     }
     let o4 = mism == 0 && !dec.is_empty() && o4_frac_ok;
+    // post hoc (not a decision rule): are the mismatches the l-side points
+    // whose order is prime to l? Expected count = sum over lines of
+    // (l-side lifted x) / l^v, l^v the l-part of #E(K).
+    let mut ph = String::new();
+    writeln!(ph, "| p | n | mismatches with predicted dead, observed alive | observed dead, predicted alive | expected (l-side x)/l^v |\n|--:|--:|--:|--:|--:|").unwrap();
+    for &(p, n) in CELLS {
+        if n % 2 == 1 {
+            continue;
+        }
+        let (mut fa, mut fd, mut exp) = (0u64, 0u64, 0f64);
+        for l in dec.iter().filter(|l| jnum(l, "p") == p && jnum(l, "n") == n as u64) {
+            let cv = curves
+                .iter()
+                .find(|c| jget(c, "arm") == Some("descent") && jnum(c, "p") == p && jnum(c, "n") == n as u64 && jnum(c, "curve") == jnum(l, "curve"))
+                .unwrap();
+            let (ell, ord) = (jnum(cv, "ell"), jnum(cv, "orderE"));
+            let mut lv = 1u64;
+            while ord % (lv * ell) == 0 {
+                lv *= ell;
+            }
+            let (lifted, dp, dobs, mm) = (jnum(l, "lifted"), jnum(l, "dead_pred"), jnum(l, "dead_obs"), jnum(l, "dead_mismatch"));
+            // mm = fd + fa, dobs - dp = fd - fa
+            let fd_l = (mm + dobs - dp) / 2;
+            fd += fd_l;
+            fa += mm - fd_l;
+            exp += (lifted - dp) as f64 / lv as f64;
+        }
+        put(&format!("posthoc_pred_dead_obs_alive_{p}_{n}"), fa as f64, &mut vals);
+        writeln!(ph, "| {p} | {n} | {fa} | {fd} | {exp:.1} |").unwrap();
+    }
     // O5
     let o5_bad = lines.iter().filter(|l| !jbool(l, "int_ok")).count();
     let o5 = o5_bad == 0;
@@ -1206,6 +1236,7 @@ pub fn compute(dir: &str) -> (String, String, Summary) {
     )
     .unwrap();
     writeln!(md, "- Descent curves: {} (j ∈ K₀ on {}; order check failed on {}; ℓ on both sides on {}). Generic curves with j ∈ K₀ (n even): {}. σ^(n/2)-stable root sets among random lines: {}.\n", dcur.len(), jk0_desc, ord_bad, both, jk0_gen, rnd_half).unwrap();
+    writeln!(md, "## Post hoc: direction of the O4 mismatches\n\n{ph}").unwrap();
     writeln!(md, "## Criterion vs constancy per cell\n\n{tab}\n## Dead points on all-lift descent lines\n\n{dtab}").unwrap();
     let js = format!(
         "{{\"O1\":{o1},\"O2\":{o2},\"O3\":{o3},\"O4\":{o4},\"O5\":{o5},\"values\":{{{}}}}}\n",

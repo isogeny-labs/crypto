@@ -166,4 +166,11 @@ the reading above is wrong.
 
 ## Amendments
 
-(none)
+**A1 (2026-11-06, after data; it changes no decision rule).**
+
+1. After the run, the summarizer gained a post-hoc table. It splits the O4
+   mismatches by direction and compares them with a uniform 1/ℓ^v
+   estimate. The run itself, at `eedd7b0a6d`, is unchanged.
+2. Every O4 mismatch is "observed dead, predicted alive". The registered
+   rule ignores ℓ-side points whose order is prime to ℓ. The O4 verdict
+   stays FAIL as registered.
