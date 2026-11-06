@@ -54,6 +54,30 @@ Top-1 8/9 (88.9%), top-5 9/9 (100%), MRR 0.917.
   session that names a real query the lexical backend misses. Record the query
   and the expected record first, then change the index, then rerun the probe.
 
+## Index fix, 2026-11-06
+
+The `crypto` source root in the shared KB config was a feature-branch checkout
+(`feat/koblitz-norm-base-20261023`, commit `6a0414df`), not `main`. About 800
+current docs, including this page and the new procedure page, were not
+searchable. The root now points at a sparse `main` mirror under
+`research-kb-sources/`, and `docs/session-logs/**` is excluded because those
+records are long, noisy and readable locally.
+
+Measured before and after the refresh, same fixed set:
+
+| query | before | after |
+|:--|--:|--:|
+| how do I query the shared knowledge base and record a receipt | missing | 2 |
+| curve identity across repositories ecdb comparisons | 4 | missing |
+| top-1 / top-5 / MRR | 8/9, 9/9, 0.825 | 8/10, 9/10, 0.850 |
+
+The procedure gap is closed. The curve-identity row is not a lost record: the
+same locked `docs/curve-identities.md` now exists in three repositories, the
+expected `crypto-autoresearcher` copy fell past fifth as `crypto` docs entered
+the index, and `crypto-autoresearcher:docs/ecdb.md` still ranks fourth as a
+relevant answer. Accepting any repository's copy, or down-weighting duplicate
+copies, is the next ranking question; reverting the index would not help.
+
 ## Rules for changing the set
 
 - Add a query only when a real session needed it, and record the expected
