@@ -182,7 +182,7 @@ pub fn scan_session(dir: &Path, label: &str, keep: usize) -> Result<Vec<Candidat
     }
     let mut out = Vec::new();
     for (_, mut v) in by_method {
-        v.sort_by(|a, b| (a.cost_ns(), a.seq).cmp(&(b.cost_ns(), b.seq)));
+        v.sort_by_key(|a| (a.cost_ns(), a.seq));
         v.truncate(keep);
         out.extend(v);
     }

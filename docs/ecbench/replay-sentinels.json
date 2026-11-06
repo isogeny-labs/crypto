@@ -694,6 +694,16 @@
       "recorded_total_gae": 74.0
     },
     {
+      "method": "rho.signed_frobenius_v2_full",
+      "session": "research/rho_frob_brent_20261106/sessions/a0-n13",
+      "session_id": "ECBS1h94944b3ac7a3",
+      "records_sha256": "82e7e117f3084caff068efd4784363e04ff51236129ee9cbb46e3edd9685edb9",
+      "seq": 220,
+      "record_id": "ECR1he418d8d3b674",
+      "recorded_solve_wall_us": 130,
+      "recorded_total_gae": 82.294535
+    },
+    {
       "method": "rho.signed_frobenius_wordram",
       "session": "research/ecbench_registry_optimization_20261101/execution/smoke-koblitz-legacy-rootfind",
       "session_id": "ECBS1h1b47fad824ab",
@@ -792,26 +802,5 @@
       "reason": "no committed record is replayable (audit::replayable: nondeterministic method, or only warm-ups, timeouts, crashes or budgeted solves)"
     }
   ],
-  "known_failures": [
-    {
-      "session": "research/three_leads_e2e_20261018/correctness/genus-smoke-session-v2",
-      "seq": 0,
-      "reason": "committed 2026-10-18; the counters of the three_leads methods changed since, so the record no longer replays (found by the first sentinel run, not by any earlier lane)"
-    },
-    {
-      "session": "research/three_leads_e2e_20261018/correctness/genus-smoke-session-v2",
-      "seq": 1,
-      "reason": "committed 2026-10-18; the counters of the three_leads methods changed since, so the record no longer replays (found by the first sentinel run, not by any earlier lane)"
-    },
-    {
-      "session": "research/three_leads_e2e_20261018/correctness/genus-smoke-session-v2",
-      "seq": 2,
-      "reason": "committed 2026-10-18; the counters of the three_leads methods changed since, so the record no longer replays (found by the first sentinel run, not by any earlier lane)"
-    },
-    {
-      "session": "research/three_leads_e2e_20261018/correctness/genus-smoke-session-v2",
-      "seq": 3,
-      "reason": "committed 2026-10-18; the counters of the three_leads methods changed since, so the record no longer replays (found by the first sentinel run, not by any earlier lane)"
-    }
-  ]
+  "known_failures": []
 }

@@ -70,7 +70,10 @@ $0.3$ (\texttt{DEC-20260728-003}, weakened).
 
 Xedni-style lifting was closed in exact form (\texttt{DEC-20260724-021},
 reject\_scoped): $P_{\rm lift}=(1-2/p+p^{-3})/(2p^3)$, so $\alpha=3$. This
-is the result restated in Chapter~\ref{ch:obstructions}.
+is the result restated in Chapter~\ref{ch:obstructions}. The exact count
+closes one family and slot shape only. A 1 November Lean audit found the
+classic JKSST obstruction conditional and refuted its overbroad readings
+(Chapter~\ref{ch:obstructions}; \art{research/jksst_xedni_audit_20261101/}).
 
 \section{August: yield, monodromy, oracles and transfers}
 
@@ -86,7 +89,15 @@ matched base size the mean is fixed. A complete $m=2$ index calculus solved
 a discrete logarithm at $p=1009$ (\texttt{DEC-20260804-db75bb}). A
 Fourier-flatness constant for the factor base was fitted as
 $C(p)\sim p^{0.055}$--$p^{0.079}$ and recorded as an open problem
-(\texttt{H-PSEUDO}). Eight proof routes were closed as non-proving.
+(\texttt{H-PSEUDO}). Eight proof routes were closed as non-proving. A frozen
+re-test on 4 November (\texttt{HPSEUDO-SYMNULL-20261104}) explained the
+recorded offset $R\approx1.28$--$1.34$ as an artefact of the null. The
+factor base is closed under negation, but the null was an asymmetric
+uniform subset. Against a negation-closed null, $R$ is consistent with 1:
+the upper 95\% bound is $1.09$ at $2^{20}$ and $1.02$ at $2^{22}$, and the
+pooled 56 curves give $1.005\pm0.008$. A residual of up to about 9\% at
+$2^{20}$ is not excluded
+(\art{crypto-autoresearcher:docs/reports/hpseudo-symnull-20261104/}).
 
 \paragraph{BKK and meet in the middle: constant factors.} A BKK sparsity
 argument promised a speedup of at least $(m+1)/2$
@@ -137,7 +148,8 @@ traced to the 2-torsion type (\texttt{DEC-20260811-a3398a},
 \paragraph{Degree of regularity.} The boolean chained $m=3$ system was
 run at $n=21$, $D=5$, and stopped at rank $265{,}950$ of a predicted
 $268{,}674$ (\texttt{EV-DREG-4500cd}). The record calls this ``not evidence
-about $d_{\rm reg}$ in either direction''. All six $n=15$ runs then
+about $d_{\rm reg}$ in either direction'', and \texttt{DEC-20260815-6b806c}
+superseded the unarchived run chain by reference, evidence-neutral. All six $n=15$ runs then
 exceeded memory (\texttt{DEC-20260828-653923}). The certified
 fall-degree results of Chapter~\ref{ch:falldegree} later replaced this
 line.
@@ -234,9 +246,11 @@ approvals and redesigns but no measured outcome:
 \item the auxiliary-input census, whose run was ruled invalid as evidence
   because its controls were inadmissible and its escalation was generic to
   256-bit primes (\texttt{DEC-20260923-ce06a6});
-\item EcGFp5 symmetrisation, where no $m=5$ ideal degree was measured
-  (\texttt{DEC-20260923-d86ff2}), although the audit found that the curve's
-  self-reported 323 bits recomputes to 322;
+\item EcGFp5 symmetrisation, where no $m=5$ ideal degree was measured by
+  September (\texttt{DEC-20260923-d86ff2}), although the audit found that the
+  curve's self-reported 323 bits recomputes to 322. A quotient solve on 1
+  November measured $D=2^{16}$ at all three primes it ran
+  (\art{research/ecgfp5_quotient_solve_20261101/});
 \item characteristic-2 quasi-subfield work, which found zero violations of
   its bound in about $340{,}000$ candidates and produced the derivation
   $\beta>1/2$ for every completely splitting $L$ (\texttt{KN-FIND-617d78}).

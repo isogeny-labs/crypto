@@ -1,14 +1,17 @@
 \chapter{Obstructions: what moving the problem cannot buy}\label{ch:obstructions}
 
-The programme kept 148 leads against ECDLP in a lead atlas
-(\art{crypto-autoresearcher:knowledge/leads/ecdlp/}, reviewed 2026-10-24).
+The programme kept 153 leads against ECDLP in a lead atlas at its
+30~October review
+(\art{crypto-autoresearcher:knowledge/leads/ecdlp/REVIEW_STATE.json}).
 Of these:
 \begin{itemize}
-\item 73 are closed with a named obstruction;
-\item 51 are open with a decided next step;
-\item 16 are blocked;
-\item 8 are unexamined.
+\item 74 are closed with a named obstruction or exhausted at scale;
+\item 53 are open with a decided next step;
+\item 17 are blocked;
+\item 9 are unexamined.
 \end{itemize}
+Later rounds, including the split of 4~November, added more
+(Chapter~\ref{ch:unconvmap}).
 Most obstructions are textbook results applied to the case at hand: the
 Shoup--Nechaev generic bound, the Corrigan-Gibbs--Kogan preprocessing bound
 $ST^2\gtrsim N$~\cite{cgk2018}, isogeny invariance of the group order, and
@@ -46,28 +49,33 @@ Together these close three families of leads: curve selection by
 anomalous monodromy, fibre censuses as a relation-rate probe, and
 factor-base geometries claimed to raise yield.
 
-\section{Oracle-augmented index calculus stays generic}
+\section{Oracle-augmented index calculus: label-valued oracles stay generic}
 
-Several leads proposed giving index calculus an extra oracle on the group:
+Several leads proposed giving index calculus an extra oracle on the group.
+Since the split of 4~November the programme separates two classes.
 \begin{itemize}
-\item a jet or $p$-adic lift;
-\item an endomorphism;
-\item an incidence or halving test;
-\item an elliptic-net evaluation.
+\item \emph{Label-valued oracles} are Shoup-simulable with overhead
+  $\Theta(\log N)$ or $O(m)$: the endomorphism image (by an eigenvalue
+  argument; the premise $\operatorname{End}_{\FF_p}(E)=\ZZ$ of the earlier
+  derivation is false), label-valued halving, an incidence check over a
+  label factor base, and a label-valued net. They stay closed at the
+  $\sqrt r$ floor (\texttt{LEAD-EXO-augmented-oracle-ggm}; derivation
+  tier, not yet ratified).
+\item \emph{Coordinate-revealing oracles} ($x$, $y$, the full point,
+  $x$-valued halving, field-valued jet and net, the threshold oracle
+  $C_t$) are not simulable, and the generic group model gives no bound for
+  them (\texttt{KN-FIND-194294}, \texttt{KN-FIND-982fdf};
+  \texttt{LEAD-EXO-coordinate-revealing-oracles}, open;
+  \S\ref{sec:um-oracles}). The earlier jet verdict is withdrawn.
 \end{itemize}
-The programme proved, at derivation tier, that each of these is
-simulable in the generic group model, so it cannot beat
-$\sqrt r$ (\texttt{KN-FIND-002}, \texttt{KN-FIND-b7e091},
-\texttt{KN-FIND-194294}; halving is equivalent to an $x$-coordinate oracle).
 
-The minimal non-simulable order-based identifier is a threshold oracle
-$C_t$ (\texttt{KN-FIND-982fdf}). Table-based decomposition then obeys the
+Table-based decomposition obeys the
 preprocessing bound $ST^2\gtrsim N$. Balanced generic index calculus costs
 about $r^{2/3}/n^{4/3}$, consistent with the measured growth of the Koblitz
 gap to rho as $r^{0.165\,[0.117,0.213]}$
 (\texttt{LEAD-ICB-generic-table-oracle}). These are known instances of
 generic-group reasoning~\cite{cgk2018}; they are recorded because each
-retired a concrete proposal.
+retired or scoped a concrete proposal.
 
 \section{Lifting sections does not produce relations}
 
@@ -84,6 +92,19 @@ slots with no disagreement, and a parameter count reproduces $\alpha=3$
 (\texttt{LEAD-ICP-xedni-function-field-sections}, \texttt{EV-XEDN-001}).
 The scope is one family ($\deg b\le10$, $p\le31$). A dimension-count theorem
 over all section shapes would be needed to close the route in general.
+
+The classic obstruction to xedni is also conditional. A kernel-checked Lean
+audit of Jacobson, Koblitz, Silverman, Stein and Teske's analysis
+(\art{research/jksst_xedni_audit_20261101/}) does three things:
+\begin{itemize}
+\item it repairs their conditional theorem;
+\item it refutes several overbroad readings of it;
+\item it leaves open the premises it rests on: Lang's height conjecture, a
+  uniform height--discriminant comparison, and the algorithm-specific
+  bridge from a one-shot relation probability to the actual attack.
+\end{itemize}
+The audit calls the result a strong conditional asymptotic obstruction for
+classic xedni, not a proof that the route is closed.
 
 \section{Twist points carry no relations}
 

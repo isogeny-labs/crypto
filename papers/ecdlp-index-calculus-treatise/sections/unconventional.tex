@@ -1,0 +1,1180 @@
+% unconventional.tex -- Part "The frontier": three chapters on unconventional
+% routes, to sit before the distance chapter (ch:distance).
+% Labels created: ch:unconvmap, ch:tensor, ch:learning and the sec:um-*,
+% sec:tn-*, sec:ln-*, tab:um-*, tab:tn-*, tab:ln-* labels below.
+
+\chapter{A map of unconventional routes and their lower bounds}\label{ch:unconvmap}
+
+The previous chapters measured index calculus as the literature defines it:
+a factor base, a decomposition system, a solver and linear algebra, priced
+against matched rho. The programme also kept a family of leads that change
+one of those ingredients more radically: an extra oracle, a tensor network
+in place of the decomposition system, a learned component in the solver, a
+statistic that might show that a factor base is not random, a lift to
+another curve model or another field. The lead atlas files them as the
+\emph{exotic} family (\art{crypto-autoresearcher:knowledge/leads/ecdlp/exotic/}).
+This chapter maps the family, with one table of verdicts and standing, and
+then gives the lower bounds that most of the family runs into. The two
+lines with the most work behind them have their own chapters: the
+tensor-contraction route (Chapter~\ref{ch:tensor}) and the learning and
+pseudorandomness lines (Chapter~\ref{ch:learning}).
+
+Three conventions hold for all three chapters.
+\begin{itemize}
+\item \emph{Standing.} Two items in this family carry a proof-carrying
+  claim: \texttt{PCC-20261104-1df881} (the source audit of implicit tensor
+  entries) and \texttt{PCC-20261104-458dda} (the structured-predicate
+  integration report), both of standing \emph{unverified}
+  (\S\ref{sec:pt-tensor}). Every other figure is an unverified assertion of
+  the producer named by its source. Several studies name their own
+  validator or red-team report; that is recorded where it exists, but it is
+  not a proof-carrying-claim standing and none of these studies has a
+  \texttt{VALIDATION.json} gate row. No row of the index-calculus
+  leaderboard comes from this family.
+\item \emph{Costs.} No line in this family produced a counted cost of a
+  complete discrete logarithm against matched rho. Where a study gives a
+  ratio, it is a stage or structure statistic, and the pricing band of
+  \S\ref{sec:band} is not applicable. Under the iterative success criterion
+  none of the results is an improvement of the index-calculus baseline.
+\item \emph{Scope.} Most measurements are at toy size: $p\le2^{14}$ for the
+  structure instruments, $n\le17$ for the binary SAT studies, $p\le2039$ for
+  the rank experiment. A toy-size null excludes only effects large enough
+  to be seen at that size.
+\end{itemize}
+
+\section{The exotic family in the atlas}\label{sec:um-atlas}
+
+On 6 November the exotic directory held 32 lead records. Their
+dispositions, read from the YAML files on crypto-autoresearcher main, are:
+\begin{itemize}
+\item 26 \texttt{open\_next\_step};
+\item 2 \texttt{open\_blocked} (advice leakage, the idea corpus);
+\item 2 \texttt{exhausted\_at\_scale} (the crypto-size candidate screen and
+  H-PSEUDO);
+\item 1 \texttt{closed\_obstructed} (label-valued augmented oracles);
+\item 1 \texttt{closed\_dominated} (the holant decomposition-count network).
+\end{itemize}
+A disposition records what the programme does next, not whether the route
+works: most of the open leads have a named obstruction for the version
+that was tried and a narrower question left. Table~\ref{tab:um-map} lists
+(with Table~\ref{tab:um-map2}) every record with its best measured result as
+the record states it and the chapter that discusses it. The table is a map, not a ranking. Where the
+record's best result is ``none'', nothing was measured.
+
+The family overlaps with work recorded elsewhere in this treatise. The
+August oracle closures, the canonical-lift statistic and xedni lifting are
+in Chapter~\ref{ch:summer}; the transport, monodromy, oracle and lifting
+obstructions are in Chapter~\ref{ch:obstructions}; the $k$-sum tables are
+in \S\ref{sec:pg-ksum}; the external tensor preprint is reviewed in
+\S\ref{sec:pt-tensor}; the H-PSEUDO correction is in Chapter~\ref{ch:summer}
+and Table~\ref{tab:corr-xref}. Corrections specific to this family are
+collected in Table~\ref{tab:corr-exotic}.
+
+\begin{table}[tbp]
+\centering\footnotesize
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.27\linewidth}>{\raggedright\arraybackslash}p{0.12\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.1\linewidth}@{}}
+\toprule
+Lead (\texttt{LEAD-EXO-}) & Disposition & Best result recorded; obstruction & Where \\
+\midrule
+\multicolumn{4}{@{}l}{\emph{Oracles and query bounds}}\\
+\path{augmented-oracle-ggm} & closed, obstructed & label-valued and public-data oracles are Shoup-simulable; toy split saving $B/A=0.0557$ (preliminary) & \S\ref{sec:um-oracles} \\
+\path{coordinate-revealing-oracles} & open & split off 4 Nov; ``the GGM gives no bound'' for $x$, $y$, full point, $x$-halving, field-valued jet and net, $C_t$, degree-$D$ tests & \S\ref{sec:um-oracles} \\
+\path{low-degree-query-lower-bound} & open & H1 false as stated, H1$'$ proved; full rank in 39 of 39 cells, $p=251$--$2039$; no toy-size violation & \S\ref{sec:um-lowdeg} \\
+\path{low-degree-algebraic-query-bound} & open & theorem programme; none & \S\ref{sec:um-lowdeg} \\
+\path{ksum-conjecture-s5-oracle} & open & a 4-SUM oracle on $\{P:x(P)<p^{1/5}\}$ needs $n^{\lceil k/2\rceil}$ under the $k$-SUM conjecture; none measured & \S\ref{sec:um-generic} \\
+\path{four-list-ktree-join} & open & $j=2$ four-tree at exponent $0.4167$ closed for character filters, toy $N\le65539$ & \S\ref{sec:um-generic} \\
+\path{invertible-hint-subset} & open & none; Lange--Winterhof and Kiltz--Winterhof statements still to be read & \S\ref{sec:um-generic} \\
+\path{lange-winterhof-interpolation} & open & none; theorem not yet recorded & \S\ref{sec:um-generic} \\
+\path{elliptic-code-list-decoding} & open & none; counting bound $\binom BMp^{k-M-1}\ge1$, $M=\sqrt{Bk}$ & \S\ref{sec:um-generic} \\
+\path{hnp-advice-leakage} & blocked & Cheon walk exponent $0.23$ against rho's $0.50$ only when $[\alpha^i]G$ is leaked & \S\ref{sec:um-generic} \\
+\addlinespace
+\multicolumn{4}{@{}l}{\emph{Tensor networks}}\\
+\path{hashed-factor-base-tensor-ecdl} & open & none: 34 correctness tests; ECC2K-130 and ECCp-131 exceed the exact-leaf budget without a relation & Ch.~\ref{ch:tensor} \\
+\path{holant-decomposition-count-network} & closed, dominated & digit-QTT rank in $x$-labelling at the ceiling (1024 at $p=1021$), as random relabellings; NULL & \S\ref{sec:ln-instruments} \\
+\path{gag-holant-semaev-chain} & open & none & \S\ref{sec:ln-instruments} \\
+\addlinespace
+\multicolumn{4}{@{}l}{\emph{Learning}}\\
+\path{ml-learned-models} & open & learned WDSat order 16{,}097 conflicts against 3{,}092 (confounded, \S\ref{sec:ln-components}) & \S\ref{sec:ln-ceiling}--\ref{sec:ln-components} \\
+\addlinespace
+\multicolumn{4}{@{}l}{\emph{Pseudorandomness and instruments}}\\
+\path{dl-character-sum-pseudorandom} & exhausted & H-PSEUDO: $R$ consistent with 1 against a negation-closed null & Ch.~\ref{ch:summer} \\
+\path{quadratic-phase-small-x-leakage} & open & NULL at $N\approx2^{12}$--$2^{14}$ and one curve at $2^{16}$ & \S\ref{sec:ln-instruments} \\
+\path{coordinate-statistic-leakage} & open & census lowered from strong to preliminary (\texttt{CORR-20261026-c94668}) & \S\ref{sec:ln-instruments} \\
+\path{weak-class-instrument-calibration} & open & no instrument detects anomalous or small-$k$ curves; $\zeta$-stable base detected & \S\ref{sec:ln-weak} \\
+\path{methodology-instruments} & open & none; false-negative rate of the screens unmeasured & \S\ref{sec:ln-weak} \\
+\bottomrule
+\end{tabularx}
+\caption[]{The exotic lead records on 6 November, part 1 of 2. Disposition and best result as each record states them; all figures producer-reported and unverified unless the text says otherwise. Source: \art{crypto-autoresearcher:knowledge/leads/ecdlp/exotic/}, one YAML file per row (\texttt{LEAD-EXO-}\emph{row}\texttt{.yaml}).}
+\label{tab:um-map}
+\end{table}
+
+\begin{table}[tbp]
+\centering\footnotesize
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.27\linewidth}>{\raggedright\arraybackslash}p{0.12\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.1\linewidth}@{}}
+\toprule
+Lead (\texttt{LEAD-EXO-}) & Disposition & Best result recorded; obstruction & Where \\
+\midrule
+\multicolumn{4}{@{}l}{\emph{Lifts, transports, models}}\\
+\path{global-lift-height} & open & xedni exponent 3 for one family; short Mordell--Weil relations at $p\le31$, no decomposition step & Ch.~\ref{ch:obstructions} \\
+\path{padic-jet-canonical-lift} & open & digit identity exact 1360/1360 on hard lifts, whose cost is the lift & \S\ref{sec:ln-models} \\
+\path{elliptic-net-eds} & open & charged exponent $1.97$--$2.80$ against BSGS $1.17$--$1.32$ & \S\ref{sec:ln-models} \\
+\path{curve-model-representation} & open & $d_{\rm reg}=2$ for Weierstrass and Edwards at $m=2,3$ (toy) & \S\ref{sec:ln-models} \\
+\path{split-jacobian-projection} & open & none; Hasse--Weil order inflation closure & \S\ref{sec:ln-models} \\
+\path{miller-pairing-cocycle} & open & none; one unreviewed proposal & \S\ref{sec:ln-models} \\
+\path{torsor-deck-period} & open & none; deck-orbit router no-go & \S\ref{sec:ln-models} \\
+\path{lattes-xline-dynamics} & open & none; forward iterates are group operations & \S\ref{sec:ln-models} \\
+\path{lossy-object-propagation} & open & none; orbit argument and rigidity theorem & \S\ref{sec:ln-models} \\
+\addlinespace
+\multicolumn{4}{@{}l}{\emph{Screens, corpora and out of scope}}\\
+\path{cryptoscale-candidate-screen} & exhausted & thirteen batches, no admissible candidate & \S\ref{sec:um-routes} \\
+\path{ideas-corpus-algebraic-transforms} & blocked & none; 15 active registry rows lack constructors & \S\ref{sec:um-routes} \\
+\path{minors-guess-and-determine} & open & none; design reconstructed from abstracts & \S\ref{sec:um-routes} \\
+\path{quantum-ecdlp-resources} & open & reversible secp256k1 addition, $-0.124\%$ on a sample island; not classical & \S\ref{sec:ln-scope} \\
+\bottomrule
+\end{tabularx}
+\caption[]{The exotic lead records, part 2 of 2 (Table~\ref{tab:um-map} continued). Same source and standing.}
+\label{tab:um-map2}
+\end{table}
+
+\section{Routes by which an encoding can be read}\label{sec:um-routes}
+
+A sub-exponential algorithm for the ECDLP on a prime-order subgroup cannot
+be generic. Shoup's bound puts every algorithm that uses only the group law
+and equality at $\Omega(\sqrt N)$, and with $S$ bits of advice the
+preprocessing bound is $ST^2\gtrsim N$~\cite{cgk2018}. A candidate must
+therefore read the encoding: coordinates, the curve equation, the field.
+The sub-exponential desk evaluation of 1 November
+(\art{research/ecdlp_subexp_desk_20261101/README.md}) sorted the routes by
+which an encoding can be read and matched sixteen proposed mechanisms
+against the atlas with \texttt{lead\_atlas.py --match}; every one of the
+sixteen landed on an existing lead. Its route table, as recorded at atlas
+snapshot \texttt{cfc1dae2}, gives one named obstruction per route:
+\begin{itemize}
+\item an algebraic factor base of size $B$ over $\FF_p$ has description
+  degree at least $B/3$, and mean yield is $\binom{B+m-1}m/N$ for every base
+  of size $B$ (Chapter~\ref{ch:cover});
+\item Coppersmith lattices reach at most $0.3293$ per $\Sem3$ block in three
+  unknowns against a demand of $0.8889$ at $(m,w)=(4,2)$;
+\item the digit and subset-sum form uses only group operations and
+  equality, so it is generic;
+\item enumerative, pair-table and meet-in-the-middle oracles have no
+  sub-rho cell in the replicated cost model at any arity;
+\item $p$-adic lifts, jets, canonical and Teichm\"uller lifts carry no
+  additive image of order $\ell$ when $\gcd(n,p)=1$;
+\item homomorphic images in a multiplicative group factor through the
+  embedding degree;
+\item index calculus in a genus-$g$ Jacobian over $\FF_p$ costs
+  $p^{2-2/g}\ge p$ for $g\ge2$;
+\item generic cost is an isogeny-class invariant, and automorphisms give
+  $\sqrt{\abs{\mathrm{Aut}}}$.
+\end{itemize}
+The README now carries a banner: it is a historical snapshot of 154 leads,
+a later reconciliation catalogued 160, and its ``xedni is closed''
+statements are superseded by the conditional reading of
+Chapter~\ref{ch:obstructions}. The route table is otherwise unchanged.
+
+Three searches were broad screens rather than mechanisms. The crypto-size
+candidate screen (\texttt{GOAL-CRYPTO-001}) ran thirteen batches that ended
+\path{FINAL_NO_CANDIDATE} or \path{NO_ADMISSIBLE_NEXT_MECHANISM} over
+its checked source set (\texttt{EV-CRYPTO-010}..\texttt{013}); its record
+states the scale reached as ``zero-compute admission sheets; no crypto-size
+run'' and asks for a sensitivity audit showing that the screen could have
+admitted a known positive. The idea corpus has 15 active registry rows,
+each blocked on a constructor or theorem that no one supplied. The minors
+and guess-and-determine lead, which would extend the lit2026 W12
+reproduction of \S\ref{sec:prime}, has a draft design reconstructed from
+abstract pages only. None of the three produced a candidate to measure.
+
+\section{Generic and conjecture-level obstructions}\label{sec:um-generic}
+
+Five records in Table~\ref{tab:um-map} are bounded by a statement about
+generic or structureless algorithms rather than by a measurement.
+\begin{itemize}
+\item \emph{$k$-SUM.} The prime-field tier that needs a 4-SUM oracle on
+  $S_B=\{P:x(P)<p^{1/5}\}$ in time well below $\sqrt{\abs{S_B}}$ meets the
+  $k$-SUM conjecture: structureless $k$-SUM needs $n^{\lceil k/2\rceil}$. The
+  one known escape, clustered 3SUM, needs additive energy that the
+  coincidence and character-sum measurements exclude. The record's next step
+  is to write the reduction as a conditional obstruction, with the caveat
+  that $k$-SUM has near-linear linear-decision-tree complexity, so no
+  Shoup-style proof is available. The measured $k$-sum tables are in
+  \S\ref{sec:pg-ksum}.
+\item \emph{Four-list joins.} A Wagner tree on $E(\FF_p)$ needs a cheap
+  filter $h$ with $h(P+Q)=f(h(P),h(Q))$ often enough. For character filters
+  under group-law or quasigroup combining, the $j=2$ four-tree at exponent
+  $0.4167$ is closed at toy $N\le65539$
+  (\art{crypto-autoresearcher:analysis/o2-sum-compatible-filters/}); the
+  log-domain FFT scans covered 507 families and 13{,}528 combinations, with a
+  maximum of $1.10\times$ the null
+  (\art{research/ic_prime_eth_leads_20261031/SYNTHESIS.md}, proposal 8). A
+  planted log-mod-$M$ character is the Pohlig--Hellman leak, not a
+  coordinate-computable filter.
+\item \emph{Invertible hint subsets and interpolation degree.} A dense
+  subset of $E(\FF_p)$ whose membership and logarithms are both computable
+  from coordinates would beat the square-root bound by random
+  self-reduction. The Lange--Winterhof and Kiltz--Winterhof degree bounds on
+  polynomials interpolating the ECDL and ECDH maps are the expected closure,
+  but both records say the theorem statements have not been read beyond
+  their abstracts; whether they cover the statistics of
+  Chapter~\ref{ch:learning} is open.
+\item \emph{List decoding.} Using Guruswami--Sudan list decoding of elliptic
+  codes as a decomposition oracle predicts hits only when
+  $\binom BMp^{k-M-1}\ge1$ with $M=\sqrt{Bk}$, which forces $k$ of order $B$;
+  nothing was run.
+\item \emph{Advice.} The hidden-number conversion of a log-bit leak is
+  deferred until some statistic has a measured nonzero advantage. The Cheon
+  walk on leaked powers $[\alpha^i]G$ measured exponent $0.23$ against rho's
+  $0.50$ from 24 bits up, but that is a different problem (the discrete
+  logarithm with auxiliary inputs), not index calculus.
+\end{itemize}
+
+\section{Augmented oracles after the 4 November split}\label{sec:um-oracles}
+
+Chapter~\ref{ch:obstructions} records the August result that jet,
+endomorphism, incidence, halving and net oracles are simulable in the
+generic group model. A red-team review of 4 November
+(\art{crypto-autoresearcher:docs/reports/leads-round2-20261104/augmented-oracle-review.md})
+showed that the record used ``oracle'' for three kinds of object, and the
+owner split the lead into two the same day:
+\begin{itemize}
+\item \emph{label oracles} (input a label, output a label or a bit fixed by
+  group relations): endomorphism image, label-valued halving, incidence
+  check over a label factor base, label-valued net. These are Shoup-simulable
+  with overhead $\Theta(\log N)$ or $O(m)$, and stay closed in
+  \texttt{LEAD-EXO-augmented-oracle-ggm};
+\item \emph{coordinate oracles} (input a label, output field data):
+  $x$, $y$, full point, $x$-valued halving, field-valued jet and net, the
+  threshold oracle $C_t$, degree-$D$ coordinate tests. These moved to
+  \texttt{LEAD-EXO-coordinate-revealing-oracles}, whose record says ``the GGM
+  gives no bound'';
+\item \emph{public-data ``oracles''} with no instance input (factor-base
+  membership of a field element): not augmentations at all, 0 queries.
+\end{itemize}
+The key step is Lemma~3 of the holant note
+(\art{crypto-autoresearcher:docs/reports/holant-h1-ggm-lemma-20261103/README.md}):
+on every curve the $x$-oracle cannot be simulated with $o(\sqrt{N'})$ group
+queries, $N'$ the largest prime factor of $N$. Two $x$-queries give $x(G)$
+and $x(Q)$, free local brute force gives $k$ up to sign, and $O(\log N)$
+group queries fix the sign. The review's sanity check: if a full-point
+oracle were simulable with $o(\sqrt N)$ overhead, Shoup would bound concrete
+ECDLP by $\Omega(\sqrt N)$ on every curve, which Smart's attack on anomalous
+curves contradicts. The same review found the endomorphism-image argument's
+premise ``$\mathrm{End}_{\FF_p}(E)=\ZZ$'' false (Frobenius) and replaced it with
+an eigenvalue argument with the same exponent, and it read the earlier jet
+verdict ``$C=1$'' as the structured-GGM verdict withdrawn by
+\texttt{CORR-20260727-003} (Table~\ref{tab:corr-exotic}).
+
+The consequence for index calculus is the point of the split. Every
+index-calculus algorithm reads coordinates, so it is a
+coordinate-revealing algorithm, and the generic group model says nothing
+about it. What the open lead asks is whether coordinate access gives a
+\emph{time-bounded} advantage on prime-order prime-field curves, which is
+the index-calculus question itself (\texttt{KN-OPEN-001}). The only
+measured number on either side is a toy split saving: on 7--8-bit curves at
+$m=3$, an $x$-membership-filtered Semaev meet in the middle has the same
+yield as the unfiltered one in 40 of 40 cells and costs $0.0557$ of its field
+operations, recorded as preliminary and as ``not a bound''.
+
+\section{The low-degree query lower bound}\label{sec:um-lowdeg}
+
+One way to keep a lower bound while admitting coordinate access is to
+allow only low-degree tests: the solver may ask whether
+$f(\text{coordinates of }X_1,\dots,X_t)=0$ for a polynomial $f$ of total
+degree at most $D$, with $X_i=[a_i]P+[b_i]Q$. The lead's conjecture H1 was
+success probability $O(T^2/N+TD/\sqrt N)$. A desk note of 4 November
+(\art{crypto-autoresearcher:docs/reports/ecdlp-leads-desk-20261104/low-degree-desk.md},
+claims tagged proved, cited or heuristic) settled the model.
+\begin{itemize}
+\item \emph{Single-point tests do not leak} (proved): a degree-$D$ test on
+  one point is true for at most $2D$ ($3D$ with $y$) values of $k$.
+\item \emph{H1 as stated is false} (proved, given a rank condition). The
+  pulled-back function has degree up to
+  $\Delta=\sum_i(2d_{x,i}+3d_{y,i})b_i^2$ on $E$, and large $b_i$ cost only
+  $O(\log N)$ group operations. If the evaluation matrix of degree-$\le D$
+  monomials on the $N$ points $v(R)$ has full rank, one test answers
+  ``$k\in S$?'' for any $S$, and binary search finds $k$ with
+  $\lceil\log_2N\rceil$ tests; for $D=3$ this needs $t\approx(6N)^{1/3}$
+  points, so $T=O(N^{1/3}\log N)$.
+\item \emph{The restatement H1$'$ is proved}: success is at most
+  $\bigl(\binom{T_g+2}2+\sum_j(\Delta_j+t_j)+1\bigr)/N$, so sub-$\sqrt N$
+  success needs $\sum_j\Delta_j\gtrsim N$. The bound is meaningful for
+  low-degree statistics of points with small multipliers.
+\item \emph{The Kohel--Shparlinski bound does not suffice} for $t\ge2$ with
+  large multipliers: every bound in that paper scales with the degree of the
+  pulled-back function, not with $D$. The note read the paper (ANTS-IV,
+  2000) in full and records what it proves.
+\end{itemize}
+
+The rank condition was then tested exactly under a protocol frozen before
+data (\art{crypto-autoresearcher:docs/reports/lowdeg-rank-20261104/README.md},
+\texttt{LOWDEG-RANK-20261104}). With random multipliers, full rank held in
+39 of 39 decisive cells at $p=251$, $509$, $1021$ and $2039$, once the
+monomial count was about twice the number of candidates; the
+random-point null was full rank and the shift control stayed within its
+Riemann--Roch bound $3Dt+1$. Small multipliers $b_i=1..t$ failed in exactly
+the three cells with $\sum b_i^2\approx0.34$--$0.41N$, as H1$'$ predicts. The
+report's validator re-ranked 8 cells exactly, confirmed the verdict, and
+corrected the protocol's own reading: at the tested points the attack spends
+about 180--490 group operations, more than $\sqrt N$ (32--45), so \emph{no
+toy-size violation of H1's query bound is shown}. By the validator's
+accounting the attack would beat $\sqrt N/D$ only for $D\ge3$ and $N$ from
+about $2^{28}$ ($D=5$) to $2^{48}$ ($D=3$), and never for $D=2$, which rests on
+full rank persisting at $t\sim N^{1/D}$, untested.
+
+The attack is not a cost. Building the test takes about $N^\omega$ local
+field operations, and a test that answers ``$k\in S$?'' for $\abs S\approx N/2$
+needs a polynomial with about $N/2$ monomials, so a plain logarithm table
+dominates it. The next step on the lead is a bound that charges the test's
+description length or local work, which, the desk note observes, would be a
+complexity conjecture rather than a generic-model theorem. For index
+calculus the lesson is the same as in \S\ref{sec:um-oracles}: once local work
+on coordinates is free, query bounds stop constraining what a factor base
+can be.
+
+\section{The lit2026 W3 audit against generic bounds}\label{sec:um-w3}
+
+The third bound is a check of the programme's own records against three
+recent generic lower bounds (\art{research/lit2026_w3_ggm_audit_20261011/README.md},
+workstream W3 of the lit2026 programme, 11 October; the other workstreams
+are in \S\ref{sec:prime}). The three papers are:
+\begin{itemize}
+\item the structured generic-group model (SGGM) of Corrigan-Gibbs, Henzinger
+  and Wu (ePrint 2026/384): an algorithm that exploits structure on a
+  $\delta$ fraction of the group needs $\Omega(\min(\sqrt q,1/\delta))$ group
+  operations;
+\item the non-adaptive preprocessing bound of Dinur, Keller and Marmor
+  (arXiv 2505.00894): success at most $3T^2/N+4\ln2\cdot ST/N$, so
+  non-adaptive algorithms below $T=\sqrt N$ need $ST\gtrsim N$;
+\item the multi-instance bound of Akshima, Kiltz, Nishaburi, Nooripoor and
+  Wiedijk (ePrint 2026/2253), read in abstract only.
+\end{itemize}
+The study maps an $m$-term decomposition oracle over a factor base $F$ onto
+the SGGM's partial operation $\star$, so that the constrained labels are $F$
+and its $j$-sums, $j\le m$, and
+$\delta\le c\sum_{j=1}^m\binom{\abs F+j-1}j/r$, with $c$ the cofactor (loose) or
+1. That mapping is the study's derivation, not a theorem of the paper, and
+the elliptic-curve section of 2026/384 could not be extracted from the copy
+that was read (a stated gap).
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}Xrrrr@{}}
+\toprule
+Family & Rows & $\delta_{\rm upper}<1$ & min measured / bound & below a bound \\
+\midrule
+prime (Table B) & 72 & 48 & 38.9 & 0 \\
+random binary (Table B) & 35 & 23 & 56.8 & 0 \\
+Koblitz round 5 ($n\le41$) & 72 & 13 & 355 & 0 \\
+Koblitz one target (Table A) & 6 & 1 & $2.84\cdot10^6$ & 0 \\
+Koblitz 32-target batch (Table C) & 9 & 1 & $7.99\cdot10^4$ & 0 \\
+Koblitz compact orbit $n37$--$n83$ (probes) & 14 & 0 & 1077 & 0 \\
+\midrule
+All & 208 & 86 & & 0 \\
+\bottomrule
+\end{tabularx}
+\caption[]{The lit2026 W3 audit: 208 index-calculus and precompute
+configurations against the SGGM bound. Producer-reported, from committed
+records, isolation L0; the compact-orbit rows are in probes, not group
+operations. Source: \art{research/lit2026_w3_ggm_audit_20261011/README.md},
+Results \S1.}
+\label{tab:um-w3}
+\end{table}
+
+Table~\ref{tab:um-w3} gives the result. No configuration is below any
+bound, for $\min(\sqrt{r/A},1/\delta)$, for the explicit constant of the
+paper's Theorem~3.2 at $\varepsilon=1/2$, or for the uniform-landing
+$\delta$. The closest row,
+\texttt{icv1-fp14-tm43-158b6914/mitm\_m2\_negfold\_walk\_balanced}, is
+$38.9\times$ above its bound, and the balanced $m=2$ prime rows at 10--18
+bits are $39$--$52\times$ above. The informative number is the other one:
+\emph{122 of 208 rows have $\delta_{\rm upper}=1$}. Their factor base's
+$m$-sums cover the subgroup, so the bound is 1 and certifies nothing; this
+covers every compact-orbit rung and every Koblitz $m=3$ row with $c=h$. For
+those configurations the whole cost is in \emph{finding} a decomposition,
+which the SGGM treats as a free evaluation of $\star$. The SGGM therefore
+splits the programme's configurations into sparse ones, which it bounds and
+which all sit $39\times$ or more above the bound, and dense ones, which it
+cannot see. Thirteen rows show relations per trial above the counting
+ceiling, up to $1.2\times$; none is significant at the Bonferroni level
+(smallest $p=0.0087$), so the study reads them as noise, not as an
+accounting bug.
+
+The other two papers place the table arms. Every non-adaptive table arm in
+the repository sits on $ST\approx N/A$: the multiplier-closure arms at
+$0.739$--$1.432$ (canonical entries times $T$ over $r/A$, 27 arms) and the
+compact-orbit target extraction at $1.053$--$2.734$. Dinur--Keller--Marmor
+say that is the floor for the class. Batch rho follows the
+$\sqrt{kq}$ multi-instance baseline: fitted slopes $0.521$--$0.585$ with
+every bootstrap interval covering the Kuhn--Struik finite-$k$ slope
+$0.533$--$0.539$, on 744 plus 744 verified fresh logarithms. The audit also
+found three record problems (an $n=61$ subgroup size recorded as
+$\log_2r=47.5407$ instead of $47.2109$; excluded precompute defined
+differently by rung; two frozen targets at $n71$ and $n73$ about
+$0.0065$--$0.0075\times$ as expensive as the rank-stage mean, each a
+$P\approx0.006$--$0.007$ event); they are reported, not edited.
+
+\section{What the bounds leave}\label{sec:um-reading}
+
+The three bounds agree. Generic and query models bound the label side of
+an algorithm and are silent on the side index calculus works on: free
+local work with coordinates. The SGGM is vacuous on the dense
+configurations that carry the cost, the augmented-oracle split moves every
+coordinate oracle outside Shoup's model, and the low-degree bound holds
+only for small multipliers, because free local interpolation breaks it
+otherwise. None of the three is evidence for or against index calculus
+below rho; each says where a lower bound would have to charge local work
+to say anything. The open leads in Table~\ref{tab:um-map} are, in effect,
+attempts either to find such a charge or to find local work that a charge
+would not cover. The next chapter is the attempt with the strongest claim
+behind it.
+
+% ---------------------------------------------------------------------------
+
+\chapter{The tensor-contraction route}\label{ch:tensor}
+
+\S\ref{sec:pt-tensor} reviews the external claim in brief: the preprint of
+Akshima and coauthors, \emph{A Subexponential Time Algorithm for Elliptic
+Curve Discrete Logarithm}, version~0.2 (Bochum/MPI, pinned at
+\texttt{1ee44e56}), claims prime-field ECDLP in
+$2^{O(b/(\log b)^{1/4})}$, $b=\lceil\log_2p\rceil$, by hashed factor bases and
+exact Boolean tensor contraction. This chapter gives the full account of
+what the programme built and learned on that route: the dependence on the
+external theorem, the prototype and the native implementation, the
+challenge attempts, the twelve prime-field leads and their refutations,
+and the finite-size situation. The summary is one sentence. \emph{Nothing
+on this route has a counted cost: no relation was found on ECC2K-130 or
+ECCp-131, no exponent moved, and the route's sub-exponential claim is
+conditional on an external result that is unverified.}
+
+\section{What the claim rests on}\label{sec:tn-conditional}
+
+The Bochum preprint's Theorem~4 is conditional on its Theorem~2, which
+invokes Theorem~D.1 of the OpenAI preprint \emph{The Exponential Time
+Hypothesis is False} (17 October 2026, revised 25 October; pinned at
+\texttt{openai/math} \texttt{7ef5c0cc}). D.1 contracts an $s$-edge
+bipartite Boolean tensor network, with degree at most $\lceil s^{9/10}\rceil$
+and vertex tensors evaluated as black boxes, in
+$(s+L)^{O(1)}2^{O(s/\sqrt{\log s})}$ time and polynomial space
+(\art{research/ic_prime_eth_leads_20261031/LEADS.md} \S1).
+
+\paragraph{The external result is unverified.} The programme did not
+verify D.1, and as of the sources read here no one had. The lead note of 31
+October records, from the public discussion it consulted, that no bug had
+been reported, that independent experts were examining the proof, that the
+Lean development in \texttt{openai/math} proves a weaker rate
+($n(\log\log n)^2/\sqrt{\log n}$) and does not contain Theorem~D.1, and that
+nobody had machine-checked that the formal statements match the paper; its
+status line is ``claimed, under examination, no reported bug''. The
+atlas's literature note on the preprint is tagged
+\texttt{unverified-proof} and states its proof status as ``not checked here''
+(\art{crypto-autoresearcher:knowledge/literature/KN-LIT-caa51d.md}). The two
+in-session readings of D.1 and the D.4 recurrence described in
+\S\ref{sec:pt-tensor} found no concrete gap; they are scoped readings, not a
+certification. Every statement in this chapter about the asymptotic
+behaviour of the route therefore inherits that condition, and a reader
+should treat the route's sub-exponential bound as conditional on an
+unverified theorem.
+
+\paragraph{Where D.1 stops being inert.} D.1's exponential term depends on
+the edge count only: vertices are black boxes, so a linear or low-rank
+vertex gets no discount, and edges are bits, so a $p$-ary digit network
+would need a $p$-adic analogue the paper does not supply
+(\art{research/ic_prime_eth_leads_20261031/LEADS.md} \S1, facts 1--3). The
+recursion's admission condition $u_0=\lambda/2^{17}\ge\lambda^{4/5}$ needs
+$\lambda\ge2^{85}$, that is $s\ge2^{2^{85}}$ edges at depth 0 (derived by a
+delegated audit; the Bochum paper quotes the weaker $2^{2^{17}}$). Below
+that threshold the algorithm is brute force over the network. The native
+implementation states the same fact in its own constants: the admission
+scale $u=\lfloor\lceil\log_2s\rceil/131072\rfloor$ is zero for every
+practically addressable network, so the code always selects the
+manuscript's finite-size fallback (\art{docs/hashed-ecdl.md}).
+
+\section{The prototype}\label{sec:tn-prototype}
+
+The first build (\art{research/btn_ecdl_20261029/README.md}, 29 October) was
+a Python prototype of the relation-finding step on the Koblitz curve
+$y^2+xy=x^3+1$, with a plain bucket-elimination contractor standing in for
+the claimed algorithm. Its findings, all local and seeded:
+\begin{itemize}
+\item over $\FF_{2^5}$ the network count of ordered pairs
+  $A_1+A_2=R$ equals brute force (42 and 40 on two targets);
+\item over $\FF_{2^7}$ the count is 112 against a brute-force 112, but plain
+  elimination needs tables of $2^{34}$ entries (min-fill width 34, against
+  23 at $n=5$), so the count conditions on the 7 bits of $x_1$ and takes
+  336\,s; dropping the curve-membership predicate on $P_2$ as redundant
+  gives 237 instead of 112, a recorded error;
+\item a complete $m=2$ index calculus over $\FF_{2^5}$ ($r=11$, $N=16$) found
+  17 relations and recovered the planted logarithm; one contraction took
+  about 340\,s;
+\item on the ECC2K-130 field the addition network with two
+  curve-membership predicates has 105{,}062 variables, 104{,}801 predicates
+  and 524{,}008 edges; a witness from reference arithmetic satisfies all
+  predicates and a one-bit flip violates one. Factor-base predicates are
+  omitted at that size. This is an encoding check, not an attack.
+\end{itemize}
+The lead note reads the widths as $2^{5n}$, five times the enumeration
+exponent. The README lists what the prototype does not show: the multiplier
+chain has $O(n^2)$ edges, the paper's $O(n)$ Fourier multiplier does not carry
+over to $\FF_2[x]$ without a characteristic-2 variant, and the GPU
+contractor was never run on a GPU.
+
+\section{The native implementation and the challenge attempts}\label{sec:tn-native}
+
+The Rust implementation of the complete algorithm, with the D.4 recursive
+backend, is in \path{crates/hashed-ecdl-tensor} and mirrored in the
+cryptanalysis repository (\art{docs/hashed-ecdl.md}). Its correctness
+record is in \S\ref{sec:pt-tensor} (34 release tests, forced recursive and
+direct controls, a tiny complete relation pipeline). Table~\ref{tab:tn-native}
+lists the engineering studies that followed and what each did and did not
+establish.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.26\linewidth}X@{}}
+\toprule
+Study & Recorded result \\
+\midrule
+ECCp-131 input validation, 29 Oct & public parameters as runner input; 27 regression tests pass; the challenge command exits with \texttt{resource limit: AKS multiplicative order} before graph or relation search \\
+Exact primality and functional witness, 30 Oct & AKS kept above \texttt{u64}, Pocklington proof nodes verified; ECCp-131 validation at 5{,}589 charged diagnostic steps; 34 tests; matched performance evaluation blocked \\
+Checked hash prime, 30 Oct & a user-reported 54-minute set-up hang traced to the AKS branch above \texttt{u64}, not to Fourier-network construction; attribution corrected \\
+Primality fast paths, 30 Oct & thirteen strong witnesses below $3317044064679887385961981$, bounded Pocklington; original ECCp-131 input validates in 17{,}471 charged steps; 74 package tests; the challenge network constructs with 1{,}684{,}796 edges, 249{,}620 vertices, degree 1{,}032, 526 interface bits \\
+CPU oracle panels, 30 Oct & two matched panels of 120 executions, byte-identical certificates; median $45.99\to3.90$\,ms ($p=65521$, $m=3$, $\tau=80$) and $80.54\to4.12$\,ms ($m=4$, $\tau=64$); L0 on one EKS VM; the oracle is enumeration with cached MITM tables, not contraction \\
+Counts-only protocol, 31 Oct & v2 supersedes v1, withdrawn before data; isolation forced from L2 to L0 because rho solves under 1\,ms grade L1; no session has run \\
+Entry-cost audit, 4 Nov & \texttt{PCC-20261104-1df881}, unverified: D.1 permits an exponential entry-work allowance; maps target-row budgets to entry traversal \\
+\bottomrule
+\end{tabularx}
+\caption[]{Engineering on the native hashed-ECDL implementation. All
+charged-step counts are uncalibrated admission diagnostics, not costs.
+Producer-reported. Sources: \art{docs/hashed-ecdl-eccp131-validation.md};
+\art{research/hashed_ecdl_speed_20261029/};
+\art{research/hashed_ecdl_hash_prime_20261030/};
+\art{research/hashed_ecdl_primality_fast_paths_20261030/};
+\art{research/hashed_ecdl_cpu_20261030/};
+\art{research/hashed_ecdl_counts_20261031/};
+\art{research/hashed_ecdl_entry_cost_20261104/}.}
+\label{tab:tn-native}
+\end{table}
+
+\paragraph{No relation on either challenge.} Two attempts at the published
+challenges stopped at resource limits. The ECCp-131 network compiles to
+1{,}564{,}506 edges, 654{,}523 variables and degree 1{,}032 in the Python
+companion, which reaches its default $u_0=0$ exact-leaf budget without a
+witness; the native command first stopped in prime certification, and after
+the primality fixes constructs the network but has not produced a
+relation. The ECC2K-130 network has 2{,}694{,}680 edges and also exceeds the
+exact-leaf budget without a relation. The atlas records the state as
+``ECC2K-130 and ECCp-131 attempts exceed their exact-leaf budget without a
+relation; no runtime, $S$ or $S$/rho figure''
+(\art{crypto-autoresearcher:knowledge/leads/ecdlp/exotic/LEAD-EXO-hashed-factor-base-tensor-ecdl.yaml};
+\art{docs/hashed-ecdl.md}). The validation receipt states that the budget
+failures ``do not prove nonexistence, a practical speedup, or a theorem
+obstruction''. Both challenge scalars remain unresolved, and the
+independent correctness and complexity audit of the backend is the open
+problem \art{problems/hashed-ecdl-tensor-backend.md}.
+
+\paragraph{The speed panels are not tensor measurements.} The CPU panels of
+Table~\ref{tab:tn-native} are the one place on this route with matched
+timings. Their $11.8$--$19.6\times$ median gain at $p=65521$ is the cached
+meet-in-the-middle oracle against the original enumeration oracle, on
+three public known-answer fixtures; the README states that the panels do not
+establish a matched-rho advantage or ``the paper's conditional tensor
+contraction hypothesis''. The larger-field feasibility ladder expired at its
+scheduling deadline with no rows. The Rust port of the Go prototype and its
+ecbench arm \texttt{ic.tensor\_contraction\_v1} are described in
+\S\ref{sec:pt-tensor}; that arm has not been run.
+
+\section{Black-box balance}\label{sec:tn-balance}
+
+The lead note of 31 October
+(\art{research/ic_prime_eth_leads_20261031/LEADS.md} \S\S2, 4) puts the
+route in the cost model of the rest of this treatise. Let $s=b/m$ be the
+window, $\abs F=2^s$ and $2^{es}$ the per-attempt decomposition cost. Three
+statements follow, with Lean receipts in \texttt{lean/IcTensorRoute.lean}
+(standard axioms, no \texttt{sorry}) that cover the cost-model arithmetic
+only.
+\begin{itemize}
+\item \emph{Ladder rule.} The relation phase $m!\,p^{(1+e)/m}$ is below
+  $p^{1/2}$ iff $e<m/2-1$, the gate of \S\ref{sec:pg-gate}.
+\item \emph{Solver-saving floor.} An encoding has at least $b$ interface
+  bits; a Boolean solver costing $2^{n_{\rm eff}(1-\delta)}$ meets the
+  per-attempt budget only if $\delta\ge1/2+1/m$. Tensor contraction under
+  D.1 gives $\delta=1/\sqrt{\log s}$, far below.
+\item \emph{Black-box balance.} Letting $m$ grow trades the $1/m$ of the
+  budget against the $m$ of the edge count; under the cost model
+  $E(m)=b/m+cmb/g$ with $g=\sqrt{\log_2b}$, the optimum is
+  $m\approx(\log b)^{1/4}$, and a route below rho needs $g>16c$, that is
+  $\log_2b>256c^2$, with $c$ the unspecified constant in D.1.
+\end{itemize}
+The note adds a concrete size: at $b=256$ the balance gives $m=2$, and the
+linear algebra alone costs $r^{3/2}\approx2^{384}$ against rho's $2^{128}$;
+beating rho on linear algebra needs $m>6$, which the balance reaches only
+for $b$ above about $2^{1296}$ (derived). The remaining levers it names are an
+improvement of the contractor's exponent on these particular networks, the
+open problem \art{problems/correlated-packet-common-kernel.md}, relation
+networks with $o(mb)$ edges, and structure that lets a solver skip a
+constant fraction of the interface.
+
+\section{Twelve prime-field leads and their refutations}\label{sec:tn-leads}
+
+The same note proposed twelve measurable leads, L01--L12, each with a
+decision rule. They were evaluated on 31 October and reviewed by two
+adversarial skeptics per lead; the skeptic digest is authoritative on
+standing, and the synthesis reconciles the two
+(\art{research/ic_prime_eth_leads_20261031/SYNTHESIS.md};
+\art{research/ic_prime_eth_leads_20261031/leads/SKEPTIC_DIGEST.md}). The raw lead
+directories are on an external volume, and nothing in the synthesis was
+re-run. This section is the full account: it gives the standing per lead,
+what the leads measured and why six were refuted as stated;
+\S\ref{sec:pa-sat} summarises it for the prime-field chapter. The verdict of the synthesis is quoted: ``Nothing
+moved the exponent question for prime-field ECDLP index calculus. Every
+result is a constant, a known negative, or an unfinished harness.''
+
+The errata of 2 November list the standing after review
+(\art{research/ic_prime_eth_leads_20261031/LEADS.md} \S9): L03, L07 and L11
+narrow, constant only; L04 and L09 contested and partial; \emph{L01, L05,
+L06, L08, L10 and L12 refuted as stated}; L02 not run. For L05 the skeptic
+digest is more precise: what is refuted is the lead's claim to be
+\emph{closed} (``refuted as closed'', both skeptics); the harness and its
+numbers stand.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.17\linewidth}XX@{}}
+\toprule
+Lead & As proposed or first read & After skeptic review \\
+\midrule
+L01 char-2 gadget & a Sch\"onhage-type gadget for $\FF_{2^n}$; evaluator verdict ``undecided'' because $\ell=7$ was censored & three finished $\ell=7$ runs give slope about $2.58$ bits of conflicts per window bit (reopen bar: CI below $2.5$; ladder bar $0.5$); the early ratio fall fits a constant padding floor of about 11k conflicts; CPU $3\times$ worse at $\ell=7$; only 4 of 11 products use the gadget \\
+L05 policy pilot & closed after a pilot of an LLM policy-search harness & refuted as closed: renaming is a null experiment by construction in kissat; the ladder held $b=8$ and varied $\ell$, not $e$ against $s$; 3 curves; the hooked CaDiCaL engine was never built; label ``harness built, renaming null recorded, policy question untested'' \\
+L06 contraction width & closed: tree-decomposition width loses to enumeration & measured on a Python structural model, not a graph dump; dense gate-graph treewidth is the wrong proxy for D.4; the transform-word cut was effectively not run; surviving claim: plain tree-decomposition DP on the school CNF loses at $b\le16$ (lower bound 15--51 against 2--10.7) \\
+L08 Koblitz transfer & char-2 gadget no worse than the integer one, margin $3.42\times$ & that compared a freed binary gadget with an unfreed integer one; the skeptic's freed 133-bit integer multiplier has 14{,}618 edges instead of 37{,}030, so the margin is about $1.4\times$; hand bound $80d+228\sqrt d$ fails at $d=46$; supported bound about $175d$ for $d\le5000$ \\
+L10 Lean filings & ``done; file as known results'' & seven gaps between the lead text and the Lean statements, all confirmed: the cost model is an unproved hypothesis, \texttt{no\_crossover} needs $c\ge1$, the interface bound is an injectivity count; not fileable as drafted \\
+L12 clause retention & incremental solving amortises learned clauses, $1/R=40\times$ at $m=2$, $b=12$ & the retained solver fills an $\abs F^{m-1}$ table whose set-up is never charged against the explicit enumeration reference; fresh baseline censored at $m=3$; target lists 48\% duplicated; class retained set-up/advice, closed \\
+\bottomrule
+\end{tabularx}
+\caption[]{The six leads refuted as stated. Producer-reported, from the
+skeptic reconciliation; no lead has a validation record. Source:
+\art{research/ic_prime_eth_leads_20261031/SYNTHESIS.md} \S3;
+\art{research/ic_prime_eth_leads_20261031/LEADS.md} \S9.}
+\label{tab:tn-refuted}
+\end{table}
+
+Table~\ref{tab:tn-refuted} gives the six refutations. The other five run
+leads carry numbers that are worth keeping as harness constants.
+\begin{itemize}
+\item \emph{L03, sparse-parity bases.} Every hashed base (Bochum's affine
+  hash, dense, sparse weight 3, 5, 7, biregular, window) matches a
+  size-matched null to a paired ratio $1.000\pm0.0003$ at $p\approx2^{14}$ to
+  $2^{22}$, $m=2,3$. Weight 3 loses about 10\% at $m=3$ from empty or
+  heavy-tailed bases. This restates the conservation of
+  Chapter~\ref{ch:cover}: a size-matched null makes pairwise-independent
+  hashes match by construction.
+\item \emph{L04, backdoor census.} The offset $(m-1)s-B^*$ saturates at
+  $2\log_2(\mathrm{cap})-1$ (1, 3, 5 for caps 2, 4, 8) at $m=3$, $s=4..7$: the
+  enumeration has moved inside the propagator. The supportable sentence is
+  ``no sub-$(m-1)s$ strong backdoor under cap-bounded window-branching
+  propagation at $s\le7$''.
+\item \emph{L07, second moment.} Hashed bases are $1.000\pm0.005$ of the
+  null; a shared negation-closed $x$-window gives $0.713/0.833/0.916$ at
+  $m=4$, the symmetric-base mechanism already known.
+\item \emph{L09, census tool.} Over 34 encodings the margin to D.1
+  admission is $-16.11$ to $-16.33$ bits of $\log_2\lambda$; with D.1's
+  constant set to 1, $s/\sqrt{\log_2s}$ is $37\times$ to $41{,}000\times$ the
+  enumeration exponent.
+\item \emph{L11, multiplier encodings.} Propagation-complete against school
+  multiplication: paired ratio $0.78$ $[0.67,0.92]$ at $b=9$ only, $1.15\times$
+  worse at $b=6$, untested at $b\ge12$.
+\end{itemize}
+The synthesis also records feasibility: $m=3$ prime SAT is censored above
+$b\approx12$ in every lead that tried it, so only the $b=6$ and $b=9$ diagonal
+cells are uncensored, and its closing recommendation is that the SAT and
+propagation lane for prime fields ``should be closed for exponent
+purposes'', with one item untested (a CaDiCaL external propagator with
+$\FF_p$ Gaussian elimination).
+
+\section{Corrected sentences of the lead note}\label{sec:tn-corrections}
+
+The lead note is left unchanged so that its original claims stay auditable;
+its \S9 lists eight corrections and says that where the text conflicts,
+the errata win. Three of the corrected sentences concern the route itself.
+\begin{itemize}
+\item \emph{``The Bochum route can never beat rho on any curve anyone will
+  deploy, whatever D.1's constant is''} is wrong as stated. Lean proves
+  $g>16c$; the figure of more than $2^{256}$ bits needs $c\ge1$, an outside
+  assumption on an unspecified $O(\cdot)$; the general threshold is
+  $\log_2b>256c^2$.
+\item \emph{``By the paper's own gadget counts the network is at least
+  $\sim10^5b$ edges per point addition''} is $9$--$30\times$ high. Measured:
+  3{,}364 edges per slot-bit for the freed binary network, $1.17\cdot10^4$ for
+  the unfreed prototype, and 11.9k edges per bit for the $m=2$ prime network
+  at $b=131$. The exponent argument is unaffected.
+\item \emph{The clustering loophole} (merging vertices to reduce $s$ below
+  the admission threshold) is closed: no row is D.1-admitted, hidden
+  interface bits cost $2^h$ entry evaluations, $s_{\rm eff}\ge(h/A)^{1.11}$,
+  and the $b<2^{36}$ closure is specific to $m=3$ ($b<2^{16}$ at $m=4$); $m\ge4$
+  is closed by \texttt{no\_crossover}, not by the floor. The derivation, with
+  heuristic steps labelled, is in \texttt{notes/clustering\_closure.md}.
+\end{itemize}
+The other five corrections are the L10 Lean overclaims, path errors, the
+ladder feasibility limit, the L08 hand bound and the L08 margin; the last is
+in Table~\ref{tab:tn-refuted}. The atlas carries the same corrections
+(Table~\ref{tab:corr-exotic}). The skeptics refuted all nine follow-up proposals as proposed, in
+one sentence each, and kept six cheap residues of them as harness constants;
+none touches an exponent.
+
+\section{Finite size}\label{sec:tn-finite}
+
+The finite-size review of 30 October
+(\art{research/hashed_ecdl_finite_size_20261030/README.md}) asked whether
+the hashed relation language can be useful below the recursion's onset. It
+argues that the onset is a guard in one algorithm, not a lower bound for
+solving these particular networks, and proposes five search strategies
+(listed in \S\ref{sec:pt-tensor}); nothing was implemented or measured
+under it. Its fourth route, replacing the global recursion schedule with
+checked local plans, is the closest to lowering the same recursion's onset
+and, in the review's words, ``has the largest proof gap''. The state
+assessment of the same day
+(\art{research/hashed_ecdl_leads_20261030/README.md}) put the priorities as
+an independent validation of the general contraction route and a
+complete-cost evaluation of the finite algorithms already delivered; it
+records the finite hashed track as implemented and development-tested
+(selectors, last-slot derivation, width and cut-set plans, partial
+relations, binary components) with ``no admitted matched full-cost panel or
+evidence of an exponent improvement''. The elimination campaign of
+1 November and the rank-census design are in \S\ref{sec:pt-tensor}.
+
+\section{What the route has and has not shown}\label{sec:tn-reading}
+
+The route is the only claimed sub-exponential algorithm for prime-field
+ECDLP that the programme examined in detail, and it is external. What the
+programme established is:
+\begin{itemize}
+\item an independent native implementation of the complete algorithm,
+  checked on small curves, with an exact contraction and certificate
+  replay;
+\item that the literal constants select brute force on every network that
+  can be written down, and that both published challenges exceed the exact
+  budget without a relation;
+\item that under the lead note's cost model black-box use of D.1 needs
+  $\log_2b>256c^2$ to cross rho, with Lean receipts for the arithmetic;
+\item twelve leads whose measured outcomes are constants or known
+  negatives, six of them refuted as first stated.
+\end{itemize}
+What it has not established is any counted cost, any exponent, or the
+correctness of D.1. The route does not move a row of any table in this
+treatise. It remains open in the atlas with two next steps: the independent
+audit of correctness and complexity, and the frozen 84-case comparison
+panel, which is blocked on checkpoint transport and native execution access.
+If D.1 were withdrawn, the route's asymptotic claim would go with it and the
+implementation would remain an exact enumerator with a tensor interface.
+
+% ---------------------------------------------------------------------------
+
+\chapter{Learning, pseudorandomness and curve models}\label{ch:learning}
+
+This chapter collects three kinds of unconventional work that share one
+methodological lesson: an instrument that sees nothing excludes only what
+it could have seen. The first is learning inside the decomposition oracle,
+where a preregistered study measured the most a learned component could gain
+and found the gain unreachable. The second is a set of tests of whether
+the factor base looks random in discrete-logarithm order, and a calibration
+that showed which known-weak curves those tests can and cannot see. The
+third is the remainder of the lifts, transports and curve models not
+already in Chapter~\ref{ch:obstructions}.
+
+\section{The ceiling for a learned decomposition oracle}\label{sec:ln-ceiling}
+
+Chapter~\ref{sec:binary} records that SAT, SMT and WDSat are enumerators on
+binary point decomposition. A study of 27 October
+(\art{research/pdp_ml_sat_ceiling_20261027/README.md}; protocol frozen at
+\texttt{8a85584fd} with one amendment before any result) asked the question
+a learned component would have to answer before anyone builds a graph
+network or an RL branching policy: how much could any learned component
+gain inside a SAT point-decomposition oracle, and does any cheap signal
+reach it? The setting is the symmetrised $\Sem4$ at $m=3$, a native
+CDCL$+$XOR solver, the curves of the Trimoska corpus~\cite{trimoska2020} and
+uniform targets, in two families: $n=15$, $\ell=5$ (3{,}000 targets) and $n=17$,
+$\ell=6$ (1{,}200 targets). Cost is in solver conflicts. Three levers were
+tested: triage (finish only the solves that score high), a fixed conflict
+cutoff, and branching order.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}Xll@{}}
+\toprule
+Quantity & $n15\ell5$ & $n17\ell6$ \\
+\midrule
+UNSAT conflicts, median [IQR] & 5781 [5738, 5819] & 45649 [45539, 45781] \\
+conflicts per sorted factor-base triple & 0.963 & 0.998 \\
+perfect-predictor ceiling, relations per conflict & 5.21--9.01$\times$ & 5.75--6.69$\times$ \\
+test AUC, all feature groups & 0.485--0.556 & 0.461--0.513 \\
+permuted-label AUC & 0.478--0.540 & 0.449--0.517 \\
+positive-control AUC (label flipped w.p.\ 0.25) & 0.747, 0.785 & 0.717, 0.725 \\
+fixed-cutoff test gain & 0.93, 1.05 & 0.91, 0.98 \\
+learned-activity branching order, conflicts / default & $\ge10.03$ & $\ge10.00$ \\
+\bottomrule
+\end{tabularx}
+\caption[]{The ML-aided SAT ceiling for point decomposition (symmetrised
+$\Sem4$, $m=3$, binary toy families). Ranges are over the two splits and
+four feature groups. Producer-reported; toy stage diagnostic, no
+validation record. Source:
+\art{research/pdp_ml_sat_ceiling_20261027/README.md}.}
+\label{tab:ln-ceiling}
+\end{table}
+
+Table~\ref{tab:ln-ceiling} gives the numbers. All 4{,}200 labels agree with
+exhaustive sorted-triple search. A refutation costs about one conflict per
+sorted factor-base triple, and every refutation lands within 4.1\% of its
+family median, so the solver is an enumerator. The prize is real: a perfect
+UNSAT predictor, charged its telemetry conflicts, would raise relations per
+conflict by $5.2$--$9.0\times$. Nothing reaches it. Test AUC sits within the
+noise of $0.5$ for every feature group (bits of $x_r$, their pairwise
+products, solver telemetry after 64 or 512 conflicts), on both families and
+both splits; the positive control at $0.72$--$0.79$ shows that the learner
+works. The one interval excluding $0.5$, telemetry at 512 conflicts on
+$n15\ell5$ at $0.556$ $[0.518,0.599]$, includes the ``decided within 512
+conflicts'' flag and gains $0.99\times$. Train-fitted gains of up to $4.7\times$
+fall to about $1\times$ held out, and telemetry trained at $n=15$ scores $0.50$ and
+$0.52$ at $n=17$. A cutoff gains nothing because a witness found early is no
+more likely than one found late. Default VSIDS is at the floor: an order
+learned from VSIDS activity on training refutations is at least $10\times$
+worse on every held-out target, because the variables that take part in
+conflicts are not the ones worth deciding on.
+
+The study closed under its preregistered rule (no lever reached $1.5\times$
+with a lower bound above $1.2\times$ on both families; the largest held-out
+lower bound was $0.92$). Its prediction P4, that every branching arm would
+stay within $0.7$--$1.4\times$ of the default, failed. The reading for index
+calculus is the product law the README states: even a perfect classifier is
+capped by relations $\times$ targets $\times$ oracle $\approx m\cdot2^n$, so it removes
+a constant from the oracle (measured here at $5$--$9\times$) and cannot change
+the exponent. The run also found and fixed a soundness bug in the native
+solver: resuming after a budget stop answered wrongly in both directions;
+an audit found no published artefact that re-solved without a reset.
+
+\section{The ML dataset campaign}\label{sec:ln-dataset}
+
+From 28 October to 1 November the programme built a native
+\texttt{crypto dataset} generator and custody pipeline for a corpus on
+which to train models of ECDLP and point-decomposition behaviour: Koblitz,
+ordinary binary and prime curves with paired twists, arities $m=2$ to 15, bit
+sizes 23--31 and 47--61, multiple generators and keys, and every supported
+native method (\art{docs/ml-dataset/DESIGN.md}; more than forty
+\texttt{research/ml\_dataset\_*} directories). The design's planning
+arithmetic is 2{,}016 parameter cells and, at 16 curve seeds, 8 generators
+and 64 keys, 16{,}515{,}072 tasks per backend configuration; the stratified
+design keeps 165{,}150{,}720 method cells at full width. These are planned
+cells, not data.
+
+\paragraph{Scope.} The campaign inventory of 1 November
+(\art{research/ml_dataset_campaign_inventory_20261101/README.md}) records
+124 selected terminal method cells in seven cohorts, under different
+protocols, seeds, methods and caps, and states that the count ``is a
+coverage inventory, not a pooled estimate or a training set''. Its labels are
+mostly method completion, bounded candidate counts and censored statuses.
+Examples: Koblitz $n=23$, $m=3$--15, 26 cells with 4 finite-domain negatives
+and 22 timeouts; Koblitz $n=47$, $m=4$, 16 verified method artifacts;
+$p=2^{61}-1$, $m=2$, 2 verified enumerations and 2 root timeouts; $n=26$--31,
+$m=2$, 36 cells, 35 known-answer-replayed. A separate 252-cell compatibility
+matrix is development-only. The one model study
+(\art{research/ecdlp_dataset_models_20261102/REPORT.typ}) is a development
+pilot that by its own protocol may not select a winner or estimate
+generalisation: 960 cells, 819 training rows, and an arm that nearly fixes the
+label (\texttt{enumerate} completes on all 240 rows and recovers the scalar
+on none; \texttt{bsgs} solves 237 of 240). Only the double-large-prime arm
+shows signal, a Brier score of $0.050$ against $0.192$ for the majority
+baseline, which the permutation control removes ($0.168$). It ran in the
+session container, not through the experiment route.
+
+\paragraph{Relevance to index calculus.} The campaign has no model result,
+and it bears on index calculus only through the ceiling of
+\S\ref{sec:ln-ceiling}: a learned predictor of decomposition success can at
+best remove the constant measured there. What it does contribute is a label
+discipline that the rest of this treatise also follows
+(\art{docs/ml-dataset/DESIGN.md}, ``Scientific labels''):
+\begin{itemize}
+\item target creation by $Q=[k]G$ is not an independently solved ECDLP, and a
+  verified decomposition is not an ECDLP solve;
+\item the first degree drop in one algorithm's trace is not the first fall
+  degree, and the maximum degree visited is a solving-degree observation, not
+  the last fall degree (Chapter~\ref{ch:falldegree});
+\item censored outcomes (timeouts, budget exhaustion, unsupported cells) are
+  kept, not dropped;
+\item splits group all keys and generators on one curve, both twists,
+  isomorphic and isogenous models and Frobenius-equivalent tasks into one
+  component; random row splits are inadmissible.
+\end{itemize}
+
+\section{Other learned components}\label{sec:ln-components}
+
+Four smaller studies tested learned components directly; none improved on
+its incumbent.
+\begin{itemize}
+\item \emph{Learned WDSat branching}
+  (\art{cryptanalysis:experiments/ideas_learning_20261018/REPORT.md}, item
+  8). 88 solver calls with upstream WDSat \texttt{61c6ff3f}: on eight held-out
+  targets the paper default with symmetry took 3{,}092 conflicts, and the
+  block, interleaved, random and learned static orders without symmetry took
+  16{,}097, 16{,}785, 16{,}676 and 16{,}097. The learned policy selected the
+  ordinary ascending order, so it \emph{is} the block arm. The
+  $16{,}097$-against-$3{,}092$ gap is the symmetry switch, which the controls
+  disable because the upstream symmetry code interprets fixed positions in
+  the order; it is not a learned-policy effect
+  (Table~\ref{tab:corr-exotic}). The atlas still quotes the comparison as
+  ``the only learned-branching negative''; read correctly, it shows that the
+  learned order did not improve the ordinary order.
+\item \emph{Learned pivot selection and program search}
+  (\art{research/ideas_execution_20261018/EXECUTION.md}, items 9--10). A
+  native learned F4 pivot selector returned the constant minimum-weight
+  rule. A restricted search over group-law query kernels re-selected the
+  incumbent pair-hash kernel; both took 820 counted units on the held-out
+  curve.
+\item \emph{Learned prefilter} (item 11). On 7{,}254 exact subgroup
+  targets in 27 cells, the one-class prefilter rejected genuine
+  decompositions and was disabled.
+\item \emph{Degree surrogate} (item 12). Fitted to 1{,}718 archived
+  degree-profile cells, the curve-held-out surrogate has degree MAE $0.10041$,
+  but with three calibration curves the honest 90\% group-conformal interval
+  is unbounded, so it cannot price a future run.
+\end{itemize}
+A reinforcement-learning pair selector for Buchberger's algorithm
+(\art{research/gbrl/PAPER.md}, undated, a paper-style self-report with no
+frozen protocol or ecbench record) reports $-5.5\%$ S-polynomial steps on
+cyclic-6 and, on held-out Semaev $m=2$ systems, $-3.9\%$ steps with $+5.4\%$
+arithmetic operations; at $m=3$ it fails to generalise to a factor base of
+size 6 (496 steps against sugar's 459). It works in Buchberger only, not F4.
+The L05 pilot of Chapter~\ref{ch:tensor} closed LLM policy search on variable
+renaming. The atlas's next step for the whole learning lead is a
+learnability control: predict a log bit from coordinates with a planted
+homomorphic leak as positive control and a random-relabelling null, at $N$
+up to $2^{24}$.
+
+\section{Pseudorandomness tests}\label{sec:ln-instruments}
+
+The question behind this line is whether a natural factor base, ordered by
+discrete logarithm, looks like a random set. Any detectable structure would
+be a lever: a relation yield above the counting heuristic, or a statistic
+that leaks log bits. The linear-phase test, H-PSEUDO, is told in
+Chapter~\ref{ch:summer}, with its 4 November correction: the small-$x$ base
+is negation-closed and the original null was not, and against a
+negation-closed null $R$ is consistent with 1 (Table~\ref{tab:corr-xref}).
+Three further instruments followed, each under a protocol frozen before
+data.
+\begin{itemize}
+\item \emph{Quadratic phases} (QUADPHASE,
+  \art{crypto-autoresearcher:docs/reports/quadphase-20261104/README.md}). The
+  statistic is the maximum over $(\alpha,\beta)$ of
+  $\abs{\sum_{l\in S}e((\alpha l^2+\beta l)/N)}/\sqrt{\abs S}$ for the logs $S$ of the
+  first 512 points in $(x,y)$ order, against 40 negation-closed random sets
+  per curve. Verdict NULL: 9 of 9 decisive curves at $N\approx2^{12}$--$2^{14}$
+  inside the null's band ($u$ from $0.125$ to $0.85$); planted control
+  $3.8$--$5.2\times$ the null maximum at the planted $\alpha_0$; A/A difference at
+  most $2.3\%$ pooled. An independent validation recomputed all 385 rows with
+  an FFT-free implementation to within $7\cdot10^{-15}$. The validator's probe
+  says the test detects coherent single-phase leakage of about $0.3$ of the
+  set or more; weaker or multi-peak structure is untested. One descriptive
+  curve at $2^{16}$ sat above all 5 of its null draws; a rerun against 40 draws
+  (\art{crypto-autoresearcher:docs/reports/quadphase-2p16-20261104/README.md})
+  put it at the median, $u=0.50$ (null mean $4.750$, s.d.\ $0.229$, maximum
+  $5.581$).
+\item \emph{Digit-level tensor structure} (HOLANT-STEPB-QTT,
+  \art{crypto-autoresearcher:docs/reports/holant-step-b-qtt-20261104/README.md}).
+  The holant lead asked whether a basis change on the $\FF_p$ bond alphabet
+  makes the decomposition-count network cheap. Flattening and CP ranks are
+  invariant under invertible bond-wise maps (checked at $p=61$), so the test
+  was reformulated as the quantised tensor-train rank of the transfer matrix
+  $M$ under binary digit splitting. NULL: from $L=8$ the natural
+  $x$-labelling and the random relabellings both sit at the rank ceiling
+  $2^L$ (1024 at $p=1021$), while the discrete-log labelling, the positive
+  control, has rank 109--121. A low score on one anomalous curve at $p=61$
+  was followed up on 63 anomalous and 63 ordinary curves at $37\le p\le127$
+  (\art{crypto-autoresearcher:docs/reports/anomalous-qtt-20261104/README.md}):
+  NULL, permutation $p=0.831$, the anomalous curves slightly above the
+  ordinary ones.
+\item \emph{Coordinate statistics.} The census that found every structured
+  additive statistic $\mathrm{PGL}_2$-unstable and every stable multiplicative
+  coset statistic at the random level (\texttt{EV-ECDLP-81f4d4}) was lowered
+  from strong to preliminary by \texttt{CORR-20261026-c94668}
+  (Table~\ref{tab:corr-structure}). The record's next step is the one
+  natural family the census never measured, digit characters.
+\end{itemize}
+Together with H-PSEUDO, these say that at toy size the small-$x$ factor base
+in log order looks like a random negation-closed set under linear and
+coherent quadratic phases and under digit-level tensor rank. They say it
+only for structure of each statistic's type, and the next section shows how
+narrow that is.
+
+\section{Calibration against known-weak curves}\label{sec:ln-weak}
+
+The weak-class calibration of 4 November
+(\art{crypto-autoresearcher:docs/reports/weakclass-20261104/README.md},
+WEAKCLASS-20261104) asked whether these instruments see curves whose
+discrete logarithm is \emph{known} to be easy: anomalous curves ($n=p$,
+Smart's attack), small embedding degree ($\mathrm{ord}_n(p)=3$--6, MOV), and
+$j=0$ curves with a factor base of whole $\zeta$-orbits, each with a paired
+ordinary curve over the same prime, with $p$ of 10, 12 and 14 bits and 3
+weak curves per class per size. A cell
+detects only if all 3 class curves fall beyond the null's 5--95\% band in the
+same direction at two sizes and the paired ordinary curves do not.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}Xlll@{}}
+\toprule
+Instrument and run & anomalous & small $k$ & $j=0$, $\zeta$-stable base \\
+\midrule
+I1 character sum, WEAKCLASS & invalid ($\bar u=0.61$) & invalid ($0.41$) & invalid ($0.12$) \\
+I1 rerun, calibrated A/A & blind ($0.46$) & blind ($0.44$) & blind ($0.28$) \\
+I1, 36 curves per class & not detected ($0.483$, $p=0.86$) & not detected ($0.476$, $p=0.82$) & detected ($0.233$, $p<10^{-5}$) \\
+I2 $m=2$ sumset yield & blind ($0.56$) & blind ($0.44$) & blind ($0.64$) \\
+I3 QTT rank, $p\approx2^{10}$ & blind ($0.36$) & blind ($0.44$) & blind ($0.60$) \\
+\bottomrule
+\end{tabularx}
+\caption[]{Which instrument sees which known-weak class. Entries are the
+verdict and mean percentile $\bar u$ within the instrument's own null. All
+producer-reported; the third row's study names an independent validation
+that replayed all 324 rows. Sources:
+\art{crypto-autoresearcher:docs/reports/weakclass-20261104/README.md};
+\art{crypto-autoresearcher:docs/reports/weakclass-i1-20261104/README.md};
+\art{crypto-autoresearcher:docs/reports/paired-anomaly-20261104/README.md}.}
+\label{tab:ln-weak}
+\end{table}
+
+Table~\ref{tab:ln-weak} gives the outcome. I2 and I3 are blind to all three
+classes while their positive controls sit at $u=0.00$ on every curve, so the
+instruments work and simply do not see Smart- or MOV-weak curves. I1 came out
+\emph{invalid} in the first run: its preregistered A/A gate required even and
+odd null means to agree within 5\% on every curve, while with 20$+$20 draws the
+sampling error alone is about 2\%, and 5 of 54 curves exceeded it. The study
+attributes the fault to the gate, not the instrument
+(Table~\ref{tab:corr-structure}). The rerun
+(\art{crypto-autoresearcher:docs/reports/weakclass-i1-20261104/README.md})
+used 200 null draws per curve in two streams compared by a KS test (7 curves
+rejected against an allowance of 14) and found I1 valid and blind to all
+three classes. It also found a post-hoc anomaly: the paired ordinary curves
+sat low (mean $u=0.276$, KS $p=1.4\cdot10^{-4}$), which put the pairing baseline in
+doubt. A preregistered replication
+(\art{crypto-autoresearcher:docs/reports/paired-anomaly-20261104/README.md},
+108 paired and 108 independent curves) did not replicate it (Mann--Whitney
+$z=0.45$, $p=0.65$), and with 36 curves per class it gave the one detection
+in the table: the $\zeta$-stable factor base of the $j=0$ class sits low at every
+size (mean $u=0.233$, $z=-4.79$). The study explains why: a log set closed under
+multiplication by the eigenvalue $\lambda$ has fewer independent frequencies,
+so its character-sum maximum is lower. That reflects how the factor base was
+built, not how easy the discrete logarithm is.
+
+The consequence is a scope note on every null above. With 36 curves per class
+at $p\le2^{14}$, I1 shows no detected shift for anomalous or small-embedding-degree
+curves, with a minimum detectable shift of about $0.13$ in $u$ at 50\% power;
+I2 and I3 are blind at 3 curves per class, I3 only at $p\approx2^{10}$ where it is
+rank-saturated. So the instruments that found the small-$x$ base random in log
+order would also have found it random on curves where the discrete logarithm
+is polynomial-time or sub-exponential. A NULL from them excludes structure of
+the statistic's own type and says nothing about whether a curve's discrete
+logarithm is easy. The methodology lead's next step, injecting planted
+signals into the real pipeline to measure each screen's false-negative rate,
+has not run.
+
+\section{Lifts, transports and curve models}\label{sec:ln-models}
+
+Chapter~\ref{ch:obstructions} records the transport, lifting and twist
+obstructions, and its xedni section is now read as conditional; the atlas
+reopened the global-lift leads accordingly, with short Mordell--Weil
+relations found on function-field surfaces at $p\le31$ but no decomposition
+step. The remaining lift and model records are short.
+\begin{itemize}
+\item \emph{$p$-adic jets and canonical lifts.} For $\gcd(n,p)=1$ every additive
+  order-$\ell$ image of a jet or formal-group target is zero (an independently
+  verified scoped gate). The digit identity $d(m\hat S)=m\,d(\hat S)$ holds exactly,
+  1360 of 1360, but only on the hard global lift, whose cost is the lift itself;
+  the computable Teichm\"uller contrast reads as chance, and a valuation profile
+  collapses to the $\pm$ fibre indicator (\texttt{KN-FIND-85845f},
+  \texttt{KN-FIND-e8cfdc}, \texttt{KN-FIND-1ba0fe}). The September statistic is in
+  Chapter~\ref{ch:summer}.
+\item \emph{Elliptic nets.} Somos identities hold for every $k$, so net
+  relations encode the group law on one fibre and not $k$. On toy primes
+  $p\in\{101,431,1601\}$ the Somos sieve's charged $k$-recovery exponent is
+  $1.97$--$2.80$ against BSGS's $1.17$--$1.32$ at identical accounting, and the
+  sieve-to-BSGS operation ratio grows from about $24\times$ to $135\times$
+  (\texttt{EV-NET-001}, preliminary).
+\item \emph{Curve models.} Model-native solving degree is the same for
+  Weierstrass Semaev and twisted Edwards systems, $d_{\rm reg}=2$ at $m=2$ and 3,
+  with Edwards a constant factor larger (\path{EV-REP-001},
+  \path{EV-REP-002}, replicated, toy). The EcGFp5 representation audit and
+  its correction \texttt{CORR-20261102-7e3a91} are in \S\ref{sec:pt-gfp5}.
+\item \emph{Split Jacobians.} Embedding $E$ as a Poincar\'e factor of a genus-2
+  Jacobian cannot beat rho on the elliptic factor because the Hasse--Weil order
+  inflation of the ambient Jacobian outweighs the genus-2 index-calculus saving
+  (\texttt{KN-FIND-61347e}); the projected-smoothness counting gate finds no
+  route with $\lambda,\mu\le0.45$.
+\item \emph{Torsors and deck orbits.} For a generically Galois cover every
+  rational deck invariant factors through the quotient, and a connected
+  nontrivial cover has no rational section, so a target-compatible selector is
+  a missing section (independently verified scoped gate).
+\item \emph{Miller cocycles.} When $\gcd(N,p-1)=1$ the $N$-th root of a Miller
+  function is a canonical primitive computable from the point; whether it
+  exposes $k$ cheaply is an unreviewed proposal with no measurement.
+\item \emph{Latt\`es dynamics.} Every forward iterate on the $x$-line is a group
+  operation, so forward dynamics is generic, and orbit quotients give
+  $\sqrt{\abs{\mathrm{Aut}}}$ for units and nothing for non-units; two accumulator
+  closures are recorded (\texttt{EV-ECDLP-0c0f51}, \texttt{EV-ECDLP-a8af77}).
+\item \emph{Lossy tracked objects.} An orbit argument shows that no lossy
+  object propagates deterministically under the full translation action, a
+  rigidity theorem covers single-point objects, and the one measurement, at
+  $\FF_{17}$, is mixed (\texttt{EV-ECDLP-ce9b50}).
+\end{itemize}
+Each record is in its YAML file under
+\art{crypto-autoresearcher:knowledge/leads/ecdlp/exotic/}; none has a cost
+against rho.
+
+\section{Out of scope}\label{sec:ln-scope}
+
+Two lines of work in the same repositories are not classical ECDLP index
+calculus and are excluded from this treatise's accounting.
+\begin{itemize}
+\item \emph{Quantum resources.} The reversible secp256k1 point-addition
+  circuit for Shor's algorithm records a best score of 2{,}490{,}847{,}962
+  (average Toffoli count 1{,}736{,}993 times 1{,}434 qubits), $-0.124\%$ against
+  its head, valid on a 9{,}024-shot sample island only
+  (\art{crypto-autoresearcher:knowledge/leads/ecdlp/exotic/LEAD-EXO-quantum-ecdlp-resources.yaml}).
+  It is a resource estimate for a quantum attack, not a classical cost.
+\item \emph{Eigen-S\'eta} is an isogeny-based public-key encryption scheme
+  (\art{research/eigen_seta_assessment_20261017/REPORT.md} and related
+  directories), not an ECDLP method; its corrections are listed in
+  Table~\ref{tab:corr-exotic} for completeness. The neural distinguishers on
+  Speck and AES (\art{research/neural_distinguishers_20261102/}) are symmetric
+  cryptanalysis.
+\end{itemize}
+
+\section{What the three chapters settle}\label{sec:ln-reading}
+
+None of the unconventional routes produced a counted cost of a discrete
+logarithm, so none changes the distance to rho of Chapter~\ref{ch:distance}.
+What they settle is narrower and mostly methodological.
+\begin{itemize}
+\item Generic and query bounds do not constrain index calculus, because
+  they leave local work with coordinates free: the SGGM is vacuous on 122 of
+  208 configurations, every coordinate oracle is outside Shoup's model, and
+  the low-degree bound holds only for small multipliers
+  (Chapter~\ref{ch:unconvmap}).
+\item The tensor route rests on an unverified external theorem, is brute
+  force at every realisable size, and found no relation on ECC2K-130 or
+  ECCp-131; six of its twelve prime-field leads were refuted as stated and
+  none moved an exponent (Chapter~\ref{ch:tensor}).
+\item A perfect learned predictor would buy $5$--$9\times$ in a SAT
+  decomposition oracle at toy size and nothing in the exponent; no feature
+  tested reaches it (\S\ref{sec:ln-ceiling}).
+\item The pseudorandomness instruments find the small-$x$ base random in log
+  order at toy size, and they are blind to anomalous and small-embedding-degree
+  curves; the only class they detect is a factor base built with a symmetry
+  (\S\ref{sec:ln-weak}).
+\end{itemize}
+The corrections these chapters state are: the learned-WDSat comparison is
+confounded with the symmetry switch; the I1 instrument was invalid in its
+first run because of a miscalibrated A/A gate; the paired-curve anomaly did
+not replicate; L01, L05, L06, L08, L10 and L12 were refuted as stated; three
+sentences of the tensor lead note were corrected; the hashed-ECDL set-up hang
+was misattributed; and the low-degree protocol's own reading of a toy-size
+pass was narrowed by its validator. The open items are the independent audit
+of the tensor backend and D.1, a counted cost for any tensor arm, a lower
+bound that charges local work, the learnability control with a planted leak,
+and the false-negative rate of the structure screens.

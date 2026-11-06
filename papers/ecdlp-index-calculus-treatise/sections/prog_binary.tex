@@ -64,10 +64,13 @@ projected degree-5 cost (\art{research/dreg_hybrid_guess_20261024/}).
 
 \paragraph{What the measurements price.} Applied to ECC2K-130's $m=4$ row,
 the closure results contradict the degree-4 floor ($+7.62$ bits over rho)
-and leave degree 5 as the optimistic case, $+10.32$ bits at $w=1$ and
-$+45.71$ at $w=2$; the hybrid gives $+8.43$ bits if the number of guesses
-stays flat in $\ell$ and $+58.27$ if it grows linearly, which only a run at
-$\ell=8$ can separate (\S\ref{sec:ladder3}). The $m=4$ cost slope on this
+and leave degree 5 as the optimistic case, $+10.32$ bits with the closure
+exponent $\omega_c=1$ and $+45.71$ with $\omega_c=2$ (column touches per
+Macaulay column, not the \S5a band weight); the hybrid gives $+8.43$ bits if
+the number of guesses stays flat in $\ell$ and $+58.27$ if it grows
+linearly (\S\ref{sec:ladder3}). The $m=3$, $\ell=8$ runs since made bound the
+count at 4 but do not measure it at $m=4$, so the range stands
+(\S\ref{sec:bd-guess}). The $m=4$ cost slope on this
 engine is $0.985$--$1.060$ bits per unit of $n$ against the $0.25$ an exponent
 lead would need, and a symmetrised refutation degree rises about one per
 unit of $\ell$ (\art{research/ic_m4_exponent_audit_20260928/},
@@ -110,8 +113,12 @@ Weil-descended summation systems grows with $\ell$ and stays within one of
 the semi-regular prediction, while the first and last fall degrees stay
 at 3--4. That is the behaviour of a generic system, and it supports no
 subexponential claim. It does not refute one: the sizes are small, the
-closure algorithms bend the curve by a degree or two, and the $(4,6)$ and
-$\ell=8$ cells that would decide the $m=4$ question have not run. The PKM
+closure algorithms bend the curve by a degree or two, and the $m=4$
+question is still open. The $(m,\ell)=(4,6)$ cell has since run and refutes
+at degree 4 on 2 of 2 unsatisfiable draws
+(\art{research/dreg_closure_m4l6_20261018/}). At $\ell=8$, only $m=3$ has
+run, with guessed variables (\S\ref{sec:ladder3}). The $m=4$, $\ell=8$
+cell has not run. The PKM
 analogue over prime fields (\S\ref{sec:prime}) is in the same state.
 
 \section{Decomposition oracles}
@@ -200,7 +207,11 @@ on all 9 cells and stays off (\art{research/pdp_shape_replay_20261015/}).
 autolab cycles built a native norm predicate over GF$(2^{83})$: a cutoff-8
 circuit cuts AND gates $60.5\%$ and clauses $32.9\%$, an affine support limit
 of 2 cuts internal coordinates from $58{,}176$ to $45{,}427$, and 1{,}237 of
-1{,}800 positive-dimensional cells were certified empty. Every hard search
+1{,}800 positive-dimensional cells were certified empty. Those certificates
+predate the 24 October field-table correction (\S\ref{sec:bo-n83}); its list
+of voided engines does not name the norm predicate, and whether the
+certificates used the truncated table is not recorded, so the empty cells
+are unconfirmed. Every hard search
 returned \textsc{unknown} with zero verified witnesses, and a primary-source
 check found the hybrid ANF/CNF approach already established in Bosphorus,
 SMFF and PolyBoRi (\art{research/autolab_cycle_20261019_v1/},
