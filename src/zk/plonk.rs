@@ -468,7 +468,11 @@ pub fn verify(circuit: &Circuit, proof: &PlonkProof) -> bool {
 
 /// Verify a [`PlonkProof`] against the circuit and public inputs:
 /// [`check`] accepts.
-pub fn verify_with_public(circuit: &Circuit, public_inputs: &[BigUint], proof: &PlonkProof) -> bool {
+pub fn verify_with_public(
+    circuit: &Circuit,
+    public_inputs: &[BigUint],
+    proof: &PlonkProof,
+) -> bool {
     check(circuit, public_inputs, proof).is_ok()
 }
 
@@ -1029,12 +1033,16 @@ mod tests {
         assert!(verify(&circuit, &prove(&circuit, &witness)));
     }
 
-    /// S2N-10 (SHF-20261028-0f3f64): each sent evaluation is checked
-    /// against its polynomial.  Shifting one by 1 is rejected; so is the
-    /// finding's forgery, which shifts one and solves another (`Z(ζω)`,
-    /// or `c(ζ)` when `Z(ζω)` is the one shifted) so the identity at ζ
-    /// still holds.  Control: the forged identity residual is zero, so
-    /// the identity check alone (the old verifier) accepts it.
+    /// S2N-10 (SHF-20261028-0f3f64): tampered evaluations of an honest
+    /// proof are rejected.  Shifting one by 1 is rejected; so is a
+    /// forgery that shifts one and solves another (`Z(ζω)`, or `c(ζ)`
+    /// when `Z(ζω)` is the one shifted) so the identity at ζ still holds.
+    /// Control: the forged identity residual is zero, so the identity
+    /// check alone (the old verifier) accepts it.  Each forgery moves two
+    /// evaluations, so this test shows only that the four comparisons
+    /// together reject; it does not show that each one is checked.
+    /// `each_evaluation_comparison_rejects_alone` isolates them
+    /// (SHF-20261106-a114e7, ZKX-2 and claim ZKX-C12).
     #[test]
     fn rejects_tampered_evaluations() {
         for (circuit, witness) in [toy_circuit(), copy_circuit()] {
@@ -1048,7 +1056,10 @@ mod tests {
                 let j = if i == 3 { 2 } else { 3 };
                 solve_eval(&circuit, &mut p, j).expect("non-zero slope");
                 assert_eq!(*evals(&mut p)[i], shifted);
-                assert!(identity_residual(&circuit, &[], &p).is_zero(), "control {i}");
+                assert!(
+                    identity_residual(&circuit, &[], &p).is_zero(),
+                    "control {i}"
+                );
                 assert!(!verify(&circuit, &p), "forged eval {i}");
             }
         }
@@ -1093,7 +1104,10 @@ mod tests {
                     );
                 }
                 assert_ne!(*evals(&mut p)[j], evals(&mut honest.clone())[j].clone());
-                assert!(identity_residual(&circuit, &[], &p).is_zero(), "control {j}");
+                assert!(
+                    identity_residual(&circuit, &[], &p).is_zero(),
+                    "control {j}"
+                );
                 assert_eq!(check(&circuit, &[], &p), Err(*want), "eval {j}");
             }
         }
@@ -1139,14 +1153,20 @@ mod tests {
     fn unbound_check(circuit: &Circuit, public: &[BigUint], proof: &PlonkProof) -> bool {
         let ch = unbound_challenges(proof);
         let p = opened_at(circuit.n, proof, &ch.3);
-        let evals_ok = (p.a_zeta.clone(), p.b_zeta.clone(), p.c_zeta.clone(), p.z_zeta_omega.clone())
-            == (
-                proof.a_zeta.clone(),
-                proof.b_zeta.clone(),
-                proof.c_zeta.clone(),
-                proof.z_zeta_omega.clone(),
-            );
-        statement_ok(circuit, public) && evals_ok && residual_at(circuit, public, proof, &ch).is_zero()
+        let evals_ok = (
+            p.a_zeta.clone(),
+            p.b_zeta.clone(),
+            p.c_zeta.clone(),
+            p.z_zeta_omega.clone(),
+        ) == (
+            proof.a_zeta.clone(),
+            proof.b_zeta.clone(),
+            proof.c_zeta.clone(),
+            proof.z_zeta_omega.clone(),
+        );
+        statement_ok(circuit, public)
+            && evals_ok
+            && residual_at(circuit, public, proof, &ch).is_zero()
     }
 
     /// An honest proof whose `t` is shifted by 1, with its evaluations
@@ -1212,7 +1232,10 @@ mod tests {
         let r = [scalar_modulus()];
         assert_eq!(check(&circuit, &r, &proof), Err(PlonkReject::Statement));
         let too_many = vec![BigUint::zero(); circuit.n + 1];
-        assert_eq!(check(&circuit, &too_many, &proof), Err(PlonkReject::Statement));
+        assert_eq!(
+            check(&circuit, &too_many, &proof),
+            Err(PlonkReject::Statement)
+        );
     }
 
     /// ZKX-3 (SHF-20261106-a114e7): swapped public inputs.  A proof made
@@ -1234,7 +1257,10 @@ mod tests {
         assert_ne!(x, BigUint::from(12345u32));
         let forged = [x];
         assert!(residual_at(&circuit, &forged, &p, &ch).is_zero(), "control");
-        assert!(unbound_check(&circuit, &forged, &p), "control: pre-fix accepts");
+        assert!(
+            unbound_check(&circuit, &forged, &p),
+            "control: pre-fix accepts"
+        );
         assert!(!circuit.is_satisfied_with_public(&forged, &witness));
         assert_eq!(check(&circuit, &forged, &p), Err(PlonkReject::EvalA));
         let q = reopened(&circuit, &forged, &p);
@@ -1269,10 +1295,7 @@ mod tests {
         assert_eq!(check(&swapped, &x0, &p), Err(PlonkReject::EvalA));
         let q = reopened(&swapped, &x0, &p);
         assert_eq!(check(&swapped, &x0, &q), Err(PlonkReject::Identity));
-        assert_ne!(
-            challenges(&swapped, &x0, &p),
-            challenges(&circuit, &x0, &p)
-        );
+        assert_ne!(challenges(&swapped, &x0, &p), challenges(&circuit, &x0, &p));
         // Every statement field moves the transcript.
         let mut c = circuit.clone();
         c.permutation.swap(4, 5);
@@ -1313,7 +1336,16 @@ mod tests {
         t.append_poly("z", &z_poly);
         let alpha = t.challenge("alpha");
         let (t_poly, rem) = compute_quotient(
-            &circuit, &[], &h, &p.a_poly, &p.b_poly, &p.c_poly, &z_poly, &beta, &gamma, &alpha,
+            &circuit,
+            &[],
+            &h,
+            &p.a_poly,
+            &p.b_poly,
+            &p.c_poly,
+            &z_poly,
+            &beta,
+            &gamma,
+            &alpha,
         );
         assert!(!rem.coeffs.is_empty(), "L₁·(Z − 1) leaves a remainder");
         p.z_poly = z_poly;

@@ -1663,7 +1663,10 @@ mod tests {
                 k.skip_degree_adjust = true;
             });
             let p = prove_with(&air, &c, &unadjusted).unwrap();
-            assert!(fri_final_layer_constant(&p), "control: bound < n alone passes");
+            assert!(
+                fri_final_layer_constant(&p),
+                "control: bound < n alone passes"
+            );
             assert_eq!(check(&air, &c, &p), Err(Reject::Deep));
         }
     }
@@ -1694,13 +1697,13 @@ mod tests {
         assert_eq!(p.fri.layer_roots.len(), honest.fri.layer_roots.len());
         assert!(fri_final_layer_constant(&p) && !fri_final_layer_constant(&honest));
         assert_eq!(p.fri.final_constant, big(0));
-        assert_eq!(
-            check(&fa, &cfg, &p),
-            Err(Reject::Fri(FriReject::FoldLayer))
-        );
+        assert_eq!(check(&fa, &cfg, &p), Err(Reject::Fri(FriReject::FoldLayer)));
         let air = two_boundary_air();
         let p = prove_with(&air, &cfg, &knobs(|k| k.fri_shift_layer1 = true)).unwrap();
-        assert!(fri_final_layer_constant(&p), "control: final layer untouched");
+        assert!(
+            fri_final_layer_constant(&p),
+            "control: final layer untouched"
+        );
         assert_eq!(
             check(&air, &cfg, &p),
             Err(Reject::Fri(FriReject::FoldLayer))
@@ -1733,16 +1736,11 @@ mod tests {
         assert_eq!(p.fri.layer_roots[..folds], honest.fri.layer_roots[..folds]);
         assert!(fri_final_layer_constant(&p) && !fri_final_layer_constant(&honest));
         let last = p.fri.layers.last().unwrap();
-        let constant_root = MerkleTree::from_leaves(
-            &last.iter().map(reduced_bytes).collect::<Vec<_>>(),
-        )
-        .root();
+        let constant_root =
+            MerkleTree::from_leaves(&last.iter().map(reduced_bytes).collect::<Vec<_>>()).root();
         assert_eq!(p.fri.layer_roots[folds], constant_root);
         assert_eq!(p.fri.final_constant, last[0]);
-        assert_eq!(
-            check(&fa, &cfg, &p),
-            Err(Reject::Fri(FriReject::FoldFinal))
-        );
+        assert_eq!(check(&fa, &cfg, &p), Err(Reject::Fri(FriReject::FoldFinal)));
         assert!(!verify(&fa, &cfg, &p));
     }
 
