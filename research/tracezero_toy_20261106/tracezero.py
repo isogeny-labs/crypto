@@ -215,6 +215,7 @@ def random_subspace(F, d, rnd):
             return sorted(span)
 
 
+SYM = bool(int(os.environ.get("TZ_SYM", "0")))
 SUB = 3  # A2: small factor-base size for the unsaturated arm
 _F = {}
 
@@ -235,8 +236,16 @@ def work(job):
         V1 = random_subspace(F, d, rnd)
         n0, t0 = lifts_trace(F, curve, V0, a, b)
         n1, t1 = lifts_trace(F, curve, V1, a, b)
-        r0 = [rnd.randrange(curve.n) for _ in range(n0)]
-        h0 = [rnd.choice(H) for _ in range(n0)] if H else None
+        if SYM:  # A4: null draws come in +-pairs, like lifts (Q, -Q)
+            r0 = [rnd.randrange(curve.n) for _ in range(n0 // 2)]
+            r0 += [curve.neg[i] for i in r0]
+            h0 = None
+            if H:
+                h0 = [rnd.choice(H) for _ in range(n0 // 2)]
+                h0 += [curve.neg[i] for i in h0]
+        else:
+            r0 = [rnd.randrange(curve.n) for _ in range(n0)]
+            h0 = [rnd.choice(H) for _ in range(n0)] if H else None
         for name, dr in (("trace", t0), ("aa", t1), ("rand", r0), ("pos", h0)):
             if dr is None:
                 continue

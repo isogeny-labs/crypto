@@ -108,3 +108,13 @@ The first launch hung: p = 11 and 13 have only 110 and 156 non-singular (a, b), 
 than the 200 curves registered, and the curve sampler looped. No row was written. For
 those primes all non-singular (a, b) are used. Both primes are below the p ≥ 17 pooling
 threshold, so no decision statistic is affected.
+
+## Amendment A4 (2026-11-06, POST HOC, after the registered run)
+
+The registered run (A1–A3; `summary.json`, rows SHA-256 pinned there) gave "no structure
+detected" under the decision rule (2 of 4 cells moved, both d = 1, both negative). But the
+d = 1 cells show a small significant shortfall of the trace arm (Δ|S| ≈ −0.16, Δcov_2 ≈
+−0.027, interval excluding 0). The null has a defect: lifts come in ±Q pairs, so trace draws
+are sign-symmetric, while the random null draws independent points. A symmetric-pair null
+(draw n/2 points and their negatives) is run as a **post hoc secondary** (`TZ_SYM=1`,
+`summary_symnull.json`). It does not replace the registered verdict.
