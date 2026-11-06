@@ -35,7 +35,13 @@ proof-carrying-claims rule; the census README marks its numbers
 \texttt{[pcc:unverified]}. The Lean results are stated with their exact
 formal status in \S\ref{sec:hd-lean}: ``kernel-checked'' is used only where
 a Lean kernel accepted the declaration and its source contains no
-\texttt{sorry}, \texttt{admit}, \texttt{native\_decide} or user axiom. The
+\texttt{sorry}, \texttt{admit}, \texttt{native\_decide} or user axiom. For the
+4~November project (\path{ecdlp_weakness_lean_20261104}), whose theorems
+carry that label in their headers below (Theorems~\ref{thm:hd-subspace},
+\ref{thm:hd-leftkernel} and~\ref{thm:hd-hazard}), the kernel that accepted
+them is the producer's local \texttt{lake env lean -o} compile: no
+proof-gate run is recorded, so there ``kernel-checked'' means
+\emph{producer's compile; no gate run recorded}. The
 corpus records every internal theorem here as
 \texttt{proved\_internal\_unreviewed}: no external reviewer has read the
 statements against the literature they address. Nothing in this chapter
@@ -328,8 +334,9 @@ systems over $\FF_{2^n}$. Assumption~1 (\S4.5) asserts $d_{F4}\le4$ for any
 subspace of dimension $k=\lceil n/m\rceil$ and any $2\le t\le m$, supported,
 as the corpus records, by 2{,}300 Magma systems with $t=m$, $n\le21$,
 $m\le6$. Corollary~\ref{cor:assump} refutes it as stated, in the cells
-$(35,2,2,18)$, $(45,2,2,23)$ with Semaev's own default subspace, and
-$(19,3,3,7)$, $(21,3,3,7)$ inside his tables' range. The revision of the
+$(35,2,2,18)$ with random subspaces, $(45,2,2,23)$ with Semaev's own
+default subspace, and $(19,3,3,7)$ inside his tables' range; implementation~A alone also
+gives $1\notin W_4$ at $(21,3,3,7)$, with no checked certificate. The revision of the
 paper (ePrint 2015/310, 10 April 2015) replaces it with a growth condition on
 the regularity degree that the corpus records as
 $o(\sqrt{n/\ln n})$ (\texttt{HEUR-SP-SEMAEV15-WEAK-REGULARITY}), sufficient

@@ -125,7 +125,7 @@ PDP oracle family &
 CUDA kernel &
   one thread per (target, slice); per-thread Montgomery inversion; SoA
   base; shared-memory hash for $\abs\Fb\le2048$; 64-bit and P-256 fields.
-  Validated in host emulation only (no GPU available).
+  Checked in host emulation only (no GPU available); no validation file.
   \art{RESEARCH_GPU_ROOTFIND_DECOMPOSITION.md} \\
 ecbench engines &
   \texttt{pdp3-koblitz:m=2|3,engine=rootfind}, \texttt{rootfind-subtract},
@@ -187,7 +187,8 @@ $n=5,9,13$, where a solve needs too few decompositions to pay for the
 table. Inside ecbench, with every group operation charged, the
 root-finding IC beats inherited F4 in solve wall by about $350\times$ at
 $n=13$ (admitted) and about $10^4\times$ at $n=23$ (descriptive), yet stays
-$2.9$--$25{,}116\times$ the strong rho in $S$ on binary curves and
+$2.9$--$25{,}116\times$ the frozen strong rho in $S$ on Koblitz curves
+$n=13$--$37$ (the jump at $n=31$ is mostly the curve's cofactor, 1{,}492) and
 $29$--$141\times$ rho on prime curves, with the gap widening
 (\art{research/pdp_root_finder_ecbench_20261013/}).
 
@@ -201,14 +202,16 @@ $m=2$ to $23.22$ and then $22.97$. Two further cycles of denser and
 sparser bases, windowed negfold and plain root finding were dead ends
 (\art{research/ecbench_rootfind_vs_rho_20261014/}). With F4's word XORs
 priced, the paired ratio negfold/F4 is $0.0545$ $[0.047,0.064]$, a
-complete-against-complete comparison; against strong signed-Frobenius rho
-($S=14.82$) the best complete arm is still $1.55\times$. A compact-orbit
-base with a counted Frobenius pair table reaches $S=15.55$, below the
-then-unpriced F4 ($16.75$), but it is itself a lower bound
-(factor-base construction natives unpriced), and it is $1.08\times$ rho.
-Amortised over 64 targets that arm reaches $S\approx11.2$, below rho; by
-the ledger's rules that is a secondary, multi-target result, not a cold
-claim.
+complete-against-complete comparison; against the frozen strong signed-Frobenius
+rho ($S=14.82$) the best complete arm is still $1.55\times$. A compact-orbit
+base with a counted Frobenius pair table reads $S=15.55$ against F4's
+then-unpriced $16.75$ and about $1.06\times$ the strong rho. All three
+figures are lower bounds (factor-base construction natives, F4's word XORs
+and rho's table work unpriced), so neither order is ranked. Amortised over
+64 targets the same arm reads $S\approx11.2$. That is a ratio of lower
+bounds with no band, and the ledger counts it as a secondary, multi-target
+diagnostic, not a result below rho
+(\art{research/ecbench_rootfind_faster_20261014/README.md}).
 
 \begin{figure}[t]
 \centering

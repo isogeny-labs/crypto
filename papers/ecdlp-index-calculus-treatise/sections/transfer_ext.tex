@@ -1283,11 +1283,11 @@ and genus 5 have $3/2$ and $8/5$ against $2$. On a prime field the same
 argument runs the other way. Chapter~\ref{sec:transfer} records the
 genus-3 hyperelliptic route against the strongest rho, the plane-quartic
 studies N4 and N4~v2 (Table~\ref{tab:prog_transfer-quartic}), Smith's walk,
-and the validated Joux--Vitse sieve row; the rho references on Jacobians
+and a summary of the Joux--Vitse cover; the rho references on Jacobians
 are in \S\ref{sec:rv-jacobian}. This chapter adds the $n=3$ Tian route and
 the N4 iteration between those two studies, the genus-4 and genus-5
 Weil-restriction Jacobians, the same-field embeddings on prime fields, and
-the Joux--Vitse work of November beyond the validated row.
+the full Joux--Vitse account, with its validated sieve row (\S\ref{sec:jac-jv}).
 
 \section{Plane quartics at $n=3$}\label{sec:jac-quartic}
 
@@ -1510,12 +1510,50 @@ remaining constructions.
 
 The Joux--Vitse cover~\cite{jouxvitse2012} of $E(\FF_{p^6})$, for curves with
 full rational 2-torsion and $\#E=4\ell$, maps the problem to a genus-3
-Jacobian over $\FF_{p^2}$. Chapter~\ref{sec:transfer} gives the plain Nagao arm
-at $p=1009$, the history of the sieve arm, and its validated measurement at
-$p=1511$ against a matched negation rho (\texttt{VAL-20261103-c31c76}). This
-section records the November studies around that row. All of them are on the
-weak class; none is on a prime-order curve, and all but the validated row
-and the Hilbert stop below lack a validation file.
+Jacobian over $\FF_{p^2}$. Chapter~\ref{sec:transfer} summarises the two arms
+of this cover; this section is the full account: the validated sieve row at
+$p=1511$, the November studies around it, and the earlier comparisons as
+they now stand. All of them are on the weak class; none is on a prime-order
+curve, and all but the validated row and the Hilbert stop below lack a
+validation file.
+
+\paragraph{The validated row: the sieve against a matched negation rho.} A
+frozen protocol of 2 November re-measured the sieve arm
+(\texttt{jv\_cover --exp sieve}) at $p=1511$ ($\ell=2^{61.4}$) against a
+matched negation-map rho: 16 new rho runs pooled with 126 earlier ones under
+a frozen homogeneity rule (142 runs), with the sieve rows of the 19 October
+study unchanged and reproduced by a second build
+(\art{research/jv_sieve_negrho_20261102/}). The sieve route costs $0.00647$
+$[0.00545,0.00799]$ of rho in group additions (U1) and $0.0156$
+$[0.0131,0.0192]$ in textbook $\FF_p$ multiplications (U2; seeds 17--24,
+95\% bootstrap intervals). Rho is therefore $155\times$ $[125,184]$ and
+$64\times$ $[52,76]$ more expensive. Charging the cover's unemitted F4,
+descent and linear-algebra work at its upper bound leaves the ratio at
+$0.107$--$0.123$ for $w=0.1$ and $1$. The order holds across the band in
+all four cells (U1 and U2, emitted and upper-bound layers), for both seed
+sets and both rho references. An independent validator passed the
+comparison (\texttt{VAL-20261103-c31c76}), with these limitations:
+\begin{itemize}
+\item the replay is sampled: 1 of the 16 new rho runs, 1 of the 126 pooled
+  runs and 2 of the 16 cover rows;
+\item the cover's F4, descent and linear-algebra additions are not emitted,
+  so only an upper-bound proxy prices them;
+\item memory is not reported for either arm;
+\item the run was local, not on the isolated lab.
+\end{itemize}
+The validator classifies the result as accounting, not an improvement to
+any method: it is a matched measurement of an existing solver. It is the
+programme's one validated measurement of index calculus below a matched rho.
+It has no \texttt{pcc} claim record, so under the proof-carrying-claims rule
+it is a validation-gate result whose statement is an unverified assertion.
+It holds on the weak class only, says nothing about prime-order curves, and
+is not extrapolated. A red-team review of the same study
+(\art{research/jv_sieve_fbline_20261102/review/red_team/REPORT.md},
+\texttt{RT-20261103-fd05ef}) adds two qualifications: U1 prices rho at a
+schoolbook harness about $2.4\times$ above the tuned price, so the
+like-for-like cell is U2 ($64\times$); and a minimal $\FF_{q^3}$ product would
+make rho about $1.34\times$ cheaper in $\FF_p$ multiplications. Neither
+reverses the order.
 
 \paragraph{The Nagao arm near parity.} The 1 November crossover study ran
 the plain arm at $p=1301$, 1451 and 1601 against two rho references on the
@@ -1573,6 +1611,23 @@ additions and $1799$ in multiplications, inside the range a 64-bit build can
 test. There is no validation file, so this is a candidate improvement of
 the index-calculus baseline, not a ranked one.
 
+\paragraph{The line search on the sieve route.} A frozen controlled study of
+2 November wired the same factor-base line search into the sieve route and
+compared three arms with the plain route P on 48 paired instances at
+$p\in\{1009,1511,1823\}$, the search's own cost charged
+(\art{research/jv_sieve_fbline_20261102/README.md}). Pooled $S$ ratios
+against P are $0.623$ $[0.562,0.689]$ for the Horner search H, $0.560$
+$[0.500,0.631]$ for the exhaustive table T and $0.600$ $[0.535,0.674]$ for the
+table at $n=32768$ (U); with additions and lookups charged, H and U stay
+below P ($0.550$, $0.525$). An independent validator passed the paired
+comparison (\texttt{VAL-20261103-594245}), but the validation gate is not
+admissible, because the protocol names no rho reference, and there is no
+\texttt{VALIDATION.json} or \texttt{pcc} claim. The red team
+(\texttt{RT-20261103-fd05ef}) broke the claim for T: an uncounted integer
+multiply per table lookup, once charged, puts T's band at $w=0.1$ at $1.164$,
+worse than P; H and U are unresolved against each other. This study is the
+cover-only half of the H and U arms below.
+
 \paragraph{The sieve route on the same instances.} The 3 November study ran
 three sieve arms (plain P, Horner line search H, table line search U) and a
 matched negation rho on the same 24 instances at $p\in\{1009,1511,1823\}$,
@@ -1627,14 +1682,44 @@ sieve, not the Nagao arm, as the cheapest route for the class.
 
 \paragraph{Earlier comparisons, as they now stand.}
 \begin{itemize}
+\item The plain Nagao arm with a sparse-FGLM linear stage read
+  $1.59$--$1.98\times$ a pooled rho constant at $p=1009$ on 24 October, closing
+  as about $p^{-2}$ (\art{research/jv_cover_p_scaling_20261024/};
+  \S\ref{sec:ladder3}). That was a lower bound against an unmatched
+  constant; the matched negation rho above supersedes it, and the crossing
+  it extrapolated near $p\approx1330$ does not hold against that rho.
+\item The 19 October sieve study (\art{research/jv_sieve_strong_rho_20261019/})
+  measured $0.024$ $[0.019,0.031]$ of a strong rho at $p=1009$ and $0.0042$ at
+  $p=1823$, but its 20 October review withheld every comparison (no numeric
+  acceptance for the controls, uncharged rho hashes, incomplete accounting).
+  Its sieve rows are the ones the validated row re-scored.
 \item The replication of the 19 October sieve study failed its preregistered
   acceptance rule A4 (a rho A/A ratio within $[0.85,1.15]$: $0.792$
   $[0.572,1.073]$), so all its decisions are withheld; its descriptive
   sieve/rho ratios ran from $0.647$ at $p=503$ to $0.00404$ at $p=1823$
-  (\art{research/jv_sieve_strong_rho_v2_20261020/README.md}).
-\item Re-priced in \texttt{bitop/v1} with both arms executed, the weak-class
-  row at $p=1511$ ($\ell=2^{61.4}$) stays below rho at $0.0098$
-  $[0.0069,0.0144]$ (\art{research/ic_acct1_cover_bitop_20261021/README.md}).
+  (\art{research/jv_sieve_strong_rho_v2_20261020/README.md}). The registered
+  prospective re-run (\art{research/jv_sieve_prospective_20261023/}) never ran
+  and was superseded by the matched study above.
+\item Re-priced in \texttt{bitop/v1} with both arms executed, the whole-route
+  row (an isogeny walk from a non-weak challenge curve to the weak class,
+  then the cover) at $p=1511$ ($\ell=2^{61.4}$) reads $0.0098$
+  $[0.0069,0.0144]$ of the strong rho R3 (largest band upper bound $0.075$);
+  it has no validator report
+  (\art{research/ic_acct1_cover_bitop_20261021/README.md}).
+\item A 9 October whole-route replay from a non-weak challenge curve, through
+  an isogeny walk to a weak curve and its cover, read $0.058$ of a pooled,
+  unmatched rho at $p=1009$ on one seed per prime, with an earlier revision of
+  the solver whose source includes the sieve module; which arm ran is not
+  recorded (\art{research/jv_cover_e2e_30bit_20261009/RESULT.md}). The
+  cover-decomposition note still states a measured sieve crossover near
+  $p\approx430$
+  (\art{research/notes/index-calculus/RESEARCH_COVER_DECOMPOSITION_LEDGER.md}
+  \S11) with no erratum; it should be read through the review. Leaderboard
+  Table~D, the historical study, is withheld.
+\item On the method side, the sparse-FGLM stage made the plain arm
+  $1.28\times$ cheaper end to end
+  (\art{research/jv_cover_sparse_fglm_20261018/}), and relation collection is
+  $99.99\%$ of $S$ (\art{research/ic_cover_leads_20261018/}).
 \item A large-prime variation of the cover decomposition does not pay at
   $p\le12{,}000$: linear algebra is $2.5\cdot10^{-3}$ of $S$ there, and one large
   prime saves at most $0.02\%$ (\art{research/jv_cover_large_prime_20261018/README.md}).
@@ -1653,7 +1738,9 @@ B0, cut counted $S$ $2.53$--$2.64\times$ while the unpriced F4-driver work rose
 $8.3$--$8.5\times$; the study classifies B0 as relabelling, which is in the
 corrections chapter (Table~\ref{tab:corr-transfer}). The baseline's distance
 to rho falls with $p$: $S$/rho of $1361$, $205$, $35.2$ and $7.19$ at $p=53$,
-101, 251 and 503, slope $-2.27\pm0.13$ in $\log p$ over four sizes.
+101, 251 and 503, slope $-2.27\pm0.13$ in $\log p$ over four sizes, against
+the matched negation rho of the Hilbert-stop study; the pooled-constant
+series of Chapter~\ref{sec:frontier} reads $620$ at $p=53$ and slope $-2.05$.
 
 \paragraph{The weak class.} Every number above is on curves with full
 rational 2-torsion and $\#E=4\ell$. A norm-one conductor theorem
@@ -1663,8 +1750,9 @@ $[0.6169,0.6468]$ at $p=47$, over a census to $p\le53$
 (\art{research/iso1_weak_classes_20261007/REPORT.md}). Generalising the cover
 over 2-torsion configurations gives genera $g\in\{1,3,7,9,13\}$, and
 Joux--Vitse's is complete among such covers with $g\le3$
-(\art{research/jv_weak_generalization_20261008/README.md}). Depth-1 classes
-hold no weak curve (Chapter~\ref{sec:transfer}). Since weakness is not a
+(\art{research/jv_weak_generalization_20261008/README.md}). Depth-1 isogeny
+classes hold no weak curve over 4{,}871{,}062 curves, while 86--95\% of deeper
+classes hold one (\art{research/jv_weak_class_law_20261007/}). Since weakness is not a
 class invariant, a Teske-type trapdoor in this class is structurally
 possible; the atlas lead is unexamined.
 
@@ -1681,8 +1769,12 @@ possible; the atlas lead is unexamined.
 \item The Joux--Vitse sieve is between about 16 and 71 times cheaper than a
   matched negation rho on the weak class at $p\le1823$ in $\FF_p$
   multiplications, depending on arm and on whether additions are charged,
-  and $155\times$ in group additions at $p=1511$; only that last cell is
-  validated.
+  and $155\times$ in group additions ($64\times$ in $\FF_p$ multiplications)
+  at $p=1511$; only the $p=1511$ comparison is validated, and it has no
+  \texttt{pcc} claim. The plain Nagao arm is above a matched negation rho at
+  $p=1301$ and 1451 and unresolved at 1601 in group additions, and above at
+  all three in multiplications; with the line search it is below in
+  additions only, unvalidated.
 \end{itemize}
 \chapter{Extension fields: the GLV-invariant programme and quotients}\label{ch:glvprogramme}
 
@@ -2002,9 +2094,10 @@ weight of the band; every handover is a model or a fit. Sources: GLV note
 \label{tab:glv-ladder}
 \end{table}
 
-Two things change the reading of the extension chapter's single figure. The
-modelled handover that \S\ref{sec:gaudry} and Chapter~\ref{ch:extension} quote
-for odd characteristic ($2^{103}$--$2^{119}$ ``depending on the frame'') is
+Two things change the reading of the earlier single-point figures. The
+modelled handovers for odd characteristic, $2^{135.1}$--$2^{135.8}$ in
+\S\ref{sec:gaudry} and the $2^{119}$ of the GLV note's early frames (E19,
+\texttt{d4-s5}), are
 superseded on this family by a measured distance to $2^{42.4}$ and a fitted
 interval of $2^{79}$--$2^{108}$ across the band. And the family is narrow: GLS
 twists over $\FF_{p^4}$ with $p\equiv1\pmod4$, full rational 2-torsion, the halves

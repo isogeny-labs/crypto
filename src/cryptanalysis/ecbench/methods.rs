@@ -1110,6 +1110,14 @@ pub fn registry() -> &'static [MethodDecl] {
             params: RHO_PARAMS,
         },
         MethodDecl {
+            id: "rho.signed_frobenius_v2_full",
+            family: "rho",
+            summary: "rho.signed_frobenius_v2 (Brent cycle detection beside the cycle window) unchanged, with its canonicalisations and distinguished-point probes priced from src/cryptanalysis/ecbench/full_prices.json exactly as rho.signed_frobenius_full prices the legacy walk",
+            entry: "ic_boundary::signed_frobenius_rho_tuned_policy(WalkPolicy::v2()) + ecbench::full_price::reprice",
+            applies: Applies::KoblitzOnly,
+            params: RHO_PARAMS,
+        },
+        MethodDecl {
             id: "rho.signed_frobenius_strong_full",
             family: "rho",
             summary: "rho.signed_frobenius_strong unchanged, with its canonicalisations, partition hashes and table probes priced from src/cryptanalysis/ecbench/full_prices.json",
@@ -1497,6 +1505,7 @@ pub fn expected_s(id: &str, a_available: u32) -> Option<f64> {
         "rho.signed_frobenius"
         | "rho.signed_frobenius_v2"
         | "rho.signed_frobenius_full"
+        | "rho.signed_frobenius_v2_full"
         | "rho.signed_frobenius_strong"
         | "rho.signed_frobenius_strong_v2"
         | "rho.signed_frobenius_strong_full"
@@ -9944,6 +9953,7 @@ mod accounting_rules_tests {
             "ic.cm_folded_native_d43_v1",
             "ic.pipeline_full", // reprices ic.pipeline: full_price tests
             "rho.signed_frobenius_full",
+            "rho.signed_frobenius_v2_full",
             "rho.signed_frobenius_strong_full",
             "ic.large_prime", // large_prime_v2_charges_… test, both ids
             "ic.large_prime_v2",
