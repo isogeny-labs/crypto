@@ -5582,7 +5582,9 @@ mod free_rows_probe {
                 .build(&ctx, &params, &mut ops)
                 .unwrap();
             let r = inst.r;
-            let lambda = (&inst.koblitz.as_ref().unwrap().lambda % r).to_u64().unwrap();
+            let lambda = (&inst.koblitz.as_ref().unwrap().lambda % r)
+                .to_u64()
+                .unwrap();
             let canon = FrobeniusCanon::new(&inst.gf, inst.n).unwrap();
             let f = fb.points.len();
             let cols = fb.columns;
