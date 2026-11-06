@@ -94,6 +94,18 @@ NAMED_BUDGET_EXCEPTIONS = {
         # 25-minute cap mid-audit and took 24.3 min in run 42055249527.
         "reason": "ecbench committed-evidence integrity audit shard; cancelled at the 25-minute cap on #2902 (2026-11-05)",
     },
+    (".github/workflows/ecbench.yml", "exhaustive_replay"): {
+        "timeout": 350,
+        # 48 shards, each replaying its share of a nonce-chosen plan; the job
+        # bound is the workflow's own 350-minute exhaustive bound.
+        "reason": "ecbench exhaustive replay matrix over all sampled sessions, 48 shards (2026-11-06)",
+    },
+    (".github/workflows/ecbench.yml", "replay_sentinels_pr"): {
+        "timeout": 30,
+        # Sentinel coverage pulls only the sentinel sessions; run time is
+        # dominated by the artifact walk on a shared runner.
+        "reason": "ecbench sentinel coverage on routine PRs; 30-minute bound (2026-11-06)",
+    },
     (".github/workflows/release.yml", "isogeny"): {
         "timeout": 45,
         # The workflow's pull_request budget expression evaluates to 45.
