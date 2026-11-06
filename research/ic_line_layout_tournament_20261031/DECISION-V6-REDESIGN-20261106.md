@@ -3,7 +3,8 @@
 **Revised: see §12, Revision 1 (2026-11-06), §13, Revision 2 / freeze
 approval (2026-11-06), and §14, Revision 3 budget-rule reading (2026-11-06).**
 Each supersedes the earlier parts it names. Where they
-conflict, the later section governs.
+conflict, the later section governs. **The v6 outcome decision is §16
+(2026-11-06, provisional until the independent validator reports).**
 
 **Status: the owner signed off on 2026-11-06. Freeze is approved, conditional
 on pre-freeze check F6b (§13).** This file is not by itself a dispatch
@@ -1558,4 +1559,364 @@ coordinator_decision_revision:
     - "Director: mirror these rulings into the protocol-v6.json amendments[] entry (changes, supersedes_fields with exact JSON paths, prior freeze), run experiment_protocol.py validate (0 findings), and recompute the shas."
     - "Main session: run experiment_protocol.py freeze, then merge the amendment; then relay card-s3.md after the node check and gate line."
     - "Main session: mirror this block into ledger/decisions/DEC-20261106-662e33.yaml."
+```
+
+## 16. Outcome of v6 as amended by V6-AMENDMENT-1 (2026-11-06; provisional)
+
+**Status: provisional.** An independent validator is recomputing the
+per-session statistics, parity, replay and position table in parallel. This
+section becomes official only when (a) the validator's report agrees on every
+per-session gate and verdict, and (b) the analysis outputs and the validator
+report are committed by the snapshot archive of §16.6. If the validator
+disagrees on any gate, a later section supersedes this one. No ruling below
+may be cited as official before then. Every figure in this section is
+`[pcc:unverified]` until its `pcc` claim carries a CI-signed verdict.
+
+### 16.1 What I read
+
+- `PROTOCOL-V6.md` (§2, §6, §7, §10), `PROTOCOL-V6-AMENDMENT-1.md` (all),
+  `protocol-v6.json` (`H-layout`, `P-wall`, `P-parity`, `C-rho-gap`), and
+  §13.3(a) and §15 of this file. Repo `main` is at `e87fa18a`, and
+  V6-AMENDMENT-1 was merged in PR #3531.
+- `$B/analysis/run-i/verdict.json` and `$B/analysis/run-ii/verdict.json`, where
+  `B=/tmp/claude-0/-home-user/fe537fb0-7f2e-504d-8df2-39e551cfffea/scratchpad/v6`.
+- The `wall` block, and the top-level `ops` block of the positive control only,
+  of each `session-*-candidate.json`, `session-*-control-comparison.json` and
+  `session-*-positive.json`.
+- The top-level `ops` block of `counted-compare-rho-neg__incumbent-w{0,0.1,1}.json`,
+  and `counted-band.txt`.
+- The executor's `$B/run/analysis-step-G.out` and `$B/run/analysis-step-H.out`.
+
+**Disclosure: one inadmissible field was exposed.** One of my searches
+displayed the `wall` block of the counted session's
+`counted-compare-incumbent__candidate-w0.1.json` (lines 336–354). PROTOCOL-V6
+§7 and §13 forbid reading it. This happened after every per-session verdict
+and the combined verdict had been computed and written, so it cannot have
+affected them. Its values are not used, quoted or reported anywhere, and they
+decide nothing.
+
+### 16.2 (a) The v6 verdict, as the frozen rules give it
+
+**C-wall: `invalid_measurement`.** This is the frozen V6-AMENDMENT-1 §3
+combination over the three per-session verdicts. Once one session is
+`invalid_measurement`, the combination is `invalid_measurement`. The
+host-epoch rule cannot change it, because it only downgrades a combined
+`supported_within_scope`.
+
+| Session | Host epoch, node | Verdict (`analyze-v6.sh`, sha256 `23e614ad…`) | Gate(s) that failed |
+|---|---|---|---|
+| s1 `ic-line-v6-s1-20261106` | H1, `ip-10-84-67-216` | `invalid_measurement` | `aa_inside_0_9_1_1` (and `total_and_corrected_ci_below_1`) |
+| s2 `ic-line-v6-s2-20261106` | H1, `ip-10-84-67-216` | `inconclusive` | `total_and_corrected_ci_below_1` only |
+| s3 `ic-line-v6-s3-20261106` | H2, `ip-10-84-75-83` | `inconclusive` | `total_and_corrected_ci_below_1` only |
+
+**Mechanical facts, read from the transcripts:**
+
+- All three wall jobs had `job-exit` 0.
+- The host-epoch `jq` exited 0, so the condition holds (s3 is on a distinct
+  node and pod).
+- The s1 determinism check is byte-equal between runs (i) and (ii).
+- Both runs' `overall` fields are `invalid_measurement`. The amendment says
+  these fields are not the verdict; the combination is.
+- Counted-companion acceptance is all true in both runs: audit and replay,
+  `invalid_outcomes` empty, record equality with the wall sessions, and ops
+  ratio 1 at w = 0, 0.1 and 1.
+
+**Why s1 failed.** In s1, the `aa_ci95` of the `--a incumbent --b candidate`
+comparison is [0.99687, 0.99992]. It is the same interval in
+`control-comparison.json`, and `aa_ratio` is 0.9984. The interval lies inside
+[0.9, 1.1] but does not contain 1, and the frozen gate requires both. The
+interval misses 1 by 0.00008. The rule is frozen, so the size of the miss
+changes nothing.
+
+**What the verdict is not.** It is not `inconclusive`. It is not
+`within_control_distribution`. It is not "regression" or "rejected". It is
+reported as `invalid_measurement`, in exactly those words.
+
+**Descriptive numbers.** These are read from the files above.
+Candidate/incumbent is b/a with `--a incumbent --b candidate`.
+
+| Session | Total wall | Corrected (A/A-corrected, per GAE) | Process wall | A/A `aa_ci95` | pc-fb2x total wall |
+|---|---|---|---|---|---|
+| s1 (invalid) | 1.1214 [1.1183, 1.1246] | 1.1232 [1.1197, 1.1268] | 1.0643 | [0.99687, 0.99992] | 1.382 [1.343, 1.422] |
+| s2 | 1.1216 [1.1183, 1.1249] | 1.1220 [1.1178, 1.1262] | 1.0643 | [0.99729, 1.00199] | 1.380 [1.341, 1.421] |
+| s3 | 1.1225 [1.1193, 1.1258] | 1.1237 [1.1200, 1.1275] | 1.0641 | [0.99722, 1.00064] | 1.393 [1.354, 1.433] |
+
+**Counted figures, all exact:**
+
+- Candidate/incumbent ops ratio is 1.0 [1.0, 1.0] in every wall session (gate
+  `counted_parity_ops`) and in the counted companion at w = 0, 0.1 and 1.
+  Record-level parity holds in all three sessions.
+- Distance remaining to the matched `rho.negation` reference, as incumbent
+  counted S over rho-neg counted S (counted session, two curves pooled, 128
+  pairs). The candidate's counted S is identical to the incumbent's.
+
+  | w | IC/rho-neg |
+  |---|---|
+  | 0 | 23.00 [20.15, 26.24] |
+  | 0.1 | 22.87 [20.01, 26.14] |
+  | 1 | 22.28 [19.35, 25.66] |
+
+  Per curve at w = 0:
+
+  | Curve | IC S | rho S |
+  |---|---|---|
+  | `icv1-fp28-tm10425-13a2119a` | 20.970 | 0.960 |
+  | `icv1-fp28-t15757-68bdca4a` | 20.572 | 0.846 |
+
+  `band --ranks` ranks rho-neg ahead of both IC arms across the whole band on
+  both curves, and leaves candidate vs incumbent "unresolved inside the band".
+  The gap to rho is reported as distance remaining, not as a gate. Rho wall
+  time is not reported (protocol §7).
+
+**Reading the pc-fb2x "corrected" figure.** For pc-fb2x the `corrected_ratio`
+is 0.579, while its total wall ratio is 1.382 and its counted ops ratio is
+2.396. The field is the A/A-corrected per-operation (per-GAE) wall ratio:
+pc-fb2x does 2.4 times the work at a lower cost per operation. It is not a
+speed-up, and no gate reads it.
+
+### 16.3 (b) How H-layout is recorded
+
+**Decision on H-layout: `weaken`.**
+
+- P-wall is not supported.
+- P-parity held.
+- H-layout is **not** rejected.
+
+H-layout has no ledger `H-*` record. It exists only in `protocol-v6.json`. Its
+status is therefore recorded here, in the mirrored decision record and in the
+results report. The frozen protocol is not edited.
+
+**The observation, and how it is reported without relabelling.** In the two
+sessions that passed every validity gate, s2 (H1) and s3 (H2), the candidate
+was about 12% slower in total wall time, at exactly equal counted GAE:
+
+- s2: 1.1216 [1.1183, 1.1249];
+- s3: 1.1225 [1.1193, 1.1258].
+
+That is a difference of about 12% against A/A intervals within ±0.3% of 1,
+replicated across the two host epochs.
+
+The frozen vocabulary has no regression verdict. PROTOCOL-V6 §6, adopted as
+frozen in §13.3(a), says exactly how this case is reported: "a valid session
+with intervals wholly above 1 maps to `inconclusive` and the report states its
+direction descriptively". So s2 and s3 are reported as `inconclusive`, each
+followed by one descriptive sentence giving the direction and the intervals.
+The overall verdict is still reported as `invalid_measurement`.
+
+The report must not:
+
+- use the words "regression verdict", "rejected" or "refuted" for C-wall;
+- coin any label that is not in the frozen set.
+
+s1 is reported descriptively and labelled `invalid_measurement`. It carries no
+weight in the `weaken` decision: an invalid session is not evidence. Its
+numbers agree with s2 and s3, and that agreement is noted, not counted.
+
+**Why `weaken` and not `reject_scoped`:**
+
+1. **A rejection would be a relabelling.** The frozen rules send this outcome
+   to `inconclusive` per session and to `invalid_measurement` overall. A
+   rejection would rest on a decision rule ("intervals wholly above 1 refute
+   the hypothesis") that was never registered. Adopting it now, after the data,
+   would change the success criteria after the outcome without a
+   `protocol_amendment`.
+2. **The refutation basis is `empirical_only`, declared.** A wall-time claim
+   admits no counterexample certificate. No derivation note explains why
+   cache-line buckets cost more than the hashbrown index here. The artifacts
+   this decision relies on (both `verdict.json` files, the session comparison
+   files and the validator report) are archived before the decision becomes
+   official (§16.6).
+3. **`weaken` is a credence decision, not a verdict.** It rests on the
+   direction the frozen protocol itself says must be reported. It changes no
+   verdict.
+
+**Scope of the `weaken`:**
+
+- the `ea8e9ef7` executable (ecbench `73362eed…`);
+- `mitm:negation_folded=1,layout=lines` against `mitm:negation_folded=1`;
+- `prime-abscissa:size=407`, `targets=walk`, `max_trials` 26479085,
+  `incremental-gauss`;
+- two fresh public fp28 curves (`icv1-fp28-tm10425-13a2119a`,
+  `icv1-fp28-t15757-68bdca4a`) with 8 targets;
+- L2 isolation, on two c8a.2xlarge host epochs (three sessions).
+
+**Transfer assumptions, stated rather than claimed:** none. The result says
+nothing about other sizes, the `stride-renew` target source, other incumbents,
+other microarchitectures or later commits.
+
+The prior in §5 predicted a corrected ratio of 0.90–0.99 and gave about 0.45
+to support. It was wrong in direction. The excluded fp20 L0 diagnostic
+(1.1345), which was listed in `data_seen`, pointed the same way as the result.
+
+### 16.4 (c) The line-layout lead: closed at fp28 on c8a.2xlarge
+
+**Ruling: closed at the §16.3 scope.**
+
+- No v7, rerun or extra session of this question is approved to turn
+  `invalid_measurement` into a cleaner label.
+- In the valid sessions, the effect is about 40 times the A/A half-width and
+  points the wrong way. A rerun could at best certify a slowdown, which is no
+  improvement under the success criterion.
+- Closing the lead is a roadmap decision. It is not a hypothesis transition to
+  `rejected`.
+- It also frees budget for exponent-targeting work, which the roadmap prefers
+  over constant-factor engineering of this kind.
+
+**What would justify reopening.** Each item needs its own coordinator
+decision, a new frozen protocol and fresh seeds, and is never pooled with v6:
+
+1. **A changed candidate with a diagnosed cause.** A profile at fp28, local and
+   with counted parity, identifies where `layout=lines` loses: bucket-scan
+   length, probes per lookup, cache and TLB misses, instructions per lookup,
+   or the batched-lane prefetch path. A revised implementation then shows a
+   lower native lookup cost than the incumbent before any L2 wall session is
+   spent.
+2. **An implementation defect in the `ea8e9ef7` build.** For example, the
+   guard falls back to a slow path, or a debug or bounds-check path is
+   enabled. That would reopen the lead as a correction, on a new binary.
+3. **A regime where the premise is materially stronger, with a written reason
+   why the fp28 sign would flip.** Examples are a much larger pair table, the
+   `stride-renew` source if it becomes the merged incumbent, or a different
+   host class. At fp28 the table already exceeds L2, so "a bigger size" alone
+   is not a reason.
+4. **The incumbent's lookup structure changes on `main`**, so that the
+   comparison `layout=lines` would face is no longer this one.
+
+The packed-table result (`mitm-prime-blocked`, corrected 0.93 at 28 bits) is
+a separate component result. This closure does not affect it.
+
+**Lead atlas.** The open item "compact lane layout (`layout=lines`)" in
+`crypto-autoresearcher:knowledge/leads/ecdlp/ic-prime/LEAD-ICP-prime-ic-constant-engineering.yaml`
+is updated to "closed at scope", with a pointer to this section. That is a
+separate curation task, done after this section becomes official.
+
+### 16.5 (d) What the results PR must carry
+
+| Item | Ruling |
+|---|---|
+| **Report** (`reports/v6/REPORT.md`, research-visuals) | **Required.** The first line states the verdict `invalid_measurement` and the per-session table of §16.2. It also carries: the §16.3 descriptive sentence; the counted §5a band and IC/rho distance; the scope; the s1 A/A miss; and the deviations of §16.7. Its class is "not an improvement". The title and headline contain no "speed-up", "gain" or "improvement" wording. No counted-session wall field and no rho wall time appear. |
+| **Graph(s)** (SVG + 150 dpi PNG from one plotting source) | **Required**, as protocol §10 specifies. (1) Per-session candidate/incumbent total and corrected ratios with CIs, beside the A/A interval and pc-fb2x total wall, with a reference line at 1. s1 is drawn hollow or greyed and labelled `invalid_measurement`. (2) A phase diagnostic. (3) The counted §5a rho band. pc-fb2x's `corrected_ratio` is either omitted or labelled "per-GAE" next to its ops ratio 2.396, so that a 1.38× slowdown never plots as 0.58. |
+| **PDF** (`reports/v6/REPORT.pdf`) | **Required.** It contains the report and the graphs. |
+| **`benchmarks/<YYYYMMDD>-<slug>/` entry and `benchmarks/README.md` row** | **Not warranted.** See the reasoning below the table. |
+| **Leaderboard component section** (§7b) | **Not warranted.** §7b adds a component section for "a big improvement in a phase or component". This is no improvement, and no row of tables A–C moves: the incumbent is unchanged. §7d needs a documented exclusion in the report and PR body, and nothing more. Run `scripts/build_ic_leaderboard.py --check`, the lab-browser `--check` and `node scripts/check_ic_dashboard_coverage.mjs`. Regenerate only the views those checks report as stale, for example the lab browser if the committed sessions or round are inputs it indexes. Any entry that a check requires is labelled `invalid_measurement`, not an improvement, and carries no "best" or "before/after" mark. |
+| **`VALIDATION.json`** | **Not written.** It exists to admit a row to the leaderboard or `benchmarks/README.md`, and no row is proposed. A `VALIDATION.json` beside an invalid verdict could be read, by tooling or by people, as validation of a result. The artifacts it would name are archived in `reports/v6/` regardless: the replay outputs, the validator report and the counted rho band. If `docs/VALIDATION_GATE.md` on `main` (absent from this checkout) requires the file for every evidence directory, the director returns to the coordinator instead of writing one. |
+| **`bench.record/v1` records** (`tools/benchrec.py`; `benchmarks/records/`) with a regenerated `benchmarks/progress/` | **Required.** AGENTS.md "Benchmark records" gives every run its own record, invalid runs included, and states that a record does not move rows. There is one record per job. The qualification, s2 and s3 are `measured`. s1 is closed `--status invalid`, with the summary "A/A gate failed: aa_ci95 [0.99687, 0.99992] excludes 1". The counted companion carries counted quantities (`S`, `gae`) only. If `benchrec` refuses a record without wall values, the director returns to the coordinator; no counted-session wall value is entered. |
+| **Raw data and analysis outputs** | **Required.** Session trees go through the store as one archive each (AGENTS.md §13, §13a), with S3 hashes. The analysis outputs are committed byte-identical, with a `SHA256SUMS`, at the frozen paths `reports/v6/analysis-a/` (run i) and `reports/v6/analysis-b/` (run ii). The analysis transcripts are committed beside them. |
+| **`pcc` claims** | **Required** before any figure is cited in the report, PR body or session log. At least two `measurement` claims: the frozen verdict outcome, and the descriptive per-session ratios and counted distance. Each pins its proof files by SHA-256. Until CI signs them, the prose is tagged `[pcc:unverified]`. `pcc lint-prose` is run on the report and the PR body. |
+| **This file, the ledger mirror and the session log** | **Required.** §16 goes in this file, with its YAML mirrored to `ledger/decisions/` under the id allocated in §16.8. The session log for 2026-11-06 gets an entry. |
+
+**Benchmarks row: why not.** A negative or invalid result is recorded in its
+research directory, and gets neither a benchmarks row nor a leaderboard
+section:
+
+- **The validation gate.** It makes `VALIDATION.json` a condition for any
+  `benchmarks/README.md` row. Its own text says it "decides what may be shown
+  as a result, never whether an honest null or negative result may be
+  recorded: those stay in their research directories".
+- **The frozen protocol.** PROTOCOL-V6 §10 places a row only after
+  `VALIDATION.json`. Read with §2 ("If supported … it enters the leaderboard
+  only after the validation gate"), that is a necessary condition, not a
+  sufficient one.
+- **The "always" rule.** The rule that performance results "also land in
+  `benchmarks/` … always" does not override the gate, which is the owner's
+  more specific rule for rows.
+
+The run's visual record therefore stays in `reports/v6/`. The bench records
+carry the measurement trail.
+
+### 16.6 Conditions before this section is official
+
+1. The validator report agrees on every per-session gate and verdict, on
+   record-level parity and on replay. It also confirms the host-epoch reading
+   and the s1 determinism check.
+2. If the validator invalidates s2 or s3, the `weaken` of §16.3 is withdrawn
+   and replaced by `inconclusive`, and §16.4 is re-decided. If the validator
+   finds that s1's A/A gate passes, the combined verdict becomes
+   `inconclusive`. C-wall is unsupported in every case, and a superseding
+   section records the change.
+3. A snapshot archive, alone and before independent review, of exactly:
+   - `reports/v6/` (analysis outputs, transcripts, report, graphs, PDF);
+   - the validator report;
+   - the bench records.
+
+   Then review. Then a ledger archive, alone, of the decision record and this
+   file. The post-commit verifier must accept each commit. The branch is
+   pushed, and the PR is opened (not as a draft) against `main` with
+   auto-merge enabled.
+
+### 16.7 Deviations and observations (recorded, none change the verdict)
+
+- **Analysis output paths.** The two `analyze-v6.sh` runs wrote to
+  `$B/analysis/run-i` and `$B/analysis/run-ii`, not to the frozen
+  `reports/v6/analysis-a` and `reports/v6/analysis-b`. The contents are the
+  outputs of the frozen script and binary on the frozen inputs. They are copied
+  byte-identical to the frozen paths with a `SHA256SUMS`, and the report names
+  the difference.
+- **The counted-session field exposure** of §16.1.
+- **A/A gate design, for future protocols only.** All three sessions have
+  `aa_ratio` below 1 (0.9984, 0.9996, 0.9989). Three sessions cannot separate a
+  small systematic block-position offset from chance. With 128 tightly paired
+  pairs, a 95% "contains 1" gate fails about 5% of sessions under a true null.
+  Over three sessions that is about 14%, so the third session added by
+  V6-AMENDMENT-1 raised the chance of `invalid_measurement`. A later protocol
+  should declare an equivalence-band A/A gate before data, for example an
+  interval inside [0.99, 1.01]. This lesson is not applied to v6.
+
+### 16.8 Decision record
+
+```yaml
+coordinator_decision:
+  id: DEC-20261106-<tok>      # allocated by the main session: python3 tools/allocate_id.py --next coordinator_decision --date 20261106, confirmed with --check
+  status: provisional_pending_independent_validator
+  relates_to: DEC-20261106-662e33
+  context: >-
+    IC-LINE-LAYOUT-E2E-FP28-V6-20261106 as amended by V6-AMENDMENT-1 (PR #3531). Three L2 wall
+    sessions on c8a.2xlarge (s1, s2 on host epoch H1 ip-10-84-67-216; s3 on H2 ip-10-84-75-83),
+    analyze-v6.sh 23e614ad run twice with ecbench 73362eed; counted companion accepted.
+  frozen_verdict:
+    C-wall: invalid_measurement      # V6-AMENDMENT-1 §3 combination; host-epoch condition holds; s1 determinism byte-equal
+    per_session: {s1: invalid_measurement, s2: inconclusive, s3: inconclusive}
+    s1_failed_gate: "aa_inside_0_9_1_1: aa_ci95 [0.99687, 0.99992] excludes 1"
+  decision: weaken
+  target_ids: [IC-LINE-LAYOUT-E2E-FP28-V6-20261106, H-layout]
+  hypothesis_status:
+    H-layout: weakened          # P-wall not supported; P-parity held; not rejected
+    refutation_basis: empirical_only
+  rationale:
+    - "The frozen verdict is invalid_measurement and is reported verbatim; nothing is relabelled."
+    - "Descriptively, in s2 (H1) and s3 (H2), which passed every validity gate, layout=lines was slower at exactly equal counted GAE: total wall 1.1216 [1.1183, 1.1249] and 1.1225 [1.1193, 1.1258]; corrected 1.1220 and 1.1237; A/A intervals within +-0.3% of 1. Reported under PROTOCOL-V6 §6 / decision §13.3(a) as inconclusive with direction stated."
+    - "reject_scoped is refused: the frozen mapping routes this outcome to inconclusive/invalid_measurement; rejecting on 'intervals above 1' would apply an unregistered rule after the outcome."
+    - "Lead closed at scope: the effect is about 40x the A/A half-width and in the wrong direction; a rerun could only certify a slowdown."
+    - "Positive control detected in all sessions (pc-fb2x total wall 1.38-1.39, ops 2.396); counted parity exact; IC/rho-neg counted 23.00 / 22.87 / 22.28 at w = 0 / 0.1 / 1 (distance remaining)."
+  scope: "ea8e9ef7 executable; mitm:negation_folded=1,layout=lines vs mitm:negation_folded=1; prime-abscissa:size=407, targets=walk, max_trials 26479085, incremental-gauss; icv1-fp28-tm10425-13a2119a and icv1-fp28-t15757-68bdca4a, 8 targets; L2; two c8a.2xlarge host epochs; no transfer claimed"
+  evidence_refs:
+    - research/ic_line_layout_tournament_20261031/reports/v6/analysis-a/verdict.json   # copied byte-identical from $B/analysis/run-i
+    - research/ic_line_layout_tournament_20261031/reports/v6/analysis-b/verdict.json   # copied byte-identical from $B/analysis/run-ii
+    - research/ic_line_layout_tournament_20261031/reports/v6/analysis-a/session-{1,2}-{candidate,control-comparison,positive}.json
+    - research/ic_line_layout_tournament_20261031/reports/v6/analysis-b/session-1-{candidate,control-comparison,positive}.json
+    - research/ic_line_layout_tournament_20261031/reports/v6/analysis-a/counted-band.txt
+    - research/ic_line_layout_tournament_20261031/reports/v6/analysis-a/counted-compare-rho-neg__incumbent-w{0,0.1,1}.json   # ops block only
+    - research/ic_line_layout_tournament_20261031/reports/v6/analysis-step-G.out
+    - research/ic_line_layout_tournament_20261031/reports/v6/analysis-step-H.out
+    - research/ic_line_layout_tournament_20261031/PROTOCOL-V6.md
+    - research/ic_line_layout_tournament_20261031/PROTOCOL-V6-AMENDMENT-1.md
+    - research/ic_line_layout_tournament_20261031/protocol-v6.json
+    - "<validator report path, when it arrives>"
+  limitations:
+    - "Provisional: the independent validator has not reported; §16.6 gives the conditions and the fallbacks."
+    - "The weaken rests on empirical_only evidence from two valid sessions; no mechanism explains the slowdown."
+    - "The counted session's wall block of counted-compare-incumbent__candidate-w0.1.json was exposed to the coordinator after all verdicts were written; it is unused and unreported."
+    - "Analysis outputs were written to scratch paths, not the frozen reports/v6/analysis-{a,b}; they are copied byte-identical."
+    - "Instances need not be distinct physical machines; the scope says host epochs, nothing finer."
+  knowledge_promotion:
+    promoted: []
+    not_warranted: "weaken on empirical_only evidence under a combined invalid_measurement verdict; not support or reject_scoped, so no KN-FIND; the closure goes to the lead atlas instead"
+  next_actions:
+    - "Validator report arrives -> coordinator confirms §16 or files a superseding section (§16.6 item 2)."
+    - "Main session: allocate the DEC id, then issue one handoff (TASK id via allocate_id) to assemble the results PR per §16.5, with exact paths and one snapshot archive; then review; then a ledger archive of this file and the DEC record; push, open the PR ready for review against main, and enable auto-merge."
+    - "After §16 is official: one curation task to mark layout=lines closed at scope in LEAD-ICP-prime-ic-constant-engineering.yaml (crypto-autoresearcher)."
+    - "Coordinator: choose the next improvement in a separate decision, from the lead atlas and the approved XP-20261029 backlog, giving exponent-targeting mechanisms priority over constant-factor items."
+    - "Main session: append the session-log entry for 2026-11-06; if a GOAL-* record carries this tournament, checkpoint it with exactly one next action: review of the validator report."
+  decided_by: coordinator
+  decided_at: 2026-11-06
 ```

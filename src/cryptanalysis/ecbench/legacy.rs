@@ -15,6 +15,7 @@
 //! | linear harvest on by default (`d1d034d94`, `9e69f57ef`, 2026-10-15) | the root basis' linear rows are appended and the node re-eliminated, so the search and its word count change |
 //! | F6-IC gate-first on by default (`d72e8b04d`) | refuted nodes skip their specialisations |
 //! | #1646 also: the F6-IC gate's partial support test (`geometric_partial_support_*`) | a node with a summand's bits partly fixed is refuted by the gate where the reduction used to find it infeasible, so splits, reductions, `infeasible_branches` and `geometric_refutations` differ |
+//! | repair R8 (`59fcca75d4`, 2026-10-26): the linear-harvest default drops its `gpv < 0.9607` half and keeps `rank >= 331` | an `ic.pipeline` record with `linear_harvest=default` made before it harvested the root rows of every solve with few generators per variable (the m = 3 cells of `f4_harvest_remeasure_20261024`), the current default does not, so word counts and the solver ledger differ ([`PRE_R8_HARVEST`]) |
 //! | `c653ede60b` (2026-11-03): the native pencil's point sieve evaluates `u` and `v` by finite differences instead of Horner | `ic.three_leads_genus2_pencil_symbolic_v2` binds its whole arithmetic and meter ledger into `pencil_replay_ledger_sha256_word_*`; the sieve charges `2 deg + 1` fewer base multiplications, additions and entry visits per point, so the digest differs ([`PRE_PENCIL_FD`]) |
 //!
 //! Both generations are committed evidence under the same id and the same
@@ -40,7 +41,7 @@ use crate::cryptanalysis::ic_boundary::set_legacy_calibration_before_1640;
 use crate::cryptanalysis::ic_framework::set_legacy_exact_word_xor_unit;
 use crate::cryptanalysis::inherited_f4::set_legacy_lazy_rewrite;
 use crate::cryptanalysis::koblitz_groebner::{
-    set_gate_first, set_legacy_no_linear_harvest, set_legacy_pre_1646,
+    set_gate_first, set_legacy_harvest_r3, set_legacy_no_linear_harvest, set_legacy_pre_1646,
 };
 
 /// A named accounting of the past.
@@ -64,6 +65,9 @@ pub struct Profile {
     /// The native pencil's point sieve as it counted before the
     /// finite-difference evaluation (`c653ede60b`, 2026-11-03).
     pub pencil_peval_sieve: bool,
+    /// The default linear harvest as round 3 item 02 shipped it, `gpv OR
+    /// rank >= 331` (before repair R8, `59fcca75d4`, 2026-10-26).
+    pub harvest_r3: bool,
 }
 
 /// The accounting of the code through 2026-10-14, when the committed
@@ -78,6 +82,7 @@ pub const PRE_2043: Profile = Profile {
     pre_1646: false,
     calibration_before_1640: false,
     pencil_peval_sieve: false,
+    harvest_r3: false,
 };
 
 /// The same accounting but for the one switch #1774 flipped, for records
@@ -109,10 +114,33 @@ pub const PRE_PENCIL_FD: Profile = Profile {
     pre_1646: false,
     calibration_before_1640: false,
     pencil_peval_sieve: true,
+    harvest_r3: false,
+};
+
+/// The accounting of the inherited-F4 default harvest before repair R8
+/// (`59fcca75d4`, 2026-10-26), when the committed
+/// `f4_harvest_remeasure_20261024` sessions were recorded: the default gate
+/// was `gpv < 0.9607 OR rank >= 331`; every other switch is the current one.
+pub const PRE_R8_HARVEST: Profile = Profile {
+    name: "pre-r8-harvest",
+    exact_word_xor_unit: false,
+    lazy_rewrite: false,
+    no_linear_harvest: false,
+    no_gate_first: false,
+    pre_1646: false,
+    calibration_before_1640: false,
+    pencil_peval_sieve: false,
+    harvest_r3: true,
 };
 
 /// Profiles tried, in order, after the current accounting fails.
-pub const PROFILES: [Profile; 4] = [PRE_2043, PRE_2043_PRICED, PRE_1646, PRE_PENCIL_FD];
+pub const PROFILES: [Profile; 5] = [
+    PRE_2043,
+    PRE_2043_PRICED,
+    PRE_1646,
+    PRE_PENCIL_FD,
+    PRE_R8_HARVEST,
+];
 
 /// A profile in force; the previous state returns when it drops.
 pub struct Guard {
@@ -127,6 +155,7 @@ impl Profile {
         set_legacy_pre_1646(self.pre_1646);
         set_legacy_calibration_before_1640(self.calibration_before_1640);
         set_legacy_no_linear_harvest(self.no_linear_harvest);
+        set_legacy_harvest_r3(self.harvest_r3);
         crate::cryptanalysis::ecbench::three_leads::set_legacy_peval_sieve(self.pencil_peval_sieve);
         if self.no_gate_first {
             set_gate_first(Some(false));
@@ -142,6 +171,7 @@ impl Drop for Guard {
         set_legacy_pre_1646(false);
         set_legacy_calibration_before_1640(false);
         set_legacy_no_linear_harvest(false);
+        set_legacy_harvest_r3(false);
         crate::cryptanalysis::ecbench::three_leads::set_legacy_peval_sieve(false);
         set_gate_first(None);
     }
@@ -306,6 +336,13 @@ pub const PRE_ENDOMORPHISM_A1_BINARIES: [Producer; 1] = [(
     "ext_endo_rho_20261023/sessions/{gls-fp2,subfield-fp3}",
 )];
 
+/// Binaries whose `ic.pipeline` records replay under [`PRE_R8_HARVEST`].
+pub const PRE_R8_HARVEST_BINARIES: [Producer; 1] = [(
+    "aa246d23df49391ccb13e0a659f10a6cd77e4677bb0c04331c2cbbefe8c9a2db",
+    "",
+    "f4_harvest_remeasure_20261024/sessions/{K0n13,K0n19,K1n11,K1n17,K1n19} (the linear_harvest=default arms)",
+)];
+
 /// Binaries whose `ic.three_leads_genus2_pencil_symbolic_v2` records replay
 /// under [`PRE_PENCIL_FD`].
 pub const PRE_PENCIL_FD_BINARIES: [Producer; 1] = [(
@@ -381,6 +418,9 @@ pub fn admits(profile: &Profile, r: &crate::cryptanalysis::ecbench::record::Reco
             return r.method.id == "ic.three_leads_genus2_pencil_symbolic_v2"
                 && listed(&PRE_PENCIL_FD_BINARIES, r);
         }
+        "pre-r8-harvest" => {
+            return r.method.id == "ic.pipeline" && listed(&PRE_R8_HARVEST_BINARIES, r);
+        }
         _ => return false,
     };
     r.method.id.starts_with("ic.")
@@ -407,13 +447,14 @@ mod tests {
 
     #[test]
     fn producer_lists_hold_full_digests_and_commits() {
-        let lists: [&[Producer]; 6] = [
+        let lists: [&[Producer]; 7] = [
             &PRE_2043_BINARIES,
             &PRE_2043_PRICED_BINARIES,
             &PRE_1646_BINARIES,
             &SETUP_DESCRIPTOR_BINARIES,
             &PRE_ENDOMORPHISM_A1_BINARIES,
             &PRE_PENCIL_FD_BINARIES,
+            &PRE_R8_HARVEST_BINARIES,
         ];
         for list in lists {
             for &(binary, commit, sessions) in list {
@@ -434,7 +475,11 @@ mod tests {
             assert!(
                 matches!(
                     profile.name,
-                    "pre-2043" | "pre-2043-priced" | "pre-1646" | "pre-pencil-fd"
+                    "pre-2043"
+                        | "pre-2043-priced"
+                        | "pre-1646"
+                        | "pre-pencil-fd"
+                        | "pre-r8-harvest"
                 ),
                 "{} has no list in `admits`",
                 profile.name
@@ -478,12 +523,22 @@ mod tests {
     #[test]
     fn pre_pencil_fd_is_offered_only_to_its_producer_and_id() {
         assert_eq!(PRE_PENCIL_FD_BINARIES.len(), 1);
-        assert_eq!(PROFILES.last().map(|p| p.name), Some("pre-pencil-fd"));
+        assert_eq!(PROFILES[3].name, "pre-pencil-fd");
         assert!(PROFILES
             .iter()
             .filter(|p| p.pencil_peval_sieve)
             .all(|p| p.name == "pre-pencil-fd"));
     }
+
+    #[test]
+    fn pre_r8_harvest_is_offered_only_to_its_producer_and_id() {
+        assert_eq!(PRE_R8_HARVEST_BINARIES.len(), 1);
+        assert!(PROFILES
+            .iter()
+            .filter(|p| p.harvest_r3)
+            .all(|p| p.name == "pre-r8-harvest"));
+    }
+
     /// The committed `genus-smoke-session-v2` records (seq 0-3, binary
     /// `20d31243...`): replayed today, each method reports the committed
     /// counters unchanged and, besides them, exactly the cost-accounting
