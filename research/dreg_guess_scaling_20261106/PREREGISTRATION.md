@@ -83,3 +83,23 @@ specialisation, at degree 4. Two committed outcomes are replayed:
 - Each process runs under `prlimit --as=15000000000` and `timeout 7200`.
 - About 12 hours of container time at most. Above that, the remaining branches are
   reported as not run.
+
+## Amendment 1 (2026-11-06, before any S5 branch other than d1.b0 was scored; owner chose the cloud route)
+
+- **Recorded before this amendment.** S5.d1.b0 refutes at degree 4 (`runs/S5.d1.b0.jsonl`:
+  195,709 columns, 2,479 s, 4.7 GB). All four positive controls refute at degree 4, and
+  Gate A passed. No other S5 branch has a record.
+- **Host.** The remaining S5 branches run on one RunPod CPU pod (cpu3g-64-256: 64 vCPU,
+  256 GB). It uses the launcher of `research/koblitz_ic_leads_build_20261024/pod/` and the
+  same `dreg_linear_guess` binary, uploaded and checked by SHA-256.
+  - **Why.** The 16 GB container's session-tracked tasks stop at 2 h, and up to 31 branches
+    × 41 min per draw do not fit.
+  - **Why not isolab-eks.** Its image carries only `ecbench` (see SURVEY §3).
+  - **Cost cap.** $30. The pod's lifetime is capped at 16,200 s, which is about $11.50
+    at $2.56/h.
+- **All 32 branches of every draw run, in parallel** (≈30 at a time, `RAYON_NUM_THREADS=2`
+  each). The registered fail-fast was a cost rule, not part of the verdict.
+- **The decision rule is unchanged.** A draw suffices iff all 32 branches refute at degree
+  4, and the verdict thresholds are as above. A capped or killed branch stays unmeasured.
+- **Added reading (exploratory, outside the decision rule).** The per-draw count of
+  refuting branches out of 32.
