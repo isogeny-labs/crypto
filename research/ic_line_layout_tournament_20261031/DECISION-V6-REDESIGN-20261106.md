@@ -1414,3 +1414,148 @@ coordinator_decision_revision:
     - "Then analyze-v6.sh twice (§15.3(4)), combine the three per-session verdicts, independent validator, evidence-review decision. s1/s2 stay sealed until s3 has written job-exit.json."
     - "Main session: mirror this block into ledger/decisions/DEC-20261106-662e33.yaml in the next ledger archive."
 ```
+
+### 15.5 Addendum (2026-11-06): rulings on the V6-AMENDMENT-1 draft
+
+**What I read** (uncommitted, in `/dev/shm/wt-v6res`):
+
+- `PROTOCOL-V6-AMENDMENT-1.md` (draft sha `6bfa3169…`);
+- the `protocol-v6.json` `amendments[]` entry (`fc21b7c2…`);
+- `launch-v6/request-session-3.json` (`9302e585…`);
+- the card `/dev/shm/v6run/card-s3.md`.
+
+No wall data has been read. The rulings below change the amendment's text in
+three places, and I made those edits in `PROTOCOL-V6-AMENDMENT-1.md` directly.
+Its sha256 is therefore no longer `6bfa3169…`. The director must mirror the
+edits into the `amendments[]` entry (`changes`, `supersedes_fields`) before the
+re-freeze.
+
+1. **EC2 check instead of `kubectl get node … NotFound`: accepted.**
+   - An EKS node named `ip-10-84-67-216…` can only be backed by an instance with
+     that private DNS name and address. If no non-terminated instance has
+     either, no live kubelet can run a pod under that name.
+   - The IP filter also catches a new instance that has just taken the address.
+     In that case the check fails and s3 waits, which errs on the safe side.
+   - The positive control and the terminated H1 instance `i-02d63a8327fb86ece`
+     are recorded on the card.
+   - A stale Node object with no instance cannot receive a running pod. The
+     after-the-run `node_name` rule is the backstop.
+2. **Node identity is decided by `node_name` alone: accepted.**
+   - Two live instances in one VPC cannot share a private IP. A different
+     `node_name` therefore implies a different instance, so the gate cannot
+     falsely pass.
+   - The only error it can make is to treat a new instance that reused the
+     address as the same host. That fails toward `inconclusive`, not toward
+     support.
+   - The EC2 instance list is recorded and decides nothing.
+   - Stated limit: distinct instances need not sit on distinct physical
+     machines. The frozen factor speaks of nodes, and the claim scope says "two
+     c8a.2xlarge host epochs", nothing finer.
+3. **"At most `inconclusive`": confirmed.** If the host-epoch condition fails,
+   a combined `supported_within_scope` becomes `inconclusive`. A combined
+   `invalid_measurement`, `inconclusive` or `within_control_distribution`
+   stands. The condition can only lower support, never raise another verdict.
+4. **Determinism check keyed on `dir`: confirmed.**
+   - s1 is passed by the same absolute path in runs (i) and (ii), and the card
+     records it. The amendment now says so.
+   - In run (ii), s1 is the second positional session (`session-2-*` files,
+     `.sessions[].session` = 2). That is why only `{verify_exit, verdict,
+     gates}` keyed on `dir` are compared.
+   - The fixed per-comparison seeds in `analyze-v6.sh` do not depend on a
+     session's position, so the check is valid.
+5. **A non-zero s3 `job-exit` enters as `invalid_measurement`: confirmed, and
+   extended.**
+   - `job-exit.json` decides this, not the script. The card reads it, and the
+     script does not.
+   - If run (ii) cannot write `verdict.json` (`analyze-v6.sh` exits 2 without
+     `records.jsonl`), s3 is `invalid_measurement` and the determinism check is
+     not applicable, because the combination is already `invalid_measurement`.
+   - If s3 and its `-r2` both write no `job-exit.json`, s3 is likewise
+     `invalid_measurement`. This is an infrastructure outcome, never evidence
+     about the candidate.
+   - These cases are now written into §2 of the amendment.
+6. **No `-r2` request file is frozen. Each one is generated at `-r2` time from
+   the frozen rule.**
+   - This matches the original v6 freeze, which froze no `-r2` file for any
+     job, including the counted job now launching. The frozen rule ("the same
+     request with the job name suffixed `-r2`") is fully mechanical.
+   - The card proves the result before launch: `jq -S -c 'del(.job.job_name)'`
+     of the generated request is byte-equal to that of the frozen request, and
+     `job.job_name` equals the frozen name + `-r2`. This is now in §2 of the
+     amendment, and it applies to every v6 job.
+   - The `-r2` card records its own §14.1 gate line.
+7. **`request-session-3.json` differs from session 1 in `job_name` and the
+   provenance label: confirmed.** §15.3(2) says exactly this. "Job name only" in
+   the dispatch was a paraphrase. s1 and s2 differ from each other in the same
+   two fields.
+8. **The seven consequential superseded fields plus `sample_size.power.note`:
+   confirmed, and not enough.** Several more fields still say "two" or "both"
+   sessions, and they are added to §6 of the amendment:
+   - `hypotheses[H-layout].predictions[P-wall].minimum_effect` and its
+     `provenance.decisive_scope`;
+   - `predictions[P-parity].provenance.decisive_scope`;
+   - `controls.positive.expected_detection`;
+   - the `budget_note` and the budget stopping rule, which are superseded by the
+     §14.1 rolling gate, as amendment item 6 already states.
+
+   The director writes each with its exact JSON path in `supersedes_fields`.
+   These fields need no change:
+   - `measurement.timed_primary_justification`, which says "two independent
+     host epochs" and is still true;
+   - `instance_sampling.rule`, where "two" refers to curves;
+   - the host-loss rule.
+
+**Re-freeze recording.** The `freeze` block holds the freeze of the document
+as it now stands, so it can always be checked against the canonical hash:
+
+- `freeze.protocol_sha256` is the canonical hash of the final amended
+  document, computed by `experiment_protocol.py freeze` after the edits above.
+  The draft value `2ce7400c…` is therefore stale and must not be copied.
+- `freeze.commit` and `frozen_at` are those of the re-freeze. `freeze.filed_before_affected_data`
+  is true.
+- The original freeze (`protocol_sha256 12415faa…` with its commit and
+  `frozen_at`) stays reproducible as the canonical hash with
+  `amendments = []`. It is recorded in `PROTOCOL-V6-AMENDMENT-1.md`, as the
+  header already does. The commit and `frozen_at` are added there. If the
+  validator accepts the field, it is also recorded as `prior_freeze` in the
+  amendment entry. If the validator refuses the field, it is recorded under
+  `extensions`. `experiment_protocol.py validate` must report 0 findings.
+- `amendments[].filed_before_affected_data` is true.
+
+The original freeze is not overwritten silently: it remains a reproducible,
+recorded hash.
+
+**Revision 3 (budget) was already recorded as §14,** so nothing was rewritten.
+The HOLD was lifted there.
+
+**Status.** Once the director has mirrored these rulings into the
+`amendments[]` entry and the validator reports 0 findings, the amendment may be
+re-frozen and merged. s3 may launch after that, under `card-s3.md`, once its
+node check prints `0` twice and its §14.1 gate line passes. The card's gate
+line (at most USD 2.95) is consistent with §14.1. s1 and s2 stay sealed per
+§15.3(5).
+
+```yaml
+coordinator_decision_revision:
+  revises: DEC-20261106-662e33
+  revision: 4.1          # addendum to §15 (Revision 4)
+  date: 2026-11-06
+  decision: approve       # V6-AMENDMENT-1 approved for re-freeze once the rulings are mirrored into the json entry
+  target_ids: [IC-LINE-LAYOUT-E2E-FP28-V6-20261106]
+  rulings:
+    p1: "EC2 non-terminated-instance check (DNS and IP, both 0) accepted in place of kubectl NotFound"
+    p2: "node_name decides; EC2 data recorded only; failure mode is conservative"
+    p3: "host-epoch failure turns supported_within_scope into inconclusive; other verdicts stand"
+    p4: "s1 matched by an identical absolute dir in both runs, recorded on the card"
+    p5: "non-zero s3 job-exit, analyze exit 2 or double host loss gives s3 invalid_measurement"
+    p6: "no -r2 file frozen; generated at rerun time; card checks del(.job.job_name) equality and the name suffix"
+    p7: "job_name plus provenance label difference confirmed"
+    p8: "director's additions confirmed; P-wall minimum_effect and decisive_scope, P-parity decisive_scope, controls.positive.expected_detection, budget_note and the budget stopping rule added"
+  refreeze: "freeze block = new canonical hash of the final amended document (recomputed; 2ce7400c is stale); the prior freeze 12415faa (reproducible with amendments=[]) is recorded in the amendment file, and in the json entry if the schema allows"
+  amendment_file_edited: research/ic_line_layout_tournament_20261031/PROTOCOL-V6-AMENDMENT-1.md   # §2 item 2 (-r2 generation, no-result case), §2 item 4 (absolute S1DIR, analyze exit 2), §6 (added superseded fields)
+  knowledge_promotion: not_warranted
+  next_actions:
+    - "Director: mirror these rulings into the protocol-v6.json amendments[] entry (changes, supersedes_fields with exact JSON paths, prior freeze), run experiment_protocol.py validate (0 findings), and recompute the shas."
+    - "Main session: run experiment_protocol.py freeze, then merge the amendment; then relay card-s3.md after the node check and gate line."
+    - "Main session: mirror this block into ledger/decisions/DEC-20261106-662e33.yaml."
+```
