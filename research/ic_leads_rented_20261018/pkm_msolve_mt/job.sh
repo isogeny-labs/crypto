@@ -11,6 +11,8 @@ remaining() { echo $(( CAPS - ($(date +%s) - T0) )); }
 status() { echo "$(date -u +%FT%TZ) $1" >> "$OUT/STATUS"; }
 D=research/pkm_m3_n21_msolve_20261018
 SYSTEMS=${MSOLVE_SYSTEMS:-"pkm_kummer_p2013265921_m3_t7_x221026520 pkm_kummer_p2013265921_m3_t7_x704078485"}   # card P2a; P2b passes the two m3_t8 targets
+RD=${MSOLVE_RUNDIR:-runs-mt}; PG=progress-mt.txt; [ "$RD" = runs-mt ] || PG=progress-$RD.txt
+export RUNDIR=$RD PROG=$PG   # MSOLVE_RUNDIR gives a launch its own records and progress file (default unchanged)
 CONTROL=pkm_kummer_p2013265921_m3_t5_x1289903598
 set -- $SYSTEMS; PAR=$#
 NCPU=$(nproc); THREADS=$(( NCPU / PAR )); [ "$THREADS" -ge 1 ] || THREADS=1
@@ -20,7 +22,7 @@ MT=$(( $(awk '/^MemTotal:/ {print $2}' /proc/meminfo) * 1024 ))
 CAP=$(( LIM * 85 / 100 / PAR ))
 WALL=$(( $(remaining) - ${SERVE_SECONDS:-2700} - 2700 - 1800 ))   # control (45 min) and margin first
 [ "$WALL" -gt "${MSOLVE_WALL_MAX:-86400}" ] && WALL=${MSOLVE_WALL_MAX:-86400}
-mkdir -p "$D/runs-mt"; ln -sfn "/workspace/src/$D/runs-mt" "$OUT/msolve-mt" 2>/dev/null || true
+mkdir -p "$D/$RD"; ln -sfn "/workspace/src/$D/$RD" "$OUT/msolve-mt" 2>/dev/null || true
 status "MSOLVE_MT plan: $PAR systems at once, $THREADS threads each, CAP=$CAP, WALL=$WALL"
 if [ "${DRY:-0}" = 1 ]; then echo "PAR=$PAR THREADS=$THREADS CAP=$CAP WALL=$WALL SYSTEMS=$SYSTEMS"; exit 0; fi
 [ "$WALL" -gt 3600 ] || { status "MSOLVE_MT_NOT_RUN: wall $WALL s under 1 h"; exit 1; }
@@ -32,14 +34,14 @@ if ! command -v msolve > /dev/null; then
 fi
 { echo "date: $(date -u +%FT%TZ)"; echo "commit: $(git rev-parse HEAD)"; echo "msolve: $(command -v msolve) $(msolve -h 2>&1 | head -2 | tr '\n' ' ')"
   echo "msolve sha256: $(sha256sum "$(command -v msolve)" | cut -d' ' -f1)"; echo "cgroup limit bytes: $LIM; CAP per process: $CAP; PAR: $PAR; THREADS each: $THREADS; WALL: $WALL"
-  echo "pod: ${RUNPOD_POD_ID:-none}"; lscpu; } > "$D/runs-mt/host-$(hostname).txt"
+  echo "pod: ${RUNPOD_POD_ID:-none}"; lscpu; } > "$D/$RD/host-$(hostname).txt"
 # Control (A1.3): the N = 15 system at the measured thread count must give the
 # committed answer (one-element basis, no solution) inside 45 minutes.
 status "MSOLVE_MT control $CONTROL threads=$THREADS"
 THREADS=$THREADS CAP=$CAP WALL=2700 "$D/run_mt.sh" "$CONTROL"
-if ! grep -q "exit=0" "$D/runs-mt/$CONTROL.mem" || ! cmp -s "$D/runs-mt/$CONTROL.out" "$D/runs/$CONTROL.out"; then
-  status "MSOLVE_MT_CONTROL_FAILED (see runs-mt/$CONTROL.*); measured systems not run"; exit 1; fi
-status "MSOLVE_MT control agrees ($(cat "$D/runs-mt/$CONTROL.mem"))"
+if ! grep -q "exit=0" "$D/$RD/$CONTROL.mem" || ! cmp -s "$D/$RD/$CONTROL.out" "$D/runs/$CONTROL.out"; then
+  status "MSOLVE_MT_CONTROL_FAILED (see $RD/$CONTROL.*); measured systems not run"; exit 1; fi
+status "MSOLVE_MT control agrees ($(cat "$D/$RD/$CONTROL.mem"))"
 for s in $SYSTEMS; do
   THREADS=$THREADS CAP=$CAP WALL=$WALL "$D/run_mt.sh" "$s" & sleep 30
 done
