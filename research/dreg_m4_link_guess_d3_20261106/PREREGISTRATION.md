@@ -109,3 +109,13 @@ Variables: `x₁ = 0–4`, `x₂ = 5–9`, `x₃ = 10–14`, `x₄ = 15–19`, t
 
 m = 4, two cells at ℓ = 5, 8 draws, the 4-core 16 GB container, not isolated.
 Iso Lab EKS is not reachable from it, and Conductor is not installed.
+
+## Amendment 1 (2026-11-06, before any study outcome was read)
+
+The first attempt's `run.sh` did not export
+`F4_F2_MAX_ROWS=50000000 F4_F2_MAX_COLS=50000000`, which the m = 3 runner
+sets. Without them, the identity control N never built degree 4 and failed V2.
+The attempt was stopped and every output moved, unread, to
+`runs/attempts/run1-no-f4-env-20261106/`. `run.sh` now exports both, and the
+study reruns from the start. The arms, draws, metric and verdict rules are
+unchanged.

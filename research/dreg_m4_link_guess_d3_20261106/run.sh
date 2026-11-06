@@ -12,6 +12,7 @@ HERE=$(cd "$(dirname "$0")" && pwd)
 REPO=$(cd "$HERE/../.." && pwd)
 RUNS=$HERE/runs
 mkdir -p "$RUNS/attempts"
+export F4_F2_MAX_ROWS=50000000 F4_F2_MAX_COLS=50000000
 export RAYON_NUM_THREADS=${RAYON_NUM_THREADS:-4}
 A=research/dreg_closure_driver_20261016/draws/m4-12-5.jsonl
 B=research/dreg_closure_driver_20261016/draws/m4-11-5.jsonl
