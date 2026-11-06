@@ -1358,7 +1358,7 @@ fn summarize_a2(a2_rows: &str, inf_rows: &str, out: &str, claimed: Option<&str>)
                 "control (first A gave 4,096): A_j dims {dims:?}, {}",
                 if ok { "all 4,096" } else { "NOT all 4,096" }
             )
-        } else if dims.iter().any(|&d| d == 4096) {
+        } else if dims.contains(&4096) {
             "chart-dependent: some A_j reaches 4,096".to_string()
         } else if dims.iter().all(|&d| d == d0) {
             "chart-independent: every A_j gives the first A's dimension".to_string()
