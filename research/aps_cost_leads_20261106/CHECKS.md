@@ -107,9 +107,10 @@ lint stopped on a missing tracked sparse file; the unchanged native
 added-line checker separately found no task findings. This is not a complete
 whole-repository validation or a hosted-check result [pcc:unverified].
 
-No source checkpoint, profiler session, performance pilot or EKS experiment
-is asserted here. The source-only gate needs its actual bounded native
-admission and hosted outcome. Complete pricing/accounting, independent
+The source1bc checkpoint acknowledgement above is its own boundary. No
+profiler session, performance pilot or EKS experiment is asserted here.
+Later run source/protocol changes need a fresh bounded checkpoint admission.
+Complete pricing/accounting, independent
 metric/full-set replay, exact registered four-size curves, frozen disjoint
 pilot/held-out protocols, native analysis/power/budgets and run admission
 remain open. A merged component PR does not complete T9 or the research panel.
