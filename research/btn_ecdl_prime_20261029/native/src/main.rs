@@ -254,11 +254,38 @@ fn derived_network_ordered(
     hash_a1_first: bool,
     m: &mut Meter,
 ) -> Res<hashed_ecdl_tensor::network::Network> {
+    derived_network_full(c, s, thresholds, seeds, target, mark_a2, hash_a1_first, false, m)
+}
+
+/// `lean`: build A1 from raw input words instead of `input_point`, dropping
+/// its validity network.  It is implied: `point_add` validates -A1 (same x,
+/// y' = -y via `modular_subtract`, which makes y canonical; (-y)^2 = y^2), so
+/// the language is unchanged.  Exactness is still checked against brute force.
+#[allow(clippy::too_many_arguments)]
+fn derived_network_full(
+    c: &Curve,
+    s: &BigUint,
+    thresholds: &[BigUint; 2],
+    seeds: &[(u64, u64); 2],
+    target: &Point,
+    mark_a2: bool,
+    hash_a1_first: bool,
+    lean: bool,
+    m: &mut Meter,
+) -> Res<hashed_ecdl_tensor::network::Network> {
     use hashed_ecdl_tensor::encoding::{Encoder, PointWords};
     let q = c.modulus().clone();
     let width = q.bits() as usize;
     let mut enc = Encoder::new();
-    let a1 = enc.input_point(c, false, m).map_err(e)?;
+    let a1 = if lean {
+        PointWords {
+            infinity: Encoder::constant(1, &BigUint::zero()).map_err(e)?,
+            x: enc.input_word(width, m).map_err(e)?,
+            y: enc.input_word(width, m).map_err(e)?,
+        }
+    } else {
+        enc.input_point(c, false, m).map_err(e)?
+    };
     if hash_a1_first {
         let (al, be) = seeds[0];
         enc.hash_member(c, &a1, s, &al.into(), &be.into(), &thresholds[0], m).map_err(e)?;
@@ -315,6 +342,7 @@ fn counts2(p: u64) -> Res<Vec<Value>> {
                 ("derived", derived_network(&c, &s, &[threshold.clone(), threshold.clone()], &seeds, target, true, &mut m)?),
                 ("derived_a1", derived_network(&c, &s, &[threshold.clone(), threshold.clone()], &seeds, target, false, &mut m)?),
                 ("derived_a1_hashfirst", derived_network_ordered(&c, &s, &[threshold.clone(), threshold.clone()], &seeds, target, false, true, &mut m)?),
+                ("derived_lean", derived_network_full(&c, &s, &[threshold.clone(), threshold.clone()], &seeds, target, false, true, true, &mut m)?),
             ];
             for (name, net) in nets {
                 let mut cm = meter(20_000_000_000);
@@ -464,6 +492,66 @@ fn prunetest(p: u64) -> Res<Vec<Value>> {
         rec["prune_over_noprune"] = json!(rec["pruning"]["steps"].as_f64().unwrap() / rec["no_pruning"]["steps"].as_f64().unwrap());
         println!("{rec}");
         out.push(rec);
+    }
+    Ok(out)
+}
+
+/// Lean A1 (no duplicate validity network) vs the combined derived network,
+/// pruning on and off, against brute force, plus a checked witness on lean.
+fn lean(p: u64) -> Res<Vec<Value>> {
+    let mut m = meter(u64::MAX / 2);
+    let (c, a, b, _) = curve_for(p, &mut m)?;
+    let s = hash_prime(p, &mut m)?;
+    let pts = affine_points(&c, p, a, b);
+    let seeds = [(1u64, 0u64), (3, 7)];
+    let mut out = Vec::new();
+    for threshold in [s.clone(), &s >> 1u8, &s >> 2u8, &s >> 3u8] {
+        let fb = bases(&c, &s, &threshold, &mut m)?;
+        let th = [threshold.clone(), threshold.clone()];
+        for target in pts.iter().take(2) {
+            let mut brute = 0u64;
+            for a1 in &pts {
+                if !fb[0].contains(&c, a1, &mut m).map_err(e)? { continue; }
+                for a2 in &pts {
+                    if fb[1].contains(&c, a2, &mut m).map_err(e)? && &c.add(a1, a2, &mut m).map_err(e)? == target { brute += 1; }
+                }
+            }
+            let mut rec = json!({ "p": p, "d": 64 - p.leading_zeros(), "threshold": threshold.to_string(), "brute": brute });
+            for (name, leanflag) in [("hashfirst", false), ("lean", true)] {
+                let net = derived_network_full(&c, &s, &th, &seeds, target, false, true, leanflag, &mut m)?;
+                rec[name] = json!({ "edges": net.edge_count(), "vertices": net.vertex_count() });
+                for pruning in [true, false] {
+                    let mut cm = meter(20_000_000_000);
+                    let mut counter = Counter::default();
+                    counter.functional_pruning = pruning;
+                    let n = counter.count(&net, &vec![None; net.edge_count()], &mut cm).map_err(e)?;
+                    rec[name][if pruning { "pruning" } else { "no_pruning" }] = json!({ "count": n.to_string(),
+                        "ok": n.to_u64() == Some(brute), "steps": cm.used, "assignments": counter.statistics.functional_assignments });
+                }
+                if leanflag {
+                    let mut wm = meter(20_000_000_000);
+                    let mut wc = Counter::default();
+                    wc.functional_pruning = false;
+                    rec[name]["witness"] = match wc.witness(&net, &vec![None; net.edge_count()], &mut wm).map_err(e)? {
+                        None => json!({ "found": false, "ok": brute == 0 }),
+                        Some(bits) => {
+                            let w = (64 - p.leading_zeros()) as usize;
+                            let num = |from: usize| -> u64 { (0..w).map(|i| (bits[from + i] as u64) << i).sum() };
+                            let a1 = pt(num(1), num(1 + w));
+                            let neg = match &a1 { Point::Affine { x, y } => Point::Affine { x: x.clone(), y: (BigUint::from(p) - y) % p }, Point::Infinity => Point::Infinity };
+                            let a2 = c.add(target, &neg, &mut m).map_err(e)?;
+                            let ok = c.contains(&a1) && a2 != Point::Infinity && fb[0].contains(&c, &a1, &mut m).map_err(e)?
+                                && fb[1].contains(&c, &a2, &mut m).map_err(e)? && &c.add(&a1, &a2, &mut m).map_err(e)? == target;
+                            json!({ "found": true, "ok": ok && brute > 0, "a1": format!("{a1:?}"), "steps": wm.used })
+                        }
+                    };
+                }
+            }
+            let best = |k: &str| [rec[k]["pruning"]["steps"].as_f64().unwrap_or(0.0), rec[k]["no_pruning"]["steps"].as_f64().unwrap_or(0.0)].into_iter().fold(f64::INFINITY, f64::min);
+            rec["lean_gain"] = json!(best("hashfirst") / best("lean"));
+            println!("{rec}");
+            out.push(rec);
+        }
     }
     Ok(out)
 }
@@ -683,6 +771,20 @@ fn report(dir: &str) -> Res<Value> {
     let fmin = |v: &[f64]| v.iter().cloned().fold(f64::INFINITY, f64::min);
     let fmax = |v: &[f64]| v.iter().cloned().fold(0.0, f64::max);
     let worse_derived = c2.iter().filter(|r| ratio(r, "original", "derived_a1") < 1.0).count();
+    let lean_summary = {
+            let ln = read_jsonl(&format!("{dir}/lean.jsonl")).unwrap_or_default();
+            let exact = !ln.is_empty() && ln.iter().all(|r| ["hashfirst", "lean"].iter().all(|k| r[*k]["pruning"]["ok"] == json!(true) && r[*k]["no_pruning"]["ok"] == json!(true)) && r["lean"]["witness"]["ok"] == json!(true));
+            let by = |small: bool| -> Vec<f64> { ln.iter().filter(|r| {
+                let t: f64 = r["threshold"].as_str().unwrap_or("0").parse().unwrap_or(0.0);
+                let full: f64 = ln.iter().filter(|q| q["p"] == r["p"]).filter_map(|q| q["threshold"].as_str()?.parse::<f64>().ok()).fold(0.0, f64::max);
+                (t * 4.0 <= full) == small }).filter_map(|r| r["lean_gain"].as_f64()).collect() };
+            let (sm, lg) = (by(true), by(false));
+            json!({ "n": ln.len(), "exact": exact,
+                "edges": ln.iter().map(|r| (u(r, "d"), r["hashfirst"]["edges"].as_u64().unwrap_or(0), r["lean"]["edges"].as_u64().unwrap_or(0))).collect::<std::collections::BTreeSet<_>>().into_iter().map(|(d, h, l)| json!({"d": d, "hashfirst": h, "lean": l})).collect::<Vec<_>>(),
+                "gain_small_threshold_min": fmin(&sm), "gain_small_threshold_max": fmax(&sm),
+                "gain_large_threshold_min": fmin(&lg), "gain_large_threshold_max": fmax(&lg),
+                "note": "small = tau <= s/4, large = tau >= s/2; gain = best(hash-first) / best(lean) over pruning on/off" })
+    };
     let derived = json!({
         "n": c2.len(),
         "counts_equal_and_match_brute_force": !c2.is_empty() && c2.iter().all(|r| r["original"]["ok"] == json!(true) && r["derived"]["ok"] == json!(true)),
@@ -706,6 +808,7 @@ fn report(dir: &str) -> Res<Value> {
         "original_noprune_penalty_max": fmax(&c2.iter().map(|r| r["original"]["no_pruning"]["steps"].as_f64().unwrap_or(0.0) / r["original"]["steps"].as_f64().unwrap_or(1.0)).collect::<Vec<_>>()),
         "overhead": read_jsonl(&format!("{dir}/overhead.jsonl")).unwrap_or_default(),
         "prune_crossover": read_jsonl(&format!("{dir}/prunetest.jsonl")).unwrap_or_default(),
+        "lean": lean_summary,
         "free_bits": c2.iter().map(|r| (u(r, "d"), r["original"]["free_input_bits"].as_u64().unwrap_or(0), r["derived"]["free_input_bits"].as_u64().unwrap_or(0))).collect::<std::collections::BTreeSet<_>>().into_iter().map(|(d, o, v)| json!({"d": d, "original": o, "derived": v})).collect::<Vec<_>>(),
         "rows": c2,
         "eccp131_log2_assignments": { "original": 4 * 131, "derived": 2 * 131 },
@@ -782,6 +885,7 @@ fn main() {
         Some("counts2") => nums(2).into_iter().try_for_each(|p| counts2(p).map(|v| v.iter().for_each(|r| println!("{r}")))),
         Some("overhead") => nums(2).into_iter().try_for_each(|p| overhead(p).map(|r| println!("{r}"))),
         Some("prunetest") => nums(2).into_iter().try_for_each(|p| prunetest(p).map(|_| ())),
+        Some("lean") => nums(2).into_iter().try_for_each(|p| lean(p).map(|_| ())),
         Some("solve") => {
             let n = nums(2);
             solve(n[0], n[1], n[2]).map(|r| println!("{r}"))

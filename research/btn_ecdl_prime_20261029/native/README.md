@@ -21,6 +21,7 @@ $B report native_runs                                                      > nat
 |---|---|
 | `sizes P...` | decomposition-network edges, vertices, max degree, interface bits per prime |
 | `counts P...` | `Counter::count` vs a brute-force decomposition count; backend; charged steps |
+| `lean P...` | lean A1 vs combined derived network, pruning on/off, brute force, checked witness |
 | `overhead P...`, `prunetest P...` | fixed per-call cost split (pruning plan vs rest); pruning on/off crossover at larger d |
 | `counts2 P...` | original vs derived-last-point variants (A1-only interface, hash-first) at four thresholds: counts, steps, checked witnesses, pinned overhead |
 | `solve P SEED XI` | `reduction::solve` with a known scalar, then `reduction::verify` |
@@ -68,6 +69,14 @@ Each line of output is one JSON object. Curves are the first prime-order
   its pruning (off costs it 1.47–35.6×). `prunetest` locates the crossover: off
   still wins at d = 5 (1.17×, 1.03×), while at d = 6 pruning wins at a small
   threshold (0.85). A size-based rule, not a blanket switch. [pcc:unverified]
+* **Lean A1 (duplicate validity check removed).** `point_add` already
+  validates −A1, which holds exactly when A1 is valid, so A1 can come from raw
+  input words instead of `input_point` (15–16% fewer edges). `lean`: 32
+  instances, every count exact with and without pruning, every witness checked.
+  At τ ≤ s/4 it is 1.08–1.66× faster (the hash rejects most A1 before any curve
+  check); at τ ≥ s/2 it is 0.59–0.91× (slower: the curve check now runs only
+  inside `point_add`). Real factor bases use tiny τ, the lean regime; a
+  threshold-based choice. [pcc:unverified]
 * **Recursion crossover (headline).** `Counter::count` selects the recursive
   backend only when `lambda / 131072 >= 1` with `lambda = ceil(log2(2·edges))`
   (transcribed from `recursive.rs` `Setup::parameters`), i.e. at least

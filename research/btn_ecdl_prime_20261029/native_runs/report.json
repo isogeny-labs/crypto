@@ -245,6 +245,32 @@
     ],
     "hashfirst_ratio_max": 1.5605368579520809,
     "hashfirst_ratio_min": 1.0,
+    "lean": {
+      "edges": [
+        {
+          "d": 3,
+          "hashfirst": 16905,
+          "lean": 14340
+        },
+        {
+          "d": 3,
+          "hashfirst": 16987,
+          "lean": 14418
+        },
+        {
+          "d": 4,
+          "hashfirst": 29329,
+          "lean": 24540
+        }
+      ],
+      "exact": true,
+      "gain_large_threshold_max": 0.9127325957830138,
+      "gain_large_threshold_min": 0.5909338984732716,
+      "gain_small_threshold_max": 1.6630971586606529,
+      "gain_small_threshold_min": 1.0817692132615129,
+      "n": 32,
+      "note": "small = tau <= s/4, large = tau >= s/2; gain = best(hash-first) / best(lean) over pruning on/off"
+    },
     "n": 32,
     "noprune_vs_prune_hashfirst_max": 2.9220825852782766,
     "noprune_vs_prune_hashfirst_min": 1.2069512439732857,

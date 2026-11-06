@@ -159,6 +159,20 @@ So the plan should be built only when the search space is large relative to
 the network: off is better through d = 5 here, and at d = 6 pruning already
 wins at a small threshold. A size-based rule, not a blanket switch.
 
+*Dropping a duplicated validity check ("lean").* `input_point` validates
+A#sub[1] (canonical coordinates, on the curve), and `point_add` then validates
+−A#sub[1], which holds exactly when A#sub[1] is valid (same x; y made canonical by
+`modular_subtract`; (−y)#super[2] = y#super[2]). Building A#sub[1] from raw input words removes
+the first check: #D.at("lean").at("edges").map(r => [d = #r.at("d"): #r.at("hashfirst") → #r.at("lean") edges]).join(", ").
+On #D.at("lean").at("n") instances every count stays exact with and without pruning and
+every witness checks out (*#D.at("lean").at("exact")*). The effect depends on the threshold:
+at τ ≤ s/4 lean is #calc.round(D.at("lean").at("gain_small_threshold_min"), digits: 2)–#calc.round(D.at("lean").at("gain_small_threshold_max"), digits: 2)× faster (the hash rejects most
+A#sub[1] before any curve check runs), at τ ≥ s/2 it is slower
+(#calc.round(D.at("lean").at("gain_large_threshold_min"), digits: 2)–#calc.round(D.at("lean").at("gain_large_threshold_max"), digits: 2)×), because the curve check, which rejects most (x, y) pairs, now
+runs only inside `point_add`. Real factor bases use tiny thresholds (at ECCp-131
+about 2#super[65] of 2#super[131] points, τ/s ≈ 2#super[−66]), which is the lean regime; like the
+pruning plan, it is a threshold-based choice.
+
 At ECCp-131 the exact fallback's worst case drops from
 $2^#D.at("eccp131_log2_assignments").at("original")$ to $2^#D.at("eccp131_log2_assignments").at("derived")$
 assignments per count. That is a large constant-exponent improvement and still
