@@ -47,3 +47,27 @@ excluded 0 and A/A half-width was ≤ 0.003 in coverage.
   This is the pattern of a small-p effect that vanishes, not a stable bias. Only seven
   primes and one cell, so the trend is an observation and not a fit or a claim.
 - No cost claim follows. A coverage deficit of 0.003 is far below anything usable.
+
+## Explaining the k = 2, d = 1 residual (post hoc exploration)
+
+Hypothesis, stated before the run: for k = 2 and d = 1, V = F_p·g is one of p + 1 lines of
+F_{p²} over F_p, and two are degenerate. If g ∈ F_p ("rational"), Q and πQ have the same
+x, so Tr(Q) is O or a doubling 2P. If g^p = −g ("pure"), x(πQ) = −x(Q). A uniform random g
+lands on each with probability (p − 1)/(p² − 1) ≈ 1/(p + 1), which shrinks with p. For
+k = 3 the chance that g ∈ F_p is about 1/p², matching no residual there.
+
+`explore_line_classes.py` (output `explore_line_classes.out.txt`) enumerates all p + 1 lines
+for 60 curves and 4 draws each, small-base cov_2 against the sign-symmetric null:
+
+| p | generic Δcov_2 | pure | rational | weighted by 1/(p+1) exposure |
+|---|---|---|---|---|
+| 23 | +0.0015 | −0.061 | −0.138 | −0.0070 |
+| 37 | −0.0026 | −0.039 | −0.051 | −0.0049 |
+| 53 | −0.0014 | −0.009 | −0.029 | −0.0021 |
+
+The generic lines (almost all of them) sit near 0. The two degenerate lines carry the
+deficit, and the exposure-weighted mix (−0.0070, −0.0049, −0.0021) is the size and the
+decay of the pooled residual (−0.0086 for p 17–31, −0.0052 at p = 37, −0.0005 to −0.0027
+for p 47–61). So the residual is the fraction of random V that are degenerate, not a
+property of the trace map on generic V. No confidence intervals were computed here (60
+curves, one seed), and a small negative generic value at p = 37 and 53 is not excluded.
