@@ -80,7 +80,7 @@ stopping policy and label law unless the contrast explicitly varies one.
 
 The growth implementation exposes `growth=none|retained_full|frontier`; a panel comparing
 independent fresh bases against retained nested bases changes the population
-law too and must be labeled factorial/confounded, not a one-factor speedup.
+law too and must be labeled factorial/confounded, not a one-factor speedup [pcc:unverified].
 Both retained modes use the same seeded sampling and ceiling policy. The
 independent reader checks the full product in `retained_full` and permits
 old-region subtraction only for certified `frontier` attempts.
@@ -130,7 +130,7 @@ inconclusive. A failed positive control stops the affected experiment.
 
 1. Successful approved source/worktree checkpoint, under fenced resume
    ownership and a fresh payload/baseline review. Approval already exists;
-   secure upload authentication is missing. No credentials in chat.
+   secure upload authentication is missing [pcc:unverified]. No credentials in chat.
 2. Source-built tested/pushed image; exact registered ladder and independent
    oracle budget; complete protocol-design and metric audit. This native
    exporter's schema/hash checks alone do not admit a design or execution.

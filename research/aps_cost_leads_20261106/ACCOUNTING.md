@@ -37,7 +37,7 @@ requires a complete method frame for a qualified cost.
 All reconstruction receipts retain `execution_attested=false`,
 `wall_qualified=false` and `gae_calibrated=false`. A matching transcript and
 unkeyed file digests do not prove execution, raw-profile authenticity, thread
-coverage or pre-data filing. Actual profiler/image configuration must record
+coverage or pre-data filing [pcc:unverified]. Actual profiler/image configuration must record
 combined threads and be reviewed at run admission. Cooperative deadlines can
 make profiled and unprofiled trajectories differ; that is a retained missing
 cost, never permission to alter a transcript or rerun for a favorable seed.

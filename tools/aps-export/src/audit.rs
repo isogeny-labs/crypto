@@ -852,6 +852,10 @@ pub fn mathematical(r: &Value, cap: u64) -> Result<Value> {
             in_budget == 1 && r["detail"]["outcome"] == "verified",
             "record success is not backed by exactly one in-budget witness",
         )?;
+        require(
+            scalar_record(r)?["matches_target"] == true,
+            "record scalar failed the separate arithmetic checker",
+        )?;
     }
     Ok(
         json!({"aps":true,"attempts":rows.len(),"coordinate_sets_checked":reported,"complete_attempts_checked":complete,"partial_attempts_retained":partial,"witnesses_checked":witnesses,"in_budget_witnesses_checked":in_budget,"execution_attested":false,"sampling_history_attested":false,"costs_attested":false}),
