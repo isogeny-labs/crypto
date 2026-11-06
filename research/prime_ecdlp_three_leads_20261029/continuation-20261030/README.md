@@ -1,5 +1,39 @@
 # G1–G6 continuation: independently check useful rank and target recovery
 
+## Observed native F4 windows — 2026-11-06
+
+The oracle now emits previously unreported process-native total/stair
+observations, partitioned into inclusive, callback and outside-callback
+windows. The wrapper preserves Result-refusal observations for a caller-held
+owner, rejects reuse and marks observed bad differences unavailable. Replay
+checks metadata arithmetic and visitor-attempt/callback consistency; older
+missing-field records remain readable. This is metadata consistency, not
+execution proof or complete cost. [pcc:unverified]
+
+[Fresh source-cd76 receipt](validation/native-windows-20261106/receipt.json)
+records36oracle tests passed,0failed/ignored:4new controls plus32prior. Format,
+CLIbuild and actual checkpoint-refusal message+expectedexit1 pass. Final scoped
+CargoClippy/supervisor remainFAIL101 on two inherited library errors; final
+example strictlint is unqualified. PCC-20261106-496201 is unsigned/unverified.
+[Delivery review](validation/native-windows-20261106/delivery-review.json) binds
+all22objects,2freshbinarycopies/8unchanged,oldraw and exact formal/gate/Mathlib
+objects. No shared-core changes or duplicate old library/process/Lean runs.
+[pcc:unverified]
+
+[Coverage/gap report](G2_NATIVE_WINDOWS_20261106.md), [inspected two-page PDF](native-windows-20261106.pdf)
+and [editable diagram](native-windows-20261106.svg) keep ambient interference,
+nontransactional reads and full-wrap limits explicit. Outside callbacks is not
+exclusive solver attribution. Stair aliases part of native total; inclusive
+aliases its parts. Do not sum overlapping views. No price or timing comparison.
+[pcc:unverified]
+
+A concrete root-counter gap remains: linear andp2 shortcuts omit supplied
+multiplication-counter updates, with inverse/addition/control work also open.
+The p2 case is outside currentPKM p>11; linear cases matter. This source review
+is not a shared-core fix. A future root change needs fresh affected core and
+integration validation. Scientific acceptance/metrics remain unchanged and the
+frozen PCC fork remains unresolved; no ordinary merge or waiver was attempted.
+
 ## Helper-accounting publication — 2026-11-06
 
 Sourceab0, fresh32-control evidence and inspected helper/encoder report were
