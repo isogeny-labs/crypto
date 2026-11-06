@@ -94,6 +94,17 @@ not a demonstrated runtime or algorithm.
 
 ## Next discriminating step
 
+The [normalized-square follow-up](../research/prime_square_kernel_20261106/lean-normalizer/README.md)
+now derives the actual shifted-grid normalizer's unit property from Lucas
+parity, factorial identities and a proved finite-product formula. The
+pointwise valuation-doubling theorem no longer assumes an unspecified unit.
+The actual normalized-square kernel also preserves every source node and
+has an entrywise identity at the origin for all real slots.
+This removes that component obligation; coefficientwise chart content,
+uniform weighted crossing density, Hermite/entry costs and recursion remain
+open. Claim records bd8ff1 and82eac6 await trusted signed verdicts.
+[pcc:unverified]
+
 A [repeated-anchor follow-up](../research/prime_pole_anchor_20261030/repeated/README.md)
 extends the fixed odd-anchor gain to k bits at added degree k, without
 changing the source moment index. It also charges a specific attempt to
