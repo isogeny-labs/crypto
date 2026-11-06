@@ -623,16 +623,19 @@ standing, and the synthesis reconciles the two
 (\art{research/ic_prime_eth_leads_20261031/SYNTHESIS.md};
 \art{research/ic_prime_eth_leads_20261031/leads/SKEPTIC_DIGEST.md}). The raw lead
 directories are on an external volume, and nothing in the synthesis was
-re-run. Table~\ref{tab:pa-eth} in \S\ref{sec:pa-sat} gives the headline and
-standing per lead; this section gives what the leads measured and why six
-were refuted as stated. The verdict of the synthesis is quoted: ``Nothing
+re-run. This section is the full account: it gives the standing per lead,
+what the leads measured and why six were refuted as stated;
+\S\ref{sec:pa-sat} summarises it for the prime-field chapter. The verdict of the synthesis is quoted: ``Nothing
 moved the exponent question for prime-field ECDLP index calculus. Every
 result is a constant, a known negative, or an unfinished harness.''
 
 The errata of 2 November list the standing after review
 (\art{research/ic_prime_eth_leads_20261031/LEADS.md} \S9): L03, L07 and L11
 narrow, constant only; L04 and L09 contested and partial; \emph{L01, L05,
-L06, L08, L10 and L12 refuted as stated}; L02 not run.
+L06, L08, L10 and L12 refuted as stated}; L02 not run. For L05 the skeptic
+digest is more precise: what is refuted is the lead's claim to be
+\emph{closed} (``refuted as closed'', both skeptics); the harness and its
+numbers stand.
 
 \begin{table}[t]
 \centering\small
@@ -641,7 +644,7 @@ L06, L08, L10 and L12 refuted as stated}; L02 not run.
 Lead & As proposed or first read & After skeptic review \\
 \midrule
 L01 char-2 gadget & a Sch\"onhage-type gadget for $\FF_{2^n}$; evaluator verdict ``undecided'' because $\ell=7$ was censored & three finished $\ell=7$ runs give slope about $2.58$ bits of conflicts per window bit (reopen bar: CI below $2.5$; ladder bar $0.5$); the early ratio fall fits a constant padding floor of about 11k conflicts; CPU $3\times$ worse at $\ell=7$; only 4 of 11 products use the gadget \\
-L05 policy pilot & closed after a pilot of an LLM policy-search harness & renaming is a null experiment by construction in kissat; the ladder held $b=8$ and varied $\ell$, not $e$ against $s$; 3 curves; the hooked CaDiCaL engine was never built; label ``harness built, renaming null recorded, policy question untested'' \\
+L05 policy pilot & closed after a pilot of an LLM policy-search harness & refuted as closed: renaming is a null experiment by construction in kissat; the ladder held $b=8$ and varied $\ell$, not $e$ against $s$; 3 curves; the hooked CaDiCaL engine was never built; label ``harness built, renaming null recorded, policy question untested'' \\
 L06 contraction width & closed: tree-decomposition width loses to enumeration & measured on a Python structural model, not a graph dump; dense gate-graph treewidth is the wrong proxy for D.4; the transform-word cut was effectively not run; surviving claim: plain tree-decomposition DP on the school CNF loses at $b\le16$ (lower bound 15--51 against 2--10.7) \\
 L08 Koblitz transfer & char-2 gadget no worse than the integer one, margin $3.42\times$ & that compared a freed binary gadget with an unfreed integer one; the skeptic's freed 133-bit integer multiplier has 14{,}618 edges instead of 37{,}030, so the margin is about $1.4\times$; hand bound $80d+228\sqrt d$ fails at $d=46$; supported bound about $175d$ for $d\le5000$ \\
 L10 Lean filings & ``done; file as known results'' & seven gaps between the lead text and the Lean statements, all confirmed: the cost model is an unproved hypothesis, \texttt{no\_crossover} needs $c\ge1$, the interface bound is an injectivity count; not fileable as drafted \\

@@ -275,7 +275,14 @@ jobs:
           list="$RUNNER_TEMP/ecbench-sessions.txt"
           mapfile -t candidates < <(git ls-tree -r --name-only HEAD | sed -n 's#/session\.json$##p')
           test "${#candidates[@]}" -gt 0 || { echo '::error::no session.json in the tree'; exit 1; }
-          printf '/%s/\n' "${candidates[@]}" | git sparse-checkout add --stdin
+          # Materialize all session directories and every bound-record path in
+          # one Git pass before artifact hydration changes the working tree.
+          {
+            printf '/%s/\n' "${candidates[@]}"
+            # Keep the exact original bound-record path selector.
+            jq -r '[.. | objects | select(has("path")) | .path | strings] | .[]' \
+              docs/bounds/records/*.json | sort -u | sed 's#^#/#'
+          } | git sparse-checkout add --stdin
           : > "$list"
           for d in "${candidates[@]}"; do
             test -f "$d/session.json" || { echo "::error::$d/session.json was not checked out"; exit 1; }
@@ -364,10 +371,6 @@ jobs:
       # the records give (docs/bounds/README.md §8).
       - name: Bound records re-derive, challenges check, the frontier is current
         run: |
-          # A record may cite evidence outside research/ecbench_*/ (an audit
-          # receipt beside its sessions): check out every path the records name.
-          jq -r '[.. | objects | select(has("path")) | .path | strings] | .[]' \
-            docs/bounds/records/*.json | sort -u | sed 's#^#/#' | git sparse-checkout add --stdin
           ./target/release/ecbench bound check --root . --record docs/bounds/records/*.json
           ./target/release/ecbench challenge check --file docs/bounds/challenges/*.json
           ./target/release/ecbench frontier build --bounds docs/bounds/records \

@@ -5,9 +5,15 @@ so index calculus must find structure in the factor base itself
 (\S\ref{sec:background}). The programme tried known-answer ladders,
 root-finding and pair-table oracles, the Petit--Kosters--Messeng Kummer
 tower, structured bases on the P-256 field, isogeny-class walks on the NIST
-curves, lattice reformulations, and miniatures of Curve25519. No prime-field arm comes within a
-single-digit factor of rho except on the smallest Table~B rows, and the gap
-grows with size. The section ends with Gaudry's $k=4$ index calculus over
+curves, lattice reformulations, and miniatures of Curve25519. Every
+prime-field arm is behind rho with negation. The closest are generic
+collision searches at rho's exponent: the residual collectors at
+$1.54$--$1.64\times$ matched rho at $w=0$ on 36--37-bit curves with a
+validator report ($1.3$--$1.7\times$ to 42 bits as the producer reports
+them; Chapter~\ref{ch:primegeneric}), and the Curve25519 walk tables at
+$1.6$--$1.9\times$ (unverified; \S\ref{sec:c25519}). Every other arm is
+further away, and where it was measured over several sizes (Table~B, the
+Kummer tower, the Curve25519 algebraic track) its gap grows. The section ends with Gaudry's $k=4$ index calculus over
 $\FF_{p^4}$, the one odd-characteristic extension field the programme
 measured end to end. Every study is listed in the programme record~\cite{icprogram2026}.
 
@@ -200,7 +206,8 @@ against a random control of $0.974$). One CPU core walks ECCp-131 rho at
 1.23 million steps per second with a 32-bit Montgomery batched walk, and
 15.06 million with an AVX-512 eight-lane walk
 (\art{research/certicom131_rho_ic_bench_20261022/},
-\art{research/certicom131_rho_parity_20261023/}).
+\art{research/certicom131_rho_parity_20261023/}). The later ECCp-131 work is
+in \S\ref{sec:pt-eccp131}.
 
 \section{Curve25519 miniatures}\label{sec:c25519}
 
@@ -269,7 +276,12 @@ per run, the incumbents reach $1.94\times$, $1.81\times$ and $1.82\times$
 matched rho at $k=24,28,32$. Over five family curves per size the mean is
 $1.57$, $1.78$, $1.80$ and $1.91\times$ at $k=20$--$32$, with per-curve
 spread about $\pm0.2$. Every autolab result is a statement claim with no
-proof attached, so its standing is \emph{unverified}. A derivation in the
+proof attached, so its standing is \emph{unverified} (R4-I1
+\texttt{PCC-20261104-c97d81}, re-baseline \texttt{PCC-20261104-d91a51},
+multi-curve \texttt{PCC-20261105-37a78d}). A 5 November correction of the
+fast probe records that the legacy affine-equivalent tally is not a complete
+native-operation cost ledger; no comparative experiment was run for it
+(\art{research/curve25519_autolab_parity_20261105/DELIVERY.md}; unverified). A derivation in the
 generic group model, checked by Monte Carlo and explicitly not a formal
 theorem (\art{research/curve25519_rho_parity_bound_20261104/}), explains
 the plateau. With $F$ unknown base logarithms, a collision-based index
@@ -289,11 +301,14 @@ four sealed records and is pinned as defective
 (\art{docs/ecbench/DEFECTIVE_SESSIONS.md}). The protocol was amended
 before data to measure F4 cost per call instead
 (\art{research/curve25519_algebraic_ladder_20261102/}). The later gains came
-from selecting the frame, the seed, the tower depth $t$ and the guess
-count $G$, and from F4 trace replay, which is a port of the Joux--Vitse
+from an isogeny-tower base (the \texttt{pkm-iso} arms, a $2^t$-point base
+built by a chain of 2-isogenies, which lifts the $t\le2$ limit of the
+$\mu_{2^t}$ tower of the generic-track paragraph), selecting its frame, seed,
+depth $t$ and guess count $G$, and from F4 trace replay, which is a port of the Joux--Vitse
 technique, not a new method.
 
-Two studies passed independent validation:
+Three studies have independent validator reports (pass with errata), and
+none has a \texttt{pcc} claim record:
 \begin{itemize}
 \item The best seed at $t=5$, $G=4$ costs $0.0578$ $[0.0466,0.0716]$ of
   the seed-0 incumbent at $w\ge0.1$
@@ -303,6 +318,9 @@ Two studies passed independent validation:
   $w=0$ (\art{research/curve25519_t4_candidate_ecbench_20261104/}). It is
   still $27.9\times$, $1.83\cdot10^4\times$ $[1.55\cdot10^4,2.15\cdot10^4]$
   and $1.13\cdot10^5\times$ behind rho at $w=0,0.1,1$.
+\item The atlas (\art{research/curve25519_ic_atlas_20261104/}) is the source
+  of the comparison with an exhaustive grid and of the scaling paragraph
+  below.
 \end{itemize}
 
 Against an exhaustive grid on the same base, the F4 arm is $42\times$ too
@@ -323,7 +341,8 @@ Sources: \art{research/curve25519_edwards_semaev_20261102/},
 \art{research/curve25519_cofactor_algebraic_20261102/},
 \art{research/curve25519_leads_wave4_20261104/}.
 
-\paragraph{Scaling.} Fitted to modelled F4 work, the algebraic cost grows as
+\paragraph{Scaling.} Fitted to modelled F4 work (atlas; validator report,
+no \texttt{pcc} claim), the algebraic cost grows as
 $r^{1.03}$ against rho's $r^{1/2}$, so the gap grows as $r^{0.53}$; the
 optimal $t$ is 4 at every $k$ (\art{research/curve25519_ic_atlas_20261104/}).
 The 5 November scale-ups ($k=24,28,32$; all standing unverified, no
@@ -358,7 +377,7 @@ second-host replay. Three leads remain open:
 \section{Audits of standard curves}
 
 Several studies examined the NIST, SECG and CryptoPro curves themselves.
-None found an ECDLP weakness. The NIST prime-curve seeds were regenerated as
+None found an ECDLP weakness. The later audits are in \S\ref{sec:pt-standard}. The NIST prime-curve seeds were regenerated as
 1997--98 \texttt{drand48} output, with the skip rule and base points still
 unexplained (\art{research/nist_seed_provenance_20261016/},
 \art{research/nist_basepoint_provenance_20261017/}); a claimed P-256 $n-1$
@@ -379,8 +398,14 @@ invalid-curve attack on an unvalidated ECDH oracle
 constructive: GLV-2 scalar multiplication $1.25$--$1.50\times$ faster via
 isogeny-chain endomorphisms (\art{research/cryptopro_b_chain_sweep_20261006/},
 \art{research/endo_native_bench_20261016/}). Cheon's attack with auxiliary
-inputs beats rho from 24 bits up, but only for the DLP with auxiliary inputs
-(\art{research/torsion_auxiliary_inputs_20260918/}).
+inputs is cheaper than matched negation rho at most sizes from 36 bits in
+ecbench's counted unit (dearer at 32 and 40 bits; no exponent separation;
+not validated;
+\S\ref{sec:gf-cheon}), and only for the DLP with auxiliary inputs; an
+earlier study's ``beats rho from 24 bits up''
+(\art{research/torsion_auxiliary_inputs_20260918/}) was not priced across
+the band, and the P-224-shape Cheon/rho ratios of a different study were
+withdrawn (\S\ref{sec:pt-standard}).
 
 \section{Literature claims that did not survive}
 
@@ -430,8 +455,9 @@ Inserted into the repository's crossover model
 the $k=4$ crossover with rho from $2^{149.4}$--$2^{152.7}$ to
 $2^{135.1}$--$2^{135.8}$ (cofactor $h=2$, forced by the 2-torsion), and
 the asymptotic ratio past it from $0.34$--$0.63$ to $0.12$--$0.22$ of rho.
-This is the one place in the programme where a crossover moves; it moves
-in an \emph{extrapolated model} ($n^{1/4}$ relations, $n^{1/2}$ linear
+This was the first place in the programme where a modelled crossover
+moved, and the GLV-invariant line later moved it further
+(Chapter~\ref{ch:glvprogramme}); it moves in an \emph{extrapolated model} ($n^{1/4}$ relations, $n^{1/2}$ linear
 algebra and rho) fed by a measured constant, so it is classed as
 \cls{engineering}, not an advance. The validation sweep notes that this
 crossover was not re-derived against a rho with the negation map; against

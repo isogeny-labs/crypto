@@ -32,7 +32,10 @@ $mN^2$ for sparse elimination. With rho's cost $\sqrt{\pi r/(2A)}$ on the
 other side, the classical balance at $m=2$ with a constant-cost oracle gives
 $N\approx r^{1/3}$ and $T\approx r^{2/3}$. That is why two-summand
 prime-field index calculus loses ground to rho as $r^{1/6}$
-(Chapter~\ref{ch:distance}).
+(Chapter~\ref{ch:distance}). The $k$-sum oracle, a generic table of
+signed $k$-sums, moves the exponent to $k/(2k-1)$, and no generic
+single-target arm whose base logarithms are unknown can go below the collision floor of
+Proposition~\ref{prop:collisionfloor}.
 
 \section{The levers}
 
@@ -46,18 +49,23 @@ the programme pulled and the sections that report them.
 Term & Levers pulled & Where \\
 \midrule
 $C_{\mathrm{dec}}$ & root finding of $S_3$; pair and meet-in-the-middle
-  tables; inherited F4, F5, F6-IC; gate-first order; harvest gates;
-  $\FF_p$ F4; $D_4$ invariants & Ch.~\ref{sec:rootfinding}, \ref{sec:groebner}, \ref{ch:extension} \\
+  tables; $k$-sum tables; inherited F4, F5, F6-IC; gate-first order;
+  harvest gates; $\FF_p$ F4; $D_4$ invariants; the Hilbert early stop on
+  the weak-class cover & Ch.~\ref{sec:rootfinding}, \ref{sec:groebner},
+  \ref{ch:extension}, \ref{ch:distance}; \S\ref{sec:pg-ksum}, \S\ref{sec:jac-jv} \\
 $\rho_{\mathrm{yield}}$, $N$ & compact Frobenius orbits; free relations;
   stride-renewed targets; greedy coverage; $n=83$ base selection; double
-  large primes & Ch.~\ref{sec:koblitz}, \ref{sec:prime}, \ref{sec:transfer} \\
+  large primes; the Joux--Vitse sieve route & Ch.~\ref{sec:koblitz}, \ref{sec:prime}, \ref{sec:transfer}; \S\ref{sec:jac-jv} \\
 $T_{\mathrm{setup}}$ & stacked producer; cache-blocked pair table; u64 root
   batching & Ch.~\ref{sec:koblitz}, \ref{sec:prime} \\
 $T_{\mathrm{LA}}$ & CADO-style filter and Wiedemann; structured Gaussian
-  elimination; block Wiedemann; first-dependency stop & Ch.~\ref{sec:koblitz}, \ref{sec:prime},
-  Ch.~\ref{ch:extension}, \ref{sec:transfer} \\
+  elimination; block Wiedemann; first-dependency stop; post-Gröbner
+  linear stage & Ch.~\ref{sec:koblitz}, \ref{sec:prime},
+  Ch.~\ref{ch:extension}, \ref{sec:transfer}, \ref{ch:audit} \\
 the exponent & genus-three transfer (cubic GHS); $k=4$ extension fields &
   Ch.~\ref{ch:extension}, \ref{sec:transfer} \\
+fixed floor & none: the collision floor bounds every generic
+  single-target arm with unknown base logarithms at $\ge1.5\times$ rho & \S\ref{sec:gf-collision} \\
 \bottomrule
 \end{tabularx}
 \caption[]{The terms of~\eqref{eq:cost} and the levers that act on them.}
@@ -72,7 +80,7 @@ trial cost milliseconds to seconds. After root finding
 probes, and the cost has moved elsewhere.
 \begin{itemize}
 \item On the Koblitz descent of the leaderboard's Table~A, reusable set-up
-  is $98.5$--$99.7\%$ of cold $S$, and descent is $0.3$--$1.4\%$
+  is $98.7$--$99.6\%$ of cold $S$, and descent is $0.4$--$1.3\%$
   (\art{docs/ic/LEADERBOARD.md}, phase table).
 \item On the $n=83$ cold pipeline with base K1107, a mean $113.755$\,s
   process splits into $47.166$\,s of set-up and $66.486$\,s of rank stage.
@@ -81,5 +89,7 @@ probes, and the cost has moved elsewhere.
 \end{itemize}
 So the relation-collection and set-up terms dominate. Their cost is set by
 $N$ and by the yield per probe, not by the oracle. This is the main
-structural fact behind the ledger. Oracle speed-ups of three to five orders
-of magnitude moved the end-to-end gap by one order at most.
+structural fact behind the ledger. Oracle speed-ups of about
+$400$--$5\cdot10^4\times$ per decomposition against F4 (up to $10^5$ in
+wall time against the PDP baseline) moved the end-to-end gap by one order
+at most.
