@@ -618,11 +618,17 @@ fn summarize(main_rows: &str, a1_rows: &str, out: &str, claimed: Option<&str>) {
         match first_ok {
             Some((d, m)) => {
                 m1.push(format!("curve {c} {t}: first working degree {d}, {:.4e} muls = {:.2}× the std arm's mean degree-29 cost on that curve", m as f64, m as f64 / std_cost));
-                vals.push((format!("m1_c{c}_degree"), d as f64));
+                vals.push((
+                    format!("m1_c{c}_{}_degree", t.split('[').next().unwrap()),
+                    d as f64,
+                ));
             }
             None => {
                 m1.push(format!("curve {c} {t}: no degree ≤ 32 works"));
-                vals.push((format!("m1_c{c}_degree"), 0.0));
+                vals.push((
+                    format!("m1_c{c}_{}_degree", t.split('[').next().unwrap()),
+                    0.0,
+                ));
             }
         }
     }

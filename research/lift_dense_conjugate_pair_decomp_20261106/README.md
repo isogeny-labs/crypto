@@ -22,7 +22,7 @@ Every statement below is an unverified assertion of this session
 ## Method
 
 - **Setup.** p = 29, K = F_{29⁴}, and 2 curves with full 2-torsion and
-  j ∉ F_{p²}.
+  j ∉ F_{p²} [pcc:unverified].
 - **Arms.** On each curve:
   - `conj`: the first all-lift conjugate-pair line, x = x₀ + u·t;
   - `std`: the line F_p.
@@ -48,7 +48,7 @@ Every statement below is an unverified assertion of this session
 | 2 | common 0 | 4,096, 1.136·10¹¹, 0/0 | 4,096, 1.157·10¹¹, 0/0 |
 | 2 | common 1 | 4,096, 1.163·10¹¹, 0/0 | 4,096, 1.135·10¹¹, 0/0 |
 
-- **When the solve works, it costs the same.**
+- **When the solve works, it costs the same** [pcc:unverified].
   - The Macaulay matrix is the same, 41,780 × 40,920 with rank 36,824, on
     every solve.
   - conj/std on the shared targets where both solves are correct: 1.025,
@@ -77,11 +77,14 @@ Every statement below is an unverified assertion of this session
   | 1 | common 0 | 30 | 48,580 × 46,376 | 4,090 | 1.441·10¹¹ | 0/2 |
   | 1 | common 0 | 31 | 56,124 × 52,360 | 4,090 | 1.945·10¹¹ | 0/2 |
   | 1 | common 0 | 32 | 64,458 × 58,905 | 4,090 | 2.572·10¹¹ | 0/2 |
-  | 2 | planted | 30–32 | see [`SUMMARY.md`](reports/run-20261106T0643Z/SUMMARY.md) | | | |
+  | 2 | planted | 30 | 48,580 × 46,376 | 4,096 | 1.596·10¹¹ | 3/3 |
+  | 2 | planted | 31 | 56,124 × 52,360 | 4,096 | 2.106·10¹¹ | 3/3 |
+  | 2 | planted | 32 | 64,458 × 58,905 | 4,096 | 2.739·10¹¹ | 3/3 |
 
-  A deficit that is stable across degrees means the system itself is not
-  in the generic position the solver assumes, not that the Macaulay matrix
-  is too small. Six of the 4,096 solutions over the algebraic closure are
+  On curve 2 [pcc:unverified], the same planted-type target solves at every degree from 29
+  to 32, with all 3 decompositions found. A deficit that is stable across
+  degrees means curve 1's system itself is not in the generic position the
+  solver assumes, not that the Macaulay matrix is too small. Six of the 4,096 solutions over the algebraic closure are
   missing, or sit at infinity or in a degenerate component, on those
   targets.
 
@@ -112,7 +115,7 @@ benchmark row.
 | K2 cost ratio on shared targets in [0.9, 1.1] with both correct | **FAIL** | curve 1 common 0: conj solve failed. The other three ratios are 1.025, 0.982 and 1.025. The median over all solves is 1.012 (the median band passes) |
 | K3 solver = oracle | **FAIL** | curve 1 conj planted (0/3) and common 0 (0/2) |
 | A/A | PASS | repeated solves give identical counts |
-| A1 / M1 (first working degree ≤ 32) | none on curve 1 | see the A1 table; curve 2 planted works at 29 |
+| A1 / M1 (first working degree among 30–32) | none on curve 1 | curve 1: no degree ≤ 32 works on either decomposable target. Curve 2 planted: 30 is the first A1 degree that works; it already worked at 29 in the main run |
 
 ## Reproduce
 
