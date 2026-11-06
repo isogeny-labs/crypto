@@ -30,7 +30,7 @@ pub fn line_chart(
     let (p, values, a, b) = checked_model(curve, &[values])?;
     if values
         .iter()
-        .any(|&x| (mul(mul(x, x, p), x, p) + mul(a, x, p) + b) % p == 0)
+        .any(|&x| (mul(mul(x, x, p), x, p) + mul(a, x, p) + b).is_multiple_of(p))
     {
         return Err("line chart requires nonzero ordinates".into());
     }
@@ -231,6 +231,14 @@ pub fn visit_plan(
         };
         let r = if let Some(pool) = pool.as_deref_mut() {
             validate_system(&cell.system, p, degree, remaining)?;
+            // Validation belongs to the same outer plan deadline. Starting a
+            // fresh `remaining` interval here would give it back to F4.
+            let Some(remaining) = budget.checked_sub(start.elapsed()).filter(|d| !d.is_zero())
+            else {
+                total.complete = false;
+                total.timed_out = true;
+                break;
+            };
             let mut error = None;
             let r = f4_fp::solve_visit_reusing(
                 &cell.system.equations,

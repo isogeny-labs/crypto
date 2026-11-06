@@ -725,3 +725,86 @@ fn an_unknown_aps_version_cannot_escape_audit() {
     assert!(audit::metrics(&r).is_err());
     assert!(math(&r).is_err());
 }
+
+#[test]
+fn native_export_reconstructs_all_instruction_rows_and_pins_the_frozen_protocol() {
+    let d = tree();
+    let (sample, _) = inclusive_tree();
+    let mut protocol: Value =
+        serde_json::from_slice(&fs::read(d.path().join("protocol.json")).unwrap()).unwrap();
+    protocol["extensions"]["aps_export"]["require_inclusive_ir"] = json!(true);
+    protocol["freeze"]["protocol_sha256"] = json!(protocol_hash(&protocol).unwrap());
+    write(d.path(), "protocol.json", &protocol);
+    let records = fs::read_to_string(d.path().join("records.jsonl")).unwrap();
+    let mut bindings = vec![];
+    for (seq, line) in records.lines().enumerate() {
+        let record = audit::record_line(line).unwrap();
+        let dir = format!("ir-{seq}");
+        fs::create_dir(d.path().join(&dir)).unwrap();
+        let mut packet: Value =
+            serde_json::from_slice(&fs::read(sample.path().join("inclusive.json")).unwrap())
+                .unwrap();
+        packet["record_id"] = record["record_id"].clone();
+        packet["protocol_sha256"] = protocol["freeze"]["protocol_sha256"].clone();
+        packet["trajectory_sha256"] = json!(inclusive::trajectory(&record).unwrap());
+        for key in ["method_parts", "scalar_parts"] {
+            for part in packet[key].as_array_mut().unwrap() {
+                let old = text(&part["path"]).unwrap().to_string();
+                let new = format!("{dir}/{old}");
+                fs::copy(sample.path().join(&old), d.path().join(&new)).unwrap();
+                part["path"] = json!(new);
+            }
+        }
+        let mut profiled = record.clone();
+        profiled["time"]["user_ns"] = json!(21);
+        let profile_path = format!("{dir}/profiled.jsonl");
+        fs::write(d.path().join(&profile_path), seal(profiled)).unwrap();
+        packet["profiled_record"] = json!(profile_path);
+        let mut receipt = audit::scalar_record(&record).unwrap();
+        receipt["binary_sha256"] = packet["verifier_binary_sha256"].clone();
+        let receipt_path = format!("{dir}/scalar.json");
+        write(d.path(), &receipt_path, &receipt);
+        packet["verifier_receipt"] = json!(receipt_path);
+        let path = format!("{dir}/inclusive.json");
+        write(d.path(), &path, &packet);
+        bindings.push(json!({"seq":seq,"path":path}));
+    }
+    let mut request: Value =
+        serde_json::from_slice(&fs::read(d.path().join("request.json")).unwrap()).unwrap();
+    request["inclusive_profiles"] = json!(bindings);
+    write(d.path(), "request.json", &request);
+    let export = build(&d).unwrap();
+    assert_eq!(export["runs"].as_array().unwrap().len(), 3);
+    for row in export["runs"].as_array().unwrap() {
+        assert_eq!(row["measurements"]["counted"]["total_ir"], 28);
+    }
+    let root = EvidenceRoot::new(d.path()).unwrap();
+    package::check(&root, &export).unwrap();
+    let mut bad: Value = root.json("ir-1/inclusive.json").unwrap();
+    bad["protocol_sha256"] = json!("f".repeat(64));
+    write(d.path(), "ir-1/inclusive.json", &bad);
+    assert!(build(&d).is_err());
+    bad["protocol_sha256"] = protocol["freeze"]["protocol_sha256"].clone();
+    bad["method_parts"] = root.json("ir-0/inclusive.json").unwrap()["method_parts"].clone();
+    write(d.path(), "ir-1/inclusive.json", &bad);
+    assert!(
+        build(&d).is_err(),
+        "a second execution cannot reuse the first execution's raw frame paths"
+    );
+}
+
+#[cfg(unix)]
+#[test]
+fn scalar_frame_cannot_alias_method_parts_through_local_symlinks() {
+    let (d, r) = inclusive_tree();
+    let mut packet: Value =
+        serde_json::from_slice(&fs::read(d.path().join("inclusive.json")).unwrap()).unwrap();
+    for (dst, src, index) in [("scalar.1", "method.1", 0), ("scalar.2", "method.5", 1)] {
+        fs::remove_file(d.path().join(dst)).unwrap();
+        std::os::unix::fs::symlink(src, d.path().join(dst)).unwrap();
+        packet["scalar_parts"][index]["sha256"] =
+            json!(hash(&fs::read(d.path().join(src)).unwrap()));
+    }
+    write(d.path(), "inclusive.json", &packet);
+    assert!(inclusive::read(&EvidenceRoot::new(d.path()).unwrap(), "inclusive.json", &r).is_err());
+}

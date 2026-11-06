@@ -214,13 +214,6 @@ pub fn read(root: &EvidenceRoot, path: &str, record: &Value) -> Result<(Value, V
             )?;
         }
         let scalar_frame = frame(root, &packet["scalar_parts"])?;
-        require(
-            scalar_frame
-                .files
-                .iter()
-                .all(|s| !files.iter().any(|m| m["path"] == s["path"])),
-            "method and scalar frames reuse the same parts",
-        )?;
         scalar_ir = scalar_frame.report.solve_ir;
         files.extend(scalar_frame.files);
         verification = scalar;
@@ -243,6 +236,13 @@ pub fn read(root: &EvidenceRoot, path: &str, record: &Value) -> Result<(Value, V
     }
     files.push(packet_pin);
     files.push(profiled_pin);
+    let mut paths = std::collections::BTreeSet::new();
+    for pin in &files {
+        require(
+            paths.insert(root.resolve(text(&pin["path"])?)?),
+            "profile evidence reuses or aliases another input",
+        )?;
+    }
     let total = method
         .solve_ir
         .checked_add(scalar_ir)

@@ -259,6 +259,7 @@ pub fn build(root: &EvidenceRoot, request_path: &str) -> Result<Value> {
     let mut missing_ir = Vec::new();
     let mut ir_audits = Vec::new();
     let mut ir_files = Vec::new();
+    let mut ir_paths = BTreeSet::new();
     for (&seq, ex) in &slots {
         let a = &pa[integer(&ex["arm"])? as usize];
         let w = &workloads[integer(&ex["workload"])? as usize];
@@ -369,6 +370,12 @@ pub fn build(root: &EvidenceRoot, request_path: &str) -> Result<Value> {
                 }
                 if !ir["method_online_ir"].is_null() {
                     counted.insert("method_online_ir".into(), ir["method_online_ir"].clone());
+                }
+                for pin in &pins {
+                    require(
+                        ir_paths.insert(root.resolve(text(&pin["path"])?)?),
+                        "profile evidence reused across execution rows",
+                    )?;
                 }
                 ir_files.extend(pins);
                 ir_audits.push(json!({"seq":seq,"audit":ir}));
