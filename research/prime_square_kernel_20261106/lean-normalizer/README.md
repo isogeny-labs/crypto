@@ -75,7 +75,8 @@ Quot.sound. No sorry, custom axiom, native evaluator or kernel bypass is
 accepted. The initial normalizer-only fresh replay completed exit0 against
 the retained successful-007 source snapshot. The final import-inclusive
 KernelNodes replay covers the final normalizer module and all kernel-node
-theorems; its status is recorded only after its actual exit. [pcc:unverified]
+theorems and has now completed exit0. See VERIFICATION.md for exact commands
+and scope. [pcc:unverified]
 
 Failed build001 (base-case tactic sequencing), build002 (nonexistent narrow
 tactic import) and build005 (finite-product rewrite mismatch) remain evidence,
