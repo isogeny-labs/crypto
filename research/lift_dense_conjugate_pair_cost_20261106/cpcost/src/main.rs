@@ -724,9 +724,9 @@ fn is_prime(n: u64) -> bool {
 
 // --------------------------------------------------------------- run ----
 
-fn run_curve(k: &K, p: u64, idx: usize, cap: u64) -> Vec<String> {
+fn run_curve(k: &K, p: u64, idx: usize, cap: u64, tag: &str, hmax: Option<u64>) -> Vec<String> {
     let cell = format!("\"p\":{p},\"n\":4");
-    let mut rng = Rng::new(&format!("cpcost-20261106/{p}/{idx}"));
+    let mut rng = Rng::new(&format!("{tag}/{p}/{idx}"));
     let nonres = loop {
         let z = k.rand(&mut rng);
         if k.chi(&z) == -1 {
@@ -780,6 +780,12 @@ fn run_curve(k: &K, p: u64, idx: usize, cap: u64) -> Vec<String> {
     if !ok || v != 1 || !is_prime(ell) {
         head.push_str(",\"kept\":false,\"reason\":\"order_or_v\"}");
         return vec![head];
+    }
+    if let Some(hm) = hmax {
+        if order / ell > hm {
+            head.push_str(",\"kept\":false,\"reason\":\"cofactor\"}");
+            return vec![head];
+        }
     }
     // first all-lift conjugate-pair line
     let conj = lines
@@ -841,7 +847,7 @@ const CELLS: &[u64] = &[13, 101];
 const KEEP: usize = 16;
 const CAP: u64 = 20_000;
 
-fn run(dir: &str) {
+fn run(dir: &str, tag: &str, hmax: Option<u64>) {
     std::fs::create_dir_all(dir).unwrap();
     let mut fh = std::fs::File::create(format!("{dir}/rows.jsonl")).unwrap();
     for &p in CELLS {
@@ -860,7 +866,7 @@ fn run(dir: &str) {
                 let mut hs = vec![];
                 for (slot, &ci) in res.iter_mut().zip(batch.iter()) {
                     let k = &k;
-                    hs.push(s.spawn(move || *slot = run_curve(k, p, ci, CAP)));
+                    hs.push(s.spawn(move || *slot = run_curve(k, p, ci, CAP, tag, hmax)));
                 }
                 for h in hs {
                     h.join().unwrap();
@@ -962,6 +968,11 @@ fn compute(dir: &str) -> (String, String, Vec<(String, f64)>) {
         vals.push((format!("kept_{p}"), kept as f64));
         vals.push((format!("no_all_lift_conj_{p}"), no_conj as f64));
         vals.push((format!("order_or_v_skipped_{p}"), bad_ord as f64));
+        let cof = curves
+            .iter()
+            .filter(|l| jnum(l, "p") == p && jget(l, "reason") == Some("cofactor"))
+            .count();
+        vals.push((format!("cofactor_skipped_{p}"), cof as f64));
         let mut ystat: HashMap<&str, (f64, f64, f64)> = HashMap::new(); // Y, rho, k
         for arm in ["conj", "std", "rand"] {
             let g: Vec<&&str> = arms
@@ -1084,7 +1095,7 @@ fn compute(dir: &str) -> (String, String, Vec<(String, f64)>) {
     let mut cur = String::new();
     for &p in CELLS {
         let get = |k: &str| vals.iter().find(|x| x.0 == format!("{k}_{p}")).unwrap().1;
-        writeln!(cur, "- p = {p}: {} drawn, {} kept; skipped for no all-lift conjugate-pair line: {}; skipped for order/v: {}", get("drawn"), get("kept"), get("no_all_lift_conj"), get("order_or_v_skipped")).unwrap();
+        writeln!(cur, "- p = {p}: {} drawn, {} kept; skipped for no all-lift conjugate-pair line: {}; skipped for order/v: {}; skipped for cofactor > 16: {}", get("drawn"), get("kept"), get("no_all_lift_conj"), get("order_or_v_skipped"), get("cofactor_skipped")).unwrap();
     }
     writeln!(md, "## Curves (Y5)\n\n{cur}").unwrap();
     let js = format!(
@@ -1209,7 +1220,8 @@ fn validate(dir: &str, claimed: &str) {
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     match args.get(1).map(|s| s.as_str()) {
-        Some("run") => run(&args[2]),
+        Some("run") => run(&args[2], "cpcost-20261106", None),
+        Some("run-smallh") => run(&args[2], "cpcost-20261106-smallh", Some(16)),
         Some("summarize") => summarize(&args[2]),
         Some("validate") => validate(&args[2], &args[3]),
         _ => eprintln!("usage: cpcost run|summarize|validate <dir> [claimed.json]"),

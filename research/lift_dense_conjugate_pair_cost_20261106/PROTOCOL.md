@@ -125,4 +125,23 @@ comparison and no leaderboard row.
 
 ## Amendments
 
-(none)
+**A1 (2026-11-06, pre-registered before its own data; written after the main
+run).** The main run's curves keep any v = 1 order. At q = 101 that let
+cofactors h = #E/ℓ reach about 2.8·10⁵. With h that large, ⟨P⟩ has only a
+few hundred elements, so trials revisit the same targets and relations
+repeat. On those curves the `std` and `rand` arms reached the 20,000-trial
+cap below full rank: q = 13, every curve with h ≥ 84; q = 101, the three
+curves with h > 10⁵. `conj` solved every curve. A cryptographic target has a
+small cofactor; with full 2-torsion, h ≥ 4. So a second set of cells is
+added:
+
+- **Cells.** `smallh`: (13, 4) and (101, 4), keeping only curves with
+  h ≤ 16. Draws continue until 16 are kept per cell. The seed string is
+  `cpcost-20261106-smallh`.
+- **Instrument.** Unchanged except for the filter: `cpcost run-smallh`.
+- **Decision rules.** Y1–Y4 as above, applied to the `smallh` cells and
+  reported separately.
+- **Main run.** Its verdicts stand as registered and are reported
+  alongside.
+
+This amendment is committed before `run-smallh` is executed.
