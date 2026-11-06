@@ -2,7 +2,8 @@
 
 use clap::Args;
 use crypto_lib::cryptanalysis::ec_index_calculus::{
-    ec_index_calculus_dlp_staged, ec_index_calculus_dlp_staged_seeded, pollard_rho_ecdlp,
+    ec_index_calculus_dlp_staged, ec_index_calculus_dlp_staged_seeded,
+    ec_index_calculus_dlp_staged_seeded_projected, pollard_rho_ecdlp,
 };
 use crypto_lib::ecc::{curve::CurveParams, field::FieldElement, point::Point};
 use num_bigint::BigUint;
@@ -61,6 +62,10 @@ pub struct PrimeArgs {
     /// IW1 route originating at the supplied curve's root node.
     #[arg(long, requires = "route_file")]
     route_id: Option<String>,
+    /// Opt-in: build the factor base from [h]F (F small-x curve points) so every
+    /// entry lies in the prime-order subgroup <G>; the default path is unchanged.
+    #[arg(long)]
+    project_cofactor: bool,
 }
 
 #[derive(Args)]
@@ -88,6 +93,10 @@ pub struct PrimeFileArgs {
     /// Root-origin IW1 route identifier.
     #[arg(long, requires = "route_file")]
     route_id: Option<String>,
+    /// Opt-in: build the factor base from [h]F (F small-x curve points) so every
+    /// entry lies in the prime-order subgroup <G>; the default path is unchanged.
+    #[arg(long)]
+    project_cofactor: bool,
 }
 
 #[derive(Deserialize)]
@@ -136,6 +145,7 @@ pub fn solve_file(args: &PrimeFileArgs) -> Result<Value, String> {
         rho_steps: args.rho_steps,
         route_file: args.route_file.clone(),
         route_id: args.route_id.clone(),
+        project_cofactor: args.project_cofactor,
     };
     let mut report = solve(&solve_args)?;
     report["operation"] = json!("solve-prime-file");
@@ -263,6 +273,16 @@ pub fn solve(args: &PrimeArgs) -> Result<Value, String> {
         .map(|t| (&t.curve, &t.generator, &t.target))
         .unwrap_or((&curve, &g, &q));
     let ic = match args.seed {
+        Some(seed) if args.project_cofactor => ec_index_calculus_dlp_staged_seeded_projected(
+            work_curve,
+            work_g,
+            work_q,
+            args.fb_size,
+            args.extra_relations,
+            args.max_trials_per_relation,
+            args.max_relation_attempts,
+            seed,
+        ),
         Some(seed) => ec_index_calculus_dlp_staged_seeded(
             work_curve,
             work_g,
@@ -345,6 +365,7 @@ mod tests {
             rho_steps: 0,
             route_file: None,
             route_id: None,
+            project_cofactor: false,
         };
         args.p = 272;
         assert!(solve(&args).unwrap_err().contains("prime"));
@@ -372,6 +393,7 @@ mod tests {
             rho_steps: 0,
             route_file: None,
             route_id: None,
+            project_cofactor: false,
         };
         let path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("docs/ic/fixtures/prime271_isogeny_routes.json");
@@ -406,6 +428,7 @@ mod tests {
             rho_steps: 0,
             route_file: None,
             route_id: None,
+            project_cofactor: false,
         };
         let report = solve(&args).unwrap();
         assert_eq!(report["input"]["curve_order"], 21);
@@ -432,6 +455,7 @@ mod tests {
             rho_steps: 0,
             route_file: None,
             route_id: None,
+            project_cofactor: false,
         };
         assert!(solve(&args).unwrap_err().contains("outside the subgroup"));
         args.qx = 0;
@@ -458,6 +482,7 @@ mod tests {
             rho_steps: 0,
             route_file: None,
             route_id: None,
+            project_cofactor: false,
         };
         let first = solve(&args).unwrap();
         let second = solve(&args).unwrap();
