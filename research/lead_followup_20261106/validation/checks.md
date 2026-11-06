@@ -15,6 +15,11 @@ Producer observations, standing unverified (`PCC-20261106-ded5b6`).
   Dependency profiles and sources stay unchanged. Default optimized qualification
   remains a future scientific-image prerequisite; no runtime comparison is made.
 - Full-library suite: currently running the same explicit correctness profile.
+  It entered the 6,231-test phase; five device tests failed on an off-disk tracked
+  emulator source. After restoring gpu/certicom/, all six tests in that group
+  passed against the same binary (device-fixtures-restored.txt). The original
+  broad run still includes those failures and remains incomplete; no overall
+  library pass is asserted.
   Its final outcome is pending and is not represented as a pass. The initial
   default release attempt failed with missing sparse-input diagnostics; all
   tracked inputs named by those diagnostics were restored. Subsequent default
@@ -29,8 +34,7 @@ Producer observations, standing unverified (`PCC-20261106-ded5b6`).
   claims remain unverified/not_covered; none has an independent signature.
 - Benchmark-record gate passes after exact-file sparse hydration. No record or
   generated progress file changes. The prepared panels have not run.
-- Both cards pass the original backlog validator with committed protocol blobs;
-  final changed blobs are structurally checked and rechecked after their commit.
+- Both cards pass the original backlog validator with their committed protocol blobs.
 
 The administrative backlog validator is unchanged src/bin/backlog.rs plus its
 card/cairn modules. It was built in a temporary Cargo package against unchanged
