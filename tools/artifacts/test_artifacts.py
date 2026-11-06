@@ -432,5 +432,87 @@ class WorkflowBootstrap(unittest.TestCase):
         self.assertIn("working-directory: ${{ github.workspace }}", once)
         self.assertIn('export ARTIFACTS_AWS="$artifacts_cli_aws"', once)
 
+
+class GateEvidenceDerivation(unittest.TestCase):
+    """The validation gate's pull list follows VALIDATION.json -> report -> raw_data."""
+
+    GATE = ("jobs:\n  gate:\n    steps:\n      - uses: actions/checkout@v4\n"
+            "      - name: tests\n        run: python3 scripts/test_validation_gate.py\n")
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.root = Path(self.tmp.name).resolve()
+        ev = self.root / "benchmarks" / "20261106-new"
+        (self.root / "research" / "new_20261106" / "sessions" / "a").mkdir(parents=True)
+        (self.root / "research" / "new_20261106" / "sessions" / "b").mkdir(parents=True)
+        ev.mkdir(parents=True)
+        for s in ("a", "b"):
+            d = self.root / "research" / "new_20261106" / "sessions" / s
+            (d / ".artifacts.json").write_text(json.dumps({"schema": "artifacts.manifest/v1", "files": {"records.jsonl": {"sha256": "0" * 64, "bytes": 9}}}))
+        (ev / "validator-report.json").write_text(json.dumps(
+            {"raw_data": [{"path": "../../research/new_20261106/sessions/a/records.jsonl"}]}))
+        (ev / "replay-certificate.json").write_text("{}")
+        (ev / "VALIDATION.json").write_text(json.dumps({
+            "replay_certificate": {"path": "replay-certificate.json"},
+            "validator_report": {"path": "validator-report.json"}}))
+        self.moved = {"research/new_20261106/sessions/a/records.jsonl",
+                      "research/new_20261106/sessions/b/records.jsonl"}
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_only_the_store_backed_raw_data_the_report_lists_is_derived(self):
+        need, notes = wire_workflows.evidence_store_files(self.root, self.moved)
+        self.assertEqual(need, {"benchmarks/20261106-new/VALIDATION.json":
+                                {"research/new_20261106/sessions/a/records.jsonl"}})
+        self.assertFalse([n for n in notes if "store-backed" in n])
+
+    def test_cover_never_pulls_unread_store_data(self):
+        want = {"research/new_20261106/sessions/a/records.jsonl"}
+        self.assertEqual(wire_workflows.cover(want, self.moved), ["research/new_20261106/sessions/a"])
+        extra = self.moved | {"research/new_20261106/sessions/a/other.jsonl"}
+        self.assertEqual(wire_workflows.cover(want, extra), ["research/new_20261106/sessions/a/records.jsonl"])
+        both = want | {"research/new_20261106/sessions/b/records.jsonl"}
+        self.assertEqual(wire_workflows.cover(both, self.moved),
+                         ["research/new_20261106/sessions/a", "research/new_20261106/sessions/b"])
+
+    def test_store_backed_report_pulls_its_whole_study(self):
+        moved = self.moved | {"benchmarks/20261106-new/validator-report.json"}
+        (self.root / "benchmarks/20261106-new/validator-report.json").unlink()
+        need, notes = wire_workflows.evidence_store_files(self.root, moved)
+        self.assertIn("benchmarks/20261106-new/validator-report.json", need["benchmarks/20261106-new/VALIDATION.json"])
+        self.assertTrue([n for n in notes if "not hydrated" in n])
+
+    def test_fixtures_are_not_evidence(self):
+        fx = self.root / "scripts" / "fixtures" / "validation_gate" / "positive"
+        fx.mkdir(parents=True)
+        (fx / "VALIDATION.json").write_text((self.root / "benchmarks/20261106-new/VALIDATION.json").read_text())
+        need, _ = wire_workflows.evidence_store_files(self.root, self.moved)
+        self.assertEqual(list(need), ["benchmarks/20261106-new/VALIDATION.json"])
+
+    def test_only_a_step_that_runs_the_gate_derives(self):
+        self.assertTrue(wire_workflows.reads_validation_gate(self.GATE))
+        self.assertFalse(wire_workflows.reads_validation_gate(
+            "on:\n  push:\n    paths:\n      - 'scripts/validation_gate.py'\n"))
+        self.assertFalse(wire_workflows.reads_validation_gate("      # python3 scripts/validation_gate.py check\n"))
+
+    def test_check_names_the_evidence_and_regeneration_fixes_it(self):
+        wf = self.root / ".github" / "workflows" / "gate.yml"
+        wf.parent.mkdir(parents=True)
+        wf.write_text(self.GATE)
+        script = Path(wire_workflows.__file__)
+        env = {**os.environ, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@t"}
+        sh(self.root, "git", "init", "-q", "-b", "main")
+        sh(self.root, "git", "add", "-A", env=env)
+        bad = sh(self.root, sys.executable, str(script), "--check", str(wf), check=False, env=env)
+        self.assertEqual(bad.returncode, 1, bad.stdout + bad.stderr)
+        self.assertIn("reads store-backed evidence of benchmarks/20261106-new/VALIDATION.json", bad.stdout + bad.stderr)
+        self.assertIn("do not hand-edit", bad.stdout + bad.stderr)
+        sh(self.root, sys.executable, str(script), str(wf), env=env)
+        self.assertIn("pull --jobs 16 research/new_20261106/sessions/a\n", wf.read_text())
+        ok = sh(self.root, sys.executable, str(script), "--check", str(wf), check=False, env=env)
+        self.assertEqual(ok.returncode, 0, ok.stdout + ok.stderr)
+
+
 if __name__ == "__main__":
     unittest.main()
