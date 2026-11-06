@@ -60,3 +60,34 @@ after this freeze. Conductor and research-kb were not reachable in this session
   unreviewed). This is the Koblitz case; the arm here is a different construction.
 - `repo:research/ghs_q16_tracezero_genus2_20261028`: related GHS work, not read in full.
 - KB `search_knowledge`: unavailable.
+
+## Amendment A1 (2026-11-06, before any code or data)
+
+Found while designing the instrument. The registered statistic is degenerate.
+Averaged over all targets R, the mean yield of m-multisets of S = F ∪ −F is
+C(|S|+m−1, m)/|E(F_p)|: it depends only on |S|, so a size-matched control always
+gives ratio 1. Structure can only show in how the sums are distributed over R.
+Changes (all before data):
+
+1. **Statistics** replace the yield ratio: (a) |S|, the number of distinct non-identity
+   points the trace map reaches; (b) coverage cov_m, the fraction of non-identity R in
+   E(F_p) that are a sum of exactly m elements of S, for m = 2, 3.
+2. **Null for the trace arm**: draw the same number of points as there are lifts Q with
+   x(Q) ∈ V, uniformly from E(F_p), drop the identity, close under negation. This tests
+   whether Tr on lifts is equidistributed. Comparison is the difference
+   Δ = trace − random, per (curve, V), averaged per curve.
+3. **Targets**: exhaustive over E(F_p) (at most about 45 points), not 50 random.
+4. **Positive control**: draws restricted to the subgroup H = 2E(F_p) (or 3E(F_p) if
+   |E(F_p)| is odd). Curves with H = E(F_p) are skipped for this arm. Expected: Δ_pos < 0
+   in cov_m.
+5. **Gaudry control** (arm 3) dropped: it is a k = 1 construction and not the same
+   instrument. The A/A arm is the trace arm on an independent second draw of V.
+6. **Decision rule** with Δ in place of the ratio: structure is claimed if, for the same
+   m, the 95% bootstrap interval of the pooled (p ≥ 17) mean Δ excludes 0 in the same
+   direction in at least 3 of the 4 (k, d) cells and the positive control interval
+   excludes 0. Inconclusive if the positive control fails or the A/A interval half-width
+   exceeds 0.05 in coverage. Cells where the random arm has mean cov_m > 0.99 are
+   saturated and reported as uninformative, not as support for H0.
+7. **Data**: per-curve rows go to the scratchpad and are pinned by SHA-256 in
+   `summary.json`; they are over the 64 KiB data-file limit. The artifact store route is
+   not available in this session.
