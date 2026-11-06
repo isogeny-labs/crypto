@@ -1,6 +1,6 @@
 # Results: an invariant guess on the second link matches the raw guess on x₃ (no detected difference, 6 against 7 of 12 draws)
 
-Standing: claim [pcc:PCC-20261105-dbef6e], an **unverified assertion** until a pcc verdict exists
+Standing: claim [pcc:PCC-20261106-607061], an **unverified assertion** until a pcc verdict exists
 (AGENTS.md, "Sabotage is assumed").
 
 - **Scoring.** Natively scored by `dreg_second_link_score`
