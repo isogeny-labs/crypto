@@ -10,6 +10,16 @@ have standing unverified pending trusted signed verdicts. [pcc:unverified]
 
 ## Proof plan
 
+Proof update2026-11-06: the [normalizer follow-up](lean-normalizer/README.md)
+now derives the unit property from actual punctured products on every shifted
+dyadic grid, then proves pointwise valuation doubling without the earlier
+unspecified-unit hypothesis. The finite-product/factorial bridge is included.
+The actual kernels now also have all-node preservation and entrywise origin
+identity theorems, covering every valid packet size and real slot.
+Chart-content, uniform mode bounds and recursive cost are separate remaining
+obligations. Claims bd8ff1 and82eac6 have standing unverified pending trusted
+signed verdicts. [pcc:unverified]
+
 1. **Specify the algorithmic claim.** Classical prime-field ECDLP with explicit
    subgroup/input assumptions, correctness/success convention and bit cost
    exp(o(b)), b=ceil(log2 p). Charge preprocessing, failed attempts, recursive
