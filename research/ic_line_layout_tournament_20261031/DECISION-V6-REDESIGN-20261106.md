@@ -1218,3 +1218,199 @@ coordinator_decision_revision:
     - "Before each later launch (any -r2, the counted job): record the gate line; if it fails, return to the coordinator."
     - "Main session: mirror this block into ledger/decisions/DEC-20261106-662e33.yaml in the next ledger archive."
 ```
+
+## 15. Revision 4: the two wall sessions shared one node (2026-11-06, before any wall data is read)
+
+### 15.1 Facts relayed by the main session
+
+Both wall jobs finished at 04:55:54Z with launcher state `succeeded` and
+`job-exit` 0. For each session the main session read integrity and identity
+fields only:
+
+- `SHA256SUMS` OK;
+- binary `73362eed…`;
+- audit OK, 576/576 verified;
+- `l2-gate` accepted, with all 576 executions at L2;
+- session complete.
+
+The identities and timings:
+
+| Session | Job UID | Pod | Node | Ran (session.json) |
+|---|---|---|---|---|
+| s1 | `10c77943-…` | `c4934aa4-…` | `ip-10-84-67-216.us-east-2.compute.internal` | 1793940843237–1793940880586 ms |
+| s2 | `6726db8e-…` | `9c36a122-…` | `ip-10-84-67-216.us-east-2.compute.internal` | 1793940715944–1793940753201 ms |
+
+Each session took 37.3 s. They ran one after the other on the same node: s1
+started 90 s after s2 finished. `host.json` and `runner-identity.json` carry no
+hostname or `boot_id`.
+
+**Nothing has been read beyond these fields.** No `compare`, no
+`analyze-v6.sh`, and no record-level wall field. The counted companion has not
+been launched.
+
+### 15.2 What the frozen protocol requires
+
+The `protocol-v6.json` variable ledger defines the factor `host_epoch` as:
+
+> two independent EKS Jobs, each on its own fresh c8a.2xlarge Spot node under
+> the launcher's required pod anti-affinity; both must decide in the same
+> direction and retain distinct Job/Pod/node identities.
+
+The placement `concurrency_note` says "each still runs on its own fresh L2
+node". The pod anti-affinity (`topology kubernetes.io/hostname`) keeps two pods
+off one node only while both exist. Once s2's pod had finished, Karpenter was
+free to place s1 on the same idle node. That is what happened.
+
+**The Job and Pod identities are distinct. The node identity is not.** The
+frozen host-epoch condition is therefore **not met**, and my §14.2
+confirmation ("each runs on its own fresh L2 node") was wrong in practice. I
+read the anti-affinity as a guarantee of node freshness. It only prevents two
+pods sharing a node at the same time. This is an infrastructure fact, not
+evidence about the candidate.
+
+### 15.3 Decision: option (c)
+
+The two sessions stay valid as measurements but are one host epoch. A third
+wall session on a distinct node supplies the second epoch, and every session
+decides.
+
+**Why not (a), "the sessions stand as independent".** Two jobs on one VM, two
+minutes apart, are a within-host replicate. They are not the cross-host
+replication the frozen factor names. The claim is about the c8a.2xlarge class,
+and a cache-line layout effect is exactly the kind that can depend on the host
+(shared L3, memory placement, neighbours on the physical machine). Accepting
+the pair would relax a preregistered design condition after the run. That it
+would happen before any wall data was seen does not make it acceptable.
+
+**Why not (b) alone, "invalid as a pair, stop".** Under the frozen rules
+nothing can supply a second host epoch:
+
+- host-loss reruns cover only jobs with no `job-exit.json`;
+- there is no noise-rerun clause;
+- the rules say "run each once, and stop".
+
+Read alone, (b) leaves v6 unable to reach `supported_within_scope`. It would
+throw away two clean sessions over an infrastructure gap that a pre-data
+amendment can close. The program has done exactly this before: v4/v5 were
+amendments filed after infrastructure failures and before any affected data.
+
+**Decision.** File a versioned protocol amendment, **V6-AMENDMENT-1**, before
+any wall field of s1 or s2 is read:
+
+1. **s1 and s2 are kept whole and both stay decision-bearing.** Together they
+   form host epoch H1 (node `ip-10-84-67-216`). Neither is discarded, demoted
+   or replaced.
+2. **One additional wall job, `ic-line-v6-s3-20261106`, forms host epoch H2.**
+   - **Request:** byte-identical to `launch-v6/request-session-1.json` apart
+     from `job_name` and the provenance label. Same spec, seeds, image, binary
+     and 3,600 s deadline.
+   - **Distinct-node rule, before launch:** the director confirms through the
+     launcher's read-only cluster status that no node named
+     `ip-10-84-67-216.us-east-2.compute.internal` exists in the cluster, and
+     records that check on the card.
+   - **Distinct-node rule, after the run:** s3's node identity (node name and,
+     where the launcher records them, `providerID` / instance id and node
+     creation time) differs from H1's.
+   - **If s3 lands on H1's node anyway:** v6 cannot satisfy the host-epoch
+     factor. C-wall is then at most `inconclusive`, the per-session results
+     are reported descriptively, and no further session is added.
+   - **Reruns:** s3 follows the frozen rules. A host-loss rerun is
+     `ic-line-v6-s3-20261106-r2`, and a non-zero `job-exit` is never rerun.
+3. **Decision rule (stricter than before, no selection).** C-wall is supported
+   only if **each of s1, s2 and s3** separately passes every frozen gate, and
+   the host-epoch condition holds between H1 and H2. Otherwise the frozen
+   per-session verdicts are combined by the frozen overall precedence over all
+   three sessions:
+   - all supported gives `supported_within_scope`;
+   - otherwise, any `invalid_measurement` gives `invalid_measurement`;
+   - otherwise, any `inconclusive` gives `inconclusive`;
+   - otherwise, `within_control_distribution`.
+
+   No session may be dropped or chosen after data. Requiring three passes
+   instead of two lowers the chance of support. That is the honest cost of the
+   infrastructure miss, and it rules out any selection.
+4. **Analysis, with `analyze-v6.sh` unchanged** (sha256 `23e614ad…`). The
+   script takes exactly two sessions and computes each session's verdict
+   independently, with fixed seeds. It is run twice:
+   - (i) `analyze-v6.sh ECBENCH reports/v6/analysis-a --counted <counted> <s1> <s2>`;
+   - (ii) `analyze-v6.sh ECBENCH reports/v6/analysis-b --counted <counted> <s3> <s1>`.
+
+   s1's per-session verdict and gates must be identical in (i) and (ii). This
+   doubles as a determinism check, and a mismatch is `invalid_measurement`. The
+   final verdict is the §15.3(3) combination over the s1, s2 and s3 verdicts.
+   Neither file's `overall` field is the verdict on its own.
+5. **Sealing.** No wall field, `compare` or `analyze-v6.sh` output of s1 or s2
+   is opened until both of these are true:
+   - V6-AMENDMENT-1 is frozen and merged;
+   - s3 (or its `-r2`) has written `job-exit.json`.
+
+   s1 and s2 records may not be copied into any report before then.
+6. **Budget.** The §14.1 rolling hard-bound gate applies unchanged:
+   - **Before s3:** `actual_spend + HB(s3) + HB(counted, if not yet
+     launched) ≤ USD 5.00`. With HB = USD 0.931 per 3,600 s job and actual
+     spend well under USD 1, this passes.
+   - **Before any later `-r2`:** its own gate line is recorded first.
+7. **Scope.** The claim's hardware scope becomes "two c8a.2xlarge host epochs
+   (three sessions)". The §4 boundary is otherwise unchanged.
+
+**What V6-AMENDMENT-1 must contain** (written by the director and frozen by the
+main session before s3 launches):
+
+- `PROTOCOL-V6-AMENDMENT-1.md`;
+- an entry in `protocol-v6.json` `amendments[]`:
+  - `filed_before_affected_data: true`;
+  - its reason (§15.2);
+  - the changes in items 1–7 above;
+  - `supersedes_fields` covering the host-epoch factor's `how`, the
+    scientific-stage stopping rule, the `decision_rule.text` combination,
+    `analysis_plan` invocations and `execution.placement.concurrency_note`;
+- `launch-v6/request-session-3.json`, passing `validate-request`;
+- a re-freeze recording the new `protocol_sha256`.
+
+**Owner.** This amendment adds one job within the USD 5 ceiling, under the
+standing authorization in AGENTS.md. The main session relays it to the owner
+before s3 launches. If the owner objects, s3 is not launched and v6 ends under
+(b): the s1/s2 pair cannot support C-wall, and the sessions are reported
+descriptively as one host epoch.
+
+### 15.4 Counted companion: may launch now
+
+The frozen trigger ("after both wall jobs have written `job-exit.json`") is
+met. The counted session decides no wall question and has no host-epoch
+requirement. Before launch, its card records the §14.1 gate line with s3's
+hard bound reserved:
+
+`actual_spend + HB(counted) + HB(s3) ≤ USD 5.00`
+
+If the counted job lands on `ip-10-84-67-216` again and keeps it alive, s3's
+pre-launch check (§15.3(2)) simply waits until that node is gone. No wall field
+of the counted session is read.
+
+```yaml
+coordinator_decision_revision:
+  revises: DEC-20261106-662e33
+  revision: 4
+  date: 2026-11-06
+  decision: revise        # pre-data amendment V6-AMENDMENT-1; counted launch released
+  target_ids: [IC-LINE-LAYOUT-E2E-FP28-V6-20261106]
+  context: "s1 and s2 both exited 0 with full integrity but ran sequentially on the same node ip-10-84-67-216; the frozen host_epoch factor requires each wall job on its own fresh node with distinct node identity; no wall data read."
+  rationale:
+    - "Pod anti-affinity prevents co-scheduling only; Karpenter reused the idle node, so the frozen host-epoch condition is unmet (an infrastructure fact; §14.2 corrected)."
+    - "(a) rejected: accepting a within-host pair would relax a preregistered cross-host replication condition on a host-sensitive cache-layout claim."
+    - "(b) alone rejected: no frozen rule can supply a second epoch; a pre-data versioned amendment can, as v4/v5 did."
+    - "(c) adopted: s1+s2 form host epoch H1 and both still decide; one added session s3 on a verified-distinct node forms H2; support requires all three sessions to pass, so nothing is selected or dropped."
+  evidence_refs:
+    - research/ic_line_layout_tournament_20261031/protocol-v6.json   # host_epoch factor, concurrency_note, stopping rules
+    - /dev/shm/v6s1-untrusted/job-exit.json
+    - /dev/shm/v6s2-untrusted/job-exit.json
+  limitations:
+    - "Node distinctness rests on node name plus providerID/instance id where the launcher records them; host.json carries no hostname or boot_id."
+    - "Three-session support is less likely than two-session support; this is accepted as the cost of the miss."
+  knowledge_promotion: not_warranted
+  next_actions:
+    - "Main session: relay this revision to the owner before s3 launches; the counted companion may launch now after recording its §14.1 gate line with HB(s3) reserved."
+    - "Director: write V6-AMENDMENT-1 (PROTOCOL-V6-AMENDMENT-1.md, protocol-v6.json amendments[] entry, launch-v6/request-session-3.json); main session re-freezes and merges it before s3."
+    - "Director card: confirm ip-10-84-67-216 is absent from the cluster, record the §14.1 gate line, launch ic-line-v6-s3-20261106; after it exits, verify node distinctness."
+    - "Then analyze-v6.sh twice (§15.3(4)), combine the three per-session verdicts, independent validator, evidence-review decision. s1/s2 stay sealed until s3 has written job-exit.json."
+    - "Main session: mirror this block into ledger/decisions/DEC-20261106-662e33.yaml in the next ledger archive."
+```
