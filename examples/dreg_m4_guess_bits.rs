@@ -181,6 +181,8 @@ fn main() {
     let mut out = Vec::new();
     let mut table = Vec::new();
     let (mut kept_all, mut tested, mut sum_up, mut sum_down) = (0u32, 0u32, 0u32, 0u32);
+    // Q2: essential guesses by link (1: guesses 0-3, 2: 4-6, 3: 7-9), per arm I, R.
+    let mut by_link = [[0u32; 3]; 2];
     for (draw, file) in DRAWS {
         let Some(rec) = draw_record(root, file, draw) else {
             errors.push(format!("draw {draw}: not found"));
@@ -192,6 +194,13 @@ fn main() {
                 continue;
             }
             let e = essential(&f);
+            for &i in &e {
+                by_link[usize::from(arm == "R")][match i {
+                    0..=3 => 0,
+                    4..=6 => 1,
+                    _ => 2,
+                }] += 1;
+            }
             let refuting = f.iter().filter(|&&x| x).count();
             // Refuting branches with guess i set to 1 and to 0.
             let per_bit: Vec<(usize, usize)> = (0..10)
@@ -287,7 +296,9 @@ fn main() {
         }
     } else if plot {
         println!(
-            r#"{{"valid":{valid},"phase2_tested":{tested},"phase2_all_kept":{kept_all},"pair_sum_essential_up":{sum_up},"pair_sum_essential_down":{sum_down},"cells":[{}]}}"#,
+            r#"{{"valid":{valid},"phase2_tested":{tested},"phase2_all_kept":{kept_all},"pair_sum_essential_up":{sum_up},"pair_sum_essential_down":{sum_down},"by_link_i":{:?},"by_link_r":{:?},"cells":[{}]}}"#,
+            by_link[0],
+            by_link[1],
             out.join(",")
         );
     } else {
@@ -296,6 +307,10 @@ fn main() {
         }
         println!(
             "Q3: arm I's essential pair-sum guesses refute more at value 1 on {sum_up}, at value 0 on {sum_down}"
+        );
+        println!(
+            "Q2: essential guesses on links 1, 2, 3: arm I {:?}, arm R {:?}",
+            by_link[0], by_link[1]
         );
         println!(
             "Q4: guessing only E keeps every refutation on {kept_all} of {tested} arm-draws tested"
