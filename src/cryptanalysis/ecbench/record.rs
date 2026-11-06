@@ -300,7 +300,7 @@ pub fn with_diagnostic_lifecycle<T>(
         &diagnostic.lifecycle_directory(),
         diagnostic.envelope.prefix.identity.clone(),
     )?;
-    let prefix = if diagnostic.envelope.arm.method == "ic.three_leads_genus2_pencil_symbolic_v2" {
+    let prefix = if super::three_leads::is_pencil_symbolic(&diagnostic.envelope.arm.method) {
         match super::three_leads::ScopedPencilProgress::install(
             &diagnostic
                 .output_root

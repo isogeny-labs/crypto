@@ -1,0 +1,817 @@
+{
+  "schema": "ecbench.replay-sentinels/v1",
+  "rule": "per method id (the id in a committed plan's arms), the replayable record (audit::replay_candidates) minimising solve_wall_ns + 2000 ns per byte of its session's records.jsonl, among the cheapest `per_method` distinct sessions; ties by session path, seq",
+  "per_method": 1,
+  "sentinels": [
+    {
+      "method": "bsgs.interleaved",
+      "session": "research/ic_techniques_20261012/ecbench_all_20261012/sessions/prime",
+      "session_id": "ECBS1hf4377a309315",
+      "records_sha256": "c10ee4a3ba76d3bca137d600c3b3aa707f66050e93e7858c5d139700f1c24ec7",
+      "seq": 67,
+      "record_id": "ECR1hff9e810c2920",
+      "recorded_solve_wall_us": 73,
+      "recorded_total_gae": 383.0
+    },
+    {
+      "method": "bsgs.interleaved_v2",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-completion-prime-p20-generic-t0",
+      "session_id": "ECBS1h71647025b59e",
+      "records_sha256": "86edf30e14f010dc8bde5f5b9592ba80c01f46ac0adede62ecd084b14c146a3f",
+      "seq": 27,
+      "record_id": "ECR1h518887816fc8",
+      "recorded_solve_wall_us": 146,
+      "recorded_total_gae": 1340.0
+    },
+    {
+      "method": "bsgs.negation",
+      "session": "research/ic_frontier_campaign_20261015/pilot/sessions/fP32",
+      "session_id": "ECBS1hfda2c8befe2c",
+      "records_sha256": "f518da420c844fd947f34594169937f14ff6f738b8eb9ac555d0e89af0143187",
+      "seq": 1,
+      "record_id": "ECR1hdb08e14642bf",
+      "recorded_solve_wall_us": 13827,
+      "recorded_total_gae": 72480.0
+    },
+    {
+      "method": "bsgs.negation_table",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-prime-generic",
+      "session_id": "ECBS1h99662487a25c",
+      "records_sha256": "a9203ce5a126a3ef814f3cf95ced2e3dd1332068f47450062029e936b64d408a",
+      "seq": 43,
+      "record_id": "ECR1h7d513d65b6ee",
+      "recorded_solve_wall_us": 22,
+      "recorded_total_gae": 114.0
+    },
+    {
+      "method": "bsgs.negation_v2",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-completion-prime-p20-generic-t0",
+      "session_id": "ECBS1h71647025b59e",
+      "records_sha256": "86edf30e14f010dc8bde5f5b9592ba80c01f46ac0adede62ecd084b14c146a3f",
+      "seq": 28,
+      "record_id": "ECR1h582cd67a0c3e",
+      "recorded_solve_wall_us": 83,
+      "recorded_total_gae": 702.0
+    },
+    {
+      "method": "bsgs.textbook",
+      "session": "research/full_volcano_graphwide_ic_20261017/execution/campaigns/repaired-control/sessions/control-v0-attempt-001",
+      "session_id": "ECBS1hf9785598bd2c",
+      "records_sha256": "ff4f31b20d848fea14fe239eac3210da3216e7b59410457e6ec1b6c9574a7384",
+      "seq": 1,
+      "record_id": "ECR1hca48a96c78be",
+      "recorded_solve_wall_us": 37,
+      "recorded_total_gae": 4.0
+    },
+    {
+      "method": "bsgs.textbook_v2",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-completion-prime-p20-generic-t0",
+      "session_id": "ECBS1h71647025b59e",
+      "records_sha256": "86edf30e14f010dc8bde5f5b9592ba80c01f46ac0adede62ecd084b14c146a3f",
+      "seq": 9,
+      "record_id": "ECR1h06584d4e7836",
+      "recorded_solve_wall_us": 116,
+      "recorded_total_gae": 1136.0
+    },
+    {
+      "method": "cheon.pminus1_comb",
+      "session": "research/cheon_ecbench_20261022/sessions/minus-20261022",
+      "session_id": "ECBS1h293023c203b3",
+      "records_sha256": "defd126cb44f4492b39912634e19936e303b40fdae786c4c432987eb1204da5b",
+      "seq": 1,
+      "record_id": "ECR1h8a2372022ad0",
+      "recorded_solve_wall_us": 22991,
+      "recorded_total_gae": 53074.0
+    },
+    {
+      "method": "cheon.pminus1_naive",
+      "session": "research/cheon_ecbench_20261022/sessions/minus-naive-20261022",
+      "session_id": "ECBS1h6323501e31ef",
+      "records_sha256": "3701f02c1ec965d2cbe011704556bbc4e3e6853721d7829009d76b614c8d722b",
+      "seq": 7,
+      "record_id": "ECR1hcf73fa3db373",
+      "recorded_solve_wall_us": 230135,
+      "recorded_total_gae": 665226.0
+    },
+    {
+      "method": "cheon.pplus1_comb",
+      "session": "research/cheon_ecbench_20261022/sessions/plus-20261022",
+      "session_id": "ECBS1ha367083f3e51",
+      "records_sha256": "8f4c064210372be67b2250c32756ba3081a5263794712c6b43c64f35976e8561",
+      "seq": 11,
+      "record_id": "ECR1h28dc783cd524",
+      "recorded_solve_wall_us": 11883,
+      "recorded_total_gae": 58721.0
+    },
+    {
+      "method": "claw.pair_table",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-koblitz-legacy-rootfind",
+      "session_id": "ECBS1h1b47fad824ab",
+      "records_sha256": "24867b554ad05a74cad7719559f6adbf78062a264c11f2792e0070b74d5d3d16",
+      "seq": 26,
+      "record_id": "ECR1hebb48cde2470",
+      "recorded_solve_wall_us": 147,
+      "recorded_total_gae": 83.0
+    },
+    {
+      "method": "claw.pair_table_v2",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-completion-koblitz-n13-claw-t0",
+      "session_id": "ECBS1hfd22451751cd",
+      "records_sha256": "a7b6f224db340dc4caa801b98742210b29c365696fc742eb0282b62558d0abfc",
+      "seq": 14,
+      "record_id": "ECR1h2701d5a48f3f",
+      "recorded_solve_wall_us": 150,
+      "recorded_total_gae": 83.0
+    },
+    {
+      "method": "ic.hyperelliptic",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-genus2-index-calculus",
+      "session_id": "ECBS1hf98e669951fe",
+      "records_sha256": "460a4b2394166344929d6f308b291d9b0e07682bf592e42cafb1bc7bde5183de",
+      "seq": 5,
+      "record_id": "ECR1hc664c8109ff7",
+      "recorded_solve_wall_us": 5614,
+      "recorded_total_gae": 183.0
+    },
+    {
+      "method": "ic.hyperelliptic_thread",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-hyperelliptic-thread",
+      "session_id": "ECBS1h008bf9124ee4",
+      "records_sha256": "39692c53f0993144f2ce4b4ae79191aa4c1a54b4df120fe9d38be07581ac9c0d",
+      "seq": 9,
+      "record_id": "ECR1h8c89b0252677",
+      "recorded_solve_wall_us": 323,
+      "recorded_total_gae": 99.0
+    },
+    {
+      "method": "ic.hyperelliptic_v2",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-genus2-index-calculus",
+      "session_id": "ECBS1hf98e669951fe",
+      "records_sha256": "460a4b2394166344929d6f308b291d9b0e07682bf592e42cafb1bc7bde5183de",
+      "seq": 19,
+      "record_id": "ECR1hd83b3497139d",
+      "recorded_solve_wall_us": 5530,
+      "recorded_total_gae": 228.0
+    },
+    {
+      "method": "ic.k4_gaudry",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-fp4-gaudry",
+      "session_id": "ECBS1h2259a7909858",
+      "records_sha256": "b0141d368e51e1ea809ca9c155a7ee5f3dc5d0b22a02e4babb9e09c5dfd70542",
+      "seq": 14,
+      "record_id": "ECR1h6bad6e0ed30e",
+      "recorded_solve_wall_us": 7235,
+      "recorded_total_gae": 22354.731958762888
+    },
+    {
+      "method": "ic.known_log_ksum_v1",
+      "session": "research/prime_precompute_regime_20261028/train/sessions/P32",
+      "session_id": "ECBS1ha9ddaf419c20",
+      "records_sha256": "99f9d0d31ed96384b3f13af1607d18241b325bef4b7443c3429bc5536abe8e73",
+      "seq": 7,
+      "record_id": "ECR1h527e60956e75",
+      "recorded_solve_wall_us": 16895,
+      "recorded_total_gae": 238783.0
+    },
+    {
+      "method": "ic.known_log_mitm2_v1",
+      "session": "research/ecbench_known_log_targets_20261021/sessions/20261021T0636Z-smoke",
+      "session_id": "ECBS1h26cf852c72ac",
+      "records_sha256": "199d8f6447534bf124cc87847168964e1c8012b984064df9af757e522bfba748",
+      "seq": 11,
+      "record_id": "ECR1h897bc08cb9a0",
+      "recorded_solve_wall_us": 3918,
+      "recorded_total_gae": 1498.0
+    },
+    {
+      "method": "ic.koblitz_batched",
+      "session": "research/ecbench_batched_screen_20261101/sessions/n13a0",
+      "session_id": "ECBS1hdaaf5e8715d0",
+      "records_sha256": "f84da25517c647e0237a40fd54834ee90bdbfd7e77c7bddcf4acc29c71224cf7",
+      "seq": 1527,
+      "record_id": "ECR1hf9496fa5d3ba",
+      "recorded_solve_wall_us": 2032,
+      "recorded_total_gae": 37388.0
+    },
+    {
+      "method": "ic.koblitz_descent",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-koblitz-descent",
+      "session_id": "ECBS1h6b8d1bdf26a6",
+      "records_sha256": "561a373d7bf48aa41f0a9af819933653f006260f9939df7e1ec951b7b74cabad",
+      "seq": 14,
+      "record_id": "ECR1h53637060b13d",
+      "recorded_solve_wall_us": 2123,
+      "recorded_total_gae": 11313.0
+    },
+    {
+      "method": "ic.large_prime",
+      "session": "research/ic_techniques_20261012/ecbench_all_20261012/sessions/binary-lp",
+      "session_id": "ECBS1he9144c9aed5b",
+      "records_sha256": "cd7dd78edadeaafbd5d4484657acf5ece2e3bf221826def852184cbd38cd5c37",
+      "seq": 3,
+      "record_id": "ECR1ha1cb7cbe9109",
+      "recorded_solve_wall_us": 11242,
+      "recorded_total_gae": 85377.0
+    },
+    {
+      "method": "ic.large_prime_v2",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-completion-binary-large-prime-n11-t0",
+      "session_id": "ECBS1hd9eafe1f8cf0",
+      "records_sha256": "ef2a4b1a51933c71b9dcdf93b87fe917841e8cc87786be45e661392c8112e2c8",
+      "seq": 15,
+      "record_id": "ECR1hff3c6128b5db",
+      "recorded_solve_wall_us": 14796,
+      "recorded_total_gae": 85416.0
+    },
+    {
+      "method": "ic.pipeline",
+      "session": "research/curve25519_algebraic_ecbench_scale_20261105/sessions/k24-c5-a1",
+      "session_id": "ECBS1h609c4fdac56b",
+      "records_sha256": "75b60131e21f72d34a600ce1ce8b31ed8860e4803b54e259f609e4bb6925f1c6",
+      "seq": 1,
+      "record_id": "ECR1h97e81c4cc102",
+      "recorded_solve_wall_us": 3012,
+      "recorded_total_gae": 20269.0
+    },
+    {
+      "method": "ic.pipeline_counted",
+      "session": "research/full_volcano_graphwide_ic_20261017/execution/campaigns/repaired-control/sessions/control-v0-attempt-001",
+      "session_id": "ECBS1hf9785598bd2c",
+      "records_sha256": "ff4f31b20d848fea14fe239eac3210da3216e7b59410457e6ec1b6c9574a7384",
+      "seq": 4,
+      "record_id": "ECR1h7960b205ba50",
+      "recorded_solve_wall_us": 238,
+      "recorded_total_gae": 119.0
+    },
+    {
+      "method": "ic.pipeline_full",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-completion-generator-orbit-a1-n29-t0",
+      "session_id": "ECBS1hfed69cbb7d9f",
+      "records_sha256": "86733aa751f96be1ad5b6c76c71d96b6bd99df06be42ade1559c9d0e44541ef1",
+      "seq": 7,
+      "record_id": "ECR1ha651ad0e0e3c",
+      "recorded_solve_wall_us": 202,
+      "recorded_total_gae": 91.567394
+    },
+    {
+      "method": "ic.pipeline_wordram",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-koblitz-legacy-rootfind",
+      "session_id": "ECBS1h1b47fad824ab",
+      "records_sha256": "24867b554ad05a74cad7719559f6adbf78062a264c11f2792e0070b74d5d3d16",
+      "seq": 29,
+      "record_id": "ECR1haf90aee000eb",
+      "recorded_solve_wall_us": 326,
+      "recorded_total_gae": 1141.7444796766663
+    },
+    {
+      "method": "ic.prime_orbit_relations_v1",
+      "session": "research/ecbench_registry_optimization_20261101/execution/prime-orbit-j0-crosscheck-l0-20261101",
+      "session_id": "ECBS1h1f3adf05df4a",
+      "records_sha256": "81ba763ddf3108053b72afa99af2b23e19b3261b084eda40bc0d3edde4a2e8fc",
+      "seq": 8,
+      "record_id": "ECR1hc68cbef31d80",
+      "recorded_solve_wall_us": 247,
+      "recorded_total_gae": 1346.0
+    },
+    {
+      "method": "ic.residual_batch",
+      "session": "research/ic_residual_batch_ecbench_20261102/sessions/E-p36",
+      "session_id": "ECBS1h13d539b3b2ae",
+      "records_sha256": "4ed06cf8ae1eb57e6ac20fa7899d33012d0df7ce30e51d79276ddd666df6129e",
+      "seq": 127,
+      "record_id": "ECR1h16fe377e74c0",
+      "recorded_solve_wall_us": 324597,
+      "recorded_total_gae": 815321.0
+    },
+    {
+      "method": "ic.shared_rank",
+      "session": "research/ic_frontier_campaign_20261015/pilot/sessions/fK23",
+      "session_id": "ECBS1h7d1741682d1e",
+      "records_sha256": "a7ce36b318626b7befef6dc4f4c9497e42893ea65da034d677cd544dc798bf6e",
+      "seq": 6,
+      "record_id": "ECR1h9bdca5c1ee7a",
+      "recorded_solve_wall_us": 637,
+      "recorded_total_gae": 3233.781068
+    },
+    {
+      "method": "ic.tensor_contraction_v1",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-prime-generic",
+      "session_id": "ECBS1h99662487a25c",
+      "records_sha256": "a9203ce5a126a3ef814f3cf95ced2e3dd1332068f47450062029e936b64d408a",
+      "seq": 50,
+      "record_id": "ECR1h7a76ccb7c8e4",
+      "recorded_solve_wall_us": 3340133,
+      "recorded_total_gae": 3138787.0
+    },
+    {
+      "method": "ic.three_leads_decomposition_v1",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-three-leads-decomposition",
+      "session_id": "ECBS1h6ec76575779a",
+      "records_sha256": "06765c02ec9b0c44a63e3d0bdec53fda19b29153c7062940fe1093ebb87e7e04",
+      "seq": 5,
+      "record_id": "ECR1h14b4e7d8021b",
+      "recorded_solve_wall_us": 123,
+      "recorded_total_gae": 286.47058823529414
+    },
+    {
+      "method": "ic.three_leads_decomposition_v2",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-three-leads-decomposition",
+      "session_id": "ECBS1h6ec76575779a",
+      "records_sha256": "06765c02ec9b0c44a63e3d0bdec53fda19b29153c7062940fe1093ebb87e7e04",
+      "seq": 12,
+      "record_id": "ECR1hc8d33335b4a4",
+      "recorded_solve_wall_us": 126,
+      "recorded_total_gae": 254.35294117647055
+    },
+    {
+      "method": "ic.three_leads_genus2_choice2_v1",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-three-leads-corrected",
+      "session_id": "ECBS1h2e4fcdc6b596",
+      "records_sha256": "5a28e1840146ec1c54d378c97091d0ee7a84936feb0e8f0262b3e7e0055bc199",
+      "seq": 43,
+      "record_id": "ECR1hec37814e0d68",
+      "recorded_solve_wall_us": 2513,
+      "recorded_total_gae": 4690.272727272727
+    },
+    {
+      "method": "ic.three_leads_genus2_pencil_symbolic_v2",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-three-leads-corrected",
+      "session_id": "ECBS1h2e4fcdc6b596",
+      "records_sha256": "5a28e1840146ec1c54d378c97091d0ee7a84936feb0e8f0262b3e7e0055bc199",
+      "seq": 17,
+      "record_id": "ECR1h72c4f2eb9383",
+      "recorded_solve_wall_us": 12019,
+      "recorded_total_gae": 9803.625
+    },
+    {
+      "method": "ic.three_leads_genus2_projective_chart_v1",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-three-leads-corrected",
+      "session_id": "ECBS1h2e4fcdc6b596",
+      "records_sha256": "5a28e1840146ec1c54d378c97091d0ee7a84936feb0e8f0262b3e7e0055bc199",
+      "seq": 44,
+      "record_id": "ECR1ha6650e731b68",
+      "recorded_solve_wall_us": 2054,
+      "recorded_total_gae": 4318.613636363636
+    },
+    {
+      "method": "ic.three_leads_genus2_target_rank_v1",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-three-leads-corrected",
+      "session_id": "ECBS1h2e4fcdc6b596",
+      "records_sha256": "5a28e1840146ec1c54d378c97091d0ee7a84936feb0e8f0262b3e7e0055bc199",
+      "seq": 45,
+      "record_id": "ECR1h65cbf513a2f0",
+      "recorded_solve_wall_us": 2104,
+      "recorded_total_gae": 4213.693181818182
+    },
+    {
+      "method": "ic.three_leads_genus2_v1",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-three-leads-corrected",
+      "session_id": "ECBS1h2e4fcdc6b596",
+      "records_sha256": "5a28e1840146ec1c54d378c97091d0ee7a84936feb0e8f0262b3e7e0055bc199",
+      "seq": 48,
+      "record_id": "ECR1h677fb1bc64cc",
+      "recorded_solve_wall_us": 2712,
+      "recorded_total_gae": 10708.875
+    },
+    {
+      "method": "ic.three_leads_genus2_v2",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-three-leads-corrected",
+      "session_id": "ECBS1h2e4fcdc6b596",
+      "records_sha256": "5a28e1840146ec1c54d378c97091d0ee7a84936feb0e8f0262b3e7e0055bc199",
+      "seq": 49,
+      "record_id": "ECR1h1914c2977966",
+      "recorded_solve_wall_us": 2775,
+      "recorded_total_gae": 10708.875
+    },
+    {
+      "method": "ic.trace_line_2lp",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-binary-large-prime-trace",
+      "session_id": "ECBS1hbe68681ca2a8",
+      "records_sha256": "b33f0ccd7fafe946f541ea427c03415cf99a0236c062bd667f2cede64583f684",
+      "seq": 23,
+      "record_id": "ECR1h0896846f7823",
+      "recorded_solve_wall_us": 223,
+      "recorded_total_gae": 926.0
+    },
+    {
+      "method": "jacobian_image.bsgs",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-jacobian-image",
+      "session_id": "ECBS1h923a2556ffc1",
+      "records_sha256": "6840fb494948318d135fa47416b4f58bb344049d1b7c1bccd9bdb523c941c227",
+      "seq": 15,
+      "record_id": "ECR1hffcbd566998d",
+      "recorded_solve_wall_us": 264,
+      "recorded_total_gae": 0.0
+    },
+    {
+      "method": "jacobian_image.bsgs_field_tally",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-jacobian-image",
+      "session_id": "ECBS1h923a2556ffc1",
+      "records_sha256": "6840fb494948318d135fa47416b4f58bb344049d1b7c1bccd9bdb523c941c227",
+      "seq": 17,
+      "record_id": "ECR1h9e47dbda0149",
+      "recorded_solve_wall_us": 557,
+      "recorded_total_gae": 0.0
+    },
+    {
+      "method": "jacobian_image.rho3",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-jacobian-image",
+      "session_id": "ECBS1h923a2556ffc1",
+      "records_sha256": "6840fb494948318d135fa47416b4f58bb344049d1b7c1bccd9bdb523c941c227",
+      "seq": 21,
+      "record_id": "ECR1hefee5a09d9f6",
+      "recorded_solve_wall_us": 355,
+      "recorded_total_gae": 0.0
+    },
+    {
+      "method": "jacobian_image.rho3_field_tally",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-jacobian-image",
+      "session_id": "ECBS1h923a2556ffc1",
+      "records_sha256": "6840fb494948318d135fa47416b4f58bb344049d1b7c1bccd9bdb523c941c227",
+      "seq": 19,
+      "record_id": "ECR1hf65825be2c9c",
+      "recorded_solve_wall_us": 942,
+      "recorded_total_gae": 0.0
+    },
+    {
+      "method": "kangaroo.vow",
+      "session": "research/ic_frontier_campaign_20261015/pilot/sessions/fP32",
+      "session_id": "ECBS1hfda2c8befe2c",
+      "records_sha256": "f518da420c844fd947f34594169937f14ff6f738b8eb9ac555d0e89af0143187",
+      "seq": 2,
+      "record_id": "ECR1h2a09738555be",
+      "recorded_solve_wall_us": 8335,
+      "recorded_total_gae": 49185.0
+    },
+    {
+      "method": "kangaroo.vow_v2",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-completion-prime-p20-generic-t0",
+      "session_id": "ECBS1h71647025b59e",
+      "records_sha256": "86edf30e14f010dc8bde5f5b9592ba80c01f46ac0adede62ecd084b14c146a3f",
+      "seq": 18,
+      "record_id": "ECR1hcdec553bb8df",
+      "recorded_solve_wall_us": 153,
+      "recorded_total_gae": 1275.0
+    },
+    {
+      "method": "rho.best2_model_v1",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-prime-generic",
+      "session_id": "ECBS1h99662487a25c",
+      "records_sha256": "a9203ce5a126a3ef814f3cf95ced2e3dd1332068f47450062029e936b64d408a",
+      "seq": 59,
+      "record_id": "ECR1h22bb5b67ee37",
+      "recorded_solve_wall_us": 68,
+      "recorded_total_gae": 472.0
+    },
+    {
+      "method": "rho.cubic",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-completion-symmetry-j0-t0",
+      "session_id": "ECBS1hc5f71aae33c5",
+      "records_sha256": "fa0cb51c349011ee735aaec04d147ab68678b7e8e331497450924d7fece79fe8",
+      "seq": 26,
+      "record_id": "ECR1hc80359204688",
+      "recorded_solve_wall_us": 142,
+      "recorded_total_gae": 554.0
+    },
+    {
+      "method": "rho.cubic_v2",
+      "session": "research/ecbench_registry_optimization_20261101/execution/prime-orbit-j0-crosscheck-l0-20261101",
+      "session_id": "ECBS1h1f3adf05df4a",
+      "records_sha256": "81ba763ddf3108053b72afa99af2b23e19b3261b084eda40bc0d3edde4a2e8fc",
+      "seq": 5,
+      "record_id": "ECR1hf12c369f605c",
+      "recorded_solve_wall_us": 111,
+      "recorded_total_gae": 258.0
+    },
+    {
+      "method": "rho.frobenius_orbit",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-extension-frobenius",
+      "session_id": "ECBS1h943f17a3566e",
+      "records_sha256": "97c6e699b05eb9c20c16a1784ec37ee4a671190b5ee593c3ccb3f9ab4f6fb413",
+      "seq": 3,
+      "record_id": "ECR1h417dad2bb4eb",
+      "recorded_solve_wall_us": 155,
+      "recorded_total_gae": 237.0
+    },
+    {
+      "method": "rho.frozen_reference",
+      "session": "research/ic_techniques_20261012/ecbench_all_20261012/sessions/prime",
+      "session_id": "ECBS1hf4377a309315",
+      "records_sha256": "c10ee4a3ba76d3bca137d600c3b3aa707f66050e93e7858c5d139700f1c24ec7",
+      "seq": 33,
+      "record_id": "ECR1hf02164235704",
+      "recorded_solve_wall_us": 110,
+      "recorded_total_gae": 1433.0
+    },
+    {
+      "method": "rho.gls",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-extension-gls",
+      "session_id": "ECBS1h32a0d7bda6b2",
+      "records_sha256": "3ad6fc2de0626bff65a7a7621e4569d5a41e253be129845ae155da9d20e9e0ee",
+      "seq": 9,
+      "record_id": "ECR1hcef9e131d43d",
+      "recorded_solve_wall_us": 138,
+      "recorded_total_gae": 344.0
+    },
+    {
+      "method": "rho.multitarget_pooled",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-prime-generic",
+      "session_id": "ECBS1h99662487a25c",
+      "records_sha256": "a9203ce5a126a3ef814f3cf95ced2e3dd1332068f47450062029e936b64d408a",
+      "seq": 81,
+      "record_id": "ECR1hfbbd57ed4a4d",
+      "recorded_solve_wall_us": 105,
+      "recorded_total_gae": 309.0
+    },
+    {
+      "method": "rho.negation",
+      "session": "research/gaudry_quartic_d4_ecbench_20261013/sessions/k4-p29-zero",
+      "session_id": "ECBS1h299e8a8af4fa",
+      "records_sha256": "e0049c2f1ada433e661a2e5af18b754ac9dc6ae2cbefbfbdd847510e38ef76bb",
+      "seq": 0,
+      "record_id": "ECR1h0a56fa63b942",
+      "recorded_solve_wall_us": 3551,
+      "recorded_total_gae": 224.0
+    },
+    {
+      "method": "rho.negation_strong",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-completion-f2m4-m10-t0",
+      "session_id": "ECBS1h43c98d6c41e0",
+      "records_sha256": "0e09855b440c98e3589f1e89cdbb734b8fbe643cfea5a8d94cf4559f7eed2f51",
+      "seq": 11,
+      "record_id": "ECR1hb1bf80912c4b",
+      "recorded_solve_wall_us": 34778,
+      "recorded_total_gae": 95002.27932960894
+    },
+    {
+      "method": "rho.negation_v2",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-nested-random-binary-n13-matrix-t0",
+      "session_id": "ECBS1h58aad2bac5e8",
+      "records_sha256": "814dbc7141c2f9a82ef9a18b107392794bb1cd9072d4cb1948a90b2cf24c4384",
+      "seq": 9,
+      "record_id": "ECR1hf0b83172799c",
+      "recorded_solve_wall_us": 55,
+      "recorded_total_gae": 85.0
+    },
+    {
+      "method": "rho.plain",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-hyperelliptic-thread",
+      "session_id": "ECBS1h008bf9124ee4",
+      "records_sha256": "39692c53f0993144f2ce4b4ae79191aa4c1a54b4df120fe9d38be07581ac9c0d",
+      "seq": 13,
+      "record_id": "ECR1he0b2cf0429c0",
+      "recorded_solve_wall_us": 241,
+      "recorded_total_gae": 97.0
+    },
+    {
+      "method": "rho.plus_model_v1",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-prime-generic",
+      "session_id": "ECBS1h99662487a25c",
+      "records_sha256": "a9203ce5a126a3ef814f3cf95ced2e3dd1332068f47450062029e936b64d408a",
+      "seq": 24,
+      "record_id": "ECR1hf3f03d4a9263",
+      "recorded_solve_wall_us": 105,
+      "recorded_total_gae": 737.0
+    },
+    {
+      "method": "rho.preprocessing",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-prime-generic",
+      "session_id": "ECBS1h99662487a25c",
+      "records_sha256": "a9203ce5a126a3ef814f3cf95ced2e3dd1332068f47450062029e936b64d408a",
+      "seq": 46,
+      "record_id": "ECR1hdcaca4d0c9af",
+      "recorded_solve_wall_us": 96,
+      "recorded_total_gae": 231.0
+    },
+    {
+      "method": "rho.quartic",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-completion-symmetry-j1728-t0",
+      "session_id": "ECBS1h6955a44729dd",
+      "records_sha256": "23e609f5ef666437f76612f51d177877a7e99e6cc5575c787f340e2cb693cd19",
+      "seq": 9,
+      "record_id": "ECR1h7cb4401c4832",
+      "recorded_solve_wall_us": 139,
+      "recorded_total_gae": 428.0
+    },
+    {
+      "method": "rho.quartic_v2",
+      "session": "research/ecbench_registry_optimization_20261101/execution/prime-orbit-j1728-crosscheck-l0-20261101",
+      "session_id": "ECBS1hdf484e9fb96b",
+      "records_sha256": "9c194e21a052ace71eb2a9fb8e6c1d2bcb6bdba7c9e017945029fc00828fed4b",
+      "seq": 5,
+      "record_id": "ECR1h5e224c595072",
+      "recorded_solve_wall_us": 98,
+      "recorded_total_gae": 135.0
+    },
+    {
+      "method": "rho.signed_frobenius",
+      "session": "research/ecbench_factor_bases_20261013/sessions/koblitz17-algebraic",
+      "session_id": "ECBS1hedc734e1870d",
+      "records_sha256": "2f281cbc3983f6c2f60e6055ef57a09e062240a53fed7ec9b72c8964a30ab3cf",
+      "seq": 0,
+      "record_id": "ECR1h42d73534dfa4",
+      "recorded_solve_wall_us": 293,
+      "recorded_total_gae": 181.0
+    },
+    {
+      "method": "rho.signed_frobenius_full",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-completion-generator-orbit-a1-n29-t0",
+      "session_id": "ECBS1hfed69cbb7d9f",
+      "records_sha256": "86733aa751f96be1ad5b6c76c71d96b6bd99df06be42ade1559c9d0e44541ef1",
+      "seq": 13,
+      "record_id": "ECR1h9a88b93095b3",
+      "recorded_solve_wall_us": 359,
+      "recorded_total_gae": 187.115993
+    },
+    {
+      "method": "rho.signed_frobenius_strong",
+      "session": "research/ic_frontier_campaign_20261015/pilot/sessions/fK19",
+      "session_id": "ECBS1h4e3c36fa57bd",
+      "records_sha256": "5b7dc927e672af4421b7ff4b8492286688ffe649551684496b9cd5e95817bf3a",
+      "seq": 0,
+      "record_id": "ECR1h087a2459bceb",
+      "recorded_solve_wall_us": 3173,
+      "recorded_total_gae": 1021.3849181367128
+    },
+    {
+      "method": "rho.signed_frobenius_strong_escape",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-completion-koblitz-n13-claw-t0",
+      "session_id": "ECBS1hfd22451751cd",
+      "records_sha256": "a7b6f224db340dc4caa801b98742210b29c365696fc742eb0282b62558d0abfc",
+      "seq": 11,
+      "record_id": "ECR1hee3c0cb51375",
+      "recorded_solve_wall_us": 117,
+      "recorded_total_gae": 640.8172020551672
+    },
+    {
+      "method": "rho.signed_frobenius_strong_full",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-completion-generator-orbit-a1-n29-t0",
+      "session_id": "ECBS1hfed69cbb7d9f",
+      "records_sha256": "86733aa751f96be1ad5b6c76c71d96b6bd99df06be42ade1559c9d0e44541ef1",
+      "seq": 10,
+      "record_id": "ECR1hf1c05ae0cdf0",
+      "recorded_solve_wall_us": 181,
+      "recorded_total_gae": 982.496569732762
+    },
+    {
+      "method": "rho.signed_frobenius_strong_legacy",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-koblitz-legacy-rootfind",
+      "session_id": "ECBS1h1b47fad824ab",
+      "records_sha256": "24867b554ad05a74cad7719559f6adbf78062a264c11f2792e0070b74d5d3d16",
+      "seq": 36,
+      "record_id": "ECR1h1efa52b1a043",
+      "recorded_solve_wall_us": 113,
+      "recorded_total_gae": 608.8172020551672
+    },
+    {
+      "method": "rho.signed_frobenius_strong_v2",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-completion-koblitz-n13-claw-t0",
+      "session_id": "ECBS1hfd22451751cd",
+      "records_sha256": "a7b6f224db340dc4caa801b98742210b29c365696fc742eb0282b62558d0abfc",
+      "seq": 9,
+      "record_id": "ECR1h2920edff9b59",
+      "recorded_solve_wall_us": 92,
+      "recorded_total_gae": 105.3557601761572
+    },
+    {
+      "method": "rho.signed_frobenius_strong_wordram",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-koblitz-legacy-rootfind",
+      "session_id": "ECBS1h1b47fad824ab",
+      "records_sha256": "24867b554ad05a74cad7719559f6adbf78062a264c11f2792e0070b74d5d3d16",
+      "seq": 34,
+      "record_id": "ECR1h75c83ee9c66a",
+      "recorded_solve_wall_us": 110,
+      "recorded_total_gae": 610.4096839005324
+    },
+    {
+      "method": "rho.signed_frobenius_v2",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-completion-koblitz-n13-rho-t0",
+      "session_id": "ECBS1hc3279d1d5293",
+      "records_sha256": "eb5f2c41f8fdcfb0c69e06749aa2c149142d9dde1b822c29ac00128dda800125",
+      "seq": 28,
+      "record_id": "ECR1h2429965da796",
+      "recorded_solve_wall_us": 136,
+      "recorded_total_gae": 74.0
+    },
+    {
+      "method": "rho.signed_frobenius_wordram",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-koblitz-legacy-rootfind",
+      "session_id": "ECBS1h1b47fad824ab",
+      "records_sha256": "24867b554ad05a74cad7719559f6adbf78062a264c11f2792e0070b74d5d3d16",
+      "seq": 24,
+      "record_id": "ECR1hf58f9f27006e",
+      "recorded_solve_wall_us": 137,
+      "recorded_total_gae": 70.65443761706042
+    },
+    {
+      "method": "rho.three_leads_jacobian_v1",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-three-leads-corrected",
+      "session_id": "ECBS1h2e4fcdc6b596",
+      "records_sha256": "5a28e1840146ec1c54d378c97091d0ee7a84936feb0e8f0262b3e7e0055bc199",
+      "seq": 32,
+      "record_id": "ECR1h8fb2cb15a25f",
+      "recorded_solve_wall_us": 2350,
+      "recorded_total_gae": 4184.261363636364
+    },
+    {
+      "method": "rho.three_leads_negation_v1",
+      "session": "research/pencil_large_prime_20261029/runs/p186379-gate-20261030-c1/checkpoint-g9-observations/checkpoint-g9/compute/session",
+      "session_id": "ECBS1hf8b5deac05ae",
+      "records_sha256": null,
+      "seq": 3,
+      "record_id": "ECR1ha36228f66009",
+      "recorded_solve_wall_us": 13652,
+      "recorded_total_gae": 35530.181818181816
+    },
+    {
+      "method": "rho.three_leads_plain_v1",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-three-leads-corrected",
+      "session_id": "ECBS1h2e4fcdc6b596",
+      "records_sha256": "5a28e1840146ec1c54d378c97091d0ee7a84936feb0e8f0262b3e7e0055bc199",
+      "seq": 26,
+      "record_id": "ECR1hdb8dca77852f",
+      "recorded_solve_wall_us": 287,
+      "recorded_total_gae": 939.2272727272727
+    },
+    {
+      "method": "transfer.ghs_cover",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-ghs-transfer",
+      "session_id": "ECBS1h65f27badcaf6",
+      "records_sha256": "566fc6c17f473cca25307f6e86b9f753db3ad964accbbe2877c036cb745e72ab",
+      "seq": 14,
+      "record_id": "ECR1h314628813299",
+      "recorded_solve_wall_us": 3567,
+      "recorded_total_gae": 3392.78247734139
+    },
+    {
+      "method": "transfer.isogeny",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-prime-isogeny",
+      "session_id": "ECBS1h23d483d49adf",
+      "records_sha256": "c23497b734fa16b447fa6ca5c46c18d62cc4ba4f2e5cde545db8cce0d346b397",
+      "seq": 14,
+      "record_id": "ECR1hb09d591179ea",
+      "recorded_solve_wall_us": 187,
+      "recorded_total_gae": 177.0
+    },
+    {
+      "method": "transfer.quartic_cover",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-prime-generic",
+      "session_id": "ECBS1h99662487a25c",
+      "records_sha256": "a9203ce5a126a3ef814f3cf95ced2e3dd1332068f47450062029e936b64d408a",
+      "seq": 19,
+      "record_id": "ECR1h1baeda80f033",
+      "recorded_solve_wall_us": 214089,
+      "recorded_total_gae": 2727311.0
+    },
+    {
+      "method": "transfer.quartic_cover_v2",
+      "session": "research/ecbench_registry_optimization_20261101/execution/smoke-prime-generic",
+      "session_id": "ECBS1h99662487a25c",
+      "records_sha256": "a9203ce5a126a3ef814f3cf95ced2e3dd1332068f47450062029e936b64d408a",
+      "seq": 18,
+      "record_id": "ECR1hfbeeaa50c690",
+      "recorded_solve_wall_us": 222024,
+      "recorded_total_gae": 2727311.0
+    }
+  ],
+  "unreplayable": [
+    {
+      "method": "ic.aps_v1",
+      "reason": "no committed record is replayable (audit::replayable: nondeterministic method, or only warm-ups, timeouts, crashes or budgeted solves)"
+    },
+    {
+      "method": "ic.cm_folded_native_d43_v1",
+      "reason": "no committed record is replayable (audit::replayable: nondeterministic method, or only warm-ups, timeouts, crashes or budgeted solves)"
+    },
+    {
+      "method": "ic.cm_folded_native_v1",
+      "reason": "no committed record is replayable (audit::replayable: nondeterministic method, or only warm-ups, timeouts, crashes or budgeted solves)"
+    },
+    {
+      "method": "ic.cm_folded_recurrence_v1",
+      "reason": "no committed record is replayable (audit::replayable: nondeterministic method, or only warm-ups, timeouts, crashes or budgeted solves)"
+    }
+  ],
+  "known_failures": [
+    {
+      "session": "research/three_leads_e2e_20261018/correctness/genus-smoke-session-v2",
+      "seq": 0,
+      "reason": "committed 2026-10-18; the counters of the three_leads methods changed since, so the record no longer replays (found by the first sentinel run, not by any earlier lane)"
+    },
+    {
+      "session": "research/three_leads_e2e_20261018/correctness/genus-smoke-session-v2",
+      "seq": 1,
+      "reason": "committed 2026-10-18; the counters of the three_leads methods changed since, so the record no longer replays (found by the first sentinel run, not by any earlier lane)"
+    },
+    {
+      "session": "research/three_leads_e2e_20261018/correctness/genus-smoke-session-v2",
+      "seq": 2,
+      "reason": "committed 2026-10-18; the counters of the three_leads methods changed since, so the record no longer replays (found by the first sentinel run, not by any earlier lane)"
+    },
+    {
+      "session": "research/three_leads_e2e_20261018/correctness/genus-smoke-session-v2",
+      "seq": 3,
+      "reason": "committed 2026-10-18; the counters of the three_leads methods changed since, so the record no longer replays (found by the first sentinel run, not by any earlier lane)"
+    }
+  ]
+}

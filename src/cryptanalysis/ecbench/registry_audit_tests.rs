@@ -21,7 +21,7 @@
 
 use super::accounting_rules_tests::{j0, j1728};
 use super::*;
-use crate::cryptanalysis::ecbench::workload::CurveSpec;
+use crate::cryptanalysis::ecbench::workload::{CurveSpec, HashWork};
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 enum Fx {
@@ -53,6 +53,9 @@ enum Fx {
     Gls,
     Subfield,
     Fp4,
+    /// `PrimeExplicit` p = 4999, order 5006 = 2 · 2503: cofactor two, so the
+    /// cofactor multiplication of a hashed public point is a real doubling.
+    Cofactor2,
 }
 
 fn spec(fx: Fx) -> CurveSpec {
@@ -95,6 +98,15 @@ fn spec(fx: Fx) -> CurveSpec {
             gy: 58,
             family: "subfield".into(),
             parameter: 3,
+        },
+        Fx::Cofactor2 => CurveSpec::PrimeExplicit {
+            p: 4999,
+            a: 1,
+            b: 10,
+            group_order: 5006,
+            r: 2503,
+            gx: 3060,
+            gy: 144,
         },
         Fx::Prime14 => CurveSpec::PrimeSearch { bits: 14, seed: 5 },
         Fx::Prime10 => CurveSpec::PrimeSearch {
@@ -184,6 +196,25 @@ const MODEL: P = &[
     ("cap_multiple", "10000"),
 ];
 const BATCH: P = &[("batch", "4")];
+const PENCIL: P = &[
+    ("small_denominator", "2"),
+    ("matrix_coefficient_cap", "1000000"),
+];
+const APS: P = &[
+    ("encoding", "line3"),
+    ("roots", "exact"),
+    ("stop", "first_informative"),
+    ("labels", "guaranteed"),
+    ("subset_size", "2"),
+    ("attempts", "8"),
+    ("degree", "24"),
+    ("budget_ms", "10000"),
+    ("sampling_draws", "1000"),
+    ("orbit", "none"),
+    ("beta", "0"),
+    ("lambda", "0"),
+    ("prune", "false"),
+];
 const LARGE_PRIME: P = &[
     ("small_dimension", "3"),
     ("envelope_dimension", "4"),
@@ -202,10 +233,12 @@ const CASES: &[(&str, Fx, P)] = &[
     (
         "ic.three_leads_genus2_pencil_symbolic_v2",
         Fx::Scholten,
-        &[
-            ("small_denominator", "2"),
-            ("matrix_coefficient_cap", "1000000"),
-        ],
+        PENCIL,
+    ),
+    (
+        "ic.three_leads_genus2_pencil_symbolic_v3",
+        Fx::Scholten,
+        PENCIL,
     ),
     ("ic.three_leads_genus2_choice2_v1", Fx::Scholten, TL_RHO),
     (
@@ -235,6 +268,8 @@ const CASES: &[(&str, Fx, P)] = &[
     ("rho.best2_model_v1", Fx::Prime18, MODEL),
     ("rho.multitarget_pooled", Fx::Prime18, BATCH),
     ("ic.residual_batch", Fx::Prime18, BATCH),
+    ("ic.residual_batch_v2", Fx::Prime18, BATCH),
+    ("ic.residual_batch_v2", Fx::Cofactor2, BATCH),
     ("rho.preprocessing", Fx::Prime18, &[("entries", "64")]),
     ("ic.pipeline", Fx::Prime18, IC_PRIME),
     ("ic.pipeline", Fx::Prime18, WWALK),
@@ -268,25 +303,8 @@ const CASES: &[(&str, Fx, P)] = &[
         Fx::Prime18,
         &[("coordinates", "affine")],
     ),
-    (
-        "ic.aps_v1",
-        Fx::Aps101,
-        &[
-            ("encoding", "line3"),
-            ("roots", "exact"),
-            ("stop", "first_informative"),
-            ("labels", "guaranteed"),
-            ("subset_size", "2"),
-            ("attempts", "8"),
-            ("degree", "24"),
-            ("budget_ms", "10000"),
-            ("sampling_draws", "1000"),
-            ("orbit", "none"),
-            ("beta", "0"),
-            ("lambda", "0"),
-            ("prune", "false"),
-        ],
-    ),
+    ("ic.aps_v1", Fx::Aps101, APS),
+    ("ic.aps_v2", Fx::Aps101, APS),
     ("transfer.isogeny", Fx::Prime14, &[("ell", "3")]),
     ("transfer.quartic_cover", Fx::Prime14, &[]),
     ("transfer.quartic_cover_v2", Fx::Prime14, &[]),
@@ -422,7 +440,7 @@ const UNCOUNTED_NAMES: &[&str] = &[
 /// (their records keep the exhaustion), or whose answer depends on a wall
 /// deadline: the recovered logarithm is not asserted, the accounting is.
 fn may_exhaust(id: &str) -> bool {
-    id.contains(".three_leads_") || id == "ic.aps_v1"
+    id.contains(".three_leads_") || crate::cryptanalysis::ecbench::aps::is_aps(id)
 }
 
 /// Frozen ids whose `unpriced` list does not meet rule 3 (counter names, one
@@ -450,6 +468,7 @@ const CHECK_PHASE: &[(&str, &str)] = &[
     ("ic.known_log_mitm2_v1", "target_recovery_check"),
     ("ic.tensor_contraction_v1", "recovery_check"),
     ("ic.residual_batch", "internal_verification"),
+    ("ic.residual_batch_v2", "internal_verification"),
     ("rho.multitarget_pooled", "internal_verification"),
     ("rho.preprocessing", "internal_verification"),
     ("rho.negation_strong", "check"),
@@ -757,4 +776,398 @@ fn what_the_planner_accepts_the_new_methods_run_without_error() {
     }
     assert!(ran > 100, "the sweep ran only {ran} solves");
     assert!(problems.is_empty(), "\n{}\n", problems.join("\n"));
+}
+
+// ---------------------------------------------------------------------------
+// The successor ids of the `unpriced` audit (README §9, "Unpriced-list ids").
+//
+// `ic.aps_v1`, `ic.three_leads_genus2_pencil_symbolic_v2` and
+// `ic.residual_batch` have committed sessions, so their records are frozen and
+// named in `UNPRICED_EXEMPT` / left as they are.  Each successor is a case
+// above (no exemption) and has a test here that the frozen id still produces
+// exactly its old record shape and that `successor − frozen` is exactly the
+// intended difference.
+// ---------------------------------------------------------------------------
+
+fn run_report(id: &str, fx: Fx, params: P) -> SolveReport {
+    let s = spec(fx);
+    let inst = s.build().unwrap();
+    let facts = inst.facts(&s);
+    let m = resolve(&MethodSpec {
+        id: id.into(),
+        params: params
+            .iter()
+            .map(|(k, v)| (k.to_string(), v.to_string()))
+            .collect(),
+    })
+    .unwrap();
+    applicable(&m, &inst, &facts).unwrap();
+    let k = 1 + 4242 % (facts.r - 1);
+    let target = inst.mul_generator_hex(k).unwrap();
+    let mut rep = solve(&m, &inst, &facts, &target, 6).unwrap();
+    rep.solve_wall_ns = 0;
+    for p in &mut rep.phases {
+        p.wall_ns = None;
+    }
+    rep
+}
+
+fn shape(p: &PhaseRecord) -> (String, u64, u64, u64, f64) {
+    (p.name.clone(), p.adds, p.doubles, p.scalar_mults, p.gae)
+}
+
+fn keys(m: &BTreeMap<String, u64>) -> Vec<&str> {
+    m.keys().map(String::as_str).collect()
+}
+
+/// The frozen `ic.aps_v1` `unpriced` prose entry, verbatim.
+const APS_V1_PROSE: &str = "APS core group/field operations, polynomial construction, allocation and hashing are not completely counted; absent solver reports leave diagnostic counts unknown. No complete S or bitop ranking is supported";
+
+const APS_V2_NEW: [&str; 5] = [
+    "aps_core_combines_uncharged",
+    "aps_core_expression_multiplications_uncharged",
+    "aps_core_point_adds_uncharged",
+    "aps_core_scalar_mults_uncharged",
+    "aps_core_square_roots_uncharged",
+];
+
+#[test]
+fn aps_v2_adds_exactly_the_core_counters_and_names_only_counters() {
+    let a = run_report("ic.aps_v1", Fx::Aps101, APS);
+    let b = run_report("ic.aps_v2", Fx::Aps101, APS);
+
+    // The frozen id keeps its record: seven counters, the prose entry, v1.
+    assert_eq!(
+        a.unpriced,
+        [
+            "aps_f4_multiplications_uncharged",
+            "aps_root_multiplications_uncharged",
+            APS_V1_PROSE
+        ]
+    );
+    assert_eq!(
+        keys(&a.counters),
+        [
+            "aps_attempts",
+            "aps_deadline_attempts",
+            "aps_f4_multiplications_uncharged",
+            "aps_failed_attempts",
+            "aps_legacy_root_count_unknown_attempts",
+            "aps_root_multiplications_uncharged",
+            "aps_unreported_algebra_attempts",
+        ]
+    );
+    assert_eq!(a.detail["schema"], "ecbench.aps/v1");
+    assert!(a.detail.get("uncounted_work").is_none());
+
+    // v2 − frozen in the counters: exactly the five core counters.
+    let mut rest = b.counters.clone();
+    for name in APS_V2_NEW {
+        assert!(rest.remove(name).is_some(), "{name} missing from v2");
+    }
+    assert_eq!(rest, a.counters);
+    // They count real work on this fixture (the others are 0 here or not).
+    for name in [
+        "aps_core_scalar_mults_uncharged",
+        "aps_core_combines_uncharged",
+        "aps_core_square_roots_uncharged",
+        "aps_core_expression_multiplications_uncharged",
+    ] {
+        assert!(b.counters[name] > 0, "{name} counted nothing");
+    }
+    // Everything charged is identical: recovery, total, phases (with native).
+    assert_eq!(a.recovered, b.recovered);
+    assert_eq!(a.total_gae, b.total_gae);
+    assert_eq!(a.phases.len(), b.phases.len());
+    for (pa, pb) in a.phases.iter().zip(&b.phases) {
+        assert_eq!(shape(pa), shape(pb));
+        assert_eq!(pa.native, pb.native);
+    }
+    // Rule 3, stated directly: counter names only, none of them prose.
+    assert_eq!(
+        b.unpriced,
+        [
+            "aps_core_combines_uncharged",
+            "aps_core_expression_multiplications_uncharged",
+            "aps_core_point_adds_uncharged",
+            "aps_core_scalar_mults_uncharged",
+            "aps_core_square_roots_uncharged",
+            "aps_f4_multiplications_uncharged",
+            "aps_legacy_root_count_unknown_attempts",
+            "aps_root_multiplications_uncharged",
+            "aps_unreported_algebra_attempts",
+        ]
+    );
+    for name in &b.unpriced {
+        assert!(b.counters.contains_key(name), "{name} is not a counter");
+    }
+    assert!(!b.unpriced.iter().any(|n| n.contains(' ')));
+    // What no counter can hold is a detail field, not an `unpriced` entry.
+    assert_eq!(b.detail["schema"], "ecbench.aps/v2");
+    assert_eq!(
+        b.detail["uncounted_work"]["allocation_observer_available"],
+        false
+    );
+    assert_eq!(b.detail["native_work_accounting_complete"], false);
+    // The tallies are a function of the run, not of the thread's history.
+    let c = run_report("ic.aps_v2", Fx::Aps101, APS);
+    assert_eq!(b.counters, c.counters);
+}
+
+#[test]
+fn aps_core_work_counts_the_calls_the_core_makes() {
+    use crate::cryptanalysis::aps_single_relation as core;
+    use crate::cryptanalysis::prime_fast::FastCurve;
+    // p = 101, order 107, the instrument's development curve.
+    let curve = FastCurve::new("t", 101, 59, 6, 107);
+    let g = curve.point(78, 4);
+    core::reset_core_work();
+    // validate_instance: two subgroup-order checks, no other group call.
+    core::validate_instance(&curve, g, g).unwrap();
+    let w = core::core_work();
+    assert_eq!(
+        (w.scalar_mults, w.combines, w.point_adds, w.lifts),
+        (2, 0, 0, 0)
+    );
+    // One more reset starts from zero.
+    core::reset_core_work();
+    assert_eq!(core::core_work(), core::CoreWork::default());
+}
+
+const PENCIL_V2_LABELS: [&str; 3] = [
+    "pencil_native_and_symbolic_arithmetic",
+    "pencil_logical_work",
+    "allocation_observer_unavailable",
+];
+
+#[test]
+fn pencil_v3_lifts_the_ledger_into_counters_and_names_only_counters() {
+    let a = run_report(
+        "ic.three_leads_genus2_pencil_symbolic_v2",
+        Fx::Scholten,
+        PENCIL,
+    );
+    let b = run_report(
+        "ic.three_leads_genus2_pencil_symbolic_v3",
+        Fx::Scholten,
+        PENCIL,
+    );
+
+    // The frozen id keeps its record: three labels, five group counters and
+    // the eight replay words, a `v2` detail schema.
+    assert_eq!(a.unpriced, PENCIL_V2_LABELS);
+    let frozen_counters: Vec<&str> = keys(&a.counters)
+        .into_iter()
+        .filter(|k| !k.contains("sha256_word"))
+        .collect();
+    assert_eq!(
+        frozen_counters,
+        [
+            "group_bit_ops_uncharged",
+            "group_field_adds_uncharged",
+            "group_field_inversions",
+            "group_field_multiplications",
+            "group_field_squarings",
+        ]
+    );
+    assert_eq!(a.detail["schema"], "ecbench-pencil-symbolic/v2");
+
+    // v3 − frozen in the counters: only the lifted `pencil_*_uncharged` ones.
+    let lifted = |k: &str| {
+        ["pencil_native_", "pencil_symbolic_", "pencil_logical_"]
+            .iter()
+            .any(|p| k.starts_with(p))
+    };
+    let mut rest = b.counters.clone();
+    rest.retain(|k, _| !lifted(k));
+    assert_eq!(rest, a.counters);
+    assert!(b
+        .counters
+        .keys()
+        .filter(|k| lifted(k.as_str()))
+        .all(|k| k.ends_with("_uncharged")));
+    // Everything charged is identical.
+    assert_eq!(a.recovered, b.recovered);
+    assert_eq!(a.total_gae, b.total_gae);
+    assert_eq!(a.phases.len(), b.phases.len());
+    for (pa, pb) in a.phases.iter().zip(&b.phases) {
+        assert_eq!(shape(pa), shape(pb));
+    }
+
+    // `unpriced` is exactly the `_uncharged` counters, each a real counter,
+    // the two the frozen id omitted among them, the three labels gone.
+    let uncharged: Vec<String> = b
+        .counters
+        .keys()
+        .filter(|k| k.ends_with("_uncharged"))
+        .cloned()
+        .collect();
+    assert_eq!(b.unpriced, uncharged);
+    for name in ["group_field_adds_uncharged", "group_bit_ops_uncharged"] {
+        assert!(b.unpriced.iter().any(|n| n == name), "{name} not listed");
+    }
+    for label in PENCIL_V2_LABELS {
+        assert!(!b.unpriced.iter().any(|n| n == label));
+        assert!(!b.counters.contains_key(label));
+    }
+
+    // The lifted counters are the ledger's own numbers.
+    let candidate = &b.detail["candidate"];
+    let arithmetic = candidate["arithmetic"].as_object().unwrap();
+    assert!(!arithmetic.is_empty());
+    for (k, v) in arithmetic {
+        assert_eq!(
+            b.counters[&format!("pencil_native_{k}_uncharged")],
+            v.as_u64().unwrap(),
+            "arithmetic {k}"
+        );
+    }
+    let setup = b.detail["cold_setup"]["semantic_counts"]
+        .as_object()
+        .unwrap();
+    let symbolic = candidate["symbolic"]["semantic_counts"]
+        .as_object()
+        .unwrap();
+    assert_eq!(
+        setup.keys().collect::<Vec<_>>(),
+        symbolic.keys().collect::<Vec<_>>()
+    );
+    for (k, v) in symbolic {
+        assert_eq!(
+            b.counters[&format!("pencil_symbolic_{k}_uncharged")],
+            v.as_u64().unwrap() + setup[k].as_u64().unwrap(),
+            "semantic {k}"
+        );
+    }
+    for k in ["pivot_lookups", "coefficient_updates", "submitted_rows"] {
+        assert_eq!(
+            b.counters[&format!("pencil_logical_{k}_uncharged")],
+            candidate["symbolic"][k].as_u64().unwrap(),
+            "logical {k}"
+        );
+    }
+    assert_eq!(
+        b.counters["pencil_logical_solver_nodes_uncharged"],
+        candidate["solver_nodes"].as_u64().unwrap()
+    );
+    assert!(b.counters["pencil_symbolic_collection_entry_visits_uncharged"] > 0);
+    assert!(b.counters["pencil_logical_solver_nodes_uncharged"] > 0);
+    // No allocation observer: a detail field, not a counter name.
+    assert_eq!(b.detail["schema"], "ecbench-pencil-symbolic/v3");
+    assert_eq!(b.detail["allocation_observer_available"], false);
+}
+
+#[test]
+fn residual_batch_v2_charges_the_base_point_derivation_and_nothing_else() {
+    for (fx, charged) in [(Fx::Prime18, false), (Fx::Cofactor2, true)] {
+        let a = run_report("ic.residual_batch", fx, BATCH);
+        let b = run_report("ic.residual_batch_v2", fx, BATCH);
+        let tag = format!("{fx:?}");
+
+        // The frozen id keeps its three phases and no base-point counter.
+        assert_eq!(
+            a.phases.iter().map(|p| p.name.as_str()).collect::<Vec<_>>(),
+            ["setup", "search", "internal_verification"],
+            "{tag}"
+        );
+        for name in [
+            "base_point_hash_draws_uncharged",
+            "base_point_on_curve_checks_uncharged",
+            "base_point_sqrt_field_multiplications_uncharged",
+        ] {
+            assert!(!a.counters.contains_key(name), "{name} in the frozen id");
+        }
+        assert!(a.detail.get("base_point").is_some());
+
+        // v2 − frozen: one leading phase, three counters, the phase's GAE.
+        assert_eq!(
+            b.phases.iter().map(|p| p.name.as_str()).collect::<Vec<_>>(),
+            ["base_point", "setup", "search", "internal_verification"],
+            "{tag}"
+        );
+        for (pa, pb) in a.phases.iter().zip(&b.phases[1..]) {
+            assert_eq!(shape(pa), shape(pb), "{tag}");
+        }
+        let base = &b.phases[0];
+        assert_eq!(base.gae, (base.adds + base.doubles) as f64);
+        assert_eq!(b.total_gae, a.total_gae + base.gae, "{tag}");
+        assert_eq!(b.total_gae, b.phases.iter().map(|p| p.gae).sum::<f64>());
+        assert_eq!(a.recovered, b.recovered);
+        // The charge is the cofactor multiplication: nothing on a cofactor-one
+        // curve (still a derivation, counted below), a real doubling at h = 2.
+        assert_eq!(
+            base.gae > 0.0,
+            charged,
+            "{tag}: base_point gae {}",
+            base.gae
+        );
+
+        let new = [
+            "base_point_hash_draws_uncharged",
+            "base_point_on_curve_checks_uncharged",
+            "base_point_sqrt_field_multiplications_uncharged",
+        ];
+        let mut rest = b.counters.clone();
+        for name in new {
+            assert!(rest.remove(name).is_some_and(|n| n > 0), "{tag}: {name}");
+        }
+        assert_eq!(rest, a.counters, "{tag}");
+        let mut expected = a.unpriced.clone();
+        expected.extend(new.map(String::from));
+        expected.sort();
+        assert_eq!(b.unpriced, expected, "{tag}");
+
+        // The phase and counters are the derivation's own tally.
+        let s = spec(fx);
+        let inst = s.build().unwrap();
+        let facts = inst.facts(&s);
+        let mut work = HashWork::default();
+        let counted = inst
+            .hash_to_subgroup_counted(&facts, 6, (1 << 40) - 1, &mut work)
+            .unwrap();
+        assert_eq!(
+            Some(counted.clone()),
+            inst.hash_to_subgroup(&facts, 6, (1 << 40) - 1)
+        );
+        assert_eq!(
+            (base.adds, base.doubles, base.scalar_mults),
+            (
+                work.group_ops.adds,
+                work.group_ops.doubles,
+                work.group_ops.scalar_mults
+            )
+        );
+        assert_eq!(b.counters["base_point_hash_draws_uncharged"], work.draws);
+        assert_eq!(
+            b.counters["base_point_sqrt_field_multiplications_uncharged"],
+            work.sqrt_field_muls
+        );
+        assert_eq!(b.detail["base_point"], serde_json::json!(counted.0));
+    }
+}
+
+#[test]
+fn counted_square_root_is_the_square_root_and_counts_its_multiplications() {
+    use crate::cryptanalysis::ic_boundary::PrimeCurve;
+    // 1019 and 4999 are 3 mod 4 (one exponentiation); 1009 and 4993 are 1 mod 4
+    // (Tonelli–Shanks).
+    for p in [1019u64, 4999, 1009, 4993] {
+        let curve = PrimeCurve { p, a: 1, b: 10 };
+        let mut total = 0u64;
+        for n in 0..p {
+            let mut muls = 0;
+            let counted = curve.sqrt_counted(n, &mut muls);
+            assert_eq!(counted, curve.sqrt(n), "p {p} n {n}");
+            match counted {
+                Some(r) => assert_eq!(r * r % p, n),
+                None => assert!(n != 0),
+            }
+            if n != 0 {
+                assert!(muls > 0, "p {p} n {n}");
+            }
+            total += muls;
+        }
+        // About log2 p squarings plus half as many multiplications each.
+        assert!(total as f64 / p as f64 > 10.0, "p {p}: {total}");
+    }
 }
