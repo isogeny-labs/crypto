@@ -61,6 +61,30 @@ Sources: \art{crypto-autoresearcher:docs/reports/hpseudo-symnull-20261104/README
 \label{tab:corr-xref}
 \end{table}
 
+\section{Benchmark rows removed from the admitted table}\label{sec:corr-archive}
+
+The validation gate (19 October) froze 116 benchmark rows as unvalidated
+(pre-gate). By 6 November 65 rows had been removed from the admitted table
+to \art{benchmarks/ARCHIVE.json}, each with its
+exact former text, its SHA-256 and a disposition (Table~\ref{tab:fm-archive}).
+A row is \emph{incomplete} when its evidence lacks a replay certificate, a
+validator report or a matched rho, \emph{documentary} when it records a
+paper, census or synthesis rather than a measurement, and \emph{censored} when it rests on
+censored sessions and lower-bound costs. All 65 rows date from 13--26 October; 47 of them
+belong to the $n=83$ pipelines, the isogeny-volcano studies and the IC tool
+programme's exploration rounds. Removal is not a refutation: the archived
+text is kept as historical evidence of what was claimed.
+
+\begin{table}[tbp]
+\centering\footnotesize
+\input{figures/tab-fm-archive.tex}
+\caption[]{Benchmark rows removed from the admitted table, by topic and by
+the date in their entry name. Topics are assigned by directory-name
+keyword in \art{figures/make_tab_fm.py} (first match wins); counts from
+\art{benchmarks/ARCHIVE.json} via \art{figures/data-fm-glance.json}.}
+\label{tab:fm-archive}
+\end{table}
+
 \section{Binary and Koblitz fields}\label{sec:corr-binary}
 
 Table~\ref{tab:corr-binary} lists the binary-field items. Two need a

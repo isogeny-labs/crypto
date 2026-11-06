@@ -1,0 +1,20 @@
+✖ [3139/3140] Building CauchyNormalizer (3.9s)
+trace: .> LEAN_PATH=/workspace/audit/next-ternary-lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/mathlib-seed/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/CryptoLean/.lake/build/lib/lean:/workspace/crypto/research/prime_square_kernel_20261106/lean-normalizer/.lake/build/lib/lean /workspace/audit/toolchains/lean-4.35.0-linux/bin/lean /workspace/crypto/research/prime_square_kernel_20261106/lean-normalizer/CauchyNormalizer.lean -o /workspace/crypto/research/prime_square_kernel_20261106/lean-normalizer/.lake/build/lib/lean/CauchyNormalizer.olean -i /workspace/crypto/research/prime_square_kernel_20261106/lean-normalizer/.lake/build/lib/lean/CauchyNormalizer.ilean -c /workspace/crypto/research/prime_square_kernel_20261106/lean-normalizer/.lake/build/ir/CauchyNormalizer.c --setup /workspace/crypto/research/prime_square_kernel_20261106/lean-normalizer/.lake/build/ir/CauchyNormalizer.setup.json --json
+error: CauchyNormalizer.lean:13:47: No goals to be solved
+error: CauchyNormalizer.lean:13:9: unsolved goals
+case zero
+k : ℕ
+hk : k < 2 ^ 0
+this : k = 0
+⊢ ↑((2 ^ 0 - 1).choose k) = 1
+warning: CauchyNormalizer.lean:22:39: This simp argument is unused:
+  h
+
+Hint: Omit it from the simp argument list.
+  [apply] simp
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: CauchyNormalizer.lean:31:0: 'CauchyNormalizer.choose_all_ones' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+Some required targets logged failures:
+- CauchyNormalizer
+error: build failed

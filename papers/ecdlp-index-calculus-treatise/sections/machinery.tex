@@ -23,8 +23,8 @@ Three distinctions run through this part of the treatise.
 \begin{itemize}
 \item A \emph{component speed-up} lowers the cost of one stage (a Macaulay
   build, an echelon, a lookup) with identical outputs. It is measured in
-  the stage's own unit---word XORs, multiply-adds, instructions, stage
-  wall time---and says nothing about the distance to rho until the stage
+  the stage's own unit (word XORs, multiply-adds, instructions, stage
+  wall time) and says nothing about the distance to rho until the stage
   is priced inside a whole solve.
 \item An \emph{end-to-end change} moves the cold one-target $S$ of a
   complete pipeline, paired against the same pipeline before the change.
@@ -287,7 +287,7 @@ generator-orbit factor base on seven Koblitz curves ($n=13$--$37$). The
 layout table finds the same relations as the lazy table on 960 of 960 run
 pairs at $1.02$--$1.09\times$ lower cost; with the generator-orbit base and
 stride the net gain over the lazy baseline is $1.26$--$3.20\times$, with the
-order holding across the band---an end-to-end improvement over an
+order holding across the band: an end-to-end improvement over an
 index-calculus baseline. At $n=29$ and one factor-base column the IC arm
 reads $S=0.546$, $0.611$ and $1.196$ at $w=0,0.1,1$ against $1.569$ for
 \texttt{rho-frob}, a paired ratio of $0.366$ $[0.241,0.523]$. The directory
@@ -309,7 +309,7 @@ the crossing is.
 \item In the validation file's like-for-like band, which prices the same
   native operation types on both arms, rho rises from $1.503$ to $1.58$ at
   $w=0.1$ while the IC arm reads $0.413$, $0.478$ and $1.063$; the crossing
-  is robust to that choice at this size and does not survive growth in $r$.
+  holds under that choice at this size and does not survive growth in $r$.
 \end{itemize}
 The refresh therefore keeps the panel as a fixed-set-up engineering
 frontier and does not pool it with the uniform-target ladder; the 1
@@ -372,7 +372,7 @@ producer-reported figure, which is how the text marks it.
 Over a binary field the decomposition oracle receives the Weil restriction
 of a summation polynomial: a Boolean system in $N$ unknowns whose solutions
 are the decompositions of one target over the factor base. The index
-calculus needs a \emph{decision}---a witness or a proof that there is none---not a
+calculus needs a \emph{decision} (a witness or a proof that there is none), not a
 Gr\"obner basis, and almost every target has none. Chapter~\ref{sec:groebner}
 describes the four engine families and Table~\ref{tab:prog_groebner-engineering}
 lists their headline engineering ratios. This chapter gives what that
@@ -864,9 +864,9 @@ came from F6 at $n=83$.
 \paragraph{October 24: every descent engine had been wrong.} A summand sweep
 with every engine on the pinned $n=83$ fixture (53-bit subgroup) found the
 same truncation one level lower: \texttt{FieldStructure} truncated the field
-table to one 64-bit word, and every Weil-descent engine---matrix F4, matrix
+table to one 64-bit word, and every Weil-descent engine (matrix F4, matrix
 F5, inherited F4, F6-IC, the F6-IC pair index, crossbred, SAT descent in
-three encodings and MQ-FES---returned ``proved \textsc{unsat}'' on
+three encodings and MQ-FES) returned ``proved \textsc{unsat}'' on
 \emph{planted} $n=83$ relations (\art{research/n83_msweep_20261024/README.md}).
 The descent builders now refuse such a field, a regression test pins it, and
 every earlier $n=83$ engine refutation is void
@@ -907,8 +907,8 @@ Across the four families the record is consistent.
   gap grows with $m$ (\S\ref{sec:bo-inherited}). Against the v2 reference of
   \S\ref{sec:em-accounting} these distances are roughly $3$--$5\times$ larger
   at $n=13$--19.
-\item Where an engine became much faster on index-calculus systems---F6-IC
-  with the few-candidate closure, chained SAT with tables and lookups---it did
+\item Where an engine became much faster on index-calculus systems (F6-IC
+  with the few-candidate closure, chained SAT with tables and lookups), it did
   so by becoming the meet-in-the-middle oracle, whose relation cost is
   bounded below by \S\ref{sec:gf-collision}.
 \item Two field-width defects (4 and 24 October) made engines report
@@ -1069,8 +1069,8 @@ pre-registered experiments E17--E42 (the $V_4$ line from E22, 18 October), each 
 \art{research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md}
 \S9 with its own report directory. On this line the decomposition solve is
 $97.7$--$98.5\%$ of $S$ and the linear algebra at most $0.006\%$
-(E32, \S9.36), so the solve's Macaulay matrix---$393\times448$ at degree 11,
-$176{,}064$ dense cells per call---is the whole cost. The levers below act on
+(E32, \S9.36), so the solve's Macaulay matrix ($393\times448$ at degree 11,
+$176{,}064$ dense cells per call) is the whole cost. The levers below act on
 that matrix. Each is priced in the line's own unit,
 \[
   S(g)=\text{counted }\FF_p\text{ multiplications}
@@ -1143,7 +1143,7 @@ Read across the table, the band does the ranking work it was built for.
   improvement across the band.
 \item \emph{A pivot order that is not a property of the curve.} If B's
   choices were fixed per curve they could be learned once and replayed,
-  as in Joux--Vitse F4 trace reuse~\cite{jouxvitse2012}. E35 found that no
+  as in Joux--Vitse F4 trace reuse~\cite{jouxvitse2011f4}. E35 found that no
   call's pivot sequence equals its curve's trace and that 997--1{,}000 of
   1{,}000 sequences per curve are distinct; in contested columns B's row
   agrees with the trace in $69.8$--$88.4\%$ of cases, and another curve's
@@ -1161,9 +1161,9 @@ Read across the table, the band does the ranking work it was built for.
   \art{benchmarks/20261102-e39-pivot-rules/}). At 1~GAE the margin is
   $0.8$--$1.3\%$.
 \item \emph{Gains that exist only at positive weights.} Storing each row
-  from its lead (V) leaves the arithmetic untouched---$41.6\%$ of the
+  from its lead (V) leaves the arithmetic untouched: $41.6\%$ of the
   $176{,}064$ cells lie left of each row's lead and are never read by the
-  echelon---so V equals A at 0~GAE and is ahead only where a stored cell has
+  echelon, so V equals A at 0~GAE and is ahead only where a stored cell has
   a price (E40; validated, \texttt{VAL-20261102-E40}). W reserves each row
   only to the block after its build end and is ahead of V by $2.2$--$2.3\%$
   at 0.1 and $3.2$--$3.4\%$ at 1~GAE (E42b). The report classifies it as a
@@ -1190,7 +1190,7 @@ closing as $n^{-1/4}$ with an extrapolated crossover near $2^{85}$--$2^{98}$.
 
 \section{Trace replay as a component speed-up}\label{sec:fe-trace}
 
-Joux and Vitse's observation~\cite{jouxvitse2012} is that the F4 runs of one
+Joux and Vitse's observation~\cite{jouxvitse2011f4} is that the F4 runs of one
 decomposition family share their sequence of useful rows, so one run can be
 recorded and later runs replayed. The programme tried it on four objects.
 \begin{itemize}
@@ -1210,8 +1210,8 @@ recorded and later runs replayed. The programme tried it on four objects.
   recording run keeps, per F4 step, the S-rows whose residue gave a new
   pivot and the reducers they reached; a replay forms only those rows and
   stops at the first step whose leads differ. Only a refutation is a result
-  of a replay---every row lies in the ideal, so reaching 1 is sound whatever
-  the trace was learned on---and a non-refuting replay falls back to plain
+  of a replay (every row lies in the ideal, so reaching 1 is sound whatever
+  the trace was learned on), and a non-refuting replay falls back to plain
   F4, charged (\art{research/curve25519_f4_trace_20261102/README.md}).
 \end{itemize}
 The fourth object is the one where the idea works, and its numbers show the
@@ -1312,10 +1312,10 @@ bases at mean absolute error $0.06$; the rule, the progression bases it
 singles out and the $m=3$ formulation point are stated in full in
 \S\ref{sec:bt-fbselect} (\art{cryptanalysis:experiments/pdp-degree-heuristics/README.md}).
 None of it is an index-calculus result: every row is a decomposition-stage
-profile on small fields. The atlas lead that would transfer it---rank
+profile on small fields. The atlas lead that would transfer it (rank
 candidate bases of equal size by $e$ inside the $m=3,4$ closure cells of
 \S\ref{sec:bd-guess} and measure degree and charged cost with a random
-control---is \emph{open, unexamined}
+control) is \emph{open, unexamined}
 (\art{crypto-autoresearcher:knowledge/leads/ecdlp/ic-engine/LEAD-ICE-linearization-excess-fb-prior.yaml}).
 
 \section{Presentations as an instrument}\label{sec:in-presentation}
@@ -1325,9 +1325,9 @@ solving degree, not the decomposition, is what an engine pays for. Two
 studies of late October measured that freedom directly.
 
 \paragraph{Tree-glued encodings.} A tree-glued, cherry-symmetric encoding
-$T$ of the prime-field point decomposition---each summand pair encoded by its
+$T$ of the prime-field point decomposition (each summand pair encoded by its
 symmetric functions with a degree-2 remainder tower, pairs glued by
-$\Sem3$, every input of degree at most 4 for every arity---was compared with
+$\Sem3$, every input of degree at most 4 for every arity) was compared with
 the plain chain $C$ and the full symmetric arm $F$ under msolve~0.6.5 on
 identical Kummer-base targets (\art{research/ic_tree_gluing_20261103/README.md};
 stage diagnostic, no $S$, contended timings).
@@ -1461,9 +1461,9 @@ The relation phase, not the matrix, sets the cost on every line measured.
 
 \texttt{ic plan} chooses a factor base, oracle and parameters for a curve
 from a cost model. Its validation on six curves is in \S\ref{sec:prime}.
-Two later versions added weight rules---\texttt{ic-planner/2} a base of
+Two later versions added weight rules (\texttt{ic-planner/2} a base of
 $1.41N_0$ at $w=1$ on prime curves, \texttt{ic-planner/3} $0.71c_0$ on Koblitz
-curves at $w\ge0.3$---and an exhaustive re-test of 26 October on 14 new
+curves at $w\ge0.3$), and an exhaustive re-test of 26 October on 14 new
 curves (3{,}328 records, 2{,}428 band verdicts restated in integers and
 checked by Lean's \texttt{decide}) withdrew all three weight rules in
 \texttt{ic-planner/4}: the prime rule failed its $w=0$ clause, the binary
@@ -1471,10 +1471,8 @@ rule failed at $w=1$, and the Koblitz rule was dearer at every weight
 (\art{research/ic_planner_exhaustive_20261026/README.md};
 \S\ref{sec:pg-engineering}, Table~\ref{tab:corr-xref}). The same re-test
 found that the residual collector is cheaper than the plan across the band
-from 36 bits---as a generic collision search, whose curve-free control costs
-the same and whose exponent matches rho's (\S\ref{sec:pg-residual}). A
-planner, in short, is a model of the engines it plans for, and its weight
-rules were the part of the model the band refuted.
+from 36 bits, as a generic collision search, whose curve-free control costs
+the same and whose exponent matches rho's (\S\ref{sec:pg-residual}).
 
 \section{Autolab loops}\label{sec:in-autolab}
 
