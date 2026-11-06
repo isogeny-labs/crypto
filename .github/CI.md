@@ -71,6 +71,24 @@ Main-branch rolling releases retain their existing full packaging behavior.
 The ecbench workflow also starts on every PR/merge group so dependency and
 embedded-data changes cannot disappear behind an incomplete trigger allowlist.
 
+### Frozen workflow pins
+
+Some research evidence pins the exact bytes of the workflow that ran it
+(`FROZEN.json` fields such as `workflow_sha256`, source locks, manifests).
+Repository-wide CI changes (runner routing, the merge set, checkout fixes)
+rewrite those files, so the live bytes stop matching the pins. Neither side is
+edited to fix that. [frozen-workflow-pins.json](scripts/frozen-workflow-pins.json)
+lists every pinned workflow, its pinned SHA-256, the files that pin it, and the
+revision that still holds those bytes. The
+[Frozen workflow replays](workflows/frozen-workflow-replays.yml) job checks that
+custody and runs each study's unchanged `ci_replay.py` in an isolated view that
+restores the pinned workflow bytes from Git
+([frozen-workflow-check.mjs](scripts/frozen-workflow-check.mjs), which reads a
+pin from a `files`/`sha256` map, a dotted `key:` field, or a JSON `pointer:`,
+and overlays further pinned workflows with `--extra-workflow`). Live workflows
+are free to follow current CI policy. A workflow marked `record` has a pin no
+runtime check asserts; the index documents it and the job keeps custody.
+
 ### Result-page triggers
 
 AGENTS.md section 7a has every result PR edit
@@ -186,6 +204,7 @@ repository settings.
 ```sh
 node --test .github/scripts/test-ci-scope.mjs
 node --test .github/scripts/test-frozen-workflow-check.mjs
+node .github/scripts/run-frozen-workflow-replays.mjs
 python3 -B scripts/test_workflows_parse.py -v
 python3 -B .github/scripts/test-pr-budgets.py -v
 python3 -B .github/scripts/check-pr-budgets.py
