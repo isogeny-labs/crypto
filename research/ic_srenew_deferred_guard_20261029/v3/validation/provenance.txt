@@ -1,0 +1,101 @@
+XP-20261029-srenew-deferred-guard-v3 -- validator provenance record (VAL see validator-report.json)
+All checks below were run by the validator on 2026-10-29; nothing here is copied from the producer's narrative.
+
+1. Worker files against the S3 originals
+   Every file under s3://isolab-results-104186811093-us-east-2/runs/ic-dg3-p<b>-20261029/<pod>/ (b = 24, 28, 32) was
+   streamed through sha256sum (aws s3 cp - , identity arn:aws:iam::104186811093:user/coreuser) and compared with
+   /dev/shm/dg3data/P<b>/eks-results/. One pod prefix per job (no reruns):
+     P24 pod 839dfb99-d7e2-4de7-aa8e-c067afa1191e
+     P28 pod 44c7bbd0-4d75-4625-9996-ba992ec3dd98
+     P32 pod bd38514c-48dc-49a0-82e0-9986502d8196
+   Result: 57 / 57 files IDENTICAL (19 per size). Lines follow ("<size> IDENTICAL <sha256> <name>"):
+     P24 IDENTICAL ca536c468b0f6c09b1b6c65ad47dc8b508ff34b9bcbeac1c760573f01cc7edde SHA256SUMS
+     P24 IDENTICAL d31efb76e094548b9aaf309b24bc608bf3a076dce1547cc346aacf0b682fe192 audit.json
+     P24 IDENTICAL 1d072fb01c5315384091676594aa7deb9b323906e4ca0b8b73e8c27d93591f35 audit.stderr
+     P24 IDENTICAL d31efb76e094548b9aaf309b24bc608bf3a076dce1547cc346aacf0b682fe192 audit.stdout
+     P24 IDENTICAL 0fe99325bb1af09e9dbcd817054f0cc292b24a1b587b2b81a6bbaf73bcd44d56 binary.sha256
+     P24 IDENTICAL 6a5baeea887ba260d6f0acdd166759c0323ed179f1c1f697bf2bd1200ed508cc build-info.json
+     P24 IDENTICAL ea55df7ac6d4494fff71ba979249074cb7d17eada85cb184aa21c9f93da57084 input-spec.json
+     P24 IDENTICAL 22adec03283d330b0f0adab672977ed32bf8a5fef4e31dba2816fafa7a20f228 job-exit.json
+     P24 IDENTICAL 22688369352fa86d5b32b868b2ba6cd6d0729619d87b8d0dad9fbf95dd7efacb l2-gate.json
+     P24 IDENTICAL 30df1c1f7bf44772072ff5e7a75679a863a3e65f2cf0d6d81b36b5f2662f4afc pod-cpuset.txt
+     P24 IDENTICAL 36afa1b85d8959e2ddd69689da3b33595aeb5b923f1baf78adef1385c34d9131 process-status.txt
+     P24 IDENTICAL e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 run-summary.json
+     P24 IDENTICAL bda8d47da89de1d360fdc6a6fdfac0882b2b245b2f15635fdf4f3b8e35ccf41e run.stderr
+     P24 IDENTICAL e85506385007a4804edc611e2719b88dae1811996a6944aac04cd57c878732a2 runner-identity.json
+     P24 IDENTICAL a5f3edd3ae5692408af02021dfff942f47e9311fcaf7a91480d4e2e61566825a session/host.json
+     P24 IDENTICAL bab371ef772c5e84056c263b9fe6299237be67381fa02a2477324a798c8aaabc session/plan.json
+     P24 IDENTICAL d1b5dedc100e0f53cc15cd5ab5d48b1aba5b5fcadcab68136861cea3da64bc2c session/records.jsonl
+     P24 IDENTICAL 9e0c631be9e1826ab46d76b5380905061a394edb20176cca20243e736e716611 session/session.json
+     P24 IDENTICAL ea55df7ac6d4494fff71ba979249074cb7d17eada85cb184aa21c9f93da57084 session/spec.json
+     P28 IDENTICAL 9046a594f927e9006ad6363c9eea0653e7785c9f9b37900d7c65cfe7aed230ea SHA256SUMS
+     P28 IDENTICAL 2c6e0d2999f0e253a1dfb6d89fe28b74833aa523016030a05bb80a74f905050c audit.json
+     P28 IDENTICAL 9688cb2f67d779bc323393ecba15a94859d445d9df4d40846e16ce88904007b5 audit.stderr
+     P28 IDENTICAL 2c6e0d2999f0e253a1dfb6d89fe28b74833aa523016030a05bb80a74f905050c audit.stdout
+     P28 IDENTICAL 0fe99325bb1af09e9dbcd817054f0cc292b24a1b587b2b81a6bbaf73bcd44d56 binary.sha256
+     P28 IDENTICAL 6a5baeea887ba260d6f0acdd166759c0323ed179f1c1f697bf2bd1200ed508cc build-info.json
+     P28 IDENTICAL cd0689e802d1ffe94b760c248769cd26003bdf52297d55c04fb46e6f5da6a3a8 input-spec.json
+     P28 IDENTICAL 7dcf6ed43859108a20d3d37c71c083e3073a3b4c4375974b12f500db55ddab77 job-exit.json
+     P28 IDENTICAL 23b7f92853d60582df8f809893a054ae6624c8e3b0c2dea30a9edef00d3222f5 l2-gate.json
+     P28 IDENTICAL 30df1c1f7bf44772072ff5e7a75679a863a3e65f2cf0d6d81b36b5f2662f4afc pod-cpuset.txt
+     P28 IDENTICAL 3f18c6105b86dbfa510c9fc45ba4c93e1dbd15081a0cf22b4235ad855214f4b5 process-status.txt
+     P28 IDENTICAL e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 run-summary.json
+     P28 IDENTICAL 395662fe9dde6516129743cb383dc315246bdfd2d37f75c7673b9abb2e899873 run.stderr
+     P28 IDENTICAL acbf8dcecba29ac4c95eb7e9bf2ec6d28b7a82f03410ede2b4ea38dedeb541c2 runner-identity.json
+     P28 IDENTICAL ed2f48b0d84753c1d65dcce0c0cad8d1a9f2a647f0fb349726894e361b2f3003 session/host.json
+     P28 IDENTICAL 0260f0415dbb5ac93619916c4031f9a8d51fc62c98c1116f95c72079f5bf4d42 session/plan.json
+     P28 IDENTICAL cd4406d3c275570b3b22ba463511898d0b45b059fd29b9e64bc430bb87f589b0 session/records.jsonl
+     P28 IDENTICAL 0c2478c1ad8057b9c1358ec27e03321b892636acd9baea85c7faaf4d99636cf1 session/session.json
+     P28 IDENTICAL cd0689e802d1ffe94b760c248769cd26003bdf52297d55c04fb46e6f5da6a3a8 session/spec.json
+     P32 IDENTICAL b127f98a70097d3ce3a0e6419714fa0a1b36a4100d236cc18eea0eb60bef36f4 SHA256SUMS
+     P32 IDENTICAL e2afe577fe21eb1a5e7e4996cc4488a74f230de16cf81274561bd3fdf6c8d55d audit.json
+     P32 IDENTICAL 7f6f37bfb81b20436d62c4f0972ec3e12e3e5cfe3cbe308be8117afe8b8e354a audit.stderr
+     P32 IDENTICAL e2afe577fe21eb1a5e7e4996cc4488a74f230de16cf81274561bd3fdf6c8d55d audit.stdout
+     P32 IDENTICAL 0fe99325bb1af09e9dbcd817054f0cc292b24a1b587b2b81a6bbaf73bcd44d56 binary.sha256
+     P32 IDENTICAL 6a5baeea887ba260d6f0acdd166759c0323ed179f1c1f697bf2bd1200ed508cc build-info.json
+     P32 IDENTICAL 0f04579703cb98d730071c6ac4016e15f7ce561ac25b6954b50206a9ddc5a934 input-spec.json
+     P32 IDENTICAL 9bb30ceb3c7354ab24d4914cffad6db3fe5f867e416c23b19a7f9e5cff5b799a job-exit.json
+     P32 IDENTICAL ca36c371d35c347593ec2f9988daab6be02b04462b4922352ac657194a50b298 l2-gate.json
+     P32 IDENTICAL 30df1c1f7bf44772072ff5e7a75679a863a3e65f2cf0d6d81b36b5f2662f4afc pod-cpuset.txt
+     P32 IDENTICAL b12f73129ad663bfc59db3c00a9683275b62b7fbcdb7ab6e2f9fdd350960c8d3 process-status.txt
+     P32 IDENTICAL e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 run-summary.json
+     P32 IDENTICAL 32eb84cb7889dd5b81b3ba17ea338e384dbd3579e0faf14e2ce2683b81a4f7e7 run.stderr
+     P32 IDENTICAL f49f8a3419420d47413a5480a10e701ae1c757fafba6e8a925e5e330943d48cf runner-identity.json
+     P32 IDENTICAL f4f9047a66cd957172d4d5c992697ec010b470c3dec55c5a7d5a206ef90da9e2 session/host.json
+     P32 IDENTICAL 2ed4b8b091b1b39beafa8a2fff68daa525ec3ca92667409db593e116add0fdcb session/plan.json
+     P32 IDENTICAL 1fee33b067d434e936c61ae4d842eeae3621d32071b7a41b7a6e79f5b27acb82 session/records.jsonl
+     P32 IDENTICAL 604d74e46e307372c962f459366fe846a1bcb2058b955c8024612106c34ccfdc session/session.json
+     P32 IDENTICAL 0f04579703cb98d730071c6ac4016e15f7ce561ac25b6954b50206a9ddc5a934 session/spec.json
+
+2. Launcher receipts (s3://.../runs/ic-dg3-p<b>-20261029/launcher/<id>/), fetched by the validator
+     P24 launcher 205ec4ab-ac65-447b-808a-c7642fabfbde job_uid 5a034b97-039e-413b-ac4c-a7f05eba9dad created 08:01:04Z
+         request.json sha256 a4c95e3fb04ae70bf82ea069e3b204de74fd3a69ac6391ed673f9e6bc62fcf30 (= result.request_sha256 = original-request.json)
+     P28 launcher 3f4424c2-6e14-4edd-ac2e-e64ebdec34ed job_uid acb82acf-cc11-4adc-93b4-741c297a10d4 created 08:02:24Z
+         request.json sha256 8f6e1cc5e65c8f21fed4eecbec46987fb2a246c1573dcdf8060492aba7b18aba (= result.request_sha256 = original-request.json)
+     P32 launcher c24e65f7-8ae6-4f68-b453-5dc494cebfde job_uid d516a6e7-4db8-4e3f-bd0d-45f0c004e6c9 created 08:05:53Z
+         request.json sha256 874be6138e03a181e2b806a1bf29b71d6227bdd3d9b415b3de854b98f3fe1900 (= result.request_sha256 = original-request.json)
+   All three: image 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:cf0dcc8ba2f6e399f3c16aec8dda0eaccb65dd0f8b75a2f90daf2b543ffb620c,
+   source_revision be2969cebf30a0cfb79088fd10094324c3efb3bb, ecbench_sha256 88070375e77648aa12a561ff9ee59e34d469c55e1da56987234811b0956e412c,
+   c8a.2xlarge, timeout 3600 s. request job.spec is JSON-equal to the frozen spec-P<b>.json, to eks-results/input-spec.json and to session/spec.json.
+   Launcher state "failed" / exit 23 is the launcher's mapping of the worker exit code 42 (job-exit.json); v3 section 6.1's exit-42 clause
+   applies and its parts were recounted (recompute-P<b>.json gate_v3).
+   The local binary /dev/shm/isolab-build/ecbench has sha256 88070375...412c (= build-info.json = binary.sha256 = session.json binary_sha256).
+
+3. Sessions (session.json): P24 ECBS1h6f22178e42b6 08:02:08Z-08:03:47Z; P28 ECBS1h9261b082b1f3 from 08:04:18Z;
+   P32 ECBS1h999ec5ed79e4 08:06:58Z-08:16:19Z. All status complete, grading_version 3, env ECBENV3hc1c5e5126853,
+   git_commit / git_dirty null (image build; the source binding is build-info.json).
+
+4. Git binding (producer worktree wt-dg, branch claude/ic-srenew-deferred-guard-run-20261029; read only)
+     freeze  e277272384d683a4d4b9983a141b523bf28c9f4a committed 07:56:17Z, pushed 07:56:20Z (remote-tracking reflog)
+     trigger a767145ff66cfb5ffc341288db0a3917b681ba2e committed 08:01:01Z, pushed 08:01:04Z
+     evidence 868fca5568aa806aeda7a2ae8bf1eb24907a8b43 committed 08:59:00Z (ancestor of HEAD; freeze is its ancestor)
+     HEAD    727cd0436477976ce7bb64a2f39ec35544099075 committed 09:03:05Z, pushed 09:03:09Z; worktree clean
+   Order: freeze push (07:56:20Z) < first job creation (08:01:04Z) < first session start (08:02:08Z);
+          trigger push (08:01:04Z) < P32 job creation (08:05:53Z) < P32 session start (08:06:58Z).
+   Committed evidence research/ic_srenew_deferred_guard_20261029/v3/P{24,28,32}: every tracked blob (79 / 79 / 82) and the
+   sha256 of every .artifacts.json entry (8 / 8 / 5) equals the S3-verified copies; 0 mismatches.
+   727cd043 adds deferred_guard_component() to scripts/build_ic_leaderboard.py (standing read from the study's VALIDATION.json);
+   the generated leaderboard files are not changed in that commit.
+
+5. Replay copies: /dev/shm/dg3val/P<b>/session/ (copied from /dev/shm/dg3data/P<b>/eks-results/session/; dg3data never written).
+   Before/after sha256 of host.json, plan.json, records.jsonl, session.json, spec.json in replay-P<b>.session-files.{before,after}.sha256.

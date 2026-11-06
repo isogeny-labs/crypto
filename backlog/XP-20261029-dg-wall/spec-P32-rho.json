@@ -1,0 +1,21 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "XP-20261029-dg-wall P32 counted session: matched rho reference for srenew and dg at N 1024",
+ "description": "Frozen protocol (backlog/XP-20261029-dg-wall/PROTOCOL.md and APPROVAL.md): counted units only (S = total GAE / sqrt r at w = 0, 0.1, 1) of rho.negation against ic.pipeline targets stride-renew and stride-renew-deferred-guard at prime-abscissa:size=1024, oracle mitm:negation_folded=1, on the same two 32-bit curves and targets as spec-P32.json. No wall figure of this session is read. Public synthetic curves and targets; no security claim.",
+ "workloads": {
+  "curves": [
+   {"kind": "prime_search", "bits": 32, "seed": 202610297323},
+   {"kind": "prime_search", "bits": 32, "seed": 202610297324}
+  ],
+  "targets_per_curve": 24,
+  "target_seed": 202610297326,
+  "target_kind": "public"
+ },
+ "arms": [
+  {"name": "rho-neg", "role": "reference", "method": {"id": "rho.negation"}},
+  {"name": "srenew", "role": "baseline", "method": {"id": "ic.pipeline", "params": {"factor_base": "prime-abscissa:size=1024", "oracle": "mitm:negation_folded=1", "max_trials": "167871873", "targets": "stride-renew"}}},
+  {"name": "dg", "role": "candidate", "method": {"id": "ic.pipeline", "params": {"factor_base": "prime-abscissa:size=1024", "oracle": "mitm:negation_folded=1", "max_trials": "167871873", "targets": "stride-renew-deferred-guard"}}},
+  {"name": "rho-neg-aa", "role": "control", "method": {"id": "rho.negation"}}
+ ],
+ "measurement": {"rounds": 6, "warmup": 1, "order": "alternate", "seed": 202610297328, "isolation_required": "L2", "timeout_seconds": 1800}
+}

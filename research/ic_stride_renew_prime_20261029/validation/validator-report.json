@@ -1,0 +1,2070 @@
+{
+ "schema": "validator-report/v1",
+ "id": "VAL-20261029-4aed57",
+ "status": "pass",
+ "verdict": "passed",
+ "independent": true,
+ "validator": "Validator subagent (claude-opus-5-5); did not produce the protocol, runs, analysis or claim",
+ "claim": "XP-20261029-stride-renew-prime: at 20 and 28 bits, ic.pipeline with targets = stride-renew (srenew) has lower whole-pipeline S than targets = walk (walk) at w = 0, 0.1 and 1, with the 95% cluster-bootstrap upper bound below 1 at every weight, and band --ranks srenew < walk on every curve (PROTOCOL.md section 6)",
+ "claim_verdict": {
+  "20": "improvement: section 6 conditions 1-4 hold; validator: pass",
+  "28": "improvement: section 6 conditions 1-4 hold; validator: pass with caveats (see caveats)"
+ },
+ "snapshot": {
+  "branch": "claude/ic-stride-renew-prime-20261029",
+  "head_commit": "0e7243aa6cbeae8f0f5a85e618929928d2aa1fd3",
+  "protocol_freeze_commit": "4d4593aabda667a681fab4a67e351dc5bcb7c1f4",
+  "evidence_committed": false,
+  "note": "The study directory was not in any commit when validated (staged by another session during validation). Every file this certificate names is bound by sha256; the eks-results files are byte-identical to the S3 originals written by the worker (validation/provenance.txt). A commit of the study directory must carry these hashes."
+ },
+ "method": "records.jsonl and plan.json read directly by validation/recompute.py (stdlib): priced S(w) = (G + w U)/sqrt(r), C = n_C = 0 (no record names a pinned calibration unit), U per the band definition; paired ratios of totals; own one-stage, stratified and two-stage cluster bootstraps; own affine EC arithmetic for [d]G = Q. ecbench compare/band re-run with a different binary and byte-compared with analysis/. Local verify --replay-all of both sessions. Mechanism split by validation/mechanism.py.",
+ "raw_data": [
+  {
+   "path": "P20/eks-results/session/records.jsonl",
+   "sha256": "038119b6f7d5ec9f2c2539607b0929c3a9ed44be1e7de21ccff93b0a4a8aaee3",
+   "s3": "s3://isolab-results-104186811093-us-east-2/runs/ic-srenew-p20-20261029/8d5ba87a-31b6-46fb-9d07-14bee7f6c08b/session/records.jsonl"
+  },
+  {
+   "path": "P20/eks-results/session/plan.json",
+   "sha256": "a8b8b2eaabed21fa18073e894222109ac80c122918c207ca15cc236856e7f98d",
+   "s3": "s3://isolab-results-104186811093-us-east-2/runs/ic-srenew-p20-20261029/8d5ba87a-31b6-46fb-9d07-14bee7f6c08b/session/plan.json"
+  },
+  {
+   "path": "P20/eks-results/session/session.json",
+   "sha256": "85bb2819521e5f824668b048c9d63445409b64f24c5a98e722989c31bac35461",
+   "s3": "s3://isolab-results-104186811093-us-east-2/runs/ic-srenew-p20-20261029/8d5ba87a-31b6-46fb-9d07-14bee7f6c08b/session/session.json"
+  },
+  {
+   "path": "P20/eks-results/session/spec.json",
+   "sha256": "fb600e6aae2c490100428e26a0a6b594bc7fc6c541deb04fea1dfe58a1713381",
+   "s3": "s3://isolab-results-104186811093-us-east-2/runs/ic-srenew-p20-20261029/8d5ba87a-31b6-46fb-9d07-14bee7f6c08b/session/spec.json"
+  },
+  {
+   "path": "P20/eks-results/session/host.json",
+   "sha256": "366b8c17895afc1a186dbc716471c256cf737f8f9aed0d5b4cbe4bbf75538cd4",
+   "s3": "s3://isolab-results-104186811093-us-east-2/runs/ic-srenew-p20-20261029/8d5ba87a-31b6-46fb-9d07-14bee7f6c08b/session/host.json"
+  },
+  {
+   "path": "P20/eks-results/SHA256SUMS",
+   "sha256": "2a4214e8a2b13c0eda588588652a98f188f7f5138d0401cd79bd268953c1d0db",
+   "s3": "s3://isolab-results-104186811093-us-east-2/runs/ic-srenew-p20-20261029/8d5ba87a-31b6-46fb-9d07-14bee7f6c08b/SHA256SUMS"
+  },
+  {
+   "path": "P20/eks-results/audit.json",
+   "sha256": "376189e669869181d8aa5b1d563cdc70d1020178b9cb60898c10a9123d973535",
+   "s3": "s3://isolab-results-104186811093-us-east-2/runs/ic-srenew-p20-20261029/8d5ba87a-31b6-46fb-9d07-14bee7f6c08b/audit.json"
+  },
+  {
+   "path": "P20/eks-results/l2-gate.json",
+   "sha256": "f7fb8b9a4c805f3b63c11bc7c7ae0eef856704cfe47c9296abeca2afbd1b10f7",
+   "s3": "s3://isolab-results-104186811093-us-east-2/runs/ic-srenew-p20-20261029/8d5ba87a-31b6-46fb-9d07-14bee7f6c08b/l2-gate.json"
+  },
+  {
+   "path": "P20/eks-results/input-spec.json",
+   "sha256": "fb600e6aae2c490100428e26a0a6b594bc7fc6c541deb04fea1dfe58a1713381",
+   "s3": "s3://isolab-results-104186811093-us-east-2/runs/ic-srenew-p20-20261029/8d5ba87a-31b6-46fb-9d07-14bee7f6c08b/input-spec.json"
+  },
+  {
+   "path": "P20/eks-results/build-info.json",
+   "sha256": "49ac9a0bfc0fbe064e3c793393adf599dea344d9e7350b4d2c1a7d086bb16138",
+   "s3": "s3://isolab-results-104186811093-us-east-2/runs/ic-srenew-p20-20261029/8d5ba87a-31b6-46fb-9d07-14bee7f6c08b/build-info.json"
+  },
+  {
+   "path": "P20/eks-results/job-exit.json",
+   "sha256": "357d2b3185ce58133ac08cedc2264c98418be85983b6134c72b7323d58bda561",
+   "s3": "s3://isolab-results-104186811093-us-east-2/runs/ic-srenew-p20-20261029/8d5ba87a-31b6-46fb-9d07-14bee7f6c08b/job-exit.json"
+  },
+  {
+   "path": "P28/eks-results/session/records.jsonl",
+   "sha256": "090a879120bf5cf1831c874f59d5a733ba8e04c9885c77ce87c8db0237599e3f",
+   "s3": "s3://isolab-results-104186811093-us-east-2/runs/ic-srenew-p28-20261029/e8fc61b5-4fb6-4257-b3ae-0692df8ff7c4/session/records.jsonl"
+  },
+  {
+   "path": "P28/eks-results/session/plan.json",
+   "sha256": "5dfab30de305ffab6db2b5265f35bb3d2a85fa7a353dc632d07baf934f022055",
+   "s3": "s3://isolab-results-104186811093-us-east-2/runs/ic-srenew-p28-20261029/e8fc61b5-4fb6-4257-b3ae-0692df8ff7c4/session/plan.json"
+  },
+  {
+   "path": "P28/eks-results/session/session.json",
+   "sha256": "b9a513f56159ab98e88fa24275c8708133de38a04cb49a69c88826de1c486109",
+   "s3": "s3://isolab-results-104186811093-us-east-2/runs/ic-srenew-p28-20261029/e8fc61b5-4fb6-4257-b3ae-0692df8ff7c4/session/session.json"
+  },
+  {
+   "path": "P28/eks-results/session/spec.json",
+   "sha256": "1de7903569c9e2b8ee7b18e9135f2eff765bb09cca5dbfab1f1fcda4f4a583bc",
+   "s3": "s3://isolab-results-104186811093-us-east-2/runs/ic-srenew-p28-20261029/e8fc61b5-4fb6-4257-b3ae-0692df8ff7c4/session/spec.json"
+  },
+  {
+   "path": "P28/eks-results/session/host.json",
+   "sha256": "b236ff8ca2bce302df09e37b3e8d29e7e8ba75e15cd9633219b82b3207b8c3c0",
+   "s3": "s3://isolab-results-104186811093-us-east-2/runs/ic-srenew-p28-20261029/e8fc61b5-4fb6-4257-b3ae-0692df8ff7c4/session/host.json"
+  },
+  {
+   "path": "P28/eks-results/SHA256SUMS",
+   "sha256": "9c8ad72ebc1dfa049d91412db5bb8065fcec6553bfe6eccc0ce95ed7be29cf52",
+   "s3": "s3://isolab-results-104186811093-us-east-2/runs/ic-srenew-p28-20261029/e8fc61b5-4fb6-4257-b3ae-0692df8ff7c4/SHA256SUMS"
+  },
+  {
+   "path": "P28/eks-results/audit.json",
+   "sha256": "7e9a2025f7da615ea36ac4bf3c6b9e2b4046160a36c971e1a16e8ebf407c0606",
+   "s3": "s3://isolab-results-104186811093-us-east-2/runs/ic-srenew-p28-20261029/e8fc61b5-4fb6-4257-b3ae-0692df8ff7c4/audit.json"
+  },
+  {
+   "path": "P28/eks-results/l2-gate.json",
+   "sha256": "f7fb8b9a4c805f3b63c11bc7c7ae0eef856704cfe47c9296abeca2afbd1b10f7",
+   "s3": "s3://isolab-results-104186811093-us-east-2/runs/ic-srenew-p28-20261029/e8fc61b5-4fb6-4257-b3ae-0692df8ff7c4/l2-gate.json"
+  },
+  {
+   "path": "P28/eks-results/input-spec.json",
+   "sha256": "1de7903569c9e2b8ee7b18e9135f2eff765bb09cca5dbfab1f1fcda4f4a583bc",
+   "s3": "s3://isolab-results-104186811093-us-east-2/runs/ic-srenew-p28-20261029/e8fc61b5-4fb6-4257-b3ae-0692df8ff7c4/input-spec.json"
+  },
+  {
+   "path": "P28/eks-results/build-info.json",
+   "sha256": "49ac9a0bfc0fbe064e3c793393adf599dea344d9e7350b4d2c1a7d086bb16138",
+   "s3": "s3://isolab-results-104186811093-us-east-2/runs/ic-srenew-p28-20261029/e8fc61b5-4fb6-4257-b3ae-0692df8ff7c4/build-info.json"
+  },
+  {
+   "path": "P28/eks-results/job-exit.json",
+   "sha256": "e098db2278151af35422ea31547c294ac623a5017607887b77130484d143bb18",
+   "s3": "s3://isolab-results-104186811093-us-east-2/runs/ic-srenew-p28-20261029/e8fc61b5-4fb6-4257-b3ae-0692df8ff7c4/job-exit.json"
+  }
+ ],
+ "headline": [
+  {
+   "name": "P20 sum S_srenew / sum S_walk at w=0 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 0.8416781431231662,
+   "recomputed": 0.8416781431231668,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-walk__srenew-w0.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P20 icv1-fp20-tm1549-7ec9131a sum S_srenew / sum S_walk at w=0",
+   "claimed": 0.8431618453011264,
+   "recomputed": 0.843161845301126,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-walk__srenew-w0.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 icv1-fp20-tm327-45c21191 sum S_srenew / sum S_walk at w=0",
+   "claimed": 0.8401725178084738,
+   "recomputed": 0.8401725178084746,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-walk__srenew-w0.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 srenew/walk 95% cluster-bootstrap lower bound at w=0",
+   "claimed": 0.8071412167360685,
+   "recomputed": 0.8075736710077098,
+   "rel_tol": 0.005,
+   "claimed_source": "P20/analysis/compare-walk__srenew-w0.json ops.ci95_bootstrap (ecbench, seed 20261002)",
+   "recomputed_by": "validation/recompute.py two-stage cluster bootstrap, own RNG seed 29102026; agreement is Monte Carlo, not bitwise"
+  },
+  {
+   "name": "P20 srenew/walk 95% cluster-bootstrap upper bound at w=0",
+   "claimed": 0.8778199882430107,
+   "recomputed": 0.8773237888539579,
+   "rel_tol": 0.005,
+   "claimed_source": "P20/analysis/compare-walk__srenew-w0.json ops.ci95_bootstrap (ecbench, seed 20261002)",
+   "recomputed_by": "validation/recompute.py two-stage cluster bootstrap, own RNG seed 29102026; agreement is Monte Carlo, not bitwise"
+  },
+  {
+   "name": "P20 sum S_srenew / sum S_walk at w=0.1 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 0.8583189981711447,
+   "recomputed": 0.8583189981711448,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-walk__srenew-w0.1.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P20 icv1-fp20-tm1549-7ec9131a sum S_srenew / sum S_walk at w=0.1",
+   "claimed": 0.8596326606346647,
+   "recomputed": 0.8596326606346648,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-walk__srenew-w0.1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 icv1-fp20-tm327-45c21191 sum S_srenew / sum S_walk at w=0.1",
+   "claimed": 0.8569764408712855,
+   "recomputed": 0.8569764408712851,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-walk__srenew-w0.1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 srenew/walk 95% cluster-bootstrap lower bound at w=0.1",
+   "claimed": 0.821374025856497,
+   "recomputed": 0.8218803634045736,
+   "rel_tol": 0.005,
+   "claimed_source": "P20/analysis/compare-walk__srenew-w0.1.json ops.ci95_bootstrap (ecbench, seed 20261002)",
+   "recomputed_by": "validation/recompute.py two-stage cluster bootstrap, own RNG seed 29102026; agreement is Monte Carlo, not bitwise"
+  },
+  {
+   "name": "P20 srenew/walk 95% cluster-bootstrap upper bound at w=0.1",
+   "claimed": 0.8970825531138649,
+   "recomputed": 0.8966705501534136,
+   "rel_tol": 0.005,
+   "claimed_source": "P20/analysis/compare-walk__srenew-w0.1.json ops.ci95_bootstrap (ecbench, seed 20261002)",
+   "recomputed_by": "validation/recompute.py two-stage cluster bootstrap, own RNG seed 29102026; agreement is Monte Carlo, not bitwise"
+  },
+  {
+   "name": "P20 sum S_srenew / sum S_walk at w=1 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 0.9255424801043312,
+   "recomputed": 0.925542480104332,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-walk__srenew-w1.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P20 icv1-fp20-tm1549-7ec9131a sum S_srenew / sum S_walk at w=1",
+   "claimed": 0.9250099410098428,
+   "recomputed": 0.9250099410098426,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-walk__srenew-w1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 icv1-fp20-tm327-45c21191 sum S_srenew / sum S_walk at w=1",
+   "claimed": 0.9261025488502228,
+   "recomputed": 0.9261025488502226,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-walk__srenew-w1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 srenew/walk 95% cluster-bootstrap lower bound at w=1",
+   "claimed": 0.8787565121895504,
+   "recomputed": 0.8791915989938314,
+   "rel_tol": 0.005,
+   "claimed_source": "P20/analysis/compare-walk__srenew-w1.json ops.ci95_bootstrap (ecbench, seed 20261002)",
+   "recomputed_by": "validation/recompute.py two-stage cluster bootstrap, own RNG seed 29102026; agreement is Monte Carlo, not bitwise"
+  },
+  {
+   "name": "P20 srenew/walk 95% cluster-bootstrap upper bound at w=1",
+   "claimed": 0.9752689848300274,
+   "recomputed": 0.9747079947686824,
+   "rel_tol": 0.005,
+   "claimed_source": "P20/analysis/compare-walk__srenew-w1.json ops.ci95_bootstrap (ecbench, seed 20261002)",
+   "recomputed_by": "validation/recompute.py two-stage cluster bootstrap, own RNG seed 29102026; agreement is Monte Carlo, not bitwise"
+  },
+  {
+   "name": "P20 sum S_walk-aa / sum S_walk at w=0 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-walk__walk-aa-w0.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P20 icv1-fp20-tm1549-7ec9131a sum S_walk-aa / sum S_walk at w=0",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-walk__walk-aa-w0.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 icv1-fp20-tm327-45c21191 sum S_walk-aa / sum S_walk at w=0",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-walk__walk-aa-w0.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 sum S_walk-aa / sum S_walk at w=0.1 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-walk__walk-aa-w0.1.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P20 icv1-fp20-tm1549-7ec9131a sum S_walk-aa / sum S_walk at w=0.1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-walk__walk-aa-w0.1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 icv1-fp20-tm327-45c21191 sum S_walk-aa / sum S_walk at w=0.1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-walk__walk-aa-w0.1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 sum S_walk-aa / sum S_walk at w=1 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-walk__walk-aa-w1.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P20 icv1-fp20-tm1549-7ec9131a sum S_walk-aa / sum S_walk at w=1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-walk__walk-aa-w1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 icv1-fp20-tm327-45c21191 sum S_walk-aa / sum S_walk at w=1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-walk__walk-aa-w1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 sum S_rho-neg-aa / sum S_rho-neg at w=0 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__rho-neg-aa-w0.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P20 icv1-fp20-tm1549-7ec9131a sum S_rho-neg-aa / sum S_rho-neg at w=0",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__rho-neg-aa-w0.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 icv1-fp20-tm327-45c21191 sum S_rho-neg-aa / sum S_rho-neg at w=0",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__rho-neg-aa-w0.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 sum S_rho-neg-aa / sum S_rho-neg at w=0.1 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__rho-neg-aa-w0.1.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P20 icv1-fp20-tm1549-7ec9131a sum S_rho-neg-aa / sum S_rho-neg at w=0.1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__rho-neg-aa-w0.1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 icv1-fp20-tm327-45c21191 sum S_rho-neg-aa / sum S_rho-neg at w=0.1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__rho-neg-aa-w0.1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 sum S_rho-neg-aa / sum S_rho-neg at w=1 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__rho-neg-aa-w1.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P20 icv1-fp20-tm1549-7ec9131a sum S_rho-neg-aa / sum S_rho-neg at w=1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__rho-neg-aa-w1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 icv1-fp20-tm327-45c21191 sum S_rho-neg-aa / sum S_rho-neg at w=1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__rho-neg-aa-w1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 sum S_walk / sum S_rho-neg at w=0 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 7.922327204947033,
+   "recomputed": 7.92232720494702,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__walk-w0.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P20 icv1-fp20-tm1549-7ec9131a sum S_walk / sum S_rho-neg at w=0",
+   "claimed": 7.959666725475347,
+   "recomputed": 7.959666725475354,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__walk-w0.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 icv1-fp20-tm327-45c21191 sum S_walk / sum S_rho-neg at w=0",
+   "claimed": 7.8847923891044625,
+   "recomputed": 7.884792389104456,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__walk-w0.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 sum S_walk / sum S_rho-neg at w=0.1 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 8.193830504709663,
+   "recomputed": 8.193830504709664,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__walk-w0.1.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P20 icv1-fp20-tm1549-7ec9131a sum S_walk / sum S_rho-neg at w=0.1",
+   "claimed": 8.255429495531148,
+   "recomputed": 8.255429495531146,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__walk-w0.1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 icv1-fp20-tm327-45c21191 sum S_walk / sum S_rho-neg at w=0.1",
+   "claimed": 8.131819227019093,
+   "recomputed": 8.131819227019097,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__walk-w0.1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 sum S_walk / sum S_rho-neg at w=1 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 9.51047986732314,
+   "recomputed": 9.51047986732314,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__walk-w1.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P20 icv1-fp20-tm1549-7ec9131a sum S_walk / sum S_rho-neg at w=1",
+   "claimed": 9.683666178087215,
+   "recomputed": 9.683666178087211,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__walk-w1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 icv1-fp20-tm327-45c21191 sum S_walk / sum S_rho-neg at w=1",
+   "claimed": 9.33490057655483,
+   "recomputed": 9.334900576554832,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__walk-w1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 sum S_srenew / sum S_rho-neg at w=0 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 6.668049651073963,
+   "recomputed": 6.6680496510739555,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__srenew-w0.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P20 icv1-fp20-tm1549-7ec9131a sum S_srenew / sum S_rho-neg at w=0",
+   "claimed": 6.711287284233767,
+   "recomputed": 6.71128728423377,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__srenew-w0.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 icv1-fp20-tm327-45c21191 sum S_srenew / sum S_rho-neg at w=0",
+   "claimed": 6.624585873950988,
+   "recomputed": 6.6245858739509895,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__srenew-w0.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 sum S_srenew / sum S_rho-neg at w=0.1 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 7.032920389986562,
+   "recomputed": 7.032920389986564,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__srenew-w0.1.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P20 icv1-fp20-tm1549-7ec9131a sum S_srenew / sum S_rho-neg at w=0.1",
+   "claimed": 7.096636821925329,
+   "recomputed": 7.096636821925328,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__srenew-w0.1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 icv1-fp20-tm327-45c21191 sum S_srenew / sum S_rho-neg at w=0.1",
+   "claimed": 6.968777498979512,
+   "recomputed": 6.968777498979511,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__srenew-w0.1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 sum S_srenew / sum S_rho-neg at w=1 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 8.802353123384568,
+   "recomputed": 8.802353123384577,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__srenew-w1.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P20 icv1-fp20-tm1549-7ec9131a sum S_srenew / sum S_rho-neg at w=1",
+   "claimed": 8.957487480151464,
+   "recomputed": 8.957487480151459,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__srenew-w1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 icv1-fp20-tm327-45c21191 sum S_srenew / sum S_rho-neg at w=1",
+   "claimed": 8.645075217210842,
+   "recomputed": 8.645075217210842,
+   "rel_tol": 1e-12,
+   "claimed_source": "P20/analysis/compare-rho-neg__srenew-w1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S rho-neg on icv1-fp20-tm327-45c21191 at w=0",
+   "claimed": 1.309988924054493,
+   "recomputed": 1.3099889240544926,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S rho-neg on icv1-fp20-tm327-45c21191 at w=0.1",
+   "claimed": 1.421070236419515,
+   "recomputed": 1.4210702364195145,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S rho-neg on icv1-fp20-tm327-45c21191 at w=1",
+   "claimed": 2.420802047704712,
+   "recomputed": 2.420802047704712,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S rho-neg-aa on icv1-fp20-tm327-45c21191 at w=0",
+   "claimed": 1.309988924054493,
+   "recomputed": 1.3099889240544926,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S rho-neg-aa on icv1-fp20-tm327-45c21191 at w=0.1",
+   "claimed": 1.421070236419515,
+   "recomputed": 1.4210702364195145,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S rho-neg-aa on icv1-fp20-tm327-45c21191 at w=1",
+   "claimed": 2.420802047704712,
+   "recomputed": 2.420802047704712,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S srenew on icv1-fp20-tm327-45c21191 at w=0",
+   "claimed": 8.678134121323646,
+   "recomputed": 8.678134121323644,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S srenew on icv1-fp20-tm327-45c21191 at w=0.1",
+   "claimed": 9.903122288029799,
+   "recomputed": 9.903122288029808,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S srenew on icv1-fp20-tm327-45c21191 at w=1",
+   "claimed": 20.928015788385263,
+   "recomputed": 20.928015788385263,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S walk on icv1-fp20-tm327-45c21191 at w=0",
+   "claimed": 10.328990698195994,
+   "recomputed": 10.328990698196,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S walk on icv1-fp20-tm327-45c21191 at w=0.1",
+   "claimed": 11.555886271460777,
+   "recomputed": 11.555886271460784,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S walk on icv1-fp20-tm327-45c21191 at w=1",
+   "claimed": 22.59794643084385,
+   "recomputed": 22.597946430843834,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S walk-aa on icv1-fp20-tm327-45c21191 at w=0",
+   "claimed": 10.328990698195994,
+   "recomputed": 10.328990698196,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S walk-aa on icv1-fp20-tm327-45c21191 at w=0.1",
+   "claimed": 11.555886271460777,
+   "recomputed": 11.555886271460784,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S walk-aa on icv1-fp20-tm327-45c21191 at w=1",
+   "claimed": 22.59794643084385,
+   "recomputed": 22.597946430843834,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S rho-neg on icv1-fp20-tm1549-7ec9131a at w=0",
+   "claimed": 1.316840503692965,
+   "recomputed": 1.3168405036929656,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S rho-neg on icv1-fp20-tm1549-7ec9131a at w=0.1",
+   "claimed": 1.4305815707889225,
+   "recomputed": 1.430581570788923,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S rho-neg on icv1-fp20-tm1549-7ec9131a at w=1",
+   "claimed": 2.4542511746525406,
+   "recomputed": 2.4542511746525393,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S rho-neg-aa on icv1-fp20-tm1549-7ec9131a at w=0",
+   "claimed": 1.316840503692965,
+   "recomputed": 1.3168405036929656,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S rho-neg-aa on icv1-fp20-tm1549-7ec9131a at w=0.1",
+   "claimed": 1.4305815707889225,
+   "recomputed": 1.430581570788923,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S rho-neg-aa on icv1-fp20-tm1549-7ec9131a at w=1",
+   "claimed": 2.4542511746525406,
+   "recomputed": 2.4542511746525393,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S srenew on icv1-fp20-tm1549-7ec9131a at w=0",
+   "claimed": 8.837694927798589,
+   "recomputed": 8.837694927798593,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S srenew on icv1-fp20-tm1549-7ec9131a at w=0.1",
+   "claimed": 10.152317852028443,
+   "recomputed": 10.152317852028446,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S srenew on icv1-fp20-tm1549-7ec9131a at w=1",
+   "claimed": 21.983924170097126,
+   "recomputed": 21.983924170097133,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S walk on icv1-fp20-tm1549-7ec9131a at w=0",
+   "claimed": 10.481611540003106,
+   "recomputed": 10.481611540003103,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S walk on icv1-fp20-tm1549-7ec9131a at w=0.1",
+   "claimed": 11.810065295254155,
+   "recomputed": 11.810065295254153,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S walk on icv1-fp20-tm1549-7ec9131a at w=1",
+   "claimed": 23.766149092513594,
+   "recomputed": 23.766149092513604,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S walk-aa on icv1-fp20-tm1549-7ec9131a at w=0",
+   "claimed": 10.481611540003106,
+   "recomputed": 10.481611540003103,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S walk-aa on icv1-fp20-tm1549-7ec9131a at w=0.1",
+   "claimed": 11.810065295254155,
+   "recomputed": 11.810065295254153,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P20 band mean S walk-aa on icv1-fp20-tm1549-7ec9131a at w=1",
+   "claimed": 23.766149092513594,
+   "recomputed": 23.766149092513604,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P20/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 sum S_srenew / sum S_walk at w=0 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 0.976554749725143,
+   "recomputed": 0.976554749725143,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-walk__srenew-w0.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P28 icv1-fp28-t20713-32971d39 sum S_srenew / sum S_walk at w=0",
+   "claimed": 0.9797949690709541,
+   "recomputed": 0.979794969070954,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-walk__srenew-w0.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 icv1-fp28-tm21435-0b5ad955 sum S_srenew / sum S_walk at w=0",
+   "claimed": 0.9733578698616907,
+   "recomputed": 0.9733578698616907,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-walk__srenew-w0.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 srenew/walk 95% cluster-bootstrap lower bound at w=0",
+   "claimed": 0.9608709784093884,
+   "recomputed": 0.9609784456324038,
+   "rel_tol": 0.005,
+   "claimed_source": "P28/analysis/compare-walk__srenew-w0.json ops.ci95_bootstrap (ecbench, seed 20261002)",
+   "recomputed_by": "validation/recompute.py two-stage cluster bootstrap, own RNG seed 29102026; agreement is Monte Carlo, not bitwise"
+  },
+  {
+   "name": "P28 srenew/walk 95% cluster-bootstrap upper bound at w=0",
+   "claimed": 0.9923703118734268,
+   "recomputed": 0.9920630066181043,
+   "rel_tol": 0.005,
+   "claimed_source": "P28/analysis/compare-walk__srenew-w0.json ops.ci95_bootstrap (ecbench, seed 20261002)",
+   "recomputed_by": "validation/recompute.py two-stage cluster bootstrap, own RNG seed 29102026; agreement is Monte Carlo, not bitwise"
+  },
+  {
+   "name": "P28 sum S_srenew / sum S_walk at w=0.1 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 0.975190567420344,
+   "recomputed": 0.9751905674203454,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-walk__srenew-w0.1.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P28 icv1-fp28-t20713-32971d39 sum S_srenew / sum S_walk at w=0.1",
+   "claimed": 0.9788414691645113,
+   "recomputed": 0.9788414691645114,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-walk__srenew-w0.1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 icv1-fp28-tm21435-0b5ad955 sum S_srenew / sum S_walk at w=0.1",
+   "claimed": 0.9715727819103054,
+   "recomputed": 0.9715727819103056,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-walk__srenew-w0.1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 srenew/walk 95% cluster-bootstrap lower bound at w=0.1",
+   "claimed": 0.9576890151761853,
+   "recomputed": 0.9577846472086116,
+   "rel_tol": 0.005,
+   "claimed_source": "P28/analysis/compare-walk__srenew-w0.1.json ops.ci95_bootstrap (ecbench, seed 20261002)",
+   "recomputed_by": "validation/recompute.py two-stage cluster bootstrap, own RNG seed 29102026; agreement is Monte Carlo, not bitwise"
+  },
+  {
+   "name": "P28 srenew/walk 95% cluster-bootstrap upper bound at w=0.1",
+   "claimed": 0.9928730402974111,
+   "recomputed": 0.9925210662703312,
+   "rel_tol": 0.005,
+   "claimed_source": "P28/analysis/compare-walk__srenew-w0.1.json ops.ci95_bootstrap (ecbench, seed 20261002)",
+   "recomputed_by": "validation/recompute.py two-stage cluster bootstrap, own RNG seed 29102026; agreement is Monte Carlo, not bitwise"
+  },
+  {
+   "name": "P28 sum S_srenew / sum S_walk at w=1 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 0.9681627230395575,
+   "recomputed": 0.9681627230395584,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-walk__srenew-w1.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P28 icv1-fp28-t20713-32971d39 sum S_srenew / sum S_walk at w=1",
+   "claimed": 0.9739946751417027,
+   "recomputed": 0.9739946751417023,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-walk__srenew-w1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 icv1-fp28-tm21435-0b5ad955 sum S_srenew / sum S_walk at w=1",
+   "claimed": 0.9622525928222015,
+   "recomputed": 0.9622525928222015,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-walk__srenew-w1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 srenew/walk 95% cluster-bootstrap lower bound at w=1",
+   "claimed": 0.9413246973230442,
+   "recomputed": 0.9412821561261652,
+   "rel_tol": 0.005,
+   "claimed_source": "P28/analysis/compare-walk__srenew-w1.json ops.ci95_bootstrap (ecbench, seed 20261002)",
+   "recomputed_by": "validation/recompute.py two-stage cluster bootstrap, own RNG seed 29102026; agreement is Monte Carlo, not bitwise"
+  },
+  {
+   "name": "P28 srenew/walk 95% cluster-bootstrap upper bound at w=1",
+   "claimed": 0.9954878082423327,
+   "recomputed": 0.9950178699513454,
+   "rel_tol": 0.005,
+   "claimed_source": "P28/analysis/compare-walk__srenew-w1.json ops.ci95_bootstrap (ecbench, seed 20261002)",
+   "recomputed_by": "validation/recompute.py two-stage cluster bootstrap, own RNG seed 29102026; agreement is Monte Carlo, not bitwise"
+  },
+  {
+   "name": "P28 sum S_walk-aa / sum S_walk at w=0 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-walk__walk-aa-w0.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P28 icv1-fp28-t20713-32971d39 sum S_walk-aa / sum S_walk at w=0",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-walk__walk-aa-w0.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 icv1-fp28-tm21435-0b5ad955 sum S_walk-aa / sum S_walk at w=0",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-walk__walk-aa-w0.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 sum S_walk-aa / sum S_walk at w=0.1 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-walk__walk-aa-w0.1.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P28 icv1-fp28-t20713-32971d39 sum S_walk-aa / sum S_walk at w=0.1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-walk__walk-aa-w0.1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 icv1-fp28-tm21435-0b5ad955 sum S_walk-aa / sum S_walk at w=0.1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-walk__walk-aa-w0.1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 sum S_walk-aa / sum S_walk at w=1 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-walk__walk-aa-w1.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P28 icv1-fp28-t20713-32971d39 sum S_walk-aa / sum S_walk at w=1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-walk__walk-aa-w1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 icv1-fp28-tm21435-0b5ad955 sum S_walk-aa / sum S_walk at w=1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-walk__walk-aa-w1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 sum S_rho-neg-aa / sum S_rho-neg at w=0 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__rho-neg-aa-w0.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P28 icv1-fp28-t20713-32971d39 sum S_rho-neg-aa / sum S_rho-neg at w=0",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__rho-neg-aa-w0.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 icv1-fp28-tm21435-0b5ad955 sum S_rho-neg-aa / sum S_rho-neg at w=0",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__rho-neg-aa-w0.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 sum S_rho-neg-aa / sum S_rho-neg at w=0.1 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__rho-neg-aa-w0.1.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P28 icv1-fp28-t20713-32971d39 sum S_rho-neg-aa / sum S_rho-neg at w=0.1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__rho-neg-aa-w0.1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 icv1-fp28-tm21435-0b5ad955 sum S_rho-neg-aa / sum S_rho-neg at w=0.1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__rho-neg-aa-w0.1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 sum S_rho-neg-aa / sum S_rho-neg at w=1 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__rho-neg-aa-w1.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P28 icv1-fp28-t20713-32971d39 sum S_rho-neg-aa / sum S_rho-neg at w=1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__rho-neg-aa-w1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 icv1-fp28-tm21435-0b5ad955 sum S_rho-neg-aa / sum S_rho-neg at w=1",
+   "claimed": 1.0,
+   "recomputed": 1.0,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__rho-neg-aa-w1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 sum S_walk / sum S_rho-neg at w=0 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 22.783665764590605,
+   "recomputed": 22.7836657645906,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__walk-w0.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P28 icv1-fp28-t20713-32971d39 sum S_walk / sum S_rho-neg at w=0",
+   "claimed": 22.999535803166427,
+   "recomputed": 22.999535803166424,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__walk-w0.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 icv1-fp28-tm21435-0b5ad955 sum S_walk / sum S_rho-neg at w=0",
+   "claimed": 22.574617958999184,
+   "recomputed": 22.57461795899919,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__walk-w0.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 sum S_walk / sum S_rho-neg at w=0.1 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 22.325938962540345,
+   "recomputed": 22.32593896254033,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__walk-w0.1.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P28 icv1-fp28-t20713-32971d39 sum S_walk / sum S_rho-neg at w=0.1",
+   "claimed": 22.586296698658643,
+   "recomputed": 22.586296698658643,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__walk-w0.1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 icv1-fp28-tm21435-0b5ad955 sum S_walk / sum S_rho-neg at w=0.1",
+   "claimed": 22.073796975237034,
+   "recomputed": 22.073796975237034,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__walk-w0.1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 sum S_walk / sum S_rho-neg at w=1 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 20.23196825741697,
+   "recomputed": 20.23196825741697,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__walk-w1.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P28 icv1-fp28-t20713-32971d39 sum S_walk / sum S_rho-neg at w=1",
+   "claimed": 20.696108918700887,
+   "recomputed": 20.696108918700887,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__walk-w1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 icv1-fp28-tm21435-0b5ad955 sum S_walk / sum S_rho-neg at w=1",
+   "claimed": 19.782372310097408,
+   "recomputed": 19.78237231009741,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__walk-w1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 sum S_srenew / sum S_rho-neg at w=0 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 22.249497018561087,
+   "recomputed": 22.249497018561083,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__srenew-w0.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P28 icv1-fp28-t20713-32971d39 sum S_srenew / sum S_rho-neg at w=0",
+   "claimed": 22.534829470909752,
+   "recomputed": 22.53482947090974,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__srenew-w0.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 icv1-fp28-tm21435-0b5ad955 sum S_srenew / sum S_rho-neg at w=0",
+   "claimed": 21.973182049512914,
+   "recomputed": 21.97318204951292,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__srenew-w0.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 sum S_srenew / sum S_rho-neg at w=0.1 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 21.77204508507169,
+   "recomputed": 21.772045085071703,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__srenew-w0.1.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P28 icv1-fp28-t20713-32971d39 sum S_srenew / sum S_rho-neg at w=0.1",
+   "claimed": 22.108403843500575,
+   "recomputed": 22.108403843500582,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__srenew-w0.1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 icv1-fp28-tm21435-0b5ad955 sum S_srenew / sum S_rho-neg at w=0.1",
+   "claimed": 21.446300334554333,
+   "recomputed": 21.446300334554337,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__srenew-w0.1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 sum S_srenew / sum S_rho-neg at w=1 (288 paired runs, 48 targets, 2 curves)",
+   "claimed": 19.587837480550707,
+   "recomputed": 19.58783748055072,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__srenew-w1.json ops.ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py (validator, stdlib, records.jsonl read directly)"
+  },
+  {
+   "name": "P28 icv1-fp28-t20713-32971d39 sum S_srenew / sum S_rho-neg at w=1",
+   "claimed": 20.157899882967364,
+   "recomputed": 20.157899882967357,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__srenew-w1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 icv1-fp28-tm21435-0b5ad955 sum S_srenew / sum S_rho-neg at w=1",
+   "claimed": 19.035639047565354,
+   "recomputed": 19.035639047565358,
+   "rel_tol": 1e-12,
+   "claimed_source": "P28/analysis/compare-rho-neg__srenew-w1.json curves[].ratio_b_over_a",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S rho-neg on icv1-fp28-tm21435-0b5ad955 at w=0",
+   "claimed": 0.9636529828796347,
+   "recomputed": 0.9636529828796344,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S rho-neg on icv1-fp28-tm21435-0b5ad955 at w=0.1",
+   "claimed": 1.056844809471244,
+   "recomputed": 1.0568448094712444,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S rho-neg on icv1-fp28-tm21435-0b5ad955 at w=1",
+   "claimed": 1.8955712487957324,
+   "recomputed": 1.895571248795732,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S rho-neg-aa on icv1-fp28-tm21435-0b5ad955 at w=0",
+   "claimed": 0.9636529828796347,
+   "recomputed": 0.9636529828796344,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S rho-neg-aa on icv1-fp28-tm21435-0b5ad955 at w=0.1",
+   "claimed": 1.056844809471244,
+   "recomputed": 1.0568448094712444,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S rho-neg-aa on icv1-fp28-tm21435-0b5ad955 at w=1",
+   "claimed": 1.8955712487957324,
+   "recomputed": 1.895571248795732,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S srenew on icv1-fp28-tm21435-0b5ad955 at w=0",
+   "claimed": 21.174522425370363,
+   "recomputed": 21.174522425370366,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S srenew on icv1-fp28-tm21435-0b5ad955 at w=0.1",
+   "claimed": 22.66541119093516,
+   "recomputed": 22.665411190935156,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S srenew on icv1-fp28-tm21435-0b5ad955 at w=1",
+   "claimed": 36.083410081018265,
+   "recomputed": 36.083410081018265,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S walk on icv1-fp28-tm21435-0b5ad955 at w=0",
+   "claimed": 21.75409793355773,
+   "recomputed": 21.754097933557734,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S walk on icv1-fp28-tm21435-0b5ad955 at w=0.1",
+   "claimed": 23.328577758601305,
+   "recomputed": 23.32857775860131,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S walk on icv1-fp28-tm21435-0b5ad955 at w=1",
+   "claimed": 37.49889618399348,
+   "recomputed": 37.49889618399346,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S walk-aa on icv1-fp28-tm21435-0b5ad955 at w=0",
+   "claimed": 21.75409793355773,
+   "recomputed": 21.754097933557734,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S walk-aa on icv1-fp28-tm21435-0b5ad955 at w=0.1",
+   "claimed": 23.328577758601305,
+   "recomputed": 23.32857775860131,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S walk-aa on icv1-fp28-tm21435-0b5ad955 at w=1",
+   "claimed": 37.49889618399348,
+   "recomputed": 37.49889618399346,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S rho-neg on icv1-fp28-t20713-32971d39 at w=0",
+   "claimed": 0.9331982462765431,
+   "recomputed": 0.9331982462765427,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S rho-neg on icv1-fp28-t20713-32971d39 at w=0.1",
+   "claimed": 1.0234954202019888,
+   "recomputed": 1.0234954202019884,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S rho-neg on icv1-fp28-t20713-32971d39 at w=1",
+   "claimed": 1.8361699855309999,
+   "recomputed": 1.8361699855309999,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S rho-neg-aa on icv1-fp28-t20713-32971d39 at w=0",
+   "claimed": 0.9331982462765431,
+   "recomputed": 0.9331982462765427,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S rho-neg-aa on icv1-fp28-t20713-32971d39 at w=0.1",
+   "claimed": 1.0234954202019888,
+   "recomputed": 1.0234954202019884,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S rho-neg-aa on icv1-fp28-t20713-32971d39 at w=1",
+   "claimed": 1.8361699855309999,
+   "recomputed": 1.8361699855309999,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S srenew on icv1-fp28-t20713-32971d39 at w=0",
+   "claimed": 21.02946334239392,
+   "recomputed": 21.029463342393925,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S srenew on icv1-fp28-t20713-32971d39 at w=0.1",
+   "claimed": 22.627850081798876,
+   "recomputed": 22.627850081798883,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S srenew on icv1-fp28-t20713-32971d39 at w=1",
+   "claimed": 37.013330736443514,
+   "recomputed": 37.01333073644352,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S walk on icv1-fp28-t20713-32971d39 at w=0",
+   "claimed": 21.463126476689453,
+   "recomputed": 21.46312647668946,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S walk on icv1-fp28-t20713-32971d39 at w=0.1",
+   "claimed": 23.11697123040042,
+   "recomputed": 23.116971230400413,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S walk on icv1-fp28-t20713-32971d39 at w=1",
+   "claimed": 38.00157401379897,
+   "recomputed": 38.001574013799,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S walk-aa on icv1-fp28-t20713-32971d39 at w=0",
+   "claimed": 21.463126476689453,
+   "recomputed": 21.46312647668946,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S walk-aa on icv1-fp28-t20713-32971d39 at w=0.1",
+   "claimed": 23.11697123040042,
+   "recomputed": 23.116971230400413,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  },
+  {
+   "name": "P28 band mean S walk-aa on icv1-fp28-t20713-32971d39 at w=1",
+   "claimed": 38.00157401379897,
+   "recomputed": 38.001574013799,
+   "rel_tol": 1e-12,
+   "claimed_source": "ecbench band --dir P28/eks-results/session --json (re-run by the validator; band.md is its 3-decimal rendering, byte-identical)",
+   "recomputed_by": "validation/recompute.py"
+  }
+ ],
+ "main_session_claims_check": [
+  {
+   "size": 20,
+   "w": "0",
+   "main_session": [
+    0.842,
+    0.807,
+    0.878
+   ],
+   "exact": [
+    0.8416781431231662,
+    0.8071412167360685,
+    0.8778199882430107
+   ],
+   "rounded": [
+    0.842,
+    0.807,
+    0.878
+   ],
+   "agree": true
+  },
+  {
+   "size": 20,
+   "w": "0.1",
+   "main_session": [
+    0.858,
+    0.821,
+    0.897
+   ],
+   "exact": [
+    0.8583189981711447,
+    0.821374025856497,
+    0.8970825531138649
+   ],
+   "rounded": [
+    0.858,
+    0.821,
+    0.897
+   ],
+   "agree": true
+  },
+  {
+   "size": 20,
+   "w": "1",
+   "main_session": [
+    0.926,
+    0.879,
+    0.975
+   ],
+   "exact": [
+    0.9255424801043312,
+    0.8787565121895504,
+    0.9752689848300274
+   ],
+   "rounded": [
+    0.926,
+    0.879,
+    0.975
+   ],
+   "agree": true
+  },
+  {
+   "size": 28,
+   "w": "0",
+   "main_session": [
+    0.977,
+    0.961,
+    0.992
+   ],
+   "exact": [
+    0.976554749725143,
+    0.9608709784093884,
+    0.9923703118734268
+   ],
+   "rounded": [
+    0.977,
+    0.961,
+    0.992
+   ],
+   "agree": true
+  },
+  {
+   "size": 28,
+   "w": "0.1",
+   "main_session": [
+    0.975,
+    0.958,
+    0.993
+   ],
+   "exact": [
+    0.975190567420344,
+    0.9576890151761853,
+    0.9928730402974111
+   ],
+   "rounded": [
+    0.975,
+    0.958,
+    0.993
+   ],
+   "agree": true
+  },
+  {
+   "size": 28,
+   "w": "1",
+   "main_session": [
+    0.968,
+    0.941,
+    0.996
+   ],
+   "exact": [
+    0.9681627230395575,
+    0.9413246973230442,
+    0.9954878082423327
+   ],
+   "rounded": [
+    0.968,
+    0.941,
+    0.995
+   ],
+   "agree": false
+  }
+ ],
+ "gae_band": {
+  "P20": {
+   "0": {
+    "mean_s_walk": 10.405301119099551,
+    "mean_s_srenew": 8.75791452456112,
+    "mean_s_rho_neg": 1.313414713873729,
+    "srenew_over_walk": 0.8416781431231668,
+    "srenew_over_walk_ci95_ecbench": [
+     0.8071412167360685,
+     0.8778199882430107
+    ],
+    "srenew_over_walk_ci95_validator_two_stage": [
+     0.8075736710077098,
+     0.8773237888539579
+    ],
+    "walk_over_rho_neg": 7.92232720494702,
+    "walk_over_rho_neg_ci95_ecbench": [
+     7.345753336802029,
+     8.58115306505256
+    ],
+    "srenew_over_rho_neg": 6.6680496510739555,
+    "srenew_over_rho_neg_ci95_ecbench": [
+     6.211693143433848,
+     7.18188961313394
+    ]
+   },
+   "0.1": {
+    "mean_s_walk": 11.682975783357469,
+    "mean_s_srenew": 10.027720070029126,
+    "mean_s_rho_neg": 1.4258259036042187,
+    "srenew_over_walk": 0.8583189981711448,
+    "srenew_over_walk_ci95_ecbench": [
+     0.821374025856497,
+     0.8970825531138649
+    ],
+    "srenew_over_walk_ci95_validator_two_stage": [
+     0.8218803634045736,
+     0.8966705501534136
+    ],
+    "walk_over_rho_neg": 8.193830504709664,
+    "walk_over_rho_neg_ci95_ecbench": [
+     7.584957022955772,
+     8.887718321198156
+    ],
+    "srenew_over_rho_neg": 7.032920389986564,
+    "srenew_over_rho_neg_ci95_ecbench": [
+     6.541787482338081,
+     7.586830407967424
+    ]
+   },
+   "1": {
+    "mean_s_walk": 23.182047761678717,
+    "mean_s_srenew": 21.4559699792412,
+    "mean_s_rho_neg": 2.4375266111786256,
+    "srenew_over_walk": 0.925542480104332,
+    "srenew_over_walk_ci95_ecbench": [
+     0.8787565121895504,
+     0.9752689848300274
+    ],
+    "srenew_over_walk_ci95_validator_two_stage": [
+     0.8791915989938314,
+     0.9747079947686824
+    ],
+    "walk_over_rho_neg": 9.51047986732314,
+    "walk_over_rho_neg_ci95_ecbench": [
+     8.741768128853897,
+     10.395569863174384
+    ],
+    "srenew_over_rho_neg": 8.802353123384577,
+    "srenew_over_rho_neg_ci95_ecbench": [
+     8.133228788317012,
+     9.56147815785707
+    ]
+   }
+  },
+  "P28": {
+   "0": {
+    "mean_s_walk": 21.6086122051236,
+    "mean_s_srenew": 21.101992883882147,
+    "mean_s_rho_neg": 0.9484256145780887,
+    "srenew_over_walk": 0.976554749725143,
+    "srenew_over_walk_ci95_ecbench": [
+     0.9608709784093884,
+     0.9923703118734268
+    ],
+    "srenew_over_walk_ci95_validator_two_stage": [
+     0.9609784456324038,
+     0.9920630066181043
+    ],
+    "walk_over_rho_neg": 22.7836657645906,
+    "walk_over_rho_neg_ci95_ecbench": [
+     21.070880595426797,
+     24.667021507999586
+    ],
+    "srenew_over_rho_neg": 22.249497018561083,
+    "srenew_over_rho_neg_ci95_ecbench": [
+     20.564635385179518,
+     24.15115953019591
+    ]
+   },
+   "0.1": {
+    "mean_s_walk": 23.22277449450086,
+    "mean_s_srenew": 22.64663063636702,
+    "mean_s_rho_neg": 1.0401701148366163,
+    "srenew_over_walk": 0.9751905674203454,
+    "srenew_over_walk_ci95_ecbench": [
+     0.9576890151761853,
+     0.9928730402974111
+    ],
+    "srenew_over_walk_ci95_validator_two_stage": [
+     0.9577846472086116,
+     0.9925210662703312
+    ],
+    "walk_over_rho_neg": 22.32593896254033,
+    "walk_over_rho_neg_ci95_ecbench": [
+     20.643879459593446,
+     24.179985915566697
+    ],
+    "srenew_over_rho_neg": 21.772045085071703,
+    "srenew_over_rho_neg_ci95_ecbench": [
+     20.102009790231065,
+     23.659686521919184
+    ]
+   },
+   "1": {
+    "mean_s_walk": 37.75023509889623,
+    "mean_s_srenew": 36.54837040873089,
+    "mean_s_rho_neg": 1.8658706171633659,
+    "srenew_over_walk": 0.9681627230395584,
+    "srenew_over_walk_ci95_ecbench": [
+     0.9413246973230442,
+     0.9954878082423327
+    ],
+    "srenew_over_walk_ci95_validator_two_stage": [
+     0.9412821561261652,
+     0.9950178699513454
+    ],
+    "walk_over_rho_neg": 20.23196825741697,
+    "walk_over_rho_neg_ci95_ecbench": [
+     18.673902479704132,
+     21.985517292666056
+    ],
+    "srenew_over_rho_neg": 19.58783748055072,
+    "srenew_over_rho_neg_ci95_ecbench": [
+     18.029434923323457,
+     21.360406518255953
+    ]
+   }
+  }
+ },
+ "completeness": {
+  "P20": {
+   "rho-neg": {
+    "censored": 0,
+    "matches_target_true": 288,
+    "measured": 288,
+    "records": 336,
+    "statuses": {
+     "verified": 288
+    },
+    "warmup": 48
+   },
+   "rho-neg-aa": {
+    "censored": 0,
+    "matches_target_true": 288,
+    "measured": 288,
+    "records": 336,
+    "statuses": {
+     "verified": 288
+    },
+    "warmup": 48
+   },
+   "srenew": {
+    "censored": 0,
+    "matches_target_true": 288,
+    "measured": 288,
+    "records": 336,
+    "statuses": {
+     "verified": 288
+    },
+    "warmup": 48
+   },
+   "walk": {
+    "censored": 0,
+    "matches_target_true": 288,
+    "measured": 288,
+    "records": 336,
+    "statuses": {
+     "verified": 288
+    },
+    "warmup": 48
+   },
+   "walk-aa": {
+    "censored": 0,
+    "matches_target_true": 288,
+    "measured": 288,
+    "records": 336,
+    "statuses": {
+     "verified": 288
+    },
+    "warmup": 48
+   }
+  },
+  "P28": {
+   "rho-neg": {
+    "censored": 0,
+    "matches_target_true": 288,
+    "measured": 288,
+    "records": 336,
+    "statuses": {
+     "verified": 288
+    },
+    "warmup": 48
+   },
+   "rho-neg-aa": {
+    "censored": 0,
+    "matches_target_true": 288,
+    "measured": 288,
+    "records": 336,
+    "statuses": {
+     "verified": 288
+    },
+    "warmup": 48
+   },
+   "srenew": {
+    "censored": 0,
+    "matches_target_true": 288,
+    "measured": 288,
+    "records": 336,
+    "statuses": {
+     "verified": 288
+    },
+    "warmup": 48
+   },
+   "walk": {
+    "censored": 0,
+    "matches_target_true": 288,
+    "measured": 288,
+    "records": 336,
+    "statuses": {
+     "verified": 288
+    },
+    "warmup": 48
+   },
+   "walk-aa": {
+    "censored": 0,
+    "matches_target_true": 288,
+    "measured": 288,
+    "records": 336,
+    "statuses": {
+     "verified": 288
+    },
+    "warmup": 48
+   }
+  }
+ },
+ "null_controls": {
+  "P20": {
+   "pairs": 288,
+   "rho_aa_vs_rho_pairs_identical": 288,
+   "walk_aa_vs_walk_pairs_identical": 288
+  },
+  "P28": {
+   "pairs": 288,
+   "rho_aa_vs_rho_pairs_identical": 288,
+   "walk_aa_vs_walk_pairs_identical": 288
+  }
+ },
+ "stride_renew_accounting": {
+  "P20": {
+   "missing_stride_counters": 0,
+   "pairs_factor_base_native_equal": 288,
+   "pairs_oracle_setup_gae_equal": 288,
+   "phase_gae_eq_adds_plus_doubles": 288,
+   "records": 288,
+   "rel_adds_ge_steps_plus_renewals_plus_restarts_plus_2": 288,
+   "renewals_ge_1_and_le_relations": 288,
+   "scalar_mults_eq_4_plus_2_restarts": 288,
+   "total_gae_eq_sum_phase_gae": 288
+  },
+  "P28": {
+   "missing_stride_counters": 0,
+   "pairs_factor_base_native_equal": 288,
+   "pairs_oracle_setup_gae_equal": 288,
+   "phase_gae_eq_adds_plus_doubles": 288,
+   "records": 288,
+   "rel_adds_ge_steps_plus_renewals_plus_restarts_plus_2": 288,
+   "renewals_ge_1_and_le_relations": 288,
+   "scalar_mults_eq_4_plus_2_restarts": 288,
+   "total_gae_eq_sum_phase_gae": 288
+  }
+ },
+ "per_pair_means": {
+  "P20": {
+   "srenew.factor_base.gae": 0.0,
+   "srenew.linear_algebra.gae": 0.0,
+   "srenew.oracle_setup.gae": 2070.0,
+   "srenew.relations.adds": 5461.559027777777,
+   "srenew.relations.doubles": 105.65972222222223,
+   "srenew.relations.relations": 27.86111111111111,
+   "srenew.relations.scalar_mults": 6.0,
+   "srenew.relations.trials": 5352.520833333333,
+   "srenew.stride_renewals": 27.86111111111111,
+   "srenew.stride_restarts": 1.0,
+   "srenew.stride_steps": 5351.520833333333,
+   "srenew.total_gae": 7663.28125,
+   "srenew.verify.gae": 26.0625,
+   "walk.factor_base.gae": 0.0,
+   "walk.linear_algebra.gae": 0.0,
+   "walk.oracle_setup.gae": 2070.0,
+   "walk.relations.adds": 5951.774305555556,
+   "walk.relations.doubles": 1055.9652777777778,
+   "walk.relations.relations": 28.583333333333332,
+   "walk.relations.scalar_mults": 59.9375,
+   "walk.relations.trials": 5378.96875,
+   "walk.total_gae": 9103.802083333334,
+   "walk.verify.gae": 26.0625,
+   "walk.walk_jumps": 28.96875,
+   "walk.walk_pool_ops": 693.5972222222222,
+   "walk.walk_steps": 5359.038194444444
+  },
+  "P28": {
+   "srenew.factor_base.gae": 0.0,
+   "srenew.linear_algebra.gae": 0.0,
+   "srenew.oracle_setup.gae": 166056.0,
+   "srenew.relations.adds": 94027.59027777778,
+   "srenew.relations.doubles": 151.39930555555554,
+   "srenew.relations.relations": 203.33333333333334,
+   "srenew.relations.scalar_mults": 6.0,
+   "srenew.relations.trials": 93544.07638888889,
+   "srenew.stride_renewals": 203.33333333333334,
+   "srenew.stride_restarts": 1.0,
+   "srenew.stride_steps": 93543.07638888889,
+   "srenew.total_gae": 260272.84375,
+   "srenew.verify.gae": 37.854166666666664,
+   "walk.factor_base.gae": 0.0,
+   "walk.linear_algebra.gae": 0.0,
+   "walk.oracle_setup.gae": 166056.0,
+   "walk.relations.adds": 98771.54166666667,
+   "walk.relations.doubles": 1633.795138888889,
+   "walk.relations.relations": 212.65625,
+   "walk.relations.scalar_mults": 64.75,
+   "walk.relations.trials": 97722.57291666667,
+   "walk.total_gae": 266499.19097222225,
+   "walk.verify.gae": 37.854166666666664,
+   "walk.walk_jumps": 31.375,
+   "walk.walk_pool_ops": 1172.3229166666667,
+   "walk.walk_steps": 97691.39930555556
+  }
+ },
+ "mechanism": {
+  "P20": {
+   "trials": {
+    "walk_mean": 5378.96875,
+    "srenew_mean": 5352.520833333333,
+    "ratio": 0.995083087875038,
+    "ci95_two_stage": [
+     0.9372365407896848,
+     1.0567881491683355
+    ]
+   },
+   "relations": {
+    "walk_mean": 28.583333333333332,
+    "srenew_mean": 27.86111111111111,
+    "ratio": 0.9747327502429544,
+    "ci95_two_stage": [
+     0.9271616541353384,
+     1.0229438314944834
+    ]
+   },
+   "dep": {
+    "walk_mean": 0.0,
+    "srenew_mean": 0.0
+   },
+   "rank": {
+    "walk_mean": 28.583333333333332,
+    "srenew_mean": 27.86111111111111,
+    "ratio": 0.9747327502429544,
+    "ci95_two_stage": [
+     0.9271616541353384,
+     1.0229438314944834
+    ]
+   },
+   "rows": {
+    "walk_mean": 28.583333333333332,
+    "srenew_mean": 27.86111111111111,
+    "ratio": 0.9747327502429544,
+    "ci95_two_stage": [
+     0.9271616541353384,
+     1.0229438314944834
+    ]
+   },
+   "rep": {
+    "walk_mean": 18.930555555555557,
+    "srenew_mean": 18.25347222222222,
+    "ratio": 0.9642333088774762,
+    "ci95_two_stage": [
+     0.8534498452576006,
+     1.0930377123912143
+    ]
+   },
+   "G": {
+    "walk_mean": 9103.802083333334,
+    "srenew_mean": 7663.28125,
+    "ratio": 0.8417671188205478,
+    "ci95_two_stage": [
+     0.8076674068942885,
+     0.8776763481535459
+    ]
+   },
+   "cols": [
+    46
+   ]
+  },
+  "P28": {
+   "trials": {
+    "walk_mean": 97722.57291666667,
+    "srenew_mean": 93544.07638888889,
+    "ratio": 0.9572412350282569,
+    "ci95_two_stage": [
+     0.9152278429254622,
+     0.999438913336631
+    ]
+   },
+   "relations": {
+    "walk_mean": 212.65625,
+    "srenew_mean": 203.33333333333334,
+    "ratio": 0.9561596865050208,
+    "ci95_two_stage": [
+     0.9158884534120417,
+     0.995971247074557
+    ]
+   },
+   "dep": {
+    "walk_mean": 0.0,
+    "srenew_mean": 0.0
+   },
+   "rank": {
+    "walk_mean": 212.65625,
+    "srenew_mean": 203.33333333333334,
+    "ratio": 0.9561596865050208,
+    "ci95_two_stage": [
+     0.9158884534120417,
+     0.995971247074557
+    ]
+   },
+   "rows": {
+    "walk_mean": 212.65625,
+    "srenew_mean": 203.33333333333334,
+    "ratio": 0.9561596865050208,
+    "ci95_two_stage": [
+     0.9158884534120417,
+     0.995971247074557
+    ]
+   },
+   "rep": {
+    "walk_mean": 30.17361111111111,
+    "srenew_mean": 29.88888888888889,
+    "ratio": 0.9905638665132336,
+    "ci95_two_stage": [
+     0.9049378569029224,
+     1.085052479189287
+    ]
+   },
+   "G": {
+    "walk_mean": 266499.19097222225,
+    "srenew_mean": 260272.84375,
+    "ratio": 0.9766365248633299,
+    "ci95_two_stage": [
+     0.9609046816502349,
+     0.9921677447336731
+    ]
+   },
+   "cols": [
+    408
+   ]
+  }
+ },
+ "replay_certificate": {
+  "path": "validation/replay-certificate.json",
+  "sha256": "4927a26e296042b475ceaf6ffffc042bf8621d143f408f17c7b5d4b049e339a5"
+ },
+ "caveats": [
+  "P28: about 2/3 of the mean saving (about 4,000 of 6,226 GAE per pair at w = 0) comes from srenew needing 4.4% fewer relations (203.3 vs 212.7; two-stage 95% CI of the ratio [0.916, 0.996]) and 4.3% fewer trials ([0.915, 0.999]); about 1/3 (about 2,200 GAE: 1,482 measured doublings plus an estimated 730 additions inside the 58.75 fewer scalar multiplications) is the deterministic scalar-multiplication saving, about 0.8% of the walk's S on its own. PROTOCOL.md section 7 attributes the gain to the scalar-multiplication share only; the relation-count effect was not predicted, has no stated mechanism, and is about two standard errors from zero.",
+  "P28: the w = 1 upper bound is 0.99549 (ecbench) and 0.9945-0.9965 over 11 validator bootstrap seeds: below 1 but within 0.6% of it.",
+  "Four sizes are decided separately at 95% each, with no multiplicity correction (as frozen). P24 (null, point 0.982) and P32 run 1 (rejected by the L2 gate, point 1.001) are producer numbers that this validation did not check.",
+  "Main-session rounding: the P28 w = 1 upper bound 0.996 should read 0.995 (0.99549). All other quoted numbers round correctly."
+ ],
+ "limitations": [
+  "Same IC implementation (ecbench) in measurement and replay; replay is cross-binary and cross-host, not an independent implementation.",
+  "Measuring binary 583e62f0 was built from cb2ec6873f30 (build-info.json); not rebuilt by the validator. Session git_commit/git_dirty are null (image build).",
+  "Evidence directory not committed at validation time; bound by sha256 to S3 originals.",
+  "Two curves per size, 24 targets per curve, 6 rounds; intervals cover target-to-target variation on these curves. No exponent, cross-size or asymptotic claim.",
+  "Counted unit only (ecbench GAE / sqrt(r), section 5a band). No wall-clock claim."
+ ],
+ "review_attestation": {
+  "joints_owned": [
+   "whole receipt for P20 and P28 (no review_plan on the task card)"
+  ],
+  "sources_read": [
+   "crypto-autoresearcher: docs/agent-runtime-core.md, agents/validator.md",
+   "wt-stride: backlog/XP-20261029-stride-renew-prime/{PROTOCOL.md, spec-P20.json, spec-P28.json}",
+   "wt-stride: research/ic_stride_renew_prime_20261029/launch/card-0{1,2,3,4}.md (headers, pins)",
+   "wt-stride: research/ic_stride_renew_prime_20261029/P{20,28}/{launch/*, eks-results/* (receipt files, records.jsonl and plan.json by script), analysis/compare-*.json, analysis/band.md}",
+   "wt-stride: research/ic_stride_renew_prime_20261029/P24/analysis/compare-walk__srenew-w*.json, P32-run1/analysis/compare-walk__srenew-w*.json (context only)",
+   "S3: both job prefixes (listing, hashes of every file, launcher download-hashes.txt for P20)",
+   "crypto origin/main: docs/VALIDATION_GATE.md, scripts/validation_gate.py (key requirements), src/cryptanalysis/ecbench/band.rs (priced_gae definition), src/cryptanalysis/ecbench/stats.rs (cluster_bootstrap_ci scheme), src/cryptanalysis/ic_boundary.rs (TargetSource::StrideRenew)",
+   "crypto cb2ec6873f30: src/cryptanalysis/ic_boundary.rs (TargetSource::StrideRenew, draw_jumps, GroupOps::gae, CountedGroup::mul)",
+   "crypto origin/main: research/prime_base_oracle_tuning_20261029/{validation/validation_report.yaml, validation/provenance.txt, replay-certificate.json, validator-report.json, VALIDATION.json} (format only)"
+  ],
+  "not_read": [
+   "research/ic_stride_renew_prime_20261029/figures/",
+   "docs/session-logs/ (producer narrative)"
+  ],
+  "read_sibling_reports": false,
+  "verdict": "passed"
+ }
+}

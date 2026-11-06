@@ -29,6 +29,8 @@ Sources (all committed, read at --ref unless noted):
                                 exact fixed-score allocation coverage, not sampled curves or security
   research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json
                                 IC collect-phase component: paired native ratio and its A/A floor
+  research/ic_stride_renew_prime_20261029/P{20,24,28,32}/analysis/compare-*.json
+                                stride-renew / walk and stride-renew / matched rho, recorded ratios
   research/explicit_relations_e2e_20261030/results-v*/
                                 exact recovery counts and bounded two-target frontier; no L0 timing rank
 Run: python3 tools/progress_metrics.py [--ref origin/main] [--since YYYY-MM-DD]
@@ -616,6 +618,32 @@ def ic_aimed_gather(ref, since):
              source=src)
 
 
+def ic_stride_renew(ref, since):
+    """Prime-field IC baseline, relation targets stride-renew against walk
+    (XP-20261029-stride-renew-prime), per size: the measured ratio
+    sum S_srenew / sum S_walk and the distance remaining to the matched rho,
+    sum S_srenew / sum S_rho-neg, at each 5a band weight, with the upper end
+    of each recorded 95% cluster-bootstrap interval. Values are the `ops`
+    block `ecbench compare` recorded; nothing is recomputed. 20 and 28 bits
+    are validated improvements; 24 and 32 bits are nulls."""
+    study = "research/ic_stride_renew_prime_20261029"
+    for bits in (20, 24, 28, 32):
+        for w in ("0", "0.1", "1"):
+            for pair, name, label in (
+                    ("walk__srenew", "srenew_over_walk", "stride-renew / walk (the baseline target source)"),
+                    ("rho-neg__srenew", "srenew_over_rho", "stride-renew / matched rho.negation (distance remaining)")):
+                path = f"{study}/P{bits}/analysis/compare-{pair}-w{w}.json"
+                for date, commit, text in file_history(ref, path, since):
+                    ops = json.loads(text).get("ops", {})
+                    ci = ops.get("ci95_bootstrap") or [None, None]
+                    metric = f"ic_baseline.stride_renew.p{bits}.{name}.w{w}"
+                    what = f"Prime-field IC {bits}-bit, {label}, sum S at w = {w}"
+                    src = f"{path}@{commit}"
+                    emit(metric, ops.get("ratio_b_over_a"), date=date, problem=P_IC, unit="ratio of S",
+                         better="lower", label=what, source=src)
+                    emit(f"{metric}.ci95_hi", ci[1], date=date, problem=P_IC, unit="ratio of S",
+                         better="lower", label=f"{what}: upper end of the 95% cluster-bootstrap interval",
+                         source=src)
 def ic_packed_filter(ref, since):
     """The membership filter on the packed pair table (a wall component, not a whole-pipeline row):
     at 32 bits, the corrected whole-solve wall per charged GAE dgbf / dgb and its 95% upper end,
@@ -828,6 +856,7 @@ def main():
     koblitz_modular_geometry(a.ref, a.since)
     pencil_gate_observations(a.ref, a.since)
     ic_aimed_gather(a.ref, a.since)
+    ic_stride_renew(a.ref, a.since)
     ic_packed_filter(a.ref, a.since)
     explicit_gpu_frontier(a.ref, a.since)
     explicit_gpu_frontier(a.ref, a.since, "research/explicit_relations_affine_20261030",

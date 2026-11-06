@@ -1,0 +1,119 @@
+{
+ "all_checks_hold": true,
+ "base_commit": "313ec5d2af38fe7994a6eab34aa1ef98e374f309",
+ "benchmarks_row": {
+  "decision": true,
+  "edge_corrected_0.9302": true,
+  "rows": 1
+ },
+ "causal_sentence": {
+  "32_bit_reading": true,
+  "numbers_present_and_equal": {
+   "0.451": true,
+   "0.565": true,
+   "0.594": true,
+   "0.851": true,
+   "0.867": true,
+   "0.898": true
+  },
+  "old_sentence_gone": true,
+  "two_causes_stated": true
+ },
+ "head": "313ec5d2af38fe7994a6eab34aa1ef98e374f309",
+ "leaderboard": {
+  "counted_dgb_over_dg": [
+   1.0,
+   1.0,
+   1.0
+  ],
+  "html_has_row": true,
+  "markdown_has_row": true,
+  "max_rel_diff_vs_recompute": 3.835711357681401e-12,
+  "rows_bits": [
+   28
+  ],
+  "validated_flag": true
+ },
+ "minor": {
+  "next_table_fixed": true,
+  "pr2844_marked": true,
+  "provenance_line_reworded": true
+ },
+ "n_checks": 23,
+ "pdf": {
+  "benchmarks_report_pdf_equal": true,
+  "embedded_images": 2,
+  "missing_in_pdf": [],
+  "new_sentence_present": true,
+  "old_sentence_absent": true,
+  "position_table_present": true,
+  "readme_decimal_numbers": 86,
+  "readme_pdf_sha256": "b34abb27869fa0b17f4955b22563ca3b3351199ea32640a3e87e8f3503f29db5"
+ },
+ "placement": {
+  "names_rows": true,
+  "names_section": true,
+  "no_24_32_rows": true,
+  "outside_tables_A_C": true,
+  "pair_table_component_is_setup_only_at_313ec5d2af": true,
+  "tracked": false
+ },
+ "position_table": {
+  "cites_validator_file": true,
+  "directions_match": true,
+  "identical_at_all_sizes": true,
+  "precedence_match": true,
+  "rows": {
+   "dg": [
+    "0 and 3",
+    "144"
+   ],
+   "dg-aa": [
+    "1 and 2",
+    "144"
+   ],
+   "dgb": [
+    "1 and 2",
+    "144"
+   ],
+   "dgb-edge": [
+    "0 and 3",
+    "144"
+   ]
+  },
+  "rows_match_recompute": true
+ },
+ "readme_lines_removed": [
+  "Every number below is read from `ecbench compare` or `ecbench band` output, or from the card's `phase_sums.json`, in `P<b>/{wall,counted}/analysis/`. Nothing here is computed by hand.",
+  "**Not relabelling, not accounting.** dg and dgb charge identical work record by record at every size, so their counted S is identical (see the next table). The wall difference is executed native work: a different memory layout for the same table.",
+  "The blocked build roughly halves the oracle set-up, but probing the packed table in the target PDP phase is slower than probing FastMap (+5%, +34% and +21%). The probe cost gives back part of the set-up gain, which is why every ratio missed its prediction. E6 flagged this risk, and PR #2844's table-floor micro-benchmark points the same way: a flat one-region table is 2.3\u20132.9\u00d7 slower on misses."
+ ],
+ "readme_numbers_dropped": [],
+ "remote_tip": "313ec5d2af38fe7994a6eab34aa1ef98e374f309",
+ "reviewed_files_sha256": {
+  "benchmarks/20261029-ic-dg-blocked/REPORT.pdf": "b34abb27869fa0b17f4955b22563ca3b3351199ea32640a3e87e8f3503f29db5",
+  "benchmarks/README.md": "b477bb71047bfd35d36bea4c39c49991b458d47c7eaf1496fbb4b59986ebb6eb",
+  "docs/ic-leaderboard.html": "4369ec1efd830d659bb91eff004a7f1bc31461466b0cb9419cfc45df62dce0d7",
+  "docs/ic/LEADERBOARD.md": "10447825730a9abdd481751dbdf18f81818bf48b3c7f15103f48f70e48e6b8dd",
+  "docs/ic/leaderboard.json": "2ecde6f9bdc15d6d14e327a21c60e0f0d6cb18a9524ae6a1c634e63b49052a42",
+  "research/ic_dg_blocked_20261029/PLACEMENT.md": "557ce691a38a08116b96e54fa017914f331d65f5eccc2eaa463aeb7c5d1ba105",
+  "research/ic_dg_blocked_20261029/README.md": "2285e932d22a3fb677304ac965422f01fae7ad6f6d46b654c76f7265791369d8",
+  "research/ic_dg_blocked_20261029/README.pdf": "b34abb27869fa0b17f4955b22563ca3b3351199ea32640a3e87e8f3503f29db5",
+  "scripts/build_ic_leaderboard.py": "8930f9992452d0893ef34b89e389018da7ebf76c68a941dd5a5c87895fcb90f5"
+ },
+ "status_short": [
+  " M .github/workflows/ic-leaderboard.yml",
+  " M .github/workflows/validation-gate.yml",
+  " M benchmarks/README.md",
+  " M docs/browser/data.json",
+  " M docs/ic-leaderboard.html",
+  " M docs/ic/LEADERBOARD.md",
+  " M docs/ic/leaderboard.json",
+  " M research/ic_dg_blocked_20261029/README.md",
+  " M research/ic_dg_blocked_20261029/README.pdf",
+  " M research/ic_dg_blocked_20261029/VALIDATION.json",
+  " M scripts/build_ic_leaderboard.py",
+  "?? benchmarks/20261029-ic-dg-blocked/",
+  "?? research/ic_dg_blocked_20261029/PLACEMENT.md"
+ ]
+}
