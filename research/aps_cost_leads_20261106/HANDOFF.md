@@ -2,6 +2,23 @@
 
 ## Current authoring continuation
 
+The broad release library command has now completed on compiled source FFD:
+exit 101, 6,098 passed, 11 failed, 133 ignored. Native statement
+`PCC-20261106-b56be1` has **unverified** standing; see
+`validation/broad-library-final.json`. Its six missing-input failures,
+three introduced registry/optimization omissions and two diagnostic-clock
+procfs failures remain the broad outcome. The later input-restoration and
+inventory-repair targeted passes do not replace it. The older pending
+receipts are preserved, and no final/new-head full-suite pass is claimed
+[pcc:unverified].
+
+At the first follow-up, both required gate jobs, size and artifacts passed
+on head F33; no submitted reviews or threads existed. These passes belong to
+that observed head, before this substantive outcome update. Later heads
+need their own checks. Auto-merge remains off under the native-ledger hold;
+main has advanced, and no actual conflict was reported. No solver/test
+assertion, frozen receipt, ledger row or benchmark was changed here.
+
 Latest checkpoint state: the hosted source-only job for `1bc72d29c` reports
 successful exact custody and unchanged standard gate. Native statement
 `PCC-20261106-2d094d` is unverified; see `CHECKPOINT-OUTCOME.md` and

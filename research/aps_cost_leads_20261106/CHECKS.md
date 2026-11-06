@@ -54,14 +54,24 @@ Rust implementation, finite-field chart lifting, F4 or complete-cost bounds
 ## Broad-suite and environmental limits
 
 The actual broad release library command compiled source
-`ffd0bd0dd33f53e53bd8f5526ffa1c2ad20cce30` and is still running at this
-receipt boundary. Its failures include missing tracked inputs, unavailable
-Linux time-namespace procfs and three introduced global-inventory omissions.
-The latter were repaired and rerun above without changing assertions,
-skips or exemption lists. Exact tracked-input restoration made six emulator
-cases and one historical bound pass on targeted reruns. None of these
-targeted outcomes replaces the broad command's eventual failed outcome;
-no final-source or new-head full-library pass is claimed [pcc:unverified].
+`ffd0bd0dd33f53e53bd8f5526ffa1c2ad20cce30` and finished with exit 101:
+6,098 passed, 11 failed, 133 ignored. Native statement
+`PCC-20261106-b56be1`, standing **unverified**, pins
+[the final broad outcome](validation/broad-library-final.json). Six failures
+lacked tracked inputs, three were introduced APS registry/optimization
+inventory omissions at that compiled source, and two required unavailable
+Linux diagnostic-clock procfs. The inventory omissions were repaired and
+rerun above without changing assertions, skips or exemptions. Exact input
+restoration made six emulator cases and one historical bound pass in
+separate targeted reruns. Those later passes do not replace this failed
+broad outcome. No final-source or later-head full-library pass is claimed
+[pcc:unverified].
+
+The earlier pending receipts retain their original boundaries. Required
+hosted jobs passed on head `f33f6dda9e4fdae869b2401572b1717454d99e84`;
+that hosted observation is separate from the failed FFD broad run, and its
+passes do not transfer to a later outcome-documentation head
+[pcc:unverified].
 
 The earlier compile failures, resource interruption and invalid positive
 orbit fixture remain in additive continuation receipts. The orbit fixture
