@@ -1,0 +1,24 @@
+digraph PacketAudit {
+  graph [rankdir=TB, bgcolor="white", pad="0.12", nodesep="0.28", ranksep="0.28",
+    label="Packet DFS proof obligations | 2026-11-06\nUnverified source argument; arrows are dependencies", labelloc="t", fontname="DejaVu Sans", fontsize=16];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=12, color="#45617c", fillcolor="#e5eef8", margin="0.10,0.07"];
+  edge [fontname="DejaVu Sans", fontsize=10, color="#62758b"];
+  target [label="Signed affine row factors\nFixed creation ring; indexed modes"];
+  invariant [label="Active prefix ONLY: t<row\nm=remaining <= k=R-row\nSuffix cells may be stale"];
+  mode [label="Mode candidate\nm becomes m-1 <= k-1\nDegree rejection cannot occur", fillcolor="#e1f0e6"];
+  constant [label="Constant candidate\nm unchanged\nDegree reject exactly at m=k", fillcolor="#fff0cf"];
+  undo [label="Keep defensive mode-undo code\nAdmitted-state rejection stays at same row"];
+  pops [label="Leaf or exhausted subtree\nrow--; restore committed PARENT once\nNever restore stale child again", fillcolor="#eee4f6"];
+  semantics [label="Each eligible indexed leaf once\nZero-factor pruning needs no cancellation\nZero prefix is NOT pruned"];
+  precision [label="Zero coefficient returns zero\nElse outgoing powers in creation ring\nLift only AFTER the full packet result"];
+  next [label="Next: checked state/semantic refinement\nThen bit cost and ancestor-retention ledger", fillcolor="#e5e8f4"];
+  target -> invariant;
+  invariant -> mode;
+  invariant -> constant;
+  mode -> undo;
+  constant -> undo;
+  undo -> pops;
+  pops -> semantics;
+  semantics -> precision;
+  precision -> next;
+}
