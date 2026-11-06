@@ -368,3 +368,62 @@ A development check, not a measurement; no wall time from it is read or reported
   - Of the fields that differ, none is a counted operation or a native counter.
   - The rest are identity (arm, role, label, record/run id, seq, method id and sha, oracle param, fbm_id), wall and phase timing (`*_ns`), isolation telemetry, and memory/scheduling effects (max_rss_kib, minor_faults, irq ticks, user/sys ns).
 - **Conclusion:** `layout=lines` changes no counted or native counter under either target mode. `ALLOWED_NATIVE = []` in `analyze-v6.sh` is correct as written, so its sha256 stays unchanged. **F4: pass.**
+
+---
+
+## F6b (decision section 13.1): gate shapes on the F6 session
+
+Run 2026-11-06 by the experiment director on `/dev/shm/v6f6/f6/session` (F6 session
+unchanged), pinned binary `/dev/shm/v3a1-untrusted/x/usr/local/bin/ecbench` (sha256
+prefix `73362eed4165d6db`, checked). Branch head `4a66f9b4a7`. `analyze-v6.sh` was not
+edited (sha256 `23e614ad0b7c74ba53a4fcd51097a44194987617661343b2243b6dec6d0f422e`);
+its `PROJ` definitions and `record_parity` jq were run unmodified apart from
+`cells` = 6. Only types and booleans are recorded; no ratio or interval value; no
+comparison involving `candidate` wall data was run (the B arm was `pc-fb2x`).
+Outputs: `/dev/shm/v6f6/f6b/cmp.json`, `/dev/shm/v6f6/f6b/replay.json`. F6 and F6b
+outputs are not v6 evidence (section 13.2).
+
+### 1. `ecbench compare --dir <F6> --a incumbent --b pc-fb2x --resamples 4000 --seed 2026110663 --json` (rc 0)
+
+| Field | Observed | Pass |
+|---|---|---|
+| `wall.self_aa` | false | yes |
+| `wall.aa_pairs >= 5` | true | yes |
+| `wall.aa_ci95` type | array (non-null) | yes |
+| `wall.aa_arms` sorted | `["incumbent","incumbent-aa"]` | yes |
+| `ops.status` / `same_seeds` / `unpaired_runs` / `ratio_b_over_a` / `ci95` | string / boolean / number / number / array | yes |
+| `wall.status` / `pairs` / `pairs_below_level` | string / number / number | yes |
+| `wall.total_wall_ratio` / `total_wall_ci95` | number / array | yes |
+| `wall.corrected_ratio` / `corrected_ci95` | number / array | yes |
+| `wall.outside_noise` | boolean | yes |
+
+All fields read by the `analyze-v6.sh` gates (`g_ops`, `g_admission`, `g_aa`,
+`g_positive`, `g_below`, `g_noise`) exist, are non-null and have the expected type.
+The `g_aa` second input (`control-comparison.json`) is written by the launcher and is
+not part of the F6 session; it is not tested here.
+
+### 2. Record fields and parity projection (24 F6 records; arms `candidate`, `incumbent`, `incumbent-aa`, `pc-fb2x`)
+
+| Check | Result |
+|---|---|
+| `.arm` string on every record | true |
+| `.outcome.recovered`, `.outcome.status`, `.outcome.matches_target` non-null on every record | true, true, true |
+| `.cost.total_gae`, `.cost.unpriced` non-null on every record | true, true |
+| `.workload.workload_id` string on every record | true |
+| `.round` number, `.warmup` boolean on every record | true, true |
+| `.phases[]` non-empty, each with `name`, `adds`, `gae` non-null | true |
+| projected `recovered`, `total_gae`, `unpriced` non-null and `phases` non-empty on the 12 incumbent and candidate records (so the parity is not vacuous) | true |
+| `record_parity` jq (unmodified, `cells` = 6, `allowed` = `[]`) | **parity true**, 6 cells |
+
+### 3. Replay fields
+
+| Check | Result |
+|---|---|
+| `ecbench verify --dir <F6> --replay-all --exit-code --out <tmp>` | exit 0 |
+| `ok`, `regraded`, `records_bound` types | boolean, boolean, boolean |
+| `records` type; `verified_records == records`; `replays` length > 0 | number; true; true |
+| replay jq of `analyze-v6.sh` (576-record count left out) | **passes** |
+
+**F6b: PASS.** Limits: one local session; L2 grading is the local host's. The
+`control-comparison.json` input and the 576-record and 128-pair counts are outside
+F6b's scope.
