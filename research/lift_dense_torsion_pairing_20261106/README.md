@@ -177,5 +177,10 @@ signed-vector rows; it is kept unchanged.
 
 | claim | standing | content |
 |:--|:--|:--|
-| `PCC-20261106-b8a052` | unverified | the L_T criterion, the pairing, and the post-hoc rows-per-column ratios (`summary.json`) |
-| `PCC-20261106-eff1c3` | unverified | no Oct 27 line and no c2pnb line is T-stable; the c2pnb u-counts reproduce (`c2pnb.jsonl`) |
+| `PCC-20261106-b5904a` | not covered (unsigned) | the L_T criterion, the pairing, the post-hoc rows-per-column ratios, and 0/27 Oct 27 lines on L_T ([`validator-report.json`](reports/run-20261106T0235Z/validator-report.json)) |
+| `PCC-20261106-74c86c` | not covered (unsigned) | the c2pnb counts reproduce and none is T-stable ([`validator-report-c2pnb.json`](reports/run-20261106T0235Z/validator-report-c2pnb.json)) |
+
+`pairing validate <run> claimed.json [rows|c2pnb]` recomputes the headline
+numbers in [`claimed.json`](claimed.json) from the raw rows, with the raw
+files pinned by SHA-256. It is a self-check by the producer, not independent
+validation.

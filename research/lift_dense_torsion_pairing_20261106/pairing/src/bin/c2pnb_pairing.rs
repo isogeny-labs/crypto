@@ -10,10 +10,19 @@ const L: usize = 6; // 384 bits >= 368
 type El = [u64; L];
 const ZERO: El = [0; L];
 
-const CURVES: [&str; 5] = ["c2pnb176v1", "c2pnb208w1", "c2pnb272w1", "c2pnb304w1", "c2pnb368w1"];
+const CURVES: [&str; 5] = [
+    "c2pnb176v1",
+    "c2pnb208w1",
+    "c2pnb272w1",
+    "c2pnb304w1",
+    "c2pnb368w1",
+];
 
 fn deg(a: &[u64]) -> Option<usize> {
-    (0..a.len()).rev().find(|&i| a[i] != 0).map(|i| i * 64 + 63 - a[i].leading_zeros() as usize)
+    (0..a.len())
+        .rev()
+        .find(|&i| a[i] != 0)
+        .map(|i| i * 64 + 63 - a[i].leading_zeros() as usize)
 }
 
 struct G {
@@ -111,7 +120,11 @@ impl G {
 }
 
 fn hex(s: &str) -> Vec<u64> {
-    let d: Vec<u64> = s.chars().filter(|c| c.is_ascii_hexdigit()).map(|c| c.to_digit(16).unwrap() as u64).collect();
+    let d: Vec<u64> = s
+        .chars()
+        .filter(|c| c.is_ascii_hexdigit())
+        .map(|c| c.to_digit(16).unwrap() as u64)
+        .collect();
     let mut o = vec![0u64; d.len() / 16 + 1];
     for (i, &v) in d.iter().rev().enumerate() {
         o[i / 16] |= v << (4 * (i % 16));
@@ -168,7 +181,13 @@ fn main() {
     let text = std::fs::read_to_string(&args[1]).expect("params");
     let mut fh = std::fs::File::create(&args[2]).unwrap();
     for name in CURVES {
-        let block = text.split(&format!("===== {name} =====")).nth(1).unwrap().split("=====").next().unwrap();
+        let block = text
+            .split(&format!("===== {name} ====="))
+            .nth(1)
+            .unwrap()
+            .split("=====")
+            .next()
+            .unwrap();
         let pv = field_of(block, "Polynomial");
         let mut poly = [0u64; 2 * L];
         poly[..pv.len()].copy_from_slice(&pv);
@@ -179,7 +198,7 @@ fn main() {
         assert!(n % 16 == 0);
         let k = n / 16;
         let qd = 4 * k; // Q = 2^(4k), [F_N : F_Q] = 4
-        // x^(2^N) = x sanity (irreducibility is the standard's claim)
+                        // x^(2^N) = x sanity (irreducibility is the standard's claim)
         let mut x = ZERO;
         x[0] = 2;
         assert_eq!(g.frob(&x, n), x);
@@ -271,7 +290,9 @@ fn main() {
         let mut sizes: Vec<usize> = vec![];
         let mut i = 0;
         while i < canon.len() {
-            let j = (i..canon.len()).find(|&j| canon[j] != canon[i]).unwrap_or(canon.len());
+            let j = (i..canon.len())
+                .find(|&j| canon[j] != canon[i])
+                .unwrap_or(canon.len());
             sizes.push(j - i);
             i = j;
         }

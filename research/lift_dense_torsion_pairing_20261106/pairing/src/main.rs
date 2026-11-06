@@ -9,6 +9,8 @@
 //!   pairing run <out_dir> <oct27 lines_amend3/rows.jsonl>
 //!   pairing summarize <out_dir>
 
+mod validate;
+
 use std::collections::{HashMap, HashSet};
 use std::fmt::Write as _;
 use std::io::Write as _;
@@ -335,8 +337,8 @@ struct Ctx<'a> {
     asv: &'a As,
     d: u32,
     n: u32,
-    sub: &'a [u64],   // F_q^*
-    kern: &'a [u64],  // nonzero u with Tr_{N/d}(u) = 0
+    sub: &'a [u64],  // F_q^*
+    kern: &'a [u64], // nonzero u with Tr_{N/d}(u) = 0
 }
 
 fn canon(ctx: &Ctx, u: u64) -> u64 {
@@ -501,7 +503,16 @@ fn rec(
     }
     for i in start..fb.len() {
         chosen.push(i);
-        rec(cv, fb, idx, left - 1, i, cv.add(acc, cv.neg(fb[i])), chosen, found);
+        rec(
+            cv,
+            fb,
+            idx,
+            left - 1,
+            i,
+            cv.add(acc, cv.neg(fb[i])),
+            chosen,
+            found,
+        );
         chosen.pop();
     }
 }
@@ -678,7 +689,9 @@ fn jget<'a>(line: &'a str, key: &str) -> Option<&'a str> {
     Some(rest[..end].trim())
 }
 fn jnum(line: &str, key: &str) -> u64 {
-    jget(line, key).and_then(|v| v.parse().ok()).unwrap_or_else(|| panic!("{key} in {line}"))
+    jget(line, key)
+        .and_then(|v| v.parse().ok())
+        .unwrap_or_else(|| panic!("{key} in {line}"))
 }
 fn jbool(line: &str, key: &str) -> bool {
     jget(line, key) == Some("true")
@@ -724,21 +737,45 @@ fn prior_rows(path: &str) -> Vec<String> {
 fn summarize(dir: &str) {
     let text = std::fs::read_to_string(format!("{dir}/rows.jsonl")).unwrap();
     let rows: Vec<&str> = text.lines().collect();
-    let curves: Vec<&str> = rows.iter().copied().filter(|l| jget(l, "kind") == Some("curve")).collect();
-    let lines: Vec<&str> = rows.iter().copied().filter(|l| jget(l, "kind") == Some("line")).collect();
-    let prior: Vec<&str> = rows.iter().copied().filter(|l| jget(l, "kind") == Some("prior")).collect();
+    let curves: Vec<&str> = rows
+        .iter()
+        .copied()
+        .filter(|l| jget(l, "kind") == Some("curve"))
+        .collect();
+    let lines: Vec<&str> = rows
+        .iter()
+        .copied()
+        .filter(|l| jget(l, "kind") == Some("line"))
+        .collect();
+    let prior: Vec<&str> = rows
+        .iter()
+        .copied()
+        .filter(|l| jget(l, "kind") == Some("prior"))
+        .collect();
     let mut md = String::new();
     let mut js = String::from("{");
 
     // P1
     let p1_bad = curves.iter().filter(|l| !jbool(l, "p1_ok")).count();
-    let n_ts = curves.iter().filter(|l| jnum(l, "tstable_lines") > 0).count();
+    let n_ts = curves
+        .iter()
+        .filter(|l| jnum(l, "tstable_lines") > 0)
+        .count();
     let p1 = p1_bad == 0;
     writeln!(md, "## P1: T-stable valid lines = [Tr_{{N/d}}(b^{{1/4}}) = 0], and equal b^{{1/4}}F_q\n\n{} curves, {} with a T-stable valid line, {} mismatches: **{}**\n", curves.len(), n_ts, p1_bad, if p1 { "PASS" } else { "FAIL" }).unwrap();
-    write!(js, "\"P1\":{{\"curves\":{},\"tstable\":{n_ts},\"mismatch\":{p1_bad},\"pass\":{p1}}}", curves.len()).unwrap();
+    write!(
+        js,
+        "\"P1\":{{\"curves\":{},\"tstable\":{n_ts},\"mismatch\":{p1_bad},\"pass\":{p1}}}",
+        curves.len()
+    )
+    .unwrap();
 
     // P2 / P2'
-    let ts_all: Vec<&str> = lines.iter().copied().filter(|l| jbool(l, "tstable") && jnum(l, "k") == jnum(l, "q1")).collect();
+    let ts_all: Vec<&str> = lines
+        .iter()
+        .copied()
+        .filter(|l| jbool(l, "tstable") && jnum(l, "k") == jnum(l, "q1"))
+        .collect();
     let mut p2_exact_bad = 0;
     let mut p2_eq = 0;
     let mut p2_le_bad = 0;
@@ -755,12 +792,20 @@ fn summarize(dir: &str) {
             p2_eq += 1;
         }
     }
-    let pos: Vec<&str> = lines.iter().copied().filter(|l| jget(l, "role") == Some("std_bFq")).collect();
+    let pos: Vec<&str> = lines
+        .iter()
+        .copied()
+        .filter(|l| jget(l, "role") == Some("std_bFq"))
+        .collect();
     let mut pos_bad = 0;
     for l in &pos {
         let k = jnum(l, "k");
         let bound = (k - jbool(l, "x0_lifts") as u64) / 2;
-        if jnum(l, "cols") > bound || jnum(l, "pair_ok") != k || jnum(l, "tplus_ok") != k || !jbool(l, "tstable") {
+        if jnum(l, "cols") > bound
+            || jnum(l, "pair_ok") != k
+            || jnum(l, "tplus_ok") != k
+            || !jbool(l, "tstable")
+        {
             pos_bad += 1;
         }
     }
@@ -771,14 +816,36 @@ fn summarize(dir: &str) {
         && pos_bad == 0;
     for nn in 2..=4u64 {
         let g: Vec<&&str> = ts_all.iter().filter(|l| jnum(l, "n") == nn).collect();
-        let eq = g.iter().filter(|l| jnum(l, "cols") == (jnum(l, "k") - 1) / 2).count();
-        writeln!(md, "- post hoc, n = {nn}: D = (k-1)/2 on {eq}/{} T-stable all-lift lines", g.len()).unwrap();
+        let eq = g
+            .iter()
+            .filter(|l| jnum(l, "cols") == (jnum(l, "k") - 1) / 2)
+            .count();
+        writeln!(
+            md,
+            "- post hoc, n = {nn}: D = (k-1)/2 on {eq}/{} T-stable all-lift lines",
+            g.len()
+        )
+        .unwrap();
     }
-    let nts: Vec<&str> = lines.iter().copied().filter(|l| !jbool(l, "tstable")).collect();
-    let nts_ok = nts.iter().filter(|l| jnum(l, "cols") + 2 >= jnum(l, "k")).count();
+    let nts: Vec<&str> = lines
+        .iter()
+        .copied()
+        .filter(|l| !jbool(l, "tstable"))
+        .collect();
+    let nts_ok = nts
+        .iter()
+        .filter(|l| jnum(l, "cols") + 2 >= jnum(l, "k"))
+        .count();
     let p2n = !nts.is_empty() && (nts_ok as f64) >= 0.95 * nts.len() as f64;
     writeln!(md, "## P2: pairing on T-stable all-lift lines\n\n{} lines; pairing/translation exact on all but {}; D <= (k-1)/2 violated on {}; equality on {}/{}. Positive control (F_q, b in F_q): {} lines, {} violations. **{}**\n", ts_all.len(), p2_exact_bad, p2_le_bad, p2_eq, ts_all.len(), pos.len(), pos_bad, if p2 { "PASS" } else { "FAIL" }).unwrap();
-    writeln!(md, "## P2': no pairing elsewhere\n\n{} non-T-stable lines, D >= k-2 on {}: **{}**\n", nts.len(), nts_ok, if p2n { "PASS" } else { "FAIL" }).unwrap();
+    writeln!(
+        md,
+        "## P2': no pairing elsewhere\n\n{} non-T-stable lines, D >= k-2 on {}: **{}**\n",
+        nts.len(),
+        nts_ok,
+        if p2n { "PASS" } else { "FAIL" }
+    )
+    .unwrap();
     write!(js, ",\"P2\":{{\"lines\":{},\"exact_bad\":{p2_exact_bad},\"le_bad\":{p2_le_bad},\"eq\":{p2_eq},\"pos_lines\":{},\"pos_bad\":{pos_bad},\"pass\":{p2}}},\"P2n\":{{\"lines\":{},\"ok\":{nts_ok},\"pass\":{p2n}}}", ts_all.len(), pos.len(), nts.len()).unwrap();
 
     // P3, P4 per cell
@@ -790,12 +857,28 @@ fn summarize(dir: &str) {
     let mut fig: Vec<(String, u32, f64, f64, f64)> = vec![]; // label, n, raw/rows T, raw/rows other, rhoT/std
     for &(nf, d) in CELLS {
         let n = nf / d;
-        let in_cell: Vec<&str> = lines.iter().copied().filter(|l| jnum(l, "N") as u32 == nf && jnum(l, "d") as u32 == d).collect();
+        let in_cell: Vec<&str> = lines
+            .iter()
+            .copied()
+            .filter(|l| jnum(l, "N") as u32 == nf && jnum(l, "d") as u32 == d)
+            .collect();
         let groups: [(&str, Box<dyn Fn(&str) -> bool>); 4] = [
-            ("L_T (T-stable)", Box::new(|l: &str| jget(l, "role") == Some("L_T"))),
-            ("valid, not T-stable", Box::new(|l: &str| jget(l, "role") == Some("valid"))),
-            ("std (generic b)", Box::new(|l: &str| jget(l, "role") == Some("std"))),
-            ("poscontrol F_q, b in F_q", Box::new(|l: &str| jget(l, "role") == Some("std_bFq"))),
+            (
+                "L_T (T-stable)",
+                Box::new(|l: &str| jget(l, "role") == Some("L_T")),
+            ),
+            (
+                "valid, not T-stable",
+                Box::new(|l: &str| jget(l, "role") == Some("valid")),
+            ),
+            (
+                "std (generic b)",
+                Box::new(|l: &str| jget(l, "role") == Some("std")),
+            ),
+            (
+                "poscontrol F_q, b in F_q",
+                Box::new(|l: &str| jget(l, "role") == Some("std_bFq")),
+            ),
         ];
         let mut stat: Vec<Option<(f64, f64)>> = vec![];
         let mut rho_std = None;
@@ -812,9 +895,20 @@ fn summarize(dir: &str) {
             let kmean = g.iter().map(|l| jnum(l, "k") as f64).sum::<f64>() / g.len() as f64;
             let dmean = g.iter().map(|l| jnum(l, "cols") as f64).sum::<f64>() / g.len() as f64;
             // rho pooled: sum rows / sum (targets * D)
-            let denom: f64 = g.iter().map(|l| (jnum(l, "targets") * jnum(l, "cols")) as f64).sum();
-            let rho = if denom > 0.0 { rws as f64 / denom } else { f64::NAN };
-            let rr = if rws > 0 { raw as f64 / rws as f64 } else { f64::NAN };
+            let denom: f64 = g
+                .iter()
+                .map(|l| (jnum(l, "targets") * jnum(l, "cols")) as f64)
+                .sum();
+            let rho = if denom > 0.0 {
+                rws as f64 / denom
+            } else {
+                f64::NAN
+            };
+            let rr = if rws > 0 {
+                raw as f64 / rws as f64
+            } else {
+                f64::NAN
+            };
             if gi == 2 {
                 rho_std = Some(rho);
             }
@@ -859,7 +953,9 @@ fn summarize(dir: &str) {
             if let Some((_, r)) = stat[1] {
                 let v = r / s;
                 if !(v >= 0.6 * hi && v <= 1.6 * hi) {
-                    p4_bad.push(format!("({nf},{d}) rho(valid)/rho(std) {v:.3} vs 2^(n-1) = {hi}"));
+                    p4_bad.push(format!(
+                        "({nf},{d}) rho(valid)/rho(std) {v:.3} vs 2^(n-1) = {hi}"
+                    ));
                 }
             }
         }
@@ -879,15 +975,39 @@ fn summarize(dir: &str) {
     for &(nf, d) in CELLS {
         let n = nf / d;
         let rv = |role: &str| -> Option<f64> {
-            let g: Vec<&str> = lines.iter().copied().filter(|l| jnum(l, "N") as u32 == nf && jnum(l, "d") as u32 == d && jget(l, "role") == Some(role)).collect();
-            if g.is_empty() { return None; }
+            let g: Vec<&str> = lines
+                .iter()
+                .copied()
+                .filter(|l| {
+                    jnum(l, "N") as u32 == nf
+                        && jnum(l, "d") as u32 == d
+                        && jget(l, "role") == Some(role)
+                })
+                .collect();
+            if g.is_empty() {
+                return None;
+            }
             let num: u64 = g.iter().map(|l| jnum(l, "rows_vec")).sum();
-            let den: f64 = g.iter().map(|l| (jnum(l, "targets") * jnum(l, "cols")) as f64).sum();
+            let den: f64 = g
+                .iter()
+                .map(|l| (jnum(l, "targets") * jnum(l, "cols")) as f64)
+                .sum();
             Some(num as f64 / den)
         };
         let (t, v, s0) = (rv("L_T"), rv("valid"), rv("std"));
-        let f = |a: Option<f64>, b: Option<f64>| match (a, b) { (Some(a), Some(b)) if b > 0.0 => format!("{:.3}", a / b), _ => "n/a".into() };
-        writeln!(md, "| {nf} | {d} | {n} | {} | {} | {} | {:.3} |", f(t, s0), f(v, s0), f(t, v), 2.0 / (1u64 << (n - 1)) as f64).unwrap();
+        let f = |a: Option<f64>, b: Option<f64>| match (a, b) {
+            (Some(a), Some(b)) if b > 0.0 => format!("{:.3}", a / b),
+            _ => "n/a".into(),
+        };
+        writeln!(
+            md,
+            "| {nf} | {d} | {n} | {} | {} | {} | {:.3} |",
+            f(t, s0),
+            f(v, s0),
+            f(t, v),
+            2.0 / (1u64 << (n - 1)) as f64
+        )
+        .unwrap();
     }
     let p3 = p3_bad.is_empty() && p3_pos_ok;
     let p4 = p4_bad.is_empty();
@@ -896,13 +1016,32 @@ fn summarize(dir: &str) {
 
     // P6
     let pv = prior.iter().filter(|l| jbool(l, "valid")).count();
-    let pt: Vec<&str> = prior.iter().copied().filter(|l| jbool(l, "tstable")).collect();
+    let pt: Vec<&str> = prior
+        .iter()
+        .copied()
+        .filter(|l| jbool(l, "tstable"))
+        .collect();
     let pta0 = pt.iter().filter(|l| jnum(l, "Tr_a") == 0).count();
     writeln!(md, "## P6: Oct 27 twisted lines on L_T\n\n{} recorded twisted rows ({} valid by this instrument); {} T-stable ({} of them with Tr(a) = 0).\n", prior.len(), pv, pt.len(), pta0).unwrap();
     for l in &pt {
-        writeln!(md, "- N = {}, d = {}, curve {}, Tr(a) = {}, u = {}", jnum(l, "N"), jnum(l, "d"), jnum(l, "curve"), jnum(l, "Tr_a"), jnum(l, "u")).unwrap();
+        writeln!(
+            md,
+            "- N = {}, d = {}, curve {}, Tr(a) = {}, u = {}",
+            jnum(l, "N"),
+            jnum(l, "d"),
+            jnum(l, "curve"),
+            jnum(l, "Tr_a"),
+            jnum(l, "u")
+        )
+        .unwrap();
     }
-    write!(js, ",\"P6\":{{\"rows\":{},\"valid\":{pv},\"tstable\":{},\"tstable_tra0\":{pta0}}}}}", prior.len(), pt.len()).unwrap();
+    write!(
+        js,
+        ",\"P6\":{{\"rows\":{},\"valid\":{pv},\"tstable\":{},\"tstable_tra0\":{pta0}}}}}",
+        prior.len(),
+        pt.len()
+    )
+    .unwrap();
     std::fs::write(format!("{dir}/SUMMARY.md"), md).unwrap();
     std::fs::write(format!("{dir}/summary.json"), js + "\n").unwrap();
     std::fs::write(format!("{dir}/fig1_pairing.svg"), svg(&fig)).unwrap();
@@ -914,12 +1053,34 @@ fn summarize(dir: &str) {
 fn svg(fig: &[(String, u32, f64, f64, f64)]) -> String {
     let (w, h) = (860.0, 360.0);
     let mut s = format!("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{w}\" height=\"{h}\" viewBox=\"0 0 {w} {h}\" font-family=\"sans-serif\" font-size=\"11\">\n<rect width=\"100%\" height=\"100%\" fill=\"white\"/>\n");
-    let panel = |s: &mut String, x0: f64, title: &str, ymax: f64, vals: &dyn Fn(&(String, u32, f64, f64, f64)) -> Vec<(f64, &'static str)>, pred: &dyn Fn(u32) -> f64| {
+    let panel = |s: &mut String,
+                 x0: f64,
+                 title: &str,
+                 ymax: f64,
+                 vals: &dyn Fn(&(String, u32, f64, f64, f64)) -> Vec<(f64, &'static str)>,
+                 pred: &dyn Fn(u32) -> f64| {
         let (pw, ph, top) = (380.0, 250.0, 50.0);
         let y = |v: f64| top + ph - (v.max(0.0) / ymax).min(1.0) * ph;
-        writeln!(s, "<text x=\"{}\" y=\"28\" font-size=\"13\" font-weight=\"bold\">{title}</text>", x0).unwrap();
-        writeln!(s, "<line x1=\"{x0}\" y1=\"{}\" x2=\"{}\" y2=\"{}\" stroke=\"black\"/>", top + ph, x0 + pw, top + ph).unwrap();
-        writeln!(s, "<line x1=\"{x0}\" y1=\"{top}\" x2=\"{x0}\" y2=\"{}\" stroke=\"black\"/>", top + ph).unwrap();
+        writeln!(
+            s,
+            "<text x=\"{}\" y=\"28\" font-size=\"13\" font-weight=\"bold\">{title}</text>",
+            x0
+        )
+        .unwrap();
+        writeln!(
+            s,
+            "<line x1=\"{x0}\" y1=\"{}\" x2=\"{}\" y2=\"{}\" stroke=\"black\"/>",
+            top + ph,
+            x0 + pw,
+            top + ph
+        )
+        .unwrap();
+        writeln!(
+            s,
+            "<line x1=\"{x0}\" y1=\"{top}\" x2=\"{x0}\" y2=\"{}\" stroke=\"black\"/>",
+            top + ph
+        )
+        .unwrap();
         let mut t = 0.0;
         while t <= ymax + 1e-9 {
             writeln!(s, "<text x=\"{}\" y=\"{}\" text-anchor=\"end\">{t}</text><line x1=\"{x0}\" y1=\"{}\" x2=\"{}\" y2=\"{}\" stroke=\"#ddd\"/>", x0 - 4.0, y(t) + 4.0, y(t), x0 + pw, y(t)).unwrap();
@@ -932,18 +1093,46 @@ fn svg(fig: &[(String, u32, f64, f64, f64)]) -> String {
             let sub = (bw - 6.0) / vs.len() as f64;
             for (j, (v, col)) in vs.iter().enumerate() {
                 if v.is_nan() {
-                    writeln!(s, "<text x=\"{}\" y=\"{}\" font-size=\"8\" fill=\"#888\">n/a</text>", cx + 3.0 + sub * j as f64, top + ph - 3.0).unwrap();
+                    writeln!(
+                        s,
+                        "<text x=\"{}\" y=\"{}\" font-size=\"8\" fill=\"#888\">n/a</text>",
+                        cx + 3.0 + sub * j as f64,
+                        top + ph - 3.0
+                    )
+                    .unwrap();
                     continue;
                 }
-                writeln!(s, "<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" fill=\"{col}\"/>", cx + 3.0 + sub * j as f64, y(*v), sub - 1.0, top + ph - y(*v)).unwrap();
+                writeln!(
+                    s,
+                    "<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" fill=\"{col}\"/>",
+                    cx + 3.0 + sub * j as f64,
+                    y(*v),
+                    sub - 1.0,
+                    top + ph - y(*v)
+                )
+                .unwrap();
             }
             let pv = pred(c.1);
             writeln!(s, "<line x1=\"{}\" y1=\"{}\" x2=\"{}\" y2=\"{}\" stroke=\"#c0392b\" stroke-width=\"2\" stroke-dasharray=\"3,2\"/>", cx + 1.0, y(pv), cx + bw - 1.0, y(pv)).unwrap();
             writeln!(s, "<text x=\"{}\" y=\"{}\" text-anchor=\"middle\" font-size=\"9\">{}</text><text x=\"{}\" y=\"{}\" text-anchor=\"middle\" font-size=\"9\">n={}</text>", cx + bw / 2.0, top + ph + 14.0, c.0, cx + bw / 2.0, top + ph + 26.0, c.1).unwrap();
         }
     };
-    panel(&mut s, 50.0, "raw relations / distinct rows (m = n)", 8.0, &|c| vec![(c.2, "#2e86c1"), (c.3, "#95a5a6")], &|n| (1u64 << (n - 1)) as f64);
-    panel(&mut s, 470.0, "rows per column, L_T / standard line (registered rows)", 5.0, &|c| vec![(c.4, "#2e86c1")], &|_| 2.0);
+    panel(
+        &mut s,
+        50.0,
+        "raw relations / distinct rows (m = n)",
+        8.0,
+        &|c| vec![(c.2, "#2e86c1"), (c.3, "#95a5a6")],
+        &|n| (1u64 << (n - 1)) as f64,
+    );
+    panel(
+        &mut s,
+        470.0,
+        "rows per column, L_T / standard line (registered rows)",
+        5.0,
+        &|c| vec![(c.4, "#2e86c1")],
+        &|_| 2.0,
+    );
     writeln!(s, "<rect x=\"50\" y=\"330\" width=\"10\" height=\"10\" fill=\"#2e86c1\"/><text x=\"64\" y=\"339\">L_T = b^(1/4) F_q (T-stable)</text><rect x=\"230\" y=\"330\" width=\"10\" height=\"10\" fill=\"#95a5a6\"/><text x=\"244\" y=\"339\">other valid lines</text><line x1=\"380\" y1=\"335\" x2=\"400\" y2=\"335\" stroke=\"#c0392b\" stroke-width=\"2\" stroke-dasharray=\"3,2\"/><text x=\"404\" y=\"339\">preregistered prediction (2^(n-1); 2)</text>").unwrap();
     s.push_str("</svg>\n");
     s
@@ -969,6 +1158,11 @@ fn main() {
             }
         }
         Some("summarize") => summarize(&args[2]),
+        Some("validate") => validate::validate(
+            &args[2],
+            &args[3],
+            args.get(4).map(|s| s.as_str()).unwrap_or("rows"),
+        ),
         _ => eprintln!("usage: pairing run <out> <oct27 rows.jsonl> | pairing summarize <out>"),
     }
 }
