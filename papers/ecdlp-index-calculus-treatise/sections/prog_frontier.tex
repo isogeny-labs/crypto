@@ -3,7 +3,7 @@
 \section{The measured frontier: one campaign, every cost priced}\label{sec:campaign}
 
 The frontier synthesis of 13 October assembled ratios from studies that
-used different curves, sizes and accounting. To replace it we ran one
+used different curves, sizes and accounting. It was replaced by one
 campaign (\art{research/ic_frontier_campaign_20261015/}, protocol frozen
 before any measured run). Every method family ran on the same fixed curve
 ladders: eight Koblitz curves chosen by subgroup size
@@ -348,8 +348,8 @@ a measured constant. \emph{Next improvement}: put the four-unknown solve
 into the complete ladder, then keep double large primes' linear-algebra
 gain without its relation-phase cost.
 
-\paragraph{Koblitz.} Free relations---root-table self-collisions used as
-homogeneous rows---are now the production default ($0.960\times$ counted,
+\paragraph{Koblitz.} Free relations (root-table self-collisions used as
+homogeneous rows) are now the production default ($0.960\times$ counted,
 $0.941\times$ wall); the linear rows the Gr\"obner oracle used to discard
 are harvested ($0.86$--$0.93\times$ where the gate fires, and a root-rank
 gate then made it fire on more cells: $1/1.41$ at $(29,15)$, $1/1.20$ end
@@ -485,7 +485,7 @@ In characteristic two, a Frobenius-reduced form of the same system
 $481\times$ below the plain form. End to end on $E(\FF_{(2^m)^4})$ the
 ratio of IC to the negation-map rho model falls from $5{,}080$ at $m=6$ to
 $6.06$ at $m=14$ ($n\approx2^{56}$; $4.3\times$ a measured rho), with fitted
-slope $-0.248$ in $\log_2 n$---Gaudry's $n^{-1/4}$---and an extrapolated
+slope $-0.248$ in $\log_2 n$ (Gaudry's $n^{-1/4}$) and an extrapolated
 crossover near $n\approx2^{68}$ ($2^{63}$--$2^{69}$ under the model). A
 later red-team review found this crossover unsupported
 (Chapter~\ref{ch:extension}; $m=15$: $5.2\times$ after corrections).
@@ -546,8 +546,8 @@ The 26 October addendum states the cause precisely and closes it
 (Chapter~\ref{ch:audit}, item 4). (iii) The equal-bytes preprocessing control at
 $n=73$ and $n=83$ is built and frozen but not run.
 \emph{Next improvement} (from the 18 October leads review): a large-memory
-host. The two exponent-level questions named then---the Weil-descent cell
-$(m,\ell)=(4,6)$ and the PKM tower at $m=3$, $N=21$---have since run on
+host. The two exponent-level questions named then (the Weil-descent cell
+$(m,\ell)=(4,6)$ and the PKM tower at $m=3$, $N=21$) have since run on
 rented hosts: the $(4,6)$ cell refuted at degree 4 at $N=54$, and the PKM
 cell finished degree 7 and stopped on memory inside degree 8, implying
 $D\ge8$ but read as inconclusive (\S\S\ref{sec:binary-descent},\ref{sec:pkm}).
@@ -564,8 +564,8 @@ third family whose measured gap to rho is now single-digit
 (Table~\ref{tab:ladder3}). The reading rules of \S\ref{sec:ladder} apply:
 each row is against its own incumbent and on its study's boundary. The
 companion ledger (\art{papers/ecdlp-ic-improvement-ledger/}) records the
-same period as a ratchet of incumbents; this section keeps to what moves
-the frontier or corrects it.
+same period as a ratchet of incumbents; the rows here are those that move
+the frontier or correct it.
 
 \begin{table}[p]
 \centering\small
@@ -612,8 +612,8 @@ diagnostic, no cost row). Sources under \art{research/}:
 
 \paragraph{One mechanism, four factor bases.} The week's measured gains on
 the index-calculus side are all the same idea: put a point and its images
-under maps of known logarithm---the Frobenius $\tau$ on a Koblitz curve, the
-CM endomorphism $\phi$, small integer multiples, the cofactor $[h]$---into
+under maps of known logarithm (the Frobenius $\tau$ on a Koblitz curve, the
+CM endomorphism $\phi$, small integer multiples, the cofactor $[h]$) into
 one column with a known coefficient, so the linear-algebra stage needs fewer
 relations. On Koblitz curves the $\ZZ[\tau]$ base needs $K+1$ relations
 instead of about one per orbit: child CPU of the complete process falls
@@ -721,9 +721,9 @@ binary curves over $\FF_{2^{3l}}$ the genus-3 class is a $2^{-l}$ fraction
 
 \paragraph{The validation gate.} On 24 October the leaderboard's gate ran
 for the first time: all 13 Table~B rows (eight prime, five random binary)
-passed---every counted field replays identically, every scalar checks in an
+passed: every counted field replays identically, every scalar checks in an
 independent verifier, and IC stays above rho at every weight of the band
-($4.05$--$54.76\times$)---and all nine Table~C rows failed; Table~A was not
+($4.05$--$54.76\times$). All nine Table~C rows failed; Table~A was not
 in scope (\art{research/ic_validation_gate_20261024/}). The study staged its
 manifest rather than installing it, and the leaderboard now marks the
 Table~B rows validated. The ledger paper, current to 23 October, records
@@ -780,8 +780,8 @@ matrix work, and the $k=4$ extension-field solve is $48\times$ and then a
 further $370\times$ cheaper over $\FF_{p^4}$ ($481\times$ below the plain
 form in characteristic two).
 None of this, by itself, moves the cold frontier: the stages it leaves
-untouched---relation yield, factor-base size, linear algebra, table
-set-up---now dominate.
+untouched (relation yield, factor-base size, linear algebra, table
+set-up) now dominate.
 
 \begin{figure}[t]
 \centering
@@ -803,7 +803,7 @@ torsion-symmetrised bases and the $n=83$ dense-root engine in ecbench under
 immutable method identities and emit cold and online records; (ii) resolve
 the inherited-F4 cross-host counter drift before using that counter in a
 bound; (iii) run a four-size native challenge against the standing rho
-bound---two sizes cannot establish an exponent; (iv) obtain an isolated
+bound, since two sizes cannot establish an exponent; (iv) obtain an isolated
 cold session at $n=83$ with every set-up phase and retained byte charged;
 (v) price F6-IC's batched geometry with a pinned conversion. Since then
 three items have moved to the front: (vi) run $k=4$ over
@@ -821,8 +821,8 @@ ranked under the band and tested past $p\approx1330$ (the matched rho now
 exists: for the sieve arm at $p=1511$, and for the Nagao arm at
 $p=1301$--$1601$, where the crossing near 1330 failed; the unpriced counters
 are still not emitted); (x) define and run a
-published-index-calculus reference arm (open problem~10); and (viii) is worth
-less than it looked for the binary question, since the $m=4$ row at $w=2$ is
+published-index-calculus reference arm (open problem~10); and (viii) bears
+less on the binary question than it first appeared, since the $m=4$ row at $w=2$ is
 about $+46$ bits over rho even if degree 5 holds (\S\ref{sec:ladder3}).
 A result in the cold domain that beats rho at four sizes would be the first
 \cls{advance} of the programme.
