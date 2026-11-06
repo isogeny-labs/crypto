@@ -691,6 +691,40 @@ pair, `a₆ + b₆`, on the same 12 draws.
   and the raw guess on the third summand still carries weight.
 - **What it is not.** No row moves.
 
+## An invariant guess on the second link (2026-11-05): as good as the raw guess on x₃
+
+`research/dreg_second_link_guess_20261105/` (pre-registered; `RESULTS.md`,
+`results.pdf`) replaces S3's raw `c₇` with coordinate 20 of the second link's
+swap invariant `e₁ + x₃`, on the same 12 draws. Unverified assertion until a
+pcc verdict exists.
+
+- **Result.** The new arm suffices on 6 of 12 draws, against S3's 7 of 12.
+  - One discordant draw (27), which favours S3. The registered two-sided sign
+    test gives p = 1.0, so the verdict is no detected difference.
+  - The arms agree on 11 of 12 draws.
+- **What it means.** Unlike a second invariant guess on the first link, an
+  invariant guess on the second link does not lose. One invariant guess per
+  link is a rule that extends along the chain, and m = 4 is its test.
+- **What it is not.** Not shown to be better than S3. No row moves.
+
+## One invariant guess per link at m = 4, degree 3 (2026-11-06): no detected difference
+
+`research/dreg_m4_link_guess_d3_20261106/` (pre-registered; `RESULTS.md`,
+`results.pdf`). Every m = 4 cell this host can hold refutes at degree 4 with
+no guess, so the per-link rule was tested at degree 3 with k = 10 guesses at
+ℓ = 5 (n = 11, 12), on all 1024 branches of 8 unsatisfiable draws.
+Unverified assertion until a pcc verdict exists.
+
+- **Result.** Invariant placement (four sums on `x₁ + x₂`, three guesses on
+  `e₁ + x₃`, three on `e₂ + x₄`) refutes on 1,888 of 8,192 branches; raw
+  placement in the same places on 1,312.
+  - By draw it is ahead on 4 and behind on 3. The registered two-sided sign
+    test gives p = 1.0: no detected difference.
+- **What it means.** The per-link rule is not established at m = 4 in the
+  regime this host reaches. The degree-4 three-guess regime at m = 4 needs a
+  larger host.
+- **What it is not.** A test of the m = 3 degree-4 regime. No row moves.
+
 ## Reproducing
 
 ```sh

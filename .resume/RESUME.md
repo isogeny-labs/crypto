@@ -1,3 +1,59 @@
+# Current chord proof task - source only
+## Goal
+Prove the exact chord encoding needed by the user's twist useful-yield/source-DLP program. The user explicitly approved checkpoint uploads for continued work; routine start/finish/plan checkpoints are authorized, with no paid resources or arbitrary result uploads.
+## Lead / hypothesis
+The accepted target-aware chord proposal, merged PR3450, needs faithful distinct-root and diagonal algebra before any native solver admission. Sources and prior work are linked in research/quadratic_twist_chord_preflight_20261105/ALGORITHM.md.
+## Spec
+research/quadratic_twist_chord_proof_20261105/PROTOCOL.md and Chord.lean. Mathlib d13f23b723b8a846827a245b89c10fc7d3f11612; Lean4.34.1. Existing LOCAL resources only, two workers max,600s stage caps,3600s iteration.
+## State
+New branch codex/twist-chord-proof from current main4268660fa364601cbb6c42f4099677209aa35213. Five proposed algebra declarations written; ZERO proof builds/scientific runs on this branch so far. Prior merged worktrees/evidence untouched. No new measured rank/degree/cost or DLP result.
+## Next steps
+Commit exact source, pass current official checkpoint gate, then run pinned lake env lean on Chord.lean with600s cap; retain raw output and failed sources. Review axioms and declaration fidelity. Complete group coverage/native census only in later explicitly frozen stages.
+## Runs in flight
+None. Next proof command has not launched. Logs will live in /workspace/twist-chord-proof-20261105 outside the checkout and be preserved for publication.
+## Stop and success conditions
+Stop each stage at600s and the focused scientific window at3600s. No paid compute or token fallback. Kernel errors are retained failures. All five declarations plus allowed-axiom audit complete this algebra component only; point-group coverage, native solver census, useful-yield/source-scalar/regularity objectives remain open.
+
+# Preserved incoming resume (historical task state)
+# Resume: crypto @ main e87fa18a73 (IC line-layout tournament v6, V6-AMENDMENT-1 merged in #3531)
+
+## Goal
+Run IC-LINE-LAYOUT-E2E-FP28-V6-20261106. It tests whether `layout=lines` lowers the fp28 IC wall time against the walk incumbent at equal counted cost.
+
+## Lead / hypothesis
+Candidate: `mitm:negation_folded=1,layout=lines` against the incumbent `prime-abscissa:size=407`, `mitm:negation_folded=1`, `targets=walk`, `max_trials=26479085`.
+- Confirm: both wall sessions pass analyze-v6.sh.
+- Kill: per the PROTOCOL-V6.md stopping rule.
+
+## Spec
+- Protocol: research/ic_line_layout_tournament_20261031/protocol-v6.json, frozen (sha256 12415faa…, commit 7c173e5a1d, merged in PR 3527 as f352040f06).
+- Decision: DEC-20261106-662e33.
+- Specs: spec-fp28-v6{,-qual,-counted}.json. Launch requests: launch-v6/.
+- Pinned image: ea8e9ef7 / ecbench 73362eed.
+
+## State
+- Qualification passed (§5.1). Wall s1 and s2 exit 0, both on node ip-10-84-67-216, data SEALED (S3 runs/ic-line-v6-s{1,2}-20261106/).
+- Counted companion ic-line-v6-counted-20261106: exit 42 (accepted by §7), audit OK, node ip-10-84-72-222.
+- V6-AMENDMENT-1 frozen (protocol_sha256 2aedaaf8…) and merged in #3531 at 05:33Z. The owner approved launching s3 after the merge.
+- A worker restart at about 05:50Z wiped /dev/shm: the old cards, clones and downloads are gone. Work now lives in the session scratchpad v6/ on the main disk.
+
+## Next steps
+1. Director rewrites card-s3 for the new paths; launch ic-line-v6-s3-20261106 via executor-mechanical.
+2. After s3 has written job-exit.json: node check, then analyze-v6.sh on (s1,s2) and (s3,s1), validator, report and results PR.
+
+## Runs in flight
+- None at checkpoint time; s3 is about to launch.
+
+## Stop and success conditions
+- Budget: USD 5 ceiling, rolling hard-bound check (§14.1). Spend so far USD 0.155.
+- The qualification requires all executions at L2 and a minimum solve of at least 5 ms.
+- Never redispatch a consumed registration, and never auto-retry an ambiguous submission.
+
+## Open questions
+- Work is in the session scratchpad on the main disk (about 7 GB free); /dev/shm does not survive restarts.
+- /home/user/crypto-autoresearcher is half-switched, pending the owner.
+
+# Preserved previous branch resume (historical task state)
 # Resume: crypto @ claude/arity-completion-20261104 (2026-11-04)
 
 ## Goal

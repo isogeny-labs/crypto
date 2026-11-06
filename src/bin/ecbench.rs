@@ -230,6 +230,13 @@ enum Cmd {
         #[arg(long, allow_hyphen_values = true, default_value_t = -0.5)]
         gamma: f64,
     },
+    /// The frozen replay sentinels (`docs/ecbench/replay-sentinels.json`):
+    /// one cheap committed record per method id that a pull request replays
+    /// with `verify --replay-seq`.
+    Sentinels {
+        #[command(subcommand)]
+        cmd: SentinelCmd,
+    },
     /// Print the host capsule.
     Host {
         /// Print the capsule as JSON.
@@ -602,6 +609,10 @@ enum BoundCmd {
         /// the rule text enters the bound's method identity.
         #[arg(long)]
         param_rule: Option<String>,
+        /// Name the static-DH oracle of the domain (an arm that queries
+        /// one must; a reference that does not may, to share the domain).
+        #[arg(long)]
+        oracle: Option<String>,
         /// The fit procedure (`docs/bounds/README.md` §3a).  Version 1
         /// re-derives records fitted before the version-2 refusals; new
         /// bounds are version 2.
@@ -880,6 +891,66 @@ fn report_problems(problems: &[String]) {
             eprintln!("  - {p}");
         }
     }
+}
+
+#[derive(clap::Subcommand, Debug)]
+enum SentinelCmd {
+    /// Print, as JSON lines, the cheapest replayable records per method
+    /// of one hydrated session (records.jsonl and plan.json decompressed).
+    Scan {
+        #[arg(long)]
+        dir: PathBuf,
+        /// The session's path in the repository (default: --dir).
+        #[arg(long)]
+        label: Option<String>,
+        /// Records kept per method.
+        #[arg(long, default_value_t = 3)]
+        keep: usize,
+    },
+    /// Write the manifest from a session list and `scan` outputs.
+    Build {
+        /// One committed session directory per line.
+        #[arg(long)]
+        list: PathBuf,
+        /// Files of `scan` output.
+        #[arg(long, num_args = 1.., required = true)]
+        candidates: Vec<PathBuf>,
+        #[arg(long)]
+        out: PathBuf,
+        /// Sentinels per method id, from distinct sessions.
+        #[arg(long, default_value_t = 1)]
+        per_method: usize,
+        /// A manifest whose `known_failures` are carried over.
+        #[arg(long)]
+        previous: Option<PathBuf>,
+        /// A record that already does not replay, `SESSION:SEQ:REASON`
+        /// (repeatable); skipped for the next-cheapest record.
+        #[arg(long = "known-failure")]
+        known_failure: Vec<String>,
+    },
+    /// Fail unless the manifest covers every method id of the listed
+    /// sessions and names only sessions as committed.
+    Check {
+        #[arg(long)]
+        list: PathBuf,
+        #[arg(long, default_value = "docs/ecbench/replay-sentinels.json")]
+        manifest: PathBuf,
+    },
+    /// Print the manifest's sessions and `seq` arguments for the replay
+    /// script: `session<TAB>seq,seq,...`, one session per line.
+    Plan {
+        #[arg(long, default_value = "docs/ecbench/replay-sentinels.json")]
+        manifest: PathBuf,
+    },
+}
+
+fn methods_len(m: &crypto_lib::cryptanalysis::ecbench::sentinels::Manifest) -> usize {
+    m.sentinels
+        .iter()
+        .map(|s| s.method.as_str())
+        .collect::<std::collections::BTreeSet<_>>()
+        .len()
+        + m.unreplayable.len()
 }
 
 fn print_json(v: &impl serde::Serialize) -> Result<(), String> {
@@ -1189,6 +1260,109 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 rows.insert(facts.slug.clone(), wordram_price::describe_curve(&facts)?);
             }
             print_json(&serde_json::json!({ "curves": rows }))?;
+        }
+        Cmd::Sentinels { cmd } => {
+            use crypto_lib::cryptanalysis::ecbench::sentinels;
+            match cmd {
+                SentinelCmd::Scan { dir, label, keep } => {
+                    let label = label.unwrap_or_else(|| dir.display().to_string());
+                    for c in sentinels::scan_session(&dir, &label, keep)? {
+                        println!("{}", serde_json::to_string(&c).map_err(|e| e.to_string())?);
+                    }
+                }
+                SentinelCmd::Build {
+                    list,
+                    candidates,
+                    out,
+                    per_method,
+                    previous,
+                    known_failure,
+                } => {
+                    let mut known: Vec<sentinels::KnownFailure> = match previous {
+                        Some(p) => {
+                            serde_json::from_str::<sentinels::Manifest>(&read(&p)?)
+                                .map_err(|e| format!("{}: {e}", p.display()))?
+                                .known_failures
+                        }
+                        None => Vec::new(),
+                    };
+                    for k in &known_failure {
+                        let mut it = k.splitn(3, ':');
+                        let (Some(session), Some(seq), Some(reason)) =
+                            (it.next(), it.next(), it.next())
+                        else {
+                            return Err(format!("--known-failure {k}: want SESSION:SEQ:REASON"));
+                        };
+                        known.push(sentinels::KnownFailure {
+                            session: session.to_string(),
+                            seq: seq
+                                .parse()
+                                .map_err(|e| format!("--known-failure {k}: {e}"))?,
+                            reason: reason.to_string(),
+                        });
+                    }
+                    let list_text = read(&list)?;
+                    let (plans, _, skipped) = sentinels::load_sessions(Path::new("."), &list_text)?;
+                    let methods = plans
+                        .iter()
+                        .flat_map(|p| p.methods.iter().cloned())
+                        .collect();
+                    let mut cs = Vec::new();
+                    for f in &candidates {
+                        for line in read(f)?.lines().filter(|l| !l.trim().is_empty()) {
+                            cs.push(
+                                serde_json::from_str::<sentinels::Candidate>(line)
+                                    .map_err(|e| format!("{}: {e}", f.display()))?,
+                            );
+                        }
+                    }
+                    let man = sentinels::build(&methods, &cs, per_method, &known);
+                    let text =
+                        serde_json::to_string_pretty(&man).map_err(|e| e.to_string())? + "\n";
+                    std::fs::write(&out, text).map_err(|e| format!("{}: {e}", out.display()))?;
+                    eprintln!(
+                        "{} sentinels over {} method ids ({} unreplayable); {} sessions without a spec skipped",
+                        man.sentinels.len(),
+                        methods_len(&man),
+                        man.unreplayable.len(),
+                        skipped.len()
+                    );
+                }
+                SentinelCmd::Check { list, manifest } => {
+                    let man: sentinels::Manifest = serde_json::from_str(&read(&manifest)?)
+                        .map_err(|e| format!("{}: {e}", manifest.display()))?;
+                    let (plans, ids, skipped) =
+                        sentinels::load_sessions(Path::new("."), &read(&list)?)?;
+                    let problems = sentinels::check(&man, &plans, &ids);
+                    for p in &problems {
+                        eprintln!("problem: {p}");
+                    }
+                    eprintln!(
+                        "replay sentinels {}: {} sentinels, {} unreplayable, {} planned sessions, {} without a spec",
+                        if problems.is_empty() { "OK" } else { "FAILED" },
+                        man.sentinels.len(),
+                        man.unreplayable.len(),
+                        plans.len(),
+                        skipped.len()
+                    );
+                    if !problems.is_empty() {
+                        std::process::exit(1);
+                    }
+                }
+                SentinelCmd::Plan { manifest } => {
+                    let man: sentinels::Manifest = serde_json::from_str(&read(&manifest)?)
+                        .map_err(|e| format!("{}: {e}", manifest.display()))?;
+                    let mut by: std::collections::BTreeMap<&str, Vec<u64>> = Default::default();
+                    for s in &man.sentinels {
+                        by.entry(&s.session).or_default().push(s.seq);
+                    }
+                    for (session, mut seqs) in by {
+                        seqs.sort_unstable();
+                        let seqs: Vec<String> = seqs.iter().map(u64::to_string).collect();
+                        println!("{session}\t{}", seqs.join(","));
+                    }
+                }
+            }
         }
         Cmd::Trend {
             compare,
@@ -1924,6 +2098,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 unit,
                 weight,
                 param_rule,
+                oracle,
                 fit_version,
                 out,
             } => {
@@ -1942,6 +2117,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         unit,
                         weight,
                         param_rule,
+                        oracle,
                         fit_version,
                     },
                     audit_refs: &[],
