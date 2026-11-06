@@ -1295,13 +1295,18 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         };
                         known.push(sentinels::KnownFailure {
                             session: session.to_string(),
-                            seq: seq.parse().map_err(|e| format!("--known-failure {k}: {e}"))?,
+                            seq: seq
+                                .parse()
+                                .map_err(|e| format!("--known-failure {k}: {e}"))?,
                             reason: reason.to_string(),
                         });
                     }
                     let list_text = read(&list)?;
                     let (plans, _, skipped) = sentinels::load_sessions(Path::new("."), &list_text)?;
-                    let methods = plans.iter().flat_map(|p| p.methods.iter().cloned()).collect();
+                    let methods = plans
+                        .iter()
+                        .flat_map(|p| p.methods.iter().cloned())
+                        .collect();
                     let mut cs = Vec::new();
                     for f in &candidates {
                         for line in read(f)?.lines().filter(|l| !l.trim().is_empty()) {
@@ -1312,7 +1317,8 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         }
                     }
                     let man = sentinels::build(&methods, &cs, per_method, &known);
-                    let text = serde_json::to_string_pretty(&man).map_err(|e| e.to_string())? + "\n";
+                    let text =
+                        serde_json::to_string_pretty(&man).map_err(|e| e.to_string())? + "\n";
                     std::fs::write(&out, text).map_err(|e| format!("{}: {e}", out.display()))?;
                     eprintln!(
                         "{} sentinels over {} method ids ({} unreplayable); {} sessions without a spec skipped",
