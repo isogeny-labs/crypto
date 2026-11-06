@@ -3,7 +3,7 @@
 = Conjugate-pair repair and radix-grading follow-up
 November 6, 2026 · Development report
 
-Native chart selection/resume support and a matched-input radix comparator are implemented. Scientific qualification panels remain blocked and have not launched. Development observations are producer assertions under PCC-20261106-7ccd3b, standing unverified.
+Native chart selection/resume support and chart/radix panel readouts are implemented. Scientific qualification panels remain blocked and have not launched. Development observations are producer assertions under PCC-20261106-ded5b6, standing unverified.
 
 #image("workflow.svg", width: 100%)
 

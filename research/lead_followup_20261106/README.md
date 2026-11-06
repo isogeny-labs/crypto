@@ -2,12 +2,12 @@
 
 Native chart-selection/resume support and a native matched-input radix comparator
 are implemented. Scientific qualification panels are **blocked, not launched**.
-Development observations are producer assertions under `PCC-20261106-7ccd3b`
+Development observations are producer assertions under `PCC-20261106-ded5b6`
 (standing: unverified), not independent scientific verification.
 
 | Requested work | Current deliverable | Remaining evidence |
 | --- | --- | --- |
-| Pursue conjugate-pair repair | Exact target/chart selection; stored matrix/solver seed; write-once output and safe partial-pair resume | Independent-chart panel; extraction of short relations; exceptional base-point handling |
+| Pursue conjugate-pair repair | Exact target/chart selection; stored matrix/solver seed; safe resume and native twelve-call readout | Independent-chart panel; extraction of short relations; exceptional base-point handling |
 | Pursue radix grading | Native comparator; matched t=10,11,12 protocol and worker | Qualification controls, larger-depth runs, memory/cost analysis and independent replay |
 | Preserve and publish | This source-linked report, diagram, PDF, two blocked backlog cards and shared problem update | Run reports/exports/claims after actual execution |
 
@@ -27,7 +27,11 @@ arm, target, set, transformed flag, Macaulay degree and chart offset. Historical
 records default to degree 29 and offset zero; the legacy A1 degree stays explicit.
 Completed halves of interrupted pairs are preserved instead of repeated.
 
-The native comparator pairs by exact curve/tower/target identity, checks grading
+The native `chart_compare` readout enforces the exact twelve-call population,
+plain A/A and nonsingular canonical matrices. A failed solve remains unknown
+even when empty sets match. This is producer consistency, not independent replay.
+
+The native radix comparator pairs by exact curve/tower/target identity, checks grading
 weights and terminal producer summaries, refuses missing/duplicate draws or
 inconsistent completed outcomes, and leaves capped costs as `ratio=null`.
 Its unit-grading parser accepts the pilot's canonical `weights:null` encoding.

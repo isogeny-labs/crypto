@@ -24,6 +24,9 @@ the source adds the offset with wrapping u64 arithmetic. Store every actual 5x5
 matrix and solver seed. The solver seed is unchanged (`0xdec0 + curve`).
 All solver invocations use Macaulay degree 29, chains and sparsest pivots. Each invocation
 runs both a plain and a transformed solve; plain repeats are the A/A controls.
+The native `chart_compare` readout enforces the complete census, plain A/A,
+canonical nonsingular chart matrices and separate unknown/complete statuses. It
+checks producer consistency; it does not independently replay curve arithmetic.
 The exact meet-in-the-middle checker remains unavailable to the candidate solver
 and checks the complete returned decomposition set afterwards.
 

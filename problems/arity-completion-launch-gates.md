@@ -9,7 +9,7 @@
   execution)
 - **Next action owner:** owner (credentials and budget); then the session that
   holds them runs the frozen cards
-- **Last updated:** 2026-11-04
+- **Last updated:** 2026-11-06
 
 ## Problem
 

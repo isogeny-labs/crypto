@@ -1,30 +1,44 @@
 # Development checks
 
-Producer observations, standing unverified (`PCC-20261106-7ccd3b`).
+Producer observations, standing unverified (`PCC-20261106-ded5b6`).
 
-- Native helper/comparator suite: passes; exact original and latest development
-  output in native-tests.txt and native-tests-final.txt. These are unit tests,
-  not scientific measurements or independent replay.
-- Historical depth-10 parser compatibility: passes on the existing L2-t10-r2,
-  L2-t10-r4 and L2-t10-r8 files. No new solver execution or research trial.
-- rustfmt on touched example/helper; cargo fmt on native manifest; worker shell
-  syntax; git diff --check: pass locally.
-- PCC ledger verify against origin/main: chain passes. Claim standing remains
-  unverified; local verify reports not_covered (unsigned statement/attestation).
-- Benchmark-record gate: passes after exact-file sparse hydration; no benchmark
-  record or generated progress file is changed.
-- Backlog validator: structurally passes with --no-git; committed-protocol check
-  will be rerun after the preparation commit.
-- Full release library suite and touched-example build: pending in the initial
-  preparation commit; final outcomes must be appended before publication.
+- Native helper/chart/radix suite: eleven tests pass. Current stdout is
+  native-tests-chart.txt. Original eight-test outputs remain pinned in
+  native-tests.txt and native-tests-final.txt; they are historical development
+  outputs, not scientific measurements or independent replay.
+- Touched example: all seven tests pass, including homogeneous polynomial
+  evaluation, distinct seeded charts and safe-resume checks. Exact command/output
+  is in example-correctness.txt (PCC-20261106-5ebf9a, unverified).
+- The example correctness command uses release with package-specific overrides:
+  `--config 'profile.release.package.crypto.opt-level=0'`
+  `--config 'profile.release.package.crypto.codegen-units=256'`.
+  Dependency profiles and sources stay unchanged. Default optimized qualification
+  remains a future scientific-image prerequisite; no runtime comparison is made.
+- Full-library suite: currently running the same explicit correctness profile.
+  Its final outcome is pending and is not represented as a pass. The initial
+  default release attempt failed with missing sparse-input diagnostics; all
+  tracked inputs named by those diagnostics were restored. Subsequent default
+  optimized compilation was stopped before tests; those noncompletions are retained.
+- Historical depth-10 parser compatibility: passes on existing L2-t10-r2/r4/r8
+  records. No new solver trial. The native comparator accepts terminal summaries
+  and the pilot's `weights:null` unit-grading encoding.
+- rustfmt/cargo fmt, worker shell syntax and source whitespace checks pass.
+  Raw stdout retains its exact terminal blank lines; diff --check can report those
+  output-only lines. Frozen proof inputs were not trimmed to suppress that notice.
+- PCC ledger chain against origin/main passes. All new statement/attestation
+  claims remain unverified/not_covered; none has an independent signature.
+- Benchmark-record gate passes after exact-file sparse hydration. No record or
+  generated progress file changes. The prepared panels have not run.
+- Both cards pass the original backlog validator with committed protocol blobs;
+  final changed blobs are structurally checked and rechecked after their commit.
 
-The administrative backlog validator is the unchanged src/bin/backlog.rs plus
-its card/cairn modules. It was built in a temporary Cargo package against the
-unchanged SHA-1/SHA-256 source modules (crate alias crypto_lib), with clap,
-serde_json, hex and libc, while the full library builds. This packaging changes
-no card validation rule. No pruned crypto solver is used for a scientific run.
+The administrative backlog validator is unchanged src/bin/backlog.rs plus its
+card/cairn modules. It was built in a temporary Cargo package against unchanged
+SHA-1/SHA-256 source modules (crate alias crypto_lib), with clap, serde_json, hex
+and libc, while the full library builds. No card rule changed and no pruned crypto
+solver is used for a scientific run.
 
-The one-page report.pdf was rendered with Typst 0.15.1 and visually inspected.
-The protocol source and both card copies are byte-identical; protocol.blob is
-computed by git hash-object. No output verifier or image/admission receipt has
-been invented; the blocked cards deliberately remain unready.
+The one-page PDF was rendered with Typst 0.15.1 and visually inspected. The study
+protocol and both card copies are byte-identical; protocol.blob is computed by
+git hash-object. No independent output verifier or image/admission receipt is
+invented; the cards deliberately remain blocked.

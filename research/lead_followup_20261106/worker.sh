@@ -16,7 +16,8 @@ out=$(cd "$out" && pwd)
 cp "$LEAD_ADMISSION_RECEIPT" "$out/admission.json"
 git rev-parse HEAD > "$out/source.txt"
 sha256sum target/release/examples/conjpair_decomp_cost target/release/examples/pkm_tower_pilot \
-  research/lead_followup_20261106/native/target/release/radix_compare > "$out/binaries.sha256"
+  research/lead_followup_20261106/native/target/release/radix_compare \
+  research/lead_followup_20261106/native/target/release/chart_compare > "$out/binaries.sha256"
 export RAYON_NUM_THREADS=4
 printf '4\n' > "$out/rayon-threads.txt"
 if [[ "$mode" == charts ]]; then
@@ -30,6 +31,9 @@ if [[ "$mode" == charts ]]; then
         2> "$out/$name-s$seed.stderr"
     done
   done
+  research/lead_followup_20261106/native/target/release/chart_compare \
+    "$out/common0-s0.jsonl" "$out/common0-s1.jsonl" "$out/common0-s2.jsonl" \
+    "$out/planted-s0.jsonl" "$out/planted-s1.jsonl" "$out/planted-s2.jsonl" > "$out/chart-readout.json"
 else
   # Run/inspect the historical smoke and G0 qualification independently before
   # admission. The receipt must bind those results to this exact binary.
