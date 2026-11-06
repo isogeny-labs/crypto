@@ -1,7 +1,8 @@
 # Line-layout tournament: coordinator decision on the version 6 redesign (2026-11-06)
 
-**Revised: see §12, Revision 1 (2026-11-06), and §13, Revision 2 / freeze
-approval (2026-11-06).** Each supersedes the earlier parts it names. Where they
+**Revised: see §12, Revision 1 (2026-11-06), §13, Revision 2 / freeze
+approval (2026-11-06), and §14, Revision 3 budget-rule reading (2026-11-06).**
+Each supersedes the earlier parts it names. Where they
 conflict, the later section governs.
 
 **Status: the owner signed off on 2026-11-06. Freeze is approved, conditional
@@ -1101,4 +1102,460 @@ coordinator_decision_revision:
     - "Director: run F6b and append it to prefreeze-checks-v6.md (one snapshot archive of that file)."
     - "Main session, on F6b PASS: run experiment_protocol.py freeze on protocol-v6.json, commit and merge the freeze with this file and ledger/decisions/DEC-20261106-662e33.yaml; push, then open or refresh the PR with auto-merge."
     - "Then, per PROTOCOL-V6.md §5: publication receipt, checkpoint gate, director card for the qualification, executor-mechanical launch; only on a pass, the two wall sessions, then the counted companion; then analyze-v6.sh, independent validator, evidence-review decision."
+```
+
+## 14. Revision 3: budget-rule reading for the wall launch (2026-11-06)
+
+**Trigger.** The qualification `ic-line-v6-qual-20261106` passed every §5.1
+condition, as recorded in `QUALIFICATION-V6-20261106.md` on branch
+`claude/ic-line-layout-v6-results-20261106`. That record stays sealed. The
+director's wall card `/dev/shm/v6run/card-wall-1-2.md` is on HOLD under the
+§13.3(c) budget rule.
+
+The qualification card undercounted CodeBuild:
+
+- `launch-remote` starts every build with `timeoutInMinutesOverride` 100;
+- a build waits up to the job's `seconds` + 180 s;
+- the protocol's worst case is 8 builds.
+
+The director's figures, at the c8a.2xlarge on-demand price of USD 0.43108 per
+hour:
+
+| Bound | CodeBuild | Total with 6.5 node-hours (USD 2.80) |
+|---|---|---|
+| Hard bound | 8 builds × 100 min × USD 0.005 = USD 4.00 | USD 6.80 |
+| Job-length bound | USD 2.27 | USD 5.07 |
+
+USD 0.05 has been spent so far. This revision changes no scientific element of
+the frozen protocol. It fixes how the frozen budget rule is read.
+
+### 14.1 Decision: option (c), a rolling hard-bound gate checked before each launch
+
+**The bound that applies is the hard bound.** The §13.3(c) rule says
+"could exceed". The job-length bound assumes the launcher's wait loop always
+ends on time. The 100-minute build timeout is the only limit that holds when
+that loop does not end on time. Option (a) is therefore rejected. Under the
+protocol's full worst case even the job-length bound fails (USD 5.07).
+
+**Option (b) is also rejected.** Removing the counted job's `-r2` would change
+the frozen host-loss rule after launch. Nothing requires that, because actual
+spend is far below the bounds.
+
+**The rule.** Before each launch L, including any `-r2`, the card records
+`actual_spend + HB(L) + HB(every first-attempt job of PROTOCOL-V6.md §5 not yet
+launched)` and requires it to be at most USD 5.00.
+
+- `actual_spend`: billed CodeBuild minutes of every build launched so far, plus
+  node-hours from node creation to termination at the on-demand price, failed
+  attempts included.
+- `HB(job)` = (job `seconds` / 3600) × USD 0.43108 + 100 min × USD 0.005. That
+  is USD 0.931 for a 3,600 s job.
+
+If the gate fails, the director stops and returns to the coordinator before
+that launch. Nothing is skipped silently, and the frozen host-loss rule is not
+amended.
+
+**Why this is safe.** Pricing a Spot node at the on-demand rate leaves room for
+node time beyond the job deadline (provisioning and teardown). The gate also
+always reserves a full hard bound for the counted job, so wall-job reruns can
+never use up its share.
+
+**Applied to the current HOLD:**
+
+- **Two wall sessions, launched back to back:** 0.05 + 2 × 0.931 + 0.931
+  (counted job reserved) = USD 2.84, at most USD 5. **Pass.**
+- **Later `-r2` launches.** Even if every wall build and node ran to its hard
+  bound, a single `-r2` would still pass: 0.05 + 3 × 0.931 + 0.931 = USD 3.77.
+  Both wall `-r2`s and the counted job also fit: 0.05 + 5 × 0.931 = USD 4.70. A
+  counted `-r2` after all of that (USD 5.63) would fail and return to the
+  coordinator. Measured spend makes these cases far less likely: the
+  qualification build ran about 4 minutes, and a wall session projects to about
+  33 s of measurement.
+
+**Record of the miscount.** The qualification card's CodeBuild undercount is
+logged as an infrastructure accounting error. It had no effect: actual spend
+was about USD 0.05, and the qualification would also have passed this gate at
+launch.
+
+### 14.2 Concurrency reading: confirmed
+
+The director's reading matches `protocol-v6.json`
+`execution.placement.concurrency_note`, and this revision adds no rule.
+
+- The two wall requests are submitted back to back.
+- They may run side by side, or one after the other under the L2 NodePool cap.
+- Each runs on its own fresh L2 node and is decided on its own data alone.
+- The card records each job's Job, Pod and node identity. The validator checks
+  that they are distinct under the frozen host-epoch factor.
+
+### 14.3 HOLD
+
+**The HOLD may be lifted.** The wall card may proceed once it records the
+§14.1 gate line for the two-session launch (USD 2.84 ≤ USD 5.00) together with
+the actual-spend basis behind it. Every later launch records its own gate line
+first.
+
+```yaml
+coordinator_decision_revision:
+  revises: DEC-20261106-662e33
+  revision: 3
+  date: 2026-11-06
+  decision: approve        # budget-rule reading; wall launch released
+  target_ids: [IC-LINE-LAYOUT-E2E-FP28-V6-20261106]
+  rationale:
+    - "§13.3(c) says 'could exceed'; only the 100-min CodeBuild timeout bounds a build whose wait loop does not end on time, so the hard bound applies; the job-length reading (a) is rejected."
+    - "A rolling gate before each launch (actual spend + hard bound of this launch + hard bound of every unlaunched first attempt <= USD 5) keeps the owner's ceiling under the strictest bound without amending the frozen host-loss rule (b rejected)."
+    - "Wall launch now: 0.05 + 2 x 0.931 + 0.931 reserved for the counted job = USD 2.84; passes."
+  evidence_refs:
+    - research/ic_line_layout_tournament_20261031/QUALIFICATION-V6-20261106.md   # sealed; only its pass status and spend are used
+    - /dev/shm/v6run/card-wall-1-2.md
+    - research/ic_line_layout_tournament_20261031/protocol-v6.json
+  limitations:
+    - "On-demand price USD 0.43108/h as recorded by the director; Spot node time is priced at the on-demand rate to cover node lifetime beyond the deadline."
+  knowledge_promotion: not_warranted
+  next_actions:
+    - "Director: record the §14.1 gate line on the wall card, lift the HOLD, and relay the card unchanged to executor-mechanical for ic-line-v6-s1-20261106 and ic-line-v6-s2-20261106."
+    - "Before each later launch (any -r2, the counted job): record the gate line; if it fails, return to the coordinator."
+    - "Main session: mirror this block into ledger/decisions/DEC-20261106-662e33.yaml in the next ledger archive."
+```
+
+## 15. Revision 4: the two wall sessions shared one node (2026-11-06, before any wall data is read)
+
+### 15.1 Facts relayed by the main session
+
+Both wall jobs finished at 04:55:54Z with launcher state `succeeded` and
+`job-exit` 0. For each session the main session read integrity and identity
+fields only:
+
+- `SHA256SUMS` OK;
+- binary `73362eed…`;
+- audit OK, 576/576 verified;
+- `l2-gate` accepted, with all 576 executions at L2;
+- session complete.
+
+The identities and timings:
+
+| Session | Job UID | Pod | Node | Ran (session.json) |
+|---|---|---|---|---|
+| s1 | `10c77943-…` | `c4934aa4-…` | `ip-10-84-67-216.us-east-2.compute.internal` | 1793940843237–1793940880586 ms |
+| s2 | `6726db8e-…` | `9c36a122-…` | `ip-10-84-67-216.us-east-2.compute.internal` | 1793940715944–1793940753201 ms |
+
+Each session took 37.3 s. They ran one after the other on the same node: s1
+started 90 s after s2 finished. `host.json` and `runner-identity.json` carry no
+hostname or `boot_id`.
+
+**Nothing has been read beyond these fields.** No `compare`, no
+`analyze-v6.sh`, and no record-level wall field. The counted companion has not
+been launched.
+
+### 15.2 What the frozen protocol requires
+
+The `protocol-v6.json` variable ledger defines the factor `host_epoch` as:
+
+> two independent EKS Jobs, each on its own fresh c8a.2xlarge Spot node under
+> the launcher's required pod anti-affinity; both must decide in the same
+> direction and retain distinct Job/Pod/node identities.
+
+The placement `concurrency_note` says "each still runs on its own fresh L2
+node". The pod anti-affinity (`topology kubernetes.io/hostname`) keeps two pods
+off one node only while both exist. Once s2's pod had finished, Karpenter was
+free to place s1 on the same idle node. That is what happened.
+
+**The Job and Pod identities are distinct. The node identity is not.** The
+frozen host-epoch condition is therefore **not met**, and my §14.2
+confirmation ("each runs on its own fresh L2 node") was wrong in practice. I
+read the anti-affinity as a guarantee of node freshness. It only prevents two
+pods sharing a node at the same time. This is an infrastructure fact, not
+evidence about the candidate.
+
+### 15.3 Decision: option (c)
+
+The two sessions stay valid as measurements but are one host epoch. A third
+wall session on a distinct node supplies the second epoch, and every session
+decides.
+
+**Why not (a), "the sessions stand as independent".** Two jobs on one VM, two
+minutes apart, are a within-host replicate. They are not the cross-host
+replication the frozen factor names. The claim is about the c8a.2xlarge class,
+and a cache-line layout effect is exactly the kind that can depend on the host
+(shared L3, memory placement, neighbours on the physical machine). Accepting
+the pair would relax a preregistered design condition after the run. That it
+would happen before any wall data was seen does not make it acceptable.
+
+**Why not (b) alone, "invalid as a pair, stop".** Under the frozen rules
+nothing can supply a second host epoch:
+
+- host-loss reruns cover only jobs with no `job-exit.json`;
+- there is no noise-rerun clause;
+- the rules say "run each once, and stop".
+
+Read alone, (b) leaves v6 unable to reach `supported_within_scope`. It would
+throw away two clean sessions over an infrastructure gap that a pre-data
+amendment can close. The program has done exactly this before: v4/v5 were
+amendments filed after infrastructure failures and before any affected data.
+
+**Decision.** File a versioned protocol amendment, **V6-AMENDMENT-1**, before
+any wall field of s1 or s2 is read:
+
+1. **s1 and s2 are kept whole and both stay decision-bearing.** Together they
+   form host epoch H1 (node `ip-10-84-67-216`). Neither is discarded, demoted
+   or replaced.
+2. **One additional wall job, `ic-line-v6-s3-20261106`, forms host epoch H2.**
+   - **Request:** byte-identical to `launch-v6/request-session-1.json` apart
+     from `job_name` and the provenance label. Same spec, seeds, image, binary
+     and 3,600 s deadline.
+   - **Distinct-node rule, before launch:** the director confirms through the
+     launcher's read-only cluster status that no node named
+     `ip-10-84-67-216.us-east-2.compute.internal` exists in the cluster, and
+     records that check on the card.
+   - **Distinct-node rule, after the run:** s3's node identity (node name and,
+     where the launcher records them, `providerID` / instance id and node
+     creation time) differs from H1's.
+   - **If s3 lands on H1's node anyway:** v6 cannot satisfy the host-epoch
+     factor. C-wall is then at most `inconclusive`, the per-session results
+     are reported descriptively, and no further session is added.
+   - **Reruns:** s3 follows the frozen rules. A host-loss rerun is
+     `ic-line-v6-s3-20261106-r2`, and a non-zero `job-exit` is never rerun.
+3. **Decision rule (stricter than before, no selection).** C-wall is supported
+   only if **each of s1, s2 and s3** separately passes every frozen gate, and
+   the host-epoch condition holds between H1 and H2. Otherwise the frozen
+   per-session verdicts are combined by the frozen overall precedence over all
+   three sessions:
+   - all supported gives `supported_within_scope`;
+   - otherwise, any `invalid_measurement` gives `invalid_measurement`;
+   - otherwise, any `inconclusive` gives `inconclusive`;
+   - otherwise, `within_control_distribution`.
+
+   No session may be dropped or chosen after data. Requiring three passes
+   instead of two lowers the chance of support. That is the honest cost of the
+   infrastructure miss, and it rules out any selection.
+4. **Analysis, with `analyze-v6.sh` unchanged** (sha256 `23e614ad…`). The
+   script takes exactly two sessions and computes each session's verdict
+   independently, with fixed seeds. It is run twice:
+   - (i) `analyze-v6.sh ECBENCH reports/v6/analysis-a --counted <counted> <s1> <s2>`;
+   - (ii) `analyze-v6.sh ECBENCH reports/v6/analysis-b --counted <counted> <s3> <s1>`.
+
+   s1's per-session verdict and gates must be identical in (i) and (ii). This
+   doubles as a determinism check, and a mismatch is `invalid_measurement`. The
+   final verdict is the §15.3(3) combination over the s1, s2 and s3 verdicts.
+   Neither file's `overall` field is the verdict on its own.
+5. **Sealing.** No wall field, `compare` or `analyze-v6.sh` output of s1 or s2
+   is opened until both of these are true:
+   - V6-AMENDMENT-1 is frozen and merged;
+   - s3 (or its `-r2`) has written `job-exit.json`.
+
+   s1 and s2 records may not be copied into any report before then.
+6. **Budget.** The §14.1 rolling hard-bound gate applies unchanged:
+   - **Before s3:** `actual_spend + HB(s3) + HB(counted, if not yet
+     launched) ≤ USD 5.00`. With HB = USD 0.931 per 3,600 s job and actual
+     spend well under USD 1, this passes.
+   - **Before any later `-r2`:** its own gate line is recorded first.
+7. **Scope.** The claim's hardware scope becomes "two c8a.2xlarge host epochs
+   (three sessions)". The §4 boundary is otherwise unchanged.
+
+**What V6-AMENDMENT-1 must contain** (written by the director and frozen by the
+main session before s3 launches):
+
+- `PROTOCOL-V6-AMENDMENT-1.md`;
+- an entry in `protocol-v6.json` `amendments[]`:
+  - `filed_before_affected_data: true`;
+  - its reason (§15.2);
+  - the changes in items 1–7 above;
+  - `supersedes_fields` covering the host-epoch factor's `how`, the
+    scientific-stage stopping rule, the `decision_rule.text` combination,
+    `analysis_plan` invocations and `execution.placement.concurrency_note`;
+- `launch-v6/request-session-3.json`, passing `validate-request`;
+- a re-freeze recording the new `protocol_sha256`.
+
+**Owner.** This amendment adds one job within the USD 5 ceiling, under the
+standing authorization in AGENTS.md. The main session relays it to the owner
+before s3 launches. If the owner objects, s3 is not launched and v6 ends under
+(b): the s1/s2 pair cannot support C-wall, and the sessions are reported
+descriptively as one host epoch.
+
+### 15.4 Counted companion: may launch now
+
+The frozen trigger ("after both wall jobs have written `job-exit.json`") is
+met. The counted session decides no wall question and has no host-epoch
+requirement. Before launch, its card records the §14.1 gate line with s3's
+hard bound reserved:
+
+`actual_spend + HB(counted) + HB(s3) ≤ USD 5.00`
+
+If the counted job lands on `ip-10-84-67-216` again and keeps it alive, s3's
+pre-launch check (§15.3(2)) simply waits until that node is gone. No wall field
+of the counted session is read.
+
+```yaml
+coordinator_decision_revision:
+  revises: DEC-20261106-662e33
+  revision: 4
+  date: 2026-11-06
+  decision: revise        # pre-data amendment V6-AMENDMENT-1; counted launch released
+  target_ids: [IC-LINE-LAYOUT-E2E-FP28-V6-20261106]
+  context: "s1 and s2 both exited 0 with full integrity but ran sequentially on the same node ip-10-84-67-216; the frozen host_epoch factor requires each wall job on its own fresh node with distinct node identity; no wall data read."
+  rationale:
+    - "Pod anti-affinity prevents co-scheduling only; Karpenter reused the idle node, so the frozen host-epoch condition is unmet (an infrastructure fact; §14.2 corrected)."
+    - "(a) rejected: accepting a within-host pair would relax a preregistered cross-host replication condition on a host-sensitive cache-layout claim."
+    - "(b) alone rejected: no frozen rule can supply a second epoch; a pre-data versioned amendment can, as v4/v5 did."
+    - "(c) adopted: s1+s2 form host epoch H1 and both still decide; one added session s3 on a verified-distinct node forms H2; support requires all three sessions to pass, so nothing is selected or dropped."
+  evidence_refs:
+    - research/ic_line_layout_tournament_20261031/protocol-v6.json   # host_epoch factor, concurrency_note, stopping rules
+    - /dev/shm/v6s1-untrusted/job-exit.json
+    - /dev/shm/v6s2-untrusted/job-exit.json
+  limitations:
+    - "Node distinctness rests on node name plus providerID/instance id where the launcher records them; host.json carries no hostname or boot_id."
+    - "Three-session support is less likely than two-session support; this is accepted as the cost of the miss."
+  knowledge_promotion: not_warranted
+  next_actions:
+    - "Main session: relay this revision to the owner before s3 launches; the counted companion may launch now after recording its §14.1 gate line with HB(s3) reserved."
+    - "Director: write V6-AMENDMENT-1 (PROTOCOL-V6-AMENDMENT-1.md, protocol-v6.json amendments[] entry, launch-v6/request-session-3.json); main session re-freezes and merges it before s3."
+    - "Director card: confirm ip-10-84-67-216 is absent from the cluster, record the §14.1 gate line, launch ic-line-v6-s3-20261106; after it exits, verify node distinctness."
+    - "Then analyze-v6.sh twice (§15.3(4)), combine the three per-session verdicts, independent validator, evidence-review decision. s1/s2 stay sealed until s3 has written job-exit.json."
+    - "Main session: mirror this block into ledger/decisions/DEC-20261106-662e33.yaml in the next ledger archive."
+```
+
+### 15.5 Addendum (2026-11-06): rulings on the V6-AMENDMENT-1 draft
+
+**What I read** (uncommitted, in `/dev/shm/wt-v6res`):
+
+- `PROTOCOL-V6-AMENDMENT-1.md` (draft sha `6bfa3169…`);
+- the `protocol-v6.json` `amendments[]` entry (`fc21b7c2…`);
+- `launch-v6/request-session-3.json` (`9302e585…`);
+- the card `/dev/shm/v6run/card-s3.md`.
+
+No wall data has been read. The rulings below change the amendment's text in
+three places, and I made those edits in `PROTOCOL-V6-AMENDMENT-1.md` directly.
+Its sha256 is therefore no longer `6bfa3169…`. The director must mirror the
+edits into the `amendments[]` entry (`changes`, `supersedes_fields`) before the
+re-freeze.
+
+1. **EC2 check instead of `kubectl get node … NotFound`: accepted.**
+   - An EKS node named `ip-10-84-67-216…` can only be backed by an instance with
+     that private DNS name and address. If no non-terminated instance has
+     either, no live kubelet can run a pod under that name.
+   - The IP filter also catches a new instance that has just taken the address.
+     In that case the check fails and s3 waits, which errs on the safe side.
+   - The positive control and the terminated H1 instance `i-02d63a8327fb86ece`
+     are recorded on the card.
+   - A stale Node object with no instance cannot receive a running pod. The
+     after-the-run `node_name` rule is the backstop.
+2. **Node identity is decided by `node_name` alone: accepted.**
+   - Two live instances in one VPC cannot share a private IP. A different
+     `node_name` therefore implies a different instance, so the gate cannot
+     falsely pass.
+   - The only error it can make is to treat a new instance that reused the
+     address as the same host. That fails toward `inconclusive`, not toward
+     support.
+   - The EC2 instance list is recorded and decides nothing.
+   - Stated limit: distinct instances need not sit on distinct physical
+     machines. The frozen factor speaks of nodes, and the claim scope says "two
+     c8a.2xlarge host epochs", nothing finer.
+3. **"At most `inconclusive`": confirmed.** If the host-epoch condition fails,
+   a combined `supported_within_scope` becomes `inconclusive`. A combined
+   `invalid_measurement`, `inconclusive` or `within_control_distribution`
+   stands. The condition can only lower support, never raise another verdict.
+4. **Determinism check keyed on `dir`: confirmed.**
+   - s1 is passed by the same absolute path in runs (i) and (ii), and the card
+     records it. The amendment now says so.
+   - In run (ii), s1 is the second positional session (`session-2-*` files,
+     `.sessions[].session` = 2). That is why only `{verify_exit, verdict,
+     gates}` keyed on `dir` are compared.
+   - The fixed per-comparison seeds in `analyze-v6.sh` do not depend on a
+     session's position, so the check is valid.
+5. **A non-zero s3 `job-exit` enters as `invalid_measurement`: confirmed, and
+   extended.**
+   - `job-exit.json` decides this, not the script. The card reads it, and the
+     script does not.
+   - If run (ii) cannot write `verdict.json` (`analyze-v6.sh` exits 2 without
+     `records.jsonl`), s3 is `invalid_measurement` and the determinism check is
+     not applicable, because the combination is already `invalid_measurement`.
+   - If s3 and its `-r2` both write no `job-exit.json`, s3 is likewise
+     `invalid_measurement`. This is an infrastructure outcome, never evidence
+     about the candidate.
+   - These cases are now written into §2 of the amendment.
+6. **No `-r2` request file is frozen. Each one is generated at `-r2` time from
+   the frozen rule.**
+   - This matches the original v6 freeze, which froze no `-r2` file for any
+     job, including the counted job now launching. The frozen rule ("the same
+     request with the job name suffixed `-r2`") is fully mechanical.
+   - The card proves the result before launch: `jq -S -c 'del(.job.job_name)'`
+     of the generated request is byte-equal to that of the frozen request, and
+     `job.job_name` equals the frozen name + `-r2`. This is now in §2 of the
+     amendment, and it applies to every v6 job.
+   - The `-r2` card records its own §14.1 gate line.
+7. **`request-session-3.json` differs from session 1 in `job_name` and the
+   provenance label: confirmed.** §15.3(2) says exactly this. "Job name only" in
+   the dispatch was a paraphrase. s1 and s2 differ from each other in the same
+   two fields.
+8. **The seven consequential superseded fields plus `sample_size.power.note`:
+   confirmed, and not enough.** Several more fields still say "two" or "both"
+   sessions, and they are added to §6 of the amendment:
+   - `hypotheses[H-layout].predictions[P-wall].minimum_effect` and its
+     `provenance.decisive_scope`;
+   - `predictions[P-parity].provenance.decisive_scope`;
+   - `controls.positive.expected_detection`;
+   - the `budget_note` and the budget stopping rule, which are superseded by the
+     §14.1 rolling gate, as amendment item 6 already states.
+
+   The director writes each with its exact JSON path in `supersedes_fields`.
+   These fields need no change:
+   - `measurement.timed_primary_justification`, which says "two independent
+     host epochs" and is still true;
+   - `instance_sampling.rule`, where "two" refers to curves;
+   - the host-loss rule.
+
+**Re-freeze recording.** The `freeze` block holds the freeze of the document
+as it now stands, so it can always be checked against the canonical hash:
+
+- `freeze.protocol_sha256` is the canonical hash of the final amended
+  document, computed by `experiment_protocol.py freeze` after the edits above.
+  The draft value `2ce7400c…` is therefore stale and must not be copied.
+- `freeze.commit` and `frozen_at` are those of the re-freeze. `freeze.filed_before_affected_data`
+  is true.
+- The original freeze (`protocol_sha256 12415faa…` with its commit and
+  `frozen_at`) stays reproducible as the canonical hash with
+  `amendments = []`. It is recorded in `PROTOCOL-V6-AMENDMENT-1.md`, as the
+  header already does. The commit and `frozen_at` are added there. If the
+  validator accepts the field, it is also recorded as `prior_freeze` in the
+  amendment entry. If the validator refuses the field, it is recorded under
+  `extensions`. `experiment_protocol.py validate` must report 0 findings.
+- `amendments[].filed_before_affected_data` is true.
+
+The original freeze is not overwritten silently: it remains a reproducible,
+recorded hash.
+
+**Revision 3 (budget) was already recorded as §14,** so nothing was rewritten.
+The HOLD was lifted there.
+
+**Status.** Once the director has mirrored these rulings into the
+`amendments[]` entry and the validator reports 0 findings, the amendment may be
+re-frozen and merged. s3 may launch after that, under `card-s3.md`, once its
+node check prints `0` twice and its §14.1 gate line passes. The card's gate
+line (at most USD 2.95) is consistent with §14.1. s1 and s2 stay sealed per
+§15.3(5).
+
+```yaml
+coordinator_decision_revision:
+  revises: DEC-20261106-662e33
+  revision: 4.1          # addendum to §15 (Revision 4)
+  date: 2026-11-06
+  decision: approve       # V6-AMENDMENT-1 approved for re-freeze once the rulings are mirrored into the json entry
+  target_ids: [IC-LINE-LAYOUT-E2E-FP28-V6-20261106]
+  rulings:
+    p1: "EC2 non-terminated-instance check (DNS and IP, both 0) accepted in place of kubectl NotFound"
+    p2: "node_name decides; EC2 data recorded only; failure mode is conservative"
+    p3: "host-epoch failure turns supported_within_scope into inconclusive; other verdicts stand"
+    p4: "s1 matched by an identical absolute dir in both runs, recorded on the card"
+    p5: "non-zero s3 job-exit, analyze exit 2 or double host loss gives s3 invalid_measurement"
+    p6: "no -r2 file frozen; generated at rerun time; card checks del(.job.job_name) equality and the name suffix"
+    p7: "job_name plus provenance label difference confirmed"
+    p8: "director's additions confirmed; P-wall minimum_effect and decisive_scope, P-parity decisive_scope, controls.positive.expected_detection, budget_note and the budget stopping rule added"
+  refreeze: "freeze block = new canonical hash of the final amended document (recomputed; 2ce7400c is stale); the prior freeze 12415faa (reproducible with amendments=[]) is recorded in the amendment file, and in the json entry if the schema allows"
+  amendment_file_edited: research/ic_line_layout_tournament_20261031/PROTOCOL-V6-AMENDMENT-1.md   # §2 item 2 (-r2 generation, no-result case), §2 item 4 (absolute S1DIR, analyze exit 2), §6 (added superseded fields)
+  knowledge_promotion: not_warranted
+  next_actions:
+    - "Director: mirror these rulings into the protocol-v6.json amendments[] entry (changes, supersedes_fields with exact JSON paths, prior freeze), run experiment_protocol.py validate (0 findings), and recompute the shas."
+    - "Main session: run experiment_protocol.py freeze, then merge the amendment; then relay card-s3.md after the node check and gate line."
+    - "Main session: mirror this block into ledger/decisions/DEC-20261106-662e33.yaml."
 ```

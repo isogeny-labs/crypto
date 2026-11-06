@@ -879,12 +879,53 @@
       "verified_by": "carried from protocol-v5.json; not re-read in this draft"
     }
   ],
-  "amendments": [],
+  "amendments": [
+    {
+      "id": "V6-AMENDMENT-1",
+      "filed": "2026-11-06",
+      "filed_before_affected_data": true,
+      "reason": "Wall sessions s1 (ic-line-v6-s1-20261106) and s2 (ic-line-v6-s2-20261106) both exited 0 with full integrity but ran one after the other on the same node ip-10-84-67-216.us-east-2.compute.internal, so the frozen host_epoch factor (each wall job on its own fresh node with distinct Job/Pod/node identity) is not met. The pod anti-affinity only keeps two live pods apart; the idle node was reused. Filed before any wall field of s1 or s2 was read. No frozen rule can supply a second host epoch. Coordinator ruling: DECISION-V6-REDESIGN-20261106.md sections 15 and 15.5.",
+      "changes": [
+        "Amendment file: research/ic_line_layout_tournament_20261031/PROTOCOL-V6-AMENDMENT-1.md, sha256 6383bbfc3171ff8828a300ca97df4e12e2d23dc9ee162d99203b04703135968c; it governs where it names a field of this document (its section 6). The prior freeze (protocol_sha256 12415faa3330276b6ccbed718a03bc598d9717576c332577024ebc4e9752543c, commit 7c173e5a1d418dce4c734c43a25718a71107a36c, frozen_at 2026-11-06T04:25:05Z) is recorded in extensions.v6_amendment_1.prior_freeze and is reproducible with experiment_protocol.py hash on this document with amendments set to [] and extensions.v6_amendment_1 removed.",
+        "s1 and s2 are kept whole and both stay decision-bearing; together they are host epoch H1 (node ip-10-84-67-216.us-east-2.compute.internal).",
+        "One additional wall job, ic-line-v6-s3-20261106, is host epoch H2: launch-v6/request-session-3.json (sha256 9302e585d73197c2428fd78471135c76b323d366b52f77774a4f2c1ee8a6c4ed), byte-identical to request-session-1.json apart from job_name and the provenance harness label; same spec, seeds, image, binary and 3600 s deadline.",
+        "Distinct-node rule before launch: no instance outside the terminated state has private DNS name ip-10-84-67-216.us-east-2.compute.internal or private address 10.84.67.216 (EC2 form of the kubectl check, both counts 0); after the run: the node_name in s3 job-exit.json differs from H1. node_name alone decides; EC2 data is recorded only. If s3 lands on H1 node, C-wall is at most inconclusive (a combined supported_within_scope becomes inconclusive, other combined verdicts stand) and no further session is added.",
+        "s3 follows the frozen host-loss rule unchanged (rerun name ic-line-v6-s3-20261106-r2 only for a job with no job-exit.json; a non-zero job-exit is never rerun). No -r2 request file is frozen, for s3 or any other v6 job: the -r2 request is generated at rerun time as the same request with the job name suffixed -r2, and the card proves before launch that jq -S -c 'del(.job.job_name)' of the generated request is byte-equal to that of the frozen request and that job.job_name equals the frozen name plus -r2.",
+        "If s3 and its -r2 both write no job-exit.json, or s3 exits non-zero, or analysis run (ii) cannot write verdict.json, s3 enters the combination as invalid_measurement (an infrastructure outcome, not evidence about the candidate); the job-exit.json decides this, not analyze-v6.sh.",
+        "C-wall is supported only if each of s1, s2 and s3 separately passes every frozen gate and the host-epoch condition holds between H1 and H2; otherwise the frozen overall precedence runs over all three per-session verdicts; no session may be dropped or chosen after data.",
+        "analyze-v6.sh is unchanged (sha256 23e614ad0b7c74ba53a4fcd51097a44194987617661343b2243b6dec6d0f422e) and is run twice: analysis-a on (s1, s2) and analysis-b on (s3, s1), each with --counted; s1 is passed by the same absolute path in both runs, the card records it, and its verify_exit, verdict and gates must be identical in both, a mismatch is invalid_measurement; the final verdict combines the s1, s2 and s3 per-session verdicts.",
+        "Sealing: no wall field, compare or analyze-v6.sh output of s1 or s2 is opened until this amendment is frozen and merged and s3 (or its -r2) has written job-exit.json.",
+        "Budget: the decision section 14.1 rolling hard-bound gate replaces the fixed 6.5 node-hour worst case before each launch (s3, the counted job, any -r2); HB(3600 s job) = 0.93108 USD; s3 is reserved in the gate of every earlier launch; the USD 5 ceiling is unchanged.",
+        "Claim hardware scope becomes two c8a.2xlarge host epochs (three sessions); the prediction, control and scope texts that say two or both sessions are superseded as listed in supersedes_fields."
+      ],
+      "supersedes_fields": [
+        "variable_ledger.factors[name=host_epoch].how",
+        "stopping_rules[1].rule",
+        "stopping_rules[5].rule",
+        "decision_rule.text",
+        "claims[id=C-wall].text",
+        "hypotheses[id=H-layout].predictions[id=P-wall].minimum_effect",
+        "hypotheses[id=H-layout].predictions[id=P-wall].provenance.decisive_scope",
+        "hypotheses[id=H-layout].predictions[id=P-parity].provenance.decisive_scope",
+        "controls.positive.expected_detection",
+        "analysis_plan.script invocations (two runs of the unchanged script)",
+        "analysis_plan.inputs",
+        "analysis_plan.outputs",
+        "execution.placement.concurrency_note",
+        "execution.placement.jobs.wall_sessions",
+        "execution.placement.route.requests",
+        "execution.placement.route.job_names",
+        "execution.placement.route.job_deadline_seconds",
+        "execution.placement.route.budget_note",
+        "sample_size.power.note"
+      ]
+    }
+  ],
   "freeze": {
     "status": "frozen",
-    "protocol_sha256": "12415faa3330276b6ccbed718a03bc598d9717576c332577024ebc4e9752543c",
-    "commit": "7c173e5a1d418dce4c734c43a25718a71107a36c",
-    "frozen_at": "2026-11-06T04:25:05Z",
+    "protocol_sha256": "2aedaaf8dd64f7bb7a481c25efc02a561022b9ebb85b78dac8fd53863b689873",
+    "commit": "5d9203cabdc6aae15f3623faf97fd87d19c7494d",
+    "frozen_at": "2026-11-06T05:19:55Z",
     "filed_before_affected_data": true
   },
   "extensions": {
@@ -909,6 +950,22 @@
       "2 (owner-decided 2026-11-06): pc-fb2x as the structural reference (B2 fix), with rho counted-only in an L2 session (B1 fix)",
       "3 (owner-decided 2026-11-06): the noise-rerun clause is NOT adopted; one foreign task slice ends a wall session; F7 not run",
       "4 (owner-decided 2026-11-06): the USD 5 ceiling and the ea8e9ef7 / 73362eed pin stand as drafted"
-    ]
+    ],
+    "v6_amendment_1": {
+      "file": "research/ic_line_layout_tournament_20261031/PROTOCOL-V6-AMENDMENT-1.md",
+      "file_sha256": "6383bbfc3171ff8828a300ca97df4e12e2d23dc9ee162d99203b04703135968c",
+      "decision": "DECISION-V6-REDESIGN-20261106.md sections 15 (Revision 4) and 15.5 (addendum)",
+      "prior_freeze": {
+        "protocol_sha256": "12415faa3330276b6ccbed718a03bc598d9717576c332577024ebc4e9752543c",
+        "commit": "7c173e5a1d418dce4c734c43a25718a71107a36c",
+        "frozen_at": "2026-11-06T04:25:05Z",
+        "reproducible_as": "experiment_protocol.py hash on this document with amendments set to [] and extensions.v6_amendment_1 removed"
+      },
+      "request_session_3": {
+        "path": "research/ic_line_layout_tournament_20261031/launch-v6/request-session-3.json",
+        "sha256": "9302e585d73197c2428fd78471135c76b323d366b52f77774a4f2c1ee8a6c4ed"
+      },
+      "rerun_request_generation": "no -r2 request file is frozen for any v6 job; the -r2 request is generated at rerun time and the card checks jq -S -c 'del(.job.job_name)' byte-equality with the frozen request and job.job_name equal to the frozen name plus -r2"
+    }
   }
 }
