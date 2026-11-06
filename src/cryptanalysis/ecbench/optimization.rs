@@ -115,8 +115,15 @@ const POLICIES: &[PolicyDecl] = &[
         StandardBand
     ),
     policy!("ic.aps_v1", NativeAdaptive, SpecializedDomain, StandardBand),
+    policy!("ic.aps_v2", NativeAdaptive, SpecializedDomain, StandardBand),
     policy!(
         "ic.three_leads_genus2_pencil_symbolic_v2",
+        NativeGrid,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
+        "ic.three_leads_genus2_pencil_symbolic_v3",
         NativeGrid,
         SpecializedDomain,
         StandardBand
@@ -220,6 +227,12 @@ const POLICIES: &[PolicyDecl] = &[
     ),
     policy!(
         "ic.residual_batch",
+        ImplementationAb,
+        DiagnosticOnly,
+        StandardBand
+    ),
+    policy!(
+        "ic.residual_batch_v2",
         ImplementationAb,
         DiagnosticOnly,
         StandardBand

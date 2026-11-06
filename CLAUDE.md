@@ -62,6 +62,16 @@ sibling crypto-autoresearcher checkout (`knowledge/leads/ecdlp/`,
 what has already been tried here and in the sibling repositories, and whether
 anything changed since its last review (AGENTS.md "Pointers").
 
+**Knowledge base first.** The shared `research-kb` MCP server indexes this
+repository, crypto-autoresearcher, cryptanalysis, crypto-lean, the archives
+and the paper collection (about 22k sources, 151k passages, 1.7k Lean
+declarations). Before a research task, a lead proposal, a factor-base or
+solver choice, a novelty or “not tried” claim, or a subagent handoff: run
+`kb_status`, two to four `search_knowledge` queries including the negative
+form, `search_theorems` for Lean claims, and `get_source`/`get_context` on the
+best hits. Record the `source_id` and `repo:path` under “Sources checked”.
+Full rule: AGENTS.md “Knowledge base first”; skill `research-kb`.
+
 Every experiment run, every PR that lands a result, and every research search
 leaves a report, a graph, and a PDF: follow the `research-visuals` skill
 (`.claude/skills/research-visuals/SKILL.md`; AGENTS.md "Research searches must

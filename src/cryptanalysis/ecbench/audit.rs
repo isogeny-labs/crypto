@@ -57,9 +57,9 @@ use crate::cryptanalysis::ecbench::methods::{
     MethodSpec, PhaseRecord, ResolvedMethod, SolveReport,
 };
 use crate::cryptanalysis::ecbench::record::{
-    check_line_seal, child_main, expected_automorphisms, f4_accounting_note, floor_s,
-    from_str_legacy_floats, grade_for_version, json_roundtrip, ChildInput, Grade, GradeInput,
-    Record, CHILD_INPUT_SCHEMA,
+    check_line_seal, child_main, expected_automorphisms, f4_accounting_note, f6_tree_note,
+    f6_tree_version, floor_s, from_str_legacy_floats, grade_for_version, json_roundtrip,
+    ChildInput, Grade, GradeInput, Record, CHILD_INPUT_SCHEMA, F6_TREE_VERSION,
 };
 use crate::cryptanalysis::ecbench::runner::{read_session, PlanDoc, Session};
 use crate::cryptanalysis::ecbench::spec::{plan, Arm, Execution, Level, Plan, Spec};
@@ -124,7 +124,7 @@ pub enum Determinism {
 
 /// The determinism the registry gives a resolved method.
 pub fn method_determinism(m: &ResolvedMethod) -> Determinism {
-    if m.id.starts_with("ic.cm_folded_") || m.id == super::aps::ID {
+    if m.id.starts_with("ic.cm_folded_") || super::aps::is_aps(&m.id) {
         return Determinism::Never;
     }
     let budget = m
@@ -146,16 +146,8 @@ pub fn method_determinism(m: &ResolvedMethod) -> Determinism {
 /// every other session's do.  Session id, and why.
 pub const FAILED_OUTCOME_REPLAY_EXEMPT: &[(&str, &str)] = &[
     (
-        "ECBS1hedc734e1870d",
-        "factor_bases_20261013/koblitz17-algebraic: the two exhausted runs' solver work is pinned now, wall-priced then",
-    ),
-    (
         "ECBS1h4c7b9db8a389",
         "rootfinding_arity_20261013/prime20-b64-m2-vs-m3: `rootfind-subtract` refused prime curves then and runs on them now",
-    ),
-    (
-        "ECBS1h302934ff99ed",
-        "f6_ic_ecbench_ladder_20261005/n7: 48 of the 72 exhausted runs count other phase work under the current code",
     ),
 ];
 
@@ -620,6 +612,21 @@ pub fn replay_with_accounting(
     host: &HostCapsule,
     session: &crate::cryptanalysis::ecbench::runner::Session,
 ) -> (bool, String) {
+    // A session recorded before the F6-IC few-candidate closure searched the
+    // older tree; replay it with that tree (every legacy profile predates it).
+    let older_tree = f6_tree_version(&session.accounting_versions) < F6_TREE_VERSION;
+    crate::cryptanalysis::koblitz_index_calculus::set_f6_tree_v1(older_tree);
+    let result = replay_with_accounting_inner(input_json, r, host, session);
+    crate::cryptanalysis::koblitz_index_calculus::set_f6_tree_v1(false);
+    result
+}
+
+fn replay_with_accounting_inner(
+    input_json: &str,
+    r: &Record,
+    host: &HostCapsule,
+    session: &crate::cryptanalysis::ecbench::runner::Session,
+) -> (bool, String) {
     let out = child_main(input_json);
     if r.outcome.status == "error" {
         // The recorded error must be the one the replay hits (the runner
@@ -827,11 +834,22 @@ fn compare_replay(
                 .filter(|s| s.op_unit.contains("word XOR"))
                 .filter(|_| diffs.contains(&"phase counts"))
                 .and_then(|_| {
-                    f4_accounting_note(
+                    let f4 = f4_accounting_note(
                         &session.accounting_versions,
                         session.started_unix_ms,
                         has_bmi2,
-                    )
+                    );
+                    let f6 = r
+                        .method
+                        .params
+                        .get("engine")
+                        .is_some_and(|e| e == "f6-ic")
+                        .then(|| f6_tree_note(&session.accounting_versions))
+                        .flatten();
+                    match (f4, f6) {
+                        (Some(a), Some(b)) => Some(format!("{a}; {b}")),
+                        (a, b) => a.or(b),
+                    }
                 });
             match note {
                 Some(n) => format!("differs in {} ({n})", diffs.join(", ")),
@@ -1631,9 +1649,10 @@ pub fn audit_opts(dir: &Path, opts: &AuditOptions) -> Result<AuditReport, String
         ));
         // Re-check the answer here.
         let inst = p.instance(ex.workload);
-        let rec: Option<u128> = r.outcome.recovered.as_deref().and_then(|s| s.parse().ok());
-        let target_ok = rec.map(|k| inst.mul_generator_hex(k).as_ref() == Some(&w.target));
-        let planted_ok = w.planted.and_then(|p| rec.map(|k| k == p));
+        let rec: Option<super::exact_scalar::ExactScalar> =
+            r.outcome.recovered.as_deref().and_then(|s| s.parse().ok());
+        let target_ok = rec.map(|k| inst.mul_generator_exact(k).as_ref() == Some(&w.target));
+        let planted_ok = w.planted.and_then(|p| rec.map(|k| k == p.into()));
         if target_ok != r.outcome.matches_target || planted_ok != r.outcome.matches_planted {
             record_problems.push(format!("{tag}: verification does not reproduce"));
         }

@@ -1,0 +1,35 @@
+{
+  "recorded_at": "2026-11-05T17:38:59.357856+00:00",
+  "steps": [
+    {
+      "step": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-O",
+        "-C",
+        "overflow-checks=yes",
+        "--test",
+        "research/primefield-companion-followup-20261102/feature-native-adaptive-fibers/lib.rs",
+        "-o",
+        "/home/ec2-user/.cache/primefield-native-adaptive-fibers-20261105/tests"
+      ],
+      "timeout_seconds": 90,
+      "exit_code": 0
+    },
+    {
+      "step": "test",
+      "argv": [
+        "/home/ec2-user/.cache/primefield-native-adaptive-fibers-20261105/tests",
+        "--test-threads=1",
+        "--nocapture"
+      ],
+      "timeout_seconds": 60,
+      "exit_code": 0
+    }
+  ],
+  "source_lock_entries": 20,
+  "binary_sha256": "de4695274971c38bc2d1dea177bf5b8b6a56d4358a419b188d3561a7787edac4",
+  "overflow_checks": true,
+  "comparative_panel": false
+}

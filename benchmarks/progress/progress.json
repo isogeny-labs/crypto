@@ -1,16 +1,176 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261105T1526Z-c25519-multicurve-rebaseline",
+  "latest_record": "20261105T2109Z-f6-parallel-split",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 39,
+    "measured": 44,
     "open": 0
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
   "series": [
+    {
+      "better": "neutral",
+      "first": 648.2,
+      "latest": 648.2,
+      "latest_derived": {},
+      "metric": "censored_ratio_lower_bound_ic_sub6_mitm",
+      "points": [
+        {
+          "commit": "18bbecb9d758",
+          "date": "2026-11-05",
+          "derived": {},
+          "n": 48,
+          "record": "20261105T1854Z-ecbench-statistics-v2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            419.6,
+            1001.0
+          ],
+          "summary": "ecbench statistics v1 vs v2 on 5 committed sessions (14 comparisons): censoring dominates (6.98 -> >=648.2), K=2 intervals 13.1x wider, heavy-tail flag fixed for n<=4",
+          "value": 648.2
+        }
+      ],
+      "problem": "analysis:ecbench_statistics_v2",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 71.0,
+      "latest": 71.0,
+      "latest_derived": {},
+      "metric": "heavy_tail_rows_flagged_n4_before_fix",
+      "points": [
+        {
+          "commit": "18bbecb9d758",
+          "date": "2026-11-05",
+          "derived": {},
+          "n": 71,
+          "record": "20261105T1854Z-ecbench-statistics-v2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "ecbench statistics v1 vs v2 on 5 committed sessions (14 comparisons): censoring dominates (6.98 -> >=648.2), K=2 intervals 13.1x wider, heavy-tail flag fixed for n<=4",
+          "value": 71.0
+        }
+      ],
+      "problem": "analysis:ecbench_statistics_v2",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 13.1,
+      "latest": 13.1,
+      "latest_derived": {},
+      "metric": "ops_interval_width_k2_new_over_old",
+      "points": [
+        {
+          "commit": "18bbecb9d758",
+          "date": "2026-11-05",
+          "derived": {},
+          "n": 1,
+          "record": "20261105T1854Z-ecbench-statistics-v2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "ecbench statistics v1 vs v2 on 5 committed sessions (14 comparisons): censoring dominates (6.98 -> >=648.2), K=2 intervals 13.1x wider, heavy-tail flag fixed for n<=4",
+          "value": 13.1
+        }
+      ],
+      "problem": "analysis:ecbench_statistics_v2",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 31.693595555358375,
+      "latest": 31.693595555358375,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 31.47185
+      },
+      "metric": "s_prime_dgbf_w0_p32",
+      "points": [
+        {
+          "commit": "827361301c47",
+          "date": "2026-11-05",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 31.47185
+          },
+          "n": null,
+          "record": "20261105T1759Z-ic-packed-filter-p32",
+          "reference": 1.0070458230707695,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Retrospective index of the 2026-10-29 packed-filter P32 sessions (EKS c8a.2xlarge, L2); single session, not replicated. [pcc:unverified]",
+          "value": 31.693595555358375
+        }
+      ],
+      "problem": "archive:ic-packed-filter-p32-20261029",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 63.49613790555689,
+      "latest": 63.49613790555689,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 31.625534
+      },
+      "metric": "s_prime_dgbf_w1_p32",
+      "points": [
+        {
+          "commit": "827361301c47",
+          "date": "2026-11-05",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 31.625534
+          },
+          "n": null,
+          "record": "20261105T1759Z-ic-packed-filter-p32",
+          "reference": 2.00774912001418,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "Retrospective index of the 2026-10-29 packed-filter P32 sessions (EKS c8a.2xlarge, L2); single session, not replicated. [pcc:unverified]",
+          "value": 63.49613790555689
+        }
+      ],
+      "problem": "archive:ic-packed-filter-p32-20261029",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.9601,
+      "latest": 0.9601,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "wall_per_gae_filtered_over_unfiltered_p32",
+      "points": [
+        {
+          "commit": "827361301c47",
+          "date": "2026-11-05",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 288,
+          "record": "20261105T1759Z-ic-packed-filter-p32",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9569,
+            0.9633
+          ],
+          "summary": "Retrospective index of the 2026-10-29 packed-filter P32 sessions (EKS c8a.2xlarge, L2); single session, not replicated. [pcc:unverified]",
+          "value": 0.9601
+        }
+      ],
+      "problem": "archive:ic-packed-filter-p32-20261029",
+      "unit": "ratio"
+    },
     {
       "better": "neutral",
       "first": 240,
@@ -1175,6 +1335,244 @@
       ],
       "problem": "ic:curve25519-family-k32",
       "unit": "S"
+    },
+    {
+      "better": "neutral",
+      "first": 1.0,
+      "latest": 1.0,
+      "latest_derived": {},
+      "metric": "f4_control_word_xors_off_over_on",
+      "points": [
+        {
+          "commit": "647818a312a6",
+          "date": "2026-11-05",
+          "derived": {},
+          "n": 9,
+          "record": "20261105T2109Z-f6-few-candidates",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "F6-IC few-candidate closure: CPU off/on 2.67-10.29x, word XORs 1.84-10.13x on 9 Koblitz cells, verdicts identical; measured 2026-11-05T18:20Z by scripts/run_arms.sh before this record existed, the recorded command rebuilds the table from the committed raw data",
+          "value": 1.0
+        }
+      ],
+      "problem": "kernel:f6_ic_gate",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 10.29,
+      "latest": 10.29,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "f6ic_cpu_off_over_on_max",
+      "points": [
+        {
+          "commit": "647818a312a6",
+          "date": "2026-11-05",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 9,
+          "record": "20261105T2109Z-f6-few-candidates",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "F6-IC few-candidate closure: CPU off/on 2.67-10.29x, word XORs 1.84-10.13x on 9 Koblitz cells, verdicts identical; measured 2026-11-05T18:20Z by scripts/run_arms.sh before this record existed, the recorded command rebuilds the table from the committed raw data",
+          "value": 10.29
+        }
+      ],
+      "problem": "kernel:f6_ic_gate",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 2.67,
+      "latest": 2.67,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "f6ic_cpu_off_over_on_min",
+      "points": [
+        {
+          "commit": "647818a312a6",
+          "date": "2026-11-05",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 9,
+          "record": "20261105T2109Z-f6-few-candidates",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.657,
+            null
+          ],
+          "summary": "F6-IC few-candidate closure: CPU off/on 2.67-10.29x, word XORs 1.84-10.13x on 9 Koblitz cells, verdicts identical; measured 2026-11-05T18:20Z by scripts/run_arms.sh before this record existed, the recorded command rebuilds the table from the committed raw data",
+          "value": 2.67
+        }
+      ],
+      "problem": "kernel:f6_ic_gate",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.84,
+      "latest": 1.84,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "f6ic_word_xors_off_over_on_min",
+      "points": [
+        {
+          "commit": "647818a312a6",
+          "date": "2026-11-05",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 9,
+          "record": "20261105T2109Z-f6-few-candidates",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "F6-IC few-candidate closure: CPU off/on 2.67-10.29x, word XORs 1.84-10.13x on 9 Koblitz cells, verdicts identical; measured 2026-11-05T18:20Z by scripts/run_arms.sh before this record existed, the recorded command rebuilds the table from the committed raw data",
+          "value": 1.84
+        }
+      ],
+      "problem": "kernel:f6_ic_gate",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.936,
+      "latest": 0.936,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "wall_seq_over_par_decomposing_min",
+      "points": [
+        {
+          "commit": "647818a312a6",
+          "date": "2026-11-05",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 2,
+          "record": "20261105T2109Z-f6-parallel-split",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Opt-in parallel split (depth 2, 4 threads): wall 1.59-2.88x on refuting cells, 0.94/1.11x on decomposing cells, counted work 1.12-2.87x higher; measured 2026-11-05T19:11Z by scripts/run_parallel.sh before this record existed, the recorded command rebuilds the table from the committed raw data",
+          "value": 0.936
+        }
+      ],
+      "problem": "kernel:inherited_f4_solve_tree",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 2.883,
+      "latest": 2.883,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "wall_seq_over_par_refuting_max",
+      "points": [
+        {
+          "commit": "647818a312a6",
+          "date": "2026-11-05",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 7,
+          "record": "20261105T2109Z-f6-parallel-split",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Opt-in parallel split (depth 2, 4 threads): wall 1.59-2.88x on refuting cells, 0.94/1.11x on decomposing cells, counted work 1.12-2.87x higher; measured 2026-11-05T19:11Z by scripts/run_parallel.sh before this record existed, the recorded command rebuilds the table from the committed raw data",
+          "value": 2.883
+        }
+      ],
+      "problem": "kernel:inherited_f4_solve_tree",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.589,
+      "latest": 1.589,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "wall_seq_over_par_refuting_min",
+      "points": [
+        {
+          "commit": "647818a312a6",
+          "date": "2026-11-05",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 7,
+          "record": "20261105T2109Z-f6-parallel-split",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Opt-in parallel split (depth 2, 4 threads): wall 1.59-2.88x on refuting cells, 0.94/1.11x on decomposing cells, counted work 1.12-2.87x higher; measured 2026-11-05T19:11Z by scripts/run_parallel.sh before this record existed, the recorded command rebuilds the table from the committed raw data",
+          "value": 1.589
+        }
+      ],
+      "problem": "kernel:inherited_f4_solve_tree",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 2.865,
+      "latest": 2.865,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "work_par_over_seq_max",
+      "points": [
+        {
+          "commit": "647818a312a6",
+          "date": "2026-11-05",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 9,
+          "record": "20261105T2109Z-f6-parallel-split",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Opt-in parallel split (depth 2, 4 threads): wall 1.59-2.88x on refuting cells, 0.94/1.11x on decomposing cells, counted work 1.12-2.87x higher; measured 2026-11-05T19:11Z by scripts/run_parallel.sh before this record existed, the recorded command rebuilds the table from the committed raw data",
+          "value": 2.865
+        }
+      ],
+      "problem": "kernel:inherited_f4_solve_tree",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 211.0,
+      "latest": 211.0,
+      "latest_derived": {},
+      "metric": "raw_pins_reverified",
+      "points": [
+        {
+          "commit": "19b5e74b9af6",
+          "date": "2026-11-05",
+          "derived": {},
+          "n": null,
+          "record": "20261105T1826Z-ic-aimed-gather-registry-binding-20261105",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Custody rebinding of the historical aimed-gather row to this PR's registry; no measurement was rerun. [pcc:unverified]",
+          "value": 211.0
+        }
+      ],
+      "problem": "registry-rebinding:ic-aimed-gather",
+      "unit": "count"
     }
   ],
   "units": {
