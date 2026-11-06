@@ -1333,10 +1333,13 @@ What CI replays (`.github/workflows/ecbench.yml`):
   session found by schema: quarter = ISO week number mod 4, so each session
   is replayed once every 4 weeks (the step summary names the quarter and its
   session count). A session's quarter is a greedy assignment by recorded
-  solver time, computed by `.github/scripts/ecbench-replay-plan.sh`. The
+  solver time, computed by `.github/scripts/ecbench-replay-plan.sh`; when
+  sessions are added a session may move quarter, so its interval is then 3 to
+  7 weeks. The
   hash-pinned incomplete and defective sessions are not replayed; the
-  sessions in `LONG_SESSIONS.tsv` (a verified run over 5 h, too long for a
-  hosted job) are replayed only by a manual run with `long=true`. A manual
+  sessions in `LONG_SESSIONS.tsv` (a verified run over 3.5 h of recorded
+  solve wall: at the 1.4x upper replay ratio that plus setup is the 350-minute
+  job timeout) are replayed only by a manual run with `long=true`. A manual
   run takes `quarter` (0-3 or `all`).
 
 #### Replay sentinels

@@ -45,7 +45,8 @@ name: ecbench
 # other sessions: quarter = ISO week number mod 4, so each session is replayed
 # once every 4 weeks.  A session's quarter is a greedy assignment, heaviest
 # recorded solver time first into the lightest quarter (ecbench-replay-plan.sh),
-# so a new session can move others between quarters.  The step summary names
+# so when sessions are added a session may move to another quarter and its
+# replay interval is then 3 to 7 weeks.  The step summary names
 # the quarter and the session count.  workflow_dispatch takes `quarter` (0-3,
 # or all) to run a chosen one, `long` to add the long sessions, and
 # `long_runner`.
@@ -55,8 +56,10 @@ name: ecbench
 # - the owner-dispositioned defective session(s) (docs/ecbench/DEFECTIVE_SESSIONS.tsv;
 #   they fail verify by design, so the audit checks each against its pinned
 #   defect instead: docs/ecbench/DEFECTIVE_SESSIONS.md);
-# - the long sessions (docs/ecbench/LONG_SESSIONS.tsv; a verified run over 5 h
-#   cannot fit a hosted job), replayed only by workflow_dispatch long=true.
+# - the long sessions (docs/ecbench/LONG_SESSIONS.tsv; a verified run over
+#   3.5 h of recorded solve wall: at the 1.4x upper replay ratio, 3.5 h plus
+#   setup is the 350-minute job timeout, so a longer run is not sure to fit
+#   a hosted job), replayed only by workflow_dispatch long=true.
 #   A pinned hash that no longer matches, or a vanished path, fails the plan.
 on:
   pull_request:
@@ -72,7 +75,7 @@ on:
         type: string
         default: ""
       long:
-        description: "Also replay the sessions pinned in docs/ecbench/LONG_SESSIONS.tsv (a verified run over 5 h)."
+        description: "Also replay the sessions pinned in docs/ecbench/LONG_SESSIONS.tsv (a verified run over 3.5 h)."
         type: boolean
         default: false
       long_runner:
@@ -600,15 +603,14 @@ jobs:
   # replay_plan pulls every session once, weighs them by recorded solver time,
   # checks the long-session pins and writes the week's plan; exhaustive_replay
   # shards replay it, each pulling only its own sessions; long_replay replays
-  # the pinned long sessions on request.  Sizing (2026-11-06 census, 1432
-  # replayable sessions, 192 h of recorded solver time): the core is 2.9 h and
-  # each quarter 47.4 h, so a week is about 50 h of recorded solver time over 12
-  # shards (a replay costs 0.2-1.4x its record; a session replays with ~1.85
-  # of the runner's 2 vCPUs): ~29 runner-hours at 1.0x, ~39 at 1.4x, and
-  # ~2.3-3.7 h per shard at 1.0x and 3.2-5.2 h at 1.4x.  The exception is
-  # quarter 0, which holds research/gaudry_k4_char2_crossover_20261015/sessions/
-  # e-m17-rho (one 4.5 h run): its shard is 4.5 h at 1.0x and 6.3 h at 1.4x.
-  # quarter=all uses 48 shards.
+  # the pinned long sessions on request.  Sizing (2026-11-06 census, 1430
+  # replayable non-long sessions, 180 h of recorded solver time): the core is
+  # 2.9 h and each quarter 44.2 h, so a week is 47.1 h of recorded solver time
+  # over 12 shards.  A replay costs 0.2-1.4x its record and a shard replays at
+  # ~1.85 of its runner's 2 vCPUs, so with 15 min of setup the heaviest shard is
+  # 3.3 h at 1.0x and 5.0 h at 1.4x (quarter 1; the limit is 350 min = 5.8 h),
+  # and a week costs ~28 runner-hours at 1.0x and ~39 at 1.4x.  quarter=all
+  # (180 h) uses 48 shards: heaviest 5.0 h at 1.4x, ~148 runner-hours.
   replay_plan:
     if: ${{ always() && !cancelled() && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') && needs.harness.result == 'success' }}
     needs: [scope, harness]
@@ -746,9 +748,10 @@ jobs:
           chmod +x target/release/ecbench
           bash .github/scripts/ecbench-replay-sessions.sh "$RUNNER_TEMP/mine.txt"
 
-  # Sessions with a verified run over 5 h (docs/ecbench/LONG_SESSIONS.tsv) do not
-  # fit a hosted job (6 h limit; a replay costs about what the run did), so
-  # they are replayed only on request: workflow_dispatch with long=true.  Set
+  # Sessions with a verified run over 3.5 h of recorded solve wall
+  # (docs/ecbench/LONG_SESSIONS.tsv) are not sure to fit a hosted job: 3.5 h
+  # at the 1.4x upper replay ratio plus setup is the 350-minute job timeout.
+  # They are replayed only on request: workflow_dispatch with long=true.  Set
   # long_runner to a self-hosted runner label for them.
   long_replay:
     if: ${{ always() && !cancelled() && github.event_name == 'workflow_dispatch' && inputs.long && needs.harness.result == 'success' }}

@@ -7,9 +7,9 @@
 # none, its record megabytes; longest_run_ms is its longest verified run.
 #
 # LONG_SESSIONS.tsv pins (path, sha256 of the committed records file, reason,
-# longest run in seconds) every session with a verified run over 5 h.  The
+# longest run in seconds) every session with a verified run over 3.5 h.  The
 # script fails if a pinned hash no longer matches, a listed path vanished or is
-# not in the list, a listed session has no run over 5 h, or an unlisted session
+# not in the list, a listed session has no run over 3.5 h, or an unlisted session
 # has one: the weekly rotation cannot fit such a run in a hosted job.
 # Usage: ecbench-replay-weights.sh LIST [INCOMPLETE_TSV] [DEFECTIVE_TSV] [LONG_TSV] > weights.tsv
 set -euo pipefail
@@ -17,7 +17,7 @@ list=${1:?usage: ecbench-replay-weights.sh LIST [INCOMPLETE_TSV] [DEFECTIVE_TSV]
 incomplete=${2:-docs/ecbench/INCOMPLETE_SESSIONS.tsv}
 defective=${3:-docs/ecbench/DEFECTIVE_SESSIONS.tsv}
 long=${4:-docs/ecbench/LONG_SESSIONS.tsv}
-threshold_ms=18000000
+threshold_ms=12600000
 for f in "$list" "$incomplete" "$defective" "$long"; do
   test -s "$f" || { echo "::error::$f is missing or empty" >&2; exit 1; }
 done
@@ -49,7 +49,7 @@ while IFS=$'\t' read -r dir sha reason seconds extra; do
     echo "::error::long-session bytes changed: $rec" >&2; fail=1
   fi
   if [[ "$seconds" -le $((threshold_ms / 1000)) ]]; then
-    echo "::error::$dir is pinned as long but its longest run is $seconds s (threshold 18000 s)" >&2; fail=1
+    echo "::error::$dir is pinned as long but its longest run is $seconds s (threshold 12600 s = 3.5 h)" >&2; fail=1
   fi
 done < "$long"
 while IFS= read -r dir; do
@@ -65,7 +65,7 @@ while IFS= read -r dir; do
     weight=$(find "$dir" -maxdepth 1 -type f -printf '%s %f\n' | awk '{ b += ($2 ~ /\.gz$/) ? 8 * $1 : $1 } END { printf "%d", b / 1e6 + 1 }')
   fi
   if [[ "$longest" -gt "$threshold_ms" ]] && ! grep -Fxq "$dir" "$pinned"; then
-    echo "::error::$dir has a verified run of $((longest / 1000)) s, over 5 h: pin it in $long" >&2; fail=1
+    echo "::error::$dir has a verified run of $((longest / 1000)) s, over 3.5 h: pin it in $long" >&2; fail=1
   fi
   printf '%s\t%s\t%s\n' "$dir" "$weight" "$longest"
 done < "$list"
