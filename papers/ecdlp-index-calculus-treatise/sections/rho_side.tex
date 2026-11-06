@@ -109,7 +109,9 @@ $k=F+1$ against $k=1$ is the displayed quotient. Since
 $\Gamma(F+\tfrac32)/\Gamma(F+1)\sim\sqrt{F}$, the floor grows as the square
 root of the number of unknown base logarithms (this asymptotic is ours,
 not the source's). Table~\ref{tab:gf-collision} sets the model against the
-study's Monte Carlo and the lab's measured incumbent.
+study's Monte Carlo and the lab's measured incumbent, and
+Figure~\ref{fig:fr-collision}(b) plots the Monte Carlo means with
+$\pm1.96$ standard errors against $\Gamma(k+\tfrac12)/\Gamma(k)$.
 
 \begin{table}[t]
 \centering\small
@@ -194,9 +196,8 @@ collectors' number of unknown base logarithms or reconciles the two readings
 The owner's decisions of 29 October
 (\art{research/prime_ic_program_20261029/DECISIONS.md}, ruling R1) split
 prime-field index calculus into a generic and an algebraic track
-(Chapter~\ref{ch:distance}). The ruling's argument for why root finding is
-generic is worth stating because it is the template for every later
-classification. At $m=2$, \texttt{rootfind-subtract} fixes $x_1=c$ for each
+(Chapter~\ref{ch:distance}). The ruling's argument that root finding is
+generic is the template for every later classification. At $m=2$, \texttt{rootfind-subtract} fixes $x_1=c$ for each
 $c$ in the base, solves the remaining quadratic $\Sem3(c,X,x_R)$ through
 its roots $x(R\mp P_c)$, and tests each root against a hash index of the
 base. It returns the solution set a Gr\"obner solve of
@@ -477,12 +478,11 @@ every reference at once.
 
 The validation gate of \S\ref{sec:gate} asks every row for ``a matched rho
 reference: the strongest available, in the same unit and the same binary,
-priced across the band''. This chapter asks how well that reference is
-known: whether ecbench charges rho what theory says, how large its
-finite-size bias is, which rho wins among the references once the band is
-applied to them, which earlier references were weaker than they looked,
-and how the strong Koblitz reference was engineered and checked. It
-complements \S\ref{sec:ecbench} and \S\ref{sec:band}, which define the
+priced across the band''. The sections below record how well that
+reference is known: ecbench's charge against analytic constants, the
+finite-size bias, the order of the references across the band, the
+references that were weaker than recorded, and the engineering and checks
+of the strong Koblitz reference. They complement \S\ref{sec:ecbench} and \S\ref{sec:band}, which define the
 instrument and the band, and Chapter~\ref{ch:audit}, which lists the
 corrections that matching forced on index-calculus rows.
 
@@ -530,6 +530,10 @@ A follow-up on fresh targets traced both to sample size.
 \begin{itemize}
 \item \emph{Rho's spread.} A rho run's cost has a coefficient of
   variation near $0.5$, so a 24-run mean moves about $\pm20\%$ at $95\%$.
+  The negation audit's 256 runs per arm give $0.507$ (negation) and $0.501$
+  (plain), against $\sqrt{4/\pi-1}=0.523$ for the first collision of the
+  Poisson model (computed by \art{figures/make_fig_fr_collision.py};
+  Figure~\ref{fig:fr-collision}).
   The $[0.85,1.35]$ band had been set on a point estimate without that
   spread; the interval contained the theory constant throughout.
 \item \emph{The kangaroo is deterministic per target.} The three rounds of
@@ -566,6 +570,55 @@ bookkeeping, walk starts), which is a visible share of a toy solve.
   and the strong Koblitz rho $1.089$ $[0.927,1.261]$ on the medium tier
   (\texttt{ECBND1hcf69c27b4978}).
 \end{itemize}
+\paragraph{The matched walk on its evaluation ladder.} The matched
+reference of leaderboard Table~B was built on 23 September
+(\art{research/ic_rho_reference_20260923/}) and evaluated on 16 fresh curves
+(seed \texttt{0xE7A1}), 128 runs per walk; every one of the study's
+$21{,}096$ runs verified, with 88 walks abandoned and restarted.
+Table~\ref{tab:fr-rholadder} and Figure~\ref{fig:fr-rholadder} give every
+curve.
+\begin{itemize}
+\item The frozen plain walk used through \S17 of the boundary ledger (16
+  jumps, two scalar multiplications per walk start, distinguished points
+  every $\sqrt r/8$) costs $2.27$--$21.10$ per $\sqrt r$.
+\item The matched negation walk (stride starts, distinguished points every
+  $r^{1/4}$, a jump table sized to $r$) costs $0.98$--$3.17$, and its walk
+  alone is $1.02$--$1.73\times$ its own floor, largest at the smallest sizes.
+\item The tuned plain walk over the negation walk is $1.10$--$1.45$ per
+  curve; pooled from $2^{20}$ it is $1.362$ $[1.296,1.430]$, with $\sqrt2$
+  inside.
+\item Exponent fits over all eight sizes per regime are below $\tfrac12$
+  (negation: $0.394$ prime, $0.397$ binary), the set-up effect above.
+\end{itemize}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-fr-rholadder.pdf}
+\caption[]{The matched rho reference on its 16-curve evaluation ladder.
+(a) Mean $S$ (GAE per $\sqrt r$, 128 runs) of the frozen plain walk, the
+tuned plain walk and the negation-map walk; dotted lines: the plain and
+negation floors $\sqrt{\pi/2}$ and $\sqrt{\pi/4}$. (b) Tuned-plain walk over
+negation walk per curve, against $\sqrt2$ (dashed). Data:
+\art{figures/data-fr-rholadder.json}, from
+\art{research/ic_rho_reference_20260923/analysis.json}
+(\texttt{tables.ladder}).}
+\label{fig:fr-rholadder}
+\end{figure}
+
+\begin{table}[t]
+\centering\scriptsize
+\setlength{\tabcolsep}{3pt}
+\input{figures/tab-fr-rholadder}
+\caption[]{The matched rho reference's evaluation ladder, every curve.
+$J$: jumps in the tuned walks' table. Frozen, tuned plain, negation: mean
+$S$ in GAE per $\sqrt r$ over 128 runs, whole solve; neg.\ median: median
+$S$ of the negation walk. Neg.\ walk/floor: the negation walk's steps over
+$\sqrt{\pi r/4}$. Plain/neg.\ walk: tuned plain walk over negation walk.
+Source: \art{research/ic_rho_reference_20260923/analysis.json}. Data:
+\art{figures/data-fr-rholadder.json}.}
+\label{tab:fr-rholadder}
+\end{table}
+
 The toy excess therefore shrinks at medium size, as fixed set-up predicts,
 but this is descriptive: no prime medium-tier rho bound exists in the plain
 ECDLP domains of the frontier. Medium-tier \texttt{rho.negation} bounds
@@ -691,6 +744,13 @@ weaker than the negation walk.
   inside the interval.
 \item \emph{Little of it reaches wall time} in ecbench's implementation:
   the median paired wall ratio is $1.140$ (L0, descriptive).
+\item \emph{Per curve and per run} (Table~\ref{tab:fr-negaudit},
+  Figure~\ref{fig:fr-collision}): the negation walk costs $0.953$--$1.016$
+  and the plain walk $1.235$--$1.468$ at $w=0$; per-run cost follows the
+  first-collision law of the Poisson model, shifted up by the walk's
+  overhead (means $0.980$ and $1.343$ against $0.886$ and $1.253$). At
+  $w=1$ the negation walk costs $1.892$--$2.029$, above plain on all four
+  curves, so the band leaves the order unresolved on each.
 \item \emph{\texttt{volcano-rho}.} On a 36-bit curve, 256 solves per arm,
   off over on is about $1.40$ pooled over five arms, at $9$--$16\%$ more
   nanoseconds per iteration (an extra branch, a field negation and a
@@ -704,6 +764,44 @@ An earlier fix in the collaborative walker
 negation-map 2-cycle test compared an unflipped sum with a normalised
 point and never fired; dead trails fell from 353 to 16 across three
 curves once it compared after the flip.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-fr-collision.pdf}
+\caption[]{Rho's collisions against the Gamma floor. (a) Per-run cost of
+the negation-map and plain walks in the negation audit (256 runs each, four
+prime-order curves of 28--40 bits, L0) against the first-collision law of
+the Poisson model: $\Pr[S\le s]=1-e^{-s^2}$ on $r/2$ negation classes and
+$1-e^{-s^2/2}$ on $r$ points (dashed; means $\sqrt{\pi/4}$ and
+$\sqrt{\pi/2}$). (b) Monte Carlo mean of the $k$-th collision over $\sqrt r$
+(4{,}000 trials, $r=131{,}203$) with $\pm1.96$ standard errors, against
+$\Gamma(k+\tfrac12)/\Gamma(k)$ (Proposition~\ref{prop:collisionfloor}).
+(c) Mean $S$ per curve at $w=0$, $0.1$ and~1 GAE per unpriced
+canonicalisation; plain rho has none, so its three points coincide. Model
+curves computed by \art{figures/make_fig_fr_collision.py}. Data:
+\art{figures/data-fr-collision.json}, from
+\art{research/rho_negation_audit_20261020/} (\texttt{comparisons},
+\texttt{band.json}) and
+\art{research/curve25519_rho_parity_bound_20261104/data/sim.json}.}
+\label{fig:fr-collision}
+\end{figure}
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{3.5pt}
+\input{figures/tab-fr-negaudit}
+\caption[]{The negation-map audit, per curve: 64 verified runs per arm and
+curve, one session (\texttt{ECBS1h83b97eccdcda}, L0). Mean $S$ in GAE per
+$\sqrt r$ with its 95\% interval; $S$/theory against $\sqrt{\pi/4}$ and
+$\sqrt{\pi/2}$; wall: median ms per solve. $w$ columns: mean $S$ with each
+unpriced canonicalisation charged $w$ GAE. Plain/neg.: paired ratio,
+cluster 95\% interval. Sources:
+\art{research/rho_negation_audit_20261020/table.md},
+\art{research/rho_negation_audit_20261020/band.json},
+\art{research/rho_negation_audit_20261020/sessions/negation_vs_plain/comparisons/rho-neg__rho-plain.json}.
+Data: \art{figures/data-fr-collision.json}.}
+\label{tab:fr-negaudit}
+\end{table}
 
 \paragraph{References that were not the strongest.} A register item of the
 repair framework (\art{research/r12_rho_ns_per_step_20261026/}) listed every
@@ -752,7 +850,7 @@ and its findings contradict the native speed-up). $^{a}$From the \texttt{main} o
 \label{tab:mr-rounds}
 \end{table}
 
-The assurance round's Q3 profile is the reason the rounds were worth doing:
+The assurance round's Q3 profile motivated the rounds:
 one step cost $1{,}196$ instructions, about 57 field multiplications,
 against a floor near six or seven, and half of it was canonicalisation. A
 separate optimisation of ecbench's standing method
@@ -861,11 +959,10 @@ custody record is still required.
 
 \chapter{Walk design, memory and many targets}\label{ch:rhovariants}
 
-This chapter collects the variations of rho the programme measured: walks
+The variations of rho the programme measured are: walks
 on automorphism classes, the iteration function, rho across isogenous
 curves and on Jacobians, the memory-heavy generic methods, many-target and
-advice-table rho, and rho at deployed scale. Each matters to index
-calculus in the same way: it moves the reference.
+advice-table rho, and rho at deployed scale. Each moves the reference against which index calculus is ranked.
 
 \section{Automorphism classes}\label{sec:rv-aut}
 

@@ -1,0 +1,146 @@
+{
+  "branch": "claude/p224-cheon-ecbench-10gpep",
+  "closed_utc": "2026-11-06T04:54:44+00:00",
+  "commands": [
+    {
+      "argv": [
+        "sh",
+        "-c",
+        "sh research/cheon_ecbench_medium_20261106/compare.sh > research/cheon_ecbench_medium_20261106/results-p1.jsonl"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-06T04:54:22+00:00",
+      "wall_s": 0.097
+    },
+    {
+      "argv": [
+        "sh",
+        "research/cheon_ecbench_medium_20261106/fit.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-06T04:54:22+00:00",
+      "wall_s": 1.519
+    }
+  ],
+  "commit": "b83ccff8cee80ddab1ea3d87bf5b65d2a156682c",
+  "commit_dirty": true,
+  "created_utc": "2026-11-06T04:54:22+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v242-x86_64-with-glibc2.39"
+  },
+  "id": "20261106T0454Z-cheon-ecbench-medium",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 48,
+      "name": "s_w0_cheon_pminus1_comb",
+      "note": "bound ECBND1h9b939ef3e3a4 (whole session, fit v2, ranked by frontier procedure 2); DLPwAI, static-DH oracle queries outside the unit",
+      "reference": 0.9871650926626283,
+      "reference_kind": "matched_rho",
+      "spread": [
+        0.44931907106131447,
+        0.721552417500526
+      ],
+      "unit": "S",
+      "value": 0.5739107759707482
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 48,
+      "name": "s_w0_cheon_pplus1_comb",
+      "note": "bound ECBND1h946fa2347b66 (whole session, fit v2, ranked by frontier procedure 2); DLPwAI, static-DH oracle queries outside the unit",
+      "reference": 1.0127298580918396,
+      "reference_kind": "matched_rho",
+      "spread": [
+        0.417457320165278,
+        0.7720462475136465
+      ],
+      "unit": "S",
+      "value": 0.5818646872479218
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 40,
+      "name": "s_w0_cheon_pminus1_naive",
+      "note": "bound ECBND1h7d73ad979cf9 (whole session, fit v2, ranked by frontier procedure 2); DLPwAI, static-DH oracle queries outside the unit",
+      "reference": 1.0548020315196973,
+      "reference_kind": "matched_rho",
+      "spread": [
+        9.38166820996826,
+        14.909373833480435
+      ],
+      "unit": "S",
+      "value": 12.242619090615317
+    }
+  ],
+  "problem": "dlpwai:static-dh-p224-shape",
+  "raw": [
+    {
+      "bytes": 665730,
+      "path": "research/cheon_ecbench_medium_20261106/sessions/minus-20261106/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/db/dbc73b0476f02927d3786440b014ee983dd3bf5db6cae43d3826de98476bfd71",
+      "sha256": "dbc73b0476f02927d3786440b014ee983dd3bf5db6cae43d3826de98476bfd71",
+      "uploaded": false
+    },
+    {
+      "bytes": 542035,
+      "path": "research/cheon_ecbench_medium_20261106/sessions/minus-naive-20261106/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c5/c53dae9fcb6fb9e29d86685da508def52f5f1c625df246684159fb5c29d8b624",
+      "sha256": "c53dae9fcb6fb9e29d86685da508def52f5f1c625df246684159fb5c29d8b624",
+      "uploaded": false
+    },
+    {
+      "bytes": 693226,
+      "path": "research/cheon_ecbench_medium_20261106/sessions/plus-20261106/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/f5/f54b6ca1958df07b70819972802cad215f9a14be5e597f7a32f65a6a43b2b1e6",
+      "sha256": "f54b6ca1958df07b70819972802cad215f9a14be5e597f7a32f65a6a43b2b1e6",
+      "uploaded": false
+    },
+    {
+      "bytes": 13357,
+      "path": "research/cheon_ecbench_medium_20261106/sessions/minus-20261106.audit.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/91/91b8644598434800d4c5205a6f1df052a58262608ee8afde384c3fefc894a287",
+      "sha256": "91b8644598434800d4c5205a6f1df052a58262608ee8afde384c3fefc894a287",
+      "uploaded": false
+    },
+    {
+      "bytes": 11373,
+      "path": "research/cheon_ecbench_medium_20261106/sessions/minus-naive-20261106.audit.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d7/d76b80e728e415725698b32c80b4dee1100727eba080a62d922483a2eb6027e4",
+      "sha256": "d76b80e728e415725698b32c80b4dee1100727eba080a62d922483a2eb6027e4",
+      "uploaded": false
+    },
+    {
+      "bytes": 13357,
+      "path": "research/cheon_ecbench_medium_20261106/sessions/plus-20261106.audit.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/59/59baa234ed6a2f9d012aaf21f40e1f6c630c36e4f4d8508fb56352277e4862b0",
+      "sha256": "59baa234ed6a2f9d012aaf21f40e1f6c630c36e4f4d8508fb56352277e4862b0",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/cheon_ecbench_medium_20261106/report.pdf",
+    "png": [],
+    "svg": [
+      "research/cheon_ecbench_medium_20261106/ranks.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "cheon-ecbench-medium",
+  "status": "measured",
+  "summary": "Medium-tier re-run of the Cheon ecbench sessions (PROTOCOL frozen in b83ccff8ce): ECBS1he3401ce241ca, ECBS1hb3aa04e7a9c6, ECBS1h64874297871c, 272 runs, all replayed by ecbench verify --replay-all; counts identical run for run to research/cheon_ecbench_20261022; the 18 whole-session fit-v2 bounds are ranked by frontier procedure 2",
+  "validation": null
+}

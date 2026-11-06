@@ -467,6 +467,75 @@ p37, and \texttt{res1dp} at $2.13$, $2.14$, $2.22$ and $2.03$, $2.04$,
 $2.07$. Between \texttt{eq} and \texttt{dp} the order is unresolved inside
 the band: \texttt{eq} is lower at $w=0$, \texttt{dp} at $w=1$.
 
+Table~\ref{tab:pf-residual-cells} gives every cell of the 1 November
+study, and Figure~\ref{fig:pf-residual} plots the distance to rho. Each
+arm has 48 pairs (16 targets, three rounds) against \texttt{rho.negation}
+in the same session; rho's mean $S$ is $0.929$ on p36 and $0.930$ on p37.
+At $w=0$ every interval lies above 1. With the byte counter excluded
+(validator finding F1), the plain and \texttt{dp} arms are flat in $w$,
+and the \texttt{eq} arms rise to $2.6$--$4.5\times$ at $w=1$. Charging rho
+one distinguished-point test per step (finding F2) lowers every $w=1$
+distance; \texttt{res1dp} on p37 is the lowest at $1.398$, still above 1.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-pf-residual.pdf}
+\caption[]{Residual collectors over matched negation rho on p36 and p37,
+48 pairs per arm. Filled: $w=0$ with the harness's 95\% linearised-$t$
+interval over 16 targets. Open triangles: $w=1$ with the table-byte
+counter excluded (validator recomputation). Crosses: $w=1$ as built, with
+the byte counter priced as operations; these values are withdrawn
+(\S\ref{sec:pg-bytes}). Dashed: parity with rho. Data
+\art{figures/data-pf-residual.json} from
+\art{research/ic_residual_dp_eq_20261101/sessions/*/comparisons/rho__*.json}
+and \art{benchmarks/20261101-ic-residual-dp-eq/validator-report.json}.}
+\label{fig:pf-residual}
+\end{figure}
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}llrrrrr@{}}
+\toprule
+Curve ($\log_2 r$) & Arm & $S$ ($w=0$) & arm/rho, $w=0$ $[95\%]$ & $w=1$ built & $w=1$ ex-bytes & $w=1$ rho$+$DP \\
+\midrule
+p36 (36.00) & \texttt{res4} & $3.692$ & $3.972$ $[3.375,4.675]$ & $51.57$ & $3.971$ & $34.794$ \\
+ & \texttt{res2} & $2.901$ & $3.121$ $[2.632,3.701]$ & $28.04$ & $3.119$ & $18.919$ \\
+ & \texttt{res1} & $2.245$ & $2.415$ $[1.924,3.032]$ & $16.87$ & $2.414$ & $11.383$ \\
+ & \texttt{res4dp} & $3.214$ & $3.458$ $[2.892,4.135]$ & $3.77$ & $3.453$ & $2.546$ \\
+ & \texttt{res2dp} & $2.432$ & $2.616$ $[2.202,3.109]$ & $2.77$ & $2.612$ & $1.871$ \\
+ & \texttt{res1dp} & $1.976$ & $2.126$ $[1.800,2.510]$ & $2.22$ & $2.121$ & $1.497$ \\
+ & \texttt{res4eq} & $2.506$ & $2.696$ $[2.294,3.169]$ & $4.76$ & $4.524$ & $3.213$ \\
+ & \texttt{res2eq} & $1.897$ & $2.041$ $[1.683,2.475]$ & $3.56$ & $3.435$ & $2.399$ \\
+ & \texttt{res1eq} & $1.434$ & $1.542$ $[1.313,1.811]$ & $2.66$ & $2.595$ & $1.798$ \\
+\addlinespace
+p37 (36.25) & \texttt{res4} & $3.721$ & $3.999$ $[3.319,4.819]$ & $51.92$ & $3.998$ & $35.035$ \\
+ & \texttt{res2} & $2.700$ & $2.902$ $[2.329,3.616]$ & $26.07$ & $2.901$ & $17.594$ \\
+ & \texttt{res1} & $2.313$ & $2.486$ $[2.046,3.020]$ & $17.37$ & $2.484$ & $11.719$ \\
+ & \texttt{res4dp} & $3.331$ & $3.580$ $[2.911,4.403]$ & $3.74$ & $3.577$ & $2.526$ \\
+ & \texttt{res2dp} & $2.542$ & $2.732$ $[2.267,3.292]$ & $2.81$ & $2.729$ & $1.898$ \\
+ & \texttt{res1dp} & $1.887$ & $2.028$ $[1.634,2.517]$ & $2.07$ & $2.025$ & $1.398$ \\
+ & \texttt{res4eq} & $2.454$ & $2.637$ $[2.180,3.192]$ & $4.58$ & $4.466$ & $3.093$ \\
+ & \texttt{res2eq} & $1.813$ & $1.949$ $[1.594,2.383]$ & $3.36$ & $3.307$ & $2.270$ \\
+ & \texttt{res1eq} & $1.526$ & $1.640$ $[1.315,2.045]$ & $2.83$ & $2.790$ & $1.907$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Residual collectors against matched \texttt{rho.negation}, per
+cell (curve, arm), 48 of 48 pairs verified in each. arm/rho: ratio of
+total counted cost, with the harness's linearised-$t$ interval over 16
+target clusters. $w=1$ built: the band as built, which prices
+\texttt{residual\_table\_bytes\_uncharged} as operations (withdrawn).
+ex-bytes: the validator's recomputation without that counter. rho$+$DP:
+the as-built band with rho also charged one distinguished-point test per
+step (validator finding F2). Standing: the evidence directory has a
+replay certificate, a passing validator report and a
+\texttt{VALIDATION.json} whose band names \texttt{res1eq} against rho; it
+is not an admitted leaderboard row and has no \texttt{pcc} claim. Sources:
+\art{research/ic_residual_dp_eq_20261101/sessions/E-p3{6,7}/comparisons/},
+\art{benchmarks/20261101-ic-residual-dp-eq/validator-report.json};
+extracted in \art{figures/data-pf-residual.json}.}
+\label{tab:pf-residual-cells}
+\end{table}
+
 \paragraph{Scale.} On p36, p40 and p42 (\art{research/ic_residual_scale_20261101/};
 three sessions of 288 records, 863 verified, one baseline run exhausted at
 $10^8$ trials) the distance of \texttt{res1eq} to matched rho is $1.32$,
@@ -526,13 +595,51 @@ studies carry a dated note and the re-run comparisons under
 \item \emph{The rule C1 of the scale study is met in 2 of 8 cells, not 6 of
   8.} The equivariant arm fails all four cells at $w=1$, where its interval
   reaches or crosses 1 (p40 \texttt{res1eq} $1.181$ $[0.859,1.625]$).
-\item \emph{An unreconciled tally.} The 1 November errata give the 12-cell
-  C1 tally as 9 of 12; the study's own \texttt{analysis/summary.json} gives
-  8 of 12 as built. Nobody has reconciled the ninth cell.
+\item \emph{The 12-cell C1 tally.} The study's own
+  \texttt{analysis/summary.json} gives 9 of 12 cells as built (all six
+  \texttt{eq} cells; \texttt{dp} fails on p36 \texttt{res1dp}, p37
+  \texttt{res2dp} and p37 \texttt{res4dp}). The validator's own bootstrap
+  gives 10 of 12; the difference is p37 \texttt{res4dp}, whose harness
+  upper limit is $1.002$ (validator finding F4). Every \texttt{eq} cell
+  fails at $w=1$ once the byte counter is excluded
+  (Table~\ref{tab:pf-residual-base}).
 \item \emph{What stands.} $w=0$ results, the leaderboard's $2.59\times$,
   every verification, audit and A/A result, and the absence of growth of the
   distance with $r$.
 \end{itemize}
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}llrrrr@{}}
+\toprule
+Curve & Candidate/baseline & $w=0$ $[95\%]$ & $w=0.1$ ex-bytes & $w=1$ built & $w=1$ ex-bytes \\
+\midrule
+p36 & \texttt{res1dp}/\texttt{res1} & $0.880$ $[0.761,1.010]$ & $0.880$ & $0.132$ & $0.879$ \\
+p36 & \texttt{res1eq}/\texttt{res1} & $0.639$ $[0.569,0.722]$ & $0.718$ & $0.158$ & $1.075$ \\
+p36 & \texttt{res2dp}/\texttt{res2} & $0.838$ $[0.785,0.899]$ & $0.838$ & $0.099$ & $0.837$ \\
+p36 & \texttt{res2eq}/\texttt{res2} & $0.654$ $[0.592,0.718]$ & $0.735$ & $0.127$ & $1.101$ \\
+p36 & \texttt{res4dp}/\texttt{res4} & $0.871$ $[0.801,0.960]$ & $0.870$ & $0.073$ & $0.870$ \\
+p36 & \texttt{res4eq}/\texttt{res4} & $0.679$ $[0.620,0.743]$ & $0.762$ & $0.092$ & $1.139$ \\
+p37 & \texttt{res1dp}/\texttt{res1} & $0.816$ $[0.694,0.957]$ & $0.816$ & $0.119$ & $0.815$ \\
+p37 & \texttt{res1eq}/\texttt{res1} & $0.660$ $[0.569,0.768]$ & $0.744$ & $0.163$ & $1.123$ \\
+p37 & \texttt{res2dp}/\texttt{res2} & $0.941$ $[0.835,1.070]$ & $0.941$ & $0.108$ & $0.941$ \\
+p37 & \texttt{res2eq}/\texttt{res2} & $0.671$ $[0.570,0.787]$ & $0.757$ & $0.129$ & $1.140$ \\
+p37 & \texttt{res4dp}/\texttt{res4} & $0.895$ $[0.810,0.993]$ & $0.895$ & $0.072$ & $0.895$ \\
+p37 & \texttt{res4eq}/\texttt{res4} & $0.660$ $[0.599,0.728]$ & $0.743$ & $0.088$ & $1.117$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Candidate over baseline in the 1 November residual study, per
+(curve, base size, candidate) cell, 48 pairs each. $w=0$: ratio of total
+counted cost with the validator's target-clustered percentile bootstrap
+(16 clusters, 4{,}000 resamples). ex-bytes: the validator's recomputation
+with \texttt{residual\_table\_bytes\_uncharged} excluded. $w=1$ built:
+the band as built (withdrawn). Source:
+\art{benchmarks/20261101-ic-residual-dp-eq/validator-report.json}
+(\texttt{c1\_interval\_check\_validator},
+\texttt{sensitivity\_candidate\_vs\_baseline\_ratio\_b\_over\_a});
+extracted in \art{figures/data-pf-residual.json}.}
+\label{tab:pf-residual-base}
+\end{table}
+
 A second byte counter, \texttt{factor\_base\_vec\_bytes\_floor\_uncharged},
 is priced the same way in the Koblitz sessions, at $0.4$--$12\%$ of $S$ at
 $w=1$; no Koblitz verdict changes direction. The 1 November evidence
@@ -1059,7 +1166,7 @@ benchmark has launched, and the paper's 11--22-bit ladder was not
 reproduced. The obstruction record
 \art{problems/aps-single-relation-complete-cost.md} lists what a complete
 cost needs. The four leads of 5 November (a nonhorizontal line chart
-$U=t^2$, $V=c/t$ with $H_{U,V}(X)=X^3-U(X+V)^2+aX+b$; F4 trace reuse across
+$U=t^2$, $V=c/t$ with $H_{U,V}(X)=X^3-U(X+V)^2+aX+b$; F4 trace reuse~\cite{jouxvitse2011f4} across
 attempts; incremental factor-base frontiers; unequal partition profiles)
 are hypotheses with no implementation, filed as \texttt{PCC-20261105-aca921}
 and \texttt{PCC-20261105-ac1e93}, both of unverified standing. The APS
