@@ -1,0 +1,53 @@
+file	kind	what	source_path	verified
+sections/distance.tex	figure	fig:fr-leaderboard: all 28 board rows, ratio to reference with CI; Table B across band w=0/0.1/1 and extended	docs/ic/leaderboard.json; research/ic_validation_gate_20261024/B/rho-reference.json	yes
+sections/distance.tex	table	tab:fr-boardB: 13 Table B rows, S_IC, S_rho, ratio, ratio vs frozen rho, band w=0/0.1/1, extended w=1	docs/ic/leaderboard.json; research/ic_validation_gate_20261024/B/rho-reference.json; research/ic_rho_reference_20260923/analysis.json	yes
+sections/distance.tex	table	tab:fr-boardA: 6 Table A rows, ratio [CI], S23 before, online speed-up [CI], break-even, canonical step; band degenerate per v7 VALIDATION.json	docs/ic/leaderboard.json; research/ic_tool_program/rule/v7/VALIDATION.json	yes
+sections/distance.tex	table	tab:fr-boardC: 9 Table C rows (pre-gate), ratio [CI], before, speed-up [CI], base; band not computable	docs/ic/leaderboard.json; research/ic_validation_gate_20261024/C/rho-reference-assessment.json	yes
+sections/distance.tex	text	new section sec:dist-board describing the 28 rows (ranges copied from the tables)	docs/ic/leaderboard.json	yes
+sections/distance.tex	figure	fig:fr-rule: rule v3,v4,v6,v7,v8,v8c cold ratio with CI and canonical-step gap per cell	research/ic_tool_program/rule/{v3,v4,v6,v7,v8,v8c}/analysis.json	yes
+sections/distance.tex	table	tab:fr-rule: cold ratio [CI] per cell x version plus slope [CI]	research/ic_tool_program/rule/*/analysis.json	yes
+sections/distance.tex	table	tab:fr-rulecanon: canonical-step gap per cell x version (v4 with CI)	research/ic_tool_program/rule/*/analysis.json	yes
+sections/distance.tex	text	paragraph: v8/v8c 1.30-1.58, v8/v7 1.36-1.67, canonical v8/v8c 0.99-1.02 (computed by make_tab_fr.py); no v5 directory	research/ic_tool_program/rule/*/analysis.json	yes
+sections/distance.tex	slop	intro rewritten: removed narration (This chapter gives ...)	-	yes
+sections/rho_side.tex	figure	fig:fr-rholadder: frozen/tuned-plain/negation S on 16 fresh curves with floors; plain/neg walk vs sqrt2	research/ic_rho_reference_20260923/analysis.json	yes
+sections/rho_side.tex	table	tab:fr-rholadder: 16 ladder curves, J, frozen, tuned plain, negation mean and median S, walk/floor, plain/neg	research/ic_rho_reference_20260923/analysis.json	yes
+sections/rho_side.tex	text	paragraph on the matched walk ladder (21096 runs, 88 abandoned, ranges, pooled sqrt2 1.362 [1.296,1.430], fits 0.394/0.397)	research/ic_rho_reference_20260923/analysis.json; README.md	yes
+sections/rho_side.tex	figure	fig:fr-collision: per-run S ECDF (256+256 runs) vs Poisson first-collision law; MC k-th collision vs Gamma; band per curve	research/rho_negation_audit_20261020/sessions/negation_vs_plain/comparisons/rho-neg__rho-plain.json; band.json; research/curve25519_rho_parity_bound_20261104/data/sim.json	yes
+sections/rho_side.tex	table	tab:fr-negaudit: 4 curves x 2 arms mean S [CI], S/theory, wall, band w=0/0.1/1, paired plain/neg [CI], pooled	research/rho_negation_audit_20261020/table.md; band.json; comparisons/rho-neg__rho-plain.json	yes
+sections/rho_side.tex	text	CV of per-run cost 0.507/0.501 vs model 0.523 (computed by make_fig_fr_collision.py); per-curve bullet in negation audit; pointer to fig panel (b) in collision floor section	research/rho_negation_audit_20261020/	yes
+sections/audit.tex	table	tab:fr-reprice: 19 round-5 boundary rows, frozen vs matched rho S and ratios	research/ic_rho_reference_20260923/analysis.json	yes
+sections/audit.tex	text	paragraph 3a: re-pricing ranges ladder 0.84-15.96 -> 5.47-38.21, headline, holdout; 616 replayed runs	research/ic_rho_reference_20260923/analysis.json; README.md	yes
+sections/audit.tex	table	tab:fr-benchcount: 145 admitted benchmark rows by date and gate standing (20 linked, 112 pre-gate, 13 neither)	benchmarks/README.md; benchmarks/PRE_GATE.json	yes
+sections/audit.tex	table	tab:fr-bench: 15 IC rows with linked VALIDATION.json and their stated distance to rho (excerpts, numbers machine-checked against the row)	benchmarks/README.md	yes
+sections/audit.tex	text	paragraph on the benchmarks table (13 rows rho ahead, genus-3 unresolved, JV Hilbert-stop slope only)	benchmarks/README.md	yes
+sections/summer.tex	table	tab:fr-julsep: decisions by verdict class x month incl. Oct-dated, experiments, run dirs	research/ecdlp_jul_sep_index_20261029/SUMMARY.json	yes
+sections/summer.tex	text	correction: 561 approve -> 558, 267 revise -> 265 (old figures included the 7 Oct-dated decisions); "about 157" outcomes -> 152 exact + 7 suffixed	research/ecdlp_jul_sep_index_20261029/SUMMARY.json	yes
+sections/summer.tex	text	correction: INDEX.json/INDEX.tsv are not committed (gitignored, artefact store per .artifacts.json); citations now name SUMMARY.json and the artefact store	research/ecdlp_jul_sep_index_20261029/.gitignore; .artifacts.json	yes
+sections/prog_frontier.tex	slop	'Free relations---root-table self-collisions used as\nhomogeneous rows--' -> 'Free relations (root-table self-collisions used as\nhomogeneous rows) a'	-	yes
+sections/prog_frontier.tex	slop	"slope $-0.248$ in $\\log_2 n$---Gaudry's $n^{-1/4}$---and" -> "slope $-0.248$ in $\\log_2 n$ (Gaudry's $n^{-1/4}$) and"	-	yes
+sections/prog_frontier.tex	slop	'named then---the Weil-descent cell\n$(m,\\ell)=(4,6)$ and the PKM tower ' -> 'named then (the Weil-descent cell\n$(m,\\ell)=(4,6)$ and the PKM tower a'	-	yes
+sections/prog_frontier.tex	slop	'maps of known logarithm---the Frobenius $\\tau$ on a Koblitz curve, the' -> 'maps of known logarithm (the Frobenius $\\tau$ on a Koblitz curve, the\n'	-	yes
+sections/prog_frontier.tex	slop	'passed---every counted field replays identically, every scalar checks ' -> 'passed: every counted field replays identically, every scalar checks i'	-	yes
+sections/prog_frontier.tex	slop	'untouched---relation yield, factor-base size, linear algebra, table\nse' -> 'untouched (relation yield, factor-base size, linear algebra, table\nset'	-	yes
+sections/prog_frontier.tex	slop	'bound---two sizes cannot establish an exponent;' -> 'bound, since two sizes cannot establish an exponent;'	-	yes
+sections/prog_frontier.tex	slop	'To replace it we ran one\ncampaign' -> 'It was replaced by one\ncampaign'	-	yes
+sections/prog_frontier.tex	slop	'same period as a ratchet of incumbents; this section keeps to what mov' -> 'same period as a ratchet of incumbents; the rows here are those that m'	-	yes
+sections/prog_frontier.tex	slop	'and (viii) is worth\nless than it looked for the binary question,' -> 'and (viii) bears\nless on the binary question than it first appeared,'	-	yes
+sections/summer.tex	slop	'showed no robust\ngain' -> 'showed no consistent\ngain'	-	yes
+sections/rho_side.tex	slop	"The ruling's argument for why root finding is\ngeneric is worth stating" -> "The ruling's argument that root finding is\ngeneric is the template for"	-	yes
+sections/rho_side.tex	slop	"priced across the band''. This chapter asks how well that reference is" -> "priced across the band''. The sections below record how well that\nrefe"	-	yes
+sections/rho_side.tex	slop	"The assurance round's Q3 profile is the reason the rounds were worth d" -> "The assurance round's Q3 profile motivated the rounds:\none step cost"	-	yes
+sections/rho_side.tex	slop	'This chapter collects the variations of rho the programme measured: wa' -> 'The variations of rho the programme measured are: walks'	-	yes
+sections/rho_side.tex	slop	'Each matters to index\ncalculus in the same way: it moves the reference' -> 'Each moves the reference against which index calculus is ranked.'	-	yes
+sections/audit.tex	slop	'A ratchet is worth only as much as its pawl. Several recorded results ' -> 'Several recorded results were'	-	yes
+sections/audit.tex	slop	'Most corrections in this chapter moved' -> 'Most corrections below moved'	-	yes
+sections/unconventional.tex	slop	'This chapter maps the family, with one table of verdicts and standing,' -> 'The family is mapped below, with one table of verdicts and standing,\nf'	-	yes
+sections/unconventional.tex	slop	'The key step is Lemma~3' -> 'The step that carries the argument is Lemma~3'	-	yes
+sections/unconventional.tex	slop	'This chapter gives the full account of\nwhat the programme built and le' -> 'What the programme built and learned on that route:'	-	yes
+sections/unconventional.tex	slop	'This section is the full account: it gives the standing per lead,\nwhat' -> 'The standing per lead, what the leads measured and why six were refute'	-	yes
+sections/unconventional.tex	slop	'The other five run\nleads carry numbers that are worth keeping as harne' -> 'The other five run\nleads carry numbers kept as harness constants.'	-	yes
+sections/unconventional.tex	slop	'This chapter collects three kinds of unconventional work that share on' -> 'Three kinds of unconventional work share one\nmethodological lesson:'	-	yes
+sections/unconventional.tex	slop	'conflicts are not the ones worth deciding on.' -> 'conflicts are not the ones that should be decided first.'	-	yes
+figures/	figure	scripts make_fig_fr_{common,leaderboard,rule,rholadder,collision}.py and make_tab_fr.py; data-fr-{leaderboard,rule,rholadder,collision,julsep,bench}.json (sources with git blob shas at origin/main 05f7382689; extractor kept at data10/fr-tools/extract.py)	see data JSON sources	yes
+NOTE	text	not changed (other owners): fm table files throw 8 LaTeX errors (\\art in moving argument, tab-fm-glance/ledgerhost/phases); treatise.tex has no longtable package, so long tables were kept as floats	-	no
+NOTE	text	Makefile ASSETS omits figures/*.tex, so the arxiv/eprint bundle would miss tab-fr-*.tex (and the existing tab-fd-*.tex); add $(wildcard figures/*.tex) (file not owned)	papers/ecdlp-index-calculus-treatise/Makefile	no

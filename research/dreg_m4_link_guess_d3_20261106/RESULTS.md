@@ -1,6 +1,6 @@
 # Results: at m = 4, degree 3, one invariant guess per link is not detectably better than raw guesses (4 against 3 draws)
 
-Standing: claim [pcc:PCC-20261106-6b308e], an **unverified assertion** until a pcc
+Standing: claim [pcc:PCC-20261106-6052e8], an **unverified assertion** until a pcc
 verdict exists (AGENTS.md, "Sabotage is assumed").
 
 - **Scoring.** Natively scored by `dreg_m4_link_score`
