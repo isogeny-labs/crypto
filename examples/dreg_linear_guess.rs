@@ -26,11 +26,19 @@
 //! unmeasured. `--satisfiable` selects the committed satisfiable draws.
 //! `--check` proves the specialisation exact: at 4,096 random points that
 //! satisfy every guess, each specialised equation equals the original.
+//!
+//! `--engine pe [--batch B]` computes each degree's closure with
+//! [`pe_closure_with`] (partial enlargement, batch `B`, default 64) instead
+//! of the dense scan. It is the same closure in less memory. It does not
+//! build the plain XL basis, so `xl_refuted` reads `false` and `xl_rank` 0
+//! in its scan entries; the line carries `"engine":"pe"`. A capped run ends
+//! the scan unmeasured.
 
 use crypto_lib::binary_ecc::F2mElement;
 use crypto_lib::cryptanalysis::koblitz_bench::{closure_refutation_scan, ClosureDegree};
 use crypto_lib::cryptanalysis::koblitz_groebner::{build_decomposition_system, FieldStructure};
 use crypto_lib::cryptanalysis::koblitz_index_calculus::find_irreducible_sparse;
+use crypto_lib::cryptanalysis::partial_enlargement::{pe_closure_with, PeMode, PeOptions};
 use crypto_lib::cryptanalysis::pq_groebner_f2::{bit, F2BoolMono, F2BoolPoly, Mask};
 use num_bigint::BigUint;
 use serde_json::Value;
@@ -148,6 +156,12 @@ fn main() {
     let only_draw: Option<u64> = flag("--draw").map(|v| v.parse().expect("--draw K"));
     let satisfiable = args.iter().any(|a| a == "--satisfiable");
     let check = args.iter().any(|a| a == "--check");
+    let pe = match flag("--engine").as_deref() {
+        None | Some("dense") => false,
+        Some("pe") => true,
+        Some(e) => panic!("--engine dense|pe, got {e}"),
+    };
+    let batch: usize = flag("--batch").map_or(64, |v| v.parse().expect("--batch"));
     // `--fix v=b,…`: x_v := b.
     let fixes: Vec<(u32, bool)> = parse_list(flag("--fix"), |kv| {
         let (k, b) = kv.split_once('=').expect("--fix v=b");
@@ -170,7 +184,16 @@ fn main() {
         let (k, c) = kv.split_once('=').expect("--link2 k=c");
         (k.parse().expect("coordinate"), c == "1")
     });
-    let valued = ["--max-cols", "--to", "--draw", "--fix", "--sum", "--link2"];
+    let valued = [
+        "--max-cols",
+        "--to",
+        "--draw",
+        "--fix",
+        "--sum",
+        "--link2",
+        "--engine",
+        "--batch",
+    ];
     let files: Vec<&String> = args
         .iter()
         .enumerate()
@@ -283,11 +306,41 @@ fn main() {
                 .count_ones() as u64;
             let mut scan = Vec::new();
             for d in (3..=to).take_while(|&d| monomials_up_to(occurring, d) <= max_cols) {
-                let Some(step) = closure_refutation_scan(&equations, sys.n_vars, d, d)
-                    .into_iter()
-                    .next()
-                else {
-                    break;
+                let step = if pe {
+                    let Some(r) = pe_closure_with(
+                        &equations,
+                        sys.n_vars,
+                        d,
+                        PeMode::Partial { batch_rows: batch },
+                        max_cols as usize,
+                        usize::MAX,
+                        PeOptions::default(),
+                    ) else {
+                        break;
+                    };
+                    if r.capped {
+                        break;
+                    }
+                    ClosureDegree {
+                        degree: d,
+                        xl_refuted: false,
+                        closure_refuted: r.refuted,
+                        saturated: r.refuted || r.saturated,
+                        xl_rank: 0,
+                        closure_rank: r.final_rows,
+                        columns: r.columns,
+                        closure_products: r.products,
+                        closure_word_ops: r.word_ops,
+                        secs: r.secs,
+                    }
+                } else {
+                    let Some(step) = closure_refutation_scan(&equations, sys.n_vars, d, d)
+                        .into_iter()
+                        .next()
+                    else {
+                        break;
+                    };
+                    step
                 };
                 let done = step.closure_refuted;
                 scan.push(step);
@@ -298,11 +351,12 @@ fn main() {
             let closure = scan.iter().find(|d| d.closure_refuted).map(|d| d.degree);
             let measured_to = scan.last().map(|d| d.degree).unwrap_or(2);
             println!(
-                r#"{{"source":"{file}","cell":"{}","m":{m},"n":{n},"ell":{ell},"draw":{},"n_vars":{},"occurring":{occurring},"committed_outcome":{},{},"identity_check":{},"closure_degree":{},"measured_to":{measured_to},"max_cols":{max_cols},"scan":[{}]}}"#,
+                r#"{{"source":"{file}","cell":"{}","m":{m},"n":{n},"ell":{ell},"draw":{},"n_vars":{},"occurring":{occurring},"committed_outcome":{},"engine":"{}",{},"identity_check":{},"closure_degree":{},"measured_to":{measured_to},"max_cols":{max_cols},"scan":[{}]}}"#,
                 v["cell"].as_str().unwrap_or(""),
                 v["draw"],
                 sys.n_vars,
                 v["outcome"],
+                if pe { "pe" } else { "dense" },
                 guesses_json(&sums),
                 identity.map_or("null".to_string(), |c| c.to_string()),
                 closure.map_or("null".to_string(), |d| d.to_string()),
