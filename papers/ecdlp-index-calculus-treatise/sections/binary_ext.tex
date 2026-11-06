@@ -59,6 +59,7 @@ Orbit-aware large primes & more verified relations at $n=17,29,31$; none at $23$
 Torsion anchors & none at $n=41$; $13.3\times$ dearer at $n=31$; $7.5\times$ dearer at $n=37$ & $\sim9{,}700\times$ at $n=41$ \\
 Free relations & $0.960\times$ (S3 root pipeline); $+5$--$9\%$ (pair-table pipeline) & unchanged \\
 Batch, 32 targets & Table~C $3.62$--$14.9\times$ batch rho & pre-gate \\
+Many-target crossover (accounting) & $G=\min_k$ IC$(k)$/batch rho$(k)$ $=3.0$--$4.1$, $n=41$--$61$ & $G>1$ at every $k$ (clock units) \\
 \bottomrule
 \end{tabularx}
 \caption[]{Koblitz constants measured after the leaderboard rules, with the
@@ -311,8 +312,10 @@ and changes no index-calculus count.
 
 \section{Routing: the one-target descent against the pipeline plan}\label{sec:kc-routing}
 
-Table~A prices the ledger \S23 one-target Koblitz pipeline at
-$4.7$--$11.8\times$ rho, but in mixed units: counted index-calculus work
+Table~A, as the routing study quotes it, prices the ledger \S23
+one-target Koblitz pipeline at $4.7$--$11.8\times$ rho (a range that matches
+no single rule revision of Table~\ref{tab:prog_koblitz-tablea}(a)), but in
+mixed units: counted index-calculus work
 against rho in canonical step units, which charge rho its
 canonicalisation. ecbench gained \texttt{ic.koblitz\_descent}, the \S23
 pipeline charged in counted group operations, with logs and native counts
@@ -403,7 +406,9 @@ is the session's own \texttt{rho.signed\_frobenius\_strong} arm, marked
 \texttt{strongest\_available} and \texttt{order\_holds\_across\_band}
 (\art{benchmarks/20261029-icb-large-prime/VALIDATION.json}); it, the
 validator report and the replay certificate were written by the producer in
-one commit, so the row is producer-validated, not independently reviewed.
+one commit, so the row is producer-validated, not independently reviewed,
+and it carries no pcc claim (an unverified assertion under the 4 November
+rule).
 The validation file calls it a component result, not a leaderboard row.
 Table~\ref{tab:kc-lp} gives the best arms.
 
@@ -561,6 +566,23 @@ $n=41$, and $7{,}700\times$ in mean wall at $n=37$ without torsion. Both
 follow-ups are exploratory, on one shared four-vCPU container, with no
 replay certificate.
 
+\paragraph{Three summands on the same curve.} Three companion studies on the
+$a=0$, $n=37$ curve (cofactor 596) ask whether more summands help the
+cycle stop; all are exploratory, local, with no replay certificate or
+validator report. With the same stop, relations with three summands cost
+$26$--$43\times$ more decomposer calls than two-summand relations at every
+base size tested ($42.9$ $[31.5,68.2]$ at $d=12$, $K=2{,}011$), and all 18
+pairs have $m=3$ dearer; the frozen prediction held
+(\art{research/ic_m3_cycle_n37_20261101/REPORT.md}). Feeding the stop a
+mixture of two-summand and ``2+1'' three-summand relations, at eight
+mixture fractions $q$ over six seeds, is monotone in $q$ and never below
+$q=0$, again as predicted (\art{research/ic_mix_cycle_n37_20261103/REPORT.md}).
+A direct $\Sem4$ solve at $m=3$ cannot run at $n=37$: a linear oracle is
+determined only for $\ell\le1$, and heuristic XL and an F4/F6 extrapolation
+put it far out of reach; that report is analysis only, with no new run
+(\art{research/ic_s4_direct_n37_20261101/REPORT.md}). None of the three moves
+the gap to rho.
+
 \paragraph{Cofactor and 2-torsion quotients: closed.} The atlas records a
 proof (\art{crypto-autoresearcher:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-cofactor-torsion-quotients.yaml}).
 On ECC2K-130 $\gcd(4,\ell)=1$, so every full-translation homomorphic
@@ -649,10 +671,27 @@ $3.62$--$14.9\times$ batch rho, with the reference taken from a different
 session (S20) at the canonical step, and all nine failed the 24 October
 gate.
 
+\paragraph{The many-target crossover.} A 30 October accounting study asked
+directly whether amortising relation collection over $k$ targets ever makes
+compact-orbit index calculus cheaper than Kuhn--Struik batch rho
+(\art{research/ic_many_target_crossover_20261030/README.md}; nothing was run,
+every number is extracted from recorded runs). With $G=\min_k
+\mathrm{IC}(k)/\text{batch rho}(k)$ as the distance remaining, it never does:
+in clock-priced \texttt{ic price} units (same process, both arms) $G=3.0$--$4.1$
+at $n=41$--$61$ for the best swept recipe and $3.7$--$6.8$ for the recipe tuned
+for $k=32$, flat to rising above $2^{36}$. On the \S5a count band, with IC at
+its emitted additions only (a lower bound), $G$ stays above 1 at $n=41$, 43,
+53 and 61 ($3.1$--$4.8$ at $w=0$, $1.6$--$2.4$ at $w=1$), so the order holds
+across the band there; at $n\le45$ and $n=47$ unemitted descent and
+construction work leaves the sizes unresolved by counts. At $n=83$, in wall
+and CPU seconds only, $G=4.8$--$5.1$ for K3300. The study classes itself as
+accounting and audit, not an improvement of the IC baseline; it has no
+validation file.
+
 \chapter{The $n=83$ campaign after 21 October}\label{ch:n83late}
 
-\S\ref{sec:n83} covers degree 83 to 21 October and the 24 October
-field-table correction, after which every Weil-descent engine's earlier
+\S\ref{sec:n83} covers degree 83 to 21 October, and \S\ref{sec:bo-n83} the
+24 October field-table correction, after which every Weil-descent engine's earlier
 $n=83$ refutation is void. Forty-one study directories were added from
 24 October to 1 November. None of them admits a new IC/rho ratio, and none
 is a leaderboard or \texttt{benchmarks/} row. They fall into eight groups
@@ -701,8 +740,10 @@ Genus-3 image & 3 & executable transfer; Prym coprime to $r$; degree-2 fibres ca
 \bottomrule
 \end{tabularx}
 \caption[]{The 41 $n=83$ study directories of 24 October--1 November, by
-group. ``Tier~1'' is the benchmark-contract host tier of
-\art{docs/IC_BENCHMARK_TIERS.md}. Sources: the \texttt{research/n83\_*}
+group. ``Tier~1'' is the benchmark-contract host tier the $n=83$ protocols name
+(\art{research/n83_cold_neighborhood_20261016/PROTOCOL.md}); the tier file
+they cite, \texttt{docs/IC\_BENCHMARK\_TIERS.md}, is on neither
+repository's branch read for this treatise. Sources: the \texttt{research/n83\_*}
 directories cited in this chapter.}
 \label{tab:n83l-groups}
 \end{table}
@@ -874,10 +915,9 @@ $[6.33,88.8]$ online, the same kind of reading as the rho/IC column of
 Table~\ref{tab:n83l-confirm}.
 
 \section{Decomposition at $n=83$ after the correction}\label{sec:n83l-sat}
-The engines run at $n=83$ are described in \S\ref{sec:bo-n83}; this section records the decomposition results after the field-table correction.
 
-
-After the 24 October correction (\S\ref{sec:n83}) chained-$\Sem3$
+After the 24 October field-table correction (\S\ref{sec:bo-n83}, which also
+describes the engines) chained-$\Sem3$
 full-width SAT was the only decomposer that ran at $n=83$, and it decided
 only $m=2$. Six preregistered follow-ups of 31 October--1 November extended
 it on the pinned pipeline-curve fixture, with the factor base the Frobenius
@@ -1092,16 +1132,27 @@ cell excepted). None has a validation file. One carries a proof-carrying
 claim, recorded as unverified. Closure outcomes do not depend on the host;
 timings are indicative only.
 
-\section{Guessing at $\ell=8$: which coordinate, not how many}\label{sec:bd-guess}
-The closure and guessing instruments are described in \S\ref{sec:in-closure}; this section records what they measured at $\ell=8$.
+A desk evaluation bounds what any algebraic-oracle lever in this chapter
+could do to today's ladder rows. Of 28 candidate point-decomposition
+strategies checked against the lead atlas, 17 collide with existing leads,
+7 overlap partly and 4 have no match, rated least promising
+(\art{research/pdp_strategy_evaluation_20261031/README.md}). The ladder rows
+(random binary curves, cofactor $h=2$--$8$) are solved with a pair table and
+a walk, not with summation polynomials: on arm~B at the published rung the
+walk is 61--82\% of $S$ and the matrix at most 0.10\% (measured, \S3 of the
+source). On the committed algebraic-oracle rows the oracle's share of $S$ is
+exactly zero when native operations are unpriced, so an algebraic-oracle
+lever has a ceiling of $1.00\times$ on those rows (derived).
 
+\section{Guessing at $\ell=8$: which coordinate, not how many}\label{sec:bd-guess}
 
 All studies in this section use the frozen $m=3$, $(n,\ell)=(22,8)$ draws
 of 22 October ($N=46$ unknowns, 44 equations, surplus $-2$; unsatisfiable
 draws 0, 3, 5, 6) or fresh draws from the same generator, the MutantXL-style
 closure \texttt{dreg\_closure} or its guess variants, and a registered
 reading of each branch as refuting at degree 4 (the constant 1 appears) or
-not (degree 4 saturates without it). Table~\ref{tab:bd-guess} lists them.
+not (degree 4 saturates without it); the instrument and its three controls
+are described in \S\ref{sec:in-closure}. Table~\ref{tab:bd-guess} lists them.
 
 \begin{table}[t]
 \centering\small
@@ -1144,8 +1195,11 @@ invariant guess on the same link (D3) is never better than the raw guess on
 $x_3$; putting it on the second link's invariant $e_1+x_3$ (L3) is as good
 as the raw guess on these 12 draws. The D3 failures all sit at branches 0
 and 4, where both top coordinates of $s$ vanish. Four guesses
-$\{7,15,23,24\}$ still suffice on every draw measured, and S3 fails on 5 of
-12.
+$\{7,15,23,24\}$ still suffice on every draw measured (68 processes, peak
+10.6\,GB, $124{,}314$ degree-4 columns per branch), and S3 fails on 5 of
+12. The guess study's registered verdict favours the rule $k=m(\ell-7)+1=4$
+over $k=m(\ell-6)=6$; $k=4$ is an upper bound, the smallest count the
+container could fit under its column cap.
 
 \paragraph{What it does not show.} Every row is one cell, $m=3$, with one
 guess set per arm. The unspecialised $\ell=8$ system is not measured at
@@ -1154,7 +1208,9 @@ least 5, and degree 5 is not measured here. The null study's 12 of 12
 unspecialised $\ell=7$ failures over $N=40$, 42, 43 and surplus $-2$, 0,
 $+1$ remove the one confound the earlier $\ell=7$ registration kept (a
 non-positive surplus), but cannot distinguish ``3 of 4'' from ``4 of 4''
-against the three-guess $\ell=8$ result. The second-link study's own reading
+against the three-guess $\ell=8$ result; a scorer defect found in its review
+(it scored only the files it was given) was fixed and the verdict
+regenerated unchanged. The second-link study's own reading
 is that one invariant guess per link extends along the chain, so $m=4$ is
 its natural test; $m=4$ at $\ell=8$ has not run. The preregistered
 high-arity discriminator that would run it
@@ -1165,11 +1221,16 @@ change on \texttt{main}; v4 is frozen and its launch is blocked.
 \paragraph{The price, unchanged.} The guess-then-degree-4 oracle costs
 $2^k\binom{N-k}{\le4}$ per target against $\binom{N}{\le5}$ for degree 5.
 At the priced ECC2K-130 cell ($m=4$, $\ell=33$, $N=2\cdot131+4\cdot33=394$,
-$w=1$) the ratio $\binom{394}{\le5}/(2^k\binom{394-k}{\le4})$ is $78.2$ at
+closure exponent $\omega_c=1$) the ratio $\binom{394}{\le5}/(2^k\binom{394-k}{\le4})$ is $78.2$ at
 $k=0$, $5.09$ at $k=4$, $1.30$ at $k=6$ and $0.66$ at $k=7$, recomputed in
 the three-guess study. Both registered growth rules give $k\approx105$--108
-there. Nothing in the series measures $k$ at $m=4$, so the $+8.43$ to
-$+58.27$-bit range of \S\ref{sec:frontier} stands.
+there. The measurements---$k\approx1$ at $\ell=7$ on 5 of 8 draws, $k\le4$
+at $\ell=8$ on 4 of 4---do not exclude a bounded $k$, and the invariant guess
+lowers $k$ on some draws. Even a bounded $k$ gives at best the degree-4
+floor, $2^{+7.62}$ over rho in unconverted units ($+8.43$ bits under the
+flat-$k$ rule), and the free-oracle floor of \S\ref{sec:gf-collision} still
+binds every row. Nothing in the series measures $k$ at $m=4$, so the $+8.43$
+to $+58.27$-bit range of \S\ref{sec:frontier} stands.
 
 \paragraph{Other degree levers of the same weeks.} A preregistered
 invariant arm that adds the summand-swap invariant $p$ as a variable makes
@@ -1177,16 +1238,16 @@ every equation quadratic but does not refute at degree 3 at $(22,6)$, where
 the plain system refutes at 4; its degree-4 matrix would have $5.1$--$5.5\times$
 the plain system's columns ($523{,}686$--$637{,}393$ against $102{,}091$), and at
 $(21,7)$ degree 4 is unmeasured
-(\art{research/dreg_pair_invariant_20261028/RESULTS.md}). Fixing one variable
-usually brings the $\ell=7$ draws back to degree 4, but the null control
-refuted 6 of 8 and was invalid, so the study is uninformative for its
-registered question (\art{research/dreg_closure_specialise_20261017/RESULTS.md}).
+(\art{research/dreg_pair_invariant_20261028/RESULTS.md}). The 17 October
+specialisation study, whose failed null control made it uninformative, is
+the control lesson of \S\ref{sec:in-closure}.
 
 \section{A measured degree-5 closure}\label{sec:bd-degree5}
 
 The descent rows of Table~\ref{tab:prog_koblitz-ecc2k130} price the $m=4$
 ECC2K-130 route at degree 4 ($+7.62$ bits, contradicted) and degree 5
-($+10.32$ bits at $w=1$, $+45.71$ at $w=2$). Until November no degree-5
+($+10.32$ bits with the closure exponent $\omega_c=1$, $+45.71$ with
+$\omega_c=2$). Until November no degree-5
 closure had been computed. The leads study of 24 October
 (\art{research/koblitz_ic_leads_build_20261024/README.md}; Amendment~1 post
 hoc, Amendments 2--7 frozen before the runs they govern) built four leads
@@ -1317,10 +1378,9 @@ on these cells the sharp assumption fails on 23\% of instances, and the
 stated first fall degree is wrong under Semaev's own definition.
 
 \section{The ceiling on learned SAT guidance}\label{sec:bd-sat}
-The SAT engines and encodings are described in \S\ref{sec:bo-sat}; this section records the ceiling they place on learned guidance.
 
-
-The SAT survey dismissed ML-guided SAT without measuring it. A preregistered
+The SAT engines and encodings are described in \S\ref{sec:bo-sat}. The SAT
+survey dismissed ML-guided SAT without measuring it. A preregistered
 study of 27 October measured the most any learned component could gain
 inside a SAT point-decomposition oracle before anyone builds one
 (\art{research/pdp_ml_sat_ceiling_20261027/README.md}; protocol frozen in
@@ -1351,45 +1411,15 @@ decompositions (\texttt{EV-ICPERF-390707};
 \art{crypto-autoresearcher:knowledge/leads/ecdlp/ic-prime/LEAD-ICP-icperf-binary-pdp-solver.yaml}).
 
 \section{F6-IC with a pair index is the meet-in-the-middle scan}\label{sec:bd-f6}
-The engine itself, its gate and its other uses are described in \S\ref{sec:bo-f6}; this section records what it established for binary decomposition.
 
-
-The F6-IC gate of \S\ref{sec:groebner} decided a node exactly only once one
-summand's coordinate bits were all assigned. On 5 November it was changed
-to run the same exact closure as soon as a summand's assigned bits leave at
-most 64 base codes, and the change is now on by default
-(\art{research/f6_few_candidates_20261105/README.md}; nine Koblitz cells,
-5 rounds $\times$ 3 repetitions, L0).
-\begin{itemize}
-\item Verdicts and indices are identical on all 80 target--engine pairs;
-  gate pair lookups and group additions are identical on all 40 F6-IC
-  targets.
-\item F6-IC CPU falls $2.67$--$10.29\times$ (worst pairing of rounds
-  $\ge1.66\times$), word XORs $1.84$--$10.13\times$, and 204--1{,}049
-  reductions per cell become 5--16; the inherited-F4 control reads
-  $0.87$--$1.05\times$.
-\end{itemize}
-Because the pair lookups and group additions do not change, the algebra was
-not ruling out any candidate $x$-coordinate on these cells: with the pair
-index, F6-IC works as the pair-index meet-in-the-middle scan, and the
-closure removes the algebra around it. The source marks the inference that
-it cannot beat ecbench's \texttt{mitm} oracle, being that oracle in the
-limit, as unverified. Two other items in the same study changed nothing:
-Four Russians batching of displaced rows would spend about 32 row
-operations per pivot on tables against about 1{,}500 row XORs per node it
-replaces, and a parallel split of one target's tree gives $1.59$--$2.88\times$
-wall on cells with no decomposition and $0.94$--$1.11\times$ where most
-targets decompose (opt-in, refused by ecbench).
-
-The same conclusion holds from the cost side. A desk evaluation of 28
-candidate point-decomposition strategies against the lead atlas found 17
-that collide with existing leads, 7 partial overlaps and 4 with no match,
-rated least promising
-(\art{research/pdp_strategy_evaluation_20261031/README.md}). On the ladder
-rows the walk is 61--82\% of $S$ and the matrix at most 0.10\%, and on the
-committed algebraic-oracle rows the oracle's share of $S$ is exactly zero
-when native operations are unpriced, so an algebraic-oracle lever has a
-ceiling of $1.00\times$ there.
+With the pair index, F6-IC is the pair-index meet-in-the-middle scan. The
+few-candidate closure of 5 November, now on by default, runs the exact
+one-fixed closure once a summand's assigned bits leave at most 64 base
+codes; it cuts F6-IC CPU $2.67$--$10.29\times$ while leaving the gate's pair
+lookups and group additions identical, so on these nine Koblitz cells the
+algebra was ruling out no candidate $x$-coordinate
+(\art{research/f6_few_candidates_20261105/README.md}). The full account,
+with its controls and the two companion items, is in \S\ref{sec:bo-f6}.
 
 \chapter{ECC2K-130, ECC2-131, factor-base selection, composite degree and GHS}\label{ch:binarytargets}
 
@@ -1643,7 +1673,8 @@ is 2--4, so the semi-regular prediction misses by 0.5--1.2 degrees on
 average; and at $m=3$ the formulation decides whether the base matters (in
 the symmetric formulation the progression is 15--40$\times$ cheaper per query
 at $\ell=3$ at equal degree, and 500--1{,}500$\times$ where the random base
-needs one more degree).
+needs one more degree). Every row is a decomposition-stage profile on small
+fields, not an index-calculus result.
 
 \paragraph{A learned cost model.} The lead
 (\art{crypto-autoresearcher:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-learned-cost-model-factor-base-selection.yaml},
@@ -1702,12 +1733,12 @@ records it as a theorem from Euler and Petit's work):
 \begin{itemize}
 \item every linearised quasi-subfield polynomial has $\beta\ge3/4$, so under
   the HKPYY cost model the exponent is at least $0.93$, at least $2^{122}$ at
-  $n=131$ against rho's $2^{60.9}$;
+  $n=131$ against rho's $2^{60.81}$ ($2^{60.9}$ in the source);
 \item with $\FF_2$ coefficients only $X^2+X$ ($n'=1$) and $L_{\Phi_{131}}$
   ($n'=130$, $\beta=0.99994$) exist at $n=131$;
 \item multiplicative quasi-subfield polynomials give $\abs V=264$ or $p+1$,
   with $\beta\ge1.02$;
-\item the cost model needs $\beta\approx0.0958$ to reach $2^{60.9}$.
+\item the cost model needs $\beta\approx0.0958$ to reach rho's cost.
 \end{itemize}
 At toy size the yield is no better than random: at $n=31$, $k=15$, the QSP
 base $t^{15}+t^7+t^3+t+1$ ($\beta=0.964$) yields $0.214$ $(0.190$--$0.240)$
@@ -1716,8 +1747,10 @@ fired (\art{research/ic_next10_20261014/08-quasi-subfield/README.md}).
 
 \section{Composite degree}\label{sec:bt-composite}
 
-Composite $n$ is the one binary setting where index calculus can be priced
-below rho on time alone. Chapter~\ref{ch:obstructions} records the lift-dense
+Composite $n$ is the one binary setting where a cost model puts index
+calculus below rho on time alone, and only for an unmeasured
+per-decomposition cost; under time$\times$memory the same model is worse on
+every row. Chapter~\ref{ch:obstructions} records the lift-dense
 twisted-line base on c2pnb208w1 and c2pnb368w1 ($+0.50$ bits, modelled), and
 \S\ref{sec:transfer} the GHS reachability of the Oakley curves.
 

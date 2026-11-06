@@ -1,9 +1,10 @@
 % Part: The rho side. Three chapters, drafted 2026-11-06 for
 % papers/ecdlp-index-calculus-treatise. Every number is checked against its
-% source in rho_side.verify.tsv. Standing: no pcc claim (pcc/claims/) covers
-% any result in these chapters, so every measured figure below is a
-% producer-reported value (an unverified assertion in the sense of
-% AGENTS.md "Sabotage is assumed") unless a VALIDATION.json is named.
+% source in rho_side.verify.tsv. Standing: two results here carry pcc claims
+% (PCC-20261104-c97d81, PCC-20261104-d91a51, both unverified); every other
+% measured figure below is a producer-reported value (an unverified assertion
+% in the sense of AGENTS.md "Sabotage is assumed") unless a VALIDATION.json is
+% named.
 
 \chapter{The generic floor and the index-calculus boundary}\label{ch:genericfloor}
 
@@ -15,10 +16,11 @@ extra inputs (auxiliary powers, advice tables) change the answer and by how
 much. Chapter~\ref{ch:matchedrho} then asks how well the programme measured
 rho, and Chapter~\ref{ch:rhovariants} how rho itself was varied.
 
-\paragraph{Standing of the evidence.} No proof-carrying claim in
-\art{pcc/claims/} covers a result of this part; the claims on
-\texttt{main} are leaderboard rows and Curve25519 autolab rounds. Every
-measured figure below is therefore the producer's reported value. Where a
+\paragraph{Standing of the evidence.} Two results in this part carry
+proof-carrying claims in \art{pcc/claims/}, both of standing unverified:
+the \texttt{wwalk} seed-averaged distances of Table~\ref{tab:gf-collision}
+(\texttt{PCC-20261104-c97d81}, \texttt{PCC-20261104-d91a51}). Every other
+measured figure below is the producer's reported value. Where a
 sealed ecbench bound (\texttt{ECBND1h\ldots}), an audit receipt or a
 \texttt{VALIDATION.json} exists, it is named; ``validated'' is used only
 for the last. The theory has the tiers of Part~\ref{part:theory}: the
@@ -128,7 +130,8 @@ and as measured on the Curve25519-family autolab incumbent \texttt{wwalk},
 a walk table on a base of two abscissae. The measured column spans
 $k=24$--$32$ and two seed regimes
 (\art{research/curve25519_rho_parity_bound_20261104/README.md}, \S2);
-unverified assertions.}
+claims \texttt{PCC-20261104-c97d81} and \texttt{PCC-20261104-d91a51},
+standing unverified.}
 \label{tab:gf-collision}
 \end{table}
 
@@ -176,6 +179,15 @@ single-target question. Read with Chapter~\ref{ch:model}, the floor is the
 reason the leaderboard's success criterion counts each improvement over
 the index-calculus baseline separately from the distance to rho: a generic
 factor base can approach the floor, and the floor is above rho.
+
+\paragraph{An open tension.} The prime-field residual collectors are
+rho walks that need $B+1$ collisions
+(\art{research/ic_residual_dp_eq_20261101/PROTOCOL.md}), and their measured
+distance to matched rho is $1.54$ and $1.64$ in the cells an independent
+validator recomputed, above the $F=1$ floor. Two producer-reported cells of
+the scale study, $1.32$ and $1.39$, lie below it. No source states the
+collectors' number of unknown base logarithms or reconciles the two readings
+(\S\ref{sec:pg-residual}).
 
 \section{Where the generic track ends: the BSGS boundary}\label{sec:gf-bsgs}
 
@@ -241,7 +253,8 @@ both classified away from the generic boundary:
   classifies that pipeline as Frobenius-folded BSGS, and the crossing rests
   on rho's fixed set-up at $\log_2r=15.4$ and widens with $r$;
 \item the GHS-weak plane-quartic family is below matched rho in its own
-  comparison (Chapter~\ref{ch:distance}), a frontier for that family only.
+  comparison (Chapter~\ref{ch:distance}; L0, no validation file), a
+  frontier for that family only.
 \end{itemize}
 A current-binary audit reproduced only 72 of 144 historical F4/F5/F6 rows,
 so those solver counts stay bound to the binary that produced them. The
@@ -257,9 +270,10 @@ are not met'' (\art{research/rho_parity_20260915/RESULTS.md}).
 
 \section{Auxiliary inputs: Cheon's algorithm}\label{sec:gf-cheon}
 
-Chapter~\ref{sec:prime} records in one sentence that Cheon's attack beats
-rho from 24 bits up, but only for the discrete logarithm with auxiliary
-inputs. That problem is the largest generic line of the programme absent
+Chapter~\ref{sec:prime} records, from the September study, that Cheon's
+attack beats rho from 24 bits up for the discrete logarithm with auxiliary
+inputs; that reading was not priced across the band and is superseded by
+the ecbench measurement below, which finds no exponent separation. That problem is the largest generic line of the programme absent
 from the treatise, and its boundary with the plain ECDLP is exact.
 
 \paragraph{The floors.} Given $G,[\alpha]G,\ldots,[\alpha^d]G$, a generic
@@ -709,7 +723,8 @@ by the size match.
 \section{Engineering the strong reference}\label{sec:mr-engineering}
 
 Chapter~\ref{sec:frontier} records that the strong signed-Frobenius rho fell
-from 1{,}196 to 679.7 instructions per step with no established native gain.
+from 1{,}196 to 718 instructions per step in three rounds, and that a fourth
+round took \texttt{main} from 707.2 to 679.7 with no established native gain.
 Table~\ref{tab:mr-rounds} gives the rounds; every round left walks, step
 counts and recovered logarithms identical, so counted-unit records are
 unchanged and only instruction or wall comparisons move.
@@ -1067,11 +1082,15 @@ ratios that read below rho are lower bounds (Chapter~\ref{sec:transfer}).
 
 \section{Kangaroo, BSGS, the pair claw and store-all schedules}\label{sec:rv-memory}
 
-\paragraph{Kangaroo.} On every sealed domain \texttt{kangaroo.vow} is
-dominated: $2.203$ $[1.803,2.527]\times$ its floor on the prime toy tier
-(\texttt{ECBND1h2e9e2024d8f3}) against negation rho's $1.453$, and
-$15.558$ $[13.742,17.597]$ on three Koblitz medium sizes against
-signed-Frobenius rho's $1.188$ (\art{docs/bounds/FRONTIER.md}). Its
+\paragraph{Kangaroo.} \texttt{kangaroo.vow} is never an operations
+leader: dominated on the prime toy tier, at $2.203$ $[1.803,2.527]\times$
+its floor (\texttt{ECBND1h2e9e2024d8f3}) against negation rho's $1.453$;
+unresolved inside the band on the Koblitz toy tier (the order against
+signed-Frobenius and negation rho flips at about $0.290$ and $0.417$ GAE);
+and unranked on the Koblitz medium tier, where $15.558$
+$[13.742,17.597]\times$ its floor against signed-Frobenius rho's $1.188$ is
+a three-size bound and a frontier entry needs four
+(\art{docs/bounds/FRONTIER.md}). Its
 calibration artefact of \S\ref{sec:mr-calibration} came from its
 determinism per target. It is the right tool only for a known short
 interval or a low-entropy secret

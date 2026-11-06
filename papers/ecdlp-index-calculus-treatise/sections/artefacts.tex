@@ -1,9 +1,13 @@
 \chapter{Artefacts}\label{app:artefacts}
 
-Every number in this treatise is copied from a committed artefact. The
-treatise ran one re-verification (\S\ref{sec:fd-binary}) and no new
-measurement. Artefact paths are relative to the \texttt{crypto} repository
-unless prefixed \texttt{crypto-autoresearcher:}.
+Every number in this treatise is copied from a committed artefact,
+except the Kummer-tower last fall degrees of \S\ref{sec:fd-pkm}, which are
+session-reported (raw data not committed). The treatise ran one
+re-verification (\S\ref{sec:fd-binary}) and no new measurement. Artefact
+paths are relative to the \texttt{crypto} repository unless prefixed
+\texttt{crypto-autoresearcher:} or \texttt{cryptanalysis:}. Each chapter
+names its own sources; the lists below give the main directories per
+part.
 
 \paragraph{Companion documents.}
 \begin{itemize}
@@ -37,6 +41,49 @@ unless prefixed \texttt{crypto-autoresearcher:}.
 \item \art{crypto-autoresearcher:knowledge/leads/ecdlp/} (Chapter~\ref{ch:obstructions}),
   \art{research/twist_obstruction_20261026/} and
   \art{research/lift_dense_factor_base_20261027/}.
+\item Hardness (Chapter~\ref{ch:hardness}):
+  \art{research/ic_weak_assumptions_20261102/},
+  \art{research/ic_weakpoints_20261102/},
+  \art{research/ecdlp_weakness_census_20261104/},
+  \art{research/ecdlp_weakness_lean_20261104/} and
+  \art{docs/ecdlp-hardness-corpus/}.
+\item Obstructions (Chapter~\ref{ch:obstructions}):
+  \art{research/jksst_xedni_audit_20261101/}.
+\end{itemize}
+
+\paragraph{Algorithms and measurements (Part~\ref{part:algorithms}).}
+\begin{itemize}
+\item Engines and instruments (Chapters~\ref{ch:engmeasure}--\ref{ch:instruments}):
+  \art{research/f4_harvest_remeasure_20261024/}.
+\item Binary curves (Chapters~\ref{ch:koblitzconst}--\ref{ch:binarytargets}):
+  \art{research/n83_crossfamily_current_20261025/},
+  \art{research/icb_large_prime_n53_n61_20261029/} and
+  \art{research/ic_m2_torsion_n41_20261101/}.
+\item Prime fields (Chapters~\ref{sec:prime} and~\ref{ch:primegeneric}--\ref{ch:primetargets}):
+  \art{research/ic_residual_scale_20261101/},
+  \art{research/ic_byte_counter_pricing_20261101/},
+  \art{research/prime_ksum_pooled_20261029/},
+  \art{research/ic_prime_eth_leads_20261031/},
+  \art{research/semaev_alternatives_audit_20261104/},
+  \art{research/curve25519_autolab_20261104/} and
+  \art{research/ecgfp5_quotient_solve_20261101/}.
+\item Transfers (Chapters~\ref{ch:isogenies}--\ref{ch:glvprogramme}):
+  \art{research/jv_cover_negrho_rescore_20261101/},
+  \art{research/jv_cover_fbline_20261102/},
+  \art{research/jv_sieve_negrho_20261102/} (the validated sieve row),
+  \art{research/jv_sieve_line_vs_rho_20261103/},
+  \art{research/ic_acct1_cover_bitop_20261021/},
+  \art{research/conductor_gap_cm_pairs_20261010/} and
+  \art{benchmarks/20261031-e32-handover-ladder/}.
+\end{itemize}
+
+\paragraph{The rho side (Part~\ref{part:rho}).}
+\begin{itemize}
+\item \art{research/curve25519_rho_parity_bound_20261104/} (the collision
+  floor), \art{research/ecbench_calibration_20261002/},
+  \art{research/rho_assurance_20261016/},
+  \art{research/rho_negation_audit_20261020/},
+  \art{research/cheon_ecbench_20261022/} and \art{docs/bounds/FRONTIER.md}.
 \end{itemize}
 
 \paragraph{The summer record (Chapter~\ref{ch:summer}).}
@@ -47,7 +94,7 @@ unless prefixed \texttt{crypto-autoresearcher:}.
   and the \texttt{experiments/EXP-*/runs/} directories of its targets.
 \end{itemize}
 
-\paragraph{Late measurements (Chapters~\ref{ch:extension}--\ref{ch:audit}).}
+\paragraph{The frontier (Part~\ref{part:frontier}) and late measurements.}
 \begin{itemize}
 \item \art{research/gaudry_k4_char2_redteam_20261026/REPORT.md}.
 \item \art{research/quartic_n4v2_20261020/} and \art{research/ghs3_vs_rho_20261023/}.
@@ -59,6 +106,10 @@ unless prefixed \texttt{crypto-autoresearcher:}.
 \item \art{research/postgb_linear_stage_20261026/}.
 \item \art{research/ic_validation_gate_20261024/}, \art{docs/ic/LEADERBOARD.md}
   and \art{docs/ic/leaderboard.json}.
+\item Unconventional routes (Chapters~\ref{ch:unconvmap}--\ref{ch:learning}):
+  \art{crypto-autoresearcher:knowledge/leads/ecdlp/exotic/}.
+\item Corrections (Appendix~\ref{ch:corrections}): the directories named in
+  each row of its tables.
 \end{itemize}
 
 \paragraph{Figures.} The figures of the programme record and the ledger are

@@ -4,9 +4,11 @@ A ratchet is worth only as much as its pawl. Several recorded results were
 corrected once the reference was matched, native work was priced, or the
 evidence was replayed. Each correction is recorded in the source with a
 dated note; frozen evidence is never rewritten. Figure~\ref{fig:audit}
-shows the before and after values. Every correction moved IC's position
-against rho \emph{down}, and several moved it from apparently ahead of rho
-to behind it.
+shows the before and after values. Most corrections in this chapter moved
+IC's position against rho \emph{down}, and several moved it from
+apparently ahead of rho to behind it. Appendix~\ref{ch:corrections}
+records two that moved it up: the byte-counter pricing rule and the
+matched-rho re-measurement of the Joux--Vitse sieve.
 
 \begin{figure}[t]
 \centering
@@ -143,7 +145,10 @@ within the run it is $305.8\to94.4$ (Chapter~\ref{sec:koblitz}).
   \art{research/ghs_cubic_quartic_ic_20261012/quartic_ic.rs} that merges
   distinct classes (reported in an open pull request). Recoveries are still
   checked against the planted scalar, but relation counts and $S$ are
-  unverified.
+  unverified. Canonical $\mathrm{Pic}^0$ keys later fixed the merge
+  (\art{research/quartic_pic_canonical_20261018/}). The N4 and N4~v2
+  measurements of Chapter~\ref{ch:distance} use the fixed code; the
+  withdrawn values are the earlier toys only.
 \item \emph{Volcano census crater.} A claim that IC is 22--25\% cheaper on
   the volcano crater was withdrawn, because the crater's rho reference
   should have been the cubic-automorphism rho. Against it, IC is
@@ -189,7 +194,7 @@ A & Koblitz descent, one target & 6 & validated at baseline v7 & as-built, same 
 \addlinespace
 C & 32-target batch & 9 & pre-gate & none matched, no band & \\
 \addlinespace
---- & components outside A--C & 2 & validated & & \\
+--- & components outside A--C & (2) & validated & & \\
 \bottomrule
 \end{tabular}
 \caption[]{Validation status of the leaderboard on 29 October. Table~B
@@ -200,15 +205,25 @@ numbers recompute to relative $10^{-9}$; index calculus stays above rho at
 every band weight. Table~A (64 targets per size) validated at baseline v7
 (\art{research/ic_tool_program/rule/v7/}); the sweep flags the reference as
 only partly adequate, and the rule~v8 row is from
-Chapter~\ref{ch:distance}. Table~C's replays and recomputations pass, but
-no matched rho with a band exists for them. The two components are the
-prime-field base-size tuning and the post-Gröbner linear stage
+Chapter~\ref{ch:distance} (rule v8 also carries a \texttt{VALIDATION.json},
+\art{research/ic_tool_program/rule/v8/VALIDATION.json}; the board has not
+been regenerated on it). Table~C's replays and recomputations pass, but
+no matched rho with a band exists for them. The component row is not
+counted in the 28 rows; it names two of several validated components
+(\art{docs/ic/leaderboard.json} has more, among them the generator-orbit
+and aimed-gather components): the prime-field base-size tuning and the post-Gröbner linear stage
 (\art{research/prime_base_oracle_tuning_20261029/VALIDATION.json},
 \art{research/postgb_linear_stage_20261026/validation/VALIDATION.json}).}
 \label{tab:audit-validation}
 \end{table}
 Validation says the numbers are what the archive says, and that the
-reference is fair. \textbf{No validated row is below its reference.}
+reference is fair. \textbf{No validated leaderboard row is below its
+reference.} The one validated measurement below a matched rho is the
+Joux--Vitse sieve route on the \texttt{jv\_cover} weak class
+($0.0065\times$, $p=1511$, \texttt{VAL-20261103-c31c76};
+\S\ref{sec:jac-jv}). It is not a leaderboard row, never has prime order,
+and has no pcc claim. The 19 validated board rows each have a pcc
+measurement claim, of standing unverified.
 
 The theory of Part~\ref{part:theory} has a different standard of evidence:
 \begin{itemize}
