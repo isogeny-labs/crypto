@@ -1253,7 +1253,7 @@ mod tests {
         let x0 = [BigUint::from(12345u32)];
         let p = shifted_t_proof(&circuit, &x0, &witness);
         let ch = unbound_challenges(&p);
-        let x = solve_affine(|v| residual_at(&circuit, &[v.clone()], &p, &ch));
+        let x = solve_affine(|v| residual_at(&circuit, std::slice::from_ref(v), &p, &ch));
         assert_ne!(x, BigUint::from(12345u32));
         let forged = [x];
         assert!(residual_at(&circuit, &forged, &p, &ch).is_zero(), "control");
