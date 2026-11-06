@@ -986,8 +986,320 @@ fn summarize(main_rows: &str, a1_rows: &str, out: &str, claimed: Option<&str>) {
     print!("{md}");
 }
 
+/// `--summarize-inf <inf rows> <inf A1 rows> <main-run rows> <out dir> [claimed]`:
+/// coded rules Q1-a/b/c, Q2, Q2-cost, A/A and A1's M2
+/// (research/lift_dense_conjugate_pair_infinity_20261106/PROTOCOL.md).
+fn summarize_inf(inf_rows: &str, a1_rows: &str, main_rows: &str, out: &str, claimed: Option<&str>) {
+    use sha2::{Digest, Sha256};
+    use std::fmt::Write as _;
+    let all = jrows(inf_rows);
+    let a1 = jrows(a1_rows);
+    let main = jrows(main_rows);
+    let inf: Vec<&serde_json::Value> = all.iter().filter(|r| s(r, "kind") == "inf").collect();
+    let main_solves: Vec<&serde_json::Value> = main
+        .iter()
+        .filter(|r| s(r, "kind") == "solve" && !b(r, "aa"))
+        .collect();
+    let short = |r: &serde_json::Value| u(r, "short1") + u(r, "short2") + u(r, "short3");
+    let id = |r: &serde_json::Value| {
+        format!(
+            "curve {} {} {} ({}{})",
+            u(r, "curve"),
+            s(r, "arm"),
+            s(r, "target"),
+            s(r, "set"),
+            if b(r, "transform") {
+                ", transformed"
+            } else {
+                ""
+            }
+        )
+    };
+    let plain: Vec<_> = inf.iter().filter(|r| !b(r, "transform")).collect();
+    let tf: Vec<_> = inf.iter().filter(|r| b(r, "transform")).collect();
+    let mut vals: Vec<(String, f64)> = vec![];
+    // A/A: R1 against the main run
+    let mut aa_bad = vec![];
+    for r in plain.iter().filter(|r| s(r, "set") == "R1") {
+        let m = main_solves.iter().find(|m| {
+            u(m, "curve") == u(r, "curve")
+                && s(m, "arm") == s(r, "arm")
+                && s(m, "target") == s(r, "target")
+        });
+        match m {
+            Some(m) if u(m, "total_muls") == u(r, "total_muls") && u(m, "dim") == u(r, "dim") => {}
+            _ => aa_bad.push(id(r)),
+        }
+    }
+    // Q1-a
+    let q1a_bad: Vec<String> = plain
+        .iter()
+        .filter(|r| (u(r, "dim") < 4096) != (short(r) > 0))
+        .map(|r| id(r))
+        .collect();
+    // Q1-b
+    let q1b_bad: Vec<String> = tf
+        .iter()
+        .filter(|r| u(r, "dim") != 4096)
+        .map(|r| format!("{} dim {}", id(r), u(r, "dim")))
+        .collect();
+    // Q1-c
+    let r3p: Vec<_> = plain.iter().filter(|r| s(r, "set") == "R3").collect();
+    let q1c_bad: Vec<String> = r3p
+        .iter()
+        .filter(|r| u(r, "dim") >= 4096)
+        .map(|r| id(r))
+        .collect();
+    let q1c_arms = ["conj", "std"]
+        .iter()
+        .all(|a| r3p.iter().any(|r| s(r, "arm") == *a));
+    // Q2
+    let q2_bad: Vec<String> = tf
+        .iter()
+        .filter(|r| !b(r, "match"))
+        .map(|r| {
+            format!(
+                "{} solver {} vs oracle {}",
+                id(r),
+                u(r, "solver_decomps"),
+                u(r, "oracle_decomps")
+            )
+        })
+        .collect();
+    // Q2-cost: R2 against the mean main-run cost of generic (dim 4096) plain solves, same curve and arm
+    let mut cost_tab = String::new();
+    let mut cost_bad = vec![];
+    let mut ratios = vec![];
+    for r in tf.iter().filter(|r| s(r, "set") == "R2") {
+        let g: Vec<f64> = main_solves
+            .iter()
+            .filter(|m| {
+                u(m, "curve") == u(r, "curve") && s(m, "arm") == s(r, "arm") && u(m, "dim") == 4096
+            })
+            .map(|m| u(m, "total_muls") as f64)
+            .collect();
+        let gen = g.iter().sum::<f64>() / g.len() as f64;
+        let ratio = u(r, "total_muls") as f64 / gen;
+        ratios.push(ratio);
+        if !(0.9..=1.1).contains(&ratio) {
+            cost_bad.push(format!("{} ratio {ratio:.3}", id(r)));
+        }
+        writeln!(
+            cost_tab,
+            "| {} | {} | {} | {:.4e} | {:.4e} | {:.4e} | {ratio:.3} |",
+            u(r, "curve"),
+            s(r, "arm"),
+            s(r, "target"),
+            u(r, "total_muls") as f64,
+            u(r, "transform_muls") as f64,
+            gen
+        )
+        .unwrap();
+    }
+    ratios.sort_by(|a, b| a.partial_cmp(b).unwrap());
+    // M2
+    let mut m2_tab = String::new();
+    let mut m2 = vec![];
+    let a1s: Vec<_> = a1.iter().filter(|r| s(r, "kind") == "inf").collect();
+    let mut targets: Vec<(u64, String)> = a1s
+        .iter()
+        .map(|r| (u(r, "curve"), s(r, "target").to_string()))
+        .collect();
+    targets.dedup();
+    for (c, t) in &targets {
+        let mut first: Option<u64> = None;
+        for r in a1s
+            .iter()
+            .filter(|r| u(r, "curve") == *c && s(r, "target") == t)
+        {
+            let md = u(r, "macaulay_degree");
+            writeln!(
+                m2_tab,
+                "| {c} | {t} | {md} | {} × {} | {} | {} | {:.4e} | {}/{} | {} |",
+                u(r, "rows"),
+                u(r, "cols"),
+                u(r, "dim"),
+                u(r, "at_infinity"),
+                u(r, "total_muls") as f64,
+                u(r, "solver_decomps"),
+                u(r, "oracle_decomps"),
+                s(r, "outcome")
+            )
+            .unwrap();
+            if u(r, "dim") == 4096 && first.is_none() {
+                first = Some(md);
+            }
+        }
+        let key = format!("m2_c{c}_{}_degree", t.split('[').next().unwrap());
+        match first {
+            Some(d) => {
+                m2.push(format!("curve {c} {t}: dim 4,096 first at degree {d}, so the degree-29 shortfall is truncation"));
+                vals.push((key, d as f64));
+            }
+            None => {
+                m2.push(format!("curve {c} {t}: dim stays below 4,096 through degree 32, so the shortfall is not truncation (cause reported, not decided)"));
+                vals.push((key, 0.0));
+            }
+        }
+    }
+    vals.push(("aa_violations".into(), aa_bad.len() as f64));
+    vals.push(("q1a_violations".into(), q1a_bad.len() as f64));
+    vals.push(("q1b_violations".into(), q1b_bad.len() as f64));
+    vals.push(("q1c_violations".into(), q1c_bad.len() as f64));
+    vals.push(("q2_violations".into(), q2_bad.len() as f64));
+    vals.push(("q2cost_violations".into(), cost_bad.len() as f64));
+    vals.push(("inf_solves".into(), inf.len() as f64));
+    vals.push(("a1_solves".into(), a1s.len() as f64));
+    if let (Some(lo), Some(hi)) = (ratios.first(), ratios.last()) {
+        vals.push(("q2cost_min_x1000".into(), (lo * 1000.0).round()));
+        vals.push(("q2cost_max_x1000".into(), (hi * 1000.0).round()));
+    }
+    let v = |x: bool| if x { "PASS" } else { "FAIL" };
+    let mut md = String::new();
+    writeln!(md, "# Summary (coded rules, PROTOCOL.md)\n").unwrap();
+    writeln!(
+        md,
+        "- **A/A** (R1 = main run, total_muls and dim): **{}** {:?}",
+        v(aa_bad.is_empty()),
+        aa_bad
+    )
+    .unwrap();
+    writeln!(
+        md,
+        "- **Q1-a** (plain: dim < 4,096 iff a ≤ 3-point decomposition exists): **{}** {:?}",
+        v(q1a_bad.is_empty()),
+        q1a_bad
+    )
+    .unwrap();
+    writeln!(
+        md,
+        "- **Q1-b** (transformed: dim = 4,096): **{}** {:?}",
+        v(q1b_bad.is_empty()),
+        q1b_bad
+    )
+    .unwrap();
+    writeln!(
+        md,
+        "- **Q1-c** (R3 plain: dim < 4,096 on both arms): **{}** {:?}",
+        v(q1c_bad.is_empty() && q1c_arms),
+        q1c_bad
+    )
+    .unwrap();
+    writeln!(
+        md,
+        "- **Q2** (transformed: solver = oracle): **{}** {:?}",
+        v(q2_bad.is_empty()),
+        q2_bad
+    )
+    .unwrap();
+    writeln!(
+        md,
+        "- **Q2-cost** (R2 / main-run generic cost in [0.9, 1.1]): **{}** {:?}\n",
+        v(cost_bad.is_empty()),
+        cost_bad
+    )
+    .unwrap();
+    writeln!(md, "## All solves (Macaulay degree 29)\n\n| curve | arm | target | set | transform | dim | at ∞ | short 1/2/3 | total_muls | solver/oracle | outcome |\n|--:|:--|:--|:--|:--|--:|--:|:--|--:|--:|:--|").unwrap();
+    for r in &inf {
+        writeln!(
+            md,
+            "| {} | {} | {} | {} | {} | {} | {} | {}/{}/{} | {:.4e} | {}/{} | {} |",
+            u(r, "curve"),
+            s(r, "arm"),
+            s(r, "target"),
+            s(r, "set"),
+            b(r, "transform"),
+            u(r, "dim"),
+            u(r, "at_infinity"),
+            u(r, "short1"),
+            u(r, "short2"),
+            u(r, "short3"),
+            u(r, "total_muls") as f64,
+            u(r, "solver_decomps"),
+            u(r, "oracle_decomps"),
+            s(r, "outcome")
+        )
+        .unwrap();
+    }
+    writeln!(md, "\n## Q2-cost (R2)\n\n| curve | arm | target | transformed total_muls | of which transform | main-run generic mean | ratio |\n|--:|:--|:--|--:|--:|--:|--:|\n{cost_tab}").unwrap();
+    writeln!(md, "## Amendment A1: transformed solves at Macaulay degree 30–32\n\n| curve | target | degree | matrix | dim | at ∞ | total_muls | solver/oracle | outcome |\n|--:|:--|--:|:--|--:|--:|--:|--:|:--|\n{m2_tab}\nM2:\n").unwrap();
+    for l in &m2 {
+        writeln!(md, "- {l}").unwrap();
+    }
+    std::fs::create_dir_all(out).unwrap();
+    std::fs::write(format!("{out}/SUMMARY.md"), &md).unwrap();
+    let js = format!(
+        "{{\"AA\":{},\"Q1a\":{},\"Q1b\":{},\"Q1c\":{},\"Q2\":{},\"Q2cost\":{},\"values\":{{{}}}}}\n",
+        aa_bad.is_empty(),
+        q1a_bad.is_empty(),
+        q1b_bad.is_empty(),
+        q1c_bad.is_empty() && q1c_arms,
+        q2_bad.is_empty(),
+        cost_bad.is_empty(),
+        vals.iter().map(|(k, v)| format!("\"{k}\":{v}")).collect::<Vec<_>>().join(",")
+    );
+    std::fs::write(format!("{out}/summary.json"), &js).unwrap();
+    let sha = |p: &str| hex::encode(Sha256::digest(std::fs::read(p).unwrap()));
+    let claimed_map: HashMap<String, f64> = claimed
+        .map(|p| {
+            std::fs::read_to_string(p)
+                .unwrap()
+                .lines()
+                .filter_map(|l| {
+                    let t = l.trim().trim_end_matches(',');
+                    let (k, v) = t.split_once(':')?;
+                    Some((
+                        k.trim().trim_matches('"').to_string(),
+                        v.trim().parse().ok()?,
+                    ))
+                })
+                .collect()
+        })
+        .unwrap_or_default();
+    let mut status_ok = claimed.is_some();
+    let heads: Vec<String> = vals
+        .iter()
+        .filter_map(|(k, v)| {
+            let c = claimed_map.get(k)?;
+            if c != v {
+                status_ok = false;
+            }
+            Some(format!(
+                "    {{\"name\": \"{k}\", \"claimed\": {c}, \"recomputed\": {v}, \"rel_tol\": 0}}"
+            ))
+        })
+        .collect();
+    if heads.is_empty() {
+        status_ok = false;
+    }
+    let rel = |p: &str| {
+        std::path::Path::new(p)
+            .file_name()
+            .unwrap()
+            .to_string_lossy()
+            .to_string()
+    };
+    let rep = format!(
+        "{{\n  \"schema\": \"validator-report\",\n  \"status\": \"{}\",\n  \"study\": \"research/lift_dense_conjugate_pair_infinity_20261106\",\n  \"recomputed_by\": {{\"tool\": \"examples/conjpair_decomp_cost.rs --summarize-inf\"}},\n  \"note\": \"Producer-run recompute of the summary values from the pinned rows; unsigned, so independence is not established.\",\n  \"raw_data\": [\n    {{\"path\": \"{}\", \"sha256\": \"{}\"}},\n    {{\"path\": \"{}\", \"sha256\": \"{}\"}},\n    {{\"path\": \"{}\", \"sha256\": \"{}\"}}\n  ],\n  \"headline\": [\n{}\n  ]\n}}\n",
+        if status_ok { "pass" } else { "fail" },
+        rel(inf_rows), sha(inf_rows), rel(a1_rows), sha(a1_rows), main_rows, sha(main_rows), heads.join(",\n")
+    );
+    std::fs::write(format!("{out}/validator-report.json"), rep).unwrap();
+    print!("{md}");
+}
+
 fn main() {
     let args: Vec<String> = env::args().skip(1).collect();
+    if args.first().map(|s| s.as_str()) == Some("--summarize-inf") {
+        summarize_inf(
+            &args[1],
+            &args[2],
+            &args[3],
+            &args[4],
+            args.get(5).map(|s| s.as_str()),
+        );
+        return;
+    }
     if args.first().map(|s| s.as_str()) == Some("--summarize") {
         summarize(
             &args[1],
