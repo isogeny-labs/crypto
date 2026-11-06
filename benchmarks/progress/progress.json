@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261105T1854Z-ecbench-statistics-v2",
+  "latest_record": "20261105T2109Z-f6-parallel-split",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 42,
+    "measured": 44,
     "open": 0
   },
   "repo": "crypto",
@@ -1335,6 +1335,221 @@
       ],
       "problem": "ic:curve25519-family-k32",
       "unit": "S"
+    },
+    {
+      "better": "neutral",
+      "first": 1.0,
+      "latest": 1.0,
+      "latest_derived": {},
+      "metric": "f4_control_word_xors_off_over_on",
+      "points": [
+        {
+          "commit": "647818a312a6",
+          "date": "2026-11-05",
+          "derived": {},
+          "n": 9,
+          "record": "20261105T2109Z-f6-few-candidates",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "F6-IC few-candidate closure: CPU off/on 2.67-10.29x, word XORs 1.84-10.13x on 9 Koblitz cells, verdicts identical; measured 2026-11-05T18:20Z by scripts/run_arms.sh before this record existed, the recorded command rebuilds the table from the committed raw data",
+          "value": 1.0
+        }
+      ],
+      "problem": "kernel:f6_ic_gate",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 10.29,
+      "latest": 10.29,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "f6ic_cpu_off_over_on_max",
+      "points": [
+        {
+          "commit": "647818a312a6",
+          "date": "2026-11-05",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 9,
+          "record": "20261105T2109Z-f6-few-candidates",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "F6-IC few-candidate closure: CPU off/on 2.67-10.29x, word XORs 1.84-10.13x on 9 Koblitz cells, verdicts identical; measured 2026-11-05T18:20Z by scripts/run_arms.sh before this record existed, the recorded command rebuilds the table from the committed raw data",
+          "value": 10.29
+        }
+      ],
+      "problem": "kernel:f6_ic_gate",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 2.67,
+      "latest": 2.67,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "f6ic_cpu_off_over_on_min",
+      "points": [
+        {
+          "commit": "647818a312a6",
+          "date": "2026-11-05",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 9,
+          "record": "20261105T2109Z-f6-few-candidates",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.657,
+            null
+          ],
+          "summary": "F6-IC few-candidate closure: CPU off/on 2.67-10.29x, word XORs 1.84-10.13x on 9 Koblitz cells, verdicts identical; measured 2026-11-05T18:20Z by scripts/run_arms.sh before this record existed, the recorded command rebuilds the table from the committed raw data",
+          "value": 2.67
+        }
+      ],
+      "problem": "kernel:f6_ic_gate",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.84,
+      "latest": 1.84,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "f6ic_word_xors_off_over_on_min",
+      "points": [
+        {
+          "commit": "647818a312a6",
+          "date": "2026-11-05",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 9,
+          "record": "20261105T2109Z-f6-few-candidates",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "F6-IC few-candidate closure: CPU off/on 2.67-10.29x, word XORs 1.84-10.13x on 9 Koblitz cells, verdicts identical; measured 2026-11-05T18:20Z by scripts/run_arms.sh before this record existed, the recorded command rebuilds the table from the committed raw data",
+          "value": 1.84
+        }
+      ],
+      "problem": "kernel:f6_ic_gate",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.936,
+      "latest": 0.936,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "wall_seq_over_par_decomposing_min",
+      "points": [
+        {
+          "commit": "647818a312a6",
+          "date": "2026-11-05",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 2,
+          "record": "20261105T2109Z-f6-parallel-split",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Opt-in parallel split (depth 2, 4 threads): wall 1.59-2.88x on refuting cells, 0.94/1.11x on decomposing cells, counted work 1.12-2.87x higher; measured 2026-11-05T19:11Z by scripts/run_parallel.sh before this record existed, the recorded command rebuilds the table from the committed raw data",
+          "value": 0.936
+        }
+      ],
+      "problem": "kernel:inherited_f4_solve_tree",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 2.883,
+      "latest": 2.883,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "wall_seq_over_par_refuting_max",
+      "points": [
+        {
+          "commit": "647818a312a6",
+          "date": "2026-11-05",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 7,
+          "record": "20261105T2109Z-f6-parallel-split",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Opt-in parallel split (depth 2, 4 threads): wall 1.59-2.88x on refuting cells, 0.94/1.11x on decomposing cells, counted work 1.12-2.87x higher; measured 2026-11-05T19:11Z by scripts/run_parallel.sh before this record existed, the recorded command rebuilds the table from the committed raw data",
+          "value": 2.883
+        }
+      ],
+      "problem": "kernel:inherited_f4_solve_tree",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.589,
+      "latest": 1.589,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "wall_seq_over_par_refuting_min",
+      "points": [
+        {
+          "commit": "647818a312a6",
+          "date": "2026-11-05",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 7,
+          "record": "20261105T2109Z-f6-parallel-split",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Opt-in parallel split (depth 2, 4 threads): wall 1.59-2.88x on refuting cells, 0.94/1.11x on decomposing cells, counted work 1.12-2.87x higher; measured 2026-11-05T19:11Z by scripts/run_parallel.sh before this record existed, the recorded command rebuilds the table from the committed raw data",
+          "value": 1.589
+        }
+      ],
+      "problem": "kernel:inherited_f4_solve_tree",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 2.865,
+      "latest": 2.865,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "work_par_over_seq_max",
+      "points": [
+        {
+          "commit": "647818a312a6",
+          "date": "2026-11-05",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 9,
+          "record": "20261105T2109Z-f6-parallel-split",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Opt-in parallel split (depth 2, 4 threads): wall 1.59-2.88x on refuting cells, 0.94/1.11x on decomposing cells, counted work 1.12-2.87x higher; measured 2026-11-05T19:11Z by scripts/run_parallel.sh before this record existed, the recorded command rebuilds the table from the committed raw data",
+          "value": 2.865
+        }
+      ],
+      "problem": "kernel:inherited_f4_solve_tree",
+      "unit": "ratio"
     },
     {
       "better": "neutral",
