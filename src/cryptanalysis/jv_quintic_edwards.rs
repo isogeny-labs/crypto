@@ -1848,7 +1848,7 @@ mod weighted_probe {
                 rep.max_cols,
                 matches!(rep.verdict, Verdict::Inconsistent)
             );
-            for (w, range) in [([1u8, 1, 1, 1, 1], 4u8..=11), ([1u8, 2, 3, 4, 2], 16u8..=30)] {
+            for (w, range) in [([1u8, 1, 1, 1, 1], 4u8..=11), ([1u8, 2, 3, 4, 2], 16u8..=40)] {
                 for d in range {
                     let mut st = QuarticSolve::default();
                     let t0 = Instant::now();
@@ -1867,7 +1867,7 @@ mod weighted_probe {
                         st.outcome,
                         res.as_ref().ok().and_then(|o| o.as_ref().map(|v| v.len()))
                     );
-                    if st.outcome.contains("not standard") || st.cols > 40_000 {
+                    if st.outcome.contains("inconsistent") || st.outcome == "solved" || st.cols > 40_000 {
                         break;
                     }
                 }
