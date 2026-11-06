@@ -22,6 +22,26 @@ script audits this checkout plus the sibling `crypto`, `crypto-autoresearcher`,
 `cryptanalysis` and `crypto-lean` when present. `--fail-under 0.5` makes a batch
 fail below that coverage; the default is report-only.
 
+`--ref` reads the logs from a git ref instead of the working tree, so a
+measurement of committed history ignores uncommitted sessions:
+
+```sh
+python3 scripts/kb_usage_report.py --ref origin/main --since 2026-11-05
+```
+
+### Scheduled report
+
+`.github/workflows/kb-usage-report.yml` runs the audit weekly and on demand in
+`crypto`. It writes the table to the step summary, uploads the JSON as an
+artifact and uses `--ref HEAD`. It is advisory: no pull request is blocked and
+`--fail-under` is not wired in.
+
+The script and its tests are shared byte-identically by the three repositories
+(`docs/shared-code.lock.json`), so each repository runs the same workflow
+against its own logs. Its first run (2026-11-06) reported `crypto`
+alone at 135 entries, 11 receipts and 8.1%, which matches the local
+`--ref` measurement at that commit.
+
 ## What counts
 
 - **Entry**: a dated `##` session-log entry, or a `### <time> UTC` entry (the
@@ -50,6 +70,22 @@ logs before it have no receipt. The four receipts are the policy entries
 themselves; the sibling entries live on their policy branches until those PRs
 merge. Use it as the before mark, not a verdict.
 
+## Current measurement
+
+Committed `main`, entries dated 2026-11-05 or later, measured after the policy
+PRs merged:
+
+| repository | entries | receipts | coverage | unique source IDs |
+|:--|--:|--:|--:|--:|
+| `crypto` | 136 | 12 | 8.8% | 7 |
+| `crypto-autoresearcher` | 6 | 3 | 50.0% | 3 |
+| `cryptanalysis` | 3 | 2 | 66.7% | 5 |
+| **total** | **145** | **17** | **11.7%** | **7** |
+
+The delta from the 0.9% pre-policy mark (1 receipt in 114 entries) is +10.8
+points. Later sessions now record receipts on their own, not just the policy
+entries, so the number is beginning to measure habit rather than the template.
+
 ## What the audit does not see
 
 - Pull-request bodies and chat answers (the PR-body field is a later step).
@@ -61,8 +97,10 @@ merge. Use it as the before mark, not a verdict.
 
 ## Next measurements
 
-- Run after each batch of sessions and keep the delta; the goal is a rising
+- Read the weekly workflow artifact and keep the delta; the goal is a rising
   trend with no drop in evidence quality, not a quota.
 - Add a `Sources checked` field to the PR template once receipts are habitual.
-- If coverage stays near zero, inspect the logs for the failure mode
-  (unknown tool, unavailable server, no trigger) before adding more policy.
+- If coverage stalls, inspect the logs for the failure mode (unknown tool,
+  unavailable server, no trigger) before adding more policy.
+- Raise retrieval quality only against a measurement: lexical misses first,
+  then the hybrid index.
