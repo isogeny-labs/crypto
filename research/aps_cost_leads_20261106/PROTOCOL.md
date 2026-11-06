@@ -136,8 +136,12 @@ inconclusive. A failed positive control stops the affected experiment.
 ## Admission checklist
 
 1. Successful approved source/worktree checkpoint, under fenced resume
-   ownership and a fresh payload/baseline review. Approval already exists;
-   secure upload authentication is missing [pcc:unverified]. No credentials in chat.
+   ownership and a fresh payload/baseline review. The hosted standard gate
+   acknowledges source1bc; independent readback remains open. See
+   [the checkpoint outcome](CHECKPOINT-OUTCOME.md), native statement
+   `PCC-20261106-2d094d`, standing unverified [pcc:unverified]. That source
+   acknowledgement does not cover later protocol/source changes; checkpoint
+   the actual frozen run source prospectively. No credentials in chat.
 2. Source-built tested/pushed image; exact registered ladder and independent
    oracle budget; complete protocol-design and metric audit. This native
    exporter's schema/hash checks alone do not admit a design or execution.

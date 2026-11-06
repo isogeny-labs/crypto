@@ -2,6 +2,19 @@
 
 ## Current authoring continuation
 
+Latest checkpoint state: the hosted source-only job for `1bc72d29c` reports
+successful exact custody and unchanged standard gate. Native statement
+`PCC-20261106-2d094d` is unverified; see `CHECKPOINT-OUTCOME.md` and
+`validation/source-checkpoint.json`. Its normalized artifact body download
+returned storage HTTP403; independent S3 readback is not claimed. The actual
+successful job completion permitted native release of the matching T10 window
+to ready and clearing its capture flag before this outcome documentation.
+T10/readback and the broader research goals remain open. The source1bc
+acknowledgement does not checkpoint subsequent metadata or a future frozen
+run protocol. The report/PDF and earlier receipts retain their original
+pre-upload development boundaries. No performance run has started
+[pcc:unverified].
+
 PR3583 was opened regular and auto-merge off at source
 `89c9f5258f1f10a5c8ad4434a572b7f8dd9fcbd4`, tree
 `022013f87adc0fc120b051ec7fc031a4cd3f244b`. Its first source-only workflow

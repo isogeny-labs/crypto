@@ -78,6 +78,13 @@ native append-only ledger stay private [pcc:unverified].
 
 ## Remaining admission
 
+Subsequent checkpoint observation: the hosted source1bc custody/standard gate
+passed, under unverified native statement `PCC-20261106-2d094d`. The artifact
+body download returned HTTP403 and independent stored-object readback remains
+open. [CHECKPOINT-OUTCOME.md](CHECKPOINT-OUTCOME.md) records this newer boundary;
+the earlier preflight failure and repair below are preserved. No speed,
+scaling or performance-admission result follows [pcc:unverified].
+
 The first hosted source-checkpoint job stopped in its exact-payload preflight;
 the standard gate was skipped and no upload/authentication outcome followed.
 The repository ignores copied nested lockfiles. The new regression reproduces
