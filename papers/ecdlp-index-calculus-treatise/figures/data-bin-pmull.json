@@ -1,0 +1,145 @@
+{
+ "schema": "treatise.figure-data/v1",
+ "slug": "bin-pmull",
+ "description": "n = 83 F6 x-only four-summand query and index build: x-only baseline vs ARM64 PMULL packed candidate, per run, by usable base points. Exploratory component diagnostic on an unisolated arm64 macOS host; not a controlled speed-up, no rho comparison.",
+ "derived": "medians and baseline/candidate ratios of medians are computed by make_fig_bin_pmull.py; the full-base paired ratios use the interleaved order baseline, candidate, candidate, baseline (pairs 1-2 and 3-4), as RESULT.md states.",
+ "rows": [
+  {
+   "arm": "baseline",
+   "points": 258,
+   "query_ns": [
+    8891166,
+    23267875,
+    14016084
+   ],
+   "build_ns": [
+    23686042,
+    45405708,
+    33392334
+   ],
+   "source": "research/f6_n83_pmull_xonly_20261005/baseline_small.jsonl"
+  },
+  {
+   "arm": "baseline",
+   "points": 1048,
+   "query_ns": [
+    216189583,
+    477150667,
+    401228125
+   ],
+   "build_ns": [
+    501812916,
+    1234932417,
+    1762557875
+   ],
+   "source": "research/f6_n83_pmull_xonly_20261005/baseline_small.jsonl"
+  },
+  {
+   "arm": "candidate",
+   "points": 258,
+   "query_ns": [
+    1819791,
+    2769125,
+    2293959
+   ],
+   "build_ns": [
+    17140000,
+    23823375,
+    31465750
+   ],
+   "source": "research/f6_n83_pmull_xonly_20261005/candidate_small.jsonl"
+  },
+  {
+   "arm": "candidate",
+   "points": 1048,
+   "query_ns": [
+    58416000,
+    78228250,
+    43862875
+   ],
+   "build_ns": [
+    404923208,
+    384352834,
+    452507000
+   ],
+   "source": "research/f6_n83_pmull_xonly_20261005/candidate_small.jsonl"
+  },
+  {
+   "arm": "baseline",
+   "points": 4054,
+   "query_ns": [
+    3484960459,
+    3803003792
+   ],
+   "build_ns": [
+    7197634042,
+    6084861125
+   ],
+   "order": [
+    1,
+    4
+   ],
+   "source": [
+    "research/f6_n83_pmull_xonly_20261005/full_1_baseline.jsonl",
+    "research/f6_n83_pmull_xonly_20261005/full_4_baseline.jsonl"
+   ]
+  },
+  {
+   "arm": "candidate",
+   "points": 4054,
+   "query_ns": [
+    1303248000,
+    1127916625
+   ],
+   "build_ns": [
+    7083676416,
+    7483934916
+   ],
+   "order": [
+    2,
+    3
+   ],
+   "source": [
+    "research/f6_n83_pmull_xonly_20261005/full_2_candidate.jsonl",
+    "research/f6_n83_pmull_xonly_20261005/full_3_candidate.jsonl"
+   ]
+  }
+ ],
+ "sources": [
+  {
+   "path": "research/f6_n83_pmull_xonly_20261005/RESULT.md",
+   "blob": "dd9aebe00d891e4313ec0b2ab684ea7a94a3c7f7",
+   "commit": "0c2a702f046606817918b03d826dba84f1ec6752"
+  },
+  {
+   "path": "research/f6_n83_pmull_xonly_20261005/baseline_small.jsonl",
+   "blob": "0f31c116f476d0fa165f0d615db474505a305766",
+   "commit": "0c2a702f046606817918b03d826dba84f1ec6752"
+  },
+  {
+   "path": "research/f6_n83_pmull_xonly_20261005/candidate_small.jsonl",
+   "blob": "244b6965ff899c0b259de79757b1fc755d4972ba",
+   "commit": "0c2a702f046606817918b03d826dba84f1ec6752"
+  },
+  {
+   "path": "research/f6_n83_pmull_xonly_20261005/full_1_baseline.jsonl",
+   "blob": "ace2c65212d3ead17033a755abbd2aded135c266",
+   "commit": "0c2a702f046606817918b03d826dba84f1ec6752"
+  },
+  {
+   "path": "research/f6_n83_pmull_xonly_20261005/full_2_candidate.jsonl",
+   "blob": "da4ca443cc8c7ed3437fa9c4aaeb4aab57e50de6",
+   "commit": "0c2a702f046606817918b03d826dba84f1ec6752"
+  },
+  {
+   "path": "research/f6_n83_pmull_xonly_20261005/full_3_candidate.jsonl",
+   "blob": "9bd5ab4a8b711581029f761c28574c5aae8ea7eb",
+   "commit": "0c2a702f046606817918b03d826dba84f1ec6752"
+  },
+  {
+   "path": "research/f6_n83_pmull_xonly_20261005/full_4_baseline.jsonl",
+   "blob": "aa0f197fee7ef891a34fe1359f1b4a30c3fde2d0",
+   "commit": "0c2a702f046606817918b03d826dba84f1ec6752"
+  }
+ ]
+}
