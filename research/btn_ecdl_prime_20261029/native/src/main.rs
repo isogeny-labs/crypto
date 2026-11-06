@@ -320,12 +320,21 @@ fn counts2(p: u64) -> Res<Vec<Value>> {
                 let mut cm = meter(20_000_000_000);
                 let mut counter = Counter::default();
                 let got = counter.count(&net, &vec![None; net.edge_count()], &mut cm).map_err(e)?;
+                // Same count with the crate's functional pruning switched off
+                // (public Counter field): no pruning plan to build, but every
+                // assignment is visited, each stopping at its first rejection.
+                let mut nm = meter(20_000_000_000);
+                let mut nc = Counter::default();
+                nc.functional_pruning = false;
+                let got_np = nc.count(&net, &vec![None; net.edge_count()], &mut nm).map_err(e)?;
                 rec[name] = json!({
                     "count": got.to_string(), "ok": got.to_u64() == Some(brute),
                     "steps": cm.used, "edges": net.edge_count(),
                     "free_input_bits": net.input_bit_count(),
                     "functional_assignments": counter.statistics.functional_assignments,
                     "backend": format!("{:?}", counter.statistics.last_backend),
+                    "no_pruning": { "count": got_np.to_string(), "ok": got_np.to_u64() == Some(brute),
+                                    "steps": nm.used, "assignments": nc.statistics.functional_assignments },
                 });
             }
             // Witness extraction (Lemma 1 prefix counts) on the derived
@@ -394,6 +403,67 @@ fn counts2(p: u64) -> Res<Vec<Value>> {
             rec["step_ratio"] = json!(so as f64 / sd.max(1) as f64);
             out.push(rec);
         }
+    }
+    Ok(out)
+}
+
+/// Decompose the fixed per-call overhead on the combined derived network:
+/// build steps, and a count with every input pinned (one assignment) with
+/// the crate's functional pruning on and off.
+fn overhead(p: u64) -> Res<Value> {
+    let mut m = meter(u64::MAX / 2);
+    let (c, a, b, _) = curve_for(p, &mut m)?;
+    let s = hash_prime(p, &mut m)?;
+    let pts = affine_points(&c, p, a, b);
+    let seeds = [(1u64, 0u64), (3, 7)];
+    let target = &pts[0];
+    let th = [s.clone(), s.clone()];
+    let mut bm = meter(u64::MAX / 2);
+    let net = derived_network_ordered(&c, &s, &th, &seeds, target, false, true, &mut bm)?;
+    let build_steps = bm.used;
+    let mut onm = meter(u64::MAX / 2);
+    let onet = reduction::decomposition_network(&c, &bases(&c, &s, &s, &mut m)?, target, &mut onm).map_err(e)?;
+    let bits = Counter::default().witness(&net, &vec![None; net.edge_count()], &mut meter(20_000_000_000)).map_err(e)?.ok_or("no witness")?;
+    let mut pins = vec![None; net.edge_count()];
+    for (&edge, &bit) in net.interface().iter().zip(&bits) { pins[edge] = Some(bit); }
+    let mut rows = Vec::new();
+    for pruning in [true, false] {
+        let mut cm = meter(20_000_000_000);
+        let mut counter = Counter::default();
+        counter.functional_pruning = pruning;
+        let n = counter.count(&net, &pins, &mut cm).map_err(e)?;
+        rows.push(json!({ "pruning": pruning, "count": n.to_string(), "steps": cm.used }));
+    }
+    Ok(json!({ "p": p, "d": 64 - p.leading_zeros(), "edges": net.edge_count(), "vertices": net.vertex_count(),
+        "build_steps": build_steps, "original_build_steps": onm.used, "original_edges": onet.edge_count(), "pinned_count": rows }))
+}
+
+/// Pruning on vs off for the combined derived network only (no brute force,
+/// no original network), to locate the crossover in d.  Counts must agree.
+fn prunetest(p: u64) -> Res<Vec<Value>> {
+    let mut m = meter(u64::MAX / 2);
+    let (c, a, b, _) = curve_for(p, &mut m)?;
+    let s = hash_prime(p, &mut m)?;
+    let pts = affine_points(&c, p, a, b);
+    let seeds = [(1u64, 0u64), (3, 7)];
+    let mut out = Vec::new();
+    for threshold in [s.clone(), &s >> 3u8] {
+        let th = [threshold.clone(), threshold.clone()];
+        let net = derived_network_ordered(&c, &s, &th, &seeds, &pts[0], false, true, &mut m)?;
+        let mut rec = json!({ "p": p, "d": 64 - p.leading_zeros(), "threshold": threshold.to_string(),
+            "edges": net.edge_count(), "free_input_bits": net.input_bit_count() });
+        for pruning in [true, false] {
+            let mut cm = meter(200_000_000_000);
+            let mut counter = Counter::default();
+            counter.functional_pruning = pruning;
+            let n = counter.count(&net, &vec![None; net.edge_count()], &mut cm).map_err(e)?;
+            rec[if pruning { "pruning" } else { "no_pruning" }] = json!({ "count": n.to_string(), "steps": cm.used,
+                "assignments": counter.statistics.functional_assignments });
+        }
+        rec["agree"] = json!(rec["pruning"]["count"] == rec["no_pruning"]["count"]);
+        rec["prune_over_noprune"] = json!(rec["pruning"]["steps"].as_f64().unwrap() / rec["no_pruning"]["steps"].as_f64().unwrap());
+        println!("{rec}");
+        out.push(rec);
     }
     Ok(out)
 }
@@ -627,6 +697,15 @@ fn report(dir: &str) -> Res<Value> {
         "hashfirst_ratio_min": fmin(&hf), "hashfirst_ratio_max": fmax(&hf),
         "derived_a1_worse_than_original": worse_derived,
         "best_worse_than_original": best.iter().filter(|x| **x < 1.0).count(),
+        "all_exact_with_and_without_pruning": !c2.is_empty() && c2.iter().all(|r| ["original", "derived", "derived_a1", "derived_a1_hashfirst"].iter().all(|k| r[*k]["ok"] == json!(true) && r[*k]["no_pruning"]["ok"] == json!(true))),
+        "noprune_vs_prune_hashfirst_min": fmin(&c2.iter().map(|r| r["derived_a1_hashfirst"]["steps"].as_f64().unwrap_or(0.0) / r["derived_a1_hashfirst"]["no_pruning"]["steps"].as_f64().unwrap_or(1.0)).collect::<Vec<_>>()),
+        "noprune_vs_prune_hashfirst_max": fmax(&c2.iter().map(|r| r["derived_a1_hashfirst"]["steps"].as_f64().unwrap_or(0.0) / r["derived_a1_hashfirst"]["no_pruning"]["steps"].as_f64().unwrap_or(1.0)).collect::<Vec<_>>()),
+        "best_overall_min": fmin(&c2.iter().map(|r| r["original"]["steps"].as_f64().unwrap_or(0.0) / r["derived_a1_hashfirst"]["no_pruning"]["steps"].as_f64().unwrap_or(1.0)).collect::<Vec<_>>()),
+        "best_overall_max": fmax(&c2.iter().map(|r| r["original"]["steps"].as_f64().unwrap_or(0.0) / r["derived_a1_hashfirst"]["no_pruning"]["steps"].as_f64().unwrap_or(1.0)).collect::<Vec<_>>()),
+        "original_noprune_penalty_min": fmin(&c2.iter().map(|r| r["original"]["no_pruning"]["steps"].as_f64().unwrap_or(0.0) / r["original"]["steps"].as_f64().unwrap_or(1.0)).collect::<Vec<_>>()),
+        "original_noprune_penalty_max": fmax(&c2.iter().map(|r| r["original"]["no_pruning"]["steps"].as_f64().unwrap_or(0.0) / r["original"]["steps"].as_f64().unwrap_or(1.0)).collect::<Vec<_>>()),
+        "overhead": read_jsonl(&format!("{dir}/overhead.jsonl")).unwrap_or_default(),
+        "prune_crossover": read_jsonl(&format!("{dir}/prunetest.jsonl")).unwrap_or_default(),
         "free_bits": c2.iter().map(|r| (u(r, "d"), r["original"]["free_input_bits"].as_u64().unwrap_or(0), r["derived"]["free_input_bits"].as_u64().unwrap_or(0))).collect::<std::collections::BTreeSet<_>>().into_iter().map(|(d, o, v)| json!({"d": d, "original": o, "derived": v})).collect::<Vec<_>>(),
         "rows": c2,
         "eccp131_log2_assignments": { "original": 4 * 131, "derived": 2 * 131 },
@@ -701,6 +780,8 @@ fn main() {
         Some("sizes") => nums(2).into_iter().try_for_each(|p| sizes(p).map(|r| println!("{r}"))),
         Some("counts") => nums(2).into_iter().try_for_each(|p| counts(p).map(|v| v.iter().for_each(|r| println!("{r}")))),
         Some("counts2") => nums(2).into_iter().try_for_each(|p| counts2(p).map(|v| v.iter().for_each(|r| println!("{r}")))),
+        Some("overhead") => nums(2).into_iter().try_for_each(|p| overhead(p).map(|r| println!("{r}"))),
+        Some("prunetest") => nums(2).into_iter().try_for_each(|p| prunetest(p).map(|_| ())),
         Some("solve") => {
             let n = nums(2);
             solve(n[0], n[1], n[2]).map(|r| println!("{r}"))

@@ -21,6 +21,7 @@ $B report native_runs                                                      > nat
 |---|---|
 | `sizes P...` | decomposition-network edges, vertices, max degree, interface bits per prime |
 | `counts P...` | `Counter::count` vs a brute-force decomposition count; backend; charged steps |
+| `overhead P...`, `prunetest P...` | fixed per-call cost split (pruning plan vs rest); pruning on/off crossover at larger d |
 | `counts2 P...` | original vs derived-last-point variants (A1-only interface, hash-first) at four thresholds: counts, steps, checked witnesses, pinned overhead |
 | `solve P SEED XI` | `reduction::solve` with a known scalar, then `reduction::verify` |
 | `size-json FILE` | network size for a JSON problem (e.g. the bundled ECCp-131 input) |
@@ -59,6 +60,14 @@ Each line of output is one JSON object. Curves are the first prime-order
   instances (p = 7, τ = 2), where a fixed per-call overhead (~5 charged steps
   per edge) dominates. At ECCp-131 the fallback's worst case falls from 2^524 to
   2^262 assignments per count, still far beyond rho's 2^65.3. [pcc:unverified]
+* **When to build the pruning plan.** On the combined network the fixed
+  per-call cost (`overhead`) is mostly the crate's pruning plan, about 4
+  charged steps per edge. Switching it off (public `Counter::functional_pruning`)
+  keeps every count exact and makes the combined network 1.21–2.92× cheaper at
+  d = 3–4 (2.97–80.2× below the pruned original); the original network needs
+  its pruning (off costs it 1.47–35.6×). `prunetest` locates the crossover: off
+  still wins at d = 5 (1.17×, 1.03×), while at d = 6 pruning wins at a small
+  threshold (0.85). A size-based rule, not a blanket switch. [pcc:unverified]
 * **Recursion crossover (headline).** `Counter::count` selects the recursive
   backend only when `lambda / 131072 >= 1` with `lambda = ceil(log2(2·edges))`
   (transcribed from `recursive.rs` `Setup::parameters`), i.e. at least

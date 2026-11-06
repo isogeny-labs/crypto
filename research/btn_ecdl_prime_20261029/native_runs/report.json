@@ -218,7 +218,10 @@
   "derived_last_point": {
     "a1_only_same_canonical_witness": true,
     "a1_only_witnesses_ok": true,
+    "all_exact_with_and_without_pruning": true,
     "all_variants_exact": true,
+    "best_overall_max": 80.21428423659866,
+    "best_overall_min": 2.9737989078703473,
     "best_ratio_max": 65.25271596533233,
     "best_ratio_min": 1.5146334617641806,
     "best_worse_than_original": 0,
@@ -243,7 +246,133 @@
     "hashfirst_ratio_max": 1.5605368579520809,
     "hashfirst_ratio_min": 1.0,
     "n": 32,
+    "noprune_vs_prune_hashfirst_max": 2.9220825852782766,
+    "noprune_vs_prune_hashfirst_min": 1.2069512439732857,
     "note": "A2 := target - A1 is computed, not searched; same language (bijection), so counts are unchanged and free input bits halve (4d -> 2d). Steps are Meter diagnostics.",
+    "original_noprune_penalty_max": 35.581531240258755,
+    "original_noprune_penalty_min": 1.4668543432928105,
+    "overhead": [
+      {
+        "build_steps": 0,
+        "d": 3,
+        "edges": 16905,
+        "original_build_steps": 5,
+        "original_edges": 31624,
+        "p": 5,
+        "pinned_count": [
+          {
+            "count": "1",
+            "pruning": true,
+            "steps": 83862
+          },
+          {
+            "count": "1",
+            "pruning": false,
+            "steps": 12907
+          }
+        ],
+        "vertices": 4422
+      },
+      {
+        "build_steps": 0,
+        "d": 4,
+        "edges": 29329,
+        "original_build_steps": 7,
+        "original_edges": 56480,
+        "p": 13,
+        "pinned_count": [
+          {
+            "count": "1",
+            "pruning": true,
+            "steps": 139761
+          },
+          {
+            "count": "1",
+            "pruning": false,
+            "steps": 17403
+          }
+        ],
+        "vertices": 6653
+      }
+    ],
+    "prune_crossover": [
+      {
+        "agree": true,
+        "d": 5,
+        "edges": 30053,
+        "free_input_bits": 10,
+        "no_pruning": {
+          "assignments": 1024,
+          "count": "15",
+          "steps": 720590
+        },
+        "p": 17,
+        "prune_over_noprune": 1.1659376344384462,
+        "pruning": {
+          "assignments": 559,
+          "count": "15",
+          "steps": 840163
+        },
+        "threshold": "37"
+      },
+      {
+        "agree": true,
+        "d": 5,
+        "edges": 30053,
+        "free_input_bits": 10,
+        "no_pruning": {
+          "assignments": 1024,
+          "count": "0",
+          "steps": 468098
+        },
+        "p": 17,
+        "prune_over_noprune": 1.0255288422509816,
+        "pruning": {
+          "assignments": 408,
+          "count": "0",
+          "steps": 480048
+        },
+        "threshold": "4"
+      },
+      {
+        "agree": true,
+        "d": 6,
+        "edges": 30865,
+        "free_input_bits": 12,
+        "no_pruning": {
+          "assignments": 4096,
+          "count": "35",
+          "steps": 2889348
+        },
+        "p": 37,
+        "prune_over_noprune": 1.0360531164816422,
+        "pruning": {
+          "assignments": 2395,
+          "count": "35",
+          "steps": 2993518
+        },
+        "threshold": "79"
+      },
+      {
+        "agree": true,
+        "d": 6,
+        "edges": 30865,
+        "free_input_bits": 12,
+        "no_pruning": {
+          "assignments": 4096,
+          "count": "0",
+          "steps": 2278790
+        },
+        "p": 37,
+        "prune_over_noprune": 0.8534568784310972,
+        "pruning": {
+          "assignments": 1873,
+          "count": "0",
+          "steps": 1944849
+        },
+        "threshold": "9"
+      }
+    ],
     "rows": [
       {
         "brute": 5,
@@ -254,6 +383,12 @@
           "edges": 16919,
           "free_input_bits": 6,
           "functional_assignments": 43,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "5",
+            "ok": true,
+            "steps": 93140
+          },
           "ok": true,
           "steps": 163933,
           "witness": {
@@ -270,6 +405,12 @@
           "edges": 16905,
           "free_input_bits": 6,
           "functional_assignments": 43,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "5",
+            "ok": true,
+            "steps": 93070
+          },
           "ok": true,
           "pinned_count": {
             "assignments": 1,
@@ -293,6 +434,12 @@
           "edges": 16905,
           "free_input_bits": 6,
           "functional_assignments": 43,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "5",
+            "ok": true,
+            "steps": 93070
+          },
           "ok": true,
           "steps": 163863
         },
@@ -302,6 +449,12 @@
           "edges": 31624,
           "free_input_bits": 12,
           "functional_assignments": 295,
+          "no_pruning": {
+            "assignments": 4096,
+            "count": "5",
+            "ok": true,
+            "steps": 4485600
+          },
           "ok": true,
           "steps": 2379059,
           "witness": {
@@ -324,6 +477,12 @@
           "edges": 16919,
           "free_input_bits": 6,
           "functional_assignments": 43,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "5",
+            "ok": true,
+            "steps": 93140
+          },
           "ok": true,
           "steps": 163933,
           "witness": {
@@ -340,6 +499,12 @@
           "edges": 16905,
           "free_input_bits": 6,
           "functional_assignments": 43,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "5",
+            "ok": true,
+            "steps": 93070
+          },
           "ok": true,
           "pinned_count": {
             "assignments": 1,
@@ -363,6 +528,12 @@
           "edges": 16905,
           "free_input_bits": 6,
           "functional_assignments": 43,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "5",
+            "ok": true,
+            "steps": 93070
+          },
           "ok": true,
           "steps": 163863
         },
@@ -372,6 +543,12 @@
           "edges": 31624,
           "free_input_bits": 12,
           "functional_assignments": 295,
+          "no_pruning": {
+            "assignments": 4096,
+            "count": "5",
+            "ok": true,
+            "steps": 4485600
+          },
           "ok": true,
           "steps": 2379059,
           "witness": {
@@ -394,6 +571,12 @@
           "edges": 16919,
           "free_input_bits": 6,
           "functional_assignments": 41,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 64874
+          },
           "ok": true,
           "steps": 135637,
           "witness": {
@@ -408,6 +591,12 @@
           "edges": 16905,
           "free_input_bits": 6,
           "functional_assignments": 41,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 64874
+          },
           "ok": true,
           "steps": 135637,
           "witness": {
@@ -422,6 +611,12 @@
           "edges": 16905,
           "free_input_bits": 6,
           "functional_assignments": 41,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 53890
+          },
           "ok": true,
           "steps": 124653
         },
@@ -431,6 +626,12 @@
           "edges": 31624,
           "free_input_bits": 12,
           "functional_assignments": 181,
+          "no_pruning": {
+            "assignments": 4096,
+            "count": "0",
+            "ok": true,
+            "steps": 3523331
+          },
           "ok": true,
           "steps": 1314140,
           "witness": {
@@ -453,6 +654,12 @@
           "edges": 16919,
           "free_input_bits": 6,
           "functional_assignments": 41,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "2",
+            "ok": true,
+            "steps": 75858
+          },
           "ok": true,
           "steps": 146621,
           "witness": {
@@ -469,6 +676,12 @@
           "edges": 16905,
           "free_input_bits": 6,
           "functional_assignments": 41,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "2",
+            "ok": true,
+            "steps": 75830
+          },
           "ok": true,
           "pinned_count": {
             "assignments": 1,
@@ -492,6 +705,12 @@
           "edges": 16905,
           "free_input_bits": 6,
           "functional_assignments": 41,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "2",
+            "ok": true,
+            "steps": 64846
+          },
           "ok": true,
           "steps": 135609
         },
@@ -501,6 +720,12 @@
           "edges": 31624,
           "free_input_bits": 12,
           "functional_assignments": 181,
+          "no_pruning": {
+            "assignments": 4096,
+            "count": "2",
+            "ok": true,
+            "steps": 3544187
+          },
           "ok": true,
           "steps": 1334996,
           "witness": {
@@ -523,6 +748,12 @@
           "edges": 16919,
           "free_input_bits": 6,
           "functional_assignments": 39,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 64068
+          },
           "ok": true,
           "steps": 134801,
           "witness": {
@@ -537,6 +768,12 @@
           "edges": 16905,
           "free_input_bits": 6,
           "functional_assignments": 39,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 64068
+          },
           "ok": true,
           "steps": 134801,
           "witness": {
@@ -551,6 +788,12 @@
           "edges": 16905,
           "free_input_bits": 6,
           "functional_assignments": 39,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 42100
+          },
           "ok": true,
           "steps": 112833
         },
@@ -560,6 +803,12 @@
           "edges": 31624,
           "free_input_bits": 12,
           "functional_assignments": 105,
+          "no_pruning": {
+            "assignments": 4096,
+            "count": "0",
+            "ok": true,
+            "steps": 2722076
+          },
           "ok": true,
           "steps": 688359,
           "witness": {
@@ -582,6 +831,12 @@
           "edges": 16919,
           "free_input_bits": 6,
           "functional_assignments": 39,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 64068
+          },
           "ok": true,
           "steps": 134801,
           "witness": {
@@ -596,6 +851,12 @@
           "edges": 16905,
           "free_input_bits": 6,
           "functional_assignments": 39,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 64068
+          },
           "ok": true,
           "steps": 134801,
           "witness": {
@@ -610,6 +871,12 @@
           "edges": 16905,
           "free_input_bits": 6,
           "functional_assignments": 39,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 42100
+          },
           "ok": true,
           "steps": 112833
         },
@@ -619,6 +886,12 @@
           "edges": 31624,
           "free_input_bits": 12,
           "functional_assignments": 105,
+          "no_pruning": {
+            "assignments": 4096,
+            "count": "0",
+            "ok": true,
+            "steps": 2722076
+          },
           "ok": true,
           "steps": 688359,
           "witness": {
@@ -641,6 +914,12 @@
           "edges": 16919,
           "free_input_bits": 6,
           "functional_assignments": 36,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 64065
+          },
           "ok": true,
           "steps": 133654,
           "witness": {
@@ -655,6 +934,12 @@
           "edges": 16905,
           "free_input_bits": 6,
           "functional_assignments": 36,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 64065
+          },
           "ok": true,
           "steps": 133654,
           "witness": {
@@ -669,6 +954,12 @@
           "edges": 16905,
           "free_input_bits": 6,
           "functional_assignments": 36,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 36605
+          },
           "ok": true,
           "steps": 106194
         },
@@ -678,6 +969,12 @@
           "edges": 31624,
           "free_input_bits": 12,
           "functional_assignments": 69,
+          "no_pruning": {
+            "assignments": 4096,
+            "count": "0",
+            "ok": true,
+            "steps": 2343223
+          },
           "ok": true,
           "steps": 424002,
           "witness": {
@@ -700,6 +997,12 @@
           "edges": 16919,
           "free_input_bits": 6,
           "functional_assignments": 36,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 63665
+          },
           "ok": true,
           "steps": 133254,
           "witness": {
@@ -714,6 +1017,12 @@
           "edges": 16905,
           "free_input_bits": 6,
           "functional_assignments": 36,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 63665
+          },
           "ok": true,
           "steps": 133254,
           "witness": {
@@ -728,6 +1037,12 @@
           "edges": 16905,
           "free_input_bits": 6,
           "functional_assignments": 36,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 36205
+          },
           "ok": true,
           "steps": 105794
         },
@@ -737,6 +1052,12 @@
           "edges": 31624,
           "free_input_bits": 12,
           "functional_assignments": 69,
+          "no_pruning": {
+            "assignments": 4096,
+            "count": "0",
+            "ok": true,
+            "steps": 2343223
+          },
           "ok": true,
           "steps": 424002,
           "witness": {
@@ -759,6 +1080,12 @@
           "edges": 17001,
           "free_input_bits": 6,
           "functional_assignments": 57,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "11",
+            "ok": true,
+            "steps": 191361
+          },
           "ok": true,
           "steps": 262515,
           "witness": {
@@ -775,6 +1102,12 @@
           "edges": 16987,
           "free_input_bits": 6,
           "functional_assignments": 57,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "11",
+            "ok": true,
+            "steps": 191207
+          },
           "ok": true,
           "pinned_count": {
             "assignments": 1,
@@ -798,6 +1131,12 @@
           "edges": 16987,
           "free_input_bits": 6,
           "functional_assignments": 57,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "11",
+            "ok": true,
+            "steps": 191207
+          },
           "ok": true,
           "steps": 262361
         },
@@ -807,6 +1146,12 @@
           "edges": 31740,
           "free_input_bits": 12,
           "functional_assignments": 729,
+          "no_pruning": {
+            "assignments": 4096,
+            "count": "11",
+            "ok": true,
+            "steps": 9627056
+          },
           "ok": true,
           "steps": 6563062,
           "witness": {
@@ -829,6 +1174,12 @@
           "edges": 17001,
           "free_input_bits": 6,
           "functional_assignments": 57,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "11",
+            "ok": true,
+            "steps": 191361
+          },
           "ok": true,
           "steps": 262515,
           "witness": {
@@ -845,6 +1196,12 @@
           "edges": 16987,
           "free_input_bits": 6,
           "functional_assignments": 57,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "11",
+            "ok": true,
+            "steps": 191207
+          },
           "ok": true,
           "pinned_count": {
             "assignments": 1,
@@ -868,6 +1225,12 @@
           "edges": 16987,
           "free_input_bits": 6,
           "functional_assignments": 57,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "11",
+            "ok": true,
+            "steps": 191207
+          },
           "ok": true,
           "steps": 262361
         },
@@ -877,6 +1240,12 @@
           "edges": 31740,
           "free_input_bits": 12,
           "functional_assignments": 729,
+          "no_pruning": {
+            "assignments": 4096,
+            "count": "11",
+            "ok": true,
+            "steps": 9627056
+          },
           "ok": true,
           "steps": 6563062,
           "witness": {
@@ -899,6 +1268,12 @@
           "edges": 17001,
           "free_input_bits": 6,
           "functional_assignments": 48,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "2",
+            "ok": true,
+            "steps": 138984
+          },
           "ok": true,
           "steps": 203406,
           "witness": {
@@ -915,6 +1290,12 @@
           "edges": 16987,
           "free_input_bits": 6,
           "functional_assignments": 48,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "2",
+            "ok": true,
+            "steps": 138956
+          },
           "ok": true,
           "pinned_count": {
             "assignments": 1,
@@ -938,6 +1319,12 @@
           "edges": 16987,
           "free_input_bits": 6,
           "functional_assignments": 48,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "2",
+            "ok": true,
+            "steps": 106004
+          },
           "ok": true,
           "steps": 170426
         },
@@ -947,6 +1334,12 @@
           "edges": 31740,
           "free_input_bits": 12,
           "functional_assignments": 324,
+          "no_pruning": {
+            "assignments": 4096,
+            "count": "2",
+            "ok": true,
+            "steps": 6463893
+          },
           "ok": true,
           "steps": 2639459,
           "witness": {
@@ -969,6 +1362,12 @@
           "edges": 17001,
           "free_input_bits": 6,
           "functional_assignments": 48,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "2",
+            "ok": true,
+            "steps": 138984
+          },
           "ok": true,
           "steps": 203406,
           "witness": {
@@ -985,6 +1384,12 @@
           "edges": 16987,
           "free_input_bits": 6,
           "functional_assignments": 48,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "2",
+            "ok": true,
+            "steps": 138956
+          },
           "ok": true,
           "pinned_count": {
             "assignments": 1,
@@ -1008,6 +1413,12 @@
           "edges": 16987,
           "free_input_bits": 6,
           "functional_assignments": 48,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "2",
+            "ok": true,
+            "steps": 106004
+          },
           "ok": true,
           "steps": 170426
         },
@@ -1017,6 +1428,12 @@
           "edges": 31740,
           "free_input_bits": 12,
           "functional_assignments": 324,
+          "no_pruning": {
+            "assignments": 4096,
+            "count": "2",
+            "ok": true,
+            "steps": 6463893
+          },
           "ok": true,
           "steps": 2639459,
           "witness": {
@@ -1039,6 +1456,12 @@
           "edges": 17001,
           "free_input_bits": 6,
           "functional_assignments": 42,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 126214
+          },
           "ok": true,
           "steps": 186148,
           "witness": {
@@ -1053,6 +1476,12 @@
           "edges": 16987,
           "free_input_bits": 6,
           "functional_assignments": 42,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 126214
+          },
           "ok": true,
           "steps": 186148,
           "witness": {
@@ -1067,6 +1496,12 @@
           "edges": 16987,
           "free_input_bits": 6,
           "functional_assignments": 42,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 71294
+          },
           "ok": true,
           "steps": 131228
         },
@@ -1076,6 +1511,12 @@
           "edges": 31740,
           "free_input_bits": 12,
           "functional_assignments": 128,
+          "no_pruning": {
+            "assignments": 4096,
+            "count": "0",
+            "ok": true,
+            "steps": 4680156
+          },
           "ok": true,
           "steps": 925612,
           "witness": {
@@ -1098,6 +1539,12 @@
           "edges": 17001,
           "free_input_bits": 6,
           "functional_assignments": 42,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 126214
+          },
           "ok": true,
           "steps": 186148,
           "witness": {
@@ -1112,6 +1559,12 @@
           "edges": 16987,
           "free_input_bits": 6,
           "functional_assignments": 42,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 126214
+          },
           "ok": true,
           "steps": 186148,
           "witness": {
@@ -1126,6 +1579,12 @@
           "edges": 16987,
           "free_input_bits": 6,
           "functional_assignments": 42,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 71294
+          },
           "ok": true,
           "steps": 131228
         },
@@ -1135,6 +1594,12 @@
           "edges": 31740,
           "free_input_bits": 12,
           "functional_assignments": 128,
+          "no_pruning": {
+            "assignments": 4096,
+            "count": "0",
+            "ok": true,
+            "steps": 4680156
+          },
           "ok": true,
           "steps": 925612,
           "witness": {
@@ -1157,6 +1622,12 @@
           "edges": 17001,
           "free_input_bits": 6,
           "functional_assignments": 39,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 125787
+          },
           "ok": true,
           "steps": 183477,
           "witness": {
@@ -1171,6 +1642,12 @@
           "edges": 16987,
           "free_input_bits": 6,
           "functional_assignments": 39,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 125787
+          },
           "ok": true,
           "steps": 183477,
           "witness": {
@@ -1185,6 +1662,12 @@
           "edges": 16987,
           "free_input_bits": 6,
           "functional_assignments": 39,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 59883
+          },
           "ok": true,
           "steps": 117573
         },
@@ -1194,6 +1677,12 @@
           "edges": 31740,
           "free_input_bits": 12,
           "functional_assignments": 39,
+          "no_pruning": {
+            "assignments": 4096,
+            "count": "0",
+            "ok": true,
+            "steps": 3831442
+          },
           "ok": true,
           "steps": 178080,
           "witness": {
@@ -1216,6 +1705,12 @@
           "edges": 17001,
           "free_input_bits": 6,
           "functional_assignments": 39,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 125787
+          },
           "ok": true,
           "steps": 183477,
           "witness": {
@@ -1230,6 +1725,12 @@
           "edges": 16987,
           "free_input_bits": 6,
           "functional_assignments": 39,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 125787
+          },
           "ok": true,
           "steps": 183477,
           "witness": {
@@ -1244,6 +1745,12 @@
           "edges": 16987,
           "free_input_bits": 6,
           "functional_assignments": 39,
+          "no_pruning": {
+            "assignments": 64,
+            "count": "0",
+            "ok": true,
+            "steps": 59883
+          },
           "ok": true,
           "steps": 117573
         },
@@ -1253,6 +1760,12 @@
           "edges": 31740,
           "free_input_bits": 12,
           "functional_assignments": 39,
+          "no_pruning": {
+            "assignments": 4096,
+            "count": "0",
+            "ok": true,
+            "steps": 3831442
+          },
           "ok": true,
           "steps": 178080,
           "witness": {
@@ -1275,6 +1788,12 @@
           "edges": 29347,
           "free_input_bits": 8,
           "functional_assignments": 181,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "9",
+            "ok": true,
+            "steps": 333652
+          },
           "ok": true,
           "steps": 455268,
           "witness": {
@@ -1291,6 +1810,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 181,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "9",
+            "ok": true,
+            "steps": 333490
+          },
           "ok": true,
           "pinned_count": {
             "assignments": 1,
@@ -1314,6 +1839,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 181,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "9",
+            "ok": true,
+            "steps": 333490
+          },
           "ok": true,
           "steps": 455106
         },
@@ -1323,6 +1854,12 @@
           "edges": 56480,
           "free_input_bits": 16,
           "functional_assignments": 1981,
+          "no_pruning": {
+            "assignments": 65536,
+            "count": "9",
+            "ok": true,
+            "steps": 69188532
+          },
           "ok": true,
           "steps": 19748700,
           "witness": {
@@ -1345,6 +1882,12 @@
           "edges": 29347,
           "free_input_bits": 8,
           "functional_assignments": 181,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "9",
+            "ok": true,
+            "steps": 333652
+          },
           "ok": true,
           "steps": 455268,
           "witness": {
@@ -1361,6 +1904,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 181,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "9",
+            "ok": true,
+            "steps": 333490
+          },
           "ok": true,
           "pinned_count": {
             "assignments": 1,
@@ -1384,6 +1933,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 181,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "9",
+            "ok": true,
+            "steps": 333490
+          },
           "ok": true,
           "steps": 455106
         },
@@ -1393,6 +1948,12 @@
           "edges": 56480,
           "free_input_bits": 16,
           "functional_assignments": 1981,
+          "no_pruning": {
+            "assignments": 65536,
+            "count": "9",
+            "ok": true,
+            "steps": 69188532
+          },
           "ok": true,
           "steps": 19748700,
           "witness": {
@@ -1415,6 +1976,12 @@
           "edges": 29347,
           "free_input_bits": 8,
           "functional_assignments": 164,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "2",
+            "ok": true,
+            "steps": 277443
+          },
           "ok": true,
           "steps": 389880,
           "witness": {
@@ -1431,6 +1998,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 164,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "2",
+            "ok": true,
+            "steps": 277407
+          },
           "ok": true,
           "pinned_count": {
             "assignments": 1,
@@ -1454,6 +2027,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 164,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "2",
+            "ok": true,
+            "steps": 240742
+          },
           "ok": true,
           "steps": 353179
         },
@@ -1463,6 +2042,12 @@
           "edges": 56480,
           "free_input_bits": 16,
           "functional_assignments": 984,
+          "no_pruning": {
+            "assignments": 65536,
+            "count": "2",
+            "ok": true,
+            "steps": 58303887
+          },
           "ok": true,
           "steps": 9068321,
           "witness": {
@@ -1485,6 +2070,12 @@
           "edges": 29347,
           "free_input_bits": 8,
           "functional_assignments": 164,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "3",
+            "ok": true,
+            "steps": 285170
+          },
           "ok": true,
           "steps": 397607,
           "witness": {
@@ -1501,6 +2092,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 164,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "3",
+            "ok": true,
+            "steps": 285116
+          },
           "ok": true,
           "pinned_count": {
             "assignments": 1,
@@ -1524,6 +2121,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 164,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "3",
+            "ok": true,
+            "steps": 248451
+          },
           "ok": true,
           "steps": 360888
         },
@@ -1533,6 +2136,12 @@
           "edges": 56480,
           "free_input_bits": 16,
           "functional_assignments": 984,
+          "no_pruning": {
+            "assignments": 65536,
+            "count": "3",
+            "ok": true,
+            "steps": 58318774
+          },
           "ok": true,
           "steps": 9083208,
           "witness": {
@@ -1555,6 +2164,12 @@
           "edges": 29347,
           "free_input_bits": 8,
           "functional_assignments": 157,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "1",
+            "ok": true,
+            "steps": 268868
+          },
           "ok": true,
           "steps": 376747,
           "witness": {
@@ -1571,6 +2186,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 157,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "1",
+            "ok": true,
+            "steps": 268850
+          },
           "ok": true,
           "pinned_count": {
             "assignments": 1,
@@ -1594,6 +2215,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 157,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "1",
+            "ok": true,
+            "steps": 217519
+          },
           "ok": true,
           "steps": 325398
         },
@@ -1603,6 +2230,12 @@
           "edges": 56480,
           "free_input_bits": 16,
           "functional_assignments": 616,
+          "no_pruning": {
+            "assignments": 65536,
+            "count": "1",
+            "ok": true,
+            "steps": 54056796
+          },
           "ok": true,
           "steps": 5206542,
           "witness": {
@@ -1625,6 +2258,12 @@
           "edges": 29347,
           "free_input_bits": 8,
           "functional_assignments": 157,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "1",
+            "ok": true,
+            "steps": 268868
+          },
           "ok": true,
           "steps": 376747,
           "witness": {
@@ -1641,6 +2280,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 157,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "1",
+            "ok": true,
+            "steps": 268850
+          },
           "ok": true,
           "pinned_count": {
             "assignments": 1,
@@ -1664,6 +2309,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 157,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "1",
+            "ok": true,
+            "steps": 217519
+          },
           "ok": true,
           "steps": 325398
         },
@@ -1673,6 +2324,12 @@
           "edges": 56480,
           "free_input_bits": 16,
           "functional_assignments": 616,
+          "no_pruning": {
+            "assignments": 65536,
+            "count": "1",
+            "ok": true,
+            "steps": 54056796
+          },
           "ok": true,
           "steps": 5206542,
           "witness": {
@@ -1695,6 +2352,12 @@
           "edges": 29347,
           "free_input_bits": 8,
           "functional_assignments": 154,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "0",
+            "ok": true,
+            "steps": 260717
+          },
           "ok": true,
           "steps": 365589,
           "witness": {
@@ -1709,6 +2372,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 154,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "0",
+            "ok": true,
+            "steps": 260717
+          },
           "ok": true,
           "steps": 365589,
           "witness": {
@@ -1723,6 +2392,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 154,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "0",
+            "ok": true,
+            "steps": 202053
+          },
           "ok": true,
           "steps": 306925
         },
@@ -1732,6 +2407,12 @@
           "edges": 56480,
           "free_input_bits": 16,
           "functional_assignments": 458,
+          "no_pruning": {
+            "assignments": 65536,
+            "count": "0",
+            "ok": true,
+            "steps": 51965786
+          },
           "ok": true,
           "steps": 3560612,
           "witness": {
@@ -1754,6 +2435,12 @@
           "edges": 29347,
           "free_input_bits": 8,
           "functional_assignments": 154,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "0",
+            "ok": true,
+            "steps": 260717
+          },
           "ok": true,
           "steps": 365589,
           "witness": {
@@ -1768,6 +2455,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 154,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "0",
+            "ok": true,
+            "steps": 260717
+          },
           "ok": true,
           "steps": 365589,
           "witness": {
@@ -1782,6 +2475,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 154,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "0",
+            "ok": true,
+            "steps": 202053
+          },
           "ok": true,
           "steps": 306925
         },
@@ -1791,6 +2490,12 @@
           "edges": 56480,
           "free_input_bits": 16,
           "functional_assignments": 458,
+          "no_pruning": {
+            "assignments": 65536,
+            "count": "0",
+            "ok": true,
+            "steps": 51965786
+          },
           "ok": true,
           "steps": 3560612,
           "witness": {
@@ -1813,6 +2518,12 @@
           "edges": 29347,
           "free_input_bits": 8,
           "functional_assignments": 211,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "17",
+            "ok": true,
+            "steps": 532025
+          },
           "ok": true,
           "steps": 653941,
           "witness": {
@@ -1829,6 +2540,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 211,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "17",
+            "ok": true,
+            "steps": 531719
+          },
           "ok": true,
           "pinned_count": {
             "assignments": 1,
@@ -1852,6 +2569,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 211,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "17",
+            "ok": true,
+            "steps": 531719
+          },
           "ok": true,
           "steps": 653635
         },
@@ -1861,6 +2584,12 @@
           "edges": 56480,
           "free_input_bits": 16,
           "functional_assignments": 3991,
+          "no_pruning": {
+            "assignments": 65536,
+            "count": "17",
+            "ok": true,
+            "steps": 107725686
+          },
           "ok": true,
           "steps": 42651459,
           "witness": {
@@ -1883,6 +2612,12 @@
           "edges": 29347,
           "free_input_bits": 8,
           "functional_assignments": 211,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "17",
+            "ok": true,
+            "steps": 532025
+          },
           "ok": true,
           "steps": 653941,
           "witness": {
@@ -1899,6 +2634,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 211,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "17",
+            "ok": true,
+            "steps": 531719
+          },
           "ok": true,
           "pinned_count": {
             "assignments": 1,
@@ -1922,6 +2663,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 211,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "17",
+            "ok": true,
+            "steps": 531719
+          },
           "ok": true,
           "steps": 653635
         },
@@ -1931,6 +2678,12 @@
           "edges": 56480,
           "free_input_bits": 16,
           "functional_assignments": 3991,
+          "no_pruning": {
+            "assignments": 65536,
+            "count": "17",
+            "ok": true,
+            "steps": 107725686
+          },
           "ok": true,
           "steps": 42651459,
           "witness": {
@@ -1953,6 +2706,12 @@
           "edges": 29347,
           "free_input_bits": 8,
           "functional_assignments": 178,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "6",
+            "ok": true,
+            "steps": 444484
+          },
           "ok": true,
           "steps": 530356,
           "witness": {
@@ -1969,6 +2728,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 178,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "6",
+            "ok": true,
+            "steps": 444376
+          },
           "ok": true,
           "pinned_count": {
             "assignments": 1,
@@ -1992,6 +2757,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 178,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "6",
+            "ok": true,
+            "steps": 400378
+          },
           "ok": true,
           "steps": 486250
         },
@@ -2001,6 +2772,12 @@
           "edges": 56480,
           "free_input_bits": 16,
           "functional_assignments": 2314,
+          "no_pruning": {
+            "assignments": 65536,
+            "count": "6",
+            "ok": true,
+            "steps": 93262386
+          },
           "ok": true,
           "steps": 23810227,
           "witness": {
@@ -2023,6 +2800,12 @@
           "edges": 29347,
           "free_input_bits": 8,
           "functional_assignments": 178,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "7",
+            "ok": true,
+            "steps": 452211
+          },
           "ok": true,
           "steps": 538083,
           "witness": {
@@ -2039,6 +2822,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 178,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "7",
+            "ok": true,
+            "steps": 452085
+          },
           "ok": true,
           "pinned_count": {
             "assignments": 1,
@@ -2062,6 +2851,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 178,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "7",
+            "ok": true,
+            "steps": 408087
+          },
           "ok": true,
           "steps": 493959
         },
@@ -2071,6 +2866,12 @@
           "edges": 56480,
           "free_input_bits": 16,
           "functional_assignments": 2314,
+          "no_pruning": {
+            "assignments": 65536,
+            "count": "7",
+            "ok": true,
+            "steps": 93277273
+          },
           "ok": true,
           "steps": 23825114,
           "witness": {
@@ -2093,6 +2894,12 @@
           "edges": 29347,
           "free_input_bits": 8,
           "functional_assignments": 157,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "0",
+            "ok": true,
+            "steps": 395154
+          },
           "ok": true,
           "steps": 462919,
           "witness": {
@@ -2107,6 +2914,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 157,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "0",
+            "ok": true,
+            "steps": 395154
+          },
           "ok": true,
           "steps": 462919,
           "witness": {
@@ -2121,6 +2934,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 157,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "0",
+            "ok": true,
+            "steps": 299825
+          },
           "ok": true,
           "steps": 367590
         },
@@ -2130,6 +2949,12 @@
           "edges": 56480,
           "free_input_bits": 16,
           "functional_assignments": 957,
+          "no_pruning": {
+            "assignments": 65536,
+            "count": "0",
+            "ok": true,
+            "steps": 77682526
+          },
           "ok": true,
           "steps": 9034638,
           "witness": {
@@ -2152,6 +2977,12 @@
           "edges": 29347,
           "free_input_bits": 8,
           "functional_assignments": 157,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "1",
+            "ok": true,
+            "steps": 402881
+          },
           "ok": true,
           "steps": 470646,
           "witness": {
@@ -2168,6 +2999,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 157,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "1",
+            "ok": true,
+            "steps": 402863
+          },
           "ok": true,
           "pinned_count": {
             "assignments": 1,
@@ -2191,6 +3028,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 157,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "1",
+            "ok": true,
+            "steps": 307534
+          },
           "ok": true,
           "steps": 375299
         },
@@ -2200,6 +3043,12 @@
           "edges": 56480,
           "free_input_bits": 16,
           "functional_assignments": 957,
+          "no_pruning": {
+            "assignments": 65536,
+            "count": "1",
+            "ok": true,
+            "steps": 77697413
+          },
           "ok": true,
           "steps": 9049525,
           "witness": {
@@ -2222,6 +3071,12 @@
           "edges": 29347,
           "free_input_bits": 8,
           "functional_assignments": 144,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "0",
+            "ok": true,
+            "steps": 393458
+          },
           "ok": true,
           "steps": 449173,
           "witness": {
@@ -2236,6 +3091,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 144,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "0",
+            "ok": true,
+            "steps": 393458
+          },
           "ok": true,
           "steps": 449173,
           "witness": {
@@ -2250,6 +3111,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 144,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "0",
+            "ok": true,
+            "steps": 268797
+          },
           "ok": true,
           "steps": 324512
         },
@@ -2259,6 +3126,12 @@
           "edges": 56480,
           "free_input_bits": 16,
           "functional_assignments": 286,
+          "no_pruning": {
+            "assignments": 65536,
+            "count": "0",
+            "ok": true,
+            "steps": 69058237
+          },
           "ok": true,
           "steps": 1940845,
           "witness": {
@@ -2281,6 +3154,12 @@
           "edges": 29347,
           "free_input_bits": 8,
           "functional_assignments": 144,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "0",
+            "ok": true,
+            "steps": 393879
+          },
           "ok": true,
           "steps": 449594,
           "witness": {
@@ -2295,6 +3174,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 144,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "0",
+            "ok": true,
+            "steps": 393879
+          },
           "ok": true,
           "steps": 449594,
           "witness": {
@@ -2309,6 +3194,12 @@
           "edges": 29329,
           "free_input_bits": 8,
           "functional_assignments": 144,
+          "no_pruning": {
+            "assignments": 256,
+            "count": "0",
+            "ok": true,
+            "steps": 269218
+          },
           "ok": true,
           "steps": 324933
         },
@@ -2318,6 +3209,12 @@
           "edges": 56480,
           "free_input_bits": 16,
           "functional_assignments": 286,
+          "no_pruning": {
+            "assignments": 65536,
+            "count": "0",
+            "ok": true,
+            "steps": 69058237
+          },
           "ok": true,
           "steps": 1940845,
           "witness": {

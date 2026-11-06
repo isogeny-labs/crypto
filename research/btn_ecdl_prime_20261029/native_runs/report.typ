@@ -131,6 +131,34 @@ thresholds τ = s, s/2, s/4, s/8, where s is the hash prime):
   )).flatten()
 )
 
+*Where the remaining cost is, and when to prune.* Pinning every input so one
+assignment remains isolates the fixed per-call cost on the combined network:
+#D.at("overhead").map(o => [d = #o.at("d"): #o.at("pinned_count").at(0).at("steps") charged steps with the crate's pruning plan, #o.at("pinned_count").at(1).at("steps") without, on #o.at("edges") edges]).join("; ").
+Building the pruning plan is about 85% of the overhead (about 4 charged steps
+per edge). With the derived network's search space halved, the plan can cost
+more than it saves: switching pruning off (the public
+`Counter::functional_pruning` field) keeps every count exact on all networks
+(*#D.at("all_exact_with_and_without_pruning")*) and makes the combined
+network #calc.round(D.at("noprune_vs_prune_hashfirst_min"), digits: 2)–#calc.round(D.at("noprune_vs_prune_hashfirst_max"), digits: 2)× cheaper at d = 3–4,
+for #calc.round(D.at("best_overall_min"), digits: 1)–#calc.round(D.at("best_overall_max"), digits: 1)× below the pruned original. The original network
+needs its pruning (off costs it #calc.round(D.at("original_noprune_penalty_min"), digits: 2)–#calc.round(D.at("original_noprune_penalty_max"), digits: 1)×). The advantage shrinks
+with d, because the search space grows 4× per bit while the plan grows with
+network size:
+
+#table(
+  columns: 6,
+  [p], [d], [τ], [free bits], [pruned / unpruned steps], [faster],
+  ..D.at("prune_crossover").map(r => (
+    str(r.at("p")), str(r.at("d")), r.at("threshold"), str(r.at("free_input_bits")),
+    str(calc.round(r.at("prune_over_noprune"), digits: 2)),
+    if r.at("prune_over_noprune") > 1 { "pruning off" } else { "pruning on" },
+  )).flatten()
+)
+
+So the plan should be built only when the search space is large relative to
+the network: off is better through d = 5 here, and at d = 6 pruning already
+wins at a small threshold. A size-based rule, not a blanket switch.
+
 At ECCp-131 the exact fallback's worst case drops from
 $2^#D.at("eccp131_log2_assignments").at("original")$ to $2^#D.at("eccp131_log2_assignments").at("derived")$
 assignments per count. That is a large constant-exponent improvement and still
