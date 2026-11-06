@@ -7,6 +7,10 @@
 //! basis; the instrument identity control is checked; the verdict is a
 //! two-sided exact sign test on draws whose refuting counts differ.
 //!
+//! `--study NAME` scores a rerun of the same design in `research/NAME/runs`;
+//! `--control-from NAME` reads the identity control `N.d5` from another study
+//! run with the same binary.
+//!
 //! ```sh
 //! cargo run --release --example dreg_m4_link_score -- research   # verdicts
 //! cargo run --release --example dreg_m4_link_score -- --plot-data research
@@ -171,15 +175,31 @@ fn main() {
     let plot = args.iter().any(|a| a == "--plot-data");
     let root = Path::new(
         args.iter()
-            .find(|a| !a.starts_with("--"))
+            .enumerate()
+            .find(|(i, a)| {
+                !a.starts_with("--")
+                    && !(*i > 0 && ["--study", "--control-from"].contains(&args[i - 1].as_str()))
+            })
+            .map(|(_, a)| a)
             .expect("research directory"),
     );
-    let runs = root.join(STUDY).join("runs");
+    // `--study NAME` scores a rerun of the same design in another study
+    // directory; `--control-from NAME` takes the identity control N from
+    // another study run with the same binary.
+    let named = |flag: &str| {
+        args.iter()
+            .position(|a| a == flag)
+            .and_then(|i| args.get(i + 1))
+            .cloned()
+    };
+    let study = named("--study").unwrap_or_else(|| STUDY.to_string());
+    let control_from = named("--control-from").unwrap_or_else(|| study.clone());
+    let runs = root.join(&study).join("runs");
     let mut errors = Vec::new();
 
     // V2: the instrument identity control.
     match (
-        load_first(&runs.join("N.d5.jsonl")),
+        load_first(&root.join(&control_from).join("runs/N.d5.jsonl")),
         load_first(&root.join(CONTROL)),
     ) {
         (Some(nr), Some(c)) => {
