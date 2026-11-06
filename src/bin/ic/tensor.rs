@@ -12,7 +12,8 @@ use clap::{Args, Subcommand};
 use ecdl_tensor_ic::field::rand_below;
 use ecdl_tensor_ic::scale::{ScaleRow, DEFAULT_BITS};
 use ecdl_tensor_ic::{
-    random_prime_order_curve, DFSCounter, NetworkStats, Solver, SparseContractor,
+    random_cofactor_curve, random_prime_order_curve, DFSCounter, NetworkStats, Solver,
+    SparseContractor,
 };
 use rand::{rngs::StdRng, SeedableRng};
 use serde_json::{json, Value};
@@ -58,6 +59,11 @@ pub struct DemoArgs {
     /// (slow: every gadget is evaluated for every candidate tuple).
     #[arg(long)]
     pub gadgets: bool,
+    /// Fixed cofactor c: draw a curve of order c·r (r prime, r > c) and solve
+    /// in its order-r subgroup with free sources A_i = [c]S_i. 1 means a
+    /// prime-order curve.
+    #[arg(long, default_value_t = 1)]
+    pub cofactor: u64,
 }
 
 pub fn run(args: TensorArgs, json_mode: bool) -> Result<Value, String> {
@@ -93,10 +99,17 @@ fn scale(args: ScaleArgs) -> Result<Value, String> {
 
 fn demo(args: DemoArgs, json_mode: bool) -> Result<Value, String> {
     let mut rng = StdRng::seed_from_u64(args.seed);
-    let c = random_prime_order_curve(&mut rng, args.bits).map_err(|e| e.to_string())?;
+    let c = if args.cofactor > 1 {
+        random_cofactor_curve(&mut rng, args.bits, args.cofactor)
+            .map_err(|e| e.to_string())?
+            .curve
+    } else {
+        random_prime_order_curve(&mut rng, args.bits).map_err(|e| e.to_string())?
+    };
     let xi = rand_below(&mut rng, c.order);
     let q = c.mul(xi, c.g);
     let mut s = Solver::new(c, args.m, Box::new(SparseContractor::default()), rng);
+    s.cofactor = args.cofactor.max(1);
     if args.gadgets {
         s.gadgets = true;
         s.counter = Box::new(DFSCounter);
@@ -109,7 +122,7 @@ fn demo(args: DemoArgs, json_mode: bool) -> Result<Value, String> {
     Ok(json!({
         "schema_version": 1, "operation": "tensor-demo",
         "status": if verified && got == xi { "complete" } else { "error" },
-        "seed": args.seed, "m": args.m, "gadgets": args.gadgets,
+        "seed": args.seed, "m": args.m, "gadgets": args.gadgets, "cofactor": args.cofactor.max(1),
         "curve": {"p": c.p, "a": c.a, "b": c.b, "order": c.order,
                   "generator": [c.g.x, c.g.y], "target": [q.x, q.y]},
         "network": stats(&st.network),
