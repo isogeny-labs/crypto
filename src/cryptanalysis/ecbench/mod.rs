@@ -97,6 +97,7 @@ pub mod prime_orbit;
 pub mod record;
 pub mod resources;
 pub mod runner;
+pub mod sentinels;
 pub mod signals;
 pub mod spec;
 pub mod stats;
