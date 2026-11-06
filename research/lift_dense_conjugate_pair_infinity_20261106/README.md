@@ -277,3 +277,4 @@ python3 research/lift_dense_conjugate_pair_infinity_20261106/fig2.py out/  # lay
 | claim | standing | content |
 |:--|:--|:--|
 | `PCC-20261106-e1a9d3` | not covered (unsigned) | rule counts, cost band, A1 degrees ([`validator-report.json`](reports/run-20261106T1550Z/validator-report.json), values in [`claimed.json`](claimed.json)) |
+| `PCC-20261106-213a67` | not covered (unsigned) | Amendment A2: chart dependence, control, Q2 re-check ([`validator-report-a2.json`](reports/run-20261106T1550Z/validator-report-a2.json), values in [`claimed_a2.json`](claimed_a2.json)) |
