@@ -1,0 +1,241 @@
+claim	value	source (cr=crypto origin/main 12a2b3d85f; ar=crypto-autoresearcher origin/main d5001059cd; ca=cryptanalysis HEAD c273e62 branch claude/cryptanalysis-repo-setup-p59kek; tx=treatise branch claude/treatise-expansion-1-20261106)
+## Chapter ch:koblitzconst
+orbit-fold closure statement (pi-stable iff sigma-stable; lattice from X^n-1; gain exactly n / n^2; empty at ord_n(2)=n-1, 131,163)	as stated	ar:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-frobenius-orbit-factor-base.yaml obstruction.statement
+H-FROB-6774fb supported, DEC-20260923-e6cd5d; H-BINSTD-b1f016 replicated	as stated	same yaml obstruction.statement
+rho gets matching sqrt(2n); matched gap unchanged	as stated	same yaml
+tau pilot cells: 4000 targets m=2, 1500 m=3, n=11,13,17,19,23	as stated	ar:analysis/ecdlp2m-iteration-20261009/tau-factor-base-pilot/README.md "Method" item 1
+tau pilot labelled exploratory, not program evidence	quote	same README line 3 "Status: exploratory, hypothesis-generating pilot. NOT program evidence."
+V_orb g=n every cell, log2 n bits; dec within +-0.1 bit, n=23 +0.01,-0.09,0.00	as stated	same README "Measured facts" 1
+V_nb g=1.93-2.02 at n=23, about 1 bit	as stated	same README "Measured facts" 2
+V_poly free coincidence 0.03-0.5 bit, 0.06-0.10 at n=23	as stated	same README "Measured facts" 3
+duplicate rows 65% of m=3 decompositions with one orbit; 0.002 at 22-45 orbits	0.65 / 0.002	same README "Measured facts" 5
+V_orb matched gain mean 3.81 [2.89,4.52] m=2; 3.08 [1.89,4.38] m=3; log2 n 3.46-4.52	as stated	same README summary table
+10-28 recheck D=4.73 [3.44,6.10]; log2 n 3.91, 4.95; D_nofold 0.56 [-0.51,1.52]; gap 22.6-33.0 bits; protocol frozen by timestamp only	as stated	LEAD-ICB-frobenius-orbit-factor-base.yaml revisit_when
+ecbench orbit ladder: 2,816 records verified; 2,112 replayed; A/A exactly 1.000	as stated	cr:research/ecbench_frobenius_orbit_vs_rho_20261014/README.md "Verification"
+slope beta 0.165 [0.117,0.213] per ln r; model 1/6; class engineering, constant-only	as stated	same README lines 3-8
+table kc-orbit rows (a,n,log2 r,cofactor,S rho-frob,orbit/rho-frob,orbit/negfold)	all 8 rows	same README "Results" table
+IC below rho-frob on no curve; interval reaches 1 on two curves	as stated	same README line 4-5 "On two curves the interval reaches 1"
+orbit/negfold 0.065 [0.059,0.071] at n=23	0.065	same README table row a0 n23
+summary row IC/rho 2.96 (n=13) to 18.2 (n=41)	as stated	LEAD-ICB-frobenius-orbit-factor-base.yaml best_measured; README table
+nonlinear lead open_next_step; external repo ml-cryptanalysis PR #53 open	as stated	ar:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-nonlinear-frob-stable-bases.yaml disposition, external_evidence comment
+trace-spectrum R=10.2 [8.6,11.8] RC-1 n17; 11.6 [8.3,15.4] K n19; 12.5 [10.7,14.4] K n17 a2=1; above 2x band	as stated	same yaml best_measured
+Hamming B3: 0.27 [0.13,0.46], 0.32 [0.14,0.55] n19; 0.43 [0.20,0.76] RC-1, 0.29 [0.11,0.54] n17; 0.20-0.52; 3 of 8 exclude 0.5; earlier 1.10 noisy denominator	as stated	same yaml best_measured
+SAT targets ~5x cheaper, UNSAT same	as stated	same yaml best_measured
+v2: random-basis R=0.22-0.40; D=+0.20 [-0.05,+0.45]; null gate failed; P_sys x1.76 8 of 8 units, 48 bases; -0.66 bits [-1.10,-0.24] post hoc	as stated	same yaml next_action.step and best_measured
+|B_6|=2^32.6; Sinz 780 aux vars 1,684 clauses; totalizer 485 / 1,817; 98 native XORs for 33-dim subspace	as stated	same yaml best_measured
+orbit union 7.03 bits at n=131; tau-adic Gamma_w reaches rho only w>=13	as stated	same yaml best_measured ("Earlier: ...")
+EV-BINSTD-1e1815 neutral, preliminary	direction neutral, strength preliminary	ar:ledger/evidence/EV-BINSTD-1e1815.yaml
+EV-FROB-a85eaf dims 1-4 excluded, 5-6 impediment, inconclusive	as stated	ar:ledger/evidence/EV-FROB-a85eaf.yaml summary; direction inconclusive
+EV-BINSTD-2d41c3 supports at dimension 5, preliminary	as stated	ar:ledger/evidence/EV-BINSTD-2d41c3.yaml direction supports, strength preliminary
+next step: 20+ normal and 20+ random bases at w=2	as stated	nonlinear yaml next_action.step
+cyclotomic-sparse yield-neutral; cross-ref only (digest's -0.49..+0.65% and p=0.001 NOT verified, not used)	cross-ref sec:frontier	digest only; benchmark dir README not found on main
+tau-Horner: H-FROB-855915 approved never run; IDEA-20261018-f2cd4d n in {17,19,23}, m in {2,3}; discriminating reading	as stated	ar:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-tau-horner-chain.yaml
+rule v4 ParallelRho/strong per step 1.02,1.20,1.08,0.75,0.92,1.08 at n=47,57,41,53,59,61; admissible false at 4	as stated	cr:research/ic_tool_program/rule/v4/README.md admissibility table
+no GFNI; neighbours' jobs active at n=53,59,61 and half of 41	as stated	same README below admissibility table
+no VALIDATION.json for v4: strongest_available; 0.845 +- 0.08 on 46 readable pairs	quote	cr:research/ic_validation_gate_20261024/README.md line ~201-202
+canonical gap v4 9.89, 9.20, 16.57, 27.17, 24.25, 42.12; 1.76-1.94x as-built; sweep 1.67-1.96	as stated	rule v4 README lines ~96-101
+volcano layers n=19,23,37,41,61; neg level-1/crater n19 1.089 [0.993,1.195], n61 0.837 [0.625,1.073]	as stated	cr:research/volcano_koblitz_layers_20261018/RESULT.md "Measured"
+plain walk n41 1.152 [1.021,1.304] excludes 1 (1 of 10)	as stated	same RESULT.md
+Frobenius/negation solver 2.153 n19, 0.864 n23, 0.264 n37, 0.150 [0.132,0.170] n41, ideal 0.156	as stated	same RESULT.md
+earlier +-8% retracted	quote "The earlier claim of "±8%" was wrong and is retracted."	same RESULT.md "Reading"
+Phi_6473: 9864 CRT primes, 606365-bit coefficients, 8590 s, 3 threads, 78 orbits size 83, 6474 j-invariants	as stated	cr:research/volcano_koblitz_n83_20261018/RESULT.md line 2
+no 131-bit signed-Frobenius walk; no ECC2K-130 matched rho	as stated	ar:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-koblitz-rho-reference.yaml mechanism
+ECC2K-130 client 13.2 M steps/s	cross-ref	tx prog_koblitz.tex sec:ecc2k130 (certicom131_rho_ic_bench_20261022)
+normal-basis canonicalisation 4.1x cheaper (ca paper not read)	as stated by atlas	LEAD-ICB-koblitz-rho-reference.yaml mechanism + evidence note
+Table A 4.7-11.8x mixed units; ic.koblitz_descent logs identical to ic price --single-target	as stated	cr:research/ic_koblitz_descent_routing_20261026/README.md intro
+routing protocol cd3af7078; 288 of 288 verified; 12 exact replays	as stated	same README "Predictions" P3, "Evidence"
+retest protocol 0ca110399; 3,328 records; Lean decide	as stated	cr:research/ic_planner_exhaustive_20261026/README.md intro
+table kc-routing six rows (descent/pipeline, pipeline/rho, descent/rho)	all values	same README section 3 table
+first study 1.421, 1.489, 1.409; 9.46, 16.19, 23.99	as stated	routing README result table
+k41 collection 2.05 M GAE, pair table 0.27 M, online 1.0k-184k	as stated	routing README "Where the descent's cost goes"
+rho strong counted S 0.11-0.14; Table A descent 13-34x in counted unit	as stated	routing README "Why Table A read lower" and "Classification"
+K2: descent/rho 14.2 to 43.6; pipeline 10.8 to 22.9 then 21.4	as stated	exhaustive README section 3 bullets
+band cannot price descent above w=0; four categories	as stated	routing README "Across the 5a band"
+W3 0.71 c0 dearer 1.06-1.17x at w=1, 0/6 below 1; earlier 0.80-0.88 at 18-26 bits; ic-planner/4	as stated	exhaustive README section 2 W3 and Decision
+LP collector string and on main	as stated	cr:research/icb_large_prime_n53_n61_20261029/README.md "Result"
+612 replays	612	commit message ecfaa38c10 "612 replays, validator, band, report"
+A/A 1.000; lp0 reproduces counter for counter	as stated	report.html Controls
+VALIDATION.json exists, strongest_available true, order_holds_across_band true, same commit as producer	as stated	cr:benchmarks/20261029-icb-large-prime/VALIDATION.json; git log ecfaa38c10 (single commit) -- CORRECTS digest "no VALIDATION.json found"
+VALIDATION note: component result, not a leaderboard row	quote	VALIDATION.json "note"
+n53: best plain 440 cols S 6.38; lp2-k40-c10 3.86; 0.604 [0.599,0.610]; 0.604/0.635/0.730; 30/31/35	as stated	icb README table
+n61: 880 cols 7.62; lp2-k60-c10 4.26; 0.559 [0.535,0.578]; 0.559/0.623/0.831; 47/52/64; 3 workloads	as stated	icb README table; report.html findings
+lp2-k20-c10 n53 0.61/0.78/1.28	as stated	report.html findings
+1LP 1.73 [1.64,1.82] and 1.47 [1.42,1.52] at n53	as stated	report.html findings
+optimal LP base 40-60 cols; plain optimum 440 to 880	as stated	report.html "It is a constant"
+memory 317 vs 313 MiB; 604 vs 1,149 MiB	as stated	report.html memory paragraph
+n61 intervals over three workloads; optimum found on same curves	as stated	report.html Limits
+DLP tuning: protocol 327afb04f, Amendments 1-3; class null	as stated	cr:research/ic_koblitz_dlp_tuning_20261023/REPORT.md header and Result
+holdout table n37,43,41,47 at w=0/0.1/1	all values	same REPORT table
+positive control 0.0316 [0.0267,0.0374]; 31.6x	as stated	same REPORT Controls
+train n43 0.893 -> holdout 0.985, ~9 points	as stated	same REPORT "Train panel"
+both arms 4.9-28x rho	as stated	same REPORT "Distance remaining"
+selected cells K=1 edge; next step structured domain (Z[tau]-norm multipliers)	as stated	same REPORT "Next thing to try"
+ic-compact = compact-orbit-scan:columns=Kb + mitm-frobenius-counted:m=2	quote	cr:research/ic_koblitz_dlp_tuning_20261023/PROTOCOL.md line 12-13
+LP study comparator mitm-frobenius-counted:m=3	quote	cr:research/icb_large_prime_n53_n61_20261029/PROTOCOL.md line 29
+same curve n53 icv1-f2m53-tm56619371-dac20a85 pipeline S 2.728, 23.99x (routing), 20.0x (retest)	as stated	routing README table; exhaustive README table; icb report.html n53 header
+n61 curve icv1-f2m61-t158598901-ab42b6c5 pipeline 21.4x	as stated	exhaustive README table; icb report.html "n = 61, session s1 (icv1-f2m61-t158598901-ab42b6c5"
+plain m3 table 49x (n53) and 85x (n61, 84.7)	49.3 / 84.7	report.html tables
+reconciliation is derived inference (unpaired sessions), sources silent	derived	this draft; neither README states a reconciliation
+Table A recipe 7.03x n53, 11.5x n61; not combined	as stated	report.html "What this is not"
+EXP-BINSTD-e066d8 stage 0 not run	as stated by atlas	ar:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-large-prime-variants.yaml lines 17, 47 ("Stage 0 approved, unimplemented")
+orbit-aware LP: n=17,29,31 every seed; small at 19; none at 23; 17,865 relations both replays; measured 10-26	as stated	cr:research/orbit_aware_large_prime_20261011/RESULTS.md headline
+n17: indep 9.2 vs 6.2; complete 10.8 vs 6.4; CPU/indep 0.181 vs 0.275 ms	as stated	same RESULTS primary table rows n17 dlp, dlp_orbit
+r between 2^15 and 2^21	as stated	same RESULTS section 2
+cycle leads: n37 cofactor 596 solved 26 and 31 s; ladder stopped 99 s; 1.5x (n23) to 16x (n31) claim	quote	cr:research/ic_m2_cycle_leads_20261030/REPORT.md Summary 3
+cycle variant 9,700x slower at n41	as stated	same REPORT Measurements
+n41: protocol baa2fcfa8; 8 pairs, 16/16 verified; geo mean 0.98 [0.64,1.43]; per-pair 0.30-2.60	as stated	cr:research/ic_m2_torsion_n41_20261101/REPORT.md Result table
+n31 post hoc 32 pairs 13.3x [10.3,17.5]	as stated	same REPORT
+n37: protocol 7893863417; off/on 0.134 [0.082,0.205]; all 8 below 1; ~7.5x; 17,062 vs 16,707 trials/relation; components 4 vs 117 cols; 126 vs 885 relations; 7,700 vs strong rho	as stated	cr:research/ic_m2_torsion_n37_20261101/REPORT.md
+ladder failure from 90% coverage stop	quote	same REPORT "The ladder's limitation ... belonged to its 90% coverage stop"
+both follow-ups exploratory, one shared 4-vCPU container, no replay certificate	as stated	n41 REPORT Status and limits; n37 REPORT Status
+quotient obstruction (gcd(4,l)=1; 2 bits; Wagner; iota-stable V_d=b^{1/4}F_{2^d}; census 0)	as stated	ar:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-cofactor-torsion-quotients.yaml obstruction, best_measured
+cheap closures: 1+tau, 1-tau, [2]; 10,238 points, n=7,11,13; at most 2 bits per summand	as stated	cr:research/cheap_closures_20261007/README.md Answer 1
+free relations table (collisions, verified, rank, needed)	all 4 rows	cr:RESEARCH_FREE_RELATIONS_CENSUS_20261012.md lines 30-33
+588 rows touch 168 of 600 columns; 72 rows span 6 dims	as stated	same file lines ~37-38
+K ~ 1,500-1,900 (n61), ~2,600 (n83); 13.1 s; 4.8 min 12 threads; 36 GB	as stated	same file lines 40-44 -- CORRECTS digest "1,500-2,050"
+production 0.960x [0.946,0.976]; wall 0.941x	as stated	cr:research/ic_improve_20261015/02-freerel-production/README.md line 7
+rule v4 lever: 6,187 relations, none rejected, 510 runs; 2-11 vs 58-327; 0.5-9%; build 1.4-1.55x; cold 1.053-1.088 (72 pairs)	as stated	cr:research/ic_tool_program/rule/v4/README.md "Lever (i)"
+59 s per solve n61 vs 3.7 s	as stated	same section
+multi-instance bound; Kuhn-Struik attains; restart portfolio; four-target union rare-event; Table C 3.62-14.9x, S20	as stated	ar:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-multi-target-and-portfolio.yaml
+H-BINSTD-32867d support, scoped observational hold, preliminary; deterministic closure controlled null	as stated	ar:ledger/evidence/EV-BINSTD-2d34cb.yaml header; ar:ledger/hypotheses/H-BINSTD-32867d.yaml header
+Table C all nine failed 24 Oct gate	cross-ref	tx prog_koblitz.tex sec:tablea
+## Chapter ch:n83late
+41 dirs 24 Oct-1 Nov	41	git ls-tree origin/main research/ | grep n83 with dates >= 20261022 (list in scratchpad/n83dirs.txt)
+pipeline curve EC1N83Ckb1a1haacb69ee9f37, y^2+xy=x^3+x^2+1, order 8569786107849059	as stated	cr:research/n83_nearby_grid_confirm16_20261024/RESULT.md "Recorded measurements"
+53-bit subgroup diagnostic; primary a=0 r=2417851639230796216685689	as stated	cr:research/n83_crossfamily_current_20261025/README.md lines ~176-179
+cofactor ~1.1e9 on a=1	quote "n = 83, cofactor about 1.1e9"	cr:research/ic_m2_torsion_n37_20261101/REPORT.md last bullet
+primary curve modulus z^83+z^45+z^2+z+1, cofactor 4	as stated	cr:research/n83_factor_base_designs_20261031/README.md
+trace -6151469093347	as stated	cr:research/n83_jacobian_projector_20261031/RESULTS.md "source trace"; volcano_koblitz_n83 RESULT t=-6151469093347
+degree sweeps three families, no subgroup filter	as stated	cr:research/n83_fixed_factor_base_20261028/README.md "No subgroup filtering is applied"
+nearby grid 19 manifests from K1120 dump; K1104,K1107,K1120 byte for byte	as stated	cr:research/n83_nearby_full_grid_20261024/README.md
+tier1 screen 84 children (60 IC, 24 rho); two attempts 2.26 / 2.93 GiB free vs 4 GiB gate; zero children	as stated	cr:research/n83_nearby_grid_tier1_20261024/README.md lines ~38-49 and schedule paragraph
+AWS Spot blocked MaxSpotInstanceCountExceeded, BLOCKED_PROVIDER_SPOT_QUOTA	quote	cr:research/n83_nearby_grid_aws_tier1_20261024/admission_20261024.json
+screen run 40150483792 fed confirmation	as stated	confirm16 RESULT.md "screen run 40150483792"
+confirm16: 112 of 112 admitted; byte-identical aggregate; K1115 47.114 ms; K1111 159.263 s; Bonferroni 0.05/21; p=0.958801, 0.773010; BOUNDED_UNKNOWN	as stated	confirm16 RESULT.md
+strata AMD EPYC 7763, Intel Xeon Platinum 8573C	as stated	confirm16 RESULT.md "Source, host, and replay"
+table n83l-confirm 7 rows	all values	confirm16 RESULT.md table
+point-0 rho online 1,454.658-3,714.787 ms	1,455-3,715	confirm16 RESULT.md point-0 table
+cold 159-166 s	159.263-165.754	confirm16 table
+five-base screen medians 66.150, 62.668, 383.550, 119.742, 65.774 s; spreads 4.676-19.132%; rho 2.015, 0.989 s; gap 3.107 s	as stated	cr:research/n83_local_five_base_screen_20261024/RESULT.md
+K-series prefixes: K3596 596,936 pts; K5500 913,000; K2304 382,464; K3300 547,800; K3450 572,700; K3500 581,000; K4300 713,800; K4405 731,230	as stated	n83_k2304_current_source_prefix, n83_k3300_..., n83_crossfamily_current README, n83_k4300_k4405 README, n83_k3596_current_source_full README, n83_k5500_fourbyte README
+K2304 control PASS 438.548 s, 5,926,551,552 bytes, target stage 420.190916 ms	as stated	cr:research/n83_k2304_current_source_control_20261026/README.md "Completed control" -- CORRECTS digest "K2304 control capped at 1,200 s"
+K1107 root4 control: 438,910.193 ms, 9,941,991,424 bytes, online 46.294 ms, 101,708,823 roots, 8 GiB, 1 GiB Bloom	as stated	cr:research/n83_root4_small_control_20261025/README.md "Recorded control"
+K3596: 792.479 s SIGTERM, 796,409,856 bytes; 1,200.952 s TIME_CAP, 9,580,888,064 bytes; busy 48 GiB macOS	as stated	cr:research/n83_k3596_current_source_full_20261025/README.md table
+K4405: 873.169 s, BOUNDED_UNKNOWN_HOST_SWAP_ABORT, 11,680,759,808 bytes	as stated	cr:research/n83_k4405_current_source_full_control_20261026/README.md
+K4405 Linux: GPU pair out of capacity; no Pod started	quote	cr:research/n83_k4405_linux_control_20261026/README.md lines ~24-26
+fourbyte K5500 32,062,766,258 bytes 29.86 GiB	as stated	cr:research/n83_k5500_fourbyte_20261025/README.md lines 28-31
+ID31 12 vs 15 GiB; 29,915,282,610 (27.86) vs 33,136,508,082 (30.86)	as stated	cr:research/n83_fourbyte_id31_20261027/README.md
+split4 25.61 GiB, 4.25 below; 2^31/2^30 slots; 1,255,377,750 states; 27,499,363,506 bytes	as stated	cr:research/n83_k5500_split4_20261025/README.md
+fp2 28.61 GiB; saves 2.25 GiB vs five-byte; Lean 4.34.1	as stated	cr:research/n83_fourbyte_fp2_20261027/README.md
+fp8 index ABBA K128 1.831, K512 1.347, K1024 1.505; K2048 baseline 42% slower	as stated	cr:research/n83_k5500_fp8_20261025/README.md lines ~40-62
+fp8 e2e ABBA K1107: 1.677 full, 2.157 online; drift 15.3%	as stated	cr:research/n83_fp8_e2e_control_20261025/README.md
+fourbyte_pair whole-process 1.017 and 1.294; load 22.03-276.40	as stated	cr:research/n83_fourbyte_pair_20261027/README.md
+bridge: 16 sealed points; nomination frozen	as stated	cr:research/n83_crossfamily_bridge_20261025/README.md
+crossfamily current: two g5g.4xlarge, $4.20 cap; us-east-1d placement gate failed; us-west-2c; not dispatched	as stated	cr:research/n83_crossfamily_current_20261025/AWS_WEST2_ADDENDUM.md; README line 41 "The panel has not yet dispatched or selected a winner."
+k1107 BL: rho faster in all three arms; 16 targets; plain rho/IC 10.7 [6.33,88.8]	as stated	cr:research/n83_k1107_bl_reproduction_20261028/RESULT.md table
+chain SAT base Frobenius union span(1,z) 167 points	quote	cr:research/n83_chain_sat_meet_20261101/PROTOCOL.md lines 10-12
+order: m2 13,461->7,195; 12.8->6.2 s; m3 tables 0 conflicts 0.38 s, planted median 8,735; m4 median 156 conflicts 0.98 s; m>=5 capped; 160 records 0 flags	as stated	cr:research/n83_chain_sat_order_20261031/README.md
+matched rho 1.51 s mean online	quote	same README "Matched rho on this curve: 1.51 s mean online"
+meet: builds 0.68,0.68,26.1,27.2,958.8 s; 3/3 refuted 0 conflicts m5-8; medians 0.80,1.39,2.54,76.7; planted 0/2; domain 10-250 vs empty; |B|^(m-d)	as stated	cr:research/n83_chain_sat_meet_20261101/README.md
+rebuild: planted 5/5 m5-8, medians 0.91,1.65,10.8,81.5 s; 64 records	as stated	cr:research/n83_chain_sat_rebuild_20261101/README.md
+indexed: m8 78.4->39.7; m9 cap -> 54.1 s; 372,406,144 fingerprints 999 s	as stated	cr:research/n83_chain_sat_indexed_20261101/README.md
+parallel: m8 41.7->11.4, m9 57.0->13.7	as stated	cr:research/n83_chain_sat_parallel_20261101/README.md
+parbuild: 1,006.8;993.4 -> 287.7;283.3; 3.50x	as stated	cr:research/n83_chain_sat_parbuild_20261101/README.md
+ic_degree_sweep: 96 attempts, 53 time, 43 memory, none completed; 40 s, 3 GiB	as stated	cr:research/n83_ic_degree_sweep_20261027/README.md "Observed" -- digest said only "hit time or memory"
+fixed base 2^27 = 134,217,728 candidates	as stated	cr:research/n83_fixed_factor_base_20261028/README.md line 1-2
+fixed degree sweep 4 completed affine (m2 Koblitz/binary), 63 time, 29 memory	as stated	cr:research/n83_fixed_degree_sweep_20261028/README.md lines 36-38
+first fall 2 Koblitz/binary m2-9, 32 witnesses; 48 replays; prime 24,17,14,12,10,9,9,8 proof-assisted	as stated	n83_ic_degree_sweep README "Latest" and "Earlier first-fall stage (R3)"
+fall catalog 48 certificates, 32 closures, m2 FFD=LFD=2, 53 constraints on 54 variables, m3-9 LFD unresolved >=2, prime >=5	as stated	cr:research/n83_fixed_fall_catalog_20261028/README.md
+degree-four witnesses: 12 m3 systems, 249 each, 2,988 total, LFD 3->4	as stated	cr:research/n83_candidate_pdp_20261028/README.md "Earlier: strict degree-four falls"
+top quotient bounds m2..m9 (28-55 ... 244-825); prime m>=3 positive-dimensional	all values	cr:research/n83_top_quotient_20261028/README.md table
+exact top-form 111,194,277,360,443,526,609; m2 28/28/42	as stated	n83_candidate_pdp README "exact original-top degrees" table and line after
+111+83(m-3)	derived	arithmetic on the exact values
+radix census 3,010 partitions of 27; 35 exact, 2,975 bounds; minimum 42 all-binary; accounting correction file	as stated	n83_candidate_pdp README "complete centered panel and fixed-domain radix census"
+prime m3-9 7<=FFD<=17 conditional, 42 cases	as stated	n83_candidate_pdp README "Latest: higher-m prime quadratic exclusion"
+sixteen constructions, design only, a=0 primary	as stated	cr:research/n83_factor_base_designs_20261031/README.md
+E: y^2+xy=x^3+1, C: v^2+u^2v=u^7+u; equal counts F2,F4,F8	as stated	cr:research/n83_jacobian_projector_20261031/RESULTS.md "Exact derivation"
+pullbacks P, Q=[37]P exact order r; phi_*phi^*=[3]; toy n=9,13,19,23; 400 destination verified; n=7 failure; no common unit	as stated	cr:research/n83_genus3_image_solver_20261031/README.md Outcome
+70.17 exponent bits; q^(4/3) ledger	quote	same README Outcome last bullet
+Prym X^4+q^2 = (X^2-2^42X+q)(X^2+2^42X+q); traces +-2^42; gcds 1; e^2=[3]e; idempotent p	as stated	n83_jacobian_projector RESULTS.md Outcome
+Lean identities	as stated	n83_jacobian_projector README "Formal proof map"
+degree-2 fibres [3]P=P+[2]P; gate fails; growing-degree router open	as stated	cr:research/n83_image_closed_degree2_20261101/README.md
+## Chapter ch:binarydegree
+l=8 update content (four guesses suffice; one three-var set fails 3 of 4; k<=6) is already in tx prog_frontier/prog_binary	cross-ref	tx prog_frontier.tex diff lines +662-669; prog_binary.tex diff
+guess: N=46, 44 equations, S=-2; UNSAT draws 0,3,5,6; 64/64 G4 branches; 124,314 cols; 10.6 GB	as stated	cr:research/dreg_closure_guess_20261022/RESULTS.md
+guess3: ranks 129,221 / 128,213 / 129,893 of 136,698; draw 6 suffices	as stated	cr:research/dreg_closure_guess3_20261023/RESULTS.md measurement table
+null22_7: N=43, 4/4 do not refute; 12 of 12 unspecialised l=7 over N=40,42,43, S=-2,0,+1	as stated	cr:research/dreg_closure_null22_7_20261028/RESULTS.md
+invariant: S3 2/4, X3 1/4; mixed	as stated	cr:research/dreg_invariant_guess_20261029/RESULTS.md
+invariant more: S3 5/8, X3 0/8; 5 discordant p=0.031; combined 6/6 p=0.016; 7/12 vs 1/12; S3 fails 5 of 12	as stated	cr:research/dreg_invariant_guess_more_20261029/RESULTS.md
+summand-dimension reading contradicted	quote	same RESULTS "The summand-dimension reading is contradicted at this cell."
+pair D3 2/12 vs S3 7/12, 5 discordant, two-sided p=0.0625; failures at branches 0 and 4 (c=f=0)	as stated	cr:research/dreg_invariant_pair_guess_20261029/RESULTS.md
+second link L3 6/12 vs S3 7/12, 1 discordant, p=1.0; PCC-20261106-607061 unverified	as stated	cr:research/dreg_second_link_guess_20261105/RESULTS.md lines 1-2 and measurement
+unspecialised l=8 not measured at degree 4 (179,447 columns)	as stated	dreg_closure_guess RESULTS "What it does and does not say"
+high arity: four protocol versions; v4 frozen; launch blocked	as stated	cr:research/dreg_high_arity_20261101/README.md
+oracle ratio 78.2 (k0), 5.09 (k4), 1.30 (k6), 0.66 (k7); N=394; k~105-108	as stated	dreg_closure_guess RESULTS "What this means for ECC2K-130"; guess3 RESULTS recomputation
+pair invariant (22,6): Q no refutation at 3; B at 4; 523,686-637,393 vs 102,091 cols; 5.1-5.5x; (21,7) unmeasured	as stated	cr:research/dreg_pair_invariant_20261028/RESULTS.md
+specialise: null control refuted 6 of 8, invalid; uninformative	as stated	cr:research/dreg_closure_specialise_20261017/RESULTS.md
+C1: Amendment 7, 4 Nov; draws 0,3; 607,530 of 760,099 (0.80), 31,632 s, 52.6 GB; 606,973, 31,888 s, 52.5 GB; EPYC 9965 32 vCPU 128 GB	as stated	cr:research/koblitz_ic_leads_build_20261024/README.md section 1
+dense engine 424/423 GB, >2x 217 GB projection, ~8x; 73 GB derived bound	as stated	same README section 1 and C1 section lines ~244-264
+$53 of $80, six pods	as stated	same README
+L2 fill 0.66-0.997; orders 0.61-1.00; MXL (11,5) 0.38-0.45, 1.8-2.5x, 0.25 payoff; 1.3-2.8 vs 1.9-4.2 GB	as stated	same README section 1
+Amendment 1 post hoc; 2-7 frozen before runs	quote	same README Status
+criterion alpha < m/2 - 1	quote	ar:analysis/ecdlp2m-iteration-20261009/m3-closure-pilot/README.md line 3
+pilots exploratory not program evidence	quote	m3/m45/block-local pilot READMEs line 2-3
+ctrial 411 rows, 1,554 values; 2^(3l)/3! within 0.03-1%, l=5..11; slope 2.9985 [2.9979,2.9992]	as stated	ar:analysis/ecdlp2m-iteration-20261009/ctrial-harvest/README.md
+budgets m3 -1.7 to -3.1 vs +3.36; m4 -0.12 to -0.61 vs +2.32	as stated	same README
+outside >=91, >=55, >=52 bits; m5,6 no cells	as stated	same README table -- digest/atlas "50-150 bits" replaced by per-row source values
+m4 SAT alpha 2.981 [2.973,2.997] m3 control; 4.328 [4.315,4.340] (4.310 fixed n17)	as stated	ar:analysis/ecdlp2m-iteration-20261009/m4-sat-cost-pilot/README.md fit table line 126
+WDSat -b returns SAT with undefined bits on UNSAT m4	as stated	same README (cell m4-n13-k3, status unknown)
+m3 pilot W4 60/60 n9, 40/40 n11, 0 false; M4,M5 none; M6 at n9; semi-regular 7-11; support-matched vs dense null	as stated	m3-closure-pilot README table and findings 1-2 (n15 "8/8" in digest NOT used)
+m45 pilot 25/25 m4n7, 10/10 m4n9, 2/2 m4n11, 10/10 m5n7, W3 30/30 m5n9k2; M4 none	as stated	m45-closure-pilot README table lines 78-82
+block-local L1 124 of 135, 39-69% fewer cols m3,m4; L2 all misses; none L3; m5n9k3 L1 0/10, L2 5/5	as stated	block-local-closure-pilot README pooled lines -- digest "124/125" corrected to 124/135
+semaev_t2: 200 instances; FFD 2 all; trace identity; Macaulay 2 on 154, 3 on 46; per-cell counts; success probs 0.0006-0.0155; dim 2k-1<n	as stated	cr:research/semaev_t2_trace_20261102/REPORT.md
+23% = 46/200	derived	arithmetic
+summer audits tested eq.(11), typed-image ratio	as stated	tx summer.tex "Semaev degree and the Semaev 2015 / Nagao audits"
+falldegree proves FFD 2 and notes Semaev's 4	as stated	tx falldegree.tex cor:ffd2 and lines 205-208
+ml sat: protocol 8a85584fd; 4,200 labels; 0.963/0.998 conflicts per triple; 4.1%; medians 5,781 / 45,649; ceiling 5.2-9.0x; AUC ~0.5; permuted 0.45-0.54; positive 0.72-0.79; 0.556 [0.518,0.599]; 0.99x; 4.7x train	as stated	cr:research/pdp_ml_sat_ceiling_20261027/README.md
+EV-ICPERF-390707 five SAT answers twist decompositions	as stated	ar:knowledge/leads/ecdlp/ic-prime/LEAD-ICP-icperf-binary-pdp-solver.yaml line 23
+f6 few candidates: 64 codes default; 80 pairs; 40 F6-IC targets; CPU 2.67-10.29x (>=1.66); XOR 1.84-10.13x; 204-1,049 -> 5-16; control 0.87-1.05x	as stated	cr:research/f6_few_candidates_20261105/README.md section 1
+inference "cannot beat mitm" marked pcc:unverified	quote	same README "[pcc:unverified]"
+Four Russians ~32 row ops per pivot vs ~1,500 row XORs; parallel 1.59-2.88x, 0.94/1.11x	as stated	same README sections 2-3
+desk eval 28 candidates: 17/7/4; walk 61-82% of S; matrix <=0.10%; ceiling 1.00x	as stated	cr:research/pdp_strategy_evaluation_20261031/README.md section 1
+## Chapter ch:binarytargets
+pdp-scaling budgets m4 l29 2^12.2 (0.5 ms), m5 l28 2^32.8 (12 min), m6 l24 2^36.8; m3 none; MITM 2^58/2^84/2^72; gaps +46/+51/+35; algebra ~2^180; SAT 2^4 / 2^7 per dim	as stated	ca:experiments/pdp-scaling/README.md lines 356-362, 369-372, 404-410
+frobenius-quotient table rows m=2,3,4,5,6,8,12	all values	ca:experiments/frobenius-quotient-m4/README.md budget table
+2^65.5 floor; required exponent 0.98 at m4; below m/2 every m	as stated	same README "Reading it" 2-3
+m4 weight-base toy: completed instances lifted, 0 spurious, 0 disagreements; slope 1.34 over 4 cells	as stated	same README section 2 Results
+isogeny class levels 1, 263, p, 263p; p=146505763881528721; 60.81; 64.33; 2^57.0; 2^65.1; 2^15.6 mults; 262/262 Velu; Kani; 2^70	as stated	ca:experiments/ecc2k130-isogeny-class/README.md Result and Layout
+11.45x penalty	cross-ref	tx prog_koblitz.tex sec:ecc2k130
+Torelli n5: genus 5 enumeration; 2^21 nets; 0.42 predicted	as stated	cr:research/ic_next10_20261014/10-torelli-toy/README.md
+Torelli n7: 1,536 models mass 0.5; predicted 2^-14 to 2^-18; ord_7(2)=3; A7 splits; genus 7=2^3-1 magic 4 (interpretation)	as stated	same README
+calibration 2^-3.5 to 2^+1.2; up to 2^19 at n7	as stated	same README
+next rungs n=11,13	as stated by atlas	ar:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-ecc2k130-jacobian-carrier.yaml line 13
+modular: round 26 diamond norms; round 22 eight Smith factors 1, kernel rank 24; RR degree 128 dim 68 genus 61; Lean	as stated	cr:research/koblitz_modular_ic_20261018/README.md
+leads survey 2026-10-23: L1-L6, D1-D3; +7.62, +10.32, 2^56.46; judgements not measured	as stated	cr:research/ecc2k130_leads_survey_20261023/report.typ
+ECC2-131 field z^131+z^13+z^2+z+1, cofactor 2, a not in F2	as stated	cr:research/certicom131_symlp_20261025/REPORT.typ Question and scope
+symLP linearisation t^2+t=e1^2+b/x_R^2	as stated	same REPORT Method
+step-rate table 5 rows	all values	same REPORT measured table
+direct relations ~5e-7	as stated	same REPORT figure caption
+model 87.3 vs 64.8 / 65.3; distance 22.5/22.0 (~2^22); slope 0.647 [0.639,0.655]	as stated	same REPORT derived cost model
+stage bench 207,822 / 207,602 / 87,055; 48,080 / 48,186 / 9,522; 0.11%; 0.419; 0.198; Xeon 6975P-C, siblings 14, 30	as stated	cr:research/certicom_131_stage_bench_20261023/REPORT.md
+clients 8.5-13.2 M steps/s	cross-ref	tx prog_binary.tex ECC2-131 (8.50, 11.46) and prog_koblitz sec:ecc2k130 (13.2)
+pdp-degree-heuristics: 656 bases, 7 families, 9 fields; D=2+[e<-3.5]+[e<-8.5]; MAE 0.06, 0.08 held out; dim V^(2)>=2l-1; progressions; 15-40x up to 100; 1.5-2x; d_reg exactly l+1; solving 2-4; miss 0.5-1.2; m3 15-40x, 500-1,500x	as stated	ca:experiments/pdp-degree-heuristics/README.md findings 1-5
+learned model numbers (stage 1.82 [1.36,2.26]; 1.13 [0.45,1.62]; +1.84 [0.95,2.68]; +0.92 [0.54,1.34]; +0.43 [0.15,0.74] vs 1.08; 0.93 [0.36,1.48]; -0.45 [-0.98,+0.04])	as stated by atlas	ar:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-learned-cost-model-factor-base-selection.yaml best_measured
+EKS: K1 l=3; 4 targets x 5 rounds; 192/192; +1.83/+0.80/+0.80 n17; +0.96/+2.47/+2.47 n19; behind rho 1.8/14.8/17.7 and 3.3/15.1/17.9; "about 9 bits" corrected	as stated by atlas	same yaml best_measured
+"independently validated 2026-11-06 with VALIDATION.json, 160 of 160 replays"	quote (UNVERIFIED: file not in any readable repo)	same yaml best_measured; atlas commit 8d61579904 (git log)
+validation "in a follow-up PR"	quote	same yaml external_evidence fb-cost-model-curves-eks note
+nothing on crypto or crypto-autoresearcher main besides atlas	checked	git ls-tree -r origin/main | grep fb-cost (no hits) in both repos; gh api to aburan28/ml-cryptanalysis refused (403, repo not enabled)
+K1 n=23 frozen 2026-11-06	as stated by atlas	same yaml next_action
+QSP: beta>=3/4; >=0.93; >=2^122; X^2+X n'=1; L_Phi131 n'=130 beta 0.99994; |V|=264 or p+1 beta>=1.02; 0.0958 -> 2^60.9	as stated	ar:analysis/qsp-ecc2k130/README.md lines 52-59, 98
+toy n31 k15 QSP 0.214 (0.190-0.240) vs 0.204-0.230; beta 0.964; kill criterion fired	as stated	cr:research/ic_next10_20261014/08-quasi-subfield/README.md line 3, 92
+c2pnb model: five curves, F_{Q^4}, Q=2^{4k}, k=11,13,17,19,23; N=Q/(2k); rho 78.10/93.98/125.78/141.71/173.57	as stated	ar:analysis/ecdlp2m-iteration-20261009/c1-gaudry-n4-c2pnb/README.md
+time margins +1.46,+5.80,+14.19,+18.34,+26.60 at 2^30; band [2^15.5,2^32.5]; time x memory 35-56 bits; mesh +1.28 (304w1), +0.97 (368w1) c<=2^27	as stated	same README Headline
+toy ladder k in {5,7,9,11,13}, ~2e4 decompositions; D=4096 brief-supplied	as stated	same README "The one open number" and "Unverified inputs"
+F_{2^16}-rational base empty; trace-zero trap	as stated by atlas	ar:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-composite-degree-c2pnb.yaml lines 23, 33
+lift-dense +0.50 bits	cross-ref	tx obstructions.tex line 128-129
+Oakley lift-dense: N=155,185; n=5; 200/200 vs 104/200, 99/200; 32x; c2pnb Tr(a)=1 0/200	as stated	cr:research/oakley_lift_dense_20261027/REPORT.typ table and text
+Oakley GHS +1.1 / +10.9 bits after 10-11 correction, formula; three contracts no runs	as stated by atlas	ar:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-oakley-quintic-tower.yaml best_measured; next_action lines 12-13 (EXP-OAKLEY-2c0552, -4276c4, -7f73ef "have trial plans and no runs")
+angles: odd char n=2-5 |z|<=0.94; binary n2 3/8 vs 0.3935, z=-4.72; trace coset argument; Bin(2,1/2); 2E coverage 3/4; correction of first reading; 21 curves	as stated	cr:research/weil_descent_angles_20261018/REPORT.md Answer 1
+IPsec: z^155+z^62+1; N=12r; 24,492 orbits; zero low-genus; not enumerated	as stated	cr:research/ghs_ipsec_isogeny_class_20261023/README.md
+generalized GHS: degrees 6/8/10/12, 63/255/1023/4095 c; 147 profiles g<=2; 15 genus one over F_{2^4}; bounds 25, 81; order-199 homomorphisms zero; 232 index-two profiles; T-P presentation; instances verified (r=19,67,43,199)	as stated	cr:research/ghs_generalized_20261024/REPORT.md
+degree-73 at 2^37: 74 kernels; degree-36 kernel poly; 2664 division poly; 128 systems; 4 of 8 cells >=10%; 2.00x (2.0046); 7 of 64 higher; criterion failed; archive repaired	as stated	cr:research/koblitz_isogeny_descent_37_results_20260925/RESULTS.md and ARCHIVE_REPAIR.md
