@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261107T1947Z-curve25519-f1-walk-k24",
+  "latest_record": "20261107T2003Z-c25519-k20-screen",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 49,
+    "measured": 50,
     "open": 0
   },
   "repo": "crypto",
@@ -760,6 +760,35 @@
         }
       ],
       "problem": "ic:curve25519-family-k20-32",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 2.636,
+      "latest": 2.636,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.696268
+      },
+      "metric": "best_arm_s_w0",
+      "points": [
+        {
+          "commit": "011b71581ed6",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.696268
+          },
+          "n": 5,
+          "record": "20261107T2003Z-c25519-k20-screen",
+          "reference": 1.554,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k = 20 screen for 1.3x: no arm beats the box incumbent (S 2.636, 1.70x rho); best challenger 2.677; target needs S 2.02",
+          "value": 2.636
+        }
+      ],
+      "problem": "ic:curve25519-family-k20",
       "unit": "S"
     },
     {

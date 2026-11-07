@@ -27,7 +27,9 @@ are committed on this branch. No Modal run yet. Modal credentials are in the ses
    (it does not for a Modal-only run), session log, PR.
 
 ## Runs in flight
-None.
+k = 20 screen done (PCC-20261107-40672e): no arm cheaper than the box incumbent; 1.3x not reached. Next: owner decision (C = 1, new target or structural idea).
+Spec: research/curve25519_autolab_20261104/k20/spec-screen.json (22 arms, five dev curves). Confirmation curves: k20/confirm-curves.json (five fresh siblings, untouched).
+Next: pick ONE arm from the screen, pre-register it, run it vs inc and rho-neg on the confirm curves (>= 5 curves, 12 targets x 2 rounds), score on the five-curve mean. Do not pick a curve; do not touch C = 1 or the rho reference.
 
 ## Stop and success conditions
 One Modal launch, 2 h function timeout, expected under 30 min. Any selftest failure stops throughput.
