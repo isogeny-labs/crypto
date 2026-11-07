@@ -1,0 +1,35 @@
+{
+ "created_at": "2026-11-07T01:45:02Z",
+ "id": "PCC-20261107-e63506",
+ "kind": "execution",
+ "producer": {
+  "commit": "7e90ec84136a0396fa662592642dae3fee16f651",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "execution",
+   "path": "research/primefield-companion-followup-20261102/feature-native-torsion-cache/receipt.json",
+   "sha256": "5bffb37ddaf93a84a6f1036d61bf845747638e6a8db9493a2a5b5b7d59a67d3c"
+  },
+  {
+   "kind": "execution",
+   "path": "research/primefield-companion-followup-20261102/feature-native-torsion-cache/cache.log",
+   "sha256": "3c5e7fe4c6cfee7e2e6f1b649246f147ba6f1431ebd9b99a3211667fa31be485"
+  },
+  {
+   "kind": "execution",
+   "path": "research/primefield-companion-followup-20261102/feature-native-torsion-cache/test.log",
+   "sha256": "8a75539e5186bffc7597184ebcc35b25ab23730a11d3ca06625ca956b8f78a98"
+  },
+  {
+   "kind": "execution",
+   "path": "research/primefield-companion-followup-20261102/feature-native-torsion-cache/subgroup.log",
+   "sha256": "7bfdbe8a31f13c5c8e63af5b3615b73dcf407529e227b2f06e31212c2d3d9147"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "Point/curve/order-bound cache consumed by projected direct initializer; full-value reference retained",
+ "statement": "Validated torsion-cache reuse passes six selected native tests. Direct initialization constructs one validation engine and no extra factor engine on three saved fixtures; context mismatch is rejected. Existing499 rows/100 splits/1375 advances/450 skips,588 acceptance cases,7 malformed cases and closure/factor checks pass. No timing or recovery experiment."
+}
