@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261107T0710Z-rho-v3-frobenius",
+  "latest_record": "20261107T0722Z-rho-v4-prime",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 1,
-    "measured": 50,
+    "measured": 51,
     "open": 0
   },
   "repo": "crypto",
@@ -657,6 +657,36 @@
       ],
       "problem": "ecdlp:prime-ladder-18-28",
       "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.9802,
+      "latest": 0.9802,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_negation_v4_over_v3_ops",
+      "points": [
+        {
+          "commit": "db068f17a560",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 1152,
+          "record": "20261107T0722Z-rho-v4-prime",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.956,
+            1.005
+          ],
+          "summary": "rho.negation_v4 vs v3 on prime 2^17.7..2^28, local L0: pooled ops 0.980 [0.956,1.005], unresolved; ladder-read check saves 2% at 2^17.7 (deterministic); v4 0.995x theory at 2^28. Not validated.",
+          "value": 0.9802
+        }
+      ],
+      "problem": "ecdlp:prime-ladder-18-28",
+      "unit": "ratio"
     },
     {
       "better": "lower",
