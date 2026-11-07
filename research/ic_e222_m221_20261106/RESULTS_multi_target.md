@@ -95,3 +95,20 @@ Symmetric pricing, IC / batch rho (median [bootstrap 95%] at price 0; configs wh
 | v3 | 24 | 1024 | 1.28 [1.26, 1.31] | 1.27 | 1.20 | 0 / 0 / 0 |
 
 v3 saves a further 3% to 28% (median ratio v3 / v2 of the counted additions 0.72 to 0.97; the saving is largest at T = 1024). IC is not cheaper than batch rho at any price in any cell except the single (22 bits, T = 1024, price 1) cell, where the order does not hold across the band (0 of 22 at prices 0 and 0.1) and therefore is not a ranking under §5a. The distance to batch rho is 1.1x to 2.0x at price 0 and shrinks with T. Not an improvement over batch rho.
+
+## v3 at large T: statistical near-parity with batch rho, unranked under §5a (22 paired configs per cell)
+
+Rule fixed before the run (commit 1c7e5d7, 04:18:38Z): `run_large_T_holdout.py`, IC v3 with the frozen fb rule fb = 2^round(log2((pT)^(1/4))); batch rho with kappa in {0.5, 0.7, 1.0} (0.7 added after a kappa scan, `results/large_T_holdout`, showed rho's minimum at 0.5 to 0.7, the earlier {0.5, 1, 2} grid having under-tuned rho by up to 5%; see the note below the table); best kappa per configuration at each price; valid cells only (24 and 25-bit groups, database <= ~5% of the x-classes); instances_vsrho idx 1 to 11 x seeds 1, 2. 352 runs (88 IC + 264 rho), all 352 fully verified. Pricing is symmetric (IC: sparse-solve operations + one hash per trial + factor-base build; rho: one hash per walk step; both at the same 0 / 0.1 / 1 GAE). Data `results/large_T_holdout/`, `analysis.txt`.
+
+| group bits | T | IC fb | IC GAE/target at 0 | rho at 0 | IC / rho at 0 [boot95] | at 0.1 | at 1 | IC cheaper in (0 / 0.1 / 1) |
+|---|---|---|---|---|---|---|---|---|
+| 24 | 4096 | 512 | 151 | 142 | 1.057 [1.052, 1.062] | 1.023 | 0.847 [0.841, 0.853] | 0 / 0 / 22 of 22 |
+| 24 | 16384 | 512 | 96 | 93 | 1.027 [1.022, 1.031] | 1.012 | 0.923 [0.917, 0.928] | 0 / 0 / 22 of 22 |
+| 25 | 4096 | 512 | 198 | 189 | 1.047 [1.045, 1.049] | 1.021 | 0.887 [0.885, 0.889] | 0 / 0 / 22 of 22 |
+| 25 | 16384 | 1024 | 127 | 119 | 1.072 [1.071, 1.074] | 1.028 | 0.788 [0.787, 0.790] | 0 / 0 / 22 of 22 |
+
+(Correction of the wording in the paragraph above: the kappa scan shows the earlier rho grid {0.5, 1, 2} was slightly too coarse for rho, so earlier IC/rho ratios were up to 5% lower than the best-tuned rho would give; the table here includes kappa = 0.7 and is the fair version.)
+
+**Reading.** At large T the multi-target IC v3 costs 3% to 7% more than the counted batch rho when unpriced work is free, 1% to 3% more at 0.1 GAE, and 8% to 21% less at 1 GAE, where it wins in every configuration. The order therefore does not hold across the §5a band and **no ranking is claimed**; the correct statement is that the two are within about 10% of each other in counted cost in this regime. The price-1 result arises because the batch rho does about one hash operation per walk step (as many as its additions), whereas the IC performs one per trial plus a small amount of other work, and the IC's trial count is lower; a hash operation costs far less than an elliptic-curve addition in practice, which makes the realistic price much closer to 0 than to 1.
+
+**This is not yet an improvement over the strongest attack.** The cost is at parity, not below it at the realistic price; group sizes are toy (2^24 to 2^25), T is large (4096 to 16384) and the comparison is against a memory-unbounded rho reference that I wrote; both arms are counted by my own code (no independent counting harness, no validator on these panels); one rho family only. The distance to batch rho in this regime has been reduced from 1.7x to 2.8x (v1) to 1.0x to 1.1x (v3).
