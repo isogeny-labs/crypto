@@ -322,7 +322,7 @@ pub fn summarize(cfg: &Cfg, recs: &[Rec], fails: &[InstFail]) -> (String, String
         let _ = write!(js, "{{\"p\":{},\"d\":{},\"arms\":{{", p, d);
         let _ = writeln!(txt, "\n## cell p={} d={}  (K={} abscissae, rank target {}, nominal paired units {})", p, d, 2 * d, 2 * d + 1, nominal);
         let mut afirst = true;
-        let mut cell_clean = !rs.is_empty();
+        let mut cell_clean = !rs.is_empty() && !fails.iter().any(|f| f.p == p && f.d == d);
         for arm in ARMS.iter().map(|a| a.0).chain(std::iter::once("pc2x")) {
             let ar: Vec<&&Rec> = rs.iter().filter(|r| r.arm == arm).collect();
             if ar.is_empty() {

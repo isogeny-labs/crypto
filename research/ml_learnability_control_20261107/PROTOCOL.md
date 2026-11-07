@@ -100,10 +100,11 @@ not measured here.
 
 ## 8. Predictions written before data (so they can fail)
 1. PC-A is detected for delta >= 0.10 by all models at m >= 16; at m = 12 only delta = 0.20 (power).
-2. PC-B: c = 1 detected by hgb and mlp, logreg detects lsb(c=1) trivially (bit 0 of u is the label). c = 2, 3 :
-   logreg detects only if the label is a linear function of bits (lsb(k) = lsb(u/2) requires bit 1 of u when u is
-   even and wrap-around otherwise: expected partial, accuracy ~0.75 for c = 2); 5/3 and rand: chance at m >= 16
-   (HD4, ~70% prior). If rand reads >= 0.9 at m = 16 the memo's falsifier holds and PC-B is a valid
-   control as designed.
+2. PC-B: c = 1 detected by all models. c = 2 detected (lsb(k) is a bit-1 function of u up to an N-dependent
+   carry), c = 3 only partly (a sawtooth of period N/3 in u). 5/3 and random c: chance at m >= 16 (HD4, ~70%
+   prior). At m = 12 a random c can still be learned (every residue has a representative a/b with
+   |a|,|b| ~ sqrt(N) ~ 60, which trees/MLPs can fit): this is the expected height-versus-size
+   effect, not a failure. If random c reads >= 0.9 at m = 16 the memo's falsifier holds and PC-B is a
+   valid control as designed.
 3. PC-D (Legendre in bit encoding): chance for all models.
 4. Curve: chance for all models and sizes (prior ~97%).

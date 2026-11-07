@@ -2,7 +2,8 @@
 Every number it writes is [pcc:unverified] until a pcc claim is filed."""
 import os
 for _v in ("OMP_NUM_THREADS","OPENBLAS_NUM_THREADS","MKL_NUM_THREADS"): os.environ.setdefault(_v, "2")
-import json, math, sys, time, argparse, platform
+import json, math, sys, time, argparse, platform, warnings
+warnings.filterwarnings('ignore', category=Warning, module='sklearn')
 import numpy as np
 from scipy.stats import binomtest, norm
 import sklearn
@@ -122,9 +123,22 @@ def decide(res, cfg, model, label):
     indiv = sum(c['arms'][f'curve|{label}'][model]['p_one_sided'] < 0.05 and
                 c['arms'][f'curve|{label}'][model]['acc'] > c['arms'][f'curve|{label}'][model].get('null_max', 1) for c in cur)
     gate = pooled(f"PC-A|delta={cfg['gate_delta']}|lsb")[0] < a
+    # NULL_BIAS: relabelling-null retrain mean farther than 3 binomial sd from 1/2 (pipeline bias)
+    nm = [c['arms'][f'curve|{label}'][model]['null_mean'] for c in cur if 'null_mean' in c['arms'][f'curve|{label}'][model]]
+    nte = cur[0]['arms'][f'curve|{label}'][model]['n']
+    if nm and abs(float(np.mean(nm)) - 0.5) > 3*0.5/math.sqrt(nte*len(nm)): return 'UNDERPOWERED', dict(p=p, acc=acc, indiv=indiv, gate=gate, flag='NULL_BIAS')
     if p < a and indiv >= cfg['replicate_curves']: return 'SIGNAL', dict(p=p, acc=acc, indiv=indiv, gate=gate)
     if not gate: return 'UNDERPOWERED', dict(p=p, acc=acc, indiv=indiv, gate=gate)
     return 'NULL', dict(p=p, acc=acc, indiv=indiv, gate=gate)
+
+def ladder(res, cfg, model):
+    """PC-B scope: which heights c the model detects (pooled p < alpha_cell); and the PC-A detected deltas."""
+    a = res['mde']['alpha_cell']; cur = res['curves']; out = {}
+    for arm in cur[0]['arms']:
+        if arm.startswith('PC-'):
+            cs = sum(c['arms'][arm][model]['correct'] for c in cur); n = sum(c['arms'][arm][model]['n'] for c in cur)
+            out[arm] = dict(acc=cs/n, detected=bool(binomtest(cs, n, 0.5, alternative='greater').pvalue < a))
+    return out
 
 def main():
     ap = argparse.ArgumentParser()
@@ -142,6 +156,7 @@ def main():
     for m in a.sizes:
         r = run_size(m, cfg, a.models, null_R=null_R)
         r['decisions'] = {f'{mn}|{lab}': decide(r, cfg, mn, lab) for mn in a.models for lab in cfg['labels']}
+        r['ladder'] = {mn: ladder(r, cfg, mn) for mn in a.models}
         allres['sizes'][str(m)] = r
         json.dump(allres, open(a.out, 'w'), indent=1, default=float)
     print(json.dumps({m: {k: v[0] for k, v in s['decisions'].items()} for m, s in allres['sizes'].items()}, indent=1))
