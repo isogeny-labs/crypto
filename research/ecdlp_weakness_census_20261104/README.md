@@ -34,9 +34,9 @@ Fresh degree-4 sweeps at n = 17 to 27 reach k on all 33 instances, so the iterat
 there is exactly 4. A real F4 run (msolve) on the main sweep's own instances reaches maximal
 step degree exactly 4 on all 54 instances from n = 17 to 34, and matches the census wherever
 the census value is exact. Literal Assumption 2 (degree 2) fails on all 111 instances with
-n ≤ 44. The Kousidis–Wiemers value 3 is not reached anywhere from n = 17 to 44. The degree
-does not grow over n = 17 to 34, which is consistent with the bounded-degree premise of the
-subexponential heuristics, at a degree one higher than predicted. Lean (`F4Containment`) proves
+n ≤ 44. The Kousidis–Wiemers value 3 is not reached anywhere from n = 17 to 44.  That matches
+Kousidis–Wiemers' Magma value 4 for n ≤ 36; they report 5 from n = 37, so this window does
+not decide whether the degree stays bounded. Lean (`F4Containment`) proves
 that F4 runs stay inside the closure. An independent validator recomputed the counts and
 replayed the runs. Details:
 [`pq2_rank/README.md`](pq2_rank/README.md).

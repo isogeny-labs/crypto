@@ -240,6 +240,298 @@
    "python_d4_equal_validator_rust_iter4": "3 of 3"
   },
   {
+   "id": "main_n8_34_dump",
+   "command": "PQ2_DUMP=validation/main_n8_34_dump/inst ./target/release/pq2_rank 8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34 3 20 validation/main_n8_34_dump/pq2_rank 44 16",
+   "cwd": "research/ecdlp_weakness_census_20261104/pq2_rank",
+   "reference": "results/run.log instance lines with 8 <= n <= 34",
+   "compared_lines": 81,
+   "compared_fields": 1377,
+   "mismatches": 0,
+   "mismatch_detail": [],
+   "extra_lines": 0,
+   "seed_line_equal": true,
+   "run_completed": true,
+   "timings_excluded": true,
+   "outputs": {
+    "pq2_rank.csv": "5db78f14fe6741cffe31305af49862162bd8096bc6842d11d7a67b224d41f209",
+    "pq2_rank.json": "f72b98087ae1c16191cbe0bd0a64586f8a65a89b097f5cbd9c2adf57808c072c",
+    "run.log": "8cc12d678c07e276e897268b7a73dfe1d7219887e14f192e8c29a3fca0307114",
+    "time.txt": "8353c82d01bef268de504a630c0a7850eec19fde7738dbc18e9cfd6e4a548cd4"
+   },
+   "time": "real 1m31.331s user 1m30.566s sys 0m0.124s"
+  },
+  {
+   "id": "f4_dumps_and_dump_log",
+   "command": "validator regeneration vs f4/dumps and f4/dump_run.log",
+   "reference": "f4/dumps/*.json, f4/dump_run.log",
+   "dumps": 81,
+   "dumps_byte_identical": 81,
+   "dump_log_lines_compared": 81,
+   "mismatches": 0,
+   "mismatch_detail": []
+  },
+  {
+   "id": "fresh_n25_dump",
+   "command": "PQ2_DUMP=validation/fresh_n25_dump/inst ./target/release/pq2_rank 25 3 0 validation/fresh_n25_dump/pq2_rank 25 0   (iter4 off; iter4 itself is checked by the validator's closure)",
+   "reference": "results/iter4_n25/pq2_rank.json",
+   "compared_lines": 3,
+   "compared_fields": 60,
+   "mismatches": 0,
+   "mismatch_detail": [],
+   "extra_lines": 0,
+   "timings_excluded": true,
+   "output_sha256": "2b59b7ad814a60f337e508389b8404d5a71578e54b31756eee7341d579f84d7f"
+  },
+  {
+   "id": "closure_iter4_n25.json",
+   "command": "python3 -I validation/closure_check.py --run-json validation/fresh_n25_dump/pq2_rank.json --dump-dir validation/fresh_n25_dump/inst --out validation/closure_iter4_n25.json --iter4-max-n 27 --low4-max-n 0 --interp-above-N 24 --expect-json results/iter4_n25/pq2_rank.json",
+   "reference": "producer results/iter4_n25/pq2_rank.json; descent by exact weight-<=2 interpolation plus 500 random points (N > 24); Z completeness from msolve's quotient dimension (msolve_fresh)",
+   "instances": 3,
+   "compared_values": 33,
+   "mismatches": 0,
+   "failed_invariant_checks": 0,
+   "failed_detail": [],
+   "mismatch_detail": [],
+   "iter2_values": [
+    1
+   ],
+   "output_sha256": "57e96529ac6e09fbc726ddad131872e1fbd1ae1d90bb36c8ca2336a8ff427a81"
+  },
+  {
+   "id": "fresh_n26_dump",
+   "command": "PQ2_DUMP=validation/fresh_n26_dump/inst ./target/release/pq2_rank 26 3 0 validation/fresh_n26_dump/pq2_rank 26 0   (iter4 off; iter4 itself is checked by the validator's closure)",
+   "reference": "results/iter4_n26/pq2_rank.json",
+   "compared_lines": 3,
+   "compared_fields": 60,
+   "mismatches": 0,
+   "mismatch_detail": [],
+   "extra_lines": 0,
+   "timings_excluded": true,
+   "output_sha256": "20d073ac02569d9bf38e76817feb880d25e80a75bc912121e69bbbf9c032bf8d"
+  },
+  {
+   "id": "closure_iter4_n26.json",
+   "command": "python3 -I validation/closure_check.py --run-json validation/fresh_n26_dump/pq2_rank.json --dump-dir validation/fresh_n26_dump/inst --out validation/closure_iter4_n26.json --iter4-max-n 27 --low4-max-n 0 --interp-above-N 24 --expect-json results/iter4_n26/pq2_rank.json",
+   "reference": "producer results/iter4_n26/pq2_rank.json; descent by exact weight-<=2 interpolation plus 500 random points (N > 24); Z completeness from msolve's quotient dimension (msolve_fresh)",
+   "instances": 3,
+   "compared_values": 33,
+   "mismatches": 0,
+   "failed_invariant_checks": 0,
+   "failed_detail": [],
+   "mismatch_detail": [],
+   "iter2_values": [
+    1
+   ],
+   "output_sha256": "15da3ebf832bf49dfc7f05239a88d7f94a8fe5e4f3870d2065be49cc017fdd83"
+  },
+  {
+   "id": "fresh_n27_dump",
+   "command": "PQ2_DUMP=validation/fresh_n27_dump/inst ./target/release/pq2_rank 27 3 0 validation/fresh_n27_dump/pq2_rank 27 0   (iter4 off; iter4 itself is checked by the validator's closure)",
+   "reference": "results/iter4_n27/pq2_rank.json",
+   "compared_lines": 3,
+   "compared_fields": 60,
+   "mismatches": 0,
+   "mismatch_detail": [],
+   "extra_lines": 0,
+   "timings_excluded": true,
+   "output_sha256": "b98cd234cfc9df5c6b48d8f8ae010220fee165b9ad1ba1e18d50a694763b99eb"
+  },
+  {
+   "id": "closure_iter4_n27.json",
+   "command": "python3 -I validation/closure_check.py --run-json validation/fresh_n27_dump/pq2_rank.json --dump-dir validation/fresh_n27_dump/inst --out validation/closure_iter4_n27.json --iter4-max-n 27 --low4-max-n 0 --interp-above-N 24 --expect-json results/iter4_n27/pq2_rank.json",
+   "reference": "producer results/iter4_n27/pq2_rank.json; descent by exact weight-<=2 interpolation plus 500 random points (N > 24); Z completeness from msolve's quotient dimension (msolve_fresh)",
+   "instances": 3,
+   "compared_values": 33,
+   "mismatches": 0,
+   "failed_invariant_checks": 0,
+   "failed_detail": [],
+   "mismatch_detail": [],
+   "iter2_values": [
+    1
+   ],
+   "output_sha256": "147849612d07a840a0f6137458bfc9ffb088f85bea7db828675f9453fd1fba30"
+  },
+  {
+   "id": "closure_main_n25_34.json",
+   "command": "python3 -I validation/closure_check.py --run-json validation/main_n8_34_dump/pq2_rank.json --dump-dir validation/main_n8_34_dump/inst --out validation/closure_main_n25_34.json --iter4-max-n 0 --low4-max-n 0 --interp-above-N 24 --only 25:0,...,34:2",
+   "reference": "Rust values of the regenerated main stream n = 25..34 (lines equal to results/run.log); descent by exact weight-<=2 interpolation; dumps byte-identical to f4/dumps",
+   "instances": 30,
+   "compared_values": 330,
+   "mismatches": 0,
+   "failed_invariant_checks": 0,
+   "failed_detail": [],
+   "mismatch_detail": [],
+   "iter2_values": [
+    1
+   ],
+   "output_sha256": "e1e2b2c33580309b9ab65470ea7e67392a0a5d8afd2b0d6b7462ac6e61f45bf1"
+  },
+  {
+   "id": "msolve_replay/msolve_replay.json",
+   "command": "python3 -I -B validation/msolve_check.py --dump-dir validation/main_n8_34_dump/inst --run-json validation/main_n8_34_dump/pq2_rank.json --producer f4/msolve_all.json --raw-dir validation/msolve_replay/raw --out validation/msolve_replay/msolve_replay.json --only <all n<=28, 29:0, 30:0, 32:0, 34:0>",
+   "reference": "producer f4/msolve_all.json rows (steps, max step degree, basis size, linear count) and census k, d_iter",
+   "instances": 67,
+   "compared_values": 938,
+   "mismatches": 0,
+   "mismatch_detail": [],
+   "msolve_version": "0.6.5-1build2",
+   "msolve_sha256": "c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa",
+   "max_step_degree_by_n": {
+    "8": [
+     3
+    ],
+    "9": [
+     3
+    ],
+    "10": [
+     3
+    ],
+    "11": [
+     3
+    ],
+    "12": [
+     3
+    ],
+    "13": [
+     3
+    ],
+    "14": [
+     3
+    ],
+    "15": [
+     4
+    ],
+    "16": [
+     3
+    ],
+    "17": [
+     4
+    ],
+    "18": [
+     4
+    ],
+    "19": [
+     4
+    ],
+    "20": [
+     4
+    ],
+    "21": [
+     4
+    ],
+    "22": [
+     4
+    ],
+    "23": [
+     4
+    ],
+    "24": [
+     4
+    ],
+    "25": [
+     4
+    ],
+    "26": [
+     4
+    ],
+    "27": [
+     4
+    ],
+    "28": [
+     4
+    ],
+    "29": [
+     4
+    ],
+    "30": [
+     4
+    ],
+    "32": [
+     4
+    ],
+    "34": [
+     4
+    ]
+   },
+   "quotient_dim_eq_Z_size": 67,
+   "output_sha256": "d4e025b1fc220172536843108de2acca7bde7992065331c8daff98f009c45c52"
+  },
+  {
+   "id": "msolve_replay/msolve_replay_extra.json",
+   "command": "python3 -I -B validation/msolve_check.py --dump-dir validation/main_n8_34_dump/inst --run-json validation/main_n8_34_dump/pq2_rank.json --producer f4/msolve_all.json --raw-dir validation/msolve_replay/raw --out validation/msolve_replay/msolve_replay_extra.json --only 31:0,33:0",
+   "reference": "producer f4/msolve_all.json rows (steps, max step degree, basis size, linear count) and census k, d_iter",
+   "instances": 2,
+   "compared_values": 28,
+   "mismatches": 0,
+   "mismatch_detail": [],
+   "msolve_version": "0.6.5-1build2",
+   "msolve_sha256": "c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa",
+   "max_step_degree_by_n": {
+    "31": [
+     4
+    ],
+    "33": [
+     4
+    ]
+   },
+   "quotient_dim_eq_Z_size": 2,
+   "output_sha256": "8862e4b814e7b2b9c4e03f3ed6b4c1259c755c04dfcab81c3a69f8f4d80f09bf"
+  },
+  {
+   "id": "msolve_replay/msolve_fresh_n25.json",
+   "command": "python3 -I -B validation/msolve_check.py --dump-dir validation/fresh_n25_dump/inst --run-json validation/fresh_n25_dump/pq2_rank.json --producer '' --raw-dir validation/msolve_replay/raw_fresh_n25 --out validation/msolve_replay/msolve_fresh_n25.json",
+   "reference": "no producer msolve rows exist for the fresh instances; checks quotient dimension = |Z|, linear = k, degree >= 4",
+   "instances": 3,
+   "compared_values": 42,
+   "mismatches": 0,
+   "mismatch_detail": [],
+   "msolve_version": "0.6.5-1build2",
+   "msolve_sha256": "c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa",
+   "max_step_degree_by_n": {
+    "25": [
+     4
+    ]
+   },
+   "quotient_dim_eq_Z_size": 3,
+   "output_sha256": "28fd5ee126848315d5f87051cd315a3ed2eb1bb9b50f476d65a05784d634c93a"
+  },
+  {
+   "id": "msolve_replay/msolve_fresh_n26.json",
+   "command": "python3 -I -B validation/msolve_check.py --dump-dir validation/fresh_n26_dump/inst --run-json validation/fresh_n26_dump/pq2_rank.json --producer '' --raw-dir validation/msolve_replay/raw_fresh_n26 --out validation/msolve_replay/msolve_fresh_n26.json",
+   "reference": "no producer msolve rows exist for the fresh instances; checks quotient dimension = |Z|, linear = k, degree >= 4",
+   "instances": 3,
+   "compared_values": 42,
+   "mismatches": 0,
+   "mismatch_detail": [],
+   "msolve_version": "0.6.5-1build2",
+   "msolve_sha256": "c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa",
+   "max_step_degree_by_n": {
+    "26": [
+     4
+    ]
+   },
+   "quotient_dim_eq_Z_size": 3,
+   "output_sha256": "3304aa7291c88e3066330f0f37562621b8df7094c6b0210c0098f18b3a77b966"
+  },
+  {
+   "id": "msolve_replay/msolve_fresh_n27.json",
+   "command": "python3 -I -B validation/msolve_check.py --dump-dir validation/fresh_n27_dump/inst --run-json validation/fresh_n27_dump/pq2_rank.json --producer '' --raw-dir validation/msolve_replay/raw_fresh_n27 --out validation/msolve_replay/msolve_fresh_n27.json",
+   "reference": "no producer msolve rows exist for the fresh instances; checks quotient dimension = |Z|, linear = k, degree >= 4",
+   "instances": 3,
+   "compared_values": 42,
+   "mismatches": 0,
+   "mismatch_detail": [],
+   "msolve_version": "0.6.5-1build2",
+   "msolve_sha256": "c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa",
+   "max_step_degree_by_n": {
+    "27": [
+     4
+    ]
+   },
+   "quotient_dim_eq_Z_size": 3,
+   "output_sha256": "696889f473490cde19fe85c5f75bcc614b81fe35a04b9e6375639aa1e0169bd9"
+  },
+  {
    "id": "F_size_independent_recount",
    "command": "replay_compare.py fsize_independent (numpy GF(2^n), n <= 32)",
    "reference": "results/rerun_n8_40/pq2_rank.json F_size",
@@ -256,10 +548,10 @@
   }
  ],
  "validator": "validator (claude-opus-5-5; Claude Code session 01AXUKfUpk9rEJg4Yyo1QcZQ)",
- "produced_at": "2026-11-05T04:07:52Z",
+ "produced_at": "2026-11-07T21:34:22Z",
  "environment": {
-  "validated_commit": "f96f4f4c019bc95084b24d9dcb80a10655200cb3",
-  "head_at_assembly": "5f6ad81efabcde6d480d68d5c7d4a67d2763715b",
+  "validated_commit": "8d9fdc45be3678dc98b1044e9d8250aca1073ce7",
+  "head_at_assembly": "8d9fdc45be3678dc98b1044e9d8250aca1073ce7",
   "src_main_rs_sha256": "386a759588a36215487b5b900646d0943195e091aaaad9a48e422dad45e8dc0d",
   "src_main_rs_equals_commit_blob": true,
   "binary_fresh_build": "/tmp/claude-0/-home-user/0f5ee4e8-cecf-515b-8fba-6c8312e48a0f/scratchpad/target/release/pq2_rank",
@@ -271,9 +563,11 @@
   "python": "3.13.18",
   "numpy": "2.5.3",
   "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
-  "kernel": "6.18.44-fc-v236",
+  "kernel": "6.18.44-fc-v310",
   "seed": "0x5eed20261104 (hard-coded in src/main.rs)",
-  "cpu_limit": "every validator process pinned with taskset -c 3 (one core)"
+  "cpu_limit": "validator processes pinned with taskset to core 3 (passes 1-3) or cores 2 and 3 (final pass)",
+  "msolve": "msolve 0.6.5-1build2",
+  "msolve_sha256": "c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa"
  },
  "problems": [],
  "producer_files_read": [
@@ -306,12 +600,352 @@
    "sha256": "eb9bc9fe736f71be9397b41850db4e3f738ac80cbaee27b8a9a66f361c63e5d1"
   },
   {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dump_run.log",
+   "sha256": "275c5bde55bd70f24e904542419e372b97fe1d74683fbc8e4cd07691b52c81fd"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n10_i0.json",
+   "sha256": "147af8d554112fac47bed26b0b26354df97193db3125a9e4f4f1237d8ebbd36a"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n10_i1.json",
+   "sha256": "a924ac51c95cf2dab90d693dc3501b3b34bcb51bb3005253d05f6575d6cae4c8"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n10_i2.json",
+   "sha256": "7f3d4bdcf9c75ecdb034ea79b35c7c16d6cd00f4f580561fcbe10b469985a65a"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n11_i0.json",
+   "sha256": "c29fb61adf588bb35bb914d58c026e4b119889cbbae780438b5947776bae4dce"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n11_i1.json",
+   "sha256": "72928bfc747ba4c2f0a87f18caae3d80186e8f12f0ca263286e148e10aebfb0f"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n11_i2.json",
+   "sha256": "1fb9f245ad78be98cdc044030c324c8a0ecd168b366746258843e8bf46de0186"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n12_i0.json",
+   "sha256": "a6c15390ff27b07f8447565e0f8df1e3e6620a40ea35ef8156ff698c572a69ec"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n12_i1.json",
+   "sha256": "bbd126ac824286416832cf0719ae447827d1442f09b80a93d6b52845d5dbbd50"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n12_i2.json",
+   "sha256": "bf357a4001ed6df2f476576dc14577c7d544b727562800d13b20ce345f2c7af3"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n13_i0.json",
+   "sha256": "fc08cd5b4c279e0602862909283bb136e31547b1a932e06069f103b0376adc79"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n13_i1.json",
+   "sha256": "b729436b23e45f0e38aba099e9dbb6010b5a135064249cceb34a1bc2c66b46ac"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n13_i2.json",
+   "sha256": "73903e4f360cb669dd2e8f68ab2b2c64e58ca6aa53288694372b907d67435c2c"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n14_i0.json",
+   "sha256": "85ad862a83ba198c60e41f38a85d9b44739ea5f323e463a26ba55da3944c90e2"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n14_i1.json",
+   "sha256": "525394353c93d5d055e739195731a67806e041c1c620aaeace0ff80e670ecccc"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n14_i2.json",
+   "sha256": "319b45f53d11dbc5596896cd9e4a17aa9874ddd1e087c15079e59fe26f807fd1"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n15_i0.json",
+   "sha256": "9dac2a7aad9a8fdeec63456fdc19523c3e6ee1c2b9d9ca2dd33533e9547e6516"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n15_i1.json",
+   "sha256": "2c8e5ebf83d641f734b42e08368238da44bbc54d721d60915c8f3c5fa6560e8b"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n15_i2.json",
+   "sha256": "b6c64d08d1202f26eaf10e5cca6cfe6c91ed6301e4297e22b13c4812eebb0388"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n16_i0.json",
+   "sha256": "b5629be6da107b86058e3a117f91a418bf4f530e4cd0172f843b375beabd26e9"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n16_i1.json",
+   "sha256": "44dca42d00d1e19d1391d953b7bd0053f71669bc8ea4b5736639cc6c884cc6e9"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n16_i2.json",
+   "sha256": "44b16888ca651b63ff9302b78990ed5d6d839c7c9dcb9594cf59c1758b6c9d30"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n17_i0.json",
+   "sha256": "cc7f4c4ba5360b0e01b0e283238728f02ec58181ee5e776283446823668bf4f9"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n17_i1.json",
+   "sha256": "081db2196cf0ca811fced001829f3fdfb08439a7102076227456704bbe096555"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n17_i2.json",
+   "sha256": "75008d7dd50cc460663d2838cec9926a0303ae43fc0eb80023e32828a6624765"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n18_i0.json",
+   "sha256": "cd439e92b9a27080df86efcda28466ad0291be1d9d36016614e3e902280bc65b"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n18_i1.json",
+   "sha256": "44278ea13f38e06172df3271aa35166c5ec6a6241de954ee0afd5335c21bae7a"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n18_i2.json",
+   "sha256": "9eddc44b7c620315c432686c74200c590e3cd2ecd942e6afb2a100c2a9e5cb93"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n19_i0.json",
+   "sha256": "b3b974363132a3eba0492a9a8ff807031bd48eb1ec03c08dcae7c9dd13dc0e53"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n19_i1.json",
+   "sha256": "ae7f895dcf094e4c0f2de26c81b0f5e671e8c615fa90101030e8945f042886f5"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n19_i2.json",
+   "sha256": "c63d2f9dbd1826e79971f2f3361805ed1166c7ff5d5d012e4ff1f9816e869dac"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n20_i0.json",
+   "sha256": "ca0b0a7e606379ad4e32ab361c3ecd222a30392bcd6d9f663fa412ab30e45f49"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n20_i1.json",
+   "sha256": "1189c6995b769ccd24b0852b3701d1eaa4505703b85761c7cff56a9ccfe18252"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n20_i2.json",
+   "sha256": "090d51b512cc2d3c598f88630660afe4d47b48a1b1d10509969758767e6ec346"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n21_i0.json",
+   "sha256": "3068340ba3bec70d2d84c43b22c382a54647efc475cb7e6dc6f6c997fefe6470"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n21_i1.json",
+   "sha256": "7b42bbdfd693cd338687a17f056680527fd79db8746429ee41e223031f8d1f74"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n21_i2.json",
+   "sha256": "14f78a7093231bf43226ce56aca692521893a770721c9d355a34139ef1becc18"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n22_i0.json",
+   "sha256": "4655e6cad51afd4887c56a4e4778ab0091eee66c151a377d75d84cec1d2bafe9"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n22_i1.json",
+   "sha256": "49ec288030f9f6764df7d4a60be27c125b48b0363530c906e96861b837244a1c"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n22_i2.json",
+   "sha256": "3cfd3420c49c66278102f449e28c6a62949f5d50bacd09e42ddac378fa79c3f2"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n23_i0.json",
+   "sha256": "eed4e73d665ec53ecd1cbea8a5bf97291f317eb023bd723649bc9673c7746270"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n23_i1.json",
+   "sha256": "457cefe2d29b5f43a111daa218e3f10f17b4ec4fe2217911372db0b704cdc1a3"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n23_i2.json",
+   "sha256": "e3ee03560ba59e243a0ee7fb614fcdcb3c6302439a6780a9bde9e393a30984fc"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n24_i0.json",
+   "sha256": "18cf9b0ac79b6cddda69e07347d75e618e1699c4534393d5b20990339d3ba28b"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n24_i1.json",
+   "sha256": "b0fade8440944864092e41b126b5bbaedcf7e4061313a1885d9cf247ec0bf6da"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n24_i2.json",
+   "sha256": "cc46c18448580cb083d13e2c77c358fbc75423d1c63037837589531105173561"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n25_i0.json",
+   "sha256": "a21cd319497777a7e4870399e82feae3924ceb3654e0f49de49ab8932812f74a"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n25_i1.json",
+   "sha256": "6ab8f825bc1575e6bf9192048dda1ef5ce1625893d153166a101730fe9bbac53"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n25_i2.json",
+   "sha256": "f7fb2c2b1d776bf0ce1dae9effdcc6ef5857d2cbaf9a17ca0f9820e3a930ded8"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n26_i0.json",
+   "sha256": "ca0eb3f3126be5574a65f10e8b3121a85acacc8fa281538e10d5262cc3becb85"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n26_i1.json",
+   "sha256": "12e17e2a20bd9a372439bf578f7d69bab67879983802948f99a0db4c73e0ead1"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n26_i2.json",
+   "sha256": "6d0744472d1410d5ee6731c6788bc800d54479e25a05330f8ec8278feecffd9d"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n27_i0.json",
+   "sha256": "c16b8ff7b37c4522d6aaefa5aa84e4e7c157484971558621e4fdea9c73457786"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n27_i1.json",
+   "sha256": "69e1f84e9b9c1f00a091a510b5c2ae4ec6e230fbbc9a95452111b46283ee9c69"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n27_i2.json",
+   "sha256": "ca7cfe431a2f97229cfc869af5456b2634e85f50a9cffa1482846888ef4b77cb"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n28_i0.json",
+   "sha256": "6a12ea969f3c11dc713f1a97d22369f4b50657e5ba8ce00e6e8f46d5dd0d23e6"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n28_i1.json",
+   "sha256": "f284da16333a6e89dea76a1fa2b1214a85b7ef954305a968fdb8ae459d3761e1"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n28_i2.json",
+   "sha256": "d1845c930cb9d6685a61625313ffeef4ebf3c9f60856b972141cd6affcdbfc3f"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n29_i0.json",
+   "sha256": "c76bc7963d32aac63a4bbea4be32be91d030caec9e20fb57ed1ee2efbde14804"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n29_i1.json",
+   "sha256": "fc0bd94f04fc22bb8d07cc0403cfbcca3cd951ddca66768b6d978f9e6d724cac"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n29_i2.json",
+   "sha256": "588c669392c972d1cbab6151c2b72a6e977042970cc37b5ce6ae23afd115e966"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n30_i0.json",
+   "sha256": "a43961ccc1ee1cbd1852b0a21c675ef9f7858f88f167949f0bd67b0922182fc3"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n30_i1.json",
+   "sha256": "e322033e67d8282d094d20c0cde203f0ce03bacb0898b078de920fc4b3545849"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n30_i2.json",
+   "sha256": "274209de22070d0483ce5b903d13635a65e80220df60b312d535484e907af29d"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n31_i0.json",
+   "sha256": "b30c0208019aa93fa71332f5240ab01f9565b2be5ef3a90f8b3036ac4122dbd9"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n31_i1.json",
+   "sha256": "82eada866c6bf6487ebee3973e0a4a6d02a193d266aa353c63525ddf198cbbf2"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n31_i2.json",
+   "sha256": "2476efbe8747d82fd2b2cd08b0868a935b564a6daa2fc380a657694ca320c9cf"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n32_i0.json",
+   "sha256": "44c1e0b1b921fdf295dd40529f7d083ff44e5ff63efb81a85acc1ed070076c61"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n32_i1.json",
+   "sha256": "2342859a20796f4f8178aa589974ac07676808a247e59ece565707996248d2d6"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n32_i2.json",
+   "sha256": "f4219f74a19d0ae3d91de5e196b58e360f51c1044f06c1d5eb1ba453fb907fc3"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n33_i0.json",
+   "sha256": "f03940e1d8692aab1675a3f565592330b05470c78c49c03704b98f25094b21aa"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n33_i1.json",
+   "sha256": "59c04f2a7a9024955c1839cf4a71a009616f53491b718e250833f961501da552"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n33_i2.json",
+   "sha256": "fa79e317f67aafe22d4d95bc0f5459287323800708cc3895eba7e0585806a188"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n34_i0.json",
+   "sha256": "ba7defff3243ce1c8860f08aa828a0136b32ab2830dc03a0e40514a62da4b9d4"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n34_i1.json",
+   "sha256": "2c4e02116fedfa688cfb1344e615b38d14fbaf4e3b4761d942c4994e95000755"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n34_i2.json",
+   "sha256": "8e779b176aa5cdc9efe631b7100a786e3cdf7369fca616d821bf547e56f69df0"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n8_i0.json",
+   "sha256": "0bde69001c5f40179ae8b8544cf0f84104bfa2adddd9edc3536d267da1557157"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n8_i1.json",
+   "sha256": "170b510f718d27d34e93165fa0bbaa9fce8db933ce61d37e0c40fb52f051749b"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n8_i2.json",
+   "sha256": "be92b8abd1ce1f7c69fec2ce4a62cf301f563d322499c1cf1c2b4ac440f99b64"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n9_i0.json",
+   "sha256": "6047867ea40b003e3808a02f9e13c883d32570013139ef0fe96140f5b2b07cd4"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n9_i1.json",
+   "sha256": "0ad4b59ab59431036143486306a70ad3dd7c2b8a99730ae3d7bda4cd8441aeb3"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n9_i2.json",
+   "sha256": "827b6826bf7e42943fc90754a71917e2489aba5121eff59ad8a75776c32b4c66"
+  },
+  {
    "path": "research/ecdlp_weakness_census_20261104/pq2_rank/results/iter4_n17_20/pq2_rank.json",
    "sha256": "1c3b1e596260b1c59d16ee64566c441117d316d2f31c575ecd3b7d56f496e9ab"
   },
   {
    "path": "research/ecdlp_weakness_census_20261104/pq2_rank/results/iter4_n21_24/pq2_rank.json",
    "sha256": "75d85b46c8ef954a29bd7cf01b4d8890b8b1d875d1d0f1f9175726295cd9f375"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/results/iter4_n25/pq2_rank.json",
+   "sha256": "af943f6ae444d2f959c3289c521d7912ab80b2b3eda8b0fdabb941a1094e8e62"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/results/iter4_n26/pq2_rank.json",
+   "sha256": "a87e9bc668de64b975e2decfe87dc4697756e2736c29c252ba2e4aa97f3d2e74"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/results/iter4_n27/pq2_rank.json",
+   "sha256": "70167375026ff7c20f8fe0bc5344eaff709d6a675b8420fb43def3e22954978f"
   },
   {
    "path": "research/ecdlp_weakness_census_20261104/pq2_rank/results/rerun_n8_40/pq2_rank.json",

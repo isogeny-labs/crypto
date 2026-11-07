@@ -27,6 +27,9 @@ sys.path.insert(0, str(HERE))
 import closure_check as cc  # noqa: E402
 import recompute as rc      # noqa: E402
 
+if "--commit" in sys.argv:  # bind the producer files to this commit (default: recompute.COMMIT)
+    rc.COMMIT = sys.argv[sys.argv.index("--commit") + 1]
+
 PKG = rc.PKG
 REPO = rc.REPO
 SP_BIN = Path("/tmp/claude-0/-home-user/0f5ee4e8-cecf-515b-8fba-6c8312e48a0f/scratchpad/target/release/pq2_rank")
@@ -254,6 +257,83 @@ if same != 5 or cmp_bad:
     problems.append(f"crosscheck: {same} identical dumps, {len(cmp_bad)} mismatches")
 
 
+# ---- final pass: main stream to n = 34, f4 dumps, fresh n = 25..27, msolve replays ------
+compare_log_run("main_n8_34_dump", f"{BIN} {NS(8, 34)} 3 20 validation/main_n8_34_dump/pq2_rank 44 16", 8, 34,
+                "PQ2_DUMP=validation/main_n8_34_dump/inst")
+if (HERE / "main_n8_34_dump/run.log").exists():
+    _, mine = own_log(HERE / "main_n8_34_dump/run.log")
+    _, f4l = producer_log("f4/dump_run.log")
+    fb = {(r["n"], r["inst"]): r for r in f4l}
+    mine_by = {(r["n"], r["inst"]): r for r in mine}
+    mm = [k for k, r in mine_by.items() if k not in fb or any(fb[k][f] != r[f] for f in VALUE_KEYS)]
+    mm += [k for k in fb if k not in mine_by]
+    f4names = sorted(Path(x).name for x in subprocess.run(
+        ["git", "-C", str(REPO), "ls-tree", "--name-only", rc.COMMIT, rc.rel(PKG / "f4/dumps") + "/"],
+        capture_output=True, text=True).stdout.split())
+    ident = sum(rc.read_text(PKG / f"f4/dumps/{nm}") == (HERE / f"main_n8_34_dump/inst/{nm}").read_text() for nm in f4names)
+    runs.append({"id": "f4_dumps_and_dump_log", "command": "validator regeneration vs f4/dumps and f4/dump_run.log",
+                 "reference": "f4/dumps/*.json, f4/dump_run.log", "dumps": len(f4names), "dumps_byte_identical": ident,
+                 "dump_log_lines_compared": len(mine), "mismatches": len(mm) + (len(f4names) - ident),
+                 "mismatch_detail": mm[:10]})
+    if mm or ident != len(f4names) or len(f4names) != 81:
+        problems.append(f"f4 dumps/log: {len(mm)} log mismatches, {ident} of {len(f4names)} dumps identical")
+for n in (25, 26, 27):
+    json_vs_json(f"fresh_n{n}_dump", HERE / f"fresh_n{n}_dump/pq2_rank.json", f"results/iter4_n{n}/pq2_rank.json",
+                 [f for f in NONTIME if f not in ("iter4", "iter4_rounds", "d_iter")],
+                 f"PQ2_DUMP=validation/fresh_n{n}_dump/inst {BIN} {n} 3 0 validation/fresh_n{n}_dump/pq2_rank {n} 0   "
+                 "(iter4 off; iter4 itself is checked by the validator's closure)")
+    closure_entry(f"closure_iter4_n{n}.json",
+                  f"{CC} --run-json validation/fresh_n{n}_dump/pq2_rank.json --dump-dir validation/fresh_n{n}_dump/inst "
+                  f"--out validation/closure_iter4_n{n}.json --iter4-max-n 27 --low4-max-n 0 --interp-above-N 24 "
+                  f"--expect-json results/iter4_n{n}/pq2_rank.json",
+                  f"producer results/iter4_n{n}/pq2_rank.json; descent by exact weight-<=2 interpolation plus 500 random "
+                  "points (N > 24); Z completeness from msolve's quotient dimension (msolve_fresh)")
+
+
+closure_entry("closure_main_n25_34.json",
+              f"{CC} --run-json validation/main_n8_34_dump/pq2_rank.json --dump-dir validation/main_n8_34_dump/inst "
+              "--out validation/closure_main_n25_34.json --iter4-max-n 0 --low4-max-n 0 --interp-above-N 24 --only 25:0,...,34:2",
+              "Rust values of the regenerated main stream n = 25..34 (lines equal to results/run.log); descent by exact "
+              "weight-<=2 interpolation; dumps byte-identical to f4/dumps")
+
+
+def msolve_entry(name: str, cmd: str, ref: str):
+    p = HERE / "msolve_replay" / name
+    if not p.exists():
+        problems.append(f"{name}: missing")
+        return
+    d = json.loads(p.read_text())
+    res = d["results"]
+    bad = [(r["n"], r["instance"], r["mismatches"], r["failed_checks"]) for r in res if r["mismatches"] or r["failed_checks"]]
+    runs.append({"id": f"msolve_replay/{name}", "command": cmd, "reference": ref, "instances": len(res),
+                 "compared_values": sum(4 + 2 + len(r["checks"]) for r in res), "mismatches": len(bad),
+                 "mismatch_detail": bad[:10], "msolve_version": d.get("msolve_version"),
+                 "msolve_sha256": d.get("msolve_sha256"),
+                 "max_step_degree_by_n": {str(n): sorted({r["max_step_degree"] for r in res if r["n"] == n})
+                                          for n in sorted({r["n"] for r in res})},
+                 "quotient_dim_eq_Z_size": sum(r["checks"]["quotient_dim_eq_Z_size"] for r in res),
+                 "output_sha256": sha(p)})
+    if bad:
+        problems.append(f"{name}: {len(bad)} instances with mismatches or failed checks")
+
+
+MS = "python3 -I -B validation/msolve_check.py"
+msolve_entry("msolve_replay.json",
+             f"{MS} --dump-dir validation/main_n8_34_dump/inst --run-json validation/main_n8_34_dump/pq2_rank.json "
+             "--producer f4/msolve_all.json --raw-dir validation/msolve_replay/raw --out validation/msolve_replay/msolve_replay.json "
+             "--only <all n<=28, 29:0, 30:0, 32:0, 34:0>",
+             "producer f4/msolve_all.json rows (steps, max step degree, basis size, linear count) and census k, d_iter")
+msolve_entry("msolve_replay_extra.json",
+             f"{MS} --dump-dir validation/main_n8_34_dump/inst --run-json validation/main_n8_34_dump/pq2_rank.json "
+             "--producer f4/msolve_all.json --raw-dir validation/msolve_replay/raw "
+             "--out validation/msolve_replay/msolve_replay_extra.json --only 31:0,33:0",
+             "producer f4/msolve_all.json rows (steps, max step degree, basis size, linear count) and census k, d_iter")
+for n in (25, 26, 27):
+    msolve_entry(f"msolve_fresh_n{n}.json",
+                 f"{MS} --dump-dir validation/fresh_n{n}_dump/inst --run-json validation/fresh_n{n}_dump/pq2_rank.json "
+                 f"--producer '' --raw-dir validation/msolve_replay/raw_fresh_n{n} --out validation/msolve_replay/msolve_fresh_n{n}.json",
+                 "no producer msolve rows exist for the fresh instances; checks quotient dimension = |Z|, linear = k, degree >= 4")
+
 # ---- independent |F'| recount for n <= 32 ------------------------------------
 def fsize_independent(row) -> int:
     n = row["n"]
@@ -321,7 +401,9 @@ env = {
     "python": platform.python_version(), "numpy": np.__version__,
     "cpu": next((l.split(":", 1)[1].strip() for l in open("/proc/cpuinfo") if l.startswith("model name")), "?"),
     "kernel": platform.release(), "seed": "0x5eed20261104 (hard-coded in src/main.rs)",
-    "cpu_limit": "every validator process pinned with taskset -c 3 (one core)",
+    "cpu_limit": "validator processes pinned with taskset to core 3 (passes 1-3) or cores 2 and 3 (final pass)",
+    "msolve": subprocess.run(["dpkg-query", "-W", "-f=${Package} ${Version}", "msolve"], capture_output=True, text=True).stdout,
+    "msolve_sha256": hashlib.sha256(Path("/usr/bin/msolve").read_bytes()).hexdigest(),
 }
 if env["binary_sha256"] != env["producer_binary_sha256"]:
     problems.append("fresh build differs from the producer's binary")

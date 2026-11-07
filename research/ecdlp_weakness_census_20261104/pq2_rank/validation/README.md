@@ -6,8 +6,8 @@ observation and stays an unverified assertion until a CI-signed verdict exists
 
 | file | what it is | status |
 |---|---|---|
-| `validator_report.json` | Task A: headline recomputation (`pcc.validator-report/v1`), third pass: corrected text at `3cb90671` | **pass**: 123 of 123 items match (see "Third pass" below) |
-| `replay_certificate.json` | Task B: re-execution and independent closure (`pcc.replay-certificate/v1`) | **verified** (`scalars_verified: true`; 17 run entries, 0 mismatches) |
+| `validator_report.json` | Task A: headline recomputation (`pcc.validator-report/v1`), final pass at `8d9fdc45` | **fail**: 4 of 195 items, all the bounded-degree reading (see "Final pass" below) |
+| `replay_certificate.json` | Task B: re-execution, independent closure, msolve replay (`pcc.replay-certificate/v1`), bound to `8d9fdc45` | **verified** (`scalars_verified: true`; 31 run entries, 0 mismatches) |
 | `controls.json` | negative controls for the validator's own checkers | 8 of 8 planted defects caught |
 
 The sections from "Binding" to "Not checked" describe the first pass at `f96f4f4c`. Three
@@ -15,9 +15,11 @@ reports exist:
 
 * first pass, 2 of 85 items failing: `validator_report.json` at `ea2fde0e`;
 * second pass, 3 of 120 failing: the same file at `3cb90671`;
-* third pass, binding, 123 of 123 matching: the current file.
+* third pass, 123 of 123 matching: the same file at `8d9fdc45`;
+* final pass, binding, 4 of 195 failing: the current file.
 
-The second and third passes are described at the end.
+The second, third and final passes are described at the end. The 17-entry certificate
+from the first pass is the blob of `replay_certificate.json` at `8d9fdc45`.
 
 **Disposition (first pass).** The five headline claims in the dispatch recompute exactly, and the
 replay reproduces them [pcc:unverified]. Two other statements in README "Results" are
@@ -300,6 +302,102 @@ fail the report:
 * Not checked: `f4/` (msolve still running; held for a later dispatch), the
   re-rendered `attack-graph.pdf` and `overview.pdf`, and signing.
 
+## Final pass: msolve F4, degree 4 to n = 27, round-5 documents (commit `8d9fdc45`)
+
+    python3 -I -B validation/recompute.py --commit 8d9fdc45be3678dc98b1044e9d8250aca1073ce7 --claims final
+    python3 -I -B validation/replay_compare.py --commit 8d9fdc45be3678dc98b1044e9d8250aca1073ce7
+
+**Binding.**
+
+* `8d9fdc45` contains the third-pass files byte-identical to what the validator wrote.
+* `src/` is unchanged since `f96f4f4c`; the binary hash is unchanged (`a6d1f253…`).
+* msolve is `0.6.5-1build2`, `/usr/bin/msolve`, sha256 `c2722288…`.
+* The tree was clean and nothing else was running. Validator processes used at most two
+  cores (`taskset -c 2` and `-c 3`).
+
+**Result: `validator_report.json` fail, 4 of 195 items; `replay_certificate.json` verified (31 run entries, 0 mismatches).**
+Every number in the new text recomputes exactly. The four failing items are all the same
+interpretive claim, the bounded-degree reading (F4 below).
+
+### What the validator re-derived
+
+| check | result |
+|---|---|
+| main stream n = 8..34 regenerated with the census arguments | 81 lines equal `results/run.log` and `f4/dump_run.log` |
+| `f4/dumps` byte-identical to the validator's regeneration | 81 of 81 |
+| dumped equations equal the Weil descent of S3 (validator's own field arithmetic) | 81 of 81: brute-force ANF over 2^N for n ≤ 24; exact weight-≤2 interpolation and 500 random points for n = 25..34 |
+| validator's degree-3 closure = Rust iter3, main stream | n ≤ 34 now (adds 30 instances at n = 25..34, all iter2 = iter3 = 1) |
+| msolve replay with the validator's own input writer and output parser | 69 of 81 main-sweep instances (all n ≤ 28; one each at n = 29..34); steps, maximal step degree, basis size and linear count equal the producer's rows on every one |
+| msolve quotient dimension = \|Z\| and linear elements = k, basis vanishes on Z | on every replayed instance (independent check that Z is complete) |
+| msolve degree = census d_iter where exact (n ≤ 16) | 27 of 27 (3 on 24, 4 on 3) |
+| msolve maximal step degree, n = 17..34 | 4 on every replayed instance |
+| fresh n = 25..27 regenerated; parameters and non-iter4 values equal `results/iter4_n25..27` | 9 of 9 |
+| validator's degree-4 closure on the fresh n = 25..27 instances | iter3 = 1 < k and iter4 = k on 9 of 9 (with the earlier 24: 33 of 33 to n = 27) |
+| msolve on the fresh n = 25..27 instances (not claimed by the producer) | degree 4, quotient dimension = \|Z\|, linear = k on 9 of 9 |
+
+### Headline items from the documents (claimed parsed from the text, recomputed from the commit)
+
+| statement (where) | claimed | recomputed |
+|---|---|---|
+| fresh n = 25..27 same outcome; d_iter = 4 on 33 of 33 fresh (pq2 README, census README, report.typ, triage) | 9; 33 / 33 | 9; 33 / 33 |
+| msolve on the main sweep's own instances, n = 8..34 | 81 | 81 |
+| dump log equals `results/run.log` | 81 | 81 |
+| linear elements in msolve's reduced basis = k | 81 of 81 | 81 of 81 |
+| msolve degree = d_iter where exact (n ≤ 16) | 27 of 27 | 27 of 27 |
+| census d_iter > 3 and msolve below 4 | 0 | 0 |
+| msolve maximal step degree n = 17..34 (all documents, MEAS-PQ2-MSOLVE-F4) | 4 on all 54 | 4 on all 54 |
+| MEAS-PQ2-MSOLVE-F4: degree 3 on 24 and 4 on 3 of the 27 with n ≤ 16 | 24, 3, 27 | 24, 3, 27 |
+| R5-003: never below the census bound; matches where exact | 0; 27 | 0; 27 |
+| truncated row recorded 0 linear; rerun gives k and takes precedence | 0; yes | 0; yes (`msolve_all.json` = precedence merge on 81 of 81) |
+| three instances rerun after a restart | 3 | 3 per-instance rerun files (the restart itself is not verifiable) |
+| R4-013 (3 copies): under containment F4's degree exceeds 2 on the n ≤ 44 instances | 111 | 111 |
+| R5-002 (3 copies), Direction bullet: degree one above the Kousidis–Wiemers 3, constant over n = 17..34 | 1; 1 | 1; 1 |
+| Lean README: round-5 pcc claim records present | 2 | 2 |
+| **pq2 README Direction: "This is evidence for the bounded-degree premise … not against it"** | supported | **not supported** |
+| **R5-002 (`lean-round5-20261107.json`, `WEAKNESSES.md`, `weakness.json`): "the bounded-degree premise holds on this range"** | supported | **not supported** |
+
+### F4: the bounded-degree reading is an overreach
+
+The measurement is sound: msolve's maximal step degree is 4 on every instance from
+n = 17 to 34. The reading drawn from it is not supported, for three reasons.
+
+1. The repository's own record of this family shows the next step. The corpus node
+   `MEAS-GB-KW-TABLE1` (`docs/ecdlp-hardness-corpus/lit-groebner.json`) gives Kousidis–Wiemers'
+   Magma data for the same construction: m = 2, random curves, random n′-dimensional
+   factor-base subspaces. Their highest step degree is 4 for n ≤ 36 and 5 for n = 37..48.
+   `GAP-GB-SUMMATION-DREG-GROWTH` and `WEAKNESS_TRIAGE.md` ("degree 4→5 at n = 36→37") cite
+   the same step. The msolve window stops at n = 34. It agrees with Kousidis–Wiemers where
+   they overlap, and it cannot see the rise they report three steps later.
+2. Within the measured range the degree did grow. On these same instances msolve gives 3
+   at n ≤ 14 and n = 16, and 4 at n = 15 and from n = 17. "Does not grow" holds only on the sub-window
+   after that step.
+3. A two-fold window in n cannot tell a bounded degree from a slowly growing one. The
+   repository's fall-degree study prefers a log₂ n fit on its m = 2 data
+   (`research/fall_degree_bounds_20261008/RESULTS.md`). A premise about all n cannot
+   "hold on a range" (R5-002). The pq2 README's own Reading bullet makes the matching
+   point: "a finite range cannot refute an o(1) statement".
+
+**On "consistent with the bounded-degree premise"** (census README, `report.typ`,
+`WEAKNESS_TRIAGE.md`). Read strictly, it is true of the n = 17..34 window, but empty: no
+finite table is inconsistent with a bounded degree. Without the Kousidis–Wiemers step
+beside it, it reads as support, so in context it is an overreach. These sentences are
+flagged, not failed: their literal content is supported.
+
+A fair wording for all of them: "msolve's degree is 4 on every instance from n = 17 to
+34, one above the Kousidis–Wiemers value 3, and matches their Magma value 4 for n ≤ 36.
+They report 5 from n = 37, so a window ending at n = 34 does not decide whether the
+degree stays bounded."
+
+**Not checked in this pass:**
+
+* `F4Containment.lean` and whether msolve fits the abstract F4 model; the documents state
+  the latter as a reading, not a theorem.
+* msolve on 12 main-sweep instances with n ≥ 29 (two each at n = 29..34). Their
+  degree, linear count and the completeness of Z rest on the producer's rows and the Rust
+  enumeration.
+* The re-rendered PDFs, SVGs and DOT graphs, and the producer's session log.
+* The pcc standing of the round-5 claims (only their records' presence).
+
 ## Reproduce
 
 From `research/ecdlp_weakness_census_20261104/pq2_rank` (each step pinned to one core):
@@ -308,7 +406,11 @@ From `research/ecdlp_weakness_census_20261104/pq2_rank` (each step pinned to one
     python3 -I -B validation/recompute.py --commit ea2fde0e4ded41a08ed5d966c96f7383d61ab802 --claims corrected
                                                # second pass
     python3 -I -B validation/recompute.py --commit 3cb9067133968daba8340c6cd4e2a46819ee6672 --claims corrected
-                                               # third pass (binding); writes validator_report.json
+                                               # third pass
+    python3 -I -B validation/recompute.py --commit 8d9fdc45be3678dc98b1044e9d8250aca1073ce7 --claims final
+                                               # final pass (binding); writes validator_report.json
+    python3 -I -B validation/msolve_check.py ...  # msolve replays; exact commands in replay_certificate.json
+    python3 -I -B validation/replay_compare.py --commit 8d9fdc45be3678dc98b1044e9d8250aca1073ce7
     python3 -I -B validation/controls.py       # writes controls.json
     python3 -I -B validation/replay_compare.py # writes replay_certificate.json (needs the run directories)
 

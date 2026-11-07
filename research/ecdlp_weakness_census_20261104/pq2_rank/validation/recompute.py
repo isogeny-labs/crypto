@@ -122,6 +122,241 @@ def parse_log(p: Path):
 
 
 
+def final_items(H, readme, L, est, detail):
+    """Items for the text and artifacts at the final commit: the degree-4 sweeps to n = 27, the
+    msolve F4 run (f4/), and every number in the changed documents."""
+    by = {(r["n"], r["inst"]): r for r in L}
+    n44 = {k for k in by if k[0] <= 44}
+    est44 = est & n44
+    # ---- degree-4 sweeps n = 17..27 ------------------------------------------------
+    fresh, fresh_new = [], []
+    main_params = set()
+    for r in json.loads(read_own(HERE / "replay_n8_44/pq2_rank.json"))["rows"]:
+        main_params.add((r["a"], r["b"], r["x_R"], tuple(r["basis"])))
+    for tag in ("iter4_n17_20", "iter4_n21_24", "iter4_n25", "iter4_n26", "iter4_n27"):
+        rows = json.loads(read_text(PKG / f"results/{tag}/pq2_rank.json"))["rows"]
+        fresh += rows
+        if tag in ("iter4_n25", "iter4_n26", "iter4_n27"):
+            fresh_new += rows
+            h, lr, other = parse_log(PKG / f"results/{tag}/run.log")
+            csvr = list(csv.DictReader(read_text(PKG / f"results/{tag}/pq2_rank.csv").splitlines()))
+            same_log = sum(all(j[k] == l[v] for k, v in (("n", "n"), ("instance", "inst"), ("k", "k"), ("iter3", "iter3"),
+                                                          ("iter4", "iter4"), ("d_iter", "d_iter"), ("Z_size", "Z")))
+                           for j, l in zip(rows, lr)) if len(lr) == len(rows) else -1
+            same_csv = sum(c["k"] == str(j["k"]) and c["iter4"] == str(j["iter4"]) and c["d_iter"] == j["d_iter"]
+                           for c, j in zip(csvr, rows)) if len(csvr) == len(rows) else -1
+            H(f"{tag}.instances", 3, len(rows))
+            H(f"{tag}.json_rows_equal_log", 3, same_log)
+            H(f"{tag}.csv_rows_equal_json", 3, same_csv)
+            H(f"{tag}.instances_shared_with_main_stream", 0,
+              sum((r["a"], r["b"], r["x_R"], tuple(r["basis"])) in main_params for r in rows))
+    same9 = sum(r["iter3"] == 1 and r["k"] > 1 and r["iter4"] == r["k"] for r in fresh_new)
+    d4_33 = sum(r["d_iter"] == "4" and r["iter3"] < r["k"] and r["iter4"] == r["k"] for r in fresh)
+    own_d4 = 0
+    for n in (25, 26, 27):
+        for r in json.loads(read_own(HERE / f"closure_iter4_n{n}.json"))["results"]:
+            own_d4 += (not r["value_mismatches"] and not r["failed_checks"] and r["mine"]["iter3"] < r["mine"]["k"]
+                       and r["mine"]["iter4"] == r["mine"]["k"])
+    H("iter4_n25_27.validator_closure_confirms_iter3_lt_k_iter4_eq_k", len(fresh_new), own_d4,
+      note="validator's own degree-4 closure (closure_check.py) on regenerated dumps, compared with the producer JSON")
+    t = " ".join(readme.split())
+    H("pq2_readme.fresh_n25_27_same_outcome", text_num(t, r"extend this to n = 27 with the same outcome on all (\d+) instances"), same9)
+    H("pq2_readme.fresh_total_d_iter_4", text_num(t, r"In total d_iter = 4 on (\d+) of \d+ fresh instances from n = 17 to 27"), d4_33)
+    H("pq2_readme.fresh_total_instances", text_num(t, r"In total d_iter = 4 on \d+ of (\d+) fresh instances from n = 17 to 27"), len(fresh))
+    H("pq2_readme.reading_fresh_need_exactly_4", text_num(t, r"The (\d+) fresh instances at n = 17 to 27 need exactly 4"), d4_33)
+    # ---- f4: dumps, dump log, msolve rows ---------------------------------------------
+    ls = subprocess.run(["git", "-C", str(REPO), "ls-tree", "--name-only", COMMIT, rel(PKG / "f4/dumps") + "/"],
+                        capture_output=True, text=True).stdout.split()
+    dump_names = sorted(Path(x).name for x in ls if x.endswith(".json"))
+    expect_names = sorted(f"n{n}_i{i}.json" for n in range(8, 35) for i in range(3))
+    identical = sum(read_text(PKG / f"f4/dumps/{nm}") == read_own(HERE / f"main_n8_34_dump/inst/{nm}").decode()
+                    for nm in dump_names if (HERE / f"main_n8_34_dump/inst/{nm}").exists())
+    H("f4.dumps_are_the_81_main_sweep_keys", 81, sum(nm in expect_names for nm in dump_names) if len(dump_names) == 81 else -1)
+    H("f4.dumps_byte_identical_to_validator_regeneration", 81, identical,
+      note="validator regenerated the main stream n = 8..34 with the census arguments (validation/main_n8_34_dump); "
+           "the n <= 24 dumps also passed its full S3 ANF check")
+    desc_ok = 0
+    for f in ("closure_replay_n8_20.json", "closure_replay_n21_24.json", "closure_main_n25_34.json"):
+        for r in json.loads(read_own(HERE / f))["results"]:
+            nm = f"n{r['n']}_i{r['instance']}.json"
+            same = nm in dump_names and read_own(HERE / r["dump"].split("validation/", 1)[1]).decode() == read_text(PKG / f"f4/dumps/{nm}")
+            desc_ok += bool(same and r["checks"].get("descent_anf_equals_dump") and not r["failed_checks"])
+    H("f4.dumps_equations_equal_S3_descent", 81, desc_ok,
+      note="validator's S3 descent: 2^N brute-force ANF and Z for n <= 24 (closure_replay_*), exact weight-<=2 "
+           "interpolation plus 500 random points for n = 25..34 (closure_main_n25_34); each dump byte-identical to f4/dumps")
+    dh, dl, do = parse_log(PKG / "f4/dump_run.log")
+    eq_lines = sum(1 for r in dl if (r["n"], r["inst"]) in by and all(r[f] == by[(r["n"], r["inst"])][f] for f in VALUE_KEYS))
+    main_hdr = read_text(PKG / "results/run.log").splitlines()[0]
+    H("f4.dump_log_lines", 81, len(dl))
+    H("f4.dump_log_seed_line_equal", 1, int(bool(dh) and dh[0] == main_hdr))
+    H("f4.dump_log_args_ns_8_34_3_per_n_d4_20", 1,
+      int(bool(re.search(r"ns=\[8, 9, .*, 33, 34\] instances_per_n=3 d4_max_n=20 ", dh[1] if len(dh) > 1 else ""))))
+    pnum = lambda pat: text_num(t, pat)
+    H("pq2_readme.f4_instances", pnum(r"ran on the main sweep's own instances for n = 8 to 34, (\d+) in all"), len(dump_names))
+    H("pq2_readme.f4_dump_log_equals_run_log", pnum(r"the dump log equals `results/run.log` on all (\d+) lines"), eq_lines)
+    # precedence merge: the full sweep first, then per-n and per-instance files
+    files = ["f4/msolve_n8_34.json", "f4/msolve_n26_i0.json", "f4/msolve_n33.json", "f4/msolve_n33_i1.json",
+             "f4/msolve_n33_i2.json", "f4/msolve_n34.json", "f4/msolve_n34_i2.json"]
+    src = {}
+    for f in files:
+        for r in json.loads(read_text(PKG / f))["rows"]:
+            src[(r["n"], r["instance"])] = (f, r)
+    full = {(r["n"], r["instance"]): r for r in json.loads(read_text(PKG / "f4/msolve_n8_34.json"))["rows"]}
+    allr = json.loads(read_text(PKG / "f4/msolve_all.json"))["rows"]
+    A = {(r["n"], r["instance"]): r for r in allr}
+    H("f4.msolve_all_rows", 81, len(allr))
+    H("f4.msolve_all_equals_precedence_merge", 81, sum(A.get(k) == v[1] for k, v in src.items()) if len(src) == 81 else -1)
+    H("f4.msolve_exit_0", 81, sum(r["msolve_exit"] == 0 for r in allr))
+    H("f4.row_census_fields_equal_run_log", 81,
+      sum(k in by and r["census_k"] == by[k]["k"] and r["census_d_iter"] == by[k]["d_iter"] for k, r in A.items()))
+    H("f4.row_k_equals_dump_Z_k", 81,
+      sum(r["k"] == by[k]["k"] for k, r in A.items() if k in by))
+    lin_ok = sum(r["linear_in_gb"] == by[k]["k"] for k, r in A.items() if k in by)
+    exact = [(k, r) for k, r in A.items() if by[k]["d_iter"].isdigit()]
+    exact_ok = sum(r["max_step_degree"] == int(by[k]["d_iter"]) for k, r in exact)
+    gt3_below = sum(1 for k, r in A.items() if by[k]["d_iter"].startswith(">") and r["max_step_degree"] < int(by[k]["d_iter"][1:]) + 1)
+    below_lb = sum(1 for k, r in A.items()
+                   if r["max_step_degree"] < (int(by[k]["d_iter"]) if by[k]["d_iter"].isdigit() else int(by[k]["d_iter"][1:]) + 1))
+    band = [r for k, r in A.items() if 17 <= k[0] <= 34]
+    deg4 = sum(r["max_step_degree"] == 4 for r in band)
+    distinct_17_34 = len({r["max_step_degree"] for r in band})
+    distinct_8_34 = sorted({r["max_step_degree"] for r in A.values()})
+    le16 = [r for k, r in A.items() if k[0] <= 16]
+    H("pq2_readme.f4_table_linear_eq_k", pnum(r"linear polynomials in msolve's reduced basis equal k \| (\d+) of \d+"), lin_ok)
+    H("pq2_readme.f4_table_linear_eq_k_of", pnum(r"linear polynomials in msolve's reduced basis equal k \| \d+ of (\d+)"), len(A))
+    H("pq2_readme.f4_table_degree_eq_exact_d_iter", pnum(r"census value is exact \(n ≤ 16\) \| (\d+) of \d+"), exact_ok)
+    H("pq2_readme.f4_table_exact_rows", pnum(r"census value is exact \(n ≤ 16\) \| \d+ of (\d+)"), len(exact))
+    H("pq2_readme.f4_table_gt3_msolve_below_4", pnum(r"census d_iter > 3 and msolve below 4 \| (\d+)"), gt3_below)
+    H("pq2_readme.f4_table_n17_34_degree_value", pnum(r"msolve maximal step degree, n = 17 to 34 \| (\d+) on all \d+"),
+      next(iter({r["max_step_degree"] for r in band})) if distinct_17_34 == 1 else -1)
+    H("pq2_readme.f4_table_n17_34_count", pnum(r"msolve maximal step degree, n = 17 to 34 \| \d+ on all (\d+)"), deg4)
+    bad = full.get((26, 0), {})
+    H("pq2_readme.f4_bad_row_linear", pnum(r"One row first recorded (\d+) linear polynomials"), bad.get("linear_in_gb"))
+    rr = json.loads(read_text(PKG / "f4/msolve_n26_i0.json"))["rows"][0]
+    H("pq2_readme.f4_n26_i0_rerun_gives_k", 1 if "The rerun gives k" in t else None,
+      int(rr["linear_in_gb"] == by[(26, 0)]["k"] and A[(26, 0)] == rr))
+    H("pq2_readme.f4_reruns_after_restart", pnum(r"(\w+) instances were rerun after a machine restart"),
+      len([f for f in files if re.search(r"_n\d+_i\d+\.json$", f) and not f.endswith("n26_i0.json")]),
+      note="recomputed: per-instance rerun files other than n26_i0 (n33_i1, n33_i2, n34_i2); the restart itself is not verifiable")
+    H("pq2_readme.reading_msolve_exactly_4", pnum(r"msolve's F4 reaches exactly 4 on all (\d+) main-sweep instances at n = 17 to 34"), deg4)
+    # validator's own msolve replay (independent driver and parser)
+    rep_ = json.loads(read_own(HERE / "msolve_replay/msolve_replay.json"))["results"]
+    if (HERE / "msolve_replay/msolve_replay_extra.json").exists():
+        rep_ += json.loads(read_own(HERE / "msolve_replay/msolve_replay_extra.json"))["results"]
+    detail["final.validator_msolve_replay_keys"] = sorted([r["n"], r["instance"]] for r in rep_)
+    rep_ok = sum(not r["mismatches"] and not r["failed_checks"] for r in rep_)
+    H("f4.validator_msolve_replay_agrees_with_producer_rows", len(rep_), rep_ok,
+      note="validator re-ran msolve with its own input writer and parser; agreement on steps, max step degree, basis "
+           "size, linear count, k, census degree; plus quotient dimension = |Z| and basis vanishing on Z")
+    # ---- Direction sentence: the bounded-degree reading ------------------------------
+    H("pq2_readme.direction_one_above_prediction", 1 if "The degree is one above the predicted value" in t else None,
+      (next(iter({r["max_step_degree"] for r in band})) - 3) if distinct_17_34 == 1 else -1,
+      note="msolve degree on n = 17..34 minus the Kousidis-Wiemers value 3")
+    H("pq2_readme.direction_no_growth_n17_34", 1 if "on n = 17 to 34 it does not grow" in t else None, distinct_17_34,
+      note="number of distinct msolve maximal step degrees on n = 17..34")
+    lit = json.loads(read_text(REPO / "docs/ecdlp-hardness-corpus/lit-groebner.json"))
+    kw = ""
+
+    def walk(o):
+        nonlocal kw
+        if isinstance(o, dict):
+            if o.get("id") == "MEAS-GB-KW-TABLE1":
+                kw = o.get("statement", "")
+            for v in o.values():
+                walk(v)
+        elif isinstance(o, list):
+            for v in o:
+                walk(v)
+    walk(lit)
+    m = re.search(r"m = 2, n = (\d+)\.\.(\d+): D_ff = 2 always, D_reg \(highest step degree\) = (\d+) for n <= (\d+) and (\d+) for n = (\d+)\.\.(\d+)", kw)
+    kw_rise = bool(m) and int(m[5]) > int(m[3])
+    detail["final.kw_table1_m2"] = m.groups() if m else None
+    detail["final.msolve_degrees_n8_34"] = distinct_8_34
+    supported = int(not kw_rise and len(distinct_8_34) == 1)
+    why = ("Encoded judgment, recomputed from repository data: a constant step degree on n = 17..34 is evidence for a "
+           "bounded degree only if nothing in the repository shows this family's degree rising. Two records do: "
+           f"(1) the msolve data themselves take the values {distinct_8_34} on n = 8..34 (3 at n <= 14 and n = 16, "
+           "4 at n = 15 and from n = 17); (2) the corpus's own record MEAS-GB-KW-TABLE1 (docs/ecdlp-hardness-corpus/lit-groebner.json) "
+           + (f"gives, for the same family (m = 2, n = {m[1]}..{m[2]}), Magma highest step degree {m[3]} for n <= {m[4]} "
+              f"and {m[5]} for n = {m[6]}..{m[7]}" if m else "(not found)")
+           + ", i.e. the next step lies just past the msolve window (n <= 34). A two-fold window in n cannot "
+           "discriminate a bounded degree from a slowly growing one (cf. the LOG fit in "
+           "research/fall_degree_bounds_20261008/RESULTS.md). Supported wording: 'the degree is 4 on every instance "
+           "from n = 17 to 34, matching Kousidis-Wiemers' value 4 for n <= 36; they report 5 from n = 37, so these "
+           "data neither support nor refute a bounded degree'.")
+    H("pq2_readme.direction_evidence_for_bounded_degree_premise",
+      1 if "This is evidence for the bounded-degree premise" in t else None, supported, note=why)
+    # ---- census README, report.typ, triage, Lean README ------------------------------
+    cen = " ".join(read_text(PKG.parent / "README.md").split())
+    H("census_readme.d4_sweeps_reach_k_n17_27", text_num(cen, r"Fresh degree-4 sweeps at n = 17 to 27 reach k on all (\d+) instances"), d4_33)
+    H("census_readme.msolve_exactly_4_n17_34", text_num(cen, r"reaches maximal step degree exactly 4 on all (\d+) instances from n = 17 to 34"), deg4)
+    H("census_readme.msolve_matches_census_where_exact", len(exact) if "matches the census wherever the census value is exact" in cen else None, exact_ok)
+    H("census_readme.no_growth_n17_34", 1 if "The degree does not grow over n = 17 to 34" in cen else None, distinct_17_34)
+    typ = " ".join(read_text(PKG.parent / "report.typ").split())
+    H("report_typ.iterated_exactly_4_n17_27", text_num(typ, r"exactly 4 on (\d+) fresh instances at n = 17--27"), d4_33)
+    H("report_typ.d4_sweeps_reach_k_n17_27", text_num(typ, r"Fresh degree-4 sweeps at n = 17 to 27 reach k on all (\d+) instances"), d4_33)
+    H("report_typ.msolve_exactly_4_n17_34", text_num(typ, r"reaches maximal step degree exactly 4 on all (\d+) main-sweep instances from n = 17 to 34"), deg4)
+    H("report_typ.table_msolve_degree_4", 4 if "msolve F4 degree 4 at n = 17--34" in typ else None,
+      next(iter({r["max_step_degree"] for r in band})) if distinct_17_34 == 1 else -1)
+    H("report_typ.no_growth_n17_34", 1 if "The degree does not grow over n = 17 to 34" in typ else None, distinct_17_34)
+    tri = " ".join(read_text(REPO / "docs/ecdlp-hardness-corpus/WEAKNESS_TRIAGE.md").split())
+    H("triage.d4_reaches_k_n17_27", text_num(tri, r"Degree 4 reaches k on (\d+) of \d+ fresh instances at n = 17 to 27"), d4_33)
+    H("triage.msolve_exactly_4_n17_34", text_num(tri, r"reaches maximal step degree exactly 4 on all (\d+) main-sweep instances at n = 17 to 34"), deg4)
+    H("triage.degree_stays_4_n17_34", 4 if "The degree stays at 4 over n = 17 to 34" in tri else None,
+      next(iter({r["max_step_degree"] for r in band})) if distinct_17_34 == 1 else -1)
+    lean = " ".join(read_text(REPO / "research/ecdlp_weakness_lean_20261104/README.md").split())
+    ids = re.findall(r"PCC-\d{8}-[0-9a-f]{6}", lean[lean.find("Round 5"):]) if "Round 5" in lean else []
+    present = sum(subprocess.run(["git", "-C", str(REPO), "cat-file", "-e", f"{COMMIT}:pcc/claims/{i}.json"]).returncode == 0
+                  for i in ids)
+    H("lean_readme.round5_pcc_claim_records_present", len(ids) if ids else None, present)
+    # ---- corpus: round 5 fragment, round 4 edge, generated copies ----------------------
+    def corpus_objs(doc):
+        flat = []
+
+        def w(o):
+            if isinstance(o, dict):
+                flat.append(o)
+                for v in o.values():
+                    w(v)
+            elif isinstance(o, list):
+                for v in o:
+                    w(v)
+        w(json.loads(read_text(REPO / doc)))
+        return {o.get("id"): o for o in flat if isinstance(o.get("id"), str)}
+    r5 = corpus_objs("docs/ecdlp-hardness-corpus/lean-round5-20261107.json")
+    ms = r5.get("MEAS-PQ2-MSOLVE-F4", {}).get("statement", "")
+    H("corpus.MEAS-PQ2-MSOLVE-F4.instances", text_num(ms, r"on the (\d+) pq2_rank main-sweep instances with n = 8 to 34"), len(A))
+    H("corpus.MEAS-PQ2-MSOLVE-F4.deg3_le16", text_num(ms, r"maximal step degree 3 on (\d+) and 4 on \d+ of the \d+ instances with n <= 16"),
+      sum(r["max_step_degree"] == 3 for r in le16))
+    H("corpus.MEAS-PQ2-MSOLVE-F4.deg4_le16", text_num(ms, r"maximal step degree 3 on \d+ and 4 on (\d+) of the \d+ instances with n <= 16"),
+      sum(r["max_step_degree"] == 4 for r in le16))
+    H("corpus.MEAS-PQ2-MSOLVE-F4.le16_rows", text_num(ms, r"of the (\d+) instances with n <= 16"), len(le16))
+    H("corpus.MEAS-PQ2-MSOLVE-F4.eq_census_d_iter", text_num(ms, r"equal to the census d_iter on all (\d+)"), exact_ok)
+    H("corpus.MEAS-PQ2-MSOLVE-F4.exactly_4_n17_34", text_num(ms, r"exactly 4 on all (\d+) instances with 17 <= n <= 34"), deg4)
+    H("corpus.MEAS-PQ2-MSOLVE-F4.linear_eq_k", text_num(ms, r"exactly k linear polynomials on all (\d+)"), lin_ok)
+    r53 = r5.get("R5-003", {}).get("statement", "")
+    H("corpus.R5-003.never_below_census_bound", 0 if "is never below it" in r53 else None, below_lb)
+    H("corpus.R5-003.matches_where_exact", len(exact) if "Matches the census lower bound on every instance where it is exact" in r53 else None, exact_ok)
+    for doc, getter in (("docs/ecdlp-hardness-corpus/lean-round5-20261107.json", lambda: r5.get("R5-002", {}).get("statement", "")),
+                        ("docs/ecdlp-hardness-corpus/WEAKNESSES.md", None),
+                        ("docs/ecdlp-hardness-corpus/weakness.json", None)):
+        txt = getter() if getter else " ".join(read_text(REPO / doc).split())
+        tag = doc.rsplit("/", 1)[1]
+        H(f"{tag}.R5-002.degree_one_above_KW", 1 if "Real F4 degree is 4, one above the Kousidis-Wiemers value 3" in txt else None,
+          (next(iter({r["max_step_degree"] for r in band})) - 3) if distinct_17_34 == 1 else -1)
+        H(f"{tag}.R5-002.constant_n17_34", 1 if "constant over n = 17 to 34" in txt else None, distinct_17_34)
+        H(f"{tag}.R5-002.bounded_degree_premise_holds_on_range",
+          1 if "the bounded-degree premise holds on this range" in txt else None, supported,
+          note="a premise about all n cannot 'hold on a range'; " + why)
+    for doc in ("docs/ecdlp-hardness-corpus/lean-round4-20261104.json", "docs/ecdlp-hardness-corpus/WEAKNESSES.md",
+                "docs/ecdlp-hardness-corpus/weakness.json"):
+        txt = " ".join(read_text(REPO / doc).split())
+        tag = doc.rsplit("/", 1)[1]
+        H(f"{tag}.R4-013.F4_degree_exceeds_2_n_le_44_under_containment",
+          text_num(txt, r"Under the containment property \(THM-F4-CONTAINMENT\), F4's maximal step degree exceeds the first fall degree 2 on the (\d+) instances with n <= 44"),
+          len(est44), note="lower bound via THM-F4-CONTAINMENT (Lean, not reviewed here)")
+
+
 def r4013_exactly4(H, prefix, txt, d4exact, ge4):
     """R4-013's degree-4 clause in whichever wording the document carries."""
     old = text_num(txt, r"; exactly 4 on (\d+) fresh instances at n = 17 to 24")
@@ -158,9 +393,19 @@ def read_own(p: Path) -> bytes:
     return data
 
 
-def corrected_items(H, readme, L, by_mono, by_own, est, open_keys, d3, d4, rust_cc, kd, names, sweep_good, detail):
+def corrected_items(H, readme, L, by_mono, by_own, est, open_keys, d3, d4, rust_cc, kd, names, sweep_good, detail,
+                    version="corrected"):
     """Headline items for the corrected wording. Every 'claimed' value is parsed from the document
     text (None if the phrase is absent, which fails the item); every 'recomputed' value from data."""
+    replaced = {"census_readme.d4_sweeps_reach_k", "report_typ.iterated_exactly_4", "report_typ.d4_sweeps_reach_k",
+                "triage.d4_reaches_k", "WEAKNESSES.md.R4-013.solver_degree_exceeds_2_n_le_44",
+                "weakness.json.R4-013.solver_degree_exceeds_2_n_le_44", "corpus.R4-013.solver_degree_exceeds_2_n_le_44"}
+    if version == "final":
+        H0 = H
+
+        def H(name, claimed, recomputed, **extra):  # noqa: F811
+            if name not in replaced:
+                H0(name, claimed, recomputed, **extra)
     key = lambda r: (r["n"], r["inst"])
     n44 = {key(r) for r in L if r["n"] <= 44}
     est44 = est & n44
@@ -307,7 +552,7 @@ def main() -> int:
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("--commit", default=COMMIT)
-    ap.add_argument("--claims", choices=["original", "corrected"], default="original")
+    ap.add_argument("--claims", choices=["original", "corrected", "final"], default="original")
     ap.add_argument("--worktree", action="store_true")
     ap.add_argument("--out", default=str(HERE / "validator_report.json"))
     args = ap.parse_args()
@@ -594,8 +839,11 @@ def main() -> int:
     detail["crosscheck_python_d4_low"] = {nm: d4[nm]["low"] for nm in d4}
     detail["crosscheck_k_from_dump_Z"] = kd
 
-    if args.claims == "corrected":
-        corrected_items(H, readme, L, by_mono, by_own, est, open_keys, d3, d4, rust_cc, kd, names, both, detail)
+    if args.claims in ("corrected", "final"):
+        corrected_items(H, readme, L, by_mono, by_own, est, open_keys, d3, d4, rust_cc, kd, names, both, detail,
+                        version=args.claims)
+    if args.claims == "final":
+        final_items(H, readme, L, est, detail)
 
     # ---------------------------------------------------------------------------
     failed = [h for h in heads if h["claimed"] != h["recomputed"]]

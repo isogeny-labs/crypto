@@ -42,7 +42,7 @@
       "status": "measured",
       "model": "repository_measurement",
       "statement": "msolve 0.6.5 (F4, grevlex) on the 81 pq2_rank main-sweep instances with n = 8 to 34 (dumped with the census seed and arguments, dump log identical to the census log): maximal step degree 3 on 24 and 4 on 3 of the 27 instances with n <= 16, equal to the census d_iter on all 27; exactly 4 on all 54 instances with 17 <= n <= 34; msolve's reduced basis contains exactly k linear polynomials on all 81.",
-      "scope": "m = 2 only; one implementation and one selection strategy; finite range n <= 34. Shows the degree does not grow over this range, not that it stays bounded asymptotically.",
+      "scope": "m = 2 only; one implementation and one selection strategy; finite range n <= 34, below the n = 37 step to 5 that MEAS-GB-KW-TABLE1 reports. Does not decide boundedness.",
       "assumptions": [],
       "source_refs": [
         "S-PQ2-F4-ROUND5"
@@ -75,7 +75,7 @@
       "from": "MEAS-PQ2-MSOLVE-F4",
       "to": "HEUR-GB-PQ-ASSUMPTION-2",
       "relation": "qualifies",
-      "statement": "Real F4 degree is 4, one above the Kousidis-Wiemers value 3, and constant over n = 17 to 34: the bounded-degree premise holds on this range at a higher degree than predicted.",
+      "statement": "Real F4 (msolve) degree is 4 on n = 17 to 34, one above the Kousidis-Wiemers value 3 and equal to their Magma value for n <= 36; MEAS-GB-KW-TABLE1 reports 5 from n = 37, so this window does not decide boundedness.",
       "source_refs": [
         "S-PQ2-F4-ROUND5"
       ]
@@ -86,6 +86,16 @@
       "to": "MEAS-PQ2-DLIN-CENSUS",
       "relation": "measures",
       "statement": "Matches the census lower bound on every instance where it is exact, and is never below it.",
+      "source_refs": [
+        "S-PQ2-F4-ROUND5"
+      ]
+    },
+    {
+      "id": "R5-004",
+      "from": "MEAS-PQ2-MSOLVE-F4",
+      "to": "MEAS-GB-KW-TABLE1",
+      "relation": "measures",
+      "statement": "Reproduces the Magma value 4 with a second implementation on n = 17 to 34, below the n = 37 step to 5.",
       "source_refs": [
         "S-PQ2-F4-ROUND5"
       ]

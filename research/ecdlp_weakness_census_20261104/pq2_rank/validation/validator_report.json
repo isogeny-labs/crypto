@@ -1,37 +1,45 @@
 {
  "schema": "pcc.validator-report/v1",
- "validated_commit": "3cb9067133968daba8340c6cd4e2a46819ee6672",
- "claims": "corrected",
- "recompute_script_sha256": "40a27cdbd6856b9ab09878b69a787cce38844a543723f50f6eee0f91fedc2760",
- "head_at_recompute": "a34eb9059103248728e9b5672821d109db3b7169",
+ "validated_commit": "8d9fdc45be3678dc98b1044e9d8250aca1073ce7",
+ "claims": "final",
+ "recompute_script_sha256": "d55e5392f163c0af8e32b959d8f20532958092bf35d290bddd74588191d7934e",
+ "head_at_recompute": "8d9fdc45be3678dc98b1044e9d8250aca1073ce7",
  "worktree_differs": [],
- "status": "pass",
+ "status": "fail",
  "validator": "validator (claude-opus-5-5; Claude Code session 01AXUKfUpk9rEJg4Yyo1QcZQ)",
- "produced_at": "2026-11-05T04:20:58Z",
+ "produced_at": "2026-11-07T21:34:58Z",
  "raw_data": [
   {
    "path": "docs/ecdlp-hardness-corpus/WEAKNESSES.md",
-   "sha256": "7d829d0f56072bc25917bf6676991681ae1d6015b1d13015188715c0fa55a4ec"
+   "sha256": "62edea97d7aba6cb9c5ca8c2f30aae5c40d651446173821a855ba015dc29093a"
   },
   {
    "path": "docs/ecdlp-hardness-corpus/WEAKNESS_TRIAGE.md",
-   "sha256": "f8bbf3de64dd4baad2a1b3f2cb886d9c25a049a8aa30f0d5deedf9d93c57a34c"
+   "sha256": "1d53e91dd663e19f00b798e1243ff49da79a7b845f28ad44b0d70874e2d1481e"
   },
   {
    "path": "docs/ecdlp-hardness-corpus/lean-round4-20261104.json",
-   "sha256": "35e42aeeb34713ba6d8c704f6875956701eb0c6f5c68d89a997d6fd9ca831211"
+   "sha256": "197acdd5c48dc2e057fef493ad01f9a74dedea29996ad573d0859588fc4fb92e"
+  },
+  {
+   "path": "docs/ecdlp-hardness-corpus/lean-round5-20261107.json",
+   "sha256": "cf29c97ad22fb396029eedf6cac6846f1133bc56c9f4bbd235826cd7f7265c93"
+  },
+  {
+   "path": "docs/ecdlp-hardness-corpus/lit-groebner.json",
+   "sha256": "7c6466be48d067fbf031adc5af7bbb9ddd1558aad9e915983a175e20381394eb"
   },
   {
    "path": "docs/ecdlp-hardness-corpus/weakness.json",
-   "sha256": "fc6d12d71cf46fddbf644f066127872fb5d5ebd4f73157a95a6f61e35cfd4ac4"
+   "sha256": "72c87a622f66aeaf57bbb423782b6291fd8055f0be78ebdb5103b7a9a23312bf"
   },
   {
    "path": "research/ecdlp_weakness_census_20261104/README.md",
-   "sha256": "84a9c560bac60414a8eaf5d35ba679ea5c4ca4fdd2a5f1548c082663a6572b77"
+   "sha256": "674cbe7109dd03960f10feb6ad1ef74038f86a34162139f4d5719b55c0832cc0"
   },
   {
    "path": "research/ecdlp_weakness_census_20261104/pq2_rank/README.md",
-   "sha256": "56f9bfc4ed64815224baeadd3ffecda8bc5fb07f764bc8718810ff997eeeac9c"
+   "sha256": "819481d32ae4956e0966f474dc23db890829b43d148127fda94f79b1d9de26fc"
   },
   {
    "path": "research/ecdlp_weakness_census_20261104/pq2_rank/crosscheck/README.md",
@@ -70,6 +78,366 @@
    "sha256": "a88019598e661e4c536f5b90b81c142cb784b871517af8827eb5f840dcf188ca"
   },
   {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dump_run.log",
+   "sha256": "275c5bde55bd70f24e904542419e372b97fe1d74683fbc8e4cd07691b52c81fd"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n10_i0.json",
+   "sha256": "147af8d554112fac47bed26b0b26354df97193db3125a9e4f4f1237d8ebbd36a"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n10_i1.json",
+   "sha256": "a924ac51c95cf2dab90d693dc3501b3b34bcb51bb3005253d05f6575d6cae4c8"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n10_i2.json",
+   "sha256": "7f3d4bdcf9c75ecdb034ea79b35c7c16d6cd00f4f580561fcbe10b469985a65a"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n11_i0.json",
+   "sha256": "c29fb61adf588bb35bb914d58c026e4b119889cbbae780438b5947776bae4dce"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n11_i1.json",
+   "sha256": "72928bfc747ba4c2f0a87f18caae3d80186e8f12f0ca263286e148e10aebfb0f"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n11_i2.json",
+   "sha256": "1fb9f245ad78be98cdc044030c324c8a0ecd168b366746258843e8bf46de0186"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n12_i0.json",
+   "sha256": "a6c15390ff27b07f8447565e0f8df1e3e6620a40ea35ef8156ff698c572a69ec"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n12_i1.json",
+   "sha256": "bbd126ac824286416832cf0719ae447827d1442f09b80a93d6b52845d5dbbd50"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n12_i2.json",
+   "sha256": "bf357a4001ed6df2f476576dc14577c7d544b727562800d13b20ce345f2c7af3"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n13_i0.json",
+   "sha256": "fc08cd5b4c279e0602862909283bb136e31547b1a932e06069f103b0376adc79"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n13_i1.json",
+   "sha256": "b729436b23e45f0e38aba099e9dbb6010b5a135064249cceb34a1bc2c66b46ac"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n13_i2.json",
+   "sha256": "73903e4f360cb669dd2e8f68ab2b2c64e58ca6aa53288694372b907d67435c2c"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n14_i0.json",
+   "sha256": "85ad862a83ba198c60e41f38a85d9b44739ea5f323e463a26ba55da3944c90e2"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n14_i1.json",
+   "sha256": "525394353c93d5d055e739195731a67806e041c1c620aaeace0ff80e670ecccc"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n14_i2.json",
+   "sha256": "319b45f53d11dbc5596896cd9e4a17aa9874ddd1e087c15079e59fe26f807fd1"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n15_i0.json",
+   "sha256": "9dac2a7aad9a8fdeec63456fdc19523c3e6ee1c2b9d9ca2dd33533e9547e6516"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n15_i1.json",
+   "sha256": "2c8e5ebf83d641f734b42e08368238da44bbc54d721d60915c8f3c5fa6560e8b"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n15_i2.json",
+   "sha256": "b6c64d08d1202f26eaf10e5cca6cfe6c91ed6301e4297e22b13c4812eebb0388"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n16_i0.json",
+   "sha256": "b5629be6da107b86058e3a117f91a418bf4f530e4cd0172f843b375beabd26e9"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n16_i1.json",
+   "sha256": "44dca42d00d1e19d1391d953b7bd0053f71669bc8ea4b5736639cc6c884cc6e9"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n16_i2.json",
+   "sha256": "44b16888ca651b63ff9302b78990ed5d6d839c7c9dcb9594cf59c1758b6c9d30"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n17_i0.json",
+   "sha256": "cc7f4c4ba5360b0e01b0e283238728f02ec58181ee5e776283446823668bf4f9"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n17_i1.json",
+   "sha256": "081db2196cf0ca811fced001829f3fdfb08439a7102076227456704bbe096555"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n17_i2.json",
+   "sha256": "75008d7dd50cc460663d2838cec9926a0303ae43fc0eb80023e32828a6624765"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n18_i0.json",
+   "sha256": "cd439e92b9a27080df86efcda28466ad0291be1d9d36016614e3e902280bc65b"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n18_i1.json",
+   "sha256": "44278ea13f38e06172df3271aa35166c5ec6a6241de954ee0afd5335c21bae7a"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n18_i2.json",
+   "sha256": "9eddc44b7c620315c432686c74200c590e3cd2ecd942e6afb2a100c2a9e5cb93"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n19_i0.json",
+   "sha256": "b3b974363132a3eba0492a9a8ff807031bd48eb1ec03c08dcae7c9dd13dc0e53"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n19_i1.json",
+   "sha256": "ae7f895dcf094e4c0f2de26c81b0f5e671e8c615fa90101030e8945f042886f5"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n19_i2.json",
+   "sha256": "c63d2f9dbd1826e79971f2f3361805ed1166c7ff5d5d012e4ff1f9816e869dac"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n20_i0.json",
+   "sha256": "ca0b0a7e606379ad4e32ab361c3ecd222a30392bcd6d9f663fa412ab30e45f49"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n20_i1.json",
+   "sha256": "1189c6995b769ccd24b0852b3701d1eaa4505703b85761c7cff56a9ccfe18252"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n20_i2.json",
+   "sha256": "090d51b512cc2d3c598f88630660afe4d47b48a1b1d10509969758767e6ec346"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n21_i0.json",
+   "sha256": "3068340ba3bec70d2d84c43b22c382a54647efc475cb7e6dc6f6c997fefe6470"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n21_i1.json",
+   "sha256": "7b42bbdfd693cd338687a17f056680527fd79db8746429ee41e223031f8d1f74"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n21_i2.json",
+   "sha256": "14f78a7093231bf43226ce56aca692521893a770721c9d355a34139ef1becc18"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n22_i0.json",
+   "sha256": "4655e6cad51afd4887c56a4e4778ab0091eee66c151a377d75d84cec1d2bafe9"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n22_i1.json",
+   "sha256": "49ec288030f9f6764df7d4a60be27c125b48b0363530c906e96861b837244a1c"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n22_i2.json",
+   "sha256": "3cfd3420c49c66278102f449e28c6a62949f5d50bacd09e42ddac378fa79c3f2"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n23_i0.json",
+   "sha256": "eed4e73d665ec53ecd1cbea8a5bf97291f317eb023bd723649bc9673c7746270"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n23_i1.json",
+   "sha256": "457cefe2d29b5f43a111daa218e3f10f17b4ec4fe2217911372db0b704cdc1a3"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n23_i2.json",
+   "sha256": "e3ee03560ba59e243a0ee7fb614fcdcb3c6302439a6780a9bde9e393a30984fc"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n24_i0.json",
+   "sha256": "18cf9b0ac79b6cddda69e07347d75e618e1699c4534393d5b20990339d3ba28b"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n24_i1.json",
+   "sha256": "b0fade8440944864092e41b126b5bbaedcf7e4061313a1885d9cf247ec0bf6da"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n24_i2.json",
+   "sha256": "cc46c18448580cb083d13e2c77c358fbc75423d1c63037837589531105173561"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n25_i0.json",
+   "sha256": "a21cd319497777a7e4870399e82feae3924ceb3654e0f49de49ab8932812f74a"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n25_i1.json",
+   "sha256": "6ab8f825bc1575e6bf9192048dda1ef5ce1625893d153166a101730fe9bbac53"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n25_i2.json",
+   "sha256": "f7fb2c2b1d776bf0ce1dae9effdcc6ef5857d2cbaf9a17ca0f9820e3a930ded8"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n26_i0.json",
+   "sha256": "ca0eb3f3126be5574a65f10e8b3121a85acacc8fa281538e10d5262cc3becb85"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n26_i1.json",
+   "sha256": "12e17e2a20bd9a372439bf578f7d69bab67879983802948f99a0db4c73e0ead1"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n26_i2.json",
+   "sha256": "6d0744472d1410d5ee6731c6788bc800d54479e25a05330f8ec8278feecffd9d"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n27_i0.json",
+   "sha256": "c16b8ff7b37c4522d6aaefa5aa84e4e7c157484971558621e4fdea9c73457786"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n27_i1.json",
+   "sha256": "69e1f84e9b9c1f00a091a510b5c2ae4ec6e230fbbc9a95452111b46283ee9c69"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n27_i2.json",
+   "sha256": "ca7cfe431a2f97229cfc869af5456b2634e85f50a9cffa1482846888ef4b77cb"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n28_i0.json",
+   "sha256": "6a12ea969f3c11dc713f1a97d22369f4b50657e5ba8ce00e6e8f46d5dd0d23e6"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n28_i1.json",
+   "sha256": "f284da16333a6e89dea76a1fa2b1214a85b7ef954305a968fdb8ae459d3761e1"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n28_i2.json",
+   "sha256": "d1845c930cb9d6685a61625313ffeef4ebf3c9f60856b972141cd6affcdbfc3f"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n29_i0.json",
+   "sha256": "c76bc7963d32aac63a4bbea4be32be91d030caec9e20fb57ed1ee2efbde14804"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n29_i1.json",
+   "sha256": "fc0bd94f04fc22bb8d07cc0403cfbcca3cd951ddca66768b6d978f9e6d724cac"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n29_i2.json",
+   "sha256": "588c669392c972d1cbab6151c2b72a6e977042970cc37b5ce6ae23afd115e966"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n30_i0.json",
+   "sha256": "a43961ccc1ee1cbd1852b0a21c675ef9f7858f88f167949f0bd67b0922182fc3"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n30_i1.json",
+   "sha256": "e322033e67d8282d094d20c0cde203f0ce03bacb0898b078de920fc4b3545849"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n30_i2.json",
+   "sha256": "274209de22070d0483ce5b903d13635a65e80220df60b312d535484e907af29d"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n31_i0.json",
+   "sha256": "b30c0208019aa93fa71332f5240ab01f9565b2be5ef3a90f8b3036ac4122dbd9"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n31_i1.json",
+   "sha256": "82eada866c6bf6487ebee3973e0a4a6d02a193d266aa353c63525ddf198cbbf2"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n31_i2.json",
+   "sha256": "2476efbe8747d82fd2b2cd08b0868a935b564a6daa2fc380a657694ca320c9cf"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n32_i0.json",
+   "sha256": "44c1e0b1b921fdf295dd40529f7d083ff44e5ff63efb81a85acc1ed070076c61"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n32_i1.json",
+   "sha256": "2342859a20796f4f8178aa589974ac07676808a247e59ece565707996248d2d6"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n32_i2.json",
+   "sha256": "f4219f74a19d0ae3d91de5e196b58e360f51c1044f06c1d5eb1ba453fb907fc3"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n33_i0.json",
+   "sha256": "f03940e1d8692aab1675a3f565592330b05470c78c49c03704b98f25094b21aa"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n33_i1.json",
+   "sha256": "59c04f2a7a9024955c1839cf4a71a009616f53491b718e250833f961501da552"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n33_i2.json",
+   "sha256": "fa79e317f67aafe22d4d95bc0f5459287323800708cc3895eba7e0585806a188"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n34_i0.json",
+   "sha256": "ba7defff3243ce1c8860f08aa828a0136b32ab2830dc03a0e40514a62da4b9d4"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n34_i1.json",
+   "sha256": "2c4e02116fedfa688cfb1344e615b38d14fbaf4e3b4761d942c4994e95000755"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n34_i2.json",
+   "sha256": "8e779b176aa5cdc9efe631b7100a786e3cdf7369fca616d821bf547e56f69df0"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n8_i0.json",
+   "sha256": "0bde69001c5f40179ae8b8544cf0f84104bfa2adddd9edc3536d267da1557157"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n8_i1.json",
+   "sha256": "170b510f718d27d34e93165fa0bbaa9fce8db933ce61d37e0c40fb52f051749b"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n8_i2.json",
+   "sha256": "be92b8abd1ce1f7c69fec2ce4a62cf301f563d322499c1cf1c2b4ac440f99b64"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n9_i0.json",
+   "sha256": "6047867ea40b003e3808a02f9e13c883d32570013139ef0fe96140f5b2b07cd4"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n9_i1.json",
+   "sha256": "0ad4b59ab59431036143486306a70ad3dd7c2b8a99730ae3d7bda4cd8441aeb3"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n9_i2.json",
+   "sha256": "827b6826bf7e42943fc90754a71917e2489aba5121eff59ad8a75776c32b4c66"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/msolve_all.json",
+   "sha256": "39560c1968787c872147ff1811f9e137eb69f3ee0c67ff5b1360a4be487b07ef"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/msolve_n26_i0.json",
+   "sha256": "43b9a89e35ac45b4a64203483dbca34f5ac5bc5946b0e6fd8aaf29524f1b20b1"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/msolve_n33.json",
+   "sha256": "3ec8d5a8d81b4639f42885ea7151b14bc41fdf298a9cec6fa68cee8b450cfb0c"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/msolve_n33_i1.json",
+   "sha256": "b35c77ef15a8d83331a41348bd83253b59490811faa93b5f2de4f8a68b5681cd"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/msolve_n33_i2.json",
+   "sha256": "d82dcef201fc17f8bf8706b3534e03094100e18af4b833824d96ac33f2ff8d8e"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/msolve_n34.json",
+   "sha256": "f0b3c3abb58b074f9d64b3fa2a2005ebec30059d33e1304b7182814add020fda"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/msolve_n34_i2.json",
+   "sha256": "a2255381e2aebe1565d7a3bd8adfb74c664fcd7e1e1c6f20af6795545b48f256"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/msolve_n8_34.json",
+   "sha256": "ea4eec222c9543451a121ed555f9f258c8210ef88a7d0874749572db006b4135"
+  },
+  {
    "path": "research/ecdlp_weakness_census_20261104/pq2_rank/results/iter4_n17_20/COMMAND.txt",
    "sha256": "41770c7fd5007d1a8ce673348e6cdc56352234f601c4dd932bb51b1ba1dc73e4"
   },
@@ -96,6 +464,42 @@
   {
    "path": "research/ecdlp_weakness_census_20261104/pq2_rank/results/iter4_n21_24/run.log",
    "sha256": "de3bc5649c1040fc7989c55a24213b9fc011879caece014d8a8b3d0bb9505618"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/results/iter4_n25/pq2_rank.csv",
+   "sha256": "ab2c9008ad4b73c9d76b9cb6c01dc1b9ae9cc8044ae828566825084a02e67297"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/results/iter4_n25/pq2_rank.json",
+   "sha256": "af943f6ae444d2f959c3289c521d7912ab80b2b3eda8b0fdabb941a1094e8e62"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/results/iter4_n25/run.log",
+   "sha256": "543682d56fcd6535fccd01666bf05466ea36afd12a2455071e8c12ec0067c873"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/results/iter4_n26/pq2_rank.csv",
+   "sha256": "c8633d9142dd93a48d95838760eab69b0f62660fdb1a90b731069e92e347a9b5"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/results/iter4_n26/pq2_rank.json",
+   "sha256": "a87e9bc668de64b975e2decfe87dc4697756e2736c29c252ba2e4aa97f3d2e74"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/results/iter4_n26/run.log",
+   "sha256": "011178e69cad19d56cd0ff07e35341d34000bab25861719f94f203ce0fbc443d"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/results/iter4_n27/pq2_rank.csv",
+   "sha256": "1850bcc5880c305ad54daf3471a1477f88f5f63e0f84817f32240afb0869ca66"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/results/iter4_n27/pq2_rank.json",
+   "sha256": "70167375026ff7c20f8fe0bc5344eaff709d6a675b8420fb43def3e22954978f"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/results/iter4_n27/run.log",
+   "sha256": "4088558a4e95b2129fb2b7a4373c9babfb3d07084c6fa66097aeeff85c725165"
   },
   {
    "path": "research/ecdlp_weakness_census_20261104/pq2_rank/results/pq2_rank.csv",
@@ -126,6 +530,22 @@
    "sha256": "ab5e1347bb3d39e753726ddc0aa6fee7a294e0ad395a75d8f99218043b1ed411"
   },
   {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/closure_iter4_n25.json",
+   "sha256": "57e96529ac6e09fbc726ddad131872e1fbd1ae1d90bb36c8ca2336a8ff427a81"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/closure_iter4_n26.json",
+   "sha256": "15da3ebf832bf49dfc7f05239a88d7f94a8fe5e4f3870d2065be49cc017fdd83"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/closure_iter4_n27.json",
+   "sha256": "147849612d07a840a0f6137458bfc9ffb088f85bea7db828675f9453fd1fba30"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/closure_main_n25_34.json",
+   "sha256": "e1e2b2c33580309b9ab65470ea7e67392a0a5d8afd2b0d6b7462ac6e61f45bf1"
+  },
+  {
    "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/closure_replay_n21_24.json",
    "sha256": "4587458f05dd6abad606188e7ff94a489424879d6854ce5b42ca6723f44a5519"
   },
@@ -154,8 +574,552 @@
    "sha256": "eb9bc9fe736f71be9397b41850db4e3f738ac80cbaee27b8a9a66f361c63e5d1"
   },
   {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n10_i0.json",
+   "sha256": "147af8d554112fac47bed26b0b26354df97193db3125a9e4f4f1237d8ebbd36a"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n10_i1.json",
+   "sha256": "a924ac51c95cf2dab90d693dc3501b3b34bcb51bb3005253d05f6575d6cae4c8"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n10_i2.json",
+   "sha256": "7f3d4bdcf9c75ecdb034ea79b35c7c16d6cd00f4f580561fcbe10b469985a65a"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n11_i0.json",
+   "sha256": "c29fb61adf588bb35bb914d58c026e4b119889cbbae780438b5947776bae4dce"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n11_i1.json",
+   "sha256": "72928bfc747ba4c2f0a87f18caae3d80186e8f12f0ca263286e148e10aebfb0f"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n11_i2.json",
+   "sha256": "1fb9f245ad78be98cdc044030c324c8a0ecd168b366746258843e8bf46de0186"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n12_i0.json",
+   "sha256": "a6c15390ff27b07f8447565e0f8df1e3e6620a40ea35ef8156ff698c572a69ec"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n12_i1.json",
+   "sha256": "bbd126ac824286416832cf0719ae447827d1442f09b80a93d6b52845d5dbbd50"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n12_i2.json",
+   "sha256": "bf357a4001ed6df2f476576dc14577c7d544b727562800d13b20ce345f2c7af3"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n13_i0.json",
+   "sha256": "fc08cd5b4c279e0602862909283bb136e31547b1a932e06069f103b0376adc79"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n13_i1.json",
+   "sha256": "b729436b23e45f0e38aba099e9dbb6010b5a135064249cceb34a1bc2c66b46ac"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n13_i2.json",
+   "sha256": "73903e4f360cb669dd2e8f68ab2b2c64e58ca6aa53288694372b907d67435c2c"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n14_i0.json",
+   "sha256": "85ad862a83ba198c60e41f38a85d9b44739ea5f323e463a26ba55da3944c90e2"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n14_i1.json",
+   "sha256": "525394353c93d5d055e739195731a67806e041c1c620aaeace0ff80e670ecccc"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n14_i2.json",
+   "sha256": "319b45f53d11dbc5596896cd9e4a17aa9874ddd1e087c15079e59fe26f807fd1"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n15_i0.json",
+   "sha256": "9dac2a7aad9a8fdeec63456fdc19523c3e6ee1c2b9d9ca2dd33533e9547e6516"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n15_i1.json",
+   "sha256": "2c8e5ebf83d641f734b42e08368238da44bbc54d721d60915c8f3c5fa6560e8b"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n15_i2.json",
+   "sha256": "b6c64d08d1202f26eaf10e5cca6cfe6c91ed6301e4297e22b13c4812eebb0388"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n16_i0.json",
+   "sha256": "b5629be6da107b86058e3a117f91a418bf4f530e4cd0172f843b375beabd26e9"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n16_i1.json",
+   "sha256": "44dca42d00d1e19d1391d953b7bd0053f71669bc8ea4b5736639cc6c884cc6e9"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n16_i2.json",
+   "sha256": "44b16888ca651b63ff9302b78990ed5d6d839c7c9dcb9594cf59c1758b6c9d30"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n17_i0.json",
+   "sha256": "cc7f4c4ba5360b0e01b0e283238728f02ec58181ee5e776283446823668bf4f9"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n17_i1.json",
+   "sha256": "081db2196cf0ca811fced001829f3fdfb08439a7102076227456704bbe096555"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n17_i2.json",
+   "sha256": "75008d7dd50cc460663d2838cec9926a0303ae43fc0eb80023e32828a6624765"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n18_i0.json",
+   "sha256": "cd439e92b9a27080df86efcda28466ad0291be1d9d36016614e3e902280bc65b"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n18_i1.json",
+   "sha256": "44278ea13f38e06172df3271aa35166c5ec6a6241de954ee0afd5335c21bae7a"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n18_i2.json",
+   "sha256": "9eddc44b7c620315c432686c74200c590e3cd2ecd942e6afb2a100c2a9e5cb93"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n19_i0.json",
+   "sha256": "b3b974363132a3eba0492a9a8ff807031bd48eb1ec03c08dcae7c9dd13dc0e53"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n19_i1.json",
+   "sha256": "ae7f895dcf094e4c0f2de26c81b0f5e671e8c615fa90101030e8945f042886f5"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n19_i2.json",
+   "sha256": "c63d2f9dbd1826e79971f2f3361805ed1166c7ff5d5d012e4ff1f9816e869dac"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n20_i0.json",
+   "sha256": "ca0b0a7e606379ad4e32ab361c3ecd222a30392bcd6d9f663fa412ab30e45f49"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n20_i1.json",
+   "sha256": "1189c6995b769ccd24b0852b3701d1eaa4505703b85761c7cff56a9ccfe18252"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n20_i2.json",
+   "sha256": "090d51b512cc2d3c598f88630660afe4d47b48a1b1d10509969758767e6ec346"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n21_i0.json",
+   "sha256": "3068340ba3bec70d2d84c43b22c382a54647efc475cb7e6dc6f6c997fefe6470"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n21_i1.json",
+   "sha256": "7b42bbdfd693cd338687a17f056680527fd79db8746429ee41e223031f8d1f74"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n21_i2.json",
+   "sha256": "14f78a7093231bf43226ce56aca692521893a770721c9d355a34139ef1becc18"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n22_i0.json",
+   "sha256": "4655e6cad51afd4887c56a4e4778ab0091eee66c151a377d75d84cec1d2bafe9"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n22_i1.json",
+   "sha256": "49ec288030f9f6764df7d4a60be27c125b48b0363530c906e96861b837244a1c"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n22_i2.json",
+   "sha256": "3cfd3420c49c66278102f449e28c6a62949f5d50bacd09e42ddac378fa79c3f2"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n23_i0.json",
+   "sha256": "eed4e73d665ec53ecd1cbea8a5bf97291f317eb023bd723649bc9673c7746270"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n23_i1.json",
+   "sha256": "457cefe2d29b5f43a111daa218e3f10f17b4ec4fe2217911372db0b704cdc1a3"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n23_i2.json",
+   "sha256": "e3ee03560ba59e243a0ee7fb614fcdcb3c6302439a6780a9bde9e393a30984fc"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n24_i0.json",
+   "sha256": "18cf9b0ac79b6cddda69e07347d75e618e1699c4534393d5b20990339d3ba28b"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n24_i1.json",
+   "sha256": "b0fade8440944864092e41b126b5bbaedcf7e4061313a1885d9cf247ec0bf6da"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n24_i2.json",
+   "sha256": "cc46c18448580cb083d13e2c77c358fbc75423d1c63037837589531105173561"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n25_i0.json",
+   "sha256": "a21cd319497777a7e4870399e82feae3924ceb3654e0f49de49ab8932812f74a"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n25_i1.json",
+   "sha256": "6ab8f825bc1575e6bf9192048dda1ef5ce1625893d153166a101730fe9bbac53"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n25_i2.json",
+   "sha256": "f7fb2c2b1d776bf0ce1dae9effdcc6ef5857d2cbaf9a17ca0f9820e3a930ded8"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n26_i0.json",
+   "sha256": "ca0eb3f3126be5574a65f10e8b3121a85acacc8fa281538e10d5262cc3becb85"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n26_i1.json",
+   "sha256": "12e17e2a20bd9a372439bf578f7d69bab67879983802948f99a0db4c73e0ead1"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n26_i2.json",
+   "sha256": "6d0744472d1410d5ee6731c6788bc800d54479e25a05330f8ec8278feecffd9d"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n27_i0.json",
+   "sha256": "c16b8ff7b37c4522d6aaefa5aa84e4e7c157484971558621e4fdea9c73457786"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n27_i1.json",
+   "sha256": "69e1f84e9b9c1f00a091a510b5c2ae4ec6e230fbbc9a95452111b46283ee9c69"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n27_i2.json",
+   "sha256": "ca7cfe431a2f97229cfc869af5456b2634e85f50a9cffa1482846888ef4b77cb"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n28_i0.json",
+   "sha256": "6a12ea969f3c11dc713f1a97d22369f4b50657e5ba8ce00e6e8f46d5dd0d23e6"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n28_i1.json",
+   "sha256": "f284da16333a6e89dea76a1fa2b1214a85b7ef954305a968fdb8ae459d3761e1"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n28_i2.json",
+   "sha256": "d1845c930cb9d6685a61625313ffeef4ebf3c9f60856b972141cd6affcdbfc3f"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n29_i0.json",
+   "sha256": "c76bc7963d32aac63a4bbea4be32be91d030caec9e20fb57ed1ee2efbde14804"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n29_i1.json",
+   "sha256": "fc0bd94f04fc22bb8d07cc0403cfbcca3cd951ddca66768b6d978f9e6d724cac"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n29_i2.json",
+   "sha256": "588c669392c972d1cbab6151c2b72a6e977042970cc37b5ce6ae23afd115e966"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n30_i0.json",
+   "sha256": "a43961ccc1ee1cbd1852b0a21c675ef9f7858f88f167949f0bd67b0922182fc3"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n30_i1.json",
+   "sha256": "e322033e67d8282d094d20c0cde203f0ce03bacb0898b078de920fc4b3545849"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n30_i2.json",
+   "sha256": "274209de22070d0483ce5b903d13635a65e80220df60b312d535484e907af29d"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n31_i0.json",
+   "sha256": "b30c0208019aa93fa71332f5240ab01f9565b2be5ef3a90f8b3036ac4122dbd9"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n31_i1.json",
+   "sha256": "82eada866c6bf6487ebee3973e0a4a6d02a193d266aa353c63525ddf198cbbf2"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n31_i2.json",
+   "sha256": "2476efbe8747d82fd2b2cd08b0868a935b564a6daa2fc380a657694ca320c9cf"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n32_i0.json",
+   "sha256": "44c1e0b1b921fdf295dd40529f7d083ff44e5ff63efb81a85acc1ed070076c61"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n32_i1.json",
+   "sha256": "2342859a20796f4f8178aa589974ac07676808a247e59ece565707996248d2d6"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n32_i2.json",
+   "sha256": "f4219f74a19d0ae3d91de5e196b58e360f51c1044f06c1d5eb1ba453fb907fc3"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n33_i0.json",
+   "sha256": "f03940e1d8692aab1675a3f565592330b05470c78c49c03704b98f25094b21aa"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n33_i1.json",
+   "sha256": "59c04f2a7a9024955c1839cf4a71a009616f53491b718e250833f961501da552"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n33_i2.json",
+   "sha256": "fa79e317f67aafe22d4d95bc0f5459287323800708cc3895eba7e0585806a188"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n34_i0.json",
+   "sha256": "ba7defff3243ce1c8860f08aa828a0136b32ab2830dc03a0e40514a62da4b9d4"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n34_i1.json",
+   "sha256": "2c4e02116fedfa688cfb1344e615b38d14fbaf4e3b4761d942c4994e95000755"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n34_i2.json",
+   "sha256": "8e779b176aa5cdc9efe631b7100a786e3cdf7369fca616d821bf547e56f69df0"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n8_i0.json",
+   "sha256": "0bde69001c5f40179ae8b8544cf0f84104bfa2adddd9edc3536d267da1557157"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n8_i1.json",
+   "sha256": "170b510f718d27d34e93165fa0bbaa9fce8db933ce61d37e0c40fb52f051749b"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n8_i2.json",
+   "sha256": "be92b8abd1ce1f7c69fec2ce4a62cf301f563d322499c1cf1c2b4ac440f99b64"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n9_i0.json",
+   "sha256": "6047867ea40b003e3808a02f9e13c883d32570013139ef0fe96140f5b2b07cd4"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n9_i1.json",
+   "sha256": "0ad4b59ab59431036143486306a70ad3dd7c2b8a99730ae3d7bda4cd8441aeb3"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/main_n8_34_dump/inst/n9_i2.json",
+   "sha256": "827b6826bf7e42943fc90754a71917e2489aba5121eff59ad8a75776c32b4c66"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/msolve_replay/msolve_replay.json",
+   "sha256": "d4e025b1fc220172536843108de2acca7bde7992065331c8daff98f009c45c52"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/msolve_replay/msolve_replay_extra.json",
+   "sha256": "8862e4b814e7b2b9c4e03f3ed6b4c1259c755c04dfcab81c3a69f8f4d80f09bf"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n10_i0.json",
+   "sha256": "147af8d554112fac47bed26b0b26354df97193db3125a9e4f4f1237d8ebbd36a"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n10_i1.json",
+   "sha256": "a924ac51c95cf2dab90d693dc3501b3b34bcb51bb3005253d05f6575d6cae4c8"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n10_i2.json",
+   "sha256": "7f3d4bdcf9c75ecdb034ea79b35c7c16d6cd00f4f580561fcbe10b469985a65a"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n11_i0.json",
+   "sha256": "c29fb61adf588bb35bb914d58c026e4b119889cbbae780438b5947776bae4dce"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n11_i1.json",
+   "sha256": "72928bfc747ba4c2f0a87f18caae3d80186e8f12f0ca263286e148e10aebfb0f"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n11_i2.json",
+   "sha256": "1fb9f245ad78be98cdc044030c324c8a0ecd168b366746258843e8bf46de0186"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n12_i0.json",
+   "sha256": "a6c15390ff27b07f8447565e0f8df1e3e6620a40ea35ef8156ff698c572a69ec"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n12_i1.json",
+   "sha256": "bbd126ac824286416832cf0719ae447827d1442f09b80a93d6b52845d5dbbd50"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n12_i2.json",
+   "sha256": "bf357a4001ed6df2f476576dc14577c7d544b727562800d13b20ce345f2c7af3"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n13_i0.json",
+   "sha256": "fc08cd5b4c279e0602862909283bb136e31547b1a932e06069f103b0376adc79"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n13_i1.json",
+   "sha256": "b729436b23e45f0e38aba099e9dbb6010b5a135064249cceb34a1bc2c66b46ac"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n13_i2.json",
+   "sha256": "73903e4f360cb669dd2e8f68ab2b2c64e58ca6aa53288694372b907d67435c2c"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n14_i0.json",
+   "sha256": "85ad862a83ba198c60e41f38a85d9b44739ea5f323e463a26ba55da3944c90e2"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n14_i1.json",
+   "sha256": "525394353c93d5d055e739195731a67806e041c1c620aaeace0ff80e670ecccc"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n14_i2.json",
+   "sha256": "319b45f53d11dbc5596896cd9e4a17aa9874ddd1e087c15079e59fe26f807fd1"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n15_i0.json",
+   "sha256": "9dac2a7aad9a8fdeec63456fdc19523c3e6ee1c2b9d9ca2dd33533e9547e6516"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n15_i1.json",
+   "sha256": "2c8e5ebf83d641f734b42e08368238da44bbc54d721d60915c8f3c5fa6560e8b"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n15_i2.json",
+   "sha256": "b6c64d08d1202f26eaf10e5cca6cfe6c91ed6301e4297e22b13c4812eebb0388"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n16_i0.json",
+   "sha256": "b5629be6da107b86058e3a117f91a418bf4f530e4cd0172f843b375beabd26e9"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n16_i1.json",
+   "sha256": "44dca42d00d1e19d1391d953b7bd0053f71669bc8ea4b5736639cc6c884cc6e9"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n16_i2.json",
+   "sha256": "44b16888ca651b63ff9302b78990ed5d6d839c7c9dcb9594cf59c1758b6c9d30"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n17_i0.json",
+   "sha256": "cc7f4c4ba5360b0e01b0e283238728f02ec58181ee5e776283446823668bf4f9"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n17_i1.json",
+   "sha256": "081db2196cf0ca811fced001829f3fdfb08439a7102076227456704bbe096555"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n17_i2.json",
+   "sha256": "75008d7dd50cc460663d2838cec9926a0303ae43fc0eb80023e32828a6624765"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n18_i0.json",
+   "sha256": "cd439e92b9a27080df86efcda28466ad0291be1d9d36016614e3e902280bc65b"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n18_i1.json",
+   "sha256": "44278ea13f38e06172df3271aa35166c5ec6a6241de954ee0afd5335c21bae7a"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n18_i2.json",
+   "sha256": "9eddc44b7c620315c432686c74200c590e3cd2ecd942e6afb2a100c2a9e5cb93"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n19_i0.json",
+   "sha256": "b3b974363132a3eba0492a9a8ff807031bd48eb1ec03c08dcae7c9dd13dc0e53"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n19_i1.json",
+   "sha256": "ae7f895dcf094e4c0f2de26c81b0f5e671e8c615fa90101030e8945f042886f5"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n19_i2.json",
+   "sha256": "c63d2f9dbd1826e79971f2f3361805ed1166c7ff5d5d012e4ff1f9816e869dac"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n20_i0.json",
+   "sha256": "ca0b0a7e606379ad4e32ab361c3ecd222a30392bcd6d9f663fa412ab30e45f49"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n20_i1.json",
+   "sha256": "1189c6995b769ccd24b0852b3701d1eaa4505703b85761c7cff56a9ccfe18252"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n20_i2.json",
+   "sha256": "090d51b512cc2d3c598f88630660afe4d47b48a1b1d10509969758767e6ec346"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n8_i0.json",
+   "sha256": "0bde69001c5f40179ae8b8544cf0f84104bfa2adddd9edc3536d267da1557157"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n8_i1.json",
+   "sha256": "170b510f718d27d34e93165fa0bbaa9fce8db933ce61d37e0c40fb52f051749b"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n8_i2.json",
+   "sha256": "be92b8abd1ce1f7c69fec2ce4a62cf301f563d322499c1cf1c2b4ac440f99b64"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n9_i0.json",
+   "sha256": "6047867ea40b003e3808a02f9e13c883d32570013139ef0fe96140f5b2b07cd4"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n9_i1.json",
+   "sha256": "0ad4b59ab59431036143486306a70ad3dd7c2b8a99730ae3d7bda4cd8441aeb3"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_20_dump/inst/n9_i2.json",
+   "sha256": "827b6826bf7e42943fc90754a71917e2489aba5121eff59ad8a75776c32b4c66"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_24_dump/inst/n21_i0.json",
+   "sha256": "3068340ba3bec70d2d84c43b22c382a54647efc475cb7e6dc6f6c997fefe6470"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_24_dump/inst/n21_i1.json",
+   "sha256": "7b42bbdfd693cd338687a17f056680527fd79db8746429ee41e223031f8d1f74"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_24_dump/inst/n21_i2.json",
+   "sha256": "14f78a7093231bf43226ce56aca692521893a770721c9d355a34139ef1becc18"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_24_dump/inst/n22_i0.json",
+   "sha256": "4655e6cad51afd4887c56a4e4778ab0091eee66c151a377d75d84cec1d2bafe9"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_24_dump/inst/n22_i1.json",
+   "sha256": "49ec288030f9f6764df7d4a60be27c125b48b0363530c906e96861b837244a1c"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_24_dump/inst/n22_i2.json",
+   "sha256": "3cfd3420c49c66278102f449e28c6a62949f5d50bacd09e42ddac378fa79c3f2"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_24_dump/inst/n23_i0.json",
+   "sha256": "eed4e73d665ec53ecd1cbea8a5bf97291f317eb023bd723649bc9673c7746270"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_24_dump/inst/n23_i1.json",
+   "sha256": "457cefe2d29b5f43a111daa218e3f10f17b4ec4fe2217911372db0b704cdc1a3"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_24_dump/inst/n23_i2.json",
+   "sha256": "e3ee03560ba59e243a0ee7fb614fcdcb3c6302439a6780a9bde9e393a30984fc"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_24_dump/inst/n24_i0.json",
+   "sha256": "18cf9b0ac79b6cddda69e07347d75e618e1699c4534393d5b20990339d3ba28b"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_24_dump/inst/n24_i1.json",
+   "sha256": "b0fade8440944864092e41b126b5bbaedcf7e4061313a1885d9cf247ec0bf6da"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_24_dump/inst/n24_i2.json",
+   "sha256": "cc46c18448580cb083d13e2c77c358fbc75423d1c63037837589531105173561"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_n8_44/pq2_rank.json",
+   "sha256": "1c46519a628e8628c234214b2006d017da943affd4eedc6f95482811789bc2e6"
+  },
+  {
    "path": "research/ecdlp_weakness_census_20261104/report.typ",
-   "sha256": "54f9058d5ef03604bcf7139f731542f91117e22dab022862f8f9e39c854bf261"
+   "sha256": "5a7454cd5d65f9b17a41739b8a1283b766ed9b6560f94b3f19be2f3ef71e7e07"
+  },
+  {
+   "path": "research/ecdlp_weakness_lean_20261104/README.md",
+   "sha256": "9f75077621dbc38f6f61613654f6b099b7c70f9a9e4c053c1650fe6d72ba1f57"
   }
  ],
  "headline": [
@@ -757,12 +1721,6 @@
    "rel_tol": 0
   },
   {
-   "name": "census_readme.d4_sweeps_reach_k",
-   "claimed": 24,
-   "recomputed": 24,
-   "rel_tol": 0
-  },
-  {
    "name": "census_readme.literal_fails_n_le_44",
    "claimed": 111,
    "recomputed": 111,
@@ -781,21 +1739,9 @@
    "rel_tol": 0
   },
   {
-   "name": "report_typ.iterated_exactly_4",
-   "claimed": 24,
-   "recomputed": 24,
-   "rel_tol": 0
-  },
-  {
    "name": "report_typ.iter3_eq_1_n17_44",
    "claimed": 84,
    "recomputed": 84,
-   "rel_tol": 0
-  },
-  {
-   "name": "report_typ.d4_sweeps_reach_k",
-   "claimed": 24,
-   "recomputed": 24,
    "rel_tol": 0
   },
   {
@@ -820,12 +1766,6 @@
    "name": "triage.iter3_eq_1_n17_44",
    "claimed": 84,
    "recomputed": 84,
-   "rel_tol": 0
-  },
-  {
-   "name": "triage.d4_reaches_k",
-   "claimed": 24,
-   "recomputed": 24,
    "rel_tol": 0
   },
   {
@@ -859,12 +1799,6 @@
    "rel_tol": 0
   },
   {
-   "name": "WEAKNESSES.md.R4-013.solver_degree_exceeds_2_n_le_44",
-   "claimed": 111,
-   "recomputed": 111,
-   "rel_tol": 0
-  },
-  {
    "name": "WEAKNESSES.md.R4-013.iterated_closure_exactly_4_on_fresh",
    "claimed": 24,
    "recomputed": 24,
@@ -877,12 +1811,6 @@
    "recomputed": 24,
    "rel_tol": 0,
    "note": "recomputed: fresh instances with iter3 < k; a lower bound on F4's maximal step degree only under the containment property (separate Lean claim F4Containment, not validated here)"
-  },
-  {
-   "name": "weakness.json.R4-013.solver_degree_exceeds_2_n_le_44",
-   "claimed": 111,
-   "recomputed": 111,
-   "rel_tol": 0
   },
   {
    "name": "weakness.json.R4-013.iterated_closure_exactly_4_on_fresh",
@@ -899,13 +1827,6 @@
    "note": "recomputed: fresh instances with iter3 < k; a lower bound on F4's maximal step degree only under the containment property (separate Lean claim F4Containment, not validated here)"
   },
   {
-   "name": "corpus.R4-013.solver_degree_exceeds_2_n_le_44",
-   "claimed": 111,
-   "recomputed": 111,
-   "rel_tol": 0,
-   "note": "a lower bound on F4's maximal step degree only under the containment property (separate Lean claim, not validated here)"
-  },
-  {
    "name": "corpus.R4-013.iterated_closure_exactly_4_on_fresh",
    "claimed": 24,
    "recomputed": 24,
@@ -918,9 +1839,497 @@
    "recomputed": 24,
    "rel_tol": 0,
    "note": "recomputed: fresh instances with iter3 < k; a lower bound on F4's maximal step degree only under the containment property (separate Lean claim F4Containment, not validated here)"
+  },
+  {
+   "name": "iter4_n25.instances",
+   "claimed": 3,
+   "recomputed": 3,
+   "rel_tol": 0
+  },
+  {
+   "name": "iter4_n25.json_rows_equal_log",
+   "claimed": 3,
+   "recomputed": 3,
+   "rel_tol": 0
+  },
+  {
+   "name": "iter4_n25.csv_rows_equal_json",
+   "claimed": 3,
+   "recomputed": 3,
+   "rel_tol": 0
+  },
+  {
+   "name": "iter4_n25.instances_shared_with_main_stream",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 0
+  },
+  {
+   "name": "iter4_n26.instances",
+   "claimed": 3,
+   "recomputed": 3,
+   "rel_tol": 0
+  },
+  {
+   "name": "iter4_n26.json_rows_equal_log",
+   "claimed": 3,
+   "recomputed": 3,
+   "rel_tol": 0
+  },
+  {
+   "name": "iter4_n26.csv_rows_equal_json",
+   "claimed": 3,
+   "recomputed": 3,
+   "rel_tol": 0
+  },
+  {
+   "name": "iter4_n26.instances_shared_with_main_stream",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 0
+  },
+  {
+   "name": "iter4_n27.instances",
+   "claimed": 3,
+   "recomputed": 3,
+   "rel_tol": 0
+  },
+  {
+   "name": "iter4_n27.json_rows_equal_log",
+   "claimed": 3,
+   "recomputed": 3,
+   "rel_tol": 0
+  },
+  {
+   "name": "iter4_n27.csv_rows_equal_json",
+   "claimed": 3,
+   "recomputed": 3,
+   "rel_tol": 0
+  },
+  {
+   "name": "iter4_n27.instances_shared_with_main_stream",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 0
+  },
+  {
+   "name": "iter4_n25_27.validator_closure_confirms_iter3_lt_k_iter4_eq_k",
+   "claimed": 9,
+   "recomputed": 9,
+   "rel_tol": 0,
+   "note": "validator's own degree-4 closure (closure_check.py) on regenerated dumps, compared with the producer JSON"
+  },
+  {
+   "name": "pq2_readme.fresh_n25_27_same_outcome",
+   "claimed": 9,
+   "recomputed": 9,
+   "rel_tol": 0
+  },
+  {
+   "name": "pq2_readme.fresh_total_d_iter_4",
+   "claimed": 33,
+   "recomputed": 33,
+   "rel_tol": 0
+  },
+  {
+   "name": "pq2_readme.fresh_total_instances",
+   "claimed": 33,
+   "recomputed": 33,
+   "rel_tol": 0
+  },
+  {
+   "name": "pq2_readme.reading_fresh_need_exactly_4",
+   "claimed": 33,
+   "recomputed": 33,
+   "rel_tol": 0
+  },
+  {
+   "name": "f4.dumps_are_the_81_main_sweep_keys",
+   "claimed": 81,
+   "recomputed": 81,
+   "rel_tol": 0
+  },
+  {
+   "name": "f4.dumps_byte_identical_to_validator_regeneration",
+   "claimed": 81,
+   "recomputed": 81,
+   "rel_tol": 0,
+   "note": "validator regenerated the main stream n = 8..34 with the census arguments (validation/main_n8_34_dump); the n <= 24 dumps also passed its full S3 ANF check"
+  },
+  {
+   "name": "f4.dumps_equations_equal_S3_descent",
+   "claimed": 81,
+   "recomputed": 81,
+   "rel_tol": 0,
+   "note": "validator's S3 descent: 2^N brute-force ANF and Z for n <= 24 (closure_replay_*), exact weight-<=2 interpolation plus 500 random points for n = 25..34 (closure_main_n25_34); each dump byte-identical to f4/dumps"
+  },
+  {
+   "name": "f4.dump_log_lines",
+   "claimed": 81,
+   "recomputed": 81,
+   "rel_tol": 0
+  },
+  {
+   "name": "f4.dump_log_seed_line_equal",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 0
+  },
+  {
+   "name": "f4.dump_log_args_ns_8_34_3_per_n_d4_20",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 0
+  },
+  {
+   "name": "pq2_readme.f4_instances",
+   "claimed": 81,
+   "recomputed": 81,
+   "rel_tol": 0
+  },
+  {
+   "name": "pq2_readme.f4_dump_log_equals_run_log",
+   "claimed": 81,
+   "recomputed": 81,
+   "rel_tol": 0
+  },
+  {
+   "name": "f4.msolve_all_rows",
+   "claimed": 81,
+   "recomputed": 81,
+   "rel_tol": 0
+  },
+  {
+   "name": "f4.msolve_all_equals_precedence_merge",
+   "claimed": 81,
+   "recomputed": 81,
+   "rel_tol": 0
+  },
+  {
+   "name": "f4.msolve_exit_0",
+   "claimed": 81,
+   "recomputed": 81,
+   "rel_tol": 0
+  },
+  {
+   "name": "f4.row_census_fields_equal_run_log",
+   "claimed": 81,
+   "recomputed": 81,
+   "rel_tol": 0
+  },
+  {
+   "name": "f4.row_k_equals_dump_Z_k",
+   "claimed": 81,
+   "recomputed": 81,
+   "rel_tol": 0
+  },
+  {
+   "name": "pq2_readme.f4_table_linear_eq_k",
+   "claimed": 81,
+   "recomputed": 81,
+   "rel_tol": 0
+  },
+  {
+   "name": "pq2_readme.f4_table_linear_eq_k_of",
+   "claimed": 81,
+   "recomputed": 81,
+   "rel_tol": 0
+  },
+  {
+   "name": "pq2_readme.f4_table_degree_eq_exact_d_iter",
+   "claimed": 27,
+   "recomputed": 27,
+   "rel_tol": 0
+  },
+  {
+   "name": "pq2_readme.f4_table_exact_rows",
+   "claimed": 27,
+   "recomputed": 27,
+   "rel_tol": 0
+  },
+  {
+   "name": "pq2_readme.f4_table_gt3_msolve_below_4",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 0
+  },
+  {
+   "name": "pq2_readme.f4_table_n17_34_degree_value",
+   "claimed": 4,
+   "recomputed": 4,
+   "rel_tol": 0
+  },
+  {
+   "name": "pq2_readme.f4_table_n17_34_count",
+   "claimed": 54,
+   "recomputed": 54,
+   "rel_tol": 0
+  },
+  {
+   "name": "pq2_readme.f4_bad_row_linear",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 0
+  },
+  {
+   "name": "pq2_readme.f4_n26_i0_rerun_gives_k",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 0
+  },
+  {
+   "name": "pq2_readme.f4_reruns_after_restart",
+   "claimed": 3,
+   "recomputed": 3,
+   "rel_tol": 0,
+   "note": "recomputed: per-instance rerun files other than n26_i0 (n33_i1, n33_i2, n34_i2); the restart itself is not verifiable"
+  },
+  {
+   "name": "pq2_readme.reading_msolve_exactly_4",
+   "claimed": 54,
+   "recomputed": 54,
+   "rel_tol": 0
+  },
+  {
+   "name": "f4.validator_msolve_replay_agrees_with_producer_rows",
+   "claimed": 69,
+   "recomputed": 69,
+   "rel_tol": 0,
+   "note": "validator re-ran msolve with its own input writer and parser; agreement on steps, max step degree, basis size, linear count, k, census degree; plus quotient dimension = |Z| and basis vanishing on Z"
+  },
+  {
+   "name": "pq2_readme.direction_one_above_prediction",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 0,
+   "note": "msolve degree on n = 17..34 minus the Kousidis-Wiemers value 3"
+  },
+  {
+   "name": "pq2_readme.direction_no_growth_n17_34",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 0,
+   "note": "number of distinct msolve maximal step degrees on n = 17..34"
+  },
+  {
+   "name": "pq2_readme.direction_evidence_for_bounded_degree_premise",
+   "claimed": 1,
+   "recomputed": 0,
+   "rel_tol": 0,
+   "note": "Encoded judgment, recomputed from repository data: a constant step degree on n = 17..34 is evidence for a bounded degree only if nothing in the repository shows this family's degree rising. Two records do: (1) the msolve data themselves take the values [3, 4] on n = 8..34 (3 at n <= 14 and n = 16, 4 at n = 15 and from n = 17); (2) the corpus's own record MEAS-GB-KW-TABLE1 (docs/ecdlp-hardness-corpus/lit-groebner.json) gives, for the same family (m = 2, n = 34..48), Magma highest step degree 4 for n <= 36 and 5 for n = 37..48, i.e. the next step lies just past the msolve window (n <= 34). A two-fold window in n cannot discriminate a bounded degree from a slowly growing one (cf. the LOG fit in research/fall_degree_bounds_20261008/RESULTS.md). Supported wording: 'the degree is 4 on every instance from n = 17 to 34, matching Kousidis-Wiemers' value 4 for n <= 36; they report 5 from n = 37, so these data neither support nor refute a bounded degree'."
+  },
+  {
+   "name": "census_readme.d4_sweeps_reach_k_n17_27",
+   "claimed": 33,
+   "recomputed": 33,
+   "rel_tol": 0
+  },
+  {
+   "name": "census_readme.msolve_exactly_4_n17_34",
+   "claimed": 54,
+   "recomputed": 54,
+   "rel_tol": 0
+  },
+  {
+   "name": "census_readme.msolve_matches_census_where_exact",
+   "claimed": 27,
+   "recomputed": 27,
+   "rel_tol": 0
+  },
+  {
+   "name": "census_readme.no_growth_n17_34",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 0
+  },
+  {
+   "name": "report_typ.iterated_exactly_4_n17_27",
+   "claimed": 33,
+   "recomputed": 33,
+   "rel_tol": 0
+  },
+  {
+   "name": "report_typ.d4_sweeps_reach_k_n17_27",
+   "claimed": 33,
+   "recomputed": 33,
+   "rel_tol": 0
+  },
+  {
+   "name": "report_typ.msolve_exactly_4_n17_34",
+   "claimed": 54,
+   "recomputed": 54,
+   "rel_tol": 0
+  },
+  {
+   "name": "report_typ.table_msolve_degree_4",
+   "claimed": 4,
+   "recomputed": 4,
+   "rel_tol": 0
+  },
+  {
+   "name": "report_typ.no_growth_n17_34",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 0
+  },
+  {
+   "name": "triage.d4_reaches_k_n17_27",
+   "claimed": 33,
+   "recomputed": 33,
+   "rel_tol": 0
+  },
+  {
+   "name": "triage.msolve_exactly_4_n17_34",
+   "claimed": 54,
+   "recomputed": 54,
+   "rel_tol": 0
+  },
+  {
+   "name": "triage.degree_stays_4_n17_34",
+   "claimed": 4,
+   "recomputed": 4,
+   "rel_tol": 0
+  },
+  {
+   "name": "lean_readme.round5_pcc_claim_records_present",
+   "claimed": 2,
+   "recomputed": 2,
+   "rel_tol": 0
+  },
+  {
+   "name": "corpus.MEAS-PQ2-MSOLVE-F4.instances",
+   "claimed": 81,
+   "recomputed": 81,
+   "rel_tol": 0
+  },
+  {
+   "name": "corpus.MEAS-PQ2-MSOLVE-F4.deg3_le16",
+   "claimed": 24,
+   "recomputed": 24,
+   "rel_tol": 0
+  },
+  {
+   "name": "corpus.MEAS-PQ2-MSOLVE-F4.deg4_le16",
+   "claimed": 3,
+   "recomputed": 3,
+   "rel_tol": 0
+  },
+  {
+   "name": "corpus.MEAS-PQ2-MSOLVE-F4.le16_rows",
+   "claimed": 27,
+   "recomputed": 27,
+   "rel_tol": 0
+  },
+  {
+   "name": "corpus.MEAS-PQ2-MSOLVE-F4.eq_census_d_iter",
+   "claimed": 27,
+   "recomputed": 27,
+   "rel_tol": 0
+  },
+  {
+   "name": "corpus.MEAS-PQ2-MSOLVE-F4.exactly_4_n17_34",
+   "claimed": 54,
+   "recomputed": 54,
+   "rel_tol": 0
+  },
+  {
+   "name": "corpus.MEAS-PQ2-MSOLVE-F4.linear_eq_k",
+   "claimed": 81,
+   "recomputed": 81,
+   "rel_tol": 0
+  },
+  {
+   "name": "corpus.R5-003.never_below_census_bound",
+   "claimed": 0,
+   "recomputed": 0,
+   "rel_tol": 0
+  },
+  {
+   "name": "corpus.R5-003.matches_where_exact",
+   "claimed": 27,
+   "recomputed": 27,
+   "rel_tol": 0
+  },
+  {
+   "name": "lean-round5-20261107.json.R5-002.degree_one_above_KW",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 0
+  },
+  {
+   "name": "lean-round5-20261107.json.R5-002.constant_n17_34",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 0
+  },
+  {
+   "name": "lean-round5-20261107.json.R5-002.bounded_degree_premise_holds_on_range",
+   "claimed": 1,
+   "recomputed": 0,
+   "rel_tol": 0,
+   "note": "a premise about all n cannot 'hold on a range'; Encoded judgment, recomputed from repository data: a constant step degree on n = 17..34 is evidence for a bounded degree only if nothing in the repository shows this family's degree rising. Two records do: (1) the msolve data themselves take the values [3, 4] on n = 8..34 (3 at n <= 14 and n = 16, 4 at n = 15 and from n = 17); (2) the corpus's own record MEAS-GB-KW-TABLE1 (docs/ecdlp-hardness-corpus/lit-groebner.json) gives, for the same family (m = 2, n = 34..48), Magma highest step degree 4 for n <= 36 and 5 for n = 37..48, i.e. the next step lies just past the msolve window (n <= 34). A two-fold window in n cannot discriminate a bounded degree from a slowly growing one (cf. the LOG fit in research/fall_degree_bounds_20261008/RESULTS.md). Supported wording: 'the degree is 4 on every instance from n = 17 to 34, matching Kousidis-Wiemers' value 4 for n <= 36; they report 5 from n = 37, so these data neither support nor refute a bounded degree'."
+  },
+  {
+   "name": "WEAKNESSES.md.R5-002.degree_one_above_KW",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 0
+  },
+  {
+   "name": "WEAKNESSES.md.R5-002.constant_n17_34",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 0
+  },
+  {
+   "name": "WEAKNESSES.md.R5-002.bounded_degree_premise_holds_on_range",
+   "claimed": 1,
+   "recomputed": 0,
+   "rel_tol": 0,
+   "note": "a premise about all n cannot 'hold on a range'; Encoded judgment, recomputed from repository data: a constant step degree on n = 17..34 is evidence for a bounded degree only if nothing in the repository shows this family's degree rising. Two records do: (1) the msolve data themselves take the values [3, 4] on n = 8..34 (3 at n <= 14 and n = 16, 4 at n = 15 and from n = 17); (2) the corpus's own record MEAS-GB-KW-TABLE1 (docs/ecdlp-hardness-corpus/lit-groebner.json) gives, for the same family (m = 2, n = 34..48), Magma highest step degree 4 for n <= 36 and 5 for n = 37..48, i.e. the next step lies just past the msolve window (n <= 34). A two-fold window in n cannot discriminate a bounded degree from a slowly growing one (cf. the LOG fit in research/fall_degree_bounds_20261008/RESULTS.md). Supported wording: 'the degree is 4 on every instance from n = 17 to 34, matching Kousidis-Wiemers' value 4 for n <= 36; they report 5 from n = 37, so these data neither support nor refute a bounded degree'."
+  },
+  {
+   "name": "weakness.json.R5-002.degree_one_above_KW",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 0
+  },
+  {
+   "name": "weakness.json.R5-002.constant_n17_34",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 0
+  },
+  {
+   "name": "weakness.json.R5-002.bounded_degree_premise_holds_on_range",
+   "claimed": 1,
+   "recomputed": 0,
+   "rel_tol": 0,
+   "note": "a premise about all n cannot 'hold on a range'; Encoded judgment, recomputed from repository data: a constant step degree on n = 17..34 is evidence for a bounded degree only if nothing in the repository shows this family's degree rising. Two records do: (1) the msolve data themselves take the values [3, 4] on n = 8..34 (3 at n <= 14 and n = 16, 4 at n = 15 and from n = 17); (2) the corpus's own record MEAS-GB-KW-TABLE1 (docs/ecdlp-hardness-corpus/lit-groebner.json) gives, for the same family (m = 2, n = 34..48), Magma highest step degree 4 for n <= 36 and 5 for n = 37..48, i.e. the next step lies just past the msolve window (n <= 34). A two-fold window in n cannot discriminate a bounded degree from a slowly growing one (cf. the LOG fit in research/fall_degree_bounds_20261008/RESULTS.md). Supported wording: 'the degree is 4 on every instance from n = 17 to 34, matching Kousidis-Wiemers' value 4 for n <= 36; they report 5 from n = 37, so these data neither support nor refute a bounded degree'."
+  },
+  {
+   "name": "lean-round4-20261104.json.R4-013.F4_degree_exceeds_2_n_le_44_under_containment",
+   "claimed": 111,
+   "recomputed": 111,
+   "rel_tol": 0,
+   "note": "lower bound via THM-F4-CONTAINMENT (Lean, not reviewed here)"
+  },
+  {
+   "name": "WEAKNESSES.md.R4-013.F4_degree_exceeds_2_n_le_44_under_containment",
+   "claimed": 111,
+   "recomputed": 111,
+   "rel_tol": 0,
+   "note": "lower bound via THM-F4-CONTAINMENT (Lean, not reviewed here)"
+  },
+  {
+   "name": "weakness.json.R4-013.F4_degree_exceeds_2_n_le_44_under_containment",
+   "claimed": 111,
+   "recomputed": 111,
+   "rel_tol": 0,
+   "note": "lower bound via THM-F4-CONTAINMENT (Lean, not reviewed here)"
   }
  ],
- "notes": "123 headline items recomputed; 0 do not match:  Counts parsed directly from results/run.log by the validator's own parser; derived JSON/CSV files checked row by row against their source logs. Rounded claims (F_over_V) are compared at the precision stated in the README; exact values are in recomputed_exact. All inputs read from commit 3cb9067133968daba8340c6cd4e2a46819ee6672 (git object store). Working-tree copies differing from it: none. Repository HEAD at recompute time: a34eb9059103248728e9b5672821d109db3b7169.",
+ "notes": "195 headline items recomputed; 4 do not match: pq2_readme.direction_evidence_for_bounded_degree_premise claimed 1 recomputed 0; lean-round5-20261107.json.R5-002.bounded_degree_premise_holds_on_range claimed 1 recomputed 0; WEAKNESSES.md.R5-002.bounded_degree_premise_holds_on_range claimed 1 recomputed 0; weakness.json.R5-002.bounded_degree_premise_holds_on_range claimed 1 recomputed 0 Counts parsed directly from results/run.log by the validator's own parser; derived JSON/CSV files checked row by row against their source logs. Rounded claims (F_over_V) are compared at the precision stated in the README; exact values are in recomputed_exact. All inputs read from commit 8d9fdc45be3678dc98b1044e9d8250aca1073ce7 (git object store). Working-tree copies differing from it: none. Repository HEAD at recompute time: 8d9fdc45be3678dc98b1044e9d8250aca1073ce7.",
  "detail": {
   "main_log_header": [
    "pq2_rank census; seed 0x5eed20261104; pclmulqdq: true",
@@ -1004,6 +2413,297 @@
   "corrected.iter2_values_on_the_24": [
    1
   ],
-  "corrected.all_n_le_44_established": true
+  "corrected.all_n_le_44_established": true,
+  "final.validator_msolve_replay_keys": [
+   [
+    8,
+    0
+   ],
+   [
+    8,
+    1
+   ],
+   [
+    8,
+    2
+   ],
+   [
+    9,
+    0
+   ],
+   [
+    9,
+    1
+   ],
+   [
+    9,
+    2
+   ],
+   [
+    10,
+    0
+   ],
+   [
+    10,
+    1
+   ],
+   [
+    10,
+    2
+   ],
+   [
+    11,
+    0
+   ],
+   [
+    11,
+    1
+   ],
+   [
+    11,
+    2
+   ],
+   [
+    12,
+    0
+   ],
+   [
+    12,
+    1
+   ],
+   [
+    12,
+    2
+   ],
+   [
+    13,
+    0
+   ],
+   [
+    13,
+    1
+   ],
+   [
+    13,
+    2
+   ],
+   [
+    14,
+    0
+   ],
+   [
+    14,
+    1
+   ],
+   [
+    14,
+    2
+   ],
+   [
+    15,
+    0
+   ],
+   [
+    15,
+    1
+   ],
+   [
+    15,
+    2
+   ],
+   [
+    16,
+    0
+   ],
+   [
+    16,
+    1
+   ],
+   [
+    16,
+    2
+   ],
+   [
+    17,
+    0
+   ],
+   [
+    17,
+    1
+   ],
+   [
+    17,
+    2
+   ],
+   [
+    18,
+    0
+   ],
+   [
+    18,
+    1
+   ],
+   [
+    18,
+    2
+   ],
+   [
+    19,
+    0
+   ],
+   [
+    19,
+    1
+   ],
+   [
+    19,
+    2
+   ],
+   [
+    20,
+    0
+   ],
+   [
+    20,
+    1
+   ],
+   [
+    20,
+    2
+   ],
+   [
+    21,
+    0
+   ],
+   [
+    21,
+    1
+   ],
+   [
+    21,
+    2
+   ],
+   [
+    22,
+    0
+   ],
+   [
+    22,
+    1
+   ],
+   [
+    22,
+    2
+   ],
+   [
+    23,
+    0
+   ],
+   [
+    23,
+    1
+   ],
+   [
+    23,
+    2
+   ],
+   [
+    24,
+    0
+   ],
+   [
+    24,
+    1
+   ],
+   [
+    24,
+    2
+   ],
+   [
+    25,
+    0
+   ],
+   [
+    25,
+    1
+   ],
+   [
+    25,
+    2
+   ],
+   [
+    26,
+    0
+   ],
+   [
+    26,
+    1
+   ],
+   [
+    26,
+    2
+   ],
+   [
+    27,
+    0
+   ],
+   [
+    27,
+    1
+   ],
+   [
+    27,
+    2
+   ],
+   [
+    28,
+    0
+   ],
+   [
+    28,
+    1
+   ],
+   [
+    28,
+    2
+   ],
+   [
+    29,
+    0
+   ],
+   [
+    30,
+    0
+   ],
+   [
+    31,
+    0
+   ],
+   [
+    32,
+    0
+   ],
+   [
+    33,
+    0
+   ],
+   [
+    34,
+    0
+   ]
+  ],
+  "final.kw_table1_m2": [
+   "34",
+   "48",
+   "4",
+   "36",
+   "5",
+   "37",
+   "48"
+  ],
+  "final.msolve_degrees_n8_34": [
+   3,
+   4
+  ]
  }
 }

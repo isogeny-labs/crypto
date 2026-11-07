@@ -235,6 +235,14 @@ class BinCurve:
         return F.mul(s, s) ^ F.mul(F.mul(x1, x2), x3) ^ self.b
 
 
+def sum_basis(basis: list[int], assign: int, offset: int) -> int:
+    x = 0
+    for i, v in enumerate(basis):
+        if (assign >> (offset + i)) & 1:
+            x ^= v
+    return x
+
+
 def gf2_rank(vecs) -> int:
     piv = {}
     for v in vecs:
@@ -437,8 +445,45 @@ def d_iter_label(k, low2, it3, it4):
     return "?"
 
 
+def descent_by_interpolation(F: Field, C, basis: list[int], xr: int, rnd, n_random: int = 500):
+    """For N too large to brute-force. x1, x2 are F_2-linear in (a, b) and S3 is a product
+    of such forms, so each output bit has Boolean degree <= 2 and is fixed by its values at
+    the points of Hamming weight <= 2; interpolate there (Moebius on the weight-<=2 cube),
+    then check the interpolant against S3 at n_random random assignments."""
+    npr = len(basis)
+    N = 2 * npr
+
+    def s3_at(assign: int) -> int:
+        x1 = x2 = 0
+        for i in range(npr):
+            if (assign >> i) & 1:
+                x1 ^= basis[i]
+            if (assign >> (npr + i)) & 1:
+                x2 ^= basis[i]
+        return C.s3(x1, x2, xr)
+
+    f0 = s3_at(0)
+    f1 = [s3_at(1 << i) for i in range(N)]
+    coef = {0: f0}
+    for i in range(N):
+        coef[1 << i] = f1[i] ^ f0
+    for i in range(N):
+        for j in range(i + 1, N):
+            coef[(1 << i) | (1 << j)] = s3_at((1 << i) | (1 << j)) ^ f1[i] ^ f1[j] ^ f0
+    anf = [set(m for m, c in coef.items() if (c >> l) & 1) for l in range(F.n)]
+
+    def interp(assign: int) -> int:
+        v = 0
+        for m, c in coef.items():
+            if m & assign == m:
+                v ^= c
+        return v
+    agree = all(interp(a) == s3_at(a) for a in (rnd.getrandbits(N) for _ in range(n_random)))
+    return anf, agree
+
+
 def check_instance(row: dict, dump: dict, iter4: bool, low4: bool, iter3: bool, seed: int,
-                   expect: dict | None = None) -> dict:
+                   expect: dict | None = None, interp: bool = False) -> dict:
     t0 = time.time()
     n, npr, N = row["n"], row["nprime"], row["N"]
     out: dict = {"n": n, "instance": row["instance"], "N": N, "checks": {}, "mine": {}, "rust": {}}
@@ -467,8 +512,15 @@ def check_instance(row: dict, dump: dict, iter4: bool, low4: bool, iter3: bool, 
         ok &= C.s3(P[0], Q[0], R[0]) == 0
         tested += 1
     ck["S3_vanishes_on_true_sums"] = ok
-    # descent by evaluation
-    Z, anf = descent_by_evaluation(F, b, basis, xr)
+    # descent by evaluation (brute force), or by exact interpolation for large N
+    if interp:
+        anf, agree = descent_by_interpolation(F, C, basis, xr, rnd)
+        ck["degree_le_2_interpolant_matches_S3_at_500_random_points"] = agree
+        Z = list(dump["Z"])  # completeness is not brute-forced here (see msolve quotient dimension)
+        ev_ok = all(C.s3(sum_basis(basis, z, 0), sum_basis(basis, z, len(basis)), xr) == 0 for z in Z)
+        ck["dumped_Z_are_zeros_of_S3"] = ev_ok
+    else:
+        Z, anf = descent_by_evaluation(F, b, basis, xr)
     dumped = []
     sq_free = True
     for e in dump["eqs"]:
@@ -483,7 +535,8 @@ def check_instance(row: dict, dump: dict, iter4: bool, low4: bool, iter3: bool, 
         dumped.append(s)
     ck["dumped_eqs_square_free"] = sq_free
     ck["descent_anf_equals_dump"] = len(dumped) == n and all(x == y for x, y in zip(anf, dumped))
-    ck["Z_bruteforce_equals_dump"] = sorted(Z) == sorted(dump["Z"])
+    if not interp:
+        ck["Z_bruteforce_equals_dump"] = sorted(Z) == sorted(dump["Z"])
     # k, affdim
     ev = [1 | (z << 1) for z in Z]
     r = gf2_rank(ev)
@@ -570,6 +623,8 @@ def main() -> int:
     ap.add_argument("--low4-max-n", type=int, default=0)
     ap.add_argument("--only", default="")
     ap.add_argument("--seed", type=int, default=20261105)
+    ap.add_argument("--interp-above-N", type=int, default=99,
+                    help="use exact weight-<=2 interpolation instead of 2^N brute force when N exceeds this")
     ap.add_argument("--expect-json", default="",
                     help="compare against this producer JSON (same instances, matched by n and instance)")
     args = ap.parse_args()
@@ -586,7 +641,7 @@ def main() -> int:
         dump = json.loads(dpath.read_text())
         res = check_instance(row, dump, iter4=row["n"] <= args.iter4_max_n,
                              low4=row["n"] <= args.low4_max_n, iter3=row["n"] <= args.iter3_max_n,
-                             seed=args.seed,
+                             seed=args.seed, interp=row["N"] > args.interp_above_N,
                              expect=expect.get((row["n"], row["instance"]), {"missing": True}) if expect else None)
         res["dump"] = str(dpath)
         results.append(res)

@@ -127,9 +127,4 @@ holds on this range [pcc:unverified].
   census values are lower bounds on F4's maximal step degree (`no_gb_of_run_of_low_lt`).
   That msolve fits the abstract model is a reading of its algorithm, not a theorem. For the
   one-shot Caminata–Gorla solving degree, d_lin ≤ sd is kernel-checked in `SubspaceCriterion`.
-* Direction. The degree is one above the predicted value, but on n = 17 to 34 it does not
-  grow. A degree that stays bounded keeps the Gröbner step polynomial in n, with a larger
-  exponent than the prediction. This is evidence for the bounded-degree premise of the
-  subexponential binary-curve heuristics, not against it. It covers m = 2 only, where the
-  heuristics need m to grow with n, so it does not by itself support a subexponential
-  algorithm.
+* Direction. msolve's degree is 4 on every instance from n = 17 to 34, one above the Kousidis–Wiemers value 3, and matches their Magma value 4 for n ≤ 36. They report 5 from n = 37 to 48 (`MEAS-GB-KW-TABLE1`), so a window ending at n = 34 does not decide whether the degree stays bounded, and the published data already show it rising. The step from 3 to 4 inside this window, at n = 15 and n = 17, is a second rise. These measurements do not support a subexponential algorithm; they cover m = 2 only, where the heuristics need m to grow with n.

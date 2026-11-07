@@ -51,9 +51,9 @@ the Kousidis--Wiemers reading is not reached from n = 17 to 44. An independent n
 saturation in Python agrees with the Rust closure on five instances, and a same-seed rerun
 reproduces the log. Lean (`F4Containment`) proves that an F4 run with maximal step
 degree $D$ stays inside the degree-$D$ closure, so the census values bound F4 from below;
-$d_"lin" <= "sd"$ is kernel-checked. The degree does not grow over n = 17 to 34: that is
-consistent with the bounded-degree premise of the subexponential heuristics, one degree
-higher than predicted, and covers m = 2 only. [pcc:unverified]
+$d_"lin" <= "sd"$ is kernel-checked. The degree 4 matches
+Kousidis--Wiemers' Magma value for $n <= 36$; they report 5 from $n = 37$, so a window ending
+at $n = 34$ does not decide whether the degree stays bounded. m = 2 only. [pcc:unverified]
 
 == pf_yield
 
