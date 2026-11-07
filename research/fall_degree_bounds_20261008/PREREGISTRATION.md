@@ -925,3 +925,41 @@ E12c: `hky_window`, `w1x`, `--features wide-vars`, `keep = 4`.
   "mixed" reading weakens H_ℓ.
 
 Nothing from any E13 part has been computed, and no E13 draw has been generated.
+
+## Amendment 18 (2026-11-07 UTC, before any E13 draw): E13 runs locally instead of on RunPod
+
+**Why.** The RunPod pod of Amendment 17 was refused for low account balance, so no pod
+existed and nothing was run. The user then asked for E13 to run locally. Nothing from any
+E13 part has been computed.
+
+**Route.**
+- The authoring container: 4 vCPU and 15 GB RAM.
+- The source is the same frozen archive (`e13/source_archive.sha256`, main `a2be6609`),
+  extracted and built here.
+- Every computation runs under an address-space cap of 13 GiB (`ulimit -v`). A run that
+  exceeds it fails cleanly and is recorded as **"not completed (memory)"**.
+- No cloud cost.
+
+**Changes from Amendment 17 (everything else unchanged):**
+- **Threads:** 4 for every part.
+- **Order:** sequential: gates, then E13b (the censored draws first, then the controls,
+  smallest `N` first), then E13a, then E13c. The engines, flags, gates and reading rules
+  are as in Amendment 17.
+- **Draw granularity:** every draw is a separate process (`--draw D`) with its own output
+  file. A finished draw is never recomputed.
+- **Container restarts:** after a restart, the runner resumes at the first draw without
+  an output file. That draw is recomputed from scratch, which is allowed because the
+  computation is deterministic. The killed attempt's partial `.err` file is kept with an
+  `.attemptN` suffix.
+- **Time limit:** none per draw. A part still unfinished when the user stops the run is
+  "not completed", with whatever finished.
+
+**Expected (recorded before any draw).**
+- E13b's censored draws fit (degree 4, at most 342,541 columns).
+- The `N = 58` controls, E13a (974,982 columns at degree 5) and E13c (`N = 84`) are
+  likely to exceed 13 GiB. Probability "not completed (memory)":
+  - `N = 58` controls: 0.5;
+  - E13a: 0.85;
+  - E13c: 0.95.
+
+Nothing from any E13 part has been computed, and no E13 draw has been generated.
