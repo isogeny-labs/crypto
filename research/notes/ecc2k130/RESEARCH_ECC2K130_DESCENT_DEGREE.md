@@ -725,6 +725,34 @@ Unverified assertion until a pcc verdict exists.
   larger host.
 - **What it is not.** A test of the m = 3 degree-4 regime. No row moves.
 
+## Which guesses decide refutation at m = 4 (2026-11-06): links 2 and 3, never link 1
+
+`research/dreg_m4_guess_bits_20261106/` (pre-registered; `RESULTS.md`,
+`results.pdf`) reruns the ten-guess m = 4 design and reads, per arm and draw,
+the guesses whose value changes degree-3 refutation. Unverified assertion until
+a pcc verdict exists.
+
+- **Result.** No link-1 guess (pair sums or raw x₂) is essential on any of 16
+  arm-draws; essential guesses sit on link 3 (34) and link 2 (18). Guessing
+  only the essential set keeps every refutation on 7 of 13 tested arm-draws,
+  all with one to three guesses.
+- **What it means.** At m = 4, degree 3, guesses on the last links do the work,
+  the opposite of m = 3 at degree 4. A guess budget should go to links 2 and 3
+  first.
+- **What it is not.** A complete guess-and-determine. No row moves.
+
+## Two guesses at (22, 8) (2026-11-07): enough on 1 of 12 draws
+
+`research/dreg_two_guess_20261106/` (pre-registered; `RESULTS.md`,
+`results.pdf`) drops `e₁[0]` from S3 and L3. Unverified assertion until a pcc
+verdict exists.
+
+- **Result.** Both two-guess sets suffice at degree 4 on draw 6 only and fail
+  at their first branch on the other 11; they never disagree.
+- **What it means.** Three guesses stay the floor for these guess kinds on 11
+  of 12 draws at ℓ = 8; there is no general halving of the branch count.
+- **What it is not.** A test of two-guess pairs that keep `e₁[0]`. No row moves.
+
 ## Reproducing
 
 ```sh
