@@ -9,11 +9,6 @@
  "date": "2026-11-07",
  "raw_data": [
   {
-   "path": "../../research/ecbench_rho_v3_ladder_20261107/sessions/main/records.jsonl",
-   "repo_path": "research/ecbench_rho_v3_ladder_20261107/sessions/main/records.jsonl",
-   "sha256": "1c536f957b4ee9eded713535f0e083b599b8559d665c89d5bcd4e3645c55c4af"
-  },
-  {
    "path": "../../research/ecbench_rho_v3_ladder_20261107/sessions/main/session.json",
    "repo_path": "research/ecbench_rho_v3_ladder_20261107/sessions/main/session.json",
    "sha256": "7713b77487d10ac0eb0556263d55c387292df84c3fc04997de9330c2dbeaaf6e"
@@ -24,14 +19,14 @@
    "sha256": "66db6f740ca92610f5cfa47df592d9ef1a2136e5cd11ab39bbc95c95502f59ab"
   },
   {
-   "path": "../../research/ecbench_rho_v3_ladder_20261107/sessions/main/plan.json",
-   "repo_path": "research/ecbench_rho_v3_ladder_20261107/sessions/main/plan.json",
-   "sha256": "6831c6ef2c73a5042a0641734dcde6808e96e300aa04d47e71889819efc1f7c8"
-  },
-  {
    "path": "../../research/ecbench_rho_v3_ladder_20261107/sessions/main/host.json",
    "repo_path": "research/ecbench_rho_v3_ladder_20261107/sessions/main/host.json",
    "sha256": "647aac0f6354a5f2d51ddaac2986eb3b4cc761bb83a6c10014b6a8c4387eca77"
+  },
+  {
+   "path": "../../research/ecbench_rho_v3_ladder_20261107/sessions/main/.artifacts.json",
+   "repo_path": "research/ecbench_rho_v3_ladder_20261107/sessions/main/.artifacts.json",
+   "sha256": "9a49b24a4f4481ca0f057ddd540ead1e9c12935a370077152880dbb0eed212db"
   }
  ],
  "headline": [
@@ -422,5 +417,38 @@
   "Curve parameters: p, trace, order, j and model12 are read from workload.curve.icv1 (ICV1:fp-<p>:<trace>:<order>:<j>:unk:unk:r:<model12>); a and b are not in the record. They were derived algebraically from the generator G and a target Q with x_G != x_Q (a = ((y_G^2 - x_G^3) - (y_Q^2 - x_Q^3)) / (x_G - x_Q), b = y_G^2 - x_G^3 - a x_G mod p). They were then bound by: SHA-256 of the canonical ICV1 model JSON (src/cryptanalysis/curve_id.rs prime_identity) equal to model12 and to the slug's model8; j = 6912 a^3 / (4a^3 + 27b^2) equal to the ICV1 j; trace = p + 1 - r; the same (p, a, b) as docs/curves/registry.json params (generator_call find_prime_order_curve(bits, 59297)); [r]G = O with r prime; and 2r > p + 1 + 2 sqrt(p), so #E(F_p) = r (cofactor 1). find_prime_order_curve (src/cryptanalysis/ic_boundary.rs, rand StdRng) was not re-executed.",
   "Controls: the incumbent-aa A/A arm reproduces the incumbent's S exactly on all 1152 pairs (ratio 1.0; counted GAE is deterministic). Reference arm (incumbent rho.negation_v2) and baseline (plain rho.plain) are priced, and the section 5a band was recomputed for both comparisons; the order holds at w = 0, 0.1 and 1 in each.",
   "rho.plain records carry zero unpriced counters; rho.plain_v3 carries distinguished-point inserts and queries (94451 and 95603), priced in the band."
- ]
+ ],
+ "hashed_in_artifact_store": {
+  "note": "Hashed but stored in the artifact store (gitignored; bytes in s3 via tools/artifacts). Not in raw_data because a checkout without hydration does not have them. The validator read the local copies; each one's sha256 matches the tracked .artifacts.json manifest and session.json (records_sha256 / plan_sha256), which are themselves pinned in raw_data.",
+  "files": [
+   {
+    "repo_path": "research/ecbench_rho_v3_ladder_20261107/sessions/main/plan.json",
+    "path_from_evidence_dir": "../../research/ecbench_rho_v3_ladder_20261107/sessions/main/plan.json",
+    "sha256": "6831c6ef2c73a5042a0641734dcde6808e96e300aa04d47e71889819efc1f7c8",
+    "bytes": 1260541,
+    "manifest": "research/ecbench_rho_v3_ladder_20261107/sessions/main/.artifacts.json",
+    "manifest_sha256": "6831c6ef2c73a5042a0641734dcde6808e96e300aa04d47e71889819efc1f7c8",
+    "manifest_bytes": 1260541,
+    "matches_manifest": true,
+    "pinned_by_session_json": "6831c6ef2c73a5042a0641734dcde6808e96e300aa04d47e71889819efc1f7c8",
+    "matches_session_json": true,
+    "validated_from_local_copy": true,
+    "matches_previous_issue": true
+   },
+   {
+    "repo_path": "research/ecbench_rho_v3_ladder_20261107/sessions/main/records.jsonl",
+    "path_from_evidence_dir": "../../research/ecbench_rho_v3_ladder_20261107/sessions/main/records.jsonl",
+    "sha256": "1c536f957b4ee9eded713535f0e083b599b8559d665c89d5bcd4e3645c55c4af",
+    "bytes": 44095470,
+    "manifest": "research/ecbench_rho_v3_ladder_20261107/sessions/main/.artifacts.json",
+    "manifest_sha256": "1c536f957b4ee9eded713535f0e083b599b8559d665c89d5bcd4e3645c55c4af",
+    "manifest_bytes": 44095470,
+    "matches_manifest": true,
+    "pinned_by_session_json": "1c536f957b4ee9eded713535f0e083b599b8559d665c89d5bcd4e3645c55c4af",
+    "matches_session_json": true,
+    "validated_from_local_copy": true,
+    "matches_previous_issue": true
+   }
+  ]
+ }
 }

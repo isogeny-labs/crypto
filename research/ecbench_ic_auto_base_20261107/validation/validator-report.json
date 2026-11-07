@@ -13,19 +13,6 @@
  "date": "2026-11-07",
  "raw_data": [
   {
-   "path": "../../research/ecbench_ic_auto_base_20261107/sessions/main/records.jsonl",
-   "repo_path": "research/ecbench_ic_auto_base_20261107/sessions/main/records.jsonl",
-   "sha256": "6f68f5a5cb3236b099f0659ec94a052e9869da87817b9abf5f589cf6c48a047d",
-   "tracked_in_git": false,
-   "store_manifest": "research/ecbench_ic_auto_base_20261107/sessions/main/.artifacts.json"
-  },
-  {
-   "path": "../../research/ecbench_ic_auto_base_20261107/sessions/main/.artifacts.json",
-   "repo_path": "research/ecbench_ic_auto_base_20261107/sessions/main/.artifacts.json",
-   "sha256": "cb40473f689c31236ded4466743ff9b93ca5d614e4753a07f088d4e4b42f1e4b",
-   "tracked_in_git": true
-  },
-  {
    "path": "../../research/ecbench_ic_auto_base_20261107/sessions/main/session.json",
    "repo_path": "research/ecbench_ic_auto_base_20261107/sessions/main/session.json",
    "sha256": "9fe620bff08af26f6f3ade0178de20810bc993f5fd77478b00c64372a1c1090d",
@@ -47,6 +34,12 @@
    "path": "../../research/ecbench_ic_auto_base_20261107/sessions/main/host.json",
    "repo_path": "research/ecbench_ic_auto_base_20261107/sessions/main/host.json",
    "sha256": "8632bd9161cc0e400b320415fdda0fc63ad97b5c6ed4ccc68aea71b094840fe3",
+   "tracked_in_git": true
+  },
+  {
+   "path": "../../research/ecbench_ic_auto_base_20261107/sessions/main/.artifacts.json",
+   "repo_path": "research/ecbench_ic_auto_base_20261107/sessions/main/.artifacts.json",
+   "sha256": "cb40473f689c31236ded4466743ff9b93ca5d614e4753a07f088d4e4b42f1e4b",
    "tracked_in_git": true
   }
  ],
@@ -523,7 +516,7 @@
  },
  "verifier_sha256": "da797c32ca0c9217b4886f050cacf350f3d7806785b7b7564c7f4198f75ede0f",
  "notes": [
-  "Validated at HEAD 8b669e5c5c52587de705d556da5e58ddd8feb260. The sessions were committed in 09eece941f. records.jsonl moved to the artifact store in 31a61d5972 (sessions/main/.artifacts.json, sha256 pinned in raw_data); the local copy hashes to the manifest and to session.json records_sha256 6f68f5a5..., the same bytes as the 1st issue. Nothing else in the study's sessions/ changed between 09eece941f and HEAD. raw_data `path` is relative to benchmarks/20261107-ic-auto-base (where VALIDATION.json will live); `repo_path` is repository-relative. records.jsonl is gitignored: a fresh checkout needs `tools/artifacts pull` before the gate's is_file check can find it.",
+  "Validated at HEAD 8b669e5c5c52587de705d556da5e58ddd8feb260. The sessions were committed in 09eece941f. records.jsonl moved to the artifact store in 31a61d5972 (sessions/main/.artifacts.json, sha256 pinned in raw_data); the local copy hashes to the manifest and to session.json records_sha256 6f68f5a5..., the same bytes as the 1st issue. Nothing else in the study's sessions/ changed between 09eece941f and HEAD. raw_data `path` is relative to benchmarks/20261107-ic-auto-base (where VALIDATION.json will live); `repo_path` is repository-relative. raw_data lists only files tracked in Git. records.jsonl live in the artifact store and are listed with their sha256 under hashed_in_artifact_store, cross-checked against .artifacts.json and session.json.",
   "Independence: the verifier (verifier_sha256; source embedded in replay-certificate.json) reads records.jsonl directly and shares no code with ecbench (no compare/table/bound/verify). No keyring signature is attached; no pcc claim was registered by the validator.",
   "Filter: non-warmup records with outcome.status == 'verified'. S = cost.s; total GAE = cost.total_gae; r = workload.curve.r. Every record's cost.s equals total_gae / sqrt(r), and its floor_s equals sqrt(pi / (2A)) with A = 2 (max relative error 0). Pairs are matched by (workload_id, round) and share algorithm_seed and target; there are no duplicates and no unpaired records.",
   "Tolerances: rel_tol 0.002 for values printed to 3-4 significant figures; 0.0002 for values printed to 5; 1e-9 for full-precision floats copied from a committed file.",
@@ -536,5 +529,24 @@
   "Curve parameters: (a, b) were derived from G and a target point, then bound by the ICV1 model12 hash, the slug, j, the trace, docs/curves/registry.json params, [r]G = O with r prime, and 2r beyond the Hasse interval (cofactor 1). See replay-certificate.json curve_parameters.",
   "m=83 / ECC2K-130: not applicable (prime-field curves of 18-28 bits; the report makes no transfer claim).",
   "The validator writes no VALIDATION.json."
- ]
+ ],
+ "hashed_in_artifact_store": {
+  "note": "Hashed but stored in the artifact store (gitignored; bytes in s3 via tools/artifacts). Not in raw_data because a checkout without hydration does not have them. The validator read the local copies; each one's sha256 matches the tracked .artifacts.json manifest and session.json (records_sha256 / plan_sha256), which are themselves pinned in raw_data.",
+  "files": [
+   {
+    "repo_path": "research/ecbench_ic_auto_base_20261107/sessions/main/records.jsonl",
+    "path_from_evidence_dir": "../../research/ecbench_ic_auto_base_20261107/sessions/main/records.jsonl",
+    "sha256": "6f68f5a5cb3236b099f0659ec94a052e9869da87817b9abf5f589cf6c48a047d",
+    "bytes": 15384290,
+    "manifest": "research/ecbench_ic_auto_base_20261107/sessions/main/.artifacts.json",
+    "manifest_sha256": "6f68f5a5cb3236b099f0659ec94a052e9869da87817b9abf5f589cf6c48a047d",
+    "manifest_bytes": 15384290,
+    "matches_manifest": true,
+    "pinned_by_session_json": "6f68f5a5cb3236b099f0659ec94a052e9869da87817b9abf5f589cf6c48a047d",
+    "matches_session_json": true,
+    "validated_from_local_copy": true,
+    "matches_previous_issue": true
+   }
+  ]
+ }
 }
