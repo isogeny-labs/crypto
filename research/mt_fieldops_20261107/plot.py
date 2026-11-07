@@ -21,7 +21,10 @@ def fig_ratios():
     fig.legend(loc="lower center", ncol=9, fontsize=7, frameon=False); fig.tight_layout(rect=(0, 0.07, 1, 1)); return fig
 f = fig_ratios(); f.savefig("ratios.svg"); f.savefig("ratios.png", dpi=150)
 with PdfPages("REPORT.pdf") as pdf:
-    t = plt.figure(figsize=(8.27, 11.69)); t.text(0.06, 0.95, "Multi-target IC in field operations (holdout, 2026-11-07)", fontsize=14, weight="bold")
-    t.text(0.06, 0.08, open("RESULTS.md").read()[:4200], fontsize=6.3, family="monospace", va="bottom", wrap=True); pdf.savefig(t)
+    lines = open("RESULTS.md").read().splitlines(); per = 95
+    for k in range(0, len(lines), per):
+        t = plt.figure(figsize=(8.27, 11.69))
+        if k == 0: t.text(0.06, 0.965, "Multi-target IC in field operations (holdout, 2026-11-07)", fontsize=13, weight="bold")
+        t.text(0.04, 0.94, "\n".join(lines[k:k + per]), fontsize=5.6, family="monospace", va="top"); pdf.savefig(t)
     pdf.savefig(fig_ratios())
 print("ok")
