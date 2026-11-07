@@ -24,7 +24,7 @@ remove or sharpen individual supports.
   columns: (auto, auto, auto, auto),
   align: left,
   [\#], [target], [instrument], [outcome],
-  [1], [`HEUR-GB-PQ-ASSUMPTION-2` (m = 2)], [`pq2_rank` census + Lean criterion], [literal reading fails on all 119 instances; iterated degree > 3 for n = 15 and 17--44, exactly 4 on 24 fresh instances at n = 17--24],
+  [1], [`HEUR-GB-PQ-ASSUMPTION-2` (m = 2)], [`pq2_rank` census + Lean criterion], [literal reading fails on the 111 instances with $n <= 44$; iterated degree > 3 for n = 15 and 17--44, exactly 4 on 33 fresh instances at n = 17--27; msolve F4 degree 4 at n = 17--34],
   [2], [degree-2 criterion generalised], [Lean `SubspaceCriterion`], [$d_"lin" <= "sd"$ for any Macaulay degree; kernel-checked],
   [3], [`HEUR-DECOMPOSITION-PROBABILITY` (prime field)], [`pf_yield` census], [zero class = Poisson once unordered; variance 1.45× Poisson for negation-closed bases],
   [4], [mean of the yield heuristic], [Lean `MeanCount`], [mean $|F|^m / |G|$ is a theorem],
@@ -44,13 +44,16 @@ remove or sharpen individual supports.
 
 119 instances, n = 8 to 47, three per n; the sweep stopped during n = 47. The iterated degree-3
 closure reaches k for every n ≤ 14 and at n = 16, and reaches only 1 at n = 15 and on all
-84 instances from n = 17 to 44. Fresh degree-4 sweeps at n = 17 to 24 reach k on all
-24 instances. So the first fall degree 2 is never the solver degree, and the value 3 of
+84 instances from n = 17 to 44. Fresh degree-4 sweeps at n = 17 to 27 reach k on all
+33 instances, and msolve's F4 reaches maximal step degree exactly 4 on all 54 main-sweep
+instances from n = 17 to 34. So the first fall degree 2 is not the solver degree on any instance with $n <= 44$, and the value 3 of
 the Kousidis--Wiemers reading is not reached from n = 17 to 44. An independent naive
 saturation in Python agrees with the Rust closure on five instances, and a same-seed rerun
-reproduces the log. The bound on F4 holds under the unformalised containment property;
-$d_"lin" <= "sd"$ is kernel-checked. The direction cuts against the subexponential
-binary-curve heuristics. [pcc:unverified]
+reproduces the log. Lean (`F4Containment`) proves that an F4 run with maximal step
+degree $D$ stays inside the degree-$D$ closure, so the census values bound F4 from below;
+$d_"lin" <= "sd"$ is kernel-checked. The degree 4 matches
+Kousidis--Wiemers' Magma value for $n <= 36$; they report 5 from $n = 37$, so a window ending
+at $n = 34$ does not decide whether the degree stays bounded. m = 2 only. [pcc:unverified]
 
 == pf_yield
 
