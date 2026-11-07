@@ -1364,6 +1364,111 @@ pub fn collect_relations(
     (rels, stats)
 }
 
+/// Table-lookup 2-decomposition: like [`collect_relations`] but, instead of subtracting every
+/// factor-base element from `R` (O(fb) work per target), looks `x(R)` up in the pair table of
+/// `x(F_j ± F_k)` (plus the factor base itself for 1-term rows), O(1) per target.  The decomposable
+/// set is the same as the 2-decomposition sweep's (`R = ±F_j ± F_k`), found in the same walk
+/// (`R ← R + G`, fresh `(a, b)` after a productive target); relations are verified in the group.
+/// Experimental (`ic_solve_table`); the existing paths are unchanged.
+pub fn collect_relations_table(
+    curve: &FastCurve,
+    g: Pt,
+    q: Pt,
+    fb: &FastFactorBase,
+    pairs: &PairTable,
+    needed: usize,
+    max_targets: u64,
+    seed: u64,
+) -> (Vec<FastRelation>, CollectStats) {
+    let f = curve.f;
+    let n = curve.n;
+    let mut rng = StdRng::seed_from_u64(seed);
+    let mut rels: Vec<FastRelation> = Vec::with_capacity(needed);
+    let mut stats = CollectStats::default();
+    let max_pair_x = pairs.entries.last().map(|e| e.0).unwrap_or(0);
+
+    let fresh = |rng: &mut StdRng| -> (u64, u64, Pt) {
+        loop {
+            let a = rng.gen_range(1..n);
+            let b = rng.gen_range(1..n);
+            if let Some(r) = curve.combine(g, q, a, b) {
+                return (a, b, r);
+            }
+        }
+    };
+    let (mut a, mut b, mut r) = fresh(&mut rng);
+
+    while rels.len() < needed && stats.targets < max_targets {
+        stats.targets += 1;
+        let xc = f.from_mont(r.x);
+        let mut found: Vec<Vec<(u32, i8)>> = Vec::new();
+        if let Some(j) = fb.lookup(xc) {
+            let s = if r.y == fb.pts[j].y { 1i8 } else { -1 };
+            found.push(vec![(j as u32, s)]);
+        }
+        if xc <= max_pair_x {
+            for &(_, j, k_raw) in pairs.lookup(xc) {
+                let sigma = if k_raw & PAIR_DIFF_BIT != 0 { -1i8 } else { 1 };
+                let k = (k_raw & !PAIR_DIFF_BIT) as usize;
+                let fk = fb.pts[k];
+                let fk = if sigma < 0 { curve.neg(fk) } else { fk };
+                let Some(pjk) = curve.add(Some(fb.pts[j as usize]), Some(fk)) else {
+                    continue;
+                };
+                let tau = if r.y == pjk.y { 1i8 } else { -1 };
+                found.push(vec![(j, tau), (k as u32, tau * sigma)]);
+            }
+        }
+        let mut productive = false;
+        let mut seen: HashSet<Vec<(u32, i8)>> = HashSet::new();
+        for entries in found {
+            let merged = merge_entries(entries);
+            if merged.is_empty() || !seen.insert(merged.clone()) {
+                continue;
+            }
+            if !relation_holds(curve, fb, r, &merged) {
+                stats.rejected += 1;
+                continue;
+            }
+            match merged.len() {
+                1 => stats.rows_one += 1,
+                2 => stats.rows_two += 1,
+                _ => stats.rows_three += 1,
+            }
+            rels.push(FastRelation {
+                a,
+                b,
+                entries: merged,
+            });
+            productive = true;
+            if rels.len() >= needed {
+                break;
+            }
+        }
+        if productive {
+            let (na, nb, nr) = fresh(&mut rng);
+            a = na;
+            b = nb;
+            r = nr;
+        } else {
+            match curve.add(Some(r), Some(g)) {
+                Some(nr) => {
+                    r = nr;
+                    a = add_mod(a, 1, n);
+                }
+                None => {
+                    let (na, nb, nr) = fresh(&mut rng);
+                    a = na;
+                    b = nb;
+                    r = nr;
+                }
+            }
+        }
+    }
+    stats.relations = rels.len();
+    (rels, stats)
+}
+
 /// Solve the relation system for `x = log_G Q` by Gauss–Jordan
 /// elimination mod `n` on `u64` (Montgomery form).  Unknowns are
 /// `(y_0 … y_{m−1}, x)`; row `r` reads
@@ -1503,6 +1608,63 @@ pub fn ic_solve(
             total_ms: t0.elapsed().as_secs_f64() * 1e3,
             factor_base_size: fb.len(),
             pair_table_entries: pairs.map(|p| p.len()).unwrap_or(0),
+            relations: rels.len(),
+            targets: stats.targets,
+            rows_one: stats.rows_one,
+            rows_two: stats.rows_two,
+            rows_three: stats.rows_three,
+        },
+    ))
+}
+
+/// End-to-end index calculus with the table-lookup collector ([`collect_relations_table`]): factor
+/// base → pair table → relations → linear algebra → group verification.  Same report and the same
+/// fail-closed verification as [`ic_solve`].  Experimental.
+pub fn ic_solve_table(
+    curve: &FastCurve,
+    g: Pt,
+    q: Pt,
+    fb_size: usize,
+    extra_relations: usize,
+    max_targets: u64,
+    seed: u64,
+) -> Option<(u64, IcReport)> {
+    let t0 = Instant::now();
+    let fb = FastFactorBase::build(curve, fb_size);
+    let factor_base_ms = t0.elapsed().as_secs_f64() * 1e3;
+    if fb.is_empty() {
+        return None;
+    }
+    let t1 = Instant::now();
+    let pairs = PairTable::build(curve, &fb);
+    let pair_table_ms = t1.elapsed().as_secs_f64() * 1e3;
+    let needed = fb.len() + extra_relations;
+    let t2 = Instant::now();
+    let (rels, stats) =
+        collect_relations_table(curve, g, q, &fb, &pairs, needed, max_targets, seed);
+    let relations_ms = t2.elapsed().as_secs_f64() * 1e3;
+    if rels.len() < needed {
+        return None;
+    }
+    let t3 = Instant::now();
+    let x = solve_relations(curve, fb.len(), &rels)?;
+    let linear_algebra_ms = t3.elapsed().as_secs_f64() * 1e3;
+    let t4 = Instant::now();
+    if curve.mul(Some(g), x) != Some(q) {
+        return None;
+    }
+    let verify_ms = t4.elapsed().as_secs_f64() * 1e3;
+    Some((
+        x,
+        IcReport {
+            factor_base_ms,
+            pair_table_ms,
+            relations_ms,
+            linear_algebra_ms,
+            verify_ms,
+            total_ms: t0.elapsed().as_secs_f64() * 1e3,
+            factor_base_size: fb.len(),
+            pair_table_entries: pairs.len(),
             relations: rels.len(),
             targets: stats.targets,
             rows_one: stats.rows_one,
