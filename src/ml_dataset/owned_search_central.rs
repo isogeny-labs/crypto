@@ -16,24 +16,30 @@ const ROLE:&str="boolean-original-owned-search-snapshot-chunk-v1";
 const MAX_SNAPSHOTS:usize=4096;
 const MAX_CHUNKS:usize=65536;
 #[derive(Clone,Copy,Debug,PartialEq,Eq)]
-pub(in crate::ml_dataset::solvers) enum Verdict{CheckedScope,Incomplete,Unknown,Rejected}
+pub(in crate::ml_dataset::solvers) enum Verdict{CheckedScope,HistoricalCheckedScope,Incomplete,Unknown,Rejected}
 pub(in crate::ml_dataset::solvers) struct Custody{
  frame:Frame,context:Option<OriginalContext>,verdict:Verdict,
  run_raw:Vec<u8>,plan_raw:Vec<u8>,protocol_raw:Vec<u8>,plan:Option<crate::ml_dataset::DatasetPlan>,run_value:Option<Value>,execution_raw:Vec<u8>,manifest_raw:Vec<u8>,manifest:Option<crate::ml_dataset::CellManifest>,
  capsule:Option<owned_identity::Capsule>,map_ack:Option<capture::CommittedEventPosition>,
- descent:Option<descent::Audit>,snapshots:Vec<Snapshot>,recheck_raw:Vec<u8>,projected:bool,incomplete:bool,
+ historical:bool,selected:Option<usize>,selection_states:Vec<checkpoint_selection::Snapshot>,selection:Option<checkpoint_selection::Attempt>,interruption:Option<interrupted_outcome::Audit>,expected_channels:Option<Value>,outcome_bytes:Vec<u8>,descent:Option<descent::Audit>,snapshots:Vec<Snapshot>,recheck_raw:Vec<u8>,projected:bool,incomplete:bool,
 }
 struct Chunk{artifact:Artifact,raw:Vec<u8>,checked_raw:Vec<u8>,checked:bool,ack:capture::CommittedEventPosition}
-struct Snapshot{index:u64,chunks:Vec<Chunk>,joined:Vec<u8>,decoded:Option<wire::Attempt>,audit:Option<semantic::Audit>}
+struct Snapshot{index:u64,chunks:Vec<Chunk>,joined:Vec<u8>,decoded:Option<wire::Attempt>,prefix:Option<wire::strict_prefix::Audit>,audit:Option<semantic::Audit>}
 impl wire::Admission for ReplayBudget{
  fn reserve(&mut self,w:u64,b:u64)->Result<(),()>{self.reserve_checking(w,b,Instant::now()).map_err(|_|())}
  fn check(&mut self)->Result<(),()>{DecodeBudget::check(self,Instant::now()).map_err(|_|())}
 }
 pub(in crate::ml_dataset::solvers) fn verify(dir:&Path,config:&CaseConfig,outcome:&Value,artifacts:&[Artifact],policy:Policy)->Custody{
- let mut c=Custody{frame:new_frame(policy,None,None),context:None,verdict:Verdict::Rejected,run_raw:Vec::new(),plan_raw:Vec::new(),protocol_raw:Vec::new(),plan:None,run_value:None,execution_raw:Vec::new(),manifest_raw:Vec::new(),manifest:None,capsule:None,map_ack:None,descent:None,snapshots:Vec::new(),recheck_raw:Vec::new(),projected:false,incomplete:false};
+ verify_mode(dir,config,outcome,artifacts,policy,false)
+}
+pub(in crate::ml_dataset::solvers) fn verify_historical(dir:&Path,config:&CaseConfig,outcome:&Value,artifacts:&[Artifact],policy:Policy)->Custody{
+ verify_mode(dir,config,outcome,artifacts,policy,true)
+}
+fn verify_mode(dir:&Path,config:&CaseConfig,outcome:&Value,artifacts:&[Artifact],policy:Policy,historical:bool)->Custody{
+ let mut c=Custody{frame:new_frame(policy,None,None),context:None,verdict:Verdict::Rejected,run_raw:Vec::new(),plan_raw:Vec::new(),protocol_raw:Vec::new(),plan:None,run_value:None,execution_raw:Vec::new(),manifest_raw:Vec::new(),manifest:None,capsule:None,map_ack:None,historical,selected:None,selection_states:Vec::new(),selection:None,interruption:None,expected_channels:None,outcome_bytes:Vec::new(),descent:None,snapshots:Vec::new(),recheck_raw:Vec::new(),projected:false,incomplete:false};
  // Failure before admission retains the empty frame without diagnostic allocation.
  if c.frame.budget.reserve_checking(65536,65536,Instant::now()).is_err(){return c}
- let result=c.run(dir,config,outcome,artifacts);
+ let result=if historical{c.run_historical(dir,config,outcome,artifacts)}else{c.run(dir,config,outcome,artifacts)};
  match result{Ok(v)=>c.verdict=v,Err(e)=>{
   let unknown=matches!(c.frame.math_refusal,Some(original_math::Error::UnsupportedPolicy|original_math::Error::ActiveTally|original_math::Error::UnsupportedMembership|original_math::Error::UnsupportedCertificate));
   c.frame.diagnostic=Some(e);
@@ -51,6 +57,109 @@ impl Custody{
  pub(in crate::ml_dataset::solvers) fn retained_slot_bytes(&self)->u64{self.frame.budget.bytes}
  pub(in crate::ml_dataset::solvers) fn verdict(&self)->Verdict{self.verdict}
  fn pay(&mut self,w:u64,b:u64)->Result<(),String>{self.frame.budget.reserve_checking(w,b,Instant::now()).map_err(|_|"owned replay admission refused".into())}
+ fn run_historical(&mut self,dir:&Path,config:&CaseConfig,outcome:&Value,artifacts:&[Artifact])->Result<Verdict,String>{
+  use crate::ml_dataset::types::{OwnedBooleanSearchRequest,OwnedBooleanSearchPolicy};
+  if !super::super::owned_search_worker::supported(config)||!matches!(config.channels.as_ref().and_then(|c|c.owned_boolean_search.as_ref()),Some(OwnedBooleanSearchRequest::MatrixContinuation{policy:OwnedBooleanSearchPolicy::ConservativeAffineEnvelopeCheckpointV1,..})){return Err("historical replay requires explicit checkpoint policy".into())}
+  self.context=Some(admit_original_inputs(dir,config,artifacts,&mut self.frame)?);
+  self.read_identity(dir,config,outcome,artifacts)?;
+  // Config is now original-admitted and v5-exclusive. Prepay disposition
+  // construction and canonical outcome serialization, retaining both results.
+  let source_bytes=(self.frame.config.len() as u64).checked_add(self.manifest_raw.len() as u64).ok_or("historical outcome quote overflow")?;
+  self.pay(source_bytes.checked_mul(128).and_then(|n|n.checked_add(65536)).ok_or("historical outcome work overflow")?,source_bytes.checked_mul(128).and_then(|n|n.checked_add(65536)).ok_or("historical outcome memory overflow")?)?;
+  self.expected_channels=crate::ml_dataset::solvers::requested_channel_disposition(config)?;
+  self.outcome_bytes=serde_json::to_vec(outcome).map_err(|e|e.to_string())?;
+  let f=&mut self.frame;let work=f.budget.policy.work.checked_sub(f.budget.work).ok_or("historical outcome allowance exhausted")?;
+  self.interruption=Some(interrupted_outcome::verify(outcome,self.expected_channels.as_ref(),interrupted_outcome::Limits{work,depth:32},f.budget.policy.deadline,&mut f.budget));
+  if let Err(e)=self.interruption.as_ref().unwrap().result{
+   self.incomplete=matches!(e,interrupted_outcome::Failure::Cap|interrupted_outcome::Failure::Depth|interrupted_outcome::Failure::Overflow|interrupted_outcome::Failure::Owner|interrupted_outcome::Failure::Deadline);
+   return Err("historical supervisor outcome not admitted".into())
+  }
+  self.replay_capture(dir,config)?;
+  if !historical_head_allowed(self.frame.head.as_ref().ok_or("historical head absent")?){return Err("historical capture stop not admitted".into())}
+  if self.snapshots.is_empty(){return Ok(Verdict::Incomplete)}
+  self.decode_historical()?;
+  let candidate=self.selection.as_ref().and_then(|a|a.result.ok()).ok_or("historical candidate absent")?;
+  self.selected=Some(candidate.selected);
+  // Exactly one selected snapshot gets original descent and mathematics. A
+  // later complete failure never causes another selection or older-row fallback.
+  self.audit_snapshot(config,candidate.selected)?;
+  self.revalidate_inner(dir,config,outcome,artifacts)?;
+  let admitted=self.descent.as_ref().is_some_and(|d|d.original_descent_verified())&&self.snapshots[candidate.selected].audit.as_ref().is_some_and(|a|a.result.is_ok()&&!a.rows.is_empty());
+  if admitted{Ok(Verdict::HistoricalCheckedScope)}else{Ok(Verdict::Incomplete)}
+ }
+ fn decode_historical(&mut self)->Result<(),String>{
+  let count=self.snapshots.len();
+  self.pay(count as u64,(count as u64).checked_mul(std::mem::size_of::<checkpoint_selection::Snapshot>() as u64).and_then(|n|n.checked_add(64)).ok_or("historical states quote overflow")?)?;
+  self.selection_states.try_reserve_exact(count).map_err(|_|"historical states allocation")?;
+  for i in 0..count{
+   let total=self.snapshots[i].chunks.iter().try_fold(0usize,|n,c|n.checked_add(c.raw.len()).ok_or("historical snapshot byte overflow"))?;
+   self.pay((total as u64).checked_mul(2).ok_or("historical snapshot copy overflow")?,(total as u64).checked_add(64).ok_or("historical snapshot allocation overflow")?)?;
+   let s=&mut self.snapshots[i];s.joined.try_reserve_exact(total).map_err(|_|"historical snapshot allocation")?;
+   for c in &s.chunks{s.joined.extend_from_slice(&c.raw)}
+   let f=&mut self.frame;let limits=remaining_wire_limits(&f.budget)?;
+   s.decoded=Some(wire::decode(std::mem::take(&mut s.joined),limits,f.budget.policy.deadline,&mut f.budget));
+   let decoded=s.decoded.as_ref().unwrap();
+   let state=match decoded.result{
+    Ok(())=>{
+     f.budget.reserve_checking((f.map_bytes.len() as u64).checked_mul(16).and_then(|n|n.checked_add(65536)).ok_or("historical identity quote")?,65536,Instant::now()).map_err(|_|"historical identity admission")?;
+     check_snapshot_binding(s,self.capsule.as_ref().ok_or("identity absent")?,self.map_ack.as_ref().ok_or("map receipt absent")?,&f.map_bytes,f.map.as_ref().ok_or("original map absent")?.pattern())?;
+     checkpoint_selection::State::Complete
+    },
+    Err(wire::Failure::Truncated)=>{
+     if i+1!=count{return Err("historical truncated snapshot not final".into())}
+     // Retain the failed full decoder and its bytes. A second bounded parser
+     // must validate every observed prefix byte before identity is exposed.
+     let bytes=decoded.raw.len();
+     f.budget.reserve_checking(bytes as u64,(bytes as u64).checked_add(64).ok_or("prefix copy quote overflow")?,Instant::now()).map_err(|_|"prefix copy refused")?;
+     let mut raw=Vec::new();raw.try_reserve_exact(bytes).map_err(|_|"prefix copy allocation")?;raw.extend_from_slice(&decoded.raw);
+     let limits=remaining_wire_limits(&f.budget)?;
+     s.prefix=Some(wire::strict_prefix::admit(raw,limits,f.budget.policy.deadline,&mut f.budget));
+     let prefix=s.prefix.as_ref().unwrap();
+     match prefix.result(){
+      Ok(wire::strict_prefix::State::IncompleteIdentityAvailable)=>{},
+      Ok(wire::strict_prefix::State::IncompleteIdentityUnavailable)=>{self.incomplete=true;return Err("historical tail identity unavailable".into())},
+      Ok(wire::strict_prefix::State::CompleteWire)=>return Err("historical prefix/full decoder disagreement".into()),
+      Err(e)=>{self.incomplete=wire_resource_refusal(e);return Err("historical strict tail refused".into())},
+     }
+     f.budget.reserve_checking((f.map_bytes.len() as u64).checked_mul(16).and_then(|n|n.checked_add(65536)).ok_or("prefix identity quote")?,65536,Instant::now()).map_err(|_|"prefix identity admission")?;
+     check_prefix_binding(prefix,s.index,self.capsule.as_ref().ok_or("identity absent")?,self.map_ack.as_ref().ok_or("map receipt absent")?,&f.map_bytes,f.map.as_ref().ok_or("original map absent")?.pattern())?;
+     checkpoint_selection::State::BoundTruncatedPrefix
+    },
+    Err(e)=>{self.incomplete=wire_resource_refusal(e);return Err("historical complete snapshot decode refused".into())},
+   };
+   DecodeBudget::check(&mut f.budget,Instant::now()).map_err(|_|"historical snapshot identity deadline")?;
+   self.selection_states.push(checkpoint_selection::Snapshot{index:s.index,state});
+  }
+  self.selection=Some(checkpoint_selection::select(&self.selection_states,MAX_SNAPSHOTS,self.frame.budget.policy.deadline,&mut self.frame.budget));
+  if let Err(e)=self.selection.as_ref().unwrap().result{
+   self.incomplete=matches!(e,checkpoint_selection::Failure::Empty|checkpoint_selection::Failure::Cap|checkpoint_selection::Failure::Owner|checkpoint_selection::Failure::Deadline|checkpoint_selection::Failure::Unavailable|checkpoint_selection::Failure::NoComplete);
+   return Err("historical snapshot selection refused".into())
+  }
+  Ok(())
+ }
+ fn project_historical(&mut self)->Result<Value,String>{
+  if self.verdict!=Verdict::HistoricalCheckedScope||self.projected||!self.descent.as_ref().is_some_and(|d|d.original_descent_verified())||!self.interruption.as_ref().is_some_and(|a|a.result.is_ok()){return Err("historical projection not admitted or consumed".into())}
+  self.projected=true;
+  let candidate=self.selection.as_ref().and_then(|a|a.result.ok()).ok_or("historical candidate absent")?;
+  if self.selected!=Some(candidate.selected){return Err("historical selected index changed".into())}
+  let rows=self.snapshots[candidate.selected].audit.as_ref().ok_or("historical mathematics absent")?.rows.len();
+  let tail_chunks=candidate.tail.map(|i|self.snapshots[i].chunks.len()).unwrap_or(0);
+  let source_bytes=(self.manifest_raw.len() as u64).checked_add(self.outcome_bytes.len() as u64).ok_or("historical projection source overflow")?;
+  let quote=(rows as u64).checked_mul(16384).and_then(|n|n.checked_add((tail_chunks as u64).checked_mul(16384)?)).and_then(|n|n.checked_add(source_bytes.checked_mul(128)?)).and_then(|n|n.checked_add(262144)).ok_or("historical projection quote overflow")?;
+  self.pay(quote,quote)?;
+  let s=&self.snapshots[candidate.selected];let audit=s.audit.as_ref().unwrap();let ack=&s.chunks.last().ok_or("selected receipt absent")?.ack;
+  let head=self.frame.head.as_ref().ok_or("terminal receipt absent")?;
+  if !historical_head_allowed(head){return Err("historical terminal stop changed".into())}
+  let mut labels=Vec::new();labels.try_reserve_exact(rows).map_err(|_|"historical labels allocation")?;
+  for r in &audit.rows{labels.push(serde_json::json!({"partition":r.partition,"node":r.node,"basis_row":r.row,"identity_verified_relative_captured_equations":true}));}
+  let mut tail=Vec::new();tail.try_reserve_exact(tail_chunks).map_err(|_|"historical tail descriptors allocation")?;
+  if let Some(i)=candidate.tail{for c in &self.snapshots[i].chunks{tail.push(serde_json::json!({"artifact":c.artifact,"receipt":c.ack}));}}
+  let reason=match self.interruption.as_ref().unwrap().result.as_ref().map_err(|_|"interruption absent")?.reason{interrupted_outcome::Reason::Timeout=>"timeout",interrupted_outcome::Reason::TraceBudgetExhausted=>"trace_budget_exhausted",interrupted_outcome::Reason::WorkerFailed=>"worker_failed"};
+  let value=serde_json::json!({"schema":"crypto.ml-dataset.owned-search-historical-rows/v1","visibility":"restricted","status":"verified_rows_from_prior_checkpoint","snapshot":s.index,"pattern":self.authenticated_map().ok_or("historical original map absent")?.pattern(),"selected_checkpoint_receipt":ack,"terminal_capture_receipt":head,"tail":{"disposition":if candidate.tail.is_some(){"bound_truncated_prefix"}else{"none_observed"},"snapshot_index":candidate.tail.map(|i|self.snapshots[i].index),"chunks":tail,"semantics_verified":false},"identity_capsule":self.capsule,"rows":labels,"verified_rows":rows,"selected_checkpoint_wire_complete":true,"selected_rows_verified":true,"original_public_factor_and_map_verified":true,"original_descent_verified":true,"descent_scope":"authenticated-pattern-auxiliary-boolean-gate-equations","lineage_and_committed_basis_verified":true,"outer_manifest_outcome_bound":true,"raw_manifest_sha256":hex::encode(Sha256::digest(&self.manifest_raw)),"canonical_outcome_sha256":hex::encode(Sha256::digest(&self.outcome_bytes)),"producer_reason_observed":reason,"producer_reason_independently_verified":false,"producer_attempt_complete":false,"report_capture_join_verified":false,"producer_report_capture_join_verified":false,"solver_completed":false,"scalar_recovered":false,"all_patterns_negative":false,"first_fall_degree":null,"last_fall_degree":null,"degree_of_regularity":null,"producer_counters_verified":false,"producer_lift_classifications_verified":false,"public_features":null});
+  DecodeBudget::check(&mut self.frame.budget,Instant::now()).map_err(|_|"historical projection deadline")?;
+  Ok(value)
+ }
+
  fn run(&mut self,dir:&Path,config:&CaseConfig,outcome:&Value,artifacts:&[Artifact])->Result<Verdict,String>{
   if !super::super::owned_search_worker::supported(config){return Err("unsupported owned F4 profile".into())}
   self.context=Some(admit_original_inputs(dir,config,artifacts,&mut self.frame)?);
@@ -159,7 +268,7 @@ impl Custody{
    if chunk!=0||self.snapshots.len()>=MAX_SNAPSHOTS{return Err("owned snapshot order/cap".into())}
    let bytes=(self.snapshots.len()+1).checked_mul(std::mem::size_of::<Snapshot>()).ok_or("snapshot capacity overflow")? as u64;
    self.pay(1,bytes)?;self.snapshots.try_reserve_exact(1).map_err(|_|"snapshot allocation")?;
-   self.snapshots.push(Snapshot{index,chunks:Vec::new(),joined:Vec::new(),decoded:None,audit:None});
+   self.snapshots.push(Snapshot{index,chunks:Vec::new(),joined:Vec::new(),decoded:None,prefix:None,audit:None});
   }
   if !is_latest_snapshot(index,self.snapshots.len()){return Err("owned snapshot interleaving".into())}
   let previous=self.snapshots.last().and_then(|s|s.chunks.last()).map(|c|c.ack.event_count).or_else(||self.snapshots.iter().rev().nth(1).and_then(|s|s.chunks.last()).map(|c|c.ack.event_count)).or_else(||self.map_ack.as_ref().map(|a|a.event_count)).ok_or("missing preceding owned receipt")?;
@@ -208,9 +317,13 @@ impl Custody{
    // the latest snapshot supplies semantic rows, so earlier positives cannot win.
    check_snapshot_binding(s,self.capsule.as_ref().ok_or("missing identity capsule")?,self.map_ack.as_ref().ok_or("missing map receipt")?,&f.map_bytes,f.map.as_ref().ok_or("missing map")?.pattern())?;
   }
+  let index=self.snapshots.len().checked_sub(1).ok_or("snapshot absent")?;
+  self.audit_snapshot(config,index)
+ }
+ fn audit_snapshot(&mut self,config:&CaseConfig,index:usize)->Result<(),String>{
   let f=&mut self.frame;let work=f.budget.policy.work.checked_sub(f.budget.work).ok_or("semantic work exhausted")?;
   let bytes=f.budget.policy.bytes.checked_sub(f.budget.bytes).ok_or("semantic bytes exhausted")?;
-  let s=self.snapshots.last_mut().ok_or("snapshot absent")?;let root=s.decoded.as_ref().and_then(|d|d.value.as_ref()).ok_or("decoded snapshot absent")?;
+  let s=self.snapshots.get_mut(index).ok_or("snapshot absent")?;let root=s.decoded.as_ref().and_then(|d|d.value.as_ref()).ok_or("decoded snapshot absent")?;
   let Some(n)=root.get("expansion").and_then(|v|v.get("variables")).and_then(wire::Value::as_u64).and_then(|n|u32::try_from(n).ok())else{return Ok(())};
   if n!=f.map.as_ref().ok_or("map absent")?.variables(){return Err("captured variable count differs from checked map".into())}
   let map=f.map.take().ok_or("original descent map already consumed")?;
@@ -278,12 +391,12 @@ impl Custody{
   DecodeBudget::check(&mut self.frame.budget,Instant::now()).map_err(|_|"owned revalidation deadline".into())
  }
  pub(in crate::ml_dataset::solvers) fn revalidate(&mut self,dir:&Path,config:&CaseConfig,outcome:&Value,artifacts:&[Artifact])->Result<(),Stop>{
-  if self.verdict!=Verdict::CheckedScope{return Err(self.frame.budget.first_stop.unwrap_or(Stop::Phase))}
+  if !matches!(self.verdict,Verdict::CheckedScope|Verdict::HistoricalCheckedScope){return Err(self.frame.budget.first_stop.unwrap_or(Stop::Phase))}
   if let Err(e)=self.revalidate_inner(dir,config,outcome,artifacts){self.frame.diagnostic=Some(e);self.verdict=Verdict::Rejected;return self.frame.budget.fail(Stop::NativeFailure)}
   Ok(())
  }
  pub(in crate::ml_dataset::solvers) fn project_restricted(&mut self)->Result<Value,String>{
-  let result=self.project_inner();
+  let result=if self.historical{self.project_historical()}else{self.project_inner()};
   if result.is_err(){self.verdict=Verdict::Rejected;let _:Result<(),Stop>=self.frame.budget.fail(Stop::NativeFailure);}
   result
  }
@@ -356,4 +469,18 @@ fn require_manifest_entry(artifacts:&[Artifact],path:&str,bytes:u64,sha:&str)->R
 
 fn checker_exhausted(c:&bridge::Certificate)->bool{
  matches!(c.result,Err(bridge::Failure::Checker))&&c.audit.as_ref().is_some_and(|a|matches!(a.result,Err(bqi::Failure::Unknown(_))))
+}
+
+impl checkpoint_selection::Admission for ReplayBudget{
+ fn reserve(&mut self,work:u64)->Result<(),()>{self.reserve_checking(work,0,Instant::now()).map_err(|_|())}
+ fn check(&mut self)->Result<(),()>{DecodeBudget::check(self,Instant::now()).map_err(|_|())}
+}
+fn remaining_wire_limits(b:&ReplayBudget)->Result<wire::Limits,String>{
+ Ok(wire::Limits{raw_bytes:usize::try_from(b.policy.payload_bytes).map_err(|_|"historical payload usize")?.min(128*1024*1024),work:b.policy.work.checked_sub(b.work).ok_or("historical work exhausted")?.min(32_000_000),allocation_bytes:b.policy.bytes.checked_sub(b.bytes).ok_or("historical bytes exhausted")?.min(256*1024*1024),..wire::Limits::default()})
+}
+fn wire_resource_refusal(e:wire::Failure)->bool{
+ matches!(e,wire::Failure::Limits|wire::Failure::RawCap|wire::Failure::Nodes|wire::Failure::Depth|wire::Failure::Container|wire::Failure::StringCap|wire::Failure::BytesCap|wire::Failure::Work|wire::Failure::Memory|wire::Failure::Overflow|wire::Failure::OwnerReserve|wire::Failure::OwnerCheck|wire::Failure::Deadline|wire::Failure::Allocation)
+}
+fn historical_head_allowed(head:&capture::CommittedHead)->bool{
+ matches!(head.stop,None|Some(capture::CaptureStop::EventLimit|capture::CaptureStop::StreamByteLimit|capture::CaptureStop::PayloadByteLimit|capture::CaptureStop::PayloadCountLimit|capture::CaptureStop::LocalByteLimit|capture::CaptureStop::ChunkLimit))
 }

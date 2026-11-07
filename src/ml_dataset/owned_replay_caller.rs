@@ -2,6 +2,22 @@
 use super::*;
 use std::io::{Read, Write};
 use std::time::{Duration, Instant};
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum ReplayMode { Terminal, Historical }
+impl ReplayMode {
+    fn parse(mode: &str) -> Option<Self> {
+        match mode { "original_owned_search_rows_v1" => Some(Self::Terminal), "original_owned_search_historical_rows_v1" => Some(Self::Historical), _ => None }
+    }
+    fn projection_matches(self, value: &Value) -> bool {
+        match self {
+            Self::Terminal => value["schema"]=="crypto.ml-dataset.owned-search-restricted-rows/v1" && value["status"]=="verified_selected_rows",
+            Self::Historical => value["schema"]=="crypto.ml-dataset.owned-search-historical-rows/v1" && value["status"]=="verified_rows_from_prior_checkpoint" && value["producer_attempt_complete"]==false && value["report_capture_join_verified"]==false,
+        }
+    }
+    fn accepts(self, verdict: solvers::OwnedReplayVerdict) -> bool {
+        matches!((self, verdict), (Self::Terminal, solvers::OwnedReplayVerdict::CheckedScope) | (Self::Historical, solvers::OwnedReplayVerdict::HistoricalCheckedScope))
+    }
+}
 const POLICY_CAP: u64 = 4096;
 const RUN_CAP: u64 = 4096;
 const CALLER_SETUP_WORK: u64 = 65536;
@@ -109,6 +125,7 @@ pub(super) struct Session {
     caller: CallerAdmission,
 }
 impl Session {
+    pub(super) fn historical(&self)->bool {ReplayMode::parse(&self.policy.mode)==Some(ReplayMode::Historical)}
     pub(super) fn from_policy(root: &Path, path: &Path, receipt: &Path) -> Result<Self, String> {
         let started = Instant::now();
         // Fixed <=4097-byte bootstrap, charged in CALLER_SETUP_WORK/FIXED_OWNER. Never producer allowance.
@@ -153,7 +170,7 @@ impl Session {
         if !p.receipt_path.is_absolute()
             || p.receipt_path != receipt
             || p.schema != "crypto.ml-dataset.owned-replay-policy/v1"
-            || p.mode != "original_owned_search_rows_v1"
+            || ReplayMode::parse(&p.mode).is_none()
             || p.cell_indices.is_empty()
             || p.cell_indices.len() > MAX_CELLS
             || p.cell_indices.windows(2).any(|v| v[0] >= v[1])
@@ -246,6 +263,7 @@ impl Session {
         Ok(session)
     }
     pub(super) fn verify(&mut self, dir: &Path, manifest: &CellManifest) -> Result<(), String> {
+        let mode = ReplayMode::parse(&self.policy.mode).ok_or("invalid retained owned replay mode")?;
         let slot = self
             .slots
             .iter_mut()
@@ -272,11 +290,7 @@ impl Session {
         if let Some(custody) = slot.custody.as_mut() {
             // REQUIRED dependency: retained-owner revalidation. No cached scalar verdict,
             // no new Policy, no transcript/payload work outside the retained central ledger.
-            if matches!(
-                custody.verdict(),
-                solvers::OwnedReplayVerdict::CheckedScope
-
-            ) {
+            if mode.accepts(custody.verdict()) {
                 custody.revalidate(
                     dir,
                     &manifest.config,
@@ -292,7 +306,11 @@ impl Session {
                 stream_bytes: self.policy.stream_bytes_per_cell,
                 payload_bytes: self.policy.payload_bytes_per_cell,
             };
-            slot.custody = Some(solvers::verify_owned_search_cell(
+            let verify = match mode {
+                ReplayMode::Terminal => solvers::verify_owned_search_cell,
+                ReplayMode::Historical => solvers::verify_owned_search_historical_cell,
+            };
+            slot.custody = Some(verify(
                 dir,
                 &manifest.config,
                 &manifest.outcome,
@@ -302,10 +320,12 @@ impl Session {
         }
         // Never map/drop a Failed/Unknown central frame into an unowned String.
         match slot.custody.as_ref().unwrap().verdict() {
-            solvers::OwnedReplayVerdict::CheckedScope
-            => {
+            verdict if mode.accepts(verdict) => {
                 slot.failed = false;
                 Ok(())
+            }
+            solvers::OwnedReplayVerdict::CheckedScope | solvers::OwnedReplayVerdict::HistoricalCheckedScope => {
+                Err("owned-search replay verdict differs from authorized mode; custody retained".into())
             }
             solvers::OwnedReplayVerdict::Incomplete => {
                 Err("owned-search replay incomplete; custody retained".into())
@@ -323,6 +343,7 @@ impl Session {
         let slot=self.slots.iter_mut().find(|s|s.index==manifest.cell_index).ok_or("search restricted projection slot missing")?;
         slot.failed=true;
         let value=slot.custody.as_mut().ok_or("search restricted projection owner missing")?.project_identity()?;
+        if !ReplayMode::parse(&self.policy.mode).ok_or("invalid retained owned replay mode")?.projection_matches(&value){return Err("owned projection differs from authorized replay mode; custody retained".into())}
         slot.projections+=1;slot.failed=false;Ok(value)
     }
     pub(super) fn write_receipt(&mut self, path: &Path, success: bool) -> Result<(), String> {
@@ -333,15 +354,16 @@ impl Session {
         let rows:Vec<Value>=self.slots.iter().map(|s|{
             let verdict=match s.custody.as_ref().map(|c|c.verdict()){
                 Some(solvers::OwnedReplayVerdict::CheckedScope)=>"checked_owned_row_scope",
+                Some(solvers::OwnedReplayVerdict::HistoricalCheckedScope)=>"checked_historical_owned_row_scope",
                 Some(solvers::OwnedReplayVerdict::Incomplete)=>"incomplete",
                 Some(solvers::OwnedReplayVerdict::Unknown)=>"unknown",
                 Some(solvers::OwnedReplayVerdict::Rejected)=>"rejected",
                 None if s.consumed=>"admission_refused",
                 None=>"unattempted",
             };
-            json!({"cell_index":s.index,"mode":"original_owned_search_rows_v1","consumed":s.consumed,"visits":s.visits,"failed":s.failed,"verdict":verdict,"restricted_row_projections":s.projections,"charged":s.custody.as_ref().map(|c|c.charged())})
+            json!({"cell_index":s.index,"mode":self.policy.mode,"consumed":s.consumed,"visits":s.visits,"failed":s.failed,"verdict":verdict,"restricted_row_projections":s.projections,"charged":s.custody.as_ref().map(|c|c.charged())})
         }).collect();
-        let value = json!({"schema":"crypto.ml-dataset.owned-replay-invocation/v1","run_sha256":self.policy.run_sha256,"verification_returned_ok":success,"reserved_work":self.reserved_work,"reserved_bytes":self.reserved_bytes,"caller_charged_work":self.caller.work,"caller_charged_bytes":self.caller.bytes,"slots":rows,"solver_completed":false,"training_export_admitted":false});
+        let value = json!({"schema":"crypto.ml-dataset.owned-replay-invocation/v1","run_sha256":self.policy.run_sha256,"mode":self.policy.mode,"verification_returned_ok":success,"reserved_work":self.reserved_work,"reserved_bytes":self.reserved_bytes,"caller_charged_work":self.caller.work,"caller_charged_bytes":self.caller.bytes,"slots":rows,"solver_completed":false,"training_export_admitted":false});
         let mut file = std::fs::OpenOptions::new()
             .create_new(true)
             .write(true)
@@ -423,7 +445,10 @@ pub(super) fn invoke(
                 return Err("existing owned-search replay invocation; reconcile instead of retry".into());
             }
             let session = Session::from_policy(&root, policy, receipt)?;
-            let start = json!({"schema":"crypto.ml-dataset.owned-replay-start/v1","policy_sha256":session.policy_sha256,"run_sha256":session.policy.run_sha256});
+            if ReplayMode::parse(&session.policy.mode)==Some(ReplayMode::Historical) && matches!(&args.command,DatasetCommand::Generate(_)) {
+                return Err("historical replay policy cannot authorize generation".into());
+            }
+            let start = json!({"schema":"crypto.ml-dataset.owned-replay-start/v1","mode":session.policy.mode,"policy_sha256":session.policy_sha256,"run_sha256":session.policy.run_sha256});
             let mut file = std::fs::OpenOptions::new()
                 .create_new(true)
                 .write(true)
@@ -459,6 +484,7 @@ pub(super) fn authorize_generation(plan: &DatasetPlan, binding: &Value) -> Resul
     }
     // Match storage::write_json through an admitted bounded writer.
     with_current(|s| {
+        if s.as_ref().is_some_and(|s|ReplayMode::parse(&s.policy.mode)==Some(ReplayMode::Historical)){return Err("historical replay policy cannot authorize generation".into())}
         let s = s.ok_or("explicit owned-search replay policy required before generation")?;
         s.caller.reserve_read()?;
         struct Bounded(Vec<u8>);
@@ -497,6 +523,7 @@ pub(super) fn authorize_cell_dispatch(index: u64, config: &CaseConfig) -> Result
     }
     with_current(|s| {
         let s = s.ok_or("explicit owned-search replay policy required before cell dispatch")?;
+        if ReplayMode::parse(&s.policy.mode)!=Some(ReplayMode::Terminal){return Err("historical replay policy cannot authorize cell dispatch".into())}
         if Instant::now() >= s.deadline
             || !s
                 .slots

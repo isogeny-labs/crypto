@@ -7610,14 +7610,14 @@ pub(super) fn verify_owned_search_unsupported(config:&CaseConfig,outcome:&Value,
     Ok(())
 }
 #[derive(Clone,Copy,Debug,PartialEq,Eq)]
-pub(super) enum OwnedReplayVerdict { CheckedScope,Incomplete,Unknown,Rejected }
+pub(super) enum OwnedReplayVerdict { CheckedScope,HistoricalCheckedScope,Incomplete,Unknown,Rejected }
 pub(super) struct OwnedReplayCustody {
     owner:koblitz_m3::sat_original_owner::central::owned::Custody,
 }
 impl OwnedReplayCustody {
     pub(super) fn verdict(&self)->OwnedReplayVerdict {
         use koblitz_m3::sat_original_owner::central::owned::Verdict;
-        match self.owner.verdict(){Verdict::CheckedScope=>OwnedReplayVerdict::CheckedScope,Verdict::Incomplete=>OwnedReplayVerdict::Incomplete,Verdict::Unknown=>OwnedReplayVerdict::Unknown,Verdict::Rejected=>OwnedReplayVerdict::Rejected}
+        match self.owner.verdict(){Verdict::CheckedScope=>OwnedReplayVerdict::CheckedScope,Verdict::HistoricalCheckedScope=>OwnedReplayVerdict::HistoricalCheckedScope,Verdict::Incomplete=>OwnedReplayVerdict::Incomplete,Verdict::Unknown=>OwnedReplayVerdict::Unknown,Verdict::Rejected=>OwnedReplayVerdict::Rejected}
     }
     pub(super) fn charged(&self)->(u64,u64){self.owner.usage()}
     pub(super) fn retained_slot_bytes()->usize{std::mem::size_of::<Self>()}
@@ -7629,4 +7629,10 @@ impl OwnedReplayCustody {
 pub(super) fn verify_owned_search_cell(dir:&Path,config:&CaseConfig,outcome:&Value,artifacts:&[super::types::Artifact],policy:SatReplayPolicy)->OwnedReplayCustody {
     use koblitz_m3::sat_original_owner::central;
     OwnedReplayCustody{owner:central::owned::verify(dir,config,outcome,artifacts,central::Policy{work:policy.work,bytes:policy.bytes,deadline:policy.deadline,stream_bytes:policy.stream_bytes,payload_bytes:policy.payload_bytes})}
+}
+
+/// Explicit historical-checkpoint replay; never aliases terminal CheckedScope.
+pub(super) fn verify_owned_search_historical_cell(dir:&Path,config:&CaseConfig,outcome:&Value,artifacts:&[super::types::Artifact],policy:SatReplayPolicy)->OwnedReplayCustody {
+    use koblitz_m3::sat_original_owner::central;
+    OwnedReplayCustody{owner:central::owned::verify_historical(dir,config,outcome,artifacts,central::Policy{work:policy.work,bytes:policy.bytes,deadline:policy.deadline,stream_bytes:policy.stream_bytes,payload_bytes:policy.payload_bytes})}
 }
