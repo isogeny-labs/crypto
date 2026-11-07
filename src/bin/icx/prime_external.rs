@@ -22,7 +22,7 @@ pub(super) fn generate_route(args: &PrimeRouteGenerateArgs) -> Result<Value, Str
 
 #[derive(Args)]
 pub struct PrimeArgs {
-    /// Prime field modulus (5..=1000000).
+    /// Prime field modulus (5..=40000000).
     #[arg(long)]
     p: u64,
     /// Short-Weierstrass coefficient a.
@@ -188,11 +188,11 @@ pub(super) fn count_curve_order(p: u64, a: u64, b: u64) -> u64 {
 }
 
 pub fn solve(args: &PrimeArgs) -> Result<Value, String> {
-    if !(5..=1_000_000).contains(&args.p) || !prime(args.p) {
-        return Err("p must be prime and in 5..=1000000".into());
+    if !(5..=40_000_000).contains(&args.p) || !prime(args.p) {
+        return Err("p must be prime and in 5..=40000000".into());
     }
-    if !(3..=4_000_000).contains(&args.n) || !prime(args.n) {
-        return Err("n must be prime and in 3..=4000000".into());
+    if !(3..=80_000_000).contains(&args.n) || !prime(args.n) {
+        return Err("n must be prime and in 3..=80000000".into());
     }
     if [args.a, args.b, args.gx, args.gy, args.qx, args.qy]
         .iter()
