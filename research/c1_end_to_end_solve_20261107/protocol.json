@@ -1,0 +1,700 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "C1-END-TO-END-SOLVE-20261107",
+  "version": 1,
+  "created": "2026-11-07",
+  "repository": "crypto",
+  "study_dir": "research/c1_end_to_end_solve_20261107",
+  "authors": [
+    "research session (subagent of the main session); frozen before any measured data"
+  ],
+  "links": {
+    "yield_study": "research/c1_twisted_line_ladder_20261027/README.md",
+    "construction": "research/lift_dense_factor_base_20261027/README.md",
+    "rules": "research/subgroup_trap_20261107/README.md",
+    "instrument_source": "src/cryptanalysis/ecbench/xline_bin.rs",
+    "specs": [
+      "research/c1_end_to_end_solve_20261107/specs/c1-e2e-m5.json",
+      "research/c1_end_to_end_solve_20261107/specs/c1-e2e-m7.json"
+    ]
+  },
+  "question": "Does the twisted all-lift line u.F_q lower the complete, verified, cold end-to-end index-calculus cost (relations, linear algebra, discrete log) against the standard base F_q on the same one-target workloads, in ecbench's counted unit, and what is each arm's distance to the matched strong rho?",
+  "claims": [
+    {
+      "id": "C1",
+      "text": "Paired totals ratio S(ic-tw-a)/S(ic-std) over all (workload, round) pairs at m = 5, with its paired bootstrap 95% interval, at every weight w in {0, 0.1, 1} of the section 5a band.",
+      "class": "comparative",
+      "decided_by": [
+        "C-tw-vs-std-m5"
+      ],
+      "if_supported": "An end-to-end pipeline improvement of the twisted line over the standard base at m = 5 (stage 2 extends it to m = 7).",
+      "if_not_supported": "A tie or a loss is the result and is reported as such; the per-trial yield gain does not carry end to end."
+    },
+    {
+      "id": "C2",
+      "text": "Each IC arm's distance to the matched rho: S(arm)/S(rho_ref) with rho_ref the cheaper (lower Sigma S) of rho-strong-l1 and rho-strong-l16, at each w of the band.",
+      "class": "comparative",
+      "decided_by": [
+        "C-gap-rho-m5"
+      ],
+      "if_supported": "Distance remaining reported per arm; not a gate.",
+      "if_not_supported": "n/a: descriptive distance."
+    },
+    {
+      "id": "C3",
+      "text": "Noise floors: construction A/A (ic-tw-b against ic-tw-a, C-aa-line) and wall A/A (ic-tw-a-aa against ic-tw-a, C-aa-wall) are reported beside C1; C1 counts only if its interval excludes the line-A/A interval.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "At toy size the relation phase dominates; the twisted line needs about twice the relations (columns q-1 against about q/2) but each trial yields a relation with probability about 0.5-0.75 against about 0.08, at an unchanged per-trial solve cost, so the end-to-end S ratio twisted/standard is below 1.",
+      "mechanism": "Yield identity (2Q-2)^4/(Q-2)^4 about 16 per trial (PR #2704), per-trial cost ratio 0.961, 2LP cost-model prediction 2^-0.5 at scale (PR #2686/#2704 model); at toy size linear algebra is negligible, so the derived toy prediction is lower than 2^-0.5.",
+      "predictions": [
+        {
+          "id": "P1",
+          "metric": "S_cold_end_to_end",
+          "direction": "lower",
+          "minimum_effect": "upper end of the paired 95% interval below 1 at w = 0, 0.1 and 1; predicted point value in [0.1, 0.71]",
+          "provenance": {
+            "written_at": "2026-11-07",
+            "first_recorded_in": "research/c1_end_to_end_solve_20261107/PROTOCOL.md",
+            "data_seen": [
+              {
+                "path": "research/c1_twisted_line_ladder_20261027/README.md",
+                "measured": "per-trial yield ratio about 16 (tau = 1 curves) and per-trial Macaulay cost ratio 0.961 [0.928, 0.991]; no end-to-end solve"
+              },
+              {
+                "path": "research/subgroup_trap_20261107/README.md",
+                "measured": "construction rules; 2E concentration; no end-to-end solve"
+              }
+            ],
+            "sample_status": "out_of_sample",
+            "decisive_scope": "end-to-end solves on f2m4_a0 curves, never measured"
+          }
+        },
+        {
+          "id": "P2",
+          "metric": "S_cold_end_to_end",
+          "direction": "equal_within",
+          "minimum_effect": "interval contains 1",
+          "provenance": {
+            "written_at": "2026-11-07",
+            "first_recorded_in": "research/c1_end_to_end_solve_20261107/PROTOCOL.md",
+            "data_seen": [
+              {
+                "path": "research/c1_twisted_line_ladder_20261027/README.md",
+                "measured": "per-trial yield ratio about 16 (tau = 1 curves) and per-trial Macaulay cost ratio 0.961 [0.928, 0.991]; no end-to-end solve"
+              },
+              {
+                "path": "research/subgroup_trap_20261107/README.md",
+                "measured": "construction rules; 2E concentration; no end-to-end solve"
+              }
+            ],
+            "sample_status": "out_of_sample",
+            "decisive_scope": "end-to-end solves on f2m4_a0 curves, never measured"
+          }
+        },
+        {
+          "id": "P3",
+          "metric": "S_cold_end_to_end",
+          "direction": "higher",
+          "minimum_effect": "every IC arm above rho (distance > 1) at these sizes; reported as distance, not a gate",
+          "provenance": {
+            "written_at": "2026-11-07",
+            "first_recorded_in": "research/c1_end_to_end_solve_20261107/PROTOCOL.md",
+            "data_seen": [
+              {
+                "path": "research/c1_twisted_line_ladder_20261027/README.md",
+                "measured": "per-trial yield ratio about 16 (tau = 1 curves) and per-trial Macaulay cost ratio 0.961 [0.928, 0.991]; no end-to-end solve"
+              },
+              {
+                "path": "research/subgroup_trap_20261107/README.md",
+                "measured": "construction rules; 2E concentration; no end-to-end solve"
+              }
+            ],
+            "sample_status": "out_of_sample",
+            "decisive_scope": "end-to-end solves on f2m4_a0 curves, never measured"
+          }
+        }
+      ]
+    }
+  ],
+  "arms": [
+    {
+      "id": "rho-strong-l1",
+      "role": "reference",
+      "description": "rho.negation_strong, lanes=1, dp_bits=auto",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "method": "rho.negation_strong",
+          "lanes": "1",
+          "dp_bits": "auto"
+        },
+        "image_digest": null
+      }
+    },
+    {
+      "id": "rho-strong-l16",
+      "role": "reference",
+      "description": "rho.negation_strong, lanes=16, dp_bits=auto",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "method": "rho.negation_strong",
+          "lanes": "16",
+          "dp_bits": "auto"
+        },
+        "image_digest": null
+      }
+    },
+    {
+      "id": "ic-std",
+      "role": "baseline",
+      "description": "ic.pipeline, bin-x-line:line=standard, gaudry-x-bin:macaulay=26,sparsest=1,charge_unsolved=1",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "method": "ic.pipeline",
+          "factor_base": "bin-x-line:line=standard",
+          "oracle": "gaudry-x-bin:macaulay=26,sparsest=1,charge_unsolved=1"
+        },
+        "image_digest": null
+      }
+    },
+    {
+      "id": "ic-tw-a",
+      "role": "candidate",
+      "description": "ic.pipeline, bin-x-line:line=twisted,line_seed=1, same oracle",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "method": "ic.pipeline",
+          "factor_base": "bin-x-line:line=twisted,line_seed=1",
+          "oracle": "gaudry-x-bin:macaulay=26,sparsest=1,charge_unsolved=1"
+        },
+        "image_digest": null
+      },
+      "same_instrument_as": "ic-std"
+    },
+    {
+      "id": "ic-tw-b",
+      "role": "candidate",
+      "description": "ic.pipeline, bin-x-line:line=twisted,line_seed=2, same oracle (construction A/A)",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "method": "ic.pipeline",
+          "factor_base": "bin-x-line:line=twisted,line_seed=2",
+          "oracle": "gaudry-x-bin:macaulay=26,sparsest=1,charge_unsolved=1"
+        },
+        "image_digest": null
+      },
+      "same_instrument_as": "ic-std"
+    },
+    {
+      "id": "ic-tw-a-aa",
+      "role": "control_aa",
+      "description": "repeat of ic-tw-a (wall-time A/A)",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "method": "ic.pipeline",
+          "factor_base": "bin-x-line:line=twisted,line_seed=1",
+          "oracle": "gaudry-x-bin:macaulay=26,sparsest=1,charge_unsolved=1"
+        },
+        "image_digest": null
+      },
+      "same_instrument_as": "ic-tw-a"
+    },
+    {
+      "id": "oracle-vs-pairtable",
+      "role": "control_positive",
+      "description": "unit test xline_bin::tests::oracle_finds_every_decomposition_the_pair_table_finds: on 12 targets per line (m = 5) the oracle's decomposition set equals an independent pair-table enumeration over the same base",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "test",
+            "--release",
+            "--lib",
+            "xline_bin"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      }
+    },
+    {
+      "id": "construction-refusals",
+      "role": "control_negative",
+      "description": "bin-x-line refuses a != 0 curves, b in F_(q^2) and a twisted line that is not all-lift; unit test curve_and_lines_follow_the_construction_rules",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "test",
+            "--release",
+            "--lib",
+            "xline_bin"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa-line",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": true,
+      "arm": "oracle-vs-pairtable",
+      "expected_detection": "Every closed system's decomposition set equals the pair-table enumeration, with at least one nonempty set per line; any mismatch voids the oracle. Every measured run must verify [k]G = Q (runner and ecbench verify --replay).",
+      "not_applicable_reason": null
+    },
+    "negative": {
+      "present": true,
+      "arm": "construction-refusals",
+      "null_population": {
+        "description": "Lines and curves outside the construction rules: a != 0 curves, b in F_(q^2), and twisted draws that are not all-lift; each must be refused (no base is built).",
+        "generator": "xline_bin unit test curve_and_lines_follow_the_construction_rules plus the builder's refusal branches",
+        "n": 2,
+        "why_n": "Exact refusals at m = 5 and m = 7; no sampling.",
+        "matched_on": [
+          "m",
+          "tower",
+          "oracle"
+        ]
+      },
+      "not_applicable_reason": null
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "line",
+        "levels": [
+          "standard",
+          "twisted"
+        ]
+      },
+      {
+        "name": "m",
+        "levels": [
+          5,
+          7
+        ]
+      },
+      {
+        "name": "method",
+        "levels": [
+          "ic.pipeline",
+          "rho.negation_strong"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "curve",
+        "treatment": "fixed",
+        "value": "f2m4_a0 m, seed 1, max_cofactor 8 (deterministic constructor)",
+        "how": "spec"
+      },
+      {
+        "name": "oracle",
+        "treatment": "fixed",
+        "value": "gaudry-x-bin macaulay=26 sparsest=1 charge_unsolved=1, identical on every IC arm",
+        "how": "spec"
+      },
+      {
+        "name": "linear algebra and targets",
+        "treatment": "fixed",
+        "value": "ic.pipeline defaults incremental-gauss, walk",
+        "how": "spec defaults written out by ecbench before hashing"
+      },
+      {
+        "name": "algorithm seeds",
+        "treatment": "crossed",
+        "value": "one seed per (workload, round) shared by every arm",
+        "how": "ecbench measurement.seed = 1"
+      },
+      {
+        "name": "host and binary",
+        "treatment": "fixed",
+        "value": "one isolab-eks image built from the frozen commit, one Job",
+        "how": "isolab-experiment.yml source_revision"
+      },
+      {
+        "name": "arm order",
+        "treatment": "randomized",
+        "value": "alternate",
+        "how": "spec measurement.order"
+      },
+      {
+        "name": "line_seed",
+        "treatment": "crossed",
+        "value": [
+          1,
+          2
+        ],
+        "how": "twisted arms ic-tw-a (1) and ic-tw-b (2); the A/A of the line draw"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-tw-vs-std-m5",
+        "arms": [
+          "ic-std",
+          "ic-tw-a"
+        ],
+        "differs_in": [
+          "line"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-gap-rho-m5",
+        "arms": [
+          "ic-std",
+          "ic-tw-a",
+          "rho-strong-l1",
+          "rho-strong-l16"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "absolute",
+        "threshold": "distance to rho reported, no threshold (success criterion: distance remaining)"
+      },
+      {
+        "id": "C-aa-line",
+        "arms": [
+          "ic-tw-a",
+          "ic-tw-b"
+        ],
+        "differs_in": [
+          "line_seed"
+        ],
+        "design": "aa"
+      },
+      {
+        "id": "C-aa-wall",
+        "arms": [
+          "ic-tw-a",
+          "ic-tw-a-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261107,
+        1
+      ],
+      "nonce": null,
+      "note": "target_seed 20261107, measurement seed 1; line seeds 1 and 2; curve seed 1"
+    },
+    "instance_sampling": {
+      "rule": "targets_per_curve planted targets from target_seed; no selection by outcome",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Primary metric is an exact count; ecbench compare is a fixed command over all pairs."
+    }
+  },
+  "sample_size": {
+    "instances": 6,
+    "replicates": 5,
+    "warmups": 1,
+    "power": {
+      "method": "paired_bootstrap",
+      "alpha": 0.05,
+      "tests_in_family": 2,
+      "correction": "holm",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Counts are deterministic per (workload, seed); rounds resample seeds. Effect predicted large (ratio < 0.71)."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": null,
+      "measured_on": "Not measured: this session could not build (shared-disk floor). A development smoke must measure per-trial seconds before dispatch; see stopping rules."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "S_cold_end_to_end",
+        "name": "S = total GAE / sqrt(r), every phase charged, cold",
+        "unit": "S",
+        "kind": "exact",
+        "definition": "ecbench record S of a verified run; solver F_q multiplications priced at fq_muls_per_add",
+        "source": "session records",
+        "aggregation": "paired_ratio",
+        "resolution": "exact",
+        "uncertainty": "paired_bootstrap_ci95"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "wall_s",
+        "name": "Wall time per execution",
+        "unit": "wall_s",
+        "kind": "timed",
+        "definition": "record wall time; a result only if the run earned L2 and lies outside the A/A interval",
+        "source": "session records",
+        "aggregation": "paired_ratio",
+        "resolution": "ns",
+        "uncertainty": "paired_bootstrap_ci95"
+      },
+      {
+        "id": "trials_relations",
+        "name": "trials, relations, decompositions per trial",
+        "unit": "count",
+        "kind": "exact",
+        "definition": "pipeline counters",
+        "source": "records",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "warmups": 1,
+    "order": "alternate",
+    "clock": "monotonic",
+    "counters": [
+      "S",
+      "gae by phase",
+      "solver F_q multiplications",
+      "*_uncharged counters"
+    ],
+    "record": [
+      "commit, image digest, binary sha256",
+      "ecbench host, isolation level",
+      "audit receipt sha256"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "cpu-l2-spot",
+    "placement": {
+      "instance_type": "c8a.2xlarge",
+      "budget": "USD 10 total for this task, build, failed and interrupted attempts included",
+      "route": "isolab-experiment.yml dispatched on main with source_revision = the frozen 40-character commit and spec_path = research/c1_end_to_end_solve_20261107/specs/c1-e2e-m5.json"
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 3600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 2
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Before dispatch, unit tests (xline_bin) and a development smoke solve of one m = 5 workload per IC arm must pass, and its per-execution time must be measured. If the m = 5 spec's projected time (executions x per-execution seconds, warmup included) exceeds 2700 s, run each IC arm as its own dispatch of the same spec restricted to that arm plus both rho arms and the A/A arm, never fewer targets or rounds.",
+      "kind": "preregistered_sequential",
+      "preregistered": true
+    },
+    {
+      "rule": "Stage 2 (m = 7 spec) runs only if stage 1 completes and its measured per-execution times project stage 2 below 2700 s per dispatch; otherwise it is recorded as not run.",
+      "kind": "preregistered_sequential",
+      "preregistered": true
+    },
+    {
+      "rule": "Total spend USD 10 including build, failed and interrupted attempts; stop new launches when reached or unknown.",
+      "kind": "budget",
+      "preregistered": true
+    },
+    {
+      "rule": "Any wrong_answer, exhausted or timeout run is kept; a comparison containing one is incomplete and decides nothing.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Audit not OK or any replay not identical: no result.",
+    "A run from another commit, image or spec hash: inadmissible.",
+    "Changing the oracle, line seeds, curves, targets, seeds, unit or accounting after any measured data."
+  ],
+  "decision_rule": {
+    "text": "Primary: ecbench compare --a ic-std --b ic-tw-a over all (workload, round) pairs at m = 5, priced at w = 0, 0.1, 1 GAE per uncharged native operation on every arm. Twisted is an end-to-end improvement iff the paired 95% interval's upper end is below 1 at all three weights and C-aa-line's interval contains 1; a regression iff the lower end is above 1 at all three weights; otherwise unresolved (tie). Gap to rho is reported per arm and weight as distance remaining, not as a gate. The two decision comparisons (C-tw-vs-std-m5, C-gap-rho-m5) are read with Holm's correction at family alpha 0.05; the A/A comparisons C-aa-line and C-aa-wall set noise floors and decide nothing.",
+    "comparison_ids": [
+      "C-tw-vs-std-m5",
+      "C-gap-rho-m5"
+    ],
+    "threshold": "95% paired bootstrap interval vs 1 across the band",
+    "statistic": "paired totals ratio Sigma S_B / Sigma S_A over (workload, round) pairs (ecbench compare)",
+    "interval": "paired bootstrap 95% (ecbench compare), at each band weight w in {0, 0.1, 1}",
+    "multiple_comparison_correction": "holm",
+    "effect_size_measure": "ratio of totals, with log2 of the ratio",
+    "verdict_vocabulary": [
+      "improvement",
+      "regression",
+      "unresolved",
+      "incomplete"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "ecbench compare / table / verify (native)",
+      "sha256": null
+    },
+    "inputs": [
+      "sessions/"
+    ],
+    "outputs": [
+      "compare JSON per pair, table, audit receipt"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "S per arm per workload with rho band; ratio with interval across w"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Reporting the per-trial yield gain as an end-to-end improvement",
+    "Using wall time below L2 or inside the A/A interval as a result",
+    "Dropping failed runs",
+    "Shrinking targets or rounds to fit a deadline"
+  ],
+  "literature": [
+    {
+      "ref": "research/c1_twisted_line_ladder_20261027/README.md",
+      "provenance": "internal",
+      "claim": "yield ratio about 16, per-trial cost ratio 0.961",
+      "verified_by": "read 2026-11-07"
+    },
+    {
+      "ref": "research/subgroup_trap_20261107/README.md",
+      "provenance": "internal",
+      "claim": "construction rules",
+      "verified_by": "read 2026-11-07"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  }
+}
