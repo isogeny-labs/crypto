@@ -163,13 +163,16 @@ and `rg` instead:
 cargo build --release
 ./run_all.sh reports/run-20261107T1              # selftest, 8 cells, score, hashes (about 8 min on 4 cores)
 ./target/release/posthoc reports/run-20261107T1   # post hoc pooled analysis
+./target/release/validate reports/run-20261107T1 claimed.json <cell=sha256>...   # validator report
 python3 plot.py reports/run-20261107T1            # layout only
 ```
 
 ## Claim record
 
-- `PCC-PENDING` (measurement). Its proof is
-  `reports/run-20261107T1/validator-report.json`: `odd_n_trace validate`
-  recomputes the registered verdicts and headline numbers from the
-  sha256-pinned cell rows. No signed verdict covers it, so every statement
+- `PCC-20261107-8b6f08` (measurement; `pcc verify`: not_covered). Its proof
+  is `reports/run-20261107T1/validator-report.json`. The `validate` binary
+  (`src/bin/validate.rs`, written after the run) reuses the frozen scorer
+  and recomputes the registered verdicts (as PASS = 1, FAIL = 0) and the
+  headline numbers from the sha256-pinned cell rows. The post hoc pooled
+  numbers are not in the validator report. No signed verdict covers it, so every statement
   here is [pcc:unverified].

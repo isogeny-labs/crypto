@@ -1,0 +1,20 @@
+{
+ "created_at": "2026-11-07T23:33:59Z",
+ "id": "PCC-20261107-8b6f08",
+ "kind": "measurement",
+ "producer": {
+  "commit": "ae08d6d920e44fa388dd8e1915e98d5d16e03c1c",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "kind": "recompute",
+   "path": "research/odd_n_trace_accounting_20261107/reports/run-20261107T1/validator-report.json",
+   "sha256": "1386e436f03a03f053fa0aea1438eaff6f3d9434fc7d95cf2050f4ae39a4a786"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "exact toy-size counts; research/odd_n_trace_accounting_20261107 run-20261107T1; no ECDLP cost, no solver cost",
+ "statement": "Odd-n trace accounting at toy sizes (E: y^2+xy=x^3+ax^2+b over F_{2^N}, N=dn; n=3,5 with d=3,4,5 and the n=4 control with d=3,4; 4 curves per cell): exact counts N(R) of ordered n-decompositions over F_q-line factor bases. Exact checks: 2E criterion vs [#E/2]R=O 0 mismatches; MITM vs brute force 0 mismatches on 2,293,041 (arm,target) pairs; coset identity sum_{2E}N=((m0+m1)^n+(m0-m1)^n)/2 exact on 120 census arm-units; 0 of 469,256 off-2E counts nonzero for trace-homogeneous arms at odd n. On 2E targets the pooled size-normalised ratio kappa_tw/kappa_std is 1.96 for odd n and 0.996 for n=4. Registered verdicts: P2, P4, P7, P8 PASS; P1, P3, P5, P6 FAIL (zero means and degenerate units at n=5); interpretation rule inconclusive. Post hoc pooling (labelled, in posthoc.txt, not recomputed by the validator): a matched-size trace-homogeneous ordinary line hz gets the same factor (kappa_hz/kappa_std 2.08 [1.62,2.72] on 2E; kappa_tw/kappa_hz 0.90 [0.71,1.11])."
+}
