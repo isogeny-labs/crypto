@@ -124,3 +124,33 @@ record's `fit.alpha` and `fit.alpha_ci95`), at each weight.
 - The run report goes in `reports/`.
 - The 12 records, plus the rebuilt `docs/bounds/frontier.json` and `FRONTIER.md`.
 - A `benchmarks/` row and `bench.record/v1` record.
+
+## Amendment 1 (2026-11-07): restart after a host loss
+
+The two sessions started at 2026-11-06T23:03Z
+(`sessions/minus-20261106` and `sessions/plus-20261106`) were killed outright
+when the container was reclaimed while idle, shortly after 00:45Z. By then
+they had written 526 and 525 of 672 records, through part of the 58-bit size.
+
+A killed runner cannot finalise its session, so both read `running`. They are
+kept, never deleted:
+- `ecbench verify --replay 0 --allow-interrupted` audits them as interrupted:
+  `interruption: never_finalised`, 0 problems
+  (`sessions/*-20261106.interrupted-audit.json`);
+- they are not cited as complete;
+- they enter no fit.
+
+The same specs, with no change, are run again from scratch into
+`sessions/minus-20261107` and `sessions/plus-20261107`, with the same binary
+and running arrangement as §2. A watcher process keeps the host alive while
+they run. §3 and §4 then apply to these sessions in place of the
+`-20261106` ones.
+
+The interrupted records are compared with the new runs as an extra
+reproduction check:
+- every record in the interrupted sessions should equal the new session's run
+  with the same arm, curve and target index;
+- mismatches are reported.
+
+Nothing else changes: sizes, targets, arms, analysis, predictions and
+decision rules are as frozen above.
