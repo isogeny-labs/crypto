@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261107T0640Z-ic-auto-base",
+  "latest_record": "20261107T0710Z-rho-v3-frobenius",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 1,
-    "measured": 49,
+    "measured": 50,
     "open": 0
   },
   "repo": "crypto",
@@ -417,6 +417,63 @@
         }
       ],
       "problem": "dlpwai:static-dh-p224-shape",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.459,
+      "latest": 0.459,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_frob_v3_over_v2_ops",
+      "points": [
+        {
+          "commit": "3592f4a17261",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 864,
+          "record": "20261107T0710Z-rho-v3-frobenius",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.418,
+            0.504
+          ],
+          "summary": "rho.signed_frobenius_v3 vs v2 on Koblitz 2^15.4..2^32.1, local L0, counted GAE: paired ops 0.459 [0.418,0.504], band-robust; medium tier 1.076x floor [0.998,1.147] (v2 1.249x); search phase 1.03-1.04x floor from 2^21. Replay-all 2592/2592. Not validated.",
+          "value": 0.459
+        }
+      ],
+      "problem": "ecdlp:koblitz-ladder",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.142,
+      "latest": 0.142,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_frob_v3_s_k43",
+      "points": [
+        {
+          "commit": "3592f4a17261",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 144,
+          "record": "20261107T0710Z-rho-v3-frobenius",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "rho.signed_frobenius_v3 vs v2 on Koblitz 2^15.4..2^32.1, local L0, counted GAE: paired ops 0.459 [0.418,0.504], band-robust; medium tier 1.076x floor [0.998,1.147] (v2 1.249x); search phase 1.03-1.04x floor from 2^21. Replay-all 2592/2592. Not validated.",
+          "value": 0.142
+        }
+      ],
+      "problem": "ecdlp:koblitz-ladder",
       "unit": "S"
     },
     {
