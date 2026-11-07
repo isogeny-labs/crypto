@@ -17,7 +17,7 @@ fn main() {
     let runs: u64 = args.get(1).and_then(|s| s.parse().ok()).unwrap_or(64);
     let k_override: usize = args.get(2).and_then(|s| s.parse().ok()).unwrap_or(0);
     let weight: u32 = args.get(3).and_then(|s| s.parse().ok()).unwrap_or(3);
-    let cont: bool = args.get(4).map_or(true, |s| s != "0");
+    let cont: bool = args.get(4).is_none_or(|s| s != "0");
     let dp: Option<u32> = args.get(5).and_then(|s| s.parse().ok());
     let ladder: u32 = args.get(6).and_then(|s| s.parse().ok()).unwrap_or(0);
     let sizes: Vec<u32> = env::var("BITS")
