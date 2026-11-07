@@ -336,20 +336,24 @@ pub(super) fn verify_and_store_worker_originals<'a>(
     let mut public_sha256 = [0; 32];
     hex::decode_to_slice(&public.sha256, &mut public_sha256).map_err(|e| e.to_string())?;
     let public_bytes = public.bytes;
-    registry.push(public);
-    registry.push(super::storage::write_json(
+    registry.push(public.clone());
+    let witness = super::storage::write_json(
         root,
         "witness.json",
         "restricted-known-answer",
         &case.private_witness,
-    )?);
+    )?;
+    registry.push(witness.clone());
     let factor_base =
         super::storage::write_json(root, "factor-base.json", "factor-base", &case.factor_base)?;
     let mut factor_base_sha256 = [0; 32];
     hex::decode_to_slice(&factor_base.sha256, &mut factor_base_sha256)
         .map_err(|e| e.to_string())?;
     let factor_base_bytes = factor_base.bytes;
-    registry.push(factor_base);
+    registry.push(factor_base.clone());
+    // Publish original storage receipts before handing out the producer token.
+    // This separate immutable file does not preempt the terminal registry.
+    registry.push(super::original_registry::publish(root, [&public, &witness, &factor_base])?);
     Ok(VerifiedWorkerOriginal {
         config,
         public: &case.public_instance,
@@ -6883,6 +6887,19 @@ mod verified_worker_original_tests {
         }
     }
     #[test]
+    fn original_registry_storage_failure_prevents_worker_token() {
+        let f = Fixture::with_shape(11, false, 4);
+        std::fs::create_dir(f.root.join(dataset::original_registry::PATH)).unwrap();
+        let mut registry = Vec::new();
+        let token = verify_and_store_worker_originals(&f.config, &f.case, &f.root, Some(&f.binding), &mut registry);
+        assert!(token.is_err(), "failed immutable checkpoint must not yield producer authority");
+        assert!(f.root.join("public.json").exists());
+        assert!(f.root.join("factor-base.json").exists());
+        assert!(!registry.iter().any(|a|a.path==dataset::original_registry::PATH));
+        assert!(!f.root.join("live/committed.json").exists());
+    }
+
+    #[test]
     fn worker_token_rejects_self_consistent_policy_substitution_before_original_writes() {
         use crate::ml_dataset::types::FactorBasePolicy;
         for replace_policy in [true, false] {
@@ -7610,14 +7627,14 @@ pub(super) fn verify_owned_search_unsupported(config:&CaseConfig,outcome:&Value,
     Ok(())
 }
 #[derive(Clone,Copy,Debug,PartialEq,Eq)]
-pub(super) enum OwnedReplayVerdict { CheckedScope,Incomplete,Unknown,Rejected }
+pub(super) enum OwnedReplayVerdict { CheckedScope,HistoricalCheckedScope,Incomplete,Unknown,Rejected }
 pub(super) struct OwnedReplayCustody {
     owner:koblitz_m3::sat_original_owner::central::owned::Custody,
 }
 impl OwnedReplayCustody {
     pub(super) fn verdict(&self)->OwnedReplayVerdict {
         use koblitz_m3::sat_original_owner::central::owned::Verdict;
-        match self.owner.verdict(){Verdict::CheckedScope=>OwnedReplayVerdict::CheckedScope,Verdict::Incomplete=>OwnedReplayVerdict::Incomplete,Verdict::Unknown=>OwnedReplayVerdict::Unknown,Verdict::Rejected=>OwnedReplayVerdict::Rejected}
+        match self.owner.verdict(){Verdict::CheckedScope=>OwnedReplayVerdict::CheckedScope,Verdict::HistoricalCheckedScope=>OwnedReplayVerdict::HistoricalCheckedScope,Verdict::Incomplete=>OwnedReplayVerdict::Incomplete,Verdict::Unknown=>OwnedReplayVerdict::Unknown,Verdict::Rejected=>OwnedReplayVerdict::Rejected}
     }
     pub(super) fn charged(&self)->(u64,u64){self.owner.usage()}
     pub(super) fn retained_slot_bytes()->usize{std::mem::size_of::<Self>()}
@@ -7630,3 +7647,13 @@ pub(super) fn verify_owned_search_cell(dir:&Path,config:&CaseConfig,outcome:&Val
     use koblitz_m3::sat_original_owner::central;
     OwnedReplayCustody{owner:central::owned::verify(dir,config,outcome,artifacts,central::Policy{work:policy.work,bytes:policy.bytes,deadline:policy.deadline,stream_bytes:policy.stream_bytes,payload_bytes:policy.payload_bytes})}
 }
+
+/// Explicit historical-checkpoint replay; never aliases terminal CheckedScope.
+pub(super) fn verify_owned_search_historical_cell(dir:&Path,config:&CaseConfig,outcome:&Value,artifacts:&[super::types::Artifact],policy:SatReplayPolicy)->OwnedReplayCustody {
+    use koblitz_m3::sat_original_owner::central;
+    OwnedReplayCustody{owner:central::owned::verify_historical(dir,config,outcome,artifacts,central::Policy{work:policy.work,bytes:policy.bytes,deadline:policy.deadline,stream_bytes:policy.stream_bytes,payload_bytes:policy.payload_bytes})}
+}
+
+#[cfg(test)]
+#[path="owned_authentic_historical_child.rs"]
+mod authentic_historical_child;

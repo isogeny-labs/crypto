@@ -1,0 +1,69 @@
+//! Schema-directed wire-prefix admission. No source authentication or snapshot completion claim.
+use super::*;
+#[derive(Clone,Copy,Debug,PartialEq,Eq)]pub enum State{IncompleteIdentityUnavailable,IncompleteIdentityAvailable,CompleteWire}
+/// Immutable retained input and complete binding prefix. No partial Value is exposed.
+pub struct Audit{raw:Vec<u8>,prefix:Option<Value>,result:Result<State,Failure>,consumed:usize,nodes:u64,charge:Charge}
+impl Audit{pub fn raw(&self)->&[u8]{&self.raw}pub fn result(&self)->Result<State,Failure>{self.result}pub fn binding_prefix(&self)->Option<&Value>{if self.result.is_ok(){self.prefix.as_ref()}else{None}}pub fn consumed(&self)->usize{self.consumed}pub fn nodes(&self)->u64{self.nodes}pub fn charge(&self)->Charge{self.charge}}
+#[derive(Clone,Copy)]enum TextRule<'a>{Any,Exact(&'a str),Hash}
+struct Parser<'a,'b,T:Admission>{reader:Reader<'a,'b,T>}
+impl<T:Admission> Parser<'_,'_,T>{
+ fn pay(&mut self,w:u64,b:u64)->Result<(),Failure>{self.reader.meter.pay(w,b)}
+ fn observed(&mut self,n:usize)->Result<&[u8],Failure>{let count=n.min(self.reader.raw.len()-self.reader.offset);self.reader.take(count)}
+ fn byte(&mut self)->Result<u8,Failure>{Ok(self.reader.take(1)?[0])}
+ fn literal(&mut self,s:&[u8],failure:Failure)->Result<(),Failure>{let got=self.observed(s.len())?;if !s.starts_with(got){return Err(failure)}if got.len()!=s.len(){return Err(Failure::Truncated)}Ok(())}
+ /// Even partial little-endian lengths/numbers reveal a lower bound. Fixed
+ /// counts reveal every expected byte, so reject contradictions before EOF.
+ fn number(&mut self,max:u64,cap:Failure,exact:Option<u64>)->Result<u64,Failure>{let got=self.observed(8)?;if let Some(n)=exact{if !n.to_le_bytes().starts_with(got){return Err(Failure::Shape)}}let mut bytes=[0u8;8];bytes[..got.len()].copy_from_slice(got);let n=u64::from_le_bytes(bytes);if n>max{return Err(cap)}if got.len()!=8{return Err(Failure::Truncated)}Ok(n)}
+ fn start(&mut self,depth:usize)->Result<u8,Failure>{if depth>self.reader.meter.limits.depth{return Err(Failure::Depth)}if self.reader.nodes>=self.reader.meter.limits.nodes{return Err(Failure::Nodes)}self.pay(1,0)?;self.reader.nodes+=1;self.byte()}
+ fn text(&mut self,rule:TextRule<'_>)->Result<String,Failure>{
+  let exact=match rule{TextRule::Exact(s)=>Some(s.len() as u64),TextRule::Hash=>Some(64),TextRule::Any=>None};
+  let n=self.number(self.reader.meter.limits.string_bytes as u64,Failure::StringCap,exact)? as usize;
+  let available=n.min(self.reader.raw.len()-self.reader.offset);
+  self.pay((available as u64).checked_mul(2).ok_or(Failure::Overflow)?,0)?;
+  let got=self.observed(n)?;
+  match rule{TextRule::Exact(s)=>if !s.as_bytes().starts_with(got){return Err(Failure::Shape)},TextRule::Hash=>if !got.iter().all(|b|b.is_ascii_digit()||(b'a'..=b'f').contains(b)){return Err(Failure::Shape)},TextRule::Any=>{}}
+  let valid=match std::str::from_utf8(got){Ok(_)=>true,Err(e)=>{if e.error_len().is_some(){return Err(Failure::Utf8)}let start=e.valid_up_to();let lead=got[start];let need=if lead&0xe0==0xc0{2}else if lead&0xf0==0xe0{3}else if lead&0xf8==0xf0{4}else{return Err(Failure::Utf8)};if start.checked_add(need).ok_or(Failure::Overflow)?>n{return Err(Failure::Utf8)}false}};
+  if got.len()!=n{return Err(Failure::Truncated)}if !valid{return Err(Failure::Utf8)}
+  // Separate immutable borrow of Reader raw from mutable meter.
+  let start=self.reader.offset-n;self.pay(n as u64,(n as u64).checked_add(64).ok_or(Failure::Overflow)?)?;
+  let mut s=String::new();s.try_reserve_exact(n).map_err(|_|Failure::Allocation)?;s.push_str(std::str::from_utf8(&self.reader.raw[start..start+n]).map_err(|_|Failure::Utf8)?);Ok(s)
+ }
+ fn key(&mut self,depth:usize,expected:Option<&str>)->Result<String,Failure>{if self.start(depth)?!=3{return Err(Failure::KeyType)}self.text(expected.map_or(TextRule::Any,TextRule::Exact))}
+ fn value(&mut self,spec:&Spec,depth:usize,rule:TextRule<'_>,true_only:bool)->Result<Value,Failure>{
+  let tag=self.start(depth)?;self.tag_value(spec,depth,rule,true_only,tag)
+ }
+ fn tag_value(&mut self,spec:&Spec,depth:usize,rule:TextRule<'_>,true_only:bool,tag:u8)->Result<Value,Failure>{
+  if let Spec::Maybe(inner)=spec{if tag==0{return Ok(Value::Null)}return self.tag_value(inner,depth,rule,true_only,tag)}
+  let compatible=matches!((spec,tag),(Spec::Any,0..=6)|(Spec::UInt|Spec::UInt32,2)|(Spec::Bool,1)|(Spec::Text,3)|(Spec::Bytes(_),4)|(Spec::List(_)|Spec::Tuple(_),5)|(Spec::Object(_),6));
+  if tag>6{return Err(Failure::Tag)}if !compatible{return Err(Failure::Shape)}
+  match tag{
+   0=>Ok(Value::Null),
+   1=>{let b=self.byte()?;if b>1{return Err(Failure::Boolean)}if true_only&&b!=1{return Err(Failure::Shape)}Ok(Value::Bool(b!=0))},
+   2=>Ok(Value::U64(self.number(if matches!(spec,Spec::UInt32){u32::MAX as u64}else{u64::MAX},Failure::Shape,None)?)),
+   3=>Ok(Value::Text(self.text(rule)?)),
+   4=>{let expected=if let Spec::Bytes(n)=spec{n.map(|x|x as u64)}else{None};let n=self.number(self.reader.meter.limits.bytes_value as u64,Failure::BytesCap,expected)? as usize;if n>self.reader.raw.len()-self.reader.offset{self.observed(n)?;return Err(Failure::Truncated)}let mut bytes=self.reader.meter.vec(n)?;bytes.extend_from_slice(self.observed(n)?);Ok(Value::Bytes(bytes))},
+   5=>{let exact=if let Spec::Tuple(fields)=spec{Some(fields.len() as u64)}else{None};let remaining=self.reader.meter.limits.nodes-self.reader.nodes;let bound=(self.reader.meter.limits.list_items as u64).min(remaining);let n=self.number(bound,if bound==remaining{Failure::Nodes}else{Failure::Container},exact)? as usize;if n as u64>remaining{return Err(Failure::Nodes)}let mut values=self.reader.meter.vec(n)?;for i in 0..n{let child=match spec{Spec::List(s)=>s,Spec::Tuple(a)=>&a[i],_=>&Spec::Any};values.push(self.value(child,depth+1,TextRule::Any,false)?)}Ok(Value::Array(values))},
+   6=>{let exact=if let Spec::Object(fields)=spec{Some(fields.len() as u64)}else{None};let remaining=(self.reader.meter.limits.nodes-self.reader.nodes)/2;let bound=(self.reader.meter.limits.map_fields as u64).min(remaining);let n=self.number(bound,if bound==remaining{Failure::Nodes}else{Failure::Container},exact)? as usize;if (n as u64).checked_mul(2).ok_or(Failure::Overflow)?>self.reader.meter.limits.nodes-self.reader.nodes{return Err(Failure::Nodes)}let mut values:Vec<(String,Value)>=self.reader.meter.vec(n)?;for i in 0..n{let known=if let Spec::Object(fields)=spec{Some(&fields[i])}else{None};let key=self.key(depth+1,known.map(|x|x.0))?;for(prev,_)in &values{self.pay((prev.len()as u64).checked_add(key.len()as u64).ok_or(Failure::Overflow)?,0)?;if prev==&key{return Err(Failure::DuplicateKey)}}let child=known.map_or(&Spec::Any,|x|&x.1);let r=if known.is_some()&&(key=="binding_sha256"||key=="last_event_sha256")&&matches!(child,Spec::Text){TextRule::Hash}else{TextRule::Any};let value=self.value(child,depth+1,r,false)?;values.push((key,value));}Ok(Value::Object(values))},_=>Err(Failure::Tag)
+  }
+ }
+ fn root(&mut self,prefix:&mut Option<Value>)->Result<(),Failure>{
+  self.literal(b"OWNSEARCH\x01",Failure::Magic)?;
+  if self.start(0)?!=6{return Err(Failure::Shape)}let fields=if let Spec::Object(f)=&ROOT{*f}else{unreachable!()};
+  let remaining=(self.reader.meter.limits.nodes-self.reader.nodes)/2;let bound=(self.reader.meter.limits.map_fields as u64).min(remaining);let n=self.number(bound,if bound==remaining{Failure::Nodes}else{Failure::Container},Some(fields.len()as u64))? as usize;
+  if (n as u64)*2>self.reader.meter.limits.nodes-self.reader.nodes{return Err(Failure::Nodes)}
+  let mut head=self.reader.meter.vec(3)?;
+  for(i,(key,spec))in fields.iter().enumerate(){let key_owned=self.key(1,Some(key))?;let rule=if i==0{TextRule::Exact("owned-search-retained-evidence/v1")}else{TextRule::Any};let value=self.value(spec,1,rule,*key=="encoding_complete")?;if i<3{head.push((key_owned,value));if i==2{*prefix=Some(Value::Object(std::mem::take(&mut head)));}}}
+  if self.reader.offset!=self.reader.raw.len(){return Err(Failure::Trailing)}Ok(())
+ }
+}
+/// A resource refusal never becomes an accepted prefix. Raw bytes and accepted
+/// charges survive all outcomes; complete identity is exposed only after the
+/// entire observed suffix has passed incremental shape validation.
+pub fn admit(raw:Vec<u8>,limits:Limits,deadline:Instant,owner:&mut impl Admission)->Audit{
+ let mut audit=Audit{raw,prefix:None,result:Err(Failure::Limits),consumed:0,nodes:0,charge:Charge::default()};
+ if !valid_limits(limits){return audit}if audit.raw.len()>limits.raw_bytes{audit.result=Err(Failure::RawCap);return audit}
+ let mut p=Parser{reader:Reader{raw:&audit.raw,offset:0,nodes:0,meter:Meter{owner,limits,deadline,charge:Charge::default()}}};
+ let parsed=p.root(&mut audit.prefix);
+ audit.result=match parsed{Ok(())=>p.pay(1,0).map(|_|State::CompleteWire),Err(Failure::Truncated)=>p.pay(1,0).map(|_|if audit.prefix.is_some(){State::IncompleteIdentityAvailable}else{State::IncompleteIdentityUnavailable}),Err(e)=>Err(e)};
+ audit.consumed=p.reader.offset;audit.nodes=p.reader.nodes;audit.charge=p.reader.meter.charge;audit
+}

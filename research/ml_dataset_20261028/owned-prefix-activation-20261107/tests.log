@@ -1,0 +1,18 @@
+
+running 13 tests
+test actual_refused_committed_chunk_is_valid_prefix_not_complete ... ok
+test fixed_partial_count_mismatch_is_not_truncation ... ok
+test invalid_ack_hash_prefix_rejects_even_before_full_hash ... ok
+test accepted_owner_charges_match_and_raw_is_retained ... ok
+test resources_and_deadline_never_fall_back_to_prefix ... ok
+test complete_invalid_suffix_invalidates_retained_identity ... ok
+test malformed_suffix_after_complete_identity_is_rejected_at_first_tag ... ok
+test truncated_utf8_must_have_a_possible_valid_completion ... ok
+test complete_wire_trailing_bytes_reject_and_identity_is_unavailable ... ok
+test generic_diagnostic_duplicate_key_cannot_hide_behind_truncation ... ok
+test observed_magic_tag_key_and_schema_mutations_reject_before_eof ... ok
+test partial_lengths_refuse_observed_caps_and_fixed_hash_length ... ok
+first_complete_identity=Some(789)
+test actual_complete_and_every_byte_cut_are_distinguished ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
