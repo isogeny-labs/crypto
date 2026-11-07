@@ -19,11 +19,12 @@ examples/prime_medium_tier_rho_rfit.rs. Curves registered in docs/curves/registr
 Publication receipt: check-experiment-git at dbd587a01aefba0634acc459ea30cfb9bbf49a09.
 
 ## State
-Inputs pushed (PR #3651, branch claude/serene-davinci-ujoi58, auto-merge paused until the round lands).
-Commit-built image requested: isolab-experiment.yml run 42413370386 on main, source_revision
-dbd587a01aefba0634acc459ea30cfb9bbf49a09, publish_only=true. Nothing launched on EKS yet.
-Other items (1, 3a, 3b, 3c, 4, 5) are committed as frozen protocols / desk results; items 1, 3a, 3b, 3c
-and 5 need study images on the command route and owner decisions (see each README); item 4 is complete.
+Inputs frozen and published: protocol.json frozen (protocol_sha256 5643e3e7...4cd6) at 529aa8ee4d;
+requests/final/J1..J6 bound to image 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:
+292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5 (source dbd587a01a, ecbench sha256
+a18af09f...d3b9); publication check at 189b78587b. Benchmark record
+benchmarks/records/20261107T2115Z-prime-medium-rho-bound.json initialised. Next: director card, executor
+launch of J1..J6 one at a time.
 
 ## Next steps
 1. Read the image URI (@sha256), source SHA and ecbench sha256 from run 42413370386's receipt.
@@ -37,7 +38,7 @@ and 5 need study images on the command route and owner decisions (see each READM
 6. After: verify --replay-all, table/band/compare, fit.sh, export, benchrec add-raw/metric/close.
 
 ## Runs in flight
-Image build only: GitHub Actions run 42413370386 (isogeny-labs/crypto). No EKS job yet. Jobs will be
+Image build done (run 42413370386, success). No EKS job yet. Jobs will be
 named prime-medium-rho-20261107-j1..j6.
 
 ## Stop and success conditions
