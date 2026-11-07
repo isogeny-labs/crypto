@@ -1,0 +1,6 @@
+spec ECS1h36f48b2c2481 (F=1 target-in-walk, single target, k=24, session 3): 260 executions
+  arm rho-neg          reference  ECM1hefea4e0ebe79 rho.negation {"cap_multiple": "64"}
+  arm f1-x07           baseline   ECM1h45f5f937a79c ic.pipeline {"factor_base": "prime-projected-abscissa:size=1,scan_cap=32", "linalg": "incremental-gauss", "max_trials": "100000000", "oracle": "wwalk:x=0.7,g=1,grow=2,seed=run", "solver": "", "solver_budget_seconds": "0", "targets": "stride-generator"}
+  arm tw-x15           candidate  ECM1h78c39e6ab532 ic.pipeline {"factor_base": "prime-projected-abscissa:size=1,scan_cap=32", "linalg": "incremental-gauss", "max_trials": "100000000", "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,seed=run", "solver": "", "solver_budget_seconds": "0", "targets": "stride-generator"}
+  arm twcj-x15         candidate  ECM1hd04e0987b738 ic.pipeline {"factor_base": "prime-projected-abscissa:size=1,scan_cap=32", "linalg": "incremental-gauss", "max_trials": "100000000", "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,seed=run", "solver": "", "solver_budget_seconds": "0", "targets": "stride-generator"}
+  workload Wdb338e370d3a icv1-fp24-tm1578-e83ed1b2 r=2^21.00 A=2 registered=true ec1=-
