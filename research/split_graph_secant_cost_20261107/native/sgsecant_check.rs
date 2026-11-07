@@ -69,6 +69,7 @@ fn exact_all(c: &Curve, bases: &[Base], label: &str, limit_targets: usize) {
             let t0 = std::time::Instant::now();
             let mut hd = 0;
             let mut dim = 0;
+            let mut fbs = 0u32;
             for (ti, rt) in c.points.iter().enumerate() {
                 if ti >= limit_targets {
                     break;
@@ -90,12 +91,13 @@ fn exact_all(c: &Curve, bases: &[Base], label: &str, limit_targets: usize) {
                 }
                 hd = hd.max(sol.handled_degree);
                 dim = dim.max(sol.dim_sum);
+                fbs += sol.fallbacks;
             }
             let d = diff(&snapshot(), &s0);
             let t = total(&d);
             println!(
-                "[{label}] base={:<8} pres={:?}: targets={} mismatches={} censored={} covered={} ordered_pairs={} handled_degree_max={} dim_max={} field_ops={} native={} secs={:.2}",
-                b.name, pres, limit_targets.min(c.points.len()), mism, cens, cov, nrel, hd, dim, t.field(), t.native, t0.elapsed().as_secs_f64()
+                "[{label}] base={:<8} pres={:?}: targets={} mismatches={} censored={} covered={} ordered_pairs={} handled_degree_max={} dim_max={} fallbacks={} field_ops={} native={} secs={:.2}",
+                b.name, pres, limit_targets.min(c.points.len()), mism, cens, cov, nrel, hd, dim, fbs, t.field(), t.native, t0.elapsed().as_secs_f64()
             );
         }
     }
