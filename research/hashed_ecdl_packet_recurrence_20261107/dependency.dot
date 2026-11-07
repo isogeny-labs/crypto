@@ -1,0 +1,18 @@
+digraph Recurrence {
+ graph [rankdir=TB, bgcolor="white", label="Proposed packet cost ledger | 2026-11-07\nUNREGISTERED; source review only", labelloc=t, fontsize=19, fontname="DejaVu Sans", nodesep=0.25, ranksep=0.28];
+ node [shape=box, style="rounded,filled", fillcolor="#e8eff7", color="#426080", fontname="DejaVu Sans", fontsize=14, margin="0.14,0.10"];
+ edge [color="#60748b", arrowsize=0.7];
+ prep [label="Entry prep BEFORE E>R\nRow scans, signs, incoming clones"];
+ dfs [label="All attempted DFS labels\nRejected + zero-prefix + accepted leaves"];
+ out [label="Reached outgoing forms and powers\nBigUint costs; arithmetic at creation p_c"];
+ coarse [label="Conditional coarse entry envelope\nq <= B, not assumed q <= E <= R"];
+ bit [label="Ring calls -> operand bit costs\nStored p_c; multiplication temporary ~2p_c"];
+ work [label="WORK: sum reached child calls\nInclude kernel, discarded mode candidates,\nchild construction and reconstruction",fillcolor="#fff0d5"];
+ space [label="SPACE: one depth-first path\nUnion of shared Arc descriptions +\nancestor modes, samples and jets",fillcolor="#e0f0e5"];
+ obligations [label="Still needed: B polynomial in root s,\nuniform precision and rational widths,\nfaithful state/caller/retention refinement",fillcolor="#f0e6f5"];
+ registration [label="Publication pending PCC registration\nConflicted ledger untouched",fillcolor="#fae5e5"];
+ prep -> dfs -> out -> coarse -> bit;
+ bit -> work; bit -> space;
+ work -> obligations; space -> obligations;
+ obligations -> registration;
+}

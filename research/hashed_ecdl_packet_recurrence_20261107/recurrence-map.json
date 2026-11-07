@@ -1,0 +1,178 @@
+{
+  "schema": "hashed-ecdl.packet-resource-proposal/v1",
+  "status": "unregistered/unverified; not executable model",
+  "source_revision": "08fb3510592ce4849abaf660bbee88191d3d6263",
+  "anchors": [
+    {
+      "id": "entry-preparation",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "line": 281,
+      "anchor": "let mut constants = Vec::with_capacity(rows);",
+      "scope": "before final cfg(test) mod tests",
+      "url": "https://github.com/isogeny-labs/crypto/blob/08fb3510592ce4849abaf660bbee88191d3d6263/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L281"
+    },
+    {
+      "id": "entry-degree",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "line": 310,
+      "anchor": "if remaining > rows {",
+      "scope": "before final cfg(test) mod tests",
+      "url": "https://github.com/isogeny-labs/crypto/blob/08fb3510592ce4849abaf660bbee88191d3d6263/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L310"
+    },
+    {
+      "id": "attempted-choice",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "line": 336,
+      "anchor": "meter.charge(1, \"packet coefficient extraction\")?;",
+      "scope": "before final cfg(test) mod tests",
+      "url": "https://github.com/isogeny-labs/crypto/blob/08fb3510592ce4849abaf660bbee88191d3d6263/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L336"
+    },
+    {
+      "id": "prefix-multiply",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "line": 361,
+      "anchor": "prefix[row + 1] = self.ring.mul(&prefix[row], factor, meter)?;",
+      "scope": "before final cfg(test) mod tests",
+      "url": "https://github.com/isogeny-labs/crypto/blob/08fb3510592ce4849abaf660bbee88191d3d6263/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L361"
+    },
+    {
+      "id": "outgoing",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "line": 385,
+      "anchor": "for mode in &self.outgoing {",
+      "scope": "before final cfg(test) mod tests",
+      "url": "https://github.com/isogeny-labs/crypto/blob/08fb3510592ce4849abaf660bbee88191d3d6263/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L385"
+    },
+    {
+      "id": "child-local",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "line": 463,
+      "anchor": "weights.push(kernel.weight(x, y, meter)?);",
+      "scope": "before final cfg(test) mod tests",
+      "url": "https://github.com/isogeny-labs/crypto/blob/08fb3510592ce4849abaf660bbee88191d3d6263/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L463"
+    },
+    {
+      "id": "child-mode-scan",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "line": 469,
+      "anchor": "for (mode, &exponent) in modes.iter().zip(beta) {",
+      "scope": "before final cfg(test) mod tests",
+      "url": "https://github.com/isogeny-labs/crypto/blob/08fb3510592ce4849abaf660bbee88191d3d6263/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L469"
+    },
+    {
+      "id": "child-arc",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "line": 432,
+      "anchor": "tensor: vertex.tensor.clone(),",
+      "scope": "before final cfg(test) mod tests",
+      "url": "https://github.com/isogeny-labs/crypto/blob/08fb3510592ce4849abaf660bbee88191d3d6263/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L432"
+    },
+    {
+      "id": "mode-candidates",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "line": 209,
+      "anchor": "for b in 0..kernel.ring.precision().saturating_sub(1) {",
+      "scope": "before final cfg(test) mod tests",
+      "url": "https://github.com/isogeny-labs/crypto/blob/08fb3510592ce4849abaf660bbee88191d3d6263/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L209"
+    },
+    {
+      "id": "mode-bigint",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/deformation.rs",
+      "line": 222,
+      "anchor": "let value = BigUint::from(j).modpow(&BigUint::from(b), kernel.ring.modulus());",
+      "scope": "before final cfg(test) mod tests",
+      "url": "https://github.com/isogeny-labs/crypto/blob/08fb3510592ce4849abaf660bbee88191d3d6263/crates/hashed-ecdl-tensor/src/contraction/deformation.rs#L222"
+    },
+    {
+      "id": "tuple-child",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/recursive.rs",
+      "line": 378,
+      "anchor": "let value = evaluate_child(&child, ring, meter)?;",
+      "scope": "before final cfg(test) mod tests",
+      "url": "https://github.com/isogeny-labs/crypto/blob/08fb3510592ce4849abaf660bbee88191d3d6263/crates/hashed-ecdl-tensor/src/contraction/recursive.rs#L378"
+    },
+    {
+      "id": "sample-storage",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/recursive.rs",
+      "line": 435,
+      "anchor": "let mut values = Vec::with_capacity(points);",
+      "scope": "before final cfg(test) mod tests",
+      "url": "https://github.com/isogeny-labs/crypto/blob/08fb3510592ce4849abaf660bbee88191d3d6263/crates/hashed-ecdl-tensor/src/contraction/recursive.rs#L435"
+    },
+    {
+      "id": "jet-storage",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/recursive.rs",
+      "line": 460,
+      "anchor": "jets.push(Jet {",
+      "scope": "before final cfg(test) mod tests",
+      "url": "https://github.com/isogeny-labs/crypto/blob/08fb3510592ce4849abaf660bbee88191d3d6263/crates/hashed-ecdl-tensor/src/contraction/recursive.rs#L460"
+    },
+    {
+      "id": "precision",
+      "path": "crates/hashed-ecdl-tensor/src/contraction/recursive.rs",
+      "line": 120,
+      "anchor": "fn child_precision(",
+      "scope": "before final cfg(test) mod tests",
+      "url": "https://github.com/isogeny-labs/crypto/blob/08fb3510592ce4849abaf660bbee88191d3d6263/crates/hashed-ecdl-tensor/src/contraction/recursive.rs#L120"
+    },
+    {
+      "id": "entry-lift",
+      "path": "crates/hashed-ecdl-tensor/src/contraction.rs",
+      "line": 493,
+      "anchor": "ring.lift(&packet.entry(bits, meter)?)",
+      "scope": "before final cfg(test) mod tests",
+      "url": "https://github.com/isogeny-labs/crypto/blob/08fb3510592ce4849abaf660bbee88191d3d6263/crates/hashed-ecdl-tensor/src/contraction.rs#L493"
+    },
+    {
+      "id": "leaf-entry",
+      "path": "crates/hashed-ecdl-tensor/src/contraction.rs",
+      "line": 621,
+      "anchor": "let value = vertex.tensor.entry(&ports, ring, meter)?;",
+      "scope": "before final cfg(test) mod tests",
+      "url": "https://github.com/isogeny-labs/crypto/blob/08fb3510592ce4849abaf660bbee88191d3d6263/crates/hashed-ecdl-tensor/src/contraction.rs#L621"
+    },
+    {
+      "id": "mul-width",
+      "path": "crates/hashed-ecdl-tensor/src/ring.rs",
+      "line": 245,
+      "anchor": "out[i + j] = (&out[i + j] + &a.0[i] * &b.0[j]) & &self.mask;",
+      "scope": "before final cfg(test) mod tests",
+      "url": "https://github.com/isogeny-labs/crypto/blob/08fb3510592ce4849abaf660bbee88191d3d6263/crates/hashed-ecdl-tensor/src/ring.rs#L245"
+    },
+    {
+      "id": "pow",
+      "path": "crates/hashed-ecdl-tensor/src/ring.rs",
+      "line": 265,
+      "anchor": "pub fn pow(&self, a: &Element, exponent: usize, meter: &mut Meter) -> Result<Element> {",
+      "scope": "before final cfg(test) mod tests",
+      "url": "https://github.com/isogeny-labs/crypto/blob/08fb3510592ce4849abaf660bbee88191d3d6263/crates/hashed-ecdl-tensor/src/ring.rs#L265"
+    },
+    {
+      "id": "interpolate",
+      "path": "crates/hashed-ecdl-tensor/src/ring.rs",
+      "line": 357,
+      "anchor": "pub fn interpolate(",
+      "scope": "before final cfg(test) mod tests",
+      "url": "https://github.com/isogeny-labs/crypto/blob/08fb3510592ce4849abaf660bbee88191d3d6263/crates/hashed-ecdl-tensor/src/ring.rs#L357"
+    }
+  ],
+  "budget_terms": [
+    "entry_preparation",
+    "attempted_DFS",
+    "outgoing_bigint_and_ring",
+    "child_preparation",
+    "attempted_mode_preparation",
+    "reached_recursive_work",
+    "samples_and_jets",
+    "shared_description_union",
+    "rational_recovery"
+  ],
+  "unproved_dependencies": [
+    "successful-state/OkErr refinement",
+    "original predicate bound",
+    "uniform B polynomial in root s, independent original description length",
+    "precision and rational-width induction",
+    "BigUint and allocation-capacity bounds",
+    "unique allocation retention induction"
+  ]
+}
