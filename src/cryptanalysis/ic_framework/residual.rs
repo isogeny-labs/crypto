@@ -38,16 +38,16 @@ use crate::cryptanalysis::ic_boundary::{
     RowStatus,
 };
 
-fn mulmod(a: u64, b: u64, m: u64) -> u64 {
+pub(super) fn mulmod(a: u64, b: u64, m: u64) -> u64 {
     ((a as u128 * b as u128) % m as u128) as u64
 }
-fn addmod(a: u64, b: u64, m: u64) -> u64 {
+pub(super) fn addmod(a: u64, b: u64, m: u64) -> u64 {
     ((a as u128 + b as u128) % m as u128) as u64
 }
-fn submod(a: u64, b: u64, m: u64) -> u64 {
+pub(super) fn submod(a: u64, b: u64, m: u64) -> u64 {
     ((a as u128 + m as u128 - b as u128) % m as u128) as u64
 }
-fn mix(v: u64) -> u64 {
+pub(super) fn mix(v: u64) -> u64 {
     let mut z = v.wrapping_add(0x9E37_79B9_7F4A_7C15);
     z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
     z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
@@ -313,7 +313,7 @@ pub fn collect_residual_and_solve<G: CountedGroup, L: RelationSolver + ?Sized>(
 }
 
 #[allow(clippy::too_many_arguments)]
-fn outcome<L: RelationSolver + ?Sized>(
+pub(super) fn outcome<L: RelationSolver + ?Sized>(
     relations: PhaseCost,
     linear_algebra: PhaseCost,
     verify: PhaseCost,

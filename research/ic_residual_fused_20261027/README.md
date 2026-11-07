@@ -1,0 +1,73 @@
+# Fused residual collector (`targets=residual-fused`), 2026-10-27
+
+Status: **local L0 sandbox measurement. NOT validated under the validation
+gate** (no replay certificate, no validator report, no matched-rho band, no
+`VALIDATION.json`). Not an isolab/L2 run; wall times are indicative only. The
+leaderboard and `benchmarks/README.md` are untouched.
+
+## What changed
+
+New `Targets::ResidualFused` (`residual-fused`), `src/cryptanalysis/ic_framework/residual_fused.rs`.
+The old walk does two additions per step (`point += J_j`, then `point -= P_i`
+with `i` from the hash of the post-jump point, which is never looked up). The
+fused walk draws `j = mix(key)>>8 mod 16` and `i = mix(key ^ 0xA5A5)>>4 mod |F|`
+from the *current* residual and adds the precomputed `C_{j,i} = J_j - P_i`
+once. a, b and the row update as before; equal residuals still take equal
+steps. The `16*|F|` combined points are computed once and charged to the
+relation phase's group-op ledger (setup). Cap: `16*|F| > 2^16` returns an error
+(protocols use base sizes 2-64). Also: `FastMap` (MixHasher) table, rows stored
+as sorted sparse `(col, coef)` lists in a boxed slice, no per-step dense clone,
+dense expansion only on a relation. New counters: `fused_combined_jumps`,
+`walk_step_adds`, `walk_steps`, `walk_adds_per_step_milli` (1000 = one add per
+step in every run). `residual_table_bytes_uncharged` = bytes actually stored
+per entry (key + a + b + slice header + 16 B per nonzero), excluding hash-map
+control bytes. `residual` is unchanged apart from `pub(super)` on five helper
+fns; `mod.rs` routes the new name; `stages.rs` parses/prints it.
+
+## Old-path byte identity (specs/identity-p16.json: rho + res2, 4 targets, 2 rounds, 16 records)
+
+Baseline binary built from main 0e5689117 vs this branch, `ecbench run --cpus none --allow-busy`.
+Records compared after dropping record/session ids, binary hash, allocator, host
+isolation telemetry, `time`, and every `*_ns` field: **16 of 16 records identical**
+(S, total_gae, counters, work/bitops, recovered log, field ops). Sessions in
+`sessions/identity-p16-{old,new}`.
+
+## Counted comparison (local L0; counted units are deterministic)
+
+Base size 2 (|F| = 4 points), `mitm-prime-blocked:m=2`, `incremental-gauss`, 2 rounds
+(records are paired by workload; mean over records). Raw: `sessions/cmp-*`,
+output of `ecbench table` / `compare`: `summary/cmp-*.txt`.
+
+| curve | targets x rounds | rho S | res2 S | res2-fused S | fused/old S (95% CI) | res2-fused / rho | res2 / rho |
+|---|---|---:|---:|---:|---|---:|---:|
+| p16 (r 2^15.7) | 16 x 2 | 1.785 | 6.425 | 5.685 | 0.885 [0.819, 0.956] | 3.18 | 3.60 |
+| p18 (r 2^17.7) | 16 x 2 | 1.400 | 4.954 | 3.824 | 0.772 [0.712, 0.837] | 2.73 | 3.54 |
+| p36 (r 2^36) | 8 x 2 | 1.161 | 2.980 | 1.739 | 0.584 [0.426, 0.800] | 1.50 | 2.57 |
+
+Gap to matched rho remains: fused is 1.5x rho (p36), down from 2.6x. Mean GAE per
+solve at p36: rho 304 219, res2 781 291, res2-fused 455 851. (Earlier README of
+research/ic_planner_exhaustive_20261026 quotes res2 2.94 at 36 bits; here 2.98 on a
+different 8-target subset.)
+
+Caveats, stated plainly:
+- The ratio approaches 0.5 only as setup (16|F| additions, restarts) becomes small
+  relative to the walk (p36); at small r the fixed costs dominate. The fused walk also
+  does somewhat more lookups (p16 27 359 vs 21 352 over 32 runs), i.e. slightly longer
+  walks, since the combined jump set is a different (still pseudo-random) walk.
+- `ecbench compare` reports the pricing band (AGENTS.md section 5a) as **unresolved**
+  for every pair: at 0.1 and 1 GAE per unpriced native op the fused arm is worse
+  (ratios 1.67/2.49 at p16, 1.81/2.42 at p36) because its unpriced table is larger:
+  `residual_table_bytes_uncharged` is 2.6x the old figure at p36 (522 MB vs 199 MB over
+  16 runs; 8 B key + 24 B + slice header + 16 B per nonzero, versus the old formula
+  `16 + 8*d_col` per entry that omits key and Vec header) and lookups are 16% higher.
+  So the counted-GAE gain is a w=0 result, not an improvement that holds across the band.
+- Wall (local, L0, shared host, no A/A): end-to-end wall fused/old 1.20 (p16), 1.04
+  (p18), 0.91 (p36); not admissible.
+- Measurement quality 0/100 (L0, shared 4-core host); no A/A arm; 2 rounds only.
+
+## Reproduce
+
+`ecbench run --spec research/ic_residual_fused_20261027/specs/<name>.json --out <dir> --cpus none --allow-busy`
+then `ecbench table --dir <dir>` and `ecbench compare --dir <dir> --a res2 --b res2f`.
+Host: local L0 sandbox (Intel Xeon 2.1 GHz, 4 shared cores), not isolab.
+Tests: `cargo test --release --lib ic_framework::residual`: 3 passed (old residual test, fused recovery on p12/p14/p16 bases 2-24, oversized-base refusal). Clippy was not run (the box OOM-kills a second full compile); the methods.rs help-string edit was made after the last build.

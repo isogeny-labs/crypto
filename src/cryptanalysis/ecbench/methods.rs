@@ -252,7 +252,7 @@ const IC_COUNTED_PARAMS: &[ParamDecl] = &[
     ParamDecl {
         name: "targets",
         default: Some("walk"),
-        help: "random, walk, or walk-prime-fast on single-word prime curves",
+        help: "random, walk, walk-prime-fast on single-word prime curves, residual, or residual-fused",
     },
     ParamDecl {
         name: "max_trials",

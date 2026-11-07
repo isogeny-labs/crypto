@@ -71,6 +71,7 @@ pub mod planner;
 pub mod plugins;
 pub mod prime_tower;
 pub mod residual;
+pub mod residual_fused;
 pub mod rootfind;
 pub mod shared_rank;
 pub mod solvers;
@@ -86,6 +87,7 @@ use crate::cryptanalysis::ic_boundary::{
     TargetSource,
 };
 use crate::cryptanalysis::ic_framework::residual as residual_mod;
+use crate::cryptanalysis::ic_framework::residual_fused as residual_fused_mod;
 use crate::cryptanalysis::ic_measurement as measurement;
 use linalg::matrix_by_name;
 use stages::{DecompositionOracle, FactorBaseBuilder, InstanceCtx, Params, SystemShape, Targets};
@@ -419,7 +421,7 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
         Targets::Random => TargetSource::Random,
         Targets::Stride => TargetSource::Stride,
         Targets::StrideRenew => TargetSource::StrideRenew,
-        Targets::Walk | Targets::Residual => TargetSource::Walk,
+        Targets::Walk | Targets::Residual | Targets::ResidualFused => TargetSource::Walk,
         Targets::WalkPrimeFast => TargetSource::WalkPrimeFast,
         Targets::WalkPrimeSerial4 => TargetSource::WalkPrimeLanes {
             lanes: 4,
@@ -466,7 +468,33 @@ pub fn run_pipeline_with_base<G: CountedGroup>(
     } else {
         CompletionRule::TargetPinned
     };
-    let mut outcome: PipelineOutcome = if spec.targets == Targets::Residual {
+    let mut outcome: PipelineOutcome = if spec.targets == Targets::ResidualFused {
+        if completion != CompletionRule::TargetPinned {
+            return Err(
+                "the residual collector stops when the target is pinned; use incremental-gauss"
+                    .into(),
+            );
+        }
+        if 16 * fb.points.len() > residual_fused_mod::MAX_COMBINED_JUMPS {
+            return Err(format!(
+                "residual-fused precomputes 16·|F| combined jumps and |F| = {} gives {} > {}; use a smaller base (protocol base sizes are 2-64) or targets=residual",
+                fb.points.len(),
+                16 * fb.points.len(),
+                residual_fused_mod::MAX_COMBINED_JUMPS
+            ));
+        }
+        residual_fused_mod::collect_residual_fused_and_solve(
+            ctx.group,
+            ctx.generator,
+            ctx.target,
+            ctx.r,
+            ctx.cofactor,
+            &fb,
+            spec.seed,
+            spec.max_trials,
+            matrix.as_mut(),
+        )
+    } else if spec.targets == Targets::Residual {
         if completion != CompletionRule::TargetPinned {
             return Err(
                 "the residual collector stops when the target is pinned; use incremental-gauss"

@@ -600,6 +600,11 @@ pub enum Targets {
     /// every step and relations come from collisions of the residuals;
     /// the oracle is not consulted.  See `ic_framework::residual`.
     Residual,
+    /// `Residual` with one fused addition per step: the jump and the base
+    /// point are both chosen from the current residual's hash and added as
+    /// the precomputed combined jump `J_j − P_i`.  A new variant; the
+    /// `Residual` walk is unchanged.  See `ic_framework::residual_fused`.
+    ResidualFused,
     /// `R ← R + S` for one drawn `S = [s]G + [t]Q`: one addition per
     /// target, with no jump table to set up.  See `TargetSource::Stride`.
     Stride,
@@ -621,6 +626,7 @@ impl Targets {
             Targets::WalkPrimeBatch8 => "walk-prime-batch-8",
             Targets::WalkPrimeBatch16 => "walk-prime-batch-16",
             Targets::Residual => "residual",
+            Targets::ResidualFused => "residual-fused",
             Targets::Stride => "stride",
             Targets::StrideRenew => "stride-renew",
         }
@@ -638,10 +644,11 @@ impl Targets {
             "walk-prime-batch-8" => Ok(Targets::WalkPrimeBatch8),
             "walk-prime-batch-16" => Ok(Targets::WalkPrimeBatch16),
             "residual" => Ok(Targets::Residual),
+            "residual-fused" => Ok(Targets::ResidualFused),
             "stride" => Ok(Targets::Stride),
             "stride-renew" => Ok(Targets::StrideRenew),
             other => Err(format!(
-                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16, walk-prime-batch-4/8/16, residual, stride or stride-renew"
+                "unknown target source `{other}`; try random, walk, walk-prime-fast, walk-prime-serial-4/8/16, walk-prime-batch-4/8/16, residual, residual-fused, stride or stride-renew"
             )),
         }
     }
