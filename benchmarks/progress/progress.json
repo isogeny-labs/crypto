@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261106T0514Z-rho-frob-brent",
+  "latest_record": "20261107T0640Z-ic-auto-base",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
-    "invalid": 0,
-    "measured": 47,
+    "invalid": 1,
+    "measured": 49,
     "open": 0
   },
   "repo": "crypto",
@@ -418,6 +418,218 @@
       ],
       "problem": "dlpwai:static-dh-p224-shape",
       "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.2469,
+      "latest": 0.2469,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ic_auto_over_b32_ops",
+      "points": [
+        {
+          "commit": "c047182e274e",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 288,
+          "record": "20261107T0640Z-ic-auto-base",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.207,
+            0.295
+          ],
+          "summary": "ic.pipeline prime-abscissa size=auto (B=0.5 r^(1/3)) vs fixed B=32, MITM pair table, prime 2^17.7..2^28, local L0, counted GAE: paired ops 0.247 [0.207,0.295], band-robust; alpha 0.908 [0.828,0.989] -> 0.598 [0.564,0.631] (theory 2/3); 12.8x matched rho.negation_v3. Audit replay-all 1440/1440. Not validated.",
+          "value": 0.2469
+        }
+      ],
+      "problem": "ecdlp:prime-ladder-18-28",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 12.7982,
+      "latest": 12.7982,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ic_auto_over_rho_v3_ops",
+      "points": [
+        {
+          "commit": "c047182e274e",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 288,
+          "record": "20261107T0640Z-ic-auto-base",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            11.707,
+            13.992
+          ],
+          "summary": "ic.pipeline prime-abscissa size=auto (B=0.5 r^(1/3)) vs fixed B=32, MITM pair table, prime 2^17.7..2^28, local L0, counted GAE: paired ops 0.247 [0.207,0.295], band-robust; alpha 0.908 [0.828,0.989] -> 0.598 [0.564,0.631] (theory 2/3); 12.8x matched rho.negation_v3. Audit replay-all 1440/1440. Not validated.",
+          "value": 12.7982
+        }
+      ],
+      "problem": "ecdlp:prime-ladder-18-28",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 19.188,
+      "latest": 19.188,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 20.993435
+      },
+      "metric": "ic_auto_s_r28",
+      "points": [
+        {
+          "commit": "c047182e274e",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 20.993435
+          },
+          "n": 48,
+          "record": "20261107T0640Z-ic-auto-base",
+          "reference": 0.914,
+          "reference_kind": "matched_rho",
+          "spread": [
+            17.92,
+            20.25
+          ],
+          "summary": "ic.pipeline prime-abscissa size=auto (B=0.5 r^(1/3)) vs fixed B=32, MITM pair table, prime 2^17.7..2^28, local L0, counted GAE: paired ops 0.247 [0.207,0.295], band-robust; alpha 0.908 [0.828,0.989] -> 0.598 [0.564,0.631] (theory 2/3); 12.8x matched rho.negation_v3. Audit replay-all 1440/1440. Not validated.",
+          "value": 19.188
+        }
+      ],
+      "problem": "ecdlp:prime-ladder-18-28",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.8643,
+      "latest": 0.8643,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_negation_v3_over_v2_ops",
+      "points": [
+        {
+          "commit": "c047182e274e",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 1152,
+          "record": "20261107T0639Z-rho-v3-ladder-fixed",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.832,
+            0.898
+          ],
+          "summary": "rho.negation_v3 (ladder-built jump table, k~sqrt(F/2)) vs rho.negation_v2 on prime 2^17.7..2^28, local L0, counted GAE: paired ops 0.864 [0.832,0.898], band-robust; v3 S/theory 1.30 at 2^17.7 to 1.04 at 2^24 and 2^28; search phase 1.00-1.03x theory at >=2^24. Audit replay-all 5760/5760. Not validated (no L2, no validator).",
+          "value": 0.8643
+        }
+      ],
+      "problem": "ecdlp:prime-ladder-18-28",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.923,
+      "latest": 0.923,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_negation_v3_s_r24",
+      "points": [
+        {
+          "commit": "c047182e274e",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 192,
+          "record": "20261107T0639Z-rho-v3-ladder-fixed",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.841,
+            1.007
+          ],
+          "summary": "rho.negation_v3 (ladder-built jump table, k~sqrt(F/2)) vs rho.negation_v2 on prime 2^17.7..2^28, local L0, counted GAE: paired ops 0.864 [0.832,0.898], band-robust; v3 S/theory 1.30 at 2^17.7 to 1.04 at 2^24 and 2^28; search phase 1.00-1.03x theory at >=2^24. Audit replay-all 5760/5760. Not validated (no L2, no validator).",
+          "value": 0.923
+        }
+      ],
+      "problem": "ecdlp:prime-ladder-18-28",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.923,
+      "latest": 0.923,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_negation_v3_s_r28",
+      "points": [
+        {
+          "commit": "c047182e274e",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 192,
+          "record": "20261107T0639Z-rho-v3-ladder-fixed",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.83,
+            1.017
+          ],
+          "summary": "rho.negation_v3 (ladder-built jump table, k~sqrt(F/2)) vs rho.negation_v2 on prime 2^17.7..2^28, local L0, counted GAE: paired ops 0.864 [0.832,0.898], band-robust; v3 S/theory 1.30 at 2^17.7 to 1.04 at 2^24 and 2^28; search phase 1.00-1.03x theory at >=2^24. Audit replay-all 5760/5760. Not validated (no L2, no validator).",
+          "value": 0.923
+        }
+      ],
+      "problem": "ecdlp:prime-ladder-18-28",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.9391,
+      "latest": 0.9391,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_plain_v3_over_plain_ops",
+      "points": [
+        {
+          "commit": "c047182e274e",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 1152,
+          "record": "20261107T0639Z-rho-v3-ladder-fixed",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.901,
+            0.979
+          ],
+          "summary": "rho.negation_v3 (ladder-built jump table, k~sqrt(F/2)) vs rho.negation_v2 on prime 2^17.7..2^28, local L0, counted GAE: paired ops 0.864 [0.832,0.898], band-robust; v3 S/theory 1.30 at 2^17.7 to 1.04 at 2^24 and 2^28; search phase 1.00-1.03x theory at >=2^24. Audit replay-all 5760/5760. Not validated (no L2, no validator).",
+          "value": 0.9391
+        }
+      ],
+      "problem": "ecdlp:prime-ladder-18-28",
+      "unit": "ratio"
     },
     {
       "better": "lower",
