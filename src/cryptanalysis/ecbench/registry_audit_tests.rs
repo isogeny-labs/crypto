@@ -299,6 +299,11 @@ const CASES: &[(&str, Fx, P)] = &[
     ),
     ("ic.tensor_contraction_v1", Fx::Prime10, &[("m", "3")]),
     (
+        "ic.tensor_contraction_cofactor_v1",
+        Fx::Cofactor2,
+        &[("m", "2")],
+    ),
+    (
         "ic.prime_orbit_relations_v1",
         Fx::Prime18,
         &[("coordinates", "affine")],
@@ -468,6 +473,7 @@ const CHECK_PHASE: &[(&str, &str)] = &[
     ("ic.known_log_ksum_v1", "target_recovery_check"),
     ("ic.known_log_mitm2_v1", "target_recovery_check"),
     ("ic.tensor_contraction_v1", "recovery_check"),
+    ("ic.tensor_contraction_cofactor_v1", "recovery_check"),
     ("ic.residual_batch", "internal_verification"),
     ("ic.residual_batch_v2", "internal_verification"),
     ("rho.multitarget_pooled", "internal_verification"),

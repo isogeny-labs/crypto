@@ -199,7 +199,9 @@ if [[ "$unbound_count" -gt 0 ]]; then
   rm -f "$report"
 fi
 rm -f "$unbound"
-summary="shard $shard: $bound_count of $index committed ecbench sessions pass integrity (--replay 0 --allow-interrupted); $unbound_count accepted as unbound prefixes (records_bound=false), not integrity-passed; $incomplete_count hash-pinned scratch sessions remain incomplete; $defective_count hash-pinned defective sessions fail exactly as pinned, not integrity-passed"
+# $audited is this shard's share; $index counts every non-pinned session in
+# the whole list (sheriff SHF-20261106-a114e7, PPX-6).
+summary="shard $shard: $bound_count of $audited sessions in this shard (of $index in total) pass integrity (--replay 0 --allow-interrupted); $unbound_count accepted as unbound prefixes (records_bound=false), not integrity-passed; $incomplete_count hash-pinned scratch sessions remain incomplete; $defective_count hash-pinned defective sessions fail exactly as pinned, not integrity-passed"
 echo "$summary"
 if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
   echo "$summary" >> "$GITHUB_STEP_SUMMARY"

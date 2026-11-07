@@ -481,6 +481,12 @@ const POLICIES: &[PolicyDecl] = &[
         StandardBand
     ),
     policy!(
+        "ic.tensor_contraction_cofactor_v1",
+        NativeGrid,
+        DiagnosticOnly,
+        StandardBand
+    ),
+    policy!(
         "ic.known_log_mitm2_v1",
         NativeAdaptive,
         DiagnosticOnly,
