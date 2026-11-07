@@ -34,7 +34,9 @@ some scope (CLAUDE.md success criterion).
   (sd 5.5); pooled z −3.13 at 691 and between −1.8 and −3.0 at every cutoff
   from 100 to 200,000. Every number matches the uploaded report
   (sha256 d38be158…) [pcc:unverified].
-- **Derived or established:** (i) Lenstra: E(F_p) ≅ O/(π − 1) as O-modules when
+- **Derived or established:** prior in-repo form: `RESEARCH_ISOGENY_FIBERS_ECDLP.md`
+  §15.1, Theorem 15.1 (isogeny-augmented generic group model, success
+  probability at most (Q + 2)²/r + 1/r; [pcc:unverified] there). Then (i) Lenstra: E(F_p) ≅ O/(π − 1) as O-modules when
   End(E) = O, so every α ∈ O acts as the scalar α mod (π − 1), and every
   F_p-rational isogeny φ: E → E′ of degree prime to n restricts to a group
   isomorphism with φ([k]P) = [k]φ(P). (ii) A point of order n is invisible
@@ -44,7 +46,10 @@ some scope (CLAUDE.md success criterion).
   scalar oracles, and Shoup's Ω(√n) bound applies; Jao–Miller–Venkatesan's
   random self-reduction (horizontal walks over exactly the split ℓ) makes
   every curve of the class equally hard. Full statement and proof sketch:
-  `research/split_prime_ecdlp_20261107/README.md` §3. No Lean proof yet.
+  `research/split_prime_ecdlp_20261107/README.md` §3. No Lean proof yet. The
+  statistic itself was already computed by the lab for the published and
+  omitted curves (`research/nist_skip_criterion_20261025/strict_elkies_20261029/results/at691.tsv`),
+  with the same counts.
 - **Suspected explanation:** none needed for the obstruction. For the
   deficit itself the uploaded report and this study agree that no mechanism
   is known; this record takes no position on its cause.

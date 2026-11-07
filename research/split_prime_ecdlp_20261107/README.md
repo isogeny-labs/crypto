@@ -65,6 +65,21 @@ Problem record: [`problems/split-prime-pattern-scalar-only.md`](../../problems/s
   F4 cost across two full conductor-1 prime-field classes (h = 128 and 300)
   at 24, 28, 32 bits, m = 2, 3, with A/A, isomorphic-model and planted
   controls. This closes the indirect route "pick a better model in the class".
+- `repo:RESEARCH_ISOGENY_FIBERS_ECDLP.md` §15.1, Theorem 15.1 (2026-10-11,
+  [pcc:unverified] there): the isogeny-augmented generic group model. Oracles
+  for every rational isogeny in the class with their scalars leave the success
+  probability of a Q-query algorithm at most (Q + 2)²/r + 1/r. This is the
+  lab's prior statement of the obstruction in §3 below, found through the
+  idea-generator pass; §3 is its specialisation to the split-prime pattern
+  (the pattern is the Kronecker symbol that selects those oracles), not a new
+  theorem. Found after the first commit of this study.
+- `repo:research/nist_skip_criterion_20261025/strict_elkies_20261029/REPORT.md`
+  and `results/at691.tsv`: the lab already computed the same statistic
+  (`E691`, strictly split odd primes ≤ 691) for the 8 published and 11
+  omitted curves in the four fields, as a separator for the skipped-curve
+  question, reproducing an externally reported pattern. Its published-curve
+  counts (60, 57, 58; 50; 42, 57, 57; 57; 54; 52) equal this study's §4
+  column, curve for curve. Found after the first commit of this study.
 - `repo:problems/prime-scalar-exact-splitting.md`,
   `repo:problems/tree-glued-pdp-separator-coupling.md`,
   `repo:problems/curve25519-family-algebraic-ic-tower.md`: the standing
@@ -83,7 +98,16 @@ Problem record: [`problems/split-prime-pattern-scalar-only.md`](../../problems/s
   discrete logarithms and related problems", EUROCRYPT 1997: Ω(√n) generic
   bound. Schoof–Elkies–Atkin: split ℓ speed up point counting only.
 
-## 3. The obstruction (derived; no Lean proof yet)
+## 3. The obstruction (derived; no Lean proof yet; prior form: Theorem 15.1 of `RESEARCH_ISOGENY_FIBERS_ECDLP.md`)
+
+**Prior work in this repository.** Theorem 15.1 of
+`RESEARCH_ISOGENY_FIBERS_ECDLP.md` (2026-10-11) already states, in the
+generic group model augmented with oracles for every rational isogeny of the
+class and their scalars, that a Q-query algorithm succeeds with probability
+at most (Q + 2)²/r + 1/r, i.e. isogeny maps add nothing generic. The theorem
+below is that statement specialised to the objects the split-prime pattern
+governs, with the scalar made explicit through Lenstra's isomorphism and with
+the ℓ-pairing and fiber-polynomial cases spelled out; it is not new.
 
 **Setting.** E/F_p ordinary, #E(F_p) = n prime, cofactor 1, Frobenius π with
 π² − tπ + p = 0, O = End(E) ⊇ Z[π], N = (π − 1) the ideal of O of norm n.
@@ -180,10 +204,16 @@ B = 100, 200, 500, 691, 1,000, 2,000, 5,000, 10,000, 20,000, 50,000,
 100,000, 200,000: −2.71, −1.81, −2.98, −3.13, −1.98, −2.16, −2.45, −2.12,
 −2.26, −2.00, −1.87, −1.79 (Stouffer Σz/√10 agrees to two decimals).
 
-**Agreement with the uploaded report.** Every split count at 691, every
-per-curve z at 691, 5,000 and 50,000, and every pooled z at the twelve
-cutoffs matches the report's table and list to the printed precision
-[pcc:unverified]. The report's numbers are therefore reproducible from the
+**Agreement with the uploaded report and with the lab's own census.** Every
+split count at 691, every per-curve z at 691, 5,000 and 50,000, and every
+pooled z at the twelve cutoffs matches the report's table and list to the
+printed precision [pcc:unverified]. The ten counts at 691 also equal the
+`strict691` column of
+`research/nist_skip_criterion_20261025/strict_elkies_20261029/results/at691.tsv`
+for the published rows (p192-139 = 60, p192-6013 = 58, p192-5228 = 57,
+p224-7026 = 50, p239-2185 = 42, p239-2320 = 57, p239-3048 = 57,
+p256-1842 = 57, p384-2688 = 54, p521-1136 = 52), a third producer with
+its own code [pcc:unverified]. The report's numbers are therefore reproducible from the
 public parameters with the stated model; this study did not reproduce the
 report's random-curve calibration (4,267 SEA-counted curves) or its
 percentiles, and makes no statement about them. The last column is this
