@@ -1,0 +1,9 @@
+# Independent review of dynamic Boolean scheduler V2
+
+Inspected the final scheduler, unchanged sparse donor contract, proof propagation, ordering, pair generation, actual reducer lead check, retained state and V2 diff. Rehashed the four source/binary entries in the final test receipt; all match the producer before/after hashes. The receipt reports return code 0; the saved suite covers independent tiny-ideal enumeration, generator-proof expansion, necessary field pairs, variable 129, and refusal points. No independent native rerun is claimed here.
+
+The root review found uncharged scans of empty input polynomials and initial task enqueue loops in V1. V2 adds a per-item admission before each loop body and adds an all-zero-generator refusal control. The patch changes only those admissions and the new control; V1 remains preserved. No remaining blocker was identified for this standalone pair-scheduler component at the reviewed scope.
+
+The sparse order is degree then lexicographic variable-support order, not the original donor row order or automatically the existing engine's degrevlex. Future checked-source conversion must validate or admit reordering explicitly. Every polynomial/proof XOR is transactional; failed temporary construction does not turn an incomplete row into an accepted basis row. An exhausted queue is a reported algorithm completion, not a formal theorem or a finite-instance fall-degree certificate.
+
+Required next work remains genuine same-degree batch matrix assembly and symbolic preprocessing, original checked-source/owner binding, model extraction, signed group lift and all-pattern search coverage. Generic Owner does not prove original authority. Retained attempts are diagnostics, not authenticated resumable checkpoints. No F4/F5, practical large-instance throughput, native-instruction or whole-RSS claim is accepted from these tests.

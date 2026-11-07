@@ -1,0 +1,28 @@
+{
+  "schema": "local-policy-entry-controls/v1",
+  "observed_utc": "2026-11-07T02:12:45.097791+00:00",
+  "compile_exit_code": 0,
+  "test_exit_code": 0,
+  "passed": 21,
+  "new_policy_tests": 5,
+  "unchanged_donor_tests": 16,
+  "failed": 0,
+  "commands": [
+    "timeout 60 bash -c 'ulimit -v 1572864; ulimit -t 60; rustc --edition=2021 --test harness.rs -o policy-tests'",
+    "timeout 30 ./policy-tests --test-threads=1"
+  ],
+  "compiled_scope": [
+    "mechanically extracted original Budget core",
+    "exact scheduler/checker/continuation modules and types",
+    "mechanically extracted actual equation Limits",
+    "policy from_budget, eligible_inputs, and their tests"
+  ],
+  "not_compiled": [
+    "authentic OriginalOwner consuming entry",
+    "CaseConfig projection wrapper",
+    "production module registration and dispatch"
+  ],
+  "cloud_jobs": 0,
+  "scientific_records": 0,
+  "sat_recovery_attempts": 0
+}

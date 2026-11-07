@@ -82,11 +82,17 @@ impl FactorBasePolicy {
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
 pub struct ChannelRequests {
+    #[serde(default,skip_serializing_if="Option::is_none",deserialize_with="present_owned_search")]
+    pub owned_boolean_search:Option<OwnedBooleanSearchRequest>,
+    #[serde(default,skip_serializing_if="Option::is_none",deserialize_with="present_search")]
+    pub sat_search:Option<SatSearchRequest>,
     pub schema: String,
     #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_boolean")]
     pub boolean_consequence: Option<BooleanRequest>,
     #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_sat")]
     pub sat_initial: Option<SatRequest>,
+    #[serde(default, skip_serializing_if = "Option::is_none", deserialize_with = "present_original_row")]
+    pub affine_boolean_row: Option<AffineBooleanRowRequest>,
 }
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(tag = "mode", rename_all = "snake_case", deny_unknown_fields)]
@@ -94,6 +100,12 @@ pub enum BooleanRequest { Produce { row_index: u32 } }
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(tag = "mode", rename_all = "snake_case", deny_unknown_fields)]
 pub enum SatRequest { CaptureAndCheckInitial {} }
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(tag="mode", rename_all="snake_case", deny_unknown_fields)]
+pub enum AffineBooleanRowRequest { AffineUnitRow { pattern:u32, row_index:u32 } }
+fn present_original_row<'de,D:serde::Deserializer<'de>>(d:D)->Result<Option<AffineBooleanRowRequest>,D::Error>{
+    AffineBooleanRowRequest::deserialize(d).map(Some)
+}
 fn present_boolean<'de,D:serde::Deserializer<'de>>(d:D)->Result<Option<BooleanRequest>,D::Error>{
     BooleanRequest::deserialize(d).map(Some)
 }
@@ -105,8 +117,37 @@ pub(super) fn present_channels<'de,D:serde::Deserializer<'de>>(d:D)->Result<Opti
     c.validate().map_err(serde::de::Error::custom)?;
     Ok(Some(c))
 }
+#[derive(Clone,Debug,Serialize,Deserialize,PartialEq,Eq)]
+#[serde(tag="mode",rename_all="snake_case",deny_unknown_fields)]
+pub enum SatSearchRequest { CaptureAndCheckModel {events:u32,conflicts:u64} }
+fn present_search<'de,D:serde::Deserializer<'de>>(d:D)->Result<Option<SatSearchRequest>,D::Error>{SatSearchRequest::deserialize(d).map(Some)}
+#[derive(Clone,Copy,Debug,Serialize,Deserialize,PartialEq,Eq)]
+#[serde(rename_all="snake_case")]
+pub enum OwnedBooleanSearchPolicy { ConservativeAffineEnvelopeV1 }
+#[derive(Clone,Debug,Serialize,Deserialize,PartialEq,Eq)]
+#[serde(tag="mode",rename_all="snake_case",deny_unknown_fields)]
+pub enum OwnedBooleanSearchRequest { MatrixContinuation { pattern:u32, policy:OwnedBooleanSearchPolicy } }
+fn present_owned_search<'de,D:serde::Deserializer<'de>>(d:D)->Result<Option<OwnedBooleanSearchRequest>,D::Error>{OwnedBooleanSearchRequest::deserialize(d).map(Some)}
 impl ChannelRequests {
     pub fn validate(&self)->Result<(),String>{
+        if self.schema=="crypto.ml-dataset.channel-requests/v5" {
+            if self.owned_boolean_search.is_none() || self.boolean_consequence.is_some() || self.sat_initial.is_some() || self.affine_boolean_row.is_some() || self.sat_search.is_some() {return Err("v5 requires exclusive owned_boolean_search".into())}
+            return Ok(());
+        }
+        if self.owned_boolean_search.is_some(){return Err("owned search requires explicit v5".into())}
+
+        if self.schema=="crypto.ml-dataset.channel-requests/v4" {
+            if self.boolean_consequence.is_some()||self.sat_initial.is_some()||self.affine_boolean_row.is_some(){return Err("v4 search request is exclusive".into())}
+            return match self.sat_search {Some(SatSearchRequest::CaptureAndCheckModel{events,conflicts}) if events>0 && events<=1_000_000 && conflicts>0=>Ok(()),_=>Err("v4 requires bounded sat_search".into())};
+        }
+        if self.sat_search.is_some(){return Err("search requires explicit v4".into())}
+        if self.schema == "crypto.ml-dataset.channel-requests/v3" {
+            if self.affine_boolean_row.is_none() || self.boolean_consequence.is_some() || self.sat_initial.is_some() {
+                return Err("v3 requires only affine_boolean_row".into());
+            }
+            return Ok(());
+        }
+        if self.affine_boolean_row.is_some() {return Err("original row requires explicit v3".into())}
         if !matches!(self.schema.as_str(), "crypto.ml-dataset.channel-requests/v1" | "crypto.ml-dataset.channel-requests/v2") || (self.boolean_consequence.is_none() && self.sat_initial.is_none())
             || (self.schema == "crypto.ml-dataset.channel-requests/v2" && self.sat_initial.is_none()) {
             return Err("unknown or empty channel request".into());
@@ -274,6 +315,9 @@ pub enum ChannelDispositionReason {
     RequiresActualOriginalShapeAndRetainedRow, OutsideOrdinaryN3Profile,
     SatCentralWorkerReplayNotIntegrated,
     RequiresActualSatInitialReplay, OutsideSatInitialProfile,
+    RequiresActualAffineUnitRow, OutsideAffineUnitRowProfile,
+    RequiresActualSatSearchReplay, OutsideSatSearchProfile,
+    RequiresActualOwnedSearchReplay, OutsideOwnedSearchProfile,
 }
 #[derive(Clone,Debug,Serialize,Deserialize,PartialEq,Eq)]
 #[serde(deny_unknown_fields)]
@@ -284,9 +328,15 @@ pub struct ChannelDisposition<T> {
 #[derive(Clone,Debug,Serialize,Deserialize,PartialEq,Eq)]
 #[serde(deny_unknown_fields)]
 pub struct RequestedChannelDispositions {
+    #[serde(default,skip_serializing_if="Option::is_none")]
+    pub owned_boolean_search:Option<ChannelDisposition<OwnedBooleanSearchRequest>>,
+    #[serde(default,skip_serializing_if="Option::is_none")]
+    pub sat_search:Option<ChannelDisposition<SatSearchRequest>>,
     pub schema:String,
     pub boolean_consequence:Option<ChannelDisposition<BooleanRequest>>,
     pub sat_initial:Option<ChannelDisposition<SatRequest>>,
+    #[serde(default,skip_serializing_if="Option::is_none")]
+    pub affine_boolean_row:Option<ChannelDisposition<AffineBooleanRowRequest>>,
 }
 #[cfg(test)]
 mod channel_tests {

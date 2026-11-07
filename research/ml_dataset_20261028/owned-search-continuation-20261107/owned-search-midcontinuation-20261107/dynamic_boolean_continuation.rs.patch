@@ -1,0 +1,24 @@
+--- a/src/ml_dataset/dynamic_boolean_continuation.rs
++++ b/src/ml_dataset/dynamic_boolean_continuation.rs
+@@ -56,6 +56,21 @@
+   let out=match before{
+    Err(e)=>CandidateCall{value:None,result:Err(e)},
+    Ok(model)=>{let value=f(model,m.deadline,&mut *m.owner);let result=m.pay(0,0);CandidateCall{value:Some(value),result}},
++  };
++  self.attempt.charge=m.charge;
++  if let Err(e)=out.result{self.attempt.failure=Some(e);self.attempt.outcome=Outcome::Unknown}
++  out
++ }
++ /// Sealed checkpoint callback: state, original equations, owner, caps and clock
++ /// remain in this live Session. No public resume/from_attempt boundary exists.
++ /// Callback charges remain in the original parent ledger. Its returned value
++ /// survives postcheck failure, while the continuation becomes sticky-failed.
++ pub fn with_checkpoint_owner<V>(&mut self,f:impl FnOnce(&Attempt,Instant,&mut T)->V)->CandidateCall<V>{
++  if let Some(e)=self.attempt.failure{return CandidateCall{value:None,result:Err(e)}}
++  let mut m=Meter{owner:self.owner,limits:self.limits,deadline:self.deadline,charge:self.attempt.charge};
++  let out=match m.pay(1,0){
++   Err(e)=>CandidateCall{value:None,result:Err(e)},
++   Ok(())=>{self.attempt.charge=m.charge;let value=f(&self.attempt,m.deadline,&mut *m.owner);let result=m.pay(0,0);CandidateCall{value:Some(value),result}},
+   };
+   self.attempt.charge=m.charge;
+   if let Err(e)=out.result{self.attempt.failure=Some(e);self.attempt.outcome=Outcome::Unknown}

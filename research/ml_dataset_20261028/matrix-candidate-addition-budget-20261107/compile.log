@@ -1,0 +1,15 @@
+warning: use of deprecated method `std::sync::atomic::Atomic::<u64>::fetch_update`: renamed to `try_update` for consistency
+  --> /home/ec2-user/ml-dataset-resume-20261029/matrix-candidate-addition-budget-20261107/budget_core.rs:91:14
+   |
+91 |             .fetch_update(
+   |              ^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+help: replace the use of the deprecated method
+   |
+91 -             .fetch_update(
+91 +             .try_update(
+   |
+
+warning: 1 warning emitted
+

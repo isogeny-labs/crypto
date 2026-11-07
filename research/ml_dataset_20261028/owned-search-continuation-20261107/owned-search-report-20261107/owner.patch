@@ -1,0 +1,26 @@
+--- a/src/ml_dataset/original_boolean_search.rs
++++ b/src/ml_dataset/original_boolean_search.rs
+@@ -1,5 +1,6 @@
+ //! Consuming transport proposal: actual admitted original parts, no borrowed token.
+ use super::*;
++#[path="owned_search_report.rs"] mod report;
+ use provenance::boolean_equations as equations;
+ use provenance::{checked_model, signed_lift, Admission, CheckedMap, Error, Quote};
+ use std::mem::size_of;
+@@ -86,6 +87,7 @@
+     continuation:Option<continuation::Attempt>,coverage:Option<continuation::CoverageAudit>,
+     exclusion_audit:Option<exclusions::Audit>,
+     publication:publication::Publication,
++    report_taken:bool,
+     original_deadline:Instant,failure:Option<Failure>,
+     lift_records:Vec<LiftRecord>,accepted_record:Option<usize>,
+ }
+@@ -275,7 +277,7 @@
+         let mut out=OwnedAttempt{
+             original:OriginalParts{public_sha256:original.public_sha256,factor_sha256:original.factor_base_sha256,budget,binding,launch_sha256,math,checked,unchecked:retained_unchecked,pattern,map_bytes:retained_bytes,map_ack,publication_attempted,map_published,capture_limits,boolean_attempted},
+             sink,diagnostic,expansion:None,normalized:Vec::new(),normalization_generator:0,normalization_term:0,normalization_sort:0,
+-            continuation:None,coverage:None,exclusion_audit:None,publication:publication::Publication::default(),original_deadline,failure:None,
++            continuation:None,coverage:None,exclusion_audit:None,publication:publication::Publication::default(),report_taken:false,original_deadline,failure:None,
+             lift_records:Vec::new(),accepted_record:None,
+         };
+         let caps=match admission{Ok(c)=>c,Err(s)=>{out.fail(Failure::Admission(s),s);return out}};

@@ -1,0 +1,12 @@
+--- a/src/ml_dataset/sat_original_owner.rs
++++ b/src/ml_dataset/sat_original_owner.rs
+@@ -971,6 +971,9 @@
+ #[path = "original_boolean_rows.rs"]
+ pub(in crate::ml_dataset::solvers) mod boolean_rows;
+ 
++#[path="original_boolean_search.rs"]
++pub(in crate::ml_dataset::solvers) mod boolean_search;
++
+ #[path = "affine_row_central.rs"]
+ pub(in crate::ml_dataset::solvers) mod affine_central;
+ #[path = "original_affine_rows.rs"]

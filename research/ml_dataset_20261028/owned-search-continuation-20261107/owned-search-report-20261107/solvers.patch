@@ -1,0 +1,20 @@
+--- a/src/ml_dataset/solvers.rs
++++ b/src/ml_dataset/solvers.rs
+@@ -427,11 +427,12 @@
+         Self{data:SolverData{outcome:Value::Null,artifacts:Vec::new()},stored:Vec::new(),
+             residual:WorkerResidualCustody{sat:Some(custody),boolean_search_report_unavailable:true,..Default::default()}}
+     }
+-    // Lifetime-free actual ownership, but no report admitted until durable
+-    // publication and original-source replay are implemented.
+-    fn from_original_boolean_search(custody:koblitz_m3::sat_original_owner::boolean_search::OwnedAttempt)->Self{
+-        Self{data:SolverData{outcome:Value::Null,artifacts:Vec::new()},stored:Vec::new(),
+-            residual:WorkerResidualCustody{boolean_search:Some(custody),boolean_search_report_unavailable:true,..Default::default()}}
++    // A fixed partial report is admitted against the retained original ledger.
++    // Refused reporting keeps its guard and all native custody.
++    fn from_original_boolean_search(mut custody:koblitz_m3::sat_original_owner::boolean_search::OwnedAttempt)->Self{
++        let outcome=custody.outcome();let unavailable=outcome.is_none();
++        Self{data:SolverData{outcome:outcome.unwrap_or(Value::Null),artifacts:Vec::new()},stored:Vec::new(),
++            residual:WorkerResidualCustody{boolean_search:Some(custody),boolean_search_report_unavailable:unavailable,..Default::default()}}
+     }
+ 
+     fn from_search_custody(mut custody:koblitz_m3::sat_original_owner::search_worker::Custody)->Self {

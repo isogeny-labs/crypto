@@ -1,0 +1,7 @@
+# Native SAT admission component validation
+
+Isolated release compilation passed. The SAT-filtered native suite ran312tests:308passed,0failed,4ignored. All13new native controls passed, including genuine CNF nonroot search, pre-root expiry, work/allocation refusal, original observer preservation, XOR partial copy, analysis/backjump accounting, stable sorting, partial model copy and partial-clause retention. Source hashes stayed unchanged.
+
+The reviewed source is based on802444fa9dc94194b2ae525d9cd3ad14fe1b9b52 with SAT source SHA-256f4097d9d66a3ef2b392110b5cea624e679ed881a031982f4e953d1ea5e1f7c0e. Native source proposals and both review corrections, compiled binary, logs and input hashes are in the S3 archive. Fresh download and contained-hash checks passed. Download the URI in s3.receipt.json, verify the byte count and SHA-256, extract into a fresh directory and run sha256sum -c SHA256SUMS.
+
+The implementation remains in the isolated validation checkout pending full-library and integration gates. Production observed-XOR and complete-search entry gates remain closed. This is the native accounting component; original-owner continuation, full model/signed-prefix verification, genuine both-twist nonroot positives, central replay and CLI activation remain subsequent work. The source review's original partial-clause finding is resolved by the retained correction and passing actual native regression.

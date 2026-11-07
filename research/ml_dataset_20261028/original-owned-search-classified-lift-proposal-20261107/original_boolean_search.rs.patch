@@ -1,0 +1,51 @@
+--- a/original_boolean_search.rs
++++ b/original_boolean_search.rs
+@@ -37,7 +37,7 @@
+     fn check(&mut self)->Result<(),provenance::Error>{self.0.check(Instant::now()).map_err(|_|provenance::Error::Admission)}
+ }
+ impl checked_model::VerificationAdmission for LiftAdmission<'_>{
+-    fn addition(&mut self)->Result<(),provenance::Error>{self.0.reserve_addition(Instant::now()).map_err(|_|provenance::Error::Admission)}
++    fn addition(&mut self)->Result<(),provenance::Error>{self.0.reserve_matrix_candidate_addition(Instant::now()).map_err(|_|provenance::Error::Admission)}
+ }
+ #[derive(Clone,Copy)]
+ pub(in crate::ml_dataset::solvers) struct Caps{pub expansion:equations::Limits,pub search:SearchLimits,pub audit:AuditLimits}
+@@ -129,7 +129,6 @@
+         let Some(node)=search.nodes.get(index)else{self.fail(Failure::Admission(Stop::Phase),Stop::Phase);return};
+         if node.candidate_valid!=Some(true){self.fail(Failure::Admission(Stop::Phase),Stop::Phase);return}
+         let Some(expansion)=self.expansion.as_ref()else{self.fail(Failure::Admission(Stop::Phase),Stop::Phase);return};
+-        if let Err(s)=self.original.budget.begin_extraction(true,Instant::now()){self.fail(Failure::Admission(s),s);return}
+         let result=signed_lift::verify_candidate(
+             expansion.source(),&node.candidate,&self.original.math.signed,self.original.math.signed_target,
+             &mut self.lift_progress,self.original_deadline,&mut LiftAdmission(&mut self.original.budget));
+@@ -137,12 +136,19 @@
+         match result{
+             signed_lift::Outcome::Deadline=>self.fail(Failure::Admission(Stop::Deadline),Stop::Deadline),
+             signed_lift::Outcome::Stopped(e)=>self.fail(Failure::LiftStopped(e),Stop::NativeFailure),
++            signed_lift::Outcome::ExhaustedForModel=>{
++                // This exact Boolean model has exhausted its allowed sign masks.
++                // Retain Matrix phase, candidate and progress for future continuation.
++                // No continuation, blocking clause or pattern UNSAT claim here.
++            },
+             signed_lift::Outcome::RejectedUnclassified(_)=>{
+                 // Keep this exact candidate, remaining search nodes and lift
+                 // progress. Further model search is NOT implemented here.
+                 // No pattern refutation or global no-lift result is inferred.
+             },
+             signed_lift::Outcome::VerifiedSignedRelation=>{
++                if let Err(s)=self.original.budget.finish_native(Instant::now()){self.fail(Failure::Admission(s),s);return}
++                if let Err(s)=self.original.budget.begin_extraction(true,Instant::now()){self.fail(Failure::Admission(s),s);return}
+                 // Stay in Extraction for prepaid capture/publication. Completing
+                 // the budget here would prohibit later same-owner writes.
+                 if let Err(s)=self.original.budget.check(Instant::now()){self.fail(Failure::Admission(s),s)}
+@@ -168,8 +174,9 @@
+         let audit=check::verify(variables,&self.normalized,self.search.as_ref().expect("retained search"),caps.audit,self.original_deadline,&mut MatrixAdmission(&mut self.original.budget));
+         let status=audit.result;self.audit=Some(audit);
+         if let Err(f)=status{let stop=if f==check::Failure::Deadline{Stop::Deadline}else{Stop::NativeFailure};self.fail(Failure::Audit(f),stop);return}
+-        if let Err(s)=self.original.budget.finish_native(Instant::now()){self.fail(Failure::Admission(s),s);return}
+-        self.lift_candidate();
++        if self.search.as_ref().is_some_and(|s|s.verdict==scheduler::search::Verdict::Witness){
++            self.lift_candidate();
++        }else if let Err(s)=self.original.budget.finish_native(Instant::now()){self.fail(Failure::Admission(s),s)}
+     }
+ }
+ impl OriginalOwner<'_>{

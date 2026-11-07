@@ -1,0 +1,9 @@
+--- a/src/ml_dataset/sat_original_owner.rs
++++ b/src/ml_dataset/sat_original_owner.rs
+@@ -984,3 +984,6 @@
+ 
+ #[path="sat_search_worker.rs"]
+ pub(in crate::ml_dataset::solvers) mod search_worker;
++
++#[path="owned_boolean_search_worker.rs"]
++pub(in crate::ml_dataset::solvers) mod owned_search_worker;

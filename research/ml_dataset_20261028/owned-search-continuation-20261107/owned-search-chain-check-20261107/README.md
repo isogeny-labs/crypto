@@ -1,0 +1,19 @@
+# Independent retained-search capture check
+
+`python3 check_capture.py /sealed/cell/live --binding ATTEMPT_DIGEST --sources trusted-sources.json`
+
+The source JSON must contain exactly `public_sha256`, `factor_sha256`, `launch_sha256`, and `binding_sha256`, each a lowercase SHA256. The owner binding is distinct from the capture attempt binding supplied by `--binding`. Obtain both from independently trusted original inputs; reading them from the same untrusted capture does not authenticate anything.
+
+This read-only checker implements the actual `capture.rs` live-event/v2 and capture-head/v1 formats. It hashes original complete JSONL line bytes including newlines, starts at the actual capture genesis, checks exact committed sequence/head byte offsets, and validates each unique payload's size/hash. Payload files must be regular files without symlink path components. The head's uncommitted file suffix is deliberately ignored. It supports full prefixes from genesis, not supervisor delta/segment exports. Run against an immutable copied/sealed directory; this is not a concurrent filesystem or hostile TOCTOU defense.
+
+Owned-search chunk events use the actual publication role, encoding and filenames. Within each snapshot, chunks must be numbered from zero and adjacent in the committed stream. Snapshot indices per pattern begin at zero and are consecutive; the first chunk immediately follows the map acknowledgement or the previous snapshot final chunk. The actual owner binding derivation from attempt digest and public/factor hashes is recomputed for each snapshot. The inspector decodes their concatenation, matches snapshot/pattern and externally supplied source identities, hashes retained map bytes, and matches the previously committed original gate-map payload plus its exact map acknowledgement position. Incomplete snapshots cause failure; the checker does not claim that all intermediate computation states were captured or that snapshots form an exhaustive history.
+
+Limits: 128 MiB combined event/payload data by default; 100000 events; 1 MiB per event; 64 KiB head/source metadata. Library limits may be raised only to 1 GiB and 1000000 events. Binary decoding uses inherited finite depth/value/string limits. Hashing uses 64 KiB blocks; no full payload or binary parse tree is allocated. Metadata maps remain bounded by event limits. No cloud access, build, generation, or mutation occurs.
+
+## Validation and precise scope
+
+`python3 -m unittest -v` runs 17 new chain/binding controls plus 11 unchanged wire-inspector controls. The new chain fixtures are independently generated Python fixtures conforming to the real Rust format; they are not actual CaptureEmitter executions. The wire inspector source and its tests are copied unchanged from `owned-search-wire-inspector-20261107`.
+
+`NATIVE_PREFIX_READBACK.json` additionally records successful checking of four saved native CLI acceptance live prefixes (99, 97, 119 and 117 events) from `nov2-boolean-cli-acceptance-pass-checkpoint`. These contain no new owned-search snapshots. Their binding was read from the observed head, so this establishes independent compatibility and internal consistency, not external authenticity. Dummy source hashes were unused because snapshot_count was zero. No native CLI or full Cargo build was rerun.
+
+A valid capture hash chain is not a signature and can be forged together with all its contents. This checker does not authenticate the producer, hash original public/factor/launch inputs, validate gate-map algebra, replay polynomial/search semantics, prove a fall degree, verify remote S3 custody, or establish solved/training-ready status. Those require the original input/custody and mathematical replay paths. Full actual owner-to-CaptureEmitter-to-this-checker execution remains outstanding.
