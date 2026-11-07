@@ -2023,10 +2023,25 @@ fn class_setup_detail(setup: GroupOps) -> Value {
         "scalar_mults": setup.scalar_mults, "gae": setup.gae()}})
 }
 
+/// Put a rho walk's uncounted-but-priced work (the short-cycle window's and
+/// Brent's compares, [`crate::cryptanalysis::ic_boundary::WINDOW_WORD_OPS`])
+/// in its `search` phase's `work_native`, where `ecbench::work` prices it and a
+/// replay compares it only for records that carry it.
+fn attach_work_native(phases: &mut [PhaseRecord], work: &BTreeMap<String, u64>) {
+    if work.is_empty() {
+        return;
+    }
+    if let Some(search) = phases.iter_mut().find(|p| p.name == "search") {
+        for (k, v) in work {
+            *search.work_native.entry(k.clone()).or_default() += v;
+        }
+    }
+}
+
 fn rho_report(res: RhoResult, wall: u64, field_ops: Option<FieldOps>) -> SolveReport {
     let c = &res.counters;
     let get = |k: &str| c.get(k).copied().unwrap_or(0);
-    let phases = if c.is_empty() {
+    let mut phases = if c.is_empty() {
         vec![ops_phase("search", res.group_ops)]
     } else {
         let setup = get("setup_additions") + get("setup_doublings");
@@ -2045,6 +2060,7 @@ fn rho_report(res: RhoResult, wall: u64, field_ops: Option<FieldOps>) -> SolveRe
         w.scalar_mults = res.group_ops.scalar_mults;
         vec![s, w, mk("internal_verification", verify)]
     };
+    attach_work_native(&mut phases, &res.work_native);
     let mut counters = res.counters.clone();
     counters.insert("steps".into(), res.steps);
     counters.insert("walks".into(), res.walks);
@@ -2192,7 +2208,8 @@ fn rho_report_v2(
     a.scalar_mults = class_setup.scalar_mults;
     let mut w = mk("search", search);
     w.scalar_mults = res.group_ops.scalar_mults;
-    let phases = vec![s, a, w, mk("internal_verification", verify)];
+    let mut phases = vec![s, a, w, mk("internal_verification", verify)];
+    attach_work_native(&mut phases, &res.work_native);
     let total_gae = phases.iter().map(|p| p.gae).sum::<f64>();
     let mut counters = res.counters.clone();
     counters.insert("steps".into(), res.steps);
@@ -2247,7 +2264,8 @@ fn pooled_report(res: RhoBatchResult, wall: u64, field_ops: Option<FieldOps>) ->
     s.doubles = setup_dbls;
     let mut w = mk("search", search);
     w.scalar_mults = res.group_ops.scalar_mults;
-    let phases = vec![s, w, mk("internal_verification", verify)];
+    let mut phases = vec![s, w, mk("internal_verification", verify)];
+    attach_work_native(&mut phases, &res.work_native);
     let mut counters = res.counters.clone();
     let steps: u64 = res.per_target.iter().map(|t| t.steps).sum();
     let walks: u64 = res.per_target.iter().map(|t| t.walks).sum();
@@ -9528,6 +9546,96 @@ mod accounting_rules_tests {
             .contains(&"distinguished_point_table_queries_uncharged".to_string()));
         assert_eq!(old.phases.len(), 3);
         assert_eq!(new.phases.len(), 4);
+    }
+
+    /// The tuned walk's short-cycle window (and, under v2, Brent's checks)
+    /// is charged in `bitop/v1` through the search phase's `work_native`,
+    /// never as a counter, so the frozen ids keep the counters they were
+    /// recorded with.
+    #[test]
+    fn tuned_rho_window_compares_are_priced_through_work_native() {
+        use crate::cryptanalysis::ecbench::work::{price, Priceable};
+        use crate::cryptanalysis::ic_boundary::{BRENT_WORD_OPS, WINDOW_WORD_OPS};
+        for (spec, id) in [
+            (
+                CurveSpec::PrimeSearch {
+                    bits: 18,
+                    seed: 59297,
+                },
+                "rho.negation",
+            ),
+            (
+                CurveSpec::PrimeSearch {
+                    bits: 18,
+                    seed: 59297,
+                },
+                "rho.plain",
+            ),
+            (
+                CurveSpec::PrimeSearch {
+                    bits: 18,
+                    seed: 59297,
+                },
+                "rho.negation_v2",
+            ),
+            (CurveSpec::Koblitz { a: 0, n: 19 }, "rho.signed_frobenius"),
+        ] {
+            let (inst, facts) = built(&spec);
+            let rep = run(&method(id, &[]), &inst, &facts, 5555, 8);
+            assert!(rep.recovered.is_some(), "{id}");
+            for name in [WINDOW_WORD_OPS, BRENT_WORD_OPS] {
+                assert!(
+                    !rep.counters.contains_key(name),
+                    "{id}: {name} is a counter"
+                );
+            }
+            let search = rep
+                .phases
+                .iter()
+                .find(|p| p.name == "search")
+                .expect("a search phase");
+            let window = search
+                .work_native
+                .get(WINDOW_WORD_OPS)
+                .copied()
+                .unwrap_or(0);
+            // Every step scans the ring and pushes into it.
+            assert!(window >= 2 * rep.counters["steps"], "{id}: {window}");
+            let brent = search.work_native.get(BRENT_WORD_OPS).copied().unwrap_or(0);
+            assert_eq!(brent > 0, id.ends_with("_v2"), "{id}: brent {brent}");
+            let priced = |phases: &[PhaseRecord]| {
+                price(&Priceable {
+                    method_id: id,
+                    method_params: &BTreeMap::new(),
+                    curve: &facts,
+                    phases,
+                    counters: &rep.counters,
+                    solver: None,
+                })
+                .expect("priced")
+            };
+            let with = priced(&rep.phases);
+            // The window counters are priced (v2 keeps its own table counters
+            // unpriced, as before).
+            for name in [WINDOW_WORD_OPS, BRENT_WORD_OPS] {
+                assert!(
+                    !with.unpriced.iter().any(|u| u == name),
+                    "{id}: {name} unpriced"
+                );
+            }
+            // Without the window's work the search phase is cheaper by
+            // exactly its word operations.
+            let mut bare = rep.phases.clone();
+            for p in bare.iter_mut() {
+                p.work_native.clear();
+            }
+            let without = priced(&bare);
+            let word = crate::cryptanalysis::bitops::Prim::WordOp;
+            let gates = with.widths.gates(word).expect("word_op priced");
+            let diff: u128 =
+                with.bitops.parse::<u128>().unwrap() - without.bitops.parse::<u128>().unwrap();
+            assert_eq!(diff, gates * u128::from(window + brent), "{id}");
+        }
     }
 
     #[test]

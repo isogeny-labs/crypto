@@ -705,6 +705,13 @@ pub struct RhoResult {
     /// that predate it, so their reports are unchanged.
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     pub counters: BTreeMap<String, u64>,
+    /// Work that `bitop/v1` prices but no counter carries, for the search
+    /// phase's `work_native` (the short-cycle window's and Brent's compares,
+    /// [`WINDOW_WORD_OPS`], [`BRENT_WORD_OPS`]).  Kept out of `counters` so
+    /// that committed records replay unchanged, and out of the serialised
+    /// result.
+    #[serde(skip)]
+    pub work_native: BTreeMap<String, u64>,
 }
 
 /// One instance of one regime: the curve, the boundaries, the reference
@@ -1455,6 +1462,7 @@ pub fn rho_reference<G: CountedGroup>(
         verified: recovered.is_some(),
         recovered,
         counters: BTreeMap::new(),
+        work_native: BTreeMap::new(),
     }
 }
 
@@ -2234,6 +2242,16 @@ struct WalkTally {
     lost_abandoned: u64,
     lost_capped: u64,
     lost_budget: u64,
+    /// 64-bit compares of the short-cycle window, which `bitop/v1` had not
+    /// charged (research/rho_cycle_window_bitops_20261107): every key of the
+    /// ring scanned per step, the ring index test of each push and, on a
+    /// hit, the ordered re-scan, the least-key search and the repeat test.
+    /// Reported as the search phase's `work_native` (never a counter, so
+    /// committed records replay unchanged).
+    window_word_ops: u64,
+    /// Brent's per-step compares ([`WalkPolicy::brent`]): the least-key
+    /// update, the checkpoint test and the power-of-two test.
+    brent_word_ops: u64,
 }
 
 /// How a walk that never reached a distinguished point ended.
@@ -2278,8 +2296,30 @@ impl WalkTally {
         self.lost_abandoned += o.lost_abandoned;
         self.lost_capped += o.lost_capped;
         self.lost_budget += o.lost_budget;
+        self.window_word_ops += o.window_word_ops;
+        self.brent_word_ops += o.brent_word_ops;
+    }
+
+    /// The window's and Brent's word operations, as a search phase's
+    /// `work_native` (`ecbench::work` prices each as one `word_op`).
+    /// Empty when the walk ran neither.
+    pub(crate) fn work_native(&self) -> BTreeMap<String, u64> {
+        let mut out = BTreeMap::new();
+        if self.window_word_ops > 0 {
+            out.insert(WINDOW_WORD_OPS.to_string(), self.window_word_ops);
+        }
+        if self.brent_word_ops > 0 {
+            out.insert(BRENT_WORD_OPS.to_string(), self.brent_word_ops);
+        }
+        out
     }
 }
+
+/// `work_native` name of the short-cycle window's compares (see
+/// [`WalkTally`]); priced one `word_op` each.
+pub const WINDOW_WORD_OPS: &str = "cycle_window_word_ops";
+/// `work_native` name of Brent's per-step compares; one `word_op` each.
+pub const BRENT_WORD_OPS: &str = "brent_word_ops";
 
 /// How one walk ended.
 enum WalkEnd<E> {
@@ -2506,9 +2546,14 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
             }
             // A short cycle: this point is one of the last `window`.
             if self.window > 0 {
+                // The scan compares the key with every entry of the ring.
+                tally.window_word_ops += self.recent_keys.len() as u64;
                 if let Some(pos) = self.recent_position(key) {
                     // The cycle is the `c` most recent points.
                     let c = self.recent_keys.len() - pos;
+                    // The ordered re-scan to the hit, the least-key search
+                    // over the cycle's `c` members, the repeat test.
+                    tally.window_word_ops += (pos as u64 + 1) + (c as u64 - 1) + 1;
                     match c {
                         2 => tally.cycles_2 += 1,
                         4 => tally.cycles_4 += 1,
@@ -2553,6 +2598,8 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
                         (since, power) = (0, 1);
                     }
                 }
+                // The push: the fill test and the ring index wrap.
+                tally.window_word_ops += 2;
                 self.remember((key, x, a, b));
             }
             if h & self.dp_mask == 0 {
@@ -2563,12 +2610,17 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
                 // closes a cycle.  `since_min` runs over every point since the
                 // checkpoint, which on a return to it is the whole cycle.
                 since += 1;
+                // The least-key update and the checkpoint test; the power test
+                // below runs when the checkpoint is not hit.
+                tally.brent_word_ops += 2 + u64::from(key != checkpoint);
                 if key < since_min.0 {
                     since_min = (key, x, a, b);
                 }
                 if key == checkpoint {
                     tally.cycles_long += 1;
                     let (min_key, mp, ma, mb) = since_min;
+                    // The repeat test.
+                    tally.brent_word_ops += 1;
                     if last_escape == Some(min_key) {
                         tally.abandoned += 1;
                         tally.lose(ops0, LostHow::Abandoned);
@@ -2598,6 +2650,7 @@ impl<'a, G: CountedGroup, C: RhoClasses<G>> TunedWalker<'a, G, C> {
                         return WalkEnd::Lost;
                     }
                     if self.window > 0 {
+                        tally.window_word_ops += 2;
                         self.remember((key, x, a, b));
                     }
                     checkpoint = key;
@@ -2825,6 +2878,7 @@ pub fn rho_walk_with_policy<G: CountedGroup, C: RhoClasses<G>>(
         wall_ns,
         verified: recovered.is_some(),
         recovered,
+        work_native: tally.work_native(),
         counters: {
             let mut counters =
                 tuned_counters(&shape, setup, start_adds, &tally, verification_ops, useless);
@@ -2885,6 +2939,9 @@ pub struct RhoBatchResult {
     pub all_verified: bool,
     pub wall_ns: u64,
     pub counters: BTreeMap<String, u64>,
+    /// As [`RhoResult::work_native`].
+    #[serde(skip)]
+    pub work_native: BTreeMap<String, u64>,
 }
 
 /// **Batch rho** (Kuhn–Struik): `k` logarithms in one group, the tuned
@@ -3083,6 +3140,7 @@ pub fn rho_batch_with<G: CountedGroup, C: RhoClasses<G>>(
         per_target,
         wall_ns: start.elapsed().as_nanos() as u64,
         counters,
+        work_native: tally_all.work_native(),
     }
 }
 
@@ -3312,6 +3370,7 @@ pub fn ic_residual_batch_with<G: CountedGroup, C: RhoClasses<G>>(
         per_target,
         wall_ns: start.elapsed().as_nanos() as u64,
         counters,
+        work_native: tally_all.work_native(),
     }
 }
 
@@ -3659,6 +3718,7 @@ pub fn signed_frobenius_rho(
         recovered,
         verified: report.verified && recovered == Some(planted),
         counters: signed_rho_counters(&report),
+        work_native: BTreeMap::new(),
     })
 }
 
@@ -4125,7 +4185,12 @@ impl<'a> ParallelRho<'a> {
         }
         if self.walk.cycle_window > 0 {
             let key = lane.x.pack();
+            // The scan compares the key with every slot of the inline ring.
+            tally.window_word_ops += RECENT_MAX as u64;
             if let Some(pos) = lane.recent.position(key) {
+                // The re-scan to the hit (bounded by the window), the least-key search, the repeat test.
+                let c = (lane.recent.len - pos) as u64;
+                tally.window_word_ops += lane.recent.window as u64 + (c - 1) + 1;
                 match lane.recent.len - pos {
                     2 => tally.cycles_2 += 1,
                     4 => tally.cycles_4 += 1,
@@ -4165,6 +4230,8 @@ impl<'a> ParallelRho<'a> {
                     return LaneEnd::Lost;
                 }
             }
+            // The push: the ring index wrap and the length bound.
+            tally.window_word_ops += 2;
             lane.recent
                 .push(lane.x.pack(), (lane.x, lane.s, lane.e, lane.acc));
         }
