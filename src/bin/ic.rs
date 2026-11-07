@@ -81,7 +81,12 @@ struct Cli {
     store_name: Option<String>,
     /// GPU offload: off (default), auto (discover workers) or a worker executable. Every offloaded
     /// result is re-verified on the CPU and a worker failure falls back to the CPU path.
-    #[arg(long, global = true, value_name = "off|auto|WORKER", default_value = "off")]
+    #[arg(
+        long,
+        global = true,
+        value_name = "off|auto|WORKER",
+        default_value = "off"
+    )]
     gpu: String,
 }
 #[derive(Subcommand)]
