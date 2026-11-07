@@ -269,7 +269,16 @@ fn main() {
     let xs: Vec<u64> = (0..targets).map(|_| plant.gen_range(1..n)).collect();
     let qs: Vec<Pt> = {
         // computed with an uncounted copy of the field
-        let f0 = F { p, a: f.a, b: f.b, ci: Cell::new(0), cm: Cell::new(0), cs: Cell::new(0), ch: Cell::new(0), cl: Cell::new(0) };
+        let f0 = F {
+            p,
+            a: f.a,
+            b: f.b,
+            ci: Cell::new(0),
+            cm: Cell::new(0),
+            cs: Cell::new(0),
+            ch: Cell::new(0),
+            cl: Cell::new(0),
+        };
         xs.iter().map(|&x| f0.smul(g, x)).collect()
     };
     let mut rng = StdRng::seed_from_u64(seed.wrapping_mul(0x2545_f491_4f6c_dd1d) ^ 0xabcdef);
@@ -431,7 +440,10 @@ fn main() {
                             let k = coef * c;
                             if fix.is_none() && k != 0 {
                                 let rest = md(rhs as i128 - coef as i128 * dv as i128, n);
-                                fix = Some((rest as u128 * inv_mod(md(k as i128, n)) as u128 % n as u128) as u64);
+                                fix = Some(
+                                    (rest as u128 * inv_mod(md(k as i128, n)) as u128 % n as u128)
+                                        as u64,
+                                );
                             }
                             continue;
                         }
@@ -449,7 +461,10 @@ fn main() {
                             let k = c2 - co;
                             if k != 0 {
                                 let rest = md(dov as i128 - d2 as i128, n);
-                                fix = Some((rest as u128 * inv_mod(md(k as i128, n)) as u128 % n as u128) as u64);
+                                fix = Some(
+                                    (rest as u128 * inv_mod(md(k as i128, n)) as u128 % n as u128)
+                                        as u64,
+                                );
                             }
                         }
                     }
@@ -473,7 +488,11 @@ fn main() {
                     ensure_w(&f, k, &mut w_pts, &mut w_log);
                     trials += 2;
                     if q.unwrap().0 == w_pts[k].unwrap().0 {
-                        break 'tgt if q == w_pts[k] { w_log[k] } else { (n - w_log[k]) % n };
+                        break 'tgt if q == w_pts[k] {
+                            w_log[k]
+                        } else {
+                            (n - w_log[k]) % n
+                        };
                     }
                     if let Some((xp, xm)) = f.xpair(q, w_pts[k]) {
                         for (xx, sw) in [(xp, 1i64), (xm, -1i64)] {
@@ -482,13 +501,19 @@ fn main() {
                                 let (i, j, kind) = e;
                                 let yl = match kind {
                                     2 => ylog[i as usize].map(|y| md(2 * y as i128, n)),
-                                    0 => ylog[i as usize].zip(ylog[j as usize]).map(|(a, b)| md(a as i128 + b as i128, n)),
-                                    _ => ylog[i as usize].zip(ylog[j as usize]).map(|(a, b)| md(a as i128 - b as i128, n)),
+                                    0 => ylog[i as usize]
+                                        .zip(ylog[j as usize])
+                                        .map(|(a, b)| md(a as i128 + b as i128, n)),
+                                    _ => ylog[i as usize]
+                                        .zip(ylog[j as usize])
+                                        .map(|(a, b)| md(a as i128 - b as i128, n)),
                                 };
                                 match yl {
                                     Some(dl) => {
                                         let dpt2 = entry_pt(&f, e);
-                                        break 'tgt resolve(&f, q, w_pts[k], sw, w_log[k], dpt2, dl, n);
+                                        break 'tgt resolve(
+                                            &f, q, w_pts[k], sw, w_log[k], dpt2, dl, n,
+                                        );
                                     }
                                     None => wasted_hits += 1,
                                 }
@@ -533,14 +558,22 @@ fn main() {
             let mut db_steps = 0u64;
             while db.len() < db_target {
                 if st >= RESTART || cur.is_none() {
-                    let (k1, k2, k3) = (rng.gen_range(0..BANK), rng.gen_range(0..BANK), rng.gen_range(0..BANK));
+                    let (k1, k2, k3) = (
+                        rng.gen_range(0..BANK),
+                        rng.gen_range(0..BANK),
+                        rng.gen_range(0..BANK),
+                    );
                     cur = f.padd(f.padd(bank[k1].0, bank[k2].0), bank[k3].0);
                     ca = (bank[k1].1 + bank[k2].1 + bank[k3].1) % n;
                     st = 0;
                 }
                 let h = hidx(cur);
                 let prev = cur;
-                let (nx, sx) = if sib { f.padd_with_sibling(prev, arms[h].0) } else { (f.padd(prev, arms[h].0), None) };
+                let (nx, sx) = if sib {
+                    f.padd_with_sibling(prev, arms[h].0)
+                } else {
+                    (f.padd(prev, arms[h].0), None)
+                };
                 cur = nx;
                 if let Some((xm, ym)) = sx {
                     f.hash();
@@ -572,7 +605,11 @@ fn main() {
                     let prev = cur;
                     let pa = ca;
                     let _ = prev;
-                    let (nx, sx) = if sib { f.padd_with_sibling(prev, arms[h].0) } else { (f.padd(prev, arms[h].0), None) };
+                    let (nx, sx) = if sib {
+                        f.padd_with_sibling(prev, arms[h].0)
+                    } else {
+                        (f.padd(prev, arms[h].0), None)
+                    };
                     cur = nx;
                     ca = (ca + arms[h].1) % n;
                     st += 1;
@@ -590,7 +627,10 @@ fn main() {
                         if let Some(&(a2, y2)) = db.get(&xm) {
                             // sibling: prev - A = (pa - a_A) G + Q, known in full
                             let eps: i128 = if ym == y2 { 1 } else { -1 };
-                            break md(eps * a2 as i128 - md(pa as i128 - arms[h].1 as i128, n) as i128, n);
+                            break md(
+                                eps * a2 as i128 - md(pa as i128 - arms[h].1 as i128, n) as i128,
+                                n,
+                            );
                         }
                     }
                     if steps_total > 4_000_000_000 {
@@ -600,7 +640,15 @@ fn main() {
                 found[t] = v;
             }
             snap.push(("targets".into(), take(&f)));
-            Out { ok: 0, extra: format!("\"db\":{},\"db_steps\":{},\"target_steps\":{}", db.len(), db_steps, steps_total) }
+            Out {
+                ok: 0,
+                extra: format!(
+                    "\"db\":{},\"db_steps\":{},\"target_steps\":{}",
+                    db.len(),
+                    db_steps,
+                    steps_total
+                ),
+            }
         }
         "bsgs2" => {
             let mf = param;
@@ -696,7 +744,18 @@ fn main() {
                 found[t] = v_found.unwrap();
             }
             snap.push(("targets".into(), take(&f)));
-            Out { ok: 0, extra: format!("\"u\":{},\"v\":{},\"mx\":{},\"baby\":{},\"giants\":{},\"trials\":{}", u, v, mx, baby.len(), h_pts.len(), trials) }
+            Out {
+                ok: 0,
+                extra: format!(
+                    "\"u\":{},\"v\":{},\"mx\":{},\"baby\":{},\"giants\":{},\"trials\":{}",
+                    u,
+                    v,
+                    mx,
+                    baby.len(),
+                    h_pts.len(),
+                    trials
+                ),
+            }
         }
         _ => panic!("unknown arm"),
     };
