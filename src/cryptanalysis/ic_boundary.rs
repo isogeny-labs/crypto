@@ -7999,7 +7999,11 @@ pub struct WalkTable<E> {
     map: FastMap<u64>,
     /// With `g_jumps`: the same key → `z` modulo `r`.
     zmap: FastMap<u64>,
-    /// Base index of the two seeds, and their relation columns.
+    /// Seeds in the base: 2, or 1 (`F = 1`, needs `g_jumps`: jumps
+    /// `[α_j]P1 + [γ_j]G`, entries `u·P1 + z·G`, `v = 0` throughout).
+    pub n_seeds: usize,
+    /// Base index of the two seeds, and their relation columns (with one
+    /// seed both slots name it).
     seeds: [usize; 2],
     seed_cols: [usize; 2],
     /// `pows[c][i] = [2^i]P_c` (`c = 2`: `G`), `None` for the identity.
@@ -8091,9 +8095,16 @@ impl<E: Copy + PartialEq> WalkTable<E> {
         seed: u64,
     ) -> Result<Self, String> {
         let (t, t_max, w, bound) = wwalk_plan_check(r, x, jumps, opts)?;
-        if fb.abscissa_list.len() != 2 {
+        let n_seeds = fb.abscissa_list.len();
+        if n_seeds == 1 && !opts.g_jumps {
+            return Err(
+                "wwalk: a 1-seed base needs g=1 (without G a collision row du·s1 = 0 is empty)"
+                    .into(),
+            );
+        }
+        if n_seeds != 2 && n_seeds != 1 {
             return Err(format!(
-                "wwalk: needs exactly 2 seeds (base abscissae); the base has {}",
+                "wwalk: needs exactly 2 seeds (base abscissae), or 1 with g=1; the base has {}",
                 fb.abscissa_list.len()
             ));
         }
@@ -8108,7 +8119,7 @@ impl<E: Copy + PartialEq> WalkTable<E> {
         };
         let grow = opts.grow > 0;
         let start = Instant::now();
-        let seeds: [usize; 2] = [0, 1].map(|c| {
+        let seeds: [usize; 2] = [0, n_seeds - 1].map(|c| {
             let a = fb.abscissa_list[c];
             fb.x_index
                 .get(&a)
@@ -8119,7 +8130,7 @@ impl<E: Copy + PartialEq> WalkTable<E> {
         let nbits = (64 - bound.leading_zeros()) as usize;
         let mut setup_ops = GroupOps::default();
         let mut pows: [Vec<Option<E>>; 3] = [Vec::new(), Vec::new(), Vec::new()];
-        for c in 0..2 {
+        for c in 0..n_seeds {
             let mut cur = (!g.is_identity(&p[c])).then_some(p[c]);
             pows[c].push(cur);
             for _ in 1..nbits {
@@ -8148,6 +8159,7 @@ impl<E: Copy + PartialEq> WalkTable<E> {
             } else {
                 fast_map(0)
             },
+            n_seeds,
             seeds,
             seed_cols,
             pows,
@@ -8169,7 +8181,7 @@ impl<E: Copy + PartialEq> WalkTable<E> {
             build_wall_ns: 0,
             insert_attempts: 0,
             identities_skipped: 0,
-            index_lookups: 2,
+            index_lookups: n_seeds as u64,
             collisions: Vec::new(),
             collision_z: Vec::new(),
             verified_collisions: 0,
@@ -8189,7 +8201,12 @@ impl<E: Copy + PartialEq> WalkTable<E> {
             if tries > 64 * jumps as u32 {
                 return Err("wwalk: could not draw non-identity jump points".into());
             }
-            let (al, be) = (rng.gen_range(1..=w), rng.gen_range(1..=w));
+            // One seed: no P2 part (β = 0), and no draw for it.
+            let (al, be) = if n_seeds == 2 {
+                (rng.gen_range(1..=w), rng.gen_range(1..=w))
+            } else {
+                (rng.gen_range(1..=w), 0)
+            };
             let ga = if opts.g_jumps { rng.gen_range(1..r) } else { 0 };
             let mut ops = table.setup_ops;
             let pt = table.eval(g, &mut ops, al, be, ga);
@@ -16411,5 +16428,155 @@ mod wwalk_table_tests {
             grow: 3,
         };
         assert!(WalkTable::build_with(g, Some(gen), &fb, r, 1.0, 16, three, 0).is_err());
+    }
+
+    /// `wwalk` over a **one-seed** base (`F = 1`, `g=1`): jumps are
+    /// `[α_j]P1 + [γ_j]G`, entries `u·P1 + z·G` with `v = 0`, every free row
+    /// is the affine equation `du·s1 = −dz` over the single seed column
+    /// (one such row pins `log P1`), probe answers rebuild the target, and
+    /// `grow=1` / `grow=2` both stop at rank 1 or at the cap.  Without `g`
+    /// the one-seed base is refused.
+    #[test]
+    fn wwalk_one_seed_rows_are_affine_and_grow_reaches_rank_one() {
+        let inst = prime_instance_for(12, 3);
+        let g = &inst.curve;
+        let r = inst.r;
+        let h = inst.cofactor;
+        let gen = inst.generator_point();
+        let log = logs(&inst);
+        let mut cops = GroupOps::default();
+        let log_of = |p: &PrimePoint, cops: &mut GroupOps| -> u64 {
+            let hp = g.mul(cops, *p, h);
+            if g.is_identity(&hp) {
+                0
+            } else {
+                log[&g.key(&hp)]
+            }
+        };
+        let fb = prime_factor_base(&inst, 1);
+        assert_eq!(fb.abscissa_list.len(), 1);
+        let mut col_log = vec![None; fb.columns];
+        for (i, p) in fb.points.iter().enumerate() {
+            let inv = invmod(fb.coef_of[i] % r, r).unwrap();
+            let l = ((log_of(p, &mut cops) as u128 * inv as u128) % r as u128) as u64;
+            let slot = col_log[fb.col_of[i]].get_or_insert(l);
+            assert_eq!(*slot, l);
+        }
+        let dot = |row: &[(usize, u64)]| {
+            row.iter().fold(0u128, |s, &(col, v)| {
+                (s + v as u128 * col_log[col].unwrap() as u128) % r as u128
+            })
+        };
+        let (mut rank1, mut capped, mut total_rows) = (0, 0, 0u64);
+        for (x, jumps, grow, seed) in [
+            (2.0, 16usize, 0u8, 0u64),
+            (1.0, 8, 1, 1),
+            (1.0, 16, 1, 2),
+            (1.5, 16, 2, 3),
+            (1.0, 16, 2, 4),
+            (0.5, 16, 2, 5),
+            (0.5, 16, 1, 6),
+            (1.0, 16, 2, 7),
+        ] {
+            let opts = WalkOpts {
+                g_jumps: true,
+                grow,
+            };
+            let t = WalkTable::build_with(g, Some(gen), &fb, r, x, jumps, opts, seed).unwrap();
+            assert_eq!(t.n_seeds, 1);
+            assert_eq!(t.seeds[0], t.seeds[1]);
+            assert_eq!(t.index_lookups, 1);
+            // (a) charging: one addition a step; doublings are P1's and G's
+            // doubled multiples only (no second seed); the ledgers sum.
+            assert_eq!(t.walk_ops.adds, t.steps);
+            assert_eq!(t.walk_ops.doubles, 0);
+            assert_eq!(t.verify_ops.doubles, 0);
+            assert!(t
+                .jump_coefs
+                .iter()
+                .all(|&(al, be)| be == 0 && (1..=t.w).contains(&al)));
+            assert!(t.jump_gammas.iter().all(|&ga| (1..r).contains(&ga)));
+            let nbits = u64::from(64 - (1 + t.t_max * t.w).leading_zeros());
+            let gbits = u64::from(64 - (r - 1).leading_zeros());
+            assert!(t.setup_ops.doubles <= (nbits - 1) + (gbits - 1));
+            let mut sum = t.setup_ops;
+            sum.merge(t.walk_ops);
+            sum.merge(t.verify_ops);
+            assert_eq!(sum.adds, t.build_ops.adds);
+            assert_eq!(sum.doubles, t.build_ops.doubles);
+            assert_eq!(t.t_max, t.t * (1 + u64::from(grow)));
+            assert!(t.steps >= t.t && t.steps <= t.t_max);
+            assert_eq!(t.inconsistent_rows, 0);
+            assert_eq!(t.rows.len(), t.row_consts.len());
+            // (b) every probe answer reproduces its target with v = 0.
+            let p1 = fb.points[t.seeds[0]];
+            let mut ops = GroupOps::default();
+            let mut lookups = 0;
+            let mut hits = 0;
+            for k in 1..r {
+                let target = g.mul(&mut ops, gen, k);
+                if let Some((sign, u, v, z)) = t.probe_z(g, &mut ops, &mut lookups, target) {
+                    assert_eq!(v, 0, "x={x} k={k}: one seed has no v");
+                    let a = g.mul(&mut ops, p1, u);
+                    let c = g.mul(&mut ops, gen, z);
+                    let s = g.add(&mut ops, a, c);
+                    assert_eq!(if sign > 0 { s } else { g.neg(s) }, target, "x={x} k={k}");
+                    let cols = t.hit_columns(&fb, r, sign, u, v);
+                    assert!(cols.len() <= 1);
+                    let konst = WalkTable::<PrimePoint>::hit_const(r, k, sign, z);
+                    assert_eq!(
+                        dot(&cols),
+                        (h as u128 * konst as u128) % r as u128,
+                        "x={x} k={k}: hit row"
+                    );
+                    hits += 1;
+                }
+            }
+            assert_eq!(
+                hits,
+                2 * t.entries,
+                "x={x}: every stored orbit is hit twice"
+            );
+            // (c) free rows: one column, affine, true under the logs.
+            assert_eq!(t.rows.len() as u64 + t.zero_rows, t.verified_collisions);
+            for (row, &konst) in t.rows.iter().zip(&t.row_consts) {
+                assert_eq!(row.len(), 1, "x={x}: a one-seed row has one column");
+                assert_eq!(row[0].0, t.seed_cols[0]);
+                assert_eq!(
+                    dot(row),
+                    (h as u128 * konst as u128) % r as u128,
+                    "x={x}: row {row:?} const {konst}"
+                );
+            }
+            total_rows += t.rows.len() as u64;
+            assert!(t.seed_rank(r) <= 1);
+            // (d) grow stops at rank 1 or at the cap.
+            if grow > 0 {
+                if t.seed_rank(r) == 1 {
+                    rank1 += 1;
+                } else {
+                    assert_eq!(t.steps, t.t_max, "stopped below rank 1 before the cap");
+                    capped += 1;
+                }
+            }
+        }
+        eprintln!(
+            "wwalk one seed small curve: rows {total_rows}, grown rank-1 {rank1}, capped {capped}"
+        );
+        assert!(total_rows > 0);
+        assert!(rank1 >= 5, "grow should usually reach rank 1");
+        // Refusals: one seed without G, and three seeds.
+        let no_g = WalkOpts {
+            g_jumps: false,
+            grow: 1,
+        };
+        assert!(WalkTable::build_with(g, Some(gen), &fb, r, 1.0, 16, no_g, 0).is_err());
+        assert!(WalkTable::build(g, &fb, r, 1.0, 16, false, 0).is_err());
+        let fb3 = prime_factor_base(&inst, 3);
+        let ok = WalkOpts {
+            g_jumps: true,
+            grow: 2,
+        };
+        assert!(WalkTable::build_with(g, Some(gen), &fb3, r, 1.0, 16, ok, 0).is_err());
     }
 }
