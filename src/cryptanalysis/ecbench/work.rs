@@ -2077,7 +2077,10 @@ mod tests {
                 &fb_phase("abscissae_enumerated_uncharged", 47),
                 None,
             );
-            assert_eq!(w.unpriced, vec!["abscissae_enumerated_uncharged".to_string()]);
+            assert_eq!(
+                w.unpriced,
+                vec!["abscissae_enumerated_uncharged".to_string()]
+            );
         }
         let over = price_with(
             "ic.pipeline",
@@ -2086,7 +2089,10 @@ mod tests {
             &fb_phase("abscissae_enumerated_uncharged", 48),
             None,
         );
-        assert_eq!(over.unpriced, vec!["abscissae_enumerated_uncharged".to_string()]);
+        assert_eq!(
+            over.unpriced,
+            vec!["abscissae_enumerated_uncharged".to_string()]
+        );
         // A prime field has no such base.
         let p = price_with(
             "ic.pipeline",
@@ -2095,7 +2101,10 @@ mod tests {
             &fb_phase("abscissae_enumerated_uncharged", 47),
             None,
         );
-        assert_eq!(p.unpriced, vec!["abscissae_enumerated_uncharged".to_string()]);
+        assert_eq!(
+            p.unpriced,
+            vec!["abscissae_enumerated_uncharged".to_string()]
+        );
     }
 
     /// Extension of 2026-11-07: a binary-field "square-root solve" is the
@@ -2169,7 +2178,10 @@ mod tests {
                 ..Default::default()
             }];
             let w = price_with("ic.pipeline", &c, &[], &phases, Some(&s));
-            assert_eq!(w.unpriced, vec![format!("solver_{}", unit.replace(' ', "_"))]);
+            assert_eq!(
+                w.unpriced,
+                vec![format!("solver_{}", unit.replace(' ', "_"))]
+            );
             assert!(w.known_uncounted.iter().any(|k| k == "solver_engine_work"));
         }
     }

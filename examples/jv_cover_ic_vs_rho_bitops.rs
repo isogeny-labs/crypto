@@ -289,6 +289,7 @@ fn main() {
     let mut json_path: Option<String> = None;
     let mut stop: Option<usize> = None;
     let mut callgrind = false;
+    let mut count = true;
     let mut i = 1;
     while i < args.len() {
         let v = args.get(i + 1).cloned().unwrap_or_default();
@@ -306,6 +307,11 @@ fn main() {
             // an interval at each arm's start and end and at every phase
             // change (`jv_bitops::set_callgrind_phases`).  Takes `1`.
             "--callgrind" => callgrind = v == "1",
+            // `--count 0` runs the same route with the counting hooks off
+            // (their one relaxed load each), for the audit's control: the
+            // instructions the hooks themselves add.  Its counts are zero;
+            // the gates come from a counted run of the same row.
+            "--count" => count = v != "0",
             other => panic!("unknown argument {other}"),
         }
         i += 2;
@@ -324,7 +330,7 @@ fn main() {
     let sink = Mutex::new(sink);
     // counting on for the whole process; each worker thread claims its own
     // tally before it computes anything
-    jv_bitops::enable(true);
+    jv_bitops::enable(count);
     jv_bitops::set_callgrind_phases(callgrind);
     match arm.as_str() {
         "ic" => {

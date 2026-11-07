@@ -75,7 +75,7 @@ fn phase_native(r: &Record, phase: &str, name: &str) -> Option<u64> {
 
 fn row(session: &str, r: &Record) -> Option<Row> {
     let v2 = work::price_record_v2(r).ok()?;
-    let w: Widths = v2.widths.clone();
+    let w: Widths = v2.widths;
     let terms: BTreeMap<String, f64> = v2
         .memory_terms
         .iter()

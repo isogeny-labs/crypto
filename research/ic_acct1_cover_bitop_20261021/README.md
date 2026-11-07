@@ -170,9 +170,18 @@ this directory naming three artifacts, and two are missing:
   with the §5a band at 0, 0.1 and 1 GAE), but not yet recorded in a
   `VALIDATION.json`.
 
-Until those exist, the study stays a research record. Separately, no
-`ecbench audit-ir` instruction audit was run, so neither arm is an admitted
-`bitop/v1` bound.
+Until those exist, the study stays a research record.
+
+**Instruction audit (2026-11-07, [`AUDIT_IR.md`](AUDIT_IR.md)).**
+
+- Every committed IC row (16/16) reproduces its counts exactly at the study
+  commit `b4eb521af1`, but not on `main` `a2be660914`: the descent changed
+  later.
+- The 3 rho rows re-executed on `main` reproduce exactly.
+- Under Callgrind at the pilot size `p = 503`, the IC arm spends 18× rho's
+  instructions per counted gate, so the IC counts are not admitted as a
+  `bitop/v1` bound. That audit and its counting-off control are in
+  `AUDIT_IR.md`.
 
 ## Files and runtimes
 

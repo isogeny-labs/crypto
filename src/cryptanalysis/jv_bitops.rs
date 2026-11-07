@@ -615,9 +615,19 @@ mod tests {
             let stem = text.trim_start_matches("jv_phase_").trim_end_matches('\0');
             let rho = matches!(
                 ph,
-                Phase::RhoPrecompute | Phase::RhoWalk | Phase::RhoCollision | Phase::RhoVerification
+                Phase::RhoPrecompute
+                    | Phase::RhoWalk
+                    | Phase::RhoCollision
+                    | Phase::RhoVerification
             );
-            assert_eq!(stem, if rho { format!("rho_{}", ph.name()) } else { ph.name().to_string() });
+            assert_eq!(
+                stem,
+                if rho {
+                    format!("rho_{}", ph.name())
+                } else {
+                    ph.name().to_string()
+                }
+            );
         }
         // The hook is inert outside Valgrind and leaves phase nesting as is.
         set_callgrind_phases(true);

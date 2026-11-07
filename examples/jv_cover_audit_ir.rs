@@ -74,6 +74,10 @@ fn main() {
     let mut committed: Vec<String> = Vec::new();
     let mut row_path = None;
     let mut prefix: Option<PathBuf> = None;
+    // `--gates-from-reference 1`: the row ran with counting off
+    // (`--count 0`); take every gate figure from the reference row of the
+    // same instance and skip the reproduction check.
+    let mut gates_from_reference = false;
     let mut i = 1;
     while i < args.len() {
         let v = args.get(i + 1).cloned().unwrap_or_default();
@@ -81,6 +85,7 @@ fn main() {
             "--committed" => committed.push(v),
             "--row" => row_path = Some(v),
             "--callgrind" => prefix = Some(PathBuf::from(v)),
+            "--gates-from-reference" => gates_from_reference = v == "1",
             other => panic!("unknown argument {other}"),
         }
         i += 2;
@@ -91,7 +96,16 @@ fn main() {
     let reference: Vec<Value> = committed.iter().flat_map(|p| read_rows(p)).collect();
     let k = key(row);
     let matches: Vec<&Value> = reference.iter().filter(|r| key(r) == k).collect();
-    assert_eq!(matches.len(), 1, "exactly one committed row for {k}");
+    assert!(!matches.is_empty(), "no reference row for {k}");
+    // A reference file may repeat an instance (an A/A re-run): every copy
+    // must carry the same counts, or the reference itself does not reproduce.
+    assert!(
+        matches
+            .iter()
+            .all(|m| counts(m) == counts(matches[0])
+                && m["total_bitops"] == matches[0]["total_bitops"]),
+        "reference rows for {k} disagree"
+    );
     let old = matches[0];
     let (a, b) = (counts(row), counts(old));
     let mismatches: Vec<Value> = a
@@ -102,7 +116,8 @@ fn main() {
         .filter(|name| a.get(*name) != b.get(*name))
         .map(|name| json!({"count": name, "rerun": a.get(name), "committed": b.get(name)}))
         .collect();
-    let total = bitops(&row["total_bitops"]);
+    let gates_row = if gates_from_reference { old } else { row };
+    let total = bitops(&gates_row["total_bitops"]);
     let committed_total = bitops(&old["total_bitops"]);
     let mut out = json!({
         "schema": "ic-acct1.audit_ir/v1",
@@ -112,12 +127,14 @@ fn main() {
         "seed": row["seed"],
         "moves": row["moves"],
         "run": row["run"],
-        "l": row["l"],
+        "l": gates_row["l"],
         "total_bitops": total.to_string(),
         "committed_total_bitops": committed_total.to_string(),
-        "reproduces_total": total == committed_total,
-        "reproduces_counts": mismatches.is_empty(),
-        "count_mismatches": mismatches,
+        "counting": !gates_from_reference,
+        "reproduces_total": (!gates_from_reference).then_some(total == committed_total),
+        "reproduces_counts": (!gates_from_reference).then_some(mismatches.is_empty()),
+        "reference_rows": matches.len(),
+        "count_mismatches": if gates_from_reference { Vec::new() } else { mismatches },
         "verified": row.get("verified_on_challenge").cloned().unwrap_or(Value::Null),
         "wall_ms": row["wall_ms"],
     });
@@ -153,7 +170,7 @@ fn main() {
         let phase_bitops = |name: &str| -> Option<u128> {
             // The IC row's phase names; rho is one interval (its phases are
             // priced from native counts after the walk, not entered).
-            row["phases"][name]["bitops"]
+            gates_row["phases"][name]["bitops"]
                 .as_str()
                 .and_then(|s| s.parse().ok())
         };
