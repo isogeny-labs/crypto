@@ -76,11 +76,12 @@ before hashing; `rho.*` `cap_multiple = 64`). One binary for every arm and job.
 ## 4. Workloads, rounds, order, seeds
 
 - `targets_per_curve` 8 (planted, `uniform_scalar_sha256_v1`), one target per
-  workload, cold, every phase charged. Measurement: `rounds: 5`, `warmup: 1`,
+  workload, cold, every phase charged. Measurement: `rounds: 6`, `warmup: 1`,
   `order: alternate`, `isolation_required: L2`, `timeout_seconds: 300` per
-  execution.
-- Per size and arm: 2 curves x 8 targets x 5 measured rounds = **80 verified
-  runs** (the lead asks for >= 24); 400 per arm over the medium tier.
+  execution. Six measured rounds because `alternate` with an odd number is
+  unbalanced (the harness warns), and the EKS gate needs at least five.
+- Per size and arm: 2 curves x 8 targets x 6 measured rounds = **96 verified
+  runs** (the lead asks for >= 24); 480 per arm over the medium tier.
 - Jobs (one ecbench session each; every EKS job is capped at 3600 s, and the
   pod replays every run, which doubles the solve time):
 
@@ -111,7 +112,12 @@ the sizes' workloads, 2 000 resamples, the harness's fixed seed) and exponent
 `--weight 0`, `0.1` and `1` GAE per unpriced native operation, the three
 records for every arm. The rho reference's own unpriced work is part of what
 is being sealed: on the toy ladder it was 0.88-1.31 per `sqrt(r)`, of the
-order of the charged work [pcc:unverified].
+order of the charged work [pcc:unverified]. The counters the development
+smoke showed (`canonicalisations_uncharged` for `rho.negation`, about one per
+GAE; `inserts_uncharged`, `lookups_uncharged` for `bsgs.negation`;
+`canonicalisations_uncharged` and the `distinguished_point_table_*_uncharged`
+pair for `rho.negation_v2`; none for `rho.plain`) are the expected list; the
+committed records decide it.
 
 Secondary: L2 solve wall time per GAE (`ns_per_gae`), read only against the
 session's A/A interval and only where the pod's L2 gate admitted every record;
@@ -163,10 +169,10 @@ curves, `[pcc:unverified]`):
 | P2 | `rho.plain` medium `R` (S / 1.2533) | 1.05, inside [1.00, 1.10]; ratio to the negation floor about 1.49 |
 | P3 | `bsgs.negation` medium `S` | 1.00 inside its 95 % interval (ratio to floor 1.13) |
 | P4 | paired `rho-plain / rho-neg` S ratio (positive control) | 1.41, interval excluding 1.2 from below |
-| P5 | model A on `rho.negation`, toy + medium | `beta` about 1 (0.6-1.4); medium `R` predicted by A below 1.01; A may be rejected by chi-square if the walk's own excess (a few percent for an r-adding walk) is real |
-| P6 | model B `R_inf` on `rho.negation` | inside [1.00, 1.10] |
+| P5 | model A on `rho.negation`, toy + medium | `beta` about 0.8-1 (the toy-only fit, `analysis/rfit-toy-only-rho-neg.json`, gives beta 0.826 [0.408, 1.748], c 101.7, chi2 1.65 on 4 dof); model A then predicts medium `R` of about 1.01; A may be rejected by chi-square if the walk's own excess (a few percent for an r-adding walk) is real |
+| P6 | model B `R_inf` on `rho.negation` | inside [1.00, 1.10] (toy-only it is undetermined: 1.13 [-1.16, 1.33]) |
 | P7 | A/A | every paired count identical (ratio exactly 1); wall A/A admitted |
-| P8 | `rho.negation_v2 / rho.negation` paired S | 1.00, interval inside [0.97, 1.05] |
+| P8 | `rho.negation_v2 / rho.negation` paired S | 1.00, interval containing 1 and inside [0.93, 1.07] (the two walks are not trajectory-identical: in the development smoke one pair differed by 1.8x, so the pairs are noisy) |
 | P9 | curve effect within a size | none after Holm over five sizes |
 
 Consequence stated in advance, derived and not measured: if P1 holds, a prime
@@ -213,8 +219,8 @@ secondary methods with `rho.negation_v2`). The band: the verdict is stated at
 w = 0 (the lead's quantity); the w = 0.1 and w = 1 constants are reported, and
 any IC gap rescaled with this bound uses the same weight on both sides.
 
-Power (heuristic, from the prior pool's per-run SD 0.55 x floor): 400 runs give
-a standard error of about 0.028 on `M` (interval about +-0.055 before the
+Power (heuristic, from the prior pool's per-run SD 0.55 x floor): 480 runs give
+a standard error of about 0.025 on `M` (interval about +-0.05 before the
 cluster widening), so `setup_excess` is decidable when the truth is near 1.06
 and `walk_shortfall` when it is near 1.3; `within_1.10_strict` will usually not
 be reached at a true 1.06, which is why it is a separate, secondary line.

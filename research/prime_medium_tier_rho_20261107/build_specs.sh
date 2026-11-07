@@ -34,12 +34,12 @@ spec() {
        isolation_required: "L2", timeout_seconds: 300}}' > "$D/specs/$1.json"
 }
 
-spec J1 "prime medium-tier rho bound J1: 33-, 37- and 41-bit curves, target block A" J1 8 "$TA" "$(seed measurement_seed/job=J1)" 5 1
-spec J2 "prime medium-tier rho bound J2: 45-bit curves, target block A" J2 8 "$TA" "$(seed measurement_seed/job=J2)" 5 1
-spec J3 "prime medium-tier rho bound J3: 49-bit curve 1, target block A" J3 4 "$TA" "$(seed measurement_seed/job=J3)" 5 1
-spec J4 "prime medium-tier rho bound J4: 49-bit curve 1, target block B" J4 4 "$TB" "$(seed measurement_seed/job=J4)" 5 1
-spec J5 "prime medium-tier rho bound J5: 49-bit curve 2, target block A" J5 4 "$TA" "$(seed measurement_seed/job=J5)" 5 1
-spec J6 "prime medium-tier rho bound J6: 49-bit curve 2, target block B" J6 4 "$TB" "$(seed measurement_seed/job=J6)" 5 1
+spec J1 "prime medium-tier rho bound J1: 33-, 37- and 41-bit curves, target block A" J1 8 "$TA" "$(seed measurement_seed/job=J1)" 6 1
+spec J2 "prime medium-tier rho bound J2: 45-bit curves, target block A" J2 8 "$TA" "$(seed measurement_seed/job=J2)" 6 1
+spec J3 "prime medium-tier rho bound J3: 49-bit curve 1, target block A" J3 4 "$TA" "$(seed measurement_seed/job=J3)" 6 1
+spec J4 "prime medium-tier rho bound J4: 49-bit curve 1, target block B" J4 4 "$TB" "$(seed measurement_seed/job=J4)" 6 1
+spec J5 "prime medium-tier rho bound J5: 49-bit curve 2, target block A" J5 4 "$TA" "$(seed measurement_seed/job=J5)" 6 1
+spec J6 "prime medium-tier rho bound J6: 49-bit curve 2, target block B" J6 4 "$TB" "$(seed measurement_seed/job=J6)" 6 1
 # Development smoke only (README "Development checks"): the first 33-bit curve,
 # 2 targets, 1 round, no warm-up. Never a result; not an EKS request.
 spec smoke-dev "DEVELOPMENT SMOKE ONLY: one 33-bit curve, 2 targets, 1 round (not a measurement)" SMOKE 2 "$TA" "$(seed measurement_seed/job=SMOKE)" 1 0
