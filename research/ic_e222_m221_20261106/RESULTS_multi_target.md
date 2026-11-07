@@ -74,3 +74,24 @@ The pair-sum table was built with 4 group additions per pair; F_i + F_j and -F_i
 | 24 | 1024 | 425 | 360 | 0.848 | 250 | 1.44 [1.43, 1.46] | 1.53 | 2.35 | 0/22 |
 
 A measured 10% to 29% reduction in the multi-target IC's counted additions (a real operation saving, not an accounting change), narrowing the distance to counted batch rho to 1.4x to 2.0x at price 0 and 1.9x to 3.4x at price 1. Still not cheaper than batch rho in any configuration. The batch-rho reference was built the same way (x-only lookups; negation free) from the start, so v2 removes an IC-only inefficiency.
+
+## v3: pure-G arms with b = 1, and a pricing fix (symmetric §5a pricing)
+
+**Change.** A target walk does not need arms shifted by multiples of Q_t: if every step adds a multiple of G, the relation is a G + 1 Q_t = +-F_i +-F_j with b fixed at 1, the start carries Q_t, and the per-target table of Q multiples (7 additions) and the 32 per-target arm additions disappear. Holdout `run_multi_holdout_v3.py` (`results/multi_holdout_v3/`, same instances, seeds and frozen fb rule as v1 and v2; 132 configs, all 132 verified).
+
+**Pricing fix.** The earlier tables priced the IC arm's unpriced operations (sparse-solve operations, one hash lookup per trial, factor-base construction) at 0.1 and 1 GAE but left the batch rho's hash operations at 0, although it does one hash insert or lookup per walk step. The symmetric version below prices both arms' unpriced operations at the same 0 / 0.1 / 1 GAE (`results/multi_holdout_v3/analysis_symmetric_pricing.txt`, which also reprices v1 and v2). It moves the price-1 column down by about 0.3 to 0.9 in the ratio and leaves price 0 unchanged.
+
+Symmetric pricing, IC / batch rho (median [bootstrap 95%] at price 0; configs where IC is cheaper out of 22):
+
+| version | group bits | T | at 0 | at 0.1 | at 1 | cheaper at 0 / 0.1 / 1 |
+|---|---|---|---|---|---|---|
+| v1 | 24 | 1024 | 1.70 [1.68, 1.72] | 1.65 | 1.43 | 0 / 0 / 0 |
+| v2 | 24 | 1024 | 1.44 [1.43, 1.46] | 1.41 | 1.29 | 0 / 0 / 0 |
+| v3 | 20 | 128 | 1.47 [1.42, 1.50] | 1.45 | 1.36 | 0 / 0 / 0 |
+| v3 | 20 | 1024 | 1.12 [1.12, 1.13] | 1.11 | 1.08 | 0 / 0 / 0 |
+| v3 | 22 | 128 | 1.81 [1.76, 1.86] | 1.80 | 1.76 | 0 / 0 / 0 |
+| v3 | 22 | 1024 | 1.12 [1.11, 1.13] | 1.10 | 0.97 | 0 / 0 / 21 |
+| v3 | 24 | 128 | 1.99 [1.92, 2.02] | 1.95 | 1.76 | 0 / 0 / 0 |
+| v3 | 24 | 1024 | 1.28 [1.26, 1.31] | 1.27 | 1.20 | 0 / 0 / 0 |
+
+v3 saves a further 3% to 28% (median ratio v3 / v2 of the counted additions 0.72 to 0.97; the saving is largest at T = 1024). IC is not cheaper than batch rho at any price in any cell except the single (22 bits, T = 1024, price 1) cell, where the order does not hold across the band (0 of 22 at prices 0 and 0.1) and therefore is not a ranking under §5a. The distance to batch rho is 1.1x to 2.0x at price 0 and shrinks with T. Not an improvement over batch rho.
