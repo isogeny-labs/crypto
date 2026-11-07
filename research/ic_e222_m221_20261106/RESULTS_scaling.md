@@ -1,3 +1,5 @@
+> **CORRECTION (2026-11-07):** every table/rho and sweep/rho ratio below compares against a textbook 3-branch Floyd rho on BigUint arithmetic, not against the repository's matched negation-map rho, and wall times of the two implementations are not comparable. See `RESULTS_vs_rho.md`: in counted operations the IC arms are at least 25x to 53x the matched rho at 20 to 24 bits. The table-vs-sweep comparisons (same arithmetic) are unaffected.
+
 # Scaling of the pair-sum table and the hoisted sweep, with a rho reference (exploratory, local, unvalidated)
 
 **Status:** exploratory (not frozen, 3 instances per size, seed 1), unvalidated (pre-gate). Local unisolated host, solver stage timer. No replay certificate, no §5a 0 / 0.1 / 1 GAE band. Not a leaderboard row.
