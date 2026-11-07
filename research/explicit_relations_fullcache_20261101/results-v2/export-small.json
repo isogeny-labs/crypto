@@ -1,0 +1,2904 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "ER-FULLCACHE-52-v2-dde6p5u9kqsrkg",
+  "created": "2026-11-01T06:44:43.025539+00:00",
+  "protocol": {
+    "path": "../protocol-small-v2.json",
+    "sha256": "ec85e405126cc9bf9382c8e1924f0ec5061170653fad103ff52921ca8efd3f12",
+    "protocol_id": "EXPLICIT-RELATIONS-FULLCACHE-SMALL-20261101",
+    "version": 2
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": "ecbench-fullcache-v2",
+    "role": "executor"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "0fe875d034b77fc9b9825af8217194aa2f4ccdee",
+    "dirty": false
+  },
+  "backend": "runpod",
+  "host": {
+    "path": "gpu-before.txt",
+    "sha256": "a1f8f7e00750a731602f537cf819ede47a69b11bb3a1257c457ed9c375a56ad2",
+    "class_id": "runpod-dde6p5u9kqsrkg",
+    "summary": {
+      "cpu_model": null,
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": null,
+      "hypervisor": null,
+      "isolation_tier_max": "L0",
+      "gpu": "RTX 4090"
+    }
+  },
+  "arms": [
+    {
+      "id": "b",
+      "role": "baseline",
+      "binary_sha256": "5eea863790c98c01a8ff09ae764740064012099f6e980c3b3d142a6e9cb13a5d",
+      "commit": "0fe875d034b77fc9b9825af8217194aa2f4ccdee"
+    },
+    {
+      "id": "v",
+      "role": "candidate",
+      "binary_sha256": "cd75c3c6ef8c8513a7751e57d7db6fabab46a48c8855a1be64753b1ca5fe7f7a",
+      "commit": "0fe875d034b77fc9b9825af8217194aa2f4ccdee"
+    },
+    {
+      "id": "x",
+      "role": "control_aa",
+      "binary_sha256": "5eea863790c98c01a8ff09ae764740064012099f6e980c3b3d142a6e9cb13a5d",
+      "commit": "0fe875d034b77fc9b9825af8217194aa2f4ccdee"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "dde6p5u9kqsrkg-52-101-0-b",
+      "arm": "b",
+      "instance_id": "52-101",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 6.695645313,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 6.677738434,
+          "verify_seconds": 0.008503864,
+          "bases_ms": 7.473637,
+          "targets_ms": 42.327972,
+          "oracle_ms": 6244.126117,
+          "linear_ms": 19.704624,
+          "replay_ms": 4.034574,
+          "relations": 185,
+          "attempts": 5947
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-101-0-b.input",
+          "sha256": "4e5cf6d8248d67758e74276f40881c20d34ce84a2c1d497c706833aca7821a36",
+          "bytes": 150,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-0-b.cert",
+          "sha256": "e20e7eb59a8b6ec7c859b694233530289cef53b48b26bf44e8782d0e4dd12be9",
+          "bytes": 84929,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-0-b.log",
+          "sha256": "c9da32593c3ae3382f862be4c74ffaa99c1e70f4cbdcbeebc6ab3f3ef6ce4744",
+          "bytes": 422702,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-0-b.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-0-b.verify",
+          "sha256": "f3f2a531ce6d9e20b11ff3ef0e24d367695afbc6a95fa425a06bb99ef91d2308",
+          "bytes": 32,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-0-b.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-101-0-v",
+      "arm": "v",
+      "instance_id": "52-101",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 5.606789239,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 5.590385103,
+          "verify_seconds": 0.005571539,
+          "bases_ms": 7.683165,
+          "targets_ms": 48.43099,
+          "oracle_ms": 5171.088816,
+          "linear_ms": 19.770016,
+          "replay_ms": 4.003773,
+          "relations": 185,
+          "attempts": 5947
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-101-0-v.input",
+          "sha256": "4e5cf6d8248d67758e74276f40881c20d34ce84a2c1d497c706833aca7821a36",
+          "bytes": 150,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-0-v.cert",
+          "sha256": "e20e7eb59a8b6ec7c859b694233530289cef53b48b26bf44e8782d0e4dd12be9",
+          "bytes": 84929,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-0-v.log",
+          "sha256": "35a08f9133048b29857cb3e1921b8dd5af3164ad0068e142b517f6661ba869fa",
+          "bytes": 422698,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-0-v.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-0-v.verify",
+          "sha256": "f3f2a531ce6d9e20b11ff3ef0e24d367695afbc6a95fa425a06bb99ef91d2308",
+          "bytes": 32,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-0-v.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-101-0-x",
+      "arm": "x",
+      "instance_id": "52-101",
+      "seed": "101",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 6.717088979,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 6.698304238,
+          "verify_seconds": 0.009060194,
+          "bases_ms": 30.193308,
+          "targets_ms": 45.972736,
+          "oracle_ms": 6281.90789,
+          "linear_ms": 19.773396,
+          "replay_ms": 4.015673,
+          "relations": 185,
+          "attempts": 5947
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-101-0-x.input",
+          "sha256": "4e5cf6d8248d67758e74276f40881c20d34ce84a2c1d497c706833aca7821a36",
+          "bytes": 150,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-0-x.cert",
+          "sha256": "e20e7eb59a8b6ec7c859b694233530289cef53b48b26bf44e8782d0e4dd12be9",
+          "bytes": 84929,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-0-x.log",
+          "sha256": "08734a77a3f9453cea9528fe31ce3a5bb525ca61c03960c65d653b95c27dab31",
+          "bytes": 422702,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-0-x.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-0-x.verify",
+          "sha256": "f3f2a531ce6d9e20b11ff3ef0e24d367695afbc6a95fa425a06bb99ef91d2308",
+          "bytes": 32,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-0-x.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-202-0-x",
+      "arm": "x",
+      "instance_id": "52-202",
+      "seed": "202",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 4.953316644,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 4.937561401,
+          "verify_seconds": 0.007078832,
+          "bases_ms": 7.27752,
+          "targets_ms": 25.095809,
+          "oracle_ms": 4495.939705,
+          "linear_ms": 21.948984,
+          "replay_ms": 4.103547,
+          "relations": 192,
+          "attempts": 4008
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-202-0-x.input",
+          "sha256": "49bbca6d68294429865138069f72689c44e80084ca0f7b8e4be800f9f7479688",
+          "bytes": 149,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-0-x.cert",
+          "sha256": "64fd90c6fb28354a805e6cabe3f10dfe2f6e3a2a61434b666c8193f3a5275cab",
+          "bytes": 88060,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-0-x.log",
+          "sha256": "b51aae269d5dfeb99aca173c9c5348eea2382f9b206257d9dd029ca0473acc46",
+          "bytes": 288885,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-0-x.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-0-x.verify",
+          "sha256": "707edcc6e1d97f4ab27f50d3d010b10619bd726d9217fe5423b0454a01663488",
+          "bytes": 33,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-0-x.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-202-0-v",
+      "arm": "v",
+      "instance_id": "52-202",
+      "seed": "202",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 4.076253304,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 4.059787866,
+          "verify_seconds": 0.006478981,
+          "bases_ms": 7.352903,
+          "targets_ms": 32.328088,
+          "oracle_ms": 3718.7774,
+          "linear_ms": 21.988285,
+          "replay_ms": 4.104797,
+          "relations": 192,
+          "attempts": 4008
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-202-0-v.input",
+          "sha256": "49bbca6d68294429865138069f72689c44e80084ca0f7b8e4be800f9f7479688",
+          "bytes": 149,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-0-v.cert",
+          "sha256": "64fd90c6fb28354a805e6cabe3f10dfe2f6e3a2a61434b666c8193f3a5275cab",
+          "bytes": 88060,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-0-v.log",
+          "sha256": "883a2a91661524dca5b7b56e8223b0156837956d96dc533a27187bbaf9902301",
+          "bytes": 288886,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-0-v.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-0-v.verify",
+          "sha256": "707edcc6e1d97f4ab27f50d3d010b10619bd726d9217fe5423b0454a01663488",
+          "bytes": 33,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-0-v.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-202-0-b",
+      "arm": "b",
+      "instance_id": "52-202",
+      "seed": "202",
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 4.969620056,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 4.95798694,
+          "verify_seconds": 0.005694213,
+          "bases_ms": 7.667704,
+          "targets_ms": 20.302203,
+          "oracle_ms": 4606.478713,
+          "linear_ms": 9.80973,
+          "replay_ms": 1.824325,
+          "relations": 192,
+          "attempts": 4008
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-202-0-b.input",
+          "sha256": "49bbca6d68294429865138069f72689c44e80084ca0f7b8e4be800f9f7479688",
+          "bytes": 149,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-0-b.cert",
+          "sha256": "64fd90c6fb28354a805e6cabe3f10dfe2f6e3a2a61434b666c8193f3a5275cab",
+          "bytes": 88060,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-0-b.log",
+          "sha256": "5ac78ce05dbfcfd4e0560b54bdaba1c060891fd17d45f002d66464524254b426",
+          "bytes": 288883,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-0-b.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-0-b.verify",
+          "sha256": "707edcc6e1d97f4ab27f50d3d010b10619bd726d9217fe5423b0454a01663488",
+          "bytes": 33,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-0-b.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-101-1-x",
+      "arm": "x",
+      "instance_id": "52-101",
+      "seed": "101",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 6.7105822360000005,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 6.694280344,
+          "verify_seconds": 0.007777418,
+          "bases_ms": 7.964405,
+          "targets_ms": 21.533249,
+          "oracle_ms": 6294.653722,
+          "linear_ms": 8.855826,
+          "replay_ms": 1.786214,
+          "relations": 185,
+          "attempts": 5947
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-101-1-x.input",
+          "sha256": "4e5cf6d8248d67758e74276f40881c20d34ce84a2c1d497c706833aca7821a36",
+          "bytes": 150,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-1-x.cert",
+          "sha256": "e20e7eb59a8b6ec7c859b694233530289cef53b48b26bf44e8782d0e4dd12be9",
+          "bytes": 84929,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-1-x.log",
+          "sha256": "b069a3b5b91539437ae8a50cebf64d1f2c66c9df78bc4fc89dbf8e98ab686dfd",
+          "bytes": 422701,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-1-x.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-1-x.verify",
+          "sha256": "f3f2a531ce6d9e20b11ff3ef0e24d367695afbc6a95fa425a06bb99ef91d2308",
+          "bytes": 32,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-1-x.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-101-1-v",
+      "arm": "v",
+      "instance_id": "52-101",
+      "seed": "101",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 5.59727415,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 5.581687333,
+          "verify_seconds": 0.008101429,
+          "bases_ms": 8.050158,
+          "targets_ms": 42.271457,
+          "oracle_ms": 5113.455848,
+          "linear_ms": 19.766546,
+          "replay_ms": 4.015473,
+          "relations": 185,
+          "attempts": 5947
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-101-1-v.input",
+          "sha256": "4e5cf6d8248d67758e74276f40881c20d34ce84a2c1d497c706833aca7821a36",
+          "bytes": 150,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-1-v.cert",
+          "sha256": "e20e7eb59a8b6ec7c859b694233530289cef53b48b26bf44e8782d0e4dd12be9",
+          "bytes": 84929,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-1-v.log",
+          "sha256": "8e16507a156dc264bf871eab7679e4874ebe74d1245ffccc971bfb0d862b16a3",
+          "bytes": 422697,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-1-v.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-1-v.verify",
+          "sha256": "f3f2a531ce6d9e20b11ff3ef0e24d367695afbc6a95fa425a06bb99ef91d2308",
+          "bytes": 32,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-1-v.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-101-1-b",
+      "arm": "b",
+      "instance_id": "52-101",
+      "seed": "101",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 6.729673768,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 6.714832698,
+          "verify_seconds": 0.008280996,
+          "bases_ms": 7.614932,
+          "targets_ms": 39.245086,
+          "oracle_ms": 6267.477254,
+          "linear_ms": 19.736074,
+          "replay_ms": 4.017534,
+          "relations": 185,
+          "attempts": 5947
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-101-1-b.input",
+          "sha256": "4e5cf6d8248d67758e74276f40881c20d34ce84a2c1d497c706833aca7821a36",
+          "bytes": 150,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-1-b.cert",
+          "sha256": "e20e7eb59a8b6ec7c859b694233530289cef53b48b26bf44e8782d0e4dd12be9",
+          "bytes": 84929,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-1-b.log",
+          "sha256": "c78f9032ae1aba19a40f2431ba9c4fc396d3e514de8400741082dd1a13ed34f0",
+          "bytes": 422701,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-1-b.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-1-b.verify",
+          "sha256": "f3f2a531ce6d9e20b11ff3ef0e24d367695afbc6a95fa425a06bb99ef91d2308",
+          "bytes": 32,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-1-b.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-202-1-b",
+      "arm": "b",
+      "instance_id": "52-202",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 4.880021696,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 4.867332483,
+          "verify_seconds": 0.005278739,
+          "bases_ms": 8.363999,
+          "targets_ms": 18.357228,
+          "oracle_ms": 4485.325144,
+          "linear_ms": 9.81216,
+          "replay_ms": 1.824985,
+          "relations": 192,
+          "attempts": 4008
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-202-1-b.input",
+          "sha256": "49bbca6d68294429865138069f72689c44e80084ca0f7b8e4be800f9f7479688",
+          "bytes": 149,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-1-b.cert",
+          "sha256": "64fd90c6fb28354a805e6cabe3f10dfe2f6e3a2a61434b666c8193f3a5275cab",
+          "bytes": 88060,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-1-b.log",
+          "sha256": "0413f190ec63053dd3df86e25183df680509dc2cf108f6924c3f95596859a521",
+          "bytes": 288883,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-1-b.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-1-b.verify",
+          "sha256": "707edcc6e1d97f4ab27f50d3d010b10619bd726d9217fe5423b0454a01663488",
+          "bytes": 33,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-1-b.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-202-1-v",
+      "arm": "v",
+      "instance_id": "52-202",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 4.122860778,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 4.110387513,
+          "verify_seconds": 0.006799543,
+          "bases_ms": 21.789578,
+          "targets_ms": 22.294027,
+          "oracle_ms": 3671.632045,
+          "linear_ms": 9.791,
+          "replay_ms": 1.830205,
+          "relations": 192,
+          "attempts": 4008
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-202-1-v.input",
+          "sha256": "49bbca6d68294429865138069f72689c44e80084ca0f7b8e4be800f9f7479688",
+          "bytes": 149,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-1-v.cert",
+          "sha256": "64fd90c6fb28354a805e6cabe3f10dfe2f6e3a2a61434b666c8193f3a5275cab",
+          "bytes": 88060,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-1-v.log",
+          "sha256": "2c4d26efc8fc94f4c7f6381e596bf5dd55d1cfe84ecd049eae75c4afe0a6f9e3",
+          "bytes": 288886,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-1-v.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-1-v.verify",
+          "sha256": "707edcc6e1d97f4ab27f50d3d010b10619bd726d9217fe5423b0454a01663488",
+          "bytes": 33,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-1-v.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-202-1-x",
+      "arm": "x",
+      "instance_id": "52-202",
+      "seed": "202",
+      "replicate": 1,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 4.926358191,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 4.910406761,
+          "verify_seconds": 0.009428657,
+          "bases_ms": 39.445459,
+          "targets_ms": 26.252845,
+          "oracle_ms": 4506.369254,
+          "linear_ms": 21.892792,
+          "replay_ms": 4.21002,
+          "relations": 192,
+          "attempts": 4008
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-202-1-x.input",
+          "sha256": "49bbca6d68294429865138069f72689c44e80084ca0f7b8e4be800f9f7479688",
+          "bytes": 149,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-1-x.cert",
+          "sha256": "64fd90c6fb28354a805e6cabe3f10dfe2f6e3a2a61434b666c8193f3a5275cab",
+          "bytes": 88060,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-1-x.log",
+          "sha256": "4a4311c115ac536474440101e5c62f87d1b2150d43ea4bf94a283787555a088d",
+          "bytes": 288885,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-1-x.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-1-x.verify",
+          "sha256": "707edcc6e1d97f4ab27f50d3d010b10619bd726d9217fe5423b0454a01663488",
+          "bytes": 33,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-1-x.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-101-2-b",
+      "arm": "b",
+      "instance_id": "52-101",
+      "seed": "101",
+      "replicate": 2,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 6.6344956889999995,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 6.6192185519999995,
+          "verify_seconds": 0.006189327,
+          "bases_ms": 39.325414,
+          "targets_ms": 47.375322,
+          "oracle_ms": 6201.211461,
+          "linear_ms": 20.151599,
+          "replay_ms": 4.132415,
+          "relations": 185,
+          "attempts": 5947
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-101-2-b.input",
+          "sha256": "4e5cf6d8248d67758e74276f40881c20d34ce84a2c1d497c706833aca7821a36",
+          "bytes": 150,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-2-b.cert",
+          "sha256": "e20e7eb59a8b6ec7c859b694233530289cef53b48b26bf44e8782d0e4dd12be9",
+          "bytes": 84929,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-2-b.log",
+          "sha256": "8d64477c28f641091260b82654ac627717d6febda266eb4f70f752921a1be178",
+          "bytes": 422703,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-2-b.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-2-b.verify",
+          "sha256": "f3f2a531ce6d9e20b11ff3ef0e24d367695afbc6a95fa425a06bb99ef91d2308",
+          "bytes": 32,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-2-b.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-101-2-v",
+      "arm": "v",
+      "instance_id": "52-101",
+      "seed": "101",
+      "replicate": 2,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 5.516078091,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 5.496893217,
+          "verify_seconds": 0.008890382,
+          "bases_ms": 7.324267,
+          "targets_ms": 36.856271,
+          "oracle_ms": 5150.921524,
+          "linear_ms": 8.82638,
+          "replay_ms": 1.786043,
+          "relations": 185,
+          "attempts": 5947
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-101-2-v.input",
+          "sha256": "4e5cf6d8248d67758e74276f40881c20d34ce84a2c1d497c706833aca7821a36",
+          "bytes": 150,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-2-v.cert",
+          "sha256": "e20e7eb59a8b6ec7c859b694233530289cef53b48b26bf44e8782d0e4dd12be9",
+          "bytes": 84929,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-2-v.log",
+          "sha256": "0cc71ad444ab443ad8ec2a068122455ef5d3fd90d4f2b11bbf79b6c747ba3e63",
+          "bytes": 422697,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-2-v.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-2-v.verify",
+          "sha256": "f3f2a531ce6d9e20b11ff3ef0e24d367695afbc6a95fa425a06bb99ef91d2308",
+          "bytes": 32,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-2-v.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-101-2-x",
+      "arm": "x",
+      "instance_id": "52-101",
+      "seed": "101",
+      "replicate": 2,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 6.729077747,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 6.712873088,
+          "verify_seconds": 0.007569296,
+          "bases_ms": 7.173042,
+          "targets_ms": 48.900147,
+          "oracle_ms": 6329.692847,
+          "linear_ms": 19.774425,
+          "replay_ms": 4.016121,
+          "relations": 185,
+          "attempts": 5947
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-101-2-x.input",
+          "sha256": "4e5cf6d8248d67758e74276f40881c20d34ce84a2c1d497c706833aca7821a36",
+          "bytes": 150,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-2-x.cert",
+          "sha256": "e20e7eb59a8b6ec7c859b694233530289cef53b48b26bf44e8782d0e4dd12be9",
+          "bytes": 84929,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-2-x.log",
+          "sha256": "77fbaba93307d9d97f5b83f4071c3a1d0be3b74b1b04b9f5a3c738969db2eddd",
+          "bytes": 422702,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-2-x.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-2-x.verify",
+          "sha256": "f3f2a531ce6d9e20b11ff3ef0e24d367695afbc6a95fa425a06bb99ef91d2308",
+          "bytes": 32,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-2-x.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-202-2-x",
+      "arm": "x",
+      "instance_id": "52-202",
+      "seed": "202",
+      "replicate": 2,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 4.965395824,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 4.95474294,
+          "verify_seconds": 0.005271715,
+          "bases_ms": 7.232654,
+          "targets_ms": 17.81859,
+          "oracle_ms": 4627.832314,
+          "linear_ms": 9.803934,
+          "replay_ms": 1.830044,
+          "relations": 192,
+          "attempts": 4008
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-202-2-x.input",
+          "sha256": "49bbca6d68294429865138069f72689c44e80084ca0f7b8e4be800f9f7479688",
+          "bytes": 149,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-2-x.cert",
+          "sha256": "64fd90c6fb28354a805e6cabe3f10dfe2f6e3a2a61434b666c8193f3a5275cab",
+          "bytes": 88060,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-2-x.log",
+          "sha256": "1cd5309252f921c6a3edfebadba085eb613cae6ee0df4aaf3a432ff62741ac34",
+          "bytes": 288883,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-2-x.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-2-x.verify",
+          "sha256": "707edcc6e1d97f4ab27f50d3d010b10619bd726d9217fe5423b0454a01663488",
+          "bytes": 33,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-2-x.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-202-2-v",
+      "arm": "v",
+      "instance_id": "52-202",
+      "seed": "202",
+      "replicate": 2,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 4.110139982,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 4.099800778,
+          "verify_seconds": 0.004985085,
+          "bases_ms": 7.428891,
+          "targets_ms": 14.832424,
+          "oracle_ms": 3751.927339,
+          "linear_ms": 9.811185,
+          "replay_ms": 1.830774,
+          "relations": 192,
+          "attempts": 4008
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-202-2-v.input",
+          "sha256": "49bbca6d68294429865138069f72689c44e80084ca0f7b8e4be800f9f7479688",
+          "bytes": 149,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-2-v.cert",
+          "sha256": "64fd90c6fb28354a805e6cabe3f10dfe2f6e3a2a61434b666c8193f3a5275cab",
+          "bytes": 88060,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-2-v.log",
+          "sha256": "eea3550c4847a3e9b08ced4071638daf29def92cc429cd056274c180a827e6dc",
+          "bytes": 288885,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-2-v.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-2-v.verify",
+          "sha256": "707edcc6e1d97f4ab27f50d3d010b10619bd726d9217fe5423b0454a01663488",
+          "bytes": 33,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-2-v.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-202-2-b",
+      "arm": "b",
+      "instance_id": "52-202",
+      "seed": "202",
+      "replicate": 2,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 4.991248222,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 4.975863882,
+          "verify_seconds": 0.006274611,
+          "bases_ms": 7.548795,
+          "targets_ms": 26.73247,
+          "oracle_ms": 4599.05167,
+          "linear_ms": 21.90903,
+          "replay_ms": 4.110975,
+          "relations": 192,
+          "attempts": 4008
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-202-2-b.input",
+          "sha256": "49bbca6d68294429865138069f72689c44e80084ca0f7b8e4be800f9f7479688",
+          "bytes": 149,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-2-b.cert",
+          "sha256": "64fd90c6fb28354a805e6cabe3f10dfe2f6e3a2a61434b666c8193f3a5275cab",
+          "bytes": 88060,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-2-b.log",
+          "sha256": "c5d22a1463202118c074e3d1bce990a5f624daa623646f144a4918f875052a5b",
+          "bytes": 288885,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-2-b.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-2-b.verify",
+          "sha256": "707edcc6e1d97f4ab27f50d3d010b10619bd726d9217fe5423b0454a01663488",
+          "bytes": 33,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-2-b.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-101-3-x",
+      "arm": "x",
+      "instance_id": "52-101",
+      "seed": "101",
+      "replicate": 3,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 6.771687825,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 6.754373737,
+          "verify_seconds": 0.009024037,
+          "bases_ms": 7.622958,
+          "targets_ms": 49.857999,
+          "oracle_ms": 6375.73356,
+          "linear_ms": 19.708453,
+          "replay_ms": 4.017331,
+          "relations": 185,
+          "attempts": 5947
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-101-3-x.input",
+          "sha256": "4e5cf6d8248d67758e74276f40881c20d34ce84a2c1d497c706833aca7821a36",
+          "bytes": 150,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-3-x.cert",
+          "sha256": "e20e7eb59a8b6ec7c859b694233530289cef53b48b26bf44e8782d0e4dd12be9",
+          "bytes": 84929,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-3-x.log",
+          "sha256": "265c89358f35c73680f42f37ac0aeee15cc33c473560fe83139a0dbd9b33a60c",
+          "bytes": 422701,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-3-x.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-3-x.verify",
+          "sha256": "f3f2a531ce6d9e20b11ff3ef0e24d367695afbc6a95fa425a06bb99ef91d2308",
+          "bytes": 32,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-3-x.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-101-3-v",
+      "arm": "v",
+      "instance_id": "52-101",
+      "seed": "101",
+      "replicate": 3,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 5.536369324,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 5.52489103,
+          "verify_seconds": 0.005995111,
+          "bases_ms": 8.419616,
+          "targets_ms": 39.518796,
+          "oracle_ms": 5152.931903,
+          "linear_ms": 9.635488,
+          "replay_ms": 1.942089,
+          "relations": 185,
+          "attempts": 5947
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-101-3-v.input",
+          "sha256": "4e5cf6d8248d67758e74276f40881c20d34ce84a2c1d497c706833aca7821a36",
+          "bytes": 150,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-3-v.cert",
+          "sha256": "e20e7eb59a8b6ec7c859b694233530289cef53b48b26bf44e8782d0e4dd12be9",
+          "bytes": 84929,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-3-v.log",
+          "sha256": "70492f4b5d69eb666a0fa15fcb7df6dbfefee6f2b8d2a97ff5600a85bb2a30c0",
+          "bytes": 422696,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-3-v.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-3-v.verify",
+          "sha256": "f3f2a531ce6d9e20b11ff3ef0e24d367695afbc6a95fa425a06bb99ef91d2308",
+          "bytes": 32,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-3-v.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-101-3-b",
+      "arm": "b",
+      "instance_id": "52-101",
+      "seed": "101",
+      "replicate": 3,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 6.640349469,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 6.623033631,
+          "verify_seconds": 0.008988156,
+          "bases_ms": 37.27019,
+          "targets_ms": 35.162556,
+          "oracle_ms": 6218.208915,
+          "linear_ms": 19.809837,
+          "replay_ms": 4.020321,
+          "relations": 185,
+          "attempts": 5947
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-101-3-b.input",
+          "sha256": "4e5cf6d8248d67758e74276f40881c20d34ce84a2c1d497c706833aca7821a36",
+          "bytes": 150,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-3-b.cert",
+          "sha256": "e20e7eb59a8b6ec7c859b694233530289cef53b48b26bf44e8782d0e4dd12be9",
+          "bytes": 84929,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-3-b.log",
+          "sha256": "f512215b607cff4c83ca86fa8f22e29f391606eb964837e0b30828f9320d9f55",
+          "bytes": 422702,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-3-b.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-3-b.verify",
+          "sha256": "f3f2a531ce6d9e20b11ff3ef0e24d367695afbc6a95fa425a06bb99ef91d2308",
+          "bytes": 32,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-3-b.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-202-3-b",
+      "arm": "b",
+      "instance_id": "52-202",
+      "seed": "202",
+      "replicate": 3,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 4.981082325,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 4.962278274,
+          "verify_seconds": 0.008581602,
+          "bases_ms": 9.324408,
+          "targets_ms": 26.691146,
+          "oracle_ms": 4506.844065,
+          "linear_ms": 9.837866,
+          "replay_ms": 1.825324,
+          "relations": 192,
+          "attempts": 4008
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-202-3-b.input",
+          "sha256": "49bbca6d68294429865138069f72689c44e80084ca0f7b8e4be800f9f7479688",
+          "bytes": 149,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-3-b.cert",
+          "sha256": "64fd90c6fb28354a805e6cabe3f10dfe2f6e3a2a61434b666c8193f3a5275cab",
+          "bytes": 88060,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-3-b.log",
+          "sha256": "5709dec2300a2945f78fce985995a8f0f3e6846b7cadccfeaac34b47eb00b444",
+          "bytes": 288885,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-3-b.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-3-b.verify",
+          "sha256": "707edcc6e1d97f4ab27f50d3d010b10619bd726d9217fe5423b0454a01663488",
+          "bytes": 33,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-3-b.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-202-3-v",
+      "arm": "v",
+      "instance_id": "52-202",
+      "seed": "202",
+      "replicate": 3,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 4.10981909,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 4.097162005,
+          "verify_seconds": 0.006872962,
+          "bases_ms": 7.725551,
+          "targets_ms": 27.750776,
+          "oracle_ms": 3685.354101,
+          "linear_ms": 21.962812,
+          "replay_ms": 4.147675,
+          "relations": 192,
+          "attempts": 4008
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-202-3-v.input",
+          "sha256": "49bbca6d68294429865138069f72689c44e80084ca0f7b8e4be800f9f7479688",
+          "bytes": 149,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-3-v.cert",
+          "sha256": "64fd90c6fb28354a805e6cabe3f10dfe2f6e3a2a61434b666c8193f3a5275cab",
+          "bytes": 88060,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-3-v.log",
+          "sha256": "b2452af0acf300c531fe352dad2f02a2f9003ec4336010d55c9cfa3046e6f097",
+          "bytes": 288887,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-3-v.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-3-v.verify",
+          "sha256": "707edcc6e1d97f4ab27f50d3d010b10619bd726d9217fe5423b0454a01663488",
+          "bytes": 33,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-3-v.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-202-3-x",
+      "arm": "x",
+      "instance_id": "52-202",
+      "seed": "202",
+      "replicate": 3,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 4.922119863,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 4.9040979799999995,
+          "verify_seconds": 0.00940417,
+          "bases_ms": 7.202123,
+          "targets_ms": 32.720906,
+          "oracle_ms": 4563.353253,
+          "linear_ms": 21.938461,
+          "replay_ms": 4.114634,
+          "relations": 192,
+          "attempts": 4008
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-202-3-x.input",
+          "sha256": "49bbca6d68294429865138069f72689c44e80084ca0f7b8e4be800f9f7479688",
+          "bytes": 149,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-3-x.cert",
+          "sha256": "64fd90c6fb28354a805e6cabe3f10dfe2f6e3a2a61434b666c8193f3a5275cab",
+          "bytes": 88060,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-3-x.log",
+          "sha256": "54fa40708bd1afa88b55fc0e45e18ff1b1317b182053b7634e4974ff721a4417",
+          "bytes": 288885,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-3-x.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-3-x.verify",
+          "sha256": "707edcc6e1d97f4ab27f50d3d010b10619bd726d9217fe5423b0454a01663488",
+          "bytes": 33,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-3-x.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-101-4-b",
+      "arm": "b",
+      "instance_id": "52-101",
+      "seed": "101",
+      "replicate": 4,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 6.5571133029999995,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 6.541391751,
+          "verify_seconds": 0.007628159,
+          "bases_ms": 7.11566,
+          "targets_ms": 28.856642,
+          "oracle_ms": 6199.900362,
+          "linear_ms": 8.825441,
+          "replay_ms": 1.782912,
+          "relations": 185,
+          "attempts": 5947
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-101-4-b.input",
+          "sha256": "4e5cf6d8248d67758e74276f40881c20d34ce84a2c1d497c706833aca7821a36",
+          "bytes": 150,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-4-b.cert",
+          "sha256": "e20e7eb59a8b6ec7c859b694233530289cef53b48b26bf44e8782d0e4dd12be9",
+          "bytes": 84929,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-4-b.log",
+          "sha256": "20ed7fd7cbb82582804026b50fcd64254d11c314f114a510abfe52fa932ec01f",
+          "bytes": 422701,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-4-b.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-4-b.verify",
+          "sha256": "f3f2a531ce6d9e20b11ff3ef0e24d367695afbc6a95fa425a06bb99ef91d2308",
+          "bytes": 32,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-4-b.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-101-4-v",
+      "arm": "v",
+      "instance_id": "52-101",
+      "seed": "101",
+      "replicate": 4,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 5.608927584,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 5.592276599,
+          "verify_seconds": 0.008589012,
+          "bases_ms": 7.086179,
+          "targets_ms": 22.289173,
+          "oracle_ms": 5267.866599,
+          "linear_ms": 8.841921,
+          "replay_ms": 1.799283,
+          "relations": 185,
+          "attempts": 5947
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-101-4-v.input",
+          "sha256": "4e5cf6d8248d67758e74276f40881c20d34ce84a2c1d497c706833aca7821a36",
+          "bytes": 150,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-4-v.cert",
+          "sha256": "e20e7eb59a8b6ec7c859b694233530289cef53b48b26bf44e8782d0e4dd12be9",
+          "bytes": 84929,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-4-v.log",
+          "sha256": "d19c4d550465452c8e68b818dd446d29198a440c09c7cddd9e6a1cc2235155a3",
+          "bytes": 422696,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-4-v.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-4-v.verify",
+          "sha256": "f3f2a531ce6d9e20b11ff3ef0e24d367695afbc6a95fa425a06bb99ef91d2308",
+          "bytes": 32,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-4-v.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-101-4-x",
+      "arm": "x",
+      "instance_id": "52-101",
+      "seed": "101",
+      "replicate": 4,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 6.780419252,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 6.7681322900000005,
+          "verify_seconds": 0.006394075,
+          "bases_ms": 7.085009,
+          "targets_ms": 21.860202,
+          "oracle_ms": 6427.407234,
+          "linear_ms": 9.612618,
+          "replay_ms": 1.904437,
+          "relations": 185,
+          "attempts": 5947
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-101-4-x.input",
+          "sha256": "4e5cf6d8248d67758e74276f40881c20d34ce84a2c1d497c706833aca7821a36",
+          "bytes": 150,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-4-x.cert",
+          "sha256": "e20e7eb59a8b6ec7c859b694233530289cef53b48b26bf44e8782d0e4dd12be9",
+          "bytes": 84929,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-4-x.log",
+          "sha256": "6273e27242982bb9c76c8cc985625f83563c626c580afac72cf983e51be98aa1",
+          "bytes": 422700,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-4-x.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-4-x.verify",
+          "sha256": "f3f2a531ce6d9e20b11ff3ef0e24d367695afbc6a95fa425a06bb99ef91d2308",
+          "bytes": 32,
+          "kind": "raw"
+        },
+        {
+          "path": "52-101-4-x.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-202-4-x",
+      "arm": "x",
+      "instance_id": "52-202",
+      "seed": "202",
+      "replicate": 4,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 4.962260684,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 4.94821104,
+          "verify_seconds": 0.005650889,
+          "bases_ms": 8.179147,
+          "targets_ms": 31.303684,
+          "oracle_ms": 4560.752224,
+          "linear_ms": 17.048949,
+          "replay_ms": 3.191312,
+          "relations": 192,
+          "attempts": 4008
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-202-4-x.input",
+          "sha256": "49bbca6d68294429865138069f72689c44e80084ca0f7b8e4be800f9f7479688",
+          "bytes": 149,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-4-x.cert",
+          "sha256": "64fd90c6fb28354a805e6cabe3f10dfe2f6e3a2a61434b666c8193f3a5275cab",
+          "bytes": 88060,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-4-x.log",
+          "sha256": "ee9a9649c0d82b789fdae517eb9a9403c0ca737eeee22c544a81f8d3031daa78",
+          "bytes": 288885,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-4-x.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-4-x.verify",
+          "sha256": "707edcc6e1d97f4ab27f50d3d010b10619bd726d9217fe5423b0454a01663488",
+          "bytes": 33,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-4-x.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-202-4-v",
+      "arm": "v",
+      "instance_id": "52-202",
+      "seed": "202",
+      "replicate": 4,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 4.061871335,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 4.044442202,
+          "verify_seconds": 0.008102575,
+          "bases_ms": 7.221864,
+          "targets_ms": 26.654135,
+          "oracle_ms": 3668.031142,
+          "linear_ms": 21.933151,
+          "replay_ms": 4.204717,
+          "relations": 192,
+          "attempts": 4008
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-202-4-v.input",
+          "sha256": "49bbca6d68294429865138069f72689c44e80084ca0f7b8e4be800f9f7479688",
+          "bytes": 149,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-4-v.cert",
+          "sha256": "64fd90c6fb28354a805e6cabe3f10dfe2f6e3a2a61434b666c8193f3a5275cab",
+          "bytes": 88060,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-4-v.log",
+          "sha256": "70420383eeb3328b3ac39f75dd820220673f711585572d0063d0a36cd58503bf",
+          "bytes": 288887,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-4-v.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-4-v.verify",
+          "sha256": "707edcc6e1d97f4ab27f50d3d010b10619bd726d9217fe5423b0454a01663488",
+          "bytes": 33,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-4-v.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    },
+    {
+      "run_id": "dde6p5u9kqsrkg-52-202-4-b",
+      "arm": "b",
+      "instance_id": "52-202",
+      "seed": "202",
+      "replicate": 4,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "recoveries": 1
+        },
+        "wall_seconds": 4.8937124050000005,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "native_status": "succeeded",
+          "solver_seconds": 4.880642146,
+          "verify_seconds": 0.0054242,
+          "bases_ms": 8.048763,
+          "targets_ms": 18.846888,
+          "oracle_ms": 4472.428054,
+          "linear_ms": 9.863217,
+          "replay_ms": 1.821824,
+          "relations": 192,
+          "attempts": 4008
+        }
+      },
+      "isolation": {
+        "tier": "L0",
+        "contended": null,
+        "blockers": [
+          "shared RunPod host; CPU exclusivity and stable clocks not certified"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "fresh CPU certificate replay, scalar+1 rejection, byte-exact certificates across arms/rounds and matched attempts/relations"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "52-202-4-b.input",
+          "sha256": "49bbca6d68294429865138069f72689c44e80084ca0f7b8e4be800f9f7479688",
+          "bytes": 149,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-4-b.cert",
+          "sha256": "64fd90c6fb28354a805e6cabe3f10dfe2f6e3a2a61434b666c8193f3a5275cab",
+          "bytes": 88060,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-4-b.log",
+          "sha256": "73ce7b3829b27a6c008ebd3a4145233aeeae63a27fc98ff800628288e75da460",
+          "bytes": 288885,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-4-b.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-4-b.verify",
+          "sha256": "707edcc6e1d97f4ab27f50d3d010b10619bd726d9217fe5423b0454a01663488",
+          "bytes": 33,
+          "kind": "raw"
+        },
+        {
+          "path": "52-202-4-b.negative",
+          "sha256": "740e7f0a6a90e6f47802ce9da287e7e4af4c572db1ea19152ca174374fd62c59",
+          "bytes": 13,
+          "kind": "raw"
+        }
+      ],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "RTX 4090",
+      "backend_ref": "dde6p5u9kqsrkg"
+    }
+  ],
+  "files": [
+    {
+      "path": "rows.csv",
+      "sha256": "d1fc6b3cbf65389b4b3aa11aa7f5bb3415020596ae6bcd4f9e97a2fe059b2058",
+      "bytes": 4742,
+      "kind": "raw"
+    },
+    {
+      "path": "curves.txt",
+      "sha256": "64e5335d0a39eb574afb3072208ac6237425d484d17c69634e55c112fcf4d9c5",
+      "bytes": 164,
+      "kind": "raw"
+    },
+    {
+      "path": "instruments.sha256",
+      "sha256": "b4276a0db33ac7173bc4492e4f75bf66015f304cc67892e00df94019e1ceb646",
+      "bytes": 531,
+      "kind": "raw"
+    },
+    {
+      "path": "receipt.json",
+      "sha256": "eefc0e6fec02e4d6f0f847676c37906a35782cb736b6dd0f5ab5b0ad5461e61d",
+      "bytes": 413,
+      "kind": "raw"
+    },
+    {
+      "path": "deletion.txt",
+      "sha256": "7ebc0bb865a2e56065e7299417e59d9da713f5529e55823a6b8c83136aed7611",
+      "bytes": 33,
+      "kind": "raw"
+    },
+    {
+      "path": "source-commit.txt",
+      "sha256": "05997ac3f0623fe3a42d7a75a5d4f24a57ca8628ddff332001cbcf46988c7a01",
+      "bytes": 41,
+      "kind": "raw"
+    },
+    {
+      "path": "source-checkout.sha256",
+      "sha256": "591161c5ca91d8576d3cc96f9632b87d5483374446917a671fadb18a6d2d8f25",
+      "bytes": 86,
+      "kind": "raw"
+    },
+    {
+      "path": "source-rehearsal.json",
+      "sha256": "4fcb2d955cc4ba01be05b4fc57d6ebcee31b0f37c215aebe10f59f0d3d153211",
+      "bytes": 202948,
+      "kind": "raw"
+    },
+    {
+      "path": "archive-manifest.json",
+      "sha256": "3cad8ebb59a8c172c8914f54cc635b77d611448fdfb22c97be5a49029fd4f520",
+      "bytes": 36455,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "../analyze.rs",
+      "sha256": "e829db66babdc3dca3121fc3bc793e54de679a878f98c9703f3cdfd227e8e681",
+      "bytes": 7927,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "Codex",
+      "text": "This export covers only the52-bit stratum. Both frozen protocols share one bounded worker and a native analyzer; rows.csv and analysis outputs contain both strata. Small stratum has30 planned cells; large has6. No profiler attached. Clock values are L0 diagnostics with wall_valid=false; successful recovery and exact certificate checks are counted separately. Every attempted process is retained; no failed cell is excluded. The pod was deleted during63-202-0-x. Its partial clock is null;63-202-0-v andb were not attempted. Original whole-panel analysis correctly refuses incomplete coverage, so its outputs are absent. Separate post-interruption descriptive outputs are not attributed to the frozen script."
+    }
+  ],
+  "reviews_dir": "reviews",
+  "flow": {
+    "planned": 30,
+    "attempted": 30,
+    "completed": 30,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  }
+}

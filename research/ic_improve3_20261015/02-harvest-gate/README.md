@@ -8,10 +8,16 @@ This is round 3, item 02 ([`../RULES.md`](../RULES.md)). The protocol is [`PROTO
 
 ## Verdict
 
-**Historical result:** C advanced against G0 under the original protocol. **R10 re-rate:** production regresses versus harvest off at (17,9) m2 (CPU 0.872 [0.771, 0.988], word operations 0.765); see [`pinned ledger`](../../ic_tool_program/ledger/r10-20261019/README.md).
+**What this item shows, and what it does not (repair R8, 2026-10-26).** Every verdict label below ("ADVANCES", "MATCHES", "The bar is met", "no cell regressed") compares C against **G0**, the previous default. None of them compares C against harvest **off**, and the data in this directory contradict a "matches off" reading at one cell. `runs/fit_test.jsonl` line 78:
 
-- **The bar is met.**
-  - Under the original G0 comparator no cell regressed. R10 identifies a regression at (17,9) m2 when compared with harvest off.
+> `{"ratio":"I/G0","cell":"pipe-n17-l9-m2-a1/prod","targets":12,"gm":0.8731,"lo":0.7832,"hi":0.9736,"verdict":"REGRESSES",...}`
+
+`I` is harvest off, so the production path at (17,9) m2 costs **1/0.873 = 1.15x the CPU** with the harvest than without it. Line 102 gives the same against C itself (I/C 0.872 [0.771, 0.988], REGRESSES; word operations line 162: 0.765 [0.686, 0.856]), because C and G0 run the identical path there. The bench-mode row (line 77) also regresses (0.922 [0.829, 0.996]). The old text labelled this cell MATCHES; that label was wrong against off. Status of "the default is no worse than off": **MEASURED, false at (17,9) m2** (and at (19,10) m2 in word operations, see the R8 paired run).
+
+**R8 follow-up** ([`../../ic_r8_harvest_default_20261026/`](../../ic_r8_harvest_default_20261026/README.md)): a fresh paired default-vs-off run on 12 cells reproduced the word-operation regression at (17,9) and (19,10) m2 (production 0.843 and 0.852, CIs excluding 1), found no other regression, and the default was narrowed to the rank gate alone (`root,gpv=0,rank=331`); `KIC_LINEAR_HARVEST=r3` restores the gate evaluated in this item. Sections 2 to 4 below describe the gate as this item shipped it. See also the [pinned ledger](../../ic_tool_program/ledger/r10-20261019/README.md).
+
+- **The bar, as this item defined it (against G0), is met.**
+  - Against G0 no cell regressed. Against harvest off, (17,9) m2 regresses in production (above).
   - (29,15) m2 advances **1.41× [1.32, 1.52]** in CPU and 1.29× in word operations.
   - Root sets are identical on every target and every arm: 0 failures in 248 test, 144 training and 142 identity rows.
 - **Default and opt-outs.**
@@ -131,20 +137,20 @@ Below, I is harvest off and R is the ungated root harvest. "Root share" is the r
   | (23,12) | 0.953 [0.846, 1.068] | 0.928 [0.823, 1.036] |
 
 - **At the cells the new gate adds,** the root share is small (≤ 7 %). The rebuild is amortised even in early-stopping solves, so the production call keeps most of the gain: 1.06–1.30×. End to end it delivers 1.20× and 1.14×.
-- **Follow-up, not done here.** In production, G0's own firing at small m = 2 (rank < 331) regresses in both word operations and CPU against harvest off at (17,9); the CPU ratio is 0.873 [0.783, 0.974]. R10 records this as the regression at that cell. That needs its own protocol, because it changes cells where this item was required to keep the incumbent's path.
+- **Follow-up, done in repair R8.** In production, G0's own firing at small m = 2 regresses in word operations and CPU against harvest off at (17,9); the CPU ratio is 0.873 [0.783, 0.974]. Repair R8 re-measured it and narrowed the default; see the [R8 note](../../ic_r8_harvest_default_20261026/README.md).
 
 ## 4. The change (`src/cryptanalysis/koblitz_groebner.rs`, gate only)
 
 - **Two new `LinearHarvest` fields.** `or_occ_at_least` and `or_rank_at_least` hold size gates that are OR-ed with the gpv gate. `u32::MAX` means never, so every existing configuration is unchanged.
 - **`linear_harvest_size_gate`.** At the root harvest point, it checks the largest rank in the node's `InheritedBases`, or the occurring-variable count.
-- **The default is now `root,gpv=0.9607,rank=331`.** `LINEAR_HARVEST_GPV` is item 05's gate.
+- **The default as this item shipped it was `root,gpv=0.9607,rank=331`** (since narrowed by repair R8 to `root,gpv=0,rank=331`; `KIC_LINEAR_HARVEST=r3` restores this one). `LINEAR_HARVEST_GPV` is item 05's gate.
 - **`parse_linear_harvest`** accepts `gpv`, `rank=`, `occ=`.
 - **Doc comments** are updated.
 - **Unit test `linear_harvest_keeps_every_root`.** It now also covers `LINEAR_HARVEST_GPV` and the size gates alone (`root,gpv=0,rank=1`, `root,gpv=0,occ=1`) against brute force, and asserts the new parse identities.
 
 | `KIC_LINEAR_HARVEST` | meaning |
 |---|---|
-| unset, `1` | **default**: root, gpv < 0.961 OR root rank ≥ 331 |
+| unset, `1` | **default as shipped by this item**: root, gpv < 0.961 OR root rank ≥ 331 (R8: now rank ≥ 331 only; this gate is `r3`) |
 | `gpv` | item 05's gate (the previous default), counter-identical |
 | `0` | off, the pre-harvest engine, counter-identical |
 | `every`, `root`, `k=`, `free=`, `gpv=x`, `rank=r`, `occ=o` | modifiers, as before plus the two size gates |

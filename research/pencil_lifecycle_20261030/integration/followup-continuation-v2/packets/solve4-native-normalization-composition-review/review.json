@@ -1,0 +1,200 @@
+{
+  "schema": "independent-formal-review/v1",
+  "decision": "accept_scoped_component",
+  "reviewer": "assembler_independent_review_v2",
+  "source_author": "first_information",
+  "independent": true,
+  "blind": false,
+  "prior_familiarity": "Reviewed narrow inverse and normalization prerequisites; plan frozen before this producer proof read.",
+  "producer_commit": "04e7fbe8d8cd6d35ba4f228015a30b07d82ecada",
+  "source_hashes": {
+    "Composition.lean.txt": "8bc6f9f07ebe8ff8e6035fb74df565a6b00c16dd5d7d94342c09290ecf239761",
+    "Controls.lean.txt": "669a7f5486198ba330f43be2e74c9f7d923eb5a96057ea0e1af68e57709bbdf1",
+    "Narrow.lean.txt": "9d20c4c354a321d9c9c5c99407d174346301013f4e99bcedc99a704f8cdedae7",
+    "Normalization.lean.txt": "c324197f137c6b781e8d50ce0c2fcaf2ab76db4178b2bd5f41ebec7fb8e3c807",
+    "Readback.lean.txt": "5fefd1acc2a3389ce2a65df27b0263d1db4ea29f5559ce90a1600ac229891e1b",
+    "names.json": "1bf574f064ffa1010fb46b6c47ac8d2db376fa47eb08a6bd9665f036dbc212c2"
+  },
+  "plan_sha256": "eb0c5cb20b071434feb70e569e85908acceb6e3f6bd89be7cf21a6016b963ca7",
+  "replay_receipt_sha256": "20354af1ec673714cfc7edf5295e9bf495e8f50b91be7a103f7a629f9291a61f",
+  "replay": {
+    "status": "passed",
+    "error": null,
+    "commands": [
+      {
+        "module": "EliminationField",
+        "argv": [
+          "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+          "-j1",
+          "-M3500",
+          "-s16384",
+          "-o",
+          "/var/tmp/native-composition-independent-5q3mbt_p/EliminationField.olean",
+          "/var/tmp/native-composition-independent-5q3mbt_p/EliminationField.lean"
+        ],
+        "expected_exit": 0,
+        "exit": 0
+      },
+      {
+        "module": "EliminationWord",
+        "argv": [
+          "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+          "-j1",
+          "-M3500",
+          "-s16384",
+          "-o",
+          "/var/tmp/native-composition-independent-5q3mbt_p/EliminationWord.olean",
+          "/var/tmp/native-composition-independent-5q3mbt_p/EliminationWord.lean"
+        ],
+        "expected_exit": 0,
+        "exit": 0
+      },
+      {
+        "module": "Narrow",
+        "argv": [
+          "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+          "-j1",
+          "-M3500",
+          "-s16384",
+          "-o",
+          "/var/tmp/native-composition-independent-5q3mbt_p/Narrow.olean",
+          "/var/tmp/native-composition-independent-5q3mbt_p/Narrow.lean"
+        ],
+        "expected_exit": 0,
+        "exit": 0
+      },
+      {
+        "module": "Normalization",
+        "argv": [
+          "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+          "-j1",
+          "-M3500",
+          "-s16384",
+          "-o",
+          "/var/tmp/native-composition-independent-5q3mbt_p/Normalization.olean",
+          "/var/tmp/native-composition-independent-5q3mbt_p/Normalization.lean"
+        ],
+        "expected_exit": 0,
+        "exit": 0
+      },
+      {
+        "module": "Composition",
+        "argv": [
+          "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+          "-j1",
+          "-M3500",
+          "-s16384",
+          "-o",
+          "/var/tmp/native-composition-independent-5q3mbt_p/Composition.olean",
+          "/var/tmp/native-composition-independent-5q3mbt_p/Composition.lean"
+        ],
+        "expected_exit": 0,
+        "exit": 0
+      },
+      {
+        "module": "Controls",
+        "argv": [
+          "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+          "-j1",
+          "-M3500",
+          "-s16384",
+          "-o",
+          "/var/tmp/native-composition-independent-5q3mbt_p/Controls.olean",
+          "/var/tmp/native-composition-independent-5q3mbt_p/Controls.lean"
+        ],
+        "expected_exit": 0,
+        "exit": 0
+      },
+      {
+        "module": "Readback",
+        "argv": [
+          "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+          "-j1",
+          "-M3500",
+          "-s16384",
+          "-o",
+          "/var/tmp/native-composition-independent-5q3mbt_p/Readback.olean",
+          "/var/tmp/native-composition-independent-5q3mbt_p/Readback.lean"
+        ],
+        "expected_exit": 0,
+        "exit": 0
+      },
+      {
+        "module": "OwnControls",
+        "argv": [
+          "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+          "-j1",
+          "-M3500",
+          "-s16384",
+          "-o",
+          "/var/tmp/native-composition-independent-5q3mbt_p/OwnControls.olean",
+          "/var/tmp/native-composition-independent-5q3mbt_p/OwnControls.lean"
+        ],
+        "expected_exit": 0,
+        "exit": 0
+      },
+      {
+        "module": "OwnReadback",
+        "argv": [
+          "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+          "-j1",
+          "-M3500",
+          "-s16384",
+          "-o",
+          "/var/tmp/native-composition-independent-5q3mbt_p/OwnReadback.olean",
+          "/var/tmp/native-composition-independent-5q3mbt_p/OwnReadback.lean"
+        ],
+        "expected_exit": 0,
+        "exit": 0
+      },
+      {
+        "module": "ExpectedFailure",
+        "argv": [
+          "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+          "-j1",
+          "-M3500",
+          "-s16384",
+          "-o",
+          "/var/tmp/native-composition-independent-5q3mbt_p/ExpectedFailure.olean",
+          "/var/tmp/native-composition-independent-5q3mbt_p/ExpectedFailure.lean"
+        ],
+        "expected_exit": 1,
+        "exit": 1
+      }
+    ],
+    "elapsed_seconds": 24.46927902198513,
+    "dependency_count": 28797,
+    "source_revision": "04e7fbe8d8cd6d35ba4f228015a30b07d82ecada",
+    "workspace": "/var/tmp/native-composition-independent-5q3mbt_p",
+    "runtime_execution": false,
+    "independent_binary_kernel_rechecker": false,
+    "trust": "Private elimination/graph/comparator snapshots plus pinned shared mathlib/toolchain caches; pre/post inventories do not exclude transient concurrent changes."
+  },
+  "theorem_claim": "Canonical native inverse is derived and composed into finite suffix normalization: canonical output, zero prefix, pivot one, equivalent augmented equation and exact residual scaling.",
+  "hypotheses": [
+    "prime modulus",
+    "p.toNat <= 2^32",
+    "canonical row",
+    "native pivot word nonzero",
+    "all earlier columns zero"
+  ],
+  "removed_premises": [
+    "supplied canonical inverse unit",
+    "supplied decoded inverse identity"
+  ],
+  "controls": {
+    "producer": 8,
+    "reviewer": 4,
+    "named_axiom_readbacks": 15,
+    "malformed_audit_rejections": 3,
+    "expected_false_pivot": "rejected with Lean exit 1"
+  },
+  "findings": [],
+  "scope_limits": [
+    "Manual source correspondence to native inv and suffix multiplication; no compiler correctness claim",
+    "No pivot search, swaps, zero-prefix propagation across iterations, full solve4 return or Ops.i counter proof",
+    "Independent binary kernel rechecker unavailable; exact source rebuilt with pinned Lean and caches",
+    "Hash inventories detect persistent changes, not transient concurrent changes"
+  ],
+  "scientific_execution": false
+}

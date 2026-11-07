@@ -1,0 +1,78 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "IC residual structure in the batch vs multi-target rho, p36",
+ "description": "research/ic_residual_batch_ecbench_20261102/PROTOCOL.md",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 68719476731,
+    "a": 68719476728,
+    "b": 33,
+    "group_order": 68719022539,
+    "r": 68719022539,
+    "gx": 2,
+    "gy": 51741851039
+   }
+  ],
+  "targets_per_curve": 16,
+  "target_seed": 20261901
+ },
+ "arms": [
+  {
+   "name": "rho",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "pool16",
+   "role": "baseline",
+   "method": {
+    "id": "rho.multitarget_pooled",
+    "params": {
+     "batch": "16"
+    }
+   }
+  },
+  {
+   "name": "res16",
+   "role": "candidate",
+   "method": {
+    "id": "ic.residual_batch",
+    "params": {
+     "batch": "16"
+    }
+   }
+  },
+  {
+   "name": "pool64",
+   "role": "baseline",
+   "method": {
+    "id": "rho.multitarget_pooled",
+    "params": {
+     "batch": "64"
+    }
+   }
+  },
+  {
+   "name": "res64",
+   "role": "candidate",
+   "method": {
+    "id": "ic.residual_batch",
+    "params": {
+     "batch": "64"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 3,
+  "warmup": 1,
+  "order": "alternate_measured",
+  "seed": 20261902,
+  "isolation_required": "L0",
+  "timeout_seconds": 3600
+ }
+}

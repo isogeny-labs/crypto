@@ -1,0 +1,43 @@
+spec ECS1h37f76d9b77c5 (prime_ksum_pooled_20261029 train, 32-bit prime-order curves): 1224 executions
+  arm rho-neg          reference  ECM1hefea4e0ebe79 rho.negation {"cap_multiple": "64"}
+  arm bsgs-neg         reference  ECM1h87f6341629c3 bsgs.negation {}
+  arm inc-n512         candidate  ECM1h790925f25aad ic.pipeline {"factor_base": "prime-abscissa:size=512", "linalg": "incremental-gauss", "max_trials": "167871873", "oracle": "mitm:negation_folded=1", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm inc-n727         candidate  ECM1h0074833cbc3c ic.pipeline {"factor_base": "prime-abscissa:size=727", "linalg": "incremental-gauss", "max_trials": "167871873", "oracle": "mitm:negation_folded=1", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm inc-n1024        candidate  ECM1h61a6431fe629 ic.pipeline {"factor_base": "prime-abscissa:size=1024", "linalg": "incremental-gauss", "max_trials": "167871873", "oracle": "mitm:negation_folded=1", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm inc-n1444        candidate  ECM1h8bb0c45e03bd ic.pipeline {"factor_base": "prime-abscissa:size=1444", "linalg": "incremental-gauss", "max_trials": "167871873", "oracle": "mitm:negation_folded=1", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm inc-n2048        candidate  ECM1h6e4af73c01f4 ic.pipeline {"factor_base": "prime-abscissa:size=2048", "linalg": "incremental-gauss", "max_trials": "167871873", "oracle": "mitm:negation_folded=1", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum4-a15        candidate  ECM1h5c68781de9ad ic.pipeline {"factor_base": "prime-abscissa:size=15", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=4", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum4-a21        candidate  ECM1h7fa6e70d5ca9 ic.pipeline {"factor_base": "prime-abscissa:size=21", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=4", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum4-a30        candidate  ECM1hb10075922e74 ic.pipeline {"factor_base": "prime-abscissa:size=30", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=4", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum4-a42        candidate  ECM1h044df1e34c92 ic.pipeline {"factor_base": "prime-abscissa:size=42", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=4", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum4-a60        candidate  ECM1h99b224282cff ic.pipeline {"factor_base": "prime-abscissa:size=60", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=4", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum5-a10        candidate  ECM1h564edf56aed0 ic.pipeline {"factor_base": "prime-abscissa:size=10", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=5", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum5-a13        candidate  ECM1hbd3a6aca25cd ic.pipeline {"factor_base": "prime-abscissa:size=13", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=5", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum5-a19        candidate  ECM1h20cad30624ca ic.pipeline {"factor_base": "prime-abscissa:size=19", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=5", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum5-a27        candidate  ECM1hd2f12309e560 ic.pipeline {"factor_base": "prime-abscissa:size=27", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=5", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  arm ksum5-a38        candidate  ECM1h80e46c3de9f8 ic.pipeline {"factor_base": "prime-abscissa:size=38", "linalg": "incremental-gauss", "max_trials": "13528399621", "oracle": "ksum:m=5", "solver": "", "solver_budget_seconds": "0", "targets": "walk"}
+  workload W62d85a734b6c icv1-fp32-t14279-7d108a60 r=2^31.97 A=2 registered=false ec1=-
+  workload W59cc2918db4b icv1-fp32-t14279-7d108a60 r=2^31.97 A=2 registered=false ec1=-
+  workload W003fa8feaa38 icv1-fp32-t14279-7d108a60 r=2^31.97 A=2 registered=false ec1=-
+  workload Wc41cd72ab304 icv1-fp32-t14279-7d108a60 r=2^31.97 A=2 registered=false ec1=-
+  workload Wf87448f9fea1 icv1-fp32-t14279-7d108a60 r=2^31.97 A=2 registered=false ec1=-
+  workload W52531c5fcbbf icv1-fp32-t14279-7d108a60 r=2^31.97 A=2 registered=false ec1=-
+  workload W09743b72e1df icv1-fp32-t14279-7d108a60 r=2^31.97 A=2 registered=false ec1=-
+  workload W27cc5fe184b7 icv1-fp32-t14279-7d108a60 r=2^31.97 A=2 registered=false ec1=-
+  workload Wf83c6a7ae02f icv1-fp32-t14279-7d108a60 r=2^31.97 A=2 registered=false ec1=-
+  workload W280e6bd95ad8 icv1-fp32-t14279-7d108a60 r=2^31.97 A=2 registered=false ec1=-
+  workload Wfbcdf43e29ae icv1-fp32-t14279-7d108a60 r=2^31.97 A=2 registered=false ec1=-
+  workload W557ce17fc668 icv1-fp32-t14279-7d108a60 r=2^31.97 A=2 registered=false ec1=-
+  workload W9b4fc5c015aa icv1-fp32-tm34607-b8d05587 r=2^31.72 A=2 registered=false ec1=-
+  workload W2f7511be67d0 icv1-fp32-tm34607-b8d05587 r=2^31.72 A=2 registered=false ec1=-
+  workload Wb33b81f0b606 icv1-fp32-tm34607-b8d05587 r=2^31.72 A=2 registered=false ec1=-
+  workload Wdf37c33d79be icv1-fp32-tm34607-b8d05587 r=2^31.72 A=2 registered=false ec1=-
+  workload W7023a126c802 icv1-fp32-tm34607-b8d05587 r=2^31.72 A=2 registered=false ec1=-
+  workload W0f952c91389e icv1-fp32-tm34607-b8d05587 r=2^31.72 A=2 registered=false ec1=-
+  workload W5485fbb251c3 icv1-fp32-tm34607-b8d05587 r=2^31.72 A=2 registered=false ec1=-
+  workload Wa0b9936f375f icv1-fp32-tm34607-b8d05587 r=2^31.72 A=2 registered=false ec1=-
+  workload W2ac8445c8ddb icv1-fp32-tm34607-b8d05587 r=2^31.72 A=2 registered=false ec1=-
+  workload W4fafcc6cea16 icv1-fp32-tm34607-b8d05587 r=2^31.72 A=2 registered=false ec1=-
+  workload W76ba886fb51a icv1-fp32-tm34607-b8d05587 r=2^31.72 A=2 registered=false ec1=-
+  workload W7149593016cd icv1-fp32-tm34607-b8d05587 r=2^31.72 A=2 registered=false ec1=-
+note: 24 slug(s) are not in docs/curves/registry.json; register before citing them in prose (AGENTS.md §11)

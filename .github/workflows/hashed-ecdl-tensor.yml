@@ -1,0 +1,44 @@
+name: hashed ECDL tensor correctness
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'crates/hashed-ecdl-tensor/**'
+      - '.github/workflows/hashed-ecdl-tensor.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hashed-ecdl-tensor-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: crates/hashed-ecdl-tensor
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout: crates/hashed-ecdl-tensor
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: crates/hashed-ecdl-tensor
+      - name: Format
+        run: cargo fmt --check
+      - name: Strict lint
+        run: cargo clippy --locked --all-targets -- -D warnings
+      - name: Exact arithmetic, recursive controls and full reduction
+        run: cargo test --locked --release
+      - uses: dtolnay/rust-toolchain@1.78.0
+      - name: Declared minimum Rust version
+        run: cargo +1.78.0 check --locked --all-targets

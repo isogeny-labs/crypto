@@ -1,0 +1,9 @@
+item,status,scope,assumptions,source_sha256,dependency_or_gate
+projective_quintic_relation,checked,actual weighted-Proj rational-point stalk,field K and point equation,601f8714b191f015d76d477cb1eb590014097281de538abe56d693f19288d52d,actual chart quintic maps to pointY squared
+projective_norm_identity,checked,arbitrary polynomial norm in actual stalk,field K and point equation and polynomial identity with actual quintic,601f8714b191f015d76d477cb1eb590014097281de538abe56d693f19288d52d,ring homomorphism from affine chart
+source_style_projective_norm_identity,checked,source-style common 2+2 norm in actual stalk,field K and point equation and valid Mumford congruences and nonzero determinant,601f8714b191f015d76d477cb1eb590014097281de538abe56d693f19288d52d,checked source_curve_eq and normalized actual quintic
+projective_norm_order,checked,chosen nonbranch factor local order,separable quintic and point equation and 2y≠0 and b≠0 and polynomial norm identity and chosen factor nonunit,601f8714b191f015d76d477cb1eb590014097281de538abe56d693f19288d52d,actual DVR and other conjugate factor unit
+source_style_order_wrapper,open,source-style coefficients in order corollary,valid Mumford congruences and chosen factor nonunit,,substitute source_curve_eq into projective_norm_order in one theorem
+characteristic_two_order_allocation,open,derivative-smooth characteristic-two point,2=0 and f'(a)≠0,,conjugate factors coincide so different local allocation needed
+global_principal_divisor_Pic0,open,global genus-two law,all finite and infinity local orders,,sum divisor and Pic0 class transport
+compiled_Rust_semantics,open,compiled complete law,formal global law,,link Rust branches to proof-side coefficient hypotheses

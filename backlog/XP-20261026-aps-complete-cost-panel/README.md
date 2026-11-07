@@ -58,3 +58,38 @@ study by PR, including honest null or negative results.
 
 The current tiny public tests are a correctness prerequisite, not this panel's
 held-out data, a speed comparison or a reproduction of APS's full paper ladder.
+
+The [2026-10-29 replay continuation](../../research/aps_replay_20261029/README.md)
+adds independent BigUint EC/sampling/relation checks and complete-set oracles
+for emitted fixed-fixture transcripts. This supplies one replay component;
+it does not make this card ready. Full pricing, native ecbench/export records,
+pre-transcript abort outcomes, metric validation and the frozen protocol remain
+open. The future timed driver must freeze the common online verification
+interval and report post-run completeness auditing separately. No cost claim
+may be inferred from a replay receipt whose costs are explicitly unattested.
+
+## Four additional comparisons (2026-10-28)
+
+The [follow-up implementation](../../research/aps_followup_20261028/README.md)
+provides correctness-tested interfaces for:
+
+1. Exhaustive versus first-informative recovery, keeping the root strategy
+   and bases fixed. Retain B=0 candidates, failed branches and incomplete
+   searches; a verified early witness is not complete enumeration.
+2. Legacy full-field scan versus exact coordinate domains and rational
+   factoring on identical equations. Auxiliary and invariant parameters
+   remain unrestricted; include factorization and fallback costs.
+3. Unordered elementary-symmetric cubic selection versus the two-parameter
+   line-divisor selection on identical full bases, including both global
+   sign orientations and coordinate deduplication.
+4. Unpruned versus saturated line selection on the same certified j=0 orbit
+   bases. Independently relabeled orbits are a refusal/correctness control;
+   they must not silently enter the pruned arm. Include the inverse variable's
+   construction and elimination cost.
+
+These comparisons remain blocked and unfrozen. Automatic approval review
+rejected the required source/worktree checkpoint upload as source-code egress
+to S3 without explicit user approval; it was not retried. The current EKS
+submission contract must also be reconciled with this card's provisional
+resource ceilings before execution. No job, funding or resource request is
+created by this update, and no practical gain is inferred from the new code.

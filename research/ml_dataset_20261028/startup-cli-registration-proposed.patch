@@ -1,0 +1,33 @@
+--- a/src/ml_dataset/mod.rs
++++ b/src/ml_dataset/mod.rs
+@@ -8,6 +8,7 @@
+ pub mod s3_budget;
+ pub mod solvers;
+ pub mod storage;
++mod startup_gate;
+ pub mod telemetry;
+ pub mod types;
+ 
+@@ -35,6 +36,11 @@
+ 
+ #[derive(Subcommand)]
+ pub enum DatasetCommand {
++    /// Validate a delivered launch grant and start the frozen bounded worker.
++    Start {
++        #[arg(long)]
++        resume: bool,
++    },
+     /// Inspect or reserve cumulative campaign allocations; admission is not launch authorization.
+     Budget {
+         #[command(subcommand)]
+@@ -920,6 +926,10 @@
+ 
+ pub fn run(args: &DatasetArgs) -> Result<(), String> {
+     match &args.command {
++        DatasetCommand::Start { resume } => {
++            let outcome = startup_gate::start(*resume).map_err(|e| e.to_string())?;
++            println!("{}", serde_json::to_string(&outcome).map_err(|e| e.to_string())?);
++        }
+         DatasetCommand::Budget { command } => println!("{}", run_budget_command(command)?),
+         DatasetCommand::Plan(a) => {
+             let plan = DatasetPlan {

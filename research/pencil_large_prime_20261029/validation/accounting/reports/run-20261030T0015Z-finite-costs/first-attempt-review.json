@@ -1,0 +1,98 @@
+{
+  "causal_chain": [
+    "The root PID 1 supervisor successfully initialized and accepted the start operation.",
+    "supervisor::launch builds Command for /opt/isolab/recovery/isolab-criu-progress.",
+    "The Command pre_exec hook drops all payload credentials to UID/GID 1000 before exec.",
+    "The target executable is 0700 root:root in the published image, so UID 1000 exec returns EACCES.",
+    "Command::spawn returns os error 13 before assigning child PID, matching the retained pid:null status."
+  ],
+  "continuation_contract": {
+    "new_runtime_changes_request_hash": true,
+    "old_state_resumable": false,
+    "reason": "terminal failed state with no committed generation; max_restores does not repair a pre-spawn failure",
+    "required": "new run name and immutable request under unchanged original deadline and aggregate budget, if already authorized",
+    "same_run_name_with_changed_request_allowed": false
+  },
+  "created_utc": "2026-10-30T00:10:45Z",
+  "exact_evidence": {
+    "controller_log": "/home/ec2-user/pencil-controller-review-20261029/first-gate-20261029/submission/controller-log-0001.json",
+    "object_listing": "/home/ec2-user/pencil-controller-review-20261029/first-gate-20261029/submission/object-list-after-controller-failure.json",
+    "publisher": "/home/ec2-user/pencil-controller-review-20261029/image-publication-20261029/resume/publish-runtime",
+    "runtime_archive": "/home/ec2-user/pencil-controller-review-20261029/replacement-runtime.tar.gz",
+    "stopped_container_extraction": "/home/ec2-user/pencil-controller-review-20261029/image-publication-20261029/extracted/runtime",
+    "supervisor_source": "/home/ec2-user/pencil-controller-review-20261029/source/taskq/deploy/eks-karpenter/resume/controller/src/supervisor.rs",
+    "supervisor_status": "/home/ec2-user/pencil-controller-review-20261029/first-gate-20261029/submission/failed-supervisor-status.json",
+    "terminal_state": "/home/ec2-user/pencil-controller-review-20261029/first-gate-20261029/submission/failed-state.json"
+  },
+  "excluded_causes": [
+    "IAM",
+    "Kubernetes RBAC",
+    "CodeBuild source package executable bits",
+    "ecbench byte hash",
+    "controller bootstrap"
+  ],
+  "failed_image_metadata": {
+    "/opt/isolab/recovery": {
+      "gid": 0,
+      "mode_octal": "0755",
+      "uid": 0
+    },
+    "/opt/isolab/recovery/isolab-criu-progress": {
+      "gid": 0,
+      "mode_octal": "0700",
+      "sha256": "144db760cf6d59103380f59f7855625459a1927e0cacd3a444512ba8ca097dd4",
+      "uid": 0
+    },
+    "/opt/isolab/recovery/isolab-eks-recovery": {
+      "gid": 0,
+      "mode_octal": "0700",
+      "sha256": "ac7d57132617775679770dc55b6f8b3acc83f4454e31b025a1f35e9b915abc21",
+      "uid": 0
+    },
+    "/opt/isolab/recovery/lib": {
+      "gid": 0,
+      "mode_octal": "0700",
+      "uid": 0
+    },
+    "/usr/local/bin/ecbench": {
+      "gid": 0,
+      "mode_octal": "0755",
+      "sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+      "uid": 0
+    }
+  },
+  "failed_run": {
+    "attempt": 0,
+    "checkpoint_generations": 0,
+    "controller_build": "isolab-recovery-controller:ef20ac28-6906-4185-9b06-1ab570af4ee2",
+    "error": "Permission denied (os error 13)",
+    "instance_id": "i-0c8459b31372de7a9",
+    "payload_pid": null,
+    "pod_uid": "16c4de04-44ec-49b7-b04b-d9e5eae0c94d",
+    "request_sha256": "85a3222af1483e0a020c65f054576b89158843f9f2e3ffea0f87770cbd887e23",
+    "restores": 0,
+    "run_name": "pencil-p739-20261029",
+    "runtime_image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:4201400427fcdba18fe88cfda6cd7f46b12db15fcc371ee56166d0fca5f5caa3",
+    "terminal_phase": "failed"
+  },
+  "minimal_fix": {
+    "insufficient": "Changing only directory modes while isolab-criu-progress remains 0700.",
+    "required": "Publish a new image derived from the immutable failed image with only /opt/isolab/recovery/isolab-criu-progress mode changed to 0755; retain identical bytes and every other path mode.",
+    "required_validation": [
+      "full runtime path/type/uid/gid/mode/hash inventory old versus corrected",
+      "only expected progress mode differs",
+      "progress byte SHA-256 unchanged",
+      "offline UID 1000 invocation reaches program argument handling without starting ecbench or a solver",
+      "digest-pinned stopped-container readback"
+    ]
+  },
+  "schema": "pencil.runtime-permission-review/v1",
+  "scientific_execution": {
+    "ecbench_started": false,
+    "mathematical_results": 0,
+    "payload_spawned": false,
+    "targets_executed": 0
+  },
+  "scope": "Read-only diagnosis of terminal first gate infrastructure failure; no controller relaunch, cloud mutation, solver execution, or mathematical result.",
+  "verdict": "confirmed_runtime_image_mode_defect"
+}

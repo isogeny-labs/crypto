@@ -6,17 +6,12 @@
 //! honest: for each curve it produces exactly one of three outcomes, per
 //! `docs/ic/ENGINE_AUDIT_AND_DESIGN.md` §1.
 //!
-//! - [`Regime::Attack`] — index calculus is the relevant sub-exponential
-//!   attack on this family, and the instance is inside the size envelope this
-//!   repository has actually solved end to end.  A run recovers a verified
-//!   logarithm and prices it against Pollard rho.
-//! - [`Regime::Scaled`] — the named curve is out of that envelope (or is a
-//!   prime-field curve, where no sub-exponential IC is known).  A run executes
-//!   the same pipeline on a same-family analogue at a feasible size and labels
-//!   any statement about the named curve as an extrapolation.
-//! - [`Regime::EstimateOnly`] — no run is attempted; the report carries the
-//!   generic-attack cost and the family's asymptotic IC form, with heuristics
-//!   named.
+//! - [`Regime::Scaled`] — `icx run` executes a feasible analogue for prime and
+//!   binary families. It never dispatches to the named curve, even when its
+//!   subgroup fits the configured bit envelope.
+//! - [`Regime::EstimateOnly`] — extension and characteristic-three families
+//!   have no runnable `icx` pipeline.
+//! - [`Regime::Attack`] — reserved for a future exact named-curve run path.
 //!
 //! Nothing here claims to break a curve, and the prime-field note is explicit:
 //! index calculus is **not** a threat to prime-field ECDLP, and the CLI says
@@ -27,15 +22,15 @@ use crate::cryptanalysis::matmul_exponent::{
     self, Applicability, BinaryIcHeuristic, OmegaBound, BOUNDS,
 };
 
-/// Largest subgroup-order bit length this repository has solved end to end
-/// with the framework (a 48-bit subgroup of `K_0/F_{2^61}`; see
-/// `docs/ic/runs/`).  Above this, a real curve is run as a scaled analogue.
+/// Largest subgroup-order bit length demonstrated with the framework
+/// (a 48-bit subgroup of `icv1-f2m61-t158598901-ab42b6c5`; see `docs/ic/runs/`). This does not
+/// enable named-curve execution in `icx run`, which always uses an analogue.
 pub const ATTACK_ENVELOPE_BITS: u64 = 48;
 
 /// What sort of run is meaningful for a curve.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Regime {
-    /// IC is relevant and the instance is in-envelope: solve and price it.
+    /// Reserved for an exact named-curve run, currently unavailable in `icx`.
     Attack,
     /// Run a same-family analogue at feasible size; extrapolate, labelled.
     Scaled,
@@ -71,22 +66,20 @@ pub struct RegimeReport {
     pub rationale: String,
 }
 
-/// Classify a curve for a `run`.  `envelope_bits` defaults to
-/// [`ATTACK_ENVELOPE_BITS`]; callers may lower it (e.g. for a quick CI run).
+/// Classify a curve by the currently available `icx` execution path.
+/// `envelope_bits` is retained for estimate API and report context.
 pub fn classify(curve: &CatalogCurve, envelope_bits: u64) -> RegimeReport {
     let relevant = ic_relevant(curve.family);
     let order_bits = curve.order_bits();
-    if relevant && order_bits <= envelope_bits {
+    if matches!(curve.family, Family::Extension | Family::Char3) {
         RegimeReport {
-            regime: Regime::Attack,
+            regime: Regime::EstimateOnly,
             ic_relevant: true,
             rationale: format!(
-                "index calculus is the relevant sub-exponential attack on the \
-                 {} family, and the {}-bit subgroup is within the end-to-end \
-                 envelope ({} bits) demonstrated in this repository",
+                "the {} family has no runnable icx pipeline for {}; \
+                 use icx estimate until a field-specific run path is connected",
                 curve.family.tag(),
-                order_bits,
-                envelope_bits
+                curve.name
             ),
         }
     } else if relevant {
@@ -94,14 +87,13 @@ pub fn classify(curve: &CatalogCurve, envelope_bits: u64) -> RegimeReport {
             regime: Regime::Scaled,
             ic_relevant: true,
             rationale: format!(
-                "index calculus applies to the {} family, but the {}-bit \
-                 subgroup exceeds the {}-bit end-to-end envelope; a run uses a \
-                 same-family analogue and any statement about {} is an \
-                 extrapolation",
+                "index calculus applies to the {} family; icx run uses a \
+                 same-family analogue for {} ({}-bit subgroup), even when the \
+                 configured envelope is {} bits. The named curve is not run",
                 curve.family.tag(),
+                curve.name,
                 order_bits,
-                envelope_bits,
-                curve.name
+                envelope_bits
             ),
         }
     } else {
@@ -362,11 +354,17 @@ mod tests {
     }
 
     #[test]
-    fn small_koblitz_analogue_is_attack_regime() {
-        // Use a tiny synthetic envelope to exercise the Attack branch on a
-        // real catalog curve: pretend the envelope is 200 bits.
+    fn envelope_does_not_turn_an_analogue_into_a_named_curve_run() {
         let k163 = by_name("sect163k1").unwrap();
         let r = classify(&k163, 200);
-        assert_eq!(r.regime, Regime::Attack);
+        assert_eq!(r.regime, Regime::Scaled);
+    }
+
+    #[test]
+    fn small_characteristic_three_curve_is_estimate_only() {
+        let c = by_name("ss-f3-5").unwrap();
+        let r = classify(&c, ATTACK_ENVELOPE_BITS);
+        assert!(r.ic_relevant);
+        assert_eq!(r.regime, Regime::EstimateOnly);
     }
 }

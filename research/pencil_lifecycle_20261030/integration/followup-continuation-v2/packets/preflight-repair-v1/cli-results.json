@@ -1,0 +1,50 @@
+[
+  {
+    "name": "actual nine immutable input inventory",
+    "exit_code": 0,
+    "stdout": "{\"cohort_slots\":22680,\"cohort_workloads\":1260,\"missing_actual_bindings\":\"checked separately per actual session; no future identities fabricated\",\"request_sha256\":\"ade032ec9f6280ff6458fe50946319bbe033aa8953f443f5dcda37c1e25e747f\",\"scientific_execution_admitted\":false,\"separate_gate_slots\":18,\"software_bindings_complete\":false,\"stage\":\"static_inventory_only\"}\n",
+    "stderr": ""
+  },
+  {
+    "name": "wrong request hash",
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "request hash mismatch\n"
+  },
+  {
+    "name": "all_missing",
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "inventory incomplete\n"
+  },
+  {
+    "name": "wrong_stage",
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "not static inventory stage\n"
+  },
+  {
+    "name": "unknown_field",
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "unknown field `admit`, expected one of `schema`, `stage`, `routes`, `artifacts`\n"
+  },
+  {
+    "name": "duplicate_route",
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "duplicate route\n"
+  },
+  {
+    "name": "certificate_bad_hash",
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "file hash mismatch\n"
+  },
+  {
+    "name": "symlink request",
+    "exit_code": 2,
+    "stdout": "",
+    "stderr": "Too many levels of symbolic links (os error 40)\n"
+  }
+]

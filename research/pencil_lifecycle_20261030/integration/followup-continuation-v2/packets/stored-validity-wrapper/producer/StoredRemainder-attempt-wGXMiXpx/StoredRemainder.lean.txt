@@ -1,0 +1,23 @@
+import StoredFast
+set_option autoImplicit false
+namespace StoredValidity
+open Polynomial ScaleTrim MonicRemainder MonicZeroTest DivisorArrayCopy StoredInput ResidualWord
+
+theorem remainder_empty_iff (p : UInt64) [Fact p.toNat.Prime] (a b : List UInt64)
+ (hp : 1<p.toNat) (hb : p.toNat<2^31) (ha : Canon p a) (hc : Canon p b)
+ (hm : b.getLast?=some 1) :
+ FallbackGeometry.remainder p a b=some [] ↔ wordsPoly p b∣wordsPoly p a := by
+ have hn : Normal b := by simp [Normal,hm]
+ have hz : wordsPoly p b≠0 := (ResidualAcceptance.monic_list p b hm).ne_zero
+ obtain ⟨r,hr,hcr,hnr,hs,hcong⟩:=FallbackGeometry.remainder_total p a b hp hb ha hc hn hz
+ constructor
+ · intro he
+   have er : r=[] := Option.some.inj (hr.symm.trans he)
+   simpa [er,wordsPoly,listPoly] using hcong
+ · intro hd
+   have hrd : wordsPoly p b∣wordsPoly p r := by
+    have hh:=dvd_sub hd hcong
+    simpa using hh
+   have er:=shorter_divisible_empty p b r hm hcr hnr hs hrd
+   simpa [er] using hr
+end StoredValidity

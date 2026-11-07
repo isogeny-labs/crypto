@@ -31,7 +31,7 @@ fn run_json(args: &[&str]) -> Value {
 fn list_covers_the_fifteen_nist_curves_and_finds_no_structural_weakness() {
     let v = run_json(&["list"]);
     assert_eq!(v["operation"], "list");
-    assert_eq!(v["count"], 15);
+    assert_eq!(v["count"], 25);
     let curves = v["curves"].as_array().unwrap();
     let mut names: Vec<&str> = curves
         .iter()
@@ -39,8 +39,31 @@ fn list_covers_the_fifteen_nist_curves_and_finds_no_structural_weakness() {
         .collect();
     names.sort_unstable();
     let mut expected = vec![
-        "P-192", "P-224", "P-256", "P-384", "P-521", "K-163", "K-233", "K-283", "K-409", "K-571",
-        "B-163", "B-233", "B-283", "B-409", "B-571",
+        "P-192",
+        "P-224",
+        "P-256",
+        "P-384",
+        "P-521",
+        "K-163",
+        "K-233",
+        "K-283",
+        "K-409",
+        "K-571",
+        "B-163",
+        "B-233",
+        "B-283",
+        "B-409",
+        "B-571",
+        "ECCp-131",
+        "ECC2K-130",
+        "ECC2-131",
+        "ECC2K-163",
+        "ECC2-163",
+        "ECC2-191",
+        "ECC2K-238",
+        "ECC2-238",
+        "ECC2K-358",
+        "ECC2-353",
     ];
     expected.sort_unstable();
     assert_eq!(names, expected);
@@ -50,6 +73,44 @@ fn list_covers_the_fifteen_nist_curves_and_finds_no_structural_weakness() {
         assert_eq!(a["order_is_prime"], true, "{}", c["curve"]["name"]);
         assert!(a["embedding_degree"].is_null(), "{}", c["curve"]["name"]);
         assert_eq!(a["recommended"], "rho");
+    }
+}
+
+#[test]
+fn certicom_130_aliases_solve_known_answers_and_load_published_targets() {
+    for (alias, canonical, qx) in [
+        ("ECC2-130", "ECC2-131", "602339c5db0e9c694ac8908528c51c440"),
+        ("ECCp-130", "ECCp-131", "3aa6f004fc62e2da1ed0bfb62c3ffb568"),
+    ] {
+        let solved = run_json(&[
+            "solve",
+            alias,
+            "--secret",
+            "42",
+            "--interval-bits",
+            "8",
+            "--method",
+            "bsgs",
+        ]);
+        assert_eq!(solved["report"]["curve"], canonical);
+        assert_eq!(solved["report"]["verified"], true);
+        assert_eq!(solved["planted_recovered"], true);
+
+        // Loading the public Q must retain the existing whole-group
+        // feasibility refusal rather than starting an unbounded search.
+        let out = bin()
+            .args(["solve", alias, "--challenge", "--json"])
+            .output()
+            .unwrap();
+        assert!(!out.status.success());
+        let report: Value = serde_json::from_slice(&out.stdout).unwrap();
+        assert_eq!(report["report"]["curve"], canonical);
+        assert_eq!(report["target"]["x"], qx);
+        assert!(report["planted_scalar"].is_null());
+        assert!(report["report"]["failure"]
+            .as_str()
+            .unwrap()
+            .contains("feasibility"));
     }
 }
 

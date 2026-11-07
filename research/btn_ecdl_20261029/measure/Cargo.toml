@@ -1,0 +1,23 @@
+[package]
+name = "btn-measure"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+hashed-ecdl-tensor = { path = "../../../crates/hashed-ecdl-tensor" }
+hashed-ecdl-tensor-fast = { path = "../hashed-ecdl-tensor-fast" }
+num-bigint = "=0.5.1"
+serde_json = "1"
+
+[[bin]]
+name = "btn-measure"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"

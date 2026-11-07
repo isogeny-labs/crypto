@@ -1,0 +1,150 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "ML-WIDE-PRIME-M3-CLI-SOFTWARE-20261030-V5",
+  "classification": "software_correctness_fixture",
+  "inputs": {
+    "n": [
+      47,
+      53,
+      61
+    ],
+    "m": [
+      3
+    ],
+    "family": "prime",
+    "solver": "f4",
+    "seed": 42,
+    "curve_seeds": 1,
+    "generators": 1,
+    "keys": 1,
+    "factor_base_size": 2,
+    "degree_bound": 4,
+    "work_limit": 50000,
+    "twists": [
+      false,
+      true
+    ],
+    "shards": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "shard_count": 6
+  },
+  "limits": {
+    "seconds_per_case": 20,
+    "memory_mib": 512,
+    "trace_mib": 16,
+    "seconds_per_command": 45,
+    "kill_grace_seconds": 5,
+    "total_runner_seconds": 1800,
+    "retries": 0,
+    "expected_cli_commands": 32
+  },
+  "software_binding": {
+    "source": "4d5a0a65bbe699e399a06579a444b6a21c87c194",
+    "binary_sha256": "6a4e44fa7f7d7128137b484ea57e7612d47a27270b7a1ddeddc7c208c80851ae"
+  },
+  "adapter_contract_confirmed": true,
+  "reserved_artifacts": {
+    "prime-f4-input.json": "complete-prime-field-polynomial-system",
+    "execution-context.json": "restricted-original-worker-execution-context/v1",
+    "prime-f4-wide-m3-result.json": "restricted-wide-prime-f4-m3-result/v1",
+    "prime-f4-wide-m3-events.jsonl": "restricted-wide-prime-f4-m3-boundary-events/v1",
+    "prime-f4-wide-m3-group-extraction.json": "restricted-wide-prime-f4-m3-group-replay/v1"
+  },
+  "forbidden_public_keys": [
+    "known_answer_scalar",
+    "found_pdp",
+    "events",
+    "basis",
+    "work_reserved",
+    "bytes_peak_reserved",
+    "native_backend_invoked",
+    "basis_derivation_verified",
+    "observations",
+    "retired_instructions_raw",
+    "native_basis_derivation_verified",
+    "bytes_reserved",
+    "native_statistics",
+    "exhaustive_no_decomposition"
+  ],
+  "controls": {
+    "source_bound_tests_passed": true,
+    "receipt_sha256": "723fdb75ace9c5432d297864d31298e06aa34efbfed40fe7071d2dcfef27d151",
+    "positive": "Fixed n47/53/61 both-twist native invocation and public3P group witnesses",
+    "negative": "Fixed4P target on signedP,-P domain, point order>7; all8triples replayed",
+    "exceptional": "Fixed targetP retains both earlier affine and later infinity-prefix matches, continuation after first witness",
+    "caps": "Triple/group/witness/admission/persistence/deadline caps never promote negative or complete claims",
+    "resampling": false,
+    "receipt_file": "controls-receipt.json",
+    "receipt_admission": "Before output creation, require SHA256 match, matching frozen source, compile_exit=0, focused.failed=0 and corrected_adapter_tests_executed=true; retain receipt in output. Parent separately owns full-library gate."
+  },
+  "acceptance": "Six fixed cells must invoke native backend and pass native verification, restricted retention and confirmed chain export. A positive witness may be verified with incomplete extraction; negative requires complete extraction. Supervisor censorship clears outer claims. Construction/pre-entry failures fail coverage. Extraction artifacts required for full fixture acceptance only, not every legitimate partial schema.",
+  "stopping": "Fail fast on command/assertion error; preserve complete and partial output, zero retries. Parent timeout 1800s mandatory.",
+  "publication": "Parent archives full output including failed fixtures, runner/checker/protocol/control receipts/source/binary binding to authorized S3 namespace with conditional PUT, HEAD, GET and SHA256 verification. Restored native verify required for every sealed shard; no verification-success claim for unsealed partials. No cloud calls in runner.",
+  "scope": "Finite m3 software correctness fixture; actual runtime acceptance pending execution. No scientific corpus, independent consumer negative proof, full basis derivation or instruction-count claim.",
+  "variable_ledger": {
+    "output": "canonical existing /var/tmp parent on XFS checked before creation",
+    "inputs": "frozen seed42/shards0..5; no adaptation after results",
+    "source": "final combined source/binary and checker mappings must be frozen before any draw",
+    "clock": "bounds only, no comparative clock admission"
+  },
+  "runner_sha256": "357dfd15946f0f0f5086f90f386beb18b51a64139ade8c79fe70d13b939719db",
+  "checker_sha256": "a8d92f221485550577ee898d92bd348cdaba1f2ba5bf74eade5f801d343d3d7a",
+  "version": 5,
+  "amendment": {
+    "reason": "Bind merged4d5 source and its own executed controls, full-library and strict test-target lint gates, and CLI binary before any V5 draw; preserve V4 results and repeat the same six fixed inputs without resampling",
+    "filed_before_affected_data": true,
+    "previous_version": 4
+  },
+  "adapter_metadata": {
+    "confirmed": true,
+    "source": "Source mapping reviewed against immutable281b4ba11c35c7f0bb47ddd5607788d41951c46f; actual CLI fixture remains unexecuted",
+    "input_schema": "ml-dataset.prime-f4-chain-input/v1",
+    "extraction_schema": "crypto.ml-dataset.wide-prime-f4-m3-extraction/v1",
+    "extraction_policy": "continue after first witness",
+    "branch_tags": [
+      "Affine",
+      "ExceptionalInfinityPrefix"
+    ],
+    "result_fields": [
+      "native_backend_invoked",
+      "extraction_complete",
+      "exhaustive_no_decomposition",
+      "pdp_witness_verified"
+    ],
+    "limits": "20s/512MiB/16MiB; unchanged native ceilings; exact source mappings reviewed",
+    "reviewed_source": "4d5a0a65bbe699e399a06579a444b6a21c87c194"
+  },
+  "feature_scope": {
+    "public": "Conditional existing canonical m3 chain graph plus public structural view; contract not yet confirmed",
+    "restricted": "native events/basis/result/group extraction and all labels",
+    "outstanding": "m4..15 native representation and remaining full corpus scope"
+  },
+  "schema_mapping_confirmed": true,
+  "strategy": "prime-f4-fp64-affine-chain-m3-group-replay/v1",
+  "result_schema": "crypto.ml-dataset.wide-prime-f4-m3-result/v1",
+  "export_contract": {
+    "confirmed": true,
+    "mode": "verified-chain-graph",
+    "condition": "Merged4d5 source-bound canonical chain reconstruction and graph/export controls passed; actual CLI compatibility remains pending. No silent fallback to empty/static-only acceptance.",
+    "independent_consumer_equivalence": false,
+    "confirmation_scope": "Immutable source contract and source-bound graph/export unit checks; runtime compatibility is tested by this fixture, not asserted by freeze",
+    "runtime_fixture_passed": false
+  },
+  "validation_gates": {
+    "path": "validation-gates.json",
+    "sha256": "506893d46b4ce6276c08f55861808221e5af30008c2b33182ae0985617b8f1e0",
+    "source": "4d5a0a65bbe699e399a06579a444b6a21c87c194"
+  },
+  "freeze": {
+    "status": "frozen",
+    "filed_before_affected_data": true,
+    "frozen_at": "2026-10-30T05:36:39Z",
+    "protocol_sha256": "9a51f246408f28543d7a49f6c1119a0c304a5686a11b3862cb3afcd859f251a4"
+  }
+}

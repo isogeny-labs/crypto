@@ -1,0 +1,196 @@
+Collector transition and exceptional-branch source audit
+Source inspection only. Eight transition obligations and eight ordered dispatch regions. No scientific execution, new
+measurements, or Lean replay. Existing component results are mapped to remaining composition obligations; no
+theorem is promoted by this report.
+Central invariant The next composition target is decoded state d = aP + bQ in the Jacobian class group. Canonicality and Mumford polynomial validity are separate representation facts. Both trial candidates may insert relations,
+while only the selected candidate advances the walk.
+Source aliases collector: retained projective_state_collector.rs; law: retained projective_law_gate.rs; three_leads:
+current repository src/cryptanalysis/three_leads.rs. Complete paths and hashes are listed at the end and in status.json.
+
+Collector transitions
+1. transfer
+Source: collector:132-161
+Existing evidence: normalization-input-guards, normalization-inverse-support, monic-remainder-zero-test; new
+residual Acceptance reported by parent
+Remaining composition: Bind actual source transfer to class homomorphism, nonzero normalized leading scale,
+canonical words and nonzero weights. Existing j.valid checks prove representation acceptance, not class-image equality.
+
+2. initialization and restart
+Source: collector:173-198,221-228,344-352
+Existing evidence: word-add11-validity-review, word-doubling-review, mixed-dispatch-word-review, sameuword-review
+Remaining composition: Prove scalar loop and add dispatch preserve class labels; initialize d=aP+bQ and each
+jump=A_iP+B_iQ. Preserve on both restart sites.
+
+3. candidate transition
+Source: collector:242-252
+Existing evidence: same component addition proofs
+Remaining composition: For each of TWO candidates derive nd=d+jump and na=a+A,nb=b+B modulo r.
+Relation insertion can happen for both candidates although only best advances. Needs class-sum semantics and
+[r]P=[r]Q=0.
+
+4. identity return
+Source: collector:253-257
+Existing evidence: identity representation and word canonicality components
+Remaining composition: Prove zero class implies na+nb*k=0 mod r via injective generator scalar map; justify
+prime r or unit nb before inverse.
+
+5. split normalization
+Source: collector:258-275; law:582-589
+Existing evidence: weighted decode and normalization packets
+Remaining composition: Prove split_possible discriminant scaling reflection for nonzero weights; normalized u
+roots and repeated-root multiplicity; curve validity preserved. Native asserts ordinate equation only after roots, not
+complete j.valid here.
+
+1
+
+6. signed physical relation
+Source: collector:288-320
+Existing evidence: relation-adapter-review, negation and Mumford validity components
+Remaining composition: Bind effective Mumford divisor to signed point classes, including repeated roots and
+y=0. Canonical min with negation is only duplicate key; na,nb retain original sign. Define canonical node ordinate
+and identity anchor0.
+
+7. graph insertion
+Source: collector:321-334; three_leads:1558-1712
+Existing evidence: relation-adapter-review and target-information review scopes
+Remaining composition: Prove find potentials/path compression, union-by-size reversal, fixed anchors, sameroot positive/negative cycles and constraint extraction. Need homomorphism h:J->Z/r with h(P)=1,h(Q)=k; nodes
+need not individually be r-torsion if h exists.
+
+8. continuation selection
+Source: collector:337-354
+Existing evidence: no complete induction found in inspected packets
+Remaining composition: Commit selected candidate together with its matching na,nb; graph remains sound
+after relations from unselected candidate; duplicate-induced restart resets labels coherently.
+
+Ordered dispatch regions
+1. identity and1+1
+Source: law:612-615
+Existing evidence: word-add11-validity-review; word-doubling-review
+Remaining composition: Complete ordered inverse/equal/distinct assembly and class-sum semantics, rather
+than redo component validity.
+
+2. 1+2 /2+1
+Source: law:616-622,828-878
+Existing evidence: mixed-dispatch-word-review
+Remaining composition: Reviewed source-order canonical validity and None exclusions available under original
+premises; supply reachable-state premises and class-sum theorem.
+
+3. same-u inverse
+Source: law:925-927
+Existing evidence: sameu guard/word packets
+Remaining composition: Inverse precedence and identity class sum; do not equate arbitrary record equality
+with class equality.
+
+4. same-u equal/double22
+Source: law:928-930,727-826
+Existing evidence: degree22-guards-review and bzero producer packets
+Remaining composition: Ordered bzero/szero identity exclusion established; bzero support geometry does not
+prove valuations/class sum. Generic double22 and all output branches still require composed validity/class/weight
+closure.
+
+2
+
+5. same-u mixed
+Source: law:931-951
+Existing evidence: sameu-composition-review, sameu-word-review
+Remaining composition: Zero-slope exclusion, extraction/doubling validity established with global smoothness;
+supply constructor smoothness binding and class sum.
+
+6. distinct support B=0
+Source: law:958-999
+Existing evidence: degree22 guards; mixed dispatcher components
+Remaining composition: shared_zero_q_delta exclusion available. Need original-input proof of extracted
+p1..p4 validity/nonzero weights; mismatch exclusion; sequential p2+2p1 then p4 addition. Both explicit first secondary
+None and returned second None need exclusion.
+
+7. B != 0 C=0
+Source: law:1000-1023
+Existing evidence: no full composed result identified in inspected packets
+Remaining composition: Prove literal degree-one payload, canonicality/nonzero weights, normalized validity
+and class sum.
+
+8. B != 0 C != 0
+Source: law:1025;636-726
+Existing evidence: common formula source present
+Remaining composition:
+Bind common helper
+load/canonicality/weights/validity/class sum.
+
+guards
+
+to
+
+outer
+
+values
+
+and
+
+prove
+
+pay-
+
+Interpretation and boundaries
+A graph-label proof may use a homomorphism h from the Jacobian group into Z/r with h(P)=1 and h(Q)=k. Individual
+factor points need not each be r-torsion if that homomorphism is established. Its existence and normalization remain
+proof obligations. Native expect calls make mixed/degree-two None exclusions concrete panic-freedom conditions.
+Raw projective equality governs scheduling and deduplication; it must not silently mean canonical class equality.
+Existing independent review statements inspected as evidence descriptions; no new hash/replay audit of all their
+dependencies. Absence claims limited to inspected packet set.
+
+Bound source and evidence files
+/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/src/bin/
+projective_state_collector.rs
+96246448e56f46b57e0ddd751990cf11fab122fbc04355b3e0ec6530194f1e35
+
+/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/src/bin/
+projective_law_gate.rs
+5976e7f30b3e9c5c49a5fc0f4095404b7322832e4b02f467bc3cb7e0d9dcc8c0
+
+/home/ec2-user/crypto-pencil-signed-graph-20261029/src/cryptanalysis/three_leads.rs
+26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6
+
+/var/tmp/pencil-portfolio-audit-20261101/matrix.json
+b69bf55ca42edc7144a6d7330ecc9ccdc0a8ed4fcde228be0fb16f6ff4efa7ff
+
+/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/
+integration/followup-continuation-v2/packets/mixed-dispatch-word-review/REVIEW.md
+283159612d65179db91163b508e16d00e726cbc4328127516f8412ed8e7f90ec
+
+/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/
+integration/followup-continuation-v2/packets/sameu-composition-review/REVIEW.md
+3
+
+344ccf4c551ef48e735bcf389836c56054c671f9d9c3f0ae6b6759179d83235c
+
+/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/
+integration/followup-continuation-v2/packets/sameu-word-review/REVIEW.md
+2b655991fc2aa14514338df1a63aa25fdc77461cbabd978088d76696fcb46e40
+
+/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/
+integration/followup-continuation-v2/packets/word-doubling-review/REPORT.md
+d6c042440314ae1666e009a5356a1e3a460aa81ca0f29feb90269f82df550e6e
+
+/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/
+integration/followup-continuation-v2/packets/word-add11-validity-review/REVIEW.md
+d1198ac53a7f3822711ac397c3e93ef6a259aec72a71988f104e43e21caf08f3
+
+/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/
+integration/followup-continuation-v2/packets/degree22-guards-review/REVIEW.md
+5a8152296da083c95d6ec701eeb0a2ddf71fc2fe0ffce180c6c0f615111973e4
+
+/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/
+integration/followup-continuation-v2/packets/degree22-guards/REPORT.md
+ab4b5c1ea780bff81459d1c474c0e459f63e6cde32e3a5a26b2a68e05799be89
+
+/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/
+integration/followup-continuation-v2/packets/degree22-bzero-word-producer/status.json
+a455bf3eb3366d9a641c6c999012aa4489eca186be042c5fcee2a7df537506b0
+
+/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/
+integration/followup-continuation-v2/packets/degree22-bzero-geometry-producer/status.json
+adff780b7ecb0832557847208b8398370ea9a98ba67c3f95dd640ae5edd0afeb
+
+4
+
+

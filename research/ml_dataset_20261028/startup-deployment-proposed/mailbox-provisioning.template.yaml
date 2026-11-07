@@ -1,0 +1,35 @@
+# Proposed administrator provisioning only. No permissions were applied.
+# Pre-provision the empty mailbox; the issuer's exact-object role cannot create it.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "__PREPROVISIONED_EXACT_GRANT_OBJECT_NAME__"
+  namespace: "__RESERVED_NAMESPACE__"
+data: {}
+# Do not mark immutable before the single complete bundle has been installed.
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: "__APPROVED_EXACT_MAILBOX_ROLE_NAME__"
+  namespace: "__RESERVED_NAMESPACE__"
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames: ["__PREPROVISIONED_EXACT_GRANT_OBJECT_NAME__"]
+    verbs: ["get", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: "__APPROVED_EXACT_MAILBOX_BINDING_NAME__"
+  namespace: "__RESERVED_NAMESPACE__"
+subjects:
+  - kind: "__APPROVED_ISSUER_SUBJECT_KIND__"
+    name: "__APPROVED_ISSUER_SUBJECT_NAME__"
+    apiGroup: "__SUBJECT_API_GROUP_OR_EMPTY_FOR_SERVICEACCOUNT__"
+    namespace: "__SERVICEACCOUNT_NAMESPACE_IF_APPLICABLE__"
+roleRef:
+  kind: Role
+  name: "__APPROVED_EXACT_MAILBOX_ROLE_NAME__"
+  apiGroup: rbac.authorization.k8s.io

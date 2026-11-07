@@ -1,0 +1,53 @@
+{
+  "schema": "research.formal-component-review/v1",
+  "reviewer": "invariants_branches",
+  "producer": "word_correspondence",
+  "producer_manifest_sha256": "a3946399d83fdb4f68513e84ca2ff0866c3d0423c00479fcbffbbd0c7df282bd",
+  "producer_source_sha256": "f1f60b5d03a3953f3ce1f28f2717fad798644496c0fa3dd0acf422c647c0a5a9",
+  "claims": [
+    {
+      "name": "actual outer word guards reflected into field",
+      "judgment": "supported_within_scope"
+    },
+    {
+      "name": "p4 then original doubling then generic ordered payload composition",
+      "judgment": "supported_within_scope"
+    },
+    {
+      "name": "Some canonical output and nonzero weights",
+      "judgment": "supported_within_scope"
+    },
+    {
+      "name": "conditional normalized output validity from original input validity",
+      "judgment": "supported_within_scope"
+    }
+  ],
+  "fresh_checks": {
+    "main": 0,
+    "producer_controls": 0,
+    "axiom_readback": 0,
+    "reviewer_boundary_controls": 0
+  },
+  "axiom_declarations": 4,
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "producer_elaboration_timeouts_retained": [
+    124,
+    124
+  ],
+  "blocking_discrepancies": [],
+  "scope": "restricted positive shared-support distinct-other UInt64 values",
+  "restricted_none_is_not_production_none": true,
+  "independence": {
+    "authored_current_composition": false,
+    "authored_prior_WordGeneric_Doubling_WordDoubling": true,
+    "prior_components_independently_reviewed": true,
+    "producer_changed": false,
+    "transitive_binary_rechecker": false
+  },
+  "scientific_execution": false,
+  "cost_ratio": null
+}

@@ -1,0 +1,22 @@
+digraph routes {
+  graph [rankdir=TB, bgcolor="white", pad=0.15, nodesep=0.22, ranksep=0.25,
+    label="Finite-size routes: proposed, no measured speedup", labelloc=t,
+    fontname="Helvetica", fontsize=12];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=11,
+    fillcolor="#edf4ff", color="#25486c", margin=0.13];
+  edge [color="#52677d", arrowsize=0.7];
+  language [label="Existing relation language\ncurve + hash + addition"];
+  selector [label="Hash selector inputs\nPROPOSED"];
+  witness [label="Structured witness solver\nPROPOSED"];
+  width [label="Width-aware encoding\nPROPOSED"];
+  recursion [label="Local recursion plans\nPROOF OPEN", fillcolor="#fff3dc"];
+  partial [label="Nested thresholds\nPROPOSED"];
+  replay [label="Existing independent replay\ncurve, subgroup, hash, sum, matrix", fillcolor="#e7f4ec"];
+  measure [label="Future admitted comparison\ncurrent IC baseline and strongest rho", fillcolor="#f3f3f3"];
+  {rank=same; selector; width; recursion; partial;}
+  language -> selector -> witness -> replay;
+  language -> width -> replay;
+  language -> recursion -> replay;
+  language -> partial -> replay;
+  replay -> measure;
+}

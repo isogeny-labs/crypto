@@ -1,0 +1,211 @@
+--- a/src/cryptanalysis/three_leads_followup.rs
++++ b/src/cryptanalysis/three_leads_followup.rs
+@@ -241,12 +241,46 @@
+     candidate_cap: u64,
+     projective: bool,
+     rank_policy: bool,
++    observer: Option<&mut SignedObserver<'_>>,
++) -> Result<Outcome, String> {
++    solve_genus2_observed_policy(inst, target, seed, candidate_cap, projective, rank_policy, false, observer)
++}
++
++/// SOURCE PROPOSAL: explicit opt-in policy; not a registered measured method.
++/// Uses no known target scalar. Every returned candidate must pass source kG=Q.
++/// Its v2 events require a separately reviewed consumer and complete cost protocol.
++pub fn solve_genus2_signed_collisions_observed(
++    inst: &StudyInstance,
++    target: Point,
++    seed: u64,
++    candidate_cap: u64,
++    projective: bool,
++    rank_policy: bool,
++    observer: Option<&mut SignedObserver<'_>>,
++) -> Result<Outcome, String> {
++    solve_genus2_observed_policy(inst, target, seed, candidate_cap, projective, rank_policy, true, observer)
++}
++
++fn solve_genus2_observed_policy(
++    inst: &StudyInstance,
++    target: Point,
++    seed: u64,
++    candidate_cap: u64,
++    projective: bool,
++    rank_policy: bool,
++    recover_signed_duplicates: bool,
+     mut observer: Option<&mut SignedObserver<'_>>,
+ ) -> Result<Outcome, String> {
+     assert_eq!(inst.family, "scholten");
+     assert!(inst.curve.valid(target));
+     let s = Scholten::new(inst.curve.f.p);
+-    assert_eq!(s.short_curve().c, inst.curve.c);
++    let source_curve = s.short_curve();
++    assert_eq!(source_curve.c, inst.curve.c);
++    if recover_signed_duplicates && (
++        inst.r > (1u64 << 63) || inst.curve.binary != source_curve.binary
++        || inst.curve.f.p != source_curve.f.p || inst.curve.f.n != source_curve.f.n
++        || inst.curve.f.modulus != source_curve.f.modulus
++    ) { return Err("source curve or bounded scalar domain mismatch".into()); }
+     let counts = || s.e.f.counts() + s.j.f.counts();
+     let mut phases = vec![NativePhase {
+         name: "destination_construction".into(),
+@@ -259,7 +293,7 @@
+     assert_ne!(q, Divisor::O);
+     observe_signed(&mut observer, || {
+         json!({
+-            "kind":"header", "schema":"signed-collector-events/v1",
++            "kind":"header", "schema":if recover_signed_duplicates {"signed-collector-events/signed-collision-v2"} else {"signed-collector-events/v1"},
+             "convention":"su_xu_plus_sv_xv_eq_a_plus_bk", "zero_node":0,
+             "p":inst.curve.f.p,"r":inst.r,"order":inst.order,"cofactor":inst.h,
+             "source_field":inst.curve.f,"source_binary":inst.curve.binary,
+@@ -275,6 +309,14 @@
+     });
+     previous = counts();
+     let ring = Ring::new(inst.r);
++    if recover_signed_duplicates {
++        let size = source_curve.f.size();
++        if inst.generator.inf || inst.generator.x >= size || inst.generator.y >= size
++            || target.x >= size || target.y >= size
++            || !source_curve.valid(inst.generator) || !source_curve.valid(target)
++            || !source_curve.mul(inst.generator, inst.r).inf
++        { return Err("invalid source generator or target domain".into()); }
++    }
+     let chart = ProjectiveChart::new(&s.j);
+     let add = |a, b| {
+         if projective {
+@@ -312,6 +354,15 @@
+     let mut nodes = BTreeMap::new();
+     let mut seen = BTreeSet::new();
+     let mut first_events = observer.is_some().then(BTreeMap::new);
++    // SAME target context for this call only. The first sign-normalized pair is immutable.
++    let mut first_signed_labels: Option<BTreeMap<Divisor, (u64, u64, u64)>> =
++        recover_signed_duplicates.then(BTreeMap::new);
++    let mut signed_label_lookups = 0u64;
++    let mut signed_label_inserts = 0u64;
++    let mut signed_collision_constraints = 0u64;
++    let mut source_verification_calls = 0u64;
++    let mut source_verified = false;
++    let mut recovery_origin: Option<&'static str> = None;
+     let mut walk_seen = HashSet::new();
+     let (mut attempts, mut continuations, mut split, mut duplicates, mut probes, mut restarts) =
+         (0, 0, 0, 0, 0, 0);
+@@ -395,9 +446,67 @@
+                             &mut observer,
+                             || json!({"kind":"duplicate","attempt":attempts,"canonical":canonical,"first_attempt":first_events.as_ref().and_then(|m| m.get(&canonical)).copied()}),
+                         )?;
++                        if let Some(first) = &first_signed_labels {
++                            signed_label_lookups += 1;
++                            let &(old_a, old_b, first_attempt) = first.get(&canonical)
++                                .ok_or("signed duplicate missing first label")?;
++                            let flipped = nd != canonical;
++                            let (aa, bb) = if flipped { (ring.neg(na), ring.neg(nb)) } else { (na, nb) };
++                            let da = ring.sub(aa, old_a);
++                            let db = ring.sub(bb, old_b);
++                            signed_collision_constraints += 1;
++                            // Delta_a + Delta_b*k = 0. Never invert a zero denominator.
++                            if db == 0 {
++                                observe_signed(&mut observer, || json!({
++                                    "kind":"signed_collision", "attempt":attempts,
++                                    "first_attempt":first_attempt, "canonical":canonical,
++                                    "sign_flipped":flipped, "normalized_labels":[aa,bb],
++                                    "first_labels":[old_a,old_b], "delta":[da,db],
++                                    "status":if da==0 {"redundant"} else {"invariant_conflict"},
++                                    "recovered":null, "source_verified":false
++                                }))?;
++                                if da != 0 { return Err("inconsistent zero-denominator signed collision".into()); }
++                            } else {
++                                let candidate = ring.mul(ring.neg(da), ring.inv(db));
++                                source_verification_calls += 1;
++                                let verified = source_curve.mul(inst.generator, candidate) == target;
++                                observe_signed(&mut observer, || json!({
++                                    "kind":"signed_collision", "attempt":attempts,
++                                    "first_attempt":first_attempt, "canonical":canonical,
++                                    "sign_flipped":flipped, "normalized_labels":[aa,bb],
++                                    "first_labels":[old_a,old_b], "delta":[da,db],
++                                    "status":if verified {"source_verified"} else {"source_rejected"},
++                                    "candidate":candidate, "recovered":if verified {Some(candidate)} else {None},
++                                    "source_verified":verified
++                                }))?;
++                                if !verified { return Err("signed collision source verification failed".into()); }
++                                recovered = Some(candidate);
++                                source_verified = true;
++                                recovery_origin = Some("signed_duplicate");
++                                break 'walk;
++                            }
++                        }
+                     } else {
+                         if let Some(first) = &mut first_events {
+                             first.insert(canonical, attempts);
++                        }
++                        if let Some(first) = &mut first_signed_labels {
++                            let flipped = nd != canonical;
++                            let (aa, bb) = if flipped { (ring.neg(na), ring.neg(nb)) } else { (na, nb) };
++                            match first.entry(canonical) {
++                                std::collections::btree_map::Entry::Vacant(entry) => {
++                                    entry.insert((aa, bb, attempts));
++                                    signed_label_inserts += 1;
++                                }
++                                std::collections::btree_map::Entry::Occupied(_) => {
++                                    return Err("first signed label already present".into());
++                                }
++                            }
++                            observe_signed(&mut observer, || json!({
++                                "kind":"first_signed_label", "attempt":attempts,
++                                "canonical":canonical, "sign_flipped":flipped,
++                                "normalized_labels":[aa,bb]
++                            }))?;
+                         }
+                         let mut edge = vec![];
+                         for x in roots {
+@@ -483,6 +592,20 @@
+             }
+         }
+     }
++    // Verify graph/identity returns too, using the source field shared by counts().
++    if recover_signed_duplicates && !source_verified {
++        if let Some(candidate) = recovered {
++            source_verification_calls += 1;
++            let verified = source_curve.mul(inst.generator, candidate) == target;
++            observe_signed(&mut observer, || json!({
++                "kind":"source_verification", "attempt":attempts,
++                "candidate":candidate, "verified":verified
++            }))?;
++            if !verified { return Err("native recovery source verification failed".into()); }
++            source_verified = true;
++            recovery_origin = Some("existing_identity_or_graph");
++        }
++    }
+     phases.push(NativePhase {
+         name: "relations_and_signed_elimination".into(),
+         counts: counts() - previous,
+@@ -523,6 +646,13 @@
+             (graph.nodes() * 64 + nodes.len() * 24) as u64,
+         ),
+     ]);
++    if recover_signed_duplicates {
++        native.insert("signed_label_lookups_uncharged".into(), signed_label_lookups);
++        native.insert("signed_label_inserts_uncharged".into(), signed_label_inserts);
++        native.insert("signed_collision_constraints".into(), signed_collision_constraints);
++        native.insert("source_verification_calls".into(), source_verification_calls);
++        native.insert("logical_signed_label_value_bytes".into(), signed_label_inserts.checked_mul(24).ok_or("logical label byte count overflow")?);
++    }
+     let mut detail = json!({"policy":"two_prospective_jumps_admit_both_relations_choose_connected_or_larger_component","candidate_cap":candidate_cap,"candidate_trials":attempts,"continuations":continuations,"first_cycle_trial":first_cycle,"p":inst.curve.f.p,"r":inst.r,"h":inst.h,"subgroup_map":"tau_pullback_plus_conjugate","dual_composition":"[2]","score_is_rank_heuristic":true,"unique_relations":true});
+     if projective {
+         native.insert("projective_chart_additions".into(), chart.ordinary.get());
+@@ -543,9 +673,16 @@
+         detail["rank_score_definition"] =
+             json!("0=target_free,1=target_bearing_merge,2=target_bearing_anchor,3=target_equation");
+     }
++    if recover_signed_duplicates {
++        detail["signed_duplicate_recovery"] = json!(true);
++        detail["recovery_origin"] = json!(recovery_origin);
++        detail["source_scalar_verified"] = json!(source_verified);
++        detail["signed_label_memory_scope"] = json!("24 value bytes per first label only; keys, tree nodes, allocator and observer memory excluded");
++        detail["cost_scope"] = json!("source field verification included in existing counts closure; map/observer complete costs unmeasured");
++    }
+     observe_signed(
+         &mut observer,
+-        || json!({"kind":"terminal","attempts":attempts,"continuations":continuations,"split_relations":split,"duplicates":duplicates,"node_count":graph.nodes(),"recovered":recovered,"exhausted":recovered.is_none(),"source_verified":false}),
++        || json!({"kind":"terminal","attempts":attempts,"continuations":continuations,"split_relations":split,"duplicates":duplicates,"node_count":graph.nodes(),"recovered":recovered,"exhausted":recovered.is_none(),"source_verified":source_verified}),
+     )?;
+     Ok(Outcome {
+         recovered,

@@ -1,0 +1,231 @@
+/var/tmp/pencil-bzero-word-20261031-v1/WordBZero.lean:43:81: error: unsolved goals
+p : UInt64
+inst✝ : Fact (Nat.Prime p.toNat)
+hfive : 5 ≤ p.toNat
+hbound : p.toNat < 2 ^ 31
+a : WeightedWord
+htwo : UInt64.toNat 2 < p.toNat
+aq : a.q.toNat < p.toNat
+ar : a.r.toNat < p.toNat
+ass : a.s.toNat < p.toNat
+att : a.t.toNat < p.toNat
+az : a.z.toNat < p.toNat
+aw : a.w.toNat < p.toNat
+⊢ 2 < p.toNat
+/var/tmp/pencil-bzero-word-20261031-v1/WordBZero.lean:45:54: warning: This simp argument is unused:
+  htwo
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [bzeroTrees, FieldExpr.good, aq, ar, ass, att, az, aw]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-bzero-word-20261031-v1/WordBZero.lean:101:25: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  MixedPositiveDistinct.doubled (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+    (BZero.point (WeightedWord.decodeTwo p a))
+in the target expression
+  (WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat) (BZero.point (WeightedWord.decodeTwo p a)).x
+        (BZero.point (WeightedWord.decodeTwo p a)).y (BZero.point (WeightedWord.decodeTwo p a)).z
+        (BZero.point (WeightedWord.decodeTwo p a)).w).z =
+    0
+
+case refine_2
+p : UInt64
+inst✝ : Fact (Nat.Prime p.toNat)
+hfive : 5 ≤ p.toNat
+hbound : p.toNat < 2 ^ 31
+a0 a1 a2 a3 : UInt64
+a : WeightedWord
+h0 : a0.toNat < p.toNat
+h1 : a1.toNat < p.toNat
+h2 : a2.toNat < p.toNat
+h3 : a3.toNat < p.toNat
+ha : WeightedWord.canonical p a
+hz : a.z ≠ 0
+hw : a.w ≠ 0
+hs : a.s ≠ 0
+hb : (bzeroWords p a).b = 0
+hv : WeightedWord.normalizedValid p (WeightedDoubling.curve ↑a0.toNat ↑a1.toNat ↑a2.toNat ↑a3.toNat) a
+hg :
+  IsCoprime (WeightedDoubling.curve ↑a0.toNat ↑a1.toNat ↑a2.toNat ↑a3.toNat)
+    (Polynomial.derivative (WeightedDoubling.curve ↑a0.toNat ↑a1.toNat ↑a2.toNat ↑a3.toNat))
+hp : 0 < p.toNat
+bc : (bzeroWords p a).b.toNat < p.toNat
+dc : WordD1.canonical p (bzeroWords p a).point
+bd : ↑(bzeroWords p a).b.toNat = BZero.sourceB (WeightedWord.decodeTwo p a)
+dd : WordD1.decode p (bzeroWords p a).point = BZero.point (WeightedWord.decodeTwo p a)
+az : ↑a.z.toNat ≠ 0
+aw : ↑a.w.toNat ≠ 0
+ass : ↑a.s.toNat ≠ 0
+two : 2 ≠ 0
+fb : BZero.sourceB (WeightedWord.decodeTwo p a) = 0
+py : (BZero.point (WeightedWord.decodeTwo p a)).y ≠ 0
+oz :
+  (WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat) (BZero.point (WeightedWord.decodeTwo p a)).x
+        (BZero.point (WeightedWord.decodeTwo p a)).y (BZero.point (WeightedWord.decodeTwo p a)).z
+        (BZero.point (WeightedWord.decodeTwo p a)).w).z ≠
+    0
+ow :
+  (WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat) (BZero.point (WeightedWord.decodeTwo p a)).x
+        (BZero.point (WeightedWord.decodeTwo p a)).y (BZero.point (WeightedWord.decodeTwo p a)).z
+        (BZero.point (WeightedWord.decodeTwo p a)).w).w ≠
+    0
+ov :
+  Polynomial.X ^ 2 +
+        Polynomial.C
+            ((WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+                  (BZero.point (WeightedWord.decodeTwo p a)).x (BZero.point (WeightedWord.decodeTwo p a)).y
+                  (BZero.point (WeightedWord.decodeTwo p a)).z (BZero.point (WeightedWord.decodeTwo p a)).w).q /
+              (WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+                    (BZero.point (WeightedWord.decodeTwo p a)).x (BZero.point (WeightedWord.decodeTwo p a)).y
+                    (BZero.point (WeightedWord.decodeTwo p a)).z (BZero.point (WeightedWord.decodeTwo p a)).w).z ^
+                2) *
+          Polynomial.X +
+      Polynomial.C
+        ((WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+              (BZero.point (WeightedWord.decodeTwo p a)).x (BZero.point (WeightedWord.decodeTwo p a)).y
+              (BZero.point (WeightedWord.decodeTwo p a)).z (BZero.point (WeightedWord.decodeTwo p a)).w).r /
+          (WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+                (BZero.point (WeightedWord.decodeTwo p a)).x (BZero.point (WeightedWord.decodeTwo p a)).y
+                (BZero.point (WeightedWord.decodeTwo p a)).z (BZero.point (WeightedWord.decodeTwo p a)).w).z ^
+            4) ∣
+    WeightedDoubling.curve ↑a0.toNat ↑a1.toNat ↑a2.toNat ↑a3.toNat -
+      (Polynomial.C
+              ((WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+                    (BZero.point (WeightedWord.decodeTwo p a)).x (BZero.point (WeightedWord.decodeTwo p a)).y
+                    (BZero.point (WeightedWord.decodeTwo p a)).z (BZero.point (WeightedWord.decodeTwo p a)).w).s /
+                ((WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+                        (BZero.point (WeightedWord.decodeTwo p a)).x (BZero.point (WeightedWord.decodeTwo p a)).y
+                        (BZero.point (WeightedWord.decodeTwo p a)).z (BZero.point (WeightedWord.decodeTwo p a)).w).z ^
+                    3 *
+                  (WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+                      (BZero.point (WeightedWord.decodeTwo p a)).x (BZero.point (WeightedWord.decodeTwo p a)).y
+                      (BZero.point (WeightedWord.decodeTwo p a)).z (BZero.point (WeightedWord.decodeTwo p a)).w).w)) *
+            Polynomial.X +
+          Polynomial.C
+            ((WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+                  (BZero.point (WeightedWord.decodeTwo p a)).x (BZero.point (WeightedWord.decodeTwo p a)).y
+                  (BZero.point (WeightedWord.decodeTwo p a)).z (BZero.point (WeightedWord.decodeTwo p a)).w).t /
+              ((WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+                      (BZero.point (WeightedWord.decodeTwo p a)).x (BZero.point (WeightedWord.decodeTwo p a)).y
+                      (BZero.point (WeightedWord.decodeTwo p a)).z (BZero.point (WeightedWord.decodeTwo p a)).w).z ^
+                  5 *
+                (WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+                    (BZero.point (WeightedWord.decodeTwo p a)).x (BZero.point (WeightedWord.decodeTwo p a)).y
+                    (BZero.point (WeightedWord.decodeTwo p a)).z (BZero.point (WeightedWord.decodeTwo p a)).w).w))) ^
+        2
+yw : (bzeroWords p a).point.y ≠ 0
+cc : WeightedWord.canonical p (dblWordPayload p a0 a1 a2 a3 (bzeroWords p a).point)
+cd :
+  WeightedWord.decodeTwo p (dblWordPayload p a0 a1 a2 a3 (bzeroWords p a).point) =
+    MixedPositiveDistinct.doubled (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+      (BZero.point (WeightedWord.decodeTwo p a))
+zz : (dblWordPayload p a0 a1 a2 a3 (bzeroWords p a).point).z = 0
+⊢ (WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat) (BZero.point (WeightedWord.decodeTwo p a)).x
+        (BZero.point (WeightedWord.decodeTwo p a)).y (BZero.point (WeightedWord.decodeTwo p a)).z
+        (BZero.point (WeightedWord.decodeTwo p a)).w).z =
+    0
+/var/tmp/pencil-bzero-word-20261031-v1/WordBZero.lean:104:25: error: Tactic `rewrite` failed: Did not find an occurrence of the pattern
+  MixedPositiveDistinct.doubled (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+    (BZero.point (WeightedWord.decodeTwo p a))
+in the target expression
+  (WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat) (BZero.point (WeightedWord.decodeTwo p a)).x
+        (BZero.point (WeightedWord.decodeTwo p a)).y (BZero.point (WeightedWord.decodeTwo p a)).z
+        (BZero.point (WeightedWord.decodeTwo p a)).w).w =
+    0
+
+case refine_3
+p : UInt64
+inst✝ : Fact (Nat.Prime p.toNat)
+hfive : 5 ≤ p.toNat
+hbound : p.toNat < 2 ^ 31
+a0 a1 a2 a3 : UInt64
+a : WeightedWord
+h0 : a0.toNat < p.toNat
+h1 : a1.toNat < p.toNat
+h2 : a2.toNat < p.toNat
+h3 : a3.toNat < p.toNat
+ha : WeightedWord.canonical p a
+hz : a.z ≠ 0
+hw : a.w ≠ 0
+hs : a.s ≠ 0
+hb : (bzeroWords p a).b = 0
+hv : WeightedWord.normalizedValid p (WeightedDoubling.curve ↑a0.toNat ↑a1.toNat ↑a2.toNat ↑a3.toNat) a
+hg :
+  IsCoprime (WeightedDoubling.curve ↑a0.toNat ↑a1.toNat ↑a2.toNat ↑a3.toNat)
+    (Polynomial.derivative (WeightedDoubling.curve ↑a0.toNat ↑a1.toNat ↑a2.toNat ↑a3.toNat))
+hp : 0 < p.toNat
+bc : (bzeroWords p a).b.toNat < p.toNat
+dc : WordD1.canonical p (bzeroWords p a).point
+bd : ↑(bzeroWords p a).b.toNat = BZero.sourceB (WeightedWord.decodeTwo p a)
+dd : WordD1.decode p (bzeroWords p a).point = BZero.point (WeightedWord.decodeTwo p a)
+az : ↑a.z.toNat ≠ 0
+aw : ↑a.w.toNat ≠ 0
+ass : ↑a.s.toNat ≠ 0
+two : 2 ≠ 0
+fb : BZero.sourceB (WeightedWord.decodeTwo p a) = 0
+py : (BZero.point (WeightedWord.decodeTwo p a)).y ≠ 0
+oz :
+  (WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat) (BZero.point (WeightedWord.decodeTwo p a)).x
+        (BZero.point (WeightedWord.decodeTwo p a)).y (BZero.point (WeightedWord.decodeTwo p a)).z
+        (BZero.point (WeightedWord.decodeTwo p a)).w).z ≠
+    0
+ow :
+  (WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat) (BZero.point (WeightedWord.decodeTwo p a)).x
+        (BZero.point (WeightedWord.decodeTwo p a)).y (BZero.point (WeightedWord.decodeTwo p a)).z
+        (BZero.point (WeightedWord.decodeTwo p a)).w).w ≠
+    0
+ov :
+  Polynomial.X ^ 2 +
+        Polynomial.C
+            ((WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+                  (BZero.point (WeightedWord.decodeTwo p a)).x (BZero.point (WeightedWord.decodeTwo p a)).y
+                  (BZero.point (WeightedWord.decodeTwo p a)).z (BZero.point (WeightedWord.decodeTwo p a)).w).q /
+              (WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+                    (BZero.point (WeightedWord.decodeTwo p a)).x (BZero.point (WeightedWord.decodeTwo p a)).y
+                    (BZero.point (WeightedWord.decodeTwo p a)).z (BZero.point (WeightedWord.decodeTwo p a)).w).z ^
+                2) *
+          Polynomial.X +
+      Polynomial.C
+        ((WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+              (BZero.point (WeightedWord.decodeTwo p a)).x (BZero.point (WeightedWord.decodeTwo p a)).y
+              (BZero.point (WeightedWord.decodeTwo p a)).z (BZero.point (WeightedWord.decodeTwo p a)).w).r /
+          (WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+                (BZero.point (WeightedWord.decodeTwo p a)).x (BZero.point (WeightedWord.decodeTwo p a)).y
+                (BZero.point (WeightedWord.decodeTwo p a)).z (BZero.point (WeightedWord.decodeTwo p a)).w).z ^
+            4) ∣
+    WeightedDoubling.curve ↑a0.toNat ↑a1.toNat ↑a2.toNat ↑a3.toNat -
+      (Polynomial.C
+              ((WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+                    (BZero.point (WeightedWord.decodeTwo p a)).x (BZero.point (WeightedWord.decodeTwo p a)).y
+                    (BZero.point (WeightedWord.decodeTwo p a)).z (BZero.point (WeightedWord.decodeTwo p a)).w).s /
+                ((WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+                        (BZero.point (WeightedWord.decodeTwo p a)).x (BZero.point (WeightedWord.decodeTwo p a)).y
+                        (BZero.point (WeightedWord.decodeTwo p a)).z (BZero.point (WeightedWord.decodeTwo p a)).w).z ^
+                    3 *
+                  (WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+                      (BZero.point (WeightedWord.decodeTwo p a)).x (BZero.point (WeightedWord.decodeTwo p a)).y
+                      (BZero.point (WeightedWord.decodeTwo p a)).z (BZero.point (WeightedWord.decodeTwo p a)).w).w)) *
+            Polynomial.X +
+          Polynomial.C
+            ((WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+                  (BZero.point (WeightedWord.decodeTwo p a)).x (BZero.point (WeightedWord.decodeTwo p a)).y
+                  (BZero.point (WeightedWord.decodeTwo p a)).z (BZero.point (WeightedWord.decodeTwo p a)).w).t /
+              ((WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+                      (BZero.point (WeightedWord.decodeTwo p a)).x (BZero.point (WeightedWord.decodeTwo p a)).y
+                      (BZero.point (WeightedWord.decodeTwo p a)).z (BZero.point (WeightedWord.decodeTwo p a)).w).z ^
+                  5 *
+                (WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+                    (BZero.point (WeightedWord.decodeTwo p a)).x (BZero.point (WeightedWord.decodeTwo p a)).y
+                    (BZero.point (WeightedWord.decodeTwo p a)).z (BZero.point (WeightedWord.decodeTwo p a)).w).w))) ^
+        2
+yw : (bzeroWords p a).point.y ≠ 0
+cc : WeightedWord.canonical p (dblWordPayload p a0 a1 a2 a3 (bzeroWords p a).point)
+cd :
+  WeightedWord.decodeTwo p (dblWordPayload p a0 a1 a2 a3 (bzeroWords p a).point) =
+    MixedPositiveDistinct.doubled (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat)
+      (BZero.point (WeightedWord.decodeTwo p a))
+ww : (dblWordPayload p a0 a1 a2 a3 (bzeroWords p a).point).w = 0
+⊢ (WeightedDoubling.output (↑a0.toNat) (↑a1.toNat) (↑a2.toNat) (↑a3.toNat) (BZero.point (WeightedWord.decodeTwo p a)).x
+        (BZero.point (WeightedWord.decodeTwo p a)).y (BZero.point (WeightedWord.decodeTwo p a)).z
+        (BZero.point (WeightedWord.decodeTwo p a)).w).w =
+    0

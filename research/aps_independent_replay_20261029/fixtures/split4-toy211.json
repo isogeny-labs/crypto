@@ -1,0 +1,149 @@
+{
+  "schema": "aps.single-relation.correctness/v1",
+  "fixture": "toy211",
+  "arm": "split4",
+  "labels": "guaranteed",
+  "subset_size": 2,
+  "seed": 20261026,
+  "attempt_cap": 32,
+  "solver_budget_ms_per_attempt": 10000,
+  "first_informative": false,
+  "curve_icv1": "ICV1:fp-211:-15:227:153:unk:unk:r:9004a75cb03c",
+  "curve_model": {
+    "a": "166",
+    "b": "158",
+    "field": "fp-211",
+    "form": "y^2=x^3+a*x+b",
+    "p": "211",
+    "v": "1"
+  },
+  "generator": [
+    155,
+    121
+  ],
+  "target": [
+    79,
+    79
+  ],
+  "expected_public_logarithm": 73,
+  "status": "verified",
+  "attempts": [
+    {
+      "base": {
+        "parts": [
+          [
+            163,
+            190
+          ],
+          [
+            165,
+            117
+          ],
+          [
+            186,
+            30
+          ],
+          [
+            89,
+            170
+          ]
+        ],
+        "points": {
+          "30": {
+            "x": 30,
+            "y": 53,
+            "u": 157,
+            "v": 223
+          },
+          "89": {
+            "x": 89,
+            "y": 32,
+            "u": 184,
+            "v": 8
+          },
+          "117": {
+            "x": 117,
+            "y": 49,
+            "u": 24,
+            "v": 225
+          },
+          "163": {
+            "x": 163,
+            "y": 32,
+            "u": 196,
+            "v": 226
+          },
+          "165": {
+            "x": 165,
+            "y": 105,
+            "u": 111,
+            "v": 2
+          },
+          "170": {
+            "x": 170,
+            "y": 32,
+            "u": 147,
+            "v": 219
+          },
+          "186": {
+            "x": 186,
+            "y": 46,
+            "u": 209,
+            "v": 223
+          },
+          "190": {
+            "x": 190,
+            "y": 156,
+            "u": 95,
+            "v": 226
+          }
+        },
+        "draws": 9
+      },
+      "algebra": {
+        "complete": true,
+        "stopped_early": false,
+        "coordinate_sets": [
+          [
+            117,
+            170,
+            186,
+            190
+          ]
+        ],
+        "solver_calls": 5,
+        "solving_degree": 3,
+        "max_rows": 75,
+        "max_columns": 83,
+        "f4_field_multiplications": 17885,
+        "timed_out": false,
+        "roots": {
+          "equation_roots_visited": 1,
+          "candidates_rejected": 0,
+          "domain_evaluations": 28,
+          "factored_univariates": 1,
+          "root_field_multiplications": 0,
+          "full_field_branches": 0
+        }
+      },
+      "recovery": {
+        "logarithm": 73,
+        "coordinates": [
+          117,
+          170,
+          186,
+          190
+        ],
+        "signs": [
+          1,
+          1,
+          -1,
+          1
+        ],
+        "a": 57,
+        "b": 220
+      }
+    }
+  ],
+  "limits": "Tiny fixed fixtures only. No target scalar is passed to relation solving. F4 counters exclude setup and are not a complete cost model. Even-arity weights require one point per original partition; orbit expansion and regrouping still check B != 0. No performance, scaling, or general-security conclusion."
+}

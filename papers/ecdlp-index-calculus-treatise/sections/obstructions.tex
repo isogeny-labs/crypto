@@ -1,0 +1,155 @@
+\chapter{Obstructions: what moving the problem cannot buy}\label{ch:obstructions}
+
+The programme kept 153 leads against ECDLP in a lead atlas at its
+30~October review
+(\art{crypto-autoresearcher:knowledge/leads/ecdlp/REVIEW_STATE.json}).
+Of these:
+\begin{itemize}
+\item 74 are closed with a named obstruction or exhausted at scale;
+\item 53 are open with a decided next step;
+\item 17 are blocked;
+\item 9 are unexamined.
+\end{itemize}
+Later rounds, including the split of 4~November, added more
+(Chapter~\ref{ch:unconvmap}).
+Most obstructions are textbook results applied to the case at hand: the
+Shoup--Nechaev generic bound, the Corrigan-Gibbs--Kogan preprocessing bound
+$ST^2\gtrsim N$~\cite{cgk2018}, isogeny invariance of the group order, and
+the Balasubramanian--Koblitz embedding-degree bound. This chapter records
+the few that the programme \emph{proved} itself and that constrain index
+calculus specifically. Each states a lever that cannot work, and why.
+
+\section{Transport conservation}\label{sec:obs-transport}
+
+A homomorphic transfer $\varphi:E\to E'$ with rational kernel $\kappa$
+changes the number of ordered $m$-decompositions of a target by exactly
+$\abs{\kappa}^{m-1}$ (Lemma~\ref{lem:conservation} in
+Chapter~\ref{sec:transfer}). So an isogeny buys only three things:
+\begin{itemize}
+\item the kernel symmetry, which is trivial on prime-order curves;
+\item the factor-base geometry available on the destination curve;
+\item the cost of arithmetic there.
+\end{itemize}
+Chains of isogenies compose to one homomorphism. A loop is an endomorphism
+acting as a known scalar. Multi-curve factor bases glued by isogenies are
+single-curve bases in disguise. Measured across sizes at fixed cofactor,
+fibre-aware index calculus loses ground to rho as $\#E^{1/6}$; the full
+measurements are in Chapter~\ref{sec:transfer}.
+
+\section{The summation cover is the same everywhere}
+
+Chapter~\ref{ch:cover} proved:
+\begin{itemize}
+\item the monodromy of the summation cover is $(\ZZ/2)^{m-2}$ for every
+  curve;
+\item its fibres split completely on the factor-base locus;
+\item mean yield at fixed base size is a double count.
+\end{itemize}
+Together these close three families of leads: curve selection by
+anomalous monodromy, fibre censuses as a relation-rate probe, and
+factor-base geometries claimed to raise yield.
+
+\section{Oracle-augmented index calculus: label-valued oracles stay generic}
+
+Several leads proposed giving index calculus an extra oracle on the group.
+Since the split of 4~November the programme separates two classes.
+\begin{itemize}
+\item \emph{Label-valued oracles} are Shoup-simulable with overhead
+  $\Theta(\log N)$ or $O(m)$: the endomorphism image (by an eigenvalue
+  argument; the premise $\operatorname{End}_{\FF_p}(E)=\ZZ$ of the earlier
+  derivation is false), label-valued halving, an incidence check over a
+  label factor base, and a label-valued net. They stay closed at the
+  $\sqrt r$ floor (\texttt{LEAD-EXO-augmented-oracle-ggm}; derivation
+  tier, not yet ratified).
+\item \emph{Coordinate-revealing oracles} ($x$, $y$, the full point,
+  $x$-valued halving, field-valued jet and net, the threshold oracle
+  $C_t$) are not simulable, and the generic group model gives no bound for
+  them (\texttt{KN-FIND-194294}, \texttt{KN-FIND-982fdf};
+  \texttt{LEAD-EXO-coordinate-revealing-oracles}, open;
+  \S\ref{sec:um-oracles}). The earlier jet verdict is withdrawn.
+\end{itemize}
+
+Table-based decomposition obeys the
+preprocessing bound $ST^2\gtrsim N$. Balanced generic index calculus costs
+about $r^{2/3}/n^{4/3}$, consistent with the measured growth of the Koblitz
+gap to rho as $r^{0.165\,[0.117,0.213]}$
+(\texttt{LEAD-ICB-generic-table-oracle}). These are known instances of
+generic-group reasoning~\cite{cgk2018}; they are recorded because each
+retired or scoped a concrete proposal.
+
+\section{Lifting sections does not produce relations}
+
+Silverman's xedni calculus lifts points to a curve over a global field, in
+the hope that rank forces relations. On a frozen family of rational
+elliptic surfaces (with $\deg b=6$ and monic quadratic $x$), the programme
+derived the exact lift probability
+\[
+  P_{\rm lift}(p)=\frac{1-2/p+p^{-3}}{2p^3},
+\]
+so the exponent is $\alpha=3$, far above the $\alpha<1/2$ that a relation
+source would need. This was checked against $596{,}268{,}874$ enumerated
+slots with no disagreement, and a parameter count reproduces $\alpha=3$
+(\texttt{LEAD-ICP-xedni-function-field-sections}, \texttt{EV-XEDN-001}).
+The scope is one family ($\deg b\le10$, $p\le31$). A dimension-count theorem
+over all section shapes would be needed to close the route in general.
+
+The classic obstruction to xedni is also conditional. A kernel-checked Lean
+audit of Jacobson, Koblitz, Silverman, Stein and Teske's analysis
+(\art{research/jksst_xedni_audit_20261101/}) does three things:
+\begin{itemize}
+\item it repairs their conditional theorem;
+\item it refutes several overbroad readings of it;
+\item it leaves open the premises it rests on: Lang's height conjecture, a
+  uniform height--discriminant comparison, and the algorithm-specific
+  bridge from a one-shot relation probability to the actual attack.
+\end{itemize}
+The audit calls the result a strong conditional asymptotic obstruction for
+classic xedni, not a proof that the route is closed.
+
+\section{Twist points carry no relations}
+
+A curve and its quadratic twist share $x$-coordinates, and therefore share
+summation polynomials. Twist points supply no relations for the curve:
+Frobenius acts as $+1$ on $E(\FF_q)$ and as $-1$ on the
+embedded twist, so the twist part $B$ of any sum satisfies $2B=0$.
+
+The study \art{research/twist_obstruction_20261026/} checked this
+exactly on toy binary curves in the ECC2K-130 model (odd $n$, twist
+$a\mapsto a+1$):
+\begin{itemize}
+\item 0 of 356{,}530{,}036 mixed sums are rational;
+\item 0 violations on 4{,}954 decomposition targets at $m=2,3$;
+\item the off-parity solution sets equal the predicted ones on 1{,}154 of
+  1{,}154 targets;
+\item positive controls found all 18{,}042 and 95 planted solutions.
+\end{itemize}
+A heuristic that ignored the obstruction predicted that 74--89\% of
+solutions would contain a twist-lifting coordinate; 0\% did at $m=2$.
+
+A follow-up asked whether a factor-base subspace can \emph{avoid} the twist
+altogether (\art{research/lift_dense_factor_base_20261027/}; 11 Lean
+theorems, standard axioms only).
+\begin{itemize}
+\item \emph{Composite degree $N=dn$, $n\ge3$: yes.} On suitable
+  $\FF_{2^d}$-lines the lift condition collapses to the constant
+  $\operatorname{Tr}(a)$. When $\operatorname{Tr}(a)=0$ every abscissa
+  lifts, giving $2^n$ relations per Gaudry--Diem trial. This applies to
+  c2pnb208w1 and c2pnb368w1, but the modelled gain is $+0.50$ bits, a
+  model output, not a measurement.
+\item \emph{Prime degree (ECC2K-130): this construction does not exist.}
+  A prime-degree field has no proper intermediate subfield, so there are no
+  $\FF_{2^d}$-lines to use. This does not rule out other twist-avoiding
+  subspaces. At the small prime degrees tested, all-lift subspaces of
+  dimension 4--5 exist, though fewer than for density-paired random sets
+  (exact all-lift 4-subspace counts $0.921\pm0.018$ of the null at $N=11$,
+  permutation $p=2\cdot10^{-5}$). This is toy evidence. Whether useful
+  twist-avoiding subspaces exist at cryptographic prime degree is
+  unresolved.
+\end{itemize}
+
+\section{What the obstructions leave open}
+
+None of the obstructions above concerns the cost of \emph{solving} the
+decomposition system, nor the linear algebra. Chapter~\ref{ch:falldegree}
+shows that the solving cost is genuinely open. The algorithms of
+Part~\ref{part:algorithms} attack the remaining free terms.

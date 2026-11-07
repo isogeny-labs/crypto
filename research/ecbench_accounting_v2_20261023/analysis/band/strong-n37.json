@@ -1,0 +1,137 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "rows": [
+    {
+      "curve": "icv1-f2m37-tm534059-32aad96b",
+      "log2_r": 27.78083708554834,
+      "arm": "rho-frob",
+      "runs": 32,
+      "verified": 32,
+      "mean_s": [
+        0.2052558105379506,
+        0.22328931416637357,
+        0.3855908468221807
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m37-tm534059-32aad96b",
+      "log2_r": 27.78083708554834,
+      "arm": "rho-frob-v2",
+      "runs": 32,
+      "verified": 32,
+      "mean_s": [
+        0.18333540695821238,
+        0.1994205217292099,
+        0.34418655466818776
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m37-tm534059-32aad96b",
+      "log2_r": 27.78083708554834,
+      "arm": "rho-strong-frozen",
+      "runs": 32,
+      "verified": 32,
+      "mean_s": [
+        0.2910808298578866,
+        0.3310645761433954,
+        0.6909182927129744
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m37-tm534059-32aad96b",
+      "log2_r": 27.78083708554834,
+      "arm": "rho-strong-v2",
+      "runs": 32,
+      "verified": 32,
+      "mean_s": [
+        0.19732981187407833,
+        0.23359684384252316,
+        0.5600001315585268
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m37-tm534059-32aad96b",
+      "log2_r": 27.78083708554834,
+      "arm": "rho-strong-v2-aa",
+      "runs": 32,
+      "verified": 32,
+      "mean_s": [
+        0.19732981187407833,
+        0.23359684384252316,
+        0.5600001315585268
+      ],
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-f2m37-tm534059-32aad96b",
+      "a": "rho-frob",
+      "b": "rho-frob-v2",
+      "verdict": "rho-frob-v2 < rho-frob"
+    },
+    {
+      "curve": "icv1-f2m37-tm534059-32aad96b",
+      "a": "rho-frob",
+      "b": "rho-strong-frozen",
+      "verdict": "rho-frob < rho-strong-frozen"
+    },
+    {
+      "curve": "icv1-f2m37-tm534059-32aad96b",
+      "a": "rho-frob",
+      "b": "rho-strong-v2",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-f2m37-tm534059-32aad96b",
+      "a": "rho-frob",
+      "b": "rho-strong-v2-aa",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-f2m37-tm534059-32aad96b",
+      "a": "rho-frob-v2",
+      "b": "rho-strong-frozen",
+      "verdict": "rho-frob-v2 < rho-strong-frozen"
+    },
+    {
+      "curve": "icv1-f2m37-tm534059-32aad96b",
+      "a": "rho-frob-v2",
+      "b": "rho-strong-v2",
+      "verdict": "rho-frob-v2 < rho-strong-v2"
+    },
+    {
+      "curve": "icv1-f2m37-tm534059-32aad96b",
+      "a": "rho-frob-v2",
+      "b": "rho-strong-v2-aa",
+      "verdict": "rho-frob-v2 < rho-strong-v2-aa"
+    },
+    {
+      "curve": "icv1-f2m37-tm534059-32aad96b",
+      "a": "rho-strong-frozen",
+      "b": "rho-strong-v2",
+      "verdict": "rho-strong-v2 < rho-strong-frozen"
+    },
+    {
+      "curve": "icv1-f2m37-tm534059-32aad96b",
+      "a": "rho-strong-frozen",
+      "b": "rho-strong-v2-aa",
+      "verdict": "rho-strong-v2-aa < rho-strong-frozen"
+    },
+    {
+      "curve": "icv1-f2m37-tm534059-32aad96b",
+      "a": "rho-strong-v2",
+      "b": "rho-strong-v2-aa",
+      "verdict": "unresolved inside the band"
+    }
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "schema": "projective-law-common22-uniqueness/v1",
+  "theorems": [
+    "Common22Coprime.determinant_bezout",
+    "Common22Coprime.supports_coprime",
+    "Common22Coprime.firstSupport_natDegree",
+    "Common22Coprime.secondSupport_natDegree",
+    "Common22Coprime.firstSupport_nonzero",
+    "Common22Coprime.secondSupport_nonzero",
+    "Common22Residues.first_residue",
+    "Common22Residues.second_residue",
+    "Common22Residues.residual_curve_eq",
+    "Common22Degree.cleared_difference_degree_lt_four",
+    "Common22Degree.cleared_difference_degree_lt_supports",
+    "Common22Degree.natDegree_le_five_of_sextic_head_zero",
+    "Common22Degree.cleared_difference_degree_lt_supports_of_sextic_head",
+    "Common22PolynomialHead.generic_expansion",
+    "Common22PolynomialHead.generic_coeff_six",
+    "Common22PolynomialHead.generic_coeff_five",
+    "Common22PolynomialHead.generic_coeff_four",
+    "Common22PolynomialHead.generic_natDegree_le_six",
+    "Common22SourceHead.sourceE_coeff_six",
+    "Common22SourceHead.sourceE_coeff_five",
+    "Common22SourceHead.sourceE_coeff_four",
+    "Common22SourceHead.canonical_n_eq_interpolant",
+    "Common22SourceHead.canonical_n_interpolates_second",
+    "Common22SourceHead.sourceE_natDegree_le_six",
+    "Common22SourceHead.sourceE_strict_degree",
+    "Common22SourceHead.source_curve_eq",
+    "Common22Uniqueness.zero_of_coprime_supports",
+    "Common22Uniqueness.residual_eq_curve"
+  ],
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "rows": [
+    {
+      "obligation": "support_coprime",
+      "kind": "premise",
+      "status": "kernel_checked_conditional",
+      "statement": "B nonzero implies IsCoprime u1 u2"
+    },
+    {
+      "obligation": "runtime_interpolation",
+      "kind": "source_link",
+      "status": "open_source_link",
+      "statement": "runtime execution instantiates proof-side numerator and interpolation"
+    },
+    {
+      "obligation": "first_residue",
+      "kind": "premise",
+      "status": "kernel_checked_conditional",
+      "statement": "interpolation and valid input imply first curve residue"
+    },
+    {
+      "obligation": "second_residue",
+      "kind": "premise",
+      "status": "kernel_checked_conditional",
+      "statement": "interpolation and valid input imply second curve residue"
+    },
+    {
+      "obligation": "generic_head",
+      "kind": "implication",
+      "status": "kernel_checked_conditional",
+      "statement": "generic cubic and quadratic residual has recorded coefficients at degrees six five four"
+    },
+    {
+      "obligation": "source_head",
+      "kind": "implication",
+      "status": "kernel_checked_conditional",
+      "statement": "proof-side source-style residual has head coefficients zero B squared zero"
+    },
+    {
+      "obligation": "degree_bound",
+      "kind": "implication",
+      "status": "kernel_checked_conditional",
+      "statement": "matching quintic heads imply difference degree below support product"
+    },
+    {
+      "obligation": "crt_uniqueness",
+      "kind": "implication",
+      "status": "kernel_checked_conditional",
+      "statement": "the four premises imply residual equals scale times curve"
+    },
+    {
+      "obligation": "source_curve_equation",
+      "kind": "implication",
+      "status": "kernel_checked_conditional",
+      "statement": "source-style support and ordinate formulas plus valid inputs imply the cleared curve equation"
+    },
+    {
+      "obligation": "divisor_class",
+      "kind": "conclusion",
+      "status": "open_geometry",
+      "statement": "residual curve equation yields the intended Pic0 class"
+    }
+  ],
+  "scope": "conditional coprimeness, residues, proof-side source-style polynomial head, strict degree, and source-style curve equation over a field; runtime semantic correspondence and geometry remain open",
+  "cost_ratio_change": null
+}

@@ -1,0 +1,68 @@
+[
+  {
+    "name": "compile",
+    "command": [
+      "timeout",
+      "-k",
+      "2s",
+      "30s",
+      "/var/tmp/pencil-musl-private-20261031/prefix/bin/musl-gcc",
+      "-static",
+      "-O2",
+      "-march=x86-64",
+      "/var/tmp/pencil-musl-private-20261031/hello.c",
+      "-Wl,-Map=/var/tmp/pencil-musl-private-20261031/hello.map",
+      "-o",
+      "/var/tmp/pencil-musl-private-20261031/hello"
+    ],
+    "exit_code": 0,
+    "start": 1793407017.2170608,
+    "end": 1793407017.2411327
+  },
+  {
+    "name": "elf_header",
+    "command": [
+      "readelf",
+      "-h",
+      "/var/tmp/pencil-musl-private-20261031/hello"
+    ],
+    "exit_code": 0,
+    "start": 1793407017.2412388,
+    "end": 1793407017.2540245
+  },
+  {
+    "name": "elf_programs",
+    "command": [
+      "readelf",
+      "-l",
+      "/var/tmp/pencil-musl-private-20261031/hello"
+    ],
+    "exit_code": 0,
+    "start": 1793407017.2541425,
+    "end": 1793407017.256973
+  },
+  {
+    "name": "elf_dynamic",
+    "command": [
+      "readelf",
+      "-d",
+      "/var/tmp/pencil-musl-private-20261031/hello"
+    ],
+    "exit_code": 0,
+    "start": 1793407017.2570894,
+    "end": 1793407017.2597911
+  },
+  {
+    "name": "run",
+    "command": [
+      "timeout",
+      "-k",
+      "1s",
+      "5s",
+      "/var/tmp/pencil-musl-private-20261031/hello"
+    ],
+    "exit_code": 0,
+    "start": 1793407017.2599049,
+    "end": 1793407017.261203
+  }
+]

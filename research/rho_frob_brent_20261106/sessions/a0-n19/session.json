@@ -1,0 +1,57 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h8eeaff364449",
+  "label": "Brent detection in the fully priced Frobenius rho: Koblitz a=0 n=19",
+  "spec_id": "ECS1h43a66b079850",
+  "spec_sha256": "43a66b079850a2d6cb0cf1fbe5767c271947581f7e299f314c3aa43282cc48f7",
+  "env_class_id": "ECBENV3h7fd9cae29de0",
+  "host_sha256": "4aa7dbbdf46ec4b91ba9b53bb57597310bc51d9dc4f2d7f4ee35ef06e277f357",
+  "plan_sha256": "44ed9bacfe62cabeb0d4cad6fcaa5e10ad8eae044864997202f45b2191b3d46a",
+  "binary_sha256": "7abbd8b1ff718d5d8fbaa140b671283b740b3cb2b65d40b74eeeb935798b0197",
+  "git_commit": "77948b3c8c6e7c0d0ef2f0e18e1f44228b4a5bbb",
+  "git_dirty": true,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": true,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "f6_ic_tree": 2,
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1793942121527,
+  "finished_unix_ms": 1793942123830,
+  "status": "complete",
+  "executions_planned": 384,
+  "records_written": 384,
+  "records_sha256": "812b4df62d5fdefd1ed21c4b46a16276bba0fea1173639eaf42c32cc5f24f157",
+  "status_counts": {
+    "verified": 384
+  },
+  "last_seq": 383
+}

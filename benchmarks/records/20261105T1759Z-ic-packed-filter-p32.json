@@ -1,0 +1,122 @@
+{
+  "branch": "claude/ic-packed-filter-20261029",
+  "closed_utc": "2026-11-05T17:59:42+00:00",
+  "commands": [
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/launch-remote",
+        "(MODE=LAUNCH, size 32: wall and counted jobs)"
+      ],
+      "cwd": ".",
+      "exit": null,
+      "provenance": "Documentary launcher reference from research/ic_packed_filter_20261029/cards/card-launch-v2.md (isolab-eks, CodeBuild isolab-experiment-launcher); this import did not execute it. The launch outcome is recorded in each session's eks-results directory.",
+      "started_utc": null,
+      "wall_s": null
+    }
+  ],
+  "commit": "827361301c477ef15a3e47798e02e2fa0ab26c69",
+  "commit_dirty": true,
+  "created_utc": "2026-11-05T17:59:01+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261029-ic-packed-filter"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v236-x86_64-with-glibc2.39"
+  },
+  "id": "20261105T1759Z-ic-packed-filter-p32",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 288,
+      "name": "wall_per_gae_filtered_over_unfiltered_p32",
+      "note": "candidate / reference (dgbf / dgb), whole-solve wall per charged GAE at N_inc, 32-bit pair, copied from the validated study report; lower is better [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9569,
+        0.9633
+      ],
+      "unit": "ratio",
+      "value": 0.9601
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "s_prime_dgbf_w0_p32",
+      "note": "counted S' at w=0 from VALIDATION.json gae_band; matched rho-neg [pcc:unverified]",
+      "reference": 1.0070458230707695,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 31.693595555358375
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": null,
+      "name": "s_prime_dgbf_w1_p32",
+      "note": "counted S' at w=1 from VALIDATION.json gae_band [pcc:unverified]",
+      "reference": 2.00774912001418,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 63.49613790555689
+    }
+  ],
+  "problem": "archive:ic-packed-filter-p32-20261029",
+  "provenance": {
+    "kind": "retrospective_metadata_index",
+    "note": "Record written after the 2026-10-29 EKS sessions; raw files are pinned by their artifact-store manifests; the executed binary is named in VALIDATION.json rho_reference.binary_or_process."
+  },
+  "raw": [
+    {
+      "bytes": 260780,
+      "path": "research/ic_packed_filter_20261029/P32/counted/eks-results/session/plan.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ff/ff7189ec7ccb51b96dec795ab97e415e9998700d701cf3b9bb3abadd03833379",
+      "sha256": "ff7189ec7ccb51b96dec795ab97e415e9998700d701cf3b9bb3abadd03833379",
+      "uploaded": true
+    },
+    {
+      "bytes": 10187327,
+      "path": "research/ic_packed_filter_20261029/P32/counted/eks-results/session/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/dd/dd64e1d28a8bb9db31a7bc5d8e18b3d8080f9adbae59fdcc609f7f6361b09416",
+      "sha256": "dd64e1d28a8bb9db31a7bc5d8e18b3d8080f9adbae59fdcc609f7f6361b09416",
+      "uploaded": true
+    },
+    {
+      "bytes": 261229,
+      "path": "research/ic_packed_filter_20261029/P32/wall/eks-results/session/plan.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/15/15a6351918beec3e561c6773d1a4955a048d95d2fae8372bcc7fc19097da81b7",
+      "sha256": "15a6351918beec3e561c6773d1a4955a048d95d2fae8372bcc7fc19097da81b7",
+      "uploaded": true
+    },
+    {
+      "bytes": 12156356,
+      "path": "research/ic_packed_filter_20261029/P32/wall/eks-results/session/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/02/02cb8847cc6493e84f934e5b144392a511f146b6768f875fbdd7e89d154877f2",
+      "sha256": "02cb8847cc6493e84f934e5b144392a511f146b6768f875fbdd7e89d154877f2",
+      "uploaded": true
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261029-ic-packed-filter/ic-packed-filter-report.pdf",
+    "png": [],
+    "svg": [
+      "benchmarks/20261029-ic-packed-filter/summary.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "ic-packed-filter-p32",
+  "status": "measured",
+  "summary": "Retrospective index of the 2026-10-29 packed-filter P32 sessions (EKS c8a.2xlarge, L2); single session, not replicated. [pcc:unverified]",
+  "validation": "benchmarks/20261029-ic-packed-filter/VALIDATION.json"
+}

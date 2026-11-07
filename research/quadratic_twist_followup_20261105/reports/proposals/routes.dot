@@ -1,0 +1,23 @@
+digraph G {
+ graph[rankdir=TB,bgcolor="white",nodesep=.35,ranksep=.35];
+ node[shape=box,style="rounded,filled",fillcolor="#eef4f7",fontname="Helvetica",fontsize=11];
+ edge[fontname="Helvetica",fontsize=10];
+ q[label="Actual original target Q
+Shared ordered base; proposed scope"];
+ e[label="Main chart
+Degree-bounded certificates"];
+ t[label="Twist chart
+Checked subgroup map required"];
+ rows[label="One coefficient space over F_r
+Charge both calls; count useful rank"];
+ chord[label="Target-aware slope chart
+Membership + exceptional branches"];
+ trace[label="Trace-lift extension system
+Keep twist variable; project rows"];
+ out[label="Original-curve relation and scalar check
+All routes PROPOSED / no run"];
+ {rank=same;e;t;}q->e;q->t[style=dashed,label="map obligation"];
+ e->rows;t->rows;rows->out;
+ q->chord[style=dashed];chord->out[style=dashed];
+ q->trace[style=dashed];trace->out[style=dashed,label="trace obligation"];
+}

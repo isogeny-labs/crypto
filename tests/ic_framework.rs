@@ -5,6 +5,14 @@ use std::{
     sync::atomic::{AtomicUsize, Ordering},
 };
 static NEXT: AtomicUsize = AtomicUsize::new(0);
+
+fn ic_binary() -> PathBuf {
+    option_env!("CARGO_BIN_EXE_ic")
+        .or(option_env!("IC_TEST_BINARY"))
+        .map(PathBuf::from)
+        .expect("CLI contracts require Cargo's integration-test executable or IC_TEST_BINARY pointing to a freshly built ic; see docs/ic/cli-contract-tests.md")
+}
+
 fn path() -> PathBuf {
     std::env::temp_dir().join(format!(
         "ic-test-{}-{}.json",
@@ -13,7 +21,7 @@ fn path() -> PathBuf {
     ))
 }
 fn command(args: &[&str]) -> (bool, Value) {
-    let output = Command::new(env!("CARGO_BIN_EXE_ic"))
+    let output = Command::new(ic_binary())
         .args(args)
         .arg("--json")
         .output()
@@ -49,7 +57,7 @@ fn verbose_run_traces_trials_and_preserves_report_and_json_output() {
     ];
     let (ok, expected) = command(&args);
     assert!(ok, "{expected}");
-    let output = Command::new(env!("CARGO_BIN_EXE_ic"))
+    let output = Command::new(ic_binary())
         .arg("-v")
         .args(args)
         .arg("--out")
@@ -86,7 +94,7 @@ fn verbose_trial_lines_are_visible_while_collection_is_still_running() {
         sync::mpsc,
         time::Duration,
     };
-    let mut child = Command::new(env!("CARGO_BIN_EXE_ic"))
+    let mut child = Command::new(ic_binary())
         .args([
             "run",
             "--degree",
@@ -151,10 +159,7 @@ fn verbose_workflow_collection_reports_every_probe_and_json_remains_clean() {
         "0",
         "--verbose",
     ];
-    let output = Command::new(env!("CARGO_BIN_EXE_ic"))
-        .args(args)
-        .output()
-        .unwrap();
+    let output = Command::new(ic_binary()).args(args).output().unwrap();
     assert!(output.status.success(), "{output:?}");
     let text = String::from_utf8(output.stdout).unwrap();
     assert_eq!(
@@ -173,7 +178,7 @@ fn verbose_workflow_collection_reports_every_probe_and_json_remains_clean() {
 #[test]
 fn verbose_log_precomputation_and_descent_report_actual_work() {
     let db = path();
-    let output = Command::new(env!("CARGO_BIN_EXE_ic"))
+    let output = Command::new(ic_binary())
         .args([
             "logs",
             "--degree",
@@ -194,7 +199,7 @@ fn verbose_log_precomputation_and_descent_report_actual_work() {
         "{text}"
     );
     assert!(text.contains("verified=true"), "{text}");
-    let output = Command::new(env!("CARGO_BIN_EXE_ic"))
+    let output = Command::new(ic_binary())
         .args([
             "solve",
             "--degree",
@@ -212,7 +217,7 @@ fn verbose_log_precomputation_and_descent_report_actual_work() {
     assert!(text.contains("solve: trial 1/"), "{text}");
     assert!(text.contains("solve: scalar verification passed"), "{text}");
     std::fs::remove_file(db).unwrap();
-    let output = Command::new(env!("CARGO_BIN_EXE_ic"))
+    let output = Command::new(ic_binary())
         .args(["generate", "--verbose"])
         .output()
         .unwrap();
@@ -471,13 +476,13 @@ fn synthetic_targets_are_reproducible_and_imports_are_not_run_arguments() {
     let (ok2, b) = command(&args);
     assert!(ok && ok2);
     assert_eq!(a["parameters"], b["parameters"]);
-    let status = Command::new(env!("CARGO_BIN_EXE_ic"))
+    let status = Command::new(ic_binary())
         .args(["run", "--file", "anything.json"])
         .output()
         .unwrap()
         .status;
     assert!(!status.success());
-    let status = Command::new(env!("CARGO_BIN_EXE_ic"))
+    let status = Command::new(ic_binary())
         .args(["run", "--degree", "131"])
         .output()
         .unwrap()
@@ -536,7 +541,7 @@ fn report_files_are_created_once_and_generated_reports_are_importable() {
     assert!(ok);
     let bytes = std::fs::read(&file).unwrap();
     assert_eq!(serde_json::from_slice::<Value>(&bytes).unwrap(), v);
-    let run = Command::new(env!("CARGO_BIN_EXE_ic"))
+    let run = Command::new(ic_binary())
         .args(["generate", "--out", file.to_str().unwrap()])
         .output()
         .unwrap();

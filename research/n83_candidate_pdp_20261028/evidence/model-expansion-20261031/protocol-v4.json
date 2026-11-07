@@ -1,0 +1,123 @@
+{
+  "id": "n83-factorbase-model-expansion-20261031",
+  "version": 4,
+  "status": "amended-before-corrected-rerun-after-preserved-v3-output",
+  "freeze": {
+    "frozen_at": "2026-10-31T18:37:09.440632+00:00",
+    "filed_before_corrected_rerun": true,
+    "data_collected_before_freeze": true,
+    "label_inspection_before_freeze": "Seven-base labels and run-01 output were already inspected; this is an exploratory correction, not confirmatory.",
+    "amends_version": 3,
+    "amendment_reason": "Run-01 retained the source script threshold of 4 folds while protocol-v3 specified 5. Preserve run-01 unchanged; v4 changes only the serialized and applied minimum fold-win threshold to 5 of 7. Model, features, data, folds, baseline, and other metrics are unchanged."
+  },
+  "objective": "Fit the already-fixed six-base ridge model on an expanded seven-base panel including r29, and compare grouped held-out-base prediction to the matched-configuration training-fold mean.",
+  "claims": [
+    {
+      "id": "C1",
+      "class": "comparative",
+      "statement": "Descriptive grouped leave-one-base-out MAE and fold wins of fixed ridge versus matched-configuration baseline on verified finite-interval midpoints."
+    },
+    {
+      "id": "C2",
+      "class": "out_of_scope",
+      "statement": "No causal factor-base ranking, exact dreg theorem, affine FFD/LFD, solver cost, or ECDLP recovery claim."
+    }
+  ],
+  "arms": [
+    "fixed_feature_ridge",
+    "matched_configuration_mean_baseline"
+  ],
+  "data": {
+    "bases": [
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33
+    ],
+    "rows_per_base": 48,
+    "planned_rows": 336,
+    "target": "midpoint of certified finite dreg interval; positive-dimensional rows excluded and counted separately",
+    "features": [
+      "m",
+      "family one-hot",
+      "target_kind one-hot",
+      "binary_terms",
+      "n_vars",
+      "input_equations",
+      "factor_base_membership point count",
+      "mean normalized x",
+      "mean normalized y"
+    ],
+    "source_manifest": "source-manifest.json",
+    "source_manifest_sha256": "26c6971976ad1df2183e8a1bd147c6a1ff5b4ca0e61e3d62a01a466d91648bf2"
+  },
+  "model": {
+    "kind": "ridge regression with intercept",
+    "alpha": 10,
+    "preprocessing": "numeric standardization fit inside training fold; categorical one-hot",
+    "base_id_and_coordinate_bits": "excluded",
+    "randomness": "none; deterministic closed-form solver"
+  },
+  "validation": {
+    "unit": "factor-base coordinate bit",
+    "method": "leave-one-base-out grouped 7-fold",
+    "grouped_rows": "all family/m/target rows from a base remain together",
+    "baseline": "training-fold mean within exact family/m/target configuration"
+  },
+  "controls": {
+    "baseline": "matched-configuration mean predictor",
+    "positive_control": {
+      "status": "not_applicable",
+      "reason": "The target is a descriptive regression; no detector or lead screen is asserted."
+    },
+    "negative_control": {
+      "status": "not_applicable",
+      "reason": "Labels were inspected before this exploratory fit; no null hypothesis or significance claim."
+    },
+    "aa": {
+      "status": "not_applicable",
+      "reason": "Deterministic fixed model; no timing claim."
+    }
+  },
+  "metrics": [
+    {
+      "name": "finite interval rows",
+      "kind": "count"
+    },
+    {
+      "name": "positive-dimensional rows",
+      "kind": "count"
+    },
+    {
+      "name": "grouped OOF MAE",
+      "kind": "descriptive",
+      "unit": "degree midpoint proxy"
+    },
+    {
+      "name": "matched baseline OOF MAE",
+      "kind": "descriptive",
+      "unit": "degree midpoint proxy"
+    },
+    {
+      "name": "held-out base folds won",
+      "kind": "count"
+    }
+  ],
+  "decision_rule": "Exploratory lead flag only if aggregate ridge MAE is lower than baseline and ridge wins at least 5 of 7 held-out bases. No statistical significance or causal interpretation.",
+  "inadmissible": [
+    "exact degree claim from interval midpoint",
+    "factor-base ranking or causal language",
+    "FFD/LFD/solver-cost/ECDLP claim",
+    "hyperparameter or feature changes after inspecting the new base labels"
+  ],
+  "analysis_script": "train-v4.py",
+  "analysis_script_sha256": "0a7abb008a104f420e4811e9a2bd10e252fb70de2c5764412a6fbd3912be3b40",
+  "outputs": [
+    "rows.json",
+    "result.json"
+  ],
+  "source_control": "All source rows and labels were collected before protocol freeze; protocol freezes only this deterministic exploratory training and its comparison."
+}

@@ -61,10 +61,11 @@ the requirements above.
   isolab NATS hub or EKS backend. Direct connections require their documented
   identity and network route. The documented Actions/CodeBuild bridge is an
   alternative only if its actual authorization and job contract are verified.
-  The currently documented EKS bridge executes a deployed digest-pinned binary;
-  its source_revision field is provenance, not an instruction to build this
-  branch. It cannot measure the new map until deployment deliberately includes
-  that map. NATS can build pinned supplied source when its connection exists.
+  The deployed EKS default executable does not change when a caller supplies
+  source_revision as provenance alone. The current bridge supports a verified
+  per-run job.build image; the reviewed main-branch GitHub workflow can build
+  the requested commit before submission. Either path must include the actual
+  native map. NATS can build pinned source when its connection exists.
 - Freeze the final instrument/protocol only after the native map passes exact
   correctness controls. This file is a requirements/runbook record, not a
   frozen measurement protocol or evidence that a job has run.
@@ -93,3 +94,12 @@ of that missing map contract. The historical files above are archived under
 `../historical/extension-field-experiments/research_lead/`.
 
 See [the observed access status](ACCESS_STATUS.md) before attempting a run.
+
+2026-10-28 access continuation: PR #2545 has merged. The official checkpoint
+gate now succeeds with the supplied lab-account AWS identity and a privately
+installed restricted upload token; the first uploaded resume was verified by
+readback. All five original artifacts are published and hydrated. The current
+EKS skill supports commit-built images through its reviewed GitHub path, so the
+old deployment limitation must not be generalized to that newer path. Direct
+AWS-bridge status polling is denied to this identity. No real native instrument,
+frozen comparison or qualified run follows from these infrastructure checks.

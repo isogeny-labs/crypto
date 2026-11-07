@@ -1,0 +1,72 @@
+{
+  "schema": "pencil-runtime-image-publication/v1",
+  "start_utc": "2026-10-29T23:39:26Z",
+  "end_utc": "2026-10-29T23:41:28Z",
+  "elapsed_wall_seconds": 122,
+  "scope": "Approved image composition/publication of existing static mathematical instrument and replacement recovery runtime; no solver or benchmark",
+  "base_image": {
+    "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:13f27597322fced9230635cedc5a4e228daf2fb951f77652edbbcab17e674c1b",
+    "source_revision": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+    "ecbench_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab"
+  },
+  "runtime_image": {
+    "runtime_image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:4201400427fcdba18fe88cfda6cd7f46b12db15fcc371ee56166d0fca5f5caa3",
+    "base_image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:13f27597322fced9230635cedc5a4e228daf2fb951f77652edbbcab17e674c1b",
+    "runtime_archive_sha256": "72b227c00c3e3781b5b351aae133ffd2ece5c43313a4476b19c6d322bbffdaec"
+  },
+  "runtime_s3_pin": {
+    "bucket": "isolab-results-104186811093-us-east-2",
+    "key": "inputs/recovery-runtime/72b227c00c3e3781b5b351aae133ffd2ece5c43313a4476b19c6d322bbffdaec.tar.gz",
+    "version": "TTM93B.uhaRMMv2PI0DaOTZHTpqibs_w",
+    "sha256": "72b227c00c3e3781b5b351aae133ffd2ece5c43313a4476b19c6d322bbffdaec"
+  },
+  "original_workflow_run": 40938439022,
+  "publication_executor": "local approved publisher; workflow tag denotes original artifact provenance",
+  "source_revision": "543a54b4b1c3be7052872af3ffe393a44c69a3c3",
+  "trusted_publication_scripts_revision": "7d7f5495c5b85ae426efdbcb721b6faf72c1be14",
+  "binary_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab",
+  "supervisor_sha256": "ac7d57132617775679770dc55b6f8b3acc83f4454e31b025a1f35e9b915abc21",
+  "digest_pull_verified": true,
+  "stopped_container_extraction_verified": true,
+  "verification_container_state": {
+    "Status": "created",
+    "Running": false,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 0,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "0001-01-01T00:00:00Z",
+    "FinishedAt": "0001-01-01T00:00:00Z"
+  },
+  "all_runtime_archive_bytes_equal": true,
+  "verification_container_removed": true,
+  "publication_exit_code": 0,
+  "final_verification_exit_code": 0,
+  "initial_verification_failures": [
+    "No default command: stopped container creation refused; supplied inert command metadata on second attempt, never started",
+    "Root-owned copied runtime permissions: unprivileged hash read refused; third verification used sudo read only"
+  ],
+  "docker_host_capacity": {
+    "ServerVersion": "25.0.16",
+    "Driver": "overlay2",
+    "NCPU": 32,
+    "MemTotal": 132915916800,
+    "DockerRootDir": "/var/lib/docker",
+    "ContainersRunning": 0,
+    "Images": 0
+  },
+  "publication_peak_rss_bytes": null,
+  "publication_cpu_seconds": null,
+  "cloud_job_submissions": 0,
+  "solver_executions": 0,
+  "protocol_qualified": false,
+  "historical_runtime_qualification_transferred": false,
+  "original_deadline_utc": "2026-10-30T03:32:22Z",
+  "hash_manifest": {
+    "path": "PUBLICATION_SHA256SUMS",
+    "sha256": "867619021d0e4ed5dc1f61e1f5b0a2dee7f48aebf07f7e2d953d84ccbbf3967d"
+  }
+}

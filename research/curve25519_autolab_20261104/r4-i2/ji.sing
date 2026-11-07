@@ -1,0 +1,11 @@
+LIB "general.lib";
+short=0;
+ring R=1048573,(s1,s2,s3,d1,d2,d3,c1,c2,c3),dp;
+int a=928; int b=924;
+ideal I= a*s1^2+c1^2-1, b*s1^2+d1^2-1, a*s2^2+c2^2-1, b*s2^2+d2^2-1,
+ c3*(1-a*b*s1^2*s2^2)-(c1*c2-a*s1*s2*d1*d2);
+ideal J=eliminate(I, s1*s2*d1*d2);
+size(J);
+list F=factorize(J[1]);
+F;
+quit;

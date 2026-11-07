@@ -1,0 +1,89 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-BLINDSPOT-08-09-r2
+experiment_id: BLINDSPOT-08
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+
+receipt: research/blindspots_20261018/08-learned-sat-branching/raw/receipt-card-09-r2.json
+must_not_exist:
+  - research/blindspots_20261018/08-learned-sat-branching/raw/card-09-r2-clone.stdout.log
+  - research/blindspots_20261018/08-learned-sat-branching/raw/card-09-r2-clone.stderr.log
+  - research/blindspots_20261018/08-learned-sat-branching/raw/card-09-r2-cms-revision.txt
+  - research/blindspots_20261018/08-learned-sat-branching/raw/card-09-r2-cmake.stdout.log
+  - research/blindspots_20261018/08-learned-sat-branching/raw/card-09-r2-cmake.stderr.log
+  - research/blindspots_20261018/08-learned-sat-branching/raw/card-09-r2-make.stdout.log
+  - research/blindspots_20261018/08-learned-sat-branching/raw/card-09-r2-make.stderr.log
+  - research/blindspots_20261018/08-learned-sat-branching/raw/card-09-r2-cms-version.txt
+  - research/blindspots_20261018/08-learned-sat-branching/raw/card-09-r2-build.stdout.log
+  - research/blindspots_20261018/08-learned-sat-branching/raw/card-09-r2-build.stderr.log
+  - research/blindspots_20261018/08-learned-sat-branching/raw/cms-n31-planted-r2.jsonl
+  - research/blindspots_20261018/08-learned-sat-branching/raw/cms-n31-planted-r2.stderr.log
+binds:
+  - {path: examples/blindspots_08_learned_branching.rs, sha256: 02478185f7001474c7510e5dd87f3eb5aca0d5ff5a536760f226e2fd892a280a}
+  - {path: research/blindspots_20261018/08-learned-sat-branching/raw/model.txt, sha256: 00f0d29d6f0535b91ca3ab0bbc1c76dbb19085fce325c5b77aabed0479b60809}
+commands:
+  - id: make-work-dir
+    argv: [mkdir, -p, target/blindspots-08/card-09-r2]
+    timeout_seconds: 5
+    success_exit_codes: [0]
+  - id: clone-cms
+    argv: [git, clone, --quiet, --depth, "1", --branch, 5.11.21, "https://github.com/msoos/cryptominisat", target/blindspots-08/card-09-r2/src]
+    timeout_seconds: 25
+    success_exit_codes: [0]
+    retry: {exit_codes: [128], max_attempts: 2}
+    stdout: research/blindspots_20261018/08-learned-sat-branching/raw/card-09-r2-clone.stdout.log
+    stderr: research/blindspots_20261018/08-learned-sat-branching/raw/card-09-r2-clone.stderr.log
+  - id: pin-cms-revision
+    argv: [git, -C, target/blindspots-08/card-09-r2/src, checkout, --quiet, --detach, 4c9a6b6b459b7c1381744115ccfe744f1121794b]
+    timeout_seconds: 15
+    success_exit_codes: [0]
+  - id: cms-revision
+    argv: [git, -C, target/blindspots-08/card-09-r2/src, rev-parse, HEAD]
+    timeout_seconds: 5
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/08-learned-sat-branching/raw/card-09-r2-cms-revision.txt
+  - id: cms-configure
+    argv: [cmake, -S, target/blindspots-08/card-09-r2/src, -B, target/blindspots-08/card-09-r2/build, "-DCMAKE_BUILD_TYPE=Release", "-DENABLE_TESTING=OFF", "-DSTATS=OFF", "-DNOZLIB=ON", "-DNOM4RI=ON", "-DSTATICCOMPILE=ON"]
+    timeout_seconds: 40
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/08-learned-sat-branching/raw/card-09-r2-cmake.stdout.log
+    stderr: research/blindspots_20261018/08-learned-sat-branching/raw/card-09-r2-cmake.stderr.log
+  - id: cms-build
+    argv: [make, -C, target/blindspots-08/card-09-r2/build, -j2, cryptominisat5-bin]
+    timeout_seconds: 120
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/08-learned-sat-branching/raw/card-09-r2-make.stdout.log
+    stderr: research/blindspots_20261018/08-learned-sat-branching/raw/card-09-r2-make.stderr.log
+  - id: cms-version
+    argv: [target/blindspots-08/card-09-r2/build/cryptominisat5, --version]
+    timeout_seconds: 5
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/08-learned-sat-branching/raw/card-09-r2-cms-version.txt
+  - id: build
+    argv: [prlimit, "--as=4294967296", rustc, --edition, "2021", -C, "opt-level=3", -C, "codegen-units=1", -C, "target-cpu=native", -o, target/blindspots-08/card-09-r2/b08, examples/blindspots_08_learned_branching.rs]
+    timeout_seconds: 30
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/08-learned-sat-branching/raw/card-09-r2-build.stdout.log
+    stderr: research/blindspots_20261018/08-learned-sat-branching/raw/card-09-r2-build.stderr.log
+  - id: cms-n31-planted
+    argv: [prlimit, "--as=4294967296", target/blindspots-08/card-09-r2/b08, cell, --n, "31", --ell, "5", --np, "16", --nr, "16", --seed, "20261018", --role, "7", --models, research/blindspots_20261018/08-learned-sat-branching/raw/model.txt, --arms, a, --only, "0,1,2", --cms, target/blindspots-08/card-09-r2/build/cryptominisat5, --cms-maxtime, "40", --tmp, target/blindspots-08/card-09-r2, --cap, "100000000"]
+    timeout_seconds: 150
+    success_exit_codes: [0]
+    stdout: research/blindspots_20261018/08-learned-sat-branching/raw/cms-n31-planted-r2.jsonl
+    stderr: research/blindspots_20261018/08-learned-sat-branching/raw/cms-n31-planted-r2.stderr.log
+  - id: remove-work-dir
+    argv: [rm, -rf, target/blindspots-08/card-09-r2]
+    timeout_seconds: 20
+    success_exit_codes: [0]
+
+bus_address: executor-mechanical-blindspot-08
+background: false
+write_scope:
+  - research/blindspots_20261018/08-learned-sat-branching/raw/
+stop_when:
+  - The tool exits with status 2.
+  - The status line in the printed summary does not read status completed.
+  - Any command line in the printed summary ends with FAILED.
+  - Any output line in the printed summary ends with MISSING.
+notes: "The repository root is /home/user/crypto. Run the command through the Bash tool with timeout 600000."

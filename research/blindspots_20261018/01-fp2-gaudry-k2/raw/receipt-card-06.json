@@ -1,0 +1,239 @@
+{
+  "card_id": "CARD-BLINDSPOT-01-06",
+  "card_path": "research/blindspots_20261018/01-fp2-gaudry-k2/card-06.yaml",
+  "card_sha256": "1f2b0ce2cc7a45ba15e0e93fbc793178241ea6c2a0003607797e59b14adefc54",
+  "commands": [
+    {
+      "argv": [
+        "mkdir",
+        "-p",
+        "target/blindspots-01/card-06"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "make-bin-dir",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "rustc",
+        "--edition",
+        "2021",
+        "-C",
+        "opt-level=3",
+        "-C",
+        "codegen-units=1",
+        "-o",
+        "target/blindspots-01/card-06/b01",
+        "examples/blindspots_01_fp2_gaudry.rs"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 10.091,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "build",
+      "index": 2,
+      "outputs": {},
+      "seconds": 10.091,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-01/card-06/b01",
+        "run",
+        "--family",
+        "torsion",
+        "--bits",
+        "40",
+        "--idx",
+        "2",
+        "--arms",
+        "ic-a:0-1,ic-b:0-1,ic-c1:0-1,ic-c2:0-1,rho-neg:0-7",
+        "--inv-cost",
+        "4",
+        "--crosscheck",
+        "10",
+        "--quiet",
+        "--out",
+        "research/blindspots_20261018/01-fp2-gaudry-k2/raw/torsion-b40-i2.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 104.042,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "torsion-b40-i2",
+      "index": 3,
+      "outputs": {
+        "research/blindspots_20261018/01-fp2-gaudry-k2/raw/torsion-b40-i2.jsonl": "b6f8eff130981bdcbd8400eec15478f9afe504dad3cfe8903ece01d8d5c3020d"
+      },
+      "seconds": 104.042,
+      "stderr_sha256": "76f66a5bf6e036cab3a978ff637b0ca5aa969b80665c94f22253328c66edc88b",
+      "stderr_tail": [
+        "[fp2-torsion-b40-i2-p992891] n = 985831966324, r = 246457991581, cofactor 4"
+      ],
+      "stdout_sha256": "edc1f9c6fc3e55e772b6d2d1767d26136587dac7a4b94c56d07b8d8b255b443c",
+      "stdout_tail": [
+        "torsion b40 i2 t0 ic-a: verified=true gae=170372279 S(w0)=343.18 S(w1)=412.56 wall=31.8s",
+        "torsion b40 i2 t1 ic-a: verified=true gae=172139797 S(w0)=346.74 S(w1)=435.30 wall=30.5s",
+        "torsion b40 i2 t0 ic-b: verified=true gae=19055050 S(w0)=38.38 S(w1)=73.34 wall=6.6s",
+        "torsion b40 i2 t1 ic-b: verified=true gae=19056891 S(w0)=38.39 S(w1)=72.75 wall=6.7s",
+        "torsion b40 i2 t0 ic-c1: verified=true gae=54154353 S(w0)=109.08 S(w1)=118.80 wall=9.0s",
+        "torsion b40 i2 t1 ic-c1: verified=true gae=52953384 S(w0)=106.67 S(w1)=115.86 wall=8.6s",
+        "torsion b40 i2 t0 ic-c2: verified=true gae=19617528 S(w0)=39.52 S(w1)=43.73 wall=4.6s",
+        "torsion b40 i2 t1 ic-c2: verified=true gae=19632250 S(w0)=39.55 S(w1)=43.75 wall=4.6s",
+        "torsion b40 i2 t0 rho-neg: verified=true gae=316326 S(w0)=0.64 S(w1)=2.54 wall=0.1s",
+        "torsion b40 i2 t1 rho-neg: verified=true gae=994796 S(w0)=2.00 S(w1)=8.01 wall=0.2s",
+        "torsion b40 i2 t2 rho-neg: verified=true gae=537441 S(w0)=1.08 S(w1)=4.32 wall=0.1s",
+        "torsion b40 i2 t3 rho-neg: verified=true gae=310931 S(w0)=0.63 S(w1)=2.50 wall=0.1s",
+        "torsion b40 i2 t4 rho-neg: verified=true gae=362660 S(w0)=0.73 S(w1)=2.91 wall=0.1s",
+        "torsion b40 i2 t5 rho-neg: verified=true gae=319735 S(w0)=0.64 S(w1)=2.57 wall=0.1s",
+        "torsion b40 i2 t6 rho-neg: verified=true gae=220296 S(w0)=0.44 S(w1)=1.76 wall=0.1s",
+        "torsion b40 i2 t7 rho-neg: verified=true gae=660801 S(w0)=1.33 S(w1)=5.32 wall=0.2s"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "prlimit",
+        "--as=4294967296",
+        "target/blindspots-01/card-06/b01",
+        "run",
+        "--family",
+        "torsion",
+        "--bits",
+        "40",
+        "--idx",
+        "3",
+        "--arms",
+        "ic-a:0-1,ic-b:0-1,ic-c1:0-1,ic-c2:0-1,rho-neg:0-7",
+        "--inv-cost",
+        "4",
+        "--crosscheck",
+        "10",
+        "--quiet",
+        "--out",
+        "research/blindspots_20261018/01-fp2-gaudry-k2/raw/torsion-b40-i3.jsonl"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 100.694,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "torsion-b40-i3",
+      "index": 4,
+      "outputs": {
+        "research/blindspots_20261018/01-fp2-gaudry-k2/raw/torsion-b40-i3.jsonl": "7e17883a1e2277e04a17e5e95a53501f15ef56fd7b14d2dbd877ead0e55f9e19"
+      },
+      "seconds": 100.694,
+      "stderr_sha256": "054744197250bc2faeb2e3e24ff329eb4c54c0a7036a15ecc1920b080f9362ff",
+      "stderr_tail": [
+        "[fp2-torsion-b40-i3-p930337] n = 865526186332, r = 216381546583, cofactor 4"
+      ],
+      "stdout_sha256": "60648d59cab9a3aa9d0f3958116eb955bdc0398aa29c84650a0ac1cc5af8c4c8",
+      "stdout_tail": [
+        "torsion b40 i3 t0 ic-a: verified=true gae=145088542 S(w0)=311.91 S(w1)=374.95 wall=25.4s",
+        "torsion b40 i3 t1 ic-a: verified=true gae=143920578 S(w0)=309.39 S(w1)=370.96 wall=26.4s",
+        "torsion b40 i3 t0 ic-b: verified=true gae=28389911 S(w0)=61.03 S(w1)=96.94 wall=6.6s",
+        "torsion b40 i3 t1 ic-b: verified=true gae=28116854 S(w0)=60.44 S(w1)=93.07 wall=8.5s",
+        "torsion b40 i3 t0 ic-c1: verified=true gae=76608936 S(w0)=164.69 S(w1)=173.99 wall=11.6s",
+        "torsion b40 i3 t1 ic-c1: verified=true gae=79238554 S(w0)=170.34 S(w1)=183.34 wall=10.9s",
+        "torsion b40 i3 t0 ic-c2: verified=true gae=29051727 S(w0)=62.45 S(w1)=66.68 wall=4.8s",
+        "torsion b40 i3 t1 ic-c2: verified=true gae=28964406 S(w0)=62.27 S(w1)=66.47 wall=4.6s",
+        "torsion b40 i3 t0 rho-neg: verified=true gae=499999 S(w0)=1.07 S(w1)=4.29 wall=0.2s",
+        "torsion b40 i3 t1 rho-neg: verified=true gae=400982 S(w0)=0.86 S(w1)=3.44 wall=0.1s",
+        "torsion b40 i3 t2 rho-neg: verified=true gae=675643 S(w0)=1.45 S(w1)=5.80 wall=0.2s",
+        "torsion b40 i3 t3 rho-neg: verified=true gae=305919 S(w0)=0.66 S(w1)=2.62 wall=0.1s",
+        "torsion b40 i3 t4 rho-neg: verified=true gae=266380 S(w0)=0.57 S(w1)=2.28 wall=0.1s",
+        "torsion b40 i3 t5 rho-neg: verified=true gae=635473 S(w0)=1.37 S(w1)=5.46 wall=0.2s",
+        "torsion b40 i3 t6 rho-neg: verified=true gae=470094 S(w0)=1.01 S(w1)=4.03 wall=0.2s",
+        "torsion b40 i3 t7 rho-neg: verified=true gae=145608 S(w0)=0.31 S(w1)=1.24 wall=0.1s"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "rm",
+        "-f",
+        "target/blindspots-01/card-06/b01"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.008,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "remove-bin",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.008,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 5,
+  "commit": "f70fa23827dec96cd92a5dfacad84e5e6afae771",
+  "dirty_after": [
+    "esearch/blindspots_20261018/01-fp2-gaudry-k2/raw/gls-b36.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/receipt-card-03.json",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/torsion-b40-i2.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/torsion-b40-i3.jsonl"
+  ],
+  "dirty_before": [
+    "esearch/blindspots_20261018/01-fp2-gaudry-k2/raw/gls-b36.jsonl",
+    "research/blindspots_20261018/01-fp2-gaudry-k2/raw/receipt-card-03.json"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

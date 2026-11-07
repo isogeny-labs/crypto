@@ -1,0 +1,11 @@
+name = "four_selector_tracks"
+version = "0.1.0"
+defaultTargets = ["FourTracks"]
+
+[[require]]
+name = "quadratic_pencil_search"
+path = "../pencil_search_20261101"
+
+[[lean_lib]]
+name = "FourTracks"
+roots = ["Recoding", "RecodedTop", "RecodedLower", "RecodedCanonical", "SupportOneHot", "SymmetricChord", "Determinantal", "DeterminantalTop", "Envelope", "FourTrackFixture"]

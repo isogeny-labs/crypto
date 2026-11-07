@@ -1,0 +1,29 @@
+K<w> := GF(4096);
+k<a> := GF(16);
+Embed(k,K);
+fromint := func<n | &+[(Integers()!((n div 2^i) mod 2))*w^i : i in [0..11]]>;
+E := EllipticCurve([K|1,fromint(32),0,0,fromint(63)]);
+G := E![fromint(62),fromint(1499),1];
+Q := E![fromint(2633),fromint(1798),1];
+C,h := WeilDescent(E,k,K!1);
+J := Jacobian(C);
+D := h(G);
+T := h(Q);
+print "curve", C;
+print "generator_image", D;
+print "target_image", T;
+print "image_type", Type(D);
+print "order", Order(D);
+print "jacobian_cardinality", #J;
+print "rational_points", #RationalPoints(C);
+print "generator_u_factorization", Factorization(D[1]);
+for n in [1..100] do
+    R := n*D;
+    fac := Factorization(R[1]);
+    if &and[Degree(t[1]) eq 1 : t in fac] then
+        print "first_smooth_multiple", n, "divisor_degree", R[3],
+              "u_factorization", fac;
+        break;
+    end if;
+end for;
+print "identity", T eq 7*D;

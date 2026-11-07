@@ -1,0 +1,51 @@
+{
+  "models": 21,
+  "arms": {
+    "eager": {
+      "states": 63,
+      "statuses": {
+        "recovery_failed": 2,
+        "nonsplit": 26,
+        "inserted": 35
+      },
+      "cycles": 0,
+      "terminals": 0,
+      "independent_dense_prefixes": 35,
+      "prime_moduli_checked": 21
+    },
+    "candidate": {
+      "states": 63,
+      "statuses": {
+        "degree_gate_skip": 2,
+        "nonsplit": 26,
+        "inserted": 35
+      },
+      "cycles": 0,
+      "terminals": 0,
+      "independent_dense_prefixes": 35,
+      "prime_moduli_checked": 21
+    }
+  },
+  "controls": [
+    {
+      "name": "positive_cycle",
+      "stop_prefix": 3,
+      "terminal": 7,
+      "independent_rank": 3
+    },
+    {
+      "name": "negative_anchor",
+      "stop_prefix": 2,
+      "terminal": 7,
+      "independent_rank": 2
+    },
+    {
+      "name": "zero_then_positive",
+      "stop_prefix": 4,
+      "terminal": 7,
+      "independent_rank": 3
+    }
+  ],
+  "equations_equal": true,
+  "raw_sha256": "76ff047da76412f1156d6ba99f4a58c85fbf5f16d4ba53917431420840f8a18c"
+}

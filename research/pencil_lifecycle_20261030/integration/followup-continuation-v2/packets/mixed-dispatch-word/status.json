@@ -1,0 +1,42 @@
+{
+  "schema": "research.formal-component-result/v1",
+  "scope": "literal mixed degree1+2 UInt64 source-order dispatcher values",
+  "theorems": [
+    "source_order_total_valid",
+    "none_excluded",
+    "returned_payload_valid"
+  ],
+  "premises": [
+    "prime5<=p<2^31",
+    "canonical original coordinates and a0-a3",
+    "four nonzero representation weights",
+    "original normalized point/divisor validity"
+  ],
+  "source_route": {
+    "Field.n": 1,
+    "Field.tables": null
+  },
+  "derived": [
+    "Some canonical valid payload",
+    "nonzero output weights",
+    "explicit mismatch and nested generic None excluded"
+  ],
+  "final_receipts": {
+    "attempt3": 0,
+    "controls3": 0,
+    "readback1": 0
+  },
+  "controls": 10,
+  "preserved_failed_receipts": [
+    "attempt1",
+    "controls1"
+  ],
+  "axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "independent_review": "pending",
+  "scientific_execution": false,
+  "cost_ratio": null
+}

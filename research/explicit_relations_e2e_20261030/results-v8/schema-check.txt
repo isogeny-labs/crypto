@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/home/ec2-user/ecbench-perf-20261030/protocol-tools/experiment_protocol.py", line 1115, in <module>
+    raise SystemExit(main())
+  File "/home/ec2-user/ecbench-perf-20261030/protocol-tools/experiment_protocol.py", line 1105, in main
+    return args.fn(args)
+  File "/home/ec2-user/ecbench-perf-20261030/protocol-tools/experiment_protocol.py", line 912, in cmd_validate
+    findings = schema_errors(obj, kind)
+  File "/home/ec2-user/ecbench-perf-20261030/protocol-tools/experiment_protocol.py", line 141, in schema_errors
+    validator = jsonschema.Draft202012Validator(schema)
+AttributeError: module 'jsonschema' has no attribute 'Draft202012Validator'

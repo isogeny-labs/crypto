@@ -1,0 +1,12 @@
+import Model
+set_option autoImplicit false
+namespace ScholtenModelControls
+theorem at_zero : ScholtenModel.F (0:ℚ)=1 := by norm_num [ScholtenModel.F]
+theorem exceptional_root : ScholtenModel.F (-1/2:ℚ)=0 := by norm_num [ScholtenModel.F]
+theorem x_coordinate : ((3:ℚ)+187/150)/(5/2)=637/375 := by norm_num
+theorem y_coordinate : (7:ℚ)/(5/2)^3=56/125 := by norm_num
+theorem omitted_scale_rejected : (7:ℚ)≠56/125 := by norm_num
+theorem round_trip : (((5/2:ℚ)*(637/375)-187/150),(5/2:ℚ)^3*(56/125))=(3,7) := by norm_num
+theorem gate_shift : (-(187/12:ℚ))/(5*(5/2))= -187/150 := by norm_num
+theorem gate_ordinate_scale : (5/2:ℚ)^3=125/8 := by norm_num
+end ScholtenModelControls

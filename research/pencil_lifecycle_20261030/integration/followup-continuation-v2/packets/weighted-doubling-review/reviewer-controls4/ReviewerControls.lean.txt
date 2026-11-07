@@ -1,0 +1,16 @@
+import Doubling
+open Polynomial WeightedDoubling
+-- All four coefficients nonzero, nonunit weights, nonzero tangent slope.
+example : let c := output (1:ℚ) 2 3 4 0 486 3 2
+ c.z ≠ 0 ∧ c.w ≠ 0 ∧
+ (X^2+C (c.q/c.z^2)*X+C (c.r/c.z^4)) ∣
+ curve 1 2 3 4-(C (c.s/(c.z^3*c.w))*X+C (c.t/(c.z^5*c.w)))^2 := by
+ apply weighted_preserves <;> norm_num [value]
+example : let c := output (1:ℚ) 2 3 4 0 486 3 2
+ c.s/(c.z^3*c.w)=1 ∧ c.t/(c.z^5*c.w)=1 := by norm_num [output]
+-- Missing a valid point is material: support X² fails when constant residue is1.
+example : ¬ (X:ℚ[X])^2 ∣ curve 2 2 3 4-(X+1)^2 := by
+ intro hd
+ obtain ⟨q,hq⟩ := hd
+ have hv := congrArg (fun g : ℚ[X] => g.coeff 0) hq
+ norm_num [curve] at hv

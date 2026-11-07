@@ -1,0 +1,35 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-n83-msweep-20261024-reference
+experiment_id: n83_msweep_20261024
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: b654e95b6e7dc7dbd3f16bce3f46e225fb145a1e
+receipt: research/n83_msweep_20261024/cards/CARD-n83-msweep-20261024-reference.receipt.json
+binds:
+  - {path: research/n83_msweep_20261024/PROTOCOL.md, sha256: 400c2d32efb252a80cab190a6fdbee9c705a1b128d3e3b92c618793b91cb73ed}
+  - {path: research/n83_msweep_20261024/grid.tsv, sha256: 31aa87faacc809d5bd798c16ce62dfdaaa07d1bdf08806dbaf772d86aa6faf89}
+  - {path: research/n83_msweep_20261024/point.jsonl, sha256: 1a553655348acd8ab6cb993c57df589f2cd394f414856fe8a050aa49881f203b}
+  - {path: research/n83_msweep_20261024/rho_config.json, sha256: cf76ebb5372acfc1355b88374f875980be66cdffba1a82cb6e4c2f28bcfa723b}
+  - {path: research/n83_msweep_20261024/run_reference.sh, sha256: 254b94b87eca22838ba250a5b51642b2795db606cb74b4d5f131e94d83e08348}
+  - {path: ./target/release/examples/koblitz_orbit_dlp_fast, sha256: 0814132d223c1ab1c615c8f73a41eacaaab6b919ed8a07207a24e32570f3619b}
+  - {path: ./target/release/examples/n83_rho_optimization_eval, sha256: 789c2296d7431b7f314a7cd6759194264b1e8774ef97680df26035c766ae4d58}
+must_not_exist:
+  - research/n83_msweep_20261024/raw/reference
+commands:
+  - id: run-reference
+    argv: [research/n83_msweep_20261024/run_reference.sh, ./target/release/examples/koblitz_orbit_dlp_fast, ./target/release/examples/n83_rho_optimization_eval, research/n83_msweep_20261024/raw/reference]
+    cwd: .
+    timeout_seconds: 3600
+    success_exit_codes: [0]
+    stdout: research/n83_msweep_20261024/receipts/reference.stdout
+    stderr: research/n83_msweep_20261024/receipts/reference.stderr
+bus_address: executor-mechanical-n83-msweep-reference
+background: true
+write_scope:
+  - research/n83_msweep_20261024/raw/
+  - research/n83_msweep_20261024/receipts/
+  - research/n83_msweep_20261024/cards/
+stop_when:
+  - Any command in the card exits with a status other than 0.
+  - The tool exits with status 2 and prints an IMPEDIMENT line.

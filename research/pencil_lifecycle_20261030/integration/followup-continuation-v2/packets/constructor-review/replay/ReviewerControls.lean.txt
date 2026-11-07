@@ -1,0 +1,12 @@
+import Constructor
+open PencilWordRefinement
+example : let a := weightConstructor 7 1 2 3 4 2 3
+    a.q = 4 ∧ a.r = 4 ∧ a.s = 2 ∧ a.t = 6 ∧ a.z = 2 ∧ a.w = 3 := by decide
+example : let a := weightConstructor 7 1 2 3 4 1 1
+    a.q = 1 ∧ a.r = 2 ∧ a.s = 3 ∧ a.t = 4 := by decide
+example : ¬ (weightConstructor 5 0 0 0 1 5 3).canonical 5 := by
+  intro h
+  have hz := h.2.2.2.2.1
+  change (5 : UInt64).toNat < (5 : UInt64).toNat at hz
+  omega
+example : (weightConstructor 5 0 0 0 1 0 3).z = 0 := by rfl

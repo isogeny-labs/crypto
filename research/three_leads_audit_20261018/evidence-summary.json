@@ -1,0 +1,75 @@
+{
+  "schema": "three-leads-audit/v1",
+  "date": "2026-10-18",
+  "base_revision": "1e2bf0715a2a927afc92e6730d6e65b59f15ab9e",
+  "claim_class": "correctness_literature_and_evidence_audit",
+  "new_timing_claim": false,
+  "original_claims": {
+    "binary_21_curve_census": "source_unlocated_not_reproduced",
+    "binary_three_eighths_limit": "not_proved_by_trace_obstruction",
+    "binary_attack_population": "odd_order_targets_pass_trace_test; if_G_equals_2E_then_full_group_3_over_8_implies_conditional_3_over_4",
+    "binary_z_minus_4_point_7": "source_unlocated_not_recomputed",
+    "n2_cost_ratio_2_point_7_to_66": "pricing_cells_unlocated_not_recomputed",
+    "pkm_18_cell_23_prime_census": "source_unlocated_not_reproduced",
+    "genus2_1260_run_census": "source_unlocated_not_reproduced",
+    "genus2_tau_map": "exact_executable_map_unlocated_not_validated",
+    "genus2_operation_counts": "source_unlocated_not_recomputed",
+    "genus2_cost_ratio_0_point_51_to_2_point_83": "pricing_cells_unlocated_not_recomputed; 0_point_51_needs_reconciliation_with_common_unit_operation_only_lower_bound_27_over_44"
+  },
+  "fresh_diagnostics": {
+    "binary": {
+      "curves": 41,
+      "generic_quadratic_curves": 35,
+      "descended_b_controls": 4,
+      "extension_degree_four_controls": 2,
+      "raw": "binary_results_v2.csv",
+      "assertions": "pass",
+      "asymptotic_limit_proof": false
+    },
+    "odd_subfield": {
+      "curves": 24,
+      "characteristics": [5, 7],
+      "extension_degrees": [2, 3, 4, 5],
+      "controls_per_curve": 32,
+      "assertions": "pass"
+    },
+    "prime_towers": {
+      "cases": 18,
+      "primes": [257, 769, 1153],
+      "tower_depths": [2, 3, 4],
+      "families": ["kummer", "split_dickson"],
+      "controls_per_case": 32,
+      "raw": "odd_results_v2.csv",
+      "solver_measured": false,
+      "assertions": "pass"
+    },
+    "signed_cycles": {
+      "modulus": 101,
+      "triangle_all_plus_rank": 3,
+      "triangle_compatible_target_values": 101,
+      "square_nonzero_coefficient_recovered_k": 37,
+      "raw": "cycle_results.csv",
+      "actual_genus2_dlp_experiment": false,
+      "assertions": "pass"
+    },
+    "lean": {
+      "gate_audited_declarations": 7,
+      "named_consequence_theorems": 4,
+      "generated_recursive_equations": 3,
+      "trusted_native_declarations": 0,
+      "failing_declarations": 0,
+      "scope": "Boolean-homomorphism consequences only",
+      "elliptic_trace_bridge_formalized": false,
+      "three_eighths_limit_formalized": false
+    }
+  },
+  "historical_solver_receipts": {
+    "independently_rerun": false,
+    "crypto_torus_source_commit": "3536d16ae185feef0ff90a0c53162e16e58f9d6f",
+    "crypto_autoresearcher_source_commit": "8b77d405e297f275a15cba425cdebb09fcc799c3",
+    "cryptanalysis_source_commit": "80868b829255312a5e41defb7d5b3a2d580ad90f",
+    "torus_tower_rows_reported_verified": 127,
+    "retained_receipt_directory": "source-receipts"
+  },
+  "open_obstruction": "../../problems/three-leads-original-evidence-unlocated.md"
+}

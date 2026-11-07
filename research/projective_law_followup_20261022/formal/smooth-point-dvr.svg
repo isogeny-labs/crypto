@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="440" viewBox="0 0 1100 440">
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9Z" fill="#60758a"/></marker></defs>
+<rect width="1100" height="440" fill="white"/>
+<text x="60" y="44" font-family="Arial" font-size="24" fill="#102a43">Rational-point Jacobian condition and DVR</text>
+<text x="60" y="68" font-family="Arial" font-size="12" fill="#52667a">Lean 4.34.1; source SHA-256 b662ea86f06b6ff9066d283272304f83df49aee3a3d8fdaad19a4740f471c283; no measurements</text>
+<g font-family="Arial" font-size="15" fill="#102a43">
+<rect x="60" y="105" width="260" height="82" rx="8" fill="#e5f1ff" stroke="#2673ba"/><text x="77" y="136">Nonzero vertical partial</text><text x="77" y="160" font-size="12">2y != 0; x-a local parameter</text>
+<rect x="60" y="215" width="260" height="82" rx="8" fill="#e5f1ff" stroke="#2673ba"/><text x="77" y="246">Nonzero horizontal partial</text><text x="77" y="270" font-size="12">f'(a) != 0; y-y0 parameter</text>
+<rect x="375" y="155" width="285" height="92" rx="8" fill="#e5f1ff" stroke="#2673ba"/><text x="392" y="185">Pointwise Jacobian equivalence</text><text x="392" y="208" font-size="12">one partial nonzero iff</text><text x="392" y="229" font-size="12">2y != 0 OR f'(a) != 0</text>
+<rect x="710" y="155" width="315" height="92" rx="8" fill="#e5f1ff" stroke="#2673ba"/><text x="727" y="185">Actual point-stalk DVR</text><text x="727" y="208" font-size="12">point equation + separable quintic</text><text x="727" y="229" font-size="12">+ pointwise Jacobian condition</text>
+<rect x="375" y="322" width="285" height="75" rx="8" fill="#f2f4f7" stroke="#7f8fa3"/><text x="392" y="352">Scheme Smooth equivalence</text><text x="392" y="375" font-size="12">formal bridge open</text>
+<rect x="710" y="322" width="315" height="75" rx="8" fill="#f2f4f7" stroke="#7f8fa3"/><text x="727" y="352">Global Pic0 / compiled semantics</text><text x="727" y="375" font-size="12">separate open gates</text>
+</g>
+<g fill="none" stroke="#60758a" stroke-width="2" marker-end="url(#arrow)"><path d="M320 146L375 182"/><path d="M320 256L375 220"/><path d="M660 201L710 201"/></g>
+<text x="60" y="421" font-family="Arial" font-size="12" fill="#52667a">Blue: checked implications. Gray: open bridges. Arrows: logical dependencies, not cost or performance.</text>
+</svg>
