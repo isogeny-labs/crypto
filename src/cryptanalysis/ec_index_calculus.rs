@@ -939,6 +939,19 @@ pub fn find_one_relation_counted(
     find_one_relation_counted_with_rng(curve, g, q, factor_base, max_trials, &mut rng)
 }
 
+/// x-coordinate → factor-base index, for O(1) lookups.
+fn factor_base_x_index(
+    factor_base: &[FactorBaseEntry],
+) -> std::collections::HashMap<BigUint, usize> {
+    let mut x_to_idx = std::collections::HashMap::new();
+    for fb in factor_base {
+        if let Point::Affine { x, .. } = &fb.point {
+            x_to_idx.insert(x.value.clone(), fb.idx);
+        }
+    }
+    x_to_idx
+}
+
 fn find_one_relation_counted_with_rng<R: rand::RngCore>(
     curve: &CurveParams,
     g: &Point,
@@ -947,17 +960,25 @@ fn find_one_relation_counted_with_rng<R: rand::RngCore>(
     max_trials: usize,
     rng: &mut R,
 ) -> Option<(Relation, usize)> {
+    let x_to_idx = factor_base_x_index(factor_base);
+    find_one_relation_sweep_with_index(curve, g, q, factor_base, &x_to_idx, max_trials, rng)
+}
+
+/// The square-root sweep with a prebuilt x-index.  The default path builds the
+/// index on every call (as before); `IC_HOIST_SWEEP=1` builds it once per solve.
+fn find_one_relation_sweep_with_index<R: rand::RngCore>(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    factor_base: &[FactorBaseEntry],
+    x_to_idx: &std::collections::HashMap<BigUint, usize>,
+    max_trials: usize,
+    rng: &mut R,
+) -> Option<(Relation, usize)> {
     use num_bigint::RandBigInt;
 
     let a_fe = curve.a_fe();
     let b_fe = curve.fe(curve.b.clone());
-    // x-coordinate → factor-base index, for O(1) lookups.
-    let mut x_to_idx = std::collections::HashMap::new();
-    for fb in factor_base {
-        if let Point::Affine { x, .. } = &fb.point {
-            x_to_idx.insert(x.value.clone(), fb.idx);
-        }
-    }
 
     for trial in 1..=max_trials {
         let mut sample_nonzero = || loop {
@@ -1818,6 +1839,12 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     } else {
         None
     };
+    // Experimental: IC_HOIST_SWEEP=1 builds the sweep's x-index once per solve.
+    let hoisted_index = if std::env::var("IC_HOIST_SWEEP").as_deref() == Ok("1") {
+        Some(factor_base_x_index(&fb))
+    } else {
+        None
+    };
     let mut relations = Vec::with_capacity(target);
     let mut attempts_exhausted = 0usize;
     let mut trials_per_relation: Vec<usize> = Vec::with_capacity(target);
@@ -1835,14 +1862,25 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
                         max_trials_per_relation,
                         rng,
                     ),
-                    None => find_one_relation_counted_with_rng(
-                        curve,
-                        g,
-                        q,
-                        &fb,
-                        max_trials_per_relation,
-                        rng,
-                    ),
+                    None => match &hoisted_index {
+                        Some(ix) => find_one_relation_sweep_with_index(
+                            curve,
+                            g,
+                            q,
+                            &fb,
+                            ix,
+                            max_trials_per_relation,
+                            rng,
+                        ),
+                        None => find_one_relation_counted_with_rng(
+                            curve,
+                            g,
+                            q,
+                            &fb,
+                            max_trials_per_relation,
+                            rng,
+                        ),
+                    },
                 };
                 if let Some(found) = attempt {
                     break 'attempt Some(found);
