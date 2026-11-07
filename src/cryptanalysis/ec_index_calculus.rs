@@ -1777,26 +1777,24 @@ type PairSumTable = std::collections::HashMap<(BigUint, BigUint), (usize, i64, u
 fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> PairSumTable {
     let a_fe = curve.a_fe();
     let mut table = PairSumTable::with_capacity(factor_base.len() * factor_base.len() * 2);
+    let mut put = |pt: &Point, key: (usize, i64, usize, i64)| {
+        if let Point::Affine { x, y } = pt {
+            table
+                .entry((x.value.clone(), y.value.clone()))
+                .or_insert(key);
+        }
+    };
+    // Negation is free on a curve: -(F_i + F_j) = (-F_i) + (-F_j) and -(F_i - F_j) = (-F_i) + F_j, so two
+    // (variable-time) additions per pair give all four sign combinations.
     for (i, fi) in factor_base.iter().enumerate() {
         for (j, fj) in factor_base.iter().enumerate().skip(i) {
-            for s_i in [1i64, -1i64] {
-                for s_j in [1i64, -1i64] {
-                    let pi = if s_i > 0 {
-                        fi.point.clone()
-                    } else {
-                        fi.point.neg()
-                    };
-                    let pj = if s_j > 0 {
-                        fj.point.clone()
-                    } else {
-                        fj.point.neg()
-                    };
-                    if let Point::Affine { x, y } = pi.add(&pj, &a_fe) {
-                        table
-                            .entry((x.value.clone(), y.value.clone()))
-                            .or_insert((i, s_i, j, s_j));
-                    }
-                }
+            let sum = fi.point.add_vartime(&fj.point, &a_fe);
+            put(&sum, (i, 1, j, 1));
+            put(&sum.neg_vartime(), (i, -1, j, -1));
+            if i != j {
+                let dif = fi.point.add_vartime(&fj.point.neg_vartime(), &a_fe);
+                put(&dif, (i, 1, j, -1));
+                put(&dif.neg_vartime(), (i, -1, j, 1));
             }
         }
     }
@@ -1853,6 +1851,130 @@ fn find_one_relation_table_with_rng<R: rand::RngCore>(
     None
 }
 
+/// r-adding walk state for relation sampling (experimental, `IC_WALK=1` with `IC_SUM_TABLE=1`).
+/// Each step adds one of `WALK_ARMS` precomputed points `a_k G + b_k Q` to the current point,
+/// tracking (a, b) mod n, so a trial costs one point addition instead of two scalar multiplications.
+struct SampleWalk {
+    r: Point,
+    a: BigUint,
+    b: BigUint,
+    arms: Vec<(Point, BigUint, BigUint)>,
+    steps: usize,
+}
+
+const WALK_ARMS: usize = 32;
+/// A walk whose step depends only on x enters a cycle after about sqrt(n) steps, so it is
+/// restarted from fresh random coefficients every `WALK_RESTART` steps.
+const WALK_RESTART: usize = 32;
+
+impl SampleWalk {
+    fn new<R: rand::RngCore>(curve: &CurveParams, g: &Point, q: &Point, rng: &mut R) -> Self {
+        use num_bigint::RandBigInt;
+        let a_fe = curve.a_fe();
+        let nonzero = |rng: &mut R| loop {
+            let v = rng.gen_biguint_below(&curve.n);
+            if !v.is_zero() {
+                break v;
+            }
+        };
+        let mut arms = Vec::with_capacity(WALK_ARMS);
+        for _ in 0..WALK_ARMS {
+            let (a, b) = (nonzero(rng), nonzero(rng));
+            let pt = relation_point(g, &a, q, &b, &a_fe);
+            arms.push((pt, a, b));
+        }
+        let (a, b) = (nonzero(rng), nonzero(rng));
+        let r = relation_point(g, &a, q, &b, &a_fe);
+        SampleWalk {
+            r,
+            a,
+            b,
+            arms,
+            steps: 0,
+        }
+    }
+
+    fn restart<R: rand::RngCore>(
+        &mut self,
+        curve: &CurveParams,
+        g: &Point,
+        q: &Point,
+        rng: &mut R,
+    ) {
+        use num_bigint::RandBigInt;
+        let a_fe = curve.a_fe();
+        let nonzero = |rng: &mut R| loop {
+            let v = rng.gen_biguint_below(&curve.n);
+            if !v.is_zero() {
+                break v;
+            }
+        };
+        let (a, b) = (nonzero(rng), nonzero(rng));
+        self.r = relation_point(g, &a, q, &b, &a_fe);
+        self.a = a;
+        self.b = b;
+        self.steps = 0;
+    }
+
+    fn step(&mut self, curve: &CurveParams) {
+        let a_fe = curve.a_fe();
+        self.steps += 1;
+        let k = match &self.r {
+            Point::Affine { x, .. } => {
+                (x.value.iter_u64_digits().next().unwrap_or(0) as usize) % WALK_ARMS
+            }
+            Point::Infinity => 0,
+        };
+        let (pt, ak, bk) = &self.arms[k];
+        self.r = self.r.add_vartime(pt, &a_fe);
+        self.a = (&self.a + ak) % &curve.n;
+        self.b = (&self.b + bk) % &curve.n;
+    }
+}
+
+/// Table lookup on an r-adding walk instead of fresh random (a, b).
+fn find_one_relation_table_walk<R: rand::RngCore>(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    table: &PairSumTable,
+    walk: &mut SampleWalk,
+    max_trials: usize,
+    rng: &mut R,
+) -> Option<(Relation, usize)> {
+    for trial in 1..=max_trials {
+        if walk.steps >= WALK_RESTART || matches!(walk.r, Point::Infinity) {
+            walk.restart(curve, g, q, rng);
+        }
+        walk.step(curve);
+        let key = match &walk.r {
+            Point::Affine { x, y } => (x.value.clone(), y.value.clone()),
+            Point::Infinity => continue,
+        };
+        if let Some(&(i, s_i, j, s_j)) = table.get(&key) {
+            let mut entries = Vec::new();
+            if i == j {
+                let combined = s_i + s_j;
+                if combined != 0 {
+                    entries.push((i, combined));
+                }
+            } else {
+                entries.push((i, s_i));
+                entries.push((j, s_j));
+            }
+            return Some((
+                Relation {
+                    coef_a: walk.a.clone(),
+                    coef_b: walk.b.clone(),
+                    entries,
+                },
+                trial,
+            ));
+        }
+    }
+    None
+}
+
 fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     curve: &CurveParams,
     g: &Point,
@@ -1893,6 +2015,12 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     } else {
         None
     };
+    // Experimental: IC_WALK=1 (with IC_SUM_TABLE=1) samples along an r-adding walk.
+    let mut walk = if sum_table.is_some() && std::env::var("IC_WALK").as_deref() == Ok("1") {
+        Some(SampleWalk::new(curve, g, q, rng))
+    } else {
+        None
+    };
     let mut relations = Vec::with_capacity(target);
     let mut attempts_exhausted = 0usize;
     let mut trials_per_relation: Vec<usize> = Vec::with_capacity(target);
@@ -1902,6 +2030,15 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
         let found = 'attempt: {
             for _ in 0..max_relation_attempts {
                 let attempt = match &sum_table {
+                    Some(t) if walk.is_some() => find_one_relation_table_walk(
+                        curve,
+                        g,
+                        q,
+                        t,
+                        walk.as_mut().expect("walk checked"),
+                        max_trials_per_relation,
+                        rng,
+                    ),
                     Some(t) => find_one_relation_table_with_rng(
                         curve,
                         g,
@@ -2385,6 +2522,127 @@ mod tests {
             gy: BigUint::from(7u32),
             n: BigUint::from(281u32),
             h: 1,
+        }
+    }
+
+    /// Sum of signed multiples of factor-base points, by the plain group law.
+    fn fb_combination(
+        curve: &CurveParams,
+        fb: &[FactorBaseEntry],
+        entries: &[(usize, i64)],
+    ) -> Point {
+        let a_fe = curve.a_fe();
+        let mut acc = Point::Infinity;
+        for &(idx, m) in entries {
+            let base = if m > 0 {
+                fb[idx].point.clone()
+            } else {
+                fb[idx].point.neg()
+            };
+            let term = base.scalar_mul(&BigUint::from(m.unsigned_abs()), &a_fe);
+            acc = acc.add(&term, &a_fe);
+        }
+        acc
+    }
+
+    /// The pair-sum table (two variable-time additions per pair, negation
+    /// free) holds exactly the keys of the plain four-addition build, and
+    /// every entry is a true decomposition `s_i F_i + s_j F_j`.
+    #[test]
+    fn pair_sum_table_is_exactly_the_four_sign_combinations() {
+        let curve = tiny_curve();
+        let a_fe = curve.a_fe();
+        let fb = build_factor_base(&curve, 12);
+        let table = build_pair_sum_table(&curve, &fb);
+        let mut reference = std::collections::HashSet::new();
+        for i in 0..fb.len() {
+            for j in i..fb.len() {
+                for s_i in [1i64, -1] {
+                    for s_j in [1i64, -1] {
+                        let pi = if s_i > 0 {
+                            fb[i].point.clone()
+                        } else {
+                            fb[i].point.neg()
+                        };
+                        let pj = if s_j > 0 {
+                            fb[j].point.clone()
+                        } else {
+                            fb[j].point.neg()
+                        };
+                        if let Point::Affine { x, y } = pi.add(&pj, &a_fe) {
+                            reference.insert((x.value.clone(), y.value.clone()));
+                        }
+                    }
+                }
+            }
+        }
+        let keys: std::collections::HashSet<_> = table.keys().cloned().collect();
+        assert_eq!(
+            keys, reference,
+            "table keys differ from the four-addition build"
+        );
+        for ((x, y), &(i, s_i, j, s_j)) in &table {
+            let pi = if s_i > 0 {
+                fb[i].point.clone()
+            } else {
+                fb[i].point.neg()
+            };
+            let pj = if s_j > 0 {
+                fb[j].point.clone()
+            } else {
+                fb[j].point.neg()
+            };
+            match pi.add(&pj, &a_fe) {
+                Point::Affine { x: x2, y: y2 } => {
+                    assert_eq!(
+                        (&x2.value, &y2.value),
+                        (x, y),
+                        "entry is not its own decomposition"
+                    )
+                }
+                Point::Infinity => panic!("an infinity sum was stored"),
+            }
+        }
+    }
+
+    /// Every relation found by the table lookup and by the restarted walk
+    /// satisfies `a G + b Q = sum of its signed factor-base terms`; the walk
+    /// keeps `r = a G + b Q` through steps and restarts.
+    #[test]
+    fn table_and_walk_relations_are_true_identities() {
+        use rand::SeedableRng;
+        let curve = tiny_curve();
+        let a_fe = curve.a_fe();
+        let g = Point::Affine {
+            x: FieldElement::new(curve.gx.clone(), curve.p.clone()),
+            y: FieldElement::new(curve.gy.clone(), curve.p.clone()),
+        };
+        let q = g.scalar_mul(&BigUint::from(57u32), &a_fe);
+        let fb = build_factor_base(&curve, 12);
+        let table = build_pair_sum_table(&curve, &fb);
+        let check = |rel: &Relation| {
+            let lhs = g
+                .scalar_mul(&rel.coef_a, &a_fe)
+                .add(&q.scalar_mul(&rel.coef_b, &a_fe), &a_fe);
+            assert_eq!(lhs, fb_combination(&curve, &fb, &rel.entries));
+        };
+        let mut rng = rand::rngs::StdRng::seed_from_u64(7);
+        for _ in 0..20 {
+            let (rel, _) =
+                find_one_relation_table_with_rng(&curve, &g, &q, &table, 100_000, &mut rng)
+                    .expect("table relation");
+            check(&rel);
+        }
+        let mut walk = SampleWalk::new(&curve, &g, &q, &mut rng);
+        for _ in 0..200 {
+            let (rel, _) =
+                find_one_relation_table_walk(&curve, &g, &q, &table, &mut walk, 100_000, &mut rng)
+                    .expect("walk relation");
+            check(&rel);
+            let on_curve = g
+                .scalar_mul(&walk.a, &a_fe)
+                .add(&q.scalar_mul(&walk.b, &a_fe), &a_fe);
+            assert_eq!(walk.r, on_curve, "walk lost r = aG + bQ");
         }
     }
 
