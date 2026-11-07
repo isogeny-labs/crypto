@@ -71,6 +71,7 @@ pub mod exact_scalar;
 pub mod exact_sampling;
 pub mod exact_rho_scalar;
 pub mod curve25519_workload;
+pub mod curve25519_pair;
 pub mod ext;
 pub mod fbm;
 pub mod fp4;

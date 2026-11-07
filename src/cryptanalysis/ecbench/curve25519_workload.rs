@@ -58,6 +58,16 @@ pub fn encode(curve: &Curve25519Wide, point: WidePoint) -> Option<[String; 2]> {
 /// Reject noncanonical field values before the backend can reduce them.
 /// Only nonidentity points in the selected prime-order subgroup are accepted.
 pub fn decode(curve: &Curve25519Wide, coordinates: &[String; 2]) -> Result<WidePoint, String> {
+    decode_counted(curve, coordinates, &mut GroupOps::default())
+}
+
+/// Same checked decoder with a retained group/field ledger. Parsing, field
+/// conversion and canonical-curve construction are not group operations.
+pub fn decode_counted(
+    curve: &Curve25519Wide,
+    coordinates: &[String; 2],
+    ops: &mut GroupOps,
+) -> Result<WidePoint, String> {
     ensure_curve(curve)?;
     let read = |text: &str| -> Result<_, String> {
         let digits = text
@@ -74,11 +84,13 @@ pub fn decode(curve: &Curve25519Wide, coordinates: &[String; 2]) -> Result<WideP
         Ok(curve.field.from_biguint(&value))
     };
     let point = Some((read(&coordinates[0])?, read(&coordinates[1])?));
+    // y^2 == x^3 + a*x + b: two multiplications and two squares.
+    ops.field_ops.muls += 2;
+    ops.field_ops.sqrs += 2;
     if !curve.on_curve(point) {
         return Err("point is not on Curve25519".into());
     }
-    let mut scratch = GroupOps::default();
-    if curve.mul_biguint(&mut scratch, point, &curve.r).is_some() {
+    if curve.mul_biguint(ops, point, &curve.r).is_some() {
         return Err("point is outside the prime-order subgroup".into());
     }
     Ok(point)

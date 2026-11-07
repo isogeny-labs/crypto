@@ -544,6 +544,16 @@ pub fn registry() -> &'static [MethodDecl] {
             params: RHO_PARAMS,
         },
         MethodDecl {
+            id: "ic.curve25519_pair_v1", family: "ic",
+            summary: "bounded actual Curve25519 signed pair decomposition, verified exact relations and target-coordinate elimination",
+            entry: "ecbench::curve25519_pair::collect_observed", applies: Applies::Any,
+            params: &[
+                ParamDecl { name: "base_size", default: None, help: "public factor-base columns, 1 through128" },
+                ParamDecl { name: "max_scan", default: None, help: "maximum lifted x coordinates, at most1000000" },
+                ParamDecl { name: "max_trials", default: None, help: "maximum full-width relation probes, at most1000000" },
+            ],
+        },
+        MethodDecl {
             id: "rho.curve25519_bounded",
             family: "rho",
             summary: "explicitly capped Curve25519 negation-map reference with exact scalars and native field counters",
@@ -1959,6 +1969,177 @@ fn class_setup_detail(setup: GroupOps) -> Value {
         "scalar_mults": setup.scalar_mults, "gae": setup.gae()}})
 }
 
+fn curve25519_pair_caps(m: &ResolvedMethod) -> Result<(usize, u64, u64), String> {
+    let number = |name: &str| -> Result<u64, String> {
+        m.params
+            .get(name)
+            .ok_or_else(|| format!("missing {name}"))?
+            .parse()
+            .map_err(|_| format!("{name} must be a nonnegative integer"))
+    };
+    let (base, scan, trials) = (
+        number("base_size")?,
+        number("max_scan")?,
+        number("max_trials")?,
+    );
+    if !(1..=128).contains(&base) || scan > 1_000_000 || trials > 1_000_000 {
+        return Err(
+            "Curve25519 pair collector requires base_size=1..=128 and max_scan/max_trials<=1000000"
+                .into(),
+        );
+    }
+    Ok((base as usize, scan, trials))
+}
+
+fn solve_curve25519_pair(
+    m: &ResolvedMethod,
+    group: &crate::cryptanalysis::curve25519_wide::Curve25519Wide,
+    facts: &CurveFacts,
+    target: &[String; 2],
+    seed: u64,
+) -> Result<SolveReport, String> {
+    use super::curve25519_pair::{build_factor_base, collect_observed, Outcome, Stage};
+    let (size, scan, trials) = curve25519_pair_caps(m)?;
+    let started = Instant::now();
+    let base = {
+        let _phase = measurement::scope(Phase::FactorBase);
+        build_factor_base(group, size, scan)?
+    };
+    measurement::begin_online(Phase::TargetQuery);
+    let mut validation = GroupOps::default();
+    let target = super::curve25519_workload::decode_counted(group, target, &mut validation)?;
+    let out = if base.complete {
+        collect_observed(group, &base.points, target, seed, trials, |stage| {
+            measurement::mark(match stage {
+                Stage::Setup | Stage::Query | Stage::Finished => Phase::TargetQuery,
+                Stage::Decomposition => Phase::TargetPdp,
+                Stage::AdmitAndEliminate => Phase::TargetDescent,
+                Stage::Recovery => Phase::RecoveryCheck,
+            });
+        })?
+    } else {
+        Outcome {
+            recovered: None,
+            rank: 0,
+            trials: 0,
+            relations: 0,
+            lookups: 0,
+            scalar_hash_draws: 0,
+            setup: GroupOps::default(),
+            search: GroupOps::default(),
+            admission: GroupOps::default(),
+            recovery: GroupOps::default(),
+            matrix: Default::default(),
+        }
+    };
+    measurement::end_online();
+    let solve_wall_ns = started.elapsed().as_nanos() as u64;
+    let phases = vec![
+        ops_phase("factor_base", base.ops),
+        ops_phase("input_validation", validation),
+        ops_phase("setup_validation", out.setup),
+        ops_phase("relation_search", out.search),
+        ops_phase("relation_admission", out.admission),
+        ops_phase("recovery_check", out.recovery),
+    ];
+    let mut counters = BTreeMap::new();
+    for (name, value) in [
+        ("input_validation_field_additions_uncharged", 2),
+        ("input_validation_coordinate_decodes_uncharged", 2),
+        ("input_validation_canonical_curve_checks_uncharged", 1),
+        ("factor_base_columns", base.points.len() as u64),
+        ("factor_base_coordinates_tried", base.coordinates_tried),
+        ("factor_base_sqrt_calls_uncharged", base.sqrt_calls),
+        (
+            "factor_base_rhs_additions_uncharged",
+            2 * base.coordinates_tried,
+        ),
+        (
+            "factor_base_coordinate_conversions_uncharged",
+            base.coordinates_tried,
+        ),
+        ("relation_trials", out.trials),
+        ("relations_verified", out.relations),
+        ("matrix_rank", out.rank as u64),
+        ("relation_point_lookups_uncharged", out.lookups),
+        ("scalar_sha256_draws_uncharged", out.scalar_hash_draws),
+        ("linalg_muls_uncharged", out.matrix.multiplications),
+        ("linalg_adds_uncharged", out.matrix.additions),
+        ("linalg_subs_uncharged", out.matrix.subtractions),
+        ("linalg_inverses_uncharged", out.matrix.inversions),
+        ("linalg_conversions_uncharged", out.matrix.conversions),
+    ] {
+        counters.insert(name.into(), value);
+    }
+    // Full coordinates, not truncated group hashes, define this inventory.
+    let mut coordinates: Vec<[String; 2]> = base
+        .points
+        .iter()
+        .map(|&point| {
+            super::curve25519_workload::encode(group, point).expect("base points are nonidentity")
+        })
+        .collect();
+    coordinates.sort();
+    let points_sha256 = sha256_hex(super::canonical::canonical(&json!(coordinates))?.as_bytes());
+    let family = "curve25519-cofactor-cleared-lifts-v1";
+    let base_params = BTreeMap::from([
+        ("base_size".to_string(), size.to_string()),
+        ("max_scan".to_string(), scan.to_string()),
+    ]);
+    let (fb_id, fb_sha256) = short_id(
+        "FB1",
+        &json!({"schema":"ecbench.factor_base/v1",
+        "curve":facts.slug,"family":family,"params":base_params,
+        "points_sha256":points_sha256,"columns":base.points.len()}),
+    )?;
+    let factor_base = FactorBaseFacts {
+        fb_id, fb_sha256, family: family.into(), params: base_params,
+        description: "G, then distinct signed classes of cofactor-cleared lifts of x=0,1,...; only log_G(G)=1 pre-admitted".into(),
+        signed_points: 2 * base.points.len() as u64, abscissae: base.points.len() as u64,
+        columns: base.points.len() as u64, dimension: None, points_sha256,
+    };
+    let recovered = out
+        .recovered
+        .as_ref()
+        .map(|value| ExactScalar::from_biguint(value).ok_or("recovered scalar exceeds256bits"))
+        .transpose()?;
+    Ok(SolveReport {
+        recovered,
+        exhausted: recovered.is_none(),
+        total_gae: phases.iter().map(|p| p.gae).sum(),
+        phases,
+        automorphisms_used: 2,
+        unpriced: unpriced_of(&counters),
+        counters,
+        deterministic: true,
+        nondeterminism: vec![],
+        solve_wall_ns,
+        factor_base: Some(factor_base),
+        detail: json!({
+            "algorithm":"bounded signed two-summand decomposition with exact verified relations",
+            "track":"generic", "factor_base_complete":base.complete,
+            "matrix":"WideGauss target-coordinate recovery modulo the exact subgroup order",
+            "accounting":"group operations plus separately retained native API counters; allocations, hash-map internals and internal square-root work are not priced",
+            "inventory":"canonical full coordinates; inventory serialization follows the solver interval",
+            "admission_timing":"group relation verification and matrix insertion share target_descent timing"
+        }),
+        online: None,
+        online_error: None,
+        solver: None,
+        field_ops: field_ops_of(
+            group,
+            &[
+                base.ops,
+                validation,
+                out.setup,
+                out.search,
+                out.admission,
+                out.recovery,
+            ],
+        ),
+    })
+}
+
 fn curve25519_cap(m: &ResolvedMethod) -> Result<u64, String> {
     let cap: u64 = m
         .params
@@ -1979,21 +2160,29 @@ fn solve_curve25519_bounded(
     seed: u64,
 ) -> Result<SolveReport, String> {
     let cap = curve25519_cap(m)?;
-    let target = super::curve25519_workload::decode(curve, target)?;
     let r = ExactScalar::from_biguint(&curve.r).ok_or("subgroup order exceeds 256 bits")?;
     super::exact_rho_scalar::take_work();
     let start = Instant::now();
     measurement::begin_online(Phase::RhoSolve);
+    let mut validation = GroupOps::default();
+    let target = super::curve25519_workload::decode_counted(curve, target, &mut validation)?;
     let (result, recovered) =
         crate::cryptanalysis::ic_wide::rho_negation(curve, curve.generator, target, r, seed, cap);
     measurement::end_online();
     let wall = start.elapsed().as_nanos() as u64;
     let scalar = super::exact_rho_scalar::take_work();
-    let field_ops = field_ops_of(curve, &[result.group_ops]);
+    let field_ops = field_ops_of(curve, &[validation, result.group_ops]);
     let mut report = rho_report(result, wall, field_ops);
+    report.total_gae += validation.gae();
+    report
+        .phases
+        .insert(0, ops_phase("input_validation", validation));
     report.recovered = recovered;
     report.exhausted = recovered.is_none();
     for (name, count) in [
+        ("input_validation_field_additions_uncharged", 2),
+        ("input_validation_coordinate_decodes_uncharged", 2),
+        ("input_validation_canonical_curve_checks_uncharged", 1),
         ("scalar_modular_adds_uncharged", scalar.modular_adds),
         ("scalar_modular_subs_uncharged", scalar.modular_subs),
         ("scalar_modular_muls_uncharged", scalar.modular_muls),
@@ -2009,7 +2198,7 @@ fn solve_curve25519_bounded(
     report.detail["scalar_count_scope"] =
         json!("API calls; allocation and internal BigUint word work are not priced");
     report.detail["target_validation"] =
-        json!("canonical coordinates, on-curve and subgroup checks before the solver window");
+        json!("canonical coordinates, on-curve and subgroup checks inside the solver window");
     Ok(report)
 }
 
@@ -2632,13 +2821,20 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
             curve25519_cap(m)?;
             return Ok(());
         }
+        if m.id == "ic.curve25519_pair_v1" {
+            curve25519_pair_caps(m)?;
+            return Ok(());
+        }
         return Err(format!(
             "`{}` has no registered full-width Curve25519 solver adapter yet",
             m.id
         ));
     }
-    if m.id == "rho.curve25519_bounded" {
-        return Err("rho.curve25519_bounded requires Curve25519".into());
+    if matches!(
+        m.id.as_str(),
+        "rho.curve25519_bounded" | "ic.curve25519_pair_v1"
+    ) {
+        return Err(format!("{} requires Curve25519", m.id));
     }
     let id = full_price::base_of(&m.id)
         .or(wordram_price::base_of(&m.id))
@@ -2884,7 +3080,12 @@ pub fn solve_measured(
     target: &[String; 2],
     seed: u64,
 ) -> Result<SolveReport, String> {
-    if matches!(inst, Instance::Curve25519(_)) || m.id == "rho.curve25519_bounded" {
+    if matches!(inst, Instance::Curve25519(_))
+        || matches!(
+            m.id.as_str(),
+            "rho.curve25519_bounded" | "ic.curve25519_pair_v1"
+        )
+    {
         applicable(m, inst, curve)?;
     }
     hyper_ic_variant_guard(m, inst, curve)?;
@@ -2927,7 +3128,11 @@ pub fn solve_measured(
     // session turns it into exclusive phase times.
     let session = measurement::Session::begin().ok();
     let mut rep = if let Instance::Curve25519(wi) = inst {
-        solve_curve25519_bounded(m, wi, target, seed)?
+        if m.id == "ic.curve25519_pair_v1" {
+            solve_curve25519_pair(m, wi, curve, target, seed)?
+        } else {
+            solve_curve25519_bounded(m, wi, target, seed)?
+        }
     } else if let Instance::Wide(wi) = inst {
         let (tx, ty) = (parse_hex_wide(&target[0])?, parse_hex_wide(&target[1])?);
         solve_wide(m, wi, tx, ty, seed)?
@@ -2972,6 +3177,23 @@ pub fn solve_measured(
         Some(Ok(_)) => {} // A method with its own five-phase online clock supplied the window.
         Some(Err(e)) => rep.online_error = Some(e.to_string()),
         None => rep.online_error = Some("a measurement session was already active".into()),
+    }
+    if m.id == "ic.curve25519_pair_v1" {
+        if let Some(window) = &mut rep.online {
+            window.start_event =
+                "public target validation after deterministic factor-base construction".into();
+            window.stop_event = if rep.exhausted {
+                "bounded collection or factor-base exhaustion"
+            } else {
+                "public point recovery check completed"
+            }
+            .into();
+            window.mapping = "target_query includes validation, setup and scalar query generation; target_PDP is signed pair lookup; target_descent combines relation verification and matrix insertion; target_recovery_check tests any determined target coordinate".into();
+            window.zero_phases.insert(
+                "target_relation_check".into(),
+                "included with matrix insertion in target_descent".into(),
+            );
+        }
     }
     if m.id == "ic.three_leads_genus2_pencil_symbolic_v2" {
         if let Some(window) = &mut rep.online {
@@ -10251,6 +10473,10 @@ mod curve25519_bounded_tests {
             assert_eq!(a.total_gae, b.total_gae);
             assert_eq!(a.total_gae, a.phases.iter().map(|p| p.gae).sum::<f64>());
             assert!(a.field_ops.is_some());
+            assert!(a
+                .phases
+                .iter()
+                .any(|p| p.name == "input_validation" && p.gae > 0.0));
             assert!(a.phases.iter().any(|p| p.name == "setup" && p.gae > 0.0));
             assert!(a.counters["scalar_sampling_draws_uncharged"] > 0);
             assert!(a
@@ -10280,5 +10506,78 @@ mod curve25519_bounded_tests {
         let narrow_spec = CurveSpec::PrimeSearch { bits: 10, seed: 1 };
         let narrow = narrow_spec.build().unwrap();
         assert!(applicable(&method(0), &narrow, &narrow.facts(&narrow_spec)).is_err());
+    }
+}
+
+#[cfg(test)]
+mod curve25519_pair_dispatch_tests {
+    use super::*;
+    use crate::cryptanalysis::ecbench::workload::CurveSpec;
+
+    fn method(size: u64, scan: u64, trials: u64) -> ResolvedMethod {
+        resolve(&MethodSpec {
+            id: "ic.curve25519_pair_v1".into(),
+            params: BTreeMap::from([
+                ("base_size".into(), size.to_string()),
+                ("max_scan".into(), scan.to_string()),
+                ("max_trials".into(), trials.to_string()),
+            ]),
+        })
+        .unwrap()
+    }
+
+    #[test]
+    fn actual_curve25519_pair_dispatch_recovers_high_scalar_and_accounts_for_every_stage() {
+        let spec = CurveSpec::Curve25519;
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let Instance::Curve25519(curve) = &inst else {
+            unreachable!()
+        };
+        let target = curve.neg(curve.double(&mut GroupOps::default(), curve.generator));
+        let coordinates = super::super::curve25519_workload::encode(curve, target).unwrap();
+        let m = method(1, 0, 1);
+        applicable(&m, &inst, &facts).unwrap();
+        let a = solve(&m, &inst, &facts, &coordinates, 7).unwrap();
+        assert_eq!(a.recovered, ExactScalar::from_biguint(&(&curve.r - 2u8)));
+        assert!(!a.exhausted);
+        assert_eq!(a.counters["relations_verified"], 1);
+        assert_eq!(a.counters["matrix_rank"], 2);
+        assert_eq!(a.total_gae, a.phases.iter().map(|p| p.gae).sum::<f64>());
+        assert!(a.field_ops.is_some());
+        assert!(a
+            .phases
+            .iter()
+            .any(|p| p.name == "input_validation" && p.gae > 0.0));
+        assert!(a.unpriced.iter().any(|s| s == "linalg_inverses_uncharged"));
+        let online = a.online.as_ref().unwrap();
+        assert_eq!(online.phases_ns.values().sum::<u64>(), online.wall_ns);
+        let b = solve(&method(1, 0, 2), &inst, &facts, &coordinates, 7).unwrap();
+        assert_eq!(a.recovered, b.recovered);
+        assert_eq!(a.counters, b.counters);
+        assert_eq!(
+            a.factor_base.as_ref().unwrap().fb_id,
+            b.factor_base.as_ref().unwrap().fb_id
+        );
+    }
+
+    #[test]
+    fn actual_curve25519_pair_dispatch_preserves_factor_base_exhaustion_and_caps() {
+        let spec = CurveSpec::Curve25519;
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let target = inst.mul_generator_exact(3u64.into()).unwrap();
+        let report = solve(&method(2, 0, 1), &inst, &facts, &target, 9).unwrap();
+        assert!(report.exhausted);
+        assert!(report.recovered.is_none());
+        assert_eq!(report.detail["factor_base_complete"], false);
+        assert_eq!(report.counters["relation_trials"], 0);
+        assert_eq!(report.factor_base.unwrap().columns, 1);
+        assert!(applicable(&method(129, 128, 1), &inst, &facts).is_err());
+        assert!(applicable(&method(1, 1_000_001, 1), &inst, &facts).is_err());
+        assert!(applicable(&method(1, 0, 1_000_001), &inst, &facts).is_err());
+        let narrow_spec = CurveSpec::PrimeSearch { bits: 10, seed: 1 };
+        let narrow = narrow_spec.build().unwrap();
+        assert!(applicable(&method(1, 0, 1), &narrow, &narrow.facts(&narrow_spec)).is_err());
     }
 }

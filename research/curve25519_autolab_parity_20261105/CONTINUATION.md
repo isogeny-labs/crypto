@@ -1043,3 +1043,435 @@ Restore remaining tracked archive fixtures, integrate collector dispatch in the 
 ### Errors
 
 Optimization policy/registry mismatch missing rho.curve25519_bounded; bounds input research/ecbench_all_candidates_20261003/sessions/prime/session.json absent. [pcc:unverified]
+
+## 2026-11-05T19:58:50.790443+00:00 — measured collector integration checkout
+
+### What was done
+
+Created /home/ec2-user/crypto-curve25519-collector-20261105 at checkpoint57f49fa23307; materialization completed. Cherry-picked policy fix as036f150866dc. Conductor cleared ecbench/study scopes. Original checkout retains full-library gate62871; Autolab test3990 already passed15/0. [pcc:unverified]
+
+### Decisions made
+
+Register the five-test collector as ic.curve25519_pair_v1 with explicit base, scan and relation caps. Bind factor-base identity to full coordinates and base construction parameters. Preserve observed admission+elimination as one timed phase. [pcc:unverified]
+
+### Open threads
+
+Compile actual dispatch, add solver regression and connect Autolab explicit method/reference configuration. Original gate's first failure attempt and fixture repairs remain separate. [pcc:unverified]
+
+### Errors
+
+No new native collector failure. Original policy fix passed4/0 isolated tests against the compiled registry; full successful gate remains pending. [pcc:unverified]
+
+## 2026-11-05T20:01:13.457690+00:00 — prior delivery merged and measured collector registered
+
+### What was done
+
+GitHub followup confirmed PR3495 merged at19:24:25Z, merge51f10e83027d7a9a92cc7a05afd0fabf4b89e4ab; provider receipt retained. Registered ic.curve25519_pair_v1 in this collector checkout, with explicit caps, factor-base identity over full coordinates, generic-track labeling, field/group/native counters and observed timing. Added two actual dispatch regressions (pending compilation). Four isolated optimization-policy tests passed against the compiled workload-checkpoint registry; retained receipt. [pcc:unverified]
+
+### Decisions made
+
+Use separate /tmp/curve25519-collector-target for the first actual library check, two build jobs and900second deadline, avoiding the other checkout's active full-test lock. Keep original failed full-library gate as a distinct attempt. [pcc:unverified]
+
+### Open threads
+
+Collector check session57829 is live compiling dependencies, log /tmp/curve25519-collector-check-attempt1.log. Original full gate62871 is live; archive fixture repair/rechecks session96419 is also live. Autolab explicit reference/candidate routing remains next. Original checkout local head e39997449b6a, collector head036f150866dc plus uncommitted integration. [pcc:unverified]
+
+### Errors
+
+Original gate's missing archives and fixed policy omission retained. No terminal collector compile result yet. [pcc:unverified]
+
+## 2026-11-05T20:04:51.756244+00:00 — collector includes and Autolab routes
+
+### What was done
+
+First collector check reached the crate and reports missing sparse include inputs. Restored the pinned input sets from the workload checkout with SHA256 verification; recorded hydration list. Conductor cleared src/bin/ic_autolab.rs for explicit routing. [pcc:unverified]
+
+### Decisions made
+
+Add optional method IDs for candidate families and an optional per-size reference. Preserve legacy JSON when these are absent; require an explicit applicable rho reference and matching exact order for full Curve25519 freezes. [pcc:unverified]
+
+### Open threads
+
+Collect first-check terminal result, retry against restored inputs, and test both legacy and full-width routing. [pcc:unverified]
+
+### Errors
+
+Initial collector check reports missing boundary_targets.json, schema.sql, registry.json, calibration.json and standards parameters; no source defect inferred from those diagnostics. [pcc:unverified]
+
+## 2026-11-05T20:08:13.249843+00:00 — measured collector library type-check completed
+
+### What was done
+
+Collector check attempt2 completed library checking and failed only in ic_autolab: MethodSpec was imported through spec.rs, which privately imports it from methods.rs. Added explicit full-width routing regression, matching train/holdout reference checks and freeze-time applicability/order guards. [pcc:unverified]
+
+### Decisions made
+
+Import MethodSpec from its public methods module, rerun both entrypoint/library checks, then compile actual dispatch and Autolab tests. Generated full-size scope text must identify the actual subgroup, preserving legacy miniature wording. [pcc:unverified]
+
+### Open threads
+
+Actual tests and original gate remain pending. [pcc:unverified]
+
+### Errors
+
+Attempt2 exited101 with E0603 private MethodSpec import; retained log. [pcc:unverified]
+
+## 2026-11-05T20:10:20.804934+00:00 — actual collector and Autolab routes type-check
+
+### What was done
+
+Library+ic_autolab check attempt3 passed, exit0. Full-width method/reference validation and frozen-reference consistency checks are implemented; legacy manifests omit the new optional fields. Source inspection found mismatched target-validation timing: pair adapter includes it, bounded rho excludes it. [pcc:unverified]
+
+### Decisions made
+
+Expose counted target decoding and include its group/field work in a distinct input_validation phase for both adapters; time validation inside both solver intervals. Preserve unpriced parsing/conversion and canonical-construction costs explicitly. [pcc:unverified]
+
+### Open threads
+
+Native actual dispatch and Autolab routing tests after accounting correction. [pcc:unverified]
+
+### Errors
+
+No new type error after the public MethodSpec import fix. [pcc:unverified]
+
+## 2026-11-05T20:12:30.486725+00:00 — matched validation accounting type-check passed
+
+### What was done
+
+Library+Autolab check attempt4 passed, exit0 in1m18. Both new adapters retain target-validation group/field work as input_validation and time it inside their solver interval. Unpriced coordinate decoding, field additions and canonical-curve checks are explicit. Frozen-reference consistency rejects changing the reference between train and holdout. [pcc:unverified]
+
+### Decisions made
+
+Freeze current source hashes and build actual-crate Curve25519 and Autolab tests with two jobs and2400second timeout. No source changes during this validation snapshot. [pcc:unverified]
+
+### Open threads
+
+Native dispatch/routing test results; original full gate and remaining fixture rechecks. [pcc:unverified]
+
+### Errors
+
+Original missing archive rechecks now pass bounds16/0, challenge1/0, rule1/0. Device/planner missing inputs were separately diagnosed and are being restored; original gate remains a failed attempt until terminal. [pcc:unverified]
+
+## 2026-11-05T20:15:54.813468+00:00 — failed full gate closed and final-source validation consolidated
+
+### What was done
+
+Original full gate62871 exited101:6061passed,18failed,130ignored,1317.12seconds. Retained full log, binary hash and result receipt. Sixteen failures were missing tracked inputs and two were the policy omission. All affected fixture groups passed their rechecks; four focused policy tests passed. Copied verified runtime fixtures and complete repair evidence to this collector checkout. [pcc:unverified]
+
+### Decisions made
+
+Consolidate publication and the next complete gate on the latest collector source, which includes the policy fix, explicit Autolab routes and corrected shared input-validation accounting. Supersedes the earlier plan to rebuild the older workload checkpoint separately. This avoids an extra full compile/test cycle while still requiring a complete successful final-source gate before push. [pcc:unverified]
+
+### Open threads
+
+Native test build56577 remains active; after focused dispatch and all Autolab tests pass, run full-library gate against this same source. Commit and publish the final integrated branch only after required checks. [pcc:unverified]
+
+### Errors
+
+All18 first-gate failures preserved; none silently discarded or reclassified as a successful gate. [pcc:unverified]
+
+## 2026-11-07T00:16:39.343674+00:00 — interrupted native validation reconciled
+
+### What was done
+
+Old session56577 is absent, its /tmp log and build cache are absent, and no matching compiler/test process survives. All six saved source hashes match. Conductor scopes clear. Current rustc1.99.1 matches the retained candidate receipt. Restored executable modes on two unchanged GPU fixture scripts that the earlier byte-copy hydration had stripped. [pcc:unverified]
+
+### Decisions made
+
+Treat the prior native outcome as unknown, not passed or failed. Retry the same native test command once with two build jobs, two test threads and2400second limit. Write the log and terminal receipt durably under collector-integration. [pcc:unverified]
+
+### Open threads
+
+Actual dispatch/routing tests, full final-source library gate, publication and bounded Autolab execution. No cloud submission resumed. [pcc:unverified]
+
+### Errors
+
+Temporary native evidence was lost across interruption; source and prior check/failed-gate evidence survived. [pcc:unverified]
+
+## 2026-11-07T00:19:01.454917+00:00 — censored reference means audited
+
+### What was done
+
+Read band.rs and Autolab selection/assessment/ratchet paths. Band means are over verified records; Autolab currently extracts rho means without checking verified==runs, and stores rho_s as a required array. A partially failed reference can therefore supply a numeric distance. [pcc:unverified]
+
+### Decisions made
+
+Prepare a complete-reference mean/ratio helper and regression outside the registered build graph. Once the fixed-source build completes, integrate it in ic_autolab only: suppress censored reference distances, use optional rho_s for a verified IC improvement with unavailable reference, and preserve legacy array serialization through Some. IC-versus-incumbent improvement remains a separate decision. [pcc:unverified]
+
+### Open threads
+
+Native retry22786 is active; source snapshot unchanged. Integrate this reporting fix after the current native build completes, then run all Autolab tests. [pcc:unverified]
+
+### Errors
+
+New source audit finding is partial-reference means leaking into distance reporting; no existing scientific record is rewritten. [pcc:unverified]
+
+## 2026-11-07T00:22:05.356636+00:00 — complete-reference guard prepared and checked
+
+### What was done
+
+Unregistered helper suite passed4/0; extended native harness with exact candidate serde definitions passed5/0. Prepared integration.patch and full ic_autolab_candidate.rs with optional rho_s, complete means for selection/assessment, unavailable distances for censored references, and unchanged legacy populated-array encoding. Receipts and hashes are durable under next-integration/complete-reference. [pcc:unverified]
+
+### Decisions made
+
+Keep the active native source snapshot unchanged until its build completes. Apply the prepared bin-only patch afterward, then run all Autolab tests before the final library gate and publication. [pcc:unverified]
+
+### Open threads
+
+Native validation retry22786 remains live; durable log collector-integration/native-tests-attempt2.log, terminal receipt native-tests-attempt2-exit.json will be written by the command. It uses two build jobs, two test threads,2400second timeout and scratch target /tmp/curve25519-collector-target. No result from the interrupted prior attempt is assumed. [pcc:unverified]
+
+### Errors
+
+No new native candidate failures. The censored-reference reporting omission is prepared for repair, not yet changed in registered source. [pcc:unverified]
+
+## 2026-11-07T00:26:36.222269+00:00 — migration reconciliation and bounded validation continuation
+
+### What was done
+
+Read approved handoff and managed Diem status: deadline expired, 50/52 durable, service inactive. EKS overview returned four succeeded, six failed and one suspended job. Native attempt2 has no terminal receipt and no surviving Cargo/rustc process. All six frozen source hashes match; Conductor scopes clear; partial scratch cache survives. [pcc:unverified]
+
+### Decisions made
+
+Preserve interrupted attempt2 log and unknown result. Resume the same test command with surviving cache, two build jobs and two test threads, deadline no later than 2026-11-07T00:56:39Z (original start record plus 2400 seconds). No Diem or EKS launch; no source patch during validation. [pcc:unverified]
+
+### Open threads
+
+Native validation, all Autolab tests, final library gate and publication. Waiting-freeze saved artifacts still being reconciled; no followup launched.
+
+### Errors
+
+Migration interrupted native validation before its terminal receipt. EKS overview configured pool values are not live enforcement evidence.
+
+## 2026-11-07T00:33:54.413225+00:00 — cloud admission readback while native validation runs
+
+### What was done
+
+Confirmed native session23929 live. Read EKS skill and cost runbook. Configured spot-job-submitter context fails credential acquisition with sts:AssumeRole denial. AWS Budgets reports daily209.32/200USD and monthly858.412/1000USD. Saved cloud-admission-20261107.json. [pcc:unverified]
+
+### Decisions made
+
+No new cloud build/job: live caps unavailable and daily snapshot exceeds ceiling; reservations and current remaining funds are not established. Continue existing local validation within its original deadline.
+
+### Open threads
+
+Native test result, pending reporting integration and final-source gate; cloud admission needs changed authoritative budget/access evidence before submission.
+
+### Errors
+
+Configured launcher role assumption denied. No broader credentials, alternate pool or privileged workaround attempted.
+
+## 2026-11-07T00:38:14.434836+00:00 — prepare ledger transition regression
+
+### What was done
+
+Read actual cmd_ratchet and existing fixture helpers. Native session23929 remains live. Conductor study scope clear.
+
+### Decisions made
+
+Add a filesystem-backed regression to candidate-v2 outside registered source: verified IC improvement with missing rho must update incumbent, preserve failed-reference counts, leave rho_s absent and reject a duplicate ratchet. Preserve the earlier candidate and receipts unchanged.
+
+### Open threads
+
+Compile and execute this regression after frozen native check terminates; no pass claimed yet.
+
+### Errors
+
+None.
+
+## 2026-11-07T00:45:12.718267+00:00 — frozen native check passed; integrate reporting guard
+
+### What was done
+
+Session23929 terminal exit0 at00:44:49UTC: library35passed/0failed/1ignored, filtered Autolab1passed/0failed. Build18m13; library tests0.13s. Both registered pair-dispatch tests and bounded rho replay pass. Conductor scopes clear and candidate/source hashes match receipt-v2. [pcc:unverified]
+
+### Decisions made
+
+Apply complete-reference candidate-v2 to ic_autolab only. Run all Autolab tests with two build/test threads and900second cap, retaining durable log/exit receipt. Then run final-source full library gate before publication.
+
+### Open threads
+
+All Autolab regression results, full-library gate and publication. Cloud admission remains unavailable per saved readback.
+
+### Errors
+
+None in this terminal check. Earlier interrupted and failed attempts preserved.
+
+## 2026-11-07T00:45:53.991449+00:00 — complete Autolab suite passed; final library gate
+
+### What was done
+
+Integrated candidate-v2 and ran all Autolab tests:22passed,0failed,0ignored; build9.04s; exit0. New actual ledger-transition regression and full-width routing regression pass. Whitespace check passed. Final source hashes saved. [pcc:unverified]
+
+### Decisions made
+
+Run required cargo test --release --lib with cached artifacts, two build/test threads and2400second timeout. Retain full log and terminal exit receipt under collector-integration. No cloud launch.
+
+### Open threads
+
+Full final-source library gate, commit/publication, then authorized cloud admission and bounded Autolab execution.
+
+### Errors
+
+No failures in Autolab suite. Prior full-gate failure remains preserved as an earlier attempt.
+
+## 2026-11-07T00:47:15.144464+00:00 — final gate exposed missing host C++ compiler
+
+### What was done
+
+Full library session76100 remains live and reports five device-emulator failures. One exact failing test reproduced exit101: Command::new(CXX or c++).output at device_tests.rs:40 returns ENOENT. c++,g++,clang++ absent from PATH. Emulator tracked source exists. [pcc:unverified]
+
+### Decisions made
+
+Restore the missing host development dependency; preserve failed gate and verify affected tests before final full rerun. No source assertion or test skip changed.
+
+### Open threads
+
+Original full gate terminal result, compiler restoration and rechecks.
+
+### Errors
+
+Spot host lacks the C++ compiler used by CPU device-source emulation tests.
+
+## 2026-11-07T00:48:51.170530+00:00 — restored compiler and clean full gate
+
+### What was done
+
+Installed gcc-c++ and libstdc++-devel11.5.0-5.amzn2023.0.5. All6 device-emulator tests pass with unchanged source. Saved package identity and recheck log. Original full gate already had5 missing-compiler failures; stopped its exact timeout owner to avoid completing a known-failed duplicate pass. Wrapper wrote exit-15; no matching library-test process survives. Final source hashes still match. [pcc:unverified]
+
+### Decisions made
+
+Run one clean full-library gate with the same source, two test threads and2400second limit. Preserve previous incomplete failed gate as such; no pass inferred from isolated recheck.
+
+### Open threads
+
+Clean full-library result and publication.
+
+### Errors
+
+Five environmental failures retained in final-library-tests.log; deliberate termination recorded separately in exit receipt.
+
+## 2026-11-07T00:50:24.386430+00:00 — scoped delivery notes prepared
+
+### What was done
+
+Prepared collector-integration/DELIVERY.md covering exact workloads, bounded adapters, explicit routing, complete-reference reporting, checked test counts and preserved failures. Full gate54355 remains live; its result is explicitly pending. [pcc:unverified]
+
+### Decisions made
+
+Keep implementation validation separate from comparative experiment and signed scientific standing. Publish after full gate.
+
+### Open threads
+
+Final gate, publication, cloud admission, comparative execution.
+
+### Errors
+
+No new test failure observed so far in the clean run.
+
+## 2026-11-07T00:53:36.995430+00:00 — publication base refreshed while full gate runs
+
+### What was done
+
+GitHub search returned no PR for collector branch. Fetched origin/main a98b62d70aac5a8070ae0c042d97d7884140149c without changing checked-out source. Saved publication-readiness-20261107.json. Full gate54355 remains live; latest output is long-running pkm_semaev tests, with no failure reported so far. [pcc:unverified]
+
+### Decisions made
+
+Wait for terminal gate before source publication; assess actual PR/base compatibility against refreshed main afterward.
+
+### Open threads
+
+Final complete gate, commit/push/PR and current-head checks.
+
+### Errors
+
+No new failure observed.
+
+## 2026-11-07T01:02:04.936181+00:00 — signed-pair coverage derivation
+
+### What was done
+
+Read registered collector, exact sampler, relation-system admission/recovery, prior pair candidate notes, and Sutherland18.783 Lecture10 pp1-3. Gaudry primary PDF retrieval failed; no theorem from it is used. Derived elementary finite sumset bound, with uniform-draw assumption separately stated. [pcc:unverified]
+
+### Decisions made
+
+Record a proof and native finite identity checks outside the active build graph. The current128-point,1M-probe cap gives a per-target hit upper bound below2^-217 under the ideal digest/uniform-target model. This is an analytic bound, not a benchmark or a claim about chosen correctness fixtures. Prioritize changed relation generation over a larger capped random-pair run. [pcc:unverified]
+
+### Open threads
+
+Native bound checker and next useful relation construction; full-library gate54355 remains live.
+
+### Errors
+
+Eprint PDF inaccessible; CiteSeer mirror403. Accessible lecture used only for relation-yield versus linear-algebra context, not as proof of this source-specific bound.
+
+## 2026-11-07T01:03:15.905599+00:00 — pair coverage bound checked and research direction sharpened
+
+### What was done
+
+Native std-only checker returned0 on297 signed bases, all small-group translation maps, and exact32769000000<2^35 arithmetic. Saved proof, source, stdout, compiler/binary hashes and scope under next-integration/pair-coverage. Full library54355 remains live; log reached Klein-four tests with no failure reported. [pcc:unverified]
+
+### Decisions made
+
+The modeled per-target hit upper bound below2^-217 at current caps makes simple cap scaling uninformative for full-size recovery. Retain checked baseline; next mechanism must broaden decomposable-point coverage per affordable probe and retain public-input relation verification. This analytical finding does not change frozen samples or authorize a new cloud attempt. [pcc:unverified]
+
+### Open threads
+
+Full library result and publication; broader decomposition construction remains research work.
+
+### Errors
+
+None in native bound check. Probability result is model-dependent and finite checks are not proof of SHA256 randomness.
+
+## 2026-11-07T01:04:47.411828+00:00 — examine multisum coverage before implementing a wider collector
+
+### What was done
+
+Read prior generic-track obstruction and structure notes, current pair-bound proof and retained full-library output. The full gate remains live.
+
+### Decisions made
+
+Compute exact counts of signed coefficient vectors reachable by m summands with repetitions, using a native BigUint recurrence. This bounds possible coverage without assuming distinct group sums and separates coverage from decomposition cost. No trial, benchmark or new method registration.
+
+### Open threads
+
+Exact count threshold and split-list sizes, then identify a tractable decomposition construction.
+
+### Errors
+
+None.
+
+## 2026-11-07T01:05:54.567584+00:00 — exact multisum envelope retained
+
+### What was done
+
+Computed signed coefficient counts via native BigUint recurrence; closed-form and pair checks pass. ForB128,T1M the loose coverage upper bound first reaches1 at m72; direct36+36 coefficient lists have1688048373042070153619500350584701786778992641 entries each. Source, exact outputs, hashes and proof scope retained in pair-coverage/MULTISUM.md. [pcc:unverified]
+
+### Decisions made
+
+Investigate compressed/algebraic decomposition, not direct enumeration at higher summand count. This envelope is neither a successful recovery prediction nor a lower bound on arbitrary algorithms.
+
+### Open threads
+
+Full-library gate54355; publication; tractable exact decomposition oracle.
+
+### Errors
+
+No native calculation failures.
+
+## 2026-11-07T01:11:04.902970+00:00 — final library gate passed
+
+### What was done
+
+Session54355 exited0. Complete library gate6086passed,0failed,130ignored,0filtered,1285.60seconds. All final source hashes still match. Saved final-validation.json with log/receipt hashes and byte counts; updated delivery notes. [pcc:unverified]
+
+### Decisions made
+
+Commit and publish scoped implementation, native checks, analytical coverage bounds and preserved failure evidence. No cloud trial is represented as completed; current-head PR checks remain required.
+
+### Open threads
+
+Commit/push/regular PR, current-head review/CI, broader exact decomposition construction and cloud admission.
+
+### Errors
+
+No failures in clean complete gate. Earlier incomplete failed attempt and compiler restoration evidence preserved.

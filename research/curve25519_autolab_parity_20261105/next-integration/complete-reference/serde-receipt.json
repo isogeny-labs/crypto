@@ -1,0 +1,30 @@
+{
+  "build_exit": 0,
+  "test_exit": 0,
+  "argv": [
+    "rustc",
+    "--edition=2021",
+    "--test",
+    "research/curve25519_autolab_parity_20261105/next-integration/complete-reference/serde-harness.rs",
+    "-L",
+    "dependency=/tmp/curve25519-collector-target/release/deps",
+    "-o",
+    "/tmp/curve25519-complete-reference-serde-tests",
+    "--extern",
+    "serde=/tmp/curve25519-collector-target/release/deps/libserde-0bf82e85196bd177.rlib",
+    "--extern",
+    "serde_json=/tmp/curve25519-collector-target/release/deps/libserde_json-458049281485fb75.rlib"
+  ],
+  "dependencies": {
+    "serde": {
+      "path": "/tmp/curve25519-collector-target/release/deps/libserde-0bf82e85196bd177.rlib",
+      "sha256": "23af8409249c26eaf525666f14063f1ccd5d0e01e257b4ee2890d9f004a06bee"
+    },
+    "serde_json": {
+      "path": "/tmp/curve25519-collector-target/release/deps/libserde_json-458049281485fb75.rlib",
+      "sha256": "c13af47bae0dc5d64e23d14a9331cca174df1110d4945ebafd2e32447b185872"
+    }
+  },
+  "harness_sha256": "33275cb56453105658f6f5a3b9c19672176bf56a01471fecc4a97303ab5f2df1",
+  "scope": "standalone helpers plus exact candidate ArmConfig/Incumbent definitions"
+}
