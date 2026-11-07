@@ -97,3 +97,29 @@ Tr(yu) = Tr_k(y · Tr_{Q⁴/Q}(u)) = 0. Hence:
 - **Not claimed:** any ECDLP cost, or anything about ECC2K-130 beyond the
   degree argument: N = 131 is prime, so K ∈ {F_2, F_{2^131}} and no subfield
   trap exists.
+
+## Amendment 1 (2026-11-07, before any computation): the trap condition
+
+T1 as frozen gives the trap condition as "2[K:F_2] divides N and is less
+than N". That is incomplete. A point with x ∈ K that lies on E(F_{2^N}) has
+y ∈ K₂ ∩ F_{2^N}:
+- this intersection is K₂ when 2[K:F_2] divides N;
+- it is K itself when N/[K:F_2] is odd.
+
+So FB ⊆ E(K*), with K* = K₂ ∩ F_{2^N}. The corrected condition: **trap if
+and only if [K:F_2] < N and 2[K:F_2] ≠ N.**
+
+In the borderline case 2[K:F_2] = N, FB still lies in
+H_K = E(K) + ker(σ_K + 1), the subgroup of index 2 in E(F_{2^N}). When
+Tr(a) = 0, every point of H_K has Tr(x) = 0, so H_K ⊆ 2E. Both subgroups have
+index 2, so H_K = 2E. This is the T2 case and is benign.
+
+P4 uses the corrected condition. Consequences:
+- For odd N (Oakley, N = 155 and 185), K ⊋ F_q gives K = F_{2^N}, so there
+  is no trap.
+- For c2pnb, [K:F_2] ∈ {4k, 8k, 16k}, and a trap occurs only at 4k (u, a and
+  b in F_16); the prediction is unchanged.
+- For C1, [K:F_2] ∈ {k, 2k, 4k}, and a trap occurs only at k.
+- A0 `tw_b` has u ∈ F_16. If deg u = 2, then [K:F_2] = 2k = N/2, so its FB
+  lies in H_K = 2E. P1's statement "some FB point lies outside E(F_{Q²})" still
+  holds, and P3 covers its zeros.
