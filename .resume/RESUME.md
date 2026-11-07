@@ -1,31 +1,38 @@
-# Resume: crypto @ claude/dreg-lfd-theory-scaling
+# Resume: crypto @ aburan28/wizardly-einstein-i9seky
 
 ## Goal
-User request (2026-11-05): find ways to reduce the degree of regularity / total solve time of the
-descended Semaev system. Three phases, chosen by the user: (1) theory and scaling survey, done
-(PR #3512); (2) the l = 9 guess-saturation test; (3) a multilinear closure engine prototype.
+User request (2026-11-07): bring each ECDLP method's measured cost to what its
+algorithm predicts (rho/BSGS/kangaroo constants vs sqrt(pi r/2A), index-calculus
+exponent vs its family's theory) and keep iterating until they match.
 
 ## Lead / hypothesis
-LEAD-ICE-descent-closure-degree-at-scale / LEAD-ICE-hybrid-guess-determine-l7. The recorded k*
-(guesses that hold degree 4) is 0, 1-2 and 4 at l = 6, 7 and 8. K_marginal predicts 7 at l = 9.
-Saturation (k* <= 5) would revive the guess route.
+Rho's gap to sqrt(pi/2A) at r = 2^18..2^28 is set-up and r-adding excess of a
+4-16 jump table built by joint double-and-add. rho.negation_v3 / rho.plain_v3
+(commit 1d03f077eb) build the table from shared ladders (2 additions a jump)
+with k ~ sqrt(F/2) jumps. Local diagnostic (examples/rho_v3_diag.rs, 2000-30000
+runs/size): v3 S/floor 1.33 / 1.26 / 1.15 / 1.09 / 1.08 / 1.05 at 2^17.7..2^28
+against legacy 1.63 / 1.53 / 1.35 / 1.20 / 1.14 / 1.11.
+Second lead: ic.pipeline with fixed B = 32 has theoretical alpha = 1 (measured
+1.005); B ~ r^(1/3) should give alpha = 2/3 (no size=auto yet).
 
 ## Spec
-research/dreg_guess_scaling_20261106/PREREGISTRATION.md (frozen at commit 37129b4253).
+research/ecbench_rho_v3_ladder_20261107/spec.json (interleaved, A/A of v2).
 
 ## State
-Gate A passed. The 4 positive controls refute at degree 4. Whole-summand runs: l = 7 and 8 done; l = 9 has 14 of 16 done, all degree 4 for nonzero x1. S5.d1.b0 refutes at degree 4 (a surprise against K_marginal). The remaining 129 branches are moving to a RunPod pod (PREREGISTRATION Amendment 1, owner chose the cloud route; $30 cap).
+Code committed; legacy ids replay bit-for-bit (288/288 of the 2026-10-06
+prime-toy session). Local L0 session next (no AWS identity in this container,
+so the isolab-eks receipts could not be read back).
 
 ## Next steps
-1. Launch: research/koblitz_ic_leads_build_20261024/pod/upload_launch.py run --name dreg-s5-l9 --vcpu 64 --flavors cpu3g --disk 40 --max-seconds 18000 <the 4 input files>, then push them.
-2. Fetch https://<pod>-8000.proxy.runpod.net/runs/ when STATUS reads ALLDONE; copy the records into runs/; stop the pod.
-3. Score both preregistrations, then write RESULTS, the graph and the PDF, the session log, and update PR #3512.
+1. Run the spec locally, verify --replay-all, table, bound fit for v3.
+2. Report + graph + PDF, benchmarks/ entry, benchrec record, PR.
+3. IC: add factor-base size=auto (B = c r^(1/3)) and measure alpha.
 
 ## Runs in flight
-RunPod pod dreg-s5-l9 (id recorded in runs/queue.log once created).
+None.
 
 ## Stop and success conditions
-About 12 h of container time at most. The decision rule is in the PREREGISTRATION.
+v3 search phase within ~2-3 % of sqrt(pi r/2A) and total S/floor -> 1 as r grows.
 
 ## Open questions
-Whether pe_closure fits about 196k columns in 15 GB.
+EKS/L2 confirmation needs an AWS identity (not in this container).

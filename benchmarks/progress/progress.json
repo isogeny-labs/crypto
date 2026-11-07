@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261106T0514Z-rho-frob-brent",
+  "latest_record": "20261107T0825Z-rho-v6",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
-    "censored": 3,
-    "invalid": 0,
-    "measured": 47,
+    "censored": 4,
+    "invalid": 1,
+    "measured": 54,
     "open": 0
   },
   "repo": "crypto",
@@ -418,6 +418,485 @@
       ],
       "problem": "dlpwai:static-dh-p224-shape",
       "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.459,
+      "latest": 0.459,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_frob_v3_over_v2_ops",
+      "points": [
+        {
+          "commit": "3592f4a17261",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 864,
+          "record": "20261107T0710Z-rho-v3-frobenius",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.418,
+            0.504
+          ],
+          "summary": "rho.signed_frobenius_v3 vs v2 on Koblitz 2^15.4..2^32.1, local L0, counted GAE: paired ops 0.459 [0.418,0.504], band-robust; medium tier 1.076x floor [0.998,1.147] (v2 1.249x); search phase 1.03-1.04x floor from 2^21. Replay-all 2592/2592. Not validated.",
+          "value": 0.459
+        }
+      ],
+      "problem": "ecdlp:koblitz-ladder",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.142,
+      "latest": 0.142,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_frob_v3_s_k43",
+      "points": [
+        {
+          "commit": "3592f4a17261",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 144,
+          "record": "20261107T0710Z-rho-v3-frobenius",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "rho.signed_frobenius_v3 vs v2 on Koblitz 2^15.4..2^32.1, local L0, counted GAE: paired ops 0.459 [0.418,0.504], band-robust; medium tier 1.076x floor [0.998,1.147] (v2 1.249x); search phase 1.03-1.04x floor from 2^21. Replay-all 2592/2592. Not validated.",
+          "value": 0.142
+        }
+      ],
+      "problem": "ecdlp:koblitz-ladder",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.9685,
+      "latest": 0.9685,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_frob_v4_over_v3_ops",
+      "points": [
+        {
+          "commit": "9783af14d6d0",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 1728,
+          "record": "20261107T0753Z-rho-v5",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.943,
+            0.994
+          ],
+          "summary": "Two-rung jumps, local L0: rho.negation_v5/v3 0.972 [0.945,0.999]; plain_v5/v3 0.963 [0.938,0.988]; signed_frobenius_v4/v3 0.969 [0.943,0.994] (toy tier); order holds across the band. Replay-all clean. Not validated.",
+          "value": 0.9685
+        }
+      ],
+      "problem": "ecdlp:prime-and-koblitz-ladder",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9428,
+      "latest": 0.9428,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_frob_v5_over_v4_ops",
+      "points": [
+        {
+          "commit": "f28781939def",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 1728,
+          "record": "20261107T0825Z-rho-v6",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.921,
+            0.965
+          ],
+          "summary": "G-only jumps, local L0: rho.negation_v6/v5 0.987 [0.960,1.014] unresolved; plain 0.979 unresolved; signed_frobenius_v5/v4 0.943 [0.921,0.965] on toy Koblitz curves only (summed GAE 1.007). Replay-all clean.",
+          "value": 0.9428
+        }
+      ],
+      "problem": "ecdlp:prime-and-koblitz-ladder",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9718,
+      "latest": 0.9718,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_negation_v5_over_v3_ops",
+      "points": [
+        {
+          "commit": "9783af14d6d0",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 2304,
+          "record": "20261107T0753Z-rho-v5",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.945,
+            0.999
+          ],
+          "summary": "Two-rung jumps, local L0: rho.negation_v5/v3 0.972 [0.945,0.999]; plain_v5/v3 0.963 [0.938,0.988]; signed_frobenius_v4/v3 0.969 [0.943,0.994] (toy tier); order holds across the band. Replay-all clean. Not validated.",
+          "value": 0.9718
+        }
+      ],
+      "problem": "ecdlp:prime-and-koblitz-ladder",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9867,
+      "latest": 0.9867,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_negation_v6_over_v5_ops",
+      "points": [
+        {
+          "commit": "f28781939def",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 2304,
+          "record": "20261107T0825Z-rho-v6",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.96,
+            1.014
+          ],
+          "summary": "G-only jumps, local L0: rho.negation_v6/v5 0.987 [0.960,1.014] unresolved; plain 0.979 unresolved; signed_frobenius_v5/v4 0.943 [0.921,0.965] on toy Koblitz curves only (summed GAE 1.007). Replay-all clean.",
+          "value": 0.9867
+        }
+      ],
+      "problem": "ecdlp:prime-and-koblitz-ladder",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.2469,
+      "latest": 0.2469,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ic_auto_over_b32_ops",
+      "points": [
+        {
+          "commit": "c047182e274e",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 288,
+          "record": "20261107T0640Z-ic-auto-base",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.207,
+            0.295
+          ],
+          "summary": "ic.pipeline prime-abscissa size=auto (B=0.5 r^(1/3)) vs fixed B=32, MITM pair table, prime 2^17.7..2^28, local L0, counted GAE: paired ops 0.247 [0.207,0.295], band-robust; alpha 0.908 [0.828,0.989] -> 0.598 [0.564,0.631] (theory 2/3); 12.8x matched rho.negation_v3. Audit replay-all 1440/1440. Not validated.",
+          "value": 0.2469
+        }
+      ],
+      "problem": "ecdlp:prime-ladder-18-28",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 12.7982,
+      "latest": 12.7982,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ic_auto_over_rho_v3_ops",
+      "points": [
+        {
+          "commit": "c047182e274e",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 288,
+          "record": "20261107T0640Z-ic-auto-base",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            11.707,
+            13.992
+          ],
+          "summary": "ic.pipeline prime-abscissa size=auto (B=0.5 r^(1/3)) vs fixed B=32, MITM pair table, prime 2^17.7..2^28, local L0, counted GAE: paired ops 0.247 [0.207,0.295], band-robust; alpha 0.908 [0.828,0.989] -> 0.598 [0.564,0.631] (theory 2/3); 12.8x matched rho.negation_v3. Audit replay-all 1440/1440. Not validated.",
+          "value": 12.7982
+        }
+      ],
+      "problem": "ecdlp:prime-ladder-18-28",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 19.188,
+      "latest": 19.188,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 20.993435
+      },
+      "metric": "ic_auto_s_r28",
+      "points": [
+        {
+          "commit": "c047182e274e",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 20.993435
+          },
+          "n": 48,
+          "record": "20261107T0640Z-ic-auto-base",
+          "reference": 0.914,
+          "reference_kind": "matched_rho",
+          "spread": [
+            17.92,
+            20.25
+          ],
+          "summary": "ic.pipeline prime-abscissa size=auto (B=0.5 r^(1/3)) vs fixed B=32, MITM pair table, prime 2^17.7..2^28, local L0, counted GAE: paired ops 0.247 [0.207,0.295], band-robust; alpha 0.908 [0.828,0.989] -> 0.598 [0.564,0.631] (theory 2/3); 12.8x matched rho.negation_v3. Audit replay-all 1440/1440. Not validated.",
+          "value": 19.188
+        }
+      ],
+      "problem": "ecdlp:prime-ladder-18-28",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.8643,
+      "latest": 0.8643,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_negation_v3_over_v2_ops",
+      "points": [
+        {
+          "commit": "c047182e274e",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 1152,
+          "record": "20261107T0639Z-rho-v3-ladder-fixed",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.832,
+            0.898
+          ],
+          "summary": "rho.negation_v3 (ladder-built jump table, k~sqrt(F/2)) vs rho.negation_v2 on prime 2^17.7..2^28, local L0, counted GAE: paired ops 0.864 [0.832,0.898], band-robust; v3 S/theory 1.30 at 2^17.7 to 1.04 at 2^24 and 2^28; search phase 1.00-1.03x theory at >=2^24. Audit replay-all 5760/5760. Not validated (no L2, no validator).",
+          "value": 0.8643
+        }
+      ],
+      "problem": "ecdlp:prime-ladder-18-28",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.923,
+      "latest": 0.923,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_negation_v3_s_r24",
+      "points": [
+        {
+          "commit": "c047182e274e",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 192,
+          "record": "20261107T0639Z-rho-v3-ladder-fixed",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.841,
+            1.007
+          ],
+          "summary": "rho.negation_v3 (ladder-built jump table, k~sqrt(F/2)) vs rho.negation_v2 on prime 2^17.7..2^28, local L0, counted GAE: paired ops 0.864 [0.832,0.898], band-robust; v3 S/theory 1.30 at 2^17.7 to 1.04 at 2^24 and 2^28; search phase 1.00-1.03x theory at >=2^24. Audit replay-all 5760/5760. Not validated (no L2, no validator).",
+          "value": 0.923
+        }
+      ],
+      "problem": "ecdlp:prime-ladder-18-28",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.923,
+      "latest": 0.923,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_negation_v3_s_r28",
+      "points": [
+        {
+          "commit": "c047182e274e",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 192,
+          "record": "20261107T0639Z-rho-v3-ladder-fixed",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.83,
+            1.017
+          ],
+          "summary": "rho.negation_v3 (ladder-built jump table, k~sqrt(F/2)) vs rho.negation_v2 on prime 2^17.7..2^28, local L0, counted GAE: paired ops 0.864 [0.832,0.898], band-robust; v3 S/theory 1.30 at 2^17.7 to 1.04 at 2^24 and 2^28; search phase 1.00-1.03x theory at >=2^24. Audit replay-all 5760/5760. Not validated (no L2, no validator).",
+          "value": 0.923
+        }
+      ],
+      "problem": "ecdlp:prime-ladder-18-28",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.9802,
+      "latest": 0.9802,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_negation_v4_over_v3_ops",
+      "points": [
+        {
+          "commit": "db068f17a560",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 1152,
+          "record": "20261107T0722Z-rho-v4-prime",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.956,
+            1.005
+          ],
+          "summary": "rho.negation_v4 vs v3 on prime 2^17.7..2^28, local L0: pooled ops 0.980 [0.956,1.005], unresolved; ladder-read check saves 2% at 2^17.7 (deterministic); v4 0.995x theory at 2^28. Not validated.",
+          "value": 0.9802
+        }
+      ],
+      "problem": "ecdlp:prime-ladder-18-28",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9391,
+      "latest": 0.9391,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_plain_v3_over_plain_ops",
+      "points": [
+        {
+          "commit": "c047182e274e",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 1152,
+          "record": "20261107T0639Z-rho-v3-ladder-fixed",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.901,
+            0.979
+          ],
+          "summary": "rho.negation_v3 (ladder-built jump table, k~sqrt(F/2)) vs rho.negation_v2 on prime 2^17.7..2^28, local L0, counted GAE: paired ops 0.864 [0.832,0.898], band-robust; v3 S/theory 1.30 at 2^17.7 to 1.04 at 2^24 and 2^28; search phase 1.00-1.03x theory at >=2^24. Audit replay-all 5760/5760. Not validated (no L2, no validator).",
+          "value": 0.9391
+        }
+      ],
+      "problem": "ecdlp:prime-ladder-18-28",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.998,
+      "latest": 0.998,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ic_auto_over_tuned_p20_w0",
+      "points": [
+        {
+          "commit": "553a4c2aeb36",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 96,
+          "record": "20261107T0738Z-ic-auto-vs-tuned",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.987,
+            1.01
+          ],
+          "summary": "ic size=auto vs tuned N baseline (45/162/407) on the prime_base study holdout curves, local L0: equal at 20 bits; at 24/28 cheaper at w=0 (0.914, 0.885) but costlier at w=1 (1.153, 1.107): band-order flips, not an improvement.",
+          "value": 0.998
+        }
+      ],
+      "problem": "ecdlp:prime-ladder-20-28",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.8848,
+      "latest": 0.8848,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ic_auto_over_tuned_p28_w0",
+      "points": [
+        {
+          "commit": "553a4c2aeb36",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 96,
+          "record": "20261107T0738Z-ic-auto-vs-tuned",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.86,
+            0.91
+          ],
+          "summary": "ic size=auto vs tuned N baseline (45/162/407) on the prime_base study holdout curves, local L0: equal at 20 bits; at 24/28 cheaper at w=0 (0.914, 0.885) but costlier at w=1 (1.153, 1.107): band-order flips, not an improvement.",
+          "value": 0.8848
+        }
+      ],
+      "problem": "ecdlp:prime-ladder-20-28",
+      "unit": "ratio"
     },
     {
       "better": "lower",
