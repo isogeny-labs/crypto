@@ -1,0 +1,145 @@
+{
+  "branch": "claude/curve25519-index-calculus-i674j4",
+  "closed_utc": "2026-11-07T19:59:13+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/curve25519_f1_walk_20261107/scripts/run_sessions.sh",
+        "24"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-07T19:47:09+00:00",
+      "wall_s": 51.487
+    }
+  ],
+  "commit": "a2be660914e8e485eefd45f2958eb6d18344dadf",
+  "commit_dirty": true,
+  "created_utc": "2026-11-07T19:47:09+00:00",
+  "curve_uid": null,
+  "entries": [
+    "benchmarks/20261107-curve25519-f1-walk"
+  ],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39"
+  },
+  "id": "20261107T1947Z-curve25519-f1-walk-k24",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 8,
+      "name": "ratio_f2_over_f1_w0",
+      "note": "S(F=2 incumbent)/S(F=1 x=0.7), pooled 8 sessions, 95% CI, w=0",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.1094,
+        1.2204
+      ],
+      "unit": "ratio",
+      "value": 1.1636
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 8,
+      "name": "ratio_f2_over_f1_w01",
+      "note": "S(F=2 incumbent)/S(F=1 x=0.7), pooled 8 sessions, 95% CI, w=0.1",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.0915,
+        1.2063
+      ],
+      "unit": "ratio",
+      "value": 1.1475
+    },
+    {
+      "baseline": null,
+      "better": "higher",
+      "n": 8,
+      "name": "ratio_f2_over_f1_w1",
+      "note": "S(F=2 incumbent)/S(F=1 x=0.7), pooled 8 sessions, 95% CI, w=1",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.9694,
+        1.1124
+      ],
+      "unit": "ratio",
+      "value": 1.0384
+    },
+    {
+      "baseline": 2.1341,
+      "better": "lower",
+      "n": 512,
+      "name": "s_f1_x07_w0",
+      "note": "F=1 wwalk x=0.7 mean S at w=0; baseline F=2 incumbent; 8 single-target sessions x 64 rounds",
+      "reference": 1.1607,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 1.8341
+    },
+    {
+      "baseline": 2.1739,
+      "better": "lower",
+      "n": 512,
+      "name": "s_f1_x07_w01",
+      "note": "F=1 wwalk x=0.7 mean S at w=0.1; baseline F=2 incumbent; 8 single-target sessions x 64 rounds",
+      "reference": 1.2651,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 1.8945
+    },
+    {
+      "baseline": 2.532,
+      "better": "lower",
+      "n": 512,
+      "name": "s_f1_x07_w1",
+      "note": "F=1 wwalk x=0.7 mean S at w=1; baseline F=2 incumbent; 8 single-target sessions x 64 rounds",
+      "reference": 2.205,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 2.4383
+    }
+  ],
+  "problem": "ic:curve25519-k24-single-target",
+  "raw": [
+    {
+      "bytes": 2030041,
+      "path": "research/curve25519_f1_walk_20261107/data/sessions-k24-records.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ca/ca22cd0da83a303b1cd932227ba6b87433102f0ba6877e8d78495f06488c4b56",
+      "sha256": "ca22cd0da83a303b1cd932227ba6b87433102f0ba6877e8d78495f06488c4b56",
+      "uploaded": false
+    },
+    {
+      "bytes": 15522,
+      "path": "research/curve25519_f1_walk_20261107/data/pooled.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/d1/d1af6320b1ab841b6aee92a7696e207fd9a1575b535eabe72cf97f55a27a6208",
+      "sha256": "d1af6320b1ab841b6aee92a7696e207fd9a1575b535eabe72cf97f55a27a6208",
+      "uploaded": false
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "benchmarks/20261107-curve25519-f1-walk/report.pdf",
+    "png": [],
+    "svg": [
+      "benchmarks/20261107-curve25519-f1-walk/ratio_to_rho.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "curve25519-f1-walk-k24",
+  "status": "measured",
+  "summary": "k=24 single-target: F=1 wwalk (1-seed base, x=0.7) vs F=2 incumbent and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_walk_20261107/README.md",
+  "validation": null
+}

@@ -2546,7 +2546,10 @@ impl<G: CountedGroup> DecompositionOracle<G> for WSumOracle<G::Elt> {
 /// Parameters: `x` (table size in units of `√r`, in `(0, 4]`), `jumps`
 /// (default 16, 2 to 64), `grow` (1: extend the walk, charged, until the
 /// first verified free row, capped at `2·T` entries; default 0), `seed`
-/// (default 0, mixed with the seeds' keys).  The verified free rows are
+/// (default 0, mixed with the seeds' keys).  A base of one abscissa is
+/// accepted with `g=1` (`F = 1`): jumps `[α_j]P1 + [γ_j]G`, a collision is
+/// the one-column affine row `du·s1 = −dz`, and `grow` stops at rank 1.
+/// The verified free rows are
 /// handed to the relation loop once, with the first trial, as
 /// `Relation::Row { a: 0, b: 0 }`.  A probe hit `±E_t` is a
 /// `Relation::Row` with the trial's own `(a, b)` and the columns
