@@ -1731,16 +1731,28 @@ pub fn ic_multi_solve(
     let mut walked = Vec::with_capacity(qs.len());
     for (t, &q) in qs.iter().enumerate() {
         let tt = Instant::now();
-        let (rs, st) = collect_relations(
-            curve,
-            g,
-            q,
-            &fb,
-            Some(&pairs),
-            1,
-            max_walk,
-            seed ^ (0x9E37_79B9 + t as u64 * 7919),
-        );
+        let mut rs: Vec<FastRelation> = Vec::new();
+        let mut st = CollectStats::default();
+        for attempt in 0..32u64 {
+            let (r1, s1) = collect_relations(
+                curve,
+                g,
+                q,
+                &fb,
+                Some(&pairs),
+                1,
+                max_walk,
+                seed ^ (0x9E37_79B9 + t as u64 * 7919 + attempt * 104_729),
+            );
+            st.targets += s1.targets;
+            let usable = r1.first().is_some_and(|r| {
+                r.b % n != 0 && r.entries.iter().all(|&(j, _)| logs[j as usize].is_some())
+            });
+            if usable {
+                rs = r1;
+                break;
+            }
+        }
         walked.push(st.targets);
         let mut res = None;
         if let Some(rel) = rs.first() {
