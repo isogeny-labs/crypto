@@ -135,6 +135,30 @@ pub fn restrict_to_subgroup(fb: &mut FactorBases, cc: &CofactorCurve) {
     }
 }
 
+/// Fills `fb.preimages`: one pass over E projects every S and files it under
+/// each F_i that holds [c]S, so the relation networks enumerate c·|F_i|
+/// sources per slot instead of all of E on every relation.
+pub fn fill_preimages(fb: &mut FactorBases, cc: &CofactorCurve) {
+    let m = fb.sets.len();
+    let members: Vec<HashSet<Point>> = fb
+        .sets
+        .iter()
+        .map(|set| set.iter().copied().collect())
+        .collect();
+    let mut pre: Vec<Vec<Point>> = vec![Vec::new(); m];
+    let points = cc.curve.points();
+    crate::opcount::bump("fb_preimage_scan_uncharged", points.len() as u64);
+    for s in points {
+        let a = cc.project(s);
+        for i in 0..m {
+            if members[i].contains(&a) {
+                pre[i].push(s);
+            }
+        }
+    }
+    fb.preimages = pre;
+}
+
 /// Factor bases over G. They are drawn as for a prime-order curve of order r
 /// (so each hash keeps about c·target members on E, about target of them in
 /// G), then restricted to G, and redrawn while any F_i ∩ G is empty.
@@ -153,6 +177,7 @@ pub fn cofactor_factor_bases(
         };
         restrict_to_subgroup(&mut fb, cc);
         if fb.sets.iter().all(|set| !set.is_empty()) {
+            fill_preimages(&mut fb, cc);
             return fb;
         }
     }
@@ -160,8 +185,9 @@ pub fn cofactor_factor_bases(
 
 /// The whole-point relation network with free sources: edges are the bits
 /// of S_1..S_m, of A_1..A_m and of the partial sums. Vertices are
-///   - source(i): S_i is an affine point of E (a support tensor over all of
-///     E; the toy enumerates the group, as factor-base listing does);
+///   - source(i): S_i is an affine point of E (a support tensor over the
+///     preimages of F_i in `fb.preimages` when filled, else over all of E;
+///     the count is the same, since only preimages pass project(i));
 ///   - project(i): A_i = [c]S_i, accepted only when F_i's membership
 ///     predicate holds on A_i (a function tensor);
 ///   - add(k) and the target predicate, as in [`crate::relation_network`].
@@ -184,12 +210,19 @@ pub fn cofactor_relation_network(
     };
     let s_blocks: Vec<Vec<usize>> = (0..m).map(|_| block()).collect();
     let a_blocks: Vec<Vec<usize>> = (0..m).map(|_| block()).collect();
-    let sources: Vec<Vec<bool>> = c.points().iter().map(|&pt| c.encode_point(pt)).collect();
+    let all_sources =
+        || -> Vec<Vec<bool>> { c.points().iter().map(|&pt| c.encode_point(pt)).collect() };
+    let mut every: Option<Vec<Vec<bool>>> = None;
     let mut n = Network::default();
     for i in 0..m {
         n.vertices.push(Vertex::Support(SupportVertex::new(
             s_blocks[i].clone(),
-            sources.clone(),
+            match fb.preimages.get(i) {
+                // Only preimages of F_i can pass the projection vertex, so
+                // listing them alone leaves the count unchanged.
+                Some(pre) => pre.iter().map(|&pt| c.encode_point(pt)).collect(),
+                None => every.get_or_insert_with(all_sources).clone(),
+            },
         )));
         let cc = *cc;
         let members: HashSet<Point> = fb.sets[i].iter().copied().collect();
