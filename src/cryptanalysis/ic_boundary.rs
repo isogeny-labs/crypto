@@ -3018,6 +3018,15 @@ impl RhoV3 {
         }
     }
 
+    /// `rho.negation_v5` / `rho.plain_v5` and, with `frobenius`,
+    /// `rho.signed_frobenius_v4`: [`RhoV3::v4`] / [`RhoV3::frobenius`] with
+    /// two-rung jumps (one addition a jump), so `k ≈ √F` jumps.
+    pub const fn v5(negation: bool) -> Self {
+        let mut v = Self::v4(negation);
+        v.weight = 2;
+        v
+    }
+
     /// The signed-Frobenius table: [`RhoV3::negation`] with the
     /// distinguished-point rule taken from the floor.
     pub const fn frobenius() -> Self {

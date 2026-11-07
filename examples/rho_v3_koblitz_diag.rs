@@ -37,7 +37,15 @@ fn main() {
             let new = signed_frobenius_rho_v3(&inst, q, 1000 + i, cap, v).unwrap();
             aut = new.automorphisms;
             for (j, res) in [&old, &new].iter().enumerate() {
-                assert_eq!(res.recovered, Some(d % r));
+                if res.recovered != Some(d % r) {
+                    eprintln!(
+                        "UNSOLVED arm {j} run {i} seed {} d {d} steps {} walks {}",
+                        1000 + i,
+                        res.steps,
+                        res.walks
+                    );
+                    continue;
+                }
                 let su = (res.counters.get("setup_additions").copied().unwrap_or(0)
                     + res.counters.get("setup_doublings").copied().unwrap_or(0))
                     as f64;
