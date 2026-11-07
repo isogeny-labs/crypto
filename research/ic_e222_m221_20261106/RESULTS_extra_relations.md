@@ -33,3 +33,19 @@
 Zero failures in 840 for each of extra = 1, 2, 3 (rule-of-three 95% upper bound 0.36% per arm); extra = 0 failed 14/144 (about 10%) on the first sample, so one relation of surplus is the cliff edge and extra = 2 or 3 is the safer setting. Per-rung medians are flat (0.12 to 0.13 for extra = 1), so the saving does not depend on size within this range. Both holdouts agree (first sample extra = 2: 0.142).
 
 **Reading.** On the `solve-prime-file` producer with fb = 8, the shipped default spends about 7 to 8 times the trials it needs. The retune is reproducible on two fresh holdouts and costs no recoveries. It is still a parameter retune of the existing solver, unvalidated and local, with no matched-rho band, and says nothing about a different producer or factor-base size. Not yet measured: fb 16 and 32 (the surplus may not matter as much when fb grows), wall time including elimination, and the validation-gate evidence. The goal is not met.
+
+## Larger factor bases (fb 16 and 32)
+
+70-instance subset of the v3 instances (rungs 10 to 16, 10 per rung), solver seeds 1..3 (210 runs per arm), extra = 64 vs 2, paired by instance and seed. Data: `results/fb/`, `results/fb/analysis.txt`.
+
+| fb | verified (64 / 2) | median trials 64 -> 2 | median relations 64 -> 2 | ratio (bootstrap 95% CI) | (fb+2)/(fb+64) |
+|---|---|---|---|---|---|
+| 8 (v3, 840 runs) | 840 / 840 | 4542 -> about 620 | 72 -> 10 | 0.136 (0.132 to 0.140) | 0.135 |
+| 16 | 210 / 210 | 1294 -> 277 | 80 -> 18 | 0.223 (0.216 to 0.228) | 0.225 |
+| 32 | 210 / 210 | 448 -> 150 | 96 -> 34 | 0.359 (0.353 to 0.365) | 0.354 |
+
+The measured ratio equals the relation-count ratio. The saving is exactly the surplus relations and shrinks to 1 as fb grows past the surplus (fb >> 64).
+
+**Does it beat the baseline's best factor-base size?** Per-trial cost is about 2 scalar multiplications plus fb square roots, so trials x fb is a first proxy for the square-root count (an estimate across different instance sets, not a measurement): baseline 36,000 / 20,700 / 14,300 at fb 8 / 16 / 32; retuned extra = 2 about 5,000 / 4,400 / 4,800. The baseline's best fb is 32 or larger, and the retune at fb 8 to 32 is still about 3 times cheaper in that proxy. Wall time (with elimination, which also shrinks) and the baseline at fb 64 and above are not yet measured.
+
+**Reading.** The improvement over the shipped default is real and reproducible on two fresh holdouts. Against a baseline tuned over fb it is smaller than the headline 0.14, and it vanishes for very large fb. It is a retune, unvalidated, with no matched-rho band; the goal is not met.
