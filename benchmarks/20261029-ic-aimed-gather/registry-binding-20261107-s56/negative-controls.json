@@ -1,0 +1,43 @@
+{
+  "schema": "s56.registry-binding-negative-controls/v1",
+  "claim_status": "unverified",
+  "controls": [
+    {
+      "case": "changed_target",
+      "returncode": 101,
+      "expected_rejection": true,
+      "fixture_sha256": "34889f5e5db7023b769958fdeb01118c73cd1a4feabb73a4193d393086eef2fb",
+      "fixture_bytes": 20091027,
+      "stderr_sha256": "2682381603247eef97356f76a00a010a9dd0ca7a2e8d92f0603048430399904b",
+      "success_output_absent": true
+    },
+    {
+      "case": "duplicate_target",
+      "returncode": 101,
+      "expected_rejection": true,
+      "fixture_sha256": "a0e5c8181d6807f472e2ff454bd608ed379b1562503000d67224be8fccf565cb",
+      "fixture_bytes": 20092899,
+      "stderr_sha256": "45a2d7d8a9af23d9db18a512c3a1c6f9ead8fd3d05862549b18f66c95250cb94",
+      "success_output_absent": true
+    },
+    {
+      "case": "wrong_original_registry_pin",
+      "returncode": 101,
+      "expected_rejection": true,
+      "fixture_sha256": "8c5063fceba3b473851ac4816c86e5b36ba9925b61734beb323a76a92497a6bc",
+      "fixture_bytes": 20832672,
+      "stderr_sha256": "4c5f82da7d08fba0776dd195dbaa2736dd6bb576b391f4b7808918c2e419b883",
+      "success_output_absent": true
+    },
+    {
+      "case": "wrong_original_report_pin",
+      "returncode": 101,
+      "expected_rejection": true,
+      "fixture_sha256": "b9b6813a9d4d92c86a3a93c97f7f29ee20c08437fcd52bc5b374d7826caf51d6",
+      "fixture_bytes": 169891,
+      "stderr_sha256": "ae0e54ed9dcab6ce52389dc6fbffa81830a5611dcb41f071e9b0bce17e94ff94",
+      "success_output_absent": true
+    }
+  ],
+  "scope": "Mutated temporary copies only; original inputs, all measurements and frozen reports unchanged."
+}

@@ -1,0 +1,15 @@
+[package]
+name = "s56-registry-binding-check"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+serde_json = { version = "=1.0.151", features = ["arbitrary_precision", "raw_value"] }
+sha2 = "=0.10.9"
+
+[[bin]]
+name = "verify-registry-binding"
+path = "verify_registry_binding.rs"
