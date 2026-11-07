@@ -1,0 +1,451 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "PF-adaptive-monomial-helper-counts-20261107",
+  "version": 1,
+  "created": "2026-11-07",
+  "repository": "crypto",
+  "study_dir": "research/primefield-companion-followup-20261102/feature-native-monomial-matched",
+  "authors": [
+    "native prime-field research"
+  ],
+  "links": {
+    "status": "DRAFT, NOT ADMITTED: no full panel, canonical validator unavailable, exact published source commit and release binary binding, export adapter, preflight, shared budget reservation and live capacity admission required."
+  },
+  "question": "How does combined-monomial adaptive recovery change the full per-target helper-event vector versus four-column adaptive recovery on the 20 fixed public fixtures?",
+  "claims": [
+    {
+      "id": "C-correct",
+      "text": "All20 public targets recover identically and pass forward multiplication in each arm.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C-count",
+      "text": "Compare complete fixed-plus-query modular helper event dimensions on each fixed target; no machine-time conclusion.",
+      "class": "comparative",
+      "decided_by": [
+        "backend"
+      ],
+      "if_supported": "Report exact signed per-target deltas only in named event dimensions.",
+      "if_not_supported": "Retain all regressions and tradeoffs without selecting favorable targets."
+    }
+  ],
+  "arms": [
+    {
+      "id": "baseline",
+      "role": "reference",
+      "description": "Four-column adaptive source (A/A uses the identical entry point)",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "rustc",
+            "--edition=2021",
+            "-O",
+            "-C",
+            "overflow-checks=yes",
+            "research/primefield-companion-followup-20261102/feature-native-monomial-matched/main.rs",
+            "-o",
+            "runner"
+          ]
+        ],
+        "binary_sha256": "c27d7beb2e774b5546a68607eae7b6096385958255967471abb6c5b03c85d609",
+        "threads": 1,
+        "flags": {
+          "optimization": "-O",
+          "edition": "2021",
+          "overflow_checks": true
+        },
+        "env": {}
+      },
+      "parameters": {
+        "source_backend": "four_column"
+      }
+    },
+    {
+      "id": "candidate",
+      "role": "candidate",
+      "description": "Combined monomial adaptive source",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "rustc",
+            "--edition=2021",
+            "-O",
+            "-C",
+            "overflow-checks=yes",
+            "research/primefield-companion-followup-20261102/feature-native-monomial-matched/main.rs",
+            "-o",
+            "runner"
+          ]
+        ],
+        "binary_sha256": "c27d7beb2e774b5546a68607eae7b6096385958255967471abb6c5b03c85d609",
+        "threads": 1,
+        "flags": {
+          "optimization": "-O",
+          "edition": "2021",
+          "overflow_checks": true
+        },
+        "env": {}
+      },
+      "parameters": {
+        "source_backend": "monomial"
+      },
+      "same_instrument_as": "baseline"
+    },
+    {
+      "id": "aa",
+      "role": "control_aa",
+      "description": "Four-column adaptive source (A/A uses the identical entry point)",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "rustc",
+            "--edition=2021",
+            "-O",
+            "-C",
+            "overflow-checks=yes",
+            "research/primefield-companion-followup-20261102/feature-native-monomial-matched/main.rs",
+            "-o",
+            "runner"
+          ]
+        ],
+        "binary_sha256": "c27d7beb2e774b5546a68607eae7b6096385958255967471abb6c5b03c85d609",
+        "threads": 1,
+        "flags": {
+          "optimization": "-O",
+          "edition": "2021",
+          "overflow_checks": true
+        },
+        "env": {}
+      },
+      "parameters": {
+        "source_backend": "four_column"
+      },
+      "same_instrument_as": "baseline"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "repeat",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Known-answer points and forward checks in every row; parser synthetic tests inject corruptions and a setup regression. No detection-population claim."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Deterministic fixed-input event comparison, no null-population hypothesis; malformed and misplaced counters are rejected by synthetic tests."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "source_backend",
+        "levels": [
+          "four_column",
+          "monomial"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "curve",
+        "treatment": "fixed",
+        "value": "F509/r479, a2 b10 P(3,68)",
+        "how": "Same public fixture"
+      },
+      {
+        "name": "targets",
+        "treatment": "fixed",
+        "value": "All20 frozen quartic recovery targets",
+        "how": "Every arm consumes same public coordinates; labels checked only after recovery"
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "One binary, shared meter, flags, compiler and System allocator",
+        "how": "Release binary hash and published source closure required"
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "Pending CPU Spot placement",
+        "how": "Record instance, CPU, kernel and admission; no timed primary metric"
+      },
+      {
+        "name": "order",
+        "treatment": "fixed",
+        "value": "Whole baseline, whole candidate, whole A/A; output interleaved by target",
+        "how": "Exact deterministic counters; objects destroyed between arms, no timed/cache inference"
+      },
+      {
+        "name": "lifetime",
+        "treatment": "fixed",
+        "value": "Setup once per arm, prepared reuse, complete teardown separately charged",
+        "how": "Add complete fixed costs to each query; not cold allocator/cache behavior"
+      },
+      {
+        "name": "warmup",
+        "treatment": "fixed",
+        "value": 0,
+        "how": "Count declared work; no time claim"
+      },
+      {
+        "name": "preemption",
+        "treatment": "measured",
+        "value": "No retry or resume",
+        "how": "Preserve partial rows; any incomplete panel invalid"
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "Unblinded strict integer analysis",
+        "how": "Frozen parser and exact input hash, no p-values"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "backend",
+        "arms": [
+          "baseline",
+          "candidate"
+        ],
+        "differs_in": [
+          "source_backend"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "repeat",
+        "arms": [
+          "baseline",
+          "aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Deterministic helper counts with A/A equality; no timed inference. Native execution grouped by arm; output rows interleaved.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        20261107
+      ],
+      "nonce": null,
+      "note": "Schedule identifier only; no stochastic arithmetic."
+    },
+    "instance_sampling": {
+      "rule": "All20 preserved quartic recovery fixtures, including all16 exceptional targets; no general-population inference.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact event counts with fixed analysis and no sampling inference",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 20,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Exact fixed-fixture integer comparison; no population-power or significance claim."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": null,
+      "measured_on": null
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "modular_product_helpers",
+        "name": "modular_product_helpers",
+        "unit": "helper calls",
+        "kind": "counted",
+        "definition": "Sum product helpers over fixed compile/calibration/preparation including teardown plus query and public verification. Distinct moduli retained in raw component rows; summed count is not weighted field or machine cost.",
+        "source": "comparison.json pairs[].single_target_events.<arm>[0]",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "event_vector",
+        "name": "event_vector",
+        "unit": "separate event dimensions",
+        "kind": "counted",
+        "definition": "All17 dimensions retained separately: inverse helpers, integer inverse helpers, Euclid steps, popcounts, rules, characters, allocation/free calls and byte volumes, exponent integer primitives. No scalar weighting.",
+        "source": "comparison.json pairs[].single_target_events",
+        "aggregation": "per_row",
+        "resolution": "1",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "L1",
+    "warmups": 0,
+    "order": "fixed",
+    "clock": "counted",
+    "counters": [
+      "all frozen native stage counters"
+    ],
+    "record": [
+      "cpu_model",
+      "kernel",
+      "binary_sha256",
+      "source_lock",
+      "protocol_sha256",
+      "image_digest",
+      "job_id",
+      "pod_id",
+      "threads",
+      "all_stage_component_counters",
+      "independently_captured_exit_status",
+      "budget_receipt"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "isolab-k8s",
+    "queue": "cpu-spot",
+    "placement": {
+      "cpus": 1,
+      "memory_mib": 1024,
+      "spot": true,
+      "max_total_usd": 1,
+      "reservation_status": "PROPOSED ceiling including build, idle, failures, storage and transfer; no reserved funds, no submission authority",
+      "concurrency": 1
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 120,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Exactly3 arms x20 queries plus3 fixed records, header and completion footer (65 records). One attempt, no replacement or retry; stop at120s and preserve partial output.",
+      "kind": "fixed_n",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Any A/A mismatch, invalid point/result, missing/extra/duplicate row, wrong schedule or counter shape/type/location invalidates panel.",
+    "Require independently captured successful producer exit, raw hash and frozen protocol hash. Preserve failure artifacts.",
+    "No timed claim or complete machine-cost claim from these helper dimensions."
+  ],
+  "decision_rule": {
+    "text": "Strict validation, A/A equality, then report per-target signed helper deltas including all fixed costs. No overall faster verdict.",
+    "comparison_ids": [
+      "backend"
+    ],
+    "threshold": "Exact signed deltas in named event dimensions",
+    "statistic": "Per-target candidate-minus-baseline event vector",
+    "interval": "Exact fixed-fixture values; no confidence interval",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Signed integers; no selected weighting",
+    "verdict_vocabulary": [
+      "valid_counted_deltas",
+      "invalid_measurement"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "analyze.py",
+      "sha256": "8a6b80b28f78bd03382cdff93c7ca3066ce82d711028c374ec00ef9f80e7cab3"
+    },
+    "inputs": [
+      "rows.jsonl; external producer receipt with exit_code/raw_sha256/protocol_sha256; expected frozen protocol hash",
+      "Verify analysis-lock.json and source/data inputs before analysis"
+    ],
+    "outputs": [
+      "comparison.json exclusive-create; retain raw failures"
+    ],
+    "blinded": false,
+    "frozen_before_data": false
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "Per-target helper deltas; component and allocation dimensions separate; A/A equality"
+    ],
+    "report_dir": "future-panel-report"
+  },
+  "inadmissible": [
+    "Launching before exact GitHub source/binary/protocol binding, canonical validation, freeze, export adapter and finite authoritative budget/capacity admission",
+    "Treating local two-target unit validation as this20-target comparison",
+    "Replacing the original4563-case cohort with this fixed20-target panel",
+    "Interpreting helper-count sums as machine instructions, total cost or time",
+    "Omitting compile/setup/preparation or teardown from the primary per-target view"
+  ],
+  "literature": [
+    {
+      "ref": "../feature-native-transport-accounting/DERIVATION.md",
+      "provenance": "internal",
+      "claim": "Shared event definitions and setup-preserving scopes",
+      "verified_by": "Source review"
+    },
+    {
+      "ref": "../feature-native-monomial-recovery/DERIVATION.md",
+      "provenance": "internal",
+      "claim": "Adaptive monomial source and skipped-step work",
+      "verified_by": "Source review and saved correctness checks"
+    },
+    {
+      "ref": "../feature-native-factor-matched/README.md",
+      "provenance": "internal",
+      "claim": "Fixed-plus-query accounting and strict parser patterns",
+      "verified_by": "Source review; no results imported"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  }
+}
