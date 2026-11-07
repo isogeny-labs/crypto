@@ -105,7 +105,7 @@ pub fn collect_residual_fused_and_solve<G: CountedGroup, L: RelationSolver + ?Si
         .collect();
 
     let mut table: FastMap<Stored> = fast_map(1 << 12);
-    let mut table_bytes = 0u64;
+    let mut table_bytes_stored = 0u64;
     let mut fresh = true;
     let (mut point, mut a, mut b) = (g.identity(), 0u64, 0u64);
     let mut row = vec![0u64; d_col];
@@ -274,7 +274,7 @@ pub fn collect_residual_fused_and_solve<G: CountedGroup, L: RelationSolver + ?Si
             continue;
         }
         if table.len() < TABLE_CAP {
-            table_bytes += entry_bytes(srow.len());
+            table_bytes_stored += entry_bytes(srow.len());
             table.insert(
                 key,
                 Stored {
@@ -292,7 +292,14 @@ pub fn collect_residual_fused_and_solve<G: CountedGroup, L: RelationSolver + ?Si
     rel.count("residual_self_collisions", self_collisions);
     rel.count("residual_direct_hits", direct_hits);
     rel.count("residual_table_entries", table.len() as u64);
-    rel.count("residual_table_bytes_uncharged", table_bytes);
+    // The priced counter uses `residual`'s formula (a, b and a dense row
+    // per entry) so the two collectors are compared in the same unit; the
+    // bytes this layout really holds are reported beside it.
+    rel.count(
+        "residual_table_bytes_uncharged",
+        (table.len() * (16 + 8 * d_col)) as u64,
+    );
+    rel.count("residual_table_bytes_stored", table_bytes_stored);
     rel.count("lookups", table_probes + trials);
     rel.count("walk_restarts", restarts);
     rel.count("walk_jumps", jump_count as u64);
