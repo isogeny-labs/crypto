@@ -190,7 +190,11 @@ fn main() {
         if qm.is_empty() {
             w.b = BigUint::zero();
         } else {
-            let beta = rng.gen_range(1..=MAXB) as usize;
+            let beta = if qm.len() == 1 {
+                1
+            } else {
+                rng.gen_range(1..=MAXB) as usize
+            };
             pt = c.add(&pt, &qm[beta - 1], a_ref);
             w.b = BigUint::from(beta as u64);
         }
@@ -281,12 +285,20 @@ fn main() {
     for _ in 0..targets {
         let xk = plant_rng.gen_biguint_below(&n); // planted (generation not counted)
         let q = g.scalar_mul(&xk, &a_fe);
+        // v3 (default): pure-G arms, b = 1 (the start carries Q_t); MT_V2=1 restores per-target arms bQ_t.
+        let v2 = std::env::var("MT_V2").is_ok();
         let mut qm: Vec<Point> = vec![q.clone()];
-        for _ in 1..MAXB {
-            let nxt = c.add(qm.last().unwrap(), &q, &a_fe);
-            qm.push(nxt);
+        let mut w;
+        if v2 {
+            for _ in 1..MAXB {
+                let nxt = c.add(qm.last().unwrap(), &q, &a_fe);
+                qm.push(nxt);
+            }
+            w = new_walk2(&mut c, &mut rng, &qm);
+        } else {
+            w = new_walk2(&mut c, &mut rng, &[]);
+            do_restart(&mut w, &mut c, &mut rng, &qm);
         }
-        let mut w = new_walk2(&mut c, &mut rng, &qm);
         if std::env::var("MT_DEBUG").is_ok() {
             eprintln!("target walk start, trials so far {}", trials_t);
         }
