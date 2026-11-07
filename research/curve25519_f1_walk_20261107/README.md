@@ -182,7 +182,7 @@ following, and this README applies its errata [pcc:unverified].
 - **Scope.** F = 1 is a generic walk-table variant that moves toward rho (section 6), not a
   decomposition-based index-calculus improvement [pcc:unverified].
 - **Binary and source.** The measuring binary (`data/binary.sha256`) was built before the last edit of
-  `src/cryptanalysis/ic_boundary.rs`, so byte identity between the binary and the source is not proven. BINARY_CHECK
+  `src/cryptanalysis/ic_boundary.rs`, so byte identity between the binary and the source is not proven. Binary check (main session, 2026-11-07): the measuring binary (sha256 prefix 44442a4ba260bbfb) was built before the last edit of `ic_boundary.rs`. A rebuild from the committed source has a different hash (1d1a57c7aadc5779). Under the rebuilt binary, `ecbench verify --replay-all` on a copy of session k20-s0 reproduced 384 of 384 replays identically, with 0 problems, so the late edit did not change any counted result in that session [pcc:unverified].
 
 ## Files
 
