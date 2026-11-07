@@ -1,0 +1,15 @@
+[package]
+name = "lift-dense-conjugate-pair"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[[bin]]
+name = "conjpair"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
+
+[workspace]

@@ -99,6 +99,25 @@ jobs:
         with:
           toolchain: '1.98'
       - uses: Swatinem/rust-cache@v2
+      - name: Regenerate the native cover report on dispatch (registry changes)
+        # A pull request that changes docs/curves/registry.json cannot build the
+        # cover report on a small host; a dispatch on its branch writes it here,
+        # and the upload below hands it back for review and commit.
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          cargo run --bin curve_cover_check
+          sha256sum docs/curves/registry.json docs/curves/covers.json docs/curves/cover-links.yaml | tee cover-report-sha256.txt
+      - name: Upload the regenerated cover report
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: cover-report-${{ github.sha }}
+          path: |
+            docs/curves/covers.json
+            docs/curves/cover-links.yaml
+            cover-report-sha256.txt
+          if-no-files-found: error
+          retention-days: 7
       - run: cargo test --bin curve_cover_check --bin curve_standards
       - name: Cover, Jacobian, transfer, and CLI controls
         run: |

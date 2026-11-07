@@ -1,0 +1,131 @@
+-- Prospective source only: not compiled or axiom-audited. [pcc:unverified]
+-- Import Nonbranch from the exact ef72bcbf... producer source in a future private build.
+import Nonbranch
+import Mathlib.Data.ENat.Basic
+
+set_option autoImplicit false
+noncomputable section
+namespace FiniteNonbranchOrder
+open Polynomial ActualNonbranchNorm Common22SeparateChartMap Common22BranchStalk
+  WeightedProjNonbranchZeroOrder WeightedProjSmoothPoints
+variable {K : Type*} [Field K]
+
+-- No polynomial degree bound is needed for this selected rational nonbranch argument.
+theorem affine_selected_ne_zero (a3 a2 a1 a0 x0 y0 b : K)
+    (h : y0^2 = fAt a3 a2 a1 a0 x0)
+    (h2 : (2:K) ≠ 0) (hy : y0 ≠ 0) (hb : b ≠ 0)
+    (n : K[X]) (hn : n.eval x0 = b*y0) :
+    affineEval a3 a2 a1 a0 n -
+      algebraMap K (A a3 a2 a1 a0) b * ybar a3 a2 a1 a0 ≠ 0 := by
+  intro hz
+  have hneg : (-y0)^2 = fAt a3 a2 a1 a0 x0 := by simpa using h
+  have he := congrArg (pointEval a3 a2 a1 a0 x0 (-y0) hneg) hz
+  simp only [map_sub, map_mul, map_zero, point_affine_eval,
+    point_scalar, pointEval_ybar] at he
+  have hbad : (2:K)*b*y0 = 0 := by
+    calc
+      (2:K)*b*y0 = n.eval x0-b*(-y0) := by rw [hn]; ring
+      _ = 0 := he
+  exact (mul_ne_zero (mul_ne_zero h2 hb) hy) hbad
+
+theorem germ_selected_ne_zero (a3 a2 a1 a0 x0 y0 b : K)
+    (h : y0^2 = fAt a3 a2 a1 a0 x0)
+    (hs : (quintic a3 a2 a1 a0).Separable)
+    (h2 : (2:K) ≠ 0) (hy : y0 ≠ 0) (hb : b ≠ 0)
+    (n : K[X]) (hn : n.eval x0 = b*y0) :
+    germEval a3 a2 a1 a0 x0 y0 h n -
+      iota a3 a2 a1 a0 x0 y0 h b * pointY a3 a2 a1 a0 x0 y0 h ≠ 0 := by
+  letI : IsDomain (A a3 a2 a1 a0) :=
+    Common22SeparableAffineDomain.affine_ring_domain_of_separable a3 a2 a1 a0 hs
+  have hinj : Function.Injective (algebraMap (A a3 a2 a1 a0)
+      (L a3 a2 a1 a0 x0 y0 h)) := FaithfulSMul.algebraMap_injective _ _
+  have hrho : Function.Injective (rho a3 a2 a1 a0 x0 y0 h) :=
+    (pointRingEquiv a3 a2 a1 a0 x0 y0 h).symm.injective.comp hinj
+  intro hz
+  apply affine_selected_ne_zero a3 a2 a1 a0 x0 y0 b h h2 hy hb n hn
+  apply hrho
+  simpa [rho, germEval, iota, pointY, map_sub, map_mul] using hz
+
+-- Codomain bridge: infinity is excluded before toNat is applied.
+theorem finite_sum_toNat (v a b c : ℕ∞) (hv : v ≠ ⊤)
+    (he : v = a+b+c) :
+    a ≠ ⊤ ∧ b ≠ ⊤ ∧ c ≠ ⊤ ∧
+      v.toNat = a.toNat+b.toNat+c.toNat := by
+  have hs : a+b+c ≠ ⊤ := by simpa [← he] using hv
+  have hc : c ≠ ⊤ := by intro h; apply hs; simp [h]
+  have hab : a+b ≠ ⊤ := by intro h; apply hs; simp [h]
+  have ha : a ≠ ⊤ := by intro h; apply hab; simp [h]
+  have hb : b ≠ ⊤ := by intro h; apply hab; simp [h]
+  refine ⟨ha,hb,hc,?_⟩
+  rw [he, ENat.toNat_add hab hc, ENat.toNat_add ha hb]
+
+theorem actual_norm_order_nat (a3 a2 a1 a0 x0 y0 b : K)
+    (h : y0^2 = fAt a3 a2 a1 a0 x0)
+    (hs : (quintic a3 a2 a1 a0).Separable)
+    (h2 : (2:K) ≠ 0) (hy : y0 ≠ 0) (hb : b ≠ 0)
+    (n u1 u2 U : K[X]) (hn : n.eval x0 = b*y0)
+    (hnorm : n^2-u1*u2*U=C (b^2)*quintic a3 a2 a1 a0) :
+    let R := ProjPointRing a3 a2 a1 a0 x0 y0 h
+    letI := Common22SeparableAffineDomain.projective_point_domain_of_separable a3 a2 a1 a0 x0 y0 h hs
+    letI := WeightedProjNonbranchDVR.projective_point_dvr a3 a2 a1 a0 x0 y0 h hs (mul_ne_zero h2 hy)
+    let v := IsDiscreteValuationRing.addVal R
+    let g := germEval a3 a2 a1 a0 x0 y0 h n -
+      iota a3 a2 a1 a0 x0 y0 h b*pointY a3 a2 a1 a0 x0 y0 h
+    v g ≠ ⊤ ∧
+    v (germEval a3 a2 a1 a0 x0 y0 h u1) ≠ ⊤ ∧
+    v (germEval a3 a2 a1 a0 x0 y0 h u2) ≠ ⊤ ∧
+    v (germEval a3 a2 a1 a0 x0 y0 h U) ≠ ⊤ ∧
+    (v g).toNat = (v (germEval a3 a2 a1 a0 x0 y0 h u1)).toNat +
+      (v (germEval a3 a2 a1 a0 x0 y0 h u2)).toNat +
+      (v (germEval a3 a2 a1 a0 x0 y0 h U)).toNat := by
+  dsimp only
+  letI := Common22SeparableAffineDomain.projective_point_domain_of_separable a3 a2 a1 a0 x0 y0 h hs
+  letI := WeightedProjNonbranchDVR.projective_point_dvr a3 a2 a1 a0 x0 y0 h hs (mul_ne_zero h2 hy)
+  have hg := germ_selected_ne_zero a3 a2 a1 a0 x0 y0 b h hs h2 hy hb n hn
+  have hv : IsDiscreteValuationRing.addVal (ProjPointRing a3 a2 a1 a0 x0 y0 h)
+      (germEval a3 a2 a1 a0 x0 y0 h n -
+        iota a3 a2 a1 a0 x0 y0 h b*pointY a3 a2 a1 a0 x0 y0 h) ≠ ⊤ := by
+    intro ht
+    exact hg (IsDiscreteValuationRing.addVal_eq_top_iff.mp ht)
+  exact ⟨hv, finite_sum_toNat _ _ _ _ hv
+    (concrete_norm_order a3 a2 a1 a0 x0 y0 b h hs h2 hy hb n u1 u2 U hn hnorm)⟩
+
+-- Source-specific specialization supplies hnorm using source_norm_identity;
+-- it must not assume the target valuation equation or a principal-divisor identity.
+theorem source_actual_norm_order_nat
+    (a3 a2 a1 a0 x0 y0 q1 r1 s1 t1 q2 r2 s2 t2 : K)
+    (h : y0^2 = fAt a3 a2 a1 a0 x0)
+    (hs : (quintic a3 a2 a1 a0).Separable)
+    (h2 : (2:K) ≠ 0) (hy : y0 ≠ 0)
+    (hb : (Common22SupportHead.coefficientData q1 r1 s1 t1 q2 r2 s2 t2).1 ≠ 0)
+    (v1 : Common22Coprime.firstSupport q1 r1 ∣ quintic a3 a2 a1 a0-(C s1*X+C t1)^2)
+    (v2 : Common22Coprime.secondSupport q2 r2 ∣ quintic a3 a2 a1 a0-(C s2*X+C t2)^2)
+    (hn : (numerator q1 r1 s1 t1 q2 r2 s2 t2).eval x0 =
+      (Common22SupportHead.coefficientData q1 r1 s1 t1 q2 r2 s2 t2).1*y0) :
+    let b := (Common22SupportHead.coefficientData q1 r1 s1 t1 q2 r2 s2 t2).1
+    let n := numerator q1 r1 s1 t1 q2 r2 s2 t2
+    let u1 := Common22Coprime.firstSupport q1 r1
+    let u2 := Common22Coprime.secondSupport q2 r2
+    let U := residual q1 r1 s1 t1 q2 r2 s2 t2
+    let R := ProjPointRing a3 a2 a1 a0 x0 y0 h
+    letI := Common22SeparableAffineDomain.projective_point_domain_of_separable a3 a2 a1 a0 x0 y0 h hs
+    letI := WeightedProjNonbranchDVR.projective_point_dvr a3 a2 a1 a0 x0 y0 h hs (mul_ne_zero h2 hy)
+    let v := IsDiscreteValuationRing.addVal R
+    let g := germEval a3 a2 a1 a0 x0 y0 h n -
+      iota a3 a2 a1 a0 x0 y0 h b*pointY a3 a2 a1 a0 x0 y0 h
+    v g ≠ ⊤ ∧
+    v (germEval a3 a2 a1 a0 x0 y0 h u1) ≠ ⊤ ∧
+    v (germEval a3 a2 a1 a0 x0 y0 h u2) ≠ ⊤ ∧
+    v (germEval a3 a2 a1 a0 x0 y0 h U) ≠ ⊤ ∧
+    (v g).toNat = (v (germEval a3 a2 a1 a0 x0 y0 h u1)).toNat +
+      (v (germEval a3 a2 a1 a0 x0 y0 h u2)).toNat +
+      (v (germEval a3 a2 a1 a0 x0 y0 h U)).toNat := by
+  exact actual_norm_order_nat a3 a2 a1 a0 x0 y0 _ h hs h2 hy hb _ _ _ _ hn
+    (source_norm_identity a3 a2 a1 a0 q1 r1 s1 t1 q2 r2 s2 t2 hb v1 v2)
+
+#print axioms source_actual_norm_order_nat
+#print axioms affine_selected_ne_zero
+#print axioms germ_selected_ne_zero
+#print axioms finite_sum_toNat
+#print axioms actual_norm_order_nat
+end FiniteNonbranchOrder

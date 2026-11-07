@@ -105,8 +105,17 @@ SOURCES = {
     "jv_cover_sparse_fglm": "research/jv_cover_sparse_fglm_20261018/summary.json",
     "lazy_columns2": "research/ecbench_lazy_columns2_20261018/figures/ratios.json",
     "postgb_linear_stage": "research/postgb_linear_stage_20261026/analysis/summary.json",
+    "ic_cover_weakclass": "research/ic_cover_weakclass_20261023/summary.json",
+    "ic_cover_weakclass_rho_neg": "research/ic_cover_weakclass_20261023/validation/rho-neg.json",
+    "d4_char2_m12": "research/ic_d4_char2_lever_20261023/results/table-m12.tsv",
+    "d4_char2_m14": "research/ic_d4_char2_lever_20261023/results/table-m14.tsv",
+    "d4_char2_cmp_m12": "research/ic_d4_char2_lever_20261023/results/cmp-m12-ic-base__ic-lever.json",
+    "d4_char2_cmp_m14": "research/ic_d4_char2_lever_20261023/results/cmp-m14-ic-base__ic-lever.json",
     "ic_m2_linear_ladder": "research/ic_m2_linear_ladder_20261024/fit.json",
     "pair_table_setup": "research/ic_oracle_setup_blocked_20261020/RESULT.json",
+    "aimed_gather": "research/ic_aimed_gather_20261023/aa2_20261029/summary.json",
+    "aimed_gather_first": "research/ic_aimed_gather_20261023/summary.json",
+    "aimed_gather_corrected": "research/ic_aimed_gather_20261023/aa2_20261029/summary-corrected.json",
     "quartic_tagged_p13": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_v1.json",
     "quartic_tagged_p37": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p37_v1.json",
     "quartic_tagged_p13_aa": "research/twist_index_calculus_20261020/quartic_twist_pair_tagged_direct_p13_aa_v1.json",
@@ -875,6 +884,43 @@ def prime_base_size_component() -> dict:
             "validated": not errs}
 
 
+def packed_filter_component() -> dict:
+    """The membership filter on the packed pair table, research/ic_packed_filter_20261029
+    (backlog XP-20261029-packed-filter, frozen protocol, decided at 32 bits): the corrected
+    whole-solve wall per charged GAE copied from the size's native `ecbench compare` output,
+    the bitop ratio from its `ecbench work` totals, and the counted S′ band against the
+    same-session rho.negation from the independent validator's j4.json. A wall component
+    speed-up at identical charged GAE; it moves no row of tables A-C. Its standing comes
+    from the study's VALIDATION.json (REVIEW-P32 (3.4))."""
+    study = "research/ic_packed_filter_20261029"
+    wall = load(f"{study}/P32/wall/analysis/compare-dgb__dgbf-w0.json")["wall"]
+    if wall.get("aa_arms") != ["dgb", "dgb-aa"] or wall.get("pairs") != 288 or wall.get("pairs_below_level"):
+        raise SystemExit(f"{study}: P32 wall comparison is not the frozen decision pair")
+    work = load(f"{study}/P32/wall/analysis/work_checks.json")
+    j4 = load(f"{study}/validation/code/out/j4.json")["P32-counted"]
+    ws = ("0.0", "0.1", "1.0")
+    band = {k: [j4[k][w]["ratio_b_over_a"] for w in ws] for k in ("dgbf/dgb", "dgb/rho-neg", "dgbf/rho-neg")}
+    if not (j4["dgb/rho-neg"]["strict_same_order_across_band_every_curve"]
+            and j4["dgbf/rho-neg"]["strict_same_order_across_band_every_curve"]):
+        raise SystemExit(f"{study}: rho-neg order does not hold across the band")
+    errs = gate.check_evidence_dir(REPO / study, REPO)
+    return {"study": study + "/", "readme": study + "/README.md", "report": study + "/REPORT.pdf",
+            "class": "engineering", "track": "generic (prime-table; docs/ic/SWEEPER.md, Tracks)",
+            "label": "whole-solve wall per charged GAE at N_inc, filtered against unfiltered packed table",
+            "candidate": "mitm-prime-blocked:m=2,filter=1", "incumbent": "mitm-prime-blocked:m=2", "bits": 32,
+            "pairs": wall["pairs"], "corrected": wall["corrected_ratio"], "corrected_ci95": wall["corrected_ci95"],
+            "bitop_ratio": float(work["ratio_dgbf_over_dgb_measured_verified_repr"]),
+            "sprime": band, "host": "c8a.2xlarge (AMD EPYC 9R45) on EKS, L2",
+            "other_sizes": ("At 24 bits the same comparison read a regression (1.0032 [1.0006, 1.0058]); "
+                            "28 bits is undecidable (infrastructure); see the README."),
+            "validation": ("validated with caveats: replay certificate, validator report and the matched rho reference "
+                           f"with the §5a band ({study}/VALIDATION.json); single session, not replicated. Caveats: the "
+                           "validator re-priced the bitops with its own code rather than re-running `ecbench work`; "
+                           "the image digest is bound through the binary hashes, not pod status")
+            if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
 def lazy_members_component() -> dict:
     """The lazy orbit-member index of research/ecbench_lazy_orbit_members_20261018:
     ratios copied from the study's saved ecbench comparisons (figures/ratios.json).
@@ -1147,6 +1193,90 @@ def postgb_linear_stage_component() -> dict:
             "validated": not errs}
 
 
+def ic_cover_weakclass_component() -> dict:
+    """Hilbert early stop in the Joux-Vitse cover IC on the weak class, from
+    research/ic_cover_weakclass_20261023: per-p mean S of the full-F4 arm (A)
+    and the Hilbert arm (B), the paired S_A/S_B, and S over the negation-map
+    rho reference added for validation, copied from the study's summary.json
+    (made from its run records) and validation/rho-neg.json. A component
+    improvement in the linear-algebra stage; these curves have no row in
+    tables A-C. Its standing comes from the study's VALIDATION.json."""
+    d = load(SOURCES["ic_cover_weakclass"])
+    rho = load(SOURCES["ic_cover_weakclass_rho_neg"])
+    study = "research/ic_cover_weakclass_20261023"
+    per_p = {row["p"]: row for row in d["per_p"]}
+    rows = []
+    for p in sorted(per_p):
+        cells = [c for c in d["cells"] if c["p"] == p]
+        for c in cells:
+            a, b = c["A"], c["B"]
+            if not (a["solved"] and b["solved"] and a["correct"] and b["correct"]
+                    and a["mismatches"] == 0 and b["mismatches"] == 0
+                    and a["digest"] == b["digest"]
+                    and a["residuals"] == b["residuals"] and a["relations"] == b["relations"]):
+                raise SystemExit(f"{SOURCES['ic_cover_weakclass']}: p={p} seed={c['seed']} "
+                                 "failed the equal-relations or verification gate")
+        base = statistics.fmean(c["A"]["S"] for c in cells)
+        lever = statistics.fmean(c["B"]["S"] for c in cells)
+        r = rho["per_p"][str(p)]
+        band = lambda s: [s / (r["s_rho"] * (1 + 2 * w * r["steps_per_op"]))
+                          for w in (0.0, 0.1, 1.0)]
+        rows.append({"p": p, "cells": len(cells), "base": base, "lever": lever,
+                     "ratio": per_p[p]["ratio_S_A_over_S_B"]["mean"],
+                     "ratio_min": per_p[p]["ratio_S_A_over_S_B"]["min"],
+                     "ratio_max": per_p[p]["ratio_S_A_over_S_B"]["max"],
+                     "before": band(base), "after": band(lever)})
+    errs = gate.check_evidence_dir(REPO / study, REPO)
+    return {"rows": rows, "slope": d["slope_A"][0], "slope_engineer": d["slope_B"][0],
+            "class": "engineering",
+            "unit": "S = counted F_p multiplications per sqrt(l) (c_add_E normalised), one thread",
+            "study": study + "/", "report": study + "/REPORT.pdf", "source": SOURCES["ic_cover_weakclass"],
+            "validation": ("validated with caveats: replay certificate, validator report and the "
+                           "negation-map rho reference with the §5a band "
+                           f"({study}/VALIDATION.json)") if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
+def d4_char2_frob_roots_component() -> dict:
+    """Frobenius-semilinear squaring in the F_q root finding of the char-2 D4
+    index calculus (`frob_roots=1`), from research/ic_d4_char2_lever_20261023:
+    per-target S of the base and lever arms and the matched rho.negation priced
+    at w = 0, 0.1 and 1 GAE per unpriced native operation, copied from the
+    study's tabulate.sh tables (made from the session records), and the paired
+    lever/base ratio from its ecbench comparisons. A component improvement: the
+    same trials, relations and logarithms, fewer counted multiplications; these
+    curves have no row in tables A-C. Its standing comes from the study's
+    VALIDATION.json."""
+    study = "research/ic_d4_char2_lever_20261023"
+    rows = []
+    for key, m in (("d4_char2_m12", 12), ("d4_char2_m14", 14)):
+        arms: dict[int, dict] = {}
+        for line in (REPO / SOURCES[key]).read_text().splitlines():
+            f = line.split("\t")
+            if int(f[0]) != m or f[4] != "verified":
+                raise SystemExit(f"{SOURCES[key]}: unexpected curve or an unverified run")
+            arms.setdefault(int(f[1]), {})[f[2]] = [float(x) for x in f[3:4] + f[6:9]]
+        for t, a in sorted(arms.items()):
+            if a["ic-base-aa"][0] != a["ic-base"][0]:
+                raise SystemExit(f"{SOURCES[key]}: A/A arm differs from the base on target {t}")
+            base, lever, rho = a["ic-base"][0], a["ic-lever"][0], a["ic-base"][1:]
+            rows.append({"m": m, "target": t, "base": base, "lever": lever, "ratio": lever / base,
+                         "base_over_rho": [base / r for r in rho], "lever_over_rho": [lever / r for r in rho]})
+    paired = {}
+    for key, m in (("d4_char2_cmp_m12", 12), ("d4_char2_cmp_m14", 14)):
+        o = load(SOURCES[key])["ops"]
+        if o.get("status") != "ok" or not o.get("same_seeds"):
+            raise SystemExit(f"{SOURCES[key]}: comparison not ok or seeds differ")
+        paired[m] = {"ratio": o["ratio_b_over_a"], "ci95": o["ci95"], "pairs": o["pairs"]}
+    errs = gate.check_evidence_dir(REPO / study, REPO)
+    return {"rows": rows, "paired": paired, "class": "engineering",
+            "unit": "S = counted cost in GAE per sqrt(r), ecbench",
+            "study": study + "/", "report": study + "/REPORT.pdf", "source": SOURCES["d4_char2_m12"],
+            "validation": ("validated with caveats: replay certificate, validator report and the matched rho "
+                           f"reference with the §5a band ({study}/VALIDATION.json)") if not errs else NOT_VALIDATED,
+            "validated": not errs}
+
+
 def secs(x: float) -> str:
     """Seconds to three significant figures, trailing zeros kept: 8.00 s, 224 s."""
     return f"{x:.0f} s" if x >= 100 else f"{x:#.3g} s"
@@ -1164,6 +1294,48 @@ def pair_table_component() -> dict:
     return {**res, "study": "research/ic_oracle_setup_blocked_20261020/",
             "report": "research/ic_oracle_setup_blocked_20261020/REPORT.pdf",
             "class": "engineering"}
+
+
+AIMED_GATHER_EVIDENCE = "benchmarks/20261029-ic-aimed-gather"
+
+
+def aimed_gather_component() -> dict:
+    """The per-unit gather of aimed-subset coordinates in relation collection
+    (#2448), from research/ic_aimed_gather_20261023: the 2026-10-29 session's
+    paired native ratios against its own 42-round A/A, with the first
+    session's 5-pair A/A kept as the before mark. Medians, intervals and
+    verdicts are copied from summary-corrected.json (correct_bootstrap.sh,
+    from the session records): the as-run bootstrap drew only odd-numbered
+    rounds (CORRECTION.md). On the measured params every arm counts the
+    same operations and recovers the same logarithm, so no row of tables A-C
+    moves. Its standing comes from the benchmarks directory's VALIDATION.json."""
+    d = load(SOURCES["aimed_gather"])
+    first = load(SOURCES["aimed_gather_first"])
+    corr = load(SOURCES["aimed_gather_corrected"])
+    if corr.get("schema") != "ic_aimed_gather.bootstrap_correction/v2":
+        raise SystemExit(f"{SOURCES['aimed_gather_corrected']}: unexpected schema")
+    if not d.get("identity_ok") or d.get("rounds_kept") != 42:
+        raise SystemExit(f"{SOURCES['aimed_gather']}: an identity failure or an incomplete session")
+    errs = gate.check_evidence_dir(REPO / AIMED_GATHER_EVIDENCE, REPO)
+
+    def pick(s, metric):
+        def one(q):
+            return {"median": q["median"], "ci95": [q["ci95"]["lo"], q["ci95"]["hi"]], "n": q["n"],
+                    "above_one": q["above_one"], "ci95_as_run": [q["ci95_as_run"]["lo"], q["ci95_as_run"]["hi"]]}
+        return {"ab": one(s[f"ab_{metric}"]), "aa": one(s[f"aa_{metric}"]), "margin": s[f"margin_{metric}"],
+                "established": s[f"established_{metric}"], "established_as_run": s[f"established_{metric}_as_run"]}
+    sess = corr["sessions"]
+    rows = [{"metric": label, "session": pick(sess["2026-10-29"], m), "before": pick(sess["2026-10-23"], m)}
+            for m, label in (("collect", "collect phase"), ("total", "whole set-up"))]
+    cg = {r["params"]: r["ratio"] for r in first["callgrind"]}
+    return {"rows": rows, "curve": "icv1-f2m53-tm56619371-dac20a85", "callgrind_ratio": cg,
+            "median_ms": d["median_ms"], "processes": d["processes"], "refused": d["refused_then_retried"],
+            "class": "engineering", "study": "research/ic_aimed_gather_20261023/",
+            "report": "research/ic_aimed_gather_20261023/aa2_20261029/report/report.pdf",
+            "source": SOURCES["aimed_gather"],
+            "validation": ("validated: replay certificate, validator report and the matched rho reference "
+                           f"with the §5a band ({AIMED_GATHER_EVIDENCE}/VALIDATION.json)") if not errs else NOT_VALIDATED,
+            "validated": not errs}
 
 
 def quartic_twist_pair_component() -> dict:
@@ -2385,6 +2557,7 @@ def build(allow_unvalidated: bool = False) -> dict:
         "linear_algebra_component": la_component(),
         "k4_v4_component": k4_v4_component(),
         "prime_base_size_component": prime_base_size_component(),
+        "packed_filter_component": packed_filter_component(),
         "lazy_members_component": lazy_members_component(),
         "generator_orbit_component": generator_orbit_component(),
         "lazy_columns2_component": lazy_columns2_component(),
@@ -2393,8 +2566,11 @@ def build(allow_unvalidated: bool = False) -> dict:
         "f4_fp_ic_component": f4_fp_ic_component(),
         "jv_cover_linear_stage_component": load(SOURCES["jv_cover_sparse_fglm"]),
         "postgb_linear_stage_component": postgb_linear_stage_component(),
+        "ic_cover_weakclass_component": ic_cover_weakclass_component(),
+        "d4_char2_frob_roots_component": d4_char2_frob_roots_component(),
         "algebraic_ladder": algebraic_ladder(),
         "pair_table_component": pair_table_component(),
+        "aimed_gather_component": aimed_gather_component(),
         "quartic_twist_pair_component": quartic_twist_pair_component(),
         "quartic_dense_component": quartic_dense_component(),
         "quartic_polynomial_component": quartic_polynomial_component(),
@@ -2768,6 +2944,46 @@ def markdown(doc: dict) -> str:
     L += ["", f"[Report]({'../../' + c2['report']}) · [study](../../{c2['study']}) · "
               f"[data](../../{c2['source']}). Distance to rho is reported, not a gate; no ranking against "
               "rho is claimed (§5a band not applied).", "", c2["validation"], ""]
+    cw = doc["ic_cover_weakclass_component"]
+    L += ["## Component improvement: Hilbert early stop in the Joux–Vitse cover IC (2026-10-28, engineering)", "",
+          "On the weak class (`jv_cover --exp dlp`, six-quadric cover over `F_p`, p = 53–503), the Hilbert stop "
+          "certifies the leading forms are a regular sequence and drops every pending F4 pair the complete "
+          "intersection's Hilbert function proves reduces to zero; the reduced basis is unchanged. The baseline "
+          "arm reproduces the recorded S; every cell has equal residuals, relations, decompositions and relation "
+          "digest, every logarithm is verified, and A/A is 1.000. The as-found form (B0) is a relabelling: S fell "
+          "2.53–2.64× while the emitted native-ops counter rose 8.3–8.5×. Counted F_p multiplications only "
+          f"(`{cw['unit']}`), a lower bound: the F4 driver's pair selection, matrix assembly and table lookups are "
+          "unpriced, and the IC side's unpriced work is not emitted. These curves have no row in tables A–C. "
+          f"The log–log slope of S/rho over p is {cw['slope']:.2f} (full F4) and {cw['slope_engineer']:.2f} "
+          "(Hilbert arm). S/rho uses the negation-map reference added for validation; distance remaining, not a "
+          "gate, and no cross-method rank is claimed.", "",
+          "| p | cells | S before → after | S_A/S_B | IC ÷ rho-neg after (w = 0 / 0.1 / 1) | IC ÷ rho-neg before |",
+          "|---:|--:|:--|:--|:--|:--|"]
+    for r in cw["rows"]:
+        band = " / ".join(f"{x:.1f}" for x in r["after"])
+        before = " / ".join(f"{x:.1f}" for x in r["before"])
+        L.append(f"| {r['p']} | {r['cells']} | {r['base']:.4g} → {r['lever']:.4g} | "
+                 f"**{r['ratio']:.3f}** [{r['ratio_min']:.3f}, {r['ratio_max']:.3f}] | {band} | {before} |")
+    L += ["", f"[Report]({'../../' + cw['report']}) · [study](../../{cw['study']}) · "
+              f"[data](../../{cw['source']}).", "", cw["validation"], ""]
+    d4 = doc["d4_char2_frob_roots_component"]
+    L += ["## Component improvement: Frobenius-semilinear root finding, char-2 D₄ index calculus (2026-10-28, engineering)", "",
+          "On the k = 4 characteristic-2 ladder (E over F_{(2^m)^4}, Frobenius-reduced D₄), each squaring modulo h in "
+          "the F_q root finding is done as Σ aᵢ²X²ⁱ with a per-modulus table instead of a generic product and reduction "
+          "(`frob_roots=1`). Same trials, relations and logarithms; every executed multiplication is still counted. "
+          "These curves have no row in tables A–C. "
+          f"{d4['unit']}; IC arms emit no counter for the eigen step's XOR accumulation and table lookups, so IC S is a lower bound (counted F_q multiplications only) and only rho is repriced across the §5a band; whether the gain survives pricing that work is unverified.", "",
+          "| curve | target | S before → after | after ÷ before | IC ÷ rho-neg before → after (w = 0 / 0.1 / 1) |",
+          "|:--|--:|:--|:--|:--|"]
+    for r in d4["rows"]:
+        band = " / ".join(f"{b:.2f} → {a:.2f}" for b, a in zip(r["base_over_rho"], r["lever_over_rho"]))
+        L.append(f"| m = {r['m']} | {r['target']} | {r['base']:.4g} → {r['lever']:.4g} | **{r['ratio']:.4f}** | {band} |")
+    pr = "; ".join(f"m = {m}: {p['ratio']:.4f} [{p['ci95'][0]:.4f}, {p['ci95'][1]:.4f}] over {p['pairs']} pair(s)"
+                   for m, p in sorted(d4["paired"].items()))
+    L += ["", f"Paired lever ÷ base (ecbench compare): {pr}. Rho stays ahead at every weight; the IC ÷ rho column is "
+              "the distance remaining, not a gate.", "",
+          f"[Report]({'../../' + d4['report']}) · [study](../../{d4['study']}) · [data](../../{d4['source']}).", "",
+          d4["validation"], ""]
     for code in ("A", "B", "C"):
         f = fams[code]
         rows = [r for r in doc["board"] if r["family"] == code]
@@ -3104,6 +3320,26 @@ def markdown(doc: dict) -> str:
     L += ["", "Rho stays ahead at every size and weight; the IC ÷ rho column is the distance remaining, not a gate.", "",
           pb["second_host"], "",
           f"[Report]({'../../' + pb['report']}) · [study](../../{pb['study']}).", "", pb["validation"], ""]
+    pf = doc["packed_filter_component"]
+    pf_s = {k: " / ".join(f"{x:.2f}" if "rho" in k else f"{x:.4f}" for x in v) for k, v in pf["sprime"].items()}
+    pf_c, (pf_lo, pf_hi) = pf["corrected"], pf["corrected_ci95"]
+    L += ["## Component speed-up: membership filter on the packed pair table (2026-10-29, engineering)", "",
+          f"Frozen protocol (backlog XP-20261029-packed-filter); track {pf['track']}. "
+          f"Label: {pf['label']}, `{pf['candidate']}` against `{pf['incumbent']}` at b = {pf['bits']}. "
+          "It moves no row of tables A–C and is ranked against nothing in them.", "",
+          f"- **Wall:** corrected {pf_c:.4f} [{pf_lo:.4f}, {pf_hi:.4f}], that is {100 * (1 - pf_c):.2f}% less wall "
+          f"per charged GAE (95%: {100 * (1 - pf_hi):.2f}% to {100 * (1 - pf_lo):.2f}%), at identical charged GAE.",
+          f"- **`bitop/v1`** {100 * (pf['bitop_ratio'] - 1):+.3f}%: the rise is build-side only; the probe-side "
+          "filter test is not counted separately; the build's pass over the empty slots is not counted.",
+          f"- **S′ `dgbf / dgb`** {pf_s['dgbf/dgb']} at w = 0 / 0.1 / 1: `dgbf`'s counted cost exceeds `dgb`'s at "
+          "w > 0 by that ratio; `table_insert_attempts` is unpriced on every IC arm, identically between `dgb` and "
+          "`dgbf`, a gap that predates this study; these figures decide nothing.",
+          f"- **Distance remaining at {pf['bits']} bits:** `dgbf / rho-neg` {pf_s['dgbf/rho-neg']} and "
+          f"`dgb / rho-neg` {pf_s['dgb/rho-neg']}. `rho-neg` is cheaper than both IC arms at every weight on every "
+          "curve, so the §5a band permits that ranking; `dgbf` is never ranked ahead of `dgb` in the counted unit.",
+          f"- **Scope:** {pf['host']}; two curves at {pf['bits']} bits; one session, {pf['pairs']} pairs.",
+          f"- **Other sizes:** {pf['other_sizes']}", "",
+          f"[README](../../{pf['readme']}) · [report PDF](../../{pf['report']}).", "", pf["validation"], ""]
     la = doc["linear_algebra_component"]
     L += ["## Linear-algebra engine, outside tables A–C", "",
           "The linear-algebra phase alone, on synthetic m = 3 relation matrices over a 62-bit prime "
@@ -3150,6 +3386,37 @@ def markdown(doc: dict) -> str:
         L.append(f"| {r['N']:,} | {pts(r['setup_ms']['scalar'])} | {pts(r['setup_ms']['batch'])} | "
                  f"{pts(r['setup_ms']['blocked'])} | {ptr(r['blocked_over_batch'])} | {ptr(r['blocked_over_scalar'])} | "
                  f"{r['run_blocked_over_scalar']:.2f} | {r['rss_gib']['batch']:.2f} → {r['rss_gib']['blocked']:.2f} GiB |")
+    L.append("")
+    ag = doc["aimed_gather_component"]
+
+    def agq(q):
+        return f"{q['median']:.3f} [{q['ci95'][0]:.3f}, {q['ci95'][1]:.3f}]"
+
+    def agv(r, bold):
+        if r["established"] and r["established_as_run"]:
+            return "**established**" if bold else "established"
+        if r["established"]:
+            return f"marginal (+{r['margin']:.3f}), not claimed"
+        return "not established"
+    L += ["## Aimed-subset gather in relation collection, outside tables A–C", "",
+          f"`ic price` on {ag['curve']} (rule v3 `k0n53/T01`, aimed m = 3 collection): main against the "
+          "change that gathers the aimed subset's coordinates once per unit instead of on every trial "
+          "(class: engineering, #2448). On these params every arm counts the same operations and recovers the same logarithm, "
+          "so S and every row above are unchanged; the board's rule v7 row for this curve was timed before the "
+          f"change and is not re-priced. Callgrind instructions per process, main / candidate: "
+          f"{ag['callgrind_ratio']['k0n53']:.3f} at n53, {ag['callgrind_ratio']['k0n61']:.3f} at n61. "
+          "Paired native ratios main / candidate, median [95% bootstrap]; a gain is established only where "
+          f"its lower end clears 1 and the same-session A/A's upper end. Intervals are corrected: the bootstrap "
+          "as first run drew only odd-numbered rounds (CORRECTION.md in the study); a verdict that holds only "
+          f"under the correction is marked marginal and not claimed. {ag['processes']} processes, "
+          f"none contended. {ag['validation'].rstrip('.')}. Study: [{ag['study']}](../../{ag['study']}).", "",
+          "| metric | 2026-10-29 A/B | rounds > 1 | 2026-10-29 A/A (42 rounds) | verdict | before: 2026-10-23 A/B | before: A/A (5 pairs) | before: verdict |",
+          "|:--|:--|--:|:--|:--|:--|:--|:--|"]
+    for r in ag["rows"]:
+        s, b = r["session"], r["before"]
+        L.append(f"| {r['metric']} | {agq(s['ab'])} | {s['ab']['above_one']} / {s['ab']['n']} | {agq(s['aa'])} | "
+                 f"{agv(s, True)} | {agq(b['ab'])} | {agq(b['aa'])} | "
+                 f"{agv(b, False)} |")
     L.append("")
     qt = doc["quartic_twist_pair_component"]
     L += ["## Quartic-twist pair index, outside tables A–C", "",
@@ -4075,6 +4342,55 @@ def page(doc: dict, standalone: bool) -> str:
              'Distance to rho is reported, not a gate; no ranking against rho is claimed (§5a band not '
              'applied).</p>'
              f'<p class="muted">{esc(c2["validation"])}</p></section>')
+    cw = doc["ic_cover_weakclass_component"]
+    P.append('<section class="panel" id="ic-cover-weakclass-hilbert"><h2>Component improvement · Hilbert early '
+             'stop in the Joux–Vitse cover IC <span class="chip">engineering</span></h2>'
+             '<p>On the weak class (<code>jv_cover --exp dlp</code>, six-quadric cover over <code>F<sub>p</sub></code>, '
+             'p = 53–503), the Hilbert stop certifies the leading forms are a regular sequence and drops every '
+             'pending F4 pair the complete intersection\'s Hilbert function proves reduces to zero; the reduced '
+             'basis is unchanged. The baseline arm reproduces the recorded S; every cell has equal residuals, '
+             'relations, decompositions and relation digest, every logarithm is verified, and A/A is 1.000. The '
+             'as-found form (B0) is a relabelling: S fell 2.53–2.64× while the emitted native-ops counter rose '
+             f'8.3–8.5×. Counted F<sub>p</sub> multiplications only ({esc(cw["unit"])}), a lower bound: the F4 '
+             'driver\'s pair selection, matrix assembly and table lookups are unpriced, and the IC side\'s unpriced '
+             'work is not emitted. These curves have no row in tables A–C. '
+             f'The log–log slope of S/rho over p is {cw["slope"]:.2f} (full F4) and {cw["slope_engineer"]:.2f} '
+             '(Hilbert arm). S/rho uses the negation-map reference added for validation; distance remaining, not a '
+             'gate, and no cross-method rank is claimed.</p>'
+             '<div class="scroll"><table><thead><tr><th>p</th><th>cells</th><th>S before → after</th>'
+             '<th>S<sub>A</sub>/S<sub>B</sub></th><th>IC ÷ rho-neg after (w = 0 / 0.1 / 1)</th>'
+             '<th>IC ÷ rho-neg before</th></tr></thead><tbody>')
+    for r in cw["rows"]:
+        band = " / ".join(f"{x:.1f}" for x in r["after"])
+        before = " / ".join(f"{x:.1f}" for x in r["before"])
+        P.append(f'<tr><td>{r["p"]}</td><td>{r["cells"]}</td><td>{r["base"]:.4g} → {r["lever"]:.4g}</td>'
+                 f'<td><b>{r["ratio"]:.3f}</b> [{r["ratio_min"]:.3f}, {r["ratio_max"]:.3f}]</td>'
+                 f'<td>{band}</td><td>{before}</td></tr>')
+    P.append('</tbody></table></div>'
+             f'<p>{gh(cw["report"], "Report")} · {gh(cw["study"], "study")} · {gh(cw["source"], "data")}.</p>'
+             f'<p class="muted">{esc(cw["validation"])}</p></section>')
+    d4 = doc["d4_char2_frob_roots_component"]
+    P.append('<section class="panel" id="d4-char2-frob-roots"><h2>Component improvement · Frobenius-semilinear '
+             'root finding, char-2 D₄ <span class="chip">engineering</span></h2>'
+             '<p>On the k = 4 characteristic-2 ladder, each squaring modulo h in the F<sub>q</sub> root finding is '
+             'done as Σ a<sub>i</sub>²X<sup>2i</sup> with a per-modulus table instead of a generic product and '
+             'reduction (<code>frob_roots=1</code>). Same trials, relations and logarithms; every executed '
+             'multiplication is still counted. These curves have no row in tables A–C. '
+             f'{esc(d4["unit"])}; IC S counts F<sub>q</sub> multiplications only (the eigen step\'s XOR and table-lookup work is not emitted), so it is a lower bound; '
+             f'only rho is repriced across the §5a band, and whether the gain survives pricing that work is unverified.</p>'
+             '<div class="scroll"><table><thead><tr><th>Curve</th><th>Target</th><th>S before → after</th>'
+             '<th>after ÷ before</th><th>IC ÷ rho-neg before → after (w = 0 / 0.1 / 1)</th></tr></thead><tbody>')
+    for r in d4["rows"]:
+        band = " / ".join(f"{b:.2f} → {a:.2f}" for b, a in zip(r["base_over_rho"], r["lever_over_rho"]))
+        P.append(f'<tr><td>m = {r["m"]}</td><td>{r["target"]}</td><td>{r["base"]:.4g} → {r["lever"]:.4g}</td>'
+                 f'<td><b>{r["ratio"]:.4f}</b></td><td>{band}</td></tr>')
+    pr = "; ".join(f"m = {m}: {p['ratio']:.4f} [{p['ci95'][0]:.4f}, {p['ci95'][1]:.4f}] over {p['pairs']} pair(s)"
+                   for m, p in sorted(d4["paired"].items()))
+    P.append('</tbody></table></div>'
+             f'<p>Paired lever ÷ base (ecbench compare): {esc(pr)}. Rho stays ahead at every weight; the IC ÷ rho '
+             'column is the distance remaining, not a gate.</p>'
+             f'<p>{gh(d4["report"], "Report")} · {gh(d4["study"], "study")} · {gh(d4["source"], "data")}.</p>'
+             f'<p class="muted">{esc(d4["validation"])}</p></section>')
     d = doc["bounded_diagnostics"][0]
     P.append(f'<section class="card" id="bounded-n37-diagnostic"><h2>New n37 counted diagnostic, outside the priced tables</h2>'
              f'<p>On <code>{esc(d["curve"])}</code>, shared-rank K16 has {d["usable_points"]:,} actual usable '
@@ -4321,6 +4637,34 @@ def page(doc: dict, standalone: bool) -> str:
              f'<p>{esc(pb["second_host"])}</p>'
              f'<p>{gh(pb["report"], "Report")} · {gh(pb["study"], "study")}.</p>'
              f'<p class="muted">{esc(pb["validation"])}</p></section>')
+    pf = doc["packed_filter_component"]
+    pf_s = {k: " / ".join(f"{x:.2f}" if "rho" in k else f"{x:.4f}" for x in v) for k, v in pf["sprime"].items()}
+    pf_c, (pf_lo, pf_hi) = pf["corrected"], pf["corrected_ci95"]
+    P.append('<section class="card" id="packed-filter-component"><h2>Component speed-up · membership filter on the '
+             'packed pair table (2026-10-29) <span class="chip">engineering</span></h2>'
+             f'<p>Frozen protocol (backlog XP-20261029-packed-filter); track {esc(pf["track"])}. '
+             f'Label: {esc(pf["label"])}, <code>{esc(pf["candidate"])}</code> against '
+             f'<code>{esc(pf["incumbent"])}</code> at b = {pf["bits"]}. It moves no row of the priced tables and '
+             'is ranked against nothing in them.</p><ul>'
+             f'<li><b>Wall:</b> corrected {pf_c:.4f} [{pf_lo:.4f}, {pf_hi:.4f}], that is {100 * (1 - pf_c):.2f}% '
+             f'less wall per charged GAE (95%: {100 * (1 - pf_hi):.2f}% to {100 * (1 - pf_lo):.2f}%), at identical '
+             'charged GAE.</li>'
+             f'<li><b><code>bitop/v1</code></b> {100 * (pf["bitop_ratio"] - 1):+.3f}%: the rise is build-side only; '
+             'the probe-side filter test is not counted separately; the build&#39;s pass over the empty slots is '
+             'not counted.</li>'
+             f'<li><b>S′ <code>dgbf / dgb</code></b> {pf_s["dgbf/dgb"]} at w = 0 / 0.1 / 1: <code>dgbf</code>&#39;s '
+             'counted cost exceeds <code>dgb</code>&#39;s at w &gt; 0 by that ratio; <code>table_insert_attempts</code> '
+             'is unpriced on every IC arm, identically between <code>dgb</code> and <code>dgbf</code>, a gap that '
+             'predates this study; these figures decide nothing.</li>'
+             f'<li><b>Distance remaining at {pf["bits"]} bits:</b> <code>dgbf / rho-neg</code> {pf_s["dgbf/rho-neg"]} '
+             f'and <code>dgb / rho-neg</code> {pf_s["dgb/rho-neg"]}. <code>rho-neg</code> is cheaper than both IC arms '
+             'at every weight on every curve, so the §5a band permits that ranking; <code>dgbf</code> is never '
+             'ranked ahead of <code>dgb</code> in the counted unit.</li>'
+             f'<li><b>Scope:</b> {esc(pf["host"])}; two curves at {pf["bits"]} bits; one session, {pf["pairs"]} '
+             'pairs.</li>'
+             f'<li><b>Other sizes:</b> {esc(pf["other_sizes"])}</li></ul>'
+             f'<p>{gh(pf["readme"], "README")} · {gh(pf["report"], "report PDF")}.</p>'
+             f'<p class="muted">{esc(pf["validation"])}</p></section>')
     la = doc["linear_algebra_component"]
     P.append('<section class="card" id="linear-algebra-component"><h2>Linear-algebra engine, outside the priced tables</h2>'
              '<p>The linear-algebra phase alone, on synthetic m = 3 relation matrices over a 62-bit prime '
@@ -4366,6 +4710,40 @@ def page(doc: dict, standalone: bool) -> str:
                  f'<td>{pq(r["blocked_over_batch"])}</td><td>{pq(r["blocked_over_scalar"])}</td>'
                  f'<td class="n">{r["run_blocked_over_scalar"]:.2f}</td>'
                  f'<td>{r["rss_gib"]["batch"]:.2f} → {r["rss_gib"]["blocked"]:.2f} GiB</td></tr>')
+    P.append('</tbody></table></section>')
+
+    ag = doc["aimed_gather_component"]
+
+    def agh(q):
+        return f'{q["median"]:.3f} <span class="muted">[{q["ci95"][0]:.3f}, {q["ci95"][1]:.3f}]</span>'
+
+    def aghv(r, bold):
+        if r["established"] and r["established_as_run"]:
+            return "<strong>established</strong>" if bold else "established"
+        if r["established"]:
+            return f'marginal (+{r["margin"]:.3f}), not claimed'
+        return "not established"
+    P.append('<section class="card" id="aimed-gather-component"><h2>Aimed-subset gather in relation collection, outside the priced tables</h2>'
+             f'<p><code>ic price</code> on <code>{esc(ag["curve"])}</code> (rule v3 <code>k0n53/T01</code>, aimed m = 3 '
+             'collection): main against the change that gathers the aimed subset&#x27;s coordinates once per unit '
+             'instead of on every trial (class: engineering, #2448). On these params every arm counts the same operations and recovers '
+             'the same logarithm, so S and every row above are unchanged; the rule v7 row for this curve was timed '
+             f'before the change and is not re-priced. Callgrind instructions per process, main / candidate: '
+             f'{ag["callgrind_ratio"]["k0n53"]:.3f} at n53, {ag["callgrind_ratio"]["k0n61"]:.3f} at n61. '
+             'Paired native ratios main / candidate, median [95% bootstrap]; a gain is established only where its '
+             'lower end clears 1 and the same-session A/A&#x27;s upper end. Intervals are corrected: the bootstrap as '
+             'first run drew only odd-numbered rounds (CORRECTION.md in the study); a verdict that holds only under '
+             f'the correction is marked marginal and not claimed. {ag["processes"]} processes, none contended. '
+             f'{esc(ag["validation"].rstrip("."))}. '
+             f'<a href="https://github.com/aburan28/crypto/blob/main/{esc(ag["study"])}">Study</a>.</p>')
+    P.append('<table><thead><tr><th>metric</th><th>2026-10-29 A/B</th><th class="n">rounds &gt; 1</th>'
+             '<th>A/A (42 rounds)</th><th>verdict</th><th>before: 2026-10-23 A/B</th><th>before: A/A (5 pairs)</th>'
+             '<th>before: verdict</th></tr></thead><tbody>')
+    for r in ag["rows"]:
+        s, b = r["session"], r["before"]
+        P.append(f'<tr><td>{esc(r["metric"])}</td><td>{agh(s["ab"])}</td>'
+                 f'<td class="n">{s["ab"]["above_one"]} / {s["ab"]["n"]}</td><td>{agh(s["aa"])}</td>'
+                 f'<td>{aghv(s, True)}</td><td>{agh(b["ab"])}</td><td>{agh(b["aa"])}</td><td>{aghv(b, False)}</td></tr>')
     P.append('</tbody></table></section>')
 
     qt = doc["quartic_twist_pair_component"]

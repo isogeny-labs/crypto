@@ -2798,7 +2798,14 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
 
     fn parameters(&self) -> &[(&str, &str)] {
         if self.blocked {
-            &[("m", "must be 2")]
+            &[
+                ("m", "must be 2"),
+                (
+                    "filter",
+                    "0 (default) or 1: a membership filter of about a byte per entry in front of \
+                     the packed table, so a missing key costs one bit read (packed layout only)",
+                ),
+            ]
         } else {
             &[
                 ("m", "must be 2"),
@@ -2817,10 +2824,26 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
         params: &Params,
         ops: &mut GroupOps,
     ) -> Result<(), String> {
-        let allowed = |key: &String| key == "m" || (!self.blocked && key == "layout");
+        let allowed = |key: &String| {
+            key == "m" || (self.blocked && key == "filter") || (!self.blocked && key == "layout")
+        };
         if params.u64_or("m", 2)? != 2 || !params.0.keys().all(allowed) {
-            return Err(format!("{} accepts only m=2", self.name_str()));
+            return Err(if self.blocked {
+                format!("{} accepts only m=2 and filter=0|1", self.name_str())
+            } else {
+                format!("{} accepts only m=2", self.name_str())
+            });
         }
+        let filtered = match params.u64_or("filter", 0)? {
+            0 => false,
+            1 => true,
+            other => {
+                return Err(format!(
+                    "{}: filter must be 0 or 1, not {other}",
+                    self.name_str()
+                ))
+            }
+        };
         self.lines = match params.get("layout") {
             None | Some("map") => false,
             Some("lines") if !self.blocked => true,
@@ -2828,7 +2851,7 @@ impl DecompositionOracle<PrimeCurve> for PrimeBatchMitmOracle {
             Some(other) => return Err(format!("unknown layout `{other}`; use map or lines")),
         };
         let table = if self.blocked {
-            PairTable::build_negation_folded_prime_blocked(ctx.group, fb)?
+            PairTable::build_negation_folded_prime_blocked_with(ctx.group, fb, filtered)?
         } else if self.lines {
             PairTable::build_negation_folded_prime_batch_lines(ctx.group, fb)?
         } else {
@@ -5460,6 +5483,465 @@ mod wwalk_pipeline_tests {
                 with_row as f64 / bases as f64,
                 rows as f64 / bases as f64,
                 x * x
+            );
+        }
+    }
+}
+
+/// **`layout=lines` is a memory layout, not a different oracle.**  The
+/// opt-in cache-line pair index and prefetched relation guard (#3116)
+/// must leave every observable of the default (`map`) layout unchanged:
+/// the decomposition of every target, the counted group operations and
+/// native counters of the table build and of every probe, the relation
+/// stream the pipeline collects, and the solved logarithm.  Checked on
+/// several small prime-field curves and seeds, for both oracles that
+/// accept the option: `mitm:negation_folded=1` and `mitm-prime-batch:m=2`.
+#[cfg(test)]
+mod layout_lines_equality_tests {
+    use super::*;
+    use crate::cryptanalysis::ic_boundary::{
+        find_prime_order_curve, prime_factor_base, prime_instance_for, Calibration, CountedGroup,
+        PrimeCurve, PrimeInstance, PrimePoint, Relation,
+    };
+    use crate::cryptanalysis::ic_framework::stages::Targets;
+    use crate::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec, RunReport};
+    use rand::{rngs::StdRng, Rng, SeedableRng};
+
+    /// The two oracle specs that accept `layout`, as the CLI spells them.
+    const SPECS: [&str; 2] = ["mitm:negation_folded=1", "mitm-prime-batch:m=2"];
+
+    /// Small prime-field curves: four roster curves and two curves drawn
+    /// by `find_prime_order_curve` off the roster, with a base size each.
+    fn curves() -> Vec<(PrimeInstance, usize)> {
+        vec![
+            (prime_instance_for(14, 1), 16),
+            (prime_instance_for(16, 1), 24),
+            (prime_instance_for(18, 1), 32),
+            (prime_instance_for(20, 59297), 48),
+            (find_prime_order_curve(15, 20261106), 20),
+            (find_prime_order_curve(17, 3116), 28),
+        ]
+    }
+
+    fn oracle_for(name: &str) -> Box<dyn DecompositionOracle<PrimeCurve>> {
+        match name {
+            "mitm" => Box::new(MitmOracle::new(2)),
+            "mitm-prime-batch" => Box::new(PrimeBatchMitmOracle::new()),
+            other => panic!("no oracle {other}"),
+        }
+    }
+
+    /// `(name, default params, lines params)` for one spec string.
+    fn arms(spec: &str) -> (String, Params, Params) {
+        let (name, map) = Params::parse_spec(spec).unwrap();
+        let (_, lines) = Params::parse_spec(&format!("{spec},layout=lines")).unwrap();
+        assert_eq!(lines.get("layout"), Some("lines"));
+        assert_eq!(map.get("layout"), None);
+        (name, map, lines)
+    }
+
+    fn ctx(inst: &PrimeInstance, target: PrimePoint) -> InstanceCtx<'_, PrimeCurve> {
+        InstanceCtx {
+            group: &inst.curve,
+            generator: inst.generator_point(),
+            target,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: None,
+        }
+    }
+
+    /// The explicit `layout=map` spelling is the default, and the lines
+    /// layout is the only arm that turns the line guard on.
+    #[test]
+    fn layout_map_is_the_default_and_lines_selects_the_line_guard() {
+        let (inst, size) = curves().remove(1);
+        let fb = prime_factor_base(&inst, size);
+        let c = ctx(&inst, inst.generator_point());
+        for spec in SPECS {
+            let (name, map, lines) = arms(spec);
+            let (_, explicit) = Params::parse_spec(&format!("{spec},layout=map")).unwrap();
+            for (params, guard) in [(&map, false), (&explicit, false), (&lines, true)] {
+                let mut oracle = oracle_for(&name);
+                oracle
+                    .prepare(&c, &fb, params, &mut GroupOps::default())
+                    .unwrap();
+                assert_eq!(oracle.line_guard(), guard, "{spec} {params:?}");
+            }
+        }
+    }
+
+    /// Table build and every probe: same decompositions (as summand
+    /// indices and as the relations the pipeline is handed), same group
+    /// operations, same native counters, target by target.
+    #[test]
+    fn layout_lines_gives_identical_decompositions_and_counted_operations() {
+        for (inst, size) in curves() {
+            let fb = prime_factor_base(&inst, size);
+            let g = inst.generator_point();
+            let c = ctx(&inst, g);
+            for spec in SPECS {
+                let (name, map_params, line_params) = arms(spec);
+                let mut map = oracle_for(&name);
+                let mut lines = oracle_for(&name);
+                let mut map_build = GroupOps::default();
+                let mut line_build = GroupOps::default();
+                map.prepare(&c, &fb, &map_params, &mut map_build).unwrap();
+                lines
+                    .prepare(&c, &fb, &line_params, &mut line_build)
+                    .unwrap();
+                let label = format!("{} {spec}", inst.name);
+                assert!(!map.line_guard() && lines.line_guard(), "{label}");
+                assert_eq!(map_build, line_build, "{label}: build ops");
+                assert!(map_build.adds > 0, "{label}: the build counted nothing");
+                assert_eq!(
+                    map.setup_work_native(),
+                    lines.setup_work_native(),
+                    "{label}: build work"
+                );
+                assert_eq!(map.summands(), lines.summands(), "{label}");
+                for seed in [1u64, 7, 20261106] {
+                    let mut rng = StdRng::seed_from_u64(seed ^ inst.r);
+                    let mut map_ops = GroupOps::default();
+                    let mut line_ops = GroupOps::default();
+                    let mut map_ctr = OracleCounters::default();
+                    let mut line_ctr = OracleCounters::default();
+                    let mut hits = 0u64;
+                    let mut setup = GroupOps::default();
+                    for trial in 0..3000u64 {
+                        let (a, b) = (rng.gen_range(0..inst.r), rng.gen_range(0..inst.r));
+                        let point = inst.curve.mul(&mut setup, g, a);
+                        let point = inst.curve.add(
+                            &mut setup,
+                            point,
+                            inst.curve.mul(&mut GroupOps::default(), g, b),
+                        );
+                        lines.touch(&c, &point);
+                        let m = map.decompose(&c, &fb, &mut map_ops, &mut map_ctr, point);
+                        let l = lines.decompose(&c, &fb, &mut line_ops, &mut line_ctr, point);
+                        assert_eq!(m, l, "{label} seed {seed} trial {trial}");
+                        if let Some(w) = &m {
+                            hits += 1;
+                            let sum = w.iter().fold(None::<PrimePoint>, |acc, &i| {
+                                Some(match acc {
+                                    None => fb.points[i],
+                                    Some(s) => {
+                                        inst.curve.add(&mut GroupOps::default(), s, fb.points[i])
+                                    }
+                                })
+                            });
+                            assert_eq!(sum, Some(point), "{label}: a wrong decomposition");
+                        }
+                        let mr: Vec<Relation> = map.decompose_relations(
+                            &c,
+                            &fb,
+                            &mut map_ops,
+                            &mut map_ctr,
+                            point,
+                            a,
+                            b,
+                        );
+                        let lr: Vec<Relation> = lines.decompose_relations(
+                            &c,
+                            &fb,
+                            &mut line_ops,
+                            &mut line_ctr,
+                            point,
+                            a,
+                            b,
+                        );
+                        assert_eq!(mr, lr, "{label} seed {seed} trial {trial}: relations");
+                    }
+                    assert!(hits > 0, "{label} seed {seed}: no target decomposed");
+                    assert_eq!(map_ops, line_ops, "{label} seed {seed}: probe ops");
+                    assert_eq!(
+                        format!("{map_ctr:?}"),
+                        format!("{line_ctr:?}"),
+                        "{label} seed {seed}: probe counters"
+                    );
+                    assert!(map_ctr.lookups > 0, "{label}: no lookup counted");
+                }
+                assert_eq!(
+                    map.relation_counters(),
+                    lines.relation_counters(),
+                    "{label}: relation counters"
+                );
+            }
+        }
+    }
+
+    fn assert_same_run(map: &RunReport, lines: &RunReport, label: &str) {
+        assert_eq!(map.recovered, lines.recovered, "{label}: recovered");
+        assert_eq!(map.verified, lines.verified, "{label}: verified");
+        assert_eq!(map.exhausted, lines.exhausted, "{label}: exhausted");
+        let (fm, fl) = (&map.factor_base, &lines.factor_base);
+        assert_eq!(fm.columns, fl.columns, "{label}");
+        assert_eq!(fm.signed_points, fl.signed_points, "{label}");
+        assert_eq!(fm.cost.group_ops, fl.cost.group_ops, "{label}: base ops");
+        assert_eq!(fm.cost.native, fl.cost.native, "{label}: base native");
+        let (dm, dl) = (&map.decomposition, &lines.decomposition);
+        assert_eq!(dm.targets_tried, dl.targets_tried, "{label}: targets");
+        assert_eq!(dm.relations_found, dl.relations_found, "{label}: relations");
+        assert_eq!(dm.setup.group_ops, dl.setup.group_ops, "{label}: setup ops");
+        assert_eq!(dm.setup.native, dl.setup.native, "{label}: setup native");
+        assert_eq!(dm.setup.work_native, dl.setup.work_native, "{label}");
+        assert_eq!(dm.setup.gae, dl.setup.gae, "{label}: setup gae");
+        assert_eq!(
+            dm.cost.group_ops, dl.cost.group_ops,
+            "{label}: relation ops"
+        );
+        assert_eq!(dm.cost.native, dl.cost.native, "{label}: relation native");
+        assert_eq!(dm.cost.work_native, dl.cost.work_native, "{label}");
+        assert_eq!(dm.cost.gae, dl.cost.gae, "{label}: relation gae");
+        let (lm, ll) = (&map.linear_algebra, &lines.linear_algebra);
+        assert_eq!(
+            (lm.rows, lm.rank, lm.dependent, lm.work),
+            (ll.rows, ll.rank, ll.dependent, ll.work),
+            "{label}: linear algebra"
+        );
+        assert_eq!(lm.cost.native, ll.cost.native, "{label}");
+        assert_eq!(map.verify.group_ops, lines.verify.group_ops, "{label}");
+        assert_eq!(map.total_gae, lines.total_gae, "{label}: total gae");
+        assert_eq!(map.s, lines.s, "{label}: S");
+    }
+
+    /// End to end: the same relation counts, the same counted cost in
+    /// every phase, and the same solved logarithm, with walk, random and
+    /// batched-lane targets (the lane source is the one that prefetches).
+    #[test]
+    fn layout_lines_solves_the_same_logarithm_at_the_same_counted_cost() {
+        let calib = Calibration::default();
+        let mut solved = 0;
+        for (inst, size) in curves() {
+            let g = inst.generator_point();
+            for planted_seed in [11u64, 30_011, 20_261_106] {
+                let planted = planted_seed % inst.r;
+                let q = inst.curve.mul(&mut GroupOps::default(), g, planted);
+                let c = ctx(&inst, q);
+                for spec in SPECS {
+                    let (name, map_params, line_params) = arms(spec);
+                    for targets in [Targets::Walk, Targets::Random, Targets::WalkPrimeBatch16] {
+                        for seed in [7u64, 3116] {
+                            let run = |params: &Params| {
+                                let mut spec = PipelineSpec {
+                                    factor_base: "prime-abscissa".into(),
+                                    oracle: name.clone(),
+                                    oracle_params: params.clone(),
+                                    targets,
+                                    max_trials: 2_000_000,
+                                    seed,
+                                    ..Default::default()
+                                };
+                                spec.factor_base_params.set("size", size.to_string());
+                                let mut oracle = oracle_for(&name);
+                                run_pipeline(
+                                    &c,
+                                    &spec,
+                                    &PrimeAbscissaBase { instance: &inst },
+                                    oracle.as_mut(),
+                                    planted,
+                                    &calib,
+                                    None,
+                                )
+                                .unwrap()
+                            };
+                            let map = run(&map_params);
+                            let lines = run(&line_params);
+                            let label = format!(
+                                "{} {spec} {} seed {seed} planted {planted}",
+                                inst.name,
+                                targets.name()
+                            );
+                            assert_same_run(&map, &lines, &label);
+                            if map.verified {
+                                assert_eq!(map.recovered, Some(planted), "{label}");
+                                solved += 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // Six curves × three logs × two specs × three sources × two seeds.
+        assert_eq!(solved, 216, "every configuration should solve");
+    }
+}
+
+#[cfg(test)]
+mod free_rows_probe {
+    //! Feasibility probe (not a result): how many target-free relations the
+    //! Frobenius-folded pair table's build-time key collisions give on the
+    //! frozen orbit panel, and their rank over the column unknowns mod r.
+    use super::*;
+    use crate::cryptanalysis::ic_boundary::koblitz_instance;
+    use crate::cryptanalysis::koblitz_fast::FrobeniusCanon;
+    use num_traits::ToPrimitive;
+    use std::collections::HashMap;
+
+    fn mulmod(a: u64, b: u64, r: u64) -> u64 {
+        ((a as u128 * b as u128) % r as u128) as u64
+    }
+    fn powmod(mut a: u64, mut e: u64, r: u64) -> u64 {
+        let mut acc = 1u64;
+        while e > 0 {
+            if e & 1 == 1 {
+                acc = mulmod(acc, a, r);
+            }
+            a = mulmod(a, a, r);
+            e >>= 1;
+        }
+        acc
+    }
+    fn rank(rows: &[Vec<u64>], cols: usize, r: u64) -> usize {
+        let mut piv: Vec<Option<Vec<u64>>> = vec![None; cols];
+        let mut rk = 0;
+        for row in rows {
+            let mut v = row.clone();
+            for c in 0..cols {
+                if v[c] == 0 {
+                    continue;
+                }
+                match &piv[c] {
+                    Some(p) => {
+                        let f = v[c];
+                        for k in c..cols {
+                            v[k] = (v[k] + r - mulmod(f, p[k], r)) % r;
+                        }
+                    }
+                    None => {
+                        let inv = powmod(v[c], r - 2, r);
+                        for k in c..cols {
+                            v[k] = mulmod(v[k], inv, r);
+                        }
+                        piv[c] = Some(v);
+                        rk += 1;
+                        break;
+                    }
+                }
+            }
+            if rk == cols {
+                break;
+            }
+        }
+        rk
+    }
+
+    #[test]
+    #[ignore]
+    fn frobenius_table_free_rows_probe() {
+        let panel: &[(u8, u32, usize)] = &[
+            (0, 13, 1),
+            (1, 17, 1),
+            (0, 19, 2),
+            (0, 23, 3),
+            (1, 29, 1),
+            (0, 31, 2),
+            (0, 37, 8),
+            (0, 41, 90),
+        ];
+        for &(a, n, c) in panel {
+            let inst = koblitz_instance(a, n).expect("instance");
+            let g = BinaryGroup(&inst.fast);
+            let ctx = InstanceCtx {
+                group: &g,
+                generator: inst.generator,
+                target: inst.generator,
+                r: inst.r,
+                cofactor: inst.cofactor,
+                group_order: inst.group_order,
+                name: inst.name.clone(),
+                field_degree: Some(inst.n),
+            };
+            let (_, params) = Params::parse_spec(&format!(
+                "compact-orbit-scan:columns={c},raw_x_cap=100000000"
+            ))
+            .unwrap();
+            let mut ops = GroupOps::default();
+            let fb = CompactOrbitScanBase { instance: &inst }
+                .build(&ctx, &params, &mut ops)
+                .unwrap();
+            let r = inst.r;
+            let lambda = (&inst.koblitz.as_ref().unwrap().lambda % r)
+                .to_u64()
+                .unwrap();
+            let canon = FrobeniusCanon::new(&inst.gf, inst.n).unwrap();
+            let f = fb.points.len();
+            let cols = fb.columns;
+            // Orbit representatives exactly as FrobeniusPairTable::build_inner.
+            let mut orbit_of = vec![0u32; f];
+            let mut reps: Vec<usize> = Vec::new();
+            let mut idx: HashMap<u64, u32> = HashMap::new();
+            for i in 0..f {
+                let key = canon.canon(fb.points[i].x);
+                let next = reps.len() as u32;
+                let id = *idx.entry(key).or_insert(next);
+                if id == next {
+                    reps.push(i);
+                }
+                orbit_of[i] = id;
+            }
+            let mut map: HashMap<u64, (usize, usize, u32, FastPoint)> = HashMap::new();
+            let (mut attempts, mut collisions, mut mismatches) = (0u64, 0u64, 0u64);
+            let mut rows: Vec<Vec<u64>> = Vec::new();
+            let mut ops2 = GroupOps::default();
+            for (orbit, &rep) in reps.iter().enumerate() {
+                for j in 0..f {
+                    if (orbit_of[j] as usize) < orbit {
+                        continue;
+                    }
+                    let u = g.add(&mut ops2, fb.points[rep], fb.points[j]);
+                    if u.infinity {
+                        continue;
+                    }
+                    attempts += 1;
+                    let (key, t_u) = canon.canon_with_shift(u.x);
+                    match map.get(&key) {
+                        None => {
+                            map.insert(key, (rep, j, t_u, u));
+                        }
+                        Some(&(i0, j0, t0, u0)) => {
+                            collisions += 1;
+                            let t = (t0 + n - t_u) % n;
+                            let v = inst.fast.frobenius_k(u0, t);
+                            let s_neg = if v == u {
+                                false
+                            } else if v == g.neg(u) {
+                                true
+                            } else {
+                                mismatches += 1;
+                                continue;
+                            };
+                            let mut row = vec![0u64; cols];
+                            for &k in &[rep, j] {
+                                let col = fb.col_of[k];
+                                row[col] = (row[col] + fb.coef_of[k] % r) % r;
+                            }
+                            let lt = powmod(lambda, t as u64, r);
+                            for &k in &[i0, j0] {
+                                let col = fb.col_of[k];
+                                let mut term = mulmod(lt, fb.coef_of[k] % r, r);
+                                if !s_neg {
+                                    term = (r - term) % r;
+                                }
+                                row[col] = (row[col] + term) % r;
+                            }
+                            if row.iter().any(|&x| x != 0) {
+                                rows.push(row);
+                            }
+                        }
+                    }
+                }
+            }
+            let rk = rank(&rows, cols, r);
+            println!(
+                "n{n} a{a} c{cols} |F| {f} reps {} entries {} attempts {attempts} collisions {collisions} nonzero rows {} rank {rk} (need {}) mismatches {mismatches} r 2^{:.1}",
+                reps.len(),
+                map.len(),
+                rows.len(),
+                cols.saturating_sub(1),
+                (r as f64).log2()
             );
         }
     }

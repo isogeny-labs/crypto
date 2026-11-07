@@ -38,8 +38,8 @@ one subtraction and one table probe per base point.
 \paragraph{Prior art.} Neither the identity nor the oracle is new. The
 identity is a direct consequence of how $\Sem3$ is defined: it is the
 polynomial whose roots are the abscissae of $P_1\pm P_2$. The oracle
-mechanism---sum $m-1$ factor-base points in the group and test whether the
-result lies in the base---is the second algorithm of McGuire and
+mechanism (sum $m-1$ factor-base points in the group and test whether the
+result lies in the base) is the second algorithm of McGuire and
 Mueller~\cite{mcguire2017}, who also evaluate $\Sem m$ by iterated
 resultants instead of solving it, building on the instance-derived bases of
 Amadori, Pintore and Sala~\cite{aps2018}. What this section adds is
@@ -88,7 +88,7 @@ $2N$ lookups per target. \emph{Binary fields}
 (\art{src/cryptanalysis/koblitz_index_calculus.rs},
 \texttt{DecompositionStrategy::PairTable}, made the default): a precomputed
 table of pair sums $F_i+F_j$ turns an $m$-decomposition into $1$, $N$ or
-$N^2$ lookups for $m=2,3,4$---the meet-in-the-middle half of a birthday
+$N^2$ lookups for $m=2,3,4$: the meet-in-the-middle half of a birthday
 search, exact and complete like exhaustive search, at the price of
 $\Theta(N^2)$ set-up and memory. Both are verified fail closed: every
 decomposition is re-added in the group, $\Sem3$ is checked to vanish,
@@ -125,7 +125,7 @@ PDP oracle family &
 CUDA kernel &
   one thread per (target, slice); per-thread Montgomery inversion; SoA
   base; shared-memory hash for $\abs\Fb\le2048$; 64-bit and P-256 fields.
-  Validated in host emulation only (no GPU available).
+  Checked in host emulation only (no GPU available); no validation file.
   \art{RESEARCH_GPU_ROOTFIND_DECOMPOSITION.md} \\
 ecbench engines &
   \texttt{pdp3-koblitz:m=2|3,engine=rootfind}, \texttt{rootfind-subtract},
@@ -179,6 +179,42 @@ $N=18$ it uses 197 multiplications where F4 uses $8.99\cdot10^{13}$
 multiply-adds; 707/707 brute-force agreements
 (\art{research/pdp_root_finder_20261012/}).
 
+Figure~\ref{fig:pf-rootfind} (left) and Table~\ref{tab:pf-rf-binary}
+give the binary oracle rungs of the PDP study per target. From $\ell=8$
+to $14$ the median wall of \texttt{rf-mitm} grows from $3.1$ to
+$482.0\,\mu$s, and its lookups stay within $0.91$--$1.00$ of the pair-table
+floor at every rung.
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{3.5pt}
+\begin{tabular}{@{}rrrrrrrrrr@{}}
+\toprule
+& & \multicolumn{3}{c}{\texttt{rf-mitm} counts per target} & \multicolumn{4}{c}{median wall per target ($\mu$s)} & \\
+\cmidrule(lr){3-5}\cmidrule(lr){6-9}
+$n$ & $\ell$ & mults & lookups & /floor & \texttt{rf-mitm} & \texttt{rf-pairs} & group-scalar & baseline & baseline/\texttt{rf-mitm} \\
+\midrule
+23 & 8 & $592$ & $238$ & $0.93$ & $3.9$ & $202.2$ & $213.6$ & $8{,}698.1$ & $2{,}230.3$ \\
+24 & 8 & $637$ & $256$ & $1.00$ & $3.1$ & $235.2$ & $276.5$ & $9{,}296.9$ & $3{,}007.2$ \\
+27 & 9 & $1{,}262$ & $506$ & $0.99$ & $6.4$ & $879.0$ & $809.7$ & $37{,}705.5$ & $5{,}881.5$ \\
+30 & 10 & $2{,}317$ & $928$ & $0.91$ & $10.7$ & $2{,}662.9$ & $2{,}693.2$ & $169{,}656.2$ & $15{,}801.8$ \\
+33 & 11 & $5{,}032$ & $2{,}014$ & $0.98$ & $23.9$ & $12{,}462.9$ & $11{,}290.4$ & $707{,}969.2$ & $29{,}665.5$ \\
+36 & 12 & $9{,}957$ & $3{,}984$ & $0.97$ & $57.6$ & $48{,}374.1$ & $48{,}094.4$ & $3{,}069{,}594.3$ & $53{,}254.7$ \\
+39 & 13 & $20{,}257$ & $8{,}104$ & $0.99$ & $156.0$ & $206{,}909.0$ & $191{,}078.5$ & $13{,}115{,}950.2$ & $84{,}095.5$ \\
+42 & 14 & $40{,}922$ & $16{,}370$ & $1.00$ & $482.0$ & $818{,}311.5$ & $757{,}478.1$ & $55{,}506{,}122.0$ & $115{,}160.1$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Root-finding decomposition oracles on binary curves, one
+query per target. /floor: lookups over the pair-table floor. baseline:
+the PS-0 enumeration; group-scalar: the same search by group arithmetic.
+Median over 2--15 runs per cell (none contended). One oracle query, not a
+complete discrete logarithm; wall clock on a shared host, descriptive.
+Producer-reported; no validation file. Source:
+\art{research/pdp_root_finder_20261012/ANALYSIS.json} (\texttt{binary});
+extracted in \art{figures/data-pf-rootfind.json}.}
+\label{tab:pf-rf-binary}
+\end{table}
+
 \paragraph{Complete solves.} End to end, the gain is two orders of
 magnitude smaller and not one-sided: $50$--$105\times$ against msolve on
 16--24-bit prime curves; $122\times$ on the one binary instance ($n=23$)
@@ -187,9 +223,51 @@ $n=5,9,13$, where a solve needs too few decompositions to pay for the
 table. Inside ecbench, with every group operation charged, the
 root-finding IC beats inherited F4 in solve wall by about $350\times$ at
 $n=13$ (admitted) and about $10^4\times$ at $n=23$ (descriptive), yet stays
-$2.9$--$25{,}116\times$ the strong rho in $S$ on binary curves and
+$2.9$--$25{,}116\times$ the frozen strong rho in $S$ on Koblitz curves
+$n=13$--$37$ (the jump at $n=31$ is mostly the curve's cofactor, 1{,}492) and
 $29$--$141\times$ rho on prime curves, with the gap widening
 (\art{research/pdp_root_finder_ecbench_20261013/}).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-pf-rootfind.pdf}
+\caption[]{Left: median wall per target of one decomposition query on
+binary curves $n=3\ell$ (Table~\ref{tab:pf-rf-binary}). Right: counted
+$S$ of the complete root-finding index calculus (\texttt{rootfind-mitm},
+$m=3$) over the strong signed-Frobenius rho on Koblitz curves, with 95\%
+cluster-bootstrap intervals (Table~\ref{tab:pf-rf-koblitz}); dashed:
+parity. Producer-reported; no validation file. Data
+\art{figures/data-pf-rootfind.json} from
+\art{research/pdp_root_finder_20261012/ANALYSIS.json} and
+\art{research/pdp_root_finder_ecbench_20261013/README.md}.}
+\label{fig:pf-rootfind}
+\end{figure}
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}rrrrrrrl@{}}
+\toprule
+$n$ & strong rho & rho & IC+F4 & IC+\texttt{mitm} & IC+\texttt{rf-mitm} & IC+\texttt{rf-pairs} & \texttt{rf-mitm}/strong rho \\
+\midrule
+13 & $14.52$ & $1.88$ & $16.18$ & $32.80$ & $41.42$ & $300.8$ & $2.85$ $[2.64,3.04]$ \\
+19 & $3.154$ & $0.752$ & $4.933$ & $39.89$ & $47.30$ & $1{,}886$ & $15.0$ $[14.3,15.7]$ \\
+23 & $1.140$ & $0.457$ & $2.323$ & $66.31$ & $69.44$ & $7{,}648$ & $60.9$ $[56.1,66.0]$ \\
+31 & $1.18$ & $0.37$ & --- & $3{,}599$ & $3{,}608$ & $1.8\cdot10^6$ & $3{,}053$ $[2{,}505,3{,}596]$ \\
+37 & $0.240$ & $0.194$ & --- & $6{,}012$ & $6{,}016$ & --- & $25{,}116$ $[20{,}793,30{,}546]$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Root-finding index calculus on Koblitz curves in ecbench: mean
+counted $S$ per arm, and \texttt{rootfind-mitm} over the strong
+signed-Frobenius rho with a 95\% cluster-bootstrap interval. IC+F4 is a
+lower bound (F4's word operations unpriced). rho: plain signed-Frobenius
+rho. 40 runs per arm at $n=13,19$ and 24 at $n=23,31,37$. The jump at
+$n=31$ is mostly the curve's cofactor, 1{,}492. Producer-reported; no
+validation file. Source:
+\art{research/pdp_root_finder_ecbench_20261013/README.md}; extracted in
+\art{figures/data-pf-rootfind.json}.}
+\label{tab:pf-rf-koblitz}
+\end{table}
 
 \paragraph{The Koblitz loops.} Figure~\ref{fig:k13} follows the best
 complete-count root-finding arm at Koblitz $E_0$, $n=13$ through four
@@ -201,14 +279,16 @@ $m=2$ to $23.22$ and then $22.97$. Two further cycles of denser and
 sparser bases, windowed negfold and plain root finding were dead ends
 (\art{research/ecbench_rootfind_vs_rho_20261014/}). With F4's word XORs
 priced, the paired ratio negfold/F4 is $0.0545$ $[0.047,0.064]$, a
-complete-against-complete comparison; against strong signed-Frobenius rho
-($S=14.82$) the best complete arm is still $1.55\times$. A compact-orbit
-base with a counted Frobenius pair table reaches $S=15.55$, below the
-then-unpriced F4 ($16.75$), but it is itself a lower bound
-(factor-base construction natives unpriced), and it is $1.08\times$ rho.
-Amortised over 64 targets that arm reaches $S\approx11.2$, below rho; by
-the ledger's rules that is a secondary, multi-target result, not a cold
-claim.
+complete-against-complete comparison; against the frozen strong signed-Frobenius
+rho ($S=14.82$) the best complete arm is still $1.55\times$. A compact-orbit
+base with a counted Frobenius pair table reads $S=15.55$ against F4's
+then-unpriced $16.75$ and about $1.06\times$ the strong rho. All three
+figures are lower bounds (factor-base construction natives, F4's word XORs
+and rho's table work unpriced), so neither order is ranked. Amortised over
+64 targets the same arm reads $S\approx11.2$. That is a ratio of lower
+bounds with no band, and the ledger counts it as a secondary, multi-target
+diagnostic, not a result below rho
+(\art{research/ecbench_rootfind_faster_20261014/README.md}).
 
 \begin{figure}[t]
 \centering
@@ -234,7 +314,7 @@ summands instead of two costs $1.431\times$ $[1.225,1.716]$; batching the
 table inversions leaves counted GAE unchanged ($1.000$; $4{,}096$ versus
 $64$ inversions, set-up wall $243$ versus $128\,\mu$s, descriptive); and a
 train-set lane selection did not resolve a hold-out winner ($0.979$
-$[0.919,1.038]$; 1{,}088/1{,}088 verified executions)
+$[0.919,1.038]$; 1{,}088/1{,}088 executions with verified answers, sealed ecbench sessions)
 (\art{benchmarks/README.md}, rows of 12--14 Oct).
 
 \paragraph{Dense root index at $n=83$.} Widening the prefix base from

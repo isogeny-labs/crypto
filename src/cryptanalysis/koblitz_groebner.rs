@@ -4743,6 +4743,71 @@ pub fn f4_word_ops_thread() -> u64 {
     F4_WORD_OPS_THREAD.with(|c| c.get())
 }
 
+/// The per-thread work counters a solve charges, read together: what a
+/// parallel solve's worker did, handed back to the thread that asked.
+#[derive(Clone, Copy, Default)]
+struct ThreadWork {
+    f4_word_ops: u64,
+    harvest: (u64, u64),
+    rows_generated: (u64, u64),
+    root_elimination: u64,
+    gate_first: (u64, u64),
+    tally: bitop_tally::Tally,
+}
+
+impl ThreadWork {
+    fn now() -> Self {
+        ThreadWork {
+            f4_word_ops: f4_word_ops_thread(),
+            harvest: linear_harvest_counts_thread(),
+            rows_generated: crate::cryptanalysis::inherited_f4::f4_rows_generated_thread(),
+            root_elimination: crate::cryptanalysis::inherited_f4::f4_root_elimination_thread(),
+            gate_first: gate_first_skips_thread(),
+            tally: bitop_tally::snapshot(),
+        }
+    }
+
+    /// The work done between `before` and now on this thread.
+    fn since(before: Self) -> Self {
+        let now = Self::now();
+        let sub = |a: (u64, u64), b: (u64, u64)| (a.0.wrapping_sub(b.0), a.1.wrapping_sub(b.1));
+        ThreadWork {
+            f4_word_ops: now.f4_word_ops.wrapping_sub(before.f4_word_ops),
+            harvest: sub(now.harvest, before.harvest),
+            rows_generated: sub(now.rows_generated, before.rows_generated),
+            root_elimination: now.root_elimination.wrapping_sub(before.root_elimination),
+            gate_first: sub(now.gate_first, before.gate_first),
+            tally: now.tally.since(before.tally),
+        }
+    }
+
+    /// Add `self` to this thread's counters.  The process-wide word-op
+    /// total already holds it: the worker charged it there.
+    fn credit(self) {
+        F4_WORD_OPS_THREAD.with(|c| c.set(c.get().wrapping_add(self.f4_word_ops)));
+        LINEAR_HARVEST_COUNTS.with(|c| {
+            let (a, b) = c.get();
+            c.set((
+                a.wrapping_add(self.harvest.0),
+                b.wrapping_add(self.harvest.1),
+            ));
+        });
+        crate::cryptanalysis::inherited_f4::credit_rows_generated(
+            self.rows_generated.0,
+            self.rows_generated.1,
+        );
+        crate::cryptanalysis::inherited_f4::credit_root_elimination(self.root_elimination);
+        GATE_FIRST_SKIPS.with(|c| {
+            let (a, b) = c.get();
+            c.set((
+                a.wrapping_add(self.gate_first.0),
+                b.wrapping_add(self.gate_first.1),
+            ));
+        });
+        bitop_tally::credit(self.tally);
+    }
+}
+
 pub(crate) fn rref_f2(matrix: &mut [Vec<u64>], n_cols: usize) -> usize {
     let mut count = 0u64;
     let rank = rref_f2_counted(matrix, n_cols, &mut count);
@@ -5208,7 +5273,8 @@ fn legacy_rref_kernel() -> bool {
 // engine counts: the row echelon form of a root went through the Four
 // Russians kernel of `gf2_elim` (before, the column-at-a-time kernel's word
 // XORs), and a child asked the node oracle before specialising its bases
-// (before, after).  Committed records made before then charge the old
+// (before, after); the same change added the F6-IC gate's partial support
+// refutation, which the pre-#1646 gate did not have.  Committed records made before then charge the old
 // accounting; the replay audit turns this on for them (`ecbench::legacy`).
 // Per thread.
 thread_local! {
@@ -5220,6 +5286,11 @@ thread_local! {
 /// `false` restores the normal choice.
 pub fn set_legacy_pre_1646(on: bool) {
     LEGACY_PRE_1646.with(|c| c.set(on));
+}
+
+/// Whether [`set_legacy_pre_1646`] is in force on this thread.
+pub(crate) fn legacy_pre_1646_active() -> bool {
+    LEGACY_PRE_1646.with(|c| c.get())
 }
 
 /// Reduced row echelon form, which is unique: whichever kernel runs, the
@@ -6942,13 +7013,17 @@ pub fn linear_harvest() -> Option<LinearHarvest> {
     if LEGACY_NO_LINEAR_HARVEST.with(|c| c.get()) {
         return None;
     }
-    if let Some(v) = LINEAR_HARVEST_OVERRIDE.with(|c| c.get()) {
-        return v;
+    let chosen = match LINEAR_HARVEST_OVERRIDE.with(|c| c.get()) {
+        Some(v) => v,
+        None => *ENV.get_or_init(|| match std::env::var("KIC_LINEAR_HARVEST") {
+            Err(_) => Some(LINEAR_HARVEST_DEFAULT),
+            Ok(s) => parse_linear_harvest(&s),
+        }),
+    };
+    if chosen == Some(LINEAR_HARVEST_DEFAULT) && LEGACY_HARVEST_R3.with(|c| c.get()) {
+        return Some(LINEAR_HARVEST_R3);
     }
-    *ENV.get_or_init(|| match std::env::var("KIC_LINEAR_HARVEST") {
-        Err(_) => Some(LINEAR_HARVEST_DEFAULT),
-        Ok(s) => parse_linear_harvest(&s),
-    })
+    chosen
 }
 
 // The replay audit's view of a record made before the harvest was on by
@@ -6957,6 +7032,21 @@ pub fn linear_harvest() -> Option<LinearHarvest> {
 // solve.  Per thread.
 thread_local! {
     static LEGACY_NO_LINEAR_HARVEST: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+// The replay audit's view of a record made while the harvest default was
+// round 3 item 02's `gpv OR rank >= 331` gate ([`LINEAR_HARVEST_R3`]), before
+// repair R8 (`59fcca75d4`, 2026-10-26) narrowed the default to the rank gate:
+// wherever the current default is chosen, the R3 gate is used instead.  An
+// explicit `gpv`, `every` or `off` choice is untouched.  Per thread.
+thread_local! {
+    static LEGACY_HARVEST_R3: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Count the default harvest as round 3 item 02 shipped it (before repair
+/// R8); `false` restores the current default.
+pub fn set_legacy_harvest_r3(on: bool) {
+    LEGACY_HARVEST_R3.with(|c| c.set(on));
 }
 
 /// Count as the engine did before the harvest was the default; `false`
@@ -7469,12 +7559,35 @@ fn solve_with_policy(
     policy: InheritPolicy,
     accept: impl FnMut(Mask) -> bool,
 ) -> (Vec<Mask>, SolveStats) {
-    solve_with_policy_and_oracle(equations, n_vars, opts, policy, accept, |_, _| {
-        NodeOracleDecision::Continue
-    })
+    let depth = PARALLEL_DEPTH_OVERRIDE
+        .with(|c| c.get())
+        .unwrap_or_else(parallel_depth);
+    let saved = PARALLEL_LEVELS.with(|c| c.replace(depth));
+    let result =
+        solve_with_policy_and_oracle_inner(equations, n_vars, opts, policy, accept, |_, _| {
+            NodeOracleDecision::Continue
+        });
+    PARALLEL_LEVELS.with(|c| c.set(saved));
+    result
 }
 
 fn solve_with_policy_and_oracle(
+    equations: &[F2BoolPoly],
+    n_vars: usize,
+    opts: &SolveOptions,
+    policy: InheritPolicy,
+    accept: impl FnMut(Mask) -> bool,
+    node_oracle: impl FnMut(&[Option<bool>], Mask) -> NodeOracleDecision,
+) -> (Vec<Mask>, SolveStats) {
+    // A node oracle runs on the calling thread only: no parallel split.
+    let saved = PARALLEL_LEVELS.with(|c| c.replace(0));
+    let result =
+        solve_with_policy_and_oracle_inner(equations, n_vars, opts, policy, accept, node_oracle);
+    PARALLEL_LEVELS.with(|c| c.set(saved));
+    result
+}
+
+fn solve_with_policy_and_oracle_inner(
     equations: &[F2BoolPoly],
     n_vars: usize,
     opts: &SolveOptions,
@@ -7506,6 +7619,152 @@ fn solve_with_policy_and_oracle(
         Vec::new(),
     );
     (out, stats)
+}
+
+thread_local! {
+    /// Split levels left that run their two children on separate threads
+    /// ([`solve_children_parallel`]); set from `KIC_SOLVE_PARALLEL_DEPTH` by
+    /// a solve without a node oracle, zero otherwise.
+    static PARALLEL_LEVELS: std::cell::Cell<u32> = const { std::cell::Cell::new(0) };
+    static PARALLEL_DEPTH_OVERRIDE: std::cell::Cell<Option<u32>> = const { std::cell::Cell::new(None) };
+}
+
+/// Override `KIC_SOLVE_PARALLEL_DEPTH` on this thread (`None` restores it).
+pub fn set_parallel_depth(depth: Option<u32>) {
+    PARALLEL_DEPTH_OVERRIDE.with(|c| c.set(depth));
+}
+
+/// `KIC_SOLVE_PARALLEL_DEPTH=k` runs the first `k` split levels of a solve
+/// without a node oracle as `2^k` independent subtrees in parallel; `0`
+/// (the default) keeps the solve on one thread.  Read once per process.
+///
+/// A parallel child builds its bases from scratch rather than specialising
+/// its parent's (the inherited bases are single-threaded), so the counted
+/// work differs from the sequential solve's and a run with it set is not a
+/// stage-unit measurement; ecbench refuses `KIC_*` overrides.  Roots,
+/// their order and the accepted root are the sequential solve's.
+fn parallel_depth() -> u32 {
+    static DEPTH: std::sync::OnceLock<u32> = std::sync::OnceLock::new();
+    *DEPTH.get_or_init(|| {
+        std::env::var("KIC_SOLVE_PARALLEL_DEPTH")
+            .ok()
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(0)
+    })
+}
+
+/// A parallel child accepts no root itself (the merge does); a named
+/// function, not a closure, so the recursion instantiates one `solve_rec`.
+fn accept_none(_: Mask) -> bool {
+    false
+}
+
+/// A parallel child runs without a node oracle.
+fn no_oracle(_: &[Option<bool>], _: Mask) -> NodeOracleDecision {
+    NodeOracleDecision::Continue
+}
+
+/// Sum `child`'s counters into `stats`: the work of a subtree solved apart.
+fn absorb_stats(stats: &mut SolveStats, child: &SolveStats) {
+    stats.reductions += child.reductions;
+    stats.infeasible_branches += child.infeasible_branches;
+    stats.propagations += child.propagations;
+    stats.splits += child.splits;
+    stats.tail_enumerations += child.tail_enumerations;
+    stats.tail_assignments_tested += child.tail_assignments_tested;
+    stats.deferred_splits += child.deferred_splits;
+    stats.exhausted |= child.exhausted;
+    stats.unsupported |= child.unsupported;
+    stats.max_degree_built = stats.max_degree_built.max(child.max_degree_built);
+    stats.oversize += child.oversize;
+    stats.eliminated += child.eliminated;
+    stats.geometric_refutations += child.geometric_refutations;
+    stats.geometric_witnesses += child.geometric_witnesses;
+}
+
+/// The two children of a split, each solved as an independent root on its
+/// own thread, then merged in the sequential order: the `false` subtree's
+/// roots before the `true` subtree's, each offered to `accept` in turn and
+/// the solve stopped at the first it accepts, as the sequential recursion
+/// would have stopped there.  A child sees no node oracle and accepts
+/// nothing itself, so it explores its whole subtree; the merge decides.
+#[allow(clippy::too_many_arguments)]
+fn solve_children_parallel(
+    system: &[F2BoolPoly],
+    canonical: bool,
+    original: &[F2BoolPoly],
+    assignment: &[Option<bool>],
+    free: usize,
+    n_vars: usize,
+    opts: &SolveOptions,
+    policy: InheritPolicy,
+    stats: &mut SolveStats,
+    out: &mut Vec<Mask>,
+    accept: &mut impl FnMut(Mask) -> bool,
+    stop: &mut bool,
+    defined: &[(u32, Mask, bool)],
+) {
+    let levels = PARALLEL_LEVELS.with(|c| c.get());
+    let caller = std::thread::current().id();
+    let budget = opts.node_budget.saturating_sub(stats.reductions);
+    let run = |value: bool| {
+        bitop_tally::word_ops((assignment.len() as u64).div_ceil(8));
+        let mut branch = assignment.to_vec();
+        branch[free] = Some(value);
+        let specialised: Vec<F2BoolPoly> = system
+            .iter()
+            .map(|p| substitute_in_solve(p, free as u32, value, canonical))
+            .collect();
+        let saved = PARALLEL_LEVELS.with(|c| c.replace(levels - 1));
+        let before = ThreadWork::now();
+        let child_opts = SolveOptions {
+            node_budget: budget,
+            ..*opts
+        };
+        let mut child_stats = SolveStats::default();
+        let mut child_out = Vec::new();
+        let mut child_stop = false;
+        solve_rec(
+            specialised,
+            canonical,
+            original,
+            branch,
+            n_vars,
+            &child_opts,
+            policy,
+            &mut child_stats,
+            &mut child_out,
+            &mut accept_none,
+            &mut no_oracle,
+            &mut child_stop,
+            None,
+            defined.to_vec(),
+        );
+        let work = ThreadWork::since(before);
+        PARALLEL_LEVELS.with(|c| c.set(saved));
+        let elsewhere = std::thread::current().id() != caller;
+        (child_stats, child_out, elsewhere.then_some(work))
+    };
+    let (low, high) = rayon::join(|| run(false), || run(true));
+    for (child_stats, child_out, work) in [low, high] {
+        absorb_stats(stats, &child_stats);
+        if let Some(work) = work {
+            work.credit();
+        }
+        if *stop || out.len() >= opts.max_solutions {
+            continue;
+        }
+        for pt in child_out {
+            if out.len() >= opts.max_solutions {
+                break;
+            }
+            out.push(pt);
+            if accept(pt) {
+                *stop = true;
+                break;
+            }
+        }
+    }
 }
 
 /// `KIC_F4_EARLY_ORACLE=0` makes a child specialise its bases before asking
@@ -7832,6 +8091,24 @@ fn solve_rec(
                     *stop = true;
                 }
             }
+        }
+        Some(free) if PARALLEL_LEVELS.with(|c| c.get()) > 0 => {
+            stats.splits += 1;
+            solve_children_parallel(
+                &system,
+                canonical,
+                original,
+                &assignment,
+                free,
+                n_vars,
+                opts,
+                policy,
+                stats,
+                out,
+                accept,
+                stop,
+                &defined,
+            );
         }
         Some(free) => {
             stats.splits += 1;
@@ -9769,6 +10046,69 @@ mod tests {
                 }
             }
         }
+        assert!(roots > 0, "no system had a root; the comparison is vacuous");
+    }
+
+    /// A parallel split returns the sequential solve's roots in the same
+    /// order, stops at the same accepted root, and credits its workers'
+    /// counted work to the calling thread.
+    #[test]
+    fn parallel_split_returns_the_sequential_roots_in_order() {
+        let kc = KoblitzCurve::new(0, 9).unwrap();
+        let fb = crate::cryptanalysis::koblitz_index_calculus::build_frobenius_factor_base(&kc, 0)
+            .unwrap();
+        let st = FieldStructure::new(kc.n, &kc.curve.irreducible);
+        let opts = SolveOptions {
+            max_solutions: 1 << 12,
+            node_budget: 1 << 20,
+            engine: SolverEngine::InheritedF4 { max_degree: 3 },
+            split_rule: SplitRule::HighestFree,
+        }
+        .resolve();
+        let pool = rayon::ThreadPoolBuilder::new()
+            .num_threads(4)
+            .build()
+            .unwrap();
+        let mut roots = 0usize;
+        pool.install(|| {
+            for raw in [1u64, 23, 300, 77] {
+                let sys = build_decomposition_system(
+                    &fb.subspace_basis,
+                    &fe(raw, kc.n),
+                    &kc.curve.b,
+                    3,
+                    &st,
+                )
+                .unwrap();
+                let policy = InheritPolicy::resolve(opts.engine);
+                set_parallel_depth(Some(0));
+                let (want, _) =
+                    solve_with_policy(&sys.equations, sys.n_vars, &opts, policy, |_| false);
+                roots += want.len();
+                for depth in [1, 2, 3] {
+                    set_parallel_depth(Some(depth));
+                    let before = f4_word_ops_thread();
+                    let (got, stats) =
+                        solve_with_policy(&sys.equations, sys.n_vars, &opts, policy, |_| false);
+                    assert!(!stats.exhausted);
+                    assert_eq!(
+                        got, want,
+                        "x_R={raw} depth={depth}: roots or their order differ"
+                    );
+                    assert!(f4_word_ops_thread() > before, "workers' work not credited");
+                    if want.len() >= 2 {
+                        // Stop at the second root, as the sequential solve does.
+                        let target = want[1];
+                        let (stopped, _) =
+                            solve_with_policy(&sys.equations, sys.n_vars, &opts, policy, |r| {
+                                r == target
+                            });
+                        assert_eq!(stopped, want[..2].to_vec(), "x_R={raw} depth={depth}");
+                    }
+                }
+                set_parallel_depth(None);
+            }
+        });
         assert!(roots > 0, "no system had a root; the comparison is vacuous");
     }
 

@@ -1,0 +1,26 @@
+{
+  "schema": "research.operational-addendum/v1",
+  "observation_utc": "2026-11-05T16:19:23Z",
+  "task": "T-1614",
+  "readback_scope": [
+    "list NodePools",
+    "get isolab/jobs ResourceQuota",
+    "GitHub branch and PR refs"
+  ],
+  "new_identity_or_role": false,
+  "kubernetes_context": "i-01f85a6c905181498@isolab.us-east-2.eksctl.io",
+  "kubeconfig": "/home/ec2-user/ops/eks-isolab/kubeconfig",
+  "nodepool_result": "Kubernetes Forbidden: current WorkerRole cannot list nodepools at cluster scope",
+  "quota_result": "Kubernetes Forbidden: current WorkerRole cannot get resourcequotas/jobs in isolab",
+  "failure_layer": "Kubernetes authorization",
+  "live_limits_verified": false,
+  "prior_default_context_failure_preserved": "../funding-readback-20261105; distinct STS role-assumption failure",
+  "github_branch_head": "763a024c40c405817e1447f0ad9ecae09c1219b8",
+  "github_pr_head": "e09d78d62447a12409e0eafe8917094d548db4b8",
+  "github_same_repository": true,
+  "github_head_synchronized": false,
+  "github_server_side_cause": null,
+  "cloud_mutations": 0,
+  "new_scientific_trials": 0,
+  "prior_report": "../funding-readback-20261105/report.pdf"
+}
