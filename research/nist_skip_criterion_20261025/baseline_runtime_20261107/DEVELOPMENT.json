@@ -1,0 +1,41 @@
+{
+  "schema": "nist-baseline-runtime-development/v1",
+  "status": "local-unsigned-development-only",
+  "parent_commit": "fc8f438c9261a6ba5d6cb5b97af7c3bdc70c99d7",
+  "compiled_source_identity": "file bindings in review-evidence/container-v4/CONTROL-SOURCE.sha256 and MANIFEST.sha256; new code was unpublished during local controls",
+  "image_config_digest": "sha256:b2e7471f7e0236e72e5fcbe11a5a1d9d97538daeee36d398ecd5a1f0603c0a60",
+  "registry_manifest_digest": null,
+  "local_container_resources": {"cpus": 2, "ram_bytes": 2147483648, "uid": 1000, "network": "none", "read_only_root": true, "capabilities": "none"},
+  "pari_stack": {"initial_bytes": 256000000, "maximum_bytes": 1073741824, "observed_growth_warning_bytes": 512000000},
+  "controls": {
+    "native": 46,
+    "cli": 7,
+    "new_launcher_refusals": 8,
+    "journal_group_exit": 0,
+    "journal_group_timeout_seconds": 180,
+    "known_order_fields_matched": [192, 224, 239, 256, 384, 521],
+    "known_order_group_exit": 0,
+    "known_order_group_timeout_seconds": 300,
+    "oom_killed": false,
+    "new_random_real_curves": 0,
+    "signed_verification": false
+  },
+  "retained_failures": [
+    "AWS CLI based image built; two pre-test attempts failed due to local disk exhaustion",
+    "stage-v2 dependency awk failed but process substitution hid failure; original zero exit and source retained",
+    "container-v3 known-order group failed on the 521-bit fixture with fixed 256000000-byte PARI stack overflow",
+    "Cargo library check unavailable, exit 127"
+  ],
+  "primary_accepted_curves": 0,
+  "primary_nonce": null,
+  "pilot_nonce": null,
+  "total_usd_cap": null,
+  "cloud_image_published": false,
+  "paid_job_started": false,
+  "successful_checkpoint_uploaded": false,
+  "command_worker_loss_qualified": false,
+  "canonical_primary_freeze": null,
+  "proof_standing": "unverified",
+  "proof_coverage": "not_covered",
+  "evidence": "review-evidence/"
+}

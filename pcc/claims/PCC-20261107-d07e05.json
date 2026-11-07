@@ -1,0 +1,36 @@
+{
+ "created_at": "2026-11-07T08:05:09Z",
+ "id": "PCC-20261107-d07e05",
+ "kind": "statement",
+ "producer": {
+  "commit": "fc8f438c9261a6ba5d6cb5b97af7c3bdc70c99d7",
+  "model": "Codex",
+  "session": "nist-baseline-runtime-20261107"
+ },
+ "proofs": [
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_skip_criterion_20261025/baseline_runtime_20261107/review-evidence/container-v3/journal-controls/stdout",
+    "sha256": "fb8654dc2008c54f4057c8fc81e7c3025d90deb6ec3fdf4ac07b725aebfffe69"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_skip_criterion_20261025/baseline_runtime_20261107/review-evidence/container-v3/known-orders/stdout",
+    "sha256": "9cad0f86deeb85ba3921de9a10c78d7d3c77fa8161c864ff5091f147c3aa18fc"
+   }
+  },
+  {
+   "kind": "attestation",
+   "subject": {
+    "path": "research/nist_skip_criterion_20261025/baseline_runtime_20261107/review-evidence/container-v3/known-orders/stderr",
+    "sha256": "6de0a2af0354d89b6690d6405b5908d5640f9b85a0abfd65180082c40cf08349"
+   }
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/nist_skip_criterion_20261025/baseline_runtime_20261107",
+ "statement": "Local minimal-container development: 46 native, seven CLI and eight launcher-refusal controls exited zero. Known-order control matched five frozen published curves, then failed on the 521-bit known curve with PARI stack overflow at 256000000 bytes. No random-curve baseline, cloud execution, qualified restore or signed execution proof is claimed."
+}
