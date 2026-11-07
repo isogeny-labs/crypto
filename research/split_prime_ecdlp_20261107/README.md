@@ -1,7 +1,7 @@
 # Split-prime pattern and the ECDLP: a scalar-only obstruction, an independent recount, and the routes that stay open (2026-11-07)
 
 Status: **derived obstruction plus a native recount; no algorithm claim.**
-Result class: **boundary study and lead closure, not a cost reduction for any ECDLP method.**
+Result class: **boundary study; lead closure for the scalar / generic route only, not a cost reduction for any ECDLP method.**
 `S` and end-to-end cost are **unset**, no cost ratio is reported; no leaderboard, benchmark or
 rho comparison is touched (CLAUDE.md success criterion is not engaged).
 
@@ -12,7 +12,9 @@ sha256 `d38be158cd13f03439aab94e060aba821700f46872644cf955e8a7a0f6d7a0c8`,
 "Split-prime deficit in published NIST / X9.62 prime curves", 7 pages).
 
 Answer in one paragraph. The pattern is real (recounted here from the curve
-parameters, every number agreeing with the report), but it cannot feed an
+parameters; every split count and z the recount can compare agrees with the
+report, while the report's calibrated bands and its L(1, χ) normalisation are
+not reproduced and one of them is questioned in §4), but it cannot feed an
 ECDLP algorithm below the generic bound on these curves: for every prime
 ℓ ≠ n, the objects it governs (ℓ-torsion, Frobenius eigenlines, the two
 rational ℓ-isogenies of a split ℓ, the class group of the Frobenius order,
@@ -20,8 +22,10 @@ the endomorphism ring) reach the prime-order group E(F_p) only as
 multiplication by a known scalar or as an isomorphism that preserves the
 discrete logarithm. This is a short theorem (§3), consistent with the lab's
 isogeny-class invariance framing and with the measured null on index-calculus
-yield across a class. The pattern's one real consequence for ECDLP work is a
-lower degree of the horizontal expander used by random self-reduction (§5).
+yield across a class. Inside the generic model the pattern's one consequence for ECDLP work is a
+lower degree of the horizontal expander used by random self-reduction (§5);
+whether it correlates with coordinate-method yield *between* classes is
+untested and is proposal P3 of §6.
 The candidate directions that survive the obstruction, with their cheapest
 tests, are in §6; none is a claim.
 
@@ -38,7 +42,10 @@ Problem record: [`problems/split-prime-pattern-scalar-only.md`](../../problems/s
 - **Objects.** t = p + 1 − n, Δ = t² − 4p < 0, K = Q(√Δ), the Frobenius
   order Z[π] and its over-orders, and for each odd prime ℓ the Kronecker
   symbol χ(ℓ) = (Δ/ℓ): split (+1, two rational ℓ-isogenies, "Elkies"),
-  ramified (0), inert (−1, "Atkin").
+  zero (ℓ ∣ Δ: ramified in K, or ℓ dividing the conductor f of Z[π], which
+  the recount does not separate, e.g. 3 ∣ f for P-224 and 5 ∣ f for
+  prime239v2 per the red-team pass), inert (−1, "Atkin"). The tables below
+  keep the report's label "ramified" for the zero case.
 - **Question A.** Is the report's deficit reproducible from the parameters
   with an exact baseline? (§4.)
 - **Question B.** Can the ℓ-adic or class-group structure that the pattern
@@ -111,6 +118,12 @@ the ℓ-pairing and fiber-polynomial cases spelled out; it is not new.
 
 **Setting.** E/F_p ordinary, #E(F_p) = n prime, cofactor 1, Frobenius π with
 π² − tπ + p = 0, O = End(E) ⊇ Z[π], N = (π − 1) the ideal of O of norm n.
+Standing assumptions, made explicit after the red-team pass: E ordinary, so
+End(E) is defined over F_p; gcd(n, Δ) = 1 (checked for all ten curves by the
+red team), so s_α below is defined for α ∈ O ⊋ Z[π] and N is prime to the
+conductor; O^× = ±1 (j ∉ {0, 1728}). The exclusion ℓ ≠ n is a convenience,
+not a gap: the two rational n-isogenies are the endomorphisms π − 1 and
+π − p, acting as the scalars 0 and 1 − p.
 
 **Theorem (scalar-only action).** Let ℓ be a prime different from n and p.
 Every F_p-rational isogeny φ: E → E′ whose degree is a power of ℓ (in
@@ -139,9 +152,10 @@ ker φ. ∎
 
 **Corollary (what an algorithm sees).** An algorithm whose only operations
 are the group law on E(F_p), the maps of the theorem, and point-independent
-Galois data is a generic-group algorithm with scalar oracles. Shoup's bound
-gives Ω(√n) group operations for the DLP; the maps cost at least one group
-operation each to evaluate on a point. So the split-prime pattern alone, for
+Galois data is a generic-group algorithm with scalar oracles: every oracle
+answer is the encoding of a known degree-one polynomial in the unknown log,
+so Shoup's simulation argument applies verbatim (this is the proof of
+Theorem 15.1) and gives Ω(√n) oracle calls. So the split-prime pattern alone, for
 any cutoff and any deficit, cannot yield a sub-generic algorithm on a
 prime-order curve. By the JMV self-reduction, every curve reachable by the
 horizontal edges that the split primes provide is exactly as hard.
@@ -152,8 +166,19 @@ embedding degree only, which these curves do not have) the n-pairing. Those
 are the lab's existing index-calculus tracks. The pattern can still enter
 there indirectly, by choosing which curve of the class to decompose on; the
 lab measured that choice null (`isogeny_class_ic_yield_20261102`, P2: ICC
-not distinguishable from zero at 24–32 bits, planted-20 % power 0.84–1.00 in
-every informative cell, one suspected curve effect not replicated).
+not distinguishable from zero at 24–32 bits, planted-20 % power 0.99–1.00 in
+the informative cells and two 24-bit m = 3 cells not informative, one
+suspected curve effect not replicated). Two presentations sit outside the
+theorem's hypotheses, as Theorem 15.1's own reading says: the Weil/Tate
+pairing on the n-torsion (needs small embedding degree; the red team
+checked the embedding degree exceeds 20,000 on all ten curves), and the
+p-adic lift. Since π ≡ 1 mod N, the n-torsion of the canonical lift is
+defined over Z_p, so every point of E(F_p) has a computable canonical lift
+with p-adic coordinates, a third presentation that neither the theorem nor
+the measured null covers. For n ≠ p the p-adic elliptic logarithm vanishes
+on torsion, which is why Smart's attack needs n = p; that this closes the
+presentation is a known-result assertion here [pcc:unverified], not a
+checked claim, and is recorded in the problem record.
 
 **The one reformulation that looks like a way in, and why it is not.** By
 Shimura reciprocity the DLP k is the element of Gal(K_N/H) ≅ (O/N)^×/±1
@@ -218,9 +243,22 @@ public parameters with the stated model; this study did not reproduce the
 report's random-curve calibration (4,267 SEA-counted curves) or its
 percentiles, and makes no statement about them. The last column is this
 study's own normalisation of the partial Euler product (ratio to
-exp E[log ∏] under the conditioned model), which is not the report's
-"× typical" column (a calibrated median); the ordering agrees (prime239v1,
-P-384 and P-224 lowest; P-256 highest).
+exp E[log ∏] under the conditioned model, per field), which is not the
+report's "× typical" column (a calibrated median); the two lowest
+(prime239v1, P-384) and the highest (P-256) agree, the rest of the order
+does not, and the column values differ from the report's by a factor of
+about 0.78–0.80 on seven curves. **Red-team finding on that gap (plausible,
+`ideas/red-team.md` F4).** The report's Figure 4 says its bands come from
+the P-224 field, and the ratio of its "× typical" to this study's raw
+partial product implies one normaliser (about 0.83–0.84) for all ten
+curves. But for a prime-order curve over a field with p ≡ 2 (mod 3)
+(the P-192, P-239 and P-384 fields) the prime ℓ = 3 is forced inert
+(t ≢ 0 and Δ ≡ t² + 1 ≢ 0 mod 3), so the Euler factor at 3 is exactly 3/4
+and the model's expected partial product is about 0.66 there against about
+0.84–0.86 for p ≡ 1 (mod 3) (P-224, P-256, P-521). The report's "prime239v1
+× 0.44 and P-384 × 0.49 outside the 95 % band" is therefore at least partly
+a field-mismatch artefact; field-matched, they are 0.56 and 0.62. This is an
+observation about the report's §4, not a re-analysis of it.
 
 ![recount](figures/recount_z.svg)
 
@@ -229,12 +267,13 @@ the report's values as hollow markers; black: pooled. Right: counts at
 B = 691 against the model expectation ± 1 sd. Source `figures/plot.py`, data
 `data/recount.json`; n = 124 primes at B = 691.*
 
-**Interpretation at this scope.** The deficit is a property of the ten
-discriminants Δ; the recount confirms it and the report's own caveats stand
+**Interpretation at this scope.** The deficit in split counts is a property
+of the ten discriminants Δ; the recount confirms it and the report's own
+caveats stand
 (cutoff chosen after the fact, correlated cutoffs, min-of-three families,
 ten curves). Nothing here bears on the cause.
 
-## 5. The one real ECDLP-adjacent effect: horizontal expander degree
+## 5. The one ECDLP-adjacent effect inside the generic model: horizontal expander degree
 
 The JMV random self-reduction walks the horizontal class along ℓ-isogenies
 for split ℓ ≤ B; the graph has degree 2 × #{split ℓ ≤ B}. A deficit lowers
@@ -245,7 +284,11 @@ transport cost, and that is the whole effect: by §3 the destination curve is
 exactly as hard. The lab's I-2 protocol
 (`research/isogeny_class_difficulty_20261008/PROTOCOL-I2-transport-cost.md`)
 already prices transport; this study adds only the observation that the
-report's statistic is the degree of that graph.
+report's statistic is the degree of that graph. Outside the generic model
+this section claims nothing: Δ is a class invariant, so the within-class
+null of 2026-11-02 cannot say whether the pattern correlates with
+coordinate-method yield between classes (red-team F1); that is proposal P3
+in §6, with its pre-registered kill line.
 
 ![obstruction](figures/obstruction_diagram.svg)
 
@@ -255,14 +298,39 @@ link is the route the lab measured null on 2026-11-02.*
 
 ## 6. Candidate novel directions that survive the obstruction
 
-Filled from the idea-generator and idea-synthesist passes of this session;
-see §6.1–§6.3 below. Every item is **proposed**, none is run, none is a
-claim. Each carries the proposer's own prior that it lowers the cost of the current
-prime-field index-calculus baseline at any scope, the closest prior work
-named by the proposer, and the cheapest native test.
+From the idea-generator (Sonnet) and idea-synthesist (Opus) passes of this
+session (scratch outputs in the session, summarised here; both report KB
+unavailable and cite repository paths only). Every item is **proposed**,
+none is run, none is a claim. Both passes independently re-derived the §3
+obstruction and **neither found a mechanism in which the split-prime deficit
+enters**: nine candidate uses were killed on paper (isogeny-pullback towers
+on a prime-order curve, where every isogeny fiber has exactly one
+F_p-point; twist-torsion translations, defined over F_{p²}; class-group
+label cycles, which give scalars only; smooth-norm endomorphisms as x-line
+maps; torus-coset bases with a trace map; Kummer-plus-Dickson unions;
+cross-target Gröbner; twist or Tate leakage; the CM lift and ray class
+field, whose isomorphism E(F_p) ≅ Ẽ[π − 1] is defined only up to
+Gal(K_N/K), which acts as every scalar). The directions below are therefore
+*coordinate-side* proposals for prime-order curves in the NIST field shape,
+ranked by the proposers' information per hour, with their own priors.
 
-<!-- SECTION6 -->
-*Pending at this commit: the idea-generator, idea-synthesist and red-team passes are still running; this section is filled in a follow-up commit on the same branch.*
+| id | mechanism (one line) | closest prior work (as named by the proposer) | cheapest discriminating test (native) | kill line | proposer's prior of lowering the prime-field IC baseline |
+|---|---|---|---|---|---|
+| P1 `IDEA-20261107-RR-DICKSON-TORUS` | Separator-free Riemann–Roch norm-divisibility system with a Dickson-torus membership tower, for prime-order curves with p ≡ 3 (mod 4) and 2^t ∣ p + 1 (the NIST shape, where the Kummer tower does not exist) | in-repo `round7_rr` (RR-Kummer, D_RR = 4 vs D_T = 6 at m3 t4 [pcc:unverified]), `pkm_dickson_torus_20261015`; Petit–Kosters–Messeng PKC 2016, Nagao ePrint 2013/548 | Rust emitter into msolve 0.6.5; four systems (RR-Dickson, T-Dickson, RR-Kummer, T-Kummer) on the same planted prime-order instance at T24 = 14,680,063 and T31 = 2,046,820,351; m = 3, t = 3–5; about 1 h | D_RR(Dickson) ≥ D_T(Dickson) everywhere; or \|D_RR(Dickson) − D_RR(Kummer)\| ≥ 2; or the RR-Kummer control fails to reproduce round7 | 0.55 for D below the tree at m = 3 in a torus cell; 0.05 for the repo's criterion (m ≥ 5, blocked by 15 GB); 0.01 end-to-end |
+| P2 `IDEA-20261107-TWIST-PURE-COSET` | Select the 2-power coset or torus element whose 2^t abscissae are mostly on E (not the twist), with a derived purity lemma (twist parts of any x-only relation sum to O, so twist columns are inert) and a derived decay law c_sel/c_mean ≈ 1 + √(2 ln C / 2^t) | in-repo `curve25519_frame_search_20261103` (frame choice, 4.71× at t = 5 [pcc:unverified]); FGHR J. Cryptology 2014 as the symmetry precedent | existing PKM oracle crate and ecbench: random vs argmax coset at equal (m, t), exact m = 2 coverage by pair enumeration, restricted-base control; prime-order curves at 2^20–2^32; a few hours | F4 cost differs by > 10 % between cosets at equal (m, t); coverage ratio off by > 20 %; or the lemma fails on exhaustive S_3 enumeration at p ≤ 10^4 | 0.85 toy-scale F4 work per relation; 0.05 cold end-to-end S with selection charged (selection cost exceeds a whole rho run at 2^24); 0 at cryptographic size (gain → 1 as t grows) |
+| C1 (synthesist) | Presentation × arithmetic test: original model, dense random shift, curve-sparse shift (for a = −3, x = X ± 1 removes the linear term) and tower-sparse shift, on j = 0/1728 twists, 64 a = −3 curves and 64 curves with −a/3 a square, at p = 786433 and one 24-bit prime; rests on a derived lemma that Semaev polynomials are weighted-homogeneous (x:1, a:2, b:3), so their top form is curve-independent and curve dependence sits in lower-order coefficients | in-repo `isogeny_class_ic_yield_20261102` P1 (F4 flat within 3.85e-5 across 27 curves [pcc:unverified]); FGHR 2014 | `pkm_ss_tower f4` in Rust; 0.5–5 CPU-hours after 1–2 days of code | arithmetic hypothesis dies if a j = 0/1728 difference vanishes under the dense random shift; engineering lever dies if sparse/dense mul-add ratio > 0.90 on ≥ 2 of 4 cells or D rises in any row | 0.02 that an arithmetic effect exists; 0.03 engineering gain (a = −3 family, toy scope) |
+| C2 (synthesist) | Full j-line census at p = 786433: every prime-order curve, analysed per trace (about 250 Frobenius fields) against the seed's covariates (split count, L(1,χ), h, conductor); random samples never reach the CM strata | in-repo `isogeny_class_difficulty_20261008`, `p2_lift_defect_20261101`, `prime_field_leads_20261031/C1_lift_torsion` | Rust census; 1–25 CPU-hours | the "no K effect" null is rejected only if an unexplained exception reproduces on fresh targets and is enriched in one K stratum (Bonferroni α = 0.0025) | 0.01 that any exception is K-related; ≤ 0.005 baseline gain |
+| P3 `IDEA-20261107-SEED-NEGATIVE-CONTROL` | Cross-trace covariate test: 2,000 random prime-order curves per prime at 2^24, 2^28, 2^32; ecbench rho.negation S and ic.pipeline yield against E_691, partial L(1,χ) and division-polynomial root counts, conditioned on n (the lab's class tests held the Frobenius field fixed; this varies it) | in-repo `isogeny_class_ic_yield_20261102` P2, `nist_skip_criterion_20261025/strict_elkies_20261029`; JMV 2005 | ecbench (existing), planted +2 % yield arm as positive control, shuffled-trace permutation as negative; hours at 24–28 bits | a replicated partial effect ≥ 1 % of yield or S with FDR < 0.01 at two primes would *reject the null* and make the seed a mechanism lead | 0.02 non-null; 0 baseline gain (a seed falsifier, not an algorithm) |
+
+**Reading.** The honest state is that the only proposals with a non-trivial
+prior (P1, P2) are transfers of in-repo levers to the prime-order field
+shape, not new mechanisms, and their priors for the repository's own
+criterion are 0.05 or lower; the two that touch the seed (C2, P3) are
+falsifiers whose expected outcome is a null that closes it for the
+coordinate tracks too. Any run follows the lab's rules: frozen task card
+through `experiment-director`, `.resume/RESUME.md`, bench record, pricing at
+0, 0.1 and 1 GAE, and the `controlled-experiment` controls. Nothing here is
+scheduled.
 
 ## 7. Status of every statement
 
@@ -273,6 +341,7 @@ named by the proposer, and the cheapest native test.
 | "Model choice within the class is null" | measured by the lab on 2026-11-02 at 24–32 bits, cited, not re-measured |
 | Expander-degree effect (§5) | derived from the counts; transport cost not measured here |
 | Candidate directions (§6) | proposed; not run |
+| Red-team review of §3–§5 (`ideas/red-team.md`) | done on commit 5e9c756773; mechanics confirmed (tool rebuilt byte-identical, parameters against OpenSSL, independent big-integer recount at all twelve cutoffs with zero mismatches, baseline formulas brute-forced for ℓ ≤ 13, at691 census matched); wording and scope findings F1–F8 folded in here; F4 on the report's normalisation is the reviewer's plausible finding, not re-analysed |
 
 Claim record for the recount: `PCC-20261107-3403f9` (`pcc/claims/PCC-20261107-3403f9.json`,
 kind `statement`; standing unverified until CI signs it) [pcc:unverified].
@@ -285,6 +354,7 @@ kind `statement`; standing unverified until CI signs it) [pcc:unverified].
 - `data/uploaded_report_values.json` — numbers transcribed from the uploaded report.
 - `figures/plot.py` — plots recorded values only; `figures/recount_z.{svg,png}`, `figures/obstruction_diagram.{svg,png}`.
 - `report/REPORT.typ`, `report/REPORT.pdf` — this note with both figures, rendered with Typst.
+- `ideas/idea-generator.md`, `ideas/idea-synthesist.md` — the two idea passes' full outputs (model output, proposals only); `ideas/red-team.md` — the adversarial review of §3–§5 and of the problem record (model output; its findings are folded into this note as stated in §7).
 - `../../problems/split-prime-pattern-scalar-only.md` — the obstruction record.
 
 ## 9. Next steps
