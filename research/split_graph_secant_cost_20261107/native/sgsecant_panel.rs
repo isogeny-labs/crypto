@@ -28,9 +28,9 @@ impl Cfg {
     pub fn frozen() -> Cfg {
         Cfg {
             seed: FROZEN_SEED,
-            cells: vec![(151, 3), (227, 4), (337, 5), (491, 6)],
-            instances: 3,
-            runs: 12,
+            cells: vec![(151, 3), (227, 4), (337, 5), (491, 6), (673, 7), (991, 8)],
+            instances: 4,
+            runs: 30,
             tmax: 400,
             budget: 2_000_000_000,
             curve_cap: 1024,
@@ -309,7 +309,7 @@ pub fn summarize(cfg: &Cfg, recs: &[Rec], fails: &[InstFail]) -> (String, String
     let mut integrity_ok = true;
     let mut ctl_ok = true;
     let mut cells_ok: Vec<(u64, usize)> = Vec::new();
-    let mut dec: BTreeMap<&str, (usize, usize, usize, usize)> = BTreeMap::new(); // cand -> (lower_all5, higher_field, weight_dependent, cells)
+    let mut dec: BTreeMap<&str, (usize, usize, usize, usize, usize)> = BTreeMap::new(); // cand -> (advancing cells, higher in field ops, not lower in field ops, weight/convention dependent, clean cells)
     let mut first = true;
     for (ci, &(p, d)) in cfg.cells.iter().enumerate() {
         let rs: Vec<&Rec> = recs.iter().filter(|r| r.p == p && r.d == d).collect();
@@ -402,39 +402,39 @@ pub fn summarize(cfg: &Cfg, recs: &[Rec], fails: &[InstFail]) -> (String, String
         let _ = writeln!(txt, "  controls: self-ratio==1: {}  positive control (solve-phase ratio exactly 2.0): {} (n={})  A/A hs2/hs2b CI95=[{:.3},{:.3}] contains the +-{:.0}% margin band: {}", self_ok, pc_ok, pcr.len(), aa.lo, aa.hi, MARGIN * 100.0, aa_ok);
         // same-base decision statistics, excl. construct (construction is identical for the pair)
         for cand in ["cs1", "cs2"] {
-            let mut lower5 = true;
-            let mut higher_field = false;
-            let mut lower_any = false;
-            let mut weight_dep = false;
             let mut vs = Vec::new();
+            let mut field_v = "unmeasured";
+            let mut other_higher = false;
+            let mut other_lower = false;
             for m in metrics() {
                 let st = pair_stat(cfg, &rs, cand, "cd", false, m, seed);
                 vs.push((m.name(), st.verdict, st.gm));
-                if st.verdict != "lower" {
-                    lower5 = false;
+                if matches!(m, Metric::Field) {
+                    field_v = st.verdict;
+                } else {
+                    if st.verdict == "higher" {
+                        other_higher = true;
+                    }
+                    if st.verdict == "lower" {
+                        other_lower = true;
+                    }
                 }
-                if st.verdict == "lower" {
-                    lower_any = true;
-                }
-                if matches!(m, Metric::Field) && st.verdict == "higher" {
-                    higher_field = true;
-                }
-            }
-            if lower_any && !lower5 {
-                weight_dep = true;
             }
             let _ = writeln!(txt, "  same-base {cand}/cd (excl. identical construction): {}", vs.iter().map(|(n, v, g)| format!("{n}:{v}({g:.3})")).collect::<Vec<_>>().join("  "));
-            let e = dec.entry(cand).or_insert((0, 0, 0, 0));
+            let e = dec.entry(cand).or_insert((0, 0, 0, 0, 0));
             if cell_clean {
-                e.3 += 1;
-                if lower5 {
-                    e.0 += 1;
+                e.4 += 1;
+                if field_v == "lower" && !other_higher {
+                    e.0 += 1; // advancing cell
                 }
-                if higher_field {
+                if field_v == "higher" {
                     e.1 += 1;
                 }
-                if weight_dep {
-                    e.2 += 1;
+                if field_v != "lower" {
+                    e.2 += 1; // not lower on field ops
+                }
+                if (field_v != "lower" && other_lower) || (field_v == "lower" && other_higher) {
+                    e.3 += 1; // weight/convention dependent
                 }
             }
         }
@@ -463,24 +463,26 @@ pub fn summarize(cfg: &Cfg, recs: &[Rec], fails: &[InstFail]) -> (String, String
     let _ = writeln!(txt, "\n## PROTOCOL DECISION (rule frozen in PROTOCOL.md)");
     let _ = writeln!(txt, "clean (uncensored) cells: {} of {}  integrity (exact root sets, replay, no unresolved): {}  controls: {}", cells_ok.len(), cfg.cells.len(), integrity_ok, ctl_ok);
     let mut dfirst = true;
-    for (cand, (lower5, higher, wdep, cells)) in dec.iter() {
+    for (cand, (adv, higher, notlower, wdep, cells)) in dec.iter() {
         let outcome = if !integrity_ok || !ctl_ok || *cells < 3 {
-            "NOT CLOSED (integrity, control or fewer than 3 clean cells)"
-        } else if *lower5 >= 3 && *higher == 0 {
-            "ADVANCES (>=3 cells lower under all five metrics, none higher)"
-        } else if *wdep >= 1 && *higher == 0 {
-            "UNRANKED (order changes across the native-weight/counting band)"
-        } else if *higher >= 3 || (*cells >= 3 && *lower5 == 0) {
-            "REJECTED at the tested scale (lower degree, not lower complete same-base cost)"
+            "NOT CLOSED (integrity, control or fewer than 3 clean cells: unmeasured)".to_string()
+        } else if *adv >= 3 && *higher == 0 {
+            "ADVANCES (>=3 clean cells lower on field ops by more than the margin, none higher, no other counting convention higher)".to_string()
+        } else if *notlower >= 3 {
+            let mut s = String::from("REJECTED on complete same-base field operations at the tested scale (lower degree, not lower cost)");
+            if *wdep > 0 {
+                s.push_str("; native-weighted or counting-convention order differs in some cells, so under section 5a the pair is UNRANKED across the band, not ranked in the candidate's favour");
+            }
+            s
         } else {
-            "INCONCLUSIVE"
+            "INCONCLUSIVE".to_string()
         };
-        let _ = writeln!(txt, "candidate {cand}: cells lower under all five metrics = {lower5}, cells higher in field ops = {higher}, cells weight-dependent = {wdep}, clean cells = {cells} -> {outcome}");
+        let _ = writeln!(txt, "candidate {cand}: advancing cells = {adv}, cells higher in field ops = {higher}, cells not lower in field ops = {notlower}, cells with convention-dependent order = {wdep}, clean cells = {cells} -> {outcome}");
         if !dfirst {
             js.push(',');
         }
         dfirst = false;
-        let _ = write!(js, "\"{}\":{{\"lower_all_five\":{},\"higher_field\":{},\"weight_dependent\":{},\"clean_cells\":{},\"outcome\":\"{}\"}}", cand, lower5, higher, wdep, cells, outcome);
+        let _ = write!(js, "\"{}\":{{\"advancing_cells\":{},\"higher_field_cells\":{},\"not_lower_field_cells\":{},\"convention_dependent_cells\":{},\"clean_cells\":{},\"outcome\":\"{}\"}}", cand, adv, higher, notlower, wdep, cells, outcome);
     }
     js.push_str("}}");
     (txt, js)
