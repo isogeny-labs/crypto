@@ -844,6 +844,57 @@ pub fn build_factor_base(curve: &CurveParams, target_size: usize) -> Vec<FactorB
     out
 }
 
+/// Cofactor-projected factor base: for each small-x point `F` of the curve
+/// the entry is `[h]F`, which lies in the prime-order subgroup `<G>` (for
+/// `gcd(h, n) = 1`).  Every sum or difference of two entries then lies in
+/// `<G>`, so a target `R ∈ <G>` can decompose over every pair rather than
+/// the `1/h` of pairs whose torsion components cancel.  Entries are keyed by
+/// the x-coordinate of `[h]F`, canonicalised by the smaller y.  Points with
+/// `[h]F = O` are skipped.  Opt-in; [`build_factor_base`] is unchanged.
+pub fn build_factor_base_projected(
+    curve: &CurveParams,
+    target_size: usize,
+) -> Vec<FactorBaseEntry> {
+    let mut out: Vec<FactorBaseEntry> = Vec::with_capacity(target_size);
+    let mut seen = std::collections::HashSet::new();
+    let a_fe = curve.a_fe();
+    let h = BigUint::from(curve.h);
+    let mut x = BigUint::one();
+    while out.len() < target_size && x < curve.p {
+        let xf = curve.fe(x.clone());
+        let rhs_value = xf
+            .mul(&xf)
+            .mul(&xf)
+            .add(&curve.a_fe().mul(&xf))
+            .add(&curve.fe(curve.b.clone()))
+            .value;
+        if let Some(y) = sqrt_mod_p(&rhs_value, &curve.p) {
+            let f = Point::Affine {
+                x: xf,
+                y: curve.fe(y),
+            };
+            if let Point::Affine { x: px, y: py } = f.scalar_mul(&h, &a_fe) {
+                if seen.insert(px.value.clone()) {
+                    let y_canon = if &py.value * &BigUint::from(2u32) < curve.p {
+                        py.value.clone()
+                    } else {
+                        &curve.p - &py.value
+                    };
+                    out.push(FactorBaseEntry {
+                        idx: out.len(),
+                        point: Point::Affine {
+                            x: px,
+                            y: curve.fe(y_canon),
+                        },
+                    });
+                }
+            }
+        }
+        x += BigUint::one();
+    }
+    out
+}
+
 // ── Relation finding ────────────────────────────────────────────────────
 
 /// One row of the index-calculus linear system.
@@ -1588,6 +1639,7 @@ pub fn ec_index_calculus_dlp_staged(
         extra_relations,
         max_trials_per_relation,
         max_relation_attempts,
+        false,
         &mut rng,
     )
 }
@@ -1614,6 +1666,35 @@ pub fn ec_index_calculus_dlp_staged_seeded(
         extra_relations,
         max_trials_per_relation,
         max_relation_attempts,
+        false,
+        &mut rng,
+    )
+}
+
+/// Seeded staged pipeline over the cofactor-projected factor base
+/// ([`build_factor_base_projected`]); otherwise identical to
+/// [`ec_index_calculus_dlp_staged_seeded`].
+pub fn ec_index_calculus_dlp_staged_seeded_projected(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    fb_size: usize,
+    extra_relations: usize,
+    max_trials_per_relation: usize,
+    max_relation_attempts: usize,
+    seed: u64,
+) -> Option<(BigUint, EcIcStageReport)> {
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(seed);
+    ec_index_calculus_dlp_staged_with_rng(
+        curve,
+        g,
+        q,
+        fb_size,
+        extra_relations,
+        max_trials_per_relation,
+        max_relation_attempts,
+        true,
         &mut rng,
     )
 }
@@ -1626,13 +1707,18 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     extra_relations: usize,
     max_trials_per_relation: usize,
     max_relation_attempts: usize,
+    project_cofactor: bool,
     rng: &mut R,
 ) -> Option<(BigUint, EcIcStageReport)> {
     use std::time::Instant;
     let total_started = Instant::now();
 
     let fb_started = Instant::now();
-    let fb = build_factor_base(curve, fb_size);
+    let fb = if project_cofactor {
+        build_factor_base_projected(curve, fb_size)
+    } else {
+        build_factor_base(curve, fb_size)
+    };
     let factor_base_ms = fb_started.elapsed().as_secs_f64() * 1e3;
     if fb.is_empty() {
         return None;

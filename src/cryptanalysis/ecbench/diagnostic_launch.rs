@@ -14,6 +14,7 @@ use super::canonical::{reject_duplicate_keys, sha256_hex};
 use super::diagnostics::Context;
 use super::methods::ResolvedMethod;
 use super::spec::{Plan, Role, Spec};
+use super::three_leads::is_pencil_symbolic;
 
 pub const MAX_LAUNCH_BYTES: usize = 65_536;
 pub const LAUNCH_SCHEMA: &str = "ecbench.diagnostic_launch/v2";
@@ -235,7 +236,7 @@ impl LaunchDocument {
             }
             let a = found[0];
             if a.role != role
-                || a.method != method
+                || !(a.method == method || (name == "pencil" && is_pencil_symbolic(&a.method)))
                 || a.profile != self.profile
                 || !digest(&a.method_config_sha256)
             {

@@ -3,7 +3,7 @@
 \section{The measured frontier: one campaign, every cost priced}\label{sec:campaign}
 
 The frontier synthesis of 13 October assembled ratios from studies that
-used different curves, sizes and accounting. To replace it we ran one
+used different curves, sizes and accounting. It was replaced by one
 campaign (\art{research/ic_frontier_campaign_20261015/}, protocol frozen
 before any measured run). Every method family ran on the same fixed curve
 ladders: eight Koblitz curves chosen by subgroup size
@@ -307,8 +307,11 @@ primes as columns, merging them with structured Gaussian elimination and
 finishing with Wiedemann moved it to $q^{1.380}$ and the constant to
 $0.653\times$. This was the first index-calculus family in the programme whose fitted
 exponent lies below rho's (the $k=4$ binary family of \S\ref{sec:ladder2}
-is the second), and the only one where measured IC beats a rho arm: the item-7 rho, which walks at $1.75\sqrt\ell$ steps,
-at $q=2^{15}$ ($0.69$ $[0.55,0.83]$). Two further
+is the second), and the first where measured IC cost fell below a rho arm:
+the item-7 rho (which walks at $1.75\sqrt\ell$ steps, about twice the
+ideal), at $q=2^{15}$ ($0.69$ $[0.55,0.83]$; no band pricing; not the
+strongest rho). Against the strongest rho see Chapter~\ref{sec:transfer}
+(genus-3 round 4, the plane quartic and the validated Joux--Vitse sieve). Two further
 rounds kept going. A frozen schedule for the factor-base fraction $\kappa(q)$
 plus block Wiedemann brought the whole solve to $0.605\times$ the first
 double-large-prime arm at $q=2^{21}$. Cheaper relation primitives
@@ -345,8 +348,8 @@ a measured constant. \emph{Next improvement}: put the four-unknown solve
 into the complete ladder, then keep double large primes' linear-algebra
 gain without its relation-phase cost.
 
-\paragraph{Koblitz.} Free relations---root-table self-collisions used as
-homogeneous rows---are now the production default ($0.960\times$ counted,
+\paragraph{Koblitz.} Free relations (root-table self-collisions used as
+homogeneous rows) are now the production default ($0.960\times$ counted,
 $0.941\times$ wall); the linear rows the Gr\"obner oracle used to discard
 are harvested ($0.86$--$0.93\times$ where the gate fires, and a root-rank
 gate then made it fire on more cells: $1/1.41$ at $(29,15)$, $1/1.20$ end
@@ -482,8 +485,10 @@ In characteristic two, a Frobenius-reduced form of the same system
 $481\times$ below the plain form. End to end on $E(\FF_{(2^m)^4})$ the
 ratio of IC to the negation-map rho model falls from $5{,}080$ at $m=6$ to
 $6.06$ at $m=14$ ($n\approx2^{56}$; $4.3\times$ a measured rho), with fitted
-slope $-0.248$ in $\log_2 n$---Gaudry's $n^{-1/4}$---and an extrapolated
-crossover near $n\approx2^{68}$ ($2^{63}$--$2^{69}$ under the model).
+slope $-0.248$ in $\log_2 n$ (Gaudry's $n^{-1/4}$) and an extrapolated
+crossover near $n\approx2^{68}$ ($2^{63}$--$2^{69}$ under the model). A
+later red-team review found this crossover unsupported
+(Chapter~\ref{ch:extension}; $m=15$: $5.2\times$ after corrections).
 After genus three, this is the nearest any index calculus in the programme
 has come to rho, and its extrapolated crossover lies where rho itself takes
 about $2^{34}$ steps, so the extrapolation can be tested directly. A Joux--Vitse
@@ -537,17 +542,17 @@ The sweep later isolated the cause: an x86-only BMI2 rewrite in inherited F4
 charges a different word-XOR count from the portable path, and with it
 disabled x86 and emulated aarch64 both replay 168/168
 (\art{research/validation_sweep_20261019/D-known-issues/item1_cross_isa_20261020/RESULT.md}).
-F4 counts are therefore comparable across instruction sets only when the
-path is stated, and until the method identity records it the root-finder
-rows rest on the recorded receipt. (iii) The equal-bytes preprocessing control at
+The 26 October addendum states the cause precisely and closes it
+(Chapter~\ref{ch:audit}, item 4). (iii) The equal-bytes preprocessing control at
 $n=73$ and $n=83$ is built and frozen but not run.
 \emph{Next improvement} (from the 18 October leads review): a large-memory
-host. The two exponent-level questions named then---the Weil-descent cell
-$(m,\ell)=(4,6)$ and the PKM tower at $m=3$, $N=21$---have since run on
+host. The two exponent-level questions named then (the Weil-descent cell
+$(m,\ell)=(4,6)$ and the PKM tower at $m=3$, $N=21$) have since run on
 rented hosts: the $(4,6)$ cell refuted at degree 4 at $N=54$, and the PKM
 cell finished degree 7 and stopped on memory inside degree 8, implying
 $D\ge8$ but read as inconclusive (\S\S\ref{sec:binary-descent},\ref{sec:pkm}).
-The $(3,7)$, $\ell=8$ and $m=4$, $N=20$ cells remain.
+The $m=4$, $N=20$ cell remains; the $(3,7)$ and $\ell=8$ cells were since
+run with guessed variables (\S\ref{sec:ladder3}).
 
 \section{The ladder continued, 21--24 October}\label{sec:ladder3}
 
@@ -559,8 +564,8 @@ third family whose measured gap to rho is now single-digit
 (Table~\ref{tab:ladder3}). The reading rules of \S\ref{sec:ladder} apply:
 each row is against its own incumbent and on its study's boundary. The
 companion ledger (\art{papers/ecdlp-ic-improvement-ledger/}) records the
-same period as a ratchet of incumbents; this section keeps to what moves
-the frontier or corrects it.
+same period as a ratchet of incumbents; the rows here are those that move
+the frontier or correct it.
 
 \begin{table}[p]
 \centering\small
@@ -587,7 +592,7 @@ Kummer tower, 30 bit (new row) & N & --- & $158.9\times$ $[121.6,221.4]$ \\
 Coppersmith lattice on $\Sem3$, $\ell\le3$ & N & 0/10 recovered in all 96 cells with $\beta\ge0.20$ & ceiling $\beta=1/4$ stands \\
 \addlinespace
 \multicolumn{4}{@{}l}{\emph{Transfer and covers}}\\
-Joux--Vitse cover of $E(\FF_{p^6})$, $p=53$--$1009$ & N & slope $-2.05$ $[-2.28,-1.83]$ in $\ln p$ & $1.59$--$1.98\times$ at $p=1009$ (LB) \\
+Joux--Vitse cover of $E(\FF_{p^6})$, $p=53$--$1009$ & N & slope $-2.05$ $[-2.28,-1.83]$ in $\ln p$ & $1.59$--$1.98\times$ at $p=1009$ (LB; pooled rho constant, superseded by matched rho, \S\ref{sec:jac-jv}) \\
 Measured trial cost, genus-255 binary Jacobian & A & $103$ curve additions per trial ($2^{6.69}$) & $N=130$ margin $+4.71\to-1.83$ bits \\
 GHS covers of $E/\FF_{q^4}$, odd $q$, census & N & genus floor 13 on odd-order curves & model exponent gap $0.154$ \\
 \bottomrule
@@ -607,8 +612,8 @@ diagnostic, no cost row). Sources under \art{research/}:
 
 \paragraph{One mechanism, four factor bases.} The week's measured gains on
 the index-calculus side are all the same idea: put a point and its images
-under maps of known logarithm---the Frobenius $\tau$ on a Koblitz curve, the
-CM endomorphism $\phi$, small integer multiples, the cofactor $[h]$---into
+under maps of known logarithm (the Frobenius $\tau$ on a Koblitz curve, the
+CM endomorphism $\phi$, small integer multiples, the cofactor $[h]$) into
 one column with a known coefficient, so the linear-algebra stage needs fewer
 relations. On Koblitz curves the $\ZZ[\tau]$ base needs $K+1$ relations
 instead of about one per orbit: child CPU of the complete process falls
@@ -642,7 +647,7 @@ slowdown). One size improves ($0.953$ $[0.904,0.998]$ at $n=57$) and five are
 not separated, so it is not a Table A improvement under its own rule. The
 free-relation lever costs 5--9\% in this pipeline. More consequential is the
 reference: with rho priced in the same process at the canonical batched step,
-the cold distance is $9.9$--$43\times$, $1.76$--$1.94\times$ the as-built
+the cold distance of rule v4 is $9.2$--$42.1\times$ (rule v3: $9.9$--$43.5\times$), $1.76$--$1.94\times$ the as-built
 figure that rule v3 used. The ledger's rule v8 reads $4.67$--$18.07\times$ on
 the same sizes in its own unit; the two are different domains in the sense of
 Definition~\ref{def:domain} and are not combined here.
@@ -659,7 +664,16 @@ tracks, the same row is $+45.71$ bits, and the measured conversion
 $K=4$--$16$ rho steps per touch raises both (\S\ref{sec:ladder2}). With the
 hybrid, the row is $+8.43$ bits if the number of guesses stays flat in $\ell$
 and $+58.27$ bits if it grows linearly; one value of $\ell$ cannot separate
-them, and the run at $\ell=8$ that would did not complete. In no scenario does
+them. The pre-registered $m=3$ runs at $(n,\ell)=(22,8)$ have since
+completed, with a series of guess sets (\S\ref{sec:bd-guess},
+Table~\ref{tab:bd-guess}): four guessed variables suffice on every draw
+measured, and three suffice on 7 of 12 draws when they include the
+summand-swap invariant. The count is 0 at $\ell=6$, about 1 at $\ell=7$ and
+at most 4 at $\ell=8$, which still does not decide whether it stays bounded
+or grows. At the priced
+$m=4$, $\ell=33$ cell the hybrid beats degree 5 only if the count is at most
+6 (\art{research/dreg_closure_guess_20261022/},
+\art{research/dreg_closure_guess3_20261023/}). In no scenario does
 the row go below the degree-4 floor of $+7.62$ bits, so the route does not
 reach rho.
 
@@ -673,20 +687,25 @@ planted decomposition in any of 96 cells with $\beta\ge0.20$ at 24--56 bits,
 with positive controls passing below, so the $\beta=1/4$ ceiling stands at
 multiplicity $\le3$.
 
-\paragraph{A third family approaches rho: the Joux--Vitse cover.} The
-genus-3 cover of $E(\FF_{p^6})$ over $\FF_{p^2}$ with Nagao decompositions
-(full rational 2-torsion; a weak class, not prime-order curves) ran at
-$p=53$--$1009$, three seeds per prime, every logarithm checked. The gap to
-rho falls from a geometric mean of $620\times$ at $p=53$ to $1.73\times$ at
-$p=1009$ ($1.59$--$1.98$), with fitted slope $-2.05$ $[-2.28,-1.83]$ in $\ln p$
-against the cost model's $-2$; the line meets rho near $p\approx1330$
-($[1170,1540]$, an extrapolation). Two limits keep it a lower-bound comparison:
-the cover arm does not emit its unpriced F4 and Wiedemann work, so it cannot be
-ranked under the band; and rho cannot be run at $p\ge503$ (subgroups of
-$2^{52}$--$2^{58}$), so those ratios use the pooled rho constant $S=1.344$
-measured at $p\le251$. If that constant kept falling at its (insignificant)
-point trend, the ratio at $p=1009$ would be about 20\% higher. A separate sieve arm on the same cover read far lower ratios, but its
-comparisons are withheld by review (\S\ref{sec:transfer}).
+\paragraph{A third family crosses rho: the Joux--Vitse cover.} The
+genus-3 cover of $E(\FF_{p^6})$ over $\FF_{p^2}$ (full rational 2-torsion;
+a weak class, not prime-order curves) has two arms; the full account is
+\S\ref{sec:jac-jv}. The plain arm, with Nagao decompositions, ran at
+$p=53$--$1009$, three seeds per prime, every logarithm checked. Against a
+pooled rho constant ($S=1.344$, measured at $p\le251$) its gap fell from a
+geometric mean of $620\times$ at $p=53$ to $1.73\times$ at $p=1009$
+($1.59$--$1.98$), slope $-2.05$ $[-2.28,-1.83]$ in $\ln p$, and the line met
+that constant near $p\approx1330$ (an extrapolation). Rho was later run on
+the same instances. Against a matched negation rho the plain arm is above
+rho in group additions at $p=1301$ ($1.41$ $[1.21,1.63]$) and $p=1451$
+($1.16$ $[1.02,1.34]$), unresolved at $p=1601$ ($0.87$ $[0.70,1.18]$), and
+above it in $\FF_p$ multiplications at all three
+(\art{research/jv_cover_negrho_rescore_20261101/README.md}), so the
+extrapolated crossing near 1330 does not hold. The arm still does not emit
+its unpriced F4 and Wiedemann work, so it stays a lower-bound comparison. A
+separate sieve arm on the same cover was measured against a matched
+negation rho at $p=1511$ and validated: it is $0.0065\times$ rho
+($155\times$ $[125,184]$ below it), and the order holds across the band.
 
 \paragraph{Covers: censuses and a repriced counterfactual.} Measuring the
 cost of one relation trial (a Cantor addition plus a smoothness test) on a
@@ -702,9 +721,9 @@ binary curves over $\FF_{2^{3l}}$ the genus-3 class is a $2^{-l}$ fraction
 
 \paragraph{The validation gate.} On 24 October the leaderboard's gate ran
 for the first time: all 13 Table~B rows (eight prime, five random binary)
-passed---every counted field replays identically, every scalar checks in an
+passed: every counted field replays identically, every scalar checks in an
 independent verifier, and IC stays above rho at every weight of the band
-($4.05$--$54.76\times$)---and all nine Table~C rows failed; Table~A was not
+($4.05$--$54.76\times$). All nine Table~C rows failed; Table~A was not
 in scope (\art{research/ic_validation_gate_20261024/}). The study staged its
 manifest rather than installing it, and the leaderboard now marks the
 Table~B rows validated. The ledger paper, current to 23 October, records
@@ -734,18 +753,21 @@ table) and $6.97\times$ (matrix F4/F5 against rho-negation at K13).
 Prime-field arms are $12$--$239\times$ rho and diverge with size (the
 30-bit Kummer-tower row of \S\ref{sec:ladder3} is $159\times$). Off the
 prime and prime-degree binary fields, three families are within a
-single-digit factor, all in weak classes: genus three after cubic GHS
+single-digit factor of rho or go below it, all in weak classes: genus three after cubic GHS
 (below the strongest rho at $q=2^{16}$ under the registered pricing,
 unresolved at the other sizes to $2^{20}$, above it under a heavier
 sensitivity pricing), $k=4$ over $\FF_{(2^m)^4}$
-($4.3\times$ a measured rho at $n\approx2^{56}$, closing as $n^{-1/4}$), and
-the Joux--Vitse cover of $E(\FF_{p^6})$ (plain Nagao arm; $1.59$--$1.98\times$ a pooled rho
-constant at $p=1009$, closing as about $p^{-2}$; a lower-bound comparison).
+($4.3\times$ a measured rho at $n\approx2^{56}$ on one target, $5.2\times$
+at $m=15$ after corrections; crossover unsupported), and the Joux--Vitse
+cover of $E(\FF_{p^6})$ (plain Nagao arm $1.16$--$1.41\times$ a matched
+negation rho at $p=1301$ and $1451$, unresolved at $1601$, a lower-bound
+comparison; its sieve arm is $0.0065\times$ a matched negation rho at
+$p=1511$, validated, \S\ref{sec:jac-jv}).
 
 \paragraph{Online, after retained set-up.} Generic again: Bernstein--Lange
 preprocessing rho. The admitted compact-orbit point at Koblitz $n=61$,
 $13.9\times$ $[9.8,19.1]$ over strong rho without a table (cold median
-$83.4\times$ rho), is $53$--$221\times$ slower online than preprocessing rho
+$83.4\times$ rho), is $53$--$317\times$ slower online than preprocessing rho
 given equal or less advice (\S\ref{sec:ladder}), and the $n=83$ points
 lose every pair run with rho given a table matched on set-up time or
 memory (\S\S\ref{sec:ladder2},\ref{sec:n83}).
@@ -758,8 +780,8 @@ matrix work, and the $k=4$ extension-field solve is $48\times$ and then a
 further $370\times$ cheaper over $\FF_{p^4}$ ($481\times$ below the plain
 form in characteristic two).
 None of this, by itself, moves the cold frontier: the stages it leaves
-untouched---relation yield, factor-base size, linear algebra, table
-set-up---now dominate.
+untouched (relation yield, factor-base size, linear algebra, table
+set-up) now dominate.
 
 \begin{figure}[t]
 \centering
@@ -781,12 +803,13 @@ torsion-symmetrised bases and the $n=83$ dense-root engine in ecbench under
 immutable method identities and emit cold and online records; (ii) resolve
 the inherited-F4 cross-host counter drift before using that counter in a
 bound; (iii) run a four-size native challenge against the standing rho
-bound---two sizes cannot establish an exponent; (iv) obtain an isolated
+bound, since two sizes cannot establish an exponent; (iv) obtain an isolated
 cold session at $n=83$ with every set-up phase and retained byte charged;
 (v) price F6-IC's batched geometry with a pinned conversion. Since then
 three items have moved to the front: (vi) run $k=4$ over
 $\FF_{(2^m)^4}$ at $m=15$--$17$ against a measured negation-map rho, where
-the fitted trend predicts parity near $n\approx2^{68}$; (vii) measure the
+the fitted trend was read as predicting parity near $n\approx2^{68}$ (the
+red team found that unsupported, Chapter~\ref{ch:extension}); (vii) measure the
 matched rho on $E_0(\FF_{q^3})$ in the genus-3 rounds' unit (done on 23
 October: below rho at $2^{16}$ under the registered pricing, unresolved
 elsewhere, \S\ref{sec:transfer}); (viii) obtain a
@@ -794,9 +817,12 @@ large-memory host for the $(4,6)$ Weil-descent cell and the PKM tower.
 The 21--24 October work adds two more and re-weights one: (ix) measure rho
 on the Joux--Vitse cover family at $p\ge503$ (or a size where it can be run)
 and emit the cover arm's unpriced counters, so that the $p^{-2}$ trend can be
-ranked under the band and tested past $p\approx1330$; (x) define and run a
-published-index-calculus reference arm (open problem~10); and (viii) is worth
-less than it looked for the binary question, since the $m=4$ row at $w=2$ is
+ranked under the band and tested past $p\approx1330$ (the matched rho now
+exists: for the sieve arm at $p=1511$, and for the Nagao arm at
+$p=1301$--$1601$, where the crossing near 1330 failed; the unpriced counters
+are still not emitted); (x) define and run a
+published-index-calculus reference arm (open problem~10); and (viii) bears
+less on the binary question than it first appeared, since the $m=4$ row at $w=2$ is
 about $+46$ bits over rho even if degree 5 holds (\S\ref{sec:ladder3}).
 A result in the cold domain that beats rho at four sizes would be the first
 \cls{advance} of the programme.

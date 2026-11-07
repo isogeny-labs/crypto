@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Runs inside the VPC launcher. The experiment itself always runs in EKS.
 set -euo pipefail
+# The override buildspec (current-run-request-buildspec.yml) does not put the
+# launcher source's bin/ on PATH, so isolab-eks-mcp is not found (exit 127).
+export PATH="${CODEBUILD_SRC_DIR:+$CODEBUILD_SRC_DIR/bin:}$PATH"
 here=$(cd "$(dirname "$0")" && pwd)
 : "${ISOLAB_CLUSTER:?}" "${ISOLAB_BUCKET:?}" "${AWS_REGION:?}" "${ISOLAB_REQUEST_KEY:?}"
 [[ "$ISOLAB_REQUEST_KEY" =~ ^inputs/requests/([a-f0-9]{64})\.json$ ]] || { echo 'Invalid request key' >&2; exit 2; }

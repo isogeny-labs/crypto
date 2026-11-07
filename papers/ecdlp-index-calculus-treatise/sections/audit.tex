@@ -1,12 +1,14 @@
 \chapter{Corrections and validation}\label{ch:audit}
 
-A ratchet is worth only as much as its pawl. Several recorded results were
+Several recorded results were
 corrected once the reference was matched, native work was priced, or the
 evidence was replayed. Each correction is recorded in the source with a
 dated note; frozen evidence is never rewritten. Figure~\ref{fig:audit}
-shows the before and after values. Every correction moved IC's position
-against rho \emph{down}, and several moved it from apparently ahead of rho
-to behind it.
+shows the before and after values. Most corrections below moved
+IC's position against rho \emph{down}, and several moved it from
+apparently ahead of rho to behind it. Appendix~\ref{ch:corrections}
+records two that moved it up: the byte-counter pricing rule and the
+matched-rho re-measurement of the Joux--Vitse sieve.
 
 \begin{figure}[t]
 \centering
@@ -105,6 +107,37 @@ last two are rho studies, neither yet in a campaign arm.}
 \label{tab:audit-rho}
 \end{table}
 
+\paragraph{3a. The matched reference re-priced every Table~B row.}
+Through \S17 of the boundary ledger every prime and random-binary row was
+divided by a frozen plain walk (16 jumps, two scalar multiplications per
+walk start, distinguished points every $\sqrt r/8$). The matched
+negation-map walk of 23 September replaced it, and the frozen walk was
+replayed exactly on all 616 recorded runs of the ten re-priced reports
+(\art{research/ic_rho_reference_20260923/README.md}).
+Table~\ref{tab:fr-reprice} gives every row of the three round-5 reports.
+\begin{itemize}
+\item Ladder: best IC over rho $0.84$--$15.96$ before, $5.47$--$38.21$
+  after. The one row below its rho, $0.84$ at 12 bits, reads $5.47$.
+\item Headline: $4.19$ and $21.38$ before, $13.08$ and $45.29$ after.
+\item Holdout: $4.74$--$16.79$ before, $12.67$--$37.07$ after.
+\end{itemize}
+The index-calculus $S$ is the same in both columns; only the reference
+changed.
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{3.5pt}
+\input{figures/tab-fr-reprice}
+\caption[]{Round-5 boundary reports re-priced against the matched rho. $S$
+in GAE per $\sqrt r$; $S_{\rm IC}$: best of nine recipes; frozen $S_\rho$:
+the plain walk used through \S17; matched $S_\rho$: the negation-map walk.
+The ladder rows are leaderboard Table~B
+(Table~\ref{tab:fr-boardB}). Source:
+\art{research/ic_rho_reference_20260923/analysis.json}
+(\texttt{tables.boundary}). Data: \art{figures/data-fr-leaderboard.json}.}
+\label{tab:fr-reprice}
+\end{table}
+
 \paragraph{4. A replay regression, and its root cause.} The root-finder
 ecbench session was recorded with a replay certificate of 120 of 168
 identical records; the 48 mismatches were all in inherited F4's word-XOR
@@ -143,7 +176,10 @@ within the run it is $305.8\to94.4$ (Chapter~\ref{sec:koblitz}).
   \art{research/ghs_cubic_quartic_ic_20261012/quartic_ic.rs} that merges
   distinct classes (reported in an open pull request). Recoveries are still
   checked against the planted scalar, but relation counts and $S$ are
-  unverified.
+  unverified. Canonical $\mathrm{Pic}^0$ keys later fixed the merge
+  (\art{research/quartic_pic_canonical_20261018/}). The N4 and N4~v2
+  measurements of Chapter~\ref{ch:distance} use the fixed code; the
+  withdrawn values are the earlier toys only.
 \item \emph{Volcano census crater.} A claim that IC is 22--25\% cheaper on
   the volcano crater was withdrawn, because the crater's rho reference
   should have been the cubic-automorphism rho. Against it, IC is
@@ -189,7 +225,7 @@ A & Koblitz descent, one target & 6 & validated at baseline v7 & as-built, same 
 \addlinespace
 C & 32-target batch & 9 & pre-gate & none matched, no band & \\
 \addlinespace
---- & components outside A--C & 2 & validated & & \\
+--- & components outside A--C & (2) & validated & & \\
 \bottomrule
 \end{tabular}
 \caption[]{Validation status of the leaderboard on 29 October. Table~B
@@ -200,15 +236,63 @@ numbers recompute to relative $10^{-9}$; index calculus stays above rho at
 every band weight. Table~A (64 targets per size) validated at baseline v7
 (\art{research/ic_tool_program/rule/v7/}); the sweep flags the reference as
 only partly adequate, and the rule~v8 row is from
-Chapter~\ref{ch:distance}. Table~C's replays and recomputations pass, but
-no matched rho with a band exists for them. The two components are the
-prime-field base-size tuning and the post-Gröbner linear stage
+Chapter~\ref{ch:distance} (rule v8 also carries a \texttt{VALIDATION.json},
+\art{research/ic_tool_program/rule/v8/VALIDATION.json}; the board has not
+been regenerated on it). Table~C's replays and recomputations pass, but
+no matched rho with a band exists for them. The component row is not
+counted in the 28 rows; it names two of several validated components
+(\art{docs/ic/leaderboard.json} has more, among them the generator-orbit
+and aimed-gather components): the prime-field base-size tuning and the post-Gröbner linear stage
 (\art{research/prime_base_oracle_tuning_20261029/VALIDATION.json},
 \art{research/postgb_linear_stage_20261026/validation/VALIDATION.json}).}
 \label{tab:audit-validation}
 \end{table}
 Validation says the numbers are what the archive says, and that the
-reference is fair. \textbf{No validated row is below its reference.}
+reference is fair. \textbf{No validated leaderboard row is below its
+reference.} The one validated measurement below a matched rho is the
+Joux--Vitse sieve route on the \texttt{jv\_cover} weak class
+($0.0065\times$, $p=1511$, \texttt{VAL-20261103-c31c76};
+\S\ref{sec:jac-jv}). It is not a leaderboard row, never has prime order,
+and has no pcc claim. The 19 validated board rows each have a pcc
+measurement claim, of standing unverified.
+
+\paragraph{The benchmarks table.} \art{benchmarks/README.md} on
+\texttt{origin/main} (\texttt{05f7382689}) admits 145 rows
+(Table~\ref{tab:fr-benchcount}). Twenty link a \texttt{VALIDATION.json} in
+the row; 112 are listed in \art{benchmarks/PRE_GATE.json} and render as
+unvalidated (pre-gate); 13 do neither. Fifteen of the twenty measure an
+index-calculus pipeline or one of its stages, and Table~\ref{tab:fr-bench}
+gives the distance to rho each of them states. Thirteen state IC above rho in
+every cell and at every weight they report. The genus-3 linear-algebra row is below rho at
+$w=0$ ($0.38\times$) and above it at $w=0.1$ and~1, so unresolved across
+the band. The Joux--Vitse Hilbert-stop row states only a slope of $S$ over
+rho ($-2.27$) and a lower bound on IC.
+
+\begin{table}[t]
+\centering\small
+\input{figures/tab-fr-benchcount}
+\caption[]{Rows of the admitted benchmarks table by date and gate
+standing. ``Linked'': the row links its \texttt{VALIDATION.json};
+pre-gate: the row's slug is in \art{benchmarks/PRE_GATE.json}; neither:
+admitted under the 24 October gate audit without a file linked in the row.
+Counted by \art{figures/make_tab_fr.py}. Data:
+\art{figures/data-fr-bench.json}.}
+\label{tab:fr-benchcount}
+\end{table}
+
+\begin{table}[t]
+\centering\scriptsize
+\input{figures/tab-fr-bench}
+\caption[]{The 15 admitted benchmark rows with a linked
+\texttt{VALIDATION.json} that measure an index-calculus pipeline or stage,
+with the distance to rho as each row's headline states it (excerpts; every
+number checked against the row by \art{figures/make_tab_fr.py}). The other
+five linked rows are a strong-rho engineering round and four studies of
+generic walks and pencil models priced against rho. Several rows state
+their validation ``with caveats'' (same-host replay, one session). Source: \art{benchmarks/README.md}. Data:
+\art{figures/data-fr-bench.json}.}
+\label{tab:fr-bench}
+\end{table}
 
 The theory of Part~\ref{part:theory} has a different standard of evidence:
 \begin{itemize}
