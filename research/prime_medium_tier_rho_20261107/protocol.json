@@ -92,7 +92,7 @@
       ],
       "sample_status": "out_of_sample"
      },
-     "role": "confirmatory"
+     "role": "decisive"
     },
     {
      "id": "P4",
@@ -121,7 +121,7 @@
       ],
       "sample_status": "out_of_sample"
      },
-     "role": "confirmatory"
+     "role": "calibration"
     },
     {
      "id": "P6",
@@ -150,7 +150,7 @@
       ],
       "sample_status": "out_of_sample"
      },
-     "role": "confirmatory"
+     "role": "calibration"
     }
    ]
   }
@@ -162,7 +162,7 @@
    "description": "rho.negation, matched prime rho of every prime IC gap; the toy bound's method id",
    "instrument": {
     "repo": "crypto",
-    "commit": "FILL_AT_FREEZE: the commit that lands this protocol",
+    "commit": null,
     "build": [
      [
       "cargo",
@@ -172,7 +172,7 @@
       "ecbench"
      ]
     ],
-    "binary_sha256": "FILL_AT_FREEZE: ecbench sha256 of the image built from that commit",
+    "binary_sha256": null,
     "flags": {},
     "env": {
      "RAYON_NUM_THREADS": "1",
@@ -183,16 +183,17 @@
    "parameters": {
     "method": "rho.negation",
     "specs": "specs/J1.json..J6.json",
-    "ecbench_arm": "rho-neg"
+    "ecbench_arm": "rho-neg",
+    "instrument_binding": "commit and binary_sha256 are set at freeze to the landing commit and the binary of the image built from it (finalize_requests.sh binds the same values into job.build)"
    }
   },
   {
    "id": "rho-neg-aa",
-   "role": "control",
+   "role": "control_aa",
    "description": "rho.negation again with the same seeds (A/A)",
    "instrument": {
     "repo": "crypto",
-    "commit": "FILL_AT_FREEZE: the commit that lands this protocol",
+    "commit": null,
     "build": [
      [
       "cargo",
@@ -202,7 +203,7 @@
       "ecbench"
      ]
     ],
-    "binary_sha256": "FILL_AT_FREEZE: ecbench sha256 of the image built from that commit",
+    "binary_sha256": null,
     "flags": {},
     "env": {
      "RAYON_NUM_THREADS": "1",
@@ -213,17 +214,18 @@
    "parameters": {
     "method": "rho.negation",
     "specs": "specs/J1.json..J6.json",
-    "ecbench_arm": "rho-neg-aa"
+    "ecbench_arm": "rho-neg-aa",
+    "instrument_binding": "commit and binary_sha256 are set at freeze to the landing commit and the binary of the image built from it (finalize_requests.sh binds the same values into job.build)"
    },
    "same_instrument_as": "rho-neg"
   },
   {
    "id": "rho-plain",
-   "role": "baseline",
+   "role": "control_positive",
    "description": "rho.plain, positive control (sqrt 2)",
    "instrument": {
     "repo": "crypto",
-    "commit": "FILL_AT_FREEZE: the commit that lands this protocol",
+    "commit": null,
     "build": [
      [
       "cargo",
@@ -233,7 +235,7 @@
       "ecbench"
      ]
     ],
-    "binary_sha256": "FILL_AT_FREEZE: ecbench sha256 of the image built from that commit",
+    "binary_sha256": null,
     "flags": {},
     "env": {
      "RAYON_NUM_THREADS": "1",
@@ -244,7 +246,8 @@
    "parameters": {
     "method": "rho.plain",
     "specs": "specs/J1.json..J6.json",
-    "ecbench_arm": "rho-plain"
+    "ecbench_arm": "rho-plain",
+    "instrument_binding": "commit and binary_sha256 are set at freeze to the landing commit and the binary of the image built from it (finalize_requests.sh binds the same values into job.build)"
    },
    "same_instrument_as": "rho-neg"
   },
@@ -254,7 +257,7 @@
    "description": "bsgs.negation, exact-analysis constant S = 1.0",
    "instrument": {
     "repo": "crypto",
-    "commit": "FILL_AT_FREEZE: the commit that lands this protocol",
+    "commit": null,
     "build": [
      [
       "cargo",
@@ -264,7 +267,7 @@
       "ecbench"
      ]
     ],
-    "binary_sha256": "FILL_AT_FREEZE: ecbench sha256 of the image built from that commit",
+    "binary_sha256": null,
     "flags": {},
     "env": {
      "RAYON_NUM_THREADS": "1",
@@ -275,7 +278,8 @@
    "parameters": {
     "method": "bsgs.negation",
     "specs": "specs/J1.json..J6.json",
-    "ecbench_arm": "bsgs-neg"
+    "ecbench_arm": "bsgs-neg",
+    "instrument_binding": "commit and binary_sha256 are set at freeze to the landing commit and the binary of the image built from it (finalize_requests.sh binds the same values into job.build)"
    },
    "same_instrument_as": "rho-neg"
   },
@@ -285,7 +289,7 @@
    "description": "rho.negation_v2, the _v2 accounting; secondary, reported only",
    "instrument": {
     "repo": "crypto",
-    "commit": "FILL_AT_FREEZE: the commit that lands this protocol",
+    "commit": null,
     "build": [
      [
       "cargo",
@@ -295,7 +299,7 @@
       "ecbench"
      ]
     ],
-    "binary_sha256": "FILL_AT_FREEZE: ecbench sha256 of the image built from that commit",
+    "binary_sha256": null,
     "flags": {},
     "env": {
      "RAYON_NUM_THREADS": "1",
@@ -306,7 +310,8 @@
    "parameters": {
     "method": "rho.negation_v2",
     "specs": "specs/J1.json..J6.json",
-    "ecbench_arm": "rho-neg-v2"
+    "ecbench_arm": "rho-neg-v2",
+    "instrument_binding": "commit and binary_sha256 are set at freeze to the landing commit and the binary of the image built from it (finalize_requests.sh binds the same values into job.build)"
    },
    "same_instrument_as": "rho-neg"
   }
@@ -324,21 +329,10 @@
    "not_applicable_reason": null
   },
   "negative": {
-   "present": true,
-   "arm": "rho-neg",
-   "null_population": {
-    "description": "random generic prime-order curves (random p in [2^(b-1), 2^b), random a, b, cofactor 1) from prime_orbit_index_calculus::generate_instance, two per size",
-    "matched_on": [
-     "field size",
-     "cofactor 1",
-     "generic j (A = 2)",
-     "generator rule",
-     "one instrument"
-    ],
-    "why_this_null": "rho's constant should not depend on the curve within a size; two exchangeable curves per size estimate the curve effect"
-   },
-   "expected_detection": "no curve effect after Holm over five sizes",
-   "not_applicable_reason": null
+   "present": false,
+   "arm": null,
+   "null_population": null,
+   "not_applicable_reason": "no claim that a curve is unusual against a null population is made; C2 compares a measured constant with fixed thresholds. Two exchangeable random generic prime-order curves per size give a curve-effect heterogeneity diagnostic (PROTOCOL.md section 8, z test per size, Holm over five), reported and not decisive"
   }
  },
  "variable_ledger": {
@@ -398,7 +392,7 @@
    {
     "name": "job",
     "treatment": "crossed",
-    "how": "sizes are split across six sessions on the same image; counts are host- and session-independent; wall time is compared only within a session"
+    "how": "sizes are split across six sessions on the same image; counts are host- and session-independent; wall time is compared only within a session; sizes are nested in jobs (J1: 33/37/41 bits, J2: 45, J3-J6: 49), so size and job are confounded for wall time only, which is not a primary metric"
    },
    {
     "name": "pricing_weight",
@@ -424,7 +418,8 @@
      "rho-neg"
     ],
     "differs_in": [],
-    "design": "absolute"
+    "design": "absolute",
+    "threshold": "ratio to floor 1.10 and 1.30 (PROTOCOL.md section 9)"
    },
    {
     "id": "C-positive",
@@ -443,7 +438,8 @@
      "bsgs-neg"
     ],
     "differs_in": [],
-    "design": "absolute"
+    "design": "absolute",
+    "threshold": "declared S = 1.0 inside the 95% interval"
    },
    {
     "id": "C-v2",
@@ -466,16 +462,34 @@
     "design": "aa"
    }
   ],
-  "crosses_map": {
-   "job": "sizes are nested in jobs (J1: 33/37/41 bits, J2: 45, J3-J6: 49); size and job are confounded for wall time only, which is not a primary metric"
-  }
+  "crosses_map": false
  },
  "randomization": {
   "arm_order": "interleaved",
   "arm_order_reason": null,
   "seed_derivation": {
    "method": "explicit_list",
-   "seeds": [],
+   "seeds": [
+    201624291843241,
+    24642267360510,
+    18561872162765,
+    135799598603144,
+    119518173357916,
+    181458334271012,
+    185150999512726,
+    196853410870112,
+    40016877808970,
+    203571419754608,
+    54849620745713,
+    262858262117844,
+    107516164087790,
+    26995759977218,
+    166668755239101,
+    6472169882280,
+    54391810056847,
+    22552766203232,
+    227095582935304
+   ],
    "nonce": null,
    "note": "seeds.json: seed(tag) = int(SHA-256('prime_medium_tier_rho_20261107/v1/' + tag)[0:12 hex], 16) for curve, target and measurement seeds, written before any data; ecbench derives per-run algorithm seeds from them"
   },
@@ -494,14 +508,14 @@
   "replicates": 6,
   "warmups": 1,
   "power": {
-   "method": "cluster_bootstrap",
+   "method": "other",
    "alpha": 0.05,
    "tests_in_family": 1,
    "correction": "none",
    "rank_test_n": null,
    "min_attainable_two_sided_p": null,
    "passes": true,
-   "note": "primary decision is one interval (rho.negation medium constant). Per-run SD about 0.55 x floor (prior pool) gives SE about 0.025 over 480 runs per arm; 96 runs per size and arm (>= 24 required). Secondary tests: Holm over 3 methods and over 5 curve-effect tests."
+   "note": "cluster bootstrap over workloads (ecbench bound fit). primary decision is one interval (rho.negation medium constant). Per-run SD about 0.55 x floor (prior pool) gives SE about 0.025 over 480 runs per arm; 96 runs per size and arm (>= 24 required). Secondary tests: Holm over 3 methods and over 5 curve-effect tests."
   },
   "preflight_runtime": {
    "fixed_seconds": 60,
@@ -522,7 +536,7 @@
     "source": "docs/bounds/records/prime-medium-rho-neg.json",
     "aggregation": "mean",
     "resolution": "1 GAE",
-    "uncertainty": "cluster_bootstrap_ci95"
+    "uncertainty": "bootstrap_ci95"
    }
   ],
   "secondary": [
@@ -546,7 +560,7 @@
     "source": "docs/bounds/records/prime-medium-bsgs-neg.json",
     "aggregation": "mean",
     "resolution": "1 GAE",
-    "uncertainty": "cluster_bootstrap_ci95"
+    "uncertainty": "bootstrap_ci95"
    },
    {
     "id": "plain_r",
@@ -557,7 +571,8 @@
     "source": "docs/bounds/records/prime-medium-rho-plain.json",
     "aggregation": "mean",
     "resolution": "1 GAE",
-    "uncertainty": "cluster_bootstrap_ci95"
+    "uncertainty": "bootstrap_ci95",
+    "formula": "R = constant.s(rho-plain) / sqrt(pi/2)"
    },
    {
     "id": "v2_over_neg",
@@ -579,7 +594,7 @@
     "source": "docs/bounds/records/prime-medium-*-w0.1.json, -w1.json",
     "aggregation": "mean",
     "resolution": "1 GAE",
-    "uncertainty": "cluster_bootstrap_ci95"
+    "uncertainty": "bootstrap_ci95"
    },
    {
     "id": "alpha",
@@ -588,20 +603,22 @@
     "kind": "derived",
     "definition": "fit.alpha of gae = C r^alpha over the 10 medium curves",
     "source": "bound records",
-    "aggregation": "regression",
+    "aggregation": "per_row",
     "resolution": "n/a",
-    "uncertainty": "cluster_bootstrap_ci95"
+    "uncertainty": "bootstrap_ci95",
+    "formula": "ln gae = ln C + alpha ln r, fitted by ecbench bound fit over the 10 medium curves"
    },
    {
     "id": "r_inf_model_b",
     "name": "R(N) asymptote and model-A beta",
     "unit": "dimensionless",
     "kind": "derived",
-    "definition": "examples/prime_medium_tier_rho_rfit.rs over the toy and medium records",
+    "definition": "examples/prime_medium_tier_rho_rfit.rs over the toy and medium records; parametric bootstrap, 2000 resamples, seed 20261107",
     "source": "analysis/rfit-*.json",
-    "aggregation": "regression",
+    "aggregation": "per_row",
     "resolution": "beta grid 0.002",
-    "uncertainty": "parametric bootstrap 2000, seed 20261107"
+    "uncertainty": "bootstrap_ci95",
+    "formula": "R(N) = R_inf + c N^-beta and R(N) = 1 + c N^-beta, N = sqrt(r), R = mean S / declared S per size, weights 1/se^2"
    },
    {
     "id": "ns_per_gae",
@@ -693,18 +710,17 @@
   }
  ],
  "decision_rule": {
-  "text": "PROTOCOL.md section 9. M = medium constant.ratio_to_floor of rho.negation at w = 0. setup_excess if M <= 1.10 and ci95_hi < 1.30; walk_shortfall if M >= 1.30 and ci95_lo > 1.10; intermediate_excess if ci95_lo > 1.10 and M < 1.30; unresolved otherwise; within_1.10_strict reported when ci95_hi <= 1.10; inconclusive if the positive control (plain/neg interval lower end above 1.2) fails or any audit fails.",
+  "text": "PROTOCOL.md section 9. M = medium constant.ratio_to_floor of rho.negation at w = 0. setup_excess if M <= 1.10 and ci95_hi < 1.30; walk_shortfall if M >= 1.30 and ci95_lo > 1.10; intermediate_excess if ci95_lo > 1.10 and M < 1.30; unresolved otherwise; within_1.10_strict reported when ci95_hi <= 1.10; inconclusive if the positive control (plain/neg interval lower end above 1.2) fails or any audit fails. Correction: the primary is a single interval (no correction); Holm applies to the secondary families (three method constants; five curve-effect tests).",
   "comparison_ids": [
    "C-neg-floor",
    "C-positive",
    "C-bsgs",
-   "C-v2",
-   "C-aa"
+   "C-v2"
   ],
   "threshold": "1.10 and 1.30 x floor",
   "statistic": "bound constant ratio_to_floor (mean over sizes of mean S / floor)",
   "interval": "ecbench cluster bootstrap 95%, 2000 resamples, harness seed",
-  "multiple_comparison_correction": "none for the single primary; holm for the secondary method-constant and curve-effect families",
+  "multiple_comparison_correction": "holm",
   "effect_size_measure": "ratio to floor; toy/medium factor (derived)",
   "verdict_vocabulary": [
    "setup_excess",
