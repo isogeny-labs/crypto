@@ -128,3 +128,13 @@ cell):**
    (development: 392 at c_E = 14), so M2's law is close to an identity at these
    sizes; M2 is kept as stated and read as a consistency check, and M3 carries the
    decision.
+
+**Clarification A.1 (2026-11-07, before any claim cell; raised by the
+experiment-director while compiling card `CARD-p2-twist-coset-20261107-1`).**
+(a) Curve seeds: Addendum A's integer `--cseed I`, I = 0, 1, 2, governs; it
+supersedes the hash-derived `P2/curve/<p>/<i>` seeds of the Instances section.
+(b) `--cseed I` is passed to `cosets`, `coverage` and `emit` as well as `curve`
+(Addendum A's command lines omitted it; without it every call would default to
+curve 1). (c) The full coset lists (`cosets --out`) are not stored (about
+400 MB, regenerable from the seeds); each call's stdout JSON (histogram,
+c_mean, c_max, exact order statistic) is stored.
