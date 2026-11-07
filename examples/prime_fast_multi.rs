@@ -34,6 +34,20 @@ fn main() {
         }
         rho_ms.sort_by(|x, y| x.partial_cmp(y).unwrap());
         let rho1 = rho_ms[rho_ms.len() / 2];
+        // single-target ic_solve (summands 3, c = 0.5) reference, 5 targets
+        let mut s3_ms = Vec::new();
+        for t in 0..5u64 {
+            let mut rng = StdRng::seed_from_u64(0xFACE ^ t ^ c.n);
+            let k = rng.gen_range(2..c.n);
+            let q = c.mul(Some(g), k).unwrap();
+            let fbs = ((0.5 * (c.f.p as f64).cbrt()).round() as usize).max(8);
+            let t0 = Instant::now();
+            if matches!(ic_solve(&c, g, q, fbs, 6, 3, u64::MAX, t), Some((x, _)) if x == k) {
+                s3_ms.push(t0.elapsed().as_secs_f64() * 1e3);
+            }
+        }
+        s3_ms.sort_by(|x, y| x.partial_cmp(y).unwrap());
+        let s3_1 = s3_ms[s3_ms.len() / 2];
         for &t_count in &ts {
             for &cc in &cs {
                 for ins in 0..inst {
@@ -58,7 +72,7 @@ fn main() {
                     let row = json!({"bits":bits,"res":res,"n":c.n,"T":t_count,"c":cc,"fb":fb,"inst":ins,
                         "ok":ok,"determined":rep.determined_logs,"setup_ms":rep.setup_ms,
                         "per_target_median_ms":per[per.len()/2],"total_ms":wall,"ic_per_target_ms":wall/t_count as f64,
-                        "rho_single_ms":rho1,"rho_T_ms":rho1*t_count as f64,
+                        "rho_single_ms":rho1,"s3_single_ms":s3_1,"s3_Tx_ms":s3_1*t_count as f64,"ratio_vs_s3_Tx":wall/(s3_1*t_count as f64),"rho_T_ms":rho1*t_count as f64,
                         "rho_ideal_multi_ms":rho1*(t_count as f64).sqrt(),
                         "ratio_vs_rho_Tx":wall/(rho1*t_count as f64),"ratio_vs_rho_ideal":wall/(rho1*(t_count as f64).sqrt())});
                     println!("{row}");
