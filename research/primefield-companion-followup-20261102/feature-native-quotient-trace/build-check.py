@@ -1,0 +1,12 @@
+from pathlib import Path
+import sys,subprocess,hashlib,json
+p=Path(__file__).resolve().parent;out=Path(sys.argv[1]).resolve();out.mkdir(exist_ok=False)
+for name,main,flags,run in [('synthetic','trace-tests.rs',['--cfg','quotient_trace','--cfg','trace_tests'],True),('collector','modes.rs',['--cfg','quotient_trace'],False),('normal','lib.rs',['--crate-type','lib','--emit=metadata,dep-info'],False)]:
+ target=out/(name+('.rmeta' if name=='normal' else ''));cmd=['/home/ec2-user/.cargo/bin/rustc','--edition=2021','-O','-C','overflow-checks=yes']+([] if name=='normal' else ['--emit=link,dep-info'])+flags+[str(p/main),'-o',str(target)]
+ r=subprocess.run(cmd,capture_output=True,timeout=60);(out/(name+'.build.stderr')).write_bytes(r.stderr);(out/(name+'.build.stdout')).write_bytes(r.stdout);d={'command':cmd,'compile_exit':r.returncode,'executed':False}
+ if r.returncode==0:
+  deps=target.with_suffix('.d').read_text().splitlines()[0].split(': ',1)[1].split();d['input_hashes']={x:hashlib.sha256(Path(x).read_bytes()).hexdigest() for x in deps};artifact=target.with_name('libnormal.rmeta') if name=='normal' else target;d['binary_sha256']=hashlib.sha256(artifact.read_bytes()).hexdigest()
+  if run:
+   q=subprocess.run([str(target)],capture_output=True,timeout=30);(out/(name+'.stdout')).write_bytes(q.stdout);(out/(name+'.stderr')).write_bytes(q.stderr);d.update(executed=True,check_exit=q.returncode,stdout_sha256=hashlib.sha256(q.stdout).hexdigest())
+ (out/(name+'.receipt.json')).write_text(json.dumps(d,indent=2)+'\n');print(name,d.get('check_exit',r.returncode),flush=True)
+ if r.returncode or d.get('check_exit',0):sys.exit(1)
