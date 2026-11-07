@@ -7,7 +7,7 @@
 set -euo pipefail
 BIN=${1:?binary}; OUT=${2:?outdir}; JOBS=${3:-4}
 mkdir -p "$OUT"
-ARMS=rho,rho_aa,mgd.all2,mgd.gesc,mgd.apm2,gd,gd_half
+ARMS=rho,rho_aa,mgd.all2,mgd.gesc,mgd.apm2,gd,gd_dp1,gd_half
 CAPS=20:1e8,24:5e8,28:2e9,32:3e9,36:2e9,40:2e9
 IDX0=10000          # panel instance indices 10000..10199 (disjoint from every development index)
 BLOCK=25            # 8 blocks of 25 instances per size

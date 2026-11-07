@@ -17,7 +17,7 @@ def cost(r, metric, incl):
         t = [a + b for a, b in zip(t, c)]
     mul, add, inv, nat = t
     return {"field": mul + add + inv, "mul_only": mul, "inv_x10": mul + add + 10 * inv,
-            "field+0.1native": mul + add + inv + 0.1 * nat, "field+1.0native": mul + add + inv + nat}[metric]
+            "field+0.1native": mul + add + inv + 0.1 * nat, "field+1native": mul + add + inv + nat}[metric]
 def ok(r):
     return r["completed"] and r["censored_systems"] == 0 and r["unresolved"] == 0 and r["nonzero_dim_systems"] == 0
 idx = {(r["p"], r["d"], r["inst"], r["run"], r["arm"]): r for r in recs}

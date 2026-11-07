@@ -47,10 +47,12 @@ pub fn run(solver: &str, inst: &Instance, cap: f64, prm: &Params) -> RunRec {
         if let Some(k) = o.k { rec.success = verify(&c, inst, k); rec.correct = k == inst.k; }
     } else {
         let is_gd = solver.starts_with("gd");
-        let mut np = prm.nprime.unwrap_or(inst.bits as usize);
+        let default_np = if solver == "gd_half" { 2 * ((inst.bits as usize + 3) / 4) } else { inst.bits as usize };
+        let mut np = prm.nprime.unwrap_or(default_np);
         if is_gd && np % 2 == 1 { np += 1; }
         let l = 3 * np;
-        let d = if is_gd { prm.d.unwrap_or_else(|| gd::choose_d(l, inst.n, 0.5)) } else { 0 };
+        let d = if is_gd { prm.d.unwrap_or_else(|| gd::choose_d(l, inst.n, 0.5) + if solver == "gd_dp1" { 1 } else { 0 }) } else { 0 };
+        assert!(d < 8 || !is_gd, "d >= 8 not supported (subset table packing / memory)");
         rec.nprime = np; rec.l = l; rec.d = d;
         let over = || cost() > cap;
         let mut st = ScanStats::default();
@@ -203,10 +205,8 @@ fn main() {
                         let job = { jobs.lock().unwrap().next() };
                         let (s, b, idx) = match job { Some(j) => j, None => break };
                         let inst = make_instance(b, idx);
-                        let (sname, nprime) = if s == "gd_half" { ("gd", Some(((b as usize + 3) / 4) * 2)) } else { (s.as_str(), None) };
-                        let prm = Params { nprime, d: None, dev_check: false };
-                        let mut rec = run(sname, &inst, caps[&b], &prm);
-                        rec.solver = s.clone();
+                        let prm = Params { nprime: None, d: None, dev_check: false };
+                        let rec = run(&s, &inst, caps[&b], &prm);
                         use std::io::Write;
                         writeln!(file.lock().unwrap(), "{}", rec.json()).unwrap();
                     });
