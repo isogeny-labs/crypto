@@ -10,7 +10,10 @@ curves from 2^17.7 to 2^28, local L0 container, counted GAE.
   2/3 in theory.
 - Distance to matched rho.negation_v3: 12.8× [11.7, 14.0].
 
-Unvalidated: no L2 run, no validator report; not a leaderboard row.
+Validated (`VALIDATION.json`: independent validator report, scalar replay certificate, matched rho.negation_v3 with the §5a band); local L0, not L2.
+The incumbent is the fixed-B frontier cell, not the hand-tuned per-size N of
+`research/prime_base_oracle_tuning_20261029`. This is not an improvement over
+the current IC baseline, and there is no leaderboard row.
 Report: [REPORT.pdf](REPORT.pdf). Run and evidence:
 `research/ecbench_ic_auto_base_20261107/`. Record:
 `benchmarks/records/20261107T0640Z-ic-auto-base.json`.

@@ -8,5 +8,5 @@ Koblitz curves from 2^15.4 to 2^32.1, local L0, counted GAE.
 - Medium tier: 1.076× the floor [0.998, 1.147]; v2 is 1.249×.
 - Search phase: 1.03–1.04× the floor from 2^21 up.
 
-Unvalidated: no L2 run, no validator report; not a leaderboard row.
+Validated (`VALIDATION.json`: independent validator report, scalar replay certificate, §5a band); local L0, not L2.
 Report: [REPORT.pdf](REPORT.pdf). Evidence: `research/ecbench_rho_v3_frobenius_20261107/`.

@@ -73,6 +73,15 @@ fields, not an implementation shortfall.
 
 ## Not established here
 
+- **Not an improvement over the current prime-field IC baseline.** The
+  incumbent here is the `docs/bounds/FRONTIER.md` cell with a fixed B = 32.
+  The leaderboard's prime-field baseline already scales the base by hand:
+  `research/prime_base_oracle_tuning_20261029` selected N = 45, 115/162,
+  288/407 and 1024 at 20, 24, 28 and 32 bits. That puts it near
+  r^(1/3) already, with a different oracle. `size=auto` makes that sizing
+  a single spec cell and measures its exponent. A paired comparison against
+  the tuned-N cells was not run, so no claim against them is made.
+
 - Only the prime-field, m = 2, MITM pair-table configuration. Other oracles
   (`subtract`, `ksum`) and Koblitz bases do not read `size=auto`.
 - Memory: the table holds about B² ≈ 0.25·r^(2/3) entries. The frontier's

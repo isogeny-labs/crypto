@@ -1,41 +1,91 @@
 {
  "schema": "validator-report/v1",
- "status": "fail",
+ "status": "pass",
  "independent": true,
- "disposition": "insufficient_evidence",
- "failed_headlines": [
-  "S2(c) candidate: least-squares slope of ln(mean total GAE) on ln r across 6 sizes (definition as dispatched)",
-  "S2(c) incumbent: least-squares slope of ln(mean total GAE) on ln r across 6 sizes (definition as dispatched)"
- ],
+ "disposition": "validated",
+ "reissue": "2nd issue, 2026-11-07: replaces the 1st issue (sha256 f10a3b2a487355d36a4af8f8c8749ea4909b3a4d4b7544627112b70992a21bea). The 1st issue failed headline (c) under a dispatch that defined it as the slope of ln(mean total GAE). The coordinator corrected the dispatch: (c) is the bound records' per-run fitted exponent. Raw bytes and recomputation are unchanged.",
  "session_id": "ECBS1haaa9771f60b5",
- "validated_commit": "3592f4a17261623cbc5d71e1ee329671d61b77fe",
- "evidence_commit": "09eece941fbc6922d8b8fbbb0a51d166fca0245d",
+ "validated_commit": "8b669e5c5c52587de705d556da5e58ddd8feb260",
+ "evidence_commits": {
+  "sessions_committed": "09eece941fbc6922d8b8fbbb0a51d166fca0245d",
+  "records_moved_to_artifact_store": "31a61d59721d7e58318ace1fc8ab133204171ad0"
+ },
  "date": "2026-11-07",
  "raw_data": [
   {
-   "path": "research/ecbench_ic_auto_base_20261107/sessions/main/records.jsonl",
-   "path_relative_to_study_dir": "sessions/main/records.jsonl",
-   "sha256": "6f68f5a5cb3236b099f0659ec94a052e9869da87817b9abf5f589cf6c48a047d"
+   "path": "../../research/ecbench_ic_auto_base_20261107/sessions/main/records.jsonl",
+   "repo_path": "research/ecbench_ic_auto_base_20261107/sessions/main/records.jsonl",
+   "sha256": "6f68f5a5cb3236b099f0659ec94a052e9869da87817b9abf5f589cf6c48a047d",
+   "tracked_in_git": false,
+   "store_manifest": "research/ecbench_ic_auto_base_20261107/sessions/main/.artifacts.json"
   },
   {
-   "path": "research/ecbench_ic_auto_base_20261107/sessions/main/session.json",
-   "path_relative_to_study_dir": "sessions/main/session.json",
-   "sha256": "9fe620bff08af26f6f3ade0178de20810bc993f5fd77478b00c64372a1c1090d"
+   "path": "../../research/ecbench_ic_auto_base_20261107/sessions/main/.artifacts.json",
+   "repo_path": "research/ecbench_ic_auto_base_20261107/sessions/main/.artifacts.json",
+   "sha256": "cb40473f689c31236ded4466743ff9b93ca5d614e4753a07f088d4e4b42f1e4b",
+   "tracked_in_git": true
   },
   {
-   "path": "research/ecbench_ic_auto_base_20261107/sessions/main/spec.json",
-   "path_relative_to_study_dir": "sessions/main/spec.json",
-   "sha256": "3bf2c896a8c0c16f2888b46d74ebe1d0134f1724eab8f70b204eaca8c7678840"
+   "path": "../../research/ecbench_ic_auto_base_20261107/sessions/main/session.json",
+   "repo_path": "research/ecbench_ic_auto_base_20261107/sessions/main/session.json",
+   "sha256": "9fe620bff08af26f6f3ade0178de20810bc993f5fd77478b00c64372a1c1090d",
+   "tracked_in_git": true
   },
   {
-   "path": "research/ecbench_ic_auto_base_20261107/sessions/main/plan.json",
-   "path_relative_to_study_dir": "sessions/main/plan.json",
-   "sha256": "fe3ba0b3955f18cf3794c173bb99e3b132b2c9247766b944f743bb25961d1baa"
+   "path": "../../research/ecbench_ic_auto_base_20261107/sessions/main/spec.json",
+   "repo_path": "research/ecbench_ic_auto_base_20261107/sessions/main/spec.json",
+   "sha256": "3bf2c896a8c0c16f2888b46d74ebe1d0134f1724eab8f70b204eaca8c7678840",
+   "tracked_in_git": true
   },
   {
-   "path": "research/ecbench_ic_auto_base_20261107/sessions/main/host.json",
-   "path_relative_to_study_dir": "sessions/main/host.json",
-   "sha256": "8632bd9161cc0e400b320415fdda0fc63ad97b5c6ed4ccc68aea71b094840fe3"
+   "path": "../../research/ecbench_ic_auto_base_20261107/sessions/main/plan.json",
+   "repo_path": "research/ecbench_ic_auto_base_20261107/sessions/main/plan.json",
+   "sha256": "fe3ba0b3955f18cf3794c173bb99e3b132b2c9247766b944f743bb25961d1baa",
+   "tracked_in_git": true
+  },
+  {
+   "path": "../../research/ecbench_ic_auto_base_20261107/sessions/main/host.json",
+   "repo_path": "research/ecbench_ic_auto_base_20261107/sessions/main/host.json",
+   "sha256": "8632bd9161cc0e400b320415fdda0fc63ad97b5c6ed4ccc68aea71b094840fe3",
+   "tracked_in_git": true
+  }
+ ],
+ "claim_sources": [
+  {
+   "path": "../../research/ecbench_ic_auto_base_20261107/bound-candidate.json",
+   "repo_path": "research/ecbench_ic_auto_base_20261107/bound-candidate.json",
+   "sha256": "d861ecc6cab55ac3ab2e1b1e8fc7ac7fe20c8604e601abd2b68914fb3c059e06",
+   "tracked_in_git": true
+  },
+  {
+   "path": "../../research/ecbench_ic_auto_base_20261107/bound-incumbent.json",
+   "repo_path": "research/ecbench_ic_auto_base_20261107/bound-incumbent.json",
+   "sha256": "72a280eb314c85b31e975381a4e2c644298f945d10bf99393090b63b0175cfcd",
+   "tracked_in_git": true
+  },
+  {
+   "path": "../../research/ecbench_ic_auto_base_20261107/sessions/main/comparisons/incumbent__candidate.json",
+   "repo_path": "research/ecbench_ic_auto_base_20261107/sessions/main/comparisons/incumbent__candidate.json",
+   "sha256": "383308ad4f2d16ad201b1166776cb8daefad019c92d2444e3028f9e53ad539f2",
+   "tracked_in_git": true
+  },
+  {
+   "path": "../../research/ecbench_ic_auto_base_20261107/sessions/main/comparisons/rho-v3__candidate.json",
+   "repo_path": "research/ecbench_ic_auto_base_20261107/sessions/main/comparisons/rho-v3__candidate.json",
+   "sha256": "09ca6b915bff9f8bdbe21995e2721e3d9c21aa202d9b14f68cdfdf7551405681",
+   "tracked_in_git": true
+  },
+  {
+   "path": "../../research/ecbench_ic_auto_base_20261107/sessions/main/comparisons/incumbent__incumbent-aa.json",
+   "repo_path": "research/ecbench_ic_auto_base_20261107/sessions/main/comparisons/incumbent__incumbent-aa.json",
+   "sha256": "79bb080caa774c42a40ed6eba82a91f6c71c38b88d4b3b8ecb73896f4c1918c7",
+   "tracked_in_git": true
+  },
+  {
+   "path": "../../research/ecbench_ic_auto_base_20261107/table.md",
+   "repo_path": "research/ecbench_ic_auto_base_20261107/table.md",
+   "sha256": "520794558397a7a788f9c85b92fdf282947996aced8c79386cf5cbc460b8658d",
+   "tracked_in_git": true
   }
  ],
  "headline": [
@@ -110,43 +160,43 @@
    "evidence": "research/ecbench_ic_auto_base_20261107/sessions/main/records.jsonl"
   },
   {
-   "name": "S2(c) candidate: least-squares slope of ln(mean total GAE) on ln r across 6 sizes (definition as dispatched)",
+   "name": "S2(c) candidate fitted exponent alpha (per-run log-log fit, 288 runs)",
    "claimed": 0.598,
-   "recomputed": 0.5951943280060952,
+   "recomputed": 0.5980610900081511,
    "rel_tol": 0.002,
-   "rel_diff": 0.004691759187131775,
-   "pass": false,
-   "definition": "OLS slope of y = ln(mean cost.total_gae per size, 48 runs each) on x = ln r, 6 points",
+   "rel_diff": 0.00010214676923773739,
+   "pass": true,
+   "definition": "fitted exponent: ordinary least-squares slope of ln(cost.total_gae) on ln(workload.curve.r) over the 288 non-warmup verified runs of the arm (one point per run), the model gae = C * r^alpha of the bound records (fit.points 288, fit.sizes 6; docs/bounds/README.md 'fit')",
    "evidence": "research/ecbench_ic_auto_base_20261107/sessions/main/records.jsonl"
   },
   {
-   "name": "S2(c) incumbent: least-squares slope of ln(mean total GAE) on ln r across 6 sizes (definition as dispatched)",
+   "name": "S2(c) incumbent fitted exponent alpha (per-run log-log fit, 288 runs)",
    "claimed": 0.908,
-   "recomputed": 0.9110846907163969,
+   "recomputed": 0.9079240663056614,
    "rel_tol": 0.002,
-   "rel_diff": 0.003385734331647371,
-   "pass": false,
-   "definition": "OLS slope of y = ln(mean cost.total_gae per size, 48 runs each) on x = ln r, 6 points",
+   "rel_diff": 8.362741667254421e-05,
+   "pass": true,
+   "definition": "fitted exponent: ordinary least-squares slope of ln(cost.total_gae) on ln(workload.curve.r) over the 288 non-warmup verified runs of the arm (one point per run), the model gae = C * r^alpha of the bound records (fit.points 288, fit.sizes 6; docs/bounds/README.md 'fit')",
    "evidence": "research/ecbench_ic_auto_base_20261107/sessions/main/records.jsonl"
   },
   {
-   "name": "S2(c') candidate: bound record fit.alpha, per-run OLS of ln(total GAE) on ln r (288 runs)",
+   "name": "S2(c) candidate fitted exponent against bound-candidate.json fit.alpha at full precision",
    "claimed": 0.5980610900081488,
    "recomputed": 0.5980610900081511,
    "rel_tol": 1e-09,
    "rel_diff": 3.898378260456725e-15,
    "pass": true,
-   "definition": "OLS slope of ln(cost.total_gae) on ln r over the 288 candidate runs; with 48 runs per size this equals the 6-point slope of mean ln(total GAE); claimed = research/ecbench_ic_auto_base_20261107/bound-candidate.json fit.alpha (model gae = C * r^alpha, points 288)",
+   "definition": "same statistic; claimed = research/ecbench_ic_auto_base_20261107/bound-candidate.json fit.alpha",
    "evidence": "research/ecbench_ic_auto_base_20261107/sessions/main/records.jsonl"
   },
   {
-   "name": "S2(c') incumbent: bound record fit.alpha, per-run OLS of ln(total GAE) on ln r (288 runs)",
+   "name": "S2(c) incumbent fitted exponent against bound-incumbent.json fit.alpha at full precision",
    "claimed": 0.9079240663056577,
    "recomputed": 0.9079240663056614,
    "rel_tol": 1e-09,
    "rel_diff": 4.035288982007868e-15,
    "pass": true,
-   "definition": "as above; claimed = research/ecbench_ic_auto_base_20261107/bound-incumbent.json fit.alpha",
+   "definition": "same statistic; claimed = research/ecbench_ic_auto_base_20261107/bound-incumbent.json fit.alpha",
    "evidence": "research/ecbench_ic_auto_base_20261107/sessions/main/records.jsonl"
   },
   {
@@ -442,6 +492,11 @@
      "n": 48
     }
    ]
+  },
+  "slope_of_means_secondary_cross_check": {
+   "definition": "OLS slope of ln(mean cost.total_gae per size, 48 runs each) on ln r, 6 points; not a headline",
+   "candidate": 0.5951943280060952,
+   "incumbent": 0.9110846907163969
   }
  },
  "structure": {
@@ -468,19 +523,18 @@
  },
  "verifier_sha256": "da797c32ca0c9217b4886f050cacf350f3d7806785b7b7564c7f4198f75ede0f",
  "notes": [
-  "Validated from commit 3592f4a17261623cbc5d71e1ee329671d61b77fe (HEAD of aburan28/wizardly-einstein-i9seky); the study directory was committed in 09eece941fbc6922d8b8fbbb0a51d166fca0245d and has no diff 09eece941fbc6922d8b8fbbb0a51d166fca0245d..HEAD; `git status --porcelain --ignored` is empty for it. Untracked files elsewhere in the tree (research/ecbench_rho_v3_frobenius_20261107/, benchmarks/20261107-rho-v3-frobenius/) are outside this validation.",
-  "Independence: the verifier (sha256 in verifier_sha256, source embedded in replay-certificate.json) reads records.jsonl directly and shares no code with ecbench (no compare/table/bound/verify). It was written by the validator; no keyring signature is attached (docs/SABOTAGE_RESISTANCE.md); no pcc claim was registered by the validator.",
-  "Filter: non-warmup records with outcome.status == 'verified'. S = cost.s; total GAE = cost.total_gae; r = workload.curve.r. cost.s was checked against total_gae / sqrt(r) for every record (max relative error 0). boundaries.floor_s was checked against sqrt(pi / (2A)), A = automorphisms_available = 2, and ratio_to_floor against s / floor_s on every record (max relative error 0).",
-  "Pairing: records are matched by (workload.workload_id, round); every matched pair also shares algorithm_seed and target; no duplicates, no unpaired records.",
-  "Tolerances: rel_tol 0.002 for values printed to 3-4 significant figures (as the dispatch asked); 0.0002 for values printed to 5 significant figures; 1e-9 where the claim is a full-precision float copied from a committed file.",
-  "Reproducibility caveat (not a headline failure): session.json and host.json record git_commit c047182e274ecc86280dc186042d336baebedb03 with git_dirty true (git_commit_source runtime_worktree). There is no src/ change between c047182e27 and 09eece941f, but 3592f4a172 changes src/cryptanalysis/ic_boundary.rs, ecbench/methods.rs and others (rho.signed_frobenius_v3), so the source of binary 6a5f9e48ed38... is not pinned by a clean commit. The producer's audit.json replayed every non-warmup record 'identical', but with the same binary sha, env class ECBENV3h8d80c7bc4dfc and hardware class ECBHW1he9e33daae9e7: not a cross-host replay. Counted GAE is deterministic; the scalar certificates below are independent of the binary.",
-  "Isolation L0 (spec isolation_required L0): only counted GAE is validated; no wall-clock figure is validated.",
-  "Large-file policy (AGENTS.md section 13; not a measurement defect): sessions/main/records.jsonl is committed directly to Git with no .artifacts.json manifest; it exceeds the 10 MiB limit of scripts/check-large-files.sh and the 64 KiB data-file threshold.",
-  "m=83 / ECC2K-130 disclosure: not applicable; prime-field curves of 18-28 bits, and the reports make no transfer claim to ECC2K-130 (no mention of ECC2K or m=83).",
-  "Curve parameters: p, trace, order, j and model12 are read from workload.curve.icv1 (ICV1:fp-<p>:<trace>:<order>:<j>:unk:unk:r:<model12>); a and b are not in the record. They were derived algebraically from the generator G and a target Q with x_G != x_Q (a = ((y_G^2 - x_G^3) - (y_Q^2 - x_Q^3)) / (x_G - x_Q), b = y_G^2 - x_G^3 - a x_G mod p). They were then bound by: SHA-256 of the canonical ICV1 model JSON (src/cryptanalysis/curve_id.rs prime_identity) equal to model12 and to the slug's model8; j = 6912 a^3 / (4a^3 + 27b^2) equal to the ICV1 j; trace = p + 1 - r; the same (p, a, b) as docs/curves/registry.json params (generator_call find_prime_order_curve(bits, 59297)); [r]G = O with r prime; and 2r > p + 1 + 2 sqrt(p), so #E(F_p) = r (cofactor 1). find_prime_order_curve (src/cryptanalysis/ic_boundary.rs, rand StdRng) was not re-executed.",
-  "Headline (c) does not reproduce under the definition in the dispatch. The least-squares slope of ln(mean total GAE) on ln r over the 6 sizes is 0.595194 (candidate) and 0.911085 (incumbent), against claimed 0.598 and 0.908: relative differences 0.0047 and 0.0034, both over rel_tol 0.002. The claimed values are the bound records' fit.alpha (model gae = C * r^alpha, points 288): a per-run OLS of ln(total GAE), i.e. the slope of the per-size geometric-mean cost. That fit reproduces exactly (S2(c'), 0.598061090008 and 0.907924066306), and REPORT.md calls it the 'fitted exponent'. The data and REPORT.md are consistent; the dispatched description of the statistic is not. Restating headline (c) as the per-run log-log fit would make every headline here reproduce. The validator does not make that substitution itself.",
-  "Bound-record defect (reporting, not headline): bound-candidate.json, bound-incumbent.json, bound-candidate-w0.1.json and bound-candidate-w1.json report dimensions.uncharged.value 0.0 for the ic.pipeline arms. Their statistic reads only counters.*_uncharged, which ic.pipeline records do not carry. The records list five unpriced native categories, totalling 31,373,334 operations for the candidate and 322,617,041 for the incumbent over 288 runs each. The comparison files price them correctly (recomputed band above). Do not cite the bound uncharged = 0 for IC.",
-  "Controls: the incumbent-aa A/A arm reproduces the incumbent exactly (ratio 1.0 over 288 pairs). Matched rho: rho.negation_v3 and rho.negation_v2 ran in the same session and binary, on the same workloads, targets and algorithm seeds (pairs share algorithm_seed and target). All six curves have j not in {0, 1728} and automorphisms_available = 2, so the negation map is the full automorphism group over F_p. The section 5a band for candidate / rho-v3 is 12.798 / 13.144 / 14.716 at w = 0 / 0.1 / 1: candidate > rho-v3 at every weight, so the ranking holds across the band.",
-  "The validator writes no VALIDATION.json (per dispatch)."
+  "Validated at HEAD 8b669e5c5c52587de705d556da5e58ddd8feb260. The sessions were committed in 09eece941f. records.jsonl moved to the artifact store in 31a61d5972 (sessions/main/.artifacts.json, sha256 pinned in raw_data); the local copy hashes to the manifest and to session.json records_sha256 6f68f5a5..., the same bytes as the 1st issue. Nothing else in the study's sessions/ changed between 09eece941f and HEAD. raw_data `path` is relative to benchmarks/20261107-ic-auto-base (where VALIDATION.json will live); `repo_path` is repository-relative. records.jsonl is gitignored: a fresh checkout needs `tools/artifacts pull` before the gate's is_file check can find it.",
+  "Independence: the verifier (verifier_sha256; source embedded in replay-certificate.json) reads records.jsonl directly and shares no code with ecbench (no compare/table/bound/verify). No keyring signature is attached; no pcc claim was registered by the validator.",
+  "Filter: non-warmup records with outcome.status == 'verified'. S = cost.s; total GAE = cost.total_gae; r = workload.curve.r. Every record's cost.s equals total_gae / sqrt(r), and its floor_s equals sqrt(pi / (2A)) with A = 2 (max relative error 0). Pairs are matched by (workload_id, round) and share algorithm_seed and target; there are no duplicates and no unpaired records.",
+  "Tolerances: rel_tol 0.002 for values printed to 3-4 significant figures; 0.0002 for values printed to 5; 1e-9 for full-precision floats copied from a committed file.",
+  "Headline (c) restated (coordinator correction): alpha is the per-run least-squares fit of ln(total GAE) on ln r over the arm's 288 runs, as in bound-candidate.json / bound-incumbent.json fit.alpha (model gae = C * r^alpha, points 288). Recomputed 0.598061090008 (candidate) and 0.907924066306 (incumbent); these agree with fit.alpha to 4e-15.",
+  "Secondary cross-check, not a headline: the OLS slope of ln(mean total GAE per size) on ln r over the 6 sizes is 0.595194 (candidate) and 0.911085 (incumbent). That slope is the exponent of the arithmetic-mean cost; the per-run fit is the exponent of the geometric-mean cost. They differ because the spread of per-run cost changes with size. Both lie inside the bound records' alpha_ci95 ([0.5636, 0.6309] and [0.8282, 0.9894]).",
+  "Bound-record finding (reporting, not a headline): bound-candidate.json, bound-incumbent.json, bound-candidate-w0.1.json and bound-candidate-w1.json give dimensions.uncharged.value 0.0 (\"mean sum of *_uncharged counters / sqrt(r)\") for the ic.pipeline arms, although every ic.pipeline record carries unpriced native work. That work is listed in cost.unpriced as sqrt_solves, lookups, row_ops, legendre_symbols and target_guard_probes, and its counts sit in phases[].native rather than counters.*_uncharged. Totals over 288 runs: candidate 31,373,334 (lookups 15,513,141, target_guard_probes 15,524,060, row_ops 226,501, legendre_symbols 73,200, sqrt_solves 36,432); incumbent 322,617,041. The comparison files price this work correctly in their section 5a band, and the recomputed band matches them. The bound's uncharged = 0 must not be cited as 'IC has no unpriced work'.",
+  "Controls: the incumbent-aa A/A arm reproduces the incumbent exactly (ratio 1.0 over 288 pairs). Matched rho: rho.negation_v3 and rho.negation_v2 ran in the same session and binary, on the same workloads, targets and algorithm seeds. Every curve has j not in {0, 1728} and A = 2, so negation is the full automorphism group over F_p. The section 5a band for candidate / rho-v3 is 12.798 / 13.144 / 14.716 at w = 0 / 0.1 / 1: candidate > rho-v3 at every weight. For candidate / incumbent it is 0.2469 / 0.2335 / 0.1922: candidate < incumbent at every weight.",
+  "Reproducibility caveat (not a headline failure): session.json records git_commit c047182e27 with git_dirty true. No src/ change lies between c047182e27 and 09eece941f, but the binary's source (6a5f9e48...) is not pinned by a clean commit. The producer's audit.json replayed every non-warmup record 'identical', but with the same binary, env class and hardware class (ECBHW1he9e33daae9e7): not cross-host. Counted GAE only; L0 isolation, so no wall-clock figure is validated.",
+  "The replay-certificate.json in this directory was issued at commit 3592f4a172, since rewritten to 7c0a288e0b with identical src/. It certifies the same records (records sha256 6f68f5a5...) and remains valid for these bytes.",
+  "Curve parameters: (a, b) were derived from G and a target point, then bound by the ICV1 model12 hash, the slug, j, the trace, docs/curves/registry.json params, [r]G = O with r prime, and 2r beyond the Hasse interval (cofactor 1). See replay-certificate.json curve_parameters.",
+  "m=83 / ECC2K-130: not applicable (prime-field curves of 18-28 bits; the report makes no transfer claim).",
+  "The validator writes no VALIDATION.json."
  ]
 }

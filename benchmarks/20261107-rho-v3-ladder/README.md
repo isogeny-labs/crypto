@@ -10,7 +10,7 @@ GAE on six prime curves from 2^17.7 to 2^28, local L0 container.
 - rho.negation_v3 total S / √(π/4): 1.30 at 2^17.7, 1.04 at 2^24 and 2^28.
   The search phase is 1.00–1.03 (±0.04) at 2^24 and above.
 
-Unvalidated: no L2 run, no validator report; not a leaderboard row.
+Validated (`VALIDATION.json`: independent validator report, scalar replay certificate, §5a band); local L0, not L2.
 Report: [REPORT.pdf](REPORT.pdf). Run and evidence:
 `research/ecbench_rho_v3_ladder_20261107/`. Record:
 `benchmarks/records/20261107T0639Z-rho-v3-ladder-fixed.json`.
