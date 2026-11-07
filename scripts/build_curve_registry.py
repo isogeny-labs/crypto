@@ -678,6 +678,50 @@ def harvest_programme_extensions(reg: Registry) -> None:
     add_extension_doc(reg, B2_C050)
 
 
+THREE_LEADS_FIXTURES = (
+    "research/three_leads_e2e_20261018/coverage-fixtures-v3/fixtures.json",
+    "research/three_leads_e2e_20261018/genus-fixtures-v1/fixtures.json",
+    "research/three_leads_e2e_20261018/genus-order-fixtures-v1/fixtures.json",
+)
+
+
+def _base_p_coefficients(value: int, degree: int, p: int) -> list[int]:
+    coefficients = []
+    for _ in range(degree):
+        value, coefficient = divmod(value, p)
+        coefficients.append(coefficient)
+    if value:
+        raise ValueError("packed extension coefficient exceeds field degree")
+    return coefficients
+
+
+def harvest_three_leads_extensions(reg: Registry) -> None:
+    """Retain the exact extension models in the frozen three-leads fixtures."""
+    for rel in THREE_LEADS_FIXTURES:
+        rows = json.loads((REPO / rel).read_text())
+        for row in rows:
+            curve = row["curve"]
+            field = curve["f"]
+            p, degree = int(field["p"]), int(field["n"])
+            if curve["binary"] or degree < 2:
+                continue
+            coefficients = curve["c"]
+            order = int(row["order"])
+            if (len(coefficients) != 4 or coefficients[2:] != [0, 1]
+                    or int(row["r"]) * int(row["h"]) != order
+                    or int(row["evidence"]["order"]) != order):
+                raise ValueError(f"invalid frozen extension record in {rel}")
+            modulus = _base_p_coefficients(int(field["modulus"]), degree, p)
+            a = _base_p_coefficients(int(coefficients[1]), degree, p)
+            b = _base_p_coefficients(int(coefficients[0]), degree, p)
+            ident = cid.extension_id(p, degree, modulus, a, b, order)
+            ident["trace"] = str(ident["trace"])
+            reg.add(ident, "extension", {
+                "p": p, "degree": degree, "modulus": int(field["modulus"]),
+                "a": int(coefficients[1]), "b": int(coefficients[0]),
+            }, rel)
+
+
 def harvest_standards(reg: Registry) -> None:
     for a, n in DESIGNATED_KOBLITZ:
         add_koblitz(reg, a, n, STANDARD_MODULI[n][1])
@@ -797,6 +841,21 @@ def harvest_native_factor_base_history(reg: Registry) -> None:
         reg.add(ident, row["family"], row["params"], str(path.relative_to(REPO)), [])
 
 
+def harvest_native_quadratic_twists(reg: Registry) -> None:
+    """Assemble hash-bound native metadata; do not run curve arithmetic here."""
+    path = REPO / "docs/curves/sources/quadratic-twist-native-20261021.json"
+    if not path.exists():
+        return
+    doc = json.loads(path.read_text())
+    if doc.get("schema") != "quadratic-twist-native-models/v1":
+        raise ValueError("unsupported native quadratic-twist catalog")
+    for row in doc["models"]:
+        ident = dict(row, model_sha256=hashlib.sha256(row["model_json"].encode()).hexdigest())
+        reg.add(ident, row["family"], row["params"], str(path.relative_to(REPO)), [])
+        for rep in row["representations"]:
+            reg.represent(ident, rep["field"], rep["curve"], str(path.relative_to(REPO)))
+
+
 def build() -> tuple[dict, list[str], list[str]]:
     reg, problems, fatal = Registry(), [], []
     harvest_standards(reg)
@@ -808,7 +867,9 @@ def build() -> tuple[dict, list[str], list[str]]:
     harvest_text_koblitz(reg)
     harvest_native_standards(reg)
     harvest_native_factor_base_history(reg)
+    harvest_native_quadratic_twists(reg)
     harvest_programme_extensions(reg)
+    harvest_three_leads_extensions(reg)
     carry_forward(reg)
     ambiguous = sorted(f"{reg.alias_text[k]!r} -> {len(v)} models"
                        for k, v in reg.alias_models.items() if len(v) > 1)
@@ -873,8 +934,9 @@ def main() -> int:
     for m in missing:
         print("unresolved:", m, file=sys.stderr)
     amap = cid.alias_map_text(doc)
+    index = cid.registry_index_text(text)
     if args.check:
-        stale = [p for p, t in ((OUT, text), (cid.ALIAS_MAP, amap))
+        stale = [p for p, t in ((OUT, text), (cid.ALIAS_MAP, amap), (cid.REGISTRY_INDEX, index))
                  if not p.exists() or p.read_text() != t]
         for p in stale:
             print(f"{p.relative_to(REPO)} is stale; run scripts/build_curve_registry.py",
@@ -885,8 +947,9 @@ def main() -> int:
         OUT.parent.mkdir(parents=True, exist_ok=True)
         OUT.write_text(text)
         cid.ALIAS_MAP.write_text(amap)
+        cid.REGISTRY_INDEX.write_text(index)
         print(f"wrote {OUT.relative_to(REPO)}: {len(doc['curves'])} curves, "
-              f"and {cid.ALIAS_MAP.relative_to(REPO)}")
+              f"{cid.ALIAS_MAP.relative_to(REPO)} and {cid.REGISTRY_INDEX.relative_to(REPO)}")
     return 1 if missing else 0
 
 

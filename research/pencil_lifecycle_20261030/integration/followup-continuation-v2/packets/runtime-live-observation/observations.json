@@ -1,0 +1,73 @@
+{
+  "schema": "pencil.readonly-live-observations/v1",
+  "observation_producer": "/root",
+  "packager": "/root/witness_independent_review_v2",
+  "packager_reran_remote_reads": false,
+  "rows": [
+    {
+      "check": "namespace_job_overview",
+      "observation": "2 listed Jobs;0 names containing pencil",
+      "scope": "Returned isolab Job list only",
+      "not_established": "No global worker/Pod/EC2 activity or campaign cost conclusion",
+      "evidence": "overview-tool-response.json"
+    },
+    {
+      "check": "original_recovery_request",
+      "observation": "helper rejected unsupported memory field",
+      "scope": "Original request preserved; parser failure",
+      "not_established": "No successful recovery-status readback from helper",
+      "evidence": "recovery-status-tool-response.json"
+    },
+    {
+      "check": "exact_c1_state_s3",
+      "observation": "fresh retained object read; phase failed; LastModified2026-10-30T07:54:06Z",
+      "scope": "Exact C1 state VersionId _dS372y1JUdgqOwWIIGTCcb7AEu2uPhQ",
+      "not_established": "Old event is not new execution or complete worker accounting",
+      "evidence": "c1-state.json;c1-state-read.stdout"
+    },
+    {
+      "check": "exact_instance_lookup",
+      "observation": "empty result []",
+      "scope": "Saved exact worker instance ID query",
+      "not_established": "No exact termination time or zero incurred cost",
+      "evidence": "c1-instance-read.stdout"
+    },
+    {
+      "check": "exact_controller_lookup",
+      "observation": "FAILED and buildComplete true; ended2026-10-30T07:54:08.858Z",
+      "scope": "isolab-recovery-controller:2fe8ec79-1f54-4abe-8ec4-151b50b1178b",
+      "not_established": "Controller completion is not worker-time ledger closure",
+      "evidence": "c1-controller-read.stdout"
+    },
+    {
+      "check": "pencil_s3_state_listing",
+      "observation": "14 state objects, all LastModified2026-10-30; none after latest planning record",
+      "scope": "Returned pencil state object listing only",
+      "not_established": "Absence in listing is not zero consumption or admission",
+      "evidence": "pencil-states-list.stdout"
+    }
+  ],
+  "planning_reference": {
+    "path": "research/pencil_lifecycle_20261030/integration/followup-continuation-v2/planning-20261103/planning-limits.json",
+    "sha256": "4079023e620b18b8ca6ab650362c83c8bdc4b81d8f0728bf313a6e011d789631",
+    "recorded_utc": "2026-11-03T17:39:17.649359+00:00",
+    "active_worker_seconds_total": 25200,
+    "deadline": "2026-11-04T06:00:00Z",
+    "execution_authorized": false
+  },
+  "c1_request_sha256": "92897e1dc5fb7fb10b3df9eceeed01aa88ea083b5a67be1431e915bf3231d907",
+  "c1_worker_instance": "i-04d58c2b309fb6549",
+  "c1_worker_pod_uid": "3a7ab215-49d1-4982-8c78-5a0c71646842",
+  "c1_state_version": "_dS372y1JUdgqOwWIIGTCcb7AEu2uPhQ",
+  "c1_state_event_last_modified": "2026-10-30T07:54:06+00:00",
+  "c1_state_bytes": 5383,
+  "c1_state_sha256": "83516c8a14ae3b7714df3fb5960d619d0ef3a8cd7122e25c5875b7a1d25b17d8",
+  "listed_state_objects": 14,
+  "listed_states_post_planning_record": 0,
+  "spent_active_worker_seconds": null,
+  "remaining_active_worker_seconds": null,
+  "outstanding_reservations_seconds": null,
+  "scientific_execution_admitted": false,
+  "runtime_execution_admitted": false,
+  "capacity_fields": "Overview configured_vcpu_limit/pool_limits are connector metadata, not live enforcement validation."
+}

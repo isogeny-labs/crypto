@@ -4,12 +4,14 @@ import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
+import { catalogSnapshotBytes, legacyFormulaSnapshotBytes } from "./catalog_snapshot.mjs";
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(SCRIPT_DIR, "..");
 const OUTPUT_PATH = "docs/curves/cover-transfer-assessments.json";
 const ASSESSMENT_DATE = "2026-10-24";
 const CATALOG_COMMIT = "728304718cb0ab6df70da620a908a5f76f175293";
+const LEGACY_FORMULA_COMMIT = "0c82a7dd1d1e6e3c847b49f8446d29d405beb0c5";
 const MAP_HASH_DOMAIN = "cover-transfer-assessments/v2/map_base";
 const SUBGROUP_HASH_DOMAIN = "cover-transfer-assessments/v2/subgroup_base";
 
@@ -35,11 +37,11 @@ function membershipHash(domain, members) {
 }
 
 async function readJson(path) {
-  return JSON.parse(await readFile(resolve(ROOT, path), "utf8"));
+  return JSON.parse(catalogSnapshotBytes(ROOT, path, CATALOG_COMMIT).toString("utf8"));
 }
 
 async function fileHash(path) {
-  return sha256Bytes(await readFile(resolve(ROOT, path)));
+  return sha256Bytes(catalogSnapshotBytes(ROOT, path, CATALOG_COMMIT));
 }
 
 function assert(condition, message) {
@@ -125,12 +127,6 @@ function declaredFieldBinding(record) {
 }
 
 const obligations = [
-  {
-    id: "general_binary_norm",
-    description:
-      "Implement and independently verify a catalog-applicable pushforward/norm on arbitrary binary Jacobian classes; the separate exact fixed-GF(8) fixture is not a catalog row and does not close this obligation.",
-    status: "unknown",
-  },
   {
     id: "current_fixed_f8_cryptanalysis_mirror",
     description:
@@ -267,16 +263,17 @@ const resultTemplates = {
     evidence_refs: [],
     obligation_id: "independent_map_oracle",
   },
-  "map.binary-arbitrary-pushforward.refuted": {
-    status: "refuted",
+  "map.binary-arbitrary-pushforward.supported": {
+    status: "supported",
     scope:
-      "Claim that the current implementation accepts and norms an arbitrary reduced class in Jac(H) for any of the 165 catalog binary covers.",
+      "Arbitrary reduced Mumford classes of degree at most three for every catalog binary cubic cover, including irreducible degree-two and degree-three support.",
     rationale:
-      "The public entry point supports one exact fixed-GF(8) fixture, which is not a catalog row, and returns Unsupported(ArbitraryJacobianPushforward) for the catalog profiles. This refutes a catalog implementation claim, not mathematical existence of a norm.",
+      "The public entry point factors the support over the base field, evaluates nonsplit points in the corresponding residue field, traces Frobenius orbits to the elliptic target, and cross-checks all 486 classes of the independent fixed-GF(8) presentation.",
     evidence_refs: [
       "src/binary_ecc/cover_transfer.rs#pushforward_arbitrary_jacobian_class",
+      "src/binary_ecc/cover_transfer.rs#image_endomorphism_certificate",
+      "src/binary_ecc/cover_transfer.rs#torsion_projector_certificate",
     ],
-    obligation_id: "general_binary_norm",
   },
   "map.prime-construction.supported": {
     status: "supported",
@@ -372,7 +369,7 @@ const resultTemplates = {
     scope:
       "Claim that the binary implementation provides a general Jac(H)-to-E norm and end-to-end logarithm transfer.",
     rationale:
-      "Catalog rows expose only point-divisor and typed-fiber pushforward domains; the separate exact fixed-GF(8) arbitrary-class fixture does not generalize to them, and no solver consumes these catalog-cover classes.",
+      "The catalog binary covers now expose a general arbitrary-class norm, but no relation collector, linear algebra, or individual-log solver consumes the projected classes; therefore an end-to-end transfer pipeline is still absent.",
     evidence_refs: [
       "src/binary_ecc/cover_transfer.rs#pushforward_arbitrary_jacobian_class",
       "research/hyperelliptic_cover_infrastructure_20261006/README.md",
@@ -508,7 +505,7 @@ const resultTemplates = {
     scope:
       "Recovery of G from the typed pull-push value [3]G using 3^{-1} mod r for all 142 linked binary triples.",
     rationale:
-      "The batch certificate checks the modular inverse and exact point equality for each catalog value r; this is bounded typed-domain recovery, not a general Jacobian norm.",
+      "The batch certificate checks the modular inverse and exact point equality for each catalog value r on the typed pull-push domain; the general arbitrary-class norm is certified separately.",
     evidence_refs: [
       "src/bin/hyperelliptic_cover.rs#every_binary_ec1_generator_has_checked_typed_transfer_hypotheses",
     ],
@@ -536,7 +533,7 @@ const resultTemplates = {
     scope:
       "Operational recovery from an arbitrary class produced by a Jacobian algorithm.",
     rationale:
-      "There is no catalog-general norm or solver connected to these cover sources that produces such a result. The separate bounded odd-prime one-infinity solver library is outside this transfer path.",
+      "A catalog-general norm now exists for the binary cubic family, but no solver is connected to these cover sources to produce and recover an arbitrary relation result. The separate bounded odd-prime one-infinity solver library is outside this transfer path.",
     evidence_refs: [],
     obligation_id: "full_solver",
   },
@@ -547,7 +544,7 @@ const resultTemplates = {
     rationale:
       "The fixture checks a nonidentity G with [29]G=O; primality of 29 proves exact source order 29.",
     evidence_refs: [
-      "src/binary_ecc/cover_transfer.rs#subgroup_status_and_arbitrary_pushforward_boundary",
+      "src/binary_ecc/cover_transfer.rs#subgroup_status_general_pushforward_and_projector",
       "research/hyperelliptic_cover_infrastructure_20261006/evidence.json#subgroup_transfer",
     ],
   },
@@ -558,7 +555,7 @@ const resultTemplates = {
     rationale:
       "The image is nonidentity and is killed by the prime 29, hence its exact order is 29.",
     evidence_refs: [
-      "src/binary_ecc/cover_transfer.rs#subgroup_status_and_arbitrary_pushforward_boundary",
+      "src/binary_ecc/cover_transfer.rs#subgroup_status_general_pushforward_and_projector",
     ],
   },
   "map.f2m7-geometry.supported": {
@@ -603,7 +600,7 @@ const profiles = {
       pullback_point_classes: "map.binary-pullback.supported",
       independent_pullback_homomorphism_oracle: "map.independent-oracle.unknown",
       pushforward_point_divisors: "map.binary-typed-pushforward.supported",
-      arbitrary_jacobian_pushforward: "map.binary-arbitrary-pushforward.refuted",
+      arbitrary_jacobian_pushforward: "map.binary-arbitrary-pushforward.supported",
       composition_on_typed_domain: "map.binary-composition.supported",
       alternate_target_model_map: "map.direct-target.not-applicable",
       field_extension_or_descent: "map.same-field.not-applicable",
@@ -611,7 +608,7 @@ const profiles = {
     },
     full_transfer_pipeline: "map.binary-pipeline.refuted",
     boundary:
-      "Supported as a same-field genus-three cover with checked one-infinity arithmetic and bounded rational-point-class transfer. Not a general Jacobian norm or solver.",
+      "Supported as a same-field genus-three cover with checked one-infinity arithmetic, arbitrary-class norm, and image/Prym projector. Not an end-to-end discrete-log solver.",
   },
   "map.odd-prime-quadratic.direct": {
     kind: "map_base",
@@ -789,13 +786,17 @@ function freshness(status, scope, rationale, evidenceRefs, obligationId) {
   return result;
 }
 
-async function sourceArtifact(path, role, assessment) {
-  return {
+async function sourceArtifact(path, role, assessment, sourceCommit = undefined) {
+  const artifact = {
     path,
-    sha256: await fileHash(path),
+    sha256: sourceCommit === undefined
+      ? await fileHash(path)
+      : sha256Bytes(legacyFormulaSnapshotBytes(ROOT, path, sourceCommit)),
     role,
     freshness: assessment,
   };
+  if (sourceCommit !== undefined) artifact.source_commit = sourceCommit;
+  return artifact;
 }
 
 function integrityArtifact(path, role) {
@@ -852,7 +853,7 @@ async function buildSourceArtifacts() {
       freshness(
         "supported",
         "the exact input registry for all 15,791 assessed map rows",
-        "The digest is computed from the current file and every membership is joined through its model hash.",
+        "The digest binds the catalog_commit snapshot and every membership is joined through its model hash; later live-catalog additions are outside this assessment.",
         ["docs/curves/registry.json"],
       ),
     ),
@@ -974,11 +975,11 @@ async function buildSourceArtifacts() {
     ),
     sourceArtifact(
       "src/binary_ecc/cover_transfer.rs",
-      "bounded binary pullback, pushforward, composition, and exact fixed-GF(8) arbitrary-class norm implementation",
+      "general binary pullback, arbitrary-class norm, image/Prym projector, and composition implementation",
       freshness(
         "supported",
-        "the binary cubic profile's typed point-class domain and the separate non-catalog fixed-GF(8), a=1, b=3, d=7 all-class fixture",
-        "The digest pins the exact current transfer API, the positive 486-class fixed-fixture norm, and the structured arbitrary-Jacobian unsupported boundary for every other field/model. The fixture target has order 6 with six fibers of size 81, so degree 3 is not coprime to the full target order and no full-group injectivity claim follows.",
+        "the binary cubic profile's arbitrary reduced Mumford classes of degree at most three, including nonsplit support, plus the independent fixed-GF(8), a=1, b=3, d=7 all-class presentation",
+        "The digest pins the exact current transfer API, its residue-field norm for every checked binary cubic cover, the image/Prym projector, and the exhaustive 486-class comparison with the independent fixed-fixture presentation. The fixture target has order 6 with six fibers of size 81, so degree 3 is not coprime to the full target order and no full-group injectivity claim follows.",
         ["src/binary_ecc/cover_transfer.rs"],
       ),
     ),
@@ -1020,13 +1021,14 @@ async function buildSourceArtifacts() {
       freshness(
         "refuted",
         "claim that this inventory is current for the 15,791-row registry",
-        "It pins an older registry, omits current slugs, and contains modeled routes without exact HC1/CV1 subgroup certificates.",
+        "At source_commit it pins an older registry and omits assessment slugs. This historical finding does not describe the refreshed live inventory; modeled routes remain distinct from exact HC1/CV1 subgroup certificates.",
         [
           "docs/curves/jacobian-transfers.json",
           "docs/curves/JACOBIAN_TRANSFERS.md",
         ],
         "refresh_formula_inventory",
       ),
+      LEGACY_FORMULA_COMMIT,
     ),
     integrityArtifact(
       "docs/curves/JACOBIAN_TRANSFERS.md",
@@ -1067,6 +1069,10 @@ async function buildSourceArtifacts() {
     integrityArtifact(
       "research/cover_transfer_assessment_20261013/verify_assessment.mjs",
       "independent catalog-wide assessment verifier",
+    ),
+    integrityArtifact(
+      "scripts/catalog_snapshot.mjs",
+      "exact dated-catalog input selector; Git failures never fall back to live inputs",
     ),
     integrityArtifact(
       "research/cover_transfer_assessment_20261013/set_pdf_metadata.py",
@@ -1407,7 +1413,7 @@ async function buildLedger() {
         },
         evidence_additions: [
           "research/hyperelliptic_cover_infrastructure_20261006/evidence.json#subgroup_transfer",
-          "src/binary_ecc/cover_transfer.rs#subgroup_status_and_arbitrary_pushforward_boundary",
+          "src/binary_ecc/cover_transfer.rs#subgroup_status_general_pushforward_and_projector",
         ],
         boundary:
           "Exact order-29 evidence upgrades only this triple's numeric source- and image-order claims; arbitrary Jacobian recovery remains unknown.",
@@ -1589,7 +1595,7 @@ async function buildLedger() {
         assessment: freshness(
           "unknown",
           "current cryptanalysis mirror or integration of the exact fixed-GF(8) arbitrary-class norm",
-          "The retained parity receipt binds the earlier cover_transfer.rs digest 67b94112f70becf100ccc2cc7e0b3bc057e5663a4019b63fe966de9e62fd5069, not the current crypto source digest 6e801f14abf087b2a6610aa320faf602d176ac764f5eee8e9d88611cdacfa896. No current-tip cryptanalysis mirror receipt is attached.",
+          "The retained parity receipt binds the earlier cover_transfer.rs digest 67b94112f70becf100ccc2cc7e0b3bc057e5663a4019b63fe966de9e62fd5069, not the current crypto source digest 61bd3ce55913a98ec07914e287393890f23b672d9867138756bb12eb29ab57f0. No current-tip cryptanalysis mirror receipt is attached.",
           [
             "src/binary_ecc/cover_transfer.rs",
             "research/cover_transfer_assessment_20261013/release_replay.txt",
@@ -1623,7 +1629,7 @@ async function buildLedger() {
     exploration_boundary: [
       "No search for production targets, private keys, or discrete logarithms was performed.",
       "All 15,791 map rows and all 979 linked EC1 representations are classified, but unknown remains unknown and refuted implementation support is not a mathematical nonexistence claim.",
-      "The 165 catalog binary maps have bounded typed point-class operations; arbitrary source-Jacobian norm remains unsupported for those rows. The exact fixed-GF(8) fixture is outside this catalog population.",
+      "The 165 catalog binary maps now have arbitrary-class norms and image/Prym projectors in the current source, including nonsplit support; catalog-wide independent-oracle replay and an end-to-end solver remain open.",
       "The 15,626 odd-characteristic maps have verified cover geometry but no compatible balanced/two-infinity Jacobian transfer implementation.",
       "Generator checks and [r]G=O do not by themselves prove that every catalog integer r is the exact source order.",
       "Formula-screen outputs in jacobian-transfers.json were not promoted to executable or measured claims.",

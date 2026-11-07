@@ -1,0 +1,21 @@
+[
+  {
+    "source": "companion-generator-compression/certificate.py",
+    "target": "compression_certificate.py",
+    "substitutions": []
+  },
+  {
+    "source": "companion-zero-delete/driver_delete.py",
+    "target": "driver_reuse.py",
+    "substitutions": [
+      [
+        "from deletion import delete_prefix, ZeroFrame",
+        "from deletion import delete_prefix, ZeroFrame\nfrom reuse import restrict_and_compress"
+      ],
+      [
+        "            del selection,deletion,d,di\n            continue",
+        "            rebound=restrict_and_compress(deletion,selection,view)\n            source,selection=rebound['source'],rebound['selection']\n            size=len(source.G)\n            d,di=selection.metric,selection.inverse_metric\n            trace.append(dict(kind='compression',dimension=size,\n                              certificate=rebound['certificate']))\n            trace.append(rebound['trace'])\n            del deletion,rebound"
+      ]
+    ]
+  }
+]

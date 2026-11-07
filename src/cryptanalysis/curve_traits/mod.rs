@@ -58,6 +58,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::binary_ecc::{F2mElement, IrreduciblePoly};
+use crate::cryptanalysis::cover_catalog;
 use arith::Factored;
 
 /// How well a value is established.  Ordered from strongest to weakest,
@@ -1234,6 +1235,57 @@ fn settle_by_walks(
     Ok(())
 }
 
+/// Levels still open on a prime-field curve, `p < 2^63`, at `ℓ ≤ 19`:
+/// the height of `j(E)` above the floor of its `ℓ`-volcano by descending
+/// walks of `ℓ`-isogenies ([`walk::height_above_floor`]), the level being
+/// the depth minus that height. A level outside the bound the other tests
+/// reached stops the build.
+fn settle_by_descent(model: &Model, levels: &mut [LevelRecord]) -> Result<(), String> {
+    let Model::Prime { p, a, b } = model else {
+        return Ok(());
+    };
+    let Some(p) = p.to_u64().filter(|&p| p < 1 << 63) else {
+        return Ok(());
+    };
+    let (a, b) = (
+        (a % p).to_u64().expect("reduced"),
+        (b % p).to_u64().expect("reduced"),
+    );
+    let m = |x: u64, y: u64| (u128::from(x) * u128::from(y) % u128::from(p)) as u64;
+    let a3 = m(4, m(a, m(a, a)));
+    let den = (u128::from(a3) + u128::from(m(27, m(b, b)))) % u128::from(p);
+    if den == 0 {
+        return Ok(());
+    }
+    let inv = BigUint::from(den as u64)
+        .modpow(&BigUint::from(p - 2), &BigUint::from(p))
+        .to_u64()
+        .expect("reduced");
+    let j = m(m(1728 % p, a3), inv);
+    for lv in levels.iter_mut().filter(|lv| lv.level.is_none()) {
+        let Some(ell) = lv.ell.parse::<u64>().ok().filter(|&l| l <= 19) else {
+            continue;
+        };
+        let Some(h) = walk::height_above_floor(p, j, ell, lv.depth) else {
+            continue;
+        };
+        let level = lv.depth - h.min(lv.depth);
+        if level > lv.level_at_most {
+            return Err(format!(
+                "descending {ell}-isogeny walks put E at level {level}, above the bound {} ({})",
+                lv.level_at_most, lv.method
+            ));
+        }
+        lv.level = Some(level);
+        lv.level_at_most = level;
+        lv.method = format!(
+            "descending {ell}-isogeny walks reach the floor in {h} steps: level {level} of depth {}",
+            lv.depth
+        );
+    }
+    Ok(())
+}
+
 /// The most candidate orders [`settle_by_walks`] weighs.
 const MAX_CANDIDATE_ORDERS: usize = 4096;
 
@@ -1682,6 +1734,9 @@ fn endomorphism(
         timed("orders", &c.slug, || {
             settle_by_walks(&c.model, &dk, walks, &mut levels, &mut contains)
         })?;
+        timed("descent", &c.slug, || {
+            settle_by_descent(&c.model, &mut levels)
+        })?;
         bound = BigUint::one();
         exact = BigUint::one();
         resolved = true;
@@ -2011,7 +2066,7 @@ pub fn signature(t: &CurveTraits, keys: &[&str]) -> String {
 
 // ── The trait file ────────────────────────────────────────────────────
 
-pub const SCHEMA: &str = "curve-traits/2";
+pub const SCHEMA: &str = "curve-traits/3";
 
 /// One file a build read, by path and SHA-256.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -2069,9 +2124,14 @@ pub struct TraitFile {
     pub schema: String,
     pub generated_by: String,
     pub what_this_is: String,
-    /// SHA-256 of the registry bytes the records were derived from.
-    pub registry_sha256: String,
-    /// Every file read: registry, factor hints, source manifest, sources.
+    /// The manifest naming the registry rows the records were derived from
+    /// (`docs/curves/cover-catalog.json`).
+    pub catalog: String,
+    /// SHA-256 of those rows ([`crate::cryptanalysis::cover_catalog::rows_sha256`]),
+    /// not of the registry file: rows the manifest does not name leave it unchanged.
+    pub catalog_rows_sha256: String,
+    /// Every file read: the catalog rows of the registry, the catalog
+    /// manifest, factor hints, source manifest, sources.
     pub inputs: Vec<InputDigest>,
     /// Rho iterations per composite.
     pub factor_budget: u64,
@@ -2081,20 +2141,26 @@ pub struct TraitFile {
 }
 
 impl TraitFile {
-    /// The registry alone: no hints, no other sources.
-    pub fn build(registry_text: &str, budget: u64) -> Result<Self, String> {
+    /// The catalog rows of the registry alone: no hints, no other sources.
+    pub fn build(registry_text: &str, catalog_text: &str, budget: u64) -> Result<Self, String> {
         let registry = Input {
             path: "docs/curves/registry.json".into(),
             text: registry_text.to_string(),
         };
-        Ok(Self::build_from(&registry, None, None, None, &[], budget)?.0)
+        let catalog = Input {
+            path: cover_catalog::MANIFEST_PATH.into(),
+            text: catalog_text.to_string(),
+        };
+        Ok(Self::build_from(&registry, &catalog, None, None, None, &[], budget)?.0)
     }
 
-    /// The registry, the factor hints, and the curves of every source the
-    /// manifest names (`sources[i]` is the file at the manifest's `i`-th
-    /// path).  Returns the [`Factoring`] too, for its leftovers.
+    /// The registry rows the catalog manifest names, the factor hints, and
+    /// the curves of every source the manifest names (`sources[i]` is the
+    /// file at the manifest's `i`-th path).  Returns the [`Factoring`] too,
+    /// for its leftovers.
     pub fn build_from(
         registry: &Input,
+        catalog: &Input,
         hints: Option<&Input>,
         certificates: Option<&Input>,
         manifest: Option<&Input>,
@@ -2102,8 +2168,16 @@ impl TraitFile {
         budget: u64,
     ) -> Result<(Self, Factoring), String> {
         use rayon::prelude::*;
-        let mut curves = read_registry(&registry.text)?;
-        let mut inputs = vec![registry.digest()];
+        let rows = Input {
+            path: format!(
+                "{} (rows named by {})",
+                registry.path,
+                cover_catalog::MANIFEST_PATH
+            ),
+            text: cover_catalog::restrict(&registry.text, &catalog.text)?,
+        };
+        let mut curves = read_registry(&rows.text)?;
+        let mut inputs = vec![rows.digest(), catalog.digest()];
         let hint_primes = match hints {
             Some(h) => {
                 inputs.push(h.digest());
@@ -2149,11 +2223,13 @@ impl TraitFile {
         let file = TraitFile {
             schema: SCHEMA.into(),
             generated_by: "cargo run --release --bin curve_traits -- build".into(),
-            what_this_is: "Traits derived from each curve's model and order (the registry, then \
-                           the sources in docs/curves/trait-sources.json), with the status of \
-                           each value; see docs/curves/TRAITS.md."
+            what_this_is: "Traits derived from each curve's model and order (the registry rows \
+                           docs/curves/cover-catalog.json names, then the sources in \
+                           docs/curves/trait-sources.json), with the status of each value; \
+                           see docs/curves/TRAITS.md."
                 .into(),
-            registry_sha256: inputs[0].sha256.clone(),
+            catalog: cover_catalog::MANIFEST_PATH.into(),
+            catalog_rows_sha256: inputs[0].sha256.clone(),
             inputs,
             factor_budget: budget,
             default_signature: DEFAULT_SIGNATURE.iter().map(|s| s.to_string()).collect(),
@@ -2243,7 +2319,7 @@ mod tests {
             .iter()
             .filter(|curve| matches!(&curve.model, Model::Extension { .. }))
             .collect();
-        assert_eq!(extensions.len(), 1324);
+        assert_eq!(extensions.len(), 1371); // 1324 existing + 47 frozen three-leads models.
         for curve in extensions {
             let Model::Extension {
                 p,

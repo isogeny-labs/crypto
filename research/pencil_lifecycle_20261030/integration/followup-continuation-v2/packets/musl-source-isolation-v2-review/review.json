@@ -1,0 +1,26 @@
+{
+  "schema": "software.additive-review/v1",
+  "v1_finding": "new-source-root-rejection-unreceipted",
+  "finding_status": "closed by narrow correction",
+  "wrapper_sha256": "4b2fe7efea27b92aebdc42d46371f1fdcfe4f0a93a4e037285f6e443c78118b4",
+  "manifest_sha256": "cd3f38165bab97017fd3b4d558b1aaeea632afa0b9fdfa02aa81b2efcf2a0ef9",
+  "manifest_mismatches": [],
+  "control_receipt_sha256": "8c2d199c9cc098013dadb0d82cdc3f8d6aa28d999a9a28066691889c3d1070cc",
+  "observed_control_receipt": {
+    "schema": "software.bounded-musl-build/v1",
+    "source_commit_requested": "b985ddb30b46abbd9a050e5753c7e301f40b07f6",
+    "seconds_cap": 1,
+    "start": 1793411341.5448992,
+    "binary_sha256": null,
+    "image_qualified": false,
+    "scientific_execution": false,
+    "status": "failed_or_interrupted",
+    "error": "AssertionError()",
+    "end": 1793411341.544962
+  },
+  "assessment": "Identical assertion moved to first statement inside try, after receipt initialization and before cache lock/source commands; exception records failure and finally saves. Build/source/cache gates unchanged.",
+  "control_boundary": "Reviewer inspected saved AssertionError failure receipt; root reports wrapper exit1. No separate outer-command/argv receipt present, so reviewer does not independently claim recorded native exit. Source final exit expression yields1 for this status.",
+  "native_execution_by_reviewer": false,
+  "build_or_checkout": false,
+  "remaining_preparation": "v1 external-input/source-ownership/cache/config preparation requirements remain"
+}

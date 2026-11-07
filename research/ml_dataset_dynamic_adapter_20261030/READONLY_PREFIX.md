@@ -1,0 +1,11 @@
+# Read-only committed-prefix custody for central dynamic admission
+
+Baseline5ec7ebb1b0118873ee175ed35532856061f13a11. Existing sources reviewed: capture.rs capture_committed_delta, verify_captured_delta, check_record, validate_head; mod.rs collect_cell_artifacts and verify_capture_context. Final cell manifests retain live files but do not by themselves resolve a bound witness publication sequence. Snapshot creation is inappropriate inside the read-only central verifier.
+
+Add a read-only helper that accepts original AttemptBinding and frozen CaptureLimits, validates the committed head and complete chained prefix, verifies unique committed payload identities and actual bytes, and returns payload descriptors with their original sequences. Reuse existing parsing, bound checks and manifest verification. Enforce configured stream/event/payload bounds and watermark totals. Ignore bytes beyond the committed watermark; never promote orphan files. No new snapshot, receipt, publication, mutable capture state or mathematical claim.
+
+These are existing outer-custody allocations and hashing, not inner solver instruction/RSS or trajectory evidence. The central caller must independently bind the original run/config, head and stream files through the authoritative cell manifest, validate exact reserved path/role/encoding, compare final witness bytes to the acknowledged payload and supply its actual sequence to independent replay. The helper alone is not central integration.
+
+Controls: genuine dedicated first publication and original sequence; wrong original binding; unchanged committed head/no snapshot creation; tolerated incomplete uncommitted tail; rejected payload corruption, missing payload, event corruption and forged head accounting. Candidate remains outside the worktree while prior immutable validation runs. No new scientific cloud job or profile activation.
+
+Implementation staged after baseline release compilation and581 focused tests passed (0failed,7ignored). A further dynamic bridge control compares the sequence returned by this helper with the sequence recovered from a separately restored snapshot in both ordinary and exceptional native tests. This successor still requires compilation, focused controls and strict lint; no successful validation is claimed at commit time. Central profile dispatch is still disabled.

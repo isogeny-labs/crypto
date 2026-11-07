@@ -1,0 +1,21 @@
+{
+  "checked_utc_date": "2026-10-26",
+  "catalog": "LMFDB read-only av_fq_isog connector, exact q=8 g=3 poly_str query",
+  "query": "SELECT label, poly_str, has_jacobian, has_principal_polarization, jacobian_count, hyp_count, array_length(curves,1) AS listed_curves FROM av_fq_isog WHERE g=3 AND q=8 AND trim(poly_str) IN ('1 0 0 -31 0 0 512','1 0 0 11 0 0 512','1 0 0 35 0 0 512','1 0 0 41 0 0 512','1 0 0 43 0 0 512') ORDER BY poly_str",
+  "status_semantics": "LMFDB inventory: has_jacobian 1 yes, -1 no, 0 uncertain; zero must not be read as impossibility",
+  "status_semantics_url": "https://github.com/LMFDB/lmfdb-inventory/blob/master/db-abvar.md",
+  "rows": [
+    {"order": 482, "label": "3.8.a_a_abf", "poly": [1,0,0,-31,0,0,512], "has_jacobian": 1, "has_principal_polarization": 1, "hyp_count": 15, "listed_curves": 15},
+    {"order": 524, "label": "3.8.a_a_l", "poly": [1,0,0,11,0,0,512], "has_jacobian": 1, "has_principal_polarization": 1, "hyp_count": 15, "listed_curves": 15},
+    {"order": 548, "label": "3.8.a_a_bj", "poly": [1,0,0,35,0,0,512], "has_jacobian": 0, "has_principal_polarization": 1, "hyp_count": 0, "listed_curves": null},
+    {"order": 554, "label": "3.8.a_a_bp", "poly": [1,0,0,41,0,0,512], "has_jacobian": 1, "has_principal_polarization": 1, "hyp_count": 3, "listed_curves": 3},
+    {"order": 556, "label": "3.8.a_a_br", "poly": [1,0,0,43,0,0,512], "has_jacobian": 1, "has_principal_polarization": 1, "hyp_count": 3, "listed_curves": 3}
+  ],
+  "literature_checked": [
+    {"title": "Gaudry-Hess-Smart, Constructive and destructive facets of Weil descent", "url": "https://www.kantmath.de/publications/papers/weil_descent.pdf", "scope": "direct characteristic-two descent construction"},
+    {"title": "Menezes-Teske, GHS isogeny walks", "url": "https://cacr.uwaterloo.ca/techreports/2004/corr2004-25.pdf", "scope": "direct-cover isogeny closure"},
+    {"title": "Tian, Cover attacks for elliptic curves with prime order", "url": "https://arxiv.org/pdf/2012.07173", "scope": "cubic Weil-restriction isogenies; displayed two-torsion formulas do not directly cover ordinary characteristic two"},
+    {"title": "Milio, Computing isogenies between Jacobians of curves of genus 2 and 3", "url": "https://www.ams.org/mcom/2020-89-323/S0025-5718-2019-03486-5/", "scope": "Jacobian-to-Jacobian isogenies given a kernel, not this source-to-quartic map"}
+  ],
+  "targeted_search": "Exact class labels and the five exact Weil-polynomial strings searched on the web; no indexed source for the specific quartic equations was identified. This bounded search does not prove publication novelty."
+}

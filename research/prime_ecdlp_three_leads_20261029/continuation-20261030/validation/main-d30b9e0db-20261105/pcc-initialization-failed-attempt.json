@@ -1,0 +1,11 @@
+{
+  "scope": "Uncommitted initialization attempt; authoritative merged main ledger was not materialized before new claim writes",
+  "raw_utf8": "{\"at\":\"2026-11-05T08:27:03Z\",\"body\":{\"claim_id\":\"PCC-20261105-c3f4cc\",\"claim_sha256\":\"c4cc91d6f8361d35c8a072f35631e9ea1c843ea7e898622e9d1009091c45670c\",\"path\":\"pcc/claims/PCC-20261105-c3f4cc.json\"},\"hash\":\"43172cd7122cc188e0bef7a0f157fe50c4bde5dfa9ed2b94080185e0fe567e49\",\"prev\":\"0000000000000000000000000000000000000000000000000000000000000000\",\"schema\":\"pcc.ledger-entry/v1\",\"seq\":0,\"type\":\"claim\"}\n{\"at\":\"2026-11-05T08:30:46Z\",\"body\":{\"claim_id\":\"PCC-20261105-de7b2b\",\"claim_sha256\":\"03695286523b78c45702557f5fecbe87d92f4422b6b0d3b68530373d03df6bcd\",\"path\":\"pcc/claims/PCC-20261105-de7b2b.json\"},\"hash\":\"f5df37dab34c3c311c187dd172af4f6222e601795e01b6c65c2f49a5c7c0f79d\",\"prev\":\"43172cd7122cc188e0bef7a0f157fe50c4bde5dfa9ed2b94080185e0fe567e49\",\"schema\":\"pcc.ledger-entry/v1\",\"seq\":1,\"type\":\"claim\"}\n",
+  "bytes": 802,
+  "sha256": "4d797674548f91139307f294a99542bd26593f2f174d3e863ea2b3735c04aa19",
+  "authoritative_index_bytes": 41676,
+  "authoritative_index_sha256": "3adbc0acc578ae5a1f011e30504732962e7f858c28738e7cc224355a95d1847f",
+  "base_entry_count": 95,
+  "new_claim_entries": 2,
+  "repair": "restore exact index base, materialize pcc, append unchanged new claim bodies through official PCC append_entry; no committed history edited"
+}

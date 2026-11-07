@@ -1,0 +1,9 @@
+import WordErrorExclusion
+open Polynomial PencilWordRefinement
+instance : Fact (Nat.Prime (5 : UInt64).toNat) := ⟨by decide⟩
+def fixture : WeightedWord := ⟨0,0,0,1,1,1⟩
+example : fixture.canonical 5 := by decide
+example : fixture.normalizedValid 5 ((X : Polynomial (ZMod (5 : UInt64).toNat))^5+1) := by
+  norm_num [WeightedWord.normalizedValid, fixture]
+  exact ⟨X^3, by ring⟩
+example : crossPreludeWord 5 fixture fixture = some .sameUDouble := by decide

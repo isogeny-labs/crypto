@@ -119,9 +119,31 @@ impl Random {
         }
     }
 
+    /// `getrandbits(64)`: two words, the first the least significant.
+    pub fn getrandbits64(&mut self) -> u64 {
+        let lo = self.genrand_u32() as u64;
+        let hi = self.genrand_u32() as u64;
+        lo | (hi << 32)
+    }
+
+    /// `shuffle(x)`: Fisher-Yates from the end, `j = randbelow(i + 1)`.
+    pub fn shuffle<T>(&mut self, x: &mut [T]) {
+        for i in (1..x.len()).rev() {
+            let j = self.randbelow(i as u32 + 1) as usize;
+            x.swap(i, j);
+        }
+    }
+
+    /// `choices(range(n), k=k)` without weights: `floor(random() * n)`.
+    pub fn choices(&mut self, n: usize, k: usize) -> Vec<usize> {
+        let nf = n as f64;
+        (0..k)
+            .map(|_| (self.random() * nf).floor() as usize)
+            .collect()
+    }
+
     /// `random()`: 53 bits from two words, as `random_random` builds them.
-    #[cfg(test)]
-    fn random(&mut self) -> f64 {
+    pub fn random(&mut self) -> f64 {
         let a = self.genrand_u32() >> 5;
         let b = self.genrand_u32() >> 6;
         (a as f64 * 67_108_864.0 + b as f64) * (1.0 / 9_007_199_254_740_992.0)

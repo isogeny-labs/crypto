@@ -1,0 +1,105 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "rho.three_leads_plain_v1",
+        "params": {
+          "trial_cap": "78679100"
+        }
+      },
+      "name": "rho_plain",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "rho.three_leads_negation_v1",
+        "params": {
+          "trial_cap": "78679100"
+        }
+      },
+      "name": "rho_neg",
+      "role": "reference"
+    },
+    {
+      "method": {
+        "id": "rho.three_leads_jacobian_v1",
+        "params": {
+          "trial_cap": "78679100"
+        }
+      },
+      "name": "jac_rho",
+      "role": "candidate"
+    },
+    {
+      "method": {
+        "id": "ic.three_leads_genus2_v1",
+        "params": {
+          "independent": "0",
+          "trial_cap": "78679100",
+          "unique_relations": "1"
+        }
+      },
+      "name": "genus_ic",
+      "role": "candidate"
+    }
+  ],
+  "description": "Fresh three-leads counts-only experiment; all cold phases; walls unqualified",
+  "label": "three-leads-genus-40",
+  "measurement": {
+    "isolation_required": "L2",
+    "order": "shuffle",
+    "rounds": 1,
+    "seed": 2026101801,
+    "timeout_seconds": 1200,
+    "warmup": 0
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 306003387410,
+        "b": 314970649156,
+        "family": "scholten",
+        "group_order": 618719418880,
+        "gx": 473497184750,
+        "gy": 586091428459,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 786587,
+        "parameter": 0,
+        "r": 241687273
+      },
+      {
+        "a": 489774797476,
+        "b": 94147862137,
+        "family": "scholten",
+        "group_order": 618832518256,
+        "gx": 15772784328,
+        "gy": 483445896758,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 786659,
+        "parameter": 0,
+        "r": 3561749
+      },
+      {
+        "a": 55737748173,
+        "b": 357384527602,
+        "family": "scholten",
+        "group_order": 618882328512,
+        "gx": 283698015427,
+        "gy": 456529748925,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 786691,
+        "parameter": 0,
+        "r": 153492641
+      }
+    ],
+    "target_seed": 202610181260,
+    "targets_per_curve": 60
+  }
+}

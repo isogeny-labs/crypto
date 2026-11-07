@@ -1,0 +1,64 @@
+{
+  "schema": "cubic-extension-local-validation/v1",
+  "observed_utc": "2026-10-28T16:48:00Z",
+  "scope": "Publication/infrastructure update; not benchmark admission",
+  "rust_source_base_revision": "6187036c049b6de2b1521b014f575952e4f1705c",
+  "rust_sources_cargo_manifests_and_lockfiles_modified": false,
+  "artifact_tool_unit_tests": {
+    "command": "python3 -m unittest discover -s tools/artifacts -p test_artifacts.py",
+    "passed": 28,
+    "failed": 0,
+    "log": "artifact-unit-tests.log",
+    "log_bytes": 178,
+    "log_sha256": "df7c1bd5e995384f83e3a1dd7d4133fc591c1c3e7777084b7bd12cefaefbc93e"
+  },
+  "original_snapshot": {
+    "files_verified": 164,
+    "total_bytes": 10945416,
+    "mismatches": 0,
+    "publication_receipt": "../../ARTIFACT_PUBLICATION_RECEIPT.json"
+  },
+  "root_release_tests": {
+    "command": "cargo test --release --lib",
+    "passed": false,
+    "tests_executed": false,
+    "build_threads": 1,
+    "test_threads": 1,
+    "timeout_seconds_per_attempt": 1800,
+    "attempts": [
+      {
+        "file": "root-release-attempt1.log",
+        "bytes": 345,
+        "sha256": "b4e2fe92e6b2515c5a8936eca3843bd41495b7c47b8df0e51ed32ccab6562949",
+        "exit_code": 101,
+        "reason": "Tracked isogeny_algos dependency outside sparse checkout; subsequently materialized",
+        "phase": "dependency resolution",
+        "virtual_memory_ceiling_gib": 4
+      },
+      {
+        "file": "root-release-attempt2.log",
+        "bytes": 13534,
+        "sha256": "c292d3e2a41cde34746357a75c5dc4f5e302f6c5ee45d619a8bd5ceb1a2642b6",
+        "exit_code": 101,
+        "reason": "Compiler memory allocation of 24576 bytes failed; SIGABRT",
+        "phase": "lib-test compilation",
+        "virtual_memory_ceiling_gib": 4
+      },
+      {
+        "file": "root-release-attempt3.log",
+        "bytes": 4289,
+        "sha256": "0e24e9a73d23d08619d5821bb4e51bdf12786cea90fd0b8640ed1d07ecf1efaf",
+        "exit_code": 101,
+        "reason": "rustc-LLVM ERROR: out of memory; Allocation failed; SIGABRT",
+        "phase": "lib-test compilation",
+        "virtual_memory_ceiling_gib": 12
+      }
+    ]
+  },
+  "conductor": {
+    "available": false,
+    "exit_code": 127
+  },
+  "paid_lab_jobs_submitted": 0,
+  "qualified_benchmark_runs": 0
+}

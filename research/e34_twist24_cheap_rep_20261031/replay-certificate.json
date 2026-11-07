@@ -1,0 +1,289 @@
+{
+ "schema": "replay-certificate/v1",
+ "status": "verified",
+ "independent": true,
+ "scalars_verified": true,
+ "id": "VAL-20261101-146a90",
+ "date": "2026-11-01",
+ "row": "E34 (GLV note §9.38 pre-registration, §9.39 results): cheap order-24 (and order-6) class representatives on E18's eight j = 0 curves; Stage R (8 curves x 5 arms x 2 arithmetics x 16 seeds), identity checks with both negative controls, negative-control walks at p = 241; evidence directory research/e34_twist24_cheap_rep_20261031",
+ "validator": "independent validator subagent (Claude Opus 5.5), not the session that produced E34: fresh build from a clean export of the recorded binary commit in a fresh tmpfs target directory, fresh runs, own comparison (validate_e34.rs compare)",
+ "recorded_binary": "bd0118f393537a2e610336e5d45f5426a6a0fa83 (experiments/38_twist24_cheap_rep/binary_commit.txt, recorded sha256 7552c98e...; the producer's worktree also held E33's uncommitted solver edits when it built)",
+ "build": "clean git archive of bd0118f39's build inputs (4,288 files, each equal to its blob), built in /dev/shm/e34val-target (tmpfs, fresh; the briefed shared target could not hold a fresh crypto_lib with ~600 MB free on /; coordinator approved), rustc 1.97.0, `cargo build --release --offline -j 2 --example e34_cheap_rep`, 19 m 11 s; e34_cheap_rep sha256 5afe6797ce18ed2c45628bc8dbcf865e50ad6f7a071d00294b7006f32ebf48a0. Details in replay/build.json.",
+ "build_record": {
+  "path": "replay/build.json",
+  "sha256": "3875c5399e9cf4aff796852fbc6aab5d1d273f160c84afb6c39341b983f1a944"
+ },
+ "selection": {
+  "nonce": "7d808504472a563714d9994b38194cc2",
+  "nonce_file": {
+   "path": "replay/nonce.txt",
+   "sha256": "c9e32c63d9a56a1f5c110194a5a4d9724014e2abccb4190137ff8ab5b1af5627"
+  },
+  "rule": "nonce 7d808504472a563714d9994b38194cc2 drawn 2026-11-01T20:42:04Z from /dev/urandom (16 bytes) after the E34 records commit d3a23e791 (2026-10-31T17:47:14Z); curve order = sort by SHA-256(nonce \":\" p) (validate_e34 draw); the first three are the mandatory sample, the rest are replayed in order while time allows",
+  "order": "601,241,769,1069,997,733,337,541",
+  "mandatory_sample": "601, 241, 769",
+  "replayed": "all eight curves (time allowed), all 5 arms, both arithmetics; identity stage on all eight; negative-control walks at p = 241"
+ },
+ "comparison": {
+  "path": "replay/replay_comparison.json",
+  "sha256": "e618d3122e03d8ac72da208445cb6c30e230faa63f55cc551e12856b5ccbfde3",
+  "rule": "every leaf of every committed record against the replay: numbers by their exact text, strings and booleans exactly, object key order and array lengths too; the records carry no wall-clock field, so nothing is excluded"
+ },
+ "runs_total": 10,
+ "runs_matched": 10,
+ "fields_compared": 34076,
+ "fields_identical": 34076,
+ "byte_identical_runs": 10,
+ "coverage": "full: every recorded E34 run replayed (8 Stage R records, 1,280 walks; the identity record, 40 checks; the negative-control walks, 16); no sampling was needed beyond the nonce-drawn order",
+ "logs": [
+  {
+   "run": "identity",
+   "committed_log_sha256": "dfacad6dd9c613a6596bb3c4460287d9aae8b29e3a21cc215f64da4a41075d11",
+   "replay_log_sha256": "dfacad6dd9c613a6596bb3c4460287d9aae8b29e3a21cc215f64da4a41075d11",
+   "identical": true
+  },
+  {
+   "run": "negative_walks",
+   "committed_log_sha256": "6d488a005d5f13d1d210c19000ebf184d374f860cc4236831e465564ca8c5edc",
+   "replay_log_sha256": "6d488a005d5f13d1d210c19000ebf184d374f860cc4236831e465564ca8c5edc",
+   "identical": true
+  },
+  {
+   "run": "stage_r_p1069",
+   "committed_log_sha256": "4b91d757895c03b1684273e3af13c279e27162b60f89bd8b669cd789fcc6e77d",
+   "replay_log_sha256": "4b91d757895c03b1684273e3af13c279e27162b60f89bd8b669cd789fcc6e77d",
+   "identical": true
+  },
+  {
+   "run": "stage_r_p241",
+   "committed_log_sha256": "424da97260e93fc2b6582a3d7a9e950c3c9014b583d43c5e18b9f532377f5484",
+   "replay_log_sha256": "424da97260e93fc2b6582a3d7a9e950c3c9014b583d43c5e18b9f532377f5484",
+   "identical": true
+  },
+  {
+   "run": "stage_r_p337",
+   "committed_log_sha256": "6b9e2bd2c00a5367e8525f10e0e8af508c31870231d32f7689f5f034a385a5ee",
+   "replay_log_sha256": "6b9e2bd2c00a5367e8525f10e0e8af508c31870231d32f7689f5f034a385a5ee",
+   "identical": true
+  },
+  {
+   "run": "stage_r_p541",
+   "committed_log_sha256": "a6fc789d5306efa9968849f5b843e729f783c6dcc05c670472ac2484333e6793",
+   "replay_log_sha256": "a6fc789d5306efa9968849f5b843e729f783c6dcc05c670472ac2484333e6793",
+   "identical": true
+  },
+  {
+   "run": "stage_r_p601",
+   "committed_log_sha256": "f9109ab910ff3e7b3f7dcf64522028cf3660944cc6482da7f5370055497b5e36",
+   "replay_log_sha256": "f9109ab910ff3e7b3f7dcf64522028cf3660944cc6482da7f5370055497b5e36",
+   "identical": true
+  },
+  {
+   "run": "stage_r_p733",
+   "committed_log_sha256": "9445f8357708fba800da7b9519ac7ff0332f2ef6d1e0820baab7768c1af397f3",
+   "replay_log_sha256": "9445f8357708fba800da7b9519ac7ff0332f2ef6d1e0820baab7768c1af397f3",
+   "identical": true
+  },
+  {
+   "run": "stage_r_p769",
+   "committed_log_sha256": "ab3ee8f1101e51555ccc5a4b5cc1c6ed1a4a8a582eec3e8bdc169250d4581c0e",
+   "replay_log_sha256": "ab3ee8f1101e51555ccc5a4b5cc1c6ed1a4a8a582eec3e8bdc169250d4581c0e",
+   "identical": true
+  },
+  {
+   "run": "stage_r_p997",
+   "committed_log_sha256": "6f1b8a6ea996f82d8691d8b8e348f8e665dde134bc459d28f1e5f243458a981e",
+   "replay_log_sha256": "6f1b8a6ea996f82d8691d8b8e348f8e665dde134bc459d28f1e5f243458a981e",
+   "identical": true
+  }
+ ],
+ "scalar_verification": "Every replayed walk (1,296) reports correct = true, which the binary sets only when the collision-recovered logarithm equals the instance's planted d and [d]G = Q holds on the curve (twist24_rep.rs, rho_j0_counted); all 160 walks of a curve recover the same logarithm (271), equal to E29's records. The identity stage's scalar checks (rep = [m]P by scalar multiplication) report 0 failures for the three cheap representatives and 65/65 per curve for the wrong-ordinate control, as committed. The validator's own checks: every n is prime and n = 1 mod 24 (own Miller-Rabin).",
+ "dirty_worktree_caveat": "The producer built its binary while E33's uncommitted edits to gaudry_quartic.rs, klein_v4.rs and quartic_folds.rs were in the worktree. This replay's binary was built from a clean export of bd0118f39 and reproduces every record byte for byte, so the recorded walk path is bd0118f39's.",
+ "runs": [
+  {
+   "run": "identity",
+   "committed": {
+    "path": "experiments/38_twist24_cheap_rep/identity.json",
+    "sha256": "d6479f4aa7c1b82adb17b11f28ae9211dd1553dcdfc9fad3bb4f001abe57d111"
+   },
+   "replay_output": {
+    "path": "research/e34_twist24_cheap_rep_20261031/replay/identity.json",
+    "sha256": "d6479f4aa7c1b82adb17b11f28ae9211dd1553dcdfc9fad3bb4f001abe57d111"
+   },
+   "byte_identical": true,
+   "fields_compared": 344,
+   "fields_identical": 344,
+   "mismatches": [],
+   "matched": true,
+   "walks": 0,
+   "walks_correct": 0
+  },
+  {
+   "run": "negative_walks",
+   "committed": {
+    "path": "experiments/38_twist24_cheap_rep/negative_walks.json",
+    "sha256": "05693f924b6fc8302d393f7344de056654891784ef529397e27ab264351621ba"
+   },
+   "replay_output": {
+    "path": "research/e34_twist24_cheap_rep_20261031/replay/negative_walks.json",
+    "sha256": "05693f924b6fc8302d393f7344de056654891784ef529397e27ab264351621ba"
+   },
+   "byte_identical": true,
+   "fields_compared": 420,
+   "fields_identical": 420,
+   "mismatches": [],
+   "matched": true,
+   "walks": 16,
+   "walks_correct": 16
+  },
+  {
+   "run": "stage_r_p1069",
+   "committed": {
+    "path": "experiments/38_twist24_cheap_rep/stage_r_p1069.json",
+    "sha256": "65803d2162a9d42387410c1a8d1cfb0fd67d2d91821dcbf2e68ec6f913e3e31f"
+   },
+   "replay_output": {
+    "path": "research/e34_twist24_cheap_rep_20261031/replay/stage_r_p1069.json",
+    "sha256": "65803d2162a9d42387410c1a8d1cfb0fd67d2d91821dcbf2e68ec6f913e3e31f"
+   },
+   "byte_identical": true,
+   "fields_compared": 4164,
+   "fields_identical": 4164,
+   "mismatches": [],
+   "matched": true,
+   "walks": 160,
+   "walks_correct": 160
+  },
+  {
+   "run": "stage_r_p241",
+   "committed": {
+    "path": "experiments/38_twist24_cheap_rep/stage_r_p241.json",
+    "sha256": "eeeb357ba97c262cb88bc0ee45d749ebd3dd4d6e95c5afbf5ff5fa7b85a159c1"
+   },
+   "replay_output": {
+    "path": "research/e34_twist24_cheap_rep_20261031/replay/stage_r_p241.json",
+    "sha256": "eeeb357ba97c262cb88bc0ee45d749ebd3dd4d6e95c5afbf5ff5fa7b85a159c1"
+   },
+   "byte_identical": true,
+   "fields_compared": 4164,
+   "fields_identical": 4164,
+   "mismatches": [],
+   "matched": true,
+   "walks": 160,
+   "walks_correct": 160
+  },
+  {
+   "run": "stage_r_p337",
+   "committed": {
+    "path": "experiments/38_twist24_cheap_rep/stage_r_p337.json",
+    "sha256": "7046ac5dbcb4f2f96ebc296ad11a4acfce3055002d310d36be177c2ea268110d"
+   },
+   "replay_output": {
+    "path": "research/e34_twist24_cheap_rep_20261031/replay/stage_r_p337.json",
+    "sha256": "7046ac5dbcb4f2f96ebc296ad11a4acfce3055002d310d36be177c2ea268110d"
+   },
+   "byte_identical": true,
+   "fields_compared": 4164,
+   "fields_identical": 4164,
+   "mismatches": [],
+   "matched": true,
+   "walks": 160,
+   "walks_correct": 160
+  },
+  {
+   "run": "stage_r_p541",
+   "committed": {
+    "path": "experiments/38_twist24_cheap_rep/stage_r_p541.json",
+    "sha256": "9157d53db6e2d946590abc930a4a14ff913a666c3b6f172babae89dfb4c43986"
+   },
+   "replay_output": {
+    "path": "research/e34_twist24_cheap_rep_20261031/replay/stage_r_p541.json",
+    "sha256": "9157d53db6e2d946590abc930a4a14ff913a666c3b6f172babae89dfb4c43986"
+   },
+   "byte_identical": true,
+   "fields_compared": 4164,
+   "fields_identical": 4164,
+   "mismatches": [],
+   "matched": true,
+   "walks": 160,
+   "walks_correct": 160
+  },
+  {
+   "run": "stage_r_p601",
+   "committed": {
+    "path": "experiments/38_twist24_cheap_rep/stage_r_p601.json",
+    "sha256": "0cd28049524dd477171dfbfeedde23ade3cbe23c1e2dea54c3993ea092d3936d"
+   },
+   "replay_output": {
+    "path": "research/e34_twist24_cheap_rep_20261031/replay/stage_r_p601.json",
+    "sha256": "0cd28049524dd477171dfbfeedde23ade3cbe23c1e2dea54c3993ea092d3936d"
+   },
+   "byte_identical": true,
+   "fields_compared": 4164,
+   "fields_identical": 4164,
+   "mismatches": [],
+   "matched": true,
+   "walks": 160,
+   "walks_correct": 160
+  },
+  {
+   "run": "stage_r_p733",
+   "committed": {
+    "path": "experiments/38_twist24_cheap_rep/stage_r_p733.json",
+    "sha256": "0159a1acda5b8fe5ada1e6568ca8190b6373eb9117d7bdc97115a57519be0153"
+   },
+   "replay_output": {
+    "path": "research/e34_twist24_cheap_rep_20261031/replay/stage_r_p733.json",
+    "sha256": "0159a1acda5b8fe5ada1e6568ca8190b6373eb9117d7bdc97115a57519be0153"
+   },
+   "byte_identical": true,
+   "fields_compared": 4164,
+   "fields_identical": 4164,
+   "mismatches": [],
+   "matched": true,
+   "walks": 160,
+   "walks_correct": 160
+  },
+  {
+   "run": "stage_r_p769",
+   "committed": {
+    "path": "experiments/38_twist24_cheap_rep/stage_r_p769.json",
+    "sha256": "e57ebd0b2b336541ce87a863b70767618fe04b80efac21ae590b258b19fcf2bd"
+   },
+   "replay_output": {
+    "path": "research/e34_twist24_cheap_rep_20261031/replay/stage_r_p769.json",
+    "sha256": "e57ebd0b2b336541ce87a863b70767618fe04b80efac21ae590b258b19fcf2bd"
+   },
+   "byte_identical": true,
+   "fields_compared": 4164,
+   "fields_identical": 4164,
+   "mismatches": [],
+   "matched": true,
+   "walks": 160,
+   "walks_correct": 160
+  },
+  {
+   "run": "stage_r_p997",
+   "committed": {
+    "path": "experiments/38_twist24_cheap_rep/stage_r_p997.json",
+    "sha256": "6668ebb33c0f8c8eb7dde73a99e6d1a2168da630e9deb48b9a34f9bbeabd23ab"
+   },
+   "replay_output": {
+    "path": "research/e34_twist24_cheap_rep_20261031/replay/stage_r_p997.json",
+    "sha256": "6668ebb33c0f8c8eb7dde73a99e6d1a2168da630e9deb48b9a34f9bbeabd23ab"
+   },
+   "byte_identical": true,
+   "fields_compared": 4164,
+   "fields_identical": 4164,
+   "mismatches": [],
+   "matched": true,
+   "walks": 160,
+   "walks_correct": 160
+  }
+ ],
+ "limitations": [
+  "Local container (4 vCPU, shared), not isolab-eks; operation counts only, no wall time compared.",
+  "Binary hashes differ from the producer's (different build path); record identity is the claim.",
+  "The in-crate unit tests were not re-run (release test build needs ~9 GB of disk)."
+ ]
+}

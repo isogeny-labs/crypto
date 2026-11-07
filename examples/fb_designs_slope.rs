@@ -1866,10 +1866,30 @@ fn measure(eqs: &[Pol], n: usize, p: u64, sol: &[u64], budget: Duration) -> Valu
         .map(|e| e.to_poly(p))
         .filter(|f| !f.is_empty())
         .collect();
-    let opts = F4Options::new(Ordering::Grevlex, max_degree).with_budget(budget);
+    let mut opts = F4Options::new(Ordering::Grevlex, max_degree).with_budget(budget);
+    // Amendment 15: `run --checkpoint-every` has the child write its F4 state
+    // to `FB_CKPT` and resume from it. The F4 deadline counts the time already
+    // spent, and the time below is the run's total, not this process's.
+    let ckpt = std::env::var_os("FB_CKPT").map(std::path::PathBuf::from);
+    if let Some(path) = &ckpt {
+        let every = std::env::var("FB_CKPT_EVERY_S")
+            .ok()
+            .and_then(|s| s.parse().ok())
+            .unwrap_or(300);
+        opts = opts.checkpointing(path.clone(), Duration::from_secs(every));
+        // Amendment 16: also snapshot a long step's dense reduction
+        if let Some(step_every) = std::env::var("FB_CKPT_STEP_EVERY_S")
+            .ok()
+            .and_then(|s| s.parse::<u64>().ok())
+            .filter(|&s| s > 0)
+        {
+            opts = opts.checkpointing_in_step(Duration::from_secs(step_every));
+        }
+    }
     let started = Instant::now();
     let r = f4_fp::f4(&input, n, p, &opts);
-    let wall = started.elapsed().as_secs_f64();
+    let carried = r.resumed_ms / 1e3;
+    let wall = started.elapsed().as_secs_f64() + carried;
     let planted_ok = !r.inconsistent && r.basis.iter().all(|f| f4_fp::eval(f, sol, p) == 0);
     let status = if r.timed_out {
         "timeout"
@@ -1883,7 +1903,7 @@ fn measure(eqs: &[Pol], n: usize, p: u64, sol: &[u64], budget: Duration) -> Valu
         "planted_violation" => Value::from("the planted solution fails F4's basis"),
         _ => Value::Null,
     };
-    json!({
+    let mut row = json!({
         "input_degrees": d_in,
         "max_degree_bound": max_degree,
         "D": r.solving_degree_max,
@@ -1905,7 +1925,11 @@ fn measure(eqs: &[Pol], n: usize, p: u64, sol: &[u64], budget: Duration) -> Valu
         "planted_ok": planted_ok,
         "status": status,
         "failure_reason": reason,
-    })
+    });
+    if ckpt.is_some() {
+        merge(&mut row, &json!({"ckpt_carried_s": carried}));
+    }
+    row
 }
 
 /// Amendment 6: an A0 system on the sparse tower engine. The Kummer
@@ -2080,6 +2104,13 @@ fn one(
     merge(&mut built, &json!({"phase": "built"}));
     println!("{built}");
     std::io::stdout().flush().ok();
+    let segments = std::env::var("FB_CKPT").ok().map(|c| {
+        assert!(
+            !tower,
+            "checkpointing is for the F4 engine, not the tower engine"
+        );
+        track_segments(&c)
+    });
     let r = if tower {
         assert_eq!(arm, Arm::A0, "the tower engine runs A0 only (Amendment 6)");
         measure_tower(&eqs, n, m, t, prime_of(prime), &sol, budget)
@@ -2087,7 +2118,60 @@ fn one(
         measure(&eqs, n, prime_of(prime), &sol, budget)
     };
     merge(&mut row, &r);
+    if let Some(sg) = segments {
+        merge(&mut row, &json!({"segments": sg}));
+    }
     row
+}
+
+/// The sidecar of a checkpointed system: `{"segments", "peak_rss_kb"}`,
+/// outliving the processes that wrote it (as the checkpoint does).
+fn read_sidecar(ckpt: &str) -> (u64, u64) {
+    std::fs::read_to_string(format!("{ckpt}.peak"))
+        .ok()
+        .and_then(|s| serde_json::from_str::<Value>(&s).ok())
+        .map_or((0, 0), |v| {
+            (
+                v["segments"].as_u64().unwrap_or(0),
+                v["peak_rss_kb"].as_u64().unwrap_or(0),
+            )
+        })
+}
+
+/// Count this process as one more segment of the system and keep sampling
+/// its peak resident set (`VmHWM`) into the sidecar every 10 s, so a segment
+/// the host kills still leaves its peak (up to the last sample). Returns the
+/// segment number.
+fn track_segments(ckpt: &str) -> u64 {
+    let (segments, _) = read_sidecar(ckpt);
+    let segment = segments + 1;
+    let ckpt = ckpt.to_string();
+    let write = move |segment: u64| {
+        let hwm = std::fs::read_to_string("/proc/self/status")
+            .ok()
+            .and_then(|s| {
+                s.lines()
+                    .find(|l| l.starts_with("VmHWM:"))
+                    .and_then(|l| l.split_whitespace().nth(1)?.parse::<u64>().ok())
+            })
+            .unwrap_or(0);
+        let peak = hwm.max(read_sidecar(&ckpt).1);
+        let tmp = format!("{ckpt}.peak.tmp");
+        if std::fs::write(
+            &tmp,
+            json!({"segments": segment, "peak_rss_kb": peak}).to_string(),
+        )
+        .is_ok()
+        {
+            std::fs::rename(&tmp, format!("{ckpt}.peak")).ok();
+        }
+    };
+    write(segment);
+    std::thread::spawn(move || loop {
+        std::thread::sleep(Duration::from_secs(10));
+        write(segment);
+    });
+    segment
 }
 
 /// Two systems are the same when every equation has the same terms.
@@ -2337,15 +2421,45 @@ struct RunArgs {
     /// Amendment 11: the first target index to run (0 unless a later target
     /// is run on its own, after an earlier one).
     first_target: usize,
+    /// Amendment 15: seconds between F4 checkpoints of a system; 0 is off.
+    ckpt_every: u64,
+    /// Amendment 16: seconds between snapshots inside a step; 0 is off.
+    ckpt_step_every: u64,
 }
 
 /// Run one system in a child under `ulimit -v` and a hard wall limit of
 /// budget + grace; the row, or a failure row with its reason.
 // The child is reaped by `wait4`, which clippy cannot see.
 #[allow(clippy::zombie_processes)]
-fn run_child(a: &RunArgs, arm: Arm, m: usize, t: usize, k: usize, log: &mut File) -> Value {
+fn run_child(
+    a: &RunArgs,
+    arm: Arm,
+    m: usize,
+    t: usize,
+    k: usize,
+    ckpt: Option<&str>,
+    log: &mut File,
+) -> Value {
     let exe = std::env::current_exe().expect("current exe");
-    let mut child = Command::new("sh")
+    // A checkpoint left by a host that died: the budget is what remains.
+    let carried = ckpt
+        .and_then(|c| f4_fp::checkpoint_elapsed(std::path::Path::new(c)))
+        .map_or(0, |d| d.as_secs());
+    if let Some(c) = ckpt {
+        let (segments, _) = read_sidecar(c);
+        writeln!(
+            log,
+            "-- checkpoint {c}: {carried} s of the budget already spent, {segments} earlier segment(s)"
+        )
+        .ok();
+    }
+    let mut cmd = Command::new("sh");
+    if let Some(c) = ckpt {
+        cmd.env("FB_CKPT", c)
+            .env("FB_CKPT_EVERY_S", a.ckpt_every.to_string())
+            .env("FB_CKPT_STEP_EVERY_S", a.ckpt_step_every.to_string());
+    }
+    let mut child = cmd
         .arg("-c")
         .arg(format!("ulimit -v {} && exec \"$0\" \"$@\"", a.vmem_kb))
         .arg(&exe)
@@ -2404,13 +2518,27 @@ fn run_child(a: &RunArgs, arm: Arm, m: usize, t: usize, k: usize, log: &mut File
         out.read_to_string(&mut s).ok();
         s
     });
+    // The child's stderr goes to the log as it is written, so a segment that
+    // the host kills still leaves its checkpoint lines there.
+    let mut err_log = log.try_clone().expect("clone the log");
     let err_t = std::thread::spawn(move || {
         let mut s = String::new();
-        err.read_to_string(&mut s).ok();
+        let mut buf = [0u8; 4096];
+        loop {
+            match err.read(&mut buf) {
+                Ok(0) | Err(_) => break,
+                Ok(n) => {
+                    let chunk = String::from_utf8_lossy(&buf[..n]);
+                    s.push_str(&chunk);
+                    err_log.write_all(chunk.as_bytes()).ok();
+                    err_log.flush().ok();
+                }
+            }
+        }
         s
     });
     let started = Instant::now();
-    let limit = Duration::from_secs(a.budget + a.grace);
+    let limit = Duration::from_secs((a.budget + a.grace).saturating_sub(carried).max(a.grace));
     let mut killed = false;
     // `wait4` rather than `try_wait`, so the child's own peak resident set
     // (`ru_maxrss`, kB on Linux) comes back with its status. The `sh`
@@ -2431,13 +2559,14 @@ fn run_child(a: &RunArgs, arm: Arm, m: usize, t: usize, k: usize, log: &mut File
         }
         std::thread::sleep(Duration::from_millis(200));
     };
-    let peak_rss_kb = ru.ru_maxrss as u64;
+    let mut peak_rss_kb = ru.ru_maxrss as u64;
+    if let Some(c) = ckpt {
+        // earlier segments' peaks are in the sidecar
+        peak_rss_kb = peak_rss_kb.max(read_sidecar(c).1);
+    }
     let wall = started.elapsed().as_secs_f64();
     let stdout = out_t.join().unwrap_or_default();
     let stderr = err_t.join().unwrap_or_default();
-    if !stderr.is_empty() {
-        write!(log, "{stderr}").ok();
-    }
     let rows: Vec<Value> = stdout
         .lines()
         .filter_map(|l| serde_json::from_str(l).ok())
@@ -2491,6 +2620,20 @@ fn run_child(a: &RunArgs, arm: Arm, m: usize, t: usize, k: usize, log: &mut File
         &json!({"process_wall_s": wall, "budget_s": a.budget, "ulimit_v_kb": a.vmem_kb,
                 "peak_rss_kb": peak_rss_kb}),
     );
+    if let Some(c) = ckpt {
+        // the system has its row: its checkpoint and sidecar are spent
+        for ext in [
+            "",
+            ".prev",
+            ".tmp",
+            ".rref",
+            ".rref.tmp",
+            ".peak",
+            ".peak.tmp",
+        ] {
+            std::fs::remove_file(format!("{c}{ext}")).ok();
+        }
+    }
     row
 }
 
@@ -2530,7 +2673,8 @@ fn run(a: &RunArgs) {
             for t in a.t_min..=a.t_max {
                 let mut all_ok = true;
                 for k in a.first_target..a.first_target + a.targets {
-                    let mut row = run_child(a, arm, m, t, k, &mut log);
+                    let ckpt = (a.ckpt_every > 0).then(|| format!("{base}.t{t}.k{k}.ckpt"));
+                    let mut row = run_child(a, arm, m, t, k, ckpt.as_deref(), &mut log);
                     merge(&mut row, &json!({"git_commit": commit, "host": host}));
                     let line = format!(
                         "{:4} m={m} t={t:2} target={k} b={:.3} |V|={} n_vars={} n_eqs={} D={} reached={} {:.1} s {}{}",
@@ -4294,8 +4438,10 @@ fn admit_tower(dir: &str, out: &str, prime: usize) -> bool {
             distinct: c["distinct_targets"] == true,
             tower: true,
             first_target: 0,
+            ckpt_every: 0,
+            ckpt_step_every: 0,
         };
-        let mut row = run_child(&a, Arm::A0, m, t, k, &mut log);
+        let mut row = run_child(&a, Arm::A0, m, t, k, None, &mut log);
         let same = row["status"] == "ok"
             && row["D"] == c["D"]
             && row["inconsistent"] == false
@@ -4410,8 +4556,10 @@ fn replay(dir: &str, out: &str, groups: &[&str], prime: Option<usize>, only_prim
             distinct: c["distinct_targets"] == true,
             tower: c["engine"] == "f4_fp_tower",
             first_target: 0,
+            ckpt_every: 0,
+            ckpt_step_every: 0,
         };
-        let mut row = run_child(&a, arm, m, t, k, &mut log);
+        let mut row = run_child(&a, arm, m, t, k, None, &mut log);
         let fields = ["D", "max_cols", "max_rows", "steps"];
         let same = row["status"] == "ok" && fields.iter().all(|x| row[*x] == c[*x]);
         total += 1;
@@ -6054,6 +6202,9 @@ fn main() {
                 distinct: args.iter().any(|a| a == "--distinct-targets"),
                 tower: flag(&args, "--engine").is_some_and(|e| e == "tower"),
                 first_target: flag(&args, "--first-target").map_or(0, |s| s.parse().unwrap()),
+                ckpt_every: flag(&args, "--checkpoint-every").map_or(0, |s| s.parse().unwrap()),
+                ckpt_step_every: flag(&args, "--checkpoint-in-step-every")
+                    .map_or(0, |s| s.parse().unwrap()),
             };
             assert!(a.t_min >= 2, "t starts at 2");
             let two = (prime_of(a.prime) - 1).trailing_zeros() as usize;

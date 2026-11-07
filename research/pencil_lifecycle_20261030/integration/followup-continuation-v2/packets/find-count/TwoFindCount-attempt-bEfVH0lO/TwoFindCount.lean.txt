@@ -1,0 +1,37 @@
+import WordCounter
+set_option autoImplicit false
+namespace FindCount
+open SignedWord
+variable {n : Nat}
+theorem two_rank_bound (r : UInt64) (s t w : State n) (u v ru rv : Fin n) (pu pv : Pot)
+ (a b : Nat) (h1 : Counted r s u t ru pu a) (h2 : Counted r t v w rv pv b)
+ (rank : Fin n→Nat) (value : Fin n→F r) (k : F r)
+ (hp : 0<r.toNat) (hr : r.toNat≤2^63) (hg : Good r s)
+ (hf : GraphFind.Forest (decode r s) rank) (hv : GraphFind.Represents (decode r s) value k) :
+ a+b≤rank u+rank v+2 := by
+ have hfield:GraphFind.Run (decode r s) u (decode r t) ru (decPot r pu) :=
+   (run_refines r hp hr s t u ru pu (erase h1) hg).2.2
+ have htforest:GraphFind.Forest (decode r t) rank :=
+   (GraphFind.run_preserves _ _ u ru _ hfield rank value k hf hv).1
+ have hA:=rank_bound h1 rank hf
+ have hB:=rank_bound h2 rank htforest
+ omega
+
+theorem two_runs_counted (r : UInt64) (s t w : State n) (u v ru rv : Fin n) (pu pv : Pot)
+ (h1 : Run r s u t ru pu) (h2 : Run r t v w rv pv)
+ (rank : Fin n→Nat) (value : Fin n→F r) (k : F r)
+ (hp : 0<r.toNat) (hr : r.toNat≤2^63) (hg : Good r s)
+ (hf : GraphFind.Forest (decode r s) rank) (hv : GraphFind.Represents (decode r s) value k) :
+ ∃ a b,Counted r s u t ru pu a ∧ Counted r t v w rv pv b ∧ 2≤a+b ∧ a+b≤rank u+rank v+2 := by
+ obtain ⟨a,ha⟩:=lift h1
+ obtain ⟨b,hb⟩:=lift h2
+ have hA:=positive ha
+ have hB:=positive hb
+ exact ⟨a,b,ha,hb,by omega,two_rank_bound r s t w u v ru rv pu pv a b ha hb rank value k hp hr hg hf hv⟩
+
+theorem two_counter_exact (c : UInt64) (a b bound : Nat)
+ (hbound : a+b≤bound) (h : c.toNat+bound<UInt64.size) :
+ (ticks (ticks c a) b).toNat=c.toNat+a+b := by
+ rw [ticks_sequence,ticks_exact c (a+b) (by omega)]
+ omega
+end FindCount

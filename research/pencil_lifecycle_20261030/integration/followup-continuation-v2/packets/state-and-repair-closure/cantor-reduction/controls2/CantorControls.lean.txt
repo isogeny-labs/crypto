@@ -1,0 +1,24 @@
+import Composition
+set_option autoImplicit false
+namespace CantorControls
+open Polynomial CZeroCantor CZeroInterpolation
+theorem negative_remainder_example :
+ -(ordinate (4:ℚ) 5-C 3*CZeroInterpolation.support 1 2)=
+ (X-C 10)*(C 3*X+C 29)+C 291 := by
+ simp [ordinate,CZeroInterpolation.support]; ring
+theorem positive_sign_rejected : (-(ordinate (4:ℚ) 5-C 3*CZeroInterpolation.support 1 2)).eval 10 ≠ (-291:ℚ) := by
+ norm_num [ordinate,CZeroInterpolation.support]
+theorem wrong_abscissa_rejected :
+ (-(ordinate (4:ℚ) 5-C 3*CZeroInterpolation.support 1 2)).eval 9 ≠ (291:ℚ) := by
+ norm_num [ordinate,CZeroInterpolation.support]
+theorem unit_quotient_degree : (X-C (10:ℚ) : ℚ[X]).natDegree=1 := linear_degree _
+theorem multiplicity_allowed :
+ -(ordinate (4:ℚ) 5-C 3*CZeroInterpolation.support 0 0)=
+ (X-C 0)*negRemainderQuotient 0 4 3 0+C (-5) := by
+ simpa [ordinate,CZeroInterpolation.support] using negative_remainder_certificate (0:ℚ) 0 4 5 3 0
+theorem characteristic_two_identity :
+ -(ordinate (1:ZMod 2) 1-C 1*CZeroInterpolation.support 1 1)=
+ (X-C 1)*negRemainderQuotient 1 1 1 1+
+ C (-(ordinate (1:ZMod 2) 1-C 1*CZeroInterpolation.support 1 1).eval 1) := by
+ exact negative_remainder_certificate 1 1 1 1 1 1
+end CantorControls

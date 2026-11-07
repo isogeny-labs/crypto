@@ -1,0 +1,16 @@
+{
+ "title": "ECC2K-130 new-leads survey, 2026-10-23 (ideation, no measurement)",
+ "cost_tiers": {"1": "minutes to 1 h, small cells or stored records", "2": "hours, fits 16 GB if serial", "3": "days of engineering or large machine"},
+ "effect_scale": {"0": "accounting or reference correction (not an IC improvement)", "1": "stage diagnostic that fixes the cost model", "2": "possible measured improvement over the IC baseline if it succeeds"},
+ "leads": [
+  {"id": "L1", "rank": 1, "short": "Matched null N0 (22,7) + shape arms", "cost": 2, "effect": 1, "verdict": "keep", "ranked": true},
+  {"id": "L2", "rank": 2, "short": "Free leaf-count rescoring L=8+f", "cost": 1, "effect": 1, "verdict": "rescope", "ranked": true},
+  {"id": "L3", "rank": 3, "short": "E-capped closure, m=3 only", "cost": 1, "effect": 2, "verdict": "rescope", "ranked": true},
+  {"id": "L4", "rank": 4, "short": "Tree vs chain encoding, m=4 l=3,4", "cost": 2, "effect": 2, "verdict": "rescope", "ranked": true},
+  {"id": "L5", "rank": 5, "short": "Unequal-arity closure-degree probe", "cost": 1, "effect": 1, "verdict": "rescope", "ranked": true},
+  {"id": "L6", "rank": 6, "short": "Measured algebra constant, uniform matrices", "cost": 2, "effect": 1, "verdict": "rescope", "ranked": true},
+  {"id": "D1", "rank": null, "short": "Bailey sigma arm (reference)", "cost": 3, "effect": 0, "verdict": "rescope", "ranked": false},
+  {"id": "D2", "rank": null, "short": "Wide-path attribution/port", "cost": 3, "effect": 0, "verdict": "rescope", "ranked": false},
+  {"id": "D3", "rank": null, "short": "n=131 client Ir per step", "cost": 1, "effect": 0, "verdict": "rescope", "ranked": false}
+ ]
+}

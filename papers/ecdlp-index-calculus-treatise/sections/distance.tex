@@ -1,0 +1,481 @@
+\chapter{The distance to rho, family by family}\label{ch:distance}
+
+The distance between index calculus and a matched rho is given here family
+by family, each with its reference, its boundary and its validation status.
+A ratio is IC over rho: greater than 1 means rho is cheaper.
+Chapter~\ref{sec:frontier} gives the frontier campaign, the improvement
+ladders of 14--24 October and the three frontiers (cold, online, stage);
+this chapter adds the work of 25 October to 3 November. Under the
+proof-carrying-claims rule every leaderboard row named here has a
+\texttt{pcc} measurement claim, and every such claim has standing
+\emph{unverified} (\texttt{pcc.py standing}, 6 November). A figure without
+a claim id is a producer-reported value (an unverified assertion), whatever
+its validation-gate status.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-families.pdf}
+\caption[]{Distance to matched rho by family and size. Koblitz and prime
+curves: the frontier campaign's priced arms ($w=0.1$, 16 targets $\times$ 2
+rounds); open markers are the Koblitz rule at v8 (cold, 64 targets) and the
+prime planner cells ($w=0$). $k=4$ over $\FF_{(2^m)^4}$: the characteristic-two
+ladder against the negation-map rho model (filled) and a measured rho
+(open); the $n\approx2^{56}$ point is one target. Curves and units differ
+between families, so the lines are not ranked against each other. Sources:
+\art{figures/data-ledger.json}.}
+\label{fig:families}
+\end{figure}
+
+\section{The leaderboard, row by row}\label{sec:dist-board}
+
+The index-calculus leaderboard (\art{docs/ic/leaderboard.json} at
+\texttt{origin/main} \texttt{05f7382689}) has 28 board rows in three tables.
+Each table has its own unit, reference and floor, so a ratio is compared
+within its table only. Nineteen rows are validated and nine are unvalidated
+(pre-gate) (\texttt{validation\_gate.status\_counts}).
+Figure~\ref{fig:fr-leaderboard} plots every row against its reference, and
+Tables~\ref{tab:fr-boardB}--\ref{tab:fr-boardC} list every row.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-fr-leaderboard.pdf}
+\caption[]{The 28 leaderboard rows. (a) IC over each table's reference
+against subgroup size; bars are the board's 95\% intervals, which only
+Tables~A and~C carry; open markers are unvalidated (pre-gate). Units differ
+between tables (A and C: batched-addition units; B: GAE). (b) Table~B
+across the pricing band: IC over negation rho at $w=0$, $0.1$ and $1$ GAE
+per unpriced native operation, and at $w=1$ with the conservative extended
+charge (IC pair-table inserts and one table operation per rho step). Dashed
+line: ratio 1. Data: \art{figures/data-fr-leaderboard.json}, from
+\art{docs/ic/leaderboard.json} and
+\art{research/ic_validation_gate_20261024/B/rho-reference.json}.}
+\label{fig:fr-leaderboard}
+\end{figure}
+
+\paragraph{Table~B: prime and random binary, one target.} Thirteen rows,
+validated on 24 October. The best recipe per row is the minimum over nine
+recipes on three planted targets, a selection in IC's favour. Against the
+matched negation-map rho the rows run from $5.47$ (fp12) to $13.46$ (fp24)
+on prime curves and from $10.62$ (f2m18) to $38.21$ (f2m27) on random
+binary curves. Across the band the smallest ratio is $4.05$ (fp12, $w=1$,
+extended charge) and the largest $54.76$ (f2m27); no row reaches 1 at any
+weight. The column ``IC/frozen $\rho$'' is the same IC against the plain
+walk used through \S17 of the boundary ledger; Chapter~\ref{ch:audit}
+gives that correction.
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\input{figures/tab-fr-boardB}
+\caption[]{Leaderboard Table~B, all 13 rows, validated. $S$ in GAE per
+$\sqrt r$; $S_\rho$: matched negation-map rho, one target. IC/$\rho$: the
+board's ratio for its best recipe. IC/frozen $\rho$: the same IC over the
+frozen plain walk of \S17 (re-pricing of 23 September). $w=0$, $0.1$, $1$:
+the validation gate's band, for each weight the passing recipe with the
+smallest ratio, so its $w=0$ column is $0.940$--$0.995$ of the board's
+(ratio computed by \art{figures/make_tab_fr.py}). ``ext.'': the gate's
+conservative extension at $w=1$. Sources: \art{docs/ic/leaderboard.json};
+\art{research/ic_validation_gate_20261024/B/rho-reference.json};
+\art{research/ic_rho_reference_20260923/analysis.json}. Data:
+\art{figures/data-fr-leaderboard.json}.}
+\label{tab:fr-boardB}
+\end{table}
+
+\paragraph{Table~A: Koblitz, one target.} Six rows, validated at rule
+baseline v7. Cold IC over cold rho on the same unseen point, 64 points per
+size, runs from $3.43$ $[3.16,3.75]$ at $r=2^{36.64}$ to $11.51$
+$[10.24,13.06]$ at $2^{47.21}$. The rule~v7 \texttt{VALIDATION.json}
+records zero unpriced operations, so $S$ is the same at $w=0$, $0.1$ and~1
+and the band does not move any row. The online speed-up column compares IC
+holding its retained table with rho holding none; Chapter~\ref{ch:audit}
+retires every such win.
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{3.5pt}
+\input{figures/tab-fr-boardA}
+\caption[]{Leaderboard Table~A, all six rows, validated (rule v7). $S$ in
+batched-addition units per $\sqrt r$, each process measuring its own unit.
+IC/$\rho$, \S23: the before mark of 30 September. Online speed-up: rho's
+walk over IC's online phase, 64 targets. Break-even: targets after which
+IC's set-up is repaid against rho. Canon.\ step: rho's canonical batched
+step in units. Sources: \art{docs/ic/leaderboard.json};
+\art{research/ic_tool_program/rule/v7/analysis.json};
+\art{research/ic_tool_program/rule/v7/VALIDATION.json}. Data:
+\art{figures/data-fr-leaderboard.json}.}
+\label{tab:fr-boardA}
+\end{table}
+
+\paragraph{Table~C: Koblitz, 32-target batch.} Nine rows, unvalidated
+(pre-gate). A batch of 32 targets solved together and priced per target
+breaks the one-target rule, so the table is a historical diagnostic. The
+ratios run from $3.62$ $[3.28,3.97]$ ($2^{39}$) to $14.90$ $[13.78,16.05]$
+($2^{18}$). The gate's assessment finds the reference in another unit and
+another process, so no band is computable
+(\art{research/ic_validation_gate_20261024/C/rho-reference-assessment.json}).
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\input{figures/tab-fr-boardC}
+\caption[]{Leaderboard Table~C, all nine rows, unvalidated (pre-gate):
+\texttt{VALIDATION.json} missing, band not computable. $S$ per $\sqrt r$
+per target in batched-addition units; reference: batch rho with signed
+Frobenius and negation on the same 32 targets. IC/ref before: \S21 and
+\S22's baseline. Speed-up: \S22's descent over its baseline. Base: factor
+base points. Source: \art{docs/ic/leaderboard.json}
+(\art{research/ic_descent_20260930/analysis-isolated.json}). Data:
+\art{figures/data-fr-leaderboard.json}.}
+\label{tab:fr-boardC}
+\end{table}
+
+\section{Koblitz curves}
+
+The leaderboard's Table~A measures a Koblitz descent: aimed $m=3$
+collection, then an $m=2$ or $m=3$ descent. It is measured cold on one
+unseen public point per process, with 64 points per size, at six sizes
+from $2^{36.6}$ to $2^{47.2}$. Figure~\ref{fig:koblitz} shows the rule at
+three baselines, and Table~\ref{tab:distance-koblitz} gives its ratios.
+From v3 to v7 the rho stayed the same and index calculus became
+$1.52$--$1.89\times$ faster; the board carries the v7 figures, validated
+(\S\ref{sec:gate}). In v8, rho's signed-Frobenius canonicalisation, batched
+16 lanes at a time in the same binary, raised the gap by
+$1.30$--$1.58\times$ at every size. All six v8 values lie inside ranges
+declared before the rows were taken, and the 408 rows of each run all pass
+the \texttt{vs\_rho} check
+(\art{research/ic_tool_program/rule/v8/README.md}). The v3$\to$v7
+improvement lowered the constant, not the growth.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}l>{\raggedright}p{3.0cm}>{\raggedright}p{3.6cm}l>{\raggedright\arraybackslash}X@{}}
+\toprule
+Rule & Rho & IC/rho & Slope & Status \\
+\midrule
+v3 & same as v7 & $5.23$--$20.97$ & $0.176$ & \\
+v7 & same as v3 & $3.43$--$11.5$ & & on the board; validated; claims
+  \texttt{PCC-20261104-24b9af} and five more, unverified \\
+v8 & matched, same binary & $4.67$ $[4.34,5.07]$, $5.70$, $7.07$, $11.75$,
+  $10.65$, $18.07$ $[15.98,20.58]$ & $0.168$ $[0.128,0.208]$ & inside
+  pre-declared ranges; \texttt{VALIDATION.json} present (replay and
+  validator, \art{research/ic_tool_program/rule/v8/VALIDATION.json}); not on
+  the board, which still carries v7; no pcc claim \\
+\addlinespace
+v8 & canonical step (model) & $6.45$--$23.32$ & & in v8's unit \\
+v4 & canonical step (model) & $9.2$--$42.1$ & & \S\ref{sec:ladder3} \\
+\bottomrule
+\end{tabularx}
+\caption[]{The Koblitz rule (leaderboard Table~A) at each baseline. IC/rho:
+cold IC over cold rho on the same unseen public point, one point per
+process, 64 points per size; a range runs over the six sizes $2^{36.6}$ to
+$2^{47.2}$, and the v8 row lists all six values in the order the source
+gives them. Slope: of the gap in $\ln r$. The canonical-step rows are a
+model of rho, not a measured rho: rho priced at the canonical batched step.
+Source: \art{research/ic_tool_program/rule/v8/README.md}.}
+\label{tab:distance-koblitz}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-koblitz-rule.pdf}
+\caption[]{The Koblitz rule at three baselines: cold IC over cold rho on the
+same public point, 64 targets per size. From v3 to v7 the IC improved
+against the same rho. v8 runs the same IC against a matched, faster rho;
+its same-binary control, v8c, reproduces v7. The dash-dot line prices rho
+at the canonical step. Source:
+\art{research/ic_tool_program/rule/v8/README.md}.}
+\label{fig:koblitz}
+\end{figure}
+
+\paragraph{Every rule version, cell by cell.} Rule versions v3, v4, v6,
+v7, v8 and the v8 same-binary control v8c are on \texttt{main}; there is no
+v5 directory. Figure~\ref{fig:fr-rule} and Tables~\ref{tab:fr-rule}
+and~\ref{tab:fr-rulecanon} give each cell. v4 is a paired re-run of v3's
+recipe against a new one, 32 targets per size; its verdict was PARTIAL (one
+size of six improved, $n=57$). Against v8c, v8 raises the as-built gap by
+$1.30$--$1.58\times$; against v7 by $1.36$--$1.67\times$. With rho priced
+at the canonical step, v8 and v8c agree within $0.99$--$1.02\times$ at every
+size, so the v8 rise is in rho's as-built step, not in the index calculus
+(ratios computed by \art{figures/make_tab_fr.py}).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-fr-rule.pdf}
+\caption[]{The Koblitz rule at every version on \texttt{main}. (a) Cold IC
+over cold rho as built, same public point, with 95\% intervals (64
+targets per size; v4: 32 paired targets). (b) The same IC with rho priced
+at the canonical batched step; only v4 records an interval. Cells offset
+horizontally by version. Dashed line: ratio 1. Data:
+\art{figures/data-fr-rule.json}, from
+\art{research/ic_tool_program/rule/v3/analysis.json} through
+\art{research/ic_tool_program/rule/v8c/analysis.json}.}
+\label{fig:fr-rule}
+\end{figure}
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\input{figures/tab-fr-rule}
+\caption[]{Cold IC over cold rho as built, every cell of every rule version,
+with 95\% intervals; last rows: the fitted slope of the ratio in $\ln r$
+over six sizes (v4 fits none). Sources:
+\art{research/ic_tool_program/rule/\{v3,v4,v6,v7,v8,v8c\}/analysis.json}
+(\texttt{cold\_ratio\_ic\_over\_rho}; v4:
+\texttt{gap\_ic\_cold\_over\_rho\_cold.v4\_as\_built}). Data:
+\art{figures/data-fr-rule.json}.}
+\label{tab:fr-rule}
+\end{table}
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\input{figures/tab-fr-rulecanon}
+\caption[]{Cold IC over rho priced at the canonical batched step, every
+cell of every rule version; a model of rho, not a measured rho. Sources:
+\texttt{diagnostics.cold\_ratio\_rho\_at\_canonical\_step} of each
+\art{research/ic_tool_program/rule/*/analysis.json}; v4:
+\texttt{gap\_ic\_cold\_over\_rho\_cold.v4\_canonical}, with its interval.
+Data: \art{figures/data-fr-rule.json}.}
+\label{tab:fr-rulecanon}
+\end{table}
+
+\paragraph{The priced campaign.} The closest Koblitz arm, compact
+Frobenius orbits, is $3.8$--$15\times$ signed-Frobenius rho at $w=0$. Fully
+priced against fully priced rho, its best cell is $1.566$ $[0.992,2.347]$,
+and the ratio grows as $r^{0.165\,[0.117,0.213]}$. A later fully priced
+component on the same kind of cell, the lazy orbit-member index, is closer:
+$1.27$ $[0.77,1.80]$ over signed-Frobenius rho at $n=29$, $r=2^{15.4}$
+(\art{research/ecbench_lazy_orbit_members_20261018/}; a component, not a
+board row, not validated). No point estimate is below 1; at $r=2^{15.4}$
+the intervals include 1.
+
+\paragraph{$n=83$.} The cold pipeline uses the base K1107/root11, which
+confirmed a saving of $1.195$\,s $[0.957,1.433]$ on a $115$\,s process (16
+public points, GitHub Tier~1 host). The last cold ratio is the K1120
+holdout's $55.4$, from five points: cold IC over the same-point plain-rho
+online wall (rho has no set-up, so its online wall is its cold cost;
+Chapter~\ref{sec:koblitz} admits no cold ratio on a stricter reading). A matched precomputed-rho
+reproduction on 28 October gave the median online IC over rho of
+Table~\ref{tab:distance-n83}, for three ways of matching rho's
+precomputation. Cold, IC took $155.5$\,s against $36.96$\,s for plain rho over all 16
+targets. In operation counts the order flips across the pricing band, so
+no ranking is made.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}lrl@{}}
+\toprule
+Rho precomputation & IC/rho & Interval \\
+\midrule
+650\,s table walks & $40.9$ & $[7.58,141.9]$ \\
+walks matched to IC set-up & $4.10$ & $[1.58,24.8]$ \\
+table matched to IC memory & $33.1$ & $[6.60,74.4]$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Koblitz $n=83$, base K1107/root11: median online IC over a
+precomputed rho, by how rho's precomputation is matched; matched
+reproduction of 28 October. L0 shared VM, one run, no replay certificate or
+validator report; public reproduction panel, not a holdout;
+producer-reported. Source:
+\art{research/n83_k1107_bl_reproduction_20261028/RESULT.md}.}
+\label{tab:distance-n83}
+\end{table}
+
+\section{Prime curves}
+
+\paragraph{Generic track.} The prime-field programme's owner decisions of
+29 October split prime-field index calculus into two counted tracks
+(\art{research/prime_ic_program_20261029/DECISIONS.md}):
+\begin{itemize}
+\item a \emph{generic} track, with table, pair-table and root-finding
+  oracles, labelled ``bounded by $\sqrt r$; cannot beat rho'';
+\item an \emph{algebraic} track, whose prime baseline is empty.
+\end{itemize}
+Table~\ref{tab:distance-prime} gives the distances on the generic track.
+The campaign pair table's exponent against rho's is the $r^{2/3}$ against
+$r^{1/2}$ of Chapter~\ref{ch:model}. The $k$-sum oracle
+(\art{research/prime_ksum_table_20261028/}) is a negation-folded table of
+every signed 4-sum of a smaller base. It lowers mean $S$ at $w=0$ by
+$1.9\times$ at 20 bits, rising to $7.2\times$ at 40 bits ($83.7\to11.6$),
+and its fitted exponent falls from $0.620$ $[0.586,0.650]$ to the
+tabulated value, against the theory value $k/(2k-1)=4/7$. 2{,}016 runs
+were verified and replayed; the source notes that the method is generic,
+so its limit is baby-step giant-step. The new 20-bit baseline
+(\art{research/prime_base_oracle_tuning_20261029/}) raises the factor base
+from 32 to 45, which gives $0.818$ $[0.773,0.866]$ of the incumbent at
+$w=0$; a second host (L2) replayed all 1{,}008 records identically and gave
+$0.836$ $[0.806,0.866]$. The same rule at 24 and 28 bits was a
+relabelling, and at 32 bits null.
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{3.6cm}l>{\raggedright}p{2.6cm}>{\raggedright}p{2.4cm}>{\raggedright\arraybackslash}X@{}}
+\toprule
+Arm & Bits & IC/rho & Exponent & Status \\
+\midrule
+Residual collector \texttt{res1eq} & 36, 37 & $1.54$, $1.64$ & rho's &
+  \texttt{VALIDATION.json}; not an admitted row \\
+Residual collector \texttt{res2} & 36 & $2.59$ & rho's & improvement-log
+  row; no validator \\
+\addlinespace
+Table~B prime rows & 10--24 & $5.47$--$13.5$ & & validated; claims
+  unverified \\
+\addlinespace
+Campaign pair table & 20 & $9.8$ ($w=0.1$: $10.5$) & $0.620$ $[0.557,0.663]$ & \\
+ & 40 & $95.2$ ($w=0.1$: $101.8$) & & \\
+\addlinespace
+$k$-sum table (28 October) & 20 & $5.3$ & $0.521$ $[0.506,0.538]$ & L0; no validation \\
+ & 40 & $13.1$ & & \\
+\addlinespace
+New 20-bit baseline & 20 & $7.75$ $[6.92,8.70]$ & & validated component;
+  incumbent $9.47$ in the same session (board row $8.30$) \\
+\addlinespace
+Planner cells & 23.5--29.6 & $12.6$--$25.8$ & & supplementary cells \\
+\bottomrule
+\end{tabularx}
+\caption[]{Generic-track prime-field index calculus. IC/rho: cost over
+rho, as each source states it (Table~B against matched negation rho; the
+new baseline against negation rho), at $w=0$ unless marked; greater than 1
+means rho is cheaper. Exponent: fitted cost exponent in $r$ at $w=0$; the
+campaign's rho with negation fits $0.435$; ``rho's'' marks an arm at rho's
+exponent. The text's $0.620$ $[0.586,0.650]$ is the $k$-sum study's refit
+of the same pair-table arm. All rows except Table~B carry no pcc claim and
+are producer-reported. The full prime-field list is
+Table~\ref{tab:pg-summary}. Sources: leaderboard Table~B
+(claims \texttt{PCC-20261104-f4bc7f}, \texttt{-a93a81} and six more);
+\art{benchmarks/20261101-ic-residual-dp-eq/VALIDATION.json};
+\art{research/ic_planner_exhaustive_20261026/README.md}; the campaign
+(\S\ref{sec:campaign}); \art{research/prime_ksum_table_20261028/};
+\art{research/prime_base_oracle_tuning_20261029/};
+\art{research/ic_planner_validation_20261020/README.md}.}
+\label{tab:distance-prime}
+\end{table}
+
+\paragraph{Algebraic track.} The Kummer tower is $29$--$159\times$ rho at
+$w=0$ (29.4 at 24 bits, \art{research/pkm_tower_ecbench_20261013/README.md};
+158.9 $[121.6,221.4]$ at 30 bits). No algebraic prime baseline exists.
+Its solving degree is the subject of \S\ref{sec:fd-pkm}.
+
+\section{Binary curves of prime degree}
+
+Table~B's random-binary rows are $10.6$--$38.2\times$ matched rho at
+$\FF_{2^{15}}$--$\FF_{2^{27}}$, and they are validated. A cofactor-projected
+base cuts three of them by $1.29$--$3.36\times$, leaving $6.1$--$14.4\times$.
+That base is not yet a board row. For Certicom ECC2-131, the $m=3$ floor
+with a free oracle is already above rho~(Chapter~\ref{sec:binary}).
+
+\section{Weak extension-field families}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-weak.pdf}
+\caption[]{Weak families.
+\emph{Left:} genus-3 GHS index calculus (hyperelliptic, double large primes,
+round 4) over the ideal strong rho on 21 instances of $E_0(\FF_{q^3})$,
+in round 4's unit. Blue: one subgroup multiplication priced at one
+$\FF_q$ multiplication, the registered unit. Orange: priced at nine, the
+protocol's sensitivity. Below the dashed line IC is cheaper. Source:
+\art{research/ghs3_vs_rho_20261023/TABLES.md}.
+\emph{Right:} plane-quartic (Diem) index calculus, N4~v2. Fitted exponents
+of cold cost in $q$ over $k=8$--$22$ against plain and negation rho, at
+$w=0$. Dotted line: $\tilde O(q)$. Dashed line: rho's $q^{3/2}$. Source:
+\art{research/quartic_n4v2_20261020/README.md}. Data:
+\art{figures/data-new.json}.}
+\label{fig:weak}
+\end{figure}
+
+Only in these families (Figure~\ref{fig:weak},
+Table~\ref{tab:distance-weak}) does index calculus approach rho or go
+below it. The genus-3 hyperelliptic row and the Joux--Vitse sieve row are
+the programme's preregistered decisions of IC below the strongest rho, and
+the sieve row is the only one validated
+(Chapter~\ref{sec:transfer}, \S\ref{sec:jac-jv}). It has no pcc claim, so
+its statement is an unverified assertion under the proof-carrying-claims
+rule. The plane-quartic row uses double large
+primes, structured elimination and Lanczos; its 501 IC units and 2{,}442
+rho runs are all verified, and it is a measurement of a known result
+(Diem, Diem--Thomé).
+
+\begin{table}[t]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{2.4cm}>{\raggedright}p{1.5cm}>{\raggedright}p{2.6cm}>{\raggedright}p{1.7cm}>{\raggedright}p{1.8cm}>{\raggedright\arraybackslash}X@{}}
+\toprule
+Family & Size & IC/rho & Rho & Exponents & Status \\
+\midrule
+Genus 3, cubic GHS, hyperelliptic & $q=2^{16}$ & $0.70$, $0.71$, $0.70$ &
+  ideal rho & pooled slope $0.034$ per bit, $[-0.047,\allowbreak 0.105]$ &
+  preregistered; at $c_\ell=9$ every instance $2.7$--$12.4$ \\
+Genus 3, cubic GHS, plane quartic (Diem) & $q=2{,}097{,}091$ & $0.005$
+  $[0.004,0.008]$ & negation rho & $0.983$ $[0.975,0.993]$ against $1.543$
+  & interpolated crossover $q^*=555$ $[389,752]$; L0; no validation file \\
+\addlinespace
+Joux--Vitse cover, sieve route & $p=1511$ & $0.00647$ $[0.00545,0.00799]$
+  (U1); $0.0156$ (U2); $0.107$--$0.123$ at $w=0.1$, 1 & matched negation rho
+  (142 pooled runs) & & validated (\texttt{VAL-20261103-\allowbreak c31c76}); weak class
+  only; unemitted work upper-bounded; local run \\
+Joux--Vitse cover, plain Nagao arm & $p=1009$ & $1.59$--$1.98$ & pooled
+  rho constant & & lower bound; against matched negation rho above at
+  $p=1301$ ($1.41$) and $1451$ ($1.16$), unresolved at $1601$
+  (\S\ref{sec:jac-jv}) \\
+\addlinespace
+$k=4$ over $\FF_{(2^m)^4}$ & $m=15$ & $5.2$ & & & after corrections;
+  crossover unsupported \\
+\addlinespace
+GHS covers over $\FF_{4096}$ & & $549$--$2{,}039$ & & & exact genus-3
+  covers found by search; full transfer cost \\
+\bottomrule
+\end{tabularx}
+\caption[]{Weak extension-field families. IC/rho: cost over the stated rho
+reference; greater than 1 means rho is cheaper. Exponents: fitted cost
+exponent in $q$, IC against rho. Genus-3 hyperelliptic: at six other sizes
+the decision is unresolved; $c_\ell=9$ prices one subgroup multiplication
+at nine $\FF_q$ multiplications. Plane quartic: three caveats, the host was
+L0 under heavy load, there is no validation file, and the frozen baseline's
+records do not replay. Joux--Vitse sieve: U1 is group additions, U2
+textbook $\FF_p$ multiplications; the $w>0$ cells price the cover's
+unemitted F4, descent and linear-algebra work as an upper bound; the order
+holds across the band in all four cells. Only the genus-3 and Joux--Vitse
+sieve rows ran under a frozen protocol, and no row has a pcc claim.
+Sources: Chapter~\ref{sec:transfer};
+\art{research/quartic_n4v2_20261020/};
+\art{research/jv_sieve_negrho_20261102/VALIDATION.json};
+\art{research/jv_cover_negrho_rescore_20261101/README.md};
+Chapter~\ref{ch:extension};
+\art{research/ghs_q16_genus3_subcovers_20261028/REPORT.md}.}
+\label{tab:distance-weak}
+\end{table}
+
+\section{Summary}
+
+\begin{table}[h]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright}p{3.9cm}l>{\raggedright\arraybackslash}X@{}}
+\toprule
+Family & IC/rho & Qualifier \\
+\midrule
+Joux--Vitse cover, sieve route, $p=1511$ & $0.0065$ & matched negation rho; weak class; validated (\texttt{VAL-20261103-c31c76}); no pcc claim \\
+Plane quartic via cubic GHS, $q\approx2^{21}$ & $0.005$ & negation rho; weak family; L0; no validation file; producer-reported \\
+Genus-3 hyperelliptic via GHS, $q=2^{16}$ & $0.70$ & ideal strong rho; one size of seven; pricing-sensitive; producer-reported \\
+Joux--Vitse cover, plain Nagao arm & $1.16$ & matched negation rho at $p=1451$; above rho at 1301 and 1451; producer-reported \\
+Koblitz, lazy orbit-member index, $n=29$ & $1.27$ $[0.77,1.80]$ & fully priced; component, not a board row; not validated \\
+Prime, residual collector \texttt{res1eq}, 36 bits & $1.54$ & rho's exponent; \texttt{VALIDATION.json}, not an admitted row \\
+Prime, residual collector \texttt{res2}, 36 bits & $2.59$ & $w=0$; improvement-log row; no validator \\
+Koblitz rule v8, $2^{36.6}$ & $4.67$ & cold, matched, 64 targets; \texttt{VALIDATION.json}; not on the board \\
+$k=4$, $\FF_{(2^m)^4}$, $m=15$ & $5.2$ & two targets; crossover unsupported \\
+Prime, $k$-sum table, 20 bits & $5.3$ & generic track; not validated \\
+Prime, Table~B, 12 bits & $5.47$ & validated; \texttt{PCC-20261104-f4bc7f} (unverified) \\
+Random binary, Table~B, 15 bits & $10.6$ & validated; \texttt{PCC-20261104-876bdc} (unverified) \\
+Koblitz $n=83$ & $55.4$ & cold IC over same-point plain-rho wall, five points \\
+\bottomrule
+\end{tabularx}
+\caption[]{Smallest measured distances to rho, by family. A row without
+a pcc claim id is producer-reported (an unverified assertion).}
+\label{tab:nearest}
+\end{table}
+
+On every prime-order curve of cryptographic shape that the programme
+measured (at the toy and medium sizes measured, $\le2^{47}$), rho is
+cheaper. Index calculus goes below rho only in weak
+extension-field families, which is where theory said it would. There the
+programme's contribution is matched, priced, verified measurement of
+known algorithms.

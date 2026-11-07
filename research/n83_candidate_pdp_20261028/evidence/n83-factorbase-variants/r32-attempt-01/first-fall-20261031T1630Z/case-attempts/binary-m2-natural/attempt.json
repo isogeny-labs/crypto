@@ -1,0 +1,36 @@
+{
+  "certificate_sha256": "2d54530e61f7b58c670dd0073e4d4d9899be22ce703ec6ed13595a27a6b229bd",
+  "closure_rank": null,
+  "command": [
+    "timeout",
+    "--kill-after=5s",
+    "60s",
+    "prlimit",
+    "--as=8589934592",
+    "--",
+    "/home/ec2-user/crypto-n83-degree-sweep-20261027/research/n83_candidate_pdp_20261028/target/release/fall",
+    "run",
+    "/tmp/n83-candidate-fall/spike32/cases/binary-m2-natural/input",
+    "/tmp/n83-candidate-fall/spike32/cases/binary-m2-natural/result"
+  ],
+  "elapsed_seconds": 0.859,
+  "family": "binary",
+  "first_fall_degree": 2,
+  "first_fall_lower_bound": 2,
+  "id": "binary-m2-natural",
+  "input_sha256": "e18ecb9cab38be03426567a5ddeb1b851acd8c4500eb760aa33210ab11064ec3",
+  "last_fall_degree": null,
+  "m": 2,
+  "replay": {
+    "returncode": 0,
+    "stderr": "",
+    "stdout": "{\"input\":\"binary-m2-natural\",\"kind\":\"explicit polynomial witness or coefficient-minor replay; not independent research review\",\"verified\":true}\n",
+    "verified": true
+  },
+  "returncode": 0,
+  "status": "completed",
+  "stderr": "",
+  "stdout": "{\"first_fall_degree\":2,\"first_fall_lower_bound\":2,\"id\":\"binary-m2-natural\",\"status\":\"certified\"}\n",
+  "system_sha256": "2da29f08a8bda431817ed2c2fae08a32ef57ff2ff51de6aff8d24cec84dfcb1b",
+  "target_kind": "natural"
+}

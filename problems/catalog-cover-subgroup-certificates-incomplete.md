@@ -103,6 +103,28 @@ comparison.
 - **Recheck trigger:** new exact-order proofs, completed catalog binary
   certificates, or a balanced prime-cover transfer implementation.
 
+## 2026-10-27: live geometry and dated assessment scopes
+
+The live registry now has 20,592 map rows and 994 EC1 representations. Native
+geometry regeneration preserves every old map and adds 4,801 rows; the additions
+include six binary and nine extension-field EC1 representations. Geometry
+verification supplies no missing subgroup-transfer certificate.
+
+The separately dated transfer assessment explicitly binds catalog commit
+`728304718cb0ab6df70da620a908a5f76f175293`: 15,791 maps, 15,789 covers, 557 fields
+and 979 EC1 representations. Its original profiles, memberships, supported and
+unknown statuses, and independent semantic digests remain unchanged. The
+4,801 new maps and 15 new EC1 representations fall outside that assessment;
+they inherit no old transfer-support result.
+
+The next coverage task is to bind a new assessment to the enlarged registry,
+enumerate those exact new map and subgroup identities, and obtain or explicitly
+leave unknown each required source-order, induced-map, image/kernel and recovery
+receipt. Existing certificates must retain their exact identity scope. Merely
+copying the earlier profile counts or relabelling geometry as transfer evidence
+does not satisfy this obligation. The historical counts below remain their
+original dated observations.
+
 ## Resolution and history
 
 Unresolved. Classifying every tuple, including an explicit `unknown`, fulfills

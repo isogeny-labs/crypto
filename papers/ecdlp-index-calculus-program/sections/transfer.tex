@@ -135,6 +135,61 @@ operation; and it is not yet reviewed. It updates the ledger paper's
 crossover at $q\le2^{22}$ once rho is measured: below rho at one size,
 unresolved at the others, with no measurable pooled trend.
 
+\paragraph{The same family through a plane quartic.} The $m=2$ type of the
+cubic GHS cover gives a smooth plane quartic over $\FF_q$ directly. On a
+plane quartic, Diem's index calculus is $\tilde O(q)$ in theory, against
+$q^{4/3}$ for the hyperelliptic genus-3 route above. Before 18 October the
+repository's plane-quartic ``pure IC'' toys could not be priced: their
+logarithms came from enumerating the subgroup, and the degree-3 class keys
+merged distinct classes. A canonical $\mathrm{Pic}^0$ arithmetic now gives
+every class a unique key (checked against brute-force class counts on 21
+curves and full Cayley tables at $q=5$). A generic addition costs 3{,}523
+multiplications and 44 inversions, flat in $q$ up to $2^{31}-1$
+(\art{research/quartic_pic_canonical_20261018/}).
+
+On that arithmetic, a pipeline with relations on lines, a reduced factor base
+with one large prime, Lanczos modulo $\ell$ and canonical descent solved and
+verified 51 of 51 units. It ran on the GHS-weak family $E_0/\FF_{q^3}$ with
+$4\mid\#E_0$, for $q=223$ to $262{,}111$ (\art{research/quartic_n4_20261019/}).
+\begin{itemize}
+  \item Its reference is a matched \emph{plain} rho, without the negation
+    map, on the same subgroup.
+  \item At $q=262{,}111$, index calculus costs $0.122$ $[0.10,0.16]$ of that
+    rho in $\FF_q$-multiplication equivalents. The order holds across the
+    pricing band for every $q\ge4051$.
+  \item The fitted exponents on $q\ge4051$ are $1.083$ $[1.040,1.129]$ for
+    index calculus and $1.485$ $[1.437,1.525]$ for rho.
+  \item In wall time, index calculus is cheaper only above $q\approx3\times10^4$.
+\end{itemize}
+This is a preregistered decision of index calculus below a matched plain rho,
+not below the strongest rho of the previous paragraph. A study that adds
+double large primes, structured elimination and a negation-map rho is open
+and not yet merged (Appendix~\ref{sec:openprs}). The result covers the
+GHS-weak family only; nothing here is about a generic curve, a prime-order
+curve or a standard curve.
+
+\paragraph{Smith's isogeny and the walk to it.} The other genus-3 type of the
+census is hyperelliptic. Smith's $(2,2,2)$-isogeny takes it to a plane quartic
+when his Propositions~2 and~4 pass. The walk study looked for curves on which
+Smith's construction succeeds by walking 2-isogenies on the elliptic side
+(\art{research/smith_elliptic_walk_20261018/}).
+\begin{itemize}
+  \item Exhaustively at $p=7$ to $31$, $0.53$--$0.61$ of the descended curves
+    pass Smith's full test, against $0.1857$ for random curves. The
+    preregistered expectation of about $0.186$ is falsified, upward.
+  \item A failing curve has a passing one in its 2-isogeny component in
+    $0.74$--$0.98$ of cases, at a mean distance of $1.5$--$3.6$ steps.
+  \item On sampled walks at $p=2^{10}$ to $2^{20}$, the frozen fit labels the
+    walk cost $o(p)$, with exponent $-0.14$ $[-0.80,0.95]$.
+  \item A labelled post hoc analysis attributes that label to censored walks
+    at the small primes. Successful walks at $p\equiv3\pmod4$ scale as
+    $p^{1.13}$ $[1.00,1.26]$ in cost, which reads as $\tilde\Theta(p)$.
+  \item At $p\equiv1\pmod4$ most walks stay inside small trapped sets.
+\end{itemize}
+A second study, also open and not yet merged, maps divisor classes through
+Smith's isogeny and runs the whole route at toy sizes. The program's closing
+note lists what stays open (\art{research/plane_quartic_program_20261018/CLOSING.md}).
+
 \paragraph{Joux--Vitse: two arms of one cover.} The Joux--Vitse cover of
 $E(\FF_{p^6})$ (full rational 2-torsion, a weak class) has been measured
 with two solvers, and their comparisons with rho do not agree. The

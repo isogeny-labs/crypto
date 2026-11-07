@@ -1,0 +1,73 @@
+{
+  "arms": [
+    {
+      "method": {
+        "id": "ic.three_leads_genus2_target_rank_v1",
+        "params": {
+          "trial_cap": "4955100"
+        }
+      },
+      "name": "genus_target_rank",
+      "role": "candidate"
+    }
+  ],
+  "description": "Original 1,260-target exact-order cohort; target-coefficient rank continuation; unchanged projective backend; all candidate work charged; L0 operation counts",
+  "label": "target-rank-projective-order-genus-28",
+  "measurement": {
+    "isolation_required": "L2",
+    "order": "shuffle",
+    "rounds": 1,
+    "seed": 2026101801,
+    "timeout_seconds": 1200,
+    "warmup": 0
+  },
+  "schema": "ecbench.spec/v1",
+  "workloads": {
+    "curves": [
+      {
+        "a": 1188265641,
+        "b": 886362972,
+        "family": "scholten",
+        "group_order": 2340895888,
+        "gx": 1555971173,
+        "gy": 981607540,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 48383,
+        "parameter": 0,
+        "r": 146305993
+      },
+      {
+        "a": 1859678294,
+        "b": 795088787,
+        "family": "scholten",
+        "group_order": 2383749328,
+        "gx": 327656729,
+        "gy": 1392028161,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 48823,
+        "parameter": 0,
+        "r": 148984333
+      },
+      {
+        "a": 2050048520,
+        "b": 1120869215,
+        "family": "scholten",
+        "group_order": 2445391472,
+        "gx": 1049618031,
+        "gy": 1929908632,
+        "kind": "three_leads",
+        "modulus": 1,
+        "n": 2,
+        "p": 49451,
+        "parameter": 0,
+        "r": 152836967
+      }
+    ],
+    "target_seed": 202610181260,
+    "targets_per_curve": 60
+  }
+}

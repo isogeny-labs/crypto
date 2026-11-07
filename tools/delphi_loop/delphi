@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Drop-in $DELPHI for tools/task_card.py lane: `route` is answered by the
+# delphi-loop registry (tools/delphi_loop/loop.py), everything else goes to the
+# real delphi binary ($DELPHI_REAL, default `delphi` on PATH).
+#
+#   DELPHI=tools/delphi_loop/delphi python3 tools/task_card.py lane ... --route
+set -euo pipefail
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [[ "${1:-}" == "route" ]]; then
+  shift
+  exec python3 "$here/loop.py" route "$@"
+fi
+real="${DELPHI_REAL:-delphi}"
+if [[ "$(command -v "$real" || true)" == "$here/delphi" ]]; then
+  echo "delphi-loop shim: DELPHI_REAL points back at the shim; set it to the real delphi binary" >&2
+  exit 2
+fi
+exec "$real" "$@"

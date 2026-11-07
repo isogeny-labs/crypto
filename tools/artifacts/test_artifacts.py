@@ -152,6 +152,9 @@ class RoundTrip(unittest.TestCase):
         diffs = [line for line in log.read_text().splitlines() if " diff " in f" {line} " and "--raw" in line]
         self.assertTrue(diffs, "check never ran git diff --raw")
         self.assertTrue(all("--no-abbrev" in line for line in diffs), diffs)
+        sizes = [line for line in log.read_text().splitlines() if " cat-file " in f" {line} "]
+        self.assertEqual(len(sizes), 1)
+        self.assertIn("--batch-check", sizes[0])
 
     def test_pull_into_absent_sparse_directory_preserves_bytes_and_clean_tree(self):
         self.art("push", "research/r1/runs/a.jsonl")
@@ -178,6 +181,27 @@ class RoundTrip(unittest.TestCase):
         self.art("push", "new.jsonl")
         self.git("commit", "-qm", "move it")
         self.assertEqual(self.art("check", base).returncode, 0)
+
+    def test_migrate_from_subdirectory_resolves_root_level_candidates(self):
+        base = self.git("rev-parse", "HEAD").strip()
+        payload = os.urandom(100_000)
+        (self.repo / "new.jsonl").write_bytes(payload)
+        self.git("add", "new.jsonl")
+        self.git("commit", "-qm", "add root-level data")
+        caller = self.repo / "research"
+
+        dry = self.art("migrate", base, "--dry-run", cwd=caller)
+        self.assertIn("new.jsonl", dry.stdout)
+        self.assertEqual(self.art("migrate", base, cwd=caller).returncode, 0)
+
+        tracked = self.git("ls-files").splitlines()
+        self.assertNotIn("new.jsonl", tracked)
+        manifest = self.repo / ".artifacts.json"
+        self.assertTrue(manifest.is_file())
+        entry = json.loads(manifest.read_text())["files"]["new.jsonl"]
+        digest = hashlib.sha256(payload).hexdigest()
+        self.assertEqual(entry, {"sha256": digest, "bytes": len(payload)})
+        self.assertEqual((self.remote / "sha256" / digest[:2] / digest).read_bytes(), payload)
 
     def test_migrate_selects_changed_data_and_replays_remote(self):
         base = self.git("rev-parse", "HEAD").strip()
@@ -304,6 +328,54 @@ class WorkflowWiringPaths(unittest.TestCase):
             wire_workflows.needed("run: ls research/notes/index-calculus/reports/run-1", moved, dirs),
             ["research/notes/index-calculus/reports/run-1"],
         )
+
+
+class WorkflowSparsePatterns(unittest.TestCase):
+    """The pull step needs tools/artifacts and the .artifacts config in a sparse checkout."""
+
+    def test_block_list_gets_tools_and_config(self):
+        block = ["      - uses: actions/checkout@v4",
+                 "        with:",
+                 "          sparse-checkout-cone-mode: false",
+                 "          sparse-checkout: |",
+                 "            /docs/x/"]
+        out = wire_workflows.add_sparse_pattern(block, "      ")
+        self.assertEqual(out[-3:], ["            /docs/x/", "            /tools/artifacts/", "            /.artifacts/"])
+
+    def test_scalar_pattern_becomes_a_list(self):
+        block = ["      - uses: actions/checkout@v4",
+                 "        with:",
+                 "          sparse-checkout: taskq/deploy/eks-karpenter"]
+        out = wire_workflows.add_sparse_pattern(block, "      ")
+        self.assertEqual(out[2:], ["          sparse-checkout: |",
+                                   "            taskq/deploy/eks-karpenter",
+                                   "            tools/artifacts",
+                                   "            .artifacts"])
+
+    def test_existing_patterns_are_not_duplicated(self):
+        block = ["      - uses: actions/checkout@v4",
+                 "        with:",
+                 "          sparse-checkout: |",
+                 "            tools/artifacts",
+                 "            .artifacts"]
+        self.assertEqual(wire_workflows.add_sparse_pattern(block, "      "), block)
+
+
+class WorkflowPullStep(unittest.TestCase):
+    WF = "jobs:\n  a:\n    steps:\n      - uses: actions/checkout@v4\n      - run: make\n"
+
+    def test_step_installs_the_aws_cli_when_absent(self):
+        out, _ = wire_workflows.wire(self.WF, ["docs/x"])
+        self.assertIn("if ! command -v aws >/dev/null; then", out)
+        self.assertIn('export ARTIFACTS_AWS="$artifacts_cli_aws"', out)
+        self.assertIn("awscli==1.46.2", out)
+        self.assertTrue(out.endswith("      - run: make\n"))
+
+    def test_rewiring_is_idempotent_and_refreshes_a_stale_step(self):
+        once, _ = wire_workflows.wire(self.WF, ["docs/x"])
+        self.assertEqual(wire_workflows.wire(once, ["docs/x"])[0], once)
+        stale = once.replace("pull --jobs 16 docs/x", "pull docs/old")
+        self.assertEqual(wire_workflows.wire(stale, ["docs/x"])[0], once)
 
 
 class S3Argv(unittest.TestCase):

@@ -1,0 +1,23 @@
+test_duplicate_json_rejected (test_assemble.Admission) ... ok
+test_unadmitted_fails_without_effects (test_assemble.Admission) ... ok
+test_expired_admission_rejected (test_assemble.AdmissionBindings) ... ok
+test_one_use_marker (test_assemble.AdmissionBindings) ... ok
+test_same_author_rejected (test_assemble.AdmissionBindings) ... ok
+test_structural_review_joins (test_assemble.AdmissionBindings) ... ok
+test_wrong_review_binding_rejected (test_assemble.AdmissionBindings) ... ok
+test_absolute_expiry_rejected_even_with_monotonic_time_left (test_assemble.CompletionGuard) ... ok
+test_valid_completion_allowed (test_assemble.CompletionGuard) ... ok
+test_changed_context_rejected (test_assemble.Workflow) ... ok
+test_existing_tag_stops_before_build (test_assemble.Workflow) ... ok
+test_failed_build_not_retried (test_assemble.Workflow) ... ok
+test_final_context_expiry_rejects_success (test_assemble.Workflow) ... ok
+test_final_context_signal_rejects_success (test_assemble.Workflow) ... ok
+test_onbuild_stops_before_build (test_assemble.Workflow) ... ok
+test_success_one_copy_build (test_assemble.Workflow) ... ok
+test_timeout_not_retried (test_assemble.Workflow) ... ok
+test_wrong_owner_rejected (test_assemble.Workflow) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.017s
+
+OK

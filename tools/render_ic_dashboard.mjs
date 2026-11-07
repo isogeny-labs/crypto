@@ -286,6 +286,12 @@ const rhoGraph = `<div class="rho-plot" data-measurement-chart role="group" aria
 let page = readFileSync(PAGE, 'utf8');
 const oldFront = between(page, START, END);
 const historical = section(oldFront, 'lab-best');
+// Recover the exact historical panel from its canonical committed source,
+// rather than depending on a previous render retaining it. These bytes come
+// from 0a0cb3e8f9:docs/index-calculus-scoreboard.html without recomputation.
+const threeLeadsRaw = readFileSync(resolve(ROOT, 'docs/ic/three-leads-e2e-panel.html'));
+assert.equal(sha(threeLeadsRaw), '23ee9d71ab77e9a5673fd8c15aa8edad06da22ad4c1cd0f798b932b3c01f8084', 'Historical three-leads panel changed; review its original evidence before changing the pin');
+const threeLeads = threeLeadsRaw.toString('utf8');
 const progressRaw = readFileSync(resolve(ROOT,'docs/ic/progress-timeline.json'));
 // GHS-weak E0/F_{q^3} plane-quartic panel: rendered from the committed frozen
 // summaries only (no arithmetic beyond formatting).
@@ -338,6 +344,17 @@ const retainedPanels = [
     const marker = /(<script type="application\/json" id="progress-data">)[\s\S]*?(<\/script>)/;
     assert.ok(marker.test(html), 'Progress panel has no canonical data embed');
     html = html.replace(marker, (_, start, end) => start + progressRaw.toString('utf8') + end);
+    const timeline = JSON.parse(progressRaw);
+    const table = /(<summary>Every plotted point as a table<\/summary>[\s\S]*?<tbody>)[\s\S]*?(<\/table>)/;
+    assert.ok(table.test(html), 'Progress panel has no plotted-point table');
+    const rows = timeline.series.flatMap(series => series.points.map(point => {
+      assert.ok(Number.isFinite(point.value), `Invalid progress value: ${point.label}`);
+      const unit = point.unit ? `<br><small>${escape(point.unit)}</small>` : '';
+      // Keep each result's cost boundary, uncertainty and reference limitations
+      // beside its value; these are recorded descriptions, not new estimates.
+      return `<tr><td>${escape(point.date)}</td><td>${escape(series.label)}<br><small>${escape(series.note)}</small></td><td>${escape(point.label)}<br><small>${escape(point.detail)}</small></td><td class="n">${point.value}&times;${unit}</td><td>${escape(point.reference)}</td><td><span class="chip">${escape(point.class)}</span></td><td><a href="${escape(point.anchor)}">panel</a> &middot; <a href="${escape(point.source)}">source</a></td></tr>`;
+    })).join('\n');
+    html = html.replace(table, (_, start, end) => start + '\n' + rows + '\n</tbody>' + end);
   }
   return {id,label,html};
 });
@@ -427,6 +444,7 @@ ${[['rho-strong','Strong signed-Frobenius rho','—','—'],['ic-k8','K8','592',
 
 <section class="dash-section" id="lab-next" aria-labelledby="next-title"><div class="dash-section-head"><div><p class="dash-kicker">05 / Tournament design</p><h2 id="next-title">A local win is a candidate, not a final answer.</h2></div></div><div class="tournament-flow" aria-label="Proposed tournament flow"><article><span class="flow-number">01 / EXPLORE</span><strong>Keep diverse candidates</strong><p>Different bases, solver families and stage combinations. Preserve alternatives with different resource tradeoffs.</p></article><article><span class="flow-number">02 / ADMIT</span><strong>Pass correctness gates</strong><p>Source identity, natural yield, failed attempts, complete costs and verified recovered answers.</p></article><article><span class="flow-number">03 / COMPARE</span><strong>Pair frozen workloads</strong><p>Same fresh point, resources and reference. Screening and untouched confirmation have separate roles.</p></article><article><span class="flow-number">04 / DECIDE</span><strong>Promote or retain</strong><p>Apply the declared uncertainty gate. Keep negative outcomes and useful alternatives for later combinations.</p></article></div><div class="next-callout"><span class="status pending">Next gate</span><div><strong>Produce both native natural-yield records.</strong><p>Use each exact pipeline, retaining failed attempts. Then freeze new target exclusions, calibrated resources and strong references before a fresh paired tournament. The three historical confirmation sets remain closed.</p></div></div><p class="dash-footnote panel-summary">This diagram describes the proposed process. It does not claim that a fresh F5/SAT tournament has run, or that any implementation is globally fastest.</p></section>
 
+${threeLeads}
 <section class="dash-library-intro" id="evidence-search" aria-labelledby="library-title"><p class="dash-kicker">06 / Evidence</p><h2 id="library-title">Open the detail you need.</h2><p class="panel-summary">The historical ledger contains other curves, cost units and questions. Its reports are preserved; they are not a combined leaderboard.</p><label for="evidence-query">Search historical reports</label><input id="evidence-query" type="search" placeholder="Frobenius, F5, rho, factor base…" autocomplete="off" aria-controls="evidence-results"><p id="evidence-count" aria-live="polite"></p><ul id="evidence-results"></ul><noscript><p>Open the full ledger below and use your browser’s Find command.</p></noscript></section><details class="dash-details" id="historical-regimes"><summary>Historical best results by regime · different workloads and accounting</summary><div class="dash-detail-body">${historical}</div></details>
 ${historicalDetails}
 </main>
@@ -441,6 +459,7 @@ page = page.replace(/<link[^>]*href="https:\/\/fonts\.[^"]*"[^>]*>\n?/g, '');
 page = page.replace('it loads two webfont\n  families from Google Fonts and needs nothing else.', 'its overview needs no network requests\n  or installed dependencies.');
 assert.equal(between(page, '<div id="legacy-evidence">', '<!-- END IC EVIDENCE LIBRARY -->'), ledgerBefore, 'Historical ledger changed');
 assert.ok(page.includes(historical), 'Historical regime summary lost');
+assert.ok(page.includes(threeLeads), 'Three-leads results panel lost');
 for (const panel of retainedPanels) assert.ok(page.includes(panel.html), `Historical panel lost: ${panel.id}`);
 const data = {
   schema_version: 3, scope: 'bounded IC autolab overview; not all repository research',
@@ -461,6 +480,7 @@ const data = {
   rho_online_table: Object.values(rows).map(row=>Object.fromEntries(['alias','online_ms','rho_online_over_IC_online','verified','scheduled'].map(key=>[key,row[key]]))),
   historical_ledger_sha256: sha(ledgerBefore), historical_regime_summary_sha256: sha(historical),
   historical_overview_panels: retainedPanels.map(panel=>({section_id:panel.id,sha256:sha(panel.html)})),
+  three_leads_panel_sha256: sha(threeLeads),
   progress_timeline_sha256: sha(progressRaw)
 };
 const output = JSON.stringify(data,null,2) + '\n';

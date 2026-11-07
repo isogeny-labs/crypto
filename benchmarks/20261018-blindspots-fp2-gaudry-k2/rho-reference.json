@@ -1,0 +1,197 @@
+{
+  "draft": true,
+  "note": "Draft rho_reference descriptor for VALIDATION.json (docs/VALIDATION_GATE.md); not VALIDATION.json itself.",
+  "scope": "Headline cell: torsion family (cofactor 4, 6 curves), log2#E = 40, best IC arms ic-b and ic-c2 against matched rho-neg, 2 IC targets and 8 rho targets a curve.",
+  "kind": "negation",
+  "kind_by_family": {
+    "torsion": "negation (rho-neg; Aut = {+-1}, j not in F_p by the trace test)",
+    "prime": "negation (rho-neg; Aut = {+-1}, j not in F_p by the trace test)",
+    "gls": "negation_frobenius (rho-psi: classes {+-P, +-psiP}, psi the twisted p-power Frobenius). Only ic-gls-psi / rho-psi is against the strongest available reference; the README's GLS rows ic-gls-neg / rho-neg and ic-gls-psi / rho-neg are not. j = 0 (an order-6 automorphism, a larger fold) is not excluded by the trace test for: ['fp2-gls-b24-i0-p4027']."
+  },
+  "protocol": "PROTOCOL.md 'Decision rule (frozen)': matched rho of the family, rho-neg (Van Oorschot-Wiener on {P, -P}, r-adding walk, 16 jumps below 2^30 and 32 above, distinguished points with floor(log2 r / 4) bits, one addition a walk start, short-cycle escape by doubling, answer verified) for ic-a, ic-b, ic-c1, ic-c2, ic-gls-neg; rho-psi for ic-gls-psi",
+  "unit": "GAE (group-addition equivalents). IC: counted F_p multiplication equivalents (inversion = 4) divided by c_add, the measured mult-eq of one affine addition on the same curve (24 at inv-cost 4). Rho: counted group additions plus doublings, 1 GAE each. Unpriced native operations of every arm priced at w GAE each (w = 0, 0.1, 1).",
+  "binary_or_process": "One process per curve: each torsion-b40-i{0..5}.jsonl came from a single invocation of the card-built binary target/blindspots-01/card-NN/b01 run with --arms 'ic-a:0-1,ic-b:0-1,ic-c1:0-1,ic-c2:0-1,rho-neg:0-7' (cards 05, 06, 07). Every card built that binary with the same rustc command from examples/blindspots_01_fp2_gaudry.rs sha256 0629a73c7ff443e70c6ce16c0872b98a5aebc5a71d25f7bff60156c8693ff559, verified at each receipt's commit; the file now lives byte-identically at research/blindspots_20261018/instruments/blindspots_01_fp2_gaudry.rs. The binary's own sha256 was not recorded (each card deletes it).",
+  "matches_protocol": true,
+  "strongest_available": true,
+  "same_unit": true,
+  "same_binary_or_process": true,
+  "gae_band": {
+    "0": {
+      "ic": 21186871.024305556,
+      "rho": 410948.9166666667
+    },
+    "0.1": {
+      "ic": 21383961.549305554,
+      "rho": 533765.7020833333
+    },
+    "1": {
+      "ic": 23157776.274305552,
+      "rho": 1639116.7708333333
+    }
+  },
+  "order_holds_across_band": true,
+  "band_arm": "ic-c2",
+  "band_cost_definition": "Mean over the 6 torsion curves of the per-curve mean total cost per verified solve, GAE, gae_priced + w * native_total; the ratio of these is the protocol gap.",
+  "band_ratio": {
+    "0": 51.55597244581832,
+    "0.1": 40.062449621326586,
+    "1": 14.128204095265312
+  },
+  "gae_band_by_arm": {
+    "ic-b": {
+      "0": {
+        "ic": 20564802.211805556,
+        "rho": 410948.9166666667,
+        "ratio": 50.042234880707326
+      },
+      "0.1": {
+        "ic": 22150942.578472223,
+        "rho": 533765.7020833333,
+        "ratio": 41.49937414864836
+      },
+      "1": {
+        "ic": 36426205.878472224,
+        "rho": 1639116.7708333333,
+        "ratio": 22.22306947658952
+      }
+    },
+    "ic-c2": {
+      "0": {
+        "ic": 21186871.024305556,
+        "rho": 410948.9166666667,
+        "ratio": 51.55597244581832
+      },
+      "0.1": {
+        "ic": 21383961.549305554,
+        "rho": 533765.7020833333,
+        "ratio": 40.062449621326586
+      },
+      "1": {
+        "ic": 23157776.274305552,
+        "rho": 1639116.7708333333,
+        "ratio": 14.128204095265312
+      }
+    }
+  },
+  "best_arm_note": "ic-b is cheaper than ic-c2 at w = 0 and dearer at w = 0.1 and 1 (ic-b < ic-c2: [True, False, False]), so by AGENTS.md 5a the two are unresolved against each other. ic-c2 is shown because it is best at two of three weights and has the smallest ratio in the band; the IC-vs-rho order holds for both arms at every weight.",
+  "evidence": {
+    "matches_protocol": "raw rows: arm rho-neg, fold 2, 8 targets on each of the 6 curves, all verified; argv per card",
+    "strongest_available": {
+      "curves": 30,
+      "all_p_prime": true,
+      "all_r_prime": true,
+      "all_hasse_ok": true,
+      "all_ordinary": true,
+      "any_j0_or_j1728_possible": false,
+      "any_j_in_Fp_base_change_possible": false,
+      "any_j_in_Fp_twist_possible": false,
+      "all_j_in_Fp_twist_possible": false,
+      "j0_or_j1728_not_excluded": []
+    },
+    "same_unit": {
+      "c_add_mult_eq_values": [
+        24
+      ],
+      "rho_doubling_share_b40": 0.018191890030127427,
+      "rho_neg_canonicalisation_fp_mult_eq_all_zero": true
+    },
+    "same_binary_or_process": {
+      "torsion-b40-i0.jsonl": {
+        "card": 5,
+        "command_id": "torsion-b40-i0",
+        "ic_arms": [
+          "ic-a",
+          "ic-b",
+          "ic-c1",
+          "ic-c2"
+        ],
+        "rho_arms": [
+          "rho-neg"
+        ],
+        "same_invocation": true,
+        "rows_match_argv": true,
+        "binary": "target/blindspots-01/card-05/b01"
+      },
+      "torsion-b40-i1.jsonl": {
+        "card": 5,
+        "command_id": "torsion-b40-i1",
+        "ic_arms": [
+          "ic-a",
+          "ic-b",
+          "ic-c1",
+          "ic-c2"
+        ],
+        "rho_arms": [
+          "rho-neg"
+        ],
+        "same_invocation": true,
+        "rows_match_argv": true,
+        "binary": "target/blindspots-01/card-05/b01"
+      },
+      "torsion-b40-i2.jsonl": {
+        "card": 6,
+        "command_id": "torsion-b40-i2",
+        "ic_arms": [
+          "ic-a",
+          "ic-b",
+          "ic-c1",
+          "ic-c2"
+        ],
+        "rho_arms": [
+          "rho-neg"
+        ],
+        "same_invocation": true,
+        "rows_match_argv": true,
+        "binary": "target/blindspots-01/card-06/b01"
+      },
+      "torsion-b40-i3.jsonl": {
+        "card": 6,
+        "command_id": "torsion-b40-i3",
+        "ic_arms": [
+          "ic-a",
+          "ic-b",
+          "ic-c1",
+          "ic-c2"
+        ],
+        "rho_arms": [
+          "rho-neg"
+        ],
+        "same_invocation": true,
+        "rows_match_argv": true,
+        "binary": "target/blindspots-01/card-06/b01"
+      },
+      "torsion-b40-i4.jsonl": {
+        "card": 7,
+        "command_id": "torsion-b40-i4",
+        "ic_arms": [
+          "ic-a",
+          "ic-b",
+          "ic-c1",
+          "ic-c2"
+        ],
+        "rho_arms": [
+          "rho-neg"
+        ],
+        "same_invocation": true,
+        "rows_match_argv": true,
+        "binary": "target/blindspots-01/card-07/b01"
+      },
+      "torsion-b40-i5.jsonl": {
+        "card": 7,
+        "command_id": "torsion-b40-i5",
+        "ic_arms": [
+          "ic-a",
+          "ic-b",
+          "ic-c1",
+          "ic-c2"
+        ],
+        "rho_arms": [
+          "rho-neg"
+        ],
+        "same_invocation": true,
+        "rows_match_argv": true,
+        "binary": "target/blindspots-01/card-07/b01"
+      }
+    }
+  }
+}

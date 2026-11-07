@@ -1,0 +1,53 @@
+{
+  "schema": "ic.line-layout.analysis/v6",
+  "protocol_id": "IC-LINE-LAYOUT-E2E-FP28-V6-20261106",
+  "ecbench_sha256": "73362eed4165d6db20fe1d398baa8fabefa2497aff6e78dab9ed8f31af31dd01",
+  "allowed_native_counters": [],
+  "verdict": "invalid_measurement",
+  "sessions": [
+    {
+      "session": 1,
+      "dir": "/tmp/claude-0/-home-user/fe537fb0-7f2e-504d-8df2-39e551cfffea/scratchpad/v6/s3-untrusted/session",
+      "verify_exit": 0,
+      "verdict": "inconclusive",
+      "gates": {
+        "replay_and_audit": true,
+        "counted_parity_ops": true,
+        "counted_parity_records": true,
+        "admission": true,
+        "aa_inside_0_9_1_1": true,
+        "positive_control_detected": true,
+        "total_and_corrected_ci_below_1": false,
+        "outside_noise": true
+      }
+    },
+    {
+      "session": 2,
+      "dir": "/tmp/claude-0/-home-user/fe537fb0-7f2e-504d-8df2-39e551cfffea/scratchpad/v6/s1-untrusted/session",
+      "verify_exit": 0,
+      "verdict": "invalid_measurement",
+      "gates": {
+        "replay_and_audit": true,
+        "counted_parity_ops": true,
+        "counted_parity_records": true,
+        "admission": true,
+        "aa_inside_0_9_1_1": false,
+        "positive_control_detected": true,
+        "total_and_corrected_ci_below_1": false,
+        "outside_noise": true
+      }
+    }
+  ],
+  "counted": {
+    "dir": "/tmp/claude-0/-home-user/fe537fb0-7f2e-504d-8df2-39e551cfffea/scratchpad/v6/counted-untrusted/session",
+    "verify_exit": 0,
+    "acceptance": {
+      "audit_and_replay": true,
+      "invalid_outcomes_empty": true,
+      "incumbent_candidate_records_equal_wall_sessions": true,
+      "incumbent_candidate_ops_ratio_1_at_w0_0_1_1": true
+    },
+    "note": "inputs to the validation gate only; no wall field of this session is read or reported"
+  },
+  "rule": "both independent L2 wall sessions must pass replay and audit, exact counted parity (ops and record level), admission, the A/A interval aa_ci95 of the incumbent-vs-candidate comparison (aa_arms incumbent and incumbent-aa, self_aa false) and of control-comparison.json each non-null, containing 1 and inside [0.9,1.1], the pc-fb2x positive control and wholly-below-1 total and corrected intervals outside the A/A noise; per-session verdict precedence: invalid_measurement, supported_within_scope, within_control_distribution, inconclusive; overall: all supported, else invalid_measurement, else inconclusive, else within_control_distribution"
+}

@@ -1,0 +1,19 @@
+stage repro done 2026-11-05T03:37:17Z
+stage p2k24 done 2026-11-05T03:41:00Z
+finished
+# restart 2026-11-05T03:58:45Z: stage order changed to p1k24 p2k28 p1k28 p1k20 (k=20 deep-G anchor last)
+./run_cells.sh: line 13: 24150 Aborted                 F4COST_PLANTED=$pl timeout $((cap+100)) "$BIN" f4cost $k $form $t $g $nt $seed $cap $m $mode 0 $nnz 0 > "$c.out" 2> "$c.stderr"
+./run_cells.sh: line 13: 24942 Aborted                 F4COST_PLANTED=$pl timeout $((cap+100)) "$BIN" f4cost $k $form $t $g $nt $seed $cap $m $mode 0 $nnz 0 > "$c.out" 2> "$c.stderr"
+# resume 2026-11-05T05:59:12Z: driver chain hit the 2 h background limit; interrupted cell removed and rerun
+./run_cells.sh: line 13: 28046 Aborted                 F4COST_PLANTED=$pl timeout $((cap+100)) "$BIN" f4cost $k $form $t $g $nt $seed $cap $m $mode 0 $nnz 0 > "$c.out" 2> "$c.stderr"
+./run_cells.sh: line 13: 28060 Aborted                 F4COST_PLANTED=$pl timeout $((cap+100)) "$BIN" f4cost $k $form $t $g $nt $seed $cap $m $mode 0 $nnz 0 > "$c.out" 2> "$c.stderr"
+./run_cells.sh: line 13: 28294 Aborted                 F4COST_PLANTED=$pl timeout $((cap+100)) "$BIN" f4cost $k $form $t $g $nt $seed $cap $m $mode 0 $nnz 0 > "$c.out" 2> "$c.stderr"
+./run_cells.sh: line 13: 28319 Aborted                 F4COST_PLANTED=$pl timeout $((cap+100)) "$BIN" f4cost $k $form $t $g $nt $seed $cap $m $mode 0 $nnz 0 > "$c.out" 2> "$c.stderr"
+stage p1k24 done 2026-11-05T06:59:20Z
+stage p2k28 done 2026-11-05T07:02:06Z
+# resume 2026-11-05T08:03:42Z: second 2 h background limit; interrupted cell removed and rerun
+stage p1k28 done 2026-11-05T08:18:55Z
+./run_cells.sh: line 13:  1873 Aborted                 F4COST_PLANTED=$pl timeout $((cap+100)) "$BIN" f4cost $k $form $t $g $nt $seed $cap $m $mode 0 $nnz 0 > "$c.out" 2> "$c.stderr"
+./run_cells.sh: line 13:  2879 Aborted                 F4COST_PLANTED=$pl timeout $((cap+100)) "$BIN" f4cost $k $form $t $g $nt $seed $cap $m $mode 0 $nnz 0 > "$c.out" 2> "$c.stderr"
+stage p1k20 done 2026-11-05T09:44:40Z
+finished

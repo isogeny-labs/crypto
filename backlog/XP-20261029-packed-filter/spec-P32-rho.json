@@ -1,0 +1,72 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "XP-20261029-packed-filter P32 counted session: matched rho.negation for dgb and dgbf at N 1024",
+ "description": "Frozen protocol (backlog/XP-20261029-packed-filter/PROTOCOL.md and APPROVAL.md): counted S of dgb and dgbf with the matched rho.negation reference and its A/A; no wall field of this session is read.",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_search",
+    "bits": 32,
+    "seed": 202610296323
+   },
+   {
+    "kind": "prime_search",
+    "bits": 32,
+    "seed": 202610296324
+   }
+  ],
+  "targets_per_curve": 24,
+  "target_seed": 202610296326,
+  "target_kind": "public"
+ },
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "dgb",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1024",
+     "oracle": "mitm-prime-blocked:m=2",
+     "max_trials": "167871873",
+     "targets": "stride-renew-deferred-guard"
+    }
+   }
+  },
+  {
+   "name": "dgbf",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=1024",
+     "oracle": "mitm-prime-blocked:m=2,filter=1",
+     "max_trials": "167871873",
+     "targets": "stride-renew-deferred-guard"
+    }
+   }
+  },
+  {
+   "name": "rho-neg-aa",
+   "role": "control",
+   "method": {
+    "id": "rho.negation"
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 6,
+  "warmup": 1,
+  "order": "alternate",
+  "seed": 202610296328,
+  "isolation_required": "L2",
+  "timeout_seconds": 1800
+ }
+}

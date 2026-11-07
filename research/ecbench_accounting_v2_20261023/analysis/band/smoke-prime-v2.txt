@@ -1,0 +1,50 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp20-t727-cd198a38 | 19.10 | bsgs-il-v2 | 6/6 | 0.885 | 1.052 | 2.553 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | bsgs-neg-v2 | 6/6 | 0.971 | 1.063 | 1.889 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | bsgs-v2 | 6/6 | 1.468 | 1.610 | 2.886 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | ic-mitm | 6/6 | 10.492 | 11.902 | 24.591 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | kangaroo-v2 | 6/6 | 1.981 | 2.004 | 2.213 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | rho-neg | 6/6 | 1.319 | 1.429 | 2.419 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | rho-neg-v2 | 6/6 | 1.411 | 1.537 | 2.670 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | rho-neg-v2-aa | 6/6 | 1.411 | 1.537 | 2.670 | — |
+| icv1-fp20-t727-cd198a38 | 19.10 | rho-plain | 6/6 | 1.441 | 1.441 | 1.441 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp20-t727-cd198a38 | bsgs-il-v2 vs bsgs-neg-v2 | unresolved inside the band |
+| icv1-fp20-t727-cd198a38 | bsgs-il-v2 vs bsgs-v2 | bsgs-il-v2 < bsgs-v2 |
+| icv1-fp20-t727-cd198a38 | bsgs-il-v2 vs ic-mitm | bsgs-il-v2 < ic-mitm |
+| icv1-fp20-t727-cd198a38 | bsgs-il-v2 vs kangaroo-v2 | unresolved inside the band |
+| icv1-fp20-t727-cd198a38 | bsgs-il-v2 vs rho-neg | unresolved inside the band |
+| icv1-fp20-t727-cd198a38 | bsgs-il-v2 vs rho-neg-v2 | bsgs-il-v2 < rho-neg-v2 |
+| icv1-fp20-t727-cd198a38 | bsgs-il-v2 vs rho-neg-v2-aa | bsgs-il-v2 < rho-neg-v2-aa |
+| icv1-fp20-t727-cd198a38 | bsgs-il-v2 vs rho-plain | unresolved inside the band |
+| icv1-fp20-t727-cd198a38 | bsgs-neg-v2 vs bsgs-v2 | bsgs-neg-v2 < bsgs-v2 |
+| icv1-fp20-t727-cd198a38 | bsgs-neg-v2 vs ic-mitm | bsgs-neg-v2 < ic-mitm |
+| icv1-fp20-t727-cd198a38 | bsgs-neg-v2 vs kangaroo-v2 | bsgs-neg-v2 < kangaroo-v2 |
+| icv1-fp20-t727-cd198a38 | bsgs-neg-v2 vs rho-neg | bsgs-neg-v2 < rho-neg |
+| icv1-fp20-t727-cd198a38 | bsgs-neg-v2 vs rho-neg-v2 | bsgs-neg-v2 < rho-neg-v2 |
+| icv1-fp20-t727-cd198a38 | bsgs-neg-v2 vs rho-neg-v2-aa | bsgs-neg-v2 < rho-neg-v2-aa |
+| icv1-fp20-t727-cd198a38 | bsgs-neg-v2 vs rho-plain | unresolved inside the band |
+| icv1-fp20-t727-cd198a38 | bsgs-v2 vs ic-mitm | bsgs-v2 < ic-mitm |
+| icv1-fp20-t727-cd198a38 | bsgs-v2 vs kangaroo-v2 | unresolved inside the band |
+| icv1-fp20-t727-cd198a38 | bsgs-v2 vs rho-neg | rho-neg < bsgs-v2 |
+| icv1-fp20-t727-cd198a38 | bsgs-v2 vs rho-neg-v2 | rho-neg-v2 < bsgs-v2 |
+| icv1-fp20-t727-cd198a38 | bsgs-v2 vs rho-neg-v2-aa | rho-neg-v2-aa < bsgs-v2 |
+| icv1-fp20-t727-cd198a38 | bsgs-v2 vs rho-plain | rho-plain < bsgs-v2 |
+| icv1-fp20-t727-cd198a38 | ic-mitm vs kangaroo-v2 | kangaroo-v2 < ic-mitm |
+| icv1-fp20-t727-cd198a38 | ic-mitm vs rho-neg | rho-neg < ic-mitm |
+| icv1-fp20-t727-cd198a38 | ic-mitm vs rho-neg-v2 | rho-neg-v2 < ic-mitm |
+| icv1-fp20-t727-cd198a38 | ic-mitm vs rho-neg-v2-aa | rho-neg-v2-aa < ic-mitm |
+| icv1-fp20-t727-cd198a38 | ic-mitm vs rho-plain | rho-plain < ic-mitm |
+| icv1-fp20-t727-cd198a38 | kangaroo-v2 vs rho-neg | unresolved inside the band |
+| icv1-fp20-t727-cd198a38 | kangaroo-v2 vs rho-neg-v2 | unresolved inside the band |
+| icv1-fp20-t727-cd198a38 | kangaroo-v2 vs rho-neg-v2-aa | unresolved inside the band |
+| icv1-fp20-t727-cd198a38 | kangaroo-v2 vs rho-plain | rho-plain < kangaroo-v2 |
+| icv1-fp20-t727-cd198a38 | rho-neg vs rho-neg-v2 | rho-neg < rho-neg-v2 |
+| icv1-fp20-t727-cd198a38 | rho-neg vs rho-neg-v2-aa | rho-neg < rho-neg-v2-aa |
+| icv1-fp20-t727-cd198a38 | rho-neg vs rho-plain | unresolved inside the band |
+| icv1-fp20-t727-cd198a38 | rho-neg-v2 vs rho-neg-v2-aa | unresolved inside the band |
+| icv1-fp20-t727-cd198a38 | rho-neg-v2 vs rho-plain | unresolved inside the band |
+| icv1-fp20-t727-cd198a38 | rho-neg-v2-aa vs rho-plain | unresolved inside the band |

@@ -1,0 +1,10 @@
+Pre-correction source: validation/pre-lint-input-sha256.txt.
+Command: cargo +1.98.0 clippy --release --locked --lib --tests --example aps_single_relation_check -- -D warnings
+Observed exit: 101. One new manual_is_multiple_of warning, in the independent
+APS witness check. Raw dependency/build output remains private.
+
+Replace x % r != 0 with !x.is_multiple_of(r) on the already validated nonzero
+subgroup order. No assertion, acceptance condition, test or lint gate is removed.
+The corrected inputs are pinned separately. Corrected checks must actually
+exit before any pass is reported. The original broad library run continues
+on its pre-correction compiled binary; never call it a corrected-head full run.

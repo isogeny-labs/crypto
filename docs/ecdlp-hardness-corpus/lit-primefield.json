@@ -1,0 +1,2664 @@
+{
+  "sources": [
+    {
+      "id": "S-PF-PKM-2016",
+      "title": "Algebraic approaches for the Elliptic Curve Discrete Logarithm Problem over prime fields (author manuscript)",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Christophe Petit, Michiel Kosters, and Ange Messeng, PKC 2016, LNCS 9615, pp. 3-18; author-hosted manuscript 16PKC_primeECDLP.pdf.",
+      "url": "https://christophe.petit.web.ulb.be/files/16PKC_primeECDLP.pdf",
+      "sha256": "a53030a6cde720c354aebfb65b1eb01e07766ce2d26e543d77f2516c0a49ef5b",
+      "notes": "Read in full 2026-11-02 (pdftotext): Sections 2-5, Algorithm 1, Section 3.2 partial analysis, Lemma 1, Tables 1-5, Problem 1. Supersedes the corpus's secondary_only S-PKM-2016 for claims attributed here. The manuscript proves no complexity theorem: Section 1 and Section 5 state that the complexity is open. Pagination of the LNCS version not checked; locations are by section/table."
+    },
+    {
+      "id": "S-PF-APS-2018",
+      "title": "On the discrete logarithm problem for prime-field elliptic curves (revised author manuscript)",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Alessandro Amadori, Federico Pintore, and Massimiliano Sala, Finite Fields and Their Applications 51 (2018) 168-182; IACR ePrint 2017/609; revised author manuscript (IRIS Trento).",
+      "url": "https://iris.unitn.it/retrieve/e3835194-60e8-72ef-e053-3705fe0ad821/Amadori%2C%20Pintore%2C%20Sala%20-%20On%20DLP%20for%20prime-field%20EC%20%28rev%29.pdf",
+      "sha256": "67442c30c2f14ab7891b6285f9b6d3c77cf5b1a6d2e838ec25b815a280029ba1",
+      "notes": "Read Sections 1, 3.1-3.4 and 4 (pdftotext) 2026-11-02. The digest equals the one recorded in research/aps_extensions_20261026/SOURCES.md. Revised manuscript, not the typeset FFA version; the ePrint abstract page (2017/609, received 2017-06-26) was read separately. Publisher PDF and ePrint PDF were behind bot checks and not fetched."
+    },
+    {
+      "id": "S-PF-SEMAEV-2015",
+      "title": "New algorithm for the discrete logarithm problem on elliptic curves",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Igor Semaev, arXiv:1504.01175v1 (2015); also IACR ePrint 2015/310.",
+      "url": "https://arxiv.org/abs/1504.01175",
+      "sha256": "4db8433bdd7a32fab22bdc53dc9455bf08c7a3d9fe4af9022b135e951ee8bf6c",
+      "notes": "Read the abstract, Sections 1, 2 and 4.2 for the prime-field remarks only. The paper's binary-field claims belong to the binary cluster."
+    },
+    {
+      "id": "S-PF-EULER-PETIT-2021",
+      "title": "New results on quasi-subfield polynomials",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Marie Euler and Christophe Petit, Finite Fields and Their Applications (2021); arXiv:1909.11326v2.",
+      "url": "https://arxiv.org/abs/1909.11326",
+      "sha256": "f080c3ab72a2a553182340c05f12dd27bd8f7925af1ec99f87d24d3f7b0b1548",
+      "notes": "Read Definition 2, Lemma 1 (restating HKPYY Lemma 4.1), Theorem 1, Lemma 2, Propositions 5-8, Section 3 (heuristic discussion), Section 4 and Remark 1."
+    },
+    {
+      "id": "S-PF-MCGUIRE-MUELLER-2019",
+      "title": "Some results on linearized trinomials that split completely",
+      "kind": "primary_publication",
+      "verification": "primary_read",
+      "citation": "Gary McGuire and Daniela Mueller, arXiv:1905.11755v3 (2019).",
+      "url": "https://arxiv.org/abs/1905.11755",
+      "sha256": "2d8f8a4bb446815ff9b660181729692e89438d5a7374f9c28012f762f3b7f3bb",
+      "notes": "Read Theorem 1.1 and Section 6 (Lemma 6.1, the HKPYY complexity as they quote it, Remark 6.1)."
+    },
+    {
+      "id": "S-PF-HKPYY-2020",
+      "title": "Quasi-subfield polynomials and the elliptic curve discrete logarithm problem",
+      "kind": "primary_publication",
+      "verification": "secondary_only",
+      "citation": "Ming-Deh Huang, Michiel Kosters, Christophe Petit, Sze Ling Yeo, and Yang Yun, Journal of Mathematical Cryptology 14(1) (2020) 25-38, doi:10.1515/jmc-2015-0049.",
+      "url": "https://doi.org/10.1515/jmc-2015-0049",
+      "notes": "Open access, but the publisher and Birmingham repository PDFs returned bot-check pages; not worked around. Abstract read via OpenAlex. Lemma 4.1, Theorem 3.2 (complexity), Lemma 3.1 and the heuristic appendix are known from Euler-Petit 2021 (Lemma 1, Section 3, Section 4.3) and McGuire-Mueller 2019 (Section 6); Definition 3.1 and the closing open problem from the quotation in src/cryptanalysis/quasi_subfield.rs."
+    },
+    {
+      "id": "S-PF-YYTK-2020",
+      "title": "Complexity bounds on Semaev's naive index calculus method for ECDLP",
+      "kind": "primary_publication",
+      "verification": "secondary_only",
+      "citation": "Kazuhiro Yokoyama, Masaya Yasuda, Yasushi Takahashi, and Jun Kogure, Journal of Mathematical Cryptology 14(1) (2020) 460-485, doi:10.1515/jmc-2019-0029.",
+      "url": "https://doi.org/10.1515/jmc-2019-0029",
+      "notes": "Abstract read via OpenAlex 2026-11-02. Publisher PDF behind a bot check. Assumption/Conjecture numbers (Assumptions 7 and 11, Conjecture 10, Section 5.4) are taken from repository readings: research/notes/ecc2k130/RESEARCH_ECC2K130_IC_LITERATURE.md section 4 and research/notes/ecdlp-general/RESEARCH_ALGEBRAIC_IC_LOWER_BOUND.md (which cite an extracted full text held off-repository); research/ecdlp_autolab/yokoyama_lower_bound.md is a paraphrase."
+    },
+    {
+      "id": "S-PF-KYTY-2018",
+      "title": "Acceleration of index calculus for solving ECDLP over prime fields and its limitation",
+      "kind": "primary_publication",
+      "verification": "metadata_only",
+      "citation": "Momonari Kudo, Yuki Yokota, Yasushi Takahashi, and Masaya Yasuda, CANS 2018, LNCS 11124, pp. 377-393, doi:10.1007/978-3-030-00434-7_19.",
+      "url": "https://doi.org/10.1007/978-3-030-00434-7_19",
+      "notes": "Paywalled. Title, authors and pages from OpenAlex; abstract fragments from search snippets only (improvements of the Amadori et al. variant with experiments and a complexity analysis of the limits of the acceleration). No theorem numbers known."
+    },
+    {
+      "id": "S-PF-HU-2024",
+      "title": "Implementation analysis of index calculus method on elliptic curves over prime finite fields",
+      "kind": "primary_publication",
+      "verification": "metadata_only",
+      "citation": "Jianjun Hu, IACR Cryptology ePrint Archive 2024/1923 (received 2024-11-27).",
+      "url": "https://eprint.iacr.org/2024/1923",
+      "notes": "Abstract page read 2026-11-02: reviews Petit et al. 2016 and Kudo et al. 2018, says it identifies problems in that algorithm, proposes a 'pseudo-index calculus', and concludes no subexponential prime-field method is known. PDF not fetched (bot check). Unrefereed."
+    },
+    {
+      "id": "S-PF-NIKOLAEV-2024",
+      "title": "On the correctness of criterion for resistance to Petit-Kosters-Messeng method",
+      "kind": "primary_publication",
+      "verification": "secondary_only",
+      "citation": "V. D. Nikolaev (CryptoPro LLC), CTCrypt 2024 slides.",
+      "notes": "Known only through the slide-26 quotation in src/cryptanalysis/pkm_criterion.rs ('Are there any real security problems? Still unknown.'). Not located online in this pass. Related metadata: Alekseev, Nikolaev, Smyshlyaev, 'On the security properties of Russian standardized elliptic curves', Mat. Vopr. Kriptogr. 9:3 (2018) 5-32, cites PKM 2016 (mathnet.ru mvk260; not read)."
+    },
+    {
+      "id": "S-PF-REPO-FALL-DEGREE",
+      "title": "Fall degrees of prime-field PKM systems: derived results and preregistration",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "research/prime_fall_degree_20261027/DERIVED.md (D1-D4) and PREREGISTRATION.md (Amendments 6-7, C-step prediction).",
+      "repository_path": "research/prime_fall_degree_20261027/DERIVED.md"
+    },
+    {
+      "id": "S-PF-REPO-FALL-DEGREE-T14",
+      "title": "t = 14 cell of the PKM-tower fall-degree study",
+      "kind": "repository_measurement",
+      "verification": "repository_read",
+      "citation": "research/prime_fall_degree_t14_20261101/REPORT.md (2026-11-01).",
+      "repository_path": "research/prime_fall_degree_t14_20261101/REPORT.md"
+    },
+    {
+      "id": "S-PF-REPO-HIGHER-M-DEGREE",
+      "title": "PKM Kummer tower solving degree at m = 3, 4",
+      "kind": "repository_measurement",
+      "verification": "repository_read",
+      "citation": "research/ic_next10_20261014/03-pkm-degree/README.md; research/pkm_m3_n21_msolve_20261018/RESULTS.md; research/pkm_symmetric_tower_20261026/README.md.",
+      "repository_path": "research/ic_next10_20261014/03-pkm-degree/README.md"
+    },
+    {
+      "id": "S-PF-REPO-IC-LOWER-BOUND",
+      "title": "Conditional lower bound for algebraic index calculus over F_p",
+      "kind": "repository_proof",
+      "verification": "repository_read",
+      "citation": "research/notes/ecdlp-general/RESEARCH_ALGEBRAIC_IC_LOWER_BOUND.md (theorem draft 2026-10-31) and research/prime_field_leads_20261031/L1_lower_bound/REPORT.md.",
+      "repository_path": "research/notes/ecdlp-general/RESEARCH_ALGEBRAIC_IC_LOWER_BOUND.md"
+    },
+    {
+      "id": "S-PF-REPO-PKM-PRICED",
+      "title": "PKM factor bases priced end to end against matched rho",
+      "kind": "repository_measurement",
+      "verification": "repository_read",
+      "citation": "research/pkm_p224_kummer_shape_20261022/README.md; research/pkm_isogeny_tower_ecbench_20261015/README.md; benchmarks/20261018-pkm-rootfind-prime/README.md; research/pkm_tower_ecbench_20261013/README.md; benchmarks/README.md rows.",
+      "repository_path": "research/pkm_p224_kummer_shape_20261022/README.md"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "DEF-PF-SEMAEV-SMALL-X-BASE",
+      "label": "Semaev's prime-field small-x factor base",
+      "kind": "definition",
+      "status": "definition",
+      "model": "algebraic_coordinate",
+      "statement": "For E/F_p, Semaev (2004) proposed the factor base F = {(x,y) in E(F_p) : x in V} with V the residues of small integer size, V = {x in Z>=0 : x < p^(1/m)} (PKM's reading) or 'bounded by q^(1/n+delta)' (Semaev 2015's reading); relations come from zeros of S_(m+1)(x_1..x_m, x(R)) with x_i in V.",
+      "scope": "Definition only. Semaev did not give an algorithm that finds such zeros (PKM Section 2.1; Semaev 2015 Section 2; APS Section 1).",
+      "source_refs": [
+        "S-SEMAEV-2004",
+        "S-PF-PKM-2016",
+        "S-PF-SEMAEV-2015",
+        "S-PF-APS-2018"
+      ],
+      "source_locations": [
+        "PKM 2016, Section 2.1",
+        "Semaev 2015, Section 2",
+        "APS 2018, Section 1 (third section of Semaev 2004)"
+      ],
+      "tags": [
+        "prime-field",
+        "factor-base",
+        "summation-polynomial",
+        "definition"
+      ],
+      "non_implications": [
+        "Semaev's Remark 2 (Weil descent variant) does not apply to prime fields (APS Section 1)"
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "GAP-PF-PRIME-RELATION-SEARCH",
+      "label": "No known sub-rho relation search over prime fields",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "statement": "No published algorithm computes summation-polynomial relations on a prime-field curve with a proved, or even a stated heuristic, cost below Pollard rho. Semaev 2015 writes that 'it is not quite clear how the system (4) may be resolved in case q is a large prime number'; PKM 2016 say their complexity is unknown; APS 2018 say 'We do not claim this result'; Hu 2024 (ePrint, unrefereed) concludes that no subexponential prime-field method is known.",
+      "scope": "Literature state as of 2026-11. A conditional heuristic statement in this direction would already be new.",
+      "source_refs": [
+        "S-PF-SEMAEV-2015",
+        "S-PF-PKM-2016",
+        "S-PF-APS-2018",
+        "S-PF-HU-2024"
+      ],
+      "source_locations": [
+        "Semaev 2015, Sections 1 and 4.2",
+        "PKM 2016, Sections 1, 2.3 and 5",
+        "APS 2018, Section 3.2",
+        "Hu 2024, abstract"
+      ],
+      "tags": [
+        "prime-field",
+        "open",
+        "index-calculus"
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "HEUR-PF-NO-SUBFIELD-OBSTRUCTION",
+      "label": "No-subfield obstruction for prime-field index calculus",
+      "kind": "heuristic",
+      "status": "heuristic",
+      "model": "algebraic_coordinate",
+      "statement": "Extension-field summation attacks restrict factor-base x-coordinates to an F_q-subfield or F_q-vector subspace V and Weil-descend, turning one equation over F_(q^n) into n equations over F_q; over F_p there is no proper subfield and no nontrivial subspace, so this mechanism is unavailable, and any prime-field factor base must be cut out by a nonlinear constraint (Semaev's small-x set, PKM's composed rational maps, APS's random set).",
+      "scope": "An informal structural reason stated by several authors; not a lower bound. It blocks the Weil-descent mechanism, not every algebraic relation search.",
+      "assumptions": [
+        "Relation search goes through polynomial-system solving in the x-coordinates"
+      ],
+      "source_refs": [
+        "S-PF-PKM-2016",
+        "S-PF-APS-2018",
+        "S-PF-SEMAEV-2015"
+      ],
+      "source_locations": [
+        "PKM 2016, Sections 2.2-2.3 and 3.1",
+        "APS 2018, Section 1 ('Weil descent, which cannot be applied to prime fields') and Section 3.2",
+        "Semaev 2015, Section 4.2"
+      ],
+      "tags": [
+        "prime-field",
+        "obstruction",
+        "weil-descent"
+      ],
+      "evidence_class": "asymptotic_heuristic",
+      "failure_modes": [
+        "A nonlinear L with a low-degree decomposition may play the subspace's role (PKM's proposal)"
+      ],
+      "non_implications": [
+        "Does not show prime-field ECDLP is harder than extension-field ECDLP in any model",
+        "Galbraith-Gaudry 2016 also discuss the prime case; its locations were not checked here"
+      ]
+    },
+    {
+      "id": "DEF-PF-GENERALIZED-ROOT-FINDING",
+      "label": "Generalized root-finding problem (PKM Problem 1)",
+      "kind": "definition",
+      "status": "definition",
+      "model": "algebraic_coordinate",
+      "statement": "Given a finite field K, f in K[X_1..X_m] and L in K(X), find X_i in K with f(X_1..X_m) = 0 and L(X_i) = 0 for all i. Every summation-polynomial relation search reduces to it with f = S_(m+1)(., x(R)).",
+      "scope": "Covers Diem/Gaudry (L = X^q - X), binary vector-space bases (linearized L), Semaev's base (L = prod_(alpha<B)(X - alpha)) and PKM's composed maps.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ],
+      "source_locations": [
+        "PKM 2016, Section 5, Problem 1",
+        "PKM 2016, Section 1 (Contributions)"
+      ],
+      "tags": [
+        "prime-field",
+        "definition",
+        "root-finding"
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "DEF-PF-RATIONAL-MAP-FACTOR-BASE",
+      "label": "PKM rational-map factor base",
+      "kind": "definition",
+      "status": "definition",
+      "model": "algebraic_coordinate",
+      "statement": "F = {(x,y) in E(F_p) : L(x) = 0} where L is a rational map over F_p with (1) |{x in F_p : L(x)=0}| ~ |{x in F_p-bar : L(x)=0}| ~ p^(1/m), and (2) L = L_(n') o ... o L_1 with each L_j of low degree, so L(x)=0 becomes x_2 = L_1(x_1), ..., L_(n')(x_(n')) = 0.",
+      "scope": "Condition (1) makes most roots rational; condition (2) makes every equation low degree at the cost of n' auxiliary variables per summand.",
+      "source_refs": [
+        "S-PF-PKM-2016",
+        "S-PKM-2016"
+      ],
+      "source_locations": [
+        "PKM 2016, Section 3.1 (conditions 1-2)",
+        "PKM 2016, Section 1 (Contributions)"
+      ],
+      "tags": [
+        "prime-field",
+        "PKM",
+        "factor-base",
+        "definition"
+      ],
+      "cited_by": [
+        {
+          "path": "docs/ic/factor-base-encyclopedia/README.md",
+          "use": "reports"
+        },
+        {
+          "path": "src/cryptanalysis/ic_framework/pkm_semaev.rs",
+          "use": "depends"
+        }
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "ALG-PF-PKM-INDEX-CALCULUS",
+      "label": "PKM Algorithm 1 (prime-curve index calculus)",
+      "kind": "algorithmic_upper_bound",
+      "status": "algorithm",
+      "model": "algebraic_coordinate",
+      "statement": "Fix m; find L and its decomposition; collect deg L + Delta relations by drawing (X,Y) = aP + bQ and solving System (4): S_(m+1)(x_11..x_m1, X) = 0, x_(i,j+1) = L_j(x_(i,j)), 0 = L_(n')(x_(i,n')) (denominators cleared), keeping solutions whose points sum to zero; finish with linear algebra.",
+      "scope": "An algorithm with no proved running time; Gröbner bases are the only solver studied.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ],
+      "source_locations": [
+        "PKM 2016, Section 3.1, Algorithm 1 and System (4)"
+      ],
+      "tags": [
+        "prime-field",
+        "PKM",
+        "algorithm"
+      ],
+      "cited_by": [
+        {
+          "path": "examples/pkm_tower_pilot.rs",
+          "use": "depends"
+        },
+        {
+          "path": "src/bin/ecbench/pkm_tower.rs",
+          "use": "depends"
+        },
+        {
+          "path": "research/prime_ecdlp_three_leads_20261029/PKM_GOALS.md",
+          "use": "reports"
+        },
+        {
+          "path": "research/notes/index-calculus/RESEARCH_PKM_TOWER_ORACLE.md",
+          "use": "depends"
+        }
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "HEUR-PF-PKM-SOLUTION-COUNT",
+      "label": "PKM expected solutions per target",
+      "kind": "heuristic",
+      "status": "heuristic",
+      "model": "algebraic_coordinate",
+      "statement": "A random target point is hit by about (deg L)^m / (m! p) m-tuples of factor-base points, so System (4) has about that many solutions and, with (deg L)^m ~ m! p, a constant probability of having one.",
+      "scope": "Counting heuristic: |F| ~ deg L, |E(F_p)| ~ p, sums equidistributed. Instance of the general decomposition-probability heuristic.",
+      "assumptions": [
+        "Sums of m factor-base points are close to uniformly distributed on E(F_p)",
+        "Most roots of L are rational x-coordinates of curve points"
+      ],
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ],
+      "source_locations": [
+        "PKM 2016, Section 3.2",
+        "PKM 2016, Section 3.1 (heuristic 2)"
+      ],
+      "tags": [
+        "prime-field",
+        "PKM",
+        "yield",
+        "heuristic"
+      ],
+      "evidence_class": "asymptotic_heuristic",
+      "failure_modes": [
+        "Only about half of the x in V are abscissae of rational points, changing constants",
+        "Structured V (a subgroup) may correlate with the target"
+      ]
+    },
+    {
+      "id": "ASM-PF-PKM-UNIT-COST",
+      "label": "PKM unit-cost accounting model",
+      "kind": "assumption",
+      "status": "assumed",
+      "model": "algebraic_coordinate",
+      "statement": "PKM's partial analysis charges one unit for every F_p operation and for every elliptic-curve scalar multiplication.",
+      "scope": "The authors call it 'a very rough approximation' sufficient for their purposes; it hides a polynomial factor and the cost of the Gröbner step is left as an unknown T(E,m,L).",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ],
+      "source_locations": [
+        "PKM 2016, Section 3.2 (first paragraph)"
+      ],
+      "tags": [
+        "prime-field",
+        "PKM",
+        "accounting"
+      ],
+      "evidence_class": "assumption",
+      "failure_modes": [
+        "A comparison against rho in group operations must re-price field operations (AGENTS.md section 5a band)"
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "COND-PF-PKM-COST-THRESHOLD",
+      "label": "PKM cost decomposition and the p^(1/2-1/m) bar",
+      "kind": "conditional_attack",
+      "status": "conditional",
+      "model": "algebraic_coordinate",
+      "statement": "Total cost P(p,m) + (m! p / (deg L)^(m-1)) T(E,m,L) + (deg L)^omega; with (deg L)^m ~ m! p, Algorithm 1 beats generic algorithms exactly when one system is solved in time T(E,m,L) below p^(1/2 - 1/m).",
+      "scope": "A reduction of the attack's cost to one unknown T, not an attack. Nothing in the paper bounds T. The bar is attainable only for m >= 3 (m = 2 asks T < 1).",
+      "assumptions": [
+        "Expected-solution count of HEUR-PF-PKM-SOLUTION-COUNT",
+        "Unit-cost model",
+        "Relations are independent enough (Delta = 10 extra)",
+        "Linear algebra (deg L)^omega with 2 < omega <= 3"
+      ],
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ],
+      "source_locations": [
+        "PKM 2016, Section 3.2"
+      ],
+      "formula": "P(p,m) + m! p (deg L)^(1-m) T(E,m,L) + (deg L)^omega < p^(1/2)  <=  T(E,m,L) < p^(1/2-1/m) when (deg L)^m ~ m! p",
+      "tags": [
+        "prime-field",
+        "PKM",
+        "cost-model",
+        "conditional-attack"
+      ],
+      "evidence_class": "conditional_theorem",
+      "failure_modes": [
+        "T grows with p faster than p^(1/2-1/m) (the Gröbner degree grows with the tower height)",
+        "Sparse linear algebra at omega ~ 2 still costs (deg L)^2 ~ p^(2/m), above p^(1/2) for m < 4"
+      ],
+      "non_implications": [
+        "Does not claim any sub-rho cost; the paper states the complexity is open"
+      ],
+      "cited_by": [
+        {
+          "path": "research/notes/ecdlp-general/RESEARCH_ALGEBRAIC_IC_LOWER_BOUND.md",
+          "use": "depends",
+          "note": "B1-B2 rebuild this bookkeeping with explicit hypotheses"
+        }
+      ]
+    },
+    {
+      "id": "HEUR-PF-PKM-RANK-DELTA",
+      "label": "PKM: Delta = 10 surplus relations suffice",
+      "kind": "heuristic",
+      "status": "heuristic",
+      "model": "algebraic_coordinate",
+      "statement": "Collecting deg L + Delta relations with Delta fixed to about 10 accounts for linear dependencies, which occur with low probability.",
+      "scope": "Rank heuristic; untested at scale in the paper.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ],
+      "source_locations": [
+        "PKM 2016, Section 3.1 (after Algorithm 1)"
+      ],
+      "tags": [
+        "prime-field",
+        "PKM",
+        "rank",
+        "heuristic"
+      ],
+      "evidence_class": "asymptotic_heuristic",
+      "assumptions": []
+    },
+    {
+      "id": "DEF-PF-PKM-SMOOTH-SUBGROUP-BASE",
+      "label": "PKM p-1 smooth-subgroup factor base",
+      "kind": "definition",
+      "status": "definition",
+      "model": "curve_family_restricted",
+      "statement": "If p - 1 = r * prod_(i=1..n') p_i with all p_i < B and prod p_i ~ p^(1/m), take V = the subgroup G of order prod p_i of F_p^* (or a coset aG), L_j(x) = x^(p_j) for j < n' and L_(n')(x) = 1 - x^(p_(n')). With B = 2 this is the Kummer tower y_(j+1) = y_j^2.",
+      "scope": "Applies only to primes with a large smooth part of p - 1.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ],
+      "source_locations": [
+        "PKM 2016, Section 3.3"
+      ],
+      "tags": [
+        "prime-field",
+        "PKM",
+        "kummer",
+        "factor-base"
+      ],
+      "cited_by": [
+        {
+          "path": "research/prime_fall_degree_20261027/DERIVED.md",
+          "use": "depends",
+          "note": "D2: Kummer quotient is a group algebra"
+        },
+        {
+          "path": "research/pkm_symmetric_tower_20261026/README.md",
+          "use": "measures"
+        },
+        {
+          "path": "research/pkm_tower_ecbench_20261013/README.md",
+          "use": "measures"
+        }
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "FACT-PF-P224-PMINUS1-SMOOTH",
+      "label": "NIST P-224 meets PKM's smooth p-1 prerequisite",
+      "kind": "structural_theorem",
+      "status": "proved_external",
+      "model": "curve_family_restricted",
+      "statement": "For p = 2^224 - 2^96 + 1, p - 1 = 2^96 * 3 * 5 * 17 * 257 * 641 * 65537 * 274177 * 6700417 * 67280421310721, so the p-1 subgroup attack's prerequisites hold already for m >= 3 with B = 2 (2^96 >= p^(1/3)).",
+      "scope": "Arithmetic fact; the product was rechecked locally (python, exact integers) on 2026-11-02. It says the construction applies, not that it is efficient.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ],
+      "source_locations": [
+        "PKM 2016, Section 3.3"
+      ],
+      "tags": [
+        "prime-field",
+        "PKM",
+        "P-224",
+        "special-prime"
+      ],
+      "evidence_class": "theorem",
+      "non_implications": [
+        "Does not imply P-224 is weaker than a generic 224-bit curve; PKM say all attacks are outperformed by generic algorithms at practical sizes"
+      ],
+      "cited_by": [
+        {
+          "path": "research/pkm_p224_kummer_shape_20261022/README.md",
+          "use": "measures"
+        },
+        {
+          "path": "src/cryptanalysis/pkm_criterion.rs",
+          "use": "mention"
+        }
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "DEF-PF-PKM-ISOGENY-BASE",
+      "label": "PKM isogeny-kernel factor base",
+      "kind": "definition",
+      "status": "definition",
+      "model": "algebraic_coordinate",
+      "statement": "Given an auxiliary curve E'/F_p with #E'(F_p) = N = r * prod p_i, p_i < B, prod p_i ~ p^(1/m), let H be the subgroup of order prod p_i and phi = phi_(n') o ... o phi_1 the isogeny with kernel H (Velu). V is the x-coordinates of a coset of H; L_j = xi_j/psi_j^2 and L_(n') = xi_(n')/psi_(n')^2 - chi, chi the x-coordinate of a non-2-torsion image point.",
+      "scope": "Works for every prime p, at the cost of finding E' (precomputation).",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ],
+      "source_locations": [
+        "PKM 2016, Section 3.4"
+      ],
+      "tags": [
+        "prime-field",
+        "PKM",
+        "isogeny",
+        "factor-base"
+      ],
+      "cited_by": [
+        {
+          "path": "research/pkm_isogeny_tower_ecbench_20261015/README.md",
+          "use": "measures"
+        },
+        {
+          "path": "src/bin/pkm_aux_search.rs",
+          "use": "depends"
+        }
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "THM-PF-PKM-LEMMA1",
+      "label": "PKM Lemma 1: isogeny base has prod p_i abscissae",
+      "kind": "structural_theorem",
+      "status": "proved_external",
+      "model": "algebraic_coordinate",
+      "statement": "In the isogeny construction, {x in F_p : L(x) = 0} has exactly prod_(i=1..n') p_i elements: a kernel coset has N/s points and distinct points of a coset have distinct x-coordinates when chi is not the x-coordinate of a 2-torsion point.",
+      "scope": "Counts the abscissae; the proof is three lines in the paper.",
+      "assumptions": [
+        "chi is not the x-coordinate of a point of order 2"
+      ],
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ],
+      "source_locations": [
+        "PKM 2016, Section 3.4, Lemma 1"
+      ],
+      "tags": [
+        "prime-field",
+        "PKM",
+        "isogeny"
+      ],
+      "evidence_class": "theorem"
+    },
+    {
+      "id": "HEUR-PF-PKM-AUX-CURVE-SEARCH",
+      "label": "Cost of finding PKM's auxiliary curve",
+      "kind": "heuristic",
+      "status": "heuristic",
+      "model": "algebraic_coordinate",
+      "statement": "With B = 2, a random curve over F_p has order divisible by 2^s ~ p^(1/m) with probability about 2^(-s) ~ p^(-1/m), so about p^(1/m) curves are tried, which is about the factor-base size and so dominated by linear algebra; larger B lowers it (Table 1: e.g. 2^54.0 trials for |p| = 160, m = 3, B = 2). If the attacker may choose p, CM with small |D| constructs (p, E') much faster.",
+      "scope": "Probability heuristic for smooth parts of random curve orders; CM route bounded by computing H_D mod p.",
+      "assumptions": [
+        "Orders of random curves over F_p behave like random integers in the Hasse interval for 2-adic (B-smooth) valuation"
+      ],
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ],
+      "source_locations": [
+        "PKM 2016, Section 3.5, Table 1"
+      ],
+      "tags": [
+        "prime-field",
+        "PKM",
+        "precomputation",
+        "heuristic"
+      ],
+      "evidence_class": "asymptotic_heuristic",
+      "cited_by": [
+        {
+          "path": "research/pkm_isogeny_tower_p192_20261015/README.md",
+          "use": "measures",
+          "note": "P(b >= t) = 2^(3-t) consistent; derived P-192 search 98,352 core-hours at t = 48"
+        },
+        {
+          "path": "research/pkm_isogeny_tower_ecbench_20261015/README.md",
+          "use": "measures",
+          "note": "curves tried ~ 1.05 * 2^t"
+        }
+      ]
+    },
+    {
+      "id": "MEAS-PF-PKM-DEGREE-TABLES",
+      "label": "PKM Tables 4-5 (published measurement): corrected degree 4 -> 5 -> 6 at m = 2",
+      "kind": "heuristic",
+      "status": "heuristic",
+      "model": "algebraic_coordinate",
+      "statement": "Magma experiments writing a random point as P1 + P2 (m = 2), 100 runs per row, factor bases of size 2^(n1) with p ~ 2^(2 n1): the corrected degree of regularity D_corr is 4 for n1 <= 5, 5 for n1 = 6..9, and 6 for n1 = 10, 11 in both the p-1 subgroup (Table 4) and the isogeny (Table 5) versions; n1 = 11 took 4975 s / 2266 MB (Table 4) and 5163 s / 1945 MB (Table 5). The binary SRA/System (2) tables stay at D_corr = 4 for n1 = 2..11.",
+      "scope": "One parameter family (m = 2), p up to ~22 bits; Magma step degrees. The authors say the set of experiments is too limited to draw conclusions.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ],
+      "source_locations": [
+        "PKM 2016, Section 4.2, Tables 2-5 and observations 1-5"
+      ],
+      "tags": [
+        "prime-field",
+        "PKM",
+        "solving-degree",
+        "measurement"
+      ],
+      "evidence_class": "measurement",
+      "failure_modes": [
+        "Two degree steps over n1 = 5..11 cannot distinguish logarithmic from linear growth in n1"
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "HEUR-PF-PKM-EASIER-THAN-SEMIGENERIC",
+      "label": "PKM systems look easier than semi-generic ones",
+      "kind": "heuristic",
+      "status": "heuristic",
+      "model": "algebraic_coordinate",
+      "statement": "Bardet's degree of regularity for a homogeneous semi-generic system of n quadrics and one quartic in n variables is (3+n)/2; the observed PKM degrees grow much more slowly in n, suggesting the systems are easier to solve than semi-generic ones of comparable parameters.",
+      "scope": "Comparison of an observed degree with a generic formula on small n; the paper stresses the experiments are too limited to conclude anything.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ],
+      "source_locations": [
+        "PKM 2016, Section 4.2 (last paragraph)",
+        "PKM 2016, Section 1 ('too limited to draw any conclusion')"
+      ],
+      "tags": [
+        "prime-field",
+        "PKM",
+        "groebner",
+        "heuristic"
+      ],
+      "evidence_class": "asymptotic_heuristic",
+      "failure_modes": [
+        "Slower-than-generic growth is still growth; a sub-rho cost needs T < p^(1/2-1/m), not merely sub-generic degree"
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "FACT-PF-PKM-NAIVE-SEMAEV-EASIER",
+      "label": "PKM (published, preliminary): Semaev's naive system was easier than theirs",
+      "kind": "heuristic",
+      "status": "heuristic",
+      "model": "algebraic_coordinate",
+      "statement": "At the PKC committee's suggestion PKM compared their systems with Semaev's original base solved by Gröbner bases, {S(x1,x2,X), L(x1), L(x2)} with L = prod_(alpha<B)(x - alpha); their preliminary results show these systems were easier to solve than theirs on similar parameters, which 'may either suggest that our approach is unlikely to be efficient asymptotically, or that Semaev's original attack should be revisited'.",
+      "scope": "Preliminary; no table published. The authors' own qualification of the tower idea.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ],
+      "source_locations": [
+        "PKM 2016, Section 5 (paragraph 'Following a suggestion by the PKC 2016 committee')"
+      ],
+      "tags": [
+        "prime-field",
+        "PKM",
+        "self-qualification",
+        "measurement"
+      ],
+      "evidence_class": "measurement",
+      "assumptions": []
+    },
+    {
+      "id": "GAP-PF-PKM-ASYMPTOTIC-OPEN",
+      "label": "PKM asymptotic complexity is open by the authors' statement",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "statement": "Petit-Kosters-Messeng state that the complexity of their algorithms remains open, that proving meaningful bounds 'appears very challenging today', and that it is not clear whether the structure leads to asymptotic improvement over generic algorithms; they list a theoretical explanation of the experiments and complexity prediction for large parameters as open problems.",
+      "scope": "The published framing of COND-PKM-PRIME-ALGEBRAIC: no theorem or heuristic exponent exists in the source.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ],
+      "source_locations": [
+        "PKM 2016, Section 1 (Contributions, Perspectives)",
+        "PKM 2016, Section 5"
+      ],
+      "tags": [
+        "prime-field",
+        "PKM",
+        "open"
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "GAP-PF-DEDICATED-ROOT-FINDER",
+      "label": "Dedicated algorithm for the generalized root-finding problem",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "statement": "PKM call 'an even more important problem' the design of a dedicated, non-Gröbner algorithm for Problem 1; by analogy, Weil descent plus Gröbner gives univariate root finding exponential in O(log n * deg f) under a 'somewhat controversial' heuristic, while dedicated algorithms are provably exponential in O(log n + deg f).",
+      "scope": "Open; a similar gain for the multivariate problem would 'greatly impact' ECC per PKM.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ],
+      "source_locations": [
+        "PKM 2016, Section 5 (last paragraph)"
+      ],
+      "tags": [
+        "prime-field",
+        "PKM",
+        "root-finding",
+        "open"
+      ],
+      "cited_by": [
+        {
+          "path": "benchmarks/20261018-pkm-rootfind-prime/README.md",
+          "use": "measures",
+          "note": "rootfind-subtract/mitm vs tower F4 on Kummer bases, 9-15 bits; 5.4-29.2x same-target rho"
+        },
+        {
+          "path": "research/pkm_tower_rootfind_20261018/RESULT.md",
+          "use": "measures"
+        }
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "ALG-PF-APS-SINGLE-RELATION",
+      "label": "APS single-relation variant of Semaev's method",
+      "kind": "algorithmic_upper_bound",
+      "status": "algorithm",
+      "model": "algebraic_coordinate",
+      "statement": "Build F incrementally from random R = uP + vQ until |F| = s with s^m ~ q; partition F into F_1..F_m and solve S_m(X_1..X_m) = 0, f_i(X_i) = prod_(v in V_i)(X_i - v) = 0 (System (11)); one solution gives a signed zero-sum among known (u,v) combinations, hence lambda + mu w = 0 mod r. No relation matrix; the factor base is redrawn when System (11) has no suitable solution. For m = 4, 5 they split S_4 or S_5 with an auxiliary variable Y.",
+      "scope": "Any finite field; the authors argue it is suited to prime fields because composite fields already have Weil descent. Its constraint is a dense univariate product (the naive presentation), not a tower.",
+      "source_refs": [
+        "S-PF-APS-2018",
+        "S-APS-2018"
+      ],
+      "source_locations": [
+        "APS 2018, Section 3 (Relation collection/solving steps)",
+        "APS 2018, Section 3.1, Systems (9)-(11)",
+        "APS 2018, Section 3.4"
+      ],
+      "tags": [
+        "prime-field",
+        "APS",
+        "algorithm",
+        "summation-polynomial"
+      ],
+      "cited_by": [
+        {
+          "path": "src/cryptanalysis/aps_single_relation.rs",
+          "use": "depends"
+        },
+        {
+          "path": "src/cryptanalysis/ecbench/aps/mod.rs",
+          "use": "measures"
+        },
+        {
+          "path": "research/aps_measurement_20261029/README.md",
+          "use": "measures"
+        },
+        {
+          "path": "research/aps_extensions_20261026/SOURCES.md",
+          "use": "reports"
+        }
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "COND-PF-APS-COST",
+      "label": "APS cost q m^m / s^m * T(E,m,V)",
+      "kind": "conditional_attack",
+      "status": "conditional",
+      "model": "algebraic_coordinate",
+      "statement": "With |F_i| ~ s/m, about (s/m)^m signed combinations exist, a random point is such a sum with probability ~ s^m / (q m^m), and the total cost is (q m^m / s^m) T(E,m,V); an improvement over generic algorithms needs this below r^(1/2), which the authors explicitly do not claim because T is unknown.",
+      "scope": "Partial analysis: T(E,m,V), the cost of one System (11), is not estimated.",
+      "assumptions": [
+        "Equidistribution of signed m-sums from a random F",
+        "|F_i| equal"
+      ],
+      "source_refs": [
+        "S-PF-APS-2018"
+      ],
+      "source_locations": [
+        "APS 2018, Section 3.2, Eq. (12)"
+      ],
+      "formula": "(q m^m / s^m) * T(E,m,V)",
+      "tags": [
+        "prime-field",
+        "APS",
+        "cost-model"
+      ],
+      "evidence_class": "conditional_theorem",
+      "non_implications": [
+        "'We do not claim this result' (sub-r^(1/2) cost)"
+      ]
+    },
+    {
+      "id": "HEUR-PF-APS-T-EQUALS-TPRIME",
+      "label": "APS assumption (13): T(E,m,V) ~ T'(E,m,V)",
+      "kind": "heuristic",
+      "status": "heuristic",
+      "model": "algebraic_coordinate",
+      "statement": "APS assume that one APS System (11) costs about as much as one PKM System (6); under it APS beat PKM for fixed m once s * m! > m^m, i.e. p^(1/m) > m^m/m!, from bit sizes 7, 14, 24, 37, 52, 70 for m = 3..8 (Table 1). They call a proof 'a challenging issue' and cite Table 2 as heuristic evidence.",
+      "scope": "Compares a dense naive presentation of degree |V_i| per variable with a tower presentation; nothing structural makes their costs equal.",
+      "source_refs": [
+        "S-PF-APS-2018"
+      ],
+      "source_locations": [
+        "APS 2018, Section 3.3, Eq. (13) and Table 1"
+      ],
+      "tags": [
+        "prime-field",
+        "APS",
+        "PKM",
+        "heuristic"
+      ],
+      "evidence_class": "asymptotic_heuristic",
+      "failure_modes": [
+        "Dense degree-|V_i| constraints and low-degree towers have different Gröbner behavior (YYTK bound the dense one)"
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "COND-PF-APS-BEATS-PKM",
+      "label": "APS outperforms PKM for fixed m and growing p",
+      "kind": "conditional_attack",
+      "status": "conditional",
+      "model": "algebraic_coordinate",
+      "statement": "Neglecting linear algebra and assuming (13), APS's algorithm costs less than PKM's when sqrt[m](p) > m^m/m!, which holds at all cryptographic sizes; the abstract states the proposal 'outperforms both the original Semaev's method and Petit et al. specialized algorithm'.",
+      "scope": "A relative claim between two algorithms neither of which has a known absolute cost below rho.",
+      "assumptions": [
+        "HEUR-PF-APS-T-EQUALS-TPRIME",
+        "Linear-algebra cost of PKM neglected"
+      ],
+      "source_refs": [
+        "S-PF-APS-2018"
+      ],
+      "source_locations": [
+        "APS 2018, Section 3.3",
+        "APS 2018, Section 4",
+        "ePrint 2017/609 abstract"
+      ],
+      "tags": [
+        "prime-field",
+        "APS",
+        "PKM",
+        "comparison"
+      ],
+      "evidence_class": "conditional_theorem"
+    },
+    {
+      "id": "CEX-PF-APS-COMPARISON-MISMATCH",
+      "label": "APS Table 2 compares against PKM's m = 2 data",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "statement": "APS Table 2's column 'Petit et al., m = 3' (0.02, 0.15, 0.13, 1.16, 1.14, 9.08, 9.09, 51.87, 59.87, 438.57, 454.79, 5163.46 s at 11..22 bits) reproduces PKM Tables 4-5 entry for entry, but PKM's experiments decompose P = P1 + P2, i.e. m = 2. APS's text also assigns even bit sizes to 'primes of a specific form' and odd ones to generic primes, whereas the matching PKM rows are the reverse (e.g. 454.79 s is Table 4's p - 1 subgroup prime 1051649, 21 bits; 438.57 s is Table 5's isogeny prime 811763, 20 bits). The 'heuristic corroboration' of assumption (13) thus compares m = 3 APS runs with m = 2 PKM systems.",
+      "scope": "Exact cross-reading of the two primary texts (this corpus pass, 2026-11-02); not reported elsewhere in the repository or found in the literature. It removes the cited evidence for (13), not (13) itself.",
+      "source_refs": [
+        "S-PF-APS-2018",
+        "S-PF-PKM-2016"
+      ],
+      "source_locations": [
+        "APS 2018, Section 3.4, Table 2 and the paragraph after it",
+        "PKM 2016, Section 4.1 ('write P = P1 + P2') and Tables 4-5"
+      ],
+      "tags": [
+        "prime-field",
+        "APS",
+        "PKM",
+        "counterexample",
+        "discrepancy"
+      ],
+      "evidence_class": "counterexample",
+      "non_implications": [
+        "Does not show APS is slower than PKM",
+        "Does not affect APS's own timings"
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "THM-PF-KYTY-APS-LIMITATION",
+      "label": "Kudo et al. 2018: acceleration of APS and its limitation",
+      "kind": "structural_theorem",
+      "status": "proved_external_unread",
+      "model": "algebraic_coordinate",
+      "statement": "Kudo, Yokota, Takahashi and Yasuda improve the Amadori et al. prime-field variant, report experiments, and give a complexity analysis of the limits of that acceleration (content known only from metadata and abstract fragments).",
+      "scope": "Unread; no theorem number known. Recorded so the APS line is not read as unchallenged.",
+      "source_refs": [
+        "S-PF-KYTY-2018"
+      ],
+      "source_locations": [
+        "CANS 2018, LNCS 11124, pp. 377-393 (abstract only)"
+      ],
+      "tags": [
+        "prime-field",
+        "APS",
+        "limitation",
+        "unread"
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "HEUR-PF-YYTK-STATISTICAL",
+      "label": "YYTK statistical assumptions on summation polynomials",
+      "kind": "heuristic",
+      "status": "heuristic",
+      "model": "algebraic_coordinate",
+      "statement": "Yokoyama-Yasuda-Takahashi-Kogure's lower bound rests on 'simple statistical assumptions on summation polynomials' (abstract); repository readings name them Assumptions 7 and 11 and Conjecture 10, the latter left unproved by the authors ('We leave a theoretical proof of the conjecture for our future work').",
+      "scope": "Validated in the paper by experiments over prime fields of up to about 25 bits (repository reading).",
+      "source_refs": [
+        "S-PF-YYTK-2020"
+      ],
+      "source_locations": [
+        "YYTK 2020, abstract",
+        "YYTK 2020, Assumptions 7 and 11, Conjecture 10 (as read in research/notes/ecc2k130/RESEARCH_ECC2K130_IC_LITERATURE.md, section 4)"
+      ],
+      "tags": [
+        "prime-field",
+        "naive-index-calculus",
+        "heuristic"
+      ],
+      "evidence_class": "asymptotic_heuristic",
+      "assumptions": []
+    },
+    {
+      "id": "THM-PF-YYTK-NAIVE-LOWER-BOUND",
+      "label": "YYTK: naive Semaev index calculus cannot beat generic methods",
+      "kind": "structural_theorem",
+      "status": "conditional",
+      "model": "algebraic_coordinate",
+      "statement": "For the PDP ideal of Semaev's naive method, I_m(a,b) = <S_(m+1)(x_1..x_m, x(aP+bQ)), F(x_1), ..., F(x_m)> with F the factor-base polynomial, Gröbner basis computation is an extension of the extended Euclidean algorithm; this yields a lower bound on its cost, and with it the naive index calculus method cannot be more efficient than generic methods (the talk version: not more efficient than brute force).",
+      "scope": "Naive (dense, no auxiliary variable) presentation only, solver = Gröbner basis; conditional on the statistical assumptions. Not a lower bound for PKM towers, APS partitions with auxiliary variables, or non-Gröbner solvers (repository readings: research/notes/index-calculus/RESEARCH_PKM_TOWER_ORACLE.md section 1.3; RESEARCH_ALGEBRAIC_IC_LOWER_BOUND.md remark A5).",
+      "assumptions": [
+        "HEUR-PF-YYTK-STATISTICAL",
+        "Solver is a Gröbner basis algorithm on the naive ideal"
+      ],
+      "source_refs": [
+        "S-PF-YYTK-2020"
+      ],
+      "source_locations": [
+        "YYTK 2020, abstract",
+        "YYTK 2020, Section 5.4 (exceptions, per repository reading)"
+      ],
+      "tags": [
+        "prime-field",
+        "lower-bound",
+        "naive-index-calculus",
+        "conditional"
+      ],
+      "evidence_class": "conditional_theorem",
+      "non_implications": [
+        "Not a lower bound for the PKM tower presentation",
+        "Not an unconditional theorem",
+        "Not instantiated at a cryptographic size"
+      ],
+      "cited_by": [
+        {
+          "path": "research/ecdlp_autolab/yokoyama_lower_bound.md",
+          "use": "reports",
+          "note": "paraphrase; overstates as 'provable'"
+        },
+        {
+          "path": "research/notes/ecc2k130/RESEARCH_ECC2K130_IC_LITERATURE.md",
+          "use": "mention",
+          "note": "do not cite as closing the question"
+        },
+        {
+          "path": "research/prime_field_leads_20261031/L1_lower_bound/REPORT.md",
+          "use": "mention",
+          "note": "A5"
+        }
+      ]
+    },
+    {
+      "id": "ASM-PF-KY-CURVE-CONSTRUCTION",
+      "label": "Kosters-Yeo Assumption 3.3 (curves with a large-order point)",
+      "kind": "assumption",
+      "status": "assumed",
+      "model": "mathematical",
+      "statement": "Given n, one can construct in time polynomial in log n a finite field F_q, an elliptic curve E/F_q and a point P in E(F_q) with ord(P) >= n.",
+      "scope": "Deterministic polynomial-time construction; Remark 3.4 notes a nondeterministic (random + Schoof) route.",
+      "source_refs": [
+        "S-KOSTERS-YEO-2015"
+      ],
+      "source_locations": [
+        "Kosters-Yeo 2015, Assumption 3.3 and Remark 3.4"
+      ],
+      "tags": [
+        "complexity",
+        "assumption"
+      ],
+      "evidence_class": "assumption",
+      "assumptions": []
+    },
+    {
+      "id": "THM-PF-KY-SUBSET-SUM-NPC",
+      "label": "Subset sum NP-complete in Z and (Z/mZ)^n, m >= 3",
+      "kind": "structural_theorem",
+      "status": "proved_external",
+      "model": "mathematical",
+      "statement": "The subset-sum problem (given finite abelian G, S subset G, g in G, is g a sum of a subset of S) is NP-complete for {Z}, {Z/nZ} and {(Z/mZ)^n : n >= 1} for each fixed m >= 3; it is easy (linear algebra) for (F_2)^n.",
+      "scope": "Classical for Z (Karp); the m = 3 gadget is new in the paper.",
+      "source_refs": [
+        "S-KOSTERS-YEO-2015"
+      ],
+      "source_locations": [
+        "Kosters-Yeo 2015, Proposition 3.1 and Remark 3.2"
+      ],
+      "tags": [
+        "complexity",
+        "NP-complete"
+      ],
+      "evidence_class": "theorem",
+      "assumptions": []
+    },
+    {
+      "id": "THM-PF-KY-NPC-SMOOTH",
+      "label": "Kosters-Yeo Thm 3.5(i): deciding S_r(x) = 0 is NP-complete",
+      "kind": "structural_theorem",
+      "status": "proved_external",
+      "model": "mathematical",
+      "statement": "Under Assumption 3.3: given F_q, E/F_q in Weierstrass form, r >= 3 and x_0..x_(r-1) in F_q, deciding whether S_(A,r)(x_0..x_(r-1)) = 0 is NP-complete (reduction from subset sum in Z via sum n_i v_i P = w'P with n_i in {+-1}).",
+      "scope": "Worst case over all (q, E, r, inputs) with r part of the input; the field is chosen by the reduction, so it gives no hardness statement for a fixed prime-field curve or fixed r.",
+      "assumptions": [
+        "ASM-PF-KY-CURVE-CONSTRUCTION"
+      ],
+      "source_refs": [
+        "S-KOSTERS-YEO-2015"
+      ],
+      "source_locations": [
+        "Kosters-Yeo 2015, Theorem 3.5(i)"
+      ],
+      "tags": [
+        "complexity",
+        "NP-complete",
+        "summation-polynomial"
+      ],
+      "evidence_class": "theorem",
+      "non_implications": [
+        "Does not imply ECDLP is hard: anomalous curves are easy while their summation-polynomial evaluation is still NP-complete (Remark 3.7)",
+        "Does not bound the cost of decomposition with fixed m",
+        "Does not imply index calculus cannot beat rho"
+      ]
+    },
+    {
+      "id": "THM-PF-KY-NPC-CUSPIDAL",
+      "label": "Kosters-Yeo Thm 3.5(ii): unconditional NP-completeness (cuspidal curve, p >= 3)",
+      "kind": "structural_theorem",
+      "status": "proved_external",
+      "model": "mathematical",
+      "statement": "For a fixed prime p >= 3, deciding whether S_((0,0,0,0,0),r)(a_0..a_(r-1)) = 0 for a_i in F_(p^n)^* (n, r in the input) is NP-complete; S of the cuspidal curve y^2 = x^3 vanishes at (1/x_i^2) iff some signed sum of the x_i is 0 (Prop. 2.2(ii)). Fails for p = 2 (Remark 3.6).",
+      "scope": "Singular (cuspidal) curve over growing extension fields of a fixed prime; no assumption.",
+      "source_refs": [
+        "S-KOSTERS-YEO-2015"
+      ],
+      "source_locations": [
+        "Kosters-Yeo 2015, Theorem 3.5(ii), Proposition 2.2, Remark 3.6"
+      ],
+      "tags": [
+        "complexity",
+        "NP-complete",
+        "singular-curve"
+      ],
+      "evidence_class": "theorem",
+      "assumptions": []
+    },
+    {
+      "id": "COND-PF-KY-FFA-REDUCTIO",
+      "label": "Kosters-Yeo reductio: unrestricted FFA would decide an NP-complete problem",
+      "kind": "structural_theorem",
+      "status": "conditional",
+      "model": "algebraic_coordinate",
+      "statement": "Deciding S_m(a_1..a_m) = 0 is equivalent (splitting trick) to the consistency of the chain S_3(a_1,a_2,X_1), S_3(a_3,X_1,X_2), ..., S_3(a_(m-1),a_m,X_(m-3)); after Weil descent to F_2 its first fall degree is 2 (Cor. 4.11), so a first-fall-degree assumption that bounds the degree of regularity of such systems would give an algorithm polynomial in the input for an NP-complete problem, which 'seems highly unlikely'.",
+      "scope": "Informal argument (the authors write 'we prove P=NP' in quotation marks). The NP-hardness used is Thm 3.5(i), whose reduction picks its own field; the argument needs it over characteristic-2 fields, which Assumption 3.3 as stated does not restrict to.",
+      "assumptions": [
+        "P != NP",
+        "Thm 3.5(i) hardness holds over binary fields"
+      ],
+      "source_refs": [
+        "S-KOSTERS-YEO-2015"
+      ],
+      "source_locations": [
+        "Kosters-Yeo 2015, Section 5 (last three paragraphs)"
+      ],
+      "tags": [
+        "first-fall-degree",
+        "complexity",
+        "counterexample-to-heuristic"
+      ],
+      "evidence_class": "conditional_theorem",
+      "failure_modes": [
+        "The first-fall-degree assumption 'does not see the number of variables' (Section 5)"
+      ],
+      "non_implications": [
+        "Does not refute FFA restricted to fixed m or fixed number of variables"
+      ]
+    },
+    {
+      "id": "HEUR-PF-PKM-FFA-TRANSPOSED",
+      "label": "First-fall assumption transposed to PKM towers (D ~ ffd)",
+      "kind": "heuristic",
+      "status": "heuristic",
+      "model": "algebraic_coordinate",
+      "statement": "The Petit-Quisquater first fall degree assumption, transposed to prime-field PKM systems, says the solving degree D stays close to the first fall degree; with ffd constant in the tower height this would make D bounded.",
+      "scope": "The form registered as H-FFD in the repository's preregistration; PKM themselves do not assume it.",
+      "source_refs": [
+        "S-PF-REPO-FALL-DEGREE",
+        "S-PF-PKM-2016"
+      ],
+      "source_locations": [
+        "research/prime_fall_degree_20261027/PREREGISTRATION.md, H-FFD",
+        "PKM 2016, Section 2.3 (FFA 'known to be false in general')"
+      ],
+      "tags": [
+        "prime-field",
+        "PKM",
+        "first-fall-degree",
+        "heuristic"
+      ],
+      "evidence_class": "asymptotic_heuristic",
+      "assumptions": []
+    },
+    {
+      "id": "THM-PF-REPO-KUMMER-FFD-FOUR",
+      "label": "Kummer m = 2 PKM systems have first fall degree 4 for every t",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "statement": "For the Kummer tower (y_0 = x/g, y_(j+1) = y_j^2, y_(t-1)^2 = 1) with t >= 2, g != 0, an inconsistent m = 2 system and 3 x_R^2 + a != 0, the reduced S_3 has first fall degree exactly 4, independent of the factor-base size 2^t (no fall at 3 because det M = -2 g^6 (3x_R^2 + a) != 0; a fall at 4 from q = y_10 y_11).",
+      "scope": "Hand proof in the repository (D3), measured ffd = 4 on every draw t = 2..10. Not reviewed outside the repository.",
+      "assumptions": [
+        "Kummer tower, m = 2",
+        "System inconsistent (target not decomposable)",
+        "3 x_R^2 + a != 0"
+      ],
+      "source_refs": [
+        "S-PF-REPO-FALL-DEGREE"
+      ],
+      "source_locations": [
+        "research/prime_fall_degree_20261027/DERIVED.md, D1-D3"
+      ],
+      "tags": [
+        "prime-field",
+        "PKM",
+        "first-fall-degree",
+        "kummer"
+      ],
+      "evidence_class": "theorem",
+      "cited_by": [
+        {
+          "path": "research/prime_fall_degree_20261027/DERIVED.md",
+          "use": "reports"
+        },
+        {
+          "path": "research/prime_fall_degree_20261027/PREREGISTRATION.md",
+          "use": "depends"
+        }
+      ]
+    },
+    {
+      "id": "MEAS-PF-REPO-KUMMER-DEGREE",
+      "label": "Measured PKM Kummer m = 2 refutation degree grows: 5 (t=9), 6 (t=10,11), >= 6 (t=14)",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "On the Kummer tower at P1 = 2013265921, m = 2, random non-decomposable targets: uncapped F4 reaches D = 5 at t = 9 and D = 6 at t = 10; at t = 11 cap 5 does not refute and cap 6 does (D = 6); at t = 14 cap 5 does not refute on either draw (D >= 6). The registered C-step prediction D = 4 + floor((t-2)/4) (7 at t = 14) is undecided; the cap-6 t = 12 pre-flight was censored at 7,200 s.",
+      "scope": "Exact deterministic computations on two draws per t; off-route host; no independent review. Differs from PKM's regime (p ~ |V|^2, about one solution) by using a fixed 31-bit p and inconsistent targets, yet the D values at |V| = 2^9, 2^10 (5, 6) coincide with PKM Table 4's D_corr at n1 = 9, 10.",
+      "source_refs": [
+        "S-PF-REPO-FALL-DEGREE-T14",
+        "S-PF-REPO-FALL-DEGREE"
+      ],
+      "source_locations": [
+        "research/prime_fall_degree_t14_20261101/REPORT.md, Result and Section 2"
+      ],
+      "tags": [
+        "prime-field",
+        "PKM",
+        "solving-degree",
+        "measurement",
+        "kummer"
+      ],
+      "evidence_class": "measurement",
+      "cited_by": [
+        {
+          "path": "research/prime_fall_degree_t14_20261101/REPORT.md",
+          "use": "measures"
+        },
+        {
+          "path": "research/pkm_tower_round2_20260925/README.md",
+          "use": "measures",
+          "note": "D = 6 at t = 11 recorded before C-step"
+        },
+        {
+          "path": "benchmarks/20261014-ic-next10-03-pkm-degree/README.pdf",
+          "use": "reports"
+        }
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "MEAS-PF-REPO-HIGHER-M-DEGREE",
+      "label": "Measured PKM Kummer degree at m = 3, 4: growth resumes",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "m = 4: D = 6, 7, 7, >= 8 at N = 8, 12, 16, 20 (msolve, three productive degree-8 rounds at N = 20 on both targets), so the plateau at 7 breaks. m = 3: D >= 7 at N = 18, 21, 24; at N = 21 msolve finished degree 7 without the unit ideal and died in degree 8 at 99.6 GiB (inconclusive). The symmetric tower lowers D by one at m = 3 (4, 5, 5, 6 at N = 6, 9, 12, 15) but D still rises.",
+      "scope": "Single prime p1 = 2013265921, two targets per cell, memory/wall-censored; the reading 'about one degree per eight tower unknowns' over N = 12-20 is the study's.",
+      "source_refs": [
+        "S-PF-REPO-HIGHER-M-DEGREE"
+      ],
+      "source_locations": [
+        "research/ic_next10_20261014/03-pkm-degree/README.md, Verdict",
+        "research/pkm_m3_n21_msolve_20261018/RESULTS.md, Addendum A1",
+        "research/pkm_symmetric_tower_20261026/README.md, Verdict"
+      ],
+      "tags": [
+        "prime-field",
+        "PKM",
+        "solving-degree",
+        "measurement"
+      ],
+      "evidence_class": "measurement",
+      "cited_by": [
+        {
+          "path": "research/ic_next10_20261014/03-pkm-degree/README.md",
+          "use": "measures"
+        },
+        {
+          "path": "research/pkm_m3_n21_msolve_20261018/RESULTS.md",
+          "use": "measures"
+        },
+        {
+          "path": "research/pkm_symmetric_tower_20261026/README.md",
+          "use": "measures"
+        }
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "MEAS-PF-REPO-PKM-VS-RHO",
+      "label": "PKM factor bases priced end to end: 17-141x matched rho",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "Whole-method index calculus on PKM bases measured against matched rho in ecbench counted units: Kummer tower on 20-28-bit prime curves 29-141x rho (2026-10-13); isogeny and Kummer bases 17-137x rho, isogeny / plain 1.002-1.331 (2026-10-15); Solinas primes and P-224 shape 18.4-75.9x matched rho at w = 0, F4 degree equal to the recorded value in 89/89 cells (2026-10-22). No run beats rho; gaps widen with size.",
+      "scope": "Toy sizes (9-28 bits); lower bounds where prime-field natives are unpriced; only some rows pass the validation gate (benchmarks/20261018-pkm-rootfind-prime has VALIDATION.json).",
+      "source_refs": [
+        "S-PF-REPO-PKM-PRICED"
+      ],
+      "source_locations": [
+        "benchmarks/README.md rows 2026-10-13, 2026-10-15, 2026-10-18",
+        "research/pkm_p224_kummer_shape_20261022/README.md"
+      ],
+      "tags": [
+        "prime-field",
+        "PKM",
+        "measurement",
+        "rho-gap"
+      ],
+      "evidence_class": "measurement",
+      "cited_by": [
+        {
+          "path": "research/pkm_p224_kummer_shape_20261022/README.md",
+          "use": "measures"
+        },
+        {
+          "path": "research/pkm_tower_ecbench_20261013/README.md",
+          "use": "measures"
+        },
+        {
+          "path": "benchmarks/20261018-pkm-rootfind-prime/README.md",
+          "use": "measures"
+        },
+        {
+          "path": "research/pkm_isogeny_tower_ecbench_20261015/README.md",
+          "use": "measures"
+        }
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "THM-PF-REPO-DIRECT-LOWER-BOUND",
+      "label": "Direct-presentation algebraic IC over F_p costs >= c_m r (internal, conditional)",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "statement": "For a factor base cut out by one polynomial in one coordinate with no auxiliary variables, any solver charged the rank of the Macaulay matrix at a degree where its output is determined costs at least c_m r in total, for every base size (Theorem 1), given the bookkeeping hypotheses H_C (no cheap proper sub-base) and H_E (algorithm-chosen targets no more decomposable than uniform ones).",
+      "scope": "Repository theorem draft (2026-10-31), not externally reviewed; unconditional replacement for YYTK on the dense presentation in the Macaulay-charged model. The tower case reduces to the open hypothesis H_T.",
+      "assumptions": [
+        "H_C",
+        "H_E",
+        "Solver charged by Macaulay-matrix rank"
+      ],
+      "source_refs": [
+        "S-PF-REPO-IC-LOWER-BOUND"
+      ],
+      "source_locations": [
+        "RESEARCH_ALGEBRAIC_IC_LOWER_BOUND.md, Section 0 item 2, Theorem 1, Lemmas A1-A3, E1"
+      ],
+      "tags": [
+        "prime-field",
+        "lower-bound",
+        "internal"
+      ],
+      "evidence_class": "conditional_theorem",
+      "cited_by": [
+        {
+          "path": "research/notes/ecdlp-general/RESEARCH_ALGEBRAIC_IC_LOWER_BOUND.md",
+          "use": "reports"
+        },
+        {
+          "path": "research/prime_field_leads_20261031/L1_lower_bound/REPORT.md",
+          "use": "reports"
+        }
+      ]
+    },
+    {
+      "id": "GAP-PF-TOWER-SOLVING-DEGREE-HT",
+      "label": "H_T: tower solving degree grows linearly in the height",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "algebraic_coordinate",
+      "statement": "For the tower presentation with t levels, D_sol >= alpha t - O(1) and rank M_(D_sol) >= (columns)^(rho - o(1)). Given H_T, H_C, H_E the repository shows tower IC costs >= r^(1/2 - o(1)) iff c(alpha,m,d,rho) = rho (m+alpha) H2(alpha/(m+alpha)) / log2 d >= (m-1)/2 (Theorem 2).",
+      "scope": "The single statement that decides whether PKM towers can beat rho in the Macaulay model; it is the precise form of GAP-PKM-SOLVING-DEGREE.",
+      "source_refs": [
+        "S-PF-REPO-IC-LOWER-BOUND"
+      ],
+      "source_locations": [
+        "RESEARCH_ALGEBRAIC_IC_LOWER_BOUND.md, hypothesis H_T, Lemma A4 (GAP), Theorem 2"
+      ],
+      "tags": [
+        "prime-field",
+        "PKM",
+        "solving-degree",
+        "open"
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "GAP-PF-SPECIAL-PRIME-EXPOSURE",
+      "label": "Do special primes (smooth p-1, P-224) weaken curves against PKM?",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "curve_family_restricted",
+      "statement": "PKM note NIST pseudo-Mersenne primes are 'potentially more vulnerable' and that P-224 meets their first attack's prerequisites; Nikolaev (CTCrypt 2024) answers the question 'Are there any real security problems?' with 'Still unknown'. No published result shows a cost advantage for smooth p - 1 over the isogeny version, and PKM's Tables 4-5 show the two versions behave alike.",
+      "scope": "Open; the repository's P-224-shape measurement (18.4-75.9x rho at toy sizes) is evidence against a practical advantage at small sizes only.",
+      "source_refs": [
+        "S-PF-PKM-2016",
+        "S-PF-NIKOLAEV-2024"
+      ],
+      "source_locations": [
+        "PKM 2016, Section 3.3 and observation 4 of Section 4.2",
+        "Nikolaev 2024, slide 26 (as quoted in src/cryptanalysis/pkm_criterion.rs)"
+      ],
+      "tags": [
+        "prime-field",
+        "PKM",
+        "special-prime",
+        "open"
+      ],
+      "cited_by": [
+        {
+          "path": "src/cryptanalysis/pkm_criterion.rs",
+          "use": "measures",
+          "note": "Nikolaev-style audit score"
+        },
+        {
+          "path": "research/pkm_p224_kummer_shape_20261022/README.md",
+          "use": "mention"
+        }
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "DEF-PF-QUASI-SUBFIELD-POLY",
+      "label": "Quasi-subfield polynomial and its quality beta",
+      "kind": "definition",
+      "status": "definition",
+      "model": "algebraic_coordinate",
+      "statement": "A quasi-subfield polynomial over F_(p^n) is L(X) = X^(p^(n')) - lambda(X) that splits completely (or has about p^(n') roots) in F_(p^n) with small deg lambda; HKPYY's Definition 3.1 asks log_q(deg lambda) < n'^2/n, and Euler-Petit define the quality beta = l n / n'^2 <= 1 with l = log_p deg lambda. lambda(X) = X gives the subfield polynomial of F_(p^(n')).",
+      "scope": "Extension fields F_(p^n), n >= 2, small characteristic in HKPYY's motivation; a prime field (n = 1) has no such polynomial with n' < n. The extension-field analogue of PKM's rational-map base.",
+      "source_refs": [
+        "S-PF-HKPYY-2020",
+        "S-PF-EULER-PETIT-2021",
+        "S-PF-MCGUIRE-MUELLER-2019"
+      ],
+      "source_locations": [
+        "HKPYY 2020, Definition 3.1 (as quoted in McGuire-Mueller Section 6.1 and src/cryptanalysis/quasi_subfield.rs)",
+        "Euler-Petit 2021, Definitions 1-2"
+      ],
+      "tags": [
+        "quasi-subfield",
+        "factor-base",
+        "definition",
+        "extension-field"
+      ],
+      "cited_by": [
+        {
+          "path": "src/cryptanalysis/quasi_subfield.rs",
+          "use": "measures",
+          "note": "exhaustive census over F_(2^n) at small parameters"
+        }
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "THM-PF-HKPYY-LEMMA41",
+      "label": "HKPYY Lemma 4.1: floor(n/n') l + (n mod n') >= n'",
+      "kind": "structural_theorem",
+      "status": "proved_external_unread",
+      "model": "mathematical",
+      "statement": "If L(X) = X^(p^(n')) - lambda(X) in F_(p^n)[X] splits completely over F_(p^n) and l = log_p deg lambda > 0, then floor(n/n') * l + (n mod n') >= n'. (A non-split variant is HKPYY Lemma C.2.)",
+      "scope": "Text known from Euler-Petit's restatement (their Lemma 1). HKPYY's open problem asks whether removing the (n mod n') term is possible, which would show the approach cannot beat generic algorithms.",
+      "source_refs": [
+        "S-PF-HKPYY-2020",
+        "S-PF-EULER-PETIT-2021"
+      ],
+      "source_locations": [
+        "HKPYY 2020, Lemma 4.1 and Lemma C.2",
+        "Euler-Petit 2021, Lemma 1"
+      ],
+      "tags": [
+        "quasi-subfield",
+        "existence-bound"
+      ],
+      "evidence_class": "theorem",
+      "assumptions": []
+    },
+    {
+      "id": "COND-PF-HKPYY-COMPLEXITY",
+      "label": "HKPYY Theorem 3.2: QSP index-calculus complexity",
+      "kind": "conditional_attack",
+      "status": "conditional",
+      "model": "algebraic_coordinate",
+      "statement": "With a quasi-subfield polynomial X^(q^d) - lambda(X) over F_(q^n) and S_(m+1), relations are found by solving the m x m sparse system S^(k) = phi^k(S), k = 0..m-1, by Rojas' sparse resultant plus univariate root finding; the total cost is m! q^(n - d(m-1)) O~(m^5.188 2^(7.376 m(m-1)) deg(lambda)^(4.876 m(m-1))) + m q^(2d).",
+      "scope": "Over extension fields F_(q^n). The constant kappa = 4.876 comes from Rojas' bound and may be suboptimal (Euler-Petit). Solution probability |F|^m/(m! p^n) and |F| ~ |V| ~ p^(n') are heuristic.",
+      "assumptions": [
+        "|F| ~ |V| ~ p^(n') (half of V lifts to two points)",
+        "Decomposition probability |F|^m/(m! p^n)",
+        "Rojas sparse-resultant cost O~(m^5.188 (3 p^l)^(kappa m^2))"
+      ],
+      "source_refs": [
+        "S-PF-HKPYY-2020",
+        "S-PF-MCGUIRE-MUELLER-2019",
+        "S-PF-EULER-PETIT-2021"
+      ],
+      "source_locations": [
+        "HKPYY 2020, Theorem 3.2 and Lemma 3.1 (as quoted in McGuire-Mueller Section 6.2 and Euler-Petit Section 4.3)"
+      ],
+      "tags": [
+        "quasi-subfield",
+        "complexity",
+        "extension-field",
+        "conditional-attack"
+      ],
+      "evidence_class": "conditional_theorem"
+    },
+    {
+      "id": "COND-PF-EP-BETA-THRESHOLD",
+      "label": "Euler-Petit Prop. 8: beating generic needs beta < 0.103",
+      "kind": "conditional_attack",
+      "status": "conditional",
+      "model": "algebraic_coordinate",
+      "statement": "Rewriting HKPYY's estimate with alpha = n'm/n, the minimum is at alpha_beta = 1/(2 kappa beta) and the cost is O~(p^(max(2 alpha_beta/m, 1 - alpha_beta(1/2 - 1/m)) n)), i.e. O~(p^((1 - alpha_beta/2) n)) for m >> 1 and alpha_beta < 2; beating generic algorithms needs alpha_beta > 1, which with kappa = 4.876 means beta < 0.103 (exponent table: beta = 1 -> 0.949, 0.1 -> 0.487).",
+      "scope": "Inherits every heuristic of HKPYY's estimate; m treated as fixed.",
+      "assumptions": [
+        "COND-PF-HKPYY-COMPLEXITY's assumptions",
+        "kappa = 4.876"
+      ],
+      "source_refs": [
+        "S-PF-EULER-PETIT-2021"
+      ],
+      "source_locations": [
+        "Euler-Petit 2021, Propositions 7-8, table after Proposition 8, Remark 1"
+      ],
+      "formula": "cost = O~(p^((1 - 1/(4 kappa beta)) n)); generic beaten iff beta < 1/(2 kappa) ~ 0.103",
+      "tags": [
+        "quasi-subfield",
+        "complexity",
+        "threshold"
+      ],
+      "evidence_class": "conditional_theorem"
+    },
+    {
+      "id": "THM-PF-EP-LINEARIZED-BETA",
+      "label": "Euler-Petit Thm 1: split linearized QSPs have beta >= 3/4",
+      "kind": "structural_theorem",
+      "status": "proved_external",
+      "model": "mathematical",
+      "statement": "If L = X^(p^(n')) - (a_l X^(p^l) + ... + a_0 X) over F_(p^n), l >= 1, splits completely over F_(p^n), then beta = l n / n'^2 >= 3/4 (via Lemma 2: n >= n' + (n' - l) floor((n'-1)/l)); equality e.g. for X^(p^2) + X^p + X over F_(p^3).",
+      "scope": "Linearized (additive) QSPs only; improves HKPYY Lemma 4.1 when (n mod n') >= n'/4. McGuire-Mueller obtained the trinomial case independently.",
+      "source_refs": [
+        "S-PF-EULER-PETIT-2021"
+      ],
+      "source_locations": [
+        "Euler-Petit 2021, Theorem 1, Lemma 2, Section 2.2"
+      ],
+      "tags": [
+        "quasi-subfield",
+        "linearized",
+        "existence-bound"
+      ],
+      "evidence_class": "theorem",
+      "assumptions": []
+    },
+    {
+      "id": "THM-PF-EP-QSP-FAMILIES",
+      "label": "Euler-Petit Props. 5-6: new QSP families (best beta ~ 0.70)",
+      "kind": "structural_theorem",
+      "status": "proved_external",
+      "model": "mathematical",
+      "statement": "Proposition 5 gives linearized QSP families (Types 1, 1bis, 2, 3), Type 2 existing for n a Mersenne prime with n' >= 3; Proposition 6 gives multiplicative QSPs X^(p^(n')) - X^d with p^(n') - d | p^n - 1, one with beta = log2(3)*4/9 ~ 0.70 < 3/4.",
+      "scope": "Existence results; every family exhibited has beta > 0.7, far above the 0.103 threshold.",
+      "source_refs": [
+        "S-PF-EULER-PETIT-2021"
+      ],
+      "source_locations": [
+        "Euler-Petit 2021, Propositions 5 and 6, Section 3"
+      ],
+      "tags": [
+        "quasi-subfield",
+        "construction"
+      ],
+      "evidence_class": "theorem",
+      "assumptions": []
+    },
+    {
+      "id": "HEUR-PF-HKPYY-SPARSE-DENSITY",
+      "label": "HKPYY density heuristic: sparse factors of X^n - 1 are as rare as random",
+      "kind": "heuristic",
+      "status": "refuted",
+      "model": "mathematical",
+      "statement": "For n a Mersenne prime, the density of sparse polynomials X^(n') - lambda(X) (deg lambda small) among factors of X^n - 1 equals that among random polynomials of the same degree; hence linearized QSPs with n Mersenne (and multiplicative QSPs) should essentially not exist for n > n' >= 3.",
+      "scope": "Used in HKPYY's appendix to argue such QSPs are unlikely. Euler-Petit show the conclusion fails: Type 2 linearized QSPs (Prop. 5) and the multiplicative families (Prop. 6) exist.",
+      "source_refs": [
+        "S-PF-HKPYY-2020",
+        "S-PF-EULER-PETIT-2021"
+      ],
+      "source_locations": [
+        "HKPYY 2020, appendix (as restated in Euler-Petit 2021, Section 3, 'Reasoning from [1]' and Lemma 5)",
+        "Euler-Petit 2021, Section 3, 'On the heuristic approximations used in [1]'"
+      ],
+      "tags": [
+        "quasi-subfield",
+        "heuristic",
+        "refuted"
+      ],
+      "evidence_class": "asymptotic_heuristic",
+      "non_implications": [
+        "The refuted case (beta <= 1) is not the sub-generic regime (alpha_beta > 1); no QSP beating generic algorithms is known"
+      ],
+      "assumptions": []
+    },
+    {
+      "id": "FACT-PF-EP-LINEARIZED-NO-GAIN",
+      "label": "No linearized QSP beats generic algorithms (under HKPYY's estimate)",
+      "kind": "structural_theorem",
+      "status": "conditional",
+      "model": "algebraic_coordinate",
+      "statement": "With beta >= 3/4 (Thm 1) and kappa ~ 4.876, alpha_beta = 1/(2 kappa beta) < 1/7, so HKPYY's algorithm with any linearized QSP costs at least O~(p^((1 - 1/14) n)), worse than p^(n/2); a sub-generic linearized QSP would need kappa < 1.5.",
+      "scope": "Conditional on HKPYY's cost estimate and its solver constant; non-linearized and non-multiplicative QSPs are not covered.",
+      "assumptions": [
+        "COND-PF-HKPYY-COMPLEXITY",
+        "kappa ~ 4.876"
+      ],
+      "source_refs": [
+        "S-PF-EULER-PETIT-2021"
+      ],
+      "source_locations": [
+        "Euler-Petit 2021, Section 4.4 (consequences of Theorem 1)"
+      ],
+      "tags": [
+        "quasi-subfield",
+        "obstruction"
+      ],
+      "evidence_class": "conditional_theorem"
+    },
+    {
+      "id": "THM-PF-MM-TRINOMIALS",
+      "label": "McGuire-Mueller Thm 1.1: split linearized trinomials",
+      "kind": "structural_theorem",
+      "status": "proved_external",
+      "model": "mathematical",
+      "statement": "For L = x^(q^d) - b x^q - a x over F_(q^n): (1) if n <= (d-1)d and d does not divide n, L never splits completely; (2) for n = i d, 1 <= i <= d-1, L has q^d roots iff a^(1+q^d+...+q^((i-1)d)) = 1 and b = 0; (3) for n = (d-1)d + 1, L splits iff N(a) = (-1)^(d-1), b = -a^(q e_1) with e_1 = sum_(i<d) q^(id), and d - 1 is a power of the characteristic.",
+      "scope": "Trinomials only; via McGuire-Sheekey's matrix A_L (nullity(L) = nullity(A_L - I)).",
+      "source_refs": [
+        "S-PF-MCGUIRE-MUELLER-2019"
+      ],
+      "source_locations": [
+        "McGuire-Mueller 2019, Theorem 1.1 (Theorems 2.1, 3.1, 4.1, 5.1)"
+      ],
+      "tags": [
+        "quasi-subfield",
+        "linearized",
+        "trinomial"
+      ],
+      "evidence_class": "theorem",
+      "assumptions": []
+    },
+    {
+      "id": "FACT-PF-MM-TRINOMIAL-NO-GAIN",
+      "label": "McGuire-Mueller: their split trinomials do not beat generic algorithms",
+      "kind": "structural_theorem",
+      "status": "conditional",
+      "model": "algebraic_coordinate",
+      "statement": "The trinomials of Thm 1.1(3) are quasi-subfield polynomials (Lemma 6.1), but plugging them into HKPYY's complexity gives m! q^(d^2 - dm + 1) O~(m^5.188 2^(7.376 m(m-1)) q^(4.876 m(m-1))) + m q^(2d), and d^2 - dm + 1 + 4.876 m(m-1) > n/2 for all d, m: they beat brute force but not generic algorithms.",
+      "scope": "Conditional on HKPYY's estimate; adding a q^2 term (Remark 6.1) is discussed without a conclusion.",
+      "assumptions": [
+        "COND-PF-HKPYY-COMPLEXITY"
+      ],
+      "source_refs": [
+        "S-PF-MCGUIRE-MUELLER-2019"
+      ],
+      "source_locations": [
+        "McGuire-Mueller 2019, Lemma 6.1, Section 6.3, Remark 6.1"
+      ],
+      "tags": [
+        "quasi-subfield",
+        "obstruction"
+      ],
+      "evidence_class": "conditional_theorem"
+    },
+    {
+      "id": "GAP-PF-QSP-EXISTENCE",
+      "label": "Do quasi-subfield polynomials with beta < 0.103 exist?",
+      "kind": "open_obligation",
+      "status": "open",
+      "model": "mathematical",
+      "statement": "HKPYY: 'It remains an open problem to find (or rule out) the existence of quasi-subfield polynomials where deg lambda is small enough to improve on the best (generic) algorithms'; removing (n mod n') from Lemma 4.1 would show the approach cannot beat generic algorithms. Euler-Petit: further work is needed to find better QSP families 'or to provide a definite proof that it will not improve on generic algorithms'.",
+      "scope": "Open for non-linearized QSPs; linearized ones are excluded by Thm 1 under HKPYY's estimate.",
+      "source_refs": [
+        "S-PF-HKPYY-2020",
+        "S-PF-EULER-PETIT-2021"
+      ],
+      "source_locations": [
+        "HKPYY 2020, closing open problem (quoted in src/cryptanalysis/quasi_subfield.rs)",
+        "Euler-Petit 2021, Section 1 ('Impact on ECDLP security') and Section 5"
+      ],
+      "tags": [
+        "quasi-subfield",
+        "open"
+      ],
+      "assumptions": []
+    }
+  ],
+  "edges": [
+    {
+      "id": "E-PF-001",
+      "from": "DEF-PF-SEMAEV-SMALL-X-BASE",
+      "to": "GAP-PF-PRIME-RELATION-SEARCH",
+      "relation": "leaves_open",
+      "statement": "Semaev defined the prime-field base but gave no algorithm to find relations in it.",
+      "source_refs": [
+        "S-PF-PKM-2016",
+        "S-PF-SEMAEV-2015"
+      ]
+    },
+    {
+      "id": "E-PF-002",
+      "from": "THEOREM-SEMAEV-SUMMATION",
+      "to": "DEF-PF-SEMAEV-SMALL-X-BASE",
+      "relation": "enables",
+      "statement": "Relations in the small-x base are zeros of S_(m+1) by Semaev's criterion.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-003",
+      "from": "HEUR-PF-NO-SUBFIELD-OBSTRUCTION",
+      "to": "FACT-PRIME-FIELD-NO-EXTENSION-GAIN",
+      "relation": "qualifies",
+      "statement": "States the mechanism behind the boundary: the subfield/vector-space restriction and Weil descent that give the extension-field gain do not exist over F_p.",
+      "source_refs": [
+        "S-PF-PKM-2016",
+        "S-PF-APS-2018"
+      ]
+    },
+    {
+      "id": "E-PF-004",
+      "from": "HEUR-PF-NO-SUBFIELD-OBSTRUCTION",
+      "to": "GAP-PF-PRIME-RELATION-SEARCH",
+      "relation": "obstructs",
+      "statement": "Without a subspace the extension-field relation-search route is unavailable, which is why the prime case has no algorithm with a cost estimate.",
+      "source_refs": [
+        "S-PF-PKM-2016",
+        "S-PF-SEMAEV-2015"
+      ]
+    },
+    {
+      "id": "E-PF-005",
+      "from": "DEF-PF-GENERALIZED-ROOT-FINDING",
+      "to": "DEF-PF-RATIONAL-MAP-FACTOR-BASE",
+      "relation": "defines",
+      "statement": "PKM's factor base is Problem 1 with L restricted to compositions of low-degree maps.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-006",
+      "from": "DEF-PF-RATIONAL-MAP-FACTOR-BASE",
+      "to": "ALG-PF-PKM-INDEX-CALCULUS",
+      "relation": "defines",
+      "statement": "Algorithm 1 is run on a rational-map factor base.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-007",
+      "from": "THEOREM-SEMAEV-SUMMATION",
+      "to": "ALG-PF-PKM-INDEX-CALCULUS",
+      "relation": "enables",
+      "statement": "System (4) starts from S_(m+1).",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-008",
+      "from": "DEF-PF-RATIONAL-MAP-FACTOR-BASE",
+      "to": "HEUR-PF-NO-SUBFIELD-OBSTRUCTION",
+      "relation": "qualifies",
+      "statement": "PKM's composed nonlinear L is their proposed substitute for the missing subspace.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-009",
+      "from": "ALG-PF-PKM-INDEX-CALCULUS",
+      "to": "COND-PF-PKM-COST-THRESHOLD",
+      "relation": "enables",
+      "statement": "The cost decomposition is the partial analysis of Algorithm 1.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-010",
+      "from": "HEUR-PF-PKM-SOLUTION-COUNT",
+      "to": "COND-PF-PKM-COST-THRESHOLD",
+      "relation": "conditions",
+      "statement": "The m! p / (deg L)^(m-1) number of systems per relation is the reciprocal of the heuristic solution count.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-011",
+      "from": "ASM-PF-PKM-UNIT-COST",
+      "to": "COND-PF-PKM-COST-THRESHOLD",
+      "relation": "conditions",
+      "statement": "The bar p^(1/2) is in the unit-cost model that counts scalar multiplications and field operations alike.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-012",
+      "from": "HEUR-PF-PKM-RANK-DELTA",
+      "to": "COND-PF-PKM-COST-THRESHOLD",
+      "relation": "conditions",
+      "statement": "Collecting only deg L + Delta relations assumes near-full rank.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-013",
+      "from": "HEUR-PF-PKM-SOLUTION-COUNT",
+      "to": "HEUR-DECOMPOSITION-PROBABILITY",
+      "relation": "instantiates",
+      "statement": "PKM's count is the random decomposition-yield heuristic for a rational-map base.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-014",
+      "from": "HEUR-PF-PKM-RANK-DELTA",
+      "to": "HEUR-RELATION-RANK",
+      "relation": "instantiates",
+      "statement": "PKM's Delta = 10 is a concrete instance of the relation-rank heuristic.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-015",
+      "from": "COND-PF-PKM-COST-THRESHOLD",
+      "to": "COND-PKM-PRIME-ALGEBRAIC",
+      "relation": "model_bridge",
+      "statement": "Gives the published cost bar T(E,m,L) < p^(1/2-1/m) that the corpus's PKM route must meet.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-016",
+      "from": "GAP-PF-PKM-ASYMPTOTIC-OPEN",
+      "to": "COND-PKM-PRIME-ALGEBRAIC",
+      "relation": "qualifies",
+      "statement": "The primary text proves no complexity: the route is conditional by the authors' own statement, not merely by this corpus's caution.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-017",
+      "from": "GAP-PF-PKM-ASYMPTOTIC-OPEN",
+      "to": "GAP-PKM-SOLVING-DEGREE",
+      "relation": "enables",
+      "statement": "The repository's solving-degree question is the concrete form of PKM's open complexity.",
+      "source_refs": [
+        "S-PF-PKM-2016",
+        "S-PF-REPO-FALL-DEGREE"
+      ]
+    },
+    {
+      "id": "E-PF-018",
+      "from": "DEF-PF-PKM-SMOOTH-SUBGROUP-BASE",
+      "to": "DEF-PF-RATIONAL-MAP-FACTOR-BASE",
+      "relation": "instantiates",
+      "statement": "x -> x^(p_j) maps compose to a map whose zeros are a smooth-order subgroup.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-019",
+      "from": "DEF-PF-PKM-ISOGENY-BASE",
+      "to": "DEF-PF-RATIONAL-MAP-FACTOR-BASE",
+      "relation": "instantiates",
+      "statement": "x-coordinate maps of the Velu isogenies compose to L.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-020",
+      "from": "THM-PF-PKM-LEMMA1",
+      "to": "DEF-PF-PKM-ISOGENY-BASE",
+      "relation": "enables",
+      "statement": "Lemma 1 shows the isogeny base has the required size prod p_i.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-021",
+      "from": "HEUR-PF-PKM-AUX-CURVE-SEARCH",
+      "to": "DEF-PF-PKM-ISOGENY-BASE",
+      "relation": "conditions",
+      "statement": "The isogeny base for an arbitrary p exists only after the auxiliary curve is found at the heuristic cost.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-022",
+      "from": "HEUR-PF-PKM-AUX-CURVE-SEARCH",
+      "to": "COND-PF-PKM-COST-THRESHOLD",
+      "relation": "conditions",
+      "statement": "P(p,m), the precomputation term, is estimated by the auxiliary-curve heuristic.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-023",
+      "from": "FACT-PF-P224-PMINUS1-SMOOTH",
+      "to": "DEF-PF-PKM-SMOOTH-SUBGROUP-BASE",
+      "relation": "instantiates",
+      "statement": "P-224's prime has p - 1 divisible by 2^96, so the Kummer base exists for m >= 3.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-024",
+      "from": "FACT-PF-P224-PMINUS1-SMOOTH",
+      "to": "GAP-PF-SPECIAL-PRIME-EXPOSURE",
+      "relation": "leaves_open",
+      "statement": "Applicability of the construction leaves open whether it gives any advantage.",
+      "source_refs": [
+        "S-PF-PKM-2016",
+        "S-PF-NIKOLAEV-2024"
+      ]
+    },
+    {
+      "id": "E-PF-025",
+      "from": "MEAS-PF-PKM-DEGREE-TABLES",
+      "to": "GAP-PF-SPECIAL-PRIME-EXPOSURE",
+      "relation": "qualifies",
+      "statement": "PKM observation 4: subgroup and isogeny versions have similar degrees, time and memory, so smooth p - 1 showed no advantage at these sizes.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-026",
+      "from": "MEAS-PF-PKM-DEGREE-TABLES",
+      "to": "ALG-PF-PKM-INDEX-CALCULUS",
+      "relation": "measures",
+      "statement": "Tables 4-5 time one relation system of Algorithm 1 at m = 2.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-027",
+      "from": "MEAS-PF-PKM-DEGREE-TABLES",
+      "to": "GAP-PKM-SOLVING-DEGREE",
+      "relation": "measures",
+      "statement": "The published prime-field degrees already step 4 -> 5 -> 6 as the base grows from 2^5 to 2^11, the earliest evidence of growth.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-028",
+      "from": "MEAS-PF-PKM-DEGREE-TABLES",
+      "to": "HEUR-PF-PKM-EASIER-THAN-SEMIGENERIC",
+      "relation": "enables",
+      "statement": "The slow degree growth is what PKM compare with Bardet's (3+n)/2.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-029",
+      "from": "FACT-PF-PKM-NAIVE-SEMAEV-EASIER",
+      "to": "COND-PKM-PRIME-ALGEBRAIC",
+      "relation": "qualifies",
+      "statement": "The authors' own comparison found the naive Semaev systems easier than the tower systems, which they say may mean the tower approach is not asymptotically efficient.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-030",
+      "from": "FACT-PF-PKM-NAIVE-SEMAEV-EASIER",
+      "to": "HEUR-PF-PKM-EASIER-THAN-SEMIGENERIC",
+      "relation": "qualifies",
+      "statement": "Being easier than semi-generic systems does not make towers easier than the naive presentation.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-031",
+      "from": "GAP-PF-DEDICATED-ROOT-FINDER",
+      "to": "DEF-PF-GENERALIZED-ROOT-FINDING",
+      "relation": "leaves_open",
+      "statement": "No non-Gröbner algorithm for Problem 1 is known.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-032",
+      "from": "ALG-PF-APS-SINGLE-RELATION",
+      "to": "COND-PF-APS-COST",
+      "relation": "enables",
+      "statement": "The cost formula is the partial analysis of the APS algorithm.",
+      "source_refs": [
+        "S-PF-APS-2018"
+      ]
+    },
+    {
+      "id": "E-PF-033",
+      "from": "THEOREM-SEMAEV-SUMMATION",
+      "to": "ALG-PF-APS-SINGLE-RELATION",
+      "relation": "enables",
+      "statement": "APS find a zero-sum among factor-base points as a zero of S_m.",
+      "source_refs": [
+        "S-PF-APS-2018"
+      ]
+    },
+    {
+      "id": "E-PF-034",
+      "from": "DEF-PF-SEMAEV-SMALL-X-BASE",
+      "to": "ALG-PF-APS-SINGLE-RELATION",
+      "relation": "qualifies",
+      "statement": "APS present their algorithm as a variation of Semaev's prime-field proposal with a random rather than small-x base.",
+      "source_refs": [
+        "S-PF-APS-2018"
+      ]
+    },
+    {
+      "id": "E-PF-035",
+      "from": "HEUR-DECOMPOSITION-PROBABILITY",
+      "to": "COND-PF-APS-COST",
+      "relation": "conditions",
+      "statement": "The success probability s^m/(q m^m) per system is a decomposition-yield heuristic.",
+      "source_refs": [
+        "S-PF-APS-2018"
+      ]
+    },
+    {
+      "id": "E-PF-036",
+      "from": "HEUR-PF-APS-T-EQUALS-TPRIME",
+      "to": "COND-PF-APS-BEATS-PKM",
+      "relation": "conditions",
+      "statement": "The comparison holds only if one APS system costs about one PKM system (13).",
+      "source_refs": [
+        "S-PF-APS-2018"
+      ]
+    },
+    {
+      "id": "E-PF-037",
+      "from": "COND-PF-PKM-COST-THRESHOLD",
+      "to": "COND-PF-APS-BEATS-PKM",
+      "relation": "enables",
+      "statement": "APS compare against PKM's cost expression p m!/s^(m-1) T' + s^omega.",
+      "source_refs": [
+        "S-PF-APS-2018",
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-038",
+      "from": "CEX-PF-APS-COMPARISON-MISMATCH",
+      "to": "HEUR-PF-APS-T-EQUALS-TPRIME",
+      "relation": "qualifies",
+      "statement": "The experimental support cited for (13) compares APS at m = 3 with PKM systems at m = 2 and swaps PKM's prime families.",
+      "source_refs": [
+        "S-PF-APS-2018",
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-039",
+      "from": "CEX-PF-APS-COMPARISON-MISMATCH",
+      "to": "COND-PF-APS-BEATS-PKM",
+      "relation": "qualifies",
+      "statement": "The published claim that APS outperform PKM rests on (13) plus a mismatched table.",
+      "source_refs": [
+        "S-PF-APS-2018",
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-040",
+      "from": "THM-PF-KYTY-APS-LIMITATION",
+      "to": "ALG-PF-APS-SINGLE-RELATION",
+      "relation": "qualifies",
+      "statement": "Kudo et al. accelerate APS and analyse the limits of that acceleration (metadata only).",
+      "source_refs": [
+        "S-PF-KYTY-2018"
+      ]
+    },
+    {
+      "id": "E-PF-041",
+      "from": "COND-PF-APS-COST",
+      "to": "GAP-PF-PRIME-RELATION-SEARCH",
+      "relation": "leaves_open",
+      "statement": "APS state explicitly that they do not claim a cost below r^(1/2).",
+      "source_refs": [
+        "S-PF-APS-2018"
+      ]
+    },
+    {
+      "id": "E-PF-042",
+      "from": "HEUR-PF-YYTK-STATISTICAL",
+      "to": "THM-PF-YYTK-NAIVE-LOWER-BOUND",
+      "relation": "conditions",
+      "statement": "The lower bound is proved only under the statistical assumptions and Conjecture 10.",
+      "source_refs": [
+        "S-PF-YYTK-2020"
+      ]
+    },
+    {
+      "id": "E-PF-043",
+      "from": "THM-PF-YYTK-NAIVE-LOWER-BOUND",
+      "to": "DEF-PF-SEMAEV-SMALL-X-BASE",
+      "relation": "obstructs",
+      "statement": "Semaev's naive method with a dense factor-base polynomial cannot beat generic methods when solved by Gröbner bases (conditionally).",
+      "source_refs": [
+        "S-PF-YYTK-2020"
+      ]
+    },
+    {
+      "id": "E-PF-044",
+      "from": "THM-PF-YYTK-NAIVE-LOWER-BOUND",
+      "to": "COND-PKM-PRIME-ALGEBRAIC",
+      "relation": "does_not_cover",
+      "statement": "The bound is stated for the naive ideal without auxiliary variables, not for PKM towers.",
+      "source_refs": [
+        "S-PF-YYTK-2020",
+        "S-PF-REPO-IC-LOWER-BOUND"
+      ]
+    },
+    {
+      "id": "E-PF-045",
+      "from": "THM-PF-YYTK-NAIVE-LOWER-BOUND",
+      "to": "ALG-PF-APS-SINGLE-RELATION",
+      "relation": "qualifies",
+      "statement": "APS System (11) is the same dense naive shape (S_m with prod(X - v) constraints) with the target folded into the base; YYTK's Euclidean-structure argument plausibly transfers but the paper bounds I_m(a,b), not System (11).",
+      "source_refs": [
+        "S-PF-YYTK-2020",
+        "S-PF-APS-2018"
+      ]
+    },
+    {
+      "id": "E-PF-046",
+      "from": "FACT-PF-PKM-NAIVE-SEMAEV-EASIER",
+      "to": "THM-PF-YYTK-NAIVE-LOWER-BOUND",
+      "relation": "qualifies",
+      "statement": "If the naive systems are easier than PKM's (PKM Section 5) and the naive method cannot beat generic methods (YYTK), the tower systems inherit no evidence of a sub-generic cost from this comparison.",
+      "source_refs": [
+        "S-PF-PKM-2016",
+        "S-PF-YYTK-2020"
+      ]
+    },
+    {
+      "id": "E-PF-047",
+      "from": "THM-PF-REPO-DIRECT-LOWER-BOUND",
+      "to": "THM-PF-YYTK-NAIVE-LOWER-BOUND",
+      "relation": "qualifies",
+      "statement": "Replaces YYTK's statistical assumptions by bookkeeping hypotheses H_C, H_E in the Macaulay-charged model, for the same dense presentation.",
+      "source_refs": [
+        "S-PF-REPO-IC-LOWER-BOUND"
+      ]
+    },
+    {
+      "id": "E-PF-048",
+      "from": "THM-PF-REPO-DIRECT-LOWER-BOUND",
+      "to": "DEF-PF-SEMAEV-SMALL-X-BASE",
+      "relation": "obstructs",
+      "statement": "Any direct (single-polynomial) prime-field base costs >= c_m r in the Macaulay model, given H_C and H_E.",
+      "source_refs": [
+        "S-PF-REPO-IC-LOWER-BOUND"
+      ]
+    },
+    {
+      "id": "E-PF-049",
+      "from": "GAP-PF-TOWER-SOLVING-DEGREE-HT",
+      "to": "GAP-PKM-SOLVING-DEGREE",
+      "relation": "instantiates",
+      "statement": "H_T is the quantitative form of the PKM solving-degree question.",
+      "source_refs": [
+        "S-PF-REPO-IC-LOWER-BOUND"
+      ]
+    },
+    {
+      "id": "E-PF-050",
+      "from": "GAP-PF-TOWER-SOLVING-DEGREE-HT",
+      "to": "COND-PKM-PRIME-ALGEBRAIC",
+      "relation": "leaves_open",
+      "statement": "Whether PKM towers fall below r^(1/2) in the Macaulay model is equivalent (given H_C, H_E) to the size of alpha, rho in H_T.",
+      "source_refs": [
+        "S-PF-REPO-IC-LOWER-BOUND"
+      ]
+    },
+    {
+      "id": "E-PF-051",
+      "from": "ASM-PF-KY-CURVE-CONSTRUCTION",
+      "to": "THM-PF-KY-NPC-SMOOTH",
+      "relation": "conditions",
+      "statement": "The reduction needs a curve with a point of order above 1 + sum 2 v_i in time poly(log n).",
+      "source_refs": [
+        "S-KOSTERS-YEO-2015"
+      ]
+    },
+    {
+      "id": "E-PF-052",
+      "from": "THM-PF-KY-SUBSET-SUM-NPC",
+      "to": "THM-PF-KY-NPC-SMOOTH",
+      "relation": "enables",
+      "statement": "Thm 3.5(i) reduces subset sum over Z to summation-polynomial evaluation.",
+      "source_refs": [
+        "S-KOSTERS-YEO-2015"
+      ]
+    },
+    {
+      "id": "E-PF-053",
+      "from": "THM-PF-KY-SUBSET-SUM-NPC",
+      "to": "THM-PF-KY-NPC-CUSPIDAL",
+      "relation": "enables",
+      "statement": "Thm 3.5(ii) reduces subset sum over (Z/pZ)^n, NP-complete for p >= 3.",
+      "source_refs": [
+        "S-KOSTERS-YEO-2015"
+      ]
+    },
+    {
+      "id": "E-PF-054",
+      "from": "THEOREM-SEMAEV-SUMMATION",
+      "to": "THM-PF-KY-NPC-SMOOTH",
+      "relation": "enables",
+      "statement": "Proposition 2.1 (Semaev's criterion) turns sum n_i v_i P = w'P into S_(m+1) = 0.",
+      "source_refs": [
+        "S-KOSTERS-YEO-2015"
+      ]
+    },
+    {
+      "id": "E-PF-055",
+      "from": "THM-PF-KY-NPC-SMOOTH",
+      "to": "COND-PF-KY-FFA-REDUCTIO",
+      "relation": "enables",
+      "statement": "The reductio needs the evaluation problem to be NP-complete.",
+      "source_refs": [
+        "S-KOSTERS-YEO-2015"
+      ]
+    },
+    {
+      "id": "E-PF-056",
+      "from": "THM-KY-S3-FIRST-FALL-TWO",
+      "to": "COND-PF-KY-FFA-REDUCTIO",
+      "relation": "enables",
+      "statement": "Each descended S_3 link of the splitting-trick chain has first fall degree 2.",
+      "source_refs": [
+        "S-KOSTERS-YEO-2015"
+      ]
+    },
+    {
+      "id": "E-PF-057",
+      "from": "COND-PF-KY-FFA-REDUCTIO",
+      "to": "HEUR-FIRST-FALL-DEGREE",
+      "relation": "obstructs",
+      "statement": "An assumption that bounds the solving degree by a constant first fall degree regardless of the number of variables would decide an NP-complete problem in polynomial time.",
+      "source_refs": [
+        "S-KOSTERS-YEO-2015"
+      ]
+    },
+    {
+      "id": "E-PF-058",
+      "from": "THM-PF-KY-NPC-SMOOTH",
+      "to": "GAP-PF-PRIME-RELATION-SEARCH",
+      "relation": "does_not_cover",
+      "statement": "Worst-case NP-completeness over varying fields and r says nothing about fixed-m decomposition on one prime-field curve (Remark 3.7).",
+      "source_refs": [
+        "S-KOSTERS-YEO-2015"
+      ]
+    },
+    {
+      "id": "E-PF-059",
+      "from": "HEUR-PF-PKM-FFA-TRANSPOSED",
+      "to": "HEUR-FIRST-FALL-DEGREE",
+      "relation": "instantiates",
+      "statement": "The transposed assumption is the first-fall heuristic applied to prime-field towers.",
+      "source_refs": [
+        "S-PF-REPO-FALL-DEGREE"
+      ]
+    },
+    {
+      "id": "E-PF-060",
+      "from": "THM-PF-REPO-KUMMER-FFD-FOUR",
+      "to": "HEUR-PF-PKM-FFA-TRANSPOSED",
+      "relation": "enables",
+      "statement": "With ffd = 4 for every t, the transposed assumption predicts a bounded solving degree.",
+      "source_refs": [
+        "S-PF-REPO-FALL-DEGREE"
+      ]
+    },
+    {
+      "id": "E-PF-061",
+      "from": "MEAS-PF-REPO-KUMMER-DEGREE",
+      "to": "HEUR-PF-PKM-FFA-TRANSPOSED",
+      "relation": "obstructs",
+      "statement": "D rises from 5 to 6 (and >= 6 at t = 14) while ffd stays 4: the prime-field analogue of Kosters-Yeo's binary observation.",
+      "source_refs": [
+        "S-PF-REPO-FALL-DEGREE-T14",
+        "S-PF-REPO-FALL-DEGREE"
+      ]
+    },
+    {
+      "id": "E-PF-062",
+      "from": "THM-KY-S3-FIRST-FALL-TWO",
+      "to": "THM-PF-REPO-KUMMER-FFD-FOUR",
+      "relation": "qualifies",
+      "statement": "Same phenomenon in characteristic 2: a constant first fall degree that does not track the solver degree.",
+      "source_refs": [
+        "S-KOSTERS-YEO-2015",
+        "S-PF-REPO-FALL-DEGREE"
+      ]
+    },
+    {
+      "id": "E-PF-063",
+      "from": "MEAS-PF-REPO-KUMMER-DEGREE",
+      "to": "GAP-PKM-SOLVING-DEGREE",
+      "relation": "measures",
+      "statement": "The current m = 2 frontier: D = 6 through t = 11, >= 6 at t = 14, C-step (7) undecided pending the cap-6 cell.",
+      "source_refs": [
+        "S-PF-REPO-FALL-DEGREE-T14"
+      ]
+    },
+    {
+      "id": "E-PF-064",
+      "from": "MEAS-PF-REPO-KUMMER-DEGREE",
+      "to": "MEAS-PF-PKM-DEGREE-TABLES",
+      "relation": "qualifies",
+      "statement": "Independent reproduction of the same degree values (5 at |V| = 2^9, 6 at 2^10) in a different regime (fixed 31-bit p, inconsistent targets), with a different engine.",
+      "source_refs": [
+        "S-PF-REPO-FALL-DEGREE-T14",
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-065",
+      "from": "MEAS-PF-REPO-HIGHER-M-DEGREE",
+      "to": "GAP-PKM-SOLVING-DEGREE",
+      "relation": "measures",
+      "statement": "m = 4 breaks the plateau (D >= 8 at N = 20); m = 3 is censored at degree 8.",
+      "source_refs": [
+        "S-PF-REPO-HIGHER-M-DEGREE"
+      ]
+    },
+    {
+      "id": "E-PF-066",
+      "from": "MEAS-PF-REPO-HIGHER-M-DEGREE",
+      "to": "GAP-PF-TOWER-SOLVING-DEGREE-HT",
+      "relation": "measures",
+      "statement": "Finite-N evidence on alpha: about one degree per eight tower unknowns over N = 12-20 at m = 4.",
+      "source_refs": [
+        "S-PF-REPO-HIGHER-M-DEGREE"
+      ]
+    },
+    {
+      "id": "E-PF-067",
+      "from": "MEAS-PF-REPO-KUMMER-DEGREE",
+      "to": "GAP-PF-TOWER-SOLVING-DEGREE-HT",
+      "relation": "measures",
+      "statement": "m = 2 degree steps give finite-t evidence on alpha.",
+      "source_refs": [
+        "S-PF-REPO-FALL-DEGREE-T14"
+      ]
+    },
+    {
+      "id": "E-PF-068",
+      "from": "MEAS-PF-REPO-PKM-VS-RHO",
+      "to": "COND-PKM-PRIME-ALGEBRAIC",
+      "relation": "measures",
+      "statement": "End-to-end priced PKM pipelines stay 17-141x above matched rho at 20-28 bits, with gaps widening.",
+      "source_refs": [
+        "S-PF-REPO-PKM-PRICED"
+      ]
+    },
+    {
+      "id": "E-PF-069",
+      "from": "MEAS-PF-REPO-PKM-VS-RHO",
+      "to": "GAP-PF-SPECIAL-PRIME-EXPOSURE",
+      "relation": "measures",
+      "statement": "Solinas and P-224-shape primes are 18.4-75.9x matched rho at toy sizes.",
+      "source_refs": [
+        "S-PF-REPO-PKM-PRICED"
+      ]
+    },
+    {
+      "id": "E-PF-070",
+      "from": "COND-PKM-PRIME-ALGEBRAIC",
+      "to": "GAP-COORDINATE-ALGEBRAIC",
+      "relation": "instantiates",
+      "statement": "PKM is a coordinate-algebraic route outside the generic-group lower bounds.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-071",
+      "from": "HEUR-FIRST-FALL-DEGREE",
+      "to": "COND-PF-PKM-COST-THRESHOLD",
+      "relation": "qualifies",
+      "statement": "PKM decline to estimate T with the first fall degree assumption, calling it 'known to be false in general'; any estimate of T through it inherits that weakness.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-072",
+      "from": "DEF-PF-QUASI-SUBFIELD-POLY",
+      "to": "COND-PF-HKPYY-COMPLEXITY",
+      "relation": "defines",
+      "statement": "The factor base is the root set of a QSP.",
+      "source_refs": [
+        "S-PF-HKPYY-2020",
+        "S-PF-MCGUIRE-MUELLER-2019"
+      ]
+    },
+    {
+      "id": "E-PF-073",
+      "from": "THEOREM-SEMAEV-SUMMATION",
+      "to": "COND-PF-HKPYY-COMPLEXITY",
+      "relation": "enables",
+      "statement": "Relations are zeros of S_(m+1) with x_i among the QSP roots.",
+      "source_refs": [
+        "S-PF-EULER-PETIT-2021"
+      ]
+    },
+    {
+      "id": "E-PF-074",
+      "from": "HEUR-DECOMPOSITION-PROBABILITY",
+      "to": "COND-PF-HKPYY-COMPLEXITY",
+      "relation": "conditions",
+      "statement": "The |F|^m/(m! p^n) success probability is the decomposition heuristic.",
+      "source_refs": [
+        "S-PF-EULER-PETIT-2021"
+      ]
+    },
+    {
+      "id": "E-PF-075",
+      "from": "COND-PF-HKPYY-COMPLEXITY",
+      "to": "COND-PF-EP-BETA-THRESHOLD",
+      "relation": "conditions",
+      "statement": "Euler-Petit's threshold is a re-parametrisation of HKPYY's estimate.",
+      "source_refs": [
+        "S-PF-EULER-PETIT-2021"
+      ]
+    },
+    {
+      "id": "E-PF-076",
+      "from": "THM-PF-HKPYY-LEMMA41",
+      "to": "DEF-PF-QUASI-SUBFIELD-POLY",
+      "relation": "qualifies",
+      "statement": "A split QSP needs l large relative to n'^2/n: small-deg lambda is impossible when n' does not divide n.",
+      "source_refs": [
+        "S-PF-EULER-PETIT-2021"
+      ]
+    },
+    {
+      "id": "E-PF-077",
+      "from": "THM-PF-EP-LINEARIZED-BETA",
+      "to": "THM-PF-HKPYY-LEMMA41",
+      "relation": "qualifies",
+      "statement": "Strengthens Lemma 4.1 for linearized QSPs whenever (n mod n') >= n'/4.",
+      "source_refs": [
+        "S-PF-EULER-PETIT-2021"
+      ]
+    },
+    {
+      "id": "E-PF-078",
+      "from": "THM-PF-EP-LINEARIZED-BETA",
+      "to": "FACT-PF-EP-LINEARIZED-NO-GAIN",
+      "relation": "enables",
+      "statement": "beta >= 3/4 gives alpha_beta < 1/7.",
+      "source_refs": [
+        "S-PF-EULER-PETIT-2021"
+      ]
+    },
+    {
+      "id": "E-PF-079",
+      "from": "COND-PF-EP-BETA-THRESHOLD",
+      "to": "FACT-PF-EP-LINEARIZED-NO-GAIN",
+      "relation": "conditions",
+      "statement": "The no-gain conclusion is relative to the threshold beta < 0.103 derived from HKPYY's estimate.",
+      "source_refs": [
+        "S-PF-EULER-PETIT-2021"
+      ]
+    },
+    {
+      "id": "E-PF-080",
+      "from": "FACT-PF-EP-LINEARIZED-NO-GAIN",
+      "to": "COND-PF-HKPYY-COMPLEXITY",
+      "relation": "obstructs",
+      "statement": "No linearized QSP makes the QSP algorithm beat generic algorithms under its own cost estimate.",
+      "source_refs": [
+        "S-PF-EULER-PETIT-2021"
+      ]
+    },
+    {
+      "id": "E-PF-081",
+      "from": "THM-PF-MM-TRINOMIALS",
+      "to": "FACT-PF-MM-TRINOMIAL-NO-GAIN",
+      "relation": "enables",
+      "statement": "Thm 1.1(3) trinomials are the QSPs evaluated.",
+      "source_refs": [
+        "S-PF-MCGUIRE-MUELLER-2019"
+      ]
+    },
+    {
+      "id": "E-PF-082",
+      "from": "COND-PF-HKPYY-COMPLEXITY",
+      "to": "FACT-PF-MM-TRINOMIAL-NO-GAIN",
+      "relation": "conditions",
+      "statement": "The no-gain computation plugs the trinomials into HKPYY's estimate.",
+      "source_refs": [
+        "S-PF-MCGUIRE-MUELLER-2019"
+      ]
+    },
+    {
+      "id": "E-PF-083",
+      "from": "FACT-PF-MM-TRINOMIAL-NO-GAIN",
+      "to": "COND-PF-HKPYY-COMPLEXITY",
+      "relation": "obstructs",
+      "statement": "Split linearized trinomials beat brute force but not generic algorithms.",
+      "source_refs": [
+        "S-PF-MCGUIRE-MUELLER-2019"
+      ]
+    },
+    {
+      "id": "E-PF-084",
+      "from": "THM-PF-MM-TRINOMIALS",
+      "to": "THM-PF-EP-LINEARIZED-BETA",
+      "relation": "qualifies",
+      "statement": "Independent trinomial special case of the beta >= 3/4 bound (noted by Euler-Petit).",
+      "source_refs": [
+        "S-PF-EULER-PETIT-2021",
+        "S-PF-MCGUIRE-MUELLER-2019"
+      ]
+    },
+    {
+      "id": "E-PF-085",
+      "from": "THM-PF-EP-QSP-FAMILIES",
+      "to": "HEUR-PF-HKPYY-SPARSE-DENSITY",
+      "relation": "refutes",
+      "statement": "Type 2 linearized QSPs for Mersenne n and the multiplicative families exist, contradicting the density heuristic's conclusion that they should not.",
+      "source_refs": [
+        "S-PF-EULER-PETIT-2021"
+      ]
+    },
+    {
+      "id": "E-PF-086",
+      "from": "THM-PF-EP-QSP-FAMILIES",
+      "to": "GAP-PF-QSP-EXISTENCE",
+      "relation": "leaves_open",
+      "statement": "The best known QSP has beta ~ 0.70, far above 0.103.",
+      "source_refs": [
+        "S-PF-EULER-PETIT-2021"
+      ]
+    },
+    {
+      "id": "E-PF-087",
+      "from": "FACT-PF-EP-LINEARIZED-NO-GAIN",
+      "to": "GAP-PF-QSP-EXISTENCE",
+      "relation": "qualifies",
+      "statement": "Narrows the open problem to non-linearized QSPs (or a better solver constant kappa < 1.5).",
+      "source_refs": [
+        "S-PF-EULER-PETIT-2021"
+      ]
+    },
+    {
+      "id": "E-PF-088",
+      "from": "COND-PF-HKPYY-COMPLEXITY",
+      "to": "COND-PKM-PRIME-ALGEBRAIC",
+      "relation": "does_not_cover",
+      "statement": "QSPs live in F_(p^n) with n >= 2; the prime-field analogue is PKM's rational-map base, not a QSP.",
+      "source_refs": [
+        "S-PF-EULER-PETIT-2021",
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "E-PF-089",
+      "from": "DEF-PF-QUASI-SUBFIELD-POLY",
+      "to": "DEF-PF-RATIONAL-MAP-FACTOR-BASE",
+      "relation": "qualifies",
+      "statement": "Both generalize the subfield polynomial X^q - X used by Diem and Gaudry (PKM Section 1; Euler-Petit Section 4.1): QSPs keep one sparse polynomial in an extension field, PKM compose low-degree maps over F_p.",
+      "source_refs": [
+        "S-PF-PKM-2016",
+        "S-PF-EULER-PETIT-2021"
+      ]
+    },
+    {
+      "id": "E-PF-090",
+      "from": "ALG-GAUDRY-FIXED-EXTENSION",
+      "to": "DEF-PF-RATIONAL-MAP-FACTOR-BASE",
+      "relation": "qualifies",
+      "statement": "PKM present Gaudry/Diem's base as the case L(x) = x^q - x of their framework.",
+      "source_refs": [
+        "S-PF-PKM-2016"
+      ]
+    }
+  ],
+  "research_targets": [
+    {
+      "id": "RT-PF-CSTEP-T14",
+      "label": "Decide the PKM Kummer m = 2 degree at t = 14",
+      "status": "blocked",
+      "priority": 1,
+      "objective": "Run the cap-6 capped-F4 cells at t = 14 on both draws to decide whether the refutation degree is 6 or >= 7, i.e. whether C-step (one degree per four levels) holds; this is the cheapest decisive measurement on GAP-PKM-SOLVING-DEGREE / H_T for m = 2.",
+      "depends_on": [
+        "MEAS-PF-REPO-KUMMER-DEGREE",
+        "GAP-PF-TOWER-SOLVING-DEGREE-HT",
+        "GAP-PKM-SOLVING-DEGREE",
+        "HEUR-PF-PKM-FFA-TRANSPOSED"
+      ],
+      "acceptance": "Two non-censored cap-6 rows at t = 14 (refutes => D <= 6, C-step refuted; no refutation => D >= 7), with commit, binary hash and host recorded.",
+      "next_step": "Resolve the Iso Lab route gap in research/prime_fall_degree_t14_20261101/README.md (112 GiB, 86,400 s, digest-pinned image with pkm_tower_pilot).",
+      "source_refs": [
+        "S-PF-REPO-FALL-DEGREE-T14",
+        "S-PF-REPO-FALL-DEGREE"
+      ]
+    },
+    {
+      "id": "RT-PF-PROVE-HT-OR-BOUNDED",
+      "label": "Prove a growing lower bound on the PKM tower solving degree",
+      "status": "open",
+      "priority": 2,
+      "objective": "Prove D_sol >= alpha t - O(1) for the Kummer m = 2 tower (group algebra F_p[z]/(z^K - 1), popcount grading, DERIVED.md D2), or exhibit a bounded-degree certificate family, settling H_T for the simplest case and turning the measured 4 -> 5 -> 6 steps into a theorem.",
+      "depends_on": [
+        "GAP-PF-TOWER-SOLVING-DEGREE-HT",
+        "THM-PF-REPO-KUMMER-FFD-FOUR",
+        "MEAS-PF-PKM-DEGREE-TABLES",
+        "GAP-PF-PKM-ASYMPTOTIC-OPEN"
+      ],
+      "acceptance": "A written proof (popcount/carry argument on the group algebra, using DERIVED.md D4's certificate bound d_F <= 2t + 2 as the matching upper side) checked against every measured D at t <= 11.",
+      "next_step": "Start from DERIVED.md D3-D4: characterise when a degree-c combination of the reduced S_3 with tower monomials can cancel all carries.",
+      "source_refs": [
+        "S-PF-REPO-FALL-DEGREE",
+        "S-PF-REPO-IC-LOWER-BOUND",
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "RT-PF-APS-VS-PKM-REMEASURE",
+      "label": "Re-measure APS against PKM at matched m",
+      "status": "ready",
+      "priority": 3,
+      "objective": "Replace APS Table 2's mismatched comparison (APS m = 3 vs PKM m = 2) by a matched-m, matched-p comparison of one APS System (11) against one PKM System (4), testing assumption (13) directly, using the repository's existing aps_single_relation and pkm_tower instruments.",
+      "depends_on": [
+        "CEX-PF-APS-COMPARISON-MISMATCH",
+        "HEUR-PF-APS-T-EQUALS-TPRIME",
+        "COND-PF-APS-BEATS-PKM",
+        "ALG-PF-APS-SINGLE-RELATION"
+      ],
+      "acceptance": "Per-system cost ratio T/T' with intervals at m = 3 over at least four field sizes, frozen protocol, both arms on the same host and engine.",
+      "next_step": "Freeze an experiment.protocol/v1 with m = 3, p of 14-22 bits, PKM Kummer and isogeny bases vs APS partitioned bases of equal |V_i|.",
+      "source_refs": [
+        "S-PF-APS-2018",
+        "S-PF-PKM-2016"
+      ]
+    },
+    {
+      "id": "RT-PF-YYTK-READ",
+      "label": "Read YYTK in full and check its scope against APS System (11)",
+      "status": "blocked",
+      "priority": 4,
+      "objective": "Obtain the primary text of Yokoyama et al. 2020 (open access, bot-checked here), record Assumptions 7/11 and Conjecture 10 verbatim with locations, and decide whether the lower bound covers APS's partitioned system and the m = 4, 5 auxiliary-variable splits.",
+      "depends_on": [
+        "THM-PF-YYTK-NAIVE-LOWER-BOUND",
+        "HEUR-PF-YYTK-STATISTICAL",
+        "ALG-PF-APS-SINGLE-RELATION"
+      ],
+      "acceptance": "Source upgraded to primary_read with SHA-256; an edge YYTK -> APS of relation obstructs or does_not_cover with a quoted reason.",
+      "next_step": "Fetch the JMC PDF from a host without the bot check, or use the off-repository extracted text cited in RESEARCH_ALGEBRAIC_IC_LOWER_BOUND.md.",
+      "source_refs": [
+        "S-PF-YYTK-2020"
+      ]
+    }
+  ]
+}

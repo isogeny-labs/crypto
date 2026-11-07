@@ -3,6 +3,13 @@
 Observed on 2026-10-26. This is a preparation/access record, not an experiment
 result, a frozen protocol, or a completed native implementation.
 
+Update, 2026-10-28: the supplied lab-account AWS credentials pass the official
+checkpoint gate; downloaded resume bytes match. The
+[new access receipt](access/20261028-aws.json) records that success and the
+remaining `codebuild:BatchGetBuilds` denial. All five historical artifacts are
+now [published and readback-verified](../ARTIFACT_PUBLICATION_RECEIPT.json).
+The observations below remain the original 2026-10-26 failure record.
+
 The cloud environment is running again. Three independent prerequisites remain:
 
 | Prerequisite | Observation | Consequence |

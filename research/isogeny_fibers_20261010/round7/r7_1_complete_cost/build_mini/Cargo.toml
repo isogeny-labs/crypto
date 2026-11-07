@@ -1,0 +1,33 @@
+# Minimal crate named `crypto_lib` that includes the SAME source files as the
+# repository's library for `cryptanalysis::isogeny_eval` and the
+# `cryptanalysis::isogeny_walk` modules the example uses.  It exists because
+# the full crate's build was OOM-killed in the shared 15 GB session container
+# (rustc peaked at 6.5 GB); on a normal machine use
+#   cargo build --release --example r7_1_complete_cost
+# in the repository instead.  make.sh writes src/lib.rs and the example link.
+[package]
+name = "r71mini"
+version = "0.0.0"
+edition = "2021"
+
+[lib]
+name = "crypto_lib"
+path = "src/lib.rs"
+
+[dependencies]
+num-bigint = { version = "0.4", features = ["rand"] }
+num-traits = "0.2"
+rand = { version = "0.8", features = ["small_rng"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", features = ["arbitrary_precision", "raw_value"] }
+
+[lints.clippy]
+needless_range_loop = "allow"
+manual_memcpy = "allow"
+too_many_arguments = "allow"
+type_complexity = "allow"
+unusual_byte_groupings = "allow"
+result_unit_err = "allow"
+chunks_exact_to_as_chunks = "allow"
+
+[workspace]

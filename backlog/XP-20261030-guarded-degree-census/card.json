@@ -1,0 +1,109 @@
+{
+  "schema": "backlog.card/v1",
+  "id": "XP-20261030-guarded-degree-census",
+  "title": "Certify exhaustive last-fall, solving and regularity degrees on one prime and one binary curve",
+  "created": "2026-10-30",
+  "authors": [
+    "Codex research lane"
+  ],
+  "status": "draft",
+  "status_note": "Unrun and unfunded: native census instrument, independent checker, canonical frozen protocol and authorized image/execution route are missing. Structural Lean results are a separate deliverable.",
+  "blocked_on": [
+    "note:finish native producer and independent checker with SAT, UNSAT, corruption and representation controls",
+    "note:validate and freeze canonical experiment.protocol/v1 and required resume checkpoint before data",
+    "hw:qualify an existing authorized EKS role plus source-matched custom image/build route; STS currently has no credentials"
+  ],
+  "links": {
+    "lead": "research/guarded_degree_invariants_20261030/STUDY_DESIGN.md",
+    "notes": [
+      "research/guarded_degree_invariants_20261030/REPORT.md",
+      "research/guarded_fall_degree_20261028/README.md"
+    ],
+    "prs": [
+      2859
+    ]
+  },
+  "question": "What are the certified last fall, graded-order solving and BFS regularity degrees for every registered target and three-abscissa base on the fixed F7 and F8 curves, with and without explicit field equations?",
+  "decision_value": "Separates raw-presentation regularity non-finiteness from finite field-equation regularity, tests the scoped prime exact-five result and records binary/SAT degree obligations. Every target/base stays in the census, including resource-limited or unresolved cases; no runtime, asymptotic or recovery claim is inferred.",
+  "protocol": {
+    "path": null,
+    "blob": null
+  },
+  "code": {
+    "repo": "crypto",
+    "commit": "4b1834891e78ca3f83b64540717042e0569d2a60",
+    "branch": "codex/guarded-degree-invariants-20261030",
+    "build": [
+      [
+        "cargo",
+        "build",
+        "--release",
+        "--locked",
+        "--bin",
+        "guarded-degree-census"
+      ]
+    ]
+  },
+  "resources": {
+    "cpus": 4,
+    "ram_gb": 16,
+    "disk_gb": 16,
+    "gpu": null,
+    "est_core_hours": null,
+    "est_wall_hours": null,
+    "notes": "Provisional ceiling only, not a runtime or feasibility estimate. The named instrument is not implemented at the source pin. Freeze measured pilot sizing and the absolute full-run deadline before ready; no capacity increase authorized."
+  },
+  "run": {
+    "argv": [
+      "target/release/guarded-degree-census",
+      "--protocol",
+      "backlog/XP-20261030-guarded-degree-census/protocol.json",
+      "--out",
+      "{out}"
+    ],
+    "env": {
+      "RAYON_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1"
+    },
+    "timeout_per_shard_s": 3600
+  },
+  "shards": {
+    "count": 1,
+    "scheme": "single",
+    "params": {},
+    "stop": "all"
+  },
+  "checkpoint": {
+    "file": null,
+    "resume_flag": null
+  },
+  "outputs": {
+    "result_schema": "experiment.export/v1 plus independently checked upper/lower, basis and Hilbert certificates; adapters not implemented",
+    "verify": [],
+    "land": "research/guarded_degree_invariants_20261030/census"
+  },
+  "cairn": {
+    "mode": "lab-task",
+    "space": "TBD",
+    "tasks": [
+      "XP-20261030-guarded-degree-census"
+    ],
+    "ttl_s": 86400,
+    "env": {
+      "name": "guarded-degree-census-pending",
+      "recipe": "Pin implemented native producer/checker, source and immutable custom execution image after qualification; no runnable environment claimed."
+    },
+    "exec": {
+      "cpus": 4,
+      "memory_mb": 16384,
+      "timeout_s": 3600,
+      "sandbox": "auto",
+      "publish": "runs/XP-20261030-guarded-degree-census"
+    },
+    "funding": {
+      "units": 0,
+      "rationale": "Unfunded blocked design only; no queue reward, cloud launch or IAM change authorized by this metadata."
+    }
+  },
+  "owner_hint": "Finite-field polynomial degree certification lane"
+}

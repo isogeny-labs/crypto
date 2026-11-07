@@ -1,0 +1,123 @@
+{
+  "schema": "pkm.merged-proof-gate-validation/v1",
+  "utc": "2026-10-30T18:40:15.367980+00:00",
+  "source_merge": "a030c1630518564bdb3633815391858b424377ce",
+  "metadata_head": "8b0cda906a7aaffce8daea70fc38a6aaa0bbcd86",
+  "source_objects": {
+    "src": "1ed5fbf7d68fcb2612bc794cd5a2f8934a2b55b1",
+    "crates": "598dc041ae257995d5dc666151921ee88f281017",
+    "Cargo.toml": "27bd18ea4dd995f969ddff7ef859c3b88612551c",
+    "Cargo.lock": "efc8d1888cb0f579d2045003195d517ce93d9e3c",
+    "examples/pkm_oracle_program.rs": "0b2d978683664b8c3d1ab6663a3b0cf75dc68d4e",
+    "examples/pkm_oracle_program": "6acb74a9bb88b3aa29a26cbe94d22d1a6a6d557d",
+    "examples/pkm_symmetric_complete.rs": "0fb50ab47dab4256dd29f4ac8eb84fb5313168e8",
+    "examples/hecke_target_router.rs": "6cbba7cbe8b673b313c08583d0a9fd00e343bf75",
+    "tools/factor-base": "7ddafa821c968783132462b62f2e051c508e7172",
+    "tools/volcano-cli": "52b1c64049002561f3ff55b149c300cdb4656f34",
+    "scripts/checkpoint.sh": "6a2a37967047b1a46ed62a4123f4c69f08a55d04",
+    "tools/lean": "b53b7f1eac6e4688f782c7e83d87fd9847867020",
+    "tests": "944fa03b7a0db26878e679649c7cbf24f4b53c57",
+    "research/prime_ecdlp_three_leads_20261029/lean": "1c366822536c08b212a7d36045580ee715f327a0",
+    "research/aps_measurement_20261029/spec-controls.json": "c11e5f1515b0080aae37539e8321cc82be573f3c",
+    "research/aps_measurement_20261029/spec-orbit-controls.json": "4f832f6190d8347f42892e304fec986453e59f66",
+    "backlog/XP-20261029-pkm-verified-oracle-program/card.json": "e99f0d598cd89d839060e991b9b157efbd6f286a"
+  },
+  "new_lean_gate_object": "b53b7f1eac6e4688f782c7e83d87fd9847867020",
+  "project_object": "1c366822536c08b212a7d36045580ee715f327a0",
+  "gate_exit": 0,
+  "project_declarations": 18,
+  "trusted_exceptions": 0,
+  "standard_foundations": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ],
+  "module_kernel_replay_exit": 0,
+  "fresh_import_replay": false,
+  "commands": {
+    "gate": "tools/lean/proof-gate.sh --out /workspace/pkm-scalar-certificates-20261030/remote-0cc5/proof-gate research/prime_ecdlp_three_leads_20261029/lean",
+    "kernel": "lake env leanchecker ThreeLeads.PKMScalarCertificates"
+  },
+  "native_validation": "TERMINAL101 at first compilation; zero tests ran; see native-failure/receipt.json; no current native pass",
+  "captures": {
+    "proof-gate.log": {
+      "raw_bytes": 92,
+      "raw_sha256": "b2954aee2f2e86b5bfd629b5335aa29e3ffdbd845e065b6af3dad1d4cf962844",
+      "stored_bytes": 92,
+      "stored_sha256": "b2954aee2f2e86b5bfd629b5335aa29e3ffdbd845e065b6af3dad1d4cf962844",
+      "prefix_preserved": true
+    },
+    "proof-gate.exit": {
+      "raw_bytes": 2,
+      "raw_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "stored_bytes": 2,
+      "stored_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "prefix_preserved": true
+    },
+    "kernel.log": {
+      "raw_bytes": 0,
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stored_bytes": 0,
+      "stored_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "prefix_preserved": true
+    },
+    "kernel.exit": {
+      "raw_bytes": 2,
+      "raw_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "stored_bytes": 2,
+      "stored_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "prefix_preserved": true
+    },
+    "supervisor.pid": {
+      "raw_bytes": 6,
+      "raw_sha256": "a1d10d24d8b80480e5f1b9c6fdac3770d59963db15d707c54c9005a966872f82",
+      "stored_bytes": 6,
+      "stored_sha256": "a1d10d24d8b80480e5f1b9c6fdac3770d59963db15d707c54c9005a966872f82",
+      "prefix_preserved": true
+    },
+    "example-tests.started": {
+      "raw_bytes": 21,
+      "raw_sha256": "4429c6eba766a549c3b6cf45227bda1a90016dca6193b7acfa4e056b3daa24ad",
+      "stored_bytes": 21,
+      "stored_sha256": "4429c6eba766a549c3b6cf45227bda1a90016dca6193b7acfa4e056b3daa24ad",
+      "prefix_preserved": true
+    },
+    "proof-gate/research_prime_ecdlp_three_leads_20261029_lean/source-build.log": {
+      "raw_bytes": 2544,
+      "raw_sha256": "030bdc8d75f565c5ecbc3f737d7a539a882959bd5a0683ee822342c93d2c313c",
+      "stored_bytes": 2544,
+      "stored_sha256": "030bdc8d75f565c5ecbc3f737d7a539a882959bd5a0683ee822342c93d2c313c",
+      "prefix_preserved": true
+    },
+    "proof-gate/research_prime_ecdlp_three_leads_20261029_lean/status": {
+      "raw_bytes": 5,
+      "raw_sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431",
+      "stored_bytes": 5,
+      "stored_sha256": "c26de83abdc9496cd1301470918ec39ecca1cf389ef0ae1c6504da1800d1c431",
+      "prefix_preserved": true
+    },
+    "proof-gate/research_prime_ecdlp_three_leads_20261029_lean/build.log": {
+      "raw_bytes": 994,
+      "raw_sha256": "fd3f4c2f41d4fc2b7334d43d37dd0854abe3c6ba7a24c866d270ce050a5e8cc4",
+      "stored_bytes": 994,
+      "stored_sha256": "fd3f4c2f41d4fc2b7334d43d37dd0854abe3c6ba7a24c866d270ce050a5e8cc4",
+      "prefix_preserved": true
+    },
+    "proof-gate/research_prime_ecdlp_three_leads_20261029_lean/audit.log": {
+      "raw_bytes": 1766,
+      "raw_sha256": "50c4c5969367a6fad38597f0af9e5afb5a84e87bb92f56274231acd694fc4b88",
+      "stored_bytes": 1766,
+      "stored_sha256": "50c4c5969367a6fad38597f0af9e5afb5a84e87bb92f56274231acd694fc4b88",
+      "prefix_preserved": true
+    },
+    "proof-gate/research_prime_ecdlp_three_leads_20261029_lean/cache.log": {
+      "raw_bytes": 138,
+      "raw_sha256": "29e284dc7d8024aa6a333a92d0b23035028d78ada47b37f7dd77d8e1a0293483",
+      "stored_bytes": 138,
+      "stored_sha256": "29e284dc7d8024aa6a333a92d0b23035028d78ada47b37f7dd77d8e1a0293483",
+      "prefix_preserved": true
+    }
+  },
+  "scientific_panels": 0,
+  "comparison_admissible": false
+}

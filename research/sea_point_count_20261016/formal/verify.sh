@@ -2,14 +2,17 @@
 # Thin tool orchestration. Arithmetic, measurements and verification are native.
 set -euo pipefail
 study=$(cd "$(dirname "$0")/.." && pwd)
-jar=${TLA_JAR:-${RUNNER_TEMP:-/tmp}/sea-tla2tools-1.8.0.jar}
+jar=${TLA_JAR:-${RUNNER_TEMP:-/tmp}/sea-tla2tools-1.7.1.jar}
 logs=${FORMAL_LOG_DIR:-${RUNNER_TEMP:-/tmp}/sea-formal-replay}
 mkdir -p "$logs"
 if [ ! -f "$jar" ]; then
+  # v1.8.0 is a rolling prerelease whose asset bytes change under one URL.
+  # Use the stable 1.7.1 release and verify its published SHA-1 and our SHA-256.
   curl --proto '=https' --tlsv1.2 -fsSL \
-    https://github.com/tlaplus/tlaplus/releases/download/v1.8.0/tla2tools.jar -o "$jar"
+    https://github.com/tlaplus/tlaplus/releases/download/v1.7.1/tla2tools.jar -o "$jar"
 fi
-printf '15d103b7e5617780bcc904c0af12f1ad242e2b345c0301136c5be4588f17edac  %s\n' "$jar" | sha256sum -c -
+printf '9416f74257aa50f250776db34964db7ec99e9883  %s\n' "$jar" | sha1sum -c -
+printf 'd532ba31aafe17afba1130f92410d9257454ff7393d1eb2fe032f0c07f352da5  %s\n' "$jar" | sha256sum -c -
 cd "$study/formal"
 check() {
   local model=$1 config=$2 expected=$3 invariant=${4:-}
@@ -34,5 +37,9 @@ check Certification SampleOnly 12 NontrivialSampleSound
 cd "$study/lean"
 lake build > "$logs/lean-build.txt" 2>&1
 lake env lean SeaProofs.lean > "$logs/lean-axioms.txt" 2>&1
-if grep -Eq 'sorryAx|^error:' "$logs/lean-axioms.txt"; then cat "$logs/lean-axioms.txt"; exit 1; fi
+lake env lean RegistryOrderUniqueness.lean > "$logs/registry-order-axioms.txt" 2>&1
+if grep -Eq 'sorryAx|^error:' "$logs/lean-axioms.txt" "$logs/registry-order-axioms.txt"; then
+  cat "$logs/lean-axioms.txt" "$logs/registry-order-axioms.txt"
+  exit 1
+fi
 printf 'Lean build and axiom inspection passed\n'

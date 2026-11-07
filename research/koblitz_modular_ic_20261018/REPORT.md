@@ -139,7 +139,7 @@ norm versus monic-division coefficient comparison in the native driver.
 The two arithmetic constructions are distinct; the replay remains
 same-agent/same-host rather than an independent validation.
 
-## 3. New written bound: no degree-131 cyclic carrier below genus 394
+## 3. New conditional written bound: no degree-131 cyclic carrier below genus 394
 
 **Statement.** Let C and B be smooth projective geometrically connected
 curves over F_2, and C->B a finite separable map, geometrically Galois

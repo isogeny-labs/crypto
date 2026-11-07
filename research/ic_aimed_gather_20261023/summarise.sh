@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+# WARNING (2026-11-06): the bootstrap below is defective and its intervals
+# are superseded.  jq steps the LCG in doubles, so past 2^53 the rounded
+# states are almost always even and, with an even round count, the
+# resamples draw only odd-numbered rounds.  Kept unchanged as the as-run
+# record; the published intervals come from
+# research/ic_aimed_gather_20261023/aa2_20261029/correct_bootstrap.sh
+# (summary-corrected.json), and aa2_20261029/CORRECTION.md says how.
 # Reduce runs/ to summary.json: Callgrind totals per arm, the perf sampling
 # shares, and the native timing statistics PROTOCOL.md declares.  jq only.
 #

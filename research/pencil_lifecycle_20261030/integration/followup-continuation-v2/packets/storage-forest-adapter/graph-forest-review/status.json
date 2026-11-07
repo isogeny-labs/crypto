@@ -1,0 +1,59 @@
+{
+  "schema": "formal-review/v1",
+  "task": "T-1237",
+  "component": "graph-forest-closure",
+  "producer_commit": "09e64fca5552e185b24359be7283660d1604d392",
+  "machine_status": "passed",
+  "source_fidelity": "faithful_scoped",
+  "review_outcome": "validated_scoped",
+  "counts": {
+    "main": 10,
+    "producer_controls": 9,
+    "reviewer_controls": 15,
+    "readbacks": 34,
+    "manifest_matches": 1599
+  },
+  "acceptance": "acceptance.json",
+  "derived": [
+    "rank witness from old Reach",
+    "post-union Forest",
+    "first root retained after second find",
+    "two-find distinct-root union Valid",
+    "component transfer",
+    "next find existence"
+  ],
+  "explicit_assumptions": [
+    "initial Forest and Valid",
+    "two Run witnesses",
+    "true edge",
+    "distinct returned roots",
+    "unit-square decoded sign products"
+  ],
+  "boundaries": [
+    "same-root cycle/anchor composition",
+    "native size metadata and overflow",
+    "node allocation/Vec/counters",
+    "word/sign decoding",
+    "compiled Rust"
+  ],
+  "negative_control": {
+    "directory": "subject/invocation-9j2tzvzh",
+    "native_exit": 1,
+    "gate_exit": 1,
+    "reason": "unsolved False goal"
+  },
+  "reviewer_failed_attempts": [],
+  "prior_successful_replay_retained": true,
+  "source_binding": "source-binding.json",
+  "scientific_execution": false,
+  "cloud_actions": false,
+  "repository_edits": false,
+  "visual_inspection": {
+    "pages": [
+      1,
+      2
+    ],
+    "svg_embedded": true,
+    "result": "all pages inspected, no clipping"
+  }
+}

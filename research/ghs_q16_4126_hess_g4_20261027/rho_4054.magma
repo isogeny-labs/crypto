@@ -1,0 +1,78 @@
+// Same-source, same-target Pollard rho with explicit group-operation counts.
+SetSeed(20261027);
+K<w> := GF(4096);
+fromint := func<n | &+[(Integers()!((n div 2^i) mod 2))*w^i : i in [0..11]]>;
+E := EllipticCurve([K|1,fromint(32),0,0,fromint(32)]);
+G := E![fromint(33),fromint(349),1];
+Q := E![fromint(2098),fromint(1182),1];
+r := 2027;
+assert #E eq 4054 and Order(G) eq r and Order(Q) eq r;
+GQ := G+Q;
+step := function(S,aa,bb,salt)
+    if S eq E!0 then
+        part := 0;
+    else
+        part := (Integers()!Trace(w^salt*S[1]))+
+                2*(Integers()!Trace(w^(salt+1)*S[1]));
+    end if;
+    if part eq 0 then
+        return S+G,(aa+1) mod r,bb;
+    elif part eq 1 then
+        return S+Q,aa,(bb+1) mod r;
+    elif part eq 2 then
+        return 2*S,(2*aa) mod r,(2*bb) mod r;
+    else
+        return S+GQ,(aa+1) mod r,(bb+1) mod r;
+    end if;
+end function;
+
+rho_wall := Realtime();
+state := 20261027;
+operations := [];
+restarts := 0;
+trials := 512;
+for trial in [1..trials] do
+    salt := trial mod 31;
+    solved := false;
+    trial_walk_operations := 0;
+    for restart in [1..50] do
+        state := (1103515245*state+12345) mod 2147483648;
+        aa := state mod r;
+        state := (1103515245*state+12345) mod 2147483648;
+        bb := state mod r;
+        U := aa*G+bb*Q;
+        V := U;
+        ua := aa; ub := bb;
+        va := aa; vb := bb;
+        for j in [1..4000] do
+            U,ua,ub := step(U,ua,ub,salt);
+            V,va,vb := step(V,va,vb,salt);
+            V,va,vb := step(V,va,vb,salt);
+            trial_walk_operations +:= 3;
+            if U eq V then
+                denominator := (vb-ub) mod r;
+                if denominator ne 0 then
+                    candidate := ((ua-va)*InverseMod(denominator,r)) mod r;
+                    assert Q eq candidate*G;
+                    Append(~operations,trial_walk_operations);
+                    solved := true;
+                end if;
+                break;
+            end if;
+        end for;
+        if solved then break; end if;
+        restarts +:= 1;
+    end for;
+    assert solved;
+end for;
+seconds := Realtime(rho_wall);
+Sort(~operations);
+print "sorted_walk_operations", operations;
+print "trials", trials, "restarts", restarts,
+      "min_group_operations", operations[1],
+      "median_group_operations", operations[trials div 2],
+      "max_group_operations", operations[trials],
+      "mean_group_operations", (&+operations)/trials,
+      "total_seconds", seconds,
+      "amortized_seconds_per_target", seconds/trials,
+      "all_source_targets_verified", true;

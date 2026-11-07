@@ -1,0 +1,69 @@
+{
+  "alternative": "Use a single ordinary L2 Job through isolab:submitters with activeDeadlineSeconds reduced by its explicit 60-second termination grace. This removes recovery but is also within existing submitter permissions. The earlier internal controller guard preserves the reviewed recovery package and is the narrower route if recovery is retained.",
+  "correction": "The prior conclusion that the fixed request deadline itself bounded active scientific payload execution was too strong. Pod activeDeadlineSeconds is relative to pod start, while remaining time is computed before scheduling. Synchronous verify and CRIU calls can block the supervisor loop. Therefore the current request deadline equal to the authorized outer deadline does not strictly prove termination by that outer deadline.",
+  "corrects": "/tmp/pencil-controller-budget-enforcement-review-20261029.json",
+  "created_utc": "2026-10-29T23:59:40.020461+00:00",
+  "current_request_safe_for_strict_outer_deadline": false,
+  "existing_submitter_limit": "The isolab:submitters identity can create/read/delete ordinary Jobs in namespace isolab but is not bound to isolab:recovery and cannot delete the recovery Pod. No external strict-stop watcher for that Pod is available without changing RBAC or using a more privileged identity.",
+  "jobs_launched": 0,
+  "mutations_performed": [],
+  "no_package_change_guard": {
+    "guard_deadline_unix": 1793324657,
+    "guard_deadline_utc": "2026-10-30T01:44:17Z",
+    "method": "Use an earlier internal request deadline G, while retaining D as the authorized outer deadline in the frozen protocol. Choose a preparation lower-bound timestamp C0 and grace reserve R, then require 2*G - C0 + R <= D. This covers the worst scheduling/cache delay before a payload can start: any start after G immediately refuses work; any start before G has delay less than G-C0. Kubernetes relative deadline plus grace then ends by D.",
+    "preparation_lower_bound_unix": 1793318353,
+    "preparation_lower_bound_utc": "2026-10-29T23:59:13Z",
+    "proof_arithmetic": {
+      "outer_deadline": 1793331142,
+      "passes": true,
+      "two_guard_minus_c0_plus_reserve": 1793331141
+    },
+    "qualification": "R=180 exceeds the explicit 60-second fresh-Job termination grace and the computation Pod standard default grace; it also retains an additional 120 seconds. The reviewed package remains unchanged. A later submission only shortens usable time because C0 is a lower bound.",
+    "reserve_seconds": 180,
+    "usable_seconds_from_c0": 6304
+  },
+  "outer_deadline": {
+    "unix": 1793331142,
+    "utc": "2026-10-30T03:32:22Z"
+  },
+  "required_actions_before_freeze": [
+    "Do not bind or submit the current request with deadline_unix_seconds=1793331142 as proof of strict outer-deadline enforcement.",
+    "Create and validate a replacement request with deadline_unix_seconds=1793324657 (2026-10-30T01:44:17Z), leaving all other fields unchanged.",
+    "Record D=03:32:22Z as the authorized outer deadline and G=01:44:17Z as a conservative operational guard derived before launch.",
+    "Recompute and bind the replacement request hash in the frozen protocol and admission receipt.",
+    "Retain all missing outcomes if the earlier guard truncates the gate."
+  ],
+  "schema": "pencil-controller-absolute-deadline-correction/v1",
+  "source_gap": [
+    {
+      "fact": "Computation Pod receives activeDeadlineSeconds=D_request-now_at_provision; scheduling delay shifts Kubernetes fallback later than D_request.",
+      "lines": "240-250",
+      "path": "cloud.rs"
+    },
+    {
+      "fact": "Native replay uses blocking command.output with no internal absolute timeout.",
+      "lines": "530-576",
+      "path": "supervisor.rs"
+    },
+    {
+      "fact": "CRIU dump starts after a deadline check but the dump itself has no timeout.",
+      "lines": "340-354",
+      "path": "supervisor.rs"
+    },
+    {
+      "fact": "Supervisor absolute check cannot run while those synchronous operations block.",
+      "lines": "627-707",
+      "path": "supervisor.rs"
+    },
+    {
+      "fact": "Fresh Job manifest caches activeDeadlineSeconds from an earlier tick; a restart delay before Job creation can shift its relative deadline.",
+      "lines": "670-705",
+      "path": "cloud.rs"
+    },
+    {
+      "fact": "Predecessor deletion is asynchronous and does not supply an outer deadline fence.",
+      "lines": "723-732",
+      "path": "cloud.rs"
+    }
+  ]
+}

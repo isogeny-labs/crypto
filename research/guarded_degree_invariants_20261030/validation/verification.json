@@ -1,0 +1,56 @@
+{
+  "schema": "guarded-degree-invariants-verification/v1",
+  "date": "2026-10-30",
+  "base_revision": "4b1834891e78ca3f83b64540717042e0569d2a60",
+  "lean": "4.34.1",
+  "mathlib_revision": "d13f23b723b8a846827a245b89c10fc7d3f11612",
+  "sources": {
+    "research/guarded_fall_degree_20261028/formal/DegreeInvariants.lean": "aa5e33090cfdcc2b3218707eeb813212cdf7a65b8edb6c1df0de70f5256a92b7",
+    "research/guarded_fall_degree_20261028/formal/lakefile.toml": "c22605e9bd635d2572585691b1e20d4261d8da82214a2d1c403e56c5017f1333",
+    "research/guarded_fall_degree_20261028/formal/lake-manifest.json": "49b851f1a1e45f01dd18ea709e3e3dafd3328e46576fe6fc1642aeaa38db0c56",
+    "research/guarded_fall_degree_20261028/formal/lean-toolchain": "d5edba4e4b8faad9c1baeadb265716d20d03be4d1a2647dc5e35b0c0325bea7b",
+    "tools/lean/AuditAxioms.lean": "b90d6b58c92138f4f4e4d4692a9c3152629c3aafa537e789248bebbf6ddb1929"
+  },
+  "build": {
+    "command": "lake build",
+    "exit_code": 0,
+    "jobs": 1706,
+    "log": "build.log",
+    "sha256": "bb013ac26049c285895f386e397910360a4368e46e16f335ff31e74b67e25d99"
+  },
+  "axiom_audit": {
+    "command": "lake env lean --run ../../../tools/lean/AuditAxioms.lean -- DegreeInvariants",
+    "exit_code": 0,
+    "audited_declarations": 28,
+    "explicit_named_theorems": 21,
+    "generated_declarations_included": true,
+    "forbidden_axioms": 0,
+    "trusted_native_evaluation": 0,
+    "log": "audit.log",
+    "sha256": "aa7c9f74b10692520e7adda1788686e517b4f554986e51cfde03cacd143d90d3"
+  },
+  "fresh_kernel": {
+    "command": "lake env leanchecker --fresh --verbose DegreeInvariants",
+    "exit_code": 0,
+    "log": "fresh.log",
+    "sha256": "31835d2ef57058830d88e2446207f9233b70ef85584b036392c438d2b7a34bcf"
+  },
+  "library": {
+    "status": "running",
+    "command": "RAYON_NUM_THREADS=8 cargo test --release --lib --locked -- --test-threads=1",
+    "scratch": "/workspace/scratch/guarded-degree-validation-20261030",
+    "not_a_pass": true
+  },
+  "experiment": {
+    "executed": false,
+    "protocol": "Design only; no canonical freeze or instrument completion claimed",
+    "execution_probe": {
+      "command": "aws sts get-caller-identity --region us-east-2 --output json",
+      "exit_code": 255,
+      "observation": "Unable to locate credentials",
+      "sha256": "a8d6f583e4c9c23475905e5a3b10daa5d9c21e8989f3d3d492318ddb7ee7def1"
+    }
+  },
+  "old_sources": "No pre-existing Lean source, dependency pin, numerical evidence or receipt changed. Lake target list extended; old configuration hashes are historical.",
+  "scope": "Explicit bounded-closure solving criterion and actual top-ideal bounds; general classical matrix equivalence is a cited written corollary, not newly formalized."
+}

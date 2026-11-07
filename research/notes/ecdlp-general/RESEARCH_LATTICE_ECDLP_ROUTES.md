@@ -79,10 +79,13 @@ this note with both: [`lattice_ecdlp_routes_20261023/REPORT.pdf`](lattice_ecdlp_
    survey verdict that over prime fields "there is no known efficient
    decomposition algorithm" for Semaev's small-abscissa base, and sharpens
    it to a quantitative ceiling.
-5. **The lifting route (xedni, Mordell–Weil lattices) is refuted in the
-   literature and exhausted at toy scale here.** Jacobson–Koblitz–
-   Silverman–Stein–Teske (2000) show an absolute bound on the coefficients of
-   any relation among lifted points, so dependence vanishes as `p` grows.
+5. **The lifting route (xedni, Mordell–Weil lattices) has a strong conditional
+   asymptotic obstruction in the literature and is exhausted at toy scale
+   here.** Under their stated height/discriminant and Lang assumptions,
+   Jacobson–Koblitz–Silverman–Stein–Teske (2000) derive a uniform coefficient
+   bound, so the displayed relation probability vanishes as `p` grows. The
+   [Lean audit](../../jksst_xedni_audit_20261101/README.md) makes the conditional
+   premises and the still-open selected-lift and adaptive-trial bridges explicit.
    The repository's function-field variant (GOAL-XEDN-001/002/003,
    GOAL-ICLIFT-001, all `completed`) found ∞-norm-1 Mordell–Weil relations
    only at `p ≤ 31` and settled its density gate exactly at rate `p^{−3}`
@@ -107,7 +110,7 @@ things, and they have four different answers.
 | (a) the *group* is a lattice quotient | `E(F_p) ≅ R/(π−1)R`, `R = End(E)` of rank 2 | exact, but the coordinate map is a 2-D DLP (`Θ(√N)`) | §4.3 |
 | (b) the *relations* form a lattice | `L_k = {(a,b) : aP + bQ = O}`, det `N`; rank-`2r` witness lattices | a basis ⇔ the log; reduction cannot start; rho samples it | §4.1, §4.2 |
 | (c) the *scalar* lives in a lattice | GLV lattice `{(a,b) : a + bλ ≡ 0 mod N}`; `Z[τ]`-net zero lattice | writable; constant factor `√#Aut`, or a 2-D BSGS at `Θ(√N)` | §4.4, §4.5 |
-| (d) the *decomposition* or the *lift* is a lattice problem | Coppersmith lattices for `S_{m+1}`; Mordell–Weil lattices of lifts | writable with extra input; ceilings derived (§6) or refuted (JKSST) | §5, §6 |
+| (d) the *decomposition* or the *lift* is a lattice problem | Coppersmith lattices for `S_{m+1}`; Mordell–Weil lattices of lifts | writable with extra input; ceilings derived (§6) or conditionally obstructed (JKSST) | §5, §6 |
 
 A fifth reading, (e) *a linear equation over `Z/N` from outside the group*,
 is the hidden-number problem, where lattices are the right tool and the
@@ -315,11 +318,12 @@ instance. `Ẽ(Q)/tors` with the Néron–Tate height is a Euclidean lattice, so
 "find the dependence" is a short-vector search in the Mordell–Weil lattice
 given its Gram matrix, and this is the one place where the ECDLP meets
 lattice reduction in the strict sense. Jacobson–Koblitz–Silverman–Stein–
-Teske (2000; read from the PDF) show that "asymptotically the algorithm is
+Teske (2000; read from the PDF) argue that "asymptotically the algorithm is
 virtually certain to fail, because of an absolute bound on the size of the
 coefficients of a relation satisfied by the lifted points", and that at
 small `p` "the odds against finding a suitable lifting are prohibitively
-high" (their §4 states the theorem, §5 the experiments at `r = 2, 3, 4`).
+high" (their §4 states a theorem under explicit height/discriminant and Lang
+premises, while §5 gives experiments at `r = 2, 3, 4`).
 Huang–Raskind's signature calculus (2009) is a formalism over number fields
 with global duality; its ECDLP equivalence rests on heuristics and no
 cost advantage is claimed. Galbraith–Gaudry (2016; read from HAL): "the
@@ -331,8 +335,14 @@ elliptic surface) so that heights are degrees and the Mordell–Weil lattice
 is exactly computable; it found ∞-norm-1 relations at `p ≤ 31` and an exact
 lift-rate of codimension 3. Nothing in it moved past toy scale, and the
 coefficient bound of JKSST transfers (KN-FIND-004, "coefficient-bound
-transfer past μ₃ supported"). **Verdict:** refuted in the literature; the
-repository's own line is complete and scoped to toy support.
+transfer past μ₃ supported"). **Verdict:** the classic prime-field route
+has a strong conditional asymptotic obstruction and strongly negative toy
+evidence. It is not an unconditional theorem covering every lift-selection
+strategy: the family-uniform height/discriminant premise, Lang input, exact
+success event, and repeated-trial bridge remain separate obligations. The
+[Lean audit](../../jksst_xedni_audit_20261101/README.md) proves the valid
+finite implications and exposes those interfaces. The repository's
+function-field experiments remain complete only at their stated toy scope.
 
 ### 5.2 Coppersmith lattices for point decomposition
 
@@ -498,9 +508,10 @@ test it.
    future proposals in four lines, the way the NZMS note's closures do.
 3. **Do not open** a campaign on lattice reduction for the pure prime-field
    ECDLP: every writable lattice is `k`-independent (Lemma B), every
-   `k`-dependent one has a basis that is the log (Lemma A), the lift route is
-   refuted (JKSST) and exhausted here at toy scale, and the decomposition
-   route is capped at `p^{5/6}` (§6).
+   `k`-dependent one has a basis that is the log (Lemma A), the lift route has
+   JKSST's conditional obstruction and only toy-scale evidence here, and the
+   decomposition route is capped at `p^{5/6}` (§6). Treat the missing JKSST
+   interfaces as formal-audit targets, not as evidence of an attack.
 4. **Keep lattices where they are live:** the HNP / leakage line
    (`research/notes/lattice-hnp/`), where the next measured item is the
    GLV-aware lattice at cryptographic size; the automorphism fold inside the

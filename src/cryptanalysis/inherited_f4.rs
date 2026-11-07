@@ -118,6 +118,12 @@ pub fn f4_rows_generated_thread() -> (u64, u64) {
     ROWS_GENERATED.with(|c| c.get())
 }
 
+/// Credit rows generated on another thread to this one (a parallel solve
+/// hands its workers' counts back to the thread that asked).
+pub(crate) fn credit_rows_generated(rows: u64, words: u64) {
+    note_rows_generated(rows, words);
+}
+
 /// Shape of the degree-`degree` Macaulay matrix an inherited-F4 root builds
 /// for `system`: `(rows, columns, rank)`, with multipliers over the
 /// occurring variables, or, with `support_local`, over each generator's own
@@ -166,6 +172,11 @@ fn note_root_elimination(word_ops: u64) {
 /// only in how they were reduced can be compared tree for tree.
 pub fn f4_root_elimination_thread() -> u64 {
     ROOT_ELIMINATION.with(|c| c.get())
+}
+
+/// Credit root eliminations done on another thread to this one.
+pub(crate) fn credit_root_elimination(word_ops: u64) {
+    note_root_elimination(word_ops);
 }
 
 // ── Root shape replay (`KIC_F4_ROOT_REPLAY=1`, off by default) ─────────
@@ -1034,6 +1045,23 @@ enum EagerMode {
     Runs,
 }
 
+// Pre-#2043 accounting for committed evidence, set by the replay audit only
+// (`ecbench::legacy`): every kept row is rewritten lazily, when first read,
+// which is what every aarch64 host did before the shift-run eager rewrite
+// and so what the records made on Apple silicon charge.  Per thread: the
+// whole specialisation runs on the calling thread, and a test solving on
+// another thread is unaffected.
+thread_local! {
+    static LEGACY_LAZY_REWRITE: std::cell::Cell<bool> = const { std::cell::Cell::new(false) };
+}
+
+/// Charge the lazy rewrite every host did before #2043 ([`eager_mode`] is
+/// then `Off`); `false` restores the normal choice.  Only the replay of a
+/// record made before that change turns it on.
+pub fn set_legacy_lazy_rewrite(on: bool) {
+    LEGACY_LAZY_REWRITE.with(|c| c.set(on));
+}
+
 /// Whether a specialisation rewrites every kept row into the child's
 /// layout at once, through the step's own plan, instead of leaving each
 /// to be rewritten from wherever it was last current when something first
@@ -1053,6 +1081,9 @@ fn eager_mode() -> EagerMode {
         return mode;
     }
     static MODE: std::sync::OnceLock<EagerMode> = std::sync::OnceLock::new();
+    if LEGACY_LAZY_REWRITE.with(|c| c.get()) {
+        return EagerMode::Off;
+    }
     *MODE.get_or_init(|| {
         let var = std::env::var("KIC_F4_EAGER");
         if var.as_deref() == Ok("0") || std::env::var("KIC_F4_REWRITE").as_deref() == Ok("scatter")

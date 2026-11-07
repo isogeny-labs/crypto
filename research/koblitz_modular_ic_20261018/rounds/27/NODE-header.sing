@@ -1,0 +1,25 @@
+// Explicit original polynomial-basis field, NOT beta^360+beta^45+1.
+ring binary27=2,(z),lp;
+poly modulus360=z^360+z^5+z^3+z^2+1;
+poly squareZ=z;int stage;
+for(stage=1;stage<=360;stage++){
+ squareZ=reduce(squareZ^2,ideal(modulus360));
+ if(stage==72 || stage==120 || stage==180){if(gcd(squareZ+z,modulus360)!=1){ERROR("F360 Rabin gcd failed");}}
+}
+if(squareZ!=z){ERROR("F360 Rabin final failed");}
+print("NODE27_F360_RABIN_PASS");
+ring nodeField27=(2,beta),(x,y,t,q),dp;
+minpoly=beta^360+beta^5+beta^3+beta^2+1;
+proc hexField(string encoded){
+ number value=0;number nibble;int pos;int digit;int bit;
+ string alphabet="0123456789abcdef";
+ for(pos=1;pos<=size(encoded);pos++){
+  for(digit=0;digit<16;digit++){if(encoded[pos]==alphabet[digit+1]){break;}}
+  if(digit==16){ERROR("bad original coefficient hex");}
+  nibble=0;
+  for(bit=0;bit<4;bit++){if((digit div (2^bit))%2==1){nibble=nibble+beta^bit;}}
+  value=value*beta^4+nibble;
+ }
+ return(value);
+}
+list millerP;list millerS;

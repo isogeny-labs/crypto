@@ -1,0 +1,53 @@
+{
+  "created_utc": "2026-10-29T23:56:49.766045+00:00",
+  "findings": [],
+  "limits": [
+    "Review establishes software scope/denominator integrity only; no solver, clock, empirical output, price ratio or mathematical theorem was replayed.",
+    "The retained receipt says source_commit_binding pending; exact source hashes are present, but post-commit provenance must be bound separately before a frozen protocol cites commit identity."
+  ],
+  "mutations_performed": [],
+  "reviewer": "ci_audit",
+  "schema": "pencil-gate60-independent-code-review/v1",
+  "solver_executions": 0,
+  "source_commit": "99b10d5c6f3f5f3fcdea8fb5a9484ac3a9ec6ff0",
+  "validation_receipt": {
+    "clippy": true,
+    "export_tests": "41 passed",
+    "fmt": true,
+    "path": "research/pencil_large_prime_20261029/validation/gate60_analysis_20261029/receipt.json",
+    "price_tests": "30 passed",
+    "sha256": "14a482e87682761cbe6a29b777714fb5dc7c700cb5152745a7aa3a859e232d8e"
+  },
+  "verdict": "no_concrete_gate_logic_defect_found",
+  "verified": {
+    "canonical_dispatch": "Gate replay requires frozen instances=60 and exact matching scope in protocol and manifest. 59-instance negative rejects. Native output must exactly equal deterministic source-linked replay.",
+    "cost_math": "No common pricing, analyzer, grid, fraction, pairing, A/A or aggregation code changed; patch adds scope dispatch and tests around the existing aggregate_scope implementation.",
+    "default_full1260": "Default aggregate rejects any gate scope and still invokes unchanged aggregate_scope(manifest,1260). Canonical replay accepts full1260 only with frozen instances=1260 and null protocol/manifest scopes.",
+    "exact_plan": {
+      "arms": 3,
+      "base_prime": [
+        739
+      ],
+      "fixture_byte_equal_to_prepared_gate_plan": true,
+      "measured_candidate_reference_pairs": 300,
+      "measured_executions": 900,
+      "planned_executions": 1080,
+      "sequences_unique_contiguous": true,
+      "sha256": "bc57819e43862f5d9c9aee0f13b983fec186b2dd14dbc8b921d8999acc4b6776",
+      "unique_workload_ids": 60,
+      "warmups": 180,
+      "workloads": 60
+    },
+    "fail_closed_scope": [
+      "gate API requires exact analysis_scope object",
+      "exactly one plan named gate-p739.json",
+      "manifest digest must equal hard-coded prepared plan digest",
+      "actual plan bytes are rehashed",
+      "prepared validation receipt file map/counts must match",
+      "plan requires exact candidate/reference/control arm identities and 5 measured plus 1 warmup three-arm rounds per target",
+      "changed same-cardinality target bytes reject"
+    ],
+    "missing_rows": "All 1080 planned slots remain in missing_executions when records are absent; pair cells stay incomplete/null unless all expected pairs are admitted.",
+    "qualified_ratios": "remains null"
+  }
+}

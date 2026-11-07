@@ -1,0 +1,4778 @@
+{
+  "audit": {
+    "source_files": 1693,
+    "status": "VERIFIED",
+    "trial_receipts": 1632
+  },
+  "decision": {
+    "arithmetic_operation_speedup": null,
+    "beats_rho": false,
+    "beats_rho_strict": false,
+    "beats_rho_strict_definition": "Winner/rho upper paired 95% limits and every cell ratio < 1 in both instructions and native process wall, on confirmation and replay. beats_rho alone is the confirmation point estimate of rho/winner exceeding one.",
+    "classification": "engineering",
+    "confirmation": {
+      "candidate": "batch16",
+      "candidate_over_baseline": 0.6299656545673873,
+      "ci95": [
+        0.5775378781221964,
+        0.6763254846298824
+      ],
+      "eligible": true,
+      "independent_curve_blocks": 5,
+      "native_wall_candidate_over_baseline": 0.7622426415069098,
+      "native_wall_ci95": [
+        0.7401160220201368,
+        0.7827701990277026
+      ],
+      "native_wall_per_cell": {
+        "n13a0": 0.7216141624095195,
+        "n17a1": 0.7572842091468744,
+        "n19a0": 0.7683787703893916,
+        "n19a1": 0.7712625470073428,
+        "n23a0": 0.794556260440732
+      },
+      "native_wall_status": "paired cold-process timing; nested curve/target bootstrap",
+      "paired_cases": 60,
+      "per_cell": {
+        "n13a0": 0.5321123924191625,
+        "n17a1": 0.6202027584878015,
+        "n19a0": 0.6579207988412393,
+        "n19a1": 0.6565415993901376,
+        "n23a0": 0.6960035122152776
+      },
+      "speedup": 1.587388126241143
+    },
+    "family_wide_or_complexity_claim": false,
+    "independent_replay": "fresh processes, frozen executable, same final cases; independent native group and rank checker",
+    "instruction_speedup": 1.587388126241143,
+    "objective": "incumbent",
+    "parity_definition": "Both candidate/rho upper paired 95% limits and every cell ratio <= 1.10, instructions and native process wall, confirmation and replay.",
+    "provisional_challenger": "batch16",
+    "reasons": [],
+    "replay": {
+      "candidate": "batch16",
+      "candidate_over_baseline": 0.6299614326911928,
+      "ci95": [
+        0.5775368360437851,
+        0.6763218098469954
+      ],
+      "eligible": true,
+      "independent_curve_blocks": 5,
+      "native_wall_candidate_over_baseline": 0.758731689160206,
+      "native_wall_ci95": [
+        0.7362046765771565,
+        0.7792408699739838
+      ],
+      "native_wall_per_cell": {
+        "n13a0": 0.7166695295204072,
+        "n17a1": 0.7522396260234534,
+        "n19a0": 0.7682511751541452,
+        "n19a1": 0.7690668154261336,
+        "n23a0": 0.7894028009671193
+      },
+      "native_wall_status": "paired cold-process timing; nested curve/target bootstrap",
+      "paired_cases": 60,
+      "per_cell": {
+        "n13a0": 0.5321075618598352,
+        "n17a1": 0.6201900667048262,
+        "n19a0": 0.6579235221513097,
+        "n19a1": 0.6565431794589468,
+        "n23a0": 0.6959961954844239
+      },
+      "speedup": 1.5873987646005627
+    },
+    "rho_comparison": {
+      "candidate": "rho",
+      "candidate_over_baseline": 0.05466563831983406,
+      "ci95": [
+        0.0470316806274229,
+        0.06252009404257437
+      ],
+      "eligible": true,
+      "independent_curve_blocks": 5,
+      "native_wall_candidate_over_baseline": 0.2273588372192889,
+      "native_wall_ci95": [
+        0.20484229892507613,
+        0.25829819105478913
+      ],
+      "native_wall_per_cell": {
+        "n13a0": 0.2882947425209433,
+        "n17a1": 0.2285888362807414,
+        "n19a0": 0.21862805188554094,
+        "n19a1": 0.21811989763014075,
+        "n23a0": 0.19331532685124037
+      },
+      "native_wall_status": "paired cold-process timing; nested curve/target bootstrap",
+      "paired_cases": 60,
+      "per_cell": {
+        "n13a0": 0.048416511108720625,
+        "n17a1": 0.04254541797835463,
+        "n19a0": 0.061730501833547266,
+        "n19a1": 0.05986564412647781,
+        "n23a0": 0.06412809890729698
+      },
+      "speedup": 18.29302704103201
+    },
+    "rho_over_winner": 0.0867755851822974,
+    "rho_parity": false,
+    "rho_verdict_scope": "observed complete instruction cost; no asymptotic crossover claim",
+    "scope": "bounded public-hash ECDLP configuration tournament",
+    "status": "promoted",
+    "unit": "valgrind-3.22-amd64-Ir",
+    "winner": "batch16",
+    "winner_over_rho": {
+      "confirmation": {
+        "candidate": "batch16",
+        "candidate_over_baseline": 11.523978753922643,
+        "ci95": [
+          10.71823713558604,
+          13.016270299350452
+        ],
+        "eligible": true,
+        "independent_curve_blocks": 5,
+        "native_wall_candidate_over_baseline": 3.3525973779137614,
+        "native_wall_ci95": [
+          2.864534546571429,
+          3.823255958422435
+        ],
+        "native_wall_per_cell": {
+          "n13a0": 2.50304308743021,
+          "n17a1": 3.312866111347694,
+          "n19a0": 3.5145479446144616,
+          "n19a1": 3.535956853946214,
+          "n23a0": 4.11015656845542
+        },
+        "native_wall_status": "paired cold-process timing; nested curve/target bootstrap",
+        "paired_cases": 60,
+        "per_cell": {
+          "n13a0": 10.99030847605457,
+          "n17a1": 14.577427792655262,
+          "n19a0": 10.657953188446204,
+          "n19a1": 10.96691782022867,
+          "n23a0": 10.853331442452614
+        },
+        "speedup": 0.08677558518229742
+      },
+      "replay": {
+        "candidate": "batch16",
+        "candidate_over_baseline": 11.523907380992881,
+        "ci95": [
+          10.718050945070347,
+          13.01619521766406
+        ],
+        "eligible": true,
+        "independent_curve_blocks": 5,
+        "native_wall_candidate_over_baseline": 3.3464194435612535,
+        "native_wall_ci95": [
+          2.864245022096604,
+          3.796992871704253
+        ],
+        "native_wall_per_cell": {
+          "n13a0": 2.49562455158388,
+          "n17a1": 3.3078175948616444,
+          "n19a0": 3.543908234720062,
+          "n19a1": 3.5319096350032115,
+          "n23a0": 4.061523972587258
+        },
+        "native_wall_status": "paired cold-process timing; nested curve/target bootstrap",
+        "paired_cases": 60,
+        "per_cell": {
+          "n13a0": 10.990176819289465,
+          "n17a1": 14.577408903234668,
+          "n19a0": 10.657931250484365,
+          "n19a1": 10.966907249831765,
+          "n23a0": 10.853172227422405
+        },
+        "speedup": 0.08677612262394299
+      }
+    }
+  },
+  "round": "round-0026",
+  "rows": [
+    {
+      "arm": "aa_control",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 24.80170028511935,
+      "mean_ir": 29245276.333333332,
+      "mean_ratio_to_rank_floor": 4177896.6190476194,
+      "mean_s_ir_per_sqrt_r": 653454.3519033914,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 4269228.0,
+        "curve_and_targets": 610609.0,
+        "factor_base_and_tables": 7599932.0,
+        "final_verification": 3565.0,
+        "individual_log": 287948.3333333333,
+        "log_certification": 649950.0,
+        "reporting_and_cleanup": 3581515.3333333335,
+        "startup_and_input": 451297.0,
+        "verify_filter_and_linear_algebra": 11791231.666666666
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14598008756491035,
+        "curve_and_targets": 0.02087889316005665,
+        "factor_base_and_tables": 0.2598687019871893,
+        "final_verification": 0.00012190002786660852,
+        "individual_log": 0.009845977519628839,
+        "log_certification": 0.022224101854671025,
+        "reporting_and_cleanup": 0.12246474584516663,
+        "startup_and_input": 0.015431449334114116,
+        "verify_filter_and_linear_algebra": 0.4031841427063965
+      },
+      "ranks": [
+        7
+      ],
+      "ratio_to_incumbent_mean_ir": 0.9999919189881871,
+      "ratio_to_rho_mean_ir": null,
+      "signed_base_sizes": [
+        182
+      ],
+      "stage": "aa",
+      "verified": 3
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 24.801711943602122,
+      "mean_ir": 29245512.666666668,
+      "mean_ratio_to_rank_floor": 4177930.3809523806,
+      "mean_s_ir_per_sqrt_r": 653459.632518401,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 4269188.0,
+        "curve_and_targets": 610609.0,
+        "factor_base_and_tables": 7599797.666666667,
+        "final_verification": 3565.0,
+        "individual_log": 287988.0,
+        "log_certification": 649950.0,
+        "reporting_and_cleanup": 3581618.3333333335,
+        "startup_and_input": 451297.0,
+        "verify_filter_and_linear_algebra": 11791499.666666666
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14597754016690287,
+        "curve_and_targets": 0.020878724437474384,
+        "factor_base_and_tables": 0.2598620086878741,
+        "final_verification": 0.00012189904279104334,
+        "individual_log": 0.009847254287603644,
+        "log_certification": 0.022223922261441407,
+        "reporting_and_cleanup": 0.12246727811393698,
+        "startup_and_input": 0.015431324632389758,
+        "verify_filter_and_linear_algebra": 0.4031900483695858
+      },
+      "ranks": [
+        7
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": null,
+      "signed_base_sizes": [
+        182
+      ],
+      "stage": "aa",
+      "verified": 3
+    },
+    {
+      "arm": "aa_control",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 25.235212894191093,
+      "mean_ir": 39496265.0,
+      "mean_ratio_to_rank_floor": 4937033.125,
+      "mean_s_ir_per_sqrt_r": 154222.2890690626,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 6114172.0,
+        "curve_and_targets": 738262.0,
+        "factor_base_and_tables": 15086967.666666666,
+        "final_verification": 6046.0,
+        "individual_log": 412085.0,
+        "log_certification": 972277.0,
+        "reporting_and_cleanup": 3979428.6666666665,
+        "startup_and_input": 451371.0,
+        "verify_filter_and_linear_algebra": 11735655.666666666
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.15480380233422072,
+        "curve_and_targets": 0.01869194466869209,
+        "factor_base_and_tables": 0.3819846678329373,
+        "final_verification": 0.00015307776570771945,
+        "individual_log": 0.010433518207354544,
+        "log_certification": 0.02461693529755282,
+        "reporting_and_cleanup": 0.10075455658064546,
+        "startup_and_input": 0.011428194539407714,
+        "verify_filter_and_linear_algebra": 0.29713330277348166
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.9999871635079444,
+      "ratio_to_rho_mean_ir": null,
+      "signed_base_sizes": [
+        272
+      ],
+      "stage": "aa",
+      "verified": 3
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 25.235231413453384,
+      "mean_ir": 39496772.0,
+      "mean_ratio_to_rank_floor": 4937096.5,
+      "mean_s_ir_per_sqrt_r": 154224.26876766342,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 6114172.0,
+        "curve_and_targets": 738262.0,
+        "factor_base_and_tables": 15086837.666666666,
+        "final_verification": 6046.0,
+        "individual_log": 412061.0,
+        "log_certification": 972277.0,
+        "reporting_and_cleanup": 3979428.3333333335,
+        "startup_and_input": 451371.0,
+        "verify_filter_and_linear_algebra": 11736317.0
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.15480181519644187,
+        "curve_and_targets": 0.018691704729692848,
+        "factor_base_and_tables": 0.3819764730815639,
+        "final_verification": 0.00015307580072619606,
+        "individual_log": 0.010432776632986614,
+        "log_certification": 0.02461661930245844,
+        "reporting_and_cleanup": 0.10075325480607208,
+        "startup_and_input": 0.011428047841479298,
+        "verify_filter_and_linear_algebra": 0.29714623260857875
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": null,
+      "signed_base_sizes": [
+        272
+      ],
+      "stage": "aa",
+      "verified": 3
+    },
+    {
+      "arm": "aa_control",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 25.46014828513903,
+      "mean_ir": 46160268.666666664,
+      "mean_ratio_to_rank_floor": 5770033.583333333,
+      "mean_s_ir_per_sqrt_r": 127597.8330437552,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 6744255.0,
+        "curve_and_targets": 1858562.0,
+        "factor_base_and_tables": 18536573.333333332,
+        "final_verification": 6285.0,
+        "individual_log": 496301.0,
+        "log_certification": 1092677.0,
+        "reporting_and_cleanup": 4138305.0,
+        "startup_and_input": 451298.0,
+        "verify_filter_and_linear_algebra": 12836012.333333334
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14610519381292453,
+        "curve_and_targets": 0.040263240524466615,
+        "factor_base_and_tables": 0.4015698753226494,
+        "final_verification": 0.00013615605328004806,
+        "individual_log": 0.010751692187580132,
+        "log_certification": 0.023671374356385534,
+        "reporting_and_cleanup": 0.08965079969277476,
+        "startup_and_input": 0.009776762853330014,
+        "verify_filter_and_linear_algebra": 0.278074905196609
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.000024675508577,
+      "ratio_to_rho_mean_ir": null,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "aa",
+      "verified": 3
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 25.460112686344385,
+      "mean_ir": 46159129.666666664,
+      "mean_ratio_to_rank_floor": 5769891.208333333,
+      "mean_s_ir_per_sqrt_r": 127594.68458002147,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 6744295.0,
+        "curve_and_targets": 1858562.0,
+        "factor_base_and_tables": 18535908.333333332,
+        "final_verification": 6285.0,
+        "individual_log": 496366.0,
+        "log_certification": 1092677.0,
+        "reporting_and_cleanup": 4138096.6666666665,
+        "startup_and_input": 451298.0,
+        "verify_filter_and_linear_algebra": 12835641.666666666
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.146109665600353,
+        "curve_and_targets": 0.040264234040403524,
+        "factor_base_and_tables": 0.40156537757944005,
+        "final_verification": 0.0001361594129999086,
+        "individual_log": 0.010753365663184189,
+        "log_certification": 0.023671958459586497,
+        "reporting_and_cleanup": 0.08964849849963592,
+        "startup_and_input": 0.009777004099925657,
+        "verify_filter_and_linear_algebra": 0.27807373664447127
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": null,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "aa",
+      "verified": 3
+    },
+    {
+      "arm": "aa_control",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 25.715926783484097,
+      "mean_ir": 55114431.0,
+      "mean_ratio_to_rank_floor": 6889303.875,
+      "mean_s_ir_per_sqrt_r": 38070.17900150784,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 7979613.0,
+        "curve_and_targets": 2155942.0,
+        "factor_base_and_tables": 26266566.333333332,
+        "final_verification": 6404.0,
+        "individual_log": 624092.0,
+        "log_certification": 1333312.0,
+        "reporting_and_cleanup": 4370170.333333333,
+        "startup_and_input": 451303.0,
+        "verify_filter_and_linear_algebra": 11927028.333333334
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14478264322460302,
+        "curve_and_targets": 0.039117558883988116,
+        "factor_base_and_tables": 0.4765823733775521,
+        "final_verification": 0.00011619461334908819,
+        "individual_log": 0.011323567869184752,
+        "log_certification": 0.024191703984025526,
+        "reporting_and_cleanup": 0.0792926689805313,
+        "startup_and_input": 0.00818847245288625,
+        "verify_filter_and_linear_algebra": 0.21640481661387984
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.9999957180182183,
+      "ratio_to_rho_mean_ir": null,
+      "signed_base_sizes": [
+        368
+      ],
+      "stage": "aa",
+      "verified": 3
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 25.715932961091205,
+      "mean_ir": 55114667.0,
+      "mean_ratio_to_rank_floor": 6889333.375,
+      "mean_s_ir_per_sqrt_r": 38070.34201801878,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 7979653.0,
+        "curve_and_targets": 2155942.0,
+        "factor_base_and_tables": 26265542.666666668,
+        "final_verification": 6404.0,
+        "individual_log": 624114.6666666666,
+        "log_certification": 1333312.0,
+        "reporting_and_cleanup": 4370228.666666667,
+        "startup_and_input": 451303.0,
+        "verify_filter_and_linear_algebra": 11928167.0
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14478274902758642,
+        "curve_and_targets": 0.039117391383313625,
+        "factor_base_and_tables": 0.47656175926213373,
+        "final_verification": 0.00011619411580587069,
+        "individual_log": 0.011323930645660377,
+        "log_certification": 0.024191600395589798,
+        "reporting_and_cleanup": 0.07929338785021901,
+        "startup_and_input": 0.008188437389996387,
+        "verify_filter_and_linear_algebra": 0.21642454992969476
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": null,
+      "signed_base_sizes": [
+        368
+      ],
+      "stage": "aa",
+      "verified": 3
+    },
+    {
+      "arm": "batch16",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 23.88637087824734,
+      "mean_ir": 15506512.083333334,
+      "mean_ratio_to_rank_floor": 2215216.011904762,
+      "mean_s_ir_per_sqrt_r": 346476.39120261883,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 1078711.5,
+        "curve_and_targets": 610831.8333333334,
+        "factor_base_and_tables": 7599804.166666667,
+        "final_verification": 4614.5,
+        "individual_log": 288836.5,
+        "log_certification": 648591.5833333334,
+        "reporting_and_cleanup": 1816703.0277777778,
+        "startup_and_input": 451325.4166666667,
+        "verify_filter_and_linear_algebra": 3007093.5555555555
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.06956506364570648,
+        "curve_and_targets": 0.03939195546043303,
+        "factor_base_and_tables": 0.49010403666696056,
+        "final_verification": 0.0002975846518676334,
+        "individual_log": 0.018626787149022793,
+        "log_certification": 0.041827045298629774,
+        "reporting_and_cleanup": 0.11715742508790236,
+        "startup_and_input": 0.029105540578126463,
+        "verify_filter_and_linear_algebra": 0.1939245614613509
+      },
+      "ranks": [
+        7
+      ],
+      "ratio_to_incumbent_mean_ir": 0.532106230665293,
+      "ratio_to_rho_mean_ir": 10.989853970544639,
+      "signed_base_sizes": [
+        182
+      ],
+      "stage": "confirmation",
+      "verified": 36
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 24.796584676365775,
+      "mean_ir": 29141760.027777776,
+      "mean_ratio_to_rank_floor": 4163108.575396826,
+      "mean_s_ir_per_sqrt_r": 651141.3910140069,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 4275115.166666667,
+        "curve_and_targets": 610831.8333333334,
+        "factor_base_and_tables": 7599817.083333333,
+        "final_verification": 4614.5,
+        "individual_log": 288810.6111111111,
+        "log_certification": 649742.9166666666,
+        "reporting_and_cleanup": 3577651.472222222,
+        "startup_and_input": 451325.4166666667,
+        "verify_filter_and_linear_algebra": 11683851.027777778
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14670065097618157,
+        "curve_and_targets": 0.020960704938586122,
+        "factor_base_and_tables": 0.26078785482034117,
+        "final_verification": 0.0001583466474091298,
+        "individual_log": 0.009910541121600697,
+        "log_certification": 0.02229593943699128,
+        "reporting_and_cleanup": 0.12276717222336685,
+        "startup_and_input": 0.015487239488502601,
+        "verify_filter_and_linear_algebra": 0.40093155034702055
+      },
+      "ranks": [
+        7
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": 20.653496120133784,
+      "signed_base_sizes": [
+        182
+      ],
+      "stage": "confirmation",
+      "verified": 36
+    },
+    {
+      "arm": "rho",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 20.42827056698828,
+      "mean_ir": 1410984.361111111,
+      "mean_ratio_to_rank_floor": null,
+      "mean_s_ir_per_sqrt_r": 31526.933126796404,
+      "phase_mean_ir": {
+        "curve_and_targets": 610831.8333333334,
+        "final_verification": 4619.5,
+        "reporting_and_cleanup": 214076.30555555556,
+        "rho_solve": 130126.30555555556,
+        "startup_and_input": 451330.4166666667
+      },
+      "phase_share": {
+        "curve_and_targets": 0.4329118381243575,
+        "final_verification": 0.0032739554932857454,
+        "reporting_and_cleanup": 0.15172124614264074,
+        "rho_solve": 0.09222377592695974,
+        "startup_and_input": 0.3198691843127563
+      },
+      "ranks": [],
+      "ratio_to_incumbent_mean_ir": 0.04841795278549298,
+      "ratio_to_rho_mean_ir": 1.0,
+      "signed_base_sizes": [],
+      "stage": "confirmation",
+      "verified": 36
+    },
+    {
+      "arm": "batch16",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 24.5509148646575,
+      "mean_ir": 24578863.361111112,
+      "mean_ratio_to_rank_floor": 3072357.920138889,
+      "mean_s_ir_per_sqrt_r": 95973.84892637996,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 1541572.5833333333,
+        "curve_and_targets": 738302.0,
+        "factor_base_and_tables": 15087087.75,
+        "final_verification": 5416.666666666667,
+        "individual_log": 411813.47222222225,
+        "log_certification": 968313.3333333334,
+        "reporting_and_cleanup": 2298152.777777778,
+        "startup_and_input": 451347.9166666667,
+        "verify_filter_and_linear_algebra": 3076856.861111111
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.06271944152520993,
+        "curve_and_targets": 0.030038085535238696,
+        "factor_base_and_tables": 0.6138236552415569,
+        "final_verification": 0.00022037905443735706,
+        "individual_log": 0.01675478097468889,
+        "log_certification": 0.03939618033213883,
+        "reporting_and_cleanup": 0.09350118205278503,
+        "startup_and_input": 0.018363254233342344,
+        "verify_filter_and_linear_algebra": 0.12518304105060205
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.6202042751343861,
+      "ratio_to_rho_mean_ir": 14.567926385960986,
+      "signed_base_sizes": [
+        272
+      ],
+      "stage": "confirmation",
+      "verified": 36
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 25.240099488908868,
+      "mean_ir": 39630270.777777776,
+      "mean_ratio_to_rank_floor": 4953783.847222222,
+      "mean_s_ir_per_sqrt_r": 154745.54557945338,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 6111683.916666667,
+        "curve_and_targets": 738302.0,
+        "factor_base_and_tables": 15086759.027777778,
+        "final_verification": 5416.666666666667,
+        "individual_log": 412551.52777777775,
+        "log_certification": 972286.1666666666,
+        "reporting_and_cleanup": 3979145.9166666665,
+        "startup_and_input": 451347.9166666667,
+        "verify_filter_and_linear_algebra": 11872777.638888888
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.15421756643897885,
+        "curve_and_targets": 0.018629749065807402,
+        "factor_base_and_tables": 0.38068776043381225,
+        "final_verification": 0.00013668003171212246,
+        "individual_log": 0.01041001031991715,
+        "log_certification": 0.02453392690952455,
+        "reporting_and_cleanup": 0.10040673047578386,
+        "startup_and_input": 0.011388968780898536,
+        "verify_filter_and_linear_algebra": 0.29958860754356526
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": 23.488916426453848,
+      "signed_base_sizes": [
+        272
+      ],
+      "stage": "confirmation",
+      "verified": 36
+    },
+    {
+      "arm": "rho",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 20.686191232490838,
+      "mean_ir": 1687190.25,
+      "mean_ratio_to_rank_floor": null,
+      "mean_s_ir_per_sqrt_r": 6588.024018220558,
+      "phase_mean_ir": {
+        "curve_and_targets": 738302.0,
+        "final_verification": 5421.666666666667,
+        "reporting_and_cleanup": 211468.63888888888,
+        "rho_solve": 280657.19444444444,
+        "startup_and_input": 451340.75
+      },
+      "phase_share": {
+        "curve_and_targets": 0.4375926188525568,
+        "final_verification": 0.0032134293489822306,
+        "reporting_and_cleanup": 0.12533775541252024,
+        "rho_solve": 0.16634590820119097,
+        "startup_and_input": 0.26751028818474976
+      },
+      "ranks": [],
+      "ratio_to_incumbent_mean_ir": 0.042573270807578556,
+      "ratio_to_rho_mean_ir": 1.0,
+      "signed_base_sizes": [],
+      "stage": "confirmation",
+      "verified": 36
+    },
+    {
+      "arm": "batch16",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 24.85506320024128,
+      "mean_ir": 30347265.722222224,
+      "mean_ratio_to_rank_floor": 3793408.215277778,
+      "mean_s_ir_per_sqrt_r": 83886.97589524255,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 1839789.25,
+        "curve_and_targets": 1858436.8333333333,
+        "factor_base_and_tables": 18535990.805555556,
+        "final_verification": 5843.583333333333,
+        "individual_log": 495006.44444444444,
+        "log_certification": 1089166.6666666667,
+        "reporting_and_cleanup": 2480980.027777778,
+        "startup_and_input": 451323.5833333333,
+        "verify_filter_and_linear_algebra": 3590728.527777778
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.06062454742513385,
+        "curve_and_targets": 0.0612390206862184,
+        "factor_base_and_tables": 0.6107960755087833,
+        "final_verification": 0.00019255716105765288,
+        "individual_log": 0.01631140179070462,
+        "log_certification": 0.03589010873783956,
+        "reporting_and_cleanup": 0.08175300043460075,
+        "startup_and_input": 0.014871968613727369,
+        "verify_filter_and_linear_algebra": 0.1183213196419345
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.6586322457745407,
+      "ratio_to_rho_mean_ir": 10.665561062036096,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "confirmation",
+      "verified": 36
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 25.45751814900133,
+      "mean_ir": 46076191.86111111,
+      "mean_ratio_to_rank_floor": 5759523.982638889,
+      "mean_s_ir_per_sqrt_r": 127365.42499007598,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 6741599.166666667,
+        "curve_and_targets": 1858436.8333333333,
+        "factor_base_and_tables": 18535910.0,
+        "final_verification": 5843.583333333333,
+        "individual_log": 495744.6111111111,
+        "log_certification": 1092520.4166666667,
+        "reporting_and_cleanup": 4137860.388888889,
+        "startup_and_input": 451323.5833333333,
+        "verify_filter_and_linear_algebra": 12756953.277777778
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14631415692920277,
+        "curve_and_targets": 0.040333993723597576,
+        "factor_base_and_tables": 0.40228823718490814,
+        "final_verification": 0.00012682435542737185,
+        "individual_log": 0.010759235759010844,
+        "log_certification": 0.023711169967342023,
+        "reporting_and_cleanup": 0.08980473910174194,
+        "startup_and_input": 0.009795158087147739,
+        "verify_filter_and_linear_algebra": 0.2768664848916216
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": 16.19349968128811,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "confirmation",
+      "verified": 36
+    },
+    {
+      "arm": "rho",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 21.44017524467999,
+      "mean_ir": 2845351.0833333335,
+      "mean_ratio_to_rank_floor": null,
+      "mean_s_ir_per_sqrt_r": 7865.2192235659295,
+      "phase_mean_ir": {
+        "curve_and_targets": 1858436.8333333333,
+        "final_verification": 5848.583333333333,
+        "reporting_and_cleanup": 214516.11111111112,
+        "rho_solve": 315239.22222222225,
+        "startup_and_input": 451310.3333333333
+      },
+      "phase_share": {
+        "curve_and_targets": 0.653148514508154,
+        "final_verification": 0.0020554874115856765,
+        "reporting_and_cleanup": 0.07539178991571231,
+        "rho_solve": 0.1107909755209958,
+        "startup_and_input": 0.1586132326435522
+      },
+      "ranks": [],
+      "ratio_to_incumbent_mean_ir": 0.061753173784634005,
+      "ratio_to_rho_mean_ir": 1.0,
+      "signed_base_sizes": [],
+      "stage": "confirmation",
+      "verified": 36
+    },
+    {
+      "arm": "batch16",
+      "cell": "n19a1",
+      "curve_slug": "icv1-f2m19-tm797-9c54981b",
+      "log2_mean_ir": 24.850222040182988,
+      "mean_ir": 30245602.0,
+      "mean_ratio_to_rank_floor": 3780700.25,
+      "mean_s_ir_per_sqrt_r": 59028.535876145084,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 1847563.4166666667,
+        "curve_and_targets": 1753403.9166666667,
+        "factor_base_and_tables": 18533559.555555556,
+        "final_verification": 6442.25,
+        "individual_log": 495879.0,
+        "log_certification": 1092353.1666666667,
+        "reporting_and_cleanup": 2482055.1944444445,
+        "startup_and_input": 451334.25,
+        "verify_filter_and_linear_algebra": 3583011.25
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.06108535768825718,
+        "curve_and_targets": 0.0579721943265228,
+        "factor_base_and_tables": 0.6127687442146318,
+        "final_verification": 0.0002129979095803747,
+        "individual_log": 0.016395077869503144,
+        "log_certification": 0.03611609934782144,
+        "reporting_and_cleanup": 0.08206334244709179,
+        "startup_and_input": 0.014922310027090881,
+        "verify_filter_and_linear_algebra": 0.1184638761695006
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.6572492323471257,
+      "ratio_to_rho_mean_ir": 10.971957533821241,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "confirmation",
+      "verified": 36
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n19a1",
+      "curve_slug": "icv1-f2m19-tm797-9c54981b",
+      "log2_mean_ir": 25.45570958326262,
+      "mean_ir": 46018466.833333336,
+      "mean_ratio_to_rank_floor": 5752308.354166667,
+      "mean_s_ir_per_sqrt_r": 89811.49459139907,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 6766749.083333333,
+        "curve_and_targets": 1753403.9166666667,
+        "factor_base_and_tables": 18533516.027777776,
+        "final_verification": 6416.0,
+        "individual_log": 496731.55555555556,
+        "log_certification": 1096092.9166666667,
+        "reporting_and_cleanup": 4138728.0,
+        "startup_and_input": 451334.25,
+        "verify_filter_and_linear_algebra": 12775495.083333334
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.1470442096178628,
+        "curve_and_targets": 0.03810218021858551,
+        "factor_base_and_tables": 0.4027408408650651,
+        "final_verification": 0.0001394222893873681,
+        "individual_log": 0.01079417872295888,
+        "log_certification": 0.02381854486018459,
+        "reporting_and_cleanup": 0.08993624266078602,
+        "startup_and_input": 0.009807676810151298,
+        "verify_filter_and_linear_algebra": 0.2776167039550184
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": 16.693754809935495,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "confirmation",
+      "verified": 36
+    },
+    {
+      "arm": "rho",
+      "cell": "n19a1",
+      "curve_slug": "icv1-f2m19-tm797-9c54981b",
+      "log2_mean_ir": 21.394473001834207,
+      "mean_ir": 2756627.6944444445,
+      "mean_ratio_to_rank_floor": null,
+      "mean_s_ir_per_sqrt_r": 5379.94571107194,
+      "phase_mean_ir": {
+        "curve_and_targets": 1753403.9166666667,
+        "final_verification": 6421.0,
+        "reporting_and_cleanup": 214442.77777777778,
+        "rho_solve": 331039.0,
+        "startup_and_input": 451321.0
+      },
+      "phase_share": {
+        "curve_and_targets": 0.6360684542930408,
+        "final_verification": 0.0023292953244794462,
+        "reporting_and_cleanup": 0.07779170840152043,
+        "rho_solve": 0.12008839665478141,
+        "startup_and_input": 0.16372214532617788
+      },
+      "ranks": [],
+      "ratio_to_incumbent_mean_ir": 0.05990264092083332,
+      "ratio_to_rho_mean_ir": 1.0,
+      "signed_base_sizes": [],
+      "stage": "confirmation",
+      "verified": 36
+    },
+    {
+      "arm": "batch16",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 25.209657053078924,
+      "mean_ir": 38802790.0,
+      "mean_ratio_to_rank_floor": 4850348.75,
+      "mean_s_ir_per_sqrt_r": 26802.946782811166,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 2031846.6666666667,
+        "curve_and_targets": 2156069.5,
+        "factor_base_and_tables": 26266013.722222224,
+        "final_verification": 6479.583333333333,
+        "individual_log": 625816.9722222222,
+        "log_certification": 1333738.5833333333,
+        "reporting_and_cleanup": 2717452.5,
+        "startup_and_input": 451320.75,
+        "verify_filter_and_linear_algebra": 3214051.722222222
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.05236341682303429,
+        "curve_and_targets": 0.05556480603585464,
+        "factor_base_and_tables": 0.6769104418064326,
+        "final_verification": 0.00016698756283590262,
+        "individual_log": 0.01612814367787013,
+        "log_certification": 0.034372234144331715,
+        "reporting_and_cleanup": 0.07003239973208113,
+        "startup_and_input": 0.011631141729757061,
+        "verify_filter_and_linear_algebra": 0.08283042848780262
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.6960019686949335,
+      "ratio_to_rho_mean_ir": 10.828029604253045,
+      "signed_base_sizes": [
+        368
+      ],
+      "stage": "confirmation",
+      "verified": 36
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 25.732493761112973,
+      "mean_ir": 55750977.36111111,
+      "mean_ratio_to_rank_floor": 6968872.170138889,
+      "mean_s_ir_per_sqrt_r": 38509.87208135217,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 8069922.583333333,
+        "curve_and_targets": 2156069.5,
+        "factor_base_and_tables": 26265988.25,
+        "final_verification": 6479.583333333333,
+        "individual_log": 625005.2777777778,
+        "log_certification": 1334615.25,
+        "reporting_and_cleanup": 4393586.361111111,
+        "startup_and_input": 451320.75,
+        "verify_filter_and_linear_algebra": 12447989.805555556
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14474943696614864,
+        "curve_and_targets": 0.03867321439110695,
+        "factor_base_and_tables": 0.4711305432345971,
+        "final_verification": 0.00011622367248135713,
+        "individual_log": 0.01121066046482887,
+        "log_certification": 0.023938867319857175,
+        "reporting_and_cleanup": 0.07880734238348691,
+        "startup_and_input": 0.008095297542080708,
+        "verify_filter_and_linear_algebra": 0.22327841402541232
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": 15.557469793593514,
+      "signed_base_sizes": [
+        368
+      ],
+      "stage": "confirmation",
+      "verified": 36
+    },
+    {
+      "arm": "rho",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 21.77295822113644,
+      "mean_ir": 3583550.4166666665,
+      "mean_ratio_to_rank_floor": null,
+      "mean_s_ir_per_sqrt_r": 2475.3300242440678,
+      "phase_mean_ir": {
+        "curve_and_targets": 2156069.5,
+        "final_verification": 6484.583333333333,
+        "reporting_and_cleanup": 212056.05555555556,
+        "rho_solve": 757614.5277777778,
+        "startup_and_input": 451325.75
+      },
+      "phase_share": {
+        "curve_and_targets": 0.6016573647108123,
+        "final_verification": 0.0018095415382393695,
+        "reporting_and_cleanup": 0.059174849213592215,
+        "rho_solve": 0.21141450229197356,
+        "startup_and_input": 0.12594374224538257
+      },
+      "ranks": [],
+      "ratio_to_incumbent_mean_ir": 0.06427780437740557,
+      "ratio_to_rho_mean_ir": 1.0,
+      "signed_base_sizes": [],
+      "stage": "confirmation",
+      "verified": 36
+    },
+    {
+      "arm": "batch128",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 25.465356039041428,
+      "mean_ir": 46327196.333333336,
+      "mean_ratio_to_rank_floor": 6618170.904761905,
+      "mean_s_ir_per_sqrt_r": 1035131.5443374736,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 8541327.0,
+        "curve_and_targets": 610801.0,
+        "factor_base_and_tables": 7600333.555555556,
+        "final_verification": 4671.666666666667,
+        "individual_log": 287929.8888888889,
+        "log_certification": 655447.6666666666,
+        "reporting_and_cleanup": 5572531.333333333,
+        "startup_and_input": 451319.44444444444,
+        "verify_filter_and_linear_algebra": 22602834.777777776
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.1843696074017401,
+        "curve_and_targets": 0.01318450172562065,
+        "factor_base_and_tables": 0.16405770599346556,
+        "final_verification": 0.00010084069480598613,
+        "individual_log": 0.006215137363745832,
+        "log_certification": 0.01414822649638867,
+        "reporting_and_cleanup": 0.1202863927537913,
+        "startup_and_input": 0.009741997793199309,
+        "verify_filter_and_linear_algebra": 0.4878955897772426
+      },
+      "ranks": [
+        7
+      ],
+      "ratio_to_incumbent_mean_ir": 1.595640688603507,
+      "ratio_to_rho_mean_ir": 32.95956819301277,
+      "signed_base_sizes": [
+        182
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "batch16",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 23.890595530774213,
+      "mean_ir": 15551986.444444444,
+      "mean_ratio_to_rank_floor": 2221712.3492063493,
+      "mean_s_ir_per_sqrt_r": 347492.4670580626,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 1078833.3333333333,
+        "curve_and_targets": 610801.0,
+        "factor_base_and_tables": 7599884.444444444,
+        "final_verification": 4671.666666666667,
+        "individual_log": 288786.3333333333,
+        "log_certification": 649386.6666666666,
+        "reporting_and_cleanup": 1814755.0,
+        "startup_and_input": 451299.44444444444,
+        "verify_filter_and_linear_algebra": 3053568.5555555555
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.06936948776204209,
+        "curve_and_targets": 0.03927478989143495,
+        "factor_base_and_tables": 0.48867612324593507,
+        "final_verification": 0.0003003903509918183,
+        "individual_log": 0.01856909626078635,
+        "log_certification": 0.041755866299551955,
+        "reporting_and_cleanup": 0.11668959502265226,
+        "startup_and_input": 0.02901876529127633,
+        "verify_filter_and_linear_algebra": 0.1963458858753292
+      },
+      "ranks": [
+        7
+      ],
+      "ratio_to_incumbent_mean_ir": 0.5356547411333541,
+      "ratio_to_rho_mean_ir": 11.064489076013015,
+      "signed_base_sizes": [
+        182
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "batch32",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 24.272019376081555,
+      "mean_ir": 20258434.777777776,
+      "mean_ratio_to_rank_floor": 2894062.111111111,
+      "mean_s_ir_per_sqrt_r": 452653.0102641386,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 2145475.3333333335,
+        "curve_and_targets": 610801.0,
+        "factor_base_and_tables": 7599829.666666667,
+        "final_verification": 4671.666666666667,
+        "individual_log": 288657.77777777775,
+        "log_certification": 650213.0,
+        "reporting_and_cleanup": 2453348.3333333335,
+        "startup_and_input": 451299.44444444444,
+        "verify_filter_and_linear_algebra": 6054138.555555556
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.10590528621129132,
+        "curve_and_targets": 0.030150453709780683,
+        "factor_base_and_tables": 0.37514397089567847,
+        "final_verification": 0.00023060353467145396,
+        "individual_log": 0.014248770003416903,
+        "log_certification": 0.032095914967391385,
+        "reporting_and_cleanup": 0.1211025609947172,
+        "startup_and_input": 0.02227711318247999,
+        "verify_filter_and_linear_algebra": 0.2988453265005726
+      },
+      "ranks": [
+        7
+      ],
+      "ratio_to_incumbent_mean_ir": 0.6977582365713756,
+      "ratio_to_rho_mean_ir": 14.412900313188995,
+      "signed_base_sizes": [
+        182
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "dense",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 24.762461755312696,
+      "mean_ir": 28460580.555555556,
+      "mean_ratio_to_rank_floor": 4065797.222222222,
+      "mean_s_ir_per_sqrt_r": 635921.1658577301,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 4276127.333333333,
+        "curve_and_targets": 610801.0,
+        "factor_base_and_tables": 7600096.555555556,
+        "final_verification": 4671.666666666667,
+        "individual_log": 287866.55555555556,
+        "log_certification": 644587.6666666666,
+        "reporting_and_cleanup": 3439331.0,
+        "startup_and_input": 451294.44444444444,
+        "verify_filter_and_linear_algebra": 11145804.333333334
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.15024736846060668,
+        "curve_and_targets": 0.02146129798047182,
+        "factor_base_and_tables": 0.2670394070395027,
+        "final_verification": 0.00016414516413491603,
+        "individual_log": 0.010114570747902875,
+        "log_certification": 0.022648437034108286,
+        "reporting_and_cleanup": 0.12084542665200962,
+        "startup_and_input": 0.015856824971068658,
+        "verify_filter_and_linear_algebra": 0.3916225219501945
+      },
+      "ranks": [
+        7
+      ],
+      "ratio_to_incumbent_mean_ir": 0.9802635158183919,
+      "ratio_to_rho_mean_ir": 20.248331862867822,
+      "signed_base_sizes": [
+        182
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "excess8",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 24.77896046908737,
+      "mean_ir": 28787925.0,
+      "mean_ratio_to_rank_floor": 4112560.714285714,
+      "mean_s_ir_per_sqrt_r": 643235.3265910933,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 4276162.0,
+        "curve_and_targets": 610801.0,
+        "factor_base_and_tables": 7599621.0,
+        "final_verification": 4671.666666666667,
+        "individual_log": 287554.0,
+        "log_certification": 645731.0,
+        "reporting_and_cleanup": 3547365.222222222,
+        "startup_and_input": 452525.44444444444,
+        "verify_filter_and_linear_algebra": 11363493.666666666
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14854012576453496,
+        "curve_and_targets": 0.021217263835444897,
+        "factor_base_and_tables": 0.2639864109691824,
+        "final_verification": 0.0001622786868684237,
+        "individual_log": 0.00998870186024175,
+        "log_certification": 0.02243061978242614,
+        "reporting_and_cleanup": 0.12322406780697887,
+        "startup_and_input": 0.015719279678700165,
+        "verify_filter_and_linear_algebra": 0.3947312516156224
+      },
+      "ranks": [
+        7
+      ],
+      "ratio_to_incumbent_mean_ir": 0.9915381915182905,
+      "ratio_to_rho_mean_ir": 20.48122166396091,
+      "signed_base_sizes": [
+        182
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 24.791220221522728,
+      "mean_ir": 29033601.777777776,
+      "mean_ratio_to_rank_floor": 4147657.3968253974,
+      "mean_s_ir_per_sqrt_r": 648724.7108516726,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 4276140.666666667,
+        "curve_and_targets": 610801.0,
+        "factor_base_and_tables": 7599704.444444444,
+        "final_verification": 4671.666666666667,
+        "individual_log": 288426.77777777775,
+        "log_certification": 649769.0,
+        "reporting_and_cleanup": 3574664.4444444445,
+        "startup_and_input": 451299.44444444444,
+        "verify_filter_and_linear_algebra": 11578124.333333334
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.1472824728876598,
+        "curve_and_targets": 0.02103772741236346,
+        "factor_base_and_tables": 0.26175548258229653,
+        "final_verification": 0.0001609055156994798,
+        "individual_log": 0.009934240332473619,
+        "log_certification": 0.022379896403254076,
+        "reporting_and_cleanup": 0.12312163236944583,
+        "startup_and_input": 0.015544039210108183,
+        "verify_filter_and_linear_algebra": 0.39878360328669904
+      },
+      "ranks": [
+        7
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": 20.656008854887464,
+      "signed_base_sizes": [
+        182
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "rho",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 20.422730602418124,
+      "mean_ir": 1405576.5555555555,
+      "mean_ratio_to_rank_floor": null,
+      "mean_s_ir_per_sqrt_r": 31406.10150823867,
+      "phase_mean_ir": {
+        "curve_and_targets": 610801.0,
+        "final_verification": 4676.666666666667,
+        "reporting_and_cleanup": 214041.22222222222,
+        "rho_solve": 124753.22222222222,
+        "startup_and_input": 451304.44444444444
+      },
+      "phase_share": {
+        "curve_and_targets": 0.43455548371648833,
+        "final_verification": 0.003327223016193671,
+        "reporting_and_cleanup": 0.15228001731831833,
+        "rho_solve": 0.08875590712518208,
+        "startup_and_input": 0.32108136882381755
+      },
+      "ranks": [],
+      "ratio_to_incumbent_mean_ir": 0.04841206290262544,
+      "ratio_to_rho_mean_ir": 1.0,
+      "signed_base_sizes": [],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "window8",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 24.70398922110362,
+      "mean_ir": 27330134.444444444,
+      "mean_ratio_to_rank_floor": 3904304.9206349202,
+      "mean_s_ir_per_sqrt_r": 610662.5592206006,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 2331102.6666666665,
+        "curve_and_targets": 610801.0,
+        "factor_base_and_tables": 7599937.333333333,
+        "final_verification": 4671.666666666667,
+        "individual_log": 288608.22222222225,
+        "log_certification": 649279.0,
+        "reporting_and_cleanup": 3538128.5555555555,
+        "startup_and_input": 451703.44444444444,
+        "verify_filter_and_linear_algebra": 11855902.555555556
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.08529422610068878,
+        "curve_and_targets": 0.022348993607829142,
+        "factor_base_and_tables": 0.2780790320948537,
+        "final_verification": 0.0001709346390579613,
+        "individual_log": 0.010560073270363634,
+        "log_certification": 0.023756890084819276,
+        "reporting_and_cleanup": 0.12945887854111057,
+        "startup_and_input": 0.016527670047238454,
+        "verify_filter_and_linear_algebra": 0.43380330161403846
+      },
+      "ranks": [
+        7
+      ],
+      "ratio_to_incumbent_mean_ir": 0.9413277296295646,
+      "ratio_to_rho_mean_ir": 19.4440739185794,
+      "signed_base_sizes": [
+        182
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "batch128",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 25.822215725074223,
+      "mean_ir": 59328243.11111111,
+      "mean_ratio_to_rank_floor": 7416030.388888889,
+      "mean_s_ir_per_sqrt_r": 231660.82815783718,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 12217467.0,
+        "curve_and_targets": 738220.0,
+        "factor_base_and_tables": 15087413.0,
+        "final_verification": 5406.0,
+        "individual_log": 412786.6666666667,
+        "log_certification": 973262.6666666666,
+        "reporting_and_cleanup": 6238292.0,
+        "startup_and_input": 451338.6666666667,
+        "verify_filter_and_linear_algebra": 23204057.111111112
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.2059300319599703,
+        "curve_and_targets": 0.012442977598669944,
+        "factor_base_and_tables": 0.254304058384874,
+        "final_verification": 0.00009112017677441646,
+        "individual_log": 0.006957675552495151,
+        "log_certification": 0.016404710735221352,
+        "reporting_and_cleanup": 0.1051487735498387,
+        "startup_and_input": 0.007607484108730317,
+        "verify_filter_and_linear_algebra": 0.39111316793342576
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.5000533477659461,
+      "ratio_to_rho_mean_ir": 35.03440772434558,
+      "signed_base_sizes": [
+        272
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "batch16",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 24.640899352883007,
+      "mean_ir": 26160728.0,
+      "mean_ratio_to_rank_floor": 3270091.0,
+      "mean_s_ir_per_sqrt_r": 102150.60476916286,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 2056935.0,
+        "curve_and_targets": 738220.0,
+        "factor_base_and_tables": 15086983.333333334,
+        "final_verification": 5406.0,
+        "individual_log": 411884.22222222225,
+        "log_certification": 969128.3333333334,
+        "reporting_and_cleanup": 2447937.0,
+        "startup_and_input": 451367.3333333333,
+        "verify_filter_and_linear_algebra": 3992866.777777778
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.07862682567549344,
+        "curve_and_targets": 0.028218633671050746,
+        "factor_base_and_tables": 0.5767034974459936,
+        "final_verification": 0.00020664562545812945,
+        "individual_log": 0.01574437157185466,
+        "log_certification": 0.03704515919179823,
+        "reporting_and_cleanup": 0.09357296937608159,
+        "startup_and_input": 0.01725362280947737,
+        "verify_filter_and_linear_algebra": 0.15262827463279224
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.6614469864361264,
+      "ratio_to_rho_mean_ir": 15.448386182635076,
+      "signed_base_sizes": [
+        272
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "batch32",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 24.818831374584384,
+      "mean_ir": 29594615.444444444,
+      "mean_ratio_to_rank_floor": 3699326.9305555555,
+      "mean_s_ir_per_sqrt_r": 115559.0114143921,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 3065220.3333333335,
+        "curve_and_targets": 738220.0,
+        "factor_base_and_tables": 15086902.111111112,
+        "final_verification": 5406.0,
+        "individual_log": 411701.8888888889,
+        "log_certification": 970820.6666666666,
+        "reporting_and_cleanup": 2857798.4444444445,
+        "startup_and_input": 451367.3333333333,
+        "verify_filter_and_linear_algebra": 6007178.666666667
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.1035735821297432,
+        "curve_and_targets": 0.02494440251760663,
+        "factor_base_and_tables": 0.5097853742831199,
+        "final_verification": 0.0001826683644579955,
+        "individual_log": 0.013911378225601317,
+        "log_certification": 0.03280396288605639,
+        "reporting_and_cleanup": 0.09656481091329455,
+        "startup_and_input": 0.0152516708379147,
+        "verify_filter_and_linear_algebra": 0.20298214984220533
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.7482692836554021,
+      "ratio_to_rho_mean_ir": 17.47615923808979,
+      "signed_base_sizes": [
+        272
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "dense",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 25.215319313871614,
+      "mean_ir": 38955381.666666664,
+      "mean_ratio_to_rank_floor": 4869422.708333333,
+      "mean_s_ir_per_sqrt_r": 152110.28516727666,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 6109844.666666667,
+        "curve_and_targets": 738220.0,
+        "factor_base_and_tables": 15087181.666666666,
+        "final_verification": 5406.0,
+        "individual_log": 411763.8888888889,
+        "log_certification": 965859.3333333334,
+        "reporting_and_cleanup": 3849704.3333333335,
+        "startup_and_input": 451362.3333333333,
+        "verify_filter_and_linear_algebra": 11336039.444444444
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.156842120530287,
+        "curve_and_targets": 0.018950398338201366,
+        "factor_base_and_tables": 0.38729389935810754,
+        "final_verification": 0.00013877415054633658,
+        "individual_log": 0.010570141307105377,
+        "log_certification": 0.02479398973928677,
+        "reporting_and_cleanup": 0.09882342743486576,
+        "startup_and_input": 0.01158664898204694,
+        "verify_filter_and_linear_algebra": 0.2910006001595529
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.9849465889819959,
+      "ratio_to_rho_mean_ir": 23.00386212029761,
+      "signed_base_sizes": [
+        272
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "excess8",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 25.22736184967164,
+      "mean_ir": 39281912.88888889,
+      "mean_ratio_to_rank_floor": 4910239.111111111,
+      "mean_s_ir_per_sqrt_r": 153385.30174273334,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 6109892.666666667,
+        "curve_and_targets": 738220.0,
+        "factor_base_and_tables": 15087189.666666666,
+        "final_verification": 5406.0,
+        "individual_log": 411262.3333333333,
+        "log_certification": 967024.6666666666,
+        "reporting_and_cleanup": 3955633.4444444445,
+        "startup_and_input": 452593.3333333333,
+        "verify_filter_and_linear_algebra": 11554690.777777778
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.1555395910568012,
+        "curve_and_targets": 0.018792872996997296,
+        "factor_base_and_tables": 0.38407471930762727,
+        "final_verification": 0.00013762058928472188,
+        "individual_log": 0.010469508816859608,
+        "log_certification": 0.024617555397619017,
+        "reporting_and_cleanup": 0.1006985951940064,
+        "startup_and_input": 0.011521672445369937,
+        "verify_filter_and_linear_algebra": 0.29414786419543454
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.9932025936664296,
+      "ratio_to_rho_mean_ir": 23.196684752052228,
+      "signed_base_sizes": [
+        272
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 25.23720191556055,
+      "mean_ir": 39550755.44444445,
+      "mean_ratio_to_rank_floor": 4943844.430555556,
+      "mean_s_ir_per_sqrt_r": 154435.0595949494,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 6109858.0,
+        "curve_and_targets": 738220.0,
+        "factor_base_and_tables": 15086857.0,
+        "final_verification": 5406.0,
+        "individual_log": 412439.1111111111,
+        "log_certification": 972169.0,
+        "reporting_and_cleanup": 3978797.0,
+        "startup_and_input": 451367.3333333333,
+        "verify_filter_and_linear_algebra": 11795642.0
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.15448144874457082,
+        "curve_and_targets": 0.018665130203061524,
+        "factor_base_and_tables": 0.3814555962449814,
+        "final_verification": 0.00013668512621948823,
+        "individual_log": 0.010428096921952599,
+        "log_certification": 0.024580289025466825,
+        "reporting_and_cleanup": 0.10059977250216816,
+        "startup_and_input": 0.011412356812434422,
+        "verify_filter_and_linear_algebra": 0.29824062441914473
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": 23.355441175824108,
+      "signed_base_sizes": [
+        272
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "rho",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 20.691515123290934,
+      "mean_ir": 1693427.888888889,
+      "mean_ratio_to_rank_floor": null,
+      "mean_s_ir_per_sqrt_r": 6612.380319957713,
+      "phase_mean_ir": {
+        "curve_and_targets": 738220.0,
+        "final_verification": 5411.0,
+        "reporting_and_cleanup": 211467.66666666666,
+        "rho_solve": 287005.55555555556,
+        "startup_and_input": 451323.6666666667
+      },
+      "phase_share": {
+        "curve_and_targets": 0.43593235049670126,
+        "final_verification": 0.003195294016062489,
+        "reporting_and_cleanup": 0.12487550727974442,
+        "rho_solve": 0.1694820059588536,
+        "startup_and_input": 0.2665148422486382
+      },
+      "ranks": [],
+      "ratio_to_incumbent_mean_ir": 0.042816575052974336,
+      "ratio_to_rho_mean_ir": 1.0,
+      "signed_base_sizes": [],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "window8",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 25.131835652996603,
+      "mean_ir": 36765153.0,
+      "mean_ratio_to_rank_floor": 4595644.125,
+      "mean_s_ir_per_sqrt_r": 143558.03146536296,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 3233588.6666666665,
+        "curve_and_targets": 738220.0,
+        "factor_base_and_tables": 15087019.666666666,
+        "final_verification": 5406.0,
+        "individual_log": 412301.1111111111,
+        "log_certification": 972709.0,
+        "reporting_and_cleanup": 3985357.3333333335,
+        "startup_and_input": 451769.77777777775,
+        "verify_filter_and_linear_algebra": 11878781.444444444
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.08795254208969745,
+        "curve_and_targets": 0.02007933980310105,
+        "factor_base_and_tables": 0.4103619442755118,
+        "final_verification": 0.00014704141174116698,
+        "individual_log": 0.011214453836520444,
+        "log_certification": 0.0264573630361337,
+        "reporting_and_cleanup": 0.10840040114434811,
+        "startup_and_input": 0.012287988513954445,
+        "verify_filter_and_linear_algebra": 0.3230989258889918
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.9295689194013681,
+      "ratio_to_rho_mean_ir": 21.710492215953032,
+      "signed_base_sizes": [
+        272
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "batch128",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 26.00535512410811,
+      "mean_ir": 67358427.55555555,
+      "mean_ratio_to_rank_floor": 8419803.444444444,
+      "mean_s_ir_per_sqrt_r": 186194.5270593744,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 13477399.333333334,
+        "curve_and_targets": 1858438.3333333333,
+        "factor_base_and_tables": 18536196.111111112,
+        "final_verification": 5866.333333333333,
+        "individual_log": 496473.22222222225,
+        "log_certification": 1093445.3333333333,
+        "reporting_and_cleanup": 6392100.666666667,
+        "startup_and_input": 451317.3333333333,
+        "verify_filter_and_linear_algebra": 25047190.888888888
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.20008482713195033,
+        "curve_and_targets": 0.02759028678038156,
+        "factor_base_and_tables": 0.2751874826030183,
+        "final_verification": 0.00008709130462546691,
+        "individual_log": 0.007370617756965058,
+        "log_certification": 0.016233237220858322,
+        "reporting_and_cleanup": 0.09489682135757431,
+        "startup_and_input": 0.0067002355861276305,
+        "verify_filter_and_linear_algebra": 0.37184940025849905
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.4647039967410058,
+      "ratio_to_rho_mean_ir": 22.86390818197703,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "batch16",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 24.830473368234962,
+      "mean_ir": 29834398.777777776,
+      "mean_ratio_to_rank_floor": 3729299.847222222,
+      "mean_s_ir_per_sqrt_r": 82469.29110611264,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 1700536.0,
+        "curve_and_targets": 1858438.3333333333,
+        "factor_base_and_tables": 18536125.666666668,
+        "final_verification": 5866.333333333333,
+        "individual_log": 495397.77777777775,
+        "log_certification": 1087894.0,
+        "reporting_and_cleanup": 2444159.0,
+        "startup_and_input": 451321.6666666667,
+        "verify_filter_and_linear_algebra": 3254660.0
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.05699917107988274,
+        "curve_and_targets": 0.0622917977055933,
+        "factor_base_and_tables": 0.6213004594037049,
+        "final_verification": 0.00019662984922300111,
+        "individual_log": 0.01660491908912795,
+        "log_certification": 0.03646441840853587,
+        "reporting_and_cleanup": 0.08192419154162871,
+        "startup_and_input": 0.015127560304745765,
+        "verify_filter_and_linear_algebra": 0.10909085261755773
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.6487467821919477,
+      "ratio_to_rho_mean_ir": 10.126883584938117,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "batch32",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 25.065562086856918,
+      "mean_ir": 35114464.222222224,
+      "mean_ratio_to_rank_floor": 4389308.027777778,
+      "mean_s_ir_per_sqrt_r": 97064.63312860903,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 3378944.6666666665,
+        "curve_and_targets": 1858438.3333333333,
+        "factor_base_and_tables": 18535915.0,
+        "final_verification": 5866.333333333333,
+        "individual_log": 496569.22222222225,
+        "log_certification": 1092110.0,
+        "reporting_and_cleanup": 2872839.4444444445,
+        "startup_and_input": 451321.6666666667,
+        "verify_filter_and_linear_algebra": 6422459.555555556
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.09622657618475916,
+        "curve_and_targets": 0.052925151344249154,
+        "factor_base_and_tables": 0.5278712180455121,
+        "final_verification": 0.00016706315939232866,
+        "individual_log": 0.014141443795914959,
+        "log_certification": 0.031101428547750904,
+        "reporting_and_cleanup": 0.08181356338697503,
+        "startup_and_input": 0.012852870652118546,
+        "verify_filter_and_linear_algebra": 0.1829006848833278
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.7635614125238875,
+      "ratio_to_rho_mean_ir": 11.919130463282157,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "dense",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 25.436306067373987,
+      "mean_ir": 45403685.333333336,
+      "mean_ratio_to_rank_floor": 5675460.666666667,
+      "mean_s_ir_per_sqrt_r": 125506.4588676758,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 6742018.666666667,
+        "curve_and_targets": 1858438.3333333333,
+        "factor_base_and_tables": 18536505.444444444,
+        "final_verification": 5866.333333333333,
+        "individual_log": 494351.6666666667,
+        "log_certification": 1087470.6666666667,
+        "reporting_and_cleanup": 4008075.5555555555,
+        "startup_and_input": 451341.0,
+        "verify_filter_and_linear_algebra": 12219617.666666666
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14849056012017114,
+        "curve_and_targets": 0.04093144245207232,
+        "factor_base_and_tables": 0.40825993106854214,
+        "final_verification": 0.00012920390250847186,
+        "individual_log": 0.010887919406483421,
+        "log_certification": 0.02395115415594458,
+        "reporting_and_cleanup": 0.08827643672820998,
+        "startup_and_input": 0.009940624790398806,
+        "verify_filter_and_linear_algebra": 0.2691327273756691
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.9872997602216047,
+      "ratio_to_rho_mean_ir": 15.41166755605313,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "excess8",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 25.4500035561408,
+      "mean_ir": 45836817.88888889,
+      "mean_ratio_to_rank_floor": 5729602.236111111,
+      "mean_s_ir_per_sqrt_r": 126703.73906352314,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 6741970.666666667,
+        "curve_and_targets": 1858438.3333333333,
+        "factor_base_and_tables": 18535598.222222224,
+        "final_verification": 5866.333333333333,
+        "individual_log": 496209.1111111111,
+        "log_certification": 1091175.0,
+        "reporting_and_cleanup": 4137918.6666666665,
+        "startup_and_input": 452596.3333333333,
+        "verify_filter_and_linear_algebra": 12517045.222222222
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14708635933256964,
+        "curve_and_targets": 0.04054466297896804,
+        "factor_base_and_tables": 0.40438230828225447,
+        "final_verification": 0.00012798299715206378,
+        "individual_log": 0.01082555757500337,
+        "log_certification": 0.02380564468164155,
+        "reporting_and_cleanup": 0.09027499851096168,
+        "startup_and_input": 0.009874078397642113,
+        "verify_filter_and_linear_algebra": 0.2730784072438071
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.9967181954236084,
+      "ratio_to_rho_mean_ir": 15.558688550162284,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 25.454745985454863,
+      "mean_ir": 45987740.666666664,
+      "mean_ratio_to_rank_floor": 5748467.583333333,
+      "mean_s_ir_per_sqrt_r": 127120.92509726249,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 6741984.0,
+        "curve_and_targets": 1858438.3333333333,
+        "factor_base_and_tables": 18535889.333333332,
+        "final_verification": 5866.333333333333,
+        "individual_log": 496473.44444444444,
+        "log_certification": 1092937.6666666667,
+        "reporting_and_cleanup": 4138090.111111111,
+        "startup_and_input": 451321.6666666667,
+        "verify_filter_and_linear_algebra": 12666739.777777778
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14660394057772874,
+        "curve_and_targets": 0.040411603318455405,
+        "factor_base_and_tables": 0.40306153476177875,
+        "final_verification": 0.00012756298196630984,
+        "individual_log": 0.01079577811928264,
+        "log_certification": 0.023765848263532147,
+        "reporting_and_cleanup": 0.08998246165440622,
+        "startup_and_input": 0.009813956070118455,
+        "verify_filter_and_linear_algebra": 0.2754373142527313
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": 15.609917248023942,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "rho",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 21.490355001309457,
+      "mean_ir": 2946059.222222222,
+      "mean_ratio_to_rank_floor": null,
+      "mean_s_ir_per_sqrt_r": 8143.600191945585,
+      "phase_mean_ir": {
+        "curve_and_targets": 1858438.3333333333,
+        "final_verification": 5871.333333333333,
+        "reporting_and_cleanup": 214695.33333333334,
+        "rho_solve": 415751.8888888889,
+        "startup_and_input": 451302.3333333333
+      },
+      "phase_share": {
+        "curve_and_targets": 0.6308217836610587,
+        "final_verification": 0.0019929447748523424,
+        "reporting_and_cleanup": 0.07287543024046472,
+        "rho_solve": 0.14112136163212832,
+        "startup_and_input": 0.153188479691496
+      },
+      "ranks": [],
+      "ratio_to_incumbent_mean_ir": 0.06406183864469812,
+      "ratio_to_rho_mean_ir": 1.0,
+      "signed_base_sizes": [],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "window8",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 25.32131368790897,
+      "mean_ir": 41925181.333333336,
+      "mean_ratio_to_rank_floor": 5240647.666666667,
+      "mean_s_ir_per_sqrt_r": 115891.05615329454,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 3441194.0,
+        "curve_and_targets": 1858438.3333333333,
+        "factor_base_and_tables": 18535505.222222224,
+        "final_verification": 5866.333333333333,
+        "individual_log": 495139.1111111111,
+        "log_certification": 1091656.6666666667,
+        "reporting_and_cleanup": 4098191.222222222,
+        "startup_and_input": 451774.3333333333,
+        "verify_filter_and_linear_algebra": 11947416.111111112
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.08207940647030713,
+        "curve_and_targets": 0.04432749660776661,
+        "factor_base_and_tables": 0.4421091247012747,
+        "final_verification": 0.000139923863100127,
+        "individual_log": 0.011810064867088417,
+        "log_certification": 0.026038209781068408,
+        "reporting_and_cleanup": 0.09775011322285886,
+        "startup_and_input": 0.01077572759295718,
+        "verify_filter_and_linear_algebra": 0.2849699328935785
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.911659949490017,
+      "ratio_to_rho_mean_ir": 14.230936369876854,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "batch128",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 26.2059614402758,
+      "mean_ir": 77407039.66666667,
+      "mean_ratio_to_rank_floor": 9675879.958333334,
+      "mean_s_ir_per_sqrt_r": 53468.752241800656,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 16050437.333333334,
+        "curve_and_targets": 2156073.0,
+        "factor_base_and_tables": 26266148.888888888,
+        "final_verification": 7031.0,
+        "individual_log": 624960.2222222222,
+        "log_certification": 1335789.0,
+        "reporting_and_cleanup": 6340299.444444444,
+        "startup_and_input": 451312.6666666667,
+        "verify_filter_and_linear_algebra": 24174988.111111112
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.20735113243511671,
+        "curve_and_targets": 0.027853706966247112,
+        "factor_base_and_tables": 0.33932506658305556,
+        "final_verification": 0.00009083153199343597,
+        "individual_log": 0.008073687159636272,
+        "log_certification": 0.017256686287865145,
+        "reporting_and_cleanup": 0.08190856376561226,
+        "startup_and_input": 0.005830382722425862,
+        "verify_filter_and_linear_algebra": 0.3123099425480476
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.389837482525321,
+      "ratio_to_rho_mean_ir": 21.173668837281966,
+      "signed_base_sizes": [
+        368
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "batch16",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 25.213561727902807,
+      "mean_ir": 38907952.55555555,
+      "mean_ratio_to_rank_floor": 4863494.069444444,
+      "mean_s_ir_per_sqrt_r": 26875.58760013642,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 2044645.3333333333,
+        "curve_and_targets": 2156073.0,
+        "factor_base_and_tables": 26265718.0,
+        "final_verification": 7031.0,
+        "individual_log": 625145.7777777778,
+        "log_certification": 1334449.6666666667,
+        "reporting_and_cleanup": 2727911.222222222,
+        "startup_and_input": 451292.6666666667,
+        "verify_filter_and_linear_algebra": 3295685.888888889
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.052550833416737684,
+        "curve_and_targets": 0.055414712375867245,
+        "factor_base_and_tables": 0.6750732504491448,
+        "final_verification": 0.00018070855797309396,
+        "individual_log": 0.016067300814278263,
+        "log_certification": 0.03429760701905977,
+        "reporting_and_cleanup": 0.07011191910772266,
+        "startup_and_input": 0.01159898265071334,
+        "verify_filter_and_linear_algebra": 0.08470468560850312
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.6985893151694091,
+      "ratio_to_rho_mean_ir": 10.642754277848585,
+      "signed_base_sizes": [
+        368
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "batch32",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 25.40522813753394,
+      "mean_ir": 44436077.55555555,
+      "mean_ratio_to_rank_floor": 5554509.694444444,
+      "mean_s_ir_per_sqrt_r": 30694.128488142873,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 4043676.6666666665,
+        "curve_and_targets": 2156073.0,
+        "factor_base_and_tables": 26265903.222222224,
+        "final_verification": 7031.0,
+        "individual_log": 624921.4444444445,
+        "log_certification": 1334455.6666666667,
+        "reporting_and_cleanup": 3182751.3333333335,
+        "startup_and_input": 451292.6666666667,
+        "verify_filter_and_linear_algebra": 6369972.555555556
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.09099985617792478,
+        "curve_and_targets": 0.0485207767788325,
+        "factor_base_and_tables": 0.5910940989195921,
+        "final_verification": 0.00015822728707792885,
+        "individual_log": 0.014063380001602201,
+        "log_certification": 0.030030905968203046,
+        "reporting_and_cleanup": 0.07162538883757562,
+        "startup_and_input": 0.010155996917199647,
+        "verify_filter_and_linear_algebra": 0.14335136911199217
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.7978463771391082,
+      "ratio_to_rho_mean_ir": 12.154899536795932,
+      "signed_base_sizes": [
+        368
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "dense",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 25.709980385732692,
+      "mean_ir": 54887731.777777776,
+      "mean_ratio_to_rank_floor": 6860966.472222222,
+      "mean_s_ir_per_sqrt_r": 37913.58698353885,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 8049999.0,
+        "curve_and_targets": 2156073.0,
+        "factor_base_and_tables": 26266556.444444444,
+        "final_verification": 7031.0,
+        "individual_log": 623333.6666666666,
+        "log_certification": 1329363.6666666667,
+        "reporting_and_cleanup": 4071609.6666666665,
+        "startup_and_input": 451312.0,
+        "verify_filter_and_linear_algebra": 11932453.333333334
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14666299260810733,
+        "curve_and_targets": 0.03928151027863976,
+        "factor_base_and_tables": 0.4785505903357242,
+        "final_verification": 0.00012809784212738443,
+        "individual_log": 0.011356520783011,
+        "log_certification": 0.024219686687889003,
+        "reporting_and_cleanup": 0.0741806872827477,
+        "startup_and_input": 0.00822245673818719,
+        "verify_filter_and_linear_algebra": 0.21739745744356642
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.9855050300858087,
+      "ratio_to_rho_mean_ir": 15.013810900104536,
+      "signed_base_sizes": [
+        368
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "excess8",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 25.722201818135357,
+      "mean_ir": 55354674.55555555,
+      "mean_ratio_to_rank_floor": 6919334.319444444,
+      "mean_s_ir_per_sqrt_r": 38236.12673965937,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 8050065.666666667,
+        "curve_and_targets": 2156073.0,
+        "factor_base_and_tables": 26266341.444444444,
+        "final_verification": 7031.0,
+        "individual_log": 624242.0,
+        "log_certification": 1331408.3333333333,
+        "reporting_and_cleanup": 4358262.555555556,
+        "startup_and_input": 452591.6666666667,
+        "verify_filter_and_linear_algebra": 12108658.888888888
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14542702547347447,
+        "curve_and_targets": 0.03895015221950411,
+        "factor_base_and_tables": 0.474509906441285,
+        "final_verification": 0.0001270172764351362,
+        "individual_log": 0.01127713250980263,
+        "log_certification": 0.02405231977286929,
+        "reporting_and_cleanup": 0.07873341484794526,
+        "startup_and_input": 0.008176214028906132,
+        "verify_filter_and_linear_algebra": 0.218746817429778
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.9938889519816038,
+      "ratio_to_rho_mean_ir": 15.141536902612868,
+      "signed_base_sizes": [
+        368
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 25.73104524571727,
+      "mean_ir": 55695029.55555555,
+      "mean_ratio_to_rank_floor": 6961878.694444444,
+      "mean_s_ir_per_sqrt_r": 38471.226250603395,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 8049985.666666667,
+        "curve_and_targets": 2156073.0,
+        "factor_base_and_tables": 26266089.333333332,
+        "final_verification": 7031.0,
+        "individual_log": 624552.8888888889,
+        "log_certification": 1334722.0,
+        "reporting_and_cleanup": 4393393.444444444,
+        "startup_and_input": 451292.6666666667,
+        "verify_filter_and_linear_algebra": 12411889.555555556
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14453687754374633,
+        "curve_and_targets": 0.03871212596896688,
+        "factor_base_and_tables": 0.4716056269820814,
+        "final_verification": 0.00012624106775967518,
+        "individual_log": 0.011213799397770317,
+        "log_certification": 0.02396483152358543,
+        "reporting_and_cleanup": 0.07888304359479786,
+        "startup_and_input": 0.00810292534662369,
+        "verify_filter_and_linear_algebra": 0.2228545285746684
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": 15.234636497793698,
+      "signed_base_sizes": [
+        368
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "rho",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 21.801762073456427,
+      "mean_ir": 3655816.111111111,
+      "mean_ratio_to_rank_floor": null,
+      "mean_s_ir_per_sqrt_r": 2525.2474029278515,
+      "phase_mean_ir": {
+        "curve_and_targets": 2156073.0,
+        "final_verification": 7036.0,
+        "reporting_and_cleanup": 212143.0,
+        "rho_solve": 829266.4444444445,
+        "startup_and_input": 451297.6666666667
+      },
+      "phase_share": {
+        "curve_and_targets": 0.5897651671940101,
+        "final_verification": 0.0019246044620831737,
+        "reporting_and_cleanup": 0.05802890341098788,
+        "rho_solve": 0.2268348350246768,
+        "startup_and_input": 0.1234464899082421
+      },
+      "ranks": [],
+      "ratio_to_incumbent_mean_ir": 0.06563989893325131,
+      "ratio_to_rho_mean_ir": 1.0,
+      "signed_base_sizes": [],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "window8",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 25.18002025531748,
+      "mean_ir": 38013809.0,
+      "mean_ratio_to_rank_floor": 4751726.125,
+      "mean_s_ir_per_sqrt_r": 26257.959792039397,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 1108464.6666666667,
+        "curve_and_targets": 2156073.0,
+        "factor_base_and_tables": 26265778.666666668,
+        "final_verification": 7031.0,
+        "individual_log": 623831.7777777778,
+        "log_certification": 1328334.6666666667,
+        "reporting_and_cleanup": 3504711.222222222,
+        "startup_and_input": 451769.6666666667,
+        "verify_filter_and_linear_algebra": 2567814.3333333335
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.02915952638859912,
+        "curve_and_targets": 0.056718152079945475,
+        "factor_base_and_tables": 0.6909536128480749,
+        "final_verification": 0.0001849591026250487,
+        "individual_log": 0.016410662182728856,
+        "log_certification": 0.03494347716290853,
+        "reporting_and_cleanup": 0.09219573924365806,
+        "startup_and_input": 0.011884356725911541,
+        "verify_filter_and_linear_algebra": 0.06754951426554844
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.6825350359511236,
+      "ratio_to_rho_mean_ir": 10.398173169723922,
+      "signed_base_sizes": [
+        368
+      ],
+      "stage": "development",
+      "verified": 9
+    },
+    {
+      "arm": "batch16",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 23.886364068365744,
+      "mean_ir": 15506438.888888888,
+      "mean_ratio_to_rank_floor": 2215205.5555555555,
+      "mean_s_ir_per_sqrt_r": 346474.7557512142,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 1078718.1666666667,
+        "curve_and_targets": 610831.8333333334,
+        "factor_base_and_tables": 7599734.611111111,
+        "final_verification": 4614.5,
+        "individual_log": 288838.25,
+        "log_certification": 648591.5833333334,
+        "reporting_and_cleanup": 1816695.5555555555,
+        "startup_and_input": 451325.4166666667,
+        "verify_filter_and_linear_algebra": 3007088.972222222
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.06956582193991814,
+        "curve_and_targets": 0.03939214140075861,
+        "factor_base_and_tables": 0.49010186449428356,
+        "final_verification": 0.0002975860565449693,
+        "individual_log": 0.018626987928670492,
+        "log_certification": 0.04182724273321584,
+        "reporting_and_cleanup": 0.11715749622289522,
+        "startup_and_input": 0.029105677963885253,
+        "verify_filter_and_linear_algebra": 0.1939251812598279
+      },
+      "ranks": [
+        7
+      ],
+      "ratio_to_incumbent_mean_ir": 0.5321022856573813,
+      "ratio_to_rho_mean_ir": 10.989756877981234,
+      "signed_base_sizes": [
+        182
+      ],
+      "stage": "replay",
+      "verified": 36
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 24.796588562589807,
+      "mean_ir": 29141838.527777776,
+      "mean_ratio_to_rank_floor": 4163119.789682539,
+      "mean_s_ir_per_sqrt_r": 651143.1450123634,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 4275137.666666667,
+        "curve_and_targets": 610831.8333333334,
+        "factor_base_and_tables": 7599963.222222222,
+        "final_verification": 4614.5,
+        "individual_log": 288809.69444444444,
+        "log_certification": 649742.9166666666,
+        "reporting_and_cleanup": 3577641.722222222,
+        "startup_and_input": 451325.4166666667,
+        "verify_filter_and_linear_algebra": 11683771.555555556
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14670102789127865,
+        "curve_and_targets": 0.02096064847628241,
+        "factor_base_and_tables": 0.2607921670754573,
+        "final_verification": 0.00015834622086734486,
+        "individual_log": 0.00991048297001417,
+        "log_certification": 0.022295879377937554,
+        "reporting_and_cleanup": 0.12276650695226526,
+        "startup_and_input": 0.015487197770191016,
+        "verify_filter_and_linear_algebra": 0.40092774326570624
+      },
+      "ranks": [
+        7
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": 20.65346677547914,
+      "signed_base_sizes": [
+        182
+      ],
+      "stage": "replay",
+      "verified": 36
+    },
+    {
+      "arm": "rho",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 20.428276503006575,
+      "mean_ir": 1410990.1666666667,
+      "mean_ratio_to_rank_floor": null,
+      "mean_s_ir_per_sqrt_r": 31527.06284571238,
+      "phase_mean_ir": {
+        "curve_and_targets": 610831.8333333334,
+        "final_verification": 4619.5,
+        "reporting_and_cleanup": 214076.63888888888,
+        "rho_solve": 130131.77777777778,
+        "startup_and_input": 451330.4166666667
+      },
+      "phase_share": {
+        "curve_and_targets": 0.4329100568973963,
+        "final_verification": 0.003273942022511142,
+        "reporting_and_cleanup": 0.1517208581223674,
+        "rho_solve": 0.09222727475500557,
+        "startup_and_input": 0.31986786820271956
+      },
+      "ranks": [],
+      "ratio_to_incumbent_mean_ir": 0.048418021578210374,
+      "ratio_to_rho_mean_ir": 1.0,
+      "signed_base_sizes": [],
+      "stage": "replay",
+      "verified": 36
+    },
+    {
+      "arm": "batch16",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 24.5509014116664,
+      "mean_ir": 24578634.166666668,
+      "mean_ratio_to_rank_floor": 3072329.2708333335,
+      "mean_s_ir_per_sqrt_r": 95972.95398373506,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 1541584.5833333333,
+        "curve_and_targets": 738302.0,
+        "factor_base_and_tables": 15086879.388888888,
+        "final_verification": 5416.666666666667,
+        "individual_log": 411817.30555555556,
+        "log_certification": 968313.3333333334,
+        "reporting_and_cleanup": 2298128.388888889,
+        "startup_and_input": 451347.9166666667,
+        "verify_filter_and_linear_algebra": 3076844.5833333335
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.06272051460955537,
+        "curve_and_targets": 0.03003836563877414,
+        "factor_base_and_tables": 0.6138209017875202,
+        "final_verification": 0.00022038110946021174,
+        "individual_log": 0.016755093174138157,
+        "log_certification": 0.039396547699405995,
+        "reporting_and_cleanup": 0.09350106166621704,
+        "startup_and_input": 0.0183634254697025,
+        "verify_filter_and_linear_algebra": 0.1251837088452264
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.6201929823316722,
+      "ratio_to_rho_mean_ir": 14.56780157488451,
+      "signed_base_sizes": [
+        272
+      ],
+      "stage": "replay",
+      "verified": 36
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 25.24011230503498,
+      "mean_ir": 39630622.833333336,
+      "mean_ratio_to_rank_floor": 4953827.854166667,
+      "mean_s_ir_per_sqrt_r": 154746.9202616836,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 6111682.583333333,
+        "curve_and_targets": 738302.0,
+        "factor_base_and_tables": 15086961.083333334,
+        "final_verification": 5416.666666666667,
+        "individual_log": 412553.5833333333,
+        "log_certification": 972280.75,
+        "reporting_and_cleanup": 3979169.0555555555,
+        "startup_and_input": 451347.9166666667,
+        "verify_filter_and_linear_algebra": 11872909.194444444
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.15421616281520548,
+        "curve_and_targets": 0.018629583569880558,
+        "factor_base_and_tables": 0.38068947709405376,
+        "final_verification": 0.00013667881752569143,
+        "individual_log": 0.010409969711259102,
+        "log_certification": 0.02453357228547552,
+        "reporting_and_cleanup": 0.10040642238427488,
+        "startup_and_input": 0.01138886760788018,
+        "verify_filter_and_linear_algebra": 0.29958926571444483
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": 23.48914287955263,
+      "signed_base_sizes": [
+        272
+      ],
+      "stage": "replay",
+      "verified": 36
+    },
+    {
+      "arm": "rho",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 20.686190139878807,
+      "mean_ir": 1687188.9722222222,
+      "mean_ratio_to_rank_floor": null,
+      "mean_s_ir_per_sqrt_r": 6588.019028842098,
+      "phase_mean_ir": {
+        "curve_and_targets": 738302.0,
+        "final_verification": 5421.666666666667,
+        "reporting_and_cleanup": 211468.63888888888,
+        "rho_solve": 280655.9166666667,
+        "startup_and_input": 451340.75
+      },
+      "phase_share": {
+        "curve_and_targets": 0.43759295025949063,
+        "final_verification": 0.003213431782644778,
+        "reporting_and_cleanup": 0.12533785033597056,
+        "rho_solve": 0.16634527684057257,
+        "startup_and_input": 0.26751049078132144
+      },
+      "ranks": [],
+      "ratio_to_incumbent_mean_ir": 0.04257286036905599,
+      "ratio_to_rho_mean_ir": 1.0,
+      "signed_base_sizes": [],
+      "stage": "replay",
+      "verified": 36
+    },
+    {
+      "arm": "batch16",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 24.85506114547527,
+      "mean_ir": 30347222.5,
+      "mean_ratio_to_rank_floor": 3793402.8125,
+      "mean_s_ir_per_sqrt_r": 83886.85641886054,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 1839799.25,
+        "curve_and_targets": 1858436.8333333333,
+        "factor_base_and_tables": 18535940.583333332,
+        "final_verification": 5843.583333333333,
+        "individual_log": 494985.02777777775,
+        "log_certification": 1089166.6666666667,
+        "reporting_and_cleanup": 2480983.277777778,
+        "startup_and_input": 451323.5833333333,
+        "verify_filter_and_linear_algebra": 3590743.6944444445
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.06062496328947402,
+        "curve_and_targets": 0.061239107906278185,
+        "factor_base_and_tables": 0.6107952905190362,
+        "final_verification": 0.00019255743530839875,
+        "individual_log": 0.016310719301503712,
+        "log_certification": 0.035890159854552316,
+        "reporting_and_cleanup": 0.08175322396564555,
+        "startup_and_input": 0.014871989795222062,
+        "verify_filter_and_linear_algebra": 0.11832198793297952
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.6586321721297578,
+      "ratio_to_rho_mean_ir": 10.665481003621656,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "replay",
+      "verified": 36
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 25.457516255549876,
+      "mean_ir": 46076131.38888889,
+      "mean_ratio_to_rank_floor": 5759516.423611111,
+      "mean_s_ir_per_sqrt_r": 127365.25783063914,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 6741561.333333333,
+        "curve_and_targets": 1858436.8333333333,
+        "factor_base_and_tables": 18535887.75,
+        "final_verification": 5843.583333333333,
+        "individual_log": 495772.9166666667,
+        "log_certification": 1092520.4166666667,
+        "reporting_and_cleanup": 4137881.5833333335,
+        "startup_and_input": 451323.5833333333,
+        "verify_filter_and_linear_algebra": 12756903.388888888
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14631352785314436,
+        "curve_and_targets": 0.04033404665960062,
+        "factor_base_and_tables": 0.4022882822681999,
+        "final_verification": 0.000126824521876906,
+        "individual_log": 0.010759864201320963,
+        "log_certification": 0.023711201086863046,
+        "reporting_and_cleanup": 0.08980531695269821,
+        "startup_and_input": 0.009795170942718697,
+        "verify_filter_and_linear_algebra": 0.2768657655135773
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": 16.193379939418506,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "replay",
+      "verified": 36
+    },
+    {
+      "arm": "rho",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 21.440184019190593,
+      "mean_ir": 2845368.388888889,
+      "mean_ratio_to_rank_floor": null,
+      "mean_s_ir_per_sqrt_r": 7865.267060189335,
+      "phase_mean_ir": {
+        "curve_and_targets": 1858436.8333333333,
+        "final_verification": 5848.583333333333,
+        "reporting_and_cleanup": 214516.63888888888,
+        "rho_solve": 315256.0,
+        "startup_and_input": 451310.3333333333
+      },
+      "phase_share": {
+        "curve_and_targets": 0.6531445420531468,
+        "final_verification": 0.0020554749100931686,
+        "reporting_and_cleanup": 0.07539151686880771,
+        "rho_solve": 0.11079619821147549,
+        "startup_and_input": 0.15861226795647687
+      },
+      "ranks": [],
+      "ratio_to_incumbent_mean_ir": 0.06175363041817874,
+      "ratio_to_rho_mean_ir": 1.0,
+      "signed_base_sizes": [],
+      "stage": "replay",
+      "verified": 36
+    },
+    {
+      "arm": "batch16",
+      "cell": "n19a1",
+      "curve_slug": "icv1-f2m19-tm797-9c54981b",
+      "log2_mean_ir": 24.85021579950676,
+      "mean_ir": 30245471.166666668,
+      "mean_ratio_to_rank_floor": 3780683.8958333335,
+      "mean_s_ir_per_sqrt_r": 59028.28053653865,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 1847566.75,
+        "curve_and_targets": 1753403.9166666667,
+        "factor_base_and_tables": 18533468.0,
+        "final_verification": 6447.666666666667,
+        "individual_log": 495865.22222222225,
+        "log_certification": 1092353.1666666667,
+        "reporting_and_cleanup": 2482034.222222222,
+        "startup_and_input": 451334.25,
+        "verify_filter_and_linear_algebra": 3582997.972222222
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.061085732135533435,
+        "curve_and_targets": 0.05797244509779968,
+        "factor_base_and_tables": 0.6127683677953615,
+        "final_verification": 0.00021317792112204213,
+        "individual_log": 0.016394693258034346,
+        "log_certification": 0.03611625557582789,
+        "reporting_and_cleanup": 0.08206300402943155,
+        "startup_and_input": 0.014922374576773414,
+        "verify_filter_and_linear_algebra": 0.11846394961011619
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.6572465444065206,
+      "ratio_to_rho_mean_ir": 10.97191316815542,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "replay",
+      "verified": 36
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n19a1",
+      "curve_slug": "icv1-f2m19-tm797-9c54981b",
+      "log2_mean_ir": 25.455709242762946,
+      "mean_ir": 46018455.972222224,
+      "mean_ratio_to_rank_floor": 5752306.996527778,
+      "mean_s_ir_per_sqrt_r": 89811.47339441688,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 6766772.416666667,
+        "curve_and_targets": 1753403.9166666667,
+        "factor_base_and_tables": 18533711.5,
+        "final_verification": 6416.0,
+        "individual_log": 496696.27777777775,
+        "log_certification": 1096092.9166666667,
+        "reporting_and_cleanup": 4138705.611111111,
+        "startup_and_input": 451334.25,
+        "verify_filter_and_linear_algebra": 12775323.083333334
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.147044751365653,
+        "curve_and_targets": 0.03810218921132558,
+        "factor_base_and_tables": 0.4027451836104055,
+        "final_verification": 0.00013942232229331733,
+        "individual_log": 0.010793414669922756,
+        "log_certification": 0.023818550481752215,
+        "reporting_and_cleanup": 0.08993577736743986,
+        "startup_and_input": 0.009807679124924041,
+        "verify_filter_and_linear_algebra": 0.2776130318462837
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": 16.693755580050738,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "replay",
+      "verified": 36
+    },
+    {
+      "arm": "rho",
+      "cell": "n19a1",
+      "curve_slug": "icv1-f2m19-tm797-9c54981b",
+      "log2_mean_ir": 21.39447259478022,
+      "mean_ir": 2756626.9166666665,
+      "mean_ratio_to_rank_floor": null,
+      "mean_s_ir_per_sqrt_r": 5379.944193129482,
+      "phase_mean_ir": {
+        "curve_and_targets": 1753403.9166666667,
+        "final_verification": 6421.0,
+        "reporting_and_cleanup": 214441.86111111112,
+        "rho_solve": 331039.1388888889,
+        "startup_and_input": 451321.0
+      },
+      "phase_share": {
+        "curve_and_targets": 0.6360686337587154,
+        "final_verification": 0.0023292959816863137,
+        "reporting_and_cleanup": 0.07779139781832203,
+        "rho_solve": 0.12008848092116282,
+        "startup_and_input": 0.16372219152011352
+      },
+      "ranks": [],
+      "ratio_to_incumbent_mean_ir": 0.059902638157408594,
+      "ratio_to_rho_mean_ir": 1.0,
+      "signed_base_sizes": [],
+      "stage": "replay",
+      "verified": 36
+    },
+    {
+      "arm": "batch16",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 25.20965000018651,
+      "mean_ir": 38802600.30555555,
+      "mean_ratio_to_rank_floor": 4850325.038194444,
+      "mean_s_ir_per_sqrt_r": 26802.815751766764,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 2031840.0,
+        "curve_and_targets": 2156069.5,
+        "factor_base_and_tables": 26265988.222222224,
+        "final_verification": 6479.583333333333,
+        "individual_log": 625782.3611111111,
+        "log_certification": 1333738.5833333333,
+        "reporting_and_cleanup": 2717353.4444444445,
+        "startup_and_input": 451320.75,
+        "verify_filter_and_linear_algebra": 3214027.861111111
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.052363501002511206,
+        "curve_and_targets": 0.05556507767576868,
+        "factor_base_and_tables": 0.6769130938490634,
+        "final_verification": 0.00016698837918874268,
+        "individual_log": 0.016127330544430416,
+        "log_certification": 0.034372402180025435,
+        "reporting_and_cleanup": 0.07003018929263326,
+        "startup_and_input": 0.011631198590971292,
+        "verify_filter_and_linear_algebra": 0.08283021848540761
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.6959943878430914,
+      "ratio_to_rho_mean_ir": 10.827823914082076,
+      "signed_base_sizes": [
+        368
+      ],
+      "stage": "replay",
+      "verified": 36
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 25.732502422137205,
+      "mean_ir": 55751312.05555555,
+      "mean_ratio_to_rank_floor": 6968914.006944444,
+      "mean_s_ir_per_sqrt_r": 38510.1032708461,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 8069932.583333333,
+        "curve_and_targets": 2156069.5,
+        "factor_base_and_tables": 26266260.111111112,
+        "final_verification": 6479.583333333333,
+        "individual_log": 624990.25,
+        "log_certification": 1334651.0833333333,
+        "reporting_and_cleanup": 4393568.777777778,
+        "startup_and_input": 451320.75,
+        "verify_filter_and_linear_algebra": 12448039.416666666
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14474874735309792,
+        "curve_and_targets": 0.038672982222400454,
+        "factor_base_and_tables": 0.47113259119242035,
+        "final_verification": 0.00011622297475037899,
+        "individual_log": 0.011210323613141233,
+        "log_certification": 0.023939366341788844,
+        "reporting_and_cleanup": 0.07880655388701231,
+        "startup_and_input": 0.008095248943204493,
+        "verify_filter_and_linear_algebra": 0.22327796347218404
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": 15.557343713126542,
+      "signed_base_sizes": [
+        368
+      ],
+      "stage": "replay",
+      "verified": 36
+    },
+    {
+      "arm": "rho",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 21.772978574061984,
+      "mean_ir": 3583600.972222222,
+      "mean_ratio_to_rank_floor": null,
+      "mean_s_ir_per_sqrt_r": 2475.3649453893036,
+      "phase_mean_ir": {
+        "curve_and_targets": 2156069.5,
+        "final_verification": 6484.583333333333,
+        "reporting_and_cleanup": 212056.63888888888,
+        "rho_solve": 757664.5,
+        "startup_and_input": 451325.75
+      },
+      "phase_share": {
+        "curve_and_targets": 0.6016488768455163,
+        "final_verification": 0.0018095160101801698,
+        "reporting_and_cleanup": 0.05917417718451804,
+        "rho_solve": 0.21142546446240237,
+        "startup_and_input": 0.1259419654973832
+      },
+      "ranks": [],
+      "ratio_to_incumbent_mean_ir": 0.06427832530024054,
+      "ratio_to_rho_mean_ir": 1.0,
+      "signed_base_sizes": [],
+      "stage": "replay",
+      "verified": 36
+    },
+    {
+      "arm": "batch16",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 23.885440583334727,
+      "mean_ir": 15496516.222222222,
+      "mean_ratio_to_rank_floor": 2213788.0317460317,
+      "mean_s_ir_per_sqrt_r": 346253.0444005702,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 1076657.3333333333,
+        "curve_and_targets": 610799.3333333334,
+        "factor_base_and_tables": 7600022.888888889,
+        "final_verification": 4787.0,
+        "individual_log": 289478.8888888889,
+        "log_certification": 649401.6666666666,
+        "reporting_and_cleanup": 1817441.2222222222,
+        "startup_and_input": 451332.3333333333,
+        "verify_filter_and_linear_algebra": 2996595.5555555555
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.06947737916664079,
+        "curve_and_targets": 0.039415267572039094,
+        "factor_base_and_tables": 0.4904342872877679,
+        "final_verification": 0.00030890813982663886,
+        "individual_log": 0.018680255919312504,
+        "log_certification": 0.04190630057453917,
+        "reporting_and_cleanup": 0.1172806323795529,
+        "startup_and_input": 0.02912476113089963,
+        "verify_filter_and_linear_algebra": 0.19337220782942138
+      },
+      "ranks": [
+        7
+      ],
+      "ratio_to_incumbent_mean_ir": 0.5319491039337719,
+      "ratio_to_rho_mean_ir": 11.004180556157173,
+      "signed_base_sizes": [
+        182
+      ],
+      "stage": "selection",
+      "verified": 9
+    },
+    {
+      "arm": "batch32",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 24.2672676584897,
+      "mean_ir": 20191820.555555556,
+      "mean_ratio_to_rank_floor": 2884545.793650794,
+      "mean_s_ir_per_sqrt_r": 451164.5868718058,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 2143394.6666666665,
+        "curve_and_targets": 610799.3333333334,
+        "factor_base_and_tables": 7599610.666666667,
+        "final_verification": 4787.0,
+        "individual_log": 289381.55555555556,
+        "log_certification": 649840.3333333334,
+        "reporting_and_cleanup": 2456290.4444444445,
+        "startup_and_input": 451332.3333333333,
+        "verify_filter_and_linear_algebra": 5986384.222222222
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.10615163010038416,
+        "curve_and_targets": 0.030249839614649242,
+        "factor_base_and_tables": 0.3763707510056946,
+        "final_verification": 0.0002370761956223363,
+        "individual_log": 0.014331622785541022,
+        "log_certification": 0.03218334530783738,
+        "reporting_and_cleanup": 0.12164779484277971,
+        "startup_and_input": 0.022352235752667395,
+        "verify_filter_and_linear_algebra": 0.2964757043948241
+      },
+      "ranks": [
+        7
+      ],
+      "ratio_to_incumbent_mean_ir": 0.693124873829159,
+      "ratio_to_rho_mean_ir": 14.338347791500984,
+      "signed_base_sizes": [
+        182
+      ],
+      "stage": "selection",
+      "verified": 9
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 24.796080460719217,
+      "mean_ir": 29131576.888888888,
+      "mean_ratio_to_rank_floor": 4161653.841269841,
+      "mean_s_ir_per_sqrt_r": 650913.8596907554,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 4279413.333333333,
+        "curve_and_targets": 610799.3333333334,
+        "factor_base_and_tables": 7599665.0,
+        "final_verification": 4787.0,
+        "individual_log": 289261.77777777775,
+        "log_certification": 648726.6666666666,
+        "reporting_and_cleanup": 3577918.111111111,
+        "startup_and_input": 451332.3333333333,
+        "verify_filter_and_linear_algebra": 11669673.333333334
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14689947439699186,
+        "curve_and_targets": 0.020966916266256054,
+        "factor_base_and_tables": 0.26087379440481295,
+        "final_verification": 0.00016432340817862886,
+        "individual_log": 0.009929492621736707,
+        "log_certification": 0.022268848306460826,
+        "reporting_and_cleanup": 0.12281923923163147,
+        "startup_and_input": 0.015492890585867206,
+        "verify_filter_and_linear_algebra": 0.4005850207780643
+      },
+      "ranks": [
+        7
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": 20.68652898328259,
+      "signed_base_sizes": [
+        182
+      ],
+      "stage": "selection",
+      "verified": 9
+    },
+    {
+      "arm": "rho",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 20.425460771803515,
+      "mean_ir": 1408239.0,
+      "mean_ratio_to_rank_floor": null,
+      "mean_s_ir_per_sqrt_r": 31465.59097549805,
+      "phase_mean_ir": {
+        "curve_and_targets": 610799.3333333334,
+        "final_verification": 4792.0,
+        "reporting_and_cleanup": 214091.88888888888,
+        "rho_solve": 127218.44444444444,
+        "startup_and_input": 451337.3333333333
+      },
+      "phase_share": {
+        "curve_and_targets": 0.433732721031965,
+        "final_verification": 0.0034028314795996988,
+        "reporting_and_cleanup": 0.1520280924536878,
+        "rho_solve": 0.09033867436169886,
+        "startup_and_input": 0.3204976806730486
+      },
+      "ranks": [],
+      "ratio_to_incumbent_mean_ir": 0.04834063756216088,
+      "ratio_to_rho_mean_ir": 1.0,
+      "signed_base_sizes": [],
+      "stage": "selection",
+      "verified": 9
+    },
+    {
+      "arm": "batch16",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 24.55069419921338,
+      "mean_ir": 24575104.222222224,
+      "mean_ratio_to_rank_floor": 3071888.027777778,
+      "mean_s_ir_per_sqrt_r": 95959.17050034722,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 1542668.0,
+        "curve_and_targets": 738462.6666666666,
+        "factor_base_and_tables": 15087427.444444444,
+        "final_verification": 5811.333333333333,
+        "individual_log": 412235.8888888889,
+        "log_certification": 968220.0,
+        "reporting_and_cleanup": 2297961.888888889,
+        "startup_and_input": 451355.6666666667,
+        "verify_filter_and_linear_algebra": 3070961.3333333335
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.06277360966815478,
+        "curve_and_targets": 0.030049218102558697,
+        "factor_base_and_tables": 0.6139313716847444,
+        "final_verification": 0.00023647237793109302,
+        "individual_log": 0.01677453267995183,
+        "log_certification": 0.03939840870031712,
+        "reporting_and_cleanup": 0.09350771691991197,
+        "startup_and_input": 0.018366378534359375,
+        "verify_filter_and_linear_algebra": 0.12496229133207067
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.6222969601273415,
+      "ratio_to_rho_mean_ir": 14.71415985480627,
+      "signed_base_sizes": [
+        272
+      ],
+      "stage": "selection",
+      "verified": 9
+    },
+    {
+      "arm": "batch32",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 24.81882173316927,
+      "mean_ir": 29594417.666666668,
+      "mean_ratio_to_rank_floor": 3699302.2083333335,
+      "mean_s_ir_per_sqrt_r": 115558.23914537841,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 3067070.6666666665,
+        "curve_and_targets": 738462.6666666666,
+        "factor_base_and_tables": 15087027.888888888,
+        "final_verification": 5811.333333333333,
+        "individual_log": 412574.8888888889,
+        "log_certification": 972062.6666666666,
+        "reporting_and_cleanup": 2857952.4444444445,
+        "startup_and_input": 451355.6666666667,
+        "verify_filter_and_linear_algebra": 6002099.444444444
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.10363679735861897,
+        "curve_and_targets": 0.02495276896420995,
+        "factor_base_and_tables": 0.509793031200002,
+        "final_verification": 0.00019636586192668565,
+        "individual_log": 0.013940970001027859,
+        "log_certification": 0.032846149487223676,
+        "reporting_and_cleanup": 0.09657065993440603,
+        "startup_and_input": 0.01525137854545609,
+        "verify_filter_and_linear_algebra": 0.2028118786471288
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.7493972755587455,
+      "ratio_to_rho_mean_ir": 17.719436240008733,
+      "signed_base_sizes": [
+        272
+      ],
+      "stage": "selection",
+      "verified": 9
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 25.235019095312254,
+      "mean_ir": 39490959.777777776,
+      "mean_ratio_to_rank_floor": 4936369.972222222,
+      "mean_s_ir_per_sqrt_r": 154201.57360355894,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 6111546.666666667,
+        "curve_and_targets": 738462.6666666666,
+        "factor_base_and_tables": 15086690.111111112,
+        "final_verification": 5811.333333333333,
+        "individual_log": 413110.3333333333,
+        "log_certification": 972495.0,
+        "reporting_and_cleanup": 3979154.111111111,
+        "startup_and_input": 451355.6666666667,
+        "verify_filter_and_linear_algebra": 11732333.888888888
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.1547581193533244,
+        "curve_and_targets": 0.018699537079425756,
+        "factor_base_and_tables": 0.3820289553864083,
+        "final_verification": 0.00014715604194060302,
+        "individual_log": 0.010460883596093236,
+        "log_certification": 0.024625762591549857,
+        "reporting_and_cleanup": 0.10076113960011292,
+        "startup_and_input": 0.011429341530479895,
+        "verify_filter_and_linear_algebra": 0.29708910482066503
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": 23.64491681237731,
+      "signed_base_sizes": [
+        272
+      ],
+      "stage": "selection",
+      "verified": 9
+    },
+    {
+      "arm": "rho",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 20.671560934314595,
+      "mean_ir": 1670167.0,
+      "mean_ratio_to_rank_floor": null,
+      "mean_s_ir_per_sqrt_r": 6521.552806768162,
+      "phase_mean_ir": {
+        "curve_and_targets": 738462.6666666666,
+        "final_verification": 5816.333333333333,
+        "reporting_and_cleanup": 211490.11111111112,
+        "rho_solve": 263037.22222222225,
+        "startup_and_input": 451360.6666666667
+      },
+      "phase_share": {
+        "curve_and_targets": 0.442148998672987,
+        "final_verification": 0.0034824860827290523,
+        "reporting_and_cleanup": 0.1266281222842453,
+        "rho_solve": 0.15749156953898755,
+        "startup_and_input": 0.2702488234210511
+      },
+      "ranks": [],
+      "ratio_to_incumbent_mean_ir": 0.042292388166768,
+      "ratio_to_rho_mean_ir": 1.0,
+      "signed_base_sizes": [],
+      "stage": "selection",
+      "verified": 9
+    },
+    {
+      "arm": "batch16",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 24.831523606461733,
+      "mean_ir": 29856125.222222224,
+      "mean_ratio_to_rank_floor": 3732015.652777778,
+      "mean_s_ir_per_sqrt_r": 82529.34810558282,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 1698455.6666666667,
+        "curve_and_targets": 1858493.6666666667,
+        "factor_base_and_tables": 18536395.222222224,
+        "final_verification": 5992.333333333333,
+        "individual_log": 493935.22222222225,
+        "log_certification": 1088752.6666666667,
+        "reporting_and_cleanup": 2444176.5555555555,
+        "startup_and_input": 451310.3333333333,
+        "verify_filter_and_linear_algebra": 3278613.5555555555
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.05688801390082892,
+        "curve_and_targets": 0.06224832100058887,
+        "factor_base_and_tables": 0.620857364586125,
+        "final_verification": 0.00020070700027990162,
+        "individual_log": 0.01654384882652425,
+        "log_certification": 0.03646664322858268,
+        "reporting_and_cleanup": 0.08186516292262633,
+        "startup_and_input": 0.015116172308837264,
+        "verify_filter_and_linear_algebra": 0.10981376622560685
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.6479275066915203,
+      "ratio_to_rho_mean_ir": 10.099592295469868,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "selection",
+      "verified": 9
+    },
+    {
+      "arm": "batch32",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 25.069323354241067,
+      "mean_ir": 35206131.0,
+      "mean_ratio_to_rank_floor": 4400766.375,
+      "mean_s_ir_per_sqrt_r": 97318.02164961204,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 3377546.3333333335,
+        "curve_and_targets": 1858493.6666666667,
+        "factor_base_and_tables": 18535463.0,
+        "final_verification": 5992.333333333333,
+        "individual_log": 495313.3333333333,
+        "log_certification": 1092271.0,
+        "reporting_and_cleanup": 2872684.222222222,
+        "startup_and_input": 451310.3333333333,
+        "verify_filter_and_linear_algebra": 6517056.777777778
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.09593631101734336,
+        "curve_and_targets": 0.05278892096000741,
+        "factor_base_and_tables": 0.5264839524683925,
+        "final_verification": 0.00017020709640980808,
+        "individual_log": 0.014068951039616745,
+        "log_certification": 0.031025022317845718,
+        "reporting_and_cleanup": 0.08159613512266435,
+        "startup_and_input": 0.01281908350944139,
+        "verify_filter_and_linear_algebra": 0.18511141646827872
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.7640315181323851,
+      "ratio_to_rho_mean_ir": 11.909367567103123,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "selection",
+      "verified": 9
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 25.457619295009575,
+      "mean_ir": 46079422.333333336,
+      "mean_ratio_to_rank_floor": 5759927.791666667,
+      "mean_s_ir_per_sqrt_r": 127374.35477465417,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 6742132.0,
+        "curve_and_targets": 1858493.6666666667,
+        "factor_base_and_tables": 18535841.0,
+        "final_verification": 5992.333333333333,
+        "individual_log": 494572.22222222225,
+        "log_certification": 1092167.0,
+        "reporting_and_cleanup": 4137866.5555555555,
+        "startup_and_input": 451310.3333333333,
+        "verify_filter_and_linear_algebra": 12761047.222222222
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14631546270758733,
+        "curve_and_targets": 0.040332399421644946,
+        "factor_base_and_tables": 0.4022585367046015,
+        "final_verification": 0.00013004358626689092,
+        "individual_log": 0.010733038679272987,
+        "log_certification": 0.023701837928856558,
+        "reporting_and_cleanup": 0.08979857702257413,
+        "startup_and_input": 0.00979418383478433,
+        "verify_filter_and_linear_algebra": 0.27693592011441137
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": 15.58753439414991,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "selection",
+      "verified": 9
+    },
+    {
+      "arm": "rho",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 21.495298456733522,
+      "mean_ir": 2956171.3333333335,
+      "mean_ratio_to_rank_floor": null,
+      "mean_s_ir_per_sqrt_r": 8171.552444013112,
+      "phase_mean_ir": {
+        "curve_and_targets": 1858493.6666666667,
+        "final_verification": 5997.333333333333,
+        "reporting_and_cleanup": 214730.55555555556,
+        "rho_solve": 425634.44444444444,
+        "startup_and_input": 451315.3333333333
+      },
+      "phase_share": {
+        "curve_and_targets": 0.6286826631834826,
+        "final_verification": 0.002028750250605682,
+        "reporting_and_cleanup": 0.07263806164896021,
+        "rho_solve": 0.1439816561526918,
+        "startup_and_input": 0.15266886876425972
+      },
+      "ranks": [],
+      "ratio_to_incumbent_mean_ir": 0.0641538279700801,
+      "ratio_to_rho_mean_ir": 1.0,
+      "signed_base_sizes": [],
+      "stage": "selection",
+      "verified": 9
+    },
+    {
+      "arm": "batch16",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 25.210721727936566,
+      "mean_ir": 38831436.11111111,
+      "mean_ratio_to_rank_floor": 4853929.513888889,
+      "mean_s_ir_per_sqrt_r": 26822.73402469882,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 2025319.0,
+        "curve_and_targets": 2156080.6666666665,
+        "factor_base_and_tables": 26266684.555555556,
+        "final_verification": 6727.666666666667,
+        "individual_log": 625892.7777777778,
+        "log_certification": 1334071.6666666667,
+        "reporting_and_cleanup": 2723188.777777778,
+        "startup_and_input": 451307.0,
+        "verify_filter_and_linear_algebra": 3242164.0
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.05215668548041367,
+        "curve_and_targets": 0.05552410321620148,
+        "factor_base_and_tables": 0.6764283576944424,
+        "final_verification": 0.0001732530995613019,
+        "individual_log": 0.01611819804930384,
+        "log_certification": 0.03435545527724995,
+        "reporting_and_cleanup": 0.07012845906563246,
+        "startup_and_input": 0.011622207293818432,
+        "verify_filter_and_linear_algebra": 0.08349328082337643
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.6958291385263364,
+      "ratio_to_rho_mean_ir": 10.990979220184789,
+      "signed_base_sizes": [
+        368
+      ],
+      "stage": "selection",
+      "verified": 9
+    },
+    {
+      "arm": "batch32",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 25.403521758624773,
+      "mean_ir": 44383550.88888889,
+      "mean_ratio_to_rank_floor": 5547943.861111111,
+      "mean_s_ir_per_sqrt_r": 30657.845801992084,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 4041202.6666666665,
+        "curve_and_targets": 2156080.6666666665,
+        "factor_base_and_tables": 26266298.555555556,
+        "final_verification": 6727.666666666667,
+        "individual_log": 625405.4444444445,
+        "log_certification": 1333935.0,
+        "reporting_and_cleanup": 3182658.4444444445,
+        "startup_and_input": 451307.0,
+        "verify_filter_and_linear_algebra": 6319935.444444444
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.09105181054088111,
+        "curve_and_targets": 0.048578372471014396,
+        "factor_base_and_tables": 0.5918025491315779,
+        "final_verification": 0.00015158018076356507,
+        "individual_log": 0.014090928551663277,
+        "log_certification": 0.03005471561613925,
+        "reporting_and_cleanup": 0.07170806257507442,
+        "startup_and_input": 0.01016833919236916,
+        "verify_filter_and_linear_algebra": 0.14239364174051689
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.7953187178395005,
+      "ratio_to_rho_mean_ir": 12.562468308974257,
+      "signed_base_sizes": [
+        368
+      ],
+      "stage": "selection",
+      "verified": 9
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 25.733916728334016,
+      "mean_ir": 55805993.11111111,
+      "mean_ratio_to_rank_floor": 6975749.138888889,
+      "mean_s_ir_per_sqrt_r": 38547.874096657426,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 8062612.333333333,
+        "curve_and_targets": 2156080.6666666665,
+        "factor_base_and_tables": 26266456.555555556,
+        "final_verification": 6727.666666666667,
+        "individual_log": 625177.1111111111,
+        "log_certification": 1334356.6666666667,
+        "reporting_and_cleanup": 4402082.333333333,
+        "startup_and_input": 451307.0,
+        "verify_filter_and_linear_algebra": 12501192.777777778
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14447574326435644,
+        "curve_and_targets": 0.038635288908376864,
+        "factor_base_and_tables": 0.47067447582660865,
+        "final_verification": 0.00012055455501475828,
+        "individual_log": 0.011202687673102923,
+        "log_certification": 0.023910633827623668,
+        "reporting_and_cleanup": 0.07888189221126625,
+        "startup_and_input": 0.008087070489032183,
+        "verify_filter_and_linear_algebra": 0.22401165324461828
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": 15.795514461297298,
+      "signed_base_sizes": [
+        368
+      ],
+      "stage": "selection",
+      "verified": 9
+    },
+    {
+      "arm": "rho",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 21.75247370689208,
+      "mean_ir": 3533027.888888889,
+      "mean_ratio_to_rank_floor": null,
+      "mean_s_ir_per_sqrt_r": 2440.4316928776666,
+      "phase_mean_ir": {
+        "curve_and_targets": 2156080.6666666665,
+        "final_verification": 6732.666666666667,
+        "reporting_and_cleanup": 212073.88888888888,
+        "rho_solve": 706828.6666666666,
+        "startup_and_input": 451312.0
+      },
+      "phase_share": {
+        "curve_and_targets": 0.6102642646686659,
+        "final_verification": 0.0019056364337910847,
+        "reporting_and_cleanup": 0.060026100998479395,
+        "rho_solve": 0.20006314382334497,
+        "startup_and_input": 0.1277408540757187
+      },
+      "ranks": [],
+      "ratio_to_incumbent_mean_ir": 0.06330911237175806,
+      "ratio_to_rho_mean_ir": 1.0,
+      "signed_base_sizes": [],
+      "stage": "selection",
+      "verified": 9
+    },
+    {
+      "arm": "batch128",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 25.472469248863987,
+      "mean_ir": 46556176.666666664,
+      "mean_ratio_to_rank_floor": 6650882.380952381,
+      "mean_s_ir_per_sqrt_r": 1040247.8644437197,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 8555081.0,
+        "curve_and_targets": 610885.0,
+        "factor_base_and_tables": 7599995.666666667,
+        "final_verification": 4504.0,
+        "individual_log": 287423.3333333333,
+        "log_certification": 653673.0,
+        "reporting_and_cleanup": 5570357.333333333,
+        "startup_and_input": 451359.0,
+        "verify_filter_and_linear_algebra": 22822898.333333332
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.18375823816574857,
+        "curve_and_targets": 0.013121459787684456,
+        "factor_base_and_tables": 0.16324355243088762,
+        "final_verification": 0.00009674333939077042,
+        "individual_log": 0.006173688518093518,
+        "log_certification": 0.014040521511896775,
+        "reporting_and_cleanup": 0.11964808393129076,
+        "startup_and_input": 0.009694932709608958,
+        "verify_filter_and_linear_algebra": 0.49022277960539856
+      },
+      "ranks": [
+        7
+      ],
+      "ratio_to_incumbent_mean_ir": 1.5889284683541036,
+      "ratio_to_rho_mean_ir": 33.195568807197716,
+      "signed_base_sizes": [
+        182
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "batch16",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 23.893676973962236,
+      "mean_ir": 15585239.333333334,
+      "mean_ratio_to_rank_floor": 2226462.761904762,
+      "mean_s_ir_per_sqrt_r": 348235.46721679386,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 1079914.0,
+        "curve_and_targets": 610885.0,
+        "factor_base_and_tables": 7600315.0,
+        "final_verification": 4504.0,
+        "individual_log": 288035.0,
+        "log_certification": 648826.0,
+        "reporting_and_cleanup": 1812022.6666666667,
+        "startup_and_input": 451339.0,
+        "verify_filter_and_linear_algebra": 3089398.6666666665
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.06929081914644108,
+        "curve_and_targets": 0.03919638235477423,
+        "factor_base_and_tables": 0.4876611027553892,
+        "final_verification": 0.0002889913913844719,
+        "individual_log": 0.018481268964792713,
+        "log_certification": 0.041630801178157505,
+        "reporting_and_cleanup": 0.11626530898317079,
+        "startup_and_input": 0.028959388453835742,
+        "verify_filter_and_linear_algebra": 0.19822593677205427
+      },
+      "ranks": [
+        7
+      ],
+      "ratio_to_incumbent_mean_ir": 0.5319128896719711,
+      "ratio_to_rho_mean_ir": 11.11261537583973,
+      "signed_base_sizes": [
+        182
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "batch32",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 24.274331061771857,
+      "mean_ir": 20290921.666666668,
+      "mean_ratio_to_rank_floor": 2898703.095238095,
+      "mean_s_ir_per_sqrt_r": 453378.89497393876,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 2146063.0,
+        "curve_and_targets": 610885.0,
+        "factor_base_and_tables": 7599779.0,
+        "final_verification": 4504.0,
+        "individual_log": 288384.0,
+        "log_certification": 650145.0,
+        "reporting_and_cleanup": 2459408.6666666665,
+        "startup_and_input": 451339.0,
+        "verify_filter_and_linear_algebra": 6080414.0
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.10576468803413153,
+        "curve_and_targets": 0.030106320946649952,
+        "factor_base_and_tables": 0.37454084761879963,
+        "final_verification": 0.00022197118859312536,
+        "individual_log": 0.014212464309777944,
+        "log_certification": 0.03204117637830317,
+        "reporting_and_cleanup": 0.12120734124694352,
+        "startup_and_input": 0.022243395712351823,
+        "verify_filter_and_linear_algebra": 0.2996617945644493
+      },
+      "ranks": [
+        7
+      ],
+      "ratio_to_incumbent_mean_ir": 0.6925144071891449,
+      "ratio_to_rho_mean_ir": 14.467869455215695,
+      "signed_base_sizes": [
+        182
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "dense",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 24.77531130776704,
+      "mean_ir": 28715200.666666668,
+      "mean_ratio_to_rank_floor": 4102171.523809524,
+      "mean_s_ir_per_sqrt_r": 641610.3793153592,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 4283387.0,
+        "curve_and_targets": 610885.0,
+        "factor_base_and_tables": 7600304.0,
+        "final_verification": 4504.0,
+        "individual_log": 287782.3333333333,
+        "log_certification": 644516.0,
+        "reporting_and_cleanup": 3440559.3333333335,
+        "startup_and_input": 451334.0,
+        "verify_filter_and_linear_algebra": 11391929.0
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14916792850318697,
+        "curve_and_targets": 0.021273924117449432,
+        "factor_base_and_tables": 0.26467877025225267,
+        "final_verification": 0.0001568507234995003,
+        "individual_log": 0.010021950975512365,
+        "log_certification": 0.022445115654308154,
+        "reporting_and_cleanup": 0.11981665645565981,
+        "startup_and_input": 0.0157175986767148,
+        "verify_filter_and_linear_algebra": 0.3967212046414163
+      },
+      "ranks": [
+        7
+      ],
+      "ratio_to_incumbent_mean_ir": 0.9800289259241306,
+      "ratio_to_rho_mean_ir": 20.4745640168796,
+      "signed_base_sizes": [
+        182
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "excess8",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 24.79723386748486,
+      "mean_ir": 29154876.333333332,
+      "mean_ratio_to_rank_floor": 4164982.3333333335,
+      "mean_s_ir_per_sqrt_r": 651434.4608023886,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 4283387.0,
+        "curve_and_targets": 610885.0,
+        "factor_base_and_tables": 7599763.333333333,
+        "final_verification": 4504.0,
+        "individual_log": 287816.6666666667,
+        "log_certification": 647814.0,
+        "reporting_and_cleanup": 3580840.6666666665,
+        "startup_and_input": 452565.0,
+        "verify_filter_and_linear_algebra": 11687300.666666666
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.1469183731403011,
+        "curve_and_targets": 0.020953098652027668,
+        "factor_base_and_tables": 0.26066868699574547,
+        "final_verification": 0.000154485306283069,
+        "individual_log": 0.009871990653501772,
+        "log_certification": 0.02221974782514655,
+        "reporting_and_cleanup": 0.12282132929415387,
+        "startup_and_input": 0.015522789218027782,
+        "verify_filter_and_linear_algebra": 0.40086949891481277
+      },
+      "ranks": [
+        7
+      ],
+      "ratio_to_incumbent_mean_ir": 0.9950347368310521,
+      "ratio_to_rho_mean_ir": 20.788062351379516,
+      "signed_base_sizes": [
+        182
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 24.80441507110877,
+      "mean_ir": 29300360.333333332,
+      "mean_ratio_to_rank_floor": 4185765.7619047626,
+      "mean_s_ir_per_sqrt_r": 654685.1448393165,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 4283387.0,
+        "curve_and_targets": 610885.0,
+        "factor_base_and_tables": 7599757.0,
+        "final_verification": 4504.0,
+        "individual_log": 287697.6666666667,
+        "log_certification": 648605.0,
+        "reporting_and_cleanup": 3573253.3333333335,
+        "startup_and_input": 451339.0,
+        "verify_filter_and_linear_algebra": 11840932.333333334
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14618888475330583,
+        "curve_and_targets": 0.020849061003015423,
+        "factor_base_and_tables": 0.2593741822128445,
+        "final_verification": 0.00015371824608163807,
+        "individual_log": 0.009818912238405805,
+        "log_certification": 0.022136417184676033,
+        "reporting_and_cleanup": 0.12195253889994823,
+        "startup_and_input": 0.015403871995612887,
+        "verify_filter_and_linear_algebra": 0.4041224134661097
+      },
+      "ranks": [
+        7
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": 20.891795614678266,
+      "signed_base_sizes": [
+        182
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "rho",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 20.41955048127628,
+      "mean_ir": 1402481.6666666667,
+      "mean_ratio_to_rank_floor": null,
+      "mean_s_ir_per_sqrt_r": 31336.949533401737,
+      "phase_mean_ir": {
+        "curve_and_targets": 610885.0,
+        "final_verification": 4509.0,
+        "reporting_and_cleanup": 214111.0,
+        "rho_solve": 121632.66666666667,
+        "startup_and_input": 451344.0
+      },
+      "phase_share": {
+        "curve_and_targets": 0.4355743212329573,
+        "final_verification": 0.0032150152883757247,
+        "reporting_and_cleanup": 0.1526658102482623,
+        "rho_solve": 0.08672674271440269,
+        "startup_and_input": 0.321818110516002
+      },
+      "ranks": [],
+      "ratio_to_incumbent_mean_ir": 0.04786567983162801,
+      "ratio_to_rho_mean_ir": 1.0,
+      "signed_base_sizes": [],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "window8",
+      "cell": "n13a0",
+      "curve_slug": "icv1-f2m13-t181-515ee569",
+      "log2_mean_ir": 24.686225043673623,
+      "mean_ir": 26995676.666666668,
+      "mean_ratio_to_rank_floor": 3856525.2380952374,
+      "mean_s_ir_per_sqrt_r": 603189.4586786261,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 2331519.0,
+        "curve_and_targets": 610885.0,
+        "factor_base_and_tables": 7599656.0,
+        "final_verification": 4504.0,
+        "individual_log": 288361.0,
+        "log_certification": 651324.0,
+        "reporting_and_cleanup": 3433971.0,
+        "startup_and_input": 451743.0,
+        "verify_filter_and_linear_algebra": 11623713.666666666
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.08636638483964655,
+        "curve_and_targets": 0.022628993803081802,
+        "factor_base_and_tables": 0.2815138177063661,
+        "final_verification": 0.00016684153005734376,
+        "individual_log": 0.010681747435360945,
+        "log_certification": 0.02412697440565483,
+        "reporting_and_cleanup": 0.127204479532093,
+        "startup_and_input": 0.016733901712409998,
+        "verify_filter_and_linear_algebra": 0.4305768590353295
+      },
+      "ranks": [
+        7
+      ],
+      "ratio_to_incumbent_mean_ir": 0.921342821711146,
+      "ratio_to_rho_mean_ir": 19.24850592224022,
+      "signed_base_sizes": [
+        182
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "batch128",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 25.815461062707037,
+      "mean_ir": 59051119.0,
+      "mean_ratio_to_rank_floor": 7381389.875,
+      "mean_s_ir_per_sqrt_r": 230578.7330591795,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 12215051.0,
+        "curve_and_targets": 738163.0,
+        "factor_base_and_tables": 15086897.333333334,
+        "final_verification": 5118.0,
+        "individual_log": 412179.0,
+        "log_certification": 973588.0,
+        "reporting_and_cleanup": 6225516.0,
+        "startup_and_input": 451366.0,
+        "verify_filter_and_linear_algebra": 22943240.666666668
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.2068555381651616,
+        "curve_and_targets": 0.012500406639203569,
+        "factor_base_and_tables": 0.2554887627672785,
+        "final_verification": 0.00008667066918748821,
+        "individual_log": 0.006980037076012057,
+        "log_certification": 0.016487206618387706,
+        "reporting_and_cleanup": 0.10542587685764261,
+        "startup_and_input": 0.00764364854796401,
+        "verify_filter_and_linear_algebra": 0.3885318526591624
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.498100822160587,
+      "ratio_to_rho_mean_ir": 34.78189172993978,
+      "signed_base_sizes": [
+        272
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "batch16",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 24.54551790292387,
+      "mean_ir": 24487088.333333332,
+      "mean_ratio_to_rank_floor": 3060886.0416666665,
+      "mean_s_ir_per_sqrt_r": 95615.49213331954,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 1538337.0,
+        "curve_and_targets": 738163.0,
+        "factor_base_and_tables": 15086672.333333334,
+        "final_verification": 5118.0,
+        "individual_log": 410811.6666666667,
+        "log_certification": 967608.0,
+        "reporting_and_cleanup": 2297722.6666666665,
+        "startup_and_input": 451346.0,
+        "verify_filter_and_linear_algebra": 2991309.6666666665
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.06282237312412195,
+        "curve_and_targets": 0.030144988654905412,
+        "factor_base_and_tables": 0.616107236922751,
+        "final_verification": 0.0002090081078783492,
+        "individual_log": 0.0167766645455942,
+        "log_certification": 0.039515028770604484,
+        "reporting_and_cleanup": 0.09383404982203887,
+        "startup_and_input": 0.018431999503411765,
+        "verify_filter_and_linear_algebra": 0.12215865054869393
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.6212266217086518,
+      "ratio_to_rho_mean_ir": 14.423219570004617,
+      "signed_base_sizes": [
+        272
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "batch32",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 24.811326132525068,
+      "mean_ir": 29441057.0,
+      "mean_ratio_to_rank_floor": 3680132.125,
+      "mean_s_ir_per_sqrt_r": 114959.40700095943,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 3061761.0,
+        "curve_and_targets": 738163.0,
+        "factor_base_and_tables": 15086678.666666666,
+        "final_verification": 5118.0,
+        "individual_log": 411861.0,
+        "log_certification": 972347.0,
+        "reporting_and_cleanup": 2858419.3333333335,
+        "startup_and_input": 451346.0,
+        "verify_filter_and_linear_algebra": 5855363.0
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.1039963001328383,
+        "curve_and_targets": 0.025072571273511,
+        "factor_base_and_tables": 0.512436719465156,
+        "final_verification": 0.00017383886726621262,
+        "individual_log": 0.013989341483221883,
+        "log_certification": 0.03302690525003909,
+        "reporting_and_cleanup": 0.0970895621489858,
+        "startup_and_input": 0.015330495776697147,
+        "verify_filter_and_linear_algebra": 0.1988842656022846
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.7469066199571375,
+      "ratio_to_rho_mean_ir": 17.341172772508944,
+      "signed_base_sizes": [
+        272
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "dense",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 25.20920157345199,
+      "mean_ir": 38790541.333333336,
+      "mean_ratio_to_rank_floor": 4848817.666666667,
+      "mean_s_ir_per_sqrt_r": 151466.62801292108,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 6108844.0,
+        "curve_and_targets": 738163.0,
+        "factor_base_and_tables": 15086780.0,
+        "final_verification": 5118.0,
+        "individual_log": 411060.3333333333,
+        "log_certification": 965798.0,
+        "reporting_and_cleanup": 3849683.0,
+        "startup_and_input": 451341.0,
+        "verify_filter_and_linear_algebra": 11173754.0
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.15748282416338882,
+        "curve_and_targets": 0.019029458590351888,
+        "factor_base_and_tables": 0.38892934930597856,
+        "final_verification": 0.00013193938068613702,
+        "individual_log": 0.010596921806298759,
+        "log_certification": 0.02489777061115861,
+        "reporting_and_cleanup": 0.09924282744391365,
+        "startup_and_input": 0.01163533646312266,
+        "verify_filter_and_linear_algebra": 0.28805357223510086
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.9840989103613921,
+      "ratio_to_rho_mean_ir": 22.8481429590141,
+      "signed_base_sizes": [
+        272
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "excess8",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 25.226292196163406,
+      "mean_ir": 39252799.0,
+      "mean_ratio_to_rank_floor": 4906599.875,
+      "mean_s_ir_per_sqrt_r": 153271.6198391876,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 6108804.0,
+        "curve_and_targets": 738163.0,
+        "factor_base_and_tables": 15087200.666666666,
+        "final_verification": 5118.0,
+        "individual_log": 410843.6666666667,
+        "log_certification": 970092.0,
+        "reporting_and_cleanup": 3978315.3333333335,
+        "startup_and_input": 452572.0,
+        "verify_filter_and_linear_algebra": 11501690.333333334
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.15562722036713866,
+        "curve_and_targets": 0.018805359587223323,
+        "factor_base_and_tables": 0.3843598686215132,
+        "final_verification": 0.00013038560638694836,
+        "individual_log": 0.010466608168927435,
+        "log_certification": 0.02471395734097841,
+        "reporting_and_cleanup": 0.10135112487986737,
+        "startup_and_input": 0.01152967460995584,
+        "verify_filter_and_linear_algebra": 0.29301580081800876
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.9958261833108406,
+      "ratio_to_rho_mean_ir": 23.120418851251376,
+      "signed_base_sizes": [
+        272
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 25.232326342290612,
+      "mean_ir": 39417319.666666664,
+      "mean_ratio_to_rank_floor": 4927164.958333333,
+      "mean_s_ir_per_sqrt_r": 153914.0287812104,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 6108844.0,
+        "curve_and_targets": 738163.0,
+        "factor_base_and_tables": 15086521.333333334,
+        "final_verification": 5118.0,
+        "individual_log": 411997.0,
+        "log_certification": 971672.0,
+        "reporting_and_cleanup": 3979116.3333333335,
+        "startup_and_input": 451346.0,
+        "verify_filter_and_linear_algebra": 11664542.0
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.15497867565982565,
+        "curve_and_targets": 0.018726869463532525,
+        "factor_base_and_tables": 0.3827383866004283,
+        "final_verification": 0.00012984140076698433,
+        "individual_log": 0.010452182022625097,
+        "log_certification": 0.024650889715915825,
+        "reporting_and_cleanup": 0.10094842487979416,
+        "startup_and_input": 0.011450448782840038,
+        "verify_filter_and_linear_algebra": 0.2959242814742714
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": 23.217323704406446,
+      "signed_base_sizes": [
+        272
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "rho",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 20.695196567228557,
+      "mean_ir": 1697754.6666666667,
+      "mean_ratio_to_rank_floor": null,
+      "mean_s_ir_per_sqrt_r": 6629.27522313861,
+      "phase_mean_ir": {
+        "curve_and_targets": 738163.0,
+        "final_verification": 5123.0,
+        "reporting_and_cleanup": 211348.0,
+        "rho_solve": 291769.6666666667,
+        "startup_and_input": 451351.0
+      },
+      "phase_share": {
+        "curve_and_targets": 0.4347877903049989,
+        "final_verification": 0.003017514898108561,
+        "reporting_and_cleanup": 0.12448677311837753,
+        "rho_solve": 0.17185620066032312,
+        "startup_and_input": 0.2658517210181919
+      },
+      "ranks": [],
+      "ratio_to_incumbent_mean_ir": 0.04307128645538972,
+      "ratio_to_rho_mean_ir": 1.0,
+      "signed_base_sizes": [],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "window8",
+      "cell": "n17a1",
+      "curve_slug": "icv1-f2m17-tm101-00378d4e",
+      "log2_mean_ir": 25.14207386092068,
+      "mean_ir": 37026988.0,
+      "mean_ratio_to_rank_floor": 4628373.5,
+      "mean_s_ir_per_sqrt_r": 144580.42669839063,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 3249952.0,
+        "curve_and_targets": 738163.0,
+        "factor_base_and_tables": 15086747.666666666,
+        "final_verification": 5118.0,
+        "individual_log": 411555.0,
+        "log_certification": 971903.0,
+        "reporting_and_cleanup": 3986184.0,
+        "startup_and_input": 451750.0,
+        "verify_filter_and_linear_algebra": 12125615.333333334
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.08777251879088842,
+        "curve_and_targets": 0.01993581006372973,
+        "factor_base_and_tables": 0.4074527387068769,
+        "final_verification": 0.00013822350335382396,
+        "individual_log": 0.011115000766467962,
+        "log_certification": 0.026248502848786943,
+        "reporting_and_cleanup": 0.10765617770475956,
+        "startup_and_input": 0.012200560304824146,
+        "verify_filter_and_linear_algebra": 0.3274804673103125
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.9393583407781009,
+      "ratio_to_rho_mean_ir": 21.809386672279306,
+      "signed_base_sizes": [
+        272
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "batch128",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 26.00848066341604,
+      "mean_ir": 67504515.0,
+      "mean_ratio_to_rank_floor": 8438064.375,
+      "mean_s_ir_per_sqrt_r": 186598.34709518522,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 13467970.0,
+        "curve_and_targets": 1858557.0,
+        "factor_base_and_tables": 18535805.0,
+        "final_verification": 5657.0,
+        "individual_log": 495079.0,
+        "log_certification": 1092617.0,
+        "reporting_and_cleanup": 6391840.666666667,
+        "startup_and_input": 451338.0,
+        "verify_filter_and_linear_algebra": 25205651.333333332
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.19951213633636208,
+        "curve_and_targets": 0.027532336170402825,
+        "factor_base_and_tables": 0.27458615175592327,
+        "final_verification": 0.00008380180199798487,
+        "individual_log": 0.0073340131397136915,
+        "log_certification": 0.016185835865941706,
+        "reporting_and_cleanup": 0.09468760225396282,
+        "startup_and_input": 0.006686041666990719,
+        "verify_filter_and_linear_algebra": 0.37339208100870486
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.4637674565181724,
+      "ratio_to_rho_mean_ir": 22.75198667732774,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "batch16",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 24.829662595090422,
+      "mean_ir": 29817637.0,
+      "mean_ratio_to_rank_floor": 3727204.625,
+      "mean_s_ir_per_sqrt_r": 82422.95761230546,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 1697869.0,
+        "curve_and_targets": 1858557.0,
+        "factor_base_and_tables": 18535879.666666668,
+        "final_verification": 5657.0,
+        "individual_log": 495161.0,
+        "log_certification": 1089875.0,
+        "reporting_and_cleanup": 2444242.6666666665,
+        "startup_and_input": 451318.0,
+        "verify_filter_and_linear_algebra": 3239077.6666666665
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.05694176906104263,
+        "curve_and_targets": 0.06233079435503223,
+        "factor_base_and_tables": 0.6216414689959056,
+        "final_verification": 0.0001897199298522549,
+        "individual_log": 0.016606312565948803,
+        "log_certification": 0.03655135381787631,
+        "reporting_and_cleanup": 0.08197305060312682,
+        "startup_and_input": 0.01513594118809616,
+        "verify_filter_and_linear_algebra": 0.10862958948311922
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.6465654433762267,
+      "ratio_to_rho_mean_ir": 10.049853402744908,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "batch32",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 25.06678284104956,
+      "mean_ir": 35144189.333333336,
+      "mean_ratio_to_rank_floor": 4393023.666666667,
+      "mean_s_ir_per_sqrt_r": 97146.80032291527,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 3376487.0,
+        "curve_and_targets": 1858557.0,
+        "factor_base_and_tables": 18535768.333333332,
+        "final_verification": 5657.0,
+        "individual_log": 494640.0,
+        "log_certification": 1091131.0,
+        "reporting_and_cleanup": 2872927.3333333335,
+        "startup_and_input": 451318.0,
+        "verify_filter_and_linear_algebra": 6457703.666666667
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.09607525636670446,
+        "curve_and_targets": 0.0528837635824255,
+        "factor_base_and_tables": 0.5274205689460205,
+        "final_verification": 0.00016096544286012268,
+        "individual_log": 0.014074588413705336,
+        "log_certification": 0.031047266154040753,
+        "reporting_and_cleanup": 0.08174686592097424,
+        "startup_and_input": 0.012841895305063612,
+        "verify_filter_and_linear_algebra": 0.18374882986820543
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.7620663689213443,
+      "ratio_to_rho_mean_ir": 11.845135506824747,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "dense",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 25.43971816395637,
+      "mean_ir": 45511196.0,
+      "mean_ratio_to_rank_floor": 5688899.5,
+      "mean_s_ir_per_sqrt_r": 125803.64362183782,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 6739170.0,
+        "curve_and_targets": 1858557.0,
+        "factor_base_and_tables": 18536135.333333332,
+        "final_verification": 5657.0,
+        "individual_log": 493653.3333333333,
+        "log_certification": 1087524.0,
+        "reporting_and_cleanup": 4007312.3333333335,
+        "startup_and_input": 451313.0,
+        "verify_filter_and_linear_algebra": 12331874.0
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14807718962164826,
+        "curve_and_targets": 0.04083735791078749,
+        "factor_base_and_tables": 0.4072873701964091,
+        "final_verification": 0.0001242990845593247,
+        "individual_log": 0.010846854768073627,
+        "log_certification": 0.023895746444457317,
+        "reporting_and_cleanup": 0.0880511321507203,
+        "startup_and_input": 0.00991652691350937,
+        "verify_filter_and_linear_algebra": 0.2709635229098352
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.986864472872963,
+      "ratio_to_rho_mean_ir": 15.33927212218696,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "excess8",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 25.453236278288344,
+      "mean_ir": 45939642.0,
+      "mean_ratio_to_rank_floor": 5742455.25,
+      "mean_s_ir_per_sqrt_r": 126987.96907650621,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 6739130.0,
+        "curve_and_targets": 1858557.0,
+        "factor_base_and_tables": 18535553.333333332,
+        "final_verification": 5657.0,
+        "individual_log": 494809.3333333333,
+        "log_certification": 1089688.0,
+        "reporting_and_cleanup": 4136169.6666666665,
+        "startup_and_input": 452617.0,
+        "verify_filter_and_linear_algebra": 12627460.666666666
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14669530946714823,
+        "curve_and_targets": 0.04045649724479786,
+        "factor_base_and_tables": 0.40347622502877434,
+        "final_verification": 0.00012313983639663538,
+        "individual_log": 0.010770857407494236,
+        "log_certification": 0.02371999329032647,
+        "reporting_and_cleanup": 0.09003486937635836,
+        "startup_and_input": 0.009852427670202567,
+        "verify_filter_and_linear_algebra": 0.2748706806785013
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.9961548931015267,
+      "ratio_to_rho_mean_ir": 15.483677243591867,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 25.458794287373053,
+      "mean_ir": 46116966.666666664,
+      "mean_ratio_to_rank_floor": 5764620.833333333,
+      "mean_s_ir_per_sqrt_r": 127478.13613717176,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 6739130.0,
+        "curve_and_targets": 1858557.0,
+        "factor_base_and_tables": 18536413.0,
+        "final_verification": 5657.0,
+        "individual_log": 494128.0,
+        "log_certification": 1091102.0,
+        "reporting_and_cleanup": 4137032.3333333335,
+        "startup_and_input": 451318.0,
+        "verify_filter_and_linear_algebra": 12803629.333333334
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.1461312503207424,
+        "curve_and_targets": 0.04030093768815382,
+        "factor_base_and_tables": 0.40194345681885696,
+        "final_verification": 0.0001226663505622298,
+        "individual_log": 0.01071466828188324,
+        "log_certification": 0.023659448547136305,
+        "reporting_and_cleanup": 0.0897073817373071,
+        "startup_and_input": 0.009786376525197885,
+        "verify_filter_and_linear_algebra": 0.27763381373016005
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": 15.543443445209071,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "rho",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 21.500560043244175,
+      "mean_ir": 2966972.3333333335,
+      "mean_ratio_to_rank_floor": null,
+      "mean_s_ir_per_sqrt_r": 8201.408946899995,
+      "phase_mean_ir": {
+        "curve_and_targets": 1858557.0,
+        "final_verification": 5662.0,
+        "reporting_and_cleanup": 214766.66666666666,
+        "rho_solve": 436663.6666666667,
+        "startup_and_input": 451323.0
+      },
+      "phase_share": {
+        "curve_and_targets": 0.6264153457447137,
+        "final_verification": 0.0019083427022182097,
+        "reporting_and_cleanup": 0.0723858002495698,
+        "rho_solve": 0.14717483603093928,
+        "startup_and_input": 0.152115675272559
+      },
+      "ranks": [],
+      "ratio_to_incumbent_mean_ir": 0.06433580844071127,
+      "ratio_to_rho_mean_ir": 1.0,
+      "signed_base_sizes": [],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "window8",
+      "cell": "n19a0",
+      "curve_slug": "icv1-f2m19-t797-b6cf2467",
+      "log2_mean_ir": 25.30879683715956,
+      "mean_ir": 41563011.0,
+      "mean_ratio_to_rank_floor": 5195376.375,
+      "mean_s_ir_per_sqrt_r": 114889.93222007448,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 3371002.0,
+        "curve_and_targets": 1858557.0,
+        "factor_base_and_tables": 18535978.666666668,
+        "final_verification": 5657.0,
+        "individual_log": 495010.0,
+        "log_certification": 1093311.0,
+        "reporting_and_cleanup": 4080454.3333333335,
+        "startup_and_input": 451795.0,
+        "verify_filter_and_linear_algebra": 11671246.0
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.08110581786290699,
+        "curve_and_targets": 0.04471661112328941,
+        "factor_base_and_tables": 0.4459729509651422,
+        "final_verification": 0.00013610659728189567,
+        "individual_log": 0.011909868608893615,
+        "log_certification": 0.026304903655801067,
+        "reporting_and_cleanup": 0.0981751378246714,
+        "startup_and_input": 0.01087012199380839,
+        "verify_filter_and_linear_algebra": 0.280808481368205
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.9012520554618727,
+      "ratio_to_rho_mean_ir": 14.008560353950047,
+      "signed_base_sizes": [
+        304
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "batch128",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 26.19888482533803,
+      "mean_ir": 77028277.33333333,
+      "mean_ratio_to_rank_floor": 9628534.666666666,
+      "mean_s_ir_per_sqrt_r": 53207.12294494683,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 16015866.0,
+        "curve_and_targets": 2156166.0,
+        "factor_base_and_tables": 26265969.666666668,
+        "final_verification": 7125.0,
+        "individual_log": 627371.3333333334,
+        "log_certification": 1336504.0,
+        "reporting_and_cleanup": 6330528.333333333,
+        "startup_and_input": 451308.0,
+        "verify_filter_and_linear_algebra": 23837439.0
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.2079219028966817,
+        "curve_and_targets": 0.027991876160872384,
+        "factor_base_and_tables": 0.3409912641951333,
+        "final_verification": 0.00009249849856004396,
+        "individual_log": 0.008144688613746833,
+        "log_certification": 0.017350822922034104,
+        "reporting_and_cleanup": 0.08218447241054748,
+        "startup_and_input": 0.00585899121237001,
+        "verify_filter_and_linear_algebra": 0.3094634830900541
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.3843405305374743,
+      "ratio_to_rho_mean_ir": 22.48536428778407,
+      "signed_base_sizes": [
+        368
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "batch16",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 25.205673128567728,
+      "mean_ir": 38695786.0,
+      "mean_ratio_to_rank_floor": 4836973.25,
+      "mean_s_ir_per_sqrt_r": 26729.03399155188,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 1999403.0,
+        "curve_and_targets": 2156166.0,
+        "factor_base_and_tables": 26265847.333333332,
+        "final_verification": 7125.0,
+        "individual_log": 627892.0,
+        "log_certification": 1335752.0,
+        "reporting_and_cleanup": 2714149.0,
+        "startup_and_input": 451288.0,
+        "verify_filter_and_linear_algebra": 3138163.6666666665
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.05166978647235645,
+        "curve_and_targets": 0.0557209511133848,
+        "factor_base_and_tables": 0.6787779768405101,
+        "final_verification": 0.0001841285766879112,
+        "individual_log": 0.01622636635420715,
+        "log_certification": 0.03451931432533765,
+        "reporting_and_cleanup": 0.07014068663704105,
+        "startup_and_input": 0.011662458542643377,
+        "verify_filter_and_linear_algebra": 0.08109833113783156
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.6954348036240376,
+      "ratio_to_rho_mean_ir": 11.295706910942577,
+      "signed_base_sizes": [
+        368
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "batch32",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 25.405224007035887,
+      "mean_ir": 44435950.333333336,
+      "mean_ratio_to_rank_floor": 5554493.791666667,
+      "mean_s_ir_per_sqrt_r": 30694.040609656513,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 4023813.0,
+        "curve_and_targets": 2156166.0,
+        "factor_base_and_tables": 26266383.0,
+        "final_verification": 7125.0,
+        "individual_log": 627913.0,
+        "log_certification": 1337037.0,
+        "reporting_and_cleanup": 3274892.3333333335,
+        "startup_and_input": 451288.0,
+        "verify_filter_and_linear_algebra": 6291333.0
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.09055309878185644,
+        "curve_and_targets": 0.04852300859609537,
+        "factor_base_and_tables": 0.591106588313392,
+        "final_verification": 0.00016034314438089623,
+        "individual_log": 0.014130743132300588,
+        "log_certification": 0.03008908305032987,
+        "reporting_and_cleanup": 0.07369916269972726,
+        "startup_and_input": 0.010155920974226792,
+        "verify_filter_and_linear_algebra": 0.1415820513076908
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.798596167394278,
+      "ratio_to_rho_mean_ir": 12.97132125122189,
+      "signed_base_sizes": [
+        368
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "dense",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 25.707593479043908,
+      "mean_ir": 54796996.333333336,
+      "mean_ratio_to_rank_floor": 6849624.541666667,
+      "mean_s_ir_per_sqrt_r": 37850.911663316794,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 8037046.0,
+        "curve_and_targets": 2156166.0,
+        "factor_base_and_tables": 26265648.0,
+        "final_verification": 7125.0,
+        "individual_log": 625312.0,
+        "log_certification": 1329141.0,
+        "reporting_and_cleanup": 4075287.3333333335,
+        "startup_and_input": 451283.0,
+        "verify_filter_and_linear_algebra": 11849988.0
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14666946252145244,
+        "curve_and_targets": 0.03934825162466782,
+        "factor_base_and_tables": 0.4793264185544866,
+        "final_verification": 0.00013002537505264354,
+        "individual_log": 0.01141142839647981,
+        "log_certification": 0.024255727301452028,
+        "reporting_and_cleanup": 0.07437063353880059,
+        "startup_and_input": 0.008235542642790476,
+        "verify_filter_and_linear_algebra": 0.2162525100448176
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.9848033164194876,
+      "ratio_to_rho_mean_ir": 15.995819549480876,
+      "signed_base_sizes": [
+        368
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "excess8",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 25.71906991231742,
+      "mean_ir": 55234637.0,
+      "mean_ratio_to_rank_floor": 6904329.625,
+      "mean_s_ir_per_sqrt_r": 38153.21104690908,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 8037126.0,
+        "curve_and_targets": 2156166.0,
+        "factor_base_and_tables": 26266187.333333332,
+        "final_verification": 7125.0,
+        "individual_log": 625842.6666666666,
+        "log_certification": 1330907.0,
+        "reporting_and_cleanup": 4361733.333333333,
+        "startup_and_input": 452587.0,
+        "verify_filter_and_linear_algebra": 11996962.666666666
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.14550880455682183,
+        "curve_and_targets": 0.03903648357460917,
+        "factor_base_and_tables": 0.47553833536252504,
+        "final_verification": 0.0001289951448400032,
+        "individual_log": 0.01133061970999586,
+        "log_certification": 0.024095514559098124,
+        "reporting_and_cleanup": 0.07896735762621801,
+        "startup_and_input": 0.008193898332309126,
+        "verify_filter_and_linear_algebra": 0.21719999113358285
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.9926685281787532,
+      "ratio_to_rho_mean_ir": 16.123571462905666,
+      "signed_base_sizes": [
+        368
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "incumbent",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 25.729685953686992,
+      "mean_ir": 55642579.0,
+      "mean_ratio_to_rank_floor": 6955322.375,
+      "mean_s_ir_per_sqrt_r": 38434.99613804487,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 8037046.0,
+        "curve_and_targets": 2156166.0,
+        "factor_base_and_tables": 26265882.333333332,
+        "final_verification": 7125.0,
+        "individual_log": 626057.3333333334,
+        "log_certification": 1333732.0,
+        "reporting_and_cleanup": 4391390.0,
+        "startup_and_input": 451288.0,
+        "verify_filter_and_linear_algebra": 12373892.333333334
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.1444405731085901,
+        "curve_and_targets": 0.03875028869528136,
+        "factor_base_and_tables": 0.4720464580430992,
+        "final_verification": 0.00012804942057053107,
+        "individual_log": 0.011251407547686339,
+        "log_certification": 0.02396962944510534,
+        "reporting_and_cleanup": 0.07892139578936483,
+        "startup_and_input": 0.008110479566376677,
+        "verify_filter_and_linear_algebra": 0.22238171838392562
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 1.0,
+      "ratio_to_rho_mean_ir": 16.24265402317886,
+      "signed_base_sizes": [
+        368
+      ],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "rho",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 21.707970472998234,
+      "mean_ir": 3425707.3333333335,
+      "mean_ratio_to_rank_floor": null,
+      "mean_s_ir_per_sqrt_r": 2366.300241524367,
+      "phase_mean_ir": {
+        "curve_and_targets": 2156166.0,
+        "final_verification": 7130.0,
+        "reporting_and_cleanup": 212153.0,
+        "rho_solve": 598965.3333333334,
+        "startup_and_input": 451293.0
+      },
+      "phase_share": {
+        "curve_and_targets": 0.6294075325757542,
+        "final_verification": 0.0020813219887824627,
+        "reporting_and_cleanup": 0.06192969198964457,
+        "rho_solve": 0.17484428033451388,
+        "startup_and_input": 0.1317371731113049
+      },
+      "ranks": [],
+      "ratio_to_incumbent_mean_ir": 0.061566293203867015,
+      "ratio_to_rho_mean_ir": 1.0,
+      "signed_base_sizes": [],
+      "stage": "smoke",
+      "verified": 3
+    },
+    {
+      "arm": "window8",
+      "cell": "n23a0",
+      "curve_slug": "icv1-f2m23-t5197-69e76b73",
+      "log2_mean_ir": 25.191124406988507,
+      "mean_ir": 38307523.0,
+      "mean_ratio_to_rank_floor": 4788440.375,
+      "mean_s_ir_per_sqrt_r": 26460.842128885964,
+      "phase_mean_ir": {
+        "collection_and_decomposition": 1171416.0,
+        "curve_and_targets": 2156166.0,
+        "factor_base_and_tables": 26265781.666666668,
+        "final_verification": 7125.0,
+        "individual_log": 625715.0,
+        "log_certification": 1328375.0,
+        "reporting_and_cleanup": 3574741.0,
+        "startup_and_input": 451765.0,
+        "verify_filter_and_linear_algebra": 2726438.3333333335
+      },
+      "phase_share": {
+        "collection_and_decomposition": 0.030579267680658967,
+        "curve_and_targets": 0.056285706596064695,
+        "factor_base_and_tables": 0.685655965452704,
+        "final_verification": 0.000185994797940864,
+        "individual_log": 0.016333997893834065,
+        "log_certification": 0.03467660908276424,
+        "reporting_and_cleanup": 0.09331694455942766,
+        "startup_and_input": 0.01179311437077255,
+        "verify_filter_and_linear_algebra": 0.07117239956583289
+      },
+      "ranks": [
+        8
+      ],
+      "ratio_to_incumbent_mean_ir": 0.6884569998094445,
+      "ratio_to_rho_mean_ir": 11.182368857740522,
+      "signed_base_sizes": [
+        368
+      ],
+      "stage": "smoke",
+      "verified": 3
+    }
+  ],
+  "schema": "ic-native-tournament-measurements/1",
+  "stage_counts": {
+    "aa": 24,
+    "confirmation": 540,
+    "development": 288,
+    "replay": 540,
+    "selection": 144,
+    "smoke": 96
+  },
+  "target_count_per_cold_job": 1,
+  "unit": "valgrind-3.22-amd64-Ir"
+}

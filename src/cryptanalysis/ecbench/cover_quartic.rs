@@ -56,6 +56,113 @@ use crate::cryptanalysis::ecbench::plane_quartic::{
 };
 use crate::cryptanalysis::ic_boundary::{CountedGroup, GroupOps, PrimeCurve, PrimePoint};
 
+thread_local! {
+    static ROOT_MULS: std::cell::Cell<u64> = const { std::cell::Cell::new(0) };
+}
+
+/// `F_p` multiplications this thread has spent evaluating `f` and taking
+/// square roots on `E` in [`QuarticCover::new`] and [`transfer`], outside
+/// `plane_quartic`'s counter.  Differences of it price that work.
+pub fn root_search_field_muls() -> u64 {
+    ROOT_MULS.with(|m| m.get())
+}
+
+fn tally_root_muls(n: u64) {
+    ROOT_MULS.with(|m| m.set(m.get() + n));
+}
+
+/// `f(x)` on `E`, tallied: `PrimeCurve::rhs` performs `x·x`, `(x²)·x` and
+/// `a·x`, three `F_p` multiplications.
+fn counted_rhs(e: &PrimeCurve, x: u64) -> u64 {
+    tally_root_muls(3);
+    e.rhs(x)
+}
+
+/// `PrimeCurve::sqrt`, tallied.
+fn counted_sqrt(e: &PrimeCurve, n: u64) -> Option<u64> {
+    let (root, muls) = sqrt_with_count(e.p, n);
+    tally_root_muls(muls);
+    let actual = e.sqrt(n);
+    debug_assert_eq!(root, actual);
+    actual
+}
+
+/// `PrimeCurve::sqrt`'s control flow and result, with every modular
+/// multiplication it performs counted (`p ≡ 3 mod 4`: the power and the
+/// check; otherwise Euler's test, the non-residue search, and
+/// Tonelli–Shanks).  Squarings and products are one each, as in
+/// `plane_quartic::mulm`; a power is square-and-multiply.
+pub fn sqrt_with_count(p: u64, n: u64) -> (Option<u64>, u64) {
+    let mut c = 0u64;
+    let mut mm = |a: u64, b: u64, c: &mut u64| {
+        *c += 1;
+        a * b % p
+    };
+    fn pw(
+        mm: &mut impl FnMut(u64, u64, &mut u64) -> u64,
+        mut a: u64,
+        mut e: u64,
+        p: u64,
+        c: &mut u64,
+    ) -> u64 {
+        let mut r = 1 % p;
+        a %= p;
+        while e > 0 {
+            if e & 1 == 1 {
+                r = mm(r, a, c);
+            }
+            a = mm(a, a, c);
+            e >>= 1;
+        }
+        r
+    }
+    let n = n % p;
+    if n == 0 {
+        return (Some(0), 0);
+    }
+    if p % 4 == 3 {
+        let r = pw(&mut mm, n, (p + 1) / 4, p, &mut c);
+        let ok = mm(r, r, &mut c) == n;
+        return (ok.then_some(r), c);
+    }
+    if pw(&mut mm, n, (p - 1) / 2, p, &mut c) != 1 {
+        return (None, c);
+    }
+    let mut q = p - 1;
+    let mut s = 0u32;
+    while q.is_multiple_of(2) {
+        q /= 2;
+        s += 1;
+    }
+    let mut z = 2u64;
+    while pw(&mut mm, z, (p - 1) / 2, p, &mut c) != p - 1 {
+        z += 1;
+    }
+    let mut m = s;
+    let mut cc = pw(&mut mm, z, q, p, &mut c);
+    let mut t = pw(&mut mm, n, q, p, &mut c);
+    let mut r = pw(&mut mm, n, q.div_ceil(2), p, &mut c);
+    loop {
+        if t == 1 {
+            return (Some(r), c);
+        }
+        let mut i = 0u32;
+        let mut tt = t;
+        while tt != 1 {
+            tt = mm(tt, tt, &mut c);
+            i += 1;
+            if i == m {
+                return (None, c);
+            }
+        }
+        let b = pw(&mut mm, cc, 1u64 << (m - i - 1), p, &mut c);
+        m = i;
+        cc = mm(b, b, &mut c);
+        t = mm(t, cc, &mut c);
+        r = mm(r, b, &mut c);
+    }
+}
+
 /// The cover and its Jacobian for one curve.
 pub struct QuarticCover {
     pub c: u64,
@@ -104,11 +211,11 @@ impl QuarticCover {
         let mut base = Vec::new();
         let mut x = 0u64;
         while base.len() < 12 && x < p {
-            let fx = e.rhs(x);
+            let fx = counted_rhs(e, x);
             if fx != 0 {
-                if let Some(s) = e.sqrt(fx) {
+                if let Some(s) = counted_sqrt(e, fx) {
                     for s in [s, (p - s) % p] {
-                        if let Some(v) = e.sqrt(s) {
+                        if let Some(v) = counted_sqrt(e, s) {
                             base.push((v, x));
                         }
                     }
@@ -225,8 +332,10 @@ pub fn transfer(
     // B: the first affine point (x, y), y ≠ 0, with G + B and Q + B affine
     // and off the 2-torsion.
     for x in 1..p.min(1 << 20) {
-        let fx = e.rhs(x);
-        let Some(y) = e.sqrt(fx) else { continue };
+        let fx = counted_rhs(e, x);
+        let Some(y) = counted_sqrt(e, fx) else {
+            continue;
+        };
         if y == 0 {
             continue;
         }
@@ -250,6 +359,57 @@ pub fn transfer(
 mod tests {
     use super::*;
     use crate::cryptanalysis::ic_boundary::find_prime_order_curve;
+
+    /// The counted square root returns `PrimeCurve::sqrt`'s answer for every
+    /// residue class, on primes of every shape (`≡ 3 mod 4`; `≡ 1 mod 4`
+    /// with 2-adic valuation 1 to 5; the largest a cover accepts below
+    /// 2^31 is exercised by a sample), and counts at least the Euler test.
+    #[test]
+    fn the_counted_square_root_agrees_with_the_curves() {
+        for p in [29u64, 31, 97, 193, 257, 12289, 65537] {
+            let e = PrimeCurve { p, a: 1, b: 1 };
+            let mut total = 0u64;
+            for n in (0..p).chain([p + 5, 3 * p + 2]) {
+                let (root, muls) = sqrt_with_count(p, n);
+                assert_eq!(root, e.sqrt(n), "p {p} n {n}");
+                if n % p != 0 {
+                    assert!(muls >= 1, "p {p} n {n}");
+                }
+                total += muls;
+            }
+            assert!(total > p, "p {p}: {total}");
+        }
+        for p in [2_147_483_629u64, 1_073_741_827] {
+            let e = PrimeCurve { p, a: 1, b: 1 };
+            for n in (1..2000u64).map(|i| i * 1_000_003 % p) {
+                assert_eq!(sqrt_with_count(p, n).0, e.sqrt(n), "p {p} n {n}");
+            }
+        }
+    }
+
+    /// The tally moves by exactly what `counted_rhs` and `counted_sqrt` add,
+    /// and the cover and transfer, which call them, record a positive count.
+    #[test]
+    fn the_root_search_is_tallied() {
+        let inst = find_prime_order_curve(12, 5);
+        let e = &inst.curve;
+        let t0 = root_search_field_muls();
+        let _ = counted_rhs(e, 17);
+        assert_eq!(root_search_field_muls() - t0, 3);
+        let t1 = root_search_field_muls();
+        let want = sqrt_with_count(e.p, 17).1;
+        let _ = counted_sqrt(e, 17);
+        assert_eq!(root_search_field_muls() - t1, want);
+        let t2 = root_search_field_muls();
+        let cover = QuarticCover::new(e).unwrap();
+        let after_new = root_search_field_muls();
+        assert!(after_new - t2 > 0);
+        let mut ops = GroupOps::default();
+        let g = inst.generator_point();
+        let q = e.mul(&mut ops, g, 5);
+        transfer(&cover, e, g, q, &mut ops).unwrap();
+        assert!(root_search_field_muls() - after_new > 0);
+    }
 
     /// `π*` is a homomorphism on `⟨G⟩` with order `r`: `π*([k]G) =
     /// [k]π*(G)` and `[r]π*(G) = 0`, with `π*(G) ≠ 0`.

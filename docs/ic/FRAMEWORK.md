@@ -832,16 +832,61 @@ worse than none:
 
 | stage | trait | plug-ins |
 |:--|:--|:--|
-| factor base | `FactorBaseBuilder` | `prime-abscissa`, `glv-orbit`, `binary-subspace`, `koblitz-orbit`, `koblitz-trace-zero`, `koblitz-symmetrised`, `gls-line` |
+| factor base | `FactorBaseBuilder` | `prime-abscissa`, `glv-orbit`, `hashed-affine`, `binary-subspace`, `koblitz-orbit`, `koblitz-trace-zero`, `koblitz-symmetrised`, `gls-line` |
 | targets | `Targets` | `random`, `walk` |
-| point decomposition | `DecompositionOracle` | `subtract`, `mitm`, `mitm-frobenius`, `descent-algebraic`, `symmetrised`; `line-resultant` (library and `examples/glv_invariant_experiments.rs`: the `O(log p)` Weil-descent oracle for a line base over `F_{p^k}`, `line_oracle.rs`) |
+| point decomposition | `DecompositionOracle` | `subtract`, `mitm`, `hashed-tensor`, `mitm-frobenius`, `descent-algebraic`, `symmetrised`, `chained-x`; `line-resultant` (library and `examples/glv_invariant_experiments.rs`: the `O(log p)` Weil-descent oracle for a line base over `F_{p^k}`, `line_oracle.rs`) |
 | polynomial solver | `SystemSolver` | `f4-f2`, `buchberger-f2`, `matrix-f4`, `matrix-f5`, `inherited-f4`, `crossbred-f2`, `xl-f2`, `sat-cdcl`, `fes-f2`, `fes-f2-wide`, `exhaustive` |
 | relation matrix | `RelationSolver` | `incremental-gauss`, `structured-gauss`, `sparse-cado` |
+
+### Hashed-affine / hashed-tensor
+
+`hashed-affine` is the union of `slots` independent affine-hashed bases
+(`(α·encode(A) + β) mod s < τ`) and `hashed-tensor` is the exact Boolean
+tensor-contraction oracle over those slots, from the vendored
+`crates/hashed-ecdl-tensor`. Both read `slots`, `seed`, `tau` and `s`; the
+two specifications must agree, and `prepare` refuses the run when the base
+is not the same point list. This is the Bochum v0.2 §3 construction with the
+October 25 manuscript Appendix D.4 contraction; it is a separate arm from
+the summation-polynomial pipeline.
+
+The contraction's work is reported as `hashed_tensor_steps`, an
+**uncalibrated** charged-primitive count, so the `S` column does not yet
+price it. Treat a `hashed-affine + hashed-tensor` row as a stage diagnostic,
+not as a comparable end-to-end `S`, until that step has a calibration.
 
 `ic bench --list` prints this with every parameter each plug-in reads.
 A parameter that takes several values (`divisor` on `koblitz-orbit`,
 `koblitz-trace-zero`, and `koblitz-symmetrised`) takes them separated by `;`,
 quoted in a shell.
+
+### Degree-of-regularity forecast
+
+Every algebraic oracle that reports its calls through
+`SolverTotals::absorb_outcome` also feeds the advisory
+degree-of-regularity forecaster (`cryptanalysis::dreg_forecast`, schema
+`dreg_forecast/v1`): a decided call observes its solving degree (the
+engine's, or else the highest degree it built), a budget-exceeded call is
+right-censored at the highest degree built, and the Kaplan–Meier estimate
+of the solving-degree distribution gives the predicted degree of
+regularity with a 95 % band, the semi-regular yardstick, the expected work
+of one more call, the projected relation-phase work from the relation yield
+and the rows still missing, and the rho floor over that work at 1, 10 and
+100 multiplications per group addition. A capped engine (`matrix-f4`,
+`matrix-f5`, `inherited-f4`, `max_degree`) is censored at its cap; an
+uncapped full Gröbner basis (`f4-f2`) is bounded by the ring's ceiling, the
+variable count; an engine that reports no degree (`sat-cdcl`, `exhaustive`)
+leaves `forecast_unavailable` saying so. The Gaudry quartic (`gaudry-d4`,
+`gaudry-d4-bin`) and line-S4 oracles, which total their degrees by hand,
+observe their fixed Macaulay degree directly (`SolverTotals::observe_degree`),
+a degenerate system censored at that degree. The relation matrix's total
+work is charged beside the solver work. `ecbench` writes the forecast on
+the record's `solver` block as `degree_of_regularity_forecast`, priced at
+the curve's automorphism fold. The same forecaster runs inside
+[the factor-base sweeper](factor-base-sweep/README.md) and the N83 summand
+sweep cell (`examples/n83_msweep_cell.rs`, Gröbner engines); the
+`dreg-triage` skill describes iterating a sweep on it. It is
+advisory everywhere: never priced into `S`, outside the replay comparison,
+never a stopping rule, and `certified_degree_of_regularity` stays null.
 
 ### Source map
 
@@ -856,6 +901,7 @@ quoted in a shell.
 | [`pq_descent_symbolic.rs`](../../src/cryptanalysis/pq_descent_symbolic.rs) | the symbolic Weil descent the algebraic oracle builds its systems with |
 | [`linalg.rs`](../../src/cryptanalysis/ic_framework/linalg.rs) | the structured elimination and the matrix registry |
 | [`mod.rs`](../../src/cryptanalysis/ic_framework/mod.rs) | the runner and the report |
+| [`dreg_forecast.rs`](../../src/cryptanalysis/dreg_forecast.rs) | the advisory degree-of-regularity forecaster the solver totals feed |
 | [`bench.rs`](../../src/bin/ic/bench.rs) | the CLI |
 
 The relation loop itself — the target guard, the collision guards, the

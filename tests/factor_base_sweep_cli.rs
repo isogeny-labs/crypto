@@ -34,6 +34,17 @@ fn call(args: &[&str]) -> Output {
 fn value(path: &Path) -> Value {
     serde_json::from_slice(&fs::read(path).unwrap()).unwrap()
 }
+fn complete_event_recorded(path: &Path, expected: &str) -> bool {
+    fs::read_to_string(path)
+        .map(|contents| {
+            contents.split_inclusive('\n').any(|line| {
+                line.strip_suffix('\n')
+                    .and_then(|record| serde_json::from_str::<Value>(record).ok())
+                    .is_some_and(|event| event["event"].as_str() == Some(expected))
+            })
+        })
+        .unwrap_or(false)
+}
 fn plan(temp: &Temp, prime: bool) -> PathBuf {
     let p = temp.0.join("plan.json");
     assert!(call(&[
@@ -101,6 +112,114 @@ fn binary_and_prime_probes_replay_and_resume_without_overwriting() {
         assert_eq!(result["trials"][0]["witness_verified"], true);
         assert!(result["certified_degree_of_regularity"].is_null());
         assert!(result["full_pipeline_speedup"].is_null());
+        // The advisory degree-of-regularity forecast travels with the result,
+        // every trial record carries its running view, the supervisor's
+        // independent replay from the records matches the worker's copy, and
+        // the run summary ranks candidates without having stopped any.
+        let forecast = &result["degree_of_regularity_forecast"];
+        assert_eq!(forecast["schema"], "dreg_forecast/v1", "{result}");
+        assert_eq!(forecast["solves"], 6);
+        assert!(forecast["certified_degree_of_regularity"].is_null());
+        assert!(forecast["all_targets"]["predicted_degree_label"].is_string());
+        assert!(
+            forecast["cost"]["hope_ratio_band"]
+                .as_array()
+                .unwrap()
+                .len()
+                == 3
+        );
+        assert!(result["trials"][6]["forecast"]["advice"].is_string());
+        assert_eq!(
+            result["trials"][6]["independent_rank"],
+            forecast["cost"]["rank"]
+        );
+        let candidate = &summary["candidates"][0];
+        assert_eq!(
+            candidate["forecast_replay_matches_worker"], true,
+            "{candidate}"
+        );
+        assert_eq!(candidate["forecast"]["solves"], 6);
+        assert_eq!(summary["triage"]["rows"].as_array().unwrap().len(), 1);
+        assert!(summary["triage"]["certified_degree_of_regularity"].is_null());
+        let triage_out = t.0.join(format!("triage-{prime}.json"));
+        let triaged = call(&[
+            "triage",
+            "--run",
+            dir.to_str().unwrap(),
+            "--out",
+            triage_out.to_str().unwrap(),
+        ]);
+        assert!(
+            triaged.status.success(),
+            "{}",
+            String::from_utf8_lossy(&triaged.stderr)
+        );
+        let triage = value(&triage_out);
+        assert_eq!(triage["schema"], "factor_base_sweep.triage/v1");
+        assert_eq!(triage["rows"][0]["solves"], 6);
+        assert_eq!(triage["rows"][0]["advice"], candidate["forecast"]["advice"]);
+        // Linear algebra is charged beside the solver work on the training
+        // rows, and the next plan comes from the triage without running.
+        if forecast["relations"].as_u64().unwrap() > 0 {
+            assert!(
+                forecast["cost"]["linear_algebra"]["observed_rows"]
+                    .as_u64()
+                    .unwrap()
+                    >= 1
+            );
+            assert!(
+                forecast["cost"]["projected_relation_phase_work_with_linear_algebra"].is_number()
+            );
+        } else {
+            assert!(forecast["cost"]["linear_algebra"].is_null());
+        }
+        let next_plan = t.0.join(format!("next-{prime}.json"));
+        let refined = call(&[
+            "refine",
+            "--run",
+            dir.to_str().unwrap(),
+            "--out",
+            next_plan.to_str().unwrap(),
+            "--drop",
+            "hopeless_at_bound",
+            "--seed-count",
+            "2",
+        ]);
+        assert!(
+            refined.status.success(),
+            "{}",
+            String::from_utf8_lossy(&refined.stderr)
+        );
+        let next = value(&next_plan);
+        assert_eq!(next["schema"], "factor_base_sweep/v1");
+        assert_eq!(
+            next["candidates"].as_array().unwrap().len(),
+            if prime { 1 } else { 2 }
+        );
+        assert_eq!(next["train"], 4, "budgets are inherited");
+        let provenance = value(&t.0.join(format!("next-{prime}.refine.json")));
+        assert_eq!(provenance["schema"], "factor_base_sweep.refine/v1");
+        assert_eq!(provenance["kept"].as_array().unwrap().len(), 1);
+        assert!(provenance["advisory"]
+            .as_str()
+            .unwrap()
+            .contains("nothing was run"));
+        // The refined plan is a valid plan for a new run directory.
+        assert!(call(&[
+            "plan",
+            "--out",
+            t.0.join(format!("unused-{prime}.json")).to_str().unwrap()
+        ])
+        .status
+        .success());
+        let bad = call(&[
+            "refine",
+            "--run",
+            dir.to_str().unwrap(),
+            "--out",
+            next_plan.to_str().unwrap(),
+        ]);
+        assert!(!bad.status.success(), "write-once output");
         let checked = call(&["verify", "--run", dir.to_str().unwrap()]);
         assert!(
             checked.status.success(),
@@ -111,6 +230,8 @@ fn binary_and_prime_probes_replay_and_resume_without_overwriting() {
         assert!(events.contains("solve_begin"));
         assert!(events.contains("rolling_verified_per_second"));
         assert!(events.contains("observed_solving_degree"));
+        assert!(events.contains("\"event\":\"forecast\""));
+        assert!(events.contains("predicted_degree_of_regularity"));
         let resumed = call(&["run", "--out", dir.to_str().unwrap(), "--resume"]);
         assert!(
             resumed.status.success(),
@@ -188,17 +309,15 @@ fn interrupted_attempt_is_retained_and_resume_obeys_the_hard_deadline() {
         .unwrap();
     let began = Instant::now();
     while began.elapsed() < Duration::from_secs(10) {
-        if fs::read_to_string(dir.join("events.jsonl"))
-            .unwrap_or_default()
-            .contains("worker_started")
-        {
+        if complete_event_recorded(&dir.join("events.jsonl"), "worker_started") {
             break;
         }
         std::thread::sleep(Duration::from_millis(10));
     }
-    assert!(fs::read_to_string(dir.join("events.jsonl"))
-        .unwrap()
-        .contains("worker_started"));
+    assert!(complete_event_recorded(
+        &dir.join("events.jsonl"),
+        "worker_started"
+    ));
     child.kill().unwrap();
     child.wait().unwrap();
     let first = attempt(&dir);
@@ -330,17 +449,15 @@ fn a_second_supervisor_cannot_write_into_an_active_run() {
     );
     let began = Instant::now();
     while began.elapsed() < Duration::from_secs(10) {
-        if fs::read_to_string(dir.join("events.jsonl"))
-            .unwrap_or_default()
-            .contains("worker_started")
-        {
+        if complete_event_recorded(&dir.join("events.jsonl"), "worker_started") {
             break;
         }
         std::thread::sleep(Duration::from_millis(10));
     }
-    assert!(fs::read_to_string(dir.join("events.jsonl"))
-        .unwrap()
-        .contains("worker_started"));
+    assert!(complete_event_recorded(
+        &dir.join("events.jsonl"),
+        "worker_started"
+    ));
     let manifest = fs::read(dir.join("manifest.json")).unwrap();
     let second = call(&["run", "--out", dir.to_str().unwrap(), "--resume"]);
     assert!(!second.status.success());

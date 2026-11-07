@@ -1,0 +1,81 @@
+{
+  "schema": "software-validation/v1",
+  "recorded_at": "2026-10-28T08:18:14Z",
+  "scope": "S3 absence check; no scientific dataset or worker IAM validation",
+  "base": "1a90e5bb7f8195cee17266e32dbfd0711585ae85",
+  "sources": {
+    "backend_sha256": "c69d3594657538131c11963af2f021a90f27af3400f7f76be216468703c9afca",
+    "integration_test_sha256": "4c91ca9edf07014322d3cdec70f34b5a2cffd161cc4b78fe1b64cf8c548fbf0b"
+  },
+  "tests": {
+    "new_integration": {
+      "passed": 12,
+      "failed": 0
+    },
+    "existing_store_cli": {
+      "passed": 5,
+      "failed": 0
+    },
+    "full_library_parallel": {
+      "passed": 4979,
+      "failed": 8,
+      "ignored": 122,
+      "disposition": "Six missing tracked runtime inputs restored; two parallel GPU lock failures isolated; all affected tests passed targeted serial reruns"
+    },
+    "full_library_serial": {
+      "passed": 4987,
+      "failed": 0,
+      "ignored": 122,
+      "invocation": "compiled native libtest executable --test-threads=1",
+      "executable_sha256": "aaaf5610d8377b265bf930003e548918e1d03765422cfc6cda8139888506a5ce"
+    },
+    "strict_clippy": "passed",
+    "scoped_rustfmt": "passed"
+  },
+  "s3_readbacks": [
+    {
+      "kind": "parallel_failure_log",
+      "uri": "s3://setec-astronomy-artifacts/store/sha256/31/313dbd91ef9a1e4289a8d560dabe352480b250cd04ab072b61e50ed7691304a7",
+      "sha256": "313dbd91ef9a1e4289a8d560dabe352480b250cd04ab072b61e50ed7691304a7",
+      "byte_cmp": true,
+      "get_receipt": {
+        "AcceptRanges": "bytes",
+        "LastModified": "2026-10-28T07:52:04+00:00",
+        "ContentLength": 443631,
+        "ETag": "\"5f1adbe5ca31de39e76cf0919cc54e0d\"",
+        "ChecksumSHA256": "MT29ke+aHkKJqNVg2r41JICyUM0EqwcrYeUO12kTBKc=",
+        "ChecksumType": "FULL_OBJECT",
+        "ContentType": "binary/octet-stream",
+        "ServerSideEncryption": "AES256",
+        "Metadata": {}
+      }
+    },
+    {
+      "kind": "serial_success_log",
+      "uri": "s3://setec-astronomy-artifacts/store/sha256/b4/b41fff155e60f3ba15474a24a123e61f8ad0e55df4d44abd578e6367daf8688b",
+      "sha256": "b41fff155e60f3ba15474a24a123e61f8ad0e55df4d44abd578e6367daf8688b",
+      "byte_cmp": true,
+      "get_receipt": {
+        "AcceptRanges": "bytes",
+        "LastModified": "2026-10-28T08:17:12+00:00",
+        "ContentLength": 437331,
+        "ETag": "\"75062c50e3cef5ddbc8efb7bb43c8720\"",
+        "ChecksumSHA256": "tB//FV5g87oVR0okoSPmH4rQ5V301Eq9V45jZ9r4aIs=",
+        "ChecksumType": "FULL_OBJECT",
+        "ContentType": "binary/octet-stream",
+        "ServerSideEncryption": "AES256",
+        "Metadata": {}
+      }
+    }
+  ],
+  "hosted_ci": "pending",
+  "worker_put_get_hash": "not performed; administrative approval pending",
+  "new_workers_launched": 0,
+  "iam_mutated": false,
+  "upstream_sync": {
+    "base": "189ac727fcc4475b42755d4f1c15f97a4a102070",
+    "conflict": "docs/session-logs/2026-10-28.md; retained both appended entries",
+    "root_rust_cargo_local_dependency_changes": false,
+    "validation_reused": "source and dependency inputs unchanged; no repeat suite"
+  }
+}

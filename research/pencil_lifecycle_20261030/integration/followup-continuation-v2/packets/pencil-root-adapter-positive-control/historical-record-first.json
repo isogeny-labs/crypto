@@ -1,0 +1,975 @@
+{
+  "schema": "ecbench.record/v1",
+  "record_id": "ECR1h914df26e556a",
+  "session_id": "ECBS1h4c7220d5a9f6",
+  "run_id": "ECM1h187cc5c6d747Wcf52db405c0dR1",
+  "seq": 0,
+  "round": 0,
+  "warmup": true,
+  "arm": "pencil",
+  "role": "candidate",
+  "method": {
+    "id": "ic.three_leads_genus2_pencil_symbolic_v2",
+    "family": "ic",
+    "params": {
+      "matrix_coefficient_cap": "25000000",
+      "small_denominator": "8"
+    },
+    "method_id": "ECM1h187cc5c6d747",
+    "method_sha256": "187cc5c6d747a3b25cfd9708e970b511886a46c49b5db9fd3b09ce5b8a7fc983",
+    "entry": "three_leads::pencil::solve"
+  },
+  "workload": {
+    "workload_id": "Wcf52db405c0d",
+    "workload_sha256": "cf52db405c0dcf1916b87de8f429f914a92160b07f72b39e869284441fa42de9",
+    "curve_spec": {
+      "kind": "three_leads",
+      "p": 739,
+      "n": 2,
+      "modulus": 1,
+      "a": 493102,
+      "b": 193650,
+      "group_order": 546352,
+      "r": 34147,
+      "gx": 433246,
+      "gy": 59741,
+      "family": "scholten",
+      "parameter": 0
+    },
+    "curve": {
+      "slug": "icv1-fp10k2-tm230-7cd9e337",
+      "icv1": "ICV1:fpk-739-2-203151c5:-230:546352:398,321:unk:unk:r:7cd9e337a915",
+      "family": "extension",
+      "construction": "three_leads_explicit(p=739,n=2,a=493102,b=193650,family=scholten,parameter=0)",
+      "field_degree": 2,
+      "field_bits": 10,
+      "group_order": 546352,
+      "r": 34147,
+      "cofactor": 16,
+      "generator": [
+        "0x69c5e",
+        "0xe95d"
+      ],
+      "automorphisms_available": 2,
+      "registered": true,
+      "ec1": null,
+      "curve_uid": null
+    },
+    "target_law": "uniform_scalar_sha256_v1",
+    "target_seed": 202610181260,
+    "target_index": 0,
+    "target": [
+      "0x15ed",
+      "0x5b1d4"
+    ],
+    "planted": 31124
+  },
+  "algorithm_seed": "17823097723983109480",
+  "outcome": {
+    "status": "verified",
+    "recovered": "31124",
+    "matches_target": true,
+    "matches_planted": true,
+    "error": null,
+    "exit": "exit 0",
+    "stderr_sha256": null
+  },
+  "cost": {
+    "unit": "ecbench.gae",
+    "total_gae": 17242.886363636364,
+    "s": 93.31118156757606,
+    "lower_bound": true,
+    "unpriced": [
+      "pencil_native_and_symbolic_arithmetic",
+      "pencil_logical_work",
+      "allocation_observer_unavailable"
+    ],
+    "deterministic": true,
+    "nondeterminism": []
+  },
+  "boundaries": {
+    "automorphisms_available": 2,
+    "automorphisms_used": 1,
+    "floor_s": 0.8862269254527579,
+    "ratio_to_floor": 105.29039333791962,
+    "floor_rule": "automorphisms/v2"
+  },
+  "phases": [
+    {
+      "name": "counted_group_component_only",
+      "adds": 4338,
+      "doubles": 0,
+      "scalar_mults": 0,
+      "gae": 17242.886363636364,
+      "wall_ns": null,
+      "native": {
+        "group_bit_ops_uncharged": 0,
+        "group_field_adds_uncharged": 455936,
+        "group_field_inversions": 11669,
+        "group_field_multiplications": 257111,
+        "group_field_squarings": 7390,
+        "pencil_replay_ledger_sha256_word_0": 3450937225665952711,
+        "pencil_replay_ledger_sha256_word_1": 15216933123941565504,
+        "pencil_replay_ledger_sha256_word_2": 17429561590725930331,
+        "pencil_replay_ledger_sha256_word_3": 6444749248345387940
+      }
+    }
+  ],
+  "counters": {
+    "adapter_accounting_sha256_word_0": 1917641752773513007,
+    "adapter_accounting_sha256_word_1": 12690524209162535342,
+    "adapter_accounting_sha256_word_2": 2769779709837875050,
+    "adapter_accounting_sha256_word_3": 9777907126482013667,
+    "group_bit_ops_uncharged": 0,
+    "group_field_adds_uncharged": 455936,
+    "group_field_inversions": 11669,
+    "group_field_multiplications": 257111,
+    "group_field_squarings": 7390,
+    "pencil_replay_ledger_sha256_word_0": 3450937225665952711,
+    "pencil_replay_ledger_sha256_word_1": 15216933123941565504,
+    "pencil_replay_ledger_sha256_word_2": 17429561590725930331,
+    "pencil_replay_ledger_sha256_word_3": 6444749248345387940
+  },
+  "factor_base": null,
+  "detail": {
+    "adapter_accounting": {
+      "accounting_attachment_is_observer_overhead": true,
+      "adapter_elapsed_ns_before_accounting_attachment": 13494845,
+      "coverage_complete": false,
+      "geometry": {
+        "partition_sum_verified": true,
+        "schema": "engine-geometry-partition/v1-draft",
+        "segments": {
+          "additional_source_verification": {
+            "constructor_modular_muls": 0,
+            "constructor_modular_squares": 0,
+            "constructor_prime_calls": 0,
+            "constructor_standalone_reductions": 0,
+            "elements_copied": 0,
+            "elements_initialized": 0,
+            "entry_visits": 0,
+            "key_comparisons": 0,
+            "metadata_family_bytes_copied": 8,
+            "metadata_key_bytes_copied": 6,
+            "metadata_string_bytes_copied": 35,
+            "metadata_value_nodes_copied": 2,
+            "scalar_constructor_modular_muls": 0,
+            "scalar_constructor_modular_squares": 0,
+            "scalar_constructor_prime_calls": 0,
+            "scalar_constructor_standalone_reductions": 0
+          },
+          "report_assembly": {
+            "constructor_modular_muls": 0,
+            "constructor_modular_squares": 0,
+            "constructor_prime_calls": 0,
+            "constructor_standalone_reductions": 0,
+            "elements_copied": 0,
+            "elements_initialized": 0,
+            "entry_visits": 0,
+            "key_comparisons": 0,
+            "metadata_family_bytes_copied": 0,
+            "metadata_key_bytes_copied": 0,
+            "metadata_string_bytes_copied": 0,
+            "metadata_value_nodes_copied": 0,
+            "scalar_constructor_modular_muls": 0,
+            "scalar_constructor_modular_squares": 0,
+            "scalar_constructor_prime_calls": 0,
+            "scalar_constructor_standalone_reductions": 0
+          },
+          "solver_including_cold_setup": {
+            "constructor_modular_muls": 35,
+            "constructor_modular_squares": 56,
+            "constructor_prime_calls": 1,
+            "constructor_standalone_reductions": 26,
+            "elements_copied": 195715,
+            "elements_initialized": 288207,
+            "entry_visits": 984365,
+            "key_comparisons": 415104,
+            "metadata_family_bytes_copied": 0,
+            "metadata_key_bytes_copied": 0,
+            "metadata_string_bytes_copied": 0,
+            "metadata_value_nodes_copied": 0,
+            "scalar_constructor_modular_muls": 0,
+            "scalar_constructor_modular_squares": 0,
+            "scalar_constructor_prime_calls": 0,
+            "scalar_constructor_standalone_reductions": 0
+          },
+          "source_unit_calibration": {
+            "constructor_modular_muls": 0,
+            "constructor_modular_squares": 0,
+            "constructor_prime_calls": 0,
+            "constructor_standalone_reductions": 0,
+            "elements_copied": 0,
+            "elements_initialized": 0,
+            "entry_visits": 0,
+            "key_comparisons": 0,
+            "metadata_family_bytes_copied": 8,
+            "metadata_key_bytes_copied": 6,
+            "metadata_string_bytes_copied": 35,
+            "metadata_value_nodes_copied": 2,
+            "scalar_constructor_modular_muls": 0,
+            "scalar_constructor_modular_squares": 0,
+            "scalar_constructor_prime_calls": 0,
+            "scalar_constructor_standalone_reductions": 0
+          }
+        },
+        "total": {
+          "constructor_modular_muls": 35,
+          "constructor_modular_squares": 56,
+          "constructor_prime_calls": 1,
+          "constructor_standalone_reductions": 26,
+          "elements_copied": 195715,
+          "elements_initialized": 288207,
+          "entry_visits": 984365,
+          "key_comparisons": 415104,
+          "metadata_family_bytes_copied": 16,
+          "metadata_key_bytes_copied": 12,
+          "metadata_string_bytes_copied": 70,
+          "metadata_value_nodes_copied": 4,
+          "scalar_constructor_modular_muls": 0,
+          "scalar_constructor_modular_squares": 0,
+          "scalar_constructor_prime_calls": 0,
+          "scalar_constructor_standalone_reductions": 0
+        }
+      },
+      "partition_policy": "whole geometry is total; named segments partition it and must not be added again",
+      "report_allocation_and_serialization_counted": false,
+      "schema": "pencil-adapter-accounting/v1-draft",
+      "source_unit_calibration_arithmetic": {
+        "addition": {
+          "bit_ops": 0,
+          "ec_adds": 1,
+          "field_adds": 44,
+          "i": 1,
+          "jac_adds": 0,
+          "m": 9,
+          "s": 4,
+          "sqrt_calls": 0
+        },
+        "included_in_legacy_group_total": false,
+        "preparation": {
+          "bit_ops": 0,
+          "ec_adds": 2,
+          "field_adds": 74,
+          "i": 1,
+          "jac_adds": 0,
+          "m": 25,
+          "s": 6,
+          "sqrt_calls": 0
+        },
+        "total": {
+          "bit_ops": 0,
+          "ec_adds": 3,
+          "field_adds": 118,
+          "i": 2,
+          "jac_adds": 0,
+          "m": 34,
+          "s": 10,
+          "sqrt_calls": 0
+        }
+      }
+    },
+    "additional_source_verification": {
+      "bit_ops": 0,
+      "ec_adds": 22,
+      "field_adds": 1344,
+      "i": 21,
+      "jac_adds": 0,
+      "m": 413,
+      "s": 112,
+      "sqrt_calls": 0
+    },
+    "allocation_observer_available": false,
+    "candidate": {
+      "allocation_observer_available": false,
+      "arithmetic": {
+        "base_adds": 100293,
+        "base_inversions": 8,
+        "base_muls": 113359,
+        "scalar_adds": 871,
+        "scalar_inversions": 0,
+        "scalar_muls": 0
+      },
+      "candidate_elapsed_ns": 11017921,
+      "candidate_envelope_allocation": null,
+      "candidate_lambdas": 989,
+      "candidate_over_rho": null,
+      "candidate_phase_overhead_ns": 364851,
+      "cold_setup_allocation": null,
+      "cold_setup_elapsed_ns": 1571852,
+      "cost_status": "incomplete_graph_and_allocation_accounting",
+      "counts": {
+        "bit_ops": 0,
+        "ec_adds": 369,
+        "field_adds": 454592,
+        "i": 11648,
+        "jac_adds": 3947,
+        "m": 256698,
+        "s": 7278,
+        "sqrt_calls": 0
+      },
+      "failure": null,
+      "matrix_coefficient_cap": 25000000,
+      "p": 739,
+      "phases": {
+        "candidate_verification": {
+          "allocation": null,
+          "arithmetic": {
+            "base_adds": 60132,
+            "base_inversions": 0,
+            "base_muls": 57507,
+            "scalar_adds": 0,
+            "scalar_inversions": 0,
+            "scalar_muls": 0
+          },
+          "elapsed_ns": 8787525,
+          "field": {
+            "bit_ops": 0,
+            "ec_adds": 0,
+            "field_adds": 333313,
+            "i": 9572,
+            "jac_adds": 3484,
+            "m": 195793,
+            "s": 4355,
+            "sqrt_calls": 0
+          },
+          "symbolic": {
+            "collection_comparisons": 26162,
+            "collection_elements_copied": 3483,
+            "collection_elements_initialized": 18327,
+            "collection_entry_visits": 105477,
+            "map_calls": 0,
+            "map_cloned_entries": 0,
+            "map_entry_visits": 0,
+            "map_key_comparisons": 0,
+            "modular_reductions": 0,
+            "parent_hops": 0,
+            "partition_terms": 0,
+            "payload_terms": 0,
+            "primality_checks": 0,
+            "scalar_adds": 0,
+            "scalar_inversions": 0,
+            "scalar_muls": 0,
+            "scalar_negations": 0,
+            "sparse_accumulations": 0,
+            "walk_label_calls": 0
+          }
+        },
+        "elimination": {
+          "allocation": null,
+          "arithmetic": {
+            "base_adds": 0,
+            "base_inversions": 0,
+            "base_muls": 0,
+            "scalar_adds": 871,
+            "scalar_inversions": 0,
+            "scalar_muls": 0
+          },
+          "elapsed_ns": 1016362,
+          "field": {
+            "bit_ops": 0,
+            "ec_adds": 0,
+            "field_adds": 0,
+            "i": 0,
+            "jac_adds": 0,
+            "m": 0,
+            "s": 0,
+            "sqrt_calls": 0
+          },
+          "symbolic": {
+            "collection_comparisons": 17606,
+            "collection_elements_copied": 7298,
+            "collection_elements_initialized": 16633,
+            "collection_entry_visits": 29311,
+            "map_calls": 36719,
+            "map_cloned_entries": 0,
+            "map_entry_visits": 25686,
+            "map_key_comparisons": 135759,
+            "modular_reductions": 3628,
+            "parent_hops": 218,
+            "partition_terms": 4335,
+            "payload_terms": 3778,
+            "primality_checks": 0,
+            "scalar_adds": 14356,
+            "scalar_inversions": 311,
+            "scalar_muls": 18530,
+            "scalar_negations": 716,
+            "sparse_accumulations": 14356,
+            "walk_label_calls": 0
+          }
+        },
+        "iterator_bookkeeping": {
+          "allocation": null,
+          "arithmetic": {
+            "base_adds": 0,
+            "base_inversions": 0,
+            "base_muls": 0,
+            "scalar_adds": 0,
+            "scalar_inversions": 0,
+            "scalar_muls": 0
+          },
+          "elapsed_ns": 0,
+          "field": {
+            "bit_ops": 0,
+            "ec_adds": 0,
+            "field_adds": 0,
+            "i": 0,
+            "jac_adds": 0,
+            "m": 0,
+            "s": 0,
+            "sqrt_calls": 0
+          },
+          "symbolic": {
+            "collection_comparisons": 0,
+            "collection_elements_copied": 0,
+            "collection_elements_initialized": 0,
+            "collection_entry_visits": 0,
+            "map_calls": 0,
+            "map_cloned_entries": 0,
+            "map_entry_visits": 873,
+            "map_key_comparisons": 0,
+            "modular_reductions": 0,
+            "parent_hops": 0,
+            "partition_terms": 0,
+            "payload_terms": 0,
+            "primality_checks": 0,
+            "scalar_adds": 0,
+            "scalar_inversions": 0,
+            "scalar_muls": 0,
+            "scalar_negations": 0,
+            "sparse_accumulations": 0,
+            "walk_label_calls": 0
+          }
+        },
+        "recovery_check": {
+          "allocation": null,
+          "arithmetic": {
+            "base_adds": 0,
+            "base_inversions": 0,
+            "base_muls": 0,
+            "scalar_adds": 0,
+            "scalar_inversions": 0,
+            "scalar_muls": 0
+          },
+          "elapsed_ns": 5760,
+          "field": {
+            "bit_ops": 0,
+            "ec_adds": 22,
+            "field_adds": 1344,
+            "i": 21,
+            "jac_adds": 0,
+            "m": 413,
+            "s": 112,
+            "sqrt_calls": 0
+          },
+          "symbolic": {
+            "collection_comparisons": 0,
+            "collection_elements_copied": 0,
+            "collection_elements_initialized": 0,
+            "collection_entry_visits": 0,
+            "map_calls": 0,
+            "map_cloned_entries": 0,
+            "map_entry_visits": 0,
+            "map_key_comparisons": 0,
+            "modular_reductions": 0,
+            "parent_hops": 0,
+            "partition_terms": 0,
+            "payload_terms": 0,
+            "primality_checks": 0,
+            "scalar_adds": 0,
+            "scalar_inversions": 0,
+            "scalar_muls": 0,
+            "scalar_negations": 0,
+            "sparse_accumulations": 0,
+            "walk_label_calls": 0
+          }
+        },
+        "sieve": {
+          "allocation": null,
+          "arithmetic": {
+            "base_adds": 35727,
+            "base_inversions": 8,
+            "base_muls": 50679,
+            "scalar_adds": 0,
+            "scalar_inversions": 0,
+            "scalar_muls": 0
+          },
+          "elapsed_ns": 685520,
+          "field": {
+            "bit_ops": 0,
+            "ec_adds": 0,
+            "field_adds": 0,
+            "i": 0,
+            "jac_adds": 0,
+            "m": 0,
+            "s": 0,
+            "sqrt_calls": 0
+          },
+          "symbolic": {
+            "collection_comparisons": 33767,
+            "collection_elements_copied": 5956,
+            "collection_elements_initialized": 21866,
+            "collection_entry_visits": 77619,
+            "map_calls": 1972,
+            "map_cloned_entries": 0,
+            "map_entry_visits": 0,
+            "map_key_comparisons": 18366,
+            "modular_reductions": 0,
+            "parent_hops": 0,
+            "partition_terms": 0,
+            "payload_terms": 0,
+            "primality_checks": 0,
+            "scalar_adds": 0,
+            "scalar_inversions": 0,
+            "scalar_muls": 0,
+            "scalar_negations": 0,
+            "sparse_accumulations": 0,
+            "walk_label_calls": 0
+          }
+        },
+        "solver_setup": {
+          "allocation": null,
+          "arithmetic": {
+            "base_adds": 0,
+            "base_inversions": 0,
+            "base_muls": 0,
+            "scalar_adds": 0,
+            "scalar_inversions": 0,
+            "scalar_muls": 0
+          },
+          "elapsed_ns": 24240,
+          "field": {
+            "bit_ops": 0,
+            "ec_adds": 0,
+            "field_adds": 0,
+            "i": 0,
+            "jac_adds": 0,
+            "m": 0,
+            "s": 0,
+            "sqrt_calls": 0
+          },
+          "symbolic": {
+            "collection_comparisons": 1477,
+            "collection_elements_copied": 739,
+            "collection_elements_initialized": 3130,
+            "collection_entry_visits": 1480,
+            "map_calls": 0,
+            "map_cloned_entries": 0,
+            "map_entry_visits": 0,
+            "map_key_comparisons": 0,
+            "modular_reductions": 52,
+            "parent_hops": 0,
+            "partition_terms": 369,
+            "payload_terms": 0,
+            "primality_checks": 2,
+            "scalar_adds": 0,
+            "scalar_inversions": 0,
+            "scalar_muls": 294,
+            "scalar_negations": 0,
+            "sparse_accumulations": 0,
+            "walk_label_calls": 0
+          }
+        },
+        "target_validation": {
+          "allocation": null,
+          "arithmetic": {
+            "base_adds": 0,
+            "base_inversions": 0,
+            "base_muls": 0,
+            "scalar_adds": 0,
+            "scalar_inversions": 0,
+            "scalar_muls": 0
+          },
+          "elapsed_ns": 180,
+          "field": {
+            "bit_ops": 0,
+            "ec_adds": 0,
+            "field_adds": 28,
+            "i": 0,
+            "jac_adds": 0,
+            "m": 10,
+            "s": 2,
+            "sqrt_calls": 0
+          },
+          "symbolic": {
+            "collection_comparisons": 0,
+            "collection_elements_copied": 0,
+            "collection_elements_initialized": 0,
+            "collection_entry_visits": 0,
+            "map_calls": 0,
+            "map_cloned_entries": 0,
+            "map_entry_visits": 0,
+            "map_key_comparisons": 0,
+            "modular_reductions": 0,
+            "parent_hops": 0,
+            "partition_terms": 0,
+            "payload_terms": 0,
+            "primality_checks": 0,
+            "scalar_adds": 0,
+            "scalar_inversions": 0,
+            "scalar_muls": 0,
+            "scalar_negations": 0,
+            "sparse_accumulations": 0,
+            "walk_label_calls": 0
+          }
+        },
+        "walk_generation": {
+          "allocation": null,
+          "arithmetic": {
+            "base_adds": 0,
+            "base_inversions": 0,
+            "base_muls": 0,
+            "scalar_adds": 0,
+            "scalar_inversions": 0,
+            "scalar_muls": 0
+          },
+          "elapsed_ns": 133483,
+          "field": {
+            "bit_ops": 0,
+            "ec_adds": 325,
+            "field_adds": 29306,
+            "i": 341,
+            "jac_adds": 8,
+            "m": 9290,
+            "s": 1760,
+            "sqrt_calls": 0
+          },
+          "symbolic": {
+            "collection_comparisons": 0,
+            "collection_elements_copied": 0,
+            "collection_elements_initialized": 0,
+            "collection_entry_visits": 0,
+            "map_calls": 0,
+            "map_cloned_entries": 0,
+            "map_entry_visits": 0,
+            "map_key_comparisons": 0,
+            "modular_reductions": 0,
+            "parent_hops": 0,
+            "partition_terms": 0,
+            "payload_terms": 0,
+            "primality_checks": 0,
+            "scalar_adds": 0,
+            "scalar_inversions": 0,
+            "scalar_muls": 0,
+            "scalar_negations": 0,
+            "sparse_accumulations": 0,
+            "walk_label_calls": 16
+          }
+        }
+      },
+      "r": 34147,
+      "recovered": 31124,
+      "rejected_candidates": 2,
+      "schema": "pencil-symbolic-result/v2",
+      "solution_key": [
+        7,
+        62
+      ],
+      "solver_mode": "symbolic",
+      "solver_node_order": "identity",
+      "solver_node_order_ops": 0,
+      "solver_nodes": 367,
+      "solver_rank": 46,
+      "solver_stored_nonzero_coefficients": 570,
+      "symbolic": {
+        "admitted_rows": 311,
+        "candidate_over_rho": null,
+        "coefficient_updates": 6368,
+        "cost_status": "incomplete_graph_and_allocation_accounting",
+        "denominator": 8,
+        "emitted_constraints": 46,
+        "input_terms": 413,
+        "inversions": 46,
+        "normalization_multiplications": 570,
+        "partition": "identity_column_mod_denominator",
+        "peak_working_coefficients": 28,
+        "pending_constraint": null,
+        "pivot_lookups": 497,
+        "rejected_three_large": 560,
+        "residual_rank": 46,
+        "retained_coefficients": 570,
+        "semantic_counts": {
+          "collection_comparisons": 79012,
+          "collection_elements_copied": 17476,
+          "collection_elements_initialized": 59956,
+          "collection_entry_visits": 213887,
+          "map_calls": 38691,
+          "map_cloned_entries": 0,
+          "map_entry_visits": 26559,
+          "map_key_comparisons": 154125,
+          "modular_reductions": 3680,
+          "parent_hops": 218,
+          "partition_terms": 4704,
+          "payload_terms": 3778,
+          "primality_checks": 2,
+          "scalar_adds": 14356,
+          "scalar_inversions": 311,
+          "scalar_muls": 18824,
+          "scalar_negations": 716,
+          "sparse_accumulations": 14356,
+          "walk_label_calls": 16
+        },
+        "submitted_rows": 871,
+        "submitted_terms": 4335
+      },
+      "verified": true,
+      "verified_relations": 871,
+      "walks": 8
+    },
+    "candidate_over_rho": null,
+    "cold_setup": {
+      "allocation": null,
+      "arithmetic": {
+        "base_adds": 4434,
+        "base_inversions": 0,
+        "base_muls": 5173,
+        "scalar_adds": 0,
+        "scalar_inversions": 0,
+        "scalar_muls": 0
+      },
+      "cofactor": 16,
+      "elapsed_ns": 1571852,
+      "field": {
+        "bit_ops": 0,
+        "ec_adds": 22,
+        "field_adds": 90601,
+        "i": 1714,
+        "jac_adds": 455,
+        "m": 51192,
+        "s": 1049,
+        "sqrt_calls": 0
+      },
+      "matrix_coefficient_cap": 25000000,
+      "order": 546352,
+      "outer_primality": {
+        "observations": {
+          "base_modulus": {
+            "counts": {
+              "divisibility_checks": 12,
+              "exponent_iterations": 63,
+              "modular_muls": 35,
+              "modular_squares": 56,
+              "product_reductions": 91,
+              "small_divisor_iterations": 12,
+              "standalone_modular_reductions": 26,
+              "witness_iterations": 7,
+              "witness_square_iterations": 0
+            },
+            "modulus": 739,
+            "prime": true
+          },
+          "scalar_modulus": {
+            "counts": {
+              "divisibility_checks": 12,
+              "exponent_iterations": 105,
+              "modular_muls": 42,
+              "modular_squares": 98,
+              "product_reductions": 140,
+              "small_divisor_iterations": 12,
+              "standalone_modular_reductions": 26,
+              "witness_iterations": 7,
+              "witness_square_iterations": 0
+            },
+            "modulus": 34147,
+            "prime": true
+          }
+        },
+        "schema": "pencil-outer-primality/v1"
+      },
+      "p": 739,
+      "projected_points_checked": 16,
+      "r": 34147,
+      "rational_curve_points": 739,
+      "schema": "pencil-symbolic-setup/v2",
+      "semantic_counts": {
+        "collection_comparisons": 30,
+        "collection_elements_copied": 739,
+        "collection_elements_initialized": 2217,
+        "collection_entry_visits": 5942,
+        "map_calls": 0,
+        "map_cloned_entries": 0,
+        "map_entry_visits": 0,
+        "map_key_comparisons": 0,
+        "modular_reductions": 0,
+        "parent_hops": 0,
+        "partition_terms": 0,
+        "payload_terms": 0,
+        "primality_checks": 0,
+        "scalar_adds": 0,
+        "scalar_inversions": 0,
+        "scalar_muls": 0,
+        "scalar_negations": 0,
+        "sparse_accumulations": 0,
+        "walk_label_calls": 0
+      }
+    },
+    "cost_status": "incomplete",
+    "schema": "ecbench-pencil-symbolic/v2",
+    "source_addition": {
+      "bit_ops": 0,
+      "ec_adds": 1,
+      "field_adds": 44,
+      "i": 1,
+      "jac_adds": 0,
+      "m": 9,
+      "s": 4,
+      "sqrt_calls": 0
+    },
+    "total_gae_scope": "counted group arithmetic only; lower bound"
+  },
+  "online": {
+    "wall_ns": 10984701,
+    "phases_ns": {
+      "target_PDP": 687980,
+      "target_descent": 1136992,
+      "target_query": 259344,
+      "target_recovery_check": 7170,
+      "target_relation_check": 8893215
+    },
+    "zero_phases": {},
+    "start_event": "source target validity check after target-blind curve, base and empty solver setup",
+    "stop_event": "first source multiplication check completed inside pencil core",
+    "included_stages": [
+      "target_query",
+      "target_PDP",
+      "target_relation_check",
+      "target_descent",
+      "target_recovery_check"
+    ],
+    "mapping": "query: target validation, labels, source query and transfer, plus intervening control bookkeeping; PDP: point-driven sieve; relation check: polynomial, point and Jacobian checks; descent: signed graph and residual elimination; recovery check: first source multiplication. Additional adapter verification is outside online and charged in cold group counts."
+  },
+  "solver": null,
+  "allocator": {
+    "name": "musl",
+    "pre_solve_trim": false,
+    "note": "no malloc_trim on this allocator; the fastbin effect is a glibc one"
+  },
+  "time": {
+    "solve_wall_ns": 12740325,
+    "method_call_wall_ns": 13778349,
+    "parent_audit_verification_ns": 9580,
+    "online_clock_diagnostics": {
+      "error": null
+    },
+    "process_wall_ns": 168574105,
+    "user_ns": 158527000,
+    "sys_ns": 9907000,
+    "max_rss_kib": 122788,
+    "minor_faults": 30157,
+    "major_faults": 0,
+    "voluntary_switches": 2,
+    "involuntary_switches": 0,
+    "schedstat_solve": {
+      "cpu_ns": 6563655,
+      "run_delay_ns": 0,
+      "timeslices": 0
+    },
+    "hw_solve": {
+      "instructions": null,
+      "cycles": null,
+      "instructions_time_enabled_ns": null,
+      "instructions_time_running_ns": null,
+      "cycles_time_enabled_ns": null,
+      "cycles_time_running_ns": null,
+      "error": "perf_event_open: Operation not permitted (os error 1)"
+    },
+    "solve": {
+      "threads_before": 1,
+      "threads_after": 1,
+      "involuntary_switches": 0,
+      "voluntary_switches": 0,
+      "minor_faults": 339,
+      "major_faults": 0,
+      "schedstat_all": {
+        "cpu_ns": 13796129,
+        "run_delay_ns": 0,
+        "timeslices": 0
+      },
+      "cpu": 4,
+      "irq": null,
+      "cpu_sched": {
+        "sched_count": 0,
+        "ttwu_count": 0,
+        "rq_cpu_ns": 0,
+        "run_delay_ns": 0,
+        "pcount": 0
+      }
+    }
+  },
+  "isolation": {
+    "level": "L2",
+    "blockers": [
+      "L3: governor is None, not performance",
+      "L3: turbo/boost is not known to be off",
+      "L3: not known to be bare metal"
+    ],
+    "run_cpu": 4,
+    "reserved": [
+      4
+    ],
+    "node": 0,
+    "placement": {
+      "affinity": [
+        4
+      ],
+      "cpu_at_start": 4,
+      "cpu_at_end": 4,
+      "mems_allowed": "0",
+      "mempolicy": null,
+      "anon_pages_by_node": {
+        "0": 2682
+      }
+    },
+    "foreign_busy_ticks": 0,
+    "steal_ticks": 0,
+    "idle_sibling_busy_ticks": 0,
+    "before": {
+      "unix_ms": 1793319777043,
+      "loadavg": [
+        0.04296875,
+        0.13037109375,
+        0.06689453125
+      ],
+      "psi_cpu_some_avg10": 0.6,
+      "psi_cpu_some_total_us": 26785826,
+      "psi_memory_some_avg10": 0.0,
+      "psi_memory_some_total_us": 0,
+      "reserved_ticks": {
+        "4": {
+          "busy": 0,
+          "idle": 21675,
+          "steal": 0
+        }
+      },
+      "intruders": {
+        "user_threads": 0,
+        "kernel_threads": 0
+      }
+    },
+    "after": {
+      "unix_ms": 1793319777212,
+      "loadavg": [
+        0.04296875,
+        0.13037109375,
+        0.06689453125
+      ],
+      "psi_cpu_some_avg10": 0.6,
+      "psi_cpu_some_total_us": 26785835,
+      "psi_memory_some_avg10": 0.0,
+      "psi_memory_some_total_us": 0,
+      "reserved_ticks": {
+        "4": {
+          "busy": 17,
+          "idle": 21675,
+          "steal": 0
+        }
+      },
+      "intruders": {
+        "user_threads": 0,
+        "kernel_threads": 0
+      }
+    }
+  },
+  "env_class_id": "ECBENV3hc1c5e5126853",
+  "binary_sha256": "a1c8ca89748a22b8a07ea00fd3983061be0d8197d5cae49fca883dcf5dd50eab"
+}

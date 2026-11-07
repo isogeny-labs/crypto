@@ -39,6 +39,7 @@ mod hash {
         pub use crate::sha256_impl::*;
     }
 }
+mod base22;
 mod carrier16;
 mod census;
 mod cm16;
@@ -79,6 +80,7 @@ mod quotient_geometry;
 mod quotients06;
 mod quotients07;
 mod ramify16;
+mod recovery22;
 mod relations08;
 mod relations11;
 mod relations14;
@@ -383,6 +385,88 @@ fn run(out: &std::path::Path) {
     );
 }
 fn main() {
+    let geom_args: Vec<String> = std::env::args().collect();
+    if geom_args.get(1).map(String::as_str) == Some("--round22-intermediate") {
+        carrier16::geometry22::intermediate(std::path::Path::new(&geom_args[2]));
+        return;
+    }
+    if geom_args.get(1).map(String::as_str) == Some("--round22-two-map") {
+        recovery22::two_map(std::path::Path::new(&geom_args[2]));return;
+    }
+    if geom_args.get(1).map(String::as_str) == Some("--round22-gate-check") {
+        carrier16::geometry22::crosscheck(std::path::Path::new(&geom_args[2]));
+        return;
+    }
+    if geom_args.get(1).map(String::as_str) == Some("--round22-trace-tower") {
+        carrier16::geometry22::trace_tower(std::path::Path::new(&geom_args[2]));
+        return;
+    }
+    if geom_args.get(1).map(String::as_str) == Some("--round22-exceptional-supports") {
+        base22::exceptional(std::path::Path::new(&geom_args[2]));
+        return;
+    }
+    match geom_args.get(1).map(String::as_str) {
+        Some("--round22-summary") => {
+            round13_record::round22::summary(std::path::Path::new(&geom_args[2]));
+            return;
+        }
+        Some("--record-round22") => {
+            round13_record::round22::record(std::path::Path::new(&geom_args[2]));
+            return;
+        }
+        Some("--round22-issue-identities") => {
+            round13_record::round22::identities(std::path::Path::new(&geom_args[2]), true);
+            return;
+        }
+        Some("--round22-check-identities") => {
+            round13_record::round22::identities(std::path::Path::new(&geom_args[2]), false);
+            return;
+        }
+        _ => {}
+    }
+    if geom_args.get(1).map(String::as_str) == Some("--round22-chart-checks") {
+        carrier16::geometry22::chart_checks(std::path::Path::new(&geom_args[2]));
+        return;
+    }
+    if geom_args.get(1).map(String::as_str) == Some("--round22-toric-model") {
+        carrier16::geometry22::toric_model(std::path::Path::new(&geom_args[2]));
+        return;
+    }
+    if geom_args.get(1).map(String::as_str) == Some("--round22-verify-recovery") {
+        recovery22::verify(std::path::Path::new(&geom_args[2]));
+        return;
+    }
+    if geom_args.get(1).map(String::as_str) == Some("--round22-base-divisors") {
+        base22::run(std::path::Path::new(&geom_args[2]));
+        return;
+    }
+    if geom_args.get(1).map(String::as_str) == Some("--round22-coupled") {
+        survivors17::source19::coupled22::run(std::path::Path::new(&geom_args[2]));
+        return;
+    }
+    if geom_args.get(1).map(String::as_str) == Some("--round22-plane-places") {
+        carrier16::geometry22::plane_places(std::path::Path::new(&geom_args[2]));
+        return;
+    }
+    if geom_args.get(1).map(String::as_str) == Some("--round22-projection") {
+        carrier16::geometry22::projection(std::path::Path::new(&geom_args[2]));
+        return;
+    }
+    if geom_args.get(1).map(String::as_str) == Some("--round22-generic-qr") {
+        carrier16::geometry22::generic_qr(std::path::Path::new(&geom_args[2]));
+        return;
+    }
+    if geom_args.get(1).map(String::as_str) == Some("--round22-geometry-input") {
+        carrier16::geometry22::emit(std::path::Path::new(&geom_args[2]));
+        return;
+    }
+    let args22 = std::env::args().collect::<Vec<_>>();
+    if args22.get(1).map(String::as_str) == Some("--round22-recovery") {
+        recovery22::run(std::path::Path::new(
+            args22.get(2).expect("output directory"),
+        ));
+        return;
+    }
     let args10: Vec<String> = std::env::args().collect();
     if args10.get(1).map(String::as_str) == Some("--round16-carrier") {
         carrier16::run(std::path::Path::new(&args10[2]));
