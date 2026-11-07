@@ -147,6 +147,6 @@ python3 plot.py $R    # layout only
 
 ## Claim record
 
-- `PCC-20261107-a59c5a` (measurement; proof: `reports/run-20261107T2/summary.json`
-  as a recompute). It is not covered by a signed verdict, so every statement
+- `PCC-20261107-286789` (measurement; proof: `reports/run-20261107T2/validator-report.json`
+, a recompute of the headline numbers from the pinned raw rows by `subgroup_trap validate`). It is not covered by a signed verdict, so every statement
   here is [pcc:unverified].

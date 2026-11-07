@@ -405,6 +405,75 @@ fn mode_score(dir: &str) {
     std::fs::write(format!("{dir}/summary.txt"), out).unwrap();
 }
 
+/// Validator report (pcc `recompute` proof): recompute the README headline
+/// numbers from the raw rows of a run and compare them with claimed.json.
+/// Raw-data hashes are passed as name=sha256 arguments (std-only, no sha2).
+fn mode_validate(dir: &str, claimed_path: &str, pins: &[String]) {
+    let mut c1 = vec![];
+    for k in [5, 7, 9, 11] {
+        c1.extend(read_jsonl(&format!("{dir}/c1_k{k}.jsonl")));
+    }
+    let mass = read_jsonl(&format!("{dir}/mass.jsonl"));
+    let audit = read_jsonl(&format!("{dir}/audit.jsonl"));
+    let n = |r: &json::J, k: &str| r.get(k).num().unwrap_or(f64::NAN);
+    let a0 = |k: f64, arm: &str| c1.iter().find(|r| n(r, "k") == k && r.get("curve").str() == "A0" && r.get("arm").str() == arm).unwrap();
+    let mk = |k: f64| mass.iter().find(|r| n(r, "k") == k).unwrap();
+    let mut ratios: Vec<f64> = c1.iter().filter(|r| r.get("curve").str() != "A0").map(|r| n(r, "mean_on_2E_over_pred")).filter(|x| x.is_finite()).collect();
+    ratios.sort_by(|a, b| a.partial_cmp(b).unwrap());
+    let applicable_trapped = audit.iter().flat_map(|r| r.get("lines").arr().iter()).filter(|l| l.get("trapped").bool()).count()
+        + audit.iter().filter(|r| r.get("c2pnb_rs_pi16_lines").get("any_u_can_trap").bool()).count()
+        + c1.iter().filter(|r| r.get("curve").str() != "A0" && r.get("curve").str() != "NEG" && r.get("trapped").bool()).count();
+    let zero_frac = |k: f64, curve: &str, arm: &str| {
+        let r = c1.iter().find(|r| n(r, "k") == k && r.get("curve").str() == curve && r.get("arm").str().starts_with(arm)).unwrap();
+        n(r, "posthoc_zeros_on_2E") / n(r, "posthoc_n_on_2E")
+    };
+    let rec: Vec<(&str, f64)> = vec![
+        ("rows", c1.len() as f64),
+        ("identity_mismatch_rows", c1.iter().filter(|r| n(r, "identity_mismatch") != 0.0).count() as f64),
+        ("a0_k5_targets_in_H", n(a0(5.0, "std"), "targets_in_H")),
+        ("a0_k7_targets_in_EQ2", n(a0(7.0, "std"), "targets_in_EQ2")),
+        ("a0_k9_targets_in_EQ2", n(a0(9.0, "std"), "targets_in_EQ2")),
+        ("a0_nonzero_outside_H", [5.0, 7.0, 9.0].iter().map(|&k| n(a0(k, "std"), "nonzero_outside_H") + n(a0(k, "tw_a(u=1)"), "nonzero_outside_H")).sum()),
+        ("mass_k5_sum_N", n(mk(5.0), "sum_N_over_EQ2")),
+        ("mass_k5_m4", n(mk(5.0), "m4")),
+        ("mass_k7_sum_N", n(mk(7.0), "sum_N_over_EQ2")),
+        ("mass_k7_m4", n(mk(7.0), "m4")),
+        ("H_k5", n(mk(5.0), "H")),
+        ("H_k7", n(mk(7.0), "H")),
+        ("support_outside_H", n(mk(5.0), "support_outside_H") + n(mk(7.0), "support_outside_H")),
+        ("p3_pairs_off_2E", c1.iter().map(|r| (n(r, "T") * (1.0 - n(r, "frac_tr_eq_tr_a"))).round()).sum()),
+        ("p3_violations", c1.iter().map(|r| n(r, "viol_2E")).sum()),
+        ("p3_ratio_median", ratios[ratios.len() / 2]),
+        ("p4_trapped_applicable", applicable_trapped as f64),
+        ("posthoc_zero_frac_a0_twb_k9", zero_frac(9.0, "A0", "tw_b")),
+        ("posthoc_zero_frac_a1_twa_k9", zero_frac(9.0, "A1", "tw_a")),
+    ];
+    let claimed = json::parse(&std::fs::read_to_string(claimed_path).unwrap());
+    let mut heads = vec![];
+    let mut ok = true;
+    for (name, v) in &rec {
+        let c = claimed.get(name);
+        let cv = c.get("value").num().expect("claimed value");
+        let tol = c.get("rel_tol").num().unwrap_or(0.0);
+        let good = if tol == 0.0 { cv == *v } else { ((cv - v) / cv).abs() <= tol };
+        ok &= good;
+        heads.push(format!("    {{\"name\": \"{name}\", \"claimed\": {cv}, \"recomputed\": {v:.6}, \"rel_tol\": {tol}}}"));
+    }
+    let raw: Vec<String> = pins
+        .iter()
+        .map(|p| {
+            let (f, h) = p.split_once('=').unwrap();
+            format!("    {{\"path\": \"{f}\", \"sha256\": \"{h}\"}}")
+        })
+        .collect();
+    println!(
+        "{{\n  \"schema\": \"validator-report\",\n  \"status\": \"{}\",\n  \"study\": \"research/subgroup_trap_20261107\",\n  \"recomputed_by\": {{\"tool\": \"research/subgroup_trap_20261107 (subgroup_trap validate)\", \"command\": \"subgroup_trap validate <run> claimed.json <file=sha256>...\"}},\n  \"note\": \"Producer-run recompute of README headline numbers from the pinned raw rows; unsigned, so independence is not established.\",\n  \"raw_data\": [\n{}\n  ],\n  \"headline\": [\n{}\n  ]\n}}",
+        if ok { "pass" } else { "fail" },
+        raw.join(",\n"),
+        heads.join(",\n")
+    );
+}
+
 fn main() {
     let a: Vec<String> = std::env::args().collect();
     match a.get(1).map(|s| s.as_str()) {
@@ -412,6 +481,7 @@ fn main() {
         Some("mass") => mode_mass(a[2].parse().unwrap()),
         Some("audit") => gf2n::audit(&a[2], &a[3]),
         Some("score") => mode_score(&a[2]),
+        Some("validate") => mode_validate(&a[2], &a[3], &a[4..]),
         _ => eprintln!("usage: subgroup_trap c1 <run_dir> <k> | mass <k> | audit <c2pnb_params> <oakley_rows.json> | score <run_dir>"),
     }
 }
