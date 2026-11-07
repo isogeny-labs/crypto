@@ -32,8 +32,9 @@ some scope (CLAUDE.md success criterion).
   output `data/recount.json`): split counts 60, 58, 57, 50, 42, 57, 57, 57,
   54, 52 at ℓ ≤ 691 against a conditioned expectation of 59.7 to 60.3
   (sd 5.5); pooled z −3.13 at 691 and between −1.8 and −3.0 at every cutoff
-  from 100 to 200,000. Every number matches the uploaded report
-  (sha256 d38be158…) [pcc:unverified].
+  from 100 to 200,000. Every count and z the recount can compare matches the uploaded report
+  (sha256 d38be158…); its calibrated bands are not reproduced and its
+  L(1, χ) normalisation is questioned (study README §4) [pcc:unverified].
 - **Derived or established:** prior in-repo form: `RESEARCH_ISOGENY_FIBERS_ECDLP.md`
   §15.1, Theorem 15.1 (isogeny-augmented generic group model, success
   probability at most (Q + 2)²/r + 1/r; [pcc:unverified] there). Then (i) Lenstra: E(F_p) ≅ O/(π − 1) as O-modules when
@@ -59,7 +60,12 @@ some scope (CLAUDE.md success criterion).
   `problems/tree-glued-pdp-separator-coupling.md`).
 - **What this evidence does not establish:** it does not bound coordinate-
   based methods (summation polynomials, division polynomials), which are the
-  lab's open tracks; it does not say the deficit is harmless for other
+  lab's open tracks; it does not cover the p-adic canonical-lift presentation
+  (every point of E(F_p) lifts to Ẽ(Z_p); believed closed for n ≠ p because
+  the p-adic elliptic logarithm vanishes on torsion, an assertion here, not a
+  checked claim); it does not test whether the pattern correlates with
+  coordinate-method yield between isogeny classes (Δ is a class invariant,
+  so the within-class null cannot; study README §6 P3); it does not say the deficit is harmless for other
   purposes (it lowers the horizontal expander degree, so the JMV transport
   needs larger ℓ for the same mixing); it does not establish anything about the
   generation process of the curves.
