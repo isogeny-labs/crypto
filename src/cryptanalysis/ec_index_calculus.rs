@@ -895,6 +895,56 @@ pub fn build_factor_base_projected(
     out
 }
 
+/// `aG + bQ` by one interleaved (Shamir) double-and-add pass over both
+/// scalars, with `G + Q` precomputed: about `max(bits)` doublings and `3/4`
+/// of that many additions, against two separate ladders plus a final add.
+/// Variable time (public scalars).  The result equals
+/// `g.scalar_mul(a) + q.scalar_mul(b)` exactly.
+pub fn double_scalar_mul_vartime(
+    g: &Point,
+    a: &BigUint,
+    q: &Point,
+    b: &BigUint,
+    a_fe: &FieldElement,
+) -> Point {
+    let gq = g.add_vartime(q, a_fe);
+    let bits = a.bits().max(b.bits());
+    let mut acc = Point::Infinity;
+    for i in (0..bits).rev() {
+        acc = acc.double_vartime(a_fe);
+        match (a.bit(i), b.bit(i)) {
+            (true, true) => acc = acc.add_vartime(&gq, a_fe),
+            (true, false) => acc = acc.add_vartime(g, a_fe),
+            (false, true) => acc = acc.add_vartime(q, a_fe),
+            (false, false) => {}
+        }
+    }
+    acc
+}
+
+/// `R = aG + bQ` for the relation search.  The default is
+/// [`Point::double_scalar_mul_vartime`] (public scalars: variable time, one
+/// interleaved word-Jacobian pass).  `IC_SHAMIR` selects an older path, kept
+/// for the controlled comparison in `RESULTS_shamir.md`: `0` the original
+/// two `scalar_mul` ladders and `add`, `1` the affine interleave, `2` two
+/// `scalar_mul_vartime` ladders and `add_vartime`.  All return the same point.
+fn relation_point(g: &Point, a: &BigUint, q: &Point, b: &BigUint, a_fe: &FieldElement) -> Point {
+    static MODE: std::sync::OnceLock<u8> = std::sync::OnceLock::new();
+    match *MODE.get_or_init(|| match std::env::var("IC_SHAMIR").as_deref() {
+        Ok("0") => 0,
+        Ok("1") => 1,
+        Ok("2") => 2,
+        _ => 3,
+    }) {
+        0 => g.scalar_mul(a, a_fe).add(&q.scalar_mul(b, a_fe), a_fe),
+        1 => double_scalar_mul_vartime(g, a, q, b, a_fe),
+        2 => g
+            .scalar_mul_vartime(a, a_fe)
+            .add_vartime(&q.scalar_mul_vartime(b, a_fe), a_fe),
+        _ => g.double_scalar_mul_vartime(a, q, b, a_fe),
+    }
+}
+
 // ── Relation finding ────────────────────────────────────────────────────
 
 /// One row of the index-calculus linear system.
@@ -990,9 +1040,7 @@ fn find_one_relation_sweep_with_index<R: rand::RngCore>(
         let a = sample_nonzero();
         let b = sample_nonzero();
         // R = aG + bQ.  Use the variable-time ladder (public k, fine).
-        let ag = g.scalar_mul(&a, &a_fe);
-        let bq = q.scalar_mul(&b, &a_fe);
-        let r = ag.add(&bq, &a_fe);
+        let r = relation_point(g, &a, q, &b, &a_fe);
         let xr = match &r {
             Point::Affine { x, .. } => x.clone(),
             Point::Infinity => continue,
@@ -1776,7 +1824,7 @@ fn find_one_relation_table_with_rng<R: rand::RngCore>(
         };
         let a = sample_nonzero();
         let b = sample_nonzero();
-        let r = g.scalar_mul(&a, &a_fe).add(&q.scalar_mul(&b, &a_fe), &a_fe);
+        let r = relation_point(g, &a, q, &b, &a_fe);
         let key = match &r {
             Point::Affine { x, y } => (x.value.clone(), y.value.clone()),
             Point::Infinity => continue,
@@ -1796,6 +1844,130 @@ fn find_one_relation_table_with_rng<R: rand::RngCore>(
                 Relation {
                     coef_a: a,
                     coef_b: b,
+                    entries,
+                },
+                trial,
+            ));
+        }
+    }
+    None
+}
+
+/// r-adding walk state for relation sampling (experimental, `IC_WALK=1` with `IC_SUM_TABLE=1`).
+/// Each step adds one of `WALK_ARMS` precomputed points `a_k G + b_k Q` to the current point,
+/// tracking (a, b) mod n, so a trial costs one point addition instead of two scalar multiplications.
+struct SampleWalk {
+    r: Point,
+    a: BigUint,
+    b: BigUint,
+    arms: Vec<(Point, BigUint, BigUint)>,
+    steps: usize,
+}
+
+const WALK_ARMS: usize = 32;
+/// A walk whose step depends only on x enters a cycle after about sqrt(n) steps, so it is
+/// restarted from fresh random coefficients every `WALK_RESTART` steps.
+const WALK_RESTART: usize = 32;
+
+impl SampleWalk {
+    fn new<R: rand::RngCore>(curve: &CurveParams, g: &Point, q: &Point, rng: &mut R) -> Self {
+        use num_bigint::RandBigInt;
+        let a_fe = curve.a_fe();
+        let nonzero = |rng: &mut R| loop {
+            let v = rng.gen_biguint_below(&curve.n);
+            if !v.is_zero() {
+                break v;
+            }
+        };
+        let mut arms = Vec::with_capacity(WALK_ARMS);
+        for _ in 0..WALK_ARMS {
+            let (a, b) = (nonzero(rng), nonzero(rng));
+            let pt = g.scalar_mul(&a, &a_fe).add(&q.scalar_mul(&b, &a_fe), &a_fe);
+            arms.push((pt, a, b));
+        }
+        let (a, b) = (nonzero(rng), nonzero(rng));
+        let r = g.scalar_mul(&a, &a_fe).add(&q.scalar_mul(&b, &a_fe), &a_fe);
+        SampleWalk {
+            r,
+            a,
+            b,
+            arms,
+            steps: 0,
+        }
+    }
+
+    fn restart<R: rand::RngCore>(
+        &mut self,
+        curve: &CurveParams,
+        g: &Point,
+        q: &Point,
+        rng: &mut R,
+    ) {
+        use num_bigint::RandBigInt;
+        let a_fe = curve.a_fe();
+        let nonzero = |rng: &mut R| loop {
+            let v = rng.gen_biguint_below(&curve.n);
+            if !v.is_zero() {
+                break v;
+            }
+        };
+        let (a, b) = (nonzero(rng), nonzero(rng));
+        self.r = g.scalar_mul(&a, &a_fe).add(&q.scalar_mul(&b, &a_fe), &a_fe);
+        self.a = a;
+        self.b = b;
+        self.steps = 0;
+    }
+
+    fn step(&mut self, curve: &CurveParams) {
+        let a_fe = curve.a_fe();
+        self.steps += 1;
+        let k = match &self.r {
+            Point::Affine { x, .. } => {
+                (x.value.iter_u64_digits().next().unwrap_or(0) as usize) % WALK_ARMS
+            }
+            Point::Infinity => 0,
+        };
+        let (pt, ak, bk) = &self.arms[k];
+        self.r = self.r.add(pt, &a_fe);
+        self.a = (&self.a + ak) % &curve.n;
+        self.b = (&self.b + bk) % &curve.n;
+    }
+}
+
+/// Table lookup on an r-adding walk instead of fresh random (a, b).
+fn find_one_relation_table_walk<R: rand::RngCore>(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    table: &PairSumTable,
+    walk: &mut SampleWalk,
+    max_trials: usize,
+    rng: &mut R,
+) -> Option<(Relation, usize)> {
+    for trial in 1..=max_trials {
+        if walk.steps >= WALK_RESTART || matches!(walk.r, Point::Infinity) {
+            walk.restart(curve, g, q, rng);
+        }
+        walk.step(curve);
+        let key = match &walk.r {
+            Point::Affine { x, y } => (x.value.clone(), y.value.clone()),
+            Point::Infinity => continue,
+        };
+        if let Some(&(i, s_i, j, s_j)) = table.get(&key) {
+            let mut entries = Vec::new();
+            if i == j {
+                let combined = s_i + s_j;
+                if combined != 0 {
+                    entries.push((i, combined));
+                }
+            } else {
+                entries.push((i, s_i));
+                entries.push((j, s_j));
+            }
+            return Some((
+                Relation {
+                    coef_a: walk.a.clone(),
+                    coef_b: walk.b.clone(),
                     entries,
                 },
                 trial,
@@ -1845,6 +2017,12 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     } else {
         None
     };
+    // Experimental: IC_WALK=1 (with IC_SUM_TABLE=1) samples along an r-adding walk.
+    let mut walk = if sum_table.is_some() && std::env::var("IC_WALK").as_deref() == Ok("1") {
+        Some(SampleWalk::new(curve, g, q, rng))
+    } else {
+        None
+    };
     let mut relations = Vec::with_capacity(target);
     let mut attempts_exhausted = 0usize;
     let mut trials_per_relation: Vec<usize> = Vec::with_capacity(target);
@@ -1854,6 +2032,15 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
         let found = 'attempt: {
             for _ in 0..max_relation_attempts {
                 let attempt = match &sum_table {
+                    Some(t) if walk.is_some() => find_one_relation_table_walk(
+                        curve,
+                        g,
+                        q,
+                        t,
+                        walk.as_mut().expect("walk checked"),
+                        max_trials_per_relation,
+                        rng,
+                    ),
                     Some(t) => find_one_relation_table_with_rng(
                         curve,
                         g,
@@ -2213,6 +2400,53 @@ mod tests {
             expect.sort();
             expect.dedup();
             assert_eq!(found_sorted, expect, "roots {roots:?}");
+        }
+    }
+
+    /// `Point::double_scalar_mul_vartime` equals two ladders plus an add,
+    /// including `Q = -G` and zero scalars.
+    #[test]
+    fn point_double_scalar_mul_vartime_matches_two_ladders() {
+        let curve = tiny_curve();
+        let a_fe = curve.a_fe();
+        let g = curve.generator();
+        let q = g.scalar_mul(&BigUint::from(190u32), &a_fe);
+        let neg_g = g.scalar_mul(&(&curve.n - BigUint::one()), &a_fe);
+        for other in [&q, &neg_g, &g] {
+            for a in 0u32..60 {
+                for b in 0u32..60 {
+                    let (a, b) = (BigUint::from(a * 5), BigUint::from(b * 13 + (a % 3)));
+                    let want = g
+                        .scalar_mul(&a, &a_fe)
+                        .add(&other.scalar_mul(&b, &a_fe), &a_fe);
+                    assert_eq!(g.double_scalar_mul_vartime(&a, other, &b, &a_fe), want);
+                }
+            }
+        }
+    }
+
+    /// Shamir interleaving equals two separate ladders plus an add.
+    #[test]
+    fn double_scalar_mul_matches_two_ladders() {
+        let curve = tiny_curve();
+        let a_fe = curve.a_fe();
+        let g = curve.generator();
+        let q = g.scalar_mul(&BigUint::from(190u32), &a_fe);
+        for a in 0u32..40 {
+            for b in 0u32..40 {
+                let (a, b) = (BigUint::from(a * 7 + 1), BigUint::from(b * 11 + 3));
+                let want = g.scalar_mul(&a, &a_fe).add(&q.scalar_mul(&b, &a_fe), &a_fe);
+                assert_eq!(double_scalar_mul_vartime(&g, &a, &q, &b, &a_fe), want);
+            }
+        }
+        // Q = -G makes G + Q the identity; the pass must still be exact.
+        let neg_g = g.scalar_mul(&(&curve.n - BigUint::one()), &a_fe);
+        for (a, b) in [(5u32, 3u32), (9, 9), (1, 0), (0, 4)] {
+            let (a, b) = (BigUint::from(a), BigUint::from(b));
+            let want = g
+                .scalar_mul(&a, &a_fe)
+                .add(&neg_g.scalar_mul(&b, &a_fe), &a_fe);
+            assert_eq!(double_scalar_mul_vartime(&g, &a, &neg_g, &b, &a_fe), want);
         }
     }
 

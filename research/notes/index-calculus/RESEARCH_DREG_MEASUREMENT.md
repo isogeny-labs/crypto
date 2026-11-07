@@ -1110,3 +1110,17 @@ F4_F2_MAX_ROWS=2000000 F4_F2_MAX_COLS=200000 \
   so the registered two-sided verdict is no detected difference (p = 1.0)
   (`research/dreg_m4_link_guess_d3_20261106/RESULTS.md`). Unverified
   assertion until a pcc verdict exists.
+
+## Which guesses decide refutation at m = 4 (2026-11-06)
+
+- With the ten guesses of the m = 4 degree-3 design in place, no link-1 guess
+  changes refutation on any of 16 arm-draws; guessing only the essential ones
+  (one to three, on links 2 and 3) keeps every refutation on 7 of 13
+  (`research/dreg_m4_guess_bits_20261106/RESULTS.md`). Unverified assertion
+  until a pcc verdict exists.
+
+## Two guesses at (22, 8) (2026-11-07)
+
+- S3 or L3 without `e₁[0]` suffices at degree 4 on 1 of 12 draws (draw 6),
+  against 6–7 with three guesses (`research/dreg_two_guess_20261106/RESULTS.md`).
+  Unverified assertion until a pcc verdict exists.

@@ -246,6 +246,7 @@ jobs:
             /Cargo.lock
             /.cargo/
             /.github/scripts/
+            /.github/workflows/ecbench.yml
             /build.rs
             /rustfmt.toml
             /clippy.toml
@@ -307,11 +308,39 @@ jobs:
           mapfile -t artifact_sessions < "$RUNNER_TEMP/ecbench-sessions.txt"
           test "${#artifact_sessions[@]}" -gt 0
           python3 tools/artifacts/artifacts.py pull --jobs 16 "${artifact_sessions[@]}"
-      - name: Committed sessions are evidence and are never edited
+      - name: Test audit download partitioning
+        run: python3 .github/scripts/test_ecbench_download_shard.py
+      - name: Plan audit downloads once from hydrated sessions
         if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+        run: |
+          python3 .github/scripts/ecbench-download-shard.py "$RUNNER_TEMP/ecbench-sessions.txt" \
+            --shards 16 --output "$RUNNER_TEMP/ecbench-audit-downloads"
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+        with:
+          name: ecbench-audit-downloads
+          path: ${{ runner.temp }}/ecbench-audit-downloads
+          if-no-files-found: error
+          retention-days: 1
+      - name: Committed sessions are evidence and are never edited
+        if: github.event_name == 'pull_request' || github.event_name == 'merge_group' || github.event_name == 'schedule'
         env:
           BASE: ${{ github.event.pull_request.base.sha || github.event.merge_group.base_sha }}
+          EVENT: ${{ github.event_name }}
         run: |
+          if [ "$EVENT" = schedule ]; then
+            # The weekly lane diffs against main as of the previous weekly
+            # run (7 days back on first-parent history), so a pointer-only
+            # edit that selected no PR audit is still caught within a week
+            # (sheriff SHF-20261106-a114e7, PPX-5).
+            git fetch --no-tags --shallow-since="$(date -u -d '9 days ago' +%Y-%m-%d)" origin "$GITHUB_SHA"
+            BASE=$(git rev-list -1 --first-parent --before="$(date -u -d '7 days ago' +%Y-%m-%dT%H:%M:%SZ)" "$GITHUB_SHA")
+            if [ -z "$BASE" ]; then
+              echo "::error::weekly lane: no main commit 7 days back to diff committed sessions against" >&2
+              exit 1
+            fi
+            echo "weekly lane: committed sessions diffed against $BASE"
+          fi
           git fetch --no-tags --depth=1 origin "$BASE"
           mapfile -t sessions < "$RUNNER_TEMP/ecbench-sessions.txt"
           # Every session directory by schema, plus any session.json or
@@ -831,7 +860,9 @@ jobs:
     needs: [scope, harness]
     runs-on: ubuntu-24.04
     timeout-minutes: 40
-    # Setup (session listing and artifact pull) takes ~8-10 min per shard and
+    # Download only the harness-assigned shard; every pinned exception remains
+    # in every shard. Previously all 16 jobs downloaded the full collection.
+    # Setup (session listing and artifact pull) took ~8-10 min per shard and
     # the heaviest shard's audit ran past 15 min on 2026-11-05 (shard 8 of
     # run 42063872441 was cancelled at the old 25-min cap), so the job allows
     # 40 min and the validation step 30.
@@ -859,22 +890,19 @@ jobs:
             /research/notes/ecc2k130/full_rank_compact_orbit_ic_20261003/
             /tools/artifacts/
             /.artifacts/
-      - name: Check out and list every committed ecbench session
+      - uses: actions/download-artifact@v4
+        with:
+          name: ecbench-audit-downloads
+          path: ${{ runner.temp }}/ecbench-audit-shards
+      - name: Check out only this shard and the pinned exceptions
+        env:
+          SHARD: ${{ matrix.shard }}
         run: |
-          list="$RUNNER_TEMP/ecbench-sessions.txt"
-          mapfile -t candidates < <(git ls-tree -r --name-only HEAD | sed -n 's#/session\.json$##p')
-          test "${#candidates[@]}" -gt 0 || { echo '::error::no session.json in the tree'; exit 1; }
-          printf '/%s/\n' "${candidates[@]}" | git sparse-checkout add --stdin
-          : > "$list"
-          for d in "${candidates[@]}"; do
-            test -f "$d/session.json" || { echo "::error::$d/session.json was not checked out"; exit 1; }
-            if jq -e '.schema == "ecbench.session/v1"' "$d/session.json" > /dev/null; then
-              echo "$d" >> "$list"
-            fi
-          done
-          test -s "$list" || { echo '::error::no committed ecbench sessions found'; exit 1; }
-          echo "$(wc -l < "$list") committed ecbench sessions (by schema)" | tee -a "$GITHUB_STEP_SUMMARY"
-      - name: Pull every discovered committed session from the artifact store
+          cp "$RUNNER_TEMP/ecbench-audit-shards/${SHARD}.txt" "$RUNNER_TEMP/ecbench-sessions.txt"
+          test -s "$RUNNER_TEMP/ecbench-sessions.txt"
+          while IFS= read -r dir; do printf '/%s/\n' "$dir"; done \
+            < "$RUNNER_TEMP/ecbench-sessions.txt" | git sparse-checkout add --stdin
+      - name: Pull only the assigned sessions from the artifact store
         shell: bash
         working-directory: ${{ github.workspace }}
         env:
@@ -905,11 +933,11 @@ jobs:
         # each shard verifies every assigned session and the matrix covers all.
         timeout-minutes: 30
         env:
-          AUDIT_SHARD: ${{ matrix.shard }}/16
+          AUDIT_SHARD: 0/1
         run: |
           chmod +x target/release/ecbench
           bash .github/scripts/ecbench-audit-sessions.sh "$RUNNER_TEMP/ecbench-sessions.txt"
-          echo 'PR evidence validation: every committed ecbench session with complete inputs (by schema) hash/seal/answer audited; four hash-pinned scratch sessions lacking spec/host capsules remain incomplete. Fresh smoke sessions exercise deterministic replay; exhaustive historical replay belongs to the manual exhaustive lane.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'PR evidence validation: every assigned ecbench session with complete inputs (by schema) hash/seal/answer audited; four hash-pinned scratch sessions lacking spec/host capsules remain incomplete. Fresh smoke sessions exercise deterministic replay; exhaustive historical replay belongs to the manual exhaustive lane.' >> "$GITHUB_STEP_SUMMARY"
 
   # A pull request audits every committed session with --replay 0, so a change
   # to what a registered method counts used to merge green while the committed
