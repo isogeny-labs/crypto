@@ -895,6 +895,54 @@ pub fn build_factor_base_projected(
     out
 }
 
+/// `aG + bQ` by one interleaved (Shamir) double-and-add pass over both
+/// scalars, with `G + Q` precomputed: about `max(bits)` doublings and `3/4`
+/// of that many additions, against two separate ladders plus a final add.
+/// Variable time (public scalars).  The result equals
+/// `g.scalar_mul(a) + q.scalar_mul(b)` exactly.
+pub fn double_scalar_mul_vartime(
+    g: &Point,
+    a: &BigUint,
+    q: &Point,
+    b: &BigUint,
+    a_fe: &FieldElement,
+) -> Point {
+    let gq = g.add_vartime(q, a_fe);
+    let bits = a.bits().max(b.bits());
+    let mut acc = Point::Infinity;
+    for i in (0..bits).rev() {
+        acc = acc.double_vartime(a_fe);
+        match (a.bit(i), b.bit(i)) {
+            (true, true) => acc = acc.add_vartime(&gq, a_fe),
+            (true, false) => acc = acc.add_vartime(g, a_fe),
+            (false, true) => acc = acc.add_vartime(q, a_fe),
+            (false, false) => {}
+        }
+    }
+    acc
+}
+
+/// `R = aG + bQ` for the relation search.  `IC_SHAMIR=1` selects
+/// [`double_scalar_mul_vartime`], `IC_SHAMIR=2` the variable-time control;
+/// the default is the two separate ladders.
+fn relation_point(g: &Point, a: &BigUint, q: &Point, b: &BigUint, a_fe: &FieldElement) -> Point {
+    // 0 (default): two `scalar_mul` ladders and `add`; 1: one interleaved
+    // pass; 2: control, two `scalar_mul_vartime` ladders and `add_vartime`
+    // (separates the arithmetic path from the interleaving).
+    static MODE: std::sync::OnceLock<u8> = std::sync::OnceLock::new();
+    match *MODE.get_or_init(|| match std::env::var("IC_SHAMIR").as_deref() {
+        Ok("1") => 1,
+        Ok("2") => 2,
+        _ => 0,
+    }) {
+        1 => double_scalar_mul_vartime(g, a, q, b, a_fe),
+        2 => g
+            .scalar_mul_vartime(a, a_fe)
+            .add_vartime(&q.scalar_mul_vartime(b, a_fe), a_fe),
+        _ => g.scalar_mul(a, a_fe).add(&q.scalar_mul(b, a_fe), a_fe),
+    }
+}
+
 // ── Relation finding ────────────────────────────────────────────────────
 
 /// One row of the index-calculus linear system.
@@ -990,9 +1038,7 @@ fn find_one_relation_sweep_with_index<R: rand::RngCore>(
         let a = sample_nonzero();
         let b = sample_nonzero();
         // R = aG + bQ.  Use the variable-time ladder (public k, fine).
-        let ag = g.scalar_mul(&a, &a_fe);
-        let bq = q.scalar_mul(&b, &a_fe);
-        let r = ag.add(&bq, &a_fe);
+        let r = relation_point(g, &a, q, &b, &a_fe);
         let xr = match &r {
             Point::Affine { x, .. } => x.clone(),
             Point::Infinity => continue,
@@ -1776,7 +1822,7 @@ fn find_one_relation_table_with_rng<R: rand::RngCore>(
         };
         let a = sample_nonzero();
         let b = sample_nonzero();
-        let r = g.scalar_mul(&a, &a_fe).add(&q.scalar_mul(&b, &a_fe), &a_fe);
+        let r = relation_point(g, &a, q, &b, &a_fe);
         let key = match &r {
             Point::Affine { x, y } => (x.value.clone(), y.value.clone()),
             Point::Infinity => continue,
@@ -2213,6 +2259,31 @@ mod tests {
             expect.sort();
             expect.dedup();
             assert_eq!(found_sorted, expect, "roots {roots:?}");
+        }
+    }
+
+    /// Shamir interleaving equals two separate ladders plus an add.
+    #[test]
+    fn double_scalar_mul_matches_two_ladders() {
+        let curve = tiny_curve();
+        let a_fe = curve.a_fe();
+        let g = curve.generator();
+        let q = g.scalar_mul(&BigUint::from(190u32), &a_fe);
+        for a in 0u32..40 {
+            for b in 0u32..40 {
+                let (a, b) = (BigUint::from(a * 7 + 1), BigUint::from(b * 11 + 3));
+                let want = g.scalar_mul(&a, &a_fe).add(&q.scalar_mul(&b, &a_fe), &a_fe);
+                assert_eq!(double_scalar_mul_vartime(&g, &a, &q, &b, &a_fe), want);
+            }
+        }
+        // Q = -G makes G + Q the identity; the pass must still be exact.
+        let neg_g = g.scalar_mul(&(&curve.n - BigUint::one()), &a_fe);
+        for (a, b) in [(5u32, 3u32), (9, 9), (1, 0), (0, 4)] {
+            let (a, b) = (BigUint::from(a), BigUint::from(b));
+            let want = g
+                .scalar_mul(&a, &a_fe)
+                .add(&neg_g.scalar_mul(&b, &a_fe), &a_fe);
+            assert_eq!(double_scalar_mul_vartime(&g, &a, &neg_g, &b, &a_fe), want);
         }
     }
 
