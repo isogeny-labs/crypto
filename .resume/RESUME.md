@@ -27,7 +27,9 @@ are committed on this branch. No Modal run yet. Modal credentials are in the ses
    (it does not for a Modal-only run), session log, PR.
 
 ## Runs in flight
-None.
+k = 20 development screen (owner target 1.3x matched rho at k = 20 and 24, C >= 2; k = 24 is below the two-seed floor, so k = 20 is the real target). Under benchrec record in scratchpad reck20, branch claude/curve25519-k20.
+Spec: research/curve25519_autolab_20261104/k20/spec-screen.json (22 arms, five dev curves). Confirmation curves: k20/confirm-curves.json (five fresh siblings, untouched).
+Next: pick ONE arm from the screen, pre-register it, run it vs inc and rho-neg on the confirm curves (>= 5 curves, 12 targets x 2 rounds), score on the five-curve mean. Do not pick a curve; do not touch C = 1 or the rho reference.
 
 ## Stop and success conditions
 One Modal launch, 2 h function timeout, expected under 30 min. Any selftest failure stops throughput.
