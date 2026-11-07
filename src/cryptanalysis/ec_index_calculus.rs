@@ -923,13 +923,23 @@ pub fn double_scalar_mul_vartime(
 }
 
 /// `R = aG + bQ` for the relation search.  `IC_SHAMIR=1` selects
-/// [`double_scalar_mul_vartime`]; the default is the two separate ladders.
+/// [`double_scalar_mul_vartime`], `IC_SHAMIR=2` the variable-time control;
+/// the default is the two separate ladders.
 fn relation_point(g: &Point, a: &BigUint, q: &Point, b: &BigUint, a_fe: &FieldElement) -> Point {
-    static SHAMIR: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
-    if *SHAMIR.get_or_init(|| std::env::var("IC_SHAMIR").as_deref() == Ok("1")) {
-        double_scalar_mul_vartime(g, a, q, b, a_fe)
-    } else {
-        g.scalar_mul(a, a_fe).add(&q.scalar_mul(b, a_fe), a_fe)
+    // 0 (default): two `scalar_mul` ladders and `add`; 1: one interleaved
+    // pass; 2: control, two `scalar_mul_vartime` ladders and `add_vartime`
+    // (separates the arithmetic path from the interleaving).
+    static MODE: std::sync::OnceLock<u8> = std::sync::OnceLock::new();
+    match *MODE.get_or_init(|| match std::env::var("IC_SHAMIR").as_deref() {
+        Ok("1") => 1,
+        Ok("2") => 2,
+        _ => 0,
+    }) {
+        1 => double_scalar_mul_vartime(g, a, q, b, a_fe),
+        2 => g
+            .scalar_mul_vartime(a, a_fe)
+            .add_vartime(&q.scalar_mul_vartime(b, a_fe), a_fe),
+        _ => g.scalar_mul(a, a_fe).add(&q.scalar_mul(b, a_fe), a_fe),
     }
 }
 
