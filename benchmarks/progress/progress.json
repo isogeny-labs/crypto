@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261107T2153Z-curve25519-f1-targetwalk-k24",
+  "latest_record": "20261107T2145Z-split-prime-p1-rr-dickson",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 51,
+    "measured": 53,
     "open": 0
   },
   "repo": "crypto",
@@ -2613,6 +2613,137 @@
       ],
       "problem": "ic:curve25519-k24-single-target",
       "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 8.0,
+      "latest": 8.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "capped_jobs",
+      "points": [
+        {
+          "commit": "72004b435c02",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 40,
+          "record": "20261107T2145Z-split-prime-p1-rr-dickson",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P1 RR vs cherry-tree T with a Dickson-torus tower at T24, T31: RR lower D and narrower matrices at m3 t3, t4 on both primes (frozen rule 5); m5 t3 undecided (T capped at 1.5 GiB); D identical to the Kummer tower",
+          "value": 8.0
+        }
+      ],
+      "problem": "ic:split-prime-p1-rr-dickson-torus",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.93,
+      "latest": 0.93,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "coverage_law_max_deviation",
+      "points": [
+        {
+          "commit": "72004b435c02",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 36,
+          "record": "20261107T2144Z-split-prime-p2-twist-coset",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P2 twist-pure coset selection on prime-order curves at 2^20, 2^24: F4 cost coset-independent (max 0.39 %), coverage law within 0.93 %, 0 purity violations, gain >= 2.25 at t=4 (stage level, frozen rule 4)",
+          "value": 0.93
+        }
+      ],
+      "problem": "ic:split-prime-p2-twist-coset-toy",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 0.39,
+      "latest": 0.39,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "f4_work_rel_diff_selected_vs_random_max",
+      "points": [
+        {
+          "commit": "72004b435c02",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 12,
+          "record": "20261107T2144Z-split-prime-p2-twist-coset",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P2 twist-pure coset selection on prime-order curves at 2^20, 2^24: F4 cost coset-independent (max 0.39 %), coverage law within 0.93 %, 0 purity violations, gain >= 2.25 at t=4 (stage level, frozen rule 4)",
+          "value": 0.39
+        }
+      ],
+      "problem": "ic:split-prime-p2-twist-coset-toy",
+      "unit": "percent"
+    },
+    {
+      "better": "higher",
+      "first": 2.25,
+      "latest": 2.25,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "gain_min_t4",
+      "points": [
+        {
+          "commit": "72004b435c02",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 8,
+          "record": "20261107T2144Z-split-prime-p2-twist-coset",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P2 twist-pure coset selection on prime-order curves at 2^20, 2^24: F4 cost coset-independent (max 0.39 %), coverage law within 0.93 %, 0 purity violations, gain >= 2.25 at t=4 (stage level, frozen rule 4)",
+          "value": 2.25
+        }
+      ],
+      "problem": "ic:split-prime-p2-twist-coset-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "purity_nontrivial_violations",
+      "points": [
+        {
+          "commit": "72004b435c02",
+          "date": "2026-11-07",
+          "derived": {},
+          "n": 24,
+          "record": "20261107T2144Z-split-prime-p2-twist-coset",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P2 twist-pure coset selection on prime-order curves at 2^20, 2^24: F4 cost coset-independent (max 0.39 %), coverage law within 0.93 %, 0 purity violations, gain >= 2.25 at t=4 (stage level, frozen rule 4)",
+          "value": 0.0
+        }
+      ],
+      "problem": "ic:split-prime-p2-twist-coset-toy",
+      "unit": "count"
     },
     {
       "better": "neutral",
