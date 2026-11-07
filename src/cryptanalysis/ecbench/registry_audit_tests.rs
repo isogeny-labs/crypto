@@ -298,7 +298,11 @@ const CASES: &[(&str, Fx, P)] = &[
         ],
     ),
     ("ic.tensor_contraction_v1", Fx::Prime10, &[("m", "3")]),
-    ("ic.tensor_contraction_cofactor_v1", Fx::Cofactor2, &[("m", "2")]),
+    (
+        "ic.tensor_contraction_cofactor_v1",
+        Fx::Cofactor2,
+        &[("m", "2")],
+    ),
     (
         "ic.prime_orbit_relations_v1",
         Fx::Prime18,
