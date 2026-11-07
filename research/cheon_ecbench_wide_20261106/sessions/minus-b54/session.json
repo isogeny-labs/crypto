@@ -1,19 +1,19 @@
 {
   "schema": "ecbench.session/v1",
-  "session_id": "ECBS1hdfbec79c5d42",
+  "session_id": "ECBS1h854c777af927",
   "label": "cheon-ecbench wide, minus: 14 P-224-shaped curves of 36 to 62 bits, 24 targets each — chunk: the 54-bit curve only",
   "spec_id": "ECS1hcb6e1101b4a4",
   "spec_sha256": "cb6e1101b4a4de3cc138c835b4a89a62047a7e2ffcd4f1d46476175e484d6266",
-  "env_class_id": "ECBENV3hb0106e8bb1a3",
-  "host_sha256": "366e4c4645d0e8f6a3ade02348d857520dbb14c2af020a0fb48e6d9379cbf168",
+  "env_class_id": "ECBENV3h8d80c7bc4dfc",
+  "host_sha256": "028e1293b874e27d3ca2ef31d510c73b51e0b41ec973435bc762787d10010811",
   "plan_sha256": "4bda5e8ffbf2580cdf59527af15f04633a11f8a3ed5bbf35c5be4f57c3a5c565",
-  "binary_sha256": "8c2639b20e7f758d852cdaddd652e2c5ba2c06235bad7747ce5a5ec92bbd7499",
+  "binary_sha256": "d4df6333bcf94bc9feed8adaa725a801a48ce37489fbf06cbc7c04d87aa01db1",
   "git_commit": null,
   "git_dirty": null,
   "options": {
     "cpus": {
       "explicit": [
-        3
+        0
       ]
     },
     "lock_path": "/tmp/claude-0/-home-user-crypto/2a54bff3-908b-5431-b68f-58bfacb5aefc/scratchpad/lock-minus-b54",
@@ -28,80 +28,78 @@
     "exe": "/proc/self/exe"
   },
   "cpu_plan": {
-    "run_cpu": 3,
+    "run_cpu": 0,
     "reserved": [
-      3
+      0
     ],
     "node": 0,
     "request": {
       "explicit": [
-        3
+        0
       ]
     },
     "unreserved_siblings": [],
     "observed": [
-      3
+      0
     ]
   },
   "preflight": {
-    "quiet": false,
-    "reasons": [
-      "PSI cpu some avg10 23.74 > 5.00"
-    ],
+    "quiet": true,
+    "reasons": [],
     "settle_seconds": 2.0,
     "reserved_busy_seconds": {
-      "3": 0.0
+      "0": 0.0
     },
     "before": {
-      "unix_ms": 1794024931844,
+      "unix_ms": 1794034130753,
       "loadavg": [
-        0.82666015625,
-        0.7763671875,
-        0.37060546875
+        1.94970703125,
+        1.99462890625,
+        1.99462890625
       ],
-      "psi_cpu_some_avg10": 16.6,
-      "psi_cpu_some_total_us": 3927875,
+      "psi_cpu_some_avg10": 0.14,
+      "psi_cpu_some_total_us": 16824223,
       "psi_memory_some_avg10": 0.0,
-      "psi_memory_some_total_us": 0,
+      "psi_memory_some_total_us": 261334,
       "reserved_ticks": {
-        "3": {
-          "busy": 1389,
-          "idle": 25802,
-          "steal": 9
+        "0": {
+          "busy": 223353,
+          "idle": 34375,
+          "steal": 1632
         }
       }
     },
     "after": {
-      "unix_ms": 1794024933850,
+      "unix_ms": 1794034132757,
       "loadavg": [
-        0.82666015625,
-        0.7763671875,
-        0.37060546875
+        1.94970703125,
+        1.99462890625,
+        1.99462890625
       ],
-      "psi_cpu_some_avg10": 23.74,
-      "psi_cpu_some_total_us": 5934101,
+      "psi_cpu_some_avg10": 0.3,
+      "psi_cpu_some_total_us": 16839063,
       "psi_memory_some_avg10": 0.0,
-      "psi_memory_some_total_us": 0,
+      "psi_memory_some_total_us": 261334,
       "reserved_ticks": {
-        "3": {
-          "busy": 1389,
-          "idle": 26002,
-          "steal": 9
+        "0": {
+          "busy": 223353,
+          "idle": 34575,
+          "steal": 1632
         }
       }
     }
   },
   "eviction": {
-    "moved_count": 82,
+    "moved_count": 62,
     "failed_user_threads": 0,
     "failed_kernel_threads": 30,
-    "irq_moved": 23,
+    "irq_moved": 11,
     "irq_unmovable": 6,
     "irq_note": "irq 36: Operation not permitted (os error 1)"
   },
   "runner_on_run_cpu": false,
   "runner_cpus": [
-    0
+    2
   ],
   "ticks_per_second": 100,
   "grading_version": 3,
@@ -119,20 +117,14 @@
     "RUST_BACKTRACE": "0",
     "RUST_MIN_STACK": "8388608"
   },
-  "started_unix_ms": 1794024933852,
-  "finished_unix_ms": 1794024949070,
-  "status": "interrupted",
+  "started_unix_ms": 1794034132760,
+  "finished_unix_ms": null,
+  "status": "running",
   "executions_planned": 48,
   "records_written": 1,
-  "records_sha256": "c689c202903d6960d27d440207fdd90c0d21807b8b5b774126ee085f6a8201c7",
+  "records_sha256": null,
   "status_counts": {
-    "interrupted": 1
+    "verified": 1
   },
-  "last_seq": 0,
-  "stop": {
-    "kind": "interrupt",
-    "seq": 0,
-    "signal": 15,
-    "message": "interrupted by signal 15"
-  }
+  "last_seq": 0
 }
