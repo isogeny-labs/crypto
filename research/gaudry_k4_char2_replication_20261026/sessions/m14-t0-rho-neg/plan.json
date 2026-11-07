@@ -1,0 +1,69 @@
+{
+  "schema": "ecbench.plan/v1",
+  "spec_id": "ECS1hd4e3c407a6fb",
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation_f2m4_refmm",
+        "family": "rho",
+        "params": {
+          "cap_multiple": "64"
+        },
+        "method_id": "ECM1h085e1add1afb",
+        "method_sha256": "085e1add1afb8a1307c9b38b3b7d65c24c81dbd4db31c9ad2c53644c8a43adec",
+        "entry": "ic_wide::rho_negation_tallied + ecbench::f2m4_price"
+      }
+    }
+  ],
+  "workloads": [
+    {
+      "workload_id": "Wff34bbc4fab8",
+      "workload_sha256": "ff34bbc4fab88666a250d3de4d5a952f9c3cc59a35828177f5f7aaa061193656",
+      "curve_spec": {
+        "kind": "f2m4_torsion",
+        "m": 14,
+        "seed": 1,
+        "max_cofactor": 2
+      },
+      "curve": {
+        "slug": "icv1-f2m56-tm338854401-5d597dcf",
+        "icv1": "ICV1:f2m-56-14e93580:-338854401:72057594376782338:0xb4a93ce3c2852f:unk:unk:r:5d597dcf8ce1",
+        "family": "extension",
+        "construction": "gaudry_quartic_bin::find_bin_curve(14, 1, 2)",
+        "field_degree": null,
+        "field_bits": 14,
+        "group_order": 72057594376782338,
+        "r": 36028797188391169,
+        "cofactor": 2,
+        "generator": [
+          "0xe0dd7d3c62c470",
+          "0x50a3c2d0bd813d"
+        ],
+        "automorphisms_available": 2,
+        "registered": false,
+        "ec1": null,
+        "curve_uid": null
+      },
+      "target_law": "uniform_scalar_sha256_v1",
+      "target_seed": 7799745981339204865,
+      "target_index": 0,
+      "target": [
+        "0x46fbff25c0462e",
+        "0xfce559ca30bc6d"
+      ],
+      "planted": 26552834860501435
+    }
+  ],
+  "executions": [
+    {
+      "seq": 0,
+      "round": 0,
+      "warmup": false,
+      "arm": 0,
+      "workload": 0,
+      "algorithm_seed": 12694637458855951315
+    }
+  ]
+}
