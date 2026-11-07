@@ -19,7 +19,12 @@ left() { echo $(( DEADLINE_EPOCH - $(date +%s) )); }
 ( while [ "$(left)" -gt 120 ]; do sleep 60; done; log "deadline"; pkill -TERM -f dreg_linear_guess; pkill -TERM -f hky_window; sleep 30; finish deadline ) &
 log "pod ${RUNPOD_POD_ID:-?} start; deadline $(date -u -d @"$DEADLINE_EPOCH" +%FT%TZ)"
 { grep MemTotal /proc/meminfo; nproc; lscpu | grep 'Model name'; } >"$OUT/host.txt"
-apt-get update -qq >/dev/null 2>&1; apt-get install -y -qq jq >/dev/null 2>&1
+apt-get update -qq >/dev/null 2>&1; apt-get install -y -qq jq build-essential pkg-config libssl-dev curl >/dev/null 2>&1
+if ! command -v cargo >/dev/null; then
+  curl -sSf https://sh.rustup.rs -o "$W/rustup.sh" && sh "$W/rustup.sh" -y --profile minimal >"$OUT/rustup.log" 2>&1 || finish "rustup_failed"
+  . "$HOME/.cargo/env"
+fi
+rustc --version >>"$OUT/host.txt"
 curl -sS -m 600 -o "$W/src.tgz" "$SRC_URL" || finish "source_download_failed"
 echo "$SRC_SHA256  $W/src.tgz" | sha256sum -c - >>"$OUT/run.log" 2>&1 || finish "source_hash_mismatch"
 tar xzf "$W/src.tgz" -C "$SRC" && cd "$SRC" || finish "extract_failed"
