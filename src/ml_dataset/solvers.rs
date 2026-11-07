@@ -664,6 +664,11 @@ pub(super) fn verify_koblitz_m3_cell(
 pub(super) fn requested_channel_disposition(config:&CaseConfig)->Result<Option<Value>,String>{
     let Some(c)=&config.channels else {return Ok(None)};
     c.validate()?;
+    let owned_boolean_search=c.owned_boolean_search.as_ref().map(|r| {
+        let eligible=koblitz_m3::sat_original_owner::owned_search_worker::supported(config);
+        super::types::ChannelDisposition{request:r.clone(),status:if eligible{super::types::ChannelDispositionStatus::Requested}else{super::types::ChannelDispositionStatus::Unsupported},
+            reason:if eligible{super::types::ChannelDispositionReason::RequiresActualOwnedSearchReplay}else{super::types::ChannelDispositionReason::OutsideOwnedSearchProfile},execution_verified:false,training_export_admitted:false}
+    });
     let sat_search=c.sat_search.as_ref().map(|r| {
         let eligible=koblitz_m3::sat_original_owner::search_worker::supported(config);
         super::types::ChannelDisposition{request:r.clone(),status:if eligible{super::types::ChannelDispositionStatus::Requested}else{super::types::ChannelDispositionStatus::Unsupported},
@@ -695,7 +700,7 @@ pub(super) fn requested_channel_disposition(config:&CaseConfig)->Result<Option<V
             execution_verified:false,training_export_admitted:false}
     });
     Ok(Some(serde_json::to_value(super::types::RequestedChannelDispositions {
-        schema:"crypto.ml-dataset.requested-channels/v1".into(),sat_search,boolean_consequence:boolean,sat_initial:sat,affine_boolean_row,
+        schema:"crypto.ml-dataset.requested-channels/v1".into(),owned_boolean_search,sat_search,boolean_consequence:boolean,sat_initial:sat,affine_boolean_row,
     }).map_err(|e|e.to_string())?))
 }
 /// Historical replay allowance explicitly supplied by an authorized caller.

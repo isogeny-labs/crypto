@@ -37,8 +37,8 @@ impl<T:Owner> Meter<'_,T>{
 }
 /// Verifies one retained row, including rows from a capped scheduler attempt.
 /// A successful equality never upgrades a capped attempt to complete closure.
-/// Checker maximum envelope is prepaid on the SAME owner and same deadline.
-/// This conservative reservation is not an actual hardware instruction count.
+/// Checker resource increments are admitted on the SAME owner and deadline.
+/// Resource quotes are modeled work, not an actual hardware instruction count.
 pub fn certify(n:u32,g:&[Polynomial],row:&Row,limits:Limits,checker:bqi::Limits,deadline:Instant,owner:&mut impl Owner)->Certificate{
  let mut c=Certificate{raw:Vec::new(),charge:Charge::default(),audit:None,result:Ok(())};let mut m=Meter{owner,limits,deadline,charge:Charge::default()};
  c.result=(||{
@@ -50,9 +50,18 @@ pub fn certify(n:u32,g:&[Polynomial],row:&Row,limits:Limits,checker:bqi::Limits,
    m.number(&mut c.raw,t.generator)?;m.monowire(&mut c.raw,&t.multiplier)?;
   }
   m.pay(1,0)?;if c.raw.len()==limits.wire{return Err(Failure::Cap)}c.raw.push(b'\n');
-  let work=checker.caps.iter().try_fold(0u64,|a,b|a.checked_add(*b)).ok_or(Failure::Overflow)?;
-  m.pay(work,checker.caps[bqi::Resource::AllocationBytes as usize])?;
-  c.audit=Some(bqi::verify_untrusted(&c.raw,checker,deadline));
+  // Preserve the original work convention: all nine resource increments
+  // contribute work, and allocation increments additionally contribute bytes.
+  // A rejected request is retained in the BQI audit before we propagate its
+  // specific bridge refusal. The original owner ledger remains authoritative
+  // when an ancestor accepted a reservation before a failed postcheck.
+  let mut admission_failure=None;
+  let audit=bqi::verify_untrusted_admitted(&c.raw,checker,deadline,&mut |resource,amount|{
+   let bytes=if resource==bqi::Resource::AllocationBytes{amount}else{0};
+   m.pay(amount,bytes).map_err(|e|{admission_failure=Some(e);})
+  });
+  c.audit=Some(audit);
+  if let Some(e)=admission_failure{return Err(e)};
   m.pay(1,0)?;if c.audit.as_ref().unwrap().result.is_err(){return Err(Failure::Checker)}Ok(())
  })();c.charge=m.charge;c
 }

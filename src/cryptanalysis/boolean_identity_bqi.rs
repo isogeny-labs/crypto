@@ -90,6 +90,9 @@ pub enum Exhaustion {
     ArithmeticOverflow,
     Allocation,
     Deadline,
+    /// Original-owner admission refused this exact request. Its ancestor may
+    /// have reserved before a later postcheck failed; consult that owner ledger.
+    Admission { resource: Resource, amount: u64 },
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Failure {
@@ -112,12 +115,13 @@ pub struct Audit {
     pub source_authenticated: bool,
     pub native_operation_witness: bool,
 }
-struct Meter {
+struct Meter<'a> {
     limits: Limits,
     charges: Charges,
     deadline: Instant,
+    admission: Option<&'a mut dyn FnMut(Resource, u64) -> Result<(), ()>>,
 }
-impl Meter {
+impl Meter<'_> {
     fn charge(&mut self, resource: Resource, amount: u64) -> Result<(), Failure> {
         let probe = Resource::DeadlineProbes as usize;
         let next = self.charges.used[probe]
@@ -128,6 +132,7 @@ impl Meter {
                 Resource::DeadlineProbes,
             )));
         }
+        self.admit(Resource::DeadlineProbes, 1)?;
         self.charges.used[probe] = next;
         if Instant::now() >= self.deadline {
             return Err(Failure::Unknown(Exhaustion::Deadline));
@@ -139,7 +144,15 @@ impl Meter {
         if next > self.limits.caps[i] {
             return Err(Failure::Unknown(Exhaustion::Resource(resource)));
         }
+        self.admit(resource, amount)?;
         self.charges.used[i] = next;
+        Ok(())
+    }
+    fn admit(&mut self, resource: Resource, amount: u64) -> Result<(), Failure> {
+        if let Some(admission) = self.admission.as_mut() {
+            admission(resource, amount).map_err(|()|
+                Failure::Unknown(Exhaustion::Admission { resource, amount }))?;
+        }
         Ok(())
     }
     fn vector<T>(&mut self, count: usize) -> Result<Vec<T>, Failure> {
@@ -412,6 +425,7 @@ pub fn verify_untrusted(bytes: &[u8], limits: Limits, deadline: Instant) -> Audi
         limits,
         charges: Charges::default(),
         deadline,
+        admission: None,
     };
     let result = arithmetic(bytes, None, &mut meter);
     Audit {
@@ -422,10 +436,32 @@ pub fn verify_untrusted(bytes: &[u8], limits: Limits, deadline: Instant) -> Audi
     }
 }
 
+/// Incremental caller-owned admission before each accepted resource charge and
+/// before the corresponding computation/allocation. Local caps and the original
+/// absolute deadline remain unchanged. Callback contract: every successful
+/// return must enforce that SAME original deadline after its reservation and
+/// postchecks. This function does not impose a second unmetered clock probe
+/// around an arbitrary callback; the native bridge satisfies this contract via
+/// Meter::pay. Successful admissions contribute to the
+/// same nine counters as verify_untrusted. A refusal retains the exact request
+/// in Unknown(Admission); an ancestor may already have reserved before returning
+/// a postcheck failure, so this is not a claim that the parent spent zero.
+/// The caller must retain its original ledger, including that refused request.
+pub fn verify_untrusted_admitted(
+    bytes: &[u8], limits: Limits, deadline: Instant,
+    admission: &mut impl FnMut(Resource, u64) -> Result<(), ()>,
+) -> Audit {
+    let mut meter = Meter { limits, charges: Charges::default(), deadline,
+        admission: Some(admission) };
+    let result = arithmetic(bytes, None, &mut meter);
+    Audit { result, charges: meter.charges, source_authenticated: false,
+        native_operation_witness: false }
+}
+
 /// Private to the checked-map parent module. Expected source is supplied only
 /// after checked-map reconstruction; comparison itself does not mint authority.
 pub(super) fn verify_expected(bytes: &[u8], variables: u32, equations: &[Poly], limits: Limits, deadline: Instant) -> Audit {
-    let mut meter = Meter { limits, charges: Charges::default(), deadline };
+    let mut meter = Meter { limits, charges: Charges::default(), deadline, admission: None };
     let result = arithmetic(bytes, Some((variables, equations)), &mut meter);
     Audit { result, charges: meter.charges, source_authenticated: false, native_operation_witness: false }
 }

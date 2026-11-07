@@ -317,6 +317,7 @@ pub enum ChannelDispositionReason {
     RequiresActualSatInitialReplay, OutsideSatInitialProfile,
     RequiresActualAffineUnitRow, OutsideAffineUnitRowProfile,
     RequiresActualSatSearchReplay, OutsideSatSearchProfile,
+    RequiresActualOwnedSearchReplay, OutsideOwnedSearchProfile,
 }
 #[derive(Clone,Debug,Serialize,Deserialize,PartialEq,Eq)]
 #[serde(deny_unknown_fields)]
@@ -327,6 +328,8 @@ pub struct ChannelDisposition<T> {
 #[derive(Clone,Debug,Serialize,Deserialize,PartialEq,Eq)]
 #[serde(deny_unknown_fields)]
 pub struct RequestedChannelDispositions {
+    #[serde(default,skip_serializing_if="Option::is_none")]
+    pub owned_boolean_search:Option<ChannelDisposition<OwnedBooleanSearchRequest>>,
     #[serde(default,skip_serializing_if="Option::is_none")]
     pub sat_search:Option<ChannelDisposition<SatSearchRequest>>,
     pub schema:String,

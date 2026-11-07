@@ -16,6 +16,8 @@ mod ledger;
 mod transcript;
 #[path = "sat_search_central.rs"]
 mod search;
+#[path="owned_search_identity_capsule.rs"]
+mod owned_identity;
 /// Must be supplied by the separately authorized replay caller, never inferred
 /// from a successful producer prefix or reset after a failure.
 pub(in crate::ml_dataset::solvers) struct Policy {

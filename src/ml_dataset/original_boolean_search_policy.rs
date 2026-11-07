@@ -87,8 +87,8 @@ fn from_budget(budget: &Budget, requested_degree: u32) -> Result<Caps, Stop> {
         });
     }
     let wire = WIRE_MAX.min(usize::try_from(bytes).map_err(|_| Stop::Overflow)?);
-    // The proof checker prepays its whole envelope on the same owner. Its sum
-    // may still refuse against remaining shared work; no cap is raised to fit.
+    // The proof checker admits each actual modeled charge on the same owner.
+    // These remain local ceilings; shared work and memory can still refuse.
     let checker = bqi::Limits {
         variables: COUNT_MAX as u32,
         generators: count as u32,
