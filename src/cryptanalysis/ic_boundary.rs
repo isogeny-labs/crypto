@@ -2769,6 +2769,7 @@ pub fn rho_walk_with_policy<G: CountedGroup, C: RhoClasses<G>>(
             ops,
             start,
             continue_walks: false,
+            verify_ladder: Vec::new(),
         },
     )
 }
@@ -2793,6 +2794,40 @@ struct RhoSetup<G: CountedGroup> {
     /// Resume from each newly stored distinguished point instead of
     /// starting a new walk (`false` in every legacy walk).
     continue_walks: bool,
+    /// `[2^i]G` for `i < len`, already paid for in the set-up: the charged
+    /// check `[d]G` reads its low bits from here.  Empty in every legacy
+    /// walk (the check is then `g.mul(G, d)`, as before).
+    verify_ladder: Vec<G::Elt>,
+}
+
+/// `[d]G` from a ladder `[2^i]G`, `i < L`, as a counted operation sequence:
+/// one addition per set bit below `L` (the first is free), and for the
+/// bits at and above `L` one doubling of the top rung, a double-and-add of
+/// `d >> L`, and one addition.
+fn ladder_mul<G: CountedGroup>(g: &G, ops: &mut GroupOps, ladder: &[G::Elt], d: u64) -> G::Elt {
+    ops.scalar_mults += 1;
+    let len = ladder.len().min(63);
+    let mut acc: Option<G::Elt> = None;
+    for (i, rung) in ladder.iter().enumerate().take(len) {
+        if (d >> i) & 1 == 1 {
+            acc = Some(match acc {
+                None => *rung,
+                Some(a) => g.add(ops, a, *rung),
+            });
+        }
+    }
+    let high = d >> len;
+    if high > 0 {
+        let top = g.double(ops, ladder[len - 1]);
+        let part = g.mul(ops, top, high);
+        // `mul` counted itself as a scalar multiplication; this is one.
+        ops.scalar_mults -= 1;
+        acc = Some(match acc {
+            None => part,
+            Some(a) => g.add(ops, a, part),
+        });
+    }
+    acc.unwrap_or_else(|| g.identity())
 }
 
 /// The search of [`rho_walk_with_policy`] (and of [`rho_walk_v3`]): walks
@@ -2820,6 +2855,7 @@ fn rho_search_from<G: CountedGroup, C: RhoClasses<G>>(
         mut ops,
         start,
         continue_walks,
+        verify_ladder,
     } = s;
     let mut walker = TunedWalker::new(g, classes, r, jumps, &shape, walk).with_policy(policy);
     let mut table: FastMap<(u64, u64)> = fast_map(1024);
@@ -2871,7 +2907,11 @@ fn rho_search_from<G: CountedGroup, C: RhoClasses<G>>(
                     if let Some(inv) = invmod(den, r) {
                         let d = mulmod(num, inv, r);
                         let before = ops.gae();
-                        let check = g.mul(&mut ops, generator, d);
+                        let check = if verify_ladder.is_empty() {
+                            g.mul(&mut ops, generator, d)
+                        } else {
+                            ladder_mul(g, &mut ops, &verify_ladder, d)
+                        };
                         verification_ops += (ops.gae() - before) as u64;
                         if check == target {
                             recovered = Some(d);
@@ -2952,9 +2992,31 @@ pub struct RhoV3 {
     /// walk, Pollard's own) instead of paying a start; a walk lost in a
     /// cycle or ended on a stored point still restarts at the next `[k]T`.
     pub continue_walks: bool,
+    /// With `dp_bits = None`: take `round(½·log₂ F − 0.8)` distinguished-point
+    /// bits, `F = √(πr/2A)`, instead of the legacy `⌊bits(r)/4⌋` (which
+    /// assumes `A = 2`; with `A = 2n` it leaves walks of `r^{1/4}` steps
+    /// in a search of `√(πr/4n)`, the distinguished-point tail dominating).
+    pub dp_from_floor: bool,
+    /// Read the charged check `[d]G`'s low bits from the `G` ladder
+    /// (already paid for) instead of a fresh double-and-add.
+    pub ladder_verify: bool,
 }
 
 impl RhoV3 {
+    /// The signed-Frobenius table: [`RhoV3::negation`] with the
+    /// distinguished-point rule taken from the floor.
+    pub const fn frobenius() -> Self {
+        Self {
+            negation: true,
+            jumps: 0,
+            weight: 3,
+            ladder_bits: 0,
+            dp_bits: None,
+            continue_walks: false,
+            dp_from_floor: true,
+            ladder_verify: true,
+        }
+    }
     pub const fn negation() -> Self {
         Self {
             negation: true,
@@ -2963,6 +3025,8 @@ impl RhoV3 {
             ladder_bits: 0,
             dp_bits: None,
             continue_walks: false,
+            dp_from_floor: false,
+            ladder_verify: false,
         }
     }
     pub const fn plain() -> Self {
@@ -2973,6 +3037,8 @@ impl RhoV3 {
             ladder_bits: 0,
             dp_bits: None,
             continue_walks: false,
+            dp_from_floor: false,
+            ladder_verify: false,
         }
     }
 }
@@ -3031,10 +3097,18 @@ pub fn rho_walk_v3<G: CountedGroup, C: RhoClasses<G>>(
     } else {
         v3.ladder_bits.clamp(2, 28)
     } as usize;
+    let dp_bits = match (v3.dp_bits, v3.dp_from_floor) {
+        (Some(d), _) => Some(d),
+        (None, false) => None,
+        (None, true) => {
+            let f = generic_floor_ops(r as f64, classes.automorphisms().max(1) as f64);
+            Some((0.5 * f.log2() - 0.8).round().max(0.0) as u32)
+        }
+    };
     let walk = RhoWalk {
         negation: v3.negation,
         jumps: k,
-        dp_bits: v3.dp_bits,
+        dp_bits,
         look_ahead: v3.negation,
         cycle_window: 16,
     };
@@ -3176,6 +3250,7 @@ pub fn rho_walk_v3<G: CountedGroup, C: RhoClasses<G>>(
             ops,
             start,
             continue_walks: v3.continue_walks,
+            verify_ladder: if v3.ladder_verify { ladder_g } else { Vec::new() },
         },
     )
 }
@@ -4042,6 +4117,30 @@ pub fn signed_frobenius_rho_tuned_policy(
         max_steps,
         RhoWalk::negation(),
         policy,
+    ))
+}
+
+/// [`rho_walk_v3`] on a Koblitz instance's signed-Frobenius classes
+/// (`A = 2n`): the ladder-built table sized to `√(πr/4n)`, the `_v2`
+/// search.  `None` for any other curve.
+pub fn signed_frobenius_rho_v3(
+    inst: &BinaryInstance,
+    target: FastPoint,
+    seed: u64,
+    max_steps: u64,
+    v3: RhoV3,
+) -> Option<RhoResult> {
+    let classes = SignedFrobeniusClasses::new(inst)?;
+    let g = BinaryGroup(&inst.fast);
+    Some(rho_walk_v3(
+        &g,
+        &classes,
+        inst.generator,
+        target,
+        inst.r,
+        seed,
+        max_steps,
+        v3,
     ))
 }
 

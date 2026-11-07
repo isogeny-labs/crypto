@@ -65,7 +65,7 @@ use crate::cryptanalysis::glv_invariant_base::Endomorphism;
 use crate::cryptanalysis::group_op_count::OpCounts;
 use crate::cryptanalysis::ic_boundary::{
     ic_residual_batch_with, price_phase, rho_batch_with, rho_cap, rho_reference, rho_walk_v3,
-    rho_walk_with, rho_walk_with_policy, signed_frobenius_rho_tuned,
+    rho_walk_with, rho_walk_with_policy, signed_frobenius_rho_tuned, signed_frobenius_rho_v3,
     signed_frobenius_rho_tuned_policy, BinaryGroup, BinaryInstance, Calibration, CountedGroup,
     CubicClasses, FieldOps, GroupOps, NegationClasses, PhaseCost, PointClasses, PreprocessingRho,
     PrimeInstance, PrimePoint, QuarticClasses, RhoBatchResult, RhoResult, RhoV3, RhoWalk,
@@ -1320,6 +1320,14 @@ pub fn registry() -> &'static [MethodDecl] {
             params: RHO_PARAMS,
         },
         MethodDecl {
+            id: "rho.signed_frobenius_v3",
+            family: "rho",
+            summary: "rho.signed_frobenius_v2's search on signed-Frobenius classes (A = 2n, Koblitz curves only) with the v3 ladder-built table (k ≈ √(√(πr/4n)/2) jumps of three rungs), distinguished-point bits round(½·log₂F − 0.8) from the floor F = √(πr/4n) instead of ⌊bits(r)/4⌋, and the charged check [d]G read from the set-up's G ladder; every operation charged",
+            entry: "ic_boundary::signed_frobenius_rho_v3(RhoV3::frobenius())",
+            applies: Applies::KoblitzOnly,
+            params: RHO_PARAMS,
+        },
+        MethodDecl {
             id: "rho.plain_v3",
             family: "rho",
             summary: "rho.negation_v3's table and search on points (A = 1), no look-ahead",
@@ -1533,6 +1541,7 @@ pub fn expected_s(id: &str, a_available: u32) -> Option<f64> {
         "rho.frobenius_orbit" => Some((PI / 12.0).sqrt()),
         "rho.signed_frobenius"
         | "rho.signed_frobenius_v2"
+        | "rho.signed_frobenius_v3"
         | "rho.signed_frobenius_full"
         | "rho.signed_frobenius_v2_full"
         | "rho.signed_frobenius_strong"
@@ -3583,6 +3592,25 @@ fn solve_inner(
             solve_strong(m, i, FastPoint::affine(tx, ty), seed)
         }
         (Instance::Binary(i), "claw") => solve_claw(m, i, FastPoint::affine(tx, ty), seed),
+        (Instance::Binary(i), _) if m.id == "rho.signed_frobenius_v3" => {
+            let t = Instant::now();
+            measurement::begin_online(Phase::RhoSolve);
+            let res = signed_frobenius_rho_v3(
+                i,
+                FastPoint::affine(tx, ty),
+                seed,
+                rho_cap(i.r, param_u64(m, "cap_multiple")? as f64),
+                RhoV3::frobenius(),
+            )
+            .ok_or("not a Koblitz instance")?;
+            measurement::end_online();
+            Ok(rho_report_v2(
+                res,
+                t.elapsed().as_nanos() as u64,
+                None,
+                GroupOps::default(),
+            ))
+        }
         (Instance::Binary(i), _) if m.id == "rho.signed_frobenius_v2" => {
             let t = Instant::now();
             measurement::begin_online(Phase::RhoSolve);
@@ -9345,6 +9373,7 @@ mod accounting_rules_tests {
             ("rho.negation_v3", &[], true),
             ("rho.plain_v3", &[], true),
             ("rho.signed_frobenius_v2", &[], false),
+            ("rho.signed_frobenius_v3", &[], false),
             ("rho.signed_frobenius_strong_v2", &[], false),
             ("bsgs.textbook_v2", &[], true),
             ("bsgs.interleaved_v2", &[], true),
