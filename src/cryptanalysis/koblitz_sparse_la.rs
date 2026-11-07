@@ -340,14 +340,14 @@ pub struct FixedMul {
 
 impl FixedMul {
     #[inline]
-    fn new(w: u64, m: u64) -> Self {
+    pub(crate) fn new(w: u64, m: u64) -> Self {
         debug_assert!(w < m, "a fixed multiplier must be reduced");
         let ws = (m >> U64_MODULUS_BITS == 0).then(|| (((w as u128) << 64) / m as u128) as u64);
         Self { w, ws }
     }
 
     #[inline]
-    fn mul(self, t: u64, m: u64) -> u64 {
+    pub(crate) fn mul(self, t: u64, m: u64) -> u64 {
         match self.ws {
             Some(ws) => mulmod_shoup(self.w, ws, t, m),
             None => mulmod(self.w, t, m),
@@ -358,7 +358,7 @@ impl FixedMul {
     /// with the subtraction as a conditional move too
     /// (`a − p + m ∈ [1, 2m)` for residues `a`, `p`).
     #[inline]
-    fn sub_from(self, a: u64, t: u64, m: u64) -> u64 {
+    pub(crate) fn sub_from(self, a: u64, t: u64, m: u64) -> u64 {
         match self.ws {
             Some(ws) => fold_once(
                 a.wrapping_sub(mulmod_shoup(self.w, ws, t, m))
