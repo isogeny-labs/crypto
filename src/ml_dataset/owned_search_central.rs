@@ -10,6 +10,8 @@ mod sparse {
 #[path="owned_search_wire_decode.rs"] pub(super) mod wire;
 #[path="owned_search_semantic_check.rs"] mod semantic;
 #[path="owned_search_original_descent.rs"] mod descent;
+#[path="owned_search_checkpoint_selection.rs"] mod checkpoint_selection;
+#[path="owned_search_interrupted_outcome.rs"] mod interrupted_outcome;
 const ROLE:&str="boolean-original-owned-search-snapshot-chunk-v1";
 const MAX_SNAPSHOTS:usize=4096;
 const MAX_CHUNKS:usize=65536;
@@ -305,7 +307,19 @@ fn chunk_path(path:&str)->Result<(u32,u64,u64),String>{
 }
 fn check_snapshot_binding(s:&Snapshot,c:&owned_identity::Capsule,map_ack:&capture::CommittedEventPosition,map:&[u8],pattern:u32)->Result<(),String>{
  let root=s.decoded.as_ref().and_then(|d|d.value.as_ref()).ok_or("snapshot decode absent")?;
- if root.get("snapshot_index").and_then(wire::Value::as_u64)!=Some(s.index){return Err("wire snapshot index".into())}
+ check_identity_binding(root,s.index,c,map_ack,map,pattern)
+}
+/// Caller must reserve the same identity-check work/bytes as the complete path
+/// and check that same absolute deadline after these comparisons before use.
+/// This checks original identity only; it never grants row export admission.
+fn check_prefix_binding(a:&wire::strict_prefix::Audit,index:u64,c:&owned_identity::Capsule,map_ack:&capture::CommittedEventPosition,map:&[u8],pattern:u32)->Result<(),String>{
+ if a.result()!=Ok(wire::strict_prefix::State::IncompleteIdentityAvailable){return Err("wire prefix identity unavailable".into())}
+ let root=a.binding_prefix().ok_or("wire prefix identity absent")?;
+ check_identity_binding(root,index,c,map_ack,map,pattern)
+}
+/// Common complete-root/prefix binding checks under the caller's prior admission.
+fn check_identity_binding(root:&wire::Value,index:u64,c:&owned_identity::Capsule,map_ack:&capture::CommittedEventPosition,map:&[u8],pattern:u32)->Result<(),String>{
+ if root.get("snapshot_index").and_then(wire::Value::as_u64)!=Some(index){return Err("wire snapshot index".into())}
  let id=root.get("identity").ok_or("wire identity absent")?;
  for(k,h)in [("public_sha256",&c.public_sha256),("factor_sha256",&c.factor_sha256),("launch_sha256",&c.launch_sha256),("binding_sha256",&c.binding_sha256)]{
   let raw=id.get(k).and_then(wire::Value::as_bytes).ok_or("wire identity bytes")?;if raw.len()!=32||hex::encode(raw)!=*h{return Err("wire original identity mismatch".into())}
