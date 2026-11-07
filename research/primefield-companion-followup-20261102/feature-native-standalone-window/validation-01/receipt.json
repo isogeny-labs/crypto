@@ -1,0 +1,53 @@
+{
+  "scope": "standalone window software checks; no timing panel",
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "source_hashes": {
+    "feature-native-division/fixtures.tsv": "48349858d7a8c223201e0913a90a0411c877c8ff1c745221f579cd5196e6ca20",
+    "feature-native-division/lib.rs": "f1dde1055bd78ef0f9863bfbceeda76a384b8f15dfad3aba7715cb6591147f80",
+    "feature-native-half-gcd/class-tests.rs": "921b783c63dd8d4ca6448533691ab17bf5979175ae017e6036ad93a30e436013",
+    "feature-native-half-gcd/euclid-tests.rs": "0e82e9fa845d89007ab20432efd3ee19526ac11f3c61ee36dff1b398d9f212a5",
+    "feature-native-half-gcd/half-tests.rs": "6de0c96969a06d801211b9d4824011c7fb12bf60dd4ff966eb46afaa358f09c2",
+    "feature-native-half-gcd/polynomial.rs": "29c0cfc13dc353fa08fca5b58bbae771a53ecc259c7068dfee27a097bd94b2a9",
+    "feature-native-half-gcd/product-tests.rs": "6fad5ac86d8cecfae89a79cc66a2c34116e65538ff61d13ccf3d266789087432",
+    "feature-native-half-gcd/residual.rs": "95a55a569f70b0022d121bcf09e290b059a815d90e43aaf9ef31be56daf998b4",
+    "feature-native-joint-window/baseline-geometry.tsv": "32aeaa7ddd3f0deed9a2ba47dafdf1967b335fb8854f04f6f8aeac66e1773e41",
+    "feature-native-joint-window/lib.rs": "8c3e6f2a4ed6fe7b98b32165737bdf8d9b75af9ac0b7599346b6686f0b2af05d",
+    "feature-native-low-product/polynomial.rs": "4276f146fd13985e457ae099fa670dc0abc68be89c8a961c377cdc78fea7f260",
+    "feature-native-polynomial/fixtures.tsv": "cf6570c523e07e5e5b37b1f192a375ef816c3edf4eccae3c805cde9bc3f1fab9",
+    "feature-native-polynomial/lib.rs": "2097908ea896d0d4558ad05000620a61663f3c7231d50caf7ad7b1feaa9ebc96",
+    "feature-native-resultant-class/class-tests.rs": "921b783c63dd8d4ca6448533691ab17bf5979175ae017e6036ad93a30e436013",
+    "feature-native-resultant-class/euclid-tests.rs": "0e82e9fa845d89007ab20432efd3ee19526ac11f3c61ee36dff1b398d9f212a5",
+    "feature-native-resultant-class/polynomial.rs": "e0f87c029e828f918b111a832234ea4abc158eaf051ff119c699a0bbdf097ac4",
+    "feature-native-resultant-class/product-tests.rs": "6fad5ac86d8cecfae89a79cc66a2c34116e65538ff61d13ccf3d266789087432",
+    "feature-native-standalone-window/lib.rs": "1b1ceff80f41db9f2c9fbf5345435fa5b772463ba17edc180d87619811c2f6c5",
+    "feature-native-standalone-window/source.rs": "3e793ae2ec16c1f5580883c649c4c8d5cad32a732c5b32ce1501ffb5e2134591",
+    "feature-native-value-division/lib.rs": "7980eb7afe322fba43082432d95ea40a66cfce1edf3488cabf6f1f41bf333e93",
+    "feature-native-window/points.tsv": "b7ba763f2bfb8e6c9a85a29d5be65c942ffba271941b53eb34af8e836a1c09ba",
+    "feature-native-window/slots.tsv": "d7645f17999ad0f65d979ee1e3abf4b21c1f4baa21c75c32de5511368a78a1ab",
+    "feature-orbit-local-terms/local.rs": "5408f64b5e60f8f0619376d7335c2703df74857cb86ca535cec6e613aaf4e5a2"
+  },
+  "commands": [
+    {
+      "name": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "--test",
+        "-C",
+        "opt-level=2",
+        "-C",
+        "overflow-checks=yes",
+        "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-standalone-window/lib.rs",
+        "-o",
+        "/tmp/standalone-source-l9x3wg60/tests"
+      ],
+      "timeout": 90,
+      "exit": 1,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "8fc8ecb32b593de4405ac373a4863e8b923f630f0064b6565afa29e092df1619"
+    }
+  ],
+  "binary_hashes": {},
+  "sources_unchanged": true,
+  "passed": false
+}

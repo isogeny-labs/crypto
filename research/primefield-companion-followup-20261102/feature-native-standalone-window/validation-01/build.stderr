@@ -1,0 +1,37 @@
+error[E0753]: expected outer doc comment
+ --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-standalone-window/source.rs:1:1
+  |
+1 | //! Standalone projected source. Prime p,r are caller-certified; no full-value runtime reference.
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2 | #[path="../feature-native-joint-window/lib.rs"]mod geometry;
+  |                                                ------------- the inner doc comment doesn't annotate this module
+  |
+help: to annotate the module, change the doc comment from inner to outer style
+  |
+1 - //! Standalone projected source. Prime p,r are caller-certified; no full-value runtime reference.
+1 + /// Standalone projected source. Prime p,r are caller-certified; no full-value runtime reference.
+  |
+
+error[E0689]: can't call method `checked_add` on ambiguous numeric type `{integer}`
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-standalone-window/lib.rs:23:19
+   |
+23 |    let end=cursor.checked_add(lanes).ok_or(Error::Geometry)?;
+   |                   ^^^^^^^^^^^
+   |
+help: you must specify a type for this binding, like `i32`
+   |
+20 |   let mut values=Vec::with_capacity(length);let mut cursor: i32=0;let lanes=joint.geometry.labels.len();
+   |                                                           +++++
+
+warning: unused variable: `k`
+  --> /home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-standalone-window/source.rs:38:9
+   |
+38 |   let[w,k,s,e]=self.part;let indices=[self.r/2+1,2*w,if s==0{1}else{s+e}];let mut factor=1;
+   |         ^ help: if this is intentional, prefix it with an underscore: `_k`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+error: aborting due to 2 previous errors; 1 warning emitted
+
+Some errors have detailed explanations: E0689, E0753.
+For more information about an error, try `rustc --explain E0689`.
