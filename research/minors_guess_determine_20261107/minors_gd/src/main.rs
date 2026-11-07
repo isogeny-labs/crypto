@@ -143,7 +143,7 @@ fn controls(args: &[String]) {
     let np: usize = arg(args, "--nprime").map(|s| s.parse().unwrap()).unwrap_or(bits as usize);
     println!("# development control (not a result): zero-minor rate, curve-derived C vs uniform random matrix, bits {} nprime {} reps {}", bits, np, reps);
     let (mut zc1, mut zc2, mut zr1, mut zr2) = (0u64, 0u64, 0u64, 0u64);
-    let mut done = 0u64; let mut exp2 = 0.0; let mut exp1 = 0.0;
+    let mut skipped = 0u64; let mut done = 0u64; let mut exp2 = 0.0; let mut exp1 = 0.0;
     for rep in 0..reps {
         let inst = make_instance(bits, 5000 + rep);
         let c = Curve::new(inst.p, inst.a, inst.b);
@@ -151,16 +151,17 @@ fn controls(args: &[String]) {
         let k = match kernel::build(&c, inst.g, inst.q, inst.n, np, &mut rng) { Some(k) => k, None => continue };
         let l = k.l;
         let (a1, a2) = count_zero_minors(&c.f, &k.c, l);
-        zc1 += a1; zc2 += a2;
+        let skip_c = a1 > 0;
+        zc1 += a1; if !skip_c { zc2 += a2; }
         let mut rm = vec![0u64; l * l];
         for v in rm.iter_mut() { *v = 1 + rng.below(inst.p - 1); }
         let (b1, b2) = count_zero_minors(&c.f, &rm, l);
-        zr1 += b1; zr2 += b2;
+        zr1 += b1; if !skip_c { zr2 += b2; }
         done += 1;
         exp1 += (l * l) as f64 / inst.p as f64;
-        exp2 += ((l * (l - 1) / 2) as f64).powi(2) / inst.p as f64;
+        if !skip_c { exp2 += ((l * (l - 1) / 2) as f64).powi(2) / (inst.p as f64 - 1.0); } else { skipped += 1; }
     }
-    println!("matrices {}: zero entries curve {} random {} (uniform expectation {:.2}); zero 2x2 minors curve {} random {} (uniform expectation {:.1})", done, zc1, zr1, exp1, zc2, zr2, exp2);
+    println!("matrices {} ({} with a zero entry excluded from the 2x2 comparison): zero entries curve {} (random matrix has none by construction; uniform expectation {:.2}); zero 2x2 minors curve {} random {} (uniform expectation {:.1})", done, skipped, zc1, exp1, zc2, zr2, exp2);
 }
 
 fn main() {
