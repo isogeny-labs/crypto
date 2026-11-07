@@ -59,3 +59,18 @@ The ranking against independent matched rho holds at every price in the band (th
 | 25 | 16384 | 1024 | 119 | 228 / 231 / 255 | 1.93 | 1.95 | 2.15 | 0/4 |
 
 The ratio does not keep falling with T: about 1.7 (T = 1024), 1.6 to 1.75 (4096), 1.6 to 1.9 (16384). Four instances per cell and one seed: the cells are not ranked against each other. The multi-target IC stays 1.6x to 2.2x above the counted batch rho in the valid regime.
+
+## v2: cheaper table build (measured holdout)
+
+The pair-sum table was built with 4 group additions per pair; F_i + F_j and -F_i - F_j (and F_i - F_j and -F_i + F_j) are negatives of each other, with the same x and flipped y, and negation is free, so 2 additions per pair give all four sign combinations (table cost m^2 instead of 2m(m+1)). Relations, trial counts, determined columns and recovered logs are identical (spot-checked: W20-2, W22-3, W24-5; old build still available with `MT_FULL_TABLE=1`). Full rerun of the holdout (`run_multi_holdout_v2.py`, `results/multi_holdout_v2/`, same instances, seeds and frozen fb rule; 132 configs, 132 verified), compared with the recorded batch-rho costs:
+
+| group bits | T | IC v1 @0 | IC v2 @0 | v2 / v1 | batch rho (best kappa) | IC v2 / rho at 0 [boot95] | at 0.1 | at 1 | IC cheaper in |
+|---|---|---|---|---|---|---|---|---|---|
+| 20 | 128 | 450 | 320 | 0.711 | 193 | 1.67 [1.61, 1.69] | 1.77 | 2.69 | 0/22 |
+| 20 | 1024 | 152 | 135 | 0.893 | 87 | 1.56 [1.54, 1.57] | 1.63 | 2.19 | 0/22 |
+| 22 | 128 | 773 | 643 | 0.832 | 339 | 1.89 [1.86, 1.94] | 2.04 | 3.36 | 0/22 |
+| 22 | 1024 | 259 | 195 | 0.751 | 142 | 1.38 [1.37, 1.39] | 1.44 | 1.93 | 0/22 |
+| 24 | 128 | 1809 | 1293 | 0.715 | 640 | 2.04 [1.99, 2.09] | 2.18 | 3.42 | 0/22 |
+| 24 | 1024 | 425 | 360 | 0.848 | 250 | 1.44 [1.43, 1.46] | 1.53 | 2.35 | 0/22 |
+
+A measured 10% to 29% reduction in the multi-target IC's counted additions (a real operation saving, not an accounting change), narrowing the distance to counted batch rho to 1.4x to 2.0x at price 0 and 1.9x to 3.4x at price 1. Still not cheaper than batch rho in any configuration. The batch-rho reference was built the same way (x-only lookups; negation free) from the start, so v2 removes an IC-only inefficiency.
