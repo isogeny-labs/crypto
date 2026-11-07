@@ -255,14 +255,39 @@ link is the route the lab measured null on 2026-11-02.*
 
 ## 6. Candidate novel directions that survive the obstruction
 
-Filled from the idea-generator and idea-synthesist passes of this session;
-see §6.1–§6.3 below. Every item is **proposed**, none is run, none is a
-claim. Each carries the proposer's own prior that it lowers the cost of the current
-prime-field index-calculus baseline at any scope, the closest prior work
-named by the proposer, and the cheapest native test.
+From the idea-generator (Sonnet) and idea-synthesist (Opus) passes of this
+session (scratch outputs in the session, summarised here; both report KB
+unavailable and cite repository paths only). Every item is **proposed**,
+none is run, none is a claim. Both passes independently re-derived the §3
+obstruction and **neither found a mechanism in which the split-prime deficit
+enters**: nine candidate uses were killed on paper (isogeny-pullback towers
+on a prime-order curve, where every isogeny fiber has exactly one
+F_p-point; twist-torsion translations, defined over F_{p²}; class-group
+label cycles, which give scalars only; smooth-norm endomorphisms as x-line
+maps; torus-coset bases with a trace map; Kummer-plus-Dickson unions;
+cross-target Gröbner; twist or Tate leakage; the CM lift and ray class
+field, whose isomorphism E(F_p) ≅ Ẽ[π − 1] is defined only up to
+Gal(K_N/K), which acts as every scalar). The directions below are therefore
+*coordinate-side* proposals for prime-order curves in the NIST field shape,
+ranked by the proposers' information per hour, with their own priors.
 
-<!-- SECTION6 -->
-*Pending at this commit: the idea-generator, idea-synthesist and red-team passes are still running; this section is filled in a follow-up commit on the same branch.*
+| id | mechanism (one line) | closest prior work (as named by the proposer) | cheapest discriminating test (native) | kill line | proposer's prior of lowering the prime-field IC baseline |
+|---|---|---|---|---|---|
+| P1 `IDEA-20261107-RR-DICKSON-TORUS` | Separator-free Riemann–Roch norm-divisibility system with a Dickson-torus membership tower, for prime-order curves with p ≡ 3 (mod 4) and 2^t ∣ p + 1 (the NIST shape, where the Kummer tower does not exist) | in-repo `round7_rr` (RR-Kummer, D_RR = 4 vs D_T = 6 at m3 t4 [pcc:unverified]), `pkm_dickson_torus_20261015`; Petit–Kosters–Messeng PKC 2016, Nagao ePrint 2013/548 | Rust emitter into msolve 0.6.5; four systems (RR-Dickson, T-Dickson, RR-Kummer, T-Kummer) on the same planted prime-order instance at T24 = 14,680,063 and T31 = 2,046,820,351; m = 3, t = 3–5; about 1 h | D_RR(Dickson) ≥ D_T(Dickson) everywhere; or \|D_RR(Dickson) − D_RR(Kummer)\| ≥ 2; or the RR-Kummer control fails to reproduce round7 | 0.55 for D below the tree at m = 3 in a torus cell; 0.05 for the repo's criterion (m ≥ 5, blocked by 15 GB); 0.01 end-to-end |
+| P2 `IDEA-20261107-TWIST-PURE-COSET` | Select the 2-power coset or torus element whose 2^t abscissae are mostly on E (not the twist), with a derived purity lemma (twist parts of any x-only relation sum to O, so twist columns are inert) and a derived decay law c_sel/c_mean ≈ 1 + √(2 ln C / 2^t) | in-repo `curve25519_frame_search_20261103` (frame choice, 4.71× at t = 5 [pcc:unverified]); FGHR J. Cryptology 2014 as the symmetry precedent | existing PKM oracle crate and ecbench: random vs argmax coset at equal (m, t), exact m = 2 coverage by pair enumeration, restricted-base control; prime-order curves at 2^20–2^32; a few hours | F4 cost differs by > 10 % between cosets at equal (m, t); coverage ratio off by > 20 %; or the lemma fails on exhaustive S_3 enumeration at p ≤ 10^4 | 0.85 toy-scale F4 work per relation; 0.05 cold end-to-end S with selection charged (selection cost exceeds a whole rho run at 2^24); 0 at cryptographic size (gain → 1 as t grows) |
+| C1 (synthesist) | Presentation × arithmetic test: original model, dense random shift, curve-sparse shift (for a = −3, x = X ± 1 removes the linear term) and tower-sparse shift, on j = 0/1728 twists, 64 a = −3 curves and 64 curves with −a/3 a square, at p = 786433 and one 24-bit prime; rests on a derived lemma that Semaev polynomials are weighted-homogeneous (x:1, a:2, b:3), so their top form is curve-independent and curve dependence sits in lower-order coefficients | in-repo `isogeny_class_ic_yield_20261102` P1 (F4 flat within 3.85e-5 across 27 curves [pcc:unverified]); FGHR 2014 | `pkm_ss_tower f4` in Rust; 0.5–5 CPU-hours after 1–2 days of code | arithmetic hypothesis dies if a j = 0/1728 difference vanishes under the dense random shift; engineering lever dies if sparse/dense mul-add ratio > 0.90 on ≥ 2 of 4 cells or D rises in any row | 0.02 that an arithmetic effect exists; 0.03 engineering gain (a = −3 family, toy scope) |
+| C2 (synthesist) | Full j-line census at p = 786433: every prime-order curve, analysed per trace (about 250 Frobenius fields) against the seed's covariates (split count, L(1,χ), h, conductor); random samples never reach the CM strata | in-repo `isogeny_class_difficulty_20261008`, `p2_lift_defect_20261101`, `prime_field_leads_20261031/C1_lift_torsion` | Rust census; 1–25 CPU-hours | the "no K effect" null is rejected only if an unexplained exception reproduces on fresh targets and is enriched in one K stratum (Bonferroni α = 0.0025) | 0.01 that any exception is K-related; ≤ 0.005 baseline gain |
+| P3 `IDEA-20261107-SEED-NEGATIVE-CONTROL` | Cross-trace covariate test: 2,000 random prime-order curves per prime at 2^24, 2^28, 2^32; ecbench rho.negation S and ic.pipeline yield against E_691, partial L(1,χ) and division-polynomial root counts, conditioned on n (the lab's class tests held the Frobenius field fixed; this varies it) | in-repo `isogeny_class_ic_yield_20261102` P2, `nist_skip_criterion_20261025/strict_elkies_20261029`; JMV 2005 | ecbench (existing), planted +2 % yield arm as positive control, shuffled-trace permutation as negative; hours at 24–28 bits | a replicated partial effect ≥ 1 % of yield or S with FDR < 0.01 at two primes would *reject the null* and make the seed a mechanism lead | 0.02 non-null; 0 baseline gain (a seed falsifier, not an algorithm) |
+
+**Reading.** The honest state is that the only proposals with a non-trivial
+prior (P1, P2) are transfers of in-repo levers to the prime-order field
+shape, not new mechanisms, and their priors for the repository's own
+criterion are 0.05 or lower; the two that touch the seed (C2, P3) are
+falsifiers whose expected outcome is a null that closes it for the
+coordinate tracks too. Any run follows the lab's rules: frozen task card
+through `experiment-director`, `.resume/RESUME.md`, bench record, pricing at
+0, 0.1 and 1 GAE, and the `controlled-experiment` controls. Nothing here is
+scheduled.
 
 ## 7. Status of every statement
 
@@ -285,6 +310,7 @@ kind `statement`; standing unverified until CI signs it) [pcc:unverified].
 - `data/uploaded_report_values.json` — numbers transcribed from the uploaded report.
 - `figures/plot.py` — plots recorded values only; `figures/recount_z.{svg,png}`, `figures/obstruction_diagram.{svg,png}`.
 - `report/REPORT.typ`, `report/REPORT.pdf` — this note with both figures, rendered with Typst.
+- `ideas/idea-generator.md`, `ideas/idea-synthesist.md` — the two idea passes' full outputs (model output, proposals only; `ideas/red-team.md` holds the adversarial review of §3–§5 once it lands).
 - `../../problems/split-prime-pattern-scalar-only.md` — the obstruction record.
 
 ## 9. Next steps
