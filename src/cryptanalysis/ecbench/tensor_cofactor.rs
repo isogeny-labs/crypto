@@ -172,6 +172,7 @@ mod tests {
     use super::super::methods::{applicable as plan, resolve, solve as run, MethodSpec};
     use super::super::workload::{CurveSpec, Instance};
     use super::*;
+    use crate::cryptanalysis::ic_boundary::CountedGroup;
 
     fn method(m: &str) -> ResolvedMethod {
         resolve(&MethodSpec {
