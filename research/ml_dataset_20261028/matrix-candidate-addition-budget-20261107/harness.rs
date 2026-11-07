@@ -1,0 +1,14 @@
+#![allow(dead_code)]
+mod budget {
+ include!("budget_core.rs");
+ #[cfg(test)] mod tests {
+ use super::*;
+ fn ready(additions:u64)->(Budget,Instant){let now=Instant::now();let mut b=Budget::new(additions,1024*1024,1024,now+Duration::from_secs(30),now).unwrap();b.begin_native(false,now).unwrap();b.observe(Reservation{work:7,bytes:11},now).unwrap();b.finish_native(now).unwrap();b.begin_native(true,now).unwrap();(b,now)}
+ #[test] fn candidate_additions_keep_original_phase_and_native_history(){let(mut b,now)=ready(4);let id=b.ownership_id;let deadline=b.deadline;let construction=b.construction_deadline;b.observe(Reservation{work:13,bytes:17},now).unwrap();let before=b.native;b.reserve_matrix_candidate_addition(now).unwrap();b.reserve_matrix_candidate_addition(now).unwrap();assert_eq!(b.phase,Phase::Matrix);assert_eq!(b.phase_native,Reservation{work:13,bytes:17});assert_eq!(b.native,before);assert_eq!(b.additions,2);assert_eq!(b.ownership_id,id);assert_eq!(b.deadline,deadline);assert_eq!(b.construction_deadline,construction);b.observe(Reservation{work:19,bytes:23},now).unwrap();assert_eq!(b.native,Reservation{work:26,bytes:34});}
+ #[test] fn candidate_and_final_extraction_share_addition_limit(){let(mut b,now)=ready(2);b.reserve_matrix_candidate_addition(now).unwrap();b.finish_native(now).unwrap();b.begin_extraction(true,now).unwrap();b.reserve_addition(now).unwrap();assert_eq!(b.additions,2);assert_eq!(b.reserve_addition(now),Err(Stop::Additions));assert_eq!(b.additions,2);}
+ #[test] fn exhaustion_of_allowance_does_not_prevent_terminal_success(){let(mut b,now)=ready(1);b.reserve_matrix_candidate_addition(now).unwrap();b.finish_native(now).unwrap();b.begin_extraction(true,now).unwrap();b.finish_extraction(now).unwrap();assert_eq!(b.phase,Phase::Complete);}
+ #[test] fn matrix_method_rejects_every_other_phase(){for phase in [Phase::Setup,Phase::Construction,Phase::Constructed,Phase::MatrixComplete,Phase::Extraction,Phase::Complete]{let(mut b,now)=ready(3);b.phase=phase;assert_eq!(b.reserve_matrix_candidate_addition(now),Err(Stop::Phase));assert_eq!(b.additions,0);assert_eq!(b.stopped,Some(Stop::Phase));}}
+ #[test] fn deadline_and_sticky_refusal_preserve_counts(){let(mut b,_)=ready(3);let deadline=b.deadline;assert_eq!(b.reserve_matrix_candidate_addition(deadline),Err(Stop::Deadline));assert_eq!(b.additions,0);assert_eq!(b.reserve_matrix_candidate_addition(deadline-Duration::from_secs(1)),Err(Stop::Deadline));assert_eq!(b.additions,0);}
+ #[test] fn continuation_does_not_reset_native_phase_ceiling(){let(mut b,now)=ready(3);let cap=b.phase_limits.bytes;b.observe(Reservation{work:1,bytes:cap},now).unwrap();b.reserve_matrix_candidate_addition(now).unwrap();assert_eq!(b.observe(Reservation{work:2,bytes:cap+1},now),Err(Stop::Bytes));assert_eq!(b.phase_native,Reservation{work:1,bytes:cap});assert_eq!(b.additions,1);}
+ }
+}
