@@ -1,0 +1,14 @@
+[package]
+name = "minors_gd"
+version = "0.1.0"
+edition = "2021"
+description = "Charged comparison of the Mahalanobis minors / guess-and-determine ECDLP line against matched negation rho (toy sizes)"
+
+[workspace]
+
+[dependencies]
+
+[profile.release]
+opt-level = 3
+debug = false
+overflow-checks = false

@@ -762,6 +762,8 @@ fn cmd_panel(args: &[String]) {
         let v: Vec<usize> = args[i + 1].split(',').map(|x| x.parse().unwrap()).collect();
         (v[0], v[1])
     });
+    let only_curve: Option<usize> = args.iter().position(|a| a == "--curve").map(|i| args[i + 1].parse().unwrap());
+    let only_target: Option<usize> = args.iter().position(|a| a == "--target").map(|i| args[i + 1].parse().unwrap());
     let (lo, hi, cells): (u64, u64, Vec<(usize, usize, usize, usize)>) = if tier == "full" {
         (61000, 65521, cells_full())
     } else if tier == "calib" {
@@ -776,8 +778,14 @@ fn cmd_panel(args: &[String]) {
             }
         }
         for ci in 0..curves {
+            if only_curve.map_or(false, |oc| oc != ci) {
+                continue;
+            }
             let c = make_curve(derive(master, &[1, k as u64, b as u64, ci as u64]), lo, hi);
             for ti in 0..targets {
+                if only_target.map_or(false, |ot| ot != ti) {
+                    continue;
+                }
                 let plant = ti == targets - 1; // last target of each curve is the planted positive control
                 let inst = make_inst(&c, derive(master, &[2, k as u64, b as u64, ci as u64, ti as u64]), b, k, plant);
                 // arm order interleaved by (ci+ti) parity per frozen protocol
@@ -801,16 +809,24 @@ fn cmd_panel(args: &[String]) {
                     };
                     res.push((arm.to_string(), set, cnt, t0.elapsed().as_secs_f64(), sing));
                 }
+                // A/A control: a second E1 run on the same instance must reproduce set and counters exactly (k<=4 only)
+                let aa: Option<bool> = if k <= 4 {
+                    let (s2, c2) = run_e1(&c, &inst, k);
+                    let f = res.iter().find(|r| r.0 == "E1").unwrap();
+                    Some(s2 == f.1 && c2.json() == f.2.json())
+                } else {
+                    None
+                };
                 let hashes: Vec<u64> = res.iter().map(|r| set_hash(&r.1)).collect();
                 let consistent = hashes.iter().all(|&h| h == hashes[0]);
                 for (arm, set, cnt, secs, sing) in &res {
                     let ver = set.iter().filter(|s| verify(&c, &inst, s)).count();
                     let planted_rec = inst.planted.as_ref().map(|s| set.contains(s));
                     println!(
-                        "{{\"k\":{},\"B\":{},\"p\":{},\"N\":{},\"curve\":{},\"target\":{},\"planted\":{},\"arm\":\"{}\",\"relations\":{},\"verified\":{},\"planted_recovered\":{},\"sets_consistent_across_arms\":{},\"set_hash\":{},\"singular_S\":{},\"t_gs\":{},\"counters\":{},\"priced_w0\":{:.1},\"priced_w0.1\":{:.1},\"priced_w1\":{:.1},\"wall_s\":{:.4}}}",
+                        "{{\"k\":{},\"B\":{},\"p\":{},\"N\":{},\"curve\":{},\"target\":{},\"planted\":{},\"arm\":\"{}\",\"relations\":{},\"verified\":{},\"planted_recovered\":{},\"sets_consistent_across_arms\":{},\"aa_e1_identical\":{},\"set_hash\":{},\"singular_S\":{},\"t_gs\":{},\"counters\":{},\"priced_w0\":{:.1},\"priced_w0.1\":{:.1},\"priced_w1\":{:.1},\"wall_s\":{:.4}}}",
                         k, b, c.p, c.n, ci, ti, inst.planted.is_some(), arm, set.len(), ver,
                         match planted_rec { Some(v) => v.to_string(), None => "null".into() },
-                        consistent, set_hash(set), sing, t_gs(b, k - 1), cnt.json(),
+                        consistent, match aa { Some(v) => v.to_string(), None => "null".into() }, set_hash(set), sing, t_gs(b, k - 1), cnt.json(),
                         cnt.priced(0.0), cnt.priced(0.1), cnt.priced(1.0), secs
                     );
                 }

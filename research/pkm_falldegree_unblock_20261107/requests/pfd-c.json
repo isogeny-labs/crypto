@@ -1,0 +1,27 @@
+{
+  "schema": "isolab.eks.command-request/v1",
+  "job": {
+    "job_name": "pfd-c-20261108",
+    "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    "command": [
+      "/usr/local/bin/entry.sh",
+      "g1",
+      "g4",
+      "hky-C",
+      "g3"
+    ],
+    "cpu": 14,
+    "memory": "56Gi",
+    "seconds": 86400,
+    "isolation_profile": "standard",
+    "retries": 0,
+    "wait_seconds": 300
+  },
+  "provenance": {
+    "harness": "claude-code-subagent",
+    "source_revision": "c2b1b2dc11bf153e49a5a155f5308f73e8088ec5",
+    "study": "prime_fall_degree",
+    "protocol_sha256": "63bdff283385ff60d862c07fe81784fb21ee70853327524baa0c1982a75549a8",
+    "note": "PLACEHOLDER image digest (no image exists for this revision); replace via make_requests.sh IMAGE_JSON. stage C: g1 g4 hky-C g3. seconds is a proposal."
+  }
+}

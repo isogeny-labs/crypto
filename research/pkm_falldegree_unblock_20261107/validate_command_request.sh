@@ -16,7 +16,7 @@ rc=0
 for f in "$@"; do
   [[ $(wc -c < "$f") -le 65536 ]] || { echo "INVALID  $f (over 64 KiB)"; rc=1; continue; }
   if jq -e --arg repository "$repo" -f "$tmp/command.jq" "$f" >/dev/null 2>&1; then
-    ph=''; jq -e '.job.image|test("@sha256:0{64}$")' "$f" >/dev/null && ph=' [PLACEHOLDER image digest: not launchable until finalize_requests.sh]'
+    ph=''; jq -e '.job.image|test("@sha256:0{64}$")' "$f" >/dev/null && ph=' [PLACEHOLDER image digest: not launchable until make_requests.sh IMAGE_JSON]'
     echo "VALID    $f$ph"
   else echo "INVALID  $f"; rc=1; fi
 done
