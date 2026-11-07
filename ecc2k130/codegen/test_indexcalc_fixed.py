@@ -94,6 +94,55 @@ class FixedTests(unittest.TestCase):
                 self.assertEqual(path.read_text().splitlines(), [json.dumps(row, sort_keys=True, separators=(',', ':'))
                                                                  for row in first])
 
+    def test_cursor_closed_form_matches_recursive_model(self):
+        def prefix(size, i):
+            return sum(size - row for row in range(i))
+        for size in range(31):
+            for i in range(size + 1):
+                self.assertEqual(fixed.consideredCount(size, i, i), prefix(size, i))
+                for j in range(i, size + 1):
+                    self.assertEqual(fixed.consideredCount(size, i, j), prefix(size, i) + (j - i))
+                    if j < size:
+                        self.assertEqual(fixed.consideredCount(size, i, j + 1),
+                                         fixed.consideredCount(size, i, j) + 1)
+                if i < size:
+                    self.assertEqual(fixed.consideredCount(size, i + 1, i + 1),
+                                     fixed.consideredCount(size, i, size))
+
+    def test_disk_estimate_matches_lean_model(self):
+        overhead = 32 * 1024 * 1024
+        for planned in (0, 1, 2, 17, 4096, 6728946):
+            for bytes_per_pair in (0, 1, 128, 256, 1000):
+                self.assertEqual(fixed.requiredBytes(planned, bytes_per_pair),
+                                 (planned * bytes_per_pair * 5) // 4 + overhead)
+        self.assertLessEqual(fixed.requiredBytes(10, 100), fixed.requiredBytes(11, 100))
+        self.assertLessEqual(fixed.requiredBytes(10, 100), fixed.requiredBytes(10, 101))
+
+    def test_batch_inversion_and_addition_match_scalar_paths(self):
+        document, _ = fixture(9, seed=1037)
+        with fixed.Campaign(document, '.', memory=True) as campaign:
+            onb = campaign.params.onb
+            values = [onb.gamma(i) for i in range(1, onb.m + 1)]
+            for value, inverse in zip(values, onb.batchInv(values)):
+                self.assertEqual(onb.mul(value, inverse), onb.one())
+            points = campaign.points
+            rng = random.Random(17)
+            pairs = [(points[rng.randrange(len(points))], points[rng.randrange(len(points))])
+                     for _ in range(500)]
+            pairs += [(point, point) for point in points]
+            for got, (left, right) in zip(campaign.params.curve.addBatch(pairs), pairs):
+                self.assertEqual(got, campaign.params.curve.add(left, right))
+
+    def test_batch_addition_matches_on_ecc2k130_sample(self):
+        document = fixed.readJson(ROOT / 'docs/ic/params/ecc2k130-fixed.json')
+        with fixed.Campaign(document, '.', memory=True) as campaign:
+            points = campaign.points
+            rng = random.Random(131)
+            pairs = [(points[rng.randrange(len(points))], points[rng.randrange(len(points))])
+                     for _ in range(64)]
+            for got, (left, right) in zip(campaign.params.curve.addBatch(pairs), pairs):
+                self.assertEqual(got, campaign.params.curve.add(left, right))
+
     def test_pair_table_check_fails_before_a_full_disk(self):
         document, _ = fixture(9, seed=1033)
         with tempfile.TemporaryDirectory() as directory:

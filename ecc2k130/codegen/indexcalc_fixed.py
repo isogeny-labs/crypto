@@ -21,6 +21,10 @@ import indexcalc_selector as selector
 
 
 FORMAT = 'fixed-koblitz-ic-v1'
+# Pair-table transactions are small enough to bound crash loss and large
+# enough to amortise SQLite's commit cost. The cursor and rolling checksum
+# are committed with the rows, so a crash loses at most one chunk.
+PAIR_CHUNK = 4096
 
 
 def require(condition, message):
@@ -168,6 +172,16 @@ class Parameters:
 
 def pointKey(point):
     return 'identity' if point is None else format(point[0], 'x') + ':' + format(point[1], 'x')
+
+
+def consideredCount(size, i, j):
+    """Candidates before cursor `(i, j)`; mirrors the Lean PairCursor model."""
+    return i * size - i * (i - 1) // 2 + (j - i)
+
+
+def requiredBytes(planned, bytesPerPair):
+    """Disk estimate used before a pair-table chunk; 25% slack + 32 MiB."""
+    return (planned * bytesPerPair * 5) // 4 + 32 * 1024 * 1024
 
 
 class Progress:
@@ -428,17 +442,17 @@ class Campaign:
                 self.uses['pair_table_loads'] += 1
                 self.progress.pairTable(total, total, state['serial'], True, 0, budget)
                 return True
-            considered = state['i'] * size - state['i'] * (state['i'] - 1) // 2 + state['j'] - state['i']
+            considered = consideredCount(size, state['i'], state['j'])
             if not self.memory:
                 remaining = max(0, total - considered)
                 planned = min(budget, remaining)
                 pages = self.db.execute('PRAGMA page_count').fetchone()[0]
                 page_size = self.db.execute('PRAGMA page_size').fetchone()[0]
                 if state['serial'] > 0:
-                    bytes_per_pair = max(128.0, pages * page_size / state['serial'])
+                    bytes_per_pair = max(128, (pages * page_size + state['serial'] - 1) // state['serial'])
                 else:
-                    bytes_per_pair = 256.0
-                required = int(planned * bytes_per_pair * 1.25) + 32 * 1024 * 1024
+                    bytes_per_pair = 256
+                required = requiredBytes(planned, bytes_per_pair)
                 free = shutil.disk_usage(self.directory).free
                 if free < required:
                     raise ValueError(
@@ -447,34 +461,55 @@ class Campaign:
                         % (required // (1024 * 1024), self.directory.resolve(),
                            free // (1024 * 1024)))
             done = 0
-            reportEvery = max(256, budget // 100)
+            reportEvery = max(PAIR_CHUNK, budget // 100)
             nextReport = reportEvery
-            while done < budget and state['i'] < size:
-                with self.db:
-                    for _ in range(min(256, budget - done)):
-                        i, j = state['i'], state['j']
-                        if i == size:
-                            break
-                        left, right = self.points[i], self.points[j]
-                        if left != self.params.curve.neg(right):
-                            key = pointKey(self.params.curve.add(left, right))
-                            serial = state['serial']
-                            self.db.execute('INSERT INTO pairs VALUES (?,?,?,?)', (serial, key, i, j))
-                            state['hash'] = digest([state['hash'], serial, key, i, j])
-                            state['serial'] += 1
-                        state['j'] += 1
-                        if state['j'] == size:
-                            state['i'] += 1
-                            state['j'] = state['i']
-                        done += 1
-                        self.uses['pair_candidates_built'] += 1
-                    self.put('pair_state', state)
-                considered = state['i'] * size - state['i'] * (state['i'] - 1) // 2 + state['j'] - state['i']
-                if done >= nextReport and done != budget:
-                    self.progress.pairTable(considered, total, state['serial'], False, done, budget)
-                    nextReport += reportEvery
+            # The pair table is rebuildable, so NORMAL synchronous commits are
+            # enough: a crash can lose one chunk, and checkPairs validates the
+            # committed cursor before resuming. Keep FULL for every other table.
+            previous_sync = self.db.execute('PRAGMA synchronous').fetchone()[0]
+            self.db.execute('PRAGMA synchronous=NORMAL')
+            self.db.execute('PRAGMA cache_size=-65536')
+            self.db.execute('PRAGMA temp_store=MEMORY')
+            try:
+                while done < budget and state['i'] < size:
+                    with self.db:
+                        entries = []
+                        for _ in range(min(PAIR_CHUNK, budget - done)):
+                            i, j = state['i'], state['j']
+                            if i == size:
+                                break
+                            left, right = self.points[i], self.points[j]
+                            if left != self.params.curve.neg(right):
+                                entries.append((i, j, left, right))
+                            state['j'] += 1
+                            if state['j'] == size:
+                                state['i'] += 1
+                                state['j'] = state['i']
+                            done += 1
+                            self.uses['pair_candidates_built'] += 1
+                        if entries:
+                            points = self.params.curve.addBatch(
+                                [(left, right) for _, _, left, right in entries])
+                            rows = []
+                            for (i, j, _, _), point in zip(entries, points):
+                                if point is None:
+                                    continue
+                                key = pointKey(point)
+                                serial = state['serial']
+                                rows.append((serial, key, i, j))
+                                state['hash'] = digest([state['hash'], serial, key, i, j])
+                                state['serial'] += 1
+                            if rows:
+                                self.db.executemany('INSERT INTO pairs VALUES (?,?,?,?)', rows)
+                        self.put('pair_state', state)
+                    considered = consideredCount(size, state['i'], state['j'])
+                    if done >= nextReport and done != budget:
+                        self.progress.pairTable(considered, total, state['serial'], False, done, budget)
+                        nextReport += reportEvery
+            finally:
+                self.db.execute('PRAGMA synchronous=%d' % previous_sync)
             complete = state['i'] == size
-            considered = state['i'] * size - state['i'] * (state['i'] - 1) // 2 + state['j'] - state['i']
+            considered = consideredCount(size, state['i'], state['j'])
             self.progress.pairTable(considered, total, state['serial'], complete, done, budget)
             return complete
 
@@ -487,7 +522,7 @@ class Campaign:
             require(serial == count and 0 <= i <= j < size, 'invalid pair-table record')
             value = digest([value, serial, key, i, j])
             count += 1
-        considered = state['i'] * size - state['i'] * (state['i'] - 1) // 2 + state['j'] - state['i']
+        considered = consideredCount(size, state['i'], state['j'])
         excluded = sum(1 for i, point in enumerate(self.points)
                        if i <= self.index[self.params.curve.neg(point)] and
                        (i < state['i'] or (i == state['i'] and self.index[self.params.curve.neg(point)] < state['j'])))

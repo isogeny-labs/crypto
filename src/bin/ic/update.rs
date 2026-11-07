@@ -599,6 +599,39 @@ mod tests {
     }
 
     #[test]
+    fn versions_compare_exhaustively_as_tuples() {
+        for major_a in 0..=4u64 {
+            for minor_a in 0..=3u64 {
+                for patch_a in 0..=3u64 {
+                    for major_b in 0..=4u64 {
+                        for minor_b in 0..=3u64 {
+                            for patch_b in 0..=3u64 {
+                                let a = format!("{major_a}.{minor_a}.{patch_a}");
+                                let b = format!("v{major_b}.{minor_b}.{patch_b}");
+                                assert_eq!(
+                                    is_newer(&a, &b).unwrap(),
+                                    (major_b, minor_b, patch_b) > (major_a, minor_a, patch_a),
+                                    "{a} -> {b}"
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn layout_uses_the_prefix_share_tree_only_for_bin() {
+        let (bin, share) = layout(Path::new("/usr/local/bin"));
+        assert_eq!(bin, PathBuf::from("/usr/local/bin"));
+        assert_eq!(share, PathBuf::from("/usr/local/share/cryptocli"));
+        let (bin, share) = layout(Path::new("/tmp/target/release"));
+        assert_eq!(bin, PathBuf::from("/tmp/target/release"));
+        assert_eq!(share, PathBuf::from("/tmp/target/release/.cryptocli"));
+    }
+
+    #[test]
     fn selects_the_native_or_universal_archive() {
         let assets = vec![
             asset("crypto-cli-v1-macos-x86_64.tar.gz"),
@@ -621,6 +654,13 @@ mod tests {
             choose_asset(&universal, "aarch64").unwrap().name,
             "crypto-cli-v1-macos-universal.tar.gz"
         );
+        let rejected = vec![
+            asset("SHA256SUMS"),
+            asset("crypto-cli-v1-macos-aarch64.zip"),
+            asset("not-crypto-cli-macos-aarch64.tar.gz"),
+            asset("crypto-cli-v1-linux-aarch64.tar.gz"),
+        ];
+        assert!(choose_asset(&rejected, "aarch64").is_none());
     }
 
     #[test]
