@@ -215,7 +215,7 @@ fn mode_c1(dir: &str, k: u32) {
                 "null".into()
             };
             println!(
-                "{{\"k\":{k},\"curve\":\"{}\",\"arm\":\"{arm}\",\"u\":\"{uhex}\",\"deg_u\":{},\"deg_K\":{deg_k},\"N\":{n},\"trapped\":{},\"fb\":{},\"fb_in_EQ2\":{fb_in_e2},\"fb_in_H\":{},\"fb_tr0\":{fb_tr0},\"T\":{nt},\"identity_mismatch\":{id_mismatch},\"targets_in_EQ2\":{targets_in_e2},\"targets_in_H\":{},\"nonzero_outside_EQ2\":{nz_outside_e2},\"nonzero_outside_H\":{},\"tr_a\":{tr_a},\"frac_tr_eq_tr_a\":{:.6},\"viol_2E\":{viol_2e},\"mean_on_2E\":{:.6},\"pred_excl\":{},\"mean_on_2E_over_pred\":{},\"posthoc_zeros_on_2E\":{zeros_on},\"posthoc_n_on_2E\":{n_on},\"posthoc_generic_share_pred\":{generic_share}}}",
+                "{{\"k\":{k},\"curve\":\"{}\",\"arm\":\"{arm}\",\"u\":\"{uhex}\",\"deg_u\":{},\"deg_K\":{deg_k},\"N\":{n},\"trapped\":{},\"fb\":{},\"fb_in_EQ2\":{fb_in_e2},\"fb_in_H\":{},\"fb_tr0\":{fb_tr0},\"T\":{nt},\"identity_mismatch\":{id_mismatch},\"targets_in_EQ2\":{targets_in_e2},\"targets_in_H\":{},\"nonzero_outside_EQ2\":{nz_outside_e2},\"nonzero_outside_H\":{},\"tr_a\":{tr_a},\"frac_tr_eq_tr_a\":{:.6},\"viol_2E\":{viol_2e},\"mean_on_2E\":{},\"pred_excl\":{},\"mean_on_2E_over_pred\":{},\"posthoc_zeros_on_2E\":{zeros_on},\"posthoc_n_on_2E\":{n_on},\"posthoc_generic_share_pred\":{generic_share}}}",
                 spec.id,
                 deg_abs(&f, &u),
                 trapped(deg_k, n),
@@ -224,9 +224,9 @@ fn mode_c1(dir: &str, k: u32) {
                 if a_fq_tr.is_some() { targets_in_h.to_string() } else { "null".into() },
                 if a_fq_tr.is_some() { nz_outside_h.to_string() } else { "null".into() },
                 n_on as f64 / nt as f64,
-                mean_on,
+                if mean_on.is_finite() { format!("{mean_on:.6}") } else { "null".into() },
                 pred.map(|p| format!("{p:.6}")).unwrap_or("null".into()),
-                ratio.map(|x| format!("{x:.6}")).unwrap_or("null".into()),
+                ratio.filter(|x| x.is_finite()).map(|x| format!("{x:.6}")).unwrap_or("null".into()),
             );
         }
     }
