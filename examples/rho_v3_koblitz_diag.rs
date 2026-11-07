@@ -34,6 +34,7 @@ fn main() {
             v.jumps = k;
             v.weight = weight;
             v.dp_bits = dp;
+            v.g_only = env::var("GONLY").is_ok();
             let new = signed_frobenius_rho_v3(&inst, q, 1000 + i, cap, v).unwrap();
             aut = new.automorphisms;
             for (j, res) in [&old, &new].iter().enumerate() {

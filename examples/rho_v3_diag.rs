@@ -63,6 +63,7 @@ fn main() {
             v.ladder_bits = ladder;
             v.dp_from_floor = env::var("DPF").is_ok();
             v.ladder_verify = env::var("LV").is_ok();
+            v.g_only = env::var("GONLY").is_ok();
             let t1 = std::time::Instant::now();
             let b = rho_walk_v3(
                 &g,

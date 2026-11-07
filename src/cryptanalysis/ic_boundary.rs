@@ -3000,6 +3000,9 @@ pub struct RhoV3 {
     /// Read the charged check `[d]G`'s low bits from the `G` ladder
     /// (already paid for) instead of a fresh double-and-add.
     pub ladder_verify: bool,
+    /// Jumps in G only, the target entering through the start stride; the
+    /// Q ladder (its doublings) is dropped and the G ladder doubles in length.
+    pub g_only: bool,
 }
 
 impl RhoV3 {
@@ -3015,6 +3018,7 @@ impl RhoV3 {
             continue_walks: false,
             dp_from_floor: true,
             ladder_verify: true,
+            g_only: false,
         }
     }
 
@@ -3024,6 +3028,14 @@ impl RhoV3 {
     pub const fn v5(negation: bool) -> Self {
         let mut v = Self::v4(negation);
         v.weight = 2;
+        v
+    }
+
+    /// `rho.negation_v6` / `rho.plain_v6` and, on signed-Frobenius classes,
+    /// `rho.signed_frobenius_v5`: [`RhoV3::v5`] with jumps in G only.
+    pub const fn v6(negation: bool) -> Self {
+        let mut v = Self::v5(negation);
+        v.g_only = true;
         v
     }
 
@@ -3039,6 +3051,7 @@ impl RhoV3 {
             continue_walks: false,
             dp_from_floor: true,
             ladder_verify: true,
+            g_only: false,
         }
     }
     pub const fn negation() -> Self {
@@ -3051,6 +3064,7 @@ impl RhoV3 {
             continue_walks: false,
             dp_from_floor: false,
             ladder_verify: false,
+            g_only: false,
         }
     }
     pub const fn plain() -> Self {
@@ -3063,6 +3077,7 @@ impl RhoV3 {
             continue_walks: false,
             dp_from_floor: false,
             ladder_verify: false,
+            g_only: false,
         }
     }
 }
@@ -3138,6 +3153,17 @@ pub fn rho_walk_v3<G: CountedGroup, C: RhoClasses<G>>(
     };
     let mut shape = WalkShape::of(r, walk);
     shape.coefficient_bits = t as u32;
+    // `tg` rungs on the G ladder.  With `g_only` the jumps are multiples of
+    // G alone (the target enters only through the start stride, as in
+    // Kuhn–Struik and Bernstein–Lange walks), the Q ladder is just Q, and
+    // the G ladder takes the coefficient room the Q ladder gave up.
+    let rbits = (64 - r.leading_zeros()) as usize;
+    let tg = if v3.g_only {
+        (2 * t).min(rbits.saturating_sub(1)).clamp(2, 28)
+    } else {
+        t
+    };
+    let span = if v3.g_only { tg } else { 2 * t };
 
     // Choose every jump's rungs first (no group operation is spent on a
     // refused draw).  A rung index below `t` is `[2^i]G`, at or above it
@@ -3148,10 +3174,10 @@ pub fn rho_walk_v3<G: CountedGroup, C: RhoClasses<G>>(
     let pack = |a: u64, b: u64| (a << 32) | b;
     let coeff = |rungs: &[usize]| -> (u64, u64) {
         rungs.iter().fold((0u64, 0u64), |(a, b), &i| {
-            if i < t {
+            if i < tg {
                 (a + (1u64 << i), b)
             } else {
-                (a, b + (1u64 << (i - t)))
+                (a, b + (1u64 << (i - tg)))
             }
         })
     };
@@ -3161,8 +3187,8 @@ pub fn rho_walk_v3<G: CountedGroup, C: RhoClasses<G>>(
     while kept.len() < k {
         draws += 1;
         let mut rungs: Vec<usize> = Vec::with_capacity(weight);
-        while rungs.len() < weight.min(2 * t) {
-            let i = rng.gen_range(0..2 * t);
+        while rungs.len() < weight.min(span) {
+            let i = rng.gen_range(0..span);
             if !rungs.contains(&i) {
                 rungs.push(i);
             }
@@ -3186,16 +3212,28 @@ pub fn rho_walk_v3<G: CountedGroup, C: RhoClasses<G>>(
         kept.push((rungs, (a, b)));
     }
     // The stride: `weight + 2` rungs, at least one on each ladder.
-    let stride_rungs: Vec<usize> = loop {
+    let stride_rungs: Vec<usize> = if v3.g_only {
         let mut rungs: Vec<usize> = Vec::new();
-        while rungs.len() < (weight + 2).min(2 * t) {
-            let i = rng.gen_range(0..2 * t);
+        while rungs.len() < (weight + 1).min(tg) {
+            let i = rng.gen_range(0..tg);
             if !rungs.contains(&i) {
                 rungs.push(i);
             }
         }
-        if rungs.iter().any(|&i| i < t) && rungs.iter().any(|&i| i >= t) {
-            break rungs;
+        rungs.push(tg);
+        rungs
+    } else {
+        loop {
+            let mut rungs: Vec<usize> = Vec::new();
+            while rungs.len() < (weight + 2).min(2 * t) {
+                let i = rng.gen_range(0..2 * t);
+                if !rungs.contains(&i) {
+                    rungs.push(i);
+                }
+            }
+            if rungs.iter().any(|&i| i < t) && rungs.iter().any(|&i| i >= t) {
+                break rungs;
+            }
         }
     };
 
@@ -3204,16 +3242,16 @@ pub fn rho_walk_v3<G: CountedGroup, C: RhoClasses<G>>(
         .iter()
         .flat_map(|(rs, _)| rs.iter())
         .chain(stride_rungs.iter())
-        .filter(|&&i| i < t)
+        .filter(|&&i| i < tg)
         .max()
         .copied();
     let top_q = kept
         .iter()
         .flat_map(|(rs, _)| rs.iter())
         .chain(stride_rungs.iter())
-        .filter(|&&i| i >= t)
+        .filter(|&&i| i >= tg)
         .max()
-        .map(|i| i - t);
+        .map(|i| i - tg);
     let mut ladder_g = vec![generator];
     if let Some(top) = top_g {
         for _ in 0..top {
@@ -3229,7 +3267,13 @@ pub fn rho_walk_v3<G: CountedGroup, C: RhoClasses<G>>(
         }
     }
     let sum_rungs = |ops: &mut GroupOps, rungs: &[usize]| -> G::Elt {
-        let pick = |i: usize| if i < t { ladder_g[i] } else { ladder_q[i - t] };
+        let pick = |i: usize| {
+            if i < tg {
+                ladder_g[i]
+            } else {
+                ladder_q[i - tg]
+            }
+        };
         let mut acc = pick(rungs[0]);
         for &i in &rungs[1..] {
             acc = g.add(ops, acc, pick(i));
