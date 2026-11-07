@@ -689,10 +689,11 @@ fn cmd_plan() {
     let mut tot_d1 = 0.0;
     for (k, b, cu, ta) in cells_full() {
         let m = k - 1;
-        let e1 = binom_f(b, m) * 1.0 + (2..m).map(|d| binom_f(b, d)).sum::<f64>();
-        let e1 = e1.max(binom_f(b, m));
-        let e2 = binom_f(b, k / 2) + binom_f(b, k - k / 2) * 2.0;
-        let d1 = binom_f(b, m) * (b as f64 * (m as f64 / (m as f64 + 1.0)) * (m as f64 * 2.0 + 1.0) + (m * m * m) as f64);
+        let e1 = binom_f(b, m) + (2..=m).map(|d| binom_f(b, d)).sum::<f64>();
+        let (h, l) = (k / 2, k - k / 2);
+        let e2 = (if h >= 2 { binom_f(b, h) } else { 0.0 }) + (if l >= 2 { binom_f(b, l) } else { 0.0 }) + binom_f(b, l);
+        let scan = (b - m) as f64 / (m as f64 + 1.0) * (2.0 * m as f64 + 1.0);
+        let d1 = binom_f(b, m) * (scan + (m * m * (m + 1)) as f64 + 3.0 * m as f64);
         let n = (cu * ta) as f64;
         println!("{} {} {} {} | {:.3e} | {:.3e} | {:.3e} | {:.2e}", k, b, cu, ta, e1, e2, d1, binom_f(b, k) / 65000.0);
         tot_e1 += e1 * n;
@@ -763,6 +764,8 @@ fn cmd_panel(args: &[String]) {
     });
     let (lo, hi, cells): (u64, u64, Vec<(usize, usize, usize, usize)>) = if tier == "full" {
         (61000, 65521, cells_full())
+    } else if tier == "calib" {
+        (61000, 65521, vec![(4, 48, 1, 2)])
     } else {
         (1000, 1100, vec![(2, 24, 1, 2), (3, 24, 1, 2), (4, 20, 1, 2), (5, 16, 1, 2), (6, 14, 1, 2)])
     };
