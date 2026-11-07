@@ -6,6 +6,8 @@ known-answer or public hash-derived Koblitz targets. The `fixed` command also
 accepts explicit K_0 curve parameters and points through degree 131, with durable
 pair tables, relations and precomputation. See [Fixed parameters](FIXED_PARAMETERS.md).
 The older inspection command uses imported points for mathematical validation.
+macOS users can install `ic` and `crax` from the release DMG; see
+[macOS install and update](MACOS_INSTALL.md).
 
 **Factor-base encyclopedia:** [factor-base-encyclopedia/README.md](factor-base-encyclopedia/README.md) describes every factor base tried here and in crypto-autoresearcher (definition, existence, build cost, oracle, measured results, verdict), starting with the PKM Kummer-coset (P-224 shape) and isogeny-chain (P-192 shape) towers; PDF in the same directory.
 
@@ -1455,6 +1457,13 @@ validates the actual fixed parameters and persists the factor base.
 pair tables, precomputed logarithms, direct target equations and the complete
 small-curve example. This CPU Python workflow accepts full-width coordinates;
 the existing Rust symbolic engine remains limited to degree 63.
+
+For ECC2K-130 specifically, `ic ecc2k130 --dir runs/ecc2k130` supplies the
+profile, the `collect` stage, live stderr progress and a
+`runs/ecc2k130/relations.jsonl` export; the default pair budget completes the
+6,728,946-candidate table in one run. `tail -f` that file to watch verified
+relations land. See the live-relations section of
+[Fixed parameters](FIXED_PARAMETERS.md).
 
 ### Learned solver and budget selector
 

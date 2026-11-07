@@ -18,8 +18,9 @@ Python output.
 | 17 | 17 | 1 | 1 | 17 |
 | 18 | 17 | 1 | 1 | 17 |
 
-Both implementations agree on every instance. The degree-4 column goes beyond
-the Rust run's degree-4 range (n ≤ 16).
+Rust and Python agree at degree 3 on all five instances. The Rust run on these
+dumps had degree 4 disabled, so the degree-4 column is Python only; the independent
+validator later re-ran Rust with degree 4 on the same dumps and it matches.
 
     python3 naive_closure.py 3 n1*_i0.json
     python3 naive_closure.py 4 n15_i0.json n17_i0.json n18_i0.json
