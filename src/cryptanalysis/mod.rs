@@ -346,6 +346,7 @@ pub mod prime_fast;
 pub mod prime_field_smt;
 pub mod prime_orbit_index_calculus;
 pub mod prime_root_trace;
+pub mod prime_signed_mitm;
 pub mod prime_small_x;
 pub mod q_curve;
 pub mod quantum_estimator;
