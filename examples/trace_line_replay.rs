@@ -153,7 +153,11 @@ mod tests {
         })
         .unwrap();
         let result = solve(&method, &instance, &workload.curve, &workload.target, 23).unwrap();
-        let scalar = result.recovered.unwrap();
+        let scalar = result
+            .recovered
+            .unwrap()
+            .checked_u128()
+            .expect("legacy trace-line instance scalar fits u128");
         let mut row = json!({"method":{"id":"ic.trace_line_2lp","params":params},"workload":workload,
             "outcome":{"status":"verified","recovered":scalar.to_string(),"matches_target":true},
             "detail":result.detail});

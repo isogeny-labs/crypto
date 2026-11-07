@@ -234,6 +234,17 @@ Left unpriced on purpose:
   increment has no fixed primitive sum.
 - `solver_conflicts`: a CDCL conflict is not a fixed number of primitives.
 
+### 2026-10-29 (packed pair-table filter)
+
+| counter or family | rule | why |
+|---|---|---|
+| `table_filter_bit_sets` | `6 · word_op` | `mitm-prime-blocked:m=2,filter=1`: one bit set per stored entry of the packed pair table's membership filter (the key shift, the multiply-shift hash, the word index and bit shift, the OR); the probe's filter read happens inside a lookup the oracle already counts |
+
+The filter's memory (8 to 16 bits per stored entry) is not added to the
+`bitop/v2` oracle-table term, which prices `table_insert_attempts · (κ + w)`
+and so already bounds the packed table from above by more than the filter
+adds.
+
 Work that was never counted stays listed: the five index-calculus items
 (`gauss_column_scans_and_pivot_inversions`, `relation_row_construction`,
 `walk_bookkeeping`, `table_insert_attempts`, `base_index_builds`) and the

@@ -143,6 +143,38 @@ e = 5: primes [79,113] obs-exp = -19.3, sd = 25.4, z = -0.76
 e = 6: primes [97] obs-exp = +32.9, sd = 18.1, z = 1.82
 e = 8: primes [127] obs-exp = +15.5, sd = 20.7, z = 0.75
 e >= 4: primes [71,73,89,103,79,113,97,127] obs-exp = -0.0, sd = 50.3, z = -0.00
+## Post-test prediction p=131 (predictions_v2.txt, registered 2026-10-29, outside the closed follow-up test)
+p=131 rows=557732 zeros obs=585 exp=589.7 [548.4,631.0] PASS dispersion=1.005 (n=550320) auc=0.9972 weak_total obs=294517082 pred=294517083
+   P(zero) in [1.00e-6,3.47e-6]: exp=0.0 obs=0
+   P(zero) in [3.47e-6,1.51e-5]: exp=0.1 obs=0
+   P(zero) in [1.51e-5,9.81e-5]: exp=0.6 obs=0
+   P(zero) in [9.81e-5,1.31e-3]: exp=5.7 obs=8
+   P(zero) in [1.31e-3,9.37e-1]: exp=583.3 obs=577
+   P(zero) <= 1e-6: obs=0
+## Pooled check including p=127 and p=131 (iso1_residual_model pool figures/zero_rows.csv)
+all: primes [53,59,61,67,83,101,107,109,131,71,73,89,103,79,113,97,127] obs-exp = +84.6, sd = 71.8, z = 1.18
+e = 3: primes [53,59,61,67,83,101,107,109,131] obs-exp = +84.6, sd = 51.2, z = 1.65
+e = 4: primes [71,73,89,103] obs-exp = -29.1, sd = 33.7, z = -0.86
+e = 5: primes [79,113] obs-exp = -19.3, sd = 25.4, z = -0.76
+e = 6: primes [97] obs-exp = +32.9, sd = 18.1, z = 1.82
+e = 8: primes [127] obs-exp = +15.5, sd = 20.7, z = 0.75
+e >= 4: primes [71,73,89,103,79,113,97,127] obs-exp = -0.0, sd = 50.3, z = -0.00
+## Post-test prediction p=137 (predictions_v2.txt, outside the closed follow-up test)
+p=137 rows=638146 zeros obs=606 exp=613.9 [571.9,656.0] PASS dispersion=1.003 (n=630417) auc=0.9971 weak_total obs=352294130 pred=352294131
+   P(zero) in [1.00e-6,3.46e-6]: exp=0.0 obs=0
+   P(zero) in [3.47e-6,1.53e-5]: exp=0.1 obs=0
+   P(zero) in [1.53e-5,1.01e-4]: exp=0.6 obs=2
+   P(zero) in [1.01e-4,1.36e-3]: exp=6.1 obs=6
+   P(zero) in [1.36e-3,9.53e-1]: exp=607.1 obs=598
+   P(zero) <= 1e-6: obs=0
+## Pooled check including p=137 (iso1_residual_model pool figures/zero_rows.csv)
+all: primes [53,59,61,67,83,101,107,109,131,71,73,89,103,137,79,113,97,127] obs-exp = +76.7, sd = 74.9, z = 1.02
+e = 3: primes [53,59,61,67,83,101,107,109,131] obs-exp = +84.6, sd = 51.2, z = 1.65
+e = 4: primes [71,73,89,103,137] obs-exp = -37.0, sd = 39.9, z = -0.93
+e = 5: primes [79,113] obs-exp = -19.3, sd = 25.4, z = -0.76
+e = 6: primes [97] obs-exp = +32.9, sd = 18.1, z = 1.82
+e = 8: primes [127] obs-exp = +15.5, sd = 20.7, z = 0.75
+e >= 4: primes [71,73,89,103,137,79,113,97,127] obs-exp = -7.9, sd = 54.7, z = -0.14
 ## Non-pristine (seen during V1 diagnosis)
 p=37 rows=12321 zeros obs=145 exp=168.8 [146.5,191.1] FAIL dispersion=0.981 (n=9870) auc=0.9590 weak_total obs=1875530 pred=1875531
    P(zero) in [1.02e-6,4.79e-5]: exp=0.0 obs=0

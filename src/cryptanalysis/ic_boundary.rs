@@ -892,6 +892,22 @@ fn powmod(mut a: u64, mut e: u64, m: u64) -> u64 {
     r
 }
 
+/// [`powmod`] adding its multiplications to `muls`.
+fn powmod_counted(mut a: u64, mut e: u64, m: u64, muls: &mut u64) -> u64 {
+    let mut r = 1u64 % m;
+    a %= m;
+    while e > 0 {
+        if e & 1 == 1 {
+            *muls += 1;
+            r = mulmod(r, a, m);
+        }
+        *muls += 1;
+        a = mulmod(a, a, m);
+        e >>= 1;
+    }
+    r
+}
+
 /// Modular inverse by the extended Euclidean algorithm: `a⁻¹ mod m` in
 /// `[0, m)`, `None` when `gcd(a, m) ≠ 1`.
 ///
@@ -1293,6 +1309,16 @@ pub trait CountedGroup {
             }
         }
         acc
+    }
+
+    /// `[k]P` for a scalar wider than one word.  The default converts when it
+    /// fits a `u64`; a group whose subgroup order (or cofactor) needs more
+    /// overrides this with its wide multiplication.
+    fn mul_biguint(&self, ops: &mut GroupOps, p: Self::Elt, k: &BigUint) -> Self::Elt {
+        let k = k
+            .to_u64()
+            .expect("this group's scalar multiplication is one word");
+        self.mul(ops, p, k)
     }
 }
 
@@ -4478,16 +4504,24 @@ impl PrimeCurve {
     /// A square root modulo `p` (Tonelli–Shanks), or `None` for a
     /// non-residue.
     pub fn sqrt(&self, n: u64) -> Option<u64> {
+        self.sqrt_counted(n, &mut 0)
+    }
+
+    /// [`PrimeCurve::sqrt`], adding to `muls` the modular multiplications it
+    /// performs (squarings included: every `mulmod` call, the ones inside
+    /// its exponentiations too). The result is `sqrt`'s, step for step.
+    pub fn sqrt_counted(&self, n: u64, muls: &mut u64) -> Option<u64> {
         let p = self.p;
         let n = n % p;
         if n == 0 {
             return Some(0);
         }
         if p % 4 == 3 {
-            let r = powmod(n, (p + 1) / 4, p);
+            let r = powmod_counted(n, (p + 1) / 4, p, muls);
+            *muls += 1;
             return (mulmod(r, r, p) == n).then_some(r);
         }
-        if powmod(n, (p - 1) / 2, p) != 1 {
+        if powmod_counted(n, (p - 1) / 2, p, muls) != 1 {
             return None;
         }
         let mut q = p - 1;
@@ -4497,13 +4531,13 @@ impl PrimeCurve {
             s += 1;
         }
         let mut z = 2u64;
-        while powmod(z, (p - 1) / 2, p) != p - 1 {
+        while powmod_counted(z, (p - 1) / 2, p, muls) != p - 1 {
             z += 1;
         }
         let mut m = s;
-        let mut c = powmod(z, q, p);
-        let mut t = powmod(n, q, p);
-        let mut r = powmod(n, q.div_ceil(2), p);
+        let mut c = powmod_counted(z, q, p, muls);
+        let mut t = powmod_counted(n, q, p, muls);
+        let mut r = powmod_counted(n, q.div_ceil(2), p, muls);
         loop {
             if t == 1 {
                 return Some(r);
@@ -4511,14 +4545,16 @@ impl PrimeCurve {
             let mut i = 0u32;
             let mut tt = t;
             while tt != 1 {
+                *muls += 1;
                 tt = mulmod(tt, tt, p);
                 i += 1;
                 if i == m {
                     return None;
                 }
             }
-            let b = powmod(c, 1u64 << (m - i - 1), p);
+            let b = powmod_counted(c, 1u64 << (m - i - 1), p, muls);
             m = i;
+            *muls += 3;
             c = mulmod(b, b, p);
             t = mulmod(t, c, p);
             r = mulmod(r, b, p);
@@ -4967,6 +5003,57 @@ pub fn roster_prime_instance(bits: u32) -> Option<PrimeInstance> {
         r: n,
         cofactor: c.h as u64,
         generator: (c.gx.to_u64()?, c.gy.to_u64()?),
+    })
+}
+
+/// The Curve25519-family miniature at `k` bits, in short Weierstrass form.
+///
+/// These are the curves of `research/curve25519_ic_baseline_20261102`
+/// (`src/bin/curve25519_family.rs`): the largest prime `p ≡ 5 (mod 8)`
+/// below `2^k`, Montgomery `A` the smallest value with `A ≡ 2 (mod 4)` and
+/// `#E = 8r`, `#E' = 4r'` (`r`, `r'` prime, `r > 2^(k−3)`), and the
+/// smallest base point of order `r`.  Every structural property an index
+/// calculus can see on Curve25519 itself is preserved; the field is small
+/// enough for the `u64` engine.  `None` for a `k` without a committed
+/// miniature.
+pub fn curve25519_family_instance(k: u32) -> Option<PrimeInstance> {
+    // (k, p, a, b, #E, r, gx, gy), short Weierstrass `y² = x³ + ax + b`.
+    const MINIATURES: &[(u32, u64, u64, u64, u64, u64, u64, u64)] = &[
+        (
+            20, 1_048_573, 63_700, 872_826, 1_049_624, 131_203, 349_837, 122,
+        ),
+        (
+            24, 16_777_213, 16_743_506, 2_381_926, 16_778_792, 2_097_349, 109, 3_123_379,
+        ),
+        (
+            28,
+            268_435_157,
+            169_487_139,
+            71_222_779,
+            268_462_472,
+            33_557_809,
+            178_958_571,
+            19_523_146,
+        ),
+        (
+            32,
+            4_294_967_197,
+            1_173_263_412,
+            337_904_346,
+            4_295_077_112,
+            536_884_639,
+            1_431_665_017,
+            592_057_774,
+        ),
+    ];
+    let &(_, p, a, b, group_order, r, gx, gy) = MINIATURES.iter().find(|m| m.0 == k)?;
+    Some(PrimeInstance {
+        name: format!("curve25519-family-k{k}"),
+        curve: PrimeCurve { p, a, b },
+        group_order,
+        r,
+        cofactor: group_order / r,
+        generator: (gx, gy),
     })
 }
 
@@ -6445,6 +6532,27 @@ struct PackedPairTable {
     shift: u32,
     entries: u64,
     insert_attempts: u64,
+    /// The optional membership filter (`filter=1`): one bit per
+    /// [`filter_bit`] position, set for every stored key.  A clear bit
+    /// proves a key is absent, so a probe that misses (nearly every probe)
+    /// reads one bit of an array of about a byte per entry instead of
+    /// scanning a region; a set bit falls through to the region scan.  No
+    /// false negatives, so every answer is the unfiltered table's.  Empty
+    /// when off.
+    filter: Vec<u64>,
+    filter_shift: u32,
+}
+
+/// Bits of a [`PackedPairTable`] filter per stored entry, before rounding
+/// up to a power of two (so 8 to 16): a miss falls through with
+/// probability at most about 1/8.
+const PACKED_FILTER_BITS_PER_ENTRY: usize = 8;
+
+/// A key's filter bit: the high bits of a fourth multiplier, independent
+/// of [`table_part`] and [`slot_of`].
+#[inline]
+fn filter_bit(key: u64, shift: u32) -> usize {
+    (key.wrapping_mul(0xA24B_AED4_963E_E407) >> shift) as usize
 }
 
 impl PackedPairTable {
@@ -6452,6 +6560,7 @@ impl PackedPairTable {
         g: &PrimeCurve,
         fb: &FactorBase<PrimePoint>,
         ops: &mut GroupOps,
+        filtered: bool,
     ) -> Result<Self, String> {
         let expected = fb.abscissa_list.len().pow(2) + 1;
         let bits = (expected / PACKED_PART_ENTRIES)
@@ -6498,6 +6607,20 @@ impl PackedPairTable {
             }
             *part = Vec::new();
         }
+        let (filter, filter_shift) = if filtered {
+            let filter_bits = (entries as usize * PACKED_FILTER_BITS_PER_ENTRY)
+                .max(1 << 12)
+                .next_power_of_two();
+            let mut filter = vec![0u64; filter_bits / 64];
+            let filter_shift = 64 - filter_bits.trailing_zeros();
+            for &word in slots.iter().filter(|&&w| w != 0) {
+                let b = filter_bit(word >> 32, filter_shift);
+                filter[b >> 6] |= 1u64 << (b & 63);
+            }
+            (filter, filter_shift)
+        } else {
+            (Vec::new(), 64)
+        };
         Ok(Self {
             slots,
             base,
@@ -6505,6 +6628,8 @@ impl PackedPairTable {
             shift,
             entries,
             insert_attempts,
+            filter,
+            filter_shift,
         })
     }
 
@@ -6512,6 +6637,12 @@ impl PackedPairTable {
     fn get(&self, key: u64) -> Option<(u32, u32)> {
         if key == 0 || key > u64::from(u32::MAX) {
             return None;
+        }
+        if !self.filter.is_empty() {
+            let b = filter_bit(key, self.filter_shift);
+            if self.filter[b >> 6] >> (b & 63) & 1 == 0 {
+                return None;
+            }
         }
         let k = table_part(key, self.shift);
         let region = &self.slots[self.base[k]..=self.base[k] + self.mask[k]];
@@ -6780,6 +6911,9 @@ pub struct PairTable {
     pub insert_attempts: u64,
     /// `x_index` reads of a folded build, one per abscissa.
     pub index_lookups: u64,
+    /// Bits set in a packed table's membership filter, one per stored
+    /// entry (`filter=1`); 0 without a filter.  `bitop/v1` only.
+    pub filter_bit_sets: u64,
 }
 
 impl PairTable {
@@ -6792,6 +6926,9 @@ impl PairTable {
         }
         if self.index_lookups > 0 {
             out.insert("lookups".to_string(), self.index_lookups);
+        }
+        if self.filter_bit_sets > 0 {
+            out.insert("table_filter_bit_sets".to_string(), self.filter_bit_sets);
         }
         out
     }
@@ -6824,6 +6961,7 @@ impl PairTable {
             build_wall_ns: start.elapsed().as_nanos() as u64,
             insert_attempts: attempts,
             index_lookups: 0,
+            filter_bit_sets: 0,
         }
     }
 
@@ -6866,6 +7004,7 @@ impl PairTable {
             part_shift: 0,
             packed: None,
             lines: None,
+            filter_bit_sets: 0,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
             insert_attempts: attempts,
@@ -6912,6 +7051,7 @@ impl PairTable {
             build_wall_ns: start.elapsed().as_nanos() as u64,
             insert_attempts: attempts,
             index_lookups: a as u64,
+            filter_bit_sets: 0,
         }
     }
 
@@ -6940,6 +7080,7 @@ impl PairTable {
             part_shift: 0,
             packed: None,
             lines: None,
+            filter_bit_sets: 0,
             build_ops: ops,
             build_wall_ns: start.elapsed().as_nanos() as u64,
             insert_attempts: attempts,
@@ -6975,6 +7116,7 @@ impl PairTable {
             build_wall_ns: start.elapsed().as_nanos() as u64,
             insert_attempts: attempts,
             index_lookups: a as u64,
+            filter_bit_sets: 0,
         })
     }
 
@@ -7001,14 +7143,33 @@ impl PairTable {
         g: &PrimeCurve,
         fb: &FactorBase<PrimePoint>,
     ) -> Result<Self, String> {
+        Self::build_negation_folded_prime_blocked_with(g, fb, false)
+    }
+
+    /// [`Self::build_negation_folded_prime_blocked`], with the packed
+    /// table's membership filter when `filtered` ([`PackedPairTable`]).
+    /// The filter needs the packed layout, so `filtered` refuses a field
+    /// or base the packed layout cannot hold rather than build the small
+    /// maps without it.  Keys, witnesses, answers and group operations are
+    /// the unfiltered table's; the filter's bit sets are `bitop/v1` work.
+    pub fn build_negation_folded_prime_blocked_with(
+        g: &PrimeCurve,
+        fb: &FactorBase<PrimePoint>,
+        filtered: bool,
+    ) -> Result<Self, String> {
         let start = Instant::now();
         let mut ops = GroupOps::default();
         if g.p <= u64::from(u32::MAX) && fb.points.len() <= 1 << 16 {
-            let packed = PackedPairTable::build(g, fb, &mut ops)?;
+            let packed = PackedPairTable::build(g, fb, &mut ops, filtered)?;
             let insert_attempts = packed.insert_attempts;
             let index_lookups = fb.abscissa_list.len() as u64;
+            let filter_bit_sets = if filtered { packed.entries } else { 0 };
             return Ok(Self {
-                kind: "negation_folded_prime_blocked",
+                kind: if filtered {
+                    "negation_folded_prime_blocked_filtered"
+                } else {
+                    "negation_folded_prime_blocked"
+                },
                 entries: packed.entries,
                 map: fast_map(0),
                 parts: Vec::new(),
@@ -7019,7 +7180,16 @@ impl PairTable {
                 build_wall_ns: start.elapsed().as_nanos() as u64,
                 insert_attempts,
                 index_lookups,
+                filter_bit_sets,
             });
+        }
+        if filtered {
+            return Err(format!(
+                "filter=1 needs the packed pair table (p < 2^32 and at most 65536 base points); \
+                 this base has p = {} and {} points",
+                g.p,
+                fb.points.len()
+            ));
         }
         Self::build_negation_folded_prime_blocked_maps(g, fb, start, ops)
     }
@@ -7087,6 +7257,7 @@ impl PairTable {
             build_wall_ns: start.elapsed().as_nanos() as u64,
             insert_attempts: attempts,
             index_lookups: fb.abscissa_list.len() as u64,
+            filter_bit_sets: 0,
         })
     }
 
@@ -7164,8 +7335,8 @@ impl PairTable {
 
 /// Largest arity a [`KSumTable`] builds, and the bits each packed summand
 /// index takes in an entry (`KSUM_MAX_K · KSUM_INDEX_BITS ≤ 64`).
-const KSUM_MAX_K: u32 = 5;
-const KSUM_INDEX_BITS: u32 = 12;
+pub const KSUM_MAX_K: u32 = 5;
+pub const KSUM_INDEX_BITS: u32 = 12;
 
 /// **A table of every signed `k`-sum of a base** (`k = 3`, `4` or `5`), keyed by
 /// the sum's abscissa as [`PairTable`] is, so one probe decides a
@@ -7404,7 +7575,7 @@ impl KSumTable {
 /// Largest seed count and coefficient bound a [`WSumTable`] builds, and
 /// the largest number of entries it agrees to try.
 const WSUM_MAX_C: usize = 8;
-const WSUM_MAX_B: u64 = 255;
+pub const WSUM_MAX_B: u64 = 255;
 const WSUM_MAX_ENTRIES: u64 = 1 << 26;
 
 /// **A coefficient-box table over `C` seed points** (`wsum`, proposal P3):
@@ -7720,6 +7891,53 @@ impl<E: Copy + PartialEq> WSumTable<E> {
     }
 }
 
+/// The refusals of [`WalkTable::build_with`] that depend on the subgroup
+/// order and the parameters alone (not on the base or the generator), so the
+/// planner can refuse a `wwalk` arm that would error on every run.  Returns
+/// `(T, T_max, w, coefficient bound)`.
+pub fn wwalk_plan_check(
+    r: u64,
+    x: f64,
+    jumps: usize,
+    opts: WalkOpts,
+) -> Result<(u64, u64, u64, u64), String> {
+    if !(x > 0.0 && x <= WWALK_MAX_X) {
+        return Err(format!("wwalk: x is in (0, {WWALK_MAX_X}], not {x}"));
+    }
+    if !(WWALK_MIN_JUMPS..=WWALK_MAX_JUMPS).contains(&jumps) {
+        return Err(format!(
+            "wwalk: jumps is from {WWALK_MIN_JUMPS} to {WWALK_MAX_JUMPS}, not {jumps}"
+        ));
+    }
+    if opts.grow > 2 {
+        return Err(format!("wwalk: grow is 0, 1 or 2, not {}", opts.grow));
+    }
+    if opts.grow == 2 && !opts.g_jumps {
+        return Err("wwalk: grow=2 needs g=1 (without G the free rows are homogeneous)".into());
+    }
+    let t = (x * (r as f64).sqrt()).round() as u64;
+    if t < 2 {
+        return Err(format!(
+            "wwalk: x={x} gives a table of {t} entries at r={r}"
+        ));
+    }
+    let t_max = t * (1 + u64::from(opts.grow));
+    if t_max > WWALK_MAX_ENTRIES {
+        return Err(format!(
+            "wwalk: {t_max} entries exceed the 2^26 table limit (x={x}, r={r})"
+        ));
+    }
+    let w = ((1.2 * (t as f64).sqrt()).round() as u64).max(2);
+    // Every coefficient is at most 1 + t_max·w: it must pack in 32 bits.
+    let bound = 1 + t_max * w;
+    if bound >= 1 << 32 {
+        return Err(format!(
+            "wwalk: coefficients up to {bound} do not fit the 32-bit packing (x={x}, r={r})"
+        ));
+    }
+    Ok((t, t_max, w, bound))
+}
+
 /// Largest table a [`WalkTable`] agrees to build, and the jump-count range.
 const WWALK_MAX_ENTRIES: u64 = 1 << 26;
 const WWALK_MIN_JUMPS: usize = 2;
@@ -7781,7 +7999,11 @@ pub struct WalkTable<E> {
     map: FastMap<u64>,
     /// With `g_jumps`: the same key → `z` modulo `r`.
     zmap: FastMap<u64>,
-    /// Base index of the two seeds, and their relation columns.
+    /// Seeds in the base: 2, or 1 (`F = 1`, needs `g_jumps`: jumps
+    /// `[α_j]P1 + [γ_j]G`, entries `u·P1 + z·G`, `v = 0` throughout).
+    pub n_seeds: usize,
+    /// Base index of the two seeds, and their relation columns (with one
+    /// seed both slots name it).
     seeds: [usize; 2],
     seed_cols: [usize; 2],
     /// `pows[c][i] = [2^i]P_c` (`c = 2`: `G`), `None` for the identity.
@@ -7872,25 +8094,19 @@ impl<E: Copy + PartialEq> WalkTable<E> {
         opts: WalkOpts,
         seed: u64,
     ) -> Result<Self, String> {
-        if !(x > 0.0 && x <= WWALK_MAX_X) {
-            return Err(format!("wwalk: x is in (0, {WWALK_MAX_X}], not {x}"));
+        let (t, t_max, w, bound) = wwalk_plan_check(r, x, jumps, opts)?;
+        let n_seeds = fb.abscissa_list.len();
+        if n_seeds == 1 && !opts.g_jumps {
+            return Err(
+                "wwalk: a 1-seed base needs g=1 (without G a collision row du·s1 = 0 is empty)"
+                    .into(),
+            );
         }
-        if !(WWALK_MIN_JUMPS..=WWALK_MAX_JUMPS).contains(&jumps) {
+        if n_seeds != 2 && n_seeds != 1 {
             return Err(format!(
-                "wwalk: jumps is from {WWALK_MIN_JUMPS} to {WWALK_MAX_JUMPS}, not {jumps}"
-            ));
-        }
-        if fb.abscissa_list.len() != 2 {
-            return Err(format!(
-                "wwalk: needs exactly 2 seeds (base abscissae); the base has {}",
+                "wwalk: needs exactly 2 seeds (base abscissae), or 1 with g=1; the base has {}",
                 fb.abscissa_list.len()
             ));
-        }
-        if opts.grow > 2 {
-            return Err(format!("wwalk: grow is 0, 1 or 2, not {}", opts.grow));
-        }
-        if opts.grow == 2 && !opts.g_jumps {
-            return Err("wwalk: grow=2 needs g=1 (without G the free rows are homogeneous)".into());
         }
         let gen = if opts.g_jumps {
             let q = generator.ok_or_else(|| "wwalk: g=1 needs the generator".to_string())?;
@@ -7902,28 +8118,8 @@ impl<E: Copy + PartialEq> WalkTable<E> {
             None
         };
         let grow = opts.grow > 0;
-        let t = (x * (r as f64).sqrt()).round() as u64;
-        if t < 2 {
-            return Err(format!(
-                "wwalk: x={x} gives a table of {t} entries at r={r}"
-            ));
-        }
-        let t_max = t * (1 + u64::from(opts.grow));
-        if t_max > WWALK_MAX_ENTRIES {
-            return Err(format!(
-                "wwalk: {t_max} entries exceed the 2^26 table limit (x={x}, r={r})"
-            ));
-        }
-        let w = ((1.2 * (t as f64).sqrt()).round() as u64).max(2);
-        // Every coefficient is at most 1 + t_max·w: it must pack in 32 bits.
-        let bound = 1 + t_max * w;
-        if bound >= 1 << 32 {
-            return Err(format!(
-                "wwalk: coefficients up to {bound} do not fit the 32-bit packing (x={x}, r={r})"
-            ));
-        }
         let start = Instant::now();
-        let seeds: [usize; 2] = [0, 1].map(|c| {
+        let seeds: [usize; 2] = [0, n_seeds - 1].map(|c| {
             let a = fb.abscissa_list[c];
             fb.x_index
                 .get(&a)
@@ -7934,7 +8130,7 @@ impl<E: Copy + PartialEq> WalkTable<E> {
         let nbits = (64 - bound.leading_zeros()) as usize;
         let mut setup_ops = GroupOps::default();
         let mut pows: [Vec<Option<E>>; 3] = [Vec::new(), Vec::new(), Vec::new()];
-        for c in 0..2 {
+        for c in 0..n_seeds {
             let mut cur = (!g.is_identity(&p[c])).then_some(p[c]);
             pows[c].push(cur);
             for _ in 1..nbits {
@@ -7963,6 +8159,7 @@ impl<E: Copy + PartialEq> WalkTable<E> {
             } else {
                 fast_map(0)
             },
+            n_seeds,
             seeds,
             seed_cols,
             pows,
@@ -7984,7 +8181,7 @@ impl<E: Copy + PartialEq> WalkTable<E> {
             build_wall_ns: 0,
             insert_attempts: 0,
             identities_skipped: 0,
-            index_lookups: 2,
+            index_lookups: n_seeds as u64,
             collisions: Vec::new(),
             collision_z: Vec::new(),
             verified_collisions: 0,
@@ -8004,7 +8201,12 @@ impl<E: Copy + PartialEq> WalkTable<E> {
             if tries > 64 * jumps as u32 {
                 return Err("wwalk: could not draw non-identity jump points".into());
             }
-            let (al, be) = (rng.gen_range(1..=w), rng.gen_range(1..=w));
+            // One seed: no P2 part (β = 0), and no draw for it.
+            let (al, be) = if n_seeds == 2 {
+                (rng.gen_range(1..=w), rng.gen_range(1..=w))
+            } else {
+                (rng.gen_range(1..=w), 0)
+            };
             let ga = if opts.g_jumps { rng.gen_range(1..r) } else { 0 };
             let mut ops = table.setup_ops;
             let pt = table.eval(g, &mut ops, al, be, ga);
@@ -12517,6 +12719,29 @@ mod tests {
         }
     }
 
+    #[test]
+    fn curve25519_family_miniatures_are_consistent() {
+        for k in [20u32, 24, 28, 32] {
+            let inst = curve25519_family_instance(k).unwrap_or_else(|| panic!("no k={k}"));
+            assert_eq!(inst.curve.p % 8, 5, "k={k}: p must be 5 mod 8");
+            assert_eq!(inst.cofactor, 8, "k={k}: #E must be 8r");
+            assert_eq!(inst.group_order, inst.r * inst.cofactor);
+            assert!(inst.r > (1u64 << (k - 3)), "k={k}: r too small");
+            let g = inst.generator_point();
+            assert!(inst.curve.is_on_curve(g), "k={k}: generator off curve");
+            let mut ops = GroupOps::default();
+            assert!(
+                inst.curve.mul(&mut ops, g, inst.r).infinity,
+                "k={k}: [r]G is not the identity"
+            );
+            assert!(
+                !inst.curve.mul(&mut ops, g, inst.r + 1).infinity,
+                "k={k}: [r+1]G is the identity"
+            );
+        }
+        assert!(curve25519_family_instance(22).is_none());
+    }
+
     /// Moduli at every edge the fast paths branch on: tiny, either side
     /// of `2^32`, above `2^63`, and the largest word.
     fn edge_moduli() -> Vec<u64> {
@@ -14698,6 +14923,77 @@ mod tests {
         }
     }
 
+    #[test]
+    fn prime_blocked_filter_answers_every_key_as_the_unfiltered_table() {
+        let inst = prime_instance_for(20, 59297);
+        let fb = prime_factor_base(&inst, 600);
+        let plain = PairTable::build_negation_folded_prime_blocked(&inst.curve, &fb).unwrap();
+        let filtered =
+            PairTable::build_negation_folded_prime_blocked_with(&inst.curve, &fb, true).unwrap();
+        let packed = filtered.packed.as_ref().expect("packed layout");
+        assert!(!packed.filter.is_empty());
+        assert!(plain.packed.as_ref().unwrap().filter.is_empty());
+        assert_eq!(filtered.kind, "negation_folded_prime_blocked_filtered");
+        assert_eq!(filtered.entries, plain.entries);
+        assert_eq!(filtered.filter_bit_sets, plain.entries);
+        assert_eq!(plain.filter_bit_sets, 0);
+        assert_eq!(filtered.insert_attempts, plain.insert_attempts);
+        assert_eq!(filtered.index_lookups, plain.index_lookups);
+        assert_eq!(filtered.build_ops.adds, plain.build_ops.adds);
+        assert_eq!(filtered.build_ops.doubles, plain.build_ops.doubles);
+        assert_eq!(
+            filtered.build_ops.field_ops.muls,
+            plain.build_ops.field_ops.muls
+        );
+        assert_eq!(
+            filtered.build_ops.field_ops.sqrs,
+            plain.build_ops.field_ops.sqrs
+        );
+        assert_eq!(
+            filtered.build_ops.field_ops.invs,
+            plain.build_ops.field_ops.invs
+        );
+        let mut work = plain.work_counters();
+        work.insert("table_filter_bit_sets".to_string(), plain.entries);
+        assert_eq!(filtered.work_counters(), work);
+        // Every key below the field, and the out-of-range ones, held or not.
+        let mut passed = 0u64;
+        for key in 0..=inst.curve.p + 1 {
+            let want = plain.get(key);
+            assert_eq!(filtered.get(key), want, "key {key}");
+            if want.is_none() && key != 0 && key <= u64::from(u32::MAX) {
+                let b = filter_bit(key, packed.filter_shift);
+                passed += packed.filter[b >> 6] >> (b & 63) & 1;
+            }
+        }
+        // The filter must reject most misses: at 8 to 16 bits an entry,
+        // at most about one miss in eight falls through.
+        let misses = inst.curve.p + 1 - plain.entries;
+        assert!(
+            passed * 6 < misses,
+            "{passed} of {misses} misses passed the filter"
+        );
+        assert_eq!(filtered.get(u64::from(u32::MAX) + 1), None);
+    }
+
+    #[test]
+    fn prime_blocked_filter_refuses_the_small_maps_layout() {
+        let curve = PrimeCurve {
+            p: (1u64 << 33) - 9,
+            a: 1,
+            b: 1,
+        };
+        let inst = prime_instance_for(20, 59297);
+        let fb = prime_factor_base(&inst, 8);
+        let err = PairTable::build_negation_folded_prime_blocked_with(&curve, &fb, true)
+            .err()
+            .expect("filter=1 needs the packed layout");
+        assert!(
+            err.contains("filter=1 needs the packed pair table"),
+            "{err}"
+        );
+    }
+
     /// Wall time of the folded prime table's arithmetic alone and of the
     /// two batched layouts, on the 32-bit curve of
     /// `research/ic_linalg_pipeline_20261019`.  A diagnostic: not a
@@ -16132,5 +16428,155 @@ mod wwalk_table_tests {
             grow: 3,
         };
         assert!(WalkTable::build_with(g, Some(gen), &fb, r, 1.0, 16, three, 0).is_err());
+    }
+
+    /// `wwalk` over a **one-seed** base (`F = 1`, `g=1`): jumps are
+    /// `[α_j]P1 + [γ_j]G`, entries `u·P1 + z·G` with `v = 0`, every free row
+    /// is the affine equation `du·s1 = −dz` over the single seed column
+    /// (one such row pins `log P1`), probe answers rebuild the target, and
+    /// `grow=1` / `grow=2` both stop at rank 1 or at the cap.  Without `g`
+    /// the one-seed base is refused.
+    #[test]
+    fn wwalk_one_seed_rows_are_affine_and_grow_reaches_rank_one() {
+        let inst = prime_instance_for(12, 3);
+        let g = &inst.curve;
+        let r = inst.r;
+        let h = inst.cofactor;
+        let gen = inst.generator_point();
+        let log = logs(&inst);
+        let mut cops = GroupOps::default();
+        let log_of = |p: &PrimePoint, cops: &mut GroupOps| -> u64 {
+            let hp = g.mul(cops, *p, h);
+            if g.is_identity(&hp) {
+                0
+            } else {
+                log[&g.key(&hp)]
+            }
+        };
+        let fb = prime_factor_base(&inst, 1);
+        assert_eq!(fb.abscissa_list.len(), 1);
+        let mut col_log = vec![None; fb.columns];
+        for (i, p) in fb.points.iter().enumerate() {
+            let inv = invmod(fb.coef_of[i] % r, r).unwrap();
+            let l = ((log_of(p, &mut cops) as u128 * inv as u128) % r as u128) as u64;
+            let slot = col_log[fb.col_of[i]].get_or_insert(l);
+            assert_eq!(*slot, l);
+        }
+        let dot = |row: &[(usize, u64)]| {
+            row.iter().fold(0u128, |s, &(col, v)| {
+                (s + v as u128 * col_log[col].unwrap() as u128) % r as u128
+            })
+        };
+        let (mut rank1, mut capped, mut total_rows) = (0, 0, 0u64);
+        for (x, jumps, grow, seed) in [
+            (2.0, 16usize, 0u8, 0u64),
+            (1.0, 8, 1, 1),
+            (1.0, 16, 1, 2),
+            (1.5, 16, 2, 3),
+            (1.0, 16, 2, 4),
+            (0.5, 16, 2, 5),
+            (0.5, 16, 1, 6),
+            (1.0, 16, 2, 7),
+        ] {
+            let opts = WalkOpts {
+                g_jumps: true,
+                grow,
+            };
+            let t = WalkTable::build_with(g, Some(gen), &fb, r, x, jumps, opts, seed).unwrap();
+            assert_eq!(t.n_seeds, 1);
+            assert_eq!(t.seeds[0], t.seeds[1]);
+            assert_eq!(t.index_lookups, 1);
+            // (a) charging: one addition a step; doublings are P1's and G's
+            // doubled multiples only (no second seed); the ledgers sum.
+            assert_eq!(t.walk_ops.adds, t.steps);
+            assert_eq!(t.walk_ops.doubles, 0);
+            assert_eq!(t.verify_ops.doubles, 0);
+            assert!(t
+                .jump_coefs
+                .iter()
+                .all(|&(al, be)| be == 0 && (1..=t.w).contains(&al)));
+            assert!(t.jump_gammas.iter().all(|&ga| (1..r).contains(&ga)));
+            let nbits = u64::from(64 - (1 + t.t_max * t.w).leading_zeros());
+            let gbits = u64::from(64 - (r - 1).leading_zeros());
+            assert!(t.setup_ops.doubles <= (nbits - 1) + (gbits - 1));
+            let mut sum = t.setup_ops;
+            sum.merge(t.walk_ops);
+            sum.merge(t.verify_ops);
+            assert_eq!(sum.adds, t.build_ops.adds);
+            assert_eq!(sum.doubles, t.build_ops.doubles);
+            assert_eq!(t.t_max, t.t * (1 + u64::from(grow)));
+            assert!(t.steps >= t.t && t.steps <= t.t_max);
+            assert_eq!(t.inconsistent_rows, 0);
+            assert_eq!(t.rows.len(), t.row_consts.len());
+            // (b) every probe answer reproduces its target with v = 0.
+            let p1 = fb.points[t.seeds[0]];
+            let mut ops = GroupOps::default();
+            let mut lookups = 0;
+            let mut hits = 0;
+            for k in 1..r {
+                let target = g.mul(&mut ops, gen, k);
+                if let Some((sign, u, v, z)) = t.probe_z(g, &mut ops, &mut lookups, target) {
+                    assert_eq!(v, 0, "x={x} k={k}: one seed has no v");
+                    let a = g.mul(&mut ops, p1, u);
+                    let c = g.mul(&mut ops, gen, z);
+                    let s = g.add(&mut ops, a, c);
+                    assert_eq!(if sign > 0 { s } else { g.neg(s) }, target, "x={x} k={k}");
+                    let cols = t.hit_columns(&fb, r, sign, u, v);
+                    assert!(cols.len() <= 1);
+                    let konst = WalkTable::<PrimePoint>::hit_const(r, k, sign, z);
+                    assert_eq!(
+                        dot(&cols),
+                        (h as u128 * konst as u128) % r as u128,
+                        "x={x} k={k}: hit row"
+                    );
+                    hits += 1;
+                }
+            }
+            assert_eq!(
+                hits,
+                2 * t.entries,
+                "x={x}: every stored orbit is hit twice"
+            );
+            // (c) free rows: one column, affine, true under the logs.
+            assert_eq!(t.rows.len() as u64 + t.zero_rows, t.verified_collisions);
+            for (row, &konst) in t.rows.iter().zip(&t.row_consts) {
+                assert_eq!(row.len(), 1, "x={x}: a one-seed row has one column");
+                assert_eq!(row[0].0, t.seed_cols[0]);
+                assert_eq!(
+                    dot(row),
+                    (h as u128 * konst as u128) % r as u128,
+                    "x={x}: row {row:?} const {konst}"
+                );
+            }
+            total_rows += t.rows.len() as u64;
+            assert!(t.seed_rank(r) <= 1);
+            // (d) grow stops at rank 1 or at the cap.
+            if grow > 0 {
+                if t.seed_rank(r) == 1 {
+                    rank1 += 1;
+                } else {
+                    assert_eq!(t.steps, t.t_max, "stopped below rank 1 before the cap");
+                    capped += 1;
+                }
+            }
+        }
+        eprintln!(
+            "wwalk one seed small curve: rows {total_rows}, grown rank-1 {rank1}, capped {capped}"
+        );
+        assert!(total_rows > 0);
+        assert!(rank1 >= 5, "grow should usually reach rank 1");
+        // Refusals: one seed without G, and three seeds.
+        let no_g = WalkOpts {
+            g_jumps: false,
+            grow: 1,
+        };
+        assert!(WalkTable::build_with(g, Some(gen), &fb, r, 1.0, 16, no_g, 0).is_err());
+        assert!(WalkTable::build(g, &fb, r, 1.0, 16, false, 0).is_err());
+        let fb3 = prime_factor_base(&inst, 3);
+        let ok = WalkOpts {
+            g_jumps: true,
+            grow: 2,
+        };
+        assert!(WalkTable::build_with(g, Some(gen), &fb3, r, 1.0, 16, ok, 0).is_err());
     }
 }

@@ -78,7 +78,7 @@ from the prime-field closure is open again (`GAP-PF-TRACE-PULLBACK-FACTOR-BASE`)
 | `F4Containment` | `run_subset`, `no_gb_of_run_of_low_lt`, `dclosed_of_basis`, `monomial_mul_mem` | A subspace S is D-closed when `X i * f ∈ S` for every `f ∈ S` with `totalDegree f + 1 ≤ D`. An abstract F4 run (`F4Run`) puts each new basis in the span of earlier bases and their monomial multiples within degree D. Every basis of such a run lies in any D-closed S that contains the generators. With `dim(S ∩ P_{≤1}) < k`, no basis of the run is a Gröbner basis, so the `pq2_rank` closure counts are lower bounds on F4's maximal step degree. Closure of `span B` reduces to a finite check on B. |
 
 The axiom audit for all four theorems shows `propext`, `Classical.choice` and `Quot.sound` only.
-Their pcc claims are `PCC-20261105-0d2470` and `PCC-20261105-96e86b`, both unsigned [pcc:unverified].
+Their pcc claims are `PCC-20261107-209a57` and `PCC-20261107-91a01d`, both unsigned [pcc:unverified].
 Fidelity limit: the model covers F4 as published, including symbolic preprocessing, the
 simplify heuristic, criteria and the final interreduction. That msolve, Magma or FGb fit it
 is a reading of their algorithms, not a theorem.

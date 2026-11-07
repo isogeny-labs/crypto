@@ -118,6 +118,12 @@ pub fn f4_rows_generated_thread() -> (u64, u64) {
     ROWS_GENERATED.with(|c| c.get())
 }
 
+/// Credit rows generated on another thread to this one (a parallel solve
+/// hands its workers' counts back to the thread that asked).
+pub(crate) fn credit_rows_generated(rows: u64, words: u64) {
+    note_rows_generated(rows, words);
+}
+
 /// Shape of the degree-`degree` Macaulay matrix an inherited-F4 root builds
 /// for `system`: `(rows, columns, rank)`, with multipliers over the
 /// occurring variables, or, with `support_local`, over each generator's own
@@ -166,6 +172,11 @@ fn note_root_elimination(word_ops: u64) {
 /// only in how they were reduced can be compared tree for tree.
 pub fn f4_root_elimination_thread() -> u64 {
     ROOT_ELIMINATION.with(|c| c.get())
+}
+
+/// Credit root eliminations done on another thread to this one.
+pub(crate) fn credit_root_elimination(word_ops: u64) {
+    note_root_elimination(word_ops);
 }
 
 // ── Root shape replay (`KIC_F4_ROOT_REPLAY=1`, off by default) ─────────

@@ -50,6 +50,10 @@ fn tls_connector(ca_file: Option<&str>) -> Result<tokio_postgres_rustls::MakeRus
 
 pub fn pool(args: &DbArgs) -> Result<Pool> {
     let cfg: tokio_postgres::Config = args.database_url.parse().context("parsing DATABASE_URL")?;
+    // Fast runs no SQL on recycle (the /v1/sql route resets its own session,
+    // api/sql.rs SESSION_RESET). Never recycle with DISCARD ALL or DEALLOCATE
+    // (RecyclingMethod::Custom): it drops the statements tokio-postgres keeps
+    // per connection for type lookups and breaks the next non-built-in column.
     let mgr_cfg = ManagerConfig { recycling_method: RecyclingMethod::Fast };
     let mgr = match args.pg_tls {
         TlsMode::Disable => Manager::from_config(cfg, tokio_postgres::NoTls, mgr_cfg),

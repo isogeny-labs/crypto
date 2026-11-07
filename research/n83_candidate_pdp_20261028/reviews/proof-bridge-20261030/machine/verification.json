@@ -1,0 +1,102 @@
+{
+  "schema": "n83.proof-bridge-machine-review/v1",
+  "producer_revision": "c64f02c176787dbf40d455f95b75bd2dd5bfe5bf",
+  "source_sha256": "1278a3102c773081aafab2c7c193cc0fff49e9654f2dbd4884024f6cdc7d8f59",
+  "lean_binary_sha256": "e8baaa71855a616dc351028f3ad2200051b0671f423a1696a100e809302d5550",
+  "toolchain_version": "Lean (version 4.34.1, x86_64-unknown-linux-gnu, commit 5045d0056413266e57c625dcd7c365b10e377c52, Release)",
+  "declarations": {
+    "N83LefschetzBoundary.exponent_within_string": [
+      "propext",
+      "Quot.sound"
+    ],
+    "N83LefschetzBoundary.exponent_within_cap": [
+      "propext",
+      "Quot.sound"
+    ],
+    "N83LefschetzBoundary.monomial_exponent_within_cap": [
+      "propext",
+      "Quot.sound"
+    ],
+    "N83LefschetzBoundary.n83_through_degree16": [
+      "propext",
+      "Quot.sound"
+    ],
+    "N83LefschetzBoundary.below_quartic_no_coefficient": [
+      "propext",
+      "Quot.sound"
+    ],
+    "N83LefschetzBoundary.odd_width_boundary": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "N83LefschetzBoundary.n83_degree17_boundary": [],
+    "N83LefschetzBoundary.source_characteristic_above_width": []
+  },
+  "named_declarations_checked": 8,
+  "controls": [
+    {
+      "control": "known_counterexample",
+      "compiler_exit_code": 0,
+      "audit_accepted": true,
+      "expected_audit_acceptance": true,
+      "reported_axioms": {
+        "removedBoundCounterexample": []
+      }
+    },
+    {
+      "control": "false_bound",
+      "compiler_exit_code": 1,
+      "audit_accepted": false,
+      "expected_audit_acceptance": false,
+      "reported_axioms": {}
+    },
+    {
+      "control": "missing_declaration",
+      "compiler_exit_code": 1,
+      "audit_accepted": false,
+      "expected_audit_acceptance": false,
+      "reported_axioms": {}
+    },
+    {
+      "control": "sorry_hole",
+      "compiler_exit_code": 0,
+      "audit_accepted": false,
+      "expected_audit_acceptance": false,
+      "reported_axioms": {
+        "deliberateHole": [
+          "sorryAx"
+        ]
+      }
+    },
+    {
+      "control": "custom_axiom",
+      "compiler_exit_code": 0,
+      "audit_accepted": false,
+      "expected_audit_acceptance": false,
+      "reported_axioms": {
+        "customAxiomControl": [
+          "deliberateUntrusted"
+        ]
+      }
+    },
+    {
+      "control": "native_bypass",
+      "compiler_exit_code": 0,
+      "audit_accepted": false,
+      "expected_audit_acceptance": false,
+      "reported_axioms": {
+        "nativeBypassControl": [
+          "nativeBypassControl._native.native_decide.ax_1_1"
+        ]
+      }
+    }
+  ],
+  "allowed_axioms": [
+    "Classical.choice",
+    "Quot.sound",
+    "propext"
+  ],
+  "lean4checker_available": false,
+  "trust_boundary": "Fresh Lean compiler/kernel run using bundled Std. No independent binary/kernel rechecker. This file audits eight arithmetic declarations, not the full polynomial claim."
+}
