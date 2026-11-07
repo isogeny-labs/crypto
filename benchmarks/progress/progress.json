@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261106T0514Z-rho-frob-brent",
+  "latest_record": "20261107T1947Z-curve25519-f1-walk-k24",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 47,
+    "measured": 49,
     "open": 0
   },
   "repo": "crypto",
@@ -1490,6 +1490,360 @@
         }
       ],
       "problem": "ic:curve25519-family-k32",
+      "unit": "S"
+    },
+    {
+      "better": "higher",
+      "first": 1.2283,
+      "latest": 1.2283,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "ratio_f2_over_f1_w01",
+      "points": [
+        {
+          "commit": "a2be660914e8",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 8,
+          "record": "20261107T1945Z-curve25519-f1-walk-k20",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.18,
+            1.2785
+          ],
+          "summary": "k=20 single-target: F=1 wwalk (1-seed base, x=0.7) vs F=2 incumbent and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_walk_20261107/README.md",
+          "value": 1.2283
+        }
+      ],
+      "problem": "ic:curve25519-k20-single-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.2385,
+      "latest": 1.2385,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "ratio_f2_over_f1_w0",
+      "points": [
+        {
+          "commit": "a2be660914e8",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 8,
+          "record": "20261107T1945Z-curve25519-f1-walk-k20",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.1919,
+            1.287
+          ],
+          "summary": "k=20 single-target: F=1 wwalk (1-seed base, x=0.7) vs F=2 incumbent and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_walk_20261107/README.md",
+          "value": 1.2385
+        }
+      ],
+      "problem": "ic:curve25519-k20-single-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.1542,
+      "latest": 1.1542,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "ratio_f2_over_f1_w1",
+      "points": [
+        {
+          "commit": "a2be660914e8",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 8,
+          "record": "20261107T1945Z-curve25519-f1-walk-k20",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0925,
+            1.2195
+          ],
+          "summary": "k=20 single-target: F=1 wwalk (1-seed base, x=0.7) vs F=2 incumbent and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_walk_20261107/README.md",
+          "value": 1.1542
+        }
+      ],
+      "problem": "ic:curve25519-k20-single-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 2.3781,
+      "latest": 2.3781,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.428717
+      },
+      "metric": "s_f1_x07_w01",
+      "points": [
+        {
+          "commit": "a2be660914e8",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.428717
+          },
+          "n": 512,
+          "record": "20261107T1945Z-curve25519-f1-walk-k20",
+          "reference": 1.6645,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=20 single-target: F=1 wwalk (1-seed base, x=0.7) vs F=2 incumbent and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_walk_20261107/README.md",
+          "value": 2.3781
+        }
+      ],
+      "problem": "ic:curve25519-k20-single-target",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 2.3211,
+      "latest": 2.3211,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.495072
+      },
+      "metric": "s_f1_x07_w0",
+      "points": [
+        {
+          "commit": "a2be660914e8",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.495072
+          },
+          "n": 512,
+          "record": "20261107T1945Z-curve25519-f1-walk-k20",
+          "reference": 1.5525,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=20 single-target: F=1 wwalk (1-seed base, x=0.7) vs F=2 incumbent and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_walk_20261107/README.md",
+          "value": 2.3211
+        }
+      ],
+      "problem": "ic:curve25519-k20-single-target",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 2.8907,
+      "latest": 2.8907,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.081768
+      },
+      "metric": "s_f1_x07_w1",
+      "points": [
+        {
+          "commit": "a2be660914e8",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.081768
+          },
+          "n": 512,
+          "record": "20261107T1945Z-curve25519-f1-walk-k20",
+          "reference": 2.6722,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=20 single-target: F=1 wwalk (1-seed base, x=0.7) vs F=2 incumbent and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_walk_20261107/README.md",
+          "value": 2.8907
+        }
+      ],
+      "problem": "ic:curve25519-k20-single-target",
+      "unit": "S"
+    },
+    {
+      "better": "higher",
+      "first": 1.1475,
+      "latest": 1.1475,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "ratio_f2_over_f1_w01",
+      "points": [
+        {
+          "commit": "a2be660914e8",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 8,
+          "record": "20261107T1947Z-curve25519-f1-walk-k24",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0915,
+            1.2063
+          ],
+          "summary": "k=24 single-target: F=1 wwalk (1-seed base, x=0.7) vs F=2 incumbent and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_walk_20261107/README.md",
+          "value": 1.1475
+        }
+      ],
+      "problem": "ic:curve25519-k24-single-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.1636,
+      "latest": 1.1636,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "ratio_f2_over_f1_w0",
+      "points": [
+        {
+          "commit": "a2be660914e8",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 8,
+          "record": "20261107T1947Z-curve25519-f1-walk-k24",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.1094,
+            1.2204
+          ],
+          "summary": "k=24 single-target: F=1 wwalk (1-seed base, x=0.7) vs F=2 incumbent and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_walk_20261107/README.md",
+          "value": 1.1636
+        }
+      ],
+      "problem": "ic:curve25519-k24-single-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 1.0384,
+      "latest": 1.0384,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "ratio_f2_over_f1_w1",
+      "points": [
+        {
+          "commit": "a2be660914e8",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 8,
+          "record": "20261107T1947Z-curve25519-f1-walk-k24",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9694,
+            1.1124
+          ],
+          "summary": "k=24 single-target: F=1 wwalk (1-seed base, x=0.7) vs F=2 incumbent and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_walk_20261107/README.md",
+          "value": 1.0384
+        }
+      ],
+      "problem": "ic:curve25519-k24-single-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.8945,
+      "latest": 1.8945,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.49751
+      },
+      "metric": "s_f1_x07_w01",
+      "points": [
+        {
+          "commit": "a2be660914e8",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.49751
+          },
+          "n": 512,
+          "record": "20261107T1947Z-curve25519-f1-walk-k24",
+          "reference": 1.2651,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=24 single-target: F=1 wwalk (1-seed base, x=0.7) vs F=2 incumbent and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_walk_20261107/README.md",
+          "value": 1.8945
+        }
+      ],
+      "problem": "ic:curve25519-k24-single-target",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.8341,
+      "latest": 1.8341,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.580167
+      },
+      "metric": "s_f1_x07_w0",
+      "points": [
+        {
+          "commit": "a2be660914e8",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.580167
+          },
+          "n": 512,
+          "record": "20261107T1947Z-curve25519-f1-walk-k24",
+          "reference": 1.1607,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=24 single-target: F=1 wwalk (1-seed base, x=0.7) vs F=2 incumbent and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_walk_20261107/README.md",
+          "value": 1.8341
+        }
+      ],
+      "problem": "ic:curve25519-k24-single-target",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 2.4383,
+      "latest": 2.4383,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.105805
+      },
+      "metric": "s_f1_x07_w1",
+      "points": [
+        {
+          "commit": "a2be660914e8",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.105805
+          },
+          "n": 512,
+          "record": "20261107T1947Z-curve25519-f1-walk-k24",
+          "reference": 2.205,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=24 single-target: F=1 wwalk (1-seed base, x=0.7) vs F=2 incumbent and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_walk_20261107/README.md",
+          "value": 2.4383
+        }
+      ],
+      "problem": "ic:curve25519-k24-single-target",
       "unit": "S"
     },
     {
