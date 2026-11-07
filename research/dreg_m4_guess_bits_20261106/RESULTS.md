@@ -1,11 +1,11 @@
 # Results: at m = 4, the four link-1 guesses never decide degree-3 refutation; one to three link-3 guesses carry it on 7 of 13 arm-draws
 
-Standing: claim [pcc:PCC-20261106-c9c345], an **unverified assertion** until a pcc
+Standing: claim [pcc:PCC-20261107-c12257], an **unverified assertion** until a pcc
 verdict exists (AGENTS.md, "Sabotage is assumed").
 
 - **Scoring.** Natively by `dreg_m4_guess_bits` (`score-output.txt`) against
   `PREREGISTRATION.md`, frozen before any run. Validity of phase 1 by
-  `dreg_m4_link_score --study` (`phase1-score.txt`).
+  `dreg_m4_link_rescore --study` (`phase1-score.txt`; the run used the same code as a `--study` option in `dreg_m4_link_score.rs`, moved to its own file before merge so that #3571's claim, which pins that source, stays valid; the two differ only in doc comments).
 - **Disclosed change after the run:** the analyser gained a report-only Q2 line
   (essential guesses by link). It changes no reading.
 - **Run, 2026-11-06 22:18 UTC to 22:55 UTC.** 16,384 phase-1 runs and 424
