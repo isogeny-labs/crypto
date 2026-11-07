@@ -1,0 +1,22 @@
+{
+  "schema": "metal-correctness-build-repair/v1",
+  "pr": 3458,
+  "parent": "e195eb7e04476901805f2b756bdf44d19e534b1d",
+  "failed_jobs": [
+    127252119523,
+    127252119582
+  ],
+  "change": {
+    "CARGO_PROFILE_RELEASE_CODEGEN_UNITS": "256"
+  },
+  "scope": "Existing untimed hosted Metal library and CLI correctness phases only",
+  "reference": [
+    "https://doc.rust-lang.org/cargo/reference/profiles.html#codegen-units",
+    ".github/workflows/aps-single-relation.yml@3a7882f5d5bddbca3afa8ee3cb708e485cc5ac62"
+  ],
+  "existing_commands_conditions_assertions_timeouts_unchanged": true,
+  "source_evidence_policy_ledger_unchanged": true,
+  "journal_all_parent_prefixes_retained": true,
+  "validation": "fresh CI required; no Metal execution possible on this Linux workspace",
+  "standing": "unverified"
+}

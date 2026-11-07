@@ -1,0 +1,20 @@
+import NodeSizes
+set_option autoImplicit false
+namespace ComponentMap
+variable {n : Nat} {K : Type*} [Field K]
+def insertRank (rank : Fin n → Nat) : Fin (n+1) → Nat := Fin.lastCases 0 rank
+theorem insert_forest (s : GraphFind.State K n) (rank : Fin n → Nat)
+ (hf : GraphFind.Forest s rank) : GraphFind.Forest (insertGraph s) (insertRank rank) := by
+ intro x
+ refine Fin.lastCases ?_ (fun i => ?_) x
+ · left;simp [insertGraph]
+ · rcases hf i with h|h
+   · left;simpa [insertGraph] using congrArg Fin.castSucc h
+   · right;simpa [insertGraph,insertRank] using h
+theorem inserted_owner_is_root (s : GraphFind.State K n) (owner : Fin n → Fin n)
+ (rank : Fin n → Nat) (hm : Valid s owner) (hf : GraphFind.Forest s rank)
+ (x : Fin (n+1)) : ∃ t pot, GraphFind.Run (insertGraph s) x t (extendMap owner x) pot := by
+ exact owner_is_returned_root _ _ _ (insert_forest s rank hf) (insert_valid s owner hm) x
+theorem next_length_bound (n : Nat) (h : n+1<USize.size) :
+ n<USize.size ∧ n+1<USize.size := by omega
+end ComponentMap

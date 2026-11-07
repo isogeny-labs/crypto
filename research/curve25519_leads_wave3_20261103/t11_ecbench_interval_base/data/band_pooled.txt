@@ -1,0 +1,33 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp20-tm1050-4295f05e | 17.00 | pkm-int-t5-g3-L541434 | 12/12 | 28.226 | 7001937.597 | 70019121.945 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | pkm-int-t5-g3-L976503 | 12/12 | 25.941 | 6333651.186 | 63336278.397 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | pkm-int-t5-g3-lo0 | 12/12 | 56.628 | 14491575.449 | 144915244.835 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | pkm-iso-t6-g4 | 12/12 | 29.170 | 1618179.641 | 16181533.886 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | pkm-iso-t6-g4-s1093 | 12/12 | 22.633 | 821161.110 | 8211407.400 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | proj-a | 12/12 | 11.437 | 12.253 | 19.590 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | rho-neg | 12/12 | 1.466 | 1.569 | 2.491 | — |
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp20-tm1050-4295f05e | pkm-int-t5-g3-L541434 vs pkm-int-t5-g3-L976503 | pkm-int-t5-g3-L976503 < pkm-int-t5-g3-L541434 |
+| icv1-fp20-tm1050-4295f05e | pkm-int-t5-g3-L541434 vs pkm-int-t5-g3-lo0 | pkm-int-t5-g3-L541434 < pkm-int-t5-g3-lo0 |
+| icv1-fp20-tm1050-4295f05e | pkm-int-t5-g3-L541434 vs pkm-iso-t6-g4 | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | pkm-int-t5-g3-L541434 vs pkm-iso-t6-g4-s1093 | pkm-iso-t6-g4-s1093 < pkm-int-t5-g3-L541434 |
+| icv1-fp20-tm1050-4295f05e | pkm-int-t5-g3-L541434 vs proj-a | proj-a < pkm-int-t5-g3-L541434 |
+| icv1-fp20-tm1050-4295f05e | pkm-int-t5-g3-L541434 vs rho-neg | rho-neg < pkm-int-t5-g3-L541434 |
+| icv1-fp20-tm1050-4295f05e | pkm-int-t5-g3-L976503 vs pkm-int-t5-g3-lo0 | pkm-int-t5-g3-L976503 < pkm-int-t5-g3-lo0 |
+| icv1-fp20-tm1050-4295f05e | pkm-int-t5-g3-L976503 vs pkm-iso-t6-g4 | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | pkm-int-t5-g3-L976503 vs pkm-iso-t6-g4-s1093 | pkm-iso-t6-g4-s1093 < pkm-int-t5-g3-L976503 |
+| icv1-fp20-tm1050-4295f05e | pkm-int-t5-g3-L976503 vs proj-a | proj-a < pkm-int-t5-g3-L976503 |
+| icv1-fp20-tm1050-4295f05e | pkm-int-t5-g3-L976503 vs rho-neg | rho-neg < pkm-int-t5-g3-L976503 |
+| icv1-fp20-tm1050-4295f05e | pkm-int-t5-g3-lo0 vs pkm-iso-t6-g4 | pkm-iso-t6-g4 < pkm-int-t5-g3-lo0 |
+| icv1-fp20-tm1050-4295f05e | pkm-int-t5-g3-lo0 vs pkm-iso-t6-g4-s1093 | pkm-iso-t6-g4-s1093 < pkm-int-t5-g3-lo0 |
+| icv1-fp20-tm1050-4295f05e | pkm-int-t5-g3-lo0 vs proj-a | proj-a < pkm-int-t5-g3-lo0 |
+| icv1-fp20-tm1050-4295f05e | pkm-int-t5-g3-lo0 vs rho-neg | rho-neg < pkm-int-t5-g3-lo0 |
+| icv1-fp20-tm1050-4295f05e | pkm-iso-t6-g4 vs pkm-iso-t6-g4-s1093 | pkm-iso-t6-g4-s1093 < pkm-iso-t6-g4 |
+| icv1-fp20-tm1050-4295f05e | pkm-iso-t6-g4 vs proj-a | proj-a < pkm-iso-t6-g4 |
+| icv1-fp20-tm1050-4295f05e | pkm-iso-t6-g4 vs rho-neg | rho-neg < pkm-iso-t6-g4 |
+| icv1-fp20-tm1050-4295f05e | pkm-iso-t6-g4-s1093 vs proj-a | proj-a < pkm-iso-t6-g4-s1093 |
+| icv1-fp20-tm1050-4295f05e | pkm-iso-t6-g4-s1093 vs rho-neg | rho-neg < pkm-iso-t6-g4-s1093 |
+| icv1-fp20-tm1050-4295f05e | proj-a vs rho-neg | rho-neg < proj-a |

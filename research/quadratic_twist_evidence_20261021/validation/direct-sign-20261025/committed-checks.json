@@ -1,0 +1,158 @@
+{
+  "checked_commit": "aee85795f3f649b3b15aa2621997d90a7d8d60f7",
+  "status": "passed",
+  "checks": {
+    "artifact-committed-check.log": "artifacts check: no data files committed\n",
+    "large-files-check.log": "check-large-files: no added or modified file over 10485760 bytes\n",
+    "naming-diff.log": "curve names: 0 problem(s)\n",
+    "backlog-committed-check.log": "XP-20261025-direct-sign-reference: ok\nXP-20261025-j0-cubic-twist-transfer: ok\nXP-20261025-cm8-quadratic-transfer: ok\n"
+  },
+  "metrics_command": "timeout 60 python3 tools/progress_metrics.py --ref HEAD --since 2026-10-01",
+  "metrics_stderr": "",
+  "new_metrics": [
+    {
+      "metric": "ic.twist.direct_sign.verified_targets",
+      "value": 1200.0,
+      "date": "2026-10-25",
+      "problem": "ecdlp-index-calculus",
+      "unit": "verified separate recoveries",
+      "better": "higher",
+      "kind": "gauge",
+      "label": "ic.twist.direct_sign.verified_targets",
+      "source": "research/quadratic_twist_evidence_20261021/native/direct-sign-20261025/audit.json"
+    },
+    {
+      "metric": "ic.twist.direct_sign.binary.main.prefix_target1.point_add_requests",
+      "value": 125.0,
+      "date": "2026-10-25",
+      "problem": "ecdlp-index-calculus",
+      "unit": "point_add_requests",
+      "better": "lower",
+      "kind": "gauge",
+      "label": "F43 prefix/Q=P cold component; unpriced",
+      "source": "research/quadratic_twist_evidence_20261021/native/direct-sign-20261025/audit.json"
+    },
+    {
+      "metric": "ic.twist.direct_sign.binary.main.prefix_target1.point_negations",
+      "value": 20.0,
+      "date": "2026-10-25",
+      "problem": "ecdlp-index-calculus",
+      "unit": "point_negations",
+      "better": "lower",
+      "kind": "gauge",
+      "label": "F43 prefix/Q=P cold component; unpriced",
+      "source": "research/quadratic_twist_evidence_20261021/native/direct-sign-20261025/audit.json"
+    },
+    {
+      "metric": "ic.twist.direct_sign.binary.twist.prefix_target1.point_add_requests",
+      "value": 136.0,
+      "date": "2026-10-25",
+      "problem": "ecdlp-index-calculus",
+      "unit": "point_add_requests",
+      "better": "lower",
+      "kind": "gauge",
+      "label": "F43 prefix/Q=P cold component; unpriced",
+      "source": "research/quadratic_twist_evidence_20261021/native/direct-sign-20261025/audit.json"
+    },
+    {
+      "metric": "ic.twist.direct_sign.binary.twist.prefix_target1.point_negations",
+      "value": 24.0,
+      "date": "2026-10-25",
+      "problem": "ecdlp-index-calculus",
+      "unit": "point_negations",
+      "better": "lower",
+      "kind": "gauge",
+      "label": "F43 prefix/Q=P cold component; unpriced",
+      "source": "research/quadratic_twist_evidence_20261021/native/direct-sign-20261025/audit.json"
+    },
+    {
+      "metric": "ic.twist.direct_sign.cached.main.prefix_target1.point_add_requests",
+      "value": 47.0,
+      "date": "2026-10-25",
+      "problem": "ecdlp-index-calculus",
+      "unit": "point_add_requests",
+      "better": "lower",
+      "kind": "gauge",
+      "label": "F43 prefix/Q=P cold component; unpriced",
+      "source": "research/quadratic_twist_evidence_20261021/native/direct-sign-20261025/audit.json"
+    },
+    {
+      "metric": "ic.twist.direct_sign.cached.main.prefix_target1.point_negations",
+      "value": 2.0,
+      "date": "2026-10-25",
+      "problem": "ecdlp-index-calculus",
+      "unit": "point_negations",
+      "better": "lower",
+      "kind": "gauge",
+      "label": "F43 prefix/Q=P cold component; unpriced",
+      "source": "research/quadratic_twist_evidence_20261021/native/direct-sign-20261025/audit.json"
+    },
+    {
+      "metric": "ic.twist.direct_sign.cached.twist.prefix_target1.point_add_requests",
+      "value": 42.0,
+      "date": "2026-10-25",
+      "problem": "ecdlp-index-calculus",
+      "unit": "point_add_requests",
+      "better": "lower",
+      "kind": "gauge",
+      "label": "F43 prefix/Q=P cold component; unpriced",
+      "source": "research/quadratic_twist_evidence_20261021/native/direct-sign-20261025/audit.json"
+    },
+    {
+      "metric": "ic.twist.direct_sign.cached.twist.prefix_target1.point_negations",
+      "value": 2.0,
+      "date": "2026-10-25",
+      "problem": "ecdlp-index-calculus",
+      "unit": "point_negations",
+      "better": "lower",
+      "kind": "gauge",
+      "label": "F43 prefix/Q=P cold component; unpriced",
+      "source": "research/quadratic_twist_evidence_20261021/native/direct-sign-20261025/audit.json"
+    },
+    {
+      "metric": "ic.twist.direct_sign.direct.main.prefix_target1.point_add_requests",
+      "value": 45.0,
+      "date": "2026-10-25",
+      "problem": "ecdlp-index-calculus",
+      "unit": "point_add_requests",
+      "better": "lower",
+      "kind": "gauge",
+      "label": "F43 prefix/Q=P cold component; unpriced",
+      "source": "research/quadratic_twist_evidence_20261021/native/direct-sign-20261025/audit.json"
+    },
+    {
+      "metric": "ic.twist.direct_sign.direct.main.prefix_target1.point_negations",
+      "value": 20.0,
+      "date": "2026-10-25",
+      "problem": "ecdlp-index-calculus",
+      "unit": "point_negations",
+      "better": "lower",
+      "kind": "gauge",
+      "label": "F43 prefix/Q=P cold component; unpriced",
+      "source": "research/quadratic_twist_evidence_20261021/native/direct-sign-20261025/audit.json"
+    },
+    {
+      "metric": "ic.twist.direct_sign.direct.twist.prefix_target1.point_add_requests",
+      "value": 40.0,
+      "date": "2026-10-25",
+      "problem": "ecdlp-index-calculus",
+      "unit": "point_add_requests",
+      "better": "lower",
+      "kind": "gauge",
+      "label": "F43 prefix/Q=P cold component; unpriced",
+      "source": "research/quadratic_twist_evidence_20261021/native/direct-sign-20261025/audit.json"
+    },
+    {
+      "metric": "ic.twist.direct_sign.direct.twist.prefix_target1.point_negations",
+      "value": 24.0,
+      "date": "2026-10-25",
+      "problem": "ecdlp-index-calculus",
+      "unit": "point_negations",
+      "better": "lower",
+      "kind": "gauge",
+      "label": "F43 prefix/Q=P cold component; unpriced",
+      "source": "research/quadratic_twist_evidence_20261021/native/direct-sign-20261025/audit.json"
+    }
+  ],
+  "scope": "Committed-tree metadata checks only; exact native request counters, no estimates or working-tree metrics."
+}

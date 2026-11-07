@@ -1,9 +1,34 @@
 //! Boolean tensor multigraphs, exact pins, and parsimonious-program metadata.
 
+use crate::canonical::PredicateProgram;
 use crate::{integrity, invalid, BigUint, Meter, Result};
 use num_traits::{One, Zero};
 use std::collections::BTreeSet;
 use std::sync::Arc;
+
+/// Stable semantic label carried by a predicate into the canonical network IR.
+///
+/// Parameters are sorted by key when constructed. The canonical exporter also
+/// records the predicate's complete bounded truth table, so this label supplies
+/// provenance and human meaning without being trusted as the evaluator.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct PredicateTag {
+    /// Namespaced predicate family, for example `encoder.constraint`.
+    pub kind: String,
+    /// Sorted semantic or shape parameters.
+    pub parameters: Vec<(String, String)>,
+}
+impl PredicateTag {
+    /// Construct a tag and sort its parameters into canonical key/value order.
+    /// Empty or duplicate keys are rejected when a canonical IR is captured.
+    pub fn new(kind: impl Into<String>, mut parameters: Vec<(String, String)>) -> Self {
+        parameters.sort();
+        Self {
+            kind: kind.into(),
+            parameters,
+        }
+    }
+}
 
 /// One tensor predicate, with a fixed and explicitly ordered port list.
 pub trait Predicate: Send + Sync {
@@ -11,12 +36,22 @@ pub trait Predicate: Send + Sync {
     fn arity(&self) -> usize;
     /// Evaluate the Boolean predicate exactly.
     fn evaluate(&self, ports: &[bool], meter: &mut Meter) -> Result<bool>;
+    /// Optional semantic tag for strict production canonicalization.
+    fn canonical_tag(&self) -> Option<&PredicateTag> {
+        None
+    }
+    /// Optional typed evaluator for predicates above the exact truth-table cap.
+    fn canonical_program(&self) -> Option<&PredicateProgram> {
+        None
+    }
 }
 
 /// A native predicate closure with explicit arity.
 pub struct FnPredicate {
     arity: usize,
-    function: Arc<dyn Fn(&[bool], &mut Meter) -> Result<bool> + Send + Sync>,
+    tag: Option<PredicateTag>,
+    program: Option<PredicateProgram>,
+    function: Option<Arc<dyn Fn(&[bool], &mut Meter) -> Result<bool> + Send + Sync>>,
 }
 impl FnPredicate {
     /// Construct a predicate. Contraction complexity assumptions on user-supplied
@@ -27,7 +62,32 @@ impl FnPredicate {
     ) -> Self {
         Self {
             arity,
-            function: Arc::new(function),
+            tag: None,
+            program: None,
+            function: Some(Arc::new(function)),
+        }
+    }
+    /// Construct a predicate with a stable semantic tag for canonical export.
+    pub fn tagged(
+        arity: usize,
+        tag: PredicateTag,
+        function: impl Fn(&[bool], &mut Meter) -> Result<bool> + Send + Sync + 'static,
+    ) -> Self {
+        Self {
+            arity,
+            tag: Some(tag),
+            program: None,
+            function: Some(Arc::new(function)),
+        }
+    }
+    /// Construct a predicate whose live evaluator is a serializable typed
+    /// program. The same program is used after canonical import.
+    pub fn programmed(arity: usize, tag: PredicateTag, program: PredicateProgram) -> Self {
+        Self {
+            arity,
+            tag: Some(tag),
+            program: Some(program),
+            function: None,
         }
     }
 }
@@ -39,7 +99,18 @@ impl Predicate for FnPredicate {
         if ports.len() != self.arity {
             return Err(invalid("predicate port arity"));
         }
-        (self.function)(ports, meter)
+        if let Some(program) = &self.program {
+            return program.evaluate(ports, meter);
+        }
+        self.function
+            .as_ref()
+            .ok_or_else(|| integrity("predicate has no evaluator"))?(ports, meter)
+    }
+    fn canonical_tag(&self) -> Option<&PredicateTag> {
+        self.tag.as_ref()
+    }
+    fn canonical_program(&self) -> Option<&PredicateProgram> {
+        self.program.as_ref()
     }
 }
 
@@ -235,6 +306,7 @@ pub(crate) struct Program {
     pub signals: usize,
     pub steps: Vec<Step>,
     pub edge_signals: Vec<usize>,
+    pub signal_regions: Vec<Option<String>>,
 }
 
 /// Conservative dependence on enumeration digits (digit zero changes fastest).
@@ -249,6 +321,136 @@ pub(crate) enum Evaluation {
 }
 
 impl Program {
+    pub(crate) fn evaluate_selected(
+        &self,
+        free_values: &[bool],
+        selected_signals: &[bool],
+        selected_vertices: &[bool],
+        network: &Network,
+        meter: &mut Meter,
+    ) -> Result<Option<Vec<bool>>> {
+        if free_values.len() != self.free.len()
+            || selected_signals.len() != self.signals
+            || selected_vertices.len() != network.vertices.len()
+        {
+            return Err(invalid("selected program shape"));
+        }
+        meter.vector(self.signals, "selected program signal assignment")?;
+        let mut values = vec![false; self.signals];
+        let mut assigned = vec![false; self.signals];
+        for (&signal, &value) in self.free.iter().zip(free_values) {
+            if selected_signals[signal] {
+                values[signal] = value;
+                assigned[signal] = true;
+            }
+        }
+        for step in &self.steps {
+            match step {
+                Step::Define {
+                    inputs,
+                    outputs,
+                    function,
+                } => {
+                    let output_signals = outputs
+                        .iter()
+                        .flat_map(|word| &word.0)
+                        .map(|bit| match bit {
+                            Bit::Signal(signal) => Ok(*signal),
+                            Bit::Constant(_) => {
+                                Err(integrity("selected program output is not a fresh signal"))
+                            }
+                        })
+                        .collect::<Result<Vec<_>>>()?;
+                    let selected = output_signals
+                        .first()
+                        .is_some_and(|&signal| selected_signals[signal]);
+                    if output_signals
+                        .iter()
+                        .any(|&signal| selected_signals[signal] != selected)
+                    {
+                        return Err(integrity("mixed selected program output region"));
+                    }
+                    if !selected {
+                        continue;
+                    }
+                    for bit in inputs.iter().flat_map(|word| &word.0) {
+                        if let Bit::Signal(signal) = bit {
+                            if !assigned[*signal] {
+                                return Err(integrity(
+                                    "selected program depends on an unselected signal",
+                                ));
+                            }
+                        }
+                    }
+                    meter.charge(1, "selected parsimonious program evaluation")?;
+                    let input = inputs
+                        .iter()
+                        .map(|word| word.value(&values))
+                        .collect::<Vec<_>>();
+                    let output = function(&input, meter)?;
+                    if output.len() != outputs.len() {
+                        return Err(integrity("selected program result arity"));
+                    }
+                    for (word, value) in outputs.iter().zip(output) {
+                        if value.bits() > word.width() as u64 {
+                            return Ok(None);
+                        }
+                        for (i, &bit) in word.0.iter().enumerate() {
+                            let Bit::Signal(signal) = bit else {
+                                return Err(integrity(
+                                    "selected program output is not a fresh signal",
+                                ));
+                            };
+                            values[signal] = value.bit(i as u64);
+                            assigned[signal] = true;
+                        }
+                    }
+                }
+                Step::Check { vertex, ports } => {
+                    if !selected_vertices[*vertex] {
+                        continue;
+                    }
+                    if ports
+                        .iter()
+                        .any(|bit| matches!(bit, Bit::Signal(signal) if !assigned[*signal]))
+                    {
+                        return Err(integrity(
+                            "selected predicate depends on an unselected signal",
+                        ));
+                    }
+                    meter.charge(1, "selected parsimonious predicate evaluation")?;
+                    let bits = ports
+                        .iter()
+                        .map(|&bit| bit.read(&values))
+                        .collect::<Vec<_>>();
+                    if !network.vertices[*vertex].predicate.evaluate(&bits, meter)? {
+                        return Ok(None);
+                    }
+                }
+            }
+        }
+        for (vertex_id, vertex) in network.vertices.iter().enumerate() {
+            if !selected_vertices[vertex_id] {
+                continue;
+            }
+            let mut ports = Vec::with_capacity(vertex.edges.len());
+            for &edge in &vertex.edges {
+                let signal = self.edge_signals[edge];
+                if !assigned[signal] {
+                    return Err(integrity(
+                        "selected graph vertex depends on an unselected signal",
+                    ));
+                }
+                ports.push(values[signal]);
+            }
+            meter.charge(1, "selected graph verification")?;
+            if !vertex.predicate.evaluate(&ports, meter)? {
+                return Ok(None);
+            }
+        }
+        Ok(Some(values))
+    }
+
     pub(crate) fn pruning_plan(
         &self,
         order: &[usize],

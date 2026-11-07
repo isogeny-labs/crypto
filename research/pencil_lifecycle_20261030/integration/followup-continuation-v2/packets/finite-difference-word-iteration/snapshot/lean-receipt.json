@@ -1,0 +1,83 @@
+{
+  "status": "passed",
+  "error": null,
+  "commands": [
+    {
+      "module": "Difference",
+      "argv": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/word-iteration-lean-wi8aniio/Difference.olean",
+        "/var/tmp/word-iteration-lean-wi8aniio/Difference.lean"
+      ],
+      "expected_exit": 0,
+      "exit": 0
+    },
+    {
+      "module": "WordIteration",
+      "argv": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/word-iteration-lean-wi8aniio/WordIteration.olean",
+        "/var/tmp/word-iteration-lean-wi8aniio/WordIteration.lean"
+      ],
+      "expected_exit": 0,
+      "exit": 0
+    },
+    {
+      "module": "Controls",
+      "argv": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/word-iteration-lean-wi8aniio/Controls.olean",
+        "/var/tmp/word-iteration-lean-wi8aniio/Controls.lean"
+      ],
+      "expected_exit": 0,
+      "exit": 0
+    },
+    {
+      "module": "Readback",
+      "argv": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/word-iteration-lean-wi8aniio/Readback.olean",
+        "/var/tmp/word-iteration-lean-wi8aniio/Readback.lean"
+      ],
+      "expected_exit": 0,
+      "exit": 0
+    },
+    {
+      "module": "ExpectedFailure",
+      "argv": [
+        "/var/tmp/pencil-same-support-lean-local-v1-wco_em6r/toolchain/bin/lean",
+        "-j1",
+        "-M3500",
+        "-s16384",
+        "-o",
+        "/var/tmp/word-iteration-lean-wi8aniio/ExpectedFailure.olean",
+        "/var/tmp/word-iteration-lean-wi8aniio/ExpectedFailure.lean"
+      ],
+      "expected_exit": 1,
+      "exit": 1
+    }
+  ],
+  "elapsed_seconds": 14.25291314398055,
+  "dependency_count": 28797,
+  "source_revision": "T1525-attempt2",
+  "workspace": "/var/tmp/word-iteration-lean-wi8aniio",
+  "runtime_execution": false,
+  "independent_binary_kernel_rechecker": false,
+  "trust": "Pinned precursor and shared mathlib/toolchain caches; pre/post inventories do not exclude transient concurrent changes."
+}

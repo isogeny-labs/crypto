@@ -13,7 +13,13 @@
 # "never_finalised") is listed, with its interruption, as an unbound prefix,
 # not integrity-passed (sheriff SHF-20261028-0f3f64, PPN-5). This is reported,
 # not fatal. A receipt without a boolean records_bound fails the session.
-# Usage: ecbench-audit-sessions.sh LIST [ECBENCH] [INCOMPLETE_TSV]
+# A committed session with a known integrity defect the owner has
+# dispositioned is pinned in DEFECTIVE_TSV by the hashes of all five capsule
+# files and the exact set of problem checks `ecbench verify` reports for it.
+# It is still audited, in every shard: the row passes only if verify fails
+# with exactly those checks, so a changed byte, a new problem or a vanished
+# one fails the run. It is reported as defective, never integrity-passed.
+# Usage: ecbench-audit-sessions.sh LIST [ECBENCH] [INCOMPLETE_TSV] [DEFECTIVE_TSV]
 # AUDIT_SHARD=K/N audits only shard K (0-based) of N, so N jobs together audit
 # the whole list. Shards are balanced by record bytes (a .gz file counts 8x,
 # its rough expansion), since audit time follows them: largest session first,
@@ -26,13 +32,51 @@ shard_k=${shard%/*}; shard_n=${shard#*/}
 if [[ ! "$shard_k" =~ ^[0-9]+$ || ! "$shard_n" =~ ^[1-9][0-9]*$ || "$shard_k" -ge "$shard_n" ]]; then
   echo "::error::AUDIT_SHARD must be K/N with 0 <= K < N, got $shard" >&2; exit 1
 fi
-list=${1:?usage: ecbench-audit-sessions.sh LIST [ECBENCH] [INCOMPLETE_TSV]}
+list=${1:?usage: ecbench-audit-sessions.sh LIST [ECBENCH] [INCOMPLETE_TSV] [DEFECTIVE_TSV]}
 ecbench=${2:-./target/release/ecbench}
 incomplete=${3:-docs/ecbench/INCOMPLETE_SESSIONS.tsv}
+defective=${4:-docs/ecbench/DEFECTIVE_SESSIONS.tsv}
 test -s "$list" || { echo "::error::$list is empty" >&2; exit 1; }
 test -s "$incomplete" || { echo "::error::$incomplete is missing" >&2; exit 1; }
+test -s "$defective" || { echo "::error::$defective is missing" >&2; exit 1; }
 excluded_list=$(mktemp)
 matched_list=$(mktemp)
+defective_list=$(mktemp)
+defective_count=0
+while IFS=$'\t' read -r dir session_hash plan_hash records_hash spec_hash host_hash problems extra; do
+  [[ -z "$dir" || "$dir" == \#* ]] && continue
+  if grep -Fxq "$dir" "$defective_list" || [[ -n "${extra:-}" || ! "$problems" =~ ^[a-z_]+(,[a-z_]+)*$ ]]; then
+    echo "::error::duplicate or malformed defective-session row: $dir" >&2; exit 1
+  fi
+  for entry in "session.json:$session_hash" "plan.json:$plan_hash" "records.jsonl:$records_hash" \
+               "spec.json:$spec_hash" "host.json:$host_hash"; do
+    name=${entry%%:*}; expected=${entry#*:}
+    if [[ ! "$expected" =~ ^[0-9a-f]{64}$ || ! -f "$dir/$name" ]]; then
+      echo "::error::missing or invalid pin for $dir/$name" >&2; exit 1
+    fi
+    actual=$(sha256sum "$dir/$name"); actual=${actual%% *}
+    if [[ "$actual" != "$expected" ]]; then
+      echo "::error::defective-session bytes changed: $dir/$name" >&2; exit 1
+    fi
+  done
+  if ! grep -Fxq "$dir" "$list"; then
+    echo "::error::defective-session row names no committed ecbench session: $dir" >&2; exit 1
+  fi
+  # Verify still runs; it must fail with exactly the pinned problem checks.
+  set +e
+  receipt=$("$ecbench" verify --dir "$dir" --replay 0 --allow-interrupted --exit-code 2> /dev/null)
+  status=$?
+  set -e
+  got=$(jq -r '[.problems[] | sub(":.*$"; "")] | unique | join(",")' <<< "$receipt" 2> /dev/null || echo unreadable)
+  want=$(tr ',' '\n' <<< "$problems" | sort -u | paste -sd, -)
+  if [[ "$status" -eq 0 || "$got" != "$want" ]]; then
+    echo "::error::defective session $dir no longer fails exactly as pinned (verify exit $status; problems '$got', pinned '$want'); review its row in $defective" >&2
+    exit 1
+  fi
+  echo "::warning::$dir is a hash-pinned defective session (problems: $got), not integrity-passed; see docs/ecbench/DEFECTIVE_SESSIONS.md" >&2
+  printf '%s\n' "$dir" >> "$defective_list"
+  defective_count=$((defective_count + 1))
+done < "$defective"
 while IFS=$'\t' read -r dir session_hash plan_hash records_hash extra; do
   [[ -z "$dir" || "$dir" == \#* ]] && continue
   if grep -Fxq "$dir" "$excluded_list" || [[ -n "${extra:-}" ]]; then
@@ -67,6 +111,8 @@ while IFS= read -r dir; do
     printf '%s\n' "$dir" >> "$matched_list"
     incomplete_count=$((incomplete_count + 1))
     echo "::warning::$dir is hash-pinned incomplete scratch evidence (spec.json and host.json absent)" >&2
+  elif grep -Fxq "$dir" "$defective_list"; then
+    : # audited above against its pinned defect, in every shard
   else
     bytes=$(find "$dir" -maxdepth 1 -type f -printf '%s %f\n' | awk '{ b += ($2 ~ /\.gz$/) ? 8 * $1 : $1 } END { print b + 0 }')
     printf '%s\t%s\t%s\n' "$bytes" "$index" "$dir" >> "$weights"
@@ -85,7 +131,7 @@ if ! cmp -s <(sort "$excluded_list") <(sort "$matched_list"); then
   diff -u <(sort "$excluded_list") <(sort "$matched_list") >&2 || true
   exit 1
 fi
-rm -f "$excluded_list" "$matched_list"
+rm -f "$excluded_list" "$matched_list" "$defective_list"
 failed=$(mktemp)
 unbound=$(mktemp)
 export ecbench failed unbound
@@ -153,7 +199,9 @@ if [[ "$unbound_count" -gt 0 ]]; then
   rm -f "$report"
 fi
 rm -f "$unbound"
-summary="shard $shard: $bound_count of $index committed ecbench sessions pass integrity (--replay 0 --allow-interrupted); $unbound_count accepted as unbound prefixes (records_bound=false), not integrity-passed; $incomplete_count hash-pinned scratch sessions remain incomplete"
+# $audited is this shard's share; $index counts every non-pinned session in
+# the whole list (sheriff SHF-20261106-a114e7, PPX-6).
+summary="shard $shard: $bound_count of $audited sessions in this shard (of $index in total) pass integrity (--replay 0 --allow-interrupted); $unbound_count accepted as unbound prefixes (records_bound=false), not integrity-passed; $incomplete_count hash-pinned scratch sessions remain incomplete; $defective_count hash-pinned defective sessions fail exactly as pinned, not integrity-passed"
 echo "$summary"
 if [[ -n "${GITHUB_STEP_SUMMARY:-}" ]]; then
   echo "$summary" >> "$GITHUB_STEP_SUMMARY"

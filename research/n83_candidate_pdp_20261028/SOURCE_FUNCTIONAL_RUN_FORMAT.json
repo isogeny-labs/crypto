@@ -1,0 +1,22 @@
+{
+  "schema": "n83.source-functional-run-format/v1",
+  "protocol": "protocol-source-functional.json",
+  "prior_development_format": "SOURCE_FUNCTIONAL_FORMAT.json",
+  "scope": "42 retained prime m3-9 cases, three arms and two target kinds; source-bound arithmetic only",
+  "layout": {
+    "preparation/stage.tar.gz": "Gzip tar of 306 payloads plus manifest.sha256: exact sources, native executable, native test executable, input/source pairs, retained terminal certificates/factors and prior top records",
+    "protocol.json": "Exact frozen execution contract; canonical hash in freeze block and separate whole-file hash in request",
+    "raw/instrument": "Exact production native executable",
+    "raw/inputs,terminal,top,source": "Dependencies copied from staged archive and verified before computation",
+    "raw/results/KEY.json": "Per-case exact source-bound arithmetic with explicit unverified filtered-space fields and null LFD/regularity",
+    "raw/results/KEY.poly": "Complete recomputed coefficient polynomial; N83PFF1 encoding described by development format",
+    "raw/results/summary.json": "All 42 records only if producer completes",
+    "raw/producer.log,replay.log": "Native phase output and failures",
+    "raw/producer-status.json,replay-status.json": "Started flag and exact exit status; terminal substitutes unattempted status125 when absent",
+    "raw/terminal.json": "Controller start/end, phase statuses, exit status, backend, wall_valid=false",
+    "raw/manifest.sha256": "Hash of every raw payload except manifest itself, finalized on controller exit",
+    "request.json,submission.json,status-*.json": "Exact EKS command, returned identity and observed lifecycle; submission alone does not establish worker execution"
+  },
+  "custody": "Input archive and frozen protocol downloaded from S3 and compared byte-for-byte before submission. Raw outputs require separate post-run S3 restoration and native replay.",
+  "failure_semantics": "Keep partial and failed attempts. A scheduling or process failure yields no degree bound. Zero pairing is inconclusive. No new LFD or regularity claim."
+}

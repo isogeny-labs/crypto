@@ -2,6 +2,8 @@
 //!
 //! ```text
 //! ecbench methods                      what can be measured
+//! ecbench optimize inventory           registry-wide optimization coverage
+//! ecbench optimize audit --development S... --holdout H...
 //! ecbench host                         the host capsule and its class id
 //! ecbench plan   --spec S              validate a spec, print its workloads and identities
 //! ecbench run    --spec S --out D      run a session (pinned, interleaved, sealed records)
@@ -35,6 +37,8 @@
 mod pdp3_koblitz;
 #[path = "ecbench/pdp_split_oracle.rs"]
 mod pdp_split_oracle;
+#[path = "ecbench/pkm_tower.rs"]
+mod pkm_tower;
 #[path = "ecbench/structured_s4.rs"]
 mod structured_s4;
 
@@ -46,8 +50,8 @@ use clap::{Parser, Subcommand};
 
 use crypto_lib::cryptanalysis::ecbench::{
     audit, bounds, calibration, callgrind, canonical, challenge, claim, compare, db, fbm, frontier,
-    full_price, gpu, host, isolab, isolation, methods, record, resources, runner, signals, spec,
-    stats, trend, wordram_price, workload,
+    full_price, gpu, host, isolab, isolation, methods, optimization, record, resources, runner,
+    signals, spec, stats, trend, wordram_price, workload,
 };
 
 #[derive(Parser)]
@@ -195,6 +199,8 @@ enum Cmd {
         #[arg(long)]
         json: bool,
     },
+    /// Inventory and audit the registry-wide optimization loop.
+    Optimize(OptimizeArgs),
     /// Measure the full-pricing units (src/cryptanalysis/ecbench/full_prices.json) on
     /// this host for Koblitz curves `a:n`, median of `reps` passes each.
     PriceUnits {
@@ -223,6 +229,13 @@ enum Cmd {
         /// Fixed exponent of n in the `model` fit.
         #[arg(long, allow_hyphen_values = true, default_value_t = -0.5)]
         gamma: f64,
+    },
+    /// The frozen replay sentinels (`docs/ecbench/replay-sentinels.json`):
+    /// one cheap committed record per method id that a pull request replays
+    /// with `verify --replay-seq`.
+    Sentinels {
+        #[command(subcommand)]
+        cmd: SentinelCmd,
     },
     /// Print the host capsule.
     Host {
@@ -522,6 +535,38 @@ enum Cmd {
     },
 }
 
+#[derive(clap::Args)]
+struct OptimizeArgs {
+    #[command(subcommand)]
+    action: OptimizeAction,
+}
+
+#[derive(Subcommand)]
+enum OptimizeAction {
+    /// List every registered method, tuning role, and nested solver/engine.
+    Inventory {
+        /// Print the machine-readable inventory instead of the compact table.
+        #[arg(long)]
+        json: bool,
+    },
+    /// Audit adaptive-development and fresh-holdout ecbench specs.
+    Audit {
+        /// Development specs; every live method/engine belongs here before
+        /// `--require-all` admits the campaign.
+        #[arg(long, num_args = 1.., required = true)]
+        development: Vec<PathBuf>,
+        /// Fresh winner-only confirmatory specs. Seeds must be disjoint from
+        /// development; holdouts require public targets and L2 isolation.
+        #[arg(long, num_args = 1..)]
+        holdout: Vec<PathBuf>,
+        /// Refuse admission unless development covers the live method registry,
+        /// every system solver, every PDP3 engine, and every prime PKM tower
+        /// engine.
+        #[arg(long)]
+        require_all: bool,
+    },
+}
+
 // Parsed once per process; boxing the fit options would only add noise.
 #[allow(clippy::large_enum_variant)]
 #[derive(Subcommand)]
@@ -564,6 +609,10 @@ enum BoundCmd {
         /// the rule text enters the bound's method identity.
         #[arg(long)]
         param_rule: Option<String>,
+        /// Name the static-DH oracle of the domain (an arm that queries
+        /// one must; a reference that does not may, to share the domain).
+        #[arg(long)]
+        oracle: Option<String>,
         /// The fit procedure (`docs/bounds/README.md` §3a).  Version 1
         /// re-derives records fitted before the version-2 refusals; new
         /// bounds are version 2.
@@ -819,6 +868,7 @@ pub fn main() -> ExitCode {
     // Oracles this binary links that the library cannot name (see
     // `pdp3_koblitz`); registered before any run, child or replay.
     crypto_lib::cryptanalysis::ecbench::methods::register_binary_plugins(binary_plugins());
+    crypto_lib::cryptanalysis::ecbench::methods::register_prime_plugins(pkm_tower::plugins());
     match run(Cli::parse()) {
         Ok(code) => code,
         Err(e) => {
@@ -841,6 +891,66 @@ fn report_problems(problems: &[String]) {
             eprintln!("  - {p}");
         }
     }
+}
+
+#[derive(clap::Subcommand, Debug)]
+enum SentinelCmd {
+    /// Print, as JSON lines, the cheapest replayable records per method
+    /// of one hydrated session (records.jsonl and plan.json decompressed).
+    Scan {
+        #[arg(long)]
+        dir: PathBuf,
+        /// The session's path in the repository (default: --dir).
+        #[arg(long)]
+        label: Option<String>,
+        /// Records kept per method.
+        #[arg(long, default_value_t = 3)]
+        keep: usize,
+    },
+    /// Write the manifest from a session list and `scan` outputs.
+    Build {
+        /// One committed session directory per line.
+        #[arg(long)]
+        list: PathBuf,
+        /// Files of `scan` output.
+        #[arg(long, num_args = 1.., required = true)]
+        candidates: Vec<PathBuf>,
+        #[arg(long)]
+        out: PathBuf,
+        /// Sentinels per method id, from distinct sessions.
+        #[arg(long, default_value_t = 1)]
+        per_method: usize,
+        /// A manifest whose `known_failures` are carried over.
+        #[arg(long)]
+        previous: Option<PathBuf>,
+        /// A record that already does not replay, `SESSION:SEQ:REASON`
+        /// (repeatable); skipped for the next-cheapest record.
+        #[arg(long = "known-failure")]
+        known_failure: Vec<String>,
+    },
+    /// Fail unless the manifest covers every method id of the listed
+    /// sessions and names only sessions as committed.
+    Check {
+        #[arg(long)]
+        list: PathBuf,
+        #[arg(long, default_value = "docs/ecbench/replay-sentinels.json")]
+        manifest: PathBuf,
+    },
+    /// Print the manifest's sessions and `seq` arguments for the replay
+    /// script: `session<TAB>seq,seq,...`, one session per line.
+    Plan {
+        #[arg(long, default_value = "docs/ecbench/replay-sentinels.json")]
+        manifest: PathBuf,
+    },
+}
+
+fn methods_len(m: &crypto_lib::cryptanalysis::ecbench::sentinels::Manifest) -> usize {
+    m.sentinels
+        .iter()
+        .map(|s| s.method.as_str())
+        .collect::<std::collections::BTreeSet<_>>()
+        .len()
+        + m.unreplayable.len()
 }
 
 fn print_json(v: &impl serde::Serialize) -> Result<(), String> {
@@ -1076,6 +1186,45 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 }
             }
         }
+        Cmd::Optimize(args) => match args.action {
+            OptimizeAction::Inventory { json } => {
+                if json {
+                    print_json(&optimization::inventory_json()?)?;
+                } else {
+                    let profiles = optimization::profiles()?;
+                    println!(
+                        "{:<43} {:<20} {:<21} {:>5}",
+                        "method", "search", "claim scope", "knobs"
+                    );
+                    for p in profiles {
+                        let knobs = p
+                            .parameters
+                            .iter()
+                            .filter(|parameter| parameter.role == optimization::ParameterRole::Knob)
+                            .count();
+                        println!(
+                            "{:<43} {:<20?} {:<21?} {:>5}",
+                            p.id, p.strategy, p.claim_scope, knobs
+                        );
+                    }
+                    println!(
+                        "\nUse `ecbench optimize inventory --json` for parameter roles and nested solvers/engines."
+                    );
+                }
+            }
+            OptimizeAction::Audit {
+                development,
+                holdout,
+                require_all,
+            } => {
+                let report = optimization::audit_campaign(&development, &holdout, require_all)?;
+                let admissible = report["admissible"].as_bool().unwrap_or(false);
+                print_json(&report)?;
+                if !admissible {
+                    return Ok(ExitCode::from(1));
+                }
+            }
+        },
         Cmd::PriceUnits { curve, reps } => {
             let mut rows = serde_json::Map::new();
             for c in &curve {
@@ -1111,6 +1260,109 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 rows.insert(facts.slug.clone(), wordram_price::describe_curve(&facts)?);
             }
             print_json(&serde_json::json!({ "curves": rows }))?;
+        }
+        Cmd::Sentinels { cmd } => {
+            use crypto_lib::cryptanalysis::ecbench::sentinels;
+            match cmd {
+                SentinelCmd::Scan { dir, label, keep } => {
+                    let label = label.unwrap_or_else(|| dir.display().to_string());
+                    for c in sentinels::scan_session(&dir, &label, keep)? {
+                        println!("{}", serde_json::to_string(&c).map_err(|e| e.to_string())?);
+                    }
+                }
+                SentinelCmd::Build {
+                    list,
+                    candidates,
+                    out,
+                    per_method,
+                    previous,
+                    known_failure,
+                } => {
+                    let mut known: Vec<sentinels::KnownFailure> = match previous {
+                        Some(p) => {
+                            serde_json::from_str::<sentinels::Manifest>(&read(&p)?)
+                                .map_err(|e| format!("{}: {e}", p.display()))?
+                                .known_failures
+                        }
+                        None => Vec::new(),
+                    };
+                    for k in &known_failure {
+                        let mut it = k.splitn(3, ':');
+                        let (Some(session), Some(seq), Some(reason)) =
+                            (it.next(), it.next(), it.next())
+                        else {
+                            return Err(format!("--known-failure {k}: want SESSION:SEQ:REASON"));
+                        };
+                        known.push(sentinels::KnownFailure {
+                            session: session.to_string(),
+                            seq: seq
+                                .parse()
+                                .map_err(|e| format!("--known-failure {k}: {e}"))?,
+                            reason: reason.to_string(),
+                        });
+                    }
+                    let list_text = read(&list)?;
+                    let (plans, _, skipped) = sentinels::load_sessions(Path::new("."), &list_text)?;
+                    let methods = plans
+                        .iter()
+                        .flat_map(|p| p.methods.iter().cloned())
+                        .collect();
+                    let mut cs = Vec::new();
+                    for f in &candidates {
+                        for line in read(f)?.lines().filter(|l| !l.trim().is_empty()) {
+                            cs.push(
+                                serde_json::from_str::<sentinels::Candidate>(line)
+                                    .map_err(|e| format!("{}: {e}", f.display()))?,
+                            );
+                        }
+                    }
+                    let man = sentinels::build(&methods, &cs, per_method, &known);
+                    let text =
+                        serde_json::to_string_pretty(&man).map_err(|e| e.to_string())? + "\n";
+                    std::fs::write(&out, text).map_err(|e| format!("{}: {e}", out.display()))?;
+                    eprintln!(
+                        "{} sentinels over {} method ids ({} unreplayable); {} sessions without a spec skipped",
+                        man.sentinels.len(),
+                        methods_len(&man),
+                        man.unreplayable.len(),
+                        skipped.len()
+                    );
+                }
+                SentinelCmd::Check { list, manifest } => {
+                    let man: sentinels::Manifest = serde_json::from_str(&read(&manifest)?)
+                        .map_err(|e| format!("{}: {e}", manifest.display()))?;
+                    let (plans, ids, skipped) =
+                        sentinels::load_sessions(Path::new("."), &read(&list)?)?;
+                    let problems = sentinels::check(&man, &plans, &ids);
+                    for p in &problems {
+                        eprintln!("problem: {p}");
+                    }
+                    eprintln!(
+                        "replay sentinels {}: {} sentinels, {} unreplayable, {} planned sessions, {} without a spec",
+                        if problems.is_empty() { "OK" } else { "FAILED" },
+                        man.sentinels.len(),
+                        man.unreplayable.len(),
+                        plans.len(),
+                        skipped.len()
+                    );
+                    if !problems.is_empty() {
+                        std::process::exit(1);
+                    }
+                }
+                SentinelCmd::Plan { manifest } => {
+                    let man: sentinels::Manifest = serde_json::from_str(&read(&manifest)?)
+                        .map_err(|e| format!("{}: {e}", manifest.display()))?;
+                    let mut by: std::collections::BTreeMap<&str, Vec<u64>> = Default::default();
+                    for s in &man.sentinels {
+                        by.entry(&s.session).or_default().push(s.seq);
+                    }
+                    for (session, mut seqs) in by {
+                        seqs.sort_unstable();
+                        let seqs: Vec<String> = seqs.iter().map(u64::to_string).collect();
+                        println!("{session}\t{}", seqs.join(","));
+                    }
+                }
+            }
         }
         Cmd::Trend {
             compare,
@@ -1846,6 +2098,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 unit,
                 weight,
                 param_rule,
+                oracle,
                 fit_version,
                 out,
             } => {
@@ -1864,6 +2117,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                         unit,
                         weight,
                         param_rule,
+                        oracle,
                         fit_version,
                     },
                     audit_refs: &[],

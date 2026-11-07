@@ -96,7 +96,7 @@ fn greedy(
         let (edge, joined) = best.ok_or_else(|| integrity("empty elimination choice"))?;
         if joined.len() > rank {
             rank = joined.len();
-            widest = joined.clone();
+            widest.clone_from(&joined);
         }
         eliminate(&mut factors, edge, joined);
         free.remove(&edge);

@@ -1,0 +1,53 @@
+digraph transfer_flow {
+  graph [
+    rankdir=TB,
+    newrank=true,
+    bgcolor="white",
+    pad="0.20",
+    nodesep="0.30",
+    ranksep="0.42",
+    fontname="DejaVu Sans",
+    fontsize=12,
+    label="Factoring mechanisms into the index-calculus program\nsolid = existing or adopted contract; dashed = proposed; red = rejected direct transfer",
+    labelloc="t"
+  ];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=10, margin="0.14,0.09"];
+  edge [fontname="DejaVu Sans", fontsize=9, color="#4b5563", arrowsize=0.75];
+
+  subgraph cluster_source {
+    label="Upstream integer-factoring evidence @ 5aebed85";
+    color="#94a3b8";
+    style="rounded";
+    residual [label="Composite residual ideal\nkey = (norm, canonical root)\nunit-aware exact cancellation", fillcolor="#dcfce7", color="#15803d"];
+    saturation [label="Prime-cofactor saturation\nY-rough + R <= Y^2", fillcolor="#fee2e2", color="#b91c1c"];
+    moments [label="Hankel / Prony moments\nexact recovery, provider missing", fillcolor="#f3f4f6", color="#6b7280"];
+    cauchy [label="Pole / Cauchy circuits\nnormalization unresolved", fillcolor="#f3f4f6", color="#6b7280"];
+    crossing [label="Order-sensitive crossings\nthreshold or realization missing", fillcolor="#f3f4f6", color="#6b7280"];
+    { rank=same; residual; saturation; }
+    { rank=same; moments; cauchy; crossing; }
+    residual -> moments [style=invis, weight=20];
+    saturation -> crossing [style=invis, weight=20];
+  }
+
+  subgraph cluster_destination {
+    label="isogeny-labs/crypto destination";
+    color="#94a3b8";
+    style="rounded";
+    existing [label="Existing residual + large-prime collectors\nexact row replay before matrix", fillcolor="#dcfce7", color="#15803d"];
+    contract [label="ADOPTED DESIGN CONTRACT\nfull curve/base context\ncanonical atom + action unit", fillcolor="#dbeafe", color="#1d4ed8", penwidth=2];
+    fixture [label="NEXT OBLIGATION\nadversarial typed-key fixture\nprime + binary registered curves", fillcolor="#fef3c7", color="#b45309", penwidth=2];
+    solver [label="Named destination solver\nic.pipeline: rank, LA, individual log, replay", fillcolor="#dcfce7", color="#15803d"];
+    advantage [label="Net advantage\nUNKNOWN / unmeasured", fillcolor="#fef3c7", color="#b45309"];
+  }
+
+  residual -> contract [label="contract-level adaptation", color="#1d4ed8", penwidth=2];
+  existing -> contract [label="harden future residual types", color="#1d4ed8"];
+  contract -> fixture [label="implement + falsify", style=dashed, color="#b45309"];
+  fixture -> solver [label="only verified complete rows", style=dashed, color="#b45309"];
+  solver -> advantage [label="requires cold three-arm accounting", style=dashed, color="#b45309"];
+
+  saturation -> contract [label="no point-primality analogue", color="#b91c1c", style=dashed, arrowhead=tee, constraint=false];
+  moments -> fixture [label="conditional: exact moment provider", color="#6b7280", style=dashed, constraint=false];
+  cauchy -> fixture [label="conditional: usable scalar extraction", color="#6b7280", style=dashed, constraint=false];
+  crossing -> fixture [label="boundary analysis only", color="#6b7280", style=dashed, constraint=false];
+}

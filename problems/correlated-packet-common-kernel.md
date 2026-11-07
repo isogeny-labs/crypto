@@ -94,6 +94,60 @@ not a demonstrated runtime or algorithm.
 
 ## Next discriminating step
 
+The [approved local panel](../research/prime_square_kernel_20261106/RESULTS_local_20261107.md)
+completed all1344 input cells twice with byte-identical output. Newton has
+1200 fewer/144 more candidate tuple counts; Smith1104 fewer/240 more. The
+L32 odd-node q16 witness has16 original versus33 candidate tuples: surviving
+Smith modes grow8 to32 despite doubled minimum weight. This is finite
+component evidence against a uniform tuple-count win, not an asymptotic
+impossibility result. Claim a69063 remains unverified. [pcc:unverified]
+
+Its native checks and independent histogram recount pass, but full protocol-
+export validation fails: original controls/instance granularity were modeled
+incorrectly, and the maintained checker refuses the explicitly post-data repair.
+Both versions and all failures remain recorded; no certified comparison or
+leaderboard result is promoted. A future decisive experiment must specify its
+logical cell/control mapping correctly before affected data are produced.
+
+The [normalized-square follow-up](../research/prime_square_kernel_20261106/lean-normalizer/README.md)
+now derives the actual shifted-grid normalizer's unit property from Lucas
+parity, factorial identities and a proved finite-product formula. The
+pointwise valuation-doubling theorem no longer assumes an unspecified unit.
+The actual normalized-square kernel also preserves every source node and
+has an entrywise identity at the origin for all real slots.
+This removes that component obligation; coefficientwise chart content,
+uniform weighted crossing density, Hermite/entry costs and recursion remain
+open. Claim records bd8ff1 and82eac6 await trusted signed verdicts.
+[pcc:unverified]
+
+A [repeated-anchor follow-up](../research/prime_pole_anchor_20261030/repeated/README.md)
+extends the fixed odd-anchor gain to k bits at added degree k, without
+changing the source moment index. It also charges a specific attempt to
+boost every valuation level: guarded scalar anchor products require added
+degree at least g*F_(2a) to gain g in each diagonal linear coefficient across
+all a levels (or g*F_(2u) for the source's retained u levels). The latter
+can fit the source's O(L) degree budget. Diagonal gains do not cover all
+crossings: L8,t2,x0,y1 is unchanged by every guarded anchor schedule.
+The general abstract suffix-budget lower bound is Lean-proved; its valuation
+bridge is written, with exact native controls. This is a family-specific
+degree obstruction, not nonexistence of a nonscalar completion or an improved
+ECDLP algorithm. The missing low-density common factorization stays open.
+
+An [anchored-pole completion](../research/prime_pole_anchor_20261030/README.md)
+has now been constructed inside W_base+C H with constant H. Exact checks
+certify one extra odd-level crossing bit, old even-level coarse weights,
+and degree2L instead of2L-1 for L4,8,16. Its single-axis mode family does
+not give the requested two-axis density or improved asymptotic exponent.
+The valuation/global integration arguments are written and partially
+formalized only; a complete recursive proof and end-to-end cost remain open.
+
+A new [nonscalar-origin/jet-completion proposal](../research/prime_jet_completion_20261030/README.md)
+uses `W_new=W_base+C H` to preserve all node values while optimizing crossing
+jets. Ordinary derivative flattening supplies a finite control:5440 nodal
+checks pass, but the tested first crossing coefficient gains only2valuation
+bits as degree roughly doubles. The matrix completion is not implemented;
+its integral factorization, higher jets and adjusted costs remain open.
+
 - **Action:** construct a fixed kernel with different valid local factorizations
   at different valuation levels; prove an actual common-family/jet identity
   before trying a relation search or fitting timing exponents.

@@ -11,6 +11,16 @@ curves, graph construction, compact arithmetic/point/hash encodings, exact
 contraction, deterministic witness extraction, exact prefix-count sampling, relation collection and
 independent algebraic certificate replay. Resource exhaustion is an error.
 
+The `canonical` module provides strict `BTNIR001` semantic snapshots for
+controlled network experiments. It preserves construction-order vertices,
+edges and ports, interface order, pins and provenance. Predicates through 16
+ports use complete truth tables; larger built-in Fourier/product relations use
+typed serializable evaluators. Arbitrary or selector predicates above that cap
+are rejected until they provide a typed evaluator. Imported snapshots are
+direct semantic replay graphs and intentionally do not reconstruct private
+functional-program hints. This is not graph-isomorphism canonicalization and
+does not itself establish a performance result.
+
 `Counter::sample` implements Lemma 1's random prefix choices using caller
 randomness. It samples interface words uniformly when the encoding is
 parsimonious; otherwise each word is weighted by its number of satisfying
@@ -57,9 +67,18 @@ remain byte-identical; the owning repositories have separate integration locks.
 
 ## Exact validation and witness search
 
-Primality now uses deterministic bounded tests throughout u64, with the first
-twelve prime bases and the published Sorenson/Webster bound. Larger values
-retain AKS unless independently checked Pocklington certificates are supplied.
+Primality uses deterministic bounded tests strictly below
+3,317,044,064,679,887,385,961,981, with the first thirteen prime bases and the
+published Sorenson/Webster bound. Above that cutoff, witnesses only reject
+composites: passing them never certifies a prime. Bundled public ECCp-131
+proofs are verified automatically, including when using the original input
+file. Other larger candidates get a bounded Pocklington proof attempt before
+AKS. The proof builder uses small-factor division, at most 16,384 Pollard rho
+iterations, 32 recursion levels, 64 proof nodes and 256 witnesses per node.
+A failed attempt falls back to AKS; caller resource exhaustion remains an error.
+`primality::prime_certificate` returns replayable proof nodes on success and
+`None` when no proof was produced. Supplied certificates remain useful for
+harder factorizations; this is not a general fast ECPP implementation.
 `Curve::with_cofactor_and_certificates` verifies every supplied proof node and
 the existing curve/order/cofactor conditions; a missing proof uses the original
 exact fallback. The runner includes proof data in its receipt for replay.
@@ -69,7 +88,8 @@ cargo run --locked --release -- validate examples/eccp131-certified.json
 ```
 
 The certified input supplies four small proof nodes for the official p/r. The
-original `eccp131.json` remains an uncertified-input control. Parameter validation
+original `eccp131.json` exercises automatic verification of the bundled proofs.
+Both files support parameter validation. Parameter validation
 does not recover the challenge scalar or establish feasible relation search.
 
 Built-in functional leaves now select the same least interface word in a

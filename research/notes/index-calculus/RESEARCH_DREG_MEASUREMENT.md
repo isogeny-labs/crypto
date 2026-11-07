@@ -1092,3 +1092,35 @@ F4_F2_MAX_ROWS=2000000 F4_F2_MAX_COLS=200000 \
   every branch of 2 of 12 draws, against 7 of 12 for S3. That is no detected
   difference at the registered two-sided threshold (p = 0.0625), and the new
   arm is never better (`research/dreg_invariant_pair_guess_20261029/RESULTS.md`).
+
+## An invariant guess on the second link (2026-11-05)
+
+- Replacing the raw guess `c₇` by coordinate 20 of `e₁ + x₃` at (22, 8) lets
+  degree 4 refute on every branch of 6 of 12 draws, against 7 of 12 for S3.
+  One draw is discordant, so the registered two-sided verdict is no detected
+  difference (p = 1.0)
+  (`research/dreg_second_link_guess_20261105/RESULTS.md`). Unverified
+  assertion until a pcc verdict exists.
+
+## One invariant guess per link at m = 4, degree 3 (2026-11-06)
+
+- At m = 4, ℓ = 5, with k = 10 guesses, placing them on the three links'
+  swap invariants makes degree 3 refute on 1,888 of 8,192 branches, against
+  1,312 for raw guesses in the same places. By draw the split is 4 against 3,
+  so the registered two-sided verdict is no detected difference (p = 1.0)
+  (`research/dreg_m4_link_guess_d3_20261106/RESULTS.md`). Unverified
+  assertion until a pcc verdict exists.
+
+## Which guesses decide refutation at m = 4 (2026-11-06)
+
+- With the ten guesses of the m = 4 degree-3 design in place, no link-1 guess
+  changes refutation on any of 16 arm-draws; guessing only the essential ones
+  (one to three, on links 2 and 3) keeps every refutation on 7 of 13
+  (`research/dreg_m4_guess_bits_20261106/RESULTS.md`). Unverified assertion
+  until a pcc verdict exists.
+
+## Two guesses at (22, 8) (2026-11-07)
+
+- S3 or L3 without `e₁[0]` suffices at degree 4 on 1 of 12 draws (draw 6),
+  against 6–7 with three guesses (`research/dreg_two_guess_20261106/RESULTS.md`).
+  Unverified assertion until a pcc verdict exists.

@@ -1,0 +1,68 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "COUNTS-ONLY amendment v2 (2026-10-31): tensor-contraction IC (ic.tensor_contraction_v1, m = 2) against rho.negation and the prime IC baseline on the registered bench-roster prime curves of 10, 12 and 14 bits (counted S only, no wall time)",
+  "description": "Supersedes, for counted S only, docs/ecbench/specs/tensor-ic-vs-rho.json (left frozen and unchanged; measurement there: rounds 6, warmup 1, order alternate, L2, timeout_seconds 900). Same curves, targets (target_seed 20261030, 8 per curve), arms, arm methods, measurement seed 20261030 and per-execution timeout. Only measurement changes. Gate-forced change: isolation_required L2 to L0. On EKS the run-ecbench L2 gate grades any solve under 1 ms as L1 (record.rs MIN_SOLVE_WALL_NS_V3) and exits 42, and rho at 10-16 bits solves in microseconds (run gh-41008826427-1: 176/192 records L1); L0 is the level ecbench documents as sufficient for operation counts. Discretionary changes, filed before any data (protocol v2): rounds 6 to 1 (S is a deterministic function of (workload, algorithm seed) and replays exactly, so a repeated seed adds nothing; rounds 2-6 would add new walk seeds per target, i.e. power, which P1 does not need; cost: C3 (tensor vs ic-mitm) is probably underpowered, so no_ranking is the expected outcome there, not parity); warmup 1 to 0 (a warm-up only absorbs one-time wall costs, which counted S does not see; with warmup 0 the measured round uses absolute seed index 0, which no measured round of the original used); order alternate to alternate_measured (with warmup 0 and one round both orders run the single round in spec order, so the plan order is identical; alternate_measured matches the 16-bit original and avoids ecbench's warning that alternate parity counts warm-ups). timeout_seconds is a wall-clock limit (runner.rs): at L0 whether a row ends verified or timeout depends on the host; a timeout row is host censoring (unknown), never a negative result. No wall-time figure from this session is a result. Caveat: on 64-bit builds lambda <= 64, root_u = lambda/131072 = 0 and public inputs take the finite-size fallback; nothing here exercises the recursive subexponential kernel; ic.tensor_contraction_v1 is an exponential toy (protocol H1). Protocol: research/hashed_ecdl_counts_20261031/protocol.json (v2).",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_roster",
+        "bits": 10
+      },
+      {
+        "kind": "prime_roster",
+        "bits": 12
+      },
+      {
+        "kind": "prime_roster",
+        "bits": 14
+      }
+    ],
+    "targets_per_curve": 8,
+    "target_seed": 20261030
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "ic-mitm",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=32",
+          "oracle": "mitm:negation_folded=1"
+        }
+      }
+    },
+    {
+      "name": "tensor-m2",
+      "role": "candidate",
+      "method": {
+        "id": "ic.tensor_contraction_v1",
+        "params": {
+          "m": "2"
+        }
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate_measured",
+    "seed": 20261030,
+    "isolation_required": "L0",
+    "timeout_seconds": 900
+  }
+}

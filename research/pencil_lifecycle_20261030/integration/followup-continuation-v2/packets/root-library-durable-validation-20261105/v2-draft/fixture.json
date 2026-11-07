@@ -1,0 +1,74 @@
+{
+  "source_plan": "research/pencil_large_prime_20261029/prepared_gate_plans/gate-p739.json",
+  "source_plan_sha256": "bc57819e43862f5d9c9aee0f13b983fec186b2dd14dbc8b921d8999acc4b6776",
+  "selection": "fixed first existing execution, no execution-based selection",
+  "execution": {
+    "seq": 0,
+    "round": 0,
+    "warmup": true,
+    "arm": 0,
+    "workload": 0,
+    "algorithm_seed": 17823097723983109480
+  },
+  "workload": {
+    "workload_id": "Wcf52db405c0d",
+    "workload_sha256": "cf52db405c0dcf1916b87de8f429f914a92160b07f72b39e869284441fa42de9",
+    "curve_spec": {
+      "kind": "three_leads",
+      "p": 739,
+      "n": 2,
+      "modulus": 1,
+      "a": 493102,
+      "b": 193650,
+      "group_order": 546352,
+      "r": 34147,
+      "gx": 433246,
+      "gy": 59741,
+      "family": "scholten",
+      "parameter": 0
+    },
+    "curve": {
+      "slug": "icv1-fp10k2-tm230-7cd9e337",
+      "icv1": "ICV1:fpk-739-2-203151c5:-230:546352:398,321:unk:unk:r:7cd9e337a915",
+      "family": "extension",
+      "construction": "three_leads_explicit(p=739,n=2,a=493102,b=193650,family=scholten,parameter=0)",
+      "field_degree": 2,
+      "field_bits": 10,
+      "group_order": 546352,
+      "r": 34147,
+      "cofactor": 16,
+      "generator": [
+        "0x69c5e",
+        "0xe95d"
+      ],
+      "automorphisms_available": 2,
+      "registered": true,
+      "ec1": null,
+      "curve_uid": null
+    },
+    "target_law": "uniform_scalar_sha256_v1",
+    "target_seed": 202610181260,
+    "target_index": 0,
+    "target": [
+      "0x15ed",
+      "0x5b1d4"
+    ],
+    "planted": 31124
+  },
+  "method": {
+    "id": "ic.three_leads_genus2_pencil_symbolic_v2",
+    "family": "ic",
+    "params": {
+      "matrix_coefficient_cap": "25000000",
+      "small_denominator": "8"
+    },
+    "method_id": "ECM1h187cc5c6d747",
+    "method_sha256": "187cc5c6d747a3b25cfd9708e970b511886a46c49b5db9fd3b09ce5b8a7fc983",
+    "entry": "three_leads::pencil::solve"
+  },
+  "historical_support": {
+    "path": "research/pencil_large_prime_20261029/validation/covered_gate_results_20261030/covered-analysis-receipt.json",
+    "scope": "historical aggregate reports all360pencil executions verified; does not claim newsource pass"
+  },
+  "new_execution": false
+}
