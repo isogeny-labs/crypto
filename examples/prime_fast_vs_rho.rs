@@ -18,7 +18,9 @@ fn main() {
     let mut rows = Vec::new();
     for bits in a[3].split(',').map(|s| s.parse::<u32>().unwrap()) {
         for res in [3u64, 1] {
-            let Some((c, g)) = find_a3_curve(bits, res) else { continue };
+            let Some((c, g)) = find_a3_curve(bits, res) else {
+                continue;
+            };
             let mut ic: Vec<(f64, Vec<f64>)> = Vec::new();
             let cs = [0.25f64, 0.5, 1.0];
             let mut icv = vec![Vec::new(); cs.len()];
@@ -33,7 +35,9 @@ fn main() {
                     let t0 = Instant::now();
                     let r = ic_solve(&c, g, q, fb, 6, 3, u64::MAX, t);
                     let ms = t0.elapsed().as_secs_f64() * 1e3;
-                    if matches!(r, Some((x, _)) if x == k) { icv[i].push(ms); }
+                    if matches!(r, Some((x, _)) if x == k) {
+                        icv[i].push(ms);
+                    }
                 }
                 let mut cfg = RhoConfig::for_bits(bits, true);
                 cfg.threads = 1;
@@ -41,7 +45,12 @@ fn main() {
                 let t0 = Instant::now();
                 let r = rho_parallel(&c, g, q, &cfg);
                 let ms = t0.elapsed().as_secs_f64() * 1e3;
-                if let Some(r) = r { if r.log == k { rho.push(ms); rho_steps.push(r.total_steps as f64); } }
+                if let Some(r) = r {
+                    if r.log == k {
+                        rho.push(ms);
+                        rho_steps.push(r.total_steps as f64);
+                    }
+                }
             }
             let _ = &mut ic;
             let row = json!({"bits":bits,"res":res,"p":c.f.p,"n":c.n,"targets":nt,
