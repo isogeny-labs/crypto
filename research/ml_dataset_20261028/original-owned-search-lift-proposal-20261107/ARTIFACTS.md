@@ -1,0 +1,3 @@
+Complete immutable packets, including omitted compiled test binary and full proposed worker reference, are in S3_RECEIPT.json. Verify archive SHA-256 and bytes, extract, then run sha256sum -c SHA256SUMS at archive root. Original manifests describe the complete archived packets. Production assembly remains uncompiled.
+
+TRANSPORT_SOURCE_REVIEW.md was received after the archive froze and is preserved separately in Git. It records an unresolved native-phase accounting-policy question: original global caps remain enforced, but normalization/audit charge checking counters outside local native phase ceilings. Resolve before activation.
