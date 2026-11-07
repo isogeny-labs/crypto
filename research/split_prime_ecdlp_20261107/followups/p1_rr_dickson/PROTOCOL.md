@@ -87,6 +87,63 @@ KB unavailable. `research/ic_tree_gluing_20261103/round7_rr/README.md`,
 `kummer_tower_faithful` in `aburan28/crypto-lean` PR #3 (the towers impose exactly
 the membership the systems claim).
 
-## Addendum A: instrument (pinned before any claim cell)
+## Addendum A: instrument and pre-data amendments (pinned before any claim cell)
 
-Pending the builder's report.
+**Instrument.** `p1tool/` (standalone Rust, `src/main.rs` sha256
+`0d9fa76e0381167b8d3c6d4ec8033a8345204db9f7ad99190ff5828171954edd`; development
+binary sha256 `4ba83d9a5ab271ddbec38ea0e263d97457dab73997cfcc80f6abb33b98f8250f`,
+rustc 1.97.0), msolve 0.6.5 (`/usr/bin/msolve` sha256 `c2722288…f759fa`), thin
+runner `calibration/msolve_cell.sh` (`ulimit -v`, `timeout`, `nice -n 10`). Details,
+equations and variable counts: `p1tool/README.md`.
+
+**Positive controls, done during the build (instrument validation)
+[pcc:unverified]:**
+- A, emitter fidelity: on round 7's instances, 12 of 12 systems emitted by
+  `p1tool` are byte-identical (`cmp`) to those of the unmodified `genrr.sing` and
+  `gen.sing`; the Singular regeneration matches all 5 hashes of
+  `round7_rr/SYSTEMS.sha256`.
+- B, measurement: RR-Kummer m3 t4 gives D = 4, widest 2,989 × 2,801, qdim 1;
+  T-Kummer m3 t4 (k0, k1) gives D = 6, widest 9,037 × 7,077, qdim 3; equal to
+  `round7_rr/rows.tsv` and `../rows.tsv`. Rule 1's control condition is therefore
+  met before any claim cell.
+
+Commands, per cell:
+
+```
+p1tool emit --system rr|t --kind dickson|kummer --p P --a A --b B --m M --t T --seed S --out C.ms
+VLIMIT=1572864 TLIMIT=1200 calibration/msolve_cell.sh C.ms C.log      # one job at a time
+p1tool parse C.log
+```
+
+**Pre-data amendments (from the build, before any claim cell):**
+
+1. **Curves fixed.** T24: a = 3,607,823, b = 6,826,282, n = 14,683,681 (BSGS; a
+   naive count agrees). T31: a = 289,962,109, b = 1,299,273,082,
+   n = 2,046,768,077 (BSGS and Hasse uniqueness). Both from `p1tool curve --seed 1`.
+2. **Kummer comparison arm on a prime-order curve.** Round 7's p0 curve has order
+   786,627, which is not prime. It stays as the positive control (B above). The
+   RR-K and T-K comparison arms of rule 3 use the prime-order curve over p0
+   a = 658,649, b = 132,295, n = 785,623, at the same cells as the Dickson arms.
+3. **Seeds and a skip rule.** A cell needs a planted instance whose base holds m
+   distinct admissible abscissae with exactly one sign pattern summing to R; at
+   t = 3 the base has at most 8 abscissae and many seeds have none. Seeds are the
+   integers S = 1, 2, …, 50 in order (not hash-derived); each cell takes the first
+   two admissible seeds, every skipped seed is recorded with its reason, and a cell
+   with no admissible seed in 1..50 is "not admissible" (never imputed). Build-time
+   emit-only checks: m3 t4 and m3 t5 are admissible at seeds 1 and 2 on both
+   primes; m3 t3 seed 1 is not; m5 t3 at T24 is admissible only at seed 2; at T31
+   at neither seed 1 nor 2.
+4. **The T arm is round 7's cherry-tree chain system with the membership tower,
+   run through msolve.** The proposal named `pkm_tower_pilot --kinds dickson-torus`,
+   which is a different system (the caterpillar S₃ chain under its own F4 engine).
+5. **Variable counts corrected.** At m = 3: N_RR = 5t − 2 (18 at t = 4) and
+   N_T = 3t + 1 (13 at t = 4); the proposal's N = (2m − 1)t + 2m (26) is wrong.
+   This changes no decision rule.
+6. **Disclosure: the predictions are not blind.** The development smoke runs at
+   tiny Dickson primes p ∈ {1151, 1279, 1999} (finished 21:35Z, two minutes after
+   the protocol commit at 21:33Z, and read before this addendum) gave
+   D_RR-D = 4, widest 2,801, and D_T-D = 6, widest 7,129, at m3 t4. These match the
+   proposal's predictions, which were written before them. The claim cells at T24
+   and T31 decide; the smoke values decide nothing.
+7. **Quotient dimension** may exceed 1 when an instance has a second decomposition
+   (2 of the 11 smoke RR cells, qdim 2); rule 1 requires only qdim ≥ 1.
