@@ -1,0 +1,32 @@
+{
+  "all_hashes_and_bytes_match": true,
+  "cases": 48,
+  "checkpoint_semantics": "after-NN contains exactly the first NN terminal rows present in summary.json",
+  "completed_cases": 48,
+  "failure_or_timeout_cases": 0,
+  "first_fall_result_index_sha256": "19a1901e57ac000be901e88173f67c8f87a886c82b3e1608acfb9f8bcfee6e43",
+  "fresh_replay_passes": 48,
+  "full_prefix_bytes": 3318856,
+  "full_prefix_object_count": 392,
+  "groups": {
+    "direct_metadata_attempt_certificate_records": 145,
+    "result_mirror_index_object": {
+      "bytes": 72304,
+      "sha256": "19a1901e57ac000be901e88173f67c8f87a886c82b3e1608acfb9f8bcfee6e43"
+    },
+    "results_mirror": {
+      "bytes_in_index": 992042,
+      "index_sha256": "19a1901e57ac000be901e88173f67c8f87a886c82b3e1608acfb9f8bcfee6e43",
+      "objects_in_index": 198
+    },
+    "rolling_checkpoints": 48
+  },
+  "input_manifest_sha256": "93b351b181b135c74cff0da0386c704d46eb777b302ed3b440ad18a249d52ca1",
+  "method": "aws s3 sync to a fresh local directory followed by SHA-256/byte-count checks against the output index and local terminal records; checkpoint JSON compared with each corresponding final-ledger prefix",
+  "per_case_certificate_s3_matches": 48,
+  "readback_utc": "2026-11-05T19:58:51.106815+00:00",
+  "s3_prefix": "s3://isolab-results-104186811093-us-east-2/runs/n83-ffd-lfd-factorbase-panel-20261105/v2/spike38/attempt-01/data-v1/",
+  "schema": "n83.s3-full-prefix-readback/v1",
+  "terminal_summary_sha256": "c80d4a433e556c2e6ff19412df146532ccb8807d8c1781e31c3aa72ae01c3ba9",
+  "validated_object_count": 392
+}

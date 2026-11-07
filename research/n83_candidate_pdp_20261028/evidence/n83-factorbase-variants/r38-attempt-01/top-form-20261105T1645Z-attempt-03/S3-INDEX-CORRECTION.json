@@ -1,0 +1,20 @@
+{
+  "schema": "n83.s3-index-correction/v1",
+  "results_prefix": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-03/results/",
+  "original_index_uri": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-03/results/S3_PERSISTENCE_INDEX.json",
+  "original_index_sha256": "4f1c46be4fe63704c2771d336f0589b777262863e15be8c0e007e6ffc7f70e78",
+  "original_index_entries": 394,
+  "readback_objects_excluding_index": 395,
+  "missing_index_entries": [
+    "controller-status.json"
+  ],
+  "added_entries": [
+    {
+      "path": "controller-status.json",
+      "bytes": 292,
+      "sha256": "807bd5cb1b937d71d36e8823f4dc2b23a05a7ab3cd31963117f5ec9583ee561a"
+    }
+  ],
+  "correction_uri": "s3://isolab-results-104186811093-us-east-2/runs/n83-pdp-top-factorbase-20261031-v2/spike38/attempt-03/reconciliation/index-correction.json",
+  "note": "The controller writes controller-status.json after the runner creates the original index; this immutable addendum accounts for that later object without replacing the original index."
+}

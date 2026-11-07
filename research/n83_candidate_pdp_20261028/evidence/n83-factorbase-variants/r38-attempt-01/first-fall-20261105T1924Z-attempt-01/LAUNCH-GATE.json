@@ -1,0 +1,110 @@
+{
+  "capsule": {
+    "all_sha256_and_byte_counts_match": true,
+    "index_sha256": "acabc35d192c11e6c980b53dc16cdc8a440bf0a4bab8997c9303fa875599e979",
+    "objects_read_back": [
+      {
+        "bytes": 15022,
+        "path": "run-first-fall.py",
+        "readback": "byte-identical",
+        "sha256": "672e6e03ee86105137494c0a716c6db2bf22d60fd59476d6eaa3bbbcef3adb33"
+      },
+      {
+        "bytes": 716,
+        "path": "launch.sh",
+        "readback": "byte-identical",
+        "sha256": "1fdcb6726621ab733b764b8b2ad507a9ed31d073a2b17427397b4abe8a6e9a76"
+      },
+      {
+        "bytes": 98820,
+        "path": "protocol-pdp-factorbase-v2.json",
+        "readback": "byte-identical",
+        "sha256": "8a9143e9588ce1ec5c204362b734f790696de90569ce1de3c086e4645e605885"
+      },
+      {
+        "bytes": 330335,
+        "path": "input-manifest.json",
+        "readback": "byte-identical",
+        "sha256": "93b351b181b135c74cff0da0386c704d46eb777b302ed3b440ad18a249d52ca1"
+      },
+      {
+        "bytes": 25150,
+        "path": "source-fall.rs",
+        "readback": "byte-identical",
+        "sha256": "f860a68fcd8c98585082965f3d4c1622d71add204c0afc5bc922ea243153ea85"
+      },
+      {
+        "bytes": 210,
+        "path": "Cargo.toml",
+        "readback": "byte-identical",
+        "sha256": "67bf2d622a3c3fe35babe46a3e17ae37693dee36a7330300b5fe57e473c71cdf"
+      },
+      {
+        "bytes": 7077,
+        "path": "Cargo.lock",
+        "readback": "byte-identical",
+        "sha256": "210fabaa277a42007115baea73429d5e68feb35e3b274eab7ef9c311270722c5"
+      },
+      {
+        "bytes": 3704,
+        "path": "CONTINUATION-BINDING.json",
+        "readback": "byte-identical",
+        "sha256": "37719f0f898aa0ed67e2be93644bd55f12b243cb4d32d2371869274189fd7ccf"
+      },
+      {
+        "bytes": 1337,
+        "path": "FILE-LAYOUT.md",
+        "readback": "byte-identical",
+        "sha256": "7dd1f03eda1e7559eea9fc4b83d104001d754b91b2d259b65035c02f939d4276"
+      },
+      {
+        "bytes": 860984,
+        "path": "instruments/fall",
+        "readback": "byte-identical",
+        "sha256": "33c859d58f30f6facf483b0df61c9ffe7339298513c15001b6583605c11c1a14"
+      }
+    ],
+    "s3_uri": "s3://isolab-results-104186811093-us-east-2/runs/n83-ffd-lfd-factorbase-panel-20261105/v2/spike38/attempt-01/capsule-v2/"
+  },
+  "cost_gate": {
+    "daily_cap_usd": 200,
+    "day_to_date_usd": 77.0045996521,
+    "max_attempt_usd": 3.15,
+    "month_to_date_usd": 582.4529988551,
+    "monthly_cap_usd": 1000,
+    "spot_usd_per_hour": 0.8015,
+    "utc_date": "2026-11-05"
+  },
+  "decision": "Ready to launch once; retain every timeout and failure artifact; no retry under this continuation. First-fall only; LFD closure remains unimplemented in the pinned executable.",
+  "launch_command": "bash launch.sh",
+  "limits": {
+    "attempts_per_case": 1,
+    "cpu_affinity": [
+      0
+    ],
+    "memory_gib": 8,
+    "per_case_replay_seconds": 60,
+    "per_case_run_seconds": 60,
+    "retries": 0,
+    "threads": 1,
+    "wall_timeout_seconds": 12850,
+    "wall_valid": false
+  },
+  "pr": {
+    "branch": "codex/n83-spike38-attempt04-20261105",
+    "capsule_source_commit": "85444b0a5efcefbf805e9a9c4df7c0f684338c78",
+    "url": "https://github.com/isogeny-labs/crypto/pull/3485"
+  },
+  "prelaunch_checks": {
+    "all_system_and_case_input_hashes_match": true,
+    "case_count": 48,
+    "cpu0_allowed": true,
+    "fall_binary_selfcheck_exit": 0,
+    "fall_process_active": false,
+    "matching_n83_eks_jobs": "previous reconciliation found none; live refresh now unavailable because the scoped WorkerRole is denied AssumeRole for the cluster launcher role; this local CPU run does not submit to EKS",
+    "other_active_lfdclose2": "separate /home/ec2-user/lfd-trace-slice-cert-20261102 process; preserved and not duplicated",
+    "result_data_prefix_empty": true
+  },
+  "recorded_utc": "2026-11-05T19:45:38.827360+00:00",
+  "schema": "n83.first-fall-launch-gate/v1"
+}
