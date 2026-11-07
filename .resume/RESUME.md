@@ -27,7 +27,9 @@ are committed on this branch. No Modal run yet. Modal credentials are in the ses
    (it does not for a Modal-only run), session log, PR.
 
 ## Runs in flight
-None.
+C = 1 boundary study (owner approved 2026-11-07 as a labelled boundary result outside the main ratchet): one-seed wwalk (existing mode `wwalk:...,g=1,grow=1` on a size=1 base, commit f51911e130 by another session) screened at k = 20, 24, 28, 32 on five dev curves with seed=run. Under benchrec record in scratchpad recc1, branch claude/curve25519-c1-boundary.
+Specs: research/curve25519_autolab_20261104/c1/spec-screen-k*.json (20 arms each). Confirmation curves c1/confirm-curves.json untouched.
+Next: pre-register ONE C = 1 arm per size from the screen, run it vs inc-c2 and rho-neg on the confirm curves (12 targets x 2 rounds), report S, ratio to rho and S relative to the C = 1 floor 1.329 as a boundary result; no new oracle, no change to rho.
 
 ## Stop and success conditions
 One Modal launch, 2 h function timeout, expected under 30 min. Any selftest failure stops throughput.
