@@ -1011,7 +1011,101 @@ fn find_one_relation_counted_with_rng<R: rand::RngCore>(
     rng: &mut R,
 ) -> Option<(Relation, usize)> {
     let x_to_idx = factor_base_x_index(factor_base);
-    find_one_relation_sweep_with_index(curve, g, q, factor_base, &x_to_idx, max_trials, rng)
+    find_one_relation_sweep_with_index(curve, g, q, factor_base, &x_to_idx, None, max_trials, rng)
+}
+
+/// The sweep's inner loop on `u64` words (small odd prime fields below 2^40): the same candidate set,
+/// in the same order, as the `BigUint` loop in [`find_one_relation_sweep_with_index`].  Experimental
+/// (`IC_FAST_SWEEP=1`, which also hoists the x-index); the default sweep is unchanged.  The design and
+/// the equality of results were first established by an independent validator's probe.
+struct WordSweep {
+    p: u64,
+    a: u64,
+    b: u64,
+    xs: Vec<Option<u64>>,
+    in_fb: Vec<bool>,
+}
+
+impl WordSweep {
+    fn new(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> Option<Self> {
+        let word = |v: &BigUint| v.to_u64_digits().first().copied().unwrap_or(0);
+        let pd = curve.p.to_u64_digits();
+        if pd.len() != 1 || pd[0] <= 2 || pd[0].is_multiple_of(2) || pd[0] >= (1u64 << 40) {
+            return None;
+        }
+        let xs: Vec<Option<u64>> = factor_base
+            .iter()
+            .map(|e| match &e.point {
+                Point::Affine { x, .. } => Some(word(&x.value)),
+                Point::Infinity => None,
+            })
+            .collect();
+        let max_x = xs.iter().flatten().copied().max().unwrap_or(0) as usize;
+        let mut in_fb = vec![false; max_x + 1];
+        for x in xs.iter().flatten() {
+            in_fb[*x as usize] = true;
+        }
+        Some(Self {
+            p: pd[0],
+            a: word(&curve.a),
+            b: word(&curve.b),
+            xs,
+            in_fb,
+        })
+    }
+
+    /// Candidate third coordinates `X` of `S_3(x1, x2, X) = 0` for factor-base element `i`, in the order
+    /// the `BigUint` loop tries them (the `+` root, then the `-` root; one candidate in the linear case).
+    fn candidates(&self, x1: u64, x2: u64) -> [Option<u64>; 2] {
+        let pw = self.p;
+        let m = |u: u64, v: u64| ((u as u128 * v as u128) % pw as u128) as u64;
+        let ad = |u: u64, v: u64| {
+            let s = u + v;
+            if s >= pw {
+                s - pw
+            } else {
+                s
+            }
+        };
+        let sb = |u: u64, v: u64| if u >= v { u - v } else { u + pw - v };
+        let ng = |u: u64| if u == 0 { 0 } else { pw - u };
+        let two_b = ad(self.b, self.b);
+        let four_b = ad(two_b, two_b);
+        let x1x2 = m(x1, x2);
+        let sum = ad(x1, x2);
+        let diff = sb(x1, x2);
+        let qa = m(diff, diff);
+        let inner = ad(m(sum, ad(x1x2, self.a)), two_b);
+        let qb = ng(ad(inner, inner));
+        let part = sb(x1x2, self.a);
+        let qc = sb(m(part, part), m(four_b, sum));
+        let mut out = [None, None];
+        if qa == 0 {
+            if qb == 0 {
+                return out;
+            }
+            if let Some(inv) = inv_mod_u64(qb, pw) {
+                out[0] = Some(m(ng(qc), inv));
+            }
+            return out;
+        }
+        let four_qa = ad(ad(qa, qa), ad(qa, qa));
+        let disc = sb(m(qb, qb), m(four_qa, qc));
+        let sq = if disc == 0 {
+            0
+        } else {
+            match sqrt_mod_p_u64(disc, pw) {
+                Some(v) => v,
+                None => return out,
+            }
+        };
+        let Some(two_qa_inv) = inv_mod_u64(ad(qa, qa), pw) else {
+            return out;
+        };
+        out[0] = Some(m(ad(ng(qb), sq), two_qa_inv));
+        out[1] = Some(m(ad(ng(qb), ng(sq)), two_qa_inv));
+        out
+    }
 }
 
 /// The square-root sweep with a prebuilt x-index.  The default path builds the
@@ -1022,6 +1116,7 @@ fn find_one_relation_sweep_with_index<R: rand::RngCore>(
     q: &Point,
     factor_base: &[FactorBaseEntry],
     x_to_idx: &std::collections::HashMap<BigUint, usize>,
+    word: Option<&WordSweep>,
     max_trials: usize,
     rng: &mut R,
 ) -> Option<(Relation, usize)> {
@@ -1045,6 +1140,32 @@ fn find_one_relation_sweep_with_index<R: rand::RngCore>(
             Point::Affine { x, .. } => x.clone(),
             Point::Infinity => continue,
         };
+
+        if let Some(w) = word {
+            let x1 = xr.value.to_u64_digits().first().copied().unwrap_or(0);
+            for (i, fb_i) in factor_base.iter().enumerate() {
+                let Some(x2) = w.xs[i] else { continue };
+                for c in w.candidates(x1, x2).into_iter().flatten() {
+                    if !((c as usize) < w.in_fb.len() && w.in_fb[c as usize]) {
+                        continue;
+                    }
+                    let candidate = curve.fe(BigUint::from(c));
+                    if let Some(rel) = try_finalise(
+                        &r,
+                        &fb_i.point,
+                        &candidate,
+                        x_to_idx,
+                        factor_base,
+                        curve,
+                        &a,
+                        &b,
+                    ) {
+                        return Some((rel, trial));
+                    }
+                }
+            }
+            continue;
+        }
 
         // Sweep each factor-base element F_i; solve
         // S₃(x_R, x_{F_i}, X) = 0  for X via the quadratic formula.
@@ -2010,8 +2131,14 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
         None
     };
     // Experimental: IC_HOIST_SWEEP=1 builds the sweep's x-index once per solve.
-    let hoisted_index = if std::env::var("IC_HOIST_SWEEP").as_deref() == Ok("1") {
+    let fast_sweep = std::env::var("IC_FAST_SWEEP").as_deref() == Ok("1");
+    let hoisted_index = if fast_sweep || std::env::var("IC_HOIST_SWEEP").as_deref() == Ok("1") {
         Some(factor_base_x_index(&fb))
+    } else {
+        None
+    };
+    let word_sweep = if fast_sweep {
+        WordSweep::new(curve, &fb)
     } else {
         None
     };
@@ -2054,6 +2181,7 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
                             q,
                             &fb,
                             ix,
+                            word_sweep.as_ref(),
                             max_trials_per_relation,
                             rng,
                         ),
@@ -2643,6 +2771,48 @@ mod tests {
                 .scalar_mul(&walk.a, &a_fe)
                 .add(&q.scalar_mul(&walk.b, &a_fe), &a_fe);
             assert_eq!(walk.r, on_curve, "walk lost r = aG + bQ");
+        }
+    }
+
+    /// The `u64` word sweep returns exactly the relations, and the same trial
+    /// counts, as the `BigUint` sweep when both consume the same random stream.
+    #[test]
+    fn word_sweep_matches_the_biguint_sweep() {
+        use rand::SeedableRng;
+        let curve = tiny_curve();
+        let a_fe = curve.a_fe();
+        let g = Point::Affine {
+            x: FieldElement::new(curve.gx.clone(), curve.p.clone()),
+            y: FieldElement::new(curve.gy.clone(), curve.p.clone()),
+        };
+        let q = g.scalar_mul(&BigUint::from(101u32), &a_fe);
+        for fb_size in [6usize, 12] {
+            let fb = build_factor_base(&curve, fb_size);
+            let x_to_idx = factor_base_x_index(&fb);
+            let word = WordSweep::new(&curve, &fb).expect("271 is a word prime");
+            let mut rng_a = rand::rngs::StdRng::seed_from_u64(11 + fb_size as u64);
+            let mut rng_b = rand::rngs::StdRng::seed_from_u64(11 + fb_size as u64);
+            for _ in 0..40 {
+                let slow = find_one_relation_sweep_with_index(
+                    &curve, &g, &q, &fb, &x_to_idx, None, 100_000, &mut rng_a,
+                )
+                .expect("BigUint sweep relation");
+                let fast = find_one_relation_sweep_with_index(
+                    &curve,
+                    &g,
+                    &q,
+                    &fb,
+                    &x_to_idx,
+                    Some(&word),
+                    100_000,
+                    &mut rng_b,
+                )
+                .expect("word sweep relation");
+                assert_eq!(slow.1, fast.1, "trial counts differ");
+                assert_eq!(slow.0.coef_a, fast.0.coef_a);
+                assert_eq!(slow.0.coef_b, fast.0.coef_b);
+                assert_eq!(slow.0.entries, fast.0.entries);
+            }
         }
     }
 
