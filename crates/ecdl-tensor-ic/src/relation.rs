@@ -91,6 +91,11 @@ pub struct FactorBases {
     /// membership tests that fix the high bits of x.
     pub x_bound: Vec<u64>,
     pub window_bits: usize,
+
+    /// preimages, if non-empty, holds for each F_i every S ∈ E with
+    /// [c]S ∈ F_i, for fixed-cofactor factor bases (Rust only; filled once
+    /// per draw by `crate::cofactor::cofactor_factor_bases`).
+    pub preimages: Vec<Vec<Point>>,
 }
 
 /// NewFactorBases draws m hash keys and sizes each F_i near (2r)^(1/m), so the
