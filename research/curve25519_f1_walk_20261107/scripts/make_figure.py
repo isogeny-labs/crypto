@@ -18,10 +18,10 @@ for ax, k in zip(axes, ('k20', 'k24')):
         lo = [r['ratio'] - r['ci95'][0] for r in rr]; hi = [r['ci95'][1] - r['ratio'] for r in rr]
         ax.bar(xs, y, 0.17, color=c, label=lab, yerr=[lo, hi], capsize=3)
     ax.axhline(1.0, color='k', lw=1); ax.text(2.45, 1.01, 'rho-neg parity', ha='right', va='bottom', fontsize=8)
-    ax.axhline(1.5, color='#d62728', lw=0.8, ls='--'); ax.text(-0.45, 1.51, 'F=1 floor 1.5x (derived)', fontsize=8, color='#d62728', bbox=dict(fc='white', ec='none', alpha=0.8))
-    ax.axhline(1.875, color='#ff7f0e', lw=0.8, ls=':'); ax.text(-0.45, 1.885, 'F=2 floor 1.875x (derived)', fontsize=8, color='#ff7f0e', bbox=dict(fc='white', ec='none', alpha=0.8))
+    ax.axhline(1.5, color='#d62728', lw=0.8, ls='--'); ax.text(-0.45, 1.51, 'F=1 model floor 1.5x (derived)', fontsize=8, color='#d62728', bbox=dict(fc='white', ec='none', alpha=0.8))
+    ax.axhline(1.875, color='#ff7f0e', lw=0.8, ls=':'); ax.text(-0.45, 1.885, 'F=2 model floor 1.875x (derived)', fontsize=8, color='#ff7f0e', bbox=dict(fc='white', ec='none', alpha=0.8))
     ax.set_xticks(range(3)); ax.set_xticklabels([f'w={w}' for w in ws])
-    ax.set_title(f'{k[1:]}-bit p, 8 single-target sessions x 64 rounds (measured)', fontsize=9)
+    ax.set_title(f'{k[1:]}-bit p, 8 single-target sessions x 64 measured rounds', fontsize=9)
     ax.set_ylim(0, 2.1)
 axes[0].set_ylabel('pooled S(arm) / S(rho-neg), 95% CI')
 axes[0].legend(fontsize=8, loc='lower left')
