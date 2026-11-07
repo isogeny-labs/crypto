@@ -36,6 +36,8 @@ that the theorems do not depend on `sorryAx`.
 
 - This does not prove the Python field arithmetic or SQLite transactions.
   Those are covered by differential tests such as
+  `test_field_multiplication_matches_reference_algorithm` (500 random pairs
+  against the pre-change bit loop),
   `test_batch_inversion_and_addition_match_scalar_paths` (500 random pairs plus
   every doubling on a small curve) and
   `test_batch_addition_matches_on_ecc2k130_sample` (64 pairs at degree 131).

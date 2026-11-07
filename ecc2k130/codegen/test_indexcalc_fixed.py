@@ -118,6 +118,26 @@ class FixedTests(unittest.TestCase):
         self.assertLessEqual(fixed.requiredBytes(10, 100), fixed.requiredBytes(11, 100))
         self.assertLessEqual(fixed.requiredBytes(10, 100), fixed.requiredBytes(10, 101))
 
+    def test_field_multiplication_matches_reference_algorithm(self):
+        document, _ = fixture(9, seed=1039)
+        with fixed.Campaign(document, '.', memory=True) as campaign:
+            onb = campaign.params.onb
+
+            def reference(a, b):
+                r, bb, i = 0, b, 0
+                while bb:
+                    if bb & 1:
+                        r ^= a if i == 0 else ((a << i) | (a >> (onb.n - i))) & onb.allOnes
+                    bb >>= 1
+                    i += 1
+                return r ^ onb.allOnes if r & 1 else r
+
+            rng = random.Random(19)
+            for _ in range(500):
+                a = onb.normalize(rng.getrandbits(onb.n))
+                b = onb.normalize(rng.getrandbits(onb.n))
+                self.assertEqual(onb.mul(a, b), reference(a, b))
+
     def test_batch_inversion_and_addition_match_scalar_paths(self):
         document, _ = fixture(9, seed=1037)
         with fixed.Campaign(document, '.', memory=True) as campaign:
