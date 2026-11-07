@@ -227,7 +227,7 @@ a priced one. Each is dated, and its tests are in
 | family `extension`, slug `icv1-f2m<N>-…` | `F_{2^N}` | `gaudry_quartic_bin`'s `y² + xy = x³ + ax² + b` over `F_{2^{4m}}`, `N = 4m`, `field_bits = m`; a binary field is priced by its degree, whatever tower the code computes in |
 | family `extension`, slug `icv1-fp<b>k4-…` | `F_{p⁴}`, `p` of `b` bits | the `F_{p⁴}` convention above |
 
-Left unpriced on purpose:
+Left unpriced on purpose (both decided on 2026-11-07, below):
 
 - `abscissae_enumerated_uncharged`: the counter is the size of the enumerated
   weight set, not the number of subsets summed nor their weight, so one
@@ -244,6 +244,23 @@ The filter's memory (8 to 16 bits per stored entry) is not added to the
 `bitop/v2` oracle-table term, which prices `table_insert_attempts · (κ + w)`
 and so already bounds the packed table from above by more than the filter
 adds.
+
+### 2026-11-07 (the counters left unpriced on purpose, decided)
+
+Each counter the 2026-10-21 extension left unpriced, and the uncounted work it
+named, is decided here from what the code executes per unit. No primitive
+weight and no vector changes (`committed_vectors_are_frozen`), and no record
+that was complete changes.
+
+| counter or item | decision | rule or reason |
+|---|---|---|
+| `abscissae_enumerated_uncharged` (`cyclotomic`, `onb-weight`) | **priced from the parameters** | `CyclotomicField::weight_set` sums every `w`-subset of its atoms (`p = 2n + 1` powers of γ, or the `n` ONB elements) with `w` additions and inserts the sum into an ordered set (one keyed-set probe): `C(atoms, w) · (w·field_add + hash_probe)`, read from the `factor_base` parameter and the curve's degree, never from the count (the deduplicated set's size). A record without a parseable `w`, or whose count exceeds `C(atoms, w)`, keeps it unpriced. The field's construction (the root-of-unity search's exponentiations, the ONB inversion) and the `points_with_x` lift test of each abscissa visited have no counter: such records carry `known_uncounted` item `cyclotomic_field_construction_and_abscissa_lift_tests` |
+| `sqrt_solves` over `F_{2^n}` (`field_sqrt` over a binary field) | **priced as the Artin–Schreier lift** | on `y² + xy = x³ + ax² + b` no square root is taken: the counter counts `lift_x` attempts (`gaudry_quartic_bin`, as every binary `points_with_x`), each `x²`, `1/x²`, `b·x⁻²`, two additions and the half-trace solve: `field_sqr + field_inv + field_mul + 2·field_add + as_solve`. `bin-t-line` records also carry `known_uncounted` item `bin_t_line_abscissa_map_and_lift_tails` (the map `t ↦ β(t + 1)/t` and a successful lift's product, sign draw and negation) |
+| `field_sqrt` over `F_{p⁴}` | kept unpriced | `gaudry_quartic::Fp4::sqrt` is Tonelli–Shanks with a random non-residue search and an input-dependent loop: one call is between about `30b` and an unbounded number of `F_{p⁴}` products, set by the RNG, so no fixed primitive sum exists and the `F_p` allowance (`2b` products) would undercount it about fourfold. The 7 `icv1-fp5k4-…` `ic.pipeline` records stay incomplete (they are incomplete through the solver gap and the five index-calculus items as well) |
+| `solver_conflicts` (`sat-cdcl` records written before `bitop_complete`) | kept unpriced | `sat.rs` charges a conflict's analysis by the literals of the conflict clause and every reason clause visited, its backjump by the trail entries undone, and propagation by the watch-list clauses scanned (`Solver::word_ops`). None of these is fixed per conflict, and the old records carry conflicts, decisions and propagations but no clause or literal visits. Re-executions of committed records on the counted engine give word operations per conflict that differ several-fold across records of one session (`research/bitop_audit_pricing_20261107/`). The 29 records stay incomplete; a re-run on the current binary prices them (`bitop_complete = 1`) |
+| `solver_F_q_multiplications` (`d4-bin-macaulay`) | kept unpriced | the count is not one primitive: `BinD4Oracle` adds `F_q` products, `F_q` inversions (one each) and the large-prime merge's products modulo `r` (`lp_merge_mulmods`) into the same total, and the engine's additions and Macaulay builds have no counter (`solver_engine_work`). The 17 `icv1-f2m…` records stay incomplete |
+| `solver_F_p_multiplications` (`gaudry-d4`) | kept unpriced | the count is modelled, not executed: an `F_{p⁴}` product is charged 13 or 19 `F_p` products (Karatsuba or schoolbook, against the convention's 16) and an inversion 16 plus an uncounted `F_p` inversion. The 7 `icv1-fp5k4-…` records stay incomplete |
+| `CM_FOLDED_NATIVE_GAP` (`ic.cm_folded_*`) | kept listed | `folded.cpp` computes inversions and roots by `power` (a variable-length square-and-multiply), relation signatures as `std::to_string` strings in a `std::set`, pivots by `power(row[k], r − 2, r)`, and the CM map, none with a counter. The doublings' and mixed additions' field additions are fixed by `group.hpp`'s formulas and could be priced, but that would raise 477 committed lower bounds without completing any record, so it is left for the owner. The 477 records stay incomplete until the backend counts its work |
 
 Work that was never counted stays listed: the five index-calculus items
 (`gauss_column_scans_and_pivot_inversions`, `relation_row_construction`,

@@ -486,14 +486,71 @@ pub struct PhaseGuard {
 
 impl Drop for PhaseGuard {
     fn drop(&mut self) {
-        PHASE.with(|p| p.set(self.previous));
+        let left = PHASE.with(|p| p.replace(self.previous));
+        if left != self.previous {
+            phase_boundary(left);
+        }
     }
 }
 
 /// Attribute counted work to `phase` until the guard drops.
 pub fn enter(phase: Phase) -> PhaseGuard {
     let previous = PHASE.with(|p| p.replace(phase as usize));
+    if previous != phase as usize {
+        phase_boundary(previous);
+    }
     PhaseGuard { previous }
+}
+
+// ── Instruction audit (Callgrind) ────────────────────────────────────────
+//
+// With [`set_callgrind_phases`] on, every phase change dumps Callgrind's
+// current interval labelled with the phase it closes (`jv_phase_<name>`),
+// so a Callgrind run of a study row splits its instructions by the same
+// phases the tally charges.  The client request is inert outside Valgrind
+// and the flag is off by default: a counted run outside an audit is
+// unchanged.
+
+static CALLGRIND_PHASES: AtomicBool = AtomicBool::new(false);
+
+/// Dump Callgrind's interval at every phase change (the audit hook of
+/// `examples/jv_cover_ic_vs_rho_bitops.rs --callgrind`).
+pub fn set_callgrind_phases(on: bool) {
+    CALLGRIND_PHASES.store(on, Ordering::SeqCst);
+}
+
+/// The Callgrind label of the interval that closes when `phase` is left.
+pub const CALLGRIND_LABELS: [&[u8]; PHASES] = [
+    b"jv_phase_instance\0",
+    b"jv_phase_harness\0",
+    b"jv_phase_walk\0",
+    b"jv_phase_transport\0",
+    b"jv_phase_model\0",
+    b"jv_phase_factor_base\0",
+    b"jv_phase_relations\0",
+    b"jv_phase_descent\0",
+    b"jv_phase_linear_algebra\0",
+    b"jv_phase_verification\0",
+    b"jv_phase_rho_precompute\0",
+    b"jv_phase_rho_walk\0",
+    b"jv_phase_rho_collision\0",
+    b"jv_phase_rho_verification\0",
+    b"jv_phase_unattributed\0",
+];
+
+#[inline]
+fn phase_boundary(left: usize) {
+    if CALLGRIND_PHASES.load(Ordering::Relaxed) {
+        crate::cryptanalysis::ic_measurement::callgrind_dump(CALLGRIND_LABELS[left]);
+    }
+}
+
+/// Dump Callgrind's current interval under `label` (static, NUL-terminated
+/// ASCII), when the audit flag is on.  Inert otherwise.
+pub fn callgrind_mark(label: &'static [u8]) {
+    if CALLGRIND_PHASES.load(Ordering::Relaxed) {
+        crate::cryptanalysis::ic_measurement::callgrind_dump(label);
+    }
 }
 
 /// Comparisons of a sort of `k` keys: `k·⌈log₂ k⌉` word ops.
@@ -547,6 +604,36 @@ mod tests {
         assert_eq!(r.get(Kind::ModrMul), 1);
         assert_eq!(r.get(Kind::ModrAdd), 1);
         assert_eq!(r.get(Kind::ModrInv), 1);
+    }
+
+    #[test]
+    fn callgrind_labels_name_every_phase_and_guards_restore() {
+        for (ph, label) in Phase::ALL.iter().zip(CALLGRIND_LABELS) {
+            let text = std::str::from_utf8(label).unwrap();
+            assert!(text.ends_with('\0') && text.is_ascii());
+            assert!(text.starts_with("jv_phase_"));
+            let stem = text.trim_start_matches("jv_phase_").trim_end_matches('\0');
+            let rho = matches!(
+                ph,
+                Phase::RhoPrecompute | Phase::RhoWalk | Phase::RhoCollision | Phase::RhoVerification
+            );
+            assert_eq!(stem, if rho { format!("rho_{}", ph.name()) } else { ph.name().to_string() });
+        }
+        // The hook is inert outside Valgrind and leaves phase nesting as is.
+        set_callgrind_phases(true);
+        let before = current_phase();
+        {
+            let _a = enter(Phase::Relations);
+            {
+                let _b = enter(Phase::Descent);
+                assert_eq!(current_phase(), Phase::Descent);
+                let _c = enter(Phase::Descent);
+                assert_eq!(current_phase(), Phase::Descent);
+            }
+            assert_eq!(current_phase(), Phase::Relations);
+        }
+        assert_eq!(current_phase(), before);
+        set_callgrind_phases(false);
     }
 
     #[test]

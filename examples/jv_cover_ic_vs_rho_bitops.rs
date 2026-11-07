@@ -19,6 +19,12 @@
 //!
 //! Every attempt is written, solved or not.  One JSON object per line.
 //!
+//! `--callgrind 1` is the instruction audit's hook: run under
+//! `valgrind --tool=callgrind --dump-instr=no`, each arm is bracketed by
+//! `jv_arm_begin` / `jv_arm_end` dumps and split at every phase change into
+//! parts labelled `jv_phase_<phase>` (`examples/jv_cover_audit_ir.rs` sums
+//! them).  Without it nothing is dumped and the counts are unchanged.
+//!
 //! ```sh
 //! JV_SIEVE_ROUND_THREADS=4 cargo run --release --example jv_cover_ic_vs_rho_bitops -- \
 //!     --arm ic --p 251 --seeds 1,2 --moves 8 --jobs 2 --json /tmp/ic.jsonl
@@ -148,9 +154,12 @@ fn ic_row(p: u64, seed: u64, moves: usize, stop: Option<usize>) -> Value {
         set_trace_scope(0x1C_0000_0000 ^ (p << 24) ^ (seed << 8) ^ moves as u64);
         let other0 = jv_bitops::snapshot_other();
         let before = jv_bitops::snapshot();
+        let outer_phase = jv_bitops::current_phase();
+        jv_bitops::callgrind_mark(b"jv_arm_begin\0");
         let r = run_end_to_end_with(
             p, seed, moves, &JUMPS, CAP_MULT, RHO_S_REF, MARGIN, stop, false,
         );
+        jv_bitops::callgrind_mark(b"jv_arm_end\0");
         let t = jv_bitops::snapshot().since(&before);
         let other1 = jv_bitops::snapshot_other();
         let other_in = |phases: &[Phase]| -> u64 {
@@ -195,6 +204,7 @@ fn ic_row(p: u64, seed: u64, moves: usize, stop: Option<usize>) -> Value {
                 "s_over_pooled_rho": r.s_over_rho,
                 "pooled_rho_s": RHO_S_REF,
             },
+            "outer_phase": outer_phase.name(),
             "round_threads": std::env::var("JV_SIEVE_ROUND_THREADS").ok(),
             "lin_mode": crypto_lib::cryptanalysis::jv_cover::lin_mode_name(),
             "wall_ms": start.elapsed().as_secs_f64() * 1e3,
@@ -213,7 +223,9 @@ fn rho_row(p: u64, seed: u64, moves: usize, arm: &str, run: u64) -> Value {
     let o = rho_opts(arm, p);
     // the rho walk's randomness: (seed, moves) pick the instance, `run` the walk
     let walk_seed = seed * 1000 + moves as u64;
+    jv_bitops::callgrind_mark(b"jv_arm_begin\0");
     let cr = strong_rho_counted(&inst, walk_seed, run, o);
+    jv_bitops::callgrind_mark(b"jv_arm_end\0");
     let prices = measure_fq3_prims(p, inst.l);
     let t = rho_tally(&cr, &prices);
     let w = jv_bitops::widths(p, inst.l);
@@ -276,6 +288,7 @@ fn main() {
     let mut jobs = 1usize;
     let mut json_path: Option<String> = None;
     let mut stop: Option<usize> = None;
+    let mut callgrind = false;
     let mut i = 1;
     while i < args.len() {
         let v = args.get(i + 1).cloned().unwrap_or_default();
@@ -289,6 +302,10 @@ fn main() {
             "--jobs" => jobs = v.parse().expect("--jobs"),
             "--json" => json_path = Some(v),
             "--stop" => stop = Some(v.parse().expect("--stop")),
+            // The instruction audit: under `valgrind --tool=callgrind`, dump
+            // an interval at each arm's start and end and at every phase
+            // change (`jv_bitops::set_callgrind_phases`).  Takes `1`.
+            "--callgrind" => callgrind = v == "1",
             other => panic!("unknown argument {other}"),
         }
         i += 2;
@@ -308,6 +325,7 @@ fn main() {
     // counting on for the whole process; each worker thread claims its own
     // tally before it computes anything
     jv_bitops::enable(true);
+    jv_bitops::set_callgrind_phases(callgrind);
     match arm.as_str() {
         "ic" => {
             let items: Vec<(u64, usize)> = seeds
