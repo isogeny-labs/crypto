@@ -1,5 +1,7 @@
 import copy
 from pathlib import Path
+import io
+import json
 import random
 import sqlite3
 import tempfile
@@ -64,6 +66,42 @@ class FixedTests(unittest.TestCase):
                 self.assertEqual(report['status'], 'complete')
                 self.assertEqual(int(report['targets']['new-target']['scalar']), expected['target-0'])
                 self.assertEqual(report['reuse'].get('pair_candidates_built', 0), 0)
+
+    def test_progress_and_relation_export_are_complete_and_resumable(self):
+        document, _ = fixture(9, seed=1031)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'relations.jsonl'
+            progress = io.StringIO()
+            with fixed.Campaign(document, directory, progress=fixed.Progress(True, 1, stream=progress),
+                                relationsOut=path) as campaign:
+                report = campaign.run(stage='collect', attempts=64, pairBudget=10000, seconds=2)
+                self.assertEqual(report['status'], 'complete')
+                self.assertEqual(report['relations_out'], str(path))
+                first = [json.loads(line) for line in path.read_text().splitlines()]
+                self.assertEqual(len(first), report['relations_saved'])
+                self.assertEqual([row['number'] for row in first], list(range(len(first))))
+                self.assertTrue(all(row['operation'] == 'fixed-relation' and row['verified'] for row in first))
+                self.assertTrue(all(row['stream'] == 'precompute' and row['target'] is None for row in first))
+                text = progress.getvalue()
+                self.assertIn('[0/4] campaign:', text)
+                self.assertIn('[1/4] pair table:', text)
+                self.assertIn('[2/4] relation stream=precompute', text)
+                self.assertIn('[4/4] done:', text)
+            # Reopening rewrites the same saved rows rather than duplicating them.
+            with fixed.Campaign(document, directory, relationsOut=path) as campaign:
+                again = campaign.run(stage='status', attempts=0, pairBudget=0)
+                self.assertEqual(again['relations_saved'], report['relations_saved'])
+                self.assertEqual(path.read_text().splitlines(), [json.dumps(row, sort_keys=True, separators=(',', ':'))
+                                                                 for row in first])
+
+    def test_pair_table_check_fails_before_a_full_disk(self):
+        document, _ = fixture(9, seed=1033)
+        with tempfile.TemporaryDirectory() as directory:
+            with fixed.Campaign(document, directory) as campaign:
+                with patch('indexcalc_fixed.shutil.disk_usage',
+                           return_value=type('Usage', (), {'free': 0})()):
+                    with self.assertRaisesRegex(ValueError, 'pair table needs about'):
+                        campaign.run(stage='pairs', attempts=0, pairBudget=10000)
 
     def test_partial_pair_build_and_interrupted_collection_match_reference(self):
         document, expected = fixture(9, seed=1009)

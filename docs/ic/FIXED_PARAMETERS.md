@@ -76,6 +76,89 @@ applies to that family on toys. Full-size `n = 131` remains bounded by
 the free-oracle floor in
 [`RESEARCH_ECC2K130_DECOMPOSITION.md`](../../RESEARCH_ECC2K130_DECOMPOSITION.md).
 
+## Watch ECC2K-130 relations live
+
+`ic ecc2k130` is the ECC2K-130 defaults for the fixed workflow:
+
+```sh
+target/release/ic ecc2k130 --dir runs/ecc2k130
+```
+
+It selects the checked-in `docs/ic/params/ecc2k130-fixed.json` profile, the
+`collect` stage (relations without target descent), live progress on stderr,
+and `<dir>/relations.jsonl` for the export. The weight-2 base has 3,668 signed
+points and 14 orbit columns, so the default pair budget of 10,000,000 covers
+the complete 6,728,946-candidate pair table in one invocation.
+
+The complete table needs roughly 2 GiB free in the campaign directory. The
+engine checks free space before building and fails early with the required and
+available sizes; on a nearly full root volume, pass `--dir` on a volume with
+space, for example `--dir /Volumes/SSD990/llm/ecc2k130`.
+
+A failure leaves the campaign usable: the report carries `stage`, `message`
+and a `hint`, and the human summary prints them instead of a row of nulls.
+Use `--json` to retain the complete report beside the log.
+
+This is an observation command, not a promise of a full-size hit: the
+`coverage_ceiling` in the report puts the two-/three-summand uniform yield far
+below the free-oracle floor at degree 131. It shows the work as it happens and
+saves every verified relation it does find; a completed pair table followed by
+`insufficient_relations` is the expected full-size outcome.
+
+Progress lines are labelled by stage and flushed as they happen:
+
+```text
+[    3.192s] ic: [0/4] campaign: degree 131, 14 orbit columns, 3668 signed points, stage=collect, solver=pairs
+[   12.004s] ic: [1/4] pair table: building; 262144/6728946 candidates (3.9%), 262000 pairs, 29871 candidates/s
+[  602.511s] ic: [2/4] collection: starting; up to 32 attempts, pairs solver, 0.25 s per query
+[  602.640s] ic: [2/4] relation stream=precompute number=0 independent=true support=3/14 rank=1/14
+[  602.641s] ic: [2/4] precompute attempt 1: verified; 1 relations (1 independent), rank 1/14, 7.8 attempts/s
+[  602.642s] ic: [4/4] done: status=insufficient_relations, 1 relations saved, 1 attempts saved
+```
+
+Every verified relation is committed to `campaign.sqlite3` first and then
+appended to the export, so `tail -f` shows it immediately and the database
+remains the authority if the process is interrupted. The export is rewritten
+from the campaign at start-up (repairing a missing tail and including relations
+saved before the option existed) and then appended for the rest of the run:
+
+```sh
+tail -f runs/ecc2k130/relations.jsonl
+```
+
+Each line is one JSON object:
+
+```json
+{"a":"...","b":"0","coefficients":[...],"independent":true,"number":0,"operation":"fixed-relation","schema_version":1,"stream":"precompute","target":null,"verified":true,"witness":[0,12,14]}
+```
+
+`witness` indexes the ordered signed factor-base points; `coefficients` is the
+relation row over the orbit columns; `a` and `b` reproduce the probe target
+`[a]G` (precompute) or `[a]G + [b]Q` (target stream). Replaying the line needs
+the same parameter file and campaign directory.
+
+Useful variants:
+
+```sh
+# Resume: same directory continues the pair cursor and attempt streams.
+target/release/ic ecc2k130 --dir runs/ecc2k130 --attempts 1000 --progress-every 10
+
+# SAT probe without a pair table.
+target/release/ic ecc2k130 --dir runs/ecc2k130-sat --stage collect \
+  --solver sat --pair-budget 0 --attempts 100
+
+# Also descend to the target (usually far beyond the free-oracle floor here).
+target/release/ic ecc2k130 --dir runs/ecc2k130 --stage all
+
+# Export only, no new work.
+target/release/ic ecc2k130 --dir runs/ecc2k130 --stage status --attempts 0
+```
+
+`--quiet` suppresses progress lines (the export still runs);
+`--no-relations-out` disables the export; `--relations-out PATH` redirects it.
+`ic fixed` exposes the same flags as `--progress`, `--progress-every`, and
+`--relations-out` for other fixed profiles.
+
 ## What is stored
 
 `campaign.sqlite3` is the durable record, with full SQLite transactions and
