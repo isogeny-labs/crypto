@@ -1,38 +1,45 @@
-# Resume: crypto @ claude/curve25519-index-calculus-i674j4
+# Resume: crypto @ claude/novel-ecdlp-algorithm-iams4j
 
 ## Goal
-Subagent task (2026-11-07): implement and measure an F = 1 wwalk variant with the target inside the
-walk (`wwalk:...,tw=1`, plus a separate chained-jump option `cj=1`), single-target ecbench sessions,
-k = 20 and k = 24 Curve25519-family miniatures, vs the current F = 1 arm (x = 0.7) and rho-neg.
+User request (2026-11-07): run every next step of research/split_prime_ecdlp_20261107 (#3654, #3655
+merged): proposals P1 (Riemann-Roch system with a Dickson-torus tower), P2 (twist-pure coset
+selection), P3 (cross-trace covariate test of the split-prime statistic) under frozen protocols on toy
+prime fields, plus a Lean statement of the obstruction.
 
 ## Lead / hypothesis
-Every collision of E_t = u P1 + z G + b Q is a row du*s1 + db*log Q = -dz; stopping at rank 2 puts the
-search phase at the two-collision floor 1.329 sqrt(r), below the current table-then-probe split
-(~1.6 sqrt(r)). Predictions P1-P7 are frozen in the protocol.
+P1: round7_rr's D_RR = 4 < D_T = 6 (m3 t4, Kummer) transfers to the Dickson torus tower (proposer 0.55
+stage-level). P2: F4 cost is coset-independent and coverage scales as c_E^m, so selecting the most
+E-pure coset pays at toy scale (0.85 toy, 0.05 cold end-to-end). P3: no Frobenius-field covariate
+moves rho cost or exact m = 2 coverage by >= 1 % (null expected, 0.98).
 
 ## Spec
-research/curve25519_f1_targetwalk_20261108/PROTOCOL.md (frozen; hashes in data/frozen.sha256), specs in
-specs/k{20,24}-s{0..7}.json, model scripts/model.py -> data/model.json.
+research/split_prime_ecdlp_20261107/followups/{README.md, p1_rr_dickson/PROTOCOL.md,
+p2_twist_coset/PROTOCOL.md, p3_cross_trace/PROTOCOL.md}, frozen in commit 535d9da826 (PR #3657).
+Instrument commands pinned in each protocol's Addendum A before any claim cell.
 
 ## State
-Code: TargetWalk in src/cryptanalysis/ic_boundary.rs; tw/cj options on WWalkOracle
-(src/cryptanalysis/ic_framework/plugins.rs); plan checks and help text in
-src/cryptanalysis/ecbench/methods.rs. Tests pass (data/cargo-test-wwalk.txt, 9 passed). Release binary
-in /home/user/ctarget-f1/release/ecbench. Benchrec records opened:
-benchmarks/records/20261107T2153Z-curve25519-f1-targetwalk-k{20,24}.json. Nothing committed (the
-main session lands the work; this subagent must not commit, push or open PRs).
+Protocols committed and pushed (PR #3657, auto-merge on). Builders writing standalone Rust crates under
+followups/p1_rr_dickson/p1tool, followups/p2_twist_coset/p2coset, followups/p3_cross_trace/p3census
+(uncommitted until they report). msolve 0.6.5 from apt at /usr/bin/msolve. aws CLI from
+/tmp/report-venv (pip) linked at /usr/local/bin/aws; caller is account 104186811093.
+Lean: aburan28/crypto-lean PR #3 (CryptoLean.SplitPrime.Obstruction), local module build passed,
+standard axioms only. Toolchain: ~/.elan with lean-4.35.0 linked from the release archive (elan cannot
+resolve "latest" through the proxy).
 
 ## Next steps
-Done 2026-11-07 22:10Z: both sizes ran (16 sessions, all audits OK), analysis, figures, README.md,
-REPORT.pdf, benchrec records closed (raw upload pending: no AWS credentials here). Remaining for the
-main session: land the work (commit/PR), raw upload, validation gate if a row is ever wanted.
+1. Read builders' reports; pin Addendum A per protocol; commit; new PR (or same branch if #3657 open).
+2. scripts/checkpoint.sh push; tools/benchrec.py init per run.
+3. experiment-director compile mode -> card per experiment; relay verbatim to executor-mechanical;
+   director assess mode.
+4. Analyse per the frozen decision rules; report + figures + Typst PDF per experiment; pcc claims;
+   session log; PR; track to merge.
 
 ## Runs in flight
-None.
+None. No claim cell has run.
 
 ## Stop and success conditions
-About 1-2 minutes of sessions per size; cap 30 minutes in total. Any session that fails its audit is
-excluded and reported, not rerun.
+Per protocol decision rules. Budget: P1 1,200 s per msolve job, one at a time; P2 same limits;
+P3 about 4 CPU-hours total. Stop a protocol on its control-failure rule.
 
 ## Open questions
-None blocking.
+Whether the director accepts the local L0 route (stated deviation from AGENTS.md section 9a).

@@ -45,3 +45,7 @@ import WeaknessLean
 #print axioms BooleanNullstellensatz.mem_fieldIdeal_of_eval_zero
 #print axioms BooleanNullstellensatz.indicator_mem
 #print axioms BooleanNullstellensatz.linear_mem_of_unique_zero
+#print axioms SolvingDegreeBound.run_subset
+#print axioms SolvingDegreeBound.no_gb_of_run_of_low_lt
+#print axioms SolvingDegreeBound.dclosed_of_basis
+#print axioms SolvingDegreeBound.monomial_mul_mem
