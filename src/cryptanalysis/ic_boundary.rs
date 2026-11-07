@@ -798,6 +798,74 @@ pub(crate) fn mulmod(a: u64, b: u64, m: u64) -> u64 {
     }
 }
 
+/// Per-modulus Barrett reducer for word-sized moduli: `mul(a, b)` is
+/// `mulmod(a, b, m)` exactly for every `a`, `b`, with one precomputed
+/// reciprocal instead of a hardware division.
+///
+/// For `2 ≤ m < 2^32` and reduced operands the product `x = a·b < 2^64`
+/// and `mu = ⌊(2^64 − 1)/m⌋` give `q = ⌊x·mu/2^64⌋` with
+/// `⌊x/m⌋ − 2 ≤ q ≤ ⌊x/m⌋`, so two conditional subtractions finish the
+/// reduction.  Every other case (larger or smaller modulus, unreduced
+/// operand) takes [`mulmod`] unchanged; a 128-bit Barrett measured no
+/// faster than `mulmod` there.
+#[derive(Clone, Copy)]
+pub(crate) struct Barrett {
+    m: u64,
+    mu: u64,
+}
+
+impl Barrett {
+    const NONE: Barrett = Barrett { m: 0, mu: 0 };
+
+    pub(crate) fn new(m: u64) -> Self {
+        if !(2..=u64::from(u32::MAX)).contains(&m) {
+            return Barrett { m, mu: 0 };
+        }
+        Barrett {
+            m,
+            mu: u64::MAX / m,
+        }
+    }
+
+    /// The reducer of `m`, cached per thread: a group operation asks for
+    /// it once and reuses it for its ~8 multiplications.
+    #[inline]
+    pub(crate) fn for_modulus(m: u64) -> Self {
+        thread_local! {
+            static CACHE: std::cell::Cell<Barrett> = const { std::cell::Cell::new(Barrett::NONE) };
+        }
+        CACHE.with(|c| {
+            let b = c.get();
+            if b.m == m && m != 0 {
+                b
+            } else {
+                let n = Barrett::new(m);
+                c.set(n);
+                n
+            }
+        })
+    }
+
+    #[inline]
+    pub(crate) fn mul(&self, a: u64, b: u64) -> u64 {
+        let m = self.m;
+        if self.mu != 0 && a < m && b < m {
+            let x = a * b;
+            let q = ((x as u128 * self.mu as u128) >> 64) as u64;
+            let mut r = x - q * m;
+            if r >= m {
+                r -= m;
+            }
+            if r >= m {
+                r -= m;
+            }
+            r
+        } else {
+            mulmod(a, b, m)
+        }
+    }
+}
+
 /// `a + b mod m`, the value of `(a + b) % m` on 128-bit integers exactly.
 /// Reduced operands need one compare-and-subtract instead of the
 /// 128-bit remainder's library call; the carry handles a modulus above
@@ -3605,7 +3673,11 @@ impl PrimeCurve {
             }
             return self.double_raw(tally, a);
         }
-        let mut f = CountedFp { p: self.p, tally };
+        let mut f = CountedFp {
+            p: self.p,
+            bar: Barrett::for_modulus(self.p),
+            tally,
+        };
         let dx = f.sub(b.x, a.x);
         let inv = f.inv(dx);
         let dy = f.sub(b.y, a.y);
@@ -3625,7 +3697,11 @@ impl PrimeCurve {
         if a.infinity || a.y == 0 {
             return PrimePoint::INFINITY;
         }
-        let mut f = CountedFp { p: self.p, tally };
+        let mut f = CountedFp {
+            p: self.p,
+            bar: Barrett::for_modulus(self.p),
+            tally,
+        };
         let x2 = f.sqr(a.x);
         let three_x2 = f.mul(3, x2);
         let num = f.add(three_x2, self.a);
@@ -3717,6 +3793,7 @@ fn jacobi(mut a: u64, mut n: u64) -> i32 {
 /// of [`mulmod`], [`invmod`], [`addmod`] and [`submod`] exactly.
 struct CountedFp<'a> {
     p: u64,
+    bar: Barrett,
     tally: &'a mut FieldOps,
 }
 
@@ -3724,12 +3801,12 @@ impl CountedFp<'_> {
     #[inline]
     fn mul(&mut self, a: u64, b: u64) -> u64 {
         self.tally.muls += 1;
-        mulmod(a, b, self.p)
+        self.bar.mul(a, b)
     }
     #[inline]
     fn sqr(&mut self, a: u64) -> u64 {
         self.tally.sqrs += 1;
-        mulmod(a, a, self.p)
+        self.bar.mul(a, a)
     }
     #[inline]
     fn inv(&mut self, a: u64) -> u64 {
@@ -9800,6 +9877,66 @@ mod tests {
                 super::invmod(a, m),
                 reference::invmod(a, m),
                 "invmod({a}, {m})"
+            );
+            assert_eq!(
+                super::Barrett::new(m).mul(a, b),
+                reference::mulmod(a, b, m),
+                "Barrett::mul({a}, {b}, {m})"
+            );
+            assert_eq!(
+                super::Barrett::for_modulus(m).mul(a, b),
+                reference::mulmod(a, b, m),
+                "Barrett::for_modulus({m}).mul({a}, {b})"
+            );
+        }
+    }
+
+    #[test]
+    fn barrett_agrees_exhaustively_on_small_moduli() {
+        for m in 1u64..400 {
+            let bar = super::Barrett::new(m);
+            for a in 0..(m + 3) {
+                assert_eq!(
+                    super::invmod(a, m),
+                    reference::invmod(a, m),
+                    "invmod({a}, {m})"
+                );
+                for b in [0, 1, a, m.saturating_sub(1), m, m + 5] {
+                    assert_eq!(
+                        bar.mul(a, b),
+                        reference::mulmod(a, b, m),
+                        "mul({a}, {b}, {m})"
+                    );
+                }
+            }
+        }
+    }
+
+    /// Indicative micro-benchmark; run with `--ignored --nocapture`.
+    #[test]
+    #[ignore]
+    fn arithmetic_micro_benchmark() {
+        use std::time::Instant;
+        for m in [53117u64, (1 << 32) - 5, (1 << 61) - 1, u64::MAX - 58] {
+            let bar = super::Barrett::new(m);
+            let n = 5_000_000u64;
+            let t = Instant::now();
+            let mut x = 12345 % m;
+            for i in 0..n {
+                x = super::mulmod(x, (x + i) % m | 1, m);
+            }
+            let old_mul = t.elapsed();
+            let t = Instant::now();
+            let mut y = 12345 % m;
+            for i in 0..n {
+                y = bar.mul(y, (y + i) % m | 1);
+            }
+            let new_mul = t.elapsed();
+            assert_eq!(x, y);
+            println!(
+                "m={m}: mul {:.1}->{:.1} ns",
+                old_mul.as_nanos() as f64 / n as f64,
+                new_mul.as_nanos() as f64 / n as f64
             );
         }
     }

@@ -284,3 +284,9 @@ path = "research/conductor_gap_followups_20261016/native/posthoc.rs"
 [[bin]]
 name = "factor-base-sweep"
 path = "src/bin/factor_base_sweep.rs"
+
+# Opt-in lab build (`--profile release-lab`): slower to compile, fat LTO and one codegen unit; default release is unchanged.
+[profile.release-lab]
+inherits = "release"
+codegen-units = 1
+lto = "fat"

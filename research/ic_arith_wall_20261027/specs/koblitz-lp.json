@@ -1,0 +1,58 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "arith wall: Koblitz k23 large_primes=1 (ic_framework/large_prime.rs maps)",
+  "description": "research/ic_arith_wall_20261027/README.md",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "koblitz",
+        "a": 0,
+        "n": 23
+      }
+    ],
+    "targets_per_curve": 4,
+    "target_seed": 20261105
+  },
+  "arms": [
+    {
+      "name": "rho",
+      "role": "reference",
+      "method": {
+        "id": "rho.signed_frobenius_strong"
+      }
+    },
+    {
+      "name": "lp1",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=6,raw_x_cap=100000000",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-frobenius:m=3,large_primes=1,lp_domain_factor=3",
+          "targets": "walk"
+        }
+      }
+    },
+    {
+      "name": "fiber",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "compact-orbit-scan:columns=6,raw_x_cap=100000000",
+          "linalg": "incremental-gauss",
+          "oracle": "mitm-frobenius-fiber:m=2,fiber=closed",
+          "targets": "walk"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 3,
+    "warmup": 0,
+    "order": "alternate_measured",
+    "seed": 20261106,
+    "timeout_seconds": 1800
+  }
+}
