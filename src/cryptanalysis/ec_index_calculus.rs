@@ -922,24 +922,26 @@ pub fn double_scalar_mul_vartime(
     acc
 }
 
-/// `R = aG + bQ` for the relation search.  `IC_SHAMIR=1` selects
-/// [`double_scalar_mul_vartime`], `IC_SHAMIR=2` the variable-time control;
-/// the default is the two separate ladders.
+/// `R = aG + bQ` for the relation search.  The default is
+/// [`Point::double_scalar_mul_vartime`] (public scalars: variable time, one
+/// interleaved word-Jacobian pass).  `IC_SHAMIR` selects an older path, kept
+/// for the controlled comparison in `RESULTS_shamir.md`: `0` the original
+/// two `scalar_mul` ladders and `add`, `1` the affine interleave, `2` two
+/// `scalar_mul_vartime` ladders and `add_vartime`.  All return the same point.
 fn relation_point(g: &Point, a: &BigUint, q: &Point, b: &BigUint, a_fe: &FieldElement) -> Point {
-    // 0 (default): two `scalar_mul` ladders and `add`; 1: one interleaved
-    // pass; 2: control, two `scalar_mul_vartime` ladders and `add_vartime`
-    // (separates the arithmetic path from the interleaving).
     static MODE: std::sync::OnceLock<u8> = std::sync::OnceLock::new();
     match *MODE.get_or_init(|| match std::env::var("IC_SHAMIR").as_deref() {
+        Ok("0") => 0,
         Ok("1") => 1,
         Ok("2") => 2,
-        _ => 0,
+        _ => 3,
     }) {
+        0 => g.scalar_mul(a, a_fe).add(&q.scalar_mul(b, a_fe), a_fe),
         1 => double_scalar_mul_vartime(g, a, q, b, a_fe),
         2 => g
             .scalar_mul_vartime(a, a_fe)
             .add_vartime(&q.scalar_mul_vartime(b, a_fe), a_fe),
-        _ => g.scalar_mul(a, a_fe).add(&q.scalar_mul(b, a_fe), a_fe),
+        _ => g.double_scalar_mul_vartime(a, q, b, a_fe),
     }
 }
 
@@ -2259,6 +2261,28 @@ mod tests {
             expect.sort();
             expect.dedup();
             assert_eq!(found_sorted, expect, "roots {roots:?}");
+        }
+    }
+
+    /// `Point::double_scalar_mul_vartime` equals two ladders plus an add,
+    /// including `Q = -G` and zero scalars.
+    #[test]
+    fn point_double_scalar_mul_vartime_matches_two_ladders() {
+        let curve = tiny_curve();
+        let a_fe = curve.a_fe();
+        let g = curve.generator();
+        let q = g.scalar_mul(&BigUint::from(190u32), &a_fe);
+        let neg_g = g.scalar_mul(&(&curve.n - BigUint::one()), &a_fe);
+        for other in [&q, &neg_g, &g] {
+            for a in 0u32..60 {
+                for b in 0u32..60 {
+                    let (a, b) = (BigUint::from(a * 5), BigUint::from(b * 13 + (a % 3)));
+                    let want = g
+                        .scalar_mul(&a, &a_fe)
+                        .add(&other.scalar_mul(&b, &a_fe), &a_fe);
+                    assert_eq!(g.double_scalar_mul_vartime(&a, other, &b, &a_fe), want);
+                }
+            }
         }
     }
 
