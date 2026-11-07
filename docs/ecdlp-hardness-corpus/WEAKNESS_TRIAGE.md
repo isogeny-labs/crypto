@@ -350,10 +350,13 @@ report) [pcc:unverified]; the Lean results have pcc claim records pending CI sig
 - **W1, Petit–Quisquater Assumption 2 (`pq2_rank`).** 119 instances, n = 8 to 47 [pcc:unverified].
   The iterated degree-3 closure reaches all k linear consequences for n ≤ 14 and n = 16,
   and only 1 of them at n = 15 and on all 84 instances from n = 17 to 44. Degree 4 reaches
-  k on 24 of 24 fresh instances at n = 17 to 24. The literal reading (degree 2) fails
+  k on 33 of 33 fresh instances at n = 17 to 27, and msolve's F4 reaches maximal step
+  degree exactly 4 on all 54 main-sweep instances at n = 17 to 34. The literal reading (degree 2) fails
   on the 111 instances with n ≤ 44, and the Kousidis–Wiemers value 3 is not reached from n = 17 to 44
-  (`MEAS-PQ2-DLIN-CENSUS` obstructs `HEUR-GB-PQ-ASSUMPTION-2`). This cuts against the
-  subexponential binary-curve heuristics.
+  (`MEAS-PQ2-DLIN-CENSUS` obstructs `HEUR-GB-PQ-ASSUMPTION-2`). The degree stays at 4
+  over n = 17 to 34, which is consistent with the bounded-degree premise of the
+  subexponential heuristics, one degree higher than predicted (`MEAS-PQ2-MSOLVE-F4`).
+  `THM-F4-CONTAINMENT` (Lean) makes the census values lower bounds for F4.
   The criterion behind it is `THM-SD-SUBSPACE-CRITERION` (Lean): a Gröbner basis
   inside the degree-d Macaulay row space supplies at most dim(rowspace ∩ P₁) linear
   leading monomials, so `d_lin ≤ sd`. The `|Z| = 1` case of the bridge `k = N` is

@@ -79,6 +79,25 @@ has fresh instances, because the random stream starts at n = 17. Iterated degree
 gives 1 and iterated degree 4 gives exactly k on all 12 instances, so d_iter = 4 there.
 `results/iter4_n21_24/` does the same at n = 21 to 24 with the same outcome on all 12
 instances. Across both sweeps, d_iter = 4 on 24 of 24 instances from n = 17 to 24.
+`results/iter4_n25/`, `iter4_n26/` and `iter4_n27/` extend this to n = 27 with the same
+outcome on all 9 instances. In total d_iter = 4 on 33 of 33 fresh instances from n = 17 to 27.
+
+**A real F4 run (`f4/`).** msolve 0.6.5 (Berthomieu, Eder and Safey El Din; F4 with
+grevlex) ran on the main sweep's own instances for n = 8 to 34, 81 in all. The binary
+dumped them with the same seed and arguments, and the dump log equals `results/run.log` on
+all 81 lines. `f4/run_msolve.py` records msolve's maximal step degree, and
+`f4/summarize.py` merges the runs into `f4/msolve_all.json`.
+
+| check | result |
+|---|---|
+| linear polynomials in msolve's reduced basis equal k | 81 of 81 |
+| msolve's degree equals d_iter where the census value is exact (n ≤ 16) | 27 of 27 |
+| census d_iter > 3 and msolve below 4 | 0 |
+| msolve maximal step degree, n = 17 to 34 | 4 on all 54 |
+
+One row first recorded 0 linear polynomials because its output was truncated while the
+disk was full. The rerun gives k, and the part file `f4/msolve_n26_i0.json` takes
+precedence. Three instances were rerun after a machine restart.
 
 **Independent cross-check.** `crosscheck/` recomputes the closure by naive full
 saturation in pure Python, sharing no code with the Rust closure. It agrees with Rust
@@ -99,12 +118,18 @@ holds on this range [pcc:unverified].
   forces this; on the other 24 the independent validator computed the degree-2 closure (iter2 = 1).
   At n = 45 to 47 no closure was computed, so those 8 instances are open.
 * The Kousidis–Wiemers reading predicts 3 + o(1). Every instance with 17 ≤ n ≤ 44 needs
-  an iterated degree above 3, and the 24 instances measured at n = 17 to 24 need exactly 4.
-  A finite range cannot refute an o(1) statement. It does show that the asymptotic value 3
-  is not reached anywhere from n = 17 to 44.
-* These numbers are lower bounds on F4's maximal step degree, valid only under the
-  containment property, which is not formalised. For the one-shot Caminata–Gorla solving
-  degree, the bound d_lin ≤ sd is kernel-checked in `SubspaceCriterion`.
-* Direction: the measured degree sits above the value the subexponential binary-curve
-  heuristics assume. This weakens the support for those heuristics. It does not support
-  a subexponential algorithm.
+  an iterated degree above 3. The 33 fresh instances at n = 17 to 27 need exactly 4, and
+  msolve's F4 reaches exactly 4 on all 54 main-sweep instances at n = 17 to 34.
+  A finite range cannot refute an o(1) statement. It does show that the value 3 is not
+  reached anywhere from n = 17 to 44.
+* Containment. `F4Containment.lean` proves (unsigned pcc claims, [pcc:unverified]) that an abstract F4 run with maximal step degree
+  D stays inside every D-closed subspace containing the generators (`run_subset`). So the
+  census values are lower bounds on F4's maximal step degree (`no_gb_of_run_of_low_lt`).
+  That msolve fits the abstract model is a reading of its algorithm, not a theorem. For the
+  one-shot Caminata–Gorla solving degree, d_lin ≤ sd is kernel-checked in `SubspaceCriterion`.
+* Direction. The degree is one above the predicted value, but on n = 17 to 34 it does not
+  grow. A degree that stays bounded keeps the Gröbner step polynomial in n, with a larger
+  exponent than the prediction. This is evidence for the bounded-degree premise of the
+  subexponential binary-curve heuristics, not against it. It covers m = 2 only, where the
+  heuristics need m to grow with n, so it does not by itself support a subexponential
+  algorithm.
