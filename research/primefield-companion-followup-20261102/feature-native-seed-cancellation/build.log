@@ -1,0 +1,92 @@
+warning: function `apply` is never used
+  --> research/primefield-companion-followup-20261102/feature-native-seed-cancellation/source.rs:19:4
+   |
+19 | fn apply(p:u64,geometry:Pair,inputs:[Pair;4],powers:[u64;4])->Result<Pair,Error>{
+   |    ^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: method `window` is never used
+ --> research/primefield-companion-followup-20261102/feature-native-seed-cancellation/source-extra.rs:8:9
+  |
+7 | impl<'a> Prepared<'a>{
+  | --------------------- method in this implementation
+8 |  pub fn window(&self,q:Point,length:usize)->Result<Window,Error>{self.begin(q,length,0).map(|(w,_)|w)}
+  |         ^^^^^^
+
+warning: function `calls` is never used
+  --> research/primefield-companion-followup-20261102/feature-native-seed-cancellation/source-extra.rs:30:20
+   |
+30 | #[cfg(test)]pub fn calls()->(usize,usize,usize){let(a,b)=transport::calls();(SIGN_CALLS.with(|n|n.get()),a,b)}
+   |                    ^^^^^
+
+warning: function `calls` is never used
+  --> research/primefield-companion-followup-20261102/feature-native-seed-cancellation/transport.rs:58:20
+   |
+58 | #[cfg(test)]pub fn calls()->(usize,usize){(PHASE_CALLS.with(|n|n.get()),VALUE_CALLS.with(|n|n.get()))}
+   |                    ^^^^^
+
+warning: fields `projective` and `inverse_z` are never read
+  --> research/primefield-companion-followup-20261102/feature-native-seed-cancellation/../feature-native-adaptive-extension/geometry.rs:18:41
+   |
+18 | pub struct Grid{pub labels:Vec<u64>,pub projective:Vec<[u64;3]>,pub affine:Vec<[u64;2]>,pub inverse_z:Vec<u64>}
+   |            ---- fields in this struct   ^^^^^^^^^^                                          ^^^^^^^^^
+   |
+   = note: `Grid` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: function `reference_ratio` is never used
+  --> research/primefield-companion-followup-20261102/feature-native-seed-cancellation/../feature-native-multiseed-factor/residual.rs:22:28
+   |
+22 | #[cfg(test)] pub(crate) fn reference_ratio(p:u64,part:[u64;4],q:[u64;2],grid:&[[u64;2]],inputs:[u64;4])->Result<Pair,Error>{
+   |                            ^^^^^^^^^^^^^^^
+
+warning: function `apply` is never used
+  --> research/primefield-companion-followup-20261102/feature-native-seed-cancellation/../feature-native-monomial-recovery/source.rs:19:4
+   |
+19 | fn apply(p:u64,geometry:Pair,inputs:[Pair;4],powers:[u64;4])->Result<Pair,Error>{
+   |    ^^^^^
+
+warning: fields `direct_initializations` and `converted_points` are never read
+  --> research/primefield-companion-followup-20261102/feature-native-seed-cancellation/../feature-native-monomial-recovery/source.rs:25:100
+   |
+25 | ...uct Window{pub points:Vec<Point>,pub signs:Vec<i8>,pub ratios:Vec<Pair>,pub direct_initializations:usize,pub converted_points:usize}
+   |        ------ fields in this struct                                            ^^^^^^^^^^^^^^^^^^^^^^           ^^^^^^^^^^^^^^^^
+   |
+   = note: `Window` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `pairs`, `converted_points`, `lane_updates`, and `conversion_batches` are never read
+ --> research/primefield-companion-followup-20261102/feature-native-seed-cancellation/../feature-native-monomial-recovery/source-extra.rs:3:125
+  |
+3 | ...ct Extension{pub sign:Option<i8>,pub ratio:Option<Pair>,pub point:Point,pub method:&'static str,pub pairs:Vec<Pair>,pub converted_points:usize,pub lane_updates:usize,pub conversion_batches:us...
+  |       --------- fields in this struct                                                                  ^^^^^               ^^^^^^^^^^^^^^^^           ^^^^^^^^^^^^           ^^^^^^^^^^^^^^^^^^
+  |
+  = note: `Extension` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: function `calls` is never used
+  --> research/primefield-companion-followup-20261102/feature-native-seed-cancellation/../feature-native-monomial-recovery/source-extra.rs:30:20
+   |
+30 | #[cfg(test)]pub fn calls()->(usize,usize,usize){let(a,b)=transport::calls();(SIGN_CALLS.with(|n|n.get()),a,b)}
+   |                    ^^^^^
+
+warning: function `calls` is never used
+  --> research/primefield-companion-followup-20261102/feature-native-seed-cancellation/../feature-native-monomial-recovery/transport.rs:51:20
+   |
+51 | #[cfg(test)]pub fn calls()->(usize,usize){(PHASE_CALLS.with(|n|n.get()),VALUE_CALLS.with(|n|n.get()))}
+   |                    ^^^^^
+
+warning: fields `projective` and `inverse_z` are never read
+  --> research/primefield-companion-followup-20261102/feature-native-seed-cancellation/../feature-native-monomial-recovery/../feature-native-adaptive-extension/geometry.rs:18:41
+   |
+18 | pub struct Grid{pub labels:Vec<u64>,pub projective:Vec<[u64;3]>,pub affine:Vec<[u64;2]>,pub inverse_z:Vec<u64>}
+   |            ---- fields in this struct   ^^^^^^^^^^                                          ^^^^^^^^^
+   |
+   = note: `Grid` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: function `reference_ratio` is never used
+  --> research/primefield-companion-followup-20261102/feature-native-seed-cancellation/../feature-native-monomial-recovery/../feature-native-multiseed-factor/residual.rs:22:28
+   |
+22 | #[cfg(test)] pub(crate) fn reference_ratio(p:u64,part:[u64;4],q:[u64;2],grid:&[[u64;2]],inputs:[u64;4])->Result<Pair,Error>{
+   |                            ^^^^^^^^^^^^^^^
+
+warning: 13 warnings emitted
+

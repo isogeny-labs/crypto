@@ -147,6 +147,34 @@ class RoundTripTests(unittest.TestCase):
         bad = pcc.verify_claim(legacy, self.repo, pcc.load_keyring(self.repo / pcc.KEYRING_PATH))
         self.assertEqual(bad["verdict"], "fail", bad)
 
+    def test_execution_creation_rejects_incomplete_inputs_before_writes(self):
+        artifact = self.repo / "artifact.txt"
+        artifact.write_text('{"synthetic": true}\n')
+        pin = {"path": "artifact.txt", "sha256": pcc.sha256_file(artifact)}
+        complete = {"receipt": pin, "verifier": pin, "journal_binds": pin,
+                    "image_id": "synthetic-untrusted-image"}
+        bad = ["execution:artifact.txt", "execution:{}"]
+        for field in complete:
+            missing = dict(complete)
+            del missing[field]
+            bad.append("execution:" + json.dumps(missing))
+        bad.append("execution:" + json.dumps(dict(complete, receipt={"path": "artifact.txt", "sha256": "bad"})))
+        before = (self.repo / pcc.LEDGER_PATH).read_bytes()
+        for spec in bad:
+            with self.subTest(spec=spec):
+                result = run(["claim", "new", "--kind", "execution", "--statement", "fixture",
+                              "--proof", "attestation:artifact.txt", "--proof", spec], self.repo)
+                self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+                self.assertIn("execution requires", result.stderr)
+                self.assertEqual((self.repo / pcc.LEDGER_PATH).read_bytes(), before)
+                self.assertFalse((self.repo / pcc.CLAIMS_DIR).exists())
+        made = run(["claim", "new", "--kind", "execution", "--statement", "fixture",
+                    "--proof", "execution:" + json.dumps(complete)], self.repo)
+        self.assertEqual(made.returncode, 0, made.stderr)
+        checked = run(["verify", Path(made.stdout.strip()).stem, "--json"], self.repo)
+        self.assertEqual(checked.returncode, 2, checked.stdout + checked.stderr)
+        self.assertEqual(json.loads(checked.stdout)["verdict"], "not_covered")
+
     def test_ledger_prefix_against_base(self):
         cid = self.make_solve()
         self.commit("claim")

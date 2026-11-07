@@ -1722,12 +1722,26 @@ def main(argv: list[str] | None = None) -> int:
             if rest.startswith("{"):
                 proofs.append({"kind": kind, **json.loads(rest)})
             else:
+                if kind == "execution":
+                    raise PccError("execution requires structured JSON with receipt, verifier, "
+                                   "image_id and journal_binds; native logs are not execution proofs. "
+                                   "Use attestation:PATH for unsigned producer artifacts")
                 p = (repo / rest).resolve()
                 if not p.is_file():
                     raise PccError(f"no such proof file {rest}")
                 pin = {"path": rest, "sha256": sha256_file(p)}
                 proofs.append({"kind": kind, "subject": pin} if kind == "attestation"
                               else {"kind": kind, **pin})
+            if kind == "execution":
+                proof = proofs[-1]
+                for field in ("receipt", "verifier", "journal_binds"):
+                    pin = proof.get(field)
+                    if (not isinstance(pin, dict) or not isinstance(pin.get("path"), str)
+                            or not pin["path"] or not isinstance(pin.get("sha256"), str)
+                            or not re.fullmatch(r"[0-9a-f]{64}", pin["sha256"])):
+                        raise PccError(f"execution requires {field} {{path, sha256}}")
+                if not isinstance(proof.get("image_id"), str) or not proof["image_id"]:
+                    raise PccError("execution requires a nonempty image_id")
         claim = {"schema": CLAIM_SCHEMA, "id": new_claim_id(), "kind": a.kind, "statement": a.statement,
                  "scope": a.scope, "proofs": proofs,
                  "producer": {"commit": head_commit(repo), "session": a.session, "model": a.model},
