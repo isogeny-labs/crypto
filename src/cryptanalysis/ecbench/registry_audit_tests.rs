@@ -257,6 +257,8 @@ const CASES: &[(&str, Fx, P)] = &[
     ("rho.negation_v2", Fx::Prime18, &[]),
     ("rho.negation_v3", Fx::Prime18, &[]),
     ("rho.plain_v3", Fx::Prime18, &[]),
+    ("rho.negation_v4", Fx::Prime18, &[]),
+    ("rho.plain_v4", Fx::Prime18, &[]),
     ("bsgs.textbook", Fx::Prime18, &[]),
     ("bsgs.interleaved", Fx::Prime18, &[]),
     ("bsgs.negation", Fx::Prime18, &[]),

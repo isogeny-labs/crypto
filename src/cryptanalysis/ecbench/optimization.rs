@@ -547,6 +547,18 @@ const POLICIES: &[PolicyDecl] = &[
         StandardBand
     ),
     policy!(
+        "rho.negation_v4",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "rho.plain_v4",
+        ImplementationAb,
+        FrontierEligible,
+        StandardBand
+    ),
+    policy!(
         "rho.plain_v3",
         ImplementationAb,
         FrontierEligible,

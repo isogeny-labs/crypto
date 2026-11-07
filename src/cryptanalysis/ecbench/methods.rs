@@ -1320,6 +1320,22 @@ pub fn registry() -> &'static [MethodDecl] {
             params: RHO_PARAMS,
         },
         MethodDecl {
+            id: "rho.negation_v4",
+            family: "rho",
+            summary: "rho.negation_v3 with distinguished-point bits round(½·log₂F − 0.8) from the floor F = √(πr/4) and the charged check [d]G read from the set-up's G ladder (RhoV3::v4)",
+            entry: "ic_boundary::rho_walk_v3(NegationClasses, RhoV3::v4(true))",
+            applies: Applies::Any,
+            params: RHO_PARAMS,
+        },
+        MethodDecl {
+            id: "rho.plain_v4",
+            family: "rho",
+            summary: "rho.plain_v3 with rho.negation_v4's distinguished-point rule and ladder-read check (A = 1)",
+            entry: "ic_boundary::rho_walk_v3(PointClasses, RhoV3::v4(false))",
+            applies: Applies::Any,
+            params: RHO_PARAMS,
+        },
+        MethodDecl {
             id: "rho.signed_frobenius_v3",
             family: "rho",
             summary: "rho.signed_frobenius_v2's search on signed-Frobenius classes (A = 2n, Koblitz curves only) with the v3 ladder-built table (k ≈ √(√(πr/4n)/2) jumps of three rungs), distinguished-point bits round(½·log₂F − 0.8) from the floor F = √(πr/4n) instead of ⌊bits(r)/4⌋, and the charged check [d]G read from the set-up's G ladder; every operation charged",
@@ -1532,8 +1548,9 @@ const KOBLITZ_BATCHED_PARAMS: &[ParamDecl] = &[
 pub fn expected_s(id: &str, a_available: u32) -> Option<f64> {
     use std::f64::consts::PI;
     match id {
-        "rho.frozen_reference" | "rho.plain" | "rho.plain_v3" => Some((PI / 2.0).sqrt()),
-        "rho.negation" | "rho.negation_v2" | "rho.negation_v3" | "rho.negation_strong" => {
+        "rho.frozen_reference" | "rho.plain" | "rho.plain_v3" | "rho.plain_v4" => Some((PI / 2.0).sqrt()),
+        "rho.negation" | "rho.negation_v2" | "rho.negation_v3" | "rho.negation_v4"
+        | "rho.negation_strong" => {
             Some((PI / 4.0).sqrt())
         }
         "rho.cubic" | "rho.cubic_v2" => Some((PI / 12.0).sqrt()),
@@ -2602,6 +2619,25 @@ fn solve_generic<G: CountedGroup>(
             generic(o, t.elapsed().as_nanos() as u64, 1)
         }
         // The `_v2` ids: the same searches, then the one charged check.
+        id @ ("rho.negation_v4" | "rho.plain_v4") => {
+            let res = if id == "rho.negation_v4" {
+                rho_walk_v3(
+                    g,
+                    &NegationClasses { r },
+                    gen,
+                    target,
+                    r,
+                    seed,
+                    cap()?,
+                    RhoV3::v4(true),
+                )
+            } else {
+                rho_walk_v3(g, &PointClasses, gen, target, r, seed, cap()?, RhoV3::v4(false))
+            };
+            let wall = t.elapsed().as_nanos() as u64;
+            let f = field_ops_of(g, &[res.group_ops]);
+            rho_report_v2(res, wall, f, GroupOps::default())
+        }
         id @ ("rho.negation_v3" | "rho.plain_v3") => {
             let res = if id == "rho.negation_v3" {
                 rho_walk_v3(
@@ -9372,6 +9408,8 @@ mod accounting_rules_tests {
             ("rho.negation_v2", &[], true),
             ("rho.negation_v3", &[], true),
             ("rho.plain_v3", &[], true),
+            ("rho.negation_v4", &[], true),
+            ("rho.plain_v4", &[], true),
             ("rho.signed_frobenius_v2", &[], false),
             ("rho.signed_frobenius_v3", &[], false),
             ("rho.signed_frobenius_strong_v2", &[], false),

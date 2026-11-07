@@ -3003,6 +3003,21 @@ pub struct RhoV3 {
 }
 
 impl RhoV3 {
+    /// `rho.negation_v4` / `rho.plain_v4`: the v3 table with the
+    /// distinguished-point rule from the floor and the ladder-read check.
+    pub const fn v4(negation: bool) -> Self {
+        Self {
+            negation,
+            jumps: 0,
+            weight: 3,
+            ladder_bits: 0,
+            dp_bits: None,
+            continue_walks: false,
+            dp_from_floor: true,
+            ladder_verify: true,
+        }
+    }
+
     /// The signed-Frobenius table: [`RhoV3::negation`] with the
     /// distinguished-point rule taken from the floor.
     pub const fn frobenius() -> Self {
