@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Pooled single-target analysis (PROTOCOL.md sections 3 and 5) -> data/pooled.json."""
+"""Pooled single-target analysis (PROTOCOL.md sections 3 and 5) -> data/pooled_measured.json."""
 import json, os, sys, statistics, glob
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from pooled_compare import pooled, load, unpriced
@@ -24,7 +24,7 @@ for k in (20, 24):
     ratios = {f'{b}/{a}': {str(w): pooled(a, b, w, dirs) for w in (0, 0.1, 1)} for a, b in PAIRS}
     # F=1 diagnostics: per-run walk steps / probes where reported
     out[f'k{k}'] = dict(sessions=len(dirs), records=len(recs), S=means, ratios=ratios)
-json.dump(out, open(os.path.join(HERE, 'data/pooled.json'), 'w'), indent=1)
+json.dump(out, open(os.path.join(HERE, 'data/pooled_measured.json'), 'w'), indent=1)
 for k, d in out.items():
     print(k, 'sessions', d['sessions'], 'records', d['records'])
     for a in ARMS:

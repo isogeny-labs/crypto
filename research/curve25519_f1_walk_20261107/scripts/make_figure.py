@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Figure: pooled S ratios to rho-neg per arm, k = 20 and 24, w = 0, 0.1, 1 (data/pooled.json)."""
+"""Figure: pooled S ratios to rho-neg per arm, k = 20 and 24, w = 0, 0.1, 1 (data/pooled_measured.json)."""
 import json, os
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 HERE = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
-d = json.load(open(os.path.join(HERE, 'data/pooled.json')))
+d = json.load(open(os.path.join(HERE, 'data/pooled_measured.json')))
 arms = [('f2-inc', 'F=2 incumbent x=0.9'), ('f1-x05', 'F=1 x=0.5'), ('f1-x07', 'F=1 x=0.7 (primary)'), ('f1-x09', 'F=1 x=0.9')]
 cols = ['#8c8c8c', '#9ecae1', '#2171b5', '#6baed6']
 fig, axes = plt.subplots(1, 2, figsize=(10, 4.2), sharey=True)

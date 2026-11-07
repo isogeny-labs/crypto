@@ -1,3 +1,5 @@
+#set page(paper: "a4", margin: 1.8cm, numbering: "1")
+#set text(size: 9.5pt)
 = One-point (F \= 1) walk-table oracle vs the F \= 2 incumbent,
 single-target ecbench (2026-11-07)
 <one-point-f-1-walk-table-oracle-vs-the-f-2-incumbent-single-target-ecbench-2026-11-07>
@@ -75,7 +77,8 @@ at rank 1, and the refusals.
   changed once, after validation, to drop `warmup: true` records
   (section 7). It takes the ratio of per-session sums with a linearised
   t interval and df \= 7 (one session \= one target \= one cluster).
-  `scripts/analyse.py` writes `data/pooled.json`.
+  `scripts/analyse.py` writes `data/pooled_measured.json` (measured
+  rounds only).
 - Runtime: about 52 s of sessions at k \= 20 and about 60 s at k \= 24.
   Both sizes ran in full, well inside the 90-minute cap.
 
@@ -88,7 +91,8 @@ measured records per session (6 arms x 64 rounds); the 6 warm-up records
 per session are excluded \[pcc:unverified\].
 
 Mean S per arm (3,072 measured records per size; source
-`data/pooled.json`, which pools `sessions/k*-s*/records.jsonl`):
+`data/pooled_measured.json`, which pools
+`sessions/k*-s*/records.jsonl`):
 
 #align(center)[#table(
   columns: 5,
@@ -153,7 +157,7 @@ rebaseline-seedrun figure of 2.105 for the same arm on the same curve
 \[pcc:unverified\].
 
 Pooled ratios with 95 % intervals over 8 single-target sessions
-(`data/pooled.json`):
+(`data/pooled_measured.json`):
 
 #align(center)[#table(
   columns: 5,
@@ -354,11 +358,11 @@ README applies its errata \[pcc:unverified\].
   1 warm-up per arm and session, but `scripts/pooled_compare.py`
   (`load`) pooled the warm-up round as well (3,120 records per size
   instead of 3,072). The loader now skips records with `"warmup": true`;
-  `scripts/analyse.py`, `data/pooled.json` and `figures/ratio_to_rho.*`
-  were regenerated and every number above was updated
-  \[pcc:unverified\]. Pooled means and ratios move by at most 0.011
-  (ratios) and 0.007 (S); the largest change is the k \= 24 f1-x07 /
-  f2-inc ratio at w \= 0, 0.859 to 0.855 \[pcc:unverified\]. No
+  `scripts/analyse.py`, `data/pooled_measured.json` (new file) and
+  `figures/ratio_to_rho.*` were regenerated and every number above was
+  updated \[pcc:unverified\]. Pooled means and ratios move by at most
+  0.011 (ratios) and 0.007 (S); the largest change is the k \= 24 f1-x07
+  / f2-inc ratio at w \= 0, 0.859 to 0.855 \[pcc:unverified\]. No
   prediction verdict changed; P1, P1b, P2, P3, P5 and P6 held on the
   same criteria \[pcc:unverified\].
 - #strong[P4 is not informative.] rho-aa and rho-neg are identical run
@@ -378,15 +382,24 @@ README applies its errata \[pcc:unverified\].
 - #strong[Binary and source.] The measuring binary
   (`data/binary.sha256`) was built before the last edit of
   `src/cryptanalysis/ic_boundary.rs`, so byte identity between the
-  binary and the source is not proven. BINARY\_CHECK
+  binary and the source is not proven. Binary check (main session,
+  2026-11-07): the measuring binary (sha256 prefix 44442a4ba260bbfb) was
+  built before the last edit of `ic_boundary.rs`. A rebuild from the
+  committed source has a different hash (1d1a57c7aadc5779). Under the
+  rebuilt binary, `ecbench verify --replay-all` on a copy of session
+  k20-s0 reproduced 384 of 384 replays identically, with 0 problems, so
+  the late edit did not change any counted result in that session
+  \[pcc:unverified\].
 
 == Files
 <files>
 `PROTOCOL.md`, `specs/`,
 `scripts/{make_specs.py,run_sessions.sh,pooled_compare.py,analyse.py,make_figure.py}`,
 `sessions/k*-s*/{session,spec,plan,host}.json`, `data/` (plans, run
-logs, bands, verify reports, `pooled.json`, `binary.sha256`,
-`frozen.sha256`, `cargo-test-wwalk.txt`, record tarballs),
+logs, bands, verify reports, `pooled.json` (the first analysis, warm-up
+included, kept unchanged because the closed benchmark records pin its
+hash), `pooled_measured.json`, `binary.sha256`, `frozen.sha256`,
+`cargo-test-wwalk.txt`, record tarballs),
 `figures/ratio_to_rho.{svg,png}`, `REPORT.pdf`. Benchmark records:
 `benchmarks/records/20261107T1945Z-curve25519-f1-walk-k20.json` and
 `benchmarks/records/20261107T1947Z-curve25519-f1-walk-k24.json`.

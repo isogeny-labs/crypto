@@ -50,7 +50,7 @@ growth stopping at rank 1, and the refusals.
 - Audit: `ecbench verify --replay 1` for every session (`data/verify-k*-s*.txt`).
 - Pooling: `scripts/pooled_compare.py`, copied from the T12 study and changed once, after validation, to drop `warmup: true` records (section 7). It takes the ratio of
   per-session sums with a linearised t interval and df = 7 (one session = one target = one cluster).
-  `scripts/analyse.py` writes `data/pooled.json`.
+  `scripts/analyse.py` writes `data/pooled_measured.json` (measured rounds only).
 - Runtime: about 52 s of sessions at k = 20 and about 60 s at k = 24. Both sizes ran in full, well
   inside the 90-minute cap.
 
@@ -60,7 +60,7 @@ Every session completed. Each wrote 390 of 390 records, all verified, and its au
 1 of 1 replays with 0 problems (`data/verify-*.txt`) [pcc:unverified]. Pooled figures use the 384 measured
 records per session (6 arms x 64 rounds); the 6 warm-up records per session are excluded [pcc:unverified].
 
-Mean S per arm (3,072 measured records per size; source `data/pooled.json`, which pools `sessions/k*-s*/records.jsonl`):
+Mean S per arm (3,072 measured records per size; source `data/pooled_measured.json`, which pools `sessions/k*-s*/records.jsonl`):
 
 | k | arm | S w=0 | S w=0.1 | S w=1 |
 |--:|:--|--:|--:|--:|
@@ -78,7 +78,7 @@ Mean S per arm (3,072 measured records per size; source `data/pooled.json`, whic
 The F = 2 incumbent at k = 24 (2.138) agrees with the rebaseline-seedrun figure of 2.105 for the same
 arm on the same curve [pcc:unverified].
 
-Pooled ratios with 95 % intervals over 8 single-target sessions (`data/pooled.json`):
+Pooled ratios with 95 % intervals over 8 single-target sessions (`data/pooled_measured.json`):
 
 | k | ratio | w = 0 | w = 0.1 | w = 1 |
 |--:|:--|:--|:--|:--|
@@ -167,7 +167,7 @@ following, and this README applies its errata [pcc:unverified].
 - **Warm-up records.** The frozen design is 64 measured rounds plus 1 warm-up per arm and session, but
   `scripts/pooled_compare.py` (`load`) pooled the warm-up round as well (3,120 records per size
   instead of 3,072). The loader now skips records with `"warmup": true`; `scripts/analyse.py`,
-  `data/pooled.json` and `figures/ratio_to_rho.*` were regenerated and every number above was updated
+  `data/pooled_measured.json` (new file) and `figures/ratio_to_rho.*` were regenerated and every number above was updated
   [pcc:unverified]. Pooled means and ratios move by at most 0.011 (ratios) and 0.007 (S); the largest change is
   the k = 24 f1-x07 / f2-inc ratio at w = 0, 0.859 to 0.855 [pcc:unverified]. No prediction verdict
   changed; P1, P1b, P2, P3, P5 and P6 held on the same criteria [pcc:unverified].
@@ -188,7 +188,7 @@ following, and this README applies its errata [pcc:unverified].
 
 `PROTOCOL.md`, `specs/`, `scripts/{make_specs.py,run_sessions.sh,pooled_compare.py,analyse.py,make_figure.py}`,
 `sessions/k*-s*/{session,spec,plan,host}.json`, `data/` (plans, run logs, bands, verify reports,
-`pooled.json`, `binary.sha256`, `frozen.sha256`, `cargo-test-wwalk.txt`, record tarballs),
+`pooled.json` (the first analysis, warm-up included, kept unchanged because the closed benchmark records pin its hash), `pooled_measured.json`, `binary.sha256`, `frozen.sha256`, `cargo-test-wwalk.txt`, record tarballs),
 `figures/ratio_to_rho.{svg,png}`, `REPORT.pdf`. Benchmark records:
 `benchmarks/records/20261107T1945Z-curve25519-f1-walk-k20.json` and
 `benchmarks/records/20261107T1947Z-curve25519-f1-walk-k24.json`.
