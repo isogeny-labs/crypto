@@ -1,0 +1,27 @@
+--- a/src/ml_dataset/export.rs
++++ b/src/ml_dataset/export.rs
+@@ -1111,6 +1111,7 @@
+     let mut affine_identity_records=0u64;
+     let mut search_relation_records=0u64;
+     let mut owned_row_records=0u64;
++    let mut owned_descent_verified_records=0u64;
+     let mut feature_occurrences = 0u64;
+     let mut sealed = 0u64;
+     let mut unsealed = 0u64;
+@@ -1186,6 +1187,7 @@
+                 index.push(&target_id,&json!({"schema":"ml-dataset.export-index/v1","record_id":target_id,"target_id":target_id,
+                     "feature_id":null,"cell":relative,"source_manifest_sha256":manifest_sha,"source_run_sha256":source_run_sha,
+                     "source_artifacts":manifest.artifacts,"status":"restricted_owned_search_scope"}))?;
++                if record["original_descent_verified"]==true{owned_descent_verified_records+=1;}
+                 owned_row_records+=1;sealed+=1;
+                 // No generic witness, scalar or exact-degree label construction.
+                 continue;
+@@ -1645,7 +1647,7 @@
+     if owned_row_records>0 {
+         manifest["owned_search_rows"]=json!({"schema":"ml-dataset.owned-search-row-export/v1",
+             "restricted_records":owned_row_records,"restricted_file":"restricted/prefix-records.jsonl",
+-            "public_search_features":0,"causal_solver_training_admitted":false,"original_descent_verified":false,"degree_labels_available":false});
++            "public_search_features":0,"causal_solver_training_admitted":false,"original_descent_verified":owned_descent_verified_records==owned_row_records,"original_descent_verified_records":owned_descent_verified_records,"descent_scope":"authenticated-pattern-auxiliary-boolean-gate-equations","degree_labels_available":false});
+     }
+     if search_relation_records>0 {
+         manifest["sat_model_relations"]=json!({"schema":"ml-dataset.sat-model-relation-export/v1",
