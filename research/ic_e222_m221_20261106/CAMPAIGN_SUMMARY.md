@@ -24,6 +24,8 @@ Conclusion for this section, corrected after the post-merge validator replay (`r
 
 Part of every gain above is baseline waste found and removed (hoisting, the relation surplus) or other sessions' arithmetic work; the table is the structural part. Remaining lever on the merged tree: `build_pair_sum_table` and `SampleWalk` still use the slow path.
 
+**Latest measurement (merged baseline, fresh tune/eval with provenance; `RESULTS_merged_baseline.md`, not yet independently replayed):** with the table and walk moved to the repository's fast point path, 60 never-used instances x 2 seeds, 480/480 recovered, frozen settings interior to wide grids: table / best hoisted sweep = 0.066x [0.058, 0.072] solver and 0.546x end to end; walk / best hoisted sweep = 0.026x [0.022, 0.029] solver and 0.534x end to end; shipped default / walk about 500x in solver time and 12x end to end. A large share is the new arms catching up with the fast point path; counted-operation results against rho and BSGS are unchanged.
+
 ## B. What is not established (and what was withdrawn)
 
 - **No improvement over rho or other generic attacks.** Single target: the IC walk costs at least 25x to 53x the repository's matched negation-map rho in counted group operations at 20 to 24 bits, widening with size (`RESULTS_vs_rho.md`; validated as a correction, with the 22-bit S corrected to a measured 0.93 to 1.11). Many targets: against the strongest counted generic arm the multi-target IC costs 1.40x to 1.53x at price 0 and up to 2.19x at price 1, cheaper in 0 of 22 configurations in every cell (`results/bsgs_large_T/analysis.txt`, complete symmetric ledger; the earlier "unranked / wins at price 1" claim was a ledger artifact and is withdrawn).
