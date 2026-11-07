@@ -101,6 +101,7 @@ pub mod sentinels;
 pub mod signals;
 pub mod spec;
 pub mod stats;
+pub mod tensor_cofactor;
 pub mod three_leads;
 pub mod trend;
 pub mod wordram_price;

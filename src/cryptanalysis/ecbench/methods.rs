@@ -1169,6 +1169,14 @@ pub fn registry() -> &'static [MethodDecl] {
             ],
         },
         MethodDecl {
+            id: super::tensor_cofactor::ID,
+            family: "ic",
+            summary: super::tensor_cofactor::SUMMARY,
+            entry: "ecdl_tensor_ic::Solver (cofactor) with SparseContractor",
+            applies: Applies::PrimeOnly,
+            params: super::tensor_cofactor::PARAMS,
+        },
+        MethodDecl {
             id: "ic.known_log_mitm2_v1",
             family: "ic",
             summary: "target-blind seeded known-log signed base, folded two-sum table, injective Q+[a]H queries and immediate scalar recovery; cold construction charged, native work unpriced",
@@ -1924,7 +1932,7 @@ pub struct SolveReport {
     pub field_ops: Option<FieldOps>,
 }
 
-fn ops_phase(name: &str, ops: GroupOps) -> PhaseRecord {
+pub(super) fn ops_phase(name: &str, ops: GroupOps) -> PhaseRecord {
     PhaseRecord {
         name: name.into(),
         adds: ops.adds,
@@ -1945,7 +1953,7 @@ pub(super) fn unpriced_of(counters: &BTreeMap<String, u64>) -> Vec<String> {
         .collect()
 }
 
-fn param_u64(m: &ResolvedMethod, name: &str) -> Result<u64, String> {
+pub(super) fn param_u64(m: &ResolvedMethod, name: &str) -> Result<u64, String> {
     m.params[name]
         .parse()
         .map_err(|_| format!("parameter `{name}` is not an integer: `{}`", m.params[name]))
@@ -2669,6 +2677,11 @@ pub fn applicable(m: &ResolvedMethod, inst: &Instance, curve: &CurveFacts) -> Re
     }
     if id == "ic.tensor_contraction_v1" {
         tensor_contraction_applicable(m, inst)?;
+    }
+    if id == super::tensor_cofactor::ID {
+        if let Instance::Prime(i) = inst {
+            super::tensor_cofactor::applicable(m, i)?;
+        }
     }
     if id == "rho.preprocessing" {
         preprocessing_applicable(m)?;
@@ -3416,6 +3429,9 @@ fn solve_inner(
         }
         (Instance::Prime(i), _) if m.id == super::prime_orbit::ID => {
             super::prime_orbit::solve(m, i, curve, PrimePoint::affine(tx, ty), seed)
+        }
+        (Instance::Prime(i), _) if m.id == super::tensor_cofactor::ID => {
+            super::tensor_cofactor::solve(m, i, PrimePoint::affine(tx, ty), seed)
         }
         (Instance::Prime(i), _) if m.id == "ic.tensor_contraction_v1" => {
             solve_tensor_contraction(m, i, PrimePoint::affine(tx, ty), seed)
@@ -6072,7 +6088,7 @@ fn solve_known_log<G: CountedGroup>(
 
 /// The phases of `ic.tensor_contraction_v1`, in the order the solver enters
 /// them (`ecdl_tensor_ic::opcount`).
-const TENSOR_PHASES: [&str; 6] = [
+pub(super) const TENSOR_PHASES: [&str; 6] = [
     "setup",
     "factor_base",
     "relation_target",
