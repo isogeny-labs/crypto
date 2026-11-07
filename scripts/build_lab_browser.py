@@ -880,8 +880,23 @@ def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--check", action="store_true", help="exit 1 if docs/browser/data.json is stale")
     parser.add_argument("--out", default=OUT)
+    parser.add_argument("--registry-only", action="store_true",
+                        help="refresh the curve roster, preserving all frozen result indexes")
     args = parser.parse_args(argv)
-    fresh = build()
+    if args.registry_only:
+        with open(args.out, encoding="utf-8") as fh:
+            fresh = json.load(fh)
+        registry, leaderboard = load(REGISTRY), load(LEADERBOARD)
+        existing = {row["slug"]: row for row in fresh["curves"]}
+        fresh["curves"] = [existing.get(row["slug"], row)
+                           for row in curve_rows(registry, leaderboard)]
+        assessed = sum(row.get("hyperelliptic_cover") is not None for row in fresh["curves"])
+        fresh["counts"].update(curves=len(fresh["curves"]), cover_assessed=assessed,
+                               cover_unassessed=len(fresh["curves"]) - assessed)
+        for path in (REGISTRY, LEADERBOARD):
+            fresh["sources"][path] = sha256_file(path)
+    else:
+        fresh = build()
     text = render(fresh)
     if args.check:
         current = ""

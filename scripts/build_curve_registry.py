@@ -856,6 +856,19 @@ def harvest_native_quadratic_twists(reg: Registry) -> None:
             reg.represent(ident, rep["field"], rep["curve"], str(path.relative_to(REPO)))
 
 
+def harvest_native_research_curves(reg: Registry) -> None:
+    """Assemble supplied native fixture identities; perform no curve arithmetic."""
+    path = REPO / "docs/curves/sources/s56-native.json"
+    doc = json.loads(path.read_text())
+    if doc.get("schema") != "native-research-curve-registry/v1":
+        raise ValueError("unsupported native research curve registry")
+    for row in doc["curves"]:
+        ident = dict(row, model_sha256=hashlib.sha256(row["model_json"].encode()).hexdigest())
+        reg.add(ident, row["family"], row["params"], str(path.relative_to(REPO)), row["aliases"])
+        for rep in row["representations"]:
+            reg.represent(ident, rep["field"], rep["curve"], str(path.relative_to(REPO)))
+
+
 def build() -> tuple[dict, list[str], list[str]]:
     reg, problems, fatal = Registry(), [], []
     harvest_standards(reg)
@@ -868,6 +881,7 @@ def build() -> tuple[dict, list[str], list[str]]:
     harvest_native_standards(reg)
     harvest_native_factor_base_history(reg)
     harvest_native_quadratic_twists(reg)
+    harvest_native_research_curves(reg)
     harvest_programme_extensions(reg)
     harvest_three_leads_extensions(reg)
     carry_forward(reg)
@@ -926,8 +940,29 @@ Registry._rebuilt = staticmethod(_rebuilt)
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true", help="fail if the registry is stale")
+    ap.add_argument("--native-research-only", action="store_true",
+                    help="merge supplied native fixture metadata, preserving all existing rows")
     args = ap.parse_args()
-    doc, problems, missing = build()
+    if args.native_research_only:
+        doc = json.loads(OUT.read_text())
+        source = json.loads((REPO / "docs/curves/sources/s56-native.json").read_text())
+        if source.get("schema") != "native-research-curve-registry/v1":
+            raise ValueError("unsupported native research curve registry")
+        by_slug = {row["slug"]: row for row in doc["curves"]}
+        for row in source["curves"]:
+            existing = by_slug.get(row["slug"])
+            if existing is not None and existing != row:
+                raise ValueError("native fixture would overwrite existing registry metadata")
+            if existing is None:
+                doc["curves"].append(row)
+        fam_rank = {"koblitz": 0, "subfield": 1, "binary": 2, "prime": 3, "extension": 4}
+        doc["curves"].sort(key=lambda e: (
+            fam_rank[e["family"]], int(e["params"].get("n", e["params"].get("m", 0)) or 0),
+            int(e["params"].get("p", 0)),
+            e["params"].get("a", 0) if e["family"] == "koblitz" else 0, e["slug"]))
+        problems, missing = [], []
+    else:
+        doc, problems, missing = build()
     text = json.dumps(doc, indent=1, ensure_ascii=False) + "\n"
     for p in problems:
         print("note:", p, file=sys.stderr)

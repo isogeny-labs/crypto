@@ -3,9 +3,9 @@
  "generated_by": "scripts/build_lab_browser.py",
  "what_this_is": "A searchable index of the curves, methods, factor bases, candidate identities, tournament rounds and ecbench sessions this repository names, joined on the identities it already computes (ICV1 slugs, EC1 aliases, ECM1 method ids, FB1 factor-base ids, IC1 candidate ids). Every figure is quoted from a committed file named in `sources` or in the row; nothing is computed here beyond means over a session's own verified runs.",
  "counts": {
-  "curves": 22268,
+  "curves": 22269,
   "cover_assessed": 22268,
-  "cover_unassessed": 0,
+  "cover_unassessed": 1,
   "methods": 220,
   "factor_bases": 677,
   "candidates": 278,
@@ -15,11 +15,11 @@
   "store_objects": 38
  },
  "sources": {
-  "docs/curves/registry.json": "1edbd0d717644b047931aba9126431f98862ee96791f4fed3884c40f971c2bc8",
+  "docs/curves/registry.json": "9173b9c7c3980c1e3a7b987fc2186c8bf4cb744266945c7b8be488527a5246f8",
   "docs/curves/covers.json": "6be671fdee40cff3e85c70ec7ca80357a38839e365896ce34a3bd49647cbe804",
   "docs/curves/cover-links.yaml": "91d4e44805113ed063a4b3c072f9a7c5ad3a73dce0567f952cba2d91949f2ef8",
   "docs/curves/standards/coverage.json": "80cb0d6d5400904a34115be076d7463f5adf9ad0b40ffc2ce92f741a16985f56",
-  "docs/ic/leaderboard.json": "e3a7c7bc731dc355f2bafccd03ecafb18a48ec0969579ec7131c5e318cb44983",
+  "docs/ic/leaderboard.json": "a37f579f0d7e1044d1aebe1e9b7b52a8e6e8c92fe2474b84ce82a0fc1f53334b",
   "store/index.json": "f2e86d6a772fee0d9d9206d0d0e23be5bed91c1ff947df0c4a1eda00c81b6ffe",
   "store/config.json": "5038b35b298c7c3b88647719229586d3a3d4fb00c1d20bf09d0f95de272cc1c1",
   "research/ecbench_all_candidates_20261003/sessions/koblitz-followup-3/records.jsonl": "961d18b9c05face1afcf8e96db9cec8f45a0326319b2c65baecb27b633d72881",
@@ -1898255,6 +1898255,55 @@
    ],
    "standards_provenance": [],
    "store_objects": []
+  },
+  {
+   "slug": "icv1-fp56-tm132906245-e876a6ea",
+   "icv1": "ICV1:fp-71776123356250111:-132906245:71776123489156357:51515385884595611:unk:unk:r:e876a6ea11f2",
+   "family": "prime",
+   "standard_names": [],
+   "field": {
+    "characteristic": "p",
+    "p": "71776123356250111",
+    "bits": 56,
+    "degree": 1,
+    "modulus": null
+   },
+   "a": "71776123356250108",
+   "b": "11246936090499842",
+   "construction": null,
+   "trace": "-132906245",
+   "order": "71776123489156357",
+   "order_bits": 55.992,
+   "r": "71776123489156357",
+   "r_bits": 55.992,
+   "cofactor": 1,
+   "generator": [
+    "0x3",
+    "0x1daf3b905eafec"
+   ],
+   "target_group": "prime-order subgroup",
+   "j": "51515385884595611",
+   "endomorphism_discriminant": null,
+   "model_json": "{\"a\":\"71776123356250108\",\"b\":\"11246936090499842\",\"field\":\"fp-71776123356250111\",\"form\":\"y^2=x^3+a*x+b\",\"p\":\"71776123356250111\",\"v\":\"1\"}",
+   "ec1": [
+    "EC1P56Cfph89d1f28a8527"
+   ],
+   "curve_uid": [
+    "urn:ec-record:1:sha256:89d1f28a8527f4709853f99bf350944571bc333dfb4a726fc254f9034079b5d9"
+   ],
+   "ec1_unresolved": null,
+   "retired_names": [
+    "s56"
+   ],
+   "sources": [
+    "docs/curves/s56/ecbench-curve.json",
+    "docs/curves/sources/s56-native.json"
+   ],
+   "on_leaderboard": false,
+   "leaderboard": [],
+   "ecbench": [],
+   "factor_bases": [],
+   "tournament_cells": []
   },
   {
    "slug": "icv1-fp56-tm252854635-0150ced1",

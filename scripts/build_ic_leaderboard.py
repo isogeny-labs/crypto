@@ -5587,13 +5587,29 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--artifact", type=Path)
+    ap.add_argument("--registry-only", action="store_true",
+                    help="refresh curve metadata while preserving every frozen result")
     ap.add_argument("--allow-unvalidated", action="store_true",
                     help="local build only: mark rows without a VALIDATION.json 'unvalidated' "
                          "instead of refusing them (CI never passes this)")
     args = ap.parse_args()
     if args.check and args.allow_unvalidated:
         ap.error("--check never allows unvalidated rows")
-    doc = build(allow_unvalidated=args.allow_unvalidated)
+    if args.registry_only:
+        doc = json.loads(OUT_JSON.read_text())
+        names = Names()
+        records, count = curve_records()
+        measured = {row["slug"] for row in doc["board"]}
+        doc["roster"] = [
+            {**row, "curves_yaml_key": (records.get(row["slug"]) or {}).get("key"),
+             "factor_base_link_status": (records.get(row["slug"]) or {}).get(
+                 "factor_base_link_status", "no_curves_yaml_record")}
+            for row in roster(names, measured)]
+        doc["curve_records"]["yaml_records"] = count
+        for key in ("registry", "curves_yaml"):
+            doc["sources"][key] = {"path": SOURCES[key], "sha256": sha256(SOURCES[key])}
+    else:
+        doc = build(allow_unvalidated=args.allow_unvalidated)
     # Round only the JSON: rendering compares recipe rows by identity.
     outs = {OUT_JSON: json.dumps(stable(doc), indent=1, ensure_ascii=False) + "\n",
             OUT_MD: markdown(doc), OUT_HTML: page(doc, standalone=True)}

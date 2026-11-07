@@ -1960,6 +1960,26 @@ impl Workload {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn s56_exact_prime_workload_uses_supplied_curve() {
+        use crate::ecc::s56;
+        let spec = super::CurveSpec::PrimeExplicit {
+            p: s56::P,
+            a: s56::A,
+            b: s56::B,
+            group_order: s56::N,
+            r: s56::N,
+            gx: s56::GX,
+            gy: s56::GY,
+        };
+        let super::Instance::Prime(instance) = spec.build().expect("exact S56 workload") else {
+            panic!("S56 must use prime-field arithmetic");
+        };
+        assert_eq!(instance.group_order, s56::N);
+        assert_eq!(instance.r, s56::N);
+        assert_eq!(instance.curve.p, s56::P);
+    }
+
     use super::*;
 
     #[test]
