@@ -20,8 +20,8 @@ def endo(m, C):
 rows = [
     ("T0 key x -> 1/x on <G>+<T0> (MC)", [xi, xi, xi]),
     ("E[8] keys by 7 translations", [8 * d["e8"]["mean_over_sqrt_r"] / d["neg"]["mean_over_sqrt_r"]] * 3),
-    ("endomorphism fold, m = 3 (C_phi >= 140)", endo(3, 140)),
-    ("endomorphism fold, m = 9 (C_phi >= 270)", endo(9, 270)),
+    ("endomorphism fold, m = 3 (C_phi approx 140)", endo(3, 140)),
+    ("endomorphism fold, m = 9 (C_phi approx 270)", endo(9, 270)),
     ("twist, E', x-only, special prime, DP, batching", [1.0, 1.0, 1.0]),
 ]
 colors = ["#2a6fdb", "#d9822b", "#c23b5a", "#8a4fbf", "#4d8f3a"]
@@ -54,7 +54,7 @@ for k, (name, v) in enumerate(rows):
     for i, vv in enumerate(v):
         s.append(f'<circle cx="{x(i):.1f}" cy="{y(vv):.1f}" r="4" fill="{c}"/>')
     s.append(f'<rect x="{Wd-R+20}" y="{T+10+k*22}" width="12" height="12" fill="{c}"/>')
-    s.append(f'<text x="{Wd-R+38}" y="{T+20+k*22}">{name}</text>')
+    s.append(f'<text x="{Wd-R+38}" y="{T+20+k*22}">{name.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;")}</text>')
 s.append(f'<text x="{Wd-R+20}" y="{T+10+len(rows)*22+20}" font-size="11">Below 1 only at w = 0 (endomorphism</text>')
 s.append(f'<text x="{Wd-R+20}" y="{T+10+len(rows)*22+36}" font-size="11">rows): unpriced native work; §5a</text>')
 s.append(f'<text x="{Wd-R+20}" y="{T+10+len(rows)*22+52}" font-size="11">band order flips, so no rank.</text>')
