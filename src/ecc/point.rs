@@ -198,6 +198,58 @@ impl Point {
         self.scalar_mul(k, a)
     }
 
+    /// `k·self + l·other` in **variable time**, for public points and
+    /// scalars: exactly `self.scalar_mul_vartime(k, a)` plus
+    /// `other.scalar_mul_vartime(l, a)`.
+    ///
+    /// When `p` fits a word the sum is one interleaved (Shamir) pass in
+    /// Jacobian coordinates with `self + other` precomputed, about
+    /// `max(bits)` doublings and three quarters as many mixed additions,
+    /// and a single inversion for the whole sum; the two ladders and the
+    /// final addition cost three.  Otherwise it is the two ladders and an
+    /// addition.
+    pub fn double_scalar_mul_vartime(
+        &self,
+        k: &BigUint,
+        other: &Point,
+        l: &BigUint,
+        a: &FieldElement,
+    ) -> Point {
+        if let (Point::Affine { x: x1, y: y1 }, Point::Affine { x: x2, y: y2 }) = (self, other) {
+            let m = &x1.modulus;
+            if let Some(w) = Word::of(m) {
+                if let Some([x1, y1, x2, y2, a]) = w.get([x1, y1, x2, y2, a]) {
+                    let both = w.affine_add((x1, y1), (x2, y2), a);
+                    let mut acc: Option<WordJacobian> = None;
+                    for i in (0..k.bits().max(l.bits())).rev() {
+                        if let Some(j) = acc {
+                            acc = w.jacobian_double(j, a);
+                        }
+                        let add = match (k.bit(i), l.bit(i)) {
+                            (true, true) => both,
+                            (true, false) => Some((x1, y1)),
+                            (false, true) => Some((x2, y2)),
+                            (false, false) => None,
+                        };
+                        if let Some(p) = add {
+                            acc = match acc {
+                                None => Some(WordJacobian {
+                                    x: p.0,
+                                    y: p.1,
+                                    z: 1,
+                                }),
+                                Some(j) => w.jacobian_add_affine(j, p, a),
+                            };
+                        }
+                    }
+                    return w.point(acc.map(|j| w.jacobian_to_affine(j)), m);
+                }
+            }
+        }
+        self.scalar_mul_vartime(k, a)
+            .add_vartime(&other.scalar_mul_vartime(l, a), a)
+    }
+
     /// The least `k < bound` with `k·self = target`, trying
     /// `k = 0, 1, 2, …` in turn — a linear discrete-log search, as in a
     /// Pohlig–Hellman digit — or `None` if there is none below `bound`.

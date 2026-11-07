@@ -255,3 +255,25 @@ fn cofactor_shape_stays_bounded() {
         println!("c={c}: edges/b {per_bit:.1?}");
     }
 }
+
+// Optimisation guard: listing only the cached preimages of each F_i as
+// sources gives exactly the count of listing all of E, for every target.
+#[test]
+fn cached_preimages_leave_counts_unchanged() {
+    let mut rng = StdRng::seed_from_u64(10);
+    for c in [2u64, 4] {
+        let cc = random_cofactor_curve(&mut rng, 9, c).unwrap();
+        let fb = cofactor_factor_bases(&cc, 2, &mut rng, false);
+        assert_eq!(fb.preimages.len(), 2);
+        for (i, pre) in fb.preimages.iter().enumerate() {
+            assert_eq!(pre.len() as u64, c * fb.sets[i].len() as u64);
+        }
+        let mut full = fb.clone();
+        full.preimages.clear();
+        for r in targets(&cc, &mut rng, 4) {
+            let cached = sparse_count(&cofactor_relation_network(&cc, &fb, r).0);
+            let every = sparse_count(&cofactor_relation_network(&cc, &full, r).0);
+            assert_eq!(cached, every, "c={c} R={r:?}");
+        }
+    }
+}
