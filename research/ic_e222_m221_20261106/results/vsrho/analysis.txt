@@ -1,0 +1,12 @@
+verified 192 / 192
+pbits | n inst | rho median ms | IC walk median ms | paired IC/rho median [boot95] | IC faster in | fb
+20 | 12 | 19.2 | 26.0 | 1.28 [0.92,1.76] | 8/24 | 64
+22 | 12 | 76.5 | 77.7 | 1.00 [0.84,2.27] | 12/24 | 64
+24 | 12 | 206.7 | 192.7 | 0.99 [0.84,1.25] | 12/24 | 128
+25 | 12 | 370.1 | 341.7 | 0.91 [0.82,1.11] | 13/24 | 128
+20 mean rho 23.4 mean IC 26.0  mean ratio 1.11
+22 mean rho 77.5 mean IC 79.2  mean ratio 1.02
+24 mean rho 194.9 mean IC 192.4  mean ratio 0.99
+25 mean rho 370.1 mean IC 344.6  mean ratio 0.93
+rho slope log2(median ms) vs log2(n) 0.84
+IC walk slope log2(median ms) vs log2(n) 0.73
