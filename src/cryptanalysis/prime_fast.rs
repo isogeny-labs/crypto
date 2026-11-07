@@ -1617,6 +1617,175 @@ pub fn ic_solve(
     ))
 }
 
+/// Solve for the discrete logs of the factor-base points to base `G` from relations `sum s_j x_j = a + b`
+/// (every relation collected against `Q = G`, so `R = (a + b) G`).  Returns `Some(x_j)` only for columns
+/// whose value is determined (pivot column with no free column in its reduced row).
+pub fn solve_fb_logs(curve: &FastCurve, m: usize, rels: &[FastRelation]) -> Vec<Option<u64>> {
+    let fnum = curve.scalar_field();
+    let n = curve.n;
+    let mut rows: Vec<Vec<u64>> = Vec::with_capacity(rels.len());
+    let mut rhs: Vec<u64> = Vec::with_capacity(rels.len());
+    for rel in rels {
+        let mut row = vec![0u64; m];
+        for &(j, sg) in &rel.entries {
+            let v = if sg < 0 {
+                neg_mod(sg.unsigned_abs() as u64 % n, n)
+            } else {
+                sg as u64 % n
+            };
+            row[j as usize] = fnum.to_mont(v);
+        }
+        rows.push(row);
+        rhs.push(fnum.to_mont(add_mod(rel.a % n, rel.b % n, n)));
+    }
+    let nrows = rows.len();
+    let mut pivot_of_col = vec![usize::MAX; m];
+    let mut row = 0usize;
+    for col in 0..m {
+        if row >= nrows {
+            break;
+        }
+        let Some(piv) = (row..nrows).find(|&r| rows[r][col] != 0) else {
+            continue;
+        };
+        rows.swap(row, piv);
+        rhs.swap(row, piv);
+        let inv = fnum.inv(rows[row][col]);
+        for c in 0..m {
+            rows[row][c] = fnum.mul(rows[row][c], inv);
+        }
+        rhs[row] = fnum.mul(rhs[row], inv);
+        let (pv, pr) = (rows[row].clone(), rhs[row]);
+        for r in 0..nrows {
+            if r == row || rows[r][col] == 0 {
+                continue;
+            }
+            let factor = rows[r][col];
+            for c in col..m {
+                if pv[c] != 0 {
+                    rows[r][c] = fnum.sub(rows[r][c], fnum.mul(factor, pv[c]));
+                }
+            }
+            rhs[r] = fnum.sub(rhs[r], fnum.mul(factor, pr));
+        }
+        pivot_of_col[col] = row;
+        row += 1;
+    }
+    (0..m)
+        .map(|c| {
+            let r = pivot_of_col[c];
+            if r == usize::MAX {
+                return None;
+            }
+            let free = (0..m).any(|c2| c2 != c && rows[r][c2] != 0);
+            if free {
+                None
+            } else {
+                Some(fnum.from_mont(rhs[r]))
+            }
+        })
+        .collect()
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct MultiReport {
+    pub setup_ms: f64,
+    pub per_target_ms: Vec<f64>,
+    pub total_ms: f64,
+    pub factor_base_size: usize,
+    pub determined_logs: usize,
+    pub targets_walked: Vec<u64>,
+}
+
+/// Multi-target index calculus: one shared factor-base log solve (relations against `G`), then per target
+/// one relation `aG + bQ_t = sum s_j F_j` (3-term decompositions) gives `log Q_t = (sum s_j x_j - a)/b`.
+/// Every returned log is verified `k G == Q_t`; `None` entries failed (no relation within `max_walk`
+/// points, an undetermined factor-base log, or b = 0).
+pub fn ic_multi_solve(
+    curve: &FastCurve,
+    g: Pt,
+    qs: &[Pt],
+    fb_size: usize,
+    extra_relations: usize,
+    max_walk: u64,
+    seed: u64,
+) -> Option<(Vec<Option<u64>>, MultiReport)> {
+    let t0 = Instant::now();
+    let fb = FastFactorBase::build(curve, fb_size);
+    if fb.is_empty() {
+        return None;
+    }
+    let pairs = PairTable::build(curve, &fb);
+    let needed = fb.len() + extra_relations;
+    let (rels, _) = collect_relations(curve, g, g, &fb, Some(&pairs), needed, u64::MAX, seed);
+    if rels.len() < needed {
+        return None;
+    }
+    let logs = solve_fb_logs(curve, fb.len(), &rels);
+    let determined = logs.iter().filter(|l| l.is_some()).count();
+    let setup_ms = t0.elapsed().as_secs_f64() * 1e3;
+    let fnum = curve.scalar_field();
+    let n = curve.n;
+    let mut out = Vec::with_capacity(qs.len());
+    let mut per = Vec::with_capacity(qs.len());
+    let mut walked = Vec::with_capacity(qs.len());
+    for (t, &q) in qs.iter().enumerate() {
+        let tt = Instant::now();
+        let (rs, st) = collect_relations(
+            curve,
+            g,
+            q,
+            &fb,
+            Some(&pairs),
+            1,
+            max_walk,
+            seed ^ (0x9E37_79B9 + t as u64 * 7919),
+        );
+        walked.push(st.targets);
+        let mut res = None;
+        if let Some(rel) = rs.first() {
+            let mut acc: Option<u64> = Some(0);
+            for &(j, sg) in &rel.entries {
+                match (acc, logs[j as usize]) {
+                    (Some(a0), Some(x)) => {
+                        let term = if sg < 0 {
+                            neg_mod(x.wrapping_mul(1) % n, n)
+                        } else {
+                            x % n
+                        };
+                        let term = fnum.from_mont(fnum.mul(
+                            fnum.to_mont(term),
+                            fnum.to_mont((sg.unsigned_abs() as u64) % n),
+                        ));
+                        acc = Some(add_mod(a0, term, n));
+                    }
+                    _ => acc = None,
+                }
+            }
+            if let (Some(sum), true) = (acc, rel.b % n != 0) {
+                let num = add_mod(sum, neg_mod(rel.a % n, n), n);
+                let k = ((num as u128 * inv_mod_u64(rel.b % n, n) as u128) % n as u128) as u64;
+                if curve.mul(Some(g), k) == Some(q) {
+                    res = Some(k);
+                }
+            }
+        }
+        per.push(tt.elapsed().as_secs_f64() * 1e3);
+        out.push(res);
+    }
+    Some((
+        out,
+        MultiReport {
+            setup_ms,
+            per_target_ms: per,
+            total_ms: t0.elapsed().as_secs_f64() * 1e3,
+            factor_base_size: fb.len(),
+            determined_logs: determined,
+            targets_walked: walked,
+        },
+    ))
+}
+
 /// End-to-end index calculus with the table-lookup collector ([`collect_relations_table`]): factor
 /// base → pair table → relations → linear algebra → group verification.  Same report and the same
 /// fail-closed verification as [`ic_solve`].  Experimental.
