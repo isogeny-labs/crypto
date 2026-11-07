@@ -919,7 +919,7 @@ mod tests {
         let mut equations=vec![0u8;23];equations[0]=3;equations[1]=5;
         let baseline=bounded_projection_json(&PublicEquations::from_admitted(&math,&config,&equations).unwrap(),32768).unwrap();
         let mut changed=config.clone();changed.solver="f5".into();changed.work_limit=65536;changed.degree_bound=6;
-        changed.channels=Some(crate::ml_dataset::types::ChannelRequests{schema:"crypto.ml-dataset.channel-requests/v1".into(),
+        changed.channels=Some(crate::ml_dataset::types::ChannelRequests{owned_boolean_search:None,sat_search:None,schema:"crypto.ml-dataset.channel-requests/v1".into(),
             boolean_consequence:Some(crate::ml_dataset::types::BooleanRequest::Produce{row_index:7}),sat_initial:None,affine_boolean_row:None});
         let same=bounded_projection_json(&PublicEquations::from_admitted(&math,&changed,&equations).unwrap(),32768).unwrap();
         assert_eq!(baseline,same);

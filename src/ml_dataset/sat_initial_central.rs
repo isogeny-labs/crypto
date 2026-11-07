@@ -14,6 +14,8 @@ use std::path::Path;
 mod ledger;
 #[path = "sat_initial_replay.rs"]
 mod transcript;
+#[path = "sat_search_central.rs"]
+mod search;
 /// Must be supplied by the separately authorized replay caller, never inferred
 /// from a successful producer prefix or reset after a failure.
 pub(in crate::ml_dataset::solvers) struct Policy {
@@ -79,6 +81,7 @@ impl Admission for ReplayBudget {
 pub(in crate::ml_dataset::solvers) struct Frame {
     budget: ReplayBudget,
     row_mode: Option<RowReplay>,
+    search_mode: Option<search::Replay>,
     config: Vec<u8>,
     public: Vec<u8>,
     factor: Vec<u8>,
@@ -413,9 +416,11 @@ fn verify_mode(
     artifacts: &[Artifact],
     policy: Policy,
     row_mode: Option<RowReplay>,
+    search_mode: Option<search::Replay>,
 ) -> Result<Outcome, Failed> {
     let mut frame = Frame {
         row_mode,
+        search_mode,
         budget: ReplayBudget {
             policy,
             work: 0,
@@ -940,6 +945,13 @@ fn run(
                         marker = Some((sequence, hash.to_owned()));
                     }
                 }
+            } else if row.event["kind"] == "binary_sat_search" {
+                let replay = f.search_mode.as_mut().ok_or("search event in initial-only mode")?;
+                let checkpoint = checkpoint_receipt.as_ref().ok_or("search before initial ledger")?;
+                let map = f.map.as_ref().ok_or("search before checked map")?;
+                let math = f.parts.complete.as_ref().ok_or("search before original math")?;
+                replay.feed(line, &binding_hash, original_binding, map, &math.signed,
+                    math.signed_target, checkpoint, &mut f.budget)?;
             } else {
                 return Err("unsupported event in initial-only capture".into());
             }
@@ -1013,6 +1025,11 @@ fn run(
     };
     complete
     };
+    let complete = if let Some(search) = f.search_mode.as_ref() {
+        if complete {
+            search.finish(f.checkpoint.as_ref().ok_or("search lacks initial ledger")?, &head)?
+        } else { false }
+    } else { complete };
     // Visitor effects remain provisional until every immutable join is repeated.
     f.budget
         .reserve_checking(
@@ -1741,9 +1758,9 @@ impl RowReplay {
 }
 pub(in crate::ml_dataset::solvers) struct VerifiedRow {frame:Frame}
 pub(in crate::ml_dataset::solvers) enum RowOutcome {Verified(VerifiedRow),UnknownOriginalMath(Frame),Incomplete(Frame)}
-pub(in crate::ml_dataset::solvers) fn verify(dir:&Path,config:&CaseConfig,artifacts:&[Artifact],policy:Policy)->Result<Outcome,Failed>{verify_mode(dir,config,artifacts,policy,None)}
+pub(in crate::ml_dataset::solvers) fn verify(dir:&Path,config:&CaseConfig,artifacts:&[Artifact],policy:Policy)->Result<Outcome,Failed>{verify_mode(dir,config,artifacts,policy,None,None)}
 pub(in crate::ml_dataset::solvers) fn verify_boolean_row(dir:&Path,config:&CaseConfig,outcome:&Value,artifacts:&[Artifact],policy:Policy,limits:RowLimits)->Result<RowOutcome,Failed>{
-    match verify_mode(dir,config,artifacts,policy,Some(RowReplay::new(limits)))? {
+    match verify_mode(dir,config,artifacts,policy,Some(RowReplay::new(limits)),None)? {
         Outcome::Verified(mut verified)=>{
             if let Err(error)=join_row_terminal(dir,outcome,artifacts,&mut verified.frame){
                 verified.frame.diagnostic=Some(error);
@@ -1826,4 +1843,281 @@ fn join_row_terminal(dir:&Path,outcome:&Value,artifacts:&[Artifact],f:&mut Frame
     f.terminal_head_raw=read(dir,"live/committed.json",65536,&mut f.budget,&mut f.pending_read)?;
     if f.terminal_head_raw!=f.head_raw{return Err("row head changed during terminal join".into())}
     DecodeBudget::check(&mut f.budget,Instant::now()).map_err(|_|"row terminal deadline".to_owned())
+}
+
+// Distinct original-owned search result. No initial-only terminal/release API.
+pub(in crate::ml_dataset::solvers) struct VerifiedSearch { frame: Frame }
+pub(in crate::ml_dataset::solvers) enum SearchOutcome {
+    Verified(VerifiedSearch), Incomplete(Frame), UnknownOriginalMath(Frame),
+}
+pub(in crate::ml_dataset::solvers) fn verify_search(
+    dir: &Path, config: &CaseConfig, artifacts: &[Artifact], policy: Policy,
+    event_limit: usize,
+) -> Result<SearchOutcome, Failed> {
+    match verify_mode(dir, config, artifacts, policy, None, Some(search::Replay::new(event_limit)))? {
+        Outcome::Verified(v) => Ok(SearchOutcome::Verified(VerifiedSearch {frame:v.frame})),
+        Outcome::IncompleteMissingProducerLedger(f) => Ok(SearchOutcome::Incomplete(f)),
+        Outcome::UnknownOriginalMath(f) => Ok(SearchOutcome::UnknownOriginalMath(f)),
+    }
+}
+impl VerifiedSearch {
+    pub(in crate::ml_dataset::solvers) fn model_relation_checked(&self) -> bool {
+        self.frame.budget.first_stop.is_none() && self.frame.search_mode.as_ref()
+            .is_some_and(|s| s.model_relation_checked())
+    }
+    pub(in crate::ml_dataset::solvers) fn native_unsat_uncertified(&self) -> bool {
+        self.frame.budget.first_stop.is_none() && self.frame.search_mode.as_ref()
+            .is_some_and(|s| s.native_unsat_uncertified())
+    }
+}
+
+
+// Report joins confer only producer-report/custody scope; no causal completion.
+fn search_report_join(f:&mut Frame,dir:&Path,outcome:&Value,artifacts:&[Artifact])->Result<(),String>{
+    f.budget.reserve_checking(65536,65536,Instant::now()).map_err(|_|"search report admission")?;
+    let mut candidates=artifacts.iter().filter(|a|a.path=="result.json" || a.role=="solver-outcome");
+    let a=candidates.next().ok_or("missing search result artifact")?;
+    if candidates.next().is_some() || a.path!="result.json" || a.role!="solver-outcome" || a.encoding!="json" || a.bytes>4096 {
+        return Err("search result descriptor".into())
+    }
+    f.terminal_raw=read(dir,"result.json",a.bytes,&mut f.budget,&mut f.pending_read)?;
+    if f.terminal_raw.len() as u64!=a.bytes || hex::encode(Sha256::digest(&f.terminal_raw))!=a.sha256 {
+        return Err("search result artifact bytes".into())
+    }
+    f.terminal=Some(serde_json::from_slice(&f.terminal_raw).map_err(|_|"search result decode")?);
+    let stored=f.terminal.as_ref().unwrap();
+    if stored!=outcome || stored["adapter_id"]!="sat-search-v1" || stored["strategy"]!="sat-search-v1"
+        || stored["status"]!="partial" || stored["solver_completed"]!=false
+        || stored["scalar_recovered_without_witness"]!=false || stored["all_patterns_negative"]!=false {
+        return Err("search producer report identity or overclaim".into())
+    }
+    let head=f.head.as_ref().ok_or("search report missing authenticated head")?;
+    if stored["terminal_sequence"].as_u64()!=Some(head.event_count)
+        || stored["terminal_sha256"].as_str()!=Some(head.last_event_sha256.as_str()) {
+        return Err("search report terminal acknowledgment".into())
+    }
+    f.search_mode.as_ref().ok_or("missing search mode")?.check_report(&stored["search_report"])?;
+    let mut telemetry=artifacts.iter().filter(|a|a.path=="telemetry/solver.json");
+    let t=telemetry.next().ok_or("search requires completed solver telemetry")?;
+    if telemetry.next().is_some()||t.encoding!="json"||t.bytes>65536{return Err("search solver telemetry descriptor".into())}
+    f.budget.reserve_checking(t.bytes.checked_mul(256).ok_or("telemetry quote")?,t.bytes.checked_mul(128).ok_or("telemetry quote")?,Instant::now()).map_err(|_|"search telemetry admission")?;
+    f.terminal_head_raw=read(dir,&t.path,t.bytes,&mut f.budget,&mut f.pending_read)?;
+    if f.terminal_head_raw.len() as u64!=t.bytes||hex::encode(Sha256::digest(&f.terminal_head_raw))!=t.sha256{return Err("search solver telemetry bytes".into())}
+    let measured:Value=serde_json::from_slice(&f.terminal_head_raw).map_err(|_|"search solver telemetry parse")?;
+    if measured["returned_ok"]!=true{return Err("search solver telemetry failed".into())}
+    crate::ml_dataset::telemetry::checked::verify_artifacts(dir,artifacts)?;
+    execution::verify(dir,artifacts)?;
+    DecodeBudget::check(&mut f.budget,Instant::now()).map_err(|_|"search report post-join deadline".into())
+}
+impl VerifiedSearch {
+    pub(in crate::ml_dataset::solvers) fn join_report(&mut self,dir:&Path,outcome:&Value,artifacts:&[Artifact])->Result<(),Stop>{
+        match search_report_join(&mut self.frame,dir,outcome,artifacts) {
+            Ok(())=>Ok(()),Err(error)=>{self.frame.diagnostic=Some(error);self.frame.budget.fail(Stop::NativeFailure)}
+        }
+    }
+    pub(in crate::ml_dataset::solvers) fn project_restricted(&mut self)->Result<Value,Stop>{
+        let f=&mut self.frame;
+        f.budget.reserve_checking(65536,65536,Instant::now())?;
+        if f.terminal.is_none(){return f.budget.fail(Stop::Phase)}
+        let value=f.search_mode.as_ref().ok_or(Stop::Phase)?.restricted_projection();
+        DecodeBudget::check(&mut f.budget,Instant::now())?;
+        Ok(value)
+    }
+}
+
+impl VerifiedSearch {
+    pub(in crate::ml_dataset::solvers) fn usage(&self) -> (u64, u64) {
+        self.frame.usage()
+    }
+    /// Recheck every persisted input against the already checked original and
+    /// exact capture chain. All costs accrue to this same retained replay owner.
+    pub(in crate::ml_dataset::solvers) fn revalidate(
+        &mut self,
+        dir: &Path,
+        config: &CaseConfig,
+        outcome: &Value,
+        artifacts: &[Artifact],
+    ) -> Result<(), Stop> {
+        let f = &mut self.frame;
+        if let Some(stop) = f.budget.first_stop {
+            return Err(stop);
+        }
+        let result = (|| -> Result<(), String> {
+            f.budget
+                .reserve_checking(8192, 16384, Instant::now())
+                .map_err(|_| "revalidation report/context admission refused")?;
+            if artifacts.len() > 4096 {
+                return Err("revalidation artifact count".into());
+            }
+            let artifact_bytes = artifacts.iter().try_fold(0u64, |n, a| {
+                n.checked_add(a.bytes)
+                    .ok_or("revalidation artifact overflow")
+            })?;
+            let head = f.head.as_ref().ok_or("missing checked revalidation head")?;
+            // Retain the whole aggregate floor. No optimistic owner discount.
+            f.budget
+                .reserve_checking(
+                    head.byte_end
+                        .checked_add(head.payload_bytes)
+                        .and_then(|n| n.checked_mul(64))
+                        .ok_or("revalidation capture work overflow")?,
+                    head.byte_end
+                        .checked_mul(128)
+                        .and_then(|n| n.checked_add(2 * 1024 * 1024))
+                        .ok_or("revalidation capture owner overflow")?,
+                    Instant::now(),
+                )
+                .map_err(|_| "revalidation capture admission refused")?;
+            let head = head.clone();
+            let (binding, caps) = f
+                .original_capture
+                .as_ref()
+                .ok_or("missing original capture context")?
+                .clone();
+
+            for pass in 0..2 {
+                f.budget
+                    .reserve_checking(
+                        artifact_bytes
+                            .checked_mul(64)
+                            .ok_or("revalidation manifest work overflow")?,
+                        2 * 1024 * 1024,
+                        Instant::now(),
+                    )
+                    .map_err(|_| "revalidation manifest admission refused")?;
+                if Some(hash_artifact_descriptors(artifacts, &mut f.budget)?)
+                    != f.artifact_fingerprint
+                {
+                    return Err("revalidation artifact descriptors changed".into());
+                }
+                for a in artifacts {
+                    f.revalidation_raw =
+                        read(dir, &a.path, a.bytes, &mut f.budget, &mut f.pending_read)?;
+                    if f.revalidation_raw.len() as u64 != a.bytes
+                        || hex::encode(Sha256::digest(&f.revalidation_raw)) != a.sha256
+                    {
+                        return Err("revalidation artifact bytes changed".into());
+                    }
+                }
+                // AttemptBinding records exact raw hashes, including formatting.
+                // These paths may be omitted from small component-fixture manifests.
+                for (path, expected) in [
+                    ("run.json", &binding.run_sha256),
+                    ("plan.json", &binding.plan_sha256),
+                    ("protocol.json", &binding.protocol_sha256),
+                    ("attempt.json", &binding.attempt_sha256),
+                ] {
+                    f.revalidation_raw = read(
+                        dir,
+                        path,
+                        crate::ml_dataset::JSON_INPUT_MAX_BYTES,
+                        &mut f.budget,
+                        &mut f.pending_read,
+                    )?;
+                    if hex::encode(Sha256::digest(&f.revalidation_raw)) != *expected {
+                        return Err("revalidation bound context bytes changed".into());
+                    }
+                }
+                f.revalidation_raw = read(
+                    dir,
+                    "measurement-policy.json",
+                    65536,
+                    &mut f.budget,
+                    &mut f.pending_read,
+                )?;
+                if Some(<[u8; 32]>::from(Sha256::digest(&f.revalidation_raw)))
+                    != f.measurement_policy_hash
+                {
+                    return Err("revalidation measurement policy changed".into());
+                }
+                for (path, expected) in [
+                    ("config.json", f.config.as_slice()),
+                    ("public.json", f.public.as_slice()),
+                    ("factor-base.json", f.factor.as_slice()),
+                ] {
+                    f.revalidation_raw = read(
+                        dir,
+                        path,
+                        expected.len() as u64,
+                        &mut f.budget,
+                        &mut f.pending_read,
+                    )?;
+                    if f.revalidation_raw.as_slice() != expected {
+                        return Err("revalidation original bytes changed".into());
+                    }
+                }
+                let n = f.config.len() as u64;
+                f.budget
+                    .reserve_checking(
+                        n.checked_mul(256)
+                            .ok_or("revalidation config work overflow")?,
+                        n.checked_mul(128)
+                            .ok_or("revalidation config owner overflow")?,
+                        Instant::now(),
+                    )
+                    .map_err(|_| "revalidation config admission refused")?;
+                f.revalidation_config =
+                    Some(serde_json::from_slice(&f.config).map_err(|e| e.to_string())?);
+                if f.revalidation_config.as_ref() != Some(config) {
+                    return Err("revalidation caller config differs".into());
+                }
+                search_report_join(f, dir, outcome, artifacts)?;
+                if pass == 0 {
+                    let authenticated=capture::verify_live_committed_prefix_owned(dir,&binding,&caps,&head,&mut |request| {
+                        match request {
+                            capture::OwnedReplayRequest::Head(_) => {
+                                f.revalidation_raw=read(dir,"live/committed.json",caps.metadata_reserve_bytes,&mut f.budget,&mut f.pending_read)?;
+                                f.revalidation_head=Some(revalidation_head(&f.revalidation_raw,&mut f.budget)?);
+                                Ok(capture::OwnedReplayReply::Head(f.revalidation_head.as_ref().unwrap().clone()))
+                            }
+                            capture::OwnedReplayRequest::Record(phase,line) => {
+                                if phase==capture::RecordPhase::BeforeRecordDecode {
+                                    f.pending_line.clear();f.pending_line.extend_from_slice(line);
+                                    f.budget.reserve_checking((line.len() as u64).checked_mul(8).and_then(|n|n.checked_add(1024)).ok_or("revalidation scan overflow")?,32768,Instant::now())
+                                        .map_err(|_|"revalidation scan refused")?;
+                                    let shape=provenance::gate_wire::json_shape::inspect(line,||DecodeBudget::check(&mut f.budget,Instant::now()).map_err(|_|provenance::gate_wire::json_shape::Error::Admission))
+                                        .map_err(|_|"revalidation shape refused")?;
+                                    f.budget.reserve_checking(0,shape.owner_bytes().map_err(|_|"revalidation owner overflow")?.checked_mul(4).ok_or("revalidation owner overflow")?,Instant::now())
+                                        .map_err(|_|"revalidation record owner refused")?;
+                                }
+                                Ok(capture::OwnedReplayReply::Done)
+                            }
+                            capture::OwnedReplayRequest::Payload(_,a) => {
+                                let path=format!("live/{}",a.path);
+                                f.revalidation_payload=read(dir,&path,a.bytes,&mut f.budget,&mut f.pending_read)?;
+                                DecodeBudget::check(&mut f.budget,Instant::now()).map_err(|_|"revalidation payload deadline")?;
+                                let proof=capture::verify_replay_payload_bytes(a,&f.revalidation_payload)?;
+                                DecodeBudget::check(&mut f.budget,Instant::now()).map_err(|_|"revalidation payload deadline")?;
+                                Ok(capture::OwnedReplayReply::Payload(proof))
+                            }
+                        }
+                    })?.ok_or("revalidation capture disappeared")?;
+                    if authenticated.payloads.len() != 1 {
+                        return Err("revalidation payload count changed".into());
+                    }
+                }
+                f.revalidation_raw = read(
+                    dir,
+                    "live/committed.json",
+                    caps.metadata_reserve_bytes,
+                    &mut f.budget,
+                    &mut f.pending_read,
+                )?;
+                f.revalidation_head = Some(revalidation_head(&f.revalidation_raw, &mut f.budget)?);
+                if f.revalidation_head.as_ref() != Some(&head) {
+                    return Err("revalidation capture endpoint changed".into());
+                }
+                DecodeBudget::check(&mut f.budget, Instant::now())
+                    .map_err(|_| "revalidation deadline refused")?;
+            }
+            Ok(())
+        })();
+        match result {
+            Ok(()) => Ok(()),
+            Err(error) => {
+                f.diagnostic = Some(error);
+                f.budget.fail(Stop::NativeFailure)
+            }
+        }
+    }
 }

@@ -367,6 +367,9 @@ pub(super) fn verify_and_store_worker_originals<'a>(
 /// performs no storage retry and makes no durable-publication claim.
 #[derive(Default)]
 pub(super) struct WorkerResidualCustody {
+    boolean_search:Option<koblitz_m3::sat_original_owner::boolean_search::OwnedAttempt>,
+    boolean_search_report_unavailable:bool,
+    search:Option<koblitz_m3::sat_original_owner::search_worker::Custody>,
     items: Vec<WorkerResidualArtifact>,
     // Moves the existing admitted owners; no Box, sink reopening or ledger reset.
     sat: Option<koblitz_m3::sat_original_owner::worker::Custody>,
@@ -393,7 +396,7 @@ impl WorkerResidualCustody {
         items
             .try_reserve_exact(Self::CAPACITY)
             .map_err(|e| e.to_string())?;
-        Ok(Self { items, sat: None, sat_report_unavailable: false, boolean_rows: None, boolean_rows_report_unavailable: false, affine_rows:None, affine_rows_report_unavailable:false })
+        Ok(Self { items, search:None,boolean_search:None,boolean_search_report_unavailable:false,sat: None, sat_report_unavailable: false, boolean_rows: None, boolean_rows_report_unavailable: false, affine_rows:None, affine_rows_report_unavailable:false })
     }
     fn retain(&mut self, item: WorkerResidualArtifact) -> Result<(), WorkerResidualArtifact> {
         if self.items.len() == Self::CAPACITY || self.items.capacity() < Self::CAPACITY {
@@ -402,6 +405,7 @@ impl WorkerResidualCustody {
         self.items.push(item);
         Ok(())
     }
+    pub(super) fn boolean_search_report_unavailable(&self)->bool{self.boolean_search_report_unavailable}
     pub(super) fn boolean_rows_report_unavailable(&self) -> bool { self.boolean_rows_report_unavailable || self.affine_rows_report_unavailable }
     pub(super) fn affine_rows_report_unavailable(&self)->bool {self.affine_rows_report_unavailable}
     pub(super) fn sat_report_unavailable(&self) -> bool {
@@ -419,6 +423,23 @@ pub(super) struct WorkerSolveOutput {
     residual: WorkerResidualCustody,
 }
 impl WorkerSolveOutput {
+    fn from_original_boolean_search_failure(custody:koblitz_m3::sat_original_owner::worker::Custody)->Self{
+        Self{data:SolverData{outcome:Value::Null,artifacts:Vec::new()},stored:Vec::new(),
+            residual:WorkerResidualCustody{sat:Some(custody),boolean_search_report_unavailable:true,..Default::default()}}
+    }
+    // A fixed partial report is admitted against the retained original ledger.
+    // Refused reporting keeps its guard and all native custody.
+    fn from_original_boolean_search(mut custody:koblitz_m3::sat_original_owner::boolean_search::OwnedAttempt)->Self{
+        let outcome=custody.outcome();let unavailable=outcome.is_none();
+        Self{data:SolverData{outcome:outcome.unwrap_or(Value::Null),artifacts:Vec::new()},stored:Vec::new(),
+            residual:WorkerResidualCustody{boolean_search:Some(custody),boolean_search_report_unavailable:unavailable,..Default::default()}}
+    }
+
+    fn from_search_custody(mut custody:koblitz_m3::sat_original_owner::search_worker::Custody)->Self {
+        let outcome=custody.outcome();let unavailable=outcome.is_none();
+        Self{data:SolverData{outcome:outcome.unwrap_or(Value::Null),artifacts:Vec::new()},stored:Vec::new(),
+            residual:WorkerResidualCustody{search:Some(custody),sat_report_unavailable:unavailable,..Default::default()}}
+    }
     pub(super) fn legacy(data: SolverData) -> Self {
         Self {
             data,
@@ -442,7 +463,7 @@ impl WorkerSolveOutput {
         let unavailable=outcome.is_none();
         Self { data: SolverData { outcome:outcome.unwrap_or(Value::Null), artifacts:Vec::new() },
             stored:Vec::new(), residual:WorkerResidualCustody {
-                items:Vec::new(),sat:None,sat_report_unavailable:false,
+                items:Vec::new(),sat:None,search:None,boolean_search:None,boolean_search_report_unavailable:false,sat_report_unavailable:false,
                 boolean_rows:Some(custody),boolean_rows_report_unavailable:unavailable, affine_rows:None, affine_rows_report_unavailable:false,
             } }
     }
@@ -455,7 +476,7 @@ impl WorkerSolveOutput {
             data: SolverData { outcome: outcome.unwrap_or(Value::Null), artifacts: Vec::new() },
             stored: Vec::new(),
             residual: WorkerResidualCustody {
-                items: Vec::new(), sat: Some(custody), sat_report_unavailable: unavailable, boolean_rows: None, boolean_rows_report_unavailable: false, affine_rows:None, affine_rows_report_unavailable:false,
+                items: Vec::new(), search:None,boolean_search:None,boolean_search_report_unavailable:false,sat: Some(custody), sat_report_unavailable: unavailable, boolean_rows: None, boolean_rows_report_unavailable: false, affine_rows:None, affine_rows_report_unavailable:false,
             },
         }
     }
@@ -643,6 +664,11 @@ pub(super) fn verify_koblitz_m3_cell(
 pub(super) fn requested_channel_disposition(config:&CaseConfig)->Result<Option<Value>,String>{
     let Some(c)=&config.channels else {return Ok(None)};
     c.validate()?;
+    let sat_search=c.sat_search.as_ref().map(|r| {
+        let eligible=koblitz_m3::sat_original_owner::search_worker::supported(config);
+        super::types::ChannelDisposition{request:r.clone(),status:if eligible{super::types::ChannelDispositionStatus::Requested}else{super::types::ChannelDispositionStatus::Unsupported},
+            reason:if eligible{super::types::ChannelDispositionReason::RequiresActualSatSearchReplay}else{super::types::ChannelDispositionReason::OutsideSatSearchProfile},execution_verified:false,training_export_admitted:false}
+    });
     let boolean=c.boolean_consequence.as_ref().map(|r| {
         let eligible=config.family=="binary" && config.m==3
             && ((23..=31).contains(&config.n)||(47..=61).contains(&config.n))
@@ -669,7 +695,7 @@ pub(super) fn requested_channel_disposition(config:&CaseConfig)->Result<Option<V
             execution_verified:false,training_export_admitted:false}
     });
     Ok(Some(serde_json::to_value(super::types::RequestedChannelDispositions {
-        schema:"crypto.ml-dataset.requested-channels/v1".into(),boolean_consequence:boolean,sat_initial:sat,affine_boolean_row,
+        schema:"crypto.ml-dataset.requested-channels/v1".into(),sat_search,boolean_consequence:boolean,sat_initial:sat,affine_boolean_row,
     }).map_err(|e|e.to_string())?))
 }
 /// Historical replay allowance explicitly supplied by an authorized caller.
@@ -793,6 +819,16 @@ pub(super) fn solve_with_verified_worker_originals(
     if context.is_some_and(|c| c.launch.binding != binding) {
         return Err("verified worker originals differ from execution attempt".into());
     }
+    if koblitz_m3::sat_original_owner::owned_search_worker::requested(config) {
+        config.channels.as_ref().unwrap().validate()?;
+        if !koblitz_m3::sat_original_owner::owned_search_worker::supported(config) {
+            return Ok(WorkerSolveOutput::legacy(SolverData{outcome:json!({"strategy":"original-boolean-search-unsupported","status":"unsupported","solver_completed":false,"all_patterns_negative":false,"training_export_admitted":false}),artifacts:Vec::new()}));
+        }
+        let context=context.ok_or("owned Boolean search requires original execution context")?;
+        if LIVE_SINK.with(|slot|slot.borrow().is_some()){return Err("nested live owned search sink".into())}
+        let sink=CaptureEmitter::create(directory,binding,limits.clone())?;
+        return Ok(koblitz_m3::sat_original_owner::owned_search_worker::run(original,case,context,sink,&limits));
+    }
     if config.channels.as_ref().is_some_and(|c|c.affine_boolean_row.is_some()) {
         config.channels.as_ref().unwrap().validate()?;
         if !koblitz_m3::sat_original_owner::affine_worker::supported(config) {
@@ -807,6 +843,15 @@ pub(super) fn solve_with_verified_worker_originals(
     }
     // Optional initial channel owns one original-budget pattern. Once selected,
     // no partial or refused attempt can fall through to the legacy SAT solver.
+    if koblitz_m3::sat_original_owner::search_worker::requested(config) {
+        if !koblitz_m3::sat_original_owner::search_worker::supported(config) {
+            return Ok(WorkerSolveOutput::legacy(SolverData{outcome:json!({"strategy":"sat-search-unsupported","status":"unsupported","solver_completed":false,"scalar_recovered_without_witness":false,"all_patterns_negative":false}),artifacts:Vec::new()}));
+        }
+        let context=context.ok_or("search requires original execution context")?;
+        if LIVE_SINK.with(|slot|slot.borrow().is_some()){return Err("nested live search sink".into())}
+        let sink=CaptureEmitter::create(directory,binding,limits.clone())?;
+        return Ok(WorkerSolveOutput::from_search_custody(koblitz_m3::sat_original_owner::search_worker::run(original,case,context,sink,&limits)));
+    }
     if koblitz_m3::sat_original_owner::worker::eligibility(config)
         == koblitz_m3::sat_original_owner::worker::Eligibility::Requested
     {
@@ -6655,17 +6700,78 @@ mod verified_worker_original_tests {
                 execution_required, positive_control, policy, family, degree_bound, None)
         }
         fn with_family_policy_channels(
-            n: u32, twist: bool, factor_base_size: usize, solver: &str, work_limit: u64,
-            execution_required: bool, positive_control: bool,
-            policy: Option<crate::ml_dataset::types::FactorBasePolicy>, family: &str,
-            degree_bound: u32, channels: Option<crate::ml_dataset::types::ChannelRequests>,
+            n: u32,
+            twist: bool,
+            factor_base_size: usize,
+            solver: &str,
+            work_limit: u64,
+            execution_required: bool,
+            positive_control: bool,
+            policy: Option<crate::ml_dataset::types::FactorBasePolicy>,
+            family: &str,
+            degree_bound: u32,
+            channels: Option<crate::ml_dataset::types::ChannelRequests>,
+        ) -> Self {
+            Self::with_family_policy_channels_recipe(
+                n,
+                twist,
+                factor_base_size,
+                solver,
+                work_limit,
+                execution_required,
+                positive_control,
+                policy,
+                family,
+                degree_bound,
+                channels,
+                false,
+            )
+        }
+        #[cfg(sat_qualification_child)]
+        pub(super) fn with_fixed_sat_qualification(family: &str, twist: bool) -> Self {
+            let channels=serde_json::from_value(json!({"schema":"crypto.ml-dataset.channel-requests/v2","sat_initial":{"mode":"capture_and_check_initial"}})).unwrap();
+            Self::finish_original_capture_setup(Self::with_family_policy_channels_recipe(
+                23,
+                twist,
+                4,
+                "sat",
+                16384,
+                true,
+                false,
+                Some(crate::ml_dataset::types::FactorBasePolicy::Legacy {}),
+                family,
+                3,
+                Some(channels),
+                true,
+            ))
+        }
+        fn with_family_policy_channels_recipe(
+            n: u32,
+            twist: bool,
+            factor_base_size: usize,
+            solver: &str,
+            work_limit: u64,
+            execution_required: bool,
+            positive_control: bool,
+            policy: Option<crate::ml_dataset::types::FactorBasePolicy>,
+            family: &str,
+            degree_bound: u32,
+            channels: Option<crate::ml_dataset::types::ChannelRequests>,
+            qualification: bool,
         ) -> Self {
             let nonce = std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
                 .unwrap()
                 .as_nanos();
-            let root = std::env::temp_dir()
-                .join(format!("verified-worker-{}-{nonce}", std::process::id()));
+            let root = if qualification {
+                PathBuf::from(
+                    std::env::var_os("SAT_REFERENCE_RESTRICTED_OUTPUT")
+                        .expect("supervised qualification output required"),
+                )
+                .join("original-case")
+            } else {
+                std::env::temp_dir().join(format!("verified-worker-{}-{nonce}", std::process::id()))
+            };
             fs::create_dir(&root).unwrap();
             let mut protocol = json!({"schema":"experiment.protocol/v1", "purpose":"verified worker input software controls"});
             if positive_control {
@@ -6680,6 +6786,9 @@ mod verified_worker_original_tests {
                     "root_failure_rule":"conflicting raw pdp-witness.json before producer entry"
                 });
             }
+            if qualification {
+                protocol["software_control"] = json!({"schema":"sat-fixed-nonroot-qualification/v3","fixed_rows":[0,0,2],"pattern":0,"qualification":"at least two distinct complete original-map models; conditional candidate","fallback":"forbidden","baby_slot_cap":4096,"reference_work":8000000,"reference_bytes":16777216,"reference_additions":100000,"checkpoint_total_bytes":67108864,"deadline":"original monotonic deadline; no renewal"});
+            }
             if let Some(request) = &channels {
                 protocol["extensions"]["dataset_channels"] = serde_json::to_value(request).unwrap();
             }
@@ -6689,7 +6798,9 @@ mod verified_worker_original_tests {
             let plan = dataset::DatasetPlan {
                 channels: channels.clone(),
                 factor_base_policies: policy.clone().into_iter().collect(),
-                schema: if channels.is_some() { "crypto.ml-dataset.plan/v3" } else if policy.is_some() {
+                schema: if channels.is_some() {
+                    "crypto.ml-dataset.plan/v3"
+                } else if policy.is_some() {
                     "crypto.ml-dataset.plan/v2"
                 } else {
                     "crypto.ml-dataset.plan/v1"
@@ -6733,7 +6844,15 @@ mod verified_worker_original_tests {
             .unwrap();
             storage::write_bytes(&root, "protocol.json", "protocol", "json", &bytes).unwrap();
             let binding = AttemptBinding::from_cell_files(&root).unwrap();
-            let case = curves::generate(&config).unwrap();
+            let case = if qualification {
+                CaseData {
+                    public_instance: Value::Null,
+                    private_witness: Value::Null,
+                    factor_base: Value::Null,
+                }
+            } else {
+                curves::generate(&config).unwrap()
+            };
             Self {
                 root,
                 config,
@@ -7397,3 +7516,44 @@ mod original_row_dispatch_controls {
 #[path="affine_replay_owner.rs"]
 mod affine_replay_owner;
 pub(super) use affine_replay_owner::{AffineReplayCustody,AffineReplayVerdict,verify_affine_row_cell,needs_affine_row_replay};
+
+#[derive(Clone,Copy,Debug,PartialEq,Eq)]
+pub(super) enum SearchReplayVerdict{CheckedScope,Incomplete,Unknown,Rejected}
+enum SearchReplayOwner{Outcome(koblitz_m3::sat_original_owner::central::SearchOutcome),Failed(koblitz_m3::sat_original_owner::central::Failed)}
+pub(super) struct SearchReplayCustody{owner:SearchReplayOwner,verdict:SearchReplayVerdict}
+impl SearchReplayCustody {
+    pub(super) fn verdict(&self)->SearchReplayVerdict{self.verdict}
+    pub(super) fn retained_slot_bytes()->usize{std::mem::size_of::<Self>()}
+    pub(super) fn charged(&self)->(u64,u64){use koblitz_m3::sat_original_owner::central::SearchOutcome as O;
+        match &self.owner {SearchReplayOwner::Outcome(O::Verified(v))=>v.usage(),SearchReplayOwner::Outcome(O::Incomplete(f)|O::UnknownOriginalMath(f))=>f.usage(),SearchReplayOwner::Failed(f)=>f.frame.usage()}}
+    pub(super) fn revalidate(&mut self,dir:&Path,config:&CaseConfig,outcome:&Value,artifacts:&[super::types::Artifact])->SearchReplayVerdict{
+        if self.verdict!=SearchReplayVerdict::CheckedScope{return self.verdict}
+        if let SearchReplayOwner::Outcome(koblitz_m3::sat_original_owner::central::SearchOutcome::Verified(v))=&mut self.owner {
+            if v.revalidate(dir,config,outcome,artifacts).is_err(){self.verdict=SearchReplayVerdict::Rejected}
+        }else{self.verdict=SearchReplayVerdict::Rejected}self.verdict
+    }
+    pub(super) fn project_identity(&mut self)->Result<Value,String>{
+        if self.verdict!=SearchReplayVerdict::CheckedScope{return Err("search scope not joined".into())}
+        if let SearchReplayOwner::Outcome(koblitz_m3::sat_original_owner::central::SearchOutcome::Verified(v))=&mut self.owner {
+            match v.project_restricted(){Ok(value)=>Ok(value),Err(_)=>{self.verdict=SearchReplayVerdict::Rejected;Err("search projection refused".into())}}
+        }else{Err("search owner missing".into())}
+    }
+}
+pub(super) fn needs_search_replay(config:&CaseConfig,outcome:&Value)->bool{
+    koblitz_m3::sat_original_owner::search_worker::requested(config)||outcome["adapter_id"]=="sat-search-v1"||outcome.get("search_report").is_some()
+}
+pub(super) fn verify_search_cell(dir:&Path,config:&CaseConfig,outcome:&Value,artifacts:&[super::types::Artifact],policy:SatReplayPolicy)->SearchReplayCustody{
+    use koblitz_m3::sat_original_owner::central;
+    let events=config.channels.as_ref().and_then(|c|c.sat_search.as_ref()).map(|r|match r{super::types::SatSearchRequest::CaptureAndCheckModel{events,..}=>*events as usize}).unwrap_or(0);
+    let result=central::verify_search(dir,config,artifacts,central::Policy{work:policy.work,bytes:policy.bytes,deadline:policy.deadline,stream_bytes:policy.stream_bytes,payload_bytes:policy.payload_bytes},events);
+    match result {
+        Ok(mut outcome_owner)=>{let verdict=match &mut outcome_owner {
+            central::SearchOutcome::Verified(v)=>if v.join_report(dir,outcome,artifacts).is_ok(){SearchReplayVerdict::CheckedScope}else{SearchReplayVerdict::Rejected},
+            central::SearchOutcome::Incomplete(_)=>SearchReplayVerdict::Incomplete,
+            central::SearchOutcome::UnknownOriginalMath(_)=>SearchReplayVerdict::Unknown,
+        };SearchReplayCustody{owner:SearchReplayOwner::Outcome(outcome_owner),verdict}},
+        Err(f)=>SearchReplayCustody{owner:SearchReplayOwner::Failed(f),verdict:SearchReplayVerdict::Rejected},
+    }
+}
+
+pub(super) fn search_request_supported(c:&CaseConfig)->bool{koblitz_m3::sat_original_owner::search_worker::supported(c)}

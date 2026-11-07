@@ -300,6 +300,21 @@ impl Budget {
         Ok(())
     }
 
+    /// Admit an actual signed-candidate group addition during bounded matrix
+    /// search. This shares the original addition count and deadline, and never
+    /// resets native phase counters or begins final extraction.
+    pub fn reserve_matrix_candidate_addition(&mut self, now: Instant) -> Result<(), Stop> {
+        self.check(now)?;
+        if self.phase != Phase::Matrix {
+            return self.fail(Stop::Phase);
+        }
+        if self.additions == self.addition_limit {
+            return self.fail(Stop::Additions);
+        }
+        self.additions += 1;
+        Ok(())
+    }
+
     /// The caller must separately establish the exact final cursor. Consuming
     /// exactly the allowance does not itself prevent successful completion.
     pub fn finish_extraction(&mut self, now: Instant) -> Result<(), Stop> {

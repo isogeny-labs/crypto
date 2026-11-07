@@ -1109,6 +1109,7 @@ fn export_with_graph_projector(
     let mut algebraic_degree_reductions = 0u64;
     let mut prefix_occurrences = 0u64;
     let mut affine_identity_records=0u64;
+    let mut search_relation_records=0u64;
     let mut feature_occurrences = 0u64;
     let mut sealed = 0u64;
     let mut unsealed = 0u64;
@@ -1166,6 +1167,27 @@ fn export_with_graph_projector(
             if manifest_sha!=before_manifest_sha {return Err("source manifest changed during export admission".into());}
             let target_id =
                 super::digest(format!("{source_run_sha}\n{manifest_sha}\n{cell_index}").as_bytes());
+            if super::solvers::needs_search_replay(&manifest.config,&manifest.outcome) {
+                let record=if manifest.outcome["strategy"]=="sat-search-unsupported" {
+                    json!({"schema":"crypto.ml-dataset.sat-model-relation/v1","visibility":"restricted","status":"unsupported", "model_relation_checked":false,"native_unsat_uncertified":false,"causal_search_verified":false,"unsat_proved":false,"scalar_recovered":false,"all_patterns_negative":false,"solver_completed":false})
+                } else {
+                    super::search_replay_caller::with_current(|session|session.ok_or("search export requires retained original replay caller")?.project(&dir,&manifest))?
+                };
+                let(group,partition)=split_for_size(manifest.config.n as u64);
+                let record_id=super::digest(format!("{target_id}\nsat-model-relation-record").as_bytes());
+                prefix_records.push(&record_id,&json!({"schema":"ml-dataset.restricted-prefix-record/v1","record_id":record_id,
+                    "source_target_id":target_id,"feature_id":null,"split_component":group,"split":partition,"record":record}))?;
+                targets.push(&target_id,&json!({"schema":"ml-dataset.restricted-targets/v1","target_id":target_id,"feature_id":null,
+                    "pdp_domain":null,"split_component":group,"split":partition,"solver":"sat","labels":record,
+                    "known_answer_scalar":null,"independently_recovered_scalar":null,"witness_artifact":null,
+                    "solution_certificates":[],"feature_status":"restricted_model_relation_only"}))?;
+                index.push(&target_id,&json!({"schema":"ml-dataset.export-index/v1","record_id":target_id,"target_id":target_id,
+                    "feature_id":null,"cell":relative,"source_manifest_sha256":manifest_sha,"source_run_sha256":source_run_sha,
+                    "source_artifacts":manifest.artifacts,"status":"restricted_search_scope"}))?;
+                search_relation_records+=1;sealed+=1;
+                // Explicitly avoid generic witness/causal/degree label construction.
+                continue;
+            }
             if super::solvers::needs_affine_row_replay(&manifest.config,&manifest.outcome,&manifest.artifacts) {
                 let record=super::affine_replay_caller::with_current(|session|session.ok_or("affine export requires retained replay invocation")?.project(&dir,&manifest))?;
                 let(group,partition)=split_for_size(manifest.config.n as u64);
@@ -1597,6 +1619,11 @@ fn export_with_graph_projector(
         "prime_chain_graph_occurrences":prime_chain_graph_occurrences,
         "prefix_feature_occurrences":prefix_occurrences,"unique_prefix_feature_rows":unique_prefix_features,
         "restricted_prefix_record_rows":prefix_record_rows});
+    if search_relation_records>0 {
+        manifest["sat_model_relations"]=json!({"schema":"ml-dataset.sat-model-relation-export/v1",
+            "restricted_records":search_relation_records,"restricted_file":"restricted/prefix-records.jsonl",
+            "public_model_features":0,"causal_solver_training_admitted":false,"degree_labels_available":false});
+    }
     if affine_identity_records>0 {
         manifest["affine_unit_identities"]=json!({"schema":"ml-dataset.affine-unit-identity-export/v1",
             "verified_restricted_records":affine_identity_records,"public_consequence_features":0,

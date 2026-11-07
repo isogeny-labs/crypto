@@ -249,6 +249,10 @@ impl OwnedExpansion {
     pub fn status(&self) -> Result<(), Failure> { self.attempt.result }
     pub fn owner_failure(&self) -> Option<Error> { self.owner_failure }
     pub fn charged(&self) -> Charge { self.attempt.charge }
+    /// Partial rows are diagnostics, never a complete admitted generator.
+    pub fn retained(&self) -> (&Polynomial, &Polynomial, Stage, usize, usize) {
+        (&self.attempt.partial, &self.attempt.scratch, self.attempt.stage, self.attempt.row, self.attempt.literal)
+    }
 }
 
 /// Distinct checked-domain encoding; never substitutes raw-domain generators.

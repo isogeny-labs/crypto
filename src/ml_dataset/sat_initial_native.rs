@@ -122,6 +122,7 @@ struct BatchAck {
     position: capture::CommittedEventPosition,
 }
 struct CaptureState {
+    search: Option<checkpoint::search::SearchCapture>,
     budget: Budget,
     sink: capture::CaptureEmitter,
     limits: capture::CaptureLimits,
@@ -202,6 +203,23 @@ fn publish<T: Serialize + ?Sized>(
     cap: usize,
     payload: &T,
 ) -> Result<Publication, Stop> {
+    publish_kind(
+        capture::TypedEventKind::BinarySatInitial,
+        budget,
+        sink,
+        buffer,
+        cap,
+        payload,
+    )
+}
+fn publish_kind<T: Serialize + ?Sized>(
+    kind: capture::TypedEventKind,
+    budget: &mut Budget,
+    sink: &mut capture::CaptureEmitter,
+    buffer: &mut capture::TypedEventBuffer,
+    cap: usize,
+    payload: &T,
+) -> Result<Publication, Stop> {
     let mut count = Count {
         budget,
         len: 0,
@@ -214,7 +232,7 @@ fn publish<T: Serialize + ?Sized>(
     let next = before.event_count.checked_add(1).ok_or(Stop::Overflow)?;
     let ledger = RefCell::new(budget);
     let result = sink.event_typed_admit_encoding_with_limit(
-        capture::TypedEventKind::BinarySatInitial,
+        kind,
         payload,
         buffer,
         cap,
@@ -317,6 +335,9 @@ impl CaptureState {
         }
     }
     fn on_event_inner(&mut self, event: &SolverEvent) -> Result<(), Stop> {
+        if self.search.is_some() {
+            return checkpoint::search::on_event(self, event);
+        }
         if self.closed || self.pending.is_some() || self.events.len() >= self.event_limit {
             return Err(Stop::Events);
         }
@@ -450,6 +471,7 @@ impl<'a> NativeInitial<'a> {
             capture_limits,
         } = owner;
         let shared = Arc::new(Mutex::new(CaptureState {
+            search: None,
             budget,
             sink,
             limits: capture_limits,
@@ -748,6 +770,7 @@ mod tests {
             .unwrap();
         let cap = limits.max_event_bytes;
         let shared = Arc::new(Mutex::new(CaptureState {
+            search: None,
             budget,
             sink,
             limits,

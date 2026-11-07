@@ -535,6 +535,7 @@ mod tests {
         }
         fn args(&self) -> DatasetArgs {
             DatasetArgs {
+                search_replay_policy:None,search_replay_receipt:None,
                 affine_replay_policy:None,affine_replay_receipt:None,
                 sat_replay_policy: Some(self.policy.clone()),
                 sat_replay_receipt: Some(self.receipt.clone()),
