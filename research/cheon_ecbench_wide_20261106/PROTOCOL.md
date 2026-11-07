@@ -200,3 +200,37 @@ container no longer had:
 the study stops at the last size that completed in both families. It reports
 that size range, and amends again before any fit. No size is dropped after
 its results are seen.
+
+## Amendment 3 (2026-11-07): cap at 56 bits
+
+The host was replaced at about 05:40Z, and its local disk went with it. The
+chunk sessions completed between 04:18Z and 05:40Z had not been pushed, so
+they are lost:
+- `minus-b40` to `minus-b54`, except `minus-b54`'s 1-record interrupted
+  start, which was pushed;
+- `plus-b38` to `plus-b54`.
+
+Their counts were never read for any analysis.
+
+Compute here only advances while a session turn is active, and the 60- and
+62-bit chunks need 2 to 4 hours each. With the owner's agreement, before any
+further data, the study is capped at **36 to 56 bits in 2-bit steps (11 sizes
+per family)**:
+- the 58, 60 and 62-bit curves stay in `curves.json` and their chunk specs
+  stay in `chunks/`, but they are not run;
+- the fits in `fit.sh` use the 11 sizes 36 to 56;
+- everything else is as frozen: targets, arms, seeds, analysis, the P3
+  decision rule and the predictions, which stand as written for the narrower
+  range.
+
+**Expected effect.** The narrower range widens the exponent intervals. Before
+any data, the planning estimate for rho is about ±0.05 with 24 targets over 11
+sizes, against about ±0.034 over 14 sizes. P3 may therefore not separate where
+the 14-size design would have.
+
+**Pushing.** Chunks are pushed as soon as each is audited, so a host loss
+costs at most the chunks in progress. A chunk lost before it was pushed is
+listed in the report and run again.
+
+The interrupted starts `minus-b54` and the two pairs of whole-spec sessions
+are kept as before.
