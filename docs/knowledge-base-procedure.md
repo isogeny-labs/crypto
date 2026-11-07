@@ -46,4 +46,8 @@ Record `KB unavailable: <why>` and fall back to the lead atlas
 (`crypto-autoresearcher:knowledge/leads/ecdlp/`) and a file search; say which
 repositories you searched.
 
+The session-start hook now checks for the shared catalog. When it is absent it
+prints that fallback and the receipt to write, instead of asking for a query
+that cannot run.
+
 The binding shared rule is `crypto-autoresearcher:docs/lab-contract.md` §11.

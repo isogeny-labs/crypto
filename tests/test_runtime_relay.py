@@ -75,11 +75,22 @@ def test_claude_turn_snapshot_then_budget_failure(repo, tmp_path):
     assert json.loads(hops[-1])["to"] == "codex"
 
 
-def test_session_start_always_reminds_about_the_kb(repo):
+def test_session_start_reminds_about_the_kb_and_its_fallback(repo, tmp_path):
     start = {"hook_event_name": "SessionStart", "session_id": "s1", "cwd": str(repo)}
-    out = relay(repo, "--runtime", "codex", "session-start", stdin=json.dumps(start)).stdout
-    assert "Research KB" in out
-    out = relay(repo, "--runtime", "claude", "session-start", stdin=json.dumps(start)).stdout
+    missing = tmp_path / "no-catalog"
+    out = relay(repo, "--runtime", "codex", "session-start", stdin=json.dumps(start),
+                env={"RESEARCH_KB_HOME": str(missing)}).stdout
+    assert "unavailable" in out and "KB unavailable" in out
+
+    home = tmp_path / "kbdata"
+    home.mkdir()
+    (home / "catalog.sqlite").write_text("")
+    out = relay(repo, "--runtime", "codex", "session-start", stdin=json.dumps(start),
+                env={"RESEARCH_KB_HOME": str(home)}).stdout
+    assert "query it" in out and "unavailable" not in out
+
+    out = relay(repo, "--runtime", "claude", "session-start", stdin=json.dumps(start),
+                env={"RESEARCH_KB_HOME": str(home)}).stdout
     payload = json.loads(out)
     assert "Research KB" in payload["hookSpecificOutput"]["additionalContext"]
 

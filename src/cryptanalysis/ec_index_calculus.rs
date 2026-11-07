@@ -844,6 +844,57 @@ pub fn build_factor_base(curve: &CurveParams, target_size: usize) -> Vec<FactorB
     out
 }
 
+/// Cofactor-projected factor base: for each small-x point `F` of the curve
+/// the entry is `[h]F`, which lies in the prime-order subgroup `<G>` (for
+/// `gcd(h, n) = 1`).  Every sum or difference of two entries then lies in
+/// `<G>`, so a target `R ∈ <G>` can decompose over every pair rather than
+/// the `1/h` of pairs whose torsion components cancel.  Entries are keyed by
+/// the x-coordinate of `[h]F`, canonicalised by the smaller y.  Points with
+/// `[h]F = O` are skipped.  Opt-in; [`build_factor_base`] is unchanged.
+pub fn build_factor_base_projected(
+    curve: &CurveParams,
+    target_size: usize,
+) -> Vec<FactorBaseEntry> {
+    let mut out: Vec<FactorBaseEntry> = Vec::with_capacity(target_size);
+    let mut seen = std::collections::HashSet::new();
+    let a_fe = curve.a_fe();
+    let h = BigUint::from(curve.h);
+    let mut x = BigUint::one();
+    while out.len() < target_size && x < curve.p {
+        let xf = curve.fe(x.clone());
+        let rhs_value = xf
+            .mul(&xf)
+            .mul(&xf)
+            .add(&curve.a_fe().mul(&xf))
+            .add(&curve.fe(curve.b.clone()))
+            .value;
+        if let Some(y) = sqrt_mod_p(&rhs_value, &curve.p) {
+            let f = Point::Affine {
+                x: xf,
+                y: curve.fe(y),
+            };
+            if let Point::Affine { x: px, y: py } = f.scalar_mul(&h, &a_fe) {
+                if seen.insert(px.value.clone()) {
+                    let y_canon = if &py.value * &BigUint::from(2u32) < curve.p {
+                        py.value.clone()
+                    } else {
+                        &curve.p - &py.value
+                    };
+                    out.push(FactorBaseEntry {
+                        idx: out.len(),
+                        point: Point::Affine {
+                            x: px,
+                            y: curve.fe(y_canon),
+                        },
+                    });
+                }
+            }
+        }
+        x += BigUint::one();
+    }
+    out
+}
+
 // ── Relation finding ────────────────────────────────────────────────────
 
 /// One row of the index-calculus linear system.
@@ -1588,6 +1639,7 @@ pub fn ec_index_calculus_dlp_staged(
         extra_relations,
         max_trials_per_relation,
         max_relation_attempts,
+        false,
         &mut rng,
     )
 }
@@ -1614,8 +1666,122 @@ pub fn ec_index_calculus_dlp_staged_seeded(
         extra_relations,
         max_trials_per_relation,
         max_relation_attempts,
+        false,
         &mut rng,
     )
+}
+
+/// Seeded staged pipeline over the cofactor-projected factor base
+/// ([`build_factor_base_projected`]); otherwise identical to
+/// [`ec_index_calculus_dlp_staged_seeded`].
+pub fn ec_index_calculus_dlp_staged_seeded_projected(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    fb_size: usize,
+    extra_relations: usize,
+    max_trials_per_relation: usize,
+    max_relation_attempts: usize,
+    seed: u64,
+) -> Option<(BigUint, EcIcStageReport)> {
+    use rand::SeedableRng;
+    let mut rng = rand::rngs::StdRng::seed_from_u64(seed);
+    ec_index_calculus_dlp_staged_with_rng(
+        curve,
+        g,
+        q,
+        fb_size,
+        extra_relations,
+        max_trials_per_relation,
+        max_relation_attempts,
+        true,
+        &mut rng,
+    )
+}
+
+/// Pair-sum table for 2-decomposition: maps the affine point `±F_i ± F_j`
+/// (`i <= j`) to `(i, s_i, j, s_j)`.  Built once per solve, so a relation
+/// trial is one hash lookup instead of a square-root sweep over the factor
+/// base.  Experimental (`IC_SUM_TABLE=1`); the default sweep is unchanged.
+type PairSumTable = std::collections::HashMap<(BigUint, BigUint), (usize, i64, usize, i64)>;
+
+fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> PairSumTable {
+    let a_fe = curve.a_fe();
+    let mut table = PairSumTable::with_capacity(factor_base.len() * factor_base.len() * 2);
+    for (i, fi) in factor_base.iter().enumerate() {
+        for (j, fj) in factor_base.iter().enumerate().skip(i) {
+            for s_i in [1i64, -1i64] {
+                for s_j in [1i64, -1i64] {
+                    let pi = if s_i > 0 {
+                        fi.point.clone()
+                    } else {
+                        fi.point.neg()
+                    };
+                    let pj = if s_j > 0 {
+                        fj.point.clone()
+                    } else {
+                        fj.point.neg()
+                    };
+                    if let Point::Affine { x, y } = pi.add(&pj, &a_fe) {
+                        table
+                            .entry((x.value.clone(), y.value.clone()))
+                            .or_insert((i, s_i, j, s_j));
+                    }
+                }
+            }
+        }
+    }
+    table
+}
+
+/// Same sampling as [`find_one_relation_counted_with_rng`] (one trial = one
+/// random `R = aG + bQ`), but the decomposition test is a table lookup.
+fn find_one_relation_table_with_rng<R: rand::RngCore>(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    table: &PairSumTable,
+    max_trials: usize,
+    rng: &mut R,
+) -> Option<(Relation, usize)> {
+    use num_bigint::RandBigInt;
+    let a_fe = curve.a_fe();
+    for trial in 1..=max_trials {
+        let mut sample_nonzero = || loop {
+            let value = rng.gen_biguint_below(&curve.n);
+            if !value.is_zero() {
+                break value;
+            }
+        };
+        let a = sample_nonzero();
+        let b = sample_nonzero();
+        let r = g.scalar_mul(&a, &a_fe).add(&q.scalar_mul(&b, &a_fe), &a_fe);
+        let key = match &r {
+            Point::Affine { x, y } => (x.value.clone(), y.value.clone()),
+            Point::Infinity => continue,
+        };
+        if let Some(&(i, s_i, j, s_j)) = table.get(&key) {
+            let mut entries = Vec::new();
+            if i == j {
+                let combined = s_i + s_j;
+                if combined != 0 {
+                    entries.push((i, combined));
+                }
+            } else {
+                entries.push((i, s_i));
+                entries.push((j, s_j));
+            }
+            return Some((
+                Relation {
+                    coef_a: a,
+                    coef_b: b,
+                    entries,
+                },
+                trial,
+            ));
+        }
+    }
+    None
 }
 
 fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
@@ -1626,13 +1792,18 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     extra_relations: usize,
     max_trials_per_relation: usize,
     max_relation_attempts: usize,
+    project_cofactor: bool,
     rng: &mut R,
 ) -> Option<(BigUint, EcIcStageReport)> {
     use std::time::Instant;
     let total_started = Instant::now();
 
     let fb_started = Instant::now();
-    let fb = build_factor_base(curve, fb_size);
+    let fb = if project_cofactor {
+        build_factor_base_projected(curve, fb_size)
+    } else {
+        build_factor_base(curve, fb_size)
+    };
     let factor_base_ms = fb_started.elapsed().as_secs_f64() * 1e3;
     if fb.is_empty() {
         return None;
@@ -1640,6 +1811,13 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     let target = fb.len() + extra_relations;
 
     let relations_started = Instant::now();
+    // Experimental: IC_SUM_TABLE=1 swaps the per-trial sweep for a pair-sum table lookup.
+    // Table construction is charged to the relation-collection stage.
+    let sum_table = if std::env::var("IC_SUM_TABLE").as_deref() == Ok("1") {
+        Some(build_pair_sum_table(curve, &fb))
+    } else {
+        None
+    };
     let mut relations = Vec::with_capacity(target);
     let mut attempts_exhausted = 0usize;
     let mut trials_per_relation: Vec<usize> = Vec::with_capacity(target);
@@ -1648,14 +1826,25 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
         let mut failed_trials = 0usize;
         let found = 'attempt: {
             for _ in 0..max_relation_attempts {
-                if let Some(found) = find_one_relation_counted_with_rng(
-                    curve,
-                    g,
-                    q,
-                    &fb,
-                    max_trials_per_relation,
-                    rng,
-                ) {
+                let attempt = match &sum_table {
+                    Some(t) => find_one_relation_table_with_rng(
+                        curve,
+                        g,
+                        q,
+                        t,
+                        max_trials_per_relation,
+                        rng,
+                    ),
+                    None => find_one_relation_counted_with_rng(
+                        curve,
+                        g,
+                        q,
+                        &fb,
+                        max_trials_per_relation,
+                        rng,
+                    ),
+                };
+                if let Some(found) = attempt {
                     break 'attempt Some(found);
                 }
                 attempts_exhausted += 1;
