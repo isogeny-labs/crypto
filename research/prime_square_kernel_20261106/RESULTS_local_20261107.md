@@ -130,3 +130,10 @@ analyzer, reruns its fixed units, recomputes the complete census and compares
 its summary/per-level table with the retained results. This does not launch
 a third panel invocation. Signed independent replay is still outstanding.
 [pcc:unverified]
+
+The repository artifact service migrated the three larger XZ metadata archives
+to content-addressed storage. Their .artifacts.json manifests retain exact
+hashes/byte counts, matched against the retained local payloads. Raw CSV gzip
+archives and the saved-data verifier remain in Git. Hydrate the larger exports
+with the repository's maintained artifact-pull tool when inspecting them from
+a fresh checkout; the original data and recorded validation failures are intact.
