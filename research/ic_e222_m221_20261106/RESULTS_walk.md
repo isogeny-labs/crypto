@@ -31,3 +31,18 @@ Dw beat D in 120/120 pairs on the solver timer and 114/120 at process level; Dw 
 
 ## Independent validation (2026-11-07)
 `results/walk/VALIDATOR_REPORT.md`: frozen-before-eval order confirmed (frozen.json 02:39:17Z, rows.jsonl 02:40:25Z); all 360 rows replayed with 0 mismatches in scalar, trials and relations (solver time 0.94 to 0.97 of recorded, process time 0.74 to 0.84); the 60 evaluation instances are valid and disjoint from every earlier panel; the walk keeps r = aG + bQ (independent Python emulation, 0 violations), cannot return a wrong verified log, and leaves the default path unchanged; the walk's and sweep's frozen fb are within 1% of the optimum of a finer grid. Gaps it lists: the headline compares against an arm added by the producer (the hoisted sweep) and the file has no unmodified-baseline row, rho row or counted-operation unit; the pairs are instances x 2 seeds; the rows do not store scalars or a binary hash.
+
+## Re-measurement against the moved baseline (post-merge binary, same frozen settings)
+
+After this branch was merged with `main` (2026-11-07, 05:12Z) the relation point of the sweep and, evidently, the point arithmetic had become faster (another session's work: `relation_point` defaulting to one interleaved word-Jacobian pass, `Point::double_scalar_mul_vartime`; see `RESULTS_shamir.md` on main). The strongest implemented baseline therefore moved. `ic` was rebuilt from the merged tree and `run_walk.py eval` was rerun with **identical frozen settings (Eh fb 256, D fb 48, Dw fb 16), instances (v5 idx 10 to 29) and seeds** (`results/walk_postmerge/`, 360 runs, all 360 recovered, no timeouts; `analysis.txt`). The frozen settings were not re-tuned for the new arithmetic.
+
+| ratio (120 pairs) | before the merge: solver / process | after the merge: solver / process |
+|---|---|---|
+| Eh (best hoisted sweep) absolute | 26.9 ms / 50.5 ms | 24.8 ms / 51.1 ms |
+| D (table) absolute | 13.9 ms / 37.8 ms | 6.2 ms / 30.4 ms |
+| Dw (table + walk) absolute | 3.3 ms / 27.1 ms | 3.7 ms / 28.6 ms |
+| D / Eh | 0.494 [0.459, 0.526] / 0.718 | 0.260 [0.218, 0.299] / 0.593 [0.534, 0.649] |
+| Dw / D | 0.249 [0.235, 0.259] / 0.720 | 0.587 [0.541, 0.659] / 0.937 [0.908, 0.959] |
+| **Dw / Eh** | 0.124 [0.110, 0.132] / 0.520 | **0.152 [0.131, 0.170] / 0.537 [0.487, 0.600]** |
+
+**Reading.** The headline against the best hoisted sweep survives the move of the baseline: 0.152x of its solver time and 0.537x of its process time (about 6.6x and 1.9x). But the decomposition changed: the faster point arithmetic helps the table (whose cost is point additions and the two scalar multiplications per trial) far more than the sweep (whose cost is square roots), so the table alone is now 0.26x of the sweep, and the walk's extra gain over the table fell from 4x to 1.7x in solver time and to 6% end to end. The walk's advantage was largely the cost of scalar multiplications that the new arithmetic made cheap; in counted group operations nothing changed. This post-merge panel has not been independently replayed (the validator replayed the pre-merge binary).
