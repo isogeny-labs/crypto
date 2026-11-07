@@ -48,19 +48,24 @@ pub fn build(c: &Curve, g: (u64, u64), q: (u64, u64), n: u64, nprime: usize, rng
     let f = &c.f;
     let l = 3 * nprime;
     assert!(n as usize > 2 * l + 2 || n > 1_000_000);
-    let mut used = std::collections::HashSet::new();
+    // 2l distinct scalars AND distinct points (papers: "distinct points P_i and Q_j"); a P/Q point
+    // coincidence would be an accidental solve that the papers ignore, so it is redrawn, not used.
+    let mut seen = std::collections::HashSet::new();
     let mut np = vec![0u64; l]; let mut nq = vec![0u64; l];
     let mut m1 = vec![0u64; l * l]; let mut m2 = vec![0u64; l * l];
     for j in 0..l {
-        loop { let s = 1 + rng.below(n - 1); if used.insert(s) { np[j] = s; break; } }
-        let pt = c.mul_scalar(np[j], Some(g))?;
-        rr_row(f, pt.0, pt.1, l, &mut m1[j * l..(j + 1) * l]);
+        loop {
+            let s = 1 + rng.below(n - 1);
+            let pt = c.mul_scalar(s, Some(g))?;
+            if seen.insert(pt) { np[j] = s; rr_row(f, pt.0, pt.1, l, &mut m1[j * l..(j + 1) * l]); break; }
+        }
     }
-    let mut usedq = std::collections::HashSet::new();
     for i in 0..l {
-        loop { let s = 1 + rng.below(n - 1); if usedq.insert(s) { nq[i] = s; break; } }
-        let pt = c.neg(c.mul_scalar(nq[i], Some(q)))?;
-        rr_row(f, pt.0, pt.1, l, &mut m2[i * l..(i + 1) * l]);
+        loop {
+            let s = 1 + rng.below(n - 1);
+            let pt = c.neg(c.mul_scalar(s, Some(q)))?;
+            if seen.insert(pt) { nq[i] = s; rr_row(f, pt.0, pt.1, l, &mut m2[i * l..(i + 1) * l]); break; }
+        }
     }
     // Solve M1^T Z = M2^T  (Z = C^T) by Gauss-Jordan on [M1^T | M2^T], l x 2l.
     let w = 2 * l;
