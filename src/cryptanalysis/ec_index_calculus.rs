@@ -1813,9 +1813,13 @@ struct SampleWalk {
     a: BigUint,
     b: BigUint,
     arms: Vec<(Point, BigUint, BigUint)>,
+    steps: usize,
 }
 
 const WALK_ARMS: usize = 32;
+/// A walk whose step depends only on x enters a cycle after about sqrt(n) steps, so it is
+/// restarted from fresh random coefficients every `WALK_RESTART` steps.
+const WALK_RESTART: usize = 32;
 
 impl SampleWalk {
     fn new<R: rand::RngCore>(curve: &CurveParams, g: &Point, q: &Point, rng: &mut R) -> Self {
@@ -1835,11 +1839,40 @@ impl SampleWalk {
         }
         let (a, b) = (nonzero(rng), nonzero(rng));
         let r = g.scalar_mul(&a, &a_fe).add(&q.scalar_mul(&b, &a_fe), &a_fe);
-        SampleWalk { r, a, b, arms }
+        SampleWalk {
+            r,
+            a,
+            b,
+            arms,
+            steps: 0,
+        }
+    }
+
+    fn restart<R: rand::RngCore>(
+        &mut self,
+        curve: &CurveParams,
+        g: &Point,
+        q: &Point,
+        rng: &mut R,
+    ) {
+        use num_bigint::RandBigInt;
+        let a_fe = curve.a_fe();
+        let mut nonzero = |rng: &mut R| loop {
+            let v = rng.gen_biguint_below(&curve.n);
+            if !v.is_zero() {
+                break v;
+            }
+        };
+        let (a, b) = (nonzero(rng), nonzero(rng));
+        self.r = g.scalar_mul(&a, &a_fe).add(&q.scalar_mul(&b, &a_fe), &a_fe);
+        self.a = a;
+        self.b = b;
+        self.steps = 0;
     }
 
     fn step(&mut self, curve: &CurveParams) {
         let a_fe = curve.a_fe();
+        self.steps += 1;
         let k = match &self.r {
             Point::Affine { x, .. } => {
                 (x.value.iter_u64_digits().next().unwrap_or(0) as usize) % WALK_ARMS
@@ -1854,13 +1887,19 @@ impl SampleWalk {
 }
 
 /// Table lookup on an r-adding walk instead of fresh random (a, b).
-fn find_one_relation_table_walk(
+fn find_one_relation_table_walk<R: rand::RngCore>(
     curve: &CurveParams,
+    g: &Point,
+    q: &Point,
     table: &PairSumTable,
     walk: &mut SampleWalk,
     max_trials: usize,
+    rng: &mut R,
 ) -> Option<(Relation, usize)> {
     for trial in 1..=max_trials {
+        if walk.steps >= WALK_RESTART || matches!(walk.r, Point::Infinity) {
+            walk.restart(curve, g, q, rng);
+        }
         walk.step(curve);
         let key = match &walk.r {
             Point::Affine { x, y } => (x.value.clone(), y.value.clone()),
@@ -1947,9 +1986,12 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
                 let attempt = match &sum_table {
                     Some(t) if walk.is_some() => find_one_relation_table_walk(
                         curve,
+                        g,
+                        q,
                         t,
                         walk.as_mut().expect("walk checked"),
                         max_trials_per_relation,
+                        rng,
                     ),
                     Some(t) => find_one_relation_table_with_rng(
                         curve,

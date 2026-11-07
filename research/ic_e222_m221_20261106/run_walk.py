@@ -16,7 +16,10 @@ def run(f,d,seed,arm,fb,t):
     for k in ("IC_SUM_TABLE","IC_HOIST_SWEEP"): env.pop(k,None)
     env.update(ENV[arm])
     t0=time.perf_counter()
-    r=subprocess.run([ic,"--json","solve-prime-file","--input",t,"--seed",str(seed),"--fb-size",str(fb),"--extra-relations",str(EXTRA[arm]),"--rho-steps","0","--max-trials-per-relation","200000","--max-relation-attempts","512"],capture_output=True,text=True,env=env)
+    try:
+        r=subprocess.run([ic,"--json","solve-prime-file","--input",t,"--seed",str(seed),"--fb-size",str(fb),"--extra-relations",str(EXTRA[arm]),"--rho-steps","0","--max-trials-per-relation","200000","--max-relation-attempts","512"],capture_output=True,text=True,env=env,timeout=120)
+    except subprocess.TimeoutExpired:
+        r=subprocess.CompletedProcess([],1,"","timeout")
     wall=(time.perf_counter()-t0)*1e3
     try:o=json.loads(r.stdout)
     except Exception:o={}
