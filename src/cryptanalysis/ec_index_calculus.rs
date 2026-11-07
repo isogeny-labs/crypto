@@ -1777,26 +1777,24 @@ type PairSumTable = std::collections::HashMap<(BigUint, BigUint), (usize, i64, u
 fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> PairSumTable {
     let a_fe = curve.a_fe();
     let mut table = PairSumTable::with_capacity(factor_base.len() * factor_base.len() * 2);
+    let mut put = |pt: &Point, key: (usize, i64, usize, i64)| {
+        if let Point::Affine { x, y } = pt {
+            table
+                .entry((x.value.clone(), y.value.clone()))
+                .or_insert(key);
+        }
+    };
+    // Negation is free on a curve: -(F_i + F_j) = (-F_i) + (-F_j) and -(F_i - F_j) = (-F_i) + F_j, so two
+    // (variable-time) additions per pair give all four sign combinations.
     for (i, fi) in factor_base.iter().enumerate() {
         for (j, fj) in factor_base.iter().enumerate().skip(i) {
-            for s_i in [1i64, -1i64] {
-                for s_j in [1i64, -1i64] {
-                    let pi = if s_i > 0 {
-                        fi.point.clone()
-                    } else {
-                        fi.point.neg()
-                    };
-                    let pj = if s_j > 0 {
-                        fj.point.clone()
-                    } else {
-                        fj.point.neg()
-                    };
-                    if let Point::Affine { x, y } = pi.add(&pj, &a_fe) {
-                        table
-                            .entry((x.value.clone(), y.value.clone()))
-                            .or_insert((i, s_i, j, s_j));
-                    }
-                }
+            let sum = fi.point.add_vartime(&fj.point, &a_fe);
+            put(&sum, (i, 1, j, 1));
+            put(&sum.neg_vartime(), (i, -1, j, -1));
+            if i != j {
+                let dif = fi.point.add_vartime(&fj.point.neg_vartime(), &a_fe);
+                put(&dif, (i, 1, j, -1));
+                put(&dif.neg_vartime(), (i, -1, j, 1));
             }
         }
     }
@@ -1882,11 +1880,11 @@ impl SampleWalk {
         let mut arms = Vec::with_capacity(WALK_ARMS);
         for _ in 0..WALK_ARMS {
             let (a, b) = (nonzero(rng), nonzero(rng));
-            let pt = g.scalar_mul(&a, &a_fe).add(&q.scalar_mul(&b, &a_fe), &a_fe);
+            let pt = relation_point(g, &a, q, &b, &a_fe);
             arms.push((pt, a, b));
         }
         let (a, b) = (nonzero(rng), nonzero(rng));
-        let r = g.scalar_mul(&a, &a_fe).add(&q.scalar_mul(&b, &a_fe), &a_fe);
+        let r = relation_point(g, &a, q, &b, &a_fe);
         SampleWalk {
             r,
             a,
@@ -1912,7 +1910,7 @@ impl SampleWalk {
             }
         };
         let (a, b) = (nonzero(rng), nonzero(rng));
-        self.r = g.scalar_mul(&a, &a_fe).add(&q.scalar_mul(&b, &a_fe), &a_fe);
+        self.r = relation_point(g, &a, q, &b, &a_fe);
         self.a = a;
         self.b = b;
         self.steps = 0;
@@ -1928,7 +1926,7 @@ impl SampleWalk {
             Point::Infinity => 0,
         };
         let (pt, ak, bk) = &self.arms[k];
-        self.r = self.r.add(pt, &a_fe);
+        self.r = self.r.add_vartime(pt, &a_fe);
         self.a = (&self.a + ak) % &curve.n;
         self.b = (&self.b + bk) % &curve.n;
     }
