@@ -10,8 +10,6 @@ Headline unit: `S` (group operations / sqrt(n); the ECDLP cost unit, every phase
 
 | problem | metric | unit | first | latest | gain vs first | gain vs previous | value/ref (kind) | points |
 |:--|:--|:--|--:|--:|--:|--:|--:|--:|
-| archive:ic-packed-filter-p32-20261029 | s_prime_dgbf_w0_p32 | S | 31.6936 | 31.6936 | 0% | –% | 31.4718 (matched_rho) | 1 |
-| archive:ic-packed-filter-p32-20261029 | s_prime_dgbf_w1_p32 | S | 63.4961 | 63.4961 | 0% | –% | 31.6255 (matched_rho) | 1 |
 | dlpwai:static-dh-p224-shape | s_w0_cheon_pminus1_comb | S | 0.5739 | 0.5739 | 0% | 0% | 0.5814 (matched_rho) | 2 |
 | dlpwai:static-dh-p224-shape | s_w0_cheon_pminus1_naive | S | 12.2426 | 12.2426 | 0% | 0% | 11.6066 (matched_rho) | 2 |
 | dlpwai:static-dh-p224-shape | s_w0_cheon_pplus1_comb | S | 0.5819 | 0.5819 | 0% | 0% | 0.5746 (matched_rho) | 2 |
@@ -51,11 +49,6 @@ Headline unit: `S` (group operations / sqrt(n); the ECDLP cost unit, every phase
 | analysis:ecbench_statistics_v2 | censored_ratio_lower_bound_ic_sub6_mitm | ratio | 648.2 | 648.2 | –% | –% | – | 1 |
 | analysis:ecbench_statistics_v2 | heavy_tail_rows_flagged_n4_before_fix | count | 71 | 71 | –% | –% | – | 1 |
 | analysis:ecbench_statistics_v2 | ops_interval_width_k2_new_over_old | ratio | 13.1 | 13.1 | –% | –% | – | 1 |
-| archive:ic-packed-filter-p32-20261029 | wall_per_gae_filtered_over_unfiltered_p32 | ratio | 0.9601 | 0.9601 | 0% | –% | – | 1 |
-| archive:icb-large-prime-n53-s1-20261029 | reported_native_records_written | count | 240 | 240 | –% | –% | – | 1 |
-| archive:icb-large-prime-n53-s2-20261029 | reported_native_records_written | count | 240 | 240 | –% | –% | – | 1 |
-| archive:icb-large-prime-n61-s1-20261029 | reported_native_records_written | count | 72 | 72 | –% | –% | – | 1 |
-| archive:icb-large-prime-n61-s2-20261029 | reported_native_records_written | count | 60 | 60 | –% | –% | – | 1 |
 | ic:curve25519-family-k20-32 | ratio_w0_k24 | ratio | 0.9375 | 0.9375 | 0% | –% | – | 1 |
 | ic:curve25519-family-k20-32 | ratio_w0_k32 | ratio | 0.8802 | 0.8802 | 0% | –% | – | 1 |
 | ic:curve25519-family-k24-32 | ratio_w0_k32 | ratio | 0.9106 | 0.9106 | 0% | –% | – | 1 |
@@ -65,10 +58,6 @@ Headline unit: `S` (group operations / sqrt(n); the ECDLP cost unit, every phase
 | ic:curve25519-k24-single-target | ratio_f2_over_f1_w01 | ratio | 1.1475 | 1.1475 | -0% | –% | – | 1 |
 | ic:curve25519-k24-single-target | ratio_f2_over_f1_w0 | ratio | 1.1636 | 1.1636 | -0% | –% | – | 1 |
 | ic:curve25519-k24-single-target | ratio_f2_over_f1_w1 | ratio | 1.0384 | 1.0384 | -0% | –% | – | 1 |
-| kernel:f6_ic_gate | f4_control_word_xors_off_over_on | ratio | 1 | 1 | –% | –% | – | 1 |
-| kernel:f6_ic_gate | f6ic_cpu_off_over_on_max | ratio | 10.29 | 10.29 | -0% | –% | – | 1 |
-| kernel:f6_ic_gate | f6ic_cpu_off_over_on_min | ratio | 2.67 | 2.67 | -0% | –% | – | 1 |
-| kernel:f6_ic_gate | f6ic_word_xors_off_over_on_min | ratio | 1.84 | 1.84 | -0% | –% | – | 1 |
 | kernel:inherited_f4_solve_tree | wall_seq_over_par_decomposing_min | ratio | 0.936 | 0.936 | -0% | –% | – | 1 |
 | kernel:inherited_f4_solve_tree | wall_seq_over_par_refuting_max | ratio | 2.883 | 2.883 | -0% | –% | – | 1 |
 | kernel:inherited_f4_solve_tree | wall_seq_over_par_refuting_min | ratio | 1.589 | 1.589 | -0% | –% | – | 1 |
@@ -99,48 +88,6 @@ Headline unit: `S` (group operations / sqrt(n); the ECDLP cost unit, every phase
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
 | 2026-11-05 | `20261105T1854Z-ecbench-statistics-v2` | `18bbecb9d758` | 13.1 | 1 | – | –% | – | ecbench statistics v1 vs v2 on 5 committed sessions (14 comparisons): censoring dominates (6.98 -> >=648.2), K=2 interva |
-
-### archive:ic-packed-filter-p32-20261029 · s_prime_dgbf_w0_p32 [S]
-
-| date | record | commit | value | n | spread | gain vs first | value/ref | summary |
-|:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-05 | `20261105T1759Z-ic-packed-filter-p32` | `827361301c47` | 31.6936 | – | – | 0% | 31.4718 | Retrospective index of the 2026-10-29 packed-filter P32 sessions (EKS c8a.2xlarge, L2); single session, not replicated.  |
-
-### archive:ic-packed-filter-p32-20261029 · s_prime_dgbf_w1_p32 [S]
-
-| date | record | commit | value | n | spread | gain vs first | value/ref | summary |
-|:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-05 | `20261105T1759Z-ic-packed-filter-p32` | `827361301c47` | 63.4961 | – | – | 0% | 31.6255 | Retrospective index of the 2026-10-29 packed-filter P32 sessions (EKS c8a.2xlarge, L2); single session, not replicated.  |
-
-### archive:ic-packed-filter-p32-20261029 · wall_per_gae_filtered_over_unfiltered_p32 [ratio]
-
-| date | record | commit | value | n | spread | gain vs first | value/ref | summary |
-|:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-05 | `20261105T1759Z-ic-packed-filter-p32` | `827361301c47` | 0.9601 | 288 | 0.9569–0.9633 | 0% | – | Retrospective index of the 2026-10-29 packed-filter P32 sessions (EKS c8a.2xlarge, L2); single session, not replicated.  |
-
-### archive:icb-large-prime-n53-s1-20261029 · reported_native_records_written [count]
-
-| date | record | commit | value | n | spread | gain vs first | value/ref | summary |
-|:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-05 | `20261105T0828Z-icb-large-prime-n53-s1-archive` | `ecfaa38c1090` | 240 | – | – | –% | – | Retrospective October 29 session index; archive commit is known, executed source commit remains unrecorded. [pcc:unverif |
-
-### archive:icb-large-prime-n53-s2-20261029 · reported_native_records_written [count]
-
-| date | record | commit | value | n | spread | gain vs first | value/ref | summary |
-|:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-05 | `20261105T0828Z-icb-large-prime-n53-s2-archive` | `ecfaa38c1090` | 240 | – | – | –% | – | Retrospective October 29 session index; archive commit is known, executed source commit remains unrecorded. [pcc:unverif |
-
-### archive:icb-large-prime-n61-s1-20261029 · reported_native_records_written [count]
-
-| date | record | commit | value | n | spread | gain vs first | value/ref | summary |
-|:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-05 | `20261105T0828Z-icb-large-prime-n61-s1-archive` | `ecfaa38c1090` | 72 | – | – | –% | – | Retrospective October 29 session index; archive commit is known, executed source commit remains unrecorded. [pcc:unverif |
-
-### archive:icb-large-prime-n61-s2-20261029 · reported_native_records_written [count]
-
-| date | record | commit | value | n | spread | gain vs first | value/ref | summary |
-|:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-05 | `20261105T0828Z-icb-large-prime-n61-s2-archive` | `ecfaa38c1090` | 60 | – | – | –% | – | Retrospective October 29 session index; archive commit is known, executed source commit remains unrecorded. [pcc:unverif |
 
 ### dlpwai:static-dh-p224-shape · s_w0_cheon_pminus1_comb [S]
 
@@ -406,30 +353,6 @@ Headline unit: `S` (group operations / sqrt(n); the ECDLP cost unit, every phase
 |:--|:--|:--|--:|--:|:--|--:|--:|:--|
 | 2026-11-07 | `20261107T1947Z-curve25519-f1-walk-k24` | `a2be660914e8` | 2.4383 | 512 | – | 0% | 1.1058 | k=24 single-target: F=1 wwalk (1-seed base, x=0.7) vs F=2 incumbent and rho-neg, 8 sessions x 64 rounds; see research/cu |
 
-### kernel:f6_ic_gate · f4_control_word_xors_off_over_on [ratio]
-
-| date | record | commit | value | n | spread | gain vs first | value/ref | summary |
-|:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-05 | `20261105T2109Z-f6-few-candidates` | `647818a312a6` | 1 | 9 | – | –% | – | F6-IC few-candidate closure: CPU off/on 2.67-10.29x, word XORs 1.84-10.13x on 9 Koblitz cells, verdicts identical; measu |
-
-### kernel:f6_ic_gate · f6ic_cpu_off_over_on_max [ratio]
-
-| date | record | commit | value | n | spread | gain vs first | value/ref | summary |
-|:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-05 | `20261105T2109Z-f6-few-candidates` | `647818a312a6` | 10.29 | 9 | – | -0% | – | F6-IC few-candidate closure: CPU off/on 2.67-10.29x, word XORs 1.84-10.13x on 9 Koblitz cells, verdicts identical; measu |
-
-### kernel:f6_ic_gate · f6ic_cpu_off_over_on_min [ratio]
-
-| date | record | commit | value | n | spread | gain vs first | value/ref | summary |
-|:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-05 | `20261105T2109Z-f6-few-candidates` | `647818a312a6` | 2.67 | 9 | 1.657–– | -0% | – | F6-IC few-candidate closure: CPU off/on 2.67-10.29x, word XORs 1.84-10.13x on 9 Koblitz cells, verdicts identical; measu |
-
-### kernel:f6_ic_gate · f6ic_word_xors_off_over_on_min [ratio]
-
-| date | record | commit | value | n | spread | gain vs first | value/ref | summary |
-|:--|:--|:--|--:|--:|:--|--:|--:|:--|
-| 2026-11-05 | `20261105T2109Z-f6-few-candidates` | `647818a312a6` | 1.84 | 9 | – | -0% | – | F6-IC few-candidate closure: CPU off/on 2.67-10.29x, word XORs 1.84-10.13x on 9 Koblitz cells, verdicts identical; measu |
-
 ### kernel:inherited_f4_solve_tree · wall_seq_over_par_decomposing_min [ratio]
 
 | date | record | commit | value | n | spread | gain vs first | value/ref | summary |
@@ -491,4 +414,15 @@ Headline unit: `S` (group operations / sqrt(n); the ECDLP cost unit, every phase
 | 2026-11-06 | `20261106T0514Z-rho-frob-brent` | `77948b3c8c6e` | 1.0008 | 96 | 1–1.002 | -0% | – | Brent detection in rho-frob, fully priced: cheaper at n23 (1.09x), n31 (1.47x), n37 (1.07x), dearer at n13 (0.72x), no d |
 
 
-Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.
+Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 6 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.
+
+## Historical records excluded from comparisons
+
+Recorded statuses above are preserved. These records contribute no points or gains.
+
+- `benchmarks/records/20261105T0828Z-icb-large-prime-n53-s1-archive.json` (SHA-256 `cceddc4549b0a35a9acb5ad5001d4dd335ab9d82a70c7cdc945927cfa600f501`): Documentary retrospective commands have no captured successful exit status. Values remain historical quotations; execution provenance is incomplete.
+- `benchmarks/records/20261105T0828Z-icb-large-prime-n53-s2-archive.json` (SHA-256 `d9e4a0ae1abeb33fa6b345b9ec978cbebfaf51e9c3a90af8813d14bc1d1d0663`): Documentary retrospective commands have no captured successful exit status. Values remain historical quotations; execution provenance is incomplete.
+- `benchmarks/records/20261105T0828Z-icb-large-prime-n61-s1-archive.json` (SHA-256 `9867f8eecd4ceeaa2651b84dcec433ac6581e1894368ad97daee45a1720efc25`): Documentary retrospective commands have no captured successful exit status. Values remain historical quotations; execution provenance is incomplete.
+- `benchmarks/records/20261105T0828Z-icb-large-prime-n61-s2-archive.json` (SHA-256 `3e3b9633253ed5fa7f7cdb5965f89e74e747475005aa44dffd27c77dcc93427e`): Documentary retrospective commands have no captured successful exit status. Values remain historical quotations; execution provenance is incomplete.
+- `benchmarks/records/20261105T1759Z-ic-packed-filter-p32.json` (SHA-256 `ee0a6574de82eb3547b0c3b4f2d0a1710addb672df168a3983d84186135f8c86`): Documentary retrospective commands have no captured successful exit status. Values remain historical quotations; execution provenance is incomplete.
+- `benchmarks/records/20261105T2109Z-f6-few-candidates.json` (SHA-256 `a59990f0ea44da3b0baeeb1e966aef480786225bcd040b128616c01040dfa08b`): Incomplete spread endpoints: the historical metric has a lower endpoint and null upper endpoint; it cannot satisfy the finite two-endpoint measurement contract.

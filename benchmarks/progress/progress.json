@@ -1,7 +1,39 @@
 {
   "headline_unit": "S",
+  "integrity_exclusions": [
+    {
+      "reason": "Documentary retrospective commands have no captured successful exit status. Values remain historical quotations; execution provenance is incomplete.",
+      "record": "benchmarks/records/20261105T0828Z-icb-large-prime-n53-s1-archive.json",
+      "sha256": "cceddc4549b0a35a9acb5ad5001d4dd335ab9d82a70c7cdc945927cfa600f501"
+    },
+    {
+      "reason": "Documentary retrospective commands have no captured successful exit status. Values remain historical quotations; execution provenance is incomplete.",
+      "record": "benchmarks/records/20261105T0828Z-icb-large-prime-n53-s2-archive.json",
+      "sha256": "d9e4a0ae1abeb33fa6b345b9ec978cbebfaf51e9c3a90af8813d14bc1d1d0663"
+    },
+    {
+      "reason": "Documentary retrospective commands have no captured successful exit status. Values remain historical quotations; execution provenance is incomplete.",
+      "record": "benchmarks/records/20261105T0828Z-icb-large-prime-n61-s1-archive.json",
+      "sha256": "9867f8eecd4ceeaa2651b84dcec433ac6581e1894368ad97daee45a1720efc25"
+    },
+    {
+      "reason": "Documentary retrospective commands have no captured successful exit status. Values remain historical quotations; execution provenance is incomplete.",
+      "record": "benchmarks/records/20261105T0828Z-icb-large-prime-n61-s2-archive.json",
+      "sha256": "3e3b9633253ed5fa7f7cdb5965f89e74e747475005aa44dffd27c77dcc93427e"
+    },
+    {
+      "reason": "Documentary retrospective commands have no captured successful exit status. Values remain historical quotations; execution provenance is incomplete.",
+      "record": "benchmarks/records/20261105T1759Z-ic-packed-filter-p32.json",
+      "sha256": "ee0a6574de82eb3547b0c3b4f2d0a1710addb672df168a3983d84186135f8c86"
+    },
+    {
+      "reason": "Incomplete spread endpoints: the historical metric has a lower endpoint and null upper endpoint; it cannot satisfy the finite two-endpoint measurement contract.",
+      "record": "benchmarks/records/20261105T2109Z-f6-few-candidates.json",
+      "sha256": "a59990f0ea44da3b0baeeb1e966aef480786225bcd040b128616c01040dfa08b"
+    }
+  ],
   "latest_record": "20261107T1947Z-curve25519-f1-walk-k24",
-  "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
+  "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared. 6 digest-pinned historical measured records are excluded from all series and derived comparisons; recorded status counts retain them. See integrity_exclusions in progress.json and PROGRESS.md for reasons.",
   "records": {
     "censored": 3,
     "invalid": 0,
@@ -82,186 +114,6 @@
       ],
       "problem": "analysis:ecbench_statistics_v2",
       "unit": "ratio"
-    },
-    {
-      "better": "lower",
-      "first": 31.693595555358375,
-      "latest": 31.693595555358375,
-      "latest_derived": {
-        "improvement_vs_first_percent": 0.0,
-        "value_over_reference": 31.47185
-      },
-      "metric": "s_prime_dgbf_w0_p32",
-      "points": [
-        {
-          "commit": "827361301c47",
-          "date": "2026-11-05",
-          "derived": {
-            "improvement_vs_first_percent": 0.0,
-            "value_over_reference": 31.47185
-          },
-          "n": null,
-          "record": "20261105T1759Z-ic-packed-filter-p32",
-          "reference": 1.0070458230707695,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "Retrospective index of the 2026-10-29 packed-filter P32 sessions (EKS c8a.2xlarge, L2); single session, not replicated. [pcc:unverified]",
-          "value": 31.693595555358375
-        }
-      ],
-      "problem": "archive:ic-packed-filter-p32-20261029",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 63.49613790555689,
-      "latest": 63.49613790555689,
-      "latest_derived": {
-        "improvement_vs_first_percent": 0.0,
-        "value_over_reference": 31.625534
-      },
-      "metric": "s_prime_dgbf_w1_p32",
-      "points": [
-        {
-          "commit": "827361301c47",
-          "date": "2026-11-05",
-          "derived": {
-            "improvement_vs_first_percent": 0.0,
-            "value_over_reference": 31.625534
-          },
-          "n": null,
-          "record": "20261105T1759Z-ic-packed-filter-p32",
-          "reference": 2.00774912001418,
-          "reference_kind": "matched_rho",
-          "spread": null,
-          "summary": "Retrospective index of the 2026-10-29 packed-filter P32 sessions (EKS c8a.2xlarge, L2); single session, not replicated. [pcc:unverified]",
-          "value": 63.49613790555689
-        }
-      ],
-      "problem": "archive:ic-packed-filter-p32-20261029",
-      "unit": "S"
-    },
-    {
-      "better": "lower",
-      "first": 0.9601,
-      "latest": 0.9601,
-      "latest_derived": {
-        "improvement_vs_first_percent": 0.0
-      },
-      "metric": "wall_per_gae_filtered_over_unfiltered_p32",
-      "points": [
-        {
-          "commit": "827361301c47",
-          "date": "2026-11-05",
-          "derived": {
-            "improvement_vs_first_percent": 0.0
-          },
-          "n": 288,
-          "record": "20261105T1759Z-ic-packed-filter-p32",
-          "reference": null,
-          "reference_kind": null,
-          "spread": [
-            0.9569,
-            0.9633
-          ],
-          "summary": "Retrospective index of the 2026-10-29 packed-filter P32 sessions (EKS c8a.2xlarge, L2); single session, not replicated. [pcc:unverified]",
-          "value": 0.9601
-        }
-      ],
-      "problem": "archive:ic-packed-filter-p32-20261029",
-      "unit": "ratio"
-    },
-    {
-      "better": "neutral",
-      "first": 240,
-      "latest": 240,
-      "latest_derived": {},
-      "metric": "reported_native_records_written",
-      "points": [
-        {
-          "commit": "ecfaa38c1090",
-          "date": "2026-11-05",
-          "derived": {},
-          "n": null,
-          "record": "20261105T0828Z-icb-large-prime-n53-s1-archive",
-          "reference": null,
-          "reference_kind": null,
-          "spread": null,
-          "summary": "Retrospective October 29 session index; archive commit is known, executed source commit remains unrecorded. [pcc:unverified]",
-          "value": 240
-        }
-      ],
-      "problem": "archive:icb-large-prime-n53-s1-20261029",
-      "unit": "count"
-    },
-    {
-      "better": "neutral",
-      "first": 240,
-      "latest": 240,
-      "latest_derived": {},
-      "metric": "reported_native_records_written",
-      "points": [
-        {
-          "commit": "ecfaa38c1090",
-          "date": "2026-11-05",
-          "derived": {},
-          "n": null,
-          "record": "20261105T0828Z-icb-large-prime-n53-s2-archive",
-          "reference": null,
-          "reference_kind": null,
-          "spread": null,
-          "summary": "Retrospective October 29 session index; archive commit is known, executed source commit remains unrecorded. [pcc:unverified]",
-          "value": 240
-        }
-      ],
-      "problem": "archive:icb-large-prime-n53-s2-20261029",
-      "unit": "count"
-    },
-    {
-      "better": "neutral",
-      "first": 72,
-      "latest": 72,
-      "latest_derived": {},
-      "metric": "reported_native_records_written",
-      "points": [
-        {
-          "commit": "ecfaa38c1090",
-          "date": "2026-11-05",
-          "derived": {},
-          "n": null,
-          "record": "20261105T0828Z-icb-large-prime-n61-s1-archive",
-          "reference": null,
-          "reference_kind": null,
-          "spread": null,
-          "summary": "Retrospective October 29 session index; archive commit is known, executed source commit remains unrecorded. [pcc:unverified]",
-          "value": 72
-        }
-      ],
-      "problem": "archive:icb-large-prime-n61-s1-20261029",
-      "unit": "count"
-    },
-    {
-      "better": "neutral",
-      "first": 60,
-      "latest": 60,
-      "latest_derived": {},
-      "metric": "reported_native_records_written",
-      "points": [
-        {
-          "commit": "ecfaa38c1090",
-          "date": "2026-11-05",
-          "derived": {},
-          "n": null,
-          "record": "20261105T0828Z-icb-large-prime-n61-s2-archive",
-          "reference": null,
-          "reference_kind": null,
-          "spread": null,
-          "summary": "Retrospective October 29 session index; archive commit is known, executed source commit remains unrecorded. [pcc:unverified]",
-          "value": 60
-        }
-      ],
-      "problem": "archive:icb-large-prime-n61-s2-20261029",
-      "unit": "count"
     },
     {
       "better": "lower",
@@ -1845,113 +1697,6 @@
       ],
       "problem": "ic:curve25519-k24-single-target",
       "unit": "S"
-    },
-    {
-      "better": "neutral",
-      "first": 1.0,
-      "latest": 1.0,
-      "latest_derived": {},
-      "metric": "f4_control_word_xors_off_over_on",
-      "points": [
-        {
-          "commit": "647818a312a6",
-          "date": "2026-11-05",
-          "derived": {},
-          "n": 9,
-          "record": "20261105T2109Z-f6-few-candidates",
-          "reference": null,
-          "reference_kind": null,
-          "spread": null,
-          "summary": "F6-IC few-candidate closure: CPU off/on 2.67-10.29x, word XORs 1.84-10.13x on 9 Koblitz cells, verdicts identical; measured 2026-11-05T18:20Z by scripts/run_arms.sh before this record existed, the recorded command rebuilds the table from the committed raw data",
-          "value": 1.0
-        }
-      ],
-      "problem": "kernel:f6_ic_gate",
-      "unit": "ratio"
-    },
-    {
-      "better": "higher",
-      "first": 10.29,
-      "latest": 10.29,
-      "latest_derived": {
-        "improvement_vs_first_percent": -0.0
-      },
-      "metric": "f6ic_cpu_off_over_on_max",
-      "points": [
-        {
-          "commit": "647818a312a6",
-          "date": "2026-11-05",
-          "derived": {
-            "improvement_vs_first_percent": -0.0
-          },
-          "n": 9,
-          "record": "20261105T2109Z-f6-few-candidates",
-          "reference": null,
-          "reference_kind": null,
-          "spread": null,
-          "summary": "F6-IC few-candidate closure: CPU off/on 2.67-10.29x, word XORs 1.84-10.13x on 9 Koblitz cells, verdicts identical; measured 2026-11-05T18:20Z by scripts/run_arms.sh before this record existed, the recorded command rebuilds the table from the committed raw data",
-          "value": 10.29
-        }
-      ],
-      "problem": "kernel:f6_ic_gate",
-      "unit": "ratio"
-    },
-    {
-      "better": "higher",
-      "first": 2.67,
-      "latest": 2.67,
-      "latest_derived": {
-        "improvement_vs_first_percent": -0.0
-      },
-      "metric": "f6ic_cpu_off_over_on_min",
-      "points": [
-        {
-          "commit": "647818a312a6",
-          "date": "2026-11-05",
-          "derived": {
-            "improvement_vs_first_percent": -0.0
-          },
-          "n": 9,
-          "record": "20261105T2109Z-f6-few-candidates",
-          "reference": null,
-          "reference_kind": null,
-          "spread": [
-            1.657,
-            null
-          ],
-          "summary": "F6-IC few-candidate closure: CPU off/on 2.67-10.29x, word XORs 1.84-10.13x on 9 Koblitz cells, verdicts identical; measured 2026-11-05T18:20Z by scripts/run_arms.sh before this record existed, the recorded command rebuilds the table from the committed raw data",
-          "value": 2.67
-        }
-      ],
-      "problem": "kernel:f6_ic_gate",
-      "unit": "ratio"
-    },
-    {
-      "better": "higher",
-      "first": 1.84,
-      "latest": 1.84,
-      "latest_derived": {
-        "improvement_vs_first_percent": -0.0
-      },
-      "metric": "f6ic_word_xors_off_over_on_min",
-      "points": [
-        {
-          "commit": "647818a312a6",
-          "date": "2026-11-05",
-          "derived": {
-            "improvement_vs_first_percent": -0.0
-          },
-          "n": 9,
-          "record": "20261105T2109Z-f6-few-candidates",
-          "reference": null,
-          "reference_kind": null,
-          "spread": null,
-          "summary": "F6-IC few-candidate closure: CPU off/on 2.67-10.29x, word XORs 1.84-10.13x on 9 Koblitz cells, verdicts identical; measured 2026-11-05T18:20Z by scripts/run_arms.sh before this record existed, the recorded command rebuilds the table from the committed raw data",
-          "value": 1.84
-        }
-      ],
-      "problem": "kernel:f6_ic_gate",
-      "unit": "ratio"
     },
     {
       "better": "higher",
