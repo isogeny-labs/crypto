@@ -200,7 +200,7 @@ impl F {
             z += 1;
         }
         let mut c = self.pow(z, q);
-        let mut x = self.pow(v, (q + 1) / 2);
+        let mut x = self.pow(v, q.div_ceil(2));
         let mut t = self.pow(v, q);
         let mut m = s;
         while t != 1 {
