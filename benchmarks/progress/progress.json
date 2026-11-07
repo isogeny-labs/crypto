@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261107T0722Z-rho-v4-prime",
+  "latest_record": "20261107T0738Z-ic-auto-vs-tuned",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 1,
-    "measured": 51,
+    "measured": 52,
     "open": 0
   },
   "repo": "crypto",
@@ -716,6 +716,66 @@
         }
       ],
       "problem": "ecdlp:prime-ladder-18-28",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.998,
+      "latest": 0.998,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ic_auto_over_tuned_p20_w0",
+      "points": [
+        {
+          "commit": "553a4c2aeb36",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 96,
+          "record": "20261107T0738Z-ic-auto-vs-tuned",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.987,
+            1.01
+          ],
+          "summary": "ic size=auto vs tuned N baseline (45/162/407) on the prime_base study holdout curves, local L0: equal at 20 bits; at 24/28 cheaper at w=0 (0.914, 0.885) but costlier at w=1 (1.153, 1.107): band-order flips, not an improvement.",
+          "value": 0.998
+        }
+      ],
+      "problem": "ecdlp:prime-ladder-20-28",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.8848,
+      "latest": 0.8848,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ic_auto_over_tuned_p28_w0",
+      "points": [
+        {
+          "commit": "553a4c2aeb36",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 96,
+          "record": "20261107T0738Z-ic-auto-vs-tuned",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.86,
+            0.91
+          ],
+          "summary": "ic size=auto vs tuned N baseline (45/162/407) on the prime_base study holdout curves, local L0: equal at 20 bits; at 24/28 cheaper at w=0 (0.914, 0.885) but costlier at w=1 (1.153, 1.107): band-order flips, not an improvement.",
+          "value": 0.8848
+        }
+      ],
+      "problem": "ecdlp:prime-ladder-20-28",
       "unit": "ratio"
     },
     {
