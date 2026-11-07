@@ -35,6 +35,7 @@ fn main() {
         let (mut ok_old, mut ok_new) = (0, 0);
         let mut kk = 0;
         let mut s2_new = 0.0;
+        let (mut t_old, mut t_new) = (0.0f64, 0.0f64);
         let mut parts_old = [0.0f64; 6];
         let mut parts_new = [0.0f64; 6];
         for i in 0..runs {
@@ -42,6 +43,7 @@ fn main() {
             let mut o = GroupOps::default();
             let q = g.mul(&mut o, gen, d);
             let seed = 1000 + i;
+            let t0 = std::time::Instant::now();
             let a = rho_walk_with(
                 &g,
                 &neg,
@@ -52,12 +54,14 @@ fn main() {
                 64 * (r as f64).sqrt() as u64 + 4096,
                 RhoWalk::negation(),
             );
+            t_old += t0.elapsed().as_nanos() as f64 / a.gae;
             let mut v = RhoV3::negation();
             v.jumps = k_override;
             v.weight = weight;
             v.continue_walks = cont;
             v.dp_bits = dp;
             v.ladder_bits = ladder;
+            let t1 = std::time::Instant::now();
             let b = rho_walk_v3(
                 &g,
                 &neg,
@@ -68,6 +72,7 @@ fn main() {
                 64 * (r as f64).sqrt() as u64 + 4096,
                 v,
             );
+            t_new += t1.elapsed().as_nanos() as f64 / b.gae;
             ok_old += (a.recovered == Some(d)) as u32;
             ok_new += (b.recovered == Some(d)) as u32;
             let sq = (r as f64).sqrt();
@@ -91,7 +96,7 @@ fn main() {
         }
         let n = runs as f64;
         let sd = (s2_new / n - (s_new / n).powi(2)).sqrt() / n.sqrt();
-        println!("   v3 S standard error {sd:.4}");
+        println!("   v3 S standard error {sd:.4}; ns/GAE legacy {:.1} v3 {:.1}", t_old / n, t_new / n);
         println!(
             "bits {bits} log2r {:.1} | legacy S {:.3} ({:.3}x floor, setup {:.3}) ok {ok_old} | v3 k={kk} S {:.3} ({:.3}x floor, setup {:.3}) ok {ok_new}",
             (r as f64).log2(),

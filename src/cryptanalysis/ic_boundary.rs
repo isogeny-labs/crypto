@@ -2996,7 +2996,7 @@ pub fn rho_v3_jumps_for(r: u64, automorphisms: u32, weight: u32) -> usize {
 pub fn rho_v3_ladder_bits(r: u64, jumps: usize) -> u32 {
     let bits = 64 - r.leading_zeros();
     let lg = usize::BITS - (jumps.max(2) - 1).leading_zeros();
-    (2 * lg + 4).clamp(6, bits.saturating_sub(1).max(2))
+    (2 * lg + 4).clamp(6, bits.saturating_sub(1).clamp(2, 28))
 }
 
 /// **Tuned rho, v3**: [`rho_walk_with_policy`]'s search under
@@ -3016,7 +3016,6 @@ pub fn rho_walk_v3<G: CountedGroup, C: RhoClasses<G>>(
     max_steps: u64,
     v3: RhoV3,
 ) -> RhoResult {
-    use std::collections::HashSet;
     let start = Instant::now();
     let mut ops = GroupOps::default();
     let mut rng = StdRng::seed_from_u64(seed);
@@ -3030,7 +3029,7 @@ pub fn rho_walk_v3<G: CountedGroup, C: RhoClasses<G>>(
     let t = if v3.ladder_bits == 0 {
         rho_v3_ladder_bits(r, k)
     } else {
-        v3.ladder_bits
+        v3.ladder_bits.clamp(2, 28)
     } as usize;
     let walk = RhoWalk {
         negation: v3.negation,
@@ -3044,8 +3043,11 @@ pub fn rho_walk_v3<G: CountedGroup, C: RhoClasses<G>>(
 
     // Choose every jump's rungs first (no group operation is spent on a
     // refused draw).  A rung index below `t` is `[2^i]G`, at or above it
-    // `[2^(i−t)]Q`.  Refused: a repeat, and any `c = x ± y` or `2c = x + y`
-    // against the jumps already kept (three-term relations over Z²).
+    // `[2^(i−t)]Q`.  Refused: a repeat, and any three-term relation over Z²
+    // with the jumps already kept: `c = x ± y`, `c = y − x`, `c = 2x`,
+    // `2c = x`.  Coefficients stay below `2^31` (`t ≤ 28`, three rungs), so
+    // `(a, b)` packs into one key; the checks are `O(k)` look-ups a draw.
+    let pack = |a: u64, b: u64| (a << 32) | b;
     let coeff = |rungs: &[usize]| -> (u64, u64) {
         rungs.iter().fold((0u64, 0u64), |(a, b), &i| {
             if i < t {
@@ -3056,9 +3058,7 @@ pub fn rho_walk_v3<G: CountedGroup, C: RhoClasses<G>>(
         })
     };
     let mut kept: Vec<(Vec<usize>, (u64, u64))> = Vec::with_capacity(k);
-    let mut values: HashSet<(i128, i128)> = HashSet::new();
-    let mut sums: HashSet<(i128, i128)> = HashSet::new();
-    let mut diffs: HashSet<(i128, i128)> = HashSet::new();
+    let mut values: FastMap<()> = fast_map(2 * k);
     let mut draws = 0u64;
     while kept.len() < k {
         draws += 1;
@@ -3070,24 +3070,21 @@ pub fn rho_walk_v3<G: CountedGroup, C: RhoClasses<G>>(
             }
         }
         let (a, b) = coeff(&rungs);
-        let c = (a as i128, b as i128);
-        let twice = (2 * c.0, 2 * c.1);
-        let refused = values.contains(&c)
-            || sums.contains(&c)
-            || diffs.contains(&c)
-            || sums.contains(&twice)
+        let has = |a: u64, b: u64| values.contains_key(&pack(a, b));
+        let related = has(a, b)
+            || (a % 2 == 0 && b % 2 == 0 && has(a / 2, b / 2))
+            || has(2 * a, 2 * b)
+            || kept.iter().any(|(_, (xa, xb))| {
+                let (xa, xb) = (*xa, *xb);
+                has(a + xa, b + xb)
+                    || (a >= xa && b >= xb && has(a - xa, b - xb))
+                    || (xa >= a && xb >= b && has(xa - a, xb - b))
+            })
             || (a % r == 0 && b % r == 0);
-        if refused && draws < 64 * k as u64 + 1024 {
+        if related && draws < 64 * k as u64 + 1024 {
             continue;
         }
-        for (_, x) in &kept {
-            let x = (x.0 as i128, x.1 as i128);
-            sums.insert((x.0 + c.0, x.1 + c.1));
-            diffs.insert((x.0 - c.0, x.1 - c.1));
-            diffs.insert((c.0 - x.0, c.1 - x.1));
-        }
-        sums.insert(twice);
-        values.insert(c);
+        values.insert(pack(a, b), ());
         kept.push((rungs, (a, b)));
     }
     // The stride: `weight + 2` rungs, at least one on each ladder.
