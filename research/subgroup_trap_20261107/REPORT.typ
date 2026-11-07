@@ -21,7 +21,7 @@ On A0's standard line, $K = FF_Q$. A point with $x in FF_Q$ satisfies $sigma_Q P
 
 #figure(image("fig_subgroup_trap.png", width: 100%), caption: [(a) A0 standard base: the exact mean count on $H$ against the identity prediction over $E$. (b) Every frozen row: on targets with $"Tr"(x_R) = "Tr"(a)$, the mean count divided by the prediction. Targets off $2E$ all have count 0.])
 
-- *Identity.* Regenerating the targets with the run's seeds reproduces every frozen count: 72 rows, 0 mismatches.
+- *Identity.* A second full run (`run-20261107T1`) agrees on every frozen field. Regenerating the targets with the run's seeds reproduces every frozen count: 72 rows, 0 mismatches.
 - *P1 PASS.* At $k = 5, 7, 9$, every factor-base point of A0 `std` and `tw_a` ($[K:FF_2] = k$, trapped) lies in $H$.
   - $k = 5$: 16 of the 20,000 targets lie in $E(FF_(Q^2))$, 9 of them in $H$. No target outside $H$ has a nonzero count.
   - $k = 7$ and $k = 9$: none of the 8,000 and 1,500 targets lies in $E(FF_(Q^2))$, and every count is 0.
@@ -43,7 +43,7 @@ Amendment 1 called the case $2[K:FF_2] = N$ benign: the factor base lies in $E(K
 
 Write the factor base as $A union B$, with $A subset E(K)$ and $B subset ker(sigma_K + 1)$. Each piece is a group of size about $Q^2$, but a single line point covers only about $Q$ of it. A 4-sum therefore reaches a generic point of $2E$ only when exactly two points come from each piece. The typical target, and every cryptographic target of odd order, sees only the fraction $binom(4,2) p^2 (1-p)^2$ of the mass, where $p = |B| slash m$. The rest sits on sets of relative size $O(1 slash Q)$.
 
-__POSTHOC__
+Fraction of the 2E-half targets with zero count. A0 `tw_b` (borderline): 74 %, 72 % and 74 % at $k = 5, 7, 9$. A1 `tw_a` (full degree): 31 %, 27 % and 25 %. The predicted generic share for `tw_b`, $6 p^2 (1-p)^2$, is 0.29, 0.37 and 0.37.
 
 This is algebra written after the data, with descriptive statistics. It is not a registered test. No applicable line in \#2686 or \#2704 is borderline (P4: all have $[K:FF_2] = N$). The construction rule becomes: *use a line only when $[K:FF_2] = N$.*
 
