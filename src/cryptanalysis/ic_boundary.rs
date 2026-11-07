@@ -3265,7 +3265,11 @@ pub fn rho_walk_v3<G: CountedGroup, C: RhoClasses<G>>(
             ops,
             start,
             continue_walks: v3.continue_walks,
-            verify_ladder: if v3.ladder_verify { ladder_g } else { Vec::new() },
+            verify_ladder: if v3.ladder_verify {
+                ladder_g
+            } else {
+                Vec::new()
+            },
         },
     )
 }

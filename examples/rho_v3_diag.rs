@@ -98,7 +98,11 @@ fn main() {
         }
         let n = runs as f64;
         let sd = (s2_new / n - (s_new / n).powi(2)).sqrt() / n.sqrt();
-        println!("   v3 S standard error {sd:.4}; ns/GAE legacy {:.1} v3 {:.1}", t_old / n, t_new / n);
+        println!(
+            "   v3 S standard error {sd:.4}; ns/GAE legacy {:.1} v3 {:.1}",
+            t_old / n,
+            t_new / n
+        );
         println!(
             "bits {bits} log2r {:.1} | legacy S {:.3} ({:.3}x floor, setup {:.3}) ok {ok_old} | v3 k={kk} S {:.3} ({:.3}x floor, setup {:.3}) ok {ok_new}",
             (r as f64).log2(),

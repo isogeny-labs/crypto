@@ -65,11 +65,11 @@ use crate::cryptanalysis::glv_invariant_base::Endomorphism;
 use crate::cryptanalysis::group_op_count::OpCounts;
 use crate::cryptanalysis::ic_boundary::{
     ic_residual_batch_with, price_phase, rho_batch_with, rho_cap, rho_reference, rho_walk_v3,
-    rho_walk_with, rho_walk_with_policy, signed_frobenius_rho_tuned, signed_frobenius_rho_v3,
-    signed_frobenius_rho_tuned_policy, BinaryGroup, BinaryInstance, Calibration, CountedGroup,
-    CubicClasses, FieldOps, GroupOps, NegationClasses, PhaseCost, PointClasses, PreprocessingRho,
-    PrimeInstance, PrimePoint, QuarticClasses, RhoBatchResult, RhoResult, RhoV3, RhoWalk,
-    WalkPolicy,
+    rho_walk_with, rho_walk_with_policy, signed_frobenius_rho_tuned,
+    signed_frobenius_rho_tuned_policy, signed_frobenius_rho_v3, BinaryGroup, BinaryInstance,
+    Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps, NegationClasses, PhaseCost,
+    PointClasses, PreprocessingRho, PrimeInstance, PrimePoint, QuarticClasses, RhoBatchResult,
+    RhoResult, RhoV3, RhoWalk, WalkPolicy,
 };
 use crate::cryptanalysis::ic_framework::cm_orbit::CmOrbitBase;
 use crate::cryptanalysis::ic_framework::fiber::{
@@ -1548,11 +1548,14 @@ const KOBLITZ_BATCHED_PARAMS: &[ParamDecl] = &[
 pub fn expected_s(id: &str, a_available: u32) -> Option<f64> {
     use std::f64::consts::PI;
     match id {
-        "rho.frozen_reference" | "rho.plain" | "rho.plain_v3" | "rho.plain_v4" => Some((PI / 2.0).sqrt()),
-        "rho.negation" | "rho.negation_v2" | "rho.negation_v3" | "rho.negation_v4"
-        | "rho.negation_strong" => {
-            Some((PI / 4.0).sqrt())
+        "rho.frozen_reference" | "rho.plain" | "rho.plain_v3" | "rho.plain_v4" => {
+            Some((PI / 2.0).sqrt())
         }
+        "rho.negation"
+        | "rho.negation_v2"
+        | "rho.negation_v3"
+        | "rho.negation_v4"
+        | "rho.negation_strong" => Some((PI / 4.0).sqrt()),
         "rho.cubic" | "rho.cubic_v2" => Some((PI / 12.0).sqrt()),
         "rho.quartic" | "rho.quartic_v2" | "rho.gls" => Some((PI / 8.0).sqrt()),
         "rho.frobenius_orbit" => Some((PI / 12.0).sqrt()),
@@ -2632,7 +2635,16 @@ fn solve_generic<G: CountedGroup>(
                     RhoV3::v4(true),
                 )
             } else {
-                rho_walk_v3(g, &PointClasses, gen, target, r, seed, cap()?, RhoV3::v4(false))
+                rho_walk_v3(
+                    g,
+                    &PointClasses,
+                    gen,
+                    target,
+                    r,
+                    seed,
+                    cap()?,
+                    RhoV3::v4(false),
+                )
             };
             let wall = t.elapsed().as_nanos() as u64;
             let f = field_ops_of(g, &[res.group_ops]);

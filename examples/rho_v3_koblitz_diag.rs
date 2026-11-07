@@ -28,7 +28,8 @@ fn main() {
             let mut o = GroupOps::default();
             let q = g.mul(&mut o, inst.generator, d);
             let cap = 64 * sq as u64 + 4096;
-            let old = signed_frobenius_rho_tuned_policy(&inst, q, 1000 + i, cap, WalkPolicy::v2()).unwrap();
+            let old = signed_frobenius_rho_tuned_policy(&inst, q, 1000 + i, cap, WalkPolicy::v2())
+                .unwrap();
             let mut v = RhoV3::frobenius();
             v.jumps = k;
             v.weight = weight;
@@ -38,7 +39,8 @@ fn main() {
             for (j, res) in [&old, &new].iter().enumerate() {
                 assert_eq!(res.recovered, Some(d % r));
                 let su = (res.counters.get("setup_additions").copied().unwrap_or(0)
-                    + res.counters.get("setup_doublings").copied().unwrap_or(0)) as f64;
+                    + res.counters.get("setup_doublings").copied().unwrap_or(0))
+                    as f64;
                 let w = res.counters.get("walk_operations").copied().unwrap_or(0) as f64;
                 tot[j][0] += res.s;
                 tot[j][1] += su / sq;
