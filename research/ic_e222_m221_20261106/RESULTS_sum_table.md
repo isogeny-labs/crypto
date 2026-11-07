@@ -2,7 +2,7 @@
 
 **Status:** unvalidated (pre-gate). Local unisolated host, solver stage timer; no replay certificate, validator report or matched-rho band. Not a leaderboard row.
 
-**Mechanism.** The baseline relation trial samples R = aG + bQ and sweeps every factor-base point F_i, solving the Semaev S_3 quadratic by a modular square root, to find F_j with R = +-F_i +-F_j. That sweep costs O(fb) square roots per trial and is about 90% of a trial at fb 256. The table variant (`IC_SUM_TABLE=1`, `src/cryptanalysis/ec_index_calculus.rs`, `build_pair_sum_table`, `find_one_relation_table_with_rng`) builds once per solve a hash table of all points +-F_i +-F_j (i <= j) and tests each R with one lookup. The set of decomposable R is the same, so with the same RNG stream the sampled trials, the number of relations and the recovered logs agree (below). Construction of the table is charged to the relation stage (`relations_ms`). Default path unchanged.
+**Mechanism.** The baseline relation trial samples R = aG + bQ and sweeps every factor-base point F_i, solving the Semaev S_3 quadratic by a modular square root, to find F_j with R = +-F_i +-F_j. That sweep costs O(fb) square roots per trial and is about 90% of a trial at fb 256. The table variant (`IC_SUM_TABLE=1`, `src/cryptanalysis/ec_index_calculus.rs`, `build_pair_sum_table`, `find_one_relation_table_with_rng`) builds once per solve a hash table of all points +-F_i +-F_j (i <= j) and tests each R with one lookup. The set of decomposable R is the same, so with the same RNG stream the sampled trials, the trial counts, the relation counts and the recovered logs agree (below; identical counts, not necessarily identical relation rows, because about 3.5% of decomposable points have more than one valid decomposition). Construction of the table is charged to the relation stage (`relations_ms`). Default path unchanged.
 
 **Design.** 30 fresh W instances (v3 indices 20 to 29 at three sizes, not used in any earlier panel), solver seeds 1, 2, extra = 2, fb 16 to 256, sweep vs table, serial, interleaved seeded order (`run_table.py`). 600 runs, all verified. Data: `results/table/`.
 
@@ -20,7 +20,7 @@ Best sweep: fb 128 (30.4 ms). Best table: fb 32 (14.6 ms). **Paired best-vs-best
 
 ## Confirmation on a third fresh set, settings frozen beforehand
 
-30 further fresh W instances (v3 indices 30 to 39 at three sizes, never used in a panel), solver seeds 1, 2, 240 runs, **all verified**. Settings were frozen from the earlier panels before this run (`run_confirm.py`): A shipped default (sweep, extra 64, fb 8); B tuned baseline (sweep, extra 64, fb 256); C retuned sweep (extra 2, fb 128); D pair-sum table (extra 2, fb 32). Serial, interleaved seeded order, solver `total_ms` (table construction inside). Data: `results/confirm/`, `analysis.txt`.
+30 further W instances (v3 indices 30 to 39 at three sizes). Correction after independent validation: these were not 'never used'; they are the same files as holdout v3 indices 30 to 39, which only the trials-only `extra_v3` panel (fb 8) touched. They are disjoint from every timing panel and every fb-selection panel, solver seeds 1, 2, 240 runs, **all verified**. Settings were frozen from the earlier panels before this run (`run_confirm.py`): A shipped default (sweep, extra 64, fb 8); B tuned baseline (sweep, extra 64, fb 256); C retuned sweep (extra 2, fb 128); D pair-sum table (extra 2, fb 32). Serial, interleaved seeded order, solver `total_ms` (table construction inside). Data: `results/confirm/`, `analysis.txt`.
 
 | arm | median total ms | median trials |
 |---|---|---|
@@ -39,3 +39,16 @@ Best sweep: fb 128 (30.4 ms). Best table: fb 32 (14.6 ms). **Paired best-vs-best
 D beat B in 60 of 60 pairs; per-size D/B medians 0.424, 0.409, 0.445, 0.443 for r bits 14 to 17 (no size trend within the range). The earlier exploratory estimates (best-vs-best 0.482 table vs retuned sweep, 0.83 retune vs tuned baseline) are consistent: the frozen-setting confirmation gives 0.521 and 0.743.
 
 **What is established, and what is not.** Established locally, on three disjoint fresh instance sets: replacing the per-trial square-root sweep by a pair-sum table lookup, together with the lower relation surplus, solves the same prime-order toy instances in about 0.41 of the time of the baseline tuned over factor-base size (0.02 of the shipped default), with every log recovered, identical relations per seed, and the table construction counted. Not established: validation-gate evidence (replay certificate, validator report, matched-rho band at the 0 / 0.1 / 1 GAE band); an isolab-eks run; any behaviour at cryptographic p (the table needs about 2 fb^2 entries and an O(fb^2) build, and the number of relations needed grows with fb, so the optimum and the advantage move with p); any change in the exponent. Within this range the gap to Pollard rho is unchanged in kind and is not closed. This is a measured constant-factor improvement over the current implementation, not independently checked, and the goal is not met.
+
+
+## Independent validation and corrections (validator agent, 2026-11-07)
+
+Full report: `results/confirm/VALIDATOR_REPORT.md`. Disposition: validated, scoped, not leaderboard-eligible. Reproduced: 240 rows, medians 688.7 / 38.9 / 29.9 / 16.3 ms, D/B 0.411, 60/60 pairs; 30 instances valid by independent arithmetic; 480/480 replays recovered the planted log with matching trials and relations; the table path cannot return a false decomposition; 43/43 `ec_index_calculus` tests pass (none exercises `IC_SUM_TABLE`).
+
+Corrections it required, all accepted:
+1. Freshness wording (fixed above).
+2. **Timer scope.** `total_ms` is the solver's stage timer. The process spends about 25 ms outside it (mostly hashing the binary); at process level D/B is 0.63 and D/C 0.72. Quote the solver-stage figure only with that qualifier.
+3. **Part of the gain is a baseline inefficiency.** The sweep rebuilds its x-to-index hash map on every relation call (about 16% of B's instructions, 4% of C's, none of D's). Instruction-count ratios are D/B 0.441 and D/C 0.536; removing only the map inserts leaves D/B 0.50 and D/C 0.55. So the table's algorithmic gain must be measured against a hoisted sweep. That arm did not exist; it is built next (below).
+4. "Identical relations" is replaced by "identical trial and relation counts".
+
+D also differs from B in three settings at once (algorithm, fb, extra), which the pairwise ladder C/B and D/C separates. The run began before the 'frozen' commit by about a minute (runner content byte-identical), so the ordering of the freeze is unproven. Toy sizes only (p up to 65,521).
