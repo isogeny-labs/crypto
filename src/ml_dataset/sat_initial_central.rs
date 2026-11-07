@@ -18,6 +18,8 @@ mod transcript;
 mod search;
 #[path="owned_search_identity_capsule.rs"]
 mod owned_identity;
+#[path="owned_search_central.rs"]
+pub(in crate::ml_dataset::solvers) mod owned;
 /// Must be supplied by the separately authorized replay caller, never inferred
 /// from a successful producer prefix or reset after a failure.
 pub(in crate::ml_dataset::solvers) struct Policy {
@@ -412,15 +414,8 @@ fn capture_buffer_owners(head: &capture::CommittedHead, dir: &Path) -> Result<u6
 }
 /// Historical verification uses LaunchContext::validate through execution::verify,
 /// never execution::admit (which would inspect today's clock as producer entry).
-fn verify_mode(
-    dir: &Path,
-    config: &CaseConfig,
-    artifacts: &[Artifact],
-    policy: Policy,
-    row_mode: Option<RowReplay>,
-    search_mode: Option<search::Replay>,
-) -> Result<Outcome, Failed> {
-    let mut frame = Frame {
+fn new_frame(policy:Policy,row_mode:Option<RowReplay>,search_mode:Option<search::Replay>)->Frame {
+    Frame {
         row_mode,
         search_mode,
         budget: ReplayBudget {
@@ -462,7 +457,17 @@ fn verify_mode(
         revalidation_config: None,
         artifact_fingerprint: None,
         measurement_policy_hash: None,
-    };
+    }
+}
+fn verify_mode(
+    dir: &Path,
+    config: &CaseConfig,
+    artifacts: &[Artifact],
+    policy: Policy,
+    row_mode: Option<RowReplay>,
+    search_mode: Option<search::Replay>,
+) -> Result<Outcome, Failed> {
+    let mut frame = new_frame(policy,row_mode,search_mode);
     // No reporting allocation is permitted until this fixed reservation succeeds.
     if let Err(stop) = frame.budget.reserve_checking(65536, 65536, Instant::now()) {
         return Err(Failed { frame, stop });
@@ -498,17 +503,13 @@ fn verify_mode(
         }
     }
 }
-fn run(
-    dir: &Path,
-    config: &CaseConfig,
-    artifacts: &[Artifact],
-    f: &mut Frame,
-) -> Result<bool, String> {
-    // Fixed report/join memory is reserved before helpers can produce Strings.
-
-    if !profile(&config.family, config.n, config.m) || config.solver != "sat" {
-        return Err("unsupported original SAT profile".into());
-    }
+struct OriginalContext {
+ artifact_bytes:u64,binding:capture::AttemptBinding,caps:capture::CaptureLimits,
+ launch:execution::LaunchContext,original_binding:[u8;32],launch_hash:String,
+}
+/// Shared original mathematics and immutable context admission; mode eligibility
+/// remains in each caller. This helper does not admit any transcript or report.
+fn admit_original_inputs(dir:&Path,config:&CaseConfig,artifacts:&[Artifact],f:&mut Frame)->Result<OriginalContext,String>{
     if artifacts.len() > 4096 {
         return Err("artifact count cap".into());
     }
@@ -672,6 +673,87 @@ fn run(
     };
     serde_json::to_writer(&mut launch_hasher, &launch).map_err(|e| e.to_string())?;
     let launch_hash = hex::encode(launch_hasher.hash.finalize());
+    Ok(OriginalContext{artifact_bytes,binding,caps,launch,original_binding,launch_hash})
+}
+/// Check the retained raw map against independently admitted original math.
+fn check_original_map(f:&mut Frame,config:&CaseConfig,original_binding:[u8;32],a:&Artifact)->Result<u32,String>{
+                let m = f.parts.complete.as_ref().unwrap();
+                // Canonical basename supplies only the expected pattern. The
+                // independent typed map verifier authenticates its actual identity.
+                let (pattern, gate_wire) =
+                    map_path_pattern(&a.path, config.m).map_err(|_| "map path/pattern mismatch")?;
+                let original = provenance::Original {
+                    binding: original_binding,
+                    a: &m.a,
+                    b: &m.b,
+                    irr: &m.irr,
+                    twist: config.twist,
+                    m: config.m,
+                    target: m.target.as_ref(),
+                    pattern,
+                    codes: &m.codes,
+                };
+                let check = provenance::Limits {
+                    variables: 1_000_000,
+                    codes: m.codes.len(),
+                    domain_clauses: 1_000_000,
+                    work: f.budget.policy.work,
+                    bytes: f.budget.policy.bytes,
+                };
+                if gate_wire {
+                    let decoded = provenance::gate_wire::decode_checked(
+                        &f.map_bytes,
+                        &original,
+                        provenance::gate_wire::DecodeLimits {
+                            wire_bytes: usize::try_from(a.bytes)
+                                .map_err(|_| "map usize overflow")?,
+                            work: f.budget.policy.work,
+                            bytes: f.budget.policy.bytes,
+                        },
+                        check,
+                        &mut f.budget,
+                    );
+                    match decoded {
+                        Ok(map) => f.map = Some(map),
+                        Err(e) => {
+                            f.raw_map = e.retained;
+                            return Err("imported gate map refused".into());
+                        }
+                    }
+                } else {
+                    // Preserve the full-map typed parse's existing prepaid bound.
+                    f.budget
+                        .reserve_checking(
+                            a.bytes.checked_mul(256).ok_or("map parse overflow")?,
+                            a.bytes.checked_mul(128).ok_or("map parse overflow")?,
+                            Instant::now(),
+                        )
+                        .map_err(|_| "full map parse admission refused".to_owned())?;
+                    // Historical full-map v1 is independently checked, never reinterpreted.
+                    let raw: provenance::Map =
+                        serde_json::from_slice(&f.map_bytes).map_err(|e| e.to_string())?;
+                    match provenance::check_imported(&original, raw, check, &mut f.budget) {
+                        Ok(map) => f.map = Some(map),
+                        Err(e) => {
+                            f.raw_map = e.retained;
+                            return Err("imported full map refused".into());
+                        }
+                    }
+                }
+    Ok(pattern)
+}
+fn run(
+    dir: &Path,
+    config: &CaseConfig,
+    artifacts: &[Artifact],
+    f: &mut Frame,
+) -> Result<bool, String> {
+    // Fixed report/join memory is reserved before helpers can produce Strings.
+
+    if !profile(&config.family, config.n, config.m) || config.solver != "sat" {
+        return Err("unsupported original SAT profile".into());
+    }
+    let OriginalContext{artifact_bytes,binding,caps,launch,original_binding,launch_hash}=admit_original_inputs(dir,config,artifacts,f)?;
     f.head_raw = read(
         dir,
         "live/committed.json",
@@ -835,69 +917,7 @@ fn run(
                 {
                     return Err("map hash mismatch".into());
                 }
-                let m = f.parts.complete.as_ref().unwrap();
-                // Canonical basename supplies only the expected pattern. The
-                // independent typed map verifier authenticates its actual identity.
-                let (pattern, gate_wire) =
-                    map_path_pattern(&a.path, config.m).map_err(|_| "map path/pattern mismatch")?;
-                let original = provenance::Original {
-                    binding: original_binding,
-                    a: &m.a,
-                    b: &m.b,
-                    irr: &m.irr,
-                    twist: config.twist,
-                    m: config.m,
-                    target: m.target.as_ref(),
-                    pattern,
-                    codes: &m.codes,
-                };
-                let check = provenance::Limits {
-                    variables: 1_000_000,
-                    codes: m.codes.len(),
-                    domain_clauses: 1_000_000,
-                    work: f.budget.policy.work,
-                    bytes: f.budget.policy.bytes,
-                };
-                if gate_wire {
-                    let decoded = provenance::gate_wire::decode_checked(
-                        &f.map_bytes,
-                        &original,
-                        provenance::gate_wire::DecodeLimits {
-                            wire_bytes: usize::try_from(a.bytes)
-                                .map_err(|_| "map usize overflow")?,
-                            work: f.budget.policy.work,
-                            bytes: f.budget.policy.bytes,
-                        },
-                        check,
-                        &mut f.budget,
-                    );
-                    match decoded {
-                        Ok(map) => f.map = Some(map),
-                        Err(e) => {
-                            f.raw_map = e.retained;
-                            return Err("imported gate map refused".into());
-                        }
-                    }
-                } else {
-                    // Preserve the full-map typed parse's existing prepaid bound.
-                    f.budget
-                        .reserve_checking(
-                            a.bytes.checked_mul(256).ok_or("map parse overflow")?,
-                            a.bytes.checked_mul(128).ok_or("map parse overflow")?,
-                            Instant::now(),
-                        )
-                        .map_err(|_| "full map parse admission refused".to_owned())?;
-                    // Historical full-map v1 is independently checked, never reinterpreted.
-                    let raw: provenance::Map =
-                        serde_json::from_slice(&f.map_bytes).map_err(|e| e.to_string())?;
-                    match provenance::check_imported(&original, raw, check, &mut f.budget) {
-                        Ok(map) => f.map = Some(map),
-                        Err(e) => {
-                            f.raw_map = e.retained;
-                            return Err("imported full map refused".into());
-                        }
-                    }
-                }
+                let pattern=check_original_map(f,config,original_binding,&a)?;
                 if let Some(r)=f.row_mode.as_mut(){
                     r.map_receipt=Some((row.sequence,digest.clone()));
                     r.map_artifact=Some(a);

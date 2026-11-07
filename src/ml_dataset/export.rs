@@ -1110,6 +1110,7 @@ fn export_with_graph_projector(
     let mut prefix_occurrences = 0u64;
     let mut affine_identity_records=0u64;
     let mut search_relation_records=0u64;
+    let mut owned_row_records=0u64;
     let mut feature_occurrences = 0u64;
     let mut sealed = 0u64;
     let mut unsealed = 0u64;
@@ -1167,6 +1168,28 @@ fn export_with_graph_projector(
             if manifest_sha!=before_manifest_sha {return Err("source manifest changed during export admission".into());}
             let target_id =
                 super::digest(format!("{source_run_sha}\n{manifest_sha}\n{cell_index}").as_bytes());
+            if super::solvers::needs_owned_search_replay(&manifest.config,&manifest.outcome,&manifest.artifacts) {
+                let record=if manifest.outcome["strategy"]=="original-boolean-search-unsupported" {
+                    super::solvers::verify_owned_search_unsupported(&manifest.config,&manifest.outcome,&manifest.artifacts)?;
+                    json!({"schema":"crypto.ml-dataset.owned-search-restricted-rows/v1","visibility":"restricted","status":"unsupported","row_identities_verified":false,"original_descent_verified":false,"solver_completed":false,"scalar_recovered_without_witness":false,"first_fall_degree":null,"last_fall_degree":null,"degree_of_regularity":null})
+                } else {
+                    super::owned_replay_caller::with_current(|session|session.ok_or("owned-search export requires retained replay invocation")?.project(&dir,&manifest))?
+                };
+                let(group,partition)=split_for_size(manifest.config.n as u64);
+                let record_id=super::digest(format!("{target_id}\nowned-search-row-record").as_bytes());
+                prefix_records.push(&record_id,&json!({"schema":"ml-dataset.restricted-prefix-record/v1","record_id":record_id,
+                    "source_target_id":target_id,"feature_id":null,"split_component":group,"split":partition,"record":record}))?;
+                targets.push(&target_id,&json!({"schema":"ml-dataset.restricted-targets/v1","target_id":target_id,"feature_id":null,
+                    "pdp_domain":null,"split_component":group,"split":partition,"solver":manifest.config.solver,"labels":record,
+                    "known_answer_scalar":null,"independently_recovered_scalar":null,"witness_artifact":null,
+                    "solution_certificates":[],"feature_status":"restricted_owned_row_identities_only"}))?;
+                index.push(&target_id,&json!({"schema":"ml-dataset.export-index/v1","record_id":target_id,"target_id":target_id,
+                    "feature_id":null,"cell":relative,"source_manifest_sha256":manifest_sha,"source_run_sha256":source_run_sha,
+                    "source_artifacts":manifest.artifacts,"status":"restricted_owned_search_scope"}))?;
+                owned_row_records+=1;sealed+=1;
+                // No generic witness, scalar or exact-degree label construction.
+                continue;
+            }
             if super::solvers::needs_search_replay(&manifest.config,&manifest.outcome) {
                 let record=if manifest.outcome["strategy"]=="sat-search-unsupported" {
                     json!({"schema":"crypto.ml-dataset.sat-model-relation/v1","visibility":"restricted","status":"unsupported", "model_relation_checked":false,"native_unsat_uncertified":false,"causal_search_verified":false,"unsat_proved":false,"scalar_recovered":false,"all_patterns_negative":false,"solver_completed":false})
@@ -1619,6 +1642,11 @@ fn export_with_graph_projector(
         "prime_chain_graph_occurrences":prime_chain_graph_occurrences,
         "prefix_feature_occurrences":prefix_occurrences,"unique_prefix_feature_rows":unique_prefix_features,
         "restricted_prefix_record_rows":prefix_record_rows});
+    if owned_row_records>0 {
+        manifest["owned_search_rows"]=json!({"schema":"ml-dataset.owned-search-row-export/v1",
+            "restricted_records":owned_row_records,"restricted_file":"restricted/prefix-records.jsonl",
+            "public_search_features":0,"causal_solver_training_admitted":false,"original_descent_verified":false,"degree_labels_available":false});
+    }
     if search_relation_records>0 {
         manifest["sat_model_relations"]=json!({"schema":"ml-dataset.sat-model-relation-export/v1",
             "restricted_records":search_relation_records,"restricted_file":"restricted/prefix-records.jsonl",

@@ -753,12 +753,16 @@ impl SatReplayCustody {
         self.verdict
     }
 }
+/// Outcome-only initial-mode disposition; shared map artifacts do not select a mode.
+pub(super) fn has_sat_initial_disposition(outcome: &Value) -> bool {
+    outcome["adapter_id"] == "sat-initial-v1"
+        || outcome["strategy"] == "sat-initial-v1"
+        || outcome.get("initial_checked").is_some()
+}
 pub(super) fn needs_sat_initial_replay(config: &CaseConfig, outcome: &Value, artifacts: &[super::types::Artifact]) -> bool {
     koblitz_m3::sat_original_owner::worker::eligibility(config)
         == koblitz_m3::sat_original_owner::worker::Eligibility::Requested
-        || outcome["adapter_id"] == "sat-initial-v1"
-        || outcome["strategy"] == "sat-initial-v1"
-        || outcome.get("initial_checked").is_some()
+        || has_sat_initial_disposition(outcome)
         || artifacts.iter().any(|a| a.role == "sat-original-gate-map"
             || a.path.starts_with("live/payloads/sat-original-pattern-")
             || a.path.starts_with("payloads/sat-original-pattern-"))
@@ -7562,3 +7566,67 @@ pub(super) fn verify_search_cell(dir:&Path,config:&CaseConfig,outcome:&Value,art
 }
 
 pub(super) fn search_request_supported(c:&CaseConfig)->bool{koblitz_m3::sat_original_owner::search_worker::supported(c)}
+
+/// Detect independently from mutable outcome labels. Reserved owned capture paths
+/// still require owned replay if a producer removes its strategy/schema fields.
+pub(super) fn needs_owned_search_replay(config:&CaseConfig,outcome:&Value,artifacts:&[super::types::Artifact])->bool {
+    koblitz_m3::sat_original_owner::owned_search_worker::requested(config)
+        || outcome["adapter_id"]=="original-owned-boolean-search-v1"
+        || outcome["strategy"]=="original-owned-boolean-search-v1"
+        || outcome["schema"]=="crypto.ml-dataset.owned-search-report/v1"
+        || outcome["strategy"]=="original-boolean-search-unsupported"
+        || has_owned_search_artifacts(artifacts)
+}
+fn has_owned_search_artifacts(artifacts:&[super::types::Artifact])->bool {
+    artifacts.iter().any(|a|a.role=="boolean-original-owned-search-snapshot-chunk-v1"
+        || a.path.starts_with("live/payloads/boolean-owned-pattern-")
+        || a.path.starts_with("payloads/boolean-owned-pattern-"))
+}
+pub(super) fn verify_owned_search_unsupported(config:&CaseConfig,outcome:&Value,artifacts:&[super::types::Artifact])->Result<(),String> {
+    if !koblitz_m3::sat_original_owner::owned_search_worker::requested(config)
+        || koblitz_m3::sat_original_owner::owned_search_worker::supported(config)
+        || has_owned_search_artifacts(artifacts)
+        || artifacts.iter().any(|a|a.role=="sat-original-gate-map"||a.path.contains("sat-original-pattern-"))
+        || outcome["strategy"]!="original-boolean-search-unsupported"||outcome["status"]!="unsupported"
+        || outcome["solver_completed"]!=false||outcome["all_patterns_negative"]!=false
+        || outcome["training_export_admitted"]!=false {
+        return Err("unsupported owned-search request carries execution evidence or overclaims".into());
+    }
+    for key in ["scalar_recovered_without_witness","scalar_recovered","scalar_replay_verified",
+        "ecdlp_pipeline_completed","full_span_search","all_patterns_covered",
+        "pdp_witness_verified","exhaustive_no_decomposition","unsat_proved",
+        "original_descent_verified","row_identities_verified","identity_verified_relative_captured_equations",
+        "independent_original_source_replay","s3_custody_verified",
+        "original_public_factor_and_map_verified","report_capture_join_verified",
+        "producer_counters_verified","producer_lift_classifications_verified",
+        "producer_model_exclusions_checked","capture_snapshot_complete",
+        "model_relation_checked","causal_search_verified","execution_verified",
+        "initial_checked","search_complete","causal_solver_training_admitted"] {
+        if outcome.get(key).is_some_and(|v|v!=&Value::Bool(false)){return Err("unsupported owned-search completion claim".into())}
+    }
+    for key in ["first_fall_degree","last_fall_degree","degree_of_regularity"] {
+        if outcome.get(key).is_some_and(|v|!v.is_null()){return Err("unsupported owned-search degree claim".into())}
+    }
+    Ok(())
+}
+#[derive(Clone,Copy,Debug,PartialEq,Eq)]
+pub(super) enum OwnedReplayVerdict { CheckedScope,Incomplete,Unknown,Rejected }
+pub(super) struct OwnedReplayCustody {
+    owner:koblitz_m3::sat_original_owner::central::owned::Custody,
+}
+impl OwnedReplayCustody {
+    pub(super) fn verdict(&self)->OwnedReplayVerdict {
+        use koblitz_m3::sat_original_owner::central::owned::Verdict;
+        match self.owner.verdict(){Verdict::CheckedScope=>OwnedReplayVerdict::CheckedScope,Verdict::Incomplete=>OwnedReplayVerdict::Incomplete,Verdict::Unknown=>OwnedReplayVerdict::Unknown,Verdict::Rejected=>OwnedReplayVerdict::Rejected}
+    }
+    pub(super) fn charged(&self)->(u64,u64){self.owner.usage()}
+    pub(super) fn retained_slot_bytes()->usize{std::mem::size_of::<Self>()}
+    pub(super) fn revalidate(&mut self,dir:&Path,config:&CaseConfig,outcome:&Value,artifacts:&[super::types::Artifact])->OwnedReplayVerdict {
+        self.owner.revalidate(dir,config,outcome,artifacts);self.verdict()
+    }
+    pub(super) fn project_identity(&mut self)->Result<Value,String>{self.owner.project_restricted()}
+}
+pub(super) fn verify_owned_search_cell(dir:&Path,config:&CaseConfig,outcome:&Value,artifacts:&[super::types::Artifact],policy:SatReplayPolicy)->OwnedReplayCustody {
+    use koblitz_m3::sat_original_owner::central;
+    OwnedReplayCustody{owner:central::owned::verify(dir,config,outcome,artifacts,central::Policy{work:policy.work,bytes:policy.bytes,deadline:policy.deadline,stream_bytes:policy.stream_bytes,payload_bytes:policy.payload_bytes})}
+}
