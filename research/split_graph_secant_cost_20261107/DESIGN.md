@@ -172,10 +172,13 @@ prospective data.
 * Historical ladder reproduction, legacy hash domain, seed 315: F83 (a=59, b=30) graph
   attempts 1/4 for d=3/4, F101 attempts 3 for d=3, F127 (a=20, b=61) attempts 1/62 for
   d=3/5. All agree with `results-summary.json` (measured).
-* Exact agreement with the exhaustive reference, zero mismatches, zero censored, zero
-  fallbacks, on **all** finite targets of F83 d=3,4, F101 d=3, F127 d=3 and **F127 d=5**,
-  for the graph, low-x and hash-x bases and all three presentations (E1, E2, dense);
-  handled degrees: graph secant d+1, dense 2d+2 as in the historical report (measured).
+* Exact agreement with the exhaustive reference on **all finite targets** of nine legacy
+  cells (F83, F101, F127 at d = 3, 4, 5) plus the F17 fixture: 87 base-by-presentation rows
+  (graph, low-x, hash-x; E1, E2, dense), 0 root-set mismatches, 0 censored systems, 0
+  triangular fallbacks, 0 unresolved (`dev_logs/leg_*.log`, `f17.log`). Handled degree is d+1
+  for the graph secant and 2d+2 for dense, as in the historical report (measured). These
+  logs include the 12 F127/d=5 candidate-secant systems that capped originally, so the new
+  extractor produces the exact root set of each of them (a correctness check only).
 * Historical-cap replay (`check-cap`): a faithful port of the 2,000,000-assignment
   coordinate-cube extractor applied to my reduced bases reproduces the historical counts
   exactly: 12 candidate-secant, 6 low-x secant, 8 hash-x secant systems cap (26 total) on

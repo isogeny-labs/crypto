@@ -152,3 +152,16 @@ Nothing to run until the image exists. Sequence for the main session: (1) commit
 ## Shared files edited
 
 None.
+
+## Development check (labelled: not a result, not stage A)
+
+Built with `CARGO_TARGET_DIR=/home/user/crypto/target cargo build --release --example pkm_tower_pilot --example prime_fall_degree_tools` (24 min cold; later `--example pfd_grid_zeros --example hky_fp_tower_check`), rustc 1.97.0, glibc, **dev host binaries (not the musl lab build)**; SHA-256s in `devcheck/binaries.sha256`. Disk was 9-11 GB free throughout. Working tree was shared and uncommitted; source state = HEAD plus other agents' edits. Run with `RAYON_NUM_THREADS=2`, seconds each, outputs in `devcheck/`:
+
+- `hky_fp_tower_check`: prints `G1: 6 cases pass` (measured, dev).
+- Stage-A-style closure, Kummer m = 2, P1, `t = 1..2`, 2 draws each (`dev-A-m2-t1-2.jsonl`): rows carry the fields the scorer and Amendment 5 need: `first_fall_degree`, `last_fall_degree`, `falls`, `censored_at`, `muladds`, `timed_out`, `x_r`, `tower`, `curve`. Values: `last_fall_degree` 3, 3 (t = 1) and 4, 4 (t = 2); `muladds` 76 and 3,485. These are the first two registered medians (3, 4), but 2 draws at 2 tiny cells on a dev build prove nothing about reproduction; stage A proper is still to be run on EKS.
+- F4 engine (`d-A` options) same cells: `solving_degree_max` 3 and 4, `inconsistent: true`, `muladds` 17 and 1,415.
+- The `cap:` stage's exact flags (`--engine tower --budget 86400 --max-dense 12800000000 --trace --cap 4 --targets 0`) at `t = 6` start and finish (`degree_reached` 4, `inconsistent: false`, `muladds` 18,609,796); `pfd_grid_zeros` on that row gives `grid_zeros 0`, `decomposable false`, `x_r 464833983`. That `x_r` equals the round-2 committed value for `t = 6`, target 0 (`fall_degree_relaunch/README.md` section 2.5 (3), cited), so the pilot's rng consumption is unchanged since round 2 for that draw.
+- The `m4:` stage's flags (`--engine hky --m 4 --hky-cmax 5 --hky-max-entries 13958643712 --hky-max-cols 4000000 --t-min 2 --max-t-m4 2 --max-t 2 --targets 0`) start and finish at `t = 2` (`N = 8`, `first_fall_degree` 4). `--t-min 4` was **not** exercised.
+- Not tested: `image/entry.sh` end to end (needs `ISOLAB_RESULTS_URI`, `aws`, the image paths), `image/build_layer.sh`, the musl build at this HEAD, any Docker/ECR step.
+
+Request source_revision (HEAD of /home/user/crypto when last generated, 2026-11-07): 0bd1d78cbf722fe996f2814304ef2f3fa8f52013. HEAD moves as the main session commits; regenerate with make_requests.sh.
