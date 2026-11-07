@@ -221,14 +221,17 @@ pub fn rho(c: &Curve, g: Pt, h: Pt, lambda: u64, seed_words: &[u64]) -> (Led, u6
     'attempt: for attempt in 0..8u64 {
         let r = 16usize;
         let mut tab: Vec<(Pt, u64, u64)> = Vec::new();
-        for i in 0..r {
+        let mut retry = 0u64;
+        while tab.len() < r {
             let mut ws = seed_words.to_vec();
-            ws.extend_from_slice(&[attempt, i as u64]);
+            ws.extend_from_slice(&[attempt, tab.len() as u64, retry]);
             let hh = hash_words("sgsecant/v1/rho", &ws);
             let a = 1 + word(&hh[..8]) % (n - 1);
             let b = 1 + word(&hh[8..16]) % (n - 1);
-            let q = add(c, smul(c, a, g), smul(c, b, h)).unwrap();
-            tab.push((q, a, b));
+            retry += 1;
+            if let Some(q) = add(c, smul(c, a, g), smul(c, b, h)) {
+                tab.push((q, a, b));
+            }
         }
         let mut ws = seed_words.to_vec();
         ws.push(attempt);

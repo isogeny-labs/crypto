@@ -8,10 +8,11 @@ use std::collections::BTreeMap;
 use std::fmt::Write as _;
 
 pub const DOMAIN: &str = "sgsecant/v1";
-pub const MASTER_SEED: u64 = 20261107;
+pub const FROZEN_SEED: u64 = 3141592653; // never used in any development run (dev runs use --seed 424242)
 
 #[derive(Clone, Debug)]
 pub struct Cfg {
+    pub seed: u64,
     pub cells: Vec<(u64, usize)>,
     pub instances: usize,
     pub runs: usize,
@@ -26,6 +27,7 @@ pub struct Cfg {
 impl Cfg {
     pub fn frozen() -> Cfg {
         Cfg {
+            seed: FROZEN_SEED,
             cells: vec![(151, 3), (227, 4), (337, 5), (491, 6)],
             instances: 3,
             runs: 12,
@@ -39,12 +41,12 @@ impl Cfg {
         }
     }
     pub fn smoke() -> Cfg {
-        Cfg { cells: vec![(151, 3), (227, 4)], instances: 1, runs: 2, tmax: 120, budget: 500_000_000, boot: 200, threads: 2, name: "smoke".into(), ..Cfg::frozen() }
+        Cfg { seed: 424242, cells: vec![(151, 3), (227, 4)], instances: 1, runs: 2, tmax: 120, budget: 500_000_000, boot: 200, threads: 2, name: "smoke".into(), ..Cfg::frozen() }
     }
     pub fn describe(&self) -> String {
         format!(
-            "name={} domain={} master_seed={} cells={:?} instances={} runs={} tmax={} budget={} curve_cap={} graph_cap={} boot={}",
-            self.name, DOMAIN, MASTER_SEED, self.cells, self.instances, self.runs, self.tmax, self.budget, self.curve_cap, self.graph_cap, self.boot
+            "name={} domain={} seed={} cells={:?} instances={} runs={} tmax={} budget={} curve_cap={} graph_cap={} boot={}",
+            self.name, DOMAIN, self.seed, self.cells, self.instances, self.runs, self.tmax, self.budget, self.curve_cap, self.graph_cap, self.boot
         )
     }
 }
@@ -102,15 +104,15 @@ fn rec_json(r: &Rec) -> String {
     s
 }
 
-fn seed_for(p: u64, d: usize, inst: usize) -> u64 {
-    let h = hash_words("sgsecant/v1/instance-seed", &[MASTER_SEED, p, d as u64, inst as u64]);
+fn seed_for(master: u64, p: u64, d: usize, inst: usize) -> u64 {
+    let h = hash_words("sgsecant/v1/instance-seed", &[master, p, d as u64, inst as u64]);
     word(&h[..8])
 }
 
 fn run_instance(cfg: &Cfg, p: u64, d: usize, inst: usize) -> (Vec<Rec>, Option<InstFail>) {
     reset();
     phase(PH_CONSTRUCT);
-    let spec = Spec { domain: DOMAIN.into(), seed: seed_for(p, d, inst), curve_cap: cfg.curve_cap, graph_cap: cfg.graph_cap };
+    let spec = Spec { domain: DOMAIN.into(), seed: seed_for(cfg.seed, p, d, inst), curve_cap: cfg.curve_cap, graph_cap: cfg.graph_cap };
     let s0 = snapshot();
     let cs = select_curve(&spec, p, "curve");
     let s1 = snapshot();
@@ -319,7 +321,7 @@ pub fn summarize(cfg: &Cfg, recs: &[Rec], fails: &[InstFail]) -> (String, String
                             }
                         }
                     }
-                    let (gm, lo, hi) = gm_ci(&ratios, cfg.boot, MASTER_SEED ^ (ci as u64 * 7919 + 13));
+                    let (gm, lo, hi) = gm_ci(&ratios, cfg.boot, cfg.seed ^ (ci as u64 * 7919 + 13));
                     let verdict = if ratios.is_empty() {
                         "unmeasured"
                     } else if hi < 1.0 {
@@ -378,6 +380,24 @@ pub fn panel_main(args: &[String]) {
             "--threads" => {
                 i += 1;
                 cfg.threads = args[i].parse().unwrap();
+            }
+            "--seed" => {
+                i += 1;
+                cfg.seed = args[i].parse().unwrap();
+                cfg.name = format!("dev-seed-{}", cfg.seed);
+            }
+            "--cells" => {
+                i += 1;
+                cfg.cells = args[i].split(',').map(|c| { let mut it = c.split(':'); (it.next().unwrap().parse().unwrap(), it.next().unwrap().parse().unwrap()) }).collect();
+                cfg.name = format!("{}-cells", cfg.name);
+            }
+            "--instances" => {
+                i += 1;
+                cfg.instances = args[i].parse().unwrap();
+            }
+            "--runs" => {
+                i += 1;
+                cfg.runs = args[i].parse().unwrap();
             }
             "--describe" => {
                 println!("{}", cfg.describe());

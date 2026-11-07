@@ -125,7 +125,7 @@ pub fn make_instance(bits: u32, idx: u64) -> Instance {
     assert!(bits >= 8 && bits <= 42);
     let seed = instance_seed(bits, idx);
     let mut rng = Rng::new(seed);
-    let margin = 1u64 << (bits / 2 + 2);
+    let margin = (1u64 << (bits / 2 + 1)) + 6;
     let (plo, phi) = ((1u64 << (bits - 1)) + margin, (1u64 << bits) - margin - 2);
     loop {
         let p = (plo + rng.below(phi - plo)) | 3; // p = 3 mod 4
