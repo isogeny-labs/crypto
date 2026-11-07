@@ -1030,7 +1030,7 @@ impl WordSweep {
     fn new(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> Option<Self> {
         let word = |v: &BigUint| v.to_u64_digits().first().copied().unwrap_or(0);
         let pd = curve.p.to_u64_digits();
-        if pd.len() != 1 || pd[0] <= 2 || pd[0] % 2 == 0 || pd[0] >= (1u64 << 40) {
+        if pd.len() != 1 || pd[0] <= 2 || pd[0].is_multiple_of(2) || pd[0] >= (1u64 << 40) {
             return None;
         }
         let xs: Vec<Option<u64>> = factor_base
