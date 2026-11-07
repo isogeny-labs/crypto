@@ -3,8 +3,8 @@
 2026-11-07. Status: **prepared, not run. No measured data exist.** Every sentence here is
 an unverified assertion of the preparing session [pcc:unverified].
 
-- Protocol: [`PROTOCOL.md`](PROTOCOL.md), [`protocol.json`](protocol.json) (validated; see its
-  `freeze` block).
+- Protocol: [`PROTOCOL.md`](PROTOCOL.md), [`protocol.json`](protocol.json). It validates and was committed
+  before any data (`bfcd18db85`). It is still a draft: the freeze tool needs a measured per-arm timing first.
 - Instrument: [`specs/c1-e2e-m5.json`](specs/c1-e2e-m5.json) (stage 1) and
   [`specs/c1-e2e-m7.json`](specs/c1-e2e-m7.json) (stage 2).
 - Code: `src/cryptanalysis/ecbench/xline_bin.rs`.

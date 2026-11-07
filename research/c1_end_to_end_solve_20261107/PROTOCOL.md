@@ -2,8 +2,12 @@
 
 Preregistered 2026-11-07, before any measured data. Machine-readable form:
 [`protocol.json`](protocol.json) (`experiment.protocol/v1`, validated with
-`crypto-autoresearcher/tools/experiment_protocol.py validate`; its `freeze`
-block records the freezing commit). Instrument: [`specs/`](specs/).
+`crypto-autoresearcher/tools/experiment_protocol.py validate`). First
+committed in `bfcd18db85`, before any data. The `freeze` block is still
+`draft`: `experiment_protocol.py freeze` refuses until the protocol records a
+measured per-arm timing (`preflight_runtime`) and an analysis-script hash,
+and neither could be produced in the preparing session (see README). Rule 1
+below fills them before the first dispatch; nothing else may change. Instrument: [`specs/`](specs/).
 
 ## Question
 
