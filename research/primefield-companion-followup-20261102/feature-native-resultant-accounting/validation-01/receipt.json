@@ -1,0 +1,49 @@
+{
+  "scope": "software instrument self-tests; no panel rows",
+  "reversible_arms": 3,
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)\nbinary: rustc\ncommit-hash: 58cf8f9c35b355199727627d07ae34a4e2846d67\ncommit-date: 2026-10-13\nhost: x86_64-unknown-linux-gnu\nrelease: 1.99.1\nLLVM version: 23.1.1\n",
+  "source_hashes": {
+    "main.rs": "451f40854751e2afbba2d3645e6af3784e712a88212405fc160a879c2b9c9564",
+    "meter.rs": "99443bf3affb9a19c6dc3c014b33923255c7fc8ff23c5eb31983fd24a83c46c8",
+    "names.rs": "ca2f39c064827c488cbf0fc64043ad241148c61302b03636ec166613d881b810",
+    "generate.py": "28e25b00f1b860a42bdc50daf19c26129c634de6bbaceb28d9f22a6904fa4758",
+    "generation.json": "a5b03653e5f64f2025c311c4f709532d15afa208e07562e349ccd12eb53f38f9",
+    "validate.py": "4c91887e7da1731f709b9d36bb4c8ae65cd1ab4546ddaf2a78ff85b2a483a05e",
+    "generated/euclid.rs": "81c327ea821163701f0a9fdd29a8a2c6db9e3ea78b509ecac194dd8d73c2b85b",
+    "generated/half.rs": "96afe40aeab98356548528bce6074bcf9886f997e49082ab37193d0b5879fb20",
+    "generated/scalar.rs": "978093fb1bdd5e847f6c094e241b6524486bff1e065ec609a57f4c8d346f54cb"
+  },
+  "commands": [
+    {
+      "label": "build",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/rustc",
+        "--edition=2021",
+        "-C",
+        "opt-level=2",
+        "-C",
+        "overflow-checks=yes",
+        "/home/ec2-user/crypto-primefield-companion-pr-20261101/research/primefield-companion-followup-20261102/feature-native-resultant-accounting/main.rs",
+        "-o",
+        "/tmp/resultant-instrument-uqyjtkqs/instrument"
+      ],
+      "timeout_seconds": 90,
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "fe7652b27b5c700bfa963690f4774b848217819eea6d62d7f95ca857bdb34157"
+    },
+    {
+      "label": "self-test",
+      "argv": [
+        "/tmp/resultant-instrument-uqyjtkqs/instrument",
+        "--self-test"
+      ],
+      "timeout_seconds": 30,
+      "exit_code": 0,
+      "stdout_sha256": "d02d06cbd2ec4ea301e35f13ac917456a08ec82d86b20780d4abdc813947124b",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "binary_sha256": "ed757644e7381db93786bdb2bd0d32990ce127b41412af1269e2b2f8bbf97e46",
+  "passed": true
+}
