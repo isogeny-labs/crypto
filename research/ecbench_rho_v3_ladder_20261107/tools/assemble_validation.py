@@ -4,21 +4,23 @@ validator's files and the session's `ecbench band --json`. Lays out recorded
 values only: the band entries are run-weighted means of the band report's
 per-curve mean_s.
 
-Usage: assemble_validation.py STUDY_DIR ENTRY_DIR CAND_ARM REF_ARM KIND PROTOCOL
+Usage: assemble_validation.py STUDY_DIR ENTRY_DIR CAND_ARM REF_ARM KIND PROTOCOL [SESSION [BAND_JSON]]
 """
 import hashlib, json, os, sys
 
 study, entry, cand, ref, kind, protocol = sys.argv[1:7]
+session = sys.argv[7] if len(sys.argv) > 7 else "main"
+band_file = sys.argv[8] if len(sys.argv) > 8 else "band.json"
 rel = os.path.relpath(study, entry)
 sha = lambda p: hashlib.sha256(open(p, "rb").read()).hexdigest()
-band = json.load(open(os.path.join(study, "band.json")))
+band = json.load(open(os.path.join(study, band_file)))
 def pooled(arm):
     rows = [r for r in band["rows"] if r["arm"] == arm]
     n = sum(r["verified"] for r in rows)
     return [sum(r["mean_s"][i] * r["verified"] for r in rows) / n for i in range(3)]
 c, r = pooled(cand), pooled(ref)
 order = len({c[i] < r[i] for i in range(3)}) == 1
-sess = json.load(open(os.path.join(study, "sessions/main/session.json")))
+sess = json.load(open(os.path.join(study, "sessions", session, "session.json")))
 man = {
     "schema": "validation-gate/v1",
     "replay_certificate": {"path": f"{rel}/validation/replay-certificate.json",

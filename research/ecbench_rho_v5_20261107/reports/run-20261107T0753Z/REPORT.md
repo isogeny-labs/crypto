@@ -26,10 +26,25 @@ Bounds (fit version 2):
 | rho.signed_frobenius_v4, Koblitz toy | `ECBND1h1c9be634d75c` | 1.813 | 0.340 |
 | rho.signed_frobenius_v3, Koblitz toy | `ECBND1h2f3867007530` | 1.900 | 0.351 |
 
+**Weighting caveat (from the validator).** The pooled ratio weights
+each curve's S equally. Summed over every run, rho.signed_frobenius_v4
+spends **5.5 % more** total GAE than v3 (ratio 1.0546). The two medium
+curves carry most of the operations, and v4 is not faster there. On the
+prime session the candidate is 1.045 at 2^21.2, and plain_v5 is 1.008 at
+2^28; both intervals include 1.
+
 The Koblitz gain sits on the toy tier: 0.939–0.962 per curve. On the two
 medium curves the ratios are 1.012 and 1.074 [0.983, 1.173], unresolved,
 so v4 is not claimed there. rho.negation_v5 has S = 0.921 at 2^28, 1.04×
 √(π/4).
+
+## Validation
+
+An independent validator recomputed the three pooled ratios and their
+band values to 4.9e-05. It re-verified [d]G = Q on all 13,440 prime and
+6,048 Koblitz records, and rejected 240/240 wrong scalars per session
+(`validation/`). `benchmarks/20261107-rho-v5/VALIDATION.json` covers the
+prime negation row and reads valid.
 
 ## Run
 
