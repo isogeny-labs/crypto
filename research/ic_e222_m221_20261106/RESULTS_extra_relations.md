@@ -49,3 +49,23 @@ The measured ratio equals the relation-count ratio. The saving is exactly the su
 **Does it beat the baseline's best factor-base size?** Per-trial cost is about 2 scalar multiplications plus fb square roots, so trials x fb is a first proxy for the square-root count (an estimate across different instance sets, not a measurement): baseline 36,000 / 20,700 / 14,300 at fb 8 / 16 / 32; retuned extra = 2 about 5,000 / 4,400 / 4,800. The baseline's best fb is 32 or larger, and the retune at fb 8 to 32 is still about 3 times cheaper in that proxy. Wall time (with elimination, which also shrinks) and the baseline at fb 64 and above are not yet measured.
 
 **Reading.** The improvement over the shipped default is real and reproducible on two fresh holdouts. Against a baseline tuned over fb it is smaller than the headline 0.14, and it vanishes for very large fb. It is a retune, unvalidated, with no matched-rho band; the goal is not met.
+
+## Wall time, fully priced, against a baseline tuned over fb (the honest number)
+
+30 further fresh W instances (v3, indices 10 to 19 at rungs 14 to 16), 2 solver seeds, fb 8 to 512, extra 64 vs 2, serial runs in interleaved seeded order (`run_timed.py`), local unisolated host. Metric: the solver's own `total_ms` (factor-base construction + relation collection + linear algebra + verification; no lifting for prime order; extraction is part of the linear-algebra stage). 960 runs, all verified (the fb 128 cells ran in both panels and are averaged). Data: `results/timed/`, `results/timed_ext/`, `analysis.txt` in each.
+
+| fb | baseline ms | retuned (extra 2) ms | ratio | retuned linear algebra ms |
+|---|---|---|---|---|
+| 8 | 677.2 | 95.0 | 0.140 | 0.01 |
+| 16 | 270.4 | 57.1 | 0.211 | 0.02 |
+| 32 | 122.6 | 47.8 | 0.390 | 0.04 |
+| 64 | 67.4 | 35.3 | 0.524 | 0.09 |
+| 128 | 53.4 | 33.5 | 0.627 | 0.41 |
+| 256 | 45.4 | 32.5 | 0.715 | 1.76 |
+| 512 | 76.5 | 65.6 | 0.858 | 7.28 |
+
+The best fb is 256 for both (the optimum is bracketed: 512 is worse for both). **Best-vs-best paired ratio 0.828, bootstrap 95% CI 0.791 to 0.891 (n = 60 instance-seed pairs; seeds on one instance are correlated, so the interval is somewhat optimistic).** So against the shipped default at its own best size the retune saves about 17% of wall time, not the 86% seen at the default fb 8, and the lever disappears at large fb as linear algebra (cubic in fb) takes over.
+
+**Caveats.** The best fb was chosen on the same 30 instances that it is then measured on (a mild optimism that affects both arms). The metric is the solver's own stage timer on a shared unisolated host, not an isolab-eks run. Toy sizes (r up to 2^18). No validation-gate evidence and no matched-rho band, so this is not a leaderboard row, and the gap to rho is unchanged in kind. This is the first number to quote for the retune; the trial ratios above are not.
+
+**Goal status: not met.** What exists is a reproducible, modest (about 17%) wall-time gain from a parameter retune at toy size; nothing structural has been shown.
