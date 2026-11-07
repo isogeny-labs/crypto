@@ -1613,6 +1613,27 @@ mod tests {
         bit, low_bits, mask_from64, mask_low64, masks_low64, Mask, MASK_BITS,
     };
 
+    /// `sat_loop` blocks each rejected model and solves again.  Root-fixed
+    /// variables make every blocking clause start with root-false literals;
+    /// added above level zero they could take both watches, so the clause
+    /// was never visited, the loop saw the same model until `max_models`
+    /// and reported an incomplete search.  x0 = x1 = 1 with x2..x4 free has
+    /// exactly 8 models: each must be seen once, then UNSAT.
+    #[test]
+    fn sat_loop_blocks_models_with_root_fixed_variables() {
+        let n_vars = 5;
+        let fixed =
+            |v: u32| F2BoolPoly::from_monos(vec![F2BoolMono::var(v), F2BoolMono::one()], n_vars);
+        let equations = vec![fixed(0), fixed(1)];
+        let mut seen = std::collections::HashSet::new();
+        let out = sat_loop(&equations, n_vars, u64::MAX, 100, |root| {
+            assert!(seen.insert(root), "model {root:?} returned twice");
+            None
+        });
+        assert!(out.complete, "enumeration must end in a proof of UNSAT");
+        assert_eq!(seen.len(), 8);
+    }
+
     fn interpolated_terms(m: usize, symmetrised: bool) -> Vec<Vec<u32>> {
         let k = Curve::koblitz(1, 9);
         let pts = k.affine_points();
