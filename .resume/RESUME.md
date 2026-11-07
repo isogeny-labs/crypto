@@ -1,37 +1,45 @@
-# Resume: crypto @ claude/gpu-ic-baseline-modal-20261107
+# Resume: crypto @ claude/novel-ecdlp-algorithm-iams4j
 
 ## Goal
-User request (2026-11-07): draft the EKS GPU pool for review and also use Modal, for the first hardware
-baseline of gpu/semaev and gpu/rootfind (no kernel in either has ever run on a GPU).
+User request (2026-11-07): run every next step of research/split_prime_ecdlp_20261107 (#3654, #3655
+merged): proposals P1 (Riemann-Roch system with a Dickson-torus tower), P2 (twist-pure coset
+selection), P3 (cross-trace covariate test of the split-prime statistic) under frozen protocols on toy
+prime fields, plus a Lean statement of the obstruction.
 
 ## Lead / hypothesis
-Engineering stage diagnostic, not a lead. Does the device agree with the verified host path, and how fast
-does it run (clmad vs software product, per-row vs per-pair, sorted vs hash lookup)? Predictions P1-P4 are
-in the spec.
+P1: round7_rr's D_RR = 4 < D_T = 6 (m3 t4, Kummer) transfers to the Dickson torus tower (proposer 0.55
+stage-level). P2: F4 cost is coset-independent and coverage scales as c_E^m, so selecting the most
+E-pure coset pays at toy scale (0.85 toy, 0.05 cold end-to-end). P3: no Frobenius-field covariate
+moves rho cost or exact m = 2 coverage by >= 1 % (null expected, 0.98).
 
 ## Spec
-research/gpu_ic_baseline_20261027/PROTOCOL.md including Amendment 1 (frozen at the commit that adds
-gpu/modal/). Container job: gpu/modal/ic_baseline_job.sh. Launcher: gpu/modal/modal_ic_job.py.
+research/split_prime_ecdlp_20261107/followups/{README.md, p1_rr_dickson/PROTOCOL.md,
+p2_twist_coset/PROTOCOL.md, p3_cross_trace/PROTOCOL.md}, frozen in commit 535d9da826 (PR #3657).
+Instrument commands pinned in each protocol's Addendum A before any claim cell.
 
 ## State
-Protocol, Modal launcher/job and the EKS GPU pool draft (taskq/deploy/eks-karpenter/gpu-draft/, NOT applied)
-are committed on this branch. No Modal run yet. Modal credentials are in the session environment
-(MODAL_TOKEN_ID, MODAL_TOKEN_SECRET); the `modal` client is pip-installed (1.6.3).
+Protocols committed and pushed (PR #3657, auto-merge on). Builders writing standalone Rust crates under
+followups/p1_rr_dickson/p1tool, followups/p2_twist_coset/p2coset, followups/p3_cross_trace/p3census
+(uncommitted until they report). msolve 0.6.5 from apt at /usr/bin/msolve. aws CLI from
+/tmp/report-venv (pip) linked at /usr/local/bin/aws; caller is account 104186811093.
+Lean: aburan28/crypto-lean PR #3 (CryptoLean.SplitPrime.Obstruction), local module build passed,
+standard axioms only. Toolchain: ~/.elan with lean-4.35.0 linked from the release archive (elan cannot
+resolve "latest" through the proxy).
 
 ## Next steps
-1. Checkpoint push must succeed (needs CHECKPOINT_UPLOAD_TOKEN or AWS creds; neither was present).
-2. `modal run --detach gpu/modal/modal_ic_job.py --out /tmp/gpu-ic-baseline/run-01`; if the client dies,
-   `--fetch-token <token>`.
-3. If the selftest gate fails, that is the result: report it, no throughput.
-4. Otherwise score P1-P4, write RESULTS, graph, PDF, benchmarks/ row only if the validation gate allows
-   (it does not for a Modal-only run), session log, PR.
+1. Read builders' reports; pin Addendum A per protocol; commit; new PR (or same branch if #3657 open).
+2. scripts/checkpoint.sh push; tools/benchrec.py init per run.
+3. experiment-director compile mode -> card per experiment; relay verbatim to executor-mechanical;
+   director assess mode.
+4. Analyse per the frozen decision rules; report + figures + Typst PDF per experiment; pcc claims;
+   session log; PR; track to merge.
 
 ## Runs in flight
-None.
+None. No claim cell has run.
 
 ## Stop and success conditions
-One Modal launch, 2 h function timeout, expected under 30 min. Any selftest failure stops throughput.
+Per protocol decision rules. Budget: P1 1,200 s per msolve job, one at a time; P2 same limits;
+P3 about 4 CPU-hours total. Stop a protocol on its control-failure rule.
 
 ## Open questions
-Whether sm_120 is available on Modal as "RTX-PRO-6000" for this workspace; whether the g7e sizes and
-G-family Spot quota exist for the EKS pool.
+Whether the director accepts the local L0 route (stated deviation from AGENTS.md section 9a).

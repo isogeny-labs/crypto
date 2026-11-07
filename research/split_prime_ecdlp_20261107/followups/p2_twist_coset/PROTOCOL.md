@@ -78,6 +78,53 @@ KB unavailable. `../../ideas/idea-generator.md` P2,
 `RESEARCH_PKM_TOWER_ORACLE.md` (line 202, "about half of V"; line 226, seed-drawn
 coset), `research/pkm_dickson_torus_20261015/`.
 
-## Addendum A: instrument (pinned before any claim cell)
+## Addendum A: instrument and pre-data amendments (pinned before any claim cell)
 
-Pending the builder's report.
+**Instrument.** `p2coset/` (standalone Rust, `src/main.rs` sha256
+`963c2f08970dd3d0602e1ad3091210d3a36b7d4cdbcc6e56f1b277350c4d401c`), built with
+`cargo build --release`; msolve 0.6.5 (Debian 0.6.5-1build2). Development
+validation (`p2coset/README.md`, `smoke/`): `selftest` 14/14; smoke cells at
+p = 12,289 (Kummer) and 65,519 (Dickson) only. No claim cell has run.
+
+Commands, per cell (`$B` = the release binary):
+
+```
+$B curve    --p P --cseed I                       # I = 0, 1, 2 (curve index)
+$B cosets   --kind K --p P --t T --C C --seed S --out cosets.json
+$B coverage --kind K --p P --t T --C C --seed S --select idx:0|idx:1|max
+$B emit     --kind K --p P --t T --m M --C C --seed S --select idx:0|idx:1|max --tseed N --out cell.ms
+( ulimit -v 1572864; nice -n 10 msolve -g 2 -t 1 -v 2 -f cell.ms -o cell.out > cell.log 2>&1 )   # timeout 1200 s
+$B parse    --log cell.log
+$B purity   --p P --m 2|3 --cseed I
+```
+
+`idx:0` is the random arm, `idx:1` the A/A arm, `max` the selected arm (ties to
+the lowest index). Seeds S follow the shared rule (README of `followups/`), the
+four targets are `--tseed 1..4`.
+
+**Pre-data amendments (from the builder's development run, before any claim
+cell):**
+
+1. **M4 violation is redefined.** The proposal's corollary "every m ≤ 3 solution is
+   E-pure" is false for trivial relations: at m = 3 a twist pair with
+   P_a = −P_b and P_c = R satisfies S_4. What the lemma states, and what
+   `twist_part_sum_eq_zero` (crypto-lean#3) formalizes, is that the twist part
+   sums to O. A violation is therefore a relation with an E-target R ≠ O whose
+   twist summands do not sum to O (`E_target_with_twist_summand_nontrivial` in the
+   `purity` output). Trivial cancelling pairs are counted and reported, not
+   violations.
+2. **The restricted-base control is dropped.** V ∩ x(E) is not a 2-power tower
+   (its defining polynomial has degree c_E, not 2^t), so it needs a different
+   system and cannot isolate what it was meant to. The A/A arm (`idx:1`) stays.
+3. **No constructed positive control.** A coset with all 2^t columns on E cannot be
+   planted on a fixed curve; `max` over C candidates is the nearest arm. M1's
+   exact order statistic plays the role of the calibrated expectation.
+4. **M1 uses the exact binomial expectation printed by `cosets`**, not the
+   proposal's Gaussian approximation (which overshoots: 1.84 vs exact 1.69 at
+   t = 4, C = 300 in development).
+5. **M3 cells need c_E ≥ m** in every arm; a cell where an arm has c_E < m is
+   recorded as "not emittable", never imputed.
+6. **Coverage at m = 2 is exactly 2·c_E² when all pair sums are distinct**
+   (development: 392 at c_E = 14), so M2's law is close to an identity at these
+   sizes; M2 is kept as stated and read as a consistency check, and M3 carries the
+   decision.
