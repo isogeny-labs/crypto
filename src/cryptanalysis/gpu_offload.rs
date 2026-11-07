@@ -79,8 +79,8 @@ pub fn report() -> Option<Value> {
         "workers": {"fes": show(&fes), "spmv": show(&spmv)},
         // A stage is `offloaded` only where its code path exists in this build.
         "stages": {
-            "fes_leaf": "not offloaded: per-target launch is slower than the CPU search; batching not built",
-            "linear_algebra_spmv": "not offloaded: per-multiply worker relaunch; persistent worker not built",
+            "fes_leaf": "not offloaded: a per-target worker launch is expected to lose to the in-process search (not yet measured against it); batching not built",
+            "linear_algebra_spmv": "not offloaded: the SpMV worker relaunches per multiply; persistent worker not built",
             "decomposition_oracles": "not offloaded: gpu/semaev and gpu/rootfind not wired",
         },
     }))
