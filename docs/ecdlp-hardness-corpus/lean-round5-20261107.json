@@ -1,0 +1,104 @@
+{
+  "schema": "ecdlp.claim-corpus/v1",
+  "fragment": "lean-round5-20261107",
+  "notes": "Round 5 (2026-11-07): the F4 containment theorem (research/ecdlp_weakness_lean_20261104/lean/F4Containment.lean) and a real F4 run (msolve) on the pq2_rank census instances. Repository results; pcc claims are unsigned until a keyring key exists.",
+  "sources": [
+    {
+      "id": "S-PQ2-F4-ROUND5",
+      "title": "pq2_rank: F4 containment in Lean and msolve F4 runs on the m = 2 census instances (2026-11-07)",
+      "kind": "repository_measurement",
+      "verification": "repository_read",
+      "citation": "research/ecdlp_weakness_lean_20261104/lean/F4Containment.lean; research/ecdlp_weakness_census_20261104/pq2_rank/f4/ (run_msolve.py, summarize.py, msolve_all.json).",
+      "repository_path": "research/ecdlp_weakness_census_20261104/pq2_rank/README.md"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "THM-F4-CONTAINMENT",
+      "label": "F4 runs with step degree <= D stay in every D-closed subspace containing the generators",
+      "kind": "structural_theorem",
+      "status": "proved_internal_unreviewed",
+      "model": "algebraic_coordinate",
+      "statement": "Let S be a subspace of K[x] closed under f -> x_i f whenever totalDegree f + 1 <= D, containing the generators F. An F4 run whose every new basis lies in the span of earlier bases and their multiples by monomials within total degree D keeps every basis inside S (run_subset). If S is finite-dimensional and dim(S cap P_{<=1}) < k, no basis of the run is a Groebner basis (no_gb_of_run_of_low_lt). Closure of span B reduces to a finite check on B (dclosed_of_basis).",
+      "scope": "Lean v4.34.1 / Mathlib v4.34.1, axioms propext, Classical.choice, Quot.sound only. Abstract F4 model; that a given implementation fits it is a reading of its algorithm, not a theorem. pcc claims PCC-20261107-209a57 and PCC-20261107-91a01d, unsigned.",
+      "assumptions": [],
+      "source_refs": [
+        "S-PQ2-F4-ROUND5"
+      ],
+      "source_locations": [
+        "research/ecdlp_weakness_lean_20261104/lean/F4Containment.lean"
+      ],
+      "tags": [
+        "groebner",
+        "lean",
+        "solving-degree"
+      ],
+      "evidence_class": "theorem"
+    },
+    {
+      "id": "MEAS-PQ2-MSOLVE-F4",
+      "label": "m = 2 descended S3: msolve F4 maximal step degree is exactly 4 for n = 17 to 34",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "msolve 0.6.5 (F4, grevlex) on the 81 pq2_rank main-sweep instances with n = 8 to 34 (dumped with the census seed and arguments, dump log identical to the census log): maximal step degree 3 on 24 and 4 on 3 of the 27 instances with n <= 16, equal to the census d_iter on all 27; exactly 4 on all 54 instances with 17 <= n <= 34; msolve's reduced basis contains exactly k linear polynomials on all 81.",
+      "scope": "m = 2 only; one implementation and one selection strategy; finite range n <= 34, below the n = 37 step to 5 that MEAS-GB-KW-TABLE1 reports. Does not decide boundedness.",
+      "assumptions": [],
+      "source_refs": [
+        "S-PQ2-F4-ROUND5"
+      ],
+      "source_locations": [
+        "research/ecdlp_weakness_census_20261104/pq2_rank/f4/msolve_all.json"
+      ],
+      "tags": [
+        "groebner",
+        "summation-polynomial",
+        "solving-degree",
+        "census"
+      ],
+      "evidence_class": "measurement"
+    }
+  ],
+  "edges": [
+    {
+      "id": "R5-001",
+      "from": "THM-F4-CONTAINMENT",
+      "to": "MEAS-PQ2-DLIN-CENSUS",
+      "relation": "conditions",
+      "statement": "Turns each closure count iter_D < k into a lower bound D + 1 on F4's maximal step degree.",
+      "source_refs": [
+        "S-PQ2-F4-ROUND5"
+      ]
+    },
+    {
+      "id": "R5-002",
+      "from": "MEAS-PQ2-MSOLVE-F4",
+      "to": "HEUR-GB-PQ-ASSUMPTION-2",
+      "relation": "qualifies",
+      "statement": "Real F4 (msolve) degree is 4 on n = 17 to 34, one above the Kousidis-Wiemers value 3 and equal to their Magma value for n <= 36; MEAS-GB-KW-TABLE1 reports 5 from n = 37, so this window does not decide boundedness.",
+      "source_refs": [
+        "S-PQ2-F4-ROUND5"
+      ]
+    },
+    {
+      "id": "R5-003",
+      "from": "MEAS-PQ2-MSOLVE-F4",
+      "to": "MEAS-PQ2-DLIN-CENSUS",
+      "relation": "measures",
+      "statement": "Matches the census lower bound on every instance where it is exact, and is never below it.",
+      "source_refs": [
+        "S-PQ2-F4-ROUND5"
+      ]
+    },
+    {
+      "id": "R5-004",
+      "from": "MEAS-PQ2-MSOLVE-F4",
+      "to": "MEAS-GB-KW-TABLE1",
+      "relation": "measures",
+      "statement": "Reproduces the Magma value 4 with a second implementation on n = 17 to 34, below the n = 37 step to 5.",
+      "source_refs": [
+        "S-PQ2-F4-ROUND5"
+      ]
+    }
+  ]
+}

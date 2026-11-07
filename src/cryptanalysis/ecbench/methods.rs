@@ -217,7 +217,7 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "oracle",
             default: None,
-            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3|4|5 (one probe a target into a negation-folded table of every signed m-sum of the base); wsum:coef=B[,free=1] (prime curves: one probe a target into a negation-folded coefficient-box table of every Σ e_c·P_c, |e_c| ≤ B, over the base's C ≤ 8 abscissae); wwalk:x=X[,jumps=16][,grow=0|1|2][,g=0|1] (prime curves, a base of exactly 2 abscissae: a random-jump walk table of round(X·√r) steps E_t = E_(t-1) + J_h, X in (0, 4], one probe a target into it as a two-column row, and its own key collisions as target-free rows; grow=1 extends the walk until the first verified free row, at most 2T; g=1 adds [gamma]G to every jump so a collision is an affine row du*s1+dv*s2=-dz; grow=2 (needs g=1) extends until two independent free rows exist, at most 3T; seed=run draws the table from the run seed so every run resamples it); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace",
+            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3|4|5 (one probe a target into a negation-folded table of every signed m-sum of the base); wsum:coef=B[,free=1] (prime curves: one probe a target into a negation-folded coefficient-box table of every Σ e_c·P_c, |e_c| ≤ B, over the base's C ≤ 8 abscissae); wwalk:x=X[,jumps=16][,grow=0|1|2][,g=0|1] (prime curves, a base of exactly 2 abscissae, or of 1 with g=1 (F=1: jumps [a]P1+[c]G, a collision is du*s1=-dz, grow=1|2 extends until that one row exists, at most 2T|3T): a random-jump walk table of round(X·√r) steps E_t = E_(t-1) + J_h, X in (0, 4], one probe a target into it as a two-column row, and its own key collisions as target-free rows; grow=1 extends the walk until the first verified free row, at most 2T; g=1 adds [gamma]G to every jump so a collision is an affine row du*s1+dv*s2=-dz; grow=2 (needs g=1) extends until two independent free rows exist, at most 3T; seed=run draws the table from the run seed so every run resamples it; tw=1 (needs g=1, grow=2 and a base of 1 abscissa) puts the target in the walk: jumps [a]P1+[c]G+[b]Q, every collision is a row du*s1+db*log Q=-dz, the walk stops at the first two independent rows (cap 3T) and those pin log Q; cj=1 (needs tw=1) builds the jumps by chained additions from two base combinations); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace",
         },
         ParamDecl {
             name: "solver",
@@ -227,7 +227,7 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "linalg",
             default: Some("incremental-gauss"),
-            help: "incremental-gauss (stop at target pin), incremental-gauss-full-rank (all columns independent), incremental-gauss-full-rank-checked (also point-check each base column), structured-gauss, sparse-cado = filter+wiedemann (CADO-style filter + block Wiedemann, full-rank rule), filter+lanczos, wiedemann or lanczos (no filter, block Wiedemann / block Lanczos, full-rank rule)",
+            help: "incremental-gauss (stop at target pin), incremental-gauss-full-rank (all columns independent), incremental-gauss-full-rank-checked (also point-check each base column), incremental-gauss-echelon (sparse forward-only elimination, same pins and answer as incremental-gauss), structured-gauss, sparse-cado = filter+wiedemann (CADO-style filter + block Wiedemann, full-rank rule), filter+lanczos, wiedemann or lanczos (no filter, block Wiedemann / block Lanczos, full-rank rule)",
         },
         ParamDecl {
             name: "targets",
@@ -2928,6 +2928,13 @@ fn pipeline_components_applicable(m: &ResolvedMethod, inst: &Instance) -> Result
                 grow,
             };
             wwalk_plan_check(i.r, x, jumps, opts)?;
+            let (tw, cj) = (or.flag("tw"), or.flag("cj"));
+            if cj && !tw {
+                return Err("wwalk: cj=1 needs tw=1".into());
+            }
+            if tw && (!opts.g_jumps || grow != 2) {
+                return Err("wwalk: tw=1 needs g=1 and grow=2".into());
+            }
         }
         _ => {}
     }

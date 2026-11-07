@@ -1,0 +1,28 @@
+== PairCursor.lean ==
+'PairCursor.considered_step' depends on axioms: [propext, Quot.sound]
+'PairCursor.considered_row_break' depends on axioms: [propext]
+'PairCursor.considered_zero' depends on axioms: [propext]
+'PairCursor.considered_total' depends on axioms: [propext]
+'PairCursor.rowPrefix_mono' depends on axioms: [propext, Quot.sound]
+== VersionSelection.lean ==
+'VersionSelection.less_irrefl' depends on axioms: [propext, Quot.sound]
+'VersionSelection.less_asymm' depends on axioms: [propext, Quot.sound]
+'VersionSelection.less_trans' depends on axioms: [propext, Classical.choice, Quot.sound]
+'VersionSelection.less_total' depends on axioms: [propext, Classical.choice, Quot.sound]
+'VersionSelection.newer_trans' depends on axioms: [propext, Classical.choice, Quot.sound]
+== AssetSelection.lean ==
+'AssetSelection.find_mem' depends on axioms: [propext]
+'AssetSelection.find_spec' depends on axioms: [propext]
+'AssetSelection.find_isSome' depends on axioms: [propext, Quot.sound]
+'AssetSelection.choose_universal' depends on axioms: [propext, Quot.sound]
+'AssetSelection.choose_arch' depends on axioms: [propext, Quot.sound]
+'AssetSelection.choose_none' depends on axioms: [propext]
+== InstallLayout.lean ==
+'InstallLayout.layout_bin' depends on axioms: [propext]
+'InstallLayout.layout_base_bin' depends on axioms: [propext]
+== DiskBudget.lean ==
+'DiskBudget.required_overhead' depends on axioms: [propext, Quot.sound]
+'DiskBudget.required_zero' depends on axioms: [propext]
+'DiskBudget.required_at_least_raw' depends on axioms: [propext, Quot.sound]
+'DiskBudget.required_mono_planned' depends on axioms: [propext, Quot.sound]
+'DiskBudget.required_mono_bytes' depends on axioms: [propext, Quot.sound]

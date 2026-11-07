@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Split-prime pattern reaches the prime-order group only through scalars](split-prime-pattern-scalar-only.md) | open (derived obstruction for the ℓ-adic / class-group route) | a novel ECDLP algorithm built on the split-prime deficit of the published prime curves | a computable non-scalar entry point verified on a toy class, or a Lean proof that closes the route formally |
 | [Divergent append-only PCC ledgers](pkm-pcc-ledger-divergence.md) | open, report-only | current-main PCC prefix/integration | canonical provenance-preserving reconciliation contract; no side selection, rechain or waiver |
 | [Ecbench time-namespace runtime](ecbench-time-namespace-runtime.md) | open | two library clock-initialization controls | qualified proc time-namespace support or specified fail-closed unsupported-runtime contract; rerun original controls/full suite |
 | [Inherited main strict-lint failures](pkm-main-strict-lint-inherited.md) | open | integrated PKM strict lint | repair trace visibility/usage and custody boolean style upstream; rerun unchanged warnings-as-errors gate |

@@ -7,8 +7,8 @@
     "model_bridge"
   ],
   "counts": {
-    "nodes": 608,
-    "frontier": 392,
+    "nodes": 610,
+    "frontier": 393,
     "contaminated_by_refuted": 3,
     "unlinked_citations": 0,
     "by_status": {
@@ -17,15 +17,15 @@
       "proved_external": 132,
       "algorithm": 12,
       "conditional": 89,
-      "measured": 29,
-      "proved_internal_unreviewed": 68,
+      "measured": 30,
+      "proved_internal_unreviewed": 69,
       "open": 70,
       "heuristic": 71,
       "refuted": 32,
       "proved_external_unread": 44
     },
     "by_formal_state": {
-      "none": 556,
+      "none": 558,
       "kernel_checked": 44,
       "stated_open": 3,
       "lean_written_unchecked": 1,
@@ -616,6 +616,10 @@
         {
           "from": "MEAS-PQ2-DLIN-CENSUS",
           "relation": "obstructs"
+        },
+        {
+          "from": "MEAS-PQ2-MSOLVE-F4",
+          "relation": "qualifies"
         }
       ]
     },
@@ -2379,6 +2383,20 @@
       "impact": 1,
       "downstream": [
         "DEF-BK-GG-UNROLLED-SYSTEM"
+      ],
+      "depends_citations": [],
+      "research_targets": [],
+      "pressure": []
+    },
+    {
+      "id": "THM-F4-CONTAINMENT",
+      "label": "F4 runs with step degree <= D stay in every D-closed subspace containing the generators",
+      "status": "proved_internal_unreviewed",
+      "formal": "none",
+      "action": "independent review, then kernel-check",
+      "impact": 1,
+      "downstream": [
+        "MEAS-PQ2-DLIN-CENSUS"
       ],
       "depends_citations": [],
       "research_targets": [],
