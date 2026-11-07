@@ -1712,8 +1712,16 @@ fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) ->
         for (j, fj) in factor_base.iter().enumerate().skip(i) {
             for s_i in [1i64, -1i64] {
                 for s_j in [1i64, -1i64] {
-                    let pi = if s_i > 0 { fi.point.clone() } else { fi.point.neg() };
-                    let pj = if s_j > 0 { fj.point.clone() } else { fj.point.neg() };
+                    let pi = if s_i > 0 {
+                        fi.point.clone()
+                    } else {
+                        fi.point.neg()
+                    };
+                    let pj = if s_j > 0 {
+                        fj.point.clone()
+                    } else {
+                        fj.point.neg()
+                    };
                     if let Point::Affine { x, y } = pi.add(&pj, &a_fe) {
                         table
                             .entry((x.value.clone(), y.value.clone()))
@@ -1763,7 +1771,14 @@ fn find_one_relation_table_with_rng<R: rand::RngCore>(
                 entries.push((i, s_i));
                 entries.push((j, s_j));
             }
-            return Some((Relation { coef_a: a, coef_b: b, entries }, trial));
+            return Some((
+                Relation {
+                    coef_a: a,
+                    coef_b: b,
+                    entries,
+                },
+                trial,
+            ));
         }
     }
     None
@@ -1812,9 +1827,14 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
         let found = 'attempt: {
             for _ in 0..max_relation_attempts {
                 let attempt = match &sum_table {
-                    Some(t) => {
-                        find_one_relation_table_with_rng(curve, g, q, t, max_trials_per_relation, rng)
-                    }
+                    Some(t) => find_one_relation_table_with_rng(
+                        curve,
+                        g,
+                        q,
+                        t,
+                        max_trials_per_relation,
+                        rng,
+                    ),
                     None => find_one_relation_counted_with_rng(
                         curve,
                         g,
