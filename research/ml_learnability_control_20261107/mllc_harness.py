@@ -1,5 +1,7 @@
 """mllc training harness: arms, models, statistics, decision rule (see PROTOCOL.md).
 Every number it writes is [pcc:unverified] until a pcc claim is filed."""
+import os
+for _v in ("OMP_NUM_THREADS","OPENBLAS_NUM_THREADS","MKL_NUM_THREADS"): os.environ.setdefault(_v, "2")
 import json, math, sys, time, argparse, platform
 import numpy as np
 from scipy.stats import binomtest, norm
