@@ -1853,6 +1853,130 @@ fn find_one_relation_table_with_rng<R: rand::RngCore>(
     None
 }
 
+/// r-adding walk state for relation sampling (experimental, `IC_WALK=1` with `IC_SUM_TABLE=1`).
+/// Each step adds one of `WALK_ARMS` precomputed points `a_k G + b_k Q` to the current point,
+/// tracking (a, b) mod n, so a trial costs one point addition instead of two scalar multiplications.
+struct SampleWalk {
+    r: Point,
+    a: BigUint,
+    b: BigUint,
+    arms: Vec<(Point, BigUint, BigUint)>,
+    steps: usize,
+}
+
+const WALK_ARMS: usize = 32;
+/// A walk whose step depends only on x enters a cycle after about sqrt(n) steps, so it is
+/// restarted from fresh random coefficients every `WALK_RESTART` steps.
+const WALK_RESTART: usize = 32;
+
+impl SampleWalk {
+    fn new<R: rand::RngCore>(curve: &CurveParams, g: &Point, q: &Point, rng: &mut R) -> Self {
+        use num_bigint::RandBigInt;
+        let a_fe = curve.a_fe();
+        let nonzero = |rng: &mut R| loop {
+            let v = rng.gen_biguint_below(&curve.n);
+            if !v.is_zero() {
+                break v;
+            }
+        };
+        let mut arms = Vec::with_capacity(WALK_ARMS);
+        for _ in 0..WALK_ARMS {
+            let (a, b) = (nonzero(rng), nonzero(rng));
+            let pt = g.scalar_mul(&a, &a_fe).add(&q.scalar_mul(&b, &a_fe), &a_fe);
+            arms.push((pt, a, b));
+        }
+        let (a, b) = (nonzero(rng), nonzero(rng));
+        let r = g.scalar_mul(&a, &a_fe).add(&q.scalar_mul(&b, &a_fe), &a_fe);
+        SampleWalk {
+            r,
+            a,
+            b,
+            arms,
+            steps: 0,
+        }
+    }
+
+    fn restart<R: rand::RngCore>(
+        &mut self,
+        curve: &CurveParams,
+        g: &Point,
+        q: &Point,
+        rng: &mut R,
+    ) {
+        use num_bigint::RandBigInt;
+        let a_fe = curve.a_fe();
+        let nonzero = |rng: &mut R| loop {
+            let v = rng.gen_biguint_below(&curve.n);
+            if !v.is_zero() {
+                break v;
+            }
+        };
+        let (a, b) = (nonzero(rng), nonzero(rng));
+        self.r = g.scalar_mul(&a, &a_fe).add(&q.scalar_mul(&b, &a_fe), &a_fe);
+        self.a = a;
+        self.b = b;
+        self.steps = 0;
+    }
+
+    fn step(&mut self, curve: &CurveParams) {
+        let a_fe = curve.a_fe();
+        self.steps += 1;
+        let k = match &self.r {
+            Point::Affine { x, .. } => {
+                (x.value.iter_u64_digits().next().unwrap_or(0) as usize) % WALK_ARMS
+            }
+            Point::Infinity => 0,
+        };
+        let (pt, ak, bk) = &self.arms[k];
+        self.r = self.r.add(pt, &a_fe);
+        self.a = (&self.a + ak) % &curve.n;
+        self.b = (&self.b + bk) % &curve.n;
+    }
+}
+
+/// Table lookup on an r-adding walk instead of fresh random (a, b).
+fn find_one_relation_table_walk<R: rand::RngCore>(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    table: &PairSumTable,
+    walk: &mut SampleWalk,
+    max_trials: usize,
+    rng: &mut R,
+) -> Option<(Relation, usize)> {
+    for trial in 1..=max_trials {
+        if walk.steps >= WALK_RESTART || matches!(walk.r, Point::Infinity) {
+            walk.restart(curve, g, q, rng);
+        }
+        walk.step(curve);
+        let key = match &walk.r {
+            Point::Affine { x, y } => (x.value.clone(), y.value.clone()),
+            Point::Infinity => continue,
+        };
+        if let Some(&(i, s_i, j, s_j)) = table.get(&key) {
+            let mut entries = Vec::new();
+            if i == j {
+                let combined = s_i + s_j;
+                if combined != 0 {
+                    entries.push((i, combined));
+                }
+            } else {
+                entries.push((i, s_i));
+                entries.push((j, s_j));
+            }
+            return Some((
+                Relation {
+                    coef_a: walk.a.clone(),
+                    coef_b: walk.b.clone(),
+                    entries,
+                },
+                trial,
+            ));
+        }
+    }
+    None
+}
+
 fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     curve: &CurveParams,
     g: &Point,
@@ -1893,6 +2017,12 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     } else {
         None
     };
+    // Experimental: IC_WALK=1 (with IC_SUM_TABLE=1) samples along an r-adding walk.
+    let mut walk = if sum_table.is_some() && std::env::var("IC_WALK").as_deref() == Ok("1") {
+        Some(SampleWalk::new(curve, g, q, rng))
+    } else {
+        None
+    };
     let mut relations = Vec::with_capacity(target);
     let mut attempts_exhausted = 0usize;
     let mut trials_per_relation: Vec<usize> = Vec::with_capacity(target);
@@ -1902,6 +2032,15 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
         let found = 'attempt: {
             for _ in 0..max_relation_attempts {
                 let attempt = match &sum_table {
+                    Some(t) if walk.is_some() => find_one_relation_table_walk(
+                        curve,
+                        g,
+                        q,
+                        t,
+                        walk.as_mut().expect("walk checked"),
+                        max_trials_per_relation,
+                        rng,
+                    ),
                     Some(t) => find_one_relation_table_with_rng(
                         curve,
                         g,
