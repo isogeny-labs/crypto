@@ -18,3 +18,18 @@
 **Cost accounting.** Collection dominates and falls with the trials. Elimination and extraction run on a 10 x 9 system instead of 72 x 9, so they also shrink; they are not separately timed here (trials are the metric). Construction of the factor base, lifting (none: prime-order) and verification (`[k]G = Q` check against the planted log) are identical across arms.
 
 **Limits.** One producer (`solve-prime-file`), fb = 8, toy sizes r <= 2^18, local host. Other producers (tournament, prime-orbit) may already use small extra values, so this says nothing about the leaderboard baselines. It does not beat rho: at these sizes the ratio to matched rho stays well above 1 (`RESULTS_rho1.md`). The goal is not met.
+
+## Fresh-holdout failure-rate sample (v3)
+
+280 new W instances (generator seed `e222m221-holdout-v3`, rungs 10 to 16 by the generator's p bits, r up to 2^18), solver seeds 1..3, fb 8, 840 runs per arm, extra = 1, 2, 3 and the 64 baseline. Data: `results/extra_v3/e{1,2,3,64}/rows.jsonl`, `results/extra_v3/analysis.txt`.
+
+| extra | verified / 840 | median trials ratio vs 64 | bootstrap 95% CI (median) | IQR |
+|---|---|---|---|---|
+| 64 (baseline, median 4542 trials) | 840 | 1 | - | - |
+| 3 | 840 | 0.148 | 0.145 to 0.152 | 0.124 to 0.180 |
+| 2 | 840 | 0.136 | 0.132 to 0.140 | 0.111 to 0.166 |
+| 1 | 840 | 0.123 | 0.120 to 0.126 | 0.099 to 0.149 |
+
+Zero failures in 840 for each of extra = 1, 2, 3 (rule-of-three 95% upper bound 0.36% per arm); extra = 0 failed 14/144 (about 10%) on the first sample, so one relation of surplus is the cliff edge and extra = 2 or 3 is the safer setting. Per-rung medians are flat (0.12 to 0.13 for extra = 1), so the saving does not depend on size within this range. Both holdouts agree (first sample extra = 2: 0.142).
+
+**Reading.** On the `solve-prime-file` producer with fb = 8, the shipped default spends about 7 to 8 times the trials it needs. The retune is reproducible on two fresh holdouts and costs no recoveries. It is still a parameter retune of the existing solver, unvalidated and local, with no matched-rho band, and says nothing about a different producer or factor-base size. Not yet measured: fb 16 and 32 (the surplus may not matter as much when fb grows), wall time including elimination, and the validation-gate evidence. The goal is not met.
