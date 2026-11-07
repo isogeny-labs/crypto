@@ -56,6 +56,6 @@ for j, g in enumerate(order):
 ax.set_title("Literature sweep 2026-11-07: sources -> knowledge-base entries / leads -> effect (all source claims reported, not checked here)", fontsize=9)
 ax.set_xlim(0, 1); ax.set_ylim(0, 1)
 fig.tight_layout()
-for ext in ("svg", "png", "pdf"):
+for ext in ("svg", "pdf"):
     fig.savefig(here / f"source_map.{ext}", dpi=150)
-print("wrote source_map.{svg,png,pdf}")
+print("wrote source_map.{svg,pdf}")

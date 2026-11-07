@@ -26,6 +26,6 @@ for i, v in enumerate(vals):
     ax.text(v * 1.3, i, f"10^{v:,.0f}" if v >= 10 else f"10^{v}", va="center", fontsize=7)
 ax.legend(loc="lower right", fontsize=7)
 fig.tight_layout()
-for ext in ("svg", "png", "pdf"):
+for ext in ("svg", "pdf"):
     fig.savefig(here / f"crossovers.{ext}", dpi=150)
-print("wrote crossovers.{svg,png,pdf}")
+print("wrote crossovers.{svg,pdf}")
