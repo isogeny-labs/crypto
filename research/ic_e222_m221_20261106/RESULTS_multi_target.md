@@ -46,3 +46,16 @@ The ranking against independent matched rho holds at every price in the band (th
 | 24 | 1024 | 250 | 425 / 448 / 652 | 1.70 [1.68, 1.72] | 1.79 | 2.60 | 0/22 |
 
 **Result: the multi-target IC is 1.7x to 2.8x more expensive than a counted batch rho (4.2x at the high end of the pricing band) in every one of the 132 paired configurations; it is not an improvement over the strongest generic multi-target attack.** The earlier model (S sqrt(n/T), 3 to 5x) was wrong in both directions: it omitted the factor 2 of the two-phase scheme (so it understated rho's cost) and the IC constants. The ratio falls as T grows (about 2.3 to 2.8 at T = 128, about 1.7 to 1.8 at T = 1024), so whether it reaches 1 at larger T is the next test. The improvement that stands is over the repository's single-target IC and over T independent matched-rho solves (previous section), not over batch rho.
+
+## Larger T: no crossover (24 and 25-bit groups, valid regime only)
+
+`run_T_ext.py` (`results/T_ext/`): T = 4096 and 16384, 4 instances x seed 1 per cell, same frozen IC fb rule and the same kappa rule for batch rho. A first attempt including 20 and 22-bit groups hung and was stopped: the reference builds its database with restarted walks that reach only a limited set of distinct points, so a database larger than that never fills (20-bit, T = 16384, kappa = 2); the database must stay a small fraction (about 5%) of the x-classes, which restricts the valid cells to 24 and 25-bit groups (kappa = 2 at T = 16384 timed out in all 8 attempts there and rho used the best kappa that completed). 16 IC runs verified; 40/48 rho runs verified and 8 timeouts.
+
+| group bits | T | IC fb | batch rho GAE/target (best kappa) | IC @0 / @0.1 / @1 | IC / rho at 0 | at 0.1 | at 1 | IC cheaper in |
+|---|---|---|---|---|---|---|---|---|
+| 24 | 4096 | 512 | 144 | 252 / 257 / 308 | 1.75 | 1.79 | 2.14 | 0/4 |
+| 24 | 16384 | 512 | 93 | 149 / 153 / 188 | 1.60 | 1.64 | 2.02 | 0/4 |
+| 25 | 4096 | 512 | 190 | 297 / 307 / 395 | 1.56 | 1.61 | 2.07 | 0/4 |
+| 25 | 16384 | 1024 | 119 | 228 / 231 / 255 | 1.93 | 1.95 | 2.15 | 0/4 |
+
+The ratio does not keep falling with T: about 1.7 (T = 1024), 1.6 to 1.75 (4096), 1.6 to 1.9 (16384). Four instances per cell and one seed: the cells are not ranked against each other. The multi-target IC stays 1.6x to 2.2x above the counted batch rho in the valid regime.

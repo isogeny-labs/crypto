@@ -87,22 +87,44 @@ fn main() {
     let fb = build_factor_base(&curve, m);
     let m = fb.len();
     let mut table: HashMap<Key, (usize, i64, usize, i64)> = HashMap::with_capacity(m * m * 2);
+    // Negation is free on a curve: -(F_i + F_j) = (-F_i) + (-F_j) and -(F_i - F_j) = (-F_i) + F_j, so two
+    // additions per pair give all four sign combinations (unless MT_FULL_TABLE is set, the old 4-addition build).
+    let full = std::env::var("MT_FULL_TABLE").is_ok();
     for i in 0..m {
         for j in i..m {
-            for s_i in [1i64, -1] {
-                for s_j in [1i64, -1] {
-                    let pi = if s_i > 0 {
-                        fb[i].point.clone()
-                    } else {
-                        fb[i].point.neg()
-                    };
-                    let pj = if s_j > 0 {
-                        fb[j].point.clone()
-                    } else {
-                        fb[j].point.neg()
-                    };
-                    if let Some(k) = key(&c.add(&pi, &pj, &a_fe)) {
-                        table.entry(k).or_insert((i, s_i, j, s_j));
+            if full {
+                for s_i in [1i64, -1] {
+                    for s_j in [1i64, -1] {
+                        let pi = if s_i > 0 {
+                            fb[i].point.clone()
+                        } else {
+                            fb[i].point.neg()
+                        };
+                        let pj = if s_j > 0 {
+                            fb[j].point.clone()
+                        } else {
+                            fb[j].point.neg()
+                        };
+                        if let Some(k) = key(&c.add(&pi, &pj, &a_fe)) {
+                            table.entry(k).or_insert((i, s_i, j, s_j));
+                        }
+                    }
+                }
+            } else {
+                let sum = c.add(&fb[i].point, &fb[j].point, &a_fe);
+                if let Some(k) = key(&sum) {
+                    table.entry(k).or_insert((i, 1, j, 1));
+                }
+                if let Some(k) = key(&sum.neg()) {
+                    table.entry(k).or_insert((i, -1, j, -1));
+                }
+                if i != j {
+                    let dif = c.add(&fb[i].point, &fb[j].point.neg(), &a_fe);
+                    if let Some(k) = key(&dif) {
+                        table.entry(k).or_insert((i, 1, j, -1));
+                    }
+                    if let Some(k) = key(&dif.neg()) {
+                        table.entry(k).or_insert((i, -1, j, 1));
                     }
                 }
             }
