@@ -154,3 +154,49 @@ reproduction check:
 
 Nothing else changes: sizes, targets, arms, analysis, predictions and
 decision rules are as frozen above.
+
+## Amendment 2 (2026-11-07): one session per size
+
+The restarted sessions `sessions/minus-20261107` and `sessions/plus-20261107`
+were also killed by a container restart, about 1.3 h in, partway through the
+58-bit size (550 and 547 of 672 records). Like the first pair, they are kept,
+audited as interrupted with 0 problems (`*.interrupted-audit.json`), never
+cited as complete, and left out of every fit.
+
+This container is restarted every 1.3 to 1.7 hours, so a single 10-hour
+session cannot finish here. With the owner's agreement, each family's spec is
+therefore run as 14 sessions, one per size:
+- `chunks/spec-<family>-b<bits>.json` is `spec-<family>.json` with only that
+  size's curve. Everything else, arms, targets, seeds and measurement, is
+  unchanged; this was checked with jq;
+- the output is `sessions/<family>-b<bits>`;
+- each chunk is audited with `--replay-all`, as in §2.
+
+A chunk killed by a restart is renamed `<dir>.interrupted-<n>`, kept, audited
+with `--allow-interrupted`, and run again from scratch.
+
+**Fits.** The §3 fits are taken over all 14 complete chunk sessions of a family
+together (`fit.sh`: one `--dir` and `--audit` per chunk, no `--tier` and no
+`--curve`). This is the same set of runs as one whole session, with no filter.
+
+**Extra reproduction checks.** The P1 positive control is unchanged. In
+addition, every record of the four interrupted sessions is compared with the
+chunk run that has the same arm, curve and target index.
+
+**Concurrency.** One chunk runs per CPU in the container's CPU set, which is
+CPUs 0 and 3 after the latest restart. Each has its own lock, under the §2
+disclosure. Counts are deterministic at L0.
+
+**A false start, disclosed.** At 04:15Z the queue started before this
+amendment was pushed. It was set for CPUs 1, 2 and 3, which the restarted
+container no longer had:
+- it completed `minus-b36`, `plus-b36` and `minus-b38`, each audited with
+  `--replay-all`. These are kept and used; their specs are this amendment's;
+- the other chunks failed to pin and wrote nothing;
+- `minus-b54` was stopped after 1 record and is handled as an interrupted
+  chunk, as above.
+
+**If a size never finishes.** If a size cannot finish here despite reruns,
+the study stops at the last size that completed in both families. It reports
+that size range, and amends again before any fit. No size is dropped after
+its results are seen.

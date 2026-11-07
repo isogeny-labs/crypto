@@ -1,0 +1,48 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "cheon-ecbench wide, plus: 14 P-224-shaped curves of 36 to 62 bits, 24 targets each — chunk: the 38-bit curve only",
+  "description": "research/cheon_ecbench_wide_20261106/PROTOCOL.md. Curves from curves.json (cheon_p224_shape gen --bits 36,38,...,62); arms, d shape, target seed and measurement as research/cheon_ecbench_medium_20261106/spec-*.json, with 24 targets per curve and a 3600 s timeout. Operation counts only. Chunk of PROTOCOL.md amendment 2: this spec with only its 38-bit curve.",
+  "workloads": {
+    "curves": [
+      {
+        "a": 31640015536,
+        "b": 131579046511,
+        "group_order": 206158232237,
+        "gx": 1,
+        "gy": 62222217930,
+        "kind": "prime_explicit",
+        "p": 206158430209,
+        "r": 206158232237
+      }
+    ],
+    "targets_per_curve": 24,
+    "target_seed": 20261022
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "cheon-comb",
+      "role": "candidate",
+      "method": {
+        "id": "cheon.pplus1_comb",
+        "params": {
+          "d": "shape:0.21106:0.015"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate",
+    "seed": 1,
+    "isolation_required": "L0",
+    "timeout_seconds": 3600
+  }
+}
