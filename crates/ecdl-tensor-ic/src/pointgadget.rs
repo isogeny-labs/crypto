@@ -418,7 +418,10 @@ pub fn gadget_cofactor_relation_network(
             y: b.field_var(ar, "sy"),
             inf: None,
         };
-        let pre: Vec<Point> = set.iter().flat_map(|&q| cc.preimages(q)).collect();
+        let pre: Vec<Point> = match fb.preimages.get(i) {
+            Some(pre) => pre.clone(),
+            None => set.iter().flat_map(|&q| cc.preimages(q)).collect(),
+        };
         b.hint(&[], &[s.x.clone(), s.y.clone()], move |_| {
             pre.iter().map(|q| vec![bi64(q.x), bi64(q.y)]).collect()
         });
