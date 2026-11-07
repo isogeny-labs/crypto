@@ -2653,6 +2653,127 @@ mod tests {
         }
     }
 
+    /// Sum of signed multiples of factor-base points, by the plain group law.
+    fn fb_combination(
+        curve: &CurveParams,
+        fb: &[FactorBaseEntry],
+        entries: &[(usize, i64)],
+    ) -> Point {
+        let a_fe = curve.a_fe();
+        let mut acc = Point::Infinity;
+        for &(idx, m) in entries {
+            let base = if m > 0 {
+                fb[idx].point.clone()
+            } else {
+                fb[idx].point.neg()
+            };
+            let term = base.scalar_mul(&BigUint::from(m.unsigned_abs()), &a_fe);
+            acc = acc.add(&term, &a_fe);
+        }
+        acc
+    }
+
+    /// The pair-sum table (two variable-time additions per pair, negation
+    /// free) holds exactly the keys of the plain four-addition build, and
+    /// every entry is a true decomposition `s_i F_i + s_j F_j`.
+    #[test]
+    fn pair_sum_table_is_exactly_the_four_sign_combinations() {
+        let curve = tiny_curve();
+        let a_fe = curve.a_fe();
+        let fb = build_factor_base(&curve, 12);
+        let table = build_pair_sum_table(&curve, &fb);
+        let mut reference = std::collections::HashSet::new();
+        for i in 0..fb.len() {
+            for j in i..fb.len() {
+                for s_i in [1i64, -1] {
+                    for s_j in [1i64, -1] {
+                        let pi = if s_i > 0 {
+                            fb[i].point.clone()
+                        } else {
+                            fb[i].point.neg()
+                        };
+                        let pj = if s_j > 0 {
+                            fb[j].point.clone()
+                        } else {
+                            fb[j].point.neg()
+                        };
+                        if let Point::Affine { x, y } = pi.add(&pj, &a_fe) {
+                            reference.insert((x.value.clone(), y.value.clone()));
+                        }
+                    }
+                }
+            }
+        }
+        let keys: std::collections::HashSet<_> = table.keys().cloned().collect();
+        assert_eq!(
+            keys, reference,
+            "table keys differ from the four-addition build"
+        );
+        for ((x, y), &(i, s_i, j, s_j)) in &table {
+            let pi = if s_i > 0 {
+                fb[i].point.clone()
+            } else {
+                fb[i].point.neg()
+            };
+            let pj = if s_j > 0 {
+                fb[j].point.clone()
+            } else {
+                fb[j].point.neg()
+            };
+            match pi.add(&pj, &a_fe) {
+                Point::Affine { x: x2, y: y2 } => {
+                    assert_eq!(
+                        (&x2.value, &y2.value),
+                        (x, y),
+                        "entry is not its own decomposition"
+                    )
+                }
+                Point::Infinity => panic!("an infinity sum was stored"),
+            }
+        }
+    }
+
+    /// Every relation found by the table lookup and by the restarted walk
+    /// satisfies `a G + b Q = sum of its signed factor-base terms`; the walk
+    /// keeps `r = a G + b Q` through steps and restarts.
+    #[test]
+    fn table_and_walk_relations_are_true_identities() {
+        use rand::SeedableRng;
+        let curve = tiny_curve();
+        let a_fe = curve.a_fe();
+        let g = Point::Affine {
+            x: FieldElement::new(curve.gx.clone(), curve.p.clone()),
+            y: FieldElement::new(curve.gy.clone(), curve.p.clone()),
+        };
+        let q = g.scalar_mul(&BigUint::from(57u32), &a_fe);
+        let fb = build_factor_base(&curve, 12);
+        let table = build_pair_sum_table(&curve, &fb);
+        let check = |rel: &Relation| {
+            let lhs = g
+                .scalar_mul(&rel.coef_a, &a_fe)
+                .add(&q.scalar_mul(&rel.coef_b, &a_fe), &a_fe);
+            assert_eq!(lhs, fb_combination(&curve, &fb, &rel.entries));
+        };
+        let mut rng = rand::rngs::StdRng::seed_from_u64(7);
+        for _ in 0..20 {
+            let (rel, _) =
+                find_one_relation_table_with_rng(&curve, &g, &q, &table, 100_000, &mut rng)
+                    .expect("table relation");
+            check(&rel);
+        }
+        let mut walk = SampleWalk::new(&curve, &g, &q, &mut rng);
+        for _ in 0..200 {
+            let (rel, _) =
+                find_one_relation_table_walk(&curve, &g, &q, &table, &mut walk, 100_000, &mut rng)
+                    .expect("walk relation");
+            check(&rel);
+            let on_curve = g
+                .scalar_mul(&walk.a, &a_fe)
+                .add(&q.scalar_mul(&walk.b, &a_fe), &a_fe);
+            assert_eq!(walk.r, on_curve, "walk lost r = aG + bQ");
+        }
+    }
+
     /// The `u64` word sweep returns exactly the relations, and the same trial
     /// counts, as the `BigUint` sweep when both consume the same random stream.
     #[test]
