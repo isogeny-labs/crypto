@@ -415,6 +415,12 @@ fn ic_rule(counter: &str) -> Option<Rule> {
         "index_inserts" => HASH,
         "index_point_negations" => Prims(&[(FieldAdd, 1)]),
         "index_sort_word_ops" => Prims(&[(WordOp, 1)]),
+        // Extension of 2026-11-07 (ic-acct-7; docs/units/BITOPS.md,
+        // "Extensions"): a column-log combination's products and sums
+        // modulo `r` (`ic.shared_rank`'s descent `Σ coef·log`, its
+        // `h⁻¹`, a full-rank check's `coef·log`).
+        "combination_modr_muls" => Prims(&[(ModrMul, 1)]),
+        "combination_modr_adds" => Prims(&[(ModrAdd, 1)]),
 
         // ── Extension of 2026-10-21 (ic-acct-6; docs/units/BITOPS.md,
         // "Extensions").  No primitive weight changes; these rules classify
@@ -2094,5 +2100,28 @@ mod tests {
             assert!(bits > 0);
             assert_eq!(v2.at, mul_decimal(committed.bitops.parse().unwrap(), bits));
         }
+    }
+
+    /// Extension of 2026-11-07 (ic-acct-7): the column-log combination
+    /// counters price one product or one sum modulo `r` each, and no
+    /// other rule moved.
+    #[test]
+    fn combination_counters_price_one_modr_operation_each() {
+        let rule = |c: &str| match ic_rule(c) {
+            Some(Rule::Prims(p)) => p.to_vec(),
+            _ => panic!("{c} has no primitive rule"),
+        };
+        assert_eq!(rule("combination_modr_muls"), vec![(ModrMul, 1)]);
+        assert_eq!(rule("combination_modr_adds"), vec![(ModrAdd, 1)]);
+        // The counters `ic.shared_rank` now writes beside them keep the
+        // rules of 2026-10-16.
+        assert_eq!(rule("target_rng_draws"), vec![(WordOp, 80)]);
+        assert_eq!(rule("row_build_words"), vec![(WordOp, 1)]);
+        assert_eq!(rule("row_build_modr_adds"), vec![(ModrAdd, 1)]);
+        assert_eq!(rule("row_build_modr_muls"), vec![(ModrMul, 1)]);
+        assert_eq!(
+            rule("curve_equation_checks_uncharged"),
+            vec![(FieldMul, 3), (FieldSqr, 2), (FieldAdd, 3)]
+        );
     }
 }
