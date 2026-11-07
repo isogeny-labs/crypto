@@ -443,6 +443,17 @@ Both arXiv papers (20–21 Oct) predate the 2026-10-26 review, which missed them
 
 The knowledge-base records are in crypto-autoresearcher#3153: KN-LIT-eef882, KN-LIT-d4aa5d, KN-LIT-ac18f4, and KN-LIT-58d42d, which supersedes KN-LIT-0b036e. KN-OPEN-57907f is superseded by KN-LIT-eef882.
 
+### Wider sweep, same day
+
+A 60-day sweep of arXiv and ePrint is in [`research/lit_sweep_20261107/`](../../lit_sweep_20261107/README.md), with a report, two figures and a PDF.
+
+- **Lü, arXiv 2610.18914.** A third reported route to `9/4` in characteristic 2: every algebraically closed field, and ω depends only on the characteristic.
+- **Dias and Lima, arXiv 2611.00517.** OpenAI's ETH algorithm beats brute force only beyond `n ≈ 10^32` variables (constant `C = 2`) to `10^3517` (`C = 10`). That confirms the galactic assessment above.
+- **Majdoddin, arXiv 2610.41622.** Anthropic's parallel #3-SAT algorithm crosses over at about `2^420` clauses at density 1.
+- **Sun, arXiv 2610.13971.** Claims ω = 2. It is an unverified outlier and is not used.
+
+No new paper in the window targets ECDLP index calculus directly, and no number in this note changes.
+
 ## Honest limits
 
 - This is a literature survey, not a result. It says what has been
