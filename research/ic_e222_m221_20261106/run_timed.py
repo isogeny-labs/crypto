@@ -4,7 +4,7 @@ Metric: total_ms from the solver's own stage report (factor base + relations + l
 plus trials_total.  Correctness: recovered scalar == planted log.  Local, unisolated host."""
 import json,os,subprocess,random,glob,sys
 inst=sys.argv[1];out=sys.argv[2];ic="../../target/release/ic"
-FBS=[8,16,32,64,128];EXTRAS=[64,2];SEEDS=[1,2]
+FBS=[int(x) for x in os.environ.get("FBS","8,16,32,64,128").split(",")];EXTRAS=[64,2];SEEDS=[1,2]
 jobs=[]
 for f in sorted(glob.glob(inst+"/*.json")):
     d=json.load(open(f))
