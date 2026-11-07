@@ -1056,6 +1056,10 @@ fn sat_loop(
                         }
                     })
                     .collect();
+                // Back to level zero before blocking: added at the SAT
+                // trail's level, root-false literals could take both
+                // watches and the clause would never be visited.
+                enc.solver.reset_search();
                 enc.solver.add_clause(clause);
             }
         }
