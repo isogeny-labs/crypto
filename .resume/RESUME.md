@@ -1,31 +1,37 @@
-# Resume: crypto @ claude/dreg-lfd-theory-scaling
+# Resume: crypto @ claude/gpu-ic-baseline-modal-20261107
 
 ## Goal
-User request (2026-11-05): find ways to reduce the degree of regularity / total solve time of the
-descended Semaev system. Three phases, chosen by the user: (1) theory and scaling survey, done
-(PR #3512); (2) the l = 9 guess-saturation test; (3) a multilinear closure engine prototype.
+User request (2026-11-07): draft the EKS GPU pool for review and also use Modal, for the first hardware
+baseline of gpu/semaev and gpu/rootfind (no kernel in either has ever run on a GPU).
 
 ## Lead / hypothesis
-LEAD-ICE-descent-closure-degree-at-scale / LEAD-ICE-hybrid-guess-determine-l7. The recorded k*
-(guesses that hold degree 4) is 0, 1-2 and 4 at l = 6, 7 and 8. K_marginal predicts 7 at l = 9.
-Saturation (k* <= 5) would revive the guess route.
+Engineering stage diagnostic, not a lead. Does the device agree with the verified host path, and how fast
+does it run (clmad vs software product, per-row vs per-pair, sorted vs hash lookup)? Predictions P1-P4 are
+in the spec.
 
 ## Spec
-research/dreg_guess_scaling_20261106/PREREGISTRATION.md (frozen at commit 37129b4253).
+research/gpu_ic_baseline_20261027/PROTOCOL.md including Amendment 1 (frozen at the commit that adds
+gpu/modal/). Container job: gpu/modal/ic_baseline_job.sh. Launcher: gpu/modal/modal_ic_job.py.
 
 ## State
-Gate A passed. The 4 positive controls refute at degree 4. Whole-summand runs: l = 7 and 8 done; l = 9 has 14 of 16 done, all degree 4 for nonzero x1. S5.d1.b0 refutes at degree 4 (a surprise against K_marginal). The remaining 129 branches are moving to a RunPod pod (PREREGISTRATION Amendment 1, owner chose the cloud route; $30 cap).
+Protocol, Modal launcher/job and the EKS GPU pool draft (taskq/deploy/eks-karpenter/gpu-draft/, NOT applied)
+are committed on this branch. No Modal run yet. Modal credentials are in the session environment
+(MODAL_TOKEN_ID, MODAL_TOKEN_SECRET); the `modal` client is pip-installed (1.6.3).
 
 ## Next steps
-1. Launch: research/koblitz_ic_leads_build_20261024/pod/upload_launch.py run --name dreg-s5-l9 --vcpu 64 --flavors cpu3g --disk 40 --max-seconds 18000 <the 4 input files>, then push them.
-2. Fetch https://<pod>-8000.proxy.runpod.net/runs/ when STATUS reads ALLDONE; copy the records into runs/; stop the pod.
-3. Score both preregistrations, then write RESULTS, the graph and the PDF, the session log, and update PR #3512.
+1. Checkpoint push must succeed (needs CHECKPOINT_UPLOAD_TOKEN or AWS creds; neither was present).
+2. `modal run --detach gpu/modal/modal_ic_job.py --out /tmp/gpu-ic-baseline/run-01`; if the client dies,
+   `--fetch-token <token>`.
+3. If the selftest gate fails, that is the result: report it, no throughput.
+4. Otherwise score P1-P4, write RESULTS, graph, PDF, benchmarks/ row only if the validation gate allows
+   (it does not for a Modal-only run), session log, PR.
 
 ## Runs in flight
-RunPod pod dreg-s5-l9 (id recorded in runs/queue.log once created).
+None.
 
 ## Stop and success conditions
-About 12 h of container time at most. The decision rule is in the PREREGISTRATION.
+One Modal launch, 2 h function timeout, expected under 30 min. Any selftest failure stops throughput.
 
 ## Open questions
-Whether pe_closure fits about 196k columns in 15 GB.
+Whether sm_120 is available on Modal as "RTX-PRO-6000" for this workspace; whether the g7e sizes and
+G-family Spot quota exist for the EKS pool.
