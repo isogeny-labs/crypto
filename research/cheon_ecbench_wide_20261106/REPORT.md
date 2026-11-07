@@ -63,9 +63,14 @@ frontier. Comb has fewer operations; rho makes no oracle queries.
 - **Pooled, w = 0.** The ratio of summed `total_gae`, comb over rho, over all
   264 pairs per family (both runs recovered the planted logarithm) ([`gap-pooled.jsonl`](gap-pooled.jsonl)) is
   **0.525** for n−1 and **0.367** for n+1.
-- **Why there is no pooled interval.** No tool pools across the 11 chunk
-  sessions, so the pooled figure has no interval, and the weighted pooled
-  ratio is not computed.
+- **Pooled, weighted.** With unpriced native work charged at w GAE per
+  operation on both arms, the pooled ratios are 0.502 (w = 0.1) and 0.398
+  (w = 1) for n−1, and 0.339 and 0.216 for n+1. The order against rho holds at
+  every weight. These are computed by the independent validator
+  (`examples/cheon_wide_validate.rs`,
+  [`benchmarks/20261107-cheon-wide/band.json`](../../benchmarks/20261107-cheon-wide/band.json)).
+- **No pooled interval.** No tool pools across the 11 chunk sessions with a
+  bootstrap, so the pooled figures are point values.
 - **Per size.** The per-size paired ratios (`ecbench compare`, 24 pairs each,
   [`gap-per-size.jsonl`](gap-per-size.jsonl)) carry intervals at every weight.
 - **What "resolved" means.** A size is resolved when the interval lies below 1
