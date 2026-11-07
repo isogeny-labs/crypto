@@ -203,6 +203,7 @@ fn main() {
     let want = (gfac * m as f64).ceil() as usize;
     let mut rows: Vec<Vec<BigUint>> = Vec::new();
     let mut rhs: Vec<BigUint> = Vec::new();
+    let mut edges: Vec<(usize, i64, usize, i64, BigUint)> = Vec::new();
     let mut walk = new_walk2(&mut c, &mut rng, &[]);
     let mut trials_g = 0u64;
     while rows.len() < want {
@@ -221,6 +222,7 @@ fn main() {
                 row[j] = (&row[j] + sm(s_j)) % &n;
                 rows.push(row);
                 rhs.push(walk.a.clone() % &n);
+                edges.push((i, s_i, j, s_j, walk.a.clone() % &n));
             }
         }
     }
@@ -231,9 +233,18 @@ fn main() {
         trials_g,
         c.adds
     );
-    let sol = gaussian_eliminate_mod_n_particular(&mut rows, &mut rhs, &n)
-        .expect("G system inconsistent");
-    let det: Vec<bool> = sol.determined.clone();
+    let dense_ops_est = 2 * (m as u64) * (m as u64) * (rows.len() as u64);
+    let use_dense = std::env::var("MT_DENSE").is_ok();
+    let t_la = Instant::now();
+    let (values, det, la_ops): (Vec<BigUint>, Vec<bool>, u64) = if use_dense {
+        let sol = gaussian_eliminate_mod_n_particular(&mut rows, &mut rhs, &n)
+            .expect("G system inconsistent");
+        (sol.values.clone(), sol.determined.clone(), dense_ops_est)
+    } else {
+        sparse_solve(m, &edges, &n)
+    };
+    let la_ms = t_la.elapsed().as_secs_f64() * 1e3;
+    let sol_values = values;
     let ndet = det.iter().filter(|&&b| b).count();
     eprintln!("determined columns {} / {}", ndet, m);
     let setup_ms = t0.elapsed().as_secs_f64() * 1e3;
@@ -273,7 +284,7 @@ fn main() {
         };
         let (i, s_i, j, s_j) = found;
         let term = |s: i64, y: &BigUint| if s > 0 { y.clone() } else { (&n - y) % &n };
-        let rhs_v = (term(s_i, &sol.values[i]) + term(s_j, &sol.values[j]) + &n - (&w.a % &n)) % &n;
+        let rhs_v = (term(s_i, &sol_values[i]) + term(s_j, &sol_values[j]) + &n - (&w.a % &n)) % &n;
         let binv = mod_inverse(&w.b, &n).expect("b not invertible");
         let x = (rhs_v * binv) % &n;
         // verification of the recovered log (priced as one scalar multiplication)
@@ -283,9 +294,101 @@ fn main() {
     }
     let adds_targets = c.adds - adds_before_targets;
     println!(
-        "{{\"n_bits\":{:.1},\"m\":{},\"targets\":{},\"ok\":{},\"determined\":{},\"adds_table\":{},\"adds_bank\":{},\"adds_grel\":{},\"adds_targets\":{},\"adds_total\":{},\"adds_per_target\":{:.1},\"adds_per_target_amortized\":{:.1},\"trials_g\":{},\"trials_targets\":{},\"skipped_undetermined\":{},\"setup_ms\":{:.1},\"targets_ms\":{:.1}}}",
+        "{{\"n_bits\":{:.1},\"m\":{},\"targets\":{},\"ok\":{},\"determined\":{},\"adds_table\":{},\"adds_bank\":{},\"adds_grel\":{},\"adds_targets\":{},\"adds_total\":{},\"adds_per_target\":{:.1},\"adds_per_target_amortized\":{:.1},\"trials_g\":{},\"trials_targets\":{},\"skipped_undetermined\":{},\"la_ops\":{},\"dense_la_ops_est\":{},\"la_ms\":{:.2},\"setup_ms\":{:.1},\"targets_ms\":{:.1}}}",
         (n.bits() as f64), m, targets, ok, ndet, adds_table, adds_bank, adds_grel, adds_targets, c.adds,
-        adds_targets as f64 / targets as f64, c.adds as f64 / targets as f64, trials_g, trials_t, skipped, setup_ms,
+        adds_targets as f64 / targets as f64, c.adds as f64 / targets as f64, trials_g, trials_t, skipped, la_ops, dense_ops_est, la_ms, setup_ms,
         t1.elapsed().as_secs_f64() * 1e3
     );
+}
+
+/// Near-linear solve of s_i y_i + s_j y_j = a (mod n) for a signed graph: BFS labels each node as
+/// alpha + beta * t (beta = +-1) from a component root t; one non-tree edge with a non-zero
+/// coefficient fixes t.  Returns (values, determined, mod-n operation count).
+fn sparse_solve(
+    m: usize,
+    edges: &[(usize, i64, usize, i64, BigUint)],
+    n: &BigUint,
+) -> (Vec<BigUint>, Vec<bool>, u64) {
+    let neg = |x: &BigUint| (n - (x % n)) % n;
+    let sgn = |s: i64, x: &BigUint| if s > 0 { x % n } else { neg(x) };
+    let mut ops = 0u64;
+    let mut vals = vec![BigUint::zero(); m];
+    let mut det = vec![false; m];
+    // self-loop rows (i == j): (s_i + s_j) y_i = a
+    let mut adj: Vec<Vec<(usize, i64, i64, BigUint)>> = vec![Vec::new(); m];
+    for (i, s_i, j, s_j, a) in edges {
+        if i == j {
+            let c = s_i + s_j;
+            if c != 0 {
+                let cinv = mod_inverse(&BigUint::from(c.unsigned_abs()), n).expect("2 invertible");
+                let mut y = (a * cinv) % n;
+                if c < 0 {
+                    y = neg(&y);
+                }
+                vals[*i] = y;
+                det[*i] = true;
+                ops += 3;
+            }
+        } else {
+            adj[*i].push((*j, *s_i, *s_j, a.clone()));
+            adj[*j].push((*i, *s_j, *s_i, a.clone()));
+        }
+    }
+    let mut alpha: Vec<Option<(BigUint, bool)>> = vec![None; m]; // (alpha, beta_is_plus)
+    for root in 0..m {
+        if alpha[root].is_some() || det[root] {
+            continue;
+        }
+        // Collect the component with labels; also detect t.
+        let mut comp = vec![root];
+        alpha[root] = Some((BigUint::zero(), true));
+        let mut t: Option<BigUint> = None;
+        let mut idx = 0;
+        while idx < comp.len() {
+            let u = comp[idx];
+            idx += 1;
+            let (au, bu_plus) = alpha[u].clone().unwrap();
+            for (v, s_u, s_v, a) in adj[u].clone() {
+                // y_v = s_v (a - s_u y_u): alpha_v = s_v (a - s_u alpha_u), beta_v = -s_v s_u beta_u
+                let av = sgn(s_v, &((a.clone() + n - sgn(s_u, &au)) % n));
+                let bv_plus = if s_u * s_v > 0 { !bu_plus } else { bu_plus };
+                ops += 4;
+                match &alpha[v] {
+                    None => {
+                        alpha[v] = Some((av, bv_plus));
+                        comp.push(v);
+                    }
+                    Some((av0, bv0_plus)) => {
+                        // consistency / fix t: (beta_v - beta_v') t = alpha_v' - alpha_v
+                        if *bv0_plus != bv_plus && t.is_none() {
+                            let diff = (av0 + n - &av) % n; // alpha_v' - alpha_v
+                            let two_inv =
+                                mod_inverse(&BigUint::from(2u32), n).expect("2 invertible");
+                            // beta difference = +-2, so t = diff / (beta_v' - beta_v)
+                            let mut tv = (diff * two_inv) % n;
+                            // (beta_v - beta_v') t = alpha_v' - alpha_v: the coefficient is -2 when beta_v is minus
+                            if !bv_plus {
+                                tv = neg(&tv);
+                            }
+                            t = Some(tv);
+                            ops += 4;
+                        }
+                    }
+                }
+            }
+        }
+        if let Some(tv) = t {
+            for u in comp {
+                let (au, b_plus) = alpha[u].clone().unwrap();
+                vals[u] = if b_plus {
+                    (au + &tv) % n
+                } else {
+                    (au + n - &tv) % n
+                };
+                det[u] = true;
+                ops += 2;
+            }
+        }
+    }
+    (vals, det, ops)
 }
