@@ -334,7 +334,7 @@ unit of restart, and nothing inside a closure is restored. An interrupted
 closure's partial time is never reported. The queue log keeps every `start` and
 `interrupted` line, and the tally reads the last `exit` line per closure, as before.
 
-### 11.9 Amendment A4 (2026-11-07 04:40Z, before the run): C1 on a 1 TB host
+### 11.9 Amendment A4 (2026-11-07 04:40Z, before the run): C1 on an 846 GB host
 
 The second C1 host (RunPod `9g6slrqws33cr8`, 512 GB, `A` = 471 GB) failed to
 allocate after 1,317 s at a peak RSS of about 405 GiB (*recorded*:
@@ -342,17 +342,19 @@ allocate after 1,317 s at a peak RSS of about 405 GiB (*recorded*:
 cell's memory far above the 217 GB projection, and an allocation failure is
 still not evidence about the degree (§11.3).
 
-- Host: AWS EC2 spot `x2iedn.8xlarge` (32 vCPU, 1,024 GiB), us-east-2, launched
-  with `research/ic_leads_rented_20261018/aws_spot/aws_spot.py run --job c1`
-  (the same `pod/boot.sh run_c1` as on RunPod). There is no cgroup limit there, so
-  `run.sh` takes MemTotal as the limit and `A` = 0.92 × MemTotal ≈ 0.99 TB.
+- Host: RunPod GPU pod with 3 × NVIDIA RTX PRO 6000 Blackwell Workstation Edition
+  (282 GB host RAM per GPU, about 846 GB in all, about $7.77/h secure), used only for its
+  host RAM; the GPUs stay idle. It is launched with `pod/launch.py run --job c1` (the
+  same `pod/boot.sh run_c1` as before), and `A` = 0.92 × the cgroup limit. The planned
+  AWS host (`x2iedn.8xlarge`, 1 TiB) was refused at launch: the account's X-family quota
+  is 0 vCPU in every region (`MaxSpotInstanceCountExceeded`, 2026-11-07 04:45Z), and
+  no standard-family spot host of 768 GB or more fits in the free 44 vCPU of us-east-2.
 - Gate: C1 runs only if that limit is at least **768 GB** (`DEG5_MIN_LIMIT=768000000000`).
-- Draw 0 only, timeout 12 h, lifetime cap 16 h (about $21 at the $1.33/h spot price
-  quoted 2026-11-07 04:24Z). Nothing else in §§11.3–11.5 changes.
+- Draw 0 only, timeout 12 h, lifetime cap 14 h (at most about $109 at $7.77/h). Nothing else in §§11.3–11.5 changes.
 - Outcomes are read as in §11.3. Exit 0 with a refutation means "degree 5 on draw 0
   only". A saturated closure that does not refute means degree ≥ 6 on draw 0. Exit
   134/137 with a memory failure is recorded as not evidence. Exit 124 (timeout) is
-  recorded as open. A spot interruption is recorded as `interrupted` and is not a
+  recorded as open. A host interruption is recorded as `interrupted` and is not a
   result.
 - A third RunPod launch on the same 512 GB shape (2026-11-07 04:22Z, pod
   `g0mby110kxbo6i`) was terminated after about 2 minutes, before the build
