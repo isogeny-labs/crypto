@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261107T0738Z-ic-auto-vs-tuned",
+  "latest_record": "20261107T0753Z-rho-v5",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 4,
     "invalid": 1,
-    "measured": 52,
+    "measured": 53,
     "open": 0
   },
   "repo": "crypto",
@@ -475,6 +475,66 @@
       ],
       "problem": "ecdlp:koblitz-ladder",
       "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.9685,
+      "latest": 0.9685,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_frob_v4_over_v3_ops",
+      "points": [
+        {
+          "commit": "9783af14d6d0",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 1728,
+          "record": "20261107T0753Z-rho-v5",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.943,
+            0.994
+          ],
+          "summary": "Two-rung jumps, local L0: rho.negation_v5/v3 0.972 [0.945,0.999]; plain_v5/v3 0.963 [0.938,0.988]; signed_frobenius_v4/v3 0.969 [0.943,0.994] (toy tier); order holds across the band. Replay-all clean. Not validated.",
+          "value": 0.9685
+        }
+      ],
+      "problem": "ecdlp:prime-and-koblitz-ladder",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9718,
+      "latest": 0.9718,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rho_negation_v5_over_v3_ops",
+      "points": [
+        {
+          "commit": "9783af14d6d0",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 2304,
+          "record": "20261107T0753Z-rho-v5",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.945,
+            0.999
+          ],
+          "summary": "Two-rung jumps, local L0: rho.negation_v5/v3 0.972 [0.945,0.999]; plain_v5/v3 0.963 [0.938,0.988]; signed_frobenius_v4/v3 0.969 [0.943,0.994] (toy tier); order holds across the band. Replay-all clean. Not validated.",
+          "value": 0.9718
+        }
+      ],
+      "problem": "ecdlp:prime-and-koblitz-ladder",
+      "unit": "ratio"
     },
     {
       "better": "lower",
