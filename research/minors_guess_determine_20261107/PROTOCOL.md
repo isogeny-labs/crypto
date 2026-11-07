@@ -45,7 +45,7 @@ checked by a counted `[m]G = Q`. A fresh set of `2l` points and a fresh `C` is o
 | `gd` | guess `a` (`l/2` dense columns), reduce `K' = K[a]^T`, `defect d` = smallest `d >= 2` with Eq. (4) success probability >= 0.5, random `b` (`l'-d` columns), signature matrix, hash of all `(d-1)`-subset lines, stop on first verified duplicate | 2607.09814 secs. 3-6, Algorithms 1-2 |
 | `gd_dp1` | as `gd` with `d+1` (the development runs showed Eq.-(4)'s smallest `d` is not the cheapest; this is the method's own tuning knob) | 2607.09814 sec. 6 |
 | `gd_half` | as `gd` with `n' = 2*ceil(bits/4)` (the paper says `l` may be reduced: "it is the probability that matters", sec. 5) | 2607.09814 sec. 5 |
-| `rho` | reference: batched (Montgomery) r-adding rho, `R = 64`, 32 walkers, negation map (canonical `y <= p/2`), 8-entry cycle ring with counted doubling escape, distinguished points `bits/2-5`, restarts by counted scalar multiplications | own implementation (not ecbench's) |
+| `rho` | reference: batched (Montgomery) r-adding rho, `R = 64`, 32 walkers, negation map (canonical `y <= p/2`), 8-entry cycle ring with counted doubling escape, distinguished points `bits/2-5`, restarts by one counted scalar multiplication `X = aG` (the jump points carry the `Q` component) | own implementation (not ecbench's) |
 | `rho_aa` | identical code, different RNG salt: the A/A noise floor of the rho estimate | control |
 
 Not implemented, with reason: three-deviation `apm3` (the paper's headline "one kernel up to
@@ -98,7 +98,7 @@ contributes its work and no success):
 |---|---|---|---|---|---|---|
 | cap per run (charged units) | 1e8 | 5e8 | 2e9 | 3e9 | 2e9 | 2e9 |
 
-Expected total work, from development-run per-attempt costs and the uniform-minor model
+Expected total work (rho re-tuned to R = 32, 16 walkers, one-multiplication restarts before freezing), from development-run per-attempt costs and the uniform-minor model
 (`[pcc:unverified]`, estimates not measurements): about `7e12` charged units, i.e. 25-55 core-hours
 at the development throughput of `4-8e7` charged units per core-second; wall time is informational.
 Launcher: `run_panel.sh` (48 shards of 25 instances); merge and analysis in the same script.

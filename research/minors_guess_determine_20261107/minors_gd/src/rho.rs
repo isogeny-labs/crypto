@@ -9,8 +9,8 @@ use crate::curve::*;
 use crate::rng::*;
 use std::collections::HashMap;
 
-pub const R: usize = 64;
-pub const W: usize = 32;
+pub const R: usize = 32;
+pub const W: usize = 16;
 const RING: usize = 8;
 
 #[derive(Default, Debug, Clone)]
@@ -27,7 +27,7 @@ pub struct RhoOut {
 
 struct Walker { x: u64, y: u64, a: u64, b: u64, ring: [u64; RING], ri: usize, since: u64 }
 
-#[inline] fn part(x: u64) -> usize { (x.wrapping_mul(0x9E3779B97F4A7C15) >> 58) as usize }
+#[inline] fn part(x: u64) -> usize { (x.wrapping_mul(0x9E3779B97F4A7C15) >> 59) as usize }
 #[inline] fn is_dp(x: u64, bits: u32) -> bool { bits == 0 || (x.wrapping_mul(0xC2B2AE3D27D4EB4F) >> (64 - bits)) == 0 }
 
 fn canon(c: &Curve, w: &mut Walker, n: u64) {
@@ -39,10 +39,11 @@ fn canon(c: &Curve, w: &mut Walker, n: u64) {
     }
 }
 
-fn start(c: &Curve, g: (u64, u64), q: (u64, u64), n: u64, rng: &mut Rng) -> Walker {
+fn start(c: &Curve, g: (u64, u64), _q: (u64, u64), n: u64, rng: &mut Rng) -> Walker {
     loop {
-        let a = rng.below(n); let b = rng.below(n);
-        let x = c.add(c.mul_scalar(a, Some(g)), c.mul_scalar(b, Some(q)));
+        // one counted scalar multiplication per (re)start: X = aG (b = 0); the walk's jump points carry the Q component
+        let a = 1 + rng.below(n - 1); let b = 0u64;
+        let x = c.mul_scalar(a, Some(g));
         if let Some((x, y)) = x {
             let mut w = Walker { x, y, a, b, ring: [u64::MAX; RING], ri: 0, since: 0 };
             canon(c, &mut w, n);
