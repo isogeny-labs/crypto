@@ -1,12 +1,12 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261107T2144Z-split-prime-p2-twist-coset",
+  "latest_record": "20261107T2145Z-split-prime-p1-rr-dickson",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 50,
-    "open": 2
+    "measured": 51,
+    "open": 1
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -1845,6 +1845,33 @@
       ],
       "problem": "ic:curve25519-k24-single-target",
       "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 8.0,
+      "latest": 8.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "capped_jobs",
+      "points": [
+        {
+          "commit": "72004b435c02",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 40,
+          "record": "20261107T2145Z-split-prime-p1-rr-dickson",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P1 RR vs cherry-tree T with a Dickson-torus tower at T24, T31: RR lower D and narrower matrices at m3 t3, t4 on both primes (frozen rule 5); m5 t3 undecided (T capped at 1.5 GiB); D identical to the Kummer tower",
+          "value": 8.0
+        }
+      ],
+      "problem": "ic:split-prime-p1-rr-dickson-torus",
+      "unit": "count"
     },
     {
       "better": "lower",

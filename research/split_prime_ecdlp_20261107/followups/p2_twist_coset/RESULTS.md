@@ -1,13 +1,17 @@
 # P2 results: twist-pure coset selection (run-20261107T214118Z)
 
-**Outcome (frozen rule 4): toy-scale gain confirmed, at stage level**
-[pcc:unverified]. On prime-order curves over the four preregistered toy
-primes, the F4 cost of the relation system does not depend on which coset
-of the 2-power base is used, exact relation coverage follows c_E^m, and
-choosing the most E-pure coset among C candidates raises relations per
-unit of F4 work by (c_sel/c_rand)^m ≥ 2.25 at t = 4. The gain decays toward
-1 as the base grows (as predicted), so it is a constant factor that vanishes
-at cryptographic size. `S`, end-to-end cost and any rho comparison are unset.
+**Outcome (frozen rule 4): toy-scale gain confirmed, at stage level, smaller
+than first written** [pcc:unverified]. On prime-order curves over the four
+preregistered toy primes, the F4 cost of the relation system on planted
+targets does not depend on which coset of the 2-power base is used, exact
+relation coverage follows c_E^m, and choosing the most E-pure coset raises
+relations per unit of F4 work. The frozen rule-4 statistic, (c_sel/c_rand)^m,
+is ≥ 2.25 at t = 4. After the red-team correction below, the gain that matters
+for an index calculus is (c_sel/c_mean)^(m−1): about **1.9 (m = 2) and 3.5
+(m = 3) at t = 4**, decaying toward 1 as the base grows. It is a constant factor
+that vanishes at cryptographic size, and a transfer of the lab's existing
+frame-choice lever to prime-order curves, not a new mechanism. `S`, end-to-end
+cost and any rho comparison are unset.
 
 - Protocol: [`PROTOCOL.md`](PROTOCOL.md) (frozen 535d9da826; Addendum A and
   Clarification A.1 before any claim cell; all merged in #3657).
@@ -36,14 +40,35 @@ the exact binomial expectation in every cell (largest deviation 7.1 %). Means
 over the 12 cells per t: observed 1.878 / 1.458 / 1.225 against exact
 1.886 / 1.471 / 1.230 at t = 4 / 6 / 8.
 
+## Red-team corrections (research/split_prime_ecdlp_20261107/followups/red-team-p1-p2.md)
+
+1. **Exponent m − 1, not m (high, unpriced in the first draft).** An index
+   calculus needs about as many relations as base elements, here c_E. A larger
+   c_E raises relations per F4 solve as c_E^m but also the number of relations
+   needed, so the net relation-stage gain is (c_sel/c_ref)^(m−1). Against the
+   frozen random arm that is 1.5 to 25 (not 2.25 to 125); rule 4 (≥ 1.2) still
+   holds. Against a typical coset, (c_max/c_mean)^(m−1) is about 1.9 / 3.5 at
+   t = 4, 1.46 / 2.1 at t = 6, 1.22 / 1.5 at t = 8 (m = 2 / 3).
+2. **The random arm is the wrong reference.** One seed-drawn coset per cell is a
+   high-variance reference (on Kummer 1,049,089, five of six idx0/idx1 draws hold
+   ≤ 4 of 16 E-columns); the red team found the seeds follow the frozen rule and no
+   cause. c_mean is the reference used above. The verdict does not depend on it.
+3. **F4 cost was measured on planted targets only.** Real decomposition attempts
+   almost never have a solution; whether F4 cost on unplanted targets is also
+   coset-independent is untested. Cheapest test: four unplanted targets per arm at
+   m2 t4 and m3 t4.
+4. **Not a new mechanism.** The Kummer half repeats the frame-choice lever of
+   `research/curve25519_frame_search_20261103`; the new part is the prime-order
+   setting, the Dickson-torus half, the exact purity check and the decay law.
+5. **Analyzer errors that do not change the outcome:** the T* column for the m = 3
+   rows of `analysis/derived/rule4_gain_and_tstar.tsv` uses m = 2 coverage (wrong;
+   ignore those T* values); the m = 3 "125" is the formula, the measured coverage
+   ratio is 102.9.
+
 ## Reading
 
-- **Gain against the frozen random arm vs the expected gain.** The rule-4 number
-  uses one seed-drawn coset as "random"; on the Kummer prime 1,049,089 that coset
-  happened to hold only 3 E-columns of 16, which inflates G to 25 (m = 2) and
-  125 (m = 3). The expected gain against a typical coset is (c_max/c_mean)^m:
-  about 3.5 (m = 2) and 6.6 (m = 3) at t = 4, about 2.1 and 3.1 at t = 6, about
-  1.5 and 1.8 at t = 8 (derived from the M1 means).
+- **Gain.** See the red-team corrections above: the relevant number is
+  (c_max/c_mean)^(m−1), about 1.9 and 3.5 at t = 4.
 - **Why it works.** F4 sees the tower equations of the coset, which have the same
   leading forms for every constant c; which roots are E-abscissae is invisible to
   it. Twist roots cost columns but never yield an E-target relation (rule 1, and
