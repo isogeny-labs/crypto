@@ -8,6 +8,18 @@ use crate::ml_dataset::types::CaseConfig;
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(in crate::ml_dataset::solvers) enum ProposedPolicy {
     ConservativeAffineEnvelopeV1,
+    ConservativeAffineEnvelopeCheckpointV1,
+}
+
+/// Additional committed-batch hook attempts only. Existing initial,
+/// post-exclusion and final snapshots remain under global capture limits.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(super) struct CheckpointCadence {pub every_batches:u64,pub max_snapshots:u64}
+fn checkpoint_for(policy:ProposedPolicy)->Option<CheckpointCadence>{
+    match policy {
+        ProposedPolicy::ConservativeAffineEnvelopeV1=>None,
+        ProposedPolicy::ConservativeAffineEnvelopeCheckpointV1=>Some(CheckpointCadence{every_batches:1,max_snapshots:16}),
+    }
 }
 
 // Exact envelope from affine_boolean_row_worker.rs::caps. New scheduler count
@@ -36,7 +48,9 @@ pub(super) fn for_owner(
         || super::super::owned_search_worker::selection(owner.original.config).map(|(pattern,_)|pattern)!=owner.pattern {
         return Err(Stop::InvalidLimits);
     }
-    from_budget(&owner.budget, owner.original.config.degree_bound)
+    let mut caps=from_budget(&owner.budget, owner.original.config.degree_bound)?;
+    caps.checkpoint=checkpoint_for(policy);
+    Ok(caps)
 }
 
 fn from_budget(budget: &Budget, requested_degree: u32) -> Result<Caps, Stop> {
@@ -98,6 +112,7 @@ fn from_budget(budget: &Budget, requested_degree: u32) -> Result<Caps, Stop> {
         caps: checker_caps,
     };
     Ok(Caps {
+        checkpoint:None,
         expansion: equations::Limits {
             variables: COUNT_MAX as u32,
             generators: count,
@@ -222,6 +237,19 @@ mod tests {
         b.adapter_bytes = b.memory_limit;
         assert!(matches!(from_budget(&b, 3), Err(Stop::Bytes)));
         assert!(matches!(from_budget(&b, 0), Err(Stop::InvalidLimits)));
+    }
+
+    #[test]
+    fn legacy_has_no_batch_hook_and_new_policy_is_finite(){
+        assert_eq!(checkpoint_for(ProposedPolicy::ConservativeAffineEnvelopeV1),None);
+        assert_eq!(checkpoint_for(ProposedPolicy::ConservativeAffineEnvelopeCheckpointV1),Some(CheckpointCadence{every_batches:1,max_snapshots:16}));
+    }
+    #[test]
+    fn cadence_selection_cannot_mutate_arithmetic_or_owner_allowance(){
+        let b=budget();let mut c=from_budget(&b,3).unwrap();
+        let before=(c.expansion.work,c.expansion.bytes,c.continuation.work,c.continuation.bytes,b.native,b.checking_work,b.deadline);
+        c.checkpoint=checkpoint_for(ProposedPolicy::ConservativeAffineEnvelopeCheckpointV1);
+        assert_eq!(before,(c.expansion.work,c.expansion.bytes,c.continuation.work,c.continuation.bytes,b.native,b.checking_work,b.deadline));
     }
 
 }

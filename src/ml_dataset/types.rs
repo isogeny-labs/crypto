@@ -123,7 +123,7 @@ pub enum SatSearchRequest { CaptureAndCheckModel {events:u32,conflicts:u64} }
 fn present_search<'de,D:serde::Deserializer<'de>>(d:D)->Result<Option<SatSearchRequest>,D::Error>{SatSearchRequest::deserialize(d).map(Some)}
 #[derive(Clone,Copy,Debug,Serialize,Deserialize,PartialEq,Eq)]
 #[serde(rename_all="snake_case")]
-pub enum OwnedBooleanSearchPolicy { ConservativeAffineEnvelopeV1 }
+pub enum OwnedBooleanSearchPolicy { ConservativeAffineEnvelopeV1, ConservativeAffineEnvelopeCheckpointV1 }
 #[derive(Clone,Debug,Serialize,Deserialize,PartialEq,Eq)]
 #[serde(tag="mode",rename_all="snake_case",deny_unknown_fields)]
 pub enum OwnedBooleanSearchRequest { MatrixContinuation { pattern:u32, policy:OwnedBooleanSearchPolicy } }
