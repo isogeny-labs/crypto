@@ -2,8 +2,8 @@
 """Matched IC-vs-rho panel on fresh instances.  fb per size frozen in vsrho_frozen.json (from the exploratory
 scale_walk panel, committed before this run).  Arms per instance and solver seed: IW = table + restarted walk
 (IC_SUM_TABLE=1 IC_WALK=1, extra 2, --rho-steps 0), RH = same-target Pollard rho of the same binary
-(`solve-prime-file --rho-steps 5000000`; its IC part uses fb 8 and is NOT timed here, only the `rho.wall_ms`
-field is read).  Serial, interleaved seeded order, 300 s timeout."""
+(`solve-prime-file --rho-steps 5000000` with the IC part starved to 1 trial / 1 attempt so it returns
+bounded_unknown at once; only the `rho.wall_ms` field is read).  Serial, interleaved seeded order, 300 s timeout."""
 import json,os,subprocess,random,glob,sys,time
 inst,out=sys.argv[1:3];ic="../../target/release/ic"
 fz=json.load(open("results/vsrho_frozen.json"))
@@ -19,7 +19,7 @@ for f,d,s,a in jobs:
         env.update({"IC_SUM_TABLE":"1","IC_WALK":"1"})
         cmd=[ic,"--json","solve-prime-file","--input",t,"--seed",str(s),"--fb-size",str(fz[str(pbits)]),"--extra-relations","2","--rho-steps","0","--max-trials-per-relation","2000000","--max-relation-attempts","512"]
     else:
-        cmd=[ic,"--json","solve-prime-file","--input",t,"--seed",str(s),"--fb-size","8","--extra-relations","2","--rho-steps","5000000","--max-trials-per-relation","2000000","--max-relation-attempts","512"]
+        cmd=[ic,"--json","solve-prime-file","--input",t,"--seed",str(s),"--fb-size","8","--extra-relations","2","--rho-steps","5000000","--max-trials-per-relation","1","--max-relation-attempts","1"]  # IC part starved on purpose: only rho.wall_ms is read
     try:
         r=subprocess.run(cmd,capture_output=True,text=True,env=env,timeout=300);o=json.loads(r.stdout)
     except Exception:
