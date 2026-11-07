@@ -54,13 +54,25 @@ Caveats, stated plainly:
   relative to the walk (p36); at small r the fixed costs dominate. The fused walk also
   does somewhat more lookups (p16 27 359 vs 21 352 over 32 runs), i.e. slightly longer
   walks, since the combined jump set is a different (still pseudo-random) walk.
-- `ecbench compare` reports the pricing band (AGENTS.md section 5a) as **unresolved**
-  for every pair: at 0.1 and 1 GAE per unpriced native op the fused arm is worse
-  (ratios 1.67/2.49 at p16, 1.81/2.42 at p36) because its unpriced table is larger:
-  `residual_table_bytes_uncharged` is 2.6x the old figure at p36 (522 MB vs 199 MB over
-  16 runs; 8 B key + 24 B + slice header + 16 B per nonzero, versus the old formula
-  `16 + 8*d_col` per entry that omits key and Vec header) and lookups are 16% higher.
-  So the counted-GAE gain is a w=0 result, not an improvement that holds across the band.
+- **§5a band, matched byte formula (re-run 2026-11-07).** The first runs priced the
+  fused table with a different byte formula than `residual` (key and slice header
+  included), which inflated its unpriced work. Commit b4a460705 makes both arms charge
+  `residual_table_bytes_uncharged = entries * (16 + 8*d_col)` and reports the fused
+  layout's real bytes as `residual_table_bytes_stored`. Re-run sessions
+  `sessions/rerun-{p16,p36}`, `ecbench compare --a res2f --b res2 --weight w`
+  (`summary/rerun-*-band.txt`); res2 / res2f, 95% interval:
+
+  | curve | w = 0 | w = 0.1 | w = 1 | band |
+  |---|---|---|---|---|
+  | p16 | 1.130 [1.046, 1.221] | 0.946 [0.830, 1.078] | 0.809 [0.676, 0.967] | unresolved |
+  | p36 | 1.714 [1.250, 2.349] | 1.054 [0.768, 1.446] | 0.883 [0.644, 1.212] | unresolved |
+
+  The fused walk halves the group additions per step but not the native work per step
+  (one table probe and one stored entry each). Once that work is priced, the cost per
+  relation follows the walk length, and the fused walk does about 16% more steps here.
+  So under §5a the two arms are **not ranked**: the gain is a w = 0 (counted GAE)
+  result only. The lever for the band is the table itself (distinguished points or
+  compact storage), not the addition count.
 - Wall (local, L0, shared host, no A/A): end-to-end wall fused/old 1.20 (p16), 1.04
   (p18), 0.91 (p36); not admissible.
 - Measurement quality 0/100 (L0, shared 4-core host); no A/A arm; 2 rounds only.
