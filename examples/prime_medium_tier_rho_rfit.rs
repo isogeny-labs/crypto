@@ -70,7 +70,10 @@ fn load(path: &str) -> Result<Vec<Point>, String> {
         let mean_s = f(s, "mean_s").ok_or("size without mean_s")?;
         let declared = f(s, "declared_s").ok_or("size without declared_s")?;
         let ci = s["s_ci95"].as_array().ok_or("size without s_ci95")?;
-        let (lo, hi) = (ci[0].as_f64().unwrap_or(f64::NAN), ci[1].as_f64().unwrap_or(f64::NAN));
+        let (lo, hi) = (
+            ci[0].as_f64().unwrap_or(f64::NAN),
+            ci[1].as_f64().unwrap_or(f64::NAN),
+        );
         let se = (hi - lo) / (2.0 * 1.959_963_984_540_054) / declared;
         if !(se.is_finite() && se > 0.0 && declared > 0.0) {
             return Err(format!("{path}: unusable interval at log2 r {log2_r}"));
@@ -225,14 +228,19 @@ fn main() {
         match a.as_str() {
             "--seed" => seed = args.next().and_then(|s| s.parse().ok()).expect("--seed N"),
             "--resamples" => {
-                resamples = args.next().and_then(|s| s.parse().ok()).expect("--resamples N")
+                resamples = args
+                    .next()
+                    .and_then(|s| s.parse().ok())
+                    .expect("--resamples N")
             }
             "--out" => out = args.next(),
             _ => files.push(a),
         }
     }
     if files.is_empty() {
-        eprintln!("usage: prime_medium_tier_rho_rfit [--seed N] [--resamples N] [--out F] RECORD...");
+        eprintln!(
+            "usage: prime_medium_tier_rho_rfit [--seed N] [--resamples N] [--out F] RECORD..."
+        );
         std::process::exit(2);
     }
     let mut p = Vec::new();
@@ -268,9 +276,9 @@ fn main() {
     let medium: Vec<&Point> = p.iter().filter(|q| q.tier == "medium").collect();
     let toy: Vec<&Point> = p.iter().filter(|q| q.tier == "toy").collect();
     let wmean = |v: &[&Point]| {
-        let (sw, swy) = v
-            .iter()
-            .fold((0.0, 0.0), |(a, b), q| (a + 1.0 / (q.se * q.se), b + q.y / (q.se * q.se)));
+        let (sw, swy) = v.iter().fold((0.0, 0.0), |(a, b), q| {
+            (a + 1.0 / (q.se * q.se), b + q.y / (q.se * q.se))
+        });
         if sw > 0.0 {
             json!({"value": swy / sw, "se": (1.0 / sw).sqrt(), "points": v.len()})
         } else {

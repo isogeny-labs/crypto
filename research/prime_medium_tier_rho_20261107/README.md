@@ -375,3 +375,11 @@ None. New file outside this directory: `examples/prime_medium_tier_rho_rfit.rs`
 (slug-prefixed, auto-discovered example; it adds no `Cargo.toml` entry).
 The local `ecbench` build and the example build wrote only to the shared
 `target/`.
+
+## Amendment note (2026-11-07 21:05 UTC, before any data)
+
+`examples/prime_medium_tier_rho_rfit.rs` was reformatted with
+`rustfmt --edition 2021` to satisfy the repository's `rustfmt (changed files)`
+check. The change is layout only. Its sha256 moved from `abcdb026…cdd1` to
+`b79e7d00…0837`, and `protocol.json` records the new hash. The protocol still
+validates with 0 findings. No measurement existed at either hash.
