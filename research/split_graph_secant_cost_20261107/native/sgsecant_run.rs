@@ -196,8 +196,8 @@ pub fn run_arm(
     }
     phase(PH_LA);
     if let Some(l) = rank.solve_lambda() {
-        // verify lambda * G == H (charged)
-        phase(PH_VERIFY);
+        // verify lambda * G == H (charged to the LA phase; PH_VERIFY is extractor-only)
+        phase(PH_LA);
         let q = smul(c, l, inst.g);
         rec.wrong_lambda = q != Some(inst.h);
     }

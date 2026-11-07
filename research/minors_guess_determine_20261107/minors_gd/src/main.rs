@@ -40,7 +40,7 @@ pub fn run(solver: &str, inst: &Instance, cap: f64, prm: &Params) -> RunRec {
     let cost = || f.muls.get() as f64 + invw * f.invs.get() as f64;
     let mut rec = RunRec { solver: solver.to_string(), bits: inst.bits, idx: inst.idx, seed: inst.seed, p: inst.p, n: inst.n, cap, ..Default::default() };
     let mut rng = Rng::new(mix(inst.seed, hash_str(solver)));
-    if solver == "rho" {
+    if solver == "rho" || solver == "rho_aa" {
         let o = rho::solve(&c, inst.g, inst.q, inst.n, inst.bits, &mut rng, cap);
         rec.attempts = 1;
         rec.extra = format!("\"steps\":{},\"dps\":{},\"restarts\":{},\"escapes\":{},\"special_adds\":{},\"useless_collisions\":{},\"cap_hit\":{}", o.steps, o.dps, o.restarts, o.escapes, o.special_adds, o.useless_collisions, o.cap_hit);

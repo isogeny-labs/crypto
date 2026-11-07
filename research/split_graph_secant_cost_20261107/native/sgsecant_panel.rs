@@ -251,6 +251,51 @@ pub const COMPARISONS: [(&str, &str, &str); 10] = [
     ("self cs2/cs2", "cs2", "cs2"),
 ];
 
+pub const MARGIN: f64 = 0.05; // materiality margin frozen in PROTOCOL.md
+
+fn verdict_of(n: usize, lo: f64, hi: f64) -> &'static str {
+    if n == 0 {
+        "unmeasured"
+    } else if hi < 1.0 - MARGIN {
+        "lower"
+    } else if lo > 1.0 + MARGIN {
+        "higher"
+    } else {
+        "indistinct"
+    }
+}
+struct Stat {
+    n: usize,
+    unmeasured: usize,
+    gm: f64,
+    lo: f64,
+    hi: f64,
+    verdict: &'static str,
+}
+fn pair_stat(cfg: &Cfg, rs: &[&Rec], a: &str, b: &str, incl: bool, m: Metric, seed: u64) -> Stat {
+    let get = |arm: &str, inst: usize, run: usize| rs.iter().find(|r| r.arm == arm && r.inst == inst && r.run == run).copied();
+    let mut ratios = Vec::new();
+    let mut unmeasured = 0;
+    for inst in 0..cfg.instances {
+        for run in 0..cfg.runs {
+            if let (Some(ra), Some(rb)) = (get(a, inst, run), get(b, inst, run)) {
+                let ok = |r: &Rec| r.rr.completed && r.rr.censored_systems == 0 && r.rr.unresolved == 0 && r.rr.nonzero_dim_systems == 0;
+                if ok(ra) && ok(rb) {
+                    ratios.push(cost(ra, m, incl) / cost(rb, m, incl));
+                } else {
+                    unmeasured += 1;
+                }
+            }
+        }
+    }
+    let (gm, lo, hi) = gm_ci(&ratios, cfg.boot, seed);
+    Stat { n: ratios.len(), unmeasured, gm, lo, hi, verdict: verdict_of(ratios.len(), lo, hi) }
+}
+/// Solve-phase operations (build, groebner, fglm, roots, replay, verify): doubled exactly by pc2x.
+fn solve_phase_field(r: &Rec) -> f64 {
+    [PH_BUILD, PH_GB, PH_FGLM, PH_ROOTS, PH_REPLAY, PH_VERIFY].iter().map(|&i| r.rr.led[i].field() as f64).sum()
+}
+
 pub fn summarize(cfg: &Cfg, recs: &[Rec], fails: &[InstFail]) -> (String, String) {
     let mut txt = String::new();
     let mut js = String::from("{\"config\":\"");
@@ -260,19 +305,25 @@ pub fn summarize(cfg: &Cfg, recs: &[Rec], fails: &[InstFail]) -> (String, String
     for f in fails {
         let _ = writeln!(txt, "INSTANCE FAILED (unmeasured): p={} d={} inst={} reason={}", f.p, f.d, f.inst, f.reason);
     }
+    // decision bookkeeping
+    let mut integrity_ok = true;
+    let mut ctl_ok = true;
+    let mut cells_ok: Vec<(u64, usize)> = Vec::new();
+    let mut dec: BTreeMap<&str, (usize, usize, usize, usize)> = BTreeMap::new(); // cand -> (lower_all5, higher_field, weight_dependent, cells)
     let mut first = true;
     for (ci, &(p, d)) in cfg.cells.iter().enumerate() {
         let rs: Vec<&Rec> = recs.iter().filter(|r| r.p == p && r.d == d).collect();
-        let get = |arm: &str, inst: usize, run: usize| rs.iter().find(|r| r.arm == arm && r.inst == inst && r.run == run).copied();
+        let nominal = cfg.instances * cfg.runs;
+        let seed = cfg.seed ^ (ci as u64 * 7919 + 13);
         if !first {
             js.push(',');
         }
         first = false;
         let _ = write!(js, "{{\"p\":{},\"d\":{},\"arms\":{{", p, d);
-        let _ = writeln!(txt, "\n## cell p={} d={}  (K={} abscissae, rank target {})", p, d, 2 * d, 2 * d + 1);
-        // per-arm medians
+        let _ = writeln!(txt, "\n## cell p={} d={}  (K={} abscissae, rank target {}, nominal paired units {})", p, d, 2 * d, 2 * d + 1, nominal);
         let mut afirst = true;
-        for (arm, _, _) in ARMS.iter().map(|a| (a.0, 0, 0)).chain(std::iter::once(("pc2x", 0, 0))) {
+        let mut cell_clean = !rs.is_empty();
+        for arm in ARMS.iter().map(|a| a.0).chain(std::iter::once("pc2x")) {
             let ar: Vec<&&Rec> = rs.iter().filter(|r| r.arm == arm).collect();
             if ar.is_empty() {
                 continue;
@@ -283,14 +334,23 @@ pub fn summarize(cfg: &Cfg, recs: &[Rec], fails: &[InstFail]) -> (String, String
             let mut nat: Vec<f64> = ar.iter().filter(|r| r.rr.completed).map(|r| total(&r.rr.led.clone().try_into().unwrap()).native as f64 / (2 * d + 1) as f64).collect();
             let mut tg: Vec<f64> = ar.iter().map(|r| r.rr.targets as f64).collect();
             let mut hd: Vec<f64> = ar.iter().map(|r| r.rr.handled_degree_max as f64).collect();
+            let mut share: Vec<f64> = ar.iter().filter(|r| r.rr.completed).map(|r| { let c = Metric::Field.of(&r.construct); c / cost(r, Metric::Field, true) }).collect();
             let mism: u64 = ar.iter().map(|r| r.rr.exact_mismatch).sum();
             let rf: u64 = ar.iter().map(|r| r.rr.replay_fail).sum();
             let cens: u64 = ar.iter().map(|r| r.rr.censored_systems).sum();
-            let (mp, mx, mn, mh, mt) = (median(&mut perrel), median(&mut perrel_x), median(&mut nat), median(&mut hd), median(&mut tg));
+            let unres: u64 = ar.iter().map(|r| r.rr.unresolved + r.rr.nonzero_dim_systems).sum();
+            let wrong = ar.iter().filter(|r| r.rr.wrong_lambda || r.rr.inconsistent).count();
+            if mism + rf + unres > 0 || wrong > 0 {
+                integrity_ok = false;
+            }
+            if cens > 0 || done < ar.len() {
+                cell_clean = false;
+            }
+            let (mp, mx, mn, mh, mt, ms) = (median(&mut perrel), median(&mut perrel_x), median(&mut nat), median(&mut hd), median(&mut tg), median(&mut share));
             let _ = writeln!(
                 txt,
-                "arm {:<5} runs={} completed={} median field_ops/relation incl.construct={:.0} excl.construct={:.0} native/relation={:.0} median targets={:.0} handled_degree_max(median)={:.0} exact_mismatch={} replay_fail={} censored_systems={}",
-                arm, ar.len(), done, mp, mx, mn, mt, mh, mism, rf, cens
+                "arm {:<5} runs={} completed={} median field/relation incl.construct={:.0} excl={:.0} native/relation={:.0} construct share={:.2} median targets={:.0} handled_degree(median)={:.0} exact_mismatch={} replay_fail={} unresolved/nonzero-dim={} censored={} wrong_lambda={}",
+                arm, ar.len(), done, mp, mx, mn, ms, mt, mh, mism, rf, unres, cens, wrong
             );
             if !afirst {
                 js.push(',');
@@ -298,8 +358,8 @@ pub fn summarize(cfg: &Cfg, recs: &[Rec], fails: &[InstFail]) -> (String, String
             afirst = false;
             let _ = write!(
                 js,
-                "\"{}\":{{\"runs\":{},\"completed\":{},\"median_field_per_relation_incl_construct\":{:.3},\"median_field_per_relation_excl_construct\":{:.3},\"median_native_per_relation\":{:.3},\"median_targets\":{:.1},\"median_handled_degree\":{:.1},\"exact_mismatch\":{},\"replay_fail\":{},\"censored_systems\":{}}}",
-                arm, ar.len(), done, mp, mx, mn, mt, mh, mism, rf, cens
+                "\"{}\":{{\"runs\":{},\"completed\":{},\"median_field_per_relation_incl_construct\":{:.3},\"median_field_per_relation_excl_construct\":{:.3},\"median_native_per_relation\":{:.3},\"construct_share\":{:.4},\"median_targets\":{:.1},\"median_handled_degree\":{:.1},\"exact_mismatch\":{},\"replay_fail\":{},\"unresolved_or_nonzero_dim\":{},\"censored_systems\":{},\"wrong_lambda\":{}}}",
+                arm, ar.len(), done, mp, mx, mn, ms, mt, mh, mism, rf, unres, cens, wrong
             );
         }
         js.push_str("},\"comparisons\":[");
@@ -307,32 +367,9 @@ pub fn summarize(cfg: &Cfg, recs: &[Rec], fails: &[InstFail]) -> (String, String
         for (label, a, b) in COMPARISONS.iter() {
             for incl in [true, false] {
                 for m in metrics() {
-                    let mut ratios = Vec::new();
-                    let mut unmeasured = 0;
-                    for inst in 0..cfg.instances {
-                        for run in 0..cfg.runs {
-                            if let (Some(ra), Some(rb)) = (get(a, inst, run), get(b, inst, run)) {
-                                if ra.rr.completed && rb.rr.completed && ra.rr.censored_systems == 0 && rb.rr.censored_systems == 0 {
-                                    // per independent relation: rank is 2d+1 for both, so the ratio of totals is the ratio per relation
-                                    ratios.push(cost(ra, m, incl) / cost(rb, m, incl));
-                                } else {
-                                    unmeasured += 1;
-                                }
-                            }
-                        }
-                    }
-                    let (gm, lo, hi) = gm_ci(&ratios, cfg.boot, cfg.seed ^ (ci as u64 * 7919 + 13));
-                    let verdict = if ratios.is_empty() {
-                        "unmeasured"
-                    } else if hi < 1.0 {
-                        "lower"
-                    } else if lo > 1.0 {
-                        "higher"
-                    } else {
-                        "indistinct"
-                    };
-                    if incl && matches!(m, Metric::Field) || (incl && !matches!(m, Metric::Field) && label.starts_with("PRIMARY")) || (!incl && label.starts_with("PRIMARY")) {
-                        let _ = writeln!(txt, "  {:<28} {:<22} construct={} n={} GM={:.4} CI95=[{:.4},{:.4}] unmeasured={} -> {}", label, m.name(), incl, ratios.len(), gm, lo, hi, unmeasured, verdict);
+                    let st = pair_stat(cfg, &rs, a, b, incl, m, seed);
+                    if (matches!(m, Metric::Field) && incl) || label.starts_with("PRIMARY") || label.starts_with("sec cs1") {
+                        let _ = writeln!(txt, "  {:<28} {:<18} incl_construct={:<5} n={} GM={:.4} CI95=[{:.4},{:.4}] unmeasured={} -> {}", label, m.name(), incl, st.n, st.gm, st.lo, st.hi, st.unmeasured, st.verdict);
                     }
                     if !cfirst {
                         js.push(',');
@@ -341,28 +378,111 @@ pub fn summarize(cfg: &Cfg, recs: &[Rec], fails: &[InstFail]) -> (String, String
                     let _ = write!(
                         js,
                         "{{\"comparison\":\"{}\",\"a\":\"{}\",\"b\":\"{}\",\"metric\":\"{}\",\"incl_construct\":{},\"n\":{},\"unmeasured\":{},\"gm_ratio\":{:.6},\"ci_lo\":{:.6},\"ci_hi\":{:.6},\"verdict\":\"{}\"}}",
-                        label, a, b, m.name(), incl, ratios.len(), unmeasured, gm, lo, hi, verdict
+                        label, a, b, m.name(), incl, st.n, st.unmeasured, st.gm, st.lo, st.hi, st.verdict
                     );
                 }
             }
         }
         js.push(']');
-        // gap to internal rho reference (distance remaining), primary arm
+        // controls
+        let selfst = pair_stat(cfg, &rs, "cs2", "cs2", true, Metric::Field, seed);
+        let mut pcr = Vec::new();
+        for r in rs.iter().filter(|r| r.arm == "pc2x") {
+            if let Some(b) = rs.iter().find(|x| x.arm == "cs2" && x.inst == r.inst && x.run == r.run) {
+                pcr.push(solve_phase_field(r) / solve_phase_field(b));
+            }
+        }
+        let pc_ok = !pcr.is_empty() && pcr.iter().all(|x| (x - 2.0).abs() < 1e-9);
+        let aa = pair_stat(cfg, &rs, "hs2", "hs2b", true, Metric::Field, seed);
+        let aa_ok = aa.n > 0 && aa.lo <= 1.0 + MARGIN && aa.hi >= 1.0 - MARGIN;
+        let self_ok = selfst.n > 0 && (selfst.gm - 1.0).abs() < 1e-12;
+        if !(pc_ok && aa_ok && self_ok) {
+            ctl_ok = false;
+        }
+        let _ = writeln!(txt, "  controls: self-ratio==1: {}  positive control (solve-phase ratio exactly 2.0): {} (n={})  A/A hs2/hs2b CI95=[{:.3},{:.3}] contains the +-{:.0}% margin band: {}", self_ok, pc_ok, pcr.len(), aa.lo, aa.hi, MARGIN * 100.0, aa_ok);
+        // same-base decision statistics, excl. construct (construction is identical for the pair)
+        for cand in ["cs1", "cs2"] {
+            let mut lower5 = true;
+            let mut higher_field = false;
+            let mut lower_any = false;
+            let mut weight_dep = false;
+            let mut vs = Vec::new();
+            for m in metrics() {
+                let st = pair_stat(cfg, &rs, cand, "cd", false, m, seed);
+                vs.push((m.name(), st.verdict, st.gm));
+                if st.verdict != "lower" {
+                    lower5 = false;
+                }
+                if st.verdict == "lower" {
+                    lower_any = true;
+                }
+                if matches!(m, Metric::Field) && st.verdict == "higher" {
+                    higher_field = true;
+                }
+            }
+            if lower_any && !lower5 {
+                weight_dep = true;
+            }
+            let _ = writeln!(txt, "  same-base {cand}/cd (excl. identical construction): {}", vs.iter().map(|(n, v, g)| format!("{n}:{v}({g:.3})")).collect::<Vec<_>>().join("  "));
+            let e = dec.entry(cand).or_insert((0, 0, 0, 0));
+            if cell_clean {
+                e.3 += 1;
+                if lower5 {
+                    e.0 += 1;
+                }
+                if higher_field {
+                    e.1 += 1;
+                }
+                if weight_dep {
+                    e.2 += 1;
+                }
+            }
+        }
+        if cell_clean {
+            cells_ok.push((p, d));
+        }
         let mut gaps = Vec::new();
         for r in rs.iter().filter(|r| r.arm == "cs2" && r.rr.completed) {
             gaps.push(cost(r, Metric::Field, true) / r.rho.field() as f64);
         }
-        let mut gaps2 = gaps.clone();
-        let mg = median(&mut gaps2);
+        let mg = median(&mut gaps);
+        let mut gaps1 = Vec::new();
+        for r in rs.iter().filter(|r| r.arm == "cs1" && r.rr.completed) {
+            gaps1.push(cost(r, Metric::Field, true) / r.rho.field() as f64);
+        }
+        let mg1 = median(&mut gaps1);
         let mut gd = Vec::new();
         for r in rs.iter().filter(|r| r.arm == "cd" && r.rr.completed) {
             gd.push(cost(r, Metric::Field, true) / r.rho.field() as f64);
         }
         let mgd = median(&mut gd);
-        let _ = writeln!(txt, "  distance to internal rho reference (field ops, complete cost / rho cost, median): cs2 = {:.1}x, cd = {:.1}x (distance remaining, not a gate; the matched ecbench rho with the section 5a band is a separate required row)", mg, mgd);
-        let _ = write!(js, ",\"gap_to_internal_rho_median\":{{\"cs2\":{:.3},\"cd\":{:.3}}}}}", mg, mgd);
+        let _ = writeln!(txt, "  distance to internal rho reference (field ops, complete cost / rho cost, median, incl. construction): cs2 = {:.1}x, cs1 = {:.1}x, cd = {:.1}x (distance remaining, not a gate; the matched ecbench rho with the section 5a band is a separate required row)", mg, mg1, mgd);
+        let _ = write!(js, ",\"clean\":{},\"gap_to_internal_rho_median\":{{\"cs2\":{:.3},\"cs1\":{:.3},\"cd\":{:.3}}}}}", cell_clean, mg, mg1, mgd);
     }
-    js.push_str("]}");
+    js.push_str("],\"decision\":{");
+    let _ = writeln!(txt, "\n## PROTOCOL DECISION (rule frozen in PROTOCOL.md)");
+    let _ = writeln!(txt, "clean (uncensored) cells: {} of {}  integrity (exact root sets, replay, no unresolved): {}  controls: {}", cells_ok.len(), cfg.cells.len(), integrity_ok, ctl_ok);
+    let mut dfirst = true;
+    for (cand, (lower5, higher, wdep, cells)) in dec.iter() {
+        let outcome = if !integrity_ok || !ctl_ok || *cells < 3 {
+            "NOT CLOSED (integrity, control or fewer than 3 clean cells)"
+        } else if *lower5 >= 3 && *higher == 0 {
+            "ADVANCES (>=3 cells lower under all five metrics, none higher)"
+        } else if *wdep >= 1 && *higher == 0 {
+            "UNRANKED (order changes across the native-weight/counting band)"
+        } else if *higher >= 3 || (*cells >= 3 && *lower5 == 0) {
+            "REJECTED at the tested scale (lower degree, not lower complete same-base cost)"
+        } else {
+            "INCONCLUSIVE"
+        };
+        let _ = writeln!(txt, "candidate {cand}: cells lower under all five metrics = {lower5}, cells higher in field ops = {higher}, cells weight-dependent = {wdep}, clean cells = {cells} -> {outcome}");
+        if !dfirst {
+            js.push(',');
+        }
+        dfirst = false;
+        let _ = write!(js, "\"{}\":{{\"lower_all_five\":{},\"higher_field\":{},\"weight_dependent\":{},\"clean_cells\":{},\"outcome\":\"{}\"}}", cand, lower5, higher, wdep, cells, outcome);
+    }
+    js.push_str("}}");
     (txt, js)
 }
 
