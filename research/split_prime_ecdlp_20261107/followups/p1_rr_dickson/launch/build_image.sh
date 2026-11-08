@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # build_image.sh COMMIT -- P1 round 3 study image: ubuntu:24.04 + ONE layer (msolve 0.6.5 and its
-# libraries from the Ubuntu noble .debs, bc, procps, AWS CLI v2, p1tool built from COMMIT, the
+# libraries from the Ubuntu noble .debs, bc (+ libreadline8t64, missing from the base: smoke job), procps, AWS CLI v2, p1tool built from COMMIT, the
 # frozen driver scripts), pushed to isolab/tasks by digest with oci-layer-publish.py (no daemon).
 # Pattern: research/pkm_falldegree_unblock_20261107/image/build_layer.sh. Receipt: launch/image.json.
 set -euo pipefail
@@ -12,11 +12,12 @@ work=$(mktemp -d); trap 'rm -rf "$work"' EXIT
 git -C "$repo" archive "$commit" "$study" | tar -x -C "$work"
 src=$work/$study
 ( cd "$src/p1tool" && CARGO_TARGET_DIR=$work/target cargo build --release --locked )
-mkdir -p "$work/debs" && ( cd "$work/debs" && apt-get download msolve libmsolve-0.6.5 libflint18t64 libmpfr6 libgmp10 libgomp1 bc procps libproc2-0 )
+mkdir -p "$work/debs" && ( cd "$work/debs" && apt-get download msolve libmsolve-0.6.5 libflint18t64 libmpfr6 libgmp10 libgomp1 bc libreadline8t64 readline-common procps libproc2-0 )
 layer=$work/layer; mkdir -p "$layer/usr/local/bin" "$layer/opt/study/calibration" "$layer/opt/study/p1tool/src" "$layer/opt/study/launch"
 for d in "$work"/debs/*.deb; do dpkg -x "$d" "$layer"; done
 [ "$(sha256sum "$layer/usr/bin/msolve" | cut -d' ' -f1)" = c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa ] \
   || { echo "msolve binary differs from the R2b bind" >&2; exit 1; }
+[ -e "$layer/usr/lib/x86_64-linux-gnu/libreadline.so.8" ] || { echo "libreadline.so.8 missing (bc needs it)" >&2; exit 1; }
 curl -sSf -o "$work/awscli.zip" https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
 ( cd "$work" && unzip -q awscli.zip ) && mkdir -p "$layer/usr/local/aws-cli" && cp -a "$work/aws/dist" "$layer/usr/local/aws-cli/dist"
 ln -s ../aws-cli/dist/aws "$layer/usr/local/bin/aws"
