@@ -1,0 +1,17 @@
+from pathlib import Path
+import hashlib,json
+p=Path(__file__).resolve().parent;old=p.parent/'feature-initial-phase-reduction';rows=[]
+for f in sorted(old.glob('*.rs')):
+ if f.name=='driver.rs':continue
+ (p/f.name).write_bytes(f.read_bytes());rows.append({'source':f.name,'sha256':hashlib.sha256(f.read_bytes()).hexdigest()})
+s=(old/'initial.rs').read_text();s=s[s.index('impl SeededImage{'):].replace('new_sectioned','new_direct_phase').replace('initial_sections','initial_direct_phase').replace('INITIAL_POWER','DIRECT_INITIAL_POWER')
+s=s.replace('let mut p=polynomial::Poly::new(r).map_err(|_|Error::Domain)?;let dn=initial_dickson(&mut p,n);','let domains=direct_phase_domains(r,n,i,normalized)?;')
+a=s.index('  for u in [1,r-1,i,r-i]');b=s.index('   if g.len()==1{continue}',a)
+s=s[:a]+'  for (u,g) in domains{\n'+s[b:]
+s='std::thread_local!{static DIRECT_INITIAL_POWER:std::cell::Cell<(usize,usize)>=const{std::cell::Cell::new((0,0))};}\n'+s
+(p/'direct-initial.rs').write_text(s)
+s=(old/'sectioned-adapter.rs').read_text().replace('recover_sectioned_image','recover_direct_phase_image').replace('SeededImage::new_sectioned','SeededImage::new_direct_phase')
+(p/'direct-adapter.rs').write_text(s)
+s=(old/'driver.rs').read_text();s=s[:s.index('fn main(){')]+'include!("phase-domain.rs");\ninclude!("direct-initial.rs");\ninclude!("direct-adapter.rs");\ninclude!("direct-checks.rs");\nfn main(){if std::env::args().any(|x|x=="--inherited"){inherited_checks()}else{direct_checks()}}\n'
+(p/'driver.rs').write_text(s)
+(p/'generation.json').write_text(json.dumps({'source_commit':'7fcf96f5029783a23b8e7448ff8f356e6affe7e5','copied':rows},indent=2)+'\n')
