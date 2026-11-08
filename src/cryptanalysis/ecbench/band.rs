@@ -146,8 +146,19 @@ pub fn calibrated_native(r: &Record) -> Result<(f64, u64), String> {
     if pinned.is_empty() {
         return Ok((0.0, 0));
     }
-    let table =
-        pinned_calibration_ratios(regime_of(r), &r.workload.curve.slug).ok_or_else(|| {
+    // A record that carries its own counted ratios (`calibration_ratios`,
+    // written by `ic.pipeline` + `bin-x-line` from the run's counted `F_q`
+    // multiplications) is read from them when the pinned table has no row;
+    // every record without that key is priced exactly as before.
+    let own = || {
+        r.detail
+            .get("calibration_ratios")
+            .and_then(|v| v.as_object())
+            .cloned()
+    };
+    let table = pinned_calibration_ratios(regime_of(r), &r.workload.curve.slug)
+        .or_else(own)
+        .ok_or_else(|| {
             format!(
                 "{}: priced by pinned units {:?} but no calibration row for {}",
                 r.record_id, pinned, r.workload.curve.slug

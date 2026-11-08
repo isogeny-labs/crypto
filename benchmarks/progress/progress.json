@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261107T1947Z-curve25519-f1-walk-k24",
+  "latest_record": "20261107T2144Z-split-prime-p3-cross-trace",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 49,
+    "measured": 55,
     "open": 0
   },
   "repo": "crypto",
@@ -418,6 +418,83 @@
       ],
       "problem": "dlpwai:static-dh-p224-shape",
       "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.986,
+      "latest": 0.986,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "aa_rho_correlation_p28",
+      "points": [
+        {
+          "commit": "72004b435c02",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 2000,
+          "record": "20261107T2144Z-split-prime-p3-cross-trace",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P3 cross-trace covariate test, 2000 prime-order curves at 2^24 and 2^28: 0 of 14 tests significant (frozen rule 2 null); coverage effects <= 0.002 %; rho walk found defective by the A/A control",
+          "value": 0.986
+        }
+      ],
+      "problem": "ecdlp:split-prime-p3-cross-trace-census",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "bonferroni_significant_tests",
+      "points": [
+        {
+          "commit": "72004b435c02",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 14,
+          "record": "20261107T2144Z-split-prime-p3-cross-trace",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P3 cross-trace covariate test, 2000 prime-order curves at 2^24 and 2^28: 0 of 14 tests significant (frozen rule 2 null); coverage effects <= 0.002 %; rho walk found defective by the A/A control",
+          "value": 0.0
+        }
+      ],
+      "problem": "ecdlp:split-prime-p3-cross-trace-census",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.7,
+      "latest": 0.7,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "max_abs_rho_effect_pct",
+      "points": [
+        {
+          "commit": "72004b435c02",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 2000,
+          "record": "20261107T2144Z-split-prime-p3-cross-trace",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P3 cross-trace covariate test, 2000 prime-order curves at 2^24 and 2^28: 0 of 14 tests significant (frozen rule 2 null); coverage effects <= 0.002 %; rho walk found defective by the A/A control",
+          "value": 0.7
+        }
+      ],
+      "problem": "ecdlp:split-prime-p3-cross-trace-census",
+      "unit": "percent"
     },
     {
       "better": "lower",
@@ -1584,6 +1661,276 @@
     },
     {
       "better": "lower",
+      "first": 1.1656,
+      "latest": 1.1656,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_tw_over_f1_w0",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k20",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.1322,
+            1.1999
+          ],
+          "summary": "k=20 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 1.1656
+        }
+      ],
+      "problem": "ic:curve25519-k20-single-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.8872,
+      "latest": 0.8872,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_twcj_over_f1_w01",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k20",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8634,
+            0.9117
+          ],
+          "summary": "k=20 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 0.8872
+        }
+      ],
+      "problem": "ic:curve25519-k20-single-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9088,
+      "latest": 0.9088,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_twcj_over_f1_w0",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k20",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8845,
+            0.9338
+          ],
+          "summary": "k=20 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 0.9088
+        }
+      ],
+      "problem": "ic:curve25519-k20-single-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.7335,
+      "latest": 0.7335,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_twcj_over_f1_w1",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k20",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.7123,
+            0.7554
+          ],
+          "summary": "k=20 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 0.7335
+        }
+      ],
+      "problem": "ic:curve25519-k20-single-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.3058,
+      "latest": 1.3058,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_twcj_over_rho_w01",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k20",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.2528,
+            1.3611
+          ],
+          "summary": "k=20 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 1.3058
+        }
+      ],
+      "problem": "ic:curve25519-k20-single-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.3963,
+      "latest": 1.3963,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_twcj_over_rho_w0",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k20",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.3409,
+            1.4539
+          ],
+          "summary": "k=20 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 1.3963
+        }
+      ],
+      "problem": "ic:curve25519-k20-single-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.3602,
+      "latest": 1.3602,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_twcj_over_rho_w1_inserts_priced",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k20",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.2976,
+            1.4258
+          ],
+          "summary": "k=20 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 1.3602
+        }
+      ],
+      "problem": "ic:curve25519-k20-single-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.8312,
+      "latest": 0.8312,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_twcj_over_rho_w1",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k20",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.7932,
+            0.8709
+          ],
+          "summary": "k=20 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 0.8312
+        }
+      ],
+      "problem": "ic:curve25519-k20-single-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.7797,
+      "latest": 0.7797,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_twcj_over_tw_w0",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k20",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.7483,
+            0.8125
+          ],
+          "summary": "k=20 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 0.7797
+        }
+      ],
+      "problem": "ic:curve25519-k20-single-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
       "first": 2.3781,
       "latest": 2.3781,
       "latest_derived": {
@@ -1664,6 +2011,120 @@
           "spread": null,
           "summary": "k=20 single-target: F=1 wwalk (1-seed base, x=0.7) vs F=2 incumbent and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_walk_20261107/README.md",
           "value": 2.8907
+        }
+      ],
+      "problem": "ic:curve25519-k20-single-target",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 2.1428,
+      "latest": 2.1428,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.305869
+      },
+      "metric": "s_twcj_w01",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.305869
+          },
+          "n": 512,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k20",
+          "reference": 1.6409,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=20 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 2.1428
+        }
+      ],
+      "problem": "ic:curve25519-k20-single-target",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 2.1383,
+      "latest": 2.1383,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.396304
+      },
+      "metric": "s_twcj_w0",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.396304
+          },
+          "n": 512,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k20",
+          "reference": 1.5314,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=20 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 2.1383
+        }
+      ],
+      "problem": "ic:curve25519-k20-single-target",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 2.183,
+      "latest": 2.183,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.831144
+      },
+      "metric": "s_twcj_w1",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.831144
+          },
+          "n": 512,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k20",
+          "reference": 2.6265,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=20 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 2.183
+        }
+      ],
+      "problem": "ic:curve25519-k20-single-target",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.3895,
+      "latest": 1.3895,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "twcj_walk_s",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 512,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k20",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "k=20 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 1.3895
         }
       ],
       "problem": "ic:curve25519-k20-single-target",
@@ -1761,6 +2222,276 @@
     },
     {
       "better": "lower",
+      "first": 0.9801,
+      "latest": 0.9801,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_tw_over_f1_w0",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k24",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9387,
+            1.0233
+          ],
+          "summary": "k=24 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 0.9801
+        }
+      ],
+      "problem": "ic:curve25519-k24-single-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.8609,
+      "latest": 0.8609,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_twcj_over_f1_w01",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k24",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.82,
+            0.9038
+          ],
+          "summary": "k=24 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 0.8609
+        }
+      ],
+      "problem": "ic:curve25519-k24-single-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.8882,
+      "latest": 0.8882,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_twcj_over_f1_w0",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k24",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8461,
+            0.9325
+          ],
+          "summary": "k=24 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 0.8882
+        }
+      ],
+      "problem": "ic:curve25519-k24-single-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.675,
+      "latest": 0.675,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_twcj_over_f1_w1",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k24",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.6422,
+            0.7095
+          ],
+          "summary": "k=24 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 0.675
+        }
+      ],
+      "problem": "ic:curve25519-k24-single-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.2961,
+      "latest": 1.2961,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_twcj_over_rho_w01",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k24",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.2246,
+            1.3718
+          ],
+          "summary": "k=24 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 1.2961
+        }
+      ],
+      "problem": "ic:curve25519-k24-single-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.4114,
+      "latest": 1.4114,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_twcj_over_rho_w0",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k24",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.3337,
+            1.4936
+          ],
+          "summary": "k=24 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 1.4114
+        }
+      ],
+      "problem": "ic:curve25519-k24-single-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.3883,
+      "latest": 1.3883,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_twcj_over_rho_w1_inserts_priced",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k24",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.3071,
+            1.4745
+          ],
+          "summary": "k=24 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 1.3883
+        }
+      ],
+      "problem": "ic:curve25519-k24-single-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.7492,
+      "latest": 0.7492,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_twcj_over_rho_w1",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k24",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.7073,
+            0.7935
+          ],
+          "summary": "k=24 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 0.7492
+        }
+      ],
+      "problem": "ic:curve25519-k24-single-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9063,
+      "latest": 0.9063,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_twcj_over_tw_w0",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k24",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8811,
+            0.9322
+          ],
+          "summary": "k=24 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 0.9063
+        }
+      ],
+      "problem": "ic:curve25519-k24-single-target",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
       "first": 1.8945,
       "latest": 1.8945,
       "latest_derived": {
@@ -1845,6 +2576,251 @@
       ],
       "problem": "ic:curve25519-k24-single-target",
       "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.6241,
+      "latest": 1.6241,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.296066
+      },
+      "metric": "s_twcj_w01",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.296066
+          },
+          "n": 512,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k24",
+          "reference": 1.2531,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=24 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 1.6241
+        }
+      ],
+      "problem": "ic:curve25519-k24-single-target",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.623,
+      "latest": 1.623,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.411304
+      },
+      "metric": "s_twcj_w0",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.411304
+          },
+          "n": 512,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k24",
+          "reference": 1.15,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=24 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 1.623
+        }
+      ],
+      "problem": "ic:curve25519-k24-single-target",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.6342,
+      "latest": 1.6342,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.749186
+      },
+      "metric": "s_twcj_w1",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.749186
+          },
+          "n": 512,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k24",
+          "reference": 2.1813,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=24 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 1.6342
+        }
+      ],
+      "problem": "ic:curve25519-k24-single-target",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.394,
+      "latest": 1.394,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "twcj_walk_s",
+      "points": [
+        {
+          "commit": "40c27ab7b369",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 512,
+          "record": "20261107T2153Z-curve25519-f1-targetwalk-k24",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "k=24 single-target: F=1 wwalk with the target in the walk (tw=1, and tw=1 with chained jumps cj=1) vs current F=1 (x=0.7) and rho-neg, 8 sessions x 64 rounds; see research/curve25519_f1_targetwalk_20261108/README.md",
+          "value": 1.394
+        }
+      ],
+      "problem": "ic:curve25519-k24-single-target",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 8.0,
+      "latest": 8.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "capped_jobs",
+      "points": [
+        {
+          "commit": "72004b435c02",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 40,
+          "record": "20261107T2145Z-split-prime-p1-rr-dickson",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P1 RR vs cherry-tree T with a Dickson-torus tower at T24, T31: RR lower D and narrower matrices at m3 t3, t4 on both primes (frozen rule 5); m5 t3 undecided (T capped at 1.5 GiB); D identical to the Kummer tower",
+          "value": 8.0
+        }
+      ],
+      "problem": "ic:split-prime-p1-rr-dickson-torus",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.93,
+      "latest": 0.93,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "coverage_law_max_deviation",
+      "points": [
+        {
+          "commit": "72004b435c02",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 36,
+          "record": "20261107T2144Z-split-prime-p2-twist-coset",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P2 twist-pure coset selection on prime-order curves at 2^20, 2^24: F4 cost coset-independent (max 0.39 %), coverage law within 0.93 %, 0 purity violations, gain >= 2.25 at t=4 (stage level, frozen rule 4)",
+          "value": 0.93
+        }
+      ],
+      "problem": "ic:split-prime-p2-twist-coset-toy",
+      "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 0.39,
+      "latest": 0.39,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "f4_work_rel_diff_selected_vs_random_max",
+      "points": [
+        {
+          "commit": "72004b435c02",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 12,
+          "record": "20261107T2144Z-split-prime-p2-twist-coset",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P2 twist-pure coset selection on prime-order curves at 2^20, 2^24: F4 cost coset-independent (max 0.39 %), coverage law within 0.93 %, 0 purity violations, gain >= 2.25 at t=4 (stage level, frozen rule 4)",
+          "value": 0.39
+        }
+      ],
+      "problem": "ic:split-prime-p2-twist-coset-toy",
+      "unit": "percent"
+    },
+    {
+      "better": "higher",
+      "first": 2.25,
+      "latest": 2.25,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "gain_min_t4",
+      "points": [
+        {
+          "commit": "72004b435c02",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 8,
+          "record": "20261107T2144Z-split-prime-p2-twist-coset",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P2 twist-pure coset selection on prime-order curves at 2^20, 2^24: F4 cost coset-independent (max 0.39 %), coverage law within 0.93 %, 0 purity violations, gain >= 2.25 at t=4 (stage level, frozen rule 4)",
+          "value": 2.25
+        }
+      ],
+      "problem": "ic:split-prime-p2-twist-coset-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "purity_nontrivial_violations",
+      "points": [
+        {
+          "commit": "72004b435c02",
+          "date": "2026-11-07",
+          "derived": {},
+          "n": 24,
+          "record": "20261107T2144Z-split-prime-p2-twist-coset",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P2 twist-pure coset selection on prime-order curves at 2^20, 2^24: F4 cost coset-independent (max 0.39 %), coverage law within 0.93 %, 0 purity violations, gain >= 2.25 at t=4 (stage level, frozen rule 4)",
+          "value": 0.0
+        }
+      ],
+      "problem": "ic:split-prime-p2-twist-coset-toy",
+      "unit": "count"
     },
     {
       "better": "neutral",
@@ -2233,6 +3209,366 @@
       ],
       "problem": "rho:koblitz_signed_frobenius_panel",
       "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0826504182816774,
+      "latest": 1.0826504182816774,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prime-medium/bsgs-neg/w0.1/s",
+      "points": [
+        {
+          "commit": "189b78587b01",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261107T2115Z-prime-medium-rho-bound",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0075393107356414,
+            1.152924700207311
+          ],
+          "summary": "Prime medium-tier rho reference bound, six EKS jobs (J1-J6, 33-49 bit, two curves per size), all complete and audited, admitted for counts (pod L2 gate exit 42; no wall time admissible). rho.negation constant/floor at w=0 = 1.093 [1.033, 1.156]; R(N) model B R_inf = 1.084 [1.020, 1.142]. PROTOCOL.md section 9 verdict: inconclusive (positive control P4 rho-plain/rho-neg interval does not exclude 1.2 from below in any job; on M alone the row would read setup_excess). Launch entries for J2 and J4 were lost when their clients were killed (cards -4, -5); those builds were finished by wait_launcher_result.sh without relaunch. [pcc:unverified]",
+          "value": 1.0826504182816774
+        }
+      ],
+      "problem": "rho:prime_medium_tier_bound",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.9842345439793895,
+      "latest": 0.9842345439793895,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prime-medium/bsgs-neg/w0/s",
+      "points": [
+        {
+          "commit": "189b78587b01",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261107T2115Z-prime-medium-rho-bound",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.915951236063988,
+            1.0481240645784684
+          ],
+          "summary": "Prime medium-tier rho reference bound, six EKS jobs (J1-J6, 33-49 bit, two curves per size), all complete and audited, admitted for counts (pod L2 gate exit 42; no wall time admissible). rho.negation constant/floor at w=0 = 1.093 [1.033, 1.156]; R(N) model B R_inf = 1.084 [1.020, 1.142]. PROTOCOL.md section 9 verdict: inconclusive (positive control P4 rho-plain/rho-neg interval does not exclude 1.2 from below in any job; on M alone the row would read setup_excess). Launch entries for J2 and J4 were lost when their clients were killed (cards -4, -5); those builds were finished by wait_launcher_result.sh without relaunch. [pcc:unverified]",
+          "value": 0.9842345439793895
+        }
+      ],
+      "problem": "rho:prime_medium_tier_bound",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.968393287002287,
+      "latest": 1.968393287002287,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prime-medium/bsgs-neg/w1/s",
+      "points": [
+        {
+          "commit": "189b78587b01",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261107T2115Z-prime-medium-rho-bound",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.8318319827805114,
+            2.0961304208669045
+          ],
+          "summary": "Prime medium-tier rho reference bound, six EKS jobs (J1-J6, 33-49 bit, two curves per size), all complete and audited, admitted for counts (pod L2 gate exit 42; no wall time admissible). rho.negation constant/floor at w=0 = 1.093 [1.033, 1.156]; R(N) model B R_inf = 1.084 [1.020, 1.142]. PROTOCOL.md section 9 verdict: inconclusive (positive control P4 rho-plain/rho-neg interval does not exclude 1.2 from below in any job; on M alone the row would read setup_excess). Launch entries for J2 and J4 were lost when their clients were killed (cards -4, -5); those builds were finished by wait_launcher_result.sh without relaunch. [pcc:unverified]",
+          "value": 1.968393287002287
+        }
+      ],
+      "problem": "rho:prime_medium_tier_bound",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.042213164448891,
+      "latest": 1.042213164448891,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prime-medium/rho-neg-v2/w0.1/s",
+      "points": [
+        {
+          "commit": "189b78587b01",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261107T2115Z-prime-medium-rho-bound",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.974194995787508,
+            1.1051903405093113
+          ],
+          "summary": "Prime medium-tier rho reference bound, six EKS jobs (J1-J6, 33-49 bit, two curves per size), all complete and audited, admitted for counts (pod L2 gate exit 42; no wall time admissible). rho.negation constant/floor at w=0 = 1.093 [1.033, 1.156]; R(N) model B R_inf = 1.084 [1.020, 1.142]. PROTOCOL.md section 9 verdict: inconclusive (positive control P4 rho-plain/rho-neg interval does not exclude 1.2 from below in any job; on M alone the row would read setup_excess). Launch entries for J2 and J4 were lost when their clients were killed (cards -4, -5); those builds were finished by wait_launcher_result.sh without relaunch. [pcc:unverified]",
+          "value": 1.042213164448891
+        }
+      ],
+      "problem": "rho:prime_medium_tier_bound",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.9473400660929809,
+      "latest": 0.9473400660929809,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prime-medium/rho-neg-v2/w0/s",
+      "points": [
+        {
+          "commit": "189b78587b01",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261107T2115Z-prime-medium-rho-bound",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8855348494147386,
+            1.0045240725037972
+          ],
+          "summary": "Prime medium-tier rho reference bound, six EKS jobs (J1-J6, 33-49 bit, two curves per size), all complete and audited, admitted for counts (pod L2 gate exit 42; no wall time admissible). rho.negation constant/floor at w=0 = 1.093 [1.033, 1.156]; R(N) model B R_inf = 1.084 [1.020, 1.142]. PROTOCOL.md section 9 verdict: inconclusive (positive control P4 rho-plain/rho-neg interval does not exclude 1.2 from below in any job; on M alone the row would read setup_excess). Launch entries for J2 and J4 were lost when their clients were killed (cards -4, -5); those builds were finished by wait_launcher_result.sh without relaunch. [pcc:unverified]",
+          "value": 0.9473400660929809
+        }
+      ],
+      "problem": "rho:prime_medium_tier_bound",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.8960710496520743,
+      "latest": 1.8960710496520743,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prime-medium/rho-neg-v2/w1/s",
+      "points": [
+        {
+          "commit": "189b78587b01",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261107T2115Z-prime-medium-rho-bound",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.7721363131424326,
+            2.0106443822333233
+          ],
+          "summary": "Prime medium-tier rho reference bound, six EKS jobs (J1-J6, 33-49 bit, two curves per size), all complete and audited, admitted for counts (pod L2 gate exit 42; no wall time admissible). rho.negation constant/floor at w=0 = 1.093 [1.033, 1.156]; R(N) model B R_inf = 1.084 [1.020, 1.142]. PROTOCOL.md section 9 verdict: inconclusive (positive control P4 rho-plain/rho-neg interval does not exclude 1.2 from below in any job; on M alone the row would read setup_excess). Launch entries for J2 and J4 were lost when their clients were killed (cards -4, -5); those builds were finished by wait_launcher_result.sh without relaunch. [pcc:unverified]",
+          "value": 1.8960710496520743
+        }
+      ],
+      "problem": "rho:prime_medium_tier_bound",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.0657921450620542,
+      "latest": 1.0657921450620542,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prime-medium/rho-neg/w0.1/s",
+      "points": [
+        {
+          "commit": "189b78587b01",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261107T2115Z-prime-medium-rho-bound",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.004363461406553,
+            1.1287383111654898
+          ],
+          "summary": "Prime medium-tier rho reference bound, six EKS jobs (J1-J6, 33-49 bit, two curves per size), all complete and audited, admitted for counts (pod L2 gate exit 42; no wall time admissible). rho.negation constant/floor at w=0 = 1.093 [1.033, 1.156]; R(N) model B R_inf = 1.084 [1.020, 1.142]. PROTOCOL.md section 9 verdict: inconclusive (positive control P4 rho-plain/rho-neg interval does not exclude 1.2 from below in any job; on M alone the row would read setup_excess). Launch entries for J2 and J4 were lost when their clients were killed (cards -4, -5); those builds were finished by wait_launcher_result.sh without relaunch. [pcc:unverified]",
+          "value": 1.0657921450620542
+        }
+      ],
+      "problem": "rho:prime_medium_tier_bound",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.9690278481988097,
+      "latest": 0.9690278481988097,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prime-medium/rho-neg/w0/s",
+      "points": [
+        {
+          "commit": "189b78587b01",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261107T2115Z-prime-medium-rho-bound",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9131539505185012,
+            1.026274385316299
+          ],
+          "summary": "Prime medium-tier rho reference bound, six EKS jobs (J1-J6, 33-49 bit, two curves per size), all complete and audited, admitted for counts (pod L2 gate exit 42; no wall time admissible). rho.negation constant/floor at w=0 = 1.093 [1.033, 1.156]; R(N) model B R_inf = 1.084 [1.020, 1.142]. PROTOCOL.md section 9 verdict: inconclusive (positive control P4 rho-plain/rho-neg interval does not exclude 1.2 from below in any job; on M alone the row would read setup_excess). Launch entries for J2 and J4 were lost when their clients were killed (cards -4, -5); those builds were finished by wait_launcher_result.sh without relaunch. [pcc:unverified]",
+          "value": 0.9690278481988097
+        }
+      ],
+      "problem": "rho:prime_medium_tier_bound",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.9366708168312694,
+      "latest": 1.9366708168312694,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prime-medium/rho-neg/w1/s",
+      "points": [
+        {
+          "commit": "189b78587b01",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261107T2115Z-prime-medium-rho-bound",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.824963021160557,
+            2.0518026384522257
+          ],
+          "summary": "Prime medium-tier rho reference bound, six EKS jobs (J1-J6, 33-49 bit, two curves per size), all complete and audited, admitted for counts (pod L2 gate exit 42; no wall time admissible). rho.negation constant/floor at w=0 = 1.093 [1.033, 1.156]; R(N) model B R_inf = 1.084 [1.020, 1.142]. PROTOCOL.md section 9 verdict: inconclusive (positive control P4 rho-plain/rho-neg interval does not exclude 1.2 from below in any job; on M alone the row would read setup_excess). Launch entries for J2 and J4 were lost when their clients were killed (cards -4, -5); those builds were finished by wait_launcher_result.sh without relaunch. [pcc:unverified]",
+          "value": 1.9366708168312694
+        }
+      ],
+      "problem": "rho:prime_medium_tier_bound",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.2702866693034724,
+      "latest": 1.2702866693034724,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prime-medium/rho-plain/w0.1/s",
+      "points": [
+        {
+          "commit": "189b78587b01",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261107T2115Z-prime-medium-rho-bound",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.19385358633292,
+            1.3536366815649752
+          ],
+          "summary": "Prime medium-tier rho reference bound, six EKS jobs (J1-J6, 33-49 bit, two curves per size), all complete and audited, admitted for counts (pod L2 gate exit 42; no wall time admissible). rho.negation constant/floor at w=0 = 1.093 [1.033, 1.156]; R(N) model B R_inf = 1.084 [1.020, 1.142]. PROTOCOL.md section 9 verdict: inconclusive (positive control P4 rho-plain/rho-neg interval does not exclude 1.2 from below in any job; on M alone the row would read setup_excess). Launch entries for J2 and J4 were lost when their clients were killed (cards -4, -5); those builds were finished by wait_launcher_result.sh without relaunch. [pcc:unverified]",
+          "value": 1.2702866693034724
+        }
+      ],
+      "problem": "rho:prime_medium_tier_bound",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.2702866693034724,
+      "latest": 1.2702866693034724,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prime-medium/rho-plain/w0/s",
+      "points": [
+        {
+          "commit": "189b78587b01",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261107T2115Z-prime-medium-rho-bound",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.19385358633292,
+            1.3536366815649752
+          ],
+          "summary": "Prime medium-tier rho reference bound, six EKS jobs (J1-J6, 33-49 bit, two curves per size), all complete and audited, admitted for counts (pod L2 gate exit 42; no wall time admissible). rho.negation constant/floor at w=0 = 1.093 [1.033, 1.156]; R(N) model B R_inf = 1.084 [1.020, 1.142]. PROTOCOL.md section 9 verdict: inconclusive (positive control P4 rho-plain/rho-neg interval does not exclude 1.2 from below in any job; on M alone the row would read setup_excess). Launch entries for J2 and J4 were lost when their clients were killed (cards -4, -5); those builds were finished by wait_launcher_result.sh without relaunch. [pcc:unverified]",
+          "value": 1.2702866693034724
+        }
+      ],
+      "problem": "rho:prime_medium_tier_bound",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.2702866693034724,
+      "latest": 1.2702866693034724,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prime-medium/rho-plain/w1/s",
+      "points": [
+        {
+          "commit": "189b78587b01",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261107T2115Z-prime-medium-rho-bound",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.19385358633292,
+            1.3536366815649752
+          ],
+          "summary": "Prime medium-tier rho reference bound, six EKS jobs (J1-J6, 33-49 bit, two curves per size), all complete and audited, admitted for counts (pod L2 gate exit 42; no wall time admissible). rho.negation constant/floor at w=0 = 1.093 [1.033, 1.156]; R(N) model B R_inf = 1.084 [1.020, 1.142]. PROTOCOL.md section 9 verdict: inconclusive (positive control P4 rho-plain/rho-neg interval does not exclude 1.2 from below in any job; on M alone the row would read setup_excess). Launch entries for J2 and J4 were lost when their clients were killed (cards -4, -5); those builds were finished by wait_launcher_result.sh without relaunch. [pcc:unverified]",
+          "value": 1.2702866693034724
+        }
+      ],
+      "problem": "rho:prime_medium_tier_bound",
+      "unit": "S"
     }
   ],
   "units": {
