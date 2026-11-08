@@ -126,3 +126,24 @@ round 2, applies the bound reading frozen in PROTOCOL-R2) →
 and turns into a trade at t5. Against arm F it is a trade everywhere. So the Riemann–Roch
 system transfers to the NIST field shape but is not the lab's best m = 3 system on matrix
 width. The m = 5 cell with a tower (card B, T24 m5 t4, 13 GiB) decides rule 3.
+
+## Round 2, card B: the first m = 5 cell with a tower (run-r2b-20261108T053603Z)
+
+Card `CARD-p1-r2-b`: T24 m5 t4, seed 2 (seed 1 skipped: base too small for m = 5), RR then T,
+13 GiB and 10,800 s, alone on the host (`provenance.txt` records the idle start). Analysis:
+`analysis/p1r2analyze` over rounds 1, 2a and 2b → `analysis/derived_r2b/`. [pcc:unverified]
+
+| system | status | D reached | widest matrix reached |
+|---|---|---|---|
+| RR | timeout at 10,800 s (exit 124) | ≥ 6 (working in degree 7 when stopped) | ≥ 146,277 |
+| T | memory cap at 13 GiB after 2,619 s (exit 139) | ≥ 9 | ≥ 662,876 |
+
+**Rule 3: undecided under the frozen text**, because RR did not complete (the frozen bound reading
+decides "RR below" only for a completed RR). Descriptively, at the point each job was stopped, RR
+was working at a lower degree and with matrices 4.5 times narrower than T, and it was limited by
+time rather than memory; neither number is an outcome. Round 7 found the same cell beyond a
+15 GB host for both systems.
+
+**What would decide it:** RR at T24 m5 t4 run to completion, on a host with more memory and a
+time limit of about a day, against T on the same host. That is a resource limit, not a
+mathematical obstruction; it is recorded in the follow-up index.
