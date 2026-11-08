@@ -64,4 +64,6 @@ for both jobs together, and raising it would be a separate cluster change.
 |---|---|---|
 | RR a1 | `p1r3-rr-a1-20261108`, pod ce76e299… | **Spot loss.** CloudTrail recorded `BidEvictedEvent` at 21:35:35Z for i-0c270755aeadb845c. The last S3 sync was at 21:36:02Z, and a status request returned the Job as `failed` with no pod. msolve was still in its degree-7 step. The partial records are in `receipts/rr-a1-results-partial/`; they are kept and supply no bound (PROTOCOL-R3). Resubmitted as a2. |
 | RR a2 | `p1r3-rr-a2-20261108`, job 4c60cc68…, pod 45447107… | running (submitted 22:30Z) |
-| T a1 | `p1r3-t-a1-20261108`, pod 117e17e4… | running (S3 sync 22:15Z, degree-9 step) |
+| T a1 | `p1r3-t-a1-20261108`, pod 117e17e4… | **Spot loss.** CloudTrail recorded `BidEvictedEvent` at 22:51:20Z for i-038d43f9a77c1938d. The last S3 sync was at 22:51:30Z, and a status request at 23:2xZ returned `failed` with no pod. msolve was in its degree-9 step. Partial records: `receipts/t-a1-results-partial/`, kept and supplying no bound. Resubmitted as a2. |
+| RR a2 (status 23:2xZ) | | still **Pending** about 53 min after submission: no Spot capacity yet for a 64Gi pod. The deadline clock runs while it is Pending. |
+| T a2 | `p1r3-t-a2-20261108` | submitted (see receipts/t-a2) |
