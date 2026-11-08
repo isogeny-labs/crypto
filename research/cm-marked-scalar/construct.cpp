@@ -42,9 +42,12 @@ struct Parameters {
  }
  Json curve(){return object({{"name",token(name)},{"p",token(f.p.str())},{"a",token(a.str())},{"b",token(b.str())},{"n",token(n.str())},{"t",token(t.str())},{"gx",token(gx.str())},{"gy",token(gy.str())}});}
 };
-static std::pair<unsigned,Big> marked_label(Parameters& p,unsigned rho){
- Big initial(long(1)-long(rho));initial=Field(p.n.str()).mod(initial);Big nm1=p.n;require(BN_sub_word(nm1.p,1),"n-1");
- for(unsigned s:{3,5,7,11,13,17,19,23,29,31})if(BN_mod_word(nm1.p,s)==0){Big exponent=nm1,mu;require(BN_div_word(exponent.p,s)==0,"projection exponent");require(BN_mod_exp(mu.p,initial.p,exponent.p,p.n.p,p.f.ctx),"projection");if(!BN_is_one(mu.p)&&!mu.zero())return {s,mu};}
+static std::pair<unsigned,Big> marked_label(Parameters& p,unsigned rho,unsigned ell,Big& lift_c){
+ Big nm1=p.n;require(BN_sub_word(nm1.p,1),"n-1");Field subgroup(p.n.str());
+ for(long j:{0,-1,1,-2,2}){
+  lift_c=Big(long(rho)+j*long(ell));Big initial;require(BN_sub(initial.p,Big(1).p,lift_c.p),"initial label");initial=subgroup.mod(initial);
+  for(unsigned s:{3,5,7,11,13,17,19,23,29,31})if(BN_mod_word(nm1.p,s)==0){Big exponent=nm1,mu;require(BN_div_word(exponent.p,s)==0,"projection exponent");require(BN_mod_exp(mu.p,initial.p,exponent.p,p.n.p,p.f.ctx),"projection");if(!BN_is_one(mu.p)&&!mu.zero())return {s,mu};}
+ }
  throw std::runtime_error("no nonidentity odd prime projection; preserve initial label and amend scope before changing root");
 }
 static unsigned select_root(Parameters& p,unsigned ell,unsigned chosen){
@@ -68,14 +71,25 @@ static Json orbit_fixtures(Parameters& p,const Big& mu,unsigned order){
  }return result;
 }
 int main(int argc,char**argv){try{
+ if(argc==4&&std::string(argv[1])=="--compare"){
+  auto generated=read_json(argv[2]),saved=read_json(argv[3]);
+  for(auto key:{"p","n","trace"})require(Big(generated.at(key).str())==Big(saved.at(key).str()),"positive control parameter");
+  for(auto key:{"kernel_polynomial","x_numerator","x_denominator","derivative_numerator"}){
+   require(coeffs(generated.at("first").at("edge").at(key))==coeffs(saved.at("first").at("edge").at(key)),"positive forward polynomial");
+   require(coeffs(generated.at("dual_normalized").at(key))==coeffs(saved.at("dual_normalized").at(key)),"positive dual polynomial");
+  }
+  for(auto key:{"a","b"})require(Big(generated.at("scaled_endpoint").at(key).str())==Big(saved.at("scaled_endpoint").at(key).str()),"positive endpoint");
+  for(auto key:{"x_scale","y_scale"})require(Big(generated.at("closing_isomorphism").at(key).str())==Big(saved.at("closing_isomorphism").at(key).str()),"positive scale");
+  std::cout<<"{\"native_constructor_positive_control\":true,\"exact_polynomial_tokens\":true,\"timing_performed\":false}\n";return 0;
+ }
  require(argc==5||argc==6,"construct --preflight CURVE ELL ROOT | construct --construct CURVE ELL ROOT OUTDIR");
- std::string mode=argv[1],name=argv[2];require((mode=="--preflight"&&argc==5)||(mode=="--construct"&&argc==6),"mode");unsigned ell=std::stoul(argv[3]),chosen=std::stoul(argv[4]);require(ell>=3&&ell<=19&&(ell&1),"bounded degree");Parameters p(name);unsigned rho=select_root(p,ell,chosen);auto label=marked_label(p,rho);unsigned s=label.first;Big mu=label.second;
- std::cout<<"{\"curve\":"<<json_quote(name)<<",\"degree\":"<<ell<<",\"root\":"<<rho<<",\"marked_order\":"<<s<<",\"preflight_pass\":true,\"timing_performed\":false}"<<std::endl;if(mode=="--preflight")return 0;
+ std::string mode=argv[1],name=argv[2];require((mode=="--preflight"&&argc==5)||(mode=="--construct"&&argc==6),"mode");unsigned ell=std::stoul(argv[3]),chosen=std::stoul(argv[4]);require(ell>=3&&ell<=19&&(ell&1),"bounded degree");Parameters p(name);unsigned rho=select_root(p,ell,chosen);Big initial_c;auto label=marked_label(p,rho,ell,initial_c);unsigned s=label.first;Big mu=label.second;
+ std::cout<<"{\"curve\":"<<json_quote(name)<<",\"degree\":"<<ell<<",\"root\":"<<rho<<",\"initial_c\":"<<json_quote(initial_c.str())<<",\"marked_order\":"<<s<<",\"preflight_pass\":true,\"timing_performed\":false}"<<std::endl;if(mode=="--preflight")return 0;
  std::filesystem::path out(argv[5]);require(!std::filesystem::exists(out),"write-once construction directory");
  auto first=velu(p.f,p.a,p.b,ell,rho);unsigned other=0;for(unsigned r=1;r<ell;++r)if(r*rho%ell==BN_mod_word(p.f.p.p,ell))other=r;require(other&&other!=rho,"opposite root");auto back=velu(p.f,Big(first.second.at("a").str()),Big(first.second.at("b").str()),ell,other);
  Big l{long(ell)},l2=p.f.mul(l,l),l3=p.f.mul(l2,l),c;
  require(BN_mod_sub(c.p,Big(1).p,mu.p,p.n.p,p.f.ctx),"CRT initial");bool crt=false;for(unsigned j=0;j<ell;++j){if(BN_mod_word(c.p,ell)==rho){crt=true;break;}require(BN_add(c.p,c.p,p.n.p),"CRT lift");}require(crt,"CRT solution");Big modulus,twice;require(BN_mul(modulus.p,p.n.p,l.p,p.f.ctx)&&BN_lshift1(twice.p,c.p),"CRT modulus");if(BN_cmp(twice.p,modulus.p)>0)require(BN_sub(c.p,c.p,modulus.p),"centered CRT");Big aa=c;BN_set_negative(aa.p,!BN_is_negative(aa.p)&&!aa.zero());Big norm,ct;require(BN_mul(norm.p,c.p,c.p,p.f.ctx)&&BN_mul(ct.p,c.p,p.t.p,p.f.ctx)&&BN_sub(norm.p,norm.p,ct.p)&&BN_add(norm.p,norm.p,p.f.p.p),"norm");Big residual,remainder;require(BN_div(residual.p,remainder.p,norm.p,l.p,p.f.ctx)&&remainder.zero(),"quotient degree");
- Json marked=object({{"name",token(name)},{"s",number(s)},{"mu",token(mu.str())},{"alpha_a",token(aa.str())},{"alpha_b",number(1)},{"norm",token(norm.str())},{"residual_degree",token(residual.str())},{"differential",token(p.f.mod(aa).str())},{"orientation_root",number(rho)},{"degree",number(ell)},{"orbit_checks",orbit_fixtures(p,mu,s)}});
+ Json marked=object({{"name",token(name)},{"s",number(s)},{"mu",token(mu.str())},{"projection_lift_c",token(initial_c.str())},{"alpha_a",token(aa.str())},{"alpha_b",number(1)},{"norm",token(norm.str())},{"residual_degree",token(residual.str())},{"differential",token(p.f.mod(aa).str())},{"orientation_root",number(rho)},{"degree",number(ell)},{"orbit_checks",orbit_fixtures(p,mu,s)}});
  Json closure=object({{"name",token(name)},{"p",token(p.f.p.str())},{"n",token(p.n.str())},{"trace",token(p.t.str())},{"first",object({{"edge",first.first},{"target",first.second}})},{"dual_normalized",back.first},{"scaled_endpoint",back.second},{"opposite_root",number(other)},{"closing_isomorphism",object({{"x_scale",token(p.f.inv(l2).str())},{"y_scale",token(p.f.inv(l3).str())}})}});
  Fixture fixture(name,p.curve(),closure,marked);qualify(std::vector<Fixture>{fixture});
  std::filesystem::create_directories(out);for(const auto& item:std::vector<std::pair<std::string,Json>>{{"curve.json",p.curve()},{"closure.json",closure},{"marked.json",marked}}){std::ofstream file(out/item.first);require(bool(file),"output file");file<<canonical_json(item.second)<<'\n';require(bool(file),"output write");}return 0;
