@@ -67,3 +67,13 @@ $(BUILD_DIR)/lift-identity: lift_identity.cpp json.hpp
 	$(CXX) $(CXXFLAGS) lift_identity.cpp -o $@ -lgmpxx -lgmp
 lift-identity-binary: $(BUILD_DIR)/lift-identity
 .PHONY: lift-identity-binary
+$(BUILD_DIR)/residual: residual.cpp native.cpp json.hpp relation_verify.hpp orbit_verify.hpp
+	mkdir -p $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) residual.cpp -o $@ $(LDLIBS)
+residual-binary: $(BUILD_DIR)/residual
+.PHONY: residual-binary
+$(BUILD_DIR)/residual-replay: residual_replay.cpp json.hpp
+	mkdir -p $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) residual_replay.cpp -o $@ -lcrypto -lgmpxx -lgmp
+residual-replay-binary: $(BUILD_DIR)/residual-replay
+.PHONY: residual-replay-binary
