@@ -41,3 +41,19 @@ Everything else matches, checked with `jq -S` after removing those four fields: 
 - No data existed before this change.
 
 **Platform finding for the lab:** a 14 vCPU request passes validation but can never be scheduled on cpu-spot. The PKM requests (14 vCPU) have the same problem. They are handled separately, because PKM runs carry a wall budget.
+
+## Relaunch B outcome: lost to Spot reclamation (recorded 2026-11-08 12:45Z)
+
+Job `minors-gd-panel-20261108-b` (job uid `0f7f5d43…`) ended `failed`.
+
+- **Pod:** the pod's task container ran 12:22:59–12:37:20Z. The node's kubelet reported exit 137 (`Error`), with pod reason `Terminated` and message "Pod was terminated in response to imminent node shutdown." This is from the EKS API-server audit log.
+- **Status:** the status route returns `pods: []` (receipts/RC/status/poll-0009…).
+- **Data:** the entry script syncs to S3 every 600 s, so a partial upload may exist under `runs/minors-gd-panel-20261108-b/`. `run_panel.sh` never finished, so nothing from this run is admitted or analysed.
+- **Accounting:** under owner decision 3 (a lost Spot cell is reported as lost, with at most one relaunch under a new name), this is the study's first Spot loss. The first launch, `minors-gd-panel-20261107`, never ran, so it is not a Spot loss.
+
+## Relaunch C: `minors-gd-panel-20261108-c`
+
+This is the single allowed relaunch.
+
+- **Request:** `eks/r2img_request_c.json` equals `eks/r2img_request_b.json` except `job.job_name` and the appended provenance note, checked with `jq -S`. It is VALID.
+- **If C is also lost:** the study is reported as lost at this scale, with no further relaunch.
