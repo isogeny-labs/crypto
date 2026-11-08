@@ -16,7 +16,7 @@ Protocol: `../PROTOCOL-R3.md`. The route follows the command-Job precedent in
 
 | job | command | cpu / memory | deadline |
 |---|---|---|---|
-| `p1r3-smoke-20261108` | the run_cells_r3 driver (RR, TLIMIT 20 s) plus an S3 upload | 2 / 4Gi | 1,800 s |
+| `p1r3-smoke-20261108` | the run_cells_r3 driver (RR, TLIMIT 20 s) plus an S3 upload; ran on the first image `sha256:7f2fa5f7…` (succeeded, instance sha matched, `bc` missing libreadline so wall was empty; fixed in the current image) | 2 / 4Gi | 1,800 s |
 | `p1r3-rr-a1-20261108` | `job-r3.sh rr` (VLIMIT 60 GiB, TLIMIT 86,400 s) | 2 / 64Gi | 100,800 s |
 | `p1r3-t-a1-20261108` | `job-r3.sh t` (VLIMIT 56 GiB, TLIMIT 86,400 s) | 2 / 60Gi | 100,800 s |
 
