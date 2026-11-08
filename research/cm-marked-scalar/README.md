@@ -10,6 +10,8 @@ The native constructor supplies the three new curves from signed Frobenius kerne
 
 The [fixed-label CM lift derivation](CM_LIFT.md) and [report](reports/cm-lift-20261108/report.pdf) now reduce the next norm search to a finite interval of a+b and one nearest-integer pair per admissible sum, while retaining the selected eigenline. An independent GMP checker replays the five existing certificates and rejects fifteen norm/label/opposite-root corruptions. No minimizing search has yet been executed, and no new global quotient or horizontal factorization is inferred from the bound.
 
+The next [fixed-label residual evaluator](RESIDUAL_SPLIT.md) uses mu0=ell*k+c and a shared doubling loop for [k]([ell]P)+[c]P. Its [complete 42,480-row census](residual-v1/README.md) independently replays and all 300 selected-plan point/count cases pass. The [inspected report](reports/residual-20261108/report.pdf) retains both the direct reference and matched binary-radix controls. Relation D+A minima are 232,267,304,451,612; the original mu is unchanged on every curve. The direct reference remains lower in this exact count comparison. Prefix-intermediate reuse and a complete admitted cold comparison remain next work.
+
 | Requirement | Current evidence and remaining work |
 | --- | --- |
 | PR before implementation/execution | Hosted PR #3674; planning commit 4afeff227516 |

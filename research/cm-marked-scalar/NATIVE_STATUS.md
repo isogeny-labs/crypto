@@ -35,3 +35,21 @@ Sources checked (KB): tools absent; migrated wrapper status fails127. Prior cons
 ### 2026-11-08T03:56Z record custody
 
 What was done: native v3 qualification is complete; corrected protocol draft validates and unfrozen execution rejects before creating output. Decisions: publish source and independent checker before freezing the count census; preserve all earlier warnings/schema attempts. Open threads: run the single frozen census and independent replay, then qualify selected plans. Errors: the initial stopping-rule schema shape was corrected with the invalid bytes retained. The shared daily-log path is exclusively held by ec2-user/T-1933, so it was not edited; this task-local record preserves the finished component and next action until that scope is released.
+
+## 2026-11-08T04:10Z: completed fixed-label residual census
+
+### What was done
+
+CM-RESIDUAL-SPLIT-V1 completed its single42,480-row native count census after source/checker df8001b87da1 and freeze206ba5c3e9bd were verified hosted, with PR3674 open. Independent GMP replay verifies every row and20minimum sets, and all300 selected-plan point/count cases pass. Five post-scan corruptions reject at intended checks. Fresh archive extraction/replay is byte-identical and deterministic repacking reproduces the104,052-byte archive. The schema-valid export contains60 explicitly derived minimum cases, not independent process runs. Both report pages and their tables/graph have been inspected.
+
+### Decisions made
+
+Keep original mu fixed and require relation to beat both optimized direct and matched binary-radix controls. The relation minima are232,267,304,451,612; direct228,260,300,449,606; binary229,260,300,450,606. Every sensitivity remains above the controls. Preserve the local component improvement and all costs without treating group-call counts as native time. Normalization field work/copies/allocations remain outside D/A/N/T. No cloud submission, clock, budget/cap/permission change or generator restart.
+
+### Open threads
+
+Retain and reuse prefix intermediates in a separately versioned evaluator, with identical reuse available to binary controls. Integrate the selected plans into a full cold native evaluator and obtain admitted timing, retaining plan-generation and all initialization/verification/destruction costs. The original e2e goal stays active. Shared daily-log scope is held by ec2-user/T-1933, so no concurrent write was made there.
+
+### Errors
+
+Retain v1 indentation warnings and the first invalid stopping-rule schema draft; final v3 is warning-free and fully qualified. A guessed root export-schema path did not exist and stopped metadata export before output; located the existing tracked schema with git ls-files and validated the export against that snapshot. No scientific scan or selection was repeated or changed. No root Cargo suite is claimed; this is the standalone C++ path and no Rust implementation was edited.
