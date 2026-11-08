@@ -60,3 +60,11 @@ cda1e5810f41550a2b929cbdb6fe4ff242865617. Its initial observation was queued;
 host admission, the optional job and parent result are pending. Exact command,
 publication identity and dispatch result are in dispatch-receipt.json. Do not
 submit another attempt or infer a full-suite pass from the accepted dispatch.
+
+At the23:24UTC check, job128880307287 passed actual host-interface preflight,
+immutable checkout/toolchain binding and the complete release test-binary build.
+The full parent test step is still in progress; no terminal receipt or artifact
+has been published. Separate compile job128880359995 passed workspace/all-target
+and wide-vars checks plus the core crate's tests. Those are distinct from the
+still-pending full library result. See progress-20261108T2324Z.json; the original
+queued dispatch receipt remains unchanged. No additional attempt was submitted.

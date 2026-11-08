@@ -60,8 +60,11 @@ time-interface preflight, immutable source input and Rust1.99.1. Ordinary compil
 jobs remain unchanged; no new credentials, scientific run or benchmark is added.
 Published and linted the change atcda1e5810, then submitted one development
 validation: Actions42529489383, requested source/workflow head
-cda1e5810f41550a2b929cbdb6fe4ff242865617. Initial state queued; actual host
-admission and parent test result are pending. Collect at the standing cadence;
+cda1e5810f41550a2b929cbdb6fe4ff242865617. At23:24UTC, actual host-interface
+preflight, immutable checkout/source/toolchain binding and release test-binary
+build passed. Full parent tests are running; terminal status/artifacts remain
+pending. Separate workspace/all-target/wide-vars compile job passed. Those are
+not the pending full library result. Collect at the standing cadence;
 do not submit another attempt automatically. The old local attempt stays incomplete.
 See development/hosted-validation-20261108/ for its bounds and receipt contract.
 
@@ -77,9 +80,11 @@ and verify current-head gate/size/artifacts checks before merge.
 ## Runs in flight
 No scientific run. The preparation is terminal failed. No scientific EKS request,
 Job UID, data export or result receipt exists. No development checks remain
-live locally. Hosted development run42529489383 is queued at the initial
-observation, pinned tocda1e5810; see development/hosted-validation-20261108/
-dispatch-receipt.json. It is not a scientific run or a reported test pass.
+live locally. Hosted development run42529489383, full job128880307287, is running
+its parent tests after host admission/build passed; pinned tocda1e5810. See
+development/hosted-validation-20261108/progress-20261108T2324Z.json and the
+unchanged initial dispatch receipt. No terminal artifact exists yet. It is not
+a scientific run or a reported full-suite pass.
 Source507829726f cache/ordered/E2E completed; E2E log reports2passed/0failed.
 Old exec73044/34529 handles are unavailable. Full-library cargo10207/test10463
 are defunct; /tmp/crypto-halftrace-nov4/full-library-attempt2.exit is absent.
