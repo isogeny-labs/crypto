@@ -479,6 +479,61 @@ fn panel<const P: i64, const D: i64>(
 fn main() {
     let args: Vec<_> = std::env::args().collect();
     let reference = args.iter().any(|s| s == "--scalar-reference");
+    if args.iter().any(|s| s == "--large-residue-control") {
+        let mut selection = vec![];
+        let mut fixture = None;
+        for b in 1i64..211 {
+            if (-108 + 27 * b * b).rem_euclid(211) == 0 {
+                selection.push(json!({"b":b,"status":"singular_skipped"}));
+                continue;
+            }
+            let r = (1
+                + (0i64..211)
+                    .flat_map(|x| (0i64..211).map(move |y| (x, y)))
+                    .filter(|&(x, y)| (y * y - x * x * x + 3 * x - b).rem_euclid(211) == 0)
+                    .count()) as u64;
+            let prime = r >= 2 && (2..).take_while(|d| d * d <= r).all(|d| r % d != 0);
+            let eligible = prime && r >= 100 && r % 3 == 2;
+            selection.push(json!({"b":b,"order":r,"prime":prime,"eligible":eligible}));
+            if eligible {
+                fixture = Some((b, r));
+                break;
+            }
+        }
+        let (b, r) = fixture.expect("bounded fixture scan exhausted");
+        let mut g = None;
+        let mut shift = None;
+        for x in 0i64..211 {
+            let rhs = (x * x * x - 3 * x + b).rem_euclid(211);
+            if g.is_none() {
+                if let Some(y) = (1i64..211).find(|&y| y * y % 211 == rhs) {
+                    g = Some((F::<211, 210>::c(x), F::c(y)))
+                }
+            }
+            if shift.is_none() {
+                if let Some(y) = (1i64..211).find(|&y| y * y % 211 == (-rhs).rem_euclid(211)) {
+                    let s = Some((F::c(x), F::new(0, y)));
+                    if mul(2, s, -3).map(|(_, y)| y.1 != 0).unwrap_or(false) {
+                        shift = s
+                    }
+                }
+            }
+            if g.is_some() && shift.is_some() {
+                break;
+            }
+        }
+        assert!(g.is_some() && shift.is_some());
+        let targets = [1, 2, 3, 5, 7, 11, 17, 31, 63, 97, r - 1];
+        let (p, receipt) = panel::<211, 210>(-3, b, r, g, shift, &targets, reference);
+        let out = json!({"all_checks_pass":true,"fixture_selection":selection,"panel":p,"scope":"amended larger scalar residue2mod3 control; fixture selected before recovery outcomes"});
+        if let Some(i) = args.iter().position(|x| x == "--check") {
+            let expected: Value = serde_json::from_slice(&fs::read(&args[i + 1]).unwrap()).unwrap();
+            assert!(out == expected, "certificate mismatch")
+        }
+        eprintln!("{}", receipt);
+        println!("{}", serde_json::to_string(&out).unwrap());
+        return;
+    }
     if args.iter().any(|s| s == "--residue-control") {
         let (p, receipt) = panel::<11, 2>(
             8,
