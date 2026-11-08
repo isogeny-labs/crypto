@@ -6,6 +6,8 @@ The original draft description below is retained as preparation history. Source/
 
 ## Original draft state
 
+Post-freeze execution record: cold-v2/attempt-001 calibration admission returned3 before the worker, recording other CPU1.8seconds over two seconds (limit0.2), CPU/memory PSI0. No rows or held-out launch; no retry. cold-v2/export.json validates and the raw archive replays byte-for-byte. The descriptive one-page report is reports/cold-admission-20261108T0521Z/. No per-point timing or speedup is inferred.
+
 This is a schema-valid draft, not an executable timing authorization. It introduces the deterministic retained-prefix primary, paired binary controls, complete serialized-input boundary and all five curves. CACHE_COLD_CONTRACT.md supplies the precise first-use and installed-plan distinctions.
 
 The60-row point manifest contains20 calibration and40 held-out points. SHA256 expansion covers at least twice each subgroup bit length before reduction. Its generation is deterministic known-answer workload preparation; it records no performance clock. The25-configuration worker produces3500 calibration and7000 held-out rows if admitted. Every regular reference has its own A/A twin. The primary candidate is fixed before data; installed-plan results remain secondary.

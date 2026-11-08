@@ -91,3 +91,21 @@ Attempt native isolation after publication and retain the resulting receipt. Onl
 ### Errors
 
 The first analyzer build's unused-function warning and19-check suite remain as v1; final v2 is warning-free and passes24. Earlier source-read output was truncated; saved replay logs/exits were reconciled rather than restarting the process. No root Cargo suite is claimed for these standalone C++ additions. Sources checked (KB): existing construction/cold contract and cited primary background; loaded KB tools/wrapper remain unavailable as previously recorded.
+
+## 2026-11-08T05:26Z: frozen calibration admission and custody
+
+### What was done
+
+Source9f59b9428989 and frozen record d4b2f1be961c were verified hosted before the one calibration launch. Canonical body digest0bbaa17b83ae883e2b72c62c611177b4d4f134e9099c102933a082ba054cbf4f. Native schema validation passes. The launcher returned3 before the measurement worker: other CPU1.8seconds over the two-second preflight exceeds0.2; CPU/memory PSI both0. No rows file, held-out launch or unchanged retry. The records were published as c03f18f47329 before the report. Fresh archive extraction verifies all members and deterministic repacking is byte-identical; the1232-byte archive hash is9d1ce72c11cf4cb726d76c7792789ff563141497b809522d9bd9d110fb52c648. The native export validates and records missing function clocks/timestamps explicitly. The one-page report PDF was rendered and inspected.
+
+### Decisions made
+
+Retain this admission refusal without any native performance inference. The24 synthetic checks and60 independent coordinate/subgroup replays remain completed software checks. The planned full cold analysis is not run on absent data. Existing source/point/relation records stay unchanged. No cloud job, Diem or old waiting followup, budget/cap/role change or alternative timed backend was launched.
+
+### Open threads
+
+The timing dependency is a quiet host passing the same preflight. This protocol's unchanged retry allowance is exhausted. Any later execution needs a distinct authorized amendment and retains this refusal. P-192 remains primary, with P-224/P-256/P-384/P-521; the original e2e objective remains active. New EKS spending remains stopped by the already recorded monthly ceiling/quota constraints. PR3674 remains open with auto-merge enabled; checks are pending, not claimed passed.
+
+### Errors
+
+Calibration admission exit3 is the sole attempted panel failure. No measurement child executed, so it is not a wrong-output or timing failure. The export initially used packaging timestamps for process boundaries; the unpublished derivative was corrected to null because the refusal receipt provides no such timestamps. A docs/session-receipts.md lookup was absent in this checkout; retain a task-local native session receipt instead of inventing a canonical tool result. Shared daily-log ownership remains respected; no root Cargo test result is claimed.
