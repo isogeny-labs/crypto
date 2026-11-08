@@ -28,8 +28,8 @@ cell". Amendment 8 does not give the command. At `m >= 3` the pilot runs the nul
 - Null construction (lines 995-1012): every `S3` link of the chain keeps its Kummer support with uniform random coefficients in `1..p-1`;
   with `--planted 0` there is no planted zero to subtract. The random-target draws (`--random 2`, `--targets k`) are those of the Kummer
   cell with the same `t`, `k` (same seed `0x504B4D54`), so the pair is matched by target index; the actual match is recorded by `x_r` in the rows.
-  (Whether the null consumes the rng identically at `m = 4` as at `m = 2` is *not* verified here; the rows' `x_r` settle it afterwards, and
-  the pairing is by `(t, k)` whatever it shows.)
+  Measured in the dev check (section 8): at `t = 2`, draw 0, the Kummer and the null row carry the same `x_r` (1102336260). That is one
+  draw at `t = 2`; at `t = 4, 5` the rows' `x_r` settle it afterwards, and the pairing is by `(t, k)` whatever they show.
 - Dev check (seconds, not a result): see section 8.
 
 ## 4. Cells (plan)
@@ -78,4 +78,8 @@ Amendment 9 (high-lambda) does not apply: `lambda(m = 4, t = 4, 5) = 1.1e-5, 1.7
 
 ## 8. Development check (seconds, dev build; not a result, not stage data)
 
-Recorded in `R2_READY.md` ("Development checks"); the null-chain flags were run at `t = 2` only.
+Static musl binary built from f13a690df0 (`image/binaries.sha256`), `RAYON_NUM_THREADS=2`, one draw, `t = 2` (`N = 8`), `--hky-cmax 5`,
+`--budget 600`, otherwise the flags of section 4. Files: `devcheck_r2/dev-m4-null.jsonl`, `dev-m4-tower.jsonl` (+ `.out`). Both exit 0 and write
+one row. Null row: `control: "null"`, `first_fall_degree 4`, `falls [4, 5]`, closure `c = 5` has `cols 1023`, `entries 5535`, `muladds 44957`; Kummer row:
+`control: "tower"`, same `cols`, `entries 8169`, `muladds 91054`. So the flags run and the null differs from the Kummer in the closure's content. `--t-min 4` was
+**not** exercised (as in the first study's dev check) and no `t >= 4` null row exists.
