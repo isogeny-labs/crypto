@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261107T2115Z-prime-medium-rho-bound",
+  "latest_record": "20261107T2144Z-split-prime-p3-cross-trace",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 54,
+    "measured": 55,
     "open": 0
   },
   "repo": "crypto",
@@ -418,6 +418,83 @@
       ],
       "problem": "dlpwai:static-dh-p224-shape",
       "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.986,
+      "latest": 0.986,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "aa_rho_correlation_p28",
+      "points": [
+        {
+          "commit": "72004b435c02",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 2000,
+          "record": "20261107T2144Z-split-prime-p3-cross-trace",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P3 cross-trace covariate test, 2000 prime-order curves at 2^24 and 2^28: 0 of 14 tests significant (frozen rule 2 null); coverage effects <= 0.002 %; rho walk found defective by the A/A control",
+          "value": 0.986
+        }
+      ],
+      "problem": "ecdlp:split-prime-p3-cross-trace-census",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "bonferroni_significant_tests",
+      "points": [
+        {
+          "commit": "72004b435c02",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 14,
+          "record": "20261107T2144Z-split-prime-p3-cross-trace",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P3 cross-trace covariate test, 2000 prime-order curves at 2^24 and 2^28: 0 of 14 tests significant (frozen rule 2 null); coverage effects <= 0.002 %; rho walk found defective by the A/A control",
+          "value": 0.0
+        }
+      ],
+      "problem": "ecdlp:split-prime-p3-cross-trace-census",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.7,
+      "latest": 0.7,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "max_abs_rho_effect_pct",
+      "points": [
+        {
+          "commit": "72004b435c02",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 2000,
+          "record": "20261107T2144Z-split-prime-p3-cross-trace",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P3 cross-trace covariate test, 2000 prime-order curves at 2^24 and 2^28: 0 of 14 tests significant (frozen rule 2 null); coverage effects <= 0.002 %; rho walk found defective by the A/A control",
+          "value": 0.7
+        }
+      ],
+      "problem": "ecdlp:split-prime-p3-cross-trace-census",
+      "unit": "percent"
     },
     {
       "better": "lower",
