@@ -6,7 +6,7 @@ namespace RationalScalar
 open CauchyNormalizer
 
 /-- One common denominator, independent of entry index. -/
-def denominator (a : ℕ) (t : ℚ) : ℚ :=
+@[expose] def denominator (a : ℕ) (t : ℚ) : ℚ :=
   ∑ s ∈ Finset.range (2^(a+1)), baseKernel a s t
 
 theorem denominator_node (a m : ℕ) (hm : m < 2^(a+1)) :
