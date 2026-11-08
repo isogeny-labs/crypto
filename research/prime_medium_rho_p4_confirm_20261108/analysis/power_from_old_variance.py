@@ -133,6 +133,7 @@ def simulate(est, stats, theta, curves, targets, rounds, sims, boot, seed, rho):
         res = est.ratio_with_interval(pairs, resamples=boot, seed=seed * 1000003 + s)
         hw = (res["ci95"][1] - res["ci95"][0]) / 2
         out["halfwidths"].append(hw)
+        out["covered"] = out.get("covered", 0) + (res["ci95"][0] <= theta <= res["ci95"][1])
         v = est.primary_outcome(res["ci95"][0], res["ci95"][1])
         out["outcomes"][v["verdict"]] = out["outcomes"].get(v["verdict"], 0) + 1
     hws = sorted(out["halfwidths"])
@@ -140,6 +141,7 @@ def simulate(est, stats, theta, curves, targets, rounds, sims, boot, seed, rho):
     out["halfwidth_p90"] = hws[int(0.9 * (len(hws) - 1))]
     out["p_halfwidth_le_0.05"] = sum(1 for h in hws if h <= 0.05) / len(hws)
     out["outcome_probability"] = {k: v / sims for k, v in sorted(out["outcomes"].items())}
+    out["coverage_of_true_theta"] = out.pop("covered") / sims
     del out["halfwidths"]
     return out
 
@@ -149,7 +151,7 @@ def main():
     ap.add_argument("--old-root", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--curves", type=int, default=10)
-    ap.add_argument("--targets", type=int, default=24)
+    ap.add_argument("--targets", type=int, default=36)
     ap.add_argument("--rounds", type=int, default=6)
     ap.add_argument("--sims", type=int, default=200)
     ap.add_argument("--boot", type=int, default=2000)
@@ -192,7 +194,7 @@ def main():
         json.dump(doc, fh, indent=1, sort_keys=True)
         fh.write("\n")
     print(json.dumps({"old_variance": stats, "delta": delta, "sim": [
-        {k: s[k] for k in ("theta_true", "pair_correlation", "halfwidth_median", "halfwidth_p90", "p_halfwidth_le_0.05", "outcome_probability")}
+        {k: s[k] for k in ("theta_true", "pair_correlation", "halfwidth_median", "halfwidth_p90", "p_halfwidth_le_0.05", "coverage_of_true_theta", "outcome_probability")}
         for s in sims]}, indent=1))
 
 
