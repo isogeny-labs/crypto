@@ -1,0 +1,75 @@
+{
+ "arms": [
+  {
+   "method": {
+    "id": "rho.negation"
+   },
+   "name": "rho-neg",
+   "role": "reference"
+  },
+  {
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=0.7,g=1,grow=2,seed=run",
+     "targets": "stride-generator"
+    }
+   },
+   "name": "f1-x07",
+   "role": "baseline"
+  },
+  {
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,seed=run",
+     "targets": "stride-generator"
+    }
+   },
+   "name": "tw-x15",
+   "role": "candidate"
+  },
+  {
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,seed=run",
+     "targets": "stride-generator"
+    }
+   },
+   "name": "twcj-x15",
+   "role": "candidate"
+  }
+ ],
+ "description": "research/curve25519_f1_targetwalk_20261108: F=1 wwalk with the target inside the walk (tw=1, and tw=1 with chained jumps cj=1) vs the F=1 table-then-probe arm vs rho-neg, one public target per session. Frozen before data (PROTOCOL.md). Public synthetic Curve25519-family miniature; no security claim.",
+ "label": "F=1 target-in-walk, single target, k=24, session 4",
+ "measurement": {
+  "isolation_required": "L0",
+  "order": "alternate",
+  "rounds": 64,
+  "seed": 20261110404,
+  "timeout_seconds": 1800,
+  "warmup": 1
+ },
+ "schema": "ecbench.spec/v1",
+ "workloads": {
+  "curves": [
+   {
+    "a": 16743506,
+    "b": 2381926,
+    "group_order": 16778792,
+    "gx": 109,
+    "gy": 3123379,
+    "kind": "prime_explicit",
+    "p": 16777213,
+    "r": 2097349
+   }
+  ],
+  "target_kind": "public",
+  "target_seed": 20261110904,
+  "targets_per_curve": 1
+ }
+}

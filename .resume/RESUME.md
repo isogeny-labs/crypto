@@ -1,31 +1,45 @@
-# Resume: crypto @ claude/dreg-lfd-theory-scaling
+# Resume: crypto @ claude/novel-ecdlp-algorithm-iams4j
 
 ## Goal
-User request (2026-11-05): find ways to reduce the degree of regularity / total solve time of the
-descended Semaev system. Three phases, chosen by the user: (1) theory and scaling survey, done
-(PR #3512); (2) the l = 9 guess-saturation test; (3) a multilinear closure engine prototype.
+User request (2026-11-07): run every next step of research/split_prime_ecdlp_20261107 (#3654, #3655
+merged): proposals P1 (Riemann-Roch system with a Dickson-torus tower), P2 (twist-pure coset
+selection), P3 (cross-trace covariate test of the split-prime statistic) under frozen protocols on toy
+prime fields, plus a Lean statement of the obstruction.
 
 ## Lead / hypothesis
-LEAD-ICE-descent-closure-degree-at-scale / LEAD-ICE-hybrid-guess-determine-l7. The recorded k*
-(guesses that hold degree 4) is 0, 1-2 and 4 at l = 6, 7 and 8. K_marginal predicts 7 at l = 9.
-Saturation (k* <= 5) would revive the guess route.
+P1: round7_rr's D_RR = 4 < D_T = 6 (m3 t4, Kummer) transfers to the Dickson torus tower (proposer 0.55
+stage-level). P2: F4 cost is coset-independent and coverage scales as c_E^m, so selecting the most
+E-pure coset pays at toy scale (0.85 toy, 0.05 cold end-to-end). P3: no Frobenius-field covariate
+moves rho cost or exact m = 2 coverage by >= 1 % (null expected, 0.98).
 
 ## Spec
-research/dreg_guess_scaling_20261106/PREREGISTRATION.md (frozen at commit 37129b4253).
+research/split_prime_ecdlp_20261107/followups/{README.md, p1_rr_dickson/PROTOCOL.md,
+p2_twist_coset/PROTOCOL.md, p3_cross_trace/PROTOCOL.md}, frozen in commit 535d9da826 (PR #3657).
+Instrument commands pinned in each protocol's Addendum A before any claim cell.
 
 ## State
-Gate A passed. The 4 positive controls refute at degree 4. Whole-summand runs: l = 7 and 8 done; l = 9 has 14 of 16 done, all degree 4 for nonzero x1. S5.d1.b0 refutes at degree 4 (a surprise against K_marginal). The remaining 129 branches are moving to a RunPod pod (PREREGISTRATION Amendment 1, owner chose the cloud route; $30 cap).
+Protocols committed and pushed (PR #3657, auto-merge on). Builders writing standalone Rust crates under
+followups/p1_rr_dickson/p1tool, followups/p2_twist_coset/p2coset, followups/p3_cross_trace/p3census
+(uncommitted until they report). msolve 0.6.5 from apt at /usr/bin/msolve. aws CLI from
+/tmp/report-venv (pip) linked at /usr/local/bin/aws; caller is account 104186811093.
+Lean: aburan28/crypto-lean PR #3 (CryptoLean.SplitPrime.Obstruction), local module build passed,
+standard axioms only. Toolchain: ~/.elan with lean-4.35.0 linked from the release archive (elan cannot
+resolve "latest" through the proxy).
 
 ## Next steps
-1. Launch: research/koblitz_ic_leads_build_20261024/pod/upload_launch.py run --name dreg-s5-l9 --vcpu 64 --flavors cpu3g --disk 40 --max-seconds 18000 <the 4 input files>, then push them.
-2. Fetch https://<pod>-8000.proxy.runpod.net/runs/ when STATUS reads ALLDONE; copy the records into runs/; stop the pod.
-3. Score both preregistrations, then write RESULTS, the graph and the PDF, the session log, and update PR #3512.
+1. Read builders' reports; pin Addendum A per protocol; commit; new PR (or same branch if #3657 open).
+2. scripts/checkpoint.sh push; tools/benchrec.py init per run.
+3. experiment-director compile mode -> card per experiment; relay verbatim to executor-mechanical;
+   director assess mode.
+4. Analyse per the frozen decision rules; report + figures + Typst PDF per experiment; pcc claims;
+   session log; PR; track to merge.
 
 ## Runs in flight
-RunPod pod dreg-s5-l9 (id recorded in runs/queue.log once created).
+None. No claim cell has run.
 
 ## Stop and success conditions
-About 12 h of container time at most. The decision rule is in the PREREGISTRATION.
+Per protocol decision rules. Budget: P1 1,200 s per msolve job, one at a time; P2 same limits;
+P3 about 4 CPU-hours total. Stop a protocol on its control-failure rule.
 
 ## Open questions
-Whether pe_closure fits about 196k columns in 15 GB.
+Whether the director accepts the local L0 route (stated deviation from AGENTS.md section 9a).

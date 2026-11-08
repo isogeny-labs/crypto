@@ -7999,7 +7999,11 @@ pub struct WalkTable<E> {
     map: FastMap<u64>,
     /// With `g_jumps`: the same key → `z` modulo `r`.
     zmap: FastMap<u64>,
-    /// Base index of the two seeds, and their relation columns.
+    /// Seeds in the base: 2, or 1 (`F = 1`, needs `g_jumps`: jumps
+    /// `[α_j]P1 + [γ_j]G`, entries `u·P1 + z·G`, `v = 0` throughout).
+    pub n_seeds: usize,
+    /// Base index of the two seeds, and their relation columns (with one
+    /// seed both slots name it).
     seeds: [usize; 2],
     seed_cols: [usize; 2],
     /// `pows[c][i] = [2^i]P_c` (`c = 2`: `G`), `None` for the identity.
@@ -8091,9 +8095,16 @@ impl<E: Copy + PartialEq> WalkTable<E> {
         seed: u64,
     ) -> Result<Self, String> {
         let (t, t_max, w, bound) = wwalk_plan_check(r, x, jumps, opts)?;
-        if fb.abscissa_list.len() != 2 {
+        let n_seeds = fb.abscissa_list.len();
+        if n_seeds == 1 && !opts.g_jumps {
+            return Err(
+                "wwalk: a 1-seed base needs g=1 (without G a collision row du·s1 = 0 is empty)"
+                    .into(),
+            );
+        }
+        if n_seeds != 2 && n_seeds != 1 {
             return Err(format!(
-                "wwalk: needs exactly 2 seeds (base abscissae); the base has {}",
+                "wwalk: needs exactly 2 seeds (base abscissae), or 1 with g=1; the base has {}",
                 fb.abscissa_list.len()
             ));
         }
@@ -8108,7 +8119,7 @@ impl<E: Copy + PartialEq> WalkTable<E> {
         };
         let grow = opts.grow > 0;
         let start = Instant::now();
-        let seeds: [usize; 2] = [0, 1].map(|c| {
+        let seeds: [usize; 2] = [0, n_seeds - 1].map(|c| {
             let a = fb.abscissa_list[c];
             fb.x_index
                 .get(&a)
@@ -8119,7 +8130,7 @@ impl<E: Copy + PartialEq> WalkTable<E> {
         let nbits = (64 - bound.leading_zeros()) as usize;
         let mut setup_ops = GroupOps::default();
         let mut pows: [Vec<Option<E>>; 3] = [Vec::new(), Vec::new(), Vec::new()];
-        for c in 0..2 {
+        for c in 0..n_seeds {
             let mut cur = (!g.is_identity(&p[c])).then_some(p[c]);
             pows[c].push(cur);
             for _ in 1..nbits {
@@ -8148,6 +8159,7 @@ impl<E: Copy + PartialEq> WalkTable<E> {
             } else {
                 fast_map(0)
             },
+            n_seeds,
             seeds,
             seed_cols,
             pows,
@@ -8169,7 +8181,7 @@ impl<E: Copy + PartialEq> WalkTable<E> {
             build_wall_ns: 0,
             insert_attempts: 0,
             identities_skipped: 0,
-            index_lookups: 2,
+            index_lookups: n_seeds as u64,
             collisions: Vec::new(),
             collision_z: Vec::new(),
             verified_collisions: 0,
@@ -8189,7 +8201,12 @@ impl<E: Copy + PartialEq> WalkTable<E> {
             if tries > 64 * jumps as u32 {
                 return Err("wwalk: could not draw non-identity jump points".into());
             }
-            let (al, be) = (rng.gen_range(1..=w), rng.gen_range(1..=w));
+            // One seed: no P2 part (β = 0), and no draw for it.
+            let (al, be) = if n_seeds == 2 {
+                (rng.gen_range(1..=w), rng.gen_range(1..=w))
+            } else {
+                (rng.gen_range(1..=w), 0)
+            };
             let ga = if opts.g_jumps { rng.gen_range(1..r) } else { 0 };
             let mut ops = table.setup_ops;
             let pt = table.eval(g, &mut ops, al, be, ga);
@@ -8489,6 +8506,492 @@ impl<E: Copy + PartialEq> WalkTable<E> {
         if self.index_lookups > 0 {
             out.insert("lookups".to_string(), self.index_lookups);
         }
+        out
+    }
+}
+
+/// One row of a [`TargetWalk`] in the relation loop's convention
+/// `Σ coef·x = h·(a + b·d)` (`Relation::Row { columns, a, b }`).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TargetWalkRow {
+    pub columns: Vec<(usize, u64)>,
+    pub a: u64,
+    pub b: u64,
+}
+
+/// **A one-seed walk with the target inside it** (`wwalk:tw=1`, `F = 1`).
+///
+/// With the base's single seed `P1`, the generator `G` and the target `Q`,
+/// `jumps` jump points `J_j = [α_j]P1 + [γ_j]G + [β_j]Q` (`α_j` uniform in
+/// `[1, w]`, `w = round(1.2·√T)`, `γ_j, β_j` uniform in `[1, r)`), and the
+/// walk `E_0 = P1`, `E_t = E_{t−1} + J_{h_t}` with `h_t` drawn from a seeded
+/// stream independently of the point (trajectories never merge), so
+/// `E_t = u_t·P1 + z_t·G + b_t·Q` with `u_t` an integer and `z_t, b_t`
+/// modulo `r`.  One key per negation orbit is stored.  **Every** verified
+/// key collision `E_t = ±E_s` is the affine row
+/// `du·s1 + db·log Q = −dz (mod r)` (`du = u_t ∓ u_s`, likewise `dz`, `db`;
+/// in the loop's convention `Row { columns: du·coef, a: −dz, b: −db }`),
+/// and the walk stops at the first two rows independent over the unknowns
+/// `(s1, log Q)`: they pin `log Q`.  `T = round(x·√r)` sets the jump bound
+/// and the cap `3T`; there is no minimum table size.  If the cap is reached
+/// below rank 2 the table answers probes like [`WalkTable::probe_z`] with
+/// the entry's `Q`-coefficient, so the pipeline still completes.
+///
+/// `cheap` (`cj=1`): the jumps' `G`/`Q` parts are built by chained
+/// additions from two base combinations `K_0 = [γ_0]G + [β_0]Q`,
+/// `K_1 = [γ_1]G + [β_1]Q` (`K_j = K_{j−1} + K_{j−2}`, coefficients modulo
+/// `r`, one addition each), and `J_j = [α_j]P1 + K_j` (the `P1` part from
+/// the doubled multiples, plus one addition), instead of three independent
+/// scalar multiplications per jump.
+///
+/// Charging is [`WalkTable`]'s: `setup_ops` (doubled multiples of `P1`,
+/// `G`, `Q` and the jumps), `walk_ops` (one addition per step) and
+/// `verify_ops` (both entries of every collision recomputed from their
+/// coefficients) sum to `build_ops`.
+pub struct TargetWalk<E> {
+    /// Key (abscissa and sign bit, shifted) → `(u, z, b)`.
+    map: FastMap<(u64, u64, u64)>,
+    /// Base index and relation column of the seed.
+    pub seed: usize,
+    pub seed_col: usize,
+    /// `pows[c][i] = [2^i]X_c` for `X = (P1, G, Q)`, `None` for the identity.
+    pows: [Vec<Option<E>>; 3],
+    pub t: u64,
+    pub t_max: u64,
+    pub w: u64,
+    pub jumps: usize,
+    pub cheap: bool,
+    /// Jump coefficients `(α, γ, β)`.
+    pub jump_coefs: Vec<(u64, u64, u64)>,
+    pub steps: u64,
+    /// Steps taken when the first and the second independent row appeared
+    /// (0 if never).
+    pub steps_first_row: u64,
+    pub steps_rank_two: u64,
+    pub entries: u64,
+    pub setup_ops: GroupOps,
+    pub walk_ops: GroupOps,
+    pub verify_ops: GroupOps,
+    pub build_ops: GroupOps,
+    pub build_wall_ns: u64,
+    pub insert_attempts: u64,
+    pub identities_skipped: u64,
+    pub index_lookups: u64,
+    /// Key collisions found: kept and new coefficient triples.
+    pub collisions: Vec<((u64, u64, u64), (u64, u64, u64))>,
+    pub verified_collisions: u64,
+    pub rows: Vec<TargetWalkRow>,
+    /// Rows whose `(du, db)` cancelled modulo `r` (dropped), and of those
+    /// the ones with a nonzero constant (must stay zero).
+    pub zero_rows: u64,
+    pub inconsistent_rows: u64,
+    /// Rank of the rows over `(s1, log Q)`, at most 2.
+    pub rank: usize,
+    basis: Vec<(u64, u64)>,
+}
+
+impl<E: Copy + PartialEq> TargetWalk<E> {
+    #[allow(clippy::too_many_arguments)]
+    pub fn build<G: CountedGroup<Elt = E>>(
+        g: &G,
+        generator: E,
+        target: E,
+        fb: &FactorBase<G::Elt>,
+        r: u64,
+        x: f64,
+        jumps: usize,
+        cheap: bool,
+        seed: u64,
+    ) -> Result<Self, String> {
+        let opts = WalkOpts {
+            g_jumps: true,
+            grow: 2,
+        };
+        let (t, t_max, w, bound) = wwalk_plan_check(r, x, jumps, opts)?;
+        if fb.abscissa_list.len() != 1 {
+            return Err(format!(
+                "wwalk: tw=1 needs a base of exactly 1 abscissa; the base has {}",
+                fb.abscissa_list.len()
+            ));
+        }
+        if g.is_identity(&generator) || g.is_identity(&target) {
+            return Err("wwalk: tw=1 with an identity generator or target".into());
+        }
+        let start = Instant::now();
+        let a0 = fb.abscissa_list[0];
+        let seed_index = fb
+            .x_index
+            .get(&a0)
+            .expect("every listed abscissa is indexed")[0];
+        let seed_col = fb.col_of[seed_index];
+        let p1 = fb.points[seed_index];
+        if g.is_identity(&p1) {
+            return Err("wwalk: tw=1 with an identity seed".into());
+        }
+        let nbits = (64 - bound.leading_zeros()) as usize;
+        let rbits = (64 - (r - 1).leading_zeros()).max(1) as usize;
+        let mut setup_ops = GroupOps::default();
+        let mut pows: [Vec<Option<E>>; 3] = [Vec::new(), Vec::new(), Vec::new()];
+        for (c, (pt, bits)) in [(p1, nbits), (generator, rbits), (target, rbits)]
+            .into_iter()
+            .enumerate()
+        {
+            let mut cur = Some(pt);
+            pows[c].push(cur);
+            for _ in 1..bits {
+                cur = cur
+                    .map(|q| g.double(&mut setup_ops, q))
+                    .filter(|q| !g.is_identity(q));
+                pows[c].push(cur);
+            }
+        }
+        let mut tw = Self {
+            map: fast_map(t_max as usize + 1),
+            seed: seed_index,
+            seed_col,
+            pows,
+            t,
+            t_max,
+            w,
+            jumps,
+            cheap,
+            jump_coefs: Vec::with_capacity(jumps),
+            steps: 0,
+            steps_first_row: 0,
+            steps_rank_two: 0,
+            entries: 0,
+            setup_ops,
+            walk_ops: GroupOps::default(),
+            verify_ops: GroupOps::default(),
+            build_ops: GroupOps::default(),
+            build_wall_ns: 0,
+            insert_attempts: 0,
+            identities_skipped: 0,
+            index_lookups: 1,
+            collisions: Vec::new(),
+            verified_collisions: 0,
+            rows: Vec::new(),
+            zero_rows: 0,
+            inconsistent_rows: 0,
+            rank: 0,
+            basis: Vec::new(),
+        };
+        let mut rng = StdRng::seed_from_u64(
+            seed ^ mix(g.key(&p1)).rotate_left(21) ^ mix(g.key(&target) ^ 0x7A86_E7A1_C0DE),
+        );
+        let jump_pts = if cheap {
+            tw.cheap_jumps(g, r, &mut rng)?
+        } else {
+            tw.plain_jumps(g, r, &mut rng)?
+        };
+        // The walk: stop at rank 2 over (s1, log Q), or at the cap.
+        let mut e = p1;
+        let mut c = (1u64, 0u64, 0u64);
+        let mut walk_ops = GroupOps::default();
+        let mut verify_ops = GroupOps::default();
+        while tw.rank < 2 && tw.steps < t_max {
+            let (jp, al, ga, be) = jump_pts[rng.gen_range(0..jumps)];
+            e = g.add(&mut walk_ops, e, jp);
+            c.0 += al;
+            c.1 = addmod(c.1, ga, r);
+            c.2 = addmod(c.2, be, r);
+            tw.steps += 1;
+            if g.is_identity(&e) {
+                tw.identities_skipped += 1;
+                continue;
+            }
+            tw.insert_attempts += 1;
+            let key = g.key(&e) >> 1;
+            let kept = match tw.map.entry(key) {
+                std::collections::hash_map::Entry::Vacant(slot) => {
+                    slot.insert(c);
+                    continue;
+                }
+                std::collections::hash_map::Entry::Occupied(o) => *o.get(),
+            };
+            tw.collisions.push((kept, c));
+            tw.verify(g, fb, r, &mut verify_ops, kept, c);
+        }
+        tw.walk_ops = walk_ops;
+        tw.verify_ops = verify_ops;
+        tw.entries = tw.map.len() as u64;
+        tw.build_ops.merge(tw.setup_ops);
+        tw.build_ops.merge(tw.walk_ops);
+        tw.build_ops.merge(tw.verify_ops);
+        tw.build_wall_ns = start.elapsed().as_nanos() as u64;
+        Ok(tw)
+    }
+
+    /// Independent jumps: `[α]P1 + [γ]G + [β]Q` from the doubled multiples.
+    fn plain_jumps<G: CountedGroup<Elt = E>>(
+        &mut self,
+        g: &G,
+        r: u64,
+        rng: &mut StdRng,
+    ) -> Result<Vec<(E, u64, u64, u64)>, String> {
+        let mut out = Vec::with_capacity(self.jumps);
+        let mut tries = 0u32;
+        while out.len() < self.jumps {
+            tries += 1;
+            if tries > 64 * self.jumps as u32 {
+                return Err("wwalk: could not draw non-identity jump points".into());
+            }
+            let al = rng.gen_range(1..=self.w);
+            let ga = rng.gen_range(1..r);
+            let be = rng.gen_range(1..r);
+            let mut ops = self.setup_ops;
+            let pt = self.eval(g, &mut ops, al, ga, be);
+            self.setup_ops = ops;
+            if let Some(pt) = pt {
+                out.push((pt, al, ga, be));
+                self.jump_coefs.push((al, ga, be));
+            }
+        }
+        Ok(out)
+    }
+
+    /// Chained jumps (`cj=1`): `K_0`, `K_1` by scalar multiplication,
+    /// `K_j = K_{j−1} + K_{j−2}`, `J_j = [α_j]P1 + K_j`.
+    fn cheap_jumps<G: CountedGroup<Elt = E>>(
+        &mut self,
+        g: &G,
+        r: u64,
+        rng: &mut StdRng,
+    ) -> Result<Vec<(E, u64, u64, u64)>, String> {
+        let mut ops = self.setup_ops;
+        let mut ks: Vec<(E, u64, u64)> = Vec::with_capacity(self.jumps);
+        let mut tries = 0u32;
+        while ks.len() < self.jumps {
+            tries += 1;
+            if tries > 64 * self.jumps as u32 {
+                self.setup_ops = ops;
+                return Err("wwalk: could not draw non-identity chained jumps".into());
+            }
+            if ks.len() < 2 {
+                let ga = rng.gen_range(1..r);
+                let be = rng.gen_range(1..r);
+                if let Some(pt) = self.eval(g, &mut ops, 0, ga, be) {
+                    ks.push((pt, ga, be));
+                }
+                continue;
+            }
+            let (k1, g1, b1) = ks[ks.len() - 1];
+            let (k2, g2, b2) = ks[ks.len() - 2];
+            let k = g.add(&mut ops, k1, k2);
+            if g.is_identity(&k) {
+                // About 1/r: start the chain again.
+                ks.clear();
+                continue;
+            }
+            ks.push((k, addmod(g1, g2, r), addmod(b1, b2, r)));
+        }
+        let mut out = Vec::with_capacity(self.jumps);
+        for &(k, ga, be) in &ks {
+            let mut tries = 0u32;
+            loop {
+                tries += 1;
+                if tries > 64 {
+                    self.setup_ops = ops;
+                    return Err("wwalk: could not draw a non-identity chained jump".into());
+                }
+                let al = rng.gen_range(1..=self.w);
+                let Some(a) = self.eval(g, &mut ops, al, 0, 0) else {
+                    continue;
+                };
+                let j = g.add(&mut ops, a, k);
+                if g.is_identity(&j) {
+                    continue;
+                }
+                out.push((j, al, ga, be));
+                self.jump_coefs.push((al, ga, be));
+                break;
+            }
+        }
+        self.setup_ops = ops;
+        Ok(out)
+    }
+
+    /// `[u]P1 + [z]G + [b]Q` from the doubled multiples, each addition
+    /// charged; `None` for the identity.
+    fn eval<G: CountedGroup<Elt = E>>(
+        &self,
+        g: &G,
+        ops: &mut GroupOps,
+        u: u64,
+        z: u64,
+        b: u64,
+    ) -> Option<E> {
+        let mut s: Option<E> = None;
+        for (c, k) in [u, z, b].into_iter().enumerate() {
+            for i in 0..64 {
+                if (k >> i) & 1 == 0 {
+                    continue;
+                }
+                let Some(q) = self.pows[c].get(i).copied().flatten() else {
+                    continue;
+                };
+                s = match s {
+                    None => Some(q),
+                    Some(a) => Some(g.add(ops, a, q)).filter(|z| !g.is_identity(z)),
+                };
+            }
+        }
+        s
+    }
+
+    /// Recompute both entries of a key collision (charged), and keep its
+    /// row if the two are `±` each other.
+    fn verify<G: CountedGroup<Elt = E>>(
+        &mut self,
+        g: &G,
+        fb: &FactorBase<E>,
+        r: u64,
+        ops: &mut GroupOps,
+        kept: (u64, u64, u64),
+        new: (u64, u64, u64),
+    ) {
+        let s1 = self.eval(g, ops, kept.0, kept.1, kept.2);
+        let s2 = self.eval(g, ops, new.0, new.1, new.2);
+        let (Some(s1), Some(s2)) = (s1, s2) else {
+            return;
+        };
+        // sign −1: E1 = E2, so E1 − E2 = O; sign +1: E1 = −E2.
+        let plus = if s1 == s2 {
+            false
+        } else if s1 == g.neg(s2) {
+            true
+        } else {
+            return;
+        };
+        self.verified_collisions += 1;
+        let comb = |a: u64, b: u64| -> u64 {
+            let (a, b) = (a % r, b % r);
+            if plus {
+                addmod(a, b, r)
+            } else {
+                submod(a, b, r)
+            }
+        };
+        let du = comb(kept.0, new.0);
+        let dz = comb(kept.1, new.1);
+        let db = comb(kept.2, new.2);
+        if du == 0 && db == 0 {
+            self.zero_rows += 1;
+            self.inconsistent_rows += u64::from(dz != 0);
+            return;
+        }
+        let coef = mulmod(du, fb.coef_of[self.seed] % r, r);
+        let columns = if coef == 0 {
+            Vec::new()
+        } else {
+            vec![(self.seed_col, coef)]
+        };
+        self.rows.push(TargetWalkRow {
+            columns,
+            a: (r - dz) % r,
+            b: (r - db) % r,
+        });
+        // Rank over (s1, log Q) of the vectors (du, db).
+        let independent = match self.basis.as_slice() {
+            [] => true,
+            [(u0, b0)] => mulmod(*u0, db, r) != mulmod(*b0, du, r),
+            _ => false,
+        };
+        if independent {
+            self.basis.push((du, db));
+            self.rank = self.basis.len();
+            if self.rank == 1 {
+                self.steps_first_row = self.steps;
+            } else {
+                self.steps_rank_two = self.steps;
+            }
+        }
+    }
+
+    /// One lookup: if the table holds `±point`, `(sign, u, z, b)` with
+    /// `point = sign·(u·P1 + z·G + b·Q)`; the entry is recomputed (charged).
+    pub fn probe<G: CountedGroup<Elt = E>>(
+        &self,
+        g: &G,
+        ops: &mut GroupOps,
+        lookups: &mut u64,
+        point: E,
+    ) -> Option<(i8, u64, u64, u64)> {
+        *lookups += 1;
+        let key = g.key(&point) >> 1;
+        let (u, z, b) = *self.map.get(&key)?;
+        let s = self.eval(g, ops, u, z, b)?;
+        if s == point {
+            Some((1, u, z, b))
+        } else if s == g.neg(point) {
+            Some((-1, u, z, b))
+        } else {
+            None
+        }
+    }
+
+    /// The row of a probe hit for the trial `point = a·G + b·Q =
+    /// sign·(u·P1 + z·G + be·Q)`: columns `sign·u·coef`, constant
+    /// `a − sign·z`, target coefficient `b − sign·be`.
+    #[allow(clippy::too_many_arguments)]
+    pub fn hit_row(
+        &self,
+        fb: &FactorBase<E>,
+        r: u64,
+        a: u64,
+        b: u64,
+        sign: i8,
+        u: u64,
+        z: u64,
+        be: u64,
+    ) -> TargetWalkRow {
+        let mut coef = mulmod(u % r, fb.coef_of[self.seed] % r, r);
+        let (mut z, mut be) = (z % r, be % r);
+        if sign < 0 {
+            coef = (r - coef) % r;
+            z = (r - z) % r;
+            be = (r - be) % r;
+        }
+        TargetWalkRow {
+            columns: if coef == 0 {
+                Vec::new()
+            } else {
+                vec![(self.seed_col, coef)]
+            },
+            a: submod(a % r, z, r),
+            b: submod(b % r, be, r),
+        }
+    }
+
+    /// The build's work beside its group operations, for `bitop/v1`.
+    pub fn work_counters(&self) -> BTreeMap<String, u64> {
+        let mut out = BTreeMap::new();
+        if self.insert_attempts > 0 {
+            out.insert("table_insert_attempts".to_string(), self.insert_attempts);
+        }
+        if self.index_lookups > 0 {
+            out.insert("lookups".to_string(), self.index_lookups);
+        }
+        out
+    }
+
+    /// The build's phase breakdown (group operations per ledger, steps),
+    /// reported beside the relation counters; none of it is priced twice
+    /// (the ledgers are already inside `build_ops`).
+    pub fn breakdown_counters(&self) -> BTreeMap<String, u64> {
+        let mut out = BTreeMap::new();
+        out.insert("tw_setup_adds".into(), self.setup_ops.adds);
+        out.insert("tw_setup_doubles".into(), self.setup_ops.doubles);
+        out.insert("tw_walk_adds".into(), self.walk_ops.adds);
+        out.insert("tw_verify_adds".into(), self.verify_ops.adds);
+        out.insert("tw_steps".into(), self.steps);
+        out.insert("tw_steps_first_row".into(), self.steps_first_row);
+        out.insert("tw_steps_rank_two".into(), self.steps_rank_two);
+        out.insert("tw_collisions".into(), self.collisions.len() as u64);
+        out.insert("tw_verified_collisions".into(), self.verified_collisions);
+        out.insert("tw_rows".into(), self.rows.len() as u64);
+        out.insert("tw_rank".into(), self.rank as u64);
+        out.insert("tw_cheap_jumps".into(), u64::from(self.cheap));
         out
     }
 }
@@ -16411,5 +16914,303 @@ mod wwalk_table_tests {
             grow: 3,
         };
         assert!(WalkTable::build_with(g, Some(gen), &fb, r, 1.0, 16, three, 0).is_err());
+    }
+
+    /// `wwalk` over a **one-seed** base (`F = 1`, `g=1`): jumps are
+    /// `[α_j]P1 + [γ_j]G`, entries `u·P1 + z·G` with `v = 0`, every free row
+    /// is the affine equation `du·s1 = −dz` over the single seed column
+    /// (one such row pins `log P1`), probe answers rebuild the target, and
+    /// `grow=1` / `grow=2` both stop at rank 1 or at the cap.  Without `g`
+    /// the one-seed base is refused.
+    #[test]
+    fn wwalk_one_seed_rows_are_affine_and_grow_reaches_rank_one() {
+        let inst = prime_instance_for(12, 3);
+        let g = &inst.curve;
+        let r = inst.r;
+        let h = inst.cofactor;
+        let gen = inst.generator_point();
+        let log = logs(&inst);
+        let mut cops = GroupOps::default();
+        let log_of = |p: &PrimePoint, cops: &mut GroupOps| -> u64 {
+            let hp = g.mul(cops, *p, h);
+            if g.is_identity(&hp) {
+                0
+            } else {
+                log[&g.key(&hp)]
+            }
+        };
+        let fb = prime_factor_base(&inst, 1);
+        assert_eq!(fb.abscissa_list.len(), 1);
+        let mut col_log = vec![None; fb.columns];
+        for (i, p) in fb.points.iter().enumerate() {
+            let inv = invmod(fb.coef_of[i] % r, r).unwrap();
+            let l = ((log_of(p, &mut cops) as u128 * inv as u128) % r as u128) as u64;
+            let slot = col_log[fb.col_of[i]].get_or_insert(l);
+            assert_eq!(*slot, l);
+        }
+        let dot = |row: &[(usize, u64)]| {
+            row.iter().fold(0u128, |s, &(col, v)| {
+                (s + v as u128 * col_log[col].unwrap() as u128) % r as u128
+            })
+        };
+        let (mut rank1, mut capped, mut total_rows) = (0, 0, 0u64);
+        for (x, jumps, grow, seed) in [
+            (2.0, 16usize, 0u8, 0u64),
+            (1.0, 8, 1, 1),
+            (1.0, 16, 1, 2),
+            (1.5, 16, 2, 3),
+            (1.0, 16, 2, 4),
+            (0.5, 16, 2, 5),
+            (0.5, 16, 1, 6),
+            (1.0, 16, 2, 7),
+        ] {
+            let opts = WalkOpts {
+                g_jumps: true,
+                grow,
+            };
+            let t = WalkTable::build_with(g, Some(gen), &fb, r, x, jumps, opts, seed).unwrap();
+            assert_eq!(t.n_seeds, 1);
+            assert_eq!(t.seeds[0], t.seeds[1]);
+            assert_eq!(t.index_lookups, 1);
+            // (a) charging: one addition a step; doublings are P1's and G's
+            // doubled multiples only (no second seed); the ledgers sum.
+            assert_eq!(t.walk_ops.adds, t.steps);
+            assert_eq!(t.walk_ops.doubles, 0);
+            assert_eq!(t.verify_ops.doubles, 0);
+            assert!(t
+                .jump_coefs
+                .iter()
+                .all(|&(al, be)| be == 0 && (1..=t.w).contains(&al)));
+            assert!(t.jump_gammas.iter().all(|&ga| (1..r).contains(&ga)));
+            let nbits = u64::from(64 - (1 + t.t_max * t.w).leading_zeros());
+            let gbits = u64::from(64 - (r - 1).leading_zeros());
+            assert!(t.setup_ops.doubles <= (nbits - 1) + (gbits - 1));
+            let mut sum = t.setup_ops;
+            sum.merge(t.walk_ops);
+            sum.merge(t.verify_ops);
+            assert_eq!(sum.adds, t.build_ops.adds);
+            assert_eq!(sum.doubles, t.build_ops.doubles);
+            assert_eq!(t.t_max, t.t * (1 + u64::from(grow)));
+            assert!(t.steps >= t.t && t.steps <= t.t_max);
+            assert_eq!(t.inconsistent_rows, 0);
+            assert_eq!(t.rows.len(), t.row_consts.len());
+            // (b) every probe answer reproduces its target with v = 0.
+            let p1 = fb.points[t.seeds[0]];
+            let mut ops = GroupOps::default();
+            let mut lookups = 0;
+            let mut hits = 0;
+            for k in 1..r {
+                let target = g.mul(&mut ops, gen, k);
+                if let Some((sign, u, v, z)) = t.probe_z(g, &mut ops, &mut lookups, target) {
+                    assert_eq!(v, 0, "x={x} k={k}: one seed has no v");
+                    let a = g.mul(&mut ops, p1, u);
+                    let c = g.mul(&mut ops, gen, z);
+                    let s = g.add(&mut ops, a, c);
+                    assert_eq!(if sign > 0 { s } else { g.neg(s) }, target, "x={x} k={k}");
+                    let cols = t.hit_columns(&fb, r, sign, u, v);
+                    assert!(cols.len() <= 1);
+                    let konst = WalkTable::<PrimePoint>::hit_const(r, k, sign, z);
+                    assert_eq!(
+                        dot(&cols),
+                        (h as u128 * konst as u128) % r as u128,
+                        "x={x} k={k}: hit row"
+                    );
+                    hits += 1;
+                }
+            }
+            assert_eq!(
+                hits,
+                2 * t.entries,
+                "x={x}: every stored orbit is hit twice"
+            );
+            // (c) free rows: one column, affine, true under the logs.
+            assert_eq!(t.rows.len() as u64 + t.zero_rows, t.verified_collisions);
+            for (row, &konst) in t.rows.iter().zip(&t.row_consts) {
+                assert_eq!(row.len(), 1, "x={x}: a one-seed row has one column");
+                assert_eq!(row[0].0, t.seed_cols[0]);
+                assert_eq!(
+                    dot(row),
+                    (h as u128 * konst as u128) % r as u128,
+                    "x={x}: row {row:?} const {konst}"
+                );
+            }
+            total_rows += t.rows.len() as u64;
+            assert!(t.seed_rank(r) <= 1);
+            // (d) grow stops at rank 1 or at the cap.
+            if grow > 0 {
+                if t.seed_rank(r) == 1 {
+                    rank1 += 1;
+                } else {
+                    assert_eq!(t.steps, t.t_max, "stopped below rank 1 before the cap");
+                    capped += 1;
+                }
+            }
+        }
+        eprintln!(
+            "wwalk one seed small curve: rows {total_rows}, grown rank-1 {rank1}, capped {capped}"
+        );
+        assert!(total_rows > 0);
+        assert!(rank1 >= 5, "grow should usually reach rank 1");
+        // Refusals: one seed without G, and three seeds.
+        let no_g = WalkOpts {
+            g_jumps: false,
+            grow: 1,
+        };
+        assert!(WalkTable::build_with(g, Some(gen), &fb, r, 1.0, 16, no_g, 0).is_err());
+        assert!(WalkTable::build(g, &fb, r, 1.0, 16, false, 0).is_err());
+        let fb3 = prime_factor_base(&inst, 3);
+        let ok = WalkOpts {
+            g_jumps: true,
+            grow: 2,
+        };
+        assert!(WalkTable::build_with(g, Some(gen), &fb3, r, 1.0, 16, ok, 0).is_err());
+    }
+
+    /// `wwalk:tw=1` ([`TargetWalk`], `F = 1` with the target in the walk),
+    /// plain and chained jumps: every row is the affine equation
+    /// `du·coef·x = h·(a + b·log Q)` under the true logs; the walk stops at
+    /// rank 2 over `(s1, log Q)` (or at `3T`); two independent rows solve
+    /// `log Q` in the loop's own matrix; probe answers rebuild their
+    /// points; the ledgers sum; the chained jumps obey their recurrence.
+    #[test]
+    fn target_walk_rows_are_affine_stop_at_rank_two_and_solve() {
+        let inst = prime_instance_for(12, 3);
+        let g = &inst.curve;
+        let r = inst.r;
+        let h = inst.cofactor;
+        let gen = inst.generator_point();
+        let log = logs(&inst);
+        let mut cops = GroupOps::default();
+        let log_of = |p: &PrimePoint, cops: &mut GroupOps| -> u64 {
+            let hp = g.mul(cops, *p, h);
+            if g.is_identity(&hp) {
+                0
+            } else {
+                log[&g.key(&hp)]
+            }
+        };
+        let fb = prime_factor_base(&inst, 1);
+        let col_x = {
+            let i = 0;
+            let inv = invmod(fb.coef_of[i] % r, r).unwrap();
+            ((log_of(&fb.points[i], &mut cops) as u128 * inv as u128) % r as u128) as u64
+        };
+        let (mut rank2, mut capped, mut solved) = (0, 0, 0);
+        let mut setup = [0u64; 2];
+        for cheap in [false, true] {
+            for seed in 0..24u64 {
+                let k = 1 + (seed * 7919 + 13) % (r - 1);
+                let q = g.mul(&mut cops, gen, k);
+                let t = TargetWalk::build(g, gen, q, &fb, r, 1.5, 16, cheap, seed).unwrap();
+                setup[usize::from(cheap)] += t.setup_ops.adds;
+                // (a) charging.
+                assert_eq!(t.walk_ops.adds, t.steps);
+                assert_eq!(t.walk_ops.doubles, 0);
+                assert_eq!(t.verify_ops.doubles, 0);
+                let mut sum = t.setup_ops;
+                sum.merge(t.walk_ops);
+                sum.merge(t.verify_ops);
+                assert_eq!(sum.adds, t.build_ops.adds);
+                assert_eq!(sum.doubles, t.build_ops.doubles);
+                let nbits = u64::from(64 - (1 + t.t_max * t.w).leading_zeros());
+                let rbits = u64::from(64 - (r - 1).leading_zeros());
+                assert!(t.setup_ops.doubles <= (nbits - 1) + 2 * (rbits - 1));
+                assert_eq!(t.t_max, 3 * t.t);
+                assert!(t.steps <= t.t_max);
+                assert_eq!(t.entries + t.collisions.len() as u64, t.insert_attempts);
+                assert_eq!(t.insert_attempts + t.identities_skipped, t.steps);
+                assert_eq!(t.jump_coefs.len(), 16);
+                for &(al, ga, be) in &t.jump_coefs {
+                    assert!((1..=t.w).contains(&al));
+                    assert!(ga < r && be < r);
+                }
+                if cheap {
+                    for j in 2..16 {
+                        let (_, g1, b1) = t.jump_coefs[j - 1];
+                        let (_, g2, b2) = t.jump_coefs[j - 2];
+                        assert_eq!(t.jump_coefs[j].1, (g1 + g2) % r, "seed={seed} j={j}");
+                        assert_eq!(t.jump_coefs[j].2, (b1 + b2) % r, "seed={seed} j={j}");
+                    }
+                }
+                // (b) rows hold under the true logs: du·coef·x = h·(a + b·k).
+                assert_eq!(t.inconsistent_rows, 0);
+                assert_eq!(t.rows.len() as u64 + t.zero_rows, t.verified_collisions);
+                let holds = |row: &TargetWalkRow| {
+                    let lhs = row.columns.iter().fold(0u128, |s, &(c, v)| {
+                        assert_eq!(c, t.seed_col);
+                        (s + v as u128 * col_x as u128) % r as u128
+                    });
+                    let rhs = (h as u128
+                        * ((row.a as u128 + row.b as u128 * k as u128) % r as u128))
+                        % r as u128;
+                    lhs == rhs
+                };
+                for row in &t.rows {
+                    assert!(holds(row), "cheap={cheap} seed={seed}: row {row:?}");
+                    assert!(row.b != 0 || !row.columns.is_empty());
+                }
+                // (c) rank-2 stop.
+                if t.rank == 2 {
+                    rank2 += 1;
+                    assert_eq!(t.steps, t.steps_rank_two, "the walk ran past rank 2");
+                    assert!(t.steps_first_row > 0 && t.steps_first_row < t.steps_rank_two);
+                    // (d) the loop's matrix solves log Q from the rows.
+                    let mut m = IncrementalGauss::new(fb.columns + 1, r);
+                    let mut pinned = None;
+                    for row in &t.rows {
+                        let mut v = vec![0u64; fb.columns + 1];
+                        for &(c, x) in &row.columns {
+                            v[c] = addmod(v[c], x, r);
+                        }
+                        v[fb.columns] = submod(0, mulmod(h % r, row.b, r), r);
+                        assert_ne!(
+                            m.add_row(v, mulmod(h % r, row.a, r)),
+                            RowStatus::Inconsistent
+                        );
+                        pinned = m.pinned(fb.columns);
+                    }
+                    assert_eq!(pinned, Some(k), "cheap={cheap} seed={seed}: log Q");
+                    solved += 1;
+                } else {
+                    assert_eq!(t.steps, t.t_max, "stopped below rank 2 before the cap");
+                    capped += 1;
+                }
+                // (e) probes: a hit rebuilds the point and its row holds.
+                let mut ops = GroupOps::default();
+                let mut lookups = 0;
+                let mut hits = 0;
+                for a in 1..r.min(600) {
+                    let pt = g.mul(&mut ops, gen, a);
+                    let p = g.add(&mut ops, pt, q);
+                    if g.is_identity(&p) {
+                        continue;
+                    }
+                    if let Some((sign, u, z, be)) = t.probe(g, &mut ops, &mut lookups, p) {
+                        let row = t.hit_row(&fb, r, a, 1, sign, u, z, be);
+                        assert!(holds(&row), "cheap={cheap} seed={seed} a={a}: hit row");
+                        hits += 1;
+                    }
+                }
+                let _ = hits;
+            }
+        }
+        eprintln!(
+            "target walk small curve: rank-2 {rank2}, capped {capped}, solved {solved}, set-up adds plain {} cheap {}",
+            setup[0], setup[1]
+        );
+        assert!(
+            rank2 >= 40,
+            "tw should almost always reach rank 2 below 4.5 sqrt(r)"
+        );
+        assert_eq!(solved, rank2);
+        assert!(
+            setup[1] < setup[0],
+            "chained jumps cost fewer set-up additions"
+        );
+        // Refusals: a two-seed base.
+        let q = g.mul(&mut cops, gen, 5);
+        let fb2 = prime_factor_base(&inst, 2);
+        assert!(TargetWalk::build(g, gen, q, &fb2, r, 1.5, 16, false, 0).is_err());
+        assert!(TargetWalk::build(g, gen, q, &fb, r, 9.0, 16, false, 0).is_err());
     }
 }
