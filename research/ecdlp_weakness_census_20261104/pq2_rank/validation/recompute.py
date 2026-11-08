@@ -122,6 +122,224 @@ def parse_log(p: Path):
 
 
 
+def final2_items(H, readme, L, detail):
+    """Items for the text at the final binding commit: the withdrawn bounded-degree reading, the
+    Kousidis-Wiemers figures, the n = 36 / 37 step test, R5-002, R5-004 and the new pcc ids."""
+    by = {(r["n"], r["inst"]): r for r in L}
+    t = " ".join(readme.split())
+    # ---- withdrawn phrases are absent everywhere --------------------------------
+    docs = {"pq2_readme": PKG / "README.md", "census_readme": PKG.parent / "README.md",
+            "report_typ": PKG.parent / "report.typ",
+            "triage": REPO / "docs/ecdlp-hardness-corpus/WEAKNESS_TRIAGE.md",
+            "lean-round5": REPO / "docs/ecdlp-hardness-corpus/lean-round5-20261107.json",
+            "WEAKNESSES.md": REPO / "docs/ecdlp-hardness-corpus/WEAKNESSES.md",
+            "weakness.json": REPO / "docs/ecdlp-hardness-corpus/weakness.json"}
+    text = {k: " ".join(read_text(v).split()) for k, v in docs.items()}
+    phrases = ["bounded-degree premise", "evidence for the bounded", "consistent with the bounded"]
+    for k, v in text.items():
+        H(f"withdrawn.{k}.bounded_degree_phrases", 0, sum(v.count(ph) for ph in phrases))
+    # ---- Kousidis-Wiemers figures against the corpus record -------------------------
+    lit = json.loads(read_text(REPO / "docs/ecdlp-hardness-corpus/lit-groebner.json"))
+    kw = ""
+
+    def walk(o):
+        nonlocal kw
+        if isinstance(o, dict):
+            if o.get("id") == "MEAS-GB-KW-TABLE1":
+                kw = o.get("statement", "")
+            for v in o.values():
+                walk(v)
+        elif isinstance(o, list):
+            for v in o:
+                walk(v)
+    walk(lit)
+    m = re.search(r"m = 2, n = (\d+)\.\.(\d+): D_ff = 2 always, D_reg \(highest step degree\) = (\d+) for n <= (\d+) "
+                  r"and (\d+) for n = (\d+)\.\.(\d+)", kw)
+    kwv = tuple(int(x) for x in m.groups()) if m else (None,) * 7  # lo, hi, d_low, n_low_max, d_high, n_high_min, n_high_max
+    detail["final2.kw_record"] = kwv
+    H("pq2_readme.kw_magma_degree_4_up_to", text_num(t, r"Kousidis and Wiemers report Magma degree 4 for n ≤ (\d+) and 5 from n = \d+"), kwv[3])
+    H("pq2_readme.kw_magma_degree_5_from", text_num(t, r"Kousidis and Wiemers report Magma degree 4 for n ≤ \d+ and 5 from n = (\d+)"), kwv[5])
+    H("pq2_readme.direction_kw_5_from", text_num(t, r"They report 5 from n = (\d+) to \d+ \(`MEAS-GB-KW-TABLE1`\)"), kwv[5])
+    H("pq2_readme.direction_kw_5_to", text_num(t, r"They report 5 from n = \d+ to (\d+) \(`MEAS-GB-KW-TABLE1`\)"), kwv[6])
+    s36_ = json.loads(read_text(PKG / "f4/step_n36_37/msolve_n36_i0.json"))["rows"][0]
+    main_ns = {r["n"] for r in json.loads(read_text(PKG / "f4/msolve_all.json"))["rows"]}
+    msolve_ns = sorted(main_ns | ({s36_["n"]} if s36_.get("msolve_exit") == 0 else set()))
+    detail["final2.msolve_measured_n"] = msolve_ns
+    mo = re.search(r"agrees with their Magma value 4 where the ranges overlap \(n = (\d+) to (\d+)\)", text["census_readme"])
+    if mo:
+        stated = list(range(int(mo[1]), int(mo[2]) + 1))
+        measured = [n for n in stated if n in msolve_ns and kwv[0] is not None and kwv[0] <= n <= kwv[3]]
+        H("census_readme.overlap_n_values_with_msolve_and_magma_4", len(stated), len(measured),
+          note=(f"stated overlap n = {stated}; msolve measured n in that span: {measured} (main sweep to n = 34, step test at "
+                f"n = 36 and 37); Kousidis-Wiemers' degree 4 covers n = {kwv[0]}..{kwv[3]}. There is no msolve run at n = 35, "
+                "so agreement 'where the ranges overlap (n = 34 to 36)' is stated for an n with no data. Supported wording: "
+                "'where the ranges overlap (n = 34, and the fresh n = 36 control)', as in R5-004."))
+        H("census_readme.kw_magma_5_from", text_num(text["census_readme"], r"they report 5 from n = (\d+)"), kwv[5])
+    mc = re.search(r"agrees with their Magma value 4 where the ranges overlap \(n = (\d+), and the fresh n = (\d+) control\)",
+                   text["census_readme"])
+    if mc:
+        A_ = {(r["n"], r["instance"]): r for r in json.loads(read_text(PKG / "f4/msolve_all.json"))["rows"]}
+        main_ov = sorted({k[0] for k in A_ if kwv[0] is not None and kwv[0] <= k[0] <= kwv[3]})
+        H("census_readme.overlap_main_sweep_n", int(mc[1]), main_ov[0] if len(main_ov) == 1 else -1,
+          note=f"main-sweep msolve n inside Kousidis-Wiemers' degree-4 range n = {kwv[0]}..{kwv[3]}: {main_ov}")
+        H("census_readme.control_n", int(mc[2]),
+          s36_["n"] if s36_.get("msolve_exit") == 0 and kwv[0] <= s36_["n"] <= kwv[3] else -1)
+        degs = [r["max_step_degree"] for k, r in A_.items() if k[0] in main_ov] + [s36_["max_step_degree"]]
+        H("census_readme.agrees_with_magma_4", 4, degs[0] if len(set(degs)) == 1 else -1)
+        H("census_readme.kw_magma_5_from", text_num(text["census_readme"], r"they report 5 from n = (\d+)"), kwv[5])
+    kw_docs = [] if (mo or mc) else [
+            ("census_readme", r"Magma value 4 for n ≤ (\d+); they report 5 from n = \d+", r"Magma value 4 for n ≤ \d+; they report 5 from n = (\d+)")]
+    for k, pat_hi, pat_from in kw_docs + [
+            ("report_typ", r"Magma value for \$n <= (\d+)\$; they report 5 from \$n = \d+\$", r"Magma value for \$n <= \d+\$; they report 5 from \$n = (\d+)\$"),
+            ("triage", r"Magma value for n ≤ (\d+); they report 5 from n = \d+", r"Magma value for n ≤ \d+; they report 5 from n = (\d+)")]:
+        H(f"{k}.kw_magma_4_up_to", text_num(text[k], pat_hi), kwv[3])
+        H(f"{k}.kw_magma_5_from", text_num(text[k], pat_from), kwv[5])
+    # ---- msolve rows (main sweep) and the Direction bullet -------------------------
+    A = {(r["n"], r["instance"]): r for r in json.loads(read_text(PKG / "f4/msolve_all.json"))["rows"]}
+    band = [r for k, r in A.items() if 17 <= k[0] <= 34]
+    deg_by_n = {n: sorted({r["max_step_degree"] for k, r in A.items() if k[0] == n}) for n in range(8, 35)}
+    rises = [n for n in range(9, 35) if len(deg_by_n[n]) == 1 and len(deg_by_n[n - 1]) == 1
+             and deg_by_n[n][0] > deg_by_n[n - 1][0]]
+    detail["final2.msolve_degree_by_n"] = deg_by_n
+    def one(xs):
+        xs = list(xs)
+        return xs[0] if xs and len(set(xs)) == 1 else -1
+    H("pq2_readme.direction_degree_4_n17_34", 4 if "msolve's degree is 4 on every instance from n = 17 to 34" in t else None,
+      one(r["max_step_degree"] for r in band))
+    H("pq2_readme.direction_one_above_kw_3", 1 if "one above the Kousidis–Wiemers value 3" in t else None,
+      one(r["max_step_degree"] for r in band) - 3)
+    s36 = json.loads(read_text(PKG / "f4/step_n36_37/msolve_n36_i0.json"))["rows"][0]
+    overlap = [r["max_step_degree"] for k, r in A.items() if kwv[0] is not None and kwv[0] <= k[0] <= kwv[3]] + [s36["max_step_degree"]]
+    H("pq2_readme.direction_matches_magma_4_where_ranges_overlap",
+      4 if "matches their Magma value 4 for n ≤ 36" in t else None, one(overlap),
+      note=f"msolve degrees where Kousidis-Wiemers report 4 (n = {kwv[0]}..{kwv[3]}): the main-sweep rows at n = 34 and the fresh n = 36 control")
+    H("pq2_readme.direction_rises_inside_window_first", text_num(t, r"The step from 3 to 4 inside this window, at n = (\d+) and n = \d+"),
+      rises[0] if rises else None, note=f"n where msolve's degree rises over n - 1 on n = 8..34: {rises}")
+    H("pq2_readme.direction_rises_inside_window_second", text_num(t, r"The step from 3 to 4 inside this window, at n = \d+ and n = (\d+)"),
+      rises[1] if len(rises) > 1 else None)
+    H("pq2_readme.direction_published_data_show_rise", 1 if "the published data already show it rising" in t else None,
+      int(kwv[4] is not None and kwv[4] > kwv[2]))
+    # ---- the n = 36 / 37 step test -------------------------------------------------
+    sp = json.loads(read_text(PKG / "f4/step_n36_37/pq2_rank.json"))["rows"]
+    S = {(r["n"], r["instance"]): r for r in sp}
+    H("step.instances_dumped", 4, len(sp))
+    H("step.dumps_byte_identical_to_validator_regeneration", 4,
+      sum(read_text(PKG / f"f4/step_n36_37/dumps/n{n}_i{i}.json") == read_own(HERE / f"step_n36_37/inst/n{n}_i{i}.json").decode()
+          for (n, i) in S))
+    cs = json.loads(read_own(HERE / "closure_step_n36_37.json"))["results"]
+    H("step.dumps_equal_S3_descent", 4, sum(r["checks"].get("descent_anf_equals_dump") is True and not r["failed_checks"] for r in cs))
+    H("pq2_readme.step_n36_degree", text_num(t, r"n = 36, instance 0 \(control\) \| maximal step degree (\d+)"), s36["max_step_degree"])
+    H("pq2_readme.step_n36_linear", text_num(t, r"linear polynomials = k = (\d+), \d+ minutes"), s36["linear_in_gb"])
+    H("pq2_readme.step_n36_k", text_num(t, r"linear polynomials = k = (\d+), \d+ minutes"), S[(36, 0)]["k"],
+      note="census k of the regenerated n = 36 instance 0 (from its Z)")
+    H("pq2_readme.step_n36_minutes", text_num(t, r"linear polynomials = k = \d+, (\d+) minutes"), round(s36["msolve_seconds"] / 60))
+    own36 = HERE / "msolve_replay/msolve_step_n36.json"
+    if own36.exists():
+        rr = json.loads(read_own(own36))["results"]
+        H("step.validator_msolve_n36_i0_agrees", 1, sum(not r["mismatches"] and not r["failed_checks"] for r in rr),
+          note="validator's own msolve run and parser: steps, degree, basis size, linear count = producer row; quotient = |Z|; linear = k")
+    att = [json.loads(read_text(PKG / f"f4/step_n36_37/{f}"))["rows"][0] for f in ("msolve_n37_i0.killed_t3.json", "msolve_n37_i0.json")]
+    killed = [r for r in att if r["msolve_exit"] == -9 and r["gb_size"] == 0 and max(r["steps"]) == 4]
+    oom = (HERE / "step_n36_37/kernel_oom.txt").read_text()
+    READ[rel(HERE / "step_n36_37/kernel_oom.txt")] = hashlib.sha256(oom.encode()).hexdigest()
+    n_oom = len(re.findall(r"Memory cgroup out of memory: Killed process \d+ \(msolve\)", oom))
+    H("pq2_readme.step_n37_killed_twice_for_memory", 2 if "killed twice for memory during degree-4 steps" in t else None,
+      min(len(killed), n_oom),
+      note="attempts with exit -9, no basis and last step degree 4 (killed_t3 and single-thread), each matched by a kernel "
+           "'Memory cgroup out of memory: Killed process (msolve)' record captured by the validator from dmesg in the same boot "
+           "(uptime 12907 s ~ 23:12:45 and 16563 s ~ 00:13:41 UTC)")
+    tlog = read_text(PKG / "f4/step_n36_37/msolve_n37_i0.timeout_3600s.log")
+    H("step.n37_first_attempt_timed_out_3600s", 1, int("timed out after 3600 seconds" in tlog))
+    i1_none = sum(read_text(PKG / f"f4/step_n36_37/msolve_n{n}_i1.log") == "" and
+                  subprocess.run(["git", "-C", str(REPO), "cat-file", "-e", f"{COMMIT}:{rel(PKG / f'f4/step_n36_37/msolve_n{n}_i1.json')}"],
+                                 capture_output=True).returncode != 0 for n in (36, 37))
+    H("pq2_readme.step_i1_no_result", 2 if "stopped early to save memory, no result" in t else None, i1_none)
+    mem = [(l.split()[0], float(l.split()[1])) for l in read_text(PKG / "f4/step_n36_37/msolve_n37_i0.mem.log").splitlines() if l.strip()]
+    inc = [b[1] - a[1] for a, b in zip(mem, mem[1:])]
+    last5 = sorted(inc[-5:])[2]
+    detail["final2.mem_log"] = {"samples": len(mem), "max_GiB": max(v for _, v in mem), "median_rate_last5_GiB_per_min": last5,
+                                "mean_rate_whole_run_GiB_per_min": (mem[-1][1] - mem[0][1]) / (len(mem) - 1)}
+    H("pq2_readme.step_mem_rate_GiB_per_min", float(m2[1]) if (m2 := re.search(r"memory grew about ([\d.]+) GiB per minute", t)) else None,
+      round(last5, 1), compared_at="1 decimal",
+      note=f"median per-minute growth over the last five minutes of msolve_n37_i0.mem.log ({last5:.2f} GiB/min); over the whole "
+           f"60-minute run the mean is {detail['final2.mem_log']['mean_rate_whole_run_GiB_per_min']:.2f} GiB/min with long plateaus, "
+           "so the README's rate describes the final phase only")
+    mavg = re.search(r"\(([\d.]+) GiB per minute averaged over the hour\)", t)
+    if mavg or "over the last five minutes" in t:
+        H("pq2_readme.step_mem_rate_is_last_five_minutes", 1, int("about 1.2 GiB per minute over the last five minutes" in t))
+        H("pq2_readme.step_mem_mean_rate_GiB_per_min", float(mavg[1]) if mavg else None,
+          round(detail["final2.mem_log"]["mean_rate_whole_run_GiB_per_min"], 2), compared_at="2 decimals")
+    H("pq2_readme.step_mem_passed_GiB", text_num(t, r"and passed (\d+) GiB on a \d+ GiB machine"), int(max(v for _, v in mem)))
+    memtotal = int(re.search(r"MemTotal:\s+(\d+) kB", Path("/proc/meminfo").read_text())[1]) / 1024 / 1024
+    H("pq2_readme.step_machine_GiB", text_num(t, r"passed \d+ GiB on a (\d+) GiB machine"), int(memtotal),
+      note="MemTotal of this VM, the same boot in which the n = 37 runs were killed (environment, not a repository artifact)")
+    kept = [f"f4/step_n36_37/{f}" for f in ("msolve_n37_i0.timeout_3600s.log", "msolve_n37_i0.killed_t3.json", "msolve_n37_i0.killed_t3.log")]
+    H("pq2_readme.step_earlier_attempts_kept", 3 if "*.timeout_3600s.log" in t and "*.killed_t3.*" in t else None,
+      sum(subprocess.run(["git", "-C", str(REPO), "cat-file", "-e", f"{COMMIT}:{rel(PKG / f)}"]).returncode == 0 for f in kept))
+    # ---- corpus fragment: MEAS-PQ2-MSOLVE-F4, R5-002 (3 copies), R5-004, THM-F4-CONTAINMENT ids ------
+    def objs(path):
+        flat = {}
+
+        def w(o):
+            if isinstance(o, dict):
+                if isinstance(o.get("id"), str):
+                    flat[o["id"]] = o
+                for v in o.values():
+                    w(v)
+            elif isinstance(o, list):
+                for v in o:
+                    w(v)
+        w(json.loads(read_text(path)))
+        return flat
+    r5 = objs(REPO / "docs/ecdlp-hardness-corpus/lean-round5-20261107.json")
+    ms = " ".join(r5.get("MEAS-PQ2-MSOLVE-F4", {}).get("statement", "").split())
+    H("corpus.MEAS-PQ2-MSOLVE-F4.n36_degree", 4 if "On one fresh instance at n = 36 msolve's degree is also 4" in ms else None, s36["max_step_degree"])
+    H("corpus.MEAS-PQ2-MSOLVE-F4.n37_not_finished", 1 if "a fresh n = 37 instance did not finish within 15 GB of memory" in ms else None,
+      int(len(killed) == 2 and n_oom >= 2))
+    thm = r5.get("THM-F4-CONTAINMENT", {}).get("scope", "")
+    ids = re.findall(r"PCC-\d{8}-[0-9a-f]{6}", thm)
+    H("corpus.THM-F4-CONTAINMENT.pcc_ids_present", len(ids) if ids else None,
+      sum(subprocess.run(["git", "-C", str(REPO), "cat-file", "-e", f"{COMMIT}:pcc/claims/{i}.json"]).returncode == 0 for i in ids))
+    for doc in ("lean-round5", "WEAKNESSES.md", "weakness.json"):
+        txt = " ".join(r5.get("R5-002", {}).get("statement", "").split()) if doc == "lean-round5" else text[doc]
+        H(f"{doc}.R5-002.msolve_degree_4_n17_34", 4 if "Real F4 (msolve) degree is 4 on n = 17 to 34" in txt else None,
+          one(r["max_step_degree"] for r in band))
+        H(f"{doc}.R5-002.one_above_kw_3", 1 if "one above the Kousidis-Wiemers value 3" in txt else None,
+          one(r["max_step_degree"] for r in band) - 3)
+        H(f"{doc}.R5-002.kw_reports_5_from", text_num(txt, r"MEAS-GB-KW-TABLE1 reports 5 from n = (\d+)"), kwv[5])
+        H(f"{doc}.R5-002.equal_magma_value_where_reported", 4 if "equal to their Magma value for n <= 36" in txt else None, one(overlap))
+    r54 = " ".join(r5.get("R5-004", {}).get("statement", "").split())
+    mm = re.search(r"Reproduces the Magma value 4 with a second implementation on n = (\d+) to (\d+), below the n = (\d+) step to 5", r54)
+    claimed_ns = list(range(int(mm[1]), int(mm[2]) + 1)) if mm else []
+    with_magma = [n for n in claimed_ns if kwv[0] is not None and kwv[0] <= n <= kwv[1]]
+    H("corpus.R5-004.step_at", text_num(r54, r"below the n = (\d+) step to 5"), kwv[5])
+    mn = re.search(r"Agrees with the Magma value 4 where the ranges overlap \(n = (\d+), and the fresh n = (\d+) control\); "
+                   r"msolve gives (\d+) on n = (\d+) to (\d+)", r54)
+    if mn:
+        main_overlap = sorted({k[0] for k in A if kwv[0] is not None and kwv[0] <= k[0] <= kwv[3]})
+        H("corpus.R5-004.overlap_main_sweep_n", int(mn[1]), main_overlap[0] if len(main_overlap) == 1 else -1,
+          note=f"main-sweep msolve n inside Kousidis-Wiemers' degree-4 range n = {kwv[0]}..{kwv[3]}: {main_overlap}")
+        H("corpus.R5-004.control_n", int(mn[2]),
+          s36["n"] if s36["msolve_exit"] == 0 and kwv[0] <= s36["n"] <= kwv[3] else -1)
+        H("corpus.R5-004.agrees_with_magma_4", 4,
+          one([r["max_step_degree"] for k, r in A.items() if k[0] in main_overlap] + [s36["max_step_degree"]]))
+        H("corpus.R5-004.msolve_gives_4_n17_34", int(mn[3]), one(r["max_step_degree"] for r in band))
+        H("corpus.R5-004.range", int(mn[5]) - int(mn[4]) + 1, len({k[0] for k in A if 17 <= k[0] <= 34}))
+    if mm:
+      H("corpus.R5-004.n_values_reproduced", len(claimed_ns) if mm else None, len(with_magma),
+      note=(f"R5-004 says msolve reproduces the Magma value 4 on n = 17..34 ({len(claimed_ns)} values of n). The corpus record "
+            f"MEAS-GB-KW-TABLE1 has Magma data for m = 2 only on n = {kwv[0]}..{kwv[1]}, so the two overlap at n = {with_magma} "
+            "(3 main-sweep instances; the fresh n = 36 control is outside the stated range). On n = 17..33 there is no Magma value "
+            "to reproduce: msolve extends the value 4 there, it does not reproduce it. Supported wording: 'Agrees with the Magma "
+            "value 4 where the ranges overlap (n = 34, and the fresh n = 36 control); msolve gives 4 on n = 17 to 34, below the "
+            "n = 37 step to 5.'"))
+    lean = " ".join(read_text(REPO / "research/ecdlp_weakness_lean_20261104/README.md").split())
+    H("lean_readme.round5_new_ids_cited", 2 if "PCC-20261107-209a57" in lean and "PCC-20261107-91a01d" in lean else None,
+      sum(subprocess.run(["git", "-C", str(REPO), "cat-file", "-e", f"{COMMIT}:pcc/claims/{i}.json"]).returncode == 0
+          for i in ("PCC-20261107-209a57", "PCC-20261107-91a01d")))
+    H("lean_readme.old_ids_gone", 0, sum(lean.count(i) + text["lean-round5"].count(i) for i in ("PCC-20261105-0d2470", "PCC-20261105-96e86b")))
+
+
 def final_items(H, readme, L, est, detail):
     """Items for the text and artifacts at the final commit: the degree-4 sweeps to n = 27, the
     msolve F4 run (f4/), and every number in the changed documents."""
@@ -552,7 +770,7 @@ def main() -> int:
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument("--commit", default=COMMIT)
-    ap.add_argument("--claims", choices=["original", "corrected", "final"], default="original")
+    ap.add_argument("--claims", choices=["original", "corrected", "final", "final2"], default="original")
     ap.add_argument("--worktree", action="store_true")
     ap.add_argument("--out", default=str(HERE / "validator_report.json"))
     args = ap.parse_args()
@@ -839,11 +1057,25 @@ def main() -> int:
     detail["crosscheck_python_d4_low"] = {nm: d4[nm]["low"] for nm in d4}
     detail["crosscheck_k_from_dump_Z"] = kd
 
-    if args.claims in ("corrected", "final"):
+    if args.claims in ("corrected", "final", "final2"):
         corrected_items(H, readme, L, by_mono, by_own, est, open_keys, d3, d4, rust_cc, kd, names, both, detail,
-                        version=args.claims)
+                        version="final" if args.claims == "final2" else args.claims)
     if args.claims == "final":
         final_items(H, readme, L, est, detail)
+    if args.claims == "final2":
+        # sentences withdrawn after the final pass are not re-claimed; their absence is checked in final2_items
+        withdrawn = {"pq2_readme.direction_one_above_prediction", "pq2_readme.direction_no_growth_n17_34",
+                     "pq2_readme.direction_evidence_for_bounded_degree_premise", "census_readme.no_growth_n17_34",
+                     "report_typ.no_growth_n17_34", "triage.degree_stays_4_n17_34"}
+        for doc in ("lean-round5-20261107.json", "WEAKNESSES.md", "weakness.json"):
+            withdrawn |= {f"{doc}.R5-002.degree_one_above_KW", f"{doc}.R5-002.constant_n17_34",
+                          f"{doc}.R5-002.bounded_degree_premise_holds_on_range"}
+
+        def Hf(name, claimed, recomputed, **extra):
+            if name not in withdrawn:
+                H(name, claimed, recomputed, **extra)
+        final_items(Hf, readme, L, est, detail)
+        final2_items(H, readme, L, detail)
 
     # ---------------------------------------------------------------------------
     failed = [h for h in heads if h["claimed"] != h["recomputed"]]
