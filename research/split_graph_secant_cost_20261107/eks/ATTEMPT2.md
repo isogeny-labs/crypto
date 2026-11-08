@@ -66,3 +66,16 @@ Job `sgsecant-panel-20261108-a2` ended `DeadlineExceeded` (EKS audit log) about 
 - **Request:** `eks/r2img_request_attempt3.json`. It is the attempt-1 request with three changes: the job name, `seconds` 43200 (so a long queue cannot exhaust the deadline), and a provenance note. Everything else is checked identical with `jq -S`.
 - **Validation:** VALID.
 - **Kept:** attempts 1 and 2 are retained, per PROTOCOL.md's interruption rule.
+
+## Attempt 3 outcome: succeeded, collected from the audit log (recorded 2026-11-08 12:30Z)
+
+Job `sgsecant-panel-20261108-a3` (job uid `517e76f8…`) succeeded.
+
+- **Run:** pod `sgsecant-panel-20261108-a3-l9dtd` (uid `90583573…`) ran 10:46:31–10:51:26Z and exited 0 (reason `Completed`). Source: the EKS API-server audit log; the node's kubelet reported that exit.
+- **Lost pod object:** the Pod object was deleted at 11:00:43Z when its node was removed, so every later `command-status` answer has `pods: []`.
+- **Collect cards:**
+  - **A3-C01** was killed during its first status poll, when the executor's turn ended. It ran only the poll and wrote no receipt; it is kept as-is.
+  - **A3-C02** stopped at `verify` with exit 50 ("Job is not succeeded with exactly one pod and pod exit 0"), because `pods` was empty.
+  - **A3-V01** completed. It is an audit-collect card. Its `pod-from-audit` step (`cards/status_with_audit_pod.sh`) requires the status `succeeded` with `pods: []`. It then accepts exactly one pod created by the job-controller with an ownerReference to the job uid, and that pod's node-reported exit code. The unchanged `verify_results.sh` then passed: the binary hash line is present and `sha256sum -c` passes on 5 files.
+- **Recheck:** `sgsecant_recheck.py` recomputed 600 comparison rows, with 0 mismatches.
+- **Raw files:** recorded with `add-raw` and uploaded.
