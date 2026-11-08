@@ -179,9 +179,11 @@ Until those exist, the study stays a research record.
   later.
 - The 3 rho rows re-executed on `main` reproduce exactly.
 - Under Callgrind at the pilot size `p = 503`, the IC arm spends 18× rho's
-  instructions per counted gate, so the IC counts are not admitted as a
-  `bitop/v1` bound. That audit and its counting-off control are in
-  `AUDIT_IR.md`.
+  instructions per counted gate.
+- Most of that is the counting hooks themselves, which a counting-off control
+  measured at 55%. The control still leaves the IC arm at 8.1× rho, the
+  sieve at 9.3×, so the IC counts are **not admitted as a `bitop/v1`
+  bound**.
 
 ## Files and runtimes
 

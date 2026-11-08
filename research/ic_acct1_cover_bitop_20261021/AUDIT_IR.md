@@ -94,13 +94,38 @@ The IC arm's phases at `p = 503`:
 | verification | 6.79·10⁷ | 7.66·10⁶ | 112.7 | 65.3 |
 | transport | 2.39·10⁶ | 2.65·10⁵ | 110.8 | 65.2 |
 
-### Verdict: the IC arm is not admitted; the diagnostic is confounded by the counting itself
+### Control: the same run with the counting hooks idle
 
-- **Over the threshold.** The IC arm spends 18× rho's instructions per
-  counted gate at `p = 503` (175.8 against 9.77). This is far over the 2× the
-  `bitop_unit_20261016` panel admitted, so the IC counts are **not admitted
-  as a `bitop/v1` bound**.
-- **The likely cause is the instrument, not hidden work.**
+`--count 0` runs the identical route with `jv_bitops` disabled. Each hook
+then costs one relaxed load, and the phase dumps are kept. The gates are
+taken from the counted twin row (`--gates-from-reference 1`). The control
+verified on the challenge curve with the same legacy product count
+(5,906,575,690), so it ran the same route.
+
+| | counting on | counting off (control) | rho R3 p = 503 |
+|:--|--:|--:|--:|
+| Ir, charged phases | 1.486·10¹² | 6.649·10¹¹ | 6.915·10¹⁰ |
+| Ir / kbitop | 175.8 | **78.7** | **9.77** |
+| relations (sieve) Ir / kbitop | 212.0 | 91.0 | |
+| descent Ir / kbitop | 31.3 | 30.5 | |
+| walk, model, transport, verification Ir / kbitop | 109–113 | 41–44 | |
+| linear algebra Ir / kbitop | 4.2 | 1.6 | |
+
+- **What the hooks cost.** 8.21·10¹¹ Ir, 55% of the counted run's
+  instructions, about 32 Ir per hooked operation.
+- **What remains.** Without them, the IC arm still spends **8.1× rho's
+  instructions per counted gate** at `p = 503`.
+  - The sieve is at 91.0 Ir/kbitop, 9.3× rho: 28 Ir per counted operation
+    against rho's 5.3.
+  - The curve-arithmetic phases (walk, model, transport, verification) sit at
+    about 4× rho, though they run the same kind of `F_p` arithmetic.
+
+### Verdict: the IC arm is not admitted
+
+- **Over the threshold, as counted.** The IC arm spends 18× rho's
+  instructions per counted gate at `p = 503` (175.8 against 9.77). This is far
+  over the 2× the `bitop_unit_20261016` panel admitted.
+- **Part of it is the instrument.**
   - Every IC phase whose primitives are counted by a per-operation hook sits
     at 65–69 Ir per counted operation, whatever its code: walk, model,
     transport, verification, sieve and linear algebra.
@@ -109,8 +134,24 @@ The IC arm's phases at `p = 503`:
   - Rho, which counts natively and prices afterwards, sits at 5.3.
   - A constant cost per operation across unrelated code is the signature of
     the counting hooks' own instructions (the thread-local tally on every
-    `mm`, `am`, `sm` and `inv_mod`), not of work hidden in one phase.
-- **The control.** This needs the same run with the hooks idle. CONTROL_PENDING
-- **Rho passes.** Rho's ratio is what a native walk costs per counted gate,
-  and its counts reproduce. As a reference, it is admitted on this audit's
-  evidence.
+    `mm`, `am`, `sm` and `inv_mod`). The control measured them at 55% of the
+    counted run.
+- **The control removes the hooks' share and the gap stays.** With the hooks
+  idle (above), the IC arm is still 8.1× rho, over the 2× bar, so the IC
+  counts stay unadmitted on the audit's own terms.
+- **What the remaining gap might be.** Either:
+  - work the counters miss, most of it in the sieve (91 Ir/kbitop, 28 Ir per
+    counted operation); or
+  - instructions per primitive that the convention leaves out on purpose
+    (control, allocation, `%` reductions in generic code), which would also
+    explain the curve-arithmetic phases at 4× rho.
+
+  Telling them apart needs a symbolised profile. The release binary carries
+  no symbols, so Callgrind attributed every part to `clone`. A
+  `debug = "line-tables-only"` build and `callgrind_annotate` on the sieve's
+  parts would do it; that is not done here.
+- **Rho shows no sign of uncounted work.** It is the reference whose ratio
+  sets the bar: 9.8–12.2 Ir/kbitop at `p = 251` and `503`, about 5.3 Ir per
+  counted operation. The 3 committed rows re-executed reproduce exactly, but
+  45 of its 48 committed rows were not re-executed, so its admission rests
+  on that sample.

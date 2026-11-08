@@ -2,7 +2,7 @@
 #set text(size: 10pt)
 #set par(justify: true)
 
-= `bitop/v1`: the unpriced counters decided, and the open `bitop/v2` choices measured
+= Two instruction audits, the unpriced `bitop/v1` counters decided, and the open `bitop/v2` choices measured
 
 2026-11-07 · branch `claude/bitop-audit-and-pricing` · class: *accounting*
 (no algorithm changed and no cost fell; not an improvement under the
@@ -10,6 +10,46 @@ success criterion). Rules: `docs/units/BITOPS.md`, "Extensions → 2026-11-07"
 and "bitop/v2 → Open definition choices". Companion instruction audits:
 `research/ic_acct1_cover_bitop_20261021/AUDIT_IR.md`,
 `research/ic_acct3_hec_ecbench_20261021/AUDIT_IR.md`.
+
+== Task A: instruction audits of two accounting studies
+
+*`ic_acct3` (hyperelliptic ecbench arms).*
+
+- *Method.* `ecbench audit-ir` on all 45 records of `sessions/g2-p41`, at the
+  study commit `8c37d9a6e7`. The `claude/ic-acct-3` head does not compile: a
+  union merge left an unclosed delimiter in `ecbench/workload.rs`.
+- *Reproduction.* All 45 reproduce their `bitop/v1` total, every phase's
+  primitive counts and the recovered scalar.
+- *Instructions per gate.* IC 1,259 Ir per kilo-gate, rho 1,313 (ratio
+  0.96). *Pass.*
+
+#figure(image("../ic_acct3_hec_ecbench_20261021/audit/figures/ir_per_gate.svg", width: 80%),
+  caption: [`ic_acct3`: Ir per 1000 counted gates, every committed run re-executed under Callgrind.])
+
+*`ic_acct1` (cover IC against strong rho, custom examples).*
+
+- *Hook.* The example gains Callgrind brackets: arm start and end, and every
+  phase change.
+- *Reproduction.*
+  - All 16 committed IC rows reproduce exactly at the study commit
+    `b4eb521af1`.
+  - On `main` the descent's field counts fall 9–20%: the code changed after
+    the study.
+  - 3 of 48 rho rows were re-executed on `main`; all reproduce.
+- *Instructions per gate.* The committed rows are out of Callgrind's reach
+  here (5·10#super[12] to 2·10#super[14] gates), so the protocol's pilot size
+  `p = 503` was audited.
+  - IC: 175.8 Ir per kilo-gate. Rho: 9.77.
+  - A counting-off control shows that the per-operation hooks cause 55% of
+    the IC instructions.
+  - Without them, IC is still *8.1×* rho, and the sieve 9.3×.
+
+  *Fail:* the IC counts are not admitted as a `bitop/v1` bound until a
+  symbolised profile settles whether the gap is uncounted sieve work or
+  convention-excluded control.
+
+#figure(image("../ic_acct1_cover_bitop_20261021/audit/figures/ir_per_gate.svg", width: 90%),
+  caption: [`ic_acct1` at `p = 503`: Ir per 1000 counted gates by phase, counting on and off, against rho R3 at `p = 503` and `251` and twice those levels.])
 
 == Task B: each counter left unpriced on purpose
 
@@ -28,7 +68,7 @@ Each decision reads what the code executes per increment.
   sees.
 - *Kept unpriced, with reasons:*
   - $F_(p^4)$ square roots: a randomised Tonelli–Shanks.
-  - SAT conflicts: no constant per conflict; see Figure 2.
+  - SAT conflicts: no constant per conflict; see the SAT figure below.
   - The d4 and PKM "multiplication" units: modelled or mixed counts, not
     products executed.
   - The CM-folded backend's gap: `power` calls, string signatures and pivots

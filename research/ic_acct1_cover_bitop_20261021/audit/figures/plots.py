@@ -34,7 +34,7 @@ order = ["relations", "descent", "linear_algebra", "walk", "model", "factor_base
 by = {ph["phase"]: ph for ph in ic["callgrind"]["phases"]}
 cby = {ph["phase"]: ph for ph in ctrl["callgrind"]["phases"]} if ctrl else {}
 
-fig, ax = plt.subplots(figsize=(7.4, 3.6))
+fig, ax = plt.subplots(figsize=(7.4, 4.3))
 x = range(len(order))
 w = 0.38 if ctrl else 0.6
 ax.bar([i - (w / 2 if ctrl else 0) for i in x], [by[p]["ir_per_kilo_bitop"] for p in order], w,
@@ -51,7 +51,7 @@ ax.set_yscale("log")
 ax.set_ylabel("Callgrind Ir per 1000 bitop/v1 gates")
 ax.set_title("ic_acct1 instruction audit at the pilot size (code: main + this branch).\n"
              "Thin orange lines: 2x rho, the admission threshold", fontsize=8.5)
-ax.legend(frameon=False, fontsize=7, loc="upper right")
+ax.legend(frameon=False, fontsize=7, loc="upper center", bbox_to_anchor=(0.5, -0.22), ncol=2)
 fig.tight_layout()
 fig.savefig(HERE / "ir_per_gate.svg")
 fig.savefig(HERE / "ir_per_gate.png", dpi=150)

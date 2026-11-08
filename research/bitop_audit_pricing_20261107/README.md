@@ -13,9 +13,17 @@ Neither part is an improvement under AGENTS.md's success criterion. Rules:
 - [`sat_per_conflict`](figures/sat_per_conflict.svg): why conflicts stay unpriced;
 - [`v2_choices`](figures/v2_choices.svg): the eight v2 choices on the hold-out.
 
-The companion instruction audits are in
-`research/ic_acct1_cover_bitop_20261021/AUDIT_IR.md` and
-`research/ic_acct3_hec_ecbench_20261021/AUDIT_IR.md`.
+The instruction audits (Task A) are written up in each audited study, and
+summarised in the report:
+
+- `research/ic_acct3_hec_ecbench_20261021/AUDIT_IR.md`: **pass**. 45/45
+  records reproduce exactly; Ir per kilo-gate is 1,259 for IC and 1,313 for
+  rho.
+- `research/ic_acct1_cover_bitop_20261021/AUDIT_IR.md`: the IC arm is **not
+  admitted**.
+  - Its 16/16 IC rows reproduce at the study commit, not at `main`.
+  - At `p = 503` it runs 18× rho's Ir per gate, and 8.1× with the counting
+    hooks idle.
 
 ## Task B: each unpriced counter, decided
 
