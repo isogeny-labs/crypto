@@ -28,7 +28,7 @@ s3://isolab-results-104186811093-us-east-2/runs/<job>/<pod-uid>/ (wrapper upload
    session log; PR.
 
 ## Runs in flight
-(filled at launch)
+None. The C = 1 boundary study (screen and confirmation) finished; results are in PR #3660 (research/curve25519_autolab_20261104/c1).
 
 ## Stop and success conditions
 One attempt, no retries; stop at exit, OOM or 6 h. Budget ceiling USD 5 (monthly account
