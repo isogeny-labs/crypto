@@ -1,0 +1,67 @@
+{
+  "scope": "Exact word projector, all-mode phase and bounded public recovery; deterministic software checks",
+  "build_exit": 0,
+  "check_exit": 0,
+  "limits_seconds": {
+    "compile": 90,
+    "check": 60
+  },
+  "commands": [
+    "timeout 90 rustc --edition=2021 -O -C overflow-checks=yes --emit=link,dep-info research/primefield-companion-followup-20261102/feature-orbit-word-projector/driver.rs -o /tmp/t1940-v2-check",
+    "timeout 60 /tmp/t1940-v2-check"
+  ],
+  "binary_sha256": "f47f37bbc0c252bc3555e1ac667820aabe3d7eeac0e2c12f6be6da3b2bd0573e",
+  "dependencies": {
+    "research/primefield-companion-followup-20261102/feature-orbit-word-projector/driver.rs": "ee1dc1accfaee89d17bf51f5aec100d885dcad2c3845f7216ec96bab1855784a",
+    "research/primefield-companion-followup-20261102/feature-orbit-word-projector/lib.rs": "df63248d97ead5f354ca00388c79dd146974db21a785d60ab0239ca4ab9342de",
+    "research/primefield-companion-followup-20261102/feature-orbit-word-projector/geometry.rs": "7e1c1aeebe7fc345f7835c8d33e7f1c7af7ada3c03393e74ee9c0f3e1de5c892",
+    "research/primefield-companion-followup-20261102/feature-orbit-word-projector/division.rs": "0b54ddf8e873541df619c618dca45a72a70c02eb3196d7aa715cdc6b5c9cbafc",
+    "research/primefield-companion-followup-20261102/feature-orbit-word-projector/polynomial.rs": "6b3f25f44847c0e9e690fa9db389bbc11b35450f5cbc7fec26ac6595eddff626",
+    "research/primefield-companion-followup-20261102/feature-orbit-local-terms/local.rs": "5408f64b5e60f8f0619376d7335c2703df74857cb86ca535cec6e613aaf4e5a2",
+    "research/primefield-companion-followup-20261102/feature-orbit-word-projector/schedule.rs": "61623bbd89ebb71aed41b76d55a6c865f4ccc7cee110f4ceb6d4a2b4335b3706",
+    "research/primefield-companion-followup-20261102/feature-orbit-word-projector/allocation.rs": "5d13867149ba35212e7f8d32d2162074508a5e7b6145478df227c2cbee560e4b",
+    "research/primefield-companion-followup-20261102/feature-orbit-word-projector/class-source.rs": "93f7af6d4bbe2ca7429fa9c68b4c657dedbb7d1321afb7ea647fcda3e2273d91",
+    "research/primefield-companion-followup-20261102/feature-orbit-word-projector/circuit.rs": "199f3c739c8e278668188188f926c165cc0959487498ed48c16f48fa9d5d4941",
+    "research/primefield-companion-followup-20261102/feature-orbit-word-projector/transcript.rs": "99cb717ed230e68a30dd2525cdd245bdda900d2f4e8ac09438e011f093b5cf11",
+    "research/primefield-companion-followup-20261102/feature-orbit-word-projector/projector.rs": "6bde1ade9d7483426864123d46564ba54708d268e707d0695a76c5149b27f7a8",
+    "research/primefield-companion-followup-20261102/feature-orbit-word-projector/word.rs": "e54bc6b863402524c781c5f51c03c6aae992a1561068c7326cc2bd195518afbe",
+    "research/primefield-companion-followup-20261102/feature-orbit-word-projector/checks.rs": "aeb51d3da1e016c64889f2ec8fe9b0bbdaf6048d0e91f52e3b1eb9b5c014d0c2"
+  },
+  "copied_sources": {
+    "lib.rs": "df63248d97ead5f354ca00388c79dd146974db21a785d60ab0239ca4ab9342de",
+    "geometry.rs": "7e1c1aeebe7fc345f7835c8d33e7f1c7af7ada3c03393e74ee9c0f3e1de5c892",
+    "division.rs": "0b54ddf8e873541df619c618dca45a72a70c02eb3196d7aa715cdc6b5c9cbafc",
+    "polynomial.rs": "6b3f25f44847c0e9e690fa9db389bbc11b35450f5cbc7fec26ac6595eddff626",
+    "schedule.rs": "61623bbd89ebb71aed41b76d55a6c865f4ccc7cee110f4ceb6d4a2b4335b3706",
+    "allocation.rs": "5d13867149ba35212e7f8d32d2162074508a5e7b6145478df227c2cbee560e4b",
+    "class-source.rs": "93f7af6d4bbe2ca7429fa9c68b4c657dedbb7d1321afb7ea647fcda3e2273d91",
+    "circuit.rs": "199f3c739c8e278668188188f926c165cc0959487498ed48c16f48fa9d5d4941",
+    "transcript.rs": "99cb717ed230e68a30dd2525cdd245bdda900d2f4e8ac09438e011f093b5cf11",
+    "projector.rs": "6bde1ade9d7483426864123d46564ba54708d268e707d0695a76c5149b27f7a8"
+  },
+  "logs": {
+    "check.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build.stderr": "0761c6d4f0801454dcc5af678451c8db6e9e058dce14bc575c847a987492a5cc",
+    "build.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "check.stdout": "574dc6006073298bd16caf4767416a4f2ed85ac79e7a91ca77d010ff58359412"
+  },
+  "source_snapshot": null,
+  "small_caps": {
+    "nodes": 100000,
+    "terms": 128,
+    "stored": 500000,
+    "pairs": 2000000
+  },
+  "large_caps": {
+    "nodes": 100000,
+    "terms": 64,
+    "stored": 100000,
+    "pairs": 2000000
+  },
+  "public_queries": {
+    "nominal": 332,
+    "guards": 27,
+    "total_excluding_setup": 359
+  },
+  "original_cohort_modified": false
+}
