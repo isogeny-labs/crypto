@@ -1,0 +1,25 @@
+{
+ "created_at": "2026-11-08T01:10:38Z",
+ "id": "PCC-20261108-52501f",
+ "kind": "measurement",
+ "producer": {
+  "commit": "c486f6e2f34da1bf2687b7a6057027a8cd67331b",
+  "model": "",
+  "session": "https://claude.ai/code/session_01AXUKfUpk9rEJg4Yyo1QcZQ"
+ },
+ "proofs": [
+  {
+   "kind": "recompute",
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/validator_report.json",
+   "sha256": "dc4af72f9bf143ce2f6bf90e69cf86fa6c8c4fcc1769da1f7f87356ff4c06bd3"
+  },
+  {
+   "kind": "replay",
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/validation/replay_certificate.json",
+   "sha256": "e1ea3904a7c62c90097cac80e1e6092c663eabe27b5ed89ecb5f220bfe722b55"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/ecdlp_weakness_census_20261104/pq2_rank; finite ranges as stated; m = 2 only; F4 containment is a separate Lean claim and is not covered here",
+ "statement": "m = 2 Weil-descended S3 over F_{2^n} (pq2_rank): the iterated degree-3 closure reaches all k linear consequences for every n <= 14 and n = 16 and only 1 of them at n = 15 and on all 84 instances with 17 <= n <= 44, so the solving degree exceeds the first fall degree 2 on the 111 instances with n <= 44 (as an F4 bound under the containment property); the degree-4 closure reaches k on 33 of 33 fresh instances at n = 17..27; msolve F4 has maximal step degree 4 on all 54 main-sweep instances at n = 17..34 and on one fresh instance at n = 36 (n = 37 not finished); this window does not decide whether the degree stays bounded (Kousidis-Wiemers report 5 from n = 37)."
+}
