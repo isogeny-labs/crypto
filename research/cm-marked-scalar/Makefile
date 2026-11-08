@@ -47,3 +47,8 @@ $(BUILD_DIR)/construct: construct.cpp native.cpp json.hpp relation_verify.hpp or
 	$(CXX) $(CXXFLAGS) construct.cpp -o $@ $(LDLIBS)
 construct-binary: $(BUILD_DIR)/construct
 .PHONY: construct-binary
+$(BUILD_DIR)/qualification-tests: qualification_tests.cpp native.cpp relation_verify.hpp orbit_verify.hpp json.hpp
+	mkdir -p $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) qualification_tests.cpp -o $@ $(LDLIBS)
+qualification-tests-binary: $(BUILD_DIR)/qualification-tests
+.PHONY: qualification-tests-binary

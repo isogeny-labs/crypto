@@ -71,6 +71,24 @@ static Json orbit_fixtures(Parameters& p,const Big& mu,unsigned order){
  }return result;
 }
 int main(int argc,char**argv){try{
+ if(argc==5&&std::string(argv[1])=="--bundle"){
+  std::filesystem::path original(argv[2]),constructed(argv[3]),out(argv[4]);require(!std::filesystem::exists(out),"write-once bundle");
+  Json curves,marked;curves.kind=marked.kind=Json::Array;
+  for(auto name:{"p192","p224","p256"}){curves.array.push_back(read_json((constructed/name/"curve.json").string()));marked.array.push_back(read_json((constructed/name/"marked.json").string()));}
+  auto original_curves=read_json((original/"published-curves.json").string()),original_marked=read_json((original/"marked-relations.json").string());
+  for(auto& c:original_curves.at("rows").array)curves.array.push_back(c);
+  for(auto& m:original_marked.at("rows").array)marked.array.push_back(m);
+  std::filesystem::create_directories(out);
+  for(auto item:std::vector<std::pair<std::string,Json>>{{"published-curves.json",object({{"rows",curves}})},{"marked-relations.json",object({{"rows",marked}})}}){std::ofstream f(out/item.first);f<<canonical_json(item.second)<<'\n';require(bool(f),"bundle output");}
+  for(auto pair:std::vector<std::pair<std::string,std::string>>{{"p192","p-192-closure.json"},{"p224","p-224-closure.json"},{"p256","p-256-closure.json"}})std::filesystem::copy_file(constructed/pair.first/"closure.json",out/pair.second);
+  for(auto file:{"p-384-closure.json","p-521-closure.json"})std::filesystem::copy_file(original/file,out/file);
+  std::cout<<"{\"bundle_curves\":5,\"exact_numeric_tokens_preserved\":true,\"timing_performed\":false}\n";return 0;
+ }
+ if(argc==3&&std::string(argv[1])=="--describe"){
+  for(auto& fixture:fixtures(argv[2])){auto& m=fixture.marked;Big norm(m.at("norm").str()),residual(m.at("residual_degree").str()),mu(m.at("mu").str()),n(fixture.curve.at("n").str());
+   std::cout<<"{\"curve\":"<<json_quote(fixture.name)<<",\"degree\":"<<m.at("degree").integer()<<",\"root\":"<<m.at("orientation_root").integer()<<",\"marked_order\":"<<m.at("s").integer()<<",\"signed_orbit_size\":"<<2*m.at("s").integer()<<",\"mu\":"<<json_quote(mu.str())<<",\"centered_mu\":"<<json_quote(centered(mu,n).str())<<",\"norm_bits\":"<<BN_num_bits(norm.p)<<",\"residual_degree_bits\":"<<BN_num_bits(residual.p)<<",\"timing_performed\":false}\n";
+  }return 0;
+ }
  if(argc==4&&std::string(argv[1])=="--compare"){
   auto generated=read_json(argv[2]),saved=read_json(argv[3]);
   for(auto key:{"p","n","trace"})require(Big(generated.at(key).str())==Big(saved.at(key).str()),"positive control parameter");

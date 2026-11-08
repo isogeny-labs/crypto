@@ -1,6 +1,8 @@
 static void verify_orbits(Runtime& r) {
+ require(r.f.marked.at("orbit_checks").array.size()==3,"complete orbit fixture panel");std::set<int> inputs;
  for(const auto& fixture:r.f.marked.at("orbit_checks").array){
   long k=fixture.at("k").integer();Big input_scalar(k);
+  require((k==0||k==1||k==17)&&inputs.insert(int(k)).second,"orbit fixture identity");
   auto P=point(r.group),current=point(r.group),representative=point(r.group);
   require(EC_POINT_mul(r.group,P.get(),input_scalar.p,nullptr,nullptr,r.field.ctx),"orbit input");
   require(EC_POINT_copy(current.get(),P.get()),"orbit initial point");
