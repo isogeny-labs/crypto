@@ -5,11 +5,11 @@
 #show figure: set block(breakable: true)
 = The F \= 1 target-in-walk arm at k \= 28 and 32, single-target ecbench (2026-11-08)
 <the-f-1-target-in-walk-arm-at-k-28-and-32-single-target-ecbench-2026-11-08>
-#strong[Class.] Measured, single-target ecbench sessions under a protocol frozen before data (#link("PROTOCOL.md"); hashes in `data/frozen.sha256`, freeze commit `e6a759cc72`). Counted units only (ecbench GAE, S \= cost/sqrt(r)); every comparison at w \= 0, 0.1 and 1 under the committed band and under `ecbench band --price-table-work`. Public synthetic Curve25519-family miniatures; no security claim. No pcc claim has been filed; every number is an unverified assertion until it is reviewed \[pcc:unverified\]. No code change; binary `/home/user/ctarget-f1/release/ecbench` (SHA-256 `d23fab99...`, `data/binary-k{28,32}.sha256`).
+#strong[Class.] Measured, single-target ecbench sessions under a protocol frozen before data (#link("PROTOCOL.md"); hashes in `data/frozen.sha256`, freeze commit `e6a759cc72`). Counted units only (ecbench GAE, S \= cost/sqrt(r)); every comparison at w \= 0, 0.1 and 1 under both band readings: the pre-2026-11-08 reading (table inserts unpriced; this README’s earlier "committed band") and the priced reading (`ecbench band --price-table-work`, the default since the owner ruling of 2026-11-08, landing in PR \#3726). Public synthetic Curve25519-family miniatures; no security claim. No pcc claim has been filed; every number is an unverified assertion until it is reviewed \[pcc:unverified\]. No code change; binary `/home/user/ctarget-f1/release/ecbench` (SHA-256 `d23fab99...`, `data/binary-k{28,32}.sha256`).
 
 #strong[Question.] The target-in-walk arm had been measured at k \= 20 and 24 only. Does its distance to rho-neg hold near 1.4x at k \= 28 and 32, where rho-neg’s set-up overhead vanishes and both arms sit near their walk floors, and do 32 or 64 jumps pay there, where the set-up they cost is 0.01 sqrt(r) or less?
 
-#strong[Answer.] The distance holds. The 16-jump arm costs 1.395x \[1.345, 1.446\] rho-neg at k \= 28 and 1.366x \[1.267, 1.473\] at k \= 32 at w \= 0, and its lower end stays above 1 at every weight once table inserts are priced like rho’s canonicalisations \[pcc:unverified\]. Against the table-then-probe F \= 1 arm it costs 0.906x \[0.877, 0.935\] and 0.857x \[0.811, 0.905\] \[pcc:unverified\]. Its mean S at k \= 32 is 1.387 with a walk of 1.368 sqrt(r), 3 % above the second-collision floor of 1.329; rho-neg’s search is 0.999 sqrt(r) there, 13 % above its first-collision floor of 0.886, which is why the measured ratio is 1.37x and not the model’s 1.5x \[pcc:unverified\]. More jumps do not pay: 32 jumps give 0.997x \[0.954, 1.041\] at k \= 28 and 0.985x \[0.930, 1.044\] at k \= 32, 64 jumps 0.998x and 0.990x, all intervals containing 1 \[pcc:unverified\]. Five of seven frozen predictions held; the only failures are the risky P4b (32 jumps strictly below 16 at k \= 32) and nothing else \[pcc:unverified\].
+#strong[Answer.] The distance holds. The 16-jump arm costs 1.395x \[1.345, 1.446\] rho-neg at k \= 28 and 1.366x \[1.267, 1.473\] at k \= 32 at w \= 0, and its lower end stays above 1 at every weight under the priced reading (table inserts priced like rho’s canonicalisations); under the pre-2026-11-08 reading the verdict against rho-neg is unresolved in all 16 sessions and the order flips at w \= 1 \[pcc:unverified\]. Against the table-then-probe F \= 1 arm it costs 0.906x \[0.877, 0.935\] and 0.857x \[0.811, 0.905\] \[pcc:unverified\]. Its mean S at k \= 32 is 1.387 with a walk of 1.368 sqrt(r), 3 % above the second-collision floor of 1.329; rho-neg’s search is 0.999 sqrt(r) there, 13 % above its first-collision floor of 0.886, which is why the measured ratio is 1.37x (frozen model 1.38x at k \= 28, 1.375x at k \= 32; data within 1.1 %) and not the floor ratio 1.5 \[pcc:unverified\]. More jumps do not pay: 32 jumps give 0.997x \[0.954, 1.041\] at k \= 28 and 0.985x \[0.930, 1.044\] at k \= 32, 64 jumps 0.998x and 0.990x, all intervals containing 1 \[pcc:unverified\]. Six of seven frozen predictions held; the only failure is the risky P4b (32 jumps strictly below 16 at k \= 32) \[pcc:unverified\]. "Rho-neg is ahead at every weight" holds under the priced reading only \[pcc:unverified\].
 
 #figure([#image("figures/scaling.png", width: 100%)],
   caption: [
@@ -25,13 +25,13 @@
 <results-measured>
 All 16 sessions completed with 325 of 325 records verified each; every audit reproduced its replay with 0 problems (`data/verify-k*-s*.txt`) \[pcc:unverified\]. Pooled figures use the 2,560 measured records per size (`data/pooled_measured.json`).
 
-Mean S per arm (committed band; then with table inserts also priced at w):
+Mean S per arm (pre-2026-11-08 reading, inserts unpriced; the last two columns price the table inserts at w):
 
 #align(center)[#table(
   columns: 7,
   align: (col, row) => (right,left,right,right,right,right,right,).at(col),
   inset: 6pt,
-  [k], [arm], [S w\=0], [S w\=0.1], [S w\=1], [w\=0.1, inserts priced], [w\=1, inserts priced],
+  [k], [arm], [S w\=0], [S w\=0.1 (unpriced)], [S w\=1 (unpriced)], [w\=0.1, inserts priced], [w\=1, inserts priced],
   [28],
   [rho-neg],
   [1.029],
@@ -111,7 +111,7 @@ Pooled ratios with 95 % intervals over 8 single-target sessions:
   columns: 5,
   align: (col, row) => (right,left,left,left,left,).at(col),
   inset: 6pt,
-  [k], [ratio], [w \= 0], [w \= 0.1 (committed / inserts priced)], [w \= 1 (committed / inserts priced)],
+  [k], [ratio], [w \= 0], [w \= 0.1 (pre-2026-11-08 / inserts priced)], [w \= 1 (pre-2026-11-08 / inserts priced)],
   [28],
   [twcj-j16 / rho-neg],
   [#strong[1.395] \[1.345, 1.446\]],
@@ -165,7 +165,7 @@ Pooled ratios with 95 % intervals over 8 single-target sessions:
 )
 ]
 
-\* The committed band prices rho-neg’s per-step canonicalisation and not the walk arms’ per-step table inserts; ecbench’s committed band verdict for rho-neg against every walk arm is "unresolved inside the band" in all 16 sessions (`data/band-k*.txt`), so no rank is admitted under that reading \[pcc:unverified\]. Under `--price-table-work` (`data/band-tw-k*.txt`) rho-neg is ahead of every arm at every weight \[pcc:unverified\].
+\* The pre-2026-11-08 reading prices rho-neg’s per-step canonicalisation and not the walk arms’ per-step table inserts. Its ecbench verdict (`data/band-k*.txt`) for rho-neg against twcj-j16, j32 and j64 is "unresolved inside the band" in all 16 sessions each, so no rank is admitted against the twcj arms under that reading; against f1-x07 it is "rho-neg \< f1-x07" in 15 of 16 sessions and unresolved in 1 (the f1-x07 inserts are priced at w \= 1 through the probe lookups, so its asymmetry is smaller) \[pcc:unverified\]. Under the priced reading (`--price-table-work`, `data/band-tw-k*.txt`) rho-neg is ahead of every arm at every weight in 16 of 16 sessions \[pcc:unverified\]. That statement holds under the priced reading only \[pcc:unverified\].
 
 === Phases and walk diagnostics (mean over 512 measured runs per arm, units of sqrt(r))
 <phases-and-walk-diagnostics-mean-over-512-measured-runs-per-arm-units-of-sqrtr>
@@ -287,7 +287,7 @@ Pooled ratios with 95 % intervals over 8 single-target sessions:
 )
 ]
 
-Every twcj record at every jump count solved at rank 2 with zero probe hits on the first trial (3,072 of 3,072) \[pcc:unverified\]. The set-up matches the frozen model (186 against 180 GAE at k \= 28 for 16 jumps; 3.5 to 3.8 GAE per extra jump) \[pcc:unverified\].
+Every twcj record at every jump count solved at rank 2 with zero probe hits on the first trial (3,072 of 3,072) \[pcc:unverified\]. The set-up is above the frozen model (`data/model.json`): 178.0 GAE at k \= 28 and 203.0 at k \= 32 for 16 jumps against measured 185.8 and 212.5 (+4.4 %, +4.7 %); the measured set-up cost per extra jump is 4.31 GAE at k \= 28 (16 to 32 and 32 to 64 jumps) and 4.82 / 4.79 GAE at k \= 32, against 4.5 and 5.0 in the model (the 3.5 to 3.8 GAE of the k \= 20 / 24 study does not carry over, and PROTOCOL.md’s "about 3.8 GAE per jump" disagrees with its own model.json) \[pcc:unverified\].
 
 == 3. Predictions (PROTOCOL.md section 5)
 <predictions-protocol.md-section-5>
@@ -330,7 +330,7 @@ Every twcj record at every jump count solved at rank 2 with zero probe hits on t
 == 4. Reading
 <reading>
 - #strong[The distance to rho is flat in k.] With the sibling studies’ k \= 20 and 24 points (1.358 and 1.343 on the same arm, `research/curve25519_tw_jumps_20261108`), the 16-jump arm is 1.34x to 1.40x rho-neg at w \= 0 from k \= 20 to 32, and the table-then-probe arm 1.54x to 1.60x \[pcc:unverified\]. Neither moves toward parity with size.
-- #strong[Why 1.37x and not 1.5x.] The derived F \= 1 floor ratio 1.5 \= 1.329 / 0.886 compares the two walks’ model floors. Measured, the twcj walk runs 3 % above 1.329 at every size, while rho-neg’s search runs 9 % to 13 % above 0.886 (0.964 and 0.999 sqrt(r) at k \= 28, 32; its look-ahead and cycle escapes are counted) \[pcc:unverified\]. The ratio of the measured walks is 1.37 to 1.42, and the remaining set-up and verification (0.03 to 0.07 sqrt(r) at these sizes) add little. A better rho-neg walk (closer to its own floor) would widen the gap; nothing here changes the reference.
+- #strong[Why 1.37x and not 1.5x.] The derived F \= 1 floor ratio 1.5 \= 1.329 / 0.886 compares the two walks’ model floors; it is not the frozen model, which predicted 1.38 (k \= 28) and 1.375 (k \= 32) for twcj-j16 / rho-neg, and the data (1.395, 1.366) agree with it within 1.1 % \[pcc:unverified\]. Measured, the twcj walk runs 3 % above 1.329 at every size, while rho-neg’s search runs 9 % to 13 % above 0.886 (0.964 and 0.999 sqrt(r) at k \= 28, 32; its look-ahead and cycle escapes are counted) \[pcc:unverified\]. The ratio of the measured walks is 1.37 to 1.42, and the remaining set-up and verification (0.03 to 0.07 sqrt(r) at these sizes) add little. A better rho-neg walk (closer to its own floor) would widen the gap; nothing here changes the reference.
 - #strong[Jumps.] The walk shortens with more jumps (1.367 to 1.344 to 1.343 sqrt(r) at k \= 32), by about the amount the 20- and 24-bit study saw, but the gain of 0.02 sqrt(r) is inside the session noise (interval half-width 0.05) and is not established \[pcc:unverified\]. Sixteen jumps remains the default; 32 is not worse at k \>\= 28.
 
 == 5. Distance to matched rho (rho-neg, same sessions)
@@ -339,7 +339,7 @@ Every twcj record at every jump count solved at rank 2 with zero probe hits on t
   columns: 5,
   align: (col, row) => (right,left,right,left,left,).at(col),
   inset: 6pt,
-  [k], [arm], [w \= 0], [w \= 0.1 (committed / inserts priced)], [w \= 1 (committed / inserts priced)],
+  [k], [arm], [w \= 0], [w \= 0.1 (pre-2026-11-08 / inserts priced)], [w \= 1 (pre-2026-11-08 / inserts priced)],
   [28],
   [twcj-j16],
   [1.40x \[1.35, 1.45\]],
@@ -368,9 +368,61 @@ Every twcj record at every jump count solved at rank 2 with zero probe hits on t
 )
 ]
 
+=== Unpriced counters per arm (AGENTS.md section 5a listing)
+<unpriced-counters-per-arm-agents.md-section-5a-listing>
+Mean per measured run, in units of sqrt(r), k \= 28 / k \= 32 (validator’s recomputation from the records) \[pcc:unverified\]. U is the sum of the counters in `cost.unpriced`; the last column is `work_native.table_insert_attempts`, counted but priced only by the priced reading.
+
+#align(center)[#table(
+  columns: 4,
+  align: (col, row) => (left,left,left,left,).at(col),
+  inset: 6pt,
+  [arm], [U (cost.unpriced)], [components], [table inserts (counted, priced only in the priced reading)],
+  [rho-neg],
+  [0.964 / 0.999],
+  [`canonicalisations_uncharged` only],
+  [none],
+  [f1-x07],
+  [0.547 / 0.582],
+  [`lookups_uncharged` 0.545 / 0.582, row\_ops and legendre\_symbols about 0.001],
+  [0.969 / 1.017],
+  [twcj-j16],
+  [0.003 / 0.001],
+  [row\_ops, legendre\_symbols],
+  [1.367 / 1.368],
+  [twcj-j32],
+  [0.003 / 0.001],
+  [row\_ops, legendre\_symbols],
+  [1.351 / 1.344],
+  [twcj-j64],
+  [0.003 / 0.001],
+  [row\_ops, legendre\_symbols],
+  [1.329 / 1.343],
+)
+]
+
+Each is priced at 0, 0.1 and 1 GAE per operation in the band files, and two arms are ranked only where the order holds across that band \[pcc:unverified\].
+
 == 6. Scope and limits
 <scope-and-limits>
-As in the sibling studies: the F \= 1 target-in-walk arm is one unknown away from rho (P1 :\= G makes it a rho walk with a stored table), does no decomposition work, is not decomposition-based index calculus, and proposes no leaderboard or `benchmarks/README.md` row; no VALIDATION.json, replay certificate or validator report exists \[pcc:unverified\]. Single target only. Local L0 counted units, deterministic and replayed; no wall-clock claim. No A/A arm (it would replicate rho-neg exactly). research-kb and ecdb were not reachable; no novelty claim.
+As in the sibling studies: the F \= 1 target-in-walk arm is one unknown away from rho (P1 :\= G makes it a rho walk with a stored table), does no decomposition work, is not decomposition-based index calculus, and proposes no leaderboard or `benchmarks/README.md` row; no VALIDATION.json or replay certificate exists (a validator report now does, `validator-report.json`) \[pcc:unverified\]. Single target only. Local L0 counted units, deterministic and replayed; no wall-clock claim. No A/A arm (it would replicate rho-neg exactly). research-kb and ecdb were not reachable; no novelty claim.
+
+== Validation (independent validator, 2026-11-08; status pass\_with\_errata)
+<validation-independent-validator-2026-11-08-status-pass_with_errata>
+Source: `validator-report.json` in this directory (not edited). Each erratum and how it was applied here \[pcc:unverified\]:
+
+- #strong[E1] (count): "five of seven" corrected to six of seven held, P4b the only failure, in the Answer; the coverage report carries the same correction \[pcc:unverified\].
+- #strong[E2] (band-verdict footnote): replaced by "unresolved against every twcj arm in all 16 sessions; against f1-x07 rho-neg is ahead in 15 of 16 and unresolved in 1", with the pre-2026-11-08 label on the reading \[pcc:unverified\].
+- #strong[E3] (5a listing): the table of every arm’s unpriced counters per run was added to section 5 \[pcc:unverified\].
+- #strong[E4] (set-up numbers and wording): 178 / 203 GAE (model) against 185.8 / 212.5 (measured); 4.3 (k \= 28) and 4.8 (k \= 32) GAE per extra jump against 4.5 and 5.0 in the model; the 1.37x is compared with the frozen model 1.38 / 1.375 and not with the floor ratio 1.5 \[pcc:unverified\]. PROTOCOL.md’s "about 3.8 GAE per jump" is not edited (frozen) \[pcc:unverified\].
+- #strong[E5] (record hygiene): disclosed below; closed records are not edited and the raw archives are not uploaded by this commit \[pcc:unverified\].
+- Also noted, from check 9: the "distance is flat in k" statement rests on four points (1.358, 1.343, 1.395, 1.366) with a least-squares slope of ln ratio on k of +0.0013 per bit (+1.6 % over 12 bits, inside the intervals); no fit was printed in the original README \[pcc:unverified\].
+
+Disclosures \[pcc:unverified\]:
+
+- The measuring binary `d23fab99...` (`/home/user/ctarget-f1/release/ecbench`) was rebuilt on disk at 2026-11-08T21:08:01Z during validation (now `fcb16d9c...`). The validator’s replays used `fcb16d9c` and reproduced every count in all 16 sessions (`audit OK: 325 records, 320 replays   reproduced, 0 problems`), so the replays establish behavioural identity only, not byte identity of source or binary \[pcc:unverified\].
+- The benchrec records `20261108T2051Z-...-k28` and `-k32` store 4-decimal metric values that differ from the validator’s recomputation by at most 0.04 % (the 3-decimal README values agree), for example k \= 28 twcj / rho 1.3951 against 1.39458; the difference comes from rounding in the producer’s pipeline. All raw entries have `uploaded: false` (raw archives not uploaded to S3), and `session.json` `git_commit` and `git_dirty` are null \[pcc:unverified\].
+- For its replays the validator exported `CHECKPOINT_SKIP` as well as `BENCHREC_SKIP`; no ledger bypass entry resulted \[pcc:unverified\].
+- Validation gate: validator report only; records have `validation: null` and no `VALIDATION.json` exists, so no leaderboard or `benchmarks/README.md` row follows \[pcc:unverified\].
 
 == Files
 <files>

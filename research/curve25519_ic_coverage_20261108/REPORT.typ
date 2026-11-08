@@ -1,22 +1,24 @@
-#set page(paper: "a4", flipped: true, margin: 1.5cm, numbering: "1")
-#set text(size: 9pt)
-#set table(inset: 3.5pt, stroke: 0.4pt + gray)
-#show table: set text(size: 7pt)
+#set page(paper: "a4", margin: 1.8cm, numbering: "1")
+#set text(size: 9.5pt)
+#set table(inset: 4pt, stroke: 0.4pt + gray)
+#show table: set text(size: 7.5pt)
 #show figure: set block(breakable: true)
 = Index calculus on the Curve25519-family miniatures: coverage of what has been tried (2026-11-08)
 <index-calculus-on-the-curve25519-family-miniatures-coverage-of-what-has-been-tried-2026-11-08>
-#strong[Class.] A coverage report: a synthesis of the lab’s measured studies, designs and screens on this family, with a ranked list of untried or under-tried directions and the two single-target studies this session ran from that list. Nothing here is a leaderboard or `benchmarks/README.md` row. Every number is copied from the named file (measured) or marked derived; every result sentence is an unverified assertion \[pcc:unverified\]. Written in the worktree `claude/ic-coverage-20261108`; no push, no PR.
+#strong[Class.] A coverage report: a synthesis of the lab’s measured studies, designs and screens on this family, with a ranked list of untried or under-tried directions and the two single-target studies this session ran from that list. Nothing here is a leaderboard or `benchmarks/README.md` row. Every number is copied from the named file (measured) or marked derived; every result sentence is an unverified assertion \[pcc:unverified\]. Written in the worktree `claude/ic-coverage-20261108`; no push, no PR. Validator errata of 2026-11-08 are applied (section 5).
+
+#strong[Band readings.] The ecbench band’s default now prices the table oracles’ counted inserts (owner ruling 2026-11-08, landing in PR \#3726); the band this report was first written under, with inserts unpriced, is called "the pre-2026-11-08 reading" below (formerly "the committed band"), and both readings are shown side by side wherever both were computed \[pcc:unverified\].
 
 #strong[Curves.] y² \= x³ + A x² + x over F\_p, p ≡ 5 (mod 8), \#E \= 8r cyclic; k \= 20: p \= 1,048,573, A \= 926, r \= 131,203, sqrt(r) \= 362.2; sizes k \= 16..32 exist (`curve25519_family family`). #strong[Goal of the programme.] S(IC) ≤ S(matched rho-neg) across the AGENTS.md §5a band (w \= 0, 0.1, 1); every verified measured improvement over the current IC baseline counts \[pcc:unverified\].
 
 == 0. Bottom line
 <bottom-line>
-- #strong[The generic track is at its collision floor.] Every table or walk design with F unknown base logarithms needs F + 1 collisions and costs at least Γ(F + 3/2)/(Γ(F + 1)Γ(3/2)) times the rho model: 1.5x (F \= 1), 1.875x (F \= 2), 2.19x (F \= 3) (`curve25519_rho_parity_bound_20261104`, derived, Monte Carlo within 1 %). The measured ladder matches: F \= 3 boxes 3.2x to 3.6x, F \= 2 walks 1.8x to 1.9x, F \= 1 walks 1.36x to 1.50x rho-neg at w \= 0 \[pcc:unverified\]. The best arm, the F \= 1 target-in-walk walk with chained jumps (`twcj`), is 1.36x to 1.40x at k \= 20 and 1.37x at k \= 32, with its walk 3 % above the 1.329 sqrt(r) second-collision floor \[pcc:unverified\]. It is one unknown away from rho (P1 :\= G makes it rho with a stored walk) and is not decomposition-based index calculus; the owner ruled the C \= 2 and walk arms count under the autolab decision rule, and the F \= 1 arms are reported as boundary results outside the ratchet.
-- #strong[The algebraic track is 1.8·10⁴x behind at w \= 0.1 and scales as r^1.03] against rho’s r^0.5 (atlas L10, T13); every coordinate, model, symmetry and base family has been measured or closed by a degree argument, and the only lever that worked was selection (frame, seed, t, G), which moved the track 16x in two days and then stalled 42x above its own brute-force grid \[pcc:unverified\].
+- #strong[The generic track is at its collision floor.] Every table or walk design with F unknown base logarithms needs F + 1 collisions and costs at least Γ(F + 3/2)/(Γ(F + 1)Γ(3/2)) times the rho model: 1.5x (F \= 1), 1.875x (F \= 2), 2.19x (F \= 3) (`curve25519_rho_parity_bound_20261104`, derived, Monte Carlo within 1 %). Two comparisons with the floors hold: the F \= 2 walk measures 1.8x to 1.9x rho against the 1.875x floor ratio (the only floor comparison in the cited file), and the twcj walk runs 3 % above its own second-collision floor 1.329 sqrt(r) \[pcc:unverified\]. The other ladder rows are distances to measured rho-neg and are not comparisons with the floor ratios: the 3.6x box is C \= 3 (round 16) and the 3.2x row a C \= 2 box (round 25, a BSGS-boundary arm), no cited file maps either to F \= 3 (3.2x to 3.6x is 1.46x to 1.65x above the F \= 3 ratio 2.19x); the F \= 1 distances (1.34x to 1.40x at k \= 20 to 32) sit below the 1.5x floor ratio because the reference is the measured rho-neg, which runs 9 % to 13 % above its model 0.886, and not the model rho; the `f1_walk` README calls its 1.496x agreement a coincidence from which no inference is drawn \[pcc:unverified\]. The best arm, the F \= 1 target-in-walk walk with chained jumps (`twcj`), is 1.36x to 1.40x at k \= 20 and 1.37x at k \= 32, with its walk 3 % above the 1.329 sqrt(r) second-collision floor \[pcc:unverified\]. It is one unknown away from rho (P1 :\= G makes it rho with a stored walk) and is not decomposition-based index calculus; the owner ruled the C \= 2 and walk arms count under the autolab decision rule, and the F \= 1 arms are reported as boundary results outside the ratchet.
+- #strong[The algebraic track is 1.8·10⁴x behind at w \= 0.1 and scales as r^1.03] against rho’s r^0.5 (atlas L10, T13); every coordinate, model, symmetry and base family has been measured or closed by a degree argument, and the levers that worked were selection (frame, seed, t, G; 16x in two days, per the atlas before wave 4, after which the track stalled 42x above its own brute-force grid) and F4 trace replay (0.4742 \[0.47418, 0.47425\] end to end, 2.1x; 0.2837 \[0.2413, 0.3335\] with t \= 4) \[pcc:unverified\].
 - #strong[Structure levers are exhausted on this family]: Aut \= ±1, End(E) \= Z\[π\] with least non-scalar degree 772,948, one rational 2-torsion point whose x-action maps ⟨G⟩ off itself, no 3-torsion, no Frobenius, twist in a different group (`curve25519_structure_vs_rho_20261107`, `ideas/STRUCTURE-R4.md`) \[pcc:unverified\].
-- #strong[What remains untried with existing tools is small-constant work on the F \= 1 arm and accounting rulings]; what might change the picture needs engine work (an oracle finding relations below about 14 native operations per trial at w \= 0.1 without forming R ± P\_i, which `curve25519_algebraic_oracle_search_20261107` found no design for) \[pcc:unverified\]. This session ran the two cheapest untried knob tests; the first (fewer jumps) was falsified, the second (scaling to k \= 28, 32) confirmed the flat 1.37x to 1.40x distance \[pcc:unverified\].
+- #strong[What remains untried with existing tools is small-constant work on the F \= 1 arm and accounting rulings]; what might change the picture needs engine work (an oracle finding relations below about 14 native operations per trial at w \= 0.1 without forming R ± P\_i, which `curve25519_algebraic_oracle_search_20261107` found no design for) \[pcc:unverified\]. This session ran the two cheapest untried knob tests; the first (fewer jumps) was falsified, the second (scaling to k \= 28, 32) confirmed the flat 1.37x to 1.40x distance, with 6 of 7 frozen predictions held (P4b failed) \[pcc:unverified\]. The accounting question the band raised is now ruled (2026-11-08): inserts are priced by default, and rho-neg is ahead at every weight under that reading only \[pcc:unverified\].
 
-#figure([#image("figures/ladder.png", width: 85%)],
+#figure([#image("figures/ladder.png", width: 100%)],
   caption: [
     Distance ladder at k \= 20
   ]
@@ -24,13 +26,17 @@
 
 == 1. Sources read, and what could not be reached
 <sources-read-and-what-could-not-be-reached>
-Read in this order: `research/curve25519_ic_atlas_20261104/REPORT.md` (sections 1 to 11), `research/curve25519_autolab_20261104/README.md` and `ideas/{PROPOSALS,PROPOSALS-R3,STRUCTURE-R4, SYNTHESIS,OBSTRUCTION}.md`, `r4-i2/README.md`, `families.json`; `research/curve25519_rho_parity_bound_20261104/{README,ALGEBRAIC_SCREEN}.md`; `research/curve25519_structure_vs_rho_20261107/README.md`; `research/curve25519_algebraic_oracle_search_20261107/README.md`; `research/curve25519_f1_walk_20261107/README.md`; `research/curve25519_f1_targetwalk_20261108/README.md` and `PROTOCOL.md`; `src/cryptanalysis/ecbench/methods.rs` (IC\_PIPELINE\_PARAMS help), `src/cryptanalysis/ic_framework/plugins.rs` (wwalk options), `src/cryptanalysis/ic_boundary.rs` (`TargetWalk`), and `ecbench methods`.
+Read in this order: `research/curve25519_ic_atlas_20261104/REPORT.md` (sections 1 to 11), `research/curve25519_autolab_20261104/README.md` and `ideas/{PROPOSALS,PROPOSALS-R3,STRUCTURE-R4, SYNTHESIS,OBSTRUCTION}.md`, `r4-i2/README.md`, `families.json`; `research/curve25519_rho_parity_bound_20261104/{README,ALGEBRAIC_SCREEN}.md`; `research/curve25519_structure_vs_rho_20261107/README.md`; `research/curve25519_algebraic_oracle_search_20261107/README.md`; `research/curve25519_f1_walk_20261107/README.md`; `research/curve25519_f1_targetwalk_20261108/README.md` and `PROTOCOL.md`; `research/curve25519_autolab_parity_20261105/` (full-size p \= 2^255 - 19 endpoint, admission limits at u64, Curve25519Wide; added after validation: it contains no new scientific trial and refutes none of the claims below); `src/cryptanalysis/ecbench/methods.rs` (IC\_PIPELINE\_PARAMS help), `src/cryptanalysis/ic_framework/plugins.rs` (wwalk options), `src/cryptanalysis/ic_boundary.rs` (`TargetWalk`), and `ecbench methods`.
+
+Caveat on the oracle-search study: its predictions were not preregistered, so a pre-data freeze cannot be checked for them \[pcc:unverified\].
+
+Scan behind the "not found" cells (added with validator erratum E7): all 1,915 `spec*.json` files under `crypto/research` smaller than 400 KB, scanned on 2026-11-08 for the family signature (`prime_explicit` curve, p ≡ 5 mod 8, \#E \= 8r with r prime): 282 specs match and contain exactly two method ids, `ic.pipeline` (default linalg `incremental-gauss` throughout) and `rho.negation`. Sessions outside `spec*.json` names, the sibling repositories, the lead atlas and research-kb were not checked \[pcc:unverified\].
 
 Not reachable from this machine, so no novelty claim is made anywhere below: the sibling lead atlas (`/home/user/crypto-autoresearcher/knowledge/leads/ecdlp/` does not exist on this machine; `tools/lead_atlas.py` is in the sibling checkout), the `research-kb` MCP server (not among the session’s MCP servers) and its CLI fallback (`scripts/research-kb` needs the sibling checkout’s executable and catalog, neither present), and `ecdb` (no `ECDB_TOKEN`). Conductor is not installed; no task was attached. Disk was at 97 % with 1.5 GB free, so the worktree is a sparse checkout and no binary was built; the measuring binary is `/home/user/ctarget-f1/release/ecbench` (SHA-256 `d23fab99…`), which already carries PR \#3700’s `band --price-table-work` opt-in.
 
 == 2. Coverage table
 <coverage-table>
-Status: #strong[done] (measured; headline number and file), #strong[designed] (protocol or screen only, no run), #strong[never tried], #strong[n/a] (does not exist on this family). All values are measured unless marked derived; the distance is S(arm)/S(rho-neg) at w \= 0 unless stated. Each row’s number is an unverified assertion \[pcc:unverified\].
+Status: #strong[done] (measured; headline number and file), #strong[designed] (protocol or screen only, no run), #strong[not found in specs] (no `spec*.json` under `crypto/research` with the family signature uses it; scan in section 1; not a novelty claim), #strong[n/a] (cannot run on this family by the method’s own `applies`, or does not exist on it). All values are measured unless marked derived; the distance is S(arm)/S(rho-neg) at w \= 0 unless stated. Each row’s number is an unverified assertion \[pcc:unverified\].
 
 === 2a. Factor-base families (ecbench prime-curve bases and engine forms)
 <a.-factor-base-families-ecbench-prime-curve-bases-and-engine-forms>
@@ -55,8 +61,8 @@ Status: #strong[done] (measured; headline number and file), #strong[designed] (p
   [done, validated (T4 to T13)],
   [best F4 arm: t \= 4, G \= 3, seed 1193 + trace, 1.83·10⁴x rho at w \= 0.1, 27.9x at w \= 0 (T13); atlas §6, §11.6],
   [`prime-kummer:t` (2-power Kummer tower)],
-  [n/a (p ≡ 5 mod 8: t ≤ 2)],
-  [atlas §1, §4],
+  [run at t \= 2 (smoke only); t \> 2 n/a (p ≡ 5 mod 8: t ≤ 2)],
+  [`curve25519_ic_ratchet_20261102/sessions/pkm-smoke-k20` (`prime-kummer:t=2` with `pkm-semaev` m \= 2 and m \= 3 at k \= 20); atlas §1, §4],
   [`glv-orbit`],
   [n/a (j ≠ 0, 1728, Aut \= ±1)],
   [atlas §1; structure\_vs\_rho C8],
@@ -85,7 +91,7 @@ Status: #strong[done] (measured; headline number and file), #strong[designed] (p
   [n/a (no 3-torsion; E\[2\] \= Z/2)],
   [atlas §1],
   [digit-set frames `digits@LO:…` (engine `Membership::Digits`)],
-  [done in the engine (L14/L15, validated); #strong[never run in ecbench] (no ecbench base spells it; `explicit-x` could list the points)],
+  [done in the engine (L14/L15, validated); #strong[not found in specs] (no ecbench base spells it; `explicit-x` could list the points; the only family mention of `explicit-x` is T11’s unit tests U1 to U4, not a session)],
   [coverage 2.1 to 2.2x the best translation frame; F4 per relation 0.48x / 0.44x; still 10.5x behind the isogeny winner at matched (t, G); atlas §11.4],
   [odd Kummer base x ∈ g·μ\_d, d | (p − 1)/4],
   [designed (L11); decision cost screened],
@@ -150,7 +156,7 @@ Status: #strong[done] (measured; headline number and file), #strong[designed] (p
   [S 2.10 to 2.15 vs 1.77 static (PROPOSALS-R3 outcomes); not merged],
   [`wwalk` x and jump grids on F \= 2],
   [done],
-  [S flat in x (rounds 32, 35); 8 / 32 jumps nulls against the fixed-table incumbent (round 34)],
+  [S flat in x (rounds 32, 35); 8 / 32 jumps nulls, tried against the fixed-table incumbent only (round 34; the autolab README states these are not evidence that the challengers would fail against the expected cost, as they were not re-run under `seed=run`)],
   [F \= 1 `wwalk` (one-abscissa base, `g=1,grow=2`)],
   [done],
   [0.809 \[0.776, 0.842\] of F \= 2 at k \= 20; 1.50x rho-neg at w \= 0; `curve25519_f1_walk_20261107`],
@@ -159,10 +165,10 @@ Status: #strong[done] (measured; headline number and file), #strong[designed] (p
   [twcj 0.909 \[0.885, 0.934\] of F \= 1 at k \= 20; 1.40x rho-neg; `curve25519_f1_targetwalk_20261108`],
   [F \= 1 target-in-walk jump count 2 / 4 / 8 / 32],
   [#strong[done this session]],
-  [4 jumps 1.22x / 1.27x the 16-jump arm; 2 jumps 3.3x; 8 null; 32 1.05x / 1.01x; `curve25519_tw_jumps_20261108`],
+  [4 jumps 1.22x / 1.27x the 16-jump arm; 2 jumps 3.3x / 3.5x; 8 jumps 1.008 \[0.967, 1.051\] at k \= 20 (tie) and 1.050 \[1.005, 1.097\] at k \= 24 (excludes 1 by 0.005); 32 jumps 1.051 \[0.996, 1.110\] and 1.014 \[0.978, 1.051\] (ties); 16 is not beaten by any tested count; `curve25519_tw_jumps_20261108`],
   [F \= 1 target-in-walk at k \= 28, 32 (and 32 / 64 jumps there)],
   [#strong[done this session]],
-  [1.40x \[1.35, 1.45\] and 1.37x \[1.27, 1.47\] rho-neg; 32 / 64 jumps nulls; `curve25519_tw_scaling_20261108`],
+  [1.395x \[1.345, 1.446\] and 1.366x \[1.267, 1.473\] rho-neg (k \= 28, 32); 32 / 64 jumps nulls; 6 of 7 predictions held; `curve25519_tw_scaling_20261108`],
   [`pkm-semaev:m=2,engine=f4` on the isogeny base],
   [done, validated],
   [T12 winner 0.0578 \[0.047, 0.072\] vs seed 0 at w ≥ 0.1; atlas §6],
@@ -190,14 +196,19 @@ Status: #strong[done] (measured; headline number and file), #strong[designed] (p
   [eliminant Φ with batched multipoint evaluation, LLL on the S₃ monomials, norm-resultant on g·μ\_d],
   [screened (counted Python)],
   [821x, no recovery (0 of 40), 4.3·10⁵x at w \= 0.1 (D4, D7, D2); oracle search],
-  [`ic.residual_batch`, `rho.multitarget_pooled` (Kuhn–Struik batches)],
-  [never tried on this family],
-  [single-target scope; `ecbench methods`],
-  [`ic.large_prime`, `ic.shared_rank`, `ic.trace_line_2lp`, `ic.k4_gaudry`, `ic.prime_orbit_relations_v1`, `ic.cm_folded_*`, `ic.aps_v1/v2`, `ic.tensor_contraction_*`],
-  [never tried on this family],
-  [prime-field orbit / CM / APS instruments need an orbit, a CM endomorphism or an extension field this family lacks; `ecbench methods`],
+  [`ic.residual_batch`, `rho.multitarget_pooled` (Kuhn–Struik batches), `ic.cm_folded_*`],
+  [not found in specs (applicability not re-checked against `applies`)],
+  [single-target scope for the first two; `ecbench methods`],
+  [`ic.large_prime`, `ic.trace_line_2lp` (BinaryOnly), `ic.shared_rank` (KoblitzOnly), `ic.k4_gaudry` (fp4\_translation curves only)],
+  [n/a by `applies`],
+  [`methods.rs` help text and `applies`],
+  [`ic.prime_orbit_relations_v1`, `ic.aps_v1/v2`, `ic.tensor_contraction_v1` and its cofactor variant, `ic.known_log_ksum_v1` (PrimeOnly)],
+  [applicable, not found in specs],
+  [the earlier reason "need an orbit, a CM endomorphism or an extension field" does not apply to `ic.tensor_contraction` (a toy exponential method, about r point additions per relation); `methods.rs`],
 )
 ]
+
+Each row’s number or status in section 2b is an unverified assertion \[pcc:unverified\].
 
 === 2c. Relation-collection strategies, linear algebra, structure, accounting
 <c.-relation-collection-strategies-linear-algebra-structure-accounting>
@@ -206,9 +217,12 @@ Status: #strong[done] (measured; headline number and file), #strong[designed] (p
   align: (col, row) => (left,left,left,).at(col),
   inset: 6pt,
   [technique], [status], [headline, file],
-  [target stream: `walk`, `random`, `walk-prime-fast`, strides],
-  [done (walk, strides); `walk-prime-fast` is an accounting relabel (native Montgomery additions)],
-  [rounds 12, 27 to 30],
+  [target stream: `walk`, `random`, strides],
+  [done (walk, strides)],
+  [rounds 12, 27 to 30 (stride tests)],
+  [`targets=walk-prime-fast`],
+  [not found in specs; relabel by help text only (native Montgomery additions; no autolab file mentions it)],
+  [`methods.rs` help text],
   [probe-probe collisions (store probes)],
   [not run: the rho guard (`is_guarded`) refuses it as rho with extra steps],
   [PROPOSALS-R3 §8],
@@ -228,7 +242,7 @@ Status: #strong[done] (measured; headline number and file), #strong[designed] (p
   [done],
   [every pipeline arm],
   [`linalg`: `incremental-gauss-full-rank(-checked)`, `echelon`, `structured-gauss`, `sparse-cado`, `wiedemann`, `lanczos`],
-  [never tried on this family; not expected to matter (F ≤ 32 columns; LA charged N² is negligible against the walk)],
+  [not found in specs; not expected to matter (F ≤ 32 columns; LA charged N² is negligible against the walk)],
   [`methods.rs`; SYNTHESIS Table 2 (LA binds only at N ≈ sqrt(r/2) for m \= 2)],
   [automorphisms, Frobenius, T₀ keys, E\[8\] keys, twist, 2-isogenous E′, endomorphism-orbit folds, GLV, x-only ladders, DPs, tag tracing, special prime, pairings],
   [done (exact checks and counted Monte Carlo, 7 of 8 frozen checks passed)],
@@ -239,9 +253,9 @@ Status: #strong[done] (measured; headline number and file), #strong[designed] (p
   [C \= 1 boundary (one-seed `wwalk`)],
   [done],
   [1.40 / 1.60 / 1.74 / 1.69 of rho at k \= 20 / 24 / 28 / 32; `autolab/c1`],
-  [table-insert pricing in the band (PR \#3700, opt-in)],
-  [accounting ruling open],
-  [committed band: twcj/rho 0.80x at w \= 1 is an artifact; inserts priced: 1.32x to 1.41x at every weight; `f1_targetwalk` §5, `tw_scaling` §2],
+  [table-insert pricing in the band (PR \#3700 opt-in; default after the owner ruling of 2026-11-08, PR \#3726)],
+  [ruled: inserts priced by default (`--no-price-table-work` is the earlier reading)],
+  [pre-2026-11-08 reading: twcj/rho 0.80x at w \= 1 is an artifact; inserts priced: 1.32x to 1.41x at every weight; `f1_targetwalk` §5, `tw_scaling` §2],
   [rho-neg reference set-up (0.376 sqrt(r) at k \= 20) and search 9 to 13 % above 0.886],
   [observed, not acted on (a rho-implementation matter inherited by matched rho)],
   [`structure_vs_rho` §6; `tw_scaling` §4],
@@ -251,20 +265,22 @@ Status: #strong[done] (measured; headline number and file), #strong[designed] (p
 )
 ]
 
+Each row’s number or status in section 2c is an unverified assertion \[pcc:unverified\].
+
 == 3. Ranked untried or under-tried directions
 <ranked-untried-or-under-tried-directions>
-Ranking by expected information per hour with existing tools. For each: mechanism, the cheapest discriminating single-target test, the preregistered prediction, and why it might beat the current best (twcj at 1.40x rho-neg at w \= 0) or the generic floor Γ(F + 3/2)/(Γ(F + 1)Γ(3/2)) \[pcc:unverified\].
+Ranking by expected information per hour with existing tools. Each numeric sentence below is an unverified assertion \[pcc:unverified\] (tagged per sentence where a prediction or derived number appears). For each: mechanism, the cheapest discriminating single-target test, the preregistered prediction, and why it might beat the current best (twcj at 1.40x rho-neg at w \= 0) or the generic floor Γ(F + 3/2)/(Γ(F + 1)Γ(3/2)) \[pcc:unverified\].
 
-+ #strong[Jump count of the target-in-walk arm] (ran this session as `curve25519_tw_jumps_20261108`). Mechanism: jump indices are drawn independently of the point, so the set-up (17 % of the k \= 20 cost, about 3.5 GAE per jump) looked removable without a walk penalty. Test: `jumps=2,4,8,32` vs 16 on `twcj`, 8 single-target sessions × 64 rounds at k \= 20 and 24. Prediction (frozen): j4/j16 upper end \< 1 at k \= 20 (point 0.946), j2 fails (\> 1.5x). Why it could beat the current best: a pure set-up saving of 0.12 sqrt(r) (6 %) at k \= 20. #strong[Outcome: falsified.] j4 costs 1.220x \[1.186, 1.256\]; the walk lengthens 34 % and needs 2.93 collisions for two independent rows (dependent re-collisions along the stored path); j2 3.25x as predicted; 16 is the optimum at k ≤ 24 \[pcc:unverified\].
-+ #strong[Scaling of the target-in-walk arm to k \= 28, 32, with 32 and 64 jumps] (ran this session as `curve25519_tw_scaling_20261108`). Mechanism: rho-neg’s set-up overhead (0.38 sqrt(r) at k \= 20) vanishes with size while twcj’s set-up and verification also shrink; and the shorter walk of more jumps (−2.5 % at k \= 20) costs nothing once the set-up is ≤ 0.01 sqrt(r). Test: rho-neg, f1-x07, twcj-j16/j32/j64, 8 sessions × 64 rounds at k \= 28, 32. Prediction (frozen): twcj/rho-neg point in \[1.30, 1.50\], j32/j16 in \[0.95, 1.00\]. #strong[Outcome: 5 of 7 held]; 1.395x \[1.345, 1.446\] and 1.366x \[1.267, 1.473\]; j32 0.997 and 0.985 (nulls); the distance is flat in k and sits at the ratio of the two measured walks (1.37) rather than the floors’ 1.5 because rho-neg’s search runs 9 to 13 % above 0.886 while twcj’s walk runs 3 % above 1.329 \[pcc:unverified\].
-+ #strong[Drop the per-collision recomputation in `TargetWalk`] (needs engine work: an option in `ic_boundary.rs`). Mechanism: each collision is verified by recomputing both entries (0.255 sqrt(r) at k \= 20, 12 % of the cost; 0.007 sqrt(r) at k \= 32); keys are exact abscissae with a sign bit and the final \[d\]G \= Q check is charged anyway, so a false key collision would only fail that check. Test: `tw=1,cj=1,verify=0` vs the current arm, 8 sessions × 64 rounds at k \= 20. Prediction: ratio 0.88 to 0.90 at k \= 20 (point 0.885, derived from the phase table), 0.99 at k \= 32; distance to rho 1.24x at k \= 20. Why: it is the largest remaining non-walk term at small k; it does not change the walk or the floor, so it cannot reach parity. Not run: no build (disk), and it is a code change.
-+ #strong[Chained set-up for the rho-neg reference] (engine work on `rho.negation`). Mechanism: the `cj` trick applies unchanged to rho’s r-adding jumps \[a\_j\]G + \[b\_j\]Q; rho-neg’s set-up is 0.376 sqrt(r) at k \= 20. Prediction: rho-neg S 1.53 → about 1.25 at k \= 20, so every k \= 20 distance in this report grows by about 1.2x; no change at k \= 32. Why it matters: it is the honest reference, not an IC gain; it would retire the k \= 20 "1.4x" figure in favour of the k \= 32 one.
-+ #strong[Digit-set base in ecbench via `explicit-x` with the `mitm` pair table or the exhaustive grid] (existing tools; the greedy digit sets of L14 at t \= 5, 6 are on disk in `curve25519_leads_wave4_20261104`). Mechanism: 2.3 to 2.5x the covered points per column of the best translation frame at equal column count. Test: `explicit-x` (22 columns, 522 covered) + `mitm` vs proj-a (32 columns) at k \= 20, 8 sessions. Prediction (derived): trials per relation 251 vs 124, F + 1 \= 23 vs 33 rows → 1.4x proj-a at w \= 0, i.e. about 11x rho-neg; it loses to proj-a and is 8x behind the walk arms. Why listed: it is the only algebraic-track base never run end to end; it cannot approach rho, so it is ranked below the F \= 1 knobs.
-+ #strong[Odd Kummer base μ\_d with a half-gcd decision] (engine work). Mechanism: the D2 norm-resultant decision is Ω(d) per trial; the validator estimated a quasi-linear implementation at "tens" rather than 1,717x the per-point decision. Prediction (derived from the screen): even at 10x the per-point cost the design stays ≥ 10³x behind at w \= 0.1, because coverage d ≈ 2,394 needs 1,208 unknowns. Why listed: it is the last named algebraic family without an engine; the screen says it cannot reach parity.
-+ #strong[Multi-target amortisation of the F \= 1 table (`f1-x07`, not `tw`) against `rho.multitarget_pooled` on its own gauge] (existing tools; outside the single-target question). Mechanism: the F \= 1 table is target-independent and reusable; rho’s batch grows like sqrt(L). Prediction (derived, Kuhn–Struik): the table arm wins a window of L only if its per-target probe cost (0.58 sqrt(r)) is below rho’s marginal cost at that L, which is about 0.886 sqrt(r)/(2 sqrt(L)) for large L, so no window for L ≥ 1 at these constants. Why listed: it is the one setting in which an IC-shaped table beats a rho-shaped walk in the literature; here the constants say no.
-+ #strong[Linear-algebra variants (`structured-gauss`, `wiedemann`, `lanczos`) on the proj-a or ksum arms.] Never run on this family; prediction: no change in S (LA is \< 0.1 % of the cost at F ≤ 32). Listed only for completeness of the coverage table; not worth a session.
++ #strong[Jump count of the target-in-walk arm] (ran this session as `curve25519_tw_jumps_20261108`). Mechanism: jump indices are drawn independently of the point, so the set-up (17 % of the k \= 20 cost, about 3.5 GAE per jump) looked removable without a walk penalty. Test: `jumps=2,4,8,32` vs 16 on `twcj`, 8 single-target sessions × 64 rounds at k \= 20 and 24. Prediction (frozen): j4/j16 upper end \< 1 at k \= 20 (point 0.946), j2 fails (\> 1.5x). Why it could beat the current best: a pure set-up saving of 0.12 sqrt(r) (6 %) at k \= 20. #strong[Outcome: falsified.] j4 costs 1.220x \[1.186, 1.256\]; the walk lengthens 34 % and needs 2.93 collisions for two independent rows (dependent re-collisions along the stored path); j2 3.25x as predicted; 16 jumps is not beaten by any tested count (8 jumps ties at k \= 20, 1.008 \[0.967, 1.051\]; 32 jumps ties at k \= 24, 1.014 \[0.978, 1.051\]; 2 and 4 are worse) \[pcc:unverified\].
++ #strong[Scaling of the target-in-walk arm to k \= 28, 32, with 32 and 64 jumps] (ran this session as `curve25519_tw_scaling_20261108`). Mechanism: rho-neg’s set-up overhead (0.38 sqrt(r) at k \= 20) vanishes with size while twcj’s set-up and verification also shrink; and the shorter walk of more jumps (−2.5 % at k \= 20) costs nothing once the set-up is ≤ 0.01 sqrt(r). Test: rho-neg, f1-x07, twcj-j16/j32/j64, 8 sessions × 64 rounds at k \= 28, 32. Prediction (frozen): twcj/rho-neg point in \[1.30, 1.50\], j32/j16 in \[0.95, 1.00\]. #strong[Outcome: 6 of 7 held (P4b failed)]; 1.395x \[1.345, 1.446\] and 1.366x \[1.267, 1.473\]; j32 0.997 and 0.985 (nulls); the distance is flat in k and sits at the ratio of the two measured walks (1.37; the frozen model predicted 1.38 and 1.375, and the data agree within 1.1 %) rather than the floor ratio 1.5, because rho-neg’s search runs 9 to 13 % above 0.886 while twcj’s walk runs 3 % above 1.329 \[pcc:unverified\].
++ #strong[Drop the per-collision recomputation in `TargetWalk`] (needs engine work: an option in `ic_boundary.rs`). Mechanism: each collision is verified by recomputing both entries (0.255 sqrt(r) at k \= 20, 12 % of the cost; 0.007 sqrt(r) at k \= 32); keys are exact abscissae with a sign bit and the final \[d\]G \= Q check is charged anyway, so a false key collision would only fail that check. Test: `tw=1,cj=1,verify=0` vs the current arm, 8 sessions × 64 rounds at k \= 20. Prediction: ratio 0.88 to 0.90 at k \= 20 (point 0.88, derived from the phase table as 1 - 0.256 / 2.136 \= 0.880) \[pcc:unverified\], 0.995 at k \= 32 \[pcc:unverified\]; distance to rho 1.24x at k \= 20 \[pcc:unverified\]. Why: it is the largest remaining non-walk term at small k; it does not change the walk or the floor, so it cannot reach parity \[pcc:unverified\]. Not run: no build (disk), and it is a code change.
++ #strong[Chained set-up for the rho-neg reference] (engine work on `rho.negation`). Mechanism: the `cj` trick applies unchanged to rho’s r-adding jumps \[a\_j\]G + \[b\_j\]Q; rho-neg’s set-up is 0.376 sqrt(r) at k \= 20. Prediction (revised after validator erratum E8): the saving is at most about 0.08 to 0.14 sqrt(r), derived from the tw\_jumps set-up GAE (the chained target-in-walk set-up costs 85.8 GAE with 2 jumps and 106.2 with 8, rho-neg uses 8; against rho-neg’s whole set-up of 135 GAE, 0.376 sqrt(r), a chained version saves about 49 GAE with 2 jumps and 29 GAE with 8), so rho-neg S goes from 1.53 to about 1.43 to 1.49 at k \= 20 and every k \= 20 distance grows by 1.05x to 1.09x (the earlier "about 1.25, 1.2x" is withdrawn: it exceeded the whole set-up); no change at k \= 32 \[pcc:unverified\]. Why it matters: it is the honest reference, not an IC gain; it would move the k \= 20 "1.4x" figure toward the k \= 32 one \[pcc:unverified\].
++ #strong[Digit-set base in ecbench via `explicit-x` with the `mitm` pair table or the exhaustive grid] (existing tools; the greedy digit sets of L14 at t \= 5, 6 are on disk in `curve25519_leads_wave4_20261104`). Mechanism: 2.3 to 2.5x the covered points per column of the best translation frame at equal column count. Test: `explicit-x` (22 columns, 522 covered) + `mitm` vs proj-a (32 columns) at k \= 20, 8 sessions. Prediction (derived): trials per relation 251 vs 124, F + 1 \= 23 vs 33 rows → 1.4x proj-a at w \= 0, i.e. about 11x rho-neg; it loses to proj-a and is 8x behind the walk arms \[pcc:unverified\]. Why listed: it is the only algebraic-track base not found run end to end in the specs; it cannot approach rho, so it is ranked below the F \= 1 knobs \[pcc:unverified\].
++ #strong[Odd Kummer base μ\_d with a half-gcd decision] (engine work). Mechanism: the D2 norm-resultant decision is Ω(d) per trial; the validator estimated a quasi-linear implementation at "tens" rather than 1,717x the per-point decision. Prediction (derived from the screen): even at 10x the per-point cost the design stays ≥ 10³x behind at w \= 0.1, because coverage d ≈ 2,394 needs 1,208 unknowns \[pcc:unverified\]. Why listed: it is the last named algebraic family without an engine; the screen says it cannot reach parity \[pcc:unverified\].
++ #strong[Multi-target amortisation of the F \= 1 table (`f1-x07`, not `tw`) against `rho.multitarget_pooled` on its own gauge] (existing tools; outside the single-target question). Mechanism: the F \= 1 table is target-independent and reusable; rho’s batch grows like sqrt(L). Prediction (derived, Kuhn–Struik): the table arm wins a window of L only if its per-target probe cost (0.58 sqrt(r)) is below rho’s marginal cost at that L, which is about 0.886 sqrt(r)/(2 sqrt(L)) for large L, so no window for L ≥ 1 at these constants \[pcc:unverified\]. Why listed: it is the one setting in which an IC-shaped table beats a rho-shaped walk in the literature; here the constants say no \[pcc:unverified\].
++ #strong[Linear-algebra variants (`structured-gauss`, `wiedemann`, `lanczos`) on the proj-a or ksum arms.] Not found in specs; prediction: no change in S (LA is \< 0.1 % of the cost at F ≤ 32) \[pcc:unverified\]. Listed only for completeness of the coverage table; not worth a session.
 
-Ideas checked and dropped because they were already tried (with where): more or fewer jumps on the F \= 2 walk (round 34), interleaving (PROPOSALS-R3 P3), stride probes of every kind (rounds 12, 27 to 30), free rows (rounds 13 to 15), the C \= 1 boundary (`autolab/c1`), lifts and torsion-shifted targets (T1), coset-pure bases (atlas §5), the Edwards G \= 0 anomaly (T6), m \= 3 (T3), 2-descent (T2), T₀ frames (T7), the 2-torsion quotient (R4-I2), every structure lever (`structure_vs_rho`), and the BSGS-shaped full-coverage designs (oracle search D1, D4, D5).
+Ideas checked and dropped because they were already tried (with where): more or fewer jumps on the F \= 2 walk (round 34, against the fixed-table incumbent only), interleaving (PROPOSALS-R3 P3), stride probes of every kind (rounds 12, 27 to 30), free rows (rounds 13 to 15), the C \= 1 boundary (`autolab/c1`), lifts and torsion-shifted targets (T1), coset-pure bases (atlas §5), the Edwards G \= 0 anomaly (T6), m \= 3 (T3), 2-descent (T2), T₀ frames (T7), the 2-torsion quotient (R4-I2), every structure lever (`structure_vs_rho`), and the BSGS-shaped full-coverage designs (oracle search D1, D4, D5).
 
 == 4. What the two studies add to the ladder
 <what-the-two-studies-add-to-the-ladder>
@@ -272,7 +288,7 @@ Ideas checked and dropped because they were already tried (with where): more or 
   columns: 5,
   align: (col, row) => (left,right,left,left,left,).at(col),
   inset: 6pt,
-  [arm (k)], [distance to rho-neg, w \= 0], [w \= 0.1 (committed / inserts priced)], [w \= 1 (committed / inserts priced)], [source],
+  [arm (k)], [distance to rho-neg, w \= 0], [w \= 0.1 (pre-2026-11-08 / inserts priced)], [w \= 1 (pre-2026-11-08 / inserts priced)], [source],
   [twcj j16 (20)],
   [1.358 \[1.232, 1.497\]],
   [1.269 / 1.351],
@@ -301,8 +317,33 @@ Ideas checked and dropped because they were already tried (with where): more or 
 )
 ]
 
-Neither study moves the distance remaining; the current best stays the 16-jump target-in-walk arm at 1.34x to 1.40x rho-neg at w \= 0 from k \= 20 to 32 \[pcc:unverified\]. Under the committed band ecbench’s own verdict for rho-neg against every walk arm is "unresolved inside the band" (the w \= 1 order flips because the walk arms’ per-step table inserts are not priced while rho’s canonicalisations are); with inserts priced, rho-neg is ahead at every weight, by 1.32x to 1.41x \[pcc:unverified\]. How the band should price table inserts is an open owner ruling (PR \#3700 made it opt-in).
+Neither study moves the distance remaining; the current best stays the 16-jump target-in-walk arm at 1.34x to 1.40x rho-neg at w \= 0 from k \= 20 to 32 \[pcc:unverified\]. Every number in the table above is an unverified assertion \[pcc:unverified\]. Under the pre-2026-11-08 reading (inserts unpriced) ecbench’s own verdict for rho-neg is "unresolved inside the band" for twcj-j16, j8, j32 (and j64) in every session, for twcj-j4 in 11 of 16 sessions, and "rho-neg ahead" for twcj-j2 (16 of 16) and for f1-x07 (15 of 16 at k \= 28, 32) (the w \= 1 order flips because the walk arms’ per-step table inserts are not priced while rho’s canonicalisations are) \[pcc:unverified\]. With inserts priced, the reading that is now the default, rho-neg is ahead at every weight, by 1.32x to 1.41x; "rho-neg remains ahead at every weight" is true under the priced reading only \[pcc:unverified\]. The owner ruling of 2026-11-08 (PR \#3726) settled how the band prices table inserts; PR \#3700 had made it opt-in \[pcc:unverified\].
 
-== 5. Files
+The figure `figures/ladder.{svg,png}` plots, for the F \= 1 rows, both the pre-2026-11-08 w \= 0.1 value (open square: 1.43, 1.31, 1.27) and the inserts-priced value (open diamond: 1.49, 1.39, 1.35); the pre-2026-11-08 square flatters the arm and is keyed as such. Rows 7 to 10 (ksum3, wsum C \= 3, wsum2, wsum2g) have no w \= 0.1 distance in their sources and carry no w \= 0.1 marker \[pcc:unverified\].
+
+== 5. Validation
+<validation>
+Source: `validator-report.json` in this directory (independent validator, 2026-11-08; status pass\_with\_errata; not edited). Each erratum and how it was applied \[pcc:unverified\]:
+
+- #strong[E1] (ladder data): row 1 w01 set to 1.05e6 (1.735e6 / 1.654 \= 1.049e6); the w01 of rows 7 to 10 is null (absent) because their sources give only a w \= 0 distance and a w \= 1 ratio; the figure and this PDF were regenerated from the corrected `data/ladder.json` \[pcc:unverified\].
+- #strong[E2] (count): "5 of 7 held" corrected to 6 of 7 (P4b failed) in sections 0 and 3 \[pcc:unverified\].
+- #strong[E3] (band verdicts): section 4 states the per-arm tally (j16, j8, j32, j64 unresolved in every session; j4 in 11 of 16; j2 and f1-x07 resolved in rho-neg’s favour), and the figure plots the inserts-priced F \= 1 values as a second, keyed marker \[pcc:unverified\].
+- #strong[E4] (ladder vs floors): "the measured ladder matches" replaced by the two statements that hold and by the statement that boxes and F \= 1 distances are against measured rho-neg \[pcc:unverified\].
+- #strong[E5] (classification): the "never tried" rows are split into n/a by `applies` and applicable but not found; prime-kummer is given as run at t \= 2 (smoke only, `pkm-smoke-k20`); `walk-prime-fast` is "not found in specs; relabel by help text" \[pcc:unverified\].
+- #strong[E6] (jump-count overclaims): "16 is the optimum" replaced by "not beaten by any tested count"; round 34 listed as tried against the fixed-table incumbent only \[pcc:unverified\].
+- #strong[E7] (scope): "never tried" reworded as "not found in `crypto/research` specs", with the scan (date, signature, size limit) under section 1 \[pcc:unverified\].
+- #strong[E8] (chained set-up prediction): replaced by the supported saving of 0.08 to 0.14 sqrt(r), S about 1.43 to 1.49, distances up 1.05x to 1.09x \[pcc:unverified\].
+- #strong[E9] (tags and numerics): the blanket tag was repeated under tables 2b, 2c and 4 and per-sentence tags were added to section 3 items 3 to 8; "point 0.885" corrected to 0.880 and "0.99 at k \= 32" to 0.995 \[pcc:unverified\].
+- #strong[E10] (stale ruling): the accounting ruling is made (owner, 2026-11-08, PR \#3726); every "committed band" figure is labelled "the pre-2026-11-08 reading" and both readings are shown \[pcc:unverified\].
+- #strong[E11] (wording and omissions): "only selection" replaced by selection (16x) and trace replay (2.1x); `curve25519_autolab_parity_20261105` and the oracle-search not-preregistered caveat added to section 1 \[pcc:unverified\].
+
+Disclosures \[pcc:unverified\]:
+
+- The measuring binary `d23fab99...` named in section 1 was rebuilt on disk at 2026-11-08T21:08:01Z during validation (now `fcb16d9c...`); replays used `fcb16d9c` and reproduced all counts of the two cited studies, so they establish behavioural identity only \[pcc:unverified\].
+- The benchrec records of the two cited studies store 4-decimal values that differ from recomputation by at most 0.07 % (rounding in the producer’s pipeline); the raw archives are not uploaded and `session.json` `git_commit` is null \[pcc:unverified\].
+- The validator exported `CHECKPOINT_SKIP` as well as `BENCHREC_SKIP` for its replays; no ledger bypass entry resulted \[pcc:unverified\].
+- The validator traced the headline cell of each row family, not every cell; autolab rounds 1 to 8 beyond the table row, R4-I2 details, the multi-curve study, PROPOSALS-R3 outcomes and the "equal S" of round 5 were not independently traced \[pcc:unverified\].
+
+== 6. Files
 <files>
 `REPORT.md`, `REPORT.pdf` (pandoc -t typst + the typst module, `scripts/render_pdf.py`), `data/ladder.json` (every ladder value with its source), `scripts/make_figure.py`, `figures/ladder.{svg,png}`. Studies: `research/curve25519_tw_jumps_20261108/`, `research/curve25519_tw_scaling_20261108/` (protocols frozen at commits `a1ce0db2f9` and `e6a759cc72` before any run; benchmark records `benchmarks/records/20261108T20{45,47,51}Z-curve25519-tw-*.json`, closed).

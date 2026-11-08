@@ -3,7 +3,9 @@
 **Class.** Measured, single-target ecbench sessions under a protocol frozen before data
 ([PROTOCOL.md](PROTOCOL.md); hashes in `data/frozen.sha256`, freeze commit `a1ce0db2f9`).
 Counted units only (ecbench GAE, S = cost/sqrt(r)); every comparison at w = 0, 0.1 and 1, under
-the committed band and under `ecbench band --price-table-work`. Public synthetic
+both band readings: the pre-2026-11-08 reading (table inserts unpriced; this README's earlier
+"committed band") and the priced reading (`ecbench band --price-table-work`; the default since the
+owner ruling of 2026-11-08, landing in PR #3726). Public synthetic
 Curve25519-family miniatures; no security claim. No pcc claim has been filed; every number is an
 unverified assertion until it is reviewed [pcc:unverified]. No code change: the existing `jumps`
 option of the `wwalk` oracle on the `tw=1,cj=1` arm, binary `/home/user/ctarget-f1/release/ecbench`
@@ -21,10 +23,15 @@ ratio is 1.008 [0.967, 1.051] at k = 20 and 1.050 [1.005, 1.097] at k = 24 [pcc:
 32 jumps it is 1.051 [0.996, 1.110] and 1.014 [0.978, 1.051]: the walk is 2.5 % and 1.5 % shorter,
 the set-up 54 and 61 GAE dearer [pcc:unverified]. Two jumps fail as predicted: 3.25x and 3.46x, with
 the walk reaching its cap below rank 2 in 94 % and 98 % of runs [pcc:unverified]. Sixteen jumps is
-at the optimum of this knob at these sizes; the only direction left is more jumps at larger k,
-where the set-up vanishes (measured in `research/curve25519_tw_scaling_20261108`). Rho-neg remains
-ahead: the 16-jump arm is 1.36x [1.23, 1.50] rho-neg at k = 20 and 1.34x [1.22, 1.48] at k = 24 at
-w = 0 on these fresh seeds [pcc:unverified].
+not beaten by any tested count: 8 and 32 jumps are indistinguishable from it at k = 20 and k = 24
+respectively, 2 and 4 are worse [pcc:unverified]. The only direction left is more jumps at larger
+k, where the set-up vanishes (measured in `research/curve25519_tw_scaling_20261108`)
+[pcc:unverified]. Rho-neg, per reading: at w = 0 it is ahead, the 16-jump arm being 1.36x
+[1.23, 1.50] rho-neg at k = 20 and 1.34x [1.22, 1.48] at k = 24; under the pre-2026-11-08 reading
+(inserts unpriced) the verdict is unresolved and the order flips at w = 1 (j16 / rho-neg 0.804 at
+k = 20, 0.712 at k = 24); with inserts priced rho-neg is ahead at every weight, by 1.32x to 1.35x
+[pcc:unverified]. "Rho-neg remains ahead at every weight" holds under the priced reading only
+[pcc:unverified].
 
 ![Jump count: pooled ratios and phases](figures/jumps.png)
 
@@ -44,9 +51,9 @@ All 16 sessions completed with 390 of 390 records verified each, and every audit
 replay with 0 problems (`data/verify-k*-s*.txt`) [pcc:unverified]. Pooled figures use the 3,072
 measured records per size (`data/pooled_measured.json`).
 
-Mean S per arm (committed band, then with table inserts also priced):
+Mean S per arm (pre-2026-11-08 reading, inserts unpriced; the last two columns price the inserts):
 
-| k | arm | S w=0 | S w=0.1 | S w=1 | w=0.1, inserts priced | w=1, inserts priced |
+| k | arm | S w=0 | S w=0.1 (unpriced) | S w=1 (unpriced) | w=0.1, inserts priced | w=1, inserts priced |
 |--:|:--|--:|--:|--:|--:|--:|
 | 20 | rho-neg | 1.573 | 1.686 | 2.711 | 1.686 | 2.711 |
 | 20 | twcj-j16 | 2.136 | 2.140 | 2.181 | 2.279 | 3.567 |
@@ -61,7 +68,7 @@ Mean S per arm (committed band, then with table inserts also priced):
 | 24 | twcj-j8 | 1.663 | 1.664 | 1.674 | 1.809 | 3.124 |
 | 24 | twcj-j32 | 1.606 | 1.607 | 1.617 | 1.740 | 2.952 |
 
-Pooled ratios with 95 % intervals over 8 single-target sessions (committed band):
+Pooled ratios with 95 % intervals over 8 single-target sessions (pre-2026-11-08 reading, inserts unpriced):
 
 | k | ratio | w = 0 | w = 0.1 | w = 1 |
 |--:|:--|:--|:--|:--|
@@ -78,15 +85,18 @@ Pooled ratios with 95 % intervals over 8 single-target sessions (committed band)
 | 24 | j16 / rho-neg | 1.343 [1.219, 1.479] | 1.233 [1.118, 1.359] | 0.712 [0.643, 0.787] * |
 | 24 | j4 / rho-neg | 1.703 [1.566, 1.852] | 1.564 [1.437, 1.701] | 0.903 [0.827, 0.985] * |
 
-\* The committed band prices rho-neg's per-step canonicalisation and not the walk arms' per-step
+\* The pre-2026-11-08 reading prices rho-neg's per-step canonicalisation and not the walk arms' per-step
 table inserts (the asymmetry found in `research/curve25519_f1_targetwalk_20261108` section 5).
-With `--price-table-work` (PR #3700's opt-in reading; `data/band-tw-*.txt`, and
+With `--price-table-work` (the priced reading, PR #3700's opt-in and the default after the ruling of 2026-11-08; `data/band-tw-*.txt`, and
 `ratios_table_work_priced` in `data/pooled_measured.json`) j16 / rho-neg is 1.358 / 1.351 / 1.316
 at k = 20 and 1.343 / 1.338 / 1.317 at k = 24 at w = 0 / 0.1 / 1, and j4 / rho-neg is
 1.657 / 1.659 / 1.667 and 1.703 / 1.702 / 1.695, so rho-neg is ahead at every weight under that
-reading [pcc:unverified]. ecbench's own committed band verdict for rho-neg against every twcj arm is
-"unresolved inside the band" in every session (`data/band-k*.txt`), so no rank between them is
-admitted under the committed reading [pcc:unverified].
+reading [pcc:unverified]. ecbench's own verdict under the pre-2026-11-08 reading
+(`data/band-k*.txt`) for rho-neg against twcj-j16, j8 and j32 is "unresolved inside the band" in all
+16 sessions; against j4 in 11 of 16 (k = 20: 5 of 8, k = 24: 6 of 8); against j2 in none (rho-neg is
+ahead in 16 of 16) [pcc:unverified]. Where the verdict is unresolved no rank is admitted under that
+reading; under the priced reading (`data/band-tw-*.txt`) rho-neg is ahead of all five twcj arms in
+16 of 16 sessions [pcc:unverified].
 
 ### Phases and walk diagnostics (mean over 512 measured runs per arm, units of sqrt(r))
 
@@ -103,8 +113,12 @@ admitted under the committed reading [pcc:unverified].
 | 24 | twcj-j16 | 0.040 | 0.110 | 1.355 | 0.079 | 0.000 | 1.583 | 1.36 (0.47) | 2.05 | 0 |
 | 24 | twcj-j32 | 0.040 | 0.152 | 1.335 | 0.079 | 0.000 | 1.606 | 1.34 (0.47) | 2.03 | 0 |
 
-The set-up follows the frozen model to within 5 % (measured 85.8 / 92.6 / 106.2 / 133.4 / 187.8 GAE
-for 2 / 4 / 8 / 16 / 32 jumps at k = 20, about 3.5 GAE per jump plus 80 fixed) [pcc:unverified].
+The set-up follows the frozen model (`data/model.json`) to within 9 %, 0.024 sqrt(r): at k = 20
+the model gives 79 / 86 / 100 / 128 / 184 GAE against measured 85.8 / 92.6 / 106.2 / 133.4 / 187.8
+for 2 / 4 / 8 / 16 / 32 jumps (+8.6 / +7.7 / +6.2 / +4.2 / +2.1 %), at k = 24 97 / 105 / 121 / 153 /
+217 against 105.7 / 113.4 / 128.6 / 159.2 / 220.2 (+9.0 / +8.0 / +6.3 / +4.1 / +1.5 %); it is within
+5 % only for 16 and 32 jumps, and the model's fixed part is 8 to 9 GAE low (72 against about 80 at
+k = 20); the slope is about 3.5 GAE per jump [pcc:unverified].
 The walk does not: every reduction in jumps lengthens it, and every collision beyond the second is
 a dependent row [pcc:unverified].
 
@@ -123,6 +137,11 @@ a dependent row [pcc:unverified].
 | P7b | k=20 j4/rho-neg point in [1.25, 1.40] | 1.657 | **failed** [pcc:unverified] |
 
 Two of nine held. The failed predictions stay failed; nothing was re-scored.
+
+Note (validator erratum E6): the k = 24 "model total S" values for j4 / j8 / j32 in PROTOCOL.md
+section 4 (1.594 / 1.604 / 1.662) are mistyped; `data/model.json`, hashed in the same freeze, gives
+1.5899 / 1.6009 / 1.6672 and is authoritative. The frozen file is not edited, and no prediction uses
+these totals [pcc:unverified].
 
 ## 4. Why the model failed (exploratory, derived from the counters, not frozen)
 
@@ -149,7 +168,7 @@ k = 20). At k = 28 and 32 the set-up is 0.01 sqrt(r) or less, which is the follo
 
 ## 5. Distance to matched rho (rho-neg, same sessions)
 
-| k | arm | w = 0 | w = 0.1 (committed / inserts priced) | w = 1 (committed / inserts priced) |
+| k | arm | w = 0 | w = 0.1 (pre-2026-11-08 / inserts priced) | w = 1 (pre-2026-11-08 / inserts priced) |
 |--:|:--|--:|:--|:--|
 | 20 | twcj-j16 (current best) | 1.36x [1.23, 1.50] | 1.27x / 1.35x | 0.80x (artifact) / 1.32x |
 | 20 | twcj-j32 | 1.43x | 1.33x / 1.41x | 0.85x (artifact) / 1.34x |
@@ -158,8 +177,29 @@ k = 20). At k = 28 and 32 the set-up is 0.01 sqrt(r) or less, which is the follo
 
 No arm of this study moves the distance remaining; the 16-jump arm stays the best, at 1.34x to
 1.36x rho-neg at w = 0, with the earlier studies' 1.40x and 1.41x inside these intervals
-[pcc:unverified]. Rho-neg's own set-up (0.376 sqrt(r) at k = 20, 0.098 at k = 24) is part of the
+[pcc:unverified]. The order of rho-neg and twcj-j16 changes with w under the pre-2026-11-08 reading
+and ecbench calls it unresolved in 16 of 16 sessions, so that reading ranks neither side; under the
+priced reading rho-neg is ahead at every weight (j16 lower ends 1.223 / 1.175 at w = 0.1 / 1 for
+k = 20, 1.214 / 1.189 for k = 24) [pcc:unverified]. Rho-neg's own set-up (0.376 sqrt(r) at k = 20, 0.098 at k = 24) is part of the
 reference, as in the earlier studies.
+
+### Unpriced counters per arm (AGENTS.md section 5a listing)
+
+Mean per measured run, in units of sqrt(r), k = 20 / k = 24 (validator's recomputation from the
+records) [pcc:unverified]. U is the sum of the counters in `cost.unpriced`; the last column is
+`work_native.table_insert_attempts`, counted but priced only by the priced reading.
+
+| arm | U (cost.unpriced) | components | table inserts (counted, priced only in the priced reading) |
+|:--|:--|:--|:--|
+| rho-neg | 1.138 / 1.061 | `canonicalisations_uncharged` only | none |
+| twcj-j2 | 0.300 / 0.230 | lookups 0.136 / 0.185, row_ops 0.148 / 0.041, projected-base and Legendre items 0.015 / 0.005 | 4.430 / 4.474 |
+| twcj-j4 | 0.052 / 0.014 | row_ops, sqrt_solves, legendre_symbols, projected_base_* items | 1.860 / 1.775 |
+| twcj-j8 | 0.046 / 0.011 | as j4 | 1.464 / 1.450 |
+| twcj-j16 | 0.045 / 0.011 | as j4 | 1.386 / 1.355 |
+| twcj-j32 | 0.044 / 0.011 | row_ops 0.028 / 0.007 plus the items above | 1.352 / 1.335 |
+
+Each of these is priced at 0, 0.1 and 1 GAE per operation in the band files, and two arms are
+ranked only where the order holds across that band [pcc:unverified].
 
 ## 6. Scope and limits
 
@@ -167,12 +207,52 @@ reference, as in the earlier studies.
   [c]G + [b]Q whose first collision gives log Q (rho with a stored walk). It does no decomposition
   work and is not decomposition-based index calculus; no leaderboard or `benchmarks/README.md`
   row is proposed, and none could be added without the validation gate (no VALIDATION.json, no
-  replay certificate, no validator report) [pcc:unverified].
+  replay certificate; a validator report now exists, `validator-report.json`) [pcc:unverified].
 - Single target only; the walk is built from the target.
 - Local L0 counted units on a shared host; deterministic and replayed; no wall-clock claim.
 - No A/A arm (ecbench seeds runs by workload and round; an A/A arm replicates rho-neg exactly,
   as the earlier studies found). Noise is carried by the between-session t intervals.
 - research-kb and ecdb were not reachable from this machine; no novelty claim is made.
+
+## Validation (independent validator, 2026-11-08; status pass_with_errata)
+
+Source: `validator-report.json` in this directory (not edited). Each erratum and how it was applied
+here [pcc:unverified]:
+
+- **E1** (Answer wording, 5a ranking): the Answer and section 5 now state the three readings
+  separately (w = 0 ahead; pre-2026-11-08 reading unresolved with the order flipping at w = 1;
+  priced reading ahead at every weight, 1.32x to 1.35x), and "committed band" is relabelled "the
+  pre-2026-11-08 reading" throughout [pcc:unverified].
+- **E2** (band-verdict footnote): replaced by the tally j16, j8, j32 unresolved in 16 of 16; j4 in
+  11 of 16; j2 in none (rho-neg ahead in 16 of 16) [pcc:unverified].
+- **E3** (5a listing): the table of every arm's unpriced counters per run was added to section 5
+  [pcc:unverified].
+- **E4** (set-up model): "within 5 %" replaced by "within 9 % (0.024 sqrt(r)), model fixed part 8 to
+  9 GAE low", with the per-jump-count deviations [pcc:unverified].
+- **E5** (overclaim): "optimum" replaced by "16 jumps is not beaten by any tested count; 8 and 32 are
+  indistinguishable at k = 20 and k = 24 respectively; 2 and 4 are worse" [pcc:unverified].
+- **E6** (PROTOCOL.md k = 24 totals): noted in section 3; the frozen file is untouched
+  [pcc:unverified].
+- **E7** (record hygiene): disclosed below; closed records are not edited, and the raw archives are
+  not uploaded by this commit [pcc:unverified].
+
+Disclosures [pcc:unverified]:
+
+- The measuring binary `d23fab99...` (`/home/user/ctarget-f1/release/ecbench`) was rebuilt on disk at
+  2026-11-08T21:08:01Z during validation (now `fcb16d9c...`). The validator's replays used
+  `fcb16d9c` and reproduced every count in all 16 sessions (`audit OK: 390 records, 384 replays
+  reproduced, 0 problems`), so the replays establish behavioural identity only, not byte identity of
+  source or binary [pcc:unverified].
+- The benchrec records `20261108T2045Z` and `T2047Z` store 4-decimal metric values that differ from
+  the validator's recomputation by at most 0.07 % (the 3-decimal README values agree), for example
+  k = 20 j16 S 2.1364 against 2.13575 and j16 / rho-neg 1.3581 against 1.35801; the difference comes
+  from rounding in the producer's pipeline and is not explained by warm-ups. All 18 raw entries per
+  record have `uploaded: false` (raw archives not uploaded to S3), and `session.json` `git_commit`
+  and `git_dirty` are null, so the sessions are bound to the binary hash only [pcc:unverified].
+- For its replays the validator exported `CHECKPOINT_SKIP` as well as `BENCHREC_SKIP`; no ledger
+  bypass entry resulted [pcc:unverified].
+- Validation gate: validator report only; records have `validation: null` and no `VALIDATION.json`
+  exists, so no leaderboard or `benchmarks/README.md` row follows [pcc:unverified].
 
 ## Files
 
