@@ -2692,7 +2692,14 @@ mod tests {
                 pricing,
             };
             compare_loaded_weighted(
-                &session, &records, &session, &records, "rho-neg", "twcj-x15", Level::L0, &opts,
+                &session,
+                &records,
+                &session,
+                &records,
+                "rho-neg",
+                "twcj-x15",
+                Level::L0,
+                &opts,
                 None,
             )
             .unwrap()
@@ -2700,18 +2707,42 @@ mod tests {
         let on = run(Pricing::default());
         let off = run(Pricing::pre_2026_11_08());
         let explicit = run(Pricing { table_work: true });
-        assert_eq!(on.comparison_id, explicit.comparison_id, "`--price-table-work` is a no-op");
-        assert_eq!(on.priced_table_work, vec!["table_insert_attempts".to_string()]);
-        assert!(off.priced_table_work.is_empty(), "the pre-2026-11-08 reading");
-        assert_ne!(on.comparison_id, off.comparison_id, "the reading is in the id");
+        assert_eq!(
+            on.comparison_id, explicit.comparison_id,
+            "`--price-table-work` is a no-op"
+        );
+        assert_eq!(
+            on.priced_table_work,
+            vec!["table_insert_attempts".to_string()]
+        );
+        assert!(
+            off.priced_table_work.is_empty(),
+            "the pre-2026-11-08 reading"
+        );
+        assert_ne!(
+            on.comparison_id, off.comparison_id,
+            "the reading is in the id"
+        );
         assert!(on.legacy_comparison_id.is_some());
-        assert_eq!(on.legacy_comparison_id, off.legacy_comparison_id, "v1 had no band");
-        assert_eq!(on.ops.ratio_b_over_a, off.ops.ratio_b_over_a, "recorded S headline");
+        assert_eq!(
+            on.legacy_comparison_id, off.legacy_comparison_id,
+            "v1 had no band"
+        );
+        assert_eq!(
+            on.ops.ratio_b_over_a, off.ops.ratio_b_over_a,
+            "recorded S headline"
+        );
         assert_eq!(on.ops.ci95_bootstrap, off.ops.ci95_bootstrap);
-        let (bon, boff) = (on.ops.band.as_ref().unwrap(), off.ops.band.as_ref().unwrap());
+        let (bon, boff) = (
+            on.ops.band.as_ref().unwrap(),
+            off.ops.band.as_ref().unwrap(),
+        );
         assert_eq!(bon.priced_table_work, on.priced_table_work);
         assert!(boff.priced_table_work.is_empty());
-        assert_eq!(bon.ratio_b_over_a[0], boff.ratio_b_over_a[0], "nothing moves at w = 0");
+        assert_eq!(
+            bon.ratio_b_over_a[0], boff.ratio_b_over_a[0],
+            "nothing moves at w = 0"
+        );
         assert!(bon.ratio_b_over_a[2].unwrap() > boff.ratio_b_over_a[2].unwrap());
         assert_eq!(boff.order, "unresolved inside the band");
         assert!(bon.order.starts_with("twcj-x15 >"), "{}", bon.order);
@@ -2724,7 +2755,10 @@ mod tests {
             }
         }
         let json = serde_json::to_value(&off).unwrap();
-        assert!(json.get("priced_table_work").is_none(), "as the old files were written");
+        assert!(
+            json.get("priced_table_work").is_none(),
+            "as the old files were written"
+        );
     }
 
     #[test]
