@@ -7,12 +7,12 @@
     "Codex planning lane"
   ],
   "status": "blocked",
-  "status_note": "The compact 32-context/2368-attempt recipe, balanced schedule, fail-stop fresh-process executor and paired diagnostic analyzer have development qualification. The canonical protocol is valid but unfrozen. Native L2/host/resource and full inventory/external/masked-export integration, independent audit, merged-source qualification and cloud/budget/checkpoint admission remain pending; the production pilot has not run.",
+  "status_note": "User budget override recorded 2026-11-08: account/lane headroom is no longer a gate for the first pilot within a USD 10 total cap. Protocol v2 is draft/unfrozen. Authentication, exact-source checkpoint/image/native L2 and remaining software/independent qualifications still block measurements; the production pilot has not run.",
   "blocked_on": [
     "pr:2984 native integration and combined-source qualification",
     "problem:problems/native-ecbench-pcc-ledger-fork.md protected canonical ledger decision",
     "note:Finish native L2/host/resource and full inventory/external/masked-export integration, independent audit and canonical freeze",
-    "note:Current account/lane budget, exact-source S3 readback and native image/execution admission required"
+    "note:Exact-source S3 readback, authenticated native image/execution and remaining technical admission required; budget headroom stop overridden 2026-11-08"
   ],
   "links": {
     "lead": "backlog/XP-20261105-native-point-hashing/README.md",
@@ -21,7 +21,9 @@
       "docs/hashed-ecdl-functional-plan.md",
       "backlog/XP-20261105-native-point-hashing/launch-readiness-20261105.json",
       "research/native_point_hashing_20261105/README.md",
-      "research/native_point_hashing_20261105/pilot-v1/PROTOCOL.md"
+      "research/native_point_hashing_20261105/pilot-v1/PROTOCOL.md",
+      "research/native_point_hashing_20261105/pilot-v1/budget-override-20261108.json",
+      "research/native_point_hashing_20261105/pilot-v1/protocol-v2.json"
     ],
     "prs": [
       2984
@@ -55,7 +57,7 @@
     "gpu": null,
     "est_core_hours": null,
     "est_wall_hours": null,
-    "notes": "User-authorized pilot scope; the reservation ceiling is uncalibrated and not admitted. One native L2 Spot job, concurrency 1, original 1800s absolute deadline. At most 2 reserved vCPU-hours for payload under this ceiling; builders/queue/idle/storage/transfer are additional and require current price/headroom checks. Multi-host work needs a separate matched-host protocol within existing authorized caps."
+    "notes": "Explicit user budget exception 2026-11-08: account/lane headroom stop waived for this first pilot, with USD 10 whole-pilot cap from the existing native-work ceiling. One native L2 job, 4 CPU/4 GiB, concurrency 1, original 1800s deadline; at most 2 builds and no automatic retry/restore. Charge whole-worker default vCPUs, builds/idle/failures/storage/transfer. Preserve live resource limits; no global budget/quota/IAM changes."
   },
   "run": {
     "argv": [
@@ -109,7 +111,7 @@
     },
     "funding": {
       "units": 0,
-      "rationale": "The user authorized the experiment scope. This unready card has no posted lease or budget reservation; zero priority funding does not establish account/lane headroom or request another execution approval."
+      "rationale": "The user overrides budget headroom gating for this bounded USD 10 pilot. Zero workflow priority is not a budget stop or a request for renewed approval. The card remains blocked on technical/authentication readiness; no lease has been posted."
     }
   },
   "owner_hint": "native ECC implementation and measurement lane"

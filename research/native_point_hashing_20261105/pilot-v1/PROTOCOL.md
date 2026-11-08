@@ -5,6 +5,12 @@ measurement has been taken. Input generation and development controls are
 preparation, not study outcomes. The original frozen native feasibility panel
 and all earlier evidence remain unchanged.
 
+Current canonical draft: [protocol-v2.json](protocol-v2.json). The
+[2026-11-08 user budget exception](budget-override-20261108.json) removes
+account/lane headroom gating for this first pilot within a USD 10 total cap.
+The old [v1 draft](protocol.json) is retained unchanged. All measurement,
+authentication, source/image, resource and review requirements continue.
+
 ## Requested experiment and current software
 
 The question is whether prepared points, exact membership indexes and hash
@@ -104,7 +110,7 @@ promoted from this pilot analysis. **Timing comparisons are refused** until the
 native L2/host/resource and canonical export/masking integrations exist.
 [pcc:unverified]
 
-`protocol.json` passes structural and cross-reference checks as a draft. Its
+The canonical record passes structural and cross-reference checks as a draft. Its
 source/binary admission, runtime estimate, power and freeze fields remain
 unready. Passing that validator does not establish launch readiness. Freeze
 the completed canonical record and analysis before the first affected data;
@@ -121,5 +127,5 @@ substitute for the 12/16-bit pilot. The analyzer reports positive/negative
 control coverage and the empty-base/full-sumset exceptions explicitly.
 These are the software interfaces, not instructions to run a local
 timing substitute. A cloud submission requires the maintained authenticated
-native image/worker path, current account/lane headroom and exact-source S3
-checkpoint/readback. No such submission was made during this development.
+native image/worker path and exact-source S3 checkpoint/readback, within the
+scoped budget exception and retained limits. No such submission was made.

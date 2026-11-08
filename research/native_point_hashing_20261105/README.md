@@ -112,7 +112,7 @@ do not treat the final manifest as an identity for the initial receipts.
 The six-arm single-batch instrument now has a compact fixed 32-context recipe,
 2,368-attempt schedule (the original 1,920 timed/warmup batches plus explicit
 controls and counted passes), fresh-process execution, durable failure ledger
-and paired diagnostic analysis. The [canonical draft](pilot-v1/protocol.json)
+and paired diagnostic analysis. The current [canonical draft](pilot-v1/protocol-v2.json)
 passes structural/cross-reference validation but remains unfrozen. The real CLI
 development control completed 76 counts-only F17 children; no 12/16-bit solver
 batch was run. Current receipts are in [pilot-v1](pilot-v1/qualification.json).
@@ -132,7 +132,9 @@ The [retained launch-admission snapshot](../../backlog/XP-20261105-native-point-
 records absent AWS credentials, unknown budget headroom and the unavailable
 main-branch checkpoint control path at its inspected revision. The current
 runtime still exposes no cloud identity. An existing authenticated runner,
-current account/lane headroom, exact-source S3 write/readback and native
-image/execution admission are prerequisites. Do not use chat credentials,
+exact-source S3 write/readback and native image/execution admission are
+prerequisites. The user [budget exception](pilot-v1/budget-override-20261108.json)
+supersedes account/lane headroom gating for this first pilot within USD 10;
+the old readiness snapshot is historical. Do not use chat credentials,
 increase quotas/trust, bypass the protected-ledger decision, run a local timing
 substitute or modify the old frozen evidence. No scientific job has been queued.

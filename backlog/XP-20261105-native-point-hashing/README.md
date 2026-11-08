@@ -13,6 +13,12 @@ or runtime predictions. The initial request was experiment design; the later
 launch request authorizes execution once the implementation and admission
 prerequisites are satisfied. No paid build or scientific submission was made.
 
+The [2026-11-08 user budget exception](../../research/native_point_hashing_20261105/pilot-v1/budget-override-20261108.json)
+overrides account/lane headroom gating for the first pilot within the existing
+USD 10 native-work ceiling. The current canonical draft is
+[protocol-v2.json](../../research/native_point_hashing_20261105/pilot-v1/protocol-v2.json).
+The original v1 draft, source manifests and frozen evidence remain unchanged.
+
 ## Question and deliverables
 
 Which uses of point hashing reduce the complete cost of useful relations, and
@@ -233,17 +239,20 @@ regressions and null outcomes without promoting them into a speed claim.
    normalization and accounting. Pin the merged combined source and manifests.
 2. Freeze each canonical protocol, input/seed manifests, driver/checker hashes,
    external references, byte/work pricing, analysis and the full attempt flow.
-3. Establish current account/lane charged-plus-reserved headroom and prices,
-   then fresh exact-source S3 checkpoint **write/readback**, authenticated native
+3. Apply the scoped user budget exception: unknown/exhausted account/lane
+   headroom alone no longer blocks this first pilot, whose whole cost is capped
+   at USD 10. Retain charged/reserved costs and actual worker/build/idle/storage
+   accounting. Require fresh exact-source S3 checkpoint **write/readback**, authenticated native
    image identity and execution admission. No chat credentials or substitute
    local fixtures/timings. No scientific execution until these checks succeed.
 4. Propose a first-pilot ceiling of one **4-vCPU, 4-GiB** native L2 Spot job,
    concurrency **1**, original absolute deadline **1,800 seconds**, and **zero
    automatic retries/restores**. CPU reservation is at most `4 * 0.5 = 2`
    vCPU-hours for the payload. That is a capacity bound, not a runtime estimate.
-   Build, queue, idle, disk and transfer costs are additional and currently
-   unestimated; obtain current prices and a whole-job dollar cap before
-   readiness. Later studies and confirmation need their own costed admission.
+   Build, queue, idle, disk and transfer costs also count against the USD 10
+   whole-pilot cap. At most two builds and one original measurement attempt are
+   authorized under this exception. Count actual default worker vCPUs even with
+   SMT disabled. Later studies and confirmation need their own costed admission.
 5. Stop on a correctness/control failure, invalid manifest or budget/deadline
    boundary. Retain original IDs/deadlines and partial artifacts; do not resubmit
    an ambiguous or interrupted job as a fresh attempt. Export planned,
@@ -251,7 +260,8 @@ regressions and null outcomes without promoting them into a speed claim.
 
 Funding stays zero while unready. The user has authorized the experiment
 scope; this card has posted no allocation, lease, build or job. Current
-headroom and execution admission still need checking. The protected PCC-ledger proposal on PR #2984
+cost accounting and execution admission still apply. The scoped exception
+removes headroom gating for this pilot. The protected PCC-ledger proposal on PR #2984
 remains a separate decision; this card does not authorize editing that ledger
 or the conflicted 2026-11-04 journal. Profiling and the original frozen matched
 panel retain their pending status and are not discharged by these new studies.

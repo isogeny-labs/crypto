@@ -2,8 +2,15 @@
 
 The first point-hashing study now has a fixed input recipe, complete schedule,
 fresh-process executor, retained failure flow and paired diagnostic analysis.
-The production study has not run. The [protocol](PROTOCOL.md) and
-[canonical JSON](protocol.json) remain draft/unfrozen.
+The production study has not run. The [protocol](PROTOCOL.md) and current
+[canonical v2 JSON](protocol-v2.json) remain draft/unfrozen. The original
+[v1 draft](protocol.json) remains unchanged for its qualification receipts.
+
+The user [overrode budget headroom gating on 2026-11-08](budget-override-20261108.json).
+This first pilot uses the existing USD 10 native-work ceiling conservatively,
+with at most two builds, one 1,800-second attempt and zero automatic retries or
+restores. Unknown account/lane headroom is no longer a blocking gate. The
+exception changes no shared AWS budget, quota, IAM or review settings.
 
 ## Prepared pilot
 
@@ -65,7 +72,9 @@ ordered/hash counts therefore cannot establish equal runtime or table cost.
 
 Finish test-specific power/runtime calibration and freeze the completed
 canonical protocol/analysis before affected data. Execution still requires
-current account/lane headroom, fresh exact-source S3 write/readback and an
-authenticated native worker/image. This software qualification submits no job.
+fresh exact-source S3 write/readback and an authenticated native worker/image.
+The scoped USD 10 exception supersedes the old headroom stop, while cost
+accounting and the retained resource/deadline limits continue. This software
+qualification submits no job.
 The remaining four component studies and fresh-target ECBench confirmation
 stay in the [original backlog](../../../backlog/XP-20261105-native-point-hashing/README.md).
