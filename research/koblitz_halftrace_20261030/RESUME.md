@@ -54,6 +54,14 @@ was uploaded. protocol.json is prospectively frozen with canonical hash
 e8e527aacb96a7e172069353254b47bce33526da7111f913b67bcdc4648c0d07.
 
 ## Next steps
+On 8 November, prepared an explicit manual full-library development job in the
+existing rust-all-targets workflow. It uses GitHub-hosted Ubuntu with an actual
+time-interface preflight, immutable source input and Rust1.99.1. Ordinary compile
+jobs remain unchanged; no new credentials, scientific run or benchmark is added.
+Publish and lint this change, then dispatch one pinned development validation
+attempt and retain its run identity. The old local attempt stays incomplete.
+See development/hosted-validation-20261108/ for its bounds and receipt contract.
+
 Attach an existing approved checkpoint/lab connection or configure the approved
 Actions upload secret. Do not repeat the failed preparation until its cause has
 changed. A fresh successful source-pinned checkpoint is required before dispatching

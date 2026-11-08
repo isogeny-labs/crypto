@@ -16,6 +16,15 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      full_library:
+        description: Run the complete native release library suite on a supported Linux host
+        type: boolean
+        default: false
+      source_revision:
+        description: Exact 40-character source SHA for the optional full library job
+        type: string
+        default: ''
 concurrency:
   group: ${{ github.event_name == 'pull_request' && github.workflow_ref || format('run-{0}', github.run_id) }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -114,3 +123,120 @@ jobs:
       # and its tests with it on.
       - run: RUSTFLAGS=-Awarnings cargo check --lib --tests --features wide-vars
       - run: cargo test --manifest-path crates/crypto-analysis-core/Cargo.toml --lib
+
+  full-library:
+    name: Native full library (manual)
+    if: github.event_name == 'workflow_dispatch' && inputs.full_library
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    permissions:
+      contents: read
+    env:
+      SOURCE_REVISION: ${{ inputs.source_revision }}
+      WORKFLOW_REVISION: ${{ github.workflow_sha }}
+      CARGO_BUILD_JOBS: '2'
+      RUST_TEST_THREADS: '4'
+      RAYON_NUM_THREADS: '1'
+    steps:
+      - name: Admit the source and required Linux interfaces
+        shell: bash
+        run: |
+          set -euo pipefail
+          VALIDATION_DIR="$RUNNER_TEMP/native-library-validation"
+          printf 'VALIDATION_DIR=%s\n' "$VALIDATION_DIR" >> "$GITHUB_ENV"
+          mkdir -p "$VALIDATION_DIR"
+          jq -n --arg source "$SOURCE_REVISION" --arg workflow "$WORKFLOW_REVISION" \
+            --arg run "$GITHUB_RUN_ID" --arg attempt "$GITHUB_RUN_ATTEMPT" \
+            '{source_revision:$source,workflow_revision:$workflow,run_id:$run,
+              run_attempt:$attempt,kind:"native-development-validation",
+              job_deadline_minutes:90,automatic_retries:0,scientific_measurement:false}' \
+            > "$VALIDATION_DIR/request.json"
+          [[ "$SOURCE_REVISION" =~ ^[0-9a-f]{40}$ ]]
+          test -r /proc/sys/kernel/random/boot_id
+          readlink /proc/self/ns/time > "$VALIDATION_DIR/time-namespace.txt"
+          cat /proc/self/timens_offsets > "$VALIDATION_DIR/time-offsets.txt"
+          jq -n --arg kernel "$(uname -sr)" --arg runner "$RUNNER_NAME" \
+            --argjson cpus "$(nproc)" \
+            '{kernel:$kernel,runner:$runner,logical_cpus:$cpus,
+              required_time_interfaces_readable:true}' > "$VALIDATION_DIR/host.json"
+      - name: Check out the immutable source and tracked test fixtures
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        timeout-minutes: 5
+        with:
+          ref: ${{ inputs.source_revision }}
+          filter: blob:none
+          persist-credentials: false
+      - name: Bind the checkout and toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SOURCE_REVISION"
+          test -z "$(git status --porcelain --untracked-files=no)"
+          rustup toolchain install 1.99.1 --profile minimal
+          rustup run 1.99.1 rustc --version > "$VALIDATION_DIR/rustc.txt"
+          sha256sum Cargo.toml Cargo.lock src/cryptanalysis/koblitz_fast.rs \
+            src/cryptanalysis/koblitz_index_calculus.rs \
+            src/cryptanalysis/ic_framework/plugins.rs examples/koblitz_halftrace.rs \
+            > "$VALIDATION_DIR/source.sha256"
+      - name: Build the complete release library test executable
+        timeout-minutes: 25
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          cargo +1.99.1 test --release --lib --locked --no-run --message-format=json \
+            > "$VALIDATION_DIR/build.jsonl" 2> "$VALIDATION_DIR/build.stderr"
+          build_status=$?
+          set -e
+          printf '%s\n' "$build_status" > "$VALIDATION_DIR/build.exit"
+          if [ "$build_status" -ne 0 ]; then
+            tail -n 60 "$VALIDATION_DIR/build.stderr"
+            exit "$build_status"
+          fi
+          mapfile -t test_binaries < <(jq -r \
+            'select(.reason=="compiler-artifact" and .target.name=="crypto_lib" and .profile.test==true) | .executable // empty' \
+            "$VALIDATION_DIR/build.jsonl")
+          test "${#test_binaries[@]}" -eq 1
+          test -x "${test_binaries[0]}"
+          sha256sum "${test_binaries[0]}" > "$VALIDATION_DIR/test-binary.sha256"
+      - name: Run every non-ignored library test and retain the parent status
+        timeout-minutes: 55
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          cargo +1.99.1 test --release --lib --locked 2>&1 | tee "$VALIDATION_DIR/library.log"
+          pipeline_status=("${PIPESTATUS[@]}")
+          test_status=${pipeline_status[0]}
+          log_status=${pipeline_status[1]}
+          set -e
+          jq -n --arg source "$SOURCE_REVISION" --argjson status "$test_status" --argjson log_status "$log_status" \
+            '{source_revision:$source,cargo_parent_exit_code:$status,
+              log_writer_exit_code:$log_status,
+              command:["cargo","+1.99.1","test","--release","--lib","--locked"],
+              filters:[],ignored_test_policy:"unchanged_default",
+              scientific_measurement:false}' > "$VALIDATION_DIR/parent-exit.json"
+          if [ "$log_status" -ne 0 ]; then exit "$log_status"; fi
+          exit "$test_status"
+      - name: Retain checksums and post-run source state
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          if test -d .git; then
+            git status --porcelain --untracked-files=no > "$VALIDATION_DIR/post-run-status.txt"
+          fi
+          if test -f "$VALIDATION_DIR/source.sha256"; then
+            sha256sum -c "$VALIDATION_DIR/source.sha256" > "$VALIDATION_DIR/post-run-source-check.txt"
+          fi
+          if test -f "$VALIDATION_DIR/library.log"; then
+            sha256sum "$VALIDATION_DIR/library.log" > "$VALIDATION_DIR/library-log.sha256"
+          fi
+      - name: Upload development receipts and complete logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-library-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/native-library-validation
+          retention-days: 14
+          if-no-files-found: warn

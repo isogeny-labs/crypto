@@ -1,0 +1,54 @@
+{
+  "schema": "crypto.native-halftrace-hosted-validation-preparation/v1",
+  "prepared_on": "2026-11-08",
+  "baseline_head": "2e2fb387b9d898c5e346056cf1ac41ab4dbefd9a",
+  "native_source_unchanged_from": "507829726fbc731543f4527348b55c5e479242c9",
+  "workflow_path": ".github/workflows/rust-all-targets.yml",
+  "manual_inputs": {
+    "full_library": true,
+    "source_revision": "exact_published_commit_to_be_recorded_in_dispatch_receipt"
+  },
+  "kind": "development_correctness_validation",
+  "host": "github-hosted_ubuntu-24.04",
+  "job_deadline_minutes": 90,
+  "step_deadlines_minutes": {
+    "checkout": 5,
+    "build": 25,
+    "tests": 55
+  },
+  "automatic_retries": 0,
+  "compiler": "Rust 1.99.1",
+  "cargo_build_jobs": 2,
+  "rust_test_threads": 4,
+  "rayon_threads": 1,
+  "filters": [],
+  "ignored_test_policy": "unchanged_default",
+  "new_secrets": [],
+  "permissions": {
+    "contents": "read"
+  },
+  "preflight_required_interfaces": [
+    "/proc/sys/kernel/random/boot_id",
+    "/proc/self/ns/time",
+    "/proc/self/timens_offsets"
+  ],
+  "local_host_time_interfaces": "still_absent_no_local_suite_restart",
+  "preparation_checks": {
+    "actionlint_version": "1.7.12",
+    "actionlint_exit_code": 0,
+    "embedded_shell_bash_n_exit_code": 0,
+    "existing_workflow_parser": {
+      "passed": 4,
+      "failed": 0
+    },
+    "native_source_manifest": "matched",
+    "git_diff_check": "passed"
+  },
+  "initial_lint_failure": "actionlint-initial.txt",
+  "parent_result_requirement": "Cargo parent and log-writer exit receipts plus a complete parent log; absent terminal receipt stays incomplete.",
+  "scientific_measurement": false,
+  "scientific_source_unchanged": "7c58661935b79153ff74c1208d0592aa56ed04a1",
+  "frozen_spec_protocol_changed": false,
+  "checkpoint_retry": false,
+  "performance_p1": "unresolved"
+}
