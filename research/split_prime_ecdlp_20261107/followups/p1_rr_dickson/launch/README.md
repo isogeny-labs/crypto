@@ -44,3 +44,16 @@ The limits for this run:
 
 Results: `s3://isolab-results-104186811093-us-east-2/runs/<job>/<pod-uid>/`.
 Launcher receipts: `receipts/`.
+
+### Owner update (2026-11-08, after launch): "Exceed target budget"
+
+The USD 60 target is lifted. The owner authorized spending past it. Spending stays finite because
+the protocol limits the attempts:
+
+- at most three attempts per system (a1 plus two resubmissions);
+- each attempt runs at most 100,800 s;
+- at most two jobs run at a time.
+
+That is at most six node-runs of 28 h each. At about USD 0.4–0.7 per hour for a 128 GiB Spot node,
+the worst case is roughly USD 70–120. The memory sizes are unchanged: the namespace quota is 128 GiB
+for both jobs together, and raising it would be a separate cluster change.
