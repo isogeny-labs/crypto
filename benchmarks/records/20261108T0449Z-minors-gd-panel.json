@@ -1,6 +1,6 @@
 {
   "branch": "claude/serene-davinci-ujoi58",
-  "closed_utc": null,
+  "closed_utc": "2026-11-08T17:26:59+00:00",
   "commands": [
     {
       "argv": [
@@ -91,7 +91,98 @@
     "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39"
   },
   "id": "20261108T0449Z-minors-gd-panel",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 200,
+      "name": "envelope_cost_per_solve_b20",
+      "note": "Cheapest minors arm (envelope, PROTOCOL s7) at 20-bit group order: mgd.gesc, 200/200 successes; charged F_p mults per solve (inversion = 1.5 bits(p) mults; censored MLE work/successes); spread = Garwood 95%; reference = matched negation rho mean on the same 200 instances. Ratio 4.37, paired bootstrap 95% [4.28, 4.46]. source research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/analysis.json (frozen minors_gd_analyze.py, primary); re-derived identically in results/RD/analysis/minors_gd_summary.json. [pcc:unverified]",
+      "reference": 109303.85,
+      "reference_kind": "matched_rho",
+      "spread": [
+        415741.133,
+        551283.713
+      ],
+      "unit": "fmul",
+      "value": 477524.385
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 200,
+      "name": "envelope_cost_per_solve_b24",
+      "note": "Envelope at 24 bits: mgd.gesc, 200/200. Ratio 6.11 [5.75, 6.51]. source research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/analysis.json (frozen minors_gd_analyze.py, primary); re-derived identically in results/RD/analysis/minors_gd_summary.json. [pcc:unverified]",
+      "reference": 191091.545,
+      "reference_kind": "matched_rho",
+      "spread": [
+        1016735.174,
+        1348217.669
+      ],
+      "unit": "fmul",
+      "value": 1167832.095
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 200,
+      "name": "envelope_cost_per_solve_b28",
+      "note": "Envelope at 28 bits: mgd.apm2, 200/200. Ratio 19.3 [17.2, 21.7]. source research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/analysis.json (frozen minors_gd_analyze.py, primary); re-derived identically in results/RD/analysis/minors_gd_summary.json. [pcc:unverified]",
+      "reference": 366962.49,
+      "reference_kind": "matched_rho",
+      "spread": [
+        6177621.953,
+        8191689.716
+      ],
+      "unit": "fmul",
+      "value": 7095677.785
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 200,
+      "name": "envelope_cost_per_solve_b32",
+      "note": "Envelope at 32 bits: mgd.apm2, 200/200. Ratio 81.9 [71.8, 93.1]. source research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/analysis.json (frozen minors_gd_analyze.py, primary); re-derived identically in results/RD/analysis/minors_gd_summary.json. [pcc:unverified]",
+      "reference": 995064.755,
+      "reference_kind": "matched_rho",
+      "spread": [
+        70944848.181,
+        94074740.678
+      ],
+      "unit": "fmul",
+      "value": 81487955.565
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 200,
+      "name": "envelope_cost_per_solve_b36",
+      "note": "Envelope at 36 bits: mgd.apm2, 160/200 (censored MLE). Ratio 365 [309, 431]. source research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/analysis.json (frozen minors_gd_analyze.py, primary); re-derived identically in results/RD/analysis/minors_gd_summary.json. [pcc:unverified]",
+      "reference": 3481127.145,
+      "reference_kind": "matched_rho",
+      "spread": [
+        1087841908.863,
+        1492352630.258
+      ],
+      "unit": "fmul",
+      "value": 1270071395.575
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 200,
+      "name": "envelope_cost_per_solve_b40",
+      "note": "Envelope at 40 bits: mgd.apm2, 19/200 (censored MLE). Ratio 1552 [1049, 2721] = distance remaining to matched rho. Exponents (not a benchrec unit): mgd.apm2 e_all 0.787 [0.766, 0.816], e_top3 0.992 [0.919, 1.093]; rho e_all 0.346, e_top3 0.461. PROTOCOL s8 verdict: closed for the reconstruction (all 6 arms). source research/minors_guess_determine_20261107/results/RD/b8617fcd-e2e5-4235-90b0-b201e5bb3857/panel/analysis.json (frozen minors_gd_analyze.py, primary); re-derived identically in results/RD/analysis/minors_gd_summary.json. [pcc:unverified]",
+      "reference": 12859331.875,
+      "reference_kind": "matched_rho",
+      "spread": [
+        12778346633.28,
+        33144196052.448
+      ],
+      "unit": "fmul",
+      "value": 19954971149.632
+    }
+  ],
   "problem": "study:minors_guess_determine_20261107",
   "raw": [
     {
@@ -485,18 +576,29 @@
       "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/12/12b3cbe5ced06d3dc300a3a9867dfda500b967638125ae372182c5f9d2d995b4",
       "sha256": "12b3cbe5ced06d3dc300a3a9867dfda500b967638125ae372182c5f9d2d995b4",
       "uploaded": true
+    },
+    {
+      "bytes": 20522,
+      "path": "research/minors_guess_determine_20261107/results/RD/analysis/scripts.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9b/9b59797b9eff596f63a4a0d92d3a165bba9c5c9d5c0f9bae13d741eb78a3282e",
+      "sha256": "9b59797b9eff596f63a4a0d92d3a165bba9c5c9d5c0f9bae13d741eb78a3282e",
+      "uploaded": true
     }
   ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
-    "png": [],
-    "svg": []
+    "pdf": "research/minors_guess_determine_20261107/results/RD/analysis/minors_gd_report.pdf",
+    "png": [
+      "research/minors_guess_determine_20261107/results/RD/analysis/minors_gd_fig1.png"
+    ],
+    "svg": [
+      "research/minors_guess_determine_20261107/results/RD/analysis/minors_gd_fig1.svg"
+    ]
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "minors-gd-panel",
-  "status": "open",
-  "summary": "",
+  "status": "measured",
+  "summary": "minors guess-and-determine panel (relaunch C): PROTOCOL section 8 closes the lead for the reconstruction (six arms, prime fields, 20-40 bits); cheapest arm 4.37x matched rho at 20 bits rising to 1552x at 40 bits; top-three exponents 0.97-1.03 vs rho 0.46; independent re-derivation 0 disagreements in 1017 quantities",
   "validation": null
 }
