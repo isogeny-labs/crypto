@@ -157,8 +157,6 @@ fn algebra_block<const P: i64, const D: i64>(
     let h = &al.h;
     let (x, y) = ap.unwrap();
     let (z, w) = bp.unwrap();
-    let one = vec![F::c(1)];
-    let t = vec![F::c(0), F::c(1)];
     let be = &al.beta;
     let dg = pm(&[-x, F::c(1)], &[-x, F::c(1)]);
     let dq = pm(&sum(be, &[-z], F::c(1)), &sum(be, &[-z], F::c(1)));
