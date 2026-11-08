@@ -1,4 +1,4 @@
-# Prime medium-tier rho reference bound (launch-ready, not run)
+# Prime medium-tier rho reference bound (run complete 2026-11-08; verdict inconclusive)
 
 > **Result (2026-11-08).** The run is complete. See [`RESULTS.md`](RESULTS.md).
 > The `rho.negation` medium constant over the floor at w = 0 is 1.093 [1.033, 1.156].
