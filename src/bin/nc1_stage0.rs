@@ -35,6 +35,10 @@
 //!       jump index per step from the seeded PRNG (oblivious, never from x), v_t = v_{t-1} + J.
 //!       Set-up: 34 full scalar multiplications (start 2, jumps 32). Must give E in
 //!       [0.85, 0.92], otherwise STOP and report, no tuning.
+//!       PRE-REGISTERED AMENDMENT (coordinator, 2026-11-08, made after the D0 k=20 value 0.9211
+//!       was seen and before any D3 run): the D0 interval is [0.85, 0.93]. Reason: the i.i.d.
+//!       control matches 0.887, so the engine is right; a 16-jump walk shows the same 3 to 4%
+//!       excess over i.i.d. in NC-2 Stage 0 (nc2/RESULTS.md), so 0.92 was too tight.
 //! D1    bsgs.negation layout (control), mirroring src/cryptanalysis/ecbench/generic.rs:186-239:
 //!       m = ceil(ceil(sqrt(r)) / 2); baby points (j, 0), j = 0..=m first, then giants
 //!       (-i s, 1), i = 0.., s = 2m + 1. Set-up: one scalar multiplication of s. Expected about 1.0

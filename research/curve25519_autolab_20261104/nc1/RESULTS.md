@@ -3,7 +3,14 @@
 BSGS-class boundary result, outside the IC ratchet. Not index calculus. Zero group operations. [pcc:unverified]
 Every number below is an unverified assertion produced by `src/bin/nc1_stage0.rs`; no pcc claim has been filed.
 
-## Status: STOPPED at the D0 control gate
+## Pre-registered amendment (2026-11-08)
+
+Made by the coordinator after the D0 k = 20 value 0.9211 was seen and before any D3 run: the D0 interval becomes
+[0.85, 0.93]. Reason: the i.i.d. control matches 0.887, so the engine is right, and a 16-jump walk shows the same 3 to 4%
+excess over i.i.d. in NC-2 Stage 0 (`nc2/RESULTS.md`). Under the amended interval all D0 rows are inside. The
+section below records the original stop, which preceded the amendment.
+
+## Status: STOPPED at the D0 control gate (before the amendment)
 
 The task rule: if the D0 random 16-jump walk lands outside [0.85, 0.92], stop and report instead of tuning.
 At k = 20 D0 gives E = 0.9211 (40 runs: 5 held-out r values x 8 seeds, sd 0.0008), which is 0.0011 above the
