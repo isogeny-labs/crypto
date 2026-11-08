@@ -11,5 +11,7 @@ int main(int argc,char** argv){try{
  f=originals.front();Field field(f.curve.at("p").str());auto& coefficient=f.closure.object["first"].object["edge"].object["kernel_polynomial"].array[0];coefficient=scalar_token(field.add(Big(coefficient.str()),Big(1)).str());reject(f,"map denominator is kernel square");
  f=originals.front();f.marked.object["orbit_checks"].array[1].object["transporter"]=scalar_token("0");reject(f,"saved representative transporter");
  f=originals.front();f.marked.object["orbit_checks"].array.clear();reject(f,"complete orbit fixture panel");
+ f=originals.front();f.closure.object["trace"]=scalar_token("1");reject(f,"trace from field and group order");
+ f=originals.front();f.closure.object["opposite_root"]=scalar_token("1");reject(f,"opposite characteristic root");
  std::cout<<"{\"native_certificate_mutations_rejected\":"<<rejected<<",\"timing_performed\":false}\n";return 0;
 }catch(const std::exception& e){std::cerr<<"qualification control failed: "<<e.what()<<'\n';return 1;}}

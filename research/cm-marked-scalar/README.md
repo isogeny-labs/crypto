@@ -1,27 +1,24 @@
-# CM marked scalar: native end-to-end comparison
+# Native CM marked-scalar relations and comparison
 
-Conductor task T-1888. This planning PR precedes implementation and comparative execution, as requested by the owner. The open objective is a verified end-to-end improvement over regular scalar multiplication for the marked scalar action. No native speedup has been measured.
+Conductor T-1888, [PR #3674](https://github.com/isogeny-labs/crypto/pull/3674). The PR was opened before implementation and comparative execution, as requested. Native closed-relation certificates and executable rational-subgroup actions now cover P-192, P-224, P-256, P-384 and P-521. P-192 is primary. The original objective of an admitted end-to-end runtime improvement over matched regular public-scalar multiplication remains open.
 
-The first panel uses P-384 and P-521 and the existing order-seven labels. P-192 remains the primary research target and must receive a compatible native continuation; P-224 and P-256 retain their previously identified map candidates. A win on one curve will be reported on that curve and workload only.
+The [construction and exact cost ledger](CONSTRUCTION.md) explains the kernels, endpoint isomorphism, CM labels, signed orbits and all five cost vectors. The [two-page report](reports/native-five-curve-20261108/report.pdf) contains the diagrams, quantitative graph and admission record.
 
-## Exact computation
+For each supplied variable-base point P, the relation route evaluates phi, eta, the closing isomorphism sigma(x,y)=(x/ell²,y/ell³), then [k], with k=mu/ell modulo n. Full polynomial identities prove sigma eta phi=[ell], while the native CM checks verify a+b=mu modulo n for alpha=a+b*pi. The implementation is an explicit rational-subgroup evaluator; the much larger global noninteger quotient has unexpanded residual polynomials. Its degree and construction status are retained.
 
-For each supplied nonzero variable-base point P, compute [mu]P on its original curve. The relation route evaluates the supplied oriented map phi, its normalized opposite map eta, the closing isomorphism sigma(x,y)=(x/ell^2,y/ell^3), then [k], with k=mu/ell mod n. The verifier checks sigma eta phi=[ell] and k ell=mu mod n. This formula is a rational-subgroup evaluator; the global noninteger quotient alpha=pi-c has a different degree from [k]dual(phi).
+The native constructor supplies the three new curves from signed Frobenius kernels. P-384/P-521 preserve historical certificates; their historical Python producer was not rerun. The exact-token bundle and [five-curve provenance](fixtures-v2/PROVENANCE.md) keep the two origins distinct. P-192 uses its published explicit group because this OpenSSL build omits the named entry.
 
-The fixtures preserve the historical certificates without rewriting them. Their implementation provenance is Python exact arithmetic. They are inputs to a new native implementation, not a native benchmark result. The global residual rational functions and prime-factor kernel chains remain unexpanded.
+| Requirement | Current evidence and remaining work |
+| --- | --- |
+| PR before implementation/execution | Hosted PR #3674; planning commit 4afeff227516 |
+| Native source and exact replay | 150 point/window cases, 15 orbit fixtures, complete polynomial/signed-kernel/label checks; native-v17 and strengthened native-v19 |
+| Negative controls | Eight certificate mutations rejected at intended checks; eleven synthetic analysis-design mutations rejected |
+| Explicit orbit object | Canonical affine representative and scalar transporter reproduced on all five curves |
+| Costed implementation | 90 native counted rows, clocks disabled; D/A/N, explicit map-formula calls, correction/setup and conversion boundaries retained |
+| Matched runtime reference | Public signed-window, OpenSSL public multiscalar and single-point references implemented; actual timing comparison pending |
+| Cold end-to-end gain | Not established; local admission refused twice and EKS live admission failed role assumption |
+| Timing protocol | Native schema validation passes for the initial P-384/P-521 draft; source/binary freeze and admitted backend pending |
 
-## Deliverables and acceptance
+Build `make -B -j1 -C research/cm-marked-scalar native-complete construct-binary qualification-tests-binary analysis-tests`; replay `/tmp/cm-marked-scalar-build/native --qualify research/cm-marked-scalar/fixtures-v2` and `/tmp/cm-marked-scalar-build/qualification-tests research/cm-marked-scalar/fixtures-v2`. Do not rerun write-once constructions into existing output directories. Use source/binary hashes rather than shared-filesystem timestamps.
 
-| Requirement | Evidence required | Current status |
-| --- | --- | --- |
-| PR before comparative execution | Hosted PR and source revision receipt | PR #3674 opened before implementation and measurement |
-| Native source and replay | C/C++ OpenSSL-backed implementation, no Python execution path | 60-case native replay passes; see NATIVE_STATUS.md |
-| Exact output | Endpoint, subgroup and scalar reconstruction checks; O and boundary cases | Full polynomial identities and known-answer native fixtures pass; held-out panel pending |
-| Matched reference | Same scalar, point, field and backend; optimized public-scalar window method and OpenSSL API reference | Native window and OpenSSL public/single routes implemented; measurement pending |
-| Full per-point cost | Setup, map evaluations, closure, correction, conversion and symmetric verification | Historical counted schedules only; native measurement pending |
-| End-to-end gain | Frozen paired test with strict improvement beyond A/A noise against the fastest reproduced reference | Unproven |
-| Cold and repeated-use accounting | Cold primary; genuine reusable setup reported separately, never silently amortized | Pending |
-
-The historical counts favored direct scalar multiplication. Preserve losses, invalid outputs and timeouts. Do not redefine success as merely publishing a PR or passing a narrower correctness test.
-
-See [BENCHMARK_CONTRACT.md](BENCHMARK_CONTRACT.md) for the intended comparison and [fixtures/PROVENANCE.md](fixtures/PROVENANCE.md) for custody. The execution protocol, source hashes and launch command must be committed and pushed before taking affected measurements.
+See [NATIVE_STATUS.md](NATIVE_STATUS.md), [BENCHMARK_CONTRACT.md](BENCHMARK_CONTRACT.md), the [protocol notes](protocol/README.md), and the [measurement-admission problem](../../problems/cm-marked-scalar-measurement-admission.md). A five-curve correctness extension does not silently extend the initial two-curve timing draft. No new cloud job or controller was launched.

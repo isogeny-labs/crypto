@@ -1,6 +1,6 @@
 # Closed oriented relations and native point actions
 
-2026-11-08. P-192 is the primary target. Native construction now supplies P-192/P-224/P-256, alongside the independently replayed historical P-384/P-521 certificates. Source: construct.cpp, relation_verify.hpp, orbit_verify.hpp. The combined native-v17 replay passes 150 point/window cases and three signed-orbit fixtures per curve; native-v18 rejects six certificate mutations at the intended check, including a sign error that preserves the kernel x action but reverses its y action.
+2026-11-08. P-192 is the primary target. Native construction now supplies P-192/P-224/P-256, alongside the independently replayed historical P-384/P-521 certificates. Source: construct.cpp, relation_verify.hpp, orbit_verify.hpp. The combined native-v17 replay passes 150 point/window cases and three signed-orbit fixtures per curve; native-v18 rejects six certificate mutations and native-v19 adds trace and opposite-root controls at the intended check, including a sign error that preserves the kernel x action but reverses its y action.
 
 | Curve | ell | selected rho | marked order s | nonzero signed orbit | norm bits | residual degree bits |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |

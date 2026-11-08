@@ -77,6 +77,10 @@ static void verify_kernel_orientation(Runtime& r,DivisionPolynomials& d) {
 }
 static void verify_relation(Runtime& r) {
  const auto& z=r.f.closure; const auto& m=r.f.marked; Field& f=r.field;
+ require(z.at("name").str()==r.f.name&&m.at("name").str()==r.f.name,"exact certificate curve name");
+ require(Big(z.at("p").str())==f.p&&Big(z.at("n").str())==r.n,"exact certificate field and order");
+ Big reconstructed_trace=f.p;require(BN_add_word(reconstructed_trace.p,1)&&BN_sub(reconstructed_trace.p,reconstructed_trace.p,r.n.p),"trace reconstruction arithmetic");
+ require(reconstructed_trace==Big(z.at("trace").str()),"trace from field and group order");
  Big a=f.mod(Big(r.f.curve.at("a").str())),b(r.f.curve.at("b").str());
  require(r.forward->degree==r.back->degree,"equal dual degrees");
  unsigned ell=unsigned(r.forward->degree);require(ell>=3&&(ell&1)&&ell<=31,"bounded odd degree");
@@ -86,6 +90,9 @@ static void verify_relation(Runtime& r) {
  require(r.back->target_a==f.mul(a,f.mul(l2,l2))&&r.back->target_b==f.mul(b,f.mul(l3,l3)),"global endpoint model");
  DivisionPolynomials division(f,a,b);
  verify_kernel_orientation(r,division);
+ unsigned rho_check=unsigned(m.at("orientation_root").integer()),other_check=unsigned(z.at("opposite_root").integer());
+ unsigned p_check=unsigned(BN_mod_word(f.p.p,ell)),t_check=unsigned(BN_mod_word(reconstructed_trace.p,ell));
+ require(other_check>0&&other_check<ell&&other_check!=rho_check&&rho_check*other_check%ell==p_check&&(rho_check+other_check)%ell==t_check,"opposite characteristic root");
  Poly sd=poly_power(f,division.get(ell),2);
  Poly sn=plus(f,times(f,Poly{Big(),Big(1)},sd),scale(f,times(f,division.cubic,times(f,division.get(ell-1),division.get(ell+1))),Big(4)),true);
  Poly cn=scale(f,homogeneous(f,r.back->N,r.forward->N,r.forward->D),r.xscale);
