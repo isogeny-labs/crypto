@@ -106,6 +106,30 @@ fn roots_for_ys(ys: &[K], g: Point) -> (Vec<Point>, Vec<Point>) {
     }
     (all, survivors)
 }
+fn only_b(ds: &[K], reference: bool) -> K {
+    if reference {
+        let n = ds.len();
+        let mut pre = vec![K::c(1); n + 1];
+        let mut post = pre.clone();
+        for z in 0..n {
+            pre[z + 1] = pre[z] * ds[z]
+        }
+        for z in (0..n).rev() {
+            post[z] = post[z + 1] * ds[z]
+        }
+        (0..n).fold(K::c(0), |s, z| s + pre[z] * post[z + 1])
+    } else {
+        let mut a = K::c(1);
+        let mut b = K::c(0);
+        for &d in ds {
+            let next = b * d + a;
+            a = a * d;
+            b = next
+        }
+        assert_eq!(a, K::c(0));
+        b
+    }
+}
 fn b_only(g: Point, gg: &[Point], p: Point, reference: bool) -> Value {
     let phi_y = phi(p, 0).unwrap().1;
     assert_ne!(phi_y, K::c(0));
@@ -116,6 +140,12 @@ fn b_only(g: Point, gg: &[Point], p: Point, reference: bool) -> Value {
         let q = mul(k, g, 0);
         let qq = graph(q, 0, 199);
         let c = constant(gg, &qq);
+        let (cal_ds, _) = arrays(gg, &qq, p, p).unwrap();
+        let bcal = only_b(&cal_ds, reference);
+        assert_ne!(bcal, K::c(0));
+        let cal_y = bcal * p.unwrap().1;
+        assert_eq!(cal_y, c * phi_y);
+
         for n in [0, 1, 2, 3, 5, 17, 198] {
             let u = mul(n, g, 0);
             let mut ys = vec![];
@@ -124,29 +154,11 @@ fn b_only(g: Point, gg: &[Point], p: Point, reference: bool) -> Value {
                 let shift = add(p, mul(i, g, 0), 0);
                 let rr = add(shift, u, 0);
                 let (ds, _) = arrays(gg, &qq, shift, rr).unwrap();
-                let b = if reference {
-                    let mut pre = vec![K::c(1); 200];
-                    let mut post = pre.clone();
-                    for z in 0..199 {
-                        pre[z + 1] = pre[z] * ds[z]
-                    }
-                    for z in (0..199).rev() {
-                        post[z] = post[z + 1] * ds[z]
-                    }
-                    (0..199).fold(K::c(0), |s, z| s + pre[z] * post[z + 1])
-                } else {
-                    let mut a = K::c(1);
-                    let mut b = K::c(0);
-                    for d in ds {
-                        let next = b * d + a;
-                        a = a * d;
-                        b = next
-                    }
-                    assert_eq!(a, K::c(0));
-                    b
-                };
+                let b = only_b(&ds, reference);
                 assert_ne!(b, K::c(0));
-                ys.push(c * phi_y / b);
+                let y = cal_y / b;
+                assert_eq!(y, c * phi_y / b);
+                ys.push(y);
                 bs.push(b);
                 query_count += 1;
             }
@@ -166,10 +178,10 @@ fn b_only(g: Point, gg: &[Point], p: Point, reference: bool) -> Value {
                 wrong_survivors.is_empty(),
                 "changed transcript accepted by actual decoder"
             );
-            rows.push(json!({"k_fixture":k,"U_fixture":n,"B_coefficients":bs.iter().map(|b|b.code()).collect::<Vec<_>>(),"normalization_constant":c.code(),"public_quotient_y":phi_y.code(),"derived_y_transcript":ys.iter().map(|y|y.code()).collect::<Vec<_>>(),"cubic_candidates":all_roots.iter().map(|&a|pc(a)).collect::<Vec<_>>(),"survivor":pc(a),"output":pc(out),"changed_y_transcript_rejected":true}));
+            rows.push(json!({"k_fixture":k,"U_fixture":n,"B_coefficients":bs.iter().map(|b|b.code()).collect::<Vec<_>>(),"calibration_B":bcal.code(),"calibration_y_factor":cal_y.code(),"reference_normalization_constant":c.code(),"public_quotient_y":phi_y.code(),"derived_y_transcript":ys.iter().map(|y|y.code()).collect::<Vec<_>>(),"cubic_candidates":all_roots.iter().map(|&a|pc(a)).collect::<Vec<_>>(),"survivor":pc(a),"output":pc(out),"changed_y_transcript_rejected":true}));
         }
     }
-    json!({"all_checks_pass":true,"marked_rows":rows,"B_only_queries":query_count,"contracted_factors":query_count*199,"root_field_elements_tested":roots_tested,"negative_control_root_field_elements_tested":roots_tested,"maximum_queries_per_case":7,"C_coefficients_computed":0,"target_graph_points":7*199,"G_graph_points":199,"normalization_constant_terms":7*198,"scope":"B-only seven-shift decoder, full toy coefficients and explicitly enumerated roots; no P192 B oracle or timing claim"})
+    json!({"all_checks_pass":true,"marked_rows":rows,"B_only_queries":query_count,"calibration_queries":7,"contracted_factors":(query_count+7)*199,"root_field_elements_tested":roots_tested,"negative_control_root_field_elements_tested":roots_tested,"maximum_queries_per_case":7,"C_coefficients_computed":0,"target_graph_points":7*199,"G_graph_points":199,"normalization_constant_terms":7*198,"scope":"calibrated B-only seven-shift decoder, full toy coefficients and explicitly enumerated roots; no P192 B oracle or timing claim"})
 }
 
 fn main() {
