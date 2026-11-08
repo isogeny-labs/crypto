@@ -1,2 +1,4 @@
 mod pole;
-fn main() { pole::run(); }
+fn main() {
+    pole::run();
+}
