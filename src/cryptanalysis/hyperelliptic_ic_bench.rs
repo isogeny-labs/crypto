@@ -322,7 +322,31 @@ pub struct RhoResult {
     /// length, charged once when it is detected and escaped.  Zero
     /// without a window.
     pub cycle_ops: usize,
+    /// The primitives the driving cycle window adds to the walk's `bitop/v1`
+    /// tally (round fourteen's window was uncharged until
+    /// `research/rho_cycle_window_bitops_20261107`).  Already inside the
+    /// tally; reported apart so a reader can price the window alone, or
+    /// re-derive a total from before it was charged.  Zero without an active
+    /// window: a passive window is an instrument the walk never consults, and
+    /// is not charged.
+    pub window_charges: WindowCharges,
     pub wall_ms: f64,
+}
+
+/// What an active cycle window charges, by primitive (all already in the
+/// `ops` tally of the run).
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct WindowCharges {
+    /// 64-bit hash compares of the window scan (newest first, to the first
+    /// match or the whole window) and the one length test of each push.
+    pub word_ops: u64,
+    /// RNG draws of the escape step (each also one `word_op`, not counted in
+    /// `word_ops` above).
+    pub rng_words: u64,
+    /// The escape step's branch index (`word_op`).
+    pub escape_index_ops: u64,
+    /// The escape step's two coefficient additions mod `N`.
+    pub modr_adds: u64,
 }
 
 /// Branch selector: a cheap hash of the Mumford representation.
@@ -624,8 +648,18 @@ fn rho_dp(
     };
     let mut fruitless_ops = 0usize;
     let mut cycle_ops = 0usize;
+    // An active window drives the walk and is charged; a passive one is an
+    // instrument (it counts `cycle_ops` and changes nothing), so a solver
+    // would not run it and it is left uncharged.
+    let charged_window = matches!(
+        window,
+        CycleWindow::Active | CycleWindow::ActiveCollideFirst
+    );
+    let mut window_charges = WindowCharges::default();
     // The last `CYCLE_WINDOW` walk hashes, newest last; cleared on every
-    // jump, since a jump starts a new trail.
+    // jump, since a jump starts a new trail.  Clearing resets a length
+    // (control, which `bitop/v1` leaves out), and holding the entries is
+    // memory, not gates (`docs/units/BITOPS.md`).
     let mut recent: std::collections::VecDeque<(u64, BigUint, BigUint)> =
         std::collections::VecDeque::with_capacity(CYCLE_WINDOW + 1);
     // Fold a position and its coefficients together, so that the walk
@@ -737,13 +771,31 @@ fn rho_dp(
             if window != CycleWindow::Off {
                 // Position of `h` in the window, newest last: a repeat
                 // means the walk is going round a cycle of that length.
-                if let Some(i) = recent.iter().rposition(|r| r.0 == h) {
+                let found = recent.iter().rposition(|r| r.0 == h);
+                if charged_window {
+                    // The scan runs newest first: one 64-bit compare per
+                    // entry it reads, to the match or through the window.
+                    let compares = match found {
+                        Some(i) => recent.len() - i,
+                        None => recent.len(),
+                    } as u64;
+                    ops::word_op(compares);
+                    window_charges.word_ops += compares;
+                }
+                if let Some(i) = found {
                     let cycle_len = recent.len() - i;
                     if window == CycleWindow::ActiveCollideFirst {
                         // A genuine rho cycle returns to the same point
-                        // with different coefficients: that solves.
+                        // with different coefficients: that solves.  The
+                        // solve and its check are the same work, in the same
+                        // phases, as at a distinguished point.
                         let (_, pa, pb) = &recent[i];
-                        if let Some(k) = solve_collision(&a, &b, pa, pb, n) {
+                        let solved = {
+                            let _phase = ops::enter(Phase::LinearAlgebra);
+                            solve_collision(&a, &b, pa, pb, n)
+                        };
+                        if let Some(k) = solved {
+                            let _phase = ops::enter(Phase::Verification);
                             if &d1.scalar_mul(&k, curve) == d2 {
                                 return RhoResult {
                                     k: Some(k),
@@ -753,6 +805,7 @@ fn rho_dp(
                                     restarts,
                                     fruitless_ops,
                                     cycle_ops,
+                                    window_charges,
                                     wall_ms: started.elapsed().as_secs_f64() * 1e3,
                                 };
                             }
@@ -766,6 +819,18 @@ fn rho_dp(
                         restarts += 1;
                         since_dp = 0;
                         recent.clear();
+                        // The escape is a walk step, charged as the gap
+                        // limit's is: one RNG draw, the branch index, the
+                        // two coefficient additions mod N (the group
+                        // addition and the fold charge themselves).
+                        drop(oracle_phase);
+                        let _phase = ops::enter(Phase::Walk);
+                        ops::rng_word(1);
+                        ops::word_op(1);
+                        ops::modr_add(2);
+                        window_charges.rng_words += 1;
+                        window_charges.escape_index_ops += 1;
+                        window_charges.modr_adds += 2;
                         let j = (rng.next_u64() as usize) % branch.len();
                         let (aj, bj, rj) = &branch[j];
                         let (nx, na, nb, _) = fold(x.add(rj, curve), (&a + aj) % n, (&b + bj) % n);
@@ -778,6 +843,12 @@ fn rho_dp(
                     cycle_ops += 1;
                 }
                 recent.push_back((h, a.clone(), b.clone()));
+                // The eviction test is one compare; the entry itself is a
+                // store (memory).
+                if charged_window {
+                    ops::word_op(1);
+                    window_charges.word_ops += 1;
+                }
                 if recent.len() > CYCLE_WINDOW {
                     recent.pop_front();
                 }
@@ -808,6 +879,7 @@ fn rho_dp(
                                     restarts,
                                     fruitless_ops,
                                     cycle_ops,
+                                    window_charges,
                                     wall_ms: started.elapsed().as_secs_f64() * 1e3,
                                 };
                             }
@@ -888,6 +960,7 @@ fn rho_dp(
         restarts,
         fruitless_ops,
         cycle_ops,
+        window_charges,
         wall_ms: started.elapsed().as_secs_f64() * 1e3,
     }
 }
@@ -1015,6 +1088,7 @@ pub fn rho_dp_integer_model_width(
                                 restarts,
                                 fruitless_ops: 0,
                                 cycle_ops: 0,
+                                window_charges: WindowCharges::default(),
                                 wall_ms: started.elapsed().as_secs_f64() * 1e3,
                             };
                         }
@@ -1048,6 +1122,7 @@ pub fn rho_dp_integer_model_width(
         restarts,
         fruitless_ops: 0,
         cycle_ops: 0,
+        window_charges: WindowCharges::default(),
         wall_ms: started.elapsed().as_secs_f64() * 1e3,
     }
 }
@@ -1161,6 +1236,7 @@ fn rho_floyd(
                         restarts,
                         fruitless_ops: 0,
                         cycle_ops: 0,
+                        window_charges: WindowCharges::default(),
                         wall_ms: started.elapsed().as_secs_f64() * 1e3,
                     };
                 }
@@ -1181,6 +1257,7 @@ fn rho_floyd(
         restarts,
         fruitless_ops: 0,
         cycle_ops: 0,
+        window_charges: WindowCharges::default(),
         wall_ms: started.elapsed().as_secs_f64() * 1e3,
     }
 }
@@ -2195,55 +2272,119 @@ mod tests {
             ),
         ] {
             let random = search == RelationSearch::Random;
-            // The full-width walk the hec study counted; the default is now
-            // the collide-first walk, whose cycle window is not yet charged.
-            let row = bitop_row(search, la, oracle, RhoVariant::DistinguishedPointsFullWidth);
-            assert_eq!(row.rho_variant, RhoVariant::DistinguishedPointsFullWidth);
-            let ic = &row.ic_bitop_phases;
-            let rho = &row.rho_bitop_phases;
-            assert!(ic.phase(Phase::Unattributed).is_zero());
-            assert!(rho.phase(Phase::Unattributed).is_zero());
-            for ph in [
-                Phase::Precompute,
-                Phase::Walk,
-                Phase::Oracle,
-                Phase::LinearAlgebra,
-                Phase::Verification,
+            // The full-width walk the hec study counted, and the default
+            // collide-first walk, whose cycle window is charged since
+            // research/rho_cycle_window_bitops_20261107.
+            for variant in [
+                RhoVariant::DistinguishedPointsFullWidth,
+                RhoVariant::default(),
             ] {
-                assert!(!ic.phase(ph).is_zero(), "IC phase {ph:?} uncharged");
-                assert!(!rho.phase(ph).is_zero(), "rho phase {ph:?} uncharged");
+                let row = bitop_row(search.clone(), la.clone(), oracle.clone(), variant.clone());
+                assert_eq!(row.rho_variant, variant);
+                let ic = &row.ic_bitop_phases;
+                let rho = &row.rho_bitop_phases;
+                assert!(ic.phase(Phase::Unattributed).is_zero());
+                assert!(rho.phase(Phase::Unattributed).is_zero());
+                for ph in [
+                    Phase::Precompute,
+                    Phase::Walk,
+                    Phase::Oracle,
+                    Phase::LinearAlgebra,
+                    Phase::Verification,
+                ] {
+                    assert!(!ic.phase(ph).is_zero(), "IC phase {ph:?} uncharged");
+                    assert!(!rho.phase(ph).is_zero(), "rho phase {ph:?} uncharged");
+                }
+                // The factor base is built in IC's precompute.
+                let pre = ic.phase(Phase::Precompute);
+                assert!(pre.get(Kind::FieldSqrt) > 0 && pre.get(Kind::HashProbe) > 0);
+                // The walk's bookkeeping mod N (Random draws, walks add).
+                let walk = ic.phase(Phase::Walk);
+                if random {
+                    assert!(walk.get(Kind::ModrMul) > 0);
+                } else {
+                    assert!(walk.get(Kind::ModrAdd) > 0);
+                }
+                assert!(walk.field_ops() > 0);
+                // The oracle probes the factor base; rho's probes its table.
+                assert!(ic.phase(Phase::Oracle).get(Kind::HashProbe) > 0);
+                assert!(rho.phase(Phase::Oracle).get(Kind::HashProbe) > 0);
+                assert!(rho.phase(Phase::Oracle).field_ops() == 0);
+                // The solve works mod N.
+                let la = ic.phase(Phase::LinearAlgebra);
+                assert!(la.get(Kind::ModrMul) > 0 && la.get(Kind::ModrInv) > 0);
+                let rla = rho.phase(Phase::LinearAlgebra);
+                assert!(rla.get(Kind::ModrInv) >= row.rho_runs as u64);
+                // Rho's walk: two coefficient additions mod N per step.
+                assert!(rho.phase(Phase::Walk).get(Kind::ModrAdd) > 0);
+                // Verification is group arithmetic.
+                assert!(ic.phase(Phase::Verification).field_ops() > 0);
+                assert!(rho.phase(Phase::Verification).field_ops() > 0);
+                // Validation is a strict subset.
+                let (all, val) = (ic.total(), row.ic_bitop_validation.total());
+                for k in Kind::ALL {
+                    assert!(val.get(k) <= all.get(k));
+                }
+                assert!(row.ic_bitops_mean() > 0.0 && row.rho_bitops_mean() > 0.0);
             }
-            // The factor base is built in IC's precompute.
-            let pre = ic.phase(Phase::Precompute);
-            assert!(pre.get(Kind::FieldSqrt) > 0 && pre.get(Kind::HashProbe) > 0);
-            // The walk's bookkeeping mod N (Random draws, walks add).
-            let walk = ic.phase(Phase::Walk);
-            if random {
-                assert!(walk.get(Kind::ModrMul) > 0);
-            } else {
-                assert!(walk.get(Kind::ModrAdd) > 0);
-            }
-            assert!(walk.field_ops() > 0);
-            // The oracle probes the factor base; rho's probes its table.
-            assert!(ic.phase(Phase::Oracle).get(Kind::HashProbe) > 0);
-            assert!(rho.phase(Phase::Oracle).get(Kind::HashProbe) > 0);
-            assert!(rho.phase(Phase::Oracle).field_ops() == 0);
-            // The solve works mod N.
-            let la = ic.phase(Phase::LinearAlgebra);
-            assert!(la.get(Kind::ModrMul) > 0 && la.get(Kind::ModrInv) > 0);
-            let rla = rho.phase(Phase::LinearAlgebra);
-            assert!(rla.get(Kind::ModrInv) >= row.rho_runs as u64);
-            // Rho's walk: two coefficient additions mod N per step.
-            assert!(rho.phase(Phase::Walk).get(Kind::ModrAdd) > 0);
-            // Verification is group arithmetic.
-            assert!(ic.phase(Phase::Verification).field_ops() > 0);
-            assert!(rho.phase(Phase::Verification).field_ops() > 0);
-            // Validation is a strict subset.
-            let (all, val) = (ic.total(), row.ic_bitop_validation.total());
-            for k in Kind::ALL {
-                assert!(val.get(k) <= all.get(k));
-            }
-            assert!(row.ic_bitops_mean() > 0.0 && row.rho_bitops_mean() > 0.0);
         }
+    }
+
+    /// The default walk's cycle window is charged: the scan's compares in
+    /// the oracle, the escape step in the walk, the collide-first solve in
+    /// linear algebra; a passive window charges nothing.
+    #[test]
+    fn the_default_walks_cycle_window_is_charged() {
+        use crate::prime_hyperelliptic::ops::Kind;
+        let (curve, d1, d2, n, k) = instance(101);
+        let widths = bitop_widths(&curve, &n);
+        let mut escapes = 0u64;
+        for seed in 0..10u64 {
+            // The default walk, and the escape-on-repeat walk, which shares its
+            // escape step and exercises it on these small groups.
+            for variant in [
+                RhoVariant::default(),
+                RhoVariant::DistinguishedPointsNegationFullWidthCycleEscape,
+            ] {
+                let t0 = ops::snapshot();
+                let r = pollard_rho_jacobian_with(&curve, &d1, &d2, &n, seed, 5_000_000, &variant);
+                let run = ops::snapshot().since(&t0);
+                assert_eq!(r.k.as_ref(), Some(&k), "seed {seed}");
+                let w = r.window_charges;
+                // At least the push test of every oracle visit after the start.
+                assert!(w.word_ops > 0, "seed {seed}: window uncharged");
+                assert_eq!(w.modr_adds, 2 * w.rng_words);
+                assert_eq!(w.escape_index_ops, w.rng_words);
+                escapes += w.rng_words;
+                // Everything reported is inside the tally.
+                let all = run.total();
+                assert!(all.get(Kind::WordOp) >= w.word_ops + w.rng_words + w.escape_index_ops);
+                assert!(all.get(Kind::ModrAdd) >= w.modr_adds);
+                assert!(all.rng_words >= w.rng_words);
+                // The collision detector does no field arithmetic; the solve and
+                // its check have their own phases.
+                assert_eq!(run.phase(Phase::Oracle).field_ops(), 0, "seed {seed}");
+                assert!(run.phase(Phase::Unattributed).is_zero());
+                assert!(run.phase(Phase::LinearAlgebra).get(Kind::ModrInv) >= 1);
+                assert!(run.phase(Phase::Verification).field_ops() > 0);
+                assert!(run.total().bitops(&widths).is_ok());
+                // A passive window is an instrument: nothing charged.
+                let passive = rho_dp(
+                    &curve,
+                    &d1,
+                    &d2,
+                    &n,
+                    seed,
+                    5_000_000,
+                    true,
+                    false,
+                    true,
+                    CycleWindow::Passive,
+                );
+                assert_eq!(passive.window_charges, WindowCharges::default());
+            }
+        }
+        // Some seed escapes a short cycle through the window.
+        assert!(escapes > 0, "no escape exercised");
     }
 }

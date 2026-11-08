@@ -37,6 +37,7 @@ digraph attack_graph {
   "CLAIM-GG-BKL-SIMD-NEGATION" [label="CLAIM-GG-BKL-SIMD-NEGATION\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
   "CLAIM-GG-CERTICOM-DP-NORMALIZATION" [label="CLAIM-GG-CERTICOM-DP-NORMALIZATION\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
   "CLAIM-GG-FKL-AGM-TO-GGM" [label="CLAIM-GG-FKL-AGM-TO-GGM\nconditional · impact 0", fillcolor="#fde2e2", color="#526575"];
+  "CLAIM-JV-ASSUMPTION1-ALL-CURVES" [label="CLAIM-JV-ASSUMPTION1-ALL-CURVES\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
   "CLAIM-LEMMA4-REVERSE-GENERAL" [label="CLAIM-LEMMA4-REVERSE-GENERAL\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
   "CLAIM-MARGINAL-IMPLIES-HAZARD" [label="CLAIM-MARGINAL-IMPLIES-HAZARD\nrefuted · impact 0", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
   "CLAIM-NAGAO-LEMMA4" [label="CLAIM-NAGAO-LEMMA4\nrefuted · impact 2", fillcolor="#f8c9c9", color="#a33a3a", penwidth=2];
@@ -370,4 +371,6 @@ digraph attack_graph {
   "CEX-PA-ALWAYS-ACCEPT" -> "CLAIM-PA-ZK-IMPLIES-SOUND" [label="refutes", color="#a33a3a", penwidth=2];
   "CEX-TRANSPARENT-ENCODING" [fillcolor="#dff4e5", color="#257942"];
   "CEX-TRANSPARENT-ENCODING" -> "CLAIM-SHOUP-ALL-ALGORITHMS" [label="refutes", color="#a33a3a", penwidth=2];
+  "CEX-SUBFIELD-FACTOR-BASE" [fillcolor="#dff4e5", color="#257942"];
+  "CEX-SUBFIELD-FACTOR-BASE" -> "CLAIM-JV-ASSUMPTION1-ALL-CURVES" [label="refutes", color="#a33a3a", penwidth=2];
 }

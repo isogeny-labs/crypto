@@ -329,6 +329,8 @@ digraph ecdlp_claims {
     "CLAIM-SHOUP-ALL-ALGORITHMS" [label="CLAIM-SHOUP-ALL-ALGORITHMS\\n'Every algorithm needs Omega(sqrt r) group operations for DLP in a prime-order group'\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
     "CEX-TRANSPARENT-ENCODING" [label="CEX-TRANSPARENT-ENCODING\\nZ/r with the identity encoding: the logarithm is the encoding (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
     "THM-F4-CONTAINMENT" [label="THM-F4-CONTAINMENT\\nF4 runs with step degree <= D stay in every D-closed subspace containing the generators", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "CEX-SUBFIELD-FACTOR-BASE" [label="CEX-SUBFIELD-FACTOR-BASE\\nSubfield curve, odd n: every sum of x in F_q factor-base points lies in E(F_q), at most 2q + 1 points (Lean)", fillcolor="#dff4e5", color="#257942", style="rounded,filled"];
+    "CLAIM-JV-ASSUMPTION1-ALL-CURVES" [label="CLAIM-JV-ASSUMPTION1-ALL-CURVES\\n'Omega(q^(n-1)/(n-1)!) decomposable points whenever #F in Omega(q)', over all E/F_{q^n}\\nREFUTED", fillcolor="#f8c9c9", color="#a33a3a", style="rounded,filled", penwidth=2];
   }
   subgraph cluster_attacks {
     label="Algorithms and special-family attacks"; color="#cad5df"; style="rounded";
@@ -1616,4 +1618,9 @@ digraph ecdlp_claims {
   "MEAS-PQ2-MSOLVE-F4" -> "HEUR-GB-PQ-ASSUMPTION-2" [label="qualifies", color="#66788a", style="dashed"];
   "MEAS-PQ2-MSOLVE-F4" -> "MEAS-PQ2-DLIN-CENSUS" [label="measures", color="#66788a", style="solid"];
   "MEAS-PQ2-MSOLVE-F4" -> "MEAS-GB-KW-TABLE1" [label="measures", color="#66788a", style="solid"];
+  "CEX-SUBFIELD-FACTOR-BASE" -> "CLAIM-JV-ASSUMPTION1-ALL-CURVES" [label="refutes", color="#a33a3a", style="solid"];
+  "CEX-SUBFIELD-FACTOR-BASE" -> "HEUR-SP-JV-ASSUMPTION1" [label="qualifies", color="#66788a", style="dashed"];
+  "CEX-SUBFIELD-FACTOR-BASE" -> "HEUR-BK-GG-DECOMP-PROPORTION" [label="qualifies", color="#66788a", style="dashed"];
+  "CEX-SUBFIELD-FACTOR-BASE" -> "HEUR-DECOMPOSITION-PROBABILITY" [label="qualifies", color="#66788a", style="dashed"];
+  "MEAS-EXT-DECOMP-CENSUS" -> "CEX-SUBFIELD-FACTOR-BASE" [label="measures", color="#66788a", style="solid"];
 }
