@@ -1,0 +1,79 @@
+module
+public import FiniteBuffers
+public import Mathlib.NumberTheory.Padics.RingHoms
+public section
+namespace ResidueEncoding
+open LocalIntegral FiniteBuffers
+
+/-- Embed the concrete rational integral subring into genuine two-adic integers. -/
+@[expose] noncomputable def toPadic : integralRing →+* ℤ_[2] where
+  toFun r := ⟨((r:ℚ) : ℚ_[2]), by
+    change ‖((r:ℚ) : ℚ_[2])‖ ≤ 1
+    rw [Padic.eq_padicNorm]
+    exact_mod_cast r.property⟩
+  map_zero' := by apply Subtype.ext; simp
+  map_one' := by apply Subtype.ext; simp
+  map_add' a b := by
+    apply Subtype.ext
+    change (((a:ℚ)+(b:ℚ):ℚ):ℚ_[2]) =
+      ((⟨((a:ℚ):ℚ_[2]),_⟩ : ℤ_[2]) + (⟨((b:ℚ):ℚ_[2]),_⟩ : ℤ_[2]) : ℤ_[2])
+    rw [PadicInt.coe_add]
+    push_cast
+    rfl
+  map_mul' a b := by
+    apply Subtype.ext
+    rw [PadicInt.coe_mul]
+    change (((a:ℚ)*(b:ℚ):ℚ):ℚ_[2]) = ((a:ℚ):ℚ_[2])*((b:ℚ):ℚ_[2])
+    push_cast
+    rfl
+
+@[expose] noncomputable def toResidue (p : ℕ) : integralRing →+* ZMod (2^p) :=
+  (PadicInt.toZModPow p).comp toPadic
+
+/-- The residue map has exactly the intended coefficient-precision kernel. -/
+theorem residue_kernel (p : ℕ) : RingHom.ker (toResidue p) = coefficientIdeal p := by
+  ext r
+  rw [RingHom.mem_ker]
+  constructor
+  · intro h
+    have hh : toPadic r ∈ RingHom.ker (PadicInt.toZModPow p) := h
+    rw [PadicInt.ker_toZModPow, Ideal.mem_span_singleton] at hh
+    obtain ⟨z,hz⟩ := hh
+    have hv : ((r:ℚ):ℚ_[2]) = (2:ℚ_[2])^p*(z:ℚ_[2]) := by
+      have hv := congrArg (fun x : ℤ_[2] => (x : ℚ_[2])) hz
+      simpa [toPadic] using hv
+    have hpow : (2:ℚ_[2])^p ≠ 0 := pow_ne_zero _ (by norm_num)
+    have heq : (((r:ℚ)/(2:ℚ)^p : ℚ):ℚ_[2]) = (z:ℚ_[2]) := by
+      push_cast
+      rw [hv]
+      field_simp
+    have hr : padicNorm 2 ((r:ℚ)/(2:ℚ)^p) ≤ 1 := by
+      have hn : ‖(((r:ℚ)/(2:ℚ)^p : ℚ):ℚ_[2])‖ ≤ 1 := by rw [heq]; exact z.property
+      rw [Padic.eq_padicNorm] at hn
+      exact_mod_cast hn
+    rw [coefficientIdeal, Ideal.mem_span_singleton]
+    refine ⟨⟨(r:ℚ)/(2:ℚ)^p,hr⟩,?_⟩
+    apply Subtype.ext
+    change (r:ℚ) = (2:ℚ)^p*((r:ℚ)/(2:ℚ)^p)
+    field_simp
+  · intro h
+    rw [coefficientIdeal, Ideal.mem_span_singleton] at h
+    obtain ⟨s,hs⟩ := h
+    rw [hs, map_mul, map_pow, map_ofNat]
+    have hz : (2 : ZMod (2^p))^p=0 := by
+      simpa only [Nat.cast_pow,Nat.cast_ofNat] using ZMod.natCast_self (2^p)
+    rw [hz,zero_mul]
+
+/-- Coefficient residue classes are exactly the usual finite modular ring. -/
+@[expose] noncomputable def coefficientEquiv (p : ℕ) :
+    (integralRing ⧸ coefficientIdeal p) ≃+* ZMod (2^p) :=
+  (Ideal.quotEquivOfEq (residue_kernel p).symm).trans
+    (RingHom.quotientKerEquivOfSurjective (ZMod.ringHom_surjective (toResidue p)))
+
+theorem coefficient_card (p : ℕ) : Nat.card (integralRing ⧸ coefficientIdeal p) = 2^p := by
+  rw [Nat.card_congr (coefficientEquiv p).toEquiv]
+  simp
+
+end ResidueEncoding
+#print axioms ResidueEncoding.residue_kernel
+#print axioms ResidueEncoding.coefficient_card

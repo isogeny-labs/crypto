@@ -1,6 +1,6 @@
 name = "common_scalar"
 version = "0.1.0"
-defaultTargets = ["CommonScalar", "RationalScalar", "LocalIntegral", "LocalCharts", "GlobalPolynomials", "LocalPrecision"]
+defaultTargets = ["CommonScalar", "RationalScalar", "LocalIntegral", "LocalCharts", "GlobalPolynomials", "LocalPrecision", "FiniteBuffers", "ResidueEncoding"]
 [[require]]
 name = "CryptoLean"
 git = "https://github.com/aburan28/crypto-lean.git"
@@ -28,3 +28,9 @@ name = "GlobalPolynomials"
 
 [[lean_lib]]
 name = "LocalPrecision"
+
+[[lean_lib]]
+name = "FiniteBuffers"
+
+[[lean_lib]]
+name = "ResidueEncoding"
