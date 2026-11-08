@@ -69,6 +69,28 @@
         "decomposition"
       ],
       "evidence_class": "counterexample"
+    },
+    {
+      "id": "MEAS-PQ2-MSOLVE-N37-STEP5",
+      "label": "msolve F4 on a fresh m = 2, n = 37 instance runs a degree-5 step",
+      "kind": "measured_bound",
+      "status": "measured",
+      "model": "repository_measurement",
+      "statement": "msolve 0.6.5 (F4, grevlex, 4 threads) on a fresh pq2_rank instance at n = 37 (m = 2, factor-base dimension 19 = ceil(37/2), field equations included; 38 variables, 75 equations) ran steps of degree 2, 2, 3, 3, 4, 4, 4, 4 and then a degree-5 step on a 1,016,044 x 610,665 matrix, about 60 minutes in at 53 GB, on an isolab-eks cpu-spot node. F4 selects the lowest-degree pairs first, so msolve's maximal step degree on this instance is at least 5.",
+      "scope": "One instance; one implementation (msolve, not Magma); run unfinished at recording, so the final Groebner basis check (linear = k = 33) is pending. A lower bound valid for every F4 run would need the degree-4 closure to fall short of k (about 58 hours at this size).",
+      "assumptions": [],
+      "source_refs": [
+        "S-ROUND6-LEAN"
+      ],
+      "source_locations": [
+        "research/ecdlp_weakness_census_20261104/pq2_rank/f4/eks_n37/interim-0742/msolve.stdout"
+      ],
+      "tags": [
+        "groebner",
+        "summation-polynomial",
+        "solving-degree"
+      ],
+      "evidence_class": "measurement"
     }
   ],
   "edges": [
@@ -120,6 +142,26 @@
       "statement": "The census's subfield-curve control at n = 3 measured decomposable fractions 0.0003 to 0.002, against 1/6.",
       "source_refs": [
         "S-CENSUS-ROUND4"
+      ]
+    },
+    {
+      "id": "R6-006",
+      "from": "MEAS-PQ2-MSOLVE-N37-STEP5",
+      "to": "HEUR-SP-SEMAEV15-ASSUMPTION1",
+      "relation": "obstructs",
+      "statement": "On the diagonal k = ceil(n/m) at m = 2, n = 37, msolve's F4 runs a degree-5 step: d_F4 > 4 for this implementation (Semaev's quantity is Magma's).",
+      "source_refs": [
+        "S-ROUND6-LEAN"
+      ]
+    },
+    {
+      "id": "R6-007",
+      "from": "MEAS-PQ2-MSOLVE-N37-STEP5",
+      "to": "MEAS-GB-KW-TABLE1",
+      "relation": "measures",
+      "statement": "Reproduces with a second implementation the step from degree 4 to 5 that Kousidis-Wiemers report for Magma from n = 37.",
+      "source_refs": [
+        "S-ROUND6-LEAN"
       ]
     }
   ]
