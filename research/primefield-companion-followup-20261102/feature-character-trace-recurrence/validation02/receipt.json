@@ -1,0 +1,81 @@
+{
+  "scope": "Streaming lifted coefficient recurrence, selected character traces, bounded subset word moments and public recovery",
+  "build_exit": 0,
+  "check_exit": 0,
+  "commands": [
+    "timeout 90 rustc --edition=2021 -O -C overflow-checks=yes --emit=link,dep-info research/primefield-companion-followup-20261102/feature-character-trace-recurrence/driver.rs -o /tmp/t1944-v2-check",
+    "timeout 60 /tmp/t1944-v2-check"
+  ],
+  "binary_sha256": "1325ba96a097a8bb9ad4881947650fdd0f1e181bd5dc8bf521c4e0fbcfc7908f",
+  "dependencies": {
+    "research/primefield-companion-followup-20261102/feature-character-trace-recurrence/driver.rs": "37cc450dbe72575ba66798168af7ec312b593b1b7a09b5d30fab47d386c6a726",
+    "research/primefield-companion-followup-20261102/feature-character-trace-recurrence/lib.rs": "df63248d97ead5f354ca00388c79dd146974db21a785d60ab0239ca4ab9342de",
+    "research/primefield-companion-followup-20261102/feature-character-trace-recurrence/geometry.rs": "7e1c1aeebe7fc345f7835c8d33e7f1c7af7ada3c03393e74ee9c0f3e1de5c892",
+    "research/primefield-companion-followup-20261102/feature-character-trace-recurrence/division.rs": "0b54ddf8e873541df619c618dca45a72a70c02eb3196d7aa715cdc6b5c9cbafc",
+    "research/primefield-companion-followup-20261102/feature-character-trace-recurrence/polynomial.rs": "6b3f25f44847c0e9e690fa9db389bbc11b35450f5cbc7fec26ac6595eddff626",
+    "research/primefield-companion-followup-20261102/feature-orbit-local-terms/local.rs": "5408f64b5e60f8f0619376d7335c2703df74857cb86ca535cec6e613aaf4e5a2",
+    "research/primefield-companion-followup-20261102/feature-character-trace-recurrence/schedule.rs": "61623bbd89ebb71aed41b76d55a6c865f4ccc7cee110f4ceb6d4a2b4335b3706",
+    "research/primefield-companion-followup-20261102/feature-character-trace-recurrence/allocation.rs": "5d13867149ba35212e7f8d32d2162074508a5e7b6145478df227c2cbee560e4b",
+    "research/primefield-companion-followup-20261102/feature-character-trace-recurrence/class-source.rs": "93f7af6d4bbe2ca7429fa9c68b4c657dedbb7d1321afb7ea647fcda3e2273d91",
+    "research/primefield-companion-followup-20261102/feature-character-trace-recurrence/circuit.rs": "199f3c739c8e278668188188f926c165cc0959487498ed48c16f48fa9d5d4941",
+    "research/primefield-companion-followup-20261102/feature-character-trace-recurrence/transcript.rs": "99cb717ed230e68a30dd2525cdd245bdda900d2f4e8ac09438e011f093b5cf11",
+    "research/primefield-companion-followup-20261102/feature-character-trace-recurrence/projector.rs": "6bde1ade9d7483426864123d46564ba54708d268e707d0695a76c5149b27f7a8",
+    "research/primefield-companion-followup-20261102/feature-character-trace-recurrence/word.rs": "e54bc6b863402524c781c5f51c03c6aae992a1561068c7326cc2bd195518afbe",
+    "research/primefield-companion-followup-20261102/feature-character-trace-recurrence/corrected.rs": "bc791c140a603f44f9e895a68184035156b8d5fc981cae7fc4632d12d9bddcca",
+    "research/primefield-companion-followup-20261102/feature-character-trace-recurrence/recurrence.rs": "f310c7068fbb64ba348491ef338ad77d08094e25e6221e96566e5016d85f578d",
+    "research/primefield-companion-followup-20261102/feature-character-trace-recurrence/checks.rs": "91e042c177707fd035ca37ad902e701c078cbacd07909f53f4c3b9d731fe12dd"
+  },
+  "copied_sources": {
+    "lib.rs": "df63248d97ead5f354ca00388c79dd146974db21a785d60ab0239ca4ab9342de",
+    "geometry.rs": "7e1c1aeebe7fc345f7835c8d33e7f1c7af7ada3c03393e74ee9c0f3e1de5c892",
+    "division.rs": "0b54ddf8e873541df619c618dca45a72a70c02eb3196d7aa715cdc6b5c9cbafc",
+    "polynomial.rs": "6b3f25f44847c0e9e690fa9db389bbc11b35450f5cbc7fec26ac6595eddff626",
+    "schedule.rs": "61623bbd89ebb71aed41b76d55a6c865f4ccc7cee110f4ceb6d4a2b4335b3706",
+    "allocation.rs": "5d13867149ba35212e7f8d32d2162074508a5e7b6145478df227c2cbee560e4b",
+    "class-source.rs": "93f7af6d4bbe2ca7429fa9c68b4c657dedbb7d1321afb7ea647fcda3e2273d91",
+    "circuit.rs": "199f3c739c8e278668188188f926c165cc0959487498ed48c16f48fa9d5d4941",
+    "transcript.rs": "99cb717ed230e68a30dd2525cdd245bdda900d2f4e8ac09438e011f093b5cf11",
+    "projector.rs": "6bde1ade9d7483426864123d46564ba54708d268e707d0695a76c5149b27f7a8",
+    "word.rs": "e54bc6b863402524c781c5f51c03c6aae992a1561068c7326cc2bd195518afbe",
+    "corrected.rs": "bc791c140a603f44f9e895a68184035156b8d5fc981cae7fc4632d12d9bddcca"
+  },
+  "logs": {
+    "check.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build.stderr": "20a12b94e687ea8b3f36a39abeb5f00b266b26ea69f8688e8c9e10ce23c1e303",
+    "build.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "check.stdout": "a28f48b19b8ebc0205e907cc56fcf9e5009d69568c97d4a7bb5738d9ba1e26e2"
+  },
+  "caps": {
+    "steps": 500000,
+    "subsets": 4096,
+    "modulus": 9223372036854775807,
+    "circuit_nodes": 100000,
+    "endpoint_correction_multiplications": 100000
+  },
+  "source_queries": {
+    "nominal": 332,
+    "guards": 27,
+    "sum_excluding_setup": 359
+  },
+  "original_cohort_modified": false,
+  "counter_scope": "recurrence modular products include initial binary power, numerator and denominator products; unit inversions and subset polynomial products are separate; window is retained entries between steps",
+  "capped_word_work": {
+    "steps": 1499184,
+    "products": 20402004,
+    "inversions": 1499184,
+    "precision_drops": 11259,
+    "subsets": 5817,
+    "polynomial_pairs": 106899
+  },
+  "capped_word_rows": [
+    "word_refusal r=41 m=5 k=17 radii=4 stats=StreamStats { steps: 0, products: 0, inversions: 0, precision_drops: 0, max_window: 0, max_modulus: 0, subsets: 0, polynomial_pairs: 0, limit: Some(\"subsets\") }",
+    "word_refusal r=41 m=5 k=40 radii=4 stats=StreamStats { steps: 0, products: 0, inversions: 0, precision_drops: 0, max_window: 0, max_modulus: 0, subsets: 0, polynomial_pairs: 0, limit: Some(\"subsets\") }",
+    "word_refusal r=97 m=3 k=7 radii=4 stats=StreamStats { steps: 499728, products: 6800668, inversions: 499728, precision_drops: 3753, max_window: 10, max_modulus: 8587340257, subsets: 1939, polynomial_pairs: 35633, limit: Some(\"steps\") }",
+    "word_refusal r=97 m=3 k=17 radii=4 stats=StreamStats { steps: 499728, products: 6800668, inversions: 499728, precision_drops: 3753, max_window: 10, max_modulus: 8587340257, subsets: 1939, polynomial_pairs: 35633, limit: Some(\"steps\") }",
+    "word_refusal r=97 m=3 k=96 radii=4 stats=StreamStats { steps: 499728, products: 6800668, inversions: 499728, precision_drops: 3753, max_window: 10, max_modulus: 8587340257, subsets: 1939, polynomial_pairs: 35633, limit: Some(\"steps\") }",
+    "word_refusal r=109 m=9 k=108 radii=4 stats=StreamStats { steps: 0, products: 0, inversions: 0, precision_drops: 0, max_window: 0, max_modulus: 0, subsets: 0, polynomial_pairs: 0, limit: Some(\"subsets\") }",
+    "word_refusal r=281 m=7 k=7 radii=4 stats=StreamStats { steps: 0, products: 0, inversions: 0, precision_drops: 0, max_window: 0, max_modulus: 0, subsets: 0, polynomial_pairs: 0, limit: Some(\"subsets\") }",
+    "word_refusal r=281 m=7 k=17 radii=4 stats=StreamStats { steps: 0, products: 0, inversions: 0, precision_drops: 0, max_window: 0, max_modulus: 0, subsets: 0, polynomial_pairs: 0, limit: Some(\"subsets\") }",
+    "word_refusal r=281 m=7 k=280 radii=4 stats=StreamStats { steps: 0, products: 0, inversions: 0, precision_drops: 0, max_window: 0, max_modulus: 0, subsets: 0, polynomial_pairs: 0, limit: Some(\"subsets\") }"
+  ]
+}
