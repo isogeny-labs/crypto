@@ -19,5 +19,5 @@ for lab in "${labels[@]}"; do
   "$BIN" --label "$lab" --p "$p" --n "$n" --threads "${THREADS:-4}" --seed "${SEED:-1}" \
     ${BOUND:+--bound "$BOUND"} ${HALF:+--half-length "$HALF"} ${SUPPORT:+--support "$SUPPORT"} \
     --sub-bounds 50,163,691,2000 --out "$OUT/rust_${lab}.json" 2> "$OUT/rust_${lab}.log"
-  echo "$lab: $(python3 -I -c "import json,sys; d=json.load(open('$OUT/rust_${lab}.json')); print('h_bits', d['h_bits'], 'ratio', d['ratio_to_analytic'], 'accepted', d['accepted'], 'wall', d['wall_s']['total'])")"
+  echo "$lab: $(grep -o '"h_bits": [0-9]*\|"ratio_to_analytic": [0-9.]*\|"accepted": [a-z]*' "$OUT/rust_${lab}.json" | tr '\n' ' ')"
 done
