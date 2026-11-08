@@ -58,8 +58,11 @@ On 8 November, prepared an explicit manual full-library development job in the
 existing rust-all-targets workflow. It uses GitHub-hosted Ubuntu with an actual
 time-interface preflight, immutable source input and Rust1.99.1. Ordinary compile
 jobs remain unchanged; no new credentials, scientific run or benchmark is added.
-Publish and lint this change, then dispatch one pinned development validation
-attempt and retain its run identity. The old local attempt stays incomplete.
+Published and linted the change atcda1e5810, then submitted one development
+validation: Actions42529489383, requested source/workflow head
+cda1e5810f41550a2b929cbdb6fe4ff242865617. Initial state queued; actual host
+admission and parent test result are pending. Collect at the standing cadence;
+do not submit another attempt automatically. The old local attempt stays incomplete.
 See development/hosted-validation-20261108/ for its bounds and receipt contract.
 
 Attach an existing approved checkpoint/lab connection or configure the approved
@@ -74,7 +77,10 @@ and verify current-head gate/size/artifacts checks before merge.
 ## Runs in flight
 No scientific run. The preparation is terminal failed. No scientific EKS request,
 Job UID, data export or result receipt exists. No development checks remain
-live. Source507829726f cache/ordered/E2E completed; E2E log reports2passed/0failed.
+live locally. Hosted development run42529489383 is queued at the initial
+observation, pinned tocda1e5810; see development/hosted-validation-20261108/
+dispatch-receipt.json. It is not a scientific run or a reported test pass.
+Source507829726f cache/ordered/E2E completed; E2E log reports2passed/0failed.
 Old exec73044/34529 handles are unavailable. Full-library cargo10207/test10463
 are defunct; /tmp/crypto-halftrace-nov4/full-library-attempt2.exit is absent.
 The raw partial log is /tmp/crypto-halftrace-nov4-full-library-attempt2.log,

@@ -52,3 +52,11 @@ Preparation validation: actionlint1.7.12 passed after correcting a job-level
 runner-context reference to a step-level GITHUB_ENV binding. The initial lint
 failure remains in actionlint-initial.txt. Native source hashes still match the
 retained507829726f manifest. This preparation is not a completed hosted test run.
+
+Submitted one development run at22:17UTC:
+[42529489383](https://github.com/isogeny-labs/crypto/actions/runs/42529489383),
+with both requested source and workflow-run head bound to
+cda1e5810f41550a2b929cbdb6fe4ff242865617. Its initial observation was queued;
+host admission, the optional job and parent result are pending. Exact command,
+publication identity and dispatch result are in dispatch-receipt.json. Do not
+submit another attempt or infer a full-suite pass from the accepted dispatch.
