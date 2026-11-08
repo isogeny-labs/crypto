@@ -1,354 +1,8 @@
 {
-  "schema": "experiment.protocol/v1",
-  "protocol_id": "prime-common-scalar-20261108",
-  "version": 1,
-  "created": "2026-11-08",
-  "repository": "crypto",
-  "study_dir": "research/prime_common_scalar_20261108",
-  "authors": [
-    "Codex"
-  ],
-  "links": {
-    "protocol_note": "PROTOCOL.md"
-  },
-  "question": "Does common scalar normalization avoid entry-normalizer mode proliferation, at equal precision and conservative charged precision proxies?",
-  "claims": [
-    {
-      "id": "C1",
-      "text": "Registered finite reconstruction, controls and grouped tuple recount complete.",
-      "class": "exact_computation",
-      "decided_by": []
-    },
-    {
-      "id": "C2",
-      "text": "Descriptive within-cell strict inequalities in the frozen census; no population or speed conclusion.",
-      "class": "exact_computation",
-      "decided_by": []
-    }
-  ],
-  "arms": [
-    {
-      "id": "paired-panel",
-      "role": "candidate",
-      "description": "One physical process containing all paired kernels and embedded controls",
-      "instrument": {
-        "repo": "crypto",
-        "commit": "90a69763d280e28d95061afe8e105e6288921add",
-        "build": [
-          [
-            "g++",
-            "-std=c++20",
-            "-O2",
-            "-Wall",
-            "-Wextra",
-            "-Werror",
-            "check.cpp",
-            "-lgmpxx",
-            "-lgmp",
-            "-o",
-            "check"
-          ]
-        ],
-        "binary_sha256": "c24860ebfa98f2da61763ea074258e459872fa1d2f3d641bd1733e2443fa5734",
-        "flags": {},
-        "env": {},
-        "threads": 1
-      },
-      "parameters": {
-        "kernels": [
-          "original",
-          "entry",
-          "scalar"
-        ],
-        "precision": [
-          16,
-          24,
-          32,
-          48
-        ],
-        "L": [
-          16,
-          32,
-          64
-        ]
-      }
-    },
-    {
-      "id": "replay",
-      "role": "control_aa",
-      "description": "Second physical execution: identical paired-panel replay",
-      "instrument": {
-        "repo": "crypto",
-        "commit": "90a69763d280e28d95061afe8e105e6288921add",
-        "build": [
-          [
-            "g++",
-            "-std=c++20",
-            "-O2",
-            "-Wall",
-            "-Wextra",
-            "-Werror",
-            "check.cpp",
-            "-lgmpxx",
-            "-lgmp",
-            "-o",
-            "check"
-          ]
-        ],
-        "binary_sha256": "c24860ebfa98f2da61763ea074258e459872fa1d2f3d641bd1733e2443fa5734",
-        "flags": {},
-        "env": {},
-        "threads": 1
-      },
-      "parameters": {
-        "kernels": [
-          "original",
-          "entry",
-          "scalar"
-        ],
-        "precision": [
-          16,
-          24,
-          32,
-          48
-        ],
-        "L": [
-          16,
-          32,
-          64
-        ]
-      },
-      "same_instrument_as": "paired-panel"
-    }
-  ],
-  "controls": {
-    "aa": {
-      "present": true,
-      "comparison": "aa",
-      "not_applicable_reason": null
-    },
-    "positive": {
-      "present": false,
-      "arm": null,
-      "expected_detection": "Embedded doubling raises Smith weights by one modulo cutoff.",
-      "not_applicable_reason": "Positive controls embedded in every panel, no separate physical process."
-    },
-    "negative": {
-      "present": false,
-      "arm": null,
-      "null_population": null,
-      "not_applicable_reason": "Exact algebraic negative control in unit.log: unnormalized square node25 differs from required5; no null-population inference."
-    }
-  },
-  "variable_ledger": {
-    "independent": [
-      {
-        "name": "kernel",
-        "levels": [
-          "original",
-          "entry",
-          "scalar"
-        ]
-      },
-      {
-        "name": "precision_policy",
-        "levels": [
-          "same",
-          "proxy"
-        ]
-      }
-    ],
-    "factors": [
-      {
-        "name": "inputs",
-        "treatment": "fixed",
-        "how": "every listed L,t,zeta,q tile and crossing row in PROTOCOL.md"
-      },
-      {
-        "name": "binary",
-        "treatment": "fixed",
-        "how": "one native executable with exact GMP rational and integer arithmetic"
-      },
-      {
-        "name": "threads",
-        "treatment": "fixed",
-        "value": 1,
-        "how": "single threaded checker"
-      },
-      {
-        "name": "host_load",
-        "treatment": "measured",
-        "how": "record host metadata; no clocks or speed claims; exact values independent of contention"
-      },
-      {
-        "name": "factorization",
-        "treatment": "crossed",
-        "how": "Newton and Smith separately, never mix their comparisons"
-      },
-      {
-        "name": "order",
-        "treatment": "fixed",
-        "how": "paired exact arithmetic in same process; no warmups or timing"
-      }
-    ],
-    "comparisons": [
-      {
-        "id": "census",
-        "arms": [
-          "paired-panel"
-        ],
-        "differs_in": [],
-        "design": "absolute",
-        "reason": "Exact physical census with embedded paired comparisons; no separate arm executions.",
-        "threshold": "20928 complete unique records and exact controls/replay"
-      },
-      {
-        "id": "aa",
-        "arms": [
-          "paired-panel",
-          "replay"
-        ],
-        "differs_in": [],
-        "design": "aa"
-      }
-    ],
-    "aa_not_applicable": null,
-    "crosses_map": false
-  },
-  "randomization": {
-    "arm_order": "fixed",
-    "arm_order_reason": "Deterministic exact values; no timed metrics or order-sensitive cache estimates.",
-    "seed_derivation": {
-      "method": "explicit_list",
-      "seeds": [
-        0
-      ],
-      "nonce": null,
-      "note": "No random inputs; seed0 labels exhaustive frozen finite cells."
-    },
-    "instance_sampling": {
-      "rule": "Exhaust listed finite cells, not a sample from a curve distribution.",
-      "independent_of_arm": true
-    },
-    "blinding": {
-      "analysis_labels_masked": false,
-      "how": "Exact descriptive comparisons, no statistical test or adaptive selection.",
-      "unmasked_at": null
-    }
-  },
-  "sample_size": {
-    "instances": 1,
-    "replicates": 1,
-    "warmups": 0,
-    "power": {
-      "method": "exact",
-      "alpha": 0.05,
-      "tests_in_family": 1,
-      "correction": "none",
-      "rank_test_n": null,
-      "min_attainable_two_sided_p": null,
-      "passes": true,
-      "note": "Exact finite enumeration with replay; no population inference, p-value or statistical power claim."
-    },
-    "preflight_runtime": {
-      "fixed_seconds": null,
-      "per_sample_seconds": null,
-      "threads": 1,
-      "estimated_total_seconds": 1800,
-      "measured_on": "No primary panel preflight: native development controls only, hard 900s ceiling per physical process; no timing metric."
-    }
-  },
-  "metrics": {
-    "primary": [
-      {
-        "id": "rows_completed",
-        "name": "complete unique finite census records",
-        "unit": "count",
-        "kind": "exact",
-        "definition": "20928 registered per-cell/kernel/precision-policy/factorization records, after all reconstruction assertions.",
-        "source": "native analyzer reports/summary.json rows",
-        "aggregation": "per_row",
-        "resolution": "1",
-        "uncertainty": "none_exact"
-      }
-    ],
-    "secondary": []
-  },
-  "measurement": {
-    "isolation_required": "L0",
-    "warmups": 0,
-    "order": "sequential",
-    "clock": "counted",
-    "counters": [
-      "rows_completed"
-    ],
-    "record": [
-      "binary_sha256",
-      "compiler_version",
-      "kernel_release",
-      "threads"
-    ],
-    "timed_primary_justification": null
-  },
-  "execution": {
-    "backend": "local",
-    "queue": null,
-    "placement": {
-      "cpus": 1,
-      "memory_limit_bytes": 2147483648,
-      "backend_authorization": "User approved local override in this session, resumed by Please unblock yourself; 1 CPU, 2GiB, 900s each x2, no retries/cloud spend."
-    },
-    "measurement_class": "throughput",
-    "timeout_seconds": 900,
-    "checkpoint": {
-      "policy": "none",
-      "interval_seconds": null,
-      "grace_seconds": null,
-      "restore_validation": "none",
-      "after_restore": {
-        "wall_time": "invalid",
-        "counted_units": "valid"
-      }
-    },
-    "retries": {
-      "infrastructure_only": true,
-      "max_attempts": 1
-    }
-  },
-  "stopping_rules": [
-    {
-      "rule": "One panel and one identical replay,20928 records each. Stop on first failure, preserve partial records; no retries.",
-      "kind": "fixed_n",
-      "preregistered": true
-    }
-  ],
-  "invalidation_rules": [
-    "Any reconstruction, control, coverage or replay failure invalidates comparisons; retain partial output.",
-    "No timings or full-cost algorithm claim; degree/precision multipliers are conservative proxies."
-  ],
-  "decision_rule": {
-    "text": "Emit every within-cell pair and per-level fewer/equal/more counts, separately for each method, kernel and precision policy.",
-    "comparison_ids": [
-      "census"
-    ],
-    "threshold": "strict integer inequalities; exact equality for controls",
-    "statistic": "exact counts",
-    "interval": "none: finite deterministic census",
-    "multiple_comparison_correction": "none",
-    "effect_size_measure": "integer tuple-count pair in every CSV record",
-    "verdict_vocabulary": [
-      "component_gain",
-      "tie",
-      "component_loss",
-      "invalid",
-      "not_run"
-    ]
-  },
+  "amendments": [],
   "analysis_plan": {
-    "script": {
-      "path": "research/prime_common_scalar_20261108/analyze.cpp",
-      "sha256": "aee93585e61b4087d599769b9b6abc69677e7a0efc2ab8cd82ed83ae42d01e00"
-    },
+    "blinded": false,
+    "frozen_before_data": true,
     "inputs": [
       "runs/0/panel.csv",
       "runs/1/panel.csv"
@@ -357,16 +11,192 @@
       "reports/summary.json",
       "reports/per-level.csv"
     ],
-    "blinded": false,
-    "frozen_before_data": true
+    "script": {
+      "path": "research/prime_common_scalar_20261108/analyze.cpp",
+      "sha256": "aee93585e61b4087d599769b9b6abc69677e7a0efc2ab8cd82ed83ae42d01e00"
+    }
   },
-  "reporting": {
-    "export_schema": "experiment.export/v1",
-    "review_schema": "experiment.review/v1",
-    "graphs": [
-      "Complete per-level table; no selected successful cells"
+  "arms": [
+    {
+      "description": "One physical process containing all paired kernels and embedded controls",
+      "id": "paired-panel",
+      "instrument": {
+        "binary_sha256": "c24860ebfa98f2da61763ea074258e459872fa1d2f3d641bd1733e2443fa5734",
+        "build": [
+          [
+            "g++",
+            "-std=c++20",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "check.cpp",
+            "-lgmpxx",
+            "-lgmp",
+            "-o",
+            "check"
+          ]
+        ],
+        "commit": "555cd9430f525a4bf0e4f0275e8b6aba4387cbf1",
+        "env": {},
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "L": [
+          16,
+          32,
+          64
+        ],
+        "kernels": [
+          "original",
+          "entry",
+          "scalar"
+        ],
+        "precision": [
+          16,
+          24,
+          32,
+          48
+        ]
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "Second physical execution: identical paired-panel replay",
+      "id": "replay",
+      "instrument": {
+        "binary_sha256": "c24860ebfa98f2da61763ea074258e459872fa1d2f3d641bd1733e2443fa5734",
+        "build": [
+          [
+            "g++",
+            "-std=c++20",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "check.cpp",
+            "-lgmpxx",
+            "-lgmp",
+            "-o",
+            "check"
+          ]
+        ],
+        "commit": "555cd9430f525a4bf0e4f0275e8b6aba4387cbf1",
+        "env": {},
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "L": [
+          16,
+          32,
+          64
+        ],
+        "kernels": [
+          "original",
+          "entry",
+          "scalar"
+        ],
+        "precision": [
+          16,
+          24,
+          32,
+          48
+        ]
+      },
+      "role": "control_aa",
+      "same_instrument_as": "paired-panel"
+    }
+  ],
+  "authors": [
+    "Codex"
+  ],
+  "claims": [
+    {
+      "class": "exact_computation",
+      "decided_by": [],
+      "id": "C1",
+      "text": "Registered finite reconstruction, controls and grouped tuple recount complete."
+    },
+    {
+      "class": "exact_computation",
+      "decided_by": [],
+      "id": "C2",
+      "text": "Descriptive within-cell strict inequalities in the frozen census; no population or speed conclusion."
+    }
+  ],
+  "controls": {
+    "aa": {
+      "comparison": "aa",
+      "not_applicable_reason": null,
+      "present": true
+    },
+    "negative": {
+      "arm": null,
+      "not_applicable_reason": "Exact algebraic negative control in unit.log: unnormalized square node25 differs from required5; no null-population inference.",
+      "null_population": null,
+      "present": false
+    },
+    "positive": {
+      "arm": null,
+      "expected_detection": "Embedded doubling raises Smith weights by one modulo cutoff.",
+      "not_applicable_reason": "Positive controls embedded in every panel, no separate physical process.",
+      "present": false
+    }
+  },
+  "created": "2026-11-08",
+  "decision_rule": {
+    "comparison_ids": [
+      "census"
     ],
-    "report_dir": "reports"
+    "effect_size_measure": "integer tuple-count pair in every CSV record",
+    "interval": "none: finite deterministic census",
+    "multiple_comparison_correction": "none",
+    "statistic": "exact counts",
+    "text": "Emit every within-cell pair and per-level fewer/equal/more counts, separately for each method, kernel and precision policy.",
+    "threshold": "strict integer inequalities; exact equality for controls",
+    "verdict_vocabulary": [
+      "component_gain",
+      "tie",
+      "component_loss",
+      "invalid",
+      "not_run"
+    ]
+  },
+  "execution": {
+    "backend": "local",
+    "checkpoint": {
+      "after_restore": {
+        "counted_units": "valid",
+        "wall_time": "invalid"
+      },
+      "grace_seconds": null,
+      "interval_seconds": null,
+      "policy": "none",
+      "restore_validation": "none"
+    },
+    "measurement_class": "throughput",
+    "placement": {
+      "backend_authorization": "User approved local override in this session, resumed by Please unblock yourself; 1 CPU, 2GiB, 900s each x2, no retries/cloud spend.",
+      "cpus": 1,
+      "memory_limit_bytes": 2147483648
+    },
+    "queue": null,
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    },
+    "timeout_seconds": 900
+  },
+  "freeze": {
+    "commit": "555cd9430f525a4bf0e4f0275e8b6aba4387cbf1",
+    "filed_before_affected_data": true,
+    "frozen_at": "2026-11-08T05:57:26Z",
+    "protocol_sha256": "dedbb0086d84e5ecffba17a424a1fcfe6b89bb3d5db0ea40a5421afc36e8d548",
+    "status": "frozen"
   },
   "inadmissible": [
     "Extrapolating finite tuple counts to an ECDLP runtime",
@@ -374,26 +204,196 @@
     "Selecting only successful cells or odd levels",
     "Changing panel after observing its results"
   ],
+  "invalidation_rules": [
+    "Any reconstruction, control, coverage or replay failure invalidates comparisons; retain partial output.",
+    "No timings or full-cost algorithm claim; degree/precision multipliers are conservative proxies."
+  ],
+  "links": {
+    "protocol_note": "PROTOCOL.md"
+  },
   "literature": [
     {
-      "ref": "crypto:research/prime_common_kernel_20261030/sources.md",
-      "provenance": "internal",
       "claim": "Pinned primary sources for Cauchy deformation and crossing modes",
+      "provenance": "internal",
+      "ref": "crypto:research/prime_common_kernel_20261030/sources.md",
       "verified_by": "source/proof-scope inspection; no independent signed verdict"
     },
     {
-      "ref": "crypto:research/prime_square_kernel_20261106/RESULTS_local_20261107.md",
-      "provenance": "internal",
       "claim": "Entry-dependent normalizer caused finite mode growth; informs common scalar repair",
+      "provenance": "internal",
+      "ref": "crypto:research/prime_square_kernel_20261106/RESULTS_local_20261107.md",
       "verified_by": "Producer source inspection, no signed independent verdict"
     }
   ],
-  "amendments": [],
-  "freeze": {
-    "status": "draft",
-    "protocol_sha256": null,
-    "commit": null,
-    "frozen_at": null,
-    "filed_before_affected_data": null
-  }
+  "measurement": {
+    "clock": "counted",
+    "counters": [
+      "rows_completed"
+    ],
+    "isolation_required": "L0",
+    "order": "sequential",
+    "record": [
+      "binary_sha256",
+      "compiler_version",
+      "kernel_release",
+      "threads"
+    ],
+    "timed_primary_justification": null,
+    "warmups": 0
+  },
+  "metrics": {
+    "primary": [
+      {
+        "aggregation": "per_row",
+        "definition": "20928 registered per-cell/kernel/precision-policy/factorization records, after all reconstruction assertions.",
+        "id": "rows_completed",
+        "kind": "exact",
+        "name": "complete unique finite census records",
+        "resolution": "1",
+        "source": "native analyzer reports/summary.json rows",
+        "uncertainty": "none_exact",
+        "unit": "count"
+      }
+    ],
+    "secondary": []
+  },
+  "protocol_id": "prime-common-scalar-20261108",
+  "question": "Does common scalar normalization avoid entry-normalizer mode proliferation, at equal precision and conservative charged precision proxies?",
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Deterministic exact values; no timed metrics or order-sensitive cache estimates.",
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact descriptive comparisons, no statistical test or adaptive selection.",
+      "unmasked_at": null
+    },
+    "instance_sampling": {
+      "independent_of_arm": true,
+      "rule": "Exhaust listed finite cells, not a sample from a curve distribution."
+    },
+    "seed_derivation": {
+      "method": "explicit_list",
+      "nonce": null,
+      "note": "No random inputs; seed0 labels exhaustive frozen finite cells.",
+      "seeds": [
+        0
+      ]
+    }
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "graphs": [
+      "Complete per-level table; no selected successful cells"
+    ],
+    "report_dir": "reports",
+    "review_schema": "experiment.review/v1"
+  },
+  "repository": "crypto",
+  "sample_size": {
+    "instances": 1,
+    "power": {
+      "alpha": 0.05,
+      "correction": "none",
+      "method": "exact",
+      "min_attainable_two_sided_p": null,
+      "note": "Exact finite enumeration with replay; no population inference, p-value or statistical power claim.",
+      "passes": true,
+      "rank_test_n": null,
+      "tests_in_family": 1
+    },
+    "preflight_runtime": {
+      "estimated_total_seconds": 1800,
+      "fixed_seconds": null,
+      "measured_on": "No primary panel preflight: native development controls only, hard 900s ceiling per physical process; no timing metric.",
+      "per_sample_seconds": null,
+      "threads": 1
+    },
+    "replicates": 1,
+    "warmups": 0
+  },
+  "schema": "experiment.protocol/v1",
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "One panel and one identical replay,20928 records each. Stop on first failure, preserve partial records; no retries."
+    }
+  ],
+  "study_dir": "research/prime_common_scalar_20261108",
+  "variable_ledger": {
+    "aa_not_applicable": null,
+    "comparisons": [
+      {
+        "arms": [
+          "paired-panel"
+        ],
+        "design": "absolute",
+        "differs_in": [],
+        "id": "census",
+        "reason": "Exact physical census with embedded paired comparisons; no separate arm executions.",
+        "threshold": "20928 complete unique records and exact controls/replay"
+      },
+      {
+        "arms": [
+          "paired-panel",
+          "replay"
+        ],
+        "design": "aa",
+        "differs_in": [],
+        "id": "aa"
+      }
+    ],
+    "crosses_map": false,
+    "factors": [
+      {
+        "how": "every listed L,t,zeta,q tile and crossing row in PROTOCOL.md",
+        "name": "inputs",
+        "treatment": "fixed"
+      },
+      {
+        "how": "one native executable with exact GMP rational and integer arithmetic",
+        "name": "binary",
+        "treatment": "fixed"
+      },
+      {
+        "how": "single threaded checker",
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1
+      },
+      {
+        "how": "record host metadata; no clocks or speed claims; exact values independent of contention",
+        "name": "host_load",
+        "treatment": "measured"
+      },
+      {
+        "how": "Newton and Smith separately, never mix their comparisons",
+        "name": "factorization",
+        "treatment": "crossed"
+      },
+      {
+        "how": "paired exact arithmetic in same process; no warmups or timing",
+        "name": "order",
+        "treatment": "fixed"
+      }
+    ],
+    "independent": [
+      {
+        "levels": [
+          "original",
+          "entry",
+          "scalar"
+        ],
+        "name": "kernel"
+      },
+      {
+        "levels": [
+          "same",
+          "proxy"
+        ],
+        "name": "precision_policy"
+      }
+    ]
+  },
+  "version": 1
 }
