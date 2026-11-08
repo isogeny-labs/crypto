@@ -1,0 +1,158 @@
+# The F = 1 target-in-walk arm at k = 28 and 32, single-target ecbench (2026-11-08)
+
+**Class.** Measured, single-target ecbench sessions under a protocol frozen before data
+([PROTOCOL.md](PROTOCOL.md); hashes in `data/frozen.sha256`, freeze commit `e6a759cc72`). Counted
+units only (ecbench GAE, S = cost/sqrt(r)); every comparison at w = 0, 0.1 and 1 under the committed
+band and under `ecbench band --price-table-work`. Public synthetic Curve25519-family miniatures; no
+security claim. No pcc claim has been filed; every number is an unverified assertion until it is
+reviewed [pcc:unverified]. No code change; binary `/home/user/ctarget-f1/release/ecbench`
+(SHA-256 `d23fab99...`, `data/binary-k{28,32}.sha256`).
+
+**Question.** The target-in-walk arm had been measured at k = 20 and 24 only. Does its distance to
+rho-neg hold near 1.4x at k = 28 and 32, where rho-neg's set-up overhead vanishes and both arms sit
+near their walk floors, and do 32 or 64 jumps pay there, where the set-up they cost is 0.01 sqrt(r)
+or less?
+
+**Answer.** The distance holds. The 16-jump arm costs 1.395x [1.345, 1.446] rho-neg at k = 28 and
+1.366x [1.267, 1.473] at k = 32 at w = 0, and its lower end stays above 1 at every weight once
+table inserts are priced like rho's canonicalisations [pcc:unverified]. Against the table-then-probe
+F = 1 arm it costs 0.906x [0.877, 0.935] and 0.857x [0.811, 0.905] [pcc:unverified]. Its mean S at
+k = 32 is 1.387 with a walk of 1.368 sqrt(r), 3 % above the second-collision floor of 1.329;
+rho-neg's search is 0.999 sqrt(r) there, 13 % above its first-collision floor of 0.886, which is why
+the measured ratio is 1.37x and not the model's 1.5x [pcc:unverified]. More jumps do not pay:
+32 jumps give 0.997x [0.954, 1.041] at k = 28 and 0.985x [0.930, 1.044] at k = 32, 64 jumps 0.998x
+and 0.990x, all intervals containing 1 [pcc:unverified]. Five of seven frozen predictions held; the
+only failures are the risky P4b (32 jumps strictly below 16 at k = 32) and nothing else
+[pcc:unverified].
+
+![Scaling of the distance to rho](figures/scaling.png)
+
+## 1. Design (as frozen)
+
+8 sessions per size, `targets_per_curve = 1`, 64 measured rounds plus 1 warm-up per arm,
+`order = alternate`; arms `rho-neg`, `f1-x07` (baseline, `wwalk:x=0.7,g=1,grow=2,seed=run`),
+`twcj-j16` (primary), `twcj-j32`, `twcj-j64` (`wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,jumps=J,seed=run`),
+all pipeline arms on `prime-projected-abscissa:size=1,scan_cap=32` with `targets=stride-generator`.
+Curves: the family miniatures of the autolab holdouts at k = 28 (`r = 33,557,809`) and k = 32
+(`r = 536,884,639`). Audit: `ecbench verify --replay 1` per session. Pooling as in the sibling
+studies. Runtime: 50 s at k = 28, 76 s at k = 32 (`data/run-*.log`).
+
+## 2. Results (measured)
+
+All 16 sessions completed with 325 of 325 records verified each; every audit reproduced its replay
+with 0 problems (`data/verify-k*-s*.txt`) [pcc:unverified]. Pooled figures use the 2,560 measured
+records per size (`data/pooled_measured.json`).
+
+Mean S per arm (committed band; then with table inserts also priced at w):
+
+| k | arm | S w=0 | S w=0.1 | S w=1 | w=0.1, inserts priced | w=1, inserts priced |
+|--:|:--|--:|--:|--:|--:|--:|
+| 28 | rho-neg | 1.029 | 1.125 | 1.993 | 1.125 | 1.993 |
+| 28 | f1-x07 | 1.584 | 1.639 | 2.131 | 1.735 | 3.100 |
+| 28 | twcj-j16 | 1.435 | 1.435 | 1.438 | 1.572 | 2.805 |
+| 28 | twcj-j32 | 1.430 | 1.430 | 1.433 | 1.565 | 2.784 |
+| 28 | twcj-j64 | 1.432 | 1.433 | 1.436 | 1.566 | 2.765 |
+| 32 | rho-neg | 1.015 | 1.115 | 2.014 | 1.115 | 2.014 |
+| 32 | f1-x07 | 1.619 | 1.677 | 2.201 | 1.779 | 3.218 |
+| 32 | twcj-j16 | 1.387 | 1.387 | 1.388 | 1.524 | 2.756 |
+| 32 | twcj-j32 | 1.367 | 1.367 | 1.368 | 1.501 | 2.711 |
+| 32 | twcj-j64 | 1.373 | 1.373 | 1.374 | 1.507 | 2.717 |
+
+Pooled ratios with 95 % intervals over 8 single-target sessions:
+
+| k | ratio | w = 0 | w = 0.1 (committed / inserts priced) | w = 1 (committed / inserts priced) |
+|--:|:--|:--|:--|:--|
+| 28 | twcj-j16 / rho-neg | **1.395** [1.345, 1.446] | 1.275 [1.230, 1.322] / 1.397 [1.347, 1.448] | 0.722 [0.695, 0.749] * / 1.407 [1.356, 1.461] |
+| 28 | f1-x07 / rho-neg | 1.540 [1.484, 1.598] | 1.456 / 1.542 | 1.070 * / 1.556 |
+| 28 | twcj-j16 / f1-x07 | **0.906** [0.877, 0.935] | 0.876 / 0.906 | 0.675 * / 0.905 |
+| 28 | twcj-j32 / twcj-j16 | 0.997 [0.954, 1.041] | 0.997 / 0.996 | 0.997 / 0.993 |
+| 28 | twcj-j64 / twcj-j16 | 0.998 [0.947, 1.053] | 0.998 / 0.996 | 0.998 / 0.986 |
+| 32 | twcj-j16 / rho-neg | **1.366** [1.267, 1.473] | 1.244 [1.154, 1.341] / 1.367 [1.267, 1.473] | 0.689 [0.639, 0.743] * / 1.368 [1.268, 1.476] |
+| 32 | f1-x07 / rho-neg | 1.595 [1.508, 1.687] | 1.504 / 1.595 | 1.093 * / 1.598 |
+| 32 | twcj-j16 / f1-x07 | **0.857** [0.811, 0.905] | 0.827 / 0.857 | 0.631 * / 0.856 |
+| 32 | twcj-j32 / twcj-j16 | 0.985 [0.930, 1.044] | 0.985 / 0.985 | 0.985 / 0.984 |
+| 32 | twcj-j64 / twcj-j16 | 0.990 [0.934, 1.049] | 0.990 / 0.989 | 0.990 / 0.986 |
+
+\* The committed band prices rho-neg's per-step canonicalisation and not the walk arms' per-step
+table inserts; ecbench's committed band verdict for rho-neg against every walk arm is "unresolved
+inside the band" in all 16 sessions (`data/band-k*.txt`), so no rank is admitted under that
+reading [pcc:unverified]. Under `--price-table-work` (`data/band-tw-k*.txt`) rho-neg is ahead of
+every arm at every weight [pcc:unverified].
+
+### Phases and walk diagnostics (mean over 512 measured runs per arm, units of sqrt(r))
+
+| k | arm | fixed | set-up | walk | collision verify | probes | total | walk steps / sqrt(r) (sd) | collisions per run | set-up GAE |
+|--:|:--|--:|--:|--:|--:|--:|--:|:--|--:|--:|
+| 28 | rho-neg | - | 0.059 | 0.964 | 0.006 | - | 1.029 | | | |
+| 28 | f1-x07 | 0.012 | 0.055 (incl. verify) | 0.969 | | 0.548 | 1.584 | | | |
+| 28 | twcj-j16 | 0.012 | 0.032 | 1.367 | 0.024 | 0 | 1.435 | 1.37 (0.48) | 2.06 | 186 |
+| 28 | twcj-j32 | 0.012 | 0.044 | 1.351 | 0.023 | 0 | 1.430 | 1.35 (0.47) | 2.03 | 255 |
+| 28 | twcj-j64 | 0.012 | 0.068 | 1.329 | 0.023 | 0 | 1.432 | 1.33 (0.49) | 2.01 | 393 |
+| 32 | rho-neg | - | 0.015 | 0.999 | 0.002 | - | 1.015 | | | |
+| 32 | f1-x07 | 0.004 | 0.016 (incl. verify) | 1.017 | | 0.582 | 1.619 | | | |
+| 32 | twcj-j16 | 0.004 | 0.009 | 1.368 | 0.007 | 0 | 1.387 | 1.37 (0.52) | 2.06 | 212 |
+| 32 | twcj-j32 | 0.004 | 0.012 | 1.344 | 0.007 | 0 | 1.367 | 1.34 (0.48) | 2.04 | 290 |
+| 32 | twcj-j64 | 0.004 | 0.019 | 1.343 | 0.007 | 0 | 1.373 | 1.34 (0.49) | 2.01 | 443 |
+
+Every twcj record at every jump count solved at rank 2 with zero probe hits on the first trial
+(3,072 of 3,072) [pcc:unverified]. The set-up matches the frozen model (186 against 180 GAE at
+k = 28 for 16 jumps; 3.5 to 3.8 GAE per extra jump) [pcc:unverified].
+
+## 3. Predictions (PROTOCOL.md section 5)
+
+| id | prediction | outcome | status |
+|:--|:--|:--|:--|
+| P1 | twcj-j16/rho-neg point in [1.30, 1.50] at w = 0, lower end > 1 at w = 0 and (inserts priced) at every weight, both sizes | 1.395, 1.366; lower ends 1.345 / 1.347 / 1.356 and 1.267 / 1.267 / 1.268 | **held** [pcc:unverified] |
+| P2 | twcj-j16/f1-x07 upper end < 1, point in [0.82, 0.93], both sizes | 0.906 [0.877, 0.935], 0.857 [0.811, 0.905] | **held** [pcc:unverified] |
+| P3 | j16 walk steps in [1.30, 1.42] both sizes; mean S at k = 32 in [1.36, 1.50] | 1.367, 1.368; 1.387 | **held** [pcc:unverified] |
+| P4 | j32/j16 point in [0.95, 1.00] both sizes | 0.997, 0.985 | **held** [pcc:unverified] |
+| P4b | k = 32 j32/j16 upper end < 1 | 1.044 | **failed** [pcc:unverified] |
+| P5 | j64/j16 point in [0.95, 1.01] both sizes | 0.998, 0.990 | **held** [pcc:unverified] |
+| P6 | >= 99.5 % of twcj records at rank 2, no probe, first trial | 100 % at every jump count | **held** [pcc:unverified] |
+
+## 4. Reading
+
+- **The distance to rho is flat in k.** With the sibling studies' k = 20 and 24 points (1.358 and
+  1.343 on the same arm, `research/curve25519_tw_jumps_20261108`), the 16-jump arm is 1.34x to
+  1.40x rho-neg at w = 0 from k = 20 to 32, and the table-then-probe arm 1.54x to 1.60x
+  [pcc:unverified]. Neither moves toward parity with size.
+- **Why 1.37x and not 1.5x.** The derived F = 1 floor ratio 1.5 = 1.329 / 0.886 compares the two
+  walks' model floors. Measured, the twcj walk runs 3 % above 1.329 at every size, while rho-neg's
+  search runs 9 % to 13 % above 0.886 (0.964 and 0.999 sqrt(r) at k = 28, 32; its look-ahead and
+  cycle escapes are counted) [pcc:unverified]. The ratio of the measured walks is 1.37 to 1.42, and
+  the remaining set-up and verification (0.03 to 0.07 sqrt(r) at these sizes) add little. A better
+  rho-neg walk (closer to its own floor) would widen the gap; nothing here changes the reference.
+- **Jumps.** The walk shortens with more jumps (1.367 to 1.344 to 1.343 sqrt(r) at k = 32), by
+  about the amount the 20- and 24-bit study saw, but the gain of 0.02 sqrt(r) is inside the
+  session noise (interval half-width 0.05) and is not established [pcc:unverified]. Sixteen jumps
+  remains the default; 32 is not worse at k >= 28.
+
+## 5. Distance to matched rho (rho-neg, same sessions)
+
+| k | arm | w = 0 | w = 0.1 (committed / inserts priced) | w = 1 (committed / inserts priced) |
+|--:|:--|--:|:--|:--|
+| 28 | twcj-j16 | 1.40x [1.35, 1.45] | 1.28x / 1.40x | 0.72x (artifact) / 1.41x |
+| 28 | f1-x07 | 1.54x | 1.46x / 1.54x | 1.07x / 1.56x |
+| 32 | twcj-j16 | 1.37x [1.27, 1.47] | 1.24x / 1.37x | 0.69x (artifact) / 1.37x |
+| 32 | twcj-j32 | 1.35x [1.25, 1.45] | 1.23x / 1.35x | 0.68x (artifact) / 1.35x |
+| 32 | f1-x07 | 1.60x | 1.50x / 1.60x | 1.09x / 1.60x |
+
+## 6. Scope and limits
+
+As in the sibling studies: the F = 1 target-in-walk arm is one unknown away from rho (P1 := G
+makes it a rho walk with a stored table), does no decomposition work, is not decomposition-based
+index calculus, and proposes no leaderboard or `benchmarks/README.md` row; no VALIDATION.json,
+replay certificate or validator report exists [pcc:unverified]. Single target only. Local L0
+counted units, deterministic and replayed; no wall-clock claim. No A/A arm (it would replicate
+rho-neg exactly). research-kb and ecdb were not reachable; no novelty claim.
+
+## Files
+
+`PROTOCOL.md`, `specs/`, `data/frozen.sha256`, `data/frozen-at.txt`, `scripts/` (`model.py`,
+`make_specs.py`, `run_sessions.sh`, `pooled_compare.py`, `analyse.py`, `make_figure.py`,
+`render_pdf.py`), `sessions/k*-s*/{session,spec,plan,host}.json` (`records.jsonl` in
+`data/sessions-k{28,32}-records.tar.gz`, hashed in the benchmark records), `data/` (model, plans,
+run logs, both band readings, verify reports, `pooled_measured.json`, binary hashes),
+`figures/scaling.{svg,png}`, `REPORT.pdf`. Benchmark records:
+`benchmarks/records/20261108T2051Z-curve25519-tw-scaling-k{28,32}.json`; copies in
+`benchmarks/20261108-curve25519-tw-scaling/`.
