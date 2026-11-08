@@ -1,0 +1,109 @@
+{
+ "schema": "ecbench.spec/v1",
+ "label": "walk-step ratio check, p36: residual vs residual-fused at B = 2, 4, 8 (research/ic_residual_fused_steps_20261107)",
+ "description": "research/ic_residual_fused_steps_20261107/README.md",
+ "workloads": {
+  "curves": [
+   {
+    "kind": "prime_explicit",
+    "p": 68719476731,
+    "a": 68719476728,
+    "b": 33,
+    "group_order": 68719022539,
+    "r": 68719022539,
+    "gx": 2,
+    "gy": 51741851039
+   }
+  ],
+  "targets_per_curve": 64,
+  "target_seed": 20261107
+ },
+ "arms": [
+  {
+   "name": "res2",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2",
+     "linalg": "incremental-gauss",
+     "oracle": "mitm-prime-blocked:m=2",
+     "targets": "residual"
+    }
+   }
+  },
+  {
+   "name": "res4",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4",
+     "linalg": "incremental-gauss",
+     "oracle": "mitm-prime-blocked:m=2",
+     "targets": "residual"
+    }
+   }
+  },
+  {
+   "name": "res8",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=8",
+     "linalg": "incremental-gauss",
+     "oracle": "mitm-prime-blocked:m=2",
+     "targets": "residual"
+    }
+   }
+  },
+  {
+   "name": "res2f",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=2",
+     "linalg": "incremental-gauss",
+     "oracle": "mitm-prime-blocked:m=2",
+     "targets": "residual-fused"
+    }
+   }
+  },
+  {
+   "name": "res4f",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=4",
+     "linalg": "incremental-gauss",
+     "oracle": "mitm-prime-blocked:m=2",
+     "targets": "residual-fused"
+    }
+   }
+  },
+  {
+   "name": "res8f",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-abscissa:size=8",
+     "linalg": "incremental-gauss",
+     "oracle": "mitm-prime-blocked:m=2",
+     "targets": "residual-fused"
+    }
+   }
+  }
+ ],
+ "measurement": {
+  "rounds": 3,
+  "warmup": 1,
+  "order": "alternate_measured",
+  "seed": 20261202,
+  "isolation_required": "L2",
+  "timeout_seconds": 1800
+ }
+}
