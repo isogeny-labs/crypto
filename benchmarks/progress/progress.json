@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261108T0449Z-minors-gd-panel",
+  "latest_record": "20261108T1825Z-arity-koblitz-m56-a5",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 65,
+    "measured": 66,
     "open": 1
   },
   "repo": "crypto",
@@ -2861,6 +2861,29 @@
       ],
       "problem": "ic:curve25519-k24-single-target",
       "unit": "S"
+    },
+    {
+      "better": "neutral",
+      "first": 148.0,
+      "latest": 148.0,
+      "latest_derived": {},
+      "metric": "cells_recorded",
+      "points": [
+        {
+          "commit": "001129b99231",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 148,
+          "record": "20261108T1825Z-arity-koblitz-m56-a5",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Koblitz chained-S3 m=5/6, 148/148 cells (attempts 4+5, Xeon 8488C, no L2: seconds diagnostic; launch wrapper killed after submit, see launch/receipts/CARD-arity-launch-koblitz-a5/NOTE.md; recorded command is the frozen analysis re-run). No m>=5 public cell decides at n=23 (K1 falsified); every n=83 m=5/6 public cell capped at 1800 s (K4 supported for chain-s3; orbit engine not_evaluable under rule 4); chain-s3 decides only proved-UNSAT cells at n=29,37 (no relation found). No matched rho; no IC improvement.",
+          "value": 148.0
+        }
+      ],
+      "problem": "ic:koblitz-chain-s3-arity-m5m6",
+      "unit": "count"
     },
     {
       "better": "lower",

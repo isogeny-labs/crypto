@@ -1,7 +1,26 @@
 {
   "branch": "claude/arity-koblitz-a5-20261108",
-  "closed_utc": null,
-  "commands": [],
+  "closed_utc": "2026-11-08T22:08:03+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-I",
+        "analyze.py",
+        "raw",
+        "--grid",
+        "grid.tsv",
+        "--json",
+        "/tmp/claude-0/-home-user/381fb568-a391-5eab-9a8f-72e38290c528/scratchpad/rerun-ANALYSIS.json",
+        "--tsv",
+        "/tmp/claude-0/-home-user/381fb568-a391-5eab-9a8f-72e38290c528/scratchpad/rerun-table.tsv"
+      ],
+      "cwd": "research/arity_completion_20261104/koblitz_m5_m6",
+      "exit": 0,
+      "started_utc": "2026-11-08T22:07:58+00:00",
+      "wall_s": 0.037
+    }
+  ],
   "commit": "001129b99231f2391af09490fb34534ae679b1dd",
   "commit_dirty": true,
   "created_utc": "2026-11-08T18:25:06+00:00",
@@ -15,7 +34,20 @@
     "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39"
   },
   "id": "20261108T1825Z-arity-koblitz-m56-a5",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 148,
+      "name": "cells_recorded",
+      "note": "148 of 148 grid cells have one record (attempts 4+5); outcomes exact, seconds diagnostic (no L2)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 148.0
+    }
+  ],
   "problem": "ic:koblitz-chain-s3-arity-m5m6",
   "raw": [
     {
@@ -42,14 +74,18 @@
   ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
-    "png": [],
-    "svg": []
+    "pdf": "research/arity_completion_20261104/koblitz_m5_m6/reports/REPORT.pdf",
+    "png": [
+      "research/arity_completion_20261104/koblitz_m5_m6/reports/fig2_outcome_grid.png"
+    ],
+    "svg": [
+      "research/arity_completion_20261104/koblitz_m5_m6/reports/fig2_outcome_grid.svg"
+    ]
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "arity-koblitz-m56-a5",
-  "status": "open",
-  "summary": "",
+  "status": "measured",
+  "summary": "Koblitz chained-S3 m=5/6, 148/148 cells (attempts 4+5, Xeon 8488C, no L2: seconds diagnostic; launch wrapper killed after submit, see launch/receipts/CARD-arity-launch-koblitz-a5/NOTE.md; recorded command is the frozen analysis re-run). No m>=5 public cell decides at n=23 (K1 falsified); every n=83 m=5/6 public cell capped at 1800 s (K4 supported for chain-s3; orbit engine not_evaluable under rule 4); chain-s3 decides only proved-UNSAT cells at n=29,37 (no relation found). No matched rho; no IC improvement.",
   "validation": null
 }
