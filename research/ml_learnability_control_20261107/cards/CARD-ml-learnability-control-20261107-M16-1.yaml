@@ -75,7 +75,7 @@ commands:
   - git
   - merge-base
   - --is-ancestor
-  - a0d8f2aba34d01354eb58c75305e821f5f786bed
+  - 53a577530448f9a1a20fd1194821c8796ad8abf3
   - HEAD
   timeout_seconds: 60
   success_exit_codes:
@@ -87,11 +87,13 @@ commands:
   - git
   - diff
   - --quiet
-  - a0d8f2aba34d01354eb58c75305e821f5f786bed
+  - 53a577530448f9a1a20fd1194821c8796ad8abf3
   - HEAD
   - --
   - research/ml_learnability_control_20261107
   - :(exclude)research/ml_learnability_control_20261107/cards
+  - :(exclude)research/ml_learnability_control_20261107/receipts
+  - :(exclude)research/ml_learnability_control_20261107/results
   - taskq/
   - tools/task_card.py
   - tools/benchrec.py
@@ -350,4 +352,4 @@ stop_when:
 - The `launch` step exits nonzero or times out; do not run it again, start no job with another name, and return the tool output verbatim.
 - Any other command exits with a code outside its success_exit_codes or reaches its timeout; return the tool output verbatim and run no later command.
 - The tool exits 2 before running any command; return `refused` with the IMPEDIMENT line.
-notes: Frozen EKS command Job mllc-m16-20261108 (4 vCPU, 16Gi, 14400 s; size 16 only, 14400 s ceiling), image 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:37c6a451e2917d2a2650705719eb9b83daaca6720d8702b9cfae4a00f38eed21, request research/ml_learnability_control_20261107/eks/requests/mllc-m16-20261108.json. The `launch` step is the only step that submits a Job and it appears once in this card family. The `wait` step polls isolab.eks.command-status/v1 every 60 s for at most 5400 s (a poll that fails, for example on the CodeBuild concurrent-build limit, is polled again) and exits 41 if the Job is still pending or active at the ceiling; the card then stops with a receipt and the later steps do not run. If the Job is terminal, the card goes on to download, verify, add-raw and upload-raw; `verify` fails unless the Job succeeded with one pod and pod exit 0, its Job UID and name equal the launch receipt, the downloaded tree is one directory named by the Pod UID, each listed file holds each listed string and `sha256sum -c SHA256SUMS` passes. Continuation and collect cards are generated on demand after the launch, so that they bind the launch receipt and the record as they then are. The head-paths-unchanged step passes when no commit after the pinned commit changed the study directory (its cards subdirectory excepted), taskq/, tools/task_card.py or tools/benchrec.py; other commits are accepted. No commit field is set because task_card.py run refuses any HEAD other than the pinned one. Pinned commit a0d8f2aba34d01354eb58c75305e821f5f786bed. The record stays open, and the card runs no close, report or analysis command.
+notes: Frozen EKS command Job mllc-m16-20261108 (4 vCPU, 16Gi, 14400 s; size 16 only, 14400 s ceiling), image 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:37c6a451e2917d2a2650705719eb9b83daaca6720d8702b9cfae4a00f38eed21, request research/ml_learnability_control_20261107/eks/requests/mllc-m16-20261108.json. The `launch` step is the only step that submits a Job and it appears once in this card family. The `wait` step polls isolab.eks.command-status/v1 every 60 s for at most 5400 s (a poll that fails, for example on the CodeBuild concurrent-build limit, is polled again) and exits 41 if the Job is still pending or active at the ceiling; the card then stops with a receipt and the later steps do not run. If the Job is terminal, the card goes on to download, verify, add-raw and upload-raw; `verify` fails unless the Job succeeded with one pod and pod exit 0, its Job UID and name equal the launch receipt, the downloaded tree is one directory named by the Pod UID, each listed file holds each listed string and `sha256sum -c SHA256SUMS` passes. Continuation and collect cards are generated on demand after the launch, so that they bind the launch receipt and the record as they then are. The head-paths-unchanged step passes when no commit after the pinned commit changed the study directory (its cards, receipts and results subdirectories excepted), taskq/, tools/task_card.py or tools/benchrec.py; other commits are accepted. No commit field is set because task_card.py run refuses any HEAD other than the pinned one. Pinned commit 53a577530448f9a1a20fd1194821c8796ad8abf3. The record stays open, and the card runs no close, report or analysis command.
