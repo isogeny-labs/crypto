@@ -52,3 +52,13 @@ $(BUILD_DIR)/qualification-tests: qualification_tests.cpp native.cpp relation_ve
 	$(CXX) $(CXXFLAGS) qualification_tests.cpp -o $@ $(LDLIBS)
 qualification-tests-binary: $(BUILD_DIR)/qualification-tests
 .PHONY: qualification-tests-binary
+$(BUILD_DIR)/recoding: recoding.cpp native.cpp relation_verify.hpp orbit_verify.hpp json.hpp
+	mkdir -p $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) recoding.cpp -o $@ $(LDLIBS)
+recoding-binary: $(BUILD_DIR)/recoding
+.PHONY: recoding-binary
+$(BUILD_DIR)/recoding-replay: recoding_replay.cpp native.cpp relation_verify.hpp orbit_verify.hpp json.hpp
+	mkdir -p $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) recoding_replay.cpp -o $@ $(LDLIBS)
+recoding-replay-binary: $(BUILD_DIR)/recoding-replay
+.PHONY: recoding-replay-binary
