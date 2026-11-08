@@ -318,6 +318,21 @@ pub struct SieveParams {
     pub excess: usize,
     pub threads: usize,
     pub seed: u64,
+    /// How the lattice index is computed from the dense matrix.
+    pub linalg: LinAlg,
+}
+
+/// Linear-algebra back end for the lattice index `[Z^k : L]`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum LinAlg {
+    /// Exact Hermite normal form with big integers (small `k`; gives the
+    /// full group structure and supports column projections).
+    Hnf,
+    /// Gcd of modular determinants of independent `k × k` row subsets: the index
+    /// is the gcd (an index-`c` sublattice has determinant `c` times the index),
+    /// so a few 31-bit primes recover each determinant. Needs a certificate for
+    /// the result (see [`order_checked`]); fast for `k` in the thousands.
+    DetGcd,
 }
 
 impl Default for SieveParams {
@@ -329,6 +344,7 @@ impl Default for SieveParams {
             excess: 64,
             threads: 4,
             seed: 1,
+            linalg: LinAlg::DetGcd,
         }
     }
 }
@@ -354,11 +370,50 @@ pub fn log2_big(x: &BigUint) -> f64 {
     top.to_f64().unwrap().log2() + (b - 53) as f64
 }
 
+/// A big integer as little-endian 32-bit limbs, for fast reduction modulo a
+/// prime below 2^32 (the factor-base primes) without allocating.
+struct Limbs {
+    l: Vec<u32>,
+    neg: bool,
+}
+
+impl Limbs {
+    fn new(x: &BigInt) -> Self {
+        Limbs {
+            l: x.magnitude().to_u32_digits(),
+            neg: x.is_negative(),
+        }
+    }
+
+    /// `x mod p` in `[0, p)` for `p < 2^32`.
+    fn modulo(&self, p: u64) -> u64 {
+        let mut r = 0u64;
+        for &limb in self.l.iter().rev() {
+            r = ((r << 32) | limb as u64) % p;
+        }
+        if self.neg && r != 0 {
+            p - r
+        } else {
+            r
+        }
+    }
+}
+
 /// One sieving pass over a random product; returns the relations found.
-fn sieve_one(fb: &[FbPrime], params: &SieveParams, rng: &mut Rng, buf: &mut [u8]) -> Vec<Relation> {
+fn sieve_one(
+    fb: &[FbPrime],
+    params: &SieveParams,
+    rng: &mut Rng,
+    buf: &mut [u8],
+    forced: Option<u32>,
+) -> Vec<Relation> {
     let n = fb.len();
-    // random exponent vector e with `support` entries in {−1, +1}
+    // random exponent vector e with `support` entries in {−1, +1}; a forced
+    // index is always part of the support so that its column gets a relation
     let mut e: BTreeMap<u32, i64> = BTreeMap::new();
+    if let Some(j) = forced {
+        e.insert(j, 1);
+    }
     while e.len() < params.support.min(n) {
         let i = rng.below(n as u64) as u32;
         if e.contains_key(&i) {
@@ -381,6 +436,7 @@ fn sieve_one(fb: &[FbPrime], params: &SieveParams, rng: &mut Rng, buf: &mut [u8]
     }
     let g = g.expect("non-empty product").reduce();
     let (a, b, c) = (g.a.clone(), g.b.clone(), g.c.clone());
+    let (la, lb, lc) = (Limbs::new(&a), Limbs::new(&b), Limbs::new(&c));
     let m = params.half_length as i64;
     let len = (2 * m + 1) as usize;
     buf.iter_mut().for_each(|x| *x = 0);
@@ -393,11 +449,11 @@ fn sieve_one(fb: &[FbPrime], params: &SieveParams, rng: &mut Rng, buf: &mut [u8]
             roots.push((p, p));
             continue;
         }
-        let ap = big_mod_u64(&a, p);
-        let bp = big_mod_u64(&b, p);
+        let ap = la.modulo(p);
+        let bp = lb.modulo(p);
         if ap == 0 {
             // linear: b x + c ≡ 0
-            let cp = big_mod_u64(&c, p);
+            let cp = lc.modulo(p);
             let r = match inv_mod(bp, p) {
                 Some(ib) if bp != 0 => mul_mod((p - cp) % p, ib, p),
                 _ => p,
@@ -518,29 +574,57 @@ fn sieve_one(fb: &[FbPrime], params: &SieveParams, rng: &mut Rng, buf: &mut [u8]
 /// Collect at least `fb.len() + params.excess` relations with `params.threads` workers.
 /// Returns the relations and the number of random products sieved.
 pub fn collect_relations(fb: &[FbPrime], params: &SieveParams) -> (Vec<Relation>, u64) {
-    let target = fb.len() + params.excess;
+    let n = fb.len();
+    let target = n + params.excess;
     let found = Mutex::new(Vec::<Relation>::new());
     let count = AtomicU64::new(0);
     let products = AtomicU64::new(0);
     let done = AtomicBool::new(false);
+    // coverage: every factor-base column must appear in some relation, or the
+    // relation lattice has no full rank; the first pass forces each prime into
+    // a product, later passes revisit the columns still missing
+    let covered: Vec<AtomicBool> = (0..n).map(|_| AtomicBool::new(false)).collect();
+    let next_col = AtomicU64::new(0);
     std::thread::scope(|scope| {
         for t in 0..params.threads.max(1) {
             let found = &found;
             let count = &count;
             let products = &products;
             let done = &done;
+            let covered = &covered;
+            let next_col = &next_col;
             let mut rng = Rng::new(params.seed ^ ((t as u64 + 1) << 32));
             scope.spawn(move || {
                 let mut buf = vec![0u8; 2 * params.half_length as usize + 1];
                 while !done.load(Ordering::Relaxed) {
-                    let rels = sieve_one(fb, params, &mut rng, &mut buf);
+                    // pick a column to force: the next unvisited one, then any still uncovered
+                    let forced = {
+                        let j = next_col.fetch_add(1, Ordering::Relaxed) as usize;
+                        if j < n {
+                            Some(j as u32)
+                        } else if count.load(Ordering::Relaxed) >= target as u64 {
+                            match covered.iter().position(|c| !c.load(Ordering::Relaxed)) {
+                                Some(j) => Some(j as u32),
+                                None => {
+                                    done.store(true, Ordering::Relaxed);
+                                    break;
+                                }
+                            }
+                        } else {
+                            None
+                        }
+                    };
+                    let rels = sieve_one(fb, params, &mut rng, &mut buf, forced);
                     products.fetch_add(1, Ordering::Relaxed);
                     if !rels.is_empty() {
+                        for r in &rels {
+                            for &(c, _) in &r.entries {
+                                covered[c as usize].store(true, Ordering::Relaxed);
+                            }
+                        }
                         let k = rels.len() as u64;
                         found.lock().unwrap().extend(rels);
-                        if count.fetch_add(k, Ordering::Relaxed) + k >= target as u64 {
-                            done.store(true, Ordering::Relaxed);
-                        }
+                        count.fetch_add(k, Ordering::Relaxed);
                     }
                 }
             });
@@ -550,6 +634,34 @@ pub fn collect_relations(fb: &[FbPrime], params: &SieveParams) -> (Vec<Relation>
         found.into_inner().unwrap(),
         products.load(Ordering::Relaxed),
     )
+}
+
+/// Choose at most `target` relations from `pool`: first one relation for every
+/// column not yet covered, then the earliest remaining ones. Rows beyond the
+/// target only slow the Hermite form without changing the lattice when the
+/// relation set is already complete; if it is not, the caller adds more.
+pub fn select_covering(pool: &[Relation], ncols: usize, target: usize) -> Vec<Relation> {
+    let mut covered = vec![false; ncols];
+    let mut chosen = vec![false; pool.len()];
+    let mut out = Vec::new();
+    for (i, r) in pool.iter().enumerate() {
+        if r.entries.iter().any(|&(c, _)| !covered[c as usize]) {
+            for &(c, _) in &r.entries {
+                covered[c as usize] = true;
+            }
+            chosen[i] = true;
+            out.push(r.clone());
+        }
+    }
+    for (i, r) in pool.iter().enumerate() {
+        if out.len() >= target {
+            break;
+        }
+        if !chosen[i] {
+            out.push(r.clone());
+        }
+    }
+    out
 }
 
 // ---------------------------------------------------------------------------
@@ -747,7 +859,12 @@ pub fn hnf_diagonal(rows: &[Vec<BigInt>]) -> Option<Vec<BigInt>> {
     let mut modulus = d;
     let mut work: Vec<Vec<BigInt>> = rows
         .iter()
-        .map(|r| r.iter().map(|x| x.mod_floor(&modulus)).collect())
+        .map(|r| {
+            r.iter()
+                .map(|x| x.mod_floor(&modulus))
+                .collect::<Vec<BigInt>>()
+        })
+        .filter(|r| r.iter().any(|x| !x.is_zero()))
         .collect();
     let mut diag = Vec::with_capacity(k);
     for j in 0..k {
@@ -802,6 +919,256 @@ pub fn hnf_diagonal(rows: &[Vec<BigInt>]) -> Option<Vec<BigInt>> {
         }
     }
     Some(diag)
+}
+
+// ---------------------------------------------------------------------------
+// Index by modular determinants
+// ---------------------------------------------------------------------------
+
+/// Barrett reduction modulo a prime `p < 2^31`.
+#[derive(Clone, Copy)]
+struct Modp {
+    p: u64,
+    m: u64,
+}
+
+impl Modp {
+    fn new(p: u64) -> Self {
+        Modp {
+            p,
+            m: ((1u128 << 64) / p as u128) as u64,
+        }
+    }
+    #[inline(always)]
+    fn reduce(&self, x: u64) -> u64 {
+        let q = ((x as u128 * self.m as u128) >> 64) as u64;
+        let mut r = x - q * self.p;
+        if r >= self.p {
+            r -= self.p;
+        }
+        r
+    }
+    #[inline(always)]
+    fn mul(&self, a: u64, b: u64) -> u64 {
+        self.reduce(a * b)
+    }
+    fn pow(&self, mut b: u64, mut e: u64) -> u64 {
+        let mut r = 1u64;
+        while e > 0 {
+            if e & 1 == 1 {
+                r = self.mul(r, b);
+            }
+            b = self.mul(b, b);
+            e >>= 1;
+        }
+        r
+    }
+    fn inv(&self, a: u64) -> u64 {
+        self.pow(a, self.p - 2)
+    }
+}
+
+/// Primes just below 2^31, largest first.
+fn crt_primes(count: usize) -> Vec<u64> {
+    let mut out = Vec::new();
+    let mut c = (1u64 << 31) - 1;
+    while out.len() < count {
+        c -= 2;
+        let mut is_prime = true;
+        let mut d = 3u64;
+        while d * d <= c {
+            if c % d == 0 {
+                is_prime = false;
+                break;
+            }
+            d += 2;
+        }
+        if is_prime {
+            out.push(c);
+        }
+    }
+    out
+}
+
+/// `rows` (any number of rows, `k` columns) reduced modulo `md`.
+fn matrix_mod(rows: &[Vec<BigInt>], md: &Modp) -> Vec<Vec<u32>> {
+    let p = BigInt::from(md.p);
+    rows.iter()
+        .map(|r| {
+            r.iter()
+                .map(|x| x.mod_floor(&p).to_u32().expect("residue < 2^31"))
+                .collect()
+        })
+        .collect()
+}
+
+/// Indices of `k` rows independent modulo `md`, scanning the rows in `order`;
+/// `None` if the rank is below `k`.
+fn independent_subset(
+    mat: &[Vec<u32>],
+    k: usize,
+    order: &[usize],
+    md: &Modp,
+) -> Option<Vec<usize>> {
+    let p = md.p;
+    let mut basis: Vec<(usize, Vec<u32>)> = Vec::new();
+    let mut chosen = Vec::new();
+    for &ri in order {
+        let mut v: Vec<u64> = mat[ri].iter().map(|&x| x as u64).collect();
+        for (pc, brow) in &basis {
+            let f = v[*pc];
+            if f != 0 {
+                let nf = p - f;
+                for c in *pc..k {
+                    v[c] = md.reduce(v[c] + nf * brow[c] as u64);
+                }
+            }
+        }
+        if let Some(pc) = (0..k).find(|&c| v[c] != 0) {
+            let inv = md.inv(v[pc]);
+            let brow: Vec<u32> = v.iter().map(|&x| md.mul(x, inv) as u32).collect();
+            basis.push((pc, brow));
+            chosen.push(ri);
+            if chosen.len() == k {
+                return Some(chosen);
+            }
+        }
+    }
+    None
+}
+
+/// Determinant of the square matrix `sub` (k × k, entries in `[0, p)`) modulo `p`.
+fn det_mod(sub: &[Vec<u32>], md: &Modp) -> u64 {
+    let k = sub.len();
+    let p = md.p;
+    let mut a: Vec<Vec<u32>> = sub.to_vec();
+    let mut det = 1u64;
+    for j in 0..k {
+        let Some(pr) = (j..k).find(|&r| a[r][j] != 0) else {
+            return 0;
+        };
+        if pr != j {
+            a.swap(pr, j);
+            det = (p - det) % p;
+        }
+        let pivot = a[j][j] as u64;
+        det = md.mul(det, pivot);
+        let inv = md.inv(pivot);
+        let (top, rest) = a.split_at_mut(j + 1);
+        let prow = &top[j];
+        for row in rest.iter_mut() {
+            let f = row[j] as u64;
+            if f == 0 {
+                continue;
+            }
+            let g = md.mul(f, inv);
+            let ng = p - g;
+            for c in j..k {
+                row[c] = md.reduce(row[c] as u64 + ng * prow[c] as u64) as u32;
+            }
+        }
+    }
+    det
+}
+
+/// `|det|` of the `k × k` submatrix of `rows` selected by `subset`, by CRT over
+/// `threads`-way parallel 31-bit primes until two successive reconstructions agree.
+fn det_crt(rows: &[Vec<BigInt>], subset: &[usize], threads: usize) -> Option<BigInt> {
+    let sub_rows: Vec<Vec<BigInt>> = subset.iter().map(|&i| rows[i].clone()).collect();
+    let primes = crt_primes(512);
+    let mut residues: Vec<(u64, u64)> = Vec::new();
+    let mut prev: Option<BigInt> = None;
+    let mut next = 0usize;
+    let batch = threads.max(1);
+    while next < primes.len() {
+        let chunk: Vec<u64> = primes[next..(next + batch).min(primes.len())].to_vec();
+        next += chunk.len();
+        let got: Vec<(u64, u64)> = std::thread::scope(|scope| {
+            let hs: Vec<_> = chunk
+                .iter()
+                .map(|&p| {
+                    let sub_rows = &sub_rows;
+                    scope.spawn(move || {
+                        let md = Modp::new(p);
+                        let m = matrix_mod(sub_rows, &md);
+                        (p, det_mod(&m, &md))
+                    })
+                })
+                .collect();
+            hs.into_iter()
+                .map(|h| h.join().expect("det thread"))
+                .collect()
+        });
+        for g in got {
+            residues.push(g);
+            // CRT over everything so far
+            let mut x = BigInt::zero();
+            let mut m = BigInt::one();
+            for &(p, r) in &residues {
+                let pb = BigInt::from(p);
+                let diff = (BigInt::from(r) - &x).mod_floor(&pb);
+                let inv = m.mod_floor(&pb).modpow(&(&pb - 2), &pb);
+                let t = (diff * inv).mod_floor(&pb);
+                x += &m * t;
+                m *= &pb;
+            }
+            let sym = if &x * 2 > m { &x - &m } else { x.clone() };
+            if residues.len() >= 3 && prev.as_ref() == Some(&sym) {
+                return Some(sym.abs());
+            }
+            prev = Some(sym);
+        }
+    }
+    None
+}
+
+/// The lattice index `[Z^k : L]` of the dense relation matrix as the gcd of the
+/// determinants of `subsets` independent `k × k` row subsets (scanning the rows
+/// in natural, reversed and shuffled order). `None` if no subset is independent.
+pub fn index_by_det_gcd(
+    rows: &[Vec<BigInt>],
+    subsets: usize,
+    threads: usize,
+    seed: u64,
+) -> Option<BigInt> {
+    let k = rows.first().map_or(0, |r| r.len());
+    if k == 0 {
+        return Some(BigInt::one());
+    }
+    if rows.len() < k {
+        return None;
+    }
+    let md = Modp::new(crt_primes(1)[0]);
+    let mat = matrix_mod(rows, &md);
+    let mut rng = Rng::new(seed);
+    let mut g: Option<BigInt> = None;
+    for s in 0..subsets {
+        let mut order: Vec<usize> = (0..rows.len()).collect();
+        match s {
+            0 => {}
+            1 => order.reverse(),
+            _ => {
+                for i in (1..order.len()).rev() {
+                    let j = rng.below(i as u64 + 1) as usize;
+                    order.swap(i, j);
+                }
+            }
+        }
+        let Some(subset) = independent_subset(&mat, k, &order, &md) else {
+            continue;
+        };
+        let Some(d) = det_crt(rows, &subset, threads) else {
+            continue;
+        };
+        if d.is_zero() {
+            continue;
+        }
+        g = Some(match g {
+            None => d,
+            Some(acc) => acc.gcd(&d),
+        });
+    }
+    g
 }
 
 /// Index `[Z^n : L]` of the lattice spanned by the relations, restricted to the
@@ -1027,6 +1394,22 @@ pub fn pow_big(form: &BinaryQuadraticForm, k: &BigUint) -> BinaryQuadraticForm {
     acc
 }
 
+/// Order of `form` provided `form^n = 1` (the full group order `n`, with its
+/// factorisation); `None` if `form^n` is not the identity, which proves that `n`
+/// is not a multiple of the group order.
+pub fn order_checked(
+    form: &BinaryQuadraticForm,
+    n: &BigUint,
+    factors: &[(BigUint, u32)],
+) -> Option<BigUint> {
+    let disc = form.discriminant();
+    let id = BinaryQuadraticForm::principal(&disc).expect("principal form");
+    if pow_big(form, n) != id {
+        return None;
+    }
+    Some(class_order(form, n, factors))
+}
+
 /// Order of a class in a group of exponent dividing `h` with known factorisation.
 pub fn class_order(form: &BinaryQuadraticForm, h: &BigUint, factors: &[(BigUint, u32)]) -> BigUint {
     let disc = form.discriminant();
@@ -1090,26 +1473,59 @@ pub fn compute(
     let (log2_h_star, l1) = analytic_log2_h(d, euler_bound);
     let ln_abs_d = (bits_of(d) as f64) * std::f64::consts::LN_2;
     let grh_bound = 6.0 * ln_abs_d * ln_abs_d;
-    let mut relations = Vec::new();
+    let mut pool: Vec<Relation> = Vec::new();
+    let mut relations: Vec<Relation>;
     let mut products = 0u64;
     let mut params = params.clone();
+    // relations from one sieved product are correlated (they share the product's
+    // exponent vector), so a plain n + 64 is often an index-2 sublattice; one
+    // fifth of n extra rows has closed the lattice at the first round in tests
+    params.excess = params.excess.max(n / 5);
     let mut last: Option<(BigInt, Dense)> = None;
     for round in 0..max_rounds {
         let (rels, prods) = collect_relations(&fb, &params);
-        relations.extend(rels);
         products += prods;
+        pool.extend(rels);
+        // the Hermite form costs rows × k²: keep one covering relation per
+        // column first, then fill up to the target; the rest stays in the pool
+        relations = select_covering(&pool, n, n + params.excess);
+        let t_sge = std::time::Instant::now();
         let dense = structured_elimination(&relations, n);
+        eprintln!(
+            "[class_group_subexp] round {round}: {} relations, {} products; elimination {:.1}s -> {} dense columns, {} rows",
+            relations.len(),
+            products,
+            t_sge.elapsed().as_secs_f64(),
+            dense.columns.len(),
+            dense.rows.len()
+        );
         if dense.rows.len() < dense.columns.len() {
             params.excess += n / 10 + 16;
             params.seed = params.seed.wrapping_add(0x1234_5678);
             continue;
         }
-        let Some(diag) = hnf_diagonal(&dense.rows) else {
+        let t_la = std::time::Instant::now();
+        let index_opt = if dense.columns.is_empty() {
+            Some(BigInt::one())
+        } else {
+            match params.linalg {
+                LinAlg::Hnf => hnf_diagonal(&dense.rows)
+                    .map(|diag| diag.iter().fold(BigInt::one(), |acc, g| acc * g)),
+                LinAlg::DetGcd => {
+                    index_by_det_gcd(&dense.rows, 4, params.threads, params.seed ^ 0x5eed)
+                }
+            }
+        };
+        let Some(index) = index_opt else {
             params.excess += n / 10 + 16;
             params.seed = params.seed.wrapping_add(0x1234_5678);
             continue;
         };
-        let index = diag.iter().fold(BigInt::one(), |acc, g| acc * g);
+        eprintln!(
+            "[class_group_subexp] lattice index ({:?}) {:.1}s",
+            params.linalg,
+            t_la.elapsed().as_secs_f64()
+        );
         let log2_index = log2_big(index.magnitude());
         let ratio = 2f64.powf(log2_index - log2_h_star);
         let accepted = (ratio - 1.0).abs() <= tolerance;
@@ -1155,6 +1571,7 @@ mod tests {
             excess: 16,
             threads: 2,
             seed: 7,
+            linalg: LinAlg::Hnf,
         };
         let (report, _, _) = compute(&d, bound, &params, 0.5, 6, 20_000).expect("converges");
         report.lattice_index
@@ -1180,6 +1597,80 @@ mod tests {
     }
 
     #[test]
+    fn det_gcd_index_matches_hnf_on_a_small_lattice() {
+        // rows generate the lattice with index 12 in Z^3: det of [[2,0,0],[0,3,0],[0,0,2]] = 12
+        let rows: Vec<Vec<BigInt>> = vec![
+            vec![2, 0, 0],
+            vec![0, 3, 0],
+            vec![0, 0, 2],
+            vec![2, 3, 2],
+            vec![4, 3, 0],
+            vec![6, 0, 2],
+        ]
+        .into_iter()
+        .map(|r| r.into_iter().map(BigInt::from).collect())
+        .collect();
+        let idx = index_by_det_gcd(&rows, 6, 2, 3).expect("full rank");
+        let diag = hnf_diagonal(&rows).expect("full rank");
+        let hnf_index = diag.iter().fold(BigInt::one(), |acc, g| acc * g);
+        assert_eq!(idx, hnf_index);
+        assert_eq!(idx, BigInt::from(12));
+    }
+
+    #[test]
+    fn det_mod_agrees_with_bareiss() {
+        let m: Vec<Vec<i64>> = vec![
+            vec![3, -1, 4, 1],
+            vec![-5, 9, 2, 6],
+            vec![5, 3, -5, 8],
+            vec![9, 7, 9, -3],
+        ];
+        let big: Vec<Vec<BigInt>> = m
+            .iter()
+            .map(|r| r.iter().map(|&x| BigInt::from(x)).collect())
+            .collect();
+        let exact = bareiss_det(big.clone());
+        let md = Modp::new(crt_primes(1)[0]);
+        let mm = matrix_mod(&big, &md);
+        let got = det_mod(&mm, &md);
+        let want = exact.mod_floor(&BigInt::from(md.p)).to_u64().unwrap();
+        assert_eq!(got, want);
+    }
+
+    #[test]
+    fn det_gcd_class_numbers_match_enumeration() {
+        for &(d, bound) in &[
+            (-1_000_003i64, 400u64),
+            (-1_000_020, 400),
+            (-4_000_003, 600),
+        ] {
+            let d_big = BigInt::from(d);
+            let h = class_number(&d_big);
+            let params = SieveParams {
+                half_length: 64,
+                support: 3,
+                slack_bits: 10,
+                excess: 16,
+                threads: 2,
+                seed: 5,
+                linalg: LinAlg::DetGcd,
+            };
+            let (report, fb, _) =
+                compute(&d_big, bound, &params, 0.5, 6, 20_000).expect("converges");
+            assert_eq!(report.lattice_index, BigInt::from(h), "D = {d}");
+            // the certificate: some split prime form has order exactly h, hence Cl is cyclic
+            let hb = report.lattice_index.magnitude().clone();
+            let (fac, complete) = factor_big(&hb);
+            assert!(complete);
+            let full = fb
+                .iter()
+                .filter(|f| f.kind == Splitting::Split)
+                .any(|f| order_checked(&f.form, &hb, &fac).as_ref() == Some(&hb));
+            let _ = full; // cyclicity is not guaranteed for every D, only checked to run
+        }
+    }
+
+    #[test]
     fn prime_forms_have_the_right_discriminant() {
         let d = BigInt::from(-1_000_020i64); // −4·3·5·7·2381, fundamental
         for fp in factor_base(&d, 200) {
@@ -1200,6 +1691,7 @@ mod tests {
             excess: 16,
             threads: 2,
             seed: 11,
+            linalg: LinAlg::Hnf,
         };
         let (report, fb, rels) = compute(&d, 400, &params, 0.5, 6, 20_000).unwrap();
         assert_eq!(report.lattice_index, BigInt::from(h));

@@ -14,7 +14,7 @@
 //! conductor is reported). Output: one JSON object (stdout and/or --out).
 
 use crypto_lib::isogeny::class_group_subexp::{
-    class_order, compute, factor_big, lattice_index, log2_big, SieveParams, Splitting,
+    compute, factor_big, lattice_index, log2_big, order_checked, LinAlg, SieveParams, Splitting,
 };
 use num_bigint::{BigInt, BigUint};
 use num_integer::Integer;
@@ -110,6 +110,10 @@ fn main() {
         excess: opts.get("excess").map_or(64, |s| s.parse().unwrap()),
         threads: opts.get("threads").map_or(4, |s| s.parse().unwrap()),
         seed: opts.get("seed").map_or(1, |s| s.parse().unwrap()),
+        linalg: match opts.get("linalg").map(|x| x.as_str()) {
+            Some("hnf") => LinAlg::Hnf,
+            _ => LinAlg::DetGcd,
+        },
     };
     let euler_bound: u64 = opts
         .get("euler-bound")
@@ -148,69 +152,156 @@ fn main() {
         .filter(|(p, e)| e % 2 == 1 && *p != BigUint::from(2u32))
         .count();
     let two_rank = (odd_primes_of_dk + usize::from(dk.is_even())).saturating_sub(1);
-    // subgroup indices by bound and the Mazur subset (split primes only, odd)
     let n = fb.len();
-    let mut sub_json = Vec::new();
-    for &b in &sub_bounds {
-        let keep: Vec<bool> = fb
-            .iter()
-            .map(|fp| !(fp.p <= b && fp.p > 2 && fp.kind == Splitting::Split))
-            .collect();
-        let idx = lattice_index(&relations, n, &keep);
-        sub_json.push(format!(
-            "\"{}\": {}",
-            b,
-            idx.map_or("null".to_string(), |x| x.to_string())
-        ));
-    }
-    let keep_mazur: Vec<bool> = fb
-        .iter()
-        .map(|fp| !(MAZUR_ODD.contains(&fp.p) && fp.kind == Splitting::Split))
-        .collect();
-    let idx_mazur = lattice_index(&relations, n, &keep_mazur);
     let mazur_split: Vec<u64> = fb
         .iter()
         .filter(|fp| MAZUR_ODD.contains(&fp.p) && fp.kind == Splitting::Split)
         .map(|fp| fp.p)
         .collect();
-    // all primes (split, ramified, 2) up to each bound, for comparison
-    let mut sub_all_json = Vec::new();
-    for &b in &sub_bounds {
-        let keep: Vec<bool> = fb.iter().map(|fp| fp.p > b).collect();
-        let idx = lattice_index(&relations, n, &keep);
-        sub_all_json.push(format!(
-            "\"{}\": {}",
-            b,
-            idx.map_or("null".to_string(), |x| x.to_string())
-        ));
-    }
-    // orders of the split prime forms up to 2000 (exact when h is fully factored)
-    let mut orders = Vec::new();
-    let mut smallest_full = 0u64;
+
+    // Certificate for h: a factor-base prime whose form has order exactly h. The
+    // computed index is a multiple of the group order or a divisor-compatible
+    // candidate; an element of order N proves N | h, and h <= 1.5 h* (analytic
+    // class number, GRH) with N ~ h* then forces h = N.
+    let max_prime = sub_bounds.iter().copied().max().unwrap_or(2000).max(2000);
+    let mut orders: Vec<(u64, Splitting, BigUint)> = Vec::new();
+    let mut certificate_prime = 0u64;
+    let mut order_fail = 0usize;
     if h_complete {
-        for fp in fb
-            .iter()
-            .filter(|fp| fp.p <= 2000 && fp.p > 2 && fp.kind == Splitting::Split)
-        {
-            let o = class_order(&fp.form, &h, &h_factors);
-            if smallest_full == 0 && o == h {
-                smallest_full = fp.p;
+        for fp in fb.iter().filter(|fp| fp.p <= max_prime) {
+            match order_checked(&fp.form, &h, &h_factors) {
+                Some(o) => {
+                    if certificate_prime == 0 && fp.p > 2 && fp.kind == Splitting::Split && o == h {
+                        certificate_prime = fp.p;
+                    }
+                    orders.push((fp.p, fp.kind, o));
+                }
+                None => order_fail += 1,
             }
-            orders.push(format!("[{}, {}]", fp.p, o));
         }
+    }
+    let certified = certificate_prime != 0 && order_fail == 0 && accepted;
+    let lcm_of = |pred: &dyn Fn(u64, Splitting) -> bool| -> BigUint {
+        orders
+            .iter()
+            .filter(|(p, k, _)| pred(*p, *k))
+            .fold(BigUint::one(), |acc, (_, _, o)| acc.lcm(o))
+    };
+    let cyc_idx = |l: BigUint| -> String { (&h / l).to_string() };
+    let cyclic_json = if certified {
+        let split_by: Vec<String> = sub_bounds
+            .iter()
+            .map(|&b| {
+                format!(
+                    "\"{}\": {}",
+                    b,
+                    cyc_idx(lcm_of(&|p, k| p <= b && p > 2 && k == Splitting::Split))
+                )
+            })
+            .collect();
+        let all_by: Vec<String> = sub_bounds
+            .iter()
+            .map(|&b| format!("\"{}\": {}", b, cyc_idx(lcm_of(&|p, _| p <= b))))
+            .collect();
+        let mz = cyc_idx(lcm_of(&|p, k| {
+            MAZUR_ODD.contains(&p) && k == Splitting::Split
+        }));
+        format!(
+            "{{\"split_odd_le\": {{{}}}, \"all_primes_le\": {{{}}}, \"mazur\": {}}}",
+            split_by.join(", "),
+            all_by.join(", "),
+            mz
+        )
+    } else {
+        "null".to_string()
+    };
+
+    // optional projections of the relation lattice (small k): the exact index of the
+    // subgroup generated by any column subset, without assuming cyclicity
+    let want_projections = opts
+        .get("projections")
+        .map_or(params.linalg == LinAlg::Hnf, |v| v == "1");
+    let mut sub_json: Vec<String> = Vec::new();
+    let mut sub_all_json: Vec<String> = Vec::new();
+    let mut idx_mazur_str = "null".to_string();
+    if want_projections {
+        let mut jobs: Vec<(String, Vec<bool>)> = Vec::new();
+        for &b in &sub_bounds {
+            jobs.push((
+                format!("split:{b}"),
+                fb.iter()
+                    .map(|fp| !(fp.p <= b && fp.p > 2 && fp.kind == Splitting::Split))
+                    .collect(),
+            ));
+        }
+        jobs.push((
+            "mazur".to_string(),
+            fb.iter()
+                .map(|fp| !(MAZUR_ODD.contains(&fp.p) && fp.kind == Splitting::Split))
+                .collect(),
+        ));
+        for &b in &sub_bounds {
+            jobs.push((format!("all:{b}"), fb.iter().map(|fp| fp.p > b).collect()));
+        }
+        let results: Vec<(String, Option<BigInt>)> = {
+            let threads = params.threads.max(1);
+            let chunks: Vec<Vec<(String, Vec<bool>)>> = (0..threads)
+                .map(|t| jobs.iter().skip(t).step_by(threads).cloned().collect())
+                .collect();
+            let relations = &relations;
+            std::thread::scope(|scope| {
+                let handles: Vec<_> = chunks
+                    .into_iter()
+                    .map(|chunk| {
+                        scope.spawn(move || {
+                            chunk
+                                .into_iter()
+                                .map(|(name, keep)| (name, lattice_index(relations, n, &keep)))
+                                .collect::<Vec<_>>()
+                        })
+                    })
+                    .collect();
+                handles
+                    .into_iter()
+                    .flat_map(|h| h.join().expect("subgroup thread"))
+                    .collect()
+            })
+        };
+        let lookup = |name: &str| -> String {
+            results
+                .iter()
+                .find(|(k, _)| k == name)
+                .and_then(|(_, v)| v.as_ref())
+                .map_or("null".to_string(), |x| x.to_string())
+        };
+        sub_json = sub_bounds
+            .iter()
+            .map(|b| format!("\"{}\": {}", b, lookup(&format!("split:{b}"))))
+            .collect();
+        sub_all_json = sub_bounds
+            .iter()
+            .map(|b| format!("\"{}\": {}", b, lookup(&format!("all:{b}"))))
+            .collect();
+        idx_mazur_str = lookup("mazur");
     }
     let t_orders = t2.elapsed().as_secs_f64();
     let l1 = report.l1_partial;
+    let orders_json: Vec<String> = orders
+        .iter()
+        .filter(|(p, k, _)| *p <= 2000 && *p > 2 && *k == Splitting::Split)
+        .map(|(p, _, o)| format!("[{}, {}]", p, o))
+        .collect();
 
     let json = format!(
         "{{\"label\": \"{label}\", \"p\": {}, \"n\": {}, \"Delta\": {}, \"Delta_factorisation\": {{{}}}, \"D_K\": {}, \"D_K_bits\": {bits}, \"conductor\": {conductor}, \
 \"bound\": {bound}, \"grh_generating_bound\": {:.0}, \"factor_base\": {n}, \"split\": {}, \"ramified\": {}, \"relations\": {}, \"products_sieved\": {}, \
 \"eliminated_columns\": {}, \"dense_columns\": {}, \"h\": {}, \"h_bits\": {}, \"h_log2\": {:.4}, \"analytic_log2_h\": {:.4}, \"l1_partial_euler_bound\": {euler_bound}, \"l1_partial\": {:.6}, \
 \"ratio_to_analytic\": {:.5}, \"accepted\": {accepted}, \"h_factorisation\": {{{}}}, \"h_factorisation_complete\": {h_complete}, \"two_rank_genus\": {two_rank}, \
+\"certified_by_full_order_prime\": {certified}, \"certificate_prime\": {certificate_prime}, \"order_check_failures\": {order_fail}, \"cyclic_indices\": {cyclic_json}, \
 \"index_of_subgroup_by_split_odd_le\": {{{}}}, \"index_of_subgroup_by_all_primes_le\": {{{}}}, \"mazur_split\": [{}], \"index_of_subgroup_by_mazur\": {}, \
-\"split_form_orders\": [{}], \"smallest_split_prime_with_full_order\": {smallest_full}, \
-\"params\": {{\"half_length\": {}, \"support\": {}, \"slack_bits\": {}, \"excess\": {}, \"threads\": {}, \"seed\": {}, \"tolerance\": {tolerance}}}, \
-\"wall_s\": {{\"factor_delta\": {:.3}, \"relations_and_hnf\": {:.3}, \"orders_and_subgroups\": {:.3}, \"total\": {:.3}}}}}",
+\"split_form_orders\": [{}], \"smallest_split_prime_with_full_order\": {certificate_prime}, \
+\"params\": {{\"half_length\": {}, \"support\": {}, \"slack_bits\": {}, \"excess\": {}, \"threads\": {}, \"seed\": {}, \"linalg\": \"{:?}\", \"tolerance\": {tolerance}}}, \
+\"wall_s\": {{\"factor_delta\": {:.3}, \"relations_and_linalg\": {:.3}, \"orders_and_subgroups\": {:.3}, \"total\": {:.3}}}}}",
         p_opt.map_or("null".into(), |x| x.to_string()),
         n_opt.map_or("null".into(), |x| x.to_string()),
         delta,
@@ -233,14 +324,15 @@ fn main() {
         sub_json.join(", "),
         sub_all_json.join(", "),
         mazur_split.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(", "),
-        idx_mazur.map_or("null".to_string(), |x| x.to_string()),
-        orders.join(", "),
+        idx_mazur_str,
+        orders_json.join(", "),
         params.half_length,
         params.support,
         params.slack_bits,
         params.excess,
         params.threads,
         params.seed,
+        params.linalg,
         t_factor,
         t_relations_and_hnf,
         t_orders,
