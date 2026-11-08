@@ -32,6 +32,29 @@ B with disjoint seeds (card `CARD-p3-cross-trace-20261107-2`, run-20261107T2220Z
   (for example through the mix64(x) partition or the canonical-sign choice) sends
   each curve into one of two regimes. Not separated by trace parity, t mod 4,
   n mod 3, n mod 4 or a mod 2.
+- **Diagnosis (2026-11-08, round 2 builder; instrumented copy of v1, 50 prime-order
+  curves over p = 1048573 = 2^20 - 3, 64 targets each) [pcc:unverified]:**
+  - *Binary property: n >= 2^k.* The DP bit count was floor(log2 n / 4). All study primes
+    sit just below a power of two (2^20 - 3, p24 = 2^24 - 3, p28 = 2^28 - 57), so the Hasse
+    interval straddles 2^k and curves with n >= 2^k get one more DP bit. At 2^20: 36 curves
+    with n >= 2^20 cost 1.698 · √n (45.0 steps per walk, 0.716 capped walks per target),
+    14 with n < 2^20 cost 1.328 (17.4 steps per walk, 0.280 capped). Confirmation on the
+    first 6 p24 claim curves (regenerated with the card's curves seed, 24 targets): the 5
+    with n >= 2^24 cost 2.26 - 2.65 · √n, the one with n < 2^24 1.57: the two clusters.
+  - *Mechanism: walks trapped in cycles longer than the 16-point window.* Capped walks end
+    in cycles of period 17 - 63 (many odd, which needs integer relations among the jump
+    logarithms u_j + v_j k with u_j, v_j < 16) and run to the cap 20 · 2^d + 64. Wasted
+    ops per target 0.11 vs 0.49 · √n at 2^20, 0.48 vs 1.2 - 1.7 at p24; the waste scales
+    with walk length and cap (both ∝ 2^d ∝ n^(1/4)), hence the growth from p24 to p28.
+    Time to the first point collision between walks is 88 - 97 % of the cost.
+  - *Ruled out:* per-curve DP density (1.00 - 1.01 × 2^-d), flip rate (0.50 - 0.52).
+  - *Fix (walk version 2, `p3census/src/rho.rs`, README "Walk version 2"):* full-size
+    G-only jumps in a per-(run, curve) table, a per-target partition salt, a
+    point-dependent escape m + M_s + M_t (a fixed escape point gave a ping-pong
+    involution), DP bits from bitlen(p). Validation at p = 2^16 - 15 ... 2^22 - 3, 50
+    curves, T = 256, runs A and B: means 1.188, 1.057, 1.035, 0.989 · √n, A/A var ratios
+    0.72 - 1.32, r(A, B) −0.16 ... +0.23, no n >= 2^k effect, 0 unsolved. This
+    validates the instrument only; Y1 has not been re-run.
 - **Missing capability:** the lab's `ic_wide::rho_negation` could not be linked
   offline (the main crate's dependencies did not resolve).
 - **What this evidence does not establish:** any property of the curves; the P3
