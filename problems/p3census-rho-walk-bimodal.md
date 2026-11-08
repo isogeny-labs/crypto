@@ -1,10 +1,10 @@
 # P3 census rho walk: bimodal, curve-reproducible cost above √n
 
-- **Status:** `open`
+- **Status:** `resolved` (2026-11-08: root cause found, walk v2 passes the gate and the claim rerun)
 - **Kind:** unknown cause (instrument defect); limits an empirical outcome
 - **Affected work:** [`research/split_prime_ecdlp_20261107/followups/p3_cross_trace/RESULTS.md`](../research/split_prime_ecdlp_20261107/followups/p3_cross_trace/RESULTS.md) (outcome Y1, rho cost against Frobenius-field covariates)
 - **Next action owner:** unassigned
-- **Last updated:** 2026-11-08
+- **Last updated:** 2026-11-08 (resolved)
 
 ## Problem
 
@@ -78,3 +78,9 @@ B with disjoint seeds (card `CARD-p3-cross-trace-20261107-2`, run-20261107T2220Z
 ## Resolution and history
 
 - 2026-11-08: opened from P3's A/A control.
+- 2026-11-08: resolved. Root cause: distinguished-point bits set per curve from
+  floor(log₂ n / 4) at primes just below a power of two, plus long fruitless cycles from
+  small jump coefficients. Walk v2 (`p3census`, src sha256 `4888b050…aed0`) passed the
+  frozen gate and the claim rerun (`CARD-p3-cross-trace-20261108-r2`): A/A r = 0.027 / 0.009,
+  variance ratios 0.95 to 1.02, every per-curve mean in 0.850 to 1.091·√n. See
+  `research/split_prime_ecdlp_20261107/followups/p3_cross_trace/RESULTS.md`, round 2.

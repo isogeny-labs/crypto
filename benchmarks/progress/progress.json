@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261108T0530Z-split-prime-p2-r2-unplanted",
+  "latest_record": "20261108T0545Z-split-prime-p3-r2-walk-v2",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 57,
+    "measured": 58,
     "open": 5
   },
   "repo": "crypto",
@@ -422,9 +422,10 @@
     {
       "better": "lower",
       "first": 0.986,
-      "latest": 0.986,
+      "latest": 0.009,
       "latest_derived": {
-        "improvement_vs_first_percent": 0.0
+        "improvement_vs_first_percent": 99.0872,
+        "improvement_vs_previous_percent": 99.0872
       },
       "metric": "aa_rho_correlation_p28",
       "points": [
@@ -441,10 +442,48 @@
           "spread": null,
           "summary": "P3 cross-trace covariate test, 2000 prime-order curves at 2^24 and 2^28: 0 of 14 tests significant (frozen rule 2 null); coverage effects <= 0.002 %; rho walk found defective by the A/A control",
           "value": 0.986
+        },
+        {
+          "commit": "3c11bc13b9cb",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 99.0872,
+            "improvement_vs_previous_percent": 99.0872
+          },
+          "n": 2000,
+          "record": "20261108T0545Z-split-prime-p3-r2-walk-v2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P3 round 2: rho cost with the corrected walk independent of the split-prime and Frobenius-field covariates at 2^24 and 2^28 (0 of 7 tests; every CI within 0.19 %); A/A r 0.027 / 0.009",
+          "value": 0.009
         }
       ],
       "problem": "ecdlp:split-prime-p3-cross-trace-census",
       "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "bonferroni_significant_rho_tests",
+      "points": [
+        {
+          "commit": "3c11bc13b9cb",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 7,
+          "record": "20261108T0545Z-split-prime-p3-r2-walk-v2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P3 round 2: rho cost with the corrected walk independent of the split-prime and Frobenius-field covariates at 2^24 and 2^28 (0 of 7 tests; every CI within 0.19 %); A/A r 0.027 / 0.009",
+          "value": 0.0
+        }
+      ],
+      "problem": "ecdlp:split-prime-p3-cross-trace-census",
+      "unit": "count"
     },
     {
       "better": "lower",
@@ -472,9 +511,10 @@
     {
       "better": "lower",
       "first": 0.7,
-      "latest": 0.7,
+      "latest": 0.087,
       "latest_derived": {
-        "improvement_vs_first_percent": 0.0
+        "improvement_vs_first_percent": 87.5714,
+        "improvement_vs_previous_percent": 87.5714
       },
       "metric": "max_abs_rho_effect_pct",
       "points": [
@@ -491,6 +531,21 @@
           "spread": null,
           "summary": "P3 cross-trace covariate test, 2000 prime-order curves at 2^24 and 2^28: 0 of 14 tests significant (frozen rule 2 null); coverage effects <= 0.002 %; rho walk found defective by the A/A control",
           "value": 0.7
+        },
+        {
+          "commit": "3c11bc13b9cb",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 87.5714,
+            "improvement_vs_previous_percent": 87.5714
+          },
+          "n": 2000,
+          "record": "20261108T0545Z-split-prime-p3-r2-walk-v2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P3 round 2: rho cost with the corrected walk independent of the split-prime and Frobenius-field covariates at 2^24 and 2^28 (0 of 7 tests; every CI within 0.19 %); A/A r 0.027 / 0.009",
+          "value": 0.087
         }
       ],
       "problem": "ecdlp:split-prime-p3-cross-trace-census",
