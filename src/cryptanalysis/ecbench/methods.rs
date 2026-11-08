@@ -212,12 +212,12 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "factor_base",
             default: None,
-            help: "plug-in spec: explicit-x:xs=X0;X1;... (exact x list, prime or binary), prime-abscissa:size=N, glv-orbit:size=N, cm-multiplier:size=N,norm=B[,endo=I][,mult=M], prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), prime-interval:t=T[,lo=L] (every point with x in [L, L + 2^T), the whole scan charged; pkm-semaev reads bits=T,lo=L from it), binary-subspace:dimension=D, binary-multiplier:size=N,mult=M, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
+            help: "plug-in spec: explicit-x:xs=X0;X1;... (exact x list, prime or binary), prime-abscissa:size=N, glv-orbit:size=N, cm-multiplier:size=N,norm=B[,endo=I][,mult=M], prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), prime-interval:t=T[,lo=L] (every point with x in [L, L + 2^T), the whole scan charged; pkm-semaev reads bits=T,lo=L from it), binary-subspace:dimension=D, binary-multiplier:size=N,mult=M, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D, bin-x-line:line=standard|twisted[,line_seed=S] (f2m4_a0 curves: abscissa line u·F_q, u = 1 or the twisted all-lift u)",
         },
         ParamDecl {
             name: "oracle",
             default: None,
-            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3|4|5 (one probe a target into a negation-folded table of every signed m-sum of the base); wsum:coef=B[,free=1] (prime curves: one probe a target into a negation-folded coefficient-box table of every Σ e_c·P_c, |e_c| ≤ B, over the base's C ≤ 8 abscissae); wwalk:x=X[,jumps=16][,grow=0|1|2][,g=0|1] (prime curves, a base of exactly 2 abscissae: a random-jump walk table of round(X·√r) steps E_t = E_(t-1) + J_h, X in (0, 4], one probe a target into it as a two-column row, and its own key collisions as target-free rows; grow=1 extends the walk until the first verified free row, at most 2T; g=1 adds [gamma]G to every jump so a collision is an affine row du*s1+dv*s2=-dz; grow=2 (needs g=1) extends until two independent free rows exist, at most 3T; seed=run draws the table from the run seed so every run resamples it); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace",
+            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3|4|5 (one probe a target into a negation-folded table of every signed m-sum of the base); wsum:coef=B[,free=1] (prime curves: one probe a target into a negation-folded coefficient-box table of every Σ e_c·P_c, |e_c| ≤ B, over the base's C ≤ 8 abscissae); wwalk:x=X[,jumps=16][,grow=0|1|2][,g=0|1] (prime curves, a base of exactly 2 abscissae, or of 1 with g=1 (F=1: jumps [a]P1+[c]G, a collision is du*s1=-dz, grow=1|2 extends until that one row exists, at most 2T|3T): a random-jump walk table of round(X·√r) steps E_t = E_(t-1) + J_h, X in (0, 4], one probe a target into it as a two-column row, and its own key collisions as target-free rows; grow=1 extends the walk until the first verified free row, at most 2T; g=1 adds [gamma]G to every jump so a collision is an affine row du*s1+dv*s2=-dz; grow=2 (needs g=1) extends until two independent free rows exist, at most 3T; seed=run draws the table from the run seed so every run resamples it; tw=1 (needs g=1, grow=2 and a base of 1 abscissa) puts the target in the walk: jumps [a]P1+[c]G+[b]Q, every collision is a row du*s1+db*log Q=-dz, the walk stops at the first two independent rows (cap 3T) and those pin log Q; cj=1 (needs tw=1) builds the jumps by chained additions from two base combinations); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace; gaudry-x-bin:macaulay=D[,sparsest=1][,charge_unsolved=1][,frob_roots=1][,replay=1] on bin-x-line (S₅ in e₁², e₂², e₃², e₄ of x/u, weights (2,2,2,1), the gaudry-d4-bin solve and charge)",
         },
         ParamDecl {
             name: "solver",
@@ -227,7 +227,7 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "linalg",
             default: Some("incremental-gauss"),
-            help: "incremental-gauss (stop at target pin), incremental-gauss-full-rank (all columns independent), incremental-gauss-full-rank-checked (also point-check each base column), structured-gauss, sparse-cado = filter+wiedemann (CADO-style filter + block Wiedemann, full-rank rule), filter+lanczos, wiedemann or lanczos (no filter, block Wiedemann / block Lanczos, full-rank rule)",
+            help: "incremental-gauss (stop at target pin), incremental-gauss-full-rank (all columns independent), incremental-gauss-full-rank-checked (also point-check each base column), incremental-gauss-echelon (sparse forward-only elimination, same pins and answer as incremental-gauss), structured-gauss, sparse-cado = filter+wiedemann (CADO-style filter + block Wiedemann, full-rank rule), filter+lanczos, wiedemann or lanczos (no filter, block Wiedemann / block Lanczos, full-rank rule)",
         },
         ParamDecl {
             name: "targets",
@@ -2023,10 +2023,25 @@ fn class_setup_detail(setup: GroupOps) -> Value {
         "scalar_mults": setup.scalar_mults, "gae": setup.gae()}})
 }
 
+/// Put a rho walk's uncounted-but-priced work (the short-cycle window's and
+/// Brent's compares, [`crate::cryptanalysis::ic_boundary::WINDOW_WORD_OPS`])
+/// in its `search` phase's `work_native`, where `ecbench::work` prices it and a
+/// replay compares it only for records that carry it.
+fn attach_work_native(phases: &mut [PhaseRecord], work: &BTreeMap<String, u64>) {
+    if work.is_empty() {
+        return;
+    }
+    if let Some(search) = phases.iter_mut().find(|p| p.name == "search") {
+        for (k, v) in work {
+            *search.work_native.entry(k.clone()).or_default() += v;
+        }
+    }
+}
+
 fn rho_report(res: RhoResult, wall: u64, field_ops: Option<FieldOps>) -> SolveReport {
     let c = &res.counters;
     let get = |k: &str| c.get(k).copied().unwrap_or(0);
-    let phases = if c.is_empty() {
+    let mut phases = if c.is_empty() {
         vec![ops_phase("search", res.group_ops)]
     } else {
         let setup = get("setup_additions") + get("setup_doublings");
@@ -2045,6 +2060,7 @@ fn rho_report(res: RhoResult, wall: u64, field_ops: Option<FieldOps>) -> SolveRe
         w.scalar_mults = res.group_ops.scalar_mults;
         vec![s, w, mk("internal_verification", verify)]
     };
+    attach_work_native(&mut phases, &res.work_native);
     let mut counters = res.counters.clone();
     counters.insert("steps".into(), res.steps);
     counters.insert("walks".into(), res.walks);
@@ -2192,7 +2208,8 @@ fn rho_report_v2(
     a.scalar_mults = class_setup.scalar_mults;
     let mut w = mk("search", search);
     w.scalar_mults = res.group_ops.scalar_mults;
-    let phases = vec![s, a, w, mk("internal_verification", verify)];
+    let mut phases = vec![s, a, w, mk("internal_verification", verify)];
+    attach_work_native(&mut phases, &res.work_native);
     let total_gae = phases.iter().map(|p| p.gae).sum::<f64>();
     let mut counters = res.counters.clone();
     counters.insert("steps".into(), res.steps);
@@ -2247,7 +2264,8 @@ fn pooled_report(res: RhoBatchResult, wall: u64, field_ops: Option<FieldOps>) ->
     s.doubles = setup_dbls;
     let mut w = mk("search", search);
     w.scalar_mults = res.group_ops.scalar_mults;
-    let phases = vec![s, w, mk("internal_verification", verify)];
+    let mut phases = vec![s, w, mk("internal_verification", verify)];
+    attach_work_native(&mut phases, &res.work_native);
     let mut counters = res.counters.clone();
     let steps: u64 = res.per_target.iter().map(|t| t.steps).sum();
     let walks: u64 = res.per_target.iter().map(|t| t.walks).sum();
@@ -2928,6 +2946,13 @@ fn pipeline_components_applicable(m: &ResolvedMethod, inst: &Instance) -> Result
                 grow,
             };
             wwalk_plan_check(i.r, x, jumps, opts)?;
+            let (tw, cj) = (or.flag("tw"), or.flag("cj"));
+            if cj && !tw {
+                return Err("wwalk: cj=1 needs tw=1".into());
+            }
+            if tw && (!opts.g_jumps || grow != 2) {
+                return Err("wwalk: tw=1 needs g=1 and grow=2".into());
+            }
         }
         _ => {}
     }
@@ -6629,9 +6654,12 @@ fn solve_ic_f2m4(
     seed: u64,
 ) -> Result<SolveReport, String> {
     let (spec, fb_name, or_name) = pipeline_spec(m, seed)?;
+    if fb_name == super::xline_bin::BASE {
+        return solve_ic_f2m4_xline(m, inst, curve, target, spec, &or_name);
+    }
     if fb_name != "bin-t-line" {
         return Err(format!(
-            "factor base `{fb_name}` does not run on a curve over F_(2^m)^4; bin-t-line does"
+            "factor base `{fb_name}` does not run on a curve over F_(2^m)^4; bin-t-line or bin-x-line does"
         ));
     }
     if or_name != "gaudry-d4-bin" {
@@ -6704,6 +6732,108 @@ fn solve_ic_f2m4(
         |q| CountedGroup::key(c, q),
     )?;
     Ok(ic_report(m, rep, &calib, Some(facts), wall, 2))
+}
+
+/// `ic.pipeline` with `bin-x-line` and `gaudry-x-bin` on an `a = 0` curve
+/// over `F_{(2^m)^4}` (`ecbench::xline_bin`; the C1 end-to-end study):
+/// the standard base `line=standard` or the twisted all-lift line
+/// `line=twisted,line_seed=N`, priced exactly as `bin-t-line` +
+/// `gaudry-d4-bin` (solver `F_q` multiplications over the curve's
+/// `fq_muls_per_add`, lifts at the measured lift price).
+fn solve_ic_f2m4_xline(
+    m: &ResolvedMethod,
+    inst: &BinCurve,
+    curve: &CurveFacts,
+    target: PtB,
+    spec: PipelineSpec,
+    or_name: &str,
+) -> Result<SolveReport, String> {
+    use super::xline_bin::{SharedLine, XLineBase, XLineOracle, ORACLE};
+    if or_name != ORACLE {
+        return Err(format!(
+            "oracle `{or_name}` does not run on bin-x-line; {ORACLE} does"
+        ));
+    }
+    let macaulay = spec.oracle_params.u64("macaulay")?;
+    let macaulay = u8::try_from(macaulay)
+        .ok()
+        .filter(|&d| d >= 2)
+        .ok_or_else(|| format!("{ORACLE}: macaulay is a degree from 2 to 255, not {macaulay}"))?;
+    let flag = |k: &str| -> Result<bool, String> {
+        match spec.oracle_params.u64_or(k, 0)? {
+            0 => Ok(false),
+            1 => Ok(true),
+            v => Err(format!("{ORACLE}: {k} is 0 or 1, not {v}")),
+        }
+    };
+    let opts = BinOptions {
+        weighted: true,
+        frobenius: false,
+        sparsest: flag("sparsest")?,
+        replay: flag("replay")?,
+        frob_roots: flag("frob_roots")?,
+    };
+    let shared: SharedLine = std::rc::Rc::new(std::cell::RefCell::new(None));
+    let base = XLineBase {
+        curve: inst,
+        shared: shared.clone(),
+    };
+    let mut oracle = XLineOracle::new(inst, macaulay, spec.seed, opts, shared);
+    oracle.charge_unsolved = flag("charge_unsolved")?;
+    let c = &inst.curve;
+    let ctx = InstanceCtx {
+        group: c,
+        generator: inst.generator,
+        target,
+        r: one_word(inst.r)?,
+        cofactor: one_word(inst.cofactor)?,
+        group_order: one_word(inst.group_order)?,
+        name: curve.slug.clone(),
+        field_degree: None,
+    };
+    let per_add = fq_muls_per_add(c) as f64;
+    let calib = Calibration {
+        ns_per_add: per_add,
+        ns_per_double: per_add,
+        ns_per_row_op: 1.0,
+        ns_per_lookup: 1.0,
+        ns_per_sqrt: Some(f2m4_lift_muls(inst)),
+        pinned_units: vec![
+            "ns_per_double".into(),
+            "ns_per_row_op".into(),
+            "ns_per_lookup".into(),
+            "ns_per_sqrt".into(),
+        ],
+        ..Default::default()
+    };
+    let t = Instant::now();
+    let (rep, fb) =
+        run_pipeline_with_base(&ctx, &spec, &base, &mut oracle, u64::MAX, &calib, None)?;
+    let wall = t.elapsed().as_nanos() as u64;
+    let facts = factor_base_facts(
+        &curve.slug,
+        &m.params["factor_base"],
+        &spec.factor_base_params,
+        &fb,
+        |q| CountedGroup::key(c, q),
+    )?;
+    let mut report = ic_report(m, rep, &calib, Some(facts), wall, 2);
+    // The pinned units' ratios (GAE per operation), from this run's own
+    // counted calibration: the §5a band reads them when the repository's
+    // pinned table has no row for the curve (`band::calibrated_native`).
+    if let Value::Object(d) = &mut report.detail {
+        d.insert(
+            "calibration_ratios".into(),
+            json!({
+                "ns_per_double": calib.ns_per_double / calib.ns_per_add,
+                "ns_per_row_op": calib.ns_per_row_op / calib.ns_per_add,
+                "ns_per_lookup": calib.ns_per_lookup / calib.ns_per_add,
+                "ns_per_sqrt": calib.ns_per_sqrt.unwrap_or(0.0) / calib.ns_per_add,
+                "source": "counted F_q multiplications of this run over fq_muls_per_add",
+            }),
+        );
+    }
+    Ok(report)
 }
 
 /// A curve over `F_{(2^m)^4}` whose subgroup order needs two words
@@ -9528,6 +9658,96 @@ mod accounting_rules_tests {
             .contains(&"distinguished_point_table_queries_uncharged".to_string()));
         assert_eq!(old.phases.len(), 3);
         assert_eq!(new.phases.len(), 4);
+    }
+
+    /// The tuned walk's short-cycle window (and, under v2, Brent's checks)
+    /// is charged in `bitop/v1` through the search phase's `work_native`,
+    /// never as a counter, so the frozen ids keep the counters they were
+    /// recorded with.
+    #[test]
+    fn tuned_rho_window_compares_are_priced_through_work_native() {
+        use crate::cryptanalysis::ecbench::work::{price, Priceable};
+        use crate::cryptanalysis::ic_boundary::{BRENT_WORD_OPS, WINDOW_WORD_OPS};
+        for (spec, id) in [
+            (
+                CurveSpec::PrimeSearch {
+                    bits: 18,
+                    seed: 59297,
+                },
+                "rho.negation",
+            ),
+            (
+                CurveSpec::PrimeSearch {
+                    bits: 18,
+                    seed: 59297,
+                },
+                "rho.plain",
+            ),
+            (
+                CurveSpec::PrimeSearch {
+                    bits: 18,
+                    seed: 59297,
+                },
+                "rho.negation_v2",
+            ),
+            (CurveSpec::Koblitz { a: 0, n: 19 }, "rho.signed_frobenius"),
+        ] {
+            let (inst, facts) = built(&spec);
+            let rep = run(&method(id, &[]), &inst, &facts, 5555, 8);
+            assert!(rep.recovered.is_some(), "{id}");
+            for name in [WINDOW_WORD_OPS, BRENT_WORD_OPS] {
+                assert!(
+                    !rep.counters.contains_key(name),
+                    "{id}: {name} is a counter"
+                );
+            }
+            let search = rep
+                .phases
+                .iter()
+                .find(|p| p.name == "search")
+                .expect("a search phase");
+            let window = search
+                .work_native
+                .get(WINDOW_WORD_OPS)
+                .copied()
+                .unwrap_or(0);
+            // Every step scans the ring and pushes into it.
+            assert!(window >= 2 * rep.counters["steps"], "{id}: {window}");
+            let brent = search.work_native.get(BRENT_WORD_OPS).copied().unwrap_or(0);
+            assert_eq!(brent > 0, id.ends_with("_v2"), "{id}: brent {brent}");
+            let priced = |phases: &[PhaseRecord]| {
+                price(&Priceable {
+                    method_id: id,
+                    method_params: &BTreeMap::new(),
+                    curve: &facts,
+                    phases,
+                    counters: &rep.counters,
+                    solver: None,
+                })
+                .expect("priced")
+            };
+            let with = priced(&rep.phases);
+            // The window counters are priced (v2 keeps its own table counters
+            // unpriced, as before).
+            for name in [WINDOW_WORD_OPS, BRENT_WORD_OPS] {
+                assert!(
+                    !with.unpriced.iter().any(|u| u == name),
+                    "{id}: {name} unpriced"
+                );
+            }
+            // Without the window's work the search phase is cheaper by
+            // exactly its word operations.
+            let mut bare = rep.phases.clone();
+            for p in bare.iter_mut() {
+                p.work_native.clear();
+            }
+            let without = priced(&bare);
+            let word = crate::cryptanalysis::bitops::Prim::WordOp;
+            let gates = with.widths.gates(word).expect("word_op priced");
+            let diff: u128 =
+                with.bitops.parse::<u128>().unwrap() - without.bitops.parse::<u128>().unwrap();
+            assert_eq!(diff, gates * u128::from(window + brent), "{id}");
+        }
     }
 
     #[test]

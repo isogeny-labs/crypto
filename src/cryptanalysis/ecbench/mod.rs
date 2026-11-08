@@ -107,3 +107,4 @@ pub mod trend;
 pub mod wordram_price;
 pub mod work;
 pub mod workload;
+pub mod xline_bin;

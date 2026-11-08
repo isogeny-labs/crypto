@@ -1,31 +1,38 @@
-# Resume: crypto @ claude/dreg-lfd-theory-scaling
+# Resume: crypto @ claude/elliptic-curves-graph-weaknesses-fw42m4
 
 ## Goal
-User request (2026-11-05): find ways to reduce the degree of regularity / total solve time of the
-descended Semaev system. Three phases, chosen by the user: (1) theory and scaling survey, done
-(PR #3512); (2) the l = 9 guess-saturation test; (3) a multilinear closure engine prototype.
+Owner asked (2026-11-08, "Please run it") to run the open n = 37 test: does msolve 0.6.5 (F4,
+grevlex) reach maximal step degree 5 on a fresh m = 2 descended S3 instance at n = 37, as
+Kousidis-Wiemers report for Magma (corpus MEAS-GB-KW-TABLE1)? Locally it was OOM-killed at 15 GB.
 
 ## Lead / hypothesis
-LEAD-ICE-descent-closure-degree-at-scale / LEAD-ICE-hybrid-guess-determine-l7. The recorded k*
-(guesses that hold degree 4) is 0, 1-2 and 4 at l = 6, 7 and 8. K_marginal predicts 7 at l = 9.
-Saturation (k* <= 5) would revive the guess route.
+Petit-Quisquater Assumption 2 at m = 2 (HEUR-GB-PQ-ASSUMPTION-2). msolve gives 4 on n = 17..34 and
+n = 36 (merged in PRs #3658, #3682). Magma reports 5 from n = 37.
 
 ## Spec
-research/dreg_guess_scaling_20261106/PREREGISTRATION.md (frozen at commit 37129b4253).
+research/ecdlp_weakness_census_20261104/pq2_rank/f4/eks_n37/{protocol.json, run.sh, input.ms},
+committed at e63bf8e55d (publication receipt in the run's receipt directory). Input dump
+pq2_rank/f4/step_n36_37/dumps/n37_i0.json.
 
 ## State
-Gate A passed. The 4 positive controls refute at degree 4. Whole-summand runs: l = 7 and 8 done; l = 9 has 14 of 16 done, all degree 4 for nonzero x1. S5.d1.b0 refutes at degree 4 (a surprise against K_marginal). The remaining 129 branches are moving to a RunPod pod (PREREGISTRATION Amendment 1, owner chose the cloud route; $30 cap).
+Image: isolab tasks base (aws-cli) + one layer /opt/msolve (msolve + its shared libs + loader +
+run.sh + input.ms), published with taskq/deploy/eks-karpenter/oci-layer-publish.py. Command job
+via taskq/deploy/eks-karpenter/remote/launch-remote-command (isolab.eks.command-request/v1),
+8 vCPU, 100Gi, 21600 s, retries 0, cpu-spot. Results land in
+s3://isolab-results-104186811093-us-east-2/runs/<job>/<pod-uid>/ (wrapper uploads every 10 min).
 
 ## Next steps
-1. Launch: research/koblitz_ic_leads_build_20261024/pod/upload_launch.py run --name dreg-s5-l9 --vcpu 64 --flavors cpu3g --disk 40 --max-seconds 18000 <the 4 input files>, then push them.
-2. Fetch https://<pod>-8000.proxy.runpod.net/runs/ when STATUS reads ALLDONE; copy the records into runs/; stop the pod.
-3. Score both preregistrations, then write RESULTS, the graph and the PDF, the session log, and update PR #3512.
+1. Publish image, write request.json, validate, launch; record Job/Pod UIDs.
+2. Read status with an isolab.eks.command-status/v1 request; download S3 outputs, verify SHA256SUMS.
+3. Parse max step degree, check linear = k = 33; update pq2_rank README, corpus MEAS-PQ2-MSOLVE-F4,
+   session log; PR.
 
 ## Runs in flight
-RunPod pod dreg-s5-l9 (id recorded in runs/queue.log once created).
+(filled at launch)
 
 ## Stop and success conditions
-About 12 h of container time at most. The decision rule is in the PREREGISTRATION.
+One attempt, no retries; stop at exit, OOM or 6 h. Budget ceiling USD 5 (monthly account
+headroom was USD 23.67 at submission).
 
 ## Open questions
-Whether pe_closure fits about 196k columns in 15 GB.
+None.
