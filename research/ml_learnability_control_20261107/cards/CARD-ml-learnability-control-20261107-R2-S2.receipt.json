@@ -1,0 +1,417 @@
+{
+  "card_id": "CARD-ml-learnability-control-20261107-R2-S2",
+  "card_path": "research/ml_learnability_control_20261107/cards/CARD-ml-learnability-control-20261107-R2-S2.yaml",
+  "card_sha256": "54b66455a4c214edf0d7977c38e8e556d39fd699e43bbdf252d1ba900df4b7d9",
+  "commands": [
+    {
+      "argv": [
+        "git",
+        "merge-base",
+        "--is-ancestor",
+        "16bb0f2cd1406b0e1ca6cbb58797dc144887c06f",
+        "HEAD"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-ancestor",
+      "index": 1,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--quiet",
+        "16bb0f2cd1406b0e1ca6cbb58797dc144887c06f",
+        "HEAD",
+        "--",
+        "research/ml_learnability_control_20261107",
+        ":(exclude)research/ml_learnability_control_20261107/cards",
+        "taskq/",
+        "tools/task_card.py",
+        "tools/benchrec.py"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "head-paths-unchanged",
+      "index": 2,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "research/primefield-companion-schur-20261101/tools/experiment_protocol.py",
+        "validate",
+        "research/ml_learnability_control_20261107/protocol.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.114,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "protocol-check",
+      "index": 3,
+      "outputs": {},
+      "seconds": 0.114,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "950a8d0c12ee97f06a3d8da5472288d67463d3eceabf1cafef2c63dbc94418ed",
+      "stdout_tail": [
+        "OK: experiment.protocol/v1 research/ml_learnability_control_20261107/protocol.json (0 finding(s))"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "h",
+        "674d224c94b5653265534f19bdebbdced1249b2a6ef8a7afa091496cb438e6e2",
+        ".freeze.status == \"frozen\" and .freeze.protocol_sha256 == $h",
+        "research/ml_learnability_control_20261107/protocol.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.003,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "protocol-frozen-hash",
+      "index": 4,
+      "outputs": {},
+      "seconds": 0.003,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "h",
+        "674d224c94b5653265534f19bdebbdced1249b2a6ef8a7afa091496cb438e6e2",
+        ".provenance.protocol_sha256 == $h",
+        "research/ml_learnability_control_20261107/eks/requests/mllc-all-20261108.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.002,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "request-protocol-identity",
+      "index": 5,
+      "outputs": {},
+      "seconds": 0.002,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "jq",
+        "-e",
+        "--arg",
+        "job",
+        "mllc-all-20261108",
+        ".job_name == $job and (.job_uid | length) > 0 and (.state == \"submitted\" or .state == \"active\" or .state == \"succeeded\")",
+        "research/ml_learnability_control_20261107/receipts/R2/launch/result.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.004,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "launch-receipt-exists",
+      "index": 6,
+      "outputs": {},
+      "seconds": 0.004,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "a17fcf0a2f50e2d495e4f90ce263410edc183add6c62699a2facbccf60410f74",
+      "stdout_tail": [
+        "true"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/ml_learnability_control_20261107/cards/wait_command_status.sh",
+        "research/ml_learnability_control_20261107/cards/status_request.json",
+        "mllc-all-20261108",
+        "research/ml_learnability_control_20261107/receipts/R2/status-s2",
+        "1800",
+        "60",
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 305.608,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "status-once",
+      "index": 7,
+      "outputs": {
+        "research/ml_learnability_control_20261107/receipts/R2/status-s2/final-status.json": "09faec306b99926d08a320255d155a88c43c2e458032c5ebe5c54d11d7218275"
+      },
+      "seconds": 305.608,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "3079a72b3ec33423486bd2f6943266445a7e64738a077e2a54dbca5e3bb9d92c",
+      "stdout_tail": [
+        "2026-11-08T06:52:01Z poll 1 launcher_exit 255 state none",
+        "2026-11-08T06:53:04Z poll 2 launcher_exit 255 state none",
+        "2026-11-08T06:54:07Z poll 3 launcher_exit 255 state none",
+        "2026-11-08T06:55:11Z poll 4 launcher_exit 255 state none",
+        "2026-11-08T06:57:03Z poll 5 launcher_exit 0 state failed",
+        "{\"state\":\"failed\",\"job_name\":\"mllc-all-20261108\",\"job_uid\":\"ca04a7c5-9751-43cf-9235-5410f2c0c838\",\"pods\":[{\"name\":\"mllc-all-20261108-l6klr\",\"uid\":\"d1e64084-42af-4973-b1a1-b1c28510c122\",\"phase\":\"Failed\",\"node\":\"ip-10-84-107-139.us-east-2.compute.internal\",\"started\":\"2026-11-08T05:47:02Z\",\"exit_code\":1,\"reason\":\"Error\"}],\"launcher\":\"isolab-experiment-launcher:0b9f2291-8e05-4e31-aa1c-a810667e4412\",\"receipt_uri\":\"s3://isolab-results-104186811093-us-east-2/runs/mllc-all-20261108/launcher/0b9f2291-8e05-4e31-aa1c-a810667e4412/\"}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "aws",
+        "s3",
+        "sync",
+        "s3://isolab-results-104186811093-us-east-2/runs/mllc-all-20261108/",
+        "research/ml_learnability_control_20261107/results/R2",
+        "--exclude",
+        "launcher/*",
+        "--only-show-errors"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 1.369,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "download",
+      "index": 8,
+      "outputs": {},
+      "seconds": 1.369,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "research/ml_learnability_control_20261107/cards/verify_salvage.sh",
+        "research/ml_learnability_control_20261107/receipts/R2/status-s2/final-status.json",
+        "research/ml_learnability_control_20261107/receipts/R2/launch/result.json",
+        "research/ml_learnability_control_20261107/results/R2",
+        "source.sha256",
+        "5cd9be780aeb5ebe0be2808262c1eba2a465a17651ccf454594974b29b280b60  PROTOCOL.md",
+        "source.sha256",
+        "e130f26b57506fc08236e505de92d291fb701fd5b66c9461ef4882e061da7607  mllc_ecgen.py",
+        "source.sha256",
+        "b01eeb6285af002d4808ed4b0476bdeb57f5831e41b72920092c2bfc2affbd4e  mllc_harness.py",
+        "source.sha256",
+        "9c8cf584ba9ff74963a4ffe1f864c0524100de26a8316e4c9c858771e2c6f560  mllc_job.sh",
+        "host.txt",
+        "93879b326440b16c0c086e728e3e7177b248ee7d2ad1ce8726d2d55aca047a8b",
+        "exit_codes.txt",
+        "size 12 exit 0",
+        "exit_codes.txt",
+        "size 16 exit 1",
+        "exit_codes.txt",
+        "size 20 exit 0",
+        "exit_codes.txt",
+        "size 24 exit 0",
+        "exit_codes.txt",
+        "fail=1"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.052,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "verify-salvage",
+      "index": 9,
+      "outputs": {},
+      "seconds": 0.052,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "d7ac4b067ec426fed344d6fb710c66aa78a551e0262cf6d89182323ea9872718",
+      "stdout_tail": [
+        "found in host.txt: 93879b326440b16c0c086e728e3e7177b248ee7d2ad1ce8726d2d55aca047a8b",
+        "found in exit_codes.txt: size 12 exit 0",
+        "found in exit_codes.txt: size 16 exit 1",
+        "found in exit_codes.txt: size 20 exit 0",
+        "found in exit_codes.txt: size 24 exit 0",
+        "found in exit_codes.txt: fail=1",
+        "pod exit code in status: 1",
+        "exit_codes.txt: OK",
+        "host.txt: OK",
+        "ladder_m12.json: OK",
+        "ladder_m12.log: OK",
+        "ladder_m16.log: OK",
+        "ladder_m20.json: OK",
+        "ladder_m20.log: OK",
+        "ladder_m24.json: OK",
+        "ladder_m24.log: OK",
+        "source.sha256: OK",
+        "versions.txt: OK",
+        "SHA256SUMS lines: 11",
+        "verified: job mllc-all-20261108 job_uid ca04a7c5-9751-43cf-9235-5410f2c0c838 pod_uid d1e64084-42af-4973-b1a1-b1c28510c122"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "find",
+        "research/ml_learnability_control_20261107/results/R2",
+        "-type",
+        "f",
+        "-exec",
+        "python3",
+        "tools/benchrec.py",
+        "add-raw",
+        "benchmarks/records/20261108T0501Z-mllc-panel.json",
+        "{}",
+        "+"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 0.066,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "add-raw",
+      "index": 10,
+      "outputs": {},
+      "seconds": 0.066,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "ddcda9761a53dfa7ee21576b272f19695726c081b984596890f523d87dfddf56",
+      "stdout_tail": [
+        "12 raw file(s) recorded"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    },
+    {
+      "argv": [
+        "python3",
+        "tools/benchrec.py",
+        "upload",
+        "benchmarks/records/20261108T0501Z-mllc-panel.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 20.214,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "upload-raw",
+      "index": 11,
+      "outputs": {},
+      "seconds": 20.214,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stdout_tail": [],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 11,
+  "commit": "c27ab1ad60b664c60febeb46f3781661f1c83a2f",
+  "dirty_after": [
+    "benchmarks/records/20261108T0501Z-mllc-panel.json",
+    "enchmarks/records/20261108T0449Z-minors-gd-panel.json"
+  ],
+  "dirty_before": [
+    "research/ml_learnability_control_20261107/eks/validate_output_m16.txt"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}
