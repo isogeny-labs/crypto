@@ -15,9 +15,9 @@ The fixtures preserve the historical certificates without rewriting them. Their 
 | Requirement | Evidence required | Current status |
 | --- | --- | --- |
 | PR before comparative execution | Hosted PR and source revision receipt | PR #3674 opened before implementation and measurement |
-| Native source and replay | C/C++ OpenSSL-backed implementation, no Python execution path | 50-case native replay passes; see NATIVE_STATUS.md |
+| Native source and replay | C/C++ OpenSSL-backed implementation, no Python execution path | 60-case native replay passes; see NATIVE_STATUS.md |
 | Exact output | Endpoint, subgroup and scalar reconstruction checks; O and boundary cases | Full polynomial identities and known-answer native fixtures pass; held-out panel pending |
-| Matched reference | Same scalar, point, field and backend; optimized public-scalar window method and OpenSSL API reference | Pending |
+| Matched reference | Same scalar, point, field and backend; optimized public-scalar window method and OpenSSL API reference | Native window and OpenSSL public/single routes implemented; measurement pending |
 | Full per-point cost | Setup, map evaluations, closure, correction, conversion and symmetric verification | Historical counted schedules only; native measurement pending |
 | End-to-end gain | Frozen paired test with strict improvement beyond A/A noise against the fastest reproduced reference | Unproven |
 | Cold and repeated-use accounting | Cold primary; genuine reusable setup reported separately, never silently amortized | Pending |
