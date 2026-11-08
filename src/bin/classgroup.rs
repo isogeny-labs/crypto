@@ -13,7 +13,7 @@
 //! Δ = t² − 4p, t = p + 1 − n, factored to its fundamental part D_K (the
 //! conductor is reported). Output: one JSON object (stdout and/or --out).
 
-use crypto::isogeny::class_group_subexp::{
+use crypto_lib::isogeny::class_group_subexp::{
     class_order, compute, factor_big, lattice_index, log2_big, SieveParams, Splitting,
 };
 use num_bigint::{BigInt, BigUint};
@@ -145,7 +145,7 @@ fn main() {
     // genus theory: 2-rank of Cl(D_K) = (number of distinct primes dividing D_K) − 1
     let odd_primes_of_dk = delta_factors
         .iter()
-        .filter(|(p, e)| e % 2 == 1 && **p != BigUint::from(2u32))
+        .filter(|(p, e)| e % 2 == 1 && *p != BigUint::from(2u32))
         .count();
     let two_rank = (odd_primes_of_dk + usize::from(dk.is_even())).saturating_sub(1);
     // subgroup indices by bound and the Mazur subset (split primes only, odd)
