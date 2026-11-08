@@ -1,45 +1,38 @@
-# Resume: crypto @ claude/novel-ecdlp-algorithm-iams4j
+# Resume: crypto @ claude/elliptic-curves-graph-weaknesses-fw42m4
 
 ## Goal
-User request (2026-11-07): run every next step of research/split_prime_ecdlp_20261107 (#3654, #3655
-merged): proposals P1 (Riemann-Roch system with a Dickson-torus tower), P2 (twist-pure coset
-selection), P3 (cross-trace covariate test of the split-prime statistic) under frozen protocols on toy
-prime fields, plus a Lean statement of the obstruction.
+Owner asked (2026-11-08, "Please run it") to run the open n = 37 test: does msolve 0.6.5 (F4,
+grevlex) reach maximal step degree 5 on a fresh m = 2 descended S3 instance at n = 37, as
+Kousidis-Wiemers report for Magma (corpus MEAS-GB-KW-TABLE1)? Locally it was OOM-killed at 15 GB.
 
 ## Lead / hypothesis
-P1: round7_rr's D_RR = 4 < D_T = 6 (m3 t4, Kummer) transfers to the Dickson torus tower (proposer 0.55
-stage-level). P2: F4 cost is coset-independent and coverage scales as c_E^m, so selecting the most
-E-pure coset pays at toy scale (0.85 toy, 0.05 cold end-to-end). P3: no Frobenius-field covariate
-moves rho cost or exact m = 2 coverage by >= 1 % (null expected, 0.98).
+Petit-Quisquater Assumption 2 at m = 2 (HEUR-GB-PQ-ASSUMPTION-2). msolve gives 4 on n = 17..34 and
+n = 36 (merged in PRs #3658, #3682). Magma reports 5 from n = 37.
 
 ## Spec
-research/split_prime_ecdlp_20261107/followups/{README.md, p1_rr_dickson/PROTOCOL.md,
-p2_twist_coset/PROTOCOL.md, p3_cross_trace/PROTOCOL.md}, frozen in commit 535d9da826 (PR #3657).
-Instrument commands pinned in each protocol's Addendum A before any claim cell.
+research/ecdlp_weakness_census_20261104/pq2_rank/f4/eks_n37/{protocol.json, run.sh, input.ms},
+committed at e63bf8e55d (publication receipt in the run's receipt directory). Input dump
+pq2_rank/f4/step_n36_37/dumps/n37_i0.json.
 
 ## State
-Protocols committed and pushed (PR #3657, auto-merge on). Builders writing standalone Rust crates under
-followups/p1_rr_dickson/p1tool, followups/p2_twist_coset/p2coset, followups/p3_cross_trace/p3census
-(uncommitted until they report). msolve 0.6.5 from apt at /usr/bin/msolve. aws CLI from
-/tmp/report-venv (pip) linked at /usr/local/bin/aws; caller is account 104186811093.
-Lean: aburan28/crypto-lean PR #3 (CryptoLean.SplitPrime.Obstruction), local module build passed,
-standard axioms only. Toolchain: ~/.elan with lean-4.35.0 linked from the release archive (elan cannot
-resolve "latest" through the proxy).
+Image: isolab tasks base (aws-cli) + one layer /opt/msolve (msolve + its shared libs + loader +
+run.sh + input.ms), published with taskq/deploy/eks-karpenter/oci-layer-publish.py. Command job
+via taskq/deploy/eks-karpenter/remote/launch-remote-command (isolab.eks.command-request/v1),
+8 vCPU, 100Gi, 21600 s, retries 0, cpu-spot. Results land in
+s3://isolab-results-104186811093-us-east-2/runs/<job>/<pod-uid>/ (wrapper uploads every 10 min).
 
 ## Next steps
-1. Read builders' reports; pin Addendum A per protocol; commit; new PR (or same branch if #3657 open).
-2. scripts/checkpoint.sh push; tools/benchrec.py init per run.
-3. experiment-director compile mode -> card per experiment; relay verbatim to executor-mechanical;
-   director assess mode.
-4. Analyse per the frozen decision rules; report + figures + Typst PDF per experiment; pcc claims;
-   session log; PR; track to merge.
+1. Publish image, write request.json, validate, launch; record Job/Pod UIDs.
+2. Read status with an isolab.eks.command-status/v1 request; download S3 outputs, verify SHA256SUMS.
+3. Parse max step degree, check linear = k = 33; update pq2_rank README, corpus MEAS-PQ2-MSOLVE-F4,
+   session log; PR.
 
 ## Runs in flight
-None. No claim cell has run.
+(filled at launch)
 
 ## Stop and success conditions
-Per protocol decision rules. Budget: P1 1,200 s per msolve job, one at a time; P2 same limits;
-P3 about 4 CPU-hours total. Stop a protocol on its control-failure rule.
+One attempt, no retries; stop at exit, OOM or 6 h. Budget ceiling USD 5 (monthly account
+headroom was USD 23.67 at submission).
 
 ## Open questions
-Whether the director accepts the local L0 route (stated deviation from AGENTS.md section 9a).
+None.
