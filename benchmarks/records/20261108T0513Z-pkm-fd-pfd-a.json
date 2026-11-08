@@ -1,6 +1,6 @@
 {
   "branch": "claude/serene-davinci-ujoi58",
-  "closed_utc": null,
+  "closed_utc": "2026-11-08T21:51:20+00:00",
   "commands": [
     {
       "argv": [
@@ -41,7 +41,152 @@
     "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39"
   },
   "id": "20261108T0513Z-pkm-fd-pfd-a",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 10,
+      "name": "stagea/repeat-check-t1-10-agree",
+      "note": "owner decision 1 median-level repeat check: t with run median = first-run median (3,4,4,4,4,5,5,5,5,6), of 10; Amendment 2 not triggered. [pcc:unverified]; RESULTS.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": 10.0,
+      "reference_kind": "baseline",
+      "spread": null,
+      "unit": "count",
+      "value": 10.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "stagea/kummer-p1-median-df-t10",
+      "note": "Kummer m=2 P1 t=10 lower-median last fall degree d_F (closure, exact), A-m2-tower.jsonl. [pcc:unverified]; RESULTS.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 6.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "stagea/kummer-p1-median-df-t11",
+      "note": "t=11 d_F = D (F4): uncapped D=6 refuted, cap 5 not refuting; scratchpad Amendment 7 D scorer (committed scorer reads >=6). Not a blind C-step cell. [pcc:unverified]; RESULTS.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 6.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "stagea/kummer-p1-median-df-lower-bound-t12",
+      "note": "t=12 median d_F censored: >= 6 (closure to cmax 5 without 1; grid_zeros 0). C-step undecided at t=12. [pcc:unverified]; RESULTS.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 6.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "stagea/kummer-p1-median-df-lower-bound-t13",
+      "note": "t=13 median d_F censored: >= 6 (closure to cmax 5 without 1; grid_zeros 0). C-step undecided at t=13. [pcc:unverified]; RESULTS.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 6.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "stagea/kummer-p1-median-df-lower-bound-t14",
+      "note": "t=14 median d_F censored: >= 6 (closure to cmax 5 without 1; grid_zeros 0). C-step undecided at t=14. [pcc:unverified]; RESULTS.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 6.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 3,
+      "name": "stagea/cstep-blind-cells-decided",
+      "note": "C-step (Amendment 6) at blind t=12,13,14: 0 of 3 decided (all undecided: bound >=6 includes c*=6,6,7); holds at non-blind t=11. [pcc:unverified]; RESULTS.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 144,
+      "name": "stagea/g3-disagreements",
+      "note": "gate G3: 144 capped F4 runs (caps d-1 and d on 72 systems, N<=20), 0 disagreements, gates/g3.log. [pcc:unverified]; RESULTS.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 72,
+      "name": "stagea/g2-violations",
+      "note": "gate G2 d_F <= D: 72 draws checked (52 in registered cells), 0 violations. [pcc:unverified]; RESULTS.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "stagea/f4-muladds-kummer-p1-t11",
+      "note": "uncapped F4 (d-A) F_p multiply-adds per draw at t=11 (both draws equal), RAYON_NUM_THREADS 12; compare only with 12-thread rows (Amendment 9). [pcc:unverified]; RESULTS.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 4877847858683.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "stagea/closure-muladds-kummer-p1-t10",
+      "note": "hky closure F_p multiply-adds, t=10 draw 0 (cmax 7; draw 1 660110151033). [pcc:unverified]; RESULTS.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "fmul",
+      "value": 660110148164.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 1,
+      "name": "stagea/job-wall",
+      "note": "pod pfd-a-20261108-p6nzd 17:14:36Z-20:47:48Z on 12 vCPU r6i-class node (Amendment 9); budgets unchanged (1800 s per closure/F4 system, 900 s in gate 3). Host context only. [pcc:unverified]; RESULTS.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "wall_s",
+      "value": 12792.0
+    }
+  ],
   "problem": "study:pkm_falldegree_unblock_20261107:pfd-a",
   "raw": [
     {
@@ -267,18 +412,29 @@
       "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/2e/2e4de1234fe8ba3f1d168cb0c7bbaa1cc4dddd6e7ad074d22a8a8590347977af",
       "sha256": "2e4de1234fe8ba3f1d168cb0c7bbaa1cc4dddd6e7ad074d22a8a8590347977af",
       "uploaded": true
+    },
+    {
+      "bytes": 15561,
+      "path": "research/pkm_falldegree_unblock_20261107/results/R9/analysis/scripts.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/8b/8b746a89d3159a36e597bef2f2b125fcd20355c5fa55aa528c031bb322b5ea5d",
+      "sha256": "8b746a89d3159a36e597bef2f2b125fcd20355c5fa55aa528c031bb322b5ea5d",
+      "uploaded": true
     }
   ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
-    "png": [],
-    "svg": []
+    "pdf": "research/pkm_falldegree_unblock_20261107/results/R9/analysis/pfdA_report.pdf",
+    "png": [
+      "research/pkm_falldegree_unblock_20261107/results/R9/analysis/pfdA_fig1.png"
+    ],
+    "svg": [
+      "research/pkm_falldegree_unblock_20261107/results/R9/analysis/pfdA_fig1.svg"
+    ]
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "pkm-fd-pfd-a",
-  "status": "open",
-  "summary": "",
+  "status": "measured",
+  "summary": "PKM stage A (pfd-a, Amendment 9, 12 vCPU): t<=10 median-level repeat check agrees (3,4,4,4,4,5,5,5,5,6), so the study continues; H-LFD grows, H-FFD fails, H-gap 0/22; C-step undecided at t=12,13,14 (needs Amendment 7 B capped runs); G1-G3 pass, H-null UNRESOLVED",
   "validation": null
 }
