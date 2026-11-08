@@ -50,7 +50,6 @@ multiplications for the start and 16 random jumps, which is a property of the mo
 | D1 bsgs.negation layout | 20 | 5 | 1.0021 | [0.95, 1.05]: inside | 1.0374 | 0 |
 | D1 | 24 | 5 | 1.0005 | inside | 1.0114 | 0 |
 | D1 | 28 | 5 | 1.0001 | inside | 1.0034 | 0 |
-| D3 held-out (best) | 20, 24, 28 | not run | not run | | not run | |
 
 ### No-negation references (D2 context)
 
@@ -84,3 +83,36 @@ on what a free random design would give, not an algorithm.
 - D0 uses an oblivious jump index (seeded PRNG), not an x-dependent walk, as the exact model requires.
 - Set-up costs follow the cost rule in the source header; the conversion to S/rho-neg is the record's, applied as assumed.
 - No D3 result, so the record's Stage 0 question (a design with E at most 0.84 at k = 20 and 28) is open.
+
+## D3 results (run after the amendment; BSGS-class boundary result, outside the IC ratchet) [pcc:unverified]
+
+Commands: the three `d3` lines in `run.sh`, exactly as written (budgets 1000x4, 300x4, 50x4 evaluations; hill-climb seed 1;
+randomised-b seeds 8 / 4 / 2). Train on siblings minus confirm r values; E below is on the five held-out confirm r values.
+Raw: `raw/d3-k{20,24,28}.txt` (the TRAIN lines hold the designs). c chosen by best train score is c = 8 at every k.
+
+| k | c | train |Sigma| frac at sqrt(r) | held-out E | E + set-up/sqrt(r) | RB per point E | RB per class E | residual flag |
+|--:|--:|--:|--:|--:|--:|--:|--:|
+| 20 | 2 | 0.505 | 1.0362 | 1.1384 | 0.8881 | 1.1041 | |
+| 20 | 3 | 0.541 | 0.9954 | 1.1563 | 0.8880 | 0.9954 | |
+| 20 | 4 | 0.582 | 0.9784 | 1.1514 | 0.8881 | 1.0027 | |
+| 20 | 8 | 0.605 | 0.9270 | 1.2658 | 0.8880 | 0.9357 | |
+| 24 | 2 | 0.501 | 0.9742 | 1.0017 | 0.8867 | 1.0713 | |
+| 24 | 3 | 0.549 | 1.0141 | 1.0548 | 0.8867 | 1.0249 | |
+| 24 | 4 | 0.572 | 0.9540 | 1.0049 | 0.8866 | 0.9820 | |
+| 24 | 8 | 0.595 | 0.9358 | 1.0194 | 0.8867 | 0.9386 | |
+| 28 | 2 | 0.500 | 1.0828 | 1.0898 | 0.8864 | 1.0665 | |
+| 28 | 3 | 0.539 | 0.9943 | 1.0050 | 0.8863 | 1.0062 | |
+| 28 | 4 | 0.547 | 0.9837 | 0.9975 | 0.8863 | 0.9880 | |
+| 28 | 8 | 0.582 | 0.9593 | 0.9796 | 0.8863 | 0.9439 | residual 1.8e-4: not ranked |
+
+Controls: D0 0.9211 / 0.9187 / 0.9179, D1 1.0021 / 1.0005 / 1.0001 (E + set-up 1.0374 / 1.0114 / 1.0034) at k = 20 / 24 / 28.
+Randomised-b per point returns every design to the Poisson value 0.886 to 0.888, as required. Per-class randomisation
+(a few full-size b values) leaves E close to the designed value, so the designs' E sits above 0.886 for structural reasons (wasted same-class pairs), not because of small b values.
+
+Reading: no D3 design is below D0 by 5% held-out (best 0.927 against 0.921 at k = 20; D3 is above D0, and no D3 value is
+below the i.i.d. 0.887). Versus the D1 layout, the lowest E + set-up is 0.9975 at k = 28 (c = 4) against 1.0034, and 1.0017 at
+k = 24 (c = 2) against 1.0114: differences below 1%, inside the spread across r (sd up to 0.06), so no separation from D1.
+The k = 32 gate (held-out E below 0.886 at k = 20 and 28) fails; k = 32 was not run.
+
+Implied S / rho-neg at k = 20 (ASSUMED conversion, not measured), c = 8 headline at w = 0 / 0.1 / 1: 0.932 / 0.932 / 0.930;
+c = 4: 0.853 / 0.861 / 0.904; D1 control: 0.774 / 0.789 / 0.867 (all in `raw/d3-k20.txt` CONVERSION lines).
