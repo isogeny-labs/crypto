@@ -1,12 +1,12 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261108T0501Z-mllc-panel",
+  "latest_record": "20261108T0512Z-prime-medium-rho-p4-confirm",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 62,
-    "open": 3
+    "measured": 63,
+    "open": 2
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -3460,6 +3460,58 @@
         }
       ],
       "problem": "rho:koblitz_signed_frobenius_panel",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 1.4639148040047696,
+      "latest": 1.4639148040047696,
+      "latest_derived": {},
+      "metric": "positive_control_ratio",
+      "points": [
+        {
+          "commit": "a11bf5007549",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 576,
+          "record": "20261108T0512Z-prime-medium-rho-p4-confirm",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.443842510909867,
+            1.4862891554596356
+          ],
+          "summary": "P4 confirm (PC + M1-M9, 2160 pairs): frozen verdict inconclusive, gate G3 positive control 1.464 (99% CI [1.438, 1.494]) excludes the designed 1.5; primary theta 1.362 [1.320, 1.405] (descriptive). PC shortfall traced to high planted targets (mean d/r 0.578), hypothesis",
+          "value": 1.4639148040047696
+        }
+      ],
+      "problem": "rho:prime_medium_p4_confirm",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 1.362445350898039,
+      "latest": 1.362445350898039,
+      "latest_derived": {},
+      "metric": "theta_w0",
+      "points": [
+        {
+          "commit": "a11bf5007549",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 2160,
+          "record": "20261108T0512Z-prime-medium-rho-p4-confirm",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.3201856254764677,
+            1.405351464380865
+          ],
+          "summary": "P4 confirm (PC + M1-M9, 2160 pairs): frozen verdict inconclusive, gate G3 positive control 1.464 (99% CI [1.438, 1.494]) excludes the designed 1.5; primary theta 1.362 [1.320, 1.405] (descriptive). PC shortfall traced to high planted targets (mean d/r 0.578), hypothesis",
+          "value": 1.362445350898039
+        }
+      ],
+      "problem": "rho:prime_medium_p4_confirm",
       "unit": "ratio"
     },
     {
