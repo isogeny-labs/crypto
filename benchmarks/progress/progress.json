@@ -1,12 +1,12 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261108T2051Z-curve25519-tw-scaling-k32",
+  "latest_record": "20261108T1825Z-arity-koblitz-m56-a5",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 69,
-    "open": 1
+    "measured": 71,
+    "open": 0
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -3347,6 +3347,29 @@
       "unit": "S"
     },
     {
+      "better": "neutral",
+      "first": 148.0,
+      "latest": 148.0,
+      "latest_derived": {},
+      "metric": "cells_recorded",
+      "points": [
+        {
+          "commit": "001129b99231",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 148,
+          "record": "20261108T1825Z-arity-koblitz-m56-a5",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Koblitz chained-S3 m=5/6, 148/148 cells (attempts 4+5, Xeon 8488C, no L2: seconds diagnostic; launch wrapper killed after submit, see launch/receipts/CARD-arity-launch-koblitz-a5/NOTE.md; recorded command is the frozen analysis re-run). No m>=5 public cell decides at n=23 (K1 falsified); every n=83 m=5/6 public cell capped at 1800 s (K4 supported for chain-s3; orbit engine not_evaluable under rule 4); chain-s3 decides only proved-UNSAT cells at n=29,37 (no relation found). No matched rho; no IC improvement.",
+          "value": 148.0
+        }
+      ],
+      "problem": "ic:koblitz-chain-s3-arity-m5m6",
+      "unit": "count"
+    },
+    {
       "better": "lower",
       "first": 8.0,
       "latest": 2.0,
@@ -5312,6 +5335,286 @@
       ],
       "problem": "study:ml_learnability_control_20261107",
       "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 660110148164.0,
+      "latest": 660110148164.0,
+      "latest_derived": {},
+      "metric": "stagea/closure-muladds-kummer-p1-t10",
+      "points": [
+        {
+          "commit": "75cf6c230728",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 2,
+          "record": "20261108T0513Z-pkm-fd-pfd-a",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "PKM stage A (pfd-a, Amendment 9, 12 vCPU): t<=10 median-level repeat check agrees (3,4,4,4,4,5,5,5,5,6), so the study continues; H-LFD grows, H-FFD fails, H-gap 0/22; C-step undecided at t=12,13,14 (needs Amendment 7 B capped runs); G1-G3 pass, H-null UNRESOLVED",
+          "value": 660110148164.0
+        }
+      ],
+      "problem": "study:pkm_falldegree_unblock_20261107:pfd-a",
+      "unit": "fmul"
+    },
+    {
+      "better": "neutral",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "stagea/cstep-blind-cells-decided",
+      "points": [
+        {
+          "commit": "75cf6c230728",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 3,
+          "record": "20261108T0513Z-pkm-fd-pfd-a",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "PKM stage A (pfd-a, Amendment 9, 12 vCPU): t<=10 median-level repeat check agrees (3,4,4,4,4,5,5,5,5,6), so the study continues; H-LFD grows, H-FFD fails, H-gap 0/22; C-step undecided at t=12,13,14 (needs Amendment 7 B capped runs); G1-G3 pass, H-null UNRESOLVED",
+          "value": 0.0
+        }
+      ],
+      "problem": "study:pkm_falldegree_unblock_20261107:pfd-a",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 4877847858683.0,
+      "latest": 4877847858683.0,
+      "latest_derived": {},
+      "metric": "stagea/f4-muladds-kummer-p1-t11",
+      "points": [
+        {
+          "commit": "75cf6c230728",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 2,
+          "record": "20261108T0513Z-pkm-fd-pfd-a",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "PKM stage A (pfd-a, Amendment 9, 12 vCPU): t<=10 median-level repeat check agrees (3,4,4,4,4,5,5,5,5,6), so the study continues; H-LFD grows, H-FFD fails, H-gap 0/22; C-step undecided at t=12,13,14 (needs Amendment 7 B capped runs); G1-G3 pass, H-null UNRESOLVED",
+          "value": 4877847858683.0
+        }
+      ],
+      "problem": "study:pkm_falldegree_unblock_20261107:pfd-a",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "stagea/g2-violations",
+      "points": [
+        {
+          "commit": "75cf6c230728",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 72,
+          "record": "20261108T0513Z-pkm-fd-pfd-a",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "PKM stage A (pfd-a, Amendment 9, 12 vCPU): t<=10 median-level repeat check agrees (3,4,4,4,4,5,5,5,5,6), so the study continues; H-LFD grows, H-FFD fails, H-gap 0/22; C-step undecided at t=12,13,14 (needs Amendment 7 B capped runs); G1-G3 pass, H-null UNRESOLVED",
+          "value": 0.0
+        }
+      ],
+      "problem": "study:pkm_falldegree_unblock_20261107:pfd-a",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "stagea/g3-disagreements",
+      "points": [
+        {
+          "commit": "75cf6c230728",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 144,
+          "record": "20261108T0513Z-pkm-fd-pfd-a",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "PKM stage A (pfd-a, Amendment 9, 12 vCPU): t<=10 median-level repeat check agrees (3,4,4,4,4,5,5,5,5,6), so the study continues; H-LFD grows, H-FFD fails, H-gap 0/22; C-step undecided at t=12,13,14 (needs Amendment 7 B capped runs); G1-G3 pass, H-null UNRESOLVED",
+          "value": 0.0
+        }
+      ],
+      "problem": "study:pkm_falldegree_unblock_20261107:pfd-a",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 12792.0,
+      "latest": 12792.0,
+      "latest_derived": {},
+      "metric": "stagea/job-wall",
+      "points": [
+        {
+          "commit": "75cf6c230728",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 1,
+          "record": "20261108T0513Z-pkm-fd-pfd-a",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "PKM stage A (pfd-a, Amendment 9, 12 vCPU): t<=10 median-level repeat check agrees (3,4,4,4,4,5,5,5,5,6), so the study continues; H-LFD grows, H-FFD fails, H-gap 0/22; C-step undecided at t=12,13,14 (needs Amendment 7 B capped runs); G1-G3 pass, H-null UNRESOLVED",
+          "value": 12792.0
+        }
+      ],
+      "problem": "study:pkm_falldegree_unblock_20261107:pfd-a",
+      "unit": "wall_s"
+    },
+    {
+      "better": "neutral",
+      "first": 6.0,
+      "latest": 6.0,
+      "latest_derived": {},
+      "metric": "stagea/kummer-p1-median-df-lower-bound-t12",
+      "points": [
+        {
+          "commit": "75cf6c230728",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 2,
+          "record": "20261108T0513Z-pkm-fd-pfd-a",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "PKM stage A (pfd-a, Amendment 9, 12 vCPU): t<=10 median-level repeat check agrees (3,4,4,4,4,5,5,5,5,6), so the study continues; H-LFD grows, H-FFD fails, H-gap 0/22; C-step undecided at t=12,13,14 (needs Amendment 7 B capped runs); G1-G3 pass, H-null UNRESOLVED",
+          "value": 6.0
+        }
+      ],
+      "problem": "study:pkm_falldegree_unblock_20261107:pfd-a",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 6.0,
+      "latest": 6.0,
+      "latest_derived": {},
+      "metric": "stagea/kummer-p1-median-df-lower-bound-t13",
+      "points": [
+        {
+          "commit": "75cf6c230728",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 2,
+          "record": "20261108T0513Z-pkm-fd-pfd-a",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "PKM stage A (pfd-a, Amendment 9, 12 vCPU): t<=10 median-level repeat check agrees (3,4,4,4,4,5,5,5,5,6), so the study continues; H-LFD grows, H-FFD fails, H-gap 0/22; C-step undecided at t=12,13,14 (needs Amendment 7 B capped runs); G1-G3 pass, H-null UNRESOLVED",
+          "value": 6.0
+        }
+      ],
+      "problem": "study:pkm_falldegree_unblock_20261107:pfd-a",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 6.0,
+      "latest": 6.0,
+      "latest_derived": {},
+      "metric": "stagea/kummer-p1-median-df-lower-bound-t14",
+      "points": [
+        {
+          "commit": "75cf6c230728",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 2,
+          "record": "20261108T0513Z-pkm-fd-pfd-a",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "PKM stage A (pfd-a, Amendment 9, 12 vCPU): t<=10 median-level repeat check agrees (3,4,4,4,4,5,5,5,5,6), so the study continues; H-LFD grows, H-FFD fails, H-gap 0/22; C-step undecided at t=12,13,14 (needs Amendment 7 B capped runs); G1-G3 pass, H-null UNRESOLVED",
+          "value": 6.0
+        }
+      ],
+      "problem": "study:pkm_falldegree_unblock_20261107:pfd-a",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 6.0,
+      "latest": 6.0,
+      "latest_derived": {},
+      "metric": "stagea/kummer-p1-median-df-t10",
+      "points": [
+        {
+          "commit": "75cf6c230728",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 2,
+          "record": "20261108T0513Z-pkm-fd-pfd-a",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "PKM stage A (pfd-a, Amendment 9, 12 vCPU): t<=10 median-level repeat check agrees (3,4,4,4,4,5,5,5,5,6), so the study continues; H-LFD grows, H-FFD fails, H-gap 0/22; C-step undecided at t=12,13,14 (needs Amendment 7 B capped runs); G1-G3 pass, H-null UNRESOLVED",
+          "value": 6.0
+        }
+      ],
+      "problem": "study:pkm_falldegree_unblock_20261107:pfd-a",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 6.0,
+      "latest": 6.0,
+      "latest_derived": {},
+      "metric": "stagea/kummer-p1-median-df-t11",
+      "points": [
+        {
+          "commit": "75cf6c230728",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 2,
+          "record": "20261108T0513Z-pkm-fd-pfd-a",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "PKM stage A (pfd-a, Amendment 9, 12 vCPU): t<=10 median-level repeat check agrees (3,4,4,4,4,5,5,5,5,6), so the study continues; H-LFD grows, H-FFD fails, H-gap 0/22; C-step undecided at t=12,13,14 (needs Amendment 7 B capped runs); G1-G3 pass, H-null UNRESOLVED",
+          "value": 6.0
+        }
+      ],
+      "problem": "study:pkm_falldegree_unblock_20261107:pfd-a",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 10.0,
+      "latest": 10.0,
+      "latest_derived": {
+        "value_over_reference": 1.0
+      },
+      "metric": "stagea/repeat-check-t1-10-agree",
+      "points": [
+        {
+          "commit": "75cf6c230728",
+          "date": "2026-11-08",
+          "derived": {
+            "value_over_reference": 1.0
+          },
+          "n": 10,
+          "record": "20261108T0513Z-pkm-fd-pfd-a",
+          "reference": 10.0,
+          "reference_kind": "baseline",
+          "spread": null,
+          "summary": "PKM stage A (pfd-a, Amendment 9, 12 vCPU): t<=10 median-level repeat check agrees (3,4,4,4,4,5,5,5,5,6), so the study continues; H-LFD grows, H-FFD fails, H-gap 0/22; C-step undecided at t=12,13,14 (needs Amendment 7 B capped runs); G1-G3 pass, H-null UNRESOLVED",
+          "value": 10.0
+        }
+      ],
+      "problem": "study:pkm_falldegree_unblock_20261107:pfd-a",
+      "unit": "count"
     },
     {
       "better": "lower",
