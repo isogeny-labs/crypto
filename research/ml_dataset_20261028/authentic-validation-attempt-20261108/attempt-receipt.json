@@ -1,0 +1,115 @@
+{
+  "source_commit": "1cfe91d3173f41a0f7d8448f4afe278cf0d9663f",
+  "authorization_sha256": "7daf1c4cb354793c6cc02f02ebef45030f460a822ea587fbd297ffe3d963b9ae",
+  "source_manifest_sha256": "8f9f91c084fbd272d927f8ebb11682ebcec3f9ad13b3c7f401aa286062ab93dc",
+  "commands": [
+    {
+      "label": "before-head",
+      "argv": [
+        "/usr/bin/git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "timeout_seconds": 60.0,
+      "memory_limit_bytes": null,
+      "pid": 2557190,
+      "start_identity": {
+        "start": 16184931,
+        "ppid": 2557182,
+        "pgid": 2557190,
+        "state": "D"
+      },
+      "exit_code": 0,
+      "timed_out": false,
+      "log_limit_exceeded": false,
+      "elapsed_seconds": 0.13709212400135584,
+      "cleanup": {
+        "killed": [],
+        "survivors": {}
+      },
+      "stdout_sha256": "38baa430ed90c8a70394dead92a702bca4e1ef8463f1e4925550dc3c430128ee",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "before-status",
+      "argv": [
+        "/usr/bin/git",
+        "status",
+        "--porcelain",
+        "--untracked-files=all"
+      ],
+      "timeout_seconds": 60.0,
+      "memory_limit_bytes": null,
+      "pid": 2557196,
+      "start_identity": {
+        "start": 16184954,
+        "ppid": 2557182,
+        "pgid": 2557196,
+        "state": "D"
+      },
+      "exit_code": 0,
+      "timed_out": false,
+      "log_limit_exceeded": false,
+      "elapsed_seconds": 9.520376960019348,
+      "cleanup": {
+        "killed": [],
+        "survivors": {}
+      },
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "cargo-lib-tests",
+      "argv": [
+        "/home/ec2-user/.cargo/bin/cargo",
+        "+1.98",
+        "test",
+        "--release",
+        "--lib",
+        "--no-run",
+        "--locked",
+        "--offline",
+        "--message-format=json"
+      ],
+      "timeout_seconds": 1200.0,
+      "memory_limit_bytes": null,
+      "pid": 2557524,
+      "start_identity": {
+        "start": 16186100,
+        "ppid": 2557182,
+        "pgid": 2557524,
+        "state": "D"
+      },
+      "exit_code": 101,
+      "timed_out": false,
+      "log_limit_exceeded": false,
+      "elapsed_seconds": 323.0577288630011,
+      "cleanup": {
+        "killed": [],
+        "survivors": {}
+      },
+      "stdout_sha256": "0f26292d7f2c095af3d0eacac26815f6b2d7249a4e1780b9f63d22fc2a51f5e7",
+      "stderr_sha256": "1a91e19980bddb6f31fcf8f48ddd6e931882634616844346b11ff4a0ea9746e3"
+    }
+  ],
+  "success": false,
+  "cloud_jobs": 0,
+  "retries": 0,
+  "cache_reused": "/var/tmp/crypto-ml-search-recovery-target-20261107",
+  "host_build_lock": "/var/tmp/spot-host-heavy-build.lock",
+  "lock_acquired_exclusive_nonblocking": true,
+  "prior_binary": {
+    "path": "/var/tmp/crypto-ml-search-recovery-target-20261107/release/crypto",
+    "sha256": "a49e6b0bd071091c49a05fac37ed6d715c981831bb9546d18fd3a473539bd3c1",
+    "archive": "/home/ec2-user/ml-dataset-resume-20261029/owned-authentic-validation-attempt-20261107/prior-release-crypto",
+    "bytes": 53654832
+  },
+  "error": "RuntimeError: bounded command failed: cargo-lib-tests",
+  "final_cleanup": {
+    "killed": [],
+    "survivors": {}
+  },
+  "elapsed_seconds": 335.69249759201193,
+  "overall_deadline_exceeded": false,
+  "host_lock_release": "after final cleanup and receipt serialization"
+}
