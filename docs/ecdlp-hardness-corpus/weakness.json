@@ -2,14 +2,14 @@
   "schema": "ecdlp.weakness-analysis/v1",
   "corpus_version": "2026-11-01",
   "counts": {
-    "nodes": 612,
+    "nodes": 613,
     "status_inflation": 17,
     "model_scope_leaps": 9,
     "contagious_sources": 23,
     "hidden_assumption_clusters": 19,
     "unwired_dependences": 11,
     "route_closures_on_weak_support": 16,
-    "live_obstructions": 53,
+    "live_obstructions": 54,
     "author_flagged": 8,
     "attack_queue": 248,
     "hygiene_queue": 114
@@ -1150,11 +1150,16 @@
       "refuted": [
         "CLAIM-JV-ASSUMPTION1-ALL-CURVES"
       ],
-      "refuted_fraction": 0.5,
+      "refuted_fraction": 0.333,
       "exposed": [
         {
           "id": "CEX-SUBFIELD-FACTOR-BASE",
           "status": "proved_internal_unreviewed",
+          "impact": 0
+        },
+        {
+          "id": "MEAS-PQ2-MSOLVE-N37-STEP5",
+          "status": "measured",
           "impact": 0
         }
       ]
@@ -2022,6 +2027,16 @@
       "statement": "A published reading of degree 5 at n = 45, m = t = 2 on the diagonal with Semaev's subspace contradicts d_F4 <= 4 if KY's step degree equals Semaev's d_F4; not a committed certificate (repository S6 keeps the off-diagonal failure NOT established)."
     },
     {
+      "edge": "R6-006",
+      "relation": "obstructs",
+      "from": "MEAS-PQ2-MSOLVE-N37-STEP5",
+      "from_status": "measured",
+      "to": "HEUR-SP-SEMAEV15-ASSUMPTION1",
+      "to_status": "heuristic",
+      "impact": 1,
+      "statement": "On the diagonal k = ceil(n/m) at m = 2, n = 37, msolve's F4 runs a degree-5 step: d_F4 > 4 for this implementation (Semaev's quantity is Magma's)."
+    },
+    {
       "edge": "E-GG-050",
       "relation": "does_not_cover",
       "from": "THM-GG-MV-MIXING",
@@ -2545,6 +2560,20 @@
       "score": 3.046
     },
     {
+      "id": "HEUR-SP-SEMAEV15-ASSUMPTION1",
+      "label": "Semaev 2015 Assumption 1: d_F4 <= 4",
+      "status": "heuristic",
+      "model": "algebraic_coordinate",
+      "impact": 1,
+      "inflates": 0,
+      "contagion": 2,
+      "obstructed": 2,
+      "breakability": 0.5,
+      "cost": "measurement",
+      "action": "measure on a scaling family without censoring",
+      "score": 2
+    },
+    {
       "id": "HEUR-BK-GG-DECOMP-PROPORTION",
       "label": "Decomposable proportion ~1/n! (l=1) or q^(lk-n)/k!",
       "status": "heuristic",
@@ -2641,20 +2670,6 @@
       "cost": "discharge conditions",
       "action": "attack the weakest condition first; each condition is its own node",
       "score": 1.495
-    },
-    {
-      "id": "HEUR-SP-SEMAEV15-ASSUMPTION1",
-      "label": "Semaev 2015 Assumption 1: d_F4 <= 4",
-      "status": "heuristic",
-      "model": "algebraic_coordinate",
-      "impact": 1,
-      "inflates": 0,
-      "contagion": 2,
-      "obstructed": 1,
-      "breakability": 0.5,
-      "cost": "measurement",
-      "action": "measure on a scaling family without censoring",
-      "score": 1.43
     },
     {
       "id": "HEUR-PF-PKM-AUX-CURVE-SEARCH",

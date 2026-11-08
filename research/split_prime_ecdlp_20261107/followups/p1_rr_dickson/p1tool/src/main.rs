@@ -9,6 +9,9 @@
 //!   `research/ic_tree_gluing_20261103/round7_rr/genrr.sing` (odd m = 2h-1).
 //! - `t`:  the cherry-tree chain system, a port of arm T of
 //!   `research/ic_tree_gluing_20261103/gen.sing` (m = 2..6).
+//! - `f`:  the full-symmetric system, a port of arm F of gen.sing (m = 3 only):
+//!   S4 = Res_X(S3(x1,x2,X), S3(X,x3,xR)) in (e1,e2,e3) with the degree-3
+//!   remainder chain of the membership tower.
 //!
 //! Membership towers:
 //! - `kummer`:  roots w in mu_{2^t} (needs 2^t | p-1), x = g*w, step y -> y^2,
@@ -1393,6 +1396,155 @@ fn build_t(i: &Inst) -> System {
     System { names: nm, eqs, plant: val }
 }
 
+/// S4(x1,x2,x3; x_R) = Res_X(S3(x1,x2,X), S3(X,x3,x_R)) rewritten in the
+/// elementary symmetric functions E1, E2, E3 of (x1,x2,x3), as gen.sing's
+/// "S4 (arm F)" section computes it (x_R numeric here; gen.sing keeps it
+/// symbolic and substitutes x_R afterwards, which gives the same polynomial).
+/// Returns {(i,j,k) -> coefficient of E1^i E2^j E3^k}.
+fn s4_sym(f: F, a: u64, b: u64, xr: u64) -> BTreeMap<(u16, u16, u16), u64> {
+    // variables x1, x2, x3, X
+    let n = 4;
+    let (x1, x2, x3, xx) = (MP::var(n, 0), MP::var(n, 1), MP::var(n, 2), MP::var(n, 3));
+    let xrp = MP::konst(n, xr);
+    let p1 = s3(f, n, &x1, &x2, &xx, a, b);
+    let p2 = s3(f, n, &xx, &x3, &xrp, a, b);
+    // coefficients in X (degree <= 2), as 3-variable polynomials in x1, x2, x3
+    let cx = |p: &MP| -> Vec<MP> {
+        let mut v = vec![MP::zero(3); 3];
+        for (e, &c) in &p.t {
+            let d = e[3] as usize;
+            assert!(d <= 2, "S3 not quadratic in X");
+            v[d].addterm(f, e[..3].to_vec(), c);
+        }
+        v
+    };
+    let (fa, fb) = (cx(&p1), cx(&p2));
+    // Sylvester determinant of two quadratics f2 X^2 + f1 X + f0, g2 X^2 + g1 X + g0:
+    // (f2 g0 - f0 g2)^2 - (f2 g1 - f1 g2)(f1 g0 - f0 g1)
+    let u = fa[2].mul(f, &fb[0]).sub(f, &fa[0].mul(f, &fb[2]));
+    let v = fa[2].mul(f, &fb[1]).sub(f, &fa[1].mul(f, &fb[2]));
+    let w = fa[1].mul(f, &fb[0]).sub(f, &fa[0].mul(f, &fb[1]));
+    let mut rem = u.mul(f, &u).sub(f, &v.mul(f, &w));
+    if rem.is_zero() {
+        die("S4 vanished");
+    }
+    // symmetric reduction: lex-leading x1^a x2^b x3^c -> E1^(a-b) E2^(b-c) E3^c
+    let e1 = MP::var(3, 0).add(f, &MP::var(3, 1)).add(f, &MP::var(3, 2));
+    let e2 = MP::var(3, 0).mul(f, &MP::var(3, 1)).add(f, &MP::var(3, 0).mul(f, &MP::var(3, 2))).add(f, &MP::var(3, 1).mul(f, &MP::var(3, 2)));
+    let e3 = MP::var(3, 0).mul(f, &MP::var(3, 1)).mul(f, &MP::var(3, 2));
+    let pw = |base: &MP, k: u16| -> MP {
+        let mut r = MP::konst(3, 1);
+        for _ in 0..k {
+            r = r.mul(f, base);
+        }
+        r
+    };
+    let mut out: BTreeMap<(u16, u16, u16), u64> = BTreeMap::new();
+    while let Some((e, &c)) = rem.t.iter().next_back() {
+        let e = e.clone();
+        if !(e[0] >= e[1] && e[1] >= e[2]) {
+            die("S4 not symmetric?");
+        }
+        let key = (e[0] - e[1], e[1] - e[2], e[2]);
+        let term = pw(&e1, key.0).mul(f, &pw(&e2, key.1)).mul(f, &pw(&e3, key.2)).scale(f, c);
+        rem = rem.sub(f, &term);
+        out.insert(key, c);
+    }
+    out
+}
+
+/// Arm F of gen.sing (m = 3): the full-symmetric system in (e1, e2, e3) with
+/// the degree-3 remainder chain, for the Kummer or Dickson tower.
+fn build_f(i: &Inst) -> System {
+    let f = F::new(i.p);
+    let (m, t) = (i.m, i.t);
+    if m != 3 {
+        die("f system is defined for m = 3 only (gen.sing arm F, S4 in e1,e2,e3)");
+    }
+    if t < 2 {
+        die("f system needs t >= 2");
+    }
+    let k = 3usize;
+    let mut nm: Vec<String> = vec!["e1".into(), "e2".into(), "e3".into()];
+    for j in 1..t {
+        if (1usize << j) >= k {
+            for r in 0..k {
+                nm.push(format!("fr{j}_{r}"));
+            }
+        }
+    }
+    let n = nm.len();
+    let v = |s: &str| MP::var(n, names_index(&nm, s));
+    let shift = i.kind.shift();
+    let es = [v("e1"), v("e2"), v("e3")];
+    let mut eqs: Vec<MP> = vec![];
+    // remainder chain: R_0 = T, R_j = R_{j-1}^2 - shift mod Q, Q = T^3 - e1 T^2 + e2 T - e3
+    let mut r: ZP = zmono(n, 1);
+    for j in 1..=t {
+        let sq = zsub(f, n, &zmul(f, n, &r, &r), &zconst(n, shift));
+        if j < t && (1usize << j) < k {
+            r = sq; // already reduced: no variables (gen.sing mchain)
+            continue;
+        }
+        // reduce modulo Q: T^d -> T^(d-3) (e1 T^2 - e2 T + e3)
+        let mut red = sq.clone();
+        red.resize(red.len().max(k), MP::zero(n));
+        for d in (k..red.len()).rev() {
+            let c = std::mem::replace(&mut red[d], MP::zero(n));
+            if c.is_zero() {
+                continue;
+            }
+            for (ii, e) in es.iter().enumerate() {
+                // T^k = sum_ii (-1)^ii e_{ii+1} T^{k-1-ii}
+                let term = c.mul(f, e);
+                let tgt = d - 1 - ii;
+                red[tgt] = if ii % 2 == 0 { red[tgt].add(f, &term) } else { red[tgt].sub(f, &term) };
+            }
+        }
+        let red = ztrim(red);
+        let rsym: ZP = if j == t {
+            zconst(n, i.c)
+        } else {
+            (0..k).map(|q| v(&format!("fr{j}_{q}"))).collect()
+        };
+        push_coeffs(&mut eqs, &zsub(f, n, &red, &rsym));
+        r = rsym;
+    }
+    // S4 with E_i -> g^i e_i
+    let g = i.scale;
+    let mut s4 = MP::zero(n);
+    for (&(p1, p2, p3), &c) in &s4_sym(f, i.a, i.b, i.xr) {
+        let mut e = vec![0u16; n];
+        e[0] = p1;
+        e[1] = p2;
+        e[2] = p3;
+        let gk = f.pow(g, (p1 as u64) + 2 * (p2 as u64) + 3 * (p3 as u64));
+        s4.addterm(f, e, f.mul(c, gk));
+    }
+    eqs.push(s4);
+    // ── planted assignment
+    let mut val = vec![u64::MAX; n];
+    let (w1, w2, w3) = (i.w[0], i.w[1], i.w[2]);
+    val[0] = f.add(f.add(w1, w2), w3);
+    val[1] = f.add(f.add(f.mul(w1, w2), f.mul(w1, w3)), f.mul(w2, w3));
+    val[2] = f.mul(f.mul(w1, w2), w3);
+    let mut qn: UP = vec![1];
+    for &w in &i.w {
+        qn = umul(f, &qn, &vec![f.neg(w), 1]);
+    }
+    let mut rr: UP = vec![0, 1];
+    for j in 1..t {
+        rr = udivrem(f, &usubc(f, &umul(f, &rr, &rr), shift), &qn).1;
+        if (1usize << j) >= k {
+            for q in 0..k {
+                val[names_index(&nm, &format!("fr{j}_{q}"))] = *rr.get(q).unwrap_or(&0);
+            }
+        }
+    }
+    assert!(val.iter().all(|&x| x != u64::MAX), "planted assignment incomplete");
+    System { names: nm, eqs, plant: val }
+}
+
 // ───────────────────────────── output ──────────────────────────────────────
 
 fn ms_text(sys: &System, p: u64) -> String {
@@ -1674,7 +1826,10 @@ fn cmd_count(m: &HashMap<String, String>) {
 }
 
 fn cmd_emit(m: &HashMap<String, String>) {
-    let system = m.get("system").map(|s| s.as_str()).unwrap_or_else(|| die("missing --system rr|t"));
+    let system = m.get("system").map(|s| s.as_str()).unwrap_or_else(|| die("missing --system rr|t|f"));
+    if system == "f" && req_u(m, "m") != 3 {
+        die("--system f is defined for m = 3 only");
+    }
     let kind = match m.get("kind").map(|s| s.as_str()) {
         Some("kummer") => Kind::Kummer,
         Some("dickson") => Kind::Dickson,
@@ -1697,7 +1852,8 @@ fn cmd_emit(m: &HashMap<String, String>) {
     let sys = match system {
         "rr" => build_rr(&inst),
         "t" => build_t(&inst),
-        _ => die("--system rr|t"),
+        "f" => build_f(&inst),
+        _ => die("--system rr|t|f"),
     };
     let f = F::new(inst.p);
     planted_check(&sys, f);
@@ -1765,6 +1921,9 @@ fn cmd_check_gb(m: &HashMap<String, String>) {
 /// round7_rr/SYSTEMS.sha256 for genrr.sing's output on it.
 const R7_FILE: &str = "# curve\n786433 779083 163026 780070\n3 4 0 206735 241748 388249 570203 191580 191580\n";
 const R7_M3T4_RR_SHA: &str = "2ceb4c5970c27253ec12844303164715d8f4e3e53b7f7bff249885757b82385a";
+/// sha256 of gen.sing's (unmodified, Singular 4.3.2) arm-F output m3_t4_k0_F.ms on the
+/// same instance; calibration/round2/controlA/controlA_F.txt.
+const R7_M3T4_F_SHA: &str = "16589edffb43504a4861596e9bb8c30adab0654a5d9ee2fc51a6b37cd3c3536f";
 
 fn cmd_selftest() {
     let mut n = 0;
@@ -1842,6 +2001,10 @@ fn cmd_selftest() {
         assert_eq!(sha256_hex(ms_text(&sys, 786433).as_bytes()), R7_M3T4_RR_SHA, "RR m3t4 differs from genrr.sing");
         let st = build_t(&inst);
         planted_check(&st, F::new(786433));
+        let sf = build_f(&inst);
+        planted_check(&sf, F::new(786433));
+        assert_eq!(sha256_hex(ms_text(&sf, 786433).as_bytes()), R7_M3T4_F_SHA, "F m3t4 differs from gen.sing");
+        assert_eq!((sf.names.len(), sf.eqs.len()), (9, 10), "F m3t4 size");
         n += 1;
     }
     // planted systems on sampled instances, both kinds, both systems
@@ -1858,6 +2021,36 @@ fn cmd_selftest() {
             let inst = sample_instance(p, a, b, kind, mm, t, None, 11);
             planted_check(&build_rr(&inst), f);
             planted_check(&build_t(&inst), f);
+            // arm F on the same instance, t = 3 and the cell's t
+            planted_check(&build_f(&inst), f);
+            let inst3 = sample_instance(p, a, b, kind, mm, 3, None, 11);
+            let f3 = build_f(&inst3);
+            planted_check(&f3, f);
+            assert_eq!((f3.names.len(), f3.eqs.len()), (6, 7), "F m3t3 size");
+        }
+        n += 1;
+    }
+    // S4 in (e1,e2,e3) vanishes at random 3-term decompositions (independent of gen.sing)
+    {
+        let p = 786433u64;
+        let f = F::new(p);
+        let cv = Curve { f, a: 779083, b: 163026 };
+        let mut rng = Rng(0xF4);
+        for _ in 0..20 {
+            let pts: Vec<Pt> = (0..3).map(|_| cv.random_point(&mut rng)).collect();
+            let r = pts.iter().fold(None, |acc, &q| cv.add(acc, q));
+            let Some((xr, _)) = r else { continue };
+            let s4 = s4_sym(f, cv.a, cv.b, xr);
+            let xs: Vec<u64> = pts.iter().map(|q| q.unwrap().0).collect();
+            let e = [
+                f.add(f.add(xs[0], xs[1]), xs[2]),
+                f.add(f.add(f.mul(xs[0], xs[1]), f.mul(xs[0], xs[2])), f.mul(xs[1], xs[2])),
+                f.mul(f.mul(xs[0], xs[1]), xs[2]),
+            ];
+            let val = s4.iter().fold(0, |acc, (&(i, j, k), &c)| {
+                f.add(acc, f.mul(c, f.mul(f.pow(e[0], i as u64), f.mul(f.pow(e[1], j as u64), f.pow(e[2], k as u64)))))
+            });
+            assert_eq!(val, 0, "S4 does not vanish at a decomposition");
         }
         n += 1;
     }

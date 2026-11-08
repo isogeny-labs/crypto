@@ -1,0 +1,42 @@
+card: CARD-p1-r2-a (sha256 9c7dcb6a9e742a08103e3f6dfee36f37ee5b08a4aceb0305daf63192891cb2c6)
+commit: d6619e21e4abba04812f72384a88c90a84640f54
+receipt: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-r2a.receipt.json sha256 d2ccb6e6b95931a59820df26c74942e085e07370381763d820194f7ef64dfeed
+status: completed
+command 1 (rustc-version): ["rustc", "--version"] exit 0 (0.06 s) succeeded
+  stdout sha256 ac31499b5910ed7ddbf1a62e57e03c1d0ca49fa78efc075b291afa8d192a4d44; last 1 lines:
+    rustc 1.97.0 (2d8144b78 2026-07-07)
+  output research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-r2a.rustc.stdout: ac31499b5910ed7ddbf1a62e57e03c1d0ca49fa78efc075b291afa8d192a4d44
+command 2 (build-p1tool): ["cargo", "build", "--release", "--locked"] in research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/p1tool exit 0 (0.104 s) succeeded
+  stdout sha256 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; last 0 lines:
+  stderr last 1 lines:
+        Finished `release` profile [optimized] target(s) in 0.03s
+  output research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-r2a.build.stdout: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+command 3 (run-cells): ["bash", "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/calibration/run_cells_r2a.sh"] exit 0 (6882.612 s) succeeded
+  stdout sha256 6fad0ce1282fe3da695ef68360e9677c9eda0461b22af87ef6900d7ddf2b2c6f; last 20 lines:
+    job 11 R2c K0_m3_t4 f seed 1 "status":"ok" exit=0 wall=.171711017
+    job 12 R2c K0_m3_t4 f seed 2 "status":"ok" exit=0 wall=.210233199
+    job 13 R2c D24_m3_t5 f seed 1 "status":"ok" exit=0 wall=27.491727548
+    job 14 R2c D24_m3_t5 f seed 2 "status":"ok" exit=0 wall=25.055142569
+    job 15 R2c D31_m3_t5 f seed 1 "status":"ok" exit=0 wall=25.501745616
+    job 16 R2c D31_m3_t5 f seed 2 "status":"ok" exit=0 wall=23.947535603
+    job 17 R2c K0_m3_t5 f seed 1 "status":"ok" exit=0 wall=24.502808385
+    job 18 R2c K0_m3_t5 f seed 2 "status":"ok" exit=0 wall=24.987789799
+    job 19 R2a D24_m3_t5 t seed 1 "status":"ok" exit=0 wall=381.530611050
+    job 20 R2a D24_m3_t5 t seed 2 "status":"ok" exit=0 wall=388.547746276
+    job 21 R2a D31_m3_t5 t seed 1 "status":"ok" exit=0 wall=360.646538770
+    job 22 R2a D31_m3_t5 t seed 2 "status":"ok" exit=0 wall=384.662274805
+    job 23 R2a K0_m3_t5 t seed 1 "status":"ok" exit=0 wall=367.525056842
+    job 24 R2a K0_m3_t5 t seed 2 "status":"ok" exit=0 wall=356.779075027
+    job 25 R2a D24_m5_t3 t seed 2 "status":"cap"   6    9356   75910   32966 x 30939      10.56%     7216 new    2140 zeroexit=139 wall=2212.931921446
+    job 26 R2a D24_m5_t3 t seed 5 "status":"cap"   6    9356   75910   32966 x 30939      10.56%     7216 new    2140 zeroexit=139 wall=2276.641131545
+    RUN_COMPLETE run_dir=research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/runs/run-r2a-20261108T053528Z jobs=26
+    fd17970d63fe8e89c0dbdc008bba8a91f765754334a8da8232e730057bc5211e  research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/runs/run-r2a-20261108T053528Z/provenance.txt
+    4816baabca61905085498196e143ed1f03788528758f9f783d209577947f0966  research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/runs/run-r2a-20261108T053528Z/jobs.tsv
+    5f66612d0535dfb4289490a7d05a63217791ab9be8e24403e811dac2f30ec758  research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/runs/run-r2a-20261108T053528Z/parsed.jsonl
+  stderr last 2 lines:
+    /home/user/crypto/research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/calibration/msolve_cell.sh: line 10: 23613 Segmentation fault      ( ulimit -v "${VLIMIT:-1572864}"; nice -n 10 timeout "${TLIMIT:-1200}" msolve -g 2 -t 1 -v 2 -f "$in" -o "$gb" ) > "$log" 2>&1
+    /home/user/crypto/research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/calibration/msolve_cell.sh: line 10: 25160 Segmentation fault      ( ulimit -v "${VLIMIT:-1572864}"; nice -n 10 timeout "${TLIMIT:-1200}" msolve -g 2 -t 1 -v 2 -f "$in" -o "$gb" ) > "$log" 2>&1
+  output research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-r2a.run.stdout: 6fad0ce1282fe3da695ef68360e9677c9eda0461b22af87ef6900d7ddf2b2c6f
+  output research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/runs/run-r2a-20261108T053528Z/provenance.txt: fd17970d63fe8e89c0dbdc008bba8a91f765754334a8da8232e730057bc5211e
+  output research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/runs/run-r2a-20261108T053528Z/jobs.tsv: 4816baabca61905085498196e143ed1f03788528758f9f783d209577947f0966
+  output research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/runs/run-r2a-20261108T053528Z/parsed.jsonl: 5f66612d0535dfb4289490a7d05a63217791ab9be8e24403e811dac2f30ec758

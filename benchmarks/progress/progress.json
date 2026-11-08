@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261108T0449Z-ecld-panel",
+  "latest_record": "20261108T0538Z-split-prime-p1-r2a-armf-caps",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 56,
+    "measured": 59,
     "open": 5
   },
   "repo": "crypto",
@@ -422,9 +422,10 @@
     {
       "better": "lower",
       "first": 0.986,
-      "latest": 0.986,
+      "latest": 0.009,
       "latest_derived": {
-        "improvement_vs_first_percent": 0.0
+        "improvement_vs_first_percent": 99.0872,
+        "improvement_vs_previous_percent": 99.0872
       },
       "metric": "aa_rho_correlation_p28",
       "points": [
@@ -441,10 +442,48 @@
           "spread": null,
           "summary": "P3 cross-trace covariate test, 2000 prime-order curves at 2^24 and 2^28: 0 of 14 tests significant (frozen rule 2 null); coverage effects <= 0.002 %; rho walk found defective by the A/A control",
           "value": 0.986
+        },
+        {
+          "commit": "3c11bc13b9cb",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 99.0872,
+            "improvement_vs_previous_percent": 99.0872
+          },
+          "n": 2000,
+          "record": "20261108T0545Z-split-prime-p3-r2-walk-v2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P3 round 2: rho cost with the corrected walk independent of the split-prime and Frobenius-field covariates at 2^24 and 2^28 (0 of 7 tests; every CI within 0.19 %); A/A r 0.027 / 0.009",
+          "value": 0.009
         }
       ],
       "problem": "ecdlp:split-prime-p3-cross-trace-census",
       "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "bonferroni_significant_rho_tests",
+      "points": [
+        {
+          "commit": "3c11bc13b9cb",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 7,
+          "record": "20261108T0545Z-split-prime-p3-r2-walk-v2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P3 round 2: rho cost with the corrected walk independent of the split-prime and Frobenius-field covariates at 2^24 and 2^28 (0 of 7 tests; every CI within 0.19 %); A/A r 0.027 / 0.009",
+          "value": 0.0
+        }
+      ],
+      "problem": "ecdlp:split-prime-p3-cross-trace-census",
+      "unit": "count"
     },
     {
       "better": "lower",
@@ -472,9 +511,10 @@
     {
       "better": "lower",
       "first": 0.7,
-      "latest": 0.7,
+      "latest": 0.087,
       "latest_derived": {
-        "improvement_vs_first_percent": 0.0
+        "improvement_vs_first_percent": 87.5714,
+        "improvement_vs_previous_percent": 87.5714
       },
       "metric": "max_abs_rho_effect_pct",
       "points": [
@@ -491,6 +531,21 @@
           "spread": null,
           "summary": "P3 cross-trace covariate test, 2000 prime-order curves at 2^24 and 2^28: 0 of 14 tests significant (frozen rule 2 null); coverage effects <= 0.002 %; rho walk found defective by the A/A control",
           "value": 0.7
+        },
+        {
+          "commit": "3c11bc13b9cb",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 87.5714,
+            "improvement_vs_previous_percent": 87.5714
+          },
+          "n": 2000,
+          "record": "20261108T0545Z-split-prime-p3-r2-walk-v2",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P3 round 2: rho cost with the corrected walk independent of the split-prime and Frobenius-field covariates at 2^24 and 2^28 (0 of 7 tests; every CI within 0.19 %); A/A r 0.027 / 0.009",
+          "value": 0.087
         }
       ],
       "problem": "ecdlp:split-prime-p3-cross-trace-census",
@@ -2694,9 +2749,10 @@
     {
       "better": "lower",
       "first": 8.0,
-      "latest": 8.0,
+      "latest": 2.0,
       "latest_derived": {
-        "improvement_vs_first_percent": 0.0
+        "improvement_vs_first_percent": 75.0,
+        "improvement_vs_previous_percent": 75.0
       },
       "metric": "capped_jobs",
       "points": [
@@ -2713,10 +2769,79 @@
           "spread": null,
           "summary": "P1 RR vs cherry-tree T with a Dickson-torus tower at T24, T31: RR lower D and narrower matrices at m3 t3, t4 on both primes (frozen rule 5); m5 t3 undecided (T capped at 1.5 GiB); D identical to the Kummer tower",
           "value": 8.0
+        },
+        {
+          "commit": "d6619e21e4ab",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 75.0,
+            "improvement_vs_previous_percent": 75.0
+          },
+          "n": 26,
+          "record": "20261108T0538Z-split-prime-p1-r2a-armf-caps",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P1 round 2 card A: arm F and completed T at m3 t5 on NIST-shape primes; RR vs F trade at every m = 3 cell (one degree lower, 2.3-3.0x wider); RR vs T trade at m3 t5; T at m5 t3 capped at 6 GiB",
+          "value": 2.0
         }
       ],
       "problem": "ic:split-prime-p1-rr-dickson-torus",
       "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 2.29,
+      "latest": 2.29,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rr_vs_f_widest_ratio_m3t4",
+      "points": [
+        {
+          "commit": "d6619e21e4ab",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261108T0538Z-split-prime-p1-r2a-armf-caps",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P1 round 2 card A: arm F and completed T at m3 t5 on NIST-shape primes; RR vs F trade at every m = 3 cell (one degree lower, 2.3-3.0x wider); RR vs T trade at m3 t5; T at m5 t3 capped at 6 GiB",
+          "value": 2.29
+        }
+      ],
+      "problem": "ic:split-prime-p1-rr-dickson-torus",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.33,
+      "latest": 1.33,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rr_vs_t_widest_ratio_m3t5",
+      "points": [
+        {
+          "commit": "d6619e21e4ab",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261108T0538Z-split-prime-p1-r2a-armf-caps",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P1 round 2 card A: arm F and completed T at m3 t5 on NIST-shape primes; RR vs F trade at every m = 3 cell (one degree lower, 2.3-3.0x wider); RR vs T trade at m3 t5; T at m5 t3 capped at 6 GiB",
+          "value": 1.33
+        }
+      ],
+      "problem": "ic:split-prime-p1-rr-dickson-torus",
+      "unit": "ratio"
     },
     {
       "better": "lower",
@@ -2773,6 +2898,29 @@
       "unit": "percent"
     },
     {
+      "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "f4_work_rel_diff_selected_vs_random_unplanted",
+      "points": [
+        {
+          "commit": "97c70ec24e81",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 12,
+          "record": "20261108T0530Z-split-prime-p2-r2-unplanted",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P2 round 2: F4 cost on 144 unplanted targets identical across cosets, primes and tower kinds at each (m,t); coset-independence holds exactly (frozen rule 1)",
+          "value": 0.0
+        }
+      ],
+      "problem": "ic:split-prime-p2-twist-coset-toy",
+      "unit": "percent"
+    },
+    {
       "better": "higher",
       "first": 2.25,
       "latest": 2.25,
@@ -2816,6 +2964,56 @@
           "reference_kind": null,
           "spread": null,
           "summary": "P2 twist-pure coset selection on prime-order curves at 2^20, 2^24: F4 cost coset-independent (max 0.39 %), coverage law within 0.93 %, 0 purity violations, gain >= 2.25 at t=4 (stage level, frozen rule 4)",
+          "value": 0.0
+        }
+      ],
+      "problem": "ic:split-prime-p2-twist-coset-toy",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.896,
+      "latest": 0.896,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "unplanted_over_planted_f4_work_m3t4",
+      "points": [
+        {
+          "commit": "97c70ec24e81",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 4,
+          "record": "20261108T0530Z-split-prime-p2-r2-unplanted",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P2 round 2: F4 cost on 144 unplanted targets identical across cosets, primes and tower kinds at each (m,t); coset-independence holds exactly (frozen rule 1)",
+          "value": 0.896
+        }
+      ],
+      "problem": "ic:split-prime-p2-twist-coset-toy",
+      "unit": "ratio"
+    },
+    {
+      "better": "higher",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "unplanted_targets_decomposing",
+      "points": [
+        {
+          "commit": "97c70ec24e81",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 144,
+          "record": "20261108T0530Z-split-prime-p2-r2-unplanted",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P2 round 2: F4 cost on 144 unplanted targets identical across cosets, primes and tower kinds at each (m,t); coset-independence holds exactly (frozen rule 1)",
           "value": 0.0
         }
       ],

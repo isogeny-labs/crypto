@@ -93,3 +93,36 @@ Every completed job has quotient dimension ≥ 1 (the planted relation is found)
    with a tower), on a ≥ 16 GiB host.
 2. Add round 7's arm F at m3 t3 to t5 on the same instances, so RR is compared with
    the lab's best m = 3 system.
+
+## Round 2, card A: capped cells completed and arm F (run-r2a-20261108T053528Z)
+
+Protocol `PROTOCOL-R2.md` (frozen before data, merged in #3693, Addendum A pinned before the
+run). Card `CARD-p1-r2-a`: 18 arm-F jobs and 8 T jobs at 6 GiB / 3,600 s; 24 completed, the
+two T jobs at m5 t3 capped again. Analysis: `analysis/p1r2analyze` (Rust; merges round 1 and
+round 2, applies the bound reading frozen in PROTOCOL-R2) →
+`analysis/derived_r2/{p1_r2_cells.tsv, decision_r2.json}`. [pcc:unverified]
+
+| cell (all three primes alike) | RR | T | F | RR vs T | RR vs F |
+|---|---|---|---|---|---|
+| m3 t3 | D 4, widest 632 | D 5, 883 | D 5, 231 | RR dominates | trade |
+| m3 t4 | D 4, 2,801 | D 6, 7,129 (Kummer 7,077) | D 5, 1,224 | RR dominates | trade |
+| m3 t5 | D 5, 31,911 (Kummer 31,870) | D 6, 23,978 (Kummer 23,720) | D 6, 10,493 | **trade** | trade |
+| m5 t3 (T24, no tower) | D 5, 2,878 | D ≥ 8, widest ≥ 82,927 (capped at 6 GiB) | n/a | RR below on both (bound reading) | n/a |
+
+- **Rule 1, control: met exactly.** T at m3 t5 on the prime-order Kummer curve gives D 6,
+  widest 23,720, round 7's values on a different curve; every completed job finds the planted
+  relation.
+- **Rule 4, RR vs arm F: trade in all 9 cells.** RR reaches one degree lower, but F's widest
+  matrix is 2.3 to 3.0 times narrower (231 vs 632, 1,224 vs 2,801, 10,493 vs 31,911). Against
+  the lab's strongest m = 3 system, RR is not a gain on these measures.
+- **Rule 5, RR vs T: RR dominates at t3 and t4, trade at t5** (RR wider, 31,911 vs 23,978), as
+  the red team predicted from round 7.
+- **Rule 2, m5 t3:** RR below T on both metrics even against T's lower bounds; this is the
+  tower-free cell (`../red-team-p1-p2.md`), so it says little about towers.
+- F's values are identical on the Dickson and Kummer primes and equal round 7's, as T's and RR's
+  are: at these sizes the F4 trace depends on the system's shape, not the prime or the tower.
+
+**Reading.** Round 1's positive result (RR below the cherry tree T at m = 3) holds at t3 and t4
+and turns into a trade at t5. Against arm F it is a trade everywhere. So the Riemann–Roch
+system transfers to the NIST field shape but is not the lab's best m = 3 system on matrix
+width. The m = 5 cell with a tower (card B, T24 m5 t4, 13 GiB) decides rule 3.
