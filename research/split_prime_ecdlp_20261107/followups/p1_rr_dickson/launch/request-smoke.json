@@ -1,0 +1,25 @@
+{
+  "schema": "isolab.eks.command-request/v1",
+  "job": {
+    "job_name": "p1r3-smoke-20261108",
+    "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:7f2fa5f7f0b3a8a639641688f9a295f7bc16eb140fe05fb29bf2cb01ed973dca",
+    "command": [
+      "/bin/bash",
+      "-c",
+      "set -x; aws --version; echo 1+1 | bc; mkdir -p /work/results; P1TOOL=/usr/local/bin/p1tool OUT_DIR=/work/results/smoke VLIMIT=3000000 TLIMIT=20 bash /opt/study/calibration/run_cells_r3.sh rr; rc=$?; aws s3 cp /work/results/ \"$ISOLAB_RESULTS_URI\" --recursive --only-show-errors; exit $rc"
+    ],
+    "cpu": 2,
+    "memory": "4Gi",
+    "seconds": 1800,
+    "isolation_profile": "standard",
+    "retries": 0,
+    "wait_seconds": 900
+  },
+  "provenance": {
+    "harness": "claude-code-main-session",
+    "source_revision": "ba6c72659b6198621f8b787a0bde95f91f4dcd06",
+    "study": "split_prime_ecdlp_20261107/p1_rr_dickson",
+    "protocol_sha256": "6f433d83473afcd12bde36dac820afb73a1443260a2766bddf6f865ead551257",
+    "note": "PROTOCOL-R3.md: T24 m5 t4 to completion; command Job, no L2 admission; wall time diagnostic only"
+  }
+}
