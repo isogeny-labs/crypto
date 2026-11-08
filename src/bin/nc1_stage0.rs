@@ -144,7 +144,7 @@ fn is_prime(n: u64) -> bool {
     }
     let mut i = 2;
     while i * i <= n {
-        if n % i == 0 {
+        if n.is_multiple_of(i) {
             return false;
         }
         i += 1;
@@ -211,8 +211,10 @@ fn coverage(v: &[Pt], r: u64, neg: bool, checks: &[usize]) -> Curve {
     let mut bits = vec![0u64; (r as usize).div_ceil(64) + 1];
     let denom = (r - 1) as f64;
     let mut sigma = 0u64;
-    let mut cur = Curve::default();
-    cur.e_sum = 1.0; // T = 0
+    let mut cur = Curve {
+        e_sum: 1.0, // T = 0
+        ..Default::default()
+    };
     let mut den1: Vec<u32> = Vec::new();
     let mut den2: Vec<u32> = Vec::new();
     let mut inv1: Vec<u32> = Vec::new();
@@ -495,7 +497,7 @@ fn gen_d3(d: &D3, r: u64, n: usize, rb: Rb, rng: &mut Rng) -> Vec<Pt> {
         .classes
         .iter()
         .enumerate()
-        .flat_map(|(k, c)| std::iter::repeat(k).take(c.w))
+        .flat_map(|(k, c)| std::iter::repeat_n(k, c.w))
         .collect();
     let mut count = vec![0i64; d.classes.len()];
     let mut out = Vec::with_capacity(n);
