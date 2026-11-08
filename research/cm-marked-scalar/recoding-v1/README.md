@@ -37,3 +37,14 @@ Do not invoke --scan into the existing write-once output. Each invocation was li
 The canonical experiment.export/v1 file passes native schema validation. Its80 rows are exact derived minimum cases (five curves x four method records x four weights) from one census, not80 independent process runs or timing trials. Centered controls reuse zero-shift rows. There is no stochastic confidence or population-power claim. A future runtime comparison must retain plan-generation work in the full first-use ledger and include cold runtime/table/map/correction/conversion/verification costs. These counts cannot certify latency.
 
 The archive is approximately91KiB; exact bytes/hashes are in export.json and runs.tar.xz.sha256. plans.json is an unchanged copy of scanner output. The mathematical certificates remain in ../fixtures-v2.
+
+## Artifact-store materialization
+
+The repository bot externalized runs.tar.xz in commit1252469892b4. Its .artifacts.json entry retains SHA25629365ee7c6edb752520467b44de2fa360c5c8542a7efe28c50665eb84cc07406 and93072bytes. A byte-identical local copy is retained and ignored by Git. From this directory, materialize the immutable object before extraction or checksum verification:
+
+~~~sh
+aws s3 cp --no-progress s3://setec-astronomy-artifacts/store/sha256/29/29365ee7c6edb752520467b44de2fa360c5c8542a7efe28c50665eb84cc07406 runs.tar.xz
+sha256sum -c runs.tar.xz.sha256
+~~~
+
+The standard repository artifact pull mechanism is also supported; see docs/artifacts.md. The agent did not repeat the remote GET after the bot upload. Local archive bytes match its manifest, and fresh extraction/replay and deterministic repacking pass. A checksum check initially used the repository root rather than this directory and therefore reported the relative basename missing; the corrected directory-scoped check passes. No archive content or scientific scan was changed.

@@ -2,7 +2,7 @@
 
 Conductor T-1888, [PR #3674](https://github.com/isogeny-labs/crypto/pull/3674). The PR was opened before implementation and comparative execution, as requested. Native closed-relation certificates and executable rational-subgroup actions now cover P-192, P-224, P-256, P-384 and P-521. P-192 is primary. The original objective of an admitted end-to-end runtime improvement over matched regular public-scalar multiplication remains open.
 
-The [construction and exact cost ledger](CONSTRUCTION.md) explains the kernels, endpoint isomorphism, CM labels, signed orbits and all five cost vectors. The [two-page report](reports/native-five-curve-20261108/report.pdf) contains the diagrams, quantitative graph and admission record.
+The [construction and exact cost ledger](CONSTRUCTION.md) explains the kernels, endpoint isomorphism, CM labels, signed orbits and all five cost vectors. The [construction report](reports/native-five-curve-20261108/report.pdf) contains the diagrams and original admission record. The subsequent [modular recoding report](reports/recoding-20261108/report.pdf) and [complete replayable census](recoding-v1/README.md) compare 30,780 schedules with symmetric direct-method optimization. P-192 saves three additions and three negations against its same-width centered fused schedule; the full direct minima remain smaller on all five curves.
 
 For each supplied variable-base point P, the relation route evaluates phi, eta, the closing isomorphism sigma(x,y)=(x/ell²,y/ell³), then [k], with k=mu/ell modulo n. Full polynomial identities prove sigma eta phi=[ell], while the native CM checks verify a+b=mu modulo n for alpha=a+b*pi. The implementation is an explicit rational-subgroup evaluator; the much larger global noninteger quotient has unexpanded residual polynomials. Its degree and construction status are retained.
 
@@ -16,7 +16,7 @@ The native constructor supplies the three new curves from signed Frobenius kerne
 | Explicit orbit object | Canonical affine representative and scalar transporter reproduced on all five curves |
 | Costed implementation | 90 native counted rows, clocks disabled; D/A/N, explicit map-formula calls, correction/setup and conversion boundaries retained |
 | Matched runtime reference | Public signed-window, OpenSSL public multiscalar and single-point references implemented; actual timing comparison pending |
-| Cold end-to-end gain | Not established; local admission refused twice and EKS live admission failed role assumption |
+| Cold end-to-end gain | Not established; local admission refused twice. Follow-up resolves EKS routing with the existing submitter identity, but quota reads remain forbidden and reported monthly spend exceeds the supplied ceiling |
 | Timing protocol | Native schema validation passes for the initial P-384/P-521 draft; source/binary freeze and admitted backend pending |
 
 Build `make -B -j1 -C research/cm-marked-scalar native-complete construct-binary qualification-tests-binary analysis-tests`; replay `/tmp/cm-marked-scalar-build/native --qualify research/cm-marked-scalar/fixtures-v2` and `/tmp/cm-marked-scalar-build/qualification-tests research/cm-marked-scalar/fixtures-v2`. Do not rerun write-once constructions into existing output directories. Use source/binary hashes rather than shared-filesystem timestamps.
