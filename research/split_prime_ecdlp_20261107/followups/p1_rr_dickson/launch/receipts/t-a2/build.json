@@ -5,7 +5,7 @@
             "arn": "arn:aws:codebuild:us-east-2:104186811093:build/isolab-experiment-launcher:4fd098c9-d158-423f-9ba9-0360830db190",
             "buildNumber": 385,
             "startTime": 1794180347.731,
-            "currentPhase": "QUEUED",
+            "currentPhase": "BUILD",
             "buildStatus": "IN_PROGRESS",
             "sourceVersion": "GAbpTmZE8VYoN72rYIOwYqaior1Pj6ep",
             "projectName": "isolab-experiment-launcher",
@@ -19,7 +19,66 @@
                 },
                 {
                     "phaseType": "QUEUED",
-                    "startTime": 1794180347.823
+                    "phaseStatus": "SUCCEEDED",
+                    "startTime": 1794180347.823,
+                    "endTime": 1794180348.76,
+                    "durationInSeconds": 0
+                },
+                {
+                    "phaseType": "PROVISIONING",
+                    "phaseStatus": "SUCCEEDED",
+                    "startTime": 1794180348.76,
+                    "endTime": 1794180366.663,
+                    "durationInSeconds": 17,
+                    "contexts": [
+                        {
+                            "statusCode": "",
+                            "message": ""
+                        }
+                    ]
+                },
+                {
+                    "phaseType": "DOWNLOAD_SOURCE",
+                    "phaseStatus": "SUCCEEDED",
+                    "startTime": 1794180366.663,
+                    "endTime": 1794180368.98,
+                    "durationInSeconds": 2,
+                    "contexts": [
+                        {
+                            "statusCode": "",
+                            "message": ""
+                        }
+                    ]
+                },
+                {
+                    "phaseType": "INSTALL",
+                    "phaseStatus": "SUCCEEDED",
+                    "startTime": 1794180368.98,
+                    "endTime": 1794180369.095,
+                    "durationInSeconds": 0,
+                    "contexts": [
+                        {
+                            "statusCode": "",
+                            "message": ""
+                        }
+                    ]
+                },
+                {
+                    "phaseType": "PRE_BUILD",
+                    "phaseStatus": "SUCCEEDED",
+                    "startTime": 1794180369.095,
+                    "endTime": 1794180369.176,
+                    "durationInSeconds": 0,
+                    "contexts": [
+                        {
+                            "statusCode": "",
+                            "message": ""
+                        }
+                    ]
+                },
+                {
+                    "phaseType": "BUILD",
+                    "startTime": 1794180369.176
                 }
             ],
             "source": {
@@ -67,8 +126,10 @@
             },
             "serviceRole": "arn:aws:iam::104186811093:role/isolab-remote-launcher-LauncherRole-sTrV7P2VXnBK",
             "logs": {
-                "deepLink": "https://console.aws.amazon.com/cloudwatch/home?region=us-east-2#logsV2:log-groups",
-                "cloudWatchLogsArn": "arn:aws:logs:us-east-2:104186811093:log-group:null:log-stream:null",
+                "groupName": "/aws/codebuild/isolab-experiment-launcher",
+                "streamName": "4fd098c9-d158-423f-9ba9-0360830db190",
+                "deepLink": "https://console.aws.amazon.com/cloudwatch/home?region=us-east-2#logsV2:log-groups/log-group/$252Faws$252Fcodebuild$252Fisolab-experiment-launcher/log-events/4fd098c9-d158-423f-9ba9-0360830db190",
+                "cloudWatchLogsArn": "arn:aws:logs:us-east-2:104186811093:log-group:/aws/codebuild/isolab-experiment-launcher:log-stream:4fd098c9-d158-423f-9ba9-0360830db190",
                 "cloudWatchLogs": {
                     "status": "ENABLED",
                     "groupName": "/aws/codebuild/isolab-experiment-launcher"
@@ -88,6 +149,10 @@
                 "securityGroupIds": [
                     "sg-096fc63b0090d98bf"
                 ]
+            },
+            "networkInterface": {
+                "subnetId": "subnet-023ccd74a57eb5a51",
+                "networkInterfaceId": "eni-0d1e9b9cae1a00528"
             },
             "encryptionKey": "arn:aws:kms:us-east-2:104186811093:alias/aws/s3"
         }
