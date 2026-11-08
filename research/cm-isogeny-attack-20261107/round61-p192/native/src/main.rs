@@ -384,6 +384,18 @@ fn panel<const P: i64, const D: i64>(
     targets: &[u64],
     reference: bool,
 ) -> (Value, Value) {
+    let on = |p: Pt<P, D>| {
+        p.map(|(x, y)| y * y == x * x * x + F::c(a) * x + F::c(b))
+            .unwrap_or(true)
+    };
+    assert!(on(g) && on(shift));
+    assert_ne!(mul(2, shift, a).unwrap().1 .1, 0);
+    let count = 1
+        + (0..P)
+            .flat_map(|x| (0..P).map(move |y| (x, y)))
+            .filter(|&(x, y)| (y * y - x * x * x - a * x - b).rem_euclid(P) == 0)
+            .count();
+    assert_eq!(count, r as usize);
     let pts = graph(g, a, r);
     let mut ctx = Ctx {
         a,
@@ -467,6 +479,25 @@ fn panel<const P: i64, const D: i64>(
 fn main() {
     let args: Vec<_> = std::env::args().collect();
     let reference = args.iter().any(|s| s == "--scalar-reference");
+    if args.iter().any(|s| s == "--residue-control") {
+        let (p, receipt) = panel::<11, 2>(
+            8,
+            1,
+            17,
+            Some((F::c(0), F::c(1))),
+            Some((F::c(1), F::new(0, 4))),
+            &(1..17).collect::<Vec<_>>(),
+            reference,
+        );
+        let out = json!({"all_checks_pass":true,"panel":p,"scope":"amended no-order3-stabilizer control; no timing or mixing claim"});
+        if let Some(i) = args.iter().position(|x| x == "--check") {
+            let expected: Value = serde_json::from_slice(&fs::read(&args[i + 1]).unwrap()).unwrap();
+            assert!(out == expected, "certificate mismatch")
+        }
+        eprintln!("{}", receipt);
+        println!("{}", serde_json::to_string(&out).unwrap());
+        return;
+    }
     let sa = Some((F::<11, 2>::c(0), F::new(0, 3)));
     let sb = Some((F::<17, 3>::c(1), F::new(0, 8)));
     let rt = (1..211).find(|x| x * x % 211 == 204).unwrap();

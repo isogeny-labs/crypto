@@ -190,6 +190,13 @@ fn main() {
     let fr = fp::Fp {
         p: fp::parse(&input["r"]),
     };
+    if args.iter().any(|s| s == "--residue-check") {
+        let residue = &fr.p % Z::from(3u32);
+        assert_eq!(residue, Z::from(2u32));
+        assert!(sqrt_mod(&fr, &fr.c(-3)).is_none());
+        println!("{}",serde_json::to_string_pretty(&json!({"all_checks_pass":true,"r":input["r"],"r_mod3":2,"order3_stabilizer_roots":0,"phi6_discriminant_is_nonsquare":true,"norm_evaluations":0,"scope":"exact P192 scalar-field residue and discriminant certificate"})).unwrap());
+        return;
+    }
     let a = fp::parse(&input["a"]);
     let g = point(&input["G"]);
     let public = point(&input["Q"]);
