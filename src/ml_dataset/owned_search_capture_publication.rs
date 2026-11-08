@@ -3,6 +3,9 @@
 use super::{OwnedAttempt,Failure as OwnerFailure,Stop,Budget,capture};
 use super::capture_encoding as encoding;
 use std::{mem::size_of,time::Instant};
+#[cfg(test)]
+#[path="owned_search_publication_observer.rs"]
+pub(in crate::ml_dataset::solvers) mod test_observer;
 pub(in crate::ml_dataset::solvers) const ROLE:&str="boolean-original-owned-search-snapshot-chunk-v1";
 #[derive(Default)]
 pub(in crate::ml_dataset::solvers) struct Publication{
@@ -50,6 +53,12 @@ impl Bridge<'_>{
   let exact=after.event_count==before.event_count.checked_add(1).ok_or(Stop::Overflow)?
    &&after.binding_sha256==before.binding_sha256&&after.byte_end>before.byte_end;
   chunk.exact=exact;if !exact{return Err(Stop::Observer)}
+  // Test observers see an actual installed acknowledgement, never pending bytes.
+  // This is custody evidence only; the original deadline check remains below.
+  #[cfg(test)]
+  test_observer::notify(test_observer::Boundary::ChunkAcknowledged {
+   pattern:self.pattern,snapshot:self.snapshot.index,chunk:index,bytes:count,receipt:after,
+  });
   self.budget.check(Instant::now())
  }
 }
@@ -90,7 +99,17 @@ pub(super) fn checkpoint_parts(source:&encoding::EncodingSource<'_>,budget:&mut 
    let retained_bytes=bridge.snapshot.chunks.iter().try_fold(0u64,|n,c|n.checked_add(c.bytes)).ok_or(Stop::Overflow)?;
    if !byte_summary.0||byte_summary.1!=byte_summary.2||byte_summary.1!=retained_bytes{return Err(Stop::Observer)}
    bridge.budget.check(Instant::now())?;
-   bridge.snapshot.complete=true;Ok(())
+   bridge.snapshot.complete=true;
+   #[cfg(test)]
+   test_observer::notify(test_observer::Boundary::SnapshotComplete {
+    pattern,snapshot:index,chunks:acknowledged,bytes:retained_bytes,
+    receipt:bridge.snapshot.chunks.last().and_then(|c|c.ack.as_ref()).expect("checked complete acknowledgement"),
+   });
+   // Test instrumentation cannot return a successful publication after consuming
+   // the original deadline while observing its complete durable state.
+   #[cfg(test)]
+   bridge.budget.check(Instant::now())?;
+   Ok(())
  })();
  if let Err(s)=result{publication.failure=Some(s);if let Some(last)=publication.snapshots.last_mut(){if !last.complete{last.failure.get_or_insert(s);}}let _:Result<(),Stop>=budget.fail(s);}
  result
