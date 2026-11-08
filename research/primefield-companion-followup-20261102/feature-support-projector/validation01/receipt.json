@@ -1,0 +1,60 @@
+{
+  "scope": "Bounded deterministic projector extraction, public singleton recovery, exact uncertainty controls; no timing claim",
+  "build_exit": 0,
+  "check_exit": 0,
+  "limits_seconds": {
+    "compile": 90,
+    "focused": 60
+  },
+  "commands": [
+    "rustc --edition=2021 -O -C overflow-checks=yes --emit=link,dep-info research/primefield-companion-followup-20261102/feature-support-projector/driver.rs -o /tmp/t1933-v1-check",
+    "/tmp/t1933-v1-check"
+  ],
+  "binary_sha256": "e2bc48164b10faf3d76ae276df49020094351e25f82dd50ed98419921ea8b755",
+  "copied_sources": 10,
+  "dependencies": {
+    "research/primefield-companion-followup-20261102/feature-support-projector/driver.rs": "fedc90438b527c9c3deaf88a775f68e655d4b51955d2b52f480dbbdc6b85759c",
+    "research/primefield-companion-followup-20261102/feature-support-projector/lib.rs": "df63248d97ead5f354ca00388c79dd146974db21a785d60ab0239ca4ab9342de",
+    "research/primefield-companion-followup-20261102/feature-support-projector/geometry.rs": "7e1c1aeebe7fc345f7835c8d33e7f1c7af7ada3c03393e74ee9c0f3e1de5c892",
+    "research/primefield-companion-followup-20261102/feature-support-projector/division.rs": "0b54ddf8e873541df619c618dca45a72a70c02eb3196d7aa715cdc6b5c9cbafc",
+    "research/primefield-companion-followup-20261102/feature-support-projector/polynomial.rs": "6b3f25f44847c0e9e690fa9db389bbc11b35450f5cbc7fec26ac6595eddff626",
+    "research/primefield-companion-followup-20261102/feature-orbit-local-terms/local.rs": "5408f64b5e60f8f0619376d7335c2703df74857cb86ca535cec6e613aaf4e5a2",
+    "research/primefield-companion-followup-20261102/feature-support-projector/schedule.rs": "61623bbd89ebb71aed41b76d55a6c865f4ccc7cee110f4ceb6d4a2b4335b3706",
+    "research/primefield-companion-followup-20261102/feature-support-projector/allocation.rs": "5d13867149ba35212e7f8d32d2162074508a5e7b6145478df227c2cbee560e4b",
+    "research/primefield-companion-followup-20261102/feature-support-projector/class-source.rs": "93f7af6d4bbe2ca7429fa9c68b4c657dedbb7d1321afb7ea647fcda3e2273d91",
+    "research/primefield-companion-followup-20261102/feature-support-projector/circuit.rs": "199f3c739c8e278668188188f926c165cc0959487498ed48c16f48fa9d5d4941",
+    "research/primefield-companion-followup-20261102/feature-support-projector/transcript.rs": "99cb717ed230e68a30dd2525cdd245bdda900d2f4e8ac09438e011f093b5cf11",
+    "research/primefield-companion-followup-20261102/feature-support-projector/public.rs": "d1a3e1342bdd35eef44d1f1f6280aff6981143d535dc7ec452e08a4852067809",
+    "research/primefield-companion-followup-20261102/feature-support-projector/projector.rs": "6bde1ade9d7483426864123d46564ba54708d268e707d0695a76c5149b27f7a8",
+    "research/primefield-companion-followup-20261102/feature-support-projector/projector-public.rs": "fe641de45270ffce0376539416bc8abf1cced0eeeda9d2f9a6630ed85735d273",
+    "research/primefield-companion-followup-20261102/feature-support-projector/checks.rs": "f25a261e391e10d4ded64670efd7d242321aa9592be2e304e285f59da27f7e3c"
+  },
+  "logs": {
+    "check.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build.stderr": "bb99ded7e9b8265177ed786a5ae6e783512e7211094dd2742cacc1c61a825e77",
+    "build.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "check.stdout": "3e2413cdf955fce2e0235ee36742e5a282d7d94a62b8bc20af6664267671946e"
+  },
+  "small_caps": {
+    "terms": 128,
+    "stored_node_coefficient_slots": 500000,
+    "monomial_pairs": 2000000,
+    "output_degree": 64,
+    "nodes": 100000
+  },
+  "large_caps": {
+    "terms": 64,
+    "stored_node_coefficient_slots": 100000,
+    "monomial_pairs": 2000000,
+    "output_degree": 8,
+    "nodes": 100000
+  },
+  "large_outcome": {
+    "status": "refused",
+    "reason": "terms",
+    "pairs": 14621,
+    "stored": 5724,
+    "max_terms": 64
+  },
+  "public_runtime_supplied_image": false
+}
