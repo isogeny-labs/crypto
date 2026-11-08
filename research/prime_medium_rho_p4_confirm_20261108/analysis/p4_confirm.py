@@ -542,7 +542,7 @@ def analyze(args):
     sec["curve_heterogeneity"] = {"Q": q, "dof": len(per) - 1, "p": chi2_sf(q, len(per) - 1),
                                   "test": "Cochran Q on ln theta_c, inverse bootstrap-variance weights"}
     sec["per_curve"] = [{"slug": p[0], "log2_r": p[1], "theta": p[2], "ci95": p[3]} for p in per]
-    fz = {s: Clusters.aggregate(cl.curves[s]["w"].values()) for s in slugs}
+    fz = {s: Clusters.aggregate(list(cl.curves[s]["w"].values())) for s in slugs}
     kix = {k: i for i, k in enumerate(keys)}
     sec["fruitless_cycles_per_walk"] = [
         {"slug": s, "log2_r": cl.curves[s]["log2_r"],
@@ -675,9 +675,9 @@ def selftest(args):
     base = args.workdir
     scenarios = [
         # name, theta, targets, break_aa, pc_scale, expected verdict
-        ("old_point_1.285", 1.285, 24, False, 0.0, "exceeds_1.2_below_sqrt2"),
-        ("sqrt2", SQRT2, 24, False, 0.0, "confirm_sqrt2"),
-        ("ratio_1.0", 1.0, 24, False, 0.0, "below_1.2"),
+        ("old_point_1.285", 1.285, 72, False, 0.0, "exceeds_1.2_below_sqrt2"),
+        ("sqrt2", SQRT2, 72, False, 0.0, "confirm_sqrt2"),
+        ("ratio_1.0", 1.0, 72, False, 0.0, "below_1.2"),
         ("straddle_1.2_small_n", 1.2, 4, False, 0.0, "inconclusive"),
         ("aa_broken", SQRT2, 24, True, 0.0, "inconclusive"),
         ("positive_control_blind", SQRT2, 24, False, 0.7, "inconclusive"),
