@@ -1,0 +1,18 @@
+make: Entering directory '/home/ec2-user/crypto-cm-marked-scalar-20261108/research/cm-marked-scalar'
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations construct.cpp -o /tmp/cm-marked-scalar-build/construct -lcrypto
+In file included from native.cpp:2,
+                 from construct.cpp:2:
+construct.cpp: In function ‘std::pair<unsigned int, Big> marked_label(Parameters&, unsigned int)’:
+construct.cpp:47:129: error: expected primary-expression before ‘unsigned’
+   47 |  for(unsigned s:{3,5,7,11,13,17,19,23,29,31})if(BN_mod_word(nm1.p,s)==0){Big exponent=nm1,mu;require(BN_div_word(exponent.p,s)!=BN_ULONG(-1),"projection exponent");require(BN_mod_exp(mu.p,initial.p,exponent.p,p.n.p,p.f.ctx),"projection");if(!BN_is_one(mu.p)&&!mu.zero())return {s,mu};}
+      |                                                                                                                                 ^~~~~~~~
+construct.cpp: In function ‘unsigned int select_root(Parameters&, unsigned int, unsigned int)’:
+construct.cpp:54:2: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   54 |  if(!chosen)chosen=roots[0];require(std::find(roots.begin(),roots.end(),chosen)!=roots.end(),"specified root not characteristic root");return chosen;
+      |  ^~
+construct.cpp:54:29: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   54 |  if(!chosen)chosen=roots[0];require(std::find(roots.begin(),roots.end(),chosen)!=roots.end(),"specified root not characteristic root");return chosen;
+      |                             ^~~~~~~
+make: *** [Makefile:47: /tmp/cm-marked-scalar-build/construct] Error 1
+make: Leaving directory '/home/ec2-user/crypto-cm-marked-scalar-20261108/research/cm-marked-scalar'

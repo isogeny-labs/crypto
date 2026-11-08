@@ -49,11 +49,19 @@ struct Fixture {
  std::string name; Json curve,closure,marked;
  Fixture(std::string n,Json c,Json z,Json m):name(std::move(n)),curve(std::move(c)),closure(std::move(z)),marked(std::move(m)){}
 };
+static int curve_nid(const std::string& name){
+ if(name=="P-192")return NID_X9_62_prime192v1;
+ if(name=="P-224")return NID_secp224r1;
+ if(name=="P-256")return NID_X9_62_prime256v1;
+ if(name=="P-384")return NID_secp384r1;
+ if(name=="P-521")return NID_secp521r1;
+ throw std::runtime_error("unsupported exact curve name");
+}
 struct Runtime {
  const Fixture& f; Field field; Big n,mu,correction,xscale,yscale; std::unique_ptr<Map> forward,back;
  EC_GROUP* group=nullptr;
  Runtime(const Fixture&v,bool relation=true):f(v),field(v.curve.at("p").str()),n(v.curve.at("n").str()),mu(v.marked.at("mu").str()){
-  group=EC_GROUP_new_by_curve_name(v.name=="P-384"?NID_secp384r1:NID_secp521r1);require(group,"group");Big actual;require(EC_GROUP_get_order(group,actual.p,field.ctx),"group order");require(actual==n,"exact subgroup order");if(relation){ forward=std::make_unique<Map>(v.closure.at("first").at("edge"),v.closure.at("first").at("target")); back=std::make_unique<Map>(v.closure.at("dual_normalized"),v.closure.at("scaled_endpoint")); xscale=Big(v.closure.at("closing_isomorphism").at("x_scale").str()); yscale=Big(v.closure.at("closing_isomorphism").at("y_scale").str()); Big ell(forward->degree),ei;require(BN_mod_inverse(ei.p,ell.p,n.p,field.ctx),"degree inverse");require(BN_mod_mul(correction.p,mu.p,ei.p,n.p,field.ctx),"correction");}
+  group=EC_GROUP_new_by_curve_name(curve_nid(v.name));require(group,"group");Big actual;require(EC_GROUP_get_order(group,actual.p,field.ctx),"group order");require(actual==n,"exact subgroup order");if(relation){ forward=std::make_unique<Map>(v.closure.at("first").at("edge"),v.closure.at("first").at("target")); back=std::make_unique<Map>(v.closure.at("dual_normalized"),v.closure.at("scaled_endpoint")); xscale=Big(v.closure.at("closing_isomorphism").at("x_scale").str()); yscale=Big(v.closure.at("closing_isomorphism").at("y_scale").str()); Big ell(forward->degree),ei;require(BN_mod_inverse(ei.p,ell.p,n.p,field.ctx),"degree inverse");require(BN_mod_mul(correction.p,mu.p,ei.p,n.p,field.ctx),"correction");}
  }
  ~Runtime(){EC_GROUP_free(group);}
  Affine affine(const EC_POINT* P){if(EC_POINT_is_at_infinity(group,P))return {};Affine a;a.infinity=false;require(EC_POINT_get_affine_coordinates(group,P,a.x.p,a.y.p,field.ctx),"get affine");return a;}
@@ -81,7 +89,7 @@ static std::vector<Fixture> fixtures(const std::string&dir){auto cs=read_json(di
 #include "orbit_verify.hpp"
 static void qualify(const std::vector<Fixture>&v){
  uint64_t cases=0;for(auto&f:v){Runtime r(f);Big a=r.field.mod(Big(f.curve.at("a").str())),b(f.curve.at("b").str());Big actual_p,actual_a,actual_b;require(EC_GROUP_get_curve(r.group,actual_p.p,actual_a.p,actual_b.p,r.field.ctx),"backend curve");require(actual_p==r.field.p&&actual_a==a&&actual_b==b,"exact backend curve parameters");r.forward->verify(r.field,a,b);r.back->verify(r.field,r.forward->target_a,r.forward->target_b);verify_relation(r);verify_orbits(r);
-  Big seventh(7),res;require(BN_mod_exp(res.p,r.mu.p,seventh.p,r.n.p,r.field.ctx),"seventh power");require(BN_is_one(res.p)&&!BN_is_one(r.mu.p),"primitive seventh root");Big ell(r.forward->degree),reconstruction;require(BN_mod_mul(reconstruction.p,r.correction.p,ell.p,r.n.p,r.field.ctx),"scalar reconstruction");require(reconstruction==r.mu,"scalar label");
+  Big seventh(f.marked.at("s").str()),res;require(BN_mod_exp(res.p,r.mu.p,seventh.p,r.n.p,r.field.ctx),"seventh power");require(BN_is_one(res.p)&&!BN_is_one(r.mu.p),"primitive prime-order root");Big ell(r.forward->degree),reconstruction;require(BN_mod_mul(reconstruction.p,r.correction.p,ell.p,r.n.p,r.field.ctx),"scalar reconstruction");require(reconstruction==r.mu,"scalar label");
   for(long input:{0,1,2,17,-1}){Big k(input),positive=k;if(input<0)require(BN_sub(positive.p,r.n.p,Big(-input).p),"negative point scalar");auto P=point(r.group);require(EC_POINT_mul(r.group,P.get(),positive.p,nullptr,nullptr,r.field.ctx),"fixture point");auto ref=point(r.group);require(EC_POINT_mul(r.group,ref.get(),nullptr,P.get(),r.mu.p,r.field.ctx),"reference");auto closed=r.transported(P.get());auto expected=point(r.group);require(EC_POINT_mul(r.group,expected.get(),nullptr,P.get(),ell.p,r.field.ctx),"closure reference");require(EC_POINT_cmp(r.group,closed.get(),expected.get(),r.field.ctx)==0,"closed dual label");
    for(unsigned w=2;w<=7;++w){Counts c,d,e;auto direct=point(r.group),candidate=point(r.group),small=point(r.group),fused=point(r.group);public_mul(r,small.get(),P.get(),ell,2,e);public_mul(r,fused.get(),small.get(),r.correction,w,e);require(EC_POINT_cmp(r.group,fused.get(),ref.get(),r.field.ctx)==0,"native fused output");public_mul(r,direct.get(),P.get(),r.mu,w,c);public_mul(r,candidate.get(),closed.get(),r.correction,w,d);require(EC_POINT_cmp(r.group,direct.get(),ref.get(),r.field.ctx)==0,"native direct output");require(EC_POINT_cmp(r.group,candidate.get(),ref.get(),r.field.ctx)==0,"native candidate output");require(EC_POINT_is_on_curve(r.group,candidate.get(),r.field.ctx)==1,"output on source curve");++cases;}
    auto ext=point(r.group);external_public(r,ext.get(),P.get(),r.mu);require(EC_POINT_cmp(r.group,ext.get(),ref.get(),r.field.ctx)==0,"external public output");if(input!=0){Big wrong=r.mu;require(BN_add_word(wrong.p,1),"negative control scalar");auto bad=point(r.group);require(EC_POINT_mul(r.group,bad.get(),nullptr,P.get(),wrong.p,r.field.ctx),"negative control");require(EC_POINT_cmp(r.group,bad.get(),ref.get(),r.field.ctx)!=0,"negative control must fail");}

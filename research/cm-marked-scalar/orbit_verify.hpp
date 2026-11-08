@@ -5,7 +5,7 @@ static void verify_orbits(Runtime& r) {
   require(EC_POINT_mul(r.group,P.get(),input_scalar.p,nullptr,nullptr,r.field.ctx),"orbit input");
   require(EC_POINT_copy(current.get(),P.get()),"orbit initial point");
   bool have=false;Affine best;Big transporter(1),best_transporter;std::set<std::string> seen;
-  int actions=k?7:1;
+  int order=r.f.marked.at("s").integer();int actions=k?order:1;
   for(int j=0;j<actions;++j){
    for(int sign:{1,-1}){
     auto candidate=point(r.group);require(EC_POINT_copy(candidate.get(),current.get()),"orbit copy");
@@ -19,7 +19,7 @@ static void verify_orbits(Runtime& r) {
    }
    if(j+1<actions){auto transported=r.transported(current.get()),next=point(r.group);Counts schedule;public_mul(r,next.get(),transported.get(),r.correction,5,schedule);current=std::move(next);require(BN_mod_mul(transporter.p,transporter.p,r.mu.p,r.n.p,r.field.ctx),"next transporter");}
   }
-  require(seen.size()==size_t(k?14:1),"signed orbit size");
+  require(seen.size()==size_t(k?2*order:1),"signed orbit size");
   if(k){const auto& saved=fixture.at("representative");require(best.x==Big(saved.at(size_t(0)).str())&&best.y==Big(saved.at(size_t(1)).str()),"saved affine orbit representative");}
   else require(best.infinity,"identity representative");
   require(best_transporter==Big(fixture.at("transporter").str()),"saved representative transporter");

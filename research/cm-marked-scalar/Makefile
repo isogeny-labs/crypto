@@ -42,3 +42,8 @@ $(BUILD_DIR)/analysis-tests: analysis_tests.cpp analysis.cpp analysis_load.hpp j
 analysis-tests: $(BUILD_DIR)/analysis-tests
 	$(BUILD_DIR)/analysis-tests
 .PHONY: analysis-tests
+$(BUILD_DIR)/construct: construct.cpp native.cpp json.hpp relation_verify.hpp orbit_verify.hpp
+	mkdir -p $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) construct.cpp -o $@ $(LDLIBS)
+construct-binary: $(BUILD_DIR)/construct
+.PHONY: construct-binary
