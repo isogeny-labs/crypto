@@ -1,0 +1,79 @@
+schema: crypto.autoresearch.mechanical-task-card.v1
+card_id: CARD-p1-r3-launch
+experiment_id: split_prime_ecdlp_20261107-p1_rr_dickson-round3-launch
+author_role: experiment-director
+executor_role: executor-mechanical
+kind: frozen_command
+commit: bba7221667c6c21457299db1fc7126a068d0dcad
+receipt: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-r3-launch.receipt.json
+binds:
+- path: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/PROTOCOL-R3.md
+  sha256: 6f433d83473afcd12bde36dac820afb73a1443260a2766bddf6f865ead551257
+- path: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/README.md
+  sha256: 57ff2002abecaeb63254ccbd5ed8859361efa8fc44d1ce758a66167c3efb426a
+- path: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/image.json
+  sha256: 0977bfd2366479240cb05f8c4ca089dc7d241d6cc6ca977eb6a6bed76c364fdb
+- path: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/build-info.json
+  sha256: 0c4e1438248ca0937e761bbe4a1e00aba710bfcad344f9f90fc9ff225903e2bf
+- path: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/request-rr-a1.json
+  sha256: 55d2fcd8f7a9e9ef4f25cf835ec32e4b6912deded1d1bbfeb029632066d8c9a9
+- path: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/request-t-a1.json
+  sha256: f5a7a1f060640e1f1c5b9d3f4cd32c8e1a3a21f78dcf494c047191a726f29772
+- path: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/check-experiment-git.json
+  sha256: 992a9de1c333f9fbb806aa13c0ef63be3d92a3ccdca7862335c47671d2758b4e
+- path: taskq/deploy/eks-karpenter/remote/launch-remote-command
+  sha256: 7e1daae8dc70f8fcb813d9315daa73df3e18e7e5f72e2d47f34f9a3c85637416
+- path: taskq/deploy/eks-karpenter/remote/run-command
+  sha256: 1cdaa7447893fd5c2dc337d3903f8981107df1de6d77ca18cd8191cc8449ced2
+- path: taskq/deploy/eks-karpenter/remote/current-run-request-buildspec.yml
+  sha256: 35504896fd8e9eae15690bda0ddd11c2a453ec1c463b8cbeb3c1224f286f335e
+must_not_exist:
+- research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/rr-a1
+- research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/t-a1
+- research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/rr-a1.launch.stdout
+- research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/rr-a1.launch.stderr
+- research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/t-a1.launch.stdout
+- research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/t-a1.launch.stderr
+- research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-r3-launch.receipt.json
+commands:
+- id: launch-rr
+  argv:
+  - taskq/deploy/eks-karpenter/remote/launch-remote-command
+  - research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/request-rr-a1.json
+  env:
+    AWS_REGION: us-east-2
+    ISOLAB_BUCKET: isolab-results-104186811093-us-east-2
+    ISOLAB_CODEBUILD_PROJECT: isolab-experiment-launcher
+    ISOLAB_CLIENT_OUTPUT: /home/user/crypto/research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/rr-a1
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/rr-a1.launch.stdout
+  stderr: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/rr-a1.launch.stderr
+  outputs:
+  - research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/rr-a1.launch.stdout
+- id: launch-t
+  argv:
+  - taskq/deploy/eks-karpenter/remote/launch-remote-command
+  - research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/request-t-a1.json
+  env:
+    AWS_REGION: us-east-2
+    ISOLAB_BUCKET: isolab-results-104186811093-us-east-2
+    ISOLAB_CODEBUILD_PROJECT: isolab-experiment-launcher
+    ISOLAB_CLIENT_OUTPUT: /home/user/crypto/research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/t-a1
+  timeout_seconds: 3600
+  success_exit_codes:
+  - 0
+  stdout: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/t-a1.launch.stdout
+  stderr: research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/t-a1.launch.stderr
+  outputs:
+  - research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/t-a1.launch.stdout
+bus_address: executor-mechanical-p1-r3-launch
+background: false
+write_scope:
+- research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/
+- research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/
+stop_when:
+- Any command exits with a status other than 0 or reaches its timeout; report the printed text verbatim, retry nothing and edit nothing. A resubmission is a new request under a new job name and is not the executor's decision.
+- Never run a launcher a second time for the same request.
+notes: Round 3 launch of PROTOCOL-R3.md, T24 m5 t4, submits the two command Jobs (p1r3-rr-a1-20261108, p1r3-t-a1-20261108) to Iso Lab EKS and nothing else. Each launcher returns once its Job is submitted and active (the Job then runs about 24 h in the cluster). Report the printed result.json (state, job_uid) of each launcher verbatim. Run launch-rr first, then launch-t. Owner authorized going over the monthly budget on 2026-11-08 (ceiling USD 60, see launch/README.md).
