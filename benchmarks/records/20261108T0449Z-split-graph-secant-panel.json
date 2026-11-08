@@ -1,6 +1,6 @@
 {
   "branch": "claude/serene-davinci-ujoi58",
-  "closed_utc": null,
+  "closed_utc": "2026-11-08T12:31:24+00:00",
   "commands": [
     {
       "argv": [
@@ -11,6 +11,71 @@
       "exit": 0,
       "started_utc": "2026-11-08T04:59:06+00:00",
       "wall_s": 133.117
+    },
+    {
+      "argv": [
+        "research/split_graph_secant_cost_20261107/cards/wait_command_status.sh",
+        "research/split_graph_secant_cost_20261107/cards/status_request.json",
+        "sgsecant-panel-20261107",
+        "research/split_graph_secant_cost_20261107/receipts/R2/status",
+        "4500",
+        "60",
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-08T05:01:20+00:00",
+      "wall_s": 3534.975
+    },
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command",
+        "research/split_graph_secant_cost_20261107/eks/r2img_request_attempt2.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-08T06:05:08+00:00",
+      "wall_s": 131.13
+    },
+    {
+      "argv": [
+        "research/split_graph_secant_cost_20261107/cards/wait_command_status.sh",
+        "research/split_graph_secant_cost_20261107/cards/status_request_a2.json",
+        "sgsecant-panel-20261108-a2",
+        "research/split_graph_secant_cost_20261107/receipts/A2/status",
+        "5400",
+        "60",
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command"
+      ],
+      "cwd": ".",
+      "exit": 41,
+      "started_utc": "2026-11-08T06:07:19+00:00",
+      "wall_s": 5422.514
+    },
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command",
+        "research/split_graph_secant_cost_20261107/eks/r2img_request_attempt3.json"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-08T09:18:00+00:00",
+      "wall_s": 131.524
+    },
+    {
+      "argv": [
+        "research/split_graph_secant_cost_20261107/cards/wait_command_status.sh",
+        "research/split_graph_secant_cost_20261107/cards/status_request_a3.json",
+        "sgsecant-panel-20261108-a3",
+        "research/split_graph_secant_cost_20261107/receipts/A3/status",
+        "900",
+        "60",
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command"
+      ],
+      "cwd": ".",
+      "exit": 41,
+      "started_utc": "2026-11-08T09:20:11+00:00",
+      "wall_s": 954.276
     }
   ],
   "commit": "15a41df4aa5ca040171d56f87ce76548db9c3002",
@@ -26,19 +91,254 @@
     "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39"
   },
   "id": "20261108T0449Z-split-graph-secant-panel",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 120,
+      "name": "cs1_over_cd.field.excl_construct.gm.c1_p151_d3",
+      "note": "PROTOCOL.md sec. 6/9 decision statistic: geometric mean of per-unit complete same-base field-op ratio cs1/cd (candidate/reference, NOT reference/candidate; lower = candidate cheaper), excl. construct; spread = 95% percentile bootstrap CI (4000, paired units); verdict higher at 5% margin; source results/A3/analysis/a3sgsecant_summary.json (reproduces panel/summary.json); [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.138421,
+        1.160318
+      ],
+      "unit": "ratio",
+      "value": 1.149494
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 120,
+      "name": "cs1_over_cd.field.excl_construct.gm.c2_p227_d4",
+      "note": "PROTOCOL.md sec. 6/9 decision statistic: geometric mean of per-unit complete same-base field-op ratio cs1/cd (candidate/reference, NOT reference/candidate; lower = candidate cheaper), excl. construct; spread = 95% percentile bootstrap CI (4000, paired units); verdict higher at 5% margin; source results/A3/analysis/a3sgsecant_summary.json (reproduces panel/summary.json); [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.358821,
+        1.37723
+      ],
+      "unit": "ratio",
+      "value": 1.368187
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 120,
+      "name": "cs1_over_cd.field.excl_construct.gm.c3_p337_d5",
+      "note": "PROTOCOL.md sec. 6/9 decision statistic: geometric mean of per-unit complete same-base field-op ratio cs1/cd (candidate/reference, NOT reference/candidate; lower = candidate cheaper), excl. construct; spread = 95% percentile bootstrap CI (4000, paired units); verdict indistinct at 5% margin; source results/A3/analysis/a3sgsecant_summary.json (reproduces panel/summary.json); [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.029968,
+        1.037969
+      ],
+      "unit": "ratio",
+      "value": 1.034109
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 120,
+      "name": "cs1_over_cd.field.excl_construct.gm.c4_p491_d6",
+      "note": "PROTOCOL.md sec. 6/9 decision statistic: geometric mean of per-unit complete same-base field-op ratio cs1/cd (candidate/reference, NOT reference/candidate; lower = candidate cheaper), excl. construct; spread = 95% percentile bootstrap CI (4000, paired units); verdict higher at 5% margin; source results/A3/analysis/a3sgsecant_summary.json (reproduces panel/summary.json); [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.15116,
+        1.161674
+      ],
+      "unit": "ratio",
+      "value": 1.156684
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 120,
+      "name": "cs1_over_cd.field.excl_construct.gm.c5_p673_d7",
+      "note": "PROTOCOL.md sec. 6/9 decision statistic: geometric mean of per-unit complete same-base field-op ratio cs1/cd (candidate/reference, NOT reference/candidate; lower = candidate cheaper), excl. construct; spread = 95% percentile bootstrap CI (4000, paired units); verdict indistinct at 5% margin; source results/A3/analysis/a3sgsecant_summary.json (reproduces panel/summary.json); [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.954951,
+        0.961075
+      ],
+      "unit": "ratio",
+      "value": 0.95796
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 120,
+      "name": "cs1_over_cd.field.excl_construct.gm.c6_p991_d8",
+      "note": "PROTOCOL.md sec. 6/9 decision statistic: geometric mean of per-unit complete same-base field-op ratio cs1/cd (candidate/reference, NOT reference/candidate; lower = candidate cheaper), excl. construct; spread = 95% percentile bootstrap CI (4000, paired units); verdict higher at 5% margin; source results/A3/analysis/a3sgsecant_summary.json (reproduces panel/summary.json); [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        1.056778,
+        1.063091
+      ],
+      "unit": "ratio",
+      "value": 1.059893
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 120,
+      "name": "cs2_over_cd.field.excl_construct.gm.c1_p151_d3",
+      "note": "PROTOCOL.md sec. 6/9 decision statistic: geometric mean of per-unit complete same-base field-op ratio cs2/cd (candidate/reference, NOT reference/candidate; lower = candidate cheaper), excl. construct; spread = 95% percentile bootstrap CI (4000, paired units); verdict higher at 5% margin; source results/A3/analysis/a3sgsecant_summary.json (reproduces panel/summary.json); [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        3.523221,
+        3.659881
+      ],
+      "unit": "ratio",
+      "value": 3.592083
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 120,
+      "name": "cs2_over_cd.field.excl_construct.gm.c2_p227_d4",
+      "note": "PROTOCOL.md sec. 6/9 decision statistic: geometric mean of per-unit complete same-base field-op ratio cs2/cd (candidate/reference, NOT reference/candidate; lower = candidate cheaper), excl. construct; spread = 95% percentile bootstrap CI (4000, paired units); verdict higher at 5% margin; source results/A3/analysis/a3sgsecant_summary.json (reproduces panel/summary.json); [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        3.598717,
+        3.693908
+      ],
+      "unit": "ratio",
+      "value": 3.647748
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 120,
+      "name": "cs2_over_cd.field.excl_construct.gm.c3_p337_d5",
+      "note": "PROTOCOL.md sec. 6/9 decision statistic: geometric mean of per-unit complete same-base field-op ratio cs2/cd (candidate/reference, NOT reference/candidate; lower = candidate cheaper), excl. construct; spread = 95% percentile bootstrap CI (4000, paired units); verdict higher at 5% margin; source results/A3/analysis/a3sgsecant_summary.json (reproduces panel/summary.json); [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        3.548128,
+        3.621627
+      ],
+      "unit": "ratio",
+      "value": 3.585584
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 120,
+      "name": "cs2_over_cd.field.excl_construct.gm.c4_p491_d6",
+      "note": "PROTOCOL.md sec. 6/9 decision statistic: geometric mean of per-unit complete same-base field-op ratio cs2/cd (candidate/reference, NOT reference/candidate; lower = candidate cheaper), excl. construct; spread = 95% percentile bootstrap CI (4000, paired units); verdict higher at 5% margin; source results/A3/analysis/a3sgsecant_summary.json (reproduces panel/summary.json); [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        3.936075,
+        4.022201
+      ],
+      "unit": "ratio",
+      "value": 3.98107
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 120,
+      "name": "cs2_over_cd.field.excl_construct.gm.c5_p673_d7",
+      "note": "PROTOCOL.md sec. 6/9 decision statistic: geometric mean of per-unit complete same-base field-op ratio cs2/cd (candidate/reference, NOT reference/candidate; lower = candidate cheaper), excl. construct; spread = 95% percentile bootstrap CI (4000, paired units); verdict higher at 5% margin; source results/A3/analysis/a3sgsecant_summary.json (reproduces panel/summary.json); [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        3.610828,
+        3.665767
+      ],
+      "unit": "ratio",
+      "value": 3.638504
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 120,
+      "name": "cs2_over_cd.field.excl_construct.gm.c6_p991_d8",
+      "note": "PROTOCOL.md sec. 6/9 decision statistic: geometric mean of per-unit complete same-base field-op ratio cs2/cd (candidate/reference, NOT reference/candidate; lower = candidate cheaper), excl. construct; spread = 95% percentile bootstrap CI (4000, paired units); verdict higher at 5% margin; source results/A3/analysis/a3sgsecant_summary.json (reproduces panel/summary.json); [pcc:unverified]",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        4.416292,
+        4.47007
+      ],
+      "unit": "ratio",
+      "value": 4.443209
+    }
+  ],
   "problem": "study:split_graph_secant_cost_20261107",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 427,
+      "path": "research/split_graph_secant_cost_20261107/results/A3/90583573-94c9-4b32-9381-df556d030f0c/SHA256SUMS",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9e/9ea0d070e545620ffbc452f573255660f5d94a741faf22b2f136d2d2fd6a49f8",
+      "sha256": "9ea0d070e545620ffbc452f573255660f5d94a741faf22b2f136d2d2fd6a49f8",
+      "uploaded": true
+    },
+    {
+      "bytes": 140939,
+      "path": "research/split_graph_secant_cost_20261107/results/A3/90583573-94c9-4b32-9381-df556d030f0c/panel/summary.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/52/520884540b1b4b2736b5efac0a655a971600ac23daab141edc3ab63389b465c2",
+      "sha256": "520884540b1b4b2736b5efac0a655a971600ac23daab141edc3ab63389b465c2",
+      "uploaded": true
+    },
+    {
+      "bytes": 5637163,
+      "path": "research/split_graph_secant_cost_20261107/results/A3/90583573-94c9-4b32-9381-df556d030f0c/panel/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/10/10bc7b34e784d3e61cdfc05bcea535662b83fb3f3549b1aa183172cf43fcc1e2",
+      "sha256": "10bc7b34e784d3e61cdfc05bcea535662b83fb3f3549b1aa183172cf43fcc1e2",
+      "uploaded": true
+    },
+    {
+      "bytes": 202,
+      "path": "research/split_graph_secant_cost_20261107/results/A3/90583573-94c9-4b32-9381-df556d030f0c/panel/config.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/3b/3be59ba273c13651a6fa648a664139b24ac485bdd6a3b8594df129bbbff7faeb",
+      "sha256": "3be59ba273c13651a6fa648a664139b24ac485bdd6a3b8594df129bbbff7faeb",
+      "uploaded": true
+    },
+    {
+      "bytes": 45413,
+      "path": "research/split_graph_secant_cost_20261107/results/A3/90583573-94c9-4b32-9381-df556d030f0c/panel/summary.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/cc/ccd86facfcd88352b345b07c68b9a264fd34ec8bdb8cb0fb46ccbf854fea85ce",
+      "sha256": "ccd86facfcd88352b345b07c68b9a264fd34ec8bdb8cb0fb46ccbf854fea85ce",
+      "uploaded": true
+    },
+    {
+      "bytes": 17223,
+      "path": "research/split_graph_secant_cost_20261107/receipts/A3/status.archive/a3-status-polls.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/79/792d332c2eef4a8cbd12b367e44e240a32c77303efad076ec257302b259e8977",
+      "sha256": "792d332c2eef4a8cbd12b367e44e240a32c77303efad076ec257302b259e8977",
+      "uploaded": true
+    },
+    {
+      "bytes": 12316,
+      "path": "research/split_graph_secant_cost_20261107/results/A3/analysis/scripts.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/9e/9e3ce3e4d439735a6bc2d469cf0d86bd3ea31ca1f7413ece5881b3bd7332ae94",
+      "sha256": "9e3ce3e4d439735a6bc2d469cf0d86bd3ea31ca1f7413ece5881b3bd7332ae94",
+      "uploaded": true
+    }
+  ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
-    "png": [],
-    "svg": []
+    "pdf": "research/split_graph_secant_cost_20261107/results/A3/analysis/a3sgsecant_report.pdf",
+    "png": [
+      "research/split_graph_secant_cost_20261107/results/A3/analysis/a3sgsecant_fig1.png"
+    ],
+    "svg": [
+      "research/split_graph_secant_cost_20261107/results/A3/analysis/a3sgsecant_fig1.svg"
+    ]
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "split-graph-secant-panel",
-  "status": "open",
-  "summary": "",
+  "status": "measured",
+  "summary": "split-graph secant panel (attempt 3): PROTOCOL section 9 REJECTED at the tested scale for cs1 and cs2, and UNRANKED under section 5a (order reverses at 1 GAE/native op); all section 8 gates pass, 6/6 clean cells; handled degree d+1 vs 2d+2 held",
   "validation": null
 }

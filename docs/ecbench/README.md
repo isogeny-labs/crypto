@@ -69,7 +69,7 @@ Factor bases (build with `ecbench fb`, publish to Git/`store:`, run
 | `verify` | audit a session from its own files, with exact replays | §9 |
 | `compare` | compare arm B against arm A, paired bootstrap intervals | §8 |
 | `table` | every arm on every curve, mean `S`, ratio to the floor and to the reference arm | §3, §8 |
-| `band` | the pricing band of AGENTS.md §5a: unpriced native work charged at each weight | AGENTS.md §5a |
+| `band` | the pricing band of AGENTS.md §5a: unpriced native work charged at each weight; `--price-table-work` (opt-in) also charges the table oracles' counted per-step inserts, which `cost.unpriced` never lists | AGENTS.md §5a, §8 "The pricing band" |
 | `resources` | resource vectors for all measured attempts | §7 |
 | `trend` | fit how a paired ratio moves across curves from `compare --save` files | §8 |
 | `calibrate` | A/A interval coverage and false admissions across quiet and contended sessions | §8 |
@@ -1166,6 +1166,37 @@ method does not take).
   holds at every weight and otherwise says `unresolved inside the band`
   (or `unrankable` when a counter is uncounted). It is over the verified
   pairs, with censored pairs excluded.
+- **Table work, an opt-in price (`--price-table-work`, 2026-11-08).** The
+  band charges, at `w`, every counter a record names in `cost.unpriced`.
+  Prime-field rho names its per-step negation canonicalisation there
+  (`canonicalisations_uncharged`, about one per step), so its per-step
+  native work is in `U`. The index-calculus table oracles (`wwalk`, the
+  pair tables: every oracle in `ic_framework/plugins.rs` that calls
+  `table_counted()`) record their per-step hash inserts only as
+  `work_native.table_insert_attempts` behind the marker
+  `counted:table_insert_attempts`, for the bitop unit (`work.rs`), and
+  never list them in `cost.unpriced`, so by default the band charges rho's
+  per-step operation and not the walk's. That asymmetry is why walk-table
+  arms read as "unresolved inside the band" or below rho at `w = 1` in
+  `research/curve25519_f1_targetwalk_20261108` (section 5) and
+  `research/curve25519_f1_walk_20261107`. `ecbench band --price-table-work`
+  and `ecbench compare --price-table-work` (`band::Pricing { table_work }`)
+  add the phase sum of each `band::TABLE_WORK_COUNTERS` counter to `U`, when
+  and only when the record carries the matching `counted:` marker in some
+  phase (a count without its marker is not known to be complete and is not
+  charged). The option is off by default so every committed band file and
+  comparison recomputes as written; a band row always lists the mean
+  table-work counts (`table_work_mean_counts`), the report names the
+  priced counters (`priced_table_work`, absent when off), and a comparison
+  carries them on each arm (`table_work_counts`) and, when priced, in its
+  identity (`priced_table_work`; a different `comparison_id`). **The record
+  format is unchanged**: the price is a reading of the committed
+  `work_native` maps, not a new counter, so `cost.unpriced` and the phase
+  `native` maps that `verify` compares (`audit::compare_replay`) are as they
+  were and committed sessions keep replaying "identical". Numbers and the
+  rule: `research/ecbench_table_work_pricing_20261108/`. The §5a text does
+  not yet say which reading is the band; until the owner rules, a note that
+  quotes a walk-table arm's distance to rho at `w > 0` gives both.
 - **Sessions must be complete.** `compare` refuses a session whose status
   is not `complete`. `--allow-interrupted` compares it anyway as
   descriptive evidence: the comparison records the statuses and the flag,

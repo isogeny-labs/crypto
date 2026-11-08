@@ -39,7 +39,7 @@ equation (as in PKM towers); the zero-dimensional quotient has the planted solut
 curve    --p P [--cseed S]
 cosets   --kind kummer|dickson --p P --t T --C C --seed S [--cseed S] [--out cosets.json]
 coverage --kind K --p P --t T --C C --seed S --select max|med|min|random|idx:K     (m=2 always; m=3 when 2^t <= 64)
-emit     --kind K --p P --t T --m 2|3 --C C --seed S --select ... --tseed N --out file.ms   (prints meta JSON)
+emit     --kind K --p P --t T --m 2|3 --C C --seed S --select ... --tseed N [--target planted|unplanted] --out file.ms   (prints meta JSON)
 parse    --log msolve.log
 purity   --p P --m 2|3 [--cseed S]      (m=2: p <= 10^4; m=3: p <= 200)
 selftest
@@ -99,3 +99,22 @@ $B emit     --kind K --p P --t T --m M --C C --seed S --select SEL --tseed N --o
 $B parse --log cell.log
 $B purity --p P --m 2 --cseed CS     # p <= 10^4;  --m 3 for p <= 200
 ```
+
+## Round 2: unplanted targets (instrument extension; smoke only, no claim cell)
+
+`emit --target unplanted` (default `planted`, unchanged): `R = [k]G`, `G` a random point and `k` uniform in `[1, n-1]`, both drawn from `--tseed`
+(R is a uniformly random point of E, independent of the coset). No planted solution exists, so no planted check; instead the program
+asserts the system is well formed (`m*t + 1` equations, S nonzero, tower equations vanish on coset elements). For `2^t <= 64`, `m <= 3` it
+decides decomposability exhaustively over the signed E-columns of the coset and records in the meta JSON:
+`decomposes` (some `R = +-P_1 +- ... +- P_m` with columns possibly repeated, i.e. the system has an F_p solution
+with all `x_i` E-abscissae of the coset) and `decomposes_distinct` (distinct columns). Also `target`, `planted_verified: false`, `planted_x: null`.
+`parse` now also handles msolve's inconsistent output ("Grobner basis has a single element / No solution", basis `[1]`, no "Dimension of
+quotient" line): `quotient_dim = 0`, new field `inconsistent: true`, while `D_max_deg`, `widest_cols`, `sum_rows_x_cols` are still read from the F4 rounds.
+selftest: 15/15 PASS (adds a synthetic inconsistent-log parse case and a decomposition-search case).
+
+Smoke (`smoke/round2/run_round2.sh`, logs and `f4_unplanted.jsonl` in `smoke/round2/`; `[pcc:unverified]`): Kummer p = 12289 and Dickson p = 65519, C = 300,
+m = 2 (t = 3, 4) and m = 3 (t = 2, 3), select max/med, 12 target seeds each: 168 cells run (the 24 m = 3, t = 2, `med` cells abort because c_E < 3).
+Every cell parsed. Decomposes true in **2 of 168** cells (kummer t=2 m=3 max ts3; dickson t=4 m=2 med ts8); in all 168 `quotient_dim > 0` iff `decomposes`
+(inconsistent cells give quotient_dim 0). F4 work on unplanted (all inconsistent) cells is constant across target seeds and cosets at each (kind, t, m),
+for example sum rows x cols: m=2, t=3: 34189; t=4: 258271; m=3, t=3: 13029970 (one Kummer med cell 13036485); D = 4 (m=2), 12 (m=3), the same as planted.
+Not run at protocol primes. Caveats: toy sizes; the hit rate is about `(2 c_E)^m / n` per target, tiny here, so it says nothing about large primes.
