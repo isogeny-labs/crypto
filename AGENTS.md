@@ -1128,6 +1128,29 @@ Every cross-method comparison and every ranking must:
   unchanged. A new byte-valued counter is added there; do not name a byte
   count `*_uncharged` without doing so. The audit and the re-run studies are
   in `research/ic_byte_counter_pricing_20261101/`.
+- **The band prices the table oracles' counted per-step inserts** (owner,
+  2026-11-08). The index-calculus table oracles (`wwalk` and the pair
+  tables, every oracle in `src/cryptanalysis/ic_framework/plugins.rs` that
+  calls `table_counted()`) do one hash-table insert per walk step and
+  record it only as `work_native.table_insert_attempts` behind the marker
+  `counted:table_insert_attempts`, never in `cost.unpriced`, while
+  prime-field rho lists its per-step canonicalisation there and is charged
+  for it. From 2026-11-08 the band's default reading adds the phase sum of
+  each counter in `TABLE_WORK_COUNTERS` (`src/cryptanalysis/ecbench/band.rs`,
+  today `table_insert_attempts`) to `U` on every arm, when and only when
+  some phase of the record carries the matching `counted:<name>` marker;
+  counted work without its marker is not known to be complete and is not
+  charged. A band or comparison computed before that date is the
+  pre-2026-11-08 reading and is labelled so where it is cited again; its
+  frozen evidence is not rewritten. `ecbench band --no-price-table-work`
+  and `ecbench compare --no-price-table-work` (`band::Pricing::
+  pre_2026_11_08()`) reproduce it, `comparison_id` and plain
+  `comparisons/a__b.json` name included; a default comparison carries the
+  priced counters in its identity and is saved under its id. The record
+  format does not change: the price is a reading of the committed
+  `work_native` maps, `cost.unpriced` and the phase `native` maps are
+  written as before, and committed sessions replay "identical". The
+  numbers under both readings: `research/ecbench_table_work_pricing_20261108/`.
 
 This applies to `ecbench compare` read-outs, tables, frontier syntheses,
 ledger rows, papers and PR descriptions. A ratio produced before this rule
