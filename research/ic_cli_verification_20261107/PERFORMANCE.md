@@ -4,12 +4,18 @@ Measured on the same Apple Silicon host, Python 3.13, campaign directory on
 the external SSD, ECC2K-130 `docs/ic/params/ecc2k130-fixed.json`, stage
 `pairs`. Rate includes factor-base construction and process start-up.
 
-| Candidates | Baseline (`isogeny/main`) | Optimized | Speedup |
+| Candidates | Baseline (`isogeny/main`) | Batched + field + batch inversion | Plus index-off build |
 | ---: | ---: | ---: | ---: |
-| 200,000 | 54.63 s, 3,661 candidates/s | 28.17 s, 7,100 candidates/s | 1.94× |
-| 500,000 | 142.74 s, 3,503 candidates/s | 75.60 s, 6,614 candidates/s | 1.89× |
+| 200,000 | 54.63 s, 3,661 candidates/s | 28.17 s, 7,100 candidates/s | same regime |
+| 500,000 | 142.74 s, 3,503 candidates/s | 75.60 s, 6,614 candidates/s | 61.37 s, 8,147 candidates/s |
 
-The 500,000-candidate campaign produced 499,930 pairs and a 160 MiB database.
+The 500,000-candidate campaign produced 499,930 pairs. With the index kept on,
+the database was 160 MiB; with the bulk index-off path it was 76 MiB during
+the incomplete build, and `CREATE INDEX pair_lookup` took 1.08 s and grew it
+to 142 MiB. The 500k wall figures were taken sequentially and the host load
+varies; a paired 50,000-candidate CPU-time test (four runs each, alternating)
+gave a median of 8.04 s with the index on and 7.69 s with it off (1.05×).
+
 The earlier in-progress run reported ~2,200 candidates/s at 1.8M candidates;
 the larger table is dominated by index growth, which is why the 500k figure is
 the more representative regression baseline.
@@ -45,10 +51,18 @@ git archive isogeny/main ecc2k130/codegen | tar -x -C "$TMP" --strip-components=
    inverse) take the scalar path. Differential tests compare every result with
    `Curve.add` for 500 random pairs plus all doublings on a small curve, and
    for 64 random pairs at degree 131.
+4. **Index-off bulk build:** above 100,000 planned candidates, `pair_lookup`
+   is dropped for the insert phase and created once when the table completes.
+   This halves the database during the build and removes B-tree maintenance
+   from every row. `decomposeExact` recreates the index if a completed table
+   lost it. The disk preflight reserves the final index (`192` bytes per
+   candidate) so a successful build cannot run out of space at index creation.
 
 ## Crash boundary
 
 A crash can lose at most one 4,096-candidate chunk. The cursor, rolling
 checksum, and rows commit together; `checkPairs` validates the committed
-cursor and checksum before resuming. The pair table is target-independent and
-rebuildable, so this trade is explicit rather than silent.
+cursor and checksum before resuming. If a crash lands after the last row but
+before index creation, the next completed build or `decomposeExact` creates
+the index. The pair table is target-independent and rebuildable, so this trade
+is explicit rather than silent.

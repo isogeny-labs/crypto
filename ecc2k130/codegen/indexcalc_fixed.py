@@ -25,6 +25,9 @@ FORMAT = 'fixed-koblitz-ic-v1'
 # enough to amortise SQLite's commit cost. The cursor and rolling checksum
 # are committed with the rows, so a crash loses at most one chunk.
 PAIR_CHUNK = 4096
+# Above this many planned candidates, maintaining pair_lookup during inserts
+# costs more than dropping it and rebuilding once at the end.
+PAIR_INDEX_THRESHOLD = 100000
 
 
 def require(condition, message):
@@ -182,6 +185,19 @@ def consideredCount(size, i, j):
 def requiredBytes(planned, bytesPerPair):
     """Disk estimate used before a pair-table chunk; 25% slack + 32 MiB."""
     return (planned * bytesPerPair * 5) // 4 + 32 * 1024 * 1024
+
+
+# Index entries are roughly this large on the degree-131 text keys. When the
+# pair index is absent during a bulk build, reserve room to create it once.
+PAIR_INDEX_BYTES_PER_PAIR = 192
+
+
+def pairTableRequiredBytes(planned, bytesPerPair, totalPairs, indexPresent):
+    """Disk required for this chunk, including the final index when absent."""
+    required = requiredBytes(planned, bytesPerPair)
+    if not indexPresent:
+        required += totalPairs * PAIR_INDEX_BYTES_PER_PAIR
+    return required
 
 
 class Progress:
@@ -429,6 +445,22 @@ class Campaign:
             with self.db:
                 self.put('base_order', self.baseHash)
 
+    def pairIndexExists(self):
+        return self.db.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='index' AND name='pair_lookup'"
+        ).fetchone() is not None
+
+    def ensurePairIndex(self):
+        if self.memory or self.pairIndexExists():
+            return
+        with self.db:
+            self.db.execute('CREATE INDEX IF NOT EXISTS pair_lookup ON pairs(point)')
+
+    def dropPairIndex(self):
+        if not self.memory and self.pairIndexExists():
+            with self.db:
+                self.db.execute('DROP INDEX IF EXISTS pair_lookup')
+
     def buildPairs(self, budget):
         """Build at most budget candidate pairs; each chunk and cursor commit together."""
         require(type(budget) is int and budget >= 0, 'pair budget must be nonnegative')
@@ -440,19 +472,21 @@ class Campaign:
             self.progress.pairStart()
             if state['i'] == size:
                 self.uses['pair_table_loads'] += 1
+                self.ensurePairIndex()
                 self.progress.pairTable(total, total, state['serial'], True, 0, budget)
                 return True
             considered = consideredCount(size, state['i'], state['j'])
+            remaining = max(0, total - considered)
+            planned = min(budget, remaining)
             if not self.memory:
-                remaining = max(0, total - considered)
-                planned = min(budget, remaining)
                 pages = self.db.execute('PRAGMA page_count').fetchone()[0]
                 page_size = self.db.execute('PRAGMA page_size').fetchone()[0]
                 if state['serial'] > 0:
                     bytes_per_pair = max(128, (pages * page_size + state['serial'] - 1) // state['serial'])
                 else:
                     bytes_per_pair = 256
-                required = requiredBytes(planned, bytes_per_pair)
+                required = pairTableRequiredBytes(planned, bytes_per_pair, total,
+                                                  self.pairIndexExists())
                 free = shutil.disk_usage(self.directory).free
                 if free < required:
                     raise ValueError(
@@ -460,6 +494,8 @@ class Campaign:
                         'choose --dir on a volume with more space or stop earlier with --pair-budget'
                         % (required // (1024 * 1024), self.directory.resolve(),
                            free // (1024 * 1024)))
+            if planned >= PAIR_INDEX_THRESHOLD:
+                self.dropPairIndex()
             done = 0
             reportEvery = max(PAIR_CHUNK, budget // 100)
             nextReport = reportEvery
@@ -509,6 +545,8 @@ class Campaign:
             finally:
                 self.db.execute('PRAGMA synchronous=%d' % previous_sync)
             complete = state['i'] == size
+            if complete:
+                self.ensurePairIndex()
             considered = consideredCount(size, state['i'], state['j'])
             self.progress.pairTable(considered, total, state['serial'], complete, done, budget)
             return complete
@@ -616,6 +654,7 @@ class Campaign:
             return witness, details
         state = self.meta('pair_state')
         require(state is not None and state['i'] == len(self.points), 'pair table is incomplete')
+        self.ensurePairIndex()
         deadline = time.monotonic() + seconds
         with self.ledger.phase('decomposition'):
             prefixes = [(None, None)] if self.params.summands == 2 else enumerate(self.points)
