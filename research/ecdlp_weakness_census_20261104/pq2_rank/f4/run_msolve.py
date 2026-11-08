@@ -10,6 +10,7 @@ descended systems pq2_rank dumps (PQ2_DUMP=<dir>), and record per instance:
 Usage: run_msolve.py DUMP_DIR OUT_JSON [CENSUS_JSON]
 With CENSUS_JSON (a pq2_rank JSON on the same instances), each row also gets
 the census lower bound d_iter, so the two can be compared instance by instance.
+Environment: MSOLVE_THREADS (default 1), MSOLVE_TIMEOUT in seconds (default 3600; 0 = none).
 """
 import json
 import os
@@ -61,8 +62,10 @@ def run(path):
         fin, fout = os.path.join(td, "in.ms"), os.path.join(td, "out.ms")
         open(fin, "w").write(to_msolve(J))
         t0 = time.time()
-        p = subprocess.run([MSOLVE, "-f", fin, "-g", "2", "-v", "2", "-o", fout],
-                           capture_output=True, text=True, timeout=3600)
+        threads = os.environ.get("MSOLVE_THREADS", "1")
+        limit = float(os.environ.get("MSOLVE_TIMEOUT", "3600")) or None
+        p = subprocess.run([MSOLVE, "-f", fin, "-g", "2", "-v", "2", "-t", threads, "-o", fout],
+                           capture_output=True, text=True, timeout=limit)
         secs = time.time() - t0
         steps = [int(m.group(1)) for m in map(STEP.match, p.stdout.splitlines()) if m]
         out = open(fout).read() if os.path.exists(fout) else ""

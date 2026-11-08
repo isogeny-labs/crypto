@@ -332,6 +332,18 @@ through `experiment-director`, `.resume/RESUME.md`, bench record, pricing at
 0, 0.1 and 1 GAE, and the `controlled-experiment` controls. Nothing here is
 scheduled.
 
+## 6a. Follow-ups run (2026-11-07/08)
+
+The three proposals with a cheap native test were preregistered (#3657), run under task
+cards, assessed and reported (`followups/README.md`). Stage-level outcomes, toy fields,
+[pcc:unverified]: **P1** the Riemann–Roch system keeps its lower solving degree with the
+Dickson-torus tower that NIST-shape primes need (rule 5 at m = 3; m = 5 undecided);
+**P2** choosing the most E-pure coset of a 2-power base gives a constant-factor gain
+(≈ 1.9 / 3.5 at t = 4) that vanishes as the base grows; **P3** across 4,000 random
+prime-order curves, the split-prime statistic does not move exact relation coverage or
+the measured rho cost: the seed is closed for the coordinate track as well as the generic
+one. The Lean core of §3 and the two proposals' lemmas are in aburan28/crypto-lean#3.
+
 ## 7. Status of every statement
 
 | statement | status |

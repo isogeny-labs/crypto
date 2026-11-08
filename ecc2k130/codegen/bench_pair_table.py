@@ -28,6 +28,8 @@ def main():
     parser.add_argument('--dir', type=Path,
                         help='campaign directory; a temporary one is used by default')
     parser.add_argument('--keep', action='store_true', help='keep the temporary campaign')
+    parser.add_argument('--pair-workers', type=int, default=1,
+                        help='processes for pair sums (1 disables the pool)')
     parser.add_argument('--json', action='store_true')
     args = parser.parse_args()
 
@@ -45,7 +47,8 @@ def main():
         result = subprocess.run(
             [sys.executable, str(HERE / 'indexcalc_fixed.py'),
              '--params', str(args.params), '--dir', str(directory),
-             '--stage', 'pairs', '--pair-budget', str(args.candidates)],
+             '--stage', 'pairs', '--pair-budget', str(args.candidates),
+             '--pair-workers', str(args.pair_workers)],
             cwd=HERE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         elapsed = time.perf_counter() - started
         try:
