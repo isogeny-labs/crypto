@@ -37,7 +37,7 @@ static std::pair<Json,Json> velu(Field& f,const Big& a,const Big& b,unsigned ell
 }
 struct Parameters {
  std::string name;std::unique_ptr<EC_GROUP,decltype(&EC_GROUP_free)> group;Field f;Big a,b,n,t,gx,gy;
- explicit Parameters(const std::string& name):name(name),group(EC_GROUP_new_by_curve_name(curve_nid(name)),EC_GROUP_free),f("3"){
+ explicit Parameters(const std::string& name):name(name),group(curve_group(name),EC_GROUP_free),f("3"){
   require(bool(group),"curve group");require(EC_GROUP_get_curve(group.get(),f.p.p,a.p,b.p,f.ctx),"parameters");require(EC_GROUP_get_order(group.get(),n.p,f.ctx),"order");require(BN_check_prime(n.p,f.ctx,nullptr)==1,"prime subgroup");require(EC_POINT_get_affine_coordinates(group.get(),EC_GROUP_get0_generator(group.get()),gx.p,gy.p,f.ctx),"generator");require(BN_copy(t.p,f.p.p)&&BN_add_word(t.p,1)&&BN_sub(t.p,t.p,n.p),"trace");
  }
  Json curve(){return object({{"name",token(name)},{"p",token(f.p.str())},{"a",token(a.str())},{"b",token(b.str())},{"n",token(n.str())},{"t",token(t.str())},{"gx",token(gx.str())},{"gy",token(gy.str())}});}

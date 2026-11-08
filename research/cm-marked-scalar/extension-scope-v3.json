@@ -1,0 +1,11 @@
+{
+ "id":"CM-NATIVE-ORIENTED-EXTENSION-V3",
+ "amends":"extension-scope-v2.json",
+ "correction":"The V2 text overstated the observed P-192 failure: its recorded V1 preflight stopped at 'curve group', before root testing. The installed OpenSSL named-curve table rejects prime192v1. Degree 5's repeated characteristic root is a separate arithmetic deduction, not that observed preflight result. Preserve both distinctions.",
+ "implementation":"Use the exact published P-192 prime-field parameters, generator and subgroup order through OpenSSL's explicit-group API. Check all parameters and generator; do not substitute a different curve.",
+ "fixed_edges":"Unchanged V2: P-192 degree13 smallest distinct root; P-224 degree11/root10; P-256 degree11/root8.",
+ "positive_control":"P-521 degree7/root6 must reproduce saved closure polynomial coefficients.",
+ "limits":{"processes":1,"threads":1,"memory_gib":2,"construction_seconds_per_curve":120,"build_seconds":120,"unchanged_retries":0,"cloud_submissions":0},
+ "filed_before_affected_construction":true,
+ "claims":"Exact construction and correctness; no timing or speed conclusion."
+}

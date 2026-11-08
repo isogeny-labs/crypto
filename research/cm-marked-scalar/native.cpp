@@ -57,11 +57,22 @@ static int curve_nid(const std::string& name){
  if(name=="P-521")return NID_secp521r1;
  throw std::runtime_error("unsupported exact curve name");
 }
+static EC_GROUP* curve_group(const std::string& name){
+ if(name!="P-192")return EC_GROUP_new_by_curve_name(curve_nid(name));
+ // This OpenSSL build omits prime192v1 from its named-curve table. Use the
+ // published prime-field model explicitly; no alternate curve is substituted.
+ Field f("6277101735386680763835789423207666416083908700390324961279");
+ Big a=f.sub(Big(),Big(3)),b("2455155546008943817740293915197451784769108058161191238065");
+ auto group=EC_GROUP_new_curve_GFp(f.p.p,a.p,b.p,f.ctx);require(group,"explicit P-192 group");
+ auto generator=point(group);
+ Big gx("602046282375688656758213480587526111916698976636884684818"),gy("174050332293622031404857552280219410364023488927386650641"),order("6277101735386680763835789423176059013767194773182842284081"),cofactor(1);
+ require(EC_POINT_set_affine_coordinates(group,generator.get(),gx.p,gy.p,f.ctx)&&EC_GROUP_set_generator(group,generator.get(),order.p,cofactor.p)&&EC_GROUP_check(group,f.ctx),"explicit P-192 parameters");return group;
+}
 struct Runtime {
  const Fixture& f; Field field; Big n,mu,correction,xscale,yscale; std::unique_ptr<Map> forward,back;
  EC_GROUP* group=nullptr;
  Runtime(const Fixture&v,bool relation=true):f(v),field(v.curve.at("p").str()),n(v.curve.at("n").str()),mu(v.marked.at("mu").str()){
-  group=EC_GROUP_new_by_curve_name(curve_nid(v.name));require(group,"group");Big actual;require(EC_GROUP_get_order(group,actual.p,field.ctx),"group order");require(actual==n,"exact subgroup order");if(relation){ forward=std::make_unique<Map>(v.closure.at("first").at("edge"),v.closure.at("first").at("target")); back=std::make_unique<Map>(v.closure.at("dual_normalized"),v.closure.at("scaled_endpoint")); xscale=Big(v.closure.at("closing_isomorphism").at("x_scale").str()); yscale=Big(v.closure.at("closing_isomorphism").at("y_scale").str()); Big ell(forward->degree),ei;require(BN_mod_inverse(ei.p,ell.p,n.p,field.ctx),"degree inverse");require(BN_mod_mul(correction.p,mu.p,ei.p,n.p,field.ctx),"correction");}
+  group=curve_group(v.name);require(group,"group");Big actual;require(EC_GROUP_get_order(group,actual.p,field.ctx),"group order");require(actual==n,"exact subgroup order");if(relation){ forward=std::make_unique<Map>(v.closure.at("first").at("edge"),v.closure.at("first").at("target")); back=std::make_unique<Map>(v.closure.at("dual_normalized"),v.closure.at("scaled_endpoint")); xscale=Big(v.closure.at("closing_isomorphism").at("x_scale").str()); yscale=Big(v.closure.at("closing_isomorphism").at("y_scale").str()); Big ell(forward->degree),ei;require(BN_mod_inverse(ei.p,ell.p,n.p,field.ctx),"degree inverse");require(BN_mod_mul(correction.p,mu.p,ei.p,n.p,field.ctx),"correction");}
  }
  ~Runtime(){EC_GROUP_free(group);}
  Affine affine(const EC_POINT* P){if(EC_POINT_is_at_infinity(group,P))return {};Affine a;a.infinity=false;require(EC_POINT_get_affine_coordinates(group,P,a.x.p,a.y.p,field.ctx),"get affine");return a;}
