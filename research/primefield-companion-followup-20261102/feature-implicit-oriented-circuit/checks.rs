@@ -1,0 +1,33 @@
+// Scalar enumeration exists only in deterministic correctness fixtures.
+fn observe(r:u64,m:usize,zeta:u64,k:u64,b:u64)->Observation{let mut z=1;let mut f=[0;3];for _ in 0..m{let s=pow((k+r-mul(b,z,r))%r,(r-1)/2,r);f[0]=(f[0]+s)%r;f[1]=(f[1]+mul(z,s,r))%r;f[2]=(f[2]+mul(pow(z,r-2,r),s,r))%r;z=mul(z,zeta,r)}Observation{b,f}}
+fn circuit_checks(){let(mut systems,mut points,mut strict,mut recovered,mut plus,mut minus,mut none,mut max_nodes)=(0,0,0,0,0,0,0,0);
+ for (r,m) in [(13u64,6usize),(17,4),(19,3),(37,6),(41,5),(97,3),(281,5),(281,7),(421,7),(1009,7)]{let zeta=(2..r).find(|&z|pow(z,m as u64,r)==1&&(1..m).all(|j|pow(z,j as u64,r)!=1)).unwrap();let radii=[2,1,3,2];let table:Vec<Vec<_>>=(0..r).map(|k|radii.iter().map(|&b|observe(r,m,zeta,k,b)).collect()).collect();
+  let ks:Vec<_>=if r>=281{vec![1,2,3,7,17,r-1]}else{(1..r).collect()};
+  for k in ks{for t in 1..=4{for sign in [1,r-1]{let obs=&table[k as usize][..t];let sys=ImplicitTranscript::build(r,m,sign,obs,100000).unwrap();max_nodes=max_nodes.max(sys.circuit.nodes.len());match sys.anchor_kind{"plus"=>plus+=1,"minus"=>minus+=1,_=>none+=1}
+   let expected:std::collections::BTreeSet<_>=(1..r).filter(|&j|pow(j,(r-1)/2,r)==sign&&table[j as usize][..t]==*obs).map(|j|pow(j,m as u64,r)).collect();
+   let anchor=(0..t).find(|&a|obs[a].f[1]!=0&&obs[a].f[2]!=0);
+   let old:std::collections::BTreeSet<_>=(1..r).filter(|&j|pow(j,(r-1)/2,r)==sign&&(0..t).all(|a|{let f=table[j as usize][a].f;f[0]==obs[a].f[0]&&mul(f[1],f[2],r)==mul(obs[a].f[1],obs[a].f[2],r)&&(obs[a].f[1]!=0||f[1]==0)&&(obs[a].f[2]!=0||f[2]==0)})&&anchor.map_or(true,|a|(a..t).all(|v|mul(obs[a].f[1],table[j as usize][v].f[1],r)==mul(obs[v].f[1],table[j as usize][a].f[1],r)))).map(|j|pow(j,m as u64,r)).collect();
+   assert!(expected.is_subset(&old));strict+=usize::from(expected.len()<old.len());
+   for y in 0..r{let values=sys.circuit.evaluate(y).unwrap();assert_eq!(sys.accepts_values(&values),expected.contains(&y),"r={r} m={m} k={k} t={t} sign={sign} y={y}");points+=1;
+    if let Some(j)=sys.phase_at(y).unwrap(){assert_eq!(pow(j,m as u64,r),y);assert_eq!(pow(j,(r-1)/2,r),sign);assert_eq!(table[j as usize][..t],*obs);recovered+=1;}
+   }systems+=1;
+  }}}
+ }
+ let r=17;let obs=[observe(r,4,4,3,2)];let sys=ImplicitTranscript::build(r,4,1,&obs,10000).unwrap();let q=[2,r-3,1];let values=sys.circuit.modulo(&q,2*sys.circuit.nodes.len()).unwrap();for y in [1,2]{let scalar=sys.circuit.evaluate(y).unwrap();for(i,v)in values.iter().enumerate(){assert_eq!(eval(v,y,r),scalar[i]);}}
+ assert!(matches!(sys.circuit.modulo(&q,2*sys.circuit.nodes.len()-1),Err(Error::Limit)));assert!(matches!(ImplicitTranscript::build(r,4,1,&obs,2),Err(Error::Limit)));assert!(matches!(ImplicitTranscript::build(r,3,1,&obs,10000),Err(Error::Domain)));
+ // Explicit minus-only branch, even if its transcript has empty support.
+ let synthetic=[Observation{b:2,f:[0,0,1]}];let s=ImplicitTranscript::build(13,6,1,&synthetic,10000).unwrap();assert_eq!(s.anchor_kind,"minus");for y in 0..13{let v=s.circuit.evaluate(y).unwrap();let expected=(1..13).any(|k|pow(k,6,13)==y&&pow(k,6,13)==1&&observe(13,6,4,k,2)==synthetic[0]);assert_eq!(s.accepts_values(&v),expected);}
+ let r=998244353;let m=7;let zeta=pow(3,(r-1)/m as u64,r);let mut large=0;let mut large_max=0;
+ for k in [1,2,3,17,123456789,r-1]{let obs:Vec<_>=[2,1,3,2].iter().map(|&b|observe(r,m,zeta,k,b)).collect();let sys=ImplicitTranscript::build(r,m,pow(k,(r-1)/2,r),&obs,100000).unwrap();let y=pow(k,m as u64,r);let v=sys.circuit.evaluate(y).unwrap();assert!(sys.accepts_values(&v));if sys.phase.is_some(){assert_eq!(sys.phase_at(y).unwrap(),Some(k));}large_max=large_max.max(sys.circuit.nodes.len());large+=1;}
+ assert!(plus>0&&none>0);
+ println!("transcript_systems={systems} image_membership_equalities={points} stricter_than_relative_states={strict} conditional_phase_checks={recovered} plus_anchor_systems={plus} minus_anchor_systems={minus} unanchored_systems={none} max_small_nodes={max_nodes}");
+ println!("large_prime={r} large_L={} large_controls={large} max_large_nodes={large_max} specialization_point_checks=2 capacity_boundary=checked",(r-1)/(2*m as u64));
+}
+fn public_checks(){let(mut transcripts,mut known,mut conditional,mut calls,mut guards)=(0,0,0,0,0);
+ for(p,a,b,r,base,m)in[(17u64,2u64,2u64,19u64,[5u64,1u64],3usize),(257,1,7,281,[1,3],5)]{let curve=group::Curve::new(p,a,b);let bp=group::Point{x:base[0],y:base[1]};assert_eq!(multiple(curve,bp,r),None);let source=source::Source::new(p,a,b,r,base,64).unwrap();let zeta=(2..r).find(|&z|pow(z,m as u64,r)==1&&(1..m).all(|j|pow(z,j as u64,r)!=1)).unwrap();
+  for k in 0..r{let target=multiple(curve,bp,k);match collect_public(&source,curve,bp,target,r,m,zeta,&[2,1,3,2],1+4*m).unwrap(){Collection::Known{scalar,calls:n}=>{assert_eq!(scalar,k);known+=1;calls+=n;},Collection::Transcript{sign,observations,calls:n}=>{assert_eq!(n,1+4*m);assert_eq!(sign,pow(k,(r-1)/2,r));for o in &observations{assert_eq!(*o,observe(r,m,zeta,k,o.b));}let sys=ImplicitTranscript::build(r,m,sign,&observations,100000).unwrap();let y=pow(k,m as u64,r);assert!(sys.accepts_values(&sys.circuit.evaluate(y).unwrap()));if let Some(j)=sys.phase_at(y).unwrap(){assert_eq!(multiple(curve,bp,j),target);conditional+=1;}transcripts+=1;calls+=n;},_=>panic!("unexpected cap")}
+   if k!=0{assert!(matches!(collect_public(&source,curve,bp,target,r,m,zeta,&[2],1).unwrap(),Collection::CallCap{calls:1}));guards+=1;}
+  }
+ }
+ println!("public_transcripts={transcripts} public_identity_endpoints={known} public_conditional_phase_checks={conditional} public_source_calls={calls} single_call_guards={guards}");
+}
