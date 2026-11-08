@@ -760,7 +760,10 @@ mod tests {
             "priced by default"
         );
         let json = serde_json::to_value(&report).unwrap();
-        assert_eq!(json["priced_table_work"], serde_json::json!(["table_insert_attempts"]));
+        assert_eq!(
+            json["priced_table_work"],
+            serde_json::json!(["table_insert_attempts"])
+        );
         let rows = committed["rows"].as_array().unwrap();
         assert_eq!(rows.len(), report.rows.len());
         let mut changed = 0;
@@ -792,7 +795,11 @@ mod tests {
             );
             let sqrt_r = 2f64.powf(got.log2_r / 2.0);
             for (k, m) in want["mean_s"].as_array().unwrap().iter().enumerate() {
-                let (m, g, w) = (m.as_f64().unwrap(), got.mean_s[k].unwrap(), DEFAULT_WEIGHTS[k]);
+                let (m, g, w) = (
+                    m.as_f64().unwrap(),
+                    got.mean_s[k].unwrap(),
+                    DEFAULT_WEIGHTS[k],
+                );
                 assert!(
                     (g - m - w * inserts / sqrt_r).abs() < 1e-9,
                     "{} w = {w}: {g} vs {m} + {}",
@@ -898,7 +905,11 @@ mod tests {
             .find(|r| r.arm == "rho-neg" && r.counts())
             .unwrap();
         let g0 = priced_gae(base, 1.0).unwrap().unwrap();
-        assert_eq!(priced_gae_with(base, 1.0, off).unwrap().unwrap(), g0, "no table work either way");
+        assert_eq!(
+            priced_gae_with(base, 1.0, off).unwrap().unwrap(),
+            g0,
+            "no table work either way"
+        );
         let mut r = base.clone();
         r.phases[0]
             .work_native
