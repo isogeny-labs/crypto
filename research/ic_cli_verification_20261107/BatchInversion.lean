@@ -52,9 +52,31 @@ theorem batch_step_invariant (prior x : g.G) :
     g.mul x (g.mul (g.inv (g.mul prior x)) prior) = g.one := by
   rw [batch_step, g.inv_mul_cancel]
 
+/-- Values produced by the backward pass, indexed left to right. -/
+def batchValues (prior : g.G) : List g.G → List g.G
+  | [] => []
+  | x :: rest =>
+      g.mul (g.inv (g.mul prior x)) prior :: batchValues (g.mul prior x) rest
+
+/-- Pointwise inverse relation on two equal-length lists. -/
+def PairwiseInverse : List g.G → List g.G → Prop
+  | [], [] => True
+  | x :: xs, y :: ys => g.mul x y = g.one ∧ PairwiseInverse xs ys
+  | _, _ => False
+
+/-- Every value in the batch is the inverse of its input element. -/
+theorem batchValues_inverses (prior : g.G) (xs : List g.G) :
+    PairwiseInverse g xs (batchValues g prior xs) := by
+  induction xs generalizing prior with
+  | nil => simp [PairwiseInverse, batchValues]
+  | cons x rest ih =>
+      simp [batchValues, PairwiseInverse]
+      exact ⟨batch_step_invariant g prior x, ih (g.mul prior x)⟩
+
 end CommGroup
 
 end BatchInversion
 
 #print axioms BatchInversion.CommGroup.batch_step
 #print axioms BatchInversion.CommGroup.batch_step_invariant
+#print axioms BatchInversion.CommGroup.batchValues_inverses

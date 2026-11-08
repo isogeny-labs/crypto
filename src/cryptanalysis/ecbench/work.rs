@@ -648,6 +648,10 @@ fn generic_rule(method: &str, counter: &str) -> Option<Rule> {
         "partition_hashes_uncharged" => Prims(&[(WordOp, 12)]),
         // x^{2^t}, y^{2^t} by linear power maps.
         "frobenius_maps_uncharged" => Prims(&[(AsSolve, 2)]),
+        // The tuned walk's short-cycle window and Brent detector: one 64-bit
+        // compare each (`work_native` of the search phase, 2026-11-07;
+        // research/rho_cycle_window_bitops_20261107).
+        "cycle_window_word_ops" | "brent_word_ops" => Prims(&[(WordOp, 1)]),
         "canonicalisations_uncharged" if strong => {
             // canon(x), three more basis conversions, the Montgomery scalar
             // update.
@@ -977,6 +981,21 @@ pub fn price(x: &Priceable) -> Result<WorkBlock, String> {
                             &format!("solver_{}", s.op_unit.replace(' ', "_")),
                         ),
                     }
+                }
+            }
+        }
+        if !ic {
+            // A generic method's priced work that no counter carries (the
+            // rho window's compares): in `work_native`, so committed records,
+            // which have none, replay and price as before.
+            for (name, &count) in &p.work_native {
+                if count == 0 {
+                    continue;
+                }
+                match generic_rule(method, name) {
+                    Some(Shape) => {}
+                    Some(Prims(ps)) => add_prims(&mut prims, ps, count as u128),
+                    None => push_unique(&mut unpriced, name),
                 }
             }
         }

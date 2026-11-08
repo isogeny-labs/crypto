@@ -245,6 +245,25 @@ The filter's memory (8 to 16 bits per stored entry) is not added to the
 and so already bounds the packed table from above by more than the filter
 adds.
 
+### 2026-11-07 (rho cycle windows)
+
+The short-cycle windows of the rho walks did work that no counter saw
+(`research/rho_cycle_window_bitops_20261107`).
+
+| counter or walk | rule | why |
+|---|---|---|
+| `cycle_window_word_ops` (`work_native` of a tuned rho walk's `search` phase) | `word_op` | `ic_boundary`'s tuned walker and its lanes compare each step's key with every entry of the recent-point ring (16), test the ring index on each push (2) and, on a hit, re-scan to the hit, search the cycle for its least key and test the repeat |
+| `brent_word_ops` (same place, `WalkPolicy::v2`) | `word_op` | Brent's least-key update, checkpoint test and power-of-two test per step, and the repeat test of a detected cycle |
+| `hyperelliptic_ic_bench`, active `CycleWindow` (the default `DistinguishedPointsNegationFullWidthCollideFirst` and `…CycleEscape`) | `word_op` per hash compare of the window scan (newest first, to the match or through all 32) and one per push; the escape step's RNG draw, branch index and two `modr_add`, as the gap-limit escape; the collide-first solve and its check in `linear_algebra` and `verification` | the walk's `ops` tally; `RhoResult::window_charges` reports the window's share. A passive window (`DistinguishedPointsNegationFullWidth`) is an instrument the walk does not consult and stays uncharged |
+
+Holding the window's entries is memory, and clearing it resets a length
+(control); neither is charged. The window counters are `work_native`, never
+counters, so committed rho records (which carry none) replay and price as
+before; a record written before 2026-11-07 is short of the window's word
+operations, a lower bound on the walk it records. The `bitop/v1` total of
+the default hyperelliptic walk before this change is its total minus
+`window_charges` at the row's widths.
+
 ### 2026-11-07 (ic-acct-7, complete counters)
 
 | counter or family | rule | why |
