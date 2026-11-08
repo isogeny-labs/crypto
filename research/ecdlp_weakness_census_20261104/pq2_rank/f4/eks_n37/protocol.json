@@ -1,0 +1,19 @@
+{
+  "schema": "pq2_rank.eks-msolve-protocol/v1",
+  "question": "Does msolve 0.6.5 (F4, grevlex) reach maximal step degree 5 on a fresh m = 2 descended S3 instance at n = 37, as Kousidis-Wiemers report for Magma (MEAS-GB-KW-TABLE1)?",
+  "input": {"dump": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/step_n36_37/dumps/n37_i0.json",
+            "dump_sha256": "ac27907fc6d46bbd6eb9a755d64c2b682372d777355c79070910a62873d264cb",
+            "msolve_input": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/eks_n37/input.ms",
+            "msolve_input_sha256": "0a6a2c1dc4fa1f9e15e4af5af05dbcada2a6d9646d0dbf6834c1d4ad3a5a9651",
+            "k": 33, "N": 38},
+  "program": {"msolve_version": "0.6.5-1build2 (Ubuntu noble)", "msolve_sha256": "c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa",
+              "wrapper": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/eks_n37/run.sh",
+              "argv": ["/opt/msolve/run.sh", "4"], "msolve_args": "-g 2 -v 2 -t 4"},
+  "resources": {"cpu": 8, "memory": "100Gi", "pool": "cpu-spot (ordinary, not a benchmark)", "seconds": 21600, "retries": 0},
+  "budget": {"dollar_ceiling_usd": 5.0, "account_monthly_headroom_usd_at_submission": 23.67, "retry_allowance": 0},
+  "measurement": "maximal step degree = largest first-column value of msolve's -v 2 step table; linear polynomials in the reduced basis must equal k = 33; no timing claim",
+  "outcomes": {"degree_5": "reproduces the published step with a second implementation",
+               "degree_4": "msolve does not step to 5 on this instance; disagrees with the Magma table at n = 37 for this instance",
+               "oom_or_timeout": "recorded as not finished, with the memory log"},
+  "provenance": "session https://claude.ai/code/session_01AXUKfUpk9rEJg4Yyo1QcZQ"
+}

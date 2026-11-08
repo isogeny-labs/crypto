@@ -79,10 +79,47 @@ has fresh instances, because the random stream starts at n = 17. Iterated degree
 gives 1 and iterated degree 4 gives exactly k on all 12 instances, so d_iter = 4 there.
 `results/iter4_n21_24/` does the same at n = 21 to 24 with the same outcome on all 12
 instances. Across both sweeps, d_iter = 4 on 24 of 24 instances from n = 17 to 24.
+`results/iter4_n25/`, `iter4_n26/` and `iter4_n27/` extend this to n = 27 with the same
+outcome on all 9 instances. In total d_iter = 4 on 33 of 33 fresh instances from n = 17 to 27.
+
+**A real F4 run (`f4/`).** msolve 0.6.5 (Berthomieu, Eder and Safey El Din; F4 with
+grevlex) ran on the main sweep's own instances for n = 8 to 34, 81 in all. The binary
+dumped them with the same seed and arguments, and the dump log equals `results/run.log` on
+all 81 lines. `f4/run_msolve.py` records msolve's maximal step degree, and
+`f4/summarize.py` merges the runs into `f4/msolve_all.json`.
+
+| check | result |
+|---|---|
+| linear polynomials in msolve's reduced basis equal k | 81 of 81 |
+| msolve's degree equals d_iter where the census value is exact (n ≤ 16) | 27 of 27 |
+| census d_iter > 3 and msolve below 4 | 0 |
+| msolve maximal step degree, n = 17 to 34 | 4 on all 54 |
+
+One row first recorded 0 linear polynomials because its output was truncated while the
+disk was full. The rerun gives k, and the part file `f4/msolve_n26_i0.json` takes
+precedence. Three instances were rerun after a machine restart.
+
+**Testing the published step to 5 (`f4/step_n36_37/`).** Kousidis and Wiemers report Magma
+degree 4 for n ≤ 36 and 5 from n = 37. To test that with a second implementation, msolve
+ran on fresh instances at n = 36 and 37.
+
+| instance | outcome |
+|---|---|
+| n = 36, instance 0 (control) | maximal step degree 4, linear polynomials = k = 35, 47 minutes |
+| n = 37, instance 0 (test) | locally killed twice for memory; on isolab-eks (128 GB node, 4 threads) msolve ran 2, 2, 4 steps at degrees 2, 3, 4 and then started a degree-5 step (1,016,044 × 610,665 matrix) about 60 minutes in, at 53 GB; run still in progress (`f4/eks_n37/interim-0742/`) |
+| n = 36 and 37, instance 1 | stopped early to save memory, no result |
+
+On the single-thread retry at n = 37, memory grew about 1.2 GiB per minute over the last
+five minutes (0.22 GiB per minute averaged over the hour) and passed 13 GiB on a 15 GiB machine (`msolve_n37_i0.mem.log`). The earlier attempts are kept as
+`*.timeout_3600s.log` and `*.killed_t3.*`. On the isolab-eks rerun msolve does reach a degree-5 step at n = 37, so its maximal step
+degree there is at least 5, matching the Magma value Kousidis–Wiemers report [pcc:unverified].
+The run had not finished at this revision; the final basis check (linear = k = 33) is pending.
 
 **Independent cross-check.** `crosscheck/` recomputes the closure by naive full
 saturation in pure Python, sharing no code with the Rust closure. It agrees with Rust
-on five dumped instances at n = 14 to 18, at degree 3 and at degree 4.
+on five dumped instances at n = 14 to 18 at degree 3. At degree 4 the Python closure reaches k on
+the three instances it was run on; the Rust run on those dumps had degree 4 disabled. The
+independent validator later ran both degrees on all five and found agreement (`validation/`).
 
 **Reproducibility.** A rerun with the same seed and arguments for n = 8 to 40
 (`results/rerun_n8_40/`) reproduces the main log line for line, timings aside. Its
@@ -93,14 +130,17 @@ holds on this range [pcc:unverified].
 **Reading.**
 
 * Literal Assumption 2 says the solver degree equals the first fall degree, which is 2.
-  It fails on all 119 instances: d_iter ≥ 3 everywhere.
+  It fails on the 111 instances with n ≤ 44: there d_iter ≥ 3. On 87 of them iter3 < k already
+  forces this; on the other 24 the independent validator computed the degree-2 closure (iter2 = 1).
+  At n = 45 to 47 no closure was computed, so those 8 instances are open.
 * The Kousidis–Wiemers reading predicts 3 + o(1). Every instance with 17 ≤ n ≤ 44 needs
-  an iterated degree above 3, and the 24 instances measured at n = 17 to 24 need exactly 4.
-  A finite range cannot refute an o(1) statement. It does show that the asymptotic value 3
-  is not reached anywhere from n = 17 to 44.
-* These numbers are lower bounds on F4's maximal step degree, valid only under the
-  containment property, which is not formalised. For the one-shot Caminata–Gorla solving
-  degree, the bound d_lin ≤ sd is kernel-checked in `SubspaceCriterion`.
-* Direction: the measured degree sits above the value the subexponential binary-curve
-  heuristics assume. This weakens the support for those heuristics. It does not support
-  a subexponential algorithm.
+  an iterated degree above 3. The 33 fresh instances at n = 17 to 27 need exactly 4, and
+  msolve's F4 reaches exactly 4 on all 54 main-sweep instances at n = 17 to 34.
+  A finite range cannot refute an o(1) statement. It does show that the value 3 is not
+  reached anywhere from n = 17 to 44.
+* Containment. `F4Containment.lean` proves (unsigned pcc claims, [pcc:unverified]) that an abstract F4 run with maximal step degree
+  D stays inside every D-closed subspace containing the generators (`run_subset`). So the
+  census values are lower bounds on F4's maximal step degree (`no_gb_of_run_of_low_lt`).
+  That msolve fits the abstract model is a reading of its algorithm, not a theorem. For the
+  one-shot Caminata–Gorla solving degree, d_lin ≤ sd is kernel-checked in `SubspaceCriterion`.
+* Direction. msolve's degree is 4 on every instance from n = 17 to 34, one above the Kousidis–Wiemers value 3, and matches their Magma value 4 for n ≤ 36. They report 5 from n = 37 to 48 (`MEAS-GB-KW-TABLE1`), so a window ending at n = 34 does not decide whether the degree stays bounded, and the published data already show it rising. The step from 3 to 4 inside this window, at n = 15 and n = 17, is a second rise. These measurements do not support a subexponential algorithm; they cover m = 2 only, where the heuristics need m to grow with n.
