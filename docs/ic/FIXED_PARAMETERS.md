@@ -100,8 +100,8 @@ and a `hint`, and the human summary prints them instead of a row of nulls.
 Use `--json` to retain the complete report beside the log.
 
 The pair-table builder is measured by `ecc2k130/codegen/bench_pair_table.py`;
-the 500,000-candidate ECC2K-130 run improved from 3,503 to 6,614 candidates/s
-on the reference host. Lean proofs for the cursor, disk-budget, install-layout
+the 500,000-candidate ECC2K-130 run improved from 3,503 to 8,147 candidates/s
+on the reference host (bulk index-off build). Lean proofs for the cursor, disk-budget, install-layout
 and update-selection arithmetic are in
 [`research/ic_cli_verification_20261107/`](../../research/ic_cli_verification_20261107/PROOF_MAP.md).
 
