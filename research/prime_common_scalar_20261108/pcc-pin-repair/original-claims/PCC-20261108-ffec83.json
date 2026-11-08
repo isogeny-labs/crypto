@@ -1,0 +1,30 @@
+{
+ "created_at": "2026-11-08T20:51:51Z",
+ "id": "PCC-20261108-ffec83",
+ "kind": "theorem",
+ "producer": {
+  "commit": "92c5b02820c0e748c5fffd10632628f9654f5cda",
+  "model": "",
+  "session": "finite-buffers-20261108"
+ },
+ "proofs": [
+  {
+   "kind": "lean",
+   "project": "research/prime_common_scalar_20261108/lean",
+   "theorem": "ResidueEncoding.coefficient_equiv_exists"
+  },
+  {
+   "kind": "lean",
+   "project": "research/prime_common_scalar_20261108/lean",
+   "theorem": "ResidueEncoding.residue_formula"
+  },
+  {
+   "kind": "lean",
+   "project": "research/prime_common_scalar_20261108/lean",
+   "theorem": "ResidueEncoding.modular_buffer_card"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "ResidueEncoding.coefficient_equiv_exists, residue_formula and modular_buffer_card; no compiler, bit-operation cost, tensor or ECDLP asymptotic claim.",
+ "statement": "The concrete coefficient quotient A/(2^p) is ring-equivalent to ZMod2^p, its encoding is numerator times inverse denominator, and length-q modular buffers have exactly2^(p*q) states."
+}

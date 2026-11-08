@@ -1,0 +1,25 @@
+{
+ "created_at": "2026-11-08T20:18:33Z",
+ "id": "PCC-20261108-ad84dd",
+ "kind": "theorem",
+ "producer": {
+  "commit": "be8c3cc432ba056e3b184fb3a1b542d7aedb777d",
+  "model": "",
+  "session": "common-scalar-local-series-20261108"
+ },
+ "proofs": [
+  {
+   "kind": "lean",
+   "project": "research/prime_common_scalar_20261108/lean",
+   "theorem": "LocalCharts.localKernel_identity"
+  },
+  {
+   "kind": "lean",
+   "project": "research/prime_common_scalar_20261108/lean",
+   "theorem": "LocalCharts.kernel_coefficient_integral"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "LocalCharts.localKernel_identity and kernel_coefficient_integral, connected to actual baseKernel by localBase_eval; not a runtime or recursive recovery claim.",
+ "statement": "The constructed integral-ring local rational-kernel series satisfies D*U=B^2 for the actual shifted base polynomial, and every coefficient lies in the rational two-adic integral subring."
+}
