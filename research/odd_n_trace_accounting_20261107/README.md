@@ -162,15 +162,20 @@ and `rg` instead:
 ```sh
 cargo build --release
 ./run_all.sh reports/run-20261107T1              # selftest, 8 cells, score, hashes (about 8 min on 4 cores)
+# or, from the committed data: (cd reports/run-20261107T1 && xz -dk cell_*.jsonl.xz && sha256sum -c RAW-XZ.sha256)
 ./target/release/posthoc reports/run-20261107T1   # post hoc pooled analysis
-./target/release/validate reports/run-20261107T1 claimed.json <cell=sha256>...   # validator report
+./target/release/validate reports/run-20261107T1 claimed.json <cell.jsonl.xz=sha256>...   # validator report
 python3 plot.py reports/run-20261107T1            # layout only
 ```
 
 ## Claim record
 
-- `PCC-20261107-8b6f08` (measurement; `pcc verify`: not_covered). Its proof
-  is `reports/run-20261107T1/validator-report.json`. The `validate` binary
+- `PCC-20261108-b9b57c` (measurement; `pcc verify`: not_covered). Its proof
+  is `reports/run-20261107T1/validator-report.json`, which pins the committed
+  `cell_*.jsonl.xz`. Each decompresses byte-exactly to the scored
+  `cell_*.jsonl` (`RAW-XZ.sha256`). The plain rows are not committed: the
+  artifact migration would move them out of Git, and the pcc gate does not
+  fetch them back. The `validate` binary
   (`src/bin/validate.rs`, written after the run) reuses the frozen scorer
   and recomputes the registered verdicts (as PASS = 1, FAIL = 0) and the
   headline numbers from the sha256-pinned cell rows. The post hoc pooled
