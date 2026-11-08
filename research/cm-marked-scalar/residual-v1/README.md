@@ -37,3 +37,14 @@ The schema-valid experiment.export/v1 contains60 exact derived minimum records: 
 Every invocation was capped at120 seconds, one process/thread and2GiB address space, with one scientific scan and zero unchanged retries. No cryptographic clock, new cloud job or controller was launched. No total-dollar cost or native-time claim is inferred; local existing-host billing was not measured. The full cold comparison still needs plan preparation, allocation, normalization, conversions, verification and destruction, and an admitted funded host.
 
 The next implementation opportunity is retaining useful intermediate multiples from the radix prefix, with the same reuse offered to binary controls. The present evaluator discards those points. Its full-vector count gap is now four calls on P-192 and two on P-384 against direct multiplication. That next implementation requires its own published source/freeze before comparative data; this run and its source remain immutable.
+
+## Artifact-store materialization
+
+The repository bot externalized the archive in4942fc80cad1. Its .artifacts.json binds the original SHA256 and104,052 bytes. The local archive is now ignored, and a byte-identical copy is retained. From this directory, materialize before verification/extraction:
+
+~~~sh
+aws s3 cp --no-progress s3://setec-astronomy-artifacts/store/sha256/f4/f45bf33a443157615b1a7a68992fe14db5ce3fc1e10a65e85a37e7bc671e6b70 runs.tar.xz
+sha256sum -c runs.tar.xz.sha256
+~~~
+
+The bot's index was retained without force-adding the archive back to Git. Local bytes match the bot manifest and the previously verified extraction/replay/repack. The agent did not perform an additional remote GET after migration; artifact-location.json distinguishes those checks. No scientific scan was repeated.
