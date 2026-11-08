@@ -8,6 +8,7 @@ from collections import Counter
 import hashlib
 import json
 import math
+import multiprocessing
 from pathlib import Path
 import shutil
 import sqlite3
@@ -28,6 +29,28 @@ PAIR_CHUNK = 4096
 # Above this many planned candidates, maintaining pair_lookup during inserts
 # costs more than dropping it and rebuilding once at the end.
 PAIR_INDEX_THRESHOLD = 100000
+# Below this budget, worker start-up costs more than the saved field time.
+PAIR_PARALLEL_MIN = 16384
+
+_PAIR_WORKER = None
+
+
+def _initPairWorker(m, points):
+    """Reconstruct the field/curve once per spawned worker."""
+    global _PAIR_WORKER
+    ledger = engine.Ledger()
+    onb = engine.AuditField(m, ledger)
+    curve = engine.AuditCurve(onb, ledger)
+    _PAIR_WORKER = (curve, points)
+
+
+def _pairKeys(indices):
+    """Return point keys (and operation counts) for `(i, j)` indices."""
+    global _PAIR_WORKER
+    curve, points = _PAIR_WORKER
+    pairs = [(points[i], points[j]) for i, j in indices]
+    keys = [None if point is None else pointKey(point) for point in curve.addBatch(pairs)]
+    return keys, dict(curve.ledger.counts)
 
 
 def require(condition, message):
@@ -269,11 +292,14 @@ class Progress:
 
 class Campaign:
     def __init__(self, document, directory, solver='pairs', memory=False, selectorModel=None,
-                 progress=None, relationsOut=None):
+                 progress=None, relationsOut=None, pairWorkers=1):
         require(__debug__, 'run without Python -O; the shared arithmetic engine uses assertions')
+        require(type(pairWorkers) is int and 1 <= pairWorkers <= 64,
+                'pair workers must be between 1 and 64')
         self.ledger = engine.Ledger()
         self.uses = Counter()
         self.started = time.perf_counter_ns()
+        self.pairWorkers = pairWorkers
         self.db = None
         self.lock = None
         self.relationsOut = None
@@ -506,6 +532,15 @@ class Campaign:
             self.db.execute('PRAGMA synchronous=NORMAL')
             self.db.execute('PRAGMA cache_size=-65536')
             self.db.execute('PRAGMA temp_store=MEMORY')
+            pool = None
+            if self.pairWorkers > 1 and budget >= PAIR_PARALLEL_MIN:
+                try:
+                    context = multiprocessing.get_context('spawn')
+                    pool = context.Pool(self.pairWorkers, initializer=_initPairWorker,
+                                        initargs=(self.params.onb.m, self.points))
+                except (OSError, ValueError) as error:
+                    self.progress.message('pair workers unavailable (%s); using one process' % error)
+                    pool = None
             try:
                 while done < budget and state['i'] < size:
                     with self.db:
@@ -524,13 +559,24 @@ class Campaign:
                             done += 1
                             self.uses['pair_candidates_built'] += 1
                         if entries:
-                            points = self.params.curve.addBatch(
-                                [(left, right) for _, _, left, right in entries])
+                            if pool is not None and len(entries) >= self.pairWorkers * 64:
+                                width = (len(entries) + self.pairWorkers - 1) // self.pairWorkers
+                                chunks = [[(i, j) for i, j, _, _ in entries[start:start + width]]
+                                          for start in range(0, len(entries), width)]
+                                keys = []
+                                worker_counts = Counter()
+                                for chunk_keys, counts in pool.map(_pairKeys, chunks):
+                                    keys.extend(chunk_keys)
+                                    worker_counts.update(counts)
+                                self.ledger.counts.update(worker_counts)
+                            else:
+                                points = self.params.curve.addBatch(
+                                    [(left, right) for _, _, left, right in entries])
+                                keys = [None if point is None else pointKey(point) for point in points]
                             rows = []
-                            for (i, j, _, _), point in zip(entries, points):
-                                if point is None:
+                            for (i, j, _, _), key in zip(entries, keys):
+                                if key is None:
                                     continue
-                                key = pointKey(point)
                                 serial = state['serial']
                                 rows.append((serial, key, i, j))
                                 state['hash'] = digest([state['hash'], serial, key, i, j])
@@ -544,6 +590,9 @@ class Campaign:
                         nextReport += reportEvery
             finally:
                 self.db.execute('PRAGMA synchronous=%d' % previous_sync)
+                if pool is not None:
+                    pool.close()
+                    pool.join()
             complete = state['i'] == size
             if complete:
                 self.ensurePairIndex()
@@ -911,11 +960,13 @@ def main():
                         help='attempts between progress heartbeats; 0 prints only relations and stage changes')
     parser.add_argument('--relations-out',
                         help='rewrite saved relations as JSON Lines, then append each new verified relation')
+    parser.add_argument('--pair-workers', type=int, default=1,
+                        help='processes used to compute pair sums (1 disables the pool)')
     args = parser.parse_args()
     try:
         with Campaign(readJson(args.params), args.dir, args.solver, selectorModel=args.selector_model,
                       progress=Progress(args.progress, args.progress_every),
-                      relationsOut=args.relations_out) as campaign:
+                      relationsOut=args.relations_out, pairWorkers=args.pair_workers) as campaign:
             report = campaign.run(args.stage, args.attempts, args.pair_budget, args.query_seconds)
     except (ValueError, OSError, sqlite3.Error, RuntimeError) as error:
         message = str(error)
