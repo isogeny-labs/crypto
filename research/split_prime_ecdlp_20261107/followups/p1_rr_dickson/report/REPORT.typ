@@ -32,3 +32,15 @@ Frozen rules: 1 control met (RR-Kummer m3 t4 D = 4; every completed job finds th
 
 = Next steps
 Rerun T at m5 t3 with at least 6 GiB, then RR and T at m5 t4 on a host with at least 16 GiB; add round 7's arm F at m3 t3–t5 on the same instances. The Dickson remainder tower's faithfulness is Lean-checked as `dickson_tower_faithful` (aburan28/crypto-lean\#3) [pcc:unverified].
+
+= Round 2, card A: capped cells completed and arm F
+Protocol `PROTOCOL-R2.md` (frozen before data, \#3693); card `CARD-p1-r2-a` (executed as specified); 26 jobs at 6 GiB, the two T jobs at m5 t3 capped again. Analysis `p1r2analyze` (Rust) with the bound reading frozen before data. [pcc:unverified]
+#table(columns: 6, stroke: 0.4pt, inset: 3pt, align: left,
+  [*cell*], [*RR*], [*T*], [*F*], [*RR vs T*], [*RR vs F*],
+  [m3 t3], [D 4, 632], [D 5, 883], [D 5, 231], [RR dominates], [trade],
+  [m3 t4], [D 4, 2,801], [D 6, 7,129], [D 5, 1,224], [RR dominates], [trade],
+  [m3 t5], [D 5, 31,911], [D 6, 23,978], [D 6, 10,493], [trade], [trade],
+  [m5 t3 (no tower)], [D 5, 2,878], [D ≥ 8, ≥ 82,927], [n/a], [RR below (bounds)], [n/a],
+)
+Control met exactly (T on the Kummer curve at m3 t5: D 6, widest 23,720, round 7's values). Against the lab's strongest $m = 3$ system F, RR is a trade in all 9 cells: one degree lower, 2.3 to 3.0 times wider. Against T, RR dominates at t3 and t4 and is a trade at t5. The m = 5 cell with a tower (card B, T24 m5 t4, 13 GiB) decides rule 3.
+#figure(image("../figures/p1_r2_cells.svg", width: 100%), caption: [RR, T and F per cell, rounds 1 and 2 merged; hatched bars are capped runs (lower bounds).])

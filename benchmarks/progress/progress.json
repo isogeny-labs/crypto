@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261108T0545Z-split-prime-p3-r2-walk-v2",
+  "latest_record": "20261108T0538Z-split-prime-p1-r2a-armf-caps",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 58,
+    "measured": 59,
     "open": 5
   },
   "repo": "crypto",
@@ -2749,9 +2749,10 @@
     {
       "better": "lower",
       "first": 8.0,
-      "latest": 8.0,
+      "latest": 2.0,
       "latest_derived": {
-        "improvement_vs_first_percent": 0.0
+        "improvement_vs_first_percent": 75.0,
+        "improvement_vs_previous_percent": 75.0
       },
       "metric": "capped_jobs",
       "points": [
@@ -2768,10 +2769,79 @@
           "spread": null,
           "summary": "P1 RR vs cherry-tree T with a Dickson-torus tower at T24, T31: RR lower D and narrower matrices at m3 t3, t4 on both primes (frozen rule 5); m5 t3 undecided (T capped at 1.5 GiB); D identical to the Kummer tower",
           "value": 8.0
+        },
+        {
+          "commit": "d6619e21e4ab",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 75.0,
+            "improvement_vs_previous_percent": 75.0
+          },
+          "n": 26,
+          "record": "20261108T0538Z-split-prime-p1-r2a-armf-caps",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P1 round 2 card A: arm F and completed T at m3 t5 on NIST-shape primes; RR vs F trade at every m = 3 cell (one degree lower, 2.3-3.0x wider); RR vs T trade at m3 t5; T at m5 t3 capped at 6 GiB",
+          "value": 2.0
         }
       ],
       "problem": "ic:split-prime-p1-rr-dickson-torus",
       "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 2.29,
+      "latest": 2.29,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rr_vs_f_widest_ratio_m3t4",
+      "points": [
+        {
+          "commit": "d6619e21e4ab",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261108T0538Z-split-prime-p1-r2a-armf-caps",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P1 round 2 card A: arm F and completed T at m3 t5 on NIST-shape primes; RR vs F trade at every m = 3 cell (one degree lower, 2.3-3.0x wider); RR vs T trade at m3 t5; T at m5 t3 capped at 6 GiB",
+          "value": 2.29
+        }
+      ],
+      "problem": "ic:split-prime-p1-rr-dickson-torus",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.33,
+      "latest": 1.33,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rr_vs_t_widest_ratio_m3t5",
+      "points": [
+        {
+          "commit": "d6619e21e4ab",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 6,
+          "record": "20261108T0538Z-split-prime-p1-r2a-armf-caps",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P1 round 2 card A: arm F and completed T at m3 t5 on NIST-shape primes; RR vs F trade at every m = 3 cell (one degree lower, 2.3-3.0x wider); RR vs T trade at m3 t5; T at m5 t3 capped at 6 GiB",
+          "value": 1.33
+        }
+      ],
+      "problem": "ic:split-prime-p1-rr-dickson-torus",
+      "unit": "ratio"
     },
     {
       "better": "lower",
