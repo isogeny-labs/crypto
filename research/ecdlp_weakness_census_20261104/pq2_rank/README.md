@@ -106,13 +106,14 @@ ran on fresh instances at n = 36 and 37.
 | instance | outcome |
 |---|---|
 | n = 36, instance 0 (control) | maximal step degree 4, linear polynomials = k = 35, 47 minutes |
-| n = 37, instance 0 (test) | not finished: killed twice for memory during degree-4 steps |
+| n = 37, instance 0 (test) | locally killed twice for memory; on isolab-eks (128 GB node, 4 threads) msolve ran 2, 2, 4 steps at degrees 2, 3, 4 and then started a degree-5 step (1,016,044 × 610,665 matrix) about 60 minutes in, at 53 GB; run still in progress (`f4/eks_n37/interim-0742/`) |
 | n = 36 and 37, instance 1 | stopped early to save memory, no result |
 
 On the single-thread retry at n = 37, memory grew about 1.2 GiB per minute over the last
 five minutes (0.22 GiB per minute averaged over the hour) and passed 13 GiB on a 15 GiB machine (`msolve_n37_i0.mem.log`). The earlier attempts are kept as
-`*.timeout_3600s.log` and `*.killed_t3.*`. Whether msolve reaches degree 5 at n = 37 is
-still open; it needs a machine with more memory.
+`*.timeout_3600s.log` and `*.killed_t3.*`. On the isolab-eks rerun msolve does reach a degree-5 step at n = 37, so its maximal step
+degree there is at least 5, matching the Magma value Kousidis–Wiemers report [pcc:unverified].
+The run had not finished at this revision; the final basis check (linear = k = 33) is pending.
 
 **Independent cross-check.** `crosscheck/` recomputes the closure by naive full
 saturation in pure Python, sharing no code with the Rust closure. It agrees with Rust
