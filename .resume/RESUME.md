@@ -1,45 +1,68 @@
-# Resume: crypto @ claude/novel-ecdlp-algorithm-iams4j
+# Resume: crypto @ claude/serene-davinci-ujoi58
 
 ## Goal
-User request (2026-11-07): run every next step of research/split_prime_ecdlp_20261107 (#3654, #3655
-merged): proposals P1 (Riemann-Roch system with a Dickson-torus tower), P2 (twist-pure coset
-selection), P3 (cross-trace covariate test of the split-prime statistic) under frozen protocols on toy
-prime fields, plus a Lean statement of the obstruction.
+
+User request (2026-11-08), verbatim: "Yes to all open leads". These are the open items left after PR
+#3651 merged. Mapping and options: research/open_leads_execution_20261108/DECISIONS.md.
+
+1. PKM fall-degree study (`research/pkm_falldegree_unblock_20261107`). Image, 17 command requests,
+   serial on EKS.
+2. Medium-tier rho follow-ups:
+   - independent validator report (`research/prime_medium_tier_rho_20261107/validation/`);
+   - new P4 confirmatory protocol (`research/prime_medium_rho_p4_confirm_20261108`), frozen before
+     data, then run.
+3. Study images and runs:
+   - 3a: minors_guess_determine_20261107;
+   - 3b: elliptic_code_list_decoding_20261107;
+   - 3c: ml_learnability_control_20261107;
+   - 5: split_graph_secant_cost_20261107.
+4. `main` defect: `evidence_audit_pr` on `research/curve25519_f1_walk_20261107` sessions (fix in the next PR).
 
 ## Lead / hypothesis
-P1: round7_rr's D_RR = 4 < D_T = 6 (m3 t4, Kummer) transfers to the Dickson torus tower (proposer 0.55
-stage-level). P2: F4 cost is coset-independent and coverage scales as c_E^m, so selecting the most
-E-pure coset pays at toy scale (0.85 toy, 0.05 cold end-to-end). P3: no Frobenius-field covariate
-moves rho cost or exact m = 2 coverage by >= 1 % (null expected, 0.98).
+
+Per study, from each frozen PROTOCOL.md (unchanged). Item 2 P4: is the pooled rho-plain / rho-neg
+ratio's interval above 1.2 (J1 alone: 1.285 [1.177, 1.404], [pcc:unverified])?
 
 ## Spec
-research/split_prime_ecdlp_20261107/followups/{README.md, p1_rr_dickson/PROTOCOL.md,
-p2_twist_coset/PROTOCOL.md, p3_cross_trace/PROTOCOL.md}, frozen in commit 535d9da826 (PR #3657).
-Instrument commands pinned in each protocol's Addendum A before any claim cell.
+
+Each study directory's PROTOCOL.md / protocol.json, frozen on main at f13a690df0. The new item 2 P4
+protocol is to be frozen after commit. The branch was reset to origin/main f13a690df016d0a457bd40579fbb9d054f486adf.
 
 ## State
-Protocols committed and pushed (PR #3657, auto-merge on). Builders writing standalone Rust crates under
-followups/p1_rr_dickson/p1tool, followups/p2_twist_coset/p2coset, followups/p3_cross_trace/p3census
-(uncommitted until they report). msolve 0.6.5 from apt at /usr/bin/msolve. aws CLI from
-/tmp/report-venv (pip) linked at /usr/local/bin/aws; caller is account 104186811093.
-Lean: aburan28/crypto-lean PR #3 (CryptoLean.SplitPrime.Obstruction), local module build passed,
-standard axioms only. Toolchain: ~/.elan with lean-4.35.0 linked from the release archive (elan cannot
-resolve "latest" through the proxy).
+
+Five preparation agents are running:
+- Rust images for 3b, 3a and 5;
+- the mllc image (3c);
+- the audit fix;
+- the validator for item 2;
+- P4 protocol design.
+
+The PKM image build is next, after the Rust images, because disk is about 7 GB free. No job has been
+launched in this round. ECR push is authorized. Docker has no daemon, so images go through
+`taskq/deploy/eks-karpenter/oci-layer-publish.py`. The pool allows at most 16 vCPU / 128 GiB on
+`cpu-spot` and 8 / 32 on `cpu-l2-spot`.
 
 ## Next steps
-1. Read builders' reports; pin Addendum A per protocol; commit; new PR (or same branch if #3657 open).
-2. scripts/checkpoint.sh push; tools/benchrec.py init per run.
-3. experiment-director compile mode -> card per experiment; relay verbatim to executor-mechanical;
-   director assess mode.
-4. Analyse per the frozen decision rules; report + figures + Typst PDF per experiment; pcc claims;
-   session log; PR; track to merge.
+
+1. Collect each agent's R2_READY.md, then commit and push.
+2. Run `scripts/checkpoint.sh push`, then `tools/benchrec.py init` per benchmark run.
+3. experiment-director compile writes a card per study. Relay it verbatim to executor-mechanical, then
+   run director assess.
+4. Launch order on `cpu-spot`: 5 (split-graph), then 3b (ecld), then 3c (mllc), then 3a (minors), then
+   PKM serial: pfd-a first, then pfd-c and pfd-b, then the x / m4 cells. P4 confirm runs on `cpu-l2-spot`.
+5. Analyse each study with its frozen rule. Each gets a report, a figure and a PDF; then PR and track it.
 
 ## Runs in flight
-None. No claim cell has run.
+
+None.
 
 ## Stop and success conditions
-Per protocol decision rules. Budget: P1 1,200 s per msolve job, one at a time; P2 same limits;
-P3 about 4 CPU-hours total. Stop a protocol on its control-failure rule.
+
+Each study's own decision rules. Budget: PKM at most US$40 per job and US$400 in total; the other
+studies at most a few dollars each. Stop a study on its control-failure rule. A lost Spot cell is
+reported as lost, with at most one relaunch.
 
 ## Open questions
-Whether the director accepts the local L0 route (stated deviation from AGENTS.md section 9a).
+
+The PKM large host (80-510 GB) needs a capacity change outside the current cost controls. It is
+prepared and reported, not forced.
