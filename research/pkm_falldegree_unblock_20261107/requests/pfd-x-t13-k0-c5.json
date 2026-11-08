@@ -1,0 +1,24 @@
+{
+  "schema": "isolab.eks.command-request/v1",
+  "job": {
+    "job_name": "pfd-x-t13-k0-c5-20261108",
+    "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    "command": [
+      "/usr/local/bin/entry.sh",
+      "cap:13:0:5:27900000000"
+    ],
+    "cpu": 14,
+    "memory": "112Gi",
+    "seconds": 90000,
+    "isolation_profile": "standard",
+    "retries": 0,
+    "wait_seconds": 300
+  },
+  "provenance": {
+    "harness": "claude-code-subagent",
+    "source_revision": "0bd1d78cbf722fe996f2814304ef2f3fa8f52013",
+    "study": "prime_fall_degree",
+    "protocol_sha256": "63bdff283385ff60d862c07fe81784fb21ee70853327524baa0c1982a75549a8",
+    "note": "PLACEHOLDER image digest (no image exists for this revision); replace via make_requests.sh IMAGE_JSON. Amendment 7 B bracket step: Kummer m=2 P1 t=13 draw 0 cap 5, --budget 86400 --max-dense 27900000000. Run only after G3 passed (pfd-a)."
+  }
+}

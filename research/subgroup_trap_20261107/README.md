@@ -151,3 +151,42 @@ python3 plot.py $R    # layout only
   `reports/run-20261107T2/validator-report.json`: `subgroup_trap validate`
   recomputes the headline numbers from the sha256-pinned raw rows. No signed
   verdict covers it, so every statement here is [pcc:unverified].
+
+## Lean
+
+The mechanisms T1 (with Amendment 1) and T2, and the P3 zero-count mechanism,
+are now proved in Lean 4. The file is
+[`LiftDenseTrap.lean`](../lift_dense_factor_base_20261027/lean/LiftDenseTrap.lean),
+in the lift-dense Lake project, with Mathlib's Weierstrass-curve points and
+group law. The statement-by-statement map, with exact hypotheses, is in
+[`PROOF_MAP.md`](../lift_dense_factor_base_20261027/lean/PROOF_MAP.md). The proof
+gate returns PASS: 53 theorems, axioms `propext`, `Classical.choice` and
+`Quot.sound` only, no `sorry` and no `native_decide`. Receipt:
+[`gate-receipt-trap/`](../lift_dense_factor_base_20261027/lean/gate-receipt-trap/).
+
+- **T1, odd degree.** `mem_range_of_quadratic` proves that a root of a monic
+  quadratic over K lies in K when [M:K] is odd. With it, `mem_range_of_x_mem`
+  shows that every point of W(M) with x ∈ K is the base change of a point of
+  W(K). By `trap_sum_mem_range` and `trap_no_decomposition`, integer
+  combinations of such points stay in that image, so a target outside it has
+  no decomposition.
+- **T1, even degree.** `finrank_adjoin_y_le_two` proves [K(y):K] ≤ 2.
+  `mem_of_finrank_adjoin_le_two` proves y ∈ K₂ for finite fields.
+  `mem_range_of_x_mem_quadratic` and `trap_no_decomposition_quadratic` then
+  confine the factor base to the image of W(K₂).
+- **Image subgroup.** `sum_mem_range` and `no_decomposition` hold for any field
+  map, using Mathlib's `WeierstrassCurve.Affine.Point.map`.
+- **T2.** On y² + xy = x³ + ax² + b (`binCurve`) over a finite field of
+  characteristic 2:
+  - `double_x`: the doubling abscissa in Mathlib's group law is x² + b/x².
+  - `trace_x_of_two_nsmul`: Tr(x(2Q)) = Tr(a).
+  - `exists_half` (needs b ≠ 0): the converse.
+  - `mem_twoE_iff`: 2E(M) = {O} ∪ {P : Tr(x_P) = Tr(a)}.
+- **P3 mechanism.** `p3_no_decomposition'` (b ≠ 0): if every factor-base point
+  has Tr(x) = Tr(a), then a target with Tr(x_R) ≠ Tr(a) has no decomposition.
+
+Not formalised:
+- the "only if" half of Amendment 1's trap condition: that E(K*) is a proper
+  subgroup, which needs point counts;
+- the factor 2 on the 2E half;
+- the post hoc borderline share.

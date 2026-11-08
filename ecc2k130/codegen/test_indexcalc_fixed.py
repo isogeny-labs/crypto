@@ -4,6 +4,8 @@ import io
 import json
 import random
 import sqlite3
+import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -117,6 +119,10 @@ class FixedTests(unittest.TestCase):
                                  (planned * bytes_per_pair * 5) // 4 + overhead)
         self.assertLessEqual(fixed.requiredBytes(10, 100), fixed.requiredBytes(11, 100))
         self.assertLessEqual(fixed.requiredBytes(10, 100), fixed.requiredBytes(10, 101))
+        self.assertEqual(fixed.pairTableRequiredBytes(10, 100, 1000, True),
+                         fixed.requiredBytes(10, 100))
+        self.assertEqual(fixed.pairTableRequiredBytes(10, 100, 1000, False),
+                         fixed.requiredBytes(10, 100) + 1000 * fixed.PAIR_INDEX_BYTES_PER_PAIR)
 
     def test_field_multiplication_matches_reference_algorithm(self):
         document, _ = fixture(9, seed=1039)
@@ -162,6 +168,55 @@ class FixedTests(unittest.TestCase):
                      for _ in range(64)]
             for got, (left, right) in zip(campaign.params.curve.addBatch(pairs), pairs):
                 self.assertEqual(got, campaign.params.curve.add(left, right))
+
+    def test_pair_worker_matches_the_serial_batch(self):
+        document, _ = fixture(9, seed=1043)
+        with fixed.Campaign(document, '.', memory=True) as campaign:
+            indices = [(0, 1), (2, 3), (4, 5), (0, 0)]
+            fixed._initPairWorker(campaign.params.onb.m, campaign.points)
+            keys, counts = fixed._pairKeys(indices)
+            expected = [None if point is None else fixed.pointKey(point)
+                        for point in campaign.params.curve.addBatch(
+                            [(campaign.points[i], campaign.points[j]) for i, j in indices])]
+            self.assertEqual(keys, expected)
+            self.assertTrue(counts)
+
+    def test_parallel_pair_workers_match_serial_cli(self):
+        script = Path(fixed.__file__)
+        params = ROOT / 'docs/ic/params/ecc2k130-fixed.json'
+        with tempfile.TemporaryDirectory() as serial_dir, tempfile.TemporaryDirectory() as parallel_dir:
+            def run(directory, workers):
+                result = subprocess.run(
+                    [sys.executable, str(script), '--params', str(params), '--dir', directory,
+                     '--stage', 'pairs', '--pair-budget', '20000',
+                     '--pair-workers', str(workers)],
+                    capture_output=True, text=True, timeout=300)
+                self.assertEqual(result.returncode, 2, result.stderr)
+                return json.loads(result.stdout)
+            serial = run(serial_dir, 1)
+            parallel = run(parallel_dir, 4)
+            self.assertEqual(serial['pair_table'], parallel['pair_table'])
+            self.assertEqual(serial['reuse']['pair_candidates_built'],
+                             parallel['reuse']['pair_candidates_built'])
+
+    def test_pair_index_is_rebuilt_when_the_table_completes(self):
+        document, _ = fixture(9, seed=1041)
+        previous = fixed.PAIR_INDEX_THRESHOLD
+        try:
+            fixed.PAIR_INDEX_THRESHOLD = 0
+            with tempfile.TemporaryDirectory() as directory:
+                with fixed.Campaign(document, directory) as campaign:
+                    campaign.buildPairs(10)
+                    self.assertFalse(campaign.pairIndexExists())
+                    campaign.buildPairs(10000)
+                    self.assertTrue(campaign.pairIndexExists())
+                    campaign.db.execute('DROP INDEX IF EXISTS pair_lookup')
+                    campaign.db.commit()
+                    self.assertFalse(campaign.pairIndexExists())
+                    campaign.decompose(campaign.params.generator, 2)
+                    self.assertTrue(campaign.pairIndexExists())
+        finally:
+            fixed.PAIR_INDEX_THRESHOLD = previous
 
     def test_pair_table_check_fails_before_a_full_disk(self):
         document, _ = fixture(9, seed=1033)

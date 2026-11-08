@@ -532,6 +532,69 @@
    "output_sha256": "696889f473490cde19fe85c5f75bcc614b81fe35a04b9e6375639aa1e0169bd9"
   },
   {
+   "id": "step_n36_37_dump",
+   "command": "PQ2_DUMP=validation/step_n36_37/inst ./target/release/pq2_rank 36,37 2 0 validation/step_n36_37/pq2_rank   (the producer's arguments from f4/step_n36_37/dump_run.log, out prefix moved)",
+   "reference": "f4/step_n36_37/pq2_rank.json",
+   "compared_lines": 4,
+   "compared_fields": 92,
+   "mismatches": 0,
+   "mismatch_detail": [],
+   "extra_lines": 0,
+   "timings_excluded": true,
+   "output_sha256": "0ffd948266326f218db94f85e44e34a5d27c96453cf0a6047e03a8677353a318"
+  },
+  {
+   "id": "step_n36_37_dumps",
+   "command": "validator regeneration vs f4/step_n36_37/dumps and part_*/",
+   "reference": "f4/step_n36_37/dumps/*.json, f4/step_n36_37/part_*/*.json",
+   "dumps": 4,
+   "dumps_byte_identical": 4,
+   "part_copies_byte_identical": 4,
+   "mismatches": 0
+  },
+  {
+   "id": "closure_step_n36_37.json",
+   "command": "python3 -I validation/closure_check.py --run-json validation/step_n36_37/pq2_rank.json --dump-dir validation/step_n36_37/inst --out validation/closure_step_n36_37.json --iter3-max-n 0 --iter4-max-n 0 --low4-max-n 0 --interp-above-N 24",
+   "reference": "Rust values of the regenerated n = 36/37 instances; descent by exact weight-<=2 interpolation plus 500 random points",
+   "instances": 4,
+   "compared_values": 44,
+   "mismatches": 0,
+   "failed_invariant_checks": 0,
+   "failed_detail": [],
+   "mismatch_detail": [],
+   "iter2_values": [
+    1
+   ],
+   "output_sha256": "4281863088251d3f118ebde8f6b265299b5ca5f16b3b75bd3a5b068d8ca69162"
+  },
+  {
+   "id": "step_n37_kernel_oom_records",
+   "command": "dmesg | grep -E 'invoked oom-killer|Memory cgroup out of memory'",
+   "reference": "f4/step_n36_37/msolve_n37_i0.killed_t3.json and msolve_n37_i0.json (exit -9)",
+   "msolve_oom_kills": 2,
+   "mismatches": 0,
+   "output_sha256": "1b03a6eda23852e0bd15550e93ea0af0de694db626e80e5f4774c64152e4a347",
+   "note": "captured by the validator in the same boot as the producer's n = 37 runs; uptime 12907 s and 16563 s"
+  },
+  {
+   "id": "msolve_replay/msolve_step_n36.json",
+   "command": "python3 -I -B validation/msolve_check.py --dump-dir validation/step_n36_37/inst --run-json validation/step_n36_37/pq2_rank.json --producer f4/step_n36_37/msolve_n36_i0.json --raw-dir validation/msolve_replay/raw_step --out validation/msolve_replay/msolve_step_n36.json --only 36:0 --timeout 10800",
+   "reference": "producer f4/step_n36_37/msolve_n36_i0.json; quotient dimension = |Z|, linear = k",
+   "instances": 1,
+   "compared_values": 14,
+   "mismatches": 0,
+   "mismatch_detail": [],
+   "msolve_version": "0.6.5-1build2",
+   "msolve_sha256": "c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa",
+   "max_step_degree_by_n": {
+    "36": [
+     4
+    ]
+   },
+   "quotient_dim_eq_Z_size": 1,
+   "output_sha256": "b7f9f64f3603f1cee6468f495478613776fdceb1483357ee43d7a598bd61206e"
+  },
+  {
    "id": "F_size_independent_recount",
    "command": "replay_compare.py fsize_independent (numpy GF(2^n), n <= 32)",
    "reference": "results/rerun_n8_40/pq2_rank.json F_size",
@@ -548,10 +611,10 @@
   }
  ],
  "validator": "validator (claude-opus-5-5; Claude Code session 01AXUKfUpk9rEJg4Yyo1QcZQ)",
- "produced_at": "2026-11-07T21:34:22Z",
+ "produced_at": "2026-11-08T01:09:41Z",
  "environment": {
-  "validated_commit": "8d9fdc45be3678dc98b1044e9d8250aca1073ce7",
-  "head_at_assembly": "8d9fdc45be3678dc98b1044e9d8250aca1073ce7",
+  "validated_commit": "c685fadce27b121b97294bfb1cca5f34a7e8dec3",
+  "head_at_assembly": "c685fadce27b121b97294bfb1cca5f34a7e8dec3",
   "src_main_rs_sha256": "386a759588a36215487b5b900646d0943195e091aaaad9a48e422dad45e8dc0d",
   "src_main_rs_equals_commit_blob": true,
   "binary_fresh_build": "/tmp/claude-0/-home-user/0f5ee4e8-cecf-515b-8fba-6c8312e48a0f/scratchpad/target/release/pq2_rank",
@@ -926,6 +989,42 @@
   {
    "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/dumps/n9_i2.json",
    "sha256": "827b6826bf7e42943fc90754a71917e2489aba5121eff59ad8a75776c32b4c66"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/step_n36_37/dumps/n36_i0.json",
+   "sha256": "d622a4ab3832045fcf7bc6cf04936829859c3df4843a248c73379c92731bfdf4"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/step_n36_37/dumps/n36_i1.json",
+   "sha256": "d1be23ae6270a0ae6b9c378b01ed79e9572ff083ecea00243b91698b14064a0b"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/step_n36_37/dumps/n37_i0.json",
+   "sha256": "ac27907fc6d46bbd6eb9a755d64c2b682372d777355c79070910a62873d264cb"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/step_n36_37/dumps/n37_i1.json",
+   "sha256": "b296bb36dcf1aa352c04246d7b215a9d97e3bbccc667d92ff9b3ae83a6afc266"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/step_n36_37/part_n36_i0/n36_i0.json",
+   "sha256": "d622a4ab3832045fcf7bc6cf04936829859c3df4843a248c73379c92731bfdf4"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/step_n36_37/part_n36_i1/n36_i1.json",
+   "sha256": "d1be23ae6270a0ae6b9c378b01ed79e9572ff083ecea00243b91698b14064a0b"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/step_n36_37/part_n37_i0/n37_i0.json",
+   "sha256": "ac27907fc6d46bbd6eb9a755d64c2b682372d777355c79070910a62873d264cb"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/step_n36_37/part_n37_i1/n37_i1.json",
+   "sha256": "b296bb36dcf1aa352c04246d7b215a9d97e3bbccc667d92ff9b3ae83a6afc266"
+  },
+  {
+   "path": "research/ecdlp_weakness_census_20261104/pq2_rank/f4/step_n36_37/pq2_rank.json",
+   "sha256": "e96c1ae88d20e1fd6254612c2400877be828a3d2d76a6022c2099e776fbc2b44"
   },
   {
    "path": "research/ecdlp_weakness_census_20261104/pq2_rank/results/iter4_n17_20/pq2_rank.json",

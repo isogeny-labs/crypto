@@ -212,12 +212,12 @@ const IC_PIPELINE_PARAMS: &[ParamDecl] = &[
         ParamDecl {
             name: "factor_base",
             default: None,
-            help: "plug-in spec: explicit-x:xs=X0;X1;... (exact x list, prime or binary), prime-abscissa:size=N, glv-orbit:size=N, cm-multiplier:size=N,norm=B[,endo=I][,mult=M], prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), prime-interval:t=T[,lo=L] (every point with x in [L, L + 2^T), the whole scan charged; pkm-semaev reads bits=T,lo=L from it), binary-subspace:dimension=D, binary-multiplier:size=N,mult=M, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D",
+            help: "plug-in spec: explicit-x:xs=X0;X1;... (exact x list, prime or binary), prime-abscissa:size=N, glv-orbit:size=N, cm-multiplier:size=N,norm=B[,endo=I][,mult=M], prime-kummer:t=T[,g=G], prime-isogeny:t=T[,seed=S] (auxiliary-curve search charged to the factor-base phase), prime-interval:t=T[,lo=L] (every point with x in [L, L + 2^T), the whole scan charged; pkm-semaev reads bits=T,lo=L from it), binary-subspace:dimension=D, binary-multiplier:size=N,mult=M, koblitz-orbit:divisor=1;2, compact-orbit-scan:columns=N,raw_x_cap=M, cyclotomic:w=W[,columns=N], koblitz-standard-subspace:dimension=D, bin-x-line:line=standard|twisted[,line_seed=S] (f2m4_a0 curves: abscissa line u·F_q, u = 1 or the twisted all-lift u)",
         },
         ParamDecl {
             name: "oracle",
             default: None,
-            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3|4|5 (one probe a target into a negation-folded table of every signed m-sum of the base); wsum:coef=B[,free=1] (prime curves: one probe a target into a negation-folded coefficient-box table of every Σ e_c·P_c, |e_c| ≤ B, over the base's C ≤ 8 abscissae); wwalk:x=X[,jumps=16][,grow=0|1|2][,g=0|1] (prime curves, a base of exactly 2 abscissae, or of 1 with g=1 (F=1: jumps [a]P1+[c]G, a collision is du*s1=-dz, grow=1|2 extends until that one row exists, at most 2T|3T): a random-jump walk table of round(X·√r) steps E_t = E_(t-1) + J_h, X in (0, 4], one probe a target into it as a two-column row, and its own key collisions as target-free rows; grow=1 extends the walk until the first verified free row, at most 2T; g=1 adds [gamma]G to every jump so a collision is an affine row du*s1+dv*s2=-dz; grow=2 (needs g=1) extends until two independent free rows exist, at most 3T; seed=run draws the table from the run seed so every run resamples it; tw=1 (needs g=1, grow=2 and a base of 1 abscissa) puts the target in the walk: jumps [a]P1+[c]G+[b]Q, every collision is a row du*s1+db*log Q=-dz, the walk stops at the first two independent rows (cap 3T) and those pin log Q; cj=1 (needs tw=1) builds the jumps by chained additions from two base combinations); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace",
+            help: "subtract, mitm, mitm-frobenius, mitm-frobenius-counted, mitm-frobenius-lazy-counted, mitm-frobenius-layout-counted (compact-orbit-scan bases) or descent-algebraic, with :m=2|3; mitm-prime-batch:m=2 (prime folded table with batched inversions); mitm-prime-blocked:m=2 (the same table inserted in cache-sized pieces); rootfind-subtract:m=2|3 (prime curves: prime_fast's direct-subtraction root finding, one batched inversion a target); ksum:m=3|4|5 (one probe a target into a negation-folded table of every signed m-sum of the base); wsum:coef=B[,free=1] (prime curves: one probe a target into a negation-folded coefficient-box table of every Σ e_c·P_c, |e_c| ≤ B, over the base's C ≤ 8 abscissae); wwalk:x=X[,jumps=16][,grow=0|1|2][,g=0|1] (prime curves, a base of exactly 2 abscissae, or of 1 with g=1 (F=1: jumps [a]P1+[c]G, a collision is du*s1=-dz, grow=1|2 extends until that one row exists, at most 2T|3T): a random-jump walk table of round(X·√r) steps E_t = E_(t-1) + J_h, X in (0, 4], one probe a target into it as a two-column row, and its own key collisions as target-free rows; grow=1 extends the walk until the first verified free row, at most 2T; g=1 adds [gamma]G to every jump so a collision is an affine row du*s1+dv*s2=-dz; grow=2 (needs g=1) extends until two independent free rows exist, at most 3T; seed=run draws the table from the run seed so every run resamples it; tw=1 (needs g=1, grow=2 and a base of 1 abscissa) puts the target in the walk: jumps [a]P1+[c]G+[b]Q, every collision is a row du*s1+db*log Q=-dz, the walk stops at the first two independent rows (cap 3T) and those pin log Q; cj=1 (needs tw=1) builds the jumps by chained additions from two base combinations); pkm-semaev:m=2|3,mode=chain|full,engine=f4|exhaustive on prime-kummer:t=T (prime curves: Semaev S_(m+1) on the base's Kummer tower, F4 over the tower ring, multiply-adds unpriced); the cofactor-fiber-aware mitm-fiber:fiber=closed|lifts|blind, mitm-frobenius-fiber:fiber=closed|lifts|blind and descent-algebraic-fiber:fiber=combined|lifts|blind (ic_framework::fiber); or pdp3-koblitz:m=3,engine=inherited-f4|f6-ic,degree=D,node_budget=N, pdp3-koblitz:m=2|3,engine=rootfind (PairSumTable), pdp3-koblitz:m=3,engine=rootfind-window (cyclic ⌈|F|/3⌉ window), pdp3-koblitz:m=2|3,engine=rootfind-negfold (PairTable negation fold, ~half set-up), and pdp3-koblitz:m=3,engine=rootfind-window-negfold on koblitz-standard-subspace; gaudry-x-bin:macaulay=D[,sparsest=1][,charge_unsolved=1][,frob_roots=1][,replay=1] on bin-x-line (S₅ in e₁², e₂², e₃², e₄ of x/u, weights (2,2,2,1), the gaudry-d4-bin solve and charge)",
         },
         ParamDecl {
             name: "solver",
@@ -6636,9 +6636,12 @@ fn solve_ic_f2m4(
     seed: u64,
 ) -> Result<SolveReport, String> {
     let (spec, fb_name, or_name) = pipeline_spec(m, seed)?;
+    if fb_name == super::xline_bin::BASE {
+        return solve_ic_f2m4_xline(m, inst, curve, target, spec, &or_name);
+    }
     if fb_name != "bin-t-line" {
         return Err(format!(
-            "factor base `{fb_name}` does not run on a curve over F_(2^m)^4; bin-t-line does"
+            "factor base `{fb_name}` does not run on a curve over F_(2^m)^4; bin-t-line or bin-x-line does"
         ));
     }
     if or_name != "gaudry-d4-bin" {
@@ -6711,6 +6714,108 @@ fn solve_ic_f2m4(
         |q| CountedGroup::key(c, q),
     )?;
     Ok(ic_report(m, rep, &calib, Some(facts), wall, 2))
+}
+
+/// `ic.pipeline` with `bin-x-line` and `gaudry-x-bin` on an `a = 0` curve
+/// over `F_{(2^m)^4}` (`ecbench::xline_bin`; the C1 end-to-end study):
+/// the standard base `line=standard` or the twisted all-lift line
+/// `line=twisted,line_seed=N`, priced exactly as `bin-t-line` +
+/// `gaudry-d4-bin` (solver `F_q` multiplications over the curve's
+/// `fq_muls_per_add`, lifts at the measured lift price).
+fn solve_ic_f2m4_xline(
+    m: &ResolvedMethod,
+    inst: &BinCurve,
+    curve: &CurveFacts,
+    target: PtB,
+    spec: PipelineSpec,
+    or_name: &str,
+) -> Result<SolveReport, String> {
+    use super::xline_bin::{SharedLine, XLineBase, XLineOracle, ORACLE};
+    if or_name != ORACLE {
+        return Err(format!(
+            "oracle `{or_name}` does not run on bin-x-line; {ORACLE} does"
+        ));
+    }
+    let macaulay = spec.oracle_params.u64("macaulay")?;
+    let macaulay = u8::try_from(macaulay)
+        .ok()
+        .filter(|&d| d >= 2)
+        .ok_or_else(|| format!("{ORACLE}: macaulay is a degree from 2 to 255, not {macaulay}"))?;
+    let flag = |k: &str| -> Result<bool, String> {
+        match spec.oracle_params.u64_or(k, 0)? {
+            0 => Ok(false),
+            1 => Ok(true),
+            v => Err(format!("{ORACLE}: {k} is 0 or 1, not {v}")),
+        }
+    };
+    let opts = BinOptions {
+        weighted: true,
+        frobenius: false,
+        sparsest: flag("sparsest")?,
+        replay: flag("replay")?,
+        frob_roots: flag("frob_roots")?,
+    };
+    let shared: SharedLine = std::rc::Rc::new(std::cell::RefCell::new(None));
+    let base = XLineBase {
+        curve: inst,
+        shared: shared.clone(),
+    };
+    let mut oracle = XLineOracle::new(inst, macaulay, spec.seed, opts, shared);
+    oracle.charge_unsolved = flag("charge_unsolved")?;
+    let c = &inst.curve;
+    let ctx = InstanceCtx {
+        group: c,
+        generator: inst.generator,
+        target,
+        r: one_word(inst.r)?,
+        cofactor: one_word(inst.cofactor)?,
+        group_order: one_word(inst.group_order)?,
+        name: curve.slug.clone(),
+        field_degree: None,
+    };
+    let per_add = fq_muls_per_add(c) as f64;
+    let calib = Calibration {
+        ns_per_add: per_add,
+        ns_per_double: per_add,
+        ns_per_row_op: 1.0,
+        ns_per_lookup: 1.0,
+        ns_per_sqrt: Some(f2m4_lift_muls(inst)),
+        pinned_units: vec![
+            "ns_per_double".into(),
+            "ns_per_row_op".into(),
+            "ns_per_lookup".into(),
+            "ns_per_sqrt".into(),
+        ],
+        ..Default::default()
+    };
+    let t = Instant::now();
+    let (rep, fb) =
+        run_pipeline_with_base(&ctx, &spec, &base, &mut oracle, u64::MAX, &calib, None)?;
+    let wall = t.elapsed().as_nanos() as u64;
+    let facts = factor_base_facts(
+        &curve.slug,
+        &m.params["factor_base"],
+        &spec.factor_base_params,
+        &fb,
+        |q| CountedGroup::key(c, q),
+    )?;
+    let mut report = ic_report(m, rep, &calib, Some(facts), wall, 2);
+    // The pinned units' ratios (GAE per operation), from this run's own
+    // counted calibration: the §5a band reads them when the repository's
+    // pinned table has no row for the curve (`band::calibrated_native`).
+    if let Value::Object(d) = &mut report.detail {
+        d.insert(
+            "calibration_ratios".into(),
+            json!({
+                "ns_per_double": calib.ns_per_double / calib.ns_per_add,
+                "ns_per_row_op": calib.ns_per_row_op / calib.ns_per_add,
+                "ns_per_lookup": calib.ns_per_lookup / calib.ns_per_add,
+                "ns_per_sqrt": calib.ns_per_sqrt.unwrap_or(0.0) / calib.ns_per_add,
+                "source": "counted F_q multiplications of this run over fq_muls_per_add",
+            }),
+        );
+    }
+    Ok(report)
 }
 
 /// A curve over `F_{(2^m)^4}` whose subgroup order needs two words
