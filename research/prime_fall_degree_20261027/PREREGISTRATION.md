@@ -374,3 +374,28 @@ The 12-vCPU relaunch on `cpu-spot`. The full text, with its evidence, is
 
 Registered per `research/open_leads_execution_20261108/DECISIONS.md` (item 1, decisions 4 and 6), with the main session's
 decisions of 2026-11-08: keep the wall budgets, and pin `r6i.4xlarge` above 90,000 s.
+
+## Amendment 10 (2026-11-08; stage B high-lambda cell; before `pfd-b` is submitted, when no stage B row exists)
+
+The stage B `m = 6`, `t = 6` rule. The full text, with its derivation, is
+`research/pkm_falldegree_unblock_20261107/AMENDMENT_R2_A_stageB_m6t6.md` (R2-A). The binding part is restated here.
+
+- **High-lambda cells.** For `m >= 3`, a cell whose `lambda = |V|^m * 2^(m-1) / (m! * p) >= 0.1` at the prime it runs at
+  is *high-lambda*. It is run as registered (no flag or command changes), and its rows are written. They are reported in a
+  separate table labelled "possibly decomposable (lambda >= 0.1, no certificate)".
+- **Excluded from the rules.** A high-lambda cell is excluded from every §6 median and rule (H-LFD, H-FFD, H-gap, H-null,
+  H-m) and from the Amendment 6, 7 and 8 readings. It is not counted as censored, not read as "`d_F > cmax`", and not
+  redrawn. For H-LFD, "the largest completed `N`" of the `(Kummer, m = 6)` ladder is the largest completed `N` among the
+  cells that are not high-lambda (`t <= 5`).
+- **Low but non-zero lambda.** Cells with `0.01 <= lambda < 0.1` keep the Amendment 7 C label "possibly decomposable" and
+  stay in the rules. `lambda` is computed from `(m, t, p)` and recorded per row; it is not estimated from outcomes.
+- **Scope.** At `P1` the rule changes exactly one registered cell: Kummer `m = 6`, `t = 6` (`lambda = 1.517`, derived).
+  No hypothesis, instrument, budget, seed, request or command changes. The threshold 0.1 is Amendment 1's.
+- **Timing.** Frozen after `pfd-a` (stage A, `m = 2` only, complete) and after `pfd-c` was submitted under Amendment 9.
+  Every cell stage C actually runs (`run.sh hky-C`) has `lambda < 0.1` (derived from `|V| = 2^t`): at `P1` every
+  `m <= 10`, `t <= 3` cell is below 0.01, and the `P0` cells are limited by Amendment 1's `tmax0` to `m <= 5` at `t = 3`
+  (`P0` `t = 3` cells with `m = 9, 10` would exceed 0.1, but they are not run). So this amendment changes no stage C cell.
+  No stage B row exists.
+
+Registered per `research/open_leads_execution_20261108/DECISIONS.md` (item 1, decision 6: "written as a dated protocol
+amendment before its cell runs").
