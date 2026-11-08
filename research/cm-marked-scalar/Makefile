@@ -62,3 +62,8 @@ $(BUILD_DIR)/recoding-replay: recoding_replay.cpp native.cpp relation_verify.hpp
 	$(CXX) $(CXXFLAGS) recoding_replay.cpp -o $@ $(LDLIBS)
 recoding-replay-binary: $(BUILD_DIR)/recoding-replay
 .PHONY: recoding-replay-binary
+$(BUILD_DIR)/lift-identity: lift_identity.cpp json.hpp
+	mkdir -p $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) lift_identity.cpp -o $@ -lgmpxx -lgmp
+lift-identity-binary: $(BUILD_DIR)/lift-identity
+.PHONY: lift-identity-binary

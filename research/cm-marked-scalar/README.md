@@ -8,6 +8,8 @@ For each supplied variable-base point P, the relation route evaluates phi, eta, 
 
 The native constructor supplies the three new curves from signed Frobenius kernels. P-384/P-521 preserve historical certificates; their historical Python producer was not rerun. The exact-token bundle and [five-curve provenance](fixtures-v2/PROVENANCE.md) keep the two origins distinct. P-192 uses its published explicit group because this OpenSSL build omits the named entry.
 
+The [fixed-label CM lift derivation](CM_LIFT.md) and [report](reports/cm-lift-20261108/report.pdf) now reduce the next norm search to a finite interval of a+b and one nearest-integer pair per admissible sum, while retaining the selected eigenline. An independent GMP checker replays the five existing certificates and rejects fifteen norm/label/opposite-root corruptions. No minimizing search has yet been executed, and no new global quotient or horizontal factorization is inferred from the bound.
+
 | Requirement | Current evidence and remaining work |
 | --- | --- |
 | PR before implementation/execution | Hosted PR #3674; planning commit 4afeff227516 |
