@@ -6,24 +6,22 @@ executor_role: executor-mechanical
 kind: frozen_command
 receipt: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-C01.receipt.json
 binds:
-- path: research/split_graph_secant_cost_20261107/cards/request_diff_a2.jq
-  sha256: 7885db1b3b6cb68d24095c752a55b7273480c8fb12ac703c84c34ab56c4ccd0c
 - path: research/split_graph_secant_cost_20261107/PROTOCOL.md
   sha256: 20acbf94d87b87f47fa20b4866c79143e9df6154e64cc1a07de9e56e10a84ed1
-- path: research/split_graph_secant_cost_20261107/eks/r2img_request_attempt2.json
-  sha256: d23b6b66cb90422cb32a4305328dbc3b0bfd25c0609ea9b34804ab896ac857c2
 - path: research/split_graph_secant_cost_20261107/eks/r2img_request.json
   sha256: 146d7f2649a910f4e4bade65cbff8b1c27595ab40294a6319c4c315a0f49b100
+- path: research/split_graph_secant_cost_20261107/eks/R2_READY.md
+  sha256: 8dd437322ae1e99f07aab3b92533f9f6265fb61f42fc0dd4ce5058993129a451
+- path: research/split_graph_secant_cost_20261107/eks/ATTEMPT2.md
+  sha256: 29410af1946c11ea894e8300ff4cb1562ba042017a89313457354a350464efb6
+- path: research/split_graph_secant_cost_20261107/sgsecant_recheck.py
+  sha256: 034f49dae528c4473e9abaab8bc21068d0449c61e3770fb938a7e30976e321c8
+- path: research/split_graph_secant_cost_20261107/eks/r2img_request_attempt2.json
+  sha256: d23b6b66cb90422cb32a4305328dbc3b0bfd25c0609ea9b34804ab896ac857c2
 - path: research/split_graph_secant_cost_20261107/eks/layer-receipt.json
   sha256: 76b81c42f3731cc1202473046c06bbad24a1eef2161db8f2ab908bd3135a35eb
 - path: research/split_graph_secant_cost_20261107/eks/r2img_validate.sh
   sha256: d398cdb586088614a05030004fabd2f1f5f676db3bd8cb97aedef80bfa12a42f
-- path: research/split_graph_secant_cost_20261107/eks/R2_READY.md
-  sha256: 8dd437322ae1e99f07aab3b92533f9f6265fb61f42fc0dd4ce5058993129a451
-- path: research/split_graph_secant_cost_20261107/eks/ATTEMPT2.md
-  sha256: 573de0e47bc48d813263fadf3836c5700a6ed10f283940977723f878a09433d8
-- path: research/split_graph_secant_cost_20261107/sgsecant_recheck.py
-  sha256: 034f49dae528c4473e9abaab8bc21068d0449c61e3770fb938a7e30976e321c8
 - path: research/split_graph_secant_cost_20261107/cards/status_request_a2.json
   sha256: 8c656c1e1e88477f9551527d6ccd727c5f70227acb18b7d036b9a7ca44fbdba1
 - path: research/split_graph_secant_cost_20261107/cards/wait_command_status.sh
@@ -48,6 +46,10 @@ binds:
   sha256: 746440f29360983290eb9c22d435ccf8ca1d49ba66f84af8db2b7326a04f44ea
 - path: taskq/deploy/eks-karpenter/submit-job
   sha256: def41b1a72b6e48dc4e6f8256455be44ccc5100a017f515d8bd2821558abcbce
+- path: benchmarks/records/20261108T0449Z-split-graph-secant-panel.json
+  sha256: 1d74db63e4f31126736a33015bbc22fa43af8441fa6577a6430d249fb964637a
+- path: research/split_graph_secant_cost_20261107/receipts/A2/launch/result.json
+  sha256: 446f8a9cdad7353089681f91ea399fa14d8bd7bcafcc4fb585fbe706dbb12d8f
 must_not_exist:
 - research/split_graph_secant_cost_20261107/receipts/A2/collect-01
 commands:
@@ -56,7 +58,7 @@ commands:
   - git
   - merge-base
   - --is-ancestor
-  - d032c1e1ee5b7b730b2ea130573b3e160107946e
+  - df6178217ef3ef52f4fdc84eeaebddc368a1a76e
   - HEAD
   timeout_seconds: 60
   success_exit_codes:
@@ -68,11 +70,13 @@ commands:
   - git
   - diff
   - --quiet
-  - d032c1e1ee5b7b730b2ea130573b3e160107946e
+  - df6178217ef3ef52f4fdc84eeaebddc368a1a76e
   - HEAD
   - --
   - research/split_graph_secant_cost_20261107
   - :(exclude)research/split_graph_secant_cost_20261107/cards
+  - :(exclude)research/split_graph_secant_cost_20261107/receipts
+  - :(exclude)research/split_graph_secant_cost_20261107/results
   - taskq/
   - tools/task_card.py
   - tools/benchrec.py
@@ -115,10 +119,10 @@ commands:
   - research/split_graph_secant_cost_20261107/cards/status_request_a2.json
   - sgsecant-panel-20261108-a2
   - research/split_graph_secant_cost_20261107/receipts/A2/collect-01
-  - '1'
-  - '1'
+  - '900'
+  - '60'
   - taskq/deploy/eks-karpenter/remote/launch-remote-command
-  timeout_seconds: 2400
+  timeout_seconds: 2700
   success_exit_codes:
   - 0
   env:
@@ -140,7 +144,7 @@ commands:
   - --exclude
   - launcher/*
   - --only-show-errors
-  timeout_seconds: 1800
+  timeout_seconds: 3600
   success_exit_codes:
   - 0
   env:
@@ -157,11 +161,44 @@ commands:
   - research/split_graph_secant_cost_20261107/results/A2
   - SHA256SUMS
   - dc7c013bc2ac19aecc69f6cd5c9a253563ef02e49d72c5590b0d9e951ef88ee9  /opt/sgsecant/sgsecant
-  timeout_seconds: 600
+  timeout_seconds: 900
   success_exit_codes:
   - 0
   stdout: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-C01.verify.stdout
   stderr: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-C01.verify.stderr
+- id: add-raw
+  argv:
+  - find
+  - research/split_graph_secant_cost_20261107/results/A2
+  - -type
+  - f
+  - -exec
+  - python3
+  - tools/benchrec.py
+  - add-raw
+  - benchmarks/records/20261108T0449Z-split-graph-secant-panel.json
+  - '{}'
+  - +
+  timeout_seconds: 900
+  success_exit_codes:
+  - 0
+  stdout: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-C01.add-raw.stdout
+  stderr: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-C01.add-raw.stderr
+- id: upload-raw
+  argv:
+  - python3
+  - tools/benchrec.py
+  - upload
+  - benchmarks/records/20261108T0449Z-split-graph-secant-panel.json
+  timeout_seconds: 1800
+  success_exit_codes:
+  - 0
+  env:
+    AWS_REGION: us-east-2
+    AWS_DEFAULT_REGION: us-east-2
+    ISOLAB_BUCKET: isolab-results-104186811093-us-east-2
+  stdout: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-C01.upload-raw.stdout
+  stderr: research/split_graph_secant_cost_20261107/cards/CARD-split-graph-secant-cost-20261107-A2-C01.upload-raw.stderr
 - id: recheck
   argv:
   - find
@@ -185,8 +222,11 @@ bus_address: executor-mechanical-split-graph-secant
 background: true
 write_scope:
 - research/split_graph_secant_cost_20261107/
+- benchmarks/records/20261108T0449Z-split-graph-secant-panel.json
+- .resume/
+- .benchrec/
 stop_when:
 - The `status-once` step exits 41; the Job has no terminal state yet, so return the tool output verbatim and run no later command. This is the expected result while the Job is running.
 - Any other command exits with a code outside its success_exit_codes or reaches its timeout; return the tool output verbatim and run no later command.
 - The tool exits 2 before running any command; return `refused` with the IMPEDIMENT line.
-notes: 'Attempt 2 of the split-graph secant panel: Job sgsecant-panel-20261108-a2 (4 vCPU, 8Gi, 10800 s), image 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:d1ab2c5c44bc83931d5d402e4ac58f58f5ea92af19d951b1441cc32068c2f07b, request research/split_graph_secant_cost_20261107/eks/r2img_request_attempt2.json. Attempt 1 (Job sgsecant-panel-20261107, card CARD-split-graph-secant-cost-20261107-R2-1) stayed Pending for its whole 3600 s deadline and produced no output; see research/split_graph_secant_cost_20261107/eks/ATTEMPT2.md. Attempt 1 files under receipts/R2 and results/R2 are not read or written by any step; this card family uses receipts/A2 and results/A2. The request differs from the attempt-1 request only in job.job_name, job.seconds and provenance.note, and the first precondition step checks that with jq. Collect card 01: it has no launch step, so it cannot submit anything. It needs research/split_graph_secant_cost_20261107/receipts/A2/launch/result.json from CARD-split-graph-secant-cost-20261107-A2-1. The `status-once` step makes one isolab.eks.command-status/v1 query and exits 41 when the Job is pending or active. When the Job is succeeded or failed the card downloads s3://isolab-results-104186811093-us-east-2/runs/sgsecant-panel-20261108-a2/ (without launcher/) into research/split_graph_secant_cost_20261107/results/A2, an idempotent sync, verifies it, and runs the independent recheck on the panel directory. `verify` fails unless the Job succeeded with one pod and pod exit 0, its Job UID and name equal the launch receipt, the downloaded tree is one directory named by the Pod UID, the binary hash line is present and `sha256sum -c --ignore-missing SHA256SUMS` passes. A task card writes a receipt once, so each firing is a different numbered card. The card has no add-raw or upload-raw step: those rewrite the benchmark record, whose sha256 changes when A2-1 launches, so a final card binds the record hash it has then. A recheck mismatch exits 1 and is a result to report. The head-paths-unchanged step passes when no commit after the pinned commit changed the study directory (its cards subdirectory excepted), taskq/, tools/task_card.py or tools/benchrec.py; other commits are accepted. No commit field is set because task_card.py run refuses any HEAD other than the pinned one. Pinned commit d032c1e1ee5b7b730b2ea130573b3e160107946e. The record stays open, and the card runs no close, report or analysis command.'
+notes: Frozen EKS command Job sgsecant-panel-20261108-a2 (4 vCPU, 8Gi, 10800 s; 10800 s ceiling), image 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:d1ab2c5c44bc83931d5d402e4ac58f58f5ea92af19d951b1441cc32068c2f07b, request research/split_graph_secant_cost_20261107/eks/r2img_request_attempt2.json. This card has no launch step, so it cannot submit anything. It was generated after the launch and binds research/split_graph_secant_cost_20261107/receipts/A2/launch/result.json and the record benchmarks/records/20261108T0449Z-split-graph-secant-panel.json at the sha256 they had at generation; if any card changed the record since, generate the card again. The `status-once` step polls isolab.eks.command-status/v1 every 60 s for at most 900 s (a poll that fails, for example on the CodeBuild concurrent-build limit, is polled again) and exits 41 when the Job is still pending or active at the ceiling. When the Job is terminal the card downloads s3://isolab-results-104186811093-us-east-2/runs/sgsecant-panel-20261108-a2/ (without launcher/) into research/split_graph_secant_cost_20261107/results/A2, an idempotent sync, and verifies it. `verify` fails unless the Job succeeded with one pod and pod exit 0, its Job UID and name equal the launch receipt, the downloaded tree is one directory named by the Pod UID, and each listed file holds each listed string; it runs `sha256sum -c --ignore-missing SHA256SUMS`. Then `add-raw` and `upload-raw` record every downloaded file in the benchmark record. The final `recheck` step runs sgsecant_recheck.py on the panel directory; a mismatch exits 1 and is a result to report. The head-paths-unchanged step passes when no commit after the pinned commit changed the study directory (its cards, receipts and results subdirectories excepted), taskq/, tools/task_card.py or tools/benchrec.py; other commits are accepted. No commit field is set because task_card.py run refuses any HEAD other than the pinned one. Pinned commit df6178217ef3ef52f4fdc84eeaebddc368a1a76e. The record stays open, and the card runs no close, report or analysis command.
