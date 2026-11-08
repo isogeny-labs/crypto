@@ -84,6 +84,106 @@ fn contract(ds: &[K], wb: &[K], wc: &[K], reference: bool) -> [K; 3] {
 fn code(v: [K; 3]) -> Value {
     json!(v.map(|x| x.code()))
 }
+fn roots_for_ys(ys: &[K], g: Point) -> (Vec<Point>, Vec<Point>) {
+    let mut all = vec![];
+    let mut survivors = vec![];
+    for i in 0..211 {
+        for h in 0..211 {
+            let x = K::new(i, h);
+            if x * x * x + K::c(7) != ys[0] * ys[0] {
+                continue;
+            }
+            let a = Some((x, ys[0]));
+            all.push(a);
+            if (0..7).all(|z| {
+                add(a, mul(z as u64, g, 0), 0)
+                    .map(|(_, y)| y == ys[z])
+                    .unwrap_or(false)
+            }) {
+                survivors.push(a)
+            }
+        }
+    }
+    (all, survivors)
+}
+fn only_b(ds: &[K], reference: bool) -> K {
+    if reference {
+        let n = ds.len();
+        let mut pre = vec![K::c(1); n + 1];
+        let mut post = pre.clone();
+        for z in 0..n {
+            pre[z + 1] = pre[z] * ds[z]
+        }
+        for z in (0..n).rev() {
+            post[z] = post[z + 1] * ds[z]
+        }
+        (0..n).fold(K::c(0), |s, z| s + pre[z] * post[z + 1])
+    } else {
+        let mut a = K::c(1);
+        let mut b = K::c(0);
+        for &d in ds {
+            let next = b * d + a;
+            a = a * d;
+            b = next
+        }
+        assert_eq!(a, K::c(0));
+        b
+    }
+}
+fn b_only(g: Point, gg: &[Point], p: Point, reference: bool) -> Value {
+    let phi_y = phi(p, 0).unwrap().1;
+    assert_ne!(phi_y, K::c(0));
+    let mut rows = vec![];
+    let mut query_count = 0;
+    let mut roots_tested = 0;
+    for k in [2, 3, 5, 7, 11, 17, 197] {
+        let q = mul(k, g, 0);
+        let qq = graph(q, 0, 199);
+        let c = constant(gg, &qq);
+        let (cal_ds, _) = arrays(gg, &qq, p, p).unwrap();
+        let bcal = only_b(&cal_ds, reference);
+        assert_ne!(bcal, K::c(0));
+        let cal_y = bcal * p.unwrap().1;
+        assert_eq!(cal_y, c * phi_y);
+
+        for n in [0, 1, 2, 3, 5, 17, 198] {
+            let u = mul(n, g, 0);
+            let mut ys = vec![];
+            let mut bs = vec![];
+            for i in 0..7 {
+                let shift = add(p, mul(i, g, 0), 0);
+                let rr = add(shift, u, 0);
+                let (ds, _) = arrays(gg, &qq, shift, rr).unwrap();
+                let b = only_b(&ds, reference);
+                assert_ne!(b, K::c(0));
+                let y = cal_y / b;
+                assert_eq!(y, c * phi_y / b);
+                ys.push(y);
+                bs.push(b);
+                query_count += 1;
+            }
+            roots_tested += 211 * 211;
+            let (all_roots, candidates) = roots_for_ys(&ys, g);
+            assert_eq!(candidates.len(), 1);
+            let a = candidates[0];
+            let out = add(a, neg(p), 0);
+            assert!(rat(out));
+            assert!(mul(199, out, 0).is_none());
+            let inv = (1..199).find(|x| ((200 - k) % 199) * x % 199 == 1).unwrap();
+            assert_eq!(out, mul(inv, u, 0));
+            let mut wrong = ys.clone();
+            wrong[0] = wrong[0] + K::c(1);
+            let (_, wrong_survivors) = roots_for_ys(&wrong, g);
+            assert!(
+                wrong_survivors.is_empty(),
+                "changed transcript accepted by actual decoder"
+            );
+            rows.push(json!({"k_fixture":k,"U_fixture":n,"B_coefficients":bs.iter().map(|b|b.code()).collect::<Vec<_>>(),"calibration_B":bcal.code(),"calibration_y_factor":cal_y.code(),"reference_normalization_constant":c.code(),"public_quotient_y":phi_y.code(),"derived_y_transcript":ys.iter().map(|y|y.code()).collect::<Vec<_>>(),"cubic_candidates":all_roots.iter().map(|&a|pc(a)).collect::<Vec<_>>(),"survivor":pc(a),"output":pc(out),"changed_y_transcript_rejected":true}));
+        }
+    }
+    json!({"all_checks_pass":true,"marked_rows":rows,"B_only_queries":query_count,"calibration_queries":7,"contracted_factors":(query_count+7)*199,"root_field_elements_tested":roots_tested,"negative_control_root_field_elements_tested":roots_tested,"maximum_queries_per_case":7,"C_coefficients_computed":0,"target_graph_points":7*199,"G_graph_points":199,"normalization_constant_terms":7*198,"scope":"calibrated B-only seven-shift decoder, full toy coefficients and explicitly enumerated roots; no P192 B oracle or timing claim"})
+}
+
 fn main() {
     let args: Vec<_> = std::env::args().collect();
     let reference = args.iter().any(|x| x == "--cofactor-reference");
@@ -130,6 +230,15 @@ fn main() {
     assert_ne!(psi_p.0, K::c(0));
     let base_derivative = dx(psi_p.0, 7);
     assert_ne!(base_derivative, K::c(0));
+    if args.iter().any(|s| s == "--B-only") {
+        let out = b_only(g, &gg, p, reference);
+        if let Some(i) = args.iter().position(|s| s == "--check") {
+            let v: Value = serde_json::from_slice(&fs::read(&args[i + 1]).unwrap()).unwrap();
+            assert_eq!(out, v, "changed B-only certificate")
+        }
+        println!("{}", serde_json::to_string_pretty(&out).unwrap());
+        return;
+    }
     let mut rows = vec![];
     let mut probes = vec![];
     let mut norms = 0;
