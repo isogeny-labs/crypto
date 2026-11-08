@@ -22,12 +22,13 @@ that the theorems do not depend on `sorryAx`.
 | `VersionSelection.lean` | Three-component lexicographic order is irreflexive, asymmetric, transitive and total; `isNewer` is exactly that order. | `src/bin/ic/update.rs`: `parse_version`, `is_newer` |
 | `AssetSelection.lean` | A universal archive wins when present; otherwise the architecture match is chosen; no match returns `none`. | `src/bin/ic/update.rs`: `choose_asset` |
 | `InstallLayout.lean` | For `<prefix>/bin`, the share tree is `<prefix>/share/cryptocli`; the binary directory is never renamed. | `src/bin/ic/update.rs`: `layout`; `src/bin/ic/install.rs` |
-| `DiskBudget.lean` | The disk estimate includes the 32 MiB overhead, is at least the raw planned bytes, and is monotone in planned work and bytes per pair. | `ecc2k130/codegen/indexcalc_fixed.py`: `requiredBytes` |
+| `DiskBudget.lean` | The disk estimate includes the 32 MiB overhead, is at least the raw planned bytes, is monotone in planned work and bytes per pair, and the index-off path reserves the final index. | `ecc2k130/codegen/indexcalc_fixed.py`: `requiredBytes`, `pairTableRequiredBytes` |
+| `BatchInversion.lean` | In a commutative group, `x * ((p*x)^{-1} * p) = 1` and `(p*x)^{-1} * p = x^{-1}`; this is the Montgomery step used by `batchInv`. | `ecc2k130/codegen/curves.py`: `Curve.addBatch`; `field.py`: `Onb.batchInv` |
 
 ## Bridges from the model to the code
 
 - `PairCursor.lean` models the cursor recursively. `test_cursor_closed_form_matches_recursive_model` in `ecc2k130/codegen/test_indexcalc_fixed.py` exhaustively checks that the closed form used by Python equals the recursive model for every cursor with `size <= 30`.
-- `DiskBudget.lean` uses the same floor-division expression as `requiredBytes`; `test_disk_estimate_matches_lean_model` checks the implementation against the expression over boundary and representative values.
+- `DiskBudget.lean` uses the same floor-division expression as `requiredBytes`; `test_disk_estimate_matches_lean_model` checks `requiredBytes` and the index allowance in `pairTableRequiredBytes` over boundary and representative values.
 - `VersionSelection.lean` abstracts the parsed tuple. The Rust test `versions_compare_exhaustively_as_tuples` checks `parse_version`/`is_newer` against the tuple order over a 5×4×4 cube, and the invalid-string tests cover rejection.
 - `AssetSelection.lean` abstracts the archive/universal/architecture booleans. The Rust test `selects_the_native_or_universal_archive` checks the exact name filtering (including `SHA256SUMS`, `.zip`, Linux and non-`crypto-cli` assets).
 - `InstallLayout.lean` models paths as segment lists. `layout_uses_the_prefix_share_tree_only_for_bin` checks `/usr/local/bin` and a non-`bin` target directory; `install::tests` checks the source/installed fallback.
@@ -41,6 +42,9 @@ that the theorems do not depend on `sorryAx`.
   `test_batch_inversion_and_addition_match_scalar_paths` (500 random pairs plus
   every doubling on a small curve) and
   `test_batch_addition_matches_on_ecc2k130_sample` (64 pairs at degree 131).
+  `BatchInversion.lean` proves the Montgomery step for any commutative group
+  with the stated inverse laws; it does not prove that the Python representation
+  satisfies those laws.
 - It does not prove the whole `ic` CLI or the release workflow.
 - Rust's `u64` parser is checked by exhaustive bounded tests, not by a
   refinement proof to the Lean string parser.
