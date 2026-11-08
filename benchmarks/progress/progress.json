@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261108T0449Z-minors-gd-panel",
+  "latest_record": "20261108T2051Z-curve25519-tw-scaling-k32",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 65,
+    "measured": 69,
     "open": 1
   },
   "repo": "crypto",
@@ -417,6 +417,490 @@
         }
       ],
       "problem": "dlpwai:static-dh-p224-shape",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.3581,
+      "latest": 1.3581,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.3581
+      },
+      "metric": "ratio_j16_over_rho_w0",
+      "points": [
+        {
+          "commit": "a1ce0db2f9ec",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.3581
+          },
+          "n": 8,
+          "record": "20261108T2045Z-curve25519-tw-jumps-k20",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            1.232,
+            1.497
+          ],
+          "summary": "k=20: jumps=4 costs 1.22x [1.19,1.26] the 16-jump target-in-walk arm (walk lengthens, dependent rows); jumps=8 null, 32 1.05x, 2 fails 3.25x; 16-jump arm 1.36x rho-neg at w=0; primary prediction failed",
+          "value": 1.3581
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k20",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0507,
+      "latest": 1.0507,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_j32_over_j16_w0",
+      "points": [
+        {
+          "commit": "a1ce0db2f9ec",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261108T2045Z-curve25519-tw-jumps-k20",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.996,
+            1.11
+          ],
+          "summary": "k=20: jumps=4 costs 1.22x [1.19,1.26] the 16-jump target-in-walk arm (walk lengthens, dependent rows); jumps=8 null, 32 1.05x, 2 fails 3.25x; 16-jump arm 1.36x rho-neg at w=0; primary prediction failed",
+          "value": 1.0507
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k20",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.2204,
+      "latest": 1.2204,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_j4_over_j16_w0",
+      "points": [
+        {
+          "commit": "a1ce0db2f9ec",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261108T2045Z-curve25519-tw-jumps-k20",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.186,
+            1.256
+          ],
+          "summary": "k=20: jumps=4 costs 1.22x [1.19,1.26] the 16-jump target-in-walk arm (walk lengthens, dependent rows); jumps=8 null, 32 1.05x, 2 fails 3.25x; 16-jump arm 1.36x rho-neg at w=0; primary prediction failed",
+          "value": 1.2204
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k20",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 2.1364,
+      "latest": 2.1364,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.358083
+      },
+      "metric": "s_twcj_j16_w0",
+      "points": [
+        {
+          "commit": "a1ce0db2f9ec",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.358083
+          },
+          "n": 512,
+          "record": "20261108T2045Z-curve25519-tw-jumps-k20",
+          "reference": 1.5731,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=20: jumps=4 costs 1.22x [1.19,1.26] the 16-jump target-in-walk arm (walk lengthens, dependent rows); jumps=8 null, 32 1.05x, 2 fails 3.25x; 16-jump arm 1.36x rho-neg at w=0; primary prediction failed",
+          "value": 2.1364
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k20",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.3431,
+      "latest": 1.3431,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.3431
+      },
+      "metric": "ratio_j16_over_rho_w0",
+      "points": [
+        {
+          "commit": "a1ce0db2f9ec",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.3431
+          },
+          "n": 8,
+          "record": "20261108T2047Z-curve25519-tw-jumps-k24",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            1.219,
+            1.479
+          ],
+          "summary": "k=24: jumps=4 costs 1.27x [1.19,1.35] the 16-jump arm; jumps=8 1.05x, 32 1.01x, 2 fails 3.46x; 16-jump arm 1.34x rho-neg at w=0; replicate prediction failed",
+          "value": 1.3431
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k24",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0141,
+      "latest": 1.0141,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_j32_over_j16_w0",
+      "points": [
+        {
+          "commit": "a1ce0db2f9ec",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261108T2047Z-curve25519-tw-jumps-k24",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.978,
+            1.051
+          ],
+          "summary": "k=24: jumps=4 costs 1.27x [1.19,1.35] the 16-jump arm; jumps=8 1.05x, 32 1.01x, 2 fails 3.46x; 16-jump arm 1.34x rho-neg at w=0; replicate prediction failed",
+          "value": 1.0141
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k24",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.2682,
+      "latest": 1.2682,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_j4_over_j16_w0",
+      "points": [
+        {
+          "commit": "a1ce0db2f9ec",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261108T2047Z-curve25519-tw-jumps-k24",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.193,
+            1.348
+          ],
+          "summary": "k=24: jumps=4 costs 1.27x [1.19,1.35] the 16-jump arm; jumps=8 1.05x, 32 1.01x, 2 fails 3.46x; 16-jump arm 1.34x rho-neg at w=0; replicate prediction failed",
+          "value": 1.2682
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k24",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.5834,
+      "latest": 1.5834,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.342661
+      },
+      "metric": "s_twcj_j16_w0",
+      "points": [
+        {
+          "commit": "a1ce0db2f9ec",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.342661
+          },
+          "n": 512,
+          "record": "20261108T2047Z-curve25519-tw-jumps-k24",
+          "reference": 1.1793,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=24: jumps=4 costs 1.27x [1.19,1.35] the 16-jump arm; jumps=8 1.05x, 32 1.01x, 2 fails 3.46x; 16-jump arm 1.34x rho-neg at w=0; replicate prediction failed",
+          "value": 1.5834
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k24",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.9966,
+      "latest": 0.9966,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_j32_over_j16_w0",
+      "points": [
+        {
+          "commit": "e6a759cc7214",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261108T2051Z-curve25519-tw-scaling-k28",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.954,
+            1.041
+          ],
+          "summary": "k=28: target-in-walk F=1 arm 1.40x [1.35,1.45] rho-neg at w=0 (inserts-priced band: ahead at every weight), 0.906x the table-then-probe arm; 32/64 jumps null",
+          "value": 0.9966
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k28",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9059,
+      "latest": 0.9059,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_twcj_over_f1_w0",
+      "points": [
+        {
+          "commit": "e6a759cc7214",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261108T2051Z-curve25519-tw-scaling-k28",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.877,
+            0.935
+          ],
+          "summary": "k=28: target-in-walk F=1 arm 1.40x [1.35,1.45] rho-neg at w=0 (inserts-priced band: ahead at every weight), 0.906x the table-then-probe arm; 32/64 jumps null",
+          "value": 0.9059
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k28",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.3951,
+      "latest": 1.3951,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.3951
+      },
+      "metric": "ratio_twcj_over_rho_w0",
+      "points": [
+        {
+          "commit": "e6a759cc7214",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.3951
+          },
+          "n": 8,
+          "record": "20261108T2051Z-curve25519-tw-scaling-k28",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            1.345,
+            1.446
+          ],
+          "summary": "k=28: target-in-walk F=1 arm 1.40x [1.35,1.45] rho-neg at w=0 (inserts-priced band: ahead at every weight), 0.906x the table-then-probe arm; 32/64 jumps null",
+          "value": 1.3951
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k28",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.4349,
+      "latest": 1.4349,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.395003
+      },
+      "metric": "s_twcj_j16_w0",
+      "points": [
+        {
+          "commit": "e6a759cc7214",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.395003
+          },
+          "n": 512,
+          "record": "20261108T2051Z-curve25519-tw-scaling-k28",
+          "reference": 1.0286,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=28: target-in-walk F=1 arm 1.40x [1.35,1.45] rho-neg at w=0 (inserts-priced band: ahead at every weight), 0.906x the table-then-probe arm; 32/64 jumps null",
+          "value": 1.4349
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k28",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.9853,
+      "latest": 0.9853,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_j32_over_j16_w0",
+      "points": [
+        {
+          "commit": "e6a759cc7214",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261108T2051Z-curve25519-tw-scaling-k32",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.93,
+            1.044
+          ],
+          "summary": "k=32: target-in-walk F=1 arm 1.37x [1.27,1.47] rho-neg at w=0, S 1.387 with walk 1.368 sqrt(r) (3% above the 1.329 floor); 0.857x the table-then-probe arm; 32/64 jumps null",
+          "value": 0.9853
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.8569,
+      "latest": 0.8569,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_twcj_over_f1_w0",
+      "points": [
+        {
+          "commit": "e6a759cc7214",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261108T2051Z-curve25519-tw-scaling-k32",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.811,
+            0.905
+          ],
+          "summary": "k=32: target-in-walk F=1 arm 1.37x [1.27,1.47] rho-neg at w=0, S 1.387 with walk 1.368 sqrt(r) (3% above the 1.329 floor); 0.857x the table-then-probe arm; 32/64 jumps null",
+          "value": 0.8569
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.3663,
+      "latest": 1.3663,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.3663
+      },
+      "metric": "ratio_twcj_over_rho_w0",
+      "points": [
+        {
+          "commit": "e6a759cc7214",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.3663
+          },
+          "n": 8,
+          "record": "20261108T2051Z-curve25519-tw-scaling-k32",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            1.267,
+            1.473
+          ],
+          "summary": "k=32: target-in-walk F=1 arm 1.37x [1.27,1.47] rho-neg at w=0, S 1.387 with walk 1.368 sqrt(r) (3% above the 1.329 floor); 0.857x the table-then-probe arm; 32/64 jumps null",
+          "value": 1.3663
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.3871,
+      "latest": 1.3871,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.366332
+      },
+      "metric": "s_twcj_j16_w0",
+      "points": [
+        {
+          "commit": "e6a759cc7214",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.366332
+          },
+          "n": 512,
+          "record": "20261108T2051Z-curve25519-tw-scaling-k32",
+          "reference": 1.0152,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=32: target-in-walk F=1 arm 1.37x [1.27,1.47] rho-neg at w=0, S 1.387 with walk 1.368 sqrt(r) (3% above the 1.329 floor); 0.857x the table-then-probe arm; 32/64 jumps null",
+          "value": 1.3871
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k32",
       "unit": "S"
     },
     {
