@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261107T1947Z-curve25519-f1-walk-k24",
+  "latest_record": "20261107T2115Z-prime-medium-rho-bound",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 49,
+    "measured": 50,
     "open": 0
   },
   "repo": "crypto",
@@ -2233,6 +2233,366 @@
       ],
       "problem": "rho:koblitz_signed_frobenius_panel",
       "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0826504182816774,
+      "latest": 1.0826504182816774,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prime-medium/bsgs-neg/w0.1/s",
+      "points": [
+        {
+          "commit": "189b78587b01",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261107T2115Z-prime-medium-rho-bound",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.0075393107356414,
+            1.152924700207311
+          ],
+          "summary": "Prime medium-tier rho reference bound, six EKS jobs (J1-J6, 33-49 bit, two curves per size), all complete and audited, admitted for counts (pod L2 gate exit 42; no wall time admissible). rho.negation constant/floor at w=0 = 1.093 [1.033, 1.156]; R(N) model B R_inf = 1.084 [1.020, 1.142]. PROTOCOL.md section 9 verdict: inconclusive (positive control P4 rho-plain/rho-neg interval does not exclude 1.2 from below in any job; on M alone the row would read setup_excess). Launch entries for J2 and J4 were lost when their clients were killed (cards -4, -5); those builds were finished by wait_launcher_result.sh without relaunch. [pcc:unverified]",
+          "value": 1.0826504182816774
+        }
+      ],
+      "problem": "rho:prime_medium_tier_bound",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.9842345439793895,
+      "latest": 0.9842345439793895,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prime-medium/bsgs-neg/w0/s",
+      "points": [
+        {
+          "commit": "189b78587b01",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261107T2115Z-prime-medium-rho-bound",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.915951236063988,
+            1.0481240645784684
+          ],
+          "summary": "Prime medium-tier rho reference bound, six EKS jobs (J1-J6, 33-49 bit, two curves per size), all complete and audited, admitted for counts (pod L2 gate exit 42; no wall time admissible). rho.negation constant/floor at w=0 = 1.093 [1.033, 1.156]; R(N) model B R_inf = 1.084 [1.020, 1.142]. PROTOCOL.md section 9 verdict: inconclusive (positive control P4 rho-plain/rho-neg interval does not exclude 1.2 from below in any job; on M alone the row would read setup_excess). Launch entries for J2 and J4 were lost when their clients were killed (cards -4, -5); those builds were finished by wait_launcher_result.sh without relaunch. [pcc:unverified]",
+          "value": 0.9842345439793895
+        }
+      ],
+      "problem": "rho:prime_medium_tier_bound",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.968393287002287,
+      "latest": 1.968393287002287,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prime-medium/bsgs-neg/w1/s",
+      "points": [
+        {
+          "commit": "189b78587b01",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261107T2115Z-prime-medium-rho-bound",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.8318319827805114,
+            2.0961304208669045
+          ],
+          "summary": "Prime medium-tier rho reference bound, six EKS jobs (J1-J6, 33-49 bit, two curves per size), all complete and audited, admitted for counts (pod L2 gate exit 42; no wall time admissible). rho.negation constant/floor at w=0 = 1.093 [1.033, 1.156]; R(N) model B R_inf = 1.084 [1.020, 1.142]. PROTOCOL.md section 9 verdict: inconclusive (positive control P4 rho-plain/rho-neg interval does not exclude 1.2 from below in any job; on M alone the row would read setup_excess). Launch entries for J2 and J4 were lost when their clients were killed (cards -4, -5); those builds were finished by wait_launcher_result.sh without relaunch. [pcc:unverified]",
+          "value": 1.968393287002287
+        }
+      ],
+      "problem": "rho:prime_medium_tier_bound",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.042213164448891,
+      "latest": 1.042213164448891,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prime-medium/rho-neg-v2/w0.1/s",
+      "points": [
+        {
+          "commit": "189b78587b01",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261107T2115Z-prime-medium-rho-bound",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.974194995787508,
+            1.1051903405093113
+          ],
+          "summary": "Prime medium-tier rho reference bound, six EKS jobs (J1-J6, 33-49 bit, two curves per size), all complete and audited, admitted for counts (pod L2 gate exit 42; no wall time admissible). rho.negation constant/floor at w=0 = 1.093 [1.033, 1.156]; R(N) model B R_inf = 1.084 [1.020, 1.142]. PROTOCOL.md section 9 verdict: inconclusive (positive control P4 rho-plain/rho-neg interval does not exclude 1.2 from below in any job; on M alone the row would read setup_excess). Launch entries for J2 and J4 were lost when their clients were killed (cards -4, -5); those builds were finished by wait_launcher_result.sh without relaunch. [pcc:unverified]",
+          "value": 1.042213164448891
+        }
+      ],
+      "problem": "rho:prime_medium_tier_bound",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.9473400660929809,
+      "latest": 0.9473400660929809,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prime-medium/rho-neg-v2/w0/s",
+      "points": [
+        {
+          "commit": "189b78587b01",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261107T2115Z-prime-medium-rho-bound",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.8855348494147386,
+            1.0045240725037972
+          ],
+          "summary": "Prime medium-tier rho reference bound, six EKS jobs (J1-J6, 33-49 bit, two curves per size), all complete and audited, admitted for counts (pod L2 gate exit 42; no wall time admissible). rho.negation constant/floor at w=0 = 1.093 [1.033, 1.156]; R(N) model B R_inf = 1.084 [1.020, 1.142]. PROTOCOL.md section 9 verdict: inconclusive (positive control P4 rho-plain/rho-neg interval does not exclude 1.2 from below in any job; on M alone the row would read setup_excess). Launch entries for J2 and J4 were lost when their clients were killed (cards -4, -5); those builds were finished by wait_launcher_result.sh without relaunch. [pcc:unverified]",
+          "value": 0.9473400660929809
+        }
+      ],
+      "problem": "rho:prime_medium_tier_bound",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.8960710496520743,
+      "latest": 1.8960710496520743,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prime-medium/rho-neg-v2/w1/s",
+      "points": [
+        {
+          "commit": "189b78587b01",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261107T2115Z-prime-medium-rho-bound",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.7721363131424326,
+            2.0106443822333233
+          ],
+          "summary": "Prime medium-tier rho reference bound, six EKS jobs (J1-J6, 33-49 bit, two curves per size), all complete and audited, admitted for counts (pod L2 gate exit 42; no wall time admissible). rho.negation constant/floor at w=0 = 1.093 [1.033, 1.156]; R(N) model B R_inf = 1.084 [1.020, 1.142]. PROTOCOL.md section 9 verdict: inconclusive (positive control P4 rho-plain/rho-neg interval does not exclude 1.2 from below in any job; on M alone the row would read setup_excess). Launch entries for J2 and J4 were lost when their clients were killed (cards -4, -5); those builds were finished by wait_launcher_result.sh without relaunch. [pcc:unverified]",
+          "value": 1.8960710496520743
+        }
+      ],
+      "problem": "rho:prime_medium_tier_bound",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.0657921450620542,
+      "latest": 1.0657921450620542,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prime-medium/rho-neg/w0.1/s",
+      "points": [
+        {
+          "commit": "189b78587b01",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261107T2115Z-prime-medium-rho-bound",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.004363461406553,
+            1.1287383111654898
+          ],
+          "summary": "Prime medium-tier rho reference bound, six EKS jobs (J1-J6, 33-49 bit, two curves per size), all complete and audited, admitted for counts (pod L2 gate exit 42; no wall time admissible). rho.negation constant/floor at w=0 = 1.093 [1.033, 1.156]; R(N) model B R_inf = 1.084 [1.020, 1.142]. PROTOCOL.md section 9 verdict: inconclusive (positive control P4 rho-plain/rho-neg interval does not exclude 1.2 from below in any job; on M alone the row would read setup_excess). Launch entries for J2 and J4 were lost when their clients were killed (cards -4, -5); those builds were finished by wait_launcher_result.sh without relaunch. [pcc:unverified]",
+          "value": 1.0657921450620542
+        }
+      ],
+      "problem": "rho:prime_medium_tier_bound",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.9690278481988097,
+      "latest": 0.9690278481988097,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prime-medium/rho-neg/w0/s",
+      "points": [
+        {
+          "commit": "189b78587b01",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261107T2115Z-prime-medium-rho-bound",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.9131539505185012,
+            1.026274385316299
+          ],
+          "summary": "Prime medium-tier rho reference bound, six EKS jobs (J1-J6, 33-49 bit, two curves per size), all complete and audited, admitted for counts (pod L2 gate exit 42; no wall time admissible). rho.negation constant/floor at w=0 = 1.093 [1.033, 1.156]; R(N) model B R_inf = 1.084 [1.020, 1.142]. PROTOCOL.md section 9 verdict: inconclusive (positive control P4 rho-plain/rho-neg interval does not exclude 1.2 from below in any job; on M alone the row would read setup_excess). Launch entries for J2 and J4 were lost when their clients were killed (cards -4, -5); those builds were finished by wait_launcher_result.sh without relaunch. [pcc:unverified]",
+          "value": 0.9690278481988097
+        }
+      ],
+      "problem": "rho:prime_medium_tier_bound",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.9366708168312694,
+      "latest": 1.9366708168312694,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prime-medium/rho-neg/w1/s",
+      "points": [
+        {
+          "commit": "189b78587b01",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261107T2115Z-prime-medium-rho-bound",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.824963021160557,
+            2.0518026384522257
+          ],
+          "summary": "Prime medium-tier rho reference bound, six EKS jobs (J1-J6, 33-49 bit, two curves per size), all complete and audited, admitted for counts (pod L2 gate exit 42; no wall time admissible). rho.negation constant/floor at w=0 = 1.093 [1.033, 1.156]; R(N) model B R_inf = 1.084 [1.020, 1.142]. PROTOCOL.md section 9 verdict: inconclusive (positive control P4 rho-plain/rho-neg interval does not exclude 1.2 from below in any job; on M alone the row would read setup_excess). Launch entries for J2 and J4 were lost when their clients were killed (cards -4, -5); those builds were finished by wait_launcher_result.sh without relaunch. [pcc:unverified]",
+          "value": 1.9366708168312694
+        }
+      ],
+      "problem": "rho:prime_medium_tier_bound",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.2702866693034724,
+      "latest": 1.2702866693034724,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prime-medium/rho-plain/w0.1/s",
+      "points": [
+        {
+          "commit": "189b78587b01",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261107T2115Z-prime-medium-rho-bound",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.19385358633292,
+            1.3536366815649752
+          ],
+          "summary": "Prime medium-tier rho reference bound, six EKS jobs (J1-J6, 33-49 bit, two curves per size), all complete and audited, admitted for counts (pod L2 gate exit 42; no wall time admissible). rho.negation constant/floor at w=0 = 1.093 [1.033, 1.156]; R(N) model B R_inf = 1.084 [1.020, 1.142]. PROTOCOL.md section 9 verdict: inconclusive (positive control P4 rho-plain/rho-neg interval does not exclude 1.2 from below in any job; on M alone the row would read setup_excess). Launch entries for J2 and J4 were lost when their clients were killed (cards -4, -5); those builds were finished by wait_launcher_result.sh without relaunch. [pcc:unverified]",
+          "value": 1.2702866693034724
+        }
+      ],
+      "problem": "rho:prime_medium_tier_bound",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.2702866693034724,
+      "latest": 1.2702866693034724,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prime-medium/rho-plain/w0/s",
+      "points": [
+        {
+          "commit": "189b78587b01",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261107T2115Z-prime-medium-rho-bound",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.19385358633292,
+            1.3536366815649752
+          ],
+          "summary": "Prime medium-tier rho reference bound, six EKS jobs (J1-J6, 33-49 bit, two curves per size), all complete and audited, admitted for counts (pod L2 gate exit 42; no wall time admissible). rho.negation constant/floor at w=0 = 1.093 [1.033, 1.156]; R(N) model B R_inf = 1.084 [1.020, 1.142]. PROTOCOL.md section 9 verdict: inconclusive (positive control P4 rho-plain/rho-neg interval does not exclude 1.2 from below in any job; on M alone the row would read setup_excess). Launch entries for J2 and J4 were lost when their clients were killed (cards -4, -5); those builds were finished by wait_launcher_result.sh without relaunch. [pcc:unverified]",
+          "value": 1.2702866693034724
+        }
+      ],
+      "problem": "rho:prime_medium_tier_bound",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.2702866693034724,
+      "latest": 1.2702866693034724,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "prime-medium/rho-plain/w1/s",
+      "points": [
+        {
+          "commit": "189b78587b01",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": null,
+          "record": "20261107T2115Z-prime-medium-rho-bound",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.19385358633292,
+            1.3536366815649752
+          ],
+          "summary": "Prime medium-tier rho reference bound, six EKS jobs (J1-J6, 33-49 bit, two curves per size), all complete and audited, admitted for counts (pod L2 gate exit 42; no wall time admissible). rho.negation constant/floor at w=0 = 1.093 [1.033, 1.156]; R(N) model B R_inf = 1.084 [1.020, 1.142]. PROTOCOL.md section 9 verdict: inconclusive (positive control P4 rho-plain/rho-neg interval does not exclude 1.2 from below in any job; on M alone the row would read setup_excess). Launch entries for J2 and J4 were lost when their clients were killed (cards -4, -5); those builds were finished by wait_launcher_result.sh without relaunch. [pcc:unverified]",
+          "value": 1.2702866693034724
+        }
+      ],
+      "problem": "rho:prime_medium_tier_bound",
+      "unit": "S"
     }
   ],
   "units": {
