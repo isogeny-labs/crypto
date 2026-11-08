@@ -35,8 +35,10 @@ amendment to the observed results.
    margin alone does not close this step.
    **Local algebraic precision step completed conditionally:** LocalPrecision
    proves inverse stability modulo (2^p,X^q) from input ideal membership and an
-   exact inverse of the approximation. Concrete finite-buffer equivalence and
-   full Hermite precision are still open. [pcc:unverified]
+   exact inverse of the approximation. The further FiniteBuffers/ResidueEncoding
+   proofs close the finite coefficient-buffer equivalence, construct the actual
+   finite inverse output and prove modular encoding/cardinality. Full Hermite
+   precision and native bit costs remain open. [pcc:unverified]
 4. **Uniform modes and total recursive cost.** Derive squared Cauchy modes with
    coefficient(b+1), genuine nonzero valuations, all tiles/rows/levels, source
    variables and child entries. Charge D, inverse, factorization, tuple

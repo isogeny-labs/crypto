@@ -1,5 +1,11 @@
 # Common scalar square and a rational successor
 
+Further update: [FINITE_BUFFERS.md](FINITE_BUFFERS.md) proves the finite
+coefficient/jet-ideal equivalence, constructs the actual finite inverse output,
+and binds coefficient encoding to ZMod2^p. See its
+[PDF](reports/finite-buffers-20261108/report.pdf). Native bit costs and the
+complete contraction/recovery recurrence remain open. [pcc:unverified]
+
 Update: the actual coefficientwise local-series and polynomial-degree bridges
 now have source-connected Lean proofs. See [the proof addendum](LOCAL_SERIES.md)
 and its [PDF](reports/local-series-20261108/report.pdf). Construction costs,

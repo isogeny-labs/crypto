@@ -1,5 +1,10 @@
 # Actual local-series and polynomial bridges
 
+Version update: the finite coefficient-buffer and residue-encoding obligations
+left open in this snapshot are subsequently addressed in
+[FINITE_BUFFERS.md](FINITE_BUFFERS.md). Its scope still excludes native and
+complete recursive cost certification. Earlier proof PDFs remain unchanged.
+
 The common rational denominator now has a symbolic integral-series construction
 connected to the imported kernel. The earlier report's coefficientwise gap and
 generic-polynomial gap are closed at this algebraic scope. This is producer

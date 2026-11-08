@@ -1,5 +1,9 @@
 # Local-series proof map, version2
 
+The finite coefficient-buffer bridge is now documented separately in
+[FINITE_BUFFERS_PROOF_MAP.md](FINITE_BUFFERS_PROOF_MAP.md). This table remains
+the exact scope of its own earlier declarations.
+
 All are producer proofs with unsigned standing. Exact declarations are in
 LocalIntegral, LocalCharts, GlobalPolynomials and LocalPrecision. Standard
 foundations only are permitted. [pcc:unverified]
