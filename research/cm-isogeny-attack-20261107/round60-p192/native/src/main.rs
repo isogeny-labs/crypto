@@ -1,5 +1,45 @@
 #![allow(dead_code, unused_imports)]
 include!("helpers.rs");
+use std::sync::atomic::{AtomicU64, Ordering};
+static TRANSFER_CALLS: AtomicU64 = AtomicU64::new(0);
+static TRANSFER_LOOKUPS: AtomicU64 = AtomicU64::new(0);
+fn key<const P: i64, const D: i64>(p: Pt<P, D>) -> Option<(i64, i64, i64, i64)> {
+    p.map(|(x, y)| (x.0, x.1, y.0, y.1))
+}
+fn transfer<const P: i64, const D: i64>(
+    g: Pt<P, D>,
+    q: Pt<P, D>,
+    u: Pt<P, D>,
+    a: i64,
+    r: u64,
+) -> Pt<P, D> {
+    let delta = add(g, neg(q), a);
+    assert!(delta.is_some());
+    let mut m = 1;
+    while m * m < r {
+        m += 1
+    }
+    let mut table = std::collections::HashMap::new();
+    let mut dcur = None;
+    let mut gcur = None;
+    for _ in 0..m {
+        assert!(table.insert(key(dcur), gcur).is_none());
+        dcur = add(dcur, delta, a);
+        gcur = add(gcur, g, a)
+    }
+    let mut probe = u;
+    let mut label = None;
+    TRANSFER_CALLS.fetch_add(1, Ordering::Relaxed);
+    for _ in 0..=m {
+        TRANSFER_LOOKUPS.fetch_add(1, Ordering::Relaxed);
+        if let Some(&baby) = table.get(&key(probe)) {
+            return add(label, baby, a);
+        }
+        probe = add(probe, neg(dcur), a);
+        label = add(label, gcur, a);
+    }
+    panic!("public transfer search failed")
+}
 fn graph<const P: i64, const D: i64>(q: Pt<P, D>, a: i64, r: u64) -> Vec<Pt<P, D>> {
     let mut v = vec![];
     let mut cur = None;
@@ -92,7 +132,11 @@ fn action<const P: i64, const D: i64>(
     let v = coeff(&ds, &xs, reference);
     assert_eq!(v[0], F::c(0));
     assert_ne!(v[1], F::c(0));
-    (decode(v[2] / v[1], shift, a, b, r), v)
+    let out = decode(v[2] / v[1], shift, a, b, r);
+    if std::env::args().any(|x| x == "--transfer-check") {
+        assert_eq!(out, transfer(gg[1], qq[1], u, a, r));
+    }
+    (out, v)
 }
 fn constant<const P: i64, const D: i64>(gg: &[Pt<P, D>], qq: &[Pt<P, D>]) -> F<P, D> {
     gg.iter()
@@ -269,6 +313,12 @@ fn main() {
         let saved: Value = serde_json::from_slice(&fs::read(&args[i + 1]).unwrap()).unwrap();
         assert!(out == saved, "certificate mismatch");
         eprintln!("cofactor-reference outputs match")
+    }
+    if args.iter().any(|x| x == "--transfer-check") {
+        eprintln!(
+            "{}",
+            json!({"public_transfer_checks":TRANSFER_CALLS.load(Ordering::Relaxed),"giant_lookups":TRANSFER_LOOKUPS.load(Ordering::Relaxed),"uses_scalar_labels":false})
+        );
     }
     println!("{}", serde_json::to_string(&out).unwrap());
 }
