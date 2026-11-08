@@ -1,6 +1,6 @@
-# DRAFT Amendment R2-A (proposed number 10): stage B, `m = 6`, `t = 6` (`lambda = 1.52`)
+# Amendment R2-A, frozen 2026-11-08 as PREREGISTRATION Amendment 10: stage B, `m = 6`, `t = 6` (`lambda = 1.52`)
 
-**Status: draft, NOT applied, NOT frozen. Requires amendment freeze.** Written 2026-11-08 (round 2, slug `r2pkm`)
+**Status: FROZEN 2026-11-08 as Amendment 10 of research/prime_fall_degree_20261027/PREREGISTRATION.md, before `pfd-b` was submitted.** (Originally written as a draft.) Written 2026-11-08 (round 2, slug `r2pkm`)
 for decision 6 of `research/open_leads_execution_20261108/DECISIONS.md` ("written as a dated protocol amendment
 before its cell runs; a cell with no frozen amendment does not run"). Target file when frozen:
 `research/prime_fall_degree_20261027/PREREGISTRATION.md` (append as "Amendment 10", with the freeze date). Renumbered from 9 on 2026-11-08, because R2-C was frozen first as Amendment 9.
