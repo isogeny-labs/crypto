@@ -35,7 +35,7 @@ pub struct Ecc2k130Args {
     /// the pair table in one run.
     #[arg(long, default_value_t = 10_000_000)]
     pub pair_budget: u64,
-    /// Processes used to compute pair sums; 0 selects min(4, CPU count).
+    /// Processes used to compute pair sums; 0 selects min(8, CPU count).
     #[arg(long, default_value_t = 0, value_parser = clap::value_parser!(u32).range(0..=64))]
     pub pair_workers: u32,
     /// Native SAT solve budget; a separate watchdog bounds each complete SAT query.
@@ -62,13 +62,13 @@ fn default_params() -> PathBuf {
     super::install::share_file_or_source("docs/ic/params/ecc2k130-fixed.json")
 }
 
-/// `0` selects up to four workers; an explicit count is kept.
+/// `0` selects up to eight workers; an explicit count is kept.
 fn resolve_pair_workers(requested: u32) -> u32 {
     if requested != 0 {
         return requested;
     }
     std::thread::available_parallelism()
-        .map(|count| count.get().min(4) as u32)
+        .map(|count| count.get().min(8) as u32)
         .unwrap_or(1)
 }
 
@@ -150,6 +150,6 @@ mod tests {
         assert_eq!(resolve_pair_workers(1), 1);
         assert_eq!(resolve_pair_workers(8), 8);
         let automatic = resolve_pair_workers(0);
-        assert!((1..=4).contains(&automatic), "{automatic}");
+        assert!((1..=8).contains(&automatic), "{automatic}");
     }
 }

@@ -419,7 +419,7 @@ no condition on the curve.
   `n`, every point of `E(F_{q^n})` with `x ∈ F_q` already lies in `E(F_q)` (a root of a monic
   quadratic over `F_q` cannot have degree 2 over `F_q` inside an odd-degree extension). Every
   sum of factor-base points therefore stays in `E(F_q)`: at most `2q + 1` points, proved
-  [pcc:unverified]. Claims PCC-20261108-cd23f6 and PCC-20261108-9610b3 await CI signing.
+  [pcc:unverified]. Claims PCC-20261108-8e873f and PCC-20261108-1ff9e1 await CI signing.
 - **Refuted reading.** `CLAIM-JV-ASSUMPTION1-ALL-CURVES`: subfield curves with `n ≥ 3` odd
   satisfy `#F ∈ Ω(q)` (Hasse, cited) yet have at most `2q + 1` decomposable points, not
   `Ω(q^{n-1}/(n-1)!)`. The same family breaks the `1/n!` proportion of
