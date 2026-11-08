@@ -32,14 +32,22 @@ time against `activeDeadlineSeconds`.
   rerun under a new job name with both attempts retained", and attempt 1's receipts are kept in full.
 - **Launch:** through a director card once `cpu-spot` capacity is free, never alongside a 14-vCPU job.
 
-## Attempt 2: local receipt loss (2026-11-08, about 07:18Z)
+## Attempt 2: local receipt loss (2026-11-08, about 06:45:56Z)
 
-The untracked directory `receipts/A2/` was removed from the working tree while card A2-1's wait was polling. The wait
-log shows "No such file or directory" from poll 55 at 07:18:41Z onward, in `cards/CARD-...-A2-1.wait-short.stdout`.
-The cause is under investigation and was not a git operation, since the directory was never tracked.
+The untracked directory `receipts/A2/` was deleted from the working tree at about 06:45:56Z, while card A2-1's wait was
+polling. The cause, reported by the experiment-director: a generator test loop wrote a synthetic launch receipt
+to `receipts/A2/launch/result.json`, overwriting the real one, then ran `rm -rf research/split_graph_secant_cost_20261107/receipts/A2`.
+The test assumed the directory did not exist.
 
+The wait log in `cards/CARD-...-A2-1.wait-short.stdout` and `.stderr` agrees:
+- polls 1–21 are normal;
+- poll 22 is `launcher_exit 255`;
+- from poll 23 at 06:46:41Z onward, every poll is "No such file or directory".
+
+Recovery and scope:
 - **Launch receipt:** `receipts/A2/launch/result.json` was restored byte for byte from the JSON tail of
   `cards/CARD-...-A2-1.launch.stdout`. Its sha256 is 446f8a9cdad73530…, equal to the digest that card A2-1's receipt
   recorded for that output.
-- **Lost:** the per-poll status files for polls 1–54. The wait step's stdout and the card receipt keep the poll log.
+- **Lost:** the per-poll status files. The poll log is kept in the card's wait stdout and stderr.
 - **Not affected:** the job (sgsecant-panel-20261108-a2) and its S3 outputs.
+- **Rule from now on:** card-generator tests use a temporary copy of the tree, never real study paths.
