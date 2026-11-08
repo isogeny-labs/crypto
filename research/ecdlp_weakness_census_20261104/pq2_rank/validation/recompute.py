@@ -175,7 +175,19 @@ def final2_items(H, readme, L, detail):
                 "so agreement 'where the ranges overlap (n = 34 to 36)' is stated for an n with no data. Supported wording: "
                 "'where the ranges overlap (n = 34, and the fresh n = 36 control)', as in R5-004."))
         H("census_readme.kw_magma_5_from", text_num(text["census_readme"], r"they report 5 from n = (\d+)"), kwv[5])
-    kw_docs = [] if mo else [
+    mc = re.search(r"agrees with their Magma value 4 where the ranges overlap \(n = (\d+), and the fresh n = (\d+) control\)",
+                   text["census_readme"])
+    if mc:
+        A_ = {(r["n"], r["instance"]): r for r in json.loads(read_text(PKG / "f4/msolve_all.json"))["rows"]}
+        main_ov = sorted({k[0] for k in A_ if kwv[0] is not None and kwv[0] <= k[0] <= kwv[3]})
+        H("census_readme.overlap_main_sweep_n", int(mc[1]), main_ov[0] if len(main_ov) == 1 else -1,
+          note=f"main-sweep msolve n inside Kousidis-Wiemers' degree-4 range n = {kwv[0]}..{kwv[3]}: {main_ov}")
+        H("census_readme.control_n", int(mc[2]),
+          s36_["n"] if s36_.get("msolve_exit") == 0 and kwv[0] <= s36_["n"] <= kwv[3] else -1)
+        degs = [r["max_step_degree"] for k, r in A_.items() if k[0] in main_ov] + [s36_["max_step_degree"]]
+        H("census_readme.agrees_with_magma_4", 4, degs[0] if len(set(degs)) == 1 else -1)
+        H("census_readme.kw_magma_5_from", text_num(text["census_readme"], r"they report 5 from n = (\d+)"), kwv[5])
+    kw_docs = [] if (mo or mc) else [
             ("census_readme", r"Magma value 4 for n ≤ (\d+); they report 5 from n = \d+", r"Magma value 4 for n ≤ \d+; they report 5 from n = (\d+)")]
     for k, pat_hi, pat_from in kw_docs + [
             ("report_typ", r"Magma value for \$n <= (\d+)\$; they report 5 from \$n = \d+\$", r"Magma value for \$n <= \d+\$; they report 5 from \$n = (\d+)\$"),

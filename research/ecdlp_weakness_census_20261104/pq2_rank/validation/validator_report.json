@@ -1,13 +1,13 @@
 {
  "schema": "pcc.validator-report/v1",
- "validated_commit": "e8164843b2984e153b0662b1925dc45f5115d55a",
+ "validated_commit": "c685fadce27b121b97294bfb1cca5f34a7e8dec3",
  "claims": "final2",
- "recompute_script_sha256": "3a5744b4076ae42b01819fec9179897f80b8254355884e190d12545dd66d793d",
- "head_at_recompute": "e8164843b2984e153b0662b1925dc45f5115d55a",
+ "recompute_script_sha256": "3cb3616122a2e5dfe83f69678a4eb025813d82820dbba84fef8b082f257194d4",
+ "head_at_recompute": "c685fadce27b121b97294bfb1cca5f34a7e8dec3",
  "worktree_differs": [],
- "status": "fail",
+ "status": "pass",
  "validator": "validator (claude-opus-5-5; Claude Code session 01AXUKfUpk9rEJg4Yyo1QcZQ)",
- "produced_at": "2026-11-08T01:07:01Z",
+ "produced_at": "2026-11-08T01:09:33Z",
  "raw_data": [
   {
    "path": "docs/ecdlp-hardness-corpus/WEAKNESSES.md",
@@ -35,7 +35,7 @@
   },
   {
    "path": "research/ecdlp_weakness_census_20261104/README.md",
-   "sha256": "7b11310bdd3751dc7bd9c949058689513c0eca20515e8704c2c80ed465312b2b"
+   "sha256": "cc41ca3ed7ebe34d16069f14e7023ba9fb4861467d7f84f44183b9589438943c"
   },
   {
    "path": "research/ecdlp_weakness_census_20261104/pq2_rank/README.md",
@@ -2375,11 +2375,23 @@
    "rel_tol": 0
   },
   {
-   "name": "census_readme.overlap_n_values_with_msolve_and_magma_4",
-   "claimed": 3,
-   "recomputed": 2,
+   "name": "census_readme.overlap_main_sweep_n",
+   "claimed": 34,
+   "recomputed": 34,
    "rel_tol": 0,
-   "note": "stated overlap n = [34, 35, 36]; msolve measured n in that span: [34, 36] (main sweep to n = 34, step test at n = 36 and 37); Kousidis-Wiemers' degree 4 covers n = 34..36. There is no msolve run at n = 35, so agreement 'where the ranges overlap (n = 34 to 36)' is stated for an n with no data. Supported wording: 'where the ranges overlap (n = 34, and the fresh n = 36 control)', as in R5-004."
+   "note": "main-sweep msolve n inside Kousidis-Wiemers' degree-4 range n = 34..36: [34]"
+  },
+  {
+   "name": "census_readme.control_n",
+   "claimed": 36,
+   "recomputed": 36,
+   "rel_tol": 0
+  },
+  {
+   "name": "census_readme.agrees_with_magma_4",
+   "claimed": 4,
+   "recomputed": 4,
+   "rel_tol": 0
   },
   {
    "name": "census_readme.kw_magma_5_from",
@@ -2698,7 +2710,7 @@
    "rel_tol": 0
   }
  ],
- "notes": "243 headline items recomputed; 1 do not match: census_readme.overlap_n_values_with_msolve_and_magma_4 claimed 3 recomputed 2 Counts parsed directly from results/run.log by the validator's own parser; derived JSON/CSV files checked row by row against their source logs. Rounded claims (F_over_V) are compared at the precision stated in the README; exact values are in recomputed_exact. All inputs read from commit e8164843b2984e153b0662b1925dc45f5115d55a (git object store). Working-tree copies differing from it: none. Repository HEAD at recompute time: e8164843b2984e153b0662b1925dc45f5115d55a.",
+ "notes": "245 headline items recomputed; 0 do not match:  Counts parsed directly from results/run.log by the validator's own parser; derived JSON/CSV files checked row by row against their source logs. Rounded claims (F_over_V) are compared at the precision stated in the README; exact values are in recomputed_exact. All inputs read from commit c685fadce27b121b97294bfb1cca5f34a7e8dec3 (git object store). Working-tree copies differing from it: none. Repository HEAD at recompute time: c685fadce27b121b97294bfb1cca5f34a7e8dec3.",
  "detail": {
   "main_log_header": [
    "pq2_rank census; seed 0x5eed20261104; pclmulqdq: true",

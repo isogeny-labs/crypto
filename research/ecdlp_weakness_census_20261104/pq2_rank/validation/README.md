@@ -6,8 +6,8 @@ observation and stays an unverified assertion until a CI-signed verdict exists
 
 | file | what it is | status |
 |---|---|---|
-| `validator_report.json` | Task A: headline recomputation (`pcc.validator-report/v1`), binding pass at `e8164843` | **fail**: 1 of 243 items, the census README overlap range (see "Binding pass at e8164843" below) |
-| `replay_certificate.json` | Task B: re-execution, independent closure, msolve replay (`pcc.replay-certificate/v1`), bound to `e8164843` | **verified** (`scalars_verified: true`; 36 run entries, 0 mismatches) |
+| `validator_report.json` | Task A: headline recomputation (`pcc.validator-report/v1`), binding pass at `c685fadc` | **pass**: 245 of 245 items, 297 files pinned (see "Binding pass at c685fadc" below) |
+| `replay_certificate.json` | Task B: re-execution, independent closure, msolve replay (`pcc.replay-certificate/v1`), bound to `c685fadc` | **verified** (`scalars_verified: true`; 36 run entries, 0 mismatches) |
 | `controls.json` | negative controls for the validator's own checkers | 8 of 8 planted defects caught |
 
 The sections from "Binding" to "Not checked" describe the first pass at `f96f4f4c`. Three
@@ -18,7 +18,8 @@ reports exist:
 * third pass, 123 of 123 matching: the same file at `8d9fdc45`;
 * final pass, 4 of 195 failing: the same file at `af86403a`;
 * final binding pass, 1 of 237 failing: the same file at `e8164843`;
-* binding pass at `e8164843`, 1 of 243 failing: the current file.
+* binding pass at `e8164843`, 1 of 243 failing: the same file at `c685fadc`;
+* binding pass at `c685fadc`, 245 of 245 matching: the current file.
 
 The second, third and final passes are described at the end. The 17-entry certificate
 from the first pass is the blob of `replay_certificate.json` at `8d9fdc45`.
@@ -502,6 +503,32 @@ changed, so the certificate was rebound without new runs. Run at `af86403a`,
   the main sweep's msolve runs stop at 34, and the step test covers 36 and 37. Supported
   wording: "where the ranges overlap (n = 34, and the fresh n = 36 control)", as in R5-004.
 
+## Binding pass at `c685fadc`
+
+    python3 -I -B validation/recompute.py --commit c685fadce27b121b97294bfb1cca5f34a7e8dec3 --claims final2
+    python3 -I -B validation/replay_compare.py --commit c685fadce27b121b97294bfb1cca5f34a7e8dec3
+
+**Binding.** `c685fadc` holds the e8164843 pass files byte-identical, and only the census
+README changed. Run at `e8164843`, `recompute.py` still reproduces that pass exactly
+(notes aside).
+
+**Result: `validator_report.json` pass, 245 of 245 items, 297 files pinned;
+`replay_certificate.json` verified (36 run entries, 0 mismatches).** The controls are
+unchanged (8 of 8 caught).
+
+* The census README now says "where the ranges overlap (n = 34, and the fresh n = 36
+  control)". That matches the data: the main-sweep msolve runs inside Kousidis–Wiemers'
+  degree-4 range are at n = 34; the control is at n = 36; msolve gives 4 at both; and
+  they report 5 from n = 37.
+* All 297 `raw_data` pins equal the blobs committed at `c685fadc`, so CI can verify them
+  on that commit or any later one that leaves those files unchanged.
+* The pcc verifier's own parser accepts the report and the certificate. Its only note is
+  the missing keyring signature.
+* `evidence_dir` for a pcc recompute proof:
+  `research/ecdlp_weakness_census_20261104/pq2_rank/validation` (the report's own
+  directory, which is also the default). The `raw_data` paths are repository-relative,
+  so they resolve with or without it.
+
 ## Reproduce
 
 From `research/ecdlp_weakness_census_20261104/pq2_rank` (each step pinned to one core):
@@ -519,8 +546,11 @@ From `research/ecdlp_weakness_census_20261104/pq2_rank` (each step pinned to one
                                                # final binding pass at af86403a
     python3 -I -B validation/replay_compare.py --commit af86403a967c37a20c5f0c0ed5aad85c806c1ddc
     python3 -I -B validation/recompute.py --commit e8164843b2984e153b0662b1925dc45f5115d55a --claims final2
-                                               # binding pass at e8164843; writes validator_report.json
+                                               # binding pass at e8164843
     python3 -I -B validation/replay_compare.py --commit e8164843b2984e153b0662b1925dc45f5115d55a
+    python3 -I -B validation/recompute.py --commit c685fadce27b121b97294bfb1cca5f34a7e8dec3 --claims final2
+                                               # binding pass at c685fadc; writes validator_report.json
+    python3 -I -B validation/replay_compare.py --commit c685fadce27b121b97294bfb1cca5f34a7e8dec3
     python3 -I -B validation/controls.py       # writes controls.json
     python3 -I -B validation/replay_compare.py # writes replay_certificate.json (needs the run directories)
 
