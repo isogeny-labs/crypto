@@ -109,8 +109,8 @@ ran on fresh instances at n = 36 and 37.
 | n = 37, instance 0 (test) | not finished: killed twice for memory during degree-4 steps |
 | n = 36 and 37, instance 1 | stopped early to save memory, no result |
 
-On the single-thread retry at n = 37, memory grew about 1.2 GiB per minute and passed
-13 GiB on a 15 GiB machine (`msolve_n37_i0.mem.log`). The earlier attempts are kept as
+On the single-thread retry at n = 37, memory grew about 1.2 GiB per minute over the last
+five minutes (0.22 GiB per minute averaged over the hour) and passed 13 GiB on a 15 GiB machine (`msolve_n37_i0.mem.log`). The earlier attempts are kept as
 `*.timeout_3600s.log` and `*.killed_t3.*`. Whether msolve reaches degree 5 at n = 37 is
 still open; it needs a machine with more memory.
 
