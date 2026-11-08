@@ -110,7 +110,7 @@ fn sqrt_mod(a: u64, p: u64) -> Option<u64> {
     }
     let mut q = p - 1;
     let mut s = 0;
-    while q % 2 == 0 {
+    while q.is_multiple_of(2) {
         q /= 2;
         s += 1;
     }
@@ -121,7 +121,7 @@ fn sqrt_mod(a: u64, p: u64) -> Option<u64> {
     let mut m = s;
     let mut c = pow_mod(z, q, p);
     let mut t = pow_mod(a, q, p);
-    let mut r = pow_mod(a, (q + 1) / 2, p);
+    let mut r = pow_mod(a, q.div_ceil(2), p);
     while t != 1 {
         let mut i = 0;
         let mut tt = t;
@@ -355,13 +355,7 @@ pub fn log2_big(x: &BigUint) -> f64 {
 }
 
 /// One sieving pass over a random product; returns the relations found.
-fn sieve_one(
-    d: &BigInt,
-    fb: &[FbPrime],
-    params: &SieveParams,
-    rng: &mut Rng,
-    buf: &mut [u8],
-) -> Vec<Relation> {
+fn sieve_one(fb: &[FbPrime], params: &SieveParams, rng: &mut Rng, buf: &mut [u8]) -> Vec<Relation> {
     let n = fb.len();
     // random exponent vector e with `support` entries in {−1, +1}
     let mut e: BTreeMap<u32, i64> = BTreeMap::new();
@@ -523,7 +517,7 @@ fn sieve_one(
 
 /// Collect at least `fb.len() + params.excess` relations with `params.threads` workers.
 /// Returns the relations and the number of random products sieved.
-pub fn collect_relations(d: &BigInt, fb: &[FbPrime], params: &SieveParams) -> (Vec<Relation>, u64) {
+pub fn collect_relations(fb: &[FbPrime], params: &SieveParams) -> (Vec<Relation>, u64) {
     let target = fb.len() + params.excess;
     let found = Mutex::new(Vec::<Relation>::new());
     let count = AtomicU64::new(0);
@@ -539,7 +533,7 @@ pub fn collect_relations(d: &BigInt, fb: &[FbPrime], params: &SieveParams) -> (V
             scope.spawn(move || {
                 let mut buf = vec![0u8; 2 * params.half_length as usize + 1];
                 while !done.load(Ordering::Relaxed) {
-                    let rels = sieve_one(d, fb, params, &mut rng, &mut buf);
+                    let rels = sieve_one(fb, params, &mut rng, &mut buf);
                     products.fetch_add(1, Ordering::Relaxed);
                     if !rels.is_empty() {
                         let k = rels.len() as u64;
@@ -595,10 +589,12 @@ pub fn structured_elimination(relations: &[Relation], ncols: usize) -> Dense {
         }
         let mut best: Option<(u32, usize)> = None; // (weight, col)
         for c in 0..ncols {
-            if alive_col[c] && has_unit[c] && weight[c] > 0 {
-                if best.map_or(true, |(w, _)| weight[c] < w) {
-                    best = Some((weight[c], c));
-                }
+            if alive_col[c]
+                && has_unit[c]
+                && weight[c] > 0
+                && best.is_none_or(|(w, _)| weight[c] < w)
+            {
+                best = Some((weight[c], c));
             }
         }
         let Some((_, col)) = best else { break };
@@ -606,7 +602,7 @@ pub fn structured_elimination(relations: &[Relation], ncols: usize) -> Dense {
         let mut piv: Option<(usize, usize)> = None; // (len, row)
         for (i, r) in rows.iter().enumerate() {
             if let Some(&v) = r.get(&(col as u32)) {
-                if (v == 1 || v == -1) && piv.map_or(true, |(l, _)| r.len() < l) {
+                if (v == 1 || v == -1) && piv.is_none_or(|(l, _)| r.len() < l) {
                     piv = Some((r.len(), i));
                 }
             }
@@ -1099,7 +1095,7 @@ pub fn compute(
     let mut params = params.clone();
     let mut last: Option<(BigInt, Dense)> = None;
     for round in 0..max_rounds {
-        let (rels, prods) = collect_relations(d, &fb, &params);
+        let (rels, prods) = collect_relations(&fb, &params);
         relations.extend(rels);
         products += prods;
         let dense = structured_elimination(&relations, n);
