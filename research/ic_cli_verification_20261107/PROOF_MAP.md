@@ -45,6 +45,7 @@ that the theorems do not depend on `sorryAx`.
   `BatchInversion.lean` proves the Montgomery step for any commutative group
   with the stated inverse laws; it does not prove that the Python representation
   satisfies those laws.
+- The worker pool is checked for serial/parallel identity on 20k and 100k candidates; it is not formally verified.
 - It does not prove the whole `ic` CLI or the release workflow.
 - Rust's `u64` parser is checked by exhaustive bounded tests, not by a
   refinement proof to the Lean string parser.
