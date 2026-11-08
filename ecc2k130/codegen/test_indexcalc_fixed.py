@@ -117,6 +117,10 @@ class FixedTests(unittest.TestCase):
                                  (planned * bytes_per_pair * 5) // 4 + overhead)
         self.assertLessEqual(fixed.requiredBytes(10, 100), fixed.requiredBytes(11, 100))
         self.assertLessEqual(fixed.requiredBytes(10, 100), fixed.requiredBytes(10, 101))
+        self.assertEqual(fixed.pairTableRequiredBytes(10, 100, 1000, True),
+                         fixed.requiredBytes(10, 100))
+        self.assertEqual(fixed.pairTableRequiredBytes(10, 100, 1000, False),
+                         fixed.requiredBytes(10, 100) + 1000 * fixed.PAIR_INDEX_BYTES_PER_PAIR)
 
     def test_field_multiplication_matches_reference_algorithm(self):
         document, _ = fixture(9, seed=1039)
@@ -162,6 +166,25 @@ class FixedTests(unittest.TestCase):
                      for _ in range(64)]
             for got, (left, right) in zip(campaign.params.curve.addBatch(pairs), pairs):
                 self.assertEqual(got, campaign.params.curve.add(left, right))
+
+    def test_pair_index_is_rebuilt_when_the_table_completes(self):
+        document, _ = fixture(9, seed=1041)
+        previous = fixed.PAIR_INDEX_THRESHOLD
+        try:
+            fixed.PAIR_INDEX_THRESHOLD = 0
+            with tempfile.TemporaryDirectory() as directory:
+                with fixed.Campaign(document, directory) as campaign:
+                    campaign.buildPairs(10)
+                    self.assertFalse(campaign.pairIndexExists())
+                    campaign.buildPairs(10000)
+                    self.assertTrue(campaign.pairIndexExists())
+                    campaign.db.execute('DROP INDEX IF EXISTS pair_lookup')
+                    campaign.db.commit()
+                    self.assertFalse(campaign.pairIndexExists())
+                    campaign.decompose(campaign.params.generator, 2)
+                    self.assertTrue(campaign.pairIndexExists())
+        finally:
+            fixed.PAIR_INDEX_THRESHOLD = previous
 
     def test_pair_table_check_fails_before_a_full_disk(self):
         document, _ = fixture(9, seed=1033)
