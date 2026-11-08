@@ -1,0 +1,2376 @@
+warning: due to multiple output types requested, the explicitly specified output file name will be adapted for each output type
+
+warning: variable does not need to be mutable
+  --> driver.rs:27:9
+   |
+27 |     let mut inv=pow(prefix[steps],r-2,r);if mul(inv,prefix[steps],r)!=1{return Err(Error::Arithmetic)}let mut ids=ds;
+   |         ----^^^
+   |         |
+   |         help: remove this `mut`
+   |
+   = note: `#[warn(unused_mut)]` (part of `#[warn(unused)]`) on by default
+
+warning: variable does not need to be mutable
+  --> progression.rs:21:38
+   |
+21 |   let mut delta=prefix[self.d+1];let mut inv=pow(prefix[n],r-2,r);if mul(inv,prefix[n],r)!=1{return Err(Error::Arithmetic)}
+   |                                      ----^^^
+   |                                      |
+   |                                      help: remove this `mut`
+
+warning: variable does not need to be mutable
+  --> streamed.rs:19:18
+   |
+19 |   if steps>0{let mut inv=pow(prefix[steps],self.r-2,self.r);if mul(inv,prefix[steps],self.r)!=1{return Err(Error::Arithmetic)}
+   |                  ----^^^
+   |                  |
+   |                  help: remove this `mut`
+
+warning: variable does not need to be mutable
+  --> context.rs:18:18
+   |
+18 |   if steps>0{let mut inv=pow(prefix[steps],self.r-2,self.r);if mul(inv,prefix[steps],self.r)!=1{return Err(Error::Arithmetic)}
+   |                  ----^^^
+   |                  |
+   |                  help: remove this `mut`
+
+warning: function `meter_checks` is never used
+ --> meter-checks.rs:1:4
+  |
+1 | fn meter_checks(){
+  |    ^^^^^^^^^^^^
+  |
+  = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: function `predecessor_main` is never used
+  --> meter-checks.rs:26:4
+   |
+26 | fn predecessor_main(){if std::env::args().any(|x|x=="--inherited"){inherited_checks()}else{meter_checks()}}
+   |    ^^^^^^^^^^^^^^^^
+
+warning: function `progression_inverse_checks` is never used
+ --> inverse-checks.rs:1:4
+  |
+1 | fn progression_inverse_checks(){
+  |    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `progression_predecessor_main` is never used
+  --> inverse-checks.rs:13:4
+   |
+13 | fn progression_predecessor_main(){if std::env::args().any(|x|x=="--inherited"){inherited_checks()}else{progression_inverse_checks();...
+   |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `reference_pow` is never used
+ --> terminal-checks.rs:1:4
+  |
+1 | fn reference_pow(a:u64,n:u64,r:u64)->u64{let mut v=1u64;for bit in(0..64).rev(){v=(v as u128*v as u128%r as u128)as u64;if(n>>bit)&1!...
+  |    ^^^^^^^^^^^^^
+
+warning: function `terminal_checks` is never used
+ --> terminal-checks.rs:2:4
+  |
+2 | fn terminal_checks(){
+  |    ^^^^^^^^^^^^^^^
+
+warning: function `terminal_predecessor_main` is never used
+  --> terminal-checks.rs:16:4
+   |
+16 | fn terminal_predecessor_main(){if std::env::args().any(|a|a=="--inherited"){inherited_checks()}else{terminal_checks();progression_in...
+   |    ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `TripleReader` is never constructed
+ --> triple.rs:1:8
+  |
+1 | struct TripleReader<'a>{anchor:SharedCoeffStream<'a>,buffer:Vec<[u64;3]>,at:usize,remaining:usize,reads:usize,batches:usize,transitio...
+  |        ^^^^^^^^^^^^
+
+warning: associated items `new`, `refill`, and `next` are never used
+  --> triple.rs:3:5
+   |
+ 2 | impl<'a> TripleReader<'a>{
+   | ------------------------- associated items in this implementation
+ 3 |  fn new(modes:&'a RecoveryModes)->Result<Self,Error>{let h=(modes.r-1)/2;if modes.m<3||h%modes.m as u64!=0{return Err(Error::Domain)...
+   |     ^^^
+ 4 |  fn refill(&mut self)->Result<(),Error>{
+   |     ^^^^^^
+...
+18 |  fn next(&mut self)->Result<[u64;3],Error>{if self.remaining==0{return Err(Error::Limit)}if self.at==self.buffer.len(){self.refill()...
+   |     ^^^^
+
+warning: function `triple_block` is never used
+  --> triple.rs:20:4
+   |
+20 | fn triple_block(rings:&mut[ReusedRing],reader:&mut TripleReader<'_>,length:usize)->Result<Vec<[SplitValue;3]>,Error>{
+   |    ^^^^^^^^^^^^
+
+warning: function `triple_modes` is never used
+  --> triple.rs:25:4
+   |
+25 | fn triple_modes(rings:&mut[ReusedRing],modes:&RecoveryModes,scale:u64)->Result<Vec<[SplitValue;3]>,Error>{
+   |    ^^^^^^^^^^^^
+
+warning: method `update_triple` is never used
+  --> triple.rs:32:5
+   |
+31 | impl DirectImage{
+   | ---------------- method in this implementation
+32 |  fn update_triple(&mut self,modes:&RecoveryModes,b:u64,f:&[u64])->Result<(),Error>{
+   |     ^^^^^^^^^^^^^
+
+warning: method `recover_triple` is never used
+ --> triple-adapter.rs:2:5
+  |
+1 | impl RecoveryModes<'_>{
+  | ---------------------- method in this implementation
+2 |  fn recover_triple(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<group::Point>,radii:&[u64],cap:usi...
+  |     ^^^^^^^^^^^^^^
+
+warning: method `recover_triple` is never used
+  --> triple-adapter.rs:36:21
+   |
+36 | impl StreamModes{fn recover_triple(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<group::Point>,rad...
+   | ----------------    ^^^^^^^^^^^^^^
+   | |
+   | method in this implementation
+
+warning: function `triple_checks` is never used
+ --> triple-checks.rs:1:4
+  |
+1 | fn triple_checks(){
+  |    ^^^^^^^^^^^^^
+
+warning: function `signed_predecessor_triple_main` is never used
+  --> triple-checks.rs:26:4
+   |
+26 | fn signed_predecessor_triple_main(){if std::env::args().any(|a|a=="--inherited"){inherited_checks()}else{triple_checks();terminal_ch...
+   |    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: fields `r`, `m`, `cap`, and `inner` are never read
+  --> borrowed-checks.rs:20:23
+   |
+20 |  struct PriorRcLayout{r:u64,m:usize,cap:usize,inner:std::rc::Rc<std::cell::RefCell<IntervalProducts>>}
+   |         ------------- ^     ^       ^^^       ^^^^^
+   |         |
+   |         fields in this struct
+
+warning: methods `signed_norm_equation` and `signed_norm_filter` are never used
+  --> signed.rs:15:5
+   |
+ 2 | impl RecoveryModes<'_> {
+   | ---------------------- methods in this implementation
+...
+15 |  fn signed_norm_equation(&self,g:&[u64],f:[u64;2],epsilon:u64)->Result<Vec<u64>,Error>{
+   |     ^^^^^^^^^^^^^^^^^^^^
+...
+27 |  fn signed_norm_filter(&self,g:&[u64],f:[u64;2],epsilon:u64)->Result<Vec<u64>,Error>{
+   |     ^^^^^^^^^^^^^^^^^^
+
+warning: struct `SignedImage` is never constructed
+ --> signed-image.rs:1:8
+  |
+1 | struct SignedImage{r:u64,m:usize,t0:u64,inv_t0:u64,orientation:ReciprocalMode,branches:Vec<CanonicalBranch>,zero:bool,rounds:usize}
+  |        ^^^^^^^^^^^
+
+warning: associated items `new`, `update`, `absorb`, and `materialize` are never used
+  --> signed-image.rs:4:5
+   |
+ 3 | impl SignedImage{
+   | ---------------- associated items in this implementation
+ 4 |  fn new(modes:&RecoveryModes,b:u64,f:&[u64],i:u64)->Result<Self,Error>{
+   |     ^^^
+...
+14 |  fn update(&mut self,modes:&RecoveryModes,b:u64,f:&[u64])->Result<(),Error>{self.absorb(modes,b,f,false)?;SIGNED_IMAGE_COUNTS.with(|...
+   |     ^^^^^^
+15 |  fn absorb(&mut self,modes:&RecoveryModes,b:u64,f:&[u64],first:bool)->Result<(),Error>{
+   |     ^^^^^^
+...
+28 |  fn materialize(&mut self,lift_cap:usize,image_cap:usize)->Result<Vec<u64>,Error>{
+   |     ^^^^^^^^^^^
+
+warning: method `recover_signed_image` is never used
+ --> signed-adapter.rs:2:5
+  |
+1 | impl RecoveryModes<'_>{
+  | ---------------------- method in this implementation
+2 |  fn recover_signed_image(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<group::Point>,radii:&[u64],c...
+  |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: method `recover_signed_image` is never used
+  --> signed-adapter.rs:36:21
+   |
+36 | impl StreamModes{fn recover_signed_image(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<group::Poin...
+   | ----------------    ^^^^^^^^^^^^^^^^^^^^
+   | |
+   | method in this implementation
+
+warning: function `signed_image_checks` is never used
+ --> image-checks.rs:1:4
+  |
+1 | fn signed_image_checks(){
+  |    ^^^^^^^^^^^^^^^^^^^
+
+warning: struct `PoweredImage` is never constructed
+ --> powered-image.rs:1:8
+  |
+1 | struct PoweredImage{r:u64,m:usize,t0:u64,inv_t0:u64,orientation:ReciprocalMode,branches:Vec<CanonicalBranch>,zero:bool,rounds:usize,s...
+  |        ^^^^^^^^^^^^
+
+warning: associated items `new`, `update`, `absorb`, and `materialize` are never used
+  --> powered-image.rs:4:5
+   |
+ 3 | impl PoweredImage{
+   | ----------------- associated items in this implementation
+ 4 |  fn new(modes:&RecoveryModes,b:u64,f:&[u64],i:u64,slot_cap:usize)->Result<Self,Error>{
+   |     ^^^
+...
+14 |  fn update(&mut self,modes:&RecoveryModes,b:u64,f:&[u64])->Result<(),Error>{self.absorb(modes,b,f,false)?;POWERED_IMAGE_COUNTS.with(...
+   |     ^^^^^^
+15 |  fn absorb(&mut self,modes:&RecoveryModes,b:u64,f:&[u64],first:bool)->Result<(),Error>{
+   |     ^^^^^^
+...
+38 |  fn materialize(&mut self,lift_cap:usize,image_cap:usize)->Result<Vec<u64>,Error>{
+   |     ^^^^^^^^^^^
+
+warning: method `recover_powered_image` is never used
+ --> powered-adapter.rs:2:5
+  |
+1 | impl RecoveryModes<'_>{
+  | ---------------------- method in this implementation
+2 |  fn recover_powered_image(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<group::Point>,radii:&[u64],...
+  |     ^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `recover_powered_image` is never used
+  --> powered-adapter.rs:36:21
+   |
+36 | impl StreamModes{fn recover_powered_image(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<group::Poi...
+   | ----------------    ^^^^^^^^^^^^^^^^^^^^^
+   | |
+   | method in this implementation
+
+warning: function `powered_checks` is never used
+ --> powered-checks.rs:1:4
+  |
+1 | fn powered_checks(){let(mut section_equalities,mut states,mut public,mut updates)=(0,0,0,0);
+  |    ^^^^^^^^^^^^^^
+
+warning: struct `SeededImage` is never constructed
+ --> seeded-image.rs:1:8
+  |
+1 | struct SeededImage{r:u64,m:usize,t0:u64,inv_t0:u64,orientation:ReciprocalMode,branches:Vec<CanonicalBranch>,zero:bool,rounds:usize,sl...
+  |        ^^^^^^^^^^^
+
+warning: associated items `new`, `update`, `absorb`, and `materialize` are never used
+  --> seeded-image.rs:4:5
+   |
+ 3 | impl SeededImage{
+   | ---------------- associated items in this implementation
+ 4 |  fn new(modes:&RecoveryModes,b:u64,f:&[u64],i:u64,slot_cap:usize,initial_character:u64)->Result<Self,Error>{
+   |     ^^^
+...
+15 |  fn update(&mut self,modes:&RecoveryModes,b:u64,f:&[u64])->Result<(),Error>{self.absorb(modes,b,f,false)?;SEEDED_IMAGE_COUNTS.with(|...
+   |     ^^^^^^
+16 |  fn absorb(&mut self,modes:&RecoveryModes,b:u64,f:&[u64],first:bool)->Result<(),Error>{
+   |     ^^^^^^
+...
+39 |  fn materialize(&mut self,lift_cap:usize,image_cap:usize)->Result<Vec<u64>,Error>{
+   |     ^^^^^^^^^^^
+
+warning: method `recover_seeded_image` is never used
+ --> seeded-adapter.rs:2:5
+  |
+1 | impl RecoveryModes<'_>{
+  | ---------------------- method in this implementation
+2 |  fn recover_seeded_image(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<group::Point>,radii:&[u64],c...
+  |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: method `recover_seeded_image` is never used
+  --> seeded-adapter.rs:36:21
+   |
+36 | impl StreamModes{fn recover_seeded_image(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<group::Poin...
+   | ----------------    ^^^^^^^^^^^^^^^^^^^^
+   | |
+   | method in this implementation
+
+warning: function `seeded_checks` is never used
+ --> seeded-checks.rs:1:4
+  |
+1 | fn seeded_checks(){let(mut states,mut retained,mut wrong,mut zero,mut public,mut route_changes,mut call_changes,mut updates)=(0,0,0,0...
+  |    ^^^^^^^^^^^^^
+
+warning: associated functions `new_sectioned` and `initial_sections` are never used
+  --> initial.rs:12:5
+   |
+11 | impl SeededImage{
+   | ---------------- associated functions in this implementation
+12 |  fn new_sectioned(modes:&RecoveryModes,b:u64,f:&[u64],i:u64,slot_cap:usize,initial_character:u64)->Result<Self,Error>{
+   |     ^^^^^^^^^^^^^
+...
+15 |  fn initial_sections(modes:&RecoveryModes,b:u64,f:&[u64],i:u64,slot_cap:usize,initial_character:u64)->Result<Self,Error>{
+   |     ^^^^^^^^^^^^^^^^
+
+warning: method `recover_sectioned_image` is never used
+ --> sectioned-adapter.rs:2:5
+  |
+1 | impl RecoveryModes<'_>{
+  | ---------------------- method in this implementation
+2 |  fn recover_sectioned_image(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<group::Point>,radii:&[u64...
+  |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `recover_sectioned_image` is never used
+  --> sectioned-adapter.rs:36:21
+   |
+36 | impl StreamModes{fn recover_sectioned_image(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<group::P...
+   | ----------------    ^^^^^^^^^^^^^^^^^^^^^^^
+   | |
+   | method in this implementation
+
+warning: function `initial_checks` is never used
+ --> initial-checks.rs:1:4
+  |
+1 | fn initial_checks(){let mut dickson_equalities=0;for r in [17u64,41,97,281]{let mut p=polynomial::Poly::new(r).unwrap();let(mut a,mut...
+  |    ^^^^^^^^^^^^^^
+
+warning: function `direct_phase_domains` is never used
+ --> phase-domain.rs:9:4
+  |
+9 | fn direct_phase_domains(r:u64,n:usize,i:u64,normalized:u64)->Result<Vec<(u64,Vec<u64>)>,Error>{
+  |    ^^^^^^^^^^^^^^^^^^^^
+
+warning: associated functions `new_direct_phase` and `initial_direct_phase` are never used
+ --> direct-initial.rs:3:5
+  |
+2 | impl SeededImage{
+  | ---------------- associated functions in this implementation
+3 |  fn new_direct_phase(modes:&RecoveryModes,b:u64,f:&[u64],i:u64,slot_cap:usize,initial_character:u64)->Result<Self,Error>{
+  |     ^^^^^^^^^^^^^^^^
+...
+6 |  fn initial_direct_phase(modes:&RecoveryModes,b:u64,f:&[u64],i:u64,slot_cap:usize,initial_character:u64)->Result<Self,Error>{
+  |     ^^^^^^^^^^^^^^^^^^^^
+
+warning: method `recover_direct_phase_image` is never used
+ --> phase-domain-adapter.rs:2:5
+  |
+1 | impl RecoveryModes<'_>{
+  | ---------------------- method in this implementation
+2 |  fn recover_direct_phase_image(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<group::Point>,radii:&[...
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `recover_direct_phase_image` is never used
+  --> phase-domain-adapter.rs:36:21
+   |
+36 | impl StreamModes{fn recover_direct_phase_image(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<group...
+   | ----------------    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+   | |
+   | method in this implementation
+
+warning: function `phase_domain_checks` is never used
+ --> phase-domain-checks.rs:1:4
+  |
+1 | fn phase_domain_checks(){let(mut second_equalities,mut factor_equalities,mut endpoint_checks)=(0,0,0);
+  |    ^^^^^^^^^^^^^^^^^^^
+
+warning: function `split_negative_domains` is never used
+  --> eighth-trace.rs:11:4
+   |
+11 | fn split_negative_domains(r:u64,n:usize,i:u64,s:u64)->Result<Vec<(u64,Vec<u64>)>,Error>{
+   |    ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated functions `new_split_negative` and `initial_split_negative` are never used
+ --> split-negative-initial.rs:3:5
+  |
+2 | impl SeededImage{
+  | ---------------- associated functions in this implementation
+3 |  fn new_split_negative(modes:&RecoveryModes,b:u64,f:&[u64],i:u64,slot_cap:usize,initial_character:u64,trace_trials:usize)->Result<Sel...
+  |     ^^^^^^^^^^^^^^^^^^
+...
+6 |  fn initial_split_negative(modes:&RecoveryModes,b:u64,f:&[u64],i:u64,slot_cap:usize,initial_character:u64,trace_trials:usize)->Result...
+  |     ^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `recover_split_negative_image` is never used
+ --> split-negative-adapter.rs:2:5
+  |
+1 | impl RecoveryModes<'_>{
+  | ---------------------- method in this implementation
+2 |  fn recover_split_negative_image(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<group::Point>,radii:...
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `recover_split_negative_image` is never used
+  --> split-negative-adapter.rs:36:21
+   |
+36 | impl StreamModes{fn recover_split_negative_image(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<gro...
+   | ----------------    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   | |
+   | method in this implementation
+
+warning: function `phase_union` is never used
+ --> negative-split-checks.rs:1:4
+  |
+1 | fn phase_union(image:&mut SeededImage,u:u64)->Vec<u64>{let mut p=polynomial::Poly::new(image.r).unwrap();let mut out=vec![1];for bran...
+  |    ^^^^^^^^^^^
+
+warning: function `negative_split_checks` is never used
+ --> negative-split-checks.rs:2:4
+  |
+2 | fn negative_split_checks(){let(mut trace_controls,mut factorizations,mut phase_unions,mut split_boundaries)=(0,0,0,0);
+  |    ^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated function `new` is never used
+  --> character-domain.rs:15:5
+   |
+14 | impl CharacterImage{
+   | ------------------- associated function in this implementation
+15 |  fn new(modes:&RecoveryModes,b:u64,f:&[u64],slot_cap:usize,initial_character:u64,trace_trials:usize)->Result<Self,Error>{
+   |     ^^^
+
+warning: struct `CharacterImage` is never constructed
+ --> character-image.rs:1:8
+  |
+1 | struct CharacterImage{r:u64,m:usize,t0:u64,inv_t0:u64,orientation:ReciprocalMode,branches:Vec<CharacterBranch>,zero:bool,rounds:usize...
+  |        ^^^^^^^^^^^^^^
+
+warning: methods `update`, `absorb`, and `materialize` are never used
+  --> character-image.rs:4:5
+   |
+ 3 | impl CharacterImage{
+   | ------------------- methods in this implementation
+ 4 |  fn update(&mut self,modes:&RecoveryModes,b:u64,f:&[u64])->Result<(),Error>{self.absorb(modes,b,f,false)?;CHARACTER_IMAGE_COUNTS.wit...
+   |     ^^^^^^
+ 5 |  fn absorb(&mut self,modes:&RecoveryModes,b:u64,f:&[u64],first:bool)->Result<(),Error>{
+   |     ^^^^^^
+...
+28 |  fn materialize(&mut self,lift_cap:usize,image_cap:usize)->Result<Vec<u64>,Error>{
+   |     ^^^^^^^^^^^
+
+warning: method `recover_character_image` is never used
+ --> character-adapter.rs:2:5
+  |
+1 | impl RecoveryModes<'_>{
+  | ---------------------- method in this implementation
+2 |  fn recover_character_image(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<group::Point>,radii:&[u64...
+  |     ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `recover_character_image` is never used
+  --> character-adapter.rs:34:21
+   |
+34 | impl StreamModes{fn recover_character_image(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<group::P...
+   | ----------------    ^^^^^^^^^^^^^^^^^^^^^^^
+   | |
+   | method in this implementation
+
+warning: function `character_checks` is never used
+ --> character-checks.rs:2:4
+  |
+2 | fn character_checks(){
+  |    ^^^^^^^^^^^^^^^^
+
+warning: function `certified_reciprocal_lift` is never used
+ --> certified-lift.rs:3:4
+  |
+3 | fn certified_reciprocal_lift(r:u64,g:&[u64],cap:usize)->Result<Vec<u64>,Error>{
+  |    ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: function `certified_fiber_lift` is never used
+  --> certified-lift.rs:12:4
+   |
+12 | fn certified_fiber_lift(fiber:&CanonicalFiber,cap:usize,ring:&mut QuadRing)->Result<Vec<u64>,Error>{
+   |    ^^^^^^^^^^^^^^^^^^^^
+
+warning: function `certified_lift_checks` is never used
+  --> certified-lift.rs:19:4
+   |
+19 | fn certified_lift_checks(){let(mut lifts,mut endpoints,mut phase_equalities,mut limits)=(0,0,0,0);
+   |    ^^^^^^^^^^^^^^^^^^^^^
+
+warning: associated function `new` is never used
+ --> certified-initial.rs:2:5
+  |
+1 | impl CertifiedCharacterImage{
+  | ---------------------------- associated function in this implementation
+2 |  fn new(modes:&RecoveryModes,b:u64,f:&[u64],slot_cap:usize,initial_character:u64,trace_trials:usize)->Result<Self,Error>{
+  |     ^^^
+
+warning: struct `CertifiedCharacterImage` is never constructed
+ --> certified-image.rs:1:8
+  |
+1 | struct CertifiedCharacterImage{r:u64,m:usize,t0:u64,inv_t0:u64,orientation:ReciprocalMode,branches:Vec<CharacterBranch>,zero:bool,rou...
+  |        ^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: methods `update`, `absorb`, and `materialize` are never used
+  --> certified-image.rs:4:5
+   |
+ 3 | impl CertifiedCharacterImage{
+   | ---------------------------- methods in this implementation
+ 4 |  fn update(&mut self,modes:&RecoveryModes,b:u64,f:&[u64])->Result<(),Error>{self.absorb(modes,b,f,false)?;CERTIFIED_CHARACTER_COUNTS...
+   |     ^^^^^^
+ 5 |  fn absorb(&mut self,modes:&RecoveryModes,b:u64,f:&[u64],first:bool)->Result<(),Error>{
+   |     ^^^^^^
+...
+28 |  fn materialize(&mut self,lift_cap:usize,image_cap:usize)->Result<Vec<u64>,Error>{
+   |     ^^^^^^^^^^^
+
+warning: method `recover_certified_character_image` is never used
+ --> certified-adapter.rs:2:5
+  |
+1 | impl RecoveryModes<'_>{
+  | ---------------------- method in this implementation
+2 |  fn recover_certified_character_image(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Option<group::Point>,r...
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning: method `recover_certified_character_image` is never used
+  --> certified-adapter.rs:34:21
+   |
+34 | impl StreamModes{fn recover_certified_character_image(&self,source:&source::Source,curve:group::Curve,base:group::Point,target:Optio...
+   | ----------------    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   | |
+   | method in this implementation
+
+warning: function `certified_checks` is never used
+ --> certified-checks.rs:2:4
+  |
+2 | fn certified_checks(){
+  |    ^^^^^^^^^^^^^^^^
+
+warning: function `homogeneous_checks` is never used
+  --> homogeneous.rs:21:4
+   |
+21 | fn homogeneous_checks(){let(mut coefficient_cases,mut point_cases)=(0,0);
+   |    ^^^^^^^^^^^^^^^^^^
+
+warning: function `balanced_lift_checks` is never used
+  --> balanced-lift.rs:19:4
+   |
+19 | fn balanced_lift_checks(){homogeneous_checks();let(mut lifts,mut endpoints,mut phase_equalities,mut limits)=(0,0,0,0);
+   |    ^^^^^^^^^^^^^^^^^^^^
+
+warning: field `orientation` is never read
+ --> balanced-image.rs:1:63
+  |
+1 | struct BalancedCharacterImage{r:u64,m:usize,t0:u64,inv_t0:u64,orientation:ReciprocalMode,branches:Vec<CharacterBranch>,zero:bool,roun...
+  |        ---------------------- field in this struct            ^^^^^^^^^^^
+
+warning: function `balanced_checks` is never used
+ --> balanced-checks.rs:2:4
+  |
+2 | fn balanced_checks(){
+  |    ^^^^^^^^^^^^^^^
+
+warning: struct `ResultantClass` is never constructed
+  --> metered-polynomial.rs:11:12
+   |
+11 | pub struct ResultantClass { p:u64, representative:u64 }
+   |            ^^^^^^^^^^^^^^
+
+warning: methods `combine`, `square`, `negate`, `is_zero`, and `project` are never used
+  --> metered-polynomial.rs:16:9
+   |
+15 | impl ResultantClass{
+   | ------------------- methods in this implementation
+16 |  pub fn combine(self,other:Self)->Result<Self,Error>{if self.p!=other.p{return Err(Error::Domain);}Ok(Self{p:self.p,representative:(...
+   |         ^^^^^^^
+17 |  pub fn square(self)->Self{Self{p:self.p,representative:((self.representative as u128*self.representative as u128)%self.p as u128)as...
+   |         ^^^^^^
+18 |  pub fn negate(self)->Self{Self{p:self.p,representative:(self.p-self.representative)%self.p}}
+   |         ^^^^^^
+19 |  pub fn is_zero(&self)->bool{self.representative==0}
+   |         ^^^^^^^
+20 |  pub fn project(self)->u64{
+   |         ^^^^^^^
+
+warning: multiple methods are never used
+   --> metered-polynomial.rs:144:9
+    |
+ 35 | impl Poly{
+    | --------- methods in this implementation
+...
+144 |  pub fn resultant_class(&mut self,a:&[u64],b:&[u64])->Result<ResultantClass,Error>{
+    |         ^^^^^^^^^^^^^^^
+...
+162 |  pub fn image_class(&self,v:u64)->Result<ResultantClass,Error>{if 1u64<<(self.p-1).trailing_zeros()>4{return Err(Error::Domain);}Ok...
+    |         ^^^^^^^^^^^
+163 |  pub fn projected_resultant(&mut self,a:&[u64],b:&[u64])->Result<u64,Error>{Ok(self.resultant_class(a,b)?.project())}
+    |         ^^^^^^^^^^^^^^^^^^^
+164 |  /// Build only the product polynomial: no retained subproduct tree nodes.
+165 |  pub fn root_product(&mut self,roots:&[u64])->Result<Vec<u64>,Error>{
+    |         ^^^^^^^^^^^^
+...
+170 |  pub fn root_resultant_class(&mut self,roots:&[u64],points:&[u64])->Result<ResultantClass,Error>{let f=self.root_product(roots)?;le...
+    |         ^^^^^^^^^^^^^^^^^^^^
+171 |  pub fn root_projected_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+176 |  pub fn value_product(&mut self,a:&[u64],tree:&Tree)->Result<u64,Error>{
+    |         ^^^^^^^^^^^^^
+...
+184 |  pub fn root_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{let source=self.product_tree(roots)?;let destinatio...
+    |         ^^^^^^^^^^^^^^
+
+warning: fields `half_batches`, `ordinary_steps`, and `recorded_transitions` are never read
+ --> ../feature-native-hgcd-roots/gcd.rs:2:50
+  |
+2 | pub struct GcdResult{pub polynomial:Vec<u64>,pub half_batches:usize,pub ordinary_steps:usize,pub recorded_transitions:usize}
+  |            --------- fields in this struct       ^^^^^^^^^^^^           ^^^^^^^^^^^^^^           ^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `GcdResult` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: constant `NAMES` is never used
+ --> meter.rs:7:11
+  |
+7 | pub const NAMES:[&str;10]=["scalar_products","polynomial_products","eea_inverse_calls","pow_r_minus_2_calls","alloc_calls","zeroed_ca...
+  |           ^^^^^
+
+warning: struct `Session` is never constructed
+  --> meter.rs:26:8
+   |
+26 | struct Session;
+   |        ^^^^^^^
+
+warning: struct `Snapshot` is never constructed
+  --> meter.rs:28:47
+   |
+28 | #[derive(Debug,Clone,PartialEq,Eq)]pub struct Snapshot{pub counts:[u64;10],pub overflow:bool}
+   |                                               ^^^^^^^^
+
+warning: function `capture` is never used
+  --> meter.rs:31:8
+   |
+31 | pub fn capture<T>(f:impl FnOnce()->T)->Result<(T,Snapshot),&'static str>{
+   |        ^^^^^^^
+
+warning: function `self_test` is never used
+  --> meter.rs:37:8
+   |
+37 | pub fn self_test(){
+   |        ^^^^^^^^^
+
+warning: variant `Phase` is never constructed
+ --> lib.rs:5:63
+  |
+5 | #[derive(Debug,PartialEq)] pub enum Error { Domain, Geometry, Phase, Division, Polynomial, Degenerate, Character }
+  |                                     -----                     ^^^^^
+  |                                     |
+  |                                     variant in this enum
+  |
+  = note: `Error` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `base` and `prepared` are never read
+ --> lib.rs:7:44
+  |
+7 | ...ct Source {p:u64,a:u64,b:u64,r:u64,base:[u64;2],curve:geometry::Curve,partition:[u64;4],calibration:u64,schedule:division::Schedule,mode:division::Mode,exponent:u64,prepared:st...
+  |       ------ fields in this struct    ^^^^                                                                                                                              ^^^^^^^^
+
+warning: function `pow` is never used
+ --> lib.rs:9:4
+  |
+9 | fn pow(mut a:u64,mut n:u64,p:u64)->u64{let mut z=1;while n!=0{if n&1!=0{z=mul(z,a,p);}n>>=1;if n!=0{a=mul(a,a,p);}}z}
+  |    ^^^
+
+warning: associated items `new_with_costs` and `window` are never used
+  --> lib.rs:15:9
+   |
+13 | impl Source {
+   | ----------- associated items in this implementation
+14 |  pub fn new(p:u64,a:u64,b:u64,r:u64,base:[u64;2],max_lanes:usize)->Result<Self,Error>{Self::build(p,a,b,r,base,max_lanes,None,4096)}
+15 |  pub fn new_with_costs(p:u64,a:u64,b:u64,r:u64,base:[u64;2],max_lanes:usize,costs:division::CostModel,node_cap:usize)->Result<Self,E...
+   |         ^^^^^^^^^^^^^^
+...
+54 |  pub fn window(&self,q:Option<[u64;2]>,length:usize)->Result<Vec<i8>,Error>{
+   |         ^^^^^^
+
+warning: fields `labels`, `projective`, and `inverse_z` are never read
+  --> geometry.rs:19:21
+   |
+19 | pub struct Grid{pub labels:Vec<u64>,pub projective:Vec<[u64;3]>,pub affine:Vec<[u64;2]>,pub inverse_z:Vec<u64>}
+   |            ----     ^^^^^^              ^^^^^^^^^^                                          ^^^^^^^^^
+   |            |
+   |            fields in this struct
+   |
+   = note: `Grid` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: multiple fields are never read
+  --> geometry.rs:65:21
+   |
+65 | pub struct Prepared{curve:Curve,r:u64,base:J,public_base:[u64;2],partition:[u64;4],labels:Vec<u64>,strides:Vec<J>,affine_strides:Vec...
+   |            -------- ^^^^^       ^     ^^^^   ^^^^^^^^^^^         ^^^^^^^^^         ^^^^^^          ^^^^^^^        ^^^^^^^^^^^^^^
+   |            |
+   |            fields in this struct
+
+warning: struct `Slot` is never constructed
+  --> geometry.rs:67:12
+   |
+67 | pub struct Slot{pub offset:usize,pub lane:usize,pub label:u64,pub projective:[u64;3],pub affine:[u64;2],pub inverse_z:u64}
+   |            ^^^^
+
+warning: struct `Window` is never constructed
+  --> geometry.rs:69:12
+   |
+69 | pub struct Window{pub labels:Vec<u64>,pub initialization:&'static str,pub snapshots:Vec<Vec<Option<[u64;3]>>>,pub slots:Vec<Slot>,pu...
+   |            ^^^^^^
+
+warning: methods `projective_only`, `mixed`, and `prepare` are never used
+  --> geometry.rs:71:5
+   |
+70 | impl Curve{
+   | ---------- methods in this implementation
+71 |  fn projective_only(&self,r:u64,q:[u64;2],width:u64,blocks:u64,s:u64,epsilon:u64)->Result<(Vec<u64>,Vec<J>),Error>{
+   |     ^^^^^^^^^^^^^^^
+...
+81 |  fn mixed(&self,a:J,b:Option<[F;2]>)->J{
+   |     ^^^^^
+...
+89 |  pub fn prepare(&self,r:u64,p:[u64;2],width:u64,blocks:u64,s:u64,epsilon:u64)->Result<Prepared,Error>{
+   |         ^^^^^^^
+
+warning: method `window` is never used
+  --> geometry.rs:98:9
+   |
+95 | impl Prepared{
+   | ------------- method in this implementation
+...
+98 |  pub fn window(&self,shifts:&[Option<[u64;2]>])->Result<Window,Error>{
+   |         ^^^^^^
+
+warning: struct `JointWindow` is never constructed
+   --> geometry.rs:127:12
+    |
+127 | pub struct JointWindow{pub shifts:Vec<Option<[u64;2]>>,pub geometry:Window,pub converted_points:usize}
+    |            ^^^^^^^^^^^
+
+warning: method `joint_window` is never used
+   --> geometry.rs:131:9
+    |
+128 | impl Prepared{
+    | ------------- method in this implementation
+...
+131 |  pub fn joint_window(&self,q:Option<[u64;2]>,length:usize)->Result<JointWindow,Error>{
+    |         ^^^^^^^^^^^^
+
+warning: field `steps` is never read
+  --> schedule.rs:14:48
+   |
+14 | #[derive(Debug)]pub struct Schedule{pub(crate) steps:Vec<Step>,pub(crate) outputs:Vec<(usize,bool)>,stats:Stats,pub(crate) power_fla...
+   |                            --------            ^^^^^
+   |                            |
+   |                            field in this struct
+   |
+   = note: `Schedule` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: methods `power_counts` and `saved_multiplications` are never used
+  --> schedule.rs:35:9
+   |
+16 | impl Schedule{
+   | ------------- methods in this implementation
+...
+35 |  pub fn power_counts(&self)->(u64,u64){(self.power_flags.iter().filter(|f|**f&1!=0).count()as u64,self.power_flags.iter().filter(|f|...
+   |         ^^^^^^^^^^^^
+36 |  pub fn saved_multiplications(&self)->u128{let(s,c)=self.power_counts();2*self.stats.even as u128+4*self.stats.odd as u128-s as u128...
+   |         ^^^^^^^^^^^^^^^^^^^^^
+
+warning: struct `Tree` is never constructed
+ --> polynomial.rs:6:12
+  |
+6 | pub struct Tree{p:u64,polynomial:Vec<u64>,children:Option<(Box<Tree>,Box<Tree>)>}
+  |            ^^^^
+
+warning: method `polynomial` is never used
+ --> polynomial.rs:7:18
+  |
+7 | impl Tree{pub fn polynomial(&self)->&[u64]{&self.polynomial}}
+  | ---------        ^^^^^^^^^^
+  | |
+  | method in this implementation
+
+warning: multiple methods are never used
+   --> polynomial.rs:144:9
+    |
+ 46 | impl Poly{
+    | --------- methods in this implementation
+...
+144 |  pub fn product_tree(&mut self,points:&[u64])->Result<Tree,Error>{
+    |         ^^^^^^^^^^^^
+...
+151 |  fn monic_remainder(&mut self,a:&[u64],b:&[u64])->Result<Vec<u64>,Error>{
+    |     ^^^^^^^^^^^^^^^
+...
+157 |  pub fn values(&mut self,a:&[u64],tree:&Tree)->Result<Vec<u64>,Error>{
+    |         ^^^^^^
+...
+230 |  pub fn projected_resultant(&mut self,a:&[u64],b:&[u64])->Result<u64,Error>{Ok(self.resultant_class(a,b)?.project())}
+    |         ^^^^^^^^^^^^^^^^^^^
+...
+252 |  pub fn root_projected_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+255 |  pub fn value_product(&mut self,a:&[u64],tree:&Tree)->Result<u64,Error>{
+    |         ^^^^^^^^^^^^^
+...
+263 |  pub fn root_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{let source=self.product_tree(roots)?;let destinatio...
+    |         ^^^^^^^^^^^^^^
+
+warning: field `b` is never read
+ --> ../feature-orbit-local-terms/local.rs:5:34
+  |
+5 | pub struct Curve { p:u64, a:u64, b:u64 }
+  |            -----                 ^
+  |            |
+  |            field in this struct
+  |
+  = note: `Curve` has derived impls for the traits `Debug` and `Clone`, but these are intentionally ignored during dead code analysis
+
+warning: struct `Local` is never constructed
+ --> ../feature-orbit-local-terms/local.rs:7:12
+  |
+7 | pub struct Local { pub order:i128, pub coefficient:u64 }
+  |            ^^^^^
+
+warning: multiple methods are never used
+  --> ../feature-orbit-local-terms/local.rs:17:5
+   |
+ 8 | impl Curve {
+   | ---------- methods in this implementation
+...
+17 |  fn valid(self,t:Point){assert!(t.x<self.p&&t.y<self.p);assert_eq!(self.mul(t.y,t.y),self.add(self.add(self.pow(t.x,3),self.mul(self...
+   |     ^^^^^
+18 |  pub fn negative(self,t:Point)->Point {Point{x:t.x,y:self.neg(t.y)}}
+   |         ^^^^^^^^
+...
+25 |  fn combine(self,a:Local,b:Local,divide:bool)->Local {Local{order:if divide{a.order.checked_sub(b.order)}else{a.order.checked_add(b....
+   |     ^^^^^^^
+26 |  fn vertical(self,x:u64,t:Option<Point>)->Local {
+   |     ^^^^^^^^
+...
+30 |  fn line(self,a:Point,l:u64,t:Option<Point>)->Local {
+   |     ^^^^
+...
+42 |  fn g(self,a:Option<Point>,b:Option<Point>,t:Option<Point>)->Local {
+   |     ^
+...
+51 |  pub fn miller(self,base:Point,r:u64,t:Option<Point>)->Local {
+   |         ^^^^^^
+...
+61 |  pub fn invariant(self,z:Local,t:Point)->Local {assert_ne!(t.y,0);let b=self.mul(2,t.y);let e=u64::try_from(z.order.unsigned_abs())....
+   |         ^^^^^^^^^
+
+warning: variants `Sign`, `Source`, `Unresolved`, and `Verification` are never constructed
+ --> ../feature-native-fast-moment-roots/lib.rs:6:55
+  |
+6 | #[derive(Debug,PartialEq)]pub enum Error{Domain,Limit,Sign,Source,Unresolved,Verification}
+  |                                    -----              ^^^^ ^^^^^^ ^^^^^^^^^^ ^^^^^^^^^^^^
+  |                                    |
+  |                                    variants in this enum
+  |
+  = note: `Error` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: struct `Moments` is never constructed
+ --> ../feature-native-fast-moment-roots/lib.rs:7:38
+  |
+7 | #[derive(Debug,PartialEq)]pub struct Moments{pub count:u64,pub first:u64,pub singleton:Option<u64>}
+  |                                      ^^^^^^^
+
+warning: function `pow` is never used
+ --> ../feature-native-fast-moment-roots/lib.rs:9:4
+  |
+9 | fn pow(mut a:u64,mut n:u64,r:u64)->u64{let mut v=1;while n>0{if n&1!=0{v=mul(v,a,r)}a=mul(a,a,r);n>>=1}v}
+  |    ^^^
+
+warning: fields `doublings`, `karatsuba_calls`, and `reciprocal_updates` are never read
+  --> ../feature-native-fast-moment-roots/lib.rs:10:69
+   |
+10 | ...]pub struct Conversion{pub coefficients:Vec<u64>,pub doublings:usize,pub karatsuba_calls:usize,pub reciprocal_updates:usize}
+   |                ---------- fields in this struct         ^^^^^^^^^           ^^^^^^^^^^^^^^^           ^^^^^^^^^^^^^^^^^^
+   |
+   = note: `Conversion` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: function `as_error` is never used
+  --> ../feature-native-fast-moment-roots/lib.rs:46:4
+   |
+46 | fn as_error(e:seed::Error)->Error{match e{seed::Error::Limit=>Error::Limit,seed::Error::Sign=>Error::Sign,_=>Error::Domain}}
+   |    ^^^^^^^^
+
+warning: struct `Consecutive` is never constructed
+  --> ../feature-native-fast-moment-roots/lib.rs:47:12
+   |
+47 | pub struct Consecutive{r:u64,seed:seed::Consecutive}
+   |            ^^^^^^^^^^^
+
+warning: associated items `new` and `roots` are never used
+  --> ../feature-native-fast-moment-roots/lib.rs:49:9
+   |
+48 | impl Consecutive{
+   | ---------------- associated items in this implementation
+49 |  pub fn new(r:u64,max_width:usize,max_points:usize,max_cm_attempts:u64)->Result<Self,Error>{Ok(Self{r,seed:seed::Consecutive::new(r,...
+   |         ^^^
+50 |  pub fn roots(&self,signs:[i8;3],max_degree:usize)->Result<RootSet,Error>{
+   |         ^^^^^
+
+warning: struct `RootSet` is never constructed
+ --> ../feature-native-fast-moment-roots/roots.rs:1:12
+  |
+1 | pub struct RootSet{r:u64,coefficients:Vec<u64>,poly:polynomial::Poly}
+  |            ^^^^^^^
+
+warning: methods `rem`, `power_mod`, `gcd`, `observe`, `moments`, and `polynomial` are never used
+  --> ../feature-native-fast-moment-roots/roots.rs:3:5
+   |
+ 2 | impl RootSet{
+   | ------------ methods in this implementation
+ 3 |  fn rem(&mut self,a:&[u64],m:&[u64])->Result<Vec<u64>,Error>{self.poly.divrem(a,m).map(|v|v.1).map_err(|_|Error::Domain)}
+   |     ^^^
+ 4 |  fn power_mod(&mut self,a:&[u64],mut exponent:u64,m:&[u64])->Result<Vec<u64>,Error>{let mut base=self.rem(a,m)?;let mut out=self.rem...
+   |     ^^^^^^^^^
+ 5 |  fn gcd(&mut self,mut a:Vec<u64>,mut b:Vec<u64>)->Result<Vec<u64>,Error>{while b!=[0]{let rem=self.rem(&a,&b)?;a=b;b=rem}let lead=*a...
+   |     ^^^
+ 6 |  pub fn observe(&mut self,offset:u64,sign:i8)->Result<Moments,Error>{
+   |         ^^^^^^^
+...
+12 |  pub fn moments(&self)->Moments{let n=self.coefficients.len()-1;let first=if n==0{0}else{(self.r-self.coefficients[n-1])%self.r};Mom...
+   |         ^^^^^^^
+13 |  pub fn polynomial(&self)->&[u64]{&self.coefficients}
+   |         ^^^^^^^^^^
+
+warning: struct `RecoverySource` is never constructed
+ --> ../feature-native-fast-moment-roots/recovery.rs:1:12
+  |
+1 | pub struct RecoverySource{source:source::Source,curve:group::Curve,base:group::Point,r:u64,seed:Consecutive,max_degree:usize,max_quer...
+  |            ^^^^^^^^^^^^^^
+
+warning: struct `Recovery` is never constructed
+ --> ../feature-native-fast-moment-roots/recovery.rs:2:28
+  |
+2 | #[derive(Debug)]pub struct Recovery{pub value:u64,pub signs:Vec<i8>,pub initial_degree:usize}
+  |                            ^^^^^^^^
+
+warning: associated items `new`, `pair`, `verify`, `finish`, and `recover` are never used
+  --> ../feature-native-fast-moment-roots/recovery.rs:4:9
+   |
+ 3 | impl RecoverySource{
+   | ------------------- associated items in this implementation
+ 4 |  pub fn new(p:u64,a:u64,b:u64,r:u64,base:[u64;2],max_lanes:usize,max_width:usize,max_points:usize,max_cm_attempts:u64,max_degree:usi...
+   |         ^^^
+...
+10 |  fn pair(t:Option<group::Point>)->Option<[u64;2]>{t.map(|p|[p.x,p.y])}
+   |     ^^^^
+11 |  fn verify(&self,k:u64,target:Option<[u64;2]>)->bool{if k>=self.r{return false}let(mut n,mut p,mut out)=(k,Some(self.base),None);whi...
+   |     ^^^^^^
+12 |  fn finish(&self,value:u64,target:Option<[u64;2]>,signs:Vec<i8>,initial_degree:usize)->Result<Recovery,Error>{if !self.verify(value,...
+   |     ^^^^^^
+13 |  pub fn recover(&self,target:Option<[u64;2]>)->Result<Recovery,Error>{
+   |         ^^^^^^^
+
+warning: variants `Nonunit`, `Order`, `ZeroDivisor`, `EmptyTree`, and `Invariant` are never constructed
+ --> ../feature-native-fast-moment-roots/../feature-native-half-gcd/polynomial.rs:4:23
+  |
+4 | pub enum Error{Domain,Nonunit,Order,ZeroDivisor,EmptyTree,Invariant}
+  |          -----        ^^^^^^^ ^^^^^ ^^^^^^^^^^^ ^^^^^^^^^ ^^^^^^^^^
+  |          |
+  |          variants in this enum
+  |
+  = note: `Error` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: field `newton_steps` is never read
+ --> ../feature-native-fast-moment-roots/../feature-native-half-gcd/polynomial.rs:5:53
+  |
+5 | pub struct Poly{p:u64,pub karatsuba_calls:usize,pub newton_steps:usize}
+  |            ---- field in this struct                ^^^^^^^^^^^^
+
+warning: struct `Tree` is never constructed
+ --> ../feature-native-fast-moment-roots/../feature-native-half-gcd/polynomial.rs:6:12
+  |
+6 | pub struct Tree{p:u64,polynomial:Vec<u64>,children:Option<(Box<Tree>,Box<Tree>)>}
+  |            ^^^^
+
+warning: method `polynomial` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-half-gcd/polynomial.rs:7:18
+  |
+7 | impl Tree{pub fn polynomial(&self)->&[u64]{&self.polynomial}}
+  | ---------        ^^^^^^^^^^
+  | |
+  | method in this implementation
+
+warning: struct `ResultantClass` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-half-gcd/polynomial.rs:11:12
+   |
+11 | pub struct ResultantClass { p:u64, representative:u64 }
+   |            ^^^^^^^^^^^^^^
+
+warning: methods `combine`, `square`, `negate`, `is_zero`, and `project` are never used
+  --> ../feature-native-fast-moment-roots/../feature-native-half-gcd/polynomial.rs:16:9
+   |
+15 | impl ResultantClass{
+   | ------------------- methods in this implementation
+16 |  pub fn combine(self,other:Self)->Result<Self,Error>{if self.p!=other.p{return Err(Error::Domain);}Ok(Self{p:self.p,representative:(...
+   |         ^^^^^^^
+17 |  pub fn square(self)->Self{Self{p:self.p,representative:((self.representative as u128*self.representative as u128)%self.p as u128)as...
+   |         ^^^^^^
+18 |  pub fn negate(self)->Self{Self{p:self.p,representative:(self.p-self.representative)%self.p}}
+   |         ^^^^^^
+19 |  pub fn is_zero(&self)->bool{self.representative==0}
+   |         ^^^^^^^
+20 |  pub fn project(self)->u64{
+   |         ^^^^^^^
+
+warning: type alias `Matrix` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-half-gcd/polynomial.rs:26:6
+   |
+26 | type Matrix=[[Vec<u64>;2];2];
+   |      ^^^^^^
+
+warning: struct `Transition` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-half-gcd/polynomial.rs:28:8
+   |
+28 | struct Transition{m:usize,n:usize,k:Option<usize>,leading:u64}
+   |        ^^^^^^^^^^
+
+warning: struct `Batch` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-half-gcd/polynomial.rs:29:8
+   |
+29 | struct Batch{matrix:Matrix,a:Vec<u64>,b:Vec<u64>,steps:Vec<Transition>}
+   |        ^^^^^
+
+warning: function `degree` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-half-gcd/polynomial.rs:30:4
+   |
+30 | fn degree(a:&[u64])->Option<usize>{if a==[0]{None}else{Some(a.len()-1)}}
+   |    ^^^^^^
+
+warning: function `identity` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-half-gcd/polynomial.rs:31:4
+   |
+31 | fn identity()->Matrix{[[vec![1],vec![0]],[vec![0],vec![1]]]}
+   |    ^^^^^^^^
+
+warning: multiple methods are never used
+   --> ../feature-native-fast-moment-roots/../feature-native-half-gcd/polynomial.rs:38:5
+    |
+ 35 | impl Poly{
+    | --------- methods in this implementation
+...
+ 38 |  fn inverse(&self,a:u64)->Result<u64,Error>{let(mut r,mut s,mut x,mut y)=(self.p as i128,(a%self.p)as i128,0i128,1i128);while s!=0{...
+    |     ^^^^^^^
+...
+ 77 |  pub fn inv_series(&mut self,a:&[u64],n:usize)->Result<Vec<u64>,Error>{
+    |         ^^^^^^^^^^
+...
+ 82 |  pub fn divrem(&mut self,a:&[u64],b:&[u64])->Result<(Vec<u64>,Vec<u64>),Error>{
+    |         ^^^^^^
+...
+ 87 |  pub fn product_tree(&mut self,points:&[u64])->Result<Tree,Error>{
+    |         ^^^^^^^^^^^^
+...
+ 94 |  fn monic_remainder(&mut self,a:&[u64],b:&[u64])->Result<Vec<u64>,Error>{
+    |     ^^^^^^^^^^^^^^^
+...
+100 |  pub fn values(&mut self,a:&[u64],tree:&Tree)->Result<Vec<u64>,Error>{
+    |         ^^^^^^
+...
+107 |  fn matrix_mul(&mut self,a:&Matrix,b:&Matrix)->Matrix{
+    |     ^^^^^^^^^^
+...
+110 |  fn matrix_apply(&mut self,m:&Matrix,a:&[u64],b:&[u64])->(Vec<u64>,Vec<u64>){
+    |     ^^^^^^^^^^^^
+...
+114 |  fn step_matrix(&self,q:&[u64])->Matrix{[[vec![0],vec![1]],[vec![1],self.sub(&[0],q)]]}
+    |     ^^^^^^^^^^^
+115 |  fn lifted(&mut self,mut batch:Batch,a:&[u64],b:&[u64],shift:usize)->Result<Batch,Error>{
+    |     ^^^^^^
+...
+122 |  fn half_gcd(&mut self,a:&[u64],b:&[u64])->Result<Batch,Error>{
+    |     ^^^^^^^^
+...
+144 |  pub fn resultant_class(&mut self,a:&[u64],b:&[u64])->Result<ResultantClass,Error>{
+    |         ^^^^^^^^^^^^^^^
+...
+162 |  pub fn image_class(&self,v:u64)->Result<ResultantClass,Error>{if 1u64<<(self.p-1).trailing_zeros()>4{return Err(Error::Domain);}Ok...
+    |         ^^^^^^^^^^^
+163 |  pub fn projected_resultant(&mut self,a:&[u64],b:&[u64])->Result<u64,Error>{Ok(self.resultant_class(a,b)?.project())}
+    |         ^^^^^^^^^^^^^^^^^^^
+164 |  /// Build only the product polynomial: no retained subproduct tree nodes.
+165 |  pub fn root_product(&mut self,roots:&[u64])->Result<Vec<u64>,Error>{
+    |         ^^^^^^^^^^^^
+...
+170 |  pub fn root_resultant_class(&mut self,roots:&[u64],points:&[u64])->Result<ResultantClass,Error>{let f=self.root_product(roots)?;le...
+    |         ^^^^^^^^^^^^^^^^^^^^
+171 |  pub fn root_projected_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+176 |  pub fn value_product(&mut self,a:&[u64],tree:&Tree)->Result<u64,Error>{
+    |         ^^^^^^^^^^^^^
+...
+184 |  pub fn root_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{let source=self.product_tree(roots)?;let destinatio...
+    |         ^^^^^^^^^^^^^^
+
+warning: enum `Error` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/lib.rs:6:36
+  |
+6 | #[derive(Debug,PartialEq)]pub enum Error{Domain,Limit,Sign,Source,Unresolved,Verification}
+  |                                    ^^^^^
+
+warning: struct `Moments` is never constructed
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/lib.rs:7:38
+  |
+7 | #[derive(Debug,PartialEq)]pub struct Moments{pub count:u64,pub first:u64,pub singleton:Option<u64>}
+  |                                      ^^^^^^^
+
+warning: function `mul` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/lib.rs:8:4
+  |
+8 | fn mul(a:u64,b:u64,r:u64)->u64{((a as u128*b as u128)%r as u128)as u64}
+  |    ^^^
+
+warning: function `pow` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/lib.rs:9:4
+  |
+9 | fn pow(mut a:u64,mut n:u64,r:u64)->u64{let mut v=1;while n>0{if n&1!=0{v=mul(v,a,r)}a=mul(a,a,r);n>>=1}v}
+  |    ^^^
+
+warning: function `ceil_sqrt` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/lib.rs:10:4
+   |
+10 | fn ceil_sqrt(n:u64)->u64{let(mut lo,mut hi)=(0u64,1u64<<32);while hi-lo>1{let m=lo+(hi-lo)/2;if(m as u128)*(m as u128)<n as u128{lo=...
+   |    ^^^^^^^^^
+
+warning: struct `Seed` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/lib.rs:11:28
+   |
+11 | #[derive(Debug)]pub struct Seed{pub r:u64,pub b1:u64,pub block_width:usize,pub blocks:usize,pub tail:usize,pub karatsuba_calls:usize...
+   |                            ^^^^
+
+warning: function `inert_seed` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/lib.rs:14:8
+   |
+14 | pub fn inert_seed(r:u64,max_width:usize,max_points:usize)->Result<Seed,Error>{
+   |        ^^^^^^^^^^
+
+warning: function `as_error` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/lib.rs:33:4
+   |
+33 | fn as_error(e:triple::Error)->Error{match e{triple::Error::Limit=>Error::Limit,triple::Error::Sign=>Error::Sign,_=>Error::Domain}}
+   |    ^^^^^^^^
+
+warning: struct `Consecutive` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/lib.rs:34:12
+   |
+34 | pub struct Consecutive{r:u64,moments:triple::Triple}
+   |            ^^^^^^^^^^^
+
+warning: associated items `new`, `moments`, and `roots` are never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/lib.rs:36:9
+   |
+35 | impl Consecutive{
+   | ---------------- associated items in this implementation
+36 |  pub fn new(r:u64,max_width:usize,max_points:usize,max_cm_attempts:u64)->Result<Self,Error>{
+   |         ^^^
+...
+40 |  pub fn moments(&self,signs:[i8;3],order:usize,max_order:usize)->Result<Vec<u64>,Error>{self.moments.moments(signs,order,max_order)....
+   |         ^^^^^^^
+41 |  pub fn roots(&self,signs:[i8;3],max_degree:usize)->Result<RootSet,Error>{
+   |         ^^^^^
+
+warning: struct `RootSet` is never constructed
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/roots.rs:1:12
+  |
+1 | pub struct RootSet{r:u64,coefficients:Vec<u64>,poly:polynomial::Poly}
+  |            ^^^^^^^
+
+warning: methods `rem`, `power_mod`, `gcd`, `observe`, `moments`, and `polynomial` are never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/roots.rs:3:5
+   |
+ 2 | impl RootSet{
+   | ------------ methods in this implementation
+ 3 |  fn rem(&mut self,a:&[u64],m:&[u64])->Result<Vec<u64>,Error>{self.poly.divrem(a,m).map(|v|v.1).map_err(|_|Error::Domain)}
+   |     ^^^
+ 4 |  fn power_mod(&mut self,a:&[u64],mut exponent:u64,m:&[u64])->Result<Vec<u64>,Error>{let mut base=self.rem(a,m)?;let mut out=self.rem...
+   |     ^^^^^^^^^
+ 5 |  fn gcd(&mut self,mut a:Vec<u64>,mut b:Vec<u64>)->Result<Vec<u64>,Error>{while b!=[0]{let rem=self.rem(&a,&b)?;a=b;b=rem}let lead=*a...
+   |     ^^^
+ 6 |  pub fn observe(&mut self,offset:u64,sign:i8)->Result<Moments,Error>{
+   |         ^^^^^^^
+...
+12 |  pub fn moments(&self)->Moments{let n=self.coefficients.len()-1;let first=if n==0{0}else{(self.r-self.coefficients[n-1])%self.r};Mom...
+   |         ^^^^^^^
+13 |  pub fn polynomial(&self)->&[u64]{&self.coefficients}
+   |         ^^^^^^^^^^
+
+warning: struct `RecoverySource` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/lib.rs:50:12
+   |
+50 | pub struct RecoverySource{source:source::Source,curve:group::Curve,base:group::Point,r:u64,seed:Consecutive,max_degree:usize,max_que...
+   |            ^^^^^^^^^^^^^^
+
+warning: struct `Recovery` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/lib.rs:51:28
+   |
+51 | #[derive(Debug)]pub struct Recovery{pub value:u64,pub signs:Vec<i8>,pub initial_degree:usize}
+   |                            ^^^^^^^^
+
+warning: associated items `new`, `pair`, `verify`, `finish`, and `recover` are never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/lib.rs:53:9
+   |
+52 | impl RecoverySource{
+   | ------------------- associated items in this implementation
+53 |  pub fn new(p:u64,a:u64,b:u64,r:u64,base:[u64;2],max_lanes:usize,max_width:usize,max_points:usize,max_cm_attempts:u64,max_degree:usi...
+   |         ^^^
+...
+59 |  fn pair(t:Option<group::Point>)->Option<[u64;2]>{t.map(|p|[p.x,p.y])}
+   |     ^^^^
+60 |  fn verify(&self,k:u64,target:Option<[u64;2]>)->bool{if k>=self.r{return false}let(mut n,mut p,mut out)=(k,Some(self.base),None);whi...
+   |     ^^^^^^
+61 |  fn finish(&self,value:u64,target:Option<[u64;2]>,signs:Vec<i8>,initial_degree:usize)->Result<Recovery,Error>{if !self.verify(value,...
+   |     ^^^^^^
+62 |  pub fn recover(&self,target:Option<[u64;2]>)->Result<Recovery,Error>{
+   |         ^^^^^^^
+
+warning: enum `Error` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-half-gcd/polynomial.rs:4:10
+  |
+4 | pub enum Error{Domain,Nonunit,Order,ZeroDivisor,EmptyTree,Invariant}
+  |          ^^^^^
+
+warning: struct `Poly` is never constructed
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-half-gcd/polynomial.rs:5:12
+  |
+5 | pub struct Poly{p:u64,pub karatsuba_calls:usize,pub newton_steps:usize}
+  |            ^^^^
+
+warning: struct `Tree` is never constructed
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-half-gcd/polynomial.rs:6:12
+  |
+6 | pub struct Tree{p:u64,polynomial:Vec<u64>,children:Option<(Box<Tree>,Box<Tree>)>}
+  |            ^^^^
+
+warning: method `polynomial` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-half-gcd/polynomial.rs:7:18
+  |
+7 | impl Tree{pub fn polynomial(&self)->&[u64]{&self.polynomial}}
+  | ---------        ^^^^^^^^^^
+  | |
+  | method in this implementation
+
+warning: struct `ResultantClass` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-half-gcd/polynomial.rs:11:12
+   |
+11 | pub struct ResultantClass { p:u64, representative:u64 }
+   |            ^^^^^^^^^^^^^^
+
+warning: methods `combine`, `square`, `negate`, `is_zero`, and `project` are never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-half-gcd/polynomial.rs:16:9
+   |
+15 | impl ResultantClass{
+   | ------------------- methods in this implementation
+16 |  pub fn combine(self,other:Self)->Result<Self,Error>{if self.p!=other.p{return Err(Error::Domain);}Ok(Self{p:self.p,representative:(...
+   |         ^^^^^^^
+17 |  pub fn square(self)->Self{Self{p:self.p,representative:((self.representative as u128*self.representative as u128)%self.p as u128)as...
+   |         ^^^^^^
+18 |  pub fn negate(self)->Self{Self{p:self.p,representative:(self.p-self.representative)%self.p}}
+   |         ^^^^^^
+19 |  pub fn is_zero(&self)->bool{self.representative==0}
+   |         ^^^^^^^
+20 |  pub fn project(self)->u64{
+   |         ^^^^^^^
+
+warning: type alias `Matrix` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-half-gcd/polynomial.rs:26:6
+   |
+26 | type Matrix=[[Vec<u64>;2];2];
+   |      ^^^^^^
+
+warning: struct `Transition` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-half-gcd/polynomial.rs:28:8
+   |
+28 | struct Transition{m:usize,n:usize,k:Option<usize>,leading:u64}
+   |        ^^^^^^^^^^
+
+warning: struct `Batch` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-half-gcd/polynomial.rs:29:8
+   |
+29 | struct Batch{matrix:Matrix,a:Vec<u64>,b:Vec<u64>,steps:Vec<Transition>}
+   |        ^^^^^
+
+warning: function `degree` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-half-gcd/polynomial.rs:30:4
+   |
+30 | fn degree(a:&[u64])->Option<usize>{if a==[0]{None}else{Some(a.len()-1)}}
+   |    ^^^^^^
+
+warning: function `identity` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-half-gcd/polynomial.rs:31:4
+   |
+31 | fn identity()->Matrix{[[vec![1],vec![0]],[vec![0],vec![1]]]}
+   |    ^^^^^^^^
+
+warning: multiple associated items are never used
+   --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-half-gcd/polynomial.rs:36:9
+    |
+ 35 | impl Poly{
+    | --------- associated items in this implementation
+ 36 |  pub fn new(p:u64)->Result<Self,Error>{if p<3||p>u64::MAX/2{return Err(Error::Domain);}Ok(Self{p,karatsuba_calls:0,newton_steps:0})}
+    |         ^^^
+ 37 |  fn fm(&self,a:u64,b:u64)->u64{((a as u128*b as u128)%self.p as u128)as u64}
+    |     ^^
+ 38 |  fn inverse(&self,a:u64)->Result<u64,Error>{let(mut r,mut s,mut x,mut y)=(self.p as i128,(a%self.p)as i128,0i128,1i128);while s!=0{...
+    |     ^^^^^^^
+ 39 |  fn trim(&self,a:&[u64])->Vec<u64>{let mut a:Vec<_>=a.iter().map(|x|x%self.p).collect();while a.len()>1&&a.last()==Some(&0){a.pop()...
+    |     ^^^^
+ 40 |  pub fn add(&self,a:&[u64],b:&[u64])->Vec<u64>{let(a,b)=(self.trim(a),self.trim(b));let mut c=vec![0;a.len().max(b.len())];for(i,x)...
+    |         ^^^
+ 41 |  pub fn sub(&self,a:&[u64],b:&[u64])->Vec<u64>{let b:Vec<_>=b.iter().map(|x|(self.p-x%self.p)%self.p).collect();self.add(a,&b)}
+    |         ^^^
+ 42 |  pub fn mul(&mut self,a:&[u64],b:&[u64])->Vec<u64>{
+    |         ^^^
+...
+ 50 |  pub fn mul_low(&mut self,a:&[u64],b:&[u64],n:usize)->Vec<u64>{
+    |         ^^^^^^^
+...
+ 77 |  pub fn inv_series(&mut self,a:&[u64],n:usize)->Result<Vec<u64>,Error>{
+    |         ^^^^^^^^^^
+...
+ 82 |  pub fn divrem(&mut self,a:&[u64],b:&[u64])->Result<(Vec<u64>,Vec<u64>),Error>{
+    |         ^^^^^^
+...
+ 87 |  pub fn product_tree(&mut self,points:&[u64])->Result<Tree,Error>{
+    |         ^^^^^^^^^^^^
+...
+ 94 |  fn monic_remainder(&mut self,a:&[u64],b:&[u64])->Result<Vec<u64>,Error>{
+    |     ^^^^^^^^^^^^^^^
+...
+100 |  pub fn values(&mut self,a:&[u64],tree:&Tree)->Result<Vec<u64>,Error>{
+    |         ^^^^^^
+...
+107 |  fn matrix_mul(&mut self,a:&Matrix,b:&Matrix)->Matrix{
+    |     ^^^^^^^^^^
+...
+110 |  fn matrix_apply(&mut self,m:&Matrix,a:&[u64],b:&[u64])->(Vec<u64>,Vec<u64>){
+    |     ^^^^^^^^^^^^
+...
+114 |  fn step_matrix(&self,q:&[u64])->Matrix{[[vec![0],vec![1]],[vec![1],self.sub(&[0],q)]]}
+    |     ^^^^^^^^^^^
+115 |  fn lifted(&mut self,mut batch:Batch,a:&[u64],b:&[u64],shift:usize)->Result<Batch,Error>{
+    |     ^^^^^^
+...
+122 |  fn half_gcd(&mut self,a:&[u64],b:&[u64])->Result<Batch,Error>{
+    |     ^^^^^^^^
+...
+144 |  pub fn resultant_class(&mut self,a:&[u64],b:&[u64])->Result<ResultantClass,Error>{
+    |         ^^^^^^^^^^^^^^^
+...
+162 |  pub fn image_class(&self,v:u64)->Result<ResultantClass,Error>{if 1u64<<(self.p-1).trailing_zeros()>4{return Err(Error::Domain);}Ok...
+    |         ^^^^^^^^^^^
+163 |  pub fn projected_resultant(&mut self,a:&[u64],b:&[u64])->Result<u64,Error>{Ok(self.resultant_class(a,b)?.project())}
+    |         ^^^^^^^^^^^^^^^^^^^
+164 |  /// Build only the product polynomial: no retained subproduct tree nodes.
+165 |  pub fn root_product(&mut self,roots:&[u64])->Result<Vec<u64>,Error>{
+    |         ^^^^^^^^^^^^
+...
+170 |  pub fn root_resultant_class(&mut self,roots:&[u64],points:&[u64])->Result<ResultantClass,Error>{let f=self.root_product(roots)?;le...
+    |         ^^^^^^^^^^^^^^^^^^^^
+171 |  pub fn root_projected_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+176 |  pub fn value_product(&mut self,a:&[u64],tree:&Tree)->Result<u64,Error>{
+    |         ^^^^^^^^^^^^^
+...
+184 |  pub fn root_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{let source=self.product_tree(roots)?;let destinatio...
+    |         ^^^^^^^^^^^^^^
+
+warning: enum `Error` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-triple-moments/lib.rs:5:10
+  |
+5 | pub enum Error { Domain, Limit, Sign, Certificate }
+  |          ^^^^^
+
+warning: function `mul` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-triple-moments/lib.rs:6:4
+  |
+6 | fn mul(a:u64,b:u64,r:u64)->u64 { ((a as u128*b as u128)%r as u128) as u64 }
+  |    ^^^
+
+warning: function `add` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-triple-moments/lib.rs:7:4
+  |
+7 | fn add(a:u64,b:u64,r:u64)->u64 { (a+b)%r }
+  |    ^^^
+
+warning: function `sub` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-triple-moments/lib.rs:8:4
+  |
+8 | fn sub(a:u64,b:u64,r:u64)->u64 { (a+r-b)%r }
+  |    ^^^
+
+warning: function `pow` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-triple-moments/lib.rs:9:4
+  |
+9 | fn pow(mut a:u64,mut n:u64,r:u64)->u64 { let mut v=1; while n>0 { if n&1!=0 {v=mul(v,a,r)} a=mul(a,a,r); n>>=1 } v }
+  |    ^^^
+
+warning: function `domain` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-triple-moments/lib.rs:10:4
+   |
+10 | fn domain(r:u64)->bool {r>=5 && r<=u64::MAX/2 && r%2==1}
+   |    ^^^^^^
+
+warning: function `chi` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-triple-moments/lib.rs:11:4
+   |
+11 | fn chi(x:u64,r:u64)->i8 {if x==0 {0} else if pow(x,(r-1)/2,r)==1 {1} else {-1}}
+   |    ^^^
+
+warning: function `signed` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-triple-moments/lib.rs:12:4
+   |
+12 | fn signed(x:i128,r:u64)->u64 {x.rem_euclid(r as i128) as u64}
+   |    ^^^^^^
+
+warning: function `invert` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-triple-moments/lib.rs:14:4
+   |
+14 | fn invert(xs:&[u64],r:u64)->Vec<u64> {
+   |    ^^^^^^
+
+warning: struct `Triple` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-triple-moments/lib.rs:21:12
+   |
+21 | pub struct Triple {r:u64,tau:u64,seeds:[u64;2]}
+   |            ^^^^^^
+
+warning: associated items `with_seeds` and `moments` are never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-triple-moments/lib.rs:24:9
+   |
+22 | impl Triple {
+   | ----------- associated items in this implementation
+23 |  /// seeds=[c_h,c_(h-1)] for ((X+1)(X+tau))^h. Caller must establish this.
+24 |  pub fn with_seeds(r:u64,tau:u64,seeds:[u64;2])->Result<Self,Error> {
+   |         ^^^^^^^^^^
+...
+30 |  pub fn moments(&self,signs:[i8;3],order:usize,max_order:usize)->Result<Vec<u64>,Error> {
+   |         ^^^^^^^
+
+warning: struct `CmCertificate` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-triple-moments/lib.rs:62:12
+   |
+62 | pub struct CmCertificate {pub r:u64,pub a:i64,pub b:u64,pub nonresidue:u64,pub sqrt_minus_one:u64,pub attempts:u64}
+   |            ^^^^^^^^^^^^^
+
+warning: methods `valid` and `triple` are never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-triple-moments/lib.rs:64:9
+   |
+63 | impl CmCertificate {
+   | ------------------ methods in this implementation
+64 |  pub fn valid(&self)->bool {
+   |         ^^^^^
+...
+72 |  pub fn triple(&self)->Result<Triple,Error> {if !self.valid(){return Err(Error::Certificate)} let trace=signed(2*self.a as i128,self...
+   |         ^^^^^^
+
+warning: function `isqrt` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-triple-moments/lib.rs:74:4
+   |
+74 | fn isqrt(n:u64)->u64 {let(mut lo,mut hi)=(0u64,1u64<<32);while hi-lo>1 {let mid=lo+(hi-lo)/2;if (mid as u128)*(mid as u128)<=n as u1...
+   |    ^^^^^
+
+warning: function `consecutive_cm` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-triple-moments/lib.rs:77:8
+   |
+77 | pub fn consecutive_cm(r:u64,max_attempts:u64)->Result<CmCertificate,Error> {
+   |        ^^^^^^^^^^^^^^
+
+warning: type alias `Pair` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/lib.rs:5:10
+  |
+5 | pub type Pair=[u64;2];
+  |          ^^^^
+
+warning: enum `Error` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/lib.rs:6:36
+  |
+6 | #[derive(Debug,PartialEq)]pub enum Error{Domain,Point,NonTorsion,Geometry,Polynomial,Degenerate,Character,Limit}
+  |                                    ^^^^^
+
+warning: function `mul` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/lib.rs:7:4
+  |
+7 | fn mul(a:u64,b:u64,p:u64)->u64{((a as u128*b as u128)%p as u128)as u64}
+  |    ^^^
+
+warning: function `pow` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/lib.rs:8:4
+  |
+8 | fn pow(mut a:u64,mut n:u64,p:u64)->u64{let mut z=1;while n>0{if n&1==1{z=mul(z,a,p)}a=mul(a,a,p);n>>=1;}z}
+  |    ^^^
+
+warning: function `partition` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/lib.rs:9:4
+  |
+9 | fn partition(r:u64)->[u64;4]{let h=(r-1)/2;let target=(h+1)/2;let(mut lo,mut hi)=(1,target);while lo<hi{let m=lo+(hi-lo)/2;if(m as u1...
+  |    ^^^^^^^^^
+
+warning: function `powers` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/lib.rs:10:4
+   |
+10 | fn powers(part:[u64;4],q:u64)->[u64;3]{let[w,k,s,e]=part;let mut f=[k-1,k,k+1];let i=f.iter().position(|n|n%3==0).unwrap();f[i]/=3;l...
+   |    ^^^^^^
+
+warning: struct `Source` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/lib.rs:11:12
+   |
+11 | pub struct Source {p:u64,a:u64,b:u64,r:u64,part:[u64;4],powers:[u64;3],curve:geometry::Curve,calibration:u64}
+   |            ^^^^^^
+
+warning: associated items `new`, `raw`, and `sign` are never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/lib.rs:14:9
+   |
+12 | impl Source{
+   | ----------- associated items in this implementation
+13 |  /// max_lanes bounds materialized geometry before allocation. p,r primality is a caller obligation.
+14 |  pub fn new(p:u64,a:u64,b:u64,r:u64,base:[u64;2],max_lanes:usize)->Result<Self,Error>{
+   |         ^^^
+...
+21 |  pub fn raw(&self,t:[u64;2])->Result<u64,Error>{
+   |         ^^^
+...
+31 |  pub fn sign(&self,t:Option<[u64;2]>)->Result<i8,Error>{let t=match t{None=>return Ok(0),Some(t)=>t};let v=self.raw(t)?;if v==self.c...
+   |         ^^^^
+
+warning: struct `F` is never constructed
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:4:8
+  |
+4 | struct F{v:u64,p:u64}
+  |        ^
+
+warning: associated items `c`, `sq`, and `inv` are never used
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:6:5
+  |
+5 | impl F{
+  | ------ associated items in this implementation
+6 |  fn c(v:u64,p:u64)->Self{Self{v:v%p,p}}
+  |     ^
+7 |  fn sq(self)->Self{self*self}
+  |     ^^
+8 |  fn inv(self)->Option<Self>{#[cfg(test)] bump_inverse();let(mut r,mut s,mut x,mut y)=(self.p as i128,self.v as i128,0i128,1i128);whil...
+  |     ^^^
+
+warning: type alias `J` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:13:6
+   |
+13 | type J=Option<[F;3]>;
+   |      ^
+
+warning: enum `Error` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:15:10
+   |
+15 | pub enum Error{Domain,Point,Singular,Partition,Empty,Infinity,Nonunit}
+   |          ^^^^^
+
+warning: struct `Curve` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:16:12
+   |
+16 | pub struct Curve{p:u64,a:F,b:F}
+   |            ^^^^^
+
+warning: struct `Grid` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:18:12
+   |
+18 | pub struct Grid{pub labels:Vec<u64>,pub projective:Vec<[u64;3]>,pub affine:Vec<[u64;2]>,pub inverse_z:Vec<u64>}
+   |            ^^^^
+
+warning: multiple associated items are never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:20:9
+   |
+19 | impl Curve{
+   | ---------- associated items in this implementation
+20 |  pub fn new(p:u64,a:u64,b:u64)->Result<Self,Error>{
+   |         ^^^
+...
+24 |  fn f(&self,n:u64)->F{F::c(n,self.p)}
+   |     ^
+25 |  fn point(&self,q:[u64;2])->Result<J,Error>{if q.iter().any(|v|*v>=self.p){return Err(Error::Point);}let(x,y)=(self.f(q[0]),self.f(q...
+   |     ^^^^^
+26 |  fn double(&self,t:[F;3])->J{
+   |     ^^^^^^
+...
+30 |  fn add(&self,a:J,b:J)->J{
+   |     ^^^
+...
+38 |  fn mul(&self,mut n:u64,base:J)->J{let(mut t,mut a)=(None,base);while n!=0{if n&1!=0{t=self.add(t,a);}n>>=1;if n!=0{a=self.add(a,a);...
+   |     ^^^
+39 |  fn batch(&self,points:&[J])->Result<(Vec<[u64;2]>,Vec<u64>),Error>{
+   |     ^^^^^
+...
+50 |  pub fn grid(&self,r:u64,q:[u64;2],width:u64,blocks:u64,s:u64,epsilon:u64)->Result<Grid,Error>{
+   |         ^^^^
+
+warning: struct `Prepared` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:64:12
+   |
+64 | pub struct Prepared<'a>{curve:&'a Curve,r:u64,base:J,public_base:[u64;2],partition:[u64;4],labels:Vec<u64>,strides:Vec<J>,affine_str...
+   |            ^^^^^^^^
+
+warning: struct `Slot` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:66:12
+   |
+66 | pub struct Slot{pub offset:usize,pub lane:usize,pub label:u64,pub projective:[u64;3],pub affine:[u64;2],pub inverse_z:u64}
+   |            ^^^^
+
+warning: struct `Window` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:68:12
+   |
+68 | pub struct Window{pub labels:Vec<u64>,pub initialization:&'static str,pub snapshots:Vec<Vec<Option<[u64;3]>>>,pub slots:Vec<Slot>,pu...
+   |            ^^^^^^
+
+warning: methods `projective_only`, `mixed`, and `prepare` are never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:70:5
+   |
+69 | impl Curve{
+   | ---------- methods in this implementation
+70 |  fn projective_only(&self,r:u64,q:[u64;2],width:u64,blocks:u64,s:u64,epsilon:u64)->Result<(Vec<u64>,Vec<J>),Error>{
+   |     ^^^^^^^^^^^^^^^
+...
+80 |  fn mixed(&self,a:J,b:Option<[F;2]>)->J{
+   |     ^^^^^
+...
+88 |  pub fn prepare(&self,r:u64,p:[u64;2],width:u64,blocks:u64,s:u64,epsilon:u64)->Result<Prepared<'_>,Error>{
+   |         ^^^^^^^
+
+warning: method `window` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:97:9
+   |
+94 | impl Prepared<'_>{
+   | ----------------- method in this implementation
+...
+97 |  pub fn window(&self,shifts:&[Option<[u64;2]>])->Result<Window,Error>{
+   |         ^^^^^^
+
+warning: struct `JointWindow` is never constructed
+   --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:126:12
+    |
+126 | pub struct JointWindow{pub shifts:Vec<Option<[u64;2]>>,pub geometry:Window,pub converted_points:usize}
+    |            ^^^^^^^^^^^
+
+warning: method `joint_window` is never used
+   --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:130:9
+    |
+127 | impl Prepared<'_>{
+    | ----------------- method in this implementation
+...
+130 |  pub fn joint_window(&self,q:Option<[u64;2]>,length:usize)->Result<JointWindow,Error>{
+    |         ^^^^^^^^^^^^
+
+warning: struct `F` is never constructed
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-value-division/lib.rs:6:8
+  |
+6 | struct F {v:u64,p:u64}
+  |        ^
+
+warning: associated items `c`, `sq`, `cube`, and `inv` are never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-value-division/lib.rs:8:5
+   |
+ 7 | impl F {
+   | ------ associated items in this implementation
+ 8 |  fn c(v:u64,p:u64)->Self{Self{v:v%p,p}}
+   |     ^
+ 9 |  fn sq(self)->Self{self*self}
+   |     ^^
+10 |  fn cube(self)->Self{self.sq()*self}
+   |     ^^^^
+11 |  fn inv(self)->Option<Self>{
+   |     ^^^
+
+warning: enum `Error` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-value-division/lib.rs:21:10
+   |
+21 | pub enum Error{Domain,Point,Singular,ZeroY,Nonunit}
+   |          ^^^^^
+
+warning: struct `ValueDivision` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-value-division/lib.rs:24:12
+   |
+24 | pub struct ValueDivision{inverse_two_y:F,cache:BTreeMap<u64,F>}
+   |            ^^^^^^^^^^^^^
+
+warning: associated items `new`, `field_value`, `value`, and `retained_indices` are never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-value-division/lib.rs:26:9
+   |
+25 | impl ValueDivision{
+   | ------------------ associated items in this implementation
+26 |  pub fn new(p:u64,a:u64,b:u64,x:u64,y:u64)->Result<Self,Error>{
+   |         ^^^
+...
+39 |  fn field_value(&mut self,n:u64)->F{
+   |     ^^^^^^^^^^^
+...
+51 |  pub fn value(&mut self,n:u64)->u64{self.field_value(n).v}
+   |         ^^^^^
+52 |  pub fn retained_indices(&self)->usize{self.cache.len()}
+   |         ^^^^^^^^^^^^^^^^
+
+warning: function `geometry_ratio` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-half-gcd/residual.rs:4:15
+  |
+4 | pub(crate) fn geometry_ratio(p:u64,part:[u64;4],q:[u64;2],grid:&[[u64;2]])->Result<Pair,Error>{
+  |               ^^^^^^^^^^^^^^
+
+warning: enum `Error` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:4:10
+  |
+4 | pub enum Error{Domain,Nonunit,Order,ZeroDivisor,EmptyTree,Invariant}
+  |          ^^^^^
+
+warning: struct `Poly` is never constructed
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:5:12
+  |
+5 | pub struct Poly{p:u64,pub karatsuba_calls:usize,pub newton_steps:usize}
+  |            ^^^^
+
+warning: struct `Tree` is never constructed
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:6:12
+  |
+6 | pub struct Tree{p:u64,polynomial:Vec<u64>,children:Option<(Box<Tree>,Box<Tree>)>}
+  |            ^^^^
+
+warning: method `polynomial` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:7:18
+  |
+7 | impl Tree{pub fn polynomial(&self)->&[u64]{&self.polynomial}}
+  | ---------        ^^^^^^^^^^
+  | |
+  | method in this implementation
+
+warning: struct `ResultantClass` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:11:12
+   |
+11 | pub struct ResultantClass { p:u64, representative:u64 }
+   |            ^^^^^^^^^^^^^^
+
+warning: methods `combine`, `square`, `negate`, `is_zero`, and `project` are never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:16:9
+   |
+15 | impl ResultantClass{
+   | ------------------- methods in this implementation
+16 |  pub fn combine(self,other:Self)->Result<Self,Error>{if self.p!=other.p{return Err(Error::Domain);}Ok(Self{p:self.p,representative:(...
+   |         ^^^^^^^
+17 |  pub fn square(self)->Self{Self{p:self.p,representative:((self.representative as u128*self.representative as u128)%self.p as u128)as...
+   |         ^^^^^^
+18 |  pub fn negate(self)->Self{Self{p:self.p,representative:(self.p-self.representative)%self.p}}
+   |         ^^^^^^
+19 |  pub fn is_zero(&self)->bool{self.representative==0}
+   |         ^^^^^^^
+20 |  pub fn project(self)->u64{
+   |         ^^^^^^^
+
+warning: type alias `Matrix` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:26:6
+   |
+26 | type Matrix=[[Vec<u64>;2];2];
+   |      ^^^^^^
+
+warning: struct `Transition` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:28:8
+   |
+28 | struct Transition{m:usize,n:usize,k:Option<usize>,leading:u64}
+   |        ^^^^^^^^^^
+
+warning: struct `Batch` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:29:8
+   |
+29 | struct Batch{matrix:Matrix,a:Vec<u64>,b:Vec<u64>,steps:Vec<Transition>}
+   |        ^^^^^
+
+warning: function `degree` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:30:4
+   |
+30 | fn degree(a:&[u64])->Option<usize>{if a==[0]{None}else{Some(a.len()-1)}}
+   |    ^^^^^^
+
+warning: function `identity` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:31:4
+   |
+31 | fn identity()->Matrix{[[vec![1],vec![0]],[vec![0],vec![1]]]}
+   |    ^^^^^^^^
+
+warning: multiple associated items are never used
+   --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:36:9
+    |
+ 35 | impl Poly{
+    | --------- associated items in this implementation
+ 36 |  pub fn new(p:u64)->Result<Self,Error>{if p<3||p>u64::MAX/2{return Err(Error::Domain);}Ok(Self{p,karatsuba_calls:0,newton_steps:0})}
+    |         ^^^
+ 37 |  fn fm(&self,a:u64,b:u64)->u64{((a as u128*b as u128)%self.p as u128)as u64}
+    |     ^^
+ 38 |  fn inverse(&self,a:u64)->Result<u64,Error>{let(mut r,mut s,mut x,mut y)=(self.p as i128,(a%self.p)as i128,0i128,1i128);while s!=0{...
+    |     ^^^^^^^
+ 39 |  fn trim(&self,a:&[u64])->Vec<u64>{let mut a:Vec<_>=a.iter().map(|x|x%self.p).collect();while a.len()>1&&a.last()==Some(&0){a.pop()...
+    |     ^^^^
+ 40 |  pub fn add(&self,a:&[u64],b:&[u64])->Vec<u64>{let(a,b)=(self.trim(a),self.trim(b));let mut c=vec![0;a.len().max(b.len())];for(i,x)...
+    |         ^^^
+ 41 |  pub fn sub(&self,a:&[u64],b:&[u64])->Vec<u64>{let b:Vec<_>=b.iter().map(|x|(self.p-x%self.p)%self.p).collect();self.add(a,&b)}
+    |         ^^^
+ 42 |  pub fn mul(&mut self,a:&[u64],b:&[u64])->Vec<u64>{
+    |         ^^^
+...
+ 50 |  pub fn mul_low(&mut self,a:&[u64],b:&[u64],n:usize)->Vec<u64>{
+    |         ^^^^^^^
+...
+ 77 |  pub fn inv_series(&mut self,a:&[u64],n:usize)->Result<Vec<u64>,Error>{
+    |         ^^^^^^^^^^
+...
+ 82 |  pub fn divrem(&mut self,a:&[u64],b:&[u64])->Result<(Vec<u64>,Vec<u64>),Error>{
+    |         ^^^^^^
+...
+ 87 |  pub fn product_tree(&mut self,points:&[u64])->Result<Tree,Error>{
+    |         ^^^^^^^^^^^^
+...
+ 94 |  fn monic_remainder(&mut self,a:&[u64],b:&[u64])->Result<Vec<u64>,Error>{
+    |     ^^^^^^^^^^^^^^^
+...
+100 |  pub fn values(&mut self,a:&[u64],tree:&Tree)->Result<Vec<u64>,Error>{
+    |         ^^^^^^
+...
+107 |  fn matrix_mul(&mut self,a:&Matrix,b:&Matrix)->Matrix{
+    |     ^^^^^^^^^^
+...
+110 |  fn matrix_apply(&mut self,m:&Matrix,a:&[u64],b:&[u64])->(Vec<u64>,Vec<u64>){
+    |     ^^^^^^^^^^^^
+...
+114 |  fn step_matrix(&self,q:&[u64])->Matrix{[[vec![0],vec![1]],[vec![1],self.sub(&[0],q)]]}
+    |     ^^^^^^^^^^^
+115 |  fn lifted(&mut self,mut batch:Batch,a:&[u64],b:&[u64],shift:usize)->Result<Batch,Error>{
+    |     ^^^^^^
+...
+122 |  fn half_gcd(&mut self,a:&[u64],b:&[u64])->Result<Batch,Error>{
+    |     ^^^^^^^^
+...
+144 |  pub fn resultant_class(&mut self,a:&[u64],b:&[u64])->Result<ResultantClass,Error>{
+    |         ^^^^^^^^^^^^^^^
+...
+162 |  pub fn image_class(&self,v:u64)->Result<ResultantClass,Error>{if 1u64<<(self.p-1).trailing_zeros()>4{return Err(Error::Domain);}Ok...
+    |         ^^^^^^^^^^^
+163 |  pub fn projected_resultant(&mut self,a:&[u64],b:&[u64])->Result<u64,Error>{Ok(self.resultant_class(a,b)?.project())}
+    |         ^^^^^^^^^^^^^^^^^^^
+164 |  /// Build only the product polynomial: no retained subproduct tree nodes.
+165 |  pub fn root_product(&mut self,roots:&[u64])->Result<Vec<u64>,Error>{
+    |         ^^^^^^^^^^^^
+...
+170 |  pub fn root_resultant_class(&mut self,roots:&[u64],points:&[u64])->Result<ResultantClass,Error>{let f=self.root_product(roots)?;le...
+    |         ^^^^^^^^^^^^^^^^^^^^
+171 |  pub fn root_projected_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+176 |  pub fn value_product(&mut self,a:&[u64],tree:&Tree)->Result<u64,Error>{
+    |         ^^^^^^^^^^^^^
+...
+184 |  pub fn root_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{let source=self.product_tree(roots)?;let destinatio...
+    |         ^^^^^^^^^^^^^^
+
+warning: struct `Point` is never constructed
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-orbit-local-terms/local.rs:3:12
+  |
+3 | pub struct Point { pub x:u64, pub y:u64 }
+  |            ^^^^^
+
+warning: struct `Curve` is never constructed
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-orbit-local-terms/local.rs:5:12
+  |
+5 | pub struct Curve { p:u64, a:u64, b:u64 }
+  |            ^^^^^
+
+warning: struct `Local` is never constructed
+ --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-orbit-local-terms/local.rs:7:12
+  |
+7 | pub struct Local { pub order:i128, pub coefficient:u64 }
+  |            ^^^^^
+
+warning: multiple associated items are never used
+  --> ../feature-native-fast-moment-roots/../feature-native-inert-seed/../feature-orbit-local-terms/local.rs:9:9
+   |
+ 8 | impl Curve {
+   | ---------- associated items in this implementation
+ 9 |  pub fn new(p:u64,a:u64,b:u64)->Self {assert!(p>3 && p<=u64::MAX/2 && a<p && b<p);let c=Self{p,a,b};assert_ne!(c.add(c.mul(4,c.pow(a...
+   |         ^^^
+10 |  fn add(self,a:u64,b:u64)->u64 {(a+b)%self.p}
+   |     ^^^
+11 |  fn neg(self,a:u64)->u64 {if a==0 {0}else{self.p-a}}
+   |     ^^^
+12 |  fn sub(self,a:u64,b:u64)->u64 {self.add(a,self.neg(b))}
+   |     ^^^
+13 |  fn mul(self,a:u64,b:u64)->u64 {((a as u128*b as u128)%self.p as u128)as u64}
+   |     ^^^
+14 |  fn pow(self,mut a:u64,mut n:u64)->u64 {let mut z=1;while n>0 {if n&1==1 {z=self.mul(z,a)}a=self.mul(a,a);n>>=1;}z}
+   |     ^^^
+15 |  fn inv(self,a:u64)->u64 {assert_ne!(a,0);let z=self.pow(a,self.p-2);assert_eq!(self.mul(a,z),1);z}
+   |     ^^^
+16 |  fn div(self,a:u64,b:u64)->u64 {self.mul(a,self.inv(b))}
+   |     ^^^
+17 |  fn valid(self,t:Point){assert!(t.x<self.p&&t.y<self.p);assert_eq!(self.mul(t.y,t.y),self.add(self.add(self.pow(t.x,3),self.mul(self...
+   |     ^^^^^
+18 |  pub fn negative(self,t:Point)->Point {Point{x:t.x,y:self.neg(t.y)}}
+   |         ^^^^^^^^
+19 |  pub fn plus(self,a:Option<Point>,b:Option<Point>)->Option<Point> {
+   |         ^^^^
+...
+25 |  fn combine(self,a:Local,b:Local,divide:bool)->Local {Local{order:if divide{a.order.checked_sub(b.order)}else{a.order.checked_add(b....
+   |     ^^^^^^^
+26 |  fn vertical(self,x:u64,t:Option<Point>)->Local {
+   |     ^^^^^^^^
+...
+30 |  fn line(self,a:Point,l:u64,t:Option<Point>)->Local {
+   |     ^^^^
+...
+42 |  fn g(self,a:Option<Point>,b:Option<Point>,t:Option<Point>)->Local {
+   |     ^
+...
+51 |  pub fn miller(self,base:Point,r:u64,t:Option<Point>)->Local {
+   |         ^^^^^^
+...
+61 |  pub fn invariant(self,z:Local,t:Point)->Local {assert_ne!(t.y,0);let b=self.mul(2,t.y);let e=u64::try_from(z.order.unsigned_abs())....
+   |         ^^^^^^^^^
+
+warning: type alias `Pair` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/lib.rs:5:10
+  |
+5 | pub type Pair=[u64;2];
+  |          ^^^^
+
+warning: enum `Error` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/lib.rs:6:36
+  |
+6 | #[derive(Debug,PartialEq)]pub enum Error{Domain,Point,NonTorsion,Geometry,Polynomial,Degenerate,Character,Limit}
+  |                                    ^^^^^
+
+warning: function `mul` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/lib.rs:7:4
+  |
+7 | fn mul(a:u64,b:u64,p:u64)->u64{((a as u128*b as u128)%p as u128)as u64}
+  |    ^^^
+
+warning: function `pow` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/lib.rs:8:4
+  |
+8 | fn pow(mut a:u64,mut n:u64,p:u64)->u64{let mut z=1;while n>0{if n&1==1{z=mul(z,a,p)}a=mul(a,a,p);n>>=1;}z}
+  |    ^^^
+
+warning: function `partition` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/lib.rs:9:4
+  |
+9 | fn partition(r:u64)->[u64;4]{let h=(r-1)/2;let target=(h+1)/2;let(mut lo,mut hi)=(1,target);while lo<hi{let m=lo+(hi-lo)/2;if(m as u1...
+  |    ^^^^^^^^^
+
+warning: function `powers` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/lib.rs:10:4
+   |
+10 | fn powers(part:[u64;4],q:u64)->[u64;3]{let[w,k,s,e]=part;let mut f=[k-1,k,k+1];let i=f.iter().position(|n|n%3==0).unwrap();f[i]/=3;l...
+   |    ^^^^^^
+
+warning: struct `Source` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/lib.rs:11:12
+   |
+11 | pub struct Source {p:u64,a:u64,b:u64,r:u64,part:[u64;4],powers:[u64;3],curve:geometry::Curve,calibration:u64}
+   |            ^^^^^^
+
+warning: associated items `new`, `raw`, and `sign` are never used
+  --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/lib.rs:14:9
+   |
+12 | impl Source{
+   | ----------- associated items in this implementation
+13 |  /// max_lanes bounds materialized geometry before allocation. p,r primality is a caller obligation.
+14 |  pub fn new(p:u64,a:u64,b:u64,r:u64,base:[u64;2],max_lanes:usize)->Result<Self,Error>{
+   |         ^^^
+...
+21 |  pub fn raw(&self,t:[u64;2])->Result<u64,Error>{
+   |         ^^^
+...
+31 |  pub fn sign(&self,t:Option<[u64;2]>)->Result<i8,Error>{let t=match t{None=>return Ok(0),Some(t)=>t};let v=self.raw(t)?;if v==self.c...
+   |         ^^^^
+
+warning: struct `F` is never constructed
+ --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:4:8
+  |
+4 | struct F{v:u64,p:u64}
+  |        ^
+
+warning: associated items `c`, `sq`, and `inv` are never used
+ --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:6:5
+  |
+5 | impl F{
+  | ------ associated items in this implementation
+6 |  fn c(v:u64,p:u64)->Self{Self{v:v%p,p}}
+  |     ^
+7 |  fn sq(self)->Self{self*self}
+  |     ^^
+8 |  fn inv(self)->Option<Self>{#[cfg(test)] bump_inverse();let(mut r,mut s,mut x,mut y)=(self.p as i128,self.v as i128,0i128,1i128);whil...
+  |     ^^^
+
+warning: type alias `J` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:13:6
+   |
+13 | type J=Option<[F;3]>;
+   |      ^
+
+warning: enum `Error` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:15:10
+   |
+15 | pub enum Error{Domain,Point,Singular,Partition,Empty,Infinity,Nonunit}
+   |          ^^^^^
+
+warning: struct `Curve` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:16:12
+   |
+16 | pub struct Curve{p:u64,a:F,b:F}
+   |            ^^^^^
+
+warning: struct `Grid` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:18:12
+   |
+18 | pub struct Grid{pub labels:Vec<u64>,pub projective:Vec<[u64;3]>,pub affine:Vec<[u64;2]>,pub inverse_z:Vec<u64>}
+   |            ^^^^
+
+warning: multiple associated items are never used
+  --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:20:9
+   |
+19 | impl Curve{
+   | ---------- associated items in this implementation
+20 |  pub fn new(p:u64,a:u64,b:u64)->Result<Self,Error>{
+   |         ^^^
+...
+24 |  fn f(&self,n:u64)->F{F::c(n,self.p)}
+   |     ^
+25 |  fn point(&self,q:[u64;2])->Result<J,Error>{if q.iter().any(|v|*v>=self.p){return Err(Error::Point);}let(x,y)=(self.f(q[0]),self.f(q...
+   |     ^^^^^
+26 |  fn double(&self,t:[F;3])->J{
+   |     ^^^^^^
+...
+30 |  fn add(&self,a:J,b:J)->J{
+   |     ^^^
+...
+38 |  fn mul(&self,mut n:u64,base:J)->J{let(mut t,mut a)=(None,base);while n!=0{if n&1!=0{t=self.add(t,a);}n>>=1;if n!=0{a=self.add(a,a);...
+   |     ^^^
+39 |  fn batch(&self,points:&[J])->Result<(Vec<[u64;2]>,Vec<u64>),Error>{
+   |     ^^^^^
+...
+50 |  pub fn grid(&self,r:u64,q:[u64;2],width:u64,blocks:u64,s:u64,epsilon:u64)->Result<Grid,Error>{
+   |         ^^^^
+
+warning: struct `Prepared` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:64:12
+   |
+64 | pub struct Prepared<'a>{curve:&'a Curve,r:u64,base:J,public_base:[u64;2],partition:[u64;4],labels:Vec<u64>,strides:Vec<J>,affine_str...
+   |            ^^^^^^^^
+
+warning: struct `Slot` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:66:12
+   |
+66 | pub struct Slot{pub offset:usize,pub lane:usize,pub label:u64,pub projective:[u64;3],pub affine:[u64;2],pub inverse_z:u64}
+   |            ^^^^
+
+warning: struct `Window` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:68:12
+   |
+68 | pub struct Window{pub labels:Vec<u64>,pub initialization:&'static str,pub snapshots:Vec<Vec<Option<[u64;3]>>>,pub slots:Vec<Slot>,pu...
+   |            ^^^^^^
+
+warning: methods `projective_only`, `mixed`, and `prepare` are never used
+  --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:70:5
+   |
+69 | impl Curve{
+   | ---------- methods in this implementation
+70 |  fn projective_only(&self,r:u64,q:[u64;2],width:u64,blocks:u64,s:u64,epsilon:u64)->Result<(Vec<u64>,Vec<J>),Error>{
+   |     ^^^^^^^^^^^^^^^
+...
+80 |  fn mixed(&self,a:J,b:Option<[F;2]>)->J{
+   |     ^^^^^
+...
+88 |  pub fn prepare(&self,r:u64,p:[u64;2],width:u64,blocks:u64,s:u64,epsilon:u64)->Result<Prepared<'_>,Error>{
+   |         ^^^^^^^
+
+warning: method `window` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:97:9
+   |
+94 | impl Prepared<'_>{
+   | ----------------- method in this implementation
+...
+97 |  pub fn window(&self,shifts:&[Option<[u64;2]>])->Result<Window,Error>{
+   |         ^^^^^^
+
+warning: struct `JointWindow` is never constructed
+   --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:126:12
+    |
+126 | pub struct JointWindow{pub shifts:Vec<Option<[u64;2]>>,pub geometry:Window,pub converted_points:usize}
+    |            ^^^^^^^^^^^
+
+warning: method `joint_window` is never used
+   --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-joint-window/lib.rs:130:9
+    |
+127 | impl Prepared<'_>{
+    | ----------------- method in this implementation
+...
+130 |  pub fn joint_window(&self,q:Option<[u64;2]>,length:usize)->Result<JointWindow,Error>{
+    |         ^^^^^^^^^^^^
+
+warning: struct `F` is never constructed
+ --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-value-division/lib.rs:6:8
+  |
+6 | struct F {v:u64,p:u64}
+  |        ^
+
+warning: associated items `c`, `sq`, `cube`, and `inv` are never used
+  --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-value-division/lib.rs:8:5
+   |
+ 7 | impl F {
+   | ------ associated items in this implementation
+ 8 |  fn c(v:u64,p:u64)->Self{Self{v:v%p,p}}
+   |     ^
+ 9 |  fn sq(self)->Self{self*self}
+   |     ^^
+10 |  fn cube(self)->Self{self.sq()*self}
+   |     ^^^^
+11 |  fn inv(self)->Option<Self>{
+   |     ^^^
+
+warning: enum `Error` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-value-division/lib.rs:21:10
+   |
+21 | pub enum Error{Domain,Point,Singular,ZeroY,Nonunit}
+   |          ^^^^^
+
+warning: struct `ValueDivision` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-value-division/lib.rs:24:12
+   |
+24 | pub struct ValueDivision{inverse_two_y:F,cache:BTreeMap<u64,F>}
+   |            ^^^^^^^^^^^^^
+
+warning: associated items `new`, `field_value`, `value`, and `retained_indices` are never used
+  --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-value-division/lib.rs:26:9
+   |
+25 | impl ValueDivision{
+   | ------------------ associated items in this implementation
+26 |  pub fn new(p:u64,a:u64,b:u64,x:u64,y:u64)->Result<Self,Error>{
+   |         ^^^
+...
+39 |  fn field_value(&mut self,n:u64)->F{
+   |     ^^^^^^^^^^^
+...
+51 |  pub fn value(&mut self,n:u64)->u64{self.field_value(n).v}
+   |         ^^^^^
+52 |  pub fn retained_indices(&self)->usize{self.cache.len()}
+   |         ^^^^^^^^^^^^^^^^
+
+warning: function `geometry_ratio` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-half-gcd/residual.rs:4:15
+  |
+4 | pub(crate) fn geometry_ratio(p:u64,part:[u64;4],q:[u64;2],grid:&[[u64;2]])->Result<Pair,Error>{
+  |               ^^^^^^^^^^^^^^
+
+warning: enum `Error` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:4:10
+  |
+4 | pub enum Error{Domain,Nonunit,Order,ZeroDivisor,EmptyTree,Invariant}
+  |          ^^^^^
+
+warning: struct `Poly` is never constructed
+ --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:5:12
+  |
+5 | pub struct Poly{p:u64,pub karatsuba_calls:usize,pub newton_steps:usize}
+  |            ^^^^
+
+warning: struct `Tree` is never constructed
+ --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:6:12
+  |
+6 | pub struct Tree{p:u64,polynomial:Vec<u64>,children:Option<(Box<Tree>,Box<Tree>)>}
+  |            ^^^^
+
+warning: method `polynomial` is never used
+ --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:7:18
+  |
+7 | impl Tree{pub fn polynomial(&self)->&[u64]{&self.polynomial}}
+  | ---------        ^^^^^^^^^^
+  | |
+  | method in this implementation
+
+warning: struct `ResultantClass` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:11:12
+   |
+11 | pub struct ResultantClass { p:u64, representative:u64 }
+   |            ^^^^^^^^^^^^^^
+
+warning: methods `combine`, `square`, `negate`, `is_zero`, and `project` are never used
+  --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:16:9
+   |
+15 | impl ResultantClass{
+   | ------------------- methods in this implementation
+16 |  pub fn combine(self,other:Self)->Result<Self,Error>{if self.p!=other.p{return Err(Error::Domain);}Ok(Self{p:self.p,representative:(...
+   |         ^^^^^^^
+17 |  pub fn square(self)->Self{Self{p:self.p,representative:((self.representative as u128*self.representative as u128)%self.p as u128)as...
+   |         ^^^^^^
+18 |  pub fn negate(self)->Self{Self{p:self.p,representative:(self.p-self.representative)%self.p}}
+   |         ^^^^^^
+19 |  pub fn is_zero(&self)->bool{self.representative==0}
+   |         ^^^^^^^
+20 |  pub fn project(self)->u64{
+   |         ^^^^^^^
+
+warning: type alias `Matrix` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:26:6
+   |
+26 | type Matrix=[[Vec<u64>;2];2];
+   |      ^^^^^^
+
+warning: struct `Transition` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:28:8
+   |
+28 | struct Transition{m:usize,n:usize,k:Option<usize>,leading:u64}
+   |        ^^^^^^^^^^
+
+warning: struct `Batch` is never constructed
+  --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:29:8
+   |
+29 | struct Batch{matrix:Matrix,a:Vec<u64>,b:Vec<u64>,steps:Vec<Transition>}
+   |        ^^^^^
+
+warning: function `degree` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:30:4
+   |
+30 | fn degree(a:&[u64])->Option<usize>{if a==[0]{None}else{Some(a.len()-1)}}
+   |    ^^^^^^
+
+warning: function `identity` is never used
+  --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:31:4
+   |
+31 | fn identity()->Matrix{[[vec![1],vec![0]],[vec![0],vec![1]]]}
+   |    ^^^^^^^^
+
+warning: multiple associated items are never used
+   --> ../feature-native-fast-moment-roots/../feature-native-standalone-source/../feature-native-half-gcd/polynomial.rs:36:9
+    |
+ 35 | impl Poly{
+    | --------- associated items in this implementation
+ 36 |  pub fn new(p:u64)->Result<Self,Error>{if p<3||p>u64::MAX/2{return Err(Error::Domain);}Ok(Self{p,karatsuba_calls:0,newton_steps:0})}
+    |         ^^^
+ 37 |  fn fm(&self,a:u64,b:u64)->u64{((a as u128*b as u128)%self.p as u128)as u64}
+    |     ^^
+ 38 |  fn inverse(&self,a:u64)->Result<u64,Error>{let(mut r,mut s,mut x,mut y)=(self.p as i128,(a%self.p)as i128,0i128,1i128);while s!=0{...
+    |     ^^^^^^^
+ 39 |  fn trim(&self,a:&[u64])->Vec<u64>{let mut a:Vec<_>=a.iter().map(|x|x%self.p).collect();while a.len()>1&&a.last()==Some(&0){a.pop()...
+    |     ^^^^
+ 40 |  pub fn add(&self,a:&[u64],b:&[u64])->Vec<u64>{let(a,b)=(self.trim(a),self.trim(b));let mut c=vec![0;a.len().max(b.len())];for(i,x)...
+    |         ^^^
+ 41 |  pub fn sub(&self,a:&[u64],b:&[u64])->Vec<u64>{let b:Vec<_>=b.iter().map(|x|(self.p-x%self.p)%self.p).collect();self.add(a,&b)}
+    |         ^^^
+ 42 |  pub fn mul(&mut self,a:&[u64],b:&[u64])->Vec<u64>{
+    |         ^^^
+...
+ 50 |  pub fn mul_low(&mut self,a:&[u64],b:&[u64],n:usize)->Vec<u64>{
+    |         ^^^^^^^
+...
+ 77 |  pub fn inv_series(&mut self,a:&[u64],n:usize)->Result<Vec<u64>,Error>{
+    |         ^^^^^^^^^^
+...
+ 82 |  pub fn divrem(&mut self,a:&[u64],b:&[u64])->Result<(Vec<u64>,Vec<u64>),Error>{
+    |         ^^^^^^
+...
+ 87 |  pub fn product_tree(&mut self,points:&[u64])->Result<Tree,Error>{
+    |         ^^^^^^^^^^^^
+...
+ 94 |  fn monic_remainder(&mut self,a:&[u64],b:&[u64])->Result<Vec<u64>,Error>{
+    |     ^^^^^^^^^^^^^^^
+...
+100 |  pub fn values(&mut self,a:&[u64],tree:&Tree)->Result<Vec<u64>,Error>{
+    |         ^^^^^^
+...
+107 |  fn matrix_mul(&mut self,a:&Matrix,b:&Matrix)->Matrix{
+    |     ^^^^^^^^^^
+...
+110 |  fn matrix_apply(&mut self,m:&Matrix,a:&[u64],b:&[u64])->(Vec<u64>,Vec<u64>){
+    |     ^^^^^^^^^^^^
+...
+114 |  fn step_matrix(&self,q:&[u64])->Matrix{[[vec![0],vec![1]],[vec![1],self.sub(&[0],q)]]}
+    |     ^^^^^^^^^^^
+115 |  fn lifted(&mut self,mut batch:Batch,a:&[u64],b:&[u64],shift:usize)->Result<Batch,Error>{
+    |     ^^^^^^
+...
+122 |  fn half_gcd(&mut self,a:&[u64],b:&[u64])->Result<Batch,Error>{
+    |     ^^^^^^^^
+...
+144 |  pub fn resultant_class(&mut self,a:&[u64],b:&[u64])->Result<ResultantClass,Error>{
+    |         ^^^^^^^^^^^^^^^
+...
+162 |  pub fn image_class(&self,v:u64)->Result<ResultantClass,Error>{if 1u64<<(self.p-1).trailing_zeros()>4{return Err(Error::Domain);}Ok...
+    |         ^^^^^^^^^^^
+163 |  pub fn projected_resultant(&mut self,a:&[u64],b:&[u64])->Result<u64,Error>{Ok(self.resultant_class(a,b)?.project())}
+    |         ^^^^^^^^^^^^^^^^^^^
+164 |  /// Build only the product polynomial: no retained subproduct tree nodes.
+165 |  pub fn root_product(&mut self,roots:&[u64])->Result<Vec<u64>,Error>{
+    |         ^^^^^^^^^^^^
+...
+170 |  pub fn root_resultant_class(&mut self,roots:&[u64],points:&[u64])->Result<ResultantClass,Error>{let f=self.root_product(roots)?;le...
+    |         ^^^^^^^^^^^^^^^^^^^^
+171 |  pub fn root_projected_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^
+...
+176 |  pub fn value_product(&mut self,a:&[u64],tree:&Tree)->Result<u64,Error>{
+    |         ^^^^^^^^^^^^^
+...
+184 |  pub fn root_resultant(&mut self,roots:&[u64],points:&[u64])->Result<u64,Error>{let source=self.product_tree(roots)?;let destinatio...
+    |         ^^^^^^^^^^^^^^
+
+warning: struct `Point` is never constructed
+ --> ../feature-native-fast-moment-roots/../feature-orbit-local-terms/local.rs:3:12
+  |
+3 | pub struct Point { pub x:u64, pub y:u64 }
+  |            ^^^^^
+
+warning: struct `Curve` is never constructed
+ --> ../feature-native-fast-moment-roots/../feature-orbit-local-terms/local.rs:5:12
+  |
+5 | pub struct Curve { p:u64, a:u64, b:u64 }
+  |            ^^^^^
+
+warning: struct `Local` is never constructed
+ --> ../feature-native-fast-moment-roots/../feature-orbit-local-terms/local.rs:7:12
+  |
+7 | pub struct Local { pub order:i128, pub coefficient:u64 }
+  |            ^^^^^
+
+warning: multiple associated items are never used
+  --> ../feature-native-fast-moment-roots/../feature-orbit-local-terms/local.rs:9:9
+   |
+ 8 | impl Curve {
+   | ---------- associated items in this implementation
+ 9 |  pub fn new(p:u64,a:u64,b:u64)->Self {assert!(p>3 && p<=u64::MAX/2 && a<p && b<p);let c=Self{p,a,b};assert_ne!(c.add(c.mul(4,c.pow(a...
+   |         ^^^
+10 |  fn add(self,a:u64,b:u64)->u64 {(a+b)%self.p}
+   |     ^^^
+11 |  fn neg(self,a:u64)->u64 {if a==0 {0}else{self.p-a}}
+   |     ^^^
+12 |  fn sub(self,a:u64,b:u64)->u64 {self.add(a,self.neg(b))}
+   |     ^^^
+13 |  fn mul(self,a:u64,b:u64)->u64 {((a as u128*b as u128)%self.p as u128)as u64}
+   |     ^^^
+14 |  fn pow(self,mut a:u64,mut n:u64)->u64 {let mut z=1;while n>0 {if n&1==1 {z=self.mul(z,a)}a=self.mul(a,a);n>>=1;}z}
+   |     ^^^
+15 |  fn inv(self,a:u64)->u64 {assert_ne!(a,0);let z=self.pow(a,self.p-2);assert_eq!(self.mul(a,z),1);z}
+   |     ^^^
+16 |  fn div(self,a:u64,b:u64)->u64 {self.mul(a,self.inv(b))}
+   |     ^^^
+17 |  fn valid(self,t:Point){assert!(t.x<self.p&&t.y<self.p);assert_eq!(self.mul(t.y,t.y),self.add(self.add(self.pow(t.x,3),self.mul(self...
+   |     ^^^^^
+18 |  pub fn negative(self,t:Point)->Point {Point{x:t.x,y:self.neg(t.y)}}
+   |         ^^^^^^^^
+19 |  pub fn plus(self,a:Option<Point>,b:Option<Point>)->Option<Point> {
+   |         ^^^^
+...
+25 |  fn combine(self,a:Local,b:Local,divide:bool)->Local {Local{order:if divide{a.order.checked_sub(b.order)}else{a.order.checked_add(b....
+   |     ^^^^^^^
+26 |  fn vertical(self,x:u64,t:Option<Point>)->Local {
+   |     ^^^^^^^^
+...
+30 |  fn line(self,a:Point,l:u64,t:Option<Point>)->Local {
+   |     ^^^^
+...
+42 |  fn g(self,a:Option<Point>,b:Option<Point>,t:Option<Point>)->Local {
+   |     ^
+...
+51 |  pub fn miller(self,base:Point,r:u64,t:Option<Point>)->Local {
+   |         ^^^^^^
+...
+61 |  pub fn invariant(self,z:Local,t:Point)->Local {assert_ne!(t.y,0);let b=self.mul(2,t.y);let e=u64::try_from(z.order.unsigned_abs())....
+   |         ^^^^^^^^^
+
+warning: 255 warnings emitted
+
