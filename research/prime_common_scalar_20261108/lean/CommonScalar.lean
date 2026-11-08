@@ -20,8 +20,11 @@ theorem normalizer_node (a m : ℕ) (hm : m < 2^(a+1)) :
   · intro h
     exact False.elim (h (Finset.mem_range.mpr hm))
 
-def kernel (a k : ℕ) (t : ℚ) : ℚ :=
+@[expose] def kernel (a k : ℕ) (t : ℚ) : ℚ :=
   normalizer a t * baseKernel a k t * baseKernel a k t
+
+theorem kernel_formula (a k : ℕ) (t : ℚ) :
+    kernel a k t = normalizer a t * baseKernel a k t * baseKernel a k t := rfl
 
 theorem node_preserved (a k m : ℕ)
     (hk : k < 2^(a+1)) (hm : m < 2^(a+1)) :
