@@ -34,3 +34,8 @@ recursive contraction homogeneity, full finite-precision Hermite recovery,
 uniform mode bound or ECDLP complexity theorem follows from these statements.
 A natural-cast simplification and imported module APIs were repaired in failed
 builds without adding assumptions; exact failures are retained.
+
+The committed-source jet-stability registration isPCC-20261108-78ae71.
+The earlier bfec94 draft-source event remains in the ledger and claim archive;
+no unsigned record was silently edited or removed. Both bind the same theorem
+statement; the current citation has a producer commit containing the module.

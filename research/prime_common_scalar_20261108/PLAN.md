@@ -14,17 +14,29 @@ amendment to the observed results.
    reciprocal as an integral truncated series and bound its operations and
    coefficient bit lengths. Reject any approach requiring an assumed unit for
    an unspecified normalizer or testing only integer z.
+   **Algebraic core completed:** LocalIntegral and LocalCharts construct the
+   actual coefficient ring, shifted actual kernel, denominator polynomial and
+   reciprocal. No even-coefficient hypothesis is required for this formal
+   inversion. Construction operation/bit-cost bounds remain open. See
+   LOCAL_SERIES.md and lean/LOCAL_SERIES_PROOF_MAP.md. [pcc:unverified]
 2. **Actual cleared polynomial.** Represent each source B_d as an explicit
    polynomial, prove evaluation agrees with baseKernel and natDegree<=2L-1.
    Connect squared_product_degree to it. Prove every actual contraction term
    has exactly M kernel occurrences, or homogenize with a charged counter.
    Check exceptional cases D=0 outside local charts; do not cancel there.
+   **Actual polynomial bridge completed:** GlobalPolynomials proves evaluation
+   equals imported baseKernel and binds the degree bound to it. Actual recursive
+   contraction homogeneity and exceptional evaluations remain open. [pcc:unverified]
 3. **Recovery under the correct budget.** Use all source levels. First formalize
    the actual source node counts and multiplicity, then lift three_level_margin
    to degree M(4L-2). Reprove the finite-precision Hermite evaluation bound with
    supplied integral jets and the exact source precision p_i. Show multiplication
    by D^M and inversion at0 preserve the target value and precision. The numeric
    margin alone does not close this step.
+   **Local algebraic precision step completed conditionally:** LocalPrecision
+   proves inverse stability modulo (2^p,X^q) from input ideal membership and an
+   exact inverse of the approximation. Concrete finite-buffer equivalence and
+   full Hermite precision are still open. [pcc:unverified]
 4. **Uniform modes and total recursive cost.** Derive squared Cauchy modes with
    coefficient(b+1), genuine nonzero valuations, all tiles/rows/levels, source
    variables and child entries. Charge D, inverse, factorization, tuple
@@ -47,3 +59,4 @@ amendment to the observed results.
 
 Independent signed PCC and review are required for verified standing. Producer
 proof builds/recounts remain labelled unverified; never manufacture independence.
+This is a standing requirement, not a result. [pcc:unverified]

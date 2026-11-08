@@ -1,5 +1,11 @@
 # Common scalar repair: finite evidence and the next denominator
 
+Historical experiment/theory snapshot from the first session. The coefficientwise
+inverse and actual polynomial representation left open below were subsequently
+proved in [LOCAL_SERIES.md](LOCAL_SERIES.md), with their exact scope and new
+receipts. The frozen panel, counts, raw data and original PDF remain unchanged.
+No later proof is retroactively counted as an experimental observation.
+
 All producer results below carry unsigned standing. ClaimPCC-20261108-4f9871
 records the finite census; theorem records and exact hypotheses are listed in
 lean/PROOF_MAP.md. Nothing here supplies a signed independent verdict.

@@ -1,12 +1,18 @@
 # Common scalar square and a rational successor
 
+Update: the actual coefficientwise local-series and polynomial-degree bridges
+now have source-connected Lean proofs. See [the proof addendum](LOCAL_SERIES.md)
+and its [PDF](reports/local-series-20261108/report.pdf). Construction costs,
+finite-buffer/recovery and recursive-program bridges remain open. These are
+unsigned producer claims1270b2/ad84dd/ee5503. [pcc:unverified]
+
 The common scalar removes the finite mode proliferation that the entry-dependent
 normalizer caused in the previous panel. At equal precision it has fewer tuple
 counts in all2616 registered cells for both Newton and Smith representations.
 This is unsigned producer evidence, recorded as PCC-20261108-4f9871.
 [pcc:unverified]
 
-The next construction is a common **rational** denominator, not an entry-dependent
+The selected construction is a common **rational** denominator, not an entry-dependent
 one: `U_d(T)=B_d(T)^2/D(T)`, `D(T)=sum_s B_s(T)=C'(T)/C'(0)`. Its node identity
 and homogeneous denominator clearing now have Lean proofs. This is a concrete
 successor to the completed polynomial-scalar experiment; it has not been run
