@@ -398,6 +398,12 @@ enum Cmd {
         /// the comparison, which is then not admissible).
         #[arg(long)]
         allow_interrupted: bool,
+        /// Also price, in the §5a band and under --weight, the per-step
+        /// table inserts the IC table oracles count in `work_native`
+        /// (`table_insert_attempts` behind its `counted:` marker), which
+        /// `cost.unpriced` never lists; off by default, the committed band.
+        #[arg(long)]
+        price_table_work: bool,
     },
     /// The one-unit table: every arm on every curve, mean S, ratio to the
     /// floor and to the reference arm.
@@ -425,6 +431,13 @@ enum Cmd {
         /// Print the pairwise verdicts after the table.
         #[arg(long)]
         ranks: bool,
+        /// Also price the per-step table inserts the IC table oracles
+        /// count in `work_native` (`table_insert_attempts` behind its
+        /// `counted:` marker), which `cost.unpriced` never lists, at w per
+        /// operation like rho's canonicalisations; off by default, the
+        /// committed band. The record format is unchanged.
+        #[arg(long)]
+        price_table_work: bool,
     },
     /// Resource vectors for all measured attempts; no invented SAT/GAE conversion.
     Resources {
@@ -1756,6 +1769,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             save,
             json,
             allow_interrupted,
+            price_table_work,
         } => {
             let c = compare::compare_weighted_with(
                 &dir,
@@ -1766,15 +1780,17 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     resamples,
                     seed,
                     allow_interrupted,
+                    pricing: crypto_lib::cryptanalysis::ecbench::band::Pricing {
+                        table_work: price_table_work,
+                    },
                 },
                 weight,
             )?;
             if save {
                 let d = dir.join("comparisons");
                 std::fs::create_dir_all(&d).map_err(|e| e.to_string())?;
-                let suffix = c
-                    .pricing_weight
-                    .map(|_| format!("__{}", c.comparison_id))
+                let suffix = (c.pricing_weight.is_some() || !c.priced_table_work.is_empty())
+                    .then(|| format!("__{}", c.comparison_id))
                     .unwrap_or_default();
                 let f = d.join(format!("{a}__{b}{suffix}.json"));
                 std::fs::write(
@@ -1790,6 +1806,12 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 println!("{}", c.verdict);
                 if let Some(weight) = c.pricing_weight {
                     println!("pricing weight: {weight} GAE per native operation");
+                }
+                if !c.priced_table_work.is_empty() {
+                    println!(
+                        "table work priced with the unpriced counters: {}",
+                        c.priced_table_work.join(", ")
+                    );
                 }
                 if let Some(q) = &c.quality {
                     println!(
@@ -1840,9 +1862,29 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                             .collect::<Vec<_>>()
                             .join(", ")
                     };
+                    let table_work = if arm.table_work_counts.is_empty() {
+                        "none".to_string()
+                    } else {
+                        arm.table_work_counts
+                            .iter()
+                            .map(|(k, v)| format!("{k}={v}"))
+                            .collect::<Vec<_>>()
+                            .join(", ")
+                    };
                     println!(
-                        "arm {}: verified {}/{} ({} censored); {}; unpriced: {}",
-                        arm.arm, arm.verified, arm.measured, arm.censored, tail, unpriced
+                        "arm {}: verified {}/{} ({} censored); {}; unpriced: {}; table work ({}): {}",
+                        arm.arm,
+                        arm.verified,
+                        arm.measured,
+                        arm.censored,
+                        tail,
+                        unpriced,
+                        if c.priced_table_work.is_empty() {
+                            "listed, not priced"
+                        } else {
+                            "priced"
+                        },
+                        table_work
                     );
                 }
                 let o = |v: Option<f64>| v.map(|x| format!("{x:.4}")).unwrap_or_else(|| "–".into());
@@ -1885,7 +1927,8 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             weights,
             json,
             ranks,
-        } => band_cmd(&dir, &weights, json.as_deref(), ranks)?,
+            price_table_work,
+        } => band_cmd(&dir, &weights, json.as_deref(), ranks, price_table_work)?,
         Cmd::Resources { dir, out } => {
             let report = resources::session(&dir)?;
             if let Some(path) = out {
@@ -2591,6 +2634,7 @@ fn band_cmd(
     weights: &str,
     json: Option<&std::path::Path>,
     ranks: bool,
+    price_table_work: bool,
 ) -> Result<(), String> {
     let weights: Vec<f64> = weights
         .split(',')
@@ -2604,7 +2648,10 @@ fn band_cmd(
     for d in dirs {
         recs.extend(runner::read_records(d)?);
     }
-    let rep = crypto_lib::cryptanalysis::ecbench::band::band(&recs, &weights)?;
+    let pricing = crypto_lib::cryptanalysis::ecbench::band::Pricing {
+        table_work: price_table_work,
+    };
+    let rep = crypto_lib::cryptanalysis::ecbench::band::band_with(&recs, &weights, pricing)?;
     print!(
         "{}",
         crypto_lib::cryptanalysis::ecbench::band::markdown(&rep)

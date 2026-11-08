@@ -68,7 +68,9 @@ use std::path::Path;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-use crate::cryptanalysis::ecbench::band::{priced_s, unpriced_counts, DEFAULT_WEIGHTS};
+use crate::cryptanalysis::ecbench::band::{
+    priced_s_with, table_work_counts, unpriced_counts, Pricing, DEFAULT_WEIGHTS,
+};
 use crate::cryptanalysis::ecbench::canonical::short_id;
 use crate::cryptanalysis::ecbench::record::Record;
 use crate::cryptanalysis::ecbench::runner::{read_records, read_session, Session};
@@ -145,6 +147,12 @@ pub struct ArmSummary {
     /// no count (the arm cannot be ranked above weight 0).
     #[serde(default)]
     pub unpriced_counts: BTreeMap<String, Option<u64>>,
+    /// Table work the arm counts in `work_native` behind a `counted:`
+    /// marker (`band::table_work_counts`), summed over the verified runs.
+    /// Listed always; in the price only under `--price-table-work`
+    /// (`Comparison::priced_table_work`).
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub table_work_counts: BTreeMap<String, u64>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -199,6 +207,10 @@ pub struct OpsBand {
     /// Verified pairs the band is computed over.
     pub pairs: u64,
     pub note: String,
+    /// The counted table-work counters priced in `U` at each weight
+    /// (`band::Pricing::table_work`); absent in the default band.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub priced_table_work: Vec<String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -388,6 +400,11 @@ pub struct Comparison {
     /// recorded S values are used.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pricing_weight: Option<f64>,
+    /// Counted table work (`work_native`, `counted:` marker) priced with the
+    /// unpriced counters, by name (`--price-table-work`); absent in the
+    /// default pricing, which is every comparison before 2026-11-08.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub priced_table_work: Vec<String>,
     /// The deterministic bootstrap seed. Historical v1 files did not store
     /// it and remain readable; calibration requires a recorded seed.
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -429,6 +446,9 @@ pub struct CompareOptions {
     /// Compare sessions whose status is not `complete`; recorded and the
     /// comparison is marked not admissible.
     pub allow_interrupted: bool,
+    /// What the §5a band and `--weight` charge beyond `cost.unpriced`
+    /// (default: nothing; `table_work` prices the counted table inserts).
+    pub pricing: Pricing,
 }
 
 // ── Tail diagnostics ───────────────────────────────────────────────
@@ -476,6 +496,7 @@ fn summarize(session_id: &str, arm: &str, recs: &[&Record]) -> Result<ArmSummary
         .filter_map(|r| Some((r.run_id.clone(), r.cost.s?)))
         .collect();
     let mut unpriced: BTreeMap<String, Option<u64>> = BTreeMap::new();
+    let mut table_work: BTreeMap<String, u64> = BTreeMap::new();
     for r in &ok {
         for (name, n) in unpriced_counts(r) {
             let e = unpriced.entry(name).or_insert(Some(0));
@@ -483,6 +504,9 @@ fn summarize(session_id: &str, arm: &str, recs: &[&Record]) -> Result<ArmSummary
                 (Some(t), Some(n)) => Some(t + n),
                 _ => None,
             };
+        }
+        for (name, n) in table_work_counts(r) {
+            *table_work.entry(name).or_insert(0) += n;
         }
     }
     let censored = recs
@@ -504,6 +528,7 @@ fn summarize(session_id: &str, arm: &str, recs: &[&Record]) -> Result<ArmSummary
         censored,
         tail: tail_diagnostics(&tail_runs),
         unpriced_counts: unpriced,
+        table_work_counts: table_work,
     })
 }
 
@@ -633,27 +658,32 @@ struct Matched {
     same_seeds: bool,
 }
 
-fn priced_pair(ra: &Record, rb: &Record) -> Vec<(Option<f64>, Option<f64>)> {
+fn priced_pair(ra: &Record, rb: &Record, pricing: Pricing) -> Vec<(Option<f64>, Option<f64>)> {
     DEFAULT_WEIGHTS
         .iter()
         .map(|&w| {
             (
-                priced_s(ra, w).ok().flatten(),
-                priced_s(rb, w).ok().flatten(),
+                priced_s_with(ra, w, pricing).ok().flatten(),
+                priced_s_with(rb, w, pricing).ok().flatten(),
             )
         })
         .collect()
 }
 
-fn run_s(r: &Record, weight: f64) -> Result<Option<f64>, String> {
-    let s = priced_s(r, weight)?;
+fn run_s(r: &Record, weight: f64, pricing: Pricing) -> Result<Option<f64>, String> {
+    let s = priced_s_with(r, weight, pricing)?;
     if s.is_some_and(|s| !s.is_finite() || s < 0.0) {
         return Err("pricing produced a non-finite or negative S value".into());
     }
     Ok(s)
 }
 
-fn match_pairs(ma: &[&Record], mb: &[&Record], weight: Option<f64>) -> Result<Matched, String> {
+fn match_pairs(
+    ma: &[&Record],
+    mb: &[&Record],
+    weight: Option<f64>,
+    pricing: Pricing,
+) -> Result<Matched, String> {
     let (ca, cb) = (arm_censor(ma), arm_censor(mb));
     let key = |r: &Record| (r.workload.workload_id.clone(), r.round);
     let mut a: BTreeMap<(String, u32), (&Record, f64, bool)> = BTreeMap::new();
@@ -663,7 +693,7 @@ fn match_pairs(ma: &[&Record], mb: &[&Record], weight: Option<f64>) -> Result<Ma
 
     for r in ma {
         let cost = match weight {
-            Some(w) if r.counts() => run_s(r, w)?.map(|s| (s, false)),
+            Some(w) if r.counts() => run_s(r, w, pricing)?.map(|s| (s, false)),
             Some(_) => None,
             None => run_cost(r, &ca),
         };
@@ -675,7 +705,7 @@ fn match_pairs(ma: &[&Record], mb: &[&Record], weight: Option<f64>) -> Result<Ma
     }
     for r in mb {
         let cost = match weight {
-            Some(w) if r.counts() => run_s(r, w)?.map(|s| (s, false)),
+            Some(w) if r.counts() => run_s(r, w, pricing)?.map(|s| (s, false)),
             Some(_) => None,
             None => run_cost(r, &cb),
         };
@@ -698,7 +728,7 @@ fn match_pairs(ma: &[&Record], mb: &[&Record], weight: Option<f64>) -> Result<Ma
                 a_censored: *ca,
                 b_censored: *cb,
                 band: if exact {
-                    priced_pair(ra, rb)
+                    priced_pair(ra, rb, pricing)
                 } else {
                     Vec::new()
                 },
@@ -869,6 +899,7 @@ pub fn band_report(
         order,
         pairs: exact.len() as u64,
         note,
+        priced_table_work: Vec::new(),
     })
 }
 
@@ -907,6 +938,7 @@ pub fn compare_weighted(
             resamples,
             seed,
             allow_interrupted: false,
+            pricing: Pricing::default(),
         },
         weight,
     )
@@ -1029,7 +1061,7 @@ pub fn compare_loaded_weighted(
         return Err("the arms report different units".into());
     }
 
-    let matched = match_pairs(&ma, &mb, weight)?;
+    let matched = match_pairs(&ma, &mb, weight, opts.pricing)?;
     if weight.is_some() {
         validate_weighted_totals(&matched)?;
     }
@@ -1093,7 +1125,17 @@ pub fn compare_loaded_weighted(
         })
         .collect();
     let incomplete = a.verified < a.measured || b.verified < b.measured;
-    let band = band_report(&strata, a_arm, b_arm, rep.censored_pairs);
+    let priced_table_work = opts.pricing.priced_table_work();
+    let band = band_report(&strata, a_arm, b_arm, rep.censored_pairs).map(|mut b| {
+        if !priced_table_work.is_empty() {
+            b.note.push_str(&format!(
+                "; counted table work priced in U with the unpriced counters: {}",
+                priced_table_work.join(", ")
+            ));
+            b.priced_table_work = priced_table_work.clone();
+        }
+        b
+    });
     let ops = OpsResult {
         status: if rep.ratio.is_none() {
             "empty".into()
@@ -1185,6 +1227,9 @@ pub fn compare_loaded_weighted(
         if let Some(w) = weight {
             identity["pricing_weight"] = json!(w.to_string());
         }
+        if !priced_table_work.is_empty() {
+            identity["priced_table_work"] = json!(priced_table_work);
+        }
         short_id("ECC1", &identity)
     };
     let (comparison_id, _) = ids(true)?;
@@ -1193,6 +1238,7 @@ pub fn compare_loaded_weighted(
         schema: COMPARISON_SCHEMA_V2.into(),
         comparison_id,
         pricing_weight: weight,
+        priced_table_work,
         resample_seed: Some(seed),
         a,
         b,
@@ -1202,7 +1248,8 @@ pub fn compare_loaded_weighted(
         wall,
         quality: Some(quality),
         verdict,
-        legacy_comparison_id: weight.is_none().then_some(legacy_id),
+        legacy_comparison_id: (weight.is_none() && opts.pricing == Pricing::default())
+            .then_some(legacy_id),
         a_session_status: Some(sa.status.clone()),
         b_session_status: Some(sb.status.clone()),
         allow_interrupted: opts.allow_interrupted,
@@ -2139,6 +2186,7 @@ mod tests {
                 resamples: 300,
                 seed: 7,
                 allow_interrupted: allow,
+                pricing: Pricing::default(),
             },
         )
     }
@@ -2554,6 +2602,7 @@ mod tests {
             resamples: 50,
             seed: 1,
             allow_interrupted: false,
+            pricing: Pricing::default(),
         };
         let unweighted = compare_loaded_weighted(
             &session,
@@ -2635,7 +2684,7 @@ mod tests {
         );
         a.cost.total_gae = None;
         b.cost.total_gae = None;
-        let matched = match_pairs(&[&a], &[&b], Some(1.0)).unwrap();
+        let matched = match_pairs(&[&a], &[&b], Some(1.0), Pricing::default()).unwrap();
         assert_eq!(matched.unpaired, 2);
         assert!(matched.by_workload.is_empty());
     }
@@ -2654,6 +2703,6 @@ mod tests {
         );
         r.cost.unpriced.push("custom_native".into());
         r.counters.insert("custom_native".into(), 2);
-        assert!(run_s(&r, f64::MAX).is_err());
+        assert!(run_s(&r, f64::MAX, Pricing::default()).is_err());
     }
 }
