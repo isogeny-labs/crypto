@@ -9,6 +9,8 @@ the external SSD, ECC2K-130 `docs/ic/params/ecc2k130-fixed.json`, stage
 | 200,000 | 54.63 s, 3,661 candidates/s | 28.17 s, 7,100 candidates/s | same regime |
 | 500,000 | 142.74 s, 3,503 candidates/s | 75.60 s, 6,614 candidates/s | 61.37 s, 8,147 candidates/s |
 
+With four process workers on the same 500,000-candidate build: **19.02 s, 26,295 candidates/s** (3.27× over the one-worker 62.15 s run measured at the same time). The parent keeps the serial hash chain and merges each worker's operation counts.
+
 The 500,000-candidate campaign produced 499,930 pairs. With the index kept on,
 the database was 160 MiB; with the bulk index-off path it was 76 MiB during
 the incomplete build, and `CREATE INDEX pair_lookup` took 1.08 s and grew it
@@ -51,7 +53,8 @@ git archive isogeny/main ecc2k130/codegen | tar -x -C "$TMP" --strip-components=
    inverse) take the scalar path. Differential tests compare every result with
    `Curve.add` for 500 random pairs plus all doublings on a small curve, and
    for 64 random pairs at degree 131.
-4. **Index-off bulk build:** above 100,000 planned candidates, `pair_lookup`
+4. **Process workers:** `--pair-workers N` computes each 4,096-entry chunk's pair sums in spawned workers, then the parent writes rows and extends the rolling checksum in the original order. `ecc2k130` defaults to `min(4, CPU count)`; `ic fixed` defaults to one worker. The 20,000- and 100,000-candidate serial/parallel runs produce identical `pair_state` hashes.
+5. **Index-off bulk build:** above 100,000 planned candidates, `pair_lookup`
    is dropped for the insert phase and created once when the table completes.
    This halves the database during the build and removes B-tree maintenance
    from every row. `decomposeExact` recreates the index if a completed table
