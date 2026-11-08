@@ -182,8 +182,9 @@ pub fn run() {
             let k = 1 + rng.below(n - 1);
             let mut z = 0;
             let q = c.mul(&mut z, k, Some(g)).unwrap();
-            let o = rho::rho_one(&c, g, q, n, k, 1000 + ti, 60 * (n as f64).sqrt() as u64 + 20000);
-            let o2 = rho::rho_one(&c, g, q, n, k, 1000 + ti, 60 * (n as f64).sqrt() as u64 + 20000);
+            let tb = rho::build_table(&c, g, n, 1000 + ti);
+            let o = rho::rho_one(&c, g, q, n, k, &tb, 0, 5000 + ti, 60 * (n as f64).sqrt() as u64 + 20000);
+            let o2 = rho::rho_one(&c, g, q, n, k, &tb, 0, 5000 + ti, 60 * (n as f64).sqrt() as u64 + 20000);
             assert_eq!(o.ops_total, o2.ops_total);
             tries += 1;
             if o.verified && o.recovered_matches { found += 1; ops_sum += o.ops_total; }
@@ -192,6 +193,65 @@ pub fn run() {
         if tries >= 60 { break; }
     }
     check("rho recovers planted k", found == tries, format!("{found}/{tries}; mean ops {:.0}", ops_sum as f64 / found.max(1) as f64));
+
+    // 5b. walk v2 defect regression (problems/p3census-rho-walk-bimodal.md). v1 had jump logs
+    // u_j + v_j k with u_j, v_j < 16 (many short integer relations, hence fruitless cycles longer
+    // than the 16-point window that ran to the length cap) and DP bits from n, which flipped for
+    // n >= 2^20 at p = 2^20 - 3. Checks: (i) no relation +-u_i +-u_j (+-u_l) = 0 mod n among the
+    // jump logs; (ii) one DP-bit value per prime; (iii) on curves with n on both sides
+    // of 2^20, capped walks < 0.5% of walks and the two classes' mean ops/sqrt(n) within 10%.
+    {
+        let p = 1048573u64;
+        let mut rel = 0u64;
+        let mut cls: [(f64, u64); 2] = [(0.0, 0); 2];
+        let (mut walks, mut capped) = (0u64, 0u64);
+        let mut got = [0u32; 2];
+        let mut guard = 0;
+        while (got[0] < 4 || got[1] < 4) && guard < 4000 {
+            guard += 1;
+            let c = Curve { p, a: 1 + rng.below(p - 1), b: 1 + rng.below(p - 1) };
+            if !c.disc_nonzero() { continue; }
+            let n = match order_prime_or_composite(&c, &mut rng) { Ok(Order::Prime(n)) if n != p => n, _ => continue };
+            let side = (n >= 1 << 20) as usize;
+            if got[side] >= 4 { continue; }
+            got[side] += 1;
+            let g = c.random_point(&mut rng);
+            let tb = rho::build_table(&c, g, n, 77 + guard as u64);
+            let logs: Vec<u64> = tb.jumps.iter().map(|j| j.1).collect();
+            for i in 0..logs.len() {
+                for j in i + 1..logs.len() {
+                    let (x, y) = (logs[i], logs[j]);
+                    if x == y || (x + y) % n == 0 { rel += 1; }
+                    for &z in &logs[j + 1..] {
+                        for s in [(x + y + z) % n, (x + y + n - z) % n, (x + n - y + z) % n, (n - x + y + z) % n] {
+                            if s == 0 { rel += 1; }
+                        }
+                    }
+                }
+            }
+            for ti in 0..48u64 {
+                let k = 1 + rng.below(n - 1);
+                let mut z = 0;
+                let q = c.mul(&mut z, k, Some(g)).unwrap();
+                let o = rho::rho_one(&c, g, q, n, k, &tb, 0, 5000 + ti, 60 * (n as f64).sqrt() as u64 + 20000);
+                if !(o.verified && o.recovered_matches) { rel += 1_000_000; }
+                walks += o.walks;
+                capped += o.capped;
+                cls[side].0 += o.ops_total as f64 / (n as f64).sqrt();
+                cls[side].1 += 1;
+            }
+        }
+        let m0 = cls[0].0 / cls[0].1.max(1) as f64;
+        let m1 = cls[1].0 / cls[1].1.max(1) as f64;
+        // dp_bits_for takes p, not n, so it cannot differ between curves over one prime.
+        let one_dp = rho::dp_bits_for(1048573) == 5 && rho::dp_bits_for(16777213) == 6 && rho::dp_bits_for(268435399) == 7;
+        let ok = got == [4, 4] && rel == 0 && one_dp && (capped as f64) < 0.005 * walks as f64 && (m1 / m0 - 1.0).abs() < 0.10;
+        check(
+            "rho v2: no short jump relations, one DP rule per prime, no capped-walk regime",
+            ok,
+            format!("relations {rel}; capped {capped}/{walks} walks; mean ops/sqrt(n) n<2^20 {m0:.3}, n>=2^20 {m1:.3} (4 curves x 48 targets each)"),
+        );
+    }
 
     // 6. coverage vs brute-force set of group elements
     let p = 1009u64;
