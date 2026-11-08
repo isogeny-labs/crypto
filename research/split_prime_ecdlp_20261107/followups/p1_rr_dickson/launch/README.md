@@ -57,3 +57,10 @@ the protocol limits the attempts:
 That is at most six node-runs of 28 h each. At about USD 0.4–0.7 per hour for a 128 GiB Spot node,
 the worst case is roughly USD 70–120. The memory sizes are unchanged: the namespace quota is 128 GiB
 for both jobs together, and raising it would be a separate cluster change.
+
+## Attempt log
+
+| attempt | job | outcome |
+|---|---|---|
+| RR a1 | `p1r3-rr-a1-20261108`, pod ce76e299… | **Spot loss.** CloudTrail recorded `BidEvictedEvent` at 21:35:35Z for i-0c270755aeadb845c. The last S3 sync was at 21:36:02Z, and a status request returned the Job as `failed` with no pod. msolve was still in its degree-7 step. The partial records are in `receipts/rr-a1-results-partial/`; they are kept and supply no bound (PROTOCOL-R3). Resubmitted as a2. |
+| T a1 | `p1r3-t-a1-20261108`, pod 117e17e4… | running (S3 sync 22:15Z, degree-9 step) |
