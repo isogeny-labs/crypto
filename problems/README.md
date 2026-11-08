@@ -11,7 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
-| [CM marked-scalar timing admission](cm-marked-scalar-measurement-admission.md) | open | admitted cold native comparison against matched public-scalar multiplication | authorized quiet backend; known live cloud caps/funds if used; published frozen inputs/source/analysis and complete paired A/A evidence |
+| [P3 census rho walk: bimodal, curve-reproducible cost above √n](p3census-rho-walk-bimodal.md) | open | reading P3's rho outcome as a statement about Pollard rho | identify the binary property on 50 small curves; a corrected walk with flat, unimodal per-curve cost; re-run Y1 |
 | [Split-prime pattern reaches the prime-order group only through scalars](split-prime-pattern-scalar-only.md) | open (derived obstruction for the ℓ-adic / class-group route) | a novel ECDLP algorithm built on the split-prime deficit of the published prime curves | a computable non-scalar entry point verified on a toy class, or a Lean proof that closes the route formally |
 | [Divergent append-only PCC ledgers](pkm-pcc-ledger-divergence.md) | open, report-only | current-main PCC prefix/integration | canonical provenance-preserving reconciliation contract; no side selection, rechain or waiver |
 | [Ecbench time-namespace runtime](ecbench-time-namespace-runtime.md) | open | two library clock-initialization controls | qualified proc time-namespace support or specified fail-closed unsupported-runtime contract; rerun original controls/full suite |
@@ -128,6 +128,7 @@ Keep resolved and superseded records in the index.
 
 | [ECDLP portfolio exhaustive-reading coverage](ecdlp-portfolio-reading-coverage.md) | open | certifying the owner's request to read all six-month portfolio sources and artifacts | complete acknowledged source coverage, branch/history reconciliation and access to named missing raw evidence; indexing and hashing remain separate |
 | [claim-n13 replay fails on accounting-version drift](ecbench-claim-n13-replay-accounting-version-drift.md) | resolved | replaying the Apple-recorded `claim-n13` inherited-F4 arms on `main` (BMI2 and portable paths already agree) | owner chose eager (version 2) as the identity, 2026-10-28; original marked pre-#2043; re-recorded as `claim-n13-v2`, which replays with 0 problems, twice |
+| [CM marked-scalar timing admission](cm-marked-scalar-measurement-admission.md) | open | admitted cold native comparison against matched public-scalar multiplication | authorized quiet backend; known live cloud caps/funds if used; published frozen inputs/source/analysis and complete paired A/A evidence |
 
 ## Add or update a problem
 

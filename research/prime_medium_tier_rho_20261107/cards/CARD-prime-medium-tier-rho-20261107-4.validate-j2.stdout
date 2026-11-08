@@ -1,0 +1,95 @@
+{
+  "schema": "isolab.eks.request/v1",
+  "job": {
+    "job_name": "prime-medium-rho-20261107-j2",
+    "instance_type": "c8a.2xlarge",
+    "seconds": 3600,
+    "memory": "4Gi",
+    "spec": {
+      "schema": "ecbench.spec/v1",
+      "label": "prime medium-tier rho bound J2: 45-bit curves, target block A",
+      "description": "research/prime_medium_tier_rho_20261107/PROTOCOL.md. Generic prime-order curves from prime_orbit_index_calculus::generate_instance(generic, bits, seed), given explicitly (curves.json); seeds from seeds.json. Operation counts are the result; wall time only at L2 against the A/A arm.",
+      "workloads": {
+        "curves": [
+          {
+            "kind": "prime_explicit",
+            "p": 27611383581911,
+            "a": 12878670601399,
+            "b": 4914515096856,
+            "group_order": 27611390040607,
+            "r": 27611390040607,
+            "gx": 4,
+            "gy": 7577605687942
+          },
+          {
+            "kind": "prime_explicit",
+            "p": 25361112161527,
+            "a": 20787366627629,
+            "b": 12019143787601,
+            "group_order": 25361110162121,
+            "r": 25361110162121,
+            "gx": 1,
+            "gy": 11221611220376
+          }
+        ],
+        "targets_per_curve": 8,
+        "target_seed": 54849620745713,
+        "target_kind": "planted"
+      },
+      "arms": [
+        {
+          "name": "rho-neg",
+          "role": "reference",
+          "method": {
+            "id": "rho.negation"
+          }
+        },
+        {
+          "name": "rho-neg-aa",
+          "role": "control",
+          "method": {
+            "id": "rho.negation"
+          }
+        },
+        {
+          "name": "rho-plain",
+          "role": "baseline",
+          "method": {
+            "id": "rho.plain"
+          }
+        },
+        {
+          "name": "bsgs-neg",
+          "role": "baseline",
+          "method": {
+            "id": "bsgs.negation"
+          }
+        },
+        {
+          "name": "rho-neg-v2",
+          "role": "candidate",
+          "method": {
+            "id": "rho.negation_v2"
+          }
+        }
+      ],
+      "measurement": {
+        "rounds": 6,
+        "warmup": 1,
+        "order": "alternate",
+        "seed": 26995759977218,
+        "isolation_required": "L2",
+        "timeout_seconds": 300
+      }
+    },
+    "build": {
+      "image_uri": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5",
+      "source_revision": "dbd587a01aefba0634acc459ea30cfb9bbf49a09",
+      "ecbench_sha256": "a18af09f9fb875dd09d0399259b5481b6952d9a8f1f52f5fccc7d9ab1a0cd3b9"
+    }
+  },
+  "provenance": {
+    "harness": "claude-code: research/prime_medium_tier_rho_20261107 (PROTOCOL.md)",
+    "source_revision": "dbd587a01aefba0634acc459ea30cfb9bbf49a09"
+  }
+}
