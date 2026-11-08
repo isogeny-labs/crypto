@@ -113,7 +113,9 @@ On the single-thread retry at n = 37, memory grew about 1.2 GiB per minute over 
 five minutes (0.22 GiB per minute averaged over the hour) and passed 13 GiB on a 15 GiB machine (`msolve_n37_i0.mem.log`). The earlier attempts are kept as
 `*.timeout_3600s.log` and `*.killed_t3.*`. On the isolab-eks rerun msolve does reach a degree-5 step at n = 37, so its maximal step
 degree there is at least 5, matching the Magma value Kousidis–Wiemers report [pcc:unverified].
-The run had not finished at this revision; the final basis check (linear = k = 33) is pending.
+The run did not finish: Kubernetes stopped it at its deadline after about 4 hours of compute (the
+6-hour deadline also counted 2 hours of queueing), about 3 hours into the degree-5 step, so the final
+basis check (linear = k = 33) is not available (`f4/eks_n37/final/OUTCOME.md`).
 
 **Independent cross-check.** `crosscheck/` recomputes the closure by naive full
 saturation in pure Python, sharing no code with the Rust closure. It agrees with Rust

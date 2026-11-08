@@ -77,13 +77,14 @@
       "status": "measured",
       "model": "repository_measurement",
       "statement": "msolve 0.6.5 (F4, grevlex, 4 threads) on a fresh pq2_rank instance at n = 37 (m = 2, factor-base dimension 19 = ceil(37/2), field equations included; 38 variables, 75 equations) ran steps of degree 2, 2, 3, 3, 4, 4, 4, 4 and then a degree-5 step on a 1,016,044 x 610,665 matrix, about 60 minutes in at 53 GB, on an isolab-eks cpu-spot node. F4 selects the lowest-degree pairs first, so msolve's maximal step degree on this instance is at least 5.",
-      "scope": "One instance; one implementation (msolve, not Magma); run unfinished at recording, so the final Groebner basis check (linear = k = 33) is pending. A lower bound valid for every F4 run would need the degree-4 closure to fall short of k (about 58 hours at this size).",
+      "scope": "One instance; one implementation (msolve, not Magma). The run was stopped by its Kubernetes deadline about 3 hours into the degree-5 step, so the final Groebner basis check (linear = k = 33) and the final maximal step degree are not available; the degree-5 step itself is established. A lower bound valid for every F4 run would need the degree-4 closure to fall short of k (about 58 hours at this size).",
       "assumptions": [],
       "source_refs": [
         "S-ROUND6-LEAN"
       ],
       "source_locations": [
-        "research/ecdlp_weakness_census_20261104/pq2_rank/f4/eks_n37/interim-0742/msolve.stdout"
+        "research/ecdlp_weakness_census_20261104/pq2_rank/f4/eks_n37/final/OUTCOME.md",
+        "research/ecdlp_weakness_census_20261104/pq2_rank/f4/eks_n37/final/msolve.stdout"
       ],
       "tags": [
         "groebner",
