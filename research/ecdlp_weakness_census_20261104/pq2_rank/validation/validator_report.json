@@ -1,13 +1,13 @@
 {
  "schema": "pcc.validator-report/v1",
- "validated_commit": "af86403a967c37a20c5f0c0ed5aad85c806c1ddc",
+ "validated_commit": "e8164843b2984e153b0662b1925dc45f5115d55a",
  "claims": "final2",
- "recompute_script_sha256": "f9db4461bdff824de63136e380253fc3a3164e2d4d85016208cc6fb180f90035",
- "head_at_recompute": "af86403a967c37a20c5f0c0ed5aad85c806c1ddc",
+ "recompute_script_sha256": "3a5744b4076ae42b01819fec9179897f80b8254355884e190d12545dd66d793d",
+ "head_at_recompute": "e8164843b2984e153b0662b1925dc45f5115d55a",
  "worktree_differs": [],
  "status": "fail",
  "validator": "validator (claude-opus-5-5; Claude Code session 01AXUKfUpk9rEJg4Yyo1QcZQ)",
- "produced_at": "2026-11-08T01:04:17Z",
+ "produced_at": "2026-11-08T01:07:01Z",
  "raw_data": [
   {
    "path": "docs/ecdlp-hardness-corpus/WEAKNESSES.md",
@@ -23,7 +23,7 @@
   },
   {
    "path": "docs/ecdlp-hardness-corpus/lean-round5-20261107.json",
-   "sha256": "dba956fe793a17027d42c02dbe4566da472003c6f9d6485f5e22f119717d77ed"
+   "sha256": "e36519e83b63063bd2872543d3e178486c03fef444498da3a1a0277a0181398c"
   },
   {
    "path": "docs/ecdlp-hardness-corpus/lit-groebner.json",
@@ -35,11 +35,11 @@
   },
   {
    "path": "research/ecdlp_weakness_census_20261104/README.md",
-   "sha256": "10908ca7fc5476d5dfdfb610f0c3c9d8195705754e8b34a9429425909742b093"
+   "sha256": "7b11310bdd3751dc7bd9c949058689513c0eca20515e8704c2c80ed465312b2b"
   },
   {
    "path": "research/ecdlp_weakness_census_20261104/pq2_rank/README.md",
-   "sha256": "b524f2a17440775d95eca155d356adfdd9d6520a3d92d836a73208f6feec8397"
+   "sha256": "96fb67b4ba71c325433af5e3045a7a367def25bab1043f5c8f98da919b4eafe1"
   },
   {
    "path": "research/ecdlp_weakness_census_20261104/pq2_rank/crosscheck/README.md",
@@ -2375,10 +2375,11 @@
    "rel_tol": 0
   },
   {
-   "name": "census_readme.kw_magma_4_up_to",
-   "claimed": 36,
-   "recomputed": 36,
-   "rel_tol": 0
+   "name": "census_readme.overlap_n_values_with_msolve_and_magma_4",
+   "claimed": 3,
+   "recomputed": 2,
+   "rel_tol": 0,
+   "note": "stated overlap n = [34, 35, 36]; msolve measured n in that span: [34, 36] (main sweep to n = 34, step test at n = 36 and 37); Kousidis-Wiemers' degree 4 covers n = 34..36. There is no msolve run at n = 35, so agreement 'where the ranges overlap (n = 34 to 36)' is stated for an n with no data. Supported wording: 'where the ranges overlap (n = 34, and the fresh n = 36 control)', as in R5-004."
   },
   {
    "name": "census_readme.kw_magma_5_from",
@@ -2526,6 +2527,19 @@
    "note": "median per-minute growth over the last five minutes of msolve_n37_i0.mem.log (1.24 GiB/min); over the whole 60-minute run the mean is 0.22 GiB/min with long plateaus, so the README's rate describes the final phase only"
   },
   {
+   "name": "pq2_readme.step_mem_rate_is_last_five_minutes",
+   "claimed": 1,
+   "recomputed": 1,
+   "rel_tol": 0
+  },
+  {
+   "name": "pq2_readme.step_mem_mean_rate_GiB_per_min",
+   "claimed": 0.22,
+   "recomputed": 0.22,
+   "rel_tol": 0,
+   "compared_at": "2 decimals"
+  },
+  {
    "name": "pq2_readme.step_mem_passed_GiB",
    "claimed": 13,
    "recomputed": 13,
@@ -2641,11 +2655,35 @@
    "rel_tol": 0
   },
   {
-   "name": "corpus.R5-004.n_values_reproduced",
-   "claimed": 18,
-   "recomputed": 1,
+   "name": "corpus.R5-004.overlap_main_sweep_n",
+   "claimed": 34,
+   "recomputed": 34,
    "rel_tol": 0,
-   "note": "R5-004 says msolve reproduces the Magma value 4 on n = 17..34 (18 values of n). The corpus record MEAS-GB-KW-TABLE1 has Magma data for m = 2 only on n = 34..48, so the two overlap at n = [34] (3 main-sweep instances; the fresh n = 36 control is outside the stated range). On n = 17..33 there is no Magma value to reproduce: msolve extends the value 4 there, it does not reproduce it. Supported wording: 'Agrees with the Magma value 4 where the ranges overlap (n = 34, and the fresh n = 36 control); msolve gives 4 on n = 17 to 34, below the n = 37 step to 5.'"
+   "note": "main-sweep msolve n inside Kousidis-Wiemers' degree-4 range n = 34..36: [34]"
+  },
+  {
+   "name": "corpus.R5-004.control_n",
+   "claimed": 36,
+   "recomputed": 36,
+   "rel_tol": 0
+  },
+  {
+   "name": "corpus.R5-004.agrees_with_magma_4",
+   "claimed": 4,
+   "recomputed": 4,
+   "rel_tol": 0
+  },
+  {
+   "name": "corpus.R5-004.msolve_gives_4_n17_34",
+   "claimed": 4,
+   "recomputed": 4,
+   "rel_tol": 0
+  },
+  {
+   "name": "corpus.R5-004.range",
+   "claimed": 18,
+   "recomputed": 18,
+   "rel_tol": 0
   },
   {
    "name": "lean_readme.round5_new_ids_cited",
@@ -2660,7 +2698,7 @@
    "rel_tol": 0
   }
  ],
- "notes": "237 headline items recomputed; 1 do not match: corpus.R5-004.n_values_reproduced claimed 18 recomputed 1 Counts parsed directly from results/run.log by the validator's own parser; derived JSON/CSV files checked row by row against their source logs. Rounded claims (F_over_V) are compared at the precision stated in the README; exact values are in recomputed_exact. All inputs read from commit af86403a967c37a20c5f0c0ed5aad85c806c1ddc (git object store). Working-tree copies differing from it: none. Repository HEAD at recompute time: af86403a967c37a20c5f0c0ed5aad85c806c1ddc.",
+ "notes": "243 headline items recomputed; 1 do not match: census_readme.overlap_n_values_with_msolve_and_magma_4 claimed 3 recomputed 2 Counts parsed directly from results/run.log by the validator's own parser; derived JSON/CSV files checked row by row against their source logs. Rounded claims (F_over_V) are compared at the precision stated in the README; exact values are in recomputed_exact. All inputs read from commit e8164843b2984e153b0662b1925dc45f5115d55a (git object store). Working-tree copies differing from it: none. Repository HEAD at recompute time: e8164843b2984e153b0662b1925dc45f5115d55a.",
  "detail": {
   "main_log_header": [
    "pq2_rank census; seed 0x5eed20261104; pclmulqdq: true",
@@ -3044,6 +3082,36 @@
    5,
    37,
    48
+  ],
+  "final2.msolve_measured_n": [
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19,
+   20,
+   21,
+   22,
+   23,
+   24,
+   25,
+   26,
+   27,
+   28,
+   29,
+   30,
+   31,
+   32,
+   33,
+   34,
+   36
   ],
   "final2.msolve_degree_by_n": {
    "8": [

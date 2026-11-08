@@ -161,10 +161,25 @@ def final2_items(H, readme, L, detail):
     H("pq2_readme.kw_magma_degree_5_from", text_num(t, r"Kousidis and Wiemers report Magma degree 4 for n ≤ \d+ and 5 from n = (\d+)"), kwv[5])
     H("pq2_readme.direction_kw_5_from", text_num(t, r"They report 5 from n = (\d+) to \d+ \(`MEAS-GB-KW-TABLE1`\)"), kwv[5])
     H("pq2_readme.direction_kw_5_to", text_num(t, r"They report 5 from n = \d+ to (\d+) \(`MEAS-GB-KW-TABLE1`\)"), kwv[6])
-    for k, pat_hi, pat_from in (
-            ("census_readme", r"Magma value 4 for n ≤ (\d+); they report 5 from n = \d+", r"Magma value 4 for n ≤ \d+; they report 5 from n = (\d+)"),
+    s36_ = json.loads(read_text(PKG / "f4/step_n36_37/msolve_n36_i0.json"))["rows"][0]
+    main_ns = {r["n"] for r in json.loads(read_text(PKG / "f4/msolve_all.json"))["rows"]}
+    msolve_ns = sorted(main_ns | ({s36_["n"]} if s36_.get("msolve_exit") == 0 else set()))
+    detail["final2.msolve_measured_n"] = msolve_ns
+    mo = re.search(r"agrees with their Magma value 4 where the ranges overlap \(n = (\d+) to (\d+)\)", text["census_readme"])
+    if mo:
+        stated = list(range(int(mo[1]), int(mo[2]) + 1))
+        measured = [n for n in stated if n in msolve_ns and kwv[0] is not None and kwv[0] <= n <= kwv[3]]
+        H("census_readme.overlap_n_values_with_msolve_and_magma_4", len(stated), len(measured),
+          note=(f"stated overlap n = {stated}; msolve measured n in that span: {measured} (main sweep to n = 34, step test at "
+                f"n = 36 and 37); Kousidis-Wiemers' degree 4 covers n = {kwv[0]}..{kwv[3]}. There is no msolve run at n = 35, "
+                "so agreement 'where the ranges overlap (n = 34 to 36)' is stated for an n with no data. Supported wording: "
+                "'where the ranges overlap (n = 34, and the fresh n = 36 control)', as in R5-004."))
+        H("census_readme.kw_magma_5_from", text_num(text["census_readme"], r"they report 5 from n = (\d+)"), kwv[5])
+    kw_docs = [] if mo else [
+            ("census_readme", r"Magma value 4 for n ≤ (\d+); they report 5 from n = \d+", r"Magma value 4 for n ≤ \d+; they report 5 from n = (\d+)")]
+    for k, pat_hi, pat_from in kw_docs + [
             ("report_typ", r"Magma value for \$n <= (\d+)\$; they report 5 from \$n = \d+\$", r"Magma value for \$n <= \d+\$; they report 5 from \$n = (\d+)\$"),
-            ("triage", r"Magma value for n ≤ (\d+); they report 5 from n = \d+", r"Magma value for n ≤ \d+; they report 5 from n = (\d+)")):
+            ("triage", r"Magma value for n ≤ (\d+); they report 5 from n = \d+", r"Magma value for n ≤ \d+; they report 5 from n = (\d+)")]:
         H(f"{k}.kw_magma_4_up_to", text_num(text[k], pat_hi), kwv[3])
         H(f"{k}.kw_magma_5_from", text_num(text[k], pat_from), kwv[5])
     # ---- msolve rows (main sweep) and the Direction bullet -------------------------
@@ -237,6 +252,11 @@ def final2_items(H, readme, L, detail):
       note=f"median per-minute growth over the last five minutes of msolve_n37_i0.mem.log ({last5:.2f} GiB/min); over the whole "
            f"60-minute run the mean is {detail['final2.mem_log']['mean_rate_whole_run_GiB_per_min']:.2f} GiB/min with long plateaus, "
            "so the README's rate describes the final phase only")
+    mavg = re.search(r"\(([\d.]+) GiB per minute averaged over the hour\)", t)
+    if mavg or "over the last five minutes" in t:
+        H("pq2_readme.step_mem_rate_is_last_five_minutes", 1, int("about 1.2 GiB per minute over the last five minutes" in t))
+        H("pq2_readme.step_mem_mean_rate_GiB_per_min", float(mavg[1]) if mavg else None,
+          round(detail["final2.mem_log"]["mean_rate_whole_run_GiB_per_min"], 2), compared_at="2 decimals")
     H("pq2_readme.step_mem_passed_GiB", text_num(t, r"and passed (\d+) GiB on a \d+ GiB machine"), int(max(v for _, v in mem)))
     memtotal = int(re.search(r"MemTotal:\s+(\d+) kB", Path("/proc/meminfo").read_text())[1]) / 1024 / 1024
     H("pq2_readme.step_machine_GiB", text_num(t, r"passed \d+ GiB on a (\d+) GiB machine"), int(memtotal),
@@ -280,8 +300,21 @@ def final2_items(H, readme, L, detail):
     mm = re.search(r"Reproduces the Magma value 4 with a second implementation on n = (\d+) to (\d+), below the n = (\d+) step to 5", r54)
     claimed_ns = list(range(int(mm[1]), int(mm[2]) + 1)) if mm else []
     with_magma = [n for n in claimed_ns if kwv[0] is not None and kwv[0] <= n <= kwv[1]]
-    H("corpus.R5-004.step_at", int(mm[3]) if mm else None, kwv[5])
-    H("corpus.R5-004.n_values_reproduced", len(claimed_ns) if mm else None, len(with_magma),
+    H("corpus.R5-004.step_at", text_num(r54, r"below the n = (\d+) step to 5"), kwv[5])
+    mn = re.search(r"Agrees with the Magma value 4 where the ranges overlap \(n = (\d+), and the fresh n = (\d+) control\); "
+                   r"msolve gives (\d+) on n = (\d+) to (\d+)", r54)
+    if mn:
+        main_overlap = sorted({k[0] for k in A if kwv[0] is not None and kwv[0] <= k[0] <= kwv[3]})
+        H("corpus.R5-004.overlap_main_sweep_n", int(mn[1]), main_overlap[0] if len(main_overlap) == 1 else -1,
+          note=f"main-sweep msolve n inside Kousidis-Wiemers' degree-4 range n = {kwv[0]}..{kwv[3]}: {main_overlap}")
+        H("corpus.R5-004.control_n", int(mn[2]),
+          s36["n"] if s36["msolve_exit"] == 0 and kwv[0] <= s36["n"] <= kwv[3] else -1)
+        H("corpus.R5-004.agrees_with_magma_4", 4,
+          one([r["max_step_degree"] for k, r in A.items() if k[0] in main_overlap] + [s36["max_step_degree"]]))
+        H("corpus.R5-004.msolve_gives_4_n17_34", int(mn[3]), one(r["max_step_degree"] for r in band))
+        H("corpus.R5-004.range", int(mn[5]) - int(mn[4]) + 1, len({k[0] for k in A if 17 <= k[0] <= 34}))
+    if mm:
+      H("corpus.R5-004.n_values_reproduced", len(claimed_ns) if mm else None, len(with_magma),
       note=(f"R5-004 says msolve reproduces the Magma value 4 on n = 17..34 ({len(claimed_ns)} values of n). The corpus record "
             f"MEAS-GB-KW-TABLE1 has Magma data for m = 2 only on n = {kwv[0]}..{kwv[1]}, so the two overlap at n = {with_magma} "
             "(3 main-sweep instances; the fresh n = 36 control is outside the stated range). On n = 17..33 there is no Magma value "
