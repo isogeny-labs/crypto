@@ -1,0 +1,25 @@
+{
+  "schema": "isolab.eks.command-request/v1",
+  "job": {
+    "job_name": "sgsecant-panel-20261108-a3",
+    "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:d1ab2c5c44bc83931d5d402e4ac58f58f5ea92af19d951b1441cc32068c2f07b",
+    "command": [
+      "/bin/sh",
+      "-c",
+      "set -eu; mkdir -p \"$ISOLAB_OUTPUT_DIR/panel\"; /opt/sgsecant/sgsecant panel --describe; /opt/sgsecant/sgsecant panel --threads 4 --out \"$ISOLAB_OUTPUT_DIR/panel\"; cd \"$ISOLAB_OUTPUT_DIR\"; sha256sum panel/records.jsonl panel/summary.json panel/summary.txt panel/config.txt /opt/sgsecant/sgsecant > SHA256SUMS; aws s3 cp --recursive \"$ISOLAB_OUTPUT_DIR\" \"$ISOLAB_RESULTS_URI\" --only-show-errors"
+    ],
+    "cpu": 4,
+    "memory": "8Gi",
+    "seconds": 43200,
+    "isolation_profile": "standard",
+    "retries": 0,
+    "wait_seconds": 60
+  },
+  "provenance": {
+    "harness": "claude-code-subagent",
+    "source_revision": "f13a690df016d0a457bd40579fbb9d054f486adf",
+    "study": "split_graph_secant_cost_20261107",
+    "protocol_sha256": "20acbf94d87b87f47fa20b4866c79143e9df6154e64cc1a07de9e56e10a84ed1",
+    "note": "Attempt 3. Attempts 1 (sgsecant-panel-20261107) and 2 (sgsecant-panel-20261108-a2) were never scheduled: each pod stayed Pending for its whole activeDeadlineSeconds (3600 s, then 10800 s) because the only cpu-spot node was held by an outside job (pq2-msolve-n37) whose pod anti-affinity excludes other isolab jobs, and that node fills the 16 vCPU nodepool limit. Deadline raised to 43200 s; everything else unchanged."
+  }
+}

@@ -1,9 +1,9 @@
-# DRAFT Amendment R2-A (proposed number 9): stage B, `m = 6`, `t = 6` (`lambda = 1.52`)
+# DRAFT Amendment R2-A (proposed number 10): stage B, `m = 6`, `t = 6` (`lambda = 1.52`)
 
 **Status: draft, NOT applied, NOT frozen. Requires amendment freeze.** Written 2026-11-08 (round 2, slug `r2pkm`)
 for decision 6 of `research/open_leads_execution_20261108/DECISIONS.md` ("written as a dated protocol amendment
 before its cell runs; a cell with no frozen amendment does not run"). Target file when frozen:
-`research/prime_fall_degree_20261027/PREREGISTRATION.md` (append as "Amendment 9", with the freeze date).
+`research/prime_fall_degree_20261027/PREREGISTRATION.md` (append as "Amendment 10", with the freeze date). Renumbered from 9 on 2026-11-08, because R2-C was frozen first as Amendment 9.
 Every number is `[pcc:unverified]`. Evidence classes are marked: derived (arithmetic on the registered formula),
 cited (a repository document says so).
 
@@ -35,7 +35,7 @@ So the one cell with `lambda >= 0.1` that has no certificate is `(Kummer, m = 6,
 
 ## 3. Rule (the text to freeze)
 
-> **Amendment 9 (R2-A), dated at freeze, before `pfd-b` is submitted.** For `m >= 3`, a cell whose
+> **Amendment 10 (R2-A), dated at freeze, before `pfd-b` is submitted.** For `m >= 3`, a cell whose
 > `lambda = |V|^m * 2^(m-1) / (m! * p) >= 0.1` at the prime it runs at is **high-lambda**. It is run as registered
 > (no flag or command changes), and its rows are written. They are reported in a separate table labelled
 > "possibly decomposable (lambda >= 0.1, no certificate)". A high-lambda cell is **excluded from every §6

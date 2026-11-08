@@ -1,68 +1,38 @@
-# Resume: crypto @ claude/serene-davinci-ujoi58
+# Resume: crypto @ claude/elliptic-curves-graph-weaknesses-fw42m4
 
 ## Goal
-
-User request (2026-11-08), verbatim: "Yes to all open leads". These are the open items left after PR
-#3651 merged. Mapping and options: research/open_leads_execution_20261108/DECISIONS.md.
-
-1. PKM fall-degree study (`research/pkm_falldegree_unblock_20261107`). Image, 17 command requests,
-   serial on EKS.
-2. Medium-tier rho follow-ups:
-   - independent validator report (`research/prime_medium_tier_rho_20261107/validation/`);
-   - new P4 confirmatory protocol (`research/prime_medium_rho_p4_confirm_20261108`), frozen before
-     data, then run.
-3. Study images and runs:
-   - 3a: minors_guess_determine_20261107;
-   - 3b: elliptic_code_list_decoding_20261107;
-   - 3c: ml_learnability_control_20261107;
-   - 5: split_graph_secant_cost_20261107.
-4. `main` defect: `evidence_audit_pr` on `research/curve25519_f1_walk_20261107` sessions (fix in the next PR).
+Owner asked (2026-11-08, "Please run it") to run the open n = 37 test: does msolve 0.6.5 (F4,
+grevlex) reach maximal step degree 5 on a fresh m = 2 descended S3 instance at n = 37, as
+Kousidis-Wiemers report for Magma (corpus MEAS-GB-KW-TABLE1)? Locally it was OOM-killed at 15 GB.
 
 ## Lead / hypothesis
-
-Per study, from each frozen PROTOCOL.md (unchanged). Item 2 P4: is the pooled rho-plain / rho-neg
-ratio's interval above 1.2 (J1 alone: 1.285 [1.177, 1.404], [pcc:unverified])?
+Petit-Quisquater Assumption 2 at m = 2 (HEUR-GB-PQ-ASSUMPTION-2). msolve gives 4 on n = 17..34 and
+n = 36 (merged in PRs #3658, #3682). Magma reports 5 from n = 37.
 
 ## Spec
-
-Each study directory's PROTOCOL.md / protocol.json, frozen on main at f13a690df0. The new item 2 P4
-protocol is to be frozen after commit. The branch was reset to origin/main f13a690df016d0a457bd40579fbb9d054f486adf.
+research/ecdlp_weakness_census_20261104/pq2_rank/f4/eks_n37/{protocol.json, run.sh, input.ms},
+committed at e63bf8e55d (publication receipt in the run's receipt directory). Input dump
+pq2_rank/f4/step_n36_37/dumps/n37_i0.json.
 
 ## State
-
-Five preparation agents are running:
-- Rust images for 3b, 3a and 5;
-- the mllc image (3c);
-- the audit fix;
-- the validator for item 2;
-- P4 protocol design.
-
-The PKM image build is next, after the Rust images, because disk is about 7 GB free. No job has been
-launched in this round. ECR push is authorized. Docker has no daemon, so images go through
-`taskq/deploy/eks-karpenter/oci-layer-publish.py`. The pool allows at most 16 vCPU / 128 GiB on
-`cpu-spot` and 8 / 32 on `cpu-l2-spot`.
+Image: isolab tasks base (aws-cli) + one layer /opt/msolve (msolve + its shared libs + loader +
+run.sh + input.ms), published with taskq/deploy/eks-karpenter/oci-layer-publish.py. Command job
+via taskq/deploy/eks-karpenter/remote/launch-remote-command (isolab.eks.command-request/v1),
+8 vCPU, 100Gi, 21600 s, retries 0, cpu-spot. Results land in
+s3://isolab-results-104186811093-us-east-2/runs/<job>/<pod-uid>/ (wrapper uploads every 10 min).
 
 ## Next steps
-
-1. Collect each agent's R2_READY.md, then commit and push.
-2. Run `scripts/checkpoint.sh push`, then `tools/benchrec.py init` per benchmark run.
-3. experiment-director compile writes a card per study. Relay it verbatim to executor-mechanical, then
-   run director assess.
-4. Launch order on `cpu-spot`: 5 (split-graph), then 3b (ecld), then 3c (mllc), then 3a (minors), then
-   PKM serial: pfd-a first, then pfd-c and pfd-b, then the x / m4 cells. P4 confirm runs on `cpu-l2-spot`.
-5. Analyse each study with its frozen rule. Each gets a report, a figure and a PDF; then PR and track it.
+1. Publish image, write request.json, validate, launch; record Job/Pod UIDs.
+2. Read status with an isolab.eks.command-status/v1 request; download S3 outputs, verify SHA256SUMS.
+3. Parse max step degree, check linear = k = 33; update pq2_rank README, corpus MEAS-PQ2-MSOLVE-F4,
+   session log; PR.
 
 ## Runs in flight
-
-None.
+None. The C = 1 boundary study (screen and confirmation) finished; results are in PR #3660 (research/curve25519_autolab_20261104/c1).
 
 ## Stop and success conditions
-
-Each study's own decision rules. Budget: PKM at most US$40 per job and US$400 in total; the other
-studies at most a few dollars each. Stop a study on its control-failure rule. A lost Spot cell is
-reported as lost, with at most one relaunch.
+One attempt, no retries; stop at exit, OOM or 6 h. Budget ceiling USD 5 (monthly account
+headroom was USD 23.67 at submission).
 
 ## Open questions
-
-The PKM large host (80-510 GB) needs a capacity change outside the current cost controls. It is
-prepared and reported, not forced.
+None.
