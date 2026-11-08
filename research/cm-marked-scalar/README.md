@@ -12,6 +12,8 @@ The [fixed-label CM lift derivation](CM_LIFT.md) and [report](reports/cm-lift-20
 
 The next [fixed-label residual evaluator](RESIDUAL_SPLIT.md) uses mu0=ell*k+c and a shared doubling loop for [k]([ell]P)+[c]P. Its [complete 42,480-row census](residual-v1/README.md) independently replays and all 300 selected-plan point/count cases pass. The [inspected report](reports/residual-20261108/report.pdf) retains both the direct reference and matched binary-radix controls. Relation D+A minima are 232,267,304,451,612; the original mu is unchanged on every curve. The direct reference remains lower in this exact count comparison. Prefix-intermediate reuse and a complete admitted cold comparison remain next work.
 
+The [prefix bank and complete cold-function implementation](CACHE_COLD_CONTRACT.md) now retain labelled intermediates, prepare the deterministic plan inside each call, and include request parsing, normalization, symmetric verification and destruction. Software qualification passes 6,300 point/GMP-schedule cases, 71,570 independent retained-point label checks and 625 complete untimed cold paths. Its [inspected report](reports/cache-cold-20261108/report.pdf) distinguishes this completed component from the earlier pre-cache count census. The new 60-point, five-curve timing draft validates; the native row/receipt analyzer, freeze/publication and admitted timing remain required. No new cached-performance result is asserted.
+
 | Requirement | Current evidence and remaining work |
 | --- | --- |
 | PR before implementation/execution | Hosted PR #3674; planning commit 4afeff227516 |

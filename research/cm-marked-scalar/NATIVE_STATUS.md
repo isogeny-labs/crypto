@@ -53,3 +53,23 @@ Retain and reuse prefix intermediates in a separately versioned evaluator, with 
 ### Errors
 
 Retain v1 indentation warnings and the first invalid stopping-rule schema draft; final v3 is warning-free and fully qualified. A guessed root export-schema path did not exist and stopped metadata export before output; located the existing tracked schema with git ls-files and validated the export against that snapshot. No scientific scan or selection was repeated or changed. No root Cargo suite is claimed; this is the standalone C++ path and no Rust implementation was edited.
+
+## 2026-11-08T04:55Z: retained prefix bank and complete cold worker
+
+### What was done
+
+Implemented cache_core.hpp and cache_eval.cpp without editing any earlier frozen producer. The bank retains integer-labelled prefix/Q-table points, reuses matching combined columns and handles exact cancellations. Independent GMP digit/count reconstruction verifies6300 boundary point/schedule cases;71570 retained labels match independent OpenSSL point multiplication. Five cache-hit positive and five wrong-residual controls pass. Full cold v1 passes575 cases; final v2 adds paired binary references and passes625 complete untimed paths plus five altered-expected-output rejections. A no-reservation launch rejects before entering the timed function.
+
+### Decisions made
+
+Use a deterministic offset0/window-from-bit-length primary, with quotient/remainder work inside the call. Secondary installed-plan modes include loading/parsing, while old search cost remains separately recorded and cannot substitute for full first-use evidence. The cold interval includes serialized input parsing, fresh curve/point setup, plan preparation, prefix/table/normalization arithmetic, symmetric output verification and destruction. Preserve all old count records; no performance gain is inferred from software coverage. No cryptographic timer, new cloud job, controller, role, budget, cap or Diem generator was started or changed.
+
+### Open threads
+
+Implement/qualify cache_analyze.cpp and synthetic complete-matrix/receipt corruption controls. Then bind sources/binaries/nine inputs/isolation, freeze and publish CM-CACHE-COLD-V2 and attempt one admitted calibration/held-out invocation each. The schema-valid draft and60-row full-width point manifest are prepared. Per-curve gate compares the deterministic primary with the fastest of all regular/binary references at each held-out point beyond the full paired A/A envelope. The original e2e objective stays active. Shared daily-log scope is held by ec2-user/T-1939; it was not edited concurrently.
+
+### Errors
+
+Initial cold draft used the wrong amendment shape and metric enums; preserved invalid JSON, generator and validation errors, then corrected to a schema-valid draft. Arm-order seed is the exact source-owned64-bit hexadecimal rule rather than a JSON floating-point approximation. Final native builds are warning-free. No scientific timing/census was repeated. No root Rust library suite is claimed; no Rust implementation was edited.
+
+Sources checked (KB): tools absent and migrated wrapper status failed127. Read the existing construction, residual and cold-boundary contracts; primary Grabner–Heuberger–Prodinger introduction/section2 and Bernstein–Lange EFD precomputation/normalization discussion. No novelty or optimality claim. The report is software qualification, not an official scientific promotion or a new global quotient construction.

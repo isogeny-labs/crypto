@@ -77,3 +77,13 @@ $(BUILD_DIR)/residual-replay: residual_replay.cpp json.hpp
 	$(CXX) $(CXXFLAGS) residual_replay.cpp -o $@ -lcrypto -lgmpxx -lgmp
 residual-replay-binary: $(BUILD_DIR)/residual-replay
 .PHONY: residual-replay-binary
+$(BUILD_DIR)/cache-qual: cache_qual.cpp cache_core.hpp native.cpp json.hpp relation_verify.hpp orbit_verify.hpp
+	mkdir -p $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) cache_qual.cpp -o $@ -lcrypto -lgmpxx -lgmp
+cache-qual-binary: $(BUILD_DIR)/cache-qual
+.PHONY: cache-qual-binary
+$(BUILD_DIR)/cache-eval: cache_eval.cpp cache_core.hpp native.cpp json.hpp relation_verify.hpp orbit_verify.hpp
+	mkdir -p $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) cache_eval.cpp -o $@ $(LDLIBS)
+cache-eval-binary: $(BUILD_DIR)/cache-eval
+.PHONY: cache-eval-binary
