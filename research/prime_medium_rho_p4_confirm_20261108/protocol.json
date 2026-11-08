@@ -22,7 +22,28 @@
   "predecessor": "research/prime_medium_tier_rho_20261107 (PROTOCOL.md section 7 P4, RESULTS.md verdict inconclusive)",
   "owner_decision": "research/open_leads_execution_20261108/DECISIONS.md",
   "analysis_command": "python3 -I -B analysis/p4_confirm.py analyze --session sessions/M1 --audit sessions/M1.audit.json ... --session sessions/PC --audit sessions/PC.audit.json --seeds seeds.json --spec-ids specs/spec-ids.json --planned-pairs 2160 --out analysis/result.json",
-  "analysis_tested_on": "synthetic data only (tests/selftest-output.json, p4_confirm.py selftest)"
+  "analysis_tested_on": "synthetic data only (tests/selftest-output.json, p4_confirm.py selftest)",
+  "script_sha256": [
+   "01e6270937bbf3919bb8c37d94919a51c112d19ba4fa8335bc8f36a1e439e194  analysis/p4_confirm.py",
+   "04c0dddbe21b6d7c6754fc4e13b5162d8faa6e59ae1a4cfc186326d70a703fc0  analysis/power_from_old_variance.py",
+   "149645339803f261c13d10d0ce574b0111fcf51240034ef8293461461d10ddb2  analysis/cost_model.py",
+   "1322b90568ea5ae2d66da131aa6f0854c4fb51c929f5e73cde37ff086a8a6b2a  build_study.py"
+  ],
+  "input_sha256": [
+   "7b36f7c8047ec47e63a83c7796fa7532a8b5ca5e5223a6c6ae2c25f477991322  curves.json",
+   "02e854e8cb819768ceb9d2b7d5ca8d98f2bcf283ea55272d7fd34c2238926b8d  seeds.json",
+   "30854efed4314040e649386aa8d928919b6608a20a7ef07fe0e674ab55535bdc  specs/spec-ids.json",
+   "203243059203295bee3398fc3e9baa64d6b763626c2962f497f2161d9abd0520  specs/M1.json",
+   "1905803c909933da8f9c2f387107bb99a74c70bd9700699df329a8c8e9742a8c  specs/M2.json",
+   "f7758a5a3488605eb6e3ac1b2b7a6ec09a059ce155832f84e63d3304794c72d1  specs/M3.json",
+   "7505d9e7b33983df7604590cf1f0ef44b1239d5e50f7aac789f70e0a66452fd6  specs/M4.json",
+   "a2a74f58faf29b7e6e6a0c13c716a2a71b473213611274ab807d920a8eba84e8  specs/M5.json",
+   "59cabee6ffc20e3887e799c62ca9c044c2902c2e4158f9d03edea2337ebc02ba  specs/M6.json",
+   "0d08631d28e7b485dfaf899cb841b16f8b283f780eb455329531af4394103cd5  specs/M7.json",
+   "dceb3a228259b0af1a4e6b94ec31e461952aa4f80241a6328944626fae3e4889  specs/M8.json",
+   "8dfa79c3918de980f925dec9b860147b4627974ba17a7fb2f3585e6289df612c  specs/M9.json",
+   "1ac9d9a185a229524de15eec7951f2361a49b1b1f1626205c7c492b253c32b97  specs/PC.json"
+  ]
  },
  "question": "On the medium prime tier (the ten generic prime-order curves at log2 r 32-49 of research/prime_medium_tier_rho_20261107), what is the pooled paired rho.plain / rho.negation operation-count ratio at w = 0, does its 95% interval exclude 1.2 from below, and is it consistent with sqrt 2 = 1.414 or with the 2026-11-07 point value of about 1.285?",
  "claims": [
