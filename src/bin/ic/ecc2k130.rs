@@ -35,6 +35,9 @@ pub struct Ecc2k130Args {
     /// the pair table in one run.
     #[arg(long, default_value_t = 10_000_000)]
     pub pair_budget: u64,
+    /// Processes used to compute pair sums; 0 selects min(4, CPU count).
+    #[arg(long, default_value_t = 0, value_parser = clap::value_parser!(u32).range(0..=64))]
+    pub pair_workers: u32,
     /// Native SAT solve budget; a separate watchdog bounds each complete SAT query.
     #[arg(long, default_value_t = 0.25)]
     pub query_seconds: f64,
@@ -59,6 +62,16 @@ fn default_params() -> PathBuf {
     super::install::share_file_or_source("docs/ic/params/ecc2k130-fixed.json")
 }
 
+/// `0` selects up to four workers; an explicit count is kept.
+fn resolve_pair_workers(requested: u32) -> u32 {
+    if requested != 0 {
+        return requested;
+    }
+    std::thread::available_parallelism()
+        .map(|count| count.get().min(4) as u32)
+        .unwrap_or(1)
+}
+
 pub fn run(args: Ecc2k130Args) -> Result<Value, String> {
     let params = args.params.unwrap_or_else(default_params);
     let dir = args.dir.unwrap_or_else(|| PathBuf::from("runs/ecc2k130"));
@@ -70,6 +83,7 @@ pub fn run(args: Ecc2k130Args) -> Result<Value, String> {
                 .unwrap_or_else(|| dir.join("relations.jsonl")),
         )
     };
+    let pair_workers = resolve_pair_workers(args.pair_workers);
     fixed::run(FixedArgs {
         params,
         dir,
@@ -78,6 +92,7 @@ pub fn run(args: Ecc2k130Args) -> Result<Value, String> {
         selector_model: args.selector_model,
         attempts: args.attempts,
         pair_budget: args.pair_budget,
+        pair_workers,
         query_seconds: args.query_seconds,
         python: args.python,
         progress: !args.quiet,
@@ -103,6 +118,7 @@ mod tests {
             selector_model: None,
             attempts: 64,
             pair_budget: 100_000,
+            pair_workers: 1,
             query_seconds: 2.0,
             python: "python3".into(),
             quiet: false,
@@ -127,5 +143,13 @@ mod tests {
             .iter()
             .all(|row| row["operation"] == "fixed-relation" && row["verified"] == true));
         std::fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn pair_worker_defaults_are_bounded_and_explicit_counts_are_kept() {
+        assert_eq!(resolve_pair_workers(1), 1);
+        assert_eq!(resolve_pair_workers(8), 8);
+        let automatic = resolve_pair_workers(0);
+        assert!((1..=4).contains(&automatic), "{automatic}");
     }
 }

@@ -6,8 +6,8 @@ observation and stays an unverified assertion until a CI-signed verdict exists
 
 | file | what it is | status |
 |---|---|---|
-| `validator_report.json` | Task A: headline recomputation (`pcc.validator-report/v1`), final pass at `8d9fdc45` | **fail**: 4 of 195 items, all the bounded-degree reading (see "Final pass" below) |
-| `replay_certificate.json` | Task B: re-execution, independent closure, msolve replay (`pcc.replay-certificate/v1`), bound to `8d9fdc45` | **verified** (`scalars_verified: true`; 31 run entries, 0 mismatches) |
+| `validator_report.json` | Task A: headline recomputation (`pcc.validator-report/v1`), binding pass at `c685fadc` | **pass**: 245 of 245 items, 297 files pinned (see "Binding pass at c685fadc" below) |
+| `replay_certificate.json` | Task B: re-execution, independent closure, msolve replay (`pcc.replay-certificate/v1`), bound to `c685fadc` | **verified** (`scalars_verified: true`; 36 run entries, 0 mismatches) |
 | `controls.json` | negative controls for the validator's own checkers | 8 of 8 planted defects caught |
 
 The sections from "Binding" to "Not checked" describe the first pass at `f96f4f4c`. Three
@@ -16,7 +16,10 @@ reports exist:
 * first pass, 2 of 85 items failing: `validator_report.json` at `ea2fde0e`;
 * second pass, 3 of 120 failing: the same file at `3cb90671`;
 * third pass, 123 of 123 matching: the same file at `8d9fdc45`;
-* final pass, binding, 4 of 195 failing: the current file.
+* final pass, 4 of 195 failing: the same file at `af86403a`;
+* final binding pass, 1 of 237 failing: the same file at `e8164843`;
+* binding pass at `e8164843`, 1 of 243 failing: the same file at `c685fadc`;
+* binding pass at `c685fadc`, 245 of 245 matching: the current file.
 
 The second, third and final passes are described at the end. The 17-entry certificate
 from the first pass is the blob of `replay_certificate.json` at `8d9fdc45`.
@@ -306,6 +309,9 @@ fail the report:
 
     python3 -I -B validation/recompute.py --commit 8d9fdc45be3678dc98b1044e9d8250aca1073ce7 --claims final
     python3 -I -B validation/replay_compare.py --commit 8d9fdc45be3678dc98b1044e9d8250aca1073ce7
+    python3 -I -B validation/recompute.py --commit af86403a967c37a20c5f0c0ed5aad85c806c1ddc --claims final2
+                                               # final binding pass; writes validator_report.json
+    python3 -I -B validation/replay_compare.py --commit af86403a967c37a20c5f0c0ed5aad85c806c1ddc
 
 **Binding.**
 
@@ -398,6 +404,131 @@ degree stays bounded."
 * The re-rendered PDFs, SVGs and DOT graphs, and the producer's session log.
 * The pcc standing of the round-5 claims (only their records' presence).
 
+## Final binding pass (commit `af86403a`, after the merge with main)
+
+    python3 -I -B validation/recompute.py --commit af86403a967c37a20c5f0c0ed5aad85c806c1ddc --claims final2
+    python3 -I -B validation/replay_compare.py --commit af86403a967c37a20c5f0c0ed5aad85c806c1ddc
+
+**Binding.**
+
+* `af86403a` holds the final-pass files byte-identical to what the validator wrote.
+* `src/`, `results/` and `crosscheck/` are unchanged since `8d9fdc45`; the binary and msolve
+  hashes are unchanged.
+* The tree was clean and nothing else was running.
+
+**Result: `validator_report.json` **fail**, 1 of 237 items; `replay_certificate.json` **verified** (36 run entries, 0 mismatches).**
+
+What changed and what the validator checked:
+
+* **The bounded-degree reading is withdrawn.**
+  * None of "bounded-degree premise", "evidence for the bounded" or "consistent with the
+    bounded" remains in any of the seven documents (7 absence checks).
+  * The replacement sentences recompute exactly against the corpus record
+    `MEAS-GB-KW-TABLE1` in four documents: Magma degree 4 up to n = 36, 5 from n = 37 to 48.
+  * The pq2 README's "step from 3 to 4 inside this window, at n = 15 and n = 17" equals
+    the n where msolve's degree rises over n − 1 (15 and 17).
+  * "Matches their Magma value 4 for n ≤ 36" holds where the ranges overlap: n = 34 (3
+    rows) and the n = 36 control.
+* **R5-002** (3 copies) recomputes: degree 4 on n = 17..34, one above 3, equal to the Magma
+  value where reported, KW report 5 from n = 37.
+* **The n = 36/37 step test (`f4/step_n36_37/`).**
+  * The validator regenerated the four instances with the producer's arguments. All four
+    dumps and their part copies are byte-identical, and all non-timing JSON fields are
+    equal.
+  * All four equations equal the S3 descent (exact interpolation plus 500 random points).
+  * Producer row for the n = 36 control: degree 4, linear = k = 35, 47 minutes, matching
+    the README.
+  * The validator's own msolve run on n = 36 i0: identical step list [2, 2, 3, 3, 4, 4, 4, 4, 4, 2, 3, 4], degree 4, linear = k = 35, quotient dimension 2 = |Z|, 2677 s, peak RSS 4.48 GiB (2.8 GiB at 23 min, still growing after that).
+  * The n = 37 attempts: one 3600 s timeout (`TimeoutExpired` in its log), then two
+    exit −9 runs with no basis, last step degree 4. Each matches a kernel record
+    "Memory cgroup out of memory: Killed process … (msolve)" with anon-rss 13.8 GB, which
+    the validator captured from `dmesg` in the same boot (`step_n36_37/kernel_oom.txt`).
+    So "killed twice for memory" holds.
+  * "Memory grew about 1.2 GiB per minute": that is the median per-minute growth over the
+    last five minutes of `msolve_n37_i0.mem.log` (1.24). Over the whole 60-minute run the
+    mean is 0.22 GiB/min, with long plateaus. The figure describes the final phase only,
+    a recorded imprecision, not a failure. "Passed 13 GiB" (maximum 13.16) and "a 15 GiB
+    machine" (MemTotal of this VM) hold. Instance 1 at n = 36 and 37: empty logs, no
+    result file.
+* **pcc ids.** The Lean README and `THM-F4-CONTAINMENT` cite `PCC-20261107-209a57` and
+  `PCC-20261107-91a01d`; both records exist, and the old ids appear nowhere.
+
+**F5: R5-004 overstates the overlap.** It says msolve "reproduces the Magma value 4 with
+a second implementation on n = 17 to 34". The corpus record `MEAS-GB-KW-TABLE1` has
+Kousidis–Wiemers' m = 2 Magma data only on n = 34..48. Of the 18 values of n claimed,
+only n = 34 has a Magma value to reproduce (3 main-sweep instances); the n = 36 control
+lies outside the stated range. On n = 17..33 msolve extends the value 4; it does not
+reproduce it.
+
+Supported wording: "Agrees with the Magma value 4 where the ranges overlap (n = 34, and
+the fresh n = 36 control); msolve gives 4 on n = 17 to 34, below the n = 37 step to 5."
+
+If Kousidis–Wiemers report m = 2 data below n = 34, the corpus record should say so, and
+this item would be re-evaluated.
+
+**Style note.** In the census README, "That matches Kousidis–Wiemers' Magma value 4 for
+n ≤ 36" follows a sentence about the value 3, so its antecedent is unclear. There is
+also a double space before it.
+
+**Not checked in this pass:**
+
+* `F4Containment.lean` itself.
+* msolve at n = 37, which was not attempted, as instructed.
+* The pcc standing of the new claim ids (only that their records exist).
+* The documents merged in from main that do not concern this census.
+* Session logs, PDFs, SVGs and DOT graphs.
+
+## Binding pass at `e8164843`
+
+    python3 -I -B validation/recompute.py --commit e8164843b2984e153b0662b1925dc45f5115d55a --claims final2
+    python3 -I -B validation/replay_compare.py --commit e8164843b2984e153b0662b1925dc45f5115d55a
+
+**Binding.** `e8164843` holds the af86403a pass files byte-identical. Only three files
+changed since `af86403a`: `lean-round5-20261107.json` (R5-004), the census `README.md` and
+`pq2_rank/README.md`, plus the re-rendered PDFs and the session log. No replay inputs
+changed, so the certificate was rebound without new runs. Run at `af86403a`,
+`recompute.py` still reproduces that pass exactly (notes aside).
+
+**Result: `validator_report.json` fail, 1 of 243 items; `replay_certificate.json` verified
+(36 run entries).**
+
+* **R5-004 (fixed).** The overlap of the main sweep with Kousidis–Wiemers' degree-4 range
+  is n = 34, and the fresh control is at n = 36. msolve gives 4 at both; it gives 4 on all
+  18 values of n from 17 to 34; the step is at n = 37. All five items match.
+* **Memory sentence (fixed).** 1.2 GiB/min over the last five minutes and 0.22 GiB/min over
+  the hour both match `msolve_n37_i0.mem.log` (median 1.24; mean 0.218).
+* **F6: the census README overlap range.** "msolve's degree 4 agrees with their Magma
+  value 4 where the ranges overlap (n = 34 to 36)" states agreement on three values of n.
+  msolve was run at n = 34 (main sweep) and n = 36 (fresh control), but never at n = 35:
+  the main sweep's msolve runs stop at 34, and the step test covers 36 and 37. Supported
+  wording: "where the ranges overlap (n = 34, and the fresh n = 36 control)", as in R5-004.
+
+## Binding pass at `c685fadc`
+
+    python3 -I -B validation/recompute.py --commit c685fadce27b121b97294bfb1cca5f34a7e8dec3 --claims final2
+    python3 -I -B validation/replay_compare.py --commit c685fadce27b121b97294bfb1cca5f34a7e8dec3
+
+**Binding.** `c685fadc` holds the e8164843 pass files byte-identical, and only the census
+README changed. Run at `e8164843`, `recompute.py` still reproduces that pass exactly
+(notes aside).
+
+**Result: `validator_report.json` pass, 245 of 245 items, 297 files pinned;
+`replay_certificate.json` verified (36 run entries, 0 mismatches).** The controls are
+unchanged (8 of 8 caught).
+
+* The census README now says "where the ranges overlap (n = 34, and the fresh n = 36
+  control)". That matches the data: the main-sweep msolve runs inside Kousidis–Wiemers'
+  degree-4 range are at n = 34; the control is at n = 36; msolve gives 4 at both; and
+  they report 5 from n = 37.
+* All 297 `raw_data` pins equal the blobs committed at `c685fadc`, so CI can verify them
+  on that commit or any later one that leaves those files unchanged.
+* The pcc verifier's own parser accepts the report and the certificate. Its only note is
+  the missing keyring signature.
+* `evidence_dir` for a pcc recompute proof:
+  `research/ecdlp_weakness_census_20261104/pq2_rank/validation` (the report's own
+  directory, which is also the default). The `raw_data` paths are repository-relative,
+  so they resolve with or without it.
+
 ## Reproduce
 
 From `research/ecdlp_weakness_census_20261104/pq2_rank` (each step pinned to one core):
@@ -408,9 +539,18 @@ From `research/ecdlp_weakness_census_20261104/pq2_rank` (each step pinned to one
     python3 -I -B validation/recompute.py --commit 3cb9067133968daba8340c6cd4e2a46819ee6672 --claims corrected
                                                # third pass
     python3 -I -B validation/recompute.py --commit 8d9fdc45be3678dc98b1044e9d8250aca1073ce7 --claims final
-                                               # final pass (binding); writes validator_report.json
+                                               # final pass
     python3 -I -B validation/msolve_check.py ...  # msolve replays; exact commands in replay_certificate.json
     python3 -I -B validation/replay_compare.py --commit 8d9fdc45be3678dc98b1044e9d8250aca1073ce7
+    python3 -I -B validation/recompute.py --commit af86403a967c37a20c5f0c0ed5aad85c806c1ddc --claims final2
+                                               # final binding pass at af86403a
+    python3 -I -B validation/replay_compare.py --commit af86403a967c37a20c5f0c0ed5aad85c806c1ddc
+    python3 -I -B validation/recompute.py --commit e8164843b2984e153b0662b1925dc45f5115d55a --claims final2
+                                               # binding pass at e8164843
+    python3 -I -B validation/replay_compare.py --commit e8164843b2984e153b0662b1925dc45f5115d55a
+    python3 -I -B validation/recompute.py --commit c685fadce27b121b97294bfb1cca5f34a7e8dec3 --claims final2
+                                               # binding pass at c685fadc; writes validator_report.json
+    python3 -I -B validation/replay_compare.py --commit c685fadce27b121b97294bfb1cca5f34a7e8dec3
     python3 -I -B validation/controls.py       # writes controls.json
     python3 -I -B validation/replay_compare.py # writes replay_certificate.json (needs the run directories)
 
