@@ -30,7 +30,7 @@ units only. Records: benchmarks/records/*curve25519-tw-*.json.
 3. Coverage REPORT.md + figure + PDF; session log entry docs/session-logs/2026-11-08.md; commit.
 
 ## Runs in flight
-None.
+None. Goal (owner, 2026-11-08): index-calculus S/rho-neg <= 0.75, stays open; BSGS-class results do not count (owner ruling). State: best measured IC ratio 1.40 (C=1, k=20, fresh curves, PR merged as c1/); NC-2 and NC-1 Stage 0 null (PRs #3729 merged, #3734 open auto-merge); measured BSGS panel 0.61-0.70 at k=20, 0.89-0.93 at k=24 (PR #3738, boundary reference only). At k>=24 the target is below rho K=1 floor 0.886. Blocker: no remaining in-scope idea with non-negligible probability; resume needs a new structural idea outside collision relations (algebraic track is about 18x at k=20). Next action if resuming: read ideas/NONCOLLISION-20261108.md closed-lever table and propose something not in it.
 
 ## Stop and success conditions
 About 90 minutes of runs in total; failed predictions stay failed; no push, no PR.
