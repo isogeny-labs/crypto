@@ -5,8 +5,9 @@
             "arn": "arn:aws:codebuild:us-east-2:104186811093:build/isolab-experiment-launcher:4fd098c9-d158-423f-9ba9-0360830db190",
             "buildNumber": 385,
             "startTime": 1794180347.731,
-            "currentPhase": "BUILD",
-            "buildStatus": "IN_PROGRESS",
+            "endTime": 1794181006.329,
+            "currentPhase": "COMPLETED",
+            "buildStatus": "SUCCEEDED",
             "sourceVersion": "GAbpTmZE8VYoN72rYIOwYqaior1Pj6ep",
             "projectName": "isolab-experiment-launcher",
             "phases": [
@@ -78,7 +79,59 @@
                 },
                 {
                     "phaseType": "BUILD",
-                    "startTime": 1794180369.176
+                    "phaseStatus": "SUCCEEDED",
+                    "startTime": 1794180369.176,
+                    "endTime": 1794181005.889,
+                    "durationInSeconds": 636,
+                    "contexts": [
+                        {
+                            "statusCode": "",
+                            "message": ""
+                        }
+                    ]
+                },
+                {
+                    "phaseType": "POST_BUILD",
+                    "phaseStatus": "SUCCEEDED",
+                    "startTime": 1794181005.889,
+                    "endTime": 1794181005.927,
+                    "durationInSeconds": 0,
+                    "contexts": [
+                        {
+                            "statusCode": "",
+                            "message": ""
+                        }
+                    ]
+                },
+                {
+                    "phaseType": "UPLOAD_ARTIFACTS",
+                    "phaseStatus": "SUCCEEDED",
+                    "startTime": 1794181005.927,
+                    "endTime": 1794181006.017,
+                    "durationInSeconds": 0,
+                    "contexts": [
+                        {
+                            "statusCode": "",
+                            "message": ""
+                        }
+                    ]
+                },
+                {
+                    "phaseType": "FINALIZING",
+                    "phaseStatus": "SUCCEEDED",
+                    "startTime": 1794181006.017,
+                    "endTime": 1794181006.329,
+                    "durationInSeconds": 0,
+                    "contexts": [
+                        {
+                            "statusCode": "",
+                            "message": ""
+                        }
+                    ]
+                },
+                {
+                    "phaseType": "COMPLETED",
+                    "startTime": 1794181006.329
                 }
             ],
             "source": {
@@ -137,7 +190,7 @@
             },
             "timeoutInMinutes": 30,
             "queuedTimeoutInMinutes": 10,
-            "buildComplete": false,
+            "buildComplete": true,
             "initiator": "coreuser",
             "vpcConfig": {
                 "vpcId": "vpc-04bee1e26f609d01c",
