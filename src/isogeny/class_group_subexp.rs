@@ -160,7 +160,9 @@ pub fn primes_upto(n: u64) -> Vec<u64> {
 }
 
 fn big_mod_u64(x: &BigInt, m: u64) -> u64 {
-    x.mod_floor(&BigInt::from(m)).to_u64().expect("reduced value fits u64")
+    x.mod_floor(&BigInt::from(m))
+        .to_u64()
+        .expect("reduced value fits u64")
 }
 
 /// xorshift64* generator: deterministic, seedable, dependency-free.
@@ -236,11 +238,29 @@ pub fn factor_base(d: &BigInt, bound: u64) -> Vec<FbPrime> {
             // D ≡ 0 (mod 4): ramified, b = 0 if D ≡ 0 (mod 8), b = 2 if D ≡ 4.
             // D ≡ 5 (mod 8): inert.
             if d8 == 1 {
-                fb.push(FbPrime { p, kind: Splitting::Split, root: 1, b: 1, form: prime_form(d, 2, 1) });
+                fb.push(FbPrime {
+                    p,
+                    kind: Splitting::Split,
+                    root: 1,
+                    b: 1,
+                    form: prime_form(d, 2, 1),
+                });
             } else if d8 == 0 {
-                fb.push(FbPrime { p, kind: Splitting::Ramified, root: 0, b: 0, form: prime_form(d, 2, 0) });
+                fb.push(FbPrime {
+                    p,
+                    kind: Splitting::Ramified,
+                    root: 0,
+                    b: 0,
+                    form: prime_form(d, 2, 0),
+                });
             } else if d8 == 4 {
-                fb.push(FbPrime { p, kind: Splitting::Ramified, root: 0, b: 2, form: prime_form(d, 2, 2) });
+                fb.push(FbPrime {
+                    p,
+                    kind: Splitting::Ramified,
+                    root: 0,
+                    b: 2,
+                    form: prime_form(d, 2, 2),
+                });
             }
             continue;
         }
@@ -249,13 +269,25 @@ pub fn factor_base(d: &BigInt, bound: u64) -> Vec<FbPrime> {
             0 => {
                 // ramified: b ≡ 0 (mod p) and b ≡ D (mod 2), so b = 0 for even D and b = p for odd D
                 let b = if d_mod4 == 0 { 0 } else { p };
-                fb.push(FbPrime { p, kind: Splitting::Ramified, root: 0, b, form: prime_form(d, p, b) });
+                fb.push(FbPrime {
+                    p,
+                    kind: Splitting::Ramified,
+                    root: 0,
+                    b,
+                    form: prime_form(d, p, b),
+                });
             }
             1 => {
                 let r = sqrt_mod(dp, p).expect("residue has a root");
                 // b ≡ r (mod p) with b ≡ D (mod 2): r or r + p, whichever has the parity of D
                 let b = if r % 2 == d_mod4 { r } else { r + p };
-                fb.push(FbPrime { p, kind: Splitting::Split, root: r, b, form: prime_form(d, p, b) });
+                fb.push(FbPrime {
+                    p,
+                    kind: Splitting::Split,
+                    root: r,
+                    b,
+                    form: prime_form(d, p, b),
+                });
             }
             _ => {}
         }
@@ -290,7 +322,14 @@ pub struct SieveParams {
 
 impl Default for SieveParams {
     fn default() -> Self {
-        SieveParams { half_length: 1 << 14, support: 10, slack_bits: 26, excess: 64, threads: 4, seed: 1 }
+        SieveParams {
+            half_length: 1 << 14,
+            support: 10,
+            slack_bits: 26,
+            excess: 64,
+            threads: 4,
+            seed: 1,
+        }
     }
 }
 
@@ -336,7 +375,11 @@ fn sieve_one(
     }
     let mut g: Option<BinaryQuadraticForm> = None;
     for (&i, &s) in &e {
-        let f = if s > 0 { fb[i as usize].form.clone() } else { fb[i as usize].form.inverse() };
+        let f = if s > 0 {
+            fb[i as usize].form.clone()
+        } else {
+            fb[i as usize].form.inverse()
+        };
         g = Some(match g {
             None => f,
             Some(acc) => acc.compose(&f),
@@ -372,7 +415,14 @@ fn sieve_one(
         let r = fp.root; // r² ≡ D (mod p); for ramified r = 0
         let r1 = mul_mod((p - bp + r) % p, inv2a, p);
         let r2 = mul_mod((2 * p - bp - r) % p, inv2a, p);
-        roots.push((r1, if fp.kind == Splitting::Ramified { p } else { r2 }));
+        roots.push((
+            r1,
+            if fp.kind == Splitting::Ramified {
+                p
+            } else {
+                r2
+            },
+        ));
     }
     // sieve
     for (idx, fp) in fb.iter().enumerate() {
@@ -502,7 +552,10 @@ pub fn collect_relations(d: &BigInt, fb: &[FbPrime], params: &SieveParams) -> (V
             });
         }
     });
-    (found.into_inner().unwrap(), products.load(Ordering::Relaxed))
+    (
+        found.into_inner().unwrap(),
+        products.load(Ordering::Relaxed),
+    )
 }
 
 // ---------------------------------------------------------------------------
@@ -580,7 +633,10 @@ pub fn structured_elimination(relations: &[Relation], ncols: usize) -> Dense {
         eliminated += 1;
         rows.retain(|r| !r.is_empty());
     }
-    let columns: Vec<u32> = (0..ncols).filter(|&c| alive_col[c]).map(|c| c as u32).collect();
+    let columns: Vec<u32> = (0..ncols)
+        .filter(|&c| alive_col[c])
+        .map(|c| c as u32)
+        .collect();
     let pos: BTreeMap<u32, usize> = columns.iter().enumerate().map(|(i, &c)| (c, i)).collect();
     let dense_rows: Vec<Vec<BigInt>> = rows
         .iter()
@@ -592,7 +648,11 @@ pub fn structured_elimination(relations: &[Relation], ncols: usize) -> Dense {
             v
         })
         .collect();
-    Dense { rows: dense_rows, columns, eliminated }
+    Dense {
+        rows: dense_rows,
+        columns,
+        eliminated,
+    }
 }
 
 const P61: u64 = (1u64 << 61) - 1;
@@ -636,7 +696,9 @@ fn bareiss_det(mut m: Vec<Vec<BigInt>>) -> BigInt {
     let mut prev = BigInt::one();
     for k in 0..n {
         if m[k][k].is_zero() {
-            let Some(sw) = (k + 1..n).find(|&i| !m[i][k].is_zero()) else { return BigInt::zero() };
+            let Some(sw) = (k + 1..n).find(|&i| !m[i][k].is_zero()) else {
+                return BigInt::zero();
+            };
             m.swap(k, sw);
             sign = -sign;
         }
@@ -687,7 +749,10 @@ pub fn hnf_diagonal(rows: &[Vec<BigInt>]) -> Option<Vec<BigInt>> {
         return None;
     }
     let mut modulus = d;
-    let mut work: Vec<Vec<BigInt>> = rows.iter().map(|r| r.iter().map(|x| x.mod_floor(&modulus)).collect()).collect();
+    let mut work: Vec<Vec<BigInt>> = rows
+        .iter()
+        .map(|r| r.iter().map(|x| x.mod_floor(&modulus)).collect())
+        .collect();
     let mut diag = Vec::with_capacity(k);
     for j in 0..k {
         // combine all rows with a nonzero entry in column j into one pivot row
@@ -767,7 +832,11 @@ pub fn lattice_index(relations: &[Relation], ncols: usize, keep: &[bool]) -> Opt
     let projected: Vec<Relation> = relations
         .iter()
         .filter_map(|r| {
-            let entries: Vec<(u32, i64)> = r.entries.iter().filter_map(|&(c, v)| map[c as usize].map(|nc| (nc, v))).collect();
+            let entries: Vec<(u32, i64)> = r
+                .entries
+                .iter()
+                .filter_map(|&(c, v)| map[c as usize].map(|nc| (nc, v)))
+                .collect();
             if entries.is_empty() {
                 None
             } else {
@@ -1083,7 +1152,14 @@ mod tests {
 
     fn h_by_relations(d: i64, bound: u64) -> BigInt {
         let d = BigInt::from(d);
-        let params = SieveParams { half_length: 64, support: 3, slack_bits: 10, excess: 16, threads: 2, seed: 7 };
+        let params = SieveParams {
+            half_length: 64,
+            support: 3,
+            slack_bits: 10,
+            excess: 16,
+            threads: 2,
+            seed: 7,
+        };
         let (report, _, _) = compute(&d, bound, &params, 0.5, 6, 20_000).expect("converges");
         report.lattice_index
     }
@@ -1091,7 +1167,16 @@ mod tests {
     #[test]
     fn small_discriminants_match_enumeration() {
         // fundamental discriminants only (the factor base assumes D = D_K)
-        for &(d, bound) in &[(-23i64, 60u64), (-47, 60), (-71, 80), (-199, 100), (-20, 60), (-56, 60), (-1_000_003, 400), (-1_000_020, 400)] {
+        for &(d, bound) in &[
+            (-23i64, 60u64),
+            (-47, 60),
+            (-71, 80),
+            (-199, 100),
+            (-20, 60),
+            (-56, 60),
+            (-1_000_003, 400),
+            (-1_000_020, 400),
+        ] {
             let h = class_number(&BigInt::from(d));
             let got = h_by_relations(d, bound);
             assert_eq!(got, BigInt::from(h), "D = {d}");
@@ -1112,17 +1197,29 @@ mod tests {
     fn orders_and_subgroup_indices_are_consistent() {
         let d = BigInt::from(-1_000_003i64); // 1000003 ≡ 3 (mod 4), so D ≡ 1 (mod 4)
         let h = class_number(&d);
-        let params = SieveParams { half_length: 64, support: 3, slack_bits: 10, excess: 16, threads: 2, seed: 11 };
+        let params = SieveParams {
+            half_length: 64,
+            support: 3,
+            slack_bits: 10,
+            excess: 16,
+            threads: 2,
+            seed: 11,
+        };
         let (report, fb, rels) = compute(&d, 400, &params, 0.5, 6, 20_000).unwrap();
         assert_eq!(report.lattice_index, BigInt::from(h));
         let hb = report.lattice_index.magnitude().clone();
         let (fac, complete) = factor_big(&hb);
         assert!(complete);
-        let prod = fac.iter().fold(BigUint::one(), |acc, (p, e)| acc * p.pow(*e));
+        let prod = fac
+            .iter()
+            .fold(BigUint::one(), |acc, (p, e)| acc * p.pow(*e));
         assert_eq!(prod, hb);
         // the subgroup generated by all factor-base primes is the whole group
         let keep_none = vec![false; fb.len()];
-        assert_eq!(lattice_index(&rels, fb.len(), &keep_none), Some(BigInt::one()));
+        assert_eq!(
+            lattice_index(&rels, fb.len(), &keep_none),
+            Some(BigInt::one())
+        );
         // the subgroup generated by the first prime alone has index h / ord
         let ord = class_order(&fb[0].form, &hb, &fac);
         let mut keep = vec![true; fb.len()];

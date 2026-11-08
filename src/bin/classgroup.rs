@@ -13,7 +13,9 @@
 //! Δ = t² − 4p, t = p + 1 − n, factored to its fundamental part D_K (the
 //! conductor is reported). Output: one JSON object (stdout and/or --out).
 
-use crypto::isogeny::class_group_subexp::{class_order, compute, factor_big, lattice_index, log2_big, SieveParams, Splitting};
+use crypto::isogeny::class_group_subexp::{
+    class_order, compute, factor_big, lattice_index, log2_big, SieveParams, Splitting,
+};
 use num_bigint::{BigInt, BigUint};
 use num_integer::Integer;
 use num_traits::{One, Signed};
@@ -60,7 +62,11 @@ fn fundamental_part(delta: &BigInt) -> (BigInt, BigUint, Vec<(BigUint, u32)>) {
 fn json_big_list(v: &[(BigUint, u32)]) -> String {
     let ps: Vec<String> = v.iter().map(|(p, _)| p.to_string()).collect();
     let es: Vec<String> = v.iter().map(|(_, e)| e.to_string()).collect();
-    format!("\"primes\": [{}], \"exponents\": [{}]", ps.join(", "), es.join(", "))
+    format!(
+        "\"primes\": [{}], \"exponents\": [{}]",
+        ps.join(", "),
+        es.join(", ")
+    )
 }
 
 fn main() {
@@ -92,16 +98,22 @@ fn main() {
         let ln = bits as f64 * std::f64::consts::LN_2;
         ((6.0 * ln * ln) as u64).max(1000)
     };
-    let bound: u64 = opts.get("bound").map_or(default_bound, |s| s.parse().unwrap());
+    let bound: u64 = opts
+        .get("bound")
+        .map_or(default_bound, |s| s.parse().unwrap());
     let params = SieveParams {
-        half_length: opts.get("half-length").map_or(1 << 14, |s| s.parse().unwrap()),
+        half_length: opts
+            .get("half-length")
+            .map_or(1 << 14, |s| s.parse().unwrap()),
         support: opts.get("support").map_or(10, |s| s.parse().unwrap()),
         slack_bits: opts.get("slack").map_or(26, |s| s.parse().unwrap()),
         excess: opts.get("excess").map_or(64, |s| s.parse().unwrap()),
         threads: opts.get("threads").map_or(4, |s| s.parse().unwrap()),
         seed: opts.get("seed").map_or(1, |s| s.parse().unwrap()),
     };
-    let euler_bound: u64 = opts.get("euler-bound").map_or(10_000_000, |s| s.parse().unwrap());
+    let euler_bound: u64 = opts
+        .get("euler-bound")
+        .map_or(10_000_000, |s| s.parse().unwrap());
     let tolerance: f64 = opts.get("tolerance").map_or(0.05, |s| s.parse().unwrap());
     let max_rounds: usize = opts.get("max-rounds").map_or(6, |s| s.parse().unwrap());
     let sub_bounds: Vec<u64> = opts
@@ -111,7 +123,8 @@ fn main() {
 
     eprintln!("[{label}] D_K has {bits} bits, conductor {conductor}; factor base bound {bound}; sieving with {} threads", params.threads);
     let t1 = Instant::now();
-    let (report, fb, relations) = compute(&dk, bound, &params, tolerance, max_rounds, euler_bound).expect("class group computation");
+    let (report, fb, relations) = compute(&dk, bound, &params, tolerance, max_rounds, euler_bound)
+        .expect("class group computation");
     let t_relations_and_hnf = t1.elapsed().as_secs_f64();
     eprintln!(
         "[{label}] lattice index has {} bits; analytic log2 h = {:.3}; ratio {:.4}; {} relations from {} products; {} columns eliminated, {} dense",
@@ -130,31 +143,55 @@ fn main() {
     let t2 = Instant::now();
     let (h_factors, h_complete) = factor_big(&h);
     // genus theory: 2-rank of Cl(D_K) = (number of distinct primes dividing D_K) − 1
-    let odd_primes_of_dk = delta_factors.iter().filter(|(p, e)| e % 2 == 1 && **p != BigUint::from(2u32)).count();
+    let odd_primes_of_dk = delta_factors
+        .iter()
+        .filter(|(p, e)| e % 2 == 1 && **p != BigUint::from(2u32))
+        .count();
     let two_rank = (odd_primes_of_dk + usize::from(dk.is_even())).saturating_sub(1);
     // subgroup indices by bound and the Mazur subset (split primes only, odd)
     let n = fb.len();
     let mut sub_json = Vec::new();
     for &b in &sub_bounds {
-        let keep: Vec<bool> = fb.iter().map(|fp| !(fp.p <= b && fp.p > 2 && fp.kind == Splitting::Split)).collect();
+        let keep: Vec<bool> = fb
+            .iter()
+            .map(|fp| !(fp.p <= b && fp.p > 2 && fp.kind == Splitting::Split))
+            .collect();
         let idx = lattice_index(&relations, n, &keep);
-        sub_json.push(format!("\"{}\": {}", b, idx.map_or("null".to_string(), |x| x.to_string())));
+        sub_json.push(format!(
+            "\"{}\": {}",
+            b,
+            idx.map_or("null".to_string(), |x| x.to_string())
+        ));
     }
-    let keep_mazur: Vec<bool> = fb.iter().map(|fp| !(MAZUR_ODD.contains(&fp.p) && fp.kind == Splitting::Split)).collect();
+    let keep_mazur: Vec<bool> = fb
+        .iter()
+        .map(|fp| !(MAZUR_ODD.contains(&fp.p) && fp.kind == Splitting::Split))
+        .collect();
     let idx_mazur = lattice_index(&relations, n, &keep_mazur);
-    let mazur_split: Vec<u64> = fb.iter().filter(|fp| MAZUR_ODD.contains(&fp.p) && fp.kind == Splitting::Split).map(|fp| fp.p).collect();
+    let mazur_split: Vec<u64> = fb
+        .iter()
+        .filter(|fp| MAZUR_ODD.contains(&fp.p) && fp.kind == Splitting::Split)
+        .map(|fp| fp.p)
+        .collect();
     // all primes (split, ramified, 2) up to each bound, for comparison
     let mut sub_all_json = Vec::new();
     for &b in &sub_bounds {
         let keep: Vec<bool> = fb.iter().map(|fp| fp.p > b).collect();
         let idx = lattice_index(&relations, n, &keep);
-        sub_all_json.push(format!("\"{}\": {}", b, idx.map_or("null".to_string(), |x| x.to_string())));
+        sub_all_json.push(format!(
+            "\"{}\": {}",
+            b,
+            idx.map_or("null".to_string(), |x| x.to_string())
+        ));
     }
     // orders of the split prime forms up to 2000 (exact when h is fully factored)
     let mut orders = Vec::new();
     let mut smallest_full = 0u64;
     if h_complete {
-        for fp in fb.iter().filter(|fp| fp.p <= 2000 && fp.p > 2 && fp.kind == Splitting::Split) {
+        for fp in fb
+            .iter()
+            .filter(|fp| fp.p <= 2000 && fp.p > 2 && fp.kind == Splitting::Split)
+        {
             let o = class_order(&fp.form, &h, &h_factors);
             if smallest_full == 0 && o == h {
                 smallest_full = fp.p;
