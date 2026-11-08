@@ -30,4 +30,22 @@ ratio of unplanted to planted F4 work per (prime, m, t, arm), against round 1's 
 
 ## Addendum A: instrument (pinned before any claim cell)
 
-Pending the builder's report (`--target unplanted`, `parse` on inconsistent systems).
+`p2coset` with `src/main.rs` sha256
+`986ae47163b15cd2d55e60bca1411eff1bdaadc0df2eb3fc4c1347fe7e5e252f` (selftest 15/15).
+New: `emit --target unplanted` (R = [k]G, G and k from `--tseed`), meta fields
+`decomposes` (any m signed E-columns, repeats allowed, matching the system's solution set)
+and `decomposes_distinct`; `parse` reads inconsistent outputs (`quotient_dim = 0`,
+`inconsistent: true`). Development smoke at p ∈ {12,289, 65,519} only
+(`smoke/round2/`): `quotient_dim > 0` exactly when `decomposes` is true in all 168 cells.
+
+Command per cell (otherwise as round 1's M3, with Clarification A.1's `--cseed 0`):
+
+```
+$B emit --kind K --p P --t T --m M --C C --seed S --cseed 0 --select idx:0|idx:1|max --tseed N --target unplanted --out cell.ms     # N = 101..104
+( ulimit -v 1572864; nice -n 10 timeout 1200 msolve -g 2 -t 1 -v 2 -f cell.ms -o cell.out > cell.log 2>&1 )
+$B parse --log cell.log
+```
+
+Disclosure: the development smoke already shows unplanted F4 work essentially constant
+across cosets and targets at each (kind, t, m) (e.g. 258,271 at m2 t4). The claim cells at
+the four protocol primes decide.
