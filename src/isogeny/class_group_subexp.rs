@@ -925,7 +925,7 @@ pub fn hnf_diagonal(rows: &[Vec<BigInt>]) -> Option<Vec<BigInt>> {
 // Index by modular determinants
 // ---------------------------------------------------------------------------
 
-/// Barrett reduction modulo a prime `p < 2^31`.
+/// Barrett reduction modulo a prime `p < 2^26`.
 #[derive(Clone, Copy)]
 struct Modp {
     p: u64,
@@ -968,10 +968,12 @@ impl Modp {
     }
 }
 
-/// Primes just below 2^31, largest first.
+/// Primes just below 2^26, largest first. At this size a product of two residues
+/// is below 2^52, so 4096 products add up in a `u64` without reduction: the
+/// elimination loops reduce lazily and vectorise.
 fn crt_primes(count: usize) -> Vec<u64> {
     let mut out = Vec::new();
-    let mut c = (1u64 << 31) - 1;
+    let mut c = (1u64 << 26) - 1;
     while out.len() < count {
         c -= 2;
         let mut is_prime = true;
@@ -1002,6 +1004,10 @@ fn matrix_mod(rows: &[Vec<BigInt>], md: &Modp) -> Vec<Vec<u32>> {
         .collect()
 }
 
+/// Reduction interval of the lazy accumulators: at most this many products
+/// (each below 2^52) are added before every entry is reduced.
+const LAZY_UPDATES: usize = 4000;
+
 /// Indices of `k` rows independent modulo `md`, scanning the rows in `order`;
 /// `None` if the rank is below `k`.
 fn independent_subset(
@@ -1013,20 +1019,35 @@ fn independent_subset(
     let p = md.p;
     let mut basis: Vec<(usize, Vec<u32>)> = Vec::new();
     let mut chosen = Vec::new();
+    let mut acc = vec![0u64; k];
     for &ri in order {
-        let mut v: Vec<u64> = mat[ri].iter().map(|&x| x as u64).collect();
+        for (a, &x) in acc.iter_mut().zip(mat[ri].iter()) {
+            *a = x as u64;
+        }
+        let mut updates = 0usize;
         for (pc, brow) in &basis {
-            let f = v[*pc];
-            if f != 0 {
-                let nf = p - f;
-                for c in *pc..k {
-                    v[c] = md.reduce(v[c] + nf * brow[c] as u64);
+            let f = md.reduce(acc[*pc]);
+            if f == 0 {
+                continue;
+            }
+            let nf = (p - f) as u32;
+            for (a, &b) in acc[*pc..].iter_mut().zip(brow[*pc..].iter()) {
+                *a += (nf as u64) * (b as u64);
+            }
+            updates += 1;
+            if updates == LAZY_UPDATES {
+                for a in acc.iter_mut() {
+                    *a = md.reduce(*a);
                 }
+                updates = 0;
             }
         }
-        if let Some(pc) = (0..k).find(|&c| v[c] != 0) {
-            let inv = md.inv(v[pc]);
-            let brow: Vec<u32> = v.iter().map(|&x| md.mul(x, inv) as u32).collect();
+        for a in acc.iter_mut() {
+            *a = md.reduce(*a);
+        }
+        if let Some(pc) = (0..k).find(|&c| acc[c] != 0) {
+            let inv = md.inv(acc[pc]);
+            let brow: Vec<u32> = acc.iter().map(|&x| md.mul(x, inv) as u32).collect();
             basis.push((pc, brow));
             chosen.push(ri);
             if chosen.len() == k {
@@ -1041,38 +1062,55 @@ fn independent_subset(
 fn det_mod(sub: &[Vec<u32>], md: &Modp) -> u64 {
     let k = sub.len();
     let p = md.p;
-    let mut a: Vec<Vec<u32>> = sub.to_vec();
+    let mut a: Vec<Vec<u64>> = sub
+        .iter()
+        .map(|r| r.iter().map(|&x| x as u64).collect())
+        .collect();
     let mut det = 1u64;
+    let mut prow = vec![0u32; k];
     for j in 0..k {
-        let Some(pr) = (j..k).find(|&r| a[r][j] != 0) else {
+        // the entries of column j below the diagonal are lazy: reduce them to pick a pivot
+        let mut pr = None;
+        for r in j..k {
+            let v = md.reduce(a[r][j]);
+            a[r][j] = v;
+            if v != 0 && pr.is_none() {
+                pr = Some(r);
+            }
+        }
+        let Some(pr) = pr else {
             return 0;
         };
         if pr != j {
             a.swap(pr, j);
             det = (p - det) % p;
         }
-        let pivot = a[j][j] as u64;
+        for c in j..k {
+            let v = md.reduce(a[j][c]);
+            a[j][c] = v;
+            prow[c] = v as u32;
+        }
+        let pivot = a[j][j];
         det = md.mul(det, pivot);
         let inv = md.inv(pivot);
-        let (top, rest) = a.split_at_mut(j + 1);
-        let prow = &top[j];
+        let (_, rest) = a.split_at_mut(j + 1);
         for row in rest.iter_mut() {
-            let f = row[j] as u64;
+            let f = row[j];
             if f == 0 {
                 continue;
             }
-            let g = md.mul(f, inv);
-            let ng = p - g;
-            for c in j..k {
-                row[c] = md.reduce(row[c] as u64 + ng * prow[c] as u64) as u32;
+            let ng = (p - md.mul(f, inv)) as u32;
+            for (x, &b) in row[j + 1..].iter_mut().zip(prow[j + 1..].iter()) {
+                *x += (ng as u64) * (b as u64);
             }
+            row[j] = 0;
         }
     }
     det
 }
 
 /// `|det|` of the `k × k` submatrix of `rows` selected by `subset`, by CRT over
-/// `threads`-way parallel 31-bit primes until two successive reconstructions agree.
+/// `threads`-way parallel 26-bit primes until two successive reconstructions agree.
 fn det_crt(rows: &[Vec<BigInt>], subset: &[usize], threads: usize) -> Option<BigInt> {
     let sub_rows: Vec<Vec<BigInt>> = subset.iter().map(|&i| rows[i].clone()).collect();
     let primes = crt_primes(512);
@@ -1480,7 +1518,7 @@ pub fn compute(
     // relations from one sieved product are correlated (they share the product's
     // exponent vector), so a plain n + 64 is often an index-2 sublattice; one
     // fifth of n extra rows has closed the lattice at the first round in tests
-    params.excess = params.excess.max(n / 5);
+    params.excess = params.excess.max(n * 3 / 10);
     let mut last: Option<(BigInt, Dense)> = None;
     for round in 0..max_rounds {
         let (rels, prods) = collect_relations(&fb, &params);
