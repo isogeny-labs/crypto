@@ -70,7 +70,7 @@ Poisson floors: 0.886 (C=0), 1.329 (C=1), 1.662 (C=2).
 | 28 | 33558059 | 2 | 1.738 | 1.658 | n/a | 1.723 | 1.685 | 0.991 | 1.009 | 1.730 |
 
 Standard errors: 0.011 to 0.012 on every 2000-sample cell (0.015 to 0.016 on the 1000 training cells); all rows are in
-`out-k*.txt`. D2 (serpentine box tiling) reaches rank K in in 0 to 9 percent of samples before the cap
+`out-k*.txt`. D2 (serpentine box tiling) reaches rank K in 0 to 9 percent of samples before the cap
 (E >= 9.5 at C=0, >= 9.98 at C=1 and 2: censored lower bounds), see `out-controls-*.txt`; this is the redundant
 coverage the record predicts for tiling, and not a competitive design.
 
