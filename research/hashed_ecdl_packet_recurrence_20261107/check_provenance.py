@@ -30,3 +30,19 @@ print(f"Metadata only: {len(sources['sources'])} source records; "
       f"{len(recurrence['anchors'])} anchors; "
       f"{len(sources['current_native_comparisons'])} pinned native comparisons consistent.")
 print('No semantic refinement, theorem, complexity bound, PCC standing or scientific result checked.')
+
+# Registration metadata only: canonical identity and immutable historical prefix.
+registration = sources['registration']
+claim_data = (repo / registration['claim_path']).read_bytes()
+claim = json.loads(claim_data)
+canonical = json.dumps(claim, sort_keys=True, separators=(',', ':'), ensure_ascii=False).encode()
+assert hashlib.sha256(canonical).hexdigest() == registration['canonical_digest']
+assert hashlib.sha256(claim_data).hexdigest() == registration['raw_file_sha256']
+base_ledger = blob(registration['base'], 'pcc/ledger.jsonl')
+ledger = (repo / 'pcc/ledger.jsonl').read_bytes()
+assert ledger.startswith(base_ledger)
+rows = ledger.splitlines()
+event = json.loads(rows[registration['prior_rows']])
+assert event['hash'] == registration['event_hash']
+assert event['body']['claim_id'] == registration['id']
+print('Registered statement identity and old prefix consistent; this does not verify its argument.')

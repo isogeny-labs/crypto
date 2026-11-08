@@ -3,7 +3,7 @@
 #set par(justify: false, leading: 0.55em)
 #show heading: set text(fill: rgb("#17324f"))
 #heading(level: 1, "Packet work and live-storage recurrence: review proposal")
-#text("7 November 2026. Unregistered working proposal. This is a source-pinned budget specification for review, not a proved bound, executed control or registered PCC result. It has no claim ID or signed verdict. Publication and result citation are pending the registration boundary in REGISTRATION.md (REGISTRATION.md). All proposed arguments below are unverified. [pcc:unverified]")
+#text("Source review prepared 7 November; registered 8 November 2026 as PCC-20261108-ebd943, kind statement, standing UNVERIFIED. This is a source-pinned budget specification for review, not a proved bound, executed control or verified PCC result. It has no proof or signed verdict. The owner authorized one official ledger append, preserving every prior row. The remaining integration boundary is recorded in REGISTRATION.md (REGISTRATION.md). All proposed arguments below remain unverified. [pcc:unverified]")
 
 #text("The proposed advance joins packet preparation, every attempted DFS choice, outgoing integer arithmetic, child construction, interpolation and retained ancestors in one cost ledger. The coarse entry budget uses the full current mode count B; it does not require the unverified q<=E<=R candidate. That candidate remains relevant to tuple/child correctness and sharper budgets. This proposal supplies conditional inequalities and a trace-accounting recurrence, not a checked complexity theorem. [pcc:unverified]")
 
@@ -133,4 +133,4 @@
 
 #text("Next discriminating step: bind B and all attempted mode-preparation candidates to root s and the tapered p_t along one recursive path, together with exact sample/jet lifetimes. That would close the missing dimensional inputs to this ledger before a faithful machine/refinement proof can claim its bounds.")
 
-#text("The general audit remains open. No canonical leaderboard, curve or performance graph obtains new measurements or transfer edges. Existing measured graphs and historical reports stay unchanged. This draft has editable source/PDF and metadata checks; registration and PR publication are explicitly pending.")
+#text("The general audit remains open. No canonical leaderboard, curve or performance graph obtains new measurements or transfer edges. Existing measured graphs and historical reports stay unchanged. The packet has editable source/PDF and metadata checks. Registration is complete as an unverified statement; PR integration still requires current-head gates, actual protection/reviews and an immutable-preserving fork resolution.")
