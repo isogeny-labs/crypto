@@ -1,5 +1,10 @@
 # Exact formal scope
 
+Version update: the coefficientwise local-series and actual puncture-polynomial
+bridges listed as open in this first-session map are now proved at the scope
+in [LOCAL_SERIES_PROOF_MAP.md](LOCAL_SERIES_PROOF_MAP.md). Earlier receipts
+remain historical, pinned evidence; no frozen experiment was rerun.
+
 Lean4.35.0; CryptoLean148f5dc389b341401e06d76abe7783c4ccf42f2e;
 Mathlibcfc55fc58714a59dc06e6e79edc6d1d95140d3c2. Libraries CauchyNormalizer and
 KernelNodes use the unchanged prior source directory. Final producer checks
