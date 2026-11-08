@@ -73,3 +73,21 @@ Implement/qualify cache_analyze.cpp and synthetic complete-matrix/receipt corrup
 Initial cold draft used the wrong amendment shape and metric enums; preserved invalid JSON, generator and validation errors, then corrected to a schema-valid draft. Arm-order seed is the exact source-owned64-bit hexadecimal rule rather than a JSON floating-point approximation. Final native builds are warning-free. No scientific timing/census was repeated. No root Rust library suite is claimed; no Rust implementation was edited.
 
 Sources checked (KB): tools absent and migrated wrapper status failed127. Read the existing construction, residual and cold-boundary contracts; primary Grabner–Heuberger–Prodinger introduction/section2 and Bernstein–Lange EFD precomputation/normalization discussion. No novelty or optimality claim. The report is software qualification, not an official scientific promotion or a new global quotient construction.
+
+## 2026-11-08T05:19Z: independent coordinates and strict native analysis
+
+### What was done
+
+Completed cache_analyze.cpp with 24 passing synthetic decision/corruption checks and exact 3500/7000-row validation. Fabricated times are software fixtures only. Independent GMP affine arithmetic verifies all60 expected mu point outputs, all60 subgroup memberships and rejects three changed sign/coordinate/scalar inputs. The saved replay completed with exit0 before migration reconciliation; it was not repeated. Sources and binary hashes are retained. Diem remains deadline-expired/inactive with50of52 durable records and no launcher; no duplicate or cloud job was started.
+
+### Decisions made
+
+Bind the analyzer, worker/header, isolation, independent point checker, nine inputs and exact host/environment into the new frozen record. Keep the deterministic primary and full cold boundary. Publish source and launch scripts, then the frozen protocol, before the first timed call. At most one calibration and one conditional held-out worker, each120seconds/2GiB; failure/refusal stops the lane without an unchanged retry. No budget/cap/role expansion.
+
+### Open threads
+
+Attempt native isolation after publication and retain the resulting receipt. Only complete admitted/uncontended panels may enter the analysis. P-192 remains primary and allfive curves remain in scope. The full e2e objective stays active. The shared daily log was read from HEAD; prior exclusive scope is respected and this task-local record carries the update.
+
+### Errors
+
+The first analyzer build's unused-function warning and19-check suite remain as v1; final v2 is warning-free and passes24. Earlier source-read output was truncated; saved replay logs/exits were reconciled rather than restarting the process. No root Cargo suite is claimed for these standalone C++ additions. Sources checked (KB): existing construction/cold contract and cited primary background; loaded KB tools/wrapper remain unavailable as previously recorded.

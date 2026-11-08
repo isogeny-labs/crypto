@@ -87,3 +87,13 @@ $(BUILD_DIR)/cache-eval: cache_eval.cpp cache_core.hpp native.cpp json.hpp relat
 	$(CXX) $(CXXFLAGS) cache_eval.cpp -o $@ $(LDLIBS)
 cache-eval-binary: $(BUILD_DIR)/cache-eval
 .PHONY: cache-eval-binary
+$(BUILD_DIR)/cache-analysis: cache_analyze.cpp json.hpp
+	mkdir -p $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) cache_analyze.cpp -o $@ -lcrypto
+cache-analysis-binary: $(BUILD_DIR)/cache-analysis
+.PHONY: cache-analysis-binary
+$(BUILD_DIR)/cache-points: cache_points.cpp json.hpp
+	mkdir -p $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) cache_points.cpp -o $@ -lgmpxx -lgmp
+cache-points-binary: $(BUILD_DIR)/cache-points
+.PHONY: cache-points-binary
