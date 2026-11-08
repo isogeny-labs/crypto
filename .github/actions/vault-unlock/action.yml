@@ -1,0 +1,39 @@
+name: vault-unlock
+description: >
+  Decrypt vault-encrypted research paths for this job. Assumes a per-realm AWS
+  role through GitHub OIDC (the caller needs `permissions: id-token: write`),
+  unwraps the realm keys with KMS, and smudges the working tree. Plaintext
+  exists only in this runner's workspace; see tools/vault/README.md for the
+  rules on logs and artifacts.
+inputs:
+  realms:
+    description: Space-separated realms to unlock (least privilege: only what the job reads).
+    required: true
+  role-to-assume:
+    description: ARN of the role whose policy allows kms:Decrypt for these realms.
+    required: true
+  aws-region:
+    description: KMS region.
+    default: us-west-2
+runs:
+  using: composite
+  steps:
+    - uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ inputs.role-to-assume }}
+        role-session-name: vault-${{ github.run_id }}-${{ github.run_attempt }}
+        aws-region: ${{ inputs.aws-region }}
+    - name: Build vault
+      shell: bash
+      run: |
+        cargo install --quiet --locked --path tools/vault --root "$RUNNER_TEMP/vault"
+        echo "$RUNNER_TEMP/vault/bin" >> "$GITHUB_PATH"
+    - name: Unlock
+      shell: bash
+      env:
+        REALMS: ${{ inputs.realms }}
+      run: |
+        args=()
+        for r in $REALMS; do args+=(--realm "$r"); done
+        vault unlock --no-hooks "${args[@]}"
+        vault status
