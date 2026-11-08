@@ -945,8 +945,8 @@ mod tests {
                 for s in 0..t {
                     let same = v[s].a == v[t].a && v[s].b == v[t].b;
                     let opp = neg
-                        && (v[s].a as u64 + v[t].a as u64) % r == 0
-                        && (v[s].b as u64 + v[t].b as u64) % r == 0;
+                        && (v[s].a as u64 + v[t].a as u64).is_multiple_of(r)
+                        && (v[s].b as u64 + v[t].b as u64).is_multiple_of(r);
                     if same || opp {
                         continue;
                     }
@@ -1005,10 +1005,10 @@ mod tests {
         check(&v, r);
         // b = 0, equal b, opposite b, small b classes
         let mut w = Vec::new();
-        for i in 0..40u32 {
+        for _ in 0..40u32 {
             let b = [0u32, 1, 100, 1, 0, 100, 5, 96][(rng.below(8)) as usize];
             w.push(Pt {
-                a: rng.below(r) as u32 + i * 0,
+                a: rng.below(r) as u32,
                 b,
             });
         }
