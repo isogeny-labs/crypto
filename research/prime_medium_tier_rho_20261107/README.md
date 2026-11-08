@@ -1,5 +1,12 @@
 # Prime medium-tier rho reference bound (launch-ready, not run)
 
+> **Result (2026-11-08).** The run is complete. See [`RESULTS.md`](RESULTS.md).
+> The `rho.negation` medium constant over the floor at w = 0 is 1.093 [1.033, 1.156].
+> The PROTOCOL.md §9 verdict is `inconclusive`: the positive control P4 misses its
+> threshold in every job. On M alone the verdict would be `setup_excess`.
+> Every number is `[pcc:unverified]`.
+
+
 Slug `prime_medium_tier_rho`. Lead `LEAD-RHO-matched-rho-calibration`
 (priority 2 of the 2026-11-07 prime-field lead assessment). **Nothing here has
 been measured on EKS.** The only executions were local development checks,
