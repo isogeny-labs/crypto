@@ -398,12 +398,19 @@ enum Cmd {
         /// the comparison, which is then not admissible).
         #[arg(long)]
         allow_interrupted: bool,
-        /// Also price, in the §5a band and under --weight, the per-step
-        /// table inserts the IC table oracles count in `work_native`
+        /// Price, in the §5a band and under --weight, the per-step table
+        /// inserts the IC table oracles count in `work_native`
         /// (`table_insert_attempts` behind its `counted:` marker), which
-        /// `cost.unpriced` never lists; off by default, the committed band.
-        #[arg(long)]
+        /// `cost.unpriced` never lists. The default since 2026-11-08;
+        /// accepted for compatibility.
+        #[arg(long, conflicts_with = "no_price_table_work")]
         price_table_work: bool,
+        /// The pre-2026-11-08 reading: charge `cost.unpriced` alone and
+        /// leave the counted table work listed but unpriced. Reproduces
+        /// every comparison saved before that date, `comparison_id` and
+        /// plain file name included.
+        #[arg(long)]
+        no_price_table_work: bool,
     },
     /// The one-unit table: every arm on every curve, mean S, ratio to the
     /// floor and to the reference arm.
@@ -431,13 +438,19 @@ enum Cmd {
         /// Print the pairwise verdicts after the table.
         #[arg(long)]
         ranks: bool,
-        /// Also price the per-step table inserts the IC table oracles
-        /// count in `work_native` (`table_insert_attempts` behind its
-        /// `counted:` marker), which `cost.unpriced` never lists, at w per
-        /// operation like rho's canonicalisations; off by default, the
-        /// committed band. The record format is unchanged.
-        #[arg(long)]
+        /// Price the per-step table inserts the IC table oracles count in
+        /// `work_native` (`table_insert_attempts` behind its `counted:`
+        /// marker), which `cost.unpriced` never lists, at w per operation
+        /// like rho's canonicalisations. The default since 2026-11-08
+        /// (AGENTS.md §5a); accepted for compatibility. The record format
+        /// is unchanged.
+        #[arg(long, conflicts_with = "no_price_table_work")]
         price_table_work: bool,
+        /// The pre-2026-11-08 reading: charge `cost.unpriced` alone and
+        /// list the counted table work without pricing it. Reproduces the
+        /// band files written before that date.
+        #[arg(long)]
+        no_price_table_work: bool,
     },
     /// Resource vectors for all measured attempts; no invented SAT/GAE conversion.
     Resources {
@@ -1769,7 +1782,8 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             save,
             json,
             allow_interrupted,
-            price_table_work,
+            price_table_work: _,
+            no_price_table_work,
         } => {
             let c = compare::compare_weighted_with(
                 &dir,
@@ -1781,7 +1795,7 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                     seed,
                     allow_interrupted,
                     pricing: crypto_lib::cryptanalysis::ecbench::band::Pricing {
-                        table_work: price_table_work,
+                        table_work: !no_price_table_work,
                     },
                 },
                 weight,
@@ -1789,6 +1803,11 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             if save {
                 let d = dir.join("comparisons");
                 std::fs::create_dir_all(&d).map_err(|e| e.to_string())?;
+                // The plain `a__b.json` name is pinned to the unweighted
+                // pre-2026-11-08 reading, which every comparison saved
+                // before that date is; a weighted or table-work-priced
+                // comparison (the default since then) carries its id, so a
+                // new reading never overwrites an old file.
                 let suffix = if c.pricing_weight.is_some() || !c.priced_table_work.is_empty() {
                     format!("__{}", c.comparison_id)
                 } else {
@@ -1809,9 +1828,13 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
                 if let Some(weight) = c.pricing_weight {
                     println!("pricing weight: {weight} GAE per native operation");
                 }
-                if !c.priced_table_work.is_empty() {
+                if c.priced_table_work.is_empty() {
                     println!(
-                        "table work priced with the unpriced counters: {}",
+                        "table work listed, not priced: the pre-2026-11-08 reading (--no-price-table-work)"
+                    );
+                } else {
+                    println!(
+                        "table work priced with the unpriced counters (the default since 2026-11-08): {}",
                         c.priced_table_work.join(", ")
                     );
                 }
@@ -1929,8 +1952,9 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             weights,
             json,
             ranks,
-            price_table_work,
-        } => band_cmd(&dir, &weights, json.as_deref(), ranks, price_table_work)?,
+            price_table_work: _,
+            no_price_table_work,
+        } => band_cmd(&dir, &weights, json.as_deref(), ranks, !no_price_table_work)?,
         Cmd::Resources { dir, out } => {
             let report = resources::session(&dir)?;
             if let Some(path) = out {

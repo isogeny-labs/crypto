@@ -37,7 +37,19 @@
 //!
 //! *Pricing band.*  AGENTS.md §5a: the unpriced native work of every arm
 //! is priced at 0, 0.1 and 1 GAE per operation and the order is reported
-//! only where it holds at every weight (`ops.band`).
+//! only where it holds at every weight (`ops.band`).  Since 2026-11-08 the
+//! default reading also prices the table oracles' counted per-step inserts
+//! (`band::Pricing`); `--no-price-table-work` is the earlier reading.
+//!
+//! *Identity.*  `comparison_id` hashes the inputs and the reading: the
+//! weight when one is given, and the priced table-work counters when any
+//! are (so a default comparison since 2026-11-08 has a different id from
+//! the pre-2026-11-08 comparison of the same inputs, which
+//! `--no-price-table-work` reproduces exactly, id included).
+//! `legacy_comparison_id` is the id of the v1 comparison of the same inputs
+//! (v1 had no band and no pricing), present on every unweighted comparison
+//! under either reading, so calibration replays v1 files under the current
+//! default.
 //!
 //! **Wall time** is a practicality note.  It is compared only inside one
 //! session (same host class, interleaved), only over pairs where both
@@ -149,7 +161,8 @@ pub struct ArmSummary {
     pub unpriced_counts: BTreeMap<String, Option<u64>>,
     /// Table work the arm counts in `work_native` behind a `counted:`
     /// marker (`band::table_work_counts`), summed over the verified runs.
-    /// Listed always; in the price only under `--price-table-work`
+    /// Listed always; in the price under the default reading since
+    /// 2026-11-08, not under `--no-price-table-work`
     /// (`Comparison::priced_table_work`).
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub table_work_counts: BTreeMap<String, u64>,
@@ -208,7 +221,9 @@ pub struct OpsBand {
     pub pairs: u64,
     pub note: String,
     /// The counted table-work counters priced in `U` at each weight
-    /// (`band::Pricing::table_work`); absent in the default band.
+    /// (`band::Pricing::table_work`); present in the default band since
+    /// 2026-11-08, absent in the pre-2026-11-08 reading
+    /// (`--no-price-table-work`) and in every comparison before that date.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub priced_table_work: Vec<String>,
 }
@@ -401,8 +416,10 @@ pub struct Comparison {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pricing_weight: Option<f64>,
     /// Counted table work (`work_native`, `counted:` marker) priced with the
-    /// unpriced counters, by name (`--price-table-work`); absent in the
-    /// default pricing, which is every comparison before 2026-11-08.
+    /// unpriced counters, by name.  Present under the default reading since
+    /// 2026-11-08 and part of `comparison_id` then; absent under
+    /// `--no-price-table-work`, which is every comparison before that date
+    /// (the pre-2026-11-08 reading).
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub priced_table_work: Vec<String>,
     /// The deterministic bootstrap seed. Historical v1 files did not store
@@ -421,7 +438,8 @@ pub struct Comparison {
     pub quality: Option<MeasurementQuality>,
     pub verdict: String,
     /// The id a v1 comparison of the same inputs carries; calibration
-    /// replays v1 files against it.
+    /// replays v1 files against it.  Independent of the pricing reading
+    /// (v1 had no band), present on every unweighted comparison.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub legacy_comparison_id: Option<String>,
     /// Status of each side's session (`complete`, `interrupted`, `running`).
@@ -447,7 +465,8 @@ pub struct CompareOptions {
     /// comparison is marked not admissible.
     pub allow_interrupted: bool,
     /// What the §5a band and `--weight` charge beyond `cost.unpriced`
-    /// (default: nothing; `table_work` prices the counted table inserts).
+    /// (default since 2026-11-08: the counted table inserts;
+    /// `Pricing::pre_2026_11_08()` charges nothing extra).
     pub pricing: Pricing,
 }
 
@@ -1227,7 +1246,9 @@ pub fn compare_loaded_weighted(
         if let Some(w) = weight {
             identity["pricing_weight"] = json!(w.to_string());
         }
-        if !priced_table_work.is_empty() {
+        // The reading is part of the v2 identity; the v1 identity predates
+        // pricing and stays the same under either reading.
+        if extra && !priced_table_work.is_empty() {
             identity["priced_table_work"] = json!(priced_table_work);
         }
         short_id("ECC1", &identity)
@@ -1248,8 +1269,7 @@ pub fn compare_loaded_weighted(
         wall,
         quality: Some(quality),
         verdict,
-        legacy_comparison_id: (weight.is_none() && opts.pricing == Pricing::default())
-            .then_some(legacy_id),
+        legacy_comparison_id: weight.is_none().then_some(legacy_id),
         a_session_status: Some(sa.status.clone()),
         b_session_status: Some(sb.status.clone()),
         allow_interrupted: opts.allow_interrupted,
@@ -2650,6 +2670,61 @@ mod tests {
         assert!(zero.legacy_comparison_id.is_none());
         assert!(one.legacy_comparison_id.is_none());
         assert!(one.workloads[0].a_mean_s.unwrap() > zero.workloads[0].a_mean_s.unwrap());
+    }
+
+    /// The two readings of one real session (targetwalk k20-s0, rho-neg vs
+    /// twcj-x15): the default prices the counted inserts and says so in its
+    /// identity, `--no-price-table-work` reproduces the pre-2026-11-08
+    /// comparison (no `priced_table_work`, the old id), the v1 id is the
+    /// same under both, and the unweighted headline (recorded S) does not
+    /// move; only the band does.
+    #[test]
+    fn default_and_pre_2026_11_08_readings_differ_in_the_band_and_the_id_only() {
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("research/curve25519_f1_targetwalk_20261108/sessions/k20-s0");
+        let session = crate::cryptanalysis::ecbench::runner::read_session(&dir).unwrap();
+        let records = crate::cryptanalysis::ecbench::runner::read_records(&dir).unwrap();
+        let run = |pricing: Pricing| {
+            let opts = CompareOptions {
+                resamples: 40,
+                seed: 7,
+                allow_interrupted: false,
+                pricing,
+            };
+            compare_loaded_weighted(
+                &session, &records, &session, &records, "rho-neg", "twcj-x15", Level::L0, &opts,
+                None,
+            )
+            .unwrap()
+        };
+        let on = run(Pricing::default());
+        let off = run(Pricing::pre_2026_11_08());
+        let explicit = run(Pricing { table_work: true });
+        assert_eq!(on.comparison_id, explicit.comparison_id, "`--price-table-work` is a no-op");
+        assert_eq!(on.priced_table_work, vec!["table_insert_attempts".to_string()]);
+        assert!(off.priced_table_work.is_empty(), "the pre-2026-11-08 reading");
+        assert_ne!(on.comparison_id, off.comparison_id, "the reading is in the id");
+        assert!(on.legacy_comparison_id.is_some());
+        assert_eq!(on.legacy_comparison_id, off.legacy_comparison_id, "v1 had no band");
+        assert_eq!(on.ops.ratio_b_over_a, off.ops.ratio_b_over_a, "recorded S headline");
+        assert_eq!(on.ops.ci95_bootstrap, off.ops.ci95_bootstrap);
+        let (bon, boff) = (on.ops.band.as_ref().unwrap(), off.ops.band.as_ref().unwrap());
+        assert_eq!(bon.priced_table_work, on.priced_table_work);
+        assert!(boff.priced_table_work.is_empty());
+        assert_eq!(bon.ratio_b_over_a[0], boff.ratio_b_over_a[0], "nothing moves at w = 0");
+        assert!(bon.ratio_b_over_a[2].unwrap() > boff.ratio_b_over_a[2].unwrap());
+        assert_eq!(boff.order, "unresolved inside the band");
+        assert!(bon.order.starts_with("twcj-x15 >"), "{}", bon.order);
+        for arm in [&on.a, &on.b, &off.a, &off.b] {
+            let listed = arm.table_work_counts.get("table_insert_attempts").copied();
+            if arm.arm == "rho-neg" {
+                assert_eq!(listed, None);
+            } else {
+                assert!(listed.is_some_and(|n| n > 0), "listed under both readings");
+            }
+        }
+        let json = serde_json::to_value(&off).unwrap();
+        assert!(json.get("priced_table_work").is_none(), "as the old files were written");
     }
 
     #[test]

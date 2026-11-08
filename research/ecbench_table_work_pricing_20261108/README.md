@@ -5,6 +5,26 @@ the committed sessions of two studies with the binary built from this branch. No
 been filed, so every number below is an unverified assertion until it is reviewed
 [pcc:unverified].
 
+## Adopted as default (2026-11-08)
+
+The repository owner approved the priced reading as the band's default on 2026-11-08, after PR
+#3700 landed it as an opt-in. From that date `band::Pricing::default()` has `table_work: true`:
+`ecbench band` and `ecbench compare` price the table oracles' counted per-step inserts without a
+flag, the band report names the priced counters by default (`priced_table_work`), and a default
+comparison carries them in its `comparison_id`. The former default is kept as the pre-2026-11-08
+reading: `--no-price-table-work` on both commands (`band::Pricing::pre_2026_11_08()`) reproduces
+every band file and comparison computed before that date, id and plain file name included, and a
+band or comparison from before that date is labelled the pre-2026-11-08 reading where it is cited
+again. `--price-table-work` is still accepted and does nothing. Counted work without its
+`counted:` marker is still not charged, and the record format does not change. The rule is now
+AGENTS.md section 5a; the tool text is `docs/ecbench/README.md`, "Table work is priced by
+default". The outputs under `data/` were regenerated with the new binary under both readings
+(`scripts/run.sh`, `data/binary.sha256`, `data/source-commit.txt`): the default output equals the
+former `--price-table-work` output, and `--no-price-table-work` equals the former default output,
+table for table and value for value in the JSON [pcc:unverified]. The sections below are the note
+as written for the opt-in; where they say "default" they mean the pre-2026-11-08 reading, and
+where they say `--price-table-work` they mean what is now the default.
+
 ## The asymmetry
 
 The band of AGENTS.md section 5a charges, at weight w, every counter a record names in
@@ -26,14 +46,16 @@ and `research/curve25519_f1_walk_20261107` (README, "Limits") [pcc:unverified].
 
 ## The rule, as implemented
 
-`band::Pricing { table_work: bool }`, default off. With `table_work` on, the phase sum of each
+`band::Pricing { table_work: bool }`, off by default when this note was written and on by
+default since the owner's ruling of the same day (above). With `table_work` on, the phase sum of each
 counter in `band::TABLE_WORK_COUNTERS` (today `["table_insert_attempts"]`) is added to U, when and
 only when some phase of the record carries the matching `counted:<name>` marker; a count without
 its marker is not known to be complete and is not charged. Everything else in the price is as
 before: `priced_gae(w) = G - C + w (U + n_C)`. The `_with(pricing)` variants of `priced_counts`,
 `unpriced_total`, `priced_gae`, `priced_s` and `band` take the option; the existing functions keep
-their signatures and behaviour. On the command line: `ecbench band --price-table-work` and
-`ecbench compare --price-table-work`.
+their signatures and behaviour. On the command line, as first landed: `ecbench band
+--price-table-work` and `ecbench compare --price-table-work`; since the ruling the flag is a no-op
+and `--no-price-table-work` selects the earlier reading.
 
 What does not change:
 
@@ -41,11 +63,16 @@ What does not change:
   the phase `native` maps and `work_native` are written as before, so the replay audit
   (`audit.rs`, `compare_replay`) compares what it compared, and committed sessions keep replaying
   "identical".
-- The default band. `ecbench band` without the flag reproduces the committed band files: the test
-  `default_band_reproduces_the_committed_targetwalk_band_file` checks k20-s0 of the targetwalk
-  study against `data/band-k20-s0.json` to 1e-9 per arm and weight, and the default JSON keeps
-  its keys (one addition: a band row always lists `table_work_mean_counts`; the report's
-  `priced_table_work` and a comparison's `priced_table_work` appear only when the flag is on).
+- The pre-2026-11-08 band stays reproducible. `ecbench band --no-price-table-work` (at first
+  landing, `ecbench band` without the flag) reproduces the committed band files: the test
+  `pre_2026_11_08_pricing_reproduces_the_committed_targetwalk_band_file` checks k20-s0 of the
+  targetwalk study against `data/band-k20-s0.json` to 1e-9 per arm and weight, and that reading's
+  JSON keeps its keys (one addition: a band row always lists `table_work_mean_counts`; the
+  report's `priced_table_work` and a comparison's `priced_table_work` appear only when table work
+  is priced, which since the ruling is the default). The converse test
+  `default_band_differs_from_the_committed_file_by_the_insert_term_only` checks that the default
+  band on the same session differs from the committed file by exactly
+  w · mean(table_insert_attempts) / sqrt(r) per arm and weight.
 - The schema name, `ecbench.band/v1`.
 
 Tests (`src/cryptanalysis/ecbench/band.rs`): the default-band reproduction above; with
@@ -56,11 +83,12 @@ no marker is not charged.
 
 ## Outputs
 
-`scripts/run.sh` runs `ecbench band --ranks` with and without `--price-table-work` on the pooled
-sessions `k20-s*` and `k24-s*` of each study (512 verified runs per arm and size) and writes
-`data/band-<study>-k<k>[-table-work].{txt,json}`; `data/binary.sha256` and
-`data/source-commit.txt` name the binary and the source commit the sessions were read with
-[pcc:unverified]. Mean S over the verified runs; the ratios are of the two arms' mean S, not the
+`scripts/run.sh` runs `ecbench band --ranks` under both readings on the pooled sessions `k20-s*`
+and `k24-s*` of each study (512 verified runs per arm and size) and writes
+`data/band-<study>-k<k>.{txt,json}` (the pre-2026-11-08 reading, `--no-price-table-work`) and
+`data/band-<study>-k<k>-table-work.{txt,json}` (table work priced, the default since 2026-11-08);
+`data/binary.sha256` and `data/source-commit.txt` name the binary and the source commit the
+sessions were read with [pcc:unverified]. Mean S over the verified runs; the ratios are of the two arms' mean S, not the
 paired estimator of the studies' `pooled_compare.py`, so they differ from the studies' pooled
 ratios in the third digit [pcc:unverified].
 
@@ -126,15 +154,18 @@ verdicts against their own incumbents (twcj-x15 < f1-x07, f1 < f2-inc) hold unde
 - `TABLE_WORK_COUNTERS` names one counter. Other `work_native` counters behind `counted:` markers
   (`index_inserts`, `gauss_entries_scanned`, `row_build_*`, `lookups` in `oracle_setup`) are not
   priced by this option; they are the bitop unit's.
-- The option is opt-in. Which reading is the §5a band is the owner's ruling (proposed wording in
-  the session report); until then a note that quotes a walk-table arm's distance to rho at w > 0
-  should give both.
+- The option was opt-in when this note was written. The owner ruled on 2026-11-08 that the
+  priced reading is the §5a band ("Adopted as default", above); a note that quotes a walk-table
+  arm's distance to rho at w > 0 from a band computed before that date labels it the
+  pre-2026-11-08 reading.
 
 ## Files
 
 - `scripts/run.sh`: the commands (sets `BENCHREC_SKIP`; this is analysis of committed sessions).
-- `data/band-{targetwalk,walk}-k{20,24}.{txt,json}`: default band, pooled sessions.
-- `data/band-{targetwalk,walk}-k{20,24}-table-work.{txt,json}`: with `--price-table-work`.
+- `data/band-{targetwalk,walk}-k{20,24}.{txt,json}`: the pre-2026-11-08 reading
+  (`--no-price-table-work`), pooled sessions.
+- `data/band-{targetwalk,walk}-k{20,24}-table-work.{txt,json}`: table work priced, the default
+  since 2026-11-08.
 - `data/binary.sha256`, `data/source-commit.txt`.
 - Code: `src/cryptanalysis/ecbench/band.rs`, `src/cryptanalysis/ecbench/compare.rs`,
   `src/bin/ecbench.rs`; docs: `docs/ecbench/README.md`.
