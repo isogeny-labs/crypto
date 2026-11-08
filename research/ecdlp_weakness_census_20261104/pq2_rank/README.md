@@ -99,6 +99,21 @@ One row first recorded 0 linear polynomials because its output was truncated whi
 disk was full. The rerun gives k, and the part file `f4/msolve_n26_i0.json` takes
 precedence. Three instances were rerun after a machine restart.
 
+**Testing the published step to 5 (`f4/step_n36_37/`).** Kousidis and Wiemers report Magma
+degree 4 for n ≤ 36 and 5 from n = 37. To test that with a second implementation, msolve
+ran on fresh instances at n = 36 and 37.
+
+| instance | outcome |
+|---|---|
+| n = 36, instance 0 (control) | maximal step degree 4, linear polynomials = k = 35, 47 minutes |
+| n = 37, instance 0 (test) | not finished: killed twice for memory during degree-4 steps |
+| n = 36 and 37, instance 1 | stopped early to save memory, no result |
+
+On the single-thread retry at n = 37, memory grew about 1.2 GiB per minute and passed
+13 GiB on a 15 GiB machine (`msolve_n37_i0.mem.log`). The earlier attempts are kept as
+`*.timeout_3600s.log` and `*.killed_t3.*`. Whether msolve reaches degree 5 at n = 37 is
+still open; it needs a machine with more memory.
+
 **Independent cross-check.** `crosscheck/` recomputes the closure by naive full
 saturation in pure Python, sharing no code with the Rust closure. It agrees with Rust
 on five dumped instances at n = 14 to 18 at degree 3. At degree 4 the Python closure reaches k on
