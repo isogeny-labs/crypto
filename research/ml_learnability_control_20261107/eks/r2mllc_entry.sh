@@ -23,7 +23,6 @@ up() {  # upload everything in $OUT (files only, no deletion); SHA256SUMS regene
   grep MemTotal /proc/meminfo; uname -r; cat /opt/study/build-info.json; } > "$OUT/host.txt" 2>&1
 python3 -I -c "import numpy,scipy,sklearn,sys;print(sys.version,numpy.__version__,scipy.__version__,sklearn.__version__)" | tee "$OUT/versions.txt"
 ( cd "$SRC" && sha256sum PROTOCOL.md mllc_ecgen.py mllc_harness.py mllc_job.sh ) | tee "$OUT/source.sha256"
-sha256sum "$0" /opt/study/src/../r2mllc_entry.sh 2>/dev/null | sort -u > "$OUT/entry.sha256"
 up
 
 ( while sleep 600; do up; done ) &
