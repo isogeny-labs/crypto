@@ -1,13 +1,20 @@
 # C1 end to end: standard base against the twisted all-lift line, against strong rho
 
-Preregistered 2026-11-07, before any measured data. Machine-readable form:
-[`protocol.json`](protocol.json) (`experiment.protocol/v1`, validated with
-`crypto-autoresearcher/tools/experiment_protocol.py validate`). First
-committed in `bfcd18db85`, before any data. The `freeze` block is still
-`draft`: `experiment_protocol.py freeze` refuses until the protocol records a
-measured per-arm timing (`preflight_runtime`) and an analysis-script hash,
-and neither could be produced in the preparing session (see README). Rule 1
-below fills them before the first dispatch; nothing else may change. Instrument: [`specs/`](specs/).
+Preregistered 2026-11-07, before any measured data. First committed in `bfcd18db85`.
+Frozen 2026-11-08, after the stopping rule 1 checks and still before any measured data
+(the freezing commit is in [`protocol.json`](protocol.json)'s `freeze` block). Machine-readable
+form: [`protocol.json`](protocol.json) (`experiment.protocol/v1`, validated and frozen with
+`crypto-autoresearcher/tools/experiment_protocol.py`). Instrument: [`specs/`](specs/).
+Frozen analysis: [`analyze.sh`](analyze.sh), whose hash is in `protocol.json`.
+
+**Changes between the first commit and the freeze, all made before any measured data:**
+
+- Rule 1 split the stage into two dispatches; see "Arms" below.
+- Arm order changed to `alternate_measured`, with 5 measured rounds.
+- The arm `rho-strong-l1-aa` was added as the std session's A/A.
+- The §5a band now reads the run's own counted calibration ratios (`calibration_ratios`)
+  when the pinned table has no row for the curve. Before this change, `ecbench compare` could
+  not price the band for any `F2m4` IC record.
 
 ## Question
 
@@ -44,7 +51,18 @@ Construction rules (`research/subgroup_trap_20261107`), enforced in code:
 - Targets are planted in the prime-order subgroup: ecbench `uniform_scalar_sha256_v1`,
   `target_seed = 20261107`.
 
-## Arms (one spec, one binary, one Job)
+## Arms (one binary, two sessions per stage)
+
+Stopping rule 1 split each stage into two isolab dispatches with the same workloads
+block (6 targets, `target_seed = 20261107`) and the same measurement seed. Their
+`(workload, round)` seeds therefore pair across sessions.
+
+- `specs/c1-e2e-m5-std.json`: both rho arms, `ic-std`, and `rho-strong-l1-aa`
+  (the A/A of that session).
+- `specs/c1-e2e-m5-tw.json`: both rho arms, `ic-tw-a`, `ic-tw-b`, and `ic-tw-a-aa`.
+
+The `m = 7` pair is the same for stage 2. Both sessions use `rounds = 5`, `warmup = 1`
+and order `alternate_measured`.
 
 | arm | role | method |
 |---|---|---|
@@ -53,7 +71,8 @@ Construction rules (`research/subgroup_trap_20261107`), enforced in code:
 | `ic-std` | baseline | `ic.pipeline`, `bin-x-line:line=standard`, `gaudry-x-bin:macaulay=26,sparsest=1,charge_unsolved=1` |
 | `ic-tw-a` | candidate | the same, `bin-x-line:line=twisted,line_seed=1` |
 | `ic-tw-b` | candidate (construction A/A) | the same, `line_seed=2` |
-| `ic-tw-a-aa` | control (wall A/A) | a repeat of `ic-tw-a` |
+| `ic-tw-a-aa` | control (wall A/A, tw session) | a repeat of `ic-tw-a` |
+| `rho-strong-l1-aa` | control (wall A/A, std session) | a repeat of `rho-strong-l1` |
 
 - **Matched rho.** The reference is the cheaper (lower `Σ S`) of the two strong
   negation walks.
@@ -77,17 +96,27 @@ Construction rules (`research/subgroup_trap_20261107`), enforced in code:
 
 ## Decision rule
 
-Run `ecbench compare --a ic-std --b ic-tw-a` over all `(workload, round)` pairs. It
-gives the paired totals ratio and its paired bootstrap 95% interval, at each `w`.
+The decision comparison runs across the two sessions. It compares operations only:
+ecbench refuses wall time across sessions.
 
-- **Improvement.** The upper end of the interval is below 1 at all three weights,
-  and `ic-tw-b / ic-tw-a` (the line A/A) contains 1.
+```
+ecbench compare --dir STD --a ic-std --b ic-tw-a --b-dir TW --weight w    (w = 0, 0.1, 1)
+```
+
+It gives the paired totals ratio and its paired bootstrap 95% interval.
+
+- **Improvement.** The upper end of the interval is below 1 at all three weights, and either
+  the line A/A interval (`ic-tw-b / ic-tw-a`) contains 1 or the C1 interval excludes the A/A
+  interval.
 - **Regression.** The lower end of the interval is above 1 at all three weights.
 - **Unresolved.** Anything else. A tie is the result if it happens.
-- **Incomplete.** Any comparison containing a run that did not verify.
-- **Correction.** Holm over the two decision comparisons.
-- **Gap to rho.** `S(arm) / S(rho_ref)` at each `w`, reported as the distance
-  remaining, not as a gate.
+- **Incomplete.** Any comparison containing an unverified run.
+- **Correction.** Holm over the two decision comparisons. The A/A comparisons decide nothing.
+- **Matched rho.** At each `w`, the matched rho is whichever of `rho-strong-l1` and
+  `rho-strong-l16` has the lower total priced `S` in the IC arm's own session.
+- **Gap to rho.** `S(arm) / S(rho_ref)` per `w`, reported as the distance remaining, not as a
+  gate.
+- **Wall time.** Compared within a session only, against that session's A/A.
 
 Prediction P1 (out of sample) is a ratio below 1, with a point value in
 `[0.1, 0.71]`. The relation phase dominates at toy size: twice the relations
@@ -106,15 +135,22 @@ times higher. The 2LP cost model's `2^{-0.5}` is the at-scale value.
 
 ## Stopping rules
 
-1. **Before dispatch.**
-   - The `xline_bin` unit tests must pass.
-   - One development smoke solve per IC arm at `m = 5` must verify, and its
-     per-execution time must be measured. The smoke is labelled not evidence.
-   - If the projected stage-1 time is above 2700 s, run each IC arm as its own
-     dispatch of the same workloads, seeds and rounds, with both rho arms and the
-     A/A arm. Never reduce targets or rounds.
-2. **Stage 2.** Stage 2 (`m = 7`) runs only if stage 1 completes and its measured
-   times project stage 2 below 2700 s per dispatch. Otherwise it is recorded as not run.
+1. **Before dispatch (satisfied 2026-11-08, before the freeze).**
+   - The `xline_bin` unit tests passed.
+   - A development smoke per IC arm verified and replayed identically. It ran at `m = 5`
+     with `target_seed = 99`, one workload, L0, on the shared preparing container, and is
+     labelled not evidence.
+   - Its timing:
+     - std session: 56 s per workload-round (`ic-std` 57.7 s);
+     - tw session: 49 s per workload-round.
+   - Projected over one session with 6 workloads × 6 rounds, that is about 3780 s, above
+     2700 s. Each stage therefore runs as the two dispatches above: about 2020 s and about
+     1760 s on that host.
+   - A dispatch that reaches its 3600 s deadline is kept as censored evidence and the stage
+     is incomplete. It is never rerun smaller.
+2. **Stage 2.** Stage 2 (`m = 7`, std and tw specs) runs only if stage 1 completes and
+   an `m = 7` smoke per IC arm, scaled by the stage-1 measured times, projects each dispatch
+   below 2700 s. Otherwise it is recorded as not run.
 3. **Budget.** USD 10 in total, counting build, failed and interrupted attempts. Stop
    when the budget is reached or the spend is unknown.
 4. **Failed runs.** Failed, timed-out and wrong runs are kept. A comparison containing one is

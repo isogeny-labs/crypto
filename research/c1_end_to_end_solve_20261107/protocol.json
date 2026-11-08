@@ -14,8 +14,10 @@
     "rules": "research/subgroup_trap_20261107/README.md",
     "instrument_source": "src/cryptanalysis/ecbench/xline_bin.rs",
     "specs": [
-      "research/c1_end_to_end_solve_20261107/specs/c1-e2e-m5.json",
-      "research/c1_end_to_end_solve_20261107/specs/c1-e2e-m7.json"
+      "research/c1_end_to_end_solve_20261107/specs/c1-e2e-m5-std.json",
+      "research/c1_end_to_end_solve_20261107/specs/c1-e2e-m5-tw.json",
+      "research/c1_end_to_end_solve_20261107/specs/c1-e2e-m7-std.json",
+      "research/c1_end_to_end_solve_20261107/specs/c1-e2e-m7-tw.json"
     ]
   },
   "question": "Does the twisted all-lift line u.F_q lower the complete, verified, cold end-to-end index-calculus cost (relations, linear algebra, discrete log) against the standard base F_q on the same one-target workloads, in ecbench's counted unit, and what is each arm's distance to the matched strong rho?",
@@ -145,7 +147,8 @@
         "flags": {
           "method": "rho.negation_strong",
           "lanes": "1",
-          "dp_bits": "auto"
+          "dp_bits": "auto",
+          "dispatch": "std and tw (both sessions)"
         },
         "image_digest": null
       }
@@ -172,10 +175,40 @@
         "flags": {
           "method": "rho.negation_strong",
           "lanes": "16",
-          "dp_bits": "auto"
+          "dp_bits": "auto",
+          "dispatch": "std and tw (both sessions)"
         },
         "image_digest": null
       }
+    },
+    {
+      "id": "rho-strong-l1-aa",
+      "role": "control_aa",
+      "description": "repeat of rho-strong-l1 in the std dispatch (wall A/A of that session)",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--release",
+            "--locked",
+            "--bin",
+            "ecbench"
+          ]
+        ],
+        "binary_sha256": null,
+        "threads": 1,
+        "flags": {
+          "method": "rho.negation_strong",
+          "lanes": "1",
+          "dp_bits": "auto",
+          "dispatch": "std"
+        },
+        "image_digest": null
+      },
+      "same_instrument_as": "rho-strong-l1"
     },
     {
       "id": "ic-std",
@@ -199,7 +232,8 @@
         "flags": {
           "method": "ic.pipeline",
           "factor_base": "bin-x-line:line=standard",
-          "oracle": "gaudry-x-bin:macaulay=26,sparsest=1,charge_unsolved=1"
+          "oracle": "gaudry-x-bin:macaulay=26,sparsest=1,charge_unsolved=1",
+          "dispatch": "std"
         },
         "image_digest": null
       }
@@ -226,7 +260,8 @@
         "flags": {
           "method": "ic.pipeline",
           "factor_base": "bin-x-line:line=twisted,line_seed=1",
-          "oracle": "gaudry-x-bin:macaulay=26,sparsest=1,charge_unsolved=1"
+          "oracle": "gaudry-x-bin:macaulay=26,sparsest=1,charge_unsolved=1",
+          "dispatch": "tw"
         },
         "image_digest": null
       },
@@ -254,7 +289,8 @@
         "flags": {
           "method": "ic.pipeline",
           "factor_base": "bin-x-line:line=twisted,line_seed=2",
-          "oracle": "gaudry-x-bin:macaulay=26,sparsest=1,charge_unsolved=1"
+          "oracle": "gaudry-x-bin:macaulay=26,sparsest=1,charge_unsolved=1",
+          "dispatch": "tw"
         },
         "image_digest": null
       },
@@ -282,7 +318,8 @@
         "flags": {
           "method": "ic.pipeline",
           "factor_base": "bin-x-line:line=twisted,line_seed=1",
-          "oracle": "gaudry-x-bin:macaulay=26,sparsest=1,charge_unsolved=1"
+          "oracle": "gaudry-x-bin:macaulay=26,sparsest=1,charge_unsolved=1",
+          "dispatch": "tw"
         },
         "image_digest": null
       },
@@ -427,6 +464,12 @@
           2
         ],
         "how": "twisted arms ic-tw-a (1) and ic-tw-b (2); the A/A of the line draw"
+      },
+      {
+        "name": "dispatch (session)",
+        "treatment": "fixed",
+        "value": "two isolab sessions per stage: std (ic-std, both rho arms, rho-strong-l1-aa) and tw (ic-tw-a, ic-tw-b, ic-tw-a-aa, both rho arms); identical workloads block and measurement seed, so (workload, round) seeds pair across sessions",
+        "how": "specs/c1-e2e-m<m>-{std,tw}.json; ecbench compare --b-dir for the decision comparison (operations only; wall refused across sessions by design)"
       }
     ],
     "comparisons": [
@@ -474,6 +517,15 @@
         ],
         "differs_in": [],
         "design": "aa"
+      },
+      {
+        "id": "C-aa-wall-std",
+        "arms": [
+          "rho-strong-l1",
+          "rho-strong-l1-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
       }
     ],
     "crosses_map": false
@@ -496,7 +548,8 @@
     "blinding": {
       "analysis_labels_masked": false,
       "how": "Primary metric is an exact count; ecbench compare is a fixed command over all pairs."
-    }
+    },
+    "arm_order_reason": "ecbench order alternate_measured (spec order on even measured rounds, reversed on odd; with 5 measured rounds spec order is used once more, which affects wall time only, read within a session against its A/A)."
   },
   "sample_size": {
     "instances": 6,
@@ -516,8 +569,8 @@
       "fixed_seconds": null,
       "per_sample_seconds": null,
       "threads": 1,
-      "estimated_total_seconds": null,
-      "measured_on": "Not measured: this session could not build (shared-disk floor). A development smoke must measure per-trial seconds before dispatch; see stopping rules."
+      "estimated_total_seconds": 3780,
+      "measured_on": "Development smoke 2026-11-08 on the preparing container (4 vCPU, shared with other agents, L0, --cpus none), m = 5, target_seed 99 (not a frozen target), one workload, rounds 1, all runs verified and replayed identically. Session wall: std dispatch 56 s per workload-round (ic-std 57.7 s per execution: 199 trials, 13 relations, 15 columns), tw dispatch 49 s per workload-round (ic-tw-a 17.5 s / 59 trials / 32 relations, ic-tw-b 13.5 s / 43 trials, ic-tw-a-aa 18.6 s); rho arms under 1 ms. Projection for 6 workloads x (5 + 1 warm-up) rounds: std about 2020 s, tw about 1760 s, total about 3780 s in two dispatches, each below the 2700 s rule-1 threshold. One workload only: trial counts vary by target, so this is an estimate, not a bound."
     }
   },
   "metrics": {
@@ -583,7 +636,7 @@
     "placement": {
       "instance_type": "c8a.2xlarge",
       "budget": "USD 10 total for this task, build, failed and interrupted attempts included",
-      "route": "isolab-experiment.yml dispatched on main with source_revision = the frozen 40-character commit and spec_path = research/c1_end_to_end_solve_20261107/specs/c1-e2e-m5.json"
+      "route": "two dispatches of isolab-experiment.yml on main with source_revision = the frozen 40-character commit: spec_path = research/c1_end_to_end_solve_20261107/specs/c1-e2e-m5-std.json, then research/c1_end_to_end_solve_20261107/specs/c1-e2e-m5-tw.json; instance_type c8a.2xlarge; seconds 3600 each"
     },
     "measurement_class": "measurement",
     "timeout_seconds": 3600,
@@ -604,12 +657,12 @@
   },
   "stopping_rules": [
     {
-      "rule": "Before dispatch, unit tests (xline_bin) and a development smoke solve of one m = 5 workload per IC arm must pass, and its per-execution time must be measured. If the m = 5 spec's projected time (executions x per-execution seconds, warmup included) exceeds 2700 s, run each IC arm as its own dispatch of the same spec restricted to that arm plus both rho arms and the A/A arm, never fewer targets or rounds.",
+      "rule": "Rule 1 (satisfied 2026-11-08 before freezing): the xline_bin unit tests passed, a development smoke per IC arm verified and replayed, and its timing projected the single-session stage 1 above 2700 s; the stage is therefore run as the two dispatches std and tw of the same workloads, seeds and rounds (5 measured + 1 warm-up), never fewer targets or rounds. If a dispatch hits its 3600 s deadline, its session is kept as censored evidence and the stage is reported incomplete; it is not rerun smaller.",
       "kind": "preregistered_sequential",
       "preregistered": true
     },
     {
-      "rule": "Stage 2 (m = 7 spec) runs only if stage 1 completes and its measured per-execution times project stage 2 below 2700 s per dispatch; otherwise it is recorded as not run.",
+      "rule": "Stage 2 (m = 7 std and tw specs) runs only if stage 1 completes and its measured per-execution times, scaled by the m = 7 smoke of each IC arm, project each m = 7 dispatch below 2700 s; otherwise stage 2 is recorded as not run.",
       "kind": "preregistered_sequential",
       "preregistered": true
     },
@@ -630,7 +683,7 @@
     "Changing the oracle, line seeds, curves, targets, seeds, unit or accounting after any measured data."
   ],
   "decision_rule": {
-    "text": "Primary: ecbench compare --a ic-std --b ic-tw-a over all (workload, round) pairs at m = 5, priced at w = 0, 0.1, 1 GAE per uncharged native operation on every arm. Twisted is an end-to-end improvement iff the paired 95% interval's upper end is below 1 at all three weights and C-aa-line's interval contains 1; a regression iff the lower end is above 1 at all three weights; otherwise unresolved (tie). Gap to rho is reported per arm and weight as distance remaining, not as a gate. The two decision comparisons (C-tw-vs-std-m5, C-gap-rho-m5) are read with Holm's correction at family alpha 0.05; the A/A comparisons C-aa-line and C-aa-wall set noise floors and decide nothing.",
+    "text": "Primary: ecbench compare --dir STD --a ic-std --b ic-tw-a --b-dir TW --weight w for w in {0, 0.1, 1} (operations, cross-session, paired by (workload, round) seed), over all pairs at m = 5. Twisted is an end-to-end improvement iff the paired 95% interval's upper end is below 1 at all three weights and the line A/A (ic-tw-b / ic-tw-a) interval contains 1, or the C1 interval excludes the line A/A interval; a regression iff the lower end is above 1 at all three weights; otherwise unresolved (tie); any unverified run makes it incomplete. The matched rho at each weight is whichever of rho-strong-l1 and rho-strong-l16 has the lower total priced S at that weight in the same session as the IC arm; gap to rho is S(arm)/S(rho_ref) per weight, reported as distance remaining, not a gate. The two decision comparisons (C-tw-vs-std-m5, C-gap-rho-m5) are read with Holm's correction at family alpha 0.05; the A/A comparisons set noise floors and decide nothing. Wall time is compared within a session only.",
     "comparison_ids": [
       "C-tw-vs-std-m5",
       "C-gap-rho-m5"
@@ -649,14 +702,14 @@
   },
   "analysis_plan": {
     "script": {
-      "path": "ecbench compare / table / verify (native)",
-      "sha256": null
+      "path": "research/c1_end_to_end_solve_20261107/analyze.sh",
+      "sha256": "6ab14facc89377a2a02ecfe4464d9eb4c85fdc144bd2107df0b50b512933f065"
     },
     "inputs": [
-      "sessions/"
+      "the std and tw session directories of one stage"
     ],
     "outputs": [
-      "compare JSON per pair, table, audit receipt"
+      "audit receipts (verify --replay-all), saved comparisons at w = 0, 0.1, 1, tables"
     ],
     "blinded": false,
     "frozen_before_data": true

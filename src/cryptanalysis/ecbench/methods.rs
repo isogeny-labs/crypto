@@ -6792,7 +6792,23 @@ fn solve_ic_f2m4_xline(
         &fb,
         |q| CountedGroup::key(c, q),
     )?;
-    Ok(ic_report(m, rep, &calib, Some(facts), wall, 2))
+    let mut report = ic_report(m, rep, &calib, Some(facts), wall, 2);
+    // The pinned units' ratios (GAE per operation), from this run's own
+    // counted calibration: the §5a band reads them when the repository's
+    // pinned table has no row for the curve (`band::calibrated_native`).
+    if let Value::Object(d) = &mut report.detail {
+        d.insert(
+            "calibration_ratios".into(),
+            json!({
+                "ns_per_double": calib.ns_per_double / calib.ns_per_add,
+                "ns_per_row_op": calib.ns_per_row_op / calib.ns_per_add,
+                "ns_per_lookup": calib.ns_per_lookup / calib.ns_per_add,
+                "ns_per_sqrt": calib.ns_per_sqrt.unwrap_or(0.0) / calib.ns_per_add,
+                "source": "counted F_q multiplications of this run over fq_muls_per_add",
+            }),
+        );
+    }
+    Ok(report)
 }
 
 /// A curve over `F_{(2^m)^4}` whose subgroup order needs two words

@@ -1,13 +1,18 @@
 # C1 end to end: twisted all-lift line against the standard base, against strong rho
 
-2026-11-07. Status: **prepared, not run. No measured data exist.** Every sentence here is
-an unverified assertion of the preparing session [pcc:unverified].
+2026-11-07/08. **Status: implemented, tested locally, protocol frozen, ready to dispatch, not
+run.** No measured data exist. Every sentence here is an unverified assertion of the
+preparing session [pcc:unverified].
 
-- Protocol: [`PROTOCOL.md`](PROTOCOL.md), [`protocol.json`](protocol.json). It validates and was committed
-  before any data (`bfcd18db85`). It is still a draft: the freeze tool needs a measured per-arm timing first.
-- Instrument: [`specs/c1-e2e-m5.json`](specs/c1-e2e-m5.json) (stage 1) and
-  [`specs/c1-e2e-m7.json`](specs/c1-e2e-m7.json) (stage 2).
-- Code: `src/cryptanalysis/ecbench/xline_bin.rs`.
+- **Protocol.** [`PROTOCOL.md`](PROTOCOL.md) and [`protocol.json`](protocol.json), frozen; the
+  `freeze` block names the commit.
+- **Analysis.** [`analyze.sh`](analyze.sh), hash in the protocol.
+- **Instrument.** [`specs/`](specs/): the stage 1 std and tw dispatches at m = 5, and stage 2 at m = 7.
+- **Code.** `src/cryptanalysis/ecbench/xline_bin.rs`, plus a fallback in
+  `src/cryptanalysis/ecbench/band.rs`.
+- **Launch.** The dispatch is held back. The checkpoint upload gate
+  (`scripts/checkpoint.sh gate`) fails with AccessDenied and no upload token is present, and
+  the coordinator is raising that with the owner.
 
 ## What ecbench already had (survey)
 
@@ -46,19 +51,53 @@ an unverified assertion of the preparing session [pcc:unverified].
     and checks the signs.
   - It is charged as `gaudry-d4-bin` is. The line search and the `u`/`b` power
     precomputation are solver work in its own prepare.
-- **Tests (written, not yet run).**
-  - The `e`-form of `S₅` vanishes on four-point sums and equals `CurveB::s5`.
-  - The construction rules hold at `m = 5, 7`.
-  - The oracle's decomposition sets equal an independent pair-table enumeration.
+- **Tests (passed 2026-11-08, `cargo test --release --lib`).**
+  - `xline_bin` (3 of 3):
+    - the `e`-form of `S₅` vanishes on four-point sums and equals `CurveB::s5`;
+    - the construction rules hold at `m = 5` and `7`;
+    - the oracle's decomposition sets equal an independent pair-table enumeration on 12
+      targets per line.
+  - `ecbench::workload` and `registry_audit_tests`: 17 passed.
+  - `f2m4`, `negation_strong` and `gaudry_quartic_bin`: 15 passed, 1 ignored.
+- **The §5a band on these records.**
+  - `ic.pipeline` on `F2m4` prices its lifts, row operations and guard probes in pinned
+    units whose ratios are this run's own counted `F_q` multiplications. The repository's
+    pinned calibration table has no row for these curves, so `ecbench compare` refused the
+    band ("priced by pinned units … but no calibration row").
+  - The x-line records now carry `detail.calibration_ratios`.
+  - `band::calibrated_native` reads those ratios only when the table has no row, so every
+    existing record is priced as before.
 
-## Why nothing ran
+## Development smoke (not evidence)
 
-- **No build, so no local checks.**
-  - The shared disk had 4.5 GB free throughout.
-  - The task forbids a build that would leave less than 4 GB, and this crate's release
-    build with its 266 dependencies would. The code has been run through `rustfmt` only:
-    it has not been compiled, unit-tested or smoke-solved.
-  - PROTOCOL.md stopping rule 1 requires those checks and a timing before any dispatch.
+Settings:
+
+- `m = 5`, curve `icv1-f2m20-t133-d7e842ba` (`r ≈ 2^18`, unregistered: register before
+  citing it in prose).
+- `target_seed = 99`, not a frozen target.
+- One workload, rounds 1, L0, `--cpus none`, on the shared preparing container.
+
+Every run verified `[k]G = Q`, and `ecbench verify --replay-all` reproduced every record
+exactly (4 of 4 and 5 of 5).
+
+| arm | S | wall per execution | trials | relations / columns |
+|---|---:|---:|---:|---:|
+| `rho-strong-l1` | 3.007 | < 1 ms | | |
+| `rho-strong-l16` | 2.904 | < 1 ms | | |
+| `ic-std` | 30257.2 | 57.7 s | 199 | 13 / 15 (pinned at rank 13) |
+| `ic-tw-a` | 9634.4 | 17.5 s | 59 | 32 / 31 |
+| `ic-tw-b` | 7085.8 | 13.5 s | 43 | 32 / 31 |
+| `ic-tw-a-aa` | 9634.4 | 18.6 s | 59 | 32 / 31 |
+
+These numbers set the dispatch plan only. They come from one workload, and they are not a
+result.
+
+## Why it has not run
+
+
+- **Build and local checks: resolved on 2026-11-08.** On 2026-11-07 the shared disk had only
+  4.5 GB free and the session could not build. Once disk was freed, the code compiled, the
+  tests passed and the smoke ran (above).
 - **The AWS bridge is denied.**
   - The container's AWS identity, `arn:aws:iam::590183823895:user/adam`, gets
     `AccessDenied` on `codebuild:BatchGetProjects` for
@@ -70,25 +109,28 @@ an unverified assertion of the preparing session [pcc:unverified].
 - **The checkpoint push is denied.** `scripts/checkpoint.sh gate` returned `AccessDenied` on
   `s3://setec-astronomy-artifacts/checkpoints/`, and no upload token is present.
 
-No run, no cost, no result, no leaderboard or `benchmarks/` row, no pcc claim (there is
-nothing to claim).
+There has been no run, so there is no cost, no result, no leaderboard or `benchmarks/` row and
+no pcc claim: there is nothing to claim.
 
-## To resume
+**The `tools/benchrec.py gate` failures predate this branch.** The gate reports 659
+problems across 54 records. They come from existing records on `main` whose files lie
+outside this sparse checkout (for example
+`benchmarks/records/20261107T2145Z-split-prime-p1-rr-dickson.json`, whose graph is not in the
+checkout), together with the progress report built from them. None comes from this branch,
+which adds no benchmark record because nothing ran.
 
-See `.resume/RESUME.md` in the preparing worktree; the exact steps are in PROTOCOL.md
-"Stopping rules" 1–2. With ≥ 8 GB free:
+## To dispatch (once the checkpoint gate passes)
 
-```sh
-cargo test --release --lib xline_bin
-cargo build --release --bin ecbench
-# smoke: a 2-target, rounds-1 scratch copy of specs/c1-e2e-m5.json, out dir outside the repo
-./target/release/ecbench run --wait --spec /tmp/smoke.json --out /tmp/smoke-out --allow-busy
-./target/release/ecbench verify --dir /tmp/smoke-out --replay 4
-```
-
-Then open a `bench.record/v1` record and dispatch `isolab-experiment.yml` on `main` with
-`spec_path=research/c1_end_to_end_solve_20261107/specs/c1-e2e-m5.json`,
-`instance_type=c8a.2xlarge` and `seconds=3600`.
+1. Open a `bench.record/v1` record for each dispatch (`python3 tools/benchrec.py init`).
+2. Dispatch `isolab-experiment.yml` on `main` twice, with `source_revision` set to the frozen
+   commit (`protocol.json` `freeze.commit`, or any later commit that leaves `specs/`,
+   `analyze.sh`, `xline_bin.rs`, `band.rs` and `methods.rs` unchanged):
+   - `spec_path=research/c1_end_to_end_solve_20261107/specs/c1-e2e-m5-std.json`,
+     `instance_type=c8a.2xlarge`, `seconds=3600`;
+   - `spec_path=research/c1_end_to_end_solve_20261107/specs/c1-e2e-m5-tw.json`, with the same
+     instance type and deadline.
+3. Fetch both sessions into `sessions/` and run `analyze.sh STD TW`. Then build the
+   `VALIDATION.json`, the report, the graph and the PDF.
 
 ## Sources checked
 
