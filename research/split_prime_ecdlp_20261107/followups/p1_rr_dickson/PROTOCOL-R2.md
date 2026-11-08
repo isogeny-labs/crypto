@@ -53,4 +53,24 @@ round7/README.md, round7_rr/}`, round-1 files of this directory.
 
 ## Addendum A: instrument (pinned before any claim cell)
 
-Pending the builder's report (arm F emitter and its controls).
+`p1tool` with `src/main.rs` sha256
+`7e50f8c82e7bc981c180e402e90c20d94ca60d4cf73cd22aaee02c15efb84ed7` (selftest 22 groups).
+New `--system f` (m = 3 only): round 7's full-symmetric system, N = 3t − 3 variables
+(e1, e2, e3 and the tower), N + 1 equations, input degrees 4 and 2; same instance sampler
+as RR and T (11 of 11 smoke cells reproduce round 1's instances). Controls (build time,
+`calibration/round2/`) [pcc:unverified]: A, all 8 round-7 m3 F systems byte-identical to the
+unmodified `gen.sing`; B, msolve at 6 GiB reproduces round 7's F rows exactly (m3 t4: D 5,
+widest 1,224, qdim 1; m3 t5: D 6, widest 10,493, qdim 1). Dickson smoke at p ∈ {1151, 1279,
+1999} only.
+
+Commands (seeds = round 1's admissible seeds per cell, from round 1's `cells.tsv`):
+
+```
+p1tool emit --system t|f|rr --kind dickson|kummer --p P --a A --b B --m M --t T --seed S --out C.ms
+VLIMIT=6291456 TLIMIT=3600 calibration/msolve_cell.sh C.ms C.log        # R2a, R2c
+VLIMIT=13631488 TLIMIT=10800 calibration/msolve_cell.sh C.ms C.log      # R2b, alone on the host
+p1tool parse C.log
+```
+
+Disclosure: the Dickson smoke gives F at m3 t4 D 5, widest 1,224, which with round 1's RR
+(D 4, widest 2,801) already suggests the predicted trade; the claim cells decide.
