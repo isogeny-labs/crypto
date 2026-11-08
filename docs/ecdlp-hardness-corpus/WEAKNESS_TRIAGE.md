@@ -407,3 +407,29 @@ validation gate) before any number enters the corpus.
 node docs/ecdlp-hardness-corpus/weakness.mjs          # writes WEAKNESSES.md, weakness.json, weakness-queue.svg
 node docs/ecdlp-hardness-corpus/weakness.mjs --check  # fails if they are stale
 ```
+
+## Round 6 (2026-11-08): a formal counterexample family for the extension-field decomposition heuristics
+
+Owner request: go after weak links in the ECDLP graph formally. The queue's precisely stated
+heuristics were screened for claims false as literally recorded and settleable by a Lean
+theorem. `HEUR-SP-JV-ASSUMPTION1` qualified: its only recorded hypothesis is `#F ∈ Ω(q)`, with
+no condition on the curve.
+
+- **`CEX-SUBFIELD-FACTOR-BASE` (Lean, `SubfieldFactorBase`).** For a curve over `F_q` and odd
+  `n`, every point of `E(F_{q^n})` with `x ∈ F_q` already lies in `E(F_q)` (a root of a monic
+  quadratic over `F_q` cannot have degree 2 over `F_q` inside an odd-degree extension). Every
+  sum of factor-base points therefore stays in `E(F_q)`: at most `2q + 1` points, proved
+  [pcc:unverified]. Claims PCC-20261108-cd23f6 and PCC-20261108-9610b3 await CI signing.
+- **Refuted reading.** `CLAIM-JV-ASSUMPTION1-ALL-CURVES`: subfield curves with `n ≥ 3` odd
+  satisfy `#F ∈ Ω(q)` (Hasse, cited) yet have at most `2q + 1` decomposable points, not
+  `Ω(q^{n-1}/(n-1)!)`. The same family breaks the `1/n!` proportion of
+  `HEUR-BK-GG-DECOMP-PROPORTION`, whose "no unexpected collisions" assumption fails wholesale.
+  The `ext_decomp` census control at `n = 3` measured 0.0003 to 0.002 against `1/6`
+  [pcc:unverified].
+- **What survives.** Both heuristics remain open for curves whose coefficients generate
+  `F_{q^n}`; the repair is an explicit non-subfield condition.
+- **Screened and not pursued.** The "r does not divide q" cluster (impact 17) states its
+  assumptions explicitly, so there is nothing false to refute. `HEUR-GG-DGM-CYCLE-RATES` is
+  exact (`1/(2r)`) under its random-branch model. `HEUR-SP-SEMAEV15-ASSUMPTION1` (`d_F4 ≤ 4`)
+  awaits the n = 37 msolve run on isolab-eks; the closure route would take about 58 hours at
+  n = 37.
