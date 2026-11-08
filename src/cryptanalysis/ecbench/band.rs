@@ -906,7 +906,11 @@ mod tests {
         assert!(table_work_counts(&r).is_empty(), "no marker, no count");
         assert_eq!(unpriced_total_with(&r, on), unpriced_total(base));
         assert_eq!(priced_gae_with(&r, 1.0, on).unwrap().unwrap(), g0);
-        assert_eq!(priced_gae(&r, 1.0).unwrap().unwrap(), g0, "the default reads the marker too");
+        assert_eq!(
+            priced_gae(&r, 1.0).unwrap().unwrap(),
+            g0,
+            "the default reads the marker too"
+        );
         // The marker in any phase makes the counter count (phase sum).
         r.phases[1]
             .work_native
@@ -921,7 +925,11 @@ mod tests {
         );
         let g1 = priced_gae_with(&r, 1.0, on).unwrap().unwrap();
         assert!((g1 - g0 - 5_007.0).abs() < 1e-6);
-        assert_eq!(priced_gae(&r, 1.0).unwrap().unwrap(), g1, "the default is `on`");
+        assert_eq!(
+            priced_gae(&r, 1.0).unwrap().unwrap(),
+            g1,
+            "the default is `on`"
+        );
         // The pre-2026-11-08 reading never reads it.
         assert_eq!(priced_gae_with(&r, 1.0, off).unwrap().unwrap(), g0);
     }
