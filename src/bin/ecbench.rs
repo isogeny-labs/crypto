@@ -1789,9 +1789,11 @@ fn run(cli: Cli) -> Result<ExitCode, String> {
             if save {
                 let d = dir.join("comparisons");
                 std::fs::create_dir_all(&d).map_err(|e| e.to_string())?;
-                let suffix = (c.pricing_weight.is_some() || !c.priced_table_work.is_empty())
-                    .then(|| format!("__{}", c.comparison_id))
-                    .unwrap_or_default();
+                let suffix = if c.pricing_weight.is_some() || !c.priced_table_work.is_empty() {
+                    format!("__{}", c.comparison_id)
+                } else {
+                    String::new()
+                };
                 let f = d.join(format!("{a}__{b}{suffix}.json"));
                 std::fs::write(
                     &f,
