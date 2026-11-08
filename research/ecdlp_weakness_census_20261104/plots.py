@@ -56,19 +56,24 @@ def pq2():
     xs = [r["n"] for r in rows if r["d_iter"] != "?"]
     ys = [order[r["d_iter"]] for r in rows if r["d_iter"] != "?"]
     ax.scatter(xs, ys, s=22, label="d_iter: lower bound on F4's max step degree")
-    for sub in ("iter4_n17_20", "iter4_n21_24"):
+    for sub in ("iter4_n17_20", "iter4_n21_24", "iter4_n25", "iter4_n26", "iter4_n27"):
         p = os.path.join(HERE, "pq2_rank", "results", sub, "pq2_rank.json")
         if os.path.exists(p):
             ext = json.load(open(p))["rows"]
             ax.scatter([r["n"] for r in ext], [order[r["d_iter"]] - 0.08 for r in ext], s=22, marker="v",
                        color="C3", label="d_iter, degree-4 extension sweep (fresh instances)" if sub.endswith("20") else None)
+    ms = os.path.join(HERE, "pq2_rank", "f4", "msolve_all.json")
+    if os.path.exists(ms):
+        mr = json.load(open(ms))["rows"]
+        ax.scatter([r["n"] + 0.25 for r in mr], [r["max_step_degree"] for r in mr], s=26, marker="*", color="C2",
+                   label="msolve F4: actual max step degree (same instances, n <= 34)")
     ax.scatter([r["n"] for r in rows], [order[r["d_lin"]] + 0.08 for r in rows], s=14, marker="x",
                color="gray", label="d_lin: lower bound on the one-shot solving degree")
     ax.set_yticks([2, 3, 3.5, 4, 4.5])
     ax.set_yticklabels(["2", "3", ">3 (deg 4 not run)", "4", ">4"])
     ax.set_xlabel("n")
     ax.set_ylabel("degree bound")
-    ax.set_title("m = 2 descended S3: degree bounds per instance (first fall degree = 2)")
+    ax.set_title("m = 2 descended S3: degree per instance (first fall degree = 2)")
     ax.legend(fontsize=8, loc="lower right")
     ax.grid(alpha=0.3)
     fig.tight_layout()

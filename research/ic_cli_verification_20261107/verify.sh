@@ -5,7 +5,7 @@ cd "$(dirname "$0")"
 log=proof_check.log
 : > "$log"
 status=0
-for file in PairCursor VersionSelection AssetSelection InstallLayout DiskBudget; do
+for file in PairCursor VersionSelection AssetSelection InstallLayout DiskBudget BatchInversion; do
   printf '== %s.lean ==\n' "$file" >> "$log"
   if lean "$file.lean" >> "$log" 2>&1; then
     printf 'OK %s.lean\n' "$file"

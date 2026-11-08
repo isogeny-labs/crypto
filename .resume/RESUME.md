@@ -1,39 +1,38 @@
-# Resume: crypto @ claude/gpu-ic-baseline-modal-20261107
+# Resume: crypto @ claude/elliptic-curves-graph-weaknesses-fw42m4
 
 ## Goal
-User request (2026-11-07): draft the EKS GPU pool for review and also use Modal, for the first hardware
-baseline of gpu/semaev and gpu/rootfind (no kernel in either has ever run on a GPU).
+Owner asked (2026-11-08, "Please run it") to run the open n = 37 test: does msolve 0.6.5 (F4,
+grevlex) reach maximal step degree 5 on a fresh m = 2 descended S3 instance at n = 37, as
+Kousidis-Wiemers report for Magma (corpus MEAS-GB-KW-TABLE1)? Locally it was OOM-killed at 15 GB.
 
 ## Lead / hypothesis
-Engineering stage diagnostic, not a lead. Does the device agree with the verified host path, and how fast
-does it run (clmad vs software product, per-row vs per-pair, sorted vs hash lookup)? Predictions P1-P4 are
-in the spec.
+Petit-Quisquater Assumption 2 at m = 2 (HEUR-GB-PQ-ASSUMPTION-2). msolve gives 4 on n = 17..34 and
+n = 36 (merged in PRs #3658, #3682). Magma reports 5 from n = 37.
 
 ## Spec
-research/gpu_ic_baseline_20261027/PROTOCOL.md including Amendment 1 (frozen at the commit that adds
-gpu/modal/). Container job: gpu/modal/ic_baseline_job.sh. Launcher: gpu/modal/modal_ic_job.py.
+research/ecdlp_weakness_census_20261104/pq2_rank/f4/eks_n37/{protocol.json, run.sh, input.ms},
+committed at e63bf8e55d (publication receipt in the run's receipt directory). Input dump
+pq2_rank/f4/step_n36_37/dumps/n37_i0.json.
 
 ## State
-Protocol, Modal launcher/job and the EKS GPU pool draft (taskq/deploy/eks-karpenter/gpu-draft/, NOT applied)
-are committed on this branch. No Modal run yet. Modal credentials are in the session environment
-(MODAL_TOKEN_ID, MODAL_TOKEN_SECRET); the `modal` client is pip-installed (1.6.3).
+Image: isolab tasks base (aws-cli) + one layer /opt/msolve (msolve + its shared libs + loader +
+run.sh + input.ms), published with taskq/deploy/eks-karpenter/oci-layer-publish.py. Command job
+via taskq/deploy/eks-karpenter/remote/launch-remote-command (isolab.eks.command-request/v1),
+8 vCPU, 100Gi, 21600 s, retries 0, cpu-spot. Results land in
+s3://isolab-results-104186811093-us-east-2/runs/<job>/<pod-uid>/ (wrapper uploads every 10 min).
 
 ## Next steps
-1. Checkpoint push must succeed (needs CHECKPOINT_UPLOAD_TOKEN or AWS creds; neither was present).
-2. `modal run --detach gpu/modal/modal_ic_job.py --out /tmp/gpu-ic-baseline/run-01`; if the client dies,
-   `--fetch-token <token>`.
-3. If the selftest gate fails, that is the result: report it, no throughput.
-4. Otherwise score P1-P4, write RESULTS, graph, PDF, benchmarks/ row only if the validation gate allows
-   (it does not for a Modal-only run), session log, PR.
+1. Publish image, write request.json, validate, launch; record Job/Pod UIDs.
+2. Read status with an isolab.eks.command-status/v1 request; download S3 outputs, verify SHA256SUMS.
+3. Parse max step degree, check linear = k = 33; update pq2_rank README, corpus MEAS-PQ2-MSOLVE-F4,
+   session log; PR.
 
 ## Runs in flight
-C = 1 boundary study (owner approved 2026-11-07 as a labelled boundary result outside the main ratchet): one-seed wwalk (existing mode `wwalk:...,g=1,grow=1` on a size=1 base, commit f51911e130 by another session) screened at k = 20, 24, 28, 32 on five dev curves with seed=run. Under benchrec record in scratchpad recc1, branch claude/curve25519-c1-boundary.
-Specs: research/curve25519_autolab_20261104/c1/spec-screen-k*.json (20 arms each). Confirmation curves c1/confirm-curves.json untouched.
-Next: pre-register ONE C = 1 arm per size from the screen, run it vs inc-c2 and rho-neg on the confirm curves (12 targets x 2 rounds), report S, ratio to rho and S relative to the C = 1 floor 1.329 as a boundary result; no new oracle, no change to rho.
+None. The C = 1 boundary study (screen and confirmation) finished; results are in PR #3660 (research/curve25519_autolab_20261104/c1).
 
 ## Stop and success conditions
-One Modal launch, 2 h function timeout, expected under 30 min. Any selftest failure stops throughput.
+One attempt, no retries; stop at exit, OOM or 6 h. Budget ceiling USD 5 (monthly account
+headroom was USD 23.67 at submission).
 
 ## Open questions
-Whether sm_120 is available on Modal as "RTX-PRO-6000" for this workspace; whether the g7e sizes and
-G-family Spot quota exist for the EKS pool.
+None.
