@@ -1,8 +1,8 @@
-# DRAFT Amendment R2-B (proposed number 10): the shape-matched `m = 4` null at `t = 4, 5`
+# DRAFT Amendment R2-B (proposed number 11): the shape-matched `m = 4` null at `t = 4, 5`
 
 **Status: draft, NOT applied, NOT frozen. Requires amendment freeze.** Written 2026-11-08 (round 2, slug `r2pkm`) for decision 6
 of `research/open_leads_execution_20261108/DECISIONS.md`. Target file when frozen:
-`research/prime_fall_degree_20261027/PREREGISTRATION.md` (append as "Amendment 10", with the freeze date). Every number is
+`research/prime_fall_degree_20261027/PREREGISTRATION.md` (append as "Amendment 11", with the freeze date; renumbered from 10 on 2026-11-08, because R2-C was frozen first as Amendment 9). Every number is
 `[pcc:unverified]`. Classes: *cited* (a file says so), *measured* (read from source or a command), *derived*, *plan*.
 
 ## 1. Timing and independence
@@ -45,7 +45,7 @@ Kummer, `m = 4`, chain presentation, `P1 = 2013265921`, seed `0x504B4D54`, `--pl
 | `pfd-m4n-t5-k1-c6` | 5 | 20 | 1 | 6 | `pfd-m4-t5-k1-c6` |
 
 Limits equal the Kummer counterparts': `--hky-max-entries 13958643712` (112Gi), `--hky-max-cols 4000000`, `--budget 172800`; request
-14 cpu / 112Gi / 176,400 s. `t = 5`, `c = 7` and `t = 6` have no null cell (they need the capacity of `CAPACITY_R2.md`, and Amendment 8 asks the null at
+12 cpu / 112Gi / 176,400 s, `instance_type` `r6i.4xlarge` (Amendment 9, R2-C; the request in `requests_r2c_pending_amendment/` is regenerated with the pin and the protocol hash once this amendment is frozen). `t = 5`, `c = 7` and `t = 6` have no null cell (they need the capacity of `CAPACITY_R2.md`, and Amendment 8 asks the null at
 `t = 4, 5` only). Exact command, as the `m4n:` stage of `image/entry_r2.sh` runs it:
 
 ```
@@ -67,7 +67,7 @@ the files live in `requests_pending_amendment/`, outside `requests/`, so that a 
 No new hypothesis. H-null (PREREGISTRATION §6) is read as written, on the `m = 4` ladder, at the common completed `N` (16 and 20).
 A cell that is censored at its `--hky-cmax` gives the one-sided value `d_F > cmax`; when both arms of a pair are censored at the same cap the
 pair reads "mixed" for H-null, never "shape-driven". The null does not enter the Amendment 8 rise/flat/fall readings; those are Kummer-only.
-Amendment 9 (high-lambda) does not apply: `lambda(m = 4, t = 4, 5) = 1.1e-5, 1.7e-4` (derived).
+Amendment 10 (R2-A, high-lambda) does not apply: `lambda(m = 4, t = 4, 5) = 1.1e-5, 1.7e-4` (derived).
 
 ## 7. Consequences stated before data
 
