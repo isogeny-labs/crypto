@@ -8,7 +8,16 @@
 //!   curves, and the classical-solver fixture curves;
 //! - isogeny-labs/cryptanalysis-rl: the ECDLP tool-policy census and stage-0b
 //!   rows;
-//! - aburan28/ml-cryptanalysis: the curve corpora with measured rho cost.
+//! - aburan28/ml-cryptanalysis: the curve corpora with measured rho cost, and
+//!   the `data/ecdb/*.jsonl` files in `csd.ecdb-measurements/v1` (one curve per
+//!   line, any number of measurements each: rho and rho-offset costs
+//!   `tier1_rho`, `n4_rho_offset`, F_p costs `n5_fp_costs`, binary-field
+//!   costs `n7_binary_costs`). A v1 prime row becomes a dataset curve like any
+//!   other; a v1 binary row is kept as a `dataset_curve_binary` record and its
+//!   measurements with no slug, because no tested function derives an ICV1
+//!   slug for a binary curve from (m, modulus, a, b, #E) outside the generated
+//!   importer's own verification. Rows whose values are not finite are
+//!   problems and are not inserted.
 //!
 //! Records are kept verbatim in `external_curve_record` and linked to an
 //! ecdb curve only by an exact identifier, in this order: EC1 alias,
@@ -68,6 +77,11 @@ pub const FILES: &[(&str, &str)] = &[
     ("ml-cryptanalysis", "data/curves.jsonl"),
     ("ml-cryptanalysis", "data/curves_holdout.jsonl"),
     ("ml-cryptanalysis", "data/enumeration.jsonl"),
+    ("ml-cryptanalysis", "data/ecdb/tier1_rho.jsonl"),
+    ("ml-cryptanalysis", "data/ecdb/n4_rho_offset.jsonl"),
+    // committed as .jsonl.gz: read_bytes falls back to <path>.gz
+    ("ml-cryptanalysis", "data/ecdb/n5_fp_costs.jsonl"),
+    ("ml-cryptanalysis", "data/ecdb/n7_binary_costs.jsonl"),
 ];
 
 const RECORD_SQL: &str = "
@@ -285,6 +299,98 @@ fn jsonl(bytes: &[u8]) -> Vec<Value> {
     bytes.split(|&b| b == b'\n').filter(|l| !l.is_empty()).filter_map(|l| serde_json::from_slice(l).ok()).collect()
 }
 
+const V1: &str = "csd.ecdb-measurements/v1";
+
+/// A finite JSON number, or None.
+fn finite(v: &Value) -> Option<f64> {
+    v.as_f64().filter(|x| x.is_finite())
+}
+
+/// One `csd.ecdb-measurements/v1` row: validate everything, then append the
+/// external record and its measurements. Err = a problem; nothing was appended.
+#[allow(clippy::too_many_arguments)]
+fn v1_row(
+    repo: &str,
+    path: &str,
+    r: &Value,
+    seen: &mut std::collections::HashSet<String>,
+    records: &mut Vec<Value>,
+    measures: &mut Vec<Value>,
+    curves: &mut Curves,
+    report: &mut Report,
+) -> Result<()> {
+    let key = r["record_key"].as_str().filter(|k| !k.is_empty()).context("missing record_key")?;
+    if r["dataset"].as_str().is_none() {
+        bail!("{key}: missing dataset");
+    }
+    let ms = r["measurements"].as_array().with_context(|| format!("{key}: measurements is not a list"))?;
+    // validate the measurements before touching any output
+    let mut rows = Vec::new();
+    let mut ids = std::collections::HashSet::new();
+    for (i, m) in ms.iter().enumerate() {
+        let text = |f: &str| m[f].as_str().filter(|x| !x.is_empty());
+        let (Some(method), Some(metric), Some(unit)) = (text("method"), text("metric"), text("unit")) else {
+            bail!("{key}: measurement {i} lacks a method, metric or unit");
+        };
+        if finite(&m["value"]).is_none() {
+            bail!("{key}: {method}/{metric}: value {} is not a finite number", m["value"]);
+        }
+        if !m["sem"].is_null() && finite(&m["sem"]).is_none() {
+            bail!("{key}: {method}/{metric}: sem {} is not a finite number", m["sem"]);
+        }
+        if !m["n"].is_null() && m["n"].as_i64().filter(|n| i32::try_from(*n).is_ok()).is_none() {
+            bail!("{key}: {method}/{metric}: n {} is not an integer", m["n"]);
+        }
+        if !ids.insert((method, metric)) {
+            bail!("{key}: duplicate measurement {method}/{metric}");
+        }
+        rows.push((method, metric, unit, m));
+    }
+    let bigf = |f: &str| big(&r[f]).with_context(|| format!("{key}: {f} is not an integer"));
+    let (kind, slug) = match r["field"].as_str() {
+        Some("prime") => {
+            let (p, a, b, n) = (bigf("p")?, bigf("a")?, bigf("b")?, bigf("N")?);
+            if !seen.insert(key.to_string()) {
+                bail!("{key}: record_key repeated in the file");
+            }
+            let slug = curves.add(&p, &a, &b, &n, "dataset").map_err(|e| invalid(report, path, key, e)).ok();
+            ("dataset_curve", slug)
+        }
+        Some("binary") => {
+            if r["m"].as_u64().is_none() || r["modulus"].as_str().is_none() || bigf("N").is_err() {
+                bail!("{key}: binary row needs m, modulus and N");
+            }
+            if r["a"].as_str().is_none() || r["b"].as_str().is_none() {
+                bail!("{key}: binary row needs a and b");
+            }
+            if !seen.insert(key.to_string()) {
+                bail!("{key}: record_key repeated in the file");
+            }
+            // No tested ICV1 slug function exists for binary curves: not linked, no curve registered.
+            ("dataset_curve_binary", None)
+        }
+        other => bail!("{key}: unknown field {other:?}"),
+    };
+    records.push(rec(repo, path, key, kind, slug.as_deref(), None, None, None, true, r));
+    for (method, metric, unit, m) in rows {
+        measures.push(meas(
+            repo,
+            path,
+            key,
+            slug.as_deref(),
+            method,
+            metric,
+            unit,
+            &m["value"],
+            &m["sem"],
+            &m["n"],
+            &r["status"],
+            m,
+        ));
+    }
+    Ok(())
+}
+
 /// Turn one sibling file into external records, measurements and dataset curves.
 fn parse_file(
     repo: &str,
@@ -470,7 +576,28 @@ fn parse_file(
             }
         }
     } else if repo == "aburan28/ml-cryptanalysis" {
-        for r in jsonl(bytes) {
+        let mut seen = std::collections::HashSet::new();
+        for (i, line) in bytes.split(|&b| b == b'\n').enumerate().filter(|(_, l)| !l.is_empty()) {
+            let r: Value = match serde_json::from_slice(line) {
+                Ok(r) => r,
+                Err(e) => {
+                    // a v1 line that is not JSON (e.g. a bare NaN) is a problem; legacy lines are skipped as before
+                    if String::from_utf8_lossy(line).contains(V1) {
+                        report.problem(format!("{path}:{}: not valid JSON: {e}", i + 1));
+                    }
+                    continue;
+                }
+            };
+            if let Some(f) = r.get("format") {
+                if f.as_str() != Some(V1) {
+                    report.problem(format!("{path}:{}: unknown format {f}", i + 1));
+                } else if let Err(e) = v1_row(repo, path, &r, &mut seen, records, measures, curves, report) {
+                    report.problem(format!("{path}:{}: {e}", i + 1));
+                } else {
+                    report.count("measurement_v1_rows", 1);
+                }
+                continue;
+            }
             let (Some(p), Some(a), Some(b), Some(n)) = (big(&r["p"]), big(&r["a"]), big(&r["b"]), big(&r["N"])) else {
                 continue;
             };
@@ -603,5 +730,129 @@ mod tests {
         let (again, _, _, _) = prime_icv1(&b("827"), &b("828"), &b("-812"), &b("823")).unwrap();
         assert_eq!(again, "icv1-fp10-t5-192cb216");
         assert!(prime_icv1(&b("827"), &b("1"), &b("15"), &b("2000")).is_err());
+    }
+    const ML: &str = "aburan28/ml-cryptanalysis";
+
+    fn v1_line(key: &str, field: &str, ms: &str) -> String {
+        let curve = if field == "prime" {
+            r#""p":"827","a":"1","b":"15","N":"823""#
+        } else {
+            r#""m":7,"modulus":"0x83","a":"0x1","b":"0x2","N":"128""#
+        };
+        format!(
+            r#"{{"format":"csd.ecdb-measurements/v1","dataset":"tier1","record_key":"{key}","field":"{field}",{curve},"status":"measured","measurements":[{ms}],"provenance":{{"git":"abc"}}}}"#
+        )
+    }
+
+    const M1: &str =
+        r#"{"method":"rho.plain","metric":"S_total","unit":"rho steps / sqrt(r)","value":1.25,"sem":0.05,"n":40}"#;
+    const M2: &str = r#"{"method":"rho.automorphism_classes","metric":"S_total","unit":"rho steps / sqrt(r)","value":0.9,"sem":null,"n":null}"#;
+
+    fn run(path: &str, text: &str) -> ((Vec<Value>, Vec<Value>), Curves, Report) {
+        let (mut out, mut curves, mut report) = ((Vec::new(), Vec::new()), Curves::default(), Report::default());
+        parse_file(ML, path, text.as_bytes(), &mut out, &mut curves, &mut report).unwrap();
+        (out, curves, report)
+    }
+
+    #[test]
+    fn ml_v1_prime_binary_and_legacy_rows() {
+        let legacy = r#"{"p":827,"a":1,"b":15,"N":823,"n_seeds":10,"status":"ok","plain_S_total_mean":2.0,"plain_S_total_sem":0.1}"#;
+        let text =
+            [v1_line("c1", "prime", &format!("{M1},{M2}")), v1_line("b1", "binary", M1), legacy.to_string()].join("\n");
+        let (out, curves, report) = run("data/ecdb/tier1_rho.jsonl", &text);
+        assert!(report.problems.is_empty(), "{:?}", report.problems);
+        let (records, ms) = out;
+        assert_eq!(records.len(), 3);
+        assert_eq!(ms.len(), 4);
+        assert_eq!(curves.curves.len(), 1);
+        assert!(curves.curves.contains_key("icv1-fp10-t5-192cb216"));
+
+        assert_eq!(records[0]["kind"], "dataset_curve");
+        assert_eq!(records[0]["record_key"], "c1");
+        assert_eq!(records[0]["slug"], "icv1-fp10-t5-192cb216");
+        assert_eq!(records[1]["kind"], "dataset_curve_binary");
+        assert!(records[1]["slug"].is_null());
+
+        let m = &ms[0];
+        assert_eq!(m["dataset"], "data/ecdb/tier1_rho.jsonl");
+        assert_eq!(m["record_key"], "c1");
+        assert_eq!(m["slug"], "icv1-fp10-t5-192cb216");
+        assert_eq!((m["method"].as_str(), m["metric"].as_str()), (Some("rho.plain"), Some("S_total")));
+        assert_eq!(m["unit"], "rho steps / sqrt(r)");
+        assert_eq!((m["value"].as_f64(), m["sem"].as_f64(), m["n"].as_i64()), (Some(1.25), Some(0.05), Some(40)));
+        assert_eq!(m["status"], "measured");
+        assert_eq!(ms[1]["method"], "rho.automorphism_classes");
+        assert!(ms[1]["sem"].is_null() && ms[1]["n"].is_null());
+        // binary: unlinked
+        assert_eq!(ms[2]["record_key"], "b1");
+        assert!(ms[2]["slug"].is_null());
+        // legacy row: unchanged behaviour (key p:a:b, kind dataset_curve, producers' unit)
+        assert_eq!(records[2]["record_key"], "827:1:15");
+        assert_eq!(ms[3]["method"], "rho.plain");
+        assert_eq!(ms[3]["slug"], "icv1-fp10-t5-192cb216");
+        assert_eq!(ms[3]["n"].as_i64(), Some(10));
+    }
+
+    #[test]
+    fn ml_v1_rejects_non_finite_values_and_duplicates() {
+        let nan = M1.replace("1.25", "NaN"); // not valid JSON: Python's json.dumps writes it
+        let as_string = M1.replace("1.25", "\"NaN\"");
+        let null_value = M1.replace("1.25", "null");
+        let bad_sem = M1.replace("0.05", "\"inf\"");
+        let dup_metric = format!("{M1},{M1}");
+        let text = [
+            v1_line("nan", "prime", &nan),
+            v1_line("str", "prime", &as_string),
+            v1_line("null", "prime", &null_value),
+            v1_line("sem", "binary", &bad_sem),
+            v1_line("dupm", "prime", &dup_metric),
+            v1_line("ok", "prime", M1),
+            v1_line("ok", "prime", M2), // repeated record_key
+        ]
+        .join("\n");
+        let (out, curves, report) = run("data/ecdb/n5_fp_costs.jsonl", &text);
+        assert_eq!(report.problems.len(), 6, "{:?}", report.problems);
+        assert!(report.problems[0].contains("not valid JSON"));
+        assert!(report.problems[5].contains("repeated"));
+        assert_eq!((out.0.len(), out.1.len()), (1, 1));
+        assert_eq!(out.0[0]["record_key"], "ok");
+        assert_eq!(curves.curves.len(), 1);
+        // (repository, dataset, record_key, method, metric) is unique
+        let mut keys: Vec<_> = out.1.iter().map(|m| (m["record_key"].to_string(), m["method"].to_string())).collect();
+        keys.sort();
+        keys.dedup();
+        assert_eq!(keys.len(), out.1.len());
+        // an unknown format is a problem
+        let (out, _, report) = run("x.jsonl", r#"{"format":"csd.ecdb-measurements/v2","record_key":"k"}"#);
+        assert_eq!((out.0.len(), report.problems.len()), (0, 1));
+    }
+
+    #[test]
+    fn stage_packs_a_gz_only_file() {
+        use std::io::Write;
+        let root = std::env::temp_dir().join(format!("ecdb-stage-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&root);
+        let sib = root.join("ext").join("ml-cryptanalysis");
+        for (d, p) in FILES.iter().filter(|(d, _)| *d == "ml-cryptanalysis") {
+            let f = sib.join(p);
+            std::fs::create_dir_all(f.parent().unwrap()).unwrap();
+            if p.ends_with("n5_fp_costs.jsonl") {
+                let mut e = flate2::write::GzEncoder::new(
+                    std::fs::File::create(format!("{}.gz", f.display())).unwrap(),
+                    flate2::Compression::fast(),
+                );
+                e.write_all(b"{\"k\":1}\n").unwrap();
+                e.finish().unwrap();
+            } else {
+                std::fs::write(&f, b"{}\n").unwrap();
+            }
+            let _ = d;
+        }
+        let out = root.join("out");
+        let staged = stage(&root, &out).unwrap();
+        assert!(staged.contains(&"aburan28/ml-cryptanalysis:data/ecdb/n5_fp_costs.jsonl".to_string()));
+        let packed = out.join("ext/ml-cryptanalysis/data/ecdb/n5_fp_costs.jsonl.gz");
+        assert_eq!(read_bytes(&packed.with_extension("")).unwrap(), b"{\"k\":1}\n");
+        let _ = std::fs::remove_dir_all(&root);
     }
 }

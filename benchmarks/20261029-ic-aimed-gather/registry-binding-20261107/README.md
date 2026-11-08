@@ -4,7 +4,7 @@ Successor of [`../registry-binding-20261105/`](../registry-binding-20261105/READ
 It was written because PR #3651 registers the ten prime medium-tier rho curves
 (`research/prime_medium_tier_rho_20261107/curves.json`) in
 `docs/curves/registry.json`. The registry grows from 22,268 to 22,278 rows,
-SHA-256 `0d46daf980898c08459803ba5e415aa0a9b60fe061d7ff069cb979d92ee5aa5a`.
+SHA-256 `33a16da0548b7b0c3482b3ba7198500a0285271794f63e9c46e10f9a02186e4f`.
 
 `verify_registry_binding.rs` is the 2026-11-05 checker with two text changes.
 `checked_on` now reads 2026-11-07, and the receipt names

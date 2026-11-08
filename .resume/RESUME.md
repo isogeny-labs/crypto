@@ -1,52 +1,45 @@
-# Resume: crypto @ claude/serene-davinci-ujoi58
+# Resume: crypto @ claude/novel-ecdlp-algorithm-iams4j
 
 ## Goal
-User request (2026-11-07): survey the prime-field ECDLP leads, then pursue the assessment's five
-priorities in parallel (research/prime_field_lead_assessment_20261107/README.md §4b). This checkpoint
-covers the one item that runs now: item 2, the sealed prime medium-tier rho reference bound
-(LEAD-RHO-matched-rho-calibration), which every prime-field IC gap is divided by.
+User request (2026-11-07): run every next step of research/split_prime_ecdlp_20261107 (#3654, #3655
+merged): proposals P1 (Riemann-Roch system with a Dickson-torus tower), P2 (twist-pure coset
+selection), P3 (cross-trace covariate test of the split-prime statistic) under frozen protocols on toy
+prime fields, plus a Lean statement of the obstruction.
 
 ## Lead / hypothesis
-LEAD-RHO-matched-rho-calibration (crypto-autoresearcher knowledge/leads/ecdlp/generic/). Prediction
-registered before data: medium-tier rho.negation about 1.06x the sqrt(pi/4) floor, inside [1.00, 1.10]
-(setup_excess); walk_shortfall if >= 1.30 with lower CI > 1.10. PROTOCOL.md §9-§10.
+P1: round7_rr's D_RR = 4 < D_T = 6 (m3 t4, Kummer) transfers to the Dickson torus tower (proposer 0.55
+stage-level). P2: F4 cost is coset-independent and coverage scales as c_E^m, so selecting the most
+E-pure coset pays at toy scale (0.85 toy, 0.05 cold end-to-end). P3: no Frobenius-field covariate
+moves rho cost or exact m = 2 coverage by >= 1 % (null expected, 0.98).
 
 ## Spec
-research/prime_medium_tier_rho_20261107/: PROTOCOL.md, protocol.json (experiment.protocol/v1, validates
-with 0 findings; freeze after the image receipt fills instrument.commit and binary_sha256), curves.json,
-seeds.json, specs/J1..J6.json, requests/J1..J6.request.json (validated), finalize_requests.sh, fit.sh,
-examples/prime_medium_tier_rho_rfit.rs. Curves registered in docs/curves/registry.json at dbd587a01a.
-Publication receipt: check-experiment-git at dbd587a01aefba0634acc459ea30cfb9bbf49a09.
+research/split_prime_ecdlp_20261107/followups/{README.md, p1_rr_dickson/PROTOCOL.md,
+p2_twist_coset/PROTOCOL.md, p3_cross_trace/PROTOCOL.md}, frozen in commit 535d9da826 (PR #3657).
+Instrument commands pinned in each protocol's Addendum A before any claim cell.
 
 ## State
-Inputs frozen and published: protocol.json frozen (protocol_sha256 5643e3e7...4cd6) at 529aa8ee4d;
-requests/final/J1..J6 bound to image 104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:
-292bdc3d91ef540bc7719f20902c5acc614dab458676225623275bb3a838cae5 (source dbd587a01a, ecbench sha256
-a18af09f...d3b9); publication check at 189b78587b. Benchmark record
-benchmarks/records/20261107T2115Z-prime-medium-rho-bound.json initialised. Next: director card, executor
-launch of J1..J6 one at a time.
+Protocols committed and pushed (PR #3657, auto-merge on). Builders writing standalone Rust crates under
+followups/p1_rr_dickson/p1tool, followups/p2_twist_coset/p2coset, followups/p3_cross_trace/p3census
+(uncommitted until they report). msolve 0.6.5 from apt at /usr/bin/msolve. aws CLI from
+/tmp/report-venv (pip) linked at /usr/local/bin/aws; caller is account 104186811093.
+Lean: aburan28/crypto-lean PR #3 (CryptoLean.SplitPrime.Obstruction), local module build passed,
+standard axioms only. Toolchain: ~/.elan with lean-4.35.0 linked from the release archive (elan cannot
+resolve "latest" through the proxy).
 
 ## Next steps
-1. Read the image URI (@sha256), source SHA and ecbench sha256 from run 42413370386's receipt.
-2. Fill protocol.json arms[].instrument.{commit,binary_sha256}; freeze with
-   crypto-autoresearcher tools/experiment_protocol.py freeze --commit auto --filed-before-affected-data.
-3. finalize_requests.sh IMAGE_URI SOURCE_SHA ECBENCH_SHA256; commit, push, rerun check-experiment-git.
-4. benchrec init --slug prime-medium-rho-bound --problem rho:prime_medium_tier_bound.
-5. experiment-director compiles the J1..J6 launch card; executor-mechanical runs it; one job at a time
-   (L2 pool holds one c8a.2xlarge); env AWS_REGION=us-east-2,
-   ISOLAB_BUCKET=isolab-results-104186811093-us-east-2, ISOLAB_CODEBUILD_PROJECT=isolab-experiment-launcher.
-6. After: verify --replay-all, table/band/compare, fit.sh, export, benchrec add-raw/metric/close.
+1. Read builders' reports; pin Addendum A per protocol; commit; new PR (or same branch if #3657 open).
+2. scripts/checkpoint.sh push; tools/benchrec.py init per run.
+3. experiment-director compile mode -> card per experiment; relay verbatim to executor-mechanical;
+   director assess mode.
+4. Analyse per the frozen decision rules; report + figures + Typst PDF per experiment; pcc claims;
+   session log; PR; track to merge.
 
 ## Runs in flight
-Image build done (run 42413370386, success). No EKS job yet. Jobs will be
-named prime-medium-rho-20261107-j1..j6.
+None. No claim cell has run.
 
 ## Stop and success conditions
-Six jobs, each under 3,600 s; about 3-3.5 c8a.2xlarge instance-hours; proposed ceiling USD 10. Stop on a
-failed A/A gate, a failed replay, or a job past its cap; report rather than rerun more than once.
-Success: sealed bounds for every arm at w = 0, 0.1, 1 and the R(N) fit, scored by PROTOCOL.md §9.
+Per protocol decision rules. Budget: P1 1,200 s per msolve job, one at a time; P2 same limits;
+P3 about 4 CPU-hours total. Stop a protocol on its control-failure rule.
 
 ## Open questions
-Whether the default deployed image carries rho.negation_v2 (hence the commit-built image). ecdb returned
-HTTP 503 during preparation. Owner decisions pending for item 1 (Mac files, ECR push, spot policy,
-ceilings, large hosts).
+Whether the director accepts the local L0 route (stated deviation from AGENTS.md section 9a).

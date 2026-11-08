@@ -1,5 +1,7 @@
 import copy
 from pathlib import Path
+import io
+import json
 import random
 import sqlite3
 import tempfile
@@ -64,6 +66,134 @@ class FixedTests(unittest.TestCase):
                 self.assertEqual(report['status'], 'complete')
                 self.assertEqual(int(report['targets']['new-target']['scalar']), expected['target-0'])
                 self.assertEqual(report['reuse'].get('pair_candidates_built', 0), 0)
+
+    def test_progress_and_relation_export_are_complete_and_resumable(self):
+        document, _ = fixture(9, seed=1031)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'relations.jsonl'
+            progress = io.StringIO()
+            with fixed.Campaign(document, directory, progress=fixed.Progress(True, 1, stream=progress),
+                                relationsOut=path) as campaign:
+                report = campaign.run(stage='collect', attempts=64, pairBudget=10000, seconds=2)
+                self.assertEqual(report['status'], 'complete')
+                self.assertEqual(report['relations_out'], str(path))
+                first = [json.loads(line) for line in path.read_text().splitlines()]
+                self.assertEqual(len(first), report['relations_saved'])
+                self.assertEqual([row['number'] for row in first], list(range(len(first))))
+                self.assertTrue(all(row['operation'] == 'fixed-relation' and row['verified'] for row in first))
+                self.assertTrue(all(row['stream'] == 'precompute' and row['target'] is None for row in first))
+                text = progress.getvalue()
+                self.assertIn('[0/4] campaign:', text)
+                self.assertIn('[1/4] pair table:', text)
+                self.assertIn('[2/4] relation stream=precompute', text)
+                self.assertIn('[4/4] done:', text)
+            # Reopening rewrites the same saved rows rather than duplicating them.
+            with fixed.Campaign(document, directory, relationsOut=path) as campaign:
+                again = campaign.run(stage='status', attempts=0, pairBudget=0)
+                self.assertEqual(again['relations_saved'], report['relations_saved'])
+                self.assertEqual(path.read_text().splitlines(), [json.dumps(row, sort_keys=True, separators=(',', ':'))
+                                                                 for row in first])
+
+    def test_cursor_closed_form_matches_recursive_model(self):
+        def prefix(size, i):
+            return sum(size - row for row in range(i))
+        for size in range(31):
+            for i in range(size + 1):
+                self.assertEqual(fixed.consideredCount(size, i, i), prefix(size, i))
+                for j in range(i, size + 1):
+                    self.assertEqual(fixed.consideredCount(size, i, j), prefix(size, i) + (j - i))
+                    if j < size:
+                        self.assertEqual(fixed.consideredCount(size, i, j + 1),
+                                         fixed.consideredCount(size, i, j) + 1)
+                if i < size:
+                    self.assertEqual(fixed.consideredCount(size, i + 1, i + 1),
+                                     fixed.consideredCount(size, i, size))
+
+    def test_disk_estimate_matches_lean_model(self):
+        overhead = 32 * 1024 * 1024
+        for planned in (0, 1, 2, 17, 4096, 6728946):
+            for bytes_per_pair in (0, 1, 128, 256, 1000):
+                self.assertEqual(fixed.requiredBytes(planned, bytes_per_pair),
+                                 (planned * bytes_per_pair * 5) // 4 + overhead)
+        self.assertLessEqual(fixed.requiredBytes(10, 100), fixed.requiredBytes(11, 100))
+        self.assertLessEqual(fixed.requiredBytes(10, 100), fixed.requiredBytes(10, 101))
+        self.assertEqual(fixed.pairTableRequiredBytes(10, 100, 1000, True),
+                         fixed.requiredBytes(10, 100))
+        self.assertEqual(fixed.pairTableRequiredBytes(10, 100, 1000, False),
+                         fixed.requiredBytes(10, 100) + 1000 * fixed.PAIR_INDEX_BYTES_PER_PAIR)
+
+    def test_field_multiplication_matches_reference_algorithm(self):
+        document, _ = fixture(9, seed=1039)
+        with fixed.Campaign(document, '.', memory=True) as campaign:
+            onb = campaign.params.onb
+
+            def reference(a, b):
+                r, bb, i = 0, b, 0
+                while bb:
+                    if bb & 1:
+                        r ^= a if i == 0 else ((a << i) | (a >> (onb.n - i))) & onb.allOnes
+                    bb >>= 1
+                    i += 1
+                return r ^ onb.allOnes if r & 1 else r
+
+            rng = random.Random(19)
+            for _ in range(500):
+                a = onb.normalize(rng.getrandbits(onb.n))
+                b = onb.normalize(rng.getrandbits(onb.n))
+                self.assertEqual(onb.mul(a, b), reference(a, b))
+
+    def test_batch_inversion_and_addition_match_scalar_paths(self):
+        document, _ = fixture(9, seed=1037)
+        with fixed.Campaign(document, '.', memory=True) as campaign:
+            onb = campaign.params.onb
+            values = [onb.gamma(i) for i in range(1, onb.m + 1)]
+            for value, inverse in zip(values, onb.batchInv(values)):
+                self.assertEqual(onb.mul(value, inverse), onb.one())
+            points = campaign.points
+            rng = random.Random(17)
+            pairs = [(points[rng.randrange(len(points))], points[rng.randrange(len(points))])
+                     for _ in range(500)]
+            pairs += [(point, point) for point in points]
+            for got, (left, right) in zip(campaign.params.curve.addBatch(pairs), pairs):
+                self.assertEqual(got, campaign.params.curve.add(left, right))
+
+    def test_batch_addition_matches_on_ecc2k130_sample(self):
+        document = fixed.readJson(ROOT / 'docs/ic/params/ecc2k130-fixed.json')
+        with fixed.Campaign(document, '.', memory=True) as campaign:
+            points = campaign.points
+            rng = random.Random(131)
+            pairs = [(points[rng.randrange(len(points))], points[rng.randrange(len(points))])
+                     for _ in range(64)]
+            for got, (left, right) in zip(campaign.params.curve.addBatch(pairs), pairs):
+                self.assertEqual(got, campaign.params.curve.add(left, right))
+
+    def test_pair_index_is_rebuilt_when_the_table_completes(self):
+        document, _ = fixture(9, seed=1041)
+        previous = fixed.PAIR_INDEX_THRESHOLD
+        try:
+            fixed.PAIR_INDEX_THRESHOLD = 0
+            with tempfile.TemporaryDirectory() as directory:
+                with fixed.Campaign(document, directory) as campaign:
+                    campaign.buildPairs(10)
+                    self.assertFalse(campaign.pairIndexExists())
+                    campaign.buildPairs(10000)
+                    self.assertTrue(campaign.pairIndexExists())
+                    campaign.db.execute('DROP INDEX IF EXISTS pair_lookup')
+                    campaign.db.commit()
+                    self.assertFalse(campaign.pairIndexExists())
+                    campaign.decompose(campaign.params.generator, 2)
+                    self.assertTrue(campaign.pairIndexExists())
+        finally:
+            fixed.PAIR_INDEX_THRESHOLD = previous
+
+    def test_pair_table_check_fails_before_a_full_disk(self):
+        document, _ = fixture(9, seed=1033)
+        with tempfile.TemporaryDirectory() as directory:
+            with fixed.Campaign(document, directory) as campaign:
+                with patch('indexcalc_fixed.shutil.disk_usage',
+                           return_value=type('Usage', (), {'free': 0})()):
+                    with self.assertRaisesRegex(ValueError, 'pair table needs about'):
+                        campaign.run(stage='pairs', attempts=0, pairBudget=10000)
 
     def test_partial_pair_build_and_interrupted_collection_match_reference(self):
         document, expected = fixture(9, seed=1009)

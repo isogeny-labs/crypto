@@ -9,6 +9,7 @@ import hashlib
 import json
 import math
 from pathlib import Path
+import shutil
 import sqlite3
 import sys
 import time
@@ -20,6 +21,13 @@ import indexcalc_selector as selector
 
 
 FORMAT = 'fixed-koblitz-ic-v1'
+# Pair-table transactions are small enough to bound crash loss and large
+# enough to amortise SQLite's commit cost. The cursor and rolling checksum
+# are committed with the rows, so a crash loses at most one chunk.
+PAIR_CHUNK = 4096
+# Above this many planned candidates, maintaining pair_lookup during inserts
+# costs more than dropping it and rebuilding once at the end.
+PAIR_INDEX_THRESHOLD = 100000
 
 
 def require(condition, message):
@@ -169,14 +177,108 @@ def pointKey(point):
     return 'identity' if point is None else format(point[0], 'x') + ':' + format(point[1], 'x')
 
 
+def consideredCount(size, i, j):
+    """Candidates before cursor `(i, j)`; mirrors the Lean PairCursor model."""
+    return i * size - i * (i - 1) // 2 + (j - i)
+
+
+def requiredBytes(planned, bytesPerPair):
+    """Disk estimate used before a pair-table chunk; 25% slack + 32 MiB."""
+    return (planned * bytesPerPair * 5) // 4 + 32 * 1024 * 1024
+
+
+# Index entries are roughly this large on the degree-131 text keys. When the
+# pair index is absent during a bulk build, reserve room to create it once.
+PAIR_INDEX_BYTES_PER_PAIR = 192
+
+
+def pairTableRequiredBytes(planned, bytesPerPair, totalPairs, indexPresent):
+    """Disk required for this chunk, including the final index when absent."""
+    required = requiredBytes(planned, bytesPerPair)
+    if not indexPresent:
+        required += totalPairs * PAIR_INDEX_BYTES_PER_PAIR
+    return required
+
+
+class Progress:
+    """Live human-readable progress on stderr.
+
+    stdout is reserved for the final JSON report: callers such as `ic fixed`
+    capture it while letting stderr through to the terminal, so these lines are
+    visible immediately but never contaminate the artifact.  The elapsed clock
+    starts when the object is created, which is the start of the invocation.
+    """
+
+    def __init__(self, enabled=False, every=100, stream=None):
+        require(type(enabled) is bool, 'progress must be a boolean')
+        require(type(every) is int and every >= 0, 'progress interval must be nonnegative')
+        self.enabled = enabled
+        self.every = every
+        self.stream = sys.stderr if stream is None else stream
+        self.started = time.monotonic()
+
+    def line(self, message):
+        if not self.enabled:
+            return
+        self.stream.write('[%9.3fs] ic: %s\n' % (time.monotonic() - self.started, message))
+        self.stream.flush()
+
+    def pairStart(self):
+        if self.enabled and not hasattr(self, 'pairStarted'):
+            self.pairStarted = time.monotonic()
+
+    def pairTable(self, considered, total, pairs, complete, built, budget):
+        if not self.enabled:
+            return
+        if not total:
+            return
+        if not hasattr(self, 'pairStarted'):
+            self.pairStarted = time.monotonic()
+        if complete:
+            state = 'complete'
+        elif built >= budget:
+            state = 'paused at this invocation budget; rerun to continue'
+        else:
+            state = 'building'
+        rate = '' if not built else ', %.0f candidates/s' % (
+            built / max(1e-9, time.monotonic() - self.pairStarted))
+        self.line('[1/4] pair table: %s; %d/%d candidates (%.1f%%), %d pairs%s'
+                  % (state, considered, total, 100.0 * considered / total, pairs, rate))
+
+    def attempt(self, stream, number, status, rank, columns, relations, independent, rate):
+        if not self.enabled:
+            return
+        if self.every and number % self.every:
+            return
+        phase = '[4/4]' if stream.startswith('target:') else '[2/4]'
+        self.line('%s %s attempt %d: %s; %d relations (%d independent), rank %d/%d, %.1f attempts/s'
+                  % (phase, stream, number + 1, status, relations, independent, rank, columns, rate))
+
+    def relation(self, record, support, rank, columns):
+        if not self.enabled:
+            return
+        phase = '[4/4]' if record['stream'].startswith('target:') else '[2/4]'
+        self.line('%s relation stream=%s number=%d independent=%s support=%d/%d rank=%d/%d'
+                  % (phase, record['stream'], record['number'], str(record['independent']).lower(),
+                     support, columns, rank, columns))
+
+    def message(self, message):
+        if self.enabled:
+            self.line(message)
+
+
 class Campaign:
-    def __init__(self, document, directory, solver='pairs', memory=False, selectorModel=None):
+    def __init__(self, document, directory, solver='pairs', memory=False, selectorModel=None,
+                 progress=None, relationsOut=None):
         require(__debug__, 'run without Python -O; the shared arithmetic engine uses assertions')
         self.ledger = engine.Ledger()
         self.uses = Counter()
         self.started = time.perf_counter_ns()
         self.db = None
         self.lock = None
+        self.relationsOut = None
+        self.progress = Progress(False) if progress is None else progress
+        self.relationsOutPath = None if relationsOut is None else Path(relationsOut)
         try:
             with self.ledger.phase('parameter_validation'):
                 self.params = Parameters(document, self.ledger)
@@ -187,6 +289,8 @@ class Campaign:
                     'SAT requires the Hamming-weight factor-base recipe')
             self.solver = solver
             path = Path(directory)
+            self.directory = path
+            self.memory = memory
             if not memory:
                 import fcntl
                 path.mkdir(parents=True, exist_ok=True)
@@ -206,11 +310,17 @@ class Campaign:
                     result TEXT NOT NULL, PRIMARY KEY(stream,number));
                 CREATE TABLE IF NOT EXISTS relations (stream TEXT NOT NULL, number INTEGER NOT NULL,
                     witness TEXT NOT NULL, coefficients TEXT NOT NULL, a TEXT NOT NULL, b TEXT NOT NULL,
+                    independent INTEGER,
                     PRIMARY KEY(stream,number));
                 CREATE TABLE IF NOT EXISTS targets (id TEXT PRIMARY KEY, point TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS solutions (id TEXT PRIMARY KEY, scalar TEXT NOT NULL);
                 CREATE TABLE IF NOT EXISTS invocations (number INTEGER PRIMARY KEY, report TEXT NOT NULL);
             ''')
+            # Older campaigns predate the independence flag; keep them readable
+            # and let future exports report it instead of silently dropping it.
+            if 'independent' not in {row[1] for row in self.db.execute('PRAGMA table_info(relations)')}:
+                with self.db:
+                    self.db.execute('ALTER TABLE relations ADD COLUMN independent INTEGER')
             with self.db:
                 saved = self.meta('identity')
                 require(saved is None or saved == self.params.identity,
@@ -222,6 +332,7 @@ class Campaign:
                     require(prior is None or prior[0] == pointKey(point), 'target ID was already bound to another point')
                     self.db.execute('INSERT OR IGNORE INTO targets VALUES (?,?)', (name, pointKey(point)))
             self.base()
+            self.openRelations()
             self.context = None
             self.selector = None
             self.selectorDomains = {}
@@ -234,6 +345,9 @@ class Campaign:
             raise
 
     def close(self):
+        if self.relationsOut is not None:
+            self.relationsOut.close()
+            self.relationsOut = None
         if self.db is not None:
             self.db.close()
             self.db = None
@@ -253,6 +367,43 @@ class Campaign:
 
     def put(self, name, value):
         self.db.execute('INSERT OR REPLACE INTO metadata VALUES (?,?)', (name, canonical(value)))
+
+    def openRelations(self):
+        """Materialise saved relations as JSON Lines, then append live.
+
+        The rewrite makes the file a complete view even when a previous run
+        saved relations before this option existed, and also repairs a missing
+        tail after a crash between the SQLite commit and the file append.  New
+        rows are flushed immediately so `tail -f` shows each verified relation
+        as it lands.
+        """
+        if self.relationsOutPath is None:
+            return
+        path = self.relationsOutPath
+        path.parent.mkdir(parents=True, exist_ok=True)
+        database = self.db.execute('PRAGMA database_list').fetchone()[2]
+        if database and Path(database).resolve() == path.resolve():
+            raise ValueError('relations export must not replace the campaign database')
+        self.relationsOut = open(path, 'w', encoding='utf-8')
+        for stream, number, witness, coefficients, a, b, independent in self.db.execute(
+                'SELECT stream,number,witness,coefficients,a,b,independent FROM relations ORDER BY stream,number'):
+            record = self.relationRecord(stream, number, json.loads(witness), json.loads(coefficients),
+                                         a, b, None if independent is None else bool(independent))
+            self.relationsOut.write(canonical(record) + '\n')
+        self.relationsOut.flush()
+        self.progress.message('relations: %d saved to %s' % (
+            self.db.execute('SELECT COUNT(*) FROM relations').fetchone()[0], path))
+
+    def relationRecord(self, stream, number, witness, coefficients, a, b, independent):
+        return {'schema_version': 1, 'operation': 'fixed-relation', 'stream': stream,
+                'target': None if stream == 'precompute' else stream[len('target:'):],
+                'number': number, 'witness': witness, 'coefficients': coefficients,
+                'a': a, 'b': b, 'independent': independent, 'verified': True}
+
+    def saveRelation(self, record):
+        if self.relationsOut is not None:
+            self.relationsOut.write(canonical(record) + '\n')
+            self.relationsOut.flush()
 
     def base(self):
         p = self.params
@@ -294,6 +445,22 @@ class Campaign:
             with self.db:
                 self.put('base_order', self.baseHash)
 
+    def pairIndexExists(self):
+        return self.db.execute(
+            "SELECT 1 FROM sqlite_master WHERE type='index' AND name='pair_lookup'"
+        ).fetchone() is not None
+
+    def ensurePairIndex(self):
+        if self.memory or self.pairIndexExists():
+            return
+        with self.db:
+            self.db.execute('CREATE INDEX IF NOT EXISTS pair_lookup ON pairs(point)')
+
+    def dropPairIndex(self):
+        if not self.memory and self.pairIndexExists():
+            with self.db:
+                self.db.execute('DROP INDEX IF EXISTS pair_lookup')
+
     def buildPairs(self, budget):
         """Build at most budget candidate pairs; each chunk and cursor commit together."""
         require(type(budget) is int and budget >= 0, 'pair budget must be nonnegative')
@@ -301,31 +468,88 @@ class Campaign:
         with self.ledger.phase('pair_table'):
             state = self.meta('pair_state') or {'i': 0, 'j': 0, 'serial': 0, 'hash': '0' * 64}
             self.checkPairs(state)
+            total = size * (size + 1) // 2
+            self.progress.pairStart()
             if state['i'] == size:
                 self.uses['pair_table_loads'] += 1
+                self.ensurePairIndex()
+                self.progress.pairTable(total, total, state['serial'], True, 0, budget)
                 return True
+            considered = consideredCount(size, state['i'], state['j'])
+            remaining = max(0, total - considered)
+            planned = min(budget, remaining)
+            if not self.memory:
+                pages = self.db.execute('PRAGMA page_count').fetchone()[0]
+                page_size = self.db.execute('PRAGMA page_size').fetchone()[0]
+                if state['serial'] > 0:
+                    bytes_per_pair = max(128, (pages * page_size + state['serial'] - 1) // state['serial'])
+                else:
+                    bytes_per_pair = 256
+                required = pairTableRequiredBytes(planned, bytes_per_pair, total,
+                                                  self.pairIndexExists())
+                free = shutil.disk_usage(self.directory).free
+                if free < required:
+                    raise ValueError(
+                        'pair table needs about %d MiB free in %s, but only %d MiB is available; '
+                        'choose --dir on a volume with more space or stop earlier with --pair-budget'
+                        % (required // (1024 * 1024), self.directory.resolve(),
+                           free // (1024 * 1024)))
+            if planned >= PAIR_INDEX_THRESHOLD:
+                self.dropPairIndex()
             done = 0
-            while done < budget and state['i'] < size:
-                with self.db:
-                    for _ in range(min(256, budget - done)):
-                        i, j = state['i'], state['j']
-                        if i == size:
-                            break
-                        left, right = self.points[i], self.points[j]
-                        if left != self.params.curve.neg(right):
-                            key = pointKey(self.params.curve.add(left, right))
-                            serial = state['serial']
-                            self.db.execute('INSERT INTO pairs VALUES (?,?,?,?)', (serial, key, i, j))
-                            state['hash'] = digest([state['hash'], serial, key, i, j])
-                            state['serial'] += 1
-                        state['j'] += 1
-                        if state['j'] == size:
-                            state['i'] += 1
-                            state['j'] = state['i']
-                        done += 1
-                        self.uses['pair_candidates_built'] += 1
-                    self.put('pair_state', state)
-            return state['i'] == size
+            reportEvery = max(PAIR_CHUNK, budget // 100)
+            nextReport = reportEvery
+            # The pair table is rebuildable, so NORMAL synchronous commits are
+            # enough: a crash can lose one chunk, and checkPairs validates the
+            # committed cursor before resuming. Keep FULL for every other table.
+            previous_sync = self.db.execute('PRAGMA synchronous').fetchone()[0]
+            self.db.execute('PRAGMA synchronous=NORMAL')
+            self.db.execute('PRAGMA cache_size=-65536')
+            self.db.execute('PRAGMA temp_store=MEMORY')
+            try:
+                while done < budget and state['i'] < size:
+                    with self.db:
+                        entries = []
+                        for _ in range(min(PAIR_CHUNK, budget - done)):
+                            i, j = state['i'], state['j']
+                            if i == size:
+                                break
+                            left, right = self.points[i], self.points[j]
+                            if left != self.params.curve.neg(right):
+                                entries.append((i, j, left, right))
+                            state['j'] += 1
+                            if state['j'] == size:
+                                state['i'] += 1
+                                state['j'] = state['i']
+                            done += 1
+                            self.uses['pair_candidates_built'] += 1
+                        if entries:
+                            points = self.params.curve.addBatch(
+                                [(left, right) for _, _, left, right in entries])
+                            rows = []
+                            for (i, j, _, _), point in zip(entries, points):
+                                if point is None:
+                                    continue
+                                key = pointKey(point)
+                                serial = state['serial']
+                                rows.append((serial, key, i, j))
+                                state['hash'] = digest([state['hash'], serial, key, i, j])
+                                state['serial'] += 1
+                            if rows:
+                                self.db.executemany('INSERT INTO pairs VALUES (?,?,?,?)', rows)
+                        self.put('pair_state', state)
+                    considered = consideredCount(size, state['i'], state['j'])
+                    if done >= nextReport and done != budget:
+                        self.progress.pairTable(considered, total, state['serial'], False, done, budget)
+                        nextReport += reportEvery
+            finally:
+                self.db.execute('PRAGMA synchronous=%d' % previous_sync)
+            complete = state['i'] == size
+            if complete:
+                self.ensurePairIndex()
+            considered = consideredCount(size, state['i'], state['j'])
+            self.progress.pairTable(considered, total, state['serial'], complete, done, budget)
+            return complete
 
     def checkPairs(self, state):
         size = len(self.points)
@@ -336,7 +560,7 @@ class Campaign:
             require(serial == count and 0 <= i <= j < size, 'invalid pair-table record')
             value = digest([value, serial, key, i, j])
             count += 1
-        considered = state['i'] * size - state['i'] * (state['i'] - 1) // 2 + state['j'] - state['i']
+        considered = consideredCount(size, state['i'], state['j'])
         excluded = sum(1 for i, point in enumerate(self.points)
                        if i <= self.index[self.params.curve.neg(point)] and
                        (i < state['i'] or (i == state['i'] and self.index[self.params.curve.neg(point)] < state['j'])))
@@ -430,6 +654,7 @@ class Campaign:
             return witness, details
         state = self.meta('pair_state')
         require(state is not None and state['i'] == len(self.points), 'pair table is incomplete')
+        self.ensurePairIndex()
         deadline = time.monotonic() + seconds
         with self.ledger.phase('decomposition'):
             prefixes = [(None, None)] if self.params.summands == 2 else enumerate(self.points)
@@ -503,18 +728,31 @@ class Campaign:
             self.queryRank, self.queryDirect = len(matrix.rows), targetName is not None
             witness, details = self.decompose(target, seconds)
             details['solver'] = self.solver
+            relation = None
             with self.ledger.phase('relation_commit'):
                 with self.db:
                     if witness is not None:
                         row = self.verify(witness, target)
                         independent = self.push(matrix, row, a, b, targetName is not None)
                         details['independent'] = independent
-                        self.db.execute('INSERT INTO relations VALUES (?,?,?,?,?,?)',
-                            (stream, cursor, canonical(witness), canonical(row), str(a), str(b)))
+                        self.db.execute('INSERT INTO relations(stream,number,witness,coefficients,a,b,independent) '
+                                        'VALUES (?,?,?,?,?,?,?)',
+                            (stream, cursor, canonical(witness), canonical(row), str(a), str(b),
+                             int(bool(independent))))
                         self.uses['new_relations'] += 1
                         self.uses['new_independent_relations'] += int(independent)
+                        relation = self.relationRecord(stream, cursor, witness, row, str(a), str(b),
+                                                       bool(independent))
                     self.db.execute('INSERT INTO attempts VALUES (?,?,?)', (stream, cursor, canonical(details)))
                 self.uses['new_attempts'] += 1
+            if relation is not None:
+                self.saveRelation(relation)
+                self.progress.relation(relation, sum(1 for value in row if value),
+                                       len(matrix.rows), matrix.size)
+            elapsed = time.monotonic() - self.progress.started
+            self.progress.attempt(stream, cursor, details['status'], len(matrix.rows), matrix.size,
+                                  self.uses['new_relations'], self.uses['new_independent_relations'],
+                                  self.uses['new_attempts'] / max(1e-9, elapsed))
             cursor += 1
         return matrix
 
@@ -545,6 +783,9 @@ class Campaign:
     def solve(self, attempts, seconds, logs):
         results = {}
         for name, target in self.params.targets.items():
+            self.progress.message('[4/4] target %s: %s' % (
+                name, 'replaying saved scalar' if self.db.execute(
+                    'SELECT 1 FROM solutions WHERE id=?', (name,)).fetchone() is not None else 'collecting'))
             saved = self.db.execute('SELECT scalar FROM solutions WHERE id=?', (name,)).fetchone()
             if saved is not None:
                 value = integer(saved[0])
@@ -600,6 +841,10 @@ class Campaign:
                   'status': 'stopped', 'identity': self.params.identity, 'degree': self.params.onb.m,
                   'subgroup_order': str(self.params.prime), 'orbit_columns': len(self.reps),
                   'signed_base_points': len(self.points), 'solver': self.solver, 'targets': {}}
+        self.progress.message('[0/4] campaign: degree %d, %d orbit columns, %d signed points, stage=%s, solver=%s'
+                              % (self.params.onb.m, len(self.reps), len(self.points), stage, self.solver))
+        if self.relationsOutPath is not None:
+            report['relations_out'] = str(self.relationsOutPath)
         count = math.comb(len(self.points) + self.params.summands - 1, self.params.summands)
         denominator = self.params.prime - 1
         report['coverage_ceiling'] = {'numerator': str(min(count, denominator)), 'denominator': str(denominator),
@@ -615,8 +860,13 @@ class Campaign:
         if ready:
             matrix = None
             if not replayOnly and stage in ('all', 'collect') and self.logs() is None:
+                self.progress.message('[2/4] collection: starting; up to %d attempts, %s solver, %s s per query'
+                                      % (attempts, self.solver, seconds))
                 matrix = self.collect(attempts, seconds)
             logs = self.logs(matrix) if stage in ('all', 'collect', 'logs', 'solve') else None
+            if stage in ('all', 'collect', 'logs', 'solve'):
+                self.progress.message('[3/4] factor-base logs: %s'
+                                      % ('available' if logs is not None else 'incomplete'))
             if stage in ('collect', 'logs'):
                 report['status'] = 'complete' if logs is not None else 'insufficient_relations'
             if stage in ('all', 'solve'):
@@ -638,6 +888,8 @@ class Campaign:
         report['source_sha256'] = {name: hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()
                                   for name in ('indexcalc_fixed.py', 'indexcalc_selector.py', 'indexcalc_e2e.py', 'field.py', 'curves.py', 'decomp.py', 'cnf.py')}
         report['previous_invocations'] = self.db.execute('SELECT COUNT(*) FROM invocations').fetchone()[0]
+        self.progress.message('[4/4] done: status=%s, %d relations saved, %d attempts saved'
+                              % (report['status'], report['relations_saved'], report['attempts_saved']))
         with self.db:
             self.db.execute('INSERT INTO invocations(report) VALUES (?)', (canonical(report),))
         return report
@@ -653,12 +905,34 @@ def main():
     parser.add_argument('--attempts', type=int, default=32)
     parser.add_argument('--pair-budget', type=int, default=10000)
     parser.add_argument('--query-seconds', type=float, default=.25)
+    parser.add_argument('--progress', action='store_true',
+                        help='print live stage, pair-table, attempt and relation progress to stderr')
+    parser.add_argument('--progress-every', type=int, default=100,
+                        help='attempts between progress heartbeats; 0 prints only relations and stage changes')
+    parser.add_argument('--relations-out',
+                        help='rewrite saved relations as JSON Lines, then append each new verified relation')
     args = parser.parse_args()
     try:
-        with Campaign(readJson(args.params), args.dir, args.solver, selectorModel=args.selector_model) as campaign:
+        with Campaign(readJson(args.params), args.dir, args.solver, selectorModel=args.selector_model,
+                      progress=Progress(args.progress, args.progress_every),
+                      relationsOut=args.relations_out) as campaign:
             report = campaign.run(args.stage, args.attempts, args.pair_budget, args.query_seconds)
     except (ValueError, OSError, sqlite3.Error, RuntimeError) as error:
-        report = {'schema_version': 1, 'operation': 'fixed', 'status': 'error', 'message': str(error)}
+        message = str(error)
+        report = {'schema_version': 1, 'operation': 'fixed', 'stage': args.stage,
+                  'status': 'error', 'message': message}
+        lowered = message.lower()
+        if 'disk is full' in lowered or 'disk i/o error' in lowered or 'database or disk is full' in lowered:
+            report['hint'] = ('the campaign directory ran out of space; choose --dir on a volume '
+                              'with free space or stop earlier with --pair-budget')
+        elif 'pair table needs about' in lowered:
+            report['hint'] = ('choose a campaign directory on a volume with more free space, '
+                              'or lower --pair-budget to build incrementally')
+        elif 'readonly' in lowered or 'read-only' in lowered:
+            report['hint'] = 'the campaign directory is not writable; check permissions or use --dir'
+        elif 'no such table' in lowered or 'malformed' in lowered:
+            report['hint'] = ('the campaign database changed or disappeared while running; '
+                              'do not move or delete an active campaign directory')
     print(json.dumps(report, sort_keys=True))
     return 0 if report['status'] in ('complete', 'stopped') else 2
 

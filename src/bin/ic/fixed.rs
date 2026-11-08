@@ -35,23 +35,40 @@ pub struct FixedArgs {
     /// Python interpreter; python-sat and pycryptosat are needed only for SAT.
     #[arg(long, default_value = "python3")]
     pub python: PathBuf,
+    /// Print live stage, pair-table, attempt and relation progress to stderr.
+    #[arg(long)]
+    pub progress: bool,
+    /// Attempts between progress heartbeats; 0 prints only relations and stage changes.
+    #[arg(long, default_value_t = 100)]
+    pub progress_every: u32,
+    /// Rewrite saved relations as JSON Lines, then append each new verified relation.
+    #[arg(long)]
+    pub relations_out: Option<PathBuf>,
+}
+
+fn fixed_engine() -> Option<PathBuf> {
+    if let Some(path) = std::env::var_os("IC_FIXED_ENGINE") {
+        let path = PathBuf::from(path);
+        if path.is_file() {
+            return Some(path);
+        }
+    }
+    super::install::share_file("ecc2k130/codegen/indexcalc_fixed.py")
 }
 
 pub fn run(args: FixedArgs) -> Result<Value, String> {
-    let script =
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("ecc2k130/codegen/indexcalc_fixed.py");
-    if !script.is_file() {
-        return Err(format!(
-            "fixed workflow engine is missing: {}",
-            script.display()
-        ));
-    }
+    let script = fixed_engine().ok_or_else(|| {
+        "fixed workflow engine is missing; looked for IC_FIXED_ENGINE, \
+         IC_SHARE_DIR, <prefix>/share/cryptocli/ecc2k130/codegen/indexcalc_fixed.py, \
+         <exe-dir>/ecc2k130/codegen/indexcalc_fixed.py, and the source checkout"
+            .to_string()
+    })?;
     let mut command = Command::new(&args.python);
     command.arg(script);
     if let Some(model) = &args.selector_model {
         command.arg("--selector-model").arg(model);
     }
-    let result = command
+    command
         .arg("--params")
         .arg(&args.params)
         .arg("--dir")
@@ -65,7 +82,17 @@ pub fn run(args: FixedArgs) -> Result<Value, String> {
         .arg("--pair-budget")
         .arg(args.pair_budget.to_string())
         .arg("--query-seconds")
-        .arg(args.query_seconds.to_string())
+        .arg(args.query_seconds.to_string());
+    if args.progress {
+        command
+            .arg("--progress")
+            .arg("--progress-every")
+            .arg(args.progress_every.to_string());
+    }
+    if let Some(path) = &args.relations_out {
+        command.arg("--relations-out").arg(path);
+    }
+    let result = command
         .stdin(Stdio::null())
         .stderr(Stdio::inherit())
         .output()
