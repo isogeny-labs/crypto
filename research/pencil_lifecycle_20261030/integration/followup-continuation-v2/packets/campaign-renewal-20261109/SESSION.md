@@ -107,3 +107,15 @@ Finalv2bindings; scientificEKS livecapsaskedoperatorreadback whilelocalworkconti
 
 ## Errors
 No nativefixturefailure. Priorfirstrootfailurepreservedandcharged. [pcc:unverified]
+
+## What was done — 18:21 UTC
+The second root validation attempt terminated during compilation after the Python 3.9 lease parser rejected a valid five-digit fractional timestamp. Exact invocation 2fe218961dcb4bff958ddfd5301234b7 is terminal, MainPID0, cgroup absent; supervisor cleanup confirmed. No controls or full suite ran.
+
+## Decisions made
+Preserve the failed attempt and charge the full 1,800-second allowance. Cumulative debit is 7,140 seconds, leaving 36,060. Prepare a separately reviewed parser correction and current mutable-cache snapshot; continue the independent branch proof replay serially.
+
+## Open threads
+Branch source review completed; release requires current ledger and publication. V3 parser/cache source review and failure archival continue in parallel.
+
+## Errors
+The lease expiry 2026-11-09T18:10:34.65128+00:00 caused ValueError; failed compilation cache is retained and must be rebound before reuse.
