@@ -22,6 +22,11 @@ cargo test --release --manifest-path tools/efd/Cargo.toml
 # Regenerate both catalogues from a fetch cache and diff (ignores the date).
 tools/efd/replay.sh G1P_CACHE G12O_CACHE
 
+# Symbolic verification of every formula program (needs sympy).
+python3 tools/efd/verify_symbolic.py --out docs/efd/prime-validation/symbolic.json
+python3 tools/efd/verify_symbolic.py --catalogue src/prime_ecc/efd/legacy_catalogue.json \
+  --out docs/efd/prime-validation/symbolic-legacy.json
+
 # Source hashes for the module and catalogue.
 cd src/prime_ecc/efd && sha256sum mod.rs program.rs formats.rs checked.rs \
   tests.rs catalogue.json
