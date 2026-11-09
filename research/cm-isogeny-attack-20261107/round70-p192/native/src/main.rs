@@ -162,7 +162,7 @@ fn special<const P: i64, const D: i64>(
     }
     let disc = (-4 * a * a * a - 27 * b * b).rem_euclid(P);
     let root = (1..P).find(|&v| v * v % P == disc).unwrap();
-    let i = t2.elems[t2.roots[fid(F::c(-1))][0]];
+    let i = t2.elems[t2.roots[fid(F::<P, D>::c(-1))][0]];
     assert_eq!(i * i, F::c(-1));
     let mut rows = vec![];
     for d in [F::c(root), F::c(-root)] {
