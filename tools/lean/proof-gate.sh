@@ -150,8 +150,8 @@ PY
     if ! (cd "$root/$t" && lake build) > "$log/build.log" 2>&1; then
       status=FAIL_build
     else
-      local f module source_rel target private_dir attempt
-      local -a sources=() source_paths=() mods=() private_mods=()
+      local f module source_rel target private_dir attempt lake_path
+      local -a sources=() source_paths=() mods=()
       private_dir="$log/private-olean"
       mkdir -p "$private_dir"
       : > "$log/source-build.log"
@@ -174,11 +174,17 @@ PY
         module=${source_rel//\//».«}
         sources+=("+«$module»")
         source_paths+=("$source_rel")
+        mods+=("«$module»")
       done < <(cd "$root" && git ls-files -z -- "$t")
       if [ ${#sources[@]} -eq 0 ]; then
         status=FAIL_no_sources
       else
+        if ! lake_path=$(cd "$root/$t" && lake env printenv LEAN_PATH); then
+          echo 'could not read Lake LEAN_PATH' >> "$log/source-build.log"
+          status=FAIL_source_build
+        fi
         for ((i=0; i<${#sources[@]}; i++)); do
+          [ "$status" = PASS ] || break
           source_rel=${source_paths[i]}
           module=${source_rel//\//.}
           attempt="$log/source-attempt.log"
@@ -188,13 +194,12 @@ PY
             cat "$attempt" >> "$log/source-registration.log"
             target="$private_dir/$source_rel.olean"
             mkdir -p "$(dirname "$target")"
-            if ! (cd "$root/$t" && LEAN_PATH="$private_dir:${LEAN_PATH:-}" \
-              lake env lean -o "$target" "$source_rel.lean") >> "$log/source-build.log" 2>&1; then
+            if ! (cd "$root/$t" && LEAN_PATH="$private_dir:$lake_path" \
+              lean -o "$target" "$source_rel.lean") >> "$log/source-build.log" 2>&1; then
               status=FAIL_source_build
               break
             fi
             printf 'privately compiled %s\n' "$source_rel.lean" >> "$log/source-build.log"
-            private_mods+=("«${module//./».«}»")
           else
             cat "$attempt" >> "$log/source-build.log"
             status=FAIL_source_build
@@ -202,13 +207,12 @@ PY
           fi
         done
         if [ "$status" = PASS ]; then
-          mapfile -t mods < <(cd "$root/$t/.lake/build/lib/lean" 2>/dev/null && find . -name '*.olean' \
-            | sed 's|^\./|«|; s|\.olean$|»|; s|/|».«|g' | sort)
-          mods+=("${private_mods[@]}")
+          # Audit exactly the tracked source modules. A previous local build
+          # may have left stale .olean files that are not in this Git tree.
           if [ ${#mods[@]} -eq 0 ]; then
             status=FAIL_no_modules
-          elif ! (cd "$root/$t" && LEAN_PATH="$private_dir:${LEAN_PATH:-}" \
-            lake env lean --run "$audit" -- "${trust_args[@]}" "${mods[@]}") > "$log/audit.log" 2>&1; then
+          elif ! (cd "$root/$t" && LEAN_PATH="$private_dir:$lake_path" \
+            lean --run "$audit" -- "${trust_args[@]}" "${mods[@]}") > "$log/audit.log" 2>&1; then
             status=FAIL_audit
           fi
         fi
