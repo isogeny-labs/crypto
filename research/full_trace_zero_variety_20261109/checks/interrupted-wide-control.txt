@@ -1,0 +1,29 @@
+   Compiling full-trace-zero-backend v0.1.0 (/workspace/crypto-trace/research/full_trace_zero_variety_20261109/native/backend)
+   Compiling full-trace-zero-validation v0.1.0 (/workspace/crypto-trace/research/full_trace_zero_variety_20261109/native)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.16s
+     Running unittests src/lib.rs (research/full_trace_zero_variety_20261109/native/target/debug/deps/full_trace_zero_validation-3b128e0dba061017)
+
+running 7 tests
+test tests::actual_degree_83_and_131_equations_replay_public_points_and_torsion_cosets ... FULL_MODEL n=83 mode=Raw variables=166 equations=85 terms=53707 degree=2 and_aux=10292
+FULL_MODEL n=83 mode=Compact variables=164 equations=83 terms=63644 degree=3 and_aux=20468
+FULL_MODEL n=83 mode=Factored variables=165 equations=84 terms=53042 degree=2 and_aux=10127
+FULL_MODEL n=131 mode=Raw variables=262 equations=133 terms=100717 degree=2 and_aux=25676
+FULL_MODEL n=131 mode=Compact variables=260 equations=131 terms=117552 degree=3 and_aux=43517
+FULL_MODEL n=131 mode=Factored variables=261 equations=132 terms=99684 degree=2 and_aux=25415
+ok
+test tests::all_three_boolean_models_are_exact_on_all_assignments ... BOOLEAN n=3 mode=Raw variables=6 equations=5 terms=31 degree=2 affine_points=0
+BOOLEAN n=3 mode=Compact variables=4 equations=3 terms=11 degree=2 affine_points=0
+BOOLEAN n=3 mode=Factored variables=5 equations=4 terms=23 degree=2 affine_points=0
+BOOLEAN n=5 mode=Raw variables=10 equations=7 terms=88 degree=2 affine_points=10
+BOOLEAN n=5 mode=Compact variables=8 equations=5 terms=69 degree=3 affine_points=10
+BOOLEAN n=5 mode=Factored variables=9 equations=6 terms=73 degree=2 affine_points=10
+ok
+test tests::complete_relation_oracle_matches_group_enumeration_and_keeps_caps_inconclusive ... ok
+test tests::full_membership_projection_and_coordinate_codec_match_point_trace_exhaustively ... FULL_KERNEL n=3 points=4 kernel=1 dimension=2
+FULL_KERNEL n=5 points=44 kernel=11 dimension=4
+FULL_KERNEL n=7 points=116 kernel=29 dimension=6
+FULL_KERNEL n=9 points=508 kernel=127 dimension=8
+ok
+test tests::full_trace_zero_sat_rejects_the_two_torsion_point_at_degree_131 ... ok
+test tests::malformed_inputs_and_caps_do_not_silently_admit_another_model ... ok
+test tests::wide_native_chain_has_full_membership_and_original_group_replay ... 

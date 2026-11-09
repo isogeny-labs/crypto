@@ -9,6 +9,10 @@
 
 use num_bigint::BigUint;
 
+use crate::binary_ecc::{
+    trace_zero::{TraceZeroAffineMode, TraceZeroError, TraceZeroVariety},
+    BinaryPoint,
+};
 use crate::binary_ecc::{F2mElement, IrreduciblePoly};
 use crate::cryptanalysis::binary_semaev::binary_semaev_s3;
 use crate::cryptanalysis::sat::{Lit, Solver};
@@ -27,7 +31,7 @@ pub fn chain_s3_max_variables(n: u32, m: usize) -> Option<u64> {
     // m=15 uses only 13 intermediate-identity bits. Keep this explicit
     // bound below the u32 mask width; build() checks its allocation cap
     // against the returned full circuit bound before constructing gates.
-    if !(2..=15).contains(&m) || !(2..=127).contains(&n) {
+    if !(2..=15).contains(&m) || !(2..=131).contains(&n) {
         return None;
     }
     let n = u64::from(n);
@@ -95,7 +99,7 @@ pub fn frobenius_orbit_domain_size(
     m: usize,
     representatives: usize,
 ) -> Option<FrobeniusOrbitDomainSize> {
-    if !(2..=127).contains(&n) || m == 0 || representatives < 2 {
+    if !(2..=131).contains(&n) || m == 0 || representatives < 2 {
         return None;
     }
     let bits = (u32::BITS - (n - 1).leading_zeros()) as usize;
@@ -302,6 +306,7 @@ pub struct ChainedS3Encoding {
     first_pair_ordered: bool,
     all_summands_exchangeable: bool,
     all_summands_ordered: bool,
+    full_trace_zero: Option<(TraceZeroVariety, Vec<Vec<u32>>)>,
 }
 
 impl ChainedS3Encoding {
@@ -398,7 +403,103 @@ impl ChainedS3Encoding {
             first_pair_ordered: false,
             all_summands_exchangeable: false,
             all_summands_ordered: false,
+            full_trace_zero: None,
         })
+    }
+
+    /// Install the full E_0 trace-zero rational-point equations on every
+    /// summand. Unlike an aggregate x-trace XOR, this supplies ordinate
+    /// variables, the original curve, and both 4E membership conditions.
+    /// All allocation is preflighted before mutating the circuit.
+    pub fn constrain_full_trace_zero_summands(
+        &mut self,
+        variety: &TraceZeroVariety,
+        max_variables: u32,
+        max_terms: usize,
+    ) -> Result<usize, TraceZeroError> {
+        let curve = variety.curve();
+        if self.full_trace_zero.is_some()
+            || curve.m != self.n
+            || curve.irreducible.degree != self.irr.degree
+            || curve.irreducible.low_terms != self.irr.low_terms
+            || curve.b != self.b
+        {
+            return Err(TraceZeroError::UnsupportedCurve);
+        }
+        let system = variety.affine_system(TraceZeroAffineMode::Raw, max_terms)?;
+        let per = self.n as u64 + system.auxiliary_variables() as u64;
+        let required = self.solver.n_vars() as u64 + per * self.m as u64;
+        if required > max_variables as u64 || required > i32::MAX as u64 {
+            return Err(TraceZeroError::VariableCap {
+                required,
+                maximum: max_variables,
+            });
+        }
+        let mut ordinates = Vec::with_capacity(self.m);
+        for i in 0..self.m {
+            let y: Vec<u32> = self.solver.add_vars(self.n).collect();
+            let mut wires = self.blocks[i].clone();
+            wires.extend(&y);
+            system.append_to_solver(&mut self.solver, &wires, max_variables)?;
+            ordinates.push(y);
+        }
+        let mut primary = self.blocks[..self.m]
+            .iter()
+            .flatten()
+            .copied()
+            .collect::<Vec<_>>();
+        primary.extend(ordinates.iter().flatten().copied());
+        self.solver.set_branch_priority(&primary);
+        self.full_trace_zero = Some((variety.clone(), ordinates));
+        Ok(self.m * (self.n as usize + 2))
+    }
+
+    /// Decode the full rational summand points when membership was installed.
+    pub fn decode_full_trace_zero_summands(&self) -> Option<Vec<BinaryPoint>> {
+        let (_, ys) = self.full_trace_zero.as_ref()?;
+        let model = self.solver.model();
+        Some(
+            (0..self.m)
+                .map(|i| BinaryPoint::Affine {
+                    x: self.decode_block(&self.blocks[i], &model),
+                    y: self.decode_block(&ys[i], &model),
+                })
+                .collect(),
+        )
+    }
+
+    /// Correctness-control interface: pin full known points, validating
+    /// their original group membership before adding coordinate units.
+    pub fn pin_full_trace_zero_summands(
+        &mut self,
+        points: &[BinaryPoint],
+    ) -> Result<(), TraceZeroError> {
+        let Some((variety, ordinates)) = self.full_trace_zero.as_ref() else {
+            return Err(TraceZeroError::UnsupportedCurve);
+        };
+        if points.len() != self.m
+            || points
+                .iter()
+                .any(|p| matches!(p, BinaryPoint::Infinity) || !variety.contains(p))
+        {
+            return Err(TraceZeroError::InvalidPoint);
+        }
+        for (i, point) in points.iter().enumerate() {
+            let BinaryPoint::Affine { x, y } = point else {
+                unreachable!()
+            };
+            for (block, value) in [(&self.blocks[i], x), (&ordinates[i], y)] {
+                let value = value.to_biguint();
+                for (j, &wire) in block.iter().enumerate() {
+                    self.solver.add_clause(vec![if value.bit(j as u64) {
+                        wire as i32
+                    } else {
+                        -(wire as i32)
+                    }]);
+                }
+            }
+        }
+        Ok(())
     }
 
     /// Add the exact finite set of rational factor-base x-coordinates to
@@ -748,6 +849,17 @@ impl ChainedS3Encoding {
     fn verify_field_assignment(&self, model: &[bool]) -> bool {
         if model.len() != self.solver.n_vars() as usize {
             return false;
+        }
+        if let Some((variety, ordinates)) = &self.full_trace_zero {
+            for i in 0..self.m {
+                let point = BinaryPoint::Affine {
+                    x: self.decode_block(&self.blocks[i], model),
+                    y: self.decode_block(&ordinates[i], model),
+                };
+                if !variety.contains(&point) {
+                    return false;
+                }
+            }
         }
         let values: Vec<_> = self
             .blocks
@@ -1178,7 +1290,8 @@ mod tests {
         assert_eq!(chain_s3_max_variables(83, 15), Some(296_393));
         assert_eq!(chain_s3_max_variables(83, 16), None);
         assert_eq!(chain_s3_max_variables(1, 4), None);
-        assert_eq!(chain_s3_max_variables(128, 4), None);
+        assert_eq!(chain_s3_max_variables(132, 4), None);
+        assert_eq!(chain_s3_max_variables(131, 3), Some(104_669));
     }
 
     #[test]

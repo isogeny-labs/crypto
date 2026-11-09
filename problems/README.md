@@ -11,6 +11,7 @@ Keep resolved and superseded records in the index.
 
 | Problem | Status | What it blocks | What would unblock it |
 | --- | --- | --- | --- |
+| [Trace-homomorphism experiment checkpoint access](trace-homomorphism-experiment-access.md) | open | matched trace-on/off solver measurement and degree-83/131 evaluation | task-specific S3 checkpoint transport, admitted source-pinned EKS harness, exact wide-field adapter |
 | [P3 census rho walk: bimodal, curve-reproducible cost above √n](p3census-rho-walk-bimodal.md) | resolved (walk v2, 2026-11-08) | reading P3's rho outcome as a statement about Pollard rho | identify the binary property on 50 small curves; a corrected walk with flat, unimodal per-curve cost; re-run Y1 |
 | [Split-prime pattern reaches the prime-order group only through scalars](split-prime-pattern-scalar-only.md) | open (derived obstruction for the ℓ-adic / class-group route) | a novel ECDLP algorithm built on the split-prime deficit of the published prime curves | a computable non-scalar entry point verified on a toy class, or a Lean proof that closes the route formally |
 | [Divergent append-only PCC ledgers](pkm-pcc-ledger-divergence.md) | open, report-only | current-main PCC prefix/integration | canonical provenance-preserving reconciliation contract; no side selection, rechain or waiver |
