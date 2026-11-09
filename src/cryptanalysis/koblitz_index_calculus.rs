@@ -8275,6 +8275,24 @@ pub fn groebner_decompose(
     engine: SolverEngine,
     node_budget: usize,
 ) -> (Option<Vec<usize>>, SolveStats) {
+    groebner_decompose_with_trace(kc, fb, index_of, st, target, m, engine, node_budget, true)
+}
+
+/// Paired-control entry point for [`groebner_decompose`]. Disabling the
+/// trace row restores the original polynomial system; both arms still
+/// require every returned root to lift to the requested group sum.
+#[allow(clippy::too_many_arguments)]
+pub fn groebner_decompose_with_trace(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    index_of: &HashMap<(BigUint, BigUint), usize>,
+    st: &FieldStructure,
+    target: &BinaryPoint,
+    m: usize,
+    engine: SolverEngine,
+    node_budget: usize,
+    trace_constraint: bool,
+) -> (Option<Vec<usize>>, SolveStats) {
     // Keep the generic frontend's unsupported-input contract explicit: the
     // archived admission replay checks this entry point. Pass the built
     // system onward so the F4 path does not build it twice.
@@ -8284,6 +8302,12 @@ pub fn groebner_decompose(
         ..Default::default()
     };
     let x_r = match target {
+        // Affine chains omit infinity intermediates. In particular, a
+        // repeated two-torsion point can be a genuine odd-arity relation
+        // with no affine-chain witness. Do not call its absence a proof.
+        BinaryPoint::Affine { x, .. } if m >= 3 && x.is_zero() => {
+            return (None, unsupported());
+        }
         BinaryPoint::Affine { x, .. } => x.clone(),
         BinaryPoint::Infinity => return (None, unsupported()),
     };
@@ -8308,6 +8332,7 @@ pub fn groebner_decompose(
         node_budget,
         false,
         false,
+        trace_constraint,
         Some(sys),
     )
 }
@@ -8347,6 +8372,7 @@ pub fn groebner_decompose_f6_ic(
         node_budget,
         true,
         false,
+        true,
         None,
     )
 }
@@ -8385,6 +8411,7 @@ pub fn groebner_decompose_f6_ic_pair_index(
         node_budget,
         true,
         true,
+        true,
         None,
     )
 }
@@ -8402,17 +8429,35 @@ pub fn decomposition_solver_equations(
     m: usize,
     engine: SolverEngine,
 ) -> Option<(Vec<F2BoolPoly>, usize)> {
+    decomposition_solver_equations_with_trace(kc, fb, st, target, m, engine, true)
+}
+
+/// Equations for the matched trace-on/off decomposition control. The row
+/// is inserted before any variable permutation, just as in the solver.
+pub fn decomposition_solver_equations_with_trace(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    st: &FieldStructure,
+    target: &BinaryPoint,
+    m: usize,
+    engine: SolverEngine,
+    trace_constraint: bool,
+) -> Option<(Vec<F2BoolPoly>, usize)> {
     let x_r = match target {
+        BinaryPoint::Affine { x, .. } if m >= 3 && x.is_zero() => return None,
         BinaryPoint::Affine { x, .. } => x.clone(),
         BinaryPoint::Infinity => return None,
     };
-    let sys = crate::cryptanalysis::polynomial_reuse::build_decomposition_system_reusing(
+    let mut sys = crate::cryptanalysis::polynomial_reuse::build_decomposition_system_reusing(
         &fb.subspace_basis,
         &x_r,
         &kc.curve.b,
         m,
         st,
     )?;
+    if trace_constraint {
+        append_decomposition_trace(kc, fb, &x_r, m, sys.n_vars, &mut sys.equations);
+    }
     let opts = SolveOptions {
         engine,
         max_solutions: usize::MAX,
@@ -8476,6 +8521,7 @@ fn groebner_decompose_with_geometry(
     node_budget: usize,
     f6_ic: bool,
     pair_index_enabled: bool,
+    trace_constraint: bool,
     prebuilt: Option<crate::cryptanalysis::koblitz_groebner::DecompositionSystem>,
 ) -> (Option<Vec<usize>>, SolveStats) {
     let unsupported = || SolveStats {
@@ -8483,7 +8529,10 @@ fn groebner_decompose_with_geometry(
         unsupported: true,
         ..Default::default()
     };
-    let sys = if let Some(sys) = prebuilt {
+    if m >= 3 && matches!(target, BinaryPoint::Affine { x, .. } if x.is_zero()) {
+        return (None, unsupported());
+    }
+    let mut sys = if let Some(sys) = prebuilt {
         sys
     } else {
         let x_r = match target {
@@ -8501,6 +8550,12 @@ fn groebner_decompose_with_geometry(
             None => return (None, unsupported()),
         }
     };
+    if trace_constraint {
+        let BinaryPoint::Affine { x, .. } = target else {
+            return (None, unsupported());
+        };
+        append_decomposition_trace(kc, fb, x, m, sys.n_vars, &mut sys.equations);
+    }
     // A root of S₃ fixes the summands only up to sign, so some roots do
     // not lift.  Lift each as it is found and stop at the first that
     // closes the group identity.
@@ -8627,10 +8682,13 @@ pub fn crossbred_decompose(
         ..unknown()
     };
     let x_r = match target {
+        BinaryPoint::Affine { x, .. } if m >= 3 && x.is_zero() => {
+            return (None, unsupported());
+        }
         BinaryPoint::Affine { x, .. } => x.clone(),
         BinaryPoint::Infinity => return (None, unsupported()),
     };
-    let sys = match crate::cryptanalysis::polynomial_reuse::build_decomposition_system_reusing(
+    let mut sys = match crate::cryptanalysis::polynomial_reuse::build_decomposition_system_reusing(
         &fb.subspace_basis,
         &x_r,
         &kc.curve.b,
@@ -8640,6 +8698,7 @@ pub fn crossbred_decompose(
         Some(sys) => sys,
         None => return (None, unsupported()),
     };
+    append_decomposition_trace(kc, fb, &x_r, m, sys.n_vars, &mut sys.equations);
     let params = params.unwrap_or_else(|| crossbred_params_for(&sys.equations, sys.n_vars));
     let xb = match extract_crossbred(&sys.equations, sys.n_vars, &params) {
         Some(xb) => xb,
@@ -8765,6 +8824,41 @@ pub(crate) fn absolute_trace_bit(x: &F2mElement, n: u32, irr: &IrreduciblePoly) 
     }
     debug_assert!(t.is_zero() || t == F2mElement::one(n));
     !t.is_zero()
+}
+
+/// Necessary condition for a rational-point decomposition, not for all
+/// algebraic summation-polynomial roots (Kosters--Yeo, arXiv:1503.08001,
+/// Proposition 4.2 and Remark 4.8). For a1=1, delta(P)=Tr(x(P)+a), so
+/// sum Tr(x_i) = Tr(x_R) + (m+1)Tr(a). Intermediate coordinates do not
+/// occur. Apply before permuting the system's variable order.
+fn append_decomposition_trace(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    x_r: &F2mElement,
+    m: usize,
+    n_vars: usize,
+    equations: &mut Vec<F2BoolPoly>,
+) {
+    use crate::cryptanalysis::pq_groebner_f2::F2BoolMono;
+    let rhs = absolute_trace_bit(x_r, kc.n, &kc.curve.irreducible)
+        ^ (m.is_multiple_of(2) && absolute_trace_bit(&kc.curve.a, kc.n, &kc.curve.irreducible));
+    let mut terms = Vec::new();
+    for (j, element) in fb.subspace_basis.iter().enumerate() {
+        if absolute_trace_bit(element, kc.n, &kc.curve.irreducible) {
+            for i in 0..m {
+                terms.push(F2BoolMono::var((i * fb.subspace_basis.len() + j) as u32));
+            }
+        }
+    }
+    if rhs {
+        terms.push(F2BoolMono::one());
+    }
+    let row = F2BoolPoly::from_monos(terms, n_vars);
+    // A trace-zero basis may make the equation identically zero. Keep a
+    // constant-one contradiction, which correctly refutes the group sum.
+    if !row.is_zero() && !equations.contains(&row) {
+        equations.push(row);
+    }
 }
 
 /// SAT controls for a paired comparison on the same decomposition system.
@@ -8936,6 +9030,9 @@ pub fn sat_decompose_with(
         ..Default::default()
     };
     let x_r = match target {
+        BinaryPoint::Affine { x, .. } if m >= 3 && x.is_zero() => {
+            return (None, unsupported());
+        }
         BinaryPoint::Affine { x, .. } => x.clone(),
         BinaryPoint::Infinity => return (None, unsupported()),
     };
@@ -8965,25 +9062,7 @@ pub fn sat_decompose_with(
     // chained (`m ≥ 3`) system — which turns UNSAT into SAT.
     let mut equations = sys.equations.clone();
     if options.trace_constraint {
-        use crate::cryptanalysis::pq_groebner_f2::{F2BoolMono, F2BoolPoly};
-        // For a rational point, delta(P)=Tr(x(P)+a), delta(O)=0,
-        // is a homomorphism to F_2 (Kosters--Yeo, arXiv:1503.08001).
-        // Thus sum Tr(x_i) = Tr(x_R) + (m+1)Tr(a). This is a
-        // necessary group condition, not an assumption about polynomial roots.
-        let rhs = absolute_trace_bit(&x_r, kc.n, &kc.curve.irreducible)
-            ^ (m.is_multiple_of(2) && absolute_trace_bit(&kc.curve.a, kc.n, &kc.curve.irreducible));
-        let mut terms = Vec::new();
-        for (j, basis_element) in fb.subspace_basis.iter().enumerate() {
-            if absolute_trace_bit(basis_element, kc.n, &kc.curve.irreducible) {
-                for i in 0..m {
-                    terms.push(F2BoolMono::var((i * fb.subspace_basis.len() + j) as u32));
-                }
-            }
-        }
-        if rhs {
-            terms.push(F2BoolMono::one());
-        }
-        equations.push(F2BoolPoly::from_monos(terms, sys.n_vars));
+        append_decomposition_trace(kc, fb, &x_r, m, sys.n_vars, &mut equations);
     }
     if let Some(d) = macaulay_degree {
         if let Some(rows) = matrix_f4_f2(&sys.equations, sys.n_vars, d) {
@@ -18509,6 +18588,263 @@ mod tests {
                 for p in points_with_x(&kc.curve, &x) {
                     for q in [&p, &point_neg(&p), kc.generator(), &torsion] {
                         assert_eq!(delta(&kc.add(&p, q)), delta(&p) ^ delta(q));
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn decomposition_trace_rows_match_coordinate_trace_for_both_parities() {
+        for a in [0, 1] {
+            let kc = KoblitzCurve::new(a, 7).unwrap();
+            let mut fb = build_frobenius_factor_base(&kc, 0).unwrap();
+            // Include a trace-one direction, independent of the base policy.
+            fb.subspace_basis = vec![F2mElement::one(7), F2mElement::from_bit_positions(&[1], 7)];
+            for m in [2usize, 3, 4] {
+                let n_vars = m * 2 + 3; // unused intermediate variables
+                for target_bit in [false, true] {
+                    let x_r = if target_bit {
+                        F2mElement::one(7)
+                    } else {
+                        F2mElement::zero(7)
+                    };
+                    let mut equations = Vec::new();
+                    append_decomposition_trace(&kc, &fb, &x_r, m, n_vars, &mut equations);
+                    assert_eq!(equations.len(), 1);
+                    for assignment in 0..(1u64 << n_vars) {
+                        let mut expected = target_bit ^ (m % 2 == 0 && a == 1);
+                        for i in 0..m {
+                            let mut x = F2mElement::zero(7);
+                            for j in 0..2 {
+                                if assignment & (1 << (i * 2 + j)) != 0 {
+                                    x = x.add(&fb.subspace_basis[j]);
+                                }
+                            }
+                            expected ^= absolute_trace_bit(&x, 7, &kc.curve.irreducible);
+                        }
+                        assert_eq!(
+                            equations[0].eval(mask_from64(assignment)),
+                            u32::from(expected)
+                        );
+                    }
+                    append_decomposition_trace(&kc, &fb, &x_r, m, n_vars, &mut equations);
+                    assert_eq!(equations.len(), 1, "do not duplicate the row");
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn decomposition_trace_zero_basis_keeps_contradictions_but_skips_zero() {
+        let kc = KoblitzCurve::new(0, 7).unwrap();
+        let mut fb = build_frobenius_factor_base(&kc, 0).unwrap();
+        fb.subspace_basis = vec![(1u32..128)
+            .map(|x| F2mElement::from_biguint(&BigUint::from(x), 7))
+            .find(|x| !absolute_trace_bit(x, 7, &kc.curve.irreducible))
+            .unwrap()];
+        let mut equations = Vec::new();
+        append_decomposition_trace(&kc, &fb, &F2mElement::zero(7), 2, 2, &mut equations);
+        assert!(equations.is_empty());
+        append_decomposition_trace(&kc, &fb, &F2mElement::one(7), 2, 2, &mut equations);
+        assert_eq!(equations, vec![F2BoolPoly::one(2)]);
+    }
+
+    #[test]
+    fn decomposition_trace_homomorphism_on_ecc2k130_and_m83_fixtures() {
+        let (challenge, q) = BinaryCurve::certicom_challenge("ECC2K-130").unwrap();
+        assert_eq!(challenge.m, 131);
+        let smaller = KoblitzCurve::known_n83_k0().unwrap();
+        for (curve, target) in [
+            (challenge, q),
+            (smaller.curve.clone(), smaller.generator().clone()),
+        ] {
+            assert!(curve.is_on_curve(&curve.generator));
+            assert!(curve.is_on_curve(&target));
+            let delta = |p: &BinaryPoint| match p {
+                BinaryPoint::Infinity => false,
+                BinaryPoint::Affine { x, .. } => {
+                    absolute_trace_bit(&x.add(&curve.a), curve.m, &curve.irreducible)
+                }
+            };
+            assert!(!delta(&curve.generator));
+            assert!(!delta(&target));
+            let torsion = BinaryPoint::Affine {
+                x: F2mElement::zero(curve.m),
+                y: F2mElement::one(curve.m),
+            };
+            let mut p = curve.generator.clone();
+            for _ in 0..8 {
+                for r in [&target, &torsion, &point_neg(&p), &BinaryPoint::Infinity] {
+                    let sum = crate::binary_ecc::curve::point_add(&curve, &p, r);
+                    assert_eq!(delta(&sum), delta(&p) ^ delta(r));
+                }
+                p = crate::binary_ecc::curve::point_add(&curve, &p, &curve.generator);
+            }
+        }
+    }
+
+    #[test]
+    fn decomposition_trace_ecc2k130_normal_basis_even_weight_is_zero() {
+        let (curve, _) = BinaryCurve::certicom_challenge("ECC2K-130").unwrap();
+        // Construct a normal basis in the actual challenge polynomial field.
+        // This is not a conversion of the campaign's type-II ONB: the trace
+        // parity identity holds for every normal basis.
+        let mut theta = F2mElement::from_bit_positions(&[1], curve.m);
+        if !absolute_trace_bit(&theta, curve.m, &curve.irreducible) {
+            theta = theta.add(&F2mElement::one(curve.m));
+        }
+        let mut basis = Vec::new();
+        let mut power = theta.clone();
+        let mut sum = F2mElement::zero(curve.m);
+        for _ in 0..curve.m {
+            sum = sum.add(&power);
+            basis.push(power.clone());
+            power = power.square(&curve.irreducible);
+        }
+        assert_eq!(power, theta);
+        assert_eq!(sum, F2mElement::one(curve.m));
+        // Check independence rather than assume trace one implies normality.
+        let mut pivots: Vec<Option<BigUint>> = vec![None; curve.m as usize];
+        let mut rank = 0;
+        for element in &basis {
+            let mut column = element.to_biguint();
+            for j in (0..curve.m as usize).rev() {
+                if !column.bit(j as u64) {
+                    continue;
+                }
+                if let Some(pivot) = &pivots[j] {
+                    column ^= pivot;
+                } else {
+                    pivots[j] = Some(column);
+                    rank += 1;
+                    break;
+                }
+            }
+        }
+        assert_eq!(rank, curve.m);
+        for i in 0..basis.len() {
+            assert!(absolute_trace_bit(&basis[i], curve.m, &curve.irreducible));
+            let weight_two = basis[i].add(&basis[(i + 1) % basis.len()]);
+            assert!(!absolute_trace_bit(
+                &weight_two,
+                curve.m,
+                &curve.irreducible
+            ));
+        }
+    }
+
+    #[test]
+    fn decomposition_trace_on_off_preserves_group_answers_and_export_order() {
+        for a in [0, 1] {
+            let kc = KoblitzCurve::new(a, 7).unwrap();
+            let fb = build_frobenius_factor_base(&kc, 0).unwrap();
+            let index = fb.index_map();
+            let st = FieldStructure::new(7, &kc.curve.irreducible);
+            let engine = SolverEngine::InheritedF4 { max_degree: 2 };
+            let torsion = points_with_x(&kc.curve, &F2mElement::zero(7)).remove(0);
+            let mut targets: Vec<_> = (1..=6u32)
+                .map(|k| kc.mul(kc.generator(), &BigUint::from(k)))
+                .collect();
+            targets.push(torsion);
+            for m in [2usize, 3] {
+                for target in &targets {
+                    if matches!(target, BinaryPoint::Infinity) {
+                        continue;
+                    }
+                    let reference = enumerate_decompose(&kc, &fb, &index, target, m);
+                    if let Some(ids) = &reference {
+                        assert_eq!(
+                            ids.iter()
+                                .fold(BinaryPoint::Infinity, |sum, &i| kc.add(&sum, &fb.points[i])),
+                            *target,
+                            "enumeration witness a={a} m={m} target={target:?}"
+                        );
+                    }
+                    let expected = reference.is_some();
+                    for trace in [false, true] {
+                        let (out, stats) = groebner_decompose_with_trace(
+                            &kc, &fb, &index, &st, target, m, engine, 100_000, trace,
+                        );
+                        if m >= 3 && matches!(target, BinaryPoint::Affine { x, .. } if x.is_zero())
+                        {
+                            assert!(reference.is_some(), "retain the real group witness");
+                            assert!(out.is_none() && stats.exhausted && stats.unsupported);
+                            assert!(decomposition_solver_equations_with_trace(
+                                &kc, &fb, &st, target, m, engine, trace,
+                            )
+                            .is_none());
+                            let (sat, sat_stats) = sat_decompose_with(
+                                &kc,
+                                &fb,
+                                &index,
+                                &st,
+                                target,
+                                m,
+                                128,
+                                None,
+                                SatDecompositionOptions {
+                                    trace_constraint: trace,
+                                    ..Default::default()
+                                },
+                            );
+                            assert!(sat.is_none() && sat_stats.exhausted && sat_stats.unsupported);
+                            let (crossbred, crossbred_stats) =
+                                crossbred_decompose(&kc, &fb, &index, &st, target, m, None);
+                            assert!(
+                                crossbred.is_none()
+                                    && crossbred_stats.exhausted
+                                    && crossbred_stats.unsupported
+                            );
+                            continue;
+                        }
+                        assert!(!stats.exhausted && !stats.unsupported);
+                        assert_eq!(out.is_some(), expected, "a={a} m={m} trace={trace} target={target:?} reference={reference:?} stats={stats:?}");
+                        if let Some(ids) = out {
+                            assert_eq!(
+                                ids.iter().fold(BinaryPoint::Infinity, |sum, &i| kc
+                                    .add(&sum, &fb.points[i])),
+                                *target
+                            );
+                        }
+                        let (equations, n_vars) = decomposition_solver_equations_with_trace(
+                            &kc, &fb, &st, target, m, engine, trace,
+                        )
+                        .unwrap();
+                        let BinaryPoint::Affine { x, .. } = target else {
+                            unreachable!()
+                        };
+                        let mut sys =
+                            build_decomposition_system(&fb.subspace_basis, x, &kc.curve.b, m, &st)
+                                .unwrap();
+                        if trace {
+                            append_decomposition_trace(
+                                &kc,
+                                &fb,
+                                x,
+                                m,
+                                sys.n_vars,
+                                &mut sys.equations,
+                            );
+                        }
+                        let opts = SolveOptions {
+                            engine,
+                            max_solutions: usize::MAX,
+                            node_budget: 0,
+                            split_rule: split_rule_default(),
+                        };
+                        let expected_equations: Vec<_> =
+                            if m >= 3 && chain_order_interleaved(opts.resolve().split_rule) {
+                                let permutation = sys.interleaved_order(kc.n);
+                                sys.equations
+                                    .iter()
+                                    .map(|e| permute_poly(e, &permutation))
+                                    .collect()
+                            } else {
+                                sys.equations
+                            };
+                        assert_eq!(n_vars, sys.n_vars);
+                        assert_eq!(equations, expected_equations);
                     }
                 }
             }
