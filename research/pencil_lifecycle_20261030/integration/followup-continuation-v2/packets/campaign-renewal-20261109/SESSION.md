@@ -215,3 +215,27 @@ Successorqualification review.
 
 ## Errors
 Earlierprogress wording impliedzerofixtures executed; the traceback/source order supports partialexecution only.
+
+## What was done — 19:36 UTC
+Correctedfixturequalification passed24/24 withdurablerows, exit0;0.064985912scaller/full60charged. Exactsourceandreview published9c30e081236d842a7ee90701e88e7a5a2a1da6ca.
+
+## Decisions made
+16380charged, reserve60freshsnapshot,26760unreserved. Releaseonesnapshot usingpublished unchangedscript/newunit; no otherpayload.
+
+## Open threads
+Snapshotcustody andfinalrootvalidationbindings.
+
+## Errors
+Priorfixture failure retained separately; successfulsuccessor doesnoteraseit.
+
+## What was done — 19:40 UTC
+Freshcache snapshotpassed2142files2386041734bytes, SHA c6e7c61773d7dcbce42f11ecacf160026799d929e7b949247c1fed481c15edfc. Native4.016078406s/caller4.313697150s; exactinvocation0ccbeafd8115473d938ee363331e694d stopped, cgroupabsent. Originalimmutableinput andfreshcache externalized withfullremoteGET hashverification.
+
+## Decisions made
+16440charged, reserve1800one manualrootv4validation,24960unreserved. Finaladmission5adfda70 binds actual24casequalification and cache; independent operationalbindingreview beforepublication/launch.
+
+## Open threads
+FullRustvalidation; reviewedhelper/pivot/cardinality/directreplays; affine137callrebuild; nativeproducerqualification.
+
+## Errors
+Priorroot/branch/fixtureattempts remain chargedandimmutable. No extra cloudsubmission.
