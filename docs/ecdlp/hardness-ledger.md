@@ -32,13 +32,14 @@ with a structure that is not a group, which is exactly what implementation bugs
 
 ## Layer 1 — the curve group law
 
-Status: implemented and tested; **formalization open**.
+Status: **closure and x-commutativity formal** (Mathlib project `lean/Closure.lean`);
+associativity still open.
 
 | Claim | Role | Known failure mode |
 | --- | --- | --- |
-| Chord–tangent formulas return a point on the curve (closure) | Makes the curve a group | Singular curves; characteristic 2/3 formulas |
-| The law is associative | Group axiom, needed for scalar multiplication | Wrong exceptional-case handling |
-| Doubling/negation/identity formulas agree with the law | Basis of all coordinate systems | Incomplete formulas (exception at P=Q, P=-Q, O) |
+| Chord–tangent formulas return a point on the curve (closure) | Makes the curve a group | Singular curves; characteristic 2/3 formulas — **formal for affine add/double over a field, char ≠ 2 for doubling** |
+| The law is associative | Group axiom, needed for scalar multiplication | Wrong exceptional-case handling — **open** |
+| Doubling/negation/identity formulas agree with the law | Basis of all coordinate systems | Incomplete formulas (exception at P=Q, P=-Q, O) — closure of doubling formal |
 | Every imported EFD chart round-trips to the affine law | Correct coordinates for the implemented arithmetic | Chart/scale errors |
 
 What is already machine-checked: the 33+1 chart round trips and the cache
@@ -46,10 +47,11 @@ relations (Lean, `Charts.lean`), plus 486/486 formula programs symbolically
 against the pinned affine law (CAS, not kernel). Closure and associativity of
 the affine law itself are the next formal targets.
 
-Infrastructure note: core Lean 4 has no `ring`/`field_simp`, and no Mathlib
-checkout is present (the Mathlib ltar cache exists, but the source clone is
-missing). Generic closure/associativity proofs need either that checkout or a
-verified polynomial normalizer; this is the gating decision for layer 1.
+Infrastructure: layer 1a uses a pinned Mathlib Lake project
+(`research/ecdlp_foundations_20261109/lean`, rev `d13f23b7...`) with `ring`,
+`field_simp` and `linear_combination`. Certificate coefficients for closure
+were computed externally and checked by Lean's ring normaliser, so the kernel
+still checks the proof.
 
 ## Layer 2 — generic-group lower bound
 
@@ -91,11 +93,12 @@ separately; a break here breaks deployments, not ECDLP.
 
 0. **Done:** modular scalar reduction, injectivity below the order, and the
    homomorphism reduction lemmas (`Foundations.lean`, 43 theorems).
-1. **Curve group law closure** for short Weierstrass affine addition and
-   doubling, over an abstract field with curve equation hypotheses. Blocked on
-   the ring-tactic/Mathlib decision above.
+1. **Done (1a):** closure of affine addition and doubling over a field
+   (`Closure.lean`, `PASS 8 thm 0 trusted`; doubling assumes `2 ≠ 0`), plus
+   commutativity of the x-coordinate.
 2. **Associativity** of the chord–tangent law (the hard one; likely via the
-   divisor-class/linear-equivalence argument rather than brute algebra).
+   divisor-class/linear-equivalence argument rather than brute algebra). This
+   is now the head of the queue.
 3. **BSGS correctness** and **Pohlig–Hellman** in the Layer 0 interface.
 4. **Generic-group lower bound** statement and adversary model.
 5. **Pairing bilinearity/non-degeneracy** for the MOV reduction, then the
