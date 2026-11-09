@@ -8535,6 +8535,14 @@ fn groebner_decompose_with_geometry(
             crate::cryptanalysis::koblitz_groebner::fall_row_gate_augment(equations, sys.n_vars)
         })
         .flatten();
+    // The links before the last never read the target: mark them for the
+    // prefix-cached root (`KIC_F4_PREFIX_ROOT=1`).  Augmented systems get
+    // no hint.
+    crate::cryptanalysis::inherited_f4::set_prefix_hint(if m >= 3 && augmented.is_none() {
+        (m - 2) * kc.n as usize
+    } else {
+        0
+    });
     let equations = augmented.as_ref().unwrap_or(equations);
     let back = order.as_deref().map(invert_permutation);
     let mut accept_root = |root| {
