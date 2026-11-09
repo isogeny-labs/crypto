@@ -1,5 +1,11 @@
 # Mumford counts and a finite Cantor subgroup counterexample
 
+The new [F5control](FIVE_CONTROL.md) proves a complete16-pair model,
+all16smooth, before native calibration. Current project gate240passes
+with0failures/0trusted-native exceptions. A separately frozen native
+calibration protocol pins both built executables; no curve invocation has
+run at this pre-calibration writing. [pcc:unverified]
+
 The subsequent [Cantor subgroup proof](CANTOR_SUBGROUP.md) checks all64
 actual polynomial additions on the complete model and proves an order-two
 proper cyclic subgroup with smooth fraction1, versus ambient7/8. Universal
@@ -34,9 +40,9 @@ and uses a different relation-count convention. [pcc:unverified]
 
 ## Scope and checks
 
-The current whole tracked project gate passes170declarations,0failing and
-0trusted-native exceptions, including the new actual Cantor/group modules
-and generated declarations. The initial count-only gate passed80; its
+The Cantor-stage whole tracked gate passed170declarations,0failing and
+0trusted-native exceptions; the subsequent F5control raises the current
+project gate to240. Both include generated declarations. The initial count-only gate passed80; its
 historical receipt is retained. The exact initial source/primary read
 scopes and planned native scalar supplement are in [sources.json](sources.json).
 All intermediate failed builds are retained in `evidence/`.

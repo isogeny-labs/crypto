@@ -56,7 +56,10 @@ The subsequent170-declaration gate now checks actual Cantor additions on
 all64pairs and a proper order-two cyclic subgroup with smooth fraction1
 versus7/8ambient, directly disproving universal finite equality in this
 arithmetic model. See [Cantor scope](../jacobian_smoothness_audit_20261109/CANTOR_SUBGROUP.md).
-Geometric Picard identification, scaling families and the native
+The subsequent F5control proves16actual pairs/all16split before native
+calibration; current separate project gate240passes0failing/0trusted-native.
+Its full local packete81718check passes, unsigned. The frozen calibration
+protocol is not yet executed at this writing. Geometric Picard identification, scaling families and the native
 multi-field census remain open. This finite deviation does not refute
 Gaudry's qualified fixed-genus limit. [pcc:unverified]
 
@@ -282,7 +285,7 @@ only at their already-stated scope. [pcc:unverified]
 | 3 Supersingular | Literal all-prime k=2 assertion refuted at r=2 using the source trace definition and actual groups. FSTp239directly checked with actual cyclotomic degree1 versus nonrational2-torsion. New characteristic2a1=0and characteristic3short families have trivial geometric p-torsion in actual groups. Corrected modular embedding proof now covers every integer r>2, with an actual order8positive control, and remains conditional on Hasse; general trace/p-rank/classification bridge and binary/ternary census remain open. |
 | 4 Pairings | Partial: cyclic restriction obstruction, actual cyclotomic/full-torsion distinction, and actual geometric F2torsion/μ2subtypes proving every point-valued map degenerate at characteristic order. Group-scheme duality is not refuted. Actual qualified Weil/Tate constructions, nondegeneracy and MOV/FR calculations remain open. |
 | 5 Diem size | Partial: stable branch locus fails actual Condition2.7. Scheme/ramification bridge and size bound remain open; no counterexample to the qualified bound. |
-| 6 Gaudry | Original2000 §§2–3 read; fixed-genus whole-Jacobian limit retained. A complete F3reduced-Mumford polynomial-pair model now has Lean counts8valid/7split and finite deviation3/8from1/2. Formal geometric Picard identification, native multi-field Jacobian census and scaling error remain open; the asymptotic statement is not refuted. |
+| 6 Gaudry | Original2000 §§2–3 read; fixed-genus whole-Jacobian limit retained. Complete actual reduced-Mumford models have Lean counts8valid/7split overF3and16valid/all16split overF5 for x5-minus-x; native calibration source/protocol is frozen but not yet run. Formal geometric Picard identification, native multi-field census and scaling error remain open; the qualified asymptotic statement is not refuted. |
 | 7 Subgroup smoothness | Partial: actual Cantor gcd/composition/reduction on all64pairs of the complete F3model is now proved, with unique output/group equivalence and an actual proper order2cyclic subgroup. Its fraction1differs from ambient7/8; direct universal finite equality is disproved. Formal geometric Picard identification, a faithful scaling family/native census and qualified typical/large-prime asymptotics remain open. |
 | 8 Bézout | Partial: actual bivariate quotient equivalence and support1/length2 Lean witness; all16msolve multiplicity/control calls pass. General n!dⁿ bound and application-specific decomposition systems remain open. |
 | 9 Gröbner heuristics | Universal square regularity reading has this Lean counterexample; generic variants and JV remain open. Native msolve controls passed, but those heuristic systems are not yet measured. |

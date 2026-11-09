@@ -1,6 +1,16 @@
 # Current additive proof and validation receipts
 
-The separate Jacobian-smoothness project gate now passes170declarations,
+The separate Jacobian-smoothness project gate now passes240declarations,
+0failures/0trusted-native exceptions, including a complete actual F5
+control with16pairs/all16split/everyv0. Packete81718full local check
+passes21:56:51Zat committed source11100a85; signed standing remains
+unverified. Scalar supplementIDC1ha387b9e22b14b9cfchecks only the
+supplied-root quadratic factorization. Native calibration protocolf2572b4d
+is frozen but has not run at this pre-calibration writing. See
+../jacobian_smoothness_audit_20261109/FIVE_CONTROL.md.
+[pcc:unverified]
+
+The preceding Cantor-stage project gate passes170declarations,
 0failing/0trusted-native exceptions. It includes the complete actual F3
 reduced-pair count8/split count7 and all64actual Cantor steps with unique
 output/group equivalence. A proper order2cyclic subgroup has smooth
@@ -59,10 +69,11 @@ the exact proof-file digest matches. See s4-degree-verification.json for
 source/gate/packet/native bindings. No source changed after those checks.
 [pcc:unverified]
 
-Fresh20:55:29Zread-only ledger comparison:501main rows and487local rows,
-common prefix457, neither a prefix of the other. Main ref571386e7has
+Fresh22:03:08Zread-only ledger comparison:501main rows and488local rows,
+common prefix457, neither a prefix of the other. Main ref55b110a5has
 ledgerblobeda919a8; parent3739remains open/unmerged. See
-../jacobian_smoothness_audit_20261109/evidence/main-ledger-cantor-subgroup.json.
+../jacobian_smoothness_audit_20261109/evidence/main-ledger-five-control.json.
+The earlier20:55receipt retains its501/487snapshot.
 The earlier20:12receipt retains its491/486snapshot.
 The earlier19:00receipt retains its483/485snapshot. The earlier17:30receipt
 preserves its483/483row snapshot; equal counts were not equal histories.
@@ -131,6 +142,7 @@ already excludes the F2/r2control by gcd(r,q)=1. [pcc:unverified]
 |---|---|---|
 | Complete F3reduced-Mumford polynomial-pair/splitting counts | 80pass,0fail,0trusted | ../jacobian_smoothness_audit_20261109/evidence/mumford-count-gate.log |
 | Complete F3actual Cantor group/subgroup proof and nonzero controls | 170pass,0fail,0trusted | ../jacobian_smoothness_audit_20261109/evidence/cantor-subgroup-gate.log |
+| Complete F5actual reduced-pair control, every u splits/everyv0 | 240pass,0fail,0trusted | ../jacobian_smoothness_audit_20261109/evidence/five-control-gate.log |
 | Census, defined canonical family and every-arity last-input degree | 308pass,0fail,0trusted | evidence/recursive-semaev-degree-gate.log |
 | Census, general fixed-size degree step and canonical S5last input | 291pass,0fail,0trusted | evidence/resultant-degree-step-gate.log |
 | Census, S4degree/leading coefficient and specialization control | 259pass,0fail,0trusted | evidence/s4-degree-gate.log |

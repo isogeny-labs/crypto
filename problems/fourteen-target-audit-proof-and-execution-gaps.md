@@ -209,3 +209,15 @@ finite cyclic-proportion equality. Nonzero smooth numerators give1/2versus
 This closes the finite-model Cantor-law/subgroup comparison gap above.
 Geometric Picard identification, native multi-field census, scaling family
 and qualified typical/large-prime asymptotics remain open. [pcc:unverified]
+
+### 2026-11-09 pre-data F5control
+
+The complete F5reduced-pair model for y²=x⁵−x has16pairs/all16split
+and everyv0, with a faithful Lean proof. Current separate gate240passes;
+packete81718full local check passes, signed standing unverified. This
+supplies the exact all-smooth native negative detector control. Built
+Rust/C++sources and a frozen two-fixture calibration protocol are ready,
+but no curve call has run at this writing. Geometry/native census/scaling
+and qualified-regime requirements remain open. See
+[control scope](../research/jacobian_smoothness_audit_20261109/FIVE_CONTROL.md).
+[pcc:unverified]
