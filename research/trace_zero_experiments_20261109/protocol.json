@@ -1,0 +1,492 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "TZP-20261109-finite-domain-partial-trace",
+  "version": 1,
+  "created": "2026-11-09",
+  "repository": "crypto",
+  "study_dir": "research/trace_zero_experiments_20261109",
+  "question": "On this frozen finite-base PDP panel, how do explicit, certified and partial-trace encodings differ in valid decision completion under identical conflict budgets and a disclosed safety fuse?",
+  "claims": [
+    {
+      "id": "correctness",
+      "text": "Every Found result replays and every Refuted result agrees with an independent complete pair-table known answer.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "completion",
+      "text": "Valid completion counts on the fixed panel may differ between encodings beyond the repeated certified A/A discrepancy; no population or timing conclusion.",
+      "class": "comparative",
+      "decided_by": [
+        "domain",
+        "partial"
+      ]
+    },
+    {
+      "id": "speed",
+      "text": "Natural-target full ECDLP performance and asymptotic speed are not established.",
+      "class": "out_of_scope",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "explicit",
+      "role": "baseline",
+      "description": "Existing full ordinate membership witness circuit",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/trace_zero_experiments_20261109/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "15c4d1b193999153c6ddc6ec94959167c8f4d016be197b55b26d6993001b1126",
+        "threads": 1,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "membership_encoding": "explicit",
+        "arity": 3,
+        "conflict_budget": 2000,
+        "wall_fuse_milliseconds": 750
+      }
+    },
+    {
+      "id": "certified",
+      "role": "reference",
+      "description": "Validated finite x domain; no redundant ordinate witnesses",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/trace_zero_experiments_20261109/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "15c4d1b193999153c6ddc6ec94959167c8f4d016be197b55b26d6993001b1126",
+        "threads": 1,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "membership_encoding": "certified",
+        "arity": 3,
+        "conflict_budget": 2000,
+        "wall_fuse_milliseconds": 750
+      },
+      "same_instrument_as": "explicit"
+    },
+    {
+      "id": "partial-trace",
+      "role": "candidate",
+      "description": "Certified finite domain plus necessary x trace on each finite partial sum",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/trace_zero_experiments_20261109/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "15c4d1b193999153c6ddc6ec94959167c8f4d016be197b55b26d6993001b1126",
+        "threads": 1,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "membership_encoding": "partial-trace",
+        "arity": 3,
+        "conflict_budget": 2000,
+        "wall_fuse_milliseconds": 750
+      },
+      "same_instrument_as": "explicit"
+    },
+    {
+      "id": "certified-aa",
+      "role": "control_aa",
+      "description": "Exact duplicate of certified under another arm name",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "cargo",
+            "build",
+            "--locked",
+            "--release",
+            "--manifest-path",
+            "research/trace_zero_experiments_20261109/native/Cargo.toml"
+          ]
+        ],
+        "binary_sha256": "15c4d1b193999153c6ddc6ec94959167c8f4d016be197b55b26d6993001b1126",
+        "threads": 1,
+        "flags": {},
+        "env": {
+          "RAYON_NUM_THREADS": "1",
+          "OMP_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "membership_encoding": "certified-aa",
+        "arity": 3,
+        "conflict_budget": 2000,
+        "wall_fuse_milliseconds": 750
+      },
+      "same_instrument_as": "explicit"
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Planted and cancellation instances are embedded in every arm through the same oracle; small-field controls must decide correctly and any wrong answer invalidates the panel. Wide UNKNOWN is retained as capped, not a detector pass."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "An independently refuted n5 signed-base control is embedded in every arm, and uniform_scalar_below_order targets in the stated generated subgroup are common to all arms. This is a paired encoding comparison, not a claim of unusual target structure."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "encoding",
+        "levels": [
+          "explicit",
+          "certified",
+          "partial-trace"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "15c4d1b193999153c6ddc6ec94959167c8f4d016be197b55b26d6993001b1126",
+        "how": "One native executable and actual production arithmetic/SAT modules; code and binary hashes pinned before affected data."
+      },
+      {
+        "name": "instances",
+        "treatment": "fixed",
+        "how": "33 exact cases serialized in workload.json from the fixed native seed rule; same points for every arm."
+      },
+      {
+        "name": "order",
+        "treatment": "crossed",
+        "how": "For case index i and replicate r, rotate four arms by i+r; all rows retained."
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "Single-threaded native solver; one CPU allocation and2GiB process address-space ceiling for the proposed local exception."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "how": "Shared development environment recorded; no timing metric. A750ms safety fuse can censor rows, assessed with A/A; no isolation claim."
+      },
+      {
+        "name": "cache_and_layout",
+        "treatment": "measured",
+        "how": "Fresh Solver per call; field-table caches shared and arm order interleaved. No warmup discarded."
+      },
+      {
+        "name": "preemption",
+        "treatment": "fixed",
+        "how": "No retry; flushed JSONL prefix retained. Global600-second guard; unattempted rows reported separately."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "how": "Compiled deterministic summary is hashed before affected data, with no adaptive sample selection or population inference."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "domain",
+        "arms": [
+          "explicit",
+          "certified"
+        ],
+        "differs_in": [
+          "encoding"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "partial",
+        "arms": [
+          "certified",
+          "partial-trace"
+        ],
+        "differs_in": [
+          "encoding"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "aa",
+        "arms": [
+          "certified",
+          "certified-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": "Deterministic rotation i+replicate avoids putting one arm first throughout.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "Native prepare(): seed=202611090000+100*n+10*d+kind_index; StdRng pinned by Cargo.lock. Uniform targets use gen_biguint_below(order), not a truncated u64 scalar. Negative-control seed20261109."
+    },
+    "instance_sampling": {
+      "rule": "n7/9/83/131 by d4/5, each with planted/cancellation/two uniform targets, plus one independently refuted n5 control. Inputs fixed before solver data.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Descriptive finite panel only; deterministic Rust summary and decision rules frozen before affected data, arm labels retained for reproducibility. No adaptive interpretation or population test.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 33,
+    "replicates": 2,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 2,
+      "correction": "other",
+      "passes": true,
+      "note": "Exact descriptive tabulation of the complete fixed panel; no population significance or power claim. Repeated rows are paired repeats, not independent targets. Both contrasts are reported simultaneously as exact finite-panel tables; no p-values or population rejections are performed."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": null,
+      "measured_on": "Pending authorized runtime preflight; no candidate experiment run yet."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "decided",
+        "name": "Valid decided oracle query",
+        "unit": "queries",
+        "kind": "counted",
+        "definition": "One for Found with original-group replay or Refuted matching independent truth; zero for Inconclusive; wrong answers invalidate. Includes the complete oracle call, but counts neither setup field operations nor time.",
+        "source": "rows.jsonl decided",
+        "aggregation": "sum",
+        "resolution": "1 query",
+        "uncertainty": "range"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "conflicts",
+        "name": "SAT conflicts",
+        "unit": "conflicts",
+        "kind": "counted",
+        "definition": "Cumulative solver conflicts over attempted identity patterns; capped rows remain censored, never imputed as completed.",
+        "source": "rows.jsonl conflicts",
+        "aggregation": "distribution",
+        "resolution": "1 conflict",
+        "uncertainty": "range"
+      },
+      {
+        "id": "peak_variables",
+        "name": "Peak SAT variables",
+        "unit": "variables",
+        "kind": "exact",
+        "definition": "Maximum allocated SAT variables in the query; a circuit-size count, not a runtime proxy.",
+        "source": "rows.jsonl peak_variables",
+        "aggregation": "distribution",
+        "resolution": "1 variable",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "alternate",
+    "clock": "none",
+    "counters": [
+      "decided",
+      "conflicts",
+      "peak_variables"
+    ],
+    "record": [
+      "binary_sha256",
+      "kernel",
+      "cpu_model",
+      "threads",
+      "instance",
+      "seed",
+      "replicate",
+      "arm",
+      "truth",
+      "verification",
+      "outcome",
+      "reason"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "state": "requires_explicit_user_exception",
+      "cpus": 1,
+      "max_address_space_bytes": 2147483648,
+      "cloud_spend_usd": 0
+    },
+    "measurement_class": "search",
+    "timeout_seconds": 600,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Fixed33 cases by4 arms by2 replicates=264 planned affected-data rows. Runtime preflight is separate and retained.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Stop on any invalid Found/Refuted result, preserving all rows.",
+      "kind": "invalidation",
+      "preregistered": true
+    },
+    {
+      "rule": "Global600-second guard,2000 conflicts and750ms safety fuse per oracle query;2GiB process ceiling; no retries.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "decision_rule": {
+    "text": "Report exact per-arm and per-stratum decided/outcome counts and paired differences for this fixed panel only. State any certified A/A disagreements. A difference within its completion discrepancy carries no preference. No speed/scaling inference; disclose every cap and incomplete row.",
+    "comparison_ids": [
+      "domain",
+      "partial"
+    ],
+    "statistic": "Exact valid completion counts and paired outcome table",
+    "interval": "Range over the two paired repeats plus certified A/A discrepancies; no population confidence interval",
+    "multiple_comparison_correction": "other",
+    "effect_size_measure": "Difference in valid decided queries on the identical finite panel",
+    "verdict_vocabulary": [
+      "descriptive_difference",
+      "within_aa_discrepancy",
+      "inconclusive",
+      "invalid"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "native/src/lib.rs",
+      "sha256": "8b58c913e12162649d21fee09ccc5ccc24d2ff8e69e5e129ee24b15920e6ea6b"
+    },
+    "inputs": [
+      "rows.jsonl"
+    ],
+    "outputs": [
+      "summary.json",
+      "export.json"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "inadmissible": [
+    "No natural ECC2K-130 recovery, end-to-end gain, isolated timing or scaling claim.",
+    "Do not treat UNKNOWN as UNSAT, discard timeouts, choose seeds after looking, change the frozen panel or compare unpaired subsets as causal.",
+    "Do not launch until execution exception or EKS/checkpoint access is actually available."
+  ],
+  "literature": [
+    {
+      "ref": "Kosters-Yeo arXiv1503.08001",
+      "provenance": "retrieved",
+      "claim": "Linear trace equations may assist solving; first fall degree is not solving degree."
+    },
+    {
+      "ref": "crypto-autoresearcher knowledge/leads/ecdlp/ic-binary/LEAD-ICB-decomposition-encoding-and-sat.yaml",
+      "provenance": "retrieved",
+      "claim": "Existing encoding/basis effects and measured limits; no novelty or scale claim."
+    },
+    {
+      "ref": "research/trace_zero_leads_20261109/README.md",
+      "provenance": "internal",
+      "claim": "Prior certified-domain and restricted-q implementation, explicit UNKNOWN controls and exact scope."
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  },
+  "extensions": {
+    "workload_path": "workload.json",
+    "workload_sha256": "83fe83dbb685c0b7ea574c26a0b1c6208038045219f899932aa60218ec9fbf09",
+    "planned_rows": 264,
+    "authorization": "pending; default EKS and S3 requirements remain in force until explicit user exception",
+    "access_receipts": [
+      "checks/checkpoint-access.txt",
+      "checks/workflow-read.json"
+    ],
+    "preflight": "16 separate engineering calls, one per arm/n; target3*base[0], no primary comparison inference; complete before freezing final runtime metadata."
+  }
+}

@@ -18,6 +18,9 @@ pub enum TraceZeroMembershipEncoding {
     /// Its two affine lifts differ by negation, so both lie in the kernel.
     /// Keep the finite x domain and replay actual supplied base lifts.
     CertifiedDomain,
+    /// Certified finite domain plus the necessary trace bit on each
+    /// finite partial sum. No restriction to the original subspace.
+    CertifiedDomainWithPartialTrace,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -59,6 +62,7 @@ pub struct TraceZeroRelationReport {
     pub conflicts: u64,
     pub peak_variables: u32,
     pub full_membership_equations: usize,
+    pub partial_trace_equations: usize,
     pub reason: Option<&'static str>,
 }
 impl Default for TraceZeroRelationReport {
@@ -72,6 +76,7 @@ impl Default for TraceZeroRelationReport {
             conflicts: 0,
             peak_variables: 0,
             full_membership_equations: 0,
+            partial_trace_equations: 0,
             reason: None,
         }
     }
@@ -225,6 +230,15 @@ pub fn decompose_full_trace_zero_with_encoding(
                 Ok(n) => report.full_membership_equations = n,
                 Err(_) => {
                     report.reason = Some("full trace-zero model or variable cap");
+                    return report;
+                }
+            }
+        }
+        if encoding == TraceZeroMembershipEncoding::CertifiedDomainWithPartialTrace {
+            match enc.constrain_trace_zero_intermediates(variety) {
+                Ok(n) => report.partial_trace_equations = n,
+                Err(_) => {
+                    report.reason = Some("partial trace admission");
                     return report;
                 }
             }

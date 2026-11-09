@@ -307,6 +307,7 @@ pub struct ChainedS3Encoding {
     all_summands_exchangeable: bool,
     all_summands_ordered: bool,
     full_trace_zero: Option<(TraceZeroVariety, Vec<Vec<u32>>)>,
+    intermediate_trace_enforced: bool,
 }
 
 impl ChainedS3Encoding {
@@ -404,7 +405,41 @@ impl ChainedS3Encoding {
             all_summands_exchangeable: false,
             all_summands_ordered: false,
             full_trace_zero: None,
+            intermediate_trace_enforced: false,
         })
+    }
+
+    /// Necessary invariant for chains of full-kernel rational points:
+    /// every finite partial sum has field trace zero in its abscissa.
+    /// This does not constrain a partial sum to the original factor base.
+    pub fn constrain_trace_zero_intermediates(
+        &mut self,
+        variety: &TraceZeroVariety,
+    ) -> Result<usize, TraceZeroError> {
+        let curve = variety.curve();
+        if self.intermediate_trace_enforced
+            || curve.m != self.n
+            || curve.irreducible.degree != self.irr.degree
+            || curve.irreducible.low_terms != self.irr.low_terms
+            || curve.b != self.b
+        {
+            return Err(TraceZeroError::UnsupportedCurve);
+        }
+        let support: Vec<_> = (0..self.n)
+            .filter(|&i| F2mElement::from_bit_positions(&[i], self.n).trace(&self.irr) != 0)
+            .collect();
+        let mut count = 0;
+        for step in 1..self.m - 1 {
+            if self.identity_mask & (1 << (step - 1)) != 0 {
+                continue;
+            }
+            let block = &self.blocks[self.m + step - 1];
+            let row: Vec<_> = support.iter().map(|&i| block[i as usize]).collect();
+            self.solver.add_xor(&row, false);
+            count += 1;
+        }
+        self.intermediate_trace_enforced = true;
+        Ok(count)
     }
 
     /// Install the full E_0 trace-zero rational-point equations on every
@@ -866,6 +901,15 @@ impl ChainedS3Encoding {
             .iter()
             .map(|block| self.decode_block(block, model))
             .collect();
+        if self.intermediate_trace_enforced {
+            for step in 1..self.m - 1 {
+                if self.identity_mask & (1 << (step - 1)) == 0
+                    && values[self.m + step - 1].trace(&self.irr) != 0
+                {
+                    return false;
+                }
+            }
+        }
         if self.target_x.as_ref() != Some(&values[2 * self.m - 2])
             && !(self.target_x.is_none() && values[2 * self.m - 2].is_zero())
         {
