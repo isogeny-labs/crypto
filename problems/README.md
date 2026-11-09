@@ -128,6 +128,7 @@ Keep resolved and superseded records in the index.
 
 | [ECDLP portfolio exhaustive-reading coverage](ecdlp-portfolio-reading-coverage.md) | open | certifying the owner's request to read all six-month portfolio sources and artifacts | complete acknowledged source coverage, branch/history reconciliation and access to named missing raw evidence; indexing and hashing remain separate |
 | [claim-n13 replay fails on accounting-version drift](ecbench-claim-n13-replay-accounting-version-drift.md) | resolved | replaying the Apple-recorded `claim-n13` inherited-F4 arms on `main` (BMI2 and portable paths already agree) | owner chose eager (version 2) as the identity, 2026-10-28; original marked pre-#2043; re-recorded as `claim-n13-v2`, which replays with 0 problems, twice |
+| [CM marked-scalar timing admission](cm-marked-scalar-measurement-admission.md) | open | admitted cold native comparison against matched public-scalar multiplication | authorized quiet backend; known live cloud caps/funds if used; published frozen inputs/source/analysis and complete paired A/A evidence |
 
 ## Add or update a problem
 

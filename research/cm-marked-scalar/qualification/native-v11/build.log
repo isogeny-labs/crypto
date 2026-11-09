@@ -1,0 +1,24 @@
+make: Entering directory '/home/ec2-user/crypto-cm-marked-scalar-20261108/research/cm-marked-scalar'
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations isolate.cpp -o /tmp/cm-marked-scalar-build/isolate -pthread -lcrypto
+isolate.cpp:43:163: error: stray ‘#’ in program
+   43 |  struct sigaction action{};action.sa_handler=interrupted_signal;sigemptyset(&action.sa_mask);sigaction(SIGTERM,&action,nullptr);sigaction(SIGINT,&action,nullptr);#ifdef CM_ISOLATION_SELFTEST
+      |                                                                                                                                                                   ^
+isolate.cpp:45:2: error: #else without #if
+   45 | #else
+      |  ^~~~
+isolate.cpp:47:2: error: #endif without #if
+   47 | #endif
+      |  ^~~~~
+isolate.cpp: In function ‘int run(int, char**)’:
+isolate.cpp:43:164: error: ‘ifdef’ was not declared in this scope
+   43 |  struct sigaction action{};action.sa_handler=interrupted_signal;sigemptyset(&action.sa_mask);sigaction(SIGTERM,&action,nullptr);sigaction(SIGINT,&action,nullptr);#ifdef CM_ISOLATION_SELFTEST
+      |                                                                                                                                                                    ^~~~~
+isolate.cpp:46:17: error: redeclaration of ‘constexpr const bool selftest’
+   46 |  constexpr bool selftest=false;
+      |                 ^~~~~~~~
+isolate.cpp:44:192: note: ‘constexpr const bool selftest’ previously declared here
+   44 |  if(argc!=7||std::string(argv[5])!="/bin/sleep"||(std::string(argv[6])!="1"&&std::string(argv[6])!="30"))throw std::runtime_error("selftest permits only fixed sleep commands");constexpr bool selftest=true;
+      |                                                                                                                                                                                                ^~~~~~~~
+make: *** [Makefile:19: /tmp/cm-marked-scalar-build/isolate] Error 1
+make: Leaving directory '/home/ec2-user/crypto-cm-marked-scalar-20261108/research/cm-marked-scalar'

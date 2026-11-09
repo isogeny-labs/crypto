@@ -1,0 +1,564 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "CM-MARKED-SCALAR-NATIVE-V1",
+  "version": 1,
+  "created": "2026-11-08",
+  "repository": "crypto",
+  "study_dir": "research/cm-marked-scalar",
+  "authors": [
+    "T-1888 native comparison"
+  ],
+  "links": {
+    "pr": "https://github.com/isogeny-labs/crypto/pull/3674",
+    "parameters": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-186.pdf",
+    "quotient": "https://ocw.mit.edu/courses/18-783-elliptic-curves-fall-2025/mit18_783_f25_lec05.pdf",
+    "openssl_reference": "https://github.com/openssl/openssl/blob/master/crypto/ec/ec_mult.c"
+  },
+  "question": "Does a calibrated explicit-map or fused relation evaluator lower complete cold per-point evaluation cost for the fixed P-384/P-521 order-seven public scalars on the held-out panel, beyond matched A/A variation?",
+  "claims": [
+    {
+      "id": "C-correct",
+      "text": "All source-model output points equal the independently computed public-scalar result.",
+      "class": "exact_computation",
+      "decided_by": []
+    },
+    {
+      "id": "C-speed",
+      "text": "The selected relation evaluator lowers end-to-end time on every held-out point beyond the A/A envelope and a one-percent minimum.",
+      "class": "comparative",
+      "decided_by": [
+        "C-selected"
+      ],
+      "if_supported": "A finite-panel native arithmetic gain for the named curve, scalar, host and accounting boundary.",
+      "if_not_supported": "No gain demonstrated on this panel; the user research objective remains open."
+    }
+  ],
+  "arms": [
+    {
+      "id": "window",
+      "role": "reference",
+      "description": "Native public signed-window multiplication including point table setup",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "make",
+            "-C",
+            "research/cm-marked-scalar",
+            "-j1",
+            "native-all"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "backend": "OpenSSL 3.5.8",
+          "language": "C++17",
+          "timing": "public scalar; cold runtime and point-dependent setup"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    },
+    {
+      "id": "window-aa",
+      "role": "control_aa",
+      "description": "Independent invocation of the identical native window reference",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "make",
+            "-C",
+            "research/cm-marked-scalar",
+            "-j1",
+            "native-all"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "backend": "OpenSSL 3.5.8",
+          "language": "C++17",
+          "timing": "public scalar; cold runtime and point-dependent setup"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    },
+    {
+      "id": "maps",
+      "role": "candidate",
+      "description": "Forward and normalized dual maps, endpoint isomorphism and correcting scalar",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "make",
+            "-C",
+            "research/cm-marked-scalar",
+            "-j1",
+            "native-all"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "backend": "OpenSSL 3.5.8",
+          "language": "C++17",
+          "timing": "public scalar; cold runtime and point-dependent setup"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    },
+    {
+      "id": "fused",
+      "role": "candidate",
+      "description": "Verified dual-pair fusion to [ell], followed by the correcting scalar",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "make",
+            "-C",
+            "research/cm-marked-scalar",
+            "-j1",
+            "native-all"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "backend": "OpenSSL 3.5.8",
+          "language": "C++17",
+          "timing": "public scalar; cold runtime and point-dependent setup"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    },
+    {
+      "id": "openssl-public",
+      "role": "reference",
+      "description": "OpenSSL exposed public multiscalar path with a zero identity term",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "make",
+            "-C",
+            "research/cm-marked-scalar",
+            "-j1",
+            "native-all"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "backend": "OpenSSL 3.5.8",
+          "language": "C++17",
+          "timing": "public scalar; cold runtime and point-dependent setup"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    },
+    {
+      "id": "openssl-public-aa",
+      "role": "control_aa",
+      "description": "Independent invocation of the identical OpenSSL public path",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "make",
+            "-C",
+            "research/cm-marked-scalar",
+            "-j1",
+            "native-all"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "backend": "OpenSSL 3.5.8",
+          "language": "C++17",
+          "timing": "public scalar; cold runtime and point-dependent setup"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    },
+    {
+      "id": "openssl-single",
+      "role": "baseline",
+      "description": "OpenSSL single-point API, separately typed constant-time reference",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "build": [
+          [
+            "make",
+            "-C",
+            "research/cm-marked-scalar",
+            "-j1",
+            "native-all"
+          ]
+        ],
+        "binary_sha256": null,
+        "flags": {
+          "backend": "OpenSSL 3.5.8",
+          "language": "C++17",
+          "timing": "public scalar; cold runtime and point-dependent setup"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Known-answer native qualification precedes the panel; each measured output is compared to an independent OpenSSL point and checked on the original curve."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Altered scalar labels are rejected by native qualification before timing; a separate timed null population is not part of this arithmetic cost claim."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "method",
+        "levels": [
+          "window",
+          "maps",
+          "fused",
+          "openssl-public",
+          "openssl-single"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "curve and scalar",
+        "treatment": "fixed",
+        "value": "Frozen exact P-384/P-521 curves and primitive seventh roots",
+        "how": "fixtures and SHA256 manifest"
+      },
+      {
+        "name": "point panel",
+        "treatment": "fixed",
+        "value": "4 calibration and 8 held-out points per curve",
+        "how": "SHA256 of cm-marked-scalar-v1:panel:curve:index; source scalar never supplied to an evaluator"
+      },
+      {
+        "name": "window",
+        "treatment": "crossed",
+        "value": [
+          3,
+          4,
+          5,
+          6,
+          7
+        ],
+        "how": "All configurations retained; choose candidate and fastest public reference only on calibration. OpenSSL API repeats are identical configurations, not five distinct algorithms."
+      },
+      {
+        "name": "instrument",
+        "treatment": "fixed",
+        "value": "One native benchmark binary and backend",
+        "how": "Source, compiler, library and binary hashes frozen before data"
+      },
+      {
+        "name": "arm order",
+        "treatment": "randomized",
+        "how": "std::mt19937_64 seeded by 0x434d383838+round+7919*window and std::shuffle; compiler/runtime pinned"
+      },
+      {
+        "name": "CPU and memory contention",
+        "treatment": "measured",
+        "how": "Native exclusive lock, SMT pair reservation, movable-thread eviction, PSI and per-process CPU readback"
+      },
+      {
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "One pinned worker and one OpenSSL backend thread"
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-selected",
+        "arms": [
+          "window",
+          "openssl-public",
+          "maps",
+          "fused"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "one_factor"
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "window",
+          "window-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      },
+      {
+        "id": "C-aa-external",
+        "arms": [
+          "openssl-public",
+          "openssl-public-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": true
+  },
+  "randomization": {
+    "arm_order": "interleaved",
+    "arm_order_reason": null,
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        288989034552
+      ],
+      "nonce": null,
+      "note": "Actual shuffle seed is the literal C++ 0x434d383838 plus round plus 7919*window; panel derivation is SHA256 as specified in the variable ledger."
+    },
+    "instance_sampling": {
+      "rule": "SHA256 cm-marked-scalar-v1:calibration|heldout:P-384|P-521:index, reduced modulo n, zero replaced by one; input point [k]G generated outside all method intervals.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Mechanical deterministic analysis predeclared; algorithm phases and source labels are visible. No analyst choices after held-out data.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 16,
+    "replicates": 6,
+    "warmups": 1,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 2,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Finite designed-workload decision, not a population significance test. Eight held-out points per curve, six paired rounds; require every point median to improve beyond the full matching A/A envelope and at least one percent. Calibration has four disjoint points per curve. No promise to resolve an arbitrarily small effect."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": null,
+      "measured_on": "No timing pilot taken; the complete bounded invocation has a 120-second hard deadline. A timeout is retained, not silently resized."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "cold_ns",
+        "name": "cold verified per-point time",
+        "unit": "ns",
+        "kind": "timed",
+        "definition": "Runtime curve and required map objects, correction preparation, point setup, maps or fusion, scalar work, output encoding and symmetric correctness check. Includes explicit bookkeeping remainder so phases sum to total.",
+        "source": "rows.jsonl total_ns / inner",
+        "aggregation": "paired_ratio",
+        "resolution": "steady_clock nanoseconds; hardware resolution and host recorded",
+        "uncertainty": "Finite-panel point medians and matched A/A envelope; no population confidence claim"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "phases",
+        "name": "charged setup/maps/group/verification/bookkeeping phases",
+        "unit": "ns",
+        "kind": "timed",
+        "definition": "Disjoint stage intervals plus bookkeeping remainder; sum equals total_ns",
+        "source": "rows.jsonl *_ns fields",
+        "aggregation": "median",
+        "resolution": "1 ns",
+        "uncertainty": "Same paired panel and admission"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "tierB",
+    "warmups": 1,
+    "order": "alternate",
+    "clock": "monotonic",
+    "counters": [],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "result_switches",
+      "affinity",
+      "threads_moved",
+      "unmovable_threads",
+      "psi",
+      "other_cpu_seconds",
+      "context_switches",
+      "max_rss_kib"
+    ],
+    "timed_primary_justification": "The requested end-to-end latency depends on native field/backend, normalization, table setup and conversions; isolated wall time is required. Historical counted arithmetic is preserved as a separate baseline."
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "reserved_cpus": [
+        14,
+        30
+      ],
+      "worker_cpu": 14,
+      "threads": 1,
+      "memory_limit_kib": 2097152,
+      "max_cloud_cost_usd": 0
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 120,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Fixed design: calibration 2 curves x 5 windows x 7 arms x 4 points x (1 warmup+6 rounds), then held-out 8 points with the same remaining factors. Inner=2 complete cold calls per row.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Any wrong output, missing row, duplicated row, invalid admission or timeout prevents a speed claim; retain all partial records and stop that bounded attempt.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "a row with outcome.status other than verified is excluded from the decisive comparison and reported",
+    "a wall-time value on a row below L2 is descriptive only (wall_valid false); counted units stand at any level"
+  ],
+  "decision_rule": {
+    "text": "For each curve, select the fastest median candidate configuration (maps or fused) and public reference (window or OpenSSL public) on calibration only. On held-out points compute reference/candidate ratios of the per-point medians. Require the minimum point speedup to exceed max(1.01,the maximum bidirectional matched-reference A/A point-median ratio). Both curves are reported independently; no cherry-picking of points or pooling contended data.",
+    "comparison_ids": [
+      "C-selected"
+    ],
+    "threshold": "minimum point speedup > max(1.01,A/A envelope)",
+    "statistic": "Pointwise ratios of per-point round medians; selection on disjoint calibration only",
+    "interval": "No population interval; strict finite-panel all-point criterion",
+    "multiple_comparison_correction": "No population p-value claim; every registered curve retained",
+    "effect_size_measure": "Median and minimum per-point speedup",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "within_control_distribution",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/cm-marked-scalar/analysis.cpp",
+      "sha256": "7b07c9e3351576dc594549bdb07aca49410850abe66d58968b2782b02fb62314"
+    },
+    "inputs": [
+      "runs/calibration/rows.jsonl",
+      "runs/calibration/admission.json",
+      "runs/heldout/rows.jsonl",
+      "runs/heldout/admission.json"
+    ],
+    "outputs": [
+      "native analysis result rows; independent point replay receipt; canonical experiment export"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "S per arm per workload with the A/A interval"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Wrong or unequal outputs",
+    "Missing setup, maps, closure, scalar correction, conversion or verification cost",
+    "Incomplete or duplicate row design",
+    "Contended or unadmitted clock",
+    "Selecting windows or method on held-out results",
+    "Treating a constant-time-only loss as a public-scalar advantage",
+    "Charging input-point generation asymmetrically",
+    "Amortizing unreused setup",
+    "Promoting finite-panel speed to unknown-scalar recovery"
+  ],
+  "literature": [
+    {
+      "ref": "crypto:docs/ecbench/README.md",
+      "provenance": "internal",
+      "claim": "the counted unit, isolation levels L0-L3 and the paired comparison this protocol uses",
+      "verified_by": "experiment-protocol worked example, 2026-10-22"
+    }
+  ],
+  "amendments": [],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": null
+  }
+}

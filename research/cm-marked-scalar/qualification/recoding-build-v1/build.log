@@ -1,0 +1,18 @@
+make: Entering directory '/home/ec2-user/crypto-cm-marked-scalar-20261108/research/cm-marked-scalar'
+mkdir -p /tmp/cm-marked-scalar-build
+g++ -O3 -std=c++17 -Wall -Wextra -Wpedantic -Wno-deprecated-declarations recoding.cpp -o /tmp/cm-marked-scalar-build/recoding -lcrypto
+recoding.cpp: In function ‘Counts analytic_count(const Big&, unsigned int)’:
+recoding.cpp:16:2: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+   16 |  if(BN_is_negative(scalar.p))BN_set_negative(reconstruct.p,!reconstruct.zero());require(reconstruct==scalar,"signed digit reconstruction");
+      |  ^~
+recoding.cpp:16:81: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   16 |  if(BN_is_negative(scalar.p))BN_set_negative(reconstruct.p,!reconstruct.zero());require(reconstruct==scalar,"signed digit reconstruction");
+      |                                                                                 ^~~~~~~
+recoding.cpp: In function ‘std::string check_protocol(const string&, const string&)’:
+recoding.cpp:29:2: warning: this ‘for’ clause does not guard... [-Wmisleading-indentation]
+   29 |  for(const auto& file:protocol.at("execution").at("placement").at("input_files").array)require(file_digest(directory+"/"+file.at("path").str())==file.at("sha256").str(),"recoding fixture binding");return hash;
+      |  ^~~
+recoding.cpp:29:198: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘for’
+   29 |  for(const auto& file:protocol.at("execution").at("placement").at("input_files").array)require(file_digest(directory+"/"+file.at("path").str())==file.at("sha256").str(),"recoding fixture binding");return hash;
+      |                                                                                                                                                                                                      ^~~~~~
+make: Leaving directory '/home/ec2-user/crypto-cm-marked-scalar-20261108/research/cm-marked-scalar'
