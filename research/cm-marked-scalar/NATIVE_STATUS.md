@@ -127,3 +127,23 @@ Publish the qualified source/receipts, bind ten sources/nine inputs/binaries/hos
 ### Errors
 
 The first qualifier passed but retained an unused-original-function warning. Intermediate v2/v3 source snapshots were published but not executed; status files identify their supersession. Final v4 uses the original implementation as a point control and is warning-free. A no-op status patch failed to match a full line and changed nothing; the timestamped record is appended here. No root Cargo suite is claimed for these standalone C++ changes. Sources checked (KB): tools/wrapper unavailable as before; prior construction/cold contracts and Bernstein–Lange precomputation paper introduction/sections3–4 read. No novelty or new curve-registry claim.
+
+## 2026-11-09T17:28Z: frozen block diagnostic and native admission outcome
+
+### What was done
+
+Source/qualification3b7fe627df89 and frozen record f43454319f8d were verified hosted, and PR3674 updated, before data. Canonical body digest72609205fba2fa0c5f16387ade18663276b538dadb7042013d329d444ce40860. The single125-row native untimed diagnostic completes and validates; all25 configurations preserve each original mu output. Fresh native summary replay and deterministic archive repack are byte-identical. The5244-byte archive hash is a0eda0859cc46f8821d403d2361581f54735c1250c1e5572b5f9a9f59fc7a124. Export validates; raw records were pushed as320f4b57f858 before the report. Both PDF pages and their count plot/admission diagram were inspected.
+
+### Decisions made
+
+Block/default D+A is231,265,303,452,612 versus previous cached232,266,303,452,613, selected direct228,260,300,449,606 and folded binary229,260,300,450,606. The fixed default recovers one doubling on P-192/P-224/P-521 and none on P-256/P-384. Planner transitions671,843,926,1554,2153 and full prefix/table/loop vectors are retained. These events do not measure CPU time. Native calibration was refused before the worker: other CPU6.3seconds over two seconds exceeds0.2; CPU/memory PSI0. No timing rows, held-out worker or retry. Do not infer e2e speed from these counts or synthetic clocks.
+
+### Open threads
+
+All per-call planning/setup/normalization/destruction costs are inside the implemented cold boundary, but their native duration and the e2e comparison remain unmeasured because admission failed. A genuinely quiet admitted host is required; this attempt is terminal and will not be restarted. The full e2e objective stays active. Preserve every curve, all controls and the strict fastest-reference/A-A gate. No cloud job, quota/cap/role/budget change, generator/controller or old followup restart.
+
+### Errors
+
+An exact new daily-log git add initially refused the sparse path; git add --sparse staged only that authorized file and the scoped check passed. First report render failed on unquoted Typst subscript words new/old; its source/log are retained, corrected PDF rendered and both pages inspected. Final software qualifications remain warning-free. No source/test change or scientific execution was repeated for report/custody. Root Cargo suite remains unrun; no Rust source changed.
+
+Report publication note: the staged whitespace checker flags a final blank line in the preserved report render-v1.log. Its original diagnostic bytes are retained. The scoped source/report check passes with only that named raw-log exception; unrestricted whitespace success is not claimed. No scientific or replay output was changed.
