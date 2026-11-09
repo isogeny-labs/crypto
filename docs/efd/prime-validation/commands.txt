@@ -13,6 +13,15 @@ cargo test --lib prime_ecc::efd
 EFD_COVERAGE_OUT=docs/efd/prime-validation/coverage.json \
   cargo test --lib prime_ecc::efd::tests::all_471
 
+# Second small prime (p = 97, also 1 mod 12).
+EFD_TEST_P=97 cargo test --lib prime_ecc::efd
+
+# The importer check target builds and its tests pass.
+cargo test --release --manifest-path tools/efd/Cargo.toml
+
+# Regenerate both catalogues from a fetch cache and diff (ignores the date).
+tools/efd/replay.sh G1P_CACHE G12O_CACHE
+
 # Source hashes for the module and catalogue.
 cd src/prime_ecc/efd && sha256sum mod.rs program.rs formats.rs checked.rs \
   tests.rs catalogue.json

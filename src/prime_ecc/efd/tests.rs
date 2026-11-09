@@ -7,8 +7,18 @@ use num_traits::Zero;
 use std::collections::BTreeSet;
 
 /// Small prime used for exhaustive model checks. `p = 1 mod 12` keeps square
-/// roots of -1 and primitive cube roots of unity available.
-const P: u64 = 109;
+/// roots of -1 and primitive cube roots of unity available. Override with
+/// `EFD_TEST_P` to re-run the same suite at another such prime (for example 97).
+#[inline]
+fn prime() -> u64 {
+    static PRIME: std::sync::OnceLock<u64> = std::sync::OnceLock::new();
+    *PRIME.get_or_init(|| {
+        std::env::var("EFD_TEST_P")
+            .ok()
+            .and_then(|s| s.parse().ok())
+            .unwrap_or(109)
+    })
+}
 
 /// Two upstream `.op3` files compute `-(r1+l3)` where the pinned record says
 /// `r2 = -r1+l3`. They are kept byte for byte; verification uses the
@@ -28,13 +38,14 @@ const KNOWN_PROGRAM_DEFECTS: &[(&str, &str)] = &[
 type Point2 = Vec<FieldElement>;
 
 fn modulus() -> BigUint {
-    BigUint::from(P)
+    static MODULUS: std::sync::OnceLock<BigUint> = std::sync::OnceLock::new();
+    MODULUS.get_or_init(|| BigUint::from(prime())).clone()
 }
 fn fe(v: u64) -> FieldElement {
-    FieldElement::new(BigUint::from(v % P), modulus())
+    FieldElement::new(BigUint::from(v % prime()), modulus())
 }
 fn fe_i(v: i64) -> FieldElement {
-    let p = P as i64;
+    let p = prime() as i64;
     fe((((v % p) + p) % p) as u64)
 }
 fn one() -> FieldElement {
@@ -69,7 +80,7 @@ fn small_sqrt(v: &FieldElement) -> Option<FieldElement> {
     if v.is_zero() {
         return Some(zero());
     }
-    (0..P).map(fe).find(|x| x.mul(x) == *v)
+    (0..prime()).map(fe).find(|x| x.mul(x) == *v)
 }
 
 fn model_points(model: &Model, params: &Bindings) -> Vec<Point2> {
@@ -77,8 +88,8 @@ fn model_points(model: &Model, params: &Bindings) -> Vec<Point2> {
     let rels = relations(model);
     let mut out = Vec::new();
     if coords.len() == 2 {
-        for a in 0..P {
-            for b in 0..P {
+        for a in 0..prime() {
+            for b in 0..prime() {
                 let point = vec![fe(a), fe(b)];
                 if satisfies(&coords, &rels, params, &point) {
                     out.push(point);
@@ -88,8 +99,8 @@ fn model_points(model: &Model, params: &Bindings) -> Vec<Point2> {
     } else {
         // Jacobi intersections: s^2+c^2=1 and a s^2+d^2=1.
         let a = params["a"].clone();
-        for s in (0..P).map(fe) {
-            for c in (0..P).map(fe) {
+        for s in (0..prime()).map(fe) {
+            for c in (0..prime()).map(fe) {
                 if s.mul(&s).add(&c.mul(&c)) != one() {
                     continue;
                 }
@@ -139,7 +150,7 @@ fn oracle(model: &Model, operation: &str, params: &Bindings, args: &[&Point2]) -
 }
 
 fn jquartic_params() -> Bindings {
-    for c in 1..P {
+    for c in 1..prime() {
         let rhs = one().sub(&fe(c).mul(&fe(c)));
         if let Some(a) = small_sqrt(&rhs) {
             return Bindings::from([("a".into(), a), ("c".into(), fe(c))]);
@@ -149,7 +160,7 @@ fn jquartic_params() -> Bindings {
 }
 
 fn cube_root_of_unity() -> Option<FieldElement> {
-    (2..P)
+    (2..prime())
         .map(fe)
         .find(|w| w.mul(w).add(w).add(&one()).is_zero())
 }
@@ -273,6 +284,10 @@ fn projection(rep: &Representation, point: &Point2) -> Projection {
         x: point[0].clone(),
         y: point[1].clone(),
     }
+}
+
+fn div(a: &FieldElement, b: &FieldElement) -> FieldElement {
+    a.mul(&b.inv_vartime().unwrap())
 }
 
 fn source_digest(s: &Source) {
@@ -501,7 +516,7 @@ fn all_471_formulas_match_affine_model_laws() {
                 "{}: only {passed} comparable cases (attempted {attempted})",
                 formula.id
             );
-            coverage.push(serde_json::json!({"formula":formula.id,"prime":P,
+            coverage.push(serde_json::json!({"formula":formula.id,"prime":prime(),
                 "program":source,
                 "passed":passed,"attempted":attempted,
                 "excluded_singular_or_conditional":attempted-passed}));
@@ -567,7 +582,7 @@ fn applies(formula: &Formula, curve: &CurveParams) -> bool {
 
 #[test]
 fn checked_weierstrass_formulas_match_existing_independent_arithmetic() {
-    for a in [0u64, P - 3] {
+    for a in [0u64, prime() - 3] {
         let curve = small_curve(a);
         let a_fe = curve.a_fe();
         let points = shortw_points(&curve);
@@ -727,7 +742,7 @@ fn all_ten_curve_equations_and_thirty_three_charts_are_covered() {
         assert!(points.len() > 8, "{}: {} points", model.id, points.len());
         // The equations must actually constrain the chart.
         assert!(
-            points.len() < P as usize * P as usize,
+            points.len() < prime() as usize * prime() as usize,
             "{}: unconstrained",
             model.id
         );
@@ -828,6 +843,76 @@ fn chart_family(id: &str) -> u8 {
     }
 }
 
+/// Encode constants implied by each Lean proof family.
+/// `(x_z_power, y_z_power, inverted)`; families with quotient coordinates are
+/// handled separately in the test below.
+fn family_constants(family: u8) -> (u32, u32, bool) {
+    match family {
+        0 => (0, 0, false),
+        1 => (1, 1, false),
+        2 => (2, 3, false),
+        3 => (1, 2, false),
+        4 => (2, 3, false),
+        6 => (0, 0, true),
+        other => panic!("family {other} has quotient/triple coordinates"),
+    }
+}
+
+/// Tie the Lean family table to the actual encode constants: for every chart,
+/// the raw X/Y written by `formats.rs` must be `x*z^a`, `y*z^b` (or `z/x`,
+/// `z/y`) with the exponents that the corresponding Lean theorem proves.
+#[test]
+fn chart_family_constants_match_encode() {
+    let x = fe(3);
+    let y = fe(7);
+    let z = fe(5);
+    let z2 = z.mul(&z);
+    let z3 = z2.mul(&z);
+    for rep in &catalogue().representations {
+        let family = chart_family(&rep.id);
+        let params = params_for(rep);
+        let point = if rep.id.starts_with("jintersect/") {
+            vec![fe(3), fe(5), fe(7)]
+        } else {
+            vec![fe(3), fe(7)]
+        };
+        let encoded = encode(rep, &params, &point, &z).unwrap();
+        match family {
+            1 | 2 | 3 | 4 => {
+                let (a, b, _) = family_constants(family);
+                let expected_x = if a == 1 { x.mul(&z) } else { x.mul(&z2) };
+                let expected_y = match b {
+                    1 => y.mul(&z),
+                    2 => y.mul(&z2),
+                    3 => y.mul(&z3),
+                    _ => unreachable!(),
+                };
+                assert_eq!(encoded["X"], expected_x, "{}", rep.id);
+                assert_eq!(encoded["Y"], expected_y, "{}", rep.id);
+            }
+            5 => assert_eq!(encoded["X"], x.mul(&z), "{}", rep.id),
+            6 => {
+                assert_eq!(encoded["X"], div(&z, &x), "{}", rep.id);
+                assert_eq!(encoded["Y"], div(&z, &y), "{}", rep.id);
+            }
+            7 => {
+                let r = params["r"].clone();
+                assert_eq!(encoded["Y"], r.mul(&y).mul(&z), "{}", rep.id);
+            }
+            8 => {
+                let r = params["r"].clone();
+                assert_eq!(encoded["Y"], r.mul(&y.mul(&y)).mul(&z), "{}", rep.id);
+            }
+            9 => {
+                assert_eq!(encoded["S"], point[0].mul(&z), "{}", rep.id);
+                assert_eq!(encoded["C"], point[1].mul(&z), "{}", rep.id);
+                assert_eq!(encoded["D"], point[2].mul(&z), "{}", rep.id);
+            }
+            other => panic!("family {other}"),
+        }
+    }
+}
+
 /// The Lean development must cover exactly the catalogue charts, with each
 /// chart mapped to a family that has a machine-checked round-trip theorem.
 #[test]
@@ -883,6 +968,10 @@ fn lean_chart_manifest_matches_catalogue() {
 fn legacy_extended_quartic_formulas_match_affine_law() {
     let c = legacy::catalogue();
     assert_eq!(c.formulas.len(), 15);
+    assert_eq!(
+        c.source_page_sha256.as_deref(),
+        Some(legacy::SOURCE_PAGE_SHA256)
+    );
     let model = c.model("jquartic").unwrap();
     let rep = c.representation("jquartic/extended").unwrap();
     // Same x=X/Z, y=Y/Z^2 family as the Lean `xyz_roundtrip` theorem.

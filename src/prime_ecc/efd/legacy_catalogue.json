@@ -2,6 +2,7 @@
   "schema": "efd-legacy-catalogue/v1",
   "section": "oldefd",
   "source_url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html",
+  "source_page_sha256": "c0d4a89fcf346bd03c875adfda2f6a820fbd3435d417128d7d8f89135ec9a28b",
   "retrieved": "2026-11-09",
   "characteristic": "p",
   "models": [
@@ -45,17 +46,17 @@
   ],
   "formulas": [
     {
-      "id": "jquartic/extended/scaling/legacy-00",
+      "id": "jquartic/extended/scaling/algorithm-2007-feng-wu",
       "representation": "jquartic/extended",
       "operation": "scaling",
-      "name": "legacy-00",
+      "name": "algorithm-2007-feng-wu",
       "assumptions": [
         "Z1 = 1"
       ],
       "record": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-00",
-        "sha256": "b17f291d2137243121794e912b4e5bc32f71a6528d9944ff4a11134d86f3eeda",
-        "text": "A := 2*W1;\nB := 1/A;\nX2 := V1*B;\nY2 := 2*Y1*B;\nZ2 := 1;\nU2 := X2^2;\nV2 := 2*X2;\nW2 := 1;\nT2 := U2+W2;\n"
+        "sha256": "814255e9f61ccf147798d79301d348a6a4c5e0fd1b591c4e6d654dd9b6c532d9",
+        "text": "A:=2*W1;\nB:=1/A;\nX2:=V1*B;\nY2:=2*Y1*B;\nZ2:=1;\nU2:=X2^2;\nV2:=2*X2; W2:=1; T2:=U2+W2;\n"
       },
       "program": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-00-program",
@@ -65,10 +66,10 @@
       "upstream_verification_url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html"
     },
     {
-      "id": "jquartic/extended/addition/legacy-01",
+      "id": "jquartic/extended/addition/2007-duquesne-page-103-table-1",
       "representation": "jquartic/extended",
       "operation": "addition",
-      "name": "legacy-01",
+      "name": "2007-duquesne-page-103-table-1",
       "assumptions": [
         "b = -2*a",
         "Z1 = 1",
@@ -76,8 +77,8 @@
       ],
       "record": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-01",
-        "sha256": "7c4d7c6889248058904176deeb34e558e46970007e2f9765337ffe6e3cfbcb80",
-        "text": "R1 := U1;\nR2 := U2;\nR3 := V1/2;\nR4 := V2/2;\nR5 := W1;\nR6 := W2;\nR7 := Y1;\nR8 := Y2;\nR9 := R7*R8;\nR7 := R7+R3;\nR8 := R8+R4;\nR3 := R3*R4;\nR7 := R7*R8;\nR7 := R7-R9;\nR7 := R7-R3;\nR4 := R1*R2;\nR8 := R5*R6;\nR1 := R1+R5;\nR2 := R2+R6;\nR5 := R1*R2;\nR5 := R5-R4;\nR5 := R5-R8;\nR1 := R8-R4;\nR2 := R8+R4;\nR6 := b*R3;\nR6 := R9-R6;\nR6 := R6*R2;\nR3 := 2*R3;\nR3 := R5*R3;\nR8 := R6+R3;\nR2 := R7^2;\nR4 := R1*R7;\nR6 := R1^2;\nX3 := R7;\nY3 := R8;\nZ3 := R1;\nU3 := R2;\nV3 := 2*R4;\nW3 := R6;\nT3 := U3+W3;\n"
+        "sha256": "f6a25988cd37e2503982df406f2582ff179c2ee5ce8542cd3231d19a14360a29",
+        "text": "R1:=U1;\nR2:=U2;\nR3:=V1/2;\nR4:=V2/2;\nR5:=W1;\nR6:=W2;\nR7:=Y1;\nR8:=Y2;\nR9:=R7*R8;\nR7:=R7+R3;\nR8:=R8+R4;\nR3:=R3*R4;\nR7:=R7*R8;\nR7:=R7-R9;\nR7:=R7-R3;\nR4:=R1*R2;\nR8:=R5*R6;\nR1:=R1+R5;\nR2:=R2+R6;\nR5:=R1*R2;\nR5:=R5-R4;\nR5:=R5-R8;\nR1:=R8-R4;\nR2:=R8+R4;\nR6:=b*R3;\nR6:=R9-R6;\nR6:=R6*R2;\nR3:=2*R3;\nR3:=R5*R3;\nR8:=R6+R3;\nR2:=R7^2;\nR4:=R1*R7;\nR6:=R1^2;\nX3:=R7;\nY3:=R8;\nZ3:=R1;\nU3:=R2;\nV3:=2*R4;\nW3:=R6;\nT3:=U3+W3;\n"
       },
       "program": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-01-program",
@@ -87,18 +88,18 @@
       "upstream_verification_url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html"
     },
     {
-      "id": "jquartic/extended/addition/legacy-02",
+      "id": "jquartic/extended/addition/2007-bernstein-lange",
       "representation": "jquartic/extended",
       "operation": "addition",
-      "name": "legacy-02",
+      "name": "2007-bernstein-lange",
       "assumptions": [
         "Z1 = 1",
         "Z2 = 1"
       ],
       "record": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-02",
-        "sha256": "5caeccaeaccb546ac9aab75f62762b962c3be09a801554e605138b14e4365889",
-        "text": "E1 := V1+Y1;\nE2 := V2+Y2;\nU1U2 := U1*U2;\nV1V2 := V1*V2;\nW1W2 := W1*W2;\nY1Y2 := Y1*Y2;\nF := W1W2+U1U2;\nG := 2*V1V2;\nX3 := E1*E2-V1V2-Y1Y2;\nY3 := F*(4*Y1Y2+a*G)+(T1*T2-F)*G;\nZ3 := 2*(W1W2-U1U2);\nU3 := X3^2;\nW3 := Z3^2;\nT3 := U3+W3;\nV3 := (X3+Z3)^2-T3;\n"
+        "sha256": "21b56e13c8d9ea537edb72b5764961975fc5362898fbf869917d6d995484ff6e",
+        "text": "E1:=V1+Y1;\nE2:=V2+Y2;\nU1U2:=U1*U2;\nV1V2:=V1*V2;\nW1W2:=W1*W2;\nY1Y2:=Y1*Y2;\nF:=W1W2+U1U2;\nG:=2*V1V2;\nX3:=E1*E2-V1V2-Y1Y2;\nY3:=F*(4*Y1Y2+a*G)+(T1*T2-F)*G;\nZ3:=2*(W1W2-U1U2);\nU3:=X3^2;\nW3:=Z3^2;\nT3:=U3+W3;\nV3:=(X3+Z3)^2-T3;\n"
       },
       "program": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-02-program",
@@ -108,18 +109,18 @@
       "upstream_verification_url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html"
     },
     {
-      "id": "jquartic/extended/addition/legacy-03",
+      "id": "jquartic/extended/addition/2007-bernstein-lange-02",
       "representation": "jquartic/extended",
       "operation": "addition",
-      "name": "legacy-03",
+      "name": "2007-bernstein-lange",
       "assumptions": [
         "Z1 = 1",
         "Z2 = 1"
       ],
       "record": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-03",
-        "sha256": "b2c8e1d7324e26d19cc72b11f9aa21629eab870a3e44829ee7a5ee3cb83d2566",
-        "text": "E1 := V1+Y1;\nE2 := V2+Y2;\nU1U2 := U1*U2;\nV1V2 := V1*V2;\nY1Y2 := Y1*Y2;\nF := W1+U1U2;\nG := 2*V1V2;\nX3 := E1*E2-V1V2-Y1Y2;\nY3 := F*(4*Y1Y2+a*G)+(T1*T2-F)*G;\nZ3 := 2*(W1-U1U2);\nU3 := X3^2;\nW3 := Z3^2;\nT3 := U3+W3;\nV3 := (X3+Z3)^2-T3;\n"
+        "sha256": "bb77febe5d6034e6a96b6b2d39166ea1421a6f70d354a72a72d3122ab3670336",
+        "text": "E1:=V1+Y1;\nE2:=V2+Y2;\nU1U2:=U1*U2;\nV1V2:=V1*V2;\nY1Y2:=Y1*Y2;\nF:=W1+U1U2;\nG:=2*V1V2;\nX3:=E1*E2-V1V2-Y1Y2;\nY3:=F*(4*Y1Y2+a*G)+(T1*T2-F)*G;\nZ3:=2*(W1-U1U2);\nU3:=X3^2;\nW3:=Z3^2;\nT3:=U3+W3;\nV3:=(X3+Z3)^2-T3;\n"
       },
       "program": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-03-program",
@@ -129,18 +130,18 @@
       "upstream_verification_url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html"
     },
     {
-      "id": "jquartic/extended/addition/legacy-04",
+      "id": "jquartic/extended/addition/2007-bernstein-lange-03",
       "representation": "jquartic/extended",
       "operation": "addition",
-      "name": "legacy-04",
+      "name": "2007-bernstein-lange",
       "assumptions": [
         "Z1 = 1",
         "Z2 = 1"
       ],
       "record": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-04",
-        "sha256": "2551b886a97f547002e1fd5283d7cea12b81d9222ab7aba05395f7b4359019ce",
-        "text": "E1 := X1+Y1;\nE2 := X2+Y2;\nB := X1*X2;\nU1U2 := B^2;\nY1Y2 := Y1*Y2;\nF := 1+U1U2;\nG := 2*B;\nX3 := E1*E2-B-Y1Y2;\nY3 := F*(Y1Y2+a*G)+(U1+U2)*G;\nZ3 := 1-U1U2;\nU3 := X3^2;\nW3 := Z3^2;\nT3 := U3+W3;\nV3 := (X3+Z3)^2-T3;\n"
+        "sha256": "d36d31288fdd48f5f777217e0ac44a76b6b2c98cb7467006ef8fb64865be3fc6",
+        "text": "E1:=X1+Y1;\nE2:=X2+Y2;\nB:=X1*X2;\nU1U2:=B^2;\nY1Y2:=Y1*Y2;\nF:=1+U1U2;\nG:=2*B;\nX3:=E1*E2-B-Y1Y2;\nY3:=F*(Y1Y2+a*G)+(U1+U2)*G;\nZ3:=1-U1U2;\nU3:=X3^2;\nW3:=Z3^2;\nT3:=U3+W3;\nV3:=(X3+Z3)^2-T3;\n"
       },
       "program": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-04-program",
@@ -150,10 +151,10 @@
       "upstream_verification_url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html"
     },
     {
-      "id": "jquartic/extended/addition/legacy-05",
+      "id": "jquartic/extended/addition/2007-duquesne-page-103-table-1-02",
       "representation": "jquartic/extended",
       "operation": "addition",
-      "name": "legacy-05",
+      "name": "2007-duquesne-page-103-table-1",
       "assumptions": [
         "b = -2*a",
         "Z1 = 1",
@@ -161,8 +162,8 @@
       ],
       "record": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-05",
-        "sha256": "7c4d7c6889248058904176deeb34e558e46970007e2f9765337ffe6e3cfbcb80",
-        "text": "R1 := U1;\nR2 := U2;\nR3 := V1/2;\nR4 := V2/2;\nR5 := W1;\nR6 := W2;\nR7 := Y1;\nR8 := Y2;\nR9 := R7*R8;\nR7 := R7+R3;\nR8 := R8+R4;\nR3 := R3*R4;\nR7 := R7*R8;\nR7 := R7-R9;\nR7 := R7-R3;\nR4 := R1*R2;\nR8 := R5*R6;\nR1 := R1+R5;\nR2 := R2+R6;\nR5 := R1*R2;\nR5 := R5-R4;\nR5 := R5-R8;\nR1 := R8-R4;\nR2 := R8+R4;\nR6 := b*R3;\nR6 := R9-R6;\nR6 := R6*R2;\nR3 := 2*R3;\nR3 := R5*R3;\nR8 := R6+R3;\nR2 := R7^2;\nR4 := R1*R7;\nR6 := R1^2;\nX3 := R7;\nY3 := R8;\nZ3 := R1;\nU3 := R2;\nV3 := 2*R4;\nW3 := R6;\nT3 := U3+W3;\n"
+        "sha256": "f6a25988cd37e2503982df406f2582ff179c2ee5ce8542cd3231d19a14360a29",
+        "text": "R1:=U1;\nR2:=U2;\nR3:=V1/2;\nR4:=V2/2;\nR5:=W1;\nR6:=W2;\nR7:=Y1;\nR8:=Y2;\nR9:=R7*R8;\nR7:=R7+R3;\nR8:=R8+R4;\nR3:=R3*R4;\nR7:=R7*R8;\nR7:=R7-R9;\nR7:=R7-R3;\nR4:=R1*R2;\nR8:=R5*R6;\nR1:=R1+R5;\nR2:=R2+R6;\nR5:=R1*R2;\nR5:=R5-R4;\nR5:=R5-R8;\nR1:=R8-R4;\nR2:=R8+R4;\nR6:=b*R3;\nR6:=R9-R6;\nR6:=R6*R2;\nR3:=2*R3;\nR3:=R5*R3;\nR8:=R6+R3;\nR2:=R7^2;\nR4:=R1*R7;\nR6:=R1^2;\nX3:=R7;\nY3:=R8;\nZ3:=R1;\nU3:=R2;\nV3:=2*R4;\nW3:=R6;\nT3:=U3+W3;\n"
       },
       "program": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-05-program",
@@ -172,18 +173,18 @@
       "upstream_verification_url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html"
     },
     {
-      "id": "jquartic/extended/addition/legacy-06",
+      "id": "jquartic/extended/addition/2007-bernstein-lange-04",
       "representation": "jquartic/extended",
       "operation": "addition",
-      "name": "legacy-06",
+      "name": "2007-bernstein-lange",
       "assumptions": [
         "Z1 = 1",
         "Z2 = 1"
       ],
       "record": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-06",
-        "sha256": "5caeccaeaccb546ac9aab75f62762b962c3be09a801554e605138b14e4365889",
-        "text": "E1 := V1+Y1;\nE2 := V2+Y2;\nU1U2 := U1*U2;\nV1V2 := V1*V2;\nW1W2 := W1*W2;\nY1Y2 := Y1*Y2;\nF := W1W2+U1U2;\nG := 2*V1V2;\nX3 := E1*E2-V1V2-Y1Y2;\nY3 := F*(4*Y1Y2+a*G)+(T1*T2-F)*G;\nZ3 := 2*(W1W2-U1U2);\nU3 := X3^2;\nW3 := Z3^2;\nT3 := U3+W3;\nV3 := (X3+Z3)^2-T3;\n"
+        "sha256": "21b56e13c8d9ea537edb72b5764961975fc5362898fbf869917d6d995484ff6e",
+        "text": "E1:=V1+Y1;\nE2:=V2+Y2;\nU1U2:=U1*U2;\nV1V2:=V1*V2;\nW1W2:=W1*W2;\nY1Y2:=Y1*Y2;\nF:=W1W2+U1U2;\nG:=2*V1V2;\nX3:=E1*E2-V1V2-Y1Y2;\nY3:=F*(4*Y1Y2+a*G)+(T1*T2-F)*G;\nZ3:=2*(W1W2-U1U2);\nU3:=X3^2;\nW3:=Z3^2;\nT3:=U3+W3;\nV3:=(X3+Z3)^2-T3;\n"
       },
       "program": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-06-program",
@@ -193,10 +194,10 @@
       "upstream_verification_url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html"
     },
     {
-      "id": "jquartic/extended/doubling/legacy-07",
+      "id": "jquartic/extended/doubling/2007-hisil-carter-dawson",
       "representation": "jquartic/extended",
       "operation": "doubling",
-      "name": "legacy-07",
+      "name": "2007-hisil-carter-dawson",
       "assumptions": [
         "Z1 = 1"
       ],
@@ -213,10 +214,10 @@
       "upstream_verification_url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html"
     },
     {
-      "id": "jquartic/extended/doubling/legacy-08",
+      "id": "jquartic/extended/doubling/2007-feng-wu-first-jqn2-doubling-formula-obvious",
       "representation": "jquartic/extended",
       "operation": "doubling",
-      "name": "legacy-08",
+      "name": "2007-feng-wu-first-jqn2-doubling-formula-obvious",
       "assumptions": [
         "epsilon = 1",
         "delta = -a",
@@ -224,8 +225,8 @@
       ],
       "record": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-08",
-        "sha256": "b117061d895a43b24e02db4f698be12ab3aa04b03ac09b51f1077c328336db63",
-        "text": "R1 := (X1*Z1+Y1)^2;\nR2 := Y1^2;\nQ1 := (X1^2)^2;\nS1 := (X1*Z1)^2;\nT := R2-epsilon*Q1+2*delta*S1;\nX3 := R1-R2-S1;\nY3 := (T+epsilon*Q1)*(R2-2*delta*S1)+4*epsilon*S1^2;\nZ3 := T-epsilon*Q1;\nU3 := X3^2;\nW3 := Z3^2;\nT3 := U3+W3;\nV3 := (X3+Z3)^2-T3;\n"
+        "sha256": "3523c82e8dbba44edbe55e36a17ab48b0fe3864462882fbb45fb9d6882bb2555",
+        "text": "R1:=(X1*Z1+Y1)^2;\nR2:=Y1^2;\nQ1:=(X1^2)^2;\nS1:=(X1*Z1)^2;\nT:=R2-epsilon*Q1+2*delta*S1;\nX3:=R1-R2-S1;\nY3:=(T+epsilon*Q1)*(R2-2*delta*S1)+4*epsilon*S1^2;\nZ3:=T-epsilon*Q1;\nU3:=X3^2;\nW3:=Z3^2;\nT3:=U3+W3;\nV3:=(X3+Z3)^2-T3;\n"
       },
       "program": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-08-program",
@@ -235,18 +236,18 @@
       "upstream_verification_url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html"
     },
     {
-      "id": "jquartic/extended/doubling/legacy-09",
+      "id": "jquartic/extended/doubling/2007-feng-wu-first-jqn2-doubling-formula-obvious-02",
       "representation": "jquartic/extended",
       "operation": "doubling",
-      "name": "legacy-09",
+      "name": "2007-feng-wu-first-jqn2-doubling-formula-obvious",
       "assumptions": [
         "delta = -a",
         "Z1 = 1"
       ],
       "record": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-09",
-        "sha256": "954c00c5e6dbcf194b3a8027e5c0e9d3a9a5107f8046316ba557e651a4af83bb",
-        "text": "R1 := (V1+2*Y1)^2;\nR2 := 4*Y1^2;\nQ1 := U1^2;\nS1 := V1^2;\nS12 := 2*S1;\nM := delta*S12;\nR2M := R2+M;\nX3 := R1-R2-S1;\nY3 := R2M*(R2-M)+S12^2;\nZ3 := R2M-8*Q1;\nU3 := X3^2;\nW3 := Z3^2;\nT3 := U3+W3;\nV3 := (X3+Z3)^2-T3;\n"
+        "sha256": "a2d6d659999767939c10ff6fc3b92d4e718a5376455f6c53af14654c06ce82a4",
+        "text": "R1:=(V1+2*Y1)^2;\nR2:=4*Y1^2;\nQ1:=U1^2;\nS1:=V1^2;\nS12:=2*S1;\nM:=delta*S12;\nR2M:=R2+M;\nX3:=R1-R2-S1;\nY3:=R2M*(R2-M)+S12^2;\nZ3:=R2M-8*Q1;\nU3:=X3^2;\nW3:=Z3^2;\nT3:=U3+W3;\nV3:=(X3+Z3)^2-T3;\n"
       },
       "program": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-09-program",
@@ -256,10 +257,10 @@
       "upstream_verification_url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html"
     },
     {
-      "id": "jquartic/extended/doubling/legacy-10",
+      "id": "jquartic/extended/doubling/2007-feng-wu-second-jqn2-doubling-formula",
       "representation": "jquartic/extended",
       "operation": "doubling",
-      "name": "legacy-10",
+      "name": "2007-feng-wu-second-jqn2-doubling-formula",
       "assumptions": [
         "epsilon = 1",
         "delta = -a",
@@ -268,8 +269,8 @@
       ],
       "record": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-10",
-        "sha256": "51874f1a6f6a393d17858726410fbcaab0ee0bb5f6b19445a6d5a1c0d5c1a6ca",
-        "text": "T1 := (X1*Z1)^2;\nT2 := Y1^2;\nS1 := (T2+2*alpha*T1)^2;\nU := (X1*Z1+Y1)^2-T1-T2;\nV := U^2;\nX3 := U;\nY3 := S1-alpha*V;\nZ3 := T2+2*delta*T1-2*epsilon*X1^4;\nU3 := X3^2;\nW3 := Z3^2;\nT3 := U3+W3;\nV3 := (X3+Z3)^2-T3;\n"
+        "sha256": "a18cb157ba1083f93da1f51f77319456687a53f9693245bac7eb960ab36bc7ad",
+        "text": "T1:=(X1*Z1)^2;\nT2:=Y1^2;\nS1:=(T2+2*alpha*T1)^2;\nU:=(X1*Z1+Y1)^2-T1-T2;\nV:=U^2;\nX3:=U;\nY3:=S1-alpha*V;\nZ3:=T2+2*delta*T1-2*epsilon*X1^4;\nU3:=X3^2;\nW3:=Z3^2;\nT3:=U3+W3;\nV3:=(X3+Z3)^2-T3;\n"
       },
       "program": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-10-program",
@@ -279,10 +280,10 @@
       "upstream_verification_url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html"
     },
     {
-      "id": "jquartic/extended/doubling/legacy-11",
+      "id": "jquartic/extended/doubling/2007-feng-wu-second-jqn2-doubling-formula-02",
       "representation": "jquartic/extended",
       "operation": "doubling",
-      "name": "legacy-11",
+      "name": "2007-feng-wu-second-jqn2-doubling-formula",
       "assumptions": [
         "delta = -a",
         "alpha^2 + delta^2 = 1",
@@ -290,8 +291,8 @@
       ],
       "record": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-11",
-        "sha256": "34ec44ad0039e6488fe82b6ffe1f6daeb4b81030ae0552427630452d5f9fb31a",
-        "text": "Y12 := 2*Y1;\nT1 := V1^2;\nT12 := 2*T1;\nT2 := Y12^2;\nX3 := (V1+Y12)^2-T1-T2;\nU3 := X3^2;\nY3 := (T2+alpha*T12)^2-alpha*U3;\nZ3 := T2+delta*T12-8*U1^2;\nW3 := Z3^2;\nT3 := U3+W3;\nV3 := (X3+Z3)^2-T3;\n"
+        "sha256": "41a5bf3154139963367f63bdc256551c0708d976f914889d905412ffdeee3116",
+        "text": "Y12:=2*Y1;\nT1:=V1^2;\nT12:=2*T1;\nT2:=Y12^2;\nX3:=(V1+Y12)^2-T1-T2;\nU3:=X3^2;\nY3:=(T2+alpha*T12)^2-alpha*U3;\nZ3:=T2+delta*T12-8*U1^2;\nW3:=Z3^2;\nT3:=U3+W3;\nV3:=(X3+Z3)^2-T3;\n"
       },
       "program": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-11-program",
@@ -301,17 +302,17 @@
       "upstream_verification_url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html"
     },
     {
-      "id": "jquartic/extended/doubling/legacy-12",
+      "id": "jquartic/extended/doubling/2007-hisil-carter-dawson-02",
       "representation": "jquartic/extended",
       "operation": "doubling",
-      "name": "legacy-12",
+      "name": "2007-hisil-carter-dawson",
       "assumptions": [
         "Z1 = 1"
       ],
       "record": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-12",
-        "sha256": "2d95d57501060b26a36f8f9a653270b4b6d5a6e15e5336ac18db57518be173f5",
-        "text": "A := U1^2;\nB := Y1^2;\nX3 := -(X1+Y1)^2+U1+B;\nZ3 := A-1;\nU3 := X3^2;\nW3 := Z3^2;\nT3 := U3+W3;\nV3 := (X3+Z3)^2-T3;\nY3 := 2*B*(A+2*U1+1)-T3;\n"
+        "sha256": "c5370c909c95d6b533857638f217e0d26ad9c5c5ffaaf2fd2fb91f9b0b753ed8",
+        "text": "A:=U1^2;\nB:=Y1^2;\nX3 := -(X1+Y1)^2+U1+B;\nZ3 := A-1;\nU3 := X3^2;\nW3 := Z3^2;\nT3 := U3+W3;\nV3 := (X3+Z3)^2-T3;\nY3 := 2*B*(A+2*U1+1)-T3;\n"
       },
       "program": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-12-program",
@@ -321,10 +322,10 @@
       "upstream_verification_url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html"
     },
     {
-      "id": "jquartic/extended/tripling/legacy-13",
+      "id": "jquartic/extended/tripling/2007-hisil-carter-dawson",
       "representation": "jquartic/extended",
       "operation": "tripling",
-      "name": "legacy-13",
+      "name": "2007-hisil-carter-dawson",
       "assumptions": [
         "Z1 = 1"
       ],
@@ -341,18 +342,18 @@
       "upstream_verification_url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html"
     },
     {
-      "id": "jquartic/extended/tripling/legacy-14",
+      "id": "jquartic/extended/tripling/2007-hisil-carter-dawson-02",
       "representation": "jquartic/extended",
       "operation": "tripling",
-      "name": "legacy-14",
+      "name": "2007-hisil-carter-dawson",
       "assumptions": [
         "b = a^2-1",
         "Z1 = 1"
       ],
       "record": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-14",
-        "sha256": "120272217359183adbecdb8e7161bc5d77949d42b023d08dcd46c4827cd8efba",
-        "text": "UU := U1^2;\nWW := W1^2;\nVV := V1^2;\nA := 4*(UU - WW);\nAA := A^2;\nB := 2*(UU + WW) + a*VV;\nBB := B^2;\nAB := (A+B)^2-AA-BB;\nC := b*VV^2;\nR := 2*(BB-C);\nX3 := X1*(AB - R);\nZ3 := Z1*(AB + R);\nY3 := Y1*(R^2 - 4*AA*C);\nU3 := X3^2;\nW3 := Z3^2;\nT3 := U3+W3;\nV3 := (X3+Z3)^2-T3;\n"
+        "sha256": "f0a05d5d5479a1a80f838dcca9786fd55a79617b69b64377c89126070c7dad96",
+        "text": "UU:=U1^2;\nWW:=W1^2;\nVV:=V1^2;\nA := 4*(UU - WW);\nAA:=A^2;\nB := 2*(UU + WW) + a*VV;\nBB:=B^2;\nAB:=(A+B)^2-AA-BB;\nC := b*VV^2;\nR:=2*(BB-C);\nX3 := X1*(AB - R);\nZ3 := Z1*(AB + R);\nY3 := Y1*(R^2 - 4*AA*C);\nU3 := X3^2;\nW3 := Z3^2;\nT3 := U3+W3;\nV3 := (X3+Z3)^2-T3;\n"
       },
       "program": {
         "url": "https://www.hyperelliptic.org/EFD/oldefd/extendedquartic.html#legacy-14-program",
