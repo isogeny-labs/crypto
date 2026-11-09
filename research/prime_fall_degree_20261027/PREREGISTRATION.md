@@ -434,3 +434,27 @@ The F4 engine's capacity as G3's scope. The full text, with its evidence, is
 
 Registered per `research/open_leads_execution_20261108/DECISIONS.md` (item 1, decision 6), with the main session's decisions of
 2026-11-09 (rule option 1; `g3` recorded as not run; G3-only job first; the stop rule; the `pfd-b` sentence; the job fields).
+
+## Amendment 12 (2026-11-09; resources only; before the `pfd-b` relaunch is submitted, when no stage B row is admitted)
+
+A price guard replaces Amendment 9's instance pin. The full text, with its evidence, is
+`research/pkm_falldegree_unblock_20261107/AMENDMENT_R2_E_price_guard.md` (R2-E). The binding parts are restated here.
+
+- **Loss.** `pfd-b-20261108` (pinned `r6i.4xlarge`) was lost to Spot reclamation 16 minutes after its pod started (exit 137,
+  "imminent node shutdown", EKS audit log). Nothing from it is admitted. Its one relaunch (owner decision 3) is
+  `pfd-b-20261109-r1`.
+- **Reason for the change.** Spot placement score, measured 2026-11-09: `r6i.4xlarge` alone 3 (region) and 1 (each zone); eight
+  16-vCPU m/r types together 9 (region) and 9, 9, 6 (zones). The pin confines a job of up to 49 h to one Spot pool.
+- **No pin.** Jobs with `seconds` above 90,000 are submitted without `instance_type`. Every other field is unchanged.
+- **Price guard at start.** Within 30 minutes of the pod's start the node's instance type and zone are read from the EKS audit
+  log and the latest Spot price `P` of that type and zone is read. If `(seconds/3600 + 0.25) × (P + 0.0088) > 40`, the job is
+  deleted and resubmitted under a new name. That is a cost-guard stop, not a Spot loss; nothing from the deleted job is admitted.
+- **Price guard while running.** At every check-in (at most 4 h apart), with `h` the hours since the pod started and `Pmax` the
+  highest price read so far: if `h × (Pmax + 0.0088) + (seconds/3600 + 0.25 − h) × (P + 0.0088) > 40`, the job is deleted,
+  reported as "stopped by the cost guard", nothing from it is admitted, and whether to run it again goes to the owner.
+- Each reading is recorded in the job's receipts and in RESULTS.
+- No hypothesis, §6 rule, cell, seed, command, image, memory, cpu, wall budget or job time limit changes. The US$40 per job and
+  US$400 total ceilings are unchanged.
+
+Registered per `research/open_leads_execution_20261108/DECISIONS.md` (item 1, decisions 3, 4 and 6), with the main session's
+decision of 2026-11-09 to enforce the per-job ceiling by observation instead of by the pin.
