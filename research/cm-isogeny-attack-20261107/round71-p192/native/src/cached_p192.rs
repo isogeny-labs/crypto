@@ -648,7 +648,7 @@ fn batch_main() {
         );
         rows.push(json!({"target":key,"j":row["selected_j"],"coefficients":v.iter().map(field).collect::<Vec<_>>(),"selected_response_counts":selected,"direct_validation_counts":direct_counts,"full27_reference_counts":rc,"batch":batch}));
     }
-    let out = json!({"all_checks_pass":true,"mode":if legacy{"legacy_denominator"}else{"one_norm_batch"},"source_setup_counts":source_setup,"target_setups":setups,"rows":rows,"whole_qualifier_counts":big::counts(),"scope":"24 prescribed P192 27-factor block responses,72 formed baby jets,24 final norms; no complete order-r response"});
+    let out = json!({"all_checks_pass":true,"mode":if legacy{"legacy_denominator"}else{"surface_product"},"source_setup_counts":source_setup,"target_setups":setups,"rows":rows,"whole_qualifier_counts":big::counts(),"scope":"24 prescribed P192 27-factor surface responses; direct evaluation, KU not implemented; no complete order-r response"});
     if let Some(i) = args.iter().position(|s| s == "--check") {
         let expected = big::load(&args[i + 1]);
         assert_eq!(out, expected, "changed P192 response record")
