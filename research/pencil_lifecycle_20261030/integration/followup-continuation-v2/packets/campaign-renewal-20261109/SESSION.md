@@ -107,3 +107,39 @@ Finalv2bindings; scientificEKS livecapsaskedoperatorreadback whilelocalworkconti
 
 ## Errors
 No nativefixturefailure. Priorfirstrootfailurepreservedandcharged. [pcc:unverified]
+
+## What was done — 18:21 UTC
+The second root validation attempt terminated during compilation after the Python 3.9 lease parser rejected a valid five-digit fractional timestamp. Exact invocation 2fe218961dcb4bff958ddfd5301234b7 is terminal, MainPID0, cgroup absent; supervisor cleanup confirmed. No controls or full suite ran.
+
+## Decisions made
+Preserve the failed attempt and charge the full 1,800-second allowance. Cumulative debit is 7,140 seconds, leaving 36,060. Prepare a separately reviewed parser correction and current mutable-cache snapshot; continue the independent branch proof replay serially.
+
+## Open threads
+Branch source review completed; release requires current ledger and publication. V3 parser/cache source review and failure archival continue in parallel.
+
+## Errors
+The lease expiry 2026-11-09T18:10:34.65128+00:00 caused ValueError; failed compilation cache is retained and must be rebound before reuse.
+
+## What was done — 18:24 UTC
+Published source/reviews at f4c7f6dcab880705c36c43c2a53cff9f6ea442af and final branch release at 9c51c9bbbc7d1a0c946abf52003911a48cf391fe. PR3768 merged; continuation PR3770 created and attached. Branch replay launched once under frozen362856bf and releasec6b64346; pre-custody passed45.819s, compiler phase active.
+
+## Decisions made
+Reserve3,600seconds, leaving32,460unreserved after7,140charged. Maintain exact T1984epoch3 heartbeat in /var/tmp/pencil-branch-heartbeat-20261109 (session59286); campaignheartbeat remains separate. Execution remainsserial.
+
+## Open threads
+Branch compiler/readback/post-custody; then parser qualification, cache snapshot and v3 full Rust validation. Fresh EKS livecap operator readback remains pending.
+
+## Errors
+No branch failure observed yet. Earlier T1970 failed-completion/passed-seal and1,800-second charge preserved in published PDF/SVG/CSV/JSON.
+
+## What was done — 18:35 UTC
+Branch replay endedfailed after12calls/11passes, four unsolved goals at BranchConjugateOrders56–59; pre/post custodypassed and allownedunits terminal. Actual474.944562s/full3600charged. Parserqualification61/61passed onPython3.9 (0.114837s outer/full60charged). Serialcache snapshot2144files2384062762bytes passed unchanged inventory/hash;1.735095sworker/2.031036souter/full60charged, exactownedunitstopped.
+
+## Decisions made
+Cumulative10860charged, reserve1800rootv3,30540unreserved. Finalv3binds actualnewcache45f46580 and reviewedparser1be89. T1992epoch3 heartbeat session53014 maintainscoordinationonly untilruntimehandoff.
+
+## Open threads
+Publish/review finalv3bindings then fulltests. Branchfour-step correction requires fresh bounded manualreplay; no automaticretry. Preserve newfour-lead PDFmap and reports.
+
+## Errors
+Branch failedsource localaxiomprint includes sorryAx; planned13name audit and maincandidate were notreached. Rootv3earlierepoch1 heartbeat409expired, no payloadusedit; currentepoch3fresh.

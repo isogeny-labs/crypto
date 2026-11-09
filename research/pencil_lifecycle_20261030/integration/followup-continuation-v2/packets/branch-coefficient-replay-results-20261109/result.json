@@ -1,0 +1,68 @@
+{
+  "schema": "branch.native-archival-review/v1",
+  "recorded_machine_status": "failed",
+  "runtime_rerun": false,
+  "independent_kernel_replay": false,
+  "freeze_sha256": "362856bff8013d6d91e2c17a6af906650273b60e4fc048efd59a283eefb154c5",
+  "planned_calls": 18,
+  "actual_calls": 12,
+  "successful_calls": 11,
+  "failed_module": "BranchConjugateOrders",
+  "failed_call": 12,
+  "errors": [
+    "/home/ec2-user/pencil-native-branch-coefficient-20261109/BranchConjugateOrders.lean:56:2: error: unsolved goals",
+    "/home/ec2-user/pencil-native-branch-coefficient-20261109/BranchConjugateOrders.lean:57:2: error: unsolved goals",
+    "/home/ec2-user/pencil-native-branch-coefficient-20261109/BranchConjugateOrders.lean:58:2: error: unsolved goals",
+    "/home/ec2-user/pencil-native-branch-coefficient-20261109/BranchConjugateOrders.lean:59:2: error: unsolved goals"
+  ],
+  "local_failed_axiom_output_contains_sorryAx": true,
+  "planned_readback_names": 13,
+  "actual_planned_readback_names": null,
+  "planned_readback_status": "not_reached",
+  "expected_failure_control_status": "not_reached",
+  "target_theorem_compile_status": "not_reached",
+  "pre_post_dependency_hashes_equal": true,
+  "dependency_files": 16736,
+  "dependency_bytes": 3111892318,
+  "all_copied_source_hashes_match": true,
+  "runtime_pre_post_hashes_match": true,
+  "all_phase_terminal_owners_confirmed": true,
+  "phases": [
+    {
+      "phase": "pre",
+      "passed": true,
+      "elapsed_seconds": 45.81917340197833,
+      "invocation_id": "3d7e175ad62040c0b6223e777fa5c4c3"
+    },
+    {
+      "phase": "compiler",
+      "passed": false,
+      "elapsed_seconds": 395.73286554199876,
+      "invocation_id": "dcd97ab3b3d34ab3bb189a2a58215e8c"
+    },
+    {
+      "phase": "post",
+      "passed": true,
+      "elapsed_seconds": 33.2820538720116,
+      "invocation_id": "51db0a20724c4be5a5d323240b8eb365"
+    }
+  ],
+  "attempt_elapsed_seconds": 474.944561981014,
+  "charged_seconds": 3600,
+  "campaign_charged_after_attempt_seconds": 10740,
+  "resources": {
+    "cpu": 1,
+    "memory_gib": 8,
+    "swap": 0,
+    "tasks": 128
+  },
+  "archived_files": 91,
+  "archive_sha256": "0fd94753db92ec09fee44db251c199df4c761fffda57223d09e3efdfe4a95dc0",
+  "archive_bytes": 2847064,
+  "limitations": [
+    "Source review supports scoped statement but native replay exposes dependency elaboration defects",
+    "No independent binary kernel rechecker",
+    "Shared-cache pre/post identity does not exclude transient concurrent modification",
+    "First eleven successful compiler calls do not establish the unrun target theorem or controls"
+  ]
+}
