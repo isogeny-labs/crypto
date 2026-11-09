@@ -1,0 +1,69 @@
+⚠ [3156/3160] Replayed S3Roots
+warning: S3Roots.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Roots.lean: imports `Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Roots.lean:137:63: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Roots.lean:137:63: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+warning: S3Roots.lean:161:55: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Roots.lean:161:55: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+⚠ [3157/3160] Replayed S3Completion
+warning: S3Completion.lean: imports `Mathlib.FieldTheory.IsAlgClosed.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Completion.lean:25:2: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Completion.lean:25:2: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+warning: S3Completion.lean:67:44: This simp argument is unused:
+  zero_add
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [WeierstrassCurve.Affine.addX, ha1, ha2, hn, zero_mul, mul_zero, add_zero, sub_zero]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+⚠ [3158/3160] Replayed BinaryS3
+warning: BinaryS3.lean: imports `Mathlib.Algebra.CharP.Two` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: BinaryS3.lean:45:0: automatically included section variable(s) unused in theorem `BinaryS3Audit.zero_coordinate_no_root`:
+  [CharP K 2]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CharP K 2] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: BinaryS3.lean:107:0: automatically included section variable(s) unused in theorem `BinaryS3Audit.curve_equation`:
+  [CharP K 2]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CharP K 2] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+warning: BinaryS3.lean:212:0: automatically included section variable(s) unused in theorem `BinaryS3Audit.exists_binary_y`:
+  [CharP K 2]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CharP K 2] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+info: BinaryS3.lean:268:0: 'BinaryS3Audit.binaryS3_pointX_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: BinaryS3.lean:269:0: 'BinaryS3Audit.binaryS3_zero_iff_exists_points' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [3159/3160] Built GeneralS3 (7.5s)
+info: GeneralS3.lean:302:0: 'GeneralS3Audit.generalS3_pointX_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: GeneralS3.lean:303:0: 'GeneralS3Audit.generalS3_zero_iff_exists_points' depends on axioms: [propext, Classical.choice, Quot.sound]
+⚠ [3160/3160] Built GeneralS3Controls (6.7s)
+warning: GeneralS3Controls.lean: imports `Mathlib.FieldTheory.IsAlgClosed.AlgebraicClosure` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: GeneralS3Controls.lean:21:30: This simp argument is unused:
+  CharTwo.neg_eq
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [h4, CharTwo.sub_eq_add, BinaryS3Audit.binaryS3]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: GeneralS3Controls.lean:83:0: 'GeneralS3Audit.nonordinary_binary_extension_counterexample' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: GeneralS3Controls.lean:84:0: 'GeneralS3Audit.characteristic_three_extension_counterexample' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+Build completed successfully (3160 jobs).
