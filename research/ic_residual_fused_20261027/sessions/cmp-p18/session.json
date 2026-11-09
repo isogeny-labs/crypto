@@ -1,0 +1,56 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1h339fa84d70d5",
+  "label": "cmp-p18 local L0: rho, res2, res2-fused",
+  "spec_id": "ECS1h7e3adbdc7787",
+  "spec_sha256": "7e3adbdc77872a6fac480a2447e6c1a3a3e019e24397f4febbb32a1591bc5fb9",
+  "env_class_id": "ECBENV3h8d80c7bc4dfc",
+  "host_sha256": "aec5ff04a435c05d38160f3db339a71238f436fd626c52695a747fb8834d1ffa",
+  "plan_sha256": "4ea8278afb38721d1b8b0028a2bf4e7c73980bf1129cdbaea9430aa2efe73894",
+  "binary_sha256": "d660d64e3da81cb401e33f5093e1fcdb7f64cf7766a28fbc0b73afe4bb097a7f",
+  "git_commit": "0e56891172a4825e8fd6c0a63685161ce9c21197",
+  "git_dirty": true,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": false,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "db1325aca1b2e904875cd5890b474cc8090bafbf32b676ceb75a94f11fadbc5d",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1794080267261,
+  "finished_unix_ms": 1794080271131,
+  "status": "complete",
+  "executions_planned": 96,
+  "records_written": 96,
+  "records_sha256": "6d823a38a32b3b101471687c9541ca12668789c3e6999307c3df094a4bf2b8d9",
+  "status_counts": {
+    "verified": 96
+  },
+  "last_seq": 95
+}

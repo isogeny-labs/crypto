@@ -23,7 +23,7 @@ that the theorems do not depend on `sorryAx`.
 | `AssetSelection.lean` | A universal archive wins when present; otherwise the architecture match is chosen; no match returns `none`. | `src/bin/ic/update.rs`: `choose_asset` |
 | `InstallLayout.lean` | For `<prefix>/bin`, the share tree is `<prefix>/share/cryptocli`; the binary directory is never renamed. | `src/bin/ic/update.rs`: `layout`; `src/bin/ic/install.rs` |
 | `DiskBudget.lean` | The disk estimate includes the 32 MiB overhead, is at least the raw planned bytes, is monotone in planned work and bytes per pair, and the index-off path reserves the final index. | `ecc2k130/codegen/indexcalc_fixed.py`: `requiredBytes`, `pairTableRequiredBytes` |
-| `BatchInversion.lean` | In a commutative group, `x * ((p*x)^{-1} * p) = 1` and `(p*x)^{-1} * p = x^{-1}`; this is the Montgomery step used by `batchInv`. | `ecc2k130/codegen/curves.py`: `Curve.addBatch`; `field.py`: `Onb.batchInv` |
+| `BatchInversion.lean` | In a commutative group, `x * ((p*x)^{-1} * p) = 1`, `(p*x)^{-1} * p = x^{-1}`, and the whole `batchValues` list is pointwise inverse to its inputs. | `ecc2k130/codegen/curves.py`: `Curve.addBatch`; `field.py`: `Onb.batchInv` |
 
 ## Bridges from the model to the code
 

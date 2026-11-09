@@ -1,0 +1,23 @@
+Nat.pow_le_pow_right {n : ℕ} (hx : n > 0) {i j : ℕ} : i ≤ j → n ^ i ≤ n ^ j
+pow_padicValNat_dvd {p n : ℕ} : p ^ padicValNat p n ∣ n
+research/prime_common_scalar_20261108/lean/ApiCheck.lean.txt:6:7: error(lean.unknownIdentifier): Unknown constant `Int.natAbs_lt`
+padicValInt (p : ℕ) (z : ℤ) : ℕ
+research/prime_common_scalar_20261108/lean/ApiCheck.lean.txt:8:7: error(lean.unknownIdentifier): Unknown constant `padicNorm.inv`
+Fin.prod_univ_eq_prod_range.{u_1} {α : Type u_1} [CommMonoid α] (f : ℕ → α) (n : ℕ) :
+  ∏ i, f ↑i = ∏ i ∈ Finset.range n, f i
+Polynomial.toPowerSeries.{u_1} {R : Type u_1} [Semiring R] : Polynomial R → PowerSeries R
+Polynomial.coeToPowerSeries.ringHom.{u_1} {R : Type u_1} [Semiring R] : Polynomial R →+* PowerSeries R
+PowerSeries.isUnit_iff_constantCoeff.{u_1} {R : Type u_1} [Ring R] {φ : PowerSeries R} :
+  IsUnit φ ↔ IsUnit (PowerSeries.constantCoeff φ)
+PowerSeries.invOfUnit.{u_1} {R : Type u_1} [Ring R] (φ : PowerSeries R) (u : Rˣ) : PowerSeries R
+Polynomial.eval₂_at_apply.{u, u_1} {R : Type u} [Semiring R] {p : Polynomial R} {S : Type u_1} [Semiring S]
+  (f : R →+* S) (r : R) : Polynomial.eval₂ f (f r) p = f (Polynomial.eval r p)
+Polynomial.eval₂_comp.{u, v} {R : Type u} {S : Type v} [Semiring R] {p q : Polynomial R} [CommSemiring S] (f : R →+* S)
+  {x : S} : Polynomial.eval₂ f x (p.comp q) = Polynomial.eval₂ f (Polynomial.eval₂ f x q) p
+Polynomial.natDegree_prod_le.{u, w} {R : Type u} {ι : Type w} (s : Finset ι) [CommSemiring R] (f : ι → Polynomial R) :
+  (∏ i ∈ s, f i).natDegree ≤ ∑ i ∈ s, (f i).natDegree
+Finset.prod_erase_mul.{u_1, u_4} {ι : Type u_1} {M : Type u_4} [CommMonoid M] [DecidableEq ι] (s : Finset ι) (f : ι → M)
+  {a : ι} (h : a ∈ s) : (∏ x ∈ s.erase a, f x) * f a = ∏ x ∈ s, f x
+Finset.mul_prod_erase.{u_1, u_4} {ι : Type u_1} {M : Type u_4} [CommMonoid M] [DecidableEq ι] (s : Finset ι) (f : ι → M)
+  {a : ι} (h : a ∈ s) : f a * ∏ x ∈ s.erase a, f x = ∏ x ∈ s, f x
+Polynomial.coeff_coe.{u_1} {R : Type u_1} [Semiring R] (φ : Polynomial R) (n : ℕ) : (PowerSeries.coeff n) ↑φ = φ.coeff n

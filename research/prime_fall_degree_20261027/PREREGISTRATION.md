@@ -350,3 +350,52 @@ as written, including its optional prediction. The binding parts are restated he
 - No outcome is an `S`, a price or a leaderboard row (§8).
 
 Adopted per `research/prime_ic_program_20261029/DECISIONS.md` (D-FD8).
+
+## Amendment 9 (2026-11-08; resources only; before any relaunch request is submitted, when no relaunch row exists)
+
+The 12-vCPU relaunch on `cpu-spot`. The full text, with its evidence, is
+`research/pkm_falldegree_unblock_20261107/AMENDMENT_R2_C_cpu12.md`. The binding parts are restated here.
+
+- **Cause.** The largest node the `cpu-spot` pool can create has 16 vCPU. With `kubeReserved` 1 CPU and `systemReserved` 1 CPU it
+  has 14000m allocatable, and a 14-vCPU pod needs about 14180m once the daemonsets are added, so it is never scheduled
+  (`research/minors_guess_determine_20261107/eks/RELAUNCH_B.md`). The static CPU manager allocates whole cores (`full-pcpus-only`),
+  so 12 vCPU is the largest request that fits.
+- **Resources.** Every relaunch job requests 12 vCPU. `RAYON_NUM_THREADS` is 12: the launcher sets it from the request
+  (`submit-job`), and each job records it in `host.txt` with the instance type (Amendment 7 A). Every job whose time limit exceeds
+  90,000 s is pinned to `r6i.4xlarge`, so that it stays within the owner's ceiling of US$40 per job at the Spot price of
+  2026-11-08. Jobs of 90,000 s or less are not pinned.
+- **Budgets unchanged.** `--budget` stays a wall-clock limit: 1800 s per closure and per F4 system, 900 s in gate 3, 86400 s per
+  capped F4 run (Amendment 7) and 172800 s per `m = 4` closure (Amendment 8). The job time limits are unchanged (at most 176,400 s).
+  A budget stop is censored as §2 and Amendment 7 B define. With fewer threads, a system close to its budget may be censored where 14
+  threads would have finished it. Such a row is reported, never dropped, and reads as a one-sided bound or *undecided*.
+- **Instrument note.** The F4 chunk size depends on the rayon thread count, so F4 `muladds` are compared only between rows with the
+  same recorded thread count. The closure's batches do not depend on it.
+- No hypothesis, rule, cell, seed, memory limit, command or image changes.
+
+Registered per `research/open_leads_execution_20261108/DECISIONS.md` (item 1, decisions 4 and 6), with the main session's
+decisions of 2026-11-08: keep the wall budgets, and pin `r6i.4xlarge` above 90,000 s.
+
+## Amendment 10 (2026-11-08; stage B high-lambda cell; before `pfd-b` is submitted, when no stage B row exists)
+
+The stage B `m = 6`, `t = 6` rule. The full text, with its derivation, is
+`research/pkm_falldegree_unblock_20261107/AMENDMENT_R2_A_stageB_m6t6.md` (R2-A). The binding part is restated here.
+
+- **High-lambda cells.** For `m >= 3`, a cell whose `lambda = |V|^m * 2^(m-1) / (m! * p) >= 0.1` at the prime it runs at
+  is *high-lambda*. It is run as registered (no flag or command changes), and its rows are written. They are reported in a
+  separate table labelled "possibly decomposable (lambda >= 0.1, no certificate)".
+- **Excluded from the rules.** A high-lambda cell is excluded from every §6 median and rule (H-LFD, H-FFD, H-gap, H-null,
+  H-m) and from the Amendment 6, 7 and 8 readings. It is not counted as censored, not read as "`d_F > cmax`", and not
+  redrawn. For H-LFD, "the largest completed `N`" of the `(Kummer, m = 6)` ladder is the largest completed `N` among the
+  cells that are not high-lambda (`t <= 5`).
+- **Low but non-zero lambda.** Cells with `0.01 <= lambda < 0.1` keep the Amendment 7 C label "possibly decomposable" and
+  stay in the rules. `lambda` is computed from `(m, t, p)` and recorded per row; it is not estimated from outcomes.
+- **Scope.** At `P1` the rule changes exactly one registered cell: Kummer `m = 6`, `t = 6` (`lambda = 1.517`, derived).
+  No hypothesis, instrument, budget, seed, request or command changes. The threshold 0.1 is Amendment 1's.
+- **Timing.** Frozen after `pfd-a` (stage A, `m = 2` only, complete) and after `pfd-c` was submitted under Amendment 9.
+  Every cell stage C actually runs (`run.sh hky-C`) has `lambda < 0.1` (derived from `|V| = 2^t`): at `P1` every
+  `m <= 10`, `t <= 3` cell is below 0.01, and the `P0` cells are limited by Amendment 1's `tmax0` to `m <= 5` at `t = 3`
+  (`P0` `t = 3` cells with `m = 9, 10` would exceed 0.1, but they are not run). So this amendment changes no stage C cell.
+  No stage B row exists.
+
+Registered per `research/open_leads_execution_20261108/DECISIONS.md` (item 1, decision 6: "written as a dated protocol
+amendment before its cell runs").

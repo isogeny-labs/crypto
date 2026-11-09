@@ -493,8 +493,18 @@ fn cmd_emit(a: &Args) {
     let pts = e_points(&cv, co);
     assert!(pts.len() >= m, "coset has fewer than m E-columns");
     let mut rng = Rng::new(a.uo("tseed", 1) ^ 0x7A6E7 ^ co.c);
-    // planted target: sum of m distinct base E points with random signs
-    let (chosen, r) = loop {
+    let target = a.so("target", "planted");
+    assert!(target == "planted" || target == "unplanted", "--target must be planted|unplanted");
+    let unplanted = target == "unplanted";
+    // planted target: sum of m distinct base E points with random signs; unplanted: R = [k]G, k from tseed
+    let (chosen, r) = if unplanted {
+        let mut rg = Rng::new(a.uo("tseed", 1) ^ 0x5EED_0F_u64 ^ p.rotate_left(7));
+        let g = cv.rand_point(&mut rg);
+        loop {
+            let k = 1 + rg.below(ci.n - 1);
+            if let Some(r) = cv.mul(k, Some(g)) { break (vec![], r); }
+        }
+    } else { loop {
         let mut idxs: Vec<usize> = vec![];
         while idxs.len() < m { let k = rng.below(pts.len() as u64) as usize; if !idxs.contains(&k) { idxs.push(k); } }
         let mut acc: Pt = None;
@@ -504,30 +514,65 @@ fn cmd_emit(a: &Args) {
             acc = cv.add(acc, Some((x, y)));
         }
         if let Some(r) = acc { break (idxs.iter().map(|&k| pts[k].0).collect::<Vec<_>>(), r); }
-    };
+    } };
     let xr = r.0;
     let nv = m * t as usize;
     let names = var_names(m, t);
     let s = summation_poly(m, nv, &cv, xr);
     let mut eqs = vec![s.clone()];
     eqs.extend(tower_eqs(kind, m, t, p, co.c));
-    // planted assignment
-    let mut asg = vec![0u64; nv];
-    for i in 0..m {
-        let mut y = chosen[i];
-        asg[vidx_y(m, t, i, 0)] = y;
-        for j in 1..t { y = tower_step(kind, y, p); asg[vidx_y(m, t, i, j)] = y; }
-        assert_eq!(tower_step(kind, y, p), co.c, "tower does not end at c");
+    // planted: assignment from the chosen columns must zero every equation.
+    // unplanted: no solution is promised; check well-formedness (tower equations vanish on coset elements,
+    // S is not identically zero, equation/variable counts) and decide decomposability by exhaustive search.
+    let mut decomposes: Option<bool> = None;
+    let mut decomposes_distinct: Option<bool> = None;
+    let asg_of = |xs: &[u64]| -> Vec<u64> {
+        let mut asg = vec![0u64; nv];
+        for i in 0..m {
+            let mut y = xs[i];
+            asg[vidx_y(m, t, i, 0)] = y;
+            for j in 1..t { y = tower_step(kind, y, p); asg[vidx_y(m, t, i, j)] = y; }
+            assert_eq!(tower_step(kind, y, p), co.c, "tower does not end at c");
+        }
+        asg
+    };
+    if !unplanted {
+        let asg = asg_of(&chosen);
+        for (k, e) in eqs.iter().enumerate() { assert_eq!(e.eval(&asg), 0, "planted solution fails equation {k}"); }
+    } else {
+        assert!(eqs.len() == nv + 1 && !s.t.is_empty(), "system not well formed");
+        let xs: Vec<u64> = (0..m).map(|i| co.elems[i % co.elems.len()]).collect();
+        let asg = asg_of(&xs);
+        for (k, e) in eqs.iter().enumerate().skip(1) { assert_eq!(e.eval(&asg), 0, "tower equation {k} fails on a coset element"); }
+        assert!(1u64 << t <= 64 && m <= 3, "decomposition search needs 2^t <= 64 and m <= 3");
+        // exhaustive: does R = sum of m signed E-columns of the coset (x_i may repeat; also distinct-columns variant)?
+        let mut signed: Vec<(usize, Pt)> = vec![];
+        for (k, &(x, y)) in pts.iter().enumerate() { signed.push((k, Some((x, y)))); signed.push((k, Some((x, negm(y, p))))); }
+        let rp: Pt = Some(r);
+        let (mut any, mut dist) = (false, false);
+        if m == 2 {
+            for &(i, u) in &signed { for &(j, v) in &signed {
+                if cv.add(u, v) == rp { any = true; if i != j { dist = true; } }
+            } }
+        } else {
+            for &(i, u) in &signed { for &(j, v) in &signed {
+                let uv = cv.add(u, v);
+                for &(k, w) in &signed {
+                    if cv.add(uv, w) == rp { any = true; if i != j && j != k && i != k { dist = true; } }
+                }
+            } }
+        }
+        decomposes = Some(any); decomposes_distinct = Some(dist);
     }
-    for (k, e) in eqs.iter().enumerate() { assert_eq!(e.eval(&asg), 0, "planted solution fails equation {k}"); }
     let body = eqs.iter().map(|e| e.to_ms(&names)).collect::<Vec<_>>().join(",\n");
     let text = format!("{}\n{}\n{}\n", names.join(","), p, body);
     let out = a.s("out");
     std::fs::write(&out, text).unwrap();
     let meta = json!({"kind": a.s("kind"), "p": p, "t": t, "m": m, "n": ci.n, "curve": curve_json(&ci, a.uo("cseed", 1)),
         "seed": a.u("seed"), "C": a.u("C"), "select": a.so("select", "max"), "selected_index": idx, "c": co.c, "c_E": co.c_e,
-        "tseed": a.uo("tseed", 1), "planted_x": chosen, "xR": xr, "yR": r.1, "vars": nv, "equations": eqs.len(),
-        "S_terms": s.t.len(), "planted_verified": true});
+        "tseed": a.uo("tseed", 1), "planted_x": if unplanted { Value::Null } else { json!(chosen) }, "xR": xr, "yR": r.1, "vars": nv, "equations": eqs.len(),
+        "S_terms": s.t.len(), "planted_verified": !unplanted, "target": target,
+        "decomposes": decomposes, "decomposes_distinct": decomposes_distinct});
     println!("{meta}");
 }
 
@@ -699,6 +744,25 @@ fn cmd_selftest() {
     check("E[max] N=1 equals 1-(1-q)^C", (exp_max_binom(1, 0.3, 5) - (1.0 - 0.7f64.powi(5))).abs() < 1e-9, &mut f);
     let e = exp_max_binom(16, 0.5, 10000);
     check(&format!("E[max] N=16,q=.5,C=1e4 in (14,16) ({e:.4})"), e > 14.0 && e < 16.0, &mut f);
+    // parse: inconsistent system (basis {1}) reports quotient_dim 0 and keeps D / widest / work proxy
+    let inc = "   2    1   5   10 x   8   50.0%   3 new 2 zero 1 | 0.0\n   3    2   5   20 x  16   40.0%   3 new 2 zero 1 | 0.0\nGrobner basis has a single element\nNo solution\n#length of basis:      1 element\n[1]:\n";
+    let pj = parse_log(inc);
+    check("parse: inconsistent log -> quotient_dim 0, D 3, widest 16, work 10*8+20*16",
+        pj["quotient_dim"] == 0 && pj["D_max_deg"] == 3 && pj["widest_cols"] == 16 && pj["sum_rows_x_cols"] == 400 && pj["inconsistent"] == true, &mut f);
+    // unplanted target: [k]G is a uniformly random point; decomposition search agrees with a constructed sum
+    {
+        let ci = find_curve(12289, 1); let cv = ci.curve;
+        let cos = gen_cosets(Kind::Kummer, &cv, 3, 1, 300).unwrap();
+        let (_, co) = select(&cos, "max");
+        let pts = e_points(&cv, co);
+        let n_all = pts.len();
+        let r = cv.add(Some(pts[0]), Some(pts[1]));
+        let mut found = false;
+        for &(x, y) in &pts { for s1 in [y, negm(y, cv.p)] { for &(x2, y2) in &pts { for s2 in [y2, negm(y2, cv.p)] {
+            if cv.add(Some((x, s1)), Some((x2, s2))) == r { found = true; }
+        } } } }
+        check(&format!("unplanted decomposition search finds a constructed sum (c_E {n_all})"), found, &mut f);
+    }
     // small-prime purity m=2 quick (p=1009) and S4 consistency at m=3 tiny
     println!("{}", if f == 0 { "SELFTEST OK" } else { "SELFTEST FAILED" });
     if f != 0 { std::process::exit(1); }
@@ -736,11 +800,15 @@ fn parse_log_impl(txt: &str) -> Value {
         }
     }
     let after = |key: &str| txt.find(key).map(|i| txt[i + key.len()..].trim_start());
-    let quotient = after("Dimension of quotient:").and_then(|s| s.split_whitespace().next()).and_then(|s| s.parse::<u64>().ok());
+    let mut quotient = after("Dimension of quotient:").and_then(|s| s.split_whitespace().next()).and_then(|s| s.parse::<u64>().ok());
+    // inconsistent system: msolve reports basis {1}; dimension line may be absent, "-1" or "0"
+    let inconsistent = txt.contains("Dimension of quotient: -1") || txt.contains("Dimension of quotient: 0")
+        || (quotient.is_none() && (txt.contains("No solution") || txt.contains("Grobner basis has a single element") || txt.contains("[1]") || txt.contains("Groebner basis is [1]") || txt.contains("is inconsistent")));
+    if inconsistent { quotient = Some(0); }
     let wall = after("overall(elapsed)").and_then(|s| s.split_whitespace().next()).and_then(|s| s.parse::<f64>().ok());
     let cpu = after("overall(cpu)").and_then(|s| s.split_whitespace().next()).and_then(|s| s.parse::<f64>().ok());
     json!({"f4_steps": steps, "D_max_deg": maxdeg, "widest_cols": maxcols, "max_rows_x_cols": maxrc,
            "max_matrix_rows": maxrc_dims.0, "max_matrix_cols": maxrc_dims.1,
-           "sum_rows_x_cols": sumrc, "sum_rows": sumrows, "quotient_dim": quotient,
+           "sum_rows_x_cols": sumrc, "sum_rows": sumrows, "quotient_dim": quotient, "inconsistent": inconsistent,
            "wall_s_descriptive": wall, "cpu_s_descriptive": cpu, "deg_sequence": deg_seq})
 }

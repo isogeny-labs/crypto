@@ -57,7 +57,11 @@ Every bound is admissible, at level `exponent`.
   [1.00, 1.10].
 - **P3 holds:** `bsgs.negation` S has an interval that contains 1.
 - **P7 holds:** the A/A paired counts are exactly 1.0000 in every job.
-- **P8 holds at J1:** `rho-neg-v2 / rho-neg` is 1.002 [0.934, 1.074].
+- **P8 fails narrowly at J1** (corrected 2026-11-08, validator finding D1):
+  `rho-neg-v2 / rho-neg` is 1.002 [0.934, 1.074]. The interval contains 1,
+  but its upper end 1.074 is outside the preregistered [0.93, 1.07]. This
+  file first said "P8 holds", which was wrong. P8 does not enter the §9
+  verdict.
 
 ### R(N) fit (`analysis/rfit-rho-neg.json`; figure `analysis/rho-neg-R-of-N.{svg,pdf,png}`)
 
@@ -115,3 +119,13 @@ certificate, a validator report and a matched-rho reference before any row.
   session at a time. That is a tooling gap, recorded here.
 - **rfit binary:** sha256 `7457cb7c…` was built before a layout-only rustfmt
   of `examples/prime_medium_tier_rho_rfit.rs`.
+
+## Follow-up: P4 confirmatory study (2026-11-08)
+
+A separate confirmatory protocol was frozen before any data: `research/prime_medium_rho_p4_confirm_20261108/` (protocol sha256 `26fd5c57…`). It ran ten jobs and 2,160 pairs.
+
+- **Frozen verdict: `inconclusive`.** Gate G3, the positive control, failed. `bsgs.textbook/negation` is designed to read 1.5 and read 1.464, with a 99% interval of [1.438, 1.494].
+- **Primary estimate, descriptive only:** the pooled `rho-plain / rho-neg` ratio is 1.362 [1.320, 1.405].
+- **Detail:** see that study's `RESULTS.md`. Its exploratory analysis traces the positive-control shortfall to an unusually high draw of planted targets. That explanation is a hypothesis.
+
+`[pcc:unverified]`
