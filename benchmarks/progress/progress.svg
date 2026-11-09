@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="3036" viewBox="0 0 900 3036" font-family="Helvetica, Arial, sans-serif" font-size="12">
-<rect width="900" height="3036" fill="white"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="4762" viewBox="0 0 900 4762" font-family="Helvetica, Arial, sans-serif" font-size="12">
+<rect width="900" height="4762" fill="white"/>
 <text x="60" y="30" font-size="18" font-weight="bold">Benchmark progress: crypto</text>
-<text x="60" y="50" fill="#555">Values from bench.record/v1 records; percentages and ratios derived, same unit within a series. Records: open 5, measured 59, invalid 0, censored 3.</text>
+<text x="60" y="50" fill="#555">Values from bench.record/v1 records; percentages and ratios derived, same unit within a series. Records: open 1, measured 72, invalid 0, censored 3.</text>
 <text x="60" y="84" font-weight="bold">Cumulative gain vs first record, unit S (derived, %)</text>
 <rect x="60" y="94" width="560" height="220" fill="none" stroke="#999"/>
 <line x1="60" y1="314.0" x2="620" y2="314.0" stroke="#eee"/>
@@ -41,82 +41,106 @@
 <circle cx="340.0" cy="285.3" r="4" fill="#69879e"><title>20261106T0454Z-cheon-ecbench-medium: 0.5819 S (n=48)</title></circle>
 <rect x="636" y="163" width="10" height="10" fill="#69879e"/>
 <text x="650" y="172">dlpwai:static-dh-p224-shape · s_w0</text>
-<circle cx="60.0" cy="285.3" r="4" fill="#b05c5c"><title>20261104T0835Z-c25519-autolab-r28-k20-32: 2.5746 S (n=64)</title></circle>
+<circle cx="620.0" cy="285.3" r="4" fill="#b05c5c"><title>20261108T2045Z-curve25519-tw-jumps-k20: 2.1364 S (n=512)</title></circle>
 <rect x="636" y="179" width="10" height="10" fill="#b05c5c"/>
-<text x="650" y="188">ic:curve25519-family-k20-32 · s_w0</text>
+<text x="650" y="188">ecdlp:curve25519-family-k20 · s_tw</text>
+<circle cx="620.0" cy="285.3" r="4" fill="#5c8a3a"><title>20261108T2047Z-curve25519-tw-jumps-k24: 1.5834 S (n=512)</title></circle>
+<rect x="636" y="195" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="204">ecdlp:curve25519-family-k24 · s_tw</text>
+<circle cx="620.0" cy="285.3" r="4" fill="#8a5ca8"><title>20261108T2051Z-curve25519-tw-scaling-k28: 1.4349 S (n=512)</title></circle>
+<rect x="636" y="211" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="220">ecdlp:curve25519-family-k28 · s_tw</text>
+<circle cx="620.0" cy="285.3" r="4" fill="#167f73"><title>20261108T2051Z-curve25519-tw-scaling-k32: 1.3871 S (n=512)</title></circle>
+<rect x="636" y="227" width="10" height="10" fill="#167f73"/>
+<text x="650" y="236">ecdlp:curve25519-family-k32 · s_tw</text>
+<circle cx="480.0" cy="285.3" r="4" fill="#637bad"><title>20261107T2135Z-c25519-c1-screen: 2.227 S (n=60)</title></circle>
+<rect x="636" y="243" width="10" height="10" fill="#637bad"/>
+<text x="650" y="252">ic:curve25519-family-k20-32 · c1co</text>
+<circle cx="480.0" cy="285.3" r="4" fill="#aa8b5b"><title>20261107T2135Z-c25519-c1-screen: 1.814 S (n=60)</title></circle>
+<rect x="636" y="259" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="268">ic:curve25519-family-k20-32 · c1co</text>
+<circle cx="480.0" cy="285.3" r="4" fill="#93a1a4"><title>20261107T2135Z-c25519-c1-screen: 1.711 S (n=60)</title></circle>
+<rect x="636" y="275" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="284">ic:curve25519-family-k20-32 · c1co</text>
+<circle cx="480.0" cy="285.3" r="4" fill="#69879e"><title>20261107T2135Z-c25519-c1-screen: 1.545 S (n=60)</title></circle>
+<rect x="636" y="291" width="10" height="10" fill="#69879e"/>
+<text x="650" y="300">ic:curve25519-family-k20-32 · c1co</text>
+<circle cx="60.0" cy="285.3" r="4" fill="#b05c5c"><title>20261104T0835Z-c25519-autolab-r28-k20-32: 2.5746 S (n=64)</title></circle>
+<rect x="636" y="307" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="316">ic:curve25519-family-k20-32 · s_w0</text>
 <polyline fill="none" stroke="#5c8a3a" stroke-width="2" points="60.0,285.3 60.0,241.5"/>
 <circle cx="60.0" cy="285.3" r="4" fill="#5c8a3a"><title>20261104T1114Z-c25519-autolab-r31-k20-32: 2.1638 S (n=64)</title></circle>
 <circle cx="60.0" cy="241.5" r="4" fill="#5c8a3a"><title>20261104T1209Z-c25519-autolab-r33-k20-32: 1.6735 S (n=64)</title></circle>
-<rect x="636" y="195" width="10" height="10" fill="#5c8a3a"/>
-<text x="650" y="204">ic:curve25519-family-k20-32 · s_w0</text>
+<rect x="636" y="323" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="332">ic:curve25519-family-k20-32 · s_w0</text>
 <polyline fill="none" stroke="#8a5ca8" stroke-width="2" points="60.0,285.3 60.0,250.2"/>
 <circle cx="60.0" cy="285.3" r="4" fill="#8a5ca8"><title>20261104T1114Z-c25519-autolab-r31-k20-32: 1.9211 S (n=64)</title></circle>
 <circle cx="60.0" cy="250.2" r="4" fill="#8a5ca8"><title>20261104T1209Z-c25519-autolab-r33-k20-32: 1.5717 S (n=64)</title></circle>
-<rect x="636" y="211" width="10" height="10" fill="#8a5ca8"/>
-<text x="650" y="220">ic:curve25519-family-k20-32 · s_w0</text>
+<rect x="636" y="339" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="348">ic:curve25519-family-k20-32 · s_w0</text>
 <polyline fill="none" stroke="#167f73" stroke-width="2" points="60.0,285.3 60.0,230.8"/>
 <circle cx="60.0" cy="285.3" r="4" fill="#167f73"><title>20261104T1114Z-c25519-autolab-r31-k20-32: 2.11 S (n=64)</title></circle>
 <circle cx="60.0" cy="230.8" r="4" fill="#167f73"><title>20261104T1209Z-c25519-autolab-r33-k20-32: 1.5152 S (n=64)</title></circle>
-<rect x="636" y="227" width="10" height="10" fill="#167f73"/>
-<text x="650" y="236">ic:curve25519-family-k20-32 · s_w0</text>
+<rect x="636" y="355" width="10" height="10" fill="#167f73"/>
+<text x="650" y="364">ic:curve25519-family-k20-32 · s_w0</text>
 <circle cx="200.0" cy="285.3" r="4" fill="#637bad"><title>20261105T1526Z-c25519-multicurve-rebaseline: 2.601 S (n=5)</title></circle>
-<rect x="636" y="243" width="10" height="10" fill="#637bad"/>
-<text x="650" y="252">ic:curve25519-family-k20-32 · s_w0</text>
+<rect x="636" y="371" width="10" height="10" fill="#637bad"/>
+<text x="650" y="380">ic:curve25519-family-k20-32 · s_w0</text>
 <circle cx="200.0" cy="285.3" r="4" fill="#aa8b5b"><title>20261105T1526Z-c25519-multicurve-rebaseline: 2.111 S (n=5)</title></circle>
-<rect x="636" y="259" width="10" height="10" fill="#aa8b5b"/>
-<text x="650" y="268">ic:curve25519-family-k20-32 · s_w0</text>
+<rect x="636" y="387" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="396">ic:curve25519-family-k20-32 · s_w0</text>
 <circle cx="200.0" cy="285.3" r="4" fill="#93a1a4"><title>20261105T1526Z-c25519-multicurve-rebaseline: 1.869 S (n=5)</title></circle>
-<rect x="636" y="275" width="10" height="10" fill="#93a1a4"/>
-<text x="650" y="284">ic:curve25519-family-k20-32 · s_w0</text>
+<rect x="636" y="403" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="412">ic:curve25519-family-k20-32 · s_w0</text>
 <circle cx="200.0" cy="285.3" r="4" fill="#69879e"><title>20261105T1526Z-c25519-multicurve-rebaseline: 1.93 S (n=5)</title></circle>
-<rect x="636" y="291" width="10" height="10" fill="#69879e"/>
-<text x="650" y="300">ic:curve25519-family-k20-32 · s_w0</text>
+<rect x="636" y="419" width="10" height="10" fill="#69879e"/>
+<text x="650" y="428">ic:curve25519-family-k20-32 · s_w0</text>
 <polyline fill="none" stroke="#b05c5c" stroke-width="2" points="60.0,285.3 60.0,295.7 60.0,216.7 60.0,219.1 60.0,204.6"/>
 <circle cx="60.0" cy="285.3" r="4" fill="#b05c5c"><title>20261104T0423Z-c25519-autolab-r7-k20: 8.3478 S (n=64)</title></circle>
 <circle cx="60.0" cy="295.7" r="4" fill="#b05c5c"><title>20261104T0509Z-c25519-autolab-r13-k20: 8.7976 S (n=64)</title></circle>
 <circle cx="60.0" cy="216.7" r="4" fill="#b05c5c"><title>20261104T0642Z-c25519-autolab-r16-k20: 5.384 S (n=64)</title></circle>
 <circle cx="60.0" cy="219.1" r="4" fill="#b05c5c"><title>20261104T0723Z-c25519-autolab-r21-k20: 5.489 S (n=32)</title></circle>
 <circle cx="60.0" cy="204.6" r="4" fill="#b05c5c"><title>20261104T0756Z-c25519-autolab-r25-k20: 4.8598 S (n=64)</title></circle>
-<rect x="636" y="307" width="10" height="10" fill="#b05c5c"/>
-<text x="650" y="316">ic:curve25519-family-k20 · s_w0_in</text>
+<rect x="636" y="435" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="444">ic:curve25519-family-k20 · s_w0_in</text>
 <circle cx="60.0" cy="285.3" r="4" fill="#5c8a3a"><title>20261104T0832Z-c25519-autolab-r27-k24-28: 2.5842 S (n=64)</title></circle>
-<rect x="636" y="323" width="10" height="10" fill="#5c8a3a"/>
-<text x="650" y="332">ic:curve25519-family-k24-28 · s_w0</text>
+<rect x="636" y="451" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="460">ic:curve25519-family-k24-28 · s_w0</text>
 <circle cx="60.0" cy="285.3" r="4" fill="#8a5ca8"><title>20261104T0832Z-c25519-autolab-r27-k24-28: 2.3732 S (n=64)</title></circle>
-<rect x="636" y="339" width="10" height="10" fill="#8a5ca8"/>
-<text x="650" y="348">ic:curve25519-family-k24-28 · s_w0</text>
+<rect x="636" y="467" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="476">ic:curve25519-family-k24-28 · s_w0</text>
 <circle cx="60.0" cy="285.3" r="4" fill="#167f73"><title>20261104T0959Z-c25519-autolab-r30-k24-32: 2.713 S (n=32)</title></circle>
-<rect x="636" y="355" width="10" height="10" fill="#167f73"/>
-<text x="650" y="364">ic:curve25519-family-k24-32 · best</text>
+<rect x="636" y="483" width="10" height="10" fill="#167f73"/>
+<text x="650" y="492">ic:curve25519-family-k24-32 · best</text>
 <circle cx="60.0" cy="285.3" r="4" fill="#637bad"><title>20261104T0954Z-c25519-autolab-r29-k24-32: 2.768 S (n=32)</title></circle>
-<rect x="636" y="371" width="10" height="10" fill="#637bad"/>
-<text x="650" y="380">ic:curve25519-family-k24-32 · best</text>
+<rect x="636" y="499" width="10" height="10" fill="#637bad"/>
+<text x="650" y="508">ic:curve25519-family-k24-32 · best</text>
 <circle cx="60.0" cy="285.3" r="4" fill="#aa8b5b"><title>20261104T1602Z-c25519-rebaseline-seedrun: 2.1055 S (n=64)</title></circle>
-<rect x="636" y="387" width="10" height="10" fill="#aa8b5b"/>
-<text x="650" y="396">ic:curve25519-family-k24-32 · s_w0</text>
+<rect x="636" y="515" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="524">ic:curve25519-family-k24-32 · s_w0</text>
 <circle cx="60.0" cy="285.3" r="4" fill="#93a1a4"><title>20261104T1602Z-c25519-rebaseline-seedrun: 1.8835 S (n=64)</title></circle>
-<rect x="636" y="403" width="10" height="10" fill="#93a1a4"/>
-<text x="650" y="412">ic:curve25519-family-k24-32 · s_w0</text>
+<rect x="636" y="531" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="540">ic:curve25519-family-k24-32 · s_w0</text>
 <circle cx="60.0" cy="285.3" r="4" fill="#69879e"><title>20261104T1602Z-c25519-rebaseline-seedrun: 1.8423 S (n=64)</title></circle>
-<rect x="636" y="419" width="10" height="10" fill="#69879e"/>
-<text x="650" y="428">ic:curve25519-family-k24-32 · s_w0</text>
+<rect x="636" y="547" width="10" height="10" fill="#69879e"/>
+<text x="650" y="556">ic:curve25519-family-k24-32 · s_w0</text>
 <polyline fill="none" stroke="#b05c5c" stroke-width="2" points="60.0,285.3 60.0,292.6 60.0,214.9 60.0,199.7 60.0,189.2"/>
 <circle cx="60.0" cy="285.3" r="4" fill="#b05c5c"><title>20261104T0437Z-c25519-autolab-r11-k24: 6.607 S (n=32)</title></circle>
 <circle cx="60.0" cy="292.6" r="4" fill="#b05c5c"><title>20261104T0445Z-c25519-autolab-r12-k24: 6.857 S (n=32)</title></circle>
 <circle cx="60.0" cy="214.9" r="4" fill="#b05c5c"><title>20261104T0645Z-c25519-autolab-r17-k24: 4.2007 S (n=64)</title></circle>
 <circle cx="60.0" cy="199.7" r="4" fill="#b05c5c"><title>20261104T0722Z-c25519-autolab-r20-k24: 3.678 S (n=64)</title></circle>
 <circle cx="60.0" cy="189.2" r="4" fill="#b05c5c"><title>20261104T0755Z-c25519-autolab-r24-k24: 3.3182 S (n=64)</title></circle>
-<rect x="636" y="435" width="10" height="10" fill="#b05c5c"/>
-<text x="650" y="444">ic:curve25519-family-k24 · s_w0_in</text>
+<rect x="636" y="563" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="572">ic:curve25519-family-k24 · s_w0_in</text>
 <circle cx="60.0" cy="285.3" r="4" fill="#5c8a3a"><title>20261104T0801Z-c25519-autolab-r26-k28-32: 2.5798 S (n=64)</title></circle>
-<rect x="636" y="451" width="10" height="10" fill="#5c8a3a"/>
-<text x="650" y="460">ic:curve25519-family-k28-32 · s_w0</text>
+<rect x="636" y="579" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="588">ic:curve25519-family-k28-32 · s_w0</text>
 <circle cx="60.0" cy="285.3" r="4" fill="#8a5ca8"><title>20261104T1546Z-c25519-r4i1-walk-seed: 1.969 S (n=16)</title></circle>
-<rect x="636" y="467" width="10" height="10" fill="#8a5ca8"/>
-<text x="650" y="476">ic:curve25519-family-k28-32 · s_w0</text>
+<rect x="636" y="595" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="604">ic:curve25519-family-k28-32 · s_w0</text>
 <circle cx="60.0" cy="285.3" r="4" fill="#167f73"><title>20261104T1546Z-c25519-r4i1-walk-seed: 1.781 S (n=16)</title></circle>
-<rect x="636" y="483" width="10" height="10" fill="#167f73"/>
-<text x="650" y="492">ic:curve25519-family-k28-32 · s_w0</text>
+<rect x="636" y="611" width="10" height="10" fill="#167f73"/>
+<text x="650" y="620">ic:curve25519-family-k28-32 · s_w0</text>
 <polyline fill="none" stroke="#637bad" stroke-width="2" points="60.0,285.3 60.0,284.9 60.0,223.6 60.0,221.6 60.0,225.7 60.0,144.2 60.0,137.6"/>
 <circle cx="60.0" cy="285.3" r="4" fill="#637bad"><title>20261104T0411Z-c25519-autolab-r4-k28: 10.9395 S (n=64)</title></circle>
 <circle cx="60.0" cy="284.9" r="4" fill="#637bad"><title>20261104T0421Z-c25519-autolab-r6-k28: 10.9194 S (n=64)</title></circle>
@@ -125,493 +149,752 @@
 <circle cx="60.0" cy="225.7" r="4" fill="#637bad"><title>20261104T0513Z-c25519-autolab-r15-k28: 7.5644 S (n=64)</title></circle>
 <circle cx="60.0" cy="144.2" r="4" fill="#637bad"><title>20261104T0646Z-c25519-autolab-r18-k28: 2.9493 S (n=64)</title></circle>
 <circle cx="60.0" cy="137.6" r="4" fill="#637bad"><title>20261104T0754Z-c25519-autolab-r23-k28: 2.576 S (n=64)</title></circle>
-<rect x="636" y="499" width="10" height="10" fill="#637bad"/>
-<text x="650" y="508">ic:curve25519-family-k28 · s_w0_in</text>
+<rect x="636" y="627" width="10" height="10" fill="#637bad"/>
+<text x="650" y="636">ic:curve25519-family-k28 · s_w0_in</text>
 <polyline fill="none" stroke="#aa8b5b" stroke-width="2" points="60.0,285.3 60.0,158.5 60.0,159.6 60.0,115.7 60.0,112.3"/>
 <circle cx="60.0" cy="285.3" r="4" fill="#aa8b5b"><title>20261104T0412Z-c25519-autolab-r4-k32: 24.1377 S (n=16)</title></circle>
 <circle cx="60.0" cy="158.5" r="4" fill="#aa8b5b"><title>20261104T0414Z-c25519-autolab-r5-k32: 8.2964 S (n=64)</title></circle>
 <circle cx="60.0" cy="159.6" r="4" fill="#aa8b5b"><title>20261104T0428Z-c25519-autolab-r10-k32: 8.4296 S (n=64)</title></circle>
 <circle cx="60.0" cy="115.7" r="4" fill="#aa8b5b"><title>20261104T0648Z-c25519-autolab-r19-k32: 2.9369 S (n=64)</title></circle>
 <circle cx="60.0" cy="112.3" r="4" fill="#aa8b5b"><title>20261104T0750Z-c25519-autolab-r22-k32: 2.519 S (n=64)</title></circle>
-<rect x="636" y="515" width="10" height="10" fill="#aa8b5b"/>
-<text x="650" y="524">ic:curve25519-family-k32 · s_w0_in</text>
-<circle cx="480.0" cy="285.3" r="4" fill="#93a1a4"><title>20261107T1945Z-curve25519-f1-walk-k20: 2.3781 S (n=512)</title></circle>
-<rect x="636" y="531" width="10" height="10" fill="#93a1a4"/>
-<text x="650" y="540">ic:curve25519-k20-single-target · </text>
-<circle cx="480.0" cy="285.3" r="4" fill="#69879e"><title>20261107T1945Z-curve25519-f1-walk-k20: 2.3211 S (n=512)</title></circle>
-<rect x="636" y="547" width="10" height="10" fill="#69879e"/>
-<text x="650" y="556">ic:curve25519-k20-single-target · </text>
-<circle cx="480.0" cy="285.3" r="4" fill="#b05c5c"><title>20261107T1945Z-curve25519-f1-walk-k20: 2.8907 S (n=512)</title></circle>
-<rect x="636" y="563" width="10" height="10" fill="#b05c5c"/>
-<text x="650" y="572">ic:curve25519-k20-single-target · </text>
-<circle cx="480.0" cy="285.3" r="4" fill="#5c8a3a"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 2.1428 S (n=512)</title></circle>
-<rect x="636" y="579" width="10" height="10" fill="#5c8a3a"/>
-<text x="650" y="588">ic:curve25519-k20-single-target · </text>
-<circle cx="480.0" cy="285.3" r="4" fill="#8a5ca8"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 2.1383 S (n=512)</title></circle>
-<rect x="636" y="595" width="10" height="10" fill="#8a5ca8"/>
-<text x="650" y="604">ic:curve25519-k20-single-target · </text>
-<circle cx="480.0" cy="285.3" r="4" fill="#167f73"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 2.183 S (n=512)</title></circle>
-<rect x="636" y="611" width="10" height="10" fill="#167f73"/>
-<text x="650" y="620">ic:curve25519-k20-single-target · </text>
-<circle cx="480.0" cy="285.3" r="4" fill="#637bad"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 1.3895 S (n=512)</title></circle>
-<rect x="636" y="627" width="10" height="10" fill="#637bad"/>
-<text x="650" y="636">ic:curve25519-k20-single-target · </text>
-<circle cx="480.0" cy="285.3" r="4" fill="#aa8b5b"><title>20261107T1947Z-curve25519-f1-walk-k24: 1.8945 S (n=512)</title></circle>
 <rect x="636" y="643" width="10" height="10" fill="#aa8b5b"/>
-<text x="650" y="652">ic:curve25519-k24-single-target · </text>
-<circle cx="480.0" cy="285.3" r="4" fill="#93a1a4"><title>20261107T1947Z-curve25519-f1-walk-k24: 1.8341 S (n=512)</title></circle>
+<text x="650" y="652">ic:curve25519-family-k32 · s_w0_in</text>
+<circle cx="480.0" cy="285.3" r="4" fill="#93a1a4"><title>20261107T1945Z-curve25519-f1-walk-k20: 2.3781 S (n=512)</title></circle>
 <rect x="636" y="659" width="10" height="10" fill="#93a1a4"/>
-<text x="650" y="668">ic:curve25519-k24-single-target · </text>
-<circle cx="480.0" cy="285.3" r="4" fill="#69879e"><title>20261107T1947Z-curve25519-f1-walk-k24: 2.4383 S (n=512)</title></circle>
+<text x="650" y="668">ic:curve25519-k20-single-target · </text>
+<circle cx="480.0" cy="285.3" r="4" fill="#69879e"><title>20261107T1945Z-curve25519-f1-walk-k20: 2.3211 S (n=512)</title></circle>
 <rect x="636" y="675" width="10" height="10" fill="#69879e"/>
-<text x="650" y="684">ic:curve25519-k24-single-target · </text>
-<circle cx="480.0" cy="285.3" r="4" fill="#b05c5c"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 1.6241 S (n=512)</title></circle>
+<text x="650" y="684">ic:curve25519-k20-single-target · </text>
+<circle cx="480.0" cy="285.3" r="4" fill="#b05c5c"><title>20261107T1945Z-curve25519-f1-walk-k20: 2.8907 S (n=512)</title></circle>
 <rect x="636" y="691" width="10" height="10" fill="#b05c5c"/>
-<text x="650" y="700">ic:curve25519-k24-single-target · </text>
-<circle cx="480.0" cy="285.3" r="4" fill="#5c8a3a"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 1.623 S (n=512)</title></circle>
+<text x="650" y="700">ic:curve25519-k20-single-target · </text>
+<circle cx="480.0" cy="285.3" r="4" fill="#5c8a3a"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 2.1428 S (n=512)</title></circle>
 <rect x="636" y="707" width="10" height="10" fill="#5c8a3a"/>
-<text x="650" y="716">ic:curve25519-k24-single-target · </text>
-<circle cx="480.0" cy="285.3" r="4" fill="#8a5ca8"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 1.6342 S (n=512)</title></circle>
+<text x="650" y="716">ic:curve25519-k20-single-target · </text>
+<circle cx="480.0" cy="285.3" r="4" fill="#8a5ca8"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 2.1383 S (n=512)</title></circle>
 <rect x="636" y="723" width="10" height="10" fill="#8a5ca8"/>
-<text x="650" y="732">ic:curve25519-k24-single-target · </text>
-<circle cx="480.0" cy="285.3" r="4" fill="#167f73"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 1.394 S (n=512)</title></circle>
+<text x="650" y="732">ic:curve25519-k20-single-target · </text>
+<circle cx="480.0" cy="285.3" r="4" fill="#167f73"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 2.183 S (n=512)</title></circle>
 <rect x="636" y="739" width="10" height="10" fill="#167f73"/>
-<text x="650" y="748">ic:curve25519-k24-single-target · </text>
-<circle cx="620.0" cy="285.3" r="4" fill="#637bad"><title>20261107T2115Z-prime-medium-rho-bound: 1.0827 S (n=None)</title></circle>
+<text x="650" y="748">ic:curve25519-k20-single-target · </text>
+<circle cx="480.0" cy="285.3" r="4" fill="#637bad"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 1.3895 S (n=512)</title></circle>
 <rect x="636" y="755" width="10" height="10" fill="#637bad"/>
-<text x="650" y="764">rho:prime_medium_tier_bound · prim</text>
-<circle cx="620.0" cy="285.3" r="4" fill="#aa8b5b"><title>20261107T2115Z-prime-medium-rho-bound: 0.9842 S (n=None)</title></circle>
+<text x="650" y="764">ic:curve25519-k20-single-target · </text>
+<circle cx="480.0" cy="285.3" r="4" fill="#aa8b5b"><title>20261107T1947Z-curve25519-f1-walk-k24: 1.8945 S (n=512)</title></circle>
 <rect x="636" y="771" width="10" height="10" fill="#aa8b5b"/>
-<text x="650" y="780">rho:prime_medium_tier_bound · prim</text>
-<circle cx="620.0" cy="285.3" r="4" fill="#93a1a4"><title>20261107T2115Z-prime-medium-rho-bound: 1.9684 S (n=None)</title></circle>
+<text x="650" y="780">ic:curve25519-k24-single-target · </text>
+<circle cx="480.0" cy="285.3" r="4" fill="#93a1a4"><title>20261107T1947Z-curve25519-f1-walk-k24: 1.8341 S (n=512)</title></circle>
 <rect x="636" y="787" width="10" height="10" fill="#93a1a4"/>
-<text x="650" y="796">rho:prime_medium_tier_bound · prim</text>
-<circle cx="620.0" cy="285.3" r="4" fill="#69879e"><title>20261107T2115Z-prime-medium-rho-bound: 1.0422 S (n=None)</title></circle>
+<text x="650" y="796">ic:curve25519-k24-single-target · </text>
+<circle cx="480.0" cy="285.3" r="4" fill="#69879e"><title>20261107T1947Z-curve25519-f1-walk-k24: 2.4383 S (n=512)</title></circle>
 <rect x="636" y="803" width="10" height="10" fill="#69879e"/>
-<text x="650" y="812">rho:prime_medium_tier_bound · prim</text>
-<circle cx="620.0" cy="285.3" r="4" fill="#b05c5c"><title>20261107T2115Z-prime-medium-rho-bound: 0.9473 S (n=None)</title></circle>
+<text x="650" y="812">ic:curve25519-k24-single-target · </text>
+<circle cx="480.0" cy="285.3" r="4" fill="#b05c5c"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 1.6241 S (n=512)</title></circle>
 <rect x="636" y="819" width="10" height="10" fill="#b05c5c"/>
-<text x="650" y="828">rho:prime_medium_tier_bound · prim</text>
-<circle cx="620.0" cy="285.3" r="4" fill="#5c8a3a"><title>20261107T2115Z-prime-medium-rho-bound: 1.8961 S (n=None)</title></circle>
+<text x="650" y="828">ic:curve25519-k24-single-target · </text>
+<circle cx="480.0" cy="285.3" r="4" fill="#5c8a3a"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 1.623 S (n=512)</title></circle>
 <rect x="636" y="835" width="10" height="10" fill="#5c8a3a"/>
-<text x="650" y="844">rho:prime_medium_tier_bound · prim</text>
-<circle cx="620.0" cy="285.3" r="4" fill="#8a5ca8"><title>20261107T2115Z-prime-medium-rho-bound: 1.0658 S (n=None)</title></circle>
+<text x="650" y="844">ic:curve25519-k24-single-target · </text>
+<circle cx="480.0" cy="285.3" r="4" fill="#8a5ca8"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 1.6342 S (n=512)</title></circle>
 <rect x="636" y="851" width="10" height="10" fill="#8a5ca8"/>
-<text x="650" y="860">rho:prime_medium_tier_bound · prim</text>
-<circle cx="620.0" cy="285.3" r="4" fill="#167f73"><title>20261107T2115Z-prime-medium-rho-bound: 0.969 S (n=None)</title></circle>
+<text x="650" y="860">ic:curve25519-k24-single-target · </text>
+<circle cx="480.0" cy="285.3" r="4" fill="#167f73"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 1.394 S (n=512)</title></circle>
 <rect x="636" y="867" width="10" height="10" fill="#167f73"/>
-<text x="650" y="876">rho:prime_medium_tier_bound · prim</text>
-<circle cx="620.0" cy="285.3" r="4" fill="#637bad"><title>20261107T2115Z-prime-medium-rho-bound: 1.9367 S (n=None)</title></circle>
+<text x="650" y="876">ic:curve25519-k24-single-target · </text>
+<circle cx="620.0" cy="285.3" r="4" fill="#637bad"><title>20261108T2319Z-c25519-bsgs-boundary: 0.981 S (n=60)</title></circle>
 <rect x="636" y="883" width="10" height="10" fill="#637bad"/>
-<text x="650" y="892">rho:prime_medium_tier_bound · prim</text>
-<circle cx="620.0" cy="285.3" r="4" fill="#aa8b5b"><title>20261107T2115Z-prime-medium-rho-bound: 1.2703 S (n=None)</title></circle>
+<text x="650" y="892">kernel:c25519_family_bsgs_vs_rho ·</text>
+<circle cx="620.0" cy="285.3" r="4" fill="#aa8b5b"><title>20261108T2319Z-c25519-bsgs-boundary: 1.041 S (n=60)</title></circle>
 <rect x="636" y="899" width="10" height="10" fill="#aa8b5b"/>
-<text x="650" y="908">rho:prime_medium_tier_bound · prim</text>
-<circle cx="620.0" cy="285.3" r="4" fill="#93a1a4"><title>20261107T2115Z-prime-medium-rho-bound: 1.2703 S (n=None)</title></circle>
+<text x="650" y="908">kernel:c25519_family_bsgs_vs_rho ·</text>
+<circle cx="620.0" cy="285.3" r="4" fill="#93a1a4"><title>20261107T2115Z-prime-medium-rho-bound: 1.0827 S (n=None)</title></circle>
 <rect x="636" y="915" width="10" height="10" fill="#93a1a4"/>
 <text x="650" y="924">rho:prime_medium_tier_bound · prim</text>
-<circle cx="620.0" cy="285.3" r="4" fill="#69879e"><title>20261107T2115Z-prime-medium-rho-bound: 1.2703 S (n=None)</title></circle>
+<circle cx="620.0" cy="285.3" r="4" fill="#69879e"><title>20261107T2115Z-prime-medium-rho-bound: 0.9842 S (n=None)</title></circle>
 <rect x="636" y="931" width="10" height="10" fill="#69879e"/>
 <text x="650" y="940">rho:prime_medium_tier_bound · prim</text>
-<text x="60" y="978" font-weight="bold">Distance remaining: value / reference (1.0 = parity; derived)</text>
-<rect x="60" y="988" width="560" height="220" fill="none" stroke="#999"/>
-<line x1="60" y1="1208.0" x2="620" y2="1208.0" stroke="#eee"/>
-<text x="54" y="1212.0" text-anchor="end" fill="#555">0.385</text>
-<line x1="60" y1="1153.0" x2="620" y2="1153.0" stroke="#eee"/>
-<text x="54" y="1157.0" text-anchor="end" fill="#555">1.28</text>
-<line x1="60" y1="1098.0" x2="620" y2="1098.0" stroke="#eee"/>
-<text x="54" y="1102.0" text-anchor="end" fill="#555">4.26</text>
-<line x1="60" y1="1043.0" x2="620" y2="1043.0" stroke="#eee"/>
-<text x="54" y="1047.0" text-anchor="end" fill="#555">14.2</text>
-<line x1="60" y1="988.0" x2="620" y2="988.0" stroke="#eee"/>
-<text x="54" y="992.0" text-anchor="end" fill="#555">47.2</text>
-<text x="60.0" y="1224" text-anchor="middle" fill="#555">2026-11-04</text>
-<text x="246.7" y="1224" text-anchor="middle" fill="#555">2026-11-05</text>
-<text x="433.3" y="1224" text-anchor="middle" fill="#555">2026-11-06</text>
-<text x="620.0" y="1224" text-anchor="middle" fill="#555">2026-11-07</text>
-<line x1="60" y1="1164.3" x2="620" y2="1164.3" stroke="#bbb" stroke-dasharray="4 3"/>
-<text x="616" y="1160.3" text-anchor="end" fill="#777">parity</text>
-<text transform="translate(16,1098.0) rotate(-90)" text-anchor="middle" fill="#555">value / reference</text>
-<circle cx="246.7" cy="1006.6" r="4" fill="#167f73"><title>20261105T1759Z-ic-packed-filter-p32: 31.6936 S (n=None)</title></circle>
-<rect x="636" y="993" width="10" height="10" fill="#167f73"/>
-<text x="650" y="1002">archive:ic-packed-filter-p32-20261</text>
-<circle cx="246.7" cy="1006.3" r="4" fill="#637bad"><title>20261105T1759Z-ic-packed-filter-p32: 63.4961 S (n=None)</title></circle>
-<rect x="636" y="1009" width="10" height="10" fill="#637bad"/>
-<text x="650" y="1018">archive:ic-packed-filter-p32-20261</text>
-<polyline fill="none" stroke="#aa8b5b" stroke-width="2" points="433.3,1189.1 433.3,1189.1"/>
-<circle cx="433.3" cy="1189.1" r="4" fill="#aa8b5b"><title>20261106T0450Z-cheon-ecbench: 0.5739 S (n=48)</title></circle>
-<circle cx="433.3" cy="1189.1" r="4" fill="#aa8b5b"><title>20261106T0454Z-cheon-ecbench-medium: 0.5739 S (n=48)</title></circle>
-<rect x="636" y="1025" width="10" height="10" fill="#aa8b5b"/>
-<text x="650" y="1034">dlpwai:static-dh-p224-shape · s_w0</text>
-<polyline fill="none" stroke="#93a1a4" stroke-width="2" points="433.3,1052.2 433.3,1052.2"/>
-<circle cx="433.3" cy="1052.2" r="4" fill="#93a1a4"><title>20261106T0450Z-cheon-ecbench: 12.2426 S (n=40)</title></circle>
-<circle cx="433.3" cy="1052.2" r="4" fill="#93a1a4"><title>20261106T0454Z-cheon-ecbench-medium: 12.2426 S (n=40)</title></circle>
-<rect x="636" y="1041" width="10" height="10" fill="#93a1a4"/>
-<text x="650" y="1050">dlpwai:static-dh-p224-shape · s_w0</text>
-<polyline fill="none" stroke="#69879e" stroke-width="2" points="433.3,1189.7 433.3,1189.7"/>
-<circle cx="433.3" cy="1189.7" r="4" fill="#69879e"><title>20261106T0450Z-cheon-ecbench: 0.5819 S (n=48)</title></circle>
-<circle cx="433.3" cy="1189.7" r="4" fill="#69879e"><title>20261106T0454Z-cheon-ecbench-medium: 0.5819 S (n=48)</title></circle>
-<rect x="636" y="1057" width="10" height="10" fill="#69879e"/>
-<text x="650" y="1066">dlpwai:static-dh-p224-shape · s_w0</text>
-<circle cx="60.0" cy="1138.5" r="4" fill="#b05c5c"><title>20261104T0835Z-c25519-autolab-r28-k20-32: 2.5746 S (n=64)</title></circle>
-<rect x="636" y="1073" width="10" height="10" fill="#b05c5c"/>
-<text x="650" y="1082">ic:curve25519-family-k20-32 · s_w0</text>
-<polyline fill="none" stroke="#5c8a3a" stroke-width="2" points="60.0,1138.2 60.0,1148.0"/>
-<circle cx="60.0" cy="1138.2" r="4" fill="#5c8a3a"><title>20261104T1114Z-c25519-autolab-r31-k20-32: 2.1638 S (n=64)</title></circle>
-<circle cx="60.0" cy="1148.0" r="4" fill="#5c8a3a"><title>20261104T1209Z-c25519-autolab-r33-k20-32: 1.6735 S (n=64)</title></circle>
-<rect x="636" y="1089" width="10" height="10" fill="#5c8a3a"/>
-<text x="650" y="1098">ic:curve25519-family-k20-32 · s_w0</text>
-<polyline fill="none" stroke="#8a5ca8" stroke-width="2" points="60.0,1131.2 60.0,1145.9"/>
-<circle cx="60.0" cy="1131.2" r="4" fill="#8a5ca8"><title>20261104T1114Z-c25519-autolab-r31-k20-32: 1.9211 S (n=64)</title></circle>
-<circle cx="60.0" cy="1145.9" r="4" fill="#8a5ca8"><title>20261104T1209Z-c25519-autolab-r33-k20-32: 1.5717 S (n=64)</title></circle>
-<rect x="636" y="1105" width="10" height="10" fill="#8a5ca8"/>
-<text x="650" y="1114">ic:curve25519-family-k20-32 · s_w0</text>
-<polyline fill="none" stroke="#167f73" stroke-width="2" points="60.0,1123.9 60.0,1144.2"/>
-<circle cx="60.0" cy="1123.9" r="4" fill="#167f73"><title>20261104T1114Z-c25519-autolab-r31-k20-32: 2.11 S (n=64)</title></circle>
-<circle cx="60.0" cy="1144.2" r="4" fill="#167f73"><title>20261104T1209Z-c25519-autolab-r33-k20-32: 1.5152 S (n=64)</title></circle>
-<rect x="636" y="1121" width="10" height="10" fill="#167f73"/>
-<text x="650" y="1130">ic:curve25519-family-k20-32 · s_w0</text>
-<circle cx="246.7" cy="1143.8" r="4" fill="#637bad"><title>20261105T1526Z-c25519-multicurve-rebaseline: 2.601 S (n=5)</title></circle>
-<rect x="636" y="1137" width="10" height="10" fill="#637bad"/>
-<text x="650" y="1146">ic:curve25519-family-k20-32 · s_w0</text>
-<circle cx="246.7" cy="1138.2" r="4" fill="#aa8b5b"><title>20261105T1526Z-c25519-multicurve-rebaseline: 2.111 S (n=5)</title></circle>
-<rect x="636" y="1153" width="10" height="10" fill="#aa8b5b"/>
-<text x="650" y="1162">ic:curve25519-family-k20-32 · s_w0</text>
-<circle cx="246.7" cy="1137.5" r="4" fill="#93a1a4"><title>20261105T1526Z-c25519-multicurve-rebaseline: 1.869 S (n=5)</title></circle>
-<rect x="636" y="1169" width="10" height="10" fill="#93a1a4"/>
-<text x="650" y="1178">ic:curve25519-family-k20-32 · s_w0</text>
-<circle cx="246.7" cy="1134.8" r="4" fill="#69879e"><title>20261105T1526Z-c25519-multicurve-rebaseline: 1.93 S (n=5)</title></circle>
-<rect x="636" y="1185" width="10" height="10" fill="#69879e"/>
-<text x="650" y="1194">ic:curve25519-family-k20-32 · s_w0</text>
-<polyline fill="none" stroke="#b05c5c" stroke-width="2" points="60.0,1094.1 60.0,1085.9 60.0,1105.5 60.0,1104.1 60.0,1110.6"/>
-<circle cx="60.0" cy="1094.1" r="4" fill="#b05c5c"><title>20261104T0423Z-c25519-autolab-r7-k20: 8.3478 S (n=64)</title></circle>
-<circle cx="60.0" cy="1085.9" r="4" fill="#b05c5c"><title>20261104T0509Z-c25519-autolab-r13-k20: 8.7976 S (n=64)</title></circle>
-<circle cx="60.0" cy="1105.5" r="4" fill="#b05c5c"><title>20261104T0642Z-c25519-autolab-r16-k20: 5.384 S (n=64)</title></circle>
-<circle cx="60.0" cy="1104.1" r="4" fill="#b05c5c"><title>20261104T0723Z-c25519-autolab-r21-k20: 5.489 S (n=32)</title></circle>
-<circle cx="60.0" cy="1110.6" r="4" fill="#b05c5c"><title>20261104T0756Z-c25519-autolab-r25-k20: 4.8598 S (n=64)</title></circle>
-<rect x="636" y="1201" width="10" height="10" fill="#b05c5c"/>
-<text x="650" y="1210">ic:curve25519-family-k20 · s_w0_in</text>
-<circle cx="60.0" cy="1131.9" r="4" fill="#5c8a3a"><title>20261104T0832Z-c25519-autolab-r27-k24-28: 2.5842 S (n=64)</title></circle>
-<rect x="636" y="1217" width="10" height="10" fill="#5c8a3a"/>
-<text x="650" y="1226">ic:curve25519-family-k24-28 · s_w0</text>
-<circle cx="60.0" cy="1124.5" r="4" fill="#8a5ca8"><title>20261104T0832Z-c25519-autolab-r27-k24-28: 2.3732 S (n=64)</title></circle>
-<rect x="636" y="1233" width="10" height="10" fill="#8a5ca8"/>
-<text x="650" y="1242">ic:curve25519-family-k24-28 · s_w0</text>
-<circle cx="60.0" cy="1134.0" r="4" fill="#167f73"><title>20261104T1602Z-c25519-rebaseline-seedrun: 2.1055 S (n=64)</title></circle>
-<rect x="636" y="1249" width="10" height="10" fill="#167f73"/>
-<text x="650" y="1258">ic:curve25519-family-k24-32 · s_w0</text>
-<circle cx="60.0" cy="1137.0" r="4" fill="#637bad"><title>20261104T1602Z-c25519-rebaseline-seedrun: 1.8835 S (n=64)</title></circle>
-<rect x="636" y="1265" width="10" height="10" fill="#637bad"/>
-<text x="650" y="1274">ic:curve25519-family-k24-32 · s_w0</text>
-<circle cx="60.0" cy="1136.8" r="4" fill="#aa8b5b"><title>20261104T1602Z-c25519-rebaseline-seedrun: 1.8423 S (n=64)</title></circle>
-<rect x="636" y="1281" width="10" height="10" fill="#aa8b5b"/>
-<text x="650" y="1290">ic:curve25519-family-k24-32 · s_w0</text>
-<polyline fill="none" stroke="#93a1a4" stroke-width="2" points="60.0,1084.2 60.0,1086.0 60.0,1108.3 60.0,1113.4 60.0,1118.6"/>
-<circle cx="60.0" cy="1084.2" r="4" fill="#93a1a4"><title>20261104T0437Z-c25519-autolab-r11-k24: 6.607 S (n=32)</title></circle>
-<circle cx="60.0" cy="1086.0" r="4" fill="#93a1a4"><title>20261104T0445Z-c25519-autolab-r12-k24: 6.857 S (n=32)</title></circle>
-<circle cx="60.0" cy="1108.3" r="4" fill="#93a1a4"><title>20261104T0645Z-c25519-autolab-r17-k24: 4.2007 S (n=64)</title></circle>
-<circle cx="60.0" cy="1113.4" r="4" fill="#93a1a4"><title>20261104T0722Z-c25519-autolab-r20-k24: 3.678 S (n=64)</title></circle>
-<circle cx="60.0" cy="1118.6" r="4" fill="#93a1a4"><title>20261104T0755Z-c25519-autolab-r24-k24: 3.3182 S (n=64)</title></circle>
-<rect x="636" y="1297" width="10" height="10" fill="#93a1a4"/>
-<text x="650" y="1306">ic:curve25519-family-k24 · s_w0_in</text>
-<circle cx="60.0" cy="1120.8" r="4" fill="#69879e"><title>20261104T0801Z-c25519-autolab-r26-k28-32: 2.5798 S (n=64)</title></circle>
-<rect x="636" y="1313" width="10" height="10" fill="#69879e"/>
-<text x="650" y="1322">ic:curve25519-family-k28-32 · s_w0</text>
-<circle cx="60.0" cy="1136.0" r="4" fill="#b05c5c"><title>20261104T1546Z-c25519-r4i1-walk-seed: 1.969 S (n=16)</title></circle>
-<rect x="636" y="1329" width="10" height="10" fill="#b05c5c"/>
-<text x="650" y="1338">ic:curve25519-family-k28-32 · s_w0</text>
-<circle cx="60.0" cy="1136.9" r="4" fill="#5c8a3a"><title>20261104T1546Z-c25519-r4i1-walk-seed: 1.781 S (n=16)</title></circle>
-<rect x="636" y="1345" width="10" height="10" fill="#5c8a3a"/>
-<text x="650" y="1354">ic:curve25519-family-k28-32 · s_w0</text>
-<polyline fill="none" stroke="#8a5ca8" stroke-width="2" points="60.0,1055.6 60.0,1056.8 60.0,1070.5 60.0,1077.1 60.0,1076.8 60.0,1114.0 60.0,1117.9"/>
-<circle cx="60.0" cy="1055.6" r="4" fill="#8a5ca8"><title>20261104T0411Z-c25519-autolab-r4-k28: 10.9395 S (n=64)</title></circle>
-<circle cx="60.0" cy="1056.8" r="4" fill="#8a5ca8"><title>20261104T0421Z-c25519-autolab-r6-k28: 10.9194 S (n=64)</title></circle>
-<circle cx="60.0" cy="1070.5" r="4" fill="#8a5ca8"><title>20261104T0425Z-c25519-autolab-r8-k28: 7.4448 S (n=64)</title></circle>
-<circle cx="60.0" cy="1077.1" r="4" fill="#8a5ca8"><title>20261104T0511Z-c25519-autolab-r14-k28: 7.33 S (n=32)</title></circle>
-<circle cx="60.0" cy="1076.8" r="4" fill="#8a5ca8"><title>20261104T0513Z-c25519-autolab-r15-k28: 7.5644 S (n=64)</title></circle>
-<circle cx="60.0" cy="1114.0" r="4" fill="#8a5ca8"><title>20261104T0646Z-c25519-autolab-r18-k28: 2.9493 S (n=64)</title></circle>
-<circle cx="60.0" cy="1117.9" r="4" fill="#8a5ca8"><title>20261104T0754Z-c25519-autolab-r23-k28: 2.576 S (n=64)</title></circle>
-<rect x="636" y="1361" width="10" height="10" fill="#8a5ca8"/>
-<text x="650" y="1370">ic:curve25519-family-k28 · s_w0_in</text>
-<polyline fill="none" stroke="#167f73" stroke-width="2" points="60.0,1011.0 60.0,1063.3 60.0,1066.2 60.0,1112.2 60.0,1118.1"/>
-<circle cx="60.0" cy="1011.0" r="4" fill="#167f73"><title>20261104T0412Z-c25519-autolab-r4-k32: 24.1377 S (n=16)</title></circle>
-<circle cx="60.0" cy="1063.3" r="4" fill="#167f73"><title>20261104T0414Z-c25519-autolab-r5-k32: 8.2964 S (n=64)</title></circle>
-<circle cx="60.0" cy="1066.2" r="4" fill="#167f73"><title>20261104T0428Z-c25519-autolab-r10-k32: 8.4296 S (n=64)</title></circle>
-<circle cx="60.0" cy="1112.2" r="4" fill="#167f73"><title>20261104T0648Z-c25519-autolab-r19-k32: 2.9369 S (n=64)</title></circle>
-<circle cx="60.0" cy="1118.1" r="4" fill="#167f73"><title>20261104T0750Z-c25519-autolab-r22-k32: 2.519 S (n=64)</title></circle>
-<rect x="636" y="1377" width="10" height="10" fill="#167f73"/>
-<text x="650" y="1386">ic:curve25519-family-k32 · s_w0_in</text>
-<circle cx="620.0" cy="1148.0" r="4" fill="#637bad"><title>20261107T1945Z-curve25519-f1-walk-k20: 2.3781 S (n=512)</title></circle>
-<rect x="636" y="1393" width="10" height="10" fill="#637bad"/>
-<text x="650" y="1402">ic:curve25519-k20-single-target · </text>
-<circle cx="620.0" cy="1145.9" r="4" fill="#aa8b5b"><title>20261107T1945Z-curve25519-f1-walk-k20: 2.3211 S (n=512)</title></circle>
-<rect x="636" y="1409" width="10" height="10" fill="#aa8b5b"/>
-<text x="650" y="1418">ic:curve25519-k20-single-target · </text>
-<circle cx="620.0" cy="1160.7" r="4" fill="#93a1a4"><title>20261107T1945Z-curve25519-f1-walk-k20: 2.8907 S (n=512)</title></circle>
-<rect x="636" y="1425" width="10" height="10" fill="#93a1a4"/>
-<text x="650" y="1434">ic:curve25519-k20-single-target · </text>
-<circle cx="620.0" cy="1152.1" r="4" fill="#69879e"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 2.1428 S (n=512)</title></circle>
-<rect x="636" y="1441" width="10" height="10" fill="#69879e"/>
-<text x="650" y="1450">ic:curve25519-k20-single-target · </text>
-<circle cx="620.0" cy="1149.0" r="4" fill="#b05c5c"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 2.1383 S (n=512)</title></circle>
-<rect x="636" y="1457" width="10" height="10" fill="#b05c5c"/>
-<text x="650" y="1466">ic:curve25519-k20-single-target · </text>
-<circle cx="620.0" cy="1172.8" r="4" fill="#5c8a3a"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 2.183 S (n=512)</title></circle>
-<rect x="636" y="1473" width="10" height="10" fill="#5c8a3a"/>
-<text x="650" y="1482">ic:curve25519-k20-single-target · </text>
-<circle cx="620.0" cy="1145.8" r="4" fill="#8a5ca8"><title>20261107T1947Z-curve25519-f1-walk-k24: 1.8945 S (n=512)</title></circle>
-<rect x="636" y="1489" width="10" height="10" fill="#8a5ca8"/>
-<text x="650" y="1498">ic:curve25519-k24-single-target · </text>
-<circle cx="620.0" cy="1143.4" r="4" fill="#167f73"><title>20261107T1947Z-curve25519-f1-walk-k24: 1.8341 S (n=512)</title></circle>
-<rect x="636" y="1505" width="10" height="10" fill="#167f73"/>
-<text x="650" y="1514">ic:curve25519-k24-single-target · </text>
-<circle cx="620.0" cy="1159.7" r="4" fill="#637bad"><title>20261107T1947Z-curve25519-f1-walk-k24: 2.4383 S (n=512)</title></circle>
-<rect x="636" y="1521" width="10" height="10" fill="#637bad"/>
-<text x="650" y="1530">ic:curve25519-k24-single-target · </text>
-<circle cx="620.0" cy="1152.5" r="4" fill="#aa8b5b"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 1.6241 S (n=512)</title></circle>
-<rect x="636" y="1537" width="10" height="10" fill="#aa8b5b"/>
-<text x="650" y="1546">ic:curve25519-k24-single-target · </text>
-<circle cx="620.0" cy="1148.6" r="4" fill="#93a1a4"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 1.623 S (n=512)</title></circle>
-<rect x="636" y="1553" width="10" height="10" fill="#93a1a4"/>
-<text x="650" y="1562">ic:curve25519-k24-single-target · </text>
-<circle cx="620.0" cy="1177.5" r="4" fill="#69879e"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 1.6342 S (n=512)</title></circle>
-<rect x="636" y="1569" width="10" height="10" fill="#69879e"/>
-<text x="650" y="1578">ic:curve25519-k24-single-target · </text>
-<text x="60" y="1616" font-weight="bold">Series in unit count: gain vs first record (derived, %)</text>
-<rect x="60" y="1626" width="560" height="220" fill="none" stroke="#999"/>
-<line x1="60" y1="1846.0" x2="620" y2="1846.0" stroke="#eee"/>
-<text x="54" y="1850.0" text-anchor="end" fill="#555">-7.5</text>
-<line x1="60" y1="1791.0" x2="620" y2="1791.0" stroke="#eee"/>
-<text x="54" y="1795.0" text-anchor="end" fill="#555">15</text>
-<line x1="60" y1="1736.0" x2="620" y2="1736.0" stroke="#eee"/>
-<text x="54" y="1740.0" text-anchor="end" fill="#555">37.5</text>
-<line x1="60" y1="1681.0" x2="620" y2="1681.0" stroke="#eee"/>
-<text x="54" y="1685.0" text-anchor="end" fill="#555">60</text>
-<line x1="60" y1="1626.0" x2="620" y2="1626.0" stroke="#eee"/>
-<text x="54" y="1630.0" text-anchor="end" fill="#555">82.5</text>
-<text x="60.0" y="1862" text-anchor="middle" fill="#555">2026-11-07</text>
-<text x="246.7" y="1862" text-anchor="middle" fill="#555">2026-11-07</text>
-<text x="433.3" y="1862" text-anchor="middle" fill="#555">2026-11-08</text>
-<text x="620.0" y="1862" text-anchor="middle" fill="#555">2026-11-08</text>
-<line x1="60" y1="1827.7" x2="620" y2="1827.7" stroke="#bbb" stroke-dasharray="4 3"/>
-<text transform="translate(16,1736.0) rotate(-90)" text-anchor="middle" fill="#555">% better than first</text>
-<rect x="636" y="1631" width="10" height="10" fill="#167f73"/>
-<text x="650" y="1640">analysis:ecbench_statistics_v2 · h</text>
-<rect x="636" y="1647" width="10" height="10" fill="#637bad"/>
-<text x="650" y="1656">archive:icb-large-prime-n53-s1-202</text>
-<rect x="636" y="1663" width="10" height="10" fill="#aa8b5b"/>
-<text x="650" y="1672">archive:icb-large-prime-n53-s2-202</text>
-<rect x="636" y="1679" width="10" height="10" fill="#93a1a4"/>
-<text x="650" y="1688">archive:icb-large-prime-n61-s1-202</text>
-<rect x="636" y="1695" width="10" height="10" fill="#69879e"/>
-<text x="650" y="1704">archive:icb-large-prime-n61-s2-202</text>
-<rect x="636" y="1711" width="10" height="10" fill="#b05c5c"/>
-<text x="650" y="1720">ecdlp:split-prime-p3-cross-trace-c</text>
-<rect x="636" y="1727" width="10" height="10" fill="#5c8a3a"/>
-<text x="650" y="1736">ecdlp:split-prime-p3-cross-trace-c</text>
-<polyline fill="none" stroke="#8a5ca8" stroke-width="2" points="60.0,1827.7 620.0,1644.3"/>
-<circle cx="60.0" cy="1827.7" r="4" fill="#8a5ca8"><title>20261107T2145Z-split-prime-p1-rr-dickson: 8 count (n=40)</title></circle>
-<circle cx="620.0" cy="1644.3" r="4" fill="#8a5ca8"><title>20261108T0538Z-split-prime-p1-r2a-armf-caps: 2 count (n=26)</title></circle>
-<rect x="636" y="1743" width="10" height="10" fill="#8a5ca8"/>
-<text x="650" y="1752">ic:split-prime-p1-rr-dickson-torus</text>
-<rect x="636" y="1759" width="10" height="10" fill="#167f73"/>
-<text x="650" y="1768">ic:split-prime-p2-twist-coset-toy </text>
-<rect x="636" y="1775" width="10" height="10" fill="#637bad"/>
-<text x="650" y="1784">ic:split-prime-p2-twist-coset-toy </text>
-<rect x="636" y="1791" width="10" height="10" fill="#aa8b5b"/>
-<text x="650" y="1800">registry-rebinding:ic-aimed-gather</text>
-<rect x="636" y="1807" width="10" height="10" fill="#93a1a4"/>
-<text x="650" y="1816">study:elliptic_code_list_decoding_</text>
-<text x="60" y="1926" font-weight="bold">Series in unit percent: gain vs first record (derived, %)</text>
-<rect x="60" y="1936" width="560" height="220" fill="none" stroke="#999"/>
-<line x1="60" y1="2156.0" x2="620" y2="2156.0" stroke="#eee"/>
-<text x="54" y="2160.0" text-anchor="end" fill="#555">-8.76</text>
-<line x1="60" y1="2101.0" x2="620" y2="2101.0" stroke="#eee"/>
-<text x="54" y="2105.0" text-anchor="end" fill="#555">17.5</text>
-<line x1="60" y1="2046.0" x2="620" y2="2046.0" stroke="#eee"/>
-<text x="54" y="2050.0" text-anchor="end" fill="#555">43.8</text>
-<line x1="60" y1="1991.0" x2="620" y2="1991.0" stroke="#eee"/>
-<text x="54" y="1995.0" text-anchor="end" fill="#555">70.1</text>
-<line x1="60" y1="1936.0" x2="620" y2="1936.0" stroke="#eee"/>
-<text x="54" y="1940.0" text-anchor="end" fill="#555">96.3</text>
-<text x="60.0" y="2172" text-anchor="middle" fill="#555">2026-11-07</text>
-<text x="246.7" y="2172" text-anchor="middle" fill="#555">2026-11-07</text>
-<text x="433.3" y="2172" text-anchor="middle" fill="#555">2026-11-08</text>
-<text x="620.0" y="2172" text-anchor="middle" fill="#555">2026-11-08</text>
-<line x1="60" y1="2137.7" x2="620" y2="2137.7" stroke="#bbb" stroke-dasharray="4 3"/>
-<text transform="translate(16,2046.0) rotate(-90)" text-anchor="middle" fill="#555">% better than first</text>
-<polyline fill="none" stroke="#167f73" stroke-width="2" points="620.0,2137.7 620.0,1954.3"/>
-<circle cx="620.0" cy="2137.7" r="4" fill="#167f73"><title>20261107T2144Z-split-prime-p3-cross-trace: 0.7 percent (n=2000)</title></circle>
-<circle cx="620.0" cy="1954.3" r="4" fill="#167f73"><title>20261108T0545Z-split-prime-p3-r2-walk-v2: 0.087 percent (n=2000)</title></circle>
-<rect x="636" y="1941" width="10" height="10" fill="#167f73"/>
-<text x="650" y="1950">ecdlp:split-prime-p3-cross-trace-c</text>
-<circle cx="60.0" cy="2137.7" r="4" fill="#637bad"><title>20261107T2144Z-split-prime-p2-twist-coset: 0.93 percent (n=36)</title></circle>
-<rect x="636" y="1957" width="10" height="10" fill="#637bad"/>
-<text x="650" y="1966">ic:split-prime-p2-twist-coset-toy </text>
-<circle cx="60.0" cy="2137.7" r="4" fill="#aa8b5b"><title>20261107T2144Z-split-prime-p2-twist-coset: 0.39 percent (n=12)</title></circle>
-<rect x="636" y="1973" width="10" height="10" fill="#aa8b5b"/>
-<text x="650" y="1982">ic:split-prime-p2-twist-coset-toy </text>
-<rect x="636" y="1989" width="10" height="10" fill="#93a1a4"/>
-<text x="650" y="1998">ic:split-prime-p2-twist-coset-toy </text>
-<text x="60" y="2236" font-weight="bold">Series in unit ratio: gain vs first record (derived, %)</text>
-<rect x="60" y="2246" width="560" height="220" fill="none" stroke="#999"/>
-<line x1="60" y1="2466.0" x2="620" y2="2466.0" stroke="#eee"/>
-<text x="54" y="2470.0" text-anchor="end" fill="#555">-9.91</text>
-<line x1="60" y1="2411.0" x2="620" y2="2411.0" stroke="#eee"/>
-<text x="54" y="2415.0" text-anchor="end" fill="#555">19.8</text>
-<line x1="60" y1="2356.0" x2="620" y2="2356.0" stroke="#eee"/>
-<text x="54" y="2360.0" text-anchor="end" fill="#555">49.5</text>
-<line x1="60" y1="2301.0" x2="620" y2="2301.0" stroke="#eee"/>
-<text x="54" y="2305.0" text-anchor="end" fill="#555">79.3</text>
-<line x1="60" y1="2246.0" x2="620" y2="2246.0" stroke="#eee"/>
-<text x="54" y="2250.0" text-anchor="end" fill="#555">109</text>
-<text x="60.0" y="2482" text-anchor="middle" fill="#555">2026-11-04</text>
-<text x="246.7" y="2482" text-anchor="middle" fill="#555">2026-11-05</text>
-<text x="433.3" y="2482" text-anchor="middle" fill="#555">2026-11-07</text>
-<text x="620.0" y="2482" text-anchor="middle" fill="#555">2026-11-08</text>
-<line x1="60" y1="2447.7" x2="620" y2="2447.7" stroke="#bbb" stroke-dasharray="4 3"/>
-<text transform="translate(16,2356.0) rotate(-90)" text-anchor="middle" fill="#555">% better than first</text>
-<rect x="636" y="2251" width="10" height="10" fill="#167f73"/>
-<text x="650" y="2260">analysis:ecbench_statistics_v2 · c</text>
-<rect x="636" y="2267" width="10" height="10" fill="#637bad"/>
-<text x="650" y="2276">analysis:ecbench_statistics_v2 · o</text>
-<circle cx="200.0" cy="2447.7" r="4" fill="#aa8b5b"><title>20261105T1759Z-ic-packed-filter-p32: 0.9601 ratio (n=288)</title></circle>
-<rect x="636" y="2283" width="10" height="10" fill="#aa8b5b"/>
-<text x="650" y="2292">archive:ic-packed-filter-p32-20261</text>
-<polyline fill="none" stroke="#93a1a4" stroke-width="2" points="620.0,2447.7 620.0,2264.3"/>
-<circle cx="620.0" cy="2447.7" r="4" fill="#93a1a4"><title>20261107T2144Z-split-prime-p3-cross-trace: 0.986 ratio (n=2000)</title></circle>
-<circle cx="620.0" cy="2264.3" r="4" fill="#93a1a4"><title>20261108T0545Z-split-prime-p3-r2-walk-v2: 0.009 ratio (n=2000)</title></circle>
-<rect x="636" y="2299" width="10" height="10" fill="#93a1a4"/>
-<text x="650" y="2308">ecdlp:split-prime-p3-cross-trace-c</text>
-<circle cx="60.0" cy="2447.7" r="4" fill="#69879e"><title>20261104T1119Z-c25519-autolab-r32-k20-32: 0.9375 ratio (n=64)</title></circle>
-<rect x="636" y="2315" width="10" height="10" fill="#69879e"/>
-<text x="650" y="2324">ic:curve25519-family-k20-32 · rati</text>
-<circle cx="60.0" cy="2447.7" r="4" fill="#b05c5c"><title>20261104T1213Z-c25519-autolab-r34-k20-32: 0.8802 ratio (n=64)</title></circle>
-<rect x="636" y="2331" width="10" height="10" fill="#b05c5c"/>
-<text x="650" y="2340">ic:curve25519-family-k20-32 · rati</text>
-<circle cx="60.0" cy="2447.7" r="4" fill="#5c8a3a"><title>20261104T1609Z-c25519-autolab-r35-k24-32: 0.9106 ratio (n=64)</title></circle>
-<rect x="636" y="2347" width="10" height="10" fill="#5c8a3a"/>
-<text x="650" y="2356">ic:curve25519-family-k24-32 · rati</text>
-<circle cx="480.0" cy="2447.7" r="4" fill="#8a5ca8"><title>20261107T1945Z-curve25519-f1-walk-k20: 1.2283 ratio (n=8)</title></circle>
-<rect x="636" y="2363" width="10" height="10" fill="#8a5ca8"/>
-<text x="650" y="2372">ic:curve25519-k20-single-target · </text>
-<circle cx="480.0" cy="2447.7" r="4" fill="#167f73"><title>20261107T1945Z-curve25519-f1-walk-k20: 1.2385 ratio (n=8)</title></circle>
-<rect x="636" y="2379" width="10" height="10" fill="#167f73"/>
-<text x="650" y="2388">ic:curve25519-k20-single-target · </text>
-<circle cx="480.0" cy="2447.7" r="4" fill="#637bad"><title>20261107T1945Z-curve25519-f1-walk-k20: 1.1542 ratio (n=8)</title></circle>
-<rect x="636" y="2395" width="10" height="10" fill="#637bad"/>
-<text x="650" y="2404">ic:curve25519-k20-single-target · </text>
-<circle cx="480.0" cy="2447.7" r="4" fill="#aa8b5b"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 1.1656 ratio (n=8)</title></circle>
-<rect x="636" y="2411" width="10" height="10" fill="#aa8b5b"/>
-<text x="650" y="2420">ic:curve25519-k20-single-target · </text>
-<circle cx="480.0" cy="2447.7" r="4" fill="#93a1a4"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 0.8872 ratio (n=8)</title></circle>
-<rect x="636" y="2427" width="10" height="10" fill="#93a1a4"/>
-<text x="650" y="2436">ic:curve25519-k20-single-target · </text>
-<circle cx="480.0" cy="2447.7" r="4" fill="#69879e"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 0.9088 ratio (n=8)</title></circle>
-<rect x="636" y="2443" width="10" height="10" fill="#69879e"/>
-<text x="650" y="2452">ic:curve25519-k20-single-target · </text>
-<circle cx="480.0" cy="2447.7" r="4" fill="#b05c5c"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 0.7335 ratio (n=8)</title></circle>
-<rect x="636" y="2459" width="10" height="10" fill="#b05c5c"/>
-<text x="650" y="2468">ic:curve25519-k20-single-target · </text>
-<circle cx="480.0" cy="2447.7" r="4" fill="#5c8a3a"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 1.3058 ratio (n=8)</title></circle>
-<rect x="636" y="2475" width="10" height="10" fill="#5c8a3a"/>
-<text x="650" y="2484">ic:curve25519-k20-single-target · </text>
-<circle cx="480.0" cy="2447.7" r="4" fill="#8a5ca8"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 1.3963 ratio (n=8)</title></circle>
-<rect x="636" y="2491" width="10" height="10" fill="#8a5ca8"/>
-<text x="650" y="2500">ic:curve25519-k20-single-target · </text>
-<circle cx="480.0" cy="2447.7" r="4" fill="#167f73"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 1.3602 ratio (n=8)</title></circle>
-<rect x="636" y="2507" width="10" height="10" fill="#167f73"/>
-<text x="650" y="2516">ic:curve25519-k20-single-target · </text>
-<circle cx="480.0" cy="2447.7" r="4" fill="#637bad"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 0.8312 ratio (n=8)</title></circle>
-<rect x="636" y="2523" width="10" height="10" fill="#637bad"/>
-<text x="650" y="2532">ic:curve25519-k20-single-target · </text>
-<circle cx="480.0" cy="2447.7" r="4" fill="#aa8b5b"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 0.7797 ratio (n=8)</title></circle>
-<rect x="636" y="2539" width="10" height="10" fill="#aa8b5b"/>
-<text x="650" y="2548">ic:curve25519-k20-single-target · </text>
-<circle cx="480.0" cy="2447.7" r="4" fill="#93a1a4"><title>20261107T1947Z-curve25519-f1-walk-k24: 1.1475 ratio (n=8)</title></circle>
-<rect x="636" y="2555" width="10" height="10" fill="#93a1a4"/>
-<text x="650" y="2564">ic:curve25519-k24-single-target · </text>
-<circle cx="480.0" cy="2447.7" r="4" fill="#69879e"><title>20261107T1947Z-curve25519-f1-walk-k24: 1.1636 ratio (n=8)</title></circle>
-<rect x="636" y="2571" width="10" height="10" fill="#69879e"/>
-<text x="650" y="2580">ic:curve25519-k24-single-target · </text>
-<circle cx="480.0" cy="2447.7" r="4" fill="#b05c5c"><title>20261107T1947Z-curve25519-f1-walk-k24: 1.0384 ratio (n=8)</title></circle>
-<rect x="636" y="2587" width="10" height="10" fill="#b05c5c"/>
-<text x="650" y="2596">ic:curve25519-k24-single-target · </text>
-<circle cx="480.0" cy="2447.7" r="4" fill="#5c8a3a"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 0.9801 ratio (n=8)</title></circle>
-<rect x="636" y="2603" width="10" height="10" fill="#5c8a3a"/>
-<text x="650" y="2612">ic:curve25519-k24-single-target · </text>
-<circle cx="480.0" cy="2447.7" r="4" fill="#8a5ca8"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 0.8609 ratio (n=8)</title></circle>
-<rect x="636" y="2619" width="10" height="10" fill="#8a5ca8"/>
-<text x="650" y="2628">ic:curve25519-k24-single-target · </text>
-<circle cx="480.0" cy="2447.7" r="4" fill="#167f73"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 0.8882 ratio (n=8)</title></circle>
-<rect x="636" y="2635" width="10" height="10" fill="#167f73"/>
-<text x="650" y="2644">ic:curve25519-k24-single-target · </text>
-<circle cx="480.0" cy="2447.7" r="4" fill="#637bad"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 0.675 ratio (n=8)</title></circle>
-<rect x="636" y="2651" width="10" height="10" fill="#637bad"/>
-<text x="650" y="2660">ic:curve25519-k24-single-target · </text>
-<circle cx="480.0" cy="2447.7" r="4" fill="#aa8b5b"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 1.2961 ratio (n=8)</title></circle>
-<rect x="636" y="2667" width="10" height="10" fill="#aa8b5b"/>
-<text x="650" y="2676">ic:curve25519-k24-single-target · </text>
-<circle cx="480.0" cy="2447.7" r="4" fill="#93a1a4"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 1.4114 ratio (n=8)</title></circle>
-<rect x="636" y="2683" width="10" height="10" fill="#93a1a4"/>
-<text x="650" y="2692">ic:curve25519-k24-single-target · </text>
-<circle cx="480.0" cy="2447.7" r="4" fill="#69879e"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 1.3883 ratio (n=8)</title></circle>
-<rect x="636" y="2699" width="10" height="10" fill="#69879e"/>
-<text x="650" y="2708">ic:curve25519-k24-single-target · </text>
-<circle cx="480.0" cy="2447.7" r="4" fill="#b05c5c"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 0.7492 ratio (n=8)</title></circle>
-<rect x="636" y="2715" width="10" height="10" fill="#b05c5c"/>
-<text x="650" y="2724">ic:curve25519-k24-single-target · </text>
-<circle cx="480.0" cy="2447.7" r="4" fill="#5c8a3a"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 0.9063 ratio (n=8)</title></circle>
-<rect x="636" y="2731" width="10" height="10" fill="#5c8a3a"/>
-<text x="650" y="2740">ic:curve25519-k24-single-target · </text>
-<circle cx="620.0" cy="2447.7" r="4" fill="#8a5ca8"><title>20261108T0538Z-split-prime-p1-r2a-armf-caps: 2.29 ratio (n=6)</title></circle>
-<rect x="636" y="2747" width="10" height="10" fill="#8a5ca8"/>
-<text x="650" y="2756">ic:split-prime-p1-rr-dickson-torus</text>
-<circle cx="620.0" cy="2447.7" r="4" fill="#167f73"><title>20261108T0538Z-split-prime-p1-r2a-armf-caps: 1.33 ratio (n=6)</title></circle>
-<rect x="636" y="2763" width="10" height="10" fill="#167f73"/>
-<text x="650" y="2772">ic:split-prime-p1-rr-dickson-torus</text>
-<circle cx="480.0" cy="2447.7" r="4" fill="#637bad"><title>20261107T2144Z-split-prime-p2-twist-coset: 2.25 ratio (n=8)</title></circle>
-<rect x="636" y="2779" width="10" height="10" fill="#637bad"/>
-<text x="650" y="2788">ic:split-prime-p2-twist-coset-toy </text>
-<circle cx="620.0" cy="2447.7" r="4" fill="#aa8b5b"><title>20261108T0530Z-split-prime-p2-r2-unplanted: 0.896 ratio (n=4)</title></circle>
-<rect x="636" y="2795" width="10" height="10" fill="#aa8b5b"/>
-<text x="650" y="2804">ic:split-prime-p2-twist-coset-toy </text>
-<rect x="636" y="2811" width="10" height="10" fill="#93a1a4"/>
-<text x="650" y="2820">kernel:f6_ic_gate · f4_control_wor</text>
-<circle cx="200.0" cy="2447.7" r="4" fill="#69879e"><title>20261105T2109Z-f6-few-candidates: 10.29 ratio (n=9)</title></circle>
-<rect x="636" y="2827" width="10" height="10" fill="#69879e"/>
-<text x="650" y="2836">kernel:f6_ic_gate · f6ic_cpu_off_o</text>
-<circle cx="200.0" cy="2447.7" r="4" fill="#b05c5c"><title>20261105T2109Z-f6-few-candidates: 2.67 ratio (n=9)</title></circle>
-<rect x="636" y="2843" width="10" height="10" fill="#b05c5c"/>
-<text x="650" y="2852">kernel:f6_ic_gate · f6ic_cpu_off_o</text>
-<circle cx="200.0" cy="2447.7" r="4" fill="#5c8a3a"><title>20261105T2109Z-f6-few-candidates: 1.84 ratio (n=9)</title></circle>
-<rect x="636" y="2859" width="10" height="10" fill="#5c8a3a"/>
-<text x="650" y="2868">kernel:f6_ic_gate · f6ic_word_xors</text>
-<circle cx="200.0" cy="2447.7" r="4" fill="#8a5ca8"><title>20261105T2109Z-f6-parallel-split: 0.936 ratio (n=2)</title></circle>
-<rect x="636" y="2875" width="10" height="10" fill="#8a5ca8"/>
-<text x="650" y="2884">kernel:inherited_f4_solve_tree · w</text>
-<circle cx="200.0" cy="2447.7" r="4" fill="#167f73"><title>20261105T2109Z-f6-parallel-split: 2.883 ratio (n=7)</title></circle>
-<rect x="636" y="2891" width="10" height="10" fill="#167f73"/>
-<text x="650" y="2900">kernel:inherited_f4_solve_tree · w</text>
-<circle cx="200.0" cy="2447.7" r="4" fill="#637bad"><title>20261105T2109Z-f6-parallel-split: 1.589 ratio (n=7)</title></circle>
-<rect x="636" y="2907" width="10" height="10" fill="#637bad"/>
-<text x="650" y="2916">kernel:inherited_f4_solve_tree · w</text>
-<circle cx="200.0" cy="2447.7" r="4" fill="#aa8b5b"><title>20261105T2109Z-f6-parallel-split: 2.865 ratio (n=9)</title></circle>
-<rect x="636" y="2923" width="10" height="10" fill="#aa8b5b"/>
-<text x="650" y="2932">kernel:inherited_f4_solve_tree · w</text>
-<circle cx="340.0" cy="2447.7" r="4" fill="#93a1a4"><title>20261106T0514Z-rho-frob-brent: 0.718 ratio (n=96)</title></circle>
-<rect x="636" y="2939" width="10" height="10" fill="#93a1a4"/>
-<text x="650" y="2948">rho:koblitz_signed_frobenius_panel</text>
-<circle cx="340.0" cy="2447.7" r="4" fill="#69879e"><title>20261106T0514Z-rho-frob-brent: 1.0948 ratio (n=96)</title></circle>
-<rect x="636" y="2955" width="10" height="10" fill="#69879e"/>
-<text x="650" y="2964">rho:koblitz_signed_frobenius_panel</text>
-<circle cx="340.0" cy="2447.7" r="4" fill="#b05c5c"><title>20261106T0514Z-rho-frob-brent: 1.4723 ratio (n=96)</title></circle>
-<rect x="636" y="2971" width="10" height="10" fill="#b05c5c"/>
-<text x="650" y="2980">rho:koblitz_signed_frobenius_panel</text>
-<circle cx="340.0" cy="2447.7" r="4" fill="#5c8a3a"><title>20261106T0514Z-rho-frob-brent: 1.0653 ratio (n=96)</title></circle>
-<rect x="636" y="2987" width="10" height="10" fill="#5c8a3a"/>
-<text x="650" y="2996">rho:koblitz_signed_frobenius_panel</text>
-<circle cx="340.0" cy="2447.7" r="4" fill="#8a5ca8"><title>20261106T0514Z-rho-frob-brent: 1.0008 ratio (n=96)</title></circle>
-<rect x="636" y="3003" width="10" height="10" fill="#8a5ca8"/>
-<text x="650" y="3012">rho:koblitz_signed_frobenius_panel</text>
+<circle cx="620.0" cy="285.3" r="4" fill="#b05c5c"><title>20261107T2115Z-prime-medium-rho-bound: 1.9684 S (n=None)</title></circle>
+<rect x="636" y="947" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="956">rho:prime_medium_tier_bound · prim</text>
+<circle cx="620.0" cy="285.3" r="4" fill="#5c8a3a"><title>20261107T2115Z-prime-medium-rho-bound: 1.0422 S (n=None)</title></circle>
+<rect x="636" y="963" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="972">rho:prime_medium_tier_bound · prim</text>
+<circle cx="620.0" cy="285.3" r="4" fill="#8a5ca8"><title>20261107T2115Z-prime-medium-rho-bound: 0.9473 S (n=None)</title></circle>
+<rect x="636" y="979" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="988">rho:prime_medium_tier_bound · prim</text>
+<circle cx="620.0" cy="285.3" r="4" fill="#167f73"><title>20261107T2115Z-prime-medium-rho-bound: 1.8961 S (n=None)</title></circle>
+<rect x="636" y="995" width="10" height="10" fill="#167f73"/>
+<text x="650" y="1004">rho:prime_medium_tier_bound · prim</text>
+<circle cx="620.0" cy="285.3" r="4" fill="#637bad"><title>20261107T2115Z-prime-medium-rho-bound: 1.0658 S (n=None)</title></circle>
+<rect x="636" y="1011" width="10" height="10" fill="#637bad"/>
+<text x="650" y="1020">rho:prime_medium_tier_bound · prim</text>
+<circle cx="620.0" cy="285.3" r="4" fill="#aa8b5b"><title>20261107T2115Z-prime-medium-rho-bound: 0.969 S (n=None)</title></circle>
+<rect x="636" y="1027" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="1036">rho:prime_medium_tier_bound · prim</text>
+<circle cx="620.0" cy="285.3" r="4" fill="#93a1a4"><title>20261107T2115Z-prime-medium-rho-bound: 1.9367 S (n=None)</title></circle>
+<rect x="636" y="1043" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="1052">rho:prime_medium_tier_bound · prim</text>
+<circle cx="620.0" cy="285.3" r="4" fill="#69879e"><title>20261107T2115Z-prime-medium-rho-bound: 1.2703 S (n=None)</title></circle>
+<rect x="636" y="1059" width="10" height="10" fill="#69879e"/>
+<text x="650" y="1068">rho:prime_medium_tier_bound · prim</text>
+<circle cx="620.0" cy="285.3" r="4" fill="#b05c5c"><title>20261107T2115Z-prime-medium-rho-bound: 1.2703 S (n=None)</title></circle>
+<rect x="636" y="1075" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="1084">rho:prime_medium_tier_bound · prim</text>
+<circle cx="620.0" cy="285.3" r="4" fill="#5c8a3a"><title>20261107T2115Z-prime-medium-rho-bound: 1.2703 S (n=None)</title></circle>
+<rect x="636" y="1091" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="1100">rho:prime_medium_tier_bound · prim</text>
+<text x="60" y="1138" font-weight="bold">Distance remaining: value / reference (1.0 = parity; derived)</text>
+<rect x="60" y="1148" width="560" height="220" fill="none" stroke="#999"/>
+<line x1="60" y1="1368.0" x2="620" y2="1368.0" stroke="#eee"/>
+<text x="54" y="1372.0" text-anchor="end" fill="#555">0.261</text>
+<line x1="60" y1="1313.0" x2="620" y2="1313.0" stroke="#eee"/>
+<text x="54" y="1317.0" text-anchor="end" fill="#555">2.79</text>
+<line x1="60" y1="1258.0" x2="620" y2="1258.0" stroke="#eee"/>
+<text x="54" y="1262.0" text-anchor="end" fill="#555">29.9</text>
+<line x1="60" y1="1203.0" x2="620" y2="1203.0" stroke="#eee"/>
+<text x="54" y="1207.0" text-anchor="end" fill="#555">320</text>
+<line x1="60" y1="1148.0" x2="620" y2="1148.0" stroke="#eee"/>
+<text x="54" y="1152.0" text-anchor="end" fill="#555">3.42e+03</text>
+<text x="60.0" y="1384" text-anchor="middle" fill="#555">2026-11-04</text>
+<text x="246.7" y="1384" text-anchor="middle" fill="#555">2026-11-05</text>
+<text x="433.3" y="1384" text-anchor="middle" fill="#555">2026-11-07</text>
+<text x="620.0" y="1384" text-anchor="middle" fill="#555">2026-11-08</text>
+<line x1="60" y1="1336.8" x2="620" y2="1336.8" stroke="#bbb" stroke-dasharray="4 3"/>
+<text x="616" y="1332.8" text-anchor="end" fill="#777">parity</text>
+<text transform="translate(16,1258.0) rotate(-90)" text-anchor="middle" fill="#555">value / reference</text>
+<circle cx="200.0" cy="1256.8" r="4" fill="#167f73"><title>20261105T1759Z-ic-packed-filter-p32: 31.6936 S (n=None)</title></circle>
+<rect x="636" y="1153" width="10" height="10" fill="#167f73"/>
+<text x="650" y="1162">archive:ic-packed-filter-p32-20261</text>
+<circle cx="200.0" cy="1256.7" r="4" fill="#637bad"><title>20261105T1759Z-ic-packed-filter-p32: 63.4961 S (n=None)</title></circle>
+<rect x="636" y="1169" width="10" height="10" fill="#637bad"/>
+<text x="650" y="1178">archive:ic-packed-filter-p32-20261</text>
+<polyline fill="none" stroke="#aa8b5b" stroke-width="2" points="340.0,1349.4 340.0,1349.4"/>
+<circle cx="340.0" cy="1349.4" r="4" fill="#aa8b5b"><title>20261106T0450Z-cheon-ecbench: 0.5739 S (n=48)</title></circle>
+<circle cx="340.0" cy="1349.4" r="4" fill="#aa8b5b"><title>20261106T0454Z-cheon-ecbench-medium: 0.5739 S (n=48)</title></circle>
+<rect x="636" y="1185" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="1194">dlpwai:static-dh-p224-shape · s_w0</text>
+<polyline fill="none" stroke="#93a1a4" stroke-width="2" points="340.0,1279.9 340.0,1279.9"/>
+<circle cx="340.0" cy="1279.9" r="4" fill="#93a1a4"><title>20261106T0450Z-cheon-ecbench: 12.2426 S (n=40)</title></circle>
+<circle cx="340.0" cy="1279.9" r="4" fill="#93a1a4"><title>20261106T0454Z-cheon-ecbench-medium: 12.2426 S (n=40)</title></circle>
+<rect x="636" y="1201" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="1210">dlpwai:static-dh-p224-shape · s_w0</text>
+<polyline fill="none" stroke="#69879e" stroke-width="2" points="340.0,1349.7 340.0,1349.7"/>
+<circle cx="340.0" cy="1349.7" r="4" fill="#69879e"><title>20261106T0450Z-cheon-ecbench: 0.5819 S (n=48)</title></circle>
+<circle cx="340.0" cy="1349.7" r="4" fill="#69879e"><title>20261106T0454Z-cheon-ecbench-medium: 0.5819 S (n=48)</title></circle>
+<rect x="636" y="1217" width="10" height="10" fill="#69879e"/>
+<text x="650" y="1226">dlpwai:static-dh-p224-shape · s_w0</text>
+<circle cx="620.0" cy="1329.7" r="4" fill="#b05c5c"><title>20261108T2045Z-curve25519-tw-jumps-k20: 1.3581 ratio (n=8)</title></circle>
+<rect x="636" y="1233" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="1242">ecdlp:curve25519-family-k20 · rati</text>
+<circle cx="620.0" cy="1329.7" r="4" fill="#5c8a3a"><title>20261108T2045Z-curve25519-tw-jumps-k20: 2.1364 S (n=512)</title></circle>
+<rect x="636" y="1249" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="1258">ecdlp:curve25519-family-k20 · s_tw</text>
+<circle cx="620.0" cy="1330.0" r="4" fill="#8a5ca8"><title>20261108T2047Z-curve25519-tw-jumps-k24: 1.3431 ratio (n=8)</title></circle>
+<rect x="636" y="1265" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="1274">ecdlp:curve25519-family-k24 · rati</text>
+<circle cx="620.0" cy="1330.0" r="4" fill="#167f73"><title>20261108T2047Z-curve25519-tw-jumps-k24: 1.5834 S (n=512)</title></circle>
+<rect x="636" y="1281" width="10" height="10" fill="#167f73"/>
+<text x="650" y="1290">ecdlp:curve25519-family-k24 · s_tw</text>
+<circle cx="620.0" cy="1329.1" r="4" fill="#637bad"><title>20261108T2051Z-curve25519-tw-scaling-k28: 1.3951 ratio (n=8)</title></circle>
+<rect x="636" y="1297" width="10" height="10" fill="#637bad"/>
+<text x="650" y="1306">ecdlp:curve25519-family-k28 · rati</text>
+<circle cx="620.0" cy="1329.1" r="4" fill="#aa8b5b"><title>20261108T2051Z-curve25519-tw-scaling-k28: 1.4349 S (n=512)</title></circle>
+<rect x="636" y="1313" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="1322">ecdlp:curve25519-family-k28 · s_tw</text>
+<circle cx="620.0" cy="1329.6" r="4" fill="#93a1a4"><title>20261108T2051Z-curve25519-tw-scaling-k32: 1.3663 ratio (n=8)</title></circle>
+<rect x="636" y="1329" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="1338">ecdlp:curve25519-family-k32 · rati</text>
+<circle cx="620.0" cy="1329.6" r="4" fill="#69879e"><title>20261108T2051Z-curve25519-tw-scaling-k32: 1.3871 S (n=512)</title></circle>
+<rect x="636" y="1345" width="10" height="10" fill="#69879e"/>
+<text x="650" y="1354">ecdlp:curve25519-family-k32 · s_tw</text>
+<circle cx="480.0" cy="1329.0" r="4" fill="#b05c5c"><title>20261107T2135Z-c25519-c1-screen: 2.227 S (n=60)</title></circle>
+<rect x="636" y="1361" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="1370">ic:curve25519-family-k20-32 · c1co</text>
+<circle cx="480.0" cy="1326.1" r="4" fill="#5c8a3a"><title>20261107T2135Z-c25519-c1-screen: 1.814 S (n=60)</title></circle>
+<rect x="636" y="1377" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="1386">ic:curve25519-family-k20-32 · c1co</text>
+<circle cx="480.0" cy="1324.3" r="4" fill="#8a5ca8"><title>20261107T2135Z-c25519-c1-screen: 1.711 S (n=60)</title></circle>
+<rect x="636" y="1393" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="1402">ic:curve25519-family-k20-32 · c1co</text>
+<circle cx="480.0" cy="1325.0" r="4" fill="#167f73"><title>20261107T2135Z-c25519-c1-screen: 1.545 S (n=60)</title></circle>
+<rect x="636" y="1409" width="10" height="10" fill="#167f73"/>
+<text x="650" y="1418">ic:curve25519-family-k20-32 · c1co</text>
+<circle cx="60.0" cy="1323.7" r="4" fill="#637bad"><title>20261104T0835Z-c25519-autolab-r28-k20-32: 2.5746 S (n=64)</title></circle>
+<rect x="636" y="1425" width="10" height="10" fill="#637bad"/>
+<text x="650" y="1434">ic:curve25519-family-k20-32 · s_w0</text>
+<polyline fill="none" stroke="#aa8b5b" stroke-width="2" points="60.0,1323.6 60.0,1328.5"/>
+<circle cx="60.0" cy="1323.6" r="4" fill="#aa8b5b"><title>20261104T1114Z-c25519-autolab-r31-k20-32: 2.1638 S (n=64)</title></circle>
+<circle cx="60.0" cy="1328.5" r="4" fill="#aa8b5b"><title>20261104T1209Z-c25519-autolab-r33-k20-32: 1.6735 S (n=64)</title></circle>
+<rect x="636" y="1441" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="1450">ic:curve25519-family-k20-32 · s_w0</text>
+<polyline fill="none" stroke="#93a1a4" stroke-width="2" points="60.0,1320.0 60.0,1327.5"/>
+<circle cx="60.0" cy="1320.0" r="4" fill="#93a1a4"><title>20261104T1114Z-c25519-autolab-r31-k20-32: 1.9211 S (n=64)</title></circle>
+<circle cx="60.0" cy="1327.5" r="4" fill="#93a1a4"><title>20261104T1209Z-c25519-autolab-r33-k20-32: 1.5717 S (n=64)</title></circle>
+<rect x="636" y="1457" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="1466">ic:curve25519-family-k20-32 · s_w0</text>
+<polyline fill="none" stroke="#69879e" stroke-width="2" points="60.0,1316.3 60.0,1326.6"/>
+<circle cx="60.0" cy="1316.3" r="4" fill="#69879e"><title>20261104T1114Z-c25519-autolab-r31-k20-32: 2.11 S (n=64)</title></circle>
+<circle cx="60.0" cy="1326.6" r="4" fill="#69879e"><title>20261104T1209Z-c25519-autolab-r33-k20-32: 1.5152 S (n=64)</title></circle>
+<rect x="636" y="1473" width="10" height="10" fill="#69879e"/>
+<text x="650" y="1482">ic:curve25519-family-k20-32 · s_w0</text>
+<circle cx="200.0" cy="1326.4" r="4" fill="#b05c5c"><title>20261105T1526Z-c25519-multicurve-rebaseline: 2.601 S (n=5)</title></circle>
+<rect x="636" y="1489" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="1498">ic:curve25519-family-k20-32 · s_w0</text>
+<circle cx="200.0" cy="1323.6" r="4" fill="#5c8a3a"><title>20261105T1526Z-c25519-multicurve-rebaseline: 2.111 S (n=5)</title></circle>
+<rect x="636" y="1505" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="1514">ic:curve25519-family-k20-32 · s_w0</text>
+<circle cx="200.0" cy="1323.2" r="4" fill="#8a5ca8"><title>20261105T1526Z-c25519-multicurve-rebaseline: 1.869 S (n=5)</title></circle>
+<rect x="636" y="1521" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="1530">ic:curve25519-family-k20-32 · s_w0</text>
+<circle cx="200.0" cy="1321.9" r="4" fill="#167f73"><title>20261105T1526Z-c25519-multicurve-rebaseline: 1.93 S (n=5)</title></circle>
+<rect x="636" y="1537" width="10" height="10" fill="#167f73"/>
+<text x="650" y="1546">ic:curve25519-family-k20-32 · s_w0</text>
+<polyline fill="none" stroke="#637bad" stroke-width="2" points="60.0,1301.2 60.0,1297.0 60.0,1307.0 60.0,1306.2 60.0,1309.6"/>
+<circle cx="60.0" cy="1301.2" r="4" fill="#637bad"><title>20261104T0423Z-c25519-autolab-r7-k20: 8.3478 S (n=64)</title></circle>
+<circle cx="60.0" cy="1297.0" r="4" fill="#637bad"><title>20261104T0509Z-c25519-autolab-r13-k20: 8.7976 S (n=64)</title></circle>
+<circle cx="60.0" cy="1307.0" r="4" fill="#637bad"><title>20261104T0642Z-c25519-autolab-r16-k20: 5.384 S (n=64)</title></circle>
+<circle cx="60.0" cy="1306.2" r="4" fill="#637bad"><title>20261104T0723Z-c25519-autolab-r21-k20: 5.489 S (n=32)</title></circle>
+<circle cx="60.0" cy="1309.6" r="4" fill="#637bad"><title>20261104T0756Z-c25519-autolab-r25-k20: 4.8598 S (n=64)</title></circle>
+<rect x="636" y="1553" width="10" height="10" fill="#637bad"/>
+<text x="650" y="1562">ic:curve25519-family-k20 · s_w0_in</text>
+<circle cx="60.0" cy="1320.4" r="4" fill="#aa8b5b"><title>20261104T0832Z-c25519-autolab-r27-k24-28: 2.5842 S (n=64)</title></circle>
+<rect x="636" y="1569" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="1578">ic:curve25519-family-k24-28 · s_w0</text>
+<circle cx="60.0" cy="1316.6" r="4" fill="#93a1a4"><title>20261104T0832Z-c25519-autolab-r27-k24-28: 2.3732 S (n=64)</title></circle>
+<rect x="636" y="1585" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="1594">ic:curve25519-family-k24-28 · s_w0</text>
+<circle cx="60.0" cy="1321.4" r="4" fill="#69879e"><title>20261104T1602Z-c25519-rebaseline-seedrun: 2.1055 S (n=64)</title></circle>
+<rect x="636" y="1601" width="10" height="10" fill="#69879e"/>
+<text x="650" y="1610">ic:curve25519-family-k24-32 · s_w0</text>
+<circle cx="60.0" cy="1323.0" r="4" fill="#b05c5c"><title>20261104T1602Z-c25519-rebaseline-seedrun: 1.8835 S (n=64)</title></circle>
+<rect x="636" y="1617" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="1626">ic:curve25519-family-k24-32 · s_w0</text>
+<circle cx="60.0" cy="1322.9" r="4" fill="#5c8a3a"><title>20261104T1602Z-c25519-rebaseline-seedrun: 1.8423 S (n=64)</title></circle>
+<rect x="636" y="1633" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="1642">ic:curve25519-family-k24-32 · s_w0</text>
+<polyline fill="none" stroke="#8a5ca8" stroke-width="2" points="60.0,1296.2 60.0,1297.1 60.0,1308.4 60.0,1311.0 60.0,1313.6"/>
+<circle cx="60.0" cy="1296.2" r="4" fill="#8a5ca8"><title>20261104T0437Z-c25519-autolab-r11-k24: 6.607 S (n=32)</title></circle>
+<circle cx="60.0" cy="1297.1" r="4" fill="#8a5ca8"><title>20261104T0445Z-c25519-autolab-r12-k24: 6.857 S (n=32)</title></circle>
+<circle cx="60.0" cy="1308.4" r="4" fill="#8a5ca8"><title>20261104T0645Z-c25519-autolab-r17-k24: 4.2007 S (n=64)</title></circle>
+<circle cx="60.0" cy="1311.0" r="4" fill="#8a5ca8"><title>20261104T0722Z-c25519-autolab-r20-k24: 3.678 S (n=64)</title></circle>
+<circle cx="60.0" cy="1313.6" r="4" fill="#8a5ca8"><title>20261104T0755Z-c25519-autolab-r24-k24: 3.3182 S (n=64)</title></circle>
+<rect x="636" y="1649" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="1658">ic:curve25519-family-k24 · s_w0_in</text>
+<circle cx="60.0" cy="1314.7" r="4" fill="#167f73"><title>20261104T0801Z-c25519-autolab-r26-k28-32: 2.5798 S (n=64)</title></circle>
+<rect x="636" y="1665" width="10" height="10" fill="#167f73"/>
+<text x="650" y="1674">ic:curve25519-family-k28-32 · s_w0</text>
+<circle cx="60.0" cy="1322.4" r="4" fill="#637bad"><title>20261104T1546Z-c25519-r4i1-walk-seed: 1.969 S (n=16)</title></circle>
+<rect x="636" y="1681" width="10" height="10" fill="#637bad"/>
+<text x="650" y="1690">ic:curve25519-family-k28-32 · s_w0</text>
+<circle cx="60.0" cy="1322.9" r="4" fill="#aa8b5b"><title>20261104T1546Z-c25519-r4i1-walk-seed: 1.781 S (n=16)</title></circle>
+<rect x="636" y="1697" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="1706">ic:curve25519-family-k28-32 · s_w0</text>
+<polyline fill="none" stroke="#93a1a4" stroke-width="2" points="60.0,1281.7 60.0,1282.3 60.0,1289.2 60.0,1292.5 60.0,1292.4 60.0,1311.3 60.0,1313.3"/>
+<circle cx="60.0" cy="1281.7" r="4" fill="#93a1a4"><title>20261104T0411Z-c25519-autolab-r4-k28: 10.9395 S (n=64)</title></circle>
+<circle cx="60.0" cy="1282.3" r="4" fill="#93a1a4"><title>20261104T0421Z-c25519-autolab-r6-k28: 10.9194 S (n=64)</title></circle>
+<circle cx="60.0" cy="1289.2" r="4" fill="#93a1a4"><title>20261104T0425Z-c25519-autolab-r8-k28: 7.4448 S (n=64)</title></circle>
+<circle cx="60.0" cy="1292.5" r="4" fill="#93a1a4"><title>20261104T0511Z-c25519-autolab-r14-k28: 7.33 S (n=32)</title></circle>
+<circle cx="60.0" cy="1292.4" r="4" fill="#93a1a4"><title>20261104T0513Z-c25519-autolab-r15-k28: 7.5644 S (n=64)</title></circle>
+<circle cx="60.0" cy="1311.3" r="4" fill="#93a1a4"><title>20261104T0646Z-c25519-autolab-r18-k28: 2.9493 S (n=64)</title></circle>
+<circle cx="60.0" cy="1313.3" r="4" fill="#93a1a4"><title>20261104T0754Z-c25519-autolab-r23-k28: 2.576 S (n=64)</title></circle>
+<rect x="636" y="1713" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="1722">ic:curve25519-family-k28 · s_w0_in</text>
+<polyline fill="none" stroke="#69879e" stroke-width="2" points="60.0,1259.0 60.0,1285.6 60.0,1287.1 60.0,1310.4 60.0,1313.4"/>
+<circle cx="60.0" cy="1259.0" r="4" fill="#69879e"><title>20261104T0412Z-c25519-autolab-r4-k32: 24.1377 S (n=16)</title></circle>
+<circle cx="60.0" cy="1285.6" r="4" fill="#69879e"><title>20261104T0414Z-c25519-autolab-r5-k32: 8.2964 S (n=64)</title></circle>
+<circle cx="60.0" cy="1287.1" r="4" fill="#69879e"><title>20261104T0428Z-c25519-autolab-r10-k32: 8.4296 S (n=64)</title></circle>
+<circle cx="60.0" cy="1310.4" r="4" fill="#69879e"><title>20261104T0648Z-c25519-autolab-r19-k32: 2.9369 S (n=64)</title></circle>
+<circle cx="60.0" cy="1313.4" r="4" fill="#69879e"><title>20261104T0750Z-c25519-autolab-r22-k32: 2.519 S (n=64)</title></circle>
+<rect x="636" y="1729" width="10" height="10" fill="#69879e"/>
+<text x="650" y="1738">ic:curve25519-family-k32 · s_w0_in</text>
+<circle cx="480.0" cy="1328.5" r="4" fill="#b05c5c"><title>20261107T1945Z-curve25519-f1-walk-k20: 2.3781 S (n=512)</title></circle>
+<rect x="636" y="1745" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="1754">ic:curve25519-k20-single-target · </text>
+<circle cx="480.0" cy="1327.5" r="4" fill="#5c8a3a"><title>20261107T1945Z-curve25519-f1-walk-k20: 2.3211 S (n=512)</title></circle>
+<rect x="636" y="1761" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="1770">ic:curve25519-k20-single-target · </text>
+<circle cx="480.0" cy="1335.0" r="4" fill="#8a5ca8"><title>20261107T1945Z-curve25519-f1-walk-k20: 2.8907 S (n=512)</title></circle>
+<rect x="636" y="1777" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="1786">ic:curve25519-k20-single-target · </text>
+<circle cx="480.0" cy="1330.6" r="4" fill="#167f73"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 2.1428 S (n=512)</title></circle>
+<rect x="636" y="1793" width="10" height="10" fill="#167f73"/>
+<text x="650" y="1802">ic:curve25519-k20-single-target · </text>
+<circle cx="480.0" cy="1329.1" r="4" fill="#637bad"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 2.1383 S (n=512)</title></circle>
+<rect x="636" y="1809" width="10" height="10" fill="#637bad"/>
+<text x="650" y="1818">ic:curve25519-k20-single-target · </text>
+<circle cx="480.0" cy="1341.1" r="4" fill="#aa8b5b"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 2.183 S (n=512)</title></circle>
+<rect x="636" y="1825" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="1834">ic:curve25519-k20-single-target · </text>
+<circle cx="480.0" cy="1327.4" r="4" fill="#93a1a4"><title>20261107T1947Z-curve25519-f1-walk-k24: 1.8945 S (n=512)</title></circle>
+<rect x="636" y="1841" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="1850">ic:curve25519-k24-single-target · </text>
+<circle cx="480.0" cy="1326.2" r="4" fill="#69879e"><title>20261107T1947Z-curve25519-f1-walk-k24: 1.8341 S (n=512)</title></circle>
+<rect x="636" y="1857" width="10" height="10" fill="#69879e"/>
+<text x="650" y="1866">ic:curve25519-k24-single-target · </text>
+<circle cx="480.0" cy="1334.5" r="4" fill="#b05c5c"><title>20261107T1947Z-curve25519-f1-walk-k24: 2.4383 S (n=512)</title></circle>
+<rect x="636" y="1873" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="1882">ic:curve25519-k24-single-target · </text>
+<circle cx="480.0" cy="1330.8" r="4" fill="#5c8a3a"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 1.6241 S (n=512)</title></circle>
+<rect x="636" y="1889" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="1898">ic:curve25519-k24-single-target · </text>
+<circle cx="480.0" cy="1328.8" r="4" fill="#8a5ca8"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 1.623 S (n=512)</title></circle>
+<rect x="636" y="1905" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="1914">ic:curve25519-k24-single-target · </text>
+<circle cx="480.0" cy="1343.5" r="4" fill="#167f73"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 1.6342 S (n=512)</title></circle>
+<rect x="636" y="1921" width="10" height="10" fill="#167f73"/>
+<text x="650" y="1930">ic:curve25519-k24-single-target · </text>
+<circle cx="620.0" cy="1348.4" r="4" fill="#637bad"><title>20261108T2319Z-c25519-bsgs-boundary: 0.981 S (n=60)</title></circle>
+<rect x="636" y="1937" width="10" height="10" fill="#637bad"/>
+<text x="650" y="1946">kernel:c25519_family_bsgs_vs_rho ·</text>
+<circle cx="620.0" cy="1339.6" r="4" fill="#aa8b5b"><title>20261108T2319Z-c25519-bsgs-boundary: 1.041 S (n=60)</title></circle>
+<rect x="636" y="1953" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="1962">kernel:c25519_family_bsgs_vs_rho ·</text>
+<circle cx="620.0" cy="1302.6" r="4" fill="#93a1a4"><title>20261108T0449Z-minors-gd-panel: 477,524.385 fmul (n=200)</title></circle>
+<rect x="636" y="1969" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="1978">study:minors_guess_determine_20261</text>
+<circle cx="620.0" cy="1294.8" r="4" fill="#69879e"><title>20261108T0449Z-minors-gd-panel: 1.168e+06 fmul (n=200)</title></circle>
+<rect x="636" y="1985" width="10" height="10" fill="#69879e"/>
+<text x="650" y="1994">study:minors_guess_determine_20261</text>
+<circle cx="620.0" cy="1268.1" r="4" fill="#b05c5c"><title>20261108T0449Z-minors-gd-panel: 7.096e+06 fmul (n=200)</title></circle>
+<rect x="636" y="2001" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="2010">study:minors_guess_determine_20261</text>
+<circle cx="620.0" cy="1234.6" r="4" fill="#5c8a3a"><title>20261108T0449Z-minors-gd-panel: 8.149e+07 fmul (n=200)</title></circle>
+<rect x="636" y="2017" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="2026">study:minors_guess_determine_20261</text>
+<circle cx="620.0" cy="1199.9" r="4" fill="#8a5ca8"><title>20261108T0449Z-minors-gd-panel: 1.27e+09 fmul (n=200)</title></circle>
+<rect x="636" y="2033" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="2042">study:minors_guess_determine_20261</text>
+<circle cx="620.0" cy="1166.3" r="4" fill="#167f73"><title>20261108T0449Z-minors-gd-panel: 1.995e+10 fmul (n=200)</title></circle>
+<rect x="636" y="2049" width="10" height="10" fill="#167f73"/>
+<text x="650" y="2058">study:minors_guess_determine_20261</text>
+<circle cx="620.0" cy="1336.8" r="4" fill="#637bad"><title>20261108T0513Z-pkm-fd-pfd-a: 10 count (n=10)</title></circle>
+<rect x="636" y="2065" width="10" height="10" fill="#637bad"/>
+<text x="650" y="2074">study:pkm_falldegree_unblock_20261</text>
+<text x="60" y="2112" font-weight="bold">Series in unit count: gain vs first record (derived, %)</text>
+<rect x="60" y="2122" width="560" height="220" fill="none" stroke="#999"/>
+<line x1="60" y1="2342.0" x2="620" y2="2342.0" stroke="#eee"/>
+<text x="54" y="2346.0" text-anchor="end" fill="#555">-7.5</text>
+<line x1="60" y1="2287.0" x2="620" y2="2287.0" stroke="#eee"/>
+<text x="54" y="2291.0" text-anchor="end" fill="#555">15</text>
+<line x1="60" y1="2232.0" x2="620" y2="2232.0" stroke="#eee"/>
+<text x="54" y="2236.0" text-anchor="end" fill="#555">37.5</text>
+<line x1="60" y1="2177.0" x2="620" y2="2177.0" stroke="#eee"/>
+<text x="54" y="2181.0" text-anchor="end" fill="#555">60</text>
+<line x1="60" y1="2122.0" x2="620" y2="2122.0" stroke="#eee"/>
+<text x="54" y="2126.0" text-anchor="end" fill="#555">82.5</text>
+<text x="60.0" y="2358" text-anchor="middle" fill="#555">2026-11-07</text>
+<text x="246.7" y="2358" text-anchor="middle" fill="#555">2026-11-07</text>
+<text x="433.3" y="2358" text-anchor="middle" fill="#555">2026-11-08</text>
+<text x="620.0" y="2358" text-anchor="middle" fill="#555">2026-11-08</text>
+<line x1="60" y1="2323.7" x2="620" y2="2323.7" stroke="#bbb" stroke-dasharray="4 3"/>
+<text transform="translate(16,2232.0) rotate(-90)" text-anchor="middle" fill="#555">% better than first</text>
+<rect x="636" y="2127" width="10" height="10" fill="#167f73"/>
+<text x="650" y="2136">analysis:ecbench_statistics_v2 · h</text>
+<rect x="636" y="2143" width="10" height="10" fill="#637bad"/>
+<text x="650" y="2152">archive:icb-large-prime-n53-s1-202</text>
+<rect x="636" y="2159" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="2168">archive:icb-large-prime-n53-s2-202</text>
+<rect x="636" y="2175" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="2184">archive:icb-large-prime-n61-s1-202</text>
+<rect x="636" y="2191" width="10" height="10" fill="#69879e"/>
+<text x="650" y="2200">archive:icb-large-prime-n61-s2-202</text>
+<rect x="636" y="2207" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="2216">ecdlp:split-prime-p3-cross-trace-c</text>
+<rect x="636" y="2223" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="2232">ecdlp:split-prime-p3-cross-trace-c</text>
+<rect x="636" y="2239" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="2248">ic:koblitz-chain-s3-arity-m5m6 · c</text>
+<polyline fill="none" stroke="#167f73" stroke-width="2" points="60.0,2323.7 620.0,2140.3"/>
+<circle cx="60.0" cy="2323.7" r="4" fill="#167f73"><title>20261107T2145Z-split-prime-p1-rr-dickson: 8 count (n=40)</title></circle>
+<circle cx="620.0" cy="2140.3" r="4" fill="#167f73"><title>20261108T0538Z-split-prime-p1-r2a-armf-caps: 2 count (n=26)</title></circle>
+<rect x="636" y="2255" width="10" height="10" fill="#167f73"/>
+<text x="650" y="2264">ic:split-prime-p1-rr-dickson-torus</text>
+<circle cx="620.0" cy="2323.7" r="4" fill="#637bad"><title>20261108T0748Z-split-prime-p1-r2b-m5t4: 6 count (n=1)</title></circle>
+<rect x="636" y="2271" width="10" height="10" fill="#637bad"/>
+<text x="650" y="2280">ic:split-prime-p1-rr-dickson-torus</text>
+<circle cx="620.0" cy="2323.7" r="4" fill="#aa8b5b"><title>20261108T0748Z-split-prime-p1-r2b-m5t4: 9 count (n=1)</title></circle>
+<rect x="636" y="2287" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="2296">ic:split-prime-p1-rr-dickson-torus</text>
+<rect x="636" y="2303" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="2312">ic:split-prime-p2-twist-coset-toy </text>
+<rect x="636" y="2319" width="10" height="10" fill="#69879e"/>
+<text x="650" y="2328">ic:split-prime-p2-twist-coset-toy </text>
+<rect x="636" y="2335" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="2344">registry-rebinding:ic-aimed-gather</text>
+<rect x="636" y="2351" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="2360">study:elliptic_code_list_decoding_</text>
+<rect x="636" y="2367" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="2376">study:pkm_falldegree_unblock_20261</text>
+<rect x="636" y="2383" width="10" height="10" fill="#167f73"/>
+<text x="650" y="2392">study:pkm_falldegree_unblock_20261</text>
+<rect x="636" y="2399" width="10" height="10" fill="#637bad"/>
+<text x="650" y="2408">study:pkm_falldegree_unblock_20261</text>
+<rect x="636" y="2415" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="2424">study:pkm_falldegree_unblock_20261</text>
+<rect x="636" y="2431" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="2440">study:pkm_falldegree_unblock_20261</text>
+<rect x="636" y="2447" width="10" height="10" fill="#69879e"/>
+<text x="650" y="2456">study:pkm_falldegree_unblock_20261</text>
+<rect x="636" y="2463" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="2472">study:pkm_falldegree_unblock_20261</text>
+<rect x="636" y="2479" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="2488">study:pkm_falldegree_unblock_20261</text>
+<rect x="636" y="2495" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="2504">study:pkm_falldegree_unblock_20261</text>
+<text x="60" y="2542" font-weight="bold">Series in unit fmul: gain vs first record (derived, %)</text>
+<rect x="60" y="2552" width="560" height="220" fill="none" stroke="#999"/>
+<line x1="60" y1="2772.0" x2="620" y2="2772.0" stroke="#eee"/>
+<text x="54" y="2776.0" text-anchor="end" fill="#555">-1.2</text>
+<line x1="60" y1="2717.0" x2="620" y2="2717.0" stroke="#eee"/>
+<text x="54" y="2721.0" text-anchor="end" fill="#555">-0.6</text>
+<line x1="60" y1="2662.0" x2="620" y2="2662.0" stroke="#eee"/>
+<text x="54" y="2666.0" text-anchor="end" fill="#555">0</text>
+<line x1="60" y1="2607.0" x2="620" y2="2607.0" stroke="#eee"/>
+<text x="54" y="2611.0" text-anchor="end" fill="#555">0.6</text>
+<line x1="60" y1="2552.0" x2="620" y2="2552.0" stroke="#eee"/>
+<text x="54" y="2556.0" text-anchor="end" fill="#555">1.2</text>
+<text x="60.0" y="2788" text-anchor="middle" fill="#555">2026-11-07</text>
+<text x="246.7" y="2788" text-anchor="middle" fill="#555">2026-11-08</text>
+<text x="433.3" y="2788" text-anchor="middle" fill="#555">2026-11-08</text>
+<text x="620.0" y="2788" text-anchor="middle" fill="#555">2026-11-09</text>
+<line x1="60" y1="2662.0" x2="620" y2="2662.0" stroke="#bbb" stroke-dasharray="4 3"/>
+<text transform="translate(16,2662.0) rotate(-90)" text-anchor="middle" fill="#555">% better than first</text>
+<circle cx="340.0" cy="2662.0" r="4" fill="#167f73"><title>20261108T0449Z-minors-gd-panel: 477,524.385 fmul (n=200)</title></circle>
+<rect x="636" y="2557" width="10" height="10" fill="#167f73"/>
+<text x="650" y="2566">study:minors_guess_determine_20261</text>
+<circle cx="340.0" cy="2662.0" r="4" fill="#637bad"><title>20261108T0449Z-minors-gd-panel: 1.168e+06 fmul (n=200)</title></circle>
+<rect x="636" y="2573" width="10" height="10" fill="#637bad"/>
+<text x="650" y="2582">study:minors_guess_determine_20261</text>
+<circle cx="340.0" cy="2662.0" r="4" fill="#aa8b5b"><title>20261108T0449Z-minors-gd-panel: 7.096e+06 fmul (n=200)</title></circle>
+<rect x="636" y="2589" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="2598">study:minors_guess_determine_20261</text>
+<circle cx="340.0" cy="2662.0" r="4" fill="#93a1a4"><title>20261108T0449Z-minors-gd-panel: 8.149e+07 fmul (n=200)</title></circle>
+<rect x="636" y="2605" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="2614">study:minors_guess_determine_20261</text>
+<circle cx="340.0" cy="2662.0" r="4" fill="#69879e"><title>20261108T0449Z-minors-gd-panel: 1.27e+09 fmul (n=200)</title></circle>
+<rect x="636" y="2621" width="10" height="10" fill="#69879e"/>
+<text x="650" y="2630">study:minors_guess_determine_20261</text>
+<circle cx="340.0" cy="2662.0" r="4" fill="#b05c5c"><title>20261108T0449Z-minors-gd-panel: 1.995e+10 fmul (n=200)</title></circle>
+<rect x="636" y="2637" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="2646">study:minors_guess_determine_20261</text>
+<rect x="636" y="2653" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="2662">study:pkm_falldegree_unblock_20261</text>
+<rect x="636" y="2669" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="2678">study:pkm_falldegree_unblock_20261</text>
+<text x="60" y="2852" font-weight="bold">Series in unit percent: gain vs first record (derived, %)</text>
+<rect x="60" y="2862" width="560" height="220" fill="none" stroke="#999"/>
+<line x1="60" y1="3082.0" x2="620" y2="3082.0" stroke="#eee"/>
+<text x="54" y="3086.0" text-anchor="end" fill="#555">-8.76</text>
+<line x1="60" y1="3027.0" x2="620" y2="3027.0" stroke="#eee"/>
+<text x="54" y="3031.0" text-anchor="end" fill="#555">17.5</text>
+<line x1="60" y1="2972.0" x2="620" y2="2972.0" stroke="#eee"/>
+<text x="54" y="2976.0" text-anchor="end" fill="#555">43.8</text>
+<line x1="60" y1="2917.0" x2="620" y2="2917.0" stroke="#eee"/>
+<text x="54" y="2921.0" text-anchor="end" fill="#555">70.1</text>
+<line x1="60" y1="2862.0" x2="620" y2="2862.0" stroke="#eee"/>
+<text x="54" y="2866.0" text-anchor="end" fill="#555">96.3</text>
+<text x="60.0" y="3098" text-anchor="middle" fill="#555">2026-11-07</text>
+<text x="246.7" y="3098" text-anchor="middle" fill="#555">2026-11-07</text>
+<text x="433.3" y="3098" text-anchor="middle" fill="#555">2026-11-08</text>
+<text x="620.0" y="3098" text-anchor="middle" fill="#555">2026-11-08</text>
+<line x1="60" y1="3063.7" x2="620" y2="3063.7" stroke="#bbb" stroke-dasharray="4 3"/>
+<text transform="translate(16,2972.0) rotate(-90)" text-anchor="middle" fill="#555">% better than first</text>
+<polyline fill="none" stroke="#167f73" stroke-width="2" points="620.0,3063.7 620.0,2880.3"/>
+<circle cx="620.0" cy="3063.7" r="4" fill="#167f73"><title>20261107T2144Z-split-prime-p3-cross-trace: 0.7 percent (n=2000)</title></circle>
+<circle cx="620.0" cy="2880.3" r="4" fill="#167f73"><title>20261108T0545Z-split-prime-p3-r2-walk-v2: 0.087 percent (n=2000)</title></circle>
+<rect x="636" y="2867" width="10" height="10" fill="#167f73"/>
+<text x="650" y="2876">ecdlp:split-prime-p3-cross-trace-c</text>
+<circle cx="60.0" cy="3063.7" r="4" fill="#637bad"><title>20261107T2144Z-split-prime-p2-twist-coset: 0.93 percent (n=36)</title></circle>
+<rect x="636" y="2883" width="10" height="10" fill="#637bad"/>
+<text x="650" y="2892">ic:split-prime-p2-twist-coset-toy </text>
+<circle cx="60.0" cy="3063.7" r="4" fill="#aa8b5b"><title>20261107T2144Z-split-prime-p2-twist-coset: 0.39 percent (n=12)</title></circle>
+<rect x="636" y="2899" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="2908">ic:split-prime-p2-twist-coset-toy </text>
+<rect x="636" y="2915" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="2924">ic:split-prime-p2-twist-coset-toy </text>
+<text x="60" y="3162" font-weight="bold">Series in unit ratio: gain vs first record (derived, %)</text>
+<rect x="60" y="3172" width="560" height="220" fill="none" stroke="#999"/>
+<line x1="60" y1="3392.0" x2="620" y2="3392.0" stroke="#eee"/>
+<text x="54" y="3396.0" text-anchor="end" fill="#555">-9.91</text>
+<line x1="60" y1="3337.0" x2="620" y2="3337.0" stroke="#eee"/>
+<text x="54" y="3341.0" text-anchor="end" fill="#555">19.8</text>
+<line x1="60" y1="3282.0" x2="620" y2="3282.0" stroke="#eee"/>
+<text x="54" y="3286.0" text-anchor="end" fill="#555">49.5</text>
+<line x1="60" y1="3227.0" x2="620" y2="3227.0" stroke="#eee"/>
+<text x="54" y="3231.0" text-anchor="end" fill="#555">79.3</text>
+<line x1="60" y1="3172.0" x2="620" y2="3172.0" stroke="#eee"/>
+<text x="54" y="3176.0" text-anchor="end" fill="#555">109</text>
+<text x="60.0" y="3408" text-anchor="middle" fill="#555">2026-11-04</text>
+<text x="246.7" y="3408" text-anchor="middle" fill="#555">2026-11-05</text>
+<text x="433.3" y="3408" text-anchor="middle" fill="#555">2026-11-07</text>
+<text x="620.0" y="3408" text-anchor="middle" fill="#555">2026-11-08</text>
+<line x1="60" y1="3373.7" x2="620" y2="3373.7" stroke="#bbb" stroke-dasharray="4 3"/>
+<text transform="translate(16,3282.0) rotate(-90)" text-anchor="middle" fill="#555">% better than first</text>
+<rect x="636" y="3177" width="10" height="10" fill="#167f73"/>
+<text x="650" y="3186">analysis:ecbench_statistics_v2 · c</text>
+<rect x="636" y="3193" width="10" height="10" fill="#637bad"/>
+<text x="650" y="3202">analysis:ecbench_statistics_v2 · o</text>
+<circle cx="200.0" cy="3373.7" r="4" fill="#aa8b5b"><title>20261105T1759Z-ic-packed-filter-p32: 0.9601 ratio (n=288)</title></circle>
+<rect x="636" y="3209" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="3218">archive:ic-packed-filter-p32-20261</text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#93a1a4"><title>20261108T2045Z-curve25519-tw-jumps-k20: 1.3581 ratio (n=8)</title></circle>
+<rect x="636" y="3225" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="3234">ecdlp:curve25519-family-k20 · rati</text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#69879e"><title>20261108T2045Z-curve25519-tw-jumps-k20: 1.0507 ratio (n=8)</title></circle>
+<rect x="636" y="3241" width="10" height="10" fill="#69879e"/>
+<text x="650" y="3250">ecdlp:curve25519-family-k20 · rati</text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#b05c5c"><title>20261108T2045Z-curve25519-tw-jumps-k20: 1.2204 ratio (n=8)</title></circle>
+<rect x="636" y="3257" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="3266">ecdlp:curve25519-family-k20 · rati</text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#5c8a3a"><title>20261108T2047Z-curve25519-tw-jumps-k24: 1.3431 ratio (n=8)</title></circle>
+<rect x="636" y="3273" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="3282">ecdlp:curve25519-family-k24 · rati</text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#8a5ca8"><title>20261108T2047Z-curve25519-tw-jumps-k24: 1.0141 ratio (n=8)</title></circle>
+<rect x="636" y="3289" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="3298">ecdlp:curve25519-family-k24 · rati</text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#167f73"><title>20261108T2047Z-curve25519-tw-jumps-k24: 1.2682 ratio (n=8)</title></circle>
+<rect x="636" y="3305" width="10" height="10" fill="#167f73"/>
+<text x="650" y="3314">ecdlp:curve25519-family-k24 · rati</text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#637bad"><title>20261108T2051Z-curve25519-tw-scaling-k28: 0.9966 ratio (n=8)</title></circle>
+<rect x="636" y="3321" width="10" height="10" fill="#637bad"/>
+<text x="650" y="3330">ecdlp:curve25519-family-k28 · rati</text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#aa8b5b"><title>20261108T2051Z-curve25519-tw-scaling-k28: 0.9059 ratio (n=8)</title></circle>
+<rect x="636" y="3337" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="3346">ecdlp:curve25519-family-k28 · rati</text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#93a1a4"><title>20261108T2051Z-curve25519-tw-scaling-k28: 1.3951 ratio (n=8)</title></circle>
+<rect x="636" y="3353" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="3362">ecdlp:curve25519-family-k28 · rati</text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#69879e"><title>20261108T2051Z-curve25519-tw-scaling-k32: 0.9853 ratio (n=8)</title></circle>
+<rect x="636" y="3369" width="10" height="10" fill="#69879e"/>
+<text x="650" y="3378">ecdlp:curve25519-family-k32 · rati</text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#b05c5c"><title>20261108T2051Z-curve25519-tw-scaling-k32: 0.8569 ratio (n=8)</title></circle>
+<rect x="636" y="3385" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="3394">ecdlp:curve25519-family-k32 · rati</text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#5c8a3a"><title>20261108T2051Z-curve25519-tw-scaling-k32: 1.3663 ratio (n=8)</title></circle>
+<rect x="636" y="3401" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="3410">ecdlp:curve25519-family-k32 · rati</text>
+<polyline fill="none" stroke="#8a5ca8" stroke-width="2" points="620.0,3373.7 620.0,3190.3"/>
+<circle cx="620.0" cy="3373.7" r="4" fill="#8a5ca8"><title>20261107T2144Z-split-prime-p3-cross-trace: 0.986 ratio (n=2000)</title></circle>
+<circle cx="620.0" cy="3190.3" r="4" fill="#8a5ca8"><title>20261108T0545Z-split-prime-p3-r2-walk-v2: 0.009 ratio (n=2000)</title></circle>
+<rect x="636" y="3417" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="3426">ecdlp:split-prime-p3-cross-trace-c</text>
+<circle cx="60.0" cy="3373.7" r="4" fill="#167f73"><title>20261104T1119Z-c25519-autolab-r32-k20-32: 0.9375 ratio (n=64)</title></circle>
+<rect x="636" y="3433" width="10" height="10" fill="#167f73"/>
+<text x="650" y="3442">ic:curve25519-family-k20-32 · rati</text>
+<circle cx="60.0" cy="3373.7" r="4" fill="#637bad"><title>20261104T1213Z-c25519-autolab-r34-k20-32: 0.8802 ratio (n=64)</title></circle>
+<rect x="636" y="3449" width="10" height="10" fill="#637bad"/>
+<text x="650" y="3458">ic:curve25519-family-k20-32 · rati</text>
+<circle cx="60.0" cy="3373.7" r="4" fill="#aa8b5b"><title>20261104T1609Z-c25519-autolab-r35-k24-32: 0.9106 ratio (n=64)</title></circle>
+<rect x="636" y="3465" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="3474">ic:curve25519-family-k24-32 · rati</text>
+<circle cx="480.0" cy="3373.7" r="4" fill="#93a1a4"><title>20261107T1945Z-curve25519-f1-walk-k20: 1.2283 ratio (n=8)</title></circle>
+<rect x="636" y="3481" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="3490">ic:curve25519-k20-single-target · </text>
+<circle cx="480.0" cy="3373.7" r="4" fill="#69879e"><title>20261107T1945Z-curve25519-f1-walk-k20: 1.2385 ratio (n=8)</title></circle>
+<rect x="636" y="3497" width="10" height="10" fill="#69879e"/>
+<text x="650" y="3506">ic:curve25519-k20-single-target · </text>
+<circle cx="480.0" cy="3373.7" r="4" fill="#b05c5c"><title>20261107T1945Z-curve25519-f1-walk-k20: 1.1542 ratio (n=8)</title></circle>
+<rect x="636" y="3513" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="3522">ic:curve25519-k20-single-target · </text>
+<circle cx="480.0" cy="3373.7" r="4" fill="#5c8a3a"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 1.1656 ratio (n=8)</title></circle>
+<rect x="636" y="3529" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="3538">ic:curve25519-k20-single-target · </text>
+<circle cx="480.0" cy="3373.7" r="4" fill="#8a5ca8"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 0.8872 ratio (n=8)</title></circle>
+<rect x="636" y="3545" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="3554">ic:curve25519-k20-single-target · </text>
+<circle cx="480.0" cy="3373.7" r="4" fill="#167f73"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 0.9088 ratio (n=8)</title></circle>
+<rect x="636" y="3561" width="10" height="10" fill="#167f73"/>
+<text x="650" y="3570">ic:curve25519-k20-single-target · </text>
+<circle cx="480.0" cy="3373.7" r="4" fill="#637bad"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 0.7335 ratio (n=8)</title></circle>
+<rect x="636" y="3577" width="10" height="10" fill="#637bad"/>
+<text x="650" y="3586">ic:curve25519-k20-single-target · </text>
+<circle cx="480.0" cy="3373.7" r="4" fill="#aa8b5b"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 1.3058 ratio (n=8)</title></circle>
+<rect x="636" y="3593" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="3602">ic:curve25519-k20-single-target · </text>
+<circle cx="480.0" cy="3373.7" r="4" fill="#93a1a4"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 1.3963 ratio (n=8)</title></circle>
+<rect x="636" y="3609" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="3618">ic:curve25519-k20-single-target · </text>
+<circle cx="480.0" cy="3373.7" r="4" fill="#69879e"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 1.3602 ratio (n=8)</title></circle>
+<rect x="636" y="3625" width="10" height="10" fill="#69879e"/>
+<text x="650" y="3634">ic:curve25519-k20-single-target · </text>
+<circle cx="480.0" cy="3373.7" r="4" fill="#b05c5c"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 0.8312 ratio (n=8)</title></circle>
+<rect x="636" y="3641" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="3650">ic:curve25519-k20-single-target · </text>
+<circle cx="480.0" cy="3373.7" r="4" fill="#5c8a3a"><title>20261107T2153Z-curve25519-f1-targetwalk-k20: 0.7797 ratio (n=8)</title></circle>
+<rect x="636" y="3657" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="3666">ic:curve25519-k20-single-target · </text>
+<circle cx="480.0" cy="3373.7" r="4" fill="#8a5ca8"><title>20261107T1947Z-curve25519-f1-walk-k24: 1.1475 ratio (n=8)</title></circle>
+<rect x="636" y="3673" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="3682">ic:curve25519-k24-single-target · </text>
+<circle cx="480.0" cy="3373.7" r="4" fill="#167f73"><title>20261107T1947Z-curve25519-f1-walk-k24: 1.1636 ratio (n=8)</title></circle>
+<rect x="636" y="3689" width="10" height="10" fill="#167f73"/>
+<text x="650" y="3698">ic:curve25519-k24-single-target · </text>
+<circle cx="480.0" cy="3373.7" r="4" fill="#637bad"><title>20261107T1947Z-curve25519-f1-walk-k24: 1.0384 ratio (n=8)</title></circle>
+<rect x="636" y="3705" width="10" height="10" fill="#637bad"/>
+<text x="650" y="3714">ic:curve25519-k24-single-target · </text>
+<circle cx="480.0" cy="3373.7" r="4" fill="#aa8b5b"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 0.9801 ratio (n=8)</title></circle>
+<rect x="636" y="3721" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="3730">ic:curve25519-k24-single-target · </text>
+<circle cx="480.0" cy="3373.7" r="4" fill="#93a1a4"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 0.8609 ratio (n=8)</title></circle>
+<rect x="636" y="3737" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="3746">ic:curve25519-k24-single-target · </text>
+<circle cx="480.0" cy="3373.7" r="4" fill="#69879e"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 0.8882 ratio (n=8)</title></circle>
+<rect x="636" y="3753" width="10" height="10" fill="#69879e"/>
+<text x="650" y="3762">ic:curve25519-k24-single-target · </text>
+<circle cx="480.0" cy="3373.7" r="4" fill="#b05c5c"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 0.675 ratio (n=8)</title></circle>
+<rect x="636" y="3769" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="3778">ic:curve25519-k24-single-target · </text>
+<circle cx="480.0" cy="3373.7" r="4" fill="#5c8a3a"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 1.2961 ratio (n=8)</title></circle>
+<rect x="636" y="3785" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="3794">ic:curve25519-k24-single-target · </text>
+<circle cx="480.0" cy="3373.7" r="4" fill="#8a5ca8"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 1.4114 ratio (n=8)</title></circle>
+<rect x="636" y="3801" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="3810">ic:curve25519-k24-single-target · </text>
+<circle cx="480.0" cy="3373.7" r="4" fill="#167f73"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 1.3883 ratio (n=8)</title></circle>
+<rect x="636" y="3817" width="10" height="10" fill="#167f73"/>
+<text x="650" y="3826">ic:curve25519-k24-single-target · </text>
+<circle cx="480.0" cy="3373.7" r="4" fill="#637bad"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 0.7492 ratio (n=8)</title></circle>
+<rect x="636" y="3833" width="10" height="10" fill="#637bad"/>
+<text x="650" y="3842">ic:curve25519-k24-single-target · </text>
+<circle cx="480.0" cy="3373.7" r="4" fill="#aa8b5b"><title>20261107T2153Z-curve25519-f1-targetwalk-k24: 0.9063 ratio (n=8)</title></circle>
+<rect x="636" y="3849" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="3858">ic:curve25519-k24-single-target · </text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#93a1a4"><title>20261108T0538Z-split-prime-p1-r2a-armf-caps: 2.29 ratio (n=6)</title></circle>
+<rect x="636" y="3865" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="3874">ic:split-prime-p1-rr-dickson-torus</text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#69879e"><title>20261108T0538Z-split-prime-p1-r2a-armf-caps: 1.33 ratio (n=6)</title></circle>
+<rect x="636" y="3881" width="10" height="10" fill="#69879e"/>
+<text x="650" y="3890">ic:split-prime-p1-rr-dickson-torus</text>
+<circle cx="480.0" cy="3373.7" r="4" fill="#b05c5c"><title>20261107T2144Z-split-prime-p2-twist-coset: 2.25 ratio (n=8)</title></circle>
+<rect x="636" y="3897" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="3906">ic:split-prime-p2-twist-coset-toy </text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#5c8a3a"><title>20261108T0530Z-split-prime-p2-r2-unplanted: 0.896 ratio (n=4)</title></circle>
+<rect x="636" y="3913" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="3922">ic:split-prime-p2-twist-coset-toy </text>
+<rect x="636" y="3929" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="3938">kernel:f6_ic_gate · f4_control_wor</text>
+<circle cx="200.0" cy="3373.7" r="4" fill="#167f73"><title>20261105T2109Z-f6-few-candidates: 10.29 ratio (n=9)</title></circle>
+<rect x="636" y="3945" width="10" height="10" fill="#167f73"/>
+<text x="650" y="3954">kernel:f6_ic_gate · f6ic_cpu_off_o</text>
+<circle cx="200.0" cy="3373.7" r="4" fill="#637bad"><title>20261105T2109Z-f6-few-candidates: 2.67 ratio (n=9)</title></circle>
+<rect x="636" y="3961" width="10" height="10" fill="#637bad"/>
+<text x="650" y="3970">kernel:f6_ic_gate · f6ic_cpu_off_o</text>
+<circle cx="200.0" cy="3373.7" r="4" fill="#aa8b5b"><title>20261105T2109Z-f6-few-candidates: 1.84 ratio (n=9)</title></circle>
+<rect x="636" y="3977" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="3986">kernel:f6_ic_gate · f6ic_word_xors</text>
+<circle cx="200.0" cy="3373.7" r="4" fill="#93a1a4"><title>20261105T2109Z-f6-parallel-split: 0.936 ratio (n=2)</title></circle>
+<rect x="636" y="3993" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="4002">kernel:inherited_f4_solve_tree · w</text>
+<circle cx="200.0" cy="3373.7" r="4" fill="#69879e"><title>20261105T2109Z-f6-parallel-split: 2.883 ratio (n=7)</title></circle>
+<rect x="636" y="4009" width="10" height="10" fill="#69879e"/>
+<text x="650" y="4018">kernel:inherited_f4_solve_tree · w</text>
+<circle cx="200.0" cy="3373.7" r="4" fill="#b05c5c"><title>20261105T2109Z-f6-parallel-split: 1.589 ratio (n=7)</title></circle>
+<rect x="636" y="4025" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="4034">kernel:inherited_f4_solve_tree · w</text>
+<circle cx="200.0" cy="3373.7" r="4" fill="#5c8a3a"><title>20261105T2109Z-f6-parallel-split: 2.865 ratio (n=9)</title></circle>
+<rect x="636" y="4041" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="4050">kernel:inherited_f4_solve_tree · w</text>
+<circle cx="340.0" cy="3373.7" r="4" fill="#8a5ca8"><title>20261106T0514Z-rho-frob-brent: 0.718 ratio (n=96)</title></circle>
+<rect x="636" y="4057" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="4066">rho:koblitz_signed_frobenius_panel</text>
+<circle cx="340.0" cy="3373.7" r="4" fill="#167f73"><title>20261106T0514Z-rho-frob-brent: 1.0948 ratio (n=96)</title></circle>
+<rect x="636" y="4073" width="10" height="10" fill="#167f73"/>
+<text x="650" y="4082">rho:koblitz_signed_frobenius_panel</text>
+<circle cx="340.0" cy="3373.7" r="4" fill="#637bad"><title>20261106T0514Z-rho-frob-brent: 1.4723 ratio (n=96)</title></circle>
+<rect x="636" y="4089" width="10" height="10" fill="#637bad"/>
+<text x="650" y="4098">rho:koblitz_signed_frobenius_panel</text>
+<circle cx="340.0" cy="3373.7" r="4" fill="#aa8b5b"><title>20261106T0514Z-rho-frob-brent: 1.0653 ratio (n=96)</title></circle>
+<rect x="636" y="4105" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="4114">rho:koblitz_signed_frobenius_panel</text>
+<circle cx="340.0" cy="3373.7" r="4" fill="#93a1a4"><title>20261106T0514Z-rho-frob-brent: 1.0008 ratio (n=96)</title></circle>
+<rect x="636" y="4121" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="4130">rho:koblitz_signed_frobenius_panel</text>
+<rect x="636" y="4137" width="10" height="10" fill="#69879e"/>
+<text x="650" y="4146">rho:prime_medium_p4_confirm · posi</text>
+<rect x="636" y="4153" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="4162">rho:prime_medium_p4_confirm · thet</text>
+<rect x="636" y="4169" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="4178">study:ml_learnability_control_2026</text>
+<rect x="636" y="4185" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="4194">study:ml_learnability_control_2026</text>
+<rect x="636" y="4201" width="10" height="10" fill="#167f73"/>
+<text x="650" y="4210">study:ml_learnability_control_2026</text>
+<rect x="636" y="4217" width="10" height="10" fill="#637bad"/>
+<text x="650" y="4226">study:ml_learnability_control_2026</text>
+<rect x="636" y="4233" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="4242">study:ml_learnability_control_2026</text>
+<rect x="636" y="4249" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="4258">study:ml_learnability_control_2026</text>
+<rect x="636" y="4265" width="10" height="10" fill="#69879e"/>
+<text x="650" y="4274">study:ml_learnability_control_2026</text>
+<rect x="636" y="4281" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="4290">study:ml_learnability_control_2026</text>
+<rect x="636" y="4297" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="4306">study:ml_learnability_control_2026</text>
+<rect x="636" y="4313" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="4322">study:ml_learnability_control_2026</text>
+<rect x="636" y="4329" width="10" height="10" fill="#167f73"/>
+<text x="650" y="4338">study:ml_learnability_control_2026</text>
+<rect x="636" y="4345" width="10" height="10" fill="#637bad"/>
+<text x="650" y="4354">study:ml_learnability_control_2026</text>
+<rect x="636" y="4361" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="4370">study:ml_learnability_control_2026</text>
+<rect x="636" y="4377" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="4386">study:ml_learnability_control_2026</text>
+<rect x="636" y="4393" width="10" height="10" fill="#69879e"/>
+<text x="650" y="4402">study:ml_learnability_control_2026</text>
+<rect x="636" y="4409" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="4418">study:ml_learnability_control_2026</text>
+<rect x="636" y="4425" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="4434">study:ml_learnability_control_2026</text>
+<rect x="636" y="4441" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="4450">study:ml_learnability_control_2026</text>
+<rect x="636" y="4457" width="10" height="10" fill="#167f73"/>
+<text x="650" y="4466">study:ml_learnability_control_2026</text>
+<rect x="636" y="4473" width="10" height="10" fill="#637bad"/>
+<text x="650" y="4482">study:ml_learnability_control_2026</text>
+<rect x="636" y="4489" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="4498">study:ml_learnability_control_2026</text>
+<rect x="636" y="4505" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="4514">study:ml_learnability_control_2026</text>
+<rect x="636" y="4521" width="10" height="10" fill="#69879e"/>
+<text x="650" y="4530">study:ml_learnability_control_2026</text>
+<rect x="636" y="4537" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="4546">study:ml_learnability_control_2026</text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#5c8a3a"><title>20261108T0449Z-split-graph-secant-panel: 1.1495 ratio (n=120)</title></circle>
+<rect x="636" y="4553" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="4562">study:split_graph_secant_cost_2026</text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#8a5ca8"><title>20261108T0449Z-split-graph-secant-panel: 1.3682 ratio (n=120)</title></circle>
+<rect x="636" y="4569" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="4578">study:split_graph_secant_cost_2026</text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#167f73"><title>20261108T0449Z-split-graph-secant-panel: 1.0341 ratio (n=120)</title></circle>
+<rect x="636" y="4585" width="10" height="10" fill="#167f73"/>
+<text x="650" y="4594">study:split_graph_secant_cost_2026</text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#637bad"><title>20261108T0449Z-split-graph-secant-panel: 1.1567 ratio (n=120)</title></circle>
+<rect x="636" y="4601" width="10" height="10" fill="#637bad"/>
+<text x="650" y="4610">study:split_graph_secant_cost_2026</text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#aa8b5b"><title>20261108T0449Z-split-graph-secant-panel: 0.958 ratio (n=120)</title></circle>
+<rect x="636" y="4617" width="10" height="10" fill="#aa8b5b"/>
+<text x="650" y="4626">study:split_graph_secant_cost_2026</text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#93a1a4"><title>20261108T0449Z-split-graph-secant-panel: 1.0599 ratio (n=120)</title></circle>
+<rect x="636" y="4633" width="10" height="10" fill="#93a1a4"/>
+<text x="650" y="4642">study:split_graph_secant_cost_2026</text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#69879e"><title>20261108T0449Z-split-graph-secant-panel: 3.5921 ratio (n=120)</title></circle>
+<rect x="636" y="4649" width="10" height="10" fill="#69879e"/>
+<text x="650" y="4658">study:split_graph_secant_cost_2026</text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#b05c5c"><title>20261108T0449Z-split-graph-secant-panel: 3.6477 ratio (n=120)</title></circle>
+<rect x="636" y="4665" width="10" height="10" fill="#b05c5c"/>
+<text x="650" y="4674">study:split_graph_secant_cost_2026</text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#5c8a3a"><title>20261108T0449Z-split-graph-secant-panel: 3.5856 ratio (n=120)</title></circle>
+<rect x="636" y="4681" width="10" height="10" fill="#5c8a3a"/>
+<text x="650" y="4690">study:split_graph_secant_cost_2026</text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#8a5ca8"><title>20261108T0449Z-split-graph-secant-panel: 3.9811 ratio (n=120)</title></circle>
+<rect x="636" y="4697" width="10" height="10" fill="#8a5ca8"/>
+<text x="650" y="4706">study:split_graph_secant_cost_2026</text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#167f73"><title>20261108T0449Z-split-graph-secant-panel: 3.6385 ratio (n=120)</title></circle>
+<rect x="636" y="4713" width="10" height="10" fill="#167f73"/>
+<text x="650" y="4722">study:split_graph_secant_cost_2026</text>
+<circle cx="620.0" cy="3373.7" r="4" fill="#637bad"><title>20261108T0449Z-split-graph-secant-panel: 4.4432 ratio (n=120)</title></circle>
+<rect x="636" y="4729" width="10" height="10" fill="#637bad"/>
+<text x="650" y="4738">study:split_graph_secant_cost_2026</text>
 </svg>

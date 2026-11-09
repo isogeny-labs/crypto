@@ -1,38 +1,39 @@
-# Resume: crypto @ claude/elliptic-curves-graph-weaknesses-fw42m4
+# Resume: crypto @ claude/ic-coverage-20261108
 
 ## Goal
-Owner asked (2026-11-08, "Please run it") to run the open n = 37 test: does msolve 0.6.5 (F4,
-grevlex) reach maximal step degree 5 on a fresh m = 2 descended S3 instance at n = 37, as
-Kousidis-Wiemers report for Magma (corpus MEAS-GB-KW-TABLE1)? Locally it was OOM-killed at 15 GB.
+Coverage report of index-calculus work on the Curve25519-family miniatures
+(research/curve25519_ic_coverage_20261108/REPORT.md) and the top untried directions run as
+single-target ecbench studies under frozen protocols (research/curve25519_tw_jumps_20261108,
+research/curve25519_tw_scaling_20261108). Success rule: every verified measured improvement over
+the current best arm (twcj-x15, 1.40x rho-neg at k = 20, w = 0) counts; distance to rho reported.
 
 ## Lead / hypothesis
-Petit-Quisquater Assumption 2 at m = 2 (HEUR-GB-PQ-ASSUMPTION-2). msolve gives 4 on n = 17..34 and
-n = 36 (merged in PRs #3658, #3682). Magma reports 5 from n = 37.
+Study A: the target-in-walk arm draws jump indices independently of the point, so its collision
+rate does not depend on the jump count for jumps >= 4; cutting jumps 16 -> 4 saves the set-up
+(0.116 sqrt(r) at k = 20) with no walk penalty; jumps = 2 fails. Study B: twcj's distance to
+rho at k = 28, 32 stays in [1.30, 1.55] as rho's set-up overhead vanishes.
 
 ## Spec
-research/ecdlp_weakness_census_20261104/pq2_rank/f4/eks_n37/{protocol.json, run.sh, input.ms},
-committed at e63bf8e55d (publication receipt in the run's receipt directory). Input dump
-pq2_rank/f4/step_n36_37/dumps/n37_i0.json.
+Protocols: research/curve25519_tw_jumps_20261108/PROTOCOL.md (frozen, data/frozen.sha256),
+research/curve25519_tw_scaling_20261108/PROTOCOL.md. Specs in each study's specs/. Binary:
+/home/user/ctarget-f1/release/ecbench (no code change). Launch: python3 tools/benchrec.py run
+<record> -- research/<study>/scripts/run_sessions.sh <k>.
 
 ## State
-Image: isolab tasks base (aws-cli) + one layer /opt/msolve (msolve + its shared libs + loader +
-run.sh + input.ms), published with taskq/deploy/eks-karpenter/oci-layer-publish.py. Command job
-via taskq/deploy/eks-karpenter/remote/launch-remote-command (isolab.eks.command-request/v1),
-8 vCPU, 100Gi, 21600 s, retries 0, cpu-spot. Results land in
-s3://isolab-results-104186811093-us-east-2/runs/<job>/<pod-uid>/ (wrapper uploads every 10 min).
+Worktree /home/user/crypto-ic (sparse checkout; disk nearly full, do not build). Conductor not
+installed. research-kb and ecdb unreachable from this machine. Sessions are local L0 counted
+units only. Records: benchmarks/records/*curve25519-tw-*.json.
 
 ## Next steps
-1. Publish image, write request.json, validate, launch; record Job/Pod UIDs.
-2. Read status with an isolab.eks.command-status/v1 request; download S3 outputs, verify SHA256SUMS.
-3. Parse max step degree, check linear = k = 33; update pq2_rank README, corpus MEAS-PQ2-MSOLVE-F4,
-   session log; PR.
+1. Run study A at k = 20, 24; analyse.py; README, figure, PDF; close records.
+2. Run study B at k = 28, 32; same.
+3. Coverage REPORT.md + figure + PDF; session log entry docs/session-logs/2026-11-08.md; commit.
 
 ## Runs in flight
-(filled at launch)
+None. Goal (owner, 2026-11-08): index-calculus S/rho-neg <= 0.75, stays open; BSGS-class results do not count (owner ruling). State: best measured IC ratio 1.40 (C=1, k=20, fresh curves, PR merged as c1/); NC-2 and NC-1 Stage 0 null (PRs #3729 merged, #3734 open auto-merge); measured BSGS panel 0.61-0.70 at k=20, 0.89-0.93 at k=24 (PR #3738, boundary reference only). At k>=24 the target is below rho K=1 floor 0.886. Blocker: no remaining in-scope idea with non-negligible probability; resume needs a new structural idea outside collision relations (algebraic track is about 18x at k=20). Next action if resuming: read ideas/NONCOLLISION-20261108.md closed-lever table and propose something not in it.
 
 ## Stop and success conditions
-One attempt, no retries; stop at exit, OOM or 6 h. Budget ceiling USD 5 (monthly account
-headroom was USD 23.67 at submission).
+About 90 minutes of runs in total; failed predictions stay failed; no push, no PR.
 
 ## Open questions
-None.
+Band pricing of table inserts (PR #3700 opt-in): both readings are reported.

@@ -44,3 +44,6 @@ Protocol `PROTOCOL-R2.md` (frozen before data, \#3693); card `CARD-p1-r2-a` (exe
 )
 Control met exactly (T on the Kummer curve at m3 t5: D 6, widest 23,720, round 7's values). Against the lab's strongest $m = 3$ system F, RR is a trade in all 9 cells: one degree lower, 2.3 to 3.0 times wider. Against T, RR dominates at t3 and t4 and is a trade at t5. The m = 5 cell with a tower (card B, T24 m5 t4, 13 GiB) decides rule 3.
 #figure(image("../figures/p1_r2_cells.svg", width: 100%), caption: [RR, T and F per cell, rounds 1 and 2 merged; hatched bars are capped runs (lower bounds).])
+
+= Round 2, card B: the first m = 5 cell with a tower
+Card `CARD-p1-r2-b`, T24 m5 t4, seed 2, 13 GiB and 10,800 s, alone on the host. RR timed out after 10,800 s at degree ≥ 6 (working in degree 7), widest ≥ 146,277; T hit the 13 GiB cap after 2,619 s at degree ≥ 9, widest ≥ 662,876. *Rule 3: undecided under the frozen text* (RR did not complete) [pcc:unverified]. Descriptively RR was at a lower degree with 4.5 times narrower matrices when stopped, limited by time not memory. Deciding it needs RR run to completion on a larger host with about a day's time limit.

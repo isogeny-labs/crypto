@@ -1,12 +1,12 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261108T0538Z-split-prime-p1-r2a-armf-caps",
+  "latest_record": "20261108T2319Z-c25519-bsgs-boundary",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 59,
-    "open": 5
+    "measured": 72,
+    "open": 1
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -421,6 +421,490 @@
     },
     {
       "better": "lower",
+      "first": 1.3581,
+      "latest": 1.3581,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.3581
+      },
+      "metric": "ratio_j16_over_rho_w0",
+      "points": [
+        {
+          "commit": "a1ce0db2f9ec",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.3581
+          },
+          "n": 8,
+          "record": "20261108T2045Z-curve25519-tw-jumps-k20",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            1.232,
+            1.497
+          ],
+          "summary": "k=20: jumps=4 costs 1.22x [1.19,1.26] the 16-jump target-in-walk arm (walk lengthens, dependent rows); jumps=8 null, 32 1.05x, 2 fails 3.25x; 16-jump arm 1.36x rho-neg at w=0; primary prediction failed",
+          "value": 1.3581
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k20",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0507,
+      "latest": 1.0507,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_j32_over_j16_w0",
+      "points": [
+        {
+          "commit": "a1ce0db2f9ec",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261108T2045Z-curve25519-tw-jumps-k20",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.996,
+            1.11
+          ],
+          "summary": "k=20: jumps=4 costs 1.22x [1.19,1.26] the 16-jump target-in-walk arm (walk lengthens, dependent rows); jumps=8 null, 32 1.05x, 2 fails 3.25x; 16-jump arm 1.36x rho-neg at w=0; primary prediction failed",
+          "value": 1.0507
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k20",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.2204,
+      "latest": 1.2204,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_j4_over_j16_w0",
+      "points": [
+        {
+          "commit": "a1ce0db2f9ec",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261108T2045Z-curve25519-tw-jumps-k20",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.186,
+            1.256
+          ],
+          "summary": "k=20: jumps=4 costs 1.22x [1.19,1.26] the 16-jump target-in-walk arm (walk lengthens, dependent rows); jumps=8 null, 32 1.05x, 2 fails 3.25x; 16-jump arm 1.36x rho-neg at w=0; primary prediction failed",
+          "value": 1.2204
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k20",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 2.1364,
+      "latest": 2.1364,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.358083
+      },
+      "metric": "s_twcj_j16_w0",
+      "points": [
+        {
+          "commit": "a1ce0db2f9ec",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.358083
+          },
+          "n": 512,
+          "record": "20261108T2045Z-curve25519-tw-jumps-k20",
+          "reference": 1.5731,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=20: jumps=4 costs 1.22x [1.19,1.26] the 16-jump target-in-walk arm (walk lengthens, dependent rows); jumps=8 null, 32 1.05x, 2 fails 3.25x; 16-jump arm 1.36x rho-neg at w=0; primary prediction failed",
+          "value": 2.1364
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k20",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.3431,
+      "latest": 1.3431,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.3431
+      },
+      "metric": "ratio_j16_over_rho_w0",
+      "points": [
+        {
+          "commit": "a1ce0db2f9ec",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.3431
+          },
+          "n": 8,
+          "record": "20261108T2047Z-curve25519-tw-jumps-k24",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            1.219,
+            1.479
+          ],
+          "summary": "k=24: jumps=4 costs 1.27x [1.19,1.35] the 16-jump arm; jumps=8 1.05x, 32 1.01x, 2 fails 3.46x; 16-jump arm 1.34x rho-neg at w=0; replicate prediction failed",
+          "value": 1.3431
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k24",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.0141,
+      "latest": 1.0141,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_j32_over_j16_w0",
+      "points": [
+        {
+          "commit": "a1ce0db2f9ec",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261108T2047Z-curve25519-tw-jumps-k24",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.978,
+            1.051
+          ],
+          "summary": "k=24: jumps=4 costs 1.27x [1.19,1.35] the 16-jump arm; jumps=8 1.05x, 32 1.01x, 2 fails 3.46x; 16-jump arm 1.34x rho-neg at w=0; replicate prediction failed",
+          "value": 1.0141
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k24",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.2682,
+      "latest": 1.2682,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_j4_over_j16_w0",
+      "points": [
+        {
+          "commit": "a1ce0db2f9ec",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261108T2047Z-curve25519-tw-jumps-k24",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.193,
+            1.348
+          ],
+          "summary": "k=24: jumps=4 costs 1.27x [1.19,1.35] the 16-jump arm; jumps=8 1.05x, 32 1.01x, 2 fails 3.46x; 16-jump arm 1.34x rho-neg at w=0; replicate prediction failed",
+          "value": 1.2682
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k24",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.5834,
+      "latest": 1.5834,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.342661
+      },
+      "metric": "s_twcj_j16_w0",
+      "points": [
+        {
+          "commit": "a1ce0db2f9ec",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.342661
+          },
+          "n": 512,
+          "record": "20261108T2047Z-curve25519-tw-jumps-k24",
+          "reference": 1.1793,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=24: jumps=4 costs 1.27x [1.19,1.35] the 16-jump arm; jumps=8 1.05x, 32 1.01x, 2 fails 3.46x; 16-jump arm 1.34x rho-neg at w=0; replicate prediction failed",
+          "value": 1.5834
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k24",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.9966,
+      "latest": 0.9966,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_j32_over_j16_w0",
+      "points": [
+        {
+          "commit": "e6a759cc7214",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261108T2051Z-curve25519-tw-scaling-k28",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.954,
+            1.041
+          ],
+          "summary": "k=28: target-in-walk F=1 arm 1.40x [1.35,1.45] rho-neg at w=0 (inserts-priced band: ahead at every weight), 0.906x the table-then-probe arm; 32/64 jumps null",
+          "value": 0.9966
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k28",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9059,
+      "latest": 0.9059,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_twcj_over_f1_w0",
+      "points": [
+        {
+          "commit": "e6a759cc7214",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261108T2051Z-curve25519-tw-scaling-k28",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.877,
+            0.935
+          ],
+          "summary": "k=28: target-in-walk F=1 arm 1.40x [1.35,1.45] rho-neg at w=0 (inserts-priced band: ahead at every weight), 0.906x the table-then-probe arm; 32/64 jumps null",
+          "value": 0.9059
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k28",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.3951,
+      "latest": 1.3951,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.3951
+      },
+      "metric": "ratio_twcj_over_rho_w0",
+      "points": [
+        {
+          "commit": "e6a759cc7214",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.3951
+          },
+          "n": 8,
+          "record": "20261108T2051Z-curve25519-tw-scaling-k28",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            1.345,
+            1.446
+          ],
+          "summary": "k=28: target-in-walk F=1 arm 1.40x [1.35,1.45] rho-neg at w=0 (inserts-priced band: ahead at every weight), 0.906x the table-then-probe arm; 32/64 jumps null",
+          "value": 1.3951
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k28",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.4349,
+      "latest": 1.4349,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.395003
+      },
+      "metric": "s_twcj_j16_w0",
+      "points": [
+        {
+          "commit": "e6a759cc7214",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.395003
+          },
+          "n": 512,
+          "record": "20261108T2051Z-curve25519-tw-scaling-k28",
+          "reference": 1.0286,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=28: target-in-walk F=1 arm 1.40x [1.35,1.45] rho-neg at w=0 (inserts-priced band: ahead at every weight), 0.906x the table-then-probe arm; 32/64 jumps null",
+          "value": 1.4349
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k28",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.9853,
+      "latest": 0.9853,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_j32_over_j16_w0",
+      "points": [
+        {
+          "commit": "e6a759cc7214",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261108T2051Z-curve25519-tw-scaling-k32",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.93,
+            1.044
+          ],
+          "summary": "k=32: target-in-walk F=1 arm 1.37x [1.27,1.47] rho-neg at w=0, S 1.387 with walk 1.368 sqrt(r) (3% above the 1.329 floor); 0.857x the table-then-probe arm; 32/64 jumps null",
+          "value": 0.9853
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.8569,
+      "latest": 0.8569,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_twcj_over_f1_w0",
+      "points": [
+        {
+          "commit": "e6a759cc7214",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261108T2051Z-curve25519-tw-scaling-k32",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.811,
+            0.905
+          ],
+          "summary": "k=32: target-in-walk F=1 arm 1.37x [1.27,1.47] rho-neg at w=0, S 1.387 with walk 1.368 sqrt(r) (3% above the 1.329 floor); 0.857x the table-then-probe arm; 32/64 jumps null",
+          "value": 0.8569
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.3663,
+      "latest": 1.3663,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.3663
+      },
+      "metric": "ratio_twcj_over_rho_w0",
+      "points": [
+        {
+          "commit": "e6a759cc7214",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.3663
+          },
+          "n": 8,
+          "record": "20261108T2051Z-curve25519-tw-scaling-k32",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            1.267,
+            1.473
+          ],
+          "summary": "k=32: target-in-walk F=1 arm 1.37x [1.27,1.47] rho-neg at w=0, S 1.387 with walk 1.368 sqrt(r) (3% above the 1.329 floor); 0.857x the table-then-probe arm; 32/64 jumps null",
+          "value": 1.3663
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.3871,
+      "latest": 1.3871,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.366332
+      },
+      "metric": "s_twcj_j16_w0",
+      "points": [
+        {
+          "commit": "e6a759cc7214",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.366332
+          },
+          "n": 512,
+          "record": "20261108T2051Z-curve25519-tw-scaling-k32",
+          "reference": 1.0152,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=32: target-in-walk F=1 arm 1.37x [1.27,1.47] rho-neg at w=0, S 1.387 with walk 1.368 sqrt(r) (3% above the 1.329 floor); 0.857x the table-then-probe arm; 32/64 jumps null",
+          "value": 1.3871
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k32",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
       "first": 0.986,
       "latest": 0.009,
       "latest_derived": {
@@ -550,6 +1034,122 @@
       ],
       "problem": "ecdlp:split-prime-p3-cross-trace-census",
       "unit": "percent"
+    },
+    {
+      "better": "lower",
+      "first": 2.227,
+      "latest": 2.227,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.400629
+      },
+      "metric": "c1confirmk20",
+      "points": [
+        {
+          "commit": "c4ae141401ed",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.400629
+          },
+          "n": 60,
+          "record": "20261107T2135Z-c25519-c1-screen",
+          "reference": 1.59,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "C = 1 boundary screen (4 sizes x 3600 records) and pre-registered confirmation on fresh curves (4 x 540); ratios to rho-neg 1.40/1.60/1.74/1.69 at k = 20/24/28/32",
+          "value": 2.227
+        }
+      ],
+      "problem": "ic:curve25519-family-k20-32",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.814,
+      "latest": 1.814,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.589833
+      },
+      "metric": "c1confirmk24",
+      "points": [
+        {
+          "commit": "c4ae141401ed",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.589833
+          },
+          "n": 60,
+          "record": "20261107T2135Z-c25519-c1-screen",
+          "reference": 1.141,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "C = 1 boundary screen (4 sizes x 3600 records) and pre-registered confirmation on fresh curves (4 x 540); ratios to rho-neg 1.40/1.60/1.74/1.69 at k = 20/24/28/32",
+          "value": 1.814
+        }
+      ],
+      "problem": "ic:curve25519-family-k20-32",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.711,
+      "latest": 1.711,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.712713
+      },
+      "metric": "c1confirmk28",
+      "points": [
+        {
+          "commit": "c4ae141401ed",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.712713
+          },
+          "n": 60,
+          "record": "20261107T2135Z-c25519-c1-screen",
+          "reference": 0.999,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "C = 1 boundary screen (4 sizes x 3600 records) and pre-registered confirmation on fresh curves (4 x 540); ratios to rho-neg 1.40/1.60/1.74/1.69 at k = 20/24/28/32",
+          "value": 1.711
+        }
+      ],
+      "problem": "ic:curve25519-family-k20-32",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.545,
+      "latest": 1.545,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.664871
+      },
+      "metric": "c1confirmk32",
+      "points": [
+        {
+          "commit": "c4ae141401ed",
+          "date": "2026-11-07",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.664871
+          },
+          "n": 60,
+          "record": "20261107T2135Z-c25519-c1-screen",
+          "reference": 0.928,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "C = 1 boundary screen (4 sizes x 3600 records) and pre-registered confirmation on fresh curves (4 x 540); ratios to rho-neg 1.40/1.60/1.74/1.69 at k = 20/24/28/32",
+          "value": 1.545
+        }
+      ],
+      "problem": "ic:curve25519-family-k20-32",
+      "unit": "S"
     },
     {
       "better": "lower",
@@ -2747,6 +3347,29 @@
       "unit": "S"
     },
     {
+      "better": "neutral",
+      "first": 148.0,
+      "latest": 148.0,
+      "latest_derived": {},
+      "metric": "cells_recorded",
+      "points": [
+        {
+          "commit": "001129b99231",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 148,
+          "record": "20261108T1825Z-arity-koblitz-m56-a5",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "Koblitz chained-S3 m=5/6, 148/148 cells (attempts 4+5, Xeon 8488C, no L2: seconds diagnostic; launch wrapper killed after submit, see launch/receipts/CARD-arity-launch-koblitz-a5/NOTE.md; recorded command is the frozen analysis re-run). No m>=5 public cell decides at n=23 (K1 falsified); every n=83 m=5/6 public cell capped at 1800 s (K4 supported for chain-s3; orbit engine not_evaluable under rule 4); chain-s3 decides only proved-UNSAT cells at n=29,37 (no relation found). No matched rho; no IC improvement.",
+          "value": 148.0
+        }
+      ],
+      "problem": "ic:koblitz-chain-s3-arity-m5m6",
+      "unit": "count"
+    },
+    {
       "better": "lower",
       "first": 8.0,
       "latest": 2.0,
@@ -2784,6 +3407,33 @@
           "spread": null,
           "summary": "P1 round 2 card A: arm F and completed T at m3 t5 on NIST-shape primes; RR vs F trade at every m = 3 cell (one degree lower, 2.3-3.0x wider); RR vs T trade at m3 t5; T at m5 t3 capped at 6 GiB",
           "value": 2.0
+        }
+      ],
+      "problem": "ic:split-prime-p1-rr-dickson-torus",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 6.0,
+      "latest": 6.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "rr_degree_reached_lower_bound",
+      "points": [
+        {
+          "commit": "39635898abcb",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 1,
+          "record": "20261108T0748Z-split-prime-p1-r2b-m5t4",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P1 round 2 card B, T24 m5 t4: RR timed out at 3 h (D >= 6), T capped at 13 GiB (D >= 9); frozen rule 3 undecided",
+          "value": 6.0
         }
       ],
       "problem": "ic:split-prime-p1-rr-dickson-torus",
@@ -2842,6 +3492,33 @@
       ],
       "problem": "ic:split-prime-p1-rr-dickson-torus",
       "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 9.0,
+      "latest": 9.0,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "t_degree_reached_lower_bound",
+      "points": [
+        {
+          "commit": "39635898abcb",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 1,
+          "record": "20261108T0748Z-split-prime-p1-r2b-m5t4",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "P1 round 2 card B, T24 m5 t4: RR timed out at 3 h (D >= 6), T capped at 13 GiB (D >= 9); frozen rule 3 undecided",
+          "value": 9.0
+        }
+      ],
+      "problem": "ic:split-prime-p1-rr-dickson-torus",
+      "unit": "count"
     },
     {
       "better": "lower",
@@ -3019,6 +3696,64 @@
       ],
       "problem": "ic:split-prime-p2-twist-coset-toy",
       "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.981,
+      "latest": 0.981,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.605556
+      },
+      "metric": "bsgsk20w0",
+      "points": [
+        {
+          "commit": "fe1849358bd0",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.605556
+          },
+          "n": 60,
+          "record": "20261108T2319Z-c25519-bsgs-boundary",
+          "reference": 1.62,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "bsgs.negation vs rho-neg, five fresh family curves: S ratio 0.611/0.625/0.697 at k=20 (w=0/0.1/1), 0.889/0.897/0.933 at k=24; BSGS-class, time-memory, outside the IC ratchet",
+          "value": 0.981
+        }
+      ],
+      "problem": "kernel:c25519_family_bsgs_vs_rho",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.041,
+      "latest": 1.041,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.885204
+      },
+      "metric": "bsgsk24w0",
+      "points": [
+        {
+          "commit": "fe1849358bd0",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.885204
+          },
+          "n": 60,
+          "record": "20261108T2319Z-c25519-bsgs-boundary",
+          "reference": 1.176,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "bsgs.negation vs rho-neg, five fresh family curves: S ratio 0.611/0.625/0.697 at k=20 (w=0/0.1/1), 0.889/0.897/0.933 at k=24; BSGS-class, time-memory, outside the IC ratchet",
+          "value": 1.041
+        }
+      ],
+      "problem": "kernel:c25519_family_bsgs_vs_rho",
+      "unit": "S"
     },
     {
       "better": "neutral",
@@ -3409,6 +4144,58 @@
       "unit": "ratio"
     },
     {
+      "better": "neutral",
+      "first": 1.4639148040047696,
+      "latest": 1.4639148040047696,
+      "latest_derived": {},
+      "metric": "positive_control_ratio",
+      "points": [
+        {
+          "commit": "a11bf5007549",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 576,
+          "record": "20261108T0512Z-prime-medium-rho-p4-confirm",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.443842510909867,
+            1.4862891554596356
+          ],
+          "summary": "P4 confirm (PC + M1-M9, 2160 pairs): frozen verdict inconclusive, gate G3 positive control 1.464 (99% CI [1.438, 1.494]) excludes the designed 1.5; primary theta 1.362 [1.320, 1.405] (descriptive). PC shortfall traced to high planted targets (mean d/r 0.578), hypothesis",
+          "value": 1.4639148040047696
+        }
+      ],
+      "problem": "rho:prime_medium_p4_confirm",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 1.362445350898039,
+      "latest": 1.362445350898039,
+      "latest_derived": {},
+      "metric": "theta_w0",
+      "points": [
+        {
+          "commit": "a11bf5007549",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 2160,
+          "record": "20261108T0512Z-prime-medium-rho-p4-confirm",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.3201856254764677,
+            1.405351464380865
+          ],
+          "summary": "P4 confirm (PC + M1-M9, 2160 pairs): frozen verdict inconclusive, gate G3 positive control 1.464 (99% CI [1.438, 1.494]) excludes the designed 1.5; primary theta 1.362 [1.320, 1.405] (descriptive). PC shortfall traced to high planted targets (mean d/r 0.578), hypothesis",
+          "value": 1.362445350898039
+        }
+      ],
+      "problem": "rho:prime_medium_p4_confirm",
+      "unit": "ratio"
+    },
+    {
       "better": "lower",
       "first": 1.0826504182816774,
       "latest": 1.0826504182816774,
@@ -3790,6 +4577,1462 @@
       ],
       "problem": "study:elliptic_code_list_decoding_20261107",
       "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 477524.385,
+      "latest": 477524.385,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 4.368779
+      },
+      "metric": "envelope_cost_per_solve_b20",
+      "points": [
+        {
+          "commit": "15a41df4aa5c",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 4.368779
+          },
+          "n": 200,
+          "record": "20261108T0449Z-minors-gd-panel",
+          "reference": 109303.85,
+          "reference_kind": "matched_rho",
+          "spread": [
+            415741.133,
+            551283.713
+          ],
+          "summary": "minors guess-and-determine panel (relaunch C): PROTOCOL section 8 closes the lead for the reconstruction (six arms, prime fields, 20-40 bits); cheapest arm 4.37x matched rho at 20 bits rising to 1552x at 40 bits; top-three exponents 0.97-1.03 vs rho 0.46; independent re-derivation 0 disagreements in 1017 quantities",
+          "value": 477524.385
+        }
+      ],
+      "problem": "study:minors_guess_determine_20261107",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 1167832.095,
+      "latest": 1167832.095,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 6.111375
+      },
+      "metric": "envelope_cost_per_solve_b24",
+      "points": [
+        {
+          "commit": "15a41df4aa5c",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 6.111375
+          },
+          "n": 200,
+          "record": "20261108T0449Z-minors-gd-panel",
+          "reference": 191091.545,
+          "reference_kind": "matched_rho",
+          "spread": [
+            1016735.174,
+            1348217.669
+          ],
+          "summary": "minors guess-and-determine panel (relaunch C): PROTOCOL section 8 closes the lead for the reconstruction (six arms, prime fields, 20-40 bits); cheapest arm 4.37x matched rho at 20 bits rising to 1552x at 40 bits; top-three exponents 0.97-1.03 vs rho 0.46; independent re-derivation 0 disagreements in 1017 quantities",
+          "value": 1167832.095
+        }
+      ],
+      "problem": "study:minors_guess_determine_20261107",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 7095677.785,
+      "latest": 7095677.785,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 19.336248
+      },
+      "metric": "envelope_cost_per_solve_b28",
+      "points": [
+        {
+          "commit": "15a41df4aa5c",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 19.336248
+          },
+          "n": 200,
+          "record": "20261108T0449Z-minors-gd-panel",
+          "reference": 366962.49,
+          "reference_kind": "matched_rho",
+          "spread": [
+            6177621.953,
+            8191689.716
+          ],
+          "summary": "minors guess-and-determine panel (relaunch C): PROTOCOL section 8 closes the lead for the reconstruction (six arms, prime fields, 20-40 bits); cheapest arm 4.37x matched rho at 20 bits rising to 1552x at 40 bits; top-three exponents 0.97-1.03 vs rho 0.46; independent re-derivation 0 disagreements in 1017 quantities",
+          "value": 7095677.785
+        }
+      ],
+      "problem": "study:minors_guess_determine_20261107",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 81487955.565,
+      "latest": 81487955.565,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 81.892113
+      },
+      "metric": "envelope_cost_per_solve_b32",
+      "points": [
+        {
+          "commit": "15a41df4aa5c",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 81.892113
+          },
+          "n": 200,
+          "record": "20261108T0449Z-minors-gd-panel",
+          "reference": 995064.755,
+          "reference_kind": "matched_rho",
+          "spread": [
+            70944848.181,
+            94074740.678
+          ],
+          "summary": "minors guess-and-determine panel (relaunch C): PROTOCOL section 8 closes the lead for the reconstruction (six arms, prime fields, 20-40 bits); cheapest arm 4.37x matched rho at 20 bits rising to 1552x at 40 bits; top-three exponents 0.97-1.03 vs rho 0.46; independent re-derivation 0 disagreements in 1017 quantities",
+          "value": 81487955.565
+        }
+      ],
+      "problem": "study:minors_guess_determine_20261107",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 1270071395.575,
+      "latest": 1270071395.575,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 364.844874
+      },
+      "metric": "envelope_cost_per_solve_b36",
+      "points": [
+        {
+          "commit": "15a41df4aa5c",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 364.844874
+          },
+          "n": 200,
+          "record": "20261108T0449Z-minors-gd-panel",
+          "reference": 3481127.145,
+          "reference_kind": "matched_rho",
+          "spread": [
+            1087841908.863,
+            1492352630.258
+          ],
+          "summary": "minors guess-and-determine panel (relaunch C): PROTOCOL section 8 closes the lead for the reconstruction (six arms, prime fields, 20-40 bits); cheapest arm 4.37x matched rho at 20 bits rising to 1552x at 40 bits; top-three exponents 0.97-1.03 vs rho 0.46; independent re-derivation 0 disagreements in 1017 quantities",
+          "value": 1270071395.575
+        }
+      ],
+      "problem": "study:minors_guess_determine_20261107",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 19954971149.632,
+      "latest": 19954971149.632,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1551.789109
+      },
+      "metric": "envelope_cost_per_solve_b40",
+      "points": [
+        {
+          "commit": "15a41df4aa5c",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1551.789109
+          },
+          "n": 200,
+          "record": "20261108T0449Z-minors-gd-panel",
+          "reference": 12859331.875,
+          "reference_kind": "matched_rho",
+          "spread": [
+            12778346633.28,
+            33144196052.448
+          ],
+          "summary": "minors guess-and-determine panel (relaunch C): PROTOCOL section 8 closes the lead for the reconstruction (six arms, prime fields, 20-40 bits); cheapest arm 4.37x matched rho at 20 bits rising to 1552x at 40 bits; top-three exponents 0.97-1.03 vs rho 0.46; independent re-derivation 0 disagreements in 1017 quantities",
+          "value": 19954971149.632
+        }
+      ],
+      "problem": "study:minors_guess_determine_20261107",
+      "unit": "fmul"
+    },
+    {
+      "better": "neutral",
+      "first": 0.515525,
+      "latest": 0.515525,
+      "latest_derived": {},
+      "metric": "heldout_accuracy/curve/m12/hgb/lsb",
+      "points": [
+        {
+          "commit": "26a45988e5ab",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 2190,
+          "record": "20261108T0501Z-mllc-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.494585,
+            0.536411
+          ],
+          "summary": "mllc panel (sizes 12, 20, 24 from job 1; 16 from the amendment rerun, conditional): 0 SIGNAL, 22 NULL, 2 UNDERPOWERED (m=12 hgb, gate G); lead closed at m=20 and m=24; HD4/P3 falsified (MLP learns the PC-B random-multiplier leak)",
+          "value": 0.515525
+        }
+      ],
+      "problem": "study:ml_learnability_control_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.492237,
+      "latest": 0.492237,
+      "latest_derived": {},
+      "metric": "heldout_accuracy/curve/m12/hgb/msb",
+      "points": [
+        {
+          "commit": "26a45988e5ab",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 2190,
+          "record": "20261108T0501Z-mllc-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.471331,
+            0.513171
+          ],
+          "summary": "mllc panel (sizes 12, 20, 24 from job 1; 16 from the amendment rerun, conditional): 0 SIGNAL, 22 NULL, 2 UNDERPOWERED (m=12 hgb, gate G); lead closed at m=20 and m=24; HD4/P3 falsified (MLP learns the PC-B random-multiplier leak)",
+          "value": 0.492237
+        }
+      ],
+      "problem": "study:ml_learnability_control_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.482192,
+      "latest": 0.482192,
+      "latest_derived": {},
+      "metric": "heldout_accuracy/curve/m12/logreg/lsb",
+      "points": [
+        {
+          "commit": "26a45988e5ab",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 2190,
+          "record": "20261108T0501Z-mllc-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.461313,
+            0.503133
+          ],
+          "summary": "mllc panel (sizes 12, 20, 24 from job 1; 16 from the amendment rerun, conditional): 0 SIGNAL, 22 NULL, 2 UNDERPOWERED (m=12 hgb, gate G); lead closed at m=20 and m=24; HD4/P3 falsified (MLP learns the PC-B random-multiplier leak)",
+          "value": 0.482192
+        }
+      ],
+      "problem": "study:ml_learnability_control_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.486301,
+      "latest": 0.486301,
+      "latest_derived": {},
+      "metric": "heldout_accuracy/curve/m12/logreg/msb",
+      "points": [
+        {
+          "commit": "26a45988e5ab",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 2190,
+          "record": "20261108T0501Z-mllc-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.46541,
+            0.50724
+          ],
+          "summary": "mllc panel (sizes 12, 20, 24 from job 1; 16 from the amendment rerun, conditional): 0 SIGNAL, 22 NULL, 2 UNDERPOWERED (m=12 hgb, gate G); lead closed at m=20 and m=24; HD4/P3 falsified (MLP learns the PC-B random-multiplier leak)",
+          "value": 0.486301
+        }
+      ],
+      "problem": "study:ml_learnability_control_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.485388,
+      "latest": 0.485388,
+      "latest_derived": {},
+      "metric": "heldout_accuracy/curve/m12/mlp/lsb",
+      "points": [
+        {
+          "commit": "26a45988e5ab",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 2190,
+          "record": "20261108T0501Z-mllc-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.4645,
+            0.506328
+          ],
+          "summary": "mllc panel (sizes 12, 20, 24 from job 1; 16 from the amendment rerun, conditional): 0 SIGNAL, 22 NULL, 2 UNDERPOWERED (m=12 hgb, gate G); lead closed at m=20 and m=24; HD4/P3 falsified (MLP learns the PC-B random-multiplier leak)",
+          "value": 0.485388
+        }
+      ],
+      "problem": "study:ml_learnability_control_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.473516,
+      "latest": 0.473516,
+      "latest_derived": {},
+      "metric": "heldout_accuracy/curve/m12/mlp/msb",
+      "points": [
+        {
+          "commit": "26a45988e5ab",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 2190,
+          "record": "20261108T0501Z-mllc-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.452669,
+            0.494456
+          ],
+          "summary": "mllc panel (sizes 12, 20, 24 from job 1; 16 from the amendment rerun, conditional): 0 SIGNAL, 22 NULL, 2 UNDERPOWERED (m=12 hgb, gate G); lead closed at m=20 and m=24; HD4/P3 falsified (MLP learns the PC-B random-multiplier leak)",
+          "value": 0.473516
+        }
+      ],
+      "problem": "study:ml_learnability_control_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.501859,
+      "latest": 0.501859,
+      "latest_derived": {},
+      "metric": "heldout_accuracy/curve/m16/hgb/lsb",
+      "points": [
+        {
+          "commit": "26a45988e5ab",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 36588,
+          "record": "20261108T0501Z-mllc-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.496735,
+            0.506981
+          ],
+          "summary": "mllc panel (sizes 12, 20, 24 from job 1; 16 from the amendment rerun, conditional): 0 SIGNAL, 22 NULL, 2 UNDERPOWERED (m=12 hgb, gate G); lead closed at m=20 and m=24; HD4/P3 falsified (MLP learns the PC-B random-multiplier leak)",
+          "value": 0.501859
+        }
+      ],
+      "problem": "study:ml_learnability_control_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.504318,
+      "latest": 0.504318,
+      "latest_derived": {},
+      "metric": "heldout_accuracy/curve/m16/hgb/msb",
+      "points": [
+        {
+          "commit": "26a45988e5ab",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 36588,
+          "record": "20261108T0501Z-mllc-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.499195,
+            0.509441
+          ],
+          "summary": "mllc panel (sizes 12, 20, 24 from job 1; 16 from the amendment rerun, conditional): 0 SIGNAL, 22 NULL, 2 UNDERPOWERED (m=12 hgb, gate G); lead closed at m=20 and m=24; HD4/P3 falsified (MLP learns the PC-B random-multiplier leak)",
+          "value": 0.504318
+        }
+      ],
+      "problem": "study:ml_learnability_control_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.498059,
+      "latest": 0.498059,
+      "latest_derived": {},
+      "metric": "heldout_accuracy/curve/m16/logreg/lsb",
+      "points": [
+        {
+          "commit": "26a45988e5ab",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 36588,
+          "record": "20261108T0501Z-mllc-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.492937,
+            0.503183
+          ],
+          "summary": "mllc panel (sizes 12, 20, 24 from job 1; 16 from the amendment rerun, conditional): 0 SIGNAL, 22 NULL, 2 UNDERPOWERED (m=12 hgb, gate G); lead closed at m=20 and m=24; HD4/P3 falsified (MLP learns the PC-B random-multiplier leak)",
+          "value": 0.498059
+        }
+      ],
+      "problem": "study:ml_learnability_control_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.499235,
+      "latest": 0.499235,
+      "latest_derived": {},
+      "metric": "heldout_accuracy/curve/m16/logreg/msb",
+      "points": [
+        {
+          "commit": "26a45988e5ab",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 36588,
+          "record": "20261108T0501Z-mllc-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.494112,
+            0.504358
+          ],
+          "summary": "mllc panel (sizes 12, 20, 24 from job 1; 16 from the amendment rerun, conditional): 0 SIGNAL, 22 NULL, 2 UNDERPOWERED (m=12 hgb, gate G); lead closed at m=20 and m=24; HD4/P3 falsified (MLP learns the PC-B random-multiplier leak)",
+          "value": 0.499235
+        }
+      ],
+      "problem": "study:ml_learnability_control_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.497595,
+      "latest": 0.497595,
+      "latest_derived": {},
+      "metric": "heldout_accuracy/curve/m16/mlp/lsb",
+      "points": [
+        {
+          "commit": "26a45988e5ab",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 36588,
+          "record": "20261108T0501Z-mllc-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.492472,
+            0.502718
+          ],
+          "summary": "mllc panel (sizes 12, 20, 24 from job 1; 16 from the amendment rerun, conditional): 0 SIGNAL, 22 NULL, 2 UNDERPOWERED (m=12 hgb, gate G); lead closed at m=20 and m=24; HD4/P3 falsified (MLP learns the PC-B random-multiplier leak)",
+          "value": 0.497595
+        }
+      ],
+      "problem": "study:ml_learnability_control_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.497458,
+      "latest": 0.497458,
+      "latest_derived": {},
+      "metric": "heldout_accuracy/curve/m16/mlp/msb",
+      "points": [
+        {
+          "commit": "26a45988e5ab",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 36588,
+          "record": "20261108T0501Z-mllc-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.492335,
+            0.502581
+          ],
+          "summary": "mllc panel (sizes 12, 20, 24 from job 1; 16 from the amendment rerun, conditional): 0 SIGNAL, 22 NULL, 2 UNDERPOWERED (m=12 hgb, gate G); lead closed at m=20 and m=24; HD4/P3 falsified (MLP learns the PC-B random-multiplier leak)",
+          "value": 0.497458
+        }
+      ],
+      "problem": "study:ml_learnability_control_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.499107,
+      "latest": 0.499107,
+      "latest_derived": {},
+      "metric": "heldout_accuracy/curve/m20/hgb/lsb",
+      "points": [
+        {
+          "commit": "26a45988e5ab",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 600000,
+          "record": "20261108T0501Z-mllc-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.497842,
+            0.500372
+          ],
+          "summary": "mllc panel (sizes 12, 20, 24 from job 1; 16 from the amendment rerun, conditional): 0 SIGNAL, 22 NULL, 2 UNDERPOWERED (m=12 hgb, gate G); lead closed at m=20 and m=24; HD4/P3 falsified (MLP learns the PC-B random-multiplier leak)",
+          "value": 0.499107
+        }
+      ],
+      "problem": "study:ml_learnability_control_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.499155,
+      "latest": 0.499155,
+      "latest_derived": {},
+      "metric": "heldout_accuracy/curve/m20/hgb/msb",
+      "points": [
+        {
+          "commit": "26a45988e5ab",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 600000,
+          "record": "20261108T0501Z-mllc-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.49789,
+            0.50042
+          ],
+          "summary": "mllc panel (sizes 12, 20, 24 from job 1; 16 from the amendment rerun, conditional): 0 SIGNAL, 22 NULL, 2 UNDERPOWERED (m=12 hgb, gate G); lead closed at m=20 and m=24; HD4/P3 falsified (MLP learns the PC-B random-multiplier leak)",
+          "value": 0.499155
+        }
+      ],
+      "problem": "study:ml_learnability_control_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.499105,
+      "latest": 0.499105,
+      "latest_derived": {},
+      "metric": "heldout_accuracy/curve/m20/logreg/lsb",
+      "points": [
+        {
+          "commit": "26a45988e5ab",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 600000,
+          "record": "20261108T0501Z-mllc-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.49784,
+            0.50037
+          ],
+          "summary": "mllc panel (sizes 12, 20, 24 from job 1; 16 from the amendment rerun, conditional): 0 SIGNAL, 22 NULL, 2 UNDERPOWERED (m=12 hgb, gate G); lead closed at m=20 and m=24; HD4/P3 falsified (MLP learns the PC-B random-multiplier leak)",
+          "value": 0.499105
+        }
+      ],
+      "problem": "study:ml_learnability_control_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.499255,
+      "latest": 0.499255,
+      "latest_derived": {},
+      "metric": "heldout_accuracy/curve/m20/logreg/msb",
+      "points": [
+        {
+          "commit": "26a45988e5ab",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 600000,
+          "record": "20261108T0501Z-mllc-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.49799,
+            0.50052
+          ],
+          "summary": "mllc panel (sizes 12, 20, 24 from job 1; 16 from the amendment rerun, conditional): 0 SIGNAL, 22 NULL, 2 UNDERPOWERED (m=12 hgb, gate G); lead closed at m=20 and m=24; HD4/P3 falsified (MLP learns the PC-B random-multiplier leak)",
+          "value": 0.499255
+        }
+      ],
+      "problem": "study:ml_learnability_control_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.498372,
+      "latest": 0.498372,
+      "latest_derived": {},
+      "metric": "heldout_accuracy/curve/m20/mlp/lsb",
+      "points": [
+        {
+          "commit": "26a45988e5ab",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 600000,
+          "record": "20261108T0501Z-mllc-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.497107,
+            0.499637
+          ],
+          "summary": "mllc panel (sizes 12, 20, 24 from job 1; 16 from the amendment rerun, conditional): 0 SIGNAL, 22 NULL, 2 UNDERPOWERED (m=12 hgb, gate G); lead closed at m=20 and m=24; HD4/P3 falsified (MLP learns the PC-B random-multiplier leak)",
+          "value": 0.498372
+        }
+      ],
+      "problem": "study:ml_learnability_control_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.497702,
+      "latest": 0.497702,
+      "latest_derived": {},
+      "metric": "heldout_accuracy/curve/m20/mlp/msb",
+      "points": [
+        {
+          "commit": "26a45988e5ab",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 600000,
+          "record": "20261108T0501Z-mllc-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.496437,
+            0.498967
+          ],
+          "summary": "mllc panel (sizes 12, 20, 24 from job 1; 16 from the amendment rerun, conditional): 0 SIGNAL, 22 NULL, 2 UNDERPOWERED (m=12 hgb, gate G); lead closed at m=20 and m=24; HD4/P3 falsified (MLP learns the PC-B random-multiplier leak)",
+          "value": 0.497702
+        }
+      ],
+      "problem": "study:ml_learnability_control_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.50012,
+      "latest": 0.50012,
+      "latest_derived": {},
+      "metric": "heldout_accuracy/curve/m24/hgb/lsb",
+      "points": [
+        {
+          "commit": "26a45988e5ab",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 600000,
+          "record": "20261108T0501Z-mllc-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.498855,
+            0.501385
+          ],
+          "summary": "mllc panel (sizes 12, 20, 24 from job 1; 16 from the amendment rerun, conditional): 0 SIGNAL, 22 NULL, 2 UNDERPOWERED (m=12 hgb, gate G); lead closed at m=20 and m=24; HD4/P3 falsified (MLP learns the PC-B random-multiplier leak)",
+          "value": 0.50012
+        }
+      ],
+      "problem": "study:ml_learnability_control_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.49932,
+      "latest": 0.49932,
+      "latest_derived": {},
+      "metric": "heldout_accuracy/curve/m24/hgb/msb",
+      "points": [
+        {
+          "commit": "26a45988e5ab",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 600000,
+          "record": "20261108T0501Z-mllc-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.498055,
+            0.500585
+          ],
+          "summary": "mllc panel (sizes 12, 20, 24 from job 1; 16 from the amendment rerun, conditional): 0 SIGNAL, 22 NULL, 2 UNDERPOWERED (m=12 hgb, gate G); lead closed at m=20 and m=24; HD4/P3 falsified (MLP learns the PC-B random-multiplier leak)",
+          "value": 0.49932
+        }
+      ],
+      "problem": "study:ml_learnability_control_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.50051,
+      "latest": 0.50051,
+      "latest_derived": {},
+      "metric": "heldout_accuracy/curve/m24/logreg/lsb",
+      "points": [
+        {
+          "commit": "26a45988e5ab",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 600000,
+          "record": "20261108T0501Z-mllc-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.499245,
+            0.501775
+          ],
+          "summary": "mllc panel (sizes 12, 20, 24 from job 1; 16 from the amendment rerun, conditional): 0 SIGNAL, 22 NULL, 2 UNDERPOWERED (m=12 hgb, gate G); lead closed at m=20 and m=24; HD4/P3 falsified (MLP learns the PC-B random-multiplier leak)",
+          "value": 0.50051
+        }
+      ],
+      "problem": "study:ml_learnability_control_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.50016,
+      "latest": 0.50016,
+      "latest_derived": {},
+      "metric": "heldout_accuracy/curve/m24/logreg/msb",
+      "points": [
+        {
+          "commit": "26a45988e5ab",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 600000,
+          "record": "20261108T0501Z-mllc-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.498895,
+            0.501425
+          ],
+          "summary": "mllc panel (sizes 12, 20, 24 from job 1; 16 from the amendment rerun, conditional): 0 SIGNAL, 22 NULL, 2 UNDERPOWERED (m=12 hgb, gate G); lead closed at m=20 and m=24; HD4/P3 falsified (MLP learns the PC-B random-multiplier leak)",
+          "value": 0.50016
+        }
+      ],
+      "problem": "study:ml_learnability_control_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.500018,
+      "latest": 0.500018,
+      "latest_derived": {},
+      "metric": "heldout_accuracy/curve/m24/mlp/lsb",
+      "points": [
+        {
+          "commit": "26a45988e5ab",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 600000,
+          "record": "20261108T0501Z-mllc-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.498753,
+            0.501284
+          ],
+          "summary": "mllc panel (sizes 12, 20, 24 from job 1; 16 from the amendment rerun, conditional): 0 SIGNAL, 22 NULL, 2 UNDERPOWERED (m=12 hgb, gate G); lead closed at m=20 and m=24; HD4/P3 falsified (MLP learns the PC-B random-multiplier leak)",
+          "value": 0.500018
+        }
+      ],
+      "problem": "study:ml_learnability_control_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 0.499782,
+      "latest": 0.499782,
+      "latest_derived": {},
+      "metric": "heldout_accuracy/curve/m24/mlp/msb",
+      "points": [
+        {
+          "commit": "26a45988e5ab",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 600000,
+          "record": "20261108T0501Z-mllc-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.498516,
+            0.501047
+          ],
+          "summary": "mllc panel (sizes 12, 20, 24 from job 1; 16 from the amendment rerun, conditional): 0 SIGNAL, 22 NULL, 2 UNDERPOWERED (m=12 hgb, gate G); lead closed at m=20 and m=24; HD4/P3 falsified (MLP learns the PC-B random-multiplier leak)",
+          "value": 0.499782
+        }
+      ],
+      "problem": "study:ml_learnability_control_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "neutral",
+      "first": 660110148164.0,
+      "latest": 660110148164.0,
+      "latest_derived": {},
+      "metric": "stagea/closure-muladds-kummer-p1-t10",
+      "points": [
+        {
+          "commit": "75cf6c230728",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 2,
+          "record": "20261108T0513Z-pkm-fd-pfd-a",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "PKM stage A (pfd-a, Amendment 9, 12 vCPU): t<=10 median-level repeat check agrees (3,4,4,4,4,5,5,5,5,6), so the study continues; H-LFD grows, H-FFD fails, H-gap 0/22; C-step undecided at t=12,13,14 (needs Amendment 7 B capped runs); G1-G3 pass, H-null UNRESOLVED",
+          "value": 660110148164.0
+        }
+      ],
+      "problem": "study:pkm_falldegree_unblock_20261107:pfd-a",
+      "unit": "fmul"
+    },
+    {
+      "better": "neutral",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "stagea/cstep-blind-cells-decided",
+      "points": [
+        {
+          "commit": "75cf6c230728",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 3,
+          "record": "20261108T0513Z-pkm-fd-pfd-a",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "PKM stage A (pfd-a, Amendment 9, 12 vCPU): t<=10 median-level repeat check agrees (3,4,4,4,4,5,5,5,5,6), so the study continues; H-LFD grows, H-FFD fails, H-gap 0/22; C-step undecided at t=12,13,14 (needs Amendment 7 B capped runs); G1-G3 pass, H-null UNRESOLVED",
+          "value": 0.0
+        }
+      ],
+      "problem": "study:pkm_falldegree_unblock_20261107:pfd-a",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 4877847858683.0,
+      "latest": 4877847858683.0,
+      "latest_derived": {},
+      "metric": "stagea/f4-muladds-kummer-p1-t11",
+      "points": [
+        {
+          "commit": "75cf6c230728",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 2,
+          "record": "20261108T0513Z-pkm-fd-pfd-a",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "PKM stage A (pfd-a, Amendment 9, 12 vCPU): t<=10 median-level repeat check agrees (3,4,4,4,4,5,5,5,5,6), so the study continues; H-LFD grows, H-FFD fails, H-gap 0/22; C-step undecided at t=12,13,14 (needs Amendment 7 B capped runs); G1-G3 pass, H-null UNRESOLVED",
+          "value": 4877847858683.0
+        }
+      ],
+      "problem": "study:pkm_falldegree_unblock_20261107:pfd-a",
+      "unit": "fmul"
+    },
+    {
+      "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "stagea/g2-violations",
+      "points": [
+        {
+          "commit": "75cf6c230728",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 72,
+          "record": "20261108T0513Z-pkm-fd-pfd-a",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "PKM stage A (pfd-a, Amendment 9, 12 vCPU): t<=10 median-level repeat check agrees (3,4,4,4,4,5,5,5,5,6), so the study continues; H-LFD grows, H-FFD fails, H-gap 0/22; C-step undecided at t=12,13,14 (needs Amendment 7 B capped runs); G1-G3 pass, H-null UNRESOLVED",
+          "value": 0.0
+        }
+      ],
+      "problem": "study:pkm_falldegree_unblock_20261107:pfd-a",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.0,
+      "latest": 0.0,
+      "latest_derived": {},
+      "metric": "stagea/g3-disagreements",
+      "points": [
+        {
+          "commit": "75cf6c230728",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 144,
+          "record": "20261108T0513Z-pkm-fd-pfd-a",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "PKM stage A (pfd-a, Amendment 9, 12 vCPU): t<=10 median-level repeat check agrees (3,4,4,4,4,5,5,5,5,6), so the study continues; H-LFD grows, H-FFD fails, H-gap 0/22; C-step undecided at t=12,13,14 (needs Amendment 7 B capped runs); G1-G3 pass, H-null UNRESOLVED",
+          "value": 0.0
+        }
+      ],
+      "problem": "study:pkm_falldegree_unblock_20261107:pfd-a",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 12792.0,
+      "latest": 12792.0,
+      "latest_derived": {},
+      "metric": "stagea/job-wall",
+      "points": [
+        {
+          "commit": "75cf6c230728",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 1,
+          "record": "20261108T0513Z-pkm-fd-pfd-a",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "PKM stage A (pfd-a, Amendment 9, 12 vCPU): t<=10 median-level repeat check agrees (3,4,4,4,4,5,5,5,5,6), so the study continues; H-LFD grows, H-FFD fails, H-gap 0/22; C-step undecided at t=12,13,14 (needs Amendment 7 B capped runs); G1-G3 pass, H-null UNRESOLVED",
+          "value": 12792.0
+        }
+      ],
+      "problem": "study:pkm_falldegree_unblock_20261107:pfd-a",
+      "unit": "wall_s"
+    },
+    {
+      "better": "neutral",
+      "first": 6.0,
+      "latest": 6.0,
+      "latest_derived": {},
+      "metric": "stagea/kummer-p1-median-df-lower-bound-t12",
+      "points": [
+        {
+          "commit": "75cf6c230728",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 2,
+          "record": "20261108T0513Z-pkm-fd-pfd-a",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "PKM stage A (pfd-a, Amendment 9, 12 vCPU): t<=10 median-level repeat check agrees (3,4,4,4,4,5,5,5,5,6), so the study continues; H-LFD grows, H-FFD fails, H-gap 0/22; C-step undecided at t=12,13,14 (needs Amendment 7 B capped runs); G1-G3 pass, H-null UNRESOLVED",
+          "value": 6.0
+        }
+      ],
+      "problem": "study:pkm_falldegree_unblock_20261107:pfd-a",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 6.0,
+      "latest": 6.0,
+      "latest_derived": {},
+      "metric": "stagea/kummer-p1-median-df-lower-bound-t13",
+      "points": [
+        {
+          "commit": "75cf6c230728",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 2,
+          "record": "20261108T0513Z-pkm-fd-pfd-a",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "PKM stage A (pfd-a, Amendment 9, 12 vCPU): t<=10 median-level repeat check agrees (3,4,4,4,4,5,5,5,5,6), so the study continues; H-LFD grows, H-FFD fails, H-gap 0/22; C-step undecided at t=12,13,14 (needs Amendment 7 B capped runs); G1-G3 pass, H-null UNRESOLVED",
+          "value": 6.0
+        }
+      ],
+      "problem": "study:pkm_falldegree_unblock_20261107:pfd-a",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 6.0,
+      "latest": 6.0,
+      "latest_derived": {},
+      "metric": "stagea/kummer-p1-median-df-lower-bound-t14",
+      "points": [
+        {
+          "commit": "75cf6c230728",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 2,
+          "record": "20261108T0513Z-pkm-fd-pfd-a",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "PKM stage A (pfd-a, Amendment 9, 12 vCPU): t<=10 median-level repeat check agrees (3,4,4,4,4,5,5,5,5,6), so the study continues; H-LFD grows, H-FFD fails, H-gap 0/22; C-step undecided at t=12,13,14 (needs Amendment 7 B capped runs); G1-G3 pass, H-null UNRESOLVED",
+          "value": 6.0
+        }
+      ],
+      "problem": "study:pkm_falldegree_unblock_20261107:pfd-a",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 6.0,
+      "latest": 6.0,
+      "latest_derived": {},
+      "metric": "stagea/kummer-p1-median-df-t10",
+      "points": [
+        {
+          "commit": "75cf6c230728",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 2,
+          "record": "20261108T0513Z-pkm-fd-pfd-a",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "PKM stage A (pfd-a, Amendment 9, 12 vCPU): t<=10 median-level repeat check agrees (3,4,4,4,4,5,5,5,5,6), so the study continues; H-LFD grows, H-FFD fails, H-gap 0/22; C-step undecided at t=12,13,14 (needs Amendment 7 B capped runs); G1-G3 pass, H-null UNRESOLVED",
+          "value": 6.0
+        }
+      ],
+      "problem": "study:pkm_falldegree_unblock_20261107:pfd-a",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 6.0,
+      "latest": 6.0,
+      "latest_derived": {},
+      "metric": "stagea/kummer-p1-median-df-t11",
+      "points": [
+        {
+          "commit": "75cf6c230728",
+          "date": "2026-11-08",
+          "derived": {},
+          "n": 2,
+          "record": "20261108T0513Z-pkm-fd-pfd-a",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "PKM stage A (pfd-a, Amendment 9, 12 vCPU): t<=10 median-level repeat check agrees (3,4,4,4,4,5,5,5,5,6), so the study continues; H-LFD grows, H-FFD fails, H-gap 0/22; C-step undecided at t=12,13,14 (needs Amendment 7 B capped runs); G1-G3 pass, H-null UNRESOLVED",
+          "value": 6.0
+        }
+      ],
+      "problem": "study:pkm_falldegree_unblock_20261107:pfd-a",
+      "unit": "count"
+    },
+    {
+      "better": "neutral",
+      "first": 10.0,
+      "latest": 10.0,
+      "latest_derived": {
+        "value_over_reference": 1.0
+      },
+      "metric": "stagea/repeat-check-t1-10-agree",
+      "points": [
+        {
+          "commit": "75cf6c230728",
+          "date": "2026-11-08",
+          "derived": {
+            "value_over_reference": 1.0
+          },
+          "n": 10,
+          "record": "20261108T0513Z-pkm-fd-pfd-a",
+          "reference": 10.0,
+          "reference_kind": "baseline",
+          "spread": null,
+          "summary": "PKM stage A (pfd-a, Amendment 9, 12 vCPU): t<=10 median-level repeat check agrees (3,4,4,4,4,5,5,5,5,6), so the study continues; H-LFD grows, H-FFD fails, H-gap 0/22; C-step undecided at t=12,13,14 (needs Amendment 7 B capped runs); G1-G3 pass, H-null UNRESOLVED",
+          "value": 10.0
+        }
+      ],
+      "problem": "study:pkm_falldegree_unblock_20261107:pfd-a",
+      "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 1.149494,
+      "latest": 1.149494,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "cs1_over_cd.field.excl_construct.gm.c1_p151_d3",
+      "points": [
+        {
+          "commit": "15a41df4aa5c",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 120,
+          "record": "20261108T0449Z-split-graph-secant-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.138421,
+            1.160318
+          ],
+          "summary": "split-graph secant panel (attempt 3): PROTOCOL section 9 REJECTED at the tested scale for cs1 and cs2, and UNRANKED under section 5a (order reverses at 1 GAE/native op); all section 8 gates pass, 6/6 clean cells; handled degree d+1 vs 2d+2 held",
+          "value": 1.149494
+        }
+      ],
+      "problem": "study:split_graph_secant_cost_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.368187,
+      "latest": 1.368187,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "cs1_over_cd.field.excl_construct.gm.c2_p227_d4",
+      "points": [
+        {
+          "commit": "15a41df4aa5c",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 120,
+          "record": "20261108T0449Z-split-graph-secant-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.358821,
+            1.37723
+          ],
+          "summary": "split-graph secant panel (attempt 3): PROTOCOL section 9 REJECTED at the tested scale for cs1 and cs2, and UNRANKED under section 5a (order reverses at 1 GAE/native op); all section 8 gates pass, 6/6 clean cells; handled degree d+1 vs 2d+2 held",
+          "value": 1.368187
+        }
+      ],
+      "problem": "study:split_graph_secant_cost_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.034109,
+      "latest": 1.034109,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "cs1_over_cd.field.excl_construct.gm.c3_p337_d5",
+      "points": [
+        {
+          "commit": "15a41df4aa5c",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 120,
+          "record": "20261108T0449Z-split-graph-secant-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.029968,
+            1.037969
+          ],
+          "summary": "split-graph secant panel (attempt 3): PROTOCOL section 9 REJECTED at the tested scale for cs1 and cs2, and UNRANKED under section 5a (order reverses at 1 GAE/native op); all section 8 gates pass, 6/6 clean cells; handled degree d+1 vs 2d+2 held",
+          "value": 1.034109
+        }
+      ],
+      "problem": "study:split_graph_secant_cost_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.156684,
+      "latest": 1.156684,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "cs1_over_cd.field.excl_construct.gm.c4_p491_d6",
+      "points": [
+        {
+          "commit": "15a41df4aa5c",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 120,
+          "record": "20261108T0449Z-split-graph-secant-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.15116,
+            1.161674
+          ],
+          "summary": "split-graph secant panel (attempt 3): PROTOCOL section 9 REJECTED at the tested scale for cs1 and cs2, and UNRANKED under section 5a (order reverses at 1 GAE/native op); all section 8 gates pass, 6/6 clean cells; handled degree d+1 vs 2d+2 held",
+          "value": 1.156684
+        }
+      ],
+      "problem": "study:split_graph_secant_cost_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.95796,
+      "latest": 0.95796,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "cs1_over_cd.field.excl_construct.gm.c5_p673_d7",
+      "points": [
+        {
+          "commit": "15a41df4aa5c",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 120,
+          "record": "20261108T0449Z-split-graph-secant-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.954951,
+            0.961075
+          ],
+          "summary": "split-graph secant panel (attempt 3): PROTOCOL section 9 REJECTED at the tested scale for cs1 and cs2, and UNRANKED under section 5a (order reverses at 1 GAE/native op); all section 8 gates pass, 6/6 clean cells; handled degree d+1 vs 2d+2 held",
+          "value": 0.95796
+        }
+      ],
+      "problem": "study:split_graph_secant_cost_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.059893,
+      "latest": 1.059893,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "cs1_over_cd.field.excl_construct.gm.c6_p991_d8",
+      "points": [
+        {
+          "commit": "15a41df4aa5c",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 120,
+          "record": "20261108T0449Z-split-graph-secant-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.056778,
+            1.063091
+          ],
+          "summary": "split-graph secant panel (attempt 3): PROTOCOL section 9 REJECTED at the tested scale for cs1 and cs2, and UNRANKED under section 5a (order reverses at 1 GAE/native op); all section 8 gates pass, 6/6 clean cells; handled degree d+1 vs 2d+2 held",
+          "value": 1.059893
+        }
+      ],
+      "problem": "study:split_graph_secant_cost_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 3.592083,
+      "latest": 3.592083,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "cs2_over_cd.field.excl_construct.gm.c1_p151_d3",
+      "points": [
+        {
+          "commit": "15a41df4aa5c",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 120,
+          "record": "20261108T0449Z-split-graph-secant-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            3.523221,
+            3.659881
+          ],
+          "summary": "split-graph secant panel (attempt 3): PROTOCOL section 9 REJECTED at the tested scale for cs1 and cs2, and UNRANKED under section 5a (order reverses at 1 GAE/native op); all section 8 gates pass, 6/6 clean cells; handled degree d+1 vs 2d+2 held",
+          "value": 3.592083
+        }
+      ],
+      "problem": "study:split_graph_secant_cost_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 3.647748,
+      "latest": 3.647748,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "cs2_over_cd.field.excl_construct.gm.c2_p227_d4",
+      "points": [
+        {
+          "commit": "15a41df4aa5c",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 120,
+          "record": "20261108T0449Z-split-graph-secant-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            3.598717,
+            3.693908
+          ],
+          "summary": "split-graph secant panel (attempt 3): PROTOCOL section 9 REJECTED at the tested scale for cs1 and cs2, and UNRANKED under section 5a (order reverses at 1 GAE/native op); all section 8 gates pass, 6/6 clean cells; handled degree d+1 vs 2d+2 held",
+          "value": 3.647748
+        }
+      ],
+      "problem": "study:split_graph_secant_cost_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 3.585584,
+      "latest": 3.585584,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "cs2_over_cd.field.excl_construct.gm.c3_p337_d5",
+      "points": [
+        {
+          "commit": "15a41df4aa5c",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 120,
+          "record": "20261108T0449Z-split-graph-secant-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            3.548128,
+            3.621627
+          ],
+          "summary": "split-graph secant panel (attempt 3): PROTOCOL section 9 REJECTED at the tested scale for cs1 and cs2, and UNRANKED under section 5a (order reverses at 1 GAE/native op); all section 8 gates pass, 6/6 clean cells; handled degree d+1 vs 2d+2 held",
+          "value": 3.585584
+        }
+      ],
+      "problem": "study:split_graph_secant_cost_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 3.98107,
+      "latest": 3.98107,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "cs2_over_cd.field.excl_construct.gm.c4_p491_d6",
+      "points": [
+        {
+          "commit": "15a41df4aa5c",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 120,
+          "record": "20261108T0449Z-split-graph-secant-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            3.936075,
+            4.022201
+          ],
+          "summary": "split-graph secant panel (attempt 3): PROTOCOL section 9 REJECTED at the tested scale for cs1 and cs2, and UNRANKED under section 5a (order reverses at 1 GAE/native op); all section 8 gates pass, 6/6 clean cells; handled degree d+1 vs 2d+2 held",
+          "value": 3.98107
+        }
+      ],
+      "problem": "study:split_graph_secant_cost_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 3.638504,
+      "latest": 3.638504,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "cs2_over_cd.field.excl_construct.gm.c5_p673_d7",
+      "points": [
+        {
+          "commit": "15a41df4aa5c",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 120,
+          "record": "20261108T0449Z-split-graph-secant-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            3.610828,
+            3.665767
+          ],
+          "summary": "split-graph secant panel (attempt 3): PROTOCOL section 9 REJECTED at the tested scale for cs1 and cs2, and UNRANKED under section 5a (order reverses at 1 GAE/native op); all section 8 gates pass, 6/6 clean cells; handled degree d+1 vs 2d+2 held",
+          "value": 3.638504
+        }
+      ],
+      "problem": "study:split_graph_secant_cost_20261107",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 4.443209,
+      "latest": 4.443209,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "cs2_over_cd.field.excl_construct.gm.c6_p991_d8",
+      "points": [
+        {
+          "commit": "15a41df4aa5c",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 120,
+          "record": "20261108T0449Z-split-graph-secant-panel",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            4.416292,
+            4.47007
+          ],
+          "summary": "split-graph secant panel (attempt 3): PROTOCOL section 9 REJECTED at the tested scale for cs1 and cs2, and UNRANKED under section 5a (order reverses at 1 GAE/native op); all section 8 gates pass, 6/6 clean cells; handled degree d+1 vs 2d+2 held",
+          "value": 4.443209
+        }
+      ],
+      "problem": "study:split_graph_secant_cost_20261107",
+      "unit": "ratio"
     }
   ],
   "units": {
