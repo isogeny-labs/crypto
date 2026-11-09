@@ -858,6 +858,61 @@ impl MumfordDivisor {
             .expect("invalid divisor or curve in Cantor addition")
     }
 
+    /// Internal fast addition for callers that already validated the curve
+    /// and both operands (the index-calculus walk, factor-base construction,
+    /// and scalar multiplication below).
+    ///
+    /// [`Self::add`] re-checks the field modulus, the curve model's
+    /// smoothness, and each operand's divisor equation on *every* call.  A
+    /// relation walk performs one addition per trial, so those checks dwarf
+    /// the Cantor arithmetic.  This path keeps the exact-division checks in
+    /// composition/reduction but skips the repeated domain validation:
+    /// callers inside this crate construct every operand through the checked
+    /// constructors first.
+    pub fn add_fast(&self, other: &Self, curve: &HyperellipticCurve) -> Self {
+        if self.is_identity() {
+            return other.clone();
+        }
+        if other.is_identity() {
+            return self.clone();
+        }
+        self.try_cantor_compose(other, curve)
+            .expect("Cantor composition on validated operands")
+            .try_reduce(curve)
+            .expect("Cantor reduction on validated operands")
+    }
+
+    /// Internal fast doubling: `2·self` without re-validating the curve.
+    pub fn double_fast(&self, curve: &HyperellipticCurve) -> Self {
+        self.add_fast(self, curve)
+    }
+
+    /// Internal fast negation: `−(u, v) = (u, (h + v) mod u)`.
+    pub fn neg_fast(&self, curve: &HyperellipticCurve) -> Self {
+        let v_new = curve.h.add(&self.v).rem(&self.u, &curve.irr);
+        Self {
+            u: self.u.clone(),
+            v: v_new,
+        }
+    }
+
+    /// Internal fast scalar multiplication: left-to-right double-and-add
+    /// through [`Self::add_fast`], without per-operation curve validation.
+    pub fn scalar_mul_fast(&self, k: &BigUint, curve: &HyperellipticCurve) -> Self {
+        if k.is_zero() {
+            return Self::identity(curve.m);
+        }
+        let bits = k.bits();
+        let mut result = Self::identity(curve.m);
+        for i in (0..bits).rev() {
+            result = result.double_fast(curve);
+            if k.bit(i) {
+                result = result.add_fast(self, curve);
+            }
+        }
+        result
+    }
+
     /// Checked group addition in `Jac(C)(F_q)`.
     pub fn try_add(
         &self,
