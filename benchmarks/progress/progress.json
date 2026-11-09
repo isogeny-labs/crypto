@@ -1,12 +1,12 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261108T1825Z-arity-koblitz-m56-a5",
+  "latest_record": "20261108T2319Z-c25519-bsgs-boundary",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 71,
-    "open": 0
+    "measured": 72,
+    "open": 1
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -3696,6 +3696,64 @@
       ],
       "problem": "ic:split-prime-p2-twist-coset-toy",
       "unit": "count"
+    },
+    {
+      "better": "lower",
+      "first": 0.981,
+      "latest": 0.981,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.605556
+      },
+      "metric": "bsgsk20w0",
+      "points": [
+        {
+          "commit": "fe1849358bd0",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.605556
+          },
+          "n": 60,
+          "record": "20261108T2319Z-c25519-bsgs-boundary",
+          "reference": 1.62,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "bsgs.negation vs rho-neg, five fresh family curves: S ratio 0.611/0.625/0.697 at k=20 (w=0/0.1/1), 0.889/0.897/0.933 at k=24; BSGS-class, time-memory, outside the IC ratchet",
+          "value": 0.981
+        }
+      ],
+      "problem": "kernel:c25519_family_bsgs_vs_rho",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.041,
+      "latest": 1.041,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.885204
+      },
+      "metric": "bsgsk24w0",
+      "points": [
+        {
+          "commit": "fe1849358bd0",
+          "date": "2026-11-08",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.885204
+          },
+          "n": 60,
+          "record": "20261108T2319Z-c25519-bsgs-boundary",
+          "reference": 1.176,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "bsgs.negation vs rho-neg, five fresh family curves: S ratio 0.611/0.625/0.697 at k=20 (w=0/0.1/1), 0.889/0.897/0.933 at k=24; BSGS-class, time-memory, outside the IC ratchet",
+          "value": 1.041
+        }
+      ],
+      "problem": "kernel:c25519_family_bsgs_vs_rho",
+      "unit": "S"
     },
     {
       "better": "neutral",
