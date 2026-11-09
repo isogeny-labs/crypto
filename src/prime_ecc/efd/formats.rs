@@ -171,6 +171,12 @@ impl Representation {
                 put("Y", y.mul(&z2));
                 put("Z", z.clone());
             }
+            // Legacy EFD chart: x=X/Z, y=Y/Z^2 with caches U,V,W,T.
+            "jquartic/extended" => {
+                put("X", x.mul(z));
+                put("Y", y.mul(&z2));
+                put("Z", z.clone());
+            }
             _ => return Err(EfdError::Unsupported(self.id.clone())),
         }
         self.derive_relations(modulus, &mut v);
@@ -356,6 +362,10 @@ impl Representation {
             "jquartic/xxyzz" | "jquartic/xxyzzr" | "jquartic/2xxyzz" | "jquartic/2xxyzzr" => {
                 let zi = get("Z")?.inv_vartime().ok_or(EfdError::ZeroDenominator)?;
                 (get("X")?.mul(&zi), div(&get("Y")?, &get("ZZ")?)?)
+            }
+            "jquartic/extended" => {
+                let zi = get("Z")?.inv_vartime().ok_or(EfdError::ZeroDenominator)?;
+                (get("X")?.mul(&zi), get("Y")?.mul(&zi.mul(&zi)))
             }
             "shortw/projective"
             | "shortw/projective-1"

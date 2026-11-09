@@ -298,6 +298,10 @@ fn instruction(line: &str) -> Result<(String, Expr)> {
 
 impl Program {
     pub(super) fn compile(formula: &Formula) -> Result<Self> {
+        Self::compile_in(catalogue(), formula)
+    }
+
+    pub(super) fn compile_in(catalogue: &'static Catalogue, formula: &Formula) -> Result<Self> {
         let mut instructions = Vec::new();
         for line in formula
             .program
@@ -317,7 +321,7 @@ impl Program {
             }
             instructions.push(instruction(line)?);
         }
-        Self::assemble(formula, instructions, ProgramSource::Upstream)
+        Self::assemble(catalogue, formula, instructions, ProgramSource::Upstream)
     }
 
     /// Reconstruct a straight-line program from the `compute NAME = EXPR`
@@ -325,6 +329,13 @@ impl Program {
     /// this makes the eight unusable upstream programs executable without
     /// changing the pinned bytes.
     pub(super) fn compile_record(formula: &Formula) -> Result<Self> {
+        Self::compile_record_in(catalogue(), formula)
+    }
+
+    pub(super) fn compile_record_in(
+        catalogue: &'static Catalogue,
+        formula: &Formula,
+    ) -> Result<Self> {
         let mut instructions = Vec::new();
         for line in formula.record.text.lines() {
             let Some(body) = line.strip_prefix("compute ") else {
@@ -338,15 +349,20 @@ impl Program {
                 formula.id
             )));
         }
-        Self::assemble(formula, instructions, ProgramSource::RecordFallback)
+        Self::assemble(
+            catalogue,
+            formula,
+            instructions,
+            ProgramSource::RecordFallback,
+        )
     }
 
     fn assemble(
+        catalogue: &'static Catalogue,
         formula: &Formula,
         instructions: Vec<(String, Expr)>,
         source: ProgramSource,
     ) -> Result<Self> {
-        let catalogue = catalogue();
         let rep = catalogue
             .representation(&formula.representation)
             .ok_or_else(|| EfdError::Unsupported(formula.representation.clone()))?;
