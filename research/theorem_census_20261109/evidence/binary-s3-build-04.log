@@ -1,0 +1,169 @@
+⚠ [3156/3158] Replayed S3Roots
+warning: S3Roots.lean: imports `Mathlib.Tactic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Roots.lean: imports `Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Roots.lean:137:63: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Roots.lean:137:63: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+warning: S3Roots.lean:161:55: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Roots.lean:161:55: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+⚠ [3157/3158] Replayed S3Completion
+warning: S3Completion.lean: imports `Mathlib.FieldTheory.IsAlgClosed.Basic` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+warning: S3Completion.lean:25:2: Unused tactic linter: `<;>` should be replaced with `;` or be removed.
+
+Note: This linter can be disabled with `set_option linter.unusedTactic false`
+warning: S3Completion.lean:25:2: Used `tac1 <;> tac2` where `(tac1; tac2)` would suffice
+
+Note: This linter can be disabled with `set_option linter.unnecessarySeqFocus false`
+warning: S3Completion.lean:67:44: This simp argument is unused:
+  zero_add
+
+Hint: Omit it from the simp argument list.
+  [apply] simp only [WeierstrassCurve.Affine.addX, ha1, ha2, hn, zero_mul, mul_zero, add_zero, sub_zero]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+✖ [3158/3158] Building BinaryS3 (3.9s)
+warning: BinaryS3.lean: imports `Mathlib.Algebra.CharP.Two` from package `mathlib`, which is designed for use with the module system; consider adding `module` to the start of this file
+trace: .> LEAN_PATH=/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/mathlib4/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_audit_20261108/lean/.lake/build/lib/lean:/workspace/crypto-audit/research/theorem_census_20261109/lean/.lake/build/lib/lean /home/agent/.elan/toolchains/leanprover--lean4---v4.35.0/bin/lean /workspace/crypto-audit/research/theorem_census_20261109/lean/BinaryS3.lean -o /workspace/crypto-audit/research/theorem_census_20261109/lean/.lake/build/lib/lean/BinaryS3.olean -i /workspace/crypto-audit/research/theorem_census_20261109/lean/.lake/build/lib/lean/BinaryS3.ilean -c /workspace/crypto-audit/research/theorem_census_20261109/lean/.lake/build/ir/BinaryS3.c --setup /workspace/crypto-audit/research/theorem_census_20261109/lean/.lake/build/ir/BinaryS3.setup.json --json
+error: BinaryS3.lean:22:48: unsolved goals
+case a
+K : Type u_1
+inst✝¹ : Field K
+inst✝ : CharP K 2
+a b x y z : K
+h : y ^ 2 + x * y = x ^ 3 + a * x ^ 2 + b
+hx : x ≠ 0
+⊢ -(x * y * 2) + x ^ 2 * z * 2 + x ^ 2 * z ^ 2 * 4 - x ^ 2 * y * 2 + x ^ 3 * z * 4 + b * 2 - y ^ 2 * 2 = 0
+warning: BinaryS3.lean:34:0: automatically included section variable(s) unused in theorem `BinaryS3Audit.zero_coordinate_no_root`:
+  [CharP K 2]
+consider restructuring your `variable` declarations so that the variables are not in scope or explicitly omit them:
+  omit [CharP K 2] in theorem ...
+
+Note: This linter can be disabled with `set_option linter.unusedSectionVars false`
+error: BinaryS3.lean:47:41: unsolved goals
+case a
+K : Type u_1
+inst✝¹ : Field K
+inst✝ : CharP K 2
+a b l n x y : K
+hx : x ≠ y
+hR : (l * x + n) ^ 2 + x * (l * x + n) = x ^ 3 + a * x ^ 2 + b
+hF : (l * y + n) ^ 2 + y * (l * y + n) = y ^ 3 + a * y ^ 2 + b
+hd : x + y ≠ 0
+⊢ -(x * y * a * 2) - x * y * l * 2 - x * y * l ^ 2 * 2 - x * y ^ 2 * 4 - x * n * l * 2 - x ^ 2 * y * 4 - x ^ 2 * l * 2 -
+                x ^ 2 * l ^ 2 * 2 -
+              y * n * l * 2 -
+            y ^ 2 * l * 2 -
+          y ^ 2 * l ^ 2 * 2 -
+        n ^ 2 * 2 +
+      b * 2 =
+    0
+error: BinaryS3.lean:51:4: ring failed, ring expressions not equal
+K : Type u_1
+inst✝¹ : Field K
+inst✝ : CharP K 2
+a b l n x y : K
+hx : x ≠ y
+hR : (l * x + n) ^ 2 + x * (l * x + n) = x ^ 3 + a * x ^ 2 + b
+hF : (l * y + n) ^ 2 + y * (l * y + n) = y ^ 3 + a * y ^ 2 + b
+hd : x + y ≠ 0
+hn : n = x * y + (x + y) * (l ^ 2 + l + x + y + a)
+⊢ x * y * 6 + x * l * 2 + x * l ^ 2 * 2 + x * a * 2 + x ^ 2 * 2 + y * l * 2 + y * l ^ 2 * 2 + y * a * 2 + y ^ 2 * 2 -
+      n * 2 =
+    0
+error: BinaryS3.lean:45:38: unsolved goals
+case a
+K : Type u_1
+inst✝¹ : Field K
+inst✝ : CharP K 2
+a b l n x y : K
+hx : x ≠ y
+hR : (l * x + n) ^ 2 + x * (l * x + n) = x ^ 3 + a * x ^ 2 + b
+hF : (l * y + n) ^ 2 + y * (l * y + n) = y ^ 3 + a * y ^ 2 + b
+hd : x + y ≠ 0
+hn : n = x * y + (x + y) * (l ^ 2 + l + x + y + a)
+hs : x * y + x * (l ^ 2 + l + x + y + a) + y * (l ^ 2 + l + x + y + a) = n
+⊢ -(n * x * 2) - n * x * l * 2 + x * y * l * 2 + x * y * l ^ 2 * 2 + x * y * a * 2 + x * y ^ 2 * 2 + x ^ 2 * y * 4 +
+          x ^ 2 * a * 2 +
+        x ^ 3 * 2 +
+      b * 2 =
+    0
+error: BinaryS3.lean:63:23: unsolved goals
+K : Type u_1
+inst✝¹ : Field K
+inst✝ : CharP K 2
+a b x u y v : K
+hx : x ≠ y
+hR : u ^ 2 + x * u = x ^ 3 + a * x ^ 2 + b
+hF : v ^ 2 + y * v = y ^ 3 + a * y ^ 2 + b
+hd : x + y ≠ 0
+l : K := (u + v) / (x + y)
+n : K := u + l * x
+⊢ (l = 0 ∨ x = 0) ∨ 2 = 0
+error: BinaryS3.lean:67:23: unsolved goals
+K : Type u_1
+inst✝¹ : Field K
+inst✝ : CharP K 2
+a b x u y v : K
+hx : x ≠ y
+hR : u ^ 2 + x * u = x ^ 3 + a * x ^ 2 + b
+hF : v ^ 2 + y * v = y ^ 3 + a * y ^ 2 + b
+hd : x + y ≠ 0
+l : K := (u + v) / (x + y)
+n : K := u + l * x
+hr : l * x + n = u
+⊢ u * y * 2 + u * x * 2 = 0
+error: BinaryS3.lean:75:57: unsolved goals
+K : Type u_1
+inst✝¹ : Field K
+inst✝ : CharP K 2
+a x u y v : K
+hx : x ≠ y
+hd : x + y ≠ 0
+⊢ u * v * 2 + u * y * 3 + u * x + u ^ 2 + v * y * 3 + v * x + v ^ 2 + y * x + y * x * a * 2 + y * x ^ 2 * 3 +
+      y ^ 2 * 2 =
+    u * v * 2 + u * y + u * x + u ^ 2 + v * y + v * x + v ^ 2 + y * x + y * x * a * 2 + y * x ^ 2 * 3
+error: BinaryS3.lean:84:64: unsolved goals
+case a
+K : Type u_1
+inst✝¹ : Field K
+inst✝ : CharP K 2
+b x y root z : K
+hx : x ≠ y
+hr : (x * y + x * root + y * root) ^ 2 + x * y * root + b = 0
+hd : x + y ≠ 0
+⊢ x * y * z * 2 + x * y * z * root * 4 - x * y * b * 2 - x * y * root - x * y * root ^ 2 * 2 + x * y ^ 2 * z * 2 -
+                                                    x * y ^ 3 * root -
+                                                  x * y ^ 3 * root ^ 2 * 4 -
+                                                x * y ^ 4 * root * 2 +
+                                              x ^ 2 * y * z * 2 +
+                                            x ^ 2 * y ^ 2 -
+                                          x ^ 2 * y ^ 2 * root * 2 -
+                                        x ^ 2 * y ^ 2 * root ^ 2 * 6 -
+                                      x ^ 2 * y ^ 3 * root * 6 -
+                                    x ^ 2 * y ^ 4 +
+                                  x ^ 2 * z * root * 2 -
+                                x ^ 2 * b -
+                              x ^ 2 * root ^ 2 -
+                            x ^ 3 * y * root -
+                          x ^ 3 * y * root ^ 2 * 4 -
+                        x ^ 3 * y ^ 2 * root * 6 -
+                      x ^ 3 * y ^ 3 * 2 -
+                    x ^ 4 * y * root * 2 -
+                  x ^ 4 * y ^ 2 -
+                x ^ 4 * root ^ 2 +
+              y ^ 2 * z * root * 2 -
+            y ^ 2 * b -
+          y ^ 2 * root ^ 2 -
+        y ^ 4 * root ^ 2 +
+      b =
+    0
+Some required targets logged failures:
+- BinaryS3
+error: build failed

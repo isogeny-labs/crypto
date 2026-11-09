@@ -8,11 +8,12 @@ theorem, Semaev's algebraic-closure theorem, and generic FGHR regularity
 are not refuted; their exact domains and remaining bridges stay explicit.
 [pcc:unverified]
 
-The expanded repository proof gate audits74declarations with0failing and
-0trusted-native exceptions. The original41-declaration receipt is retained
-as its earlier snapshot. Counts include generated equation lemmas, not
-74new mathematical results. Both proof attempts and final receipts are
-retained. The current unsigned PCC records are `PCC-20261109-44730b` and
+The torsion-only proof snapshot audited74declarations with0failing and
+0trusted-native exceptions. The current binary follow-up audits116declarations;
+the original41-declaration and intermediate96-declaration receipts are
+retained as earlier snapshots. Counts include generated equation lemmas,
+not116new mathematical results. Both proof attempts and final receipts are
+retained. The torsion snapshot's unsigned PCC records are `PCC-20261109-44730b` and
 `PCC-20261109-5bd3a4`. Earlier packets omitted required declaration hashes;
 they remain as superseded records, and their failed metadata check is
 preserved. The Lean kernel audit itself passed. [pcc:unverified]
@@ -40,6 +41,16 @@ and [paper-audit-backlog.json](paper-audit-backlog.json). Those are metadata
 counts; untouched papers are not labelled audited. [pcc:unverified]
 
 ## Exact counterexamples
+
+The binary follow-up proves the full ordinary characteristic-two S3
+equivalence over an algebraically closed field, using actual Mathlib elliptic
+points and all repeated-coordinate/two-torsion cases. It also checks a domain
+negative control overF2: a true zero-sum triple has binaryS3=0 while the
+short-Weierstrass expression is1. This refutes substituting a formula on the
+wrong model. Claim PCC-20261109-517cb7 remains unsigned. See
+[BINARY_S3.md](BINARY_S3.md), [Lean proof](lean/BinaryS3.lean),
+[actual counterexample](lean/BinaryMisapplication.lean), and
+[proof report](reports/proof-20261109-binary/report.pdf). [pcc:unverified]
 
 The solver-control follow-up proves the actual algebra equivalence
 K[x,y]/(xy,x+y−c) ≃ K[t]/(t²−ct), length2, and a closed F5support1/length2
@@ -164,7 +175,7 @@ only at their already-stated scope. [pcc:unverified]
 
 | Item | Current status and concrete remaining obligation |
 |---|---|
-| 1 Semaev | Partial: general short S3 equivalence from prior increment; rational-only converse refuted here; bounded S3/S4/S5 native census completed. Universal binary equivalence, recursion and degree proofs remain open. |
+| 1 Semaev | Partial: general short and ordinary binary S3 equivalences now proved with all repeated-coordinate cases in actual Mathlib point groups. Rational-only converse and wrong-model substitution refuted. Bounded S3/S4/S5 native census completed. General resultant recursion and degree proofs remain open. |
 | 2 BK | Partial: primary proof read and actual excluded-case geometric3-torsion witness, even with9dividing#E. Full qualified E[r]/Frobenius proof and all-p<500 census remain open. Qualified theorem is not refuted. |
 | 3 Supersingular | Literal all-prime k=2 assertion refuted at r=2 using the source trace definition and actual groups. FSTp239 directly checked using actual cyclotomic degree1 versus nonrational2-torsion. Corrected odd-prime proof is conditional on Hasse; general Hasse/classification and binary/ternary census remain open. |
 | 4 Pairings | Partial: cyclic restriction obstruction and actual r=2 cyclotomic/full-torsion field distinction. Actual Weil/Tate constructions, nondegeneracy and MOV/FR calculations remain open. |

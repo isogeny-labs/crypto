@@ -83,3 +83,27 @@ Remote bot archived benchrec-gate.log to .artifacts.json; reviewed exact hashes
 and preserved that migration. Metadata-fix remote head ac0fc062627ea6a0e307a4fe0b105b0e9a7514ef
 passes verify-all's binding stage; remaining PR-body prose tag is being fixed
 with the mathematical follow-up. No required gate is disabled.
+
+2026-11-09 binary follow-up: actual ordinary characteristic-two S3
+equivalence is now proved, with all repeated-coordinate cases and actual
+Mathlib points. The wrong-model negative control gives binaryS3=0 versus
+shortS3=1 on a true zero-sum F2triple. Final census-project gate116pass,
+0failing/0trusted-native exceptions. PCC-20261109-517cb7 remains unsigned.
+Reports/source: BINARY_S3.md, lean/BinaryS3.lean,
+lean/BinaryMisapplication.lean, reports/proof-20261109-binary/report.pdf.
+General recursion/degree proofs remain open. [pcc:unverified]
+
+Item13follow-up: independent local Rust arithmetic matches6fields,
+942models/4188162triples/244236zeros. New quadratic field foundation gate11
+passes. The one manual separate-host dispatch returnedHTTP404; actual
+responses and the incomplete row remain in the passing2-row export under
+../independent_s3_validator_20261109. No remote host is claimed. Source and
+protocol were committed before affected work; zero paid spend. [pcc:unverified]
+
+At05:59Z current-main read-only inspection still finds458ledgerrows,
+local475before the binary claim, common prefix457; neither history is a
+prefix. Parent3739remains open/mergeablefalse, head967ff57c. No ledger
+rechain or main merge attempted. Applicable CI on published98f02250passes;
+subsequent binary publication needs its own checks. Resume via the exact
+14-item README map; do not silently treat these gaps as completed.
+[pcc:unverified]
