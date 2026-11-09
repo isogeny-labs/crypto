@@ -111,3 +111,13 @@ $(BUILD_DIR)/block-analysis: block_analyze.cpp json.hpp
 	$(CXX) $(CXXFLAGS) block_analyze.cpp -o $@ -lcrypto
 block-analysis-binary: $(BUILD_DIR)/block-analysis
 .PHONY: block-eval-binary block-analysis-binary
+$(BUILD_DIR)/block-tune: block_tune.cpp block_core.hpp cache_core.hpp native.cpp json.hpp relation_verify.hpp orbit_verify.hpp
+	mkdir -p $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) block_tune.cpp -o $@ -lcrypto
+block-tune-binary: $(BUILD_DIR)/block-tune
+.PHONY: block-tune-binary
+$(BUILD_DIR)/block-tune-replay: block_tune_replay.cpp json.hpp
+	mkdir -p $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) block_tune_replay.cpp -o $@ -lcrypto -lgmpxx -lgmp
+block-tune-replay-binary: $(BUILD_DIR)/block-tune-replay
+.PHONY: block-tune-replay-binary
