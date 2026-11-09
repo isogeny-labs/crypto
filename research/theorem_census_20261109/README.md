@@ -45,10 +45,18 @@ The solver-control follow-up proves the actual algebra equivalence
 K[x,y]/(xy,x+y−c) ≃ K[t]/(t²−ct), length2, and a closed F5support1/length2
 witness. All16preregistered msolve0.6.5 calls pass their exact known-answer
 checks, including the prior degree3control. The expanded project gate now
-audits93declarations with0failing/0trusted-native exceptions. Claim
+audits96declarations with0failing/0trusted-native exceptions. Claim
 PCC-20261109-ee57d0 is unsigned. See
 [solver multiplicity study](../solver_multiplicity_audit_20261109/README.md)
 for the frozen protocol, raw outputs and report. [pcc:unverified]
+
+The retained msolve preflight also announces k^344 but prints an integer
+with a different F5residue for k=2. Lean proves the unequal residues and
+out-of-int32-range arithmetic; pinned source casts floating pow before
+field reduction. This source/log audit is separate from a formal C/libm
+execution proof. Claim PCC-20261109-c7c353 is unsigned. See
+[source observations](../solver_multiplicity_audit_20261109/SOURCE_OBSERVATIONS.md).
+[pcc:unverified]
 
 1. On `y²=x³+1` over F5, `S3(3,1,4)=0`, but there is no F5-point above x=3.
    `rational_only_s3_converse_false` uses Mathlib's actual elliptic point
@@ -167,7 +175,7 @@ only at their already-stated scope. [pcc:unverified]
 | 9 Gröbner heuristics | Universal square regularity reading has this Lean counterexample; generic variants and JV remain open. Native msolve controls passed, but those heuristic systems are not yet measured. |
 | 10 Walks | Original Hildebrand fixed-support proof/hypotheses read; random-support averaging and fixed positive probabilities retained. Prior iid-label identity is not a collision theorem. Lean mixing proof and exact walk census remain open. |
 | 11 Standards | Screening hypotheses reviewed. Large-order anomalous Smart fixture/proof and matched rho benchmark remain open. Screened NIST recommendation is not refuted. |
-| 12 msolve/F4 | Partial static audit and exact native GB/staircase/parameter fixtures. No faithful C-to-F4Run refinement or trace certificate yet. |
+| 12 msolve/F4 | Partial static audit, exact native GB/staircase/count fixtures, and a Lean-backed preflight coefficient discrepancy/C conversion boundary. No faithful C/libm-to-F4Run refinement, full parameter-map or row-trace certificate yet. |
 | 13 Independence | Other-language fixed controls/census on this one host. Independent second-host execution remains unavailable. |
 | 14 Negative control | Prior Lean lower/upper degree certificates, production Rust control, and actual msolve degree3known-answer run pass. No retroactive claim that older censuses used this control. |
 

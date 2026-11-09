@@ -3,6 +3,7 @@ import DescentCounterexample
 import TorsionBoundaries
 import SourceFSTBoundary
 import BivariateMultiplicity
+import SolverCoefficientBoundary
 
 #print axioms SkepticalAudit.rational_only_s3_converse_false
 #print axioms SkepticalAudit.extensionPolynomial_irreducible
@@ -37,3 +38,6 @@ import BivariateMultiplicity
 #print axioms BivariateMultiplicityAudit.quotient_dimension_two
 #print axioms BivariateMultiplicityAudit.triangular_generators_same_ideal
 #print axioms BivariateMultiplicityAudit.support_is_not_multiplicity
+#print axioms SolverCoefficientAudit.advertised_power_outside_int32
+#print axioms SolverCoefficientAudit.observed_coefficient_wrong_in_five
+#print axioms SolverCoefficientAudit.observed_coefficient_wrong_in_five_at_first_overflow

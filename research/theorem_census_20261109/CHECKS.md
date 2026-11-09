@@ -1,6 +1,6 @@
 # Solver-control follow-up
 
-The latest expanded repository gate passes93declarations,0failing,
+The latest expanded repository gate passes96declarations,0failing,
 0trusted-native exceptions. It includes the actual bivariate quotient
 equivalence/length2 and closed support1witness. All16frozen-protocol msolve
 calls pass exact checks; the canonical export passes against that protocol
@@ -9,6 +9,13 @@ with file hashes. The standalone native checker compiles with
 ../solver_multiplicity_audit_20261109/evidence and its README. Claim
 PCC-20261109-ee57d0 remains unsigned. Earlier counts below are historical
 increment receipts and are preserved. [pcc:unverified]
+
+The96-declaration receipt is proof-gate-coeff.log in the solver study;
+its earlier proof-gate.log preserves the93-declaration checkpoint. Three
+new arithmetic lemmas check the retained preflight's announced exponent,
+out-of-int32 bound and unequal F5coefficients. Source/C-standard context
+is SOURCE_OBSERVATIONS.md, not a formal C/libm execution proof. Claim
+PCC-20261109-c7c353 remains unsigned. [pcc:unverified]
 
 # Validation scope
 
