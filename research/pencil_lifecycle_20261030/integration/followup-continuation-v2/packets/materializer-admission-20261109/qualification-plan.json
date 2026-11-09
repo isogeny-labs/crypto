@@ -1,0 +1,73 @@
+{
+  "schema": "materializer-journal-qualification-plan/v1",
+  "status": "superseded_by_independent_prospective_plan_not_executed",
+  "claim_class": "exact_computation",
+  "claim": "The fifteen fixed deterministic software storage cases satisfy their acknowledged-prefix acceptance and rejection assertions.",
+  "candidate_source": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/materializer-admission-20261109/materialize.py",
+  "candidate_sha256": "6bfc278cdfb8cd5f2adad13f5e920a2baee131be9f7dedc4b472329f2f0da4f7",
+  "reader": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/materializer-journal-reader-20261107/receipt_reader.py",
+  "reader_sha256": "021215e4b46f84c63e0b297acc427fce244bbe675647fe13b88eb60a0326e2e9",
+  "maximum_worker_seconds": 60,
+  "maximum_attempts": 1,
+  "automatic_retry": false,
+  "scientific_trials": 0,
+  "fixed_cases": [
+    "normal intermediate/final",
+    "partial unacknowledged tail",
+    "first-file fsync failure",
+    "first-directory fsync failure",
+    "append fsync failure",
+    "append write exception",
+    "append short write",
+    "append flush exception",
+    "checkpoint replace exception",
+    "acknowledged-prefix corruption rejection",
+    "normal A/A repeat",
+    "before-first-append interruption",
+    "durable append before checkpoint",
+    "checkpoint directory fsync failure",
+    "pointer-count mismatch rejection"
+  ],
+  "controls": {
+    "positive": "Unmodified successful prefix must be accepted by independent reader.",
+    "negative": "Alter one acknowledged byte and one pointer count in separate fixtures; each must be rejected.",
+    "AA": "Repeat deterministic successful fixture in fresh directory; exact logical records must match.",
+    "baseline": "Existing reviewed reader fixture semantics; no timing comparison."
+  },
+  "variables": {
+    "fixed": [
+      "candidate and reader hashes",
+      "case ordering as listed",
+      "fresh private directories",
+      "same Python interpreter",
+      "injected failure sites"
+    ],
+    "measured": [
+      "host boot ID",
+      "mount and filesystem",
+      "native limits",
+      "CPU/RAM cgroup",
+      "elapsed time only for accounting"
+    ]
+  },
+  "acceptance": "All fifteen fixed software storage cases must pass the independently reviewed harness assertions. Interrupted states are synthetic function-boundary states, not actual OS interruption. No child process, top-level materializer, physical durability or terminal custody is qualified.",
+  "pending_before_execution": [
+    "Independent prospective review and published exact harness/plan/source readback",
+    "Root release with current lease, campaign debit/reservation and no-overlap readback"
+  ],
+  "not_covered": [
+    "hardware power-loss durability",
+    "scientific performance",
+    "full materialization success",
+    "terminal custody of old T1716",
+    "actual OS interruption and child-process cleanup"
+  ],
+  "authoritative_plan": {
+    "path": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/materializer-qualification-20261109/PLAN.md",
+    "sha256": "62a8b4d74c9e594e611176a4d7b9777d2ad08865ada75c2f6f37a7a70c60eff1"
+  },
+  "harness": {
+    "path": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/materializer-qualification-20261109/qualify.py",
+    "sha256": "efe039f547b2eaf0b590c0ff236b7932f12fcf0158b4dc6d845712c322c64d56"
+  }
+}
