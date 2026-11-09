@@ -77,7 +77,15 @@
     "pending_snapshot_seconds": 60,
     "pending_parser_qualification_seconds": 60,
     "validation_reservation_seconds": 1800,
-    "root_ledger_authoritative": true
+    "root_ledger_authoritative": true,
+    "pending_branch_reservation_seconds": 3600,
+    "conditional_after_branch_parser_snapshot": {
+      "condition": "All three pending attempts terminal and each conservative reservation charged by coordinator; not current accounting",
+      "charged_seconds": 10860,
+      "remaining_before_validation_seconds": 32340,
+      "validation_reservation_seconds": 1800,
+      "unreserved_after_validation_reservation_seconds": 30540
+    }
   },
   "root_release_condition": "Fresh current-cache snapshot, parser qualification, independent review, final bindings, publication/readback, current lease and no-overlap checks. One manual bounded attempt.",
   "current_cache_sha256": null
