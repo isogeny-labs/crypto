@@ -239,3 +239,15 @@ FullRustvalidation; reviewedhelper/pivot/cardinality/directreplays; affine137cal
 
 ## Errors
 Priorroot/branch/fixtureattempts remain chargedandimmutable. No extra cloudsubmission.
+
+## What was done — 19:42 UTC
+Publishedfinalv4admissionandreviewsatd97d50bb1c8549a4d71bc4df75e601cbb8818618, verifiedremoteequality. Launchedoneserialboundedrootvalidation, session79995/caller322556, invocationa80ba03158b54687892e12b9e78f7c70. Supervisorinitialandsecondleaseheartbeatpassed, capturedsamecgroup; noinitialerror.
+
+## Decisions made
+Native supervisor nowmaintainsT2031epoch3; prelaunchheartbeat59167stopfileset.16440charged+1800reservedunchanged; otherpayloadsqueued.
+
+## Open threads
+Preinputs/build/fourcontrols/fullsuite, then queuedformalreplays.
+
+## Errors
+No newruntimeerrorobservedatthisreadback; earlierfailuresretained.
