@@ -56,3 +56,12 @@ Copilot resolution appeared by this check. No ledger was rewritten, no side
 was selected, and no main merge is attempted. Reconciliation needs the
 repository's authorized ledger process. Receipt:
 evidence/main-ledger-integration.json. [pcc:unverified]
+
+2026-11-09 CI follow-up: the full PCC gate failed on the two original active
+packets lacking declaration hashes; successor packets alone did not repair
+`verify-all`. Their original bytes now live in evidence/metadata-originals/.
+The unsigned active packets have their missing declaration hashes restored,
+with appended claim/note events for the changed digests; statements and all
+existing ledger rows are unchanged. This is a correction of our metadata
+defect, not an inherited CI failure. The amendment receipt records both
+digests. [pcc:unverified]

@@ -16,6 +16,12 @@ retained. The current unsigned PCC records are `PCC-20261109-44730b` and
 they remain as superseded records, and their failed metadata check is
 preserved. The Lean kernel audit itself passed. [pcc:unverified]
 
+CI subsequently found that superseded packets still participate in
+`verify-all`. Their missing hashes were repaired in the active unsigned
+packets with append-only correction events; exact original bytes are retained
+under evidence/metadata-originals/. The mathematical statements were not
+changed. See evidence/metadata-binding-amendment.json. [pcc:unverified]
+
 ## Exact counterexamples
 
 1. On `y²=x³+1` over F5, `S3(3,1,4)=0`, but there is no F5-point above x=3.
