@@ -1,7 +1,7 @@
 {
   "schema": "ecbench.spec/v1",
-  "label": "C1 end-to-end DIAGNOSTIC (not evidence): tw dispatch at 1 target, 1 round, no warmup",
-  "description": "Diagnostic for the 2026-11-09 stage-1 dispatches (runs 42559413871, 42559417239) that ended without a final receipt. Same code (7aaa6318), curve, arms and isolation as c1-e2e-m5-tw.json; only the workload size is reduced. Not evidence; not scored.",
+  "label": "C1 end-to-end DIAGNOSTIC v2 (not evidence): contract-valid short job, 1 target",
+  "description": "Diagnostic for the 2026-11-09 stage-1 dispatches (runs 42559413871, 42559417239) that ended without a final receipt. Same code (7aaa6318), curve, arms and isolation as c1-e2e-m5-tw.json; only the workload size is reduced. Not evidence; not scored. v2: meets the lab spec contract (rounds >= 5, warmup >= 1, reference + control arms); v1 was refused at submission (exit 20) for violating it.",
   "workloads": {
     "curves": [
       {
@@ -36,11 +36,22 @@
           "oracle": "gaudry-x-bin:macaulay=26,sparsest=1,charge_unsolved=1"
         }
       }
+    },
+    {
+      "name": "rho-strong-l1-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation_strong",
+        "params": {
+          "lanes": "1",
+          "dp_bits": "auto"
+        }
+      }
     }
   ],
   "measurement": {
-    "rounds": 1,
-    "warmup": 0,
+    "rounds": 5,
+    "warmup": 1,
     "order": "alternate_measured",
     "seed": 1,
     "isolation_required": "L2",
