@@ -248,7 +248,7 @@ impl PrefixEntry {
                     }
                     t.push(s);
                 }
-                *once += ((1u64 << b) * (words - lead) as u64) as u64;
+                *once += (1u64 << b) * (words - lead) as u64;
             }
             tables.push((lead, t));
         }
@@ -407,7 +407,7 @@ mod tests {
                 *seed = seed
                     .wrapping_mul(6364136223846793005)
                     .wrapping_add(1442695040888963407);
-                if (*seed >> 40) % 3 != 0 {
+                if !(*seed >> 40).is_multiple_of(3) {
                     mask |= (1 as Mask) << ((*seed >> 33) as usize % n);
                 }
             }
