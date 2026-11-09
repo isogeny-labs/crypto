@@ -183,3 +183,16 @@ This closes the earlier all-arity family-definition/last-input-degree gap.
 The other input degrees beyondS4, symmetry, all-mgeometric zero-sum
 equivalence and irreducibility remain open, along with the other original
 requirements. [pcc:unverified]
+
+### 2026-11-09 complete finite Mumford-pair count
+
+The separate Jacobian-smoothness study now proves a complete bijection with
+all actual reduced polynomial pairs for F3y²=x⁵−x:8valid/7split, fraction7/8
+and finite deviation3/8from1/2. The curve polynomial is proved monic,
+degree5and separable/squarefree; the project gate passes80declarations,
+0failing/0trusted-native exceptions. See
+[source and scope](../research/jacobian_smoothness_audit_20261109/README.md).
+Formal geometric Picard identification, ambient Cantor group law/subgroup
+proportions, multi-field native census and a scaling family remain open.
+The finite exact-half strengthening fails; Gaudry's qualified limit and
+MMT's binary large-prime heuristic are not refuted. [pcc:unverified]

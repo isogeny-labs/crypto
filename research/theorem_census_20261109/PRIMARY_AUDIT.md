@@ -106,7 +106,11 @@ the full prime-field classification. [pcc:unverified]
 Gaudry Proposition4 is a fixed-genus limit as q grows, for the whole
 Jacobian. The algorithm samples a large prime subgroup (§2.3); equality of
 smoothness proportions in that subgroup is a distinct unresolved claim.
-An exact higher-genus Jacobian model/count/family is still missing here.
+The subsequent complete F3reduced-Mumford polynomial-pair model proves
+8valid/7split representatives, fraction7/8and finite deviation3/8from1/2.
+Geometric Picard identification, actual Cantor/subgroup arithmetic and a
+native multi-field/scaling census remain open. See
+../jacobian_smoothness_audit_20261109/README.md.
 [pcc:unverified]
 
 Hildebrand Theorem1 averages total-variation distance over distinct random
@@ -120,6 +124,9 @@ theorem's full proof remains open. See ../walk_audit_20261109/README.md.
 [pcc:unverified]
 
 Exact publisher URLs, PDF hashes and read ranges are in `sources.json`.
+The later MMT2002§4.2–4.3read scopes and hashes are in the separate
+Jacobian-smoothness study's sources.json, including the visually checked
+heuristic beforeeq13and identity convention ineq12.
 Initial archive/author endpoints failed, then publisher PDFs succeeded.
 The KB service remains unavailable; no literature-novelty claim is made.
 The full44-unread-node snapshot and source index are tracked separately
