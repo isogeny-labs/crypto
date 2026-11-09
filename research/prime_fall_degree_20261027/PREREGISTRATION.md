@@ -399,3 +399,38 @@ The stage B `m = 6`, `t = 6` rule. The full text, with its derivation, is
 
 Registered per `research/open_leads_execution_20261108/DECISIONS.md` (item 1, decision 6: "written as a dated protocol
 amendment before its cell runs").
+
+## Amendment 11 (2026-11-09; gate G3's scope; before any stage C G3 row exists and before `pfd-b` is submitted)
+
+The F4 engine's capacity as G3's scope. The full text, with its evidence, is
+`research/pkm_falldegree_unblock_20261107/AMENDMENT_R2_D_g3_scope.md` (R2-D). The binding parts are restated here.
+
+- **Instrument limit.** `f4_fp_tower` (and `f4_tower_generic`) holds at most `MAX_FREE = 4` free variables; the pilot's tower ring
+  has `n_free = m − 2` for every kind, `t`, `p` and non-naive control. So capped F4 runs only at `m <= 6`, as Amendment 3 already
+  registers ("at most 4 free unknowns, `m ≤ 6`"). `gate3` selects rows by `N = m·t <= 20` only, so in `pfd-c-20261108` it launched
+  capped runs at `t = 2`, `m >= 7`; the pilot panicked (`f4_fp_tower.rs:736`), and `g3` exited 101 with an empty `gates/g3.jsonl`.
+- **Scope.** G3 applies as §4 registers it to closure-measured random-target cells (prefix `A-`, `B-`, `C-`, not naive, `N <= 20`)
+  with `m <= 6`. A cell with `m >= 7` is labelled **"G3 not applicable (F4 engine capacity)"**. The label depends on `m` only.
+- **Use of labelled rows.** Their closure values (`d_F` exact or censored, `ffd`) enter every §6 rule that uses closure values, as
+  registered (H-m, H-LFD). No capped-F4 value (`=D (F4)`, the Amendment 7 B bracket, a §5 D cell) exists there or may be made by any
+  engine; rows without `D` do not enter H-FFD or H-gap (§6 as written). RESULTS reports them in their own block and discloses that no
+  gate checks the closure at 5-8 free variables (G1 cases use 0, 1, 3; G3 reaches 4; G4 runs at `m = 2, 3`).
+- **`pfd-c`'s `g3` stage is recorded as "not run (tool defect)", not as a §4 gate failure.** Reasons: G3's domain is "every cell where
+  both run"; Amendment 3 registers the F4 capacity as `m ≤ 6`; `gate3` does not skip cells outside it; it panicked before comparing
+  anything, so there is no agreement or disagreement evidence. This is the main session's reading of the registered text, made before
+  any stage C G3 row exists; the owner may overrule it. The `hky-C` rows stand.
+- **Stage C G3 job.** One command job, `pfd-g3c-20261109`, on the frozen image (no new image), cpu 12, memory 56Gi, `seconds` 57600, no
+  instance pin. It copies the 19 stage C run files with `m <= 6` from `pfd-c-20261108` (chosen by file name, that is by `(m, t, p)`)
+  and runs `prime_fall_degree_tools gate3 --max-n 20 --jobs 2 --budget 900`; pass is exit 0 with ", 0 disagreements". The command is
+  frozen verbatim in R2-D §4.4.
+- **Order.** The stage C G3 job runs before `pfd-b` and before any `pfd-x` capped run.
+- **Stop rule.** Whether a disagreement stops capped F4 only or the whole study, and whether G3 is one gate or one per stage, are not
+  decided. If the stage C G3 job reports one or more disagreements (a budget timeout counts as one, as `gate3` defines it), no further
+  PKM job is submitted and the question goes to the owner with the rows. If it reports 0 disagreements, the study continues in the
+  `R2_READY.md` order.
+- **`pfd-b`.** All of its `d-B` and G3 cells are within capacity (`m <= 6`); it runs `g1 hky-B d-B g3` as requested. A budget timeout in
+  its G3 at `m = 5, 6`, where no gate run has yet been made, is a risk, not a prediction.
+- No hypothesis, §6 rule, cell, seed, budget, memory limit, image or existing command changes.
+
+Registered per `research/open_leads_execution_20261108/DECISIONS.md` (item 1, decision 6), with the main session's decisions of
+2026-11-09 (rule option 1; `g3` recorded as not run; G3-only job first; the stop rule; the `pfd-b` sentence; the job fields).
