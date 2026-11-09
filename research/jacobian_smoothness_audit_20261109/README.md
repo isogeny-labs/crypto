@@ -1,4 +1,11 @@
-# Exact reduced-Mumford counting at q=3
+# Mumford counts and a finite Cantor subgroup counterexample
+
+The subsequent [Cantor subgroup proof](CANTOR_SUBGROUP.md) checks all64
+actual polynomial additions on the complete model and proves an order-two
+proper cyclic subgroup with smooth fraction1, versus ambient7/8. Universal
+finite cyclic-proportion equality is false in this arithmetic model.
+Geometric Picard identification and qualified large-prime/asymptotic regimes
+remain separate. [pcc:unverified]
 
 Lean proves that the complete reduced-Mumford polynomial-pair model for
 y²=x⁵−x over F3 has eight representatives, seven with completely split u.
@@ -27,21 +34,24 @@ and uses a different relation-count convention. [pcc:unverified]
 
 ## Scope and checks
 
-The whole tracked project gate passes 80 declarations, 0 failing and 0 trusted-native
-exceptions, including generated declarations. The exact source/primary read
+The current whole tracked project gate passes170declarations,0failing and
+0trusted-native exceptions, including the new actual Cantor/group modules
+and generated declarations. The initial count-only gate passed80; its
+historical receipt is retained. The exact initial source/primary read
 scopes and planned native scalar supplement are in [sources.json](sources.json).
 All intermediate failed builds are retained in `evidence/`.
 [pcc:unverified]
 
 This is a complete finite polynomial-pair model proof. A formal geometric
-identification with Pic⁰/J(C), an ambient Cantor group law, and a cyclic
-subgroup-smoothness counterexample are still separate obligations. A small
+identification with Pic⁰/J(C) remains a separate obligation. The subsequent
+actual finite Cantor group law and cyclic fraction counterexample are now
+proved in [CANTOR_SUBGROUP.md](CANTOR_SUBGROUP.md). A small
 finite discrepancy also does not disprove an asymptotic or typical-subgroup
 heuristic. The [original fourteen-item audit](../theorem_census_20261109/README.md)
 remains partial. [pcc:unverified]
 
 No new native curve population, statistical study, benchmark, paid compute
-or separate-host validation was run for this proof. The scalar identity
+or separate-host validation was run for this proof. The initial scalar identity
 supplement checks only the quotient/remainder rewrite and
 cannot establish these counts or the geometric identification.
 [pcc:unverified]
@@ -59,4 +69,11 @@ Supplement IDC1h7d12c937b3b1482b accepts32derived and11extra points only
 for the scalar quotient/remainder rewrite; its proof pointer matches.
 Exact hashes and scope are in [verification.json](verification.json).
 See the [two-page report](reports/proof-20261109-mumford-count/report.pdf).
+[pcc:unverified]
+
+The current Cantor packet is PCC-20261109-4a0f82, with source/identity
+plan in [cantor-sources.json](cantor-sources.json). Scalar supplement
+IDC1h95637a8da70e67cd covers only cancellation/factorization identities.
+The actual gcd,64reductions, group matching and subgroup counts rest on Lean.
+See [current full gate](evidence/cantor-subgroup-gate.log).
 [pcc:unverified]

@@ -1,9 +1,17 @@
 # Current additive proof and validation receipts
 
-The separate Jacobian-smoothness project gate passes80declarations,
-0failing/0trusted-native exceptions. It proves the complete actual F3
-reduced-Mumford polynomial-pair count8, split-u count7 and finite deviation
-3/8from1/2, with explicit geometric/group-law gaps. Full local packet07eb0d
+The separate Jacobian-smoothness project gate now passes170declarations,
+0failing/0trusted-native exceptions. It includes the complete actual F3
+reduced-pair count8/split count7 and all64actual Cantor steps with unique
+output/group equivalence. A proper order2cyclic subgroup has smooth
+fraction1versus7/8ambient; direct universal finite equality is false in
+the arithmetic model. Geometric Picard identification, scaling families
+and native multi-field census remain open. Current packet4a0f82full local
+check passes20:56:49Zat source5ffeedb4, unsigned. SupplementIDC1h95637a8da70e67cd
+accepts32derived/11extra points only for cancellation/factorization.
+See ../jacobian_smoothness_audit_20261109/CANTOR_SUBGROUP.md and
+evidence/cantor-subgroup-gate.log there. Initial80-declaration gate is
+retained as a historical count-only receipt. Full local packet07eb0d
 check passes20:00:58Z, unsigned; scalar supplementIDC1h7d12c937b3b1482b
 accepts32derived/11extra points only for the quotient/remainder rewrite.
 See ../jacobian_smoothness_audit_20261109/README.md and its verification.json.
@@ -51,10 +59,11 @@ the exact proof-file digest matches. See s4-degree-verification.json for
 source/gate/packet/native bindings. No source changed after those checks.
 [pcc:unverified]
 
-Fresh20:12Zread-only ledger comparison:491main rows and486local rows,
-common prefix457, neither a prefix of the other. Main refdb7f7d3ehas
-ledgerblob88cf56e0; parent3739remains open/unmerged. See
-../jacobian_smoothness_audit_20261109/evidence/main-ledger-mumford-count.json.
+Fresh20:55:29Zread-only ledger comparison:501main rows and487local rows,
+common prefix457, neither a prefix of the other. Main ref571386e7has
+ledgerblobeda919a8; parent3739remains open/unmerged. See
+../jacobian_smoothness_audit_20261109/evidence/main-ledger-cantor-subgroup.json.
+The earlier20:12receipt retains its491/486snapshot.
 The earlier19:00receipt retains its483/485snapshot. The earlier17:30receipt
 preserves its483/483row snapshot; equal counts were not equal histories.
 No history selected/rechained and no force push. [pcc:unverified]
@@ -121,6 +130,7 @@ already excludes the F2/r2control by gcd(r,q)=1. [pcc:unverified]
 | Component | Gate result | Exact receipt |
 |---|---|---|
 | Complete F3reduced-Mumford polynomial-pair/splitting counts | 80pass,0fail,0trusted | ../jacobian_smoothness_audit_20261109/evidence/mumford-count-gate.log |
+| Complete F3actual Cantor group/subgroup proof and nonzero controls | 170pass,0fail,0trusted | ../jacobian_smoothness_audit_20261109/evidence/cantor-subgroup-gate.log |
 | Census, defined canonical family and every-arity last-input degree | 308pass,0fail,0trusted | evidence/recursive-semaev-degree-gate.log |
 | Census, general fixed-size degree step and canonical S5last input | 291pass,0fail,0trusted | evidence/resultant-degree-step-gate.log |
 | Census, S4degree/leading coefficient and specialization control | 259pass,0fail,0trusted | evidence/s4-degree-gate.log |

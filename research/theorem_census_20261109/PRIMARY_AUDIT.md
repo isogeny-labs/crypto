@@ -108,10 +108,22 @@ Jacobian. The algorithm samples a large prime subgroup (§2.3); equality of
 smoothness proportions in that subgroup is a distinct unresolved claim.
 The subsequent complete F3reduced-Mumford polynomial-pair model proves
 8valid/7split representatives, fraction7/8and finite deviation3/8from1/2.
-Geometric Picard identification, actual Cantor/subgroup arithmetic and a
-native multi-field/scaling census remain open. See
-../jacobian_smoothness_audit_20261109/README.md.
+The subsequent complete arithmetic proof checks64actual Cantor additions,
+unique output/group equivalence and a proper cyclic order2subgroup with
+fraction1versus7/8ambient. It disproves universal finite equality in that
+model, not the qualified large-prime/asymptotic assertion. Geometric Picard
+identification and native multi-field/scaling work remain open. See
+../jacobian_smoothness_audit_20261109/CANTOR_SUBGROUP.md.
 [pcc:unverified]
+
+For the arithmetic correspondence, Stoll2014Definition2.2p5,
+Lemmas4.16–4.17/Theorem4.18pp23–25andLemma5.2p30were read,
+with PDFp24visually inspected. The source uses characteristic≠2 and
+squarefree odd-degree models; F3fixture satisfies this setting. The
+geometric representation theorem is a separate unformalized bridge.
+Cantor1987publisher PDF403is retained as unread; Stoll is not substituted
+as proof that the original paper was read. Exact hashes/read scopes:
+../jacobian_smoothness_audit_20261109/cantor-sources.json. [pcc:unverified]
 
 Hildebrand Theorem1 averages total-variation distance over distinct random
 support points, with fixed support size≥2, fixed positive probabilities,

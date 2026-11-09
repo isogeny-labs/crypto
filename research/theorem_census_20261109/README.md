@@ -51,8 +51,12 @@ counts; untouched papers are not labelled audited. [pcc:unverified]
 The subsequent [Mumford counting study](../jacobian_smoothness_audit_20261109/README.md)
 proves completeness and counts in the actual reduced polynomial-pair model
 for F3y²=x⁵−x:8valid,7with split u, fraction7/8and finite difference3/8from1/2.
-Its80-declaration gate and full local packet07eb0dcheck pass, unsigned.
-Geometric Picard identification, actual Cantor subgroup laws and the native
+Its initial80-declaration gate and full local packet07eb0dcheck pass, unsigned.
+The subsequent170-declaration gate now checks actual Cantor additions on
+all64pairs and a proper order-two cyclic subgroup with smooth fraction1
+versus7/8ambient, directly disproving universal finite equality in this
+arithmetic model. See [Cantor scope](../jacobian_smoothness_audit_20261109/CANTOR_SUBGROUP.md).
+Geometric Picard identification, scaling families and the native
 multi-field census remain open. This finite deviation does not refute
 Gaudry's qualified fixed-genus limit. [pcc:unverified]
 
@@ -279,7 +283,7 @@ only at their already-stated scope. [pcc:unverified]
 | 4 Pairings | Partial: cyclic restriction obstruction, actual cyclotomic/full-torsion distinction, and actual geometric F2torsion/μ2subtypes proving every point-valued map degenerate at characteristic order. Group-scheme duality is not refuted. Actual qualified Weil/Tate constructions, nondegeneracy and MOV/FR calculations remain open. |
 | 5 Diem size | Partial: stable branch locus fails actual Condition2.7. Scheme/ramification bridge and size bound remain open; no counterexample to the qualified bound. |
 | 6 Gaudry | Original2000 §§2–3 read; fixed-genus whole-Jacobian limit retained. A complete F3reduced-Mumford polynomial-pair model now has Lean counts8valid/7split and finite deviation3/8from1/2. Formal geometric Picard identification, native multi-field Jacobian census and scaling error remain open; the asymptotic statement is not refuted. |
-| 7 Subgroup smoothness | Partial: abstract confinement proof; complete finite Mumford pair/splitting model now supplied as a next arithmetic domain. Ambient Cantor group law, formal geometric Jacobian identification, cyclic subgroup proportions and a faithful scaling family remain open. |
+| 7 Subgroup smoothness | Partial: actual Cantor gcd/composition/reduction on all64pairs of the complete F3model is now proved, with unique output/group equivalence and an actual proper order2cyclic subgroup. Its fraction1differs from ambient7/8; direct universal finite equality is disproved. Formal geometric Picard identification, a faithful scaling family/native census and qualified typical/large-prime asymptotics remain open. |
 | 8 Bézout | Partial: actual bivariate quotient equivalence and support1/length2 Lean witness; all16msolve multiplicity/control calls pass. General n!dⁿ bound and application-specific decomposition systems remain open. |
 | 9 Gröbner heuristics | Universal square regularity reading has this Lean counterexample; generic variants and JV remain open. Native msolve controls passed, but those heuristic systems are not yet measured. |
 | 10 Walks | Actual PMF fixed-support nonmixing family, actual finite hash-graph variance correction, and exhaustive3930-support mixing/82034-map collision census now pass scoped checks. Random-support averaging, nonuniform p_i and limiting collision constants remain open; qualified Hildebrand is not refuted. See ../walk_audit_20261109. |
