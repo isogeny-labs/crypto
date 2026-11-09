@@ -1,4 +1,36 @@
-# Binary EFD formulas in crypto and cryptanalysis
+# Explicit-Formulas Database in this repository
+
+The current EFD at <https://www.hyperelliptic.org/EFD/> has exactly two
+sections, and both are imported:
+
+| Section | Field | Models | Charts | Formulas | Module |
+| --- | --- | ---: | ---: | ---: | --- |
+| `g12o` | GF(2^m) | 3 | 19 | 135 | `binary_ecc::efd` |
+| `g1p` | GF(p), p odd | 10 | 33 | 471 | `prime_ecc::efd` |
+| **Total** | | **13** | **52** | **606** | |
+
+All 606 current-EFD formulas are executable. A supplementary section adds 15
+formulas from the legacy EFD's extended Jacobi-quartic coordinates (the one
+coordinate system absent from the current sections), converted from its Magma
+programs and verified; see `prime-field.md`. In the prime section 463 run EFD's optimized
+`.op3` directly and 8 use a record-derived fallback because the served program is
+incomplete or contradicts its record (see `prime-field.md`).
+
+Coverage was checked by crawling every representation page of both sections:
+the set of `auto-code/*.op3` formula ids equals the catalogue id set exactly
+(471/471 and 135/135, no missing and no extra ids). The legacy
+`oldefd/` pages are the superseded genus-1 HTML tables. They carry no
+machine-readable records or programs (only speed records and Magma checks); the
+one coordinate system there not present in the current sections is "Extended
+Jacobi-quartic coordinates", which has no explicit formula listing to import.
+Their other content is covered by the two current sections. No genus-2 or
+genus-3 section exists on the site.
+
+Model conversions and chart conversions are drawn in
+[`conversions.md`](conversions.md) (Graphviz source in `conversions.dot`,
+rendered `conversions.svg`, Mermaid in `conversions.mmd`).
+
+## Binary section
 
 The complete [linked EFD binary-field section](https://www.hyperelliptic.org/EFD/g12o/index.html)
 is available through `binary_ecc::efd`: **135 executable reference programs in
@@ -19,8 +51,10 @@ Jacobian, lambda, Lopez–Dahab (generic, `a2=0`, `a2=1`), extended Lopez–Daha
 (`a2=0`, `a2=1`), and XZ. Every representation has finite-point encoding and
 projection helpers; quotient formats return a typed `X` or `W` projection.
 
-This index concerns characteristic two. Prime-field XYZZ/Edwards formulas belong
-to EFD's separate `g1p` section and are not part of this import. A binary Edwards
+This index concerns characteristic two. The prime-field `g1p` section is a
+separate import under `prime_ecc::efd` (471 programs, 33 charts); see
+[`prime-field.md`](prime-field.md). The same shared importer reads both
+sections (`tools/efd` with an optional `g12o`/`g1p` argument). A binary Edwards
 or Hessian formula requires its own model parameters and points. Selecting a
 format does not convert a Weierstrass curve into another curve model.
 
