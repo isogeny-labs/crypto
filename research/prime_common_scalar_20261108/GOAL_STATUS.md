@@ -13,7 +13,22 @@ inverse-buffer specification. The frozen scalar panel and all its losses are
 retained separately. See the proof maps and producer receipts; signed independent
 standing remains absent. [pcc:unverified]
 
-## The mathematical blocker
+## Nov9 continuation: actual affine contraction bridge
+
+The actual D.8 Boolean contraction now has a source-connected clearing identity,
+the doubled polynomial degree bound, origin under injective supplied placement,
+and actual integral local-series/quotient transport. The zero-output affine
+factor is homogenized as D-N. See
+[the versioned report](reports/boolean-contraction-20261109/REPORT.md) and its
+six canonically pinned unsigned PCC records. [pcc:unverified]
+
+This discharges the prior contraction-homogeneity question by proving the
+correct affine statement. The explicit finite sum is a specification; its
+definition does not provide an efficient recursive evaluator. The next
+tractable step is source D.5 all-level node counts and tapered Hermite recovery
+with the repaired degree budget, followed by uniform mode and entry costs.
+
+## The outstanding algorithm theorem
 
 The inverse buffer takes the denominator's coefficient vector as input. Its
 correctness does not construct or bound the full relation/partition evaluator.
