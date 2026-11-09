@@ -34,12 +34,13 @@ not either formula on its stated model. The theorem is
 `short_formula_binary_counterexample` in
 [BinaryMisapplication.lean](lean/BinaryMisapplication.lean). [pcc:unverified]
 
-All proof development/build failures are retained in evidence/binary-s3-*
+Failed build diagnostics are retained in evidence/binary-s3-*
 and evidence/binary-misapplication-*. The first expanded audit, before the
 negative control was added, passes114declarations with0failing and0trusted
 native exceptions. The final whole-project receipt passes116declarations,
 0failing and0trusted-native exceptions. PCC-20261109-517cb7 binds the full
-equivalence and remains unsigned. The receipt accompanies the report.
+equivalence and passes its full local PCC check, remaining unsigned.
+The receipt accompanies the report.
 No custom axioms, explicit proof holes or native_decide are used. The
 automatic sorryAx shown in retained failed-build diagnostics is the Lean
 elaborator's failed declaration placeholder; the final successful audit

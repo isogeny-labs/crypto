@@ -88,7 +88,8 @@ with the mathematical follow-up. No required gate is disabled.
 equivalence is now proved, with all repeated-coordinate cases and actual
 Mathlib points. The wrong-model negative control gives binaryS3=0 versus
 shortS3=1 on a true zero-sum F2triple. Final census-project gate116pass,
-0failing/0trusted-native exceptions. PCC-20261109-517cb7 remains unsigned.
+0failing/0trusted-native exceptions. PCC-20261109-517cb7 passes its full
+local check and remains unsigned.
 Reports/source: BINARY_S3.md, lean/BinaryS3.lean,
 lean/BinaryMisapplication.lean, reports/proof-20261109-binary/report.pdf.
 General recursion/degree proofs remain open. [pcc:unverified]
@@ -107,3 +108,11 @@ rechain or main merge attempted. Applicable CI on published98f02250passes;
 subsequent binary publication needs its own checks. Resume via the exact
 14-item README map; do not silently treat these gaps as completed.
 [pcc:unverified]
+
+06:06Z publication: binary source8214c7c0 published as2b190fb4, exact
+sharedtreee764b5c7. Full PCC517cb7checkpasses at06:05:40Z. Report's final
+one-page rendering visually checked; final rasterSHA256
+786cbfadfd8c050f0072e2b793e10aee1701a0f78f0fe167c1edba16471d1ef4.
+Canonical independent-validator export/file hashes still pass,476ledgerrows
+retain the old prefix. Current binary-head global/PCCchecks are pending;
+signing remains skipped on the feature base. [pcc:unverified]

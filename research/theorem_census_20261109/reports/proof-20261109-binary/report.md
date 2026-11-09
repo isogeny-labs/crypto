@@ -1,6 +1,6 @@
 ---
 geometry: margin=17mm
-fontsize: 9pt
+fontsize: 10pt
 mainfont: DejaVu Serif
 monofont: DejaVu Sans Mono
 ---
