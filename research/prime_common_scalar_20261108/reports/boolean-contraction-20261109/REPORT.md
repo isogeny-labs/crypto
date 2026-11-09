@@ -69,7 +69,7 @@ evidence, not the quantified ring proof or independent attestation
 
 The default Lean build passed (packed-build-004.log). The actual repository gate
 reports 140 declarations and zero extra trusted axioms; see
-[gate](../../lean/contraction-gate/). Official import-inclusive fresh replay is
+[gate](../../lean/contraction-gate/). Official import-inclusive fresh replay exited0; its status is
 recorded separately in contraction-fresh-status.json and contraction-fresh-001.log.
 Axioms are restricted to propext, Classical.choice and Quot.sound. No gate,
 checker, trust policy or dependency revision was changed [pcc:unverified].
