@@ -200,11 +200,11 @@ impl Formula {
     }
     /// Compile the upstream `.op3` program against another pinned catalogue
     /// (for example the legacy supplementary section).
-    pub fn compile_in(&self, catalogue: &'static Catalogue) -> Result<Program> {
+    pub fn compile_in(&self, catalogue: &Catalogue) -> Result<Program> {
         Program::compile_in(catalogue, self)
     }
     /// Record-derived program against another pinned catalogue.
-    pub fn compile_record_in(&self, catalogue: &'static Catalogue) -> Result<Program> {
+    pub fn compile_record_in(&self, catalogue: &Catalogue) -> Result<Program> {
         Program::compile_record_in(catalogue, self)
     }
     /// Upstream program when usable, otherwise the record-derived fallback.
@@ -236,8 +236,20 @@ impl Formula {
     /// Cache parameters with defining assumptions are derived if absent and
     /// verified if supplied. Point and differential-relation validity are the
     /// caller's responsibility. Use `weierstrass_operation` for checked ADD/DBL.
+    /// Evaluate against the current-EFD catalogue
+    /// ([`catalogue`]). Formulas from a supplementary catalogue must use
+    /// [`Formula::evaluate_in`].
     pub fn evaluate(&self, modulus: &BigUint, inputs: &Bindings) -> Result<Bindings> {
         self.compiled()?.evaluate(modulus, inputs)
+    }
+    /// Evaluate against a specific pinned catalogue.
+    pub fn evaluate_in(
+        &self,
+        catalogue: &Catalogue,
+        modulus: &BigUint,
+        inputs: &Bindings,
+    ) -> Result<Bindings> {
+        self.compile_in(catalogue)?.evaluate(modulus, inputs)
     }
 }
 

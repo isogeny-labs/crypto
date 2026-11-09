@@ -816,7 +816,8 @@ fn chart_family(id: &str) -> u8 {
         | "hessian/standard"
         | "hessian/extended" => 1,
         "shortw/w12-0" | "jquartic/xyz" | "jquartic/2xyz" | "jquartic/xxyzz"
-        | "jquartic/xxyzzr" | "jquartic/2xxyzz" | "jquartic/2xxyzzr" | "2dik/standard" => 3,
+        | "jquartic/xxyzzr" | "jquartic/2xxyzz" | "jquartic/2xxyzzr" | "jquartic/extended"
+        | "2dik/standard" => 3,
         "shortw/xyzz" | "shortw/xyzz-3" => 4,
         "shortw/xz" | "montgom/xz" => 5,
         "edwards/inverted" | "twisted/inverted" => 6,
@@ -884,6 +885,8 @@ fn legacy_extended_quartic_formulas_match_affine_law() {
     assert_eq!(c.formulas.len(), 15);
     let model = c.model("jquartic").unwrap();
     let rep = c.representation("jquartic/extended").unwrap();
+    // Same x=X/Z, y=Y/Z^2 family as the Lean `xyz_roundtrip` theorem.
+    assert_eq!(chart_family(&rep.id), 3);
     let params = Bindings::from([("a".into(), fe(2))]);
     let points = model_points(model, &params);
     assert!(points.len() > 8, "{} points", points.len());

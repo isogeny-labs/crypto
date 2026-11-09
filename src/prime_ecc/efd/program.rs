@@ -301,7 +301,7 @@ impl Program {
         Self::compile_in(catalogue(), formula)
     }
 
-    pub(super) fn compile_in(catalogue: &'static Catalogue, formula: &Formula) -> Result<Self> {
+    pub(super) fn compile_in(catalogue: &Catalogue, formula: &Formula) -> Result<Self> {
         let mut instructions = Vec::new();
         for line in formula
             .program
@@ -332,10 +332,7 @@ impl Program {
         Self::compile_record_in(catalogue(), formula)
     }
 
-    pub(super) fn compile_record_in(
-        catalogue: &'static Catalogue,
-        formula: &Formula,
-    ) -> Result<Self> {
+    pub(super) fn compile_record_in(catalogue: &Catalogue, formula: &Formula) -> Result<Self> {
         let mut instructions = Vec::new();
         for line in formula.record.text.lines() {
             let Some(body) = line.strip_prefix("compute ") else {
@@ -358,7 +355,7 @@ impl Program {
     }
 
     fn assemble(
-        catalogue: &'static Catalogue,
+        catalogue: &Catalogue,
         formula: &Formula,
         instructions: Vec<(String, Expr)>,
         source: ProgramSource,
