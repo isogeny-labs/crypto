@@ -32,7 +32,13 @@
   ],
   "retries_scientific": 0,
   "cloud_jobs": 0,
-  "fresh_copy_qualification": "pending",
+  "fresh_copy_qualification": {
+    "build_exit": 0,
+    "P192_exit": 0,
+    "P192_byte_equality": true,
+    "mutated_order_boolean_exit": 101,
+    "small_replay": "not run; first panel failed and zero scientific retries retained"
+  },
   "binary_sha256": {
     "shifted-fiber": "a167ffaf4d77c5d9471539c83f4c9351b99a808cd00464844807b9d818fb15ae",
     "fiber-p192": "5437ed2aa0ffe07beff4aa1adbbc569071e827da5bafb520d5a83702c4f76d1c"
@@ -45,5 +51,6 @@
     "native/src/big.rs": "24485366af25ffa6df9d094c34815052723689ff3edf4a206f0f762f2b54fafb",
     "native/src/poly.rs": "b96768c3b3d98498040980685004f8206a180d2712bfdfe8277a51e2e92dde01",
     "native/src/p192.rs": "6300169683f7dbc83c9a4fc756dc01466133a6e734a1d30004fd4cc7ab73a4f2"
-  }
+  },
+  "counter_scope": "K multiplication/inverse calls include quotient arithmetic; inverse internals excluded. Point-add counter counts legacy source E only; generic quotient Model additions are not separately counted."
 }
