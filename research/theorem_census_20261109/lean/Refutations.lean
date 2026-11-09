@@ -2,6 +2,7 @@ import RationalCounterexample
 import DescentCounterexample
 import TorsionBoundaries
 import SourceFSTBoundary
+import BivariateMultiplicity
 
 #print axioms SkepticalAudit.rational_only_s3_converse_false
 #print axioms SkepticalAudit.extensionPolynomial_irreducible
@@ -32,3 +33,7 @@ import SourceFSTBoundary
 #print axioms FSTBoundaryAudit.roots2_extension_degree
 #print axioms FSTBoundaryAudit.two_torsion_not_all_rational
 #print axioms FSTBoundaryAudit.fst_algorithm3_3_r_two_counterexample
+#print axioms BivariateMultiplicityAudit.quotientEquiv
+#print axioms BivariateMultiplicityAudit.quotient_dimension_two
+#print axioms BivariateMultiplicityAudit.triangular_generators_same_ideal
+#print axioms BivariateMultiplicityAudit.support_is_not_multiplicity
