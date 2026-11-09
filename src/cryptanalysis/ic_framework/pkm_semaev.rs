@@ -221,6 +221,55 @@ fn poly_trim(v: &mut Vec<u64>) {
     }
 }
 
+/// Fixed-degree Sylvester determinant for a quadratic and a quartic.
+/// Padding is intentional: specialization can lower both leading degrees,
+/// and the homogeneous resultant must retain their common infinity root.
+fn resultant_2_4(f: [u64; 3], g: [u64; 5], p: u64, mults: &mut u64) -> u64 {
+    fn cm(a: u64, b: u64, p: u64, n: &mut u64) -> u64 {
+        *n += 1;
+        mulm(a, b, p)
+    }
+    let mut mat = [[0u64; 6]; 6];
+    for (row, values) in mat.iter_mut().take(4).enumerate() {
+        for j in 0..3 {
+            values[row + j] = f[2 - j];
+        }
+    }
+    for row in 0..2 {
+        for j in 0..5 {
+            mat[4 + row][row + j] = g[4 - j];
+        }
+    }
+    let mut det = 1;
+    for col in 0..6 {
+        let Some(pivot) = (col..6).find(|&row| mat[row][col] != 0) else {
+            return 0;
+        };
+        if pivot != col {
+            mat.swap(pivot, col);
+            det = subm(0, det, p);
+        }
+        let value = mat[col][col];
+        det = cm(det, value, p, mults);
+        let (mut inv, mut x, mut exponent) = (1, value, p - 2);
+        while exponent > 0 {
+            if exponent & 1 != 0 {
+                inv = cm(inv, x, p, mults);
+            }
+            x = cm(x, x, p, mults);
+            exponent >>= 1;
+        }
+        for row in col + 1..6 {
+            let ratio = cm(mat[row][col], inv, p, mults);
+            for j in col + 1..6 {
+                mat[row][j] = subm(mat[row][j], cm(ratio, mat[col][j], p, mults), p);
+            }
+            mat[row][col] = 0;
+        }
+    }
+    det
+}
+
 /// `a mod b` over `F_p` (`b` non-zero, trimmed).
 fn poly_rem(mut a: Vec<u64>, b: &[u64], p: u64) -> Vec<u64> {
     poly_trim(&mut a);
@@ -789,6 +838,11 @@ pub struct PkmSemaevOracle {
     g: u64,
     membership: Membership,
     mode: PkmMode,
+    /// Opt-in retained-chain experiment; legacy layouts and affine behavior
+    /// remain the default for frozen-source replay compatibility.
+    level_layout: bool,
+    all_charts: bool,
+    balanced: bool,
     engine: PkmEngine,
     max_degree: u32,
     max_nnz: Option<u64>,
@@ -845,6 +899,9 @@ impl PkmSemaevOracle {
             g,
             membership: Membership::Kummer,
             mode: PkmMode::Chain,
+            level_layout: false,
+            all_charts: false,
+            balanced: false,
             engine: PkmEngine::F4,
             max_degree: 12,
             max_nnz: None,
@@ -1048,14 +1105,16 @@ impl PkmSemaevOracle {
         Some(serde_json::json!({"schema":"pkm-prepared-system/v1",
             "modulus":prep.ring.p.to_string(),"m":self.m,"t":self.t,"g":self.g.to_string(),
             "mode":format!("{:?}",self.mode),"tower_variables":prep.ring.n_tower(),
-            "free_variables":prep.ring.n_free,"variable_order":"tower blocks by summand, then chain auxiliaries",
+            "free_variables":prep.ring.n_free,"variable_order":if self.level_layout {"tower levels across summands, then chain auxiliaries"} else {"tower blocks by summand, then chain auxiliaries"},
+            "projective_chart_coverage":self.all_charts,"addition_tree":if self.balanced{"balanced"}else{"left"},
             "summand_map":"x_i = g * y_(i,0)",
             "square_rule_convention":"y_j^2 = a*y_j*y_next + b*y_next + c*y_j + d",
             "square_rules":prep.ring.rules.iter().map(|r|serde_json::json!({"next":r.next,
                 "a":r.a.to_string(),"b":r.b.to_string(),"c":r.c.to_string(),"d":r.d.to_string()})).collect::<Vec<_>>(),
             "equations_by_target_x_power":prep.eqs.iter().map(|parts|parts.iter().map(Self::polynomial_artifact).collect::<Vec<_>>()).collect::<Vec<_>>(),
             "grid_x":prep.v.iter().map(ToString::to_string).collect::<Vec<_>>(),"original_equation_degrees":prep.degrees,
-            "original_equation_recipe":if self.mode==PkmMode::Chain{"chained S3 with affine intermediate x coordinates"}else{"S_(m+1), m=2 S3 or m=3 S4 resultant"},
+            "original_equation_recipe":if self.all_charts{"homogeneous S3, finite/infinity intermediate charts"}else if self.mode==PkmMode::Chain{"chained S3 with affine intermediate x coordinates"}else{"S_(m+1), m=2 S3 or m=3 S4 resultant"},
+            "chart_systems":if self.all_charts {Some(self.branches.iter().enumerate().map(|(mask,b)|serde_json::json!({"infinity_mask":mask,"equations_by_target_x_power":b.eqs.iter().map(|parts|parts.iter().map(Self::polynomial_artifact).collect::<Vec<_>>()).collect::<Vec<_>>(),"degrees":b.degrees})).collect::<Vec<_>>())}else{None},
             "trace_gaps":["private internal row/pivot operations and pair rejection witnesses"]}))
     }
 
@@ -1076,6 +1135,38 @@ impl PkmSemaevOracle {
             Some("exhaustive") => PkmEngine::Exhaustive,
             Some(o) => return Err(format!("pkm-semaev: engine is f4 or exhaustive, not {o}")),
         };
+        self.level_layout = match params.get("layout").unwrap_or("blocks") {
+            "blocks" => false,
+            "levels" => true,
+            other => {
+                return Err(format!(
+                    "pkm-semaev: layout is blocks or levels, not {other}"
+                ))
+            }
+        };
+        self.all_charts = match params.get("charts").unwrap_or("affine") {
+            "affine" => false,
+            "all" => true,
+            other => return Err(format!("pkm-semaev: charts is affine or all, not {other}")),
+        };
+        self.balanced = match params.get("tree").unwrap_or("left") {
+            "left" => false,
+            "balanced" => true,
+            other => return Err(format!("pkm-semaev: tree is left or balanced, not {other}")),
+        };
+        if (self.level_layout || self.all_charts || self.balanced)
+            && !matches!(self.membership, Membership::Kummer)
+        {
+            return Err(
+                "pkm-semaev: layout/charts/tree experiments require Kummer membership".into(),
+            );
+        }
+        if self.all_charts && (self.mode != PkmMode::Chain || self.m < 3) {
+            return Err("pkm-semaev: charts=all requires mode=chain and m>=3".into());
+        }
+        if self.balanced && (self.mode != PkmMode::Chain || self.m != 4) {
+            return Err("pkm-semaev: tree=balanced requires mode=chain,m=4".into());
+        }
         if self.engine == PkmEngine::Exhaustive {
             self.totals.solver = "tower-exhaustive".into();
         }
@@ -1123,9 +1214,15 @@ impl PkmSemaevOracle {
                 ));
             }
         }
-        // The grid that reads a consistent system's solutions takes m ≤ 3.
-        if !(2..=3).contains(&self.m) {
-            return Err(format!("pkm-semaev: m is 2 or 3, not {}", self.m));
+        if !(2..=4).contains(&self.m) {
+            return Err(format!("pkm-semaev: m is 2, 3 or 4, not {}", self.m));
+        }
+        if self.m == 4
+            && (!matches!(self.membership, Membership::Kummer)
+                || self.mode != PkmMode::Chain
+                || !self.all_charts)
+        {
+            return Err("pkm-semaev: m=4 requires Kummer mode=chain,charts=all".into());
         }
         if self.mode == PkmMode::Chain && self.m < 3 {
             self.mode = PkmMode::Full; // m = 2: S₃ alone, no free unknown
@@ -1160,6 +1257,13 @@ impl PkmSemaevOracle {
             .filter(|_| self.guess > 0)
             .map(|a| self.build_system_fixed(curve, Some(a)))
             .collect();
+        if self.all_charts {
+            // Guessing is not available for the Kummer membership selected by
+            // this option. Chart branches cover finite and infinite partial sums.
+            self.branches = (0..(1usize << (self.m - 2)))
+                .map(|chart| self.build_system_chart(curve, None, chart))
+                .collect();
+        }
         self.prepared = Some(prep);
         self.traces.clear();
         self.trace_setup.clear();
@@ -1328,6 +1432,18 @@ impl PkmSemaevOracle {
     /// The system, with the top `guess` bits of the first summand fixed to
     /// `fixed` when it is given (bits form; hybrid guessing).
     fn build_system_fixed(&self, curve: &PrimeCurve, fixed: Option<u64>) -> Prepared {
+        self.build_system_chart(curve, fixed, 0)
+    }
+
+    fn tower_index(&self, block: usize, level: usize) -> usize {
+        if self.level_layout {
+            level * self.m as usize + block
+        } else {
+            block * self.t as usize + level
+        }
+    }
+
+    fn build_system_chart(&self, curve: &PrimeCurve, fixed: Option<u64>, chart: usize) -> Prepared {
         let p = curve.p;
         let (a, b) = self.s3_coefficients(curve);
         let (m, t) = (self.m as usize, self.t as usize);
@@ -1350,7 +1466,7 @@ impl PkmSemaevOracle {
         let n = n_t + n_free + 1; // last variable: x_R (unused when shared)
         let xr_var = n - 1;
         let x = |i: usize| match &self.membership {
-            Membership::Kummer => Pol::var(n, i * t).scale(self.g, p),
+            Membership::Kummer => Pol::var(n, self.tower_index(i, 0)).scale(self.g, p),
             Membership::Isogeny { .. } => Pol::var(n, i * t),
             Membership::Bits { .. }
             | Membership::Digits { .. }
@@ -1401,7 +1517,47 @@ impl PkmSemaevOracle {
         } else {
             Pol::var(n, xr_var)
         };
-        let raw: Vec<Pol> = if let Membership::EdwardsBits { shift } = &self.membership {
+        let raw: Vec<Pol> = if self.all_charts {
+            let one = Pol::constant(n, 1, p);
+            let zero = Pol::constant(n, 0, p);
+            let leaf = |i| (x(i), one.clone());
+            let aux = |i: usize| {
+                if chart & (1 << i) == 0 {
+                    (Pol::var(n, n_t + i), one.clone())
+                } else {
+                    (one.clone(), zero.clone())
+                }
+            };
+            let projective_s3 = |v: (Pol, Pol), w: (Pol, Pol), z: (Pol, Pol)| {
+                let [al, be, ga] = s3_in_u_frac((&v.0, &v.1), (&w.0, &w.1), a, b, p);
+                al.mul(&z.0, p)
+                    .mul(&z.0, p)
+                    .add(&be.mul(&z.0, p).mul(&z.1, p), p)
+                    .add(&ga.mul(&z.1, p).mul(&z.1, p), p)
+            };
+            let mut equations = vec![projective_s3(leaf(0), leaf(1), aux(0))];
+            if self.balanced {
+                equations.push(projective_s3(leaf(2), leaf(3), aux(1)));
+                equations.push(projective_s3(aux(0), aux(1), (xr.clone(), one.clone())));
+            } else {
+                for i in 1..m - 2 {
+                    equations.push(projective_s3(aux(i - 1), leaf(i + 1), aux(i)));
+                }
+                equations.push(projective_s3(
+                    aux(m - 3),
+                    leaf(m - 1),
+                    (xr.clone(), one.clone()),
+                ));
+            }
+            for i in 0..m - 2 {
+                if chart & (1 << i) != 0 {
+                    // An infinity chart has no affine coordinate: pin the
+                    // otherwise unused variable instead of leaving a free line.
+                    equations.push(Pol::var(n, n_t + i));
+                }
+            }
+            equations
+        } else if let Membership::EdwardsBits { shift } = &self.membership {
             // x_i = N_i/D_i with N_i = (1 + s) + (1 − s)·y_i, D_i = 1 − y_i.
             let s = shift.expect("edwards shift resolved in prepare") % p;
             let (c1, c2) = (addm(1, s, p), subm(1, s, p));
@@ -1526,6 +1682,23 @@ impl PkmSemaevOracle {
             }
         }
         let ring = TowerRing { p, rules, n_free };
+        let ring = if self.level_layout {
+            let mut reordered = ring.rules.clone();
+            for block in 0..m {
+                for level in 0..t {
+                    let mut rule = ring.rules[block * t + level].clone();
+                    rule.next = (level + 1 < t).then_some(self.tower_index(block, level + 1) as u8);
+                    reordered[self.tower_index(block, level)] = rule;
+                }
+            }
+            TowerRing {
+                p,
+                rules: reordered,
+                n_free,
+            }
+        } else {
+            ring
+        };
         ring.check();
         let degrees = raw
             .iter()
@@ -1771,7 +1944,90 @@ impl PkmSemaevOracle {
                     }
                 }
             }
-            _ => unreachable!("read_params admits m ≤ 3"),
+            4 => {
+                fn cm(a: u64, b: u64, p: u64, n: &mut u64) -> u64 {
+                    *n += 1;
+                    mulm(a, b, p)
+                }
+                let xr2 = cm(x_r, x_r, p, &mut mults);
+                let twice_xr = cm(2, x_r, p, &mut mults);
+                let twice_b = cm(2, b, p, &mut mults);
+                let four_b = cm(4, b, p, &mut mults);
+                let a_xr = cm(a, x_r, p, &mut mults);
+                let be0 = cm(2, addm(a_xr, twice_b, p), p, &mut mults);
+                let be1 = cm(2, addm(xr2, a, p), p, &mut mults);
+                let a2 = cm(a, a, p, &mut mults);
+                let b_xr = cm(four_b, x_r, p, &mut mults);
+                let twice_a_xr = cm(2, a_xr, p, &mut mults);
+                // Coefficients in U of S3(x_R,U,Z), by powers of Z.
+                let aa = [xr2, subm(0, twice_xr, p), 1];
+                let bb = [subm(0, be0, p), subm(0, be1, p), subm(0, twice_xr, p)];
+                let cc = [
+                    subm(a2, b_xr, p),
+                    subm(0, addm(twice_a_xr, four_b, p), p),
+                    xr2,
+                ];
+                let mut right = Vec::new();
+                for k in 0..v.len() {
+                    for l in k..v.len() {
+                        let (al, be, ga) = s3c(v[k], v[l], &mut mults);
+                        // The legacy m<=3 ledger prices this helper at six;
+                        // this new path counts its eight actual mulm calls.
+                        mults += 2;
+                        let (mut ag, mut ab, mut bg) = ([0; 3], [0; 3], [0; 3]);
+                        for j in 0..3 {
+                            ag[j] = subm(
+                                cm(al, cc[j], p, &mut mults),
+                                cm(ga, aa[j], p, &mut mults),
+                                p,
+                            );
+                            ab[j] = subm(
+                                cm(al, bb[j], p, &mut mults),
+                                cm(be, aa[j], p, &mut mults),
+                                p,
+                            );
+                            bg[j] = subm(
+                                cm(be, cc[j], p, &mut mults),
+                                cm(ga, bb[j], p, &mut mults),
+                                p,
+                            );
+                        }
+                        let mut coeffs = [0; 5];
+                        for i in 0..3 {
+                            for j in 0..3 {
+                                coeffs[i + j] = addm(
+                                    coeffs[i + j],
+                                    subm(
+                                        cm(ag[i], ag[j], p, &mut mults),
+                                        cm(ab[i], bg[j], p, &mut mults),
+                                        p,
+                                    ),
+                                    p,
+                                );
+                            }
+                        }
+                        right.push((k, l, coeffs));
+                    }
+                }
+                for i in 0..v.len() {
+                    for j in i..v.len() {
+                        let (al, be, ga) = s3c(v[i], v[j], &mut mults);
+                        mults += 2;
+                        for &(k, l, coeffs) in &right {
+                            if k < j {
+                                continue;
+                            }
+                            if resultant_2_4([ga, be, al], coeffs, p, &mut mults) == 0 {
+                                out.push(vec![v[i], v[j], v[k], v[l]]);
+                                if first_only {
+                                    return (out, mults);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            _ => unreachable!("read_params admits m ≤ 4"),
         }
         (out, mults)
     }
@@ -1869,7 +2125,7 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
 
     fn parameters(&self) -> &[(&str, &str)] {
         &[
-            ("m", "summands, 2 or 3"),
+            ("m", "summands, 2 or 3; Kummer chains with charts=all also support 4"),
             (
                 "mode",
                 "chain (default for m ≥ 3: S₃ links with free u) or full (S_(m+1))",
@@ -1879,6 +2135,9 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                 "f4 (f4_fp_tower, default) or exhaustive (the V^m grid reference)",
             ),
             ("degree", "F4 degree bound, default 12"),
+            ("layout", "Kummer tower layout: blocks (legacy) or levels"),
+            ("charts", "affine (legacy) or all projective intermediate charts, Kummer m>=3"),
+            ("tree", "left (legacy) or balanced (Kummer m=4,charts=all)"),
             (
                 "max_nnz",
                 "F4 matrix size cap; a system past it is decided on the grid and counted",
@@ -2344,10 +2603,26 @@ impl DecompositionOracle<PrimeCurve> for PkmSemaevOracle {
                         timed_out: rep.timed_out,
                         extra,
                     };
-                    let shape = self.shape.clone().unwrap_or_default();
+                    let shape = if self.all_charts {
+                        let prep = &self.branches[br];
+                        let mut degrees = prep.degrees.clone();
+                        degrees.extend(std::iter::repeat_n(2, prep.tower_eqs));
+                        SystemShape {
+                            n_vars: prep.ring.n_vars(),
+                            n_equations: degrees.len(),
+                            degrees,
+                            semi_regular_degree: None,
+                        }
+                    } else {
+                        self.shape.clone().unwrap_or_default()
+                    };
                     self.totals.absorb(&shape, Some(&cost), undecided);
                     if branch.is_some() {
-                        self.bump("pkm_guess_branches_solved", 1);
+                        if self.all_charts {
+                            self.bump("pkm_projective_charts_solved", 1);
+                        } else {
+                            self.bump("pkm_guess_branches_solved", 1);
+                        }
                     }
                     let stop = !rep.inconsistent;
                     last = Some((rep, undecided));
@@ -2540,6 +2815,251 @@ mod tests {
         idx.iter().fold(curve.identity(), |acc, &i| {
             curve.add(&mut ops, acc, fb.points[i])
         })
+    }
+
+    fn retained_tiny_instance() -> PrimeInstance {
+        PrimeInstance {
+            name: "retained-chain-unit-fp17".into(),
+            curve: PrimeCurve { p: 17, a: 2, b: 2 },
+            group_order: 19,
+            r: 19,
+            cofactor: 1,
+            generator: (5, 1),
+        }
+    }
+
+    #[test]
+    fn retained_projective_charts_cover_every_signed_four_tuple() {
+        let inst = retained_tiny_instance();
+        let fb = base(&inst, 2);
+        let curve = &inst.curve;
+        let mut infinity_cases = 0;
+        for layout in ["blocks", "levels"] {
+            for tree in ["left", "balanced"] {
+                let mut o = oracle(
+                    &inst,
+                    &fb,
+                    4,
+                    2,
+                    &format!("m=4,charts=all,layout={layout},tree={tree},engine=exhaustive"),
+                );
+                assert_eq!(o.branches.len(), 4);
+                for i in 0..fb.points.len() {
+                    for j in 0..fb.points.len() {
+                        for k in 0..fb.points.len() {
+                            for l in 0..fb.points.len() {
+                                let ids = [i, j, k, l];
+                                let target = sum(curve, &fb, &ids);
+                                if target.infinity {
+                                    continue;
+                                }
+                                let mut scratch = GroupOps::default();
+                                let first = curve.add(&mut scratch, fb.points[i], fb.points[j]);
+                                let second = if tree == "balanced" {
+                                    curve.add(&mut scratch, fb.points[k], fb.points[l])
+                                } else {
+                                    curve.add(&mut scratch, first, fb.points[k])
+                                };
+                                let intermediate = [first, second];
+                                let chart = intermediate.iter().enumerate().fold(
+                                    0,
+                                    |mask, (bit, point)| {
+                                        mask | (usize::from(point.infinity) << bit)
+                                    },
+                                );
+                                infinity_cases += usize::from(chart != 0);
+                                let ring = o.branches[chart].ring.clone();
+                                let mut assignment = vec![0; ring.n_vars()];
+                                for (block, id) in ids.iter().enumerate() {
+                                    let mut y = fb.points[*id].x;
+                                    for level in 0..2 {
+                                        assignment[o.tower_index(block, level)] = y;
+                                        y = mulm(y, y, curve.p);
+                                    }
+                                    assert_eq!(y, 1);
+                                }
+                                for (index, point) in intermediate.iter().enumerate() {
+                                    assignment[8 + index] =
+                                        if point.infinity { 0 } else { point.x };
+                                }
+                                let equations = o.specialise_branch(Some(chart), target.x, None);
+                                assert!(
+                                    equations.iter().all(|f| ring.eval(f, &assignment) == 0),
+                                    "layout={layout},tree={tree},chart={chart},tuple={ids:?}"
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        assert!(
+            infinity_cases > 0,
+            "the projective cases must actually be exercised"
+        );
+    }
+
+    #[test]
+    fn retained_layouts_and_four_sum_reference_match_the_exact_group() {
+        let inst = retained_tiny_instance();
+        let fb = base(&inst, 2);
+        for m in [3, 4] {
+            let expected = decomposable_points(&inst.curve, &fb, m, &mut GroupOps::default());
+            for layout in ["blocks", "levels"] {
+                let trees: &[&str] = if m == 4 {
+                    &["left", "balanced"]
+                } else {
+                    &["left"]
+                };
+                for tree in trees {
+                    let mut f4 = oracle(
+                        &inst,
+                        &fb,
+                        m,
+                        2,
+                        &format!(
+                            "m={m},charts=all,layout={layout},tree={tree},degree=4,max_nnz=100000"
+                        ),
+                    );
+                    let mut grid = oracle(
+                        &inst,
+                        &fb,
+                        m,
+                        2,
+                        &format!("m={m},charts=all,tree={tree},engine=exhaustive"),
+                    );
+                    for scalar in 1..inst.r {
+                        let target = inst.curve.mul(
+                            &mut GroupOps::default(),
+                            inst.generator_point(),
+                            scalar,
+                        );
+                        let truth = expected.contains(&inst.curve.key(&target));
+                        for o in [&mut f4, &mut grid] {
+                            let got = o.decompose(
+                                &ctx(&inst),
+                                &fb,
+                                &mut GroupOps::default(),
+                                &mut OracleCounters::default(),
+                                target,
+                            );
+                            assert_eq!(
+                                got.is_some(),
+                                truth,
+                                "m={m},layout={layout},tree={tree},k={scalar}"
+                            );
+                            if let Some(ids) = got {
+                                assert_eq!(sum(&inst.curve, &fb, &ids), target);
+                            }
+                        }
+                    }
+                    assert!(
+                        f4.native
+                            .get("pkm_projective_charts_solved")
+                            .copied()
+                            .unwrap_or(0)
+                            > 0
+                    );
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn retained_options_reject_uncovered_modes() {
+        for spec in [
+            "m=4",
+            "m=4,mode=full,charts=all",
+            "m=3,tree=balanced",
+            "m=2,charts=all",
+            "m=3,layout=unknown",
+            "m=3,charts=unknown",
+        ] {
+            let (_, params) = Params::parse_spec(&format!("pkm-semaev:{spec}")).unwrap();
+            let m = params.u64("m").unwrap() as u32;
+            assert!(
+                PkmSemaevOracle::new(m, 2, 1).read_params(&params).is_err(),
+                "{spec}"
+            );
+        }
+    }
+
+    #[test]
+    fn retained_sylvester_matches_product_at_known_roots() {
+        let p = 17;
+        for a in 0..p {
+            for b in 0..p {
+                let f = [mulm(a, b, p), subm(0, addm(a, b, p), p), 1];
+                for g in [
+                    [1, 2, 3, 4, 1],
+                    [0, 1, 0, 0, 1],
+                    [3, 0, 7, 2, 0],
+                    [1, 0, 0, 0, 0],
+                ] {
+                    let eval = |x| g.iter().rev().fold(0, |v, &c| addm(mulm(v, x, p), c, p));
+                    let expected = mulm(eval(a), eval(b), p);
+                    let mut mults = 0;
+                    assert_eq!(
+                        resultant_2_4(f, g, p, &mut mults),
+                        expected,
+                        "a={a},b={b},g={g:?}"
+                    );
+                    assert!(mults > 0);
+                }
+            }
+        }
+        // Both specified leading coefficients vanish: a common projective
+        // infinity root is part of this fixed-degree resultant.
+        assert_eq!(resultant_2_4([1, 1, 0], [2, 3, 4, 1, 0], p, &mut 0), 0);
+    }
+
+    #[test]
+    fn retained_four_sum_has_correct_negative_verdicts_on_a_sparse_fixture() {
+        let inst = PrimeInstance {
+            name: "retained-chain-fp2393".into(),
+            curve: PrimeCurve {
+                p: 2393,
+                a: 2390,
+                b: 1614,
+            },
+            group_order: 2377,
+            r: 2377,
+            cofactor: 1,
+            generator: (0, 80),
+        };
+        let fb = base(&inst, 2);
+        let expected = decomposable_points(&inst.curve, &fb, 4, &mut GroupOps::default());
+        assert!(expected.len() < inst.r as usize);
+        let mut misses = 0;
+        for tree in ["left", "balanced"] {
+            let mut o = oracle(
+                &inst,
+                &fb,
+                4,
+                2,
+                &format!("m=4,charts=all,tree={tree},degree=4,max_nnz=100000"),
+            );
+            for k in 1..=16 {
+                let target =
+                    inst.curve
+                        .mul(&mut GroupOps::default(), inst.generator_point(), 37 * k);
+                let truth = expected.contains(&inst.curve.key(&target));
+                let got = o.decompose(
+                    &ctx(&inst),
+                    &fb,
+                    &mut GroupOps::default(),
+                    &mut OracleCounters::default(),
+                    target,
+                );
+                assert_eq!(got.is_some(), truth, "tree={tree},k={k}");
+                if let Some(ids) = got {
+                    assert_eq!(sum(&inst.curve, &fb, &ids), target);
+                } else {
+                    misses += 1;
+                }
+            }
+        }
+        assert!(misses > 0, "the no-decomposition branch was exercised");
     }
 
     /// Planted sums of three base points decompose, under F4 in both

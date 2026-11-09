@@ -1,32 +1,36 @@
-# Resume: crypto @ claude/happy-johnson-9edk2r
+# Resume: crypto @ codex/retained-chain-ic-20261109
 
 ## Goal
-Run the prepared trace-line reference panel (research/trace_c1_2lp_20261027/reference-d{2,3,4,5}.json)
-on Iso Lab EKS Spot via the GitHub route (isolab-experiment.yml on main), as a measured stage
-diagnostic of the Tr_{N/d} trace-selected factor-base line against the standard subfield line and matched rho.
+Retain Kummer power and elliptic-addition chains, compare orders through m=4,
+then collect independent relations and solve complete public toy pipelines.
+PR destination: isogeny-labs/crypto.
 
 ## Lead / hypothesis
-Trace line lifts every nonzero x (exact, research/trace_homomorphism_tests_20261109 T4), so the
-four-summand MITM reference should need fewer trials than the standard line. This is the exact
-MITM reference only, NOT the algebraic C1 experiment of PROTOCOL.md (still blocked on the C1 oracle).
+Variable layout/addition tree may change F4 support/degree/elimination work.
+No scaling benefit is assumed. All projective intermediate charts are covered.
 
 ## Spec
-Specs frozen on main; source_revision = main HEAD at dispatch (recorded in the session log and
-research/trace_c1_2lp_20261027/isolab-20261109/LAUNCH.md). c8a.2xlarge, seconds=1800, one dispatch per size.
-Dollar ceiling: USD 10 for all four dispatches including failures.
+research/retained_chain_ic_20261109/PROTOCOL.md; native ecbench command and
+pipeline-m3.json/pipeline-m4.json. EKS Spot, 4 CPUs/4GiB, one concurrent job,
+1800-second deadline, zero retries, USD5 aggregate build/trial ceiling.
 
 ## State
-d5 run 42639382601 failed (launcher exit 23, Job failed, no pod UID in result). Gate unknown without S3. d2-d4 not dispatched.
+Rust core and command type-check; focused producer tests pass. Full library
+suite and command unit build are in progress. No paid build or cloud trial.
+Checkpoint gate failed: upload route unavailable. Live budget unknown; GitHub
+workflow metadata readable but variables endpoint HTTP403. See admission.json.
 
 ## Next steps
-1. Await each run; read step summary; download receipts only via the lab's verified route.
-2. Report per-size outcome, L2/A/A admission, and the IC/rho gap; no claim beyond the MITM reference.
+Finish required development checks, commit/push code/protocol/specs, open regular
+PR and enable auto-merge subject to gates. Before cloud build/trial, establish
+configured checkpoint upload plus live balances/reservations/capacity. Preserve
+and hash all failures and producer observations; do not substitute local trials.
 
 ## Runs in flight
-None.
+No scientific runs. Local development test processes only.
 
 ## Stop and success conditions
-No automatic resubmission. A failed or ambiguous run is reconciled against its original run ID first.
-
-## Open questions
-Whether the S3 receipts are readable from this session (no valid AWS identity here).
+Do not launch while checkpoint gate fails or shared budget is unknown.
+Study ceiling USD5, original deadline1800s, no retries. Success requires actual
+source-bound EKS receipts, complete panel/failure accounting, rank/scalar replay,
+and independent timing/PCC admission where claimed.

@@ -4,7 +4,7 @@
 - **Kind:** configured access; upload authorization is recorded
 - **Affected work:** [native target continuation](../research/quotient_calibration_20261025/target-native/README.md)
 - **Next action owner:** user for the environment connection; then the repository operator
-- **Last updated:** 2026-10-30
+- **Last updated:** 2026-11-09
 
 ## Requirement and observed blocker
 
@@ -74,3 +74,17 @@ The [preparation report](../research/quotient_calibration_20261025/reports/prepa
 links the implemented work, fixed checks and proof record. A successful
 checkpoint resolves this access blocker; it does not prove a calibration,
 inverse transfer, global identity, speed improvement or vulnerability.
+
+## 2026-11-09 — Additional affected retained-chain study
+
+The [retained power/addition-chain study](../research/retained_chain_ic_20261109/README.md)
+encountered the same missing checkpoint upload route: its normal gate exits 1
+before any experiment submission [pcc:unverified]. This is a separate public
+toy workload, not a continuation of the target-calibration payload above.
+
+Its [admission record](../research/retained_chain_ic_20261109/admission.json)
+also records a separate missing live shared-budget readback. GitHub workflow
+metadata is readable, but the Actions-variables endpoint returns HTTP403.
+No paid build or job was submitted. A configured checkpoint route and actual
+remaining-budget/reservation readback are necessary before that study's
+frozen cloud protocol can run; neither issue is a mathematical obstruction.
