@@ -224,8 +224,10 @@ jobs:
     needs: scope
     runs-on: ubuntu-24.04
     # Keep the exhaustive scientific audit's existing 300-minute budget in
-    # the weekly/manual lane; ordinary PR validation is bounded at 45 minutes.
-    timeout-minutes: ${{ (github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'merge_group') && 45 || 300 }}
+    # the weekly/manual lane; ordinary PR validation is bounded at 60 minutes
+    # (45 was hit on #3667, 2026-11-08: unit 15.5 + integration 13 min, and
+    # session listing/pull ~11 min, leave the bound re-derivation no room).
+    timeout-minutes: ${{ (github.event_name == 'push' || github.event_name == 'pull_request' || github.event_name == 'merge_group') && 60 || 300 }}
     steps:
       - name: Require successful scope classification
         if: needs.scope.result != 'success'
