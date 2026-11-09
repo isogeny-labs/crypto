@@ -3204,6 +3204,18 @@ impl DecompositionOracle<CurveB> for BinD4Oracle<'_> {
     fn summands(&self) -> u32 {
         4
     }
+    /// The set-up interpolates the symmetrised system (solver work, in the
+    /// solver block) and builds no table, so with large primes off there
+    /// are no table inserts to count and the item is complete; the
+    /// large-prime store's pivot inserts are not counted, so with large
+    /// primes on the item stays listed (`ecbench::work`).
+    fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        if self.lp.enabled() {
+            BTreeMap::new()
+        } else {
+            BTreeMap::from([("counted:table_insert_attempts".to_string(), 1)])
+        }
+    }
     fn describe(&self, _params: &Params) -> String {
         let form = if self.opts.frobenius {
             "(s₂², s₃², s₄, π²), weights (2, 2, 1, 1): 64 solutions"

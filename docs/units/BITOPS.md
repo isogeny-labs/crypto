@@ -264,6 +264,23 @@ operations, a lower bound on the walk it records. The `bitop/v1` total of
 the default hyperelliptic walk before this change is its total minus
 `window_charges` at the row's widths.
 
+### 2026-11-07 (ic-acct-7, complete counters)
+
+| counter or family | rule | why |
+|---|---|---|
+| `combination_modr_muls` | `modr_mul` | a product modulo `r` in a column-log combination: `ic.shared_rank`'s descent `Σ coef·log` and `·h⁻¹`, the `h⁻¹ = h^{r−2}` exponentiation's products, a full-rank check's `coef·log` |
+| `combination_modr_adds` | `modr_add` | a sum modulo `r` in the same combinations (`Σ`, and `− a` for the residual shift) |
+
+`ic.shared_rank` also writes, at the site that does the work, the counters the
+2026-10-16 instrumentation already prices: `target_rng_draws` (every 64-bit
+word its `StdRng` hands out, counted by a forwarding wrapper, for the rank
+trials and the residual shifts), `row_build_words`, `row_build_modr_adds`,
+`row_build_modr_muls` (its rows, the transcript's copy and the target's
+dense row), its matrix's `gauss_entries_scanned` and `pivot_inversion_steps`,
+the folded table's `table_insert_attempts`, one
+`curve_equation_checks_uncharged` for the target's `is_on_curve`, and the
+`counted:` markers of the four items it had not counted.
+
 ### 2026-11-07 (the counters left unpriced on purpose, decided)
 
 Each counter the 2026-10-21 extension left unpriced, and the uncounted work it

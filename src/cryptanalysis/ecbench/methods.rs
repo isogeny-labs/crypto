@@ -7962,6 +7962,102 @@ mod shared_rank_tests {
         assert!(report
             .unpriced
             .contains(&"field_arithmetic_uncharged".into()));
+        // ic-acct-7: every counted marker is written and the record prices
+        // complete in `bitop/v1`; each item's counters sit in the phase
+        // that does the work.
+        let work = crate::cryptanalysis::ecbench::work::price(
+            &crate::cryptanalysis::ecbench::work::Priceable {
+                method_id: &method.id,
+                method_params: &method.params,
+                curve: &facts,
+                phases: &report.phases,
+                counters: &report.counters,
+                solver: report.solver.as_ref(),
+            },
+        )
+        .unwrap();
+        assert!(work.unpriced.is_empty(), "{:?}", work.unpriced);
+        assert!(
+            work.known_uncounted.is_empty(),
+            "{:?}",
+            work.known_uncounted
+        );
+        assert!(work.complete);
+        let wn = |phase: &str, counter: &str| {
+            report
+                .phases
+                .iter()
+                .find(|p| p.name == phase)
+                .unwrap_or_else(|| panic!("no phase {phase}"))
+                .work_native
+                .get(counter)
+                .copied()
+                .unwrap_or(0)
+        };
+        for (phase, marker, counter) in [
+            // compact-orbit-scan prices its index inserts in its own
+            // `hash_probes_uncharged`; the abscissa sort is the new count.
+            (
+                "factor_base",
+                "counted:base_index_builds",
+                "index_sort_word_ops",
+            ),
+            (
+                "oracle_setup",
+                "counted:table_insert_attempts",
+                "table_insert_attempts",
+            ),
+            ("relations", "counted:walk_bookkeeping", "target_rng_draws"),
+            (
+                "linear_algebra",
+                "counted:relation_row_construction",
+                "row_build_words",
+            ),
+            (
+                "linear_algebra",
+                "counted:gauss_column_scans_and_pivot_inversions",
+                "gauss_entries_scanned",
+            ),
+            (
+                "linear_algebra",
+                "counted:gauss_column_scans_and_pivot_inversions",
+                "pivot_inversion_steps",
+            ),
+            (
+                "target_relation_check",
+                "counted:relation_row_construction",
+                "row_build_modr_adds",
+            ),
+            (
+                "target_descent",
+                "combination_modr_muls",
+                "combination_modr_adds",
+            ),
+        ] {
+            assert_eq!(wn(phase, marker).min(1), 1, "{phase} {marker}");
+            assert!(wn(phase, counter) > 0, "{phase} {counter}");
+            // Never in `native`: the GAE path and committed records stay.
+            let p = report.phases.iter().find(|p| p.name == phase).unwrap();
+            assert!(!p.native.contains_key(counter), "{counter} in native");
+        }
+        // At least one draw a rank trial (`gen_range` rejects and redraws,
+        // and every word is counted), and a row's words, `h·a` and the
+        // pivots' inversions by their exact rules.
+        let trials = report.counters["rank_trials"];
+        assert!(wn("relations", "target_rng_draws") >= trials);
+        let rank = report.counters["matrix_rank"];
+        assert_eq!(
+            wn("linear_algebra", "pivot_inversion_steps"),
+            rank * crate::cryptanalysis::ic_boundary::pivot_inversion_steps(binary.r)
+        );
+        let rows = report
+            .phases
+            .iter()
+            .find(|p| p.name == "linear_algebra")
+            .unwrap()
+            .native["rows"];
+        assert_eq!(wn("linear_algebra", "row_build_modr_muls"), rows);
+        assert_eq!(wn("linear_algebra", "row_build_words"), 2 * 4 * rows);
         let online = report
             .online
             .expect("library online clock survives ecbench");
@@ -10967,3 +11063,137 @@ mod tensor_contraction_tests {
 #[cfg(test)]
 #[path = "registry_audit_tests.rs"]
 mod registry_audit_tests;
+
+/// ic-acct-7: which `known_uncounted` items a record of each archive
+/// configuration still carries on this binary.  A diagnostic, run by hand:
+/// `ECBENCH_COVERAGE_CONFIGS=<jsonl> cargo test --release --lib
+/// coverage_of_archive_configs -- --ignored --nocapture`, one
+/// `{"id", "params", "curve"}` a line.  Large curves are swapped for small
+/// ones of the same kind and size parameters capped, so it answers "does
+/// this code path write its markers", not "what did the session cost".
+#[cfg(test)]
+mod complete_counters_coverage {
+    use super::*;
+    use crate::cryptanalysis::ecbench::work;
+    use crate::cryptanalysis::ecbench::workload::CurveSpec;
+
+    fn shrink_curve(curve: &Value) -> Value {
+        let kind = curve["kind"].as_str().unwrap_or("");
+        match kind {
+            "koblitz" if curve["n"].as_u64().unwrap_or(0) > 23 => {
+                json!({"kind": "koblitz", "a": curve["a"], "n": 19})
+            }
+            "prime_explicit" | "prime_public_fixture"
+                if curve["p"].as_u64().unwrap_or(u64::MAX) > (1u64 << 32) =>
+            {
+                json!({"kind": "prime_search", "bits": 20, "seed": 59297})
+            }
+            "prime_search" if curve["bits"].as_u64().unwrap_or(0) > 24 => {
+                json!({"kind": "prime_search", "bits": 20, "seed": 59297})
+            }
+            _ => curve.clone(),
+        }
+    }
+
+    fn shrink_param(v: &str) -> String {
+        // `size=N`, `columns=N`, `dimension=N`: capped so a toy curve runs.
+        let mut out = Vec::new();
+        for part in v.split(',') {
+            let capped = ["size=", "columns=", "dimension="]
+                .iter()
+                .find_map(|k| {
+                    let (head, num) = part.rsplit_once(k)?;
+                    let n: u64 = num.parse().ok()?;
+                    let cap = match *k {
+                        "size=" => 48,
+                        "columns=" => 4,
+                        _ => 5,
+                    };
+                    Some(format!("{head}{k}{}", n.min(cap)))
+                })
+                .unwrap_or_else(|| part.to_string());
+            out.push(capped);
+        }
+        out.join(",")
+    }
+
+    #[test]
+    #[ignore]
+    fn coverage_of_archive_configs() {
+        let Ok(path) = std::env::var("ECBENCH_COVERAGE_CONFIGS") else {
+            return;
+        };
+        let text = std::fs::read_to_string(path).unwrap();
+        for line in text.lines().filter(|l| !l.trim().is_empty()) {
+            let c: Value = serde_json::from_str(line).unwrap();
+            let id = c["id"].as_str().unwrap().to_string();
+            let mut params: BTreeMap<String, String> = c["params"]
+                .as_object()
+                .unwrap()
+                .iter()
+                .map(|(k, v)| (k.clone(), shrink_param(v.as_str().unwrap_or(""))))
+                .collect();
+            if let Some(t) = params.get_mut("max_trials") {
+                *t = (t.parse::<u64>().unwrap_or(0)).min(2_000_000).to_string();
+            }
+            let label = format!("{id} {}", serde_json::to_string(&params).unwrap());
+            let curve = shrink_curve(&c["curve"]);
+            let outcome = (|| -> Result<work::WorkBlock, String> {
+                let spec: CurveSpec =
+                    serde_json::from_value(curve.clone()).map_err(|e| e.to_string())?;
+                let inst = spec.build()?;
+                let facts = inst.facts(&spec);
+                let m = resolve(&MethodSpec {
+                    id: id.clone(),
+                    params: params.clone(),
+                })?;
+                let k = 4242 % facts.r;
+                let target = inst.mul_generator_hex(k.max(1)).ok_or("no target")?;
+                let rep = solve(&m, &inst, &facts, &target, 6)?;
+                work::price(&work::Priceable {
+                    method_id: &m.id,
+                    method_params: &m.params,
+                    curve: &facts,
+                    phases: &rep.phases,
+                    counters: &rep.counters,
+                    solver: rep.solver.as_ref(),
+                })
+            })();
+            match outcome {
+                Ok(w) => println!(
+                    "COVERAGE\t{}\tuncounted={:?}\tunpriced={:?}\t{label}\t{curve}",
+                    if w.complete { "complete" } else { "incomplete" },
+                    w.known_uncounted,
+                    w.unpriced
+                ),
+                Err(e) => println!("COVERAGE\terror\t{e}\t\t{label}\t{curve}"),
+            }
+        }
+    }
+}
+
+/// ic-acct-7: the Gaudry oracles' set-ups build no table, so they carry the
+/// `table_insert_attempts` marker (which `run_pipeline_with_base` copies into
+/// the `oracle_setup` phase); with large primes on, the binary oracle's
+/// pivot store is uncounted and the item stays listed.
+#[cfg(test)]
+mod complete_counters_gaudry_tests {
+    use crate::cryptanalysis::gaudry_quartic_bin::{find_bin_curve, BinD4Oracle, BinOptions};
+    use crate::cryptanalysis::gaudry_quartic_d4::{find_d4_curve, D4Oracle};
+    use crate::cryptanalysis::ic_framework::stages::DecompositionOracle;
+
+    const MARKER: &str = "counted:table_insert_attempts";
+
+    #[test]
+    fn gaudry_set_ups_mark_their_table_inserts_counted() {
+        let bin = find_bin_curve(6, 1, 16).unwrap();
+        let oracle = BinD4Oracle::new(&bin, 11, 7, BinOptions::default());
+        assert_eq!(oracle.setup_work_native().get(MARKER), Some(&1));
+        let mut lp = BinD4Oracle::new(&bin, 11, 7, BinOptions::default());
+        lp.lp.max_large = 2;
+        assert!(!lp.setup_work_native().contains_key(MARKER));
+        let d4 = find_d4_curve(29, 1, 16).unwrap();
+        let oracle = D4Oracle::new(&d4, 14, 7);
+        assert_eq!(oracle.setup_work_native().get(MARKER), Some(&1));
+    }
+}
