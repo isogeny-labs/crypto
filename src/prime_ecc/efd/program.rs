@@ -41,9 +41,11 @@ impl Expr {
             Self::Sub(a, b) => a.eval(modulus, values)?.sub(&b.eval(modulus, values)?),
             Self::Mul(a, b) => a.eval(modulus, values)?.mul(&b.eval(modulus, values)?),
             Self::Div(a, b) => {
+                // EFD inputs are public; variable-time inversion is safe here
+                // and avoids the constant-time ladder's 3 multiplications/bit.
                 let inverse = b
                     .eval(modulus, values)?
-                    .inv()
+                    .inv_vartime()
                     .ok_or(EfdError::ZeroDenominator)?;
                 if matches!(**a, Self::Constant(ref n) if n == &BigUint::one()) {
                     inverse
