@@ -16,14 +16,14 @@ research/trace_c1_2lp_20261027/isolab-20261109/LAUNCH.md). c8a.2xlarge, seconds=
 Dollar ceiling: USD 10 for all four dispatches including failures.
 
 ## State
-Dispatches pending/in flight: see LAUNCH.md for workflow run IDs.
+d5 run 42639382601 failed (launcher exit 23, Job failed, no pod UID in result). Gate unknown without S3. d2-d4 not dispatched.
 
 ## Next steps
 1. Await each run; read step summary; download receipts only via the lab's verified route.
 2. Report per-size outcome, L2/A/A admission, and the IC/rho gap; no claim beyond the MITM reference.
 
 ## Runs in flight
-See research/trace_c1_2lp_20261027/isolab-20261109/LAUNCH.md.
+None.
 
 ## Stop and success conditions
 No automatic resubmission. A failed or ambiguous run is reconciled against its original run ID first.

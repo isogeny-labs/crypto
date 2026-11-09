@@ -23,3 +23,10 @@ priced end-to-end IC result.
 
 Filled in after each dispatch: UTC time, workflow run ID, outcome.
 - 2026-11-09T14:55:14Z: `reference-d5.json` dispatched, workflow run 42639382601 (run #214, attempt 1), head f07b6d3e4e. The d2–d4 dispatches are held until #214 shows whether the route completes end to end.
+- 2026-11-09T15:21:41Z: run 42639382601 **failed** in "Launch, await and verify the EKS experiment". The build and image publish succeeded:
+  - image `isolab/tasks@sha256:fe11b397904fcac9d346737f287a4938476296fe8da9a45b7ccab2a83c6353d6`, ecbench SHA-256 `25a1351c272d3c0d78e775e9296eefb9dc66938745a475f646e76697bfa578af`;
+  - launcher `isolab-experiment-launcher:8096a7db-d8a1-4b26-ba03-95e9defdaf3b`, request SHA-256 `31a58ab39a4e99981aafad4cdc861c24d7d469d1717ae91f8b7b2be9e1ea9220`.
+
+  Job `gh-42639382601-1` (UID `eba3a8ca-a1c3-4cd5-a506-b278481a2e92`) reached Kubernetes state `failed` about 3 minutes after submission. The launcher's `result.json` has exit code 23 (Job not succeeded), an empty `pod_uid` and an empty `results_uri`. Launcher receipts are at `s3://isolab-results-104186811093-us-east-2/runs/gh-42639382601-1/launcher/8096a7db-d8a1-4b26-ba03-95e9defdaf3b/`.
+
+  The failing gate is not visible from GitHub. The pod exit code sits only in private S3, and this session has no AWS identity that can read it. Possible classes include native audit, L2 isolation, A/A control and payload execution. **No result was produced, and d2–d4 were not dispatched.** Measured rows: 0.
