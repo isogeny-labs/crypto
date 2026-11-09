@@ -41,6 +41,15 @@ counts; untouched papers are not labelled audited. [pcc:unverified]
 
 ## Exact counterexamples
 
+The solver-control follow-up proves the actual algebra equivalence
+K[x,y]/(xy,x+y−c) ≃ K[t]/(t²−ct), length2, and a closed F5support1/length2
+witness. All16preregistered msolve0.6.5 calls pass their exact known-answer
+checks, including the prior degree3control. The expanded project gate now
+audits93declarations with0failing/0trusted-native exceptions. Claim
+PCC-20261109-ee57d0 is unsigned. See
+[solver multiplicity study](../solver_multiplicity_audit_20261109/README.md)
+for the frozen protocol, raw outputs and report. [pcc:unverified]
+
 1. On `y²=x³+1` over F5, `S3(3,1,4)=0`, but there is no F5-point above x=3.
    `rational_only_s3_converse_false` uses Mathlib's actual elliptic point
    group. The curve is nonsingular. The field qualification matters.
@@ -154,13 +163,13 @@ only at their already-stated scope. [pcc:unverified]
 | 5 Diem size | Partial: stable branch locus fails actual Condition2.7. Scheme/ramification bridge and size bound remain open; no counterexample to the qualified bound. |
 | 6 Gaudry | Original2000 §§2–3 read; fixed-genus whole-Jacobian limit confirmed as the claim's scope. Actual higher-genus census and lower-order error remain open; small-q error alone is not a refutation. |
 | 7 Subgroup smoothness | Partial: abstract confinement proof only. A faithful higher-genus Jacobian family and subgroup proportions remain open. |
-| 8 Bézout | Partial: quotient-length versus support control. General bound and msolve multiplicity comparison remain open. |
-| 9 Gröbner heuristics | Universal square regularity reading has this Lean counterexample; generic variants and JV remain open. No msolve measurement yet. |
+| 8 Bézout | Partial: actual bivariate quotient equivalence and support1/length2 Lean witness; all16msolve multiplicity/control calls pass. General n!dⁿ bound and application-specific decomposition systems remain open. |
+| 9 Gröbner heuristics | Universal square regularity reading has this Lean counterexample; generic variants and JV remain open. Native msolve controls passed, but those heuristic systems are not yet measured. |
 | 10 Walks | Original Hildebrand fixed-support proof/hypotheses read; random-support averaging and fixed positive probabilities retained. Prior iid-label identity is not a collision theorem. Lean mixing proof and exact walk census remain open. |
 | 11 Standards | Screening hypotheses reviewed. Large-order anomalous Smart fixture/proof and matched rho benchmark remain open. Screened NIST recommendation is not refuted. |
-| 12 msolve/F4 | Partial static audit. No faithful C-to-F4Run refinement or trace certificate yet. |
+| 12 msolve/F4 | Partial static audit and exact native GB/staircase/parameter fixtures. No faithful C-to-F4Run refinement or trace certificate yet. |
 | 13 Independence | Other-language fixed controls/census on this one host. Independent second-host execution remains unavailable. |
-| 14 Negative control | Prior Lean lower/upper degree certificates and actual production Rust control pass. No retroactive claim that older censuses used this control. |
+| 14 Negative control | Prior Lean lower/upper degree certificates, production Rust control, and actual msolve degree3known-answer run pass. No retroactive claim that older censuses used this control. |
 
 The actual higher-genus Jacobian, pairing, general geometric supersingularity and C-refinement
 bridges are substantial missing formalizations, not assumed lemmas. A proof
