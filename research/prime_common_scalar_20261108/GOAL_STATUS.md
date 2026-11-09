@@ -24,9 +24,13 @@ six canonically pinned unsigned PCC records. [pcc:unverified]
 
 This discharges the prior contraction-homogeneity question by proving the
 correct affine statement. The explicit finite sum is a specification; its
-definition does not provide an efficient recursive evaluator. The next
-tractable step is source D.5 all-level node counts and tapered Hermite recovery
-with the repaired degree budget, followed by uniform mode and entry costs.
+definition does not provide an efficient recursive evaluator. The subsequent
+source-recovery component derives the actual node counts, ceiling and complete
+per-node multiplicity margin, then proves that exact scaled source jets
+determine the actual cleared polynomial over any Q-algebra. See
+[source-recovery report](reports/source-recovery-20261109/REPORT.md).
+Finite-precision multiplier losses and uniform mode/entry costs remain open.
+[pcc:unverified]
 
 ## The outstanding algorithm theorem
 

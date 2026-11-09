@@ -46,6 +46,14 @@ amendment to the observed results.
    proofs close the finite coefficient-buffer equivalence, construct the actual
    finite inverse output and prove modular encoding/cardinality. Full Hermite
    precision and native bit costs remain open. [pcc:unverified]
+   **Nov9 exact source recovery step:** NodeMultiplicity derives actual grid
+   valuation counts, the actual ceiling budget and the full per-node taper
+   margin for 3<=u<=a and u<=M. HermiteUniqueness proves exact scaled source
+   jets determine the actual cleared packed polynomial over any Q-algebra.
+   Exact cancellation of2L does not hold in finite2^p quotients. The next
+   obligation is the actual Hermite multiplier valuation/loss bound D.10,
+   not another numerical multiplicity margin. See
+   reports/source-recovery-20261109/REPORT.md. [pcc:unverified]
 4. **Uniform modes and total recursive cost.** Derive squared Cauchy modes with
    coefficient(b+1), genuine nonzero valuations, all tiles/rows/levels, source
    variables and child entries. Charge D, inverse, factorization, tuple
