@@ -70,3 +70,26 @@ curve/Jacobian/implementation bridges have not been formalized.
 Unresolved. The proof-and-control increment does not close the original
 fourteen-item request, and opening or merging its PR would not do so.
 [pcc:unverified]
+
+### 2026-11-09 follow-up
+
+The user explicitly approved local checkpoints for this audit. That removes
+the upload prerequisite recorded above; it must not be asked for again.
+The native Semaev census subsequently completed its documented bounded
+domain with no discrepancy counters. The missing frozen JSON preregistration
+is preserved as a deviation, not repaired retroactively. [pcc:unverified]
+
+The [follow-up study](../research/theorem_census_20261109/PRIMARY_AUDIT.md)
+now has an expanded74-declaration local Lean gate, actual BK excluded-case
+geometric3-torsion, an F5 r=2 corpus counterexample, and a direct FSTp239
+counterexample using actual F7(mu2) field degree1 and nonrational2-torsion.
+The finite-field source trace definition is connected to actual point counts;
+the corrected odd-prime theorem retains Hasse as an explicit premise. No
+general p-rank equivalence or Hasse theorem is thereby supplied.
+[pcc:unverified]
+
+Primary BK/FST/Gaudry/Hildebrand sources were recovered/read at the recorded
+scopes. All44unread-label tasks and239source records remain catalogued; the
+full fourteen-item objective and independent second-host census stay open.
+Main integration has an additional immutable-ledger fork, which was not
+resolved by selecting a side or rewriting prior rows. [pcc:unverified]

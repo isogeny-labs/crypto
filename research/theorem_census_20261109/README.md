@@ -1,16 +1,17 @@
 # Skeptical Lean refutations and exact Semaev census
 
-Two concrete witnesses now compile in Lean4.35.0. The first disproves the
-rational-point strengthening of Semaev's converse. The second constructs a
-genuine degree-two extension of F5, lifts a nonzero order-three target on a
-nonsingular curve to it, and proves that its two-coordinate symmetrized
-descent is nonregular. These statements do not refute Semaev's actual
-algebraic-closure theorem or a generic-instance regularity assertion.
+Lean4.35.0 now checks actual torsion-boundary witnesses, a direct r=2
+source correction in FST2010, the rational-point strengthening of Semaev's
+converse, and nonregularity of a genuine F25 symmetrized descent. The proofs
+use actual elliptic point groups and intermediate fields. The qualified BK
+theorem, Semaev's algebraic-closure theorem, and generic FGHR regularity
+are not refuted; their exact domains and remaining bridges stay explicit.
 [pcc:unverified]
 
-The final repository proof gate audits41declarations with0failing and
-0trusted-native exceptions. That includes generated equation lemmas, not
-41new mathematical results. Both proof attempts and final receipts are
+The expanded repository proof gate audits74declarations with0failing and
+0trusted-native exceptions. The original41-declaration receipt is retained
+as its earlier snapshot. Counts include generated equation lemmas, not
+74new mathematical results. Both proof attempts and final receipts are
 retained. The current unsigned PCC records are `PCC-20261109-44730b` and
 `PCC-20261109-5bd3a4`. Earlier packets omitted required declaration hashes;
 they remain as superseded records, and their failed metadata check is
@@ -21,6 +22,22 @@ CI subsequently found that superseded packets still participate in
 packets with append-only correction events; exact original bytes are retained
 under evidence/metadata-originals/. The mathematical statements were not
 changed. See evidence/metadata-binding-amendment.json. [pcc:unverified]
+
+The follow-up adds actual BK excluded-boundary torsion and a direct FST2010
+r=2 source correction. For Algorithm3.3(1)'s E/F7:y²=x³+x, Lean establishes
+#E=8, the source supersingular trace condition, a rational point of order2,
+and nonrational geometric2-torsion; nevertheless the **actual field**
+F7(μ2)/F7 has degree1. This contradicts the literal degree2 sentence on
+p239 under Definition2.1. The primary page was visually checked.
+[pcc:unverified]
+
+See [PRIMARY_AUDIT.md](PRIMARY_AUDIT.md) for the exact statements and proof
+bridges, [the torsion report](reports/proof-20261109-torsion/report.pdf), and
+[pcc-torsion-records.json](pcc-torsion-records.json) for unsigned claims.
+The entire44-unread-label backlog and all239source records, including170
+primary-publication records, are tracked in [UNREAD_BACKLOG.md](UNREAD_BACKLOG.md)
+and [paper-audit-backlog.json](paper-audit-backlog.json). Those are metadata
+counts; untouched papers are not labelled audited. [pcc:unverified]
 
 ## Exact counterexamples
 
@@ -121,7 +138,8 @@ The identity issuer is reproduced with `cargo run --release --locked` from
 
 ## Original fourteen requirements
 
-This adds evidence to items1 and9. It does **not** complete the fourteen-item
+This adds formal evidence to items1,2,3and9 and primary-source review to
+items6and10. It does **not** complete the fourteen-item
 request. The original hypotheses and all gaps are retained in the
 [acceptance map](../theorem_audit_20261108/README.md#exact-acceptance-map).
 The table here records the current delta; earlier components remain valid
@@ -130,27 +148,27 @@ only at their already-stated scope. [pcc:unverified]
 | Item | Current status and concrete remaining obligation |
 |---|---|
 | 1 Semaev | Partial: general short S3 equivalence from prior increment; rational-only converse refuted here; bounded S3/S4/S5 native census completed. Universal binary equivalence, recursion and degree proofs remain open. |
-| 2 BK | Partial: linear algebra core only. Actual E[r]/Frobenius bridge and all p<500 torsion census remain open. Actual theorem excludes r dividing q−1; no refutation established. |
-| 3 Supersingular | Partial: embedding-order arithmetic under explicit trace-zero/divisibility assumptions. Supersingularity/Hasse bridge and requested binary/ternary census remain open. |
-| 4 Pairings | Partial: cyclic restriction obstruction. Actual Weil/Tate constructions, domains, nondegeneracy and MOV/FR calculations remain open. |
+| 2 BK | Partial: primary proof read and actual excluded-case geometric3-torsion witness, even with9dividing#E. Full qualified E[r]/Frobenius proof and all-p<500 census remain open. Qualified theorem is not refuted. |
+| 3 Supersingular | Literal all-prime k=2 assertion refuted at r=2 using the source trace definition and actual groups. FSTp239 directly checked using actual cyclotomic degree1 versus nonrational2-torsion. Corrected odd-prime proof is conditional on Hasse; general Hasse/classification and binary/ternary census remain open. |
+| 4 Pairings | Partial: cyclic restriction obstruction and actual r=2 cyclotomic/full-torsion field distinction. Actual Weil/Tate constructions, nondegeneracy and MOV/FR calculations remain open. |
 | 5 Diem size | Partial: stable branch locus fails actual Condition2.7. Scheme/ramification bridge and size bound remain open; no counterexample to the qualified bound. |
-| 6 Gaudry | Source reviewed; actual hyperelliptic Jacobian census and asymptotic error remain open. Small-q error alone would not refute the asymptotic statement. |
+| 6 Gaudry | Original2000 §§2–3 read; fixed-genus whole-Jacobian limit confirmed as the claim's scope. Actual higher-genus census and lower-order error remain open; small-q error alone is not a refutation. |
 | 7 Subgroup smoothness | Partial: abstract confinement proof only. A faithful higher-genus Jacobian family and subgroup proportions remain open. |
 | 8 Bézout | Partial: quotient-length versus support control. General bound and msolve multiplicity comparison remain open. |
 | 9 Gröbner heuristics | Universal square regularity reading has this Lean counterexample; generic variants and JV remain open. No msolve measurement yet. |
-| 10 Walks | Partial: exact iid label collision identity. Fixed-partition collision/mixing census and qualified asymptotic claims remain open. |
+| 10 Walks | Original Hildebrand fixed-support proof/hypotheses read; random-support averaging and fixed positive probabilities retained. Prior iid-label identity is not a collision theorem. Lean mixing proof and exact walk census remain open. |
 | 11 Standards | Screening hypotheses reviewed. Large-order anomalous Smart fixture/proof and matched rho benchmark remain open. Screened NIST recommendation is not refuted. |
 | 12 msolve/F4 | Partial static audit. No faithful C-to-F4Run refinement or trace certificate yet. |
 | 13 Independence | Other-language fixed controls/census on this one host. Independent second-host execution remains unavailable. |
 | 14 Negative control | Prior Lean lower/upper degree certificates and actual production Rust control pass. No retroactive claim that older censuses used this control. |
 
-The actual higher-genus Jacobian, pairing, supersingularity and C-refinement
+The actual higher-genus Jacobian, pairing, general geometric supersingularity and C-refinement
 bridges are substantial missing formalizations, not assumed lemmas. A proof
 about an abstract group or a chosen polynomial list does not discharge them.
 No unsupported claim node is promoted. PCC records remain producer assertions
 until a separate signed verdict. [pcc:unverified]
 
-Sources: [sources.json](sources.json), with primary FGHR PDF hash/read scope;
+Sources: [sources.json](sources.json), including exact primary BK/FST/Gaudry/Hildebrand/FGHR hashes/read scopes;
 the KB service remains unavailable. Reports and plots:
 [reports/run-20261109-native/](reports/run-20261109-native/).
 Validation receipts and inherited repository-wide check limitations are

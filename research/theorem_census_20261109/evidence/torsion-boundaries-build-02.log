@@ -1,0 +1,70 @@
+TorsionBoundaries.lean:30:2: warning: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+TorsionBoundaries.lean:35:2: error: Tactic `decide` failed to reduce
+  @decide (Fintype.card (Option { xy // SkepticalAudit.rationalCurve.Nonsingular xy.1 xy.2 }) = 6)
+    (instDecidableEqNat (Fintype.card (Option { xy // SkepticalAudit.rationalCurve.Nonsingular xy.1 xy.2 })) 6)
+to `true` or `false`.
+
+After unfolding the instances `instDecidableAnd`, `instDecidableEqFin`, `instDecidableEqNat`, `Nat.decEq`, `ZMod.decidableEq`, and `ZMod.decidableEq._aux_3`, reduction got stuck at
+  (List.map (⇑Function.Embedding.some)
+          (List.pmap Subtype.mk
+            (List.filter (fun b => decide ((fun xy => SkepticalAudit.rationalCurve.Nonsingular xy.1 xy.2) b))
+              (List.map (Prod.mk ((fun i => i) ⟨0, ⋯⟩)) (List.finRange (4 + 1)) ++
+                (List.map (Prod.mk ((fun i => i) ⟨1, ⋯⟩)) (List.finRange (4 + 1)) ++
+                  (List.map (Prod.mk ((fun i => i) ⟨2, ⋯⟩)) (List.finRange (4 + 1)) ++
+                    (List.map (Prod.mk ((fun i => i) ⟨3, ⋯⟩)) (List.finRange (4 + 1)) ++
+                      (List.map (Prod.mk ((fun i => i) ⟨4, ⋯⟩)) (List.finRange (4 + 1)) ++ []))))))
+            ⋯)).length.beq
+    5
+TorsionBoundaries.lean:59:2: warning: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+TorsionBoundaries.lean:106:2: warning: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+TorsionBoundaries.lean:110:2: error: Tactic `decide` failed to reduce
+  @decide (Fintype.card (Option { xy // bkCurve.Nonsingular xy.1 xy.2 }) = 9)
+    (instDecidableEqNat (Fintype.card (Option { xy // bkCurve.Nonsingular xy.1 xy.2 })) 9)
+to `true` or `false`.
+
+After unfolding the instances `instDecidableAnd`, `instDecidableEqFin`, `instDecidableEqNat`, `Nat.decEq`, `ZMod.decidableEq`, and `ZMod.decidableEq._aux_3`, reduction got stuck at
+  (List.map (⇑Function.Embedding.some)
+          (List.pmap Subtype.mk
+            (List.filter (fun b => decide ((fun xy => bkCurve.Nonsingular xy.1 xy.2) b))
+              (List.map (Prod.mk ((fun i => i) ⟨0, ⋯⟩)) (List.finRange (6 + 1)) ++
+                (List.map (Prod.mk ((fun i => i) ⟨1, ⋯⟩)) (List.finRange (6 + 1)) ++
+                  (List.map (Prod.mk ((fun i => i) ⟨2, ⋯⟩)) (List.finRange (6 + 1)) ++
+                    (List.map (Prod.mk ((fun i => i) ⟨3, ⋯⟩)) (List.finRange (6 + 1)) ++
+                      (List.map (Prod.mk ((fun i => i) ⟨4, ⋯⟩)) (List.finRange (6 + 1)) ++
+                        (List.map (Prod.mk ((fun i => i) ⟨5, ⋯⟩)) (List.finRange (6 + 1)) ++
+                          (List.map (Prod.mk ((fun i => i) ⟨6, ⋯⟩)) (List.finRange (6 + 1)) ++ []))))))))
+            ⋯)).length.beq
+    8
+TorsionBoundaries.lean:119:29: error: unsolved goals
+case deg_eq_deg
+g : K[X] := map (algebraMap F K) cubic
+⊢ (X ^ 3 + C ((algebraMap F K) 5) * X ^ 2 + C ((algebraMap F K) 3) * X).natDegree = 3
+TorsionBoundaries.lean:153:55: warning: `simp` already closes the goal
+
+Hint: Use `simp` instead of `simpa`:
+  [apply] simp at hc
+
+Note: This linter can be disabled with `set_option linter.unnecessarySimpa false`
+TorsionBoundaries.lean:192:12: error: Dependent elimination failed: Failed to solve equation
+  P = (WeierstrassCurve.Affine.Point.map (Algebra.ofId F K)) WeierstrassCurve.Affine.Point.zero

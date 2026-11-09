@@ -66,3 +66,20 @@ already diverges. Do not resolve by choosing a ledger/rechaining old rows.
 Autofix marked parent needs-human; no Copilot resolution observed. Preserve
 both histories for authorized reconciliation. New ready PR is stacked only;
 no claim of merge readiness or auto-merge availability on a feature base.
+
+2026-11-09 torsion/source follow-up: expanded Lean gate passes74declarations,
+0failing,0trusted-native exceptions. New modules TorsionBoundaries.lean and
+SourceFSTBoundary.lean provide an actual BK excluded-case witness and a direct
+FSTp239 r=2 field-degree discrepancy, with the paper's actual trace definition
+and actual intermediate-field adjoin/finrank. Corrected odd-prime theorem
+retains Hasse as an explicit premise. Sources BK/FST/Gaudry/Hildebrand now
+have primary PDF hashes/read scopes in sources.json. All44unread-label nodes
+and239source records are preserved in paper-audit-backlog.json.
+
+CI caught original active claim metadata omissions. Original bytes preserved
+in evidence/metadata-originals/; binding-only amendments append events, with
+both full local PCC checks passing. Ledger470rows, all prior rows intact.
+Remote bot archived benchrec-gate.log to .artifacts.json; reviewed exact hashes
+and preserved that migration. Metadata-fix remote head ac0fc062627ea6a0e307a4fe0b105b0e9a7514ef
+passes verify-all's binding stage; remaining PR-body prose tag is being fixed
+with the mathematical follow-up. No required gate is disabled.

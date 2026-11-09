@@ -1,5 +1,22 @@
 # Validation scope
 
+Latest follow-up: repository gate passes74declarations,0failing,
+0trusted-native exceptions, including both actual torsion-boundary modules.
+The source/field-degree report and exact unsigned claims are in PRIMARY_AUDIT.md.
+The ledger now has470entries and remains a valid append-only extension of
+the local parent. Main's previously documented fork is not reconciled.
+[pcc:unverified]
+
+The direct FST and actual BK-boundary claim packets also pass their full
+local PCC checks (same repository kernel gate); receipts are
+evidence/pcc-fst-torsion-check.json and evidence/pcc-bk-boundary-check.json.
+They remain unsigned. Both pages of the new torsion/source PDF were visually
+inspected with legible Greek/math symbols after the final rendering.
+[pcc:unverified]
+
+The list below is the earlier census increment's snapshot; its original
+41-declaration and463-entry receipts remain unchanged. [pcc:unverified]
+
 - `lake build`: pass, pinned Lean4.35.0/Mathlib56a00585; all earlier failed
   incremental builds retained. [pcc:unverified]
 - Final repository transitive gate: pass41audited declarations,0failing,

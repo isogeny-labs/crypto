@@ -1,5 +1,7 @@
 import RationalCounterexample
 import DescentCounterexample
+import TorsionBoundaries
+import SourceFSTBoundary
 
 #print axioms SkepticalAudit.rational_only_s3_converse_false
 #print axioms SkepticalAudit.extensionPolynomial_irreducible
@@ -13,3 +15,20 @@ import DescentCounterexample
 #print axioms SkepticalAudit.symmetrization_over_extension
 #print axioms SkepticalAudit.universal_descent_regularity_counterexample
 #print axioms SkepticalAudit.symmetrization_universal
+#print axioms TorsionBoundaryAudit.small_curve_cardinality
+#print axioms TorsionBoundaryAudit.small_curve_source_supersingular
+#print axioms TorsionBoundaryAudit.twoPoint_order
+#print axioms TorsionBoundaryAudit.literal_supersingular_k_two_false
+#print axioms TorsionBoundaryAudit.hasse_trace_zero
+#print axioms TorsionBoundaryAudit.corrected_prime_embedding_degree
+#print axioms TorsionBoundaryAudit.bkCurve_cardinality
+#print axioms TorsionBoundaryAudit.geometric_root_exists
+#print axioms TorsionBoundaryAudit.bk_geometric_nonrational_three_torsion
+#print axioms TorsionBoundaryAudit.bk_excluded_boundary_counterexample
+#print axioms FSTBoundaryAudit.curve_cardinality
+#print axioms FSTBoundaryAudit.curve_source_supersingular
+#print axioms FSTBoundaryAudit.twoPoint_order
+#print axioms FSTBoundaryAudit.roots2_adjoin_eq_bot
+#print axioms FSTBoundaryAudit.roots2_extension_degree
+#print axioms FSTBoundaryAudit.two_torsion_not_all_rational
+#print axioms FSTBoundaryAudit.fst_algorithm3_3_r_two_counterexample
