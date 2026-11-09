@@ -146,6 +146,27 @@ doubling-oriented Jacobi quartic charts. A square root has two signs; the
 formulas are identities modulo those defining relations, so either choice is
 consistent, and callers that need a specific root can supply it.
 
+## Formal verification of the chart maps
+
+`research/efd_coordinate_charts_20261108/Charts.lean` machine-checks the
+encode/project round trip for every chart family over an abstract field-like
+structure (commutative multiplication, inverse on nonzero elements, the usual
+inverse laws). Theorems: `affine`, `projective`, `jacobian`, `xyz`, `xyzz`,
+`x_only`, `inverted`, `yz`, `yzsquared`, `jintersect`. Assumptions are explicit
+nonzero denominators (projective scale, inverted coordinates, and `r` for the
+YZ charts); the identities are characteristic-independent.
+
+The manifest at the end of that file pins all 33 chart ids to their proof
+family, and the Rust test `lean_chart_manifest_matches_catalogue` fails if the
+manifest, the catalogue id set, or the family dispatch in `formats.rs` drift.
+
+```sh
+bash tools/lean/proof-gate.sh research/efd_coordinate_charts_20261108/Charts.lean
+```
+
+Result: `PASS 37 thm 0 trusted`, i.e. every theorem is proved with no `sorry`,
+`native_decide` or user axiom.
+
 ## Verification
 
 Model and chart conversions (including the shared Weierstrass hub) are in
@@ -159,6 +180,7 @@ Model and chart conversions (including the shared Weierstrass hub) are in
 | Executable formulas | **471 of 471** (463 upstream + 8 record-derived fallback) |
 | Chart ids and curve equations pinned | 33 ids, 10 models, all explicitly handled |
 | Weierstrass bridge present both ways | 10/10 models (`Model::to_weierstrass`, `from_weierstrass`) |
+| Chart round trips, machine-checked | 10 Lean theorems covering all 33 charts (37 theorems, 0 trusted) |
 | Affine chart round trip, scales 1, 2, 7 | all 33 charts (also from model parameters alone, no `r`/`c` supplied) |
 | Ten curve equations + 33 chart ids pinned, unknown charts rejected | `all_ten_curve_equations_and_thirty_three_charts_are_covered` |
 | Formula vs pinned affine model law, `p = 109` | 471 formulas, >= 8 comparisons each (cap 32); fallback rows flagged in coverage |
