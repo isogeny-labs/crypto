@@ -15,7 +15,7 @@ and web tools only: I ran nothing, queried no ecdb, made no Conductor check, and
    - At k = 20 it is closed at w = 1 on the five-curve mean. A sliver stays open on the curve least favourable
      to rho.
    - Non-collision (decomposition) IC can pass only with an oracle costing a few native operations per trial.
-     No known oracle comes within 10^2 of that (record SNC-3).
+     The cheapest known oracle is about 40x over that budget at k = 20, and the gap grows with k (record SNC-3).
 2. **The connection.** The four lanes each saw one side of the same constraint (section 2):
    - The generic track has few unknowns and unstructured abscissae, so its only relations are collisions.
    - The algebraic track has structured abscissae but many independent unknowns, so it pays in trials, linear
@@ -250,7 +250,7 @@ prediction:
   gamma_montecarlo: "0.47 [0.42, 0.52] at N = 1e3..1e5"
   existing_oracles_c_t: "rootfind-type: about N sqrt-solves per trial (>= 3e2 at k = 20); pkm-iso m = 2: about 7e5 F4 multiply-adds per target (SYNTHESIS, isogeny-seed engine table) [pcc:unverified]"
   S_over_rho_w1_best_conceivable_c_t_10: {full_group: {k20: "2.4", k28: "3.4"}, base_in_G: {k20: "0.86", k28: "1.22"}}
-  S_over_rho_w1_existing_oracles: ">= 8 at every k"
+  S_over_rho_w1_existing_oracles: ">= 4.5 (base in <G>, c_t = 300) and >= 12 (full-group base) at k = 20; larger at higher k, where N and hence c_t grow"
   reaches_0.75: "probability < 0.01: needs an O(1)-evaluation m = 2 decomposition oracle over a <G>-only structured base, an open problem (Hu, ePrint 2024/1923, as quoted in SYNTHESIS section 2)"
 discriminating_test: >
   (a) A native Monte Carlo of the first solvable cycle in a random signed multigraph with edge labels (a, b) uniform
