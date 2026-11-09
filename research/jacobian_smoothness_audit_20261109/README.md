@@ -1,3 +1,8 @@
+Current native update: [both calibration controls match](CALIBRATION.md),
+with raw/file-checked exports and retained failed launcher. Full census
+protocol is separately frozen before population data; the new Stoll
+count module compiles, with full gate and cycle work pending. [pcc:unverified]
+
 # Mumford counts and a finite Cantor subgroup counterexample
 
 The new [F5control](FIVE_CONTROL.md) proves a complete16-pair model,
