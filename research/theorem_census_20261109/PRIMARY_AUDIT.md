@@ -64,6 +64,13 @@ The requested all-p<500 census remains unexecuted. [pcc:unverified]
 
 ## Corrected prime-field arithmetic
 
+The subsequent CompositeTorsion.lean removes the subgroup-primality
+assumption: `corrected_integer_embedding_degree` applies to every r>2
+dividing the actual point count, retaining Hasse explicitly. An actual
+point P=(3,3)on the source F7curve has order8and modular embedding order2.
+No full Hasse/field-degree/geometric-torsion bridge is thereby supplied.
+See [COMPOSITE_TORSION.md](COMPOSITE_TORSION.md). [pcc:unverified]
+
 `corrected_prime_embedding_degree` derives k=2 for odd primes r>2 from the
 source trace definition, primality of p≥5, actual group-order divisibility,
 and the explicit Hasse premise t²≤4p. `hasse_trace_zero` supplies the missing

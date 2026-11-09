@@ -132,3 +132,15 @@ The16:26Zread-only ledger comparison is483main rows versus481local,
 common prefix457; both histories remain intact. Parent3739is still
 open/unmerged. Local mathematics continues independently of that merge
 dependency. [pcc:unverified]
+
+### 2026-11-09 composite-order arithmetic
+
+The corrected modular embedding-order theorem now allows every integer
+r>2dividing the actual curve cardinality, retaining Hasse explicitly.
+An actual smooth F7curve has P=(3,3)of order8and modular embedding order2.
+Full census gate205passes,0failing/0trusted-native exceptions; unsigned
+packet10789dpasses its full local check. These composite orders are positive
+controls, not counterexamples under the trace-zero divisibility condition.
+General Hasse/geometric/field-degree bridges and original censuses remain
+open. See [scope](../research/theorem_census_20261109/COMPOSITE_TORSION.md).
+[pcc:unverified]

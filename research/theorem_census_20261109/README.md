@@ -12,10 +12,10 @@ are not refuted; their exact domains and remaining bridges stay explicit.
 [pcc:unverified]
 
 The torsion-only proof snapshot audited74declarations with0failing and
-0trusted-native exceptions. The current general-S4follow-up
-audits197declarations; the original41-declaration and intermediate96/116/134/167-declaration receipts are
+0trusted-native exceptions. The current composite-order follow-up
+audits205declarations; the original41-declaration and intermediate96/116/134/167/197-declaration receipts are
 retained as earlier snapshots. Counts include generated equation lemmas,
-not197new mathematical results. Both proof attempts and final receipts are
+not205new mathematical results. Both proof attempts and final receipts are
 retained. The torsion snapshot's unsigned PCC records are `PCC-20261109-44730b` and
 `PCC-20261109-5bd3a4`. Earlier packets omitted required declaration hashes;
 they remain as superseded records, and their failed metadata check is
@@ -44,6 +44,16 @@ and [paper-audit-backlog.json](paper-audit-backlog.json). Those are metadata
 counts; untouched papers are not labelled audited. [pcc:unverified]
 
 ## Exact counterexamples
+
+Composite subgroup orders do not break the conditional prime-field
+arithmetic: the corrected modular-order theorem now applies to every
+integer r>2dividing the actual point count, retaining Hasse explicitly.
+On actual E/F7:y²=x³+x, P=(3,3)has order8and modular embedding order2.
+The r2counterexample and missing Hasse/geometric/field-degree bridges
+remain separate. See [COMPOSITE_TORSION.md](COMPOSITE_TORSION.md),
+[Lean source](lean/CompositeTorsion.lean), and
+[report](reports/proof-20261109-composite/report.pdf). Packet10789dis
+unsigned. [pcc:unverified]
 
 The S4follow-up proves the actual fixed degree2/2Sylvester-resultant
 zero-sum equivalence for four points, including partial sums at infinity.
@@ -219,7 +229,7 @@ only at their already-stated scope. [pcc:unverified]
 |---|---|
 | 1 Semaev | Partial: full general-Weierstrass S3equivalence in every characteristic now proved, including all repeated-coordinate cases and actual point sums. Prior short/ordinary binary forms are checked specializations. Rational-only converse and wrong-model extensions refuted, including actual F2/F3geometric controls. First actual fixed-degree S4resultant equivalence now proved, with a faithful degree-drop control; bounded S3/S4/S5native census completed. Recursion beyond m4, irreducibility and degree proofs remain open; original2004PDFstill403/unread. |
 | 2 BK | Partial: original r²point-count formulation read; actual excluded-case geometric3-torsion witness even with9dividing#E. New F2/r2actual geometric torsion has2points all rational, refuting unrestricted set inclusion despite2notdividingq−1. The actual node already excludes this by gcd(r,q)=1; original r²condition is not refuted. Full qualified Frobenius proof and all-p<500 census remain open. |
-| 3 Supersingular | Literal all-prime k=2 assertion refuted at r=2 using the source trace definition and actual groups. FSTp239directly checked with actual cyclotomic degree1 versus nonrational2-torsion. New characteristic2a1=0and characteristic3short families have trivial geometric p-torsion in actual groups. Corrected odd-prime embedding proof remains conditional on Hasse; general trace/p-rank/classification bridge and binary/ternary census remain open. |
+| 3 Supersingular | Literal all-prime k=2 assertion refuted at r=2 using the source trace definition and actual groups. FSTp239directly checked with actual cyclotomic degree1 versus nonrational2-torsion. New characteristic2a1=0and characteristic3short families have trivial geometric p-torsion in actual groups. Corrected modular embedding proof now covers every integer r>2, with an actual order8positive control, and remains conditional on Hasse; general trace/p-rank/classification bridge and binary/ternary census remain open. |
 | 4 Pairings | Partial: cyclic restriction obstruction, actual cyclotomic/full-torsion distinction, and actual geometric F2torsion/μ2subtypes proving every point-valued map degenerate at characteristic order. Group-scheme duality is not refuted. Actual qualified Weil/Tate constructions, nondegeneracy and MOV/FR calculations remain open. |
 | 5 Diem size | Partial: stable branch locus fails actual Condition2.7. Scheme/ramification bridge and size bound remain open; no counterexample to the qualified bound. |
 | 6 Gaudry | Original2000 §§2–3 read; fixed-genus whole-Jacobian limit confirmed as the claim's scope. Actual higher-genus census and lower-order error remain open; small-q error alone is not a refutation. |

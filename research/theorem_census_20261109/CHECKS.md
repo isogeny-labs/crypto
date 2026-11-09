@@ -1,6 +1,20 @@
 # Current additive proof and validation receipts
 
-The current census gate passes197declarations,0failing and0trusted-native
+The latest census gate passes205declarations,0failing and0trusted-native
+exceptions. CompositeTorsion.lean removes the unnecessary r-prime
+assumption from the conditional trace/Hasse modular argument and checks
+an actual point of order8on the smooth F7source curve. The explicit
+universal-and-control conjunction is bound by unsigned packet10789d.
+Hasse and the general cyclotomic/geometric bridges remain open.
+See COMPOSITE_TORSION.md and evidence/composite-torsion-gate.log.
+[pcc:unverified]
+
+The full local packet10789dcheck passes16:44:10Zat source631edd39, still
+unsigned. See composite-torsion-verification.json for exact bindings.
+No native population, field-degree proof or frozen-data change is inferred.
+[pcc:unverified]
+
+The preceding S4census gate passes197declarations,0failing and0trusted-native
 exceptions. It adds GeneralS4.lean's actual fixed degree2/2Mathlib
 Sylvester-resultant equivalence in every characteristic and actual F5
 degree-drop finite-root negative control. Main/control packets21757f/ce6722
@@ -47,6 +61,7 @@ already excludes the F2/r2control by gcd(r,q)=1. [pcc:unverified]
 
 | Component | Gate result | Exact receipt |
 |---|---|---|
+| Census, composite-order conditional arithmetic and actual point | 205pass,0fail,0trusted | evidence/composite-torsion-gate.log |
 | Census, first S4resultant step and degree-drop control | 197pass,0fail,0trusted | evidence/general-s4-gate.log |
 | Census, general S3and model/p-torsion controls | 167pass,0fail,0trusted | evidence/general-s3-gate.log |
 | Actual walk PMF/hash graph | 21pass,0fail,0trusted | ../walk_audit_20261109/evidence/proof-gate-normalized.log |
