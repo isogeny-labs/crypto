@@ -6642,7 +6642,9 @@ mod wide {
         #[test]
         fn padd_scan_finds_the_s3_relation_with_the_s3_probes() {
             let (fast, gf, basis, solver, base, reps) = small_instance(9);
-            let index = build_index128_with_symmetry(&gf, &basis, &solver, &reps, false, false);
+            let index = build_index128_with_symmetry(
+                &gf, &basis, &solver, &reps, false, false, false, false,
+            );
             let mut seed = 0xA076_1D64_78BD_642Fu64;
             let mut solved = 0usize;
             let swapped_before = PADD_SWAPPED_PAIRS.load(std::sync::atomic::Ordering::Relaxed);
