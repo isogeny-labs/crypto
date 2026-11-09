@@ -847,7 +847,7 @@ fn chain_m(r: u64) -> u64 {
 /// control `uniform_e`).
 fn build_chain(r: u64, rng: &mut Rng, uniform_e: bool) -> (Vec<Vec4>, Vec4) {
     let m = chain_m(r);
-    let mut seed_coord = |rng: &mut Rng| {
+    let seed_coord = |rng: &mut Rng| {
         if uniform_e {
             rng.below(r)
         } else {
