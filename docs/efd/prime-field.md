@@ -194,6 +194,22 @@ python3 tools/efd/verify_symbolic.py \
   --out docs/efd/prime-validation/symbolic-legacy.json
 ```
 
+## Symbolic verification of the Weierstrass bridges
+
+`tools/efd/verify_bridges.py` composes each model's `toweierstrass` and
+`fromweierstrass` relations and checks over the rational-function field that the
+composition is the identity on the model coordinates (curve equations are
+imposed where needed). All ten models pass: `shortw`, `montgom`, `edwards`,
+`twisted`, `twistedhessian`, `hessian`, `jintersect` (three coordinates),
+`jquartic`, `2dik`, `3dik` — report in `bridges.json`.
+
+```sh
+python3 tools/efd/verify_bridges.py --out docs/efd/prime-validation/bridges.json
+```
+
+This is CAS verification, not a Lean kernel proof; the same caveat as the
+formula checks applies.
+
 ## Formal verification of the chart maps
 
 `research/efd_coordinate_charts_20261108/Charts.lean` machine-checks the
