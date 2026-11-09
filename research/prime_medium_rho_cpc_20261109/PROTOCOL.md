@@ -126,4 +126,22 @@ M is `constant.ratio_to_floor` of
 
 ## Amendments
 
-None.
+### A1 (2026-11-09, after PC and M2 launched, before any result was read)
+
+- **What happened.** Cards M1 and M3 (attempt 1) stopped at
+  `codebuild start-build` with `AccountLimitExceededException`: the launcher
+  project `isolab-experiment-launcher` allows 2 concurrent builds, and PC and
+  M2 held both.
+- **Nothing ran.**
+  - Both `build-start.json` files are empty.
+  - `list-builds-for-project` shows only the PC and M2 builds in progress.
+  - S3 holds no `runs/prime-medium-rho-cpc-20261109-m1/` or `-m3/` prefix.
+- **Preserved.** The attempt-1 receipts and card outputs are kept under
+  `attempts/M1-a1-startbuild-refused/` and `attempts/M3-a1-startbuild-refused/`.
+- **Relaunch.** M1 and M3 are launched once more, as attempt 2. The request,
+  spec, seeds and job names are unchanged, and the cards are new
+  (`…-M1-a2`, `…-M3-a2`), pinned to the commit carrying this amendment. No
+  experiment is repeated: neither job ever started.
+- **Scheduling.** At most 2 launcher builds at a time, so PC and M2 come
+  first, then M1 and M3, then M4. §8's "PC first" is kept.
+- Nothing else in this protocol changes.
