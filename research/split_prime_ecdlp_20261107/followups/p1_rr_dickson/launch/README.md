@@ -65,5 +65,13 @@ for both jobs together, and raising it would be a separate cluster change.
 | RR a1 | `p1r3-rr-a1-20261108`, pod ce76e299… | **Spot loss.** CloudTrail recorded `BidEvictedEvent` at 21:35:35Z for i-0c270755aeadb845c. The last S3 sync was at 21:36:02Z, and a status request returned the Job as `failed` with no pod. msolve was still in its degree-7 step. The partial records are in `receipts/rr-a1-results-partial/`; they are kept and supply no bound (PROTOCOL-R3). Resubmitted as a2. |
 | RR a2 | `p1r3-rr-a2-20261108`, job 4c60cc68…, pod 45447107… | running (submitted 22:30Z) |
 | T a1 | `p1r3-t-a1-20261108`, pod 117e17e4… | **Spot loss.** CloudTrail recorded `BidEvictedEvent` at 22:51:20Z for i-038d43f9a77c1938d. The last S3 sync was at 22:51:30Z, and a status request at 23:2xZ returned `failed` with no pod. msolve was in its degree-9 step. Partial records: `receipts/t-a1-results-partial/`, kept and supplying no bound. Resubmitted as a2. |
-| RR a2 (status 23:2xZ) | | still **Pending** about 53 min after submission: no Spot capacity yet for a 64Gi pod. The deadline clock runs while it is Pending. |
-| T a2 | `p1r3-t-a2-20261108`, job 8fce259e…, pod 828468c7… | submitted 23:37Z; Pending at submission |
+| RR a2 | `p1r3-rr-a2-20261108`, job 4c60cc68…, pod 45447107… | Pending 22:30Z → 08:36Z (about 10 h), because pool `cpu-spot` was at its node limit (Karpenter event: "node limits have been exhausted for nodepool"). Ran from 08:36Z, instance sha matched. **Spot loss:** `BidEvictedEvent` 11:09:30Z for i-02123e2feff6642a7, last sync 11:09:53Z, still in the degree-7 step. Partial records: `receipts/rr-a2-results-partial/`, kept and supplying no bound. Resubmitted as a3. |
+| T a2 | `p1r3-t-a2-20261108`, job 8fce259e…, pod 828468c7… | Pending 23:37Z → 02:38Z. **Completed as a recorded result:** msolve hit the 56 GiB `ulimit -v` cap (exit 139) after 21,267 s in the degree-9 step, giving D ≥ 9 and widest ≥ 1,305,345 (847,295 × 1,305,345). Instance sha matched. `job-exit.json` exit 0 at 08:33:10Z. Records: `receipts/t-a2-results/`. |
+| RR a3 (last) | `p1r3-rr-a3-20261108`, pinned `instance_type: r6a.4xlarge` | AWS Spot Advisor for us-east-2, read 2026-11-09, lists r6a.4xlarge at <5 % interruption and r7a.4xlarge, which Karpenter chose before, at >20 %. The pin changes only where the job runs; the workload and every frozen value in PROTOCOL-R3 are the same. See receipts/rr-a3. |
+
+### NodePool limit (2026-11-09)
+
+The owner chose to raise the `cpu-spot` limit, and approved a temporary /24 on the EKS endpoint
+allowlist to do it. Before acting I re-checked: T a2 had finished, and no cpu-spot node was
+running, so RR a3 fits the existing limit of 16 vCPU / 128Gi on its own. **The raise was not
+applied, and the endpoint allowlist was not touched.**
