@@ -18,6 +18,7 @@ use std::sync::OnceLock;
 
 mod checked;
 mod formats;
+pub mod legacy;
 mod program;
 #[cfg(test)]
 mod tests;
@@ -197,6 +198,15 @@ impl Formula {
     pub fn compile_record(&self) -> Result<Program> {
         Program::compile_record(self)
     }
+    /// Compile the upstream `.op3` program against another pinned catalogue
+    /// (for example the legacy supplementary section).
+    pub fn compile_in(&self, catalogue: &'static Catalogue) -> Result<Program> {
+        Program::compile_in(catalogue, self)
+    }
+    /// Record-derived program against another pinned catalogue.
+    pub fn compile_record_in(&self, catalogue: &'static Catalogue) -> Result<Program> {
+        Program::compile_record_in(catalogue, self)
+    }
     /// Upstream program when usable, otherwise the record-derived fallback.
     pub fn compile_any(&self) -> Result<Program> {
         match self.compile() {
@@ -218,9 +228,9 @@ impl Formula {
             }
             map
         });
-        cache.get(self.id.as_str()).ok_or_else(|| {
-            EfdError::Unsupported(format!("{}: no executable program", self.id))
-        })
+        cache
+            .get(self.id.as_str())
+            .ok_or_else(|| EfdError::Unsupported(format!("{}: no executable program", self.id)))
     }
     /// Evaluate a reference program. No strings are evaluated as Rust or shell.
     /// Cache parameters with defining assumptions are derived if absent and

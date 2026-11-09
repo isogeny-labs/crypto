@@ -876,6 +876,75 @@ fn lean_chart_manifest_matches_catalogue() {
     }
 }
 
+/// The legacy extended Jacobi-quartic section is converted from the old EFD
+/// Magma programs and verified against the same pinned affine law.
+#[test]
+fn legacy_extended_quartic_formulas_match_affine_law() {
+    let c = legacy::catalogue();
+    assert_eq!(c.formulas.len(), 15);
+    let model = c.model("jquartic").unwrap();
+    let rep = c.representation("jquartic/extended").unwrap();
+    let params = Bindings::from([("a".into(), fe(2))]);
+    let points = model_points(model, &params);
+    assert!(points.len() > 8, "{} points", points.len());
+    let mut checked = 0;
+    for formula in &c.formulas {
+        let program = formula
+            .compile_in(c)
+            .unwrap_or_else(|e| panic!("{}: {e}", formula.id));
+        let mut passed = 0;
+        for k in 0..points.len() * points.len() {
+            if passed == 16 {
+                break;
+            }
+            let p = &points[k % points.len()];
+            let q = &points[(k / points.len() + k + 3) % points.len()];
+            let attempt = (|| -> Result<()> {
+                let mut inputs = params.clone();
+                let mut encoded_points: Vec<(u32, &Point2)> = vec![(1, p)];
+                let expected: Vec<(u32, Point2)> = match formula.operation.as_str() {
+                    "addition" => {
+                        encoded_points.push((2, q));
+                        vec![(3, oracle(model, "addition", &params, &[p, q])?)]
+                    }
+                    "doubling" => vec![(3, oracle(model, "doubling", &params, &[p])?)],
+                    "tripling" => {
+                        let doubled = oracle(model, "doubling", &params, &[p])?;
+                        vec![(3, oracle(model, "addition", &params, &[p, &doubled])?)]
+                    }
+                    "scaling" => vec![(2, p.clone())],
+                    other => panic!("uncovered operation {other}"),
+                };
+                for (index, point) in encoded_points {
+                    let encoded =
+                        rep.encode_affine(&modulus(), &params, &point[0], &point[1], &one())?;
+                    inputs.extend(rep.bind_point(&encoded, index));
+                }
+                let output = program.evaluate(&modulus(), &inputs)?;
+                for (index, point) in expected {
+                    assert_eq!(
+                        rep.project(&params, &output, index)?,
+                        projection(rep, &point),
+                        "{} k={k}",
+                        formula.id
+                    );
+                }
+                Ok(())
+            })();
+            match attempt {
+                Ok(()) => passed += 1,
+                Err(
+                    EfdError::ZeroDenominator | EfdError::OutsideChart | EfdError::Assumption(_),
+                ) => {}
+                Err(e) => panic!("{}: {e}", formula.id),
+            }
+        }
+        assert!(passed >= 8, "{}: only {passed}", formula.id);
+        checked += 1;
+    }
+    assert_eq!(checked, 15);
+}
+
 #[test]
 fn rejects_assumption_field_and_chart_mismatches() {
     let c = catalogue();

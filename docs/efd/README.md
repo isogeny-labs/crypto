@@ -9,7 +9,10 @@ sections, and both are imported:
 | `g1p` | GF(p), p odd | 10 | 33 | 471 | `prime_ecc::efd` |
 | **Total** | | **13** | **52** | **606** | |
 
-All 606 formulas are executable. In the prime section 463 run EFD's optimized
+All 606 current-EFD formulas are executable. A supplementary section adds 15
+formulas from the legacy EFD's extended Jacobi-quartic coordinates (the one
+coordinate system absent from the current sections), converted from its Magma
+programs and verified; see `prime-field.md`. In the prime section 463 run EFD's optimized
 `.op3` directly and 8 use a record-derived fallback because the served program is
 incomplete or contradicts its record (see `prime-field.md`).
 

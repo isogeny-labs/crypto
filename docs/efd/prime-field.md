@@ -146,6 +146,29 @@ doubling-oriented Jacobi quartic charts. A square root has two signs; the
 formulas are identities modulo those defining relations, so either choice is
 consistent, and callers that need a specific root can supply it.
 
+## Legacy supplementary section: extended Jacobi quartic
+
+The old EFD page `oldefd/extendedquartic.html` carries a coordinate system the
+current sections do not: **extended Jacobi-quartic coordinates**
+`(X:Y:Z:U:V:W:T)` with `x=X/Z`, `y=Y/Z^2`, `U=X^2`, `V=2XZ`, `W=Z^2`,
+`T=U+W`. Its Magma blocks were converted statement-for-statement into
+`src/prime_ecc/efd/legacy_catalogue.json`:
+
+- 15 formulas: 6 addition, 6 doubling, 2 tripling, 1 scaling.
+- Program text and its SHA-256 are pinned per formula; the page URL is the
+  provenance. The page has no `.op3` files, so this is the only machine-readable
+  form of these formulas.
+- Parameters are derived from each block's setup: `b=-2a` or `b=a^2-1`,
+  `epsilon=1`, `delta=-a`, and `alpha^2+delta^2=1` (Tonelli--Shanks).
+- `jquartic/extended` is implemented in `formats.rs` (encode + project, caches
+  from the chart relations) and verified against the pinned Jacobi-quartic
+  affine law at `p = 109` by
+  `legacy_extended_quartic_formulas_match_affine_law`.
+
+These formulas are supplementary: they are not part of the current-EFD counts
+(606) and are not in the Lean manifest, which pins only the 33 current charts.
+With them the repository carries **621 machine-readable EFD formulas**.
+
 ## Formal verification of the chart maps
 
 `research/efd_coordinate_charts_20261108/Charts.lean` machine-checks the
