@@ -1,0 +1,88 @@
+{
+  "schema": "prime-leads.validation/v1",
+  "source_commit": "31410711806e73aed58cbc2bd74ed60b93de3572",
+  "base": "4bf664c0d9da0dae721b6314b71cd0e0c48aa979",
+  "phases": {
+    "cycle2-clippy": 0,
+    "cycle2-lib": 0,
+    "controls": 0,
+    "format": 0,
+    "supervisor": 0,
+    "lean-build": 0,
+    "cycle2-build": 0,
+    "lean-kernel": 0,
+    "rust-build": 0,
+    "strict-clippy": 0,
+    "lean-gate": 0,
+    "cycle2-controls": 0
+  },
+  "source_files": {
+    "research/prime_leads_new_cycle_20261109/controls.rs": {
+      "sha256": "879000c276a68428ffdd52091e2c31d488e731b7816319df912d4654ceb4700f",
+      "git_object": "7360fd7abe3a7f41904ed5c93b7b58522937cca5"
+    },
+    "research/prime_leads_new_cycle_20261109/anchor_cycle2.rs": {
+      "sha256": "b113381fc5b9cefea3edb89fe108c67be97808126a5fcbd25e7d5927b4038d17",
+      "git_object": "f2a893c473ed20b699c03795a00bed532dabeb78"
+    },
+    "research/prime_leads_new_cycle_20261109/lean/BinaryPrimitiveGuard.lean": {
+      "sha256": "fa05f888f1c4c17e65d5e3f6a4b51f680aa0ffc900405ac88ecc046f4075e44e",
+      "git_object": "e9b791af08c1667b54ffb45bfc00298724713b45"
+    },
+    "research/prime_leads_new_cycle_20261109/lean/lakefile.toml": {
+      "sha256": "5b5854455cf75fee218be651a33e6516b8a55be2cab58723ba54243e07891334",
+      "git_object": "236b212c43d5dd5d1a1a1d48f3f57c28e73c71e6"
+    },
+    "research/prime_leads_new_cycle_20261109/lean/lake-manifest.json": {
+      "sha256": "2dbce3fe784dea762058cf4cfe5dccf26f8884233df874e6697a5649ba9330a4",
+      "git_object": "b6e6ba3c84337472e2e6b07e5edbfd24c5719b70"
+    },
+    "research/prime_leads_new_cycle_20261109/lean/lean-toolchain": {
+      "sha256": "d5edba4e4b8faad9c1baeadb265716d20d03be4d1a2647dc5e35b0c0325bea7b",
+      "git_object": "ba8ebf2dbaf6a668cd2a0e086186d6d569b69ff5"
+    }
+  },
+  "native": {
+    "control_functions": 8,
+    "passed": 8,
+    "failed": 0,
+    "ignored": 0,
+    "H1_primary_cases": 1520,
+    "H2_distinct_fixture_candidates": 48,
+    "H3_directions": 361,
+    "H3_isolating": 342,
+    "H3_ambiguous": 19,
+    "counts_are_not_total_work_or_prices": true
+  },
+  "binaries": [
+    "45b3b963d1e5c12015cabc48fa37112eb7ab1bdb9e394760c6ab94d23c56a91d  /workspace/prime-leads-cycle-20261109/native-final-v2/controls-tests",
+    "daeae80290f091c88605a71bd4b97461132ba65729f630c8356095d6c78cafd0  /workspace/prime-leads-cycle-20261109/native-final-v2/controls-clippy",
+    "7d5b4002d7f356c93969bd5c5f024c0e9f9b0090450d745be1970a8052eabbcc  /workspace/prime-leads-cycle-20261109/native-final-v2/anchor-tests",
+    "bff798af76208335d1191ea958ca989debcfea2219afe1d4e590b58c80fe66e6  /workspace/prime-leads-cycle-20261109/native-final-v2/anchor-clippy",
+    "913e79bd52d70a9edca1232db2ab09933c038d4d32a303470c3d13d38abad3bb  /workspace/prime-leads-cycle-20261109/native-final-v2/liblead_controls.rlib"
+  ],
+  "formal": {
+    "explicit_theorems": 2,
+    "audited_declarations": 2,
+    "trusted_exceptions": 0,
+    "mathlib": "d13f23b723b8a846827a245b89c10fc7d3f11612",
+    "lean": "4.34.1",
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "kernel_replay": "official module replay against imports, not --fresh"
+  },
+  "earlier_attempts": [
+    "cycle1-initial format1",
+    "cycle2-doclint strictdoclint1"
+  ],
+  "scientific_panels": 0,
+  "comparison_admissible": false,
+  "cost": null,
+  "gae": null,
+  "scaling": null,
+  "library_or_production_backend_qualification": false,
+  "p20_replay": "unrun; canonical raw pull missing configured credentials"
+}

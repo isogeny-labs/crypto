@@ -153,3 +153,31 @@ and19 ambiguous directions. [anchor_cycle2.rs](anchor_cycle2.rs) and the new
 [final recipe](validation/final/validate.sh) are committed before execution.
 No H3 result is claimed here. Canonical P20 input read stopped at missing
 configured credentials; no raw records or replay were obtained.
+
+
+## Final source-bound results
+
+On final source `31410711806e73aed58cbc2bd74ed60b93de3572`, all eight native
+control functions pass, both standalone strict-clippy targets pass and format
+passes. H1 matches the independent reference over its1,520 primary cases; H2
+preserves coverage/equations over48 fixture candidates; H3 agrees for361 anchor
+directions,342 isolating and19 ambiguous. Fixture/reference/repeated executions
+are additional work; these are not total-price measurements. Exact captures and
+source/binary bindings are in [the final receipt](validation/final-v2/receipt.json).
+PCC-20261109-f7aa99 is an unsigned producer observation. [pcc:unverified]
+
+The Mathlib-only project builds and its official scoped gate audits two
+declarations with zero trusted exceptions. Official module kernel replay passes
+against imports, not `--fresh`. The positive-depth theorem's canonical local PCC
+verifier also returns0; both theorem standings remain2/unverified without an
+independent signed verdict. See [bindings](validation/final-v2/formal-claim-bindings.json),
+[local verdict](validation/final-v2/headline-pcc.json) and
+[standings](validation/final-v2/standing.json). Theorem IDs are
+PCC-20261109-8b4132 and PCC-20261109-ff6e2a. [pcc:unverified]
+
+The recorded first formatting failure and second strict-doclint failure remain
+immutable in the earlier receipts. Their layout-only fixes preserve the fixed
+mathematical criteria. The final recipe uses a new source pin and output
+directory. Original five-sum replay is still unrun because canonical input
+access has no configured credentials. H4 label geometry is the next unrun
+hypothesis; production anchor provenance/attachment remains an independent task.
