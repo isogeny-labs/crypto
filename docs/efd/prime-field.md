@@ -154,10 +154,12 @@ current sections do not: **extended Jacobi-quartic coordinates**
 `T=U+W`. Its Magma blocks were converted statement-for-statement into
 `src/prime_ecc/efd/legacy_catalogue.json`:
 
-- 15 formulas: 6 addition, 6 doubling, 2 tripling, 1 scaling.
-- Program text and its SHA-256 are pinned per formula; the page URL is the
-  provenance. The page has no `.op3` files, so this is the only machine-readable
-  form of these formulas.
+- 15 formulas: 6 addition, 6 doubling, 2 tripling, 1 scaling, named after their
+  authors (for example `2007-duquesne-page-103-table-1`).
+- Each record keeps the raw Magma block and its SHA-256; each program keeps the
+  converted straight-line text and its SHA-256. The upstream HTML page hash
+  (`c0d4a89f...`) is pinned in the catalogue and in `legacy::SOURCE_PAGE_SHA256`.
+  The page has no `.op3` files, so this is the only machine-readable form.
 - Parameters are derived from each block's setup: `b=-2a` or `b=a^2-1`,
   `epsilon=1`, `delta=-a`, and `alpha^2+delta^2=1` (Tonelli--Shanks).
 - `jquartic/extended` is implemented in `formats.rs` (encode + project, caches
@@ -182,6 +184,10 @@ YZ charts); the identities are characteristic-independent.
 The manifest at the end of that file pins all 33 chart ids to their proof
 family, and the Rust test `lean_chart_manifest_matches_catalogue` fails if the
 manifest, the catalogue id set, or the family dispatch in `formats.rs` drift.
+
+The family codes are also tied to the actual encoders: `chart_family_constants_match_encode`
+checks that each chart writes `X = x*z^a`, `Y = y*z^b` (or `z/x`, `z/y`,
+`r*y*z`, ...) with the exponents the corresponding Lean theorem proves.
 
 ```sh
 bash tools/lean/proof-gate.sh research/efd_coordinate_charts_20261108/Charts.lean
@@ -260,6 +266,10 @@ two. Costs from a fallback program are record costs, not EFD's optimized counts.
 - `encode_affine`/`encode_jintersection` are coordinate maps. They do not by
   themselves assert curve membership; use `Model::on_model` when that check is
   wanted (the checked short-Weierstrass adapter always performs it).
+- The sweeps run at two primes: the default `p = 109` and `EFD_TEST_P=97`.
+- `tools/efd` builds again (the check target stubs the cryptanalysis ledger and
+  the prime-field Certicom lookup). `tools/efd/replay.sh G1P_CACHE G12O_CACHE` regenerates
+  both catalogues and diffs them, ignoring the retrieval date.
 - Only short Weierstrass has an adapter to the crate's existing curve law.
   The other nine models are verified against the pinned EFD affine records;
   for `2dik` that record was observed not to reproduce the short-Weierstrass

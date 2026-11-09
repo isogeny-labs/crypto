@@ -19,3 +19,9 @@ pub fn catalogue() -> &'static Catalogue {
             .expect("checked legacy EFD catalogue")
     })
 }
+
+/// SHA-256 of the upstream `extendedquartic.html` page these programs were
+/// converted from. Pinned so a re-conversion can be checked against the same
+/// source bytes.
+pub const SOURCE_PAGE_SHA256: &str =
+    "c0d4a89fcf346bd03c875adfda2f6a820fbd3435d417128d7d8f89135ec9a28b";

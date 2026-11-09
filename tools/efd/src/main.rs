@@ -212,7 +212,7 @@ fn run() -> Result<(), String> {
         Characteristic::Two => json!(2),
         Characteristic::Prime => json!("p"),
     };
-    let out = json!({"schema":section.schema,"section":section.name,
+    let out = json!({"schema":section.schema,
         "source_url":format!("{}index.html", section.base),
         "retrieved":retrieved.trim(),"characteristic":characteristic,
         "models":model_records,"representations":representations,"formulas":formulas});

@@ -84,6 +84,10 @@ pub struct Catalogue {
     pub schema: String,
     #[serde(default)]
     pub section: Option<String>,
+    /// SHA-256 of the upstream HTML page, when the section is derived from a
+    /// legacy page rather than the record/program file layout.
+    #[serde(default)]
+    pub source_page_sha256: Option<String>,
     pub source_url: String,
     /// The EFD section marker. Characteristic two catalogues use `2`; this one
     /// uses the string `"p"`.
