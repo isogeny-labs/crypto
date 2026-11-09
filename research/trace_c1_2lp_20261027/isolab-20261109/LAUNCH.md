@@ -22,3 +22,4 @@ priced end-to-end IC result.
 ## Dispatch log
 
 Filled in after each dispatch: UTC time, workflow run ID, outcome.
+- 2026-11-09T14:55:14Z: `reference-d5.json` dispatched, workflow run 42639382601 (run #214, attempt 1), head f07b6d3e4e. The d2–d4 dispatches are held until #214 shows whether the route completes end to end.
