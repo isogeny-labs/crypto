@@ -1,6 +1,6 @@
 name = "common_scalar"
 version = "0.1.0"
-defaultTargets = ["CommonScalar", "RationalScalar", "LocalIntegral", "LocalCharts", "GlobalPolynomials", "LocalPrecision", "FiniteBuffers", "ResidueEncoding", "BooleanContraction", "PackedContraction", "NodeMultiplicity", "HermiteUniqueness", "HermiteBasis", "HermiteGrid", "HermiteValuation", "HermiteMoment", "HermiteError", "HermiteReconstruction", "IntegralRecovery", "FiniteRecovery"]
+defaultTargets = ["CommonScalar", "RationalScalar", "LocalIntegral", "LocalCharts", "GlobalPolynomials", "LocalPrecision", "FiniteBuffers", "ResidueEncoding", "BooleanContraction", "PackedContraction", "NodeMultiplicity", "HermiteUniqueness", "HermiteBasis", "HermiteGrid", "HermiteValuation", "HermiteMoment", "HermiteError", "HermiteReconstruction", "IntegralRecovery", "FiniteRecovery", "BufferBudget"]
 [[require]]
 name = "CryptoLean"
 git = "https://github.com/aburan28/crypto-lean.git"
@@ -70,3 +70,6 @@ name = "IntegralRecovery"
 
 [[lean_lib]]
 name = "FiniteRecovery"
+
+[[lean_lib]]
+name = "BufferBudget"
