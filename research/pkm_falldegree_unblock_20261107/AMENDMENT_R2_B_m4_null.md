@@ -1,8 +1,8 @@
-# DRAFT Amendment R2-B (proposed number 11): the shape-matched `m = 4` null at `t = 4, 5`
+# DRAFT Amendment R2-B (proposed number 12): the shape-matched `m = 4` null at `t = 4, 5`
 
 **Status: draft, NOT applied, NOT frozen. Requires amendment freeze.** Written 2026-11-08 (round 2, slug `r2pkm`) for decision 6
 of `research/open_leads_execution_20261108/DECISIONS.md`. Target file when frozen:
-`research/prime_fall_degree_20261027/PREREGISTRATION.md` (append as "Amendment 11", with the freeze date; renumbered from 10 on 2026-11-08, because R2-C was frozen first as Amendment 9). Every number is
+`research/prime_fall_degree_20261027/PREREGISTRATION.md` (append as "Amendment 12", with the freeze date; renumbered from 10 on 2026-11-08, because R2-C was frozen first as Amendment 9, and from 11 on 2026-11-09, because R2-D was frozen first as Amendment 11). Every number is
 `[pcc:unverified]`. Classes: *cited* (a file says so), *measured* (read from source or a command), *derived*, *plan*.
 
 ## 1. Timing and independence
