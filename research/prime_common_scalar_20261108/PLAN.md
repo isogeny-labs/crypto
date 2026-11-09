@@ -134,3 +134,22 @@ Next refine canonical scaled modular extraction and odd-part coefficient
 construction from replay/ACCUMULATOR_NEXT.md, retaining coordinate and full
 recursive cost obligations separately. Native correctness evidence is scoped
 to this finite sparse-fixture domain.
+
+## Nov9 actual chart-unit bridge and broad-goal dependency
+
+ChartUnits derives actual even chart ratios, characteristic2 polynomial
+reductions, actual old-normalizer evaluation, even remainders, and unit
+evaluation at every substitution in arbitrary coefficient targets with
+nilpotent2. Constructed finite normalized entries and scalar-square entries
+have one common unit comparison and preserve all scalar divisibility
+thresholds. Source7bb276623; actual source audit310 declarations,0 extra trusted
+axioms; fresh import-inclusive replay exit0. Report:
+reports/chart-units-20261109/REPORT.md [pcc:unverified].
+
+This closes the actual finite normalizer-unit premise. The broad goal still
+requires a complete executable evaluator and prime-field reduction whose
+uniform expected bit cost is exp(o(n)) for ECDLP input length n, or an
+applicable unrestricted non-generic lower-bound argument. Source network size
+s and ECDLP input length n cannot be identified without that reduction.
+Existing family-specific origin facts and finite records supply neither side
+of the existential/nonexistential target [pcc:unverified].
