@@ -126,3 +126,8 @@ $(BUILD_DIR)/block-tune-mutate: block_tune_mutate.cpp json.hpp
 	$(CXX) $(CXXFLAGS) block_tune_mutate.cpp -o $@ -lcrypto
 block-tune-mutate-binary: $(BUILD_DIR)/block-tune-mutate
 .PHONY: block-tune-mutate-binary
+$(BUILD_DIR)/block-compact-qual: block_compact_qual.cpp block_compact.hpp block_qual.cpp block_core.hpp cache_core.hpp native.cpp json.hpp relation_verify.hpp orbit_verify.hpp
+	mkdir -p $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) block_compact_qual.cpp -o $@ -lcrypto -lgmpxx -lgmp
+block-compact-qual-binary: $(BUILD_DIR)/block-compact-qual
+.PHONY: block-compact-qual-binary
