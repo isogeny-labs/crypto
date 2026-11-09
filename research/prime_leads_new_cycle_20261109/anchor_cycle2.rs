@@ -25,6 +25,7 @@
 //!    19 ambiguous cases, and rank 6 versus 5 respectively for the query system.
 //!    Left-pivot rank and independent right-pivot inverse-free reference rank
 //!    must agree for every collision/query/anchor/target-unit matrix.
+//!
 //! Stop on any mismatch. Preserve failures rather than weakening expectations.
 //! This is a finite linear-information control, not a new ECDLP complexity,
 //! global novelty, scientific-panel, timing, cost, pricing or execution claim.
