@@ -377,3 +377,17 @@ ratio ≥ 1.8; otherwise the screening saving is reported as not confirmed.
 factor on a restricted curve family, and the crossover figure is moved only if a
 measured ratio is applied explicitly and labelled as such. Predictor ≠ cost: stage 1
 alone proves nothing about S.
+
+### Amendment 6, stage 1 result and stage 2 launch (2026-11-09)
+
+Stage 1 ran (26 primes × 200 curves = 5,200 curves, none exhausted; an interrupted
+p = 269 partial of 6 lines was dropped and p = 269, 277, 281, 293 re-run, see
+`scan/NOTE.txt`). Against the frozen predictions: S1 holds (rung mean of
+columns/p 0.46–0.50, SD falls from 0.116 at p = 29 to 0.040–0.045 at p ≥ 269);
+S3 holds (200 curves everywhere); S2 holds for p ≥ 53 (top-5% mean over median
+1.15–1.34, model saving 1.9–3.5×) and misses at p ≤ 41 (1.40–1.45, 4.3–4.9×,
+just above the 1.4 / 4.2× bound). The model saving *falls* with p (4.3× at
+p = 29, 2.6× at p = 101, 1.9× at p = 293). Stage 2 is launched by
+`make_specs_scan.sh` (12 jobs, selection frozen in `scan/summary.json`) and run
+by `run_queue6.sh` (a copy of `run_queue5.sh` with its own counter), four
+workers, start window 24 h, binary unchanged (sha256 `8627cd29…`).
