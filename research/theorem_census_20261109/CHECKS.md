@@ -1,6 +1,19 @@
 # Current additive proof and validation receipts
 
-The current census gate passes291declarations,0failing and0trusted-native
+The current census gate passes308declarations,0failing and0trusted-native
+exceptions. RecursiveSemaevDegree.lean defines the actual canonical family
+and proves last-input degree2^(m−2)for every aritym≥3, successor coefficient
+square, actual S3base evaluation and exact canonical S4bridge. Packet3bc113
+pins the explicit combined theorem. FixedD8scalar supplementIDC1h0872017c01480c3d
+accepts32derived/11extra points only for its monic-square resultant identity;
+the all-arity conclusion rests on Lean. See RECURSIVE_SEMAEV_DEGREE.md and
+evidence/recursive-semaev-degree-gate.log. [pcc:unverified]
+
+The full local packet3bc113check passes18:58:23Zat source196d2fac, still
+unsigned. Source preceded issue and the native proof-file pointer matches.
+See recursive-semaev-degree-verification.json. [pcc:unverified]
+
+The preceding census gate passes291declarations,0failing and0trusted-native
 exceptions. ResultantDegreeStep.lean proves the actual fixed-size arbitraryD
 coefficient/degree step and canonical S5last-input degree8; it refutes
 resetting the declared size after specialization. Packet621d56pins the
@@ -29,10 +42,10 @@ the exact proof-file digest matches. See s4-degree-verification.json for
 source/gate/packet/native bindings. No source changed after those checks.
 [pcc:unverified]
 
-Fresh18:37Zread-only ledger comparison:483main rows and484local rows,
-common prefix457, neither a prefix of the other. Main ref50fa6a02has the
+Fresh19:00Zread-only ledger comparison:483main rows and485local rows,
+common prefix457, neither a prefix of the other. Main ref6713d2a8has the
 same ledgerblob1f8804d3; parent3739remains open/unmerged. See
-evidence/main-ledger-resultant-degree-step.json. The earlier17:30receipt
+evidence/main-ledger-recursive-semaev-degree.json. The earlier17:30receipt
 preserves its483/483row snapshot; equal counts were not equal histories.
 No history selected/rechained and no force push. [pcc:unverified]
 
@@ -97,6 +110,7 @@ already excludes the F2/r2control by gcd(r,q)=1. [pcc:unverified]
 
 | Component | Gate result | Exact receipt |
 |---|---|---|
+| Census, defined canonical family and every-arity last-input degree | 308pass,0fail,0trusted | evidence/recursive-semaev-degree-gate.log |
 | Census, general fixed-size degree step and canonical S5last input | 291pass,0fail,0trusted | evidence/resultant-degree-step-gate.log |
 | Census, S4degree/leading coefficient and specialization control | 259pass,0fail,0trusted | evidence/s4-degree-gate.log |
 | Census, composite-order conditional arithmetic and actual point | 205pass,0fail,0trusted | evidence/composite-torsion-gate.log |

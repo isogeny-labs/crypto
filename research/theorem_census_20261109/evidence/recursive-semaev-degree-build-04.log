@@ -1,0 +1,40 @@
+Try this:
+  [apply] ring_nf
+  
+  The `ring` tactic failed to close the goal. Use `ring_nf` to obtain a normal form.
+    
+  Note that `ring` works primarily in *commutative* rings. If you have a noncommutative ring, abelian group or module, consider using `noncomm_ring`, `abel` or `module` instead.
+RecursiveSemaevDegree.lean:38:25: error: unsolved goals
+K : Type u
+inst✝ : Field K
+W : WeierstrassCurve.Affine K
+t : ↑(InputRing K 0)
+⊢ -(eval t (C pairX) * eval t (C pairY) * t * eval t (C (liftPair (WeierstrassCurve.b₂ W)))) -
+                              eval t (C pairX) * eval t (C pairY) * t ^ 2 * 2 -
+                            eval t (C pairX) * eval t (C pairY) * eval t (C (liftPair (WeierstrassCurve.b₄ W))) -
+                          eval t (C pairX) * eval t (C pairY) ^ 2 * t * eval t (C 2) -
+                        eval t (C pairX) * t * eval t (C (liftPair (WeierstrassCurve.b₄ W))) -
+                      eval t (C pairX) * eval t (C (liftPair (WeierstrassCurve.b₆ W))) -
+                    eval t (C pairX) ^ 2 * eval t (C pairY) * t * eval t (C 2) +
+                  eval t (C pairX) ^ 2 * eval t (C pairY) ^ 2 +
+                eval t (C pairX) ^ 2 * t ^ 2 -
+              eval t (C pairY) * t * eval t (C (liftPair (WeierstrassCurve.b₄ W))) -
+            eval t (C pairY) * eval t (C (liftPair (WeierstrassCurve.b₆ W))) +
+          eval t (C pairY) ^ 2 * t ^ 2 -
+        t * eval t (C (liftPair (WeierstrassCurve.b₆ W))) -
+      eval t (C (liftPair (WeierstrassCurve.b₈ W))) =
+    -(t * pairX * pairY * liftPair (WeierstrassCurve.b₂ W)) - t * pairX * pairY ^ 2 * 2 -
+                            t * pairX * liftPair (WeierstrassCurve.b₄ W) -
+                          t * pairX ^ 2 * pairY * 2 -
+                        t * pairY * liftPair (WeierstrassCurve.b₄ W) -
+                      t * liftPair (WeierstrassCurve.b₆ W) -
+                    t ^ 2 * pairX * pairY * 2 +
+                  t ^ 2 * pairX ^ 2 +
+                t ^ 2 * pairY ^ 2 -
+              pairX * pairY * liftPair (WeierstrassCurve.b₄ W) -
+            pairX * liftPair (WeierstrassCurve.b₆ W) +
+          pairX ^ 2 * pairY ^ 2 -
+        pairY * liftPair (WeierstrassCurve.b₆ W) -
+      liftPair (WeierstrassCurve.b₈ W)
+'RecursiveSemaevDegreeAudit.recursivePolynomial_natDegree' depends on axioms: [propext, Classical.choice, Quot.sound]
+'RecursiveSemaevDegreeAudit.all_arities_last_input_degree' depends on axioms: [propext, Classical.choice, Quot.sound]

@@ -170,3 +170,16 @@ exceptions. See
 This narrows the earlier m5degree gap to the remaining input positions;
 general all-mfamily/zero-sum recursion, every-input degrees and irreducibility
 remain open. No asymptotic or complexity conclusion follows. [pcc:unverified]
+
+### 2026-11-09 every-arity last-input degree
+
+The canonical family is now defined using actual independent polynomial
+coefficient rings and fixed-size Sylvester-resultant successors. Lean
+proves last-input degree2^(m−2)for every aritym≥3, the successor coefficient
+square and an exact equality with canonical S4at arity4. Whole census gate
+308passes,0failing/0trusted-native exceptions. See
+[source and scope](../research/theorem_census_20261109/RECURSIVE_SEMAEV_DEGREE.md).
+This closes the earlier all-arity family-definition/last-input-degree gap.
+The other input degrees beyondS4, symmetry, all-mgeometric zero-sum
+equivalence and irreducibility remain open, along with the other original
+requirements. [pcc:unverified]

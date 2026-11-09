@@ -1,0 +1,641 @@
+RecursiveSemaevDegree.lean:15:21: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Semiring K
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+RecursiveSemaevDegree.lean:16:11: error(lean.synthInstanceFailed): failed to synthesize instance of type class
+  Semiring (InputRing K n)
+
+Hint: Type class instance resolution failures can be inspected with the `set_option trace.Meta.synthInstance true` command.
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._aux_1' has type
+  {K : Type u_1} → [inst : Field K] → Polynomial (Polynomial K)
+but it is expected to have type
+  {K : Type u_1} → [Field K] → InputRing K 0
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._aux_3' has type
+  {K : Type u_1} → [inst : Field K] → Polynomial (Polynomial K) → Polynomial (Polynomial K) → Polynomial (Polynomial K)
+but it is expected to have type
+  {K : Type u_1} → [Field K] → InputRing K 0 → InputRing K 0 → InputRing K 0
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_5' has type
+  ∀ {K : Type u_1} [inst : Field K] (a b c : Polynomial (Polynomial K)), a + b + c = a + (b + c)
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K] (a b c : InputRing K 0), a + b + c = a + (b + c)
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_6' has type
+  ∀ {K : Type u_1} [inst : Field K] (a : Polynomial (Polynomial K)), 0 + a = a
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K] (a : InputRing K 0), 0 + a = a
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_7' has type
+  ∀ {K : Type u_1} [inst : Field K] (a : Polynomial (Polynomial K)), a + 0 = a
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K] (a : InputRing K 0), a + 0 = a
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._aux_8' has type
+  {K : Type u_1} → [inst : Field K] → ℕ → Polynomial (Polynomial K) → Polynomial (Polynomial K)
+but it is expected to have type
+  {K : Type u_1} → [Field K] → ℕ → InputRing K 0 → InputRing K 0
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_10' has type
+  ∀ {K : Type u_1} [inst : Field K],
+    autoParam (∀ (x : Polynomial (Polynomial K)), 0 • x = 0) AddMonoid.nsmul_zero._autoParam
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K], autoParam (∀ (x : InputRing K 0), 0 • x = 0) AddMonoid.nsmul_zero._autoParam
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_11' has type
+  ∀ {K : Type u_1} [inst : Field K],
+    autoParam (∀ (n : ℕ) (x : Polynomial (Polynomial K)), (n + 1) • x = n • x + x) AddMonoid.nsmul_succ._autoParam
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K],
+    autoParam (∀ (n : ℕ) (x : InputRing K 0), (n + 1) • x = n • x + x) AddMonoid.nsmul_succ._autoParam
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_12' has type
+  ∀ {K : Type u_1} [inst : Field K] (a b : Polynomial (Polynomial K)), a + b = b + a
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K] (a b : InputRing K 0), a + b = b + a
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._aux_13' has type
+  {K : Type u_1} → [inst : Field K] → Polynomial (Polynomial K)
+but it is expected to have type
+  {K : Type u_1} → [Field K] → InputRing K 0
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._aux_15' has type
+  {K : Type u_1} → [inst : Field K] → Polynomial (Polynomial K) → Polynomial (Polynomial K) → Polynomial (Polynomial K)
+but it is expected to have type
+  {K : Type u_1} → [Field K] → InputRing K 0 → InputRing K 0 → InputRing K 0
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_17' has type
+  ∀ {K : Type u_1} [inst : Field K] (a b c : Polynomial (Polynomial K)), a * b * c = a * (b * c)
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K] (a b c : InputRing K 0), a * b * c = a * (b * c)
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_18' has type
+  ∀ {K : Type u_1} [inst : Field K] (a : Polynomial (Polynomial K)), 1 * a = a
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K] (a : InputRing K 0), 1 * a = a
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_19' has type
+  ∀ {K : Type u_1} [inst : Field K] (a : Polynomial (Polynomial K)), a * 1 = a
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K] (a : InputRing K 0), a * 1 = a
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._aux_20' has type
+  {K : Type u_1} → [inst : Field K] → ℕ → Polynomial (Polynomial K) → Polynomial (Polynomial K)
+but it is expected to have type
+  {K : Type u_1} → [Field K] → ℕ → InputRing K 0 → InputRing K 0
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_22' has type
+  ∀ {K : Type u_1} [inst : Field K],
+    autoParam (∀ (x : Polynomial (Polynomial K)), x ^ 0 = 1) Monoid.npow_zero._autoParam
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K], autoParam (∀ (x : InputRing K 0), x ^ 0 = 1) Monoid.npow_zero._autoParam
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_23' has type
+  ∀ {K : Type u_1} [inst : Field K],
+    autoParam (∀ (n : ℕ) (x : Polynomial (Polynomial K)), x ^ (n + 1) = x ^ n * x) Monoid.npow_succ._autoParam
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K],
+    autoParam (∀ (n : ℕ) (x : InputRing K 0), x ^ (n + 1) = x ^ n * x) Monoid.npow_succ._autoParam
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_24' has type
+  ∀ {K : Type u_1} [inst : Field K] (a : Polynomial (Polynomial K)), 0 * a = 0
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K] (a : InputRing K 0), 0 * a = 0
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_25' has type
+  ∀ {K : Type u_1} [inst : Field K] (a : Polynomial (Polynomial K)), a * 0 = 0
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K] (a : InputRing K 0), a * 0 = 0
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_26' has type
+  ∀ {K : Type u_1} [inst : Field K] (a b c : Polynomial (Polynomial K)), a * (b + c) = a * b + a * c
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K] (a b c : InputRing K 0), a * (b + c) = a * b + a * c
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_27' has type
+  ∀ {K : Type u_1} [inst : Field K] (a b c : Polynomial (Polynomial K)), (a + b) * c = a * c + b * c
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K] (a b c : InputRing K 0), (a + b) * c = a * c + b * c
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._aux_28' has type
+  {K : Type u_1} → [inst : Field K] → ℕ → Polynomial (Polynomial K)
+but it is expected to have type
+  {K : Type u_1} → [Field K] → ℕ → InputRing K 0
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_30' has type
+  ∀ {K : Type u_1} [inst : Field K], autoParam (↑0 = 0) AddMonoidWithOne.natCast_zero._autoParam
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K], autoParam (↑0 = 0) AddMonoidWithOne.natCast_zero._autoParam
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_31' has type
+  ∀ {K : Type u_1} [inst : Field K], autoParam (∀ (n : ℕ), ↑(n + 1) = ↑n + 1) AddMonoidWithOne.natCast_succ._autoParam
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K], autoParam (∀ (n : ℕ), ↑(n + 1) = ↑n + 1) AddMonoidWithOne.natCast_succ._autoParam
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._aux_32' has type
+  {K : Type u_1} → [inst : Field K] → Polynomial (Polynomial K) → Polynomial (Polynomial K)
+but it is expected to have type
+  {K : Type u_1} → [Field K] → InputRing K 0 → InputRing K 0
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._aux_34' has type
+  {K : Type u_1} → [inst : Field K] → Polynomial (Polynomial K) → Polynomial (Polynomial K) → Polynomial (Polynomial K)
+but it is expected to have type
+  {K : Type u_1} → [Field K] → InputRing K 0 → InputRing K 0 → InputRing K 0
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._aux_36' has type
+  {K : Type u_1} → [inst : Field K] → ℤ → Polynomial (Polynomial K) → Polynomial (Polynomial K)
+but it is expected to have type
+  {K : Type u_1} → [Field K] → ℤ → InputRing K 0 → InputRing K 0
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_38' has type
+  ∀ {K : Type u_1} [inst : Field K],
+    autoParam (∀ (a b : Polynomial (Polynomial K)), a - b = a + -b) SubNegMonoid.sub_eq_add_neg._autoParam
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K],
+    autoParam (∀ (a b : InputRing K 0), a - b = a + -b) SubNegMonoid.sub_eq_add_neg._autoParam
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_39' has type
+  ∀ {K : Type u_1} [inst : Field K],
+    autoParam (∀ (a : Polynomial (Polynomial K)), 0 • a = 0) SubNegMonoid.zsmul_zero'._autoParam
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K], autoParam (∀ (a : InputRing K 0), 0 • a = 0) SubNegMonoid.zsmul_zero'._autoParam
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_40' has type
+  ∀ {K : Type u_1} [inst : Field K],
+    autoParam (∀ (n : ℕ) (a : Polynomial (Polynomial K)), ↑n.succ • a = ↑n • a + a) SubNegMonoid.zsmul_succ'._autoParam
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K],
+    autoParam (∀ (n : ℕ) (a : InputRing K 0), ↑n.succ • a = ↑n • a + a) SubNegMonoid.zsmul_succ'._autoParam
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_41' has type
+  ∀ {K : Type u_1} [inst : Field K],
+    autoParam (∀ (n : ℕ) (a : Polynomial (Polynomial K)), Int.negSucc n • a = -(↑n.succ • a))
+      SubNegMonoid.zsmul_neg'._autoParam
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K],
+    autoParam (∀ (n : ℕ) (a : InputRing K 0), Int.negSucc n • a = -(↑n.succ • a)) SubNegMonoid.zsmul_neg'._autoParam
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_42' has type
+  ∀ {K : Type u_1} [inst : Field K] (a : Polynomial (Polynomial K)), -a + a = 0
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K] (a : InputRing K 0), -a + a = 0
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._aux_43' has type
+  {K : Type u_1} → [inst : Field K] → ℤ → Polynomial (Polynomial K)
+but it is expected to have type
+  {K : Type u_1} → [Field K] → ℤ → InputRing K 0
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_45' has type
+  ∀ {K : Type u_1} [inst : Field K],
+    autoParam (∀ (n : ℕ), IntCast.intCast ↑n = ↑n) AddGroupWithOne.intCast_ofNat._autoParam
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K],
+    autoParam (∀ (n : ℕ), IntCast.intCast ↑n = ↑n) AddGroupWithOne.intCast_ofNat._autoParam
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_46' has type
+  ∀ {K : Type u_1} [inst : Field K],
+    autoParam (∀ (n : ℕ), IntCast.intCast (Int.negSucc n) = -↑(n + 1)) AddGroupWithOne.intCast_negSucc._autoParam
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K],
+    autoParam (∀ (n : ℕ), IntCast.intCast (Int.negSucc n) = -↑(n + 1)) AddGroupWithOne.intCast_negSucc._autoParam
+RecursiveSemaevDegree.lean:20:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_47' has type
+  ∀ {K : Type u_1} [inst : Field K] (a b : Polynomial (Polynomial K)), a * b = b * a
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K] (a b : InputRing K 0), a * b = b * a
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._aux_48' has type
+  {K : Type u_1} → (n : ℕ) → (this : CommRing (InputRing K n)) → Polynomial (InputRing K n)
+but it is expected to have type
+  {K : Type u_1} → (n : ℕ) → CommRing (InputRing K n) → InputRing K (n + 1)
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._aux_50' has type
+  {K : Type u_1} →
+    (n : ℕ) →
+      (this : CommRing (InputRing K n)) →
+        Polynomial (InputRing K n) → Polynomial (InputRing K n) → Polynomial (InputRing K n)
+but it is expected to have type
+  {K : Type u_1} → (n : ℕ) → CommRing (InputRing K n) → InputRing K (n + 1) → InputRing K (n + 1) → InputRing K (n + 1)
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_52' has type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a b c : Polynomial (InputRing K n)), a + b + c = a + (b + c)
+but it is expected to have type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a b c : InputRing K (n + 1)), a + b + c = a + (b + c)
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_53' has type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a : Polynomial (InputRing K n)), 0 + a = a
+but it is expected to have type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a : InputRing K (n + 1)), 0 + a = a
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_54' has type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a : Polynomial (InputRing K n)), a + 0 = a
+but it is expected to have type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a : InputRing K (n + 1)), a + 0 = a
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._aux_55' has type
+  {K : Type u_1} →
+    (n : ℕ) → (this : CommRing (InputRing K n)) → ℕ → Polynomial (InputRing K n) → Polynomial (InputRing K n)
+but it is expected to have type
+  {K : Type u_1} → (n : ℕ) → CommRing (InputRing K n) → ℕ → InputRing K (n + 1) → InputRing K (n + 1)
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_57' has type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)),
+    autoParam (∀ (x : Polynomial (InputRing K n)), 0 • x = 0) AddMonoid.nsmul_zero._autoParam
+but it is expected to have type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)),
+    autoParam (∀ (x : InputRing K (n + 1)), 0 • x = 0) AddMonoid.nsmul_zero._autoParam
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_58' has type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)),
+    autoParam (∀ (n_1 : ℕ) (x : Polynomial (InputRing K n)), (n_1 + 1) • x = n_1 • x + x)
+      AddMonoid.nsmul_succ._autoParam
+but it is expected to have type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)),
+    autoParam (∀ (n_1 : ℕ) (x : InputRing K (n + 1)), (n_1 + 1) • x = n_1 • x + x) AddMonoid.nsmul_succ._autoParam
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_59' has type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a b : Polynomial (InputRing K n)), a + b = b + a
+but it is expected to have type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a b : InputRing K (n + 1)), a + b = b + a
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._aux_60' has type
+  {K : Type u_1} → (n : ℕ) → (this : CommRing (InputRing K n)) → Polynomial (InputRing K n)
+but it is expected to have type
+  {K : Type u_1} → (n : ℕ) → CommRing (InputRing K n) → InputRing K (n + 1)
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._aux_62' has type
+  {K : Type u_1} →
+    (n : ℕ) →
+      (this : CommRing (InputRing K n)) →
+        Polynomial (InputRing K n) → Polynomial (InputRing K n) → Polynomial (InputRing K n)
+but it is expected to have type
+  {K : Type u_1} → (n : ℕ) → CommRing (InputRing K n) → InputRing K (n + 1) → InputRing K (n + 1) → InputRing K (n + 1)
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_64' has type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a b c : Polynomial (InputRing K n)), a * b * c = a * (b * c)
+but it is expected to have type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a b c : InputRing K (n + 1)), a * b * c = a * (b * c)
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_65' has type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a : Polynomial (InputRing K n)), 1 * a = a
+but it is expected to have type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a : InputRing K (n + 1)), 1 * a = a
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_66' has type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a : Polynomial (InputRing K n)), a * 1 = a
+but it is expected to have type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a : InputRing K (n + 1)), a * 1 = a
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._aux_67' has type
+  {K : Type u_1} →
+    (n : ℕ) → (this : CommRing (InputRing K n)) → ℕ → Polynomial (InputRing K n) → Polynomial (InputRing K n)
+but it is expected to have type
+  {K : Type u_1} → (n : ℕ) → CommRing (InputRing K n) → ℕ → InputRing K (n + 1) → InputRing K (n + 1)
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_69' has type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)),
+    autoParam (∀ (x : Polynomial (InputRing K n)), x ^ 0 = 1) Monoid.npow_zero._autoParam
+but it is expected to have type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)),
+    autoParam (∀ (x : InputRing K (n + 1)), x ^ 0 = 1) Monoid.npow_zero._autoParam
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_70' has type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)),
+    autoParam (∀ (n_1 : ℕ) (x : Polynomial (InputRing K n)), x ^ (n_1 + 1) = x ^ n_1 * x) Monoid.npow_succ._autoParam
+but it is expected to have type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)),
+    autoParam (∀ (n_1 : ℕ) (x : InputRing K (n + 1)), x ^ (n_1 + 1) = x ^ n_1 * x) Monoid.npow_succ._autoParam
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_71' has type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a : Polynomial (InputRing K n)), 0 * a = 0
+but it is expected to have type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a : InputRing K (n + 1)), 0 * a = 0
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_72' has type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a : Polynomial (InputRing K n)), a * 0 = 0
+but it is expected to have type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a : InputRing K (n + 1)), a * 0 = 0
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_73' has type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a b c : Polynomial (InputRing K n)),
+    a * (b + c) = a * b + a * c
+but it is expected to have type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a b c : InputRing K (n + 1)), a * (b + c) = a * b + a * c
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_74' has type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a b c : Polynomial (InputRing K n)),
+    (a + b) * c = a * c + b * c
+but it is expected to have type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a b c : InputRing K (n + 1)), (a + b) * c = a * c + b * c
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._aux_75' has type
+  {K : Type u_1} → (n : ℕ) → (this : CommRing (InputRing K n)) → ℕ → Polynomial (InputRing K n)
+but it is expected to have type
+  {K : Type u_1} → (n : ℕ) → CommRing (InputRing K n) → ℕ → InputRing K (n + 1)
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_77' has type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)), autoParam (↑0 = 0) AddMonoidWithOne.natCast_zero._autoParam
+but it is expected to have type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)), autoParam (↑0 = 0) AddMonoidWithOne.natCast_zero._autoParam
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_78' has type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)),
+    autoParam (∀ (n_1 : ℕ), ↑(n_1 + 1) = ↑n_1 + 1) AddMonoidWithOne.natCast_succ._autoParam
+but it is expected to have type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)),
+    autoParam (∀ (n_1 : ℕ), ↑(n_1 + 1) = ↑n_1 + 1) AddMonoidWithOne.natCast_succ._autoParam
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._aux_79' has type
+  {K : Type u_1} → (n : ℕ) → (this : CommRing (InputRing K n)) → Polynomial (InputRing K n) → Polynomial (InputRing K n)
+but it is expected to have type
+  {K : Type u_1} → (n : ℕ) → CommRing (InputRing K n) → InputRing K (n + 1) → InputRing K (n + 1)
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._aux_81' has type
+  {K : Type u_1} →
+    (n : ℕ) →
+      (this : CommRing (InputRing K n)) →
+        Polynomial (InputRing K n) → Polynomial (InputRing K n) → Polynomial (InputRing K n)
+but it is expected to have type
+  {K : Type u_1} → (n : ℕ) → CommRing (InputRing K n) → InputRing K (n + 1) → InputRing K (n + 1) → InputRing K (n + 1)
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._aux_83' has type
+  {K : Type u_1} →
+    (n : ℕ) → (this : CommRing (InputRing K n)) → ℤ → Polynomial (InputRing K n) → Polynomial (InputRing K n)
+but it is expected to have type
+  {K : Type u_1} → (n : ℕ) → CommRing (InputRing K n) → ℤ → InputRing K (n + 1) → InputRing K (n + 1)
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_85' has type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)),
+    autoParam (∀ (a b : Polynomial (InputRing K n)), a - b = a + -b) SubNegMonoid.sub_eq_add_neg._autoParam
+but it is expected to have type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)),
+    autoParam (∀ (a b : InputRing K (n + 1)), a - b = a + -b) SubNegMonoid.sub_eq_add_neg._autoParam
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_86' has type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)),
+    autoParam (∀ (a : Polynomial (InputRing K n)), 0 • a = 0) SubNegMonoid.zsmul_zero'._autoParam
+but it is expected to have type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)),
+    autoParam (∀ (a : InputRing K (n + 1)), 0 • a = 0) SubNegMonoid.zsmul_zero'._autoParam
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_87' has type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)),
+    autoParam (∀ (n_1 : ℕ) (a : Polynomial (InputRing K n)), ↑n_1.succ • a = ↑n_1 • a + a)
+      SubNegMonoid.zsmul_succ'._autoParam
+but it is expected to have type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)),
+    autoParam (∀ (n_1 : ℕ) (a : InputRing K (n + 1)), ↑n_1.succ • a = ↑n_1 • a + a) SubNegMonoid.zsmul_succ'._autoParam
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_88' has type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)),
+    autoParam (∀ (n_1 : ℕ) (a : Polynomial (InputRing K n)), Int.negSucc n_1 • a = -(↑n_1.succ • a))
+      SubNegMonoid.zsmul_neg'._autoParam
+but it is expected to have type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)),
+    autoParam (∀ (n_1 : ℕ) (a : InputRing K (n + 1)), Int.negSucc n_1 • a = -(↑n_1.succ • a))
+      SubNegMonoid.zsmul_neg'._autoParam
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_89' has type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a : Polynomial (InputRing K n)), -a + a = 0
+but it is expected to have type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a : InputRing K (n + 1)), -a + a = 0
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._aux_90' has type
+  {K : Type u_1} → (n : ℕ) → (this : CommRing (InputRing K n)) → ℤ → Polynomial (InputRing K n)
+but it is expected to have type
+  {K : Type u_1} → (n : ℕ) → CommRing (InputRing K n) → ℤ → InputRing K (n + 1)
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_92' has type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)),
+    autoParam (∀ (n_1 : ℕ), IntCast.intCast ↑n_1 = ↑n_1) AddGroupWithOne.intCast_ofNat._autoParam
+but it is expected to have type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)),
+    autoParam (∀ (n_1 : ℕ), IntCast.intCast ↑n_1 = ↑n_1) AddGroupWithOne.intCast_ofNat._autoParam
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_93' has type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)),
+    autoParam (∀ (n_1 : ℕ), IntCast.intCast (Int.negSucc n_1) = -↑(n_1 + 1)) AddGroupWithOne.intCast_negSucc._autoParam
+but it is expected to have type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)),
+    autoParam (∀ (n_1 : ℕ), IntCast.intCast (Int.negSucc n_1) = -↑(n_1 + 1)) AddGroupWithOne.intCast_negSucc._autoParam
+RecursiveSemaevDegree.lean:23:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingCommRing._proof_94' has type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a b : Polynomial (InputRing K n)), a * b = b * a
+but it is expected to have type
+  ∀ {K : Type u_1} (n : ℕ) (ih : CommRing (InputRing K n)) (a b : InputRing K (n + 1)), a * b = b * a
+RecursiveSemaevDegree.lean:29:4: warning: Try this: 
+  letI̵
+
+The goal is a proposition, so `let` is preferred over `letI`.
+The difference between `let` and `letI` is that `letI` inlines the value.
+But this is not relevant for proofs because of proof irrelevance.
+
+Note: This linter can be disabled with `set_option linter.style.haveILetI false`
+RecursiveSemaevDegree.lean:27:18: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingIsDomain._proof_1' has type
+  ∀ {K : Type u_1} [inst : Field K], IsDomain (Polynomial (Polynomial K))
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K], IsDomain (InputRing K 0)
+RecursiveSemaevDegree.lean:30:10: error: (kernel) declaration type mismatch, 'RecursiveSemaevDegreeAudit.inputRingIsDomain._proof_2' has type
+  ∀ {K : Type u_1} [inst : Field K] (n : ℕ), IsDomain (InputRing K n) → IsDomain (Polynomial (InputRing K n))
+but it is expected to have type
+  ∀ {K : Type u_1} [inst : Field K] (n : ℕ), IsDomain (InputRing K n) → IsDomain (InputRing K (n + 1))
+RecursiveSemaevDegree.lean:33:2: error: Type mismatch
+  C.comp C
+has type
+  K →+* K[X][X]
+but is expected to have type
+  K →+* InputRing K 0
+RecursiveSemaevDegree.lean:34:2: error: Type mismatch
+  C.comp (coefficientEmbedding n)
+has type
+  K →+* (InputRing K n)[X]
+but is expected to have type
+  K →+* InputRing K (n + 1)
+RecursiveSemaevDegree.lean:38:7: error: Application type mismatch: The argument
+  pairA
+has type
+  PairRing K
+but is expected to have type
+  InputRing K 0
+in the application
+  quad pairA
+RecursiveSemaevDegree.lean:43:20: error: Application type mismatch: The argument
+  t
+has type
+  InputRing K 0
+but is expected to have type
+  PairRing K
+in the application
+  s3Ring (liftPair (WeierstrassCurve.b₂ W)) (liftPair (WeierstrassCurve.b₄ W)) (liftPair (WeierstrassCurve.b₆ W))
+    (liftPair (WeierstrassCurve.b₈ W)) pairX pairY t
+RecursiveSemaevDegree.lean:45:2: error: `ring_nf` made no progress on the goal
+RecursiveSemaevDegree.lean:44:8: warning: declaration uses `sorry`
+RecursiveSemaevDegree.lean:44:8: warning: This simp argument is unused:
+  basePolynomial
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [quad, pairA, pairB, pairC, s3Ring, qaRing, qbRing, qcRing]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+RecursiveSemaevDegree.lean:44:23: warning: This simp argument is unused:
+  quad
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [basePolynomial, pairA, pairB, pairC, s3Ring, qaRing, qbRing, qcRing]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+RecursiveSemaevDegree.lean:44:28: warning: This simp argument is unused:
+  pairA
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [basePolynomial, quad, pairB, pairC, s3Ring, qaRing, qbRing, qcRing]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+RecursiveSemaevDegree.lean:44:34: warning: This simp argument is unused:
+  pairB
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [basePolynomial, quad, pairA, pairC, s3Ring, qaRing, qbRing, qcRing]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+RecursiveSemaevDegree.lean:44:40: warning: This simp argument is unused:
+  pairC
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [basePolynomial, quad, pairA, pairB, s3Ring, qaRing, qbRing, qcRing]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+RecursiveSemaevDegree.lean:44:46: warning: This simp argument is unused:
+  s3Ring
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [basePolynomial, quad, pairA, pairB, pairC, qaRing, qbRing, qcRing]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+RecursiveSemaevDegree.lean:44:53: warning: This simp argument is unused:
+  qaRing
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [basePolynomial, quad, pairA, pairB, pairC, s3Ring, qbRing, qcRing]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+RecursiveSemaevDegree.lean:44:60: warning: This simp argument is unused:
+  qbRing
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [basePolynomial, quad, pairA, pairB, pairC, s3Ring, qaRing, qcRing]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+RecursiveSemaevDegree.lean:44:67: warning: This simp argument is unused:
+  qcRing
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [basePolynomial, quad, pairA, pairB, pairC, s3Ring, qaRing, qbRing]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+RecursiveSemaevDegree.lean:50:14: warning: declaration uses `sorry`
+RecursiveSemaevDegree.lean:47:8: warning: declaration uses `sorry`
+RecursiveSemaevDegree.lean:58:2: error: Type mismatch
+  resultantStep (2 ^ (n + 1)) (recursivePolynomial W n) ((coefficientEmbedding n) (WeierstrassCurve.b₂ W))
+    ((coefficientEmbedding n) (WeierstrassCurve.b₄ W)) ((coefficientEmbedding n) (WeierstrassCurve.b₆ W))
+    ((coefficientEmbedding n) (WeierstrassCurve.b₈ W))
+has type
+  (InputRing K n)[X][X]
+but is expected to have type
+  (InputRing K (n + 1))[X]
+RecursiveSemaevDegree.lean:67:6: error: Type mismatch
+  resultantStep (2 ^ (n + 1)) (recursivePolynomial W n) ((coefficientEmbedding n) (WeierstrassCurve.b₂ W))
+    ((coefficientEmbedding n) (WeierstrassCurve.b₄ W)) ((coefficientEmbedding n) (WeierstrassCurve.b₆ W))
+    ((coefficientEmbedding n) (WeierstrassCurve.b₈ W))
+has type
+  (InputRing K n)[X][X]
+but is expected to have type
+  (InputRing K (n + 1))[X]
+RecursiveSemaevDegree.lean:74:12: error: Type mismatch: After simplification, term
+  basePolynomial_natDegree W
+ has type
+  @Eq ℕ (basePolynomial W).natDegree 2
+but is expected to have type
+  @Eq ℕ (basePolynomial W).natDegree (2 ^ (0 + 1))
+RecursiveSemaevDegree.lean:74:24: warning: declaration uses `sorry`
+'RecursiveSemaevDegreeAudit.recursivePolynomial_natDegree' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound,
+ inputRingCommRing._aux_1,
+ inputRingCommRing._aux_13,
+ inputRingCommRing._aux_15,
+ inputRingCommRing._aux_20,
+ inputRingCommRing._aux_28,
+ inputRingCommRing._aux_3,
+ inputRingCommRing._aux_32,
+ inputRingCommRing._aux_34,
+ inputRingCommRing._aux_36,
+ inputRingCommRing._aux_43,
+ inputRingCommRing._aux_48,
+ inputRingCommRing._aux_50,
+ inputRingCommRing._aux_55,
+ inputRingCommRing._aux_60,
+ inputRingCommRing._aux_62,
+ inputRingCommRing._aux_67,
+ inputRingCommRing._aux_75,
+ inputRingCommRing._aux_79,
+ inputRingCommRing._aux_8,
+ inputRingCommRing._aux_81,
+ inputRingCommRing._aux_83,
+ inputRingCommRing._aux_90,
+ inputRingCommRing._proof_10,
+ inputRingCommRing._proof_11,
+ inputRingCommRing._proof_12,
+ inputRingCommRing._proof_17,
+ inputRingCommRing._proof_18,
+ inputRingCommRing._proof_19,
+ inputRingCommRing._proof_22,
+ inputRingCommRing._proof_23,
+ inputRingCommRing._proof_24,
+ inputRingCommRing._proof_25,
+ inputRingCommRing._proof_26,
+ inputRingCommRing._proof_27,
+ inputRingCommRing._proof_30,
+ inputRingCommRing._proof_31,
+ inputRingCommRing._proof_38,
+ inputRingCommRing._proof_39,
+ inputRingCommRing._proof_40,
+ inputRingCommRing._proof_41,
+ inputRingCommRing._proof_42,
+ inputRingCommRing._proof_45,
+ inputRingCommRing._proof_46,
+ inputRingCommRing._proof_47,
+ inputRingCommRing._proof_5,
+ inputRingCommRing._proof_52,
+ inputRingCommRing._proof_53,
+ inputRingCommRing._proof_54,
+ inputRingCommRing._proof_57,
+ inputRingCommRing._proof_58,
+ inputRingCommRing._proof_59,
+ inputRingCommRing._proof_6,
+ inputRingCommRing._proof_64,
+ inputRingCommRing._proof_65,
+ inputRingCommRing._proof_66,
+ inputRingCommRing._proof_69,
+ inputRingCommRing._proof_7,
+ inputRingCommRing._proof_70,
+ inputRingCommRing._proof_71,
+ inputRingCommRing._proof_72,
+ inputRingCommRing._proof_73,
+ inputRingCommRing._proof_74,
+ inputRingCommRing._proof_77,
+ inputRingCommRing._proof_78,
+ inputRingCommRing._proof_85,
+ inputRingCommRing._proof_86,
+ inputRingCommRing._proof_87,
+ inputRingCommRing._proof_88,
+ inputRingCommRing._proof_89,
+ inputRingCommRing._proof_92,
+ inputRingCommRing._proof_93,
+ inputRingCommRing._proof_94]
+'RecursiveSemaevDegreeAudit.all_arities_last_input_degree' depends on axioms: [propext,
+ sorryAx,
+ Classical.choice,
+ Quot.sound,
+ inputRingCommRing._aux_1,
+ inputRingCommRing._aux_13,
+ inputRingCommRing._aux_15,
+ inputRingCommRing._aux_20,
+ inputRingCommRing._aux_28,
+ inputRingCommRing._aux_3,
+ inputRingCommRing._aux_32,
+ inputRingCommRing._aux_34,
+ inputRingCommRing._aux_36,
+ inputRingCommRing._aux_43,
+ inputRingCommRing._aux_48,
+ inputRingCommRing._aux_50,
+ inputRingCommRing._aux_55,
+ inputRingCommRing._aux_60,
+ inputRingCommRing._aux_62,
+ inputRingCommRing._aux_67,
+ inputRingCommRing._aux_75,
+ inputRingCommRing._aux_79,
+ inputRingCommRing._aux_8,
+ inputRingCommRing._aux_81,
+ inputRingCommRing._aux_83,
+ inputRingCommRing._aux_90,
+ inputRingCommRing._proof_10,
+ inputRingCommRing._proof_11,
+ inputRingCommRing._proof_12,
+ inputRingCommRing._proof_17,
+ inputRingCommRing._proof_18,
+ inputRingCommRing._proof_19,
+ inputRingCommRing._proof_22,
+ inputRingCommRing._proof_23,
+ inputRingCommRing._proof_24,
+ inputRingCommRing._proof_25,
+ inputRingCommRing._proof_26,
+ inputRingCommRing._proof_27,
+ inputRingCommRing._proof_30,
+ inputRingCommRing._proof_31,
+ inputRingCommRing._proof_38,
+ inputRingCommRing._proof_39,
+ inputRingCommRing._proof_40,
+ inputRingCommRing._proof_41,
+ inputRingCommRing._proof_42,
+ inputRingCommRing._proof_45,
+ inputRingCommRing._proof_46,
+ inputRingCommRing._proof_47,
+ inputRingCommRing._proof_5,
+ inputRingCommRing._proof_52,
+ inputRingCommRing._proof_53,
+ inputRingCommRing._proof_54,
+ inputRingCommRing._proof_57,
+ inputRingCommRing._proof_58,
+ inputRingCommRing._proof_59,
+ inputRingCommRing._proof_6,
+ inputRingCommRing._proof_64,
+ inputRingCommRing._proof_65,
+ inputRingCommRing._proof_66,
+ inputRingCommRing._proof_69,
+ inputRingCommRing._proof_7,
+ inputRingCommRing._proof_70,
+ inputRingCommRing._proof_71,
+ inputRingCommRing._proof_72,
+ inputRingCommRing._proof_73,
+ inputRingCommRing._proof_74,
+ inputRingCommRing._proof_77,
+ inputRingCommRing._proof_78,
+ inputRingCommRing._proof_85,
+ inputRingCommRing._proof_86,
+ inputRingCommRing._proof_87,
+ inputRingCommRing._proof_88,
+ inputRingCommRing._proof_89,
+ inputRingCommRing._proof_92,
+ inputRingCommRing._proof_93,
+ inputRingCommRing._proof_94]

@@ -87,6 +87,13 @@ specialization. This is not a defined all-mfamily/every-input degree or
 zero-sum recursion proof. See
 [RESULTANT_DEGREE_STEP.md](RESULTANT_DEGREE_STEP.md). [pcc:unverified]
 
+The subsequent RecursiveSemaevDegree.lean defines the actual canonical
+family and proves its last-input degree2^(m−2)for every aritym≥3, its
+successor leading-coefficient square and an exact canonical S4bridge.
+The other input degrees/symmetry, geometric zero-sum equivalence beyondS4
+and irreducibility remain separate open targets. See
+[RECURSIVE_SEMAEV_DEGREE.md](RECURSIVE_SEMAEV_DEGREE.md). [pcc:unverified]
+
 `corrected_prime_embedding_degree` derives k=2 for odd primes r>2 from the
 source trace definition, primality of p≥5, actual group-order divisibility,
 and the explicit Hasse premise t²≤4p. `hasse_trace_zero` supplies the missing
@@ -123,7 +130,7 @@ in `paper-audit-backlog.json`; no untouched paper is labelled audited.
 
 Run `lake build` and `lake env lean Refutations.lean` in `lean/`, then the
 repository proof gate at `research/theorem_census_20261109/lean`. Current
-receipts are under `evidence/resultant-degree-step-gate/`; earlier torsion
+receipts are under `evidence/recursive-semaev-degree-gate/`; earlier torsion
 receipts remain in `evidence/proof-gate-torsion-fst/`. Failed incremental
 builds are retained. This latest proof piece runs only its scoped scalar
 identity supplement, without a new curve population, performance assertion,
