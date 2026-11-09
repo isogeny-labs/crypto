@@ -113,3 +113,24 @@ all raw outputs; leave any absent independent standing explicit.
 A passed panel would be bounded correctness evidence, not an asymptotic
 runtime theorem. A failed panel must preserve the exact polynomial, nodes,
 orders, precisions, jets, lifts and first mismatching reconstruction term.
+
+## Nov9 update: exact finite recovery construction completed
+
+The rational obligations in steps5 and6 are now discharged by the actual
+construction, including exact interpolation, actual local charts, computed
+quotient congruence and computed target residue. See
+[the new report](reports/hermite-recovery-20261109/REPORT.md). The integral
+output's value is the computed sum. Its proof uses the target to establish
+integrality; its value does not return that target [pcc:unverified].
+
+The source child precision is established for this rational primitive. The
+proposed next native census will test that actual formula and congruent lifts;
+the doubled-budget proxy remains a separate historical diagnostic, not a
+required arm of a correctness census. Freeze the final census and defective
+controls in its own prospective protocol. No old panel is reopened.
+
+Immediate work: native finite arithmetic and prospective checkpoint admission;
+then coordinate refinement and fast input-jet/all-level recursive cost proofs.
+The plan above remains the historical derivation sequence; step3's specific
+weighted identity was replaced by a proved pairing and second-moment bound
+[pcc:unverified].
