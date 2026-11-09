@@ -53,6 +53,12 @@ later prove redundant or incompatible for a particular factor-base closure;
 that decision requires a proof or a checked counterexample and a versioned
 disposition, rather than deleting the ordinal.
 
+There is narrower prior art: the frozen full-D18 worker in
+[`primary_adapter.rs`](primary_adapter.rs) can install a Frobenius orbit-phase
+domain and an ordered first-pair constraint in the same encoding. That path is
+bound to its retained full-D18 input and source gates; it does not establish a
+general adapter for the v2–v4 base recipes or make a v5 suffix case executed.
+
 The finite grid is complete only over its **declared** base recipes, pair shapes,
 five symmetry switches, and solver axes. It does not enumerate arbitrary new
 field bases, higher-order base mixtures, alternative implementations, or
