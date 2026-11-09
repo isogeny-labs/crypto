@@ -8,7 +8,7 @@ cm_commit=$(git rev-parse HEAD)
 cm_inputs=$(for cm_path in "$cm_dir/fixtures-v2/published-curves.json" "$cm_dir/fixtures-v2/marked-relations.json" "$cm_dir/fixtures-v2/"p-{192,224,256,384,521}-closure.json "$cm_dir/residual-v1/plans.json"; do
   jq -n --arg path "$cm_path" --arg sha "$(sha256sum "$cm_path" | cut -d' ' -f1)" '{path:$path,sha256:$sha}'
 done | jq -s .)
-cm_sources=$(for cm_name in block_tune.cpp block_tune_replay.cpp block_core.hpp cache_core.hpp native.cpp json.hpp relation_verify.hpp orbit_verify.hpp; do
+cm_sources=$(for cm_name in block_tune.cpp block_tune_replay.cpp block_tune_mutate.cpp block_core.hpp cache_core.hpp native.cpp json.hpp relation_verify.hpp orbit_verify.hpp; do
   cm_path=$cm_dir/$cm_name
   jq -n --arg path "$cm_path" --arg sha "$(sha256sum "$cm_path" | cut -d' ' -f1)" '{path:$path,sha256:$sha}'
 done | jq -s .)

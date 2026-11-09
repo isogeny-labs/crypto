@@ -121,3 +121,8 @@ $(BUILD_DIR)/block-tune-replay: block_tune_replay.cpp json.hpp
 	$(CXX) $(CXXFLAGS) block_tune_replay.cpp -o $@ -lcrypto -lgmpxx -lgmp
 block-tune-replay-binary: $(BUILD_DIR)/block-tune-replay
 .PHONY: block-tune-replay-binary
+$(BUILD_DIR)/block-tune-mutate: block_tune_mutate.cpp json.hpp
+	mkdir -p $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) block_tune_mutate.cpp -o $@ -lcrypto
+block-tune-mutate-binary: $(BUILD_DIR)/block-tune-mutate
+.PHONY: block-tune-mutate-binary
