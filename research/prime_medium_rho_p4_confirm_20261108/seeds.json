@@ -1,0 +1,104 @@
+{
+  "schema": "prime_medium_rho_p4_confirm.seeds/v1",
+  "rule": "seed(tag) = int(SHA-256(UTF-8(prefix + tag)).hexdigest()[0:12], 16), a 48-bit integer",
+  "prefix": "prime_medium_rho_p4_confirm_20261108/v1/",
+  "written": "2026-11-08, before any data of this study",
+  "disjoint_from": {
+    "path": "research/prime_medium_tier_rho_20261107/seeds.json",
+    "checked": "no value here equals any value there, and the values here are distinct"
+  },
+  "seeds": [
+    {
+      "tag": "target_seed/block=K01",
+      "seed": 259261276268747
+    },
+    {
+      "tag": "target_seed/block=K02",
+      "seed": 58898508776987
+    },
+    {
+      "tag": "target_seed/block=K03",
+      "seed": 131557798055508
+    },
+    {
+      "tag": "target_seed/block=K04",
+      "seed": 230559409661136
+    },
+    {
+      "tag": "target_seed/block=K05",
+      "seed": 112559572458697
+    },
+    {
+      "tag": "target_seed/block=K06",
+      "seed": 134742999582066
+    },
+    {
+      "tag": "target_seed/block=K07",
+      "seed": 50033655736337
+    },
+    {
+      "tag": "target_seed/block=K08",
+      "seed": 239703336658961
+    },
+    {
+      "tag": "target_seed/block=K09",
+      "seed": 98200427807618
+    },
+    {
+      "tag": "target_seed/block=K10",
+      "seed": 225203915520274
+    },
+    {
+      "tag": "measurement_seed/job=M1",
+      "seed": 249115091267486
+    },
+    {
+      "tag": "measurement_seed/job=M2",
+      "seed": 68345070444546
+    },
+    {
+      "tag": "measurement_seed/job=M3",
+      "seed": 48503903392925
+    },
+    {
+      "tag": "measurement_seed/job=M4",
+      "seed": 38659607828687
+    },
+    {
+      "tag": "measurement_seed/job=M5",
+      "seed": 124745887533118
+    },
+    {
+      "tag": "measurement_seed/job=M6",
+      "seed": 121887317757250
+    },
+    {
+      "tag": "measurement_seed/job=M7",
+      "seed": 86164594671542
+    },
+    {
+      "tag": "measurement_seed/job=M8",
+      "seed": 31435994005288
+    },
+    {
+      "tag": "measurement_seed/job=M9",
+      "seed": 69004135767548
+    },
+    {
+      "tag": "measurement_seed/job=PC",
+      "seed": 47075202384453
+    },
+    {
+      "tag": "analysis/bootstrap",
+      "seed": 47393111417401
+    },
+    {
+      "tag": "analysis/bootstrap-large",
+      "seed": 52762206010099
+    },
+    {
+      "tag": "analysis/bootstrap-positive-control",
+      "seed": 263411560565113
+    }
+  ]
+}

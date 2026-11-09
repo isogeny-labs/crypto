@@ -22,6 +22,74 @@ pub mod replay;
 /// A deliberately bounded instrument: the substitution solver may enumerate F_p.
 pub const MAX_FIELD: u64 = 65_521;
 
+/// Work this module's own code performs outside the F4 and root-finding
+/// solvers, counted per calling thread and never priced. A caller that wants
+/// it resets the tally before a run and reads it after: group-operation calls
+/// on the module's [`FastCurve`] (each call, not each field operation inside
+/// it) and the coefficient multiplications of polynomial construction.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize)]
+pub struct CoreWork {
+    /// `FastCurve::mul` calls (scalar multiplications, subgroup-order checks
+    /// and label verifications included).
+    pub scalar_mults: u64,
+    /// `FastCurve::combine` calls (`uG + vQ`).
+    pub combines: u64,
+    /// `FastCurve::add` calls made directly by this module.
+    pub point_adds: u64,
+    /// `FastCurve::lift_x` calls (one square root each).
+    pub lifts: u64,
+    /// Coefficient multiplications of `Expr::mul`, one per pair of terms.
+    pub expression_multiplications: u64,
+}
+
+thread_local! {
+    static CORE_WORK: std::cell::Cell<CoreWork> = const { std::cell::Cell::new(CoreWork {
+        scalar_mults: 0,
+        combines: 0,
+        point_adds: 0,
+        lifts: 0,
+        expression_multiplications: 0,
+    }) };
+}
+
+/// Zero this thread's [`CoreWork`] tally.
+pub fn reset_core_work() {
+    CORE_WORK.with(|c| c.set(CoreWork::default()));
+}
+
+/// This thread's [`CoreWork`] since the last [`reset_core_work`].
+pub fn core_work() -> CoreWork {
+    CORE_WORK.with(std::cell::Cell::get)
+}
+
+fn bump_core_work(f: impl FnOnce(&mut CoreWork)) {
+    CORE_WORK.with(|c| {
+        let mut w = c.get();
+        f(&mut w);
+        c.set(w);
+    });
+}
+
+fn counted_mul(curve: &FastCurve, p: Option<Pt>, k: u64) -> Option<Pt> {
+    bump_core_work(|w| w.scalar_mults += 1);
+    curve.mul(p, k)
+}
+
+fn counted_add(curve: &FastCurve, a: Option<Pt>, b: Option<Pt>) -> Option<Pt> {
+    bump_core_work(|w| w.point_adds += 1);
+    curve.add(a, b)
+}
+
+fn counted_lift_x(curve: &FastCurve, x: u64) -> Option<Pt> {
+    bump_core_work(|w| w.lifts += 1);
+    curve.lift_x(x)
+}
+
+fn counted_combine(curve: &FastCurve, g: Pt, q: Pt, u: u64, v: u64) -> Option<Pt> {
+    bump_core_work(|w| w.combines += 1);
+    curve.combine(g, q, u, v)
+}
+
 fn mul(a: u64, b: u64, p: u64) -> u64 {
     (u128::from(a) * u128::from(b) % u128::from(p)) as u64
 }
@@ -88,6 +156,10 @@ impl Expr {
         self.add(&minus)
     }
     fn mul(&self, rhs: &Self) -> Self {
+        let pairs = (self.terms.len() as u64).saturating_mul(rhs.terms.len() as u64);
+        bump_core_work(|w| {
+            w.expression_multiplications = w.expression_multiplications.saturating_add(pairs)
+        });
         let terms: Poly = self
             .terms
             .iter()
@@ -268,7 +340,7 @@ pub fn build_system(
     }
     let all: Vec<_> = parts.iter().flatten().copied().collect();
     checked_coordinates(&all, p)?;
-    if all.iter().any(|&x| curve.lift_x(x).is_none()) {
+    if all.iter().any(|&x| counted_lift_x(curve, x).is_none()) {
         return Err("coordinate without a rational curve lift".into());
     }
     let a = curve.f.from_mont(curve.a);
@@ -858,8 +930,8 @@ pub fn validate_instance(curve: &FastCurve, g: Pt, q: Pt) -> Result<(), String> 
     }
     if !curve.is_on_curve(g)
         || !curve.is_on_curve(q)
-        || curve.mul(Some(g), curve.n).is_some()
-        || curve.mul(Some(q), curve.n).is_some()
+        || counted_mul(curve, Some(g), curve.n).is_some()
+        || counted_mul(curve, Some(q), curve.n).is_some()
     {
         return Err("points are not in the declared prime-order subgroup".into());
     }
@@ -900,7 +972,10 @@ pub fn sample_base(
     } else {
         vec![0; sizes.len()]
     };
-    let shifts: Vec<_> = weights.iter().map(|&w| curve.mul(Some(q), w)).collect();
+    let shifts: Vec<_> = weights
+        .iter()
+        .map(|&w| counted_mul(curve, Some(q), w))
+        .collect();
     let mut rng = StdRng::seed_from_u64(seed);
     let mut base = LabeledBase {
         parts: vec![vec![]; sizes.len()],
@@ -919,9 +994,9 @@ pub fn sample_base(
                 rng.gen_range(0..curve.n)
             };
             let point = if labels == Labels::Guaranteed {
-                curve.add(curve.mul(Some(g), u), shifts[slot])
+                counted_add(curve, counted_mul(curve, Some(g), u), shifts[slot])
             } else {
-                curve.combine(g, q, u, v)
+                counted_combine(curve, g, q, u, v)
             };
             base.draws += 1;
             let Some(point) = point else {
@@ -950,7 +1025,9 @@ pub fn validate_base(curve: &FastCurve, g: Pt, q: Pt, base: &LabeledBase) -> Res
             return Err("noncanonical labeled point".into());
         }
         let point = curve.point(entry.x, entry.y);
-        if !curve.is_on_curve(point) || curve.combine(g, q, entry.u, entry.v) != Some(point) {
+        if !curve.is_on_curve(point)
+            || counted_combine(curve, g, q, entry.u, entry.v) != Some(point)
+        {
             return Err("invalid known point representation".into());
         }
     }
@@ -1029,7 +1106,9 @@ fn checked_order_three(
         x: curve.f.mul(point.x, beta_mont),
         y: point.y,
     };
-    if curve.mul(Some(g), lambda) != Some(phi(g)) || curve.mul(Some(q), lambda) != Some(phi(q)) {
+    if counted_mul(curve, Some(g), lambda) != Some(phi(g))
+        || counted_mul(curve, Some(q), lambda) != Some(phi(q))
+    {
         return Err("incorrect automorphism eigenvalue".into());
     }
     Ok(beta_mont)
@@ -1216,7 +1295,11 @@ fn recover_validated_observed(
             let mut b = 0;
             for (entry, &sign) in entries.iter().zip(&signs) {
                 let point = curve.point(entry.x, entry.y);
-                sum = curve.add(sum, Some(if sign == 1 { point } else { curve.neg(point) }));
+                sum = counted_add(
+                    curve,
+                    sum,
+                    Some(if sign == 1 { point } else { curve.neg(point) }),
+                );
                 a = (a + if sign == 1 {
                     entry.u
                 } else {
@@ -1234,7 +1317,7 @@ fn recover_validated_observed(
             observer(RecoveryPhase::Descent);
             let logarithm = mul(neg(a, curve.n), inv_mod(b, curve.n), curve.n);
             observer(RecoveryPhase::Verification);
-            if curve.mul(Some(g), logarithm) != Some(q) {
+            if counted_mul(curve, Some(g), logarithm) != Some(q) {
                 return Err("signed point relation failed logarithm verification".into());
             }
             return Ok(Some(Recovery {

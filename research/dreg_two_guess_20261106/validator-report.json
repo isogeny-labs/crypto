@@ -1,0 +1,74 @@
+{
+  "schema": "validator-report",
+  "status": "pass",
+  "study": "research/dreg_two_guess_20261106",
+  "recomputed_by": {
+    "tool": "examples/dreg_two_guess_score.rs",
+    "command": "dreg_two_guess_score --plot-data research",
+    "binary_sha256": "e5c6589d303394e95446c37aac4e247bbdb153e0870ccdc9452a98ebd7090838"
+  },
+  "note": "Producer-run recompute of the RESULTS.md headline numbers. Run records are pinned by runs/SHA256SUMS (pinned here), which survives a move of the records to the artifact store. Unsigned, so independence is not established.",
+  "headline": [
+    {
+      "name": "K2L draws sufficing (of 12)",
+      "claimed": 1,
+      "recomputed": 1,
+      "rel_tol": 0
+    },
+    {
+      "name": "K2S draws sufficing (of 12)",
+      "claimed": 1,
+      "recomputed": 1,
+      "rel_tol": 0
+    },
+    {
+      "name": "K2L-only discordant draws",
+      "claimed": 0,
+      "recomputed": 0,
+      "rel_tol": 0
+    },
+    {
+      "name": "K2S-only discordant draws",
+      "claimed": 0,
+      "recomputed": 0,
+      "rel_tol": 0
+    },
+    {
+      "name": "two-sided sign test p",
+      "claimed": 1.0,
+      "recomputed": 1.0000,
+      "rel_tol": 1E-9
+    }
+  ],
+  "disagreements": [],
+  "raw_data": [
+    {
+      "path": "examples/dreg_two_guess_score.rs",
+      "sha256": "3ab5051c80192387fc34190398a0f08759622826241cb9f467340b670a84da98"
+    },
+    {
+      "path": "research/dreg_invariant_guess_20261029/draws/m3-22-8.jsonl",
+      "sha256": "95ee147e1221ce4ef6c98bdd0b808398a01362343ffaa66debc217d6eeff5a9b"
+    },
+    {
+      "path": "research/dreg_invariant_guess_20261029/runs/S3.d5.b0.jsonl",
+      "sha256": "a0477e259d0991fd77b039e40656a94defb27a1e72d4ce6bc1dfe3f9a0ebf250"
+    },
+    {
+      "path": "research/dreg_invariant_guess_more_20261029/draws/m3-22-8-more.jsonl",
+      "sha256": "da20fea78e0c9030a6563aad1cda7ba0f71d242120955873a8bbeecee4dc5859"
+    },
+    {
+      "path": "research/dreg_two_guess_20261106/PREREGISTRATION.md",
+      "sha256": "f80fac2bad17a8038d83552a8ef01d24d120344b0c9a2658e7406977f61c2f46"
+    },
+    {
+      "path": "research/dreg_two_guess_20261106/runs/SHA256SUMS",
+      "sha256": "06e834a7920f6bd7c5e355cfa2233268d9ae6c2e08e77f71104a4cd8e630b00d"
+    },
+    {
+      "path": "research/dreg_two_guess_20261106/score-output.txt",
+      "sha256": "325c10fd9715c689fac8916809c5ce0d4ed459211ecfbd9a5eb50bc856eaa206"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+# r2c_spot_prices_20261108.txt [pcc:unverified] measured: read-only `aws ec2 describe-spot-price-history`, us-east-2, Linux/UNIX,
+# start-time = query time - 6 h, queried 2026-11-08T12:46Z; 176 price points, timestamps 2026-11-07T22:00:00.000Z .. 2026-11-08T12:00:00.000Z; raw JSON sha256 1ffe9c59d6795d74fe391eebb84e6f41bee7597794d76825f45e9eb8db208282 (kept in the session scratchpad, not committed).
+# Types: every x86 16-vCPU m/r type of `aws ec2 describe-instance-types` that passes cpu-spot's requirements in nodepool.yaml
+# (category c/m/r, generation > 5, instance-cpu 16, family NotIn [c7i-flex, m7i-flex, c8i-flex, m8i-flex]). A quote, not a forecast.
+type                GiB thr/core   n AZs  min $/h  max $/h  fits
+m6a.4xlarge          64        2   7   3   0.1958   0.2194  56Gi
+r8i-flex.4xlarge    128        2   5   3   0.1926   0.2315  56Gi,112Gi
+m6id.4xlarge         64        2   7   3   0.1677   0.2347  56Gi
+m7a.4xlarge          64        1   6   3   0.2215   0.2395  56Gi
+m6i.4xlarge          64        2   5   3   0.2277   0.2494  56Gi
+m8i.4xlarge          64        2   6   3   0.2165   0.2805  56Gi
+r6a.4xlarge         128        2   5   3   0.2666   0.3005  56Gi,112Gi
+m6in.4xlarge         64        2   7   3   0.2598   0.3027  56Gi
+r8i.4xlarge         128        2   7   3   0.2751   0.3114  56Gi,112Gi
+r7a.4xlarge         128        1   6   3   0.2932   0.3154  56Gi,112Gi
+r6i.4xlarge         128        2   6   3   0.3011   0.3243  56Gi,112Gi
+r6id.4xlarge        128        2   6   3   0.3164   0.3295  56Gi,112Gi
+r6in.4xlarge        128        2   6   3   0.3139   0.3330  56Gi,112Gi
+r7i.4xlarge         128        2   6   3   0.2429   0.3405  56Gi,112Gi
+m7i.4xlarge          64        2   5   3   0.2354   0.3512  56Gi
+m8a.4xlarge          64        1   5   3   0.2907   0.3595  56Gi
+r8a.4xlarge         128        1   6   3   0.2840   0.4156  56Gi,112Gi
+m6idn.4xlarge        64        2   6   3   0.2124   0.4275  56Gi
+r6idn.4xlarge       128        2   6   3   0.3983   0.5160  56Gi,112Gi
+r7iz.4xlarge        128        2   7   3   0.4218   0.5240  56Gi,112Gi
+r8id.4xlarge        128        2   5   3   0.3468   0.5243  56Gi,112Gi
+m8idb.4xlarge        64        2   6   3   0.4797   0.6038  56Gi
+m8idn.4xlarge        64        2   5   3   0.4879   0.6559  56Gi
+m8in.4xlarge         64        2   5   3   0.4325   0.6603  56Gi
+m8ib.4xlarge         64        2   7   3   0.4169   0.7569  56Gi
+r8idn.4xlarge       128        2   6   3   0.4635   0.7579  56Gi,112Gi
+r8in.4xlarge        128        2   5   3   0.4763   0.8684  56Gi,112Gi
+m8id.4xlarge         64        2   6   3   0.3972   0.9061  56Gi
+r8ib.4xlarge        128        2   6   3   0.5625   0.9333  56Gi,112Gi
+r8idb.4xlarge       128        2   5   3   0.5863   0.9620  56Gi,112Gi

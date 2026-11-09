@@ -553,6 +553,7 @@ mod tests {
             rho_steps: 0,
             route_file: None,
             route_id: None,
+            project_cofactor: false,
         };
         let mapped = transport(&target, &path, route_id).unwrap();
         std::fs::remove_file(path).unwrap();
@@ -621,6 +622,7 @@ mod tests {
             rho_steps: 0,
             route_file: None,
             route_id: None,
+            project_cofactor: false,
         };
         let mapped = transport(&target, &path, two_hop["id"].as_str().unwrap()).unwrap();
         std::fs::remove_file(path).unwrap();
@@ -687,6 +689,7 @@ mod tests {
             rho_steps: 0,
             route_file: None,
             route_id: None,
+            project_cofactor: false,
         };
         let mapped = transport(&target, &path, &route_id).unwrap();
         assert_eq!(mapped.receipt["hops"], 1);
@@ -756,6 +759,7 @@ mod tests {
             rho_steps: 0,
             route_file: None,
             route_id: None,
+            project_cofactor: false,
         };
         let mapped = transport(&target, &path, &route_id).unwrap();
         std::fs::remove_file(path).unwrap();

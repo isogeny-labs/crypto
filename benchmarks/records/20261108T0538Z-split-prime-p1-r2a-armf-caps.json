@@ -1,0 +1,124 @@
+{
+  "branch": "claude/novel-ecdlp-algorithm-iams4j",
+  "closed_utc": "2026-11-08T07:36:11+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "tools/task_card.py",
+        "run",
+        "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-r2a.yaml"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "note": "launched detached (setsid nohup env BENCHREC=<this record> ...); started_utc from provenance.txt; wall_s = sum of receipt per-command seconds; exit from the receipt (status completed)",
+      "started_utc": "2026-11-08T05:38:21Z",
+      "wall_s": 6882.776
+    }
+  ],
+  "commit": "d6619e21e4abba04812f72384a88c90a84640f54",
+  "commit_dirty": true,
+  "created_utc": "2026-11-08T05:38:00+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39"
+  },
+  "id": "20261108T0538Z-split-prime-p1-r2a-armf-caps",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 6,
+      "name": "rr_vs_f_widest_ratio_m3t4",
+      "note": "RR widest 2801 / F widest 1224; RR D 4 vs F D 5; trade",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 2.29
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 6,
+      "name": "rr_vs_t_widest_ratio_m3t5",
+      "note": "RR 31911 / T 23978 at m3 t5 (Dickson); trade",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "ratio",
+      "value": 1.33
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 26,
+      "name": "capped_jobs",
+      "note": "T at T24 m5 t3, 6 GiB",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 2.0
+    }
+  ],
+  "problem": "ic:split-prime-p1-rr-dickson-torus",
+  "raw": [
+    {
+      "bytes": 11600,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/runs/run-r2a-20261108T053528Z/parsed.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/5f/5f66612d0535dfb4289490a7d05a63217791ab9be8e24403e811dac2f30ec758",
+      "sha256": "5f66612d0535dfb4289490a7d05a63217791ab9be8e24403e811dac2f30ec758",
+      "uploaded": true
+    },
+    {
+      "bytes": 9097,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/runs/run-r2a-20261108T053528Z/jobs.tsv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/48/4816baabca61905085498196e143ed1f03788528758f9f783d209577947f0966",
+      "sha256": "4816baabca61905085498196e143ed1f03788528758f9f783d209577947f0966",
+      "uploaded": true
+    },
+    {
+      "bytes": 1088,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/runs/run-r2a-20261108T053528Z/provenance.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/fd/fd17970d63fe8e89c0dbdc008bba8a91f765754334a8da8232e730057bc5211e",
+      "sha256": "fd17970d63fe8e89c0dbdc008bba8a91f765754334a8da8232e730057bc5211e",
+      "uploaded": true
+    },
+    {
+      "bytes": 1861,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/analysis/derived_r2/decision_r2.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/03/03582a0bcef012807d471866ee34ef5d6dfdedcf22aab75a65df46e3a6b67215",
+      "sha256": "03582a0bcef012807d471866ee34ef5d6dfdedcf22aab75a65df46e3a6b67215",
+      "uploaded": true
+    },
+    {
+      "bytes": 867,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/analysis/derived_r2/p1_r2_cells.tsv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/a1/a1b7400512eb91c0c1b7b4138cd0b822edad2aa39f2e1d7bed94907a27b04ad0",
+      "sha256": "a1b7400512eb91c0c1b7b4138cd0b822edad2aa39f2e1d7bed94907a27b04ad0",
+      "uploaded": true
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/report/REPORT.pdf",
+    "png": [
+      "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/figures/p1_r2_cells.png"
+    ],
+    "svg": [
+      "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/figures/p1_r2_cells.svg"
+    ]
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "split-prime-p1-r2a-armf-caps",
+  "status": "measured",
+  "summary": "P1 round 2 card A: arm F and completed T at m3 t5 on NIST-shape primes; RR vs F trade at every m = 3 cell (one degree lower, 2.3-3.0x wider); RR vs T trade at m3 t5; T at m5 t3 capped at 6 GiB",
+  "validation": null
+}

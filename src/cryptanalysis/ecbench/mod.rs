@@ -11,6 +11,7 @@
 //! | [`canonical`] | canonical JSON, SHA-256 identities, derived seeds |
 //! | [`workload`] | curve constructions → ICV1-named single-target workloads |
 //! | [`methods`] | the method registry and the one `solve` every method goes through |
+//! | [`oracle`] | the static Diffie-Hellman oracle: Cheon's auxiliary inputs as a counted, separately priced resource |
 //! | [`aps`] | bounded APS polynomial instrument with exclusive wall phases and explicit incomplete native pricing |
 //! | [`generic`] | counted BSGS (three forms) and the kangaroo on any [`CountedGroup`] |
 //! | [`fp4`] | `E(F_{p⁴})`: the curve, its counted group and `ic.k4_gaudry` (Gaudry `k = 4`) |
@@ -67,6 +68,7 @@ pub mod diagnostic_preflight;
 pub mod diagnostic_resources;
 pub mod diagnostic_runtime;
 pub mod diagnostics;
+pub mod exact_scalar;
 pub mod ext;
 pub mod fbm;
 pub mod fp4;
@@ -89,16 +91,20 @@ pub mod legacy;
 pub mod methods;
 pub mod negation_strong;
 pub mod optimization;
+pub mod oracle;
 pub mod plane_quartic;
 pub mod prime_orbit;
 pub mod record;
 pub mod resources;
 pub mod runner;
+pub mod sentinels;
 pub mod signals;
 pub mod spec;
 pub mod stats;
+pub mod tensor_cofactor;
 pub mod three_leads;
 pub mod trend;
 pub mod wordram_price;
 pub mod work;
 pub mod workload;
+pub mod xline_bin;

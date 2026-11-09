@@ -433,7 +433,7 @@ fn ingest_lifecycle_v2(input: &ChildInput, line: &[u8]) -> Result<Value, String>
         &child.lifecycle_directory(),
         &child.envelope.prefix.identity,
     );
-    let candidate = child.envelope.arm.method == "ic.three_leads_genus2_pencil_symbolic_v2";
+    let candidate = super::three_leads::is_pencil_symbolic(&child.envelope.arm.method);
     let prefix = if candidate {
         Some(super::diagnostics::ingest(
             &child.output_root,
@@ -1721,14 +1721,14 @@ fn assemble(
     // This audit clock is separate from child timing and its isolation grade.
     let audit_verification = recovered.map(|k| {
         let started = Instant::now();
-        let matches = inst.mul_generator_hex(k).as_ref() == Some(&w.target);
+        let matches = inst.mul_generator_exact(k).as_ref() == Some(&w.target);
         let elapsed_ns = u64::try_from(started.elapsed().as_nanos())
             .expect("bounded parent audit verification interval");
         (matches, elapsed_ns)
     });
     let matches_target = audit_verification.map(|(matches, _)| matches);
     // A public target has no planted answer: [k]G = Q decides alone.
-    let matches_planted = w.planted.and_then(|p| recovered.map(|k| k == p));
+    let matches_planted = w.planted.and_then(|p| recovered.map(|k| k == p.into()));
     let status = if reaped.spawn_error.is_some() {
         "spawn_error"
     } else if reaped.interrupted {

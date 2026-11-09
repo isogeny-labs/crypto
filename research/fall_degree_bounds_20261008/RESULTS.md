@@ -552,3 +552,40 @@ These are verified output files, not a solver-memory checkpoint. No closure
 replay, independent algorithm validation, retry or deadline extension accompanies
 this preservation. Earlier still-running records are historical; the requested
 E12a degree determination and the general first-/last-fall questions remain open.
+
+## E13 (Amendments 17 and 18): independent-engine check, degree 5 at (3, 21, 7), and (4, 28, 7), 2026-11-08
+
+Local route (Amendment 18): 4 vCPU, 15 GB, `ulimit -v` 13 GiB, sequential, frozen source
+main `a2be6609`. Run 2026-11-07 22:56 → 2026-11-08 10:05 UTC. One container restart
+(01:37 UTC): B_3-21-7_d0 was recomputed from scratch, and attempt 1 is kept as `.err.attempt1`.
+Gates G0 (7 tests ok) and G1 (closure_rank 131,588, empty diff) passed.
+Scored by `e13/score_e13.py` from committed files → `e13/score.json`. Report, graph
+and PDF: `reports/run-20261108-e13/`.
+
+| part | registered reading | prediction (A17 / A18) |
+|:--|:--|:--|
+| E13b | **disagreement** (rule as written): **no draw differs**, but 3 of 8 controls (6:10:3 d1, d3, d4, `N = 58`) are not completed (memory), so "every control refutes" is not met | agreement 0.85 / `N = 58` controls not completed 0.5 |
+| E13a | **not completed**: 0 of 4 draws measured; each exceeded 13 GiB at degree 5 after ~19 min | not completed 0.1 / 0.85 |
+| E13c | **no reading**: gate 0 did not build (rustc/LLVM out of memory under the cap, which the runner applied to the whole `run_window.sh`, build included); no draw computed | no reading 0.8 / not completed 0.95 |
+
+**E13b detail.**
+- **Censored draws:** all 12 E10 `d_F ≥ 5` draws saturate unrefuted at degree 4 under
+  `pe`, with `closure_rank` equal to `hky_par`'s degree-4 `dim`. The degree-3 ranks are equal too.
+
+  | cell | degree-4 ranks |
+  |:--|:--|
+  | 3:21:7 | 117,335, 116,485, 118,185, 117,505 |
+  | 3:24:8 | 186,549, 187,453, 186,323, 185,193 |
+  | 3:27:9 | 160,259 ×4 |
+
+- **Controls:** 4:12:3 ×4 refute at degree 4 and 6:10:3 d2 at degree 3, each as recorded.
+  The suspension clause of "disagreement" lists **no cell**, so the E10 `≥ 5` readings are
+  not suspended.
+- **What the "disagreement" label reflects:** the rule had no case for an unmeasured
+  control. It does not reflect a mismatch.
+- **What is shown:** a second closure implementation reproduces every censored draw. Its
+  positive detection of a degree-4 refutation is confirmed only at `N = 48` (4:12:3),
+  not at `N = 58`.
+
+**Open:** the exact `d_F` at (3, 21, 7) and any reading at (4, 28, 7) need more than
+13 GiB. That means a pod under a new amendment. Nothing was retried under Amendments 17 and 18.

@@ -2515,7 +2515,10 @@ mod tests {
             1,
         )
         .unwrap();
-        assert_eq!(rep.recovered, Some(4242));
+        assert_eq!(
+            rep.recovered,
+            Some(crate::cryptanalysis::ecbench::exact_scalar::ExactScalar::from(4242u64))
+        );
         let run_fb = rep.factor_base.clone().unwrap();
         let kc = bi.koblitz.as_ref().unwrap();
         let (rebuilt, points) =
