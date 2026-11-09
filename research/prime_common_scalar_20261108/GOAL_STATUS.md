@@ -29,7 +29,11 @@ source-recovery component derives the actual node counts, ceiling and complete
 per-node multiplicity margin, then proves that exact scaled source jets
 determine the actual cleared polynomial over any Q-algebra. See
 [source-recovery report](reports/source-recovery-20261109/REPORT.md).
-Finite-precision multiplier losses and uniform mode/entry costs remain open.
+The subsequent [Hermite precision component](reports/hermite-precision-20261109/REPORT.md)
+derives actual multiplier/evaluation losses and stability of the explicit
+finite functional at the original source precision, over rational integral
+coefficients. Exact D.9 reconstruction from quotient jets, coordinate refinement
+and uniform mode/entry costs remain open.
 [pcc:unverified]
 
 ## The outstanding algorithm theorem
