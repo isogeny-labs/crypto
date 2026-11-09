@@ -296,10 +296,10 @@ pub fn run(args: PrimeArgs) -> Result<Value, String> {
         let params = parse_efd_bindings(&args.efd_params, &p)?;
         let repr = EfdRepresentation::new(model_id, &args.efd_chart, &p, &params)?;
         let chart_label = repr
-            .chart_id
+            .chart_id()
             .split_once('/')
             .map(|(_, chart)| chart)
-            .unwrap_or(repr.chart_id.as_str());
+            .unwrap_or(repr.chart_id());
         let curve_name = format!("EFD {model_id}/{chart_label} over F_{p}");
 
         macro_rules! efd_prime {
