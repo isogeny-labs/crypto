@@ -108,6 +108,37 @@ and raise its share. The inherited engine does not use `D ≥ 4` on these
 cells (`max_degree: 3`), so that would be a different and costlier
 operating point. It is not pursued here.
 
+## Follow-up: root degree D = 4 (2026-11-09)
+
+At D = 4 the cubic prefix takes linear multipliers, so the cacheable share
+grows. Commands are the same as above with `--degree 4 --max-degree 4`.
+These cells have at least 24 variables, so the engine builds only the top
+degree. Raw files are named `raw/*D4.jsonl`. `[pcc:unverified]`
+
+| cell | prefix rows / root rows | root share of stage | scratch ÷ prefix (incl. one-time) | (excl.) | stage XORs, D = 4 ÷ D = 3 (scratch) | splits D = 3 → D = 4 |
+|:--|--:|--:|--:|--:|--:|--:|
+| K0/2^13 dim 4 m 4 | 664 / 2568 | 11 % | 1.012 | 1.022 | 118× | 650 → 373 |
+| K1/2^15 dim 4 m 4 | 821 / 3629 | 3 % | 1.001 | 1.004 | 188× | 1846 → 920 |
+| K0/2^15 dim 5 m 3 | 355 / 3422 | 28 % | 1.002 | 1.006 | 147× | 200 → 84 |
+| K1/2^17 dim 5 m 3 | 415 / 4733 | 21 % | 1.000 | 1.002 | 188× | 247 → 114 |
+
+- **Exact again.** Row spaces are equal, and verdicts, splits and
+  reductions are identical between the two arms.
+- **The cacheable share grows as predicted:** 26–23 % of root rows at
+  m = 4 and 9–10 % at m = 3. On the m = 4 cells the per-target root work
+  falls by about 20 % (for example 15.2 M → 12.1 M XORs on K0/2^13).
+- **The stage barely moves:** 1.000–1.012× including the one-time build,
+  and 1.002–1.022× excluding it. Below the root, the stage is dominated by
+  specialisation and re-reduction, which the cache does not touch.
+- **D = 4 is the wrong operating point.** It halves the splits, but the
+  stage costs 118–188× more word XORs than D = 3 from scratch. The best
+  D = 4 cell (1.022×) is therefore still about 115× worse than the
+  production D = 3 baseline.
+
+**Decision:** the null stands at both degrees. Raising D makes the prefix
+cacheable, but it costs two orders of magnitude more than the cache can
+save.
+
 ## Reproduce
 
 ```

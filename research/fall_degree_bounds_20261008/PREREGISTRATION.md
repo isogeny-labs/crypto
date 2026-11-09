@@ -963,3 +963,62 @@ E13 part has been computed.
   - E13c: 0.95.
 
 Nothing from any E13 part has been computed, and no E13 draw has been generated.
+
+## Amendment 19 (2026-11-09 UTC, before any draw below): E14, the parts of E13 that need more than 13 GiB, on RunPod
+
+**Why.**
+- E13 ran locally under a 13 GiB cap (Amendment 18). Three parts ran out of memory:
+  - the three `N = 58` controls 6:10:3 d1, d3 and d4;
+  - all four E13a draws (degree 5 at (3, 21, 7));
+  - the E13c gate build. The local runner put the cap on the build too.
+- The owner topped up RunPod on 2026-11-09 and asked for the pod route.
+- E13's recorded readings are unchanged. E14 is a new run with its own readings.
+
+**Route.** As in Amendment 17:
+- **Pod:** one RunPod CPU pod, `cpu3g`, 64 vCPU, `interruptible: false`.
+- **Source:** the same frozen archive (main `a2be6609`, SHA-256 `18b14930…`), fetched by
+  presigned URL and hash-checked.
+- **Outputs:** tarred to S3 by presigned PUT every 10 minutes and after every draw.
+- **Hard cap of USD 100:** the pod reads its own `costPerHr` from the RunPod API and sets
+  its deadline to `min(36 h, floor(100 / costPerHr) h)` from start. It deletes itself at
+  the end or at the deadline. No second pod is created without a new amendment.
+- **Memory:** no `ulimit`.
+- **Gates:** G0 and G1 of Amendment 17, unchanged. E14c also runs the gates of
+  `e12/run_window.sh`.
+
+**E14b: the three unmeasured E13b controls.**
+- **Run:** 6:10:3 draws 1, 3 and 4 (recorded `d_F` = 4 each), from
+  `e9/run-r3/out/E_6-10-3.jsonl`, with
+  `dreg_linear_guess --engine pe --batch 64 --to 4 --max-cols 600000 --draw D`, 64 threads.
+- **Reading:**
+  - **"controls confirmed"** if all three refute at degree 4.
+  - **"control differs"** if any of them saturates unrefuted at degree 4 or refutes at
+    degree 3. The draw is listed.
+  - **"not completed"** if any draw does not finish.
+- **Combined with E13b:** if E14b reads "controls confirmed", E13b's condition holds over
+  E13 and E14 together. All 12 censored draws agree, and all 8 controls refute at their
+  recorded `d_F`. That combined statement is reported as **"independent agreement (E13b +
+  E14b)"**. E13b's own recorded reading stays "disagreement".
+
+**E14a: the exact `d_F` at (3, 21, 7).** Rules as E13a (Amendment 17):
+- **Run:** `--to 5 --max-cols 1000000`, draws 0, 1, 3 and 4 in that order, 40 threads.
+- **Per draw:** "`d_F = 5`", "`d_F ≥ 6`" or "unmeasured". The degree-4 entry must equal
+  E13b's committed record for the same draw, or the draw is void.
+- **Cell:** "`d_F = 5`" if ≥ 3 of 4 draws read 5; "`d_F ≥ 6`" if ≥ 3 of 4 read ≥ 6;
+  "split" if ≥ 2 are measured; "not completed" otherwise.
+
+**E14c: (4, 28, 7).** `e12/run_window.sh "$OUT/C" 4:28:7`, 24 threads, concurrent with E14a.
+- **Reading:** Amendment 11's E12c rule. "H_ℓ refuted at `m = 4`" if at least 2 completed
+  draws are "`d_F = 4` certified"; otherwise "no reading".
+- **Consistency check:** draw 0 must equal `e12/interrupted-c-20261028/W_4-28-7.jsonl` on
+  every non-timing field.
+
+**Scheduling.** Gates first, then E14b, then E14a and E14c concurrently. A part cut off by
+the deadline is "not completed". Nothing is retried.
+
+**Prediction (recorded before any draw).**
+- E14b "controls confirmed": 0.85.
+- E14a: "`d_F = 5`" 0.55, "`d_F ≥ 6`" 0.3, "not completed" 0.15.
+- E14c: "no reading" 0.75.
+
+Nothing from any E14 part has been computed, and no E14 draw has been generated.

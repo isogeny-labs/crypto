@@ -25,6 +25,8 @@ for f in "$here"/pass/*.lean "$here"/fail/*.lean; do
   fi
 done
 # Projects with an unimported source must not inherit a default-root pass.
+# Lake rejects an unregistered module during the explicit source build; a
+# registered module reaches the axiom audit, where `sorry` must be rejected.
 projects=$(mktemp -d)
 trap 'rm -rf "$projects"' EXIT
 for control in omitted unconfigured-good configured-good configured-bad; do
@@ -52,16 +54,22 @@ EOF
   git -C "$project" add .
   (cd "$project" && "$gate" --out receipts .) > /tmp/lean-selftest.$$ 2>&1
   rc=$?
+  reason=''
   case "$control" in
-    omitted) want_rc=1; expect='FAIL_audit' ;;
-    unconfigured-good) want_rc=0; expect='PASS +2 thm' ;;
+    omitted) want_rc=1; expect='FAIL_source_build'; reason='unknown module.*Omitted' ;;
+    unconfigured-good) want_rc=1; expect='FAIL_source_build'; reason='unknown module.*Omitted' ;;
     configured-good) want_rc=0; expect='PASS +2 thm' ;;
     configured-bad) want_rc=1; expect='FAIL_audit' ;;
   esac
-  if [ "$rc" -eq "$want_rc" ] && grep -qE "$expect" /tmp/lean-selftest.$$; then
+  if [ "$rc" -eq "$want_rc" ] && grep -qE "$expect" /tmp/lean-selftest.$$ && \
+     { [ -z "$reason" ] || grep -qE "$reason" /tmp/lean-selftest.$$; }; then
     echo "ok    $control $(head -1 /tmp/lean-selftest.$$)"
   else
     echo "WRONG project $control expected $want_rc /$expect/, got $rc"
+    cat /tmp/lean-selftest.$$
+    bad=1
+  fi
+done
 # A Lake default target can omit a registered Lean module. The gate must
 # explicitly build and audit the omitted tracked source before passing.
 for project in "$rel/project-omitted" "./$rel/project-omitted" "$rel/project-omitted/" "$rel/project-quoted"; do
