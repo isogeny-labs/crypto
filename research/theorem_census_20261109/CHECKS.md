@@ -280,3 +280,24 @@ with appended claim/note events for the changed digests; statements and all
 existing ledger rows are unchanged. This is a correction of our metadata
 defect, not an inherited CI failure. The amendment receipt records both
 digests. [pcc:unverified]
+
+## 2026-11-09: prime-five finite cycle and complete F3/F5native population
+
+The separate Mumford project gate now passes348declarations/0failing/
+0trusted-native. New Stollx5+1/F3classification proves complete10/8counts;
+all25nonzero-v Cantor steps, actual full gcd, prime5generation/order,
+properness and fraction1vs4/5are Leanchecked. Source327d3183precedes
+supplementIDC1hb7102c15384f2648and theorem packetd8b77b; full local
+PCCcheck passes23:00:19Z. Full ambient ten-pair group and geometric
+Picard identification remain open. [pcc:unverified]
+
+Frozen nativecensusa7bc5ba9completes4calls: all243/3125monic quintics
+per field/repeat,162/2500squarefree; C++matches31560/2707800additions
+and595488/111960960triples. Proper nontrivial unequal counts321/11005,
+with odd-prime/noncharacteristic strata42/1510. Six deterministic files
+per field repeat byte-identically. Canonical four-row export/file check
+passes0findings;40rawfiles are archived and unpack/hashchecked.
+Unsigned measurement37f91chas local not_covered(missing signed replay/
+recompute), not a signed or separate-host verification. Native L0clocks
+are invalid scientifically, paidcompute0. See the study's CENSUS.md,
+STOLL_CYCLE.md and verification metadata. [pcc:unverified]

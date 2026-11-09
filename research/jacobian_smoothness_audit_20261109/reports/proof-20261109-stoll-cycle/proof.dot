@@ -1,0 +1,15 @@
+digraph Stoll {
+  graph [rankdir=LR,bgcolor="white",pad="0.16",nodesep="0.25",ranksep="0.35",fontname="DejaVu Sans"];
+  node [shape=box,style="rounded,filled",fillcolor="#edf4fa",fontname="DejaVu Sans",fontsize=10];
+  edge [fontname="DejaVu Sans",fontsize=9,color="#355d7d"];
+  complete [label="All bounded polynomial pairs\n91 coefficient shapes\n10 actual pairs; 8 split u"];
+  cert [label="25 explicit Cantor steps\ncommon divisors + Bezout\nnormalized full gcd\ncomposition + reduction"];
+  cycle [label="Actual five-pair cyclic image\n(1,0), (X,±1), (X²,±1)\n(X,1) has order 5",fillcolor="#e7f4ed"];
+  fractions [label="Exact fractions\ncycle 5/5 = 1\nambient 8/10 = 4/5",fillcolor="#e7f4ed"];
+  bridge [label="Open formal bridges\nfull ten-pair ambient addition\ngeometric Picard/Jacobian",style="rounded,dashed",fillcolor="white",color="#9a6742"];
+  complete -> fractions;
+  cert -> cycle;
+  cycle -> fractions;
+  complete -> bridge [style=dashed,color="#9a6742"];
+  cycle -> bridge [style=dashed,color="#9a6742"];
+}

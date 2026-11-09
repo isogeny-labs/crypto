@@ -1,12 +1,15 @@
-Current native update: [both calibration controls match](CALIBRATION.md),
-with raw/file-checked exports and retained failed launcher. Full census
-protocol is separately frozen before population data; the new Stoll
-count module compiles, with full gate and cycle work pending. [pcc:unverified]
+Current result: [the actual prime-five Cantor cycle](STOLL_CYCLE.md) has
+smooth fraction1versusambient4/5; the whole tracked project gate passes348
+declarations/0failing/0trusted-native. The [complete native census](CENSUS.md)
+passes all4cells, two-language arithmetic and byte-identical repeats over
+all F3/F5monic quintics. [Calibration failures and controls](CALIBRATION.md)
+remain retained. Scientific standing is unsigned/unverified; full ambient
+Stoll-group/geometry and the original all14gaps stay explicit. [pcc:unverified]
 
 # Mumford counts and a finite Cantor subgroup counterexample
 
 The new [F5control](FIVE_CONTROL.md) proves a complete16-pair model,
-all16smooth, before native calibration. Current project gate240passes
+all16smooth, before native calibration. The F5-stage project gate240passes
 with0failures/0trusted-native exceptions. A separately frozen native
 calibration protocol pins both built executables; no curve invocation has
 run at this pre-calibration writing. [pcc:unverified]
@@ -46,7 +49,7 @@ and uses a different relation-count convention. [pcc:unverified]
 ## Scope and checks
 
 The Cantor-stage whole tracked gate passed170declarations,0failing and
-0trusted-native exceptions; the subsequent F5control raises the current
+0trusted-native exceptions; the subsequent F5control raised the then-current
 project gate to240. Both include generated declarations. The initial count-only gate passed80; its
 historical receipt is retained. The exact initial source/primary read
 scopes and planned native scalar supplement are in [sources.json](sources.json).
@@ -86,5 +89,5 @@ The current Cantor packet is PCC-20261109-4a0f82, with source/identity
 plan in [cantor-sources.json](cantor-sources.json). Scalar supplement
 IDC1h95637a8da70e67cd covers only cancellation/factorization identities.
 The actual gcd,64reductions, group matching and subgroup counts rest on Lean.
-See [current full gate](evidence/cantor-subgroup-gate.log).
+See the [historical Cantor-stage gate](evidence/cantor-subgroup-gate.log).
 [pcc:unverified]
