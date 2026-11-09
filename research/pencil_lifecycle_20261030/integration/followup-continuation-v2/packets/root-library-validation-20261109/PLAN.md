@@ -25,3 +25,11 @@ Worker preserves default features and one Cargo job/test thread. Compile: cargo 
 1800 seconds total including hashing, compilation, tests, cleanup/sealing. Outer1795s TERM plus5s KILL. Native unit2CPU/16GiB/zero swap/tasks512, runtime clipped to deadline2026-11-10T05:11:39Z; worker retains reviewed16GiB RLIMIT_AS and singleCargo job. Workspace cache/free-space thresholds6GiB; worker logs256MiB; metadata64MiB; total durable output384MiB. Thresholds are sampled, not quotas. One attempt, no retries; all failures/costs preserved.
 
 Use launch-draft.json with fresh caller control output paths. Preserve outer command exit/stdout/stderr durably. Success requires outer exit0, in-bound completion.json, matching sealed output manifest and every member, native noerrors/payloadpassed, every exact control/fullsuite/post-input record, and owned empty cgroup. Completion marker alone is insufficient. Source validation does not generate a matched-cohort result.
+
+## Materialization binding update
+
+Copied exact successful materializer input-manifest bytes c5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2 and terminal/worker receipts. No source regeneration. New T-1958 epoch3/attempt2 lease is explicit in coordination-claim.json. Root expects charged1080 after pending60-second wrapper qualification, leaving42120 before1800reservation and40320unreserved. Qualification remains pending until actual receipt bound; admission stillfalse and publication fieldsnull. No worker launch by this agent. [pcc:unverified]
+
+## Final admission, pending final publication readback
+
+Root reported and retained26/26synthetic wrapper cases passed, exit0; qualification-result.json/exit and sourcepublication receipts are copied exactly and hash-bound. Cumulative1080charged,42120before1800reservation,40320unreserved. admission.json now admits the configured singleattempt subject to parent finalbindingreview/publicationreadback/livefence/resources/nooverlap. publication.json binds reviewed wrapper/qualification source079484df3a1bb5afdce3c3e017ab3ba70a702b1d; finalconfig GitHubreadback must be retained externally after publication. Earlier admission-draft/publication-pending/launch-draft remain historicalprepared records and are not operational files. No tests/payload launched by preparation agent. [pcc:unverified]

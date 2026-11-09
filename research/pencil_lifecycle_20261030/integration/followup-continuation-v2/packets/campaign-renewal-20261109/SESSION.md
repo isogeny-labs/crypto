@@ -59,3 +59,15 @@ Wait for complete materialization and native terminal custody, then serial60sroo
 
 ## Errors
 No new payload error observed. Existing known-C1diagnostic-only wording is stale for changedruntime. [pcc:unverified]
+
+## What was done — 17:36 UTC
+Materializer passed20,762files/573.064698s with manifestc5178d2138d79f1ea8cac1fc96cb8d968913ba403d68ee66fa36afdd60fdf3f2. Samecapturedinvocation success/exit0/MainPID0,cgroupabsent, then ownedunitstopped. Root wrapper qualification ran once afterterminal,26casespass/exit0/0.222153109s. [pcc:unverified]
+
+## Decisions made
+Charge full900materializer and60rootqualification; cumulative1080seconds, reserve1800fullvalidation,unreserved40320. [pcc:unverified]
+
+## Open threads
+Bind actualmanifest and qualification with finalrootadmission; archive nativeevidence and publishreports. [pcc:unverified]
+
+## Errors
+No errors in completedmaterializer or wrapperqualification. [pcc:unverified]
