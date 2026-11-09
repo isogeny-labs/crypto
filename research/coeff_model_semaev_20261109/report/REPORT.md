@@ -5,7 +5,11 @@ subtitle: "Coefficient size and curve model in S3/S4 relation finding, on reduce
 
 # Answer
 
-**The class is flat.** On reduced ECCp-131 analogues, isogenous curves with
+**The class is flat**: the registered primary cell (C40-S3) meets every
+condition of the frozen "flat" rule. The 2^48 replication sees no effect
+either (P1 0.996 [0.910, 1.091]), but by rule it is "inconclusive", because
+its positive control was too weak to be detected. On reduced ECCp-131
+analogues, isogenous curves with
 minimal |a|, |b| find S3 relations at the same rate and the same counted cost
 as random isogenous curves. Montgomery and Edwards factor bases on a 4 | #E
 side curve match Weierstrass ones. A small-coefficient member of a class
@@ -22,7 +26,7 @@ extrapolation from measured values, not measured at 131 bits).
 | Montgomery/Edwards model inside the ECCp-131 class? | None. h = 1, so every isogenous curve has prime order, and 4 ∤ #E | exact |
 | S3 yield, small-coefficient members vs random members, p ≈ 2^40.3 | 0.987 [0.928, 1.051]: **flat** under the frozen rule | measured |
 | Same at p ≈ 2^48, T = 200 (registered) | 0.962 [0.801, 1.156]: **inconclusive** (underpowered) | measured |
-| Same at p ≈ 2^48, T = 800 (amendment A2) | see §3.2 | measured |
+| Same at p ≈ 2^48, T = 800 (amendment A2) | 0.996 [0.910, 1.091]; still **inconclusive** by rule (planted control not detected), no effect seen | measured |
 | S3 counted cost per base element, every Weierstrass arm | identical (74.0576–74.0577 at 2^40; 87.0693 at 2^48) | measured, exact count |
 | Montgomery vs Weierstrass S3 yield (side curve) | 1.091 [0.976, 1.216], p_holm 0.77: no effect | measured |
 | Montgomery vs Weierstrass S3 cost | 74.06 vs 75.06 mults per element: one multiplication (the b·s term), 1.3% | measured, exact count |
@@ -141,7 +145,33 @@ mismatches).**
 - **Decision: inconclusive.** The design was underpowered for its own
   positive control, a protocol fault recorded in amendment A2.
 
-**Extended (amendment A2, T = 800).** C48_T800_PLACEHOLDER
+**Extended (amendment A2, T = 800).** 7200 targets, 45 cross-checks, 0
+mismatches.
+
+- **Replay**: the 1800 T = 200 rows reappear in the T = 800 output with
+  identical counts and multiplication tallies (0 differences,
+  `runs/C48-S3-T800.replay.json`). The 6164 rows of a first T = 800 attempt,
+  killed by a 2-hour task limit, also reappear unchanged.
+- P1 = **0.996 [0.910, 1.091]**. Every family contrast has p_holm = 1.0:
+  - SMALL1/RAND 0.998 [0.885, 1.120]. The T = 200 dip of 0.76 regressed
+    away.
+  - SMALL2/RAND 0.994
+  - P3 SMALL1/SMALL1_ISO 0.979 [0.847, 1.130]
+  - E0/RAND 1.039
+- Heterogeneity p = 0.99. Counted cost is 87.0693 multiplications per
+  element on every arm.
+- Positive control: 1.116 [0.972, 1.279]. **Not detected.**
+- **Decision under the frozen rule: still inconclusive**, for one reason
+  only: the planted control was not detected. At p = 2^48 the planted signal
+  is weak (+0.12 measured), so even T = 800 cannot resolve it. No further
+  extension is made; that would compound optional stopping.
+- What the cell does establish, independently of the control: any effect of
+  coefficient size on S3 yield at 2^48 is smaller than ±9% (the P1 CI). The
+  C40 detector, the same code, demonstrably sees a +31% planted effect.
+- Descriptive note, not the registered rule: the PLANTED arm's own mean,
+  1.13 ± 1.96 SE, excludes the heuristic value 1 (figure, third panel).
+  The registered contrast divides by E0 and inherits E0's noise, which is
+  why it does not exclude 1.
 
 ## 3.3 C40-S4 (descriptive; T = 40, registered as low power)
 
