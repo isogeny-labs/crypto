@@ -190,3 +190,28 @@ construction, harnesses and result generation. Changes:
   the rebuilt binary, whose hash is recorded in FROZEN_A1.sha256. The S3/S4
   instrument code (`s3_count`, `gl_count`, `target`, `build_base`, the run
   loop) is unchanged.
+
+## Amendment A2 (2026-11-09, after the T=200 C48-S3 analysis, before any extension data)
+
+Registered verdict at the frozen sample size: C48-S3 at T = 200 is
+**inconclusive**. P1 = 0.962 [0.801, 1.156]; the upper bound exceeds the
+1.15 margin, and the positive control was not detected (PLANTED/E0 = 1.105
+[0.836, 1.447], 13 planted targets). This verdict stands and is reported
+first.
+
+The design was underpowered, a fault in the protocol, not in the data: 10%
+planting at T = 200 adds about 20 planted targets per arm, which is too few
+to move a ratio whose SE is about 0.15. Extension:
+
+- C48-S3 rerun at T = 800 per arm (`runs/C48-S3-T800.cell`). It is identical
+  to `runs/C48-S3.cell` except T, with the same binary (FROZEN_A1), arms,
+  seeds and order seed. Targets are derived per index, so indices 0–199
+  regenerate the T = 200 targets. Their rows must reproduce the original
+  y/muls exactly (replay check); any mismatch voids the extension.
+- Same analysis, margin [0.85, 1.15], positive-control rule and Holm family.
+- Caveat stated in advance: the extension was decided after seeing an
+  inconclusive interim, which is optional stopping. The T = 800 verdict is
+  reported as "extended (A2)", next to the T = 200 verdict, never in its
+  place.
+- C40-S4 (T = 40) stays descriptive, as registered in §3. It is not
+  extended.
