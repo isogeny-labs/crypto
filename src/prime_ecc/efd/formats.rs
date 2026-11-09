@@ -42,7 +42,8 @@ impl Projection {
 }
 
 fn div(a: &FieldElement, b: &FieldElement) -> Result<FieldElement> {
-    let inverse = b.inv().ok_or(EfdError::ZeroDenominator)?;
+    // Public coordinates: variable-time inversion, see `program::Expr::eval`.
+    let inverse = b.inv_vartime().ok_or(EfdError::ZeroDenominator)?;
     Ok(a.mul(&inverse))
 }
 
@@ -308,7 +309,7 @@ impl Representation {
             });
         }
         if self.id.starts_with("jintersect/") {
-            let zi = get("Z")?.inv().ok_or(EfdError::ZeroDenominator)?;
+            let zi = get("Z")?.inv_vartime().ok_or(EfdError::ZeroDenominator)?;
             return Ok(Projection::Triple {
                 s: get("S")?.mul(&zi),
                 c: get("C")?.mul(&zi),
@@ -316,7 +317,7 @@ impl Representation {
             });
         }
         if self.id == "shortw/xz" || self.id == "montgom/xz" {
-            let zi = get("Z")?.inv().ok_or(EfdError::ZeroDenominator)?;
+            let zi = get("Z")?.inv_vartime().ok_or(EfdError::ZeroDenominator)?;
             return Ok(Projection::X(get("X")?.mul(&zi)));
         }
         if self.id == "edwards/inverted" || self.id == "twisted/inverted" {
@@ -327,12 +328,12 @@ impl Representation {
         }
         let (x, y) = match self.id.as_str() {
             "shortw/jacobian" | "shortw/jacobian-0" | "shortw/jacobian-3" | "shortw/modified" => {
-                let zi = get("Z")?.inv().ok_or(EfdError::ZeroDenominator)?;
+                let zi = get("Z")?.inv_vartime().ok_or(EfdError::ZeroDenominator)?;
                 let z2 = zi.mul(&zi);
                 (get("X")?.mul(&z2), get("Y")?.mul(&z2.mul(&zi)))
             }
             "shortw/w12-0" => {
-                let zi = get("Z")?.inv().ok_or(EfdError::ZeroDenominator)?;
+                let zi = get("Z")?.inv_vartime().ok_or(EfdError::ZeroDenominator)?;
                 (get("X")?.mul(&zi), get("Y")?.mul(&zi.mul(&zi)))
             }
             "shortw/xyzz" | "shortw/xyzz-3" => (
@@ -340,20 +341,20 @@ impl Representation {
                 div(&get("Y")?, &get("ZZZ")?)?,
             ),
             "2dik/standard" => {
-                let zi = get("Z")?.inv().ok_or(EfdError::ZeroDenominator)?;
+                let zi = get("Z")?.inv_vartime().ok_or(EfdError::ZeroDenominator)?;
                 (get("X")?.mul(&zi), div(&get("Y")?, &get("ZZ")?)?)
             }
             "3dik/standard" => {
-                let zi = get("Z")?.inv().ok_or(EfdError::ZeroDenominator)?;
+                let zi = get("Z")?.inv_vartime().ok_or(EfdError::ZeroDenominator)?;
                 let z2 = zi.mul(&zi);
                 (get("X")?.mul(&z2), get("Y")?.mul(&z2.mul(&zi)))
             }
             "jquartic/xyz" | "jquartic/2xyz" => {
-                let zi = get("Z")?.inv().ok_or(EfdError::ZeroDenominator)?;
+                let zi = get("Z")?.inv_vartime().ok_or(EfdError::ZeroDenominator)?;
                 (get("X")?.mul(&zi), get("Y")?.mul(&zi.mul(&zi)))
             }
             "jquartic/xxyzz" | "jquartic/xxyzzr" | "jquartic/2xxyzz" | "jquartic/2xxyzzr" => {
-                let zi = get("Z")?.inv().ok_or(EfdError::ZeroDenominator)?;
+                let zi = get("Z")?.inv_vartime().ok_or(EfdError::ZeroDenominator)?;
                 (get("X")?.mul(&zi), div(&get("Y")?, &get("ZZ")?)?)
             }
             "shortw/projective"
@@ -366,7 +367,7 @@ impl Representation {
             | "hessian/standard"
             | "hessian/extended"
             | "twistedhessian/projective" => {
-                let zi = get("Z")?.inv().ok_or(EfdError::ZeroDenominator)?;
+                let zi = get("Z")?.inv_vartime().ok_or(EfdError::ZeroDenominator)?;
                 (get("X")?.mul(&zi), get("Y")?.mul(&zi))
             }
             _ => return Err(EfdError::Unsupported(self.id.clone())),

@@ -205,12 +205,29 @@ impl Formula {
             Err(e) => Err(e),
         }
     }
+    /// Cached execution program for this formula. Parsing happens once per
+    /// process; repeated arithmetic reuses the same straight-line program.
+    pub fn compiled(&self) -> Result<&'static Program> {
+        static CACHE: OnceLock<std::collections::HashMap<&'static str, Program>> = OnceLock::new();
+        let cache = CACHE.get_or_init(|| {
+            let mut map = std::collections::HashMap::new();
+            for formula in &catalogue().formulas {
+                if let Ok(program) = formula.compile_any() {
+                    map.insert(formula.id.as_str(), program);
+                }
+            }
+            map
+        });
+        cache.get(self.id.as_str()).ok_or_else(|| {
+            EfdError::Unsupported(format!("{}: no executable program", self.id))
+        })
+    }
     /// Evaluate a reference program. No strings are evaluated as Rust or shell.
     /// Cache parameters with defining assumptions are derived if absent and
     /// verified if supplied. Point and differential-relation validity are the
     /// caller's responsibility. Use `weierstrass_operation` for checked ADD/DBL.
     pub fn evaluate(&self, modulus: &BigUint, inputs: &Bindings) -> Result<Bindings> {
-        self.compile()?.evaluate(modulus, inputs)
+        self.compiled()?.evaluate(modulus, inputs)
     }
 }
 
