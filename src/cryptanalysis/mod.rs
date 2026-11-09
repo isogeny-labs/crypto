@@ -104,6 +104,7 @@ pub mod b_weak_class_battery;
 pub mod bielliptic_quartic;
 pub mod biext_k2;
 pub mod binary_field_basis;
+pub mod binary_hyperelliptic_index_calculus;
 pub mod binary_isogeny;
 pub mod binary_root_trace;
 pub mod binary_semaev;
@@ -218,6 +219,7 @@ pub mod hashed_ecdl;
 /// (`crates/ecdl-tensor-ic`, Rust port of the Go `ecdltensor` prototype).
 pub use ecdl_tensor_ic as tensor_ic;
 pub mod dreg_forecast;
+pub mod hec_dlp;
 pub mod hilbert_class_poly;
 pub mod hky_fp_tower;
 pub mod hnp_ecdsa;
