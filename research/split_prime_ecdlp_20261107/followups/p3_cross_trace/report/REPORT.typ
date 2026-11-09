@@ -29,3 +29,6 @@ Percentile of each published curve's $z_691$ in the census, $p_24$ / $p_28$: pri
 
 = Next steps
 Re-run Y1 with the lab's `rho_negation` or a corrected walk under the same frozen covariates and seeds; diagnose the bimodality on 50 curves at $p <= 2^20$.
+
+= Round 2: rho rerun with the corrected walk
+Card `CARD-p3-cross-trace-20261108-r2` (executed as specified). Root cause of the round-1 defect: distinguished-point bits set per curve from $floor(log_2 n slash 4)$ at primes just below a power of two, plus long fruitless cycles from small jump coefficients. Walk v2 passed the frozen gate. *Outcome (PROTOCOL-R2 rule 3): null, instrument informative* [pcc:unverified]: A/A $r$ = 0.027 / 0.009 (round 1: 0.974 / 0.986), variance ratios 0.95 to 1.02, every per-curve mean in 0.850 to 1.091 · √n; all 7 rho tests null, every 95 % interval within ±0.19 % of zero (largest −0.087 % per SD, $p_24$ $z_691$, p = 0.083), minimum detectable effect 0.19 %. With round 1's coverage null, the seed is closed on both outcomes at $2^24$ and $2^28$.

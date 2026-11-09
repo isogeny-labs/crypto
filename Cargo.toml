@@ -87,6 +87,12 @@ path = "src/bin/quartic_ic.rs"
 name = "hyperelliptic-cover"
 path = "src/bin/hyperelliptic_cover.rs"
 
+# `hecx` — inspect, estimate and solve HECDLP instances over prime and binary
+# fields, with arbitrary genus, coefficients and subgroup orders.
+[[bin]]
+name = "hecx"
+path = "src/bin/hecx.rs"
+
 # `icx` — index calculus across every standardized curve (catalog + engine).
 [[bin]]
 name = "icx"
@@ -313,3 +319,9 @@ path = "research/conductor_gap_followups_20261016/native/posthoc.rs"
 [[bin]]
 name = "factor-base-sweep"
 path = "src/bin/factor_base_sweep.rs"
+
+# `classgroup` — exact class number of an imaginary quadratic field by the
+# relation method (crypto::isogeny::class_group_subexp).
+[[bin]]
+name = "classgroup"
+path = "src/bin/classgroup.rs"

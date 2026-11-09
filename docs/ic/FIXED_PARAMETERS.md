@@ -101,7 +101,7 @@ Use `--json` to retain the complete report beside the log.
 
 The pair-table builder is measured by `ecc2k130/codegen/bench_pair_table.py`;
 the 500,000-candidate ECC2K-130 run improved from 3,503 to 8,147 candidates/s
-on one worker, and to 26,295 candidates/s with four process workers, on the
+on one worker, and to 31,720 candidates/s with eight process workers, on the
 reference host (bulk index-off build). Lean proofs for the cursor, disk-budget, install-layout
 and update-selection arithmetic are in
 [`research/ic_cli_verification_20261107/`](../../research/ic_cli_verification_20261107/PROOF_MAP.md).
@@ -150,7 +150,7 @@ Useful variants:
 # Resume: same directory continues the pair cursor and attempt streams.
 target/release/ic ecc2k130 --dir runs/ecc2k130 --attempts 1000 --progress-every 10
 
-# Pair sums use min(4, CPU count) workers by default; pin them explicitly:
+# Pair sums use min(8, CPU count) workers by default; pin them explicitly:
 target/release/ic ecc2k130 --dir runs/ecc2k130 --pair-workers 8
 
 # SAT probe without a pair table.

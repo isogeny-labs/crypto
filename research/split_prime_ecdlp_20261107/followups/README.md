@@ -14,6 +14,15 @@ obstruction.
 | Lean obligations | `aburan28/crypto-lean` PR #3 | seven declarations, standard axioms only (local build) [pcc:unverified] | `CryptoLean.SplitPrime.Obstruction` |
 | Red team (P1, P2) | `red-team-p1-p2.md` | corrections folded into P1 and P2 RESULTS | |
 
+### Round 2 (protocols `*/PROTOCOL-R2.md`, merged in #3693)
+
+| item | outcome (frozen rules) [pcc:unverified] |
+|---|---|
+| P1 arm F and caps | Control met exactly; RR vs round 7's arm F: **trade at all 9 m = 3 cells** (one degree lower, 2.3–3.0× wider); RR vs T: dominates at t3, t4, trade at t5 |
+| P1 m5 t4 (first m = 5 cell with a tower) | **undecided**: RR timed out at 3 h (D ≥ 6), T capped at 13 GiB (D ≥ 9); needs a larger host and about a day |
+| P2 unplanted targets | **coset-independence holds exactly**: identical F4 work across cosets, primes and towers; the stage gain holds for the whole relation search |
+| P3 rho rerun (walk v2) | **null**: 0 of 7 tests, every CI within ±0.19 %; walk defect resolved (A/A r 0.027 / 0.009) |
+
 ## Rules shared by the three protocols
 
 - **Frozen before data.** Each protocol is committed before any claim cell runs.
