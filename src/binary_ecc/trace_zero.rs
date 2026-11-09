@@ -42,11 +42,11 @@ pub enum TraceZeroCoordinates {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum TraceZeroAffineMode {
-    /// 2n variables, n curve equations and two trace equations, degree <=2.
+    /// Unrestricted: 2n variables, n curve equations and two trace equations.
     Raw,
-    /// 2n-2 variables, n curve equations, degree <=3.
+    /// Unrestricted: 2n-2 variables, n curve equations, degree <=3.
     Compact,
-    /// 2n-1 variables, n curve equations and one quadratic helper equation.
+    /// Unrestricted: 2n-1 variables and one quadratic helper equation.
     Factored,
 }
 
@@ -135,6 +135,84 @@ pub struct TraceZeroVariety {
 pub struct TraceZeroFactorBase {
     pub subspace_basis: Vec<F2mElement>,
     pub points: Vec<BinaryPoint>,
+}
+
+/// Exact restriction of q(x)=Tr(x H(x)) to a supplied trace-zero basis.
+#[derive(Clone, Debug)]
+pub struct TraceZeroSubspaceProfile {
+    pub dimension: usize,
+    pub polar_rank: usize,
+    pub linear_terms: usize,
+    pub quadratic_terms: usize,
+    pub product_span_dimension: usize,
+    pub restricted_q: TraceZeroPolynomial,
+}
+
+fn binary_rank(rows: impl IntoIterator<Item = BigUint>, n: usize) -> usize {
+    let mut pivots: Vec<Option<BigUint>> = vec![None; n];
+    let mut rank = 0;
+    for mut row in rows {
+        for bit in (0..n).rev() {
+            if !row.bit(bit as u64) {
+                continue;
+            }
+            if let Some(pivot) = &pivots[bit] {
+                row ^= pivot;
+            } else {
+                pivots[bit] = Some(row);
+                rank += 1;
+                break;
+            }
+        }
+    }
+    rank
+}
+
+fn basis_coordinates(
+    basis: &[F2mElement],
+    value: &F2mElement,
+    n: u32,
+) -> Result<BigUint, TraceZeroError> {
+    if value.m_value() != n || basis.len() > n as usize {
+        return Err(TraceZeroError::InvalidCoordinates);
+    }
+    let mut pivots: Vec<Option<(BigUint, BigUint)>> = vec![None; n as usize];
+    for (i, b) in basis.iter().enumerate() {
+        if b.m_value() != n {
+            return Err(TraceZeroError::InvalidCoordinates);
+        }
+        let mut row = b.to_biguint();
+        let mut label = BigUint::one() << i;
+        for bit in (0..n).rev() {
+            if !row.bit(bit as u64) {
+                continue;
+            }
+            if let Some((r, l)) = &pivots[bit as usize] {
+                row ^= r;
+                label ^= l;
+            } else {
+                pivots[bit as usize] = Some((row.clone(), label));
+                break;
+            }
+        }
+        if row.is_zero() {
+            return Err(TraceZeroError::InvalidCoordinates);
+        }
+    }
+    let mut row = value.to_biguint();
+    let mut label = BigUint::zero();
+    for bit in (0..n).rev() {
+        if row.bit(bit as u64) {
+            if let Some((r, l)) = &pivots[bit as usize] {
+                row ^= r;
+                label ^= l;
+            }
+        }
+    }
+    if !row.is_zero() {
+        return Err(TraceZeroError::InvalidCoordinates);
+    }
+    Ok(label)
 }
 
 fn polynomial_gcd(mut a: BigUint, mut b: BigUint) -> BigUint {
@@ -593,6 +671,147 @@ impl TraceZeroVariety {
             variety: self.clone(),
             x,
             y,
+            x_basis: None,
+        })
+    }
+
+    fn subspace_x(
+        &self,
+        basis: &[F2mElement],
+        cap: usize,
+    ) -> Result<Vec<TraceZeroPolynomial>, TraceZeroError> {
+        basis_coordinates(basis, &F2mElement::zero(self.curve.m), self.curve.m)?;
+        if basis.iter().any(|b| b.trace(&self.curve.irreducible) != 0) {
+            return Err(TraceZeroError::InvalidCoordinates);
+        }
+        let mut x = vec![TraceZeroPolynomial::default(); self.curve.m as usize];
+        for (i, b) in basis.iter().enumerate() {
+            for (bit, p) in x.iter_mut().enumerate() {
+                if b.to_biguint().bit(bit as u64) {
+                    p.xor(&TraceZeroPolynomial::variable(i as u32), cap)?;
+                }
+            }
+        }
+        Ok(x)
+    }
+
+    pub fn subspace_profile(
+        &self,
+        basis: &[F2mElement],
+        max_terms: usize,
+    ) -> Result<TraceZeroSubspaceProfile, TraceZeroError> {
+        if max_terms == 0 {
+            return Err(TraceZeroError::TermCap);
+        }
+        let x = self.subspace_x(basis, max_terms)?;
+        let q = self.symbolic_q(&x, max_terms)?;
+        let d = basis.len();
+        let mut polar = vec![BigUint::zero(); d];
+        let mut linear = 0;
+        let mut quadratic = 0;
+        for term in &q.terms {
+            match term.as_slice() {
+                [_] => linear += 1,
+                [i, j] => {
+                    polar[*i as usize].set_bit(*j as u64, true);
+                    polar[*j as usize].set_bit(*i as u64, true);
+                    quadratic += 1;
+                }
+                _ => {}
+            }
+        }
+        let products = (0..d)
+            .flat_map(|i| (i..d).map(move |j| (i, j)))
+            .map(|(i, j)| {
+                basis[i]
+                    .mul(&basis[j], &self.curve.irreducible)
+                    .to_biguint()
+            });
+        Ok(TraceZeroSubspaceProfile {
+            dimension: d,
+            polar_rank: binary_rank(polar, d),
+            linear_terms: linear,
+            quadratic_terms: quadratic,
+            product_span_dimension: binary_rank(products, self.curve.m as usize),
+            restricted_q: q,
+        })
+    }
+
+    /// Exact full-kernel affine model with x restricted to this trace-zero
+    /// subspace. Variables are its basis coefficients, then y_1..y_(n-1).
+    /// Restrict before eliminating y_0: if q is linear here, degree stays two.
+    pub fn affine_system_over_subspace(
+        &self,
+        basis: &[F2mElement],
+        max_terms: usize,
+    ) -> Result<TraceZeroAffineSystem, TraceZeroError> {
+        self.affine_system_over_subspace_with_mode(basis, TraceZeroAffineMode::Compact, max_terms)
+    }
+
+    /// Matched raw/compact/factored presentations of the same restricted
+    /// point set. The already implied x-trace row is omitted in every mode.
+    pub fn affine_system_over_subspace_with_mode(
+        &self,
+        basis: &[F2mElement],
+        mode: TraceZeroAffineMode,
+        max_terms: usize,
+    ) -> Result<TraceZeroAffineSystem, TraceZeroError> {
+        if max_terms == 0 {
+            return Err(TraceZeroError::TermCap);
+        }
+        let n = self.curve.m as usize;
+        let x = self.subspace_x(basis, max_terms)?;
+        let mut y = vec![TraceZeroPolynomial::default(); n];
+        let q = self.symbolic_q(&x, max_terms)?;
+        let mut extra = Vec::new();
+        if mode == TraceZeroAffineMode::Raw {
+            let mut ty = q;
+            for i in 0..n {
+                y[i] = TraceZeroPolynomial::variable((basis.len() + i) as u32);
+                if self.trace_bits[i] {
+                    ty.xor(&y[i], max_terms)?;
+                }
+            }
+            extra.push(ty);
+        } else {
+            for i in 1..n {
+                y[i] = TraceZeroPolynomial::variable((basis.len() + i - 1) as u32);
+                if self.trace_bits[i] {
+                    let yi = y[i].clone();
+                    y[0].xor(&yi, max_terms)?;
+                }
+            }
+            if mode == TraceZeroAffineMode::Factored {
+                let helper = TraceZeroPolynomial::variable((basis.len() + n - 1) as u32);
+                y[0].xor(&helper, max_terms)?;
+                let mut relation = q;
+                relation.xor(&helper, max_terms)?;
+                extra.push(relation);
+            } else {
+                y[0].xor(&q, max_terms)?;
+            }
+        }
+        let mut equations = self.square(&y, max_terms)?;
+        let xy = self.multiply(&x, &y, max_terms)?;
+        let x2 = self.square(&x, max_terms)?;
+        let x3 = self.multiply(&x, &x2, max_terms)?;
+        for i in 0..n {
+            equations[i].xor(&xy[i], max_terms)?;
+            equations[i].xor(&x3[i], max_terms)?;
+        }
+        equations[0].xor(&TraceZeroPolynomial::one(), max_terms)?;
+        equations.extend(extra);
+        if equations.iter().map(|p| p.terms.len()).sum::<usize>() > max_terms {
+            return Err(TraceZeroError::TermCap);
+        }
+        Ok(TraceZeroAffineSystem {
+            variables: (basis.len() + n - usize::from(mode == TraceZeroAffineMode::Compact)) as u32,
+            equations,
+            mode,
+            variety: self.clone(),
+            x,
+            y,
+            x_basis: Some(basis.to_vec()),
         })
     }
 }
@@ -604,8 +823,14 @@ pub struct TraceZeroAffineSystem {
     variety: TraceZeroVariety,
     x: Vec<TraceZeroPolynomial>,
     y: Vec<TraceZeroPolynomial>,
+    x_basis: Option<Vec<F2mElement>>,
 }
 impl TraceZeroAffineSystem {
+    /// Some for a subspace-restricted model; x variables are coefficients
+    /// in this exact ordered basis, not raw polynomial-coordinate bits.
+    pub fn x_subspace_basis(&self) -> Option<&[F2mElement]> {
+        self.x_basis.as_deref()
+    }
     pub fn maximum_degree(&self) -> usize {
         self.equations
             .iter()
@@ -639,16 +864,30 @@ impl TraceZeroAffineSystem {
         let mut bits = Vec::new();
         match self.mode {
             TraceZeroAffineMode::Raw => {
-                for i in 0..n {
-                    bits.push(xb.bit(i as u64));
+                if let Some(basis) = &self.x_basis {
+                    let coefficients = basis_coordinates(basis, x, self.variety.curve.m)?;
+                    for i in 0..basis.len() {
+                        bits.push(coefficients.bit(i as u64));
+                    }
+                } else {
+                    for i in 0..n {
+                        bits.push(xb.bit(i as u64));
+                    }
                 }
                 for i in 0..n {
                     bits.push(yb.bit(i as u64));
                 }
             }
             _ => {
-                for i in 1..n {
-                    bits.push(xb.bit(i as u64));
+                if let Some(basis) = &self.x_basis {
+                    let coefficients = basis_coordinates(basis, x, self.variety.curve.m)?;
+                    for i in 0..basis.len() {
+                        bits.push(coefficients.bit(i as u64));
+                    }
+                } else {
+                    for i in 1..n {
+                        bits.push(xb.bit(i as u64));
+                    }
                 }
                 for i in 1..n {
                     bits.push(yb.bit(i as u64));

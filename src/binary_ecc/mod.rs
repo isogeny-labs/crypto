@@ -80,5 +80,5 @@ pub use hyperelliptic::{
 pub use poly_f2m::F2mPoly;
 pub use trace_zero::{
     TraceZeroAffineMode, TraceZeroAffineSystem, TraceZeroCoordinates, TraceZeroError,
-    TraceZeroFactorBase, TraceZeroVariety,
+    TraceZeroFactorBase, TraceZeroSubspaceProfile, TraceZeroVariety,
 };

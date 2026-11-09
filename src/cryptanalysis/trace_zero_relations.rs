@@ -1,14 +1,24 @@
 //! Exact full-trace-zero rational-point relation oracle.
 //!
-//! All S3 intermediate-identity patterns are retained. Full affine curve and
-//! two-bit 4E membership constraints are attached to each summand. A model
-//! is still checked in the original group; caps never imply refutation.
+//! All S3 intermediate-identity patterns are retained. Membership can be
+//! supplied by explicit affine witnesses or by the checked finite domain.
+//! A model is still checked in the original group; caps never imply refutation.
 
 use crate::binary_ecc::{curve::point_add, BinaryPoint, F2mElement, TraceZeroVariety};
 use crate::cryptanalysis::binary_semaev_chain_sat::ChainedS3Encoding;
 use crate::cryptanalysis::sat::SolveResult;
 use num_bigint::BigUint;
 use std::time::{Duration, Instant};
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum TraceZeroMembershipEncoding {
+    /// Add ordinate witnesses, original curve rows and both membership bits.
+    ExplicitPoints,
+    /// Every allowed x is obtained from a validated full-kernel base point.
+    /// Its two affine lifts differ by negation, so both lie in the kernel.
+    /// Keep the finite x domain and replay actual supplied base lifts.
+    CertifiedDomain,
+}
 
 #[derive(Clone, Copy, Debug)]
 pub struct TraceZeroRelationLimits {
@@ -115,6 +125,27 @@ pub fn decompose_full_trace_zero(
     m: usize,
     limits: TraceZeroRelationLimits,
 ) -> TraceZeroRelationReport {
+    decompose_full_trace_zero_with_encoding(
+        variety,
+        base,
+        target,
+        m,
+        limits,
+        TraceZeroMembershipEncoding::ExplicitPoints,
+    )
+}
+
+/// Same allowed base, target, identity patterns and replay as the explicit
+/// encoding. CertifiedDomain existentially eliminates redundant summand
+/// membership witnesses; it does not skip admission of any supplied point.
+pub fn decompose_full_trace_zero_with_encoding(
+    variety: &TraceZeroVariety,
+    base: &[BinaryPoint],
+    target: &BinaryPoint,
+    m: usize,
+    limits: TraceZeroRelationLimits,
+    encoding: TraceZeroMembershipEncoding,
+) -> TraceZeroRelationReport {
     let mut report = TraceZeroRelationReport::default();
     if !(2..=9).contains(&m) {
         report.reason = Some("unsupported arity");
@@ -185,15 +216,17 @@ pub fn decompose_full_trace_zero(
             report.reason = Some("finite factor-base domain cap");
             return report;
         }
-        match enc.constrain_full_trace_zero_summands(
-            variety,
-            limits.max_variables,
-            limits.max_polynomial_terms,
-        ) {
-            Ok(n) => report.full_membership_equations = n,
-            Err(_) => {
-                report.reason = Some("full trace-zero model or variable cap");
-                return report;
+        if encoding == TraceZeroMembershipEncoding::ExplicitPoints {
+            match enc.constrain_full_trace_zero_summands(
+                variety,
+                limits.max_variables,
+                limits.max_polynomial_terms,
+            ) {
+                Ok(n) => report.full_membership_equations = n,
+                Err(_) => {
+                    report.reason = Some("full trace-zero model or variable cap");
+                    return report;
+                }
             }
         }
         report.peak_variables = report.peak_variables.max(enc.solver.n_vars());
