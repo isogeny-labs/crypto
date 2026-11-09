@@ -1,0 +1,49 @@
+{
+  "source_commit": "2a72e643377ac5af14df23e1a21d949bf1424e2a",
+  "initial_source_commit": "70cd70daf181278e1bbee4194ef3b8f4b99dcaee",
+  "native_trials": [
+    {
+      "program": "shifted-fiber",
+      "exit": 101,
+      "stdout": "small-fibers.json",
+      "stderr": "small-fibers.stderr",
+      "completed_frozen_panel": false,
+      "cause": "wrong_Z rejection asserted for every fiber, stricter than frozen some-retained-point control; no rerun under zero-retry bound"
+    },
+    {
+      "program": "fiber-p192",
+      "exit": 0,
+      "stdout": "P192-fibers.json",
+      "stderr": "P192-fibers.stderr",
+      "completed_frozen_panel": true
+    }
+  ],
+  "builds": [
+    {
+      "exit": 101,
+      "stderr": "build.stderr",
+      "cause": "generic field type inference"
+    },
+    {
+      "exit": 0,
+      "stderr": "build-fixed.stderr",
+      "changed_source": "explicit F<P,D> at minus-one lookup"
+    }
+  ],
+  "retries_scientific": 0,
+  "cloud_jobs": 0,
+  "fresh_copy_qualification": "pending",
+  "binary_sha256": {
+    "shifted-fiber": "a167ffaf4d77c5d9471539c83f4c9351b99a808cd00464844807b9d818fb15ae",
+    "fiber-p192": "5437ed2aa0ffe07beff4aa1adbbc569071e827da5bafb520d5a83702c4f76d1c"
+  },
+  "source_hashes": {
+    "native/Cargo.toml": "19400048ad2d3ab6b4630a9db8874e8577e154311bb6762f296c48388a762e7d",
+    "native/Cargo.lock": "aff2a39e37b181e134f454030569c408515bfdee850a0f646876996e12750228",
+    "native/src/main.rs": "63d21d8d828307b856d9a8e4a741b82921ff9e36ca5312264fd382f8b994a637",
+    "native/src/helpers.rs": "11572b16ef8fb2361786b8a94b2f92c24912707a6c8dbb039046b4437a977c90",
+    "native/src/big.rs": "24485366af25ffa6df9d094c34815052723689ff3edf4a206f0f762f2b54fafb",
+    "native/src/poly.rs": "b96768c3b3d98498040980685004f8206a180d2712bfdfe8277a51e2e92dde01",
+    "native/src/p192.rs": "6300169683f7dbc83c9a4fc756dc01466133a6e734a1d30004fd4cc7ab73a4f2"
+  }
+}
