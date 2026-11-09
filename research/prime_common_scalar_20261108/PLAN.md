@@ -118,3 +118,19 @@ input/scaled-weight construction, retained-state and recomputation bounds for
 one-node-at-a-time processing. The frozen exact-rational census is not amended
 to include a native accumulator arm without a new prospective version. Its
 S3 admission failed and no data was collected; narrow substitution is pending.
+
+## Nov9 admitted native recovery census completed
+
+After explicit owner approval of GitHub checkpoints, protocolv2 was frozen
+before data with only checkpoint transport changed. Two physical invocations
+completed180 positive cases plus3 defective controls each; native recount
+accepted366 records and byte-identical A/A. Export has two actual rows, no
+valid clocks and unsigned producer standing. Report:
+replay/reports/run-20261109T200742Z/REPORT.md [pcc:unverified].
+
+The previously pending admission step is closed for this census. Its2-run
+budget is exhausted; no third invocation or post-data accumulator substitution.
+Next refine canonical scaled modular extraction and odd-part coefficient
+construction from replay/ACCUMULATOR_NEXT.md, retaining coordinate and full
+recursive cost obligations separately. Native correctness evidence is scoped
+to this finite sparse-fixture domain.

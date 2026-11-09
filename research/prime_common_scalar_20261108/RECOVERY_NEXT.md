@@ -151,3 +151,17 @@ plus recomputation. Keep coordinate extension and the full recurrence separate.
 Native census is prospectively frozen; S3 gate failed for unavailable transport.
 No execution occurs until that transport or specific substitution is authorized
 [pcc:unverified].
+
+## Nov9 native admission resolved and census completed
+
+Owner approved committed/pushed GitHub checkpoint substitution. V2 was frozen
+before any data and all other protocol fields retained. Both invocations and
+the frozen exact analyzer passed:180 positive cases and3 defects each,366
+recounted records, byte-identical raw panels. Export/report are under replay/.
+No clock or measured memory claim. This completed census has no remaining
+invocations [pcc:unverified].
+
+Continue from replay/ACCUMULATOR_NEXT.md: canonical scaled-ring extraction,
+actual odd-part coefficients, native construction/state/recomputation bounds,
+coordinate lattice, then the full mode/bit-cost recurrence. A future empirical
+accumulator arm needs its own prospective amendment and resource envelope.

@@ -82,3 +82,14 @@ and valid cross-precision cancellation, supporting a streaming representation.
 See the capacity and stream-precision reports linked in PLAN.md. Native
 unscaling, coefficient generation, retained-state/recomputation costs and the
 uniform recursive theorem remain the next obligations [pcc:unverified].
+
+## Nov9 native exact recovery evidence
+
+The native finite rational recovery census now completes both physical
+invocations and the separately frozen exact recount. All180 positive cases
+and3 defective controls pass in each invocation;366 records are recounted,
+with byte-identical A/A. This is bounded component correctness evidence,
+retaining unsigned producer standing and no timing/asymptotic inference.
+The checkpoint admission is resolved under the explicit owner substitution;
+next refinement is the distinct scaled modular accumulator and its costs
+[pcc:unverified].
