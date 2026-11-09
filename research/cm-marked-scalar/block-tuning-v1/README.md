@@ -35,3 +35,9 @@ From the repository root, after building the exact published native replay sourc
 ```
 
 The replay intentionally binds its exact binary and input/source hashes; a different build needs a separately recorded replay binding, not an edited old frozen protocol. The first replay compilation failed on mixed-type auto declarations; original bytes/logs remain in qualification/block-tune-build-v1. Final v2 and native fault-tool builds are warning-free. No root Cargo suite is claimed, and no Rust implementation changed. KB unavailable as previously recorded; existing block/residual contracts and cited primary precomputation background checked. No novelty, global-chain optimality or expanded quotient claim.
+
+## Claim standing and managed archive
+
+All numeric/computational observations here are producer-side unverified assertions under docs/SABOTAGE_RESISTANCE.md; code-separated GMP replay is not a keyring-signed independent verdict. Formal registration is currently blocked by T-1989's write-exclusive PCC scopes. pcc-submission-draft.json pins the evidence packet within this uncontested study scope and explicitly is not a registered claim. No signed standing or scientific promotion is asserted. [pcc:unverified]
+
+The bot externalized the archive in be6490725cd3. ARTIFACT_LOCATOR.md records its content-addressed locator, exact bytes/hash, local restoration and replay instructions. [pcc:unverified]

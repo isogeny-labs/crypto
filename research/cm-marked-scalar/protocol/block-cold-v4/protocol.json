@@ -1,0 +1,978 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "CM-BLOCK-COLD-V3",
+  "version": 4,
+  "created": "2026-11-09",
+  "repository": "crypto",
+  "study_dir": "research/cm-marked-scalar",
+  "authors": [
+    "T-1888 native comparison"
+  ],
+  "links": {
+    "pr": "https://github.com/isogeny-labs/crypto/pull/3674",
+    "parameters": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-186.pdf",
+    "quotient": "https://ocw.mit.edu/courses/18-783-elliptic-curves-fall-2025/mit18_783_f25_lec05.pdf",
+    "openssl_reference": "https://github.com/openssl/openssl/blob/master/crypto/ec/ec_mult.c"
+  },
+  "question": "Does bounded block folding of retained multiples beat complete regular scalar multiplication after all per-call planning, point setup, normalization, verification and destruction costs, on P-192 primary and all five curves?",
+  "claims": [
+    {
+      "id": "C-point",
+      "class": "exact_computation",
+      "text": "Cached prefixes and full cold function preserve the original marked mu point output.",
+      "decided_by": []
+    },
+    {
+      "id": "C-primary",
+      "class": "comparative",
+      "text": "The deterministic candidate is faster end-to-end beyond the paired A/A envelope on every held-out point, reported per curve.",
+      "decided_by": [
+        "C-primary"
+      ],
+      "if_supported": "Finite-panel full cold result for the stated deterministic method and backend.",
+      "if_not_supported": "Retain ties/losses and all costs; installed-plan or arithmetic-only results do not replace the primary claim."
+    }
+  ],
+  "arms": [
+    {
+      "id": "window",
+      "role": "reference",
+      "description": "Same complete cold interface; window/window-aa cross widths2..7, other configurations have index0.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016",
+        "build": [
+          [
+            "make",
+            "-B",
+            "-j1",
+            "-C",
+            "research/cm-marked-scalar",
+            "block-eval-binary"
+          ]
+        ],
+        "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+        "flags": {
+          "backend": "OpenSSL3.5.8",
+          "language": "C++17",
+          "clock_scope": "Serialized request through verified encoded output and destruction"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    },
+    {
+      "id": "window-aa",
+      "role": "baseline",
+      "description": "Same complete cold interface; window/window-aa cross widths2..7, other configurations have index0.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016",
+        "build": [
+          [
+            "make",
+            "-B",
+            "-j1",
+            "-C",
+            "research/cm-marked-scalar",
+            "block-eval-binary"
+          ]
+        ],
+        "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+        "flags": {
+          "backend": "OpenSSL3.5.8",
+          "language": "C++17",
+          "clock_scope": "Serialized request through verified encoded output and destruction"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    },
+    {
+      "id": "selected",
+      "role": "reference",
+      "description": "Same complete cold interface; window/window-aa cross widths2..7, other configurations have index0.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016",
+        "build": [
+          [
+            "make",
+            "-B",
+            "-j1",
+            "-C",
+            "research/cm-marked-scalar",
+            "block-eval-binary"
+          ]
+        ],
+        "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+        "flags": {
+          "backend": "OpenSSL3.5.8",
+          "language": "C++17",
+          "clock_scope": "Serialized request through verified encoded output and destruction"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    },
+    {
+      "id": "selected-aa",
+      "role": "baseline",
+      "description": "Same complete cold interface; window/window-aa cross widths2..7, other configurations have index0.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016",
+        "build": [
+          [
+            "make",
+            "-B",
+            "-j1",
+            "-C",
+            "research/cm-marked-scalar",
+            "block-eval-binary"
+          ]
+        ],
+        "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+        "flags": {
+          "backend": "OpenSSL3.5.8",
+          "language": "C++17",
+          "clock_scope": "Serialized request through verified encoded output and destruction"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    },
+    {
+      "id": "openssl-public",
+      "role": "reference",
+      "description": "Same complete cold interface; window/window-aa cross widths2..7, other configurations have index0.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016",
+        "build": [
+          [
+            "make",
+            "-B",
+            "-j1",
+            "-C",
+            "research/cm-marked-scalar",
+            "block-eval-binary"
+          ]
+        ],
+        "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+        "flags": {
+          "backend": "OpenSSL3.5.8",
+          "language": "C++17",
+          "clock_scope": "Serialized request through verified encoded output and destruction"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    },
+    {
+      "id": "openssl-public-aa",
+      "role": "baseline",
+      "description": "Same complete cold interface; window/window-aa cross widths2..7, other configurations have index0.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016",
+        "build": [
+          [
+            "make",
+            "-B",
+            "-j1",
+            "-C",
+            "research/cm-marked-scalar",
+            "block-eval-binary"
+          ]
+        ],
+        "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+        "flags": {
+          "backend": "OpenSSL3.5.8",
+          "language": "C++17",
+          "clock_scope": "Serialized request through verified encoded output and destruction"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    },
+    {
+      "id": "openssl-single",
+      "role": "reference",
+      "description": "Same complete cold interface; window/window-aa cross widths2..7, other configurations have index0.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016",
+        "build": [
+          [
+            "make",
+            "-B",
+            "-j1",
+            "-C",
+            "research/cm-marked-scalar",
+            "block-eval-binary"
+          ]
+        ],
+        "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+        "flags": {
+          "backend": "OpenSSL3.5.8",
+          "language": "C++17",
+          "clock_scope": "Serialized request through verified encoded output and destruction"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    },
+    {
+      "id": "openssl-single-aa",
+      "role": "baseline",
+      "description": "Same complete cold interface; window/window-aa cross widths2..7, other configurations have index0.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016",
+        "build": [
+          [
+            "make",
+            "-B",
+            "-j1",
+            "-C",
+            "research/cm-marked-scalar",
+            "block-eval-binary"
+          ]
+        ],
+        "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+        "flags": {
+          "backend": "OpenSSL3.5.8",
+          "language": "C++17",
+          "clock_scope": "Serialized request through verified encoded output and destruction"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    },
+    {
+      "id": "block-binary",
+      "role": "reference",
+      "description": "Same complete cold interface; window/window-aa cross widths2..7, other configurations have index0.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016",
+        "build": [
+          [
+            "make",
+            "-B",
+            "-j1",
+            "-C",
+            "research/cm-marked-scalar",
+            "block-eval-binary"
+          ]
+        ],
+        "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+        "flags": {
+          "backend": "OpenSSL3.5.8",
+          "language": "C++17",
+          "clock_scope": "Serialized request through verified encoded output and destruction"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    },
+    {
+      "id": "block-binary-aa",
+      "role": "baseline",
+      "description": "Same complete cold interface; window/window-aa cross widths2..7, other configurations have index0.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016",
+        "build": [
+          [
+            "make",
+            "-B",
+            "-j1",
+            "-C",
+            "research/cm-marked-scalar",
+            "block-eval-binary"
+          ]
+        ],
+        "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+        "flags": {
+          "backend": "OpenSSL3.5.8",
+          "language": "C++17",
+          "clock_scope": "Serialized request through verified encoded output and destruction"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    },
+    {
+      "id": "binary-installed",
+      "role": "reference",
+      "description": "Same complete cold interface; window/window-aa cross widths2..7, other configurations have index0.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016",
+        "build": [
+          [
+            "make",
+            "-B",
+            "-j1",
+            "-C",
+            "research/cm-marked-scalar",
+            "block-eval-binary"
+          ]
+        ],
+        "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+        "flags": {
+          "backend": "OpenSSL3.5.8",
+          "language": "C++17",
+          "clock_scope": "Serialized request through verified encoded output and destruction"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    },
+    {
+      "id": "binary-installed-aa",
+      "role": "baseline",
+      "description": "Same complete cold interface; window/window-aa cross widths2..7, other configurations have index0.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016",
+        "build": [
+          [
+            "make",
+            "-B",
+            "-j1",
+            "-C",
+            "research/cm-marked-scalar",
+            "block-eval-binary"
+          ]
+        ],
+        "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+        "flags": {
+          "backend": "OpenSSL3.5.8",
+          "language": "C++17",
+          "clock_scope": "Serialized request through verified encoded output and destruction"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    },
+    {
+      "id": "block-default",
+      "role": "candidate",
+      "description": "Primary deterministic quotient/remainder and retained-prefix method; no installed-plan dependency.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016",
+        "build": [
+          [
+            "make",
+            "-B",
+            "-j1",
+            "-C",
+            "research/cm-marked-scalar",
+            "block-eval-binary"
+          ]
+        ],
+        "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+        "flags": {
+          "backend": "OpenSSL3.5.8",
+          "language": "C++17",
+          "clock_scope": "Serialized request through verified encoded output and destruction"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    },
+    {
+      "id": "cache-default",
+      "role": "baseline",
+      "description": "Same complete cold interface; window/window-aa cross widths2..7, other configurations have index0.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016",
+        "build": [
+          [
+            "make",
+            "-B",
+            "-j1",
+            "-C",
+            "research/cm-marked-scalar",
+            "block-eval-binary"
+          ]
+        ],
+        "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+        "flags": {
+          "backend": "OpenSSL3.5.8",
+          "language": "C++17",
+          "clock_scope": "Serialized request through verified encoded output and destruction"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    },
+    {
+      "id": "cache-installed",
+      "role": "baseline",
+      "description": "Secondary artifact-loaded plan; old search cost remains separately accounted and cannot replace first-use primary.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": "3b7fe627df895dd2fbef4d2bbebee6c5bda75016",
+        "build": [
+          [
+            "make",
+            "-B",
+            "-j1",
+            "-C",
+            "research/cm-marked-scalar",
+            "block-eval-binary"
+          ]
+        ],
+        "binary_sha256": "a0ae92dc0af67daa40235f6e2d62c1cd98e6b113e1e9fcd4135add41d71c39a7",
+        "flags": {
+          "backend": "OpenSSL3.5.8",
+          "language": "C++17",
+          "clock_scope": "Serialized request through verified encoded output and destruction"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "RAYON_NUM_THREADS": "1"
+        },
+        "threads": 1
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": true,
+      "comparison": "C-aa",
+      "not_applicable_reason": null
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Native qualifier verifies 300 exhaustive small minima, 2520 point actions, retained labels and planted multicolumn/leading cases; analyzer synthetic planted gain/noise controls are separate software tests, not timing data."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Altered programs and expected point outputs reject; analyzer rejects invalid matrices, source/receipt bindings, arithmetic subphase costs and A/A or primary selection errors."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "method",
+        "levels": [
+          "deterministic cached",
+          "all regular references",
+          "cache disabled",
+          "installed secondary"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "curve and mu",
+        "treatment": "fixed",
+        "value": [
+          "P-192",
+          "P-224",
+          "P-256",
+          "P-384",
+          "P-521"
+        ],
+        "how": "Original five saved labels and common serialized request; no generator or point-specific tuning."
+      },
+      {
+        "name": "point",
+        "treatment": "fixed",
+        "value": "4calibration+8heldout per curve",
+        "how": "Frozen60-point manifest, full-width SHA256 expansion with panel/curve/index/block domains; no input logarithm passed to candidate."
+      },
+      {
+        "name": "candidate plan",
+        "treatment": "fixed",
+        "value": "ell,offset0,width4 through200bits;5 through300bits;6 otherwise",
+        "how": "Prepared inside each call. Installed artifact is a separate secondary arm, with loading/parsing charged."
+      },
+      {
+        "name": "instrument and environment",
+        "treatment": "fixed",
+        "value": "One worker binary/backend, one thread, same input/output checks",
+        "how": "Bind binary/header/worker/analysis/isolation hashes and environment before freeze."
+      },
+      {
+        "name": "order",
+        "treatment": "randomized",
+        "value": "Fixed seeded per-round shuffle of25 configurations",
+        "how": "Retain one warmup+6rounds, every row and five exclusive phases."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "Native exclusive-core admission with full SMT pair",
+        "how": "Reject contended/failed receipts; enforce PSI and other-CPU thresholds without fallback."
+      },
+      {
+        "name": "block planner",
+        "treatment": "fixed",
+        "value": "maximum span16; exact D+A,negation,D,step lexicographic key; offset0/window heuristic unchanged",
+        "how": "Recode, bank-label construction, DP states/transitions/allocations and reconstruction all inside plan_ns. Point bank construction/normalization plus destruction are inside arithmetic_ns. No plan is reused across points or calls."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-primary",
+        "arms": [
+          "block-default",
+          "window",
+          "selected",
+          "openssl-public",
+          "openssl-single",
+          "block-binary",
+          "binary-installed"
+        ],
+        "differs_in": [
+          "method"
+        ],
+        "design": "absolute"
+      },
+      {
+        "id": "C-aa",
+        "arms": [
+          "window",
+          "window-aa"
+        ],
+        "differs_in": [],
+        "design": "aa"
+      }
+    ],
+    "aa_not_applicable": null,
+    "crosses_map": true
+  },
+  "randomization": {
+    "arm_order": "randomized",
+    "arm_order_reason": "Per-round seeded shuffle; every configuration and point retained.",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "seeds": [],
+      "nonce": null,
+      "note": "Worker literal0x43414348455632 + round + heldout offset1009; point-domain cm-cache-cold-v2."
+    },
+    "instance_sampling": {
+      "rule": "Five curves;20calibration and40heldout points;25configurations;one warmup+6rounds:3500+7000 rows.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Mechanical deterministic analysis predeclared; algorithm phases and source labels are visible. No analyst choices after held-out data.",
+      "unmasked_at": null
+    }
+  },
+  "sample_size": {
+    "instances": 40,
+    "replicates": 6,
+    "warmups": 1,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 5,
+      "correction": "none",
+      "rank_test_n": null,
+      "min_attainable_two_sided_p": null,
+      "passes": true,
+      "note": "Complete finite designed panel; every held-out point must beat the fastest of all11 reference configurations and the maximum paired A/A envelope. No population significance or power claim."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": null,
+      "threads": 1,
+      "estimated_total_seconds": null,
+      "measured_on": "No timing pilot;120-second deadline per panel. One attempt each, no unchanged retries."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "cold_ns",
+        "name": "cold verified per-point time",
+        "unit": "ns",
+        "kind": "timed",
+        "definition": "Total cold nanoseconds from before request parse until required objects are destroyed and verified encoded output exists. Five exclusive phases sum to total.",
+        "source": "rows.jsonl total_ns; one complete cold call per row; no division",
+        "aggregation": "paired_ratio",
+        "resolution": "steady_clock nanoseconds; hardware resolution and host recorded",
+        "uncertainty": "range"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "phase_ns",
+        "name": "Exclusive phase costs",
+        "unit": "nanoseconds",
+        "kind": "timed",
+        "definition": "setup,plan,arithmetic,verify,destroy; exact sum equals total",
+        "source": "raw JSONL",
+        "aggregation": "per_row",
+        "resolution": "native monotonic clock; host resolution recorded",
+        "uncertainty": "range"
+      },
+      {
+        "id": "block_setup_ns",
+        "name": "Point-bank setup and loop/destruction subphases",
+        "unit": "ns",
+        "kind": "timed",
+        "definition": "For block arms bank_setup_ns+loop_bank_destroy_ns=arithmetic_ns exactly; these nested times are not added again to total",
+        "source": "raw block JSONL; null for reference-internal phases not exposed",
+        "aggregation": "per_row",
+        "resolution": "same monotonic clock",
+        "uncertainty": "range"
+      },
+      {
+        "id": "diagnostic_counts",
+        "name": "Complete group and planner event counts",
+        "unit": "events",
+        "kind": "counted",
+        "definition": "One untimed 125-row matrix across five curves and25 configurations: includes actual prefix/table D/A/N, retained points, DP transitions and folded blocks. Unknown API internals remain null. No time inferred from event counts.",
+        "source": "counts.jsonl; all clock fields zero and timing_performed=false",
+        "aggregation": "per_row",
+        "resolution": "exact native events",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "tierB",
+    "warmups": 1,
+    "order": "randomized",
+    "clock": "monotonic",
+    "counters": [],
+    "record": [
+      "cpu_model",
+      "kernel_release",
+      "binary_sha256",
+      "result_switches",
+      "affinity",
+      "threads_moved",
+      "unmovable_threads",
+      "psi",
+      "other_cpu_seconds",
+      "context_switches",
+      "max_rss_kib"
+    ],
+    "timed_primary_justification": "The requested end-to-end latency depends on native field/backend, normalization, table setup and conversions; isolated wall time is required. Historical counted arithmetic is preserved as a separate baseline."
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "placement": {
+      "reserved_cpus": [
+        14,
+        30
+      ],
+      "worker_cpu": 14,
+      "threads": 1,
+      "memory_limit_kib": 2097152,
+      "max_cloud_cost_usd": 0,
+      "calibration_points": 4,
+      "heldout_points": 8,
+      "rounds": 6,
+      "warmups": 1,
+      "configuration_count": 25,
+      "point_manifest": "research/cm-marked-scalar/protocol/cache-cold-v2/points.json",
+      "input_files": [
+        {
+          "path": "research/cm-marked-scalar/fixtures-v2/published-curves.json",
+          "sha256": "0d3bd936810a5f987e9cb00188b0f75c78b9a7f91474bf754bbee0d7218e2120"
+        },
+        {
+          "path": "research/cm-marked-scalar/fixtures-v2/marked-relations.json",
+          "sha256": "f65d64a5036f5c2ac863a55d6191df56b328515c0d67a67e4b1f628be8aae1b2"
+        },
+        {
+          "path": "research/cm-marked-scalar/fixtures-v2/p-192-closure.json",
+          "sha256": "633270bc01bb38c7d66c5474f528c73d46c645df148019a0ac3418b547383eca"
+        },
+        {
+          "path": "research/cm-marked-scalar/fixtures-v2/p-224-closure.json",
+          "sha256": "0e01eb0975a2b35525b04c694a22ed336f56913f9e0a1c0b3b2335c7975926ce"
+        },
+        {
+          "path": "research/cm-marked-scalar/fixtures-v2/p-256-closure.json",
+          "sha256": "abf11b0536baf8a3c899c1b94917b7ba0d395d6bf0addbe87a0aa6159950e504"
+        },
+        {
+          "path": "research/cm-marked-scalar/fixtures-v2/p-384-closure.json",
+          "sha256": "72bc072ef64e2edaef3dadfbccb4eb9b2fe0c4952502591f25fb1038257c9008"
+        },
+        {
+          "path": "research/cm-marked-scalar/fixtures-v2/p-521-closure.json",
+          "sha256": "ba5eacad1943994a1055e760c66b95f659e7289595e4cb6073150bfcc4fe0059"
+        },
+        {
+          "path": "research/cm-marked-scalar/residual-v1/plans.json",
+          "sha256": "ee7e9e7150351ef8850dbe4d8e721bbbbe68ba552539017fff6cac04c79c8cb5"
+        },
+        {
+          "path": "research/cm-marked-scalar/protocol/cache-cold-v2/points.json",
+          "sha256": "0f703f35a42d85333013e0152fb5e66fc6f8bb1069c84d8cfb91a02957aaa457"
+        }
+      ],
+      "cache_header_sha256": "50e2fe3c06f5be122e043ef5d669423d7423778bf0976398fb7fd1f26d651d19",
+      "worker_source_sha256": "f45d795a80330dd7983bd426dede441ce16c4fc2f3a3205d8d0e2f5ca47521af",
+      "isolation_binary_sha256": "a1b46dc7c52eb88dc0e13d6e94067e7bc1d6f4de14a4124c2726a3ab4f272066",
+      "analysis_binary_sha256": "5f4481468bd26dbde4870ee289bce4ebdfefcc4648d0995602cf05144ce49363",
+      "panel_launches": {
+        "calibration": 1,
+        "heldout": 1
+      },
+      "primary_arm": "block-default",
+      "point_checker_binary_sha256": "9d141a138cf93ada18e8d6e5676f4f9e0977d2ff09ed630aaf05a6cc896511b7",
+      "point_checker_source_sha256": "5a6ef5f15f8be0280b6735d23c93196c2708a41c9f9bd406837d088fd7cbbe58",
+      "expected_host": {
+        "cpu_model": " Intel(R) Xeon(R) 6975P-C",
+        "kernel": "6.18.54-121.166.amzn2023.x86_64",
+        "logical_cpus": 32,
+        "machine": "x86_64"
+      },
+      "expected_switches": {
+        "LD_LIBRARY_PATH": null,
+        "LD_PRELOAD": null,
+        "OMP_NUM_THREADS": "1",
+        "OPENSSL_CONF": null,
+        "OPENSSL_MODULES": null,
+        "OPENSSL_ia32cap": null,
+        "RAYON_NUM_THREADS": "1"
+      },
+      "source_files": [
+        {
+          "path": "research/cm-marked-scalar/block_core.hpp",
+          "sha256": "ab79173cb6b8f59d359a1e52a3a32d35b933735d64e2684524e9348eb26ca678"
+        },
+        {
+          "path": "research/cm-marked-scalar/block_eval.cpp",
+          "sha256": "f45d795a80330dd7983bd426dede441ce16c4fc2f3a3205d8d0e2f5ca47521af"
+        },
+        {
+          "path": "research/cm-marked-scalar/block_analyze.cpp",
+          "sha256": "177f7d6e3f6397862634f3809bb4cccbe09923bba592735a742b14cf3bea94ec"
+        },
+        {
+          "path": "research/cm-marked-scalar/cache_core.hpp",
+          "sha256": "50e2fe3c06f5be122e043ef5d669423d7423778bf0976398fb7fd1f26d651d19"
+        },
+        {
+          "path": "research/cm-marked-scalar/cache_eval.cpp",
+          "sha256": "048e11ed1a6503384bda5c0d1e213361af0f74c32af3e96b2a1883c4791bdb03"
+        },
+        {
+          "path": "research/cm-marked-scalar/native.cpp",
+          "sha256": "c357e78448653317f39b93e647065cde371e4df6dc249f6c9a9aa57f4d7229f1"
+        },
+        {
+          "path": "research/cm-marked-scalar/json.hpp",
+          "sha256": "ce2fc98e68f35f6500e5983ac2288de3e1945c88cafabc433d502e865ff11973"
+        },
+        {
+          "path": "research/cm-marked-scalar/relation_verify.hpp",
+          "sha256": "a02e71ab00088b90168f223db104d4f1a07dc3c3999f567d9a8113f4b004c5e3"
+        },
+        {
+          "path": "research/cm-marked-scalar/orbit_verify.hpp",
+          "sha256": "302e98c4a1db831dd54e8d1f5ad6070b9d0be05f2ad8e25301d64cf908b431ef"
+        },
+        {
+          "path": "research/cm-marked-scalar/isolate.cpp",
+          "sha256": "6f86467a07b3468cba679b1ae0caa82c51bbe77a5253a3d8586334cb311ec1fc"
+        }
+      ],
+      "count_invocations": 0,
+      "count_rows": 0
+    },
+    "measurement_class": "measurement",
+    "timeout_seconds": 120,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Stop after3500calibration and7000heldout rows, or retain the first admission refusal/timeout/failure without resizing.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "Any wrong output, missing/duplicate row, phase sum, binding or admission failure invalidates the panel.",
+      "kind": "invalidation",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "a row with outcome.status other than verified is excluded from the decisive comparison and reported",
+    "a wall-time value on a row below L2 is descriptive only (wall_valid false); counted units stand at any level"
+  ],
+  "decision_rule": {
+    "text": "Report calibration reference choice. At each heldout point use the fastest median across all11 regular/binary reference configurations. Per curve require minimum reference/block-default speedup > max(1.01,maximum bidirectional paired A/A median ratio across those references and points). Installed candidate is secondary only; report all five curves.",
+    "comparison_ids": [
+      "C-primary"
+    ],
+    "threshold": "minimum point speedup > max(1.01,A/A envelope)",
+    "statistic": "Minimum per-point fastest-reference speedup against deterministic block-default; maximum paired A/A envelope",
+    "interval": "No population interval; strict finite-panel all-point criterion",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "Median and minimum per-point speedup",
+    "verdict_vocabulary": [
+      "supported_within_scope",
+      "within_control_distribution",
+      "invalid_measurement",
+      "inconclusive"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "research/cm-marked-scalar/block_analyze.cpp",
+      "sha256": "177f7d6e3f6397862634f3809bb4cccbe09923bba592735a742b14cf3bea94ec"
+    },
+    "inputs": [
+      "frozen point manifest",
+      "both raw JSONL panels",
+      "both native isolation receipts"
+    ],
+    "outputs": [
+      "per-curve primary and secondary results",
+      "full phase costs",
+      "canonical export and inspected report"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "S per arm per workload with the A/A interval"
+    ],
+    "report_dir": "reports"
+  },
+  "inadmissible": [
+    "Wrong or unequal outputs",
+    "Missing setup, maps, closure, scalar correction, conversion or verification cost",
+    "Incomplete or duplicate row design",
+    "Contended or unadmitted clock",
+    "Selecting windows or method on held-out results",
+    "Treating a constant-time-only loss as a public-scalar advantage",
+    "Charging input-point generation asymmetrically",
+    "Amortizing unreused setup",
+    "Promoting finite-panel speed to unknown-scalar recovery"
+  ],
+  "literature": [
+    {
+      "ref": "crypto:docs/ecbench/README.md",
+      "provenance": "internal",
+      "claim": "the counted unit, isolation levels L0-L3 and the paired comparison this protocol uses",
+      "verified_by": "experiment-protocol worked example, 2026-10-22"
+    }
+  ],
+  "amendments": [
+    {
+      "id": "A-CACHE-COLD-V2",
+      "filed": "2026-11-08",
+      "reason": "Five-curve retained-prefix method, complete serialized-input boundary, deterministic primary and full-width point manifest. Earlier two-curve timing draft remains unexecuted.",
+      "changes": [
+        "Five curves including primary P-192",
+        "Retained prefix bank and deterministic first-use primary",
+        "Full serialized-input to verified-output/destruction boundary",
+        "Native exact row/receipt analyzer required before freeze"
+      ],
+      "filed_before_affected_data": true
+    },
+    {
+      "id": "A-BLOCK-COLD-V3",
+      "filed": "2026-11-09",
+      "reason": "User explicitly requested block folding on all five curves, all planning/setup costs, PR updated before execution and an actual e2e comparison. The prior cache attempt refusal remains unchanged.",
+      "changes": [
+        "block-default primary and matched block-binary/A-A reference",
+        "All arm dispatch/initialization charged inside cold boundary",
+        "Nested point-bank setup and loop/destruction costs",
+        "One frozen untimed125-row event diagnostic",
+        "Ten source dependencies bound alongside nine input files"
+      ],
+      "filed_before_affected_data": true
+    },
+    {
+      "id": "A-QUIET-WINDOW-V4",
+      "filed": "2026-11-09",
+      "reason": "After V3 was refused before its measurement worker, the user selected a quiet window on this existing host. Permit one new calibration and conditional heldout attempt under unchanged isolation, first-use costs, inputs, algorithms and decision rule.",
+      "changes": [
+        "New bounded timing opportunity on the user-selected existing host",
+        "No repeated count diagnostic",
+        "All V3 refusals and frozen evidence retained; no source, label, target or threshold change"
+      ],
+      "filed_before_affected_data": true
+    }
+  ],
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "909d66a15190fd989d183f6d29866c0152bb6c3e7498a8fb6fecddc98f566d72",
+    "commit": "be6490725cd3299f85562136df7b3ba231755757",
+    "frozen_at": "2026-11-09T18:35:51Z",
+    "filed_before_affected_data": true
+  }
+}
