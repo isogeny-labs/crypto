@@ -1,5 +1,14 @@
 # Solver-control follow-up
 
+The additive walk study now has its own21-declaration transitive gate,
+0failing/0trusted-native exceptions. Actual PMF and actual normalized
+hash-graph counterexamples pass both local PCC checks, unsigned. Four
+frozen census calls cover3930mixing supports and82034fixed hash maps per
+repeat,0censored, every inline check and exact repeat passes. Export/file
+hash validation passes. These are separate from the96-declaration project
+below. See ../walk_audit_20261109/README.md for scope and reports.
+[pcc:unverified]
+
 The latest expanded repository gate passes96declarations,0failing,
 0trusted-native exceptions. It includes the actual bivariate quotient
 equivalence/length2 and closed support1witness. All16frozen-protocol msolve
