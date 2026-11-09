@@ -119,11 +119,36 @@ of the short-Weierstrass S3 coordinate.  The JSON report carries a
 `representation` object with the model, chart, model parameters, chart affine
 map, pinned EFD sources and the short-Weierstrass `(A, B)`.
 
+## Operational checks
+
+- `--efd-list` prints all ten models, their parameters and equations, every
+  chart, and the number of imported formulas per chart.
+- `--efd-check` round-trips points through the selected chart;
+  `--efd-check --efd-chart all` checks every chart of the model and reports
+  per-chart results.
+- `--efd-p` and `--efd-order` are checked with Miller-Rabin (bases 2..53).
+- Unknown model, chart, or parameter names are rejected with the accepted set.
+- A model whose parameters give a singular short-Weierstrass curve is rejected.
+- Chart parameters that are supplied are checked against their defining
+  relation (`r^2 = d` for Edwards YZ).
+- Coordinates must be canonical and belong to the representation's field.
+- `--efd-lift` must be below `EfdRepresentation::max_lift` (2 for x-only and
+  y-only, 4 for squared-y).
+- A supplied generator or target is checked for curve membership and for
+  `[n]P = O` before the exact probe.
+- Every public conversion returns an error instead of panicking on malformed
+  input or an exceptional point of the rational map.
+
+No production path uses `unwrap`/`expect` on user input; the remaining
+`unwrap`s are in test code.
+
 ## Verification
 
 ```sh
 cargo test --lib prime_ecc::efd          # 10 tests, 471 formulas
-cargo test --lib efd_representations     # models, all 33 charts, IC smoke
+cargo test --lib efd_representations     # 5 tests: models, charts, IC, invalid input
+cargo test --bin ic parses_efd_integers  # CLI parsing
+cargo test --bin ic efd_catalogue_lists  # model/chart catalogue
 ```
 
 The tests check:
