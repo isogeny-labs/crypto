@@ -13,7 +13,33 @@ inverse-buffer specification. The frozen scalar panel and all its losses are
 retained separately. See the proof maps and producer receipts; signed independent
 standing remains absent. [pcc:unverified]
 
-## The mathematical blocker
+## Nov9 continuation: actual affine contraction bridge
+
+The actual D.8 Boolean contraction now has a source-connected clearing identity,
+the doubled polynomial degree bound, origin under injective supplied placement,
+and actual integral local-series/quotient transport. The zero-output affine
+factor is homogenized as D-N. See
+[the versioned report](reports/boolean-contraction-20261109/REPORT.md) and its
+six canonically pinned unsigned PCC records. [pcc:unverified]
+
+This discharges the prior contraction-homogeneity question by proving the
+correct affine statement. The explicit finite sum is a specification; its
+definition does not provide an efficient recursive evaluator. The subsequent
+source-recovery component derives the actual node counts, ceiling and complete
+per-node multiplicity margin, then proves that exact scaled source jets
+determine the actual cleared polynomial over any Q-algebra. See
+[source-recovery report](reports/source-recovery-20261109/REPORT.md).
+The subsequent [Hermite precision component](reports/hermite-precision-20261109/REPORT.md)
+derives actual multiplier/evaluation losses and stability of the explicit
+finite functional at the original source precision, over rational integral
+coefficients. The subsequent constructed recovery component establishes exact D.9
+interpolation, computed finite quotient congruence and the target residue.
+See [the constructed recovery report](reports/hermite-recovery-20261109/REPORT.md).
+Coordinate refinement, native implementation and uniform mode/entry costs
+remain open.
+[pcc:unverified]
+
+## The outstanding algorithm theorem
 
 The inverse buffer takes the denominator's coefficient vector as input. Its
 correctness does not construct or bound the full relation/partition evaluator.
@@ -36,8 +62,9 @@ not imply unrestricted nonexistence of sub-exponential ECDLP algorithms.
 
 The next meaningful step is an explicit actual contraction/recovery evaluator
 with a quantitative all-level mode and child-call bound, followed by a faithful
-bit-cost recurrence. Native refinement of the finite buffer and full Hermite
-precision remain supporting obligations. PLAN.md gives their scopes.
+bit-cost recurrence. Native refinement, efficient jet construction and coordinate precision
+remain supporting obligations; rational Hermite precision and finite recovery
+correctness are established by the actual construction [pcc:unverified]. PLAN.md gives their scopes.
 
 No permission, credential, machine-isolation or missing-tool change is needed
 to alter this status: the outstanding requirement is the mathematical algorithm
