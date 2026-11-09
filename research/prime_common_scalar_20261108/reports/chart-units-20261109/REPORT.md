@@ -119,6 +119,6 @@ small additional component checks do not supply either [pcc:unverified].
 The actual default-project source audit passed310 declarations with0 additional
 trusted axioms, including ChartUnits and the exposed scalar formula. Receipts:
 ../../lean/chart-units-gate/. Only propext, Classical.choice and Quot.sound occur.
-The fresh ChartUnits replay is still in flight at this checkpoint; its final
-unique status JSON must be read before claiming that replay succeeded
+The fresh import-inclusive ChartUnits replay exited0 for source7bb276623.
+Its unique raw compressed log and status JSON are retained under ../../lean/
 [pcc:unverified].

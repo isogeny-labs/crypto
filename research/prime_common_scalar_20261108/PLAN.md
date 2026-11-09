@@ -143,7 +143,7 @@ evaluation at every substitution in arbitrary coefficient targets with
 nilpotent2. Constructed finite normalized entries and scalar-square entries
 have one common unit comparison and preserve all scalar divisibility
 thresholds. Source7bb276623; actual source audit310 declarations,0 extra trusted
-axioms; fresh replay pending its separate receipt. Report:
+axioms; fresh import-inclusive replay exit0. Report:
 reports/chart-units-20261109/REPORT.md [pcc:unverified].
 
 This closes the actual finite normalizer-unit premise. The broad goal still
