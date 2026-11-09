@@ -54,6 +54,13 @@ amendment to the observed results.
    obligation is the actual Hermite multiplier valuation/loss bound D.10,
    not another numerical multiplicity margin. See
    reports/source-recovery-20261109/REPORT.md. [pcc:unverified]
+   **Nov9 actual precision step:** HermiteBasis/Grid/Valuation/Moment/Error
+   derive the actual multiplier loss6hD_i and evaluation loss4M(a+1), construct
+   the actual integral local reciprocal, and prove finite-functional stability
+   at the original p+8hD_i+8M(a+1). This is over rational integral coefficients.
+   Exact D.9 reconstruction from quotient jets and the extension/nilpotent
+   coordinate refinement remain open. See
+   reports/hermite-precision-20261109/REPORT.md. [pcc:unverified]
 4. **Uniform modes and total recursive cost.** Derive squared Cauchy modes with
    coefficient(b+1), genuine nonzero valuations, all tiles/rows/levels, source
    variables and child entries. Charge D, inverse, factorization, tuple

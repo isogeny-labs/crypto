@@ -4,6 +4,29 @@ Continuation checkpoint, 2026-11-09. This is a prospective programme, not a
 completed proof or an executed experiment. It does not reopen the frozen
 normalizer panel or authorize a timed campaign.
 
+## Current checkpoint: actual losses and finite-functional stability
+
+The original sequence below is retained as the prospective record. The
+quantitative goals of Steps1--4 now have source-connected proofs: actual ceiling/order bounds, actual basis and
+finite reciprocal, actual multiplier loss6hD_i (by a grid pairing and finite
+second moment), and actual evaluation loss4M(a+1). Step3's displayed weighted
+identity was replaced by the proved pairing/moment argument for the same bound.
+Step5's finite-functional
+stability is also proved at the original source precision. The exact D.9
+reconstruction identity from quotient jets remains open, followed by coordinate
+and bit-cost refinements. See
+[the precision report](reports/hermite-precision-20261109/REPORT.md).
+[pcc:unverified]
+
+The next code target is an explicit exact quotient truncation and interpolation
+polynomial: show each sampled chart has the prescribed low jets, bound total
+degree below the full source jet count, and apply exactHermiteUnique. Then
+combine that identity with actualRecoveryFunctionalStable and the actual
+inverse-buffer correspondence. No new comparative campaign has run.
+[pcc:unverified]
+
+## Original prospective sequence
+
 The accepted source chain is actual affine clearing -> actual packed degree ->
 actual grid counts and ceiling -> exact scaled-jet determination. See the two
 versioned Nov9 reports and their unsigned statement pins. [pcc:unverified]
