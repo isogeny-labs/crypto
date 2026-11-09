@@ -167,3 +167,27 @@ Publish/review branchv2finalbindingsandrunserially. Source-reviewedpivotandroot-
 
 ## Errors
 No root testinventory/controls/fullsuite reached. Frozenfailureevidenceisarchivedwith PDF/SVG/CSV/JSON,notreplaced.
+
+## What was done — 19:10 UTC
+Published source and correctedbranch release at3d8095a319c080f75442880ee97e6b03f3464e28, verifiedremote ref. PR3771 created/attached, auto-mergeenabled. One correctedbranchreplay launched(session71339), freeze4974f967/release4b81c8df; precheckpassed103.900759s andcompileractive. Campaign12660charged+3600reserved=26940unreserved remainsunchanged.
+
+## Decisions made
+V4 permit repair and actualproducer qualification stay source-only untilindependentreview/frozenbindings. Acceptedsourceplans forpivot/rootcardinality willrunseriallywithinremainingallowance; no duplicateDiem/EKS submissions.
+
+## Open threads
+Correctedbranchcompiler/readback/post; v4softwarequalification/cache/fullsuite; reviewednewformalcontrols andeventadapter realproducerqualification.
+
+## Errors
+No correctedbrancherrorobserved yet. PreviousRust compile failures and branchfourgoal failure remain distinctarchived attempts.
+
+## What was done — 19:30 UTC
+Corrected branch v2 ended with13 successful calls and failed BranchRootMultiplicity. Pre/post custody matched; total532.083336seconds, full3600charged. Archived result7ac00b3a and preserved all failures. V4 permit source independently reviewed,24 qualification cases prospective.
+
+## Decisions made
+Campaign16260charged,0reserved,26940remaining; one payload at a time. T2031epoch3 heartbeat59167 maintains source/qualification coordination. Publish exact v4 source before qualification.
+
+## Open threads
+Permit qualification/cache snapshot/full library; minimal branch helper and independent polynomial route; pivot/cardinality replay; affine caller and native event producer qualification.
+
+## Errors
+Branch main theorem, controls and final readback not reached. No new scientific execution or duplicate external owner.
