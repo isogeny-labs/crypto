@@ -835,6 +835,54 @@ fn eval_randomised_e(r: u64, c: usize, samples: &[Sample], g: &Genome, seed: u64
     })
 }
 
+/// SNC-2 chained design (see the pre-registration in the header): wwalk alpha bound.
+fn chain_m(r: u64) -> u64 {
+    let t = (1.75 * (r as f64).sqrt()).round();
+    ((1.2 * t.sqrt()).round() as u64).max(1)
+}
+
+/// The chained C = 2 jump set and start vector.  `K_0, K_1` uniform in
+/// `Z_r^2` (coordinates 0 and 1 = G and Q parts), `K_j = K_{j-1} + K_{j-2}`;
+/// seed coordinates uniform in `[1, M]` (or in `Z_r` for the randomised-e
+/// control `uniform_e`).
+fn build_chain(r: u64, rng: &mut Rng, uniform_e: bool) -> (Vec<Vec4>, Vec4) {
+    let m = chain_m(r);
+    let mut seed_coord = |rng: &mut Rng| {
+        if uniform_e {
+            rng.below(r)
+        } else {
+            1 + rng.below(m)
+        }
+    };
+    let mut k = vec![[rng.below(r), rng.below(r)], [rng.below(r), rng.below(r)]];
+    for j in 2..16 {
+        let (p, q) = (k[j - 1], k[j - 2]);
+        k.push([addmod(p[0], q[0], r), addmod(p[1], q[1], r)]);
+    }
+    let jumps = k
+        .iter()
+        .map(|kj| [kj[0], kj[1], seed_coord(rng), seed_coord(rng)])
+        .collect();
+    let start = [rng.below(r), rng.below(r), seed_coord(rng), seed_coord(rng)];
+    (jumps, start)
+}
+
+fn eval_chain(r: u64, samples: &[Sample], uniform_e: bool) -> Stat {
+    evaluate(r, 2, samples, |smp| {
+        let mut rng = Rng::new(smp.design ^ 0xC4A1_0005);
+        let (jumps, start) = build_chain(r, &mut rng, uniform_e);
+        WalkGen::new(r, jumps, Sched::Random, start, rng.next())
+    })
+}
+
+/// Aggregate per-curve stats: mean of means, SE = sqrt(sum se^2) / m.
+fn aggregate(stats: &[Stat]) -> (f64, f64) {
+    let m = stats.len() as f64;
+    let mean = stats.iter().map(|s| s.mean).sum::<f64>() / m;
+    let se = stats.iter().map(|s| s.se * s.se).sum::<f64>().sqrt() / m;
+    (mean, se)
+}
+
 struct SearchResult {
     best: Genome,
     train: Stat,
@@ -885,6 +933,7 @@ struct Args {
     train: usize,
     restarts: usize,
     steps: usize,
+    chained: bool,
 }
 
 fn parse_args() -> Result<Args, String> {
@@ -898,6 +947,7 @@ fn parse_args() -> Result<Args, String> {
         train: 300,
         restarts: 8,
         steps: 40,
+        chained: false,
     };
     let argv: Vec<String> = std::env::args().skip(1).collect();
     let mut i = 0;
@@ -929,6 +979,11 @@ fn parse_args() -> Result<Args, String> {
                     x.parse().map_err(|_| bad(key))?,
                     j.parse().map_err(|_| bad(key))?,
                 ));
+            }
+            ("--chained", _) => {
+                a.chained = true;
+                i += 1;
+                continue;
             }
             ("--no-d3", _) => {
                 a.d3 = false;
@@ -980,6 +1035,10 @@ fn main() {
         args.restarts,
         args.steps
     );
+    if args.chained {
+        run_chained(&args);
+        return;
+    }
     let poisson = |c: usize| match c {
         0 => 0.886,
         1 => 1.329,
@@ -1041,6 +1100,38 @@ fn main() {
                 println!("CE  randomised-e control of D3 winner: E = {}", fmt(&ce));
             }
         }
+    }
+}
+
+/// SNC-2 Stage 0: CH, D0, D0i and CE at C = 2 on every `--r`, plus the
+/// per-invocation aggregates (one invocation per size).
+fn run_chained(args: &Args) {
+    let mut agg: [Vec<Stat>; 4] = Default::default();
+    for &r in &args.rs {
+        let held = make_samples(r, args.seed ^ 0xAAAA_0001, args.n);
+        println!(
+            "\n## r={r} C=2 (K=3, sqrt(r)={:.1}) Poisson floor 1.662, M={}",
+            (r as f64).sqrt(),
+            chain_m(r)
+        );
+        let rows = [
+            ("CH ", eval_chain(r, &held, false)),
+            ("D0 ", eval_d0(r, 2, &held, false)),
+            ("D0i", eval_d0i(r, 2, &held)),
+            ("CE ", eval_chain(r, &held, true)),
+        ];
+        for (i, (name, st)) in rows.iter().enumerate() {
+            println!("{name} E = {}", fmt(st));
+            agg[i].push(*st);
+        }
+    }
+    println!(
+        "\n## aggregate over {} curves (mean of means, SE = sqrt(sum se^2)/m)",
+        args.rs.len()
+    );
+    for (name, v) in ["CH ", "D0 ", "D0i", "CE "].iter().zip(agg.iter()) {
+        let (m, se) = aggregate(v);
+        println!("AGG {name} E = {m:.4} +- {se:.4}");
     }
 }
 
@@ -1230,5 +1321,48 @@ mod tests {
         let set: std::collections::HashSet<(u64, u64, u64)> =
             a.iter().map(|s| (s.d, s.s[0], s.s[1])).collect();
         assert!(b.iter().all(|s| !set.contains(&(s.d, s.s[0], s.s[1]))));
+    }
+
+    #[test]
+    fn chain_recurrence_and_ranges() {
+        let r = 2_097_349u64;
+        let m = chain_m(r);
+        assert_eq!(m, 60); // round(1.2 * sqrt(round(1.75 * 1448.2)))
+        let mut rng = Rng::new(7);
+        let (j, start) = build_chain(r, &mut rng, false);
+        assert_eq!(j.len(), 16);
+        for t in 2..16 {
+            assert_eq!(j[t][0], (j[t - 1][0] + j[t - 2][0]) % r);
+            assert_eq!(j[t][1], (j[t - 1][1] + j[t - 2][1]) % r);
+        }
+        for v in j.iter().chain(std::iter::once(&start)) {
+            assert!((1..=m).contains(&v[2]) && (1..=m).contains(&v[3]));
+        }
+        // randomised-e control: seed coordinates range over Z_r
+        let (ju, _) = build_chain(r, &mut Rng::new(7), true);
+        assert!(ju.iter().any(|v| v[2] > m || v[3] > m));
+    }
+
+    #[test]
+    fn aggregate_combines_means_and_ses() {
+        let mk = |mean, se| Stat {
+            mean,
+            se,
+            n: 1,
+            censored: 0,
+        };
+        let (m, se) = aggregate(&[mk(1.0, 0.3), mk(2.0, 0.4), mk(3.0, 0.0)]);
+        assert!((m - 2.0).abs() < 1e-12);
+        assert!((se - 0.5 / 3.0).abs() < 1e-12);
+    }
+
+    #[test]
+    fn chain_runs_and_is_deterministic_small_r() {
+        let r = 131_203u64;
+        let samples = make_samples(r, 11, 60);
+        let a = eval_chain(r, &samples, false);
+        let b = eval_chain(r, &samples, false);
+        assert_eq!(a.mean, b.mean);
+        assert!(a.mean > 0.5 && a.mean < 10.5);
     }
 }
