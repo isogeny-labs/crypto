@@ -84,3 +84,18 @@ amendment to the observed results.
 Independent signed PCC and review are required for verified standing. Producer
 proof builds/recounts remain labelled unverified; never manufacture independence.
 This is a standing requirement, not a result. [pcc:unverified]
+
+## Nov9 constructed recovery checkpoint
+
+HermiteReconstruction, IntegralRecovery and FiniteRecovery now construct exact
+D.9 interpolation, actual integral charts, finite modular quotient buffers and
+canonical lifts, then establish integrality and the target residue at the
+original source child precision. Sourcebd8cbfe23, actual audit269 declarations,
+fresh import-inclusive replay exit0; unsigned pins and full scope are in
+reports/hermite-recovery-20261109/REPORT.md [pcc:unverified].
+
+This closes rational exact reconstruction and finite-buffer congruence in
+steps3 and5. The earlier proposed weighted D.10 identity was superseded by the
+actual involution/pairing moment argument, not established as that same formula.
+Next: prospectively admitted native correctness replay, coordinate precision
+refinement, efficient jet construction and uniform all-level bit costs.

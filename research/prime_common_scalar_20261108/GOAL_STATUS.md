@@ -32,8 +32,11 @@ determine the actual cleared polynomial over any Q-algebra. See
 The subsequent [Hermite precision component](reports/hermite-precision-20261109/REPORT.md)
 derives actual multiplier/evaluation losses and stability of the explicit
 finite functional at the original source precision, over rational integral
-coefficients. Exact D.9 reconstruction from quotient jets, coordinate refinement
-and uniform mode/entry costs remain open.
+coefficients. The subsequent constructed recovery component establishes exact D.9
+interpolation, computed finite quotient congruence and the target residue.
+See [the constructed recovery report](reports/hermite-recovery-20261109/REPORT.md).
+Coordinate refinement, native implementation and uniform mode/entry costs
+remain open.
 [pcc:unverified]
 
 ## The outstanding algorithm theorem
@@ -59,8 +62,9 @@ not imply unrestricted nonexistence of sub-exponential ECDLP algorithms.
 
 The next meaningful step is an explicit actual contraction/recovery evaluator
 with a quantitative all-level mode and child-call bound, followed by a faithful
-bit-cost recurrence. Native refinement of the finite buffer and full Hermite
-precision remain supporting obligations. PLAN.md gives their scopes.
+bit-cost recurrence. Native refinement, efficient jet construction and coordinate precision
+remain supporting obligations; rational Hermite precision and finite recovery
+correctness are established by the actual construction [pcc:unverified]. PLAN.md gives their scopes.
 
 No permission, credential, machine-isolation or missing-tool change is needed
 to alter this status: the outstanding requirement is the mathematical algorithm
