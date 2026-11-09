@@ -99,3 +99,22 @@ steps3 and5. The earlier proposed weighted D.10 identity was superseded by the
 actual involution/pairing moment argument, not established as that same formula.
 Next: prospectively admitted native correctness replay, coordinate precision
 refinement, efficient jet construction and uniform all-level bit costs.
+
+## Nov9 capacity and scaled-accumulator continuation
+
+Actual-node quotient slot capacity B has exact active-level accounting and
+bounds B>=8h^2*u*4^a, u*B>=72M^2*4^a. These charge simultaneous fixed-width
+prescribed buffers, with no unrestricted memory lower bound. See
+reports/buffer-budget-20261109/REPORT.md [pcc:unverified].
+
+StreamPrecision constructs integral weights and a finite scaled functional at
+K=8h*2^a+8M(a+1), identifies its rational value and establishes the scaled
+actual target residue at p+K. Cross-precision cancellation identifies output
+residue at p; no inverse of2 in a fixed characteristic ring is assumed.
+See reports/stream-precision-20261109/REPORT.md [pcc:unverified].
+
+Next discriminating representation work: canonical native unscaling, efficient
+input/scaled-weight construction, retained-state and recomputation bounds for
+one-node-at-a-time processing. The frozen exact-rational census is not amended
+to include a native accumulator arm without a new prospective version. Its
+S3 admission failed and no data was collected; narrow substitution is pending.

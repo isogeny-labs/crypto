@@ -134,3 +134,20 @@ then coordinate refinement and fast input-jet/all-level recursive cost proofs.
 The plan above remains the historical derivation sequence; step3's specific
 weighted identity was replaced by a proved pairing and second-moment bound
 [pcc:unverified].
+
+## Nov9 representation checkpoint
+
+Explicit prescribed buffer capacity has the actual-node bound8h^2*u*4^a.
+The integral scaled-functional bridge now preserves target residue in the
+larger ring at p+K and supports correct cross-precision cancellation. Reports:
+[capacity](reports/buffer-budget-20261109/REPORT.md),
+[scaled accumulator](reports/stream-precision-20261109/REPORT.md).
+These are algebraic/accounting statements, with no measured memory or full
+recursive runtime claim [pcc:unverified].
+
+Next: prove canonical integer low-bit extraction for a scaled modular sum,
+then refine scaled weight/input generation and charge one-node retained state
+plus recomputation. Keep coordinate extension and the full recurrence separate.
+Native census is prospectively frozen; S3 gate failed for unavailable transport.
+No execution occurs until that transport or specific substitution is authorized
+[pcc:unverified].
