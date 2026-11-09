@@ -62,6 +62,10 @@ EOF
     echo "ok    $control $(head -1 /tmp/lean-selftest.$$)"
   else
     echo "WRONG project $control expected $want_rc /$expect/, got $rc"
+    cat /tmp/lean-selftest.$$
+    bad=1
+  fi
+done
 # A Lake default target can omit a registered Lean module. The gate must
 # explicitly build and audit the omitted tracked source before passing.
 for project in "$rel/project-omitted" "./$rel/project-omitted" "$rel/project-omitted/" "$rel/project-quoted"; do
