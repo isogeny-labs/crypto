@@ -9,6 +9,10 @@ sections, and both are imported:
 | `g1p` | GF(p), p odd | 10 | 33 | 471 | `prime_ecc::efd` |
 | **Total** | | **13** | **52** | **606** | |
 
+All 606 formulas are executable. In the prime section 463 run EFD's optimized
+`.op3` directly and 8 use a record-derived fallback because the served program is
+incomplete or contradicts its record (see `prime-field.md`).
+
 Coverage was checked by crawling every representation page of both sections:
 the set of `auto-code/*.op3` formula ids equals the catalogue id set exactly
 (471/471 and 135/135, no missing and no extra ids). The legacy

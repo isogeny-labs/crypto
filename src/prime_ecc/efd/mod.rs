@@ -24,7 +24,7 @@ mod tests;
 
 pub use checked::{weierstrass_operation, CheckedPoint, ExecutionPath};
 pub use formats::Projection;
-pub use program::{OperationCounts, Program};
+pub use program::{OperationCounts, Program, ProgramSource};
 
 pub type Bindings = BTreeMap<String, FieldElement>;
 pub type Result<T> = std::result::Result<T, EfdError>;
@@ -187,8 +187,23 @@ pub fn catalogue() -> &'static Catalogue {
 }
 
 impl Formula {
+    /// Compile the optimized upstream `.op3` program.
     pub fn compile(&self) -> Result<Program> {
         Program::compile(self)
+    }
+    /// Compile the unoptimized computation stated in the pinned record. This
+    /// is the fallback for upstream programs that are incomplete or contradict
+    /// their record; inspect [`Program::source`] before quoting costs.
+    pub fn compile_record(&self) -> Result<Program> {
+        Program::compile_record(self)
+    }
+    /// Upstream program when usable, otherwise the record-derived fallback.
+    pub fn compile_any(&self) -> Result<Program> {
+        match self.compile() {
+            Ok(program) => Ok(program),
+            Err(EfdError::Unsupported(_)) => self.compile_record(),
+            Err(e) => Err(e),
+        }
     }
     /// Evaluate a reference program. No strings are evaluated as Rust or shell.
     /// Cache parameters with defining assumptions are derived if absent and

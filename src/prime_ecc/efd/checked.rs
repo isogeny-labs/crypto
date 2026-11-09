@@ -57,6 +57,9 @@ pub fn weierstrass_operation(
     let rep = catalogue()
         .representation(&formula.representation)
         .ok_or_else(|| EfdError::Unsupported(formula.representation.clone()))?;
+    // `add-1986-cc*` upstream programs are incomplete; the pinned record still
+    // states the computation, so use that fallback instead of refusing.
+    let program = formula.compile_any()?;
     // Do not allow an exceptional-case fallback to bypass specialization checks.
     for assumption in &rep.assumptions {
         let (left, right) = program::equality(assumption)?;
@@ -83,7 +86,7 @@ pub fn weierstrass_operation(
     }
     let mut all = inputs.clone();
     all.extend(encoded);
-    let output = match formula.evaluate(&modulus, &all) {
+    let output = match program.evaluate(&modulus, &all) {
         Ok(v) => v,
         Err(EfdError::ZeroDenominator) => return Ok(fallback()),
         Err(e) => return Err(e),

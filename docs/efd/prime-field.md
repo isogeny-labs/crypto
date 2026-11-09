@@ -155,18 +155,25 @@ Model and chart conversions (including the shared Weierstrass hub) are in
 | Check | Result |
 | --- | --- |
 | Catalogue size, ids, per-source SHA-256 | 471 / 33 / 10, all match |
-| Source texts compile to programs | 465 of 471 (6 upstream-incomplete, below) |
+| Upstream `.op3` programs compile | 465 of 471 (6 upstream-incomplete, below) |
+| Executable formulas | **471 of 471** (463 upstream + 8 record-derived fallback) |
 | Chart ids and curve equations pinned | 33 ids, 10 models, all explicitly handled |
 | Weierstrass bridge present both ways | 10/10 models (`Model::to_weierstrass`, `from_weierstrass`) |
 | Affine chart round trip, scales 1, 2, 7 | all 33 charts (also from model parameters alone, no `r`/`c` supplied) |
 | Ten curve equations + 33 chart ids pinned, unknown charts rejected | `all_ten_curve_equations_and_thirty_three_charts_are_covered` |
-| Formula vs pinned affine model law, `p = 109` | 463 formulas, >= 8 comparisons each (cap 32) |
+| Formula vs pinned affine model law, `p = 109` | 471 formulas, >= 8 comparisons each (cap 32); fallback rows flagged in coverage |
 | Checked short-Weierstrass adapter vs `ecc::point::Point` (`p = 109`, `a = 0` and `a = -3`) | all applicable formulas |
 | Checked adapter on secp256k1 (`a = 0`) and P-256 (`a = -3`) planted generator multiples | all applicable formulas, formula path |
 
 The model-law check evaluates the unoptimized affine `addition`, `doubling`,
 `negation` and `tripling` definitions from each pinned `data/coordinates`
-record; it is independent of the optimized `.op3` program under test. Points
+record; it is independent of the optimized `.op3` program under test. For the
+eight formulas whose upstream `.op3` is unusable, the program under test is
+reconstructed from that formula's own `compute` lines, so those rows are
+record-consistency checks rather than independent ones; the six short
+Weierstrass ones are additionally checked against `ecc::Point` on `p = 109`,
+secp256k1 and P-256. Each coverage row carries `"program": "upstream"` or
+`"record-fallback"`. Points
 are enumerated exhaustively on `F_109`. Formulas whose declared assumptions do
 not hold for a sample (for example `X2 = 1` mixed charts or `Z1 = 1`) are
 skipped for that sample, and singular affine charts and vanishing denominators
@@ -181,13 +188,16 @@ These are pinned and reported, not silently repaired.
 | --- | --- |
 | `shortw/jacobian{,-0,-3}/addition/add-1986-cc-2` (3) | The upstream `.op3` contains the EFD generator's own `error: not sure how to handle ...` line instead of the `Y3` instruction. `compile` returns `Unsupported`; the record and hash are retained. |
 | `shortw/projective{,-1,-3}/addition/add-1986-cc` (3) | Same: incomplete upstream program. |
-| `jintersect/{standard,extended}/doubling/dbl-2001-ls` (2) | The `.op3` computes `r2 = -t7` with `t7 = r1 + l3`; the pinned record says `r2 = -r1 + l3`. The program disagrees with its own record on every tested point, so it is excluded from the law comparison. |
+| `jintersect/{standard,extended}/doubling/dbl-2001-ls` (2) | The `.op3` computes `r2 = -t7` with `t7 = r1 + l3`; the pinned record says `r2 = -r1 + l3`. The program disagrees with its own record on every tested point; verification uses the record-derived fallback. |
 
 The 2 `jintersect` entries are listed in `KNOWN_PROGRAM_DEFECTS` in
 `src/prime_ecc/efd/tests.rs` together with the evidence assertion.
 
-No program was rewritten: the catalogue preserves the bytes that were served,
-and the executable boundary is explicit.
+No program was rewritten: the catalogue preserves the bytes that were served.
+`Formula::compile` still returns exactly the upstream program (or `Unsupported`
+for the six incomplete ones); `Formula::compile_record` and `Formula::compile_any`
+expose the record-derived fallback, and `Program::source()` distinguishes the
+two. Costs from a fallback program are record costs, not EFD's optimized counts.
 
 ## Scope limits
 
@@ -200,6 +210,8 @@ and the executable boundary is explicit.
   with known terms, constant multiples, products with a known factor, and
   squares via Tonelli--Shanks). Assumptions that need a root of a general
   polynomial (for example `w^2 + w + 1 = 0`) must be supplied by the caller.
+- Eight upstream programs are unusable; use `compile_any` when a formula must
+  execute, and check `Program::source()` before quoting operation counts.
 - `encode_affine`/`encode_jintersection` are coordinate maps. They do not by
   themselves assert curve membership; use `Model::on_model` when that check is
   wanted (the checked short-Weierstrass adapter always performs it).
