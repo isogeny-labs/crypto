@@ -1,0 +1,34 @@
+{
+  "schema": "lean.canonical-declaration-bindings/v1",
+  "repository": "/workspace/crypto-leads-cycle-20261109",
+  "observed_head": "46f02141d71f6f8b5238361de8efa049d092bba6",
+  "canonical_tool": "tools/pcc/pcc.py",
+  "canonical_tool_sha256": "5e1a97036633b9798adc39aded657708decb244ca9ed98e4a41408be9ac17010",
+  "read_only": true,
+  "claim_tool_invoked": false,
+  "proofs_rerun": false,
+  "bindings": [
+    {
+      "theorem": "BinaryPrimitiveGuard.primitive_root_of_binary_guard_succ",
+      "namespace": "BinaryPrimitiveGuard",
+      "project": "research/prime_leads_new_cycle_20261109/lean",
+      "source": "research/prime_leads_new_cycle_20261109/lean/BinaryPrimitiveGuard.lean",
+      "source_git_object": "e9b791af08c1667b54ffb45bfc00298724713b45",
+      "source_sha256": "fa05f888f1c4c17e65d5e3f6a4b51f680aa0ffc900405ac88ecc046f4075e44e",
+      "decl_sha256": "63de8e043a321a27a246773baefaee1e6968e3baaea3174c03952ecad73bea24",
+      "normalized_declaration": "theorem primitive_root_of_binary_guard_succ {K : Type*} [Field K] (ζ : K) (s : ℕ) (hfull : ζ ^ (2 ^ (s + 1)) = 1) (hhalf : ζ ^ (2 ^ s) ≠ 1) : IsPrimitiveRoot ζ (2 ^ (s + 1))",
+      "normalization": "canonical tools/pcc/pcc.py lean_find_declaration; short declaration name, whitespace normalized, proof excluded; qualified and short lookups agree"
+    },
+    {
+      "theorem": "BinaryPrimitiveGuard.primitive_root_of_binary_guard",
+      "namespace": "BinaryPrimitiveGuard",
+      "project": "research/prime_leads_new_cycle_20261109/lean",
+      "source": "research/prime_leads_new_cycle_20261109/lean/BinaryPrimitiveGuard.lean",
+      "source_git_object": "e9b791af08c1667b54ffb45bfc00298724713b45",
+      "source_sha256": "fa05f888f1c4c17e65d5e3f6a4b51f680aa0ffc900405ac88ecc046f4075e44e",
+      "decl_sha256": "27bff96578e37943e89a88d52935765ae7774e3a07ec45b8d127332b31f51569",
+      "normalized_declaration": "theorem primitive_root_of_binary_guard {K : Type*} [Field K] (ζ : K) (t : ℕ) (ht : 0 < t) (hfull : ζ ^ (2 ^ t) = 1) (hhalf : ζ ^ (2 ^ (t - 1)) ≠ 1) : IsPrimitiveRoot ζ (2 ^ t)",
+      "normalization": "canonical tools/pcc/pcc.py lean_find_declaration; short declaration name, whitespace normalized, proof excluded; qualified and short lookups agree"
+    }
+  ]
+}

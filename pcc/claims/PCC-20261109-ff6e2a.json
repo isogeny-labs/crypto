@@ -1,0 +1,21 @@
+{
+ "created_at": "2026-11-09T05:56:13Z",
+ "id": "PCC-20261109-ff6e2a",
+ "kind": "theorem",
+ "producer": {
+  "commit": "31410711806e73aed58cbc2bd74ed60b93de3572",
+  "model": "",
+  "session": ""
+ },
+ "proofs": [
+  {
+   "decl_sha256": "27bff96578e37943e89a88d52935765ae7774e3a07ec45b8d127332b31f51569",
+   "kind": "lean",
+   "project": "research/prime_leads_new_cycle_20261109/lean",
+   "theorem": "BinaryPrimitiveGuard.primitive_root_of_binary_guard"
+  }
+ ],
+ "schema": "pcc.claim/v1",
+ "scope": "research/prime_leads_new_cycle_20261109/lean",
+ "statement": "theorem primitive_root_of_binary_guard {K : Type*} [Field K] (\u03b6 : K) (t : \u2115) (ht : 0 < t) (hfull : \u03b6 ^ (2 ^ t) = 1) (hhalf : \u03b6 ^ (2 ^ (t - 1)) \u2260 1) : IsPrimitiveRoot \u03b6 (2 ^ t)"
+}
