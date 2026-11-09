@@ -2,7 +2,7 @@
 
 `ic_program.tex` (built: [`ic_program.pdf`](ic_program.pdf)) is the
 programme record of the repository's ECDLP index-calculus work from
-2026-07-01 to 2026-10-24 (last folded in: 21–24 October): the routes pursued, the measurement infrastructure
+2026-07-01 to 2026-10-26 (last folded in: 21–24 October, plus the plane-quartic program of 18–26 October): the routes pursued, the measurement infrastructure
 (ecbench, the boundary ledger, claim hygiene), what improved and on which
 boundary, the negative results, and where the frontier stands.
 
@@ -16,7 +16,10 @@ Restore authors with `make deanonymize` after creating an `AUTHORS` file
 **Change class** (per `AGENTS.md`): none of its own; it reports results
 already classed by their studies. With one modelled exception (the `k = 4`
 crossover of §10.9, an extrapolation fed by a measured constant) every
-improvement it reports is *engineering* or *accounting*.
+improvement it reports is *engineering* or *accounting*. The plane-quartic
+N4 result (§11), which the leaderboard classes *advance* restricted to the
+GHS-weak family, is reported as below a matched plain rho, not as an advance
+against the strongest rho.
 
 ## What it says
 
@@ -54,7 +57,9 @@ improvement it reports is *engineering* or *accounting*.
   unplanted relation), small-x bases, isogeny walks over a million
   P-256-isogenous curves, lattices, ECCp-131, audits of standard curves,
   Gaudry `k = 4` over `F_{p^4}`.
-- **Covers and transfers** (§11): the conservation lemma, genus 3 at parity
+- **Covers and transfers** (§11): the conservation lemma, plane-quartic index
+  calculus below a matched plain rho from q = 4051 on the GHS-weak family, Smith's
+  walk (frozen o(p), post hoc Θ~(p)), genus 3 at parity
   with the strongest rho over `q = 2^14..2^20`, the two generations of
   Joux–Vitse comparisons, cover censuses, volcano levels.
 - **Frontier** (§12): a table of every measured improvement by boundary and

@@ -1,0 +1,29 @@
+{
+  "argv": [
+    "timeout",
+    "-k",
+    "2s",
+    "30s",
+    "aws",
+    "ec2",
+    "describe-nat-gateways",
+    "--query",
+    "NatGateways[].{Id:NatGatewayId,State:State,Create:CreateTime}",
+    "--region",
+    "us-east-2",
+    "--cli-connect-timeout",
+    "5",
+    "--cli-read-timeout",
+    "15",
+    "--output",
+    "json"
+  ],
+  "exit": 0,
+  "started_utc": "2026-11-03T22:29:37.796356+00:00",
+  "observed_utc": "2026-11-03T22:29:38.631781+00:00",
+  "elapsed_seconds": 0.8354294820164796,
+  "stdout_sha256": "f41fef4c616bf7bcce08bfa8ed5eb78409355b4b5e961e4ee4deddb541892747",
+  "stdout_bytes": 131,
+  "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "stderr_bytes": 0
+}

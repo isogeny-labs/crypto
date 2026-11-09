@@ -1,0 +1,1977 @@
+{
+ "schema": "hashed-ecdl-counts.decision/v2",
+ "alpha": 0.05,
+ "tests_in_family": 32,
+ "weights": [
+  0.0,
+  0.1,
+  1.0
+ ],
+ "resamples": 4000,
+ "seed": 20261002,
+ "tracks": {
+  "C": {
+   "verify_replay_all": [
+    {
+     "dir": "/dev/shm/restore/sessions/C-10-14",
+     "exit": 0
+    },
+    {
+     "dir": "/dev/shm/sessions/C-16",
+     "exit": 0
+    }
+   ],
+   "determinism": {
+    "C-aa": {
+     "pairs": 32,
+     "s_mismatch": [],
+     "timeout_censoring": [],
+     "other_status_mismatch": [],
+     "invalidates_track": false
+    }
+   },
+   "valid": true
+  },
+  "B": {
+   "verify_replay_all": [
+    {
+     "dir": "/dev/shm/restore/sessions/B",
+     "exit": 0
+    }
+   ],
+   "determinism": {
+    "B-aa-rho": {
+     "pairs": 32,
+     "s_mismatch": [],
+     "timeout_censoring": [],
+     "other_status_mismatch": [],
+     "invalidates_track": false
+    },
+    "B-aa-selectors": {
+     "pairs": 32,
+     "s_mismatch": [],
+     "timeout_censoring": [],
+     "other_status_mismatch": [],
+     "invalidates_track": false
+    }
+   },
+   "valid": true
+  }
+ },
+ "cells": [
+  {
+   "slug": "icv1-fp10-t5-192cb216",
+   "statuses": [
+    "verified"
+   ],
+   "complete": true,
+   "problems": [],
+   "log2_r": 9.684748620421626,
+   "ratio": [
+    4318.073669849932,
+    5008.26522825944,
+    9543.3187250996
+   ],
+   "log2_ratio": [
+    12.076172141783625,
+    12.290095251358014,
+    13.220275340792263
+   ],
+   "ci95_linearised_t": [
+    [
+     2964.737587113392,
+     6289.177261184067
+    ],
+    [
+     3419.027371871384,
+     7336.215206391784
+    ],
+    [
+     6260.3218941207,
+     14547.963160547462
+    ]
+   ],
+   "ci95_cluster_bootstrap_descriptive": [
+    [
+     3226.9555920533676,
+     5782.213873634946
+    ],
+    [
+     3734.3145967247856,
+     6750.70824324065
+    ],
+    [
+     6921.911749438554,
+     13228.758266818699
+    ]
+   ],
+   "comparison": "C-rho",
+   "track": "C",
+   "a": "rho-neg",
+   "b": "tensor-m2",
+   "lower_bound_only": false,
+   "band_order": "rho-neg < tensor-m2",
+   "p_per_weight": [
+    2.34008368238392e-10,
+    2.2998780657701445e-10,
+    2.7655189249742307e-10
+   ],
+   "p": 2.7655189249742307e-10,
+   "pre": "candidate",
+   "holm_step": 9,
+   "holm_level": 0.0020833333333333333,
+   "verdict": "supported_within_scope",
+   "direction": "B > A"
+  },
+  {
+   "slug": "icv1-fp12-t19-d4a315df",
+   "statuses": [
+    "verified"
+   ],
+   "complete": true,
+   "problems": [],
+   "log2_r": 11.925183519434208,
+   "ratio": [
+    27039.386944818303,
+    30522.253762488937,
+    49612.360655737706
+   ],
+   "log2_ratio": [
+    14.722774821787269,
+    14.897573874222488,
+    15.598411984740121
+   ],
+   "ci95_linearised_t": [
+    [
+     19844.061505273814,
+     36843.68979391157
+    ],
+    [
+     22259.125645975426,
+     41852.85574818659
+    ],
+    [
+     34902.88770410321,
+     70520.99387024726
+    ]
+   ],
+   "ci95_cluster_bootstrap_descriptive": [
+    [
+     21865.354973198337,
+     34862.17107162619
+    ],
+    [
+     24584.53196945203,
+     39595.57872721723
+    ],
+    [
+     39005.1197301855,
+     66305.11435079726
+    ]
+   ],
+   "comparison": "C-rho",
+   "track": "C",
+   "a": "rho-neg",
+   "b": "tensor-m2",
+   "lower_bound_only": false,
+   "band_order": "rho-neg < tensor-m2",
+   "p_per_weight": [
+    1.4987344698624838e-11,
+    1.589395282053374e-11,
+    2.450550873334123e-11
+   ],
+   "p": 2.450550873334123e-11,
+   "pre": "candidate",
+   "holm_step": 7,
+   "holm_level": 0.0019230769230769232,
+   "verdict": "supported_within_scope",
+   "direction": "B > A"
+  },
+  {
+   "slug": "icv1-fp14-tm43-158b6914",
+   "statuses": [
+    "verified"
+   ],
+   "complete": true,
+   "problems": [],
+   "log2_r": 13.986464267334126,
+   "ratio": [
+    169643.70417326994,
+    190459.48918197988,
+    301042.1300280636
+   ],
+   "log2_ratio": [
+    17.372148364099356,
+    17.539124642909044,
+    18.199605876801552
+   ],
+   "ci95_linearised_t": [
+    [
+     139833.55540952686,
+     205808.87242224274
+    ],
+    [
+     156124.58564397568,
+     232345.32133319028
+    ],
+    [
+     239436.87178580047,
+     378497.9455165437
+    ]
+   ],
+   "ci95_cluster_bootstrap_descriptive": [
+    [
+     147700.6429655918,
+     198839.4061190059
+    ],
+    [
+     165123.2832244347,
+     224710.36745326384
+    ],
+    [
+     256615.55966825323,
+     366239.74933037156
+    ]
+   ],
+   "comparison": "C-rho",
+   "track": "C",
+   "a": "rho-neg",
+   "b": "tensor-m2",
+   "lower_bound_only": false,
+   "band_order": "rho-neg < tensor-m2",
+   "p_per_weight": [
+    1.7497114868092467e-13,
+    1.9939605522267811e-13,
+    4.1389114358025836e-13
+   ],
+   "p": 4.1389114358025836e-13,
+   "pre": "candidate",
+   "holm_step": 3,
+   "holm_level": 0.0016666666666666668,
+   "verdict": "supported_within_scope",
+   "direction": "B > A"
+  },
+  {
+   "slug": "icv1-fp16-t351-d433f24e",
+   "statuses": [
+    "verified"
+   ],
+   "complete": true,
+   "problems": [],
+   "log2_r": 15.988218682078955,
+   "ratio": [
+    673278.547393365,
+    756951.1869096645,
+    1206157.7463483587
+   ],
+   "log2_ratio": [
+    19.360843971550967,
+    19.529840743374432,
+    20.201987170585326
+   ],
+   "ci95_linearised_t": [
+    [
+     524571.224009755,
+     864141.9537181664
+    ],
+    [
+     585602.33991028,
+     978437.1753906164
+    ],
+    [
+     898208.9567262552,
+     1619686.0409615492
+    ]
+   ],
+   "ci95_cluster_bootstrap_descriptive": [
+    [
+     560287.3427077456,
+     826220.9186057353
+    ],
+    [
+     627015.9623762803,
+     935192.4343570193
+    ],
+    [
+     974119.3912483912,
+     1543073.246101294
+    ]
+   ],
+   "comparison": "C-rho",
+   "track": "C",
+   "a": "rho-neg",
+   "b": "tensor-m2",
+   "lower_bound_only": false,
+   "band_order": "rho-neg < tensor-m2",
+   "p_per_weight": [
+    4.909406214892442e-13,
+    5.617728504603292e-13,
+    1.1688428003253648e-12
+   ],
+   "p": 1.1688428003253648e-12,
+   "pre": "candidate",
+   "holm_step": 4,
+   "holm_level": 0.001724137931034483,
+   "verdict": "supported_within_scope",
+   "direction": "B > A"
+  },
+  {
+   "slug": "icv1-fp10-t5-192cb216",
+   "statuses": [
+    "verified"
+   ],
+   "complete": true,
+   "problems": [],
+   "log2_r": 9.684748620421626,
+   "ratio": [
+    258.8654616831602,
+    303.9444293630136,
+    630.2369269223179
+   ],
+   "log2_ratio": [
+    8.016058680766447,
+    8.247663767355126,
+    9.29975047717833
+   ],
+   "ci95_linearised_t": [
+    [
+     201.30897176741672,
+     332.8779967633909
+    ],
+    [
+     236.53252519988257,
+     390.5687645398454
+    ],
+    [
+     491.1478446706952,
+     808.7149080798692
+    ]
+   ],
+   "ci95_cluster_bootstrap_descriptive": [
+    [
+     208.22968712102846,
+     308.73429139385973
+    ],
+    [
+     244.58718840895006,
+     362.4052753305951
+    ],
+    [
+     511.40145782539497,
+     751.4982531015296
+    ]
+   ],
+   "comparison": "C-ic",
+   "track": "C",
+   "a": "ic-mitm",
+   "b": "tensor-m2",
+   "lower_bound_only": false,
+   "band_order": "ic-mitm < tensor-m2",
+   "p_per_weight": [
+    2.4651836127986826e-10,
+    1.981035335774095e-10,
+    8.232037274069626e-11
+   ],
+   "p": 2.4651836127986826e-10,
+   "pre": "candidate",
+   "holm_step": 8,
+   "holm_level": 0.002,
+   "verdict": "supported_within_scope",
+   "direction": "B > A"
+  },
+  {
+   "slug": "icv1-fp12-t19-d4a315df",
+   "statuses": [
+    "verified"
+   ],
+   "complete": true,
+   "problems": [],
+   "log2_r": 11.925183519434208,
+   "ratio": [
+    2988.288636025584,
+    3504.504585024431,
+    7241.380630495903
+   ],
+   "log2_ratio": [
+    11.545103788094316,
+    11.77499479644571,
+    12.822049070213408
+   ],
+   "ci95_linearised_t": [
+    [
+     2479.517501762314,
+     3601.4543014327387
+    ],
+    [
+     2901.9486356445877,
+     4232.174283032839
+    ],
+    [
+     5887.21599274641,
+     8907.027277465133
+    ]
+   ],
+   "ci95_cluster_bootstrap_descriptive": [
+    [
+     2597.4669700998193,
+     3447.886018270209
+    ],
+    [
+     3041.6935827600455,
+     4055.08137537496
+    ],
+    [
+     6171.399883923389,
+     8478.928516844711
+    ]
+   ],
+   "comparison": "C-ic",
+   "track": "C",
+   "a": "ic-mitm",
+   "b": "tensor-m2",
+   "lower_bound_only": false,
+   "band_order": "ic-mitm < tensor-m2",
+   "p_per_weight": [
+    2.3929747072770624e-12,
+    2.248645714075792e-12,
+    2.3727686482288846e-12
+   ],
+   "p": 2.3929747072770624e-12,
+   "pre": "candidate",
+   "holm_step": 5,
+   "holm_level": 0.0017857142857142859,
+   "verdict": "supported_within_scope",
+   "direction": "B > A"
+  },
+  {
+   "slug": "icv1-fp14-tm43-158b6914",
+   "statuses": [
+    "verified"
+   ],
+   "complete": true,
+   "problems": [],
+   "log2_r": 13.986464267334126,
+   "ratio": [
+    21013.972778432144,
+    24348.98578465425,
+    46388.72338074189
+   ],
+   "log2_ratio": [
+    14.359061314807711,
+    14.571574060114854,
+    15.501486523266507
+   ],
+   "ci95_linearised_t": [
+    [
+     18286.68018332139,
+     24148.01634336245
+    ],
+    [
+     21071.678048625203,
+     28136.01780423824
+    ],
+    [
+     38488.51661652942,
+     55910.53763736948
+    ]
+   ],
+   "ci95_cluster_bootstrap_descriptive": [
+    [
+     18765.777810034764,
+     23223.272362615324
+    ],
+    [
+     21627.736472014167,
+     26994.879777182345
+    ],
+    [
+     39721.06569818456,
+     53154.23362163326
+    ]
+   ],
+   "comparison": "C-ic",
+   "track": "C",
+   "a": "ic-mitm",
+   "b": "tensor-m2",
+   "lower_bound_only": false,
+   "band_order": "ic-mitm < tensor-m2",
+   "p_per_weight": [
+    6.616929226765933e-14,
+    7.860379014346108e-14,
+    3.05089287166993e-13
+   ],
+   "p": 3.05089287166993e-13,
+   "pre": "candidate",
+   "holm_step": 2,
+   "holm_level": 0.0016129032258064516,
+   "verdict": "supported_within_scope",
+   "direction": "B > A"
+  },
+  {
+   "slug": "icv1-fp16-t351-d433f24e",
+   "statuses": [
+    "verified"
+   ],
+   "complete": true,
+   "problems": [],
+   "log2_r": 15.988218682078955,
+   "ratio": [
+    121098.31042811138,
+    136676.0490087811,
+    222416.77395157557
+   ],
+   "log2_ratio": [
+    16.885819211029837,
+    17.06040092291346,
+    17.762906069981145
+   ],
+   "ci95_linearised_t": [
+    [
+     112410.39223076492,
+     130457.69610373896
+    ],
+    [
+     126290.77077377988,
+     147915.34059216536
+    ],
+    [
+     199594.24051810705,
+     247848.9419665316
+    ]
+   ],
+   "ci95_cluster_bootstrap_descriptive": [
+    [
+     114075.24249139115,
+     127686.0486703462
+    ],
+    [
+     128309.04213838861,
+     144618.37229130985
+    ],
+    [
+     204476.63112557787,
+     241169.98852009734
+    ]
+   ],
+   "comparison": "C-ic",
+   "track": "C",
+   "a": "ic-mitm",
+   "b": "tensor-m2",
+   "lower_bound_only": false,
+   "band_order": "ic-mitm < tensor-m2",
+   "p_per_weight": [
+    2.220446049250313e-16,
+    4.440892098500626e-16,
+    2.6645352591003757e-15
+   ],
+   "p": 2.6645352591003757e-15,
+   "pre": "candidate",
+   "holm_step": 1,
+   "holm_level": 0.0015625,
+   "verdict": "supported_within_scope",
+   "direction": "B > A"
+  },
+  {
+   "slug": "icv1-fp10-t5-192cb216",
+   "statuses": [
+    "exhausted",
+    "verified"
+   ],
+   "complete": false,
+   "problems": [
+    "w=0.0: pairs 0, censored 0, ci none",
+    "w=0.1: pairs 0, censored 0, ci none",
+    "w=1.0: pairs 0, censored 0, ci none"
+   ],
+   "verdict": "incomplete_unknown",
+   "descriptive_ratio_incomplete_unknown": [
+    null,
+    null,
+    null
+   ],
+   "descriptive_note": "includes exhausted pairs at the S they spent",
+   "verified_pairs": 0,
+   "descriptive_verified_pairs_ratio_recorded_s": null,
+   "comparison": "B-rho-source",
+   "track": "B",
+   "a": "rho-neg",
+   "b": "native-source",
+   "lower_bound_only": true,
+   "band_order": "incomplete",
+   "p": 1.0,
+   "pre": "incomplete_unknown",
+   "holm_step": 21,
+   "holm_level": 0.004166666666666667
+  },
+  {
+   "slug": "icv1-fp12-t19-d4a315df",
+   "statuses": [
+    "exhausted",
+    "verified"
+   ],
+   "complete": false,
+   "problems": [
+    "w=0.0: pairs 0, censored 0, ci none",
+    "w=0.1: pairs 0, censored 0, ci none",
+    "w=1.0: pairs 0, censored 0, ci none"
+   ],
+   "verdict": "incomplete_unknown",
+   "descriptive_ratio_incomplete_unknown": [
+    null,
+    null,
+    null
+   ],
+   "descriptive_note": "includes exhausted pairs at the S they spent",
+   "verified_pairs": 0,
+   "descriptive_verified_pairs_ratio_recorded_s": null,
+   "comparison": "B-rho-source",
+   "track": "B",
+   "a": "rho-neg",
+   "b": "native-source",
+   "lower_bound_only": true,
+   "band_order": "incomplete",
+   "p": 1.0,
+   "pre": "incomplete_unknown",
+   "holm_step": 22,
+   "holm_level": 0.004545454545454546
+  },
+  {
+   "slug": "icv1-fp14-tm43-158b6914",
+   "statuses": [
+    "exhausted",
+    "verified"
+   ],
+   "complete": false,
+   "problems": [
+    "w=0.0: pairs 0, censored 0, ci none",
+    "w=0.1: pairs 0, censored 0, ci none",
+    "w=1.0: pairs 0, censored 0, ci none"
+   ],
+   "verdict": "incomplete_unknown",
+   "descriptive_ratio_incomplete_unknown": [
+    null,
+    null,
+    null
+   ],
+   "descriptive_note": "includes exhausted pairs at the S they spent",
+   "verified_pairs": 0,
+   "descriptive_verified_pairs_ratio_recorded_s": null,
+   "comparison": "B-rho-source",
+   "track": "B",
+   "a": "rho-neg",
+   "b": "native-source",
+   "lower_bound_only": true,
+   "band_order": "incomplete",
+   "p": 1.0,
+   "pre": "incomplete_unknown",
+   "holm_step": 23,
+   "holm_level": 0.005
+  },
+  {
+   "slug": "icv1-fp16-t351-d433f24e",
+   "statuses": [
+    "exhausted",
+    "verified"
+   ],
+   "complete": false,
+   "problems": [
+    "w=0.0: pairs 0, censored 0, ci none",
+    "w=0.1: pairs 0, censored 0, ci none",
+    "w=1.0: pairs 0, censored 0, ci none"
+   ],
+   "verdict": "incomplete_unknown",
+   "descriptive_ratio_incomplete_unknown": [
+    null,
+    null,
+    null
+   ],
+   "descriptive_note": "includes exhausted pairs at the S they spent",
+   "verified_pairs": 0,
+   "descriptive_verified_pairs_ratio_recorded_s": null,
+   "comparison": "B-rho-source",
+   "track": "B",
+   "a": "rho-neg",
+   "b": "native-source",
+   "lower_bound_only": true,
+   "band_order": "incomplete",
+   "p": 1.0,
+   "pre": "incomplete_unknown",
+   "holm_step": 24,
+   "holm_level": 0.005555555555555556
+  },
+  {
+   "slug": "icv1-fp10-t5-192cb216",
+   "statuses": [
+    "verified"
+   ],
+   "complete": true,
+   "problems": [],
+   "log2_r": 9.684748620421626,
+   "ratio": [
+    1306.4646840148698,
+    1450.5113704012383,
+    2371.471830985916
+   ],
+   "log2_ratio": [
+    10.351452411321366,
+    10.502345889372203,
+    11.211567016440991
+   ],
+   "ci95_linearised_t": [
+    [
+     1081.3967344154241,
+     1578.3753697950215
+    ],
+    [
+     1204.0010849660953,
+     1747.4928070538465
+    ],
+    [
+     1973.0180145180266,
+     2850.3939668961953
+    ]
+   ],
+   "ci95_cluster_bootstrap_descriptive": [
+    [
+     1119.2270907271804,
+     1503.6892715068702
+    ],
+    [
+     1245.989865661089,
+     1666.7168483214953
+    ],
+    [
+     2062.3578347391435,
+     2746.229831144465
+    ]
+   ],
+   "comparison": "B-rho-selectors",
+   "track": "B",
+   "a": "rho-neg",
+   "b": "native-selectors",
+   "lower_bound_only": true,
+   "band_order": "rho-neg < native-selectors",
+   "p_per_weight": [
+    5.621503262887018e-12,
+    4.575895218295045e-12,
+    2.653877118063974e-12
+   ],
+   "p": 5.621503262887018e-12,
+   "pre": "candidate",
+   "holm_step": 6,
+   "holm_level": 0.001851851851851852,
+   "verdict": "supported_within_scope",
+   "direction": "B > A"
+  },
+  {
+   "slug": "icv1-fp12-t19-d4a315df",
+   "statuses": [
+    "exhausted",
+    "verified"
+   ],
+   "complete": false,
+   "problems": [
+    "w=0.0: pairs 5, censored 0, ci linearised_t",
+    "w=0.1: pairs 5, censored 0, ci linearised_t",
+    "w=1.0: pairs 5, censored 0, ci linearised_t"
+   ],
+   "verdict": "incomplete_unknown",
+   "descriptive_ratio_incomplete_unknown": [
+    8002.8396017699115,
+    8693.14799044553,
+    12454.935699933021
+   ],
+   "descriptive_note": "includes exhausted pairs at the S they spent",
+   "verified_pairs": 5,
+   "descriptive_verified_pairs_ratio_recorded_s": 8002.8396017699115,
+   "comparison": "B-rho-selectors",
+   "track": "B",
+   "a": "rho-neg",
+   "b": "native-selectors",
+   "lower_bound_only": true,
+   "band_order": "incomplete",
+   "p": 1.0,
+   "pre": "incomplete_unknown",
+   "holm_step": 18,
+   "holm_level": 0.0033333333333333335
+  },
+  {
+   "slug": "icv1-fp14-tm43-158b6914",
+   "statuses": [
+    "exhausted",
+    "verified"
+   ],
+   "complete": false,
+   "problems": [
+    "w=0.0: pairs 0, censored 0, ci none",
+    "w=0.1: pairs 0, censored 0, ci none",
+    "w=1.0: pairs 0, censored 0, ci none"
+   ],
+   "verdict": "incomplete_unknown",
+   "descriptive_ratio_incomplete_unknown": [
+    null,
+    null,
+    null
+   ],
+   "descriptive_note": "includes exhausted pairs at the S they spent",
+   "verified_pairs": 0,
+   "descriptive_verified_pairs_ratio_recorded_s": null,
+   "comparison": "B-rho-selectors",
+   "track": "B",
+   "a": "rho-neg",
+   "b": "native-selectors",
+   "lower_bound_only": true,
+   "band_order": "incomplete",
+   "p": 1.0,
+   "pre": "incomplete_unknown",
+   "holm_step": 19,
+   "holm_level": 0.0035714285714285718
+  },
+  {
+   "slug": "icv1-fp16-t351-d433f24e",
+   "statuses": [
+    "exhausted",
+    "verified"
+   ],
+   "complete": false,
+   "problems": [
+    "w=0.0: pairs 0, censored 0, ci none",
+    "w=0.1: pairs 0, censored 0, ci none",
+    "w=1.0: pairs 0, censored 0, ci none"
+   ],
+   "verdict": "incomplete_unknown",
+   "descriptive_ratio_incomplete_unknown": [
+    null,
+    null,
+    null
+   ],
+   "descriptive_note": "includes exhausted pairs at the S they spent",
+   "verified_pairs": 0,
+   "descriptive_verified_pairs_ratio_recorded_s": null,
+   "comparison": "B-rho-selectors",
+   "track": "B",
+   "a": "rho-neg",
+   "b": "native-selectors",
+   "lower_bound_only": true,
+   "band_order": "incomplete",
+   "p": 1.0,
+   "pre": "incomplete_unknown",
+   "holm_step": 20,
+   "holm_level": 0.0038461538461538464
+  },
+  {
+   "slug": "icv1-fp10-t5-192cb216",
+   "statuses": [
+    "exhausted",
+    "verified"
+   ],
+   "complete": false,
+   "problems": [
+    "w=0.0: pairs 0, censored 0, ci none",
+    "w=0.1: pairs 0, censored 0, ci none",
+    "w=1.0: pairs 0, censored 0, ci none"
+   ],
+   "verdict": "incomplete_unknown",
+   "descriptive_ratio_incomplete_unknown": [
+    null,
+    null,
+    null
+   ],
+   "descriptive_note": "includes exhausted pairs at the S they spent",
+   "verified_pairs": 0,
+   "descriptive_verified_pairs_ratio_recorded_s": null,
+   "comparison": "B-rho-width",
+   "track": "B",
+   "a": "rho-neg",
+   "b": "native-width",
+   "lower_bound_only": true,
+   "band_order": "incomplete",
+   "p": 1.0,
+   "pre": "incomplete_unknown",
+   "holm_step": 25,
+   "holm_level": 0.00625
+  },
+  {
+   "slug": "icv1-fp12-t19-d4a315df",
+   "statuses": [
+    "exhausted",
+    "verified"
+   ],
+   "complete": false,
+   "problems": [
+    "w=0.0: pairs 0, censored 0, ci none",
+    "w=0.1: pairs 0, censored 0, ci none",
+    "w=1.0: pairs 0, censored 0, ci none"
+   ],
+   "verdict": "incomplete_unknown",
+   "descriptive_ratio_incomplete_unknown": [
+    null,
+    null,
+    null
+   ],
+   "descriptive_note": "includes exhausted pairs at the S they spent",
+   "verified_pairs": 0,
+   "descriptive_verified_pairs_ratio_recorded_s": null,
+   "comparison": "B-rho-width",
+   "track": "B",
+   "a": "rho-neg",
+   "b": "native-width",
+   "lower_bound_only": true,
+   "band_order": "incomplete",
+   "p": 1.0,
+   "pre": "incomplete_unknown",
+   "holm_step": 26,
+   "holm_level": 0.0071428571428571435
+  },
+  {
+   "slug": "icv1-fp14-tm43-158b6914",
+   "statuses": [
+    "exhausted",
+    "verified"
+   ],
+   "complete": false,
+   "problems": [
+    "w=0.0: pairs 0, censored 0, ci none",
+    "w=0.1: pairs 0, censored 0, ci none",
+    "w=1.0: pairs 0, censored 0, ci none"
+   ],
+   "verdict": "incomplete_unknown",
+   "descriptive_ratio_incomplete_unknown": [
+    null,
+    null,
+    null
+   ],
+   "descriptive_note": "includes exhausted pairs at the S they spent",
+   "verified_pairs": 0,
+   "descriptive_verified_pairs_ratio_recorded_s": null,
+   "comparison": "B-rho-width",
+   "track": "B",
+   "a": "rho-neg",
+   "b": "native-width",
+   "lower_bound_only": true,
+   "band_order": "incomplete",
+   "p": 1.0,
+   "pre": "incomplete_unknown",
+   "holm_step": 27,
+   "holm_level": 0.008333333333333333
+  },
+  {
+   "slug": "icv1-fp16-t351-d433f24e",
+   "statuses": [
+    "exhausted",
+    "verified"
+   ],
+   "complete": false,
+   "problems": [
+    "w=0.0: pairs 0, censored 0, ci none",
+    "w=0.1: pairs 0, censored 0, ci none",
+    "w=1.0: pairs 0, censored 0, ci none"
+   ],
+   "verdict": "incomplete_unknown",
+   "descriptive_ratio_incomplete_unknown": [
+    null,
+    null,
+    null
+   ],
+   "descriptive_note": "includes exhausted pairs at the S they spent",
+   "verified_pairs": 0,
+   "descriptive_verified_pairs_ratio_recorded_s": null,
+   "comparison": "B-rho-width",
+   "track": "B",
+   "a": "rho-neg",
+   "b": "native-width",
+   "lower_bound_only": true,
+   "band_order": "incomplete",
+   "p": 1.0,
+   "pre": "incomplete_unknown",
+   "holm_step": 28,
+   "holm_level": 0.01
+  },
+  {
+   "slug": "icv1-fp10-t5-192cb216",
+   "statuses": [
+    "verified"
+   ],
+   "complete": true,
+   "problems": [],
+   "log2_r": 9.684748620421626,
+   "ratio": [
+    495.6096654275093,
+    550.5304202881297,
+    901.6654929577467
+   ],
+   "log2_ratio": [
+    8.953060513105466,
+    9.104678473793765,
+    9.816448500020591
+   ],
+   "ci95_linearised_t": [
+    [
+     352.50214842127605,
+     696.8154423036765
+    ],
+    [
+     391.5198034057899,
+     774.1211070963228
+    ],
+    [
+     635.4374137160831,
+     1279.4346754564713
+    ]
+   ],
+   "ci95_cluster_bootstrap_descriptive": [
+    [
+     366.0521196430293,
+     631.6559882916557
+    ],
+    [
+     405.9542188224387,
+     700.8103961011059
+    ],
+    [
+     663.1585040071238,
+     1163.6389149415947
+    ]
+   ],
+   "comparison": "B-rho-partial",
+   "track": "B",
+   "a": "rho-neg",
+   "b": "native-partial",
+   "lower_bound_only": true,
+   "band_order": "rho-neg < native-partial",
+   "p_per_weight": [
+    9.498639652605334e-10,
+    8.468232781666529e-10,
+    6.017040199424173e-10
+   ],
+   "p": 9.498639652605334e-10,
+   "pre": "candidate",
+   "holm_step": 10,
+   "holm_level": 0.002173913043478261,
+   "verdict": "supported_within_scope",
+   "direction": "B > A"
+  },
+  {
+   "slug": "icv1-fp12-t19-d4a315df",
+   "statuses": [
+    "verified"
+   ],
+   "complete": true,
+   "problems": [],
+   "log2_r": 11.925183519434208,
+   "ratio": [
+    1751.7509157509157,
+    1911.921776919363,
+    2801.478300180832
+   ],
+   "log2_ratio": [
+    10.774581935081672,
+    10.900807783734377,
+    11.451972602380021
+   ],
+   "ci95_linearised_t": [
+    [
+     1069.4015491611865,
+     2869.48459466992
+    ],
+    [
+     1163.7429743876053,
+     3141.1101604992236
+    ],
+    [
+     1665.5878510528023,
+     4712.01843926951
+    ]
+   ],
+   "ci95_cluster_bootstrap_descriptive": [
+    [
+     1156.0071027921501,
+     2522.2857142857147
+    ],
+    [
+     1259.2329971857412,
+     2766.6602843290325
+    ],
+    [
+     1820.946525820735,
+     4195.431677392909
+    ]
+   ],
+   "comparison": "B-rho-partial",
+   "track": "B",
+   "a": "rho-neg",
+   "b": "native-partial",
+   "lower_bound_only": true,
+   "band_order": "rho-neg < native-partial",
+   "p_per_weight": [
+    3.4562481765476605e-09,
+    3.3220244333165283e-09,
+    3.251649838276194e-09
+   ],
+   "p": 3.4562481765476605e-09,
+   "pre": "candidate",
+   "holm_step": 12,
+   "holm_level": 0.002380952380952381,
+   "verdict": "supported_within_scope",
+   "direction": "B > A"
+  },
+  {
+   "slug": "icv1-fp14-tm43-158b6914",
+   "statuses": [
+    "exhausted",
+    "verified"
+   ],
+   "complete": false,
+   "problems": [
+    "w=0.0: pairs 7, censored 0, ci linearised_t",
+    "w=0.1: pairs 7, censored 0, ci linearised_t",
+    "w=1.0: pairs 7, censored 0, ci linearised_t"
+   ],
+   "verdict": "incomplete_unknown",
+   "descriptive_ratio_incomplete_unknown": [
+    7975.976729153199,
+    8607.674904597492,
+    12008.732018561483
+   ],
+   "descriptive_note": "includes exhausted pairs at the S they spent",
+   "verified_pairs": 7,
+   "descriptive_verified_pairs_ratio_recorded_s": 7975.976729153201,
+   "comparison": "B-rho-partial",
+   "track": "B",
+   "a": "rho-neg",
+   "b": "native-partial",
+   "lower_bound_only": true,
+   "band_order": "incomplete",
+   "p": 1.0,
+   "pre": "incomplete_unknown",
+   "holm_step": 16,
+   "holm_level": 0.0029411764705882353
+  },
+  {
+   "slug": "icv1-fp16-t351-d433f24e",
+   "statuses": [
+    "exhausted",
+    "verified"
+   ],
+   "complete": false,
+   "problems": [
+    "w=0.0: pairs 1, censored 0, ci within_t",
+    "w=0.1: pairs 1, censored 0, ci within_t",
+    "w=1.0: pairs 1, censored 0, ci within_t"
+   ],
+   "verdict": "incomplete_unknown",
+   "descriptive_ratio_incomplete_unknown": [
+    612.57,
+    730.3191884365468,
+    1328.078968573731
+   ],
+   "descriptive_note": "includes exhausted pairs at the S they spent",
+   "verified_pairs": 1,
+   "descriptive_verified_pairs_ratio_recorded_s": 612.57,
+   "comparison": "B-rho-partial",
+   "track": "B",
+   "a": "rho-neg",
+   "b": "native-partial",
+   "lower_bound_only": true,
+   "band_order": "incomplete",
+   "p": 1.0,
+   "pre": "incomplete_unknown",
+   "holm_step": 17,
+   "holm_level": 0.003125
+  },
+  {
+   "slug": "icv1-fp10-t5-192cb216",
+   "statuses": [
+    "verified"
+   ],
+   "complete": true,
+   "problems": [],
+   "log2_r": 9.684748620421626,
+   "ratio": [
+    14.838909541511772,
+    14.53244433861174,
+    12.573063380281692
+   ],
+   "log2_ratio": [
+    3.8913131722331245,
+    3.8612054777346363,
+    3.6522642947728126
+   ],
+   "ci95_linearised_t": [
+    [
+     13.616867020200592,
+     16.170623980869678
+    ],
+    [
+     13.204869889374788,
+     15.99348878286053
+    ],
+    [
+     10.660386182070681,
+     14.828911454488653
+    ]
+   ],
+   "ci95_cluster_bootstrap_descriptive": [
+    [
+     13.881685028105778,
+     15.859660472025427
+    ],
+    [
+     13.495618431240118,
+     15.65199359045043
+    ],
+    [
+     11.057229498178218,
+     14.271353671666173
+    ]
+   ],
+   "comparison": "B-rho-ic",
+   "track": "B",
+   "a": "rho-neg",
+   "b": "ic-mitm",
+   "lower_bound_only": false,
+   "band_order": "rho-neg < ic-mitm",
+   "p_per_weight": [
+    2.1220802892685242e-11,
+    4.78554973426526e-11,
+    3.1430522628994595e-09
+   ],
+   "p": 3.1430522628994595e-09,
+   "pre": "candidate",
+   "holm_step": 11,
+   "holm_level": 0.002272727272727273,
+   "verdict": "supported_within_scope",
+   "direction": "B > A"
+  },
+  {
+   "slug": "icv1-fp12-t19-d4a315df",
+   "statuses": [
+    "verified"
+   ],
+   "complete": true,
+   "problems": [],
+   "log2_r": 11.925183519434208,
+   "ratio": [
+    9.756043956043955,
+    9.407118714216734,
+    7.469258589511753
+   ],
+   "log2_ratio": [
+    3.2862962582390347,
+    3.233752910707578,
+    2.9009650459168617
+   ],
+   "ci95_linearised_t": [
+    [
+     8.004968703266226,
+     11.890164371714011
+    ],
+    [
+     7.669066748658271,
+     11.539067973146668
+    ],
+    [
+     5.869092699900499,
+     9.505698193852165
+    ]
+   ],
+   "ci95_cluster_bootstrap_descriptive": [
+    [
+     8.505732484076434,
+     11.536458333333334
+    ],
+    [
+     8.16672636103152,
+     11.210543657331137
+    ],
+    [
+     6.341017705518346,
+     9.230977011494254
+    ]
+   ],
+   "comparison": "B-rho-ic",
+   "track": "B",
+   "a": "rho-neg",
+   "b": "ic-mitm",
+   "lower_bound_only": false,
+   "band_order": "rho-neg < ic-mitm",
+   "p_per_weight": [
+    2.3119441028285337e-08,
+    3.2299477092934126e-08,
+    2.1532037375315838e-07
+   ],
+   "p": 2.1532037375315838e-07,
+   "pre": "candidate",
+   "holm_step": 14,
+   "holm_level": 0.002631578947368421,
+   "verdict": "supported_within_scope",
+   "direction": "B > A"
+  },
+  {
+   "slug": "icv1-fp14-tm43-158b6914",
+   "statuses": [
+    "verified"
+   ],
+   "complete": true,
+   "problems": [],
+   "log2_r": 13.986464267334126,
+   "ratio": [
+    8.527901785714285,
+    8.258194364577344,
+    6.808730423192269
+   ],
+   "log2_ratio": [
+    3.0921908229377464,
+    3.0458263741343354,
+    2.7673858139615835
+   ],
+   "ci95_linearised_t": [
+    [
+     6.866351131653277,
+     10.591521970312952
+    ],
+    [
+     6.6453534160170635,
+     10.26247513018078
+    ],
+    [
+     5.507050756593404,
+     8.41808293126773
+    ]
+   ],
+   "ci95_cluster_bootstrap_descriptive": [
+    [
+     7.269614263003383,
+     10.280059640139058
+    ],
+    [
+     7.041396085266391,
+     9.978686742124896
+    ],
+    [
+     5.869474685863306,
+     8.272811020979125
+    ]
+   ],
+   "comparison": "B-rho-ic",
+   "track": "B",
+   "a": "rho-neg",
+   "b": "ic-mitm",
+   "lower_bound_only": false,
+   "band_order": "rho-neg < ic-mitm",
+   "p_per_weight": [
+    6.633965576874346e-08,
+    7.501965026968094e-08,
+    1.2345605693298012e-07
+   ],
+   "p": 1.2345605693298012e-07,
+   "pre": "candidate",
+   "holm_step": 13,
+   "holm_level": 0.0025,
+   "verdict": "supported_within_scope",
+   "direction": "B > A"
+  },
+  {
+   "slug": "icv1-fp16-t351-d433f24e",
+   "statuses": [
+    "verified"
+   ],
+   "complete": true,
+   "problems": [],
+   "log2_r": 15.988218682078955,
+   "ratio": [
+    5.193804034582133,
+    5.16566839401485,
+    5.0171806787776365
+   ],
+   "log2_ratio": [
+    2.376791581272762,
+    2.368955033764579,
+    2.32687689339081
+   ],
+   "ci95_linearised_t": [
+    [
+     3.6620540172291696,
+     7.366248619689194
+    ],
+    [
+     3.603293093232643,
+     7.405484168645487
+    ],
+    [
+     3.3002320731632206,
+     7.627373289349486
+    ]
+   ],
+   "ci95_cluster_bootstrap_descriptive": [
+    [
+     4.158449676858664,
+     7.144337160686297
+    ],
+    [
+     4.108393189918765,
+     7.177091545536983
+    ],
+    [
+     3.8544337055065823,
+     7.378963553867122
+    ]
+   ],
+   "comparison": "B-rho-ic",
+   "track": "B",
+   "a": "rho-neg",
+   "b": "ic-mitm",
+   "lower_bound_only": false,
+   "band_order": "rho-neg < ic-mitm",
+   "p_per_weight": [
+    1.0405794062195994e-05,
+    1.3012969035886002e-05,
+    3.955704177749375e-05
+   ],
+   "p": 3.955704177749375e-05,
+   "pre": "candidate",
+   "holm_step": 15,
+   "holm_level": 0.002777777777777778,
+   "verdict": "supported_within_scope",
+   "direction": "B > A"
+  },
+  {
+   "slug": "icv1-fp10-t5-192cb216",
+   "statuses": [
+    "exhausted",
+    "verified"
+   ],
+   "complete": false,
+   "problems": [
+    "w=0.0: pairs 0, censored 0, ci none",
+    "w=0.1: pairs 0, censored 0, ci none",
+    "w=1.0: pairs 0, censored 0, ci none"
+   ],
+   "verdict": "incomplete_unknown",
+   "descriptive_ratio_incomplete_unknown": [
+    null,
+    null,
+    null
+   ],
+   "descriptive_note": "includes exhausted pairs at the S they spent",
+   "verified_pairs": 0,
+   "descriptive_verified_pairs_ratio_recorded_s": null,
+   "comparison": "B-source-selectors",
+   "track": "B",
+   "a": "native-source",
+   "b": "native-selectors",
+   "lower_bound_only": false,
+   "band_order": "incomplete",
+   "p": 1.0,
+   "pre": "incomplete_unknown",
+   "holm_step": 29,
+   "holm_level": 0.0125
+  },
+  {
+   "slug": "icv1-fp12-t19-d4a315df",
+   "statuses": [
+    "exhausted",
+    "verified"
+   ],
+   "complete": false,
+   "problems": [
+    "w=0.0: pairs 0, censored 0, ci none",
+    "w=0.1: pairs 0, censored 0, ci none",
+    "w=1.0: pairs 0, censored 0, ci none"
+   ],
+   "verdict": "incomplete_unknown",
+   "descriptive_ratio_incomplete_unknown": [
+    null,
+    null,
+    null
+   ],
+   "descriptive_note": "includes exhausted pairs at the S they spent",
+   "verified_pairs": 0,
+   "descriptive_verified_pairs_ratio_recorded_s": null,
+   "comparison": "B-source-selectors",
+   "track": "B",
+   "a": "native-source",
+   "b": "native-selectors",
+   "lower_bound_only": false,
+   "band_order": "incomplete",
+   "p": 1.0,
+   "pre": "incomplete_unknown",
+   "holm_step": 30,
+   "holm_level": 0.016666666666666666
+  },
+  {
+   "slug": "icv1-fp14-tm43-158b6914",
+   "statuses": [
+    "exhausted"
+   ],
+   "complete": false,
+   "problems": [
+    "w=0.0: pairs 0, censored 0, ci none",
+    "w=0.1: pairs 0, censored 0, ci none",
+    "w=1.0: pairs 0, censored 0, ci none"
+   ],
+   "verdict": "incomplete_unknown",
+   "descriptive_ratio_incomplete_unknown": [
+    null,
+    null,
+    null
+   ],
+   "descriptive_note": "includes exhausted pairs at the S they spent",
+   "verified_pairs": 0,
+   "descriptive_verified_pairs_ratio_recorded_s": null,
+   "comparison": "B-source-selectors",
+   "track": "B",
+   "a": "native-source",
+   "b": "native-selectors",
+   "lower_bound_only": false,
+   "band_order": "incomplete",
+   "p": 1.0,
+   "pre": "incomplete_unknown",
+   "holm_step": 31,
+   "holm_level": 0.025
+  },
+  {
+   "slug": "icv1-fp16-t351-d433f24e",
+   "statuses": [
+    "exhausted"
+   ],
+   "complete": false,
+   "problems": [
+    "w=0.0: pairs 0, censored 0, ci none",
+    "w=0.1: pairs 0, censored 0, ci none",
+    "w=1.0: pairs 0, censored 0, ci none"
+   ],
+   "verdict": "incomplete_unknown",
+   "descriptive_ratio_incomplete_unknown": [
+    null,
+    null,
+    null
+   ],
+   "descriptive_note": "includes exhausted pairs at the S they spent",
+   "verified_pairs": 0,
+   "descriptive_verified_pairs_ratio_recorded_s": null,
+   "comparison": "B-source-selectors",
+   "track": "B",
+   "a": "native-source",
+   "b": "native-selectors",
+   "lower_bound_only": false,
+   "band_order": "incomplete",
+   "p": 1.0,
+   "pre": "incomplete_unknown",
+   "holm_step": 32,
+   "holm_level": 0.05
+  }
+ ],
+ "descriptive": [
+  {
+   "slug": "icv1-fp10-t5-192cb216",
+   "statuses": [
+    "verified"
+   ],
+   "complete": true,
+   "problems": [],
+   "log2_r": 9.684748620421626,
+   "ratio": [
+    16.680763983628925,
+    16.47756874095514,
+    15.14243027888446
+   ],
+   "log2_ratio": [
+    4.0601134610171785,
+    4.042431484002888,
+    3.9205248636139323
+   ],
+   "ci95_linearised_t": [
+    [
+     14.070698221323154,
+     19.774987900448806
+    ],
+    [
+     13.821425745750338,
+     19.64415803459227
+    ],
+    [
+     12.2077260976101,
+     18.782629370736412
+    ]
+   ],
+   "ci95_cluster_bootstrap_descriptive": [
+    [
+     14.651845986035925,
+     19.057542768273716
+    ],
+    [
+     14.412598467207614,
+     18.897563176895304
+    ],
+    [
+     12.929382312243229,
+     18.053864168618265
+    ]
+   ],
+   "comparison": "C-rho-ic",
+   "verdict": "descriptive"
+  },
+  {
+   "slug": "icv1-fp12-t19-d4a315df",
+   "statuses": [
+    "verified"
+   ],
+   "complete": true,
+   "problems": [],
+   "log2_r": 11.925183519434208,
+   "ratio": [
+    9.048452220726784,
+    8.709434678133302,
+    6.851229508196721
+   ],
+   "log2_ratio": [
+    3.1776710336929535,
+    3.1225790777767757,
+    2.7763629145267124
+   ],
+   "ci95_linearised_t": [
+    [
+     7.259985179435549,
+     11.277500651473927
+    ],
+    [
+     6.946813043187564,
+     10.91928801611523
+    ],
+    [
+     5.295642355838361,
+     8.863768098356491
+    ]
+   ],
+   "ci95_cluster_bootstrap_descriptive": [
+    [
+     7.698731427569159,
+     10.790862791087287
+    ],
+    [
+     7.380618071812038,
+     10.436916614810206
+    ],
+    [
+     5.685994174232315,
+     8.38088638020549
+    ]
+   ],
+   "comparison": "C-rho-ic",
+   "verdict": "descriptive"
+  },
+  {
+   "slug": "icv1-fp14-tm43-158b6914",
+   "statuses": [
+    "verified"
+   ],
+   "complete": true,
+   "problems": [],
+   "log2_r": 13.986464267334126,
+   "ratio": [
+    8.072900158478605,
+    7.822070737008496,
+    6.489554100405362
+   ],
+   "log2_ratio": [
+    3.0130870492916455,
+    2.9675505827941926,
+    2.6981193535350454
+   ],
+   "ci95_linearised_t": [
+    [
+     6.559787799238553,
+     9.93503432783739
+    ],
+    [
+     6.312304910087515,
+     9.692939660913238
+    ],
+    [
+     5.018208575539495,
+     8.39230011828682
+    ]
+   ],
+   "ci95_cluster_bootstrap_descriptive": [
+    [
+     6.93500068468082,
+     9.578317342991877
+    ],
+    [
+     6.682458770614691,
+     9.344147766464634
+    ],
+    [
+     5.3987738448441815,
+     8.041572213148655
+    ]
+   ],
+   "comparison": "C-rho-ic",
+   "verdict": "descriptive"
+  },
+  {
+   "slug": "icv1-fp16-t351-d433f24e",
+   "statuses": [
+    "verified"
+   ],
+   "complete": true,
+   "problems": [],
+   "log2_r": 15.988218682078955,
+   "ratio": [
+    5.5597682991047925,
+    5.538287010777085,
+    5.422962148578607
+   ],
+   "log2_ratio": [
+    2.475024760521131,
+    2.4694398204609724,
+    2.43908110060418
+   ],
+   "ci95_linearised_t": [
+    [
+     4.240489678871493,
+     7.2894938746689375
+    ],
+    [
+     4.182302998918332,
+     7.333907424133316
+    ],
+    [
+     3.8765846601122314,
+     7.586192755574928
+    ]
+   ],
+   "ci95_cluster_bootstrap_descriptive": [
+    [
+     4.533513270355376,
+     6.918679606200008
+    ],
+    [
+     4.480699840563901,
+     6.942352471926385
+    ],
+    [
+     4.204598902534622,
+     7.106749435964377
+    ]
+   ],
+   "comparison": "C-rho-ic",
+   "verdict": "descriptive"
+  },
+  {
+   "slug": "icv1-fp10-t5-192cb216",
+   "statuses": [
+    "verified"
+   ],
+   "complete": true,
+   "problems": [],
+   "log2_r": 9.684748620421626,
+   "ratio": [
+    1.0148698884758365,
+    1.0276223359923802,
+    1.109154929577465
+   ],
+   "log2_ratio": [
+    0.02129477836322837,
+    0.0393101535405786,
+    0.149460898882597
+   ],
+   "ci95_linearised_t": [
+    [
+     0.9695329220425879,
+     1.062326886605419
+    ],
+    [
+     0.9797566490135009,
+     1.0778264852743904
+    ],
+    [
+     1.0437786067869432,
+     1.1786260513548785
+    ]
+   ],
+   "ci95_cluster_bootstrap_descriptive": [
+    [
+     0.9818652849740933,
+     1.0521892331752658
+    ],
+    [
+     0.9917807142371988,
+     1.067096018735363
+    ],
+    [
+     1.0568136564762671,
+     1.160344827586207
+    ]
+   ],
+   "comparison": "B-pos",
+   "verdict": "descriptive"
+  },
+  {
+   "slug": "icv1-fp12-t19-d4a315df",
+   "statuses": [
+    "verified"
+   ],
+   "complete": true,
+   "problems": [],
+   "log2_r": 11.925183519434208,
+   "ratio": [
+    1.0336996336996338,
+    1.045664620266262,
+    1.1121157323688968
+   ],
+   "log2_ratio": [
+    0.04781703679004951,
+    0.06442020506099308,
+    0.15330692999189505
+   ],
+   "ci95_linearised_t": [
+    [
+     0.8481646707626339,
+     1.2598201381696026
+    ],
+    [
+     0.8495545865838955,
+     1.2870444293323922
+    ],
+    [
+     0.8592011962260303,
+     1.4394782125711123
+    ]
+   ],
+   "ci95_cluster_bootstrap_descriptive": [
+    [
+     0.8871342907193871,
+     1.1926527006950915
+    ],
+    [
+     0.8897565674217146,
+     1.213215661663536
+    ],
+    [
+     0.9054253906091095,
+     1.3289222681812443
+    ]
+   ],
+   "comparison": "B-pos",
+   "verdict": "descriptive"
+  },
+  {
+   "slug": "icv1-fp14-tm43-158b6914",
+   "statuses": [
+    "verified"
+   ],
+   "complete": true,
+   "problems": [],
+   "log2_r": 13.986464267334126,
+   "ratio": [
+    0.9508928571428569,
+    0.9607925139840034,
+    1.0139953348883706
+   ],
+   "log2_ratio": [
+    -0.07264530183176628,
+    -0.05770318456012294,
+    0.020051014916307553
+   ],
+   "ci95_linearised_t": [
+    [
+     0.7756614682127485,
+     1.1657111546983565
+    ],
+    [
+     0.7775622854815141,
+     1.1872003981726658
+    ],
+    [
+     0.7880243532983933,
+     1.3047649287382437
+    ]
+   ],
+   "ci95_cluster_bootstrap_descriptive": [
+    [
+     0.7929380570995084,
+     1.0806003335186214
+    ],
+    [
+     0.7949025693362198,
+     1.0975800156128024
+    ],
+    [
+     0.8071006123691774,
+     1.1852262657039556
+    ]
+   ],
+   "comparison": "B-pos",
+   "verdict": "descriptive"
+  },
+  {
+   "slug": "icv1-fp16-t351-d433f24e",
+   "statuses": [
+    "verified"
+   ],
+   "complete": true,
+   "problems": [],
+   "log2_r": 15.988218682078955,
+   "ratio": [
+    0.8890489913544668,
+    0.8910200327523161,
+    0.901422334882411
+   ],
+   "log2_ratio": [
+    -0.1696651734288431,
+    -0.1664702267456332,
+    -0.1497248981900964
+   ],
+   "ci95_linearised_t": [
+    [
+     0.6826883314662076,
+     1.1577876354365655
+    ],
+    [
+     0.6781900466900481,
+     1.1706404460529936
+    ],
+    [
+     0.6550733083213611,
+     1.240414188004492
+    ]
+   ],
+   "ci95_cluster_bootstrap_descriptive": [
+    [
+     0.6886577010910937,
+     1.0157974890081556
+    ],
+    [
+     0.6824292228766864,
+     1.0226593446459045
+    ],
+    [
+     0.6539772466745402,
+     1.0592437706917581
+    ]
+   ],
+   "comparison": "B-pos",
+   "verdict": "descriptive"
+  }
+ ],
+ "P1": "supported_within_scope",
+ "P4": {
+  "complete_cells_host_dependent": [
+   [
+    "B-rho-selectors",
+    "icv1-fp10-t5-192cb216"
+   ],
+   [
+    "B-rho-partial",
+    "icv1-fp10-t5-192cb216"
+   ],
+   [
+    "B-rho-partial",
+    "icv1-fp12-t19-d4a315df"
+   ]
+  ],
+  "verdict": "supported_within_scope"
+ }
+}

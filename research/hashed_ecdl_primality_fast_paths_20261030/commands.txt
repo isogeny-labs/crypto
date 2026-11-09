@@ -1,0 +1,34 @@
+Baseline (before edits), from the crypto repository root:
+cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml
+
+Candidate, from the crypto repository root:
+cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml -- --nocapture
+cargo clippy --locked --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --all-targets -- -D warnings
+cargo +1.78.0 check --locked --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --all-targets
+cargo fmt --check --manifest-path crates/hashed-ecdl-tensor/Cargo.toml
+cargo run --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml --bin hashed-ecdl -- validate crates/hashed-ecdl-tensor/examples/eccp131.json
+cargo test --locked --release --lib
+
+Peer, from the cryptanalysis repository root:
+cargo test --locked --release --manifest-path bindings/rust/hashed-ecdl-tensor/Cargo.toml -- --nocapture
+cargo test --locked --release --manifest-path bindings/rust/hashed-ecdl-tensor/Cargo.toml parsed_public_proofs_never_bypass -- --nocapture
+cargo clippy --locked --manifest-path bindings/rust/hashed-ecdl-tensor/Cargo.toml --all-targets -- -D warnings
+cargo +1.78.0 check --locked --manifest-path bindings/rust/hashed-ecdl-tensor/Cargo.toml --all-targets
+cargo fmt --check --manifest-path bindings/rust/hashed-ecdl-tensor/Cargo.toml
+cargo run --locked --release --manifest-path bindings/rust/hashed-ecdl-tensor/Cargo.toml --bin hashed-ecdl -- validate bindings/rust/hashed-ecdl-tensor/examples/eccp131.json
+
+Documents (rendering only; no research calculation uses Python):
+dot -Tsvg flow.dot -o flow.svg
+python -c 'import typst; typst.compile("report.typ", output="report.pdf")'
+pdftoppm -scale-to 1300 -png -singlefile report.pdf /tmp/primality-report
+
+Delivery at fc9af16fa1ce0654ee9df3ce63101c487ed215fb plus the source patch:
+# Restore delivery-native-Cargo.lock to crates/hashed-ecdl-tensor/Cargo.lock for exact replay.
+cargo test --locked --release --manifest-path crates/hashed-ecdl-tensor/Cargo.toml -- --nocapture
+cargo run --locked --release --manifest-path research/hashed_ecdl_primality_fast_paths_20261030/native-setup-check/Cargo.toml
+# The matched baseline uses identical client source/Cargo.lock, with every dependency
+# package file verified against fc9af16f's Git blobs. It exits 1 in AKS.
+
+Parent raw archive (not uploaded; see parent-validation/LOCAL-ONLY.json):
+ARTIFACTS_REMOTE=s3://setec-astronomy-artifacts AWS_DEFAULT_REGION=us-east-2 python tools/artifacts/artifacts.py push research/hashed_ecdl_primality_fast_paths_20261030/parent-validation/runs.tar.xz
+# Actual result: exit 2, Unable to locate credentials. No remote copy is claimed.

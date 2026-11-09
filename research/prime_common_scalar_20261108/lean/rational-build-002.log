@@ -1,0 +1,42 @@
+ℹ [3139/3143] Replayed CauchyNormalizer
+info: ../../prime_square_kernel_20261106/lean-normalizer/CauchyNormalizer.lean:183:0: 'CauchyNormalizer.choose_all_ones' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ../../prime_square_kernel_20261106/lean-normalizer/CauchyNormalizer.lean:184:0: 'CauchyNormalizer.choose_unit' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ../../prime_square_kernel_20261106/lean-normalizer/CauchyNormalizer.lean:185:0: 'CauchyNormalizer.weight_valuation' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ../../prime_square_kernel_20261106/lean-normalizer/CauchyNormalizer.lean:186:0: 'CauchyNormalizer.signedWeight_ratio_unit' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ../../prime_square_kernel_20261106/lean-normalizer/CauchyNormalizer.lean:187:0: 'CauchyNormalizer.puncture_formula' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ../../prime_square_kernel_20261106/lean-normalizer/CauchyNormalizer.lean:188:0: 'CauchyNormalizer.puncture_normalizer_unit' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ../../prime_square_kernel_20261106/lean-normalizer/CauchyNormalizer.lean:189:0: 'CauchyNormalizer.cauchyRho_unit' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ../../prime_square_kernel_20261106/lean-normalizer/CauchyNormalizer.lean:190:0: 'CauchyNormalizer.normalized_square_valuation' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [3140/3143] Replayed KernelNodes
+info: ../../prime_square_kernel_20261106/lean-normalizer/KernelNodes.lean:84:0: 'CauchyNormalizer.baseKernel_node' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ../../prime_square_kernel_20261106/lean-normalizer/KernelNodes.lean:85:0: 'CauchyNormalizer.squareKernel_node_preserved' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ../../prime_square_kernel_20261106/lean-normalizer/KernelNodes.lean:86:0: 'CauchyNormalizer.squareKernel_valuation' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ../../prime_square_kernel_20261106/lean-normalizer/KernelNodes.lean:87:0: 'CauchyNormalizer.squareKernel_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ../../prime_square_kernel_20261106/lean-normalizer/KernelNodes.lean:88:0: 'CauchyNormalizer.matrixEntry_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [3141/3143] Replayed CommonScalar
+info: CommonScalar.lean:92:0: 'CommonScalar.normalizer_node' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CommonScalar.lean:93:0: 'CommonScalar.normalizer_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CommonScalar.lean:94:0: 'CommonScalar.node_preserved' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CommonScalar.lean:95:0: 'CommonScalar.kernel_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CommonScalar.lean:96:0: 'CommonScalar.matrix_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CommonScalar.lean:97:0: 'CommonScalar.jet_origin_obstruction' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CommonScalar.lean:98:0: 'CommonScalar.squared_geometric_sum' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CommonScalar.lean:99:0: 'CommonScalar.squared_geometric_remainder' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: CommonScalar.lean:100:0: 'CommonScalar.coarse_budget_inclusion' depends on axioms: [propext, Classical.choice, Quot.sound]
+✖ [3142/3143] Building RationalScalar (1.6s)
+trace: .> LEAN_PATH=/workspace/audit/next-ternary-lean/.lake/packages/Cli/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/batteries/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/Qq/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/aesop/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/proofwidgets/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/importGraph/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/plausible/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/mathlib-seed/.lake/build/lib/lean:/workspace/audit/next-ternary-lean/.lake/packages/CryptoLean/.lake/build/lib/lean:/workspace/crypto/research/prime_common_scalar_20261108/lean/.lake/build/lib/lean /workspace/audit/toolchains/lean-4.35.0-linux/bin/lean /workspace/crypto/research/prime_common_scalar_20261108/lean/RationalScalar.lean -o /workspace/crypto/research/prime_common_scalar_20261108/lean/.lake/build/lib/lean/RationalScalar.olean -i /workspace/crypto/research/prime_common_scalar_20261108/lean/.lake/build/lib/lean/RationalScalar.ilean -c /workspace/crypto/research/prime_common_scalar_20261108/lean/.lake/build/ir/RationalScalar.c --setup /workspace/crypto/research/prime_common_scalar_20261108/lean/.lake/build/ir/RationalScalar.setup.json --json
+error: RationalScalar.lean:66:16: Tactic `unfold` failed to unfold `CommonScalar.kernel` in
+  baseKernel a k t * baseKernel a k t / denominator a t * (CommonScalar.normalizer a t * denominator a t) =
+    CommonScalar.kernel a k t
+info: RationalScalar.lean:87:0: 'RationalScalar.denominator_node' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: RationalScalar.lean:88:0: 'RationalScalar.node_preserved' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: RationalScalar.lean:89:0: 'RationalScalar.denominator_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: RationalScalar.lean:90:0: 'RationalScalar.kernel_origin' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: RationalScalar.lean:91:0: 'RationalScalar.clear_product' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: RationalScalar.lean:92:0: 'RationalScalar.clear_homogeneous_sum' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: RationalScalar.lean:93:0: 'RationalScalar.scalar_relation' depends on axioms: [propext, sorryAx, Classical.choice, Quot.sound]
+info: RationalScalar.lean:94:0: 'RationalScalar.squared_product_degree' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: RationalScalar.lean:95:0: 'RationalScalar.three_level_margin' depends on axioms: [propext, Classical.choice, Quot.sound]
+Some required targets logged failures:
+- RationalScalar
+error: build failed

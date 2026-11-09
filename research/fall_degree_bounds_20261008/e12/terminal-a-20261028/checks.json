@@ -1,0 +1,58 @@
+{
+  "schema": "e12.terminal-preservation-checks/v1",
+  "job": "20261028-021829-fd-e12a-r6a-20261028-r3-0c1d7f",
+  "terminal": {
+    "phase": "interrupted",
+    "exit_code": 143,
+    "spot_notice_utc": "2026-10-28T12:03:18Z",
+    "status_updated_utc": "2026-10-28T12:04:22Z"
+  },
+  "flow": {
+    "requested_completed_target_records": 2,
+    "completed_target_records": 0,
+    "missing_completed_target_records": 2,
+    "internal_candidates_attempted": null
+  },
+  "preservation": {
+    "source_hash_list_files_verified": 7,
+    "output_archive_members": 28,
+    "output_archive_regular_files": 27,
+    "copied_output_files": 25,
+    "canonical_bundle_members": 9,
+    "canonical_local_upload_readback_bytes_equal": true,
+    "canonical_receipt_fresh_get_verified_utc": "2026-10-28T12:26:22Z",
+    "new_cloud_request_by_packet_author": false
+  },
+  "producer_gates": {
+    "native_tests_reported_passed": 3,
+    "gate1_reported_agree": 24,
+    "gate1_reported_disagree": 0,
+    "saved_gate_jsonl_files": 4,
+    "saved_gate_jsonl_objects": 16,
+    "saved_gate_diff_files_empty": 4
+  },
+  "target_artifacts": {
+    "jsonl_bytes": 0,
+    "jsonl_objects": 0,
+    "error_bytes": 0,
+    "wrapper_status": "gate_passed",
+    "cells_status_present": false
+  },
+  "validation": {
+    "byte_hashes_checked": true,
+    "protocol_blob_hash_checked": true,
+    "solver_replayed": false,
+    "gates_replayed": false,
+    "formal_independent_review_performed": false,
+    "scientific_result_verified": false,
+    "solver_state_restorable": false,
+    "exact_degree": null
+  },
+  "delivery": {
+    "source_modified": false,
+    "prior_evidence_modified": false,
+    "new_trial_launched": false,
+    "retry_launched": false,
+    "cargo_run_for_packet": false
+  }
+}

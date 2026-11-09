@@ -1,0 +1,169 @@
+{
+  "schema": "private.gate.combined-software-controls/v1",
+  "gate_source_sha256": "6548d8d41a37975bb30c1a225583113ea6c25056753b3d455d90f1608d8e65bc",
+  "compiler_path": "/var/tmp/pencil-musl-private-20261031/prefix/bin/musl-gcc",
+  "compiler_sha256": "4f597c5343a03531e174d3a96e7af1ac329d3959966d90f68eb72fd495e8509c",
+  "toolchain_manifest_sha256": "d3059f6a44903b1c0705da1991eff2fb3a7af83c40b08c8b911ebe738055e724",
+  "toolchain_files_verified": 364,
+  "child_environment": {
+    "PATH": "/usr/bin:/bin",
+    "LC_ALL": "C",
+    "REALGCC": "/usr/bin/gcc",
+    "TMPDIR": "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-gate-controls/attempt1/tmp"
+  },
+  "frozen_plan_sha256": "11a96c61f7a49f69a49849fe4ff63d1220c0024366c3e1d8645c56b013e16cfe",
+  "runtime_admitted": false,
+  "image_admitted": false,
+  "candidate_executed": true,
+  "actual_kernel_container_qualification": false,
+  "held_release_controls_passed": true,
+  "launch_uncertain": false,
+  "pending_signals": [],
+  "proposal_manifest_sha256": "0cd60392cae590d32febbf7d45b43cf28178ac74da61abc37d9ba4aea7aaa31f",
+  "commands": [
+    {
+      "label": "compiler-version",
+      "argv": [
+        "/var/tmp/pencil-musl-private-20261031/prefix/bin/musl-gcc",
+        "--version"
+      ],
+      "cap_seconds": 5,
+      "launch_uncertain": false,
+      "pid": 4017276,
+      "pgid": 4017276,
+      "exit_code": 0,
+      "reap_confirmed": true
+    },
+    {
+      "label": "compiler-target",
+      "argv": [
+        "/var/tmp/pencil-musl-private-20261031/prefix/bin/musl-gcc",
+        "-dumpmachine"
+      ],
+      "cap_seconds": 5,
+      "launch_uncertain": false,
+      "pid": 4017277,
+      "pgid": 4017277,
+      "exit_code": 0,
+      "reap_confirmed": true
+    },
+    {
+      "label": "candidate-elf",
+      "argv": [
+        "/usr/bin/readelf",
+        "-h",
+        "-l",
+        "-d",
+        "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-gate-controls/attempt1/gate-candidate.bin"
+      ],
+      "cap_seconds": 5,
+      "launch_uncertain": false,
+      "pid": 4017281,
+      "pgid": 4017281,
+      "exit_code": 0,
+      "reap_confirmed": true
+    },
+    {
+      "label": "parser-build",
+      "argv": [
+        "/var/tmp/pencil-musl-private-20261031/prefix/bin/musl-gcc",
+        "-static",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-march=x86-64",
+        "-mtune=generic",
+        "-DFIXTURES=\"/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-gate-controls/fixtures\"",
+        "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-gate-controls/parser-controls.c",
+        "-o",
+        "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-gate-controls/attempt1/parser-controls.bin"
+      ],
+      "cap_seconds": 60,
+      "launch_uncertain": false,
+      "pid": 4017282,
+      "pgid": 4017282,
+      "exit_code": 0,
+      "reap_confirmed": true
+    },
+    {
+      "label": "parser-controls",
+      "argv": [
+        "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-gate-controls/attempt1/parser-controls.bin"
+      ],
+      "cap_seconds": 5,
+      "launch_uncertain": false,
+      "pid": 4017287,
+      "pgid": 4017287,
+      "exit_code": 0,
+      "reap_confirmed": true
+    },
+    {
+      "label": "pristine-host-negative",
+      "argv": [
+        "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-gate-controls/attempt1/gate-candidate.bin",
+        "Q1",
+        "01234567-89ab-cdef-0123-456789abcdef"
+      ],
+      "cap_seconds": 5,
+      "launch_uncertain": false,
+      "pid": 4017288,
+      "pgid": 4017288,
+      "exit_code": 126,
+      "reap_confirmed": true
+    },
+    {
+      "label": "helper-build",
+      "argv": [
+        "/var/tmp/pencil-musl-private-20261031/prefix/bin/musl-gcc",
+        "-static",
+        "-std=c11",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-march=x86-64",
+        "-mtune=generic",
+        "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-gate-controls/controls.c",
+        "-o",
+        "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-gate-controls/attempt1/helper-controls.bin"
+      ],
+      "cap_seconds": 60,
+      "launch_uncertain": false,
+      "pid": 4017289,
+      "pgid": 4017289,
+      "exit_code": 0,
+      "reap_confirmed": true
+    },
+    {
+      "label": "helper-controls",
+      "argv": [
+        "/home/ec2-user/crypto-pencil-signed-graph-20261029/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-private-gate-controls/attempt1/helper-controls.bin"
+      ],
+      "cap_seconds": 25,
+      "launch_uncertain": false,
+      "pid": 4017295,
+      "pgid": 4017295,
+      "exit_code": 0,
+      "reap_confirmed": true
+    }
+  ],
+  "compiler_target": "x86_64-amazon-linux",
+  "gate_binary_sha256": "830406f4c2ddaf900ff4f95ca85f5b1c111b71c9d4d8bf6467ffa46853ae88e9",
+  "parser_checks": 45,
+  "parser_binary_sha256": "7c4e57928e66acd0da194bed2cdf01d88a30bf8a2d383212dadfc4de68fdc8aa",
+  "pristine_host_negative_passed": true,
+  "helper_binary_sha256": "9f30d3f7439ad88e1145db00fa2e1fc9f42dc0583e5575ebd84da2cfc181fe13",
+  "helper_controls": {
+    "status": "helper_controls_passed",
+    "checks": 154,
+    "partial_lengths": 37,
+    "real_timeout_seconds": 15.001871,
+    "uid_gid_mocked": true,
+    "whole_gate_executed": false
+  },
+  "status": "fixed_software_checks_passed_pending_independent_review",
+  "pending_signal": null,
+  "elapsed_seconds": 15.807885821996024
+}

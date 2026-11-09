@@ -1,0 +1,33 @@
+{
+  "schema": "crypto.ml-dataset.build/v1",
+  "source_commit": "0f55f1c333449d4c85f04448da16fbfec15249cb",
+  "source_dirty": false,
+  "binary_sha256": "b61bf3c1c123bfe95650624d53bf4f0ef96cf1f9d6a583adc61540363572e77b",
+  "plan_sha256": "d698efdad6d674e944ebf3741962eb71b38829bdaf882fb8a8407a7fc57f753a",
+  "protocol_file_sha256": "05a54dacc052b49bf7b9d6ffd776c461f49757e01488088c9a79bbf136f11604",
+  "build_argv": [
+    "cargo",
+    "build",
+    "--release",
+    "--bin",
+    "crypto",
+    "--locked"
+  ],
+  "provenance_env": {
+    "CRYPTO_BUILD_GIT_COMMIT": "0f55f1c333449d4c85f04448da16fbfec15249cb",
+    "CRYPTO_BUILD_GIT_DIRTY": "false"
+  },
+  "base_image": "public.ecr.aws/aws-cli/aws-cli@sha256:b94fc7612d131f1a3cb76145ba3385c813ad7561ef2c2b60c89fbd5dfee93d39",
+  "validation": {
+    "strict_maintained_clippy": "passed with Rust1.98",
+    "changed_file_rustfmt": "passed",
+    "full_library_status": "running",
+    "endpoint_combinations_checked": 360,
+    "endpoint_test_passed": 1,
+    "endpoint_test_failed": 0,
+    "cloud_dataset_cells_verified": 0
+  },
+  "scientific_generation_before_build": false,
+  "prior_launches": "Two prior attempts used source4c94f1d; neither establishes verified cloud cells. This new binary has not run a scientific generation wave.",
+  "binary_bytes": 27414008
+}

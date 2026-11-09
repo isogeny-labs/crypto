@@ -1,0 +1,328 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "ML-DATASET-PRIME-CHAIN-CLI-NATIVE-SOFTWARE-20261029",
+  "version": 1,
+  "created": "2026-10-29",
+  "repository": "crypto",
+  "study_dir": "research/ml_dataset_20261028/startup-integration-cli-fixture-native",
+  "classification": "software_correctness_fixture",
+  "purpose": "Exercise the integrated release CLI through bounded local generation, intact-cell replay, and rejection of rehashed semantic corruption. Exclude all outputs from the research corpus.",
+  "question": "Does the actual clean release binary retain and independently reconstruct the new prime affine-S3-chain input on both selected twist cells, and reject modified algebra even when artifact hashes are recomputed?",
+  "claims": [
+    {
+      "id": "C-cli-replay",
+      "class": "exact_computation",
+      "text": "Both selected sealed local software cells retain exact chain inputs and pass native verify; the copied cell passes hash-only status but fails native semantic verification.",
+      "decided_by": [
+        "C-absolute"
+      ]
+    },
+    {
+      "id": "C-exclusions",
+      "class": "out_of_scope",
+      "text": "No PDP solve requirement, independent ECDLP recovery, FFD/LFD certificate, timing or statistical comparison, model-training result, cloud durability, startup-gate execution, or corpus completion follows from this software fixture.",
+      "decided_by": []
+    }
+  ],
+  "literature": [
+    {
+      "ref": "docs/ml-dataset/PRIME-F4-CHAIN-CONTRACT.md",
+      "provenance": "internal",
+      "claim": "Prime chain leaves use the exact signed factor-base abscissae and auxiliaries range over the field; affine-chain completion is not general PDP impossibility.",
+      "verified_by": "Read the frozen contract and its prior primary-source review; no new mathematical mechanism is proposed."
+    },
+    {
+      "ref": "src/ml_dataset/mod.rs",
+      "provenance": "internal",
+      "claim": "Use the actual PlanArgs, GenerateArgs, verify_protocol, mixed-radix cell indexing, central replay and status contracts.",
+      "verified_by": "Read current implementation and TempRun.bound before authoring this fixture."
+    }
+  ],
+  "arms": [
+    {
+      "id": "native-cli",
+      "role": "candidate",
+      "description": "Natural native generated targets on exactly two fixed local software cells; no target planting or resampling.",
+      "instrument": {
+        "repo": "crypto",
+        "commit": null,
+        "binary_sha256": null,
+        "binding_rule": "Require exact source_commit and binary_sha256 arguments, check native clean preflight before generation, then check both retained run bindings and hash the binary before/after each command.",
+        "build": [],
+        "threads": 1,
+        "env": {
+          "RAYON_NUM_THREADS": "1"
+        }
+      },
+      "parameters": {
+        "family": "prime",
+        "n": 7,
+        "m": 3,
+        "solver": "f4",
+        "seed": 42,
+        "curve_seeds": 8,
+        "generators": 2,
+        "keys": 2,
+        "twists": true,
+        "planned_cells": 64,
+        "selected_shards": [
+          62,
+          63
+        ],
+        "shard_count": 64,
+        "max_cases_per_invocation": 1,
+        "selected_curve_seed": 7,
+        "selected_generator_index": 1,
+        "selected_key_index": 1,
+        "factor_base_size": 2,
+        "degree_bound": 4,
+        "work_limit": 512
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "not_applicable_reason": "Exact software assertions only; no timing or statistical effect is estimated."
+    },
+    "positive": {
+      "present": true,
+      "arm": "native-cli",
+      "expected_detection": "The intact generated cells are accepted by central native replay; this is a verifier acceptance control, not a planted PDP solution."
+    },
+    "negative": {
+      "present": true,
+      "arm": "copied-rehashed-semantic-corruption",
+      "null_population": "Software control only: one copied shard62 cell has its auxiliary domain and one S3 coefficient changed, with all manifest artifact hashes and sizes recomputed.",
+      "expected_detection": "Hash-only native status accepts, then native verify rejects with prime F4 chain input differs at."
+    },
+    "baseline": {
+      "present": false,
+      "not_applicable_reason": "No before/after algorithm or performance comparison is requested."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "twist",
+        "levels": [
+          false,
+          true
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "source_binary",
+        "treatment": "fixed",
+        "how": "Exact runtime binding is filed in execution-inputs.json before the first command and checked against native preflight and run records."
+      },
+      {
+        "name": "curve_generator_key_seed",
+        "treatment": "fixed",
+        "how": "Fixed two mixed-radix shard positions; no resampling on failures."
+      },
+      {
+        "name": "thread_count",
+        "treatment": "fixed",
+        "value": 1,
+        "how": "RAYON_NUM_THREADS=1 in explicitly allowed subprocess environment."
+      },
+      {
+        "name": "host_kernel_load",
+        "treatment": "measured",
+        "how": "Retain native host/telemetry artifacts; no timing inference."
+      },
+      {
+        "name": "limits_and_order",
+        "treatment": "fixed",
+        "how": "Fixed sequential command order and worker/command limits; timing is operational only."
+      },
+      {
+        "name": "publication_credentials_environment",
+        "treatment": "fixed",
+        "how": "No publish/remote/budget arguments. Explicit environment allowlist excludes ISOLAB_RESULTS_URI, AWS/IRSA, store routes and proxies."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "C-absolute",
+        "arms": [
+          "native-cli"
+        ],
+        "design": "absolute",
+        "differs_in": [],
+        "threshold": "All specified software assertions pass."
+      }
+    ]
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Fixed software command sequence; no timing comparison.",
+    "seed_derivation": {
+      "method": "explicit_list",
+      "seeds": [
+        42
+      ],
+      "note": "Native construction uses fixed curve_seed7 and generator/key index1 in both selected shards."
+    },
+    "instance_sampling": {
+      "rule": "Keep the native generator's natural target for each fixed configuration; never change it to obtain a PDP success.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Explicit deterministic software assertions; no human statistical classification."
+    }
+  },
+  "sample_size": {
+    "instances": 2,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "not_applicable",
+      "note": "Fixed finite software coverage; no probability or statistical power claim."
+    },
+    "configured_limits_only": true,
+    "preflight_runtime": {
+      "fixed_seconds": null,
+      "per_sample_seconds": 20,
+      "threads": 1,
+      "measured_on": "Not measured;20 seconds is the configured worker timeout, not a runtime estimate."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "software_assertions",
+        "kind": "exact",
+        "unit": "assertion",
+        "definition": "Recorded pass/fail of fixed CLI provenance, integrity and semantic-replay assertions.",
+        "source": "run.rs and retained CLI stdout/stderr",
+        "aggregation": "all_required",
+        "resolution": "one assertion",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": []
+  },
+  "measurement": {
+    "isolation_required": "L0",
+    "clock": "not_a_performance_measurement",
+    "order": "sequential",
+    "warmups": 0,
+    "record": [
+      "full source commit",
+      "binary SHA256 before and after",
+      "fixture commit declaration",
+      "fixture/protocol/plan hashes",
+      "command argv",
+      "stdout/stderr",
+      "exit and timeout status",
+      "all native cell artifacts",
+      "tampered copy and rewritten manifest"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local-native-software-test",
+    "measurement_class": "software_correctness",
+    "scientific_trial": false,
+    "cloud_calls_requested": false,
+    "publish": false,
+    "worker_seconds_per_case": 20,
+    "worker_memory_mib": 512,
+    "worker_trace_mib": 16,
+    "trace_limit_is_polling_threshold": true,
+    "per_command_timeout_seconds": 45,
+    "overall_command_budget_seconds": 240,
+    "termination_grace_seconds": 0,
+    "cancellation": "SIGINT/SIGTERM set an atomic flag; command watchdog or cancellation kills and reaps the child process group immediately. SIGKILL, host loss or storage failure require retained-process/output reconciliation.",
+    "checkpoint": {
+      "policy": "retain every emitted local file and command prefix",
+      "automatic_resume": false,
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "not_used_for_research"
+      }
+    },
+    "retries": {
+      "max_attempts": 1,
+      "automatic": false,
+      "note": "Stop on first failed required assertion and retain all files. A new attempt requires a separately recorded fresh output path."
+    }
+  },
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "At most two native generation calls, each max_cases1, in separate shards62/64 and63/64. No additional cell generation or resume."
+    },
+    {
+      "kind": "invalidation",
+      "preregistered": true,
+      "rule": "Stop after any unexpected exit, timeout, binding mismatch, missing chain input, failed intact replay, or incorrect tamper result. No replacement target or weakened assertion."
+    }
+  ],
+  "decision_rule": {
+    "comparison_ids": [
+      "C-absolute"
+    ],
+    "text": "Pass only when both intact selected cells satisfy all exact assertions and the copied/rehashed corruption is rejected semantically. PDP success is neither required nor inferred.",
+    "threshold": "all_required_software_checks",
+    "statistic": "none",
+    "interval": "none",
+    "multiple_comparison_correction": "not_applicable",
+    "effect_size_measure": "not_applicable",
+    "verdict_vocabulary": [
+      "passed_software_checks",
+      "failed_software_checks"
+    ]
+  },
+  "analysis_plan": {
+    "script": "run.rs",
+    "script_sha256": "554e5bf1f70e051f0c59364305faa069b01ea35fbae0ab8e4f443d5d29ddb2c8",
+    "inputs": [
+      "frozen protocol and fixture manifest",
+      "exact runtime source/binary arguments",
+      "retained native CLI artifacts"
+    ],
+    "outputs": [
+      "execution-inputs.json",
+      "commands/*.receipt.json",
+      "receipt.json",
+      "complete native output and tampered-copy directories"
+    ],
+    "frozen_before_data": true,
+    "blinded": false
+  },
+  "reporting": {
+    "schema": "ml-dataset.cli-correctness-receipt/v2",
+    "counts_excluded_from_research_corpus": true,
+    "startup_gate_exercised": false,
+    "publication_or_cloud_validation": false,
+    "external_experiment_schema_validation_claimed": false
+  },
+  "inadmissible": [
+    "Counting either local software cell or the corrupted copy toward the requested research corpus",
+    "Demanding a solved PDP or changing natural targets until one is found",
+    "Calling known-answer target construction independently solved ECDLP",
+    "Treating encoding-relative exhaustion as a general PDP impossibility certificate",
+    "Claiming speed, instructions, first/last fall degree, learning efficacy, or cloud durability",
+    "Running publish/remote/budget/grant/startup/cloud commands",
+    "Automatically retrying, resuming, deleting failures, or reusing scratch output"
+  ],
+  "amendments": [],
+  "successor": {
+    "historical_protocol_file_sha256": "5e2f7390850b50002cc8be68220a1286f6d48b8e977159ce12aeb9a119a7aca2",
+    "reason": "Native Rust successor preserving the original frozen Python source and receipts unchanged."
+  },
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "b654ced146d8ce4143c45b46367eceba3ded66f0911fa1d47a22b14b6e77842c",
+    "frozen_at": "2026-10-29T12:28:08.263Z",
+    "filed_before_affected_data": true,
+    "commit": null,
+    "commit_binding": "Commit this new native fixture before execution; caller verifies and supplies its exact Git commit."
+  }
+}

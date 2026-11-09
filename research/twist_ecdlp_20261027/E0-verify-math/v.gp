@@ -1,0 +1,28 @@
+default(parisizemax,2000000000);
+\\ orbit reps of (a4,a6) under u^4,u^6 for p>=5; independent code
+orbs(p)={my(seen=Map(),res=List());
+ for(a=0,p-1,for(b=0,p-1, if((4*a^3+27*b^2)%p==0,next); my(k=a*p+b); if(mapisdefined(seen,k),next);
+  my(n=0,o=Map()); for(u=1,p-1,my(a2=(u^4*a)%p,b2=(u^6*b)%p,k2=a2*p+b2); if(!mapisdefined(o,k2),mapput(o,k2,1);mapput(seen,k2,1);n++));
+  listput(res,[a,b,n])));Vec(res)};
+\\ part 1: p=7 and p<=31 stats from own code: classes, weight, g2>1 classes, sum nE*nEt
+tot=0;
+forprime(p=5,31,
+ my(c=orbs(p),ng=0,w=0,s=0,nev=0);
+ for(i=1,#c, my(a=c[i][1],b=c[i][2],E=ellinit([a,b],p),nE=ellcard(E),Et=ellinit([a*Mod(2,p)^0*0+0,0]*0+[0,0],p)); 
+   \\ twist by nonsquare d
+   my(d=2); while(kronecker(d,p)!=-1,d++);
+   my(E2=ellinit([d^2*a,d^3*b],p),nEt=ellcard(E2));
+   if(nE+nEt!=2*p+2,error("order"));
+   my(r=#polrootsmod(x^3+a*x+b,p)); if(r>0,ng++); if(nE%2==0!=(r>0),error("parity"));
+   w+=c[i][3]; s+=nE*nEt);
+ print("own p=",p," classes=",#c," weight=",w," g2gt1=",ng," sum_nE_nEt=",s);
+ tot+=s);
+print("own T1 pair-add sum p=5..31 (p>=5 only): ",tot);
+\\ part 2: P5
+nev=0;ntot=0;
+forprime(p=101,199,
+ my(S=Set(),cnt=0);
+ \\ count (a,b) disc!=0 with cubic having a root: a6 = -x^3-a x
+ for(a=0,p-1, my(seenb=vector(p)); for(x=0,p-1, my(b=(-x^3-a*x)%p; if((4*a^3+27*b^2)%p!=0, seenb[b+1]=1)); cnt+=vecsum(seenb));
+ nev+=cnt; ntot+=p^2-p);
+print("own P5: even=",nev," total=",ntot," frac=",nev/ntot*1.);

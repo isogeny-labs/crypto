@@ -1,0 +1,42 @@
+import Repair
+set_option autoImplicit false
+namespace RepairControls
+open ProjectiveComparator RepairClosure
+def perm (j:Fin 4) : Fin 4 := if j=0 then 1 else if j=1 then 0 else if j=2 then 3 else 2
+def m : Mat ℚ := fun i j=>if j=perm i then 2 else 0
+def v : V ℚ := fun i=>if i=0 then 1 else 0
+
+theorem square_four : squareScalar m 4 := by
+ intro i j
+ fin_cases i <;> fin_cases j <;> norm_num [mm,m,perm]
+theorem nonzero_input : nonzero v := by
+ exact ⟨0,by norm_num [v]⟩
+theorem repaired_nonzero : nonzero (linear m v) := by
+ exact preserves_nonzero m 4 (by norm_num) square_four v nonzero_input
+theorem literal_swapped : linear m v 1=2 ∧ linear m v 0=0 := by
+ norm_num [linear,m,perm,v]
+theorem two_repairs : linear m (linear m v) 0=4 := by
+ rw [twice m 4 square_four v]; norm_num [v]
+theorem square_zero_without_closure :
+ squareScalar (fun _ _=> (0:ℚ)) 0 ∧ nonzero v ∧
+ ¬ nonzero (linear (fun _ _=>(0:ℚ)) v) := by
+ refine ⟨?_,nonzero_input,?_⟩
+ · intro i j; simp [mm]
+ · rintro ⟨i,hi⟩; simpa [linear] using hi
+theorem zero_comparator_vacuity : same (fun _=>(0:ℚ)) v ∧ ¬nonzero (fun _=>(0:ℚ)) := by
+ constructor
+ · exact zero_matches_everything v
+ · rintro ⟨i,hi⟩; exact hi rfl
+-- Invertible scalar matrices preserve zero as zero, so Some(z) needs its nonzero guard.
+theorem zero_stays_zero : linear m (fun _=>0)=fun _=>0 := linear_zero m
+end RepairControls
+namespace RepairControls
+open ProjectiveComparator RepairClosure
+def c1 : Mat ℚ := fun i j=>if i=j then 1 else 0
+def c2 : Mat ℚ := fun i j=>if i=j then (if j=2 then -1 else 1) else 0
+def degreeOne : V ℚ := fun i=>if i=0 then 0 else 1
+theorem wrong_degree_one_basis : ¬same (linear c1 degreeOne) (linear c2 degreeOne) := by
+ intro h
+ have h12 := h 1 2
+ norm_num [linear,c1,c2,degreeOne] at h12
+end RepairControls

@@ -1,0 +1,9 @@
+ring io27=2,(w),dp;
+list a=w+1,w^2+1,w^3+1;
+print("IO27_INTERNAL_SIZE");size(a);print(a);
+write("implicit.dump",a);
+link out="ASCII:w explicit.dump";open(out);write(out,a);close(out);
+link each="ASCII:w each.dump";open(each);
+int j;for(j=1;j<=size(a);j++){write(each,"ITEM "+string(j)+" "+string(a[j]));}
+close(each);
+print("IO27_ALL_CHECKS_PASS");quit;

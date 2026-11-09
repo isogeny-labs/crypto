@@ -1,0 +1,180 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "rows": [
+    {
+      "curve": "icv1-fp23-tm110-8df20cbc",
+      "log2_r": 20.000070167215192,
+      "arm": "bsgs-neg-v2",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        1.1322966831070482,
+        1.2418317798054879,
+        2.2276476500914435
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp23-tm110-8df20cbc",
+      "log2_r": 20.000070167215192,
+      "arm": "kangaroo-v2",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        2.0147622021247877,
+        2.03940352997047,
+        2.261175480581604
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp23-tm110-8df20cbc",
+      "log2_r": 20.000070167215192,
+      "arm": "rho-cubic",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        0.807353413332257,
+        0.8716300077804459,
+        1.4501193578141471
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp23-tm110-8df20cbc",
+      "log2_r": 20.000070167215192,
+      "arm": "rho-cubic-v2",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        0.7746393651355464,
+        0.8363688210052351,
+        1.391933923832435
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp23-tm110-8df20cbc",
+      "log2_r": 20.000070167215192,
+      "arm": "rho-neg-v2",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        1.1066625408633568,
+        1.205996876513394,
+        2.100005897363729
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-fp23-tm110-8df20cbc",
+      "log2_r": 20.000070167215192,
+      "arm": "rho-plain",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        1.490889850716018,
+        1.490889850716018,
+        1.490889850716018
+      ],
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-fp23-tm110-8df20cbc",
+      "a": "bsgs-neg-v2",
+      "b": "kangaroo-v2",
+      "verdict": "bsgs-neg-v2 < kangaroo-v2"
+    },
+    {
+      "curve": "icv1-fp23-tm110-8df20cbc",
+      "a": "bsgs-neg-v2",
+      "b": "rho-cubic",
+      "verdict": "rho-cubic < bsgs-neg-v2"
+    },
+    {
+      "curve": "icv1-fp23-tm110-8df20cbc",
+      "a": "bsgs-neg-v2",
+      "b": "rho-cubic-v2",
+      "verdict": "rho-cubic-v2 < bsgs-neg-v2"
+    },
+    {
+      "curve": "icv1-fp23-tm110-8df20cbc",
+      "a": "bsgs-neg-v2",
+      "b": "rho-neg-v2",
+      "verdict": "rho-neg-v2 < bsgs-neg-v2"
+    },
+    {
+      "curve": "icv1-fp23-tm110-8df20cbc",
+      "a": "bsgs-neg-v2",
+      "b": "rho-plain",
+      "verdict": "unresolved inside the band"
+    },
+    {
+      "curve": "icv1-fp23-tm110-8df20cbc",
+      "a": "kangaroo-v2",
+      "b": "rho-cubic",
+      "verdict": "rho-cubic < kangaroo-v2"
+    },
+    {
+      "curve": "icv1-fp23-tm110-8df20cbc",
+      "a": "kangaroo-v2",
+      "b": "rho-cubic-v2",
+      "verdict": "rho-cubic-v2 < kangaroo-v2"
+    },
+    {
+      "curve": "icv1-fp23-tm110-8df20cbc",
+      "a": "kangaroo-v2",
+      "b": "rho-neg-v2",
+      "verdict": "rho-neg-v2 < kangaroo-v2"
+    },
+    {
+      "curve": "icv1-fp23-tm110-8df20cbc",
+      "a": "kangaroo-v2",
+      "b": "rho-plain",
+      "verdict": "rho-plain < kangaroo-v2"
+    },
+    {
+      "curve": "icv1-fp23-tm110-8df20cbc",
+      "a": "rho-cubic",
+      "b": "rho-cubic-v2",
+      "verdict": "rho-cubic-v2 < rho-cubic"
+    },
+    {
+      "curve": "icv1-fp23-tm110-8df20cbc",
+      "a": "rho-cubic",
+      "b": "rho-neg-v2",
+      "verdict": "rho-cubic < rho-neg-v2"
+    },
+    {
+      "curve": "icv1-fp23-tm110-8df20cbc",
+      "a": "rho-cubic",
+      "b": "rho-plain",
+      "verdict": "rho-cubic < rho-plain"
+    },
+    {
+      "curve": "icv1-fp23-tm110-8df20cbc",
+      "a": "rho-cubic-v2",
+      "b": "rho-neg-v2",
+      "verdict": "rho-cubic-v2 < rho-neg-v2"
+    },
+    {
+      "curve": "icv1-fp23-tm110-8df20cbc",
+      "a": "rho-cubic-v2",
+      "b": "rho-plain",
+      "verdict": "rho-cubic-v2 < rho-plain"
+    },
+    {
+      "curve": "icv1-fp23-tm110-8df20cbc",
+      "a": "rho-neg-v2",
+      "b": "rho-plain",
+      "verdict": "unresolved inside the band"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+\documentclass[11pt]{article}\usepackage[margin=0.8in]{geometry}\begin{document}
+\section*{Finite nonbranch order: independent source review}
+Source: \texttt{eaf3957bc766e9da64e7ba27efb6ef74b34c57705020d0ad2514dbe86bd75c1a}. Published commit: \texttt{1b7c04cd5f5ad6de6f662b84f24035ed756f6b5d}.
+
+Five declarations match the announced rational nonbranch local-order claim at source level. The reviewer did not author the proof. The plan preceded source access; the coordinator disclosed the conjugate-point strategy, so this is explicitly context-informed, not blind.
+\subsection*{Checked logical route}
+\fbox{\parbox{0.94\linewidth}{Conjugate evaluation $2by_0\ne0$ $\longrightarrow$ actual affine function nonzero.\\
+Actual injective localization $\longrightarrow$ nonzero in point stalk.\\
+Actual DVR $\longrightarrow$ finite valuation; norm identity $\longrightarrow$ finite Nat sum.}}
+
+The source derives the domain and DVR from the actual separable quintic and nonbranch point. Mathlib's AtPrime localization instance supplies faithful scalar action and hence injection. The extended valuation is proved finite before applying the finite-only Nat-addition API. The final coefficientData specialization derives its norm identity from the support divisibilities rather than assuming the valuation conclusion.
+\subsection*{Boundary attacks and nonvacuity}
+Explicit hand examples removing $b\ne0$, $y_0\ne0$ or characteristic different from two give numerator order one and norm order two. Evaluation at the selected point provides a kernel-map attack; it cannot replace localization. Zero residual factor contradicts the nonzero norm product under valid hypotheses.
+
+The generic claim is nonvacuous over $\mathbf Q$: $f=X^5+1$, $P=(0,1)$, $n=b=1$, $u_1=u_2=X$, $U=-X^3$. Then $n^2-u_1u_2U=f$. A later coordinator-supplied fixture was independently checked against coefficientData: $q_1=q_2=s_1=s_2=0$, $r_1=-1,r_2=-4,t_1=t_2=1$ gives $(B,A,C,Q,R)=(-9,0,0,-81,0)$ and $f=X^5-5X^3+4X+1$. This is disclosed prior-fixture reuse, not blind discovery.
+\subsection*{Separate findings}
+Source fidelity: \textbf{faithful scoped}. Machine status: \textbf{not verified}. Overall review: \textbf{inconclusive}. No substantive mathematical counterexample to the stated hypotheses was found. Six announced dependency hashes matched; the complete immutable import closure was not audited.
+
+Next checks are exact module compilation, named elaborated-type and axiom readbacks, immutable import binding and checked controls. No compiler was invoked. The result concerns rational nonbranch local order, not a global divisor construction.
+
+Detailed findings and sources: \texttt{REPORT.md}, \texttt{review.json}, \texttt{sources-read.json}. Preread attacks: \texttt{DERIVATION.md}. Editable diagram: \texttt{flow.svg}.
+\end{document}

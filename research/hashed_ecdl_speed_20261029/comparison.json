@@ -1,0 +1,38 @@
+{
+  "schema": "hashed-ecdl.optimization-status/v1",
+  "baseline_crypto": "d188c5a6775dff07129084ab2f3f7ae39547c9fc",
+  "baseline_cryptanalysis": "1caa747d9bb888e0b98c739a59b17fbb1bd92e99",
+  "baseline_binary_sha256": "e522c1c17cddb3eb17d744525b49eb5b44757dfa04a7b99fcff09bfd501a84b7",
+  "candidate_binary_sha256": "84276e2c508d5889abd101798dd4fd966140332148204ab4d98c556e0b86ac48",
+  "binary_upload_status": "local_development_copies_not_uploaded_missing_S3_transport",
+  "status": "implementation_correctness_checked_measurements_blocked",
+  "profile_status": "not_recorded_missing_gawk",
+  "checkpoint_status": "failed_no_upload_transport",
+  "performance_panel_status": "not_run",
+  "common_operation_ratio": null,
+  "wall_speedup": null,
+  "s_over_rho": null,
+  "s_over_applicable_floor": null,
+  "cold_proof_generation_cost": null,
+  "runtime_confidence_interval": null,
+  "full_seeded_certificate_matches": true,
+  "native_tests_passed": 34,
+  "bounded_regression_diagnostic": {
+    "case": "unpinned_four_bit_free_input_interface",
+    "samples_per_method": 1,
+    "prefix_functional_assignments": 31,
+    "ordered_functional_assignments": 1,
+    "same_selected_word": true,
+    "calibrated_or_runtime_measurement": false
+  },
+  "eccp131_parameter_validation": {
+    "status": "validated_with_checked_prime_proofs",
+    "diagnostic_charged_steps": 5589,
+    "unchanged_step_budget": 2000000,
+    "calibrated_operations": null,
+    "challenge_solved": false
+  },
+  "ecc2k130_solved": false,
+  "eccp131_solved": false,
+  "next_requirement": "Use an existing authenticated S3 checkpoint/native Iso Lab runner, then execute the frozen profile and matched baseline/candidate panel."
+}

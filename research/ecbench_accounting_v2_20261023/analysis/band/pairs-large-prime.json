@@ -1,0 +1,69 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.1,
+    1.0
+  ],
+  "rows": [
+    {
+      "curve": "icv1-f2m11-t67-ae0facd2",
+      "log2_r": 9.952741247186488,
+      "arm": "lp",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        2711.4921873804437,
+        2925.7043407314295,
+        4853.613720890295
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m11-t67-ae0facd2",
+      "log2_r": 9.952741247186488,
+      "arm": "lp-v2",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        2712.3975197170785,
+        2926.6096730680647,
+        4854.519053226931
+      ],
+      "uncounted": []
+    },
+    {
+      "curve": "icv1-f2m11-t67-ae0facd2",
+      "log2_r": 9.952741247186488,
+      "arm": "rho-frob",
+      "runs": 16,
+      "verified": 16,
+      "mean_s": [
+        2.4162049422924428,
+        2.474376515677133,
+        2.9979206761393495
+      ],
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-f2m11-t67-ae0facd2",
+      "a": "lp",
+      "b": "lp-v2",
+      "verdict": "lp < lp-v2"
+    },
+    {
+      "curve": "icv1-f2m11-t67-ae0facd2",
+      "a": "lp",
+      "b": "rho-frob",
+      "verdict": "rho-frob < lp"
+    },
+    {
+      "curve": "icv1-f2m11-t67-ae0facd2",
+      "a": "lp-v2",
+      "b": "rho-frob",
+      "verdict": "rho-frob < lp-v2"
+    }
+  ]
+}

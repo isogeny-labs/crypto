@@ -1,5 +1,9 @@
 //! Native arithmetic and complete solvers for the three-leads replication.
 //! The standalone research driver and ecbench compile this same source.
+#[path = "three_leads_geometry_events.rs"]
+pub mod geometry_events;
+#[path = "three_leads_rho_events.rs"]
+mod rho_events;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use std::cell::{Cell, OnceCell};
@@ -789,57 +793,86 @@ impl Elliptic {
 
 type Poly = Vec<u64>;
 fn trim(mut a: Poly) -> Poly {
-    while a.last() == Some(&0) {
+    while geometry_events::last_is(&a, 0) {
         a.pop();
     }
     a
 }
 fn padd(f: &Field, a: &[u64], b: &[u64]) -> Poly {
-    let mut r = vec![0; a.len().max(b.len())];
+    let mut r = geometry_events::initialized(vec![0; a.len().max(b.len())]);
     for (i, v) in r.iter_mut().enumerate() {
+        geometry_events::record(
+            1 + usize::from(i < a.len()) + usize::from(i < b.len()),
+            0,
+            0,
+            0,
+        );
         *v = f.add(*a.get(i).unwrap_or(&0), *b.get(i).unwrap_or(&0));
     }
     trim(r)
 }
 fn pneg(f: &Field, a: &[u64]) -> Poly {
-    a.iter().map(|&x| f.neg(x)).collect()
+    a.iter()
+        .map(|&x| {
+            geometry_events::record(1, 0, 1, 0);
+            f.neg(x)
+        })
+        .collect()
 }
 fn psub(f: &Field, a: &[u64], b: &[u64]) -> Poly {
     padd(f, a, &pneg(f, b))
 }
 fn pscale(f: &Field, a: &[u64], s: u64) -> Poly {
-    trim(a.iter().map(|&x| f.mul(x, s)).collect())
+    trim(
+        a.iter()
+            .map(|&x| {
+                geometry_events::record(1, 0, 1, 0);
+                f.mul(x, s)
+            })
+            .collect(),
+    )
 }
 fn pmul(f: &Field, a: &[u64], b: &[u64]) -> Poly {
     if a.is_empty() || b.is_empty() {
         return vec![];
     }
-    let mut r = vec![0; a.len() + b.len() - 1];
+    let mut r = geometry_events::initialized(vec![0; a.len() + b.len() - 1]);
     for (i, &x) in a.iter().enumerate() {
+        geometry_events::record(1, 0, 0, 0);
         for (j, &y) in b.iter().enumerate() {
+            geometry_events::record(2, 0, 0, 0);
             r[i + j] = f.add(r[i + j], f.mul(x, y));
         }
     }
     trim(r)
 }
 fn pdiv(f: &Field, a: &[u64], b: &[u64]) -> (Poly, Poly) {
+    geometry_events::record(0, 0, 0, 1);
     assert!(!b.is_empty());
-    let mut r = trim(a.to_vec());
-    let mut q = vec![0; a.len().saturating_sub(b.len()) + 1];
-    let il = if b.last() == Some(&1) {
+    let mut r = trim(geometry_events::copied(a));
+    let mut q = geometry_events::initialized(vec![0; a.len().saturating_sub(b.len()) + 1]);
+    let il = if geometry_events::last_is(b, 1) {
         1
     } else {
-        f.inv(*b.last().unwrap())
+        f.inv(*geometry_events::last(b).unwrap())
     };
-    while !r.is_empty() && r.len() >= b.len() {
+    while {
+        geometry_events::record(0, 0, 0, 1);
+        !r.is_empty() && {
+            geometry_events::record(0, 0, 0, 1);
+            r.len() >= b.len()
+        }
+    } {
         let j = r.len() - b.len();
         let c = if il == 1 {
-            *r.last().unwrap()
+            *geometry_events::last(&r).unwrap()
         } else {
-            f.mul(*r.last().unwrap(), il)
+            f.mul(*geometry_events::last(&r).unwrap(), il)
         };
+        geometry_events::record(0, 1, 0, 0);
         q[j] = c;
         for (k, &x) in b.iter().enumerate() {
+            geometry_events::record(2, 0, 0, 0);
             r[j + k] = f.sub(r[j + k], f.mul(c, x));
         }
         r = trim(r);
@@ -851,21 +884,28 @@ fn prem(f: &Field, a: &[u64], b: &[u64]) -> Poly {
 }
 fn pexact(f: &Field, a: &[u64], b: &[u64]) -> Poly {
     let (q, r) = pdiv(f, a, b);
+    geometry_events::record(0, 0, 0, 1);
     assert!(r.is_empty(), "inexact polynomial division");
     q
 }
 fn pmonic(f: &Field, a: &[u64]) -> Poly {
     if a.is_empty() {
         vec![]
-    } else if a.last() == Some(&1) {
-        a.to_vec()
+    } else if geometry_events::last_is(a, 1) {
+        geometry_events::copied(a)
     } else {
-        pscale(f, a, f.inv(*a.last().unwrap()))
+        pscale(f, a, f.inv(*geometry_events::last(a).unwrap()))
     }
 }
 fn pegcd(f: &Field, a: &[u64], b: &[u64]) -> (Poly, Poly, Poly) {
-    let (mut r0, mut r1, mut s0, mut s1, mut t0, mut t1) =
-        (a.to_vec(), b.to_vec(), vec![1], vec![], vec![], vec![1]);
+    let (mut r0, mut r1, mut s0, mut s1, mut t0, mut t1) = (
+        geometry_events::copied(a),
+        geometry_events::copied(b),
+        geometry_events::initialized(vec![1]),
+        vec![],
+        vec![],
+        geometry_events::initialized(vec![1]),
+    );
     while !r1.is_empty() {
         let (q, r) = pdiv(f, &r0, &r1);
         r0 = r1;
@@ -877,7 +917,7 @@ fn pegcd(f: &Field, a: &[u64], b: &[u64]) -> (Poly, Poly, Poly) {
         t0 = t1;
         t1 = t;
     }
-    let inv = f.inv(*r0.last().unwrap());
+    let inv = f.inv(*geometry_events::last(&r0).unwrap());
     (
         pscale(f, &r0, inv),
         pscale(f, &s0, inv),
@@ -885,10 +925,13 @@ fn pegcd(f: &Field, a: &[u64], b: &[u64]) -> (Poly, Poly, Poly) {
     )
 }
 fn peval(f: &Field, a: &[u64], x: u64) -> u64 {
-    a.iter().rev().fold(0, |r, &c| f.add(f.mul(r, x), c))
+    a.iter().rev().fold(0, |r, &c| {
+        geometry_events::record(1, 0, 0, 0);
+        f.add(f.mul(r, x), c)
+    })
 }
 fn ppow(f: &Field, a: &[u64], n: usize) -> Poly {
-    (0..n).fold(vec![1], |r, _| pmul(f, &r, a))
+    (0..n).fold(geometry_events::initialized(vec![1]), |r, _| pmul(f, &r, a))
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
@@ -908,15 +951,16 @@ impl Divisor {
         let mut d = Self::O;
         d.degree = u.len() - 1;
         d.u = [0; 3];
+        geometry_events::record(0, u.len() + v.len(), 3, 0);
         d.u[..u.len()].copy_from_slice(u);
         d.v[..v.len()].copy_from_slice(v);
         d
     }
     fn up(&self) -> Poly {
-        self.u[..=self.degree].to_vec()
+        geometry_events::copied(&self.u[..=self.degree])
     }
     fn vp(&self) -> Poly {
-        trim(self.v[..self.degree].to_vec())
+        trim(geometry_events::copied(&self.v[..self.degree]))
     }
 }
 #[derive(Clone, Debug)]
@@ -938,6 +982,7 @@ impl Jacobian {
     pub fn neg(&self, d: Divisor) -> Divisor {
         let mut out = d;
         for x in &mut out.v[..d.degree] {
+            geometry_events::record(1, 0, 0, 0);
             *x = self.f.neg(*x);
         }
         out
@@ -987,13 +1032,13 @@ impl Jacobian {
                     f.mul(dd, f.sub(bb, f.mul(aa, b.u[1]))),
                     f.mul(f.mul(aa, cc), b.u[0]),
                 );
-                let slope = vec![f.mul(s0, ni), f.mul(s1, ni)];
+                let slope = geometry_events::initialized(vec![f.mul(s0, ni), f.mul(s1, ni)]);
                 let v = padd(f, &va, &pmul(f, &slope, &ua));
                 let u = pmul(f, &ua, &ub);
                 let quotient = pexact(f, &psub(f, &self.polynomial, &pmul(f, &v, &v)), &u);
                 let inverse_lead = f.neg(f.sq(f.mul(norm, si)));
                 let out_u = pscale(f, &quotient, inverse_lead);
-                assert_eq!(out_u.last(), Some(&1));
+                assert!(geometry_events::last_is(&out_u, 1));
                 return Divisor::from(&out_u, &prem(f, &pneg(f, &v), &out_u));
             }
         }
@@ -1029,7 +1074,10 @@ impl Jacobian {
     }
     pub fn point(&self, x: u64, y: u64) -> Divisor {
         assert_eq!(self.f.sq(y), peval(&self.f, &self.polynomial, x));
-        Divisor::from(&[self.f.neg(x), 1], &trim(vec![y]))
+        Divisor::from(
+            &[self.f.neg(x), 1],
+            &trim(geometry_events::initialized(vec![y])),
+        )
     }
 }
 
@@ -1045,7 +1093,7 @@ pub struct Scholten {
 }
 impl Scholten {
     pub fn new(p: u64) -> Self {
-        assert!(p > 13 && p % 4 == 3 && is_prime(p));
+        assert!(p > 13 && p % 4 == 3 && geometry_events::constructor_prime(p));
         let f = Field::new(p, 2, p - (-1i64).rem_euclid(p as i64) as u64);
         // x^2+1: the packed low constant is 1.
         assert_eq!(f.modulus, 1);
@@ -1064,8 +1112,8 @@ impl Scholten {
             ],
             binary: false,
         };
-        let b = vec![f.neg(i), f.sub(1, i)];
-        let a = vec![i, f.add(1, i)];
+        let b = geometry_events::initialized(vec![f.neg(i), f.sub(1, i)]);
+        let a = geometry_events::initialized(vec![i, f.add(1, i)]);
         // F(t)=t^6 f_C(1+1/t), via the cover identity, avoids fractions.
         let polynomial = pscale(
             &f,
@@ -1089,18 +1137,27 @@ impl Scholten {
             iw,
         );
         assert_eq!(polynomial.len(), 6);
-        assert!(polynomial.iter().all(|&x| x < p));
+        assert!(polynomial.iter().all(|&x| {
+            geometry_events::record(1, 0, 0, 1);
+            x < p
+        }));
         let base = Field::new(p, 1, 0);
         let derivative: Poly = polynomial
             .iter()
             .enumerate()
             .skip(1)
-            .map(|(i, &x)| base.mul(x, i as u64))
+            .map(|(i, &x)| {
+                geometry_events::record(1, 0, 1, 0);
+                base.mul(x, i as u64)
+            })
             .collect();
-        assert_eq!(pegcd(&base, &polynomial, &derivative).0, vec![1]);
+        assert!(geometry_events::slice_eq(
+            &pegcd(&base, &polynomial, &derivative).0,
+            &geometry_events::initialized(vec![1])
+        ));
         let j = Jacobian {
             f: base,
-            polynomial: polynomial.clone(),
+            polynomial: geometry_events::copied(&polynomial),
         };
         let j2 = Jacobian { f, polynomial };
         Self {
@@ -1119,8 +1176,8 @@ impl Scholten {
         }
         let f = &self.e.f;
         let i = self.p;
-        let a = vec![i, f.add(1, i)];
-        let b = vec![f.neg(i), f.sub(1, i)];
+        let a = geometry_events::initialized(vec![i, f.add(1, i)]);
+        let b = geometry_events::initialized(vec![f.neg(i), f.sub(1, i)]);
         let u = pmonic(
             f,
             &psub(f, &pmul(f, &a, &a), &pscale(f, &pmul(f, &b, &b), p.x)),
@@ -1130,13 +1187,18 @@ impl Scholten {
         assert!(self.j2.valid(d));
         let mut conjugate = d;
         for x in &mut conjugate.u {
+            geometry_events::record(1, 0, 0, 0);
             *x = f.conjugate(*x);
         }
         for x in &mut conjugate.v {
+            geometry_events::record(1, 0, 0, 0);
             *x = f.conjugate(*x);
         }
         let out = self.j2.add(d, conjugate);
-        assert!(out.u.iter().chain(&out.v).all(|&x| x < self.p));
+        assert!(out.u.iter().chain(&out.v).all(|&x| {
+            geometry_events::record(1, 0, 0, 1);
+            x < self.p
+        }));
         assert!(self.j.valid(out));
         out
     }
@@ -1157,16 +1219,20 @@ impl Scholten {
         let f = &self.e.f;
         let mut roots = Vec::new();
         if d.degree == 1 {
+            geometry_events::record(0, 0, 1, 0);
             roots.push(f.neg(d.u[0]));
         } else {
             let discriminant = f.sub(f.sq(d.u[1]), f.mul(f.constant(4), d.u[0]));
             let s = f.sqrt(discriminant).expect("Fp quadratic splits in Fp2");
             let half = f.inv(2);
+            geometry_events::record(0, 0, 1, 0);
             roots.push(f.mul(f.sub(s, d.u[1]), half));
+            geometry_events::record(0, 0, 1, 0);
             roots.push(f.mul(f.sub(f.neg(s), d.u[1]), half));
         }
         let mut out = Point::O;
         for t in roots {
+            geometry_events::record(1, 0, 0, 0);
             let y = peval(f, &d.vp(), t);
             let pt = self.cover(t, y);
             assert!(self.e.valid(pt));
@@ -1234,6 +1300,7 @@ pub struct StudyInstance {
 }
 impl StudyInstance {
     pub fn fresh(&self) -> Self {
+        geometry_events::metadata_clone(&self.evidence, &self.family);
         let mut out = self.clone();
         out.curve.f = self.curve.f.fresh();
         out
@@ -1424,7 +1491,7 @@ pub struct Ring {
 }
 impl Ring {
     pub fn new(r: u64) -> Self {
-        assert!(is_prime(r) && r > 2);
+        assert!(geometry_events::scalar_constructor_prime(r) && r > 2);
         Self {
             r,
             counts: Default::default(),
@@ -2526,6 +2593,7 @@ fn canonical<G: NativeGroup>(
 ) -> (G::Element, u64, u64, bool) {
     if fold {
         let negative = g.neg(point);
+        rho_events::comparison();
         if negative < point {
             return (negative, ring.neg(a), ring.neg(b), true);
         }
@@ -2545,7 +2613,20 @@ fn rho_native<G: NativeGroup>(
     cap: u64,
     fold: bool,
     counts: impl Fn() -> Counts,
+    before_target: impl FnOnce(),
 ) -> (Option<u64>, Vec<NativePhase>, BTreeMap<String, u64>) {
+    rho_events::reset();
+    let mut before_target = Some(before_target);
+    let mut target_mul = |scalar| {
+        // A zero multiple never reads target coordinates. Defer the boundary
+        // until the first nonzero use, including initial start and restarts.
+        if scalar != 0 {
+            if let Some(begin) = before_target.take() {
+                begin();
+            }
+        }
+        g.mul(q, scalar)
+    };
     let ring = Ring::new(r);
     let mut rng = Rng(seed);
     let mut draws = 0;
@@ -2554,8 +2635,11 @@ fn rho_native<G: NativeGroup>(
     while jumps.len() < 16 {
         let a = uniform(&mut rng, r.min(4096), &mut draws);
         let b = uniform(&mut rng, r.min(4096), &mut draws);
-        let x = g.add(g.mul(p, a), g.mul(q, b));
+        let generator_part = g.mul(p, a);
+        let x = g.add(generator_part, target_mul(b));
+        rho_events::comparison();
         if x != g.identity() {
+            rho_events::initialized();
             jumps.push((x, a, b));
         }
     }
@@ -2563,7 +2647,7 @@ fn rho_native<G: NativeGroup>(
         uniform(&mut rng, r, &mut draws),
         uniform(&mut rng, r, &mut draws),
     );
-    let start = g.add(g.mul(p, a), g.mul(q, b));
+    let start = g.add(g.mul(p, a), target_mul(b));
     let (mut x, aa, bb, _) = canonical(g, start, a, b, &ring, fold);
     a = aa;
     b = bb;
@@ -2572,7 +2656,11 @@ fn rho_native<G: NativeGroup>(
         counts: counts() - before,
     }];
     let previous = counts();
-    let mut seen = HashMap::new();
+    // Synthetic accounting instrument: pin collision-table hashing for exact
+    // semantic-counter replay. This changes table layout/runtime, not walk RNG.
+    // DefaultHasher internals are toolchain-specific; bind Rust and binary hashes.
+    let mut seen: HashMap<_, _, rho_events::ReplayBuildHasher> =
+        HashMap::with_hasher(rho_events::ReplayBuildHasher::default());
     let mut probes = 0;
     let mut hashes = 0;
     let mut steps = 0;
@@ -2583,12 +2671,15 @@ fn rho_native<G: NativeGroup>(
     let mut recovered = None;
     let mut consecutive = 0;
     for _ in 0..cap {
+        rho_events::comparison();
         if x == g.identity() && b != 0 {
             recovered = Some(ring.mul(ring.neg(a), ring.inv(b)));
             break;
         }
         probes += 1;
-        if let Some(&(old_a, old_b)) = seen.get(&x) {
+        if let Some(&(old_a, old_b)) = seen.get(&rho_events::Key(x)) {
+            rho_events::visit();
+            rho_events::copied();
             let delta_b = ring.sub(b, old_b);
             let delta_a = ring.sub(old_a, a);
             if delta_b != 0 {
@@ -2598,12 +2689,15 @@ fn rho_native<G: NativeGroup>(
             assert_eq!(delta_a, 0);
             escapes += 1;
             consecutive += 1;
-            if consecutive >= 4 || x == g.identity() {
+            if consecutive >= 4 || {
+                rho_events::comparison();
+                x == g.identity()
+            } {
                 restarts += 1;
                 consecutive = 0;
                 a = uniform(&mut rng, r, &mut draws);
                 b = uniform(&mut rng, r, &mut draws);
-                x = g.add(g.mul(p, a), g.mul(q, b));
+                x = g.add(g.mul(p, a), target_mul(b));
             } else {
                 x = g.add(x, x);
                 a = ring.add(a, a);
@@ -2617,13 +2711,15 @@ fn rho_native<G: NativeGroup>(
             continue;
         }
         consecutive = 0;
-        seen.insert(x, (a, b));
+        rho_events::initialized();
+        seen.insert(rho_events::Key(x), (a, b));
         steps += 1;
         hashes += 1;
         let index = g.hash(x) as usize % 16;
         let mut next = None;
         for offset in 0..16 {
             let j = (index + offset) % 16;
+            rho_events::visit();
             let jump = &jumps[j];
             let point = g.add(x, jump.0);
             let ca = ring.add(a, jump.1);
@@ -2659,7 +2755,27 @@ fn rho_native<G: NativeGroup>(
         counts: counts() - previous,
     });
     let scalar = ring.counts.get();
+    let semantic = rho_events::snapshot();
     let native = BTreeMap::from([
+        (
+            "rho_hash_policy_rust_default_v1".into(),
+            rho_events::HASH_POLICY_VERSION,
+        ),
+        (
+            "rho_semantic_key_comparisons_v1".into(),
+            semantic.key_comparisons,
+        ),
+        ("rho_semantic_entry_visits_v1".into(), semantic.entry_visits),
+        (
+            "rho_semantic_elements_copied_v1".into(),
+            semantic.elements_copied,
+        ),
+        (
+            "rho_semantic_elements_initialized_v1".into(),
+            semantic.elements_initialized,
+        ),
+        ("rho_observed_hash_calls_v1".into(), semantic.hash_calls),
+        ("rho_observed_hash_bytes_v1".into(), semantic.hash_bytes),
         ("walk_steps".into(), steps),
         ("lookahead_rejected_additions".into(), rejected),
         ("cycle_escape_doublings".into(), escapes),
@@ -2687,6 +2803,20 @@ pub fn solve_rho(
     fold: bool,
     transferred: bool,
 ) -> Outcome {
+    solve_rho_with_target_hook(inst, target, seed, cap, fold, transferred, || {})
+}
+
+/// Same arithmetic and counters as solve_rho; hook runs immediately before
+/// first target-dependent arithmetic (target transfer or first target multiple).
+pub fn solve_rho_with_target_hook(
+    inst: &StudyInstance,
+    target: Point,
+    seed: u64,
+    cap: u64,
+    fold: bool,
+    transferred: bool,
+    before_target: impl FnOnce(),
+) -> Outcome {
     let fresh = inst.fresh();
     let inst = &fresh;
     if transferred {
@@ -2701,12 +2831,14 @@ pub fn solve_rho(
         }];
         let before = counts();
         let p = s.tau(s.from_short(inst.generator));
+        before_target();
         let q = s.tau(s.from_short(target));
         phases.push(NativePhase {
             name: "transfer".into(),
             counts: counts() - before,
         });
-        let (recovered, mut walk, native) = rho_native(&s.j, p, q, inst.r, seed, cap, fold, counts);
+        let (recovered, mut walk, native) =
+            rho_native(&s.j, p, q, inst.r, seed, cap, fold, counts, || {});
         phases.append(&mut walk);
         Outcome {
             recovered,
@@ -2719,10 +2851,17 @@ pub fn solve_rho(
     } else {
         let e = &inst.curve;
         e.f.reset();
-        let (recovered, phases, native) =
-            rho_native(e, inst.generator, target, inst.r, seed, cap, fold, || {
-                e.f.counts()
-            });
+        let (recovered, phases, native) = rho_native(
+            e,
+            inst.generator,
+            target,
+            inst.r,
+            seed,
+            cap,
+            fold,
+            || e.f.counts(),
+            before_target,
+        );
         Outcome {
             recovered,
             exhausted: recovered.is_none(),
@@ -2737,6 +2876,56 @@ pub fn solve_rho(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn rho_target_hook_defers_zero_multiples() {
+        use std::cell::Cell;
+        struct TracedGroup<'a> {
+            started: &'a Cell<bool>,
+            zero_before: &'a Cell<usize>,
+        }
+        impl NativeGroup for TracedGroup<'_> {
+            type Element = u64;
+            fn identity(&self) -> u64 {
+                0
+            }
+            fn add(&self, a: u64, b: u64) -> u64 {
+                (a + b) % 3
+            }
+            fn neg(&self, a: u64) -> u64 {
+                (3 - a) % 3
+            }
+            fn hash(&self, a: u64) -> u64 {
+                a
+            }
+            fn mul(&self, a: u64, k: u64) -> u64 {
+                if a == 2 {
+                    if k != 0 {
+                        assert!(self.started.get(), "target used before hook");
+                    } else if !self.started.get() {
+                        self.zero_before.set(self.zero_before.get() + 1);
+                    }
+                }
+                (a * k) % 3
+            }
+        }
+        let zero_before = Cell::new(0);
+        for seed in 0..64 {
+            let started = Cell::new(false);
+            let group = TracedGroup {
+                started: &started,
+                zero_before: &zero_before,
+            };
+            rho_native(&group, 1, 2, 3, seed, 0, false, Counts::default, || {
+                assert!(!started.replace(true), "duplicate target hook");
+            });
+            assert!(started.get());
+        }
+        assert!(
+            zero_before.get() > 0,
+            "fixture must exercise leading zero multiples"
+        );
+    }
+
     fn small(e: Elliptic, family: &str, parameter: u64) -> Option<StudyInstance> {
         let order = exhaustive_order(&e);
         let &(r, exp) = factor(order).last()?;
@@ -3033,5 +3222,63 @@ mod tests {
         .unwrap();
         s.family = "scholten".into();
         assert!(s.validate().is_err());
+    }
+}
+
+#[cfg(test)]
+mod coverage_consolidated_tests {
+    use super::*;
+    #[test]
+    fn scalar_constructor_domain_and_partition_are_exact() {
+        let before = geometry_events::snapshot();
+        let _ = Ring::new(47);
+        let middle = geometry_events::snapshot();
+        let one = middle.checked_since(before).unwrap();
+        assert_eq!(one.scalar_constructor_prime_calls, 1);
+        assert_eq!(one.scalar_constructor_modular_muls, 28);
+        assert_eq!(one.scalar_constructor_modular_squares, 28);
+        assert_eq!(one.scalar_constructor_standalone_reductions, 26);
+        assert_eq!(one.constructor_prime_calls, 0);
+        assert_eq!(one.constructor_modular_muls, 0);
+        assert!(std::panic::catch_unwind(|| Ring::new(4)).is_err());
+        let after = geometry_events::snapshot();
+        let rejected = after.checked_since(middle).unwrap();
+        assert_eq!(rejected.scalar_constructor_prime_calls, 1);
+        assert_eq!(rejected.scalar_constructor_standalone_reductions, 1);
+        assert_eq!(rejected.scalar_constructor_modular_muls, 0);
+        assert_eq!(one.checked_add(rejected), after.checked_since(before));
+        assert!(before.checked_since(after).is_none());
+        let partition =
+            geometry_events::partition(before, &[("valid", middle), ("rejected", after)]).unwrap();
+        assert_eq!(partition["total"]["scalar_constructor_prime_calls"], 2);
+        assert_eq!(
+            partition["segments"]["valid"]["scalar_constructor_modular_squares"],
+            28
+        );
+        assert_eq!(
+            partition["segments"]["rejected"]["scalar_constructor_standalone_reductions"],
+            1
+        );
+    }
+    #[test]
+    fn empty_polynomial_predicates_keep_short_circuit_counts() {
+        let f = Field::new(7, 1, 0);
+        let before = geometry_events::snapshot();
+        assert_eq!(pdiv(&f, &[], &[1]), (vec![], vec![]));
+        let delta = geometry_events::snapshot().checked_since(before).unwrap();
+        // denominator nonempty, trim empty, monic last, loop !empty,
+        // output trim zero, output trim empty: six evaluated predicates.
+        assert_eq!(delta.key_comparisons, 6);
+        assert_eq!(delta.entry_visits, 2); // denominator last, output zero
+        assert_eq!(delta.elements_initialized, 1);
+        let before = geometry_events::snapshot();
+        assert!(pexact(&f, &[], &[1]).is_empty());
+        assert_eq!(
+            geometry_events::snapshot()
+                .checked_since(before)
+                .unwrap()
+                .key_comparisons,
+            7
+        );
     }
 }

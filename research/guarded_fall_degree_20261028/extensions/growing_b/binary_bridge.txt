@@ -1,0 +1,162 @@
+Growing-cardinality bridge in characteristic two
+Date: 2026-10-28
+
+Status and dependencies
+-----------------------
+This is a mathematical extension, with no new code, experiments, or Lean
+formalization. It uses the proved characteristic-two local B=3 ceiling in
+../characteristic_two/extension_proof.txt and the degree-preserving algebra
+and triple-projector argument in proof.txt in this directory. It makes no
+literature-priority claim. The binary summation polynomial is the one in
+Semaev, arXiv:1504.01175, Section 2; the Weil-descent/trace boundary is
+discussed by Kosters--Yeo, arXiv:1503.08001, Sections 2 and 4.2.
+
+Setting
+-------
+Let k=GF(2^n) and let E/k be the ordinary nonsingular curve
+  Y^2+X*Y=X^3+a2*X^2+a6,  a6 !=0.
+Let S contain B distinct abscissas of rational affine points, with both
+point signs allowed. Let R be an affine rational target and r=x(R). Put
+  g(T)=product_(s in S)(T+s),
+  f3(X,Y,Z)=(X*Y+X*Z+Y*Z)^2+X*Y*Z+a6,
+  F_S={g(x),g(y),g(z),f1=f3(x,y,u),f2=f3(u,z,r),h=v*(x+y)+1}.
+
+Degrees are ORDINARY polynomial total degrees over k. Variables x,y,z,u,v
+are field-coordinate variables; they are not the Boolean coordinates of
+Weil descent. No field equations or Boolean reductions are implicit.
+
+Results
+-------
+For B>=2 the ordinary homogeneous-top/Koszul first-fall invariant satisfies
+  d_ff^ord(F_S)=B+1.
+
+For every UNSATISFIABLE instance with B>=3,
+  B+1 <= d_F(F_S) <= 3B-4.
+
+In particular B>=4 gives a growing-degree sandwich. At B=3 this is only
+4<=d_F<=5; the sharper generic degree-five lower bound and the exceptional
+cube-orbit issue belong to the separate local characteristic-two proof.
+No degree-five lower bound is asserted here for every binary B=3 system.
+
+1. Characteristic-two regular core
+----------------------------------
+The leading forms of the non-membership inputs are
+  H=v*(x+y),
+  A=(x*y+x*u+y*u)^2=x^2*y^2+x^2*u^2+y^2*u^2,
+  C=u^2*z^2.
+
+These form a regular sequence by the same ELEMENTARY argument as in odd
+characteristic, without dividing by two or three:
+
+* gcd(H,A)=1. A is independent of v, and setting y=x gives A=x^4, not zero.
+* z is a non-zero-divisor modulo (H,A), since neither generator uses z.
+* u is a non-zero-divisor modulo (H,A). If
+    u*f=alpha*H+beta*A,
+  reduce modulo u, where A=x^2*y^2 and gcd(H,x^2*y^2)=1. The coefficient
+  syzygy is therefore a multiple of (-x^2*y^2,H). Correct alpha and beta
+  by the corresponding full Koszul identity so both become divisible by
+  u, then divide. Signs cause no problem: minus and plus agree in k.
+
+Thus u^2*z^2 is a non-zero-divisor modulo (H,A). Every syzygy of this
+three-input core is Koszul, by the direct three-generator argument in
+proof.txt, Section 1.
+
+2. Exact ordinary first fall
+----------------------------
+Before degree B no membership top is eligible, and the regular core has
+only Koszul syzygies. At degree B, membership components are constants.
+Any relation would put c1*x^B+c2*y^B+c3*z^B in (H,A,C). Evaluation at the
+three coordinate-axis points (with u=v=0) forces c1=c2=c3=0.
+
+At degree B+1,
+  v*x^B+v*y^B+Q_top*H=0,
+  Q_top=(x^B+y^B)/(x+y),
+is a non-Koszul top syzygy. A Koszul relation with a membership component
+first occurs at degree min(B+2,B+4,2B)>B+1 for B>=2. The displayed relation
+has nonzero membership components, so it is not in that trivial submodule.
+Its full identity is
+  v*(g(x)+g(y))+Q*h=Q,
+  Q=(g(x)+g(y))/(x+y),
+which lifts to a nonzero degree-(B-1) polynomial. This proves d_ff^ord=B+1.
+
+This statement is not the first-fall degree in a Boolean function algebra.
+If a separate finite-field definition truncates variables at degree |k|,
+the equality with this ordinary-ring invariant needs its own range check;
+in particular degrees below |k| are unaffected by that truncation. None
+of this supplies a transfer theorem to GF(2)-coordinate Weil descent.
+
+3. No hidden core degree falls
+-------------------------------
+Let K=(h,f1,f2). Regularity of its leading forms implies top(K)=(H,A,C).
+The proof is the explicit Koszul degree-reduction argument from proof.txt:
+choose an expression of an element of K with minimal maximum product
+degree. If leading terms cancel above the output degree, their syzygy is
+Koszul; subtract the matching FULL input Koszul identities to lower that
+maximum, a contradiction. This reasoning is characteristic-independent.
+
+K is proper over the algebraic closure. Choose an affine U with x(U)!=r,
+and choose P avoiding O,U and the finite fibre of [2] over U. Then Qp=U-P
+and T=R-U are affine and x(P)!=x(Qp). They give a zero of f1,f2,h. In
+characteristic two [2] may be inseparable, but it is still a finite morphism;
+its fibre is finite, which is all the argument needs. Negation preserves
+the abscissa, and equality of abscissas still means equality up to sign.
+
+4. Closed-space lower bound B+1
+-------------------------------
+Define
+  W=(K intersect polynomials of degree<=B)+span_k{g(x),g(y),g(z)}.
+It contains every eligible input at degree B. Any member of W of degree
+less than B has membership coefficients c1,c2,c3 whose degree-B part lies
+in top(K). The coordinate-axis argument forces all three coefficients to
+vanish. Such a low-degree member therefore lies in K.
+
+Consequently W is closed under every multiplication permitted at degree B:
+a nonconstant multiplier requires the original degree to be less than B,
+and its product remains in K and degree<=B. It excludes 1, since K is
+proper and the same argument applied to 1 kills the membership coefficients.
+Thus 1 is not in V(F_S,B).
+
+All algebraic-closure solutions of F_S are rational: membership and the
+guard fix distinct rational x,y and rational z; the first quadratic's roots
+are rational sum/difference abscissas, so u is rational, and v is the rational
+inverse of x+y. Hence rational unsatisfiability makes the ideal the unit
+ideal. Last fall is the least refutation degree, giving d_F>=B+1.
+
+5. Upper bound 3B-4 from the local degree-five theorem
+-----------------------------------------------------
+For each three-element T subset S use
+  g_T=product_(t in T)(X+t), q_T=g/g_T,
+  e_T=q_T(x)*q_T(y)*q_T(z), kappa_T=product_(t in T)q_T(t).
+Each kappa_T is nonzero. The exact polynomial identity
+  sum_(|T|=3)e_T/kappa_T=1
+is valid in characteristic two. Its proof does NOT divide by a factorial
+or by a Vandermonde: multiply the difference by
+  (x+y)*(x+z)*(y+z),
+obtain a polynomial of degree<=B-1 in each variable vanishing on S^3, use
+tensor interpolation, then cancel the nonzero polynomial in the domain.
+
+Each local three-abscissa system is unsatisfiable and has a degree-five
+refutation by ../characteristic_two/extension_proof.txt. Multiply that
+entire refutation by e_T. All intermediate degrees are at most
+  3*(B-3)+5=3B-4.
+The localized local membership inputs are obtainable from the global
+inputs using
+  e_T*g_T(x)=q_T(y)*q_T(z)*g(x),
+of degree 3B-6, and likewise for y,z. Localized quartics have degree 3B-5
+and the localized guard degree 3B-7. All fit the ceiling. Hence e_T belongs
+to V(F_S,3B-4); summing with the nonzero scalar weights gives 1.
+
+6. Growing B is nonvacuous, with an essential encoding limitation
+----------------------------------------------------------------
+Hasse gives #E(k)>=|k|+1-2*sqrt(|k|). At most 2B points lie above S, and
+their full ordered three-sums occupy at most 8B^3 points. For sufficiently
+large binary extension fields, #E(k)>8B^3+1 ensures both enough rational
+abscissas to choose S and an affine rational target outside the full sum
+set. These are actual unsatisfiable instances for unbounded B.
+
+Thus d_F has Theta(B) scale in this explicit degree-B membership encoding,
+and the constant ceiling five cannot extend to B>=5. For B=2^ell this
+encoding already has exponential degree in ell. Expanding into Boolean
+coordinates changes the presentation and the degrees of Frobenius terms.
+The inequalities above do not establish growing last-fall degree for the
+fixed-degree Boolean systems of the original n/ell experiments.

@@ -31,6 +31,7 @@ pub mod hash;
 pub mod isogeny;
 pub mod kdf;
 pub mod keys;
+pub mod ml_dataset;
 pub mod pqc;
 pub mod prime_hyperelliptic;
 pub mod store;

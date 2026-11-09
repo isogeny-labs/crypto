@@ -1,0 +1,32 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.9in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\begin{document}
+\section*{Source-derived common 2+2 coefficient slice}
+\texttt{projective-law-coefficient-slice/v1}. A restricted parser extracts
+seven field expressions from the Rust common 2+2 function and their seven
+Lean counterparts. It substitutes earlier assignments and compares expanded
+integer polynomials. All seven pairs match; subtraction-to-addition
+mutations in the Rust and Lean $B$ coefficients are rejected.
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+Rust / Lean & Monomials & Equal\\
+\midrule
+dq / dq & 2 & yes\\
+dr / dr & 2 & yes\\
+ds / ds & 2 & yes\\
+dt / dt & 2 & yes\\
+bcoef / B & 7 & yes\\
+acoef / A & 12 & yes\\
+ccoef / C & 8 & yes\\
+\bottomrule
+\end{tabular}
+\end{center}
+\noindent This check covers the named coefficient slice only. It does not
+establish Rust operational semantics, weighted-coordinate validity, or the
+Jacobian group law. The existing 1,260-target cost ratios remain unchanged.
+The accompanying JSON records source hashes; CSV retains one row per pair.
+\end{document}

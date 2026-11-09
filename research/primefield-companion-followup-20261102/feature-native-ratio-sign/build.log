@@ -1,0 +1,33 @@
+warning: fields `labels`, `projective`, and `inverse_z` are never read
+  --> research/primefield-companion-followup-20261102/feature-native-ratio-sign/routed/../../feature-native-joint-window/lib.rs:18:21
+   |
+18 | pub struct Grid{pub labels:Vec<u64>,pub projective:Vec<[u64;3]>,pub affine:Vec<[u64;2]>,pub inverse_z:Vec<u64>}
+   |            ----     ^^^^^^              ^^^^^^^^^^                                          ^^^^^^^^^
+   |            |
+   |            fields in this struct
+   |
+   = note: `Grid` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: fields `labels`, `projective`, and `inverse_z` are never read
+  --> research/primefield-companion-followup-20261102/feature-native-ratio-sign/../feature-native-low-product/routed/../../feature-native-joint-window/lib.rs:18:21
+   |
+18 | pub struct Grid{pub labels:Vec<u64>,pub projective:Vec<[u64;3]>,pub affine:Vec<[u64;2]>,pub inverse_z:Vec<u64>}
+   |            ----     ^^^^^^              ^^^^^^^^^^                                          ^^^^^^^^^
+   |            |
+   |            fields in this struct
+   |
+   = note: `Grid` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: fields `labels`, `projective`, and `inverse_z` are never read
+  --> research/primefield-companion-followup-20261102/feature-native-ratio-sign/../feature-native-low-product/../feature-native-recovery/../feature-native-shared-seeds/../feature-native-joint-window/lib.rs:18:21
+   |
+18 | pub struct Grid{pub labels:Vec<u64>,pub projective:Vec<[u64;3]>,pub affine:Vec<[u64;2]>,pub inverse_z:Vec<u64>}
+   |            ----     ^^^^^^              ^^^^^^^^^^                                          ^^^^^^^^^
+   |            |
+   |            fields in this struct
+   |
+   = note: `Grid` has a derived impl for the trait `Debug`, but this is intentionally ignored during dead code analysis
+
+warning: 3 warnings emitted
+

@@ -1,0 +1,83 @@
+// Input: full basisJets389[68], invariantJets129[34], coordinateCoefficients[4].
+if(size(basisJets389)!=68 || size(invariantJets129)!=34 || size(coordinateCoefficients)!=4){ERROR("quadratic input framing");}
+proc qApply(poly bits,ideal values){
+ poly answer=0;int j;
+ for(j=1;j<=size(bits);j++){
+  if(leadcoef(bits[j])!=1){ERROR("nonbinary coordinate coefficient");}
+  answer=answer+values[deg(bits[j])+1];
+ }
+ return(answer);
+}
+poly bJet=qApply(coordinateCoefficients[2],basisJets389);
+poly cJet=qApply(coordinateCoefficients[3],basisJets389);
+poly oneJet=qApply(coordinateCoefficients[1],basisJets389);
+poly good=jet((bJet+cJet)*basisJets389[1]+cJet^2,256);
+poly bad=jet(good+oneJet^2,256);
+print("QUADRICS27_ACTUAL_SOURCE_POSITIVE_AND_CORRUPTED_CONTROLS");good;bad;
+if(good!=0 || bad!=1){ERROR("source-bound quadratic identity controls failed");}
+proc makeQuadrics27(ideal jets,int count,int precision,int expectedRank,string label){
+ list columns;list pivotPolys;list pivotCombinations;list quadraticRelations;
+ int i;int j;int k;int p;int term;int index;int multiplicationRank27=0;int n=count*(count+1) div 2;
+ intmat pairs[n][2];poly value;poly combination;poly residue;
+ for(i=1;i<=precision;i++){
+  pivotPolys=insert(pivotPolys,poly(0),size(pivotPolys));
+  pivotCombinations=insert(pivotCombinations,poly(0),size(pivotCombinations));
+ }
+ k=0;
+ for(i=1;i<=count;i++){
+ for(j=i;j<=count;j++){
+  value=jet(jets[i]*jets[j],precision-1);columns=insert(columns,value,size(columns));
+  pairs[k+1,1]=i;pairs[k+1,2]=j;combination=w^k;
+  while(value!=0){
+   if(leadcoef(value)!=1){ERROR("nonbinary multiplication matrix");}
+   p=deg(value)+1;
+   if(pivotPolys[p]==0){pivotPolys[p]=value;pivotCombinations[p]=combination;multiplicationRank27=multiplicationRank27+1;break;}
+   value=value+pivotPolys[p];combination=combination+pivotCombinations[p];
+  }
+  if(value==0){
+   if(deg(combination)!=k){ERROR("quadratic quadraticRelations leading-index independence failed");}
+   quadraticRelations=insert(quadraticRelations,combination,size(quadraticRelations));
+  }
+  k=k+1;
+ }
+ }
+ print("QUADRICS27_COUNTS "+label+" basis,monomials,multiplicationRank27,quadraticRelations");count;n;multiplicationRank27;size(quadraticRelations);
+ if(k!=n || multiplicationRank27!=expectedRank || multiplicationRank27+size(quadraticRelations)!=n){ERROR("quadratic multiplication multiplicationRank27 mismatch");}
+ // Independently recombine from saved original product columns.
+ for(i=1;i<=size(quadraticRelations);i++){
+  residue=0;combination=quadraticRelations[i];
+  for(term=1;term<=size(combination);term++){residue=residue+columns[deg(combination[term])+1];}
+  if(residue!=0){ERROR("quadratic quadraticRelations independent recombination failed");}
+ }
+ for(p=1;p<=precision;p++){
+  if(pivotPolys[p]!=0){
+   residue=0;combination=pivotCombinations[p];
+   for(term=1;term<=size(combination);term++){residue=residue+columns[deg(combination[term])+1];}
+   if(residue!=pivotPolys[p]){ERROR("multiplication pivot recombination failed");}
+  }
+ }
+ // Export every generator separately; bulk write(list) is forbidden.
+ link output="ASCII:w "+label+"-quadrics.sing";open(output);
+ write(output,"ring "+label+"=2,(x(1.."+string(count)+")),dp;ideal equations;");
+ string row;
+ for(i=1;i<=size(quadraticRelations);i++){
+  row="equations["+string(i)+"]=0";combination=quadraticRelations[i];
+  for(term=1;term<=size(combination);term++){
+   index=deg(combination[term])+1;
+   row=row+"+x("+string(pairs[index,1])+")*x("+string(pairs[index,2])+")";
+  }
+  write(output,row+";");
+ }
+ close(output);
+ link certificate="ASCII:w "+label+"-quadraticRelations.sing";open(certificate);
+ write(certificate,"ideal kernelVectors;");
+ for(i=1;i<=size(quadraticRelations);i++){write(certificate,"kernelVectors["+string(i)+"]="+string(quadraticRelations[i])+";");}
+ close(certificate);
+ link colfile="ASCII:w "+label+"-products.sing";open(colfile);write(colfile,"ideal productColumns;");
+ for(i=1;i<=size(columns);i++){write(colfile,"productColumns["+string(i)+"]="+string(columns[i])+";");}
+ close(colfile);
+ print("QUADRICS27_COMPLETE_DEGREE_TWO_KERNEL "+label);
+}
+makeQuadrics27(basisJets389,68,257,196,"sourceC27");
+makeQuadrics27(invariantJets129,34,129,98,"quotientH27");
+print("QUADRICS27_ALL_CHECKS_PASS");quit;

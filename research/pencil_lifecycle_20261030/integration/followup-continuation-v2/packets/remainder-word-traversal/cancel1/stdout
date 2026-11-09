@@ -1,0 +1,124 @@
+/var/tmp/pencil-remainder-word-traversal-20261031-v1/Cancel.lean:32:26: error: Invalid simp theorem: Expected a proposition, but found
+  (x_0 : ℕ) → State x_0 → Fin x_0 → UInt64
+/var/tmp/pencil-remainder-word-traversal-20261031-v1/Cancel.lean:32:14: error: Type mismatch: After simplification, term
+  h.left
+ has type
+  (cancelWord p (CoefficientTraversal.read xs e.1) c e.2).toNat < p.toNat
+but is expected to have type
+  (CoefficientTraversal.read ⟨(↑xs).set (↑e.1) (cancelWord p (CoefficientTraversal.read xs e.1) c e.2) ⋯, ⋯⟩
+        e.1).toNat <
+    p.toNat
+/var/tmp/pencil-remainder-word-traversal-20261031-v1/Cancel.lean:34:17: error: Ambiguous term
+  read
+Possible interpretations:
+  CoefficientTraversal.read : State ?m.93 → Fin ?m.93 → UInt64
+  
+  MonadReader.read : ?m.94 ?m.93
+/var/tmp/pencil-remainder-word-traversal-20261031-v1/Cancel.lean:34:5: error: Type mismatch: After simplification, term
+  hx i
+ has type
+  (CoefficientTraversal.read xs i).toNat < p.toNat
+but is expected to have type
+  (CoefficientTraversal.read ⟨(↑xs).set (↑e.1) (cancelWord p (CoefficientTraversal.read xs e.1) c e.2) ⋯, ⋯⟩ i).toNat <
+    p.toNat
+/var/tmp/pencil-remainder-word-traversal-20261031-v1/Cancel.lean:37:26: error: Ambiguous term
+  read
+Possible interpretations:
+  CoefficientTraversal.read : State ?m.119 → Fin ?m.119 → UInt64
+  
+  MonadReader.read : ?m.120 ?m.119
+/var/tmp/pencil-remainder-word-traversal-20261031-v1/Cancel.lean:37:14: error: Type mismatch: After simplification, term
+  h.right
+ has type
+  ↑(cancelWord p (CoefficientTraversal.read xs e.1) c e.2).toNat =
+    ↑(CoefficientTraversal.read xs e.1).toNat - ↑c.toNat * ↑e.2.toNat
+but is expected to have type
+  ↑(CoefficientTraversal.read ⟨(↑xs).set (↑e.1) (cancelWord p (CoefficientTraversal.read xs e.1) c e.2) ⋯, ⋯⟩
+          e.1).toNat =
+    ↑(CoefficientTraversal.read xs e.1).toNat - ↑c.toNat * ↑e.2.toNat
+/var/tmp/pencil-remainder-word-traversal-20261031-v1/Cancel.lean:39:16: error: Ambiguous term
+  read
+Possible interpretations:
+  CoefficientTraversal.read : State ?m.138 → Fin ?m.138 → UInt64
+  
+  MonadReader.read : ?m.139 ?m.138
+/var/tmp/pencil-remainder-word-traversal-20261031-v1/Cancel.lean:38:3: error: unsolved goals
+case neg
+n : ℕ
+p c : UInt64
+xs : State n
+e : Event n
+hp : 0 < p.toNat
+hb : p.toNat < 2 ^ 31
+hc : c.toNat < p.toNat
+hx : Good p xs
+he : e.2.toNat < p.toNat
+h :
+  (cancelWord p (CoefficientTraversal.read xs e.1) c e.2).toNat < p.toNat ∧
+    ↑(cancelWord p (CoefficientTraversal.read xs e.1) c e.2).toNat =
+      ↑(CoefficientTraversal.read xs e.1).toNat - ↑c.toNat * ↑e.2.toNat
+i : Fin n
+hi : ¬i = e.1
+hne : ↑i ≠ ↑e.1
+⊢ ↑(CoefficientTraversal.read ⟨(↑xs).set (↑e.1) (cancelWord p (CoefficientTraversal.read xs e.1) c e.2) ⋯, ⋯⟩ i).toNat =
+    ↑(CoefficientTraversal.read xs i).toNat
+/var/tmp/pencil-remainder-word-traversal-20261031-v1/Cancel.lean:39:44: warning: This simp argument is unused:
+  Array.getElem_set
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [step, read, decode, contribution, hi, hne, Ne.symm hne]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-remainder-word-traversal-20261031-v1/Cancel.lean:39:62: warning: This simp argument is unused:
+  hne
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [step, read, decode, contribution, hi, Array.getElem_set, Ne.symm hne]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-remainder-word-traversal-20261031-v1/Cancel.lean:39:66: warning: This simp argument is unused:
+  Ne.symm hne
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [step, read, decode, contribution, hi, Array.getElem_set, hne]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+/var/tmp/pencil-remainder-word-traversal-20261031-v1/Cancel.lean:51:28: error: don't know how to synthesize implicit argument `b`
+  @And.intro (Good p xs) (∀ (i : ?m.66), ?m.70 i = ?m.70 i) hx fun i => rfl
+context:
+n : ℕ
+p c : UInt64
+hp : 0 < p.toNat
+hb : p.toNat < 2 ^ 31
+hc : c.toNat < p.toNat
+xs : State n
+hx : Good p xs
+he : ∀ e ∈ [], e.2.toNat < p.toNat
+⊢ Prop
+/var/tmp/pencil-remainder-word-traversal-20261031-v1/Cancel.lean:51:49: error: don't know how to synthesize implicit argument `a`
+  @rfl (?m.69 i) (?m.70 i)
+context:
+n : ℕ
+p c : UInt64
+hp : 0 < p.toNat
+hb : p.toNat < 2 ^ 31
+hc : c.toNat < p.toNat
+xs : State n
+hx : Good p xs
+he : ∀ e ∈ [], e.2.toNat < p.toNat
+i : ?m.66
+⊢ ?m.69 i
+/var/tmp/pencil-remainder-word-traversal-20261031-v1/Cancel.lean:51:49: error: don't know how to synthesize implicit argument `α`
+  @rfl (?m.69 i) (?m.70 i)
+context:
+n : ℕ
+p c : UInt64
+hp : 0 < p.toNat
+hb : p.toNat < 2 ^ 31
+hc : c.toNat < p.toNat
+xs : State n
+hx : Good p xs
+he : ∀ e ∈ [], e.2.toNat < p.toNat
+i : ?m.66
+⊢ Sort ?u.50
+/var/tmp/pencil-remainder-word-traversal-20261031-v1/Cancel.lean:51:46: error(lean.inferBinderTypeFailed): Failed to infer type of binder `i`

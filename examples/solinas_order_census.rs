@@ -298,8 +298,8 @@ fn census(p: u64, curves: u64, seed: u64) -> ([u64; NB], u64, u64, u64) {
         }
         let mut s: i64 = 0;
         let mut ax = 0u64;
-        for x in 0..pu {
-            let mut t = cube[x] as u64 + ax + b;
+        for &cx in cube.iter() {
+            let mut t = cx as u64 + ax + b;
             if t >= p {
                 t -= p;
             }
@@ -330,6 +330,7 @@ fn census(p: u64, curves: u64, seed: u64) -> ([u64; NB], u64, u64, u64) {
     (obs, h3, h5, done)
 }
 
+#[allow(clippy::too_many_arguments)]
 fn analyse(
     role: &'static str,
     shape: &'static str,
@@ -355,8 +356,8 @@ fn analyse(
             cnt += 1.0;
         }
     }
-    for j in 0..NB {
-        gen[j] /= cnt;
+    for g in gen.iter_mut() {
+        *g /= cnt;
     }
     let (s1, d1) = chi2(&obs2, &right, done);
     // F2 (positive control): the model for the wrong class mod 4, d' = -p.

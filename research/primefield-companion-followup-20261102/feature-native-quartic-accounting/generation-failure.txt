@@ -1,0 +1,1 @@
+First generation attempt stopped with AssertionError in source seed-stage routing. Identical window and begin fragments appeared twice; the first global replacement consumed both, and the second attempted replacement was missing. No native build or execution occurred. Fix: deduplicate matched fragments before replacement.

@@ -1,0 +1,45 @@
+{
+  "schema": "crypto.ml-dataset.launch-readiness/v1",
+  "recorded_utc": "2026-10-28T07:23:43Z",
+  "status": "blocked_before_submission",
+  "job_name_reserved_for_future_use": "ml-dataset-f0863ae-pilot-003-20261028",
+  "submitted": false,
+  "source_commit": "f0863aefd6e1a416929f8acc02283d46f9c69936",
+  "binary_sha256": "8d3853fbaa4cc69423029a7bf5112dca26551350e2b88206e0284902e3fbdc49",
+  "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:4f40819952d2889e633dd84c07c59e84f9f4183d040773ae65552d98c7263cbc",
+  "plan_file_sha256": "d698efdad6d674e944ebf3741962eb71b38829bdaf882fb8a8407a7fc57f753a",
+  "protocol_file_sha256": "05a54dacc052b49bf7b9d6ffd776c461f49757e01488088c9a79bbf136f11604",
+  "data_remote": "s3://setec-astronomy-artifacts/ml-dataset/20261028/store",
+  "effective_results_uri": "s3://setec-astronomy-artifacts/ml-dataset-lab/runs/ml-dataset-f0863ae-pilot-003-20261028/",
+  "proposed_wave": {
+    "max_cases": 36,
+    "shard_index": 0,
+    "shard_count": 19,
+    "seconds_per_case": 30,
+    "memory_mib": 2048,
+    "trace_mib": 64,
+    "cpu": 2,
+    "job_memory": "4Gi",
+    "job_seconds": 3600,
+    "retries": 0
+  },
+  "software_validation": {
+    "library_passed": 5043,
+    "library_failed": 0,
+    "library_ignored": 123,
+    "dataset_tests_passed": 71,
+    "endpoint_combinations_checked": 360,
+    "strict_pinned_clippy": "passed",
+    "changed_file_formatting": "passed",
+    "uid1000_container_preflight": "passed; no scientific computation; cloud permissions not checked"
+  },
+  "required_gates": {
+    "scoped_iam_policy_human_approval": "pending; policy has not been applied",
+    "worker_role_fresh_key_conditional_put_get_hash": "not run",
+    "external_job_nonduplication_reconciliation": "must refresh immediately before launch",
+    "cumulative_budget_admission": "pending actual us-east-2 EKS resource pricing and prior-wave accounting; shared ceiling USD200 total",
+    "cumulative_output_and_request_caps": "not enforced by per-cell trace limits; required before launch",
+    "current_commit_checkpoint_gate": "must refresh immediately before launch"
+  },
+  "supersedes": "Prepared continuation only; pilot001 and pilot002 remain separately recorded failed attempts. No job, policy change, extra budget or completed dataset is implied."
+}

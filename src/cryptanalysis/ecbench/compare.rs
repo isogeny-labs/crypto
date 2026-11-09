@@ -37,7 +37,19 @@
 //!
 //! *Pricing band.*  AGENTS.md §5a: the unpriced native work of every arm
 //! is priced at 0, 0.1 and 1 GAE per operation and the order is reported
-//! only where it holds at every weight (`ops.band`).
+//! only where it holds at every weight (`ops.band`).  Since 2026-11-08 the
+//! default reading also prices the table oracles' counted per-step inserts
+//! (`band::Pricing`); `--no-price-table-work` is the earlier reading.
+//!
+//! *Identity.*  `comparison_id` hashes the inputs and the reading: the
+//! weight when one is given, and the priced table-work counters when any
+//! are (so a default comparison since 2026-11-08 has a different id from
+//! the pre-2026-11-08 comparison of the same inputs, which
+//! `--no-price-table-work` reproduces exactly, id included).
+//! `legacy_comparison_id` is the id of the v1 comparison of the same inputs
+//! (v1 had no band and no pricing), present on every unweighted comparison
+//! under either reading, so calibration replays v1 files under the current
+//! default.
 //!
 //! **Wall time** is a practicality note.  It is compared only inside one
 //! session (same host class, interleaved), only over pairs where both
@@ -68,7 +80,9 @@ use std::path::Path;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-use crate::cryptanalysis::ecbench::band::{priced_s, unpriced_counts, DEFAULT_WEIGHTS};
+use crate::cryptanalysis::ecbench::band::{
+    priced_s_with, table_work_counts, unpriced_counts, Pricing, DEFAULT_WEIGHTS,
+};
 use crate::cryptanalysis::ecbench::canonical::short_id;
 use crate::cryptanalysis::ecbench::record::Record;
 use crate::cryptanalysis::ecbench::runner::{read_records, read_session, Session};
@@ -96,9 +110,17 @@ pub const MIN_WALL_PAIRS: usize = 5;
 /// An interval over fewer workloads than this is `indicative`.
 pub const INDICATIVE_BELOW_WORKLOADS: usize = 5;
 
-/// An arm whose largest run is more than this share of its total S has a
-/// heavy tail: the mean is carried by one run.
+/// An arm whose largest run is more than this share of its total S, and
+/// more than twice its equal share (`2/n`), has a heavy tail: the mean is
+/// carried by one run.  The second condition keeps the flag informative at
+/// small `n`, where one of four runs always holds at least a quarter; from
+/// eight runs up the share alone decides.
 pub const HEAVY_TAIL_SHARE: f64 = 0.25;
+
+/// The share above which the top run of `n` marks a heavy tail.
+pub fn heavy_tail_share(n: usize) -> f64 {
+    HEAVY_TAIL_SHARE.max(2.0 / n.max(1) as f64)
+}
 
 /// What the measured arm's tail looks like (verified runs only).
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -137,6 +159,13 @@ pub struct ArmSummary {
     /// no count (the arm cannot be ranked above weight 0).
     #[serde(default)]
     pub unpriced_counts: BTreeMap<String, Option<u64>>,
+    /// Table work the arm counts in `work_native` behind a `counted:`
+    /// marker (`band::table_work_counts`), summed over the verified runs.
+    /// Listed always; in the price under the default reading since
+    /// 2026-11-08, not under `--no-price-table-work`
+    /// (`Comparison::priced_table_work`).
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub table_work_counts: BTreeMap<String, u64>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -191,6 +220,12 @@ pub struct OpsBand {
     /// Verified pairs the band is computed over.
     pub pairs: u64,
     pub note: String,
+    /// The counted table-work counters priced in `U` at each weight
+    /// (`band::Pricing::table_work`); present in the default band since
+    /// 2026-11-08, absent in the pre-2026-11-08 reading
+    /// (`--no-price-table-work`) and in every comparison before that date.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub priced_table_work: Vec<String>,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -297,12 +332,29 @@ pub struct WallResult {
     pub ci_method: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub dof: Option<f64>,
-    /// End to end: `Σ solve_wall_B / Σ solve_wall_A` and its linearised
-    /// interval.  Carries the work variance; secondary.
+    /// Historical name for `Σ solve_wall_B / Σ solve_wall_A` and its
+    /// linearised interval. Carries the work variance; secondary. This is the
+    /// algorithm solve interval, not the complete cold method or process.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub total_wall_ratio: Option<f64>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub total_wall_ci95: Option<(f64, f64)>,
+    /// Complete cold method call: setup, solve, in-child verification and
+    /// report completion, excluding workload construction and process launch.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub method_call_wall_ratio: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub method_call_wall_ci95: Option<(f64, f64)>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub method_call_wall_ci95_bootstrap: Option<(f64, f64)>,
+    /// Fork-to-reap process wall time, including workload reconstruction and
+    /// process overhead. This is the broadest end-to-end practicality figure.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub process_wall_ratio: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub process_wall_ci95: Option<(f64, f64)>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub process_wall_ci95_bootstrap: Option<(f64, f64)>,
     /// The two compared arms run one method: this comparison is itself an
     /// A/A control and has nothing to correct.
     #[serde(default)]
@@ -363,6 +415,13 @@ pub struct Comparison {
     /// recorded S values are used.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub pricing_weight: Option<f64>,
+    /// Counted table work (`work_native`, `counted:` marker) priced with the
+    /// unpriced counters, by name.  Present under the default reading since
+    /// 2026-11-08 and part of `comparison_id` then; absent under
+    /// `--no-price-table-work`, which is every comparison before that date
+    /// (the pre-2026-11-08 reading).
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub priced_table_work: Vec<String>,
     /// The deterministic bootstrap seed. Historical v1 files did not store
     /// it and remain readable; calibration requires a recorded seed.
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -379,7 +438,8 @@ pub struct Comparison {
     pub quality: Option<MeasurementQuality>,
     pub verdict: String,
     /// The id a v1 comparison of the same inputs carries; calibration
-    /// replays v1 files against it.
+    /// replays v1 files against it.  Independent of the pricing reading
+    /// (v1 had no band), present on every unweighted comparison.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub legacy_comparison_id: Option<String>,
     /// Status of each side's session (`complete`, `interrupted`, `running`).
@@ -404,6 +464,10 @@ pub struct CompareOptions {
     /// Compare sessions whose status is not `complete`; recorded and the
     /// comparison is marked not admissible.
     pub allow_interrupted: bool,
+    /// What the §5a band and `--weight` charge beyond `cost.unpriced`
+    /// (default since 2026-11-08: the counted table inserts;
+    /// `Pricing::pre_2026_11_08()` charges nothing extra).
+    pub pricing: Pricing,
 }
 
 // ── Tail diagnostics ───────────────────────────────────────────────
@@ -428,7 +492,7 @@ pub fn tail_diagnostics(runs: &[(String, f64)]) -> Option<TailDiagnostics> {
         max_over_median: (med > 0.0).then(|| top / med),
         top_run_share: share,
         top_run_id: top_id,
-        heavy_tail: share > HEAVY_TAIL_SHARE,
+        heavy_tail: share > heavy_tail_share(runs.len()),
     })
 }
 
@@ -451,6 +515,7 @@ fn summarize(session_id: &str, arm: &str, recs: &[&Record]) -> Result<ArmSummary
         .filter_map(|r| Some((r.run_id.clone(), r.cost.s?)))
         .collect();
     let mut unpriced: BTreeMap<String, Option<u64>> = BTreeMap::new();
+    let mut table_work: BTreeMap<String, u64> = BTreeMap::new();
     for r in &ok {
         for (name, n) in unpriced_counts(r) {
             let e = unpriced.entry(name).or_insert(Some(0));
@@ -458,6 +523,9 @@ fn summarize(session_id: &str, arm: &str, recs: &[&Record]) -> Result<ArmSummary
                 (Some(t), Some(n)) => Some(t + n),
                 _ => None,
             };
+        }
+        for (name, n) in table_work_counts(r) {
+            *table_work.entry(name).or_insert(0) += n;
         }
     }
     let censored = recs
@@ -479,6 +547,7 @@ fn summarize(session_id: &str, arm: &str, recs: &[&Record]) -> Result<ArmSummary
         censored,
         tail: tail_diagnostics(&tail_runs),
         unpriced_counts: unpriced,
+        table_work_counts: table_work,
     })
 }
 
@@ -524,6 +593,23 @@ fn ratio_of_sums(pairs: impl Iterator<Item = (f64, f64)>) -> Option<f64> {
         n += 1;
     }
     (n > 0 && sa > 0.0).then(|| sb / sa)
+}
+
+/// Target-clustered paired percentile bootstrap of a ratio of sums. It
+/// resamples workloads and their rounds while always keeping each arm's two
+/// observations together.
+fn paired_ratio_bootstrap(
+    by_workload: &BTreeMap<String, Vec<(f64, f64)>>,
+    resamples: usize,
+    seed: u64,
+) -> Option<(f64, f64)> {
+    let strata: Vec<Vec<(f64, f64)>> = by_workload.values().cloned().collect();
+    let stat = |sample: &[Vec<(f64, f64)>]| ratio_of_sums(sample.iter().flatten().copied());
+    if strata.len() >= 2 {
+        cluster_bootstrap_ci(&strata, resamples, seed, stat)
+    } else {
+        bootstrap_ci(&strata, resamples, seed, stat)
+    }
 }
 
 fn pair_ratio(pairs: impl Iterator<Item = Pair>) -> Option<f64> {
@@ -591,27 +677,32 @@ struct Matched {
     same_seeds: bool,
 }
 
-fn priced_pair(ra: &Record, rb: &Record) -> Vec<(Option<f64>, Option<f64>)> {
+fn priced_pair(ra: &Record, rb: &Record, pricing: Pricing) -> Vec<(Option<f64>, Option<f64>)> {
     DEFAULT_WEIGHTS
         .iter()
         .map(|&w| {
             (
-                priced_s(ra, w).ok().flatten(),
-                priced_s(rb, w).ok().flatten(),
+                priced_s_with(ra, w, pricing).ok().flatten(),
+                priced_s_with(rb, w, pricing).ok().flatten(),
             )
         })
         .collect()
 }
 
-fn run_s(r: &Record, weight: f64) -> Result<Option<f64>, String> {
-    let s = priced_s(r, weight)?;
+fn run_s(r: &Record, weight: f64, pricing: Pricing) -> Result<Option<f64>, String> {
+    let s = priced_s_with(r, weight, pricing)?;
     if s.is_some_and(|s| !s.is_finite() || s < 0.0) {
         return Err("pricing produced a non-finite or negative S value".into());
     }
     Ok(s)
 }
 
-fn match_pairs(ma: &[&Record], mb: &[&Record], weight: Option<f64>) -> Result<Matched, String> {
+fn match_pairs(
+    ma: &[&Record],
+    mb: &[&Record],
+    weight: Option<f64>,
+    pricing: Pricing,
+) -> Result<Matched, String> {
     let (ca, cb) = (arm_censor(ma), arm_censor(mb));
     let key = |r: &Record| (r.workload.workload_id.clone(), r.round);
     let mut a: BTreeMap<(String, u32), (&Record, f64, bool)> = BTreeMap::new();
@@ -621,7 +712,7 @@ fn match_pairs(ma: &[&Record], mb: &[&Record], weight: Option<f64>) -> Result<Ma
 
     for r in ma {
         let cost = match weight {
-            Some(w) if r.counts() => run_s(r, w)?.map(|s| (s, false)),
+            Some(w) if r.counts() => run_s(r, w, pricing)?.map(|s| (s, false)),
             Some(_) => None,
             None => run_cost(r, &ca),
         };
@@ -633,7 +724,7 @@ fn match_pairs(ma: &[&Record], mb: &[&Record], weight: Option<f64>) -> Result<Ma
     }
     for r in mb {
         let cost = match weight {
-            Some(w) if r.counts() => run_s(r, w)?.map(|s| (s, false)),
+            Some(w) if r.counts() => run_s(r, w, pricing)?.map(|s| (s, false)),
             Some(_) => None,
             None => run_cost(r, &cb),
         };
@@ -656,7 +747,7 @@ fn match_pairs(ma: &[&Record], mb: &[&Record], weight: Option<f64>) -> Result<Ma
                 a_censored: *ca,
                 b_censored: *cb,
                 band: if exact {
-                    priced_pair(ra, rb)
+                    priced_pair(ra, rb, pricing)
                 } else {
                     Vec::new()
                 },
@@ -827,6 +918,7 @@ pub fn band_report(
         order,
         pairs: exact.len() as u64,
         note,
+        priced_table_work: Vec::new(),
     })
 }
 
@@ -865,6 +957,7 @@ pub fn compare_weighted(
             resamples,
             seed,
             allow_interrupted: false,
+            pricing: Pricing::default(),
         },
         weight,
     )
@@ -987,7 +1080,7 @@ pub fn compare_loaded_weighted(
         return Err("the arms report different units".into());
     }
 
-    let matched = match_pairs(&ma, &mb, weight)?;
+    let matched = match_pairs(&ma, &mb, weight, opts.pricing)?;
     if weight.is_some() {
         validate_weighted_totals(&matched)?;
     }
@@ -1051,7 +1144,17 @@ pub fn compare_loaded_weighted(
         })
         .collect();
     let incomplete = a.verified < a.measured || b.verified < b.measured;
-    let band = band_report(&strata, a_arm, b_arm, rep.censored_pairs);
+    let priced_table_work = opts.pricing.priced_table_work();
+    let band = band_report(&strata, a_arm, b_arm, rep.censored_pairs).map(|mut b| {
+        if !priced_table_work.is_empty() {
+            b.note.push_str(&format!(
+                "; counted table work priced in U with the unpriced counters: {}",
+                priced_table_work.join(", ")
+            ));
+            b.priced_table_work = priced_table_work.clone();
+        }
+        b
+    });
     let ops = OpsResult {
         status: if rep.ratio.is_none() {
             "empty".into()
@@ -1143,6 +1246,11 @@ pub fn compare_loaded_weighted(
         if let Some(w) = weight {
             identity["pricing_weight"] = json!(w.to_string());
         }
+        // The reading is part of the v2 identity; the v1 identity predates
+        // pricing and stays the same under either reading.
+        if extra && !priced_table_work.is_empty() {
+            identity["priced_table_work"] = json!(priced_table_work);
+        }
         short_id("ECC1", &identity)
     };
     let (comparison_id, _) = ids(true)?;
@@ -1151,6 +1259,7 @@ pub fn compare_loaded_weighted(
         schema: COMPARISON_SCHEMA_V2.into(),
         comparison_id,
         pricing_weight: weight,
+        priced_table_work,
         resample_seed: Some(seed),
         a,
         b,
@@ -1444,6 +1553,14 @@ struct WallData {
     all: Vec<WallPair>,
     /// Pairs where both runs earned `required`.
     admitted: Vec<WallPair>,
+    all_method_call: Vec<(f64, f64)>,
+    admitted_method_call: Vec<(f64, f64)>,
+    all_method_call_by_workload: BTreeMap<String, Vec<(f64, f64)>>,
+    admitted_method_call_by_workload: BTreeMap<String, Vec<(f64, f64)>>,
+    all_process: Vec<(f64, f64)>,
+    admitted_process: Vec<(f64, f64)>,
+    all_process_by_workload: BTreeMap<String, Vec<(f64, f64)>>,
+    admitted_process_by_workload: BTreeMap<String, Vec<(f64, f64)>>,
     pairs: u64,
     below: u64,
 }
@@ -1461,10 +1578,18 @@ fn wall_data(recs: &[Record], a: &str, b: &str, required: Level) -> WallData {
     let mut d = WallData {
         all: Vec::new(),
         admitted: Vec::new(),
+        all_method_call: Vec::new(),
+        admitted_method_call: Vec::new(),
+        all_method_call_by_workload: BTreeMap::new(),
+        admitted_method_call_by_workload: BTreeMap::new(),
+        all_process: Vec::new(),
+        admitted_process: Vec::new(),
+        all_process_by_workload: BTreeMap::new(),
+        admitted_process_by_workload: BTreeMap::new(),
         pairs: 0,
         below: 0,
     };
-    for (_, (ra, rb)) in by {
+    for ((workload, _round), (ra, rb)) in by {
         let (Some(ra), Some(rb)) = (ra, rb) else {
             continue;
         };
@@ -1475,6 +1600,37 @@ fn wall_data(recs: &[Record], a: &str, b: &str, required: Level) -> WallData {
         let below = ra.isolation.level < required || rb.isolation.level < required;
         if below {
             d.below += 1;
+        }
+        let process = (
+            ra.time.process_wall_ns as f64,
+            rb.time.process_wall_ns as f64,
+        );
+        d.all_process.push(process);
+        d.all_process_by_workload
+            .entry(workload.clone())
+            .or_default()
+            .push(process);
+        if !below {
+            d.admitted_process.push(process);
+            d.admitted_process_by_workload
+                .entry(workload.clone())
+                .or_default()
+                .push(process);
+        }
+        if let (Some(a), Some(b)) = (ra.time.method_call_wall_ns, rb.time.method_call_wall_ns) {
+            let method_call = (a as f64, b as f64);
+            d.all_method_call.push(method_call);
+            d.all_method_call_by_workload
+                .entry(workload.clone())
+                .or_default()
+                .push(method_call);
+            if !below {
+                d.admitted_method_call.push(method_call);
+                d.admitted_method_call_by_workload
+                    .entry(workload)
+                    .or_default()
+                    .push(method_call);
+            }
         }
         if let (true, Some(ga), Some(gb)) = (ta > 0 && tb > 0, ra.cost.total_gae, rb.cost.total_gae)
         {
@@ -1632,6 +1788,12 @@ fn wall_compare(
         dof: None,
         total_wall_ratio: None,
         total_wall_ci95: None,
+        method_call_wall_ratio: None,
+        method_call_wall_ci95: None,
+        method_call_wall_ci95_bootstrap: None,
+        process_wall_ratio: None,
+        process_wall_ci95: None,
+        process_wall_ci95_bootstrap: None,
         self_aa: false,
         aa_selection: None,
         aa_ratio: None,
@@ -1666,6 +1828,24 @@ fn wall_compare(
         w.ns_per_gae_a = Some(f.ns_per_gae_a);
         w.ns_per_gae_b = Some(f.ns_per_gae_b);
     }
+    if let Some(ratio) = linearised_ratio(&data.all_method_call) {
+        w.method_call_wall_ratio = Some(ratio.estimate);
+        w.method_call_wall_ci95 = ratio.ci95_log();
+    }
+    w.method_call_wall_ci95_bootstrap = paired_ratio_bootstrap(
+        &data.all_method_call_by_workload,
+        resamples,
+        seed ^ 0x4D45_5448_4F44,
+    );
+    if let Some(ratio) = linearised_ratio(&data.all_process) {
+        w.process_wall_ratio = Some(ratio.estimate);
+        w.process_wall_ci95 = ratio.ci95_log();
+    }
+    w.process_wall_ci95_bootstrap = paired_ratio_bootstrap(
+        &data.all_process_by_workload,
+        resamples,
+        seed ^ 0x5052_4F43_4553_53,
+    );
     if data.below > 0 {
         w.reasons.push(format!(
             "{} of {} pairs did not reach {}",
@@ -1697,6 +1877,24 @@ fn wall_compare(
     w.dof = Some(fig.ratio.df);
     w.total_wall_ratio = fig.total.map(|t| t.estimate);
     w.total_wall_ci95 = fig.total.and_then(|t| t.ci95_log());
+    if let Some(ratio) = linearised_ratio(&data.admitted_method_call) {
+        w.method_call_wall_ratio = Some(ratio.estimate);
+        w.method_call_wall_ci95 = ratio.ci95_log();
+    }
+    w.method_call_wall_ci95_bootstrap = paired_ratio_bootstrap(
+        &data.admitted_method_call_by_workload,
+        resamples,
+        seed ^ 0x4D45_5448_4F44,
+    );
+    if let Some(ratio) = linearised_ratio(&data.admitted_process) {
+        w.process_wall_ratio = Some(ratio.estimate);
+        w.process_wall_ci95 = ratio.ci95_log();
+    }
+    w.process_wall_ci95_bootstrap = paired_ratio_bootstrap(
+        &data.admitted_process_by_workload,
+        resamples,
+        seed ^ 0x5052_4F43_4553_53,
+    );
 
     // The noise floor and bias correction.
     let mut arms: BTreeMap<String, (String, String)> = BTreeMap::new();
@@ -1913,6 +2111,7 @@ mod tests {
         } else {
             json!(wall_ns)
         });
+        v["time"]["method_call_wall_ns"] = json!(wall_ns + 500_000);
         v["time"]["process_wall_ns"] = json!(wall_ns + 1_000_000);
         v["algorithm_seed"] = json!(format!("{round}"));
         let mut r: Record = serde_json::from_value(v).unwrap();
@@ -2007,6 +2206,7 @@ mod tests {
                 resamples: 300,
                 seed: 7,
                 allow_interrupted: allow,
+                pricing: Pricing::default(),
             },
         )
     }
@@ -2109,6 +2309,17 @@ mod tests {
         assert!((t.top_run_share - 30.0 / 38.0).abs() < 1e-12);
         assert_eq!(t.max_over_median, Some(30.0));
         assert!(tail_diagnostics(&[]).is_none());
+        // Four even runs hold a quarter each: not a tail.  One run carrying
+        // more than the other three together is.
+        let even: Vec<(String, f64)> = (0..4).map(|i| (format!("e{i}"), 1.0 + i as f64)).collect();
+        assert!(!tail_diagnostics(&even).unwrap().heavy_tail);
+        let mut lop = even.clone();
+        lop[3].1 = 7.0;
+        assert!(tail_diagnostics(&lop).unwrap().heavy_tail);
+        // Two runs can never show a tail; from eight runs up the share alone decides.
+        assert!(!tail_diagnostics(&even[..2]).unwrap().heavy_tail);
+        assert_eq!(heavy_tail_share(8), HEAVY_TAIL_SHARE);
+        assert_eq!(heavy_tail_share(4), 0.5);
     }
 
     #[test]
@@ -2278,6 +2489,16 @@ mod tests {
         let aa = c.wall.aa_ratio.unwrap();
         assert!((aa - 1.02).abs() < 0.02, "A/A ratio {aa}");
         assert!(c.wall.corrected_ratio.is_some());
+        assert!(c.wall.method_call_wall_ratio.is_some());
+        assert!(c.wall.method_call_wall_ci95.is_some());
+        assert!(c.wall.method_call_wall_ci95_bootstrap.is_some());
+        assert!(c.wall.process_wall_ratio.is_some());
+        assert!(c.wall.process_wall_ci95.is_some());
+        assert!(c.wall.process_wall_ci95_bootstrap.is_some());
+        assert!(
+            c.wall.process_wall_ratio.unwrap() < c.wall.total_wall_ratio.unwrap(),
+            "the fixed process overhead attenuates B/A"
+        );
         assert!(c.wall.legacy_ci95.is_some());
         assert!(c.wall.median_ratio.is_some());
         assert!(c.verdict.contains("INDICATIVE"), "{}", c.verdict);
@@ -2401,6 +2622,7 @@ mod tests {
             resamples: 50,
             seed: 1,
             allow_interrupted: false,
+            pricing: Pricing::default(),
         };
         let unweighted = compare_loaded_weighted(
             &session,
@@ -2450,6 +2672,95 @@ mod tests {
         assert!(one.workloads[0].a_mean_s.unwrap() > zero.workloads[0].a_mean_s.unwrap());
     }
 
+    /// The two readings of one real session (targetwalk k20-s0, rho-neg vs
+    /// twcj-x15): the default prices the counted inserts and says so in its
+    /// identity, `--no-price-table-work` reproduces the pre-2026-11-08
+    /// comparison (no `priced_table_work`, the old id), the v1 id is the
+    /// same under both, and the unweighted headline (recorded S) does not
+    /// move; only the band does.
+    #[test]
+    fn default_and_pre_2026_11_08_readings_differ_in_the_band_and_the_id_only() {
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("research/curve25519_f1_targetwalk_20261108/sessions/k20-s0");
+        let session = crate::cryptanalysis::ecbench::runner::read_session(&dir).unwrap();
+        let records = crate::cryptanalysis::ecbench::runner::read_records(&dir).unwrap();
+        let run = |pricing: Pricing| {
+            let opts = CompareOptions {
+                resamples: 40,
+                seed: 7,
+                allow_interrupted: false,
+                pricing,
+            };
+            compare_loaded_weighted(
+                &session,
+                &records,
+                &session,
+                &records,
+                "rho-neg",
+                "twcj-x15",
+                Level::L0,
+                &opts,
+                None,
+            )
+            .unwrap()
+        };
+        let on = run(Pricing::default());
+        let off = run(Pricing::pre_2026_11_08());
+        let explicit = run(Pricing { table_work: true });
+        assert_eq!(
+            on.comparison_id, explicit.comparison_id,
+            "`--price-table-work` is a no-op"
+        );
+        assert_eq!(
+            on.priced_table_work,
+            vec!["table_insert_attempts".to_string()]
+        );
+        assert!(
+            off.priced_table_work.is_empty(),
+            "the pre-2026-11-08 reading"
+        );
+        assert_ne!(
+            on.comparison_id, off.comparison_id,
+            "the reading is in the id"
+        );
+        assert!(on.legacy_comparison_id.is_some());
+        assert_eq!(
+            on.legacy_comparison_id, off.legacy_comparison_id,
+            "v1 had no band"
+        );
+        assert_eq!(
+            on.ops.ratio_b_over_a, off.ops.ratio_b_over_a,
+            "recorded S headline"
+        );
+        assert_eq!(on.ops.ci95_bootstrap, off.ops.ci95_bootstrap);
+        let (bon, boff) = (
+            on.ops.band.as_ref().unwrap(),
+            off.ops.band.as_ref().unwrap(),
+        );
+        assert_eq!(bon.priced_table_work, on.priced_table_work);
+        assert!(boff.priced_table_work.is_empty());
+        assert_eq!(
+            bon.ratio_b_over_a[0], boff.ratio_b_over_a[0],
+            "nothing moves at w = 0"
+        );
+        assert!(bon.ratio_b_over_a[2].unwrap() > boff.ratio_b_over_a[2].unwrap());
+        assert_eq!(boff.order, "unresolved inside the band");
+        assert!(bon.order.starts_with("twcj-x15 >"), "{}", bon.order);
+        for arm in [&on.a, &on.b, &off.a, &off.b] {
+            let listed = arm.table_work_counts.get("table_insert_attempts").copied();
+            if arm.arm == "rho-neg" {
+                assert_eq!(listed, None);
+            } else {
+                assert!(listed.is_some_and(|n| n > 0), "listed under both readings");
+            }
+        }
+        let json = serde_json::to_value(&off).unwrap();
+        assert!(
+            json.get("priced_table_work").is_none(),
+            "as the old files were written"
+        );
+    }
+
     #[test]
     fn weighted_comparison_rejects_negative_or_nonfinite_weights() {
         assert!(validate_pricing_weight(Some(-0.1)).is_err());
@@ -2482,7 +2793,7 @@ mod tests {
         );
         a.cost.total_gae = None;
         b.cost.total_gae = None;
-        let matched = match_pairs(&[&a], &[&b], Some(1.0)).unwrap();
+        let matched = match_pairs(&[&a], &[&b], Some(1.0), Pricing::default()).unwrap();
         assert_eq!(matched.unpaired, 2);
         assert!(matched.by_workload.is_empty());
     }
@@ -2501,6 +2812,6 @@ mod tests {
         );
         r.cost.unpriced.push("custom_native".into());
         r.counters.insert("custom_native".into(), 2);
-        assert!(run_s(&r, f64::MAX).is_err());
+        assert!(run_s(&r, f64::MAX, Pricing::default()).is_err());
     }
 }

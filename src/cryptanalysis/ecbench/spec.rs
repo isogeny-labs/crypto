@@ -122,6 +122,24 @@ fn default_timeout() -> u64 {
     600
 }
 
+/// Index used in the measured algorithm-seed hash. Scheduling rounds remain
+/// absolute; warm-ups always retain their separate domain and absolute index.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum AlgorithmSeedRound {
+    /// Historical law: warm-ups advance the measured seed index.
+    #[default]
+    Absolute,
+    /// Measured streams start at zero independently of the warm-up count.
+    MeasuredIndex,
+}
+
+impl AlgorithmSeedRound {
+    fn is_absolute(&self) -> bool {
+        *self == Self::Absolute
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Measurement {
@@ -135,6 +153,9 @@ pub struct Measurement {
     /// Master seed of the algorithm seeds.  Each (workload, round) gets
     /// one seed shared by every arm, so arms are paired.
     pub seed: u64,
+    /// Opt-in measured-index seed law. Omission preserves historical identities.
+    #[serde(default, skip_serializing_if = "AlgorithmSeedRound::is_absolute")]
+    pub algorithm_seed_round: AlgorithmSeedRound,
     /// Below this level a wall-clock figure is descriptive, never a result.
     #[serde(default = "default_level")]
     pub isolation_required: Level,
@@ -211,7 +232,7 @@ impl Spec {
         Ok(spec)
     }
 
-    fn identity_view(&self) -> Value {
+    pub(crate) fn identity_view(&self) -> Value {
         json!({
             "schema": self.schema,
             "workloads": serde_json::to_value(&self.workloads).unwrap_or(Value::Null),
@@ -341,13 +362,19 @@ pub fn plan(spec: Spec) -> Result<Plan, String> {
         for (wi, w) in workloads.iter().enumerate() {
             // One seed per (workload, round), shared by every arm.
             let wid = u64::from_str_radix(&w.workload_id[1..], 16).unwrap_or(0);
+            let seed_round =
+                if !warmup && m.algorithm_seed_round == AlgorithmSeedRound::MeasuredIndex {
+                    round - m.warmup
+                } else {
+                    round
+                };
             let algorithm_seed = derive_u64(
                 if warmup {
                     "ecbench.warmup_seed"
                 } else {
                     "ecbench.algorithm_seed"
                 },
-                &[m.seed, wid, round as u64],
+                &[m.seed, wid, seed_round as u64],
             );
             let mut order: Vec<usize> = (0..arms.len()).collect();
             match m.order {
@@ -441,6 +468,99 @@ mod tests {
         assert_eq!(r1[0].algorithm_seed, r1[1].algorithm_seed);
         assert_eq!((r1[0].arm, r1[1].arm), (1, 0));
         assert!(p.spec_id.starts_with("ECS1h"));
+    }
+
+    #[test]
+    fn default_seed_round_preserves_legacy_serialization_and_expansion() {
+        let s = spec(&[("a", "rho.negation"), ("b", "bsgs.textbook")]);
+        let legacy_measurement = json!({
+            "rounds": 3, "warmup": 1, "order": "alternate", "seed": 9,
+            "isolation_required": "L2", "timeout_seconds": 600
+        });
+        assert_eq!(
+            serde_json::to_value(&s.measurement).unwrap(),
+            legacy_measurement
+        );
+        let mut explicit = serde_json::to_value(&s).unwrap();
+        explicit["measurement"]["algorithm_seed_round"] = json!("absolute");
+        let p = plan(s).unwrap();
+        let explicit = plan(Spec::from_json(&explicit.to_string()).unwrap()).unwrap();
+        assert_eq!(p.spec_id, explicit.spec_id);
+        assert_eq!(p.spec_sha256, explicit.spec_sha256);
+        assert_eq!(
+            serde_json::to_value(&p.executions).unwrap(),
+            serde_json::to_value(&explicit.executions).unwrap()
+        );
+        for e in &p.executions {
+            let wid = u64::from_str_radix(&p.workloads[e.workload].workload_id[1..], 16).unwrap();
+            let domain = if e.warmup {
+                "ecbench.warmup_seed"
+            } else {
+                "ecbench.algorithm_seed"
+            };
+            assert_eq!(
+                e.algorithm_seed,
+                derive_u64(domain, &[9, wid, u64::from(e.round)])
+            );
+        }
+    }
+
+    #[test]
+    fn measured_seed_round_preserves_streams_across_warmup_counts() {
+        let mut s = spec(&[("a", "rho.negation"), ("b", "bsgs.textbook")]);
+        s.measurement.rounds = 5;
+        s.measurement.warmup = 0;
+        let legacy = plan(s.clone()).unwrap();
+        s.measurement.algorithm_seed_round = AlgorithmSeedRound::MeasuredIndex;
+        assert_eq!(
+            serde_json::to_value(&s.measurement).unwrap()["algorithm_seed_round"],
+            "measured_index"
+        );
+        assert_eq!(
+            Spec::from_json(&serde_json::to_string(&s).unwrap()).unwrap(),
+            s
+        );
+        for warmup in [0, 1, 3] {
+            s.measurement.warmup = warmup;
+            let p = plan(s.clone()).unwrap();
+            assert_ne!(p.spec_id, legacy.spec_id);
+            assert_eq!(
+                serde_json::to_value(&p.workloads).unwrap(),
+                serde_json::to_value(&legacy.workloads).unwrap()
+            );
+            for wi in 0..p.workloads.len() {
+                let wid = u64::from_str_radix(&p.workloads[wi].workload_id[1..], 16).unwrap();
+                for index in 0..5 {
+                    let paired: Vec<_> = p
+                        .executions
+                        .iter()
+                        .filter(|e| e.workload == wi && !e.warmup && e.round == warmup + index)
+                        .collect();
+                    assert_eq!(paired.len(), 2);
+                    assert_ne!(paired[0].arm, paired[1].arm);
+                    let expected =
+                        derive_u64("ecbench.algorithm_seed", &[9, wid, u64::from(index)]);
+                    for e in paired {
+                        assert_eq!(e.algorithm_seed, expected);
+                        let old = legacy
+                            .executions
+                            .iter()
+                            .find(|old| {
+                                old.workload == wi && old.round == index && old.arm == e.arm
+                            })
+                            .unwrap();
+                        assert_eq!(e.algorithm_seed, old.algorithm_seed);
+                    }
+                }
+                for e in p.executions.iter().filter(|e| e.workload == wi && e.warmup) {
+                    assert!(e.round < warmup);
+                    assert_eq!(
+                        e.algorithm_seed,
+                        derive_u64("ecbench.warmup_seed", &[9, wid, u64::from(e.round)])
+                    );
+                }
+            }
+        }
     }
 
     fn first_arm_per_round(p: &Plan, workload: usize) -> Vec<(u32, bool, usize)> {

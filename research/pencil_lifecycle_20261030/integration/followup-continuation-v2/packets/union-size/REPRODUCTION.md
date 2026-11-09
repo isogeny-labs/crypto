@@ -1,0 +1,3 @@
+# Reproduction
+
+check.sh specifies the pinned Lean compiler, imported roots, one thread, 4096 MiB and 120-second per-module limit. Replay UnionSize, SizeComposition, SizeControls, SizeReadback in order; ExpectedFailure must fail. The failed Probe/development/control attempts remain evidence. audit-readback.py checks exact declaration names and allowed axioms. Dependency caches are reused and absolute paths require restoration and binding before independent replay. render-report.py creates the report and editable graph. Repository archiving must apply artifact-store policy and exclude compiled caches from Git. No scientific execution is requested by this document.

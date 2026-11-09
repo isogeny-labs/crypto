@@ -1,0 +1,56 @@
+{
+  "schema": "ecbench.session/v1",
+  "session_id": "ECBS1ha57ef6e65d33",
+  "label": "XP-20261016-prime-base-oracle-tuning Stage T (train), 20-bit fresh prime-order curve (edge extension)",
+  "spec_id": "ECS1he0b1e6e97d41",
+  "spec_sha256": "e0b1e6e97d4109a59a17aa0c1b06bd0f2b5415ccee2f828345635c9c48e7b853",
+  "env_class_id": "ECBENV3hc4d998f5ae3f",
+  "host_sha256": "74d55d9da02f3d0af85410c1f287f3d1a56a2f9650ccce74e6436f76f63fc789",
+  "plan_sha256": "e4a7572cfec2d215d9a925fec7b2234e50b78d351444d6523b69001736d5f5b7",
+  "binary_sha256": "bf5eec6d61fbe83a7e6911bf73d05d847cc0ab23fd6db3342290a26b9f3807d9",
+  "git_commit": null,
+  "git_dirty": null,
+  "options": {
+    "cpus": "none",
+    "lock_path": "/tmp/crypto-bench.lock",
+    "wait_for_lock": false,
+    "allow_busy": true,
+    "thresholds": {
+      "settle_seconds": 2.0,
+      "max_other_cpu": 0.1,
+      "max_psi": 5.0,
+      "max_preemptions_per_second": 50.0
+    },
+    "exe": "/proc/self/exe"
+  },
+  "cpu_plan": null,
+  "preflight": null,
+  "eviction": null,
+  "runner_on_run_cpu": false,
+  "runner_cpus": null,
+  "ticks_per_second": 100,
+  "grading_version": 3,
+  "accounting_versions": {
+    "inherited_f4_specialise": 2
+  },
+  "child_env_sha256": "b9e4decea4304c93d55c1bc864aad1cc167f3b53bbd7223d8faa77f517543298",
+  "child_env": {
+    "HOME": "/root",
+    "LC_ALL": "C",
+    "OMP_NUM_THREADS": "1",
+    "PATH": "/tmp/claude-0/awsvenv/bin:/nix/var/nix/profiles/default/bin:/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+    "RAYON_NUM_THREADS": "1",
+    "RUST_BACKTRACE": "0",
+    "RUST_MIN_STACK": "8388608"
+  },
+  "started_unix_ms": 1793237634607,
+  "finished_unix_ms": 1793237635396,
+  "status": "complete",
+  "executions_planned": 16,
+  "records_written": 16,
+  "records_sha256": "d095988b7ed40d909d20bd2155ebc416ba7b14455fe53cf29dc1a4cf6e8d26b7",
+  "status_counts": {
+    "verified": 16
+  },
+  "last_seq": 15
+}

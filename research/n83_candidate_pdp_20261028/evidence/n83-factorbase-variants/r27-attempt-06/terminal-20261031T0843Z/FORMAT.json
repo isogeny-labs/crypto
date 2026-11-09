@@ -1,0 +1,14 @@
+{
+  "schema": "n83.factor-base-attempt-terminal/v1",
+  "scope": "r27 attempt-06 pre-producer failure",
+  "files": {
+    "status-tool.json": "terminal Job/Pod status",
+    "logs-tool.json": "bounded container logs",
+    "results-listing.json": "all objects under Job result prefix",
+    "partial-output/": "verified content-addressed runner snapshots, including run manifest",
+    "README.md": "failure cause and scope",
+    "DATA_INDEX.json": "sizes and SHA-256 of all capture files"
+  },
+  "failure": "lscpu missing in pinned image; exit 127 before native selfcheck/producer",
+  "factor_base_points_generated": false
+}

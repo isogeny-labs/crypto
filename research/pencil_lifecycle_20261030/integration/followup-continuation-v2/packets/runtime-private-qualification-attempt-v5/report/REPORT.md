@@ -1,0 +1,13 @@
+# Private runtime qualification v5: Q0–Q4 passed
+
+The single v5 attempt completed all five software qualification cases. The outer launcher returned 0 after 39.186950947 seconds; the inner qualifier recorded 6.383614638 seconds and cleanup_complete=true. The service journal records 13.828 CPU seconds. These intervals cover different boundaries and are not added together or used as a performance comparison.
+
+Q0 checked the exact image, configuration, static executable identities, runtime members and metadata custody. Q1 passed the diagnostic-preflight positive control with expected exit 0. Q2 passed rejection of the wrong request digest with expected exit 2 and the expected message. Q3 passed rejection of the wrong owner-configuration digest with expected exit 125 and the expected message. Q4 checked unchanged fixture snapshots and gate bytes. A negative control passes when it rejects the deliberately invalid input. The standardized cases.csv binds these meanings to the published qualifier and native receipt.
+
+For Q1–Q3, the held PID1 gate recorded UID/GID 1000, pids.max=1 and pids.current=1 after container startup and before the tested program executed. Three corresponding host-ancestry records bind exact container IDs, nonces, process start ticks and cgroup device/inode inside the owned service. This is not an observation before container startup or a claim of continuous enforcement.
+
+The worker records qualified_stopped, mounts closed, shim state resolved and endpoint_live=false. Captured unit state is not-found/inactive/dead with MainPID 0; cgroup state is empty/absent and associated loop devices are empty. Read-only debugfs receipt extraction left recorded disk metadata unchanged. Disk digest f38930c6e068ab0e18cae8b6881bbb3a3087ad5b4ddb1775a4ec53785d214a95 is inherited from the worker; the report producer did not rehash the full disk.
+
+One 300-second service with two CPUs, 2 GiB memory and the retained 4 GiB filesystem was admitted. Conservative debit remains 600 worker seconds and USD 1 for this attempt, regardless of its shorter elapsed observation. Campaign cumulative debit is 3000 seconds, with 22200 remaining through 2026-11-04T06:00UTC. Dollar reservations total USD 59, including the existing shared reserve; actual dollars for this attempt are unmeasured. Earlier failures and their debits remain preserved; there was no automatic retry.
+
+The prelaunch publication receipt binds the exact source/admission files to GitHub commit f3e799286da55d5fa88a375d45607ff4a6519688. The report’s JSON binds the raw evidence bytes. Independent postreview is pending and will be recorded separately. This was software qualification and diagnostic-preflight execution; no scientific target or matched cohort was run.

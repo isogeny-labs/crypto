@@ -1,0 +1,103 @@
+{
+ "arms": [
+  {
+   "name": "rho-neg",
+   "role": "reference",
+   "method": {
+    "id": "rho.negation"
+   }
+  },
+  {
+   "name": "inc-c2",
+   "role": "baseline",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=2,scan_cap=32",
+     "oracle": "wwalk:x=0.9,g=1,grow=2,seed=run",
+     "targets": "stride-generator"
+    }
+   }
+  },
+  {
+   "name": "c1-x10-j8-g",
+   "role": "candidate",
+   "method": {
+    "id": "ic.pipeline",
+    "params": {
+     "factor_base": "prime-projected-abscissa:size=1,scan_cap=32",
+     "oracle": "wwalk:x=1.0,jumps=8,g=1,grow=1,seed=run",
+     "targets": "stride-generator"
+    }
+   }
+  }
+ ],
+ "description": "Pre-registered before any confirmation run; arm = lowest screen mean S(w=0) at this size. research/curve25519_autolab_20261104/c1: C = 1 boundary study (owner approved 2026-11-07, labelled boundary result outside the main ratchet). In-sample screen on the five multi-curve curves; confirmation uses five fresh sibling curves (confirm-curves.json) and one pre-registered arm per size. Public synthetic targets; no security claim.",
+ "label": "C = 1 boundary confirmation k = 28: pre-registered c1-x10-j8-g on five fresh sibling curves",
+ "measurement": {
+  "isolation_required": "L0",
+  "order": "alternate",
+  "rounds": 2,
+  "seed": 20262538,
+  "timeout_seconds": 1800,
+  "warmup": 1
+ },
+ "schema": "ecbench.spec/v1",
+ "workloads": {
+  "curves": [
+   {
+    "a": 178687587,
+    "b": 13872414,
+    "gx": 89478497,
+    "gy": 121408824,
+    "group_order": 268464472,
+    "p": 268434581,
+    "r": 33558059,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 268215858,
+    "b": 39365730,
+    "gx": 283,
+    "gy": 18229649,
+    "group_order": 268452472,
+    "p": 268434557,
+    "r": 33556559,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 268066962,
+    "b": 85749650,
+    "gx": 354,
+    "gy": 37168132,
+    "group_order": 268438712,
+    "p": 268434461,
+    "r": 33554839,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 176974979,
+    "b": 188574103,
+    "gx": 178957077,
+    "gy": 33226997,
+    "group_order": 268455688,
+    "p": 268434389,
+    "r": 33556961,
+    "kind": "prime_explicit"
+   },
+   {
+    "a": 265839570,
+    "b": 266541725,
+    "gx": 936,
+    "gy": 70189180,
+    "group_order": 268438648,
+    "p": 268434269,
+    "r": 33554831,
+    "kind": "prime_explicit"
+   }
+  ],
+  "target_kind": "public",
+  "target_seed": 20262528,
+  "targets_per_curve": 12
+ }
+}

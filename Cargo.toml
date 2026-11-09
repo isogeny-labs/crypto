@@ -27,8 +27,16 @@ name = "koblitz_n53_compact_protocol"
 path = "experiments/koblitz-n53-compact-cold-20261009/native_run.rs"
 
 [[bin]]
+name = "ct_dynamic_audit"
+path = "research/ct_dynamic_audit_20261102/src/main.rs"
+
+[[bin]]
 name = "crypto"
 path = "src/main.rs"
+
+[[bin]]
+name = "n83-exclusion-audit"
+path = "research/n83_highk_beyond4405_20261021/native_exclusion_audit.rs"
 
 [[bin]]
 name = "ecdlp-audit"
@@ -37,6 +45,10 @@ path = "src/bin/ecdlp_audit.rs"
 [[bin]]
 name = "ic"
 path = "src/bin/ic.rs"
+
+[[bin]]
+name = "ecdlp-challenges"
+path = "src/bin/ecdlp_challenges.rs"
 
 # `volcano-rho` — one ECDLP instance carried by explicit Vélu maps to every
 # curve of an ℓ-isogeny volcano, with Pollard rho timed on each stratum.
@@ -74,6 +86,12 @@ path = "src/bin/quartic_ic.rs"
 [[bin]]
 name = "hyperelliptic-cover"
 path = "src/bin/hyperelliptic_cover.rs"
+
+# `hecx` — inspect, estimate and solve HECDLP instances over prime and binary
+# fields, with arbitrary genus, coefficients and subgroup orders.
+[[bin]]
+name = "hecx"
+path = "src/bin/hecx.rs"
 
 # `icx` — index calculus across every standardized curve (catalog + engine).
 [[bin]]
@@ -172,6 +190,8 @@ redis-native-tls = ["redis/tls-native-tls"]
 # (`pq_groebner_f2::Mask`).  Off by default: the 64-bit build, its counters
 # and its frozen benchmarks are unchanged.
 wide-vars = []
+# Explicit selected-bin CLI contracts; production builds keep their behavior.
+ic-cli-contracts = []
 f4-four-tables = []
 f4-five-tables = []
 f4-wide-tables = []
@@ -214,9 +234,23 @@ result_unit_err = "allow"
 chunks_exact_to_as_chunks = "allow"
 
 [dependencies]
+hashed-ecdl-tensor = { path = "crates/hashed-ecdl-tensor" }
+ecdl-tensor-ic = { path = "crates/ecdl-tensor-ic" }
+pencil-symbolic-graph = { path = "research/pencil_large_prime_20261029", features = ["reporting"] }
+factor-base = { path = "tools/factor-base" }
 volcano-cli = { path = "tools/volcano-cli" }
+isogeny_algos = { path = "isogeny_algos" }
 # Durable per-vertex IC campaign checkpoints; matches volcano-cli's backend.
 rusqlite = { version = "0.32", features = ["bundled"] }
+# Dataset-only transport accounts each HTTP attempt before transmission.
+# Explicit IRSA bootstrap avoids unmetered default credential-chain requests.
+aws-sdk-s3 = { version = "=1.155.0", default-features = false, features = ["rt-tokio", "http-1x"] }
+aws-sdk-sts = { version = "=1.119.0", default-features = false, features = ["rt-tokio"] }
+aws-smithy-runtime-api = { version = "=1.19.2", features = ["client", "http-1x"] }
+aws-smithy-types = { version = "=1.9.1", features = ["rt-tokio", "http-body-1-x"] }
+aws-credential-types = "=1.3.1"
+aws-smithy-http-client = { version = "=1.5.2", default-features = false, features = ["default-client", "rustls-ring"] }
+tokio = { version = "=1.54.1", features = ["rt-multi-thread", "fs", "io-util", "net", "time"] }
 # Portable CPU-time and peak-RSS measurements for ic research reports.
 libc = "0.2"
 num-bigint = { version = "0.4", features = ["rand"] }
@@ -245,7 +279,8 @@ rayon = "1.10"
 # BLAKE3 is kept as a crate: its Merkle-tree construction is too complex to
 # reimplement educationally without obscuring the learning goal.
 blake3 = "1.5"
-sha2 = "0.10"
+sha2 = { version = "0.10", features = ["compress"] }
+streebog = "0.10.2"
 # DEFLATE compression. Used only by the cryptopals Set-7 CRIME demo
 # (challenge 51): the attack treats compressed-output length as a
 # side channel, so we need a real LZ77-style compressor for the
@@ -284,3 +319,9 @@ path = "research/conductor_gap_followups_20261016/native/posthoc.rs"
 [[bin]]
 name = "factor-base-sweep"
 path = "src/bin/factor_base_sweep.rs"
+
+# `classgroup` — exact class number of an imaginary quadratic field by the
+# relation method (crypto::isogeny::class_group_subexp).
+[[bin]]
+name = "classgroup"
+path = "src/bin/classgroup.rs"

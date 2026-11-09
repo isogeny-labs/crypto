@@ -1,0 +1,15 @@
+verified 240 / 240
+A shipped default (sweep, extra 64, fb 8) median total_ms 688.7 trials 17546.0
+B tuned baseline (sweep, extra 64, fb 256) median total_ms 38.9 trials 326.0
+C retuned sweep (extra 2, fb 128) median total_ms 29.9 trials 197.0
+D pair-sum table (extra 2, fb 32) median total_ms 16.3 trials 567.5
+D / A 0.023 boot95 [0.022,0.025]
+D / B 0.411 boot95 [0.392,0.459]
+D / C 0.521 boot95 [0.491,0.583]
+C / B 0.743 boot95 [0.691,0.813]
+C / A 0.044 boot95 [0.041,0.046]
+r_bits 14 n 14 D/B median 0.424
+r_bits 15 n 16 D/B median 0.409
+r_bits 16 n 22 D/B median 0.445
+r_bits 17 n 8 D/B median 0.443
+D wins vs B in 60 of 60 pairs

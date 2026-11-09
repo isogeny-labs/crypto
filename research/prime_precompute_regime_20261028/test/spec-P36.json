@@ -1,0 +1,92 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "prime precomputation regime: test panel, 36-bit a=-3 curve",
+  "description": "PROTOCOL.md test panel: rho-neg reference, A/A control, cold ic-ksum4, known-log k = 4 sum table, preprocessing rho at equal entries and at equal precomputation. Counts only; AGENTS.md 5a band. Public synthetic; no security claim.",
+  "workloads": {
+    "targets_per_curve": 16,
+    "target_seed": 20261015200,
+    "target_kind": "public",
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 68719476731,
+        "a": 68719476728,
+        "b": 33,
+        "group_order": 68719022539,
+        "r": 68719022539,
+        "gx": 2,
+        "gy": 51741851039
+      }
+    ]
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "ic-ksum4",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=44",
+          "oracle": "ksum:m=4",
+          "max_trials": "13528399621"
+        }
+      }
+    },
+    {
+      "name": "kl-ksum4",
+      "role": "candidate",
+      "method": {
+        "id": "ic.known_log_ksum_v1",
+        "params": {
+          "size": "44",
+          "k": "4",
+          "base_seed": "20261028",
+          "max_sums": "100000000",
+          "max_trials": "1000000000000"
+        }
+      }
+    },
+    {
+      "name": "pre-eqS",
+      "role": "baseline",
+      "method": {
+        "id": "rho.preprocessing",
+        "params": {
+          "entries": "1086008"
+        }
+      }
+    },
+    {
+      "name": "pre-eqP",
+      "role": "baseline",
+      "method": {
+        "id": "rho.preprocessing",
+        "params": {
+          "entries": "38"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 2,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 20261015201,
+    "isolation_required": "L0",
+    "timeout_seconds": 3600
+  }
+}

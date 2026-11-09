@@ -1,0 +1,102 @@
+"""Exact counted prime-field arithmetic; no timing model."""
+from contextlib import contextmanager
+from functools import lru_cache
+from math import gcd
+STAGES=['normalization','division','group','polynomial','outer','recurrence']
+OPS=['products','inversions','additions','negations','power_calls','power_products']
+class Meter:
+ def __init__(self,p):
+  self.p=p;self.stage='outer';self.counts={s+'_'+k:0 for s in STAGES for k in OPS};self.counts.update(scalar_modular_inversions=0,scalar_exponent_reductions=0)
+ def hit(self,k,n=1):self.counts[self.stage+'_'+k]+=n
+ @contextmanager
+ def at(self,s):
+  old=self.stage;self.stage=s
+  try:yield
+  finally:self.stage=old
+ def f(self,x):return F(x,self)
+class F(int):
+ def __new__(cls,x,m):
+  v=int.__new__(cls,int(x)%m.p);v.m=m;return v
+ def __add__(self,x):self.m.hit('additions');return self.m.f(int(self)+int(x))
+ __radd__=__add__
+ def __sub__(self,x):self.m.hit('additions');return self.m.f(int(self)-int(x))
+ def __rsub__(self,x):self.m.hit('additions');return self.m.f(int(x)-int(self))
+ def __neg__(self):self.m.hit('negations');return self.m.f(-int(self))
+ def __mul__(self,x):self.m.hit('products');return self.m.f(int(self)*int(x))
+ __rmul__=__mul__
+ def __mod__(self,p):
+  assert p==self.m.p;return self
+ def __pow__(self,n,mod=None):
+  assert mod is None or mod==self.m.p;n=int(n);self.m.hit('power_calls')
+  if n==-1:self.m.hit('inversions');return self.m.f(pow(int(self),-1,self.m.p))
+  assert n>=0
+  a=self;v=self.m.f(1)
+  while n:
+   if n&1:v=v*a;self.m.hit('power_products')
+   n>>=1
+   if n:a=a*a;self.m.hit('power_products')
+  return v
+ def __truediv__(self,x):return self*self.m.f(x)**-1
+
+def division(C,Q,n,m,jet=False):
+ p=C['p'];a=m.f(C['a']);b=m.f(C['b'])
+ class J:
+  def __init__(self,v,d=0):self.v=m.f(v);self.d=m.f(d)
+  def lift(self,t):return t if isinstance(t,J) else J(t)
+  def __add__(self,t):t=self.lift(t);return J(self.v+t.v,self.d+t.d)
+  __radd__=__add__
+  def __neg__(self):return J(-self.v,-self.d)
+  def __sub__(self,t):return self+-self.lift(t)
+  def __rsub__(self,t):return self.lift(t)+-self
+  def __mul__(self,t):t=self.lift(t);return J(self.v*t.v,self.d*t.v+self.v*t.d)
+  __rmul__=__mul__
+  def __pow__(self,n):
+   if n==-1:
+    v=self.v**-1;return J(v,-self.d*v*v)
+   if n==0:return J(1)
+   return J(self.v**n,m.f(n)*self.v**(n-1)*self.d)
+  def __truediv__(self,t):return self*self.lift(t)**-1
+ if jet:x=J(Q[0],m.f(2)*m.f(Q[1]));y=J(Q[1],m.f(3)*m.f(Q[0])*m.f(Q[0])+a);a=J(a);b=J(b)
+ else:x=m.f(Q[0]);y=m.f(Q[1])
+ base={0:J(0) if jet else m.f(0),1:J(1) if jet else m.f(1),2:2*y,3:3*x**4+6*a*x*x+12*b*x-a*a,4:4*y*(x**6+5*a*x**4+20*b*x**3-5*a*a*x*x-4*a*b*x-8*b*b-a**3)}
+ inv=(2*y)**-1
+ @lru_cache(None)
+ def W(k):
+  if k in base:return base[k]
+  t=k//2
+  if k%2:return W(t+2)*W(t)**3-W(t-1)*W(t+1)**3
+  return W(t)*inv*(W(t+2)*W(t-1)**2-W(t-2)*W(t+1)**2)
+ z=W(n);return (z.v,z.d) if jet else z
+
+def phase(C,Q,m):
+ p,r=C['p'],C['r']
+ if Q is None or r==p or gcd(r,p-1)!=1:raise ValueError('coprime nonzero domain required')
+ with m.at('normalization'):
+  value,derivative=division(C,Q,r,m,jet=True);assert not value and derivative
+  m.counts['scalar_modular_inversions']+=1
+  return (m.f(-r)*derivative**-1)**pow(r*r,-1,p-1)
+
+def polynomial_class(Base,m):
+ class P(Base):
+  def wrap(self,a):return [m.f(x) for x in a]
+  def add(self,a,b):
+   with m.at('polynomial'):return super().add(self.wrap(a),self.wrap(b))
+  def neg(self,a):
+   with m.at('polynomial'):return super().neg(self.wrap(a))
+  def sub(self,a,b):
+   with m.at('polynomial'):return super().sub(self.wrap(a),self.wrap(b))
+  def scale(self,a,c):
+   with m.at('polynomial'):return super().scale(self.wrap(a),m.f(c))
+  def mul(self,a,b):
+   with m.at('polynomial'):return super().mul(self.wrap(a),self.wrap(b))
+  def inv_series(self,a,n):
+   with m.at('polynomial'):return super().inv_series(self.wrap(a),n)
+  def divrem(self,a,b):
+   with m.at('polynomial'):return super().divrem(self.wrap(a),self.wrap(b))
+  def product_tree(self,points):
+   with m.at('polynomial'):
+    if len(points)==1:return ([-m.f(points[0]),m.f(1)],None,None)
+    return super().product_tree(points)
+  def values(self,a,t):
+   with m.at('polynomial'):return super().values(self.wrap(a),t)
+ return P

@@ -90,11 +90,11 @@ if [ "$selftest" = 1 ]; then
 fi
 # Probe: can this process count user-space cycles and instructions at all?
 probe=$("$PERF_BIN" stat -x, -e cycles:u,instructions:u -- true 2>&1 || true)
-if [ "$selftest" = 0 ] && grep -q '<not supported>' <<< "$probe"; then
-    unsupported "perf reports cycles:u/instructions:u <not supported>: no hardware PMU is exposed (event sources: $(ls /sys/bus/event_source/devices | tr '\n' ' '))"
+if [ "$selftest" = 0 ] && grep -qE '<not (supported|counted)>' <<< "$probe"; then
+    unsupported "perf could not count cycles:u/instructions:u in the probe (<not supported> or <not counted>)"
 fi
 if grep -qiE 'permission|access to performance monitoring' <<< "$probe"; then
-    unsupported "perf_event_paranoid=$(cat /proc/sys/kernel/perf_event_paranoid) forbids counting; set it to 2 or lower"
+    unsupported "perf_event_paranoid=$(cat /proc/sys/kernel/perf_event_paranoid 2>/dev/null || echo unknown) forbids counting; set it to 2 or lower"
 fi
 
 events="cycles:u,instructions:u,branches:u,branch-misses:u,task-clock"
@@ -110,6 +110,7 @@ tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 runs=()
 status=0
+missing_hardware=0
 for i in $(seq 1 "$repeat"); do
     csv="$tmp/run$i.csv"
     set +e
@@ -136,7 +137,12 @@ for i in $(seq 1 "$repeat"); do
          branch_miss_rate: (if ($v.branches // 0) > 0 and $v["branch-misses"] != null then $v["branch-misses"] / $v.branches else null end)}')
     emit "$rec"
     runs+=("$rec")
-    [ "$(jq '.multiplexed | length' <<< "$rec")" = 0 ] || { [ "$status" = 0 ] && status=5; }
+    if [ "$selftest" = 0 ] && ! jq -e '.ipc != null' > /dev/null <<< "$rec"; then
+        missing_hardware=1
+    fi
+    if [ "$(jq '.multiplexed | length' <<< "$rec")" != 0 ] && [ "$status" = 0 ]; then
+        status=5
+    fi
 done
 
 summary=$(printf '%s\n' "${runs[@]}" | jq -sc --arg label "$label" --argjson host "$(host_json)" \
@@ -155,4 +161,9 @@ summary=$(printf '%s\n' "${runs[@]}" | jq -sc --arg label "$label" --argjson hos
      host: $host}' -- "${cmd[@]}")
 emit "$summary"
 jq -r '"perf_ipc: IPC median \(.ipc.median) [\(.ipc.min)-\(.ipc.max)] over \(.ipc.n) runs; cycles median \(.cycles.median); instructions median \(.instructions.median)"' <<< "$summary" >&2
+# A successful probe does not guarantee that every measured run has counters.
+# Preserve the raw records and command failures; never report null IPC as measured.
+if [ "$missing_hardware" = 1 ] && [ "$status" != 4 ]; then
+    unsupported "one or more measured runs lack usable cycles/instructions for IPC"
+fi
 exit "$status"

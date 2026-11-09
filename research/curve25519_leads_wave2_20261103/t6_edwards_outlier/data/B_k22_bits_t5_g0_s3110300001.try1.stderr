@@ -1,0 +1,10 @@
+
+thread 'main' (7292) panicked at src/bin/curve25519_family.rs:1657:13:
+assertion failed: fb.abscissa_list.iter().all(|&x| x < span)
+stack backtrace:
+   0: __rustc::rust_begin_unwind
+   1: core::panicking::panic_fmt
+   2: core::panicking::panic
+   3: curve25519_family::f4cost_m
+   4: curve25519_family::main
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.

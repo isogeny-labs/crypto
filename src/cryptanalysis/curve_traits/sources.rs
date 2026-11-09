@@ -7,7 +7,10 @@
 //! recorded; such slugs are computed identities, not registrations.  A
 //! curve whose slug is already in the registry is skipped: the registry
 //! record wins.  The IC crosswalk entries that point at registry models
-//! are skipped for the same reason; the others are read in full.
+//! are skipped for the same reason; the others are read in full: binary
+//! models (`field.p: 2`) and prime-field generalized Weierstrass models
+//! (`field.representation: prime`), the latter taken to the registry's short
+//! form and re-checked ([`prime_entry`]).
 
 use std::collections::BTreeMap;
 
@@ -16,6 +19,7 @@ use num_traits::Zero;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+use super::arith::is_prime;
 use super::{irreducible, GeneratorCoords, Model, RegistryCurve, Representation, Source};
 use crate::binary_ecc::F2mElement;
 use crate::cryptanalysis::curve_id;
@@ -244,7 +248,9 @@ fn block(
     if content.starts_with("- ") || content == "-" {
         let mut seq = Vec::new();
         while let Some(&(line, ind, c)) = lines.get(*pos) {
-            if ind != indent {
+            // A sequence written at its parent key's own column ends at the
+            // first line there that is not an item (the next sibling key).
+            if ind != indent || !(c.starts_with("- ") || c == "-") {
                 break;
             }
             let item = c
@@ -352,7 +358,8 @@ pub fn read_crosswalk(spec: &SourceSpec, text: &str) -> Result<Vec<RegistryCurve
         let field = &c["field"];
         let curve = &c["curve"];
         if field["p"].as_str() != Some("2") {
-            return Err(format!("{what}: only binary crosswalk entries are read"));
+            out.push(prime_entry(spec, &what, c)?);
+            continue;
         }
         let n: u32 = uint(&field["n"], &what)?
             .try_into()
@@ -426,6 +433,104 @@ pub fn read_crosswalk(spec: &SourceSpec, text: &str) -> Result<Vec<RegistryCurve
     Ok(out)
 }
 
+/// `v mod p` as a non-negative integer.
+fn modp(v: &BigInt, p: &BigUint) -> BigUint {
+    let p = BigInt::from(p.clone());
+    (((v % &p) + &p) % &p).try_into().expect("reduced mod p")
+}
+
+/// A prime-field crosswalk entry: the generalized Weierstrass model
+/// `y² + a₁xy + a₃y = x³ + a₂x² + a₄x + a₆` over `GF(p)`, `p > 3`, written
+/// `curve.coefficients: [a₁, a₂, a₃, a₄, a₆]`.  It is taken to the registry's
+/// short form `y² = x³ + Ax + B` by `A = −27c₄`, `B = −54c₆` and
+/// `(x, y) ↦ (36x + 3b₂, 108(2y + a₁x + a₃))`, an isomorphism over `GF(p)`
+/// that keeps the group.  Nothing the file states is taken on trust that
+/// the reader can check cheaply: `p` is a probable prime, the model is
+/// non-singular, `q + 1 − t` is the stated order, `r·h` is that order, and
+/// the generator lies on the entry's curve and on the short curve.
+fn prime_entry(spec: &SourceSpec, what: &str, c: &Value) -> Result<RegistryCurve, String> {
+    let (field, curve) = (&c["field"], &c["curve"]);
+    if field["representation"].as_str() != Some("prime")
+        || uint(&field["degree"], what)? != 1u8.into()
+    {
+        return Err(format!(
+            "{what}: only binary and prime-field crosswalk entries are read"
+        ));
+    }
+    let p = uint(&field["characteristic"], what)?;
+    if p <= BigUint::from(3u8) || !is_prime(&p) {
+        return Err(format!("{what}: the characteristic is not a prime above 3"));
+    }
+    if curve["model"].as_str() != Some("generalized Weierstrass") {
+        return Err(format!(
+            "{what}: only generalized Weierstrass prime models are read"
+        ));
+    }
+    let co: Vec<BigInt> = curve["coefficients"]
+        .as_array()
+        .filter(|v| v.len() == 5)
+        .ok_or_else(|| format!("{what}: coefficients"))?
+        .iter()
+        .map(|v| int(v, what))
+        .collect::<Result<_, _>>()?;
+    let (a1, a2, a3, a4, a6) = (&co[0], &co[1], &co[2], &co[3], &co[4]);
+    let b2 = a1 * a1 + a2 * 4;
+    let b4 = a4 * 2 + a1 * a3;
+    let b6 = a3 * a3 + a6 * 4;
+    let c4 = &b2 * &b2 - &b4 * 24;
+    let b2_cubed: BigInt = &b2 * &b2 * &b2;
+    let c6 = -b2_cubed + &b2 * &b4 * 36 - &b6 * 216;
+    let (a, b) = (modp(&(c4 * -27), &p), modp(&(c6 * -54), &p));
+    let order = uint(&curve["curve_order"], what)?;
+    let trace = int(&curve["trace"], what)?;
+    if BigInt::from(p.clone()) + 1u8 - &trace != BigInt::from(order.clone()) {
+        return Err(format!("{what}: order ≠ q + 1 − t"));
+    }
+    let subgroup_order = uint(&curve["subgroup_order"], what)?;
+    let cofactor = uint(&curve["cofactor"], what)?;
+    if &subgroup_order * &cofactor != order {
+        return Err(format!("{what}: subgroup order × cofactor ≠ curve order"));
+    }
+    let g = curve["generator"]
+        .as_array()
+        .filter(|g| g.len() == 2)
+        .ok_or_else(|| format!("{what}: generator"))?;
+    let (gx, gy) = (int(&g[0], what)?, int(&g[1], what)?);
+    // On the stated model: y² + a₁xy + a₃y − (x³ + a₂x² + a₄x + a₆) ≡ 0.
+    let on_model =
+        &gy * &gy + a1 * &gx * &gy + a3 * &gy - (&gx * &gx * &gx + a2 * &gx * &gx + a4 * &gx + a6);
+    if !modp(&on_model, &p).is_zero() {
+        return Err(format!("{what}: the generator is not on the curve"));
+    }
+    let x = modp(&(&gx * 36 + &b2 * 3), &p);
+    let y = modp(&((&gy * 2 + a1 * &gx + a3) * 108), &p);
+    let short = (&y * &y + &p - (&x * &x * &x + &a * &x + &b) % &p) % &p;
+    if !short.is_zero() {
+        return Err(format!("{what}: the generator is not on the short model"));
+    }
+    let id = curve_id::prime(&p, &a, &b, &order)
+        .ok_or_else(|| format!("{what}: not a curve with that order"))?;
+    let end = match &c["trait_status"]["endomorphism_discriminant"] {
+        d if d["status"].as_str() == Some("proved") => Some(int(&d["value"], what)?),
+        _ => None,
+    };
+    Ok(RegistryCurve {
+        slug: id.slug,
+        family: spec.family.clone(),
+        model: Model::Prime { p, a, b },
+        trace,
+        order,
+        end,
+        representations: vec![Representation {
+            generator: GeneratorCoords::Affine(x, y),
+            subgroup_order,
+            cofactor,
+        }],
+        levels: levels(&c["endomorphism"]["volcano_levels"], what)?,
+        source: source(spec, c["curve_uid"].as_str()),
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -446,6 +551,97 @@ mod tests {
         assert!(parse_yaml("a: |\n  x\n").is_err());
         assert!(parse_yaml("a:\n  -\n    b: 1\n").is_err());
         assert!(parse_yaml("a:\n  -\n").is_err());
+    }
+
+    #[test]
+    fn a_sequence_at_its_keys_column_ends_at_the_next_sibling_key() {
+        let (v, dups) =
+            parse_yaml("m:\n  c:\n  - 0\n  - -1\n  k: 15\n  g:\n  - 2\nz: 1\n").unwrap();
+        assert!(dups.is_empty());
+        assert_eq!(v["m"]["c"][0], "0");
+        assert_eq!(v["m"]["c"][1], "-1");
+        assert_eq!(v["m"]["c"].as_array().unwrap().len(), 2);
+        assert_eq!(v["m"]["k"], "15");
+        assert_eq!(v["m"]["g"][0], "2");
+        assert_eq!(v["z"], "1");
+    }
+
+    const HECKE_P11587: &str = "curves:
+  hecke_x011_p11587:
+    curve_uid: urn:ec-record:1:sha256:aa
+    field:
+      characteristic: 11587
+      degree: 1
+      representation: prime
+    curve:
+      coefficients:
+      - 0
+      - -1
+      - 1
+      - -10
+      - -20
+      cofactor: 15
+      curve_order: 11535
+      generator:
+      - 10078
+      - 5351
+      model: generalized Weierstrass
+      subgroup_order: 769
+      trace: 53
+    icv1_identity:
+      slug: null
+";
+
+    fn spec() -> SourceSpec {
+        SourceSpec {
+            kind: "ic-crosswalk".into(),
+            path: "curves.yaml".into(),
+            family: "ic-crosswalk".into(),
+        }
+    }
+
+    #[test]
+    fn a_prime_field_crosswalk_entry_is_read_in_the_registry_short_form() {
+        let rows = read_crosswalk(&spec(), HECKE_P11587).unwrap();
+        assert_eq!(rows.len(), 1);
+        let c = &rows[0];
+        // X0(11), y² + y = x³ − x² − 10x − 20, over GF(11587).  The short
+        // model and the image of G were computed independently:
+        // A = 9782, B = 8746, (x, y) = (3599, 8811).
+        let Model::Prime { p, a, b } = &c.model else {
+            panic!("a prime entry reads as a prime model")
+        };
+        assert_eq!(p, &BigUint::from(11587u32));
+        assert_eq!((a, b), (&BigUint::from(9782u32), &BigUint::from(8746u32)));
+        assert_eq!(c.order, BigUint::from(11535u32));
+        assert_eq!(c.trace, BigInt::from(53));
+        let GeneratorCoords::Affine(x, y) = &c.representations[0].generator else {
+            panic!("affine generator")
+        };
+        assert_eq!((x, y), (&BigUint::from(3599u32), &BigUint::from(8811u32)));
+        assert_eq!(c.representations[0].subgroup_order, BigUint::from(769u32));
+        assert_eq!(c.representations[0].cofactor, BigUint::from(15u32));
+        assert!(c.slug.starts_with("icv1-fp14-t53-"), "{}", c.slug);
+        assert!(!c.source.registered);
+    }
+
+    #[test]
+    fn a_prime_field_crosswalk_entry_that_does_not_check_is_refused() {
+        let bad = |from: &str, to: &str| {
+            let text = HECKE_P11587.replace(from, to);
+            assert_ne!(text, HECKE_P11587, "{from}");
+            read_crosswalk(&spec(), &text).unwrap_err()
+        };
+        assert!(bad("curve_order: 11535", "curve_order: 11536").contains("order ≠ q + 1 − t"));
+        assert!(bad("cofactor: 15", "cofactor: 14").contains("cofactor"));
+        assert!(bad("      - 5351", "      - 5352").contains("not on the curve"));
+        assert!(bad("characteristic: 11587", "characteristic: 11589").contains("prime"));
+        assert!(bad("representation: prime", "representation: extension")
+            .contains("only binary and prime-field"));
+        assert!(
+            bad("model: generalized Weierstrass", "model: short Weierstrass")
+                .contains("generalized Weierstrass")
+        );
     }
 
     #[test]

@@ -1,0 +1,32 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.9in]{geometry}
+\usepackage{booktabs}
+\begin{document}
+\section*{Common 2+2 residual-support head}
+\texttt{projective-law-common22-support-head/v1}. Lean proves the $X^6$,
+$X^5$, and $X^4$ coefficients of $N^2-u_1u_2U$ are $0$, $B^2$, and $0$
+over any commutative ring. Five source expressions and three coefficient
+identities match after exact integer-polynomial expansion. Rust and Lean
+$Q$-sign mutations are rejected.
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+Obligation & Monomials & Equal\\
+\midrule
+B & 7 & yes\\
+A & 12 & yes\\
+C & 8 & yes\\
+Q & 88 & yes\\
+Rbar\_via\_r\_factor & 115 & yes\\
+e6 & 0 & yes\\
+e5 & 24 & yes\\
+e4 & 0 & yes\\
+\bottomrule
+\end{tabular}
+\end{center}
+\noindent This is a high-degree polynomial boundary in the unit-weight
+common branch. Lower curve coefficients, weighted normalization, and the
+divisor-class theorem remain unproved here. The existing cost ratios do not
+change.
+\end{document}

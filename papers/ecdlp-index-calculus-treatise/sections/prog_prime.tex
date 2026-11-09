@@ -1,0 +1,532 @@
+\chapter{Prime fields}\label{sec:prime}
+
+Over $\FF_p$ there is no subfield to descend to and no Frobenius to fold,
+so index calculus must find structure in the factor base itself
+(\S\ref{sec:background}). The programme tried known-answer ladders,
+root-finding and pair-table oracles, the Petit--Kosters--Messeng Kummer
+tower, structured bases on the P-256 field, isogeny-class walks on the NIST
+curves, lattice reformulations, and miniatures of Curve25519. Every
+prime-field arm is behind rho with negation. The closest are generic
+collision searches at rho's exponent: the residual collectors at
+$1.54$--$1.64\times$ matched rho at $w=0$ on 36--37-bit curves with a
+validator report ($1.3$--$1.7\times$ to 42 bits as the producer reports
+them; Chapter~\ref{ch:primegeneric}), and the Curve25519 walk tables at
+$1.6$--$1.9\times$ (unverified; \S\ref{sec:c25519}). Every other arm is
+further away, and where it was measured over several sizes (Table~B, the
+Kummer tower, the Curve25519 algebraic track) its gap grows. The section ends with Gaudry's $k=4$ index calculus over
+$\FF_{p^4}$, the one odd-characteristic extension field the programme
+measured end to end. Every study is listed in the programme record~\cite{icprogram2026}.
+
+\section{Known-answer ladders and leaderboard rows}
+
+Over prime fields the ledger tracks staged known-answer ladders
+(\art{docs/ic/boundary_targets.json}, regime \texttt{prime}). On $j=0$
+curves the staged driver recovers a 20-bit logarithm
+($p=1{,}048{,}609$) in 56.8--64.9\,s of IC wall against 150--153\,ms of rho
+on the identical public point, with split timers and three seeds; running
+the relation search on 14 threads made that stage $3$--$4.4\times$ faster in
+wall time with counted work unchanged
+(\art{research/j0_parallel_relations_20261016/}). On the generic $a=-3$
+shape (P-256 and CryptoPro-B class), a Semaev-$\Sem4$ three-decomposition
+family with Cantor--Zassenhaus root finding yields one relation per trial at
+$p=65{,}519$ with a 120-point base; at fixed base size, median trials per
+relation grow from 2 to 28 to 379--506 at 16, 20 and 24 bits, about
+$16\times$ per four bits. The prime \texttt{vs\_rho} row is \emph{not
+achieved} at any measured size.
+
+Table~B of \art{docs/ic/LEADERBOARD.md} has eight prime rows,
+$\log_2 r=9.7$--$23.4$, one target, $m=2$, folded pair table with walked
+targets: IC is $6.34$, $5.47$, $6.43$, $6.71$, $5.82$, $8.3$, $10.5$ and
+$13.5\times$ matched rho, the ratio rising from about 18 bits. All eight
+passed the validation gate on 24 October
+(\art{research/ic_validation_gate_20261024/}). In ecbench the root-finding
+pair table is $16$--$20\times$ matched rho in counted GAE, and $7.46\times$
+$[5.82,9.63]$ with a lane collector, all lower bounds
+(\art{research/ecbench_rootfinding_lanes_20261013/}); a planner that picks
+the base, stop rule and oracle beat every one-change alternative on six
+curves at $w=0$, the root-find-and-subtract variant by $171$--$439\times$
+(\art{research/ic_planner_validation_20261020/}). The planner's three
+weight rules, which scaled the base or stop for $w>0$, failed out of sample
+on 26 October and were withdrawn (rule set \texttt{ic-planner/4};
+\art{research/ic_planner_exhaustive_20261026/}). The frontier campaign's
+two-summand prime arm goes from $10.5\times$ rho at 20 bits to $102\times$ at
+40 bits (\S\ref{sec:campaign}).
+
+\paragraph{Root finding against Buchberger on NIST shapes.} Per query, root
+finding of Semaev's $\Sem3$ was $3{,}021\times$ (P-256 shape) to
+$5{,}802\times$ (P-224) cheaper than the comparison arm at a six-point base
+(\art{research/semaev_rootfind_nist_20261012/}); the arm was
+\texttt{groebner\_f4::buchberger}, not F4, so the ratio is against
+Buchberger (\S\ref{sec:corrections}). It is an oracle ratio with no complete
+solve. A host emulation of a GPU decomposition kernel passed six
+configurations on 40--61-bit P-256-class curves
+(\art{research/gpu_rootfind_decomposition_20261012/}); no device ran it.
+Three frozen SMT formulations of a 20-bit decomposition all returned
+\textsc{unknown} at 120\,s, where the native reference needed 146 probes
+(\art{research/prime_field_smt_20261005/}).
+
+\paragraph{Earlier, in crypto-autoresearcher.} The first end-to-end
+prime-field index calculus of the laboratory predates this repository's:
+an imported Autolab round of 1 June 2026 solved logarithms with an $m=3$
+Semaev index calculus over a factor base of the smallest valid abscissae, at
+a fitted cost exponent of $0.889$ against rho's $0.5$, IC/rho growing from
+$21.5$ to $205.7$ over 10--18 bits (\art{ar:experiments/EXP-ALPF-032/analysis.md}).
+Structured bases there weakened rather than supported a relation excess
+(\art{ar:ledger/evidence/EV-PFDR-f6b76c.yaml}), and on one 13-bit curve an
+apparent early fall of the degree fired identically when the Semaev form
+was replaced by a random polynomial but not when the factor-base
+constraints were, so it came from the factor base, not from the summation
+polynomial (\art{ar:experiments/EXP-PFDR-4bfc6f/analysis.md}). A separate repository asked the
+underlying question directly, whether any coordinate-defined subset of
+$E(\FF_p)$ interacts with addition better than a random subset, and
+found none on toy curves (\texttt{ecdlp-prime-field-smallness},
+\art{README.md} at \texttt{4f20be9b36}).
+
+\section{The Kummer tower}\label{sec:pkm}
+
+Petit, Kosters and Messeng's base $V=\mu_{2^t}$ (the roots of
+$x^{2^t}-1$) gives prime-field summation systems extra structure for an
+algebraic solver. Its claim rests on the solving degree of those systems
+staying bounded as $N=m\ell$ grows; the programme measured that degree for
+four weeks.
+
+\paragraph{The solving degree.} The pilot found F4's solving degree at
+4--5 for $m=2$ through $N=18$ and read the preregistered ``grows like $N$''
+as failing at toy size (\art{research/pkm_tower_pilot_20260924/}). Round 2
+showed it is not bounded: at $m=2$ it is 5 to $N=18$ and 6 at $N=20,22$, at
+$m=3$ it reaches 7 at $N=15$, and the null family behaves the same
+(\art{research/pkm_tower_round2_20260925/}). At $m=4$, $N=16$ finished at
+$D=7$, as at $N=12$ (\art{research/pkm_tower_round3_20260925/}); at $m=3$
+the line reads $6,6,7,7$ over $N=9$--$18$
+(\art{research/pkm_tower_round7_20261006/}). Signature engines agreed with
+F4 but needed one or two degrees more and $1.7$--$28\times$ the memory, so F4
+stayed (rounds 4--5); a full-echelon exit cut multiply-adds $39.8\%$ at
+$m=4$, $N=12$ without moving $D$ (round 6). The torus and split Dickson
+presentations give the same $D$ in every cell, and the Kummer $D$ does not
+depend on the 2-adic valuation (\art{research/pkm_dickson_torus_20261015/}).
+At $m=3$, $N=21$ two engines finished every degree-7 step without reaching
+the unit ideal and stopped inside degree 8 on memory: the native
+\texttt{f4\_fp\_tower} at a 317\,GB matrix cap after a 67\,GB peak, msolve at
+99.6\,GiB on 16 threads (\art{research/pkm_lead1_m3n21_20261016/},
+\art{research/pkm_m3_n21_msolve_20261018/}). That implies $D\ge8$ at
+$N=21$, which both studies read as inconclusive because no degree-8 step
+completed. The Certicom-131 programme's gate needs $D\le3$ at $m\ge4$; the
+toy plateau at 7 is above it, at $2^{89}$--$2^{98}$ (generous) and
+$2^{129}$--$2^{139}$ (plain) at 131 bits
+(\art{docs/ic/CERTICOM131_IC_PROGRAM.md}). The exponent sum of decompositions
+on the tower is indistinguishable from random at $k=1$--$6$
+(\art{research/ic_exponent_falsifiers_20261013/}).
+
+\paragraph{In ecbench.} We ran the tower end to end with the root-finding
+oracles on five curves of 20--28 bits (896 runs, all verified, all replay
+audits OK; \art{research/pkm_tower_ecbench_20261013/}). Index calculus
+costs $34.0$, $41.9$, $29.4$, $96.6$ and $140.6\times$ rho-negation in $S$
+(95\% intervals in Figure~\ref{fig:prime}), growing by $0.26\pm0.28$ bits of
+$S_{IC}/S_\rho$ per bit of $r$, consistent with the $p^{1/6}$ the floors
+predict. The tower base costs the same as a plain base of the same size to
+within 1\% (ratios $0.999$--$1.012$): PKM's structure helps an algebraic
+solver, not a table. An isogeny-tower variant costs $1.00$--$1.33\times$ the
+plain base once its auxiliary-curve search is charged, and every arm is
+$17$--$137\times$ rho (\art{research/pkm_isogeny_tower_ecbench_20261015/});
+for a P-192-sized tower that search would cost about $2^{74}$ GAE, or
+11.2 core-years, while a supersingular auxiliary curve gives the needed point
+in 7\,ms with the same solving degree
+(\art{research/pkm_isogeny_tower_p192_20261015/},
+\art{research/pkm_supersingular_aux_20261015/}). A 30-bit row of 24 October
+is $158.9\times$ rho (\S\ref{sec:ladder3}). Swapping in an A11 presentation
+could not be priced: ecbench has no method that builds a tower summation
+system (\art{research/a11_pipeline_pricing_20261019/}).
+
+\section{Structured bases on the P-256 field}
+
+Twenty-four rounds between 4 and 6 October
+(\art{research/icv1-fp256-t89188191154553853111372247798585809583-f188c491_affine_bitbox_degree_round1_20261004/}
+and its 23 successors; cluster ``icv1-fp256'') searched for factor bases on
+the P-256 field whose summation systems have lower degree. They found
+degree reductions on split systems: Dickson-torus branching lowered the
+solving degree of components from 4 to 3, image trees for $\Sem9$ and
+$\Sem{17}$ reached local degree 2, and an indexed quadratic image cut one
+stage $498\times$. At the P-256 modulus the images hit their generic size
+ceilings (width ratio $1.000000$), so the degree reduction transferred and
+the compression did not (round 14). No round found a relation for a
+target that was not planted: planted length-17 relations were recovered,
+hash-public targets were not, and a log-transport round found zero
+relations among 14.4 million images (round 21). Projected end to end, the
+best schedule is $16.2$--$19.4$ bits above rho in the same unit, after a
+symmetric projection of $2^{144.625}$ was withdrawn for exceeding its domain
+(round 20); the final geometric bases are $392$--$404\times$ rho, and a
+known-log constant of $0.964\times$ rho in round 24 is a lower bound that the
+study itself says is not an attack.
+
+\section{Small-abscissa bases and isogeny classes}
+
+Two-point small-$x$ bases have an exact pair yield of $2B^2/(n-1)$ with no
+pair-sum collisions: on P-192 a base of 8{,}192 points needs $2^{178}$ trials
+for enough relations against rho's $2^{96}$, and on all 33 SECG curves the
+route loses to rho by at least $2^{40.9}$ in trials
+(\art{research/prime_small_x_p192_20261014/},
+\art{research/secg_small_x_20261014/}). At $p=2^{61}-1$, 1{,}228{,}800{,}000
+target trials over 1{,}024 curves of a horizontal isogeny class found zero
+relations, while a 20-bit positive control found 33 and recovered the
+scalar (\art{research/prime61_factor_base_20261016/},
+\art{research/prime61_disk_extend_20261018/}). Native walkers enumerated
+1{,}064{,}000 distinct curves isogenous to P-256, 20{,}000-curve classes of
+P-224 and P-192, and verified isogenies of degree up to 10{,}453 (P-192) and
+1{,}471 (P-224); no preregistered structural screen fired on any walked
+curve, so no factor-base test was ever selected
+(\art{research/p256_isogeny_million_20261006/},
+\art{research/p192_p224_large_degree_isogenies_20261009/}). By
+Lemma~\ref{lem:conservation} a homomorphic transfer could change only
+bounded constants in any case. The class of a 61-bit curve has a
+certified order of $358{,}094{,}304$ with adjacency still open
+(\art{research/p61_terminal_closure_20261023/}).
+
+\section{Lattices}
+
+Every lattice intrinsic to $(E,P,[k]P)$ has rank 2 (4 over $\ZZ[\tau]$), and
+relation lattices have a derived ceiling of $p^{5/6}$
+(\art{research/notes/ecdlp-general/RESEARCH_LATTICE_ECDLP_ROUTES.md}).
+A Coppersmith reformulation of the $m=4$ oracle via $\Sem5$ reaches
+$\delta^*=1/80$ against about $1/5$ needed and is closed
+(\art{research/lit2026_w10_s5_coppersmith_20261011/}); on $\Sem3$, a
+frozen falsifier recovered no planted decomposition in any of 96 cells with
+$\beta\ge0.20$ at 24--56 bits, so the $\beta=1/4$ ceiling stands at
+multiplicity $\le3$ (\art{research/coppersmith_s3_theta2_20261023/}).
+
+\section{ECCp-131}
+
+ECCp-131 ($\log_2 r=130.19$, rho $2^{64.92}$ GAE) has exact parameters wired
+into the BSGS and IC command paths; a three-point small-$x$ probe found zero
+natural relations and rank zero at a 128-point base, which blocks any
+full-parameter IC solution and is an open problem record
+(\art{research/eccp131_bsgs_ic_20261020/},
+\art{problems/eccp131-full-parameter-index-calculus.md}). Structured prime
+bases for the Certicom programme were a null result (N/E $0.969$--$1.000$
+against a random control of $0.974$). One CPU core walks ECCp-131 rho at
+1.23 million steps per second with a 32-bit Montgomery batched walk, and
+15.06 million with an AVX-512 eight-lane walk
+(\art{research/certicom131_rho_ic_bench_20261022/},
+\art{research/certicom131_rho_parity_20261023/}). The later ECCp-131 work is
+in \S\ref{sec:pt-eccp131}.
+
+\section{Curve25519 miniatures}\label{sec:c25519}
+
+Between 2 and 5 November thirty-one studies measured index calculus on
+miniatures of Curve25519. The real Curve25519 was not attacked; nothing ran at
+255 bits. Each target is a miniature built by Curve25519's own selection
+rule. The prime $p$ is the largest below $2^k$ with $p\equiv5\pmod 8$. The
+coefficient $A$ is the smallest $A\equiv2\pmod4$ with $\#E=8r$,
+$\#E'=4r'$ ($r,r'$ prime) and a cyclic 2-part. The base point is the
+smallest abscissa $u$ of order $r$. At $k=255$ this rule gives
+$A=486662$, $u=9$; the 255-bit search itself was not rerun, as it needs SEA
+point counting. Table~\ref{tab:c25519} lists the four main curves; later studies added
+$k=16,18,22$ and four sibling primes per size
+(\art{research/curve25519_ic_baseline_20261102/}). Costs are in the
+section's unit $S=(\text{counted GAE}+w\cdot\text{unpriced native
+operations})/\sqrt r$ at $w=0,0.1,1$. Against rho with negation
+(\texttt{rho-neg}), every arm is ranked only where its order holds across
+the band.
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}rrrrr@{}}
+\toprule
+$k$ & $p$ & $A$ & $r$ ($\#E=8r$) & baseline \texttt{proj-a} / rho-neg ($w=0$) \\
+\midrule
+20 & 1{,}048{,}573 & 926 & 131{,}203 & $7.8\times$ \\
+24 & 16{,}777{,}213 & 318 & 2{,}097{,}349 & $10.6\times$ \\
+28 & 268{,}435{,}157 & 5{,}330 & 33{,}557{,}809 & $18.1\times$ \\
+32 & 4{,}294{,}967{,}197 & 27{,}842 & 536{,}884{,}639 & $24.7\times$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Curve25519 miniatures and the generic baseline. The baseline is a
+projected-abscissa factor base with negation-folded meet-in-the-middle
+(4{,}032 records, all verified, replay audit passed). The gap is
+$7.8$--$7.9\times$, $18.1$--$18.4\times$ and $24.3$--$24.7\times$ across
+$w\in\{0,0.1,1\}$ at $k=20,28,32$. Source:
+\art{research/curve25519_ic_baseline_20261102/README.md}.}
+\label{tab:c25519}
+\end{table}
+
+\paragraph{Generic track.} The cofactor costs what it should: an
+unprojected small-$x$ base needs $7.66$--$8.38\times$ the trials (8
+predicted, $1.00$ on a cofactor-1 control). Projection removes the
+penalty. With the penalty gone, the baseline gap still grows with $k$
+(Table~\ref{tab:c25519}). The first ratchet round found nothing: a retuned
+base size was null ($0.996$ $[0.944,1.051]$ and $0.977$ $[0.941,1.015]$);
+the closed cofactor fiber and a $T_0$-closed base were dominated; and the
+Kummer tower is blocked, because $p\equiv5\pmod8$ forces $t\le2$
+(\art{research/curve25519_ic_ratchet_20261102/}). The $T_0$ symmetry halves
+the work of a blind base ($1.944$--$2.016\times$), but projection already
+beats it by $3.33$--$4.00\times$
+(\art{research/curve25519_t0_symmetry_20261102/}). Three-term sums
+improved on the baseline at $k=20$ ($0.758$ $[0.716,0.802]$) and $k=24$
+($0.596$ $[0.575,0.619]$). The gain did not hold at $k=28$, where its order
+across the $w$ band is not fixed (\art{research/curve25519_m3_generic_20261102/}).
+
+\paragraph{The autolab and the collision floor.} A 35-round automated
+ratchet (\art{research/curve25519_autolab_20261104/}) moved the generic
+incumbent from four-term sums to coefficient-box sums and then to a walk
+table over two seed abscissae (\texttt{wwalk}). Rounds 22--35 sit at the
+baby-step giant-step boundary. They count as index calculus only by the
+owner's ruling of 4 November. The fixed-table distances of $1.43$--$1.55\times$
+rho were single table draws (correction R4-I1). Averaged over 16 walk seeds
+they are $1.82\times$ ($k=32$) and $1.86\times$ ($k=28$). With a fresh table
+per run, the incumbents reach $1.94\times$, $1.81\times$ and $1.82\times$
+matched rho at $k=24,28,32$. Over five family curves per size the mean is
+$1.57$, $1.78$, $1.80$ and $1.91\times$ at $k=20$--$32$, with per-curve
+spread about $\pm0.2$. Every autolab result is a statement claim with no
+proof attached, so its standing is \emph{unverified} (R4-I1
+\texttt{PCC-20261104-c97d81}, re-baseline \texttt{PCC-20261104-d91a51},
+multi-curve \texttt{PCC-20261105-37a78d}). A 5 November correction of the
+fast probe records that the legacy affine-equivalent tally is not a complete
+native-operation cost ledger; no comparative experiment was run for it
+(\art{research/curve25519_autolab_parity_20261105/DELIVERY.md}; unverified). A derivation in the
+generic group model, checked by Monte Carlo and explicitly not a formal
+theorem (\art{research/curve25519_rho_parity_bound_20261104/}), explains
+the plateau. With $F$ unknown base logarithms, a collision-based index
+calculus costs at least
+$\Gamma(F+\tfrac32)/(\Gamma(F+1)\Gamma(\tfrac32))$ times rho. That is
+$1.5\times$ for $F=1$ and $1.875\times$ for $F=2$, where Monte Carlo
+gives $1.889\times$. \texttt{wwalk} has $F=2$, so its $1.8$--$1.9\times$
+is this floor, not an implementation constant. Parity needs $F=0$, which
+is rho under another name.
+
+Table~\ref{tab:pf-c25519-multi} and Figure~\ref{fig:pf-c25519} give the
+multi-curve re-baseline per curve: the ledger curve and four siblings by
+the same selection rule at each $k$, 12 targets $\times$ 2 rounds per
+curve, 720 of 720 records audited per size. At $w=0$ every per-curve
+ratio lies between $1.44$ and $2.13$. At $w=1$, where rho's
+canonicalisations are priced, the ratios fall to $0.95$--$1.64$. Rho is
+cheaper across the band on 19 of 20 curves; on one $k=24$ curve the order
+is unresolved inside the band ($1.52$ at $w=0$, $0.95$ at $w=1$).
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}rlrrlrrl@{}}
+\toprule
+$k$ & Incumbent & $S_{\rm inc}$ & $S_{\rm rho}$ & per-curve inc/rho, $w=0$ & mean & $w=0.1$ & $w=1$ [range] \\
+\midrule
+20 & \texttt{wsum2g-b15-n2} & $2.601$ & $1.660$ & 1.59, 1.57, 1.44, 1.56, 1.69 & $1.57$ & $1.53$ & $1.32$ $[1.17,1.43]$ \\
+24 & \texttt{wwalkGg-x09-sr-n2} & $2.111$ & $1.193$ & 1.52, 1.82, 2.10, 1.73, 1.75 & $1.78$ & $1.67$ & $1.12$ $[0.95,1.35]$ \\
+28 & \texttt{wwalkGg-x09-sr-n2} & $1.869$ & $1.040$ & 1.80, 1.62, 1.88, 1.94, 1.78 & $1.80$ & $1.68$ & $1.11$ $[1.02,1.18]$ \\
+32 & \texttt{wwalkG-x06-sr-n2} & $1.930$ & $1.013$ & 2.13, 1.87, 1.92, 1.69, 1.95 & $1.91$ & $1.83$ & $1.46$ $[1.21,1.64]$ \\
+\bottomrule
+\end{tabular}
+\caption[]{Curve25519-rule miniatures, five family curves per $k$:
+ledger incumbent against \texttt{rho-neg} on each curve. $S$ columns:
+means over the five curves at $w=0$, as the source tabulates them.
+Per-curve ratios and their means at each weight are derived from the
+per-curve band means by a short script; \art{figures/make_fig_pf_c25519.py}
+repeats the computation for Figure~\ref{fig:pf-c25519}.
+All arms are $F=2$ collision designs (\texttt{wsum2}, \texttt{wwalk}).
+Standing: unverified (statement claim \texttt{PCC-20261105-37a78d}).
+Source: \art{research/curve25519_autolab_20261104/multicurve/band-k*.json};
+extracted in \art{figures/data-pf-c25519.json}.}
+\label{tab:pf-c25519-multi}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-pf-c25519.pdf}
+\caption[]{Walk-table and coefficient-box incumbents over matched
+\texttt{rho-neg} on five Curve25519-rule curves per $k$ (open markers: one
+curve; lines: mean of five) at $w=0$, $0.1$ and $1$. Dotted: the
+collision floors $1.5$ ($F=1$) and $1.875$ ($F=2$) of the generic-group
+derivation in \art{research/curve25519_rho_parity_bound_20261104/}, which is
+not a formal theorem and bounds the $w=0$ count. Dashed: parity. Standing
+unverified (\texttt{PCC-20261105-37a78d}). Data
+\art{figures/data-pf-c25519.json}.}
+\label{fig:pf-c25519}
+\end{figure}
+
+\paragraph{Algebraic track.} Semaev summation decided by F4
+(\art{research/curve25519_algebraic_ecbench_20261102/}) ran end to end at
+$k=20$ at $18.2\times$, $9.55\cdot10^5\times$ and $5.85\cdot10^6\times$ rho
+for $w=0,0.1,1$. A timing smoke of the frozen algebraic ladder showed that
+ladder would take days. Its interrupted session is citable only for its
+four sealed records and is pinned as defective
+(\art{docs/ecbench/DEFECTIVE_SESSIONS.md}). The protocol was amended
+before data to measure F4 cost per call instead
+(\art{research/curve25519_algebraic_ladder_20261102/}). The later gains came
+from an isogeny-tower base (the \texttt{pkm-iso} arms, a $2^t$-point base
+built by a chain of 2-isogenies, which lifts the $t\le2$ limit of the
+$\mu_{2^t}$ tower of the generic-track paragraph), selecting its frame, seed,
+depth $t$ and guess count $G$, and from F4 trace replay, which is a port of the Joux--Vitse
+technique~\cite{jouxvitse2011f4}, not a new method.
+
+Three studies have independent validator reports (pass with errata), and
+none has a \texttt{pcc} claim record:
+\begin{itemize}
+\item The best seed at $t=5$, $G=4$ costs $0.0578$ $[0.0466,0.0716]$ of
+  the seed-0 incumbent at $w\ge0.1$
+  (\art{research/curve25519_t10_winner_ecbench_20261104/}).
+\item A $t=4$, $G=3$ arm with trace replay costs $0.2837$
+  $[0.2413,0.3335]$ of that winner at $w=0.1$, but $1.567\times$ more at
+  $w=0$ (\art{research/curve25519_t4_candidate_ecbench_20261104/}). It is
+  still $27.9\times$, $1.83\cdot10^4\times$ $[1.55\cdot10^4,2.15\cdot10^4]$
+  and $1.13\cdot10^5\times$ behind rho at $w=0,0.1,1$.
+\item The atlas (\art{research/curve25519_ic_atlas_20261104/}) is the source
+  of the comparison with an exhaustive grid and of the scaling paragraph
+  below.
+\end{itemize}
+
+Against an exhaustive grid on the same base, the F4 arm is $42\times$ too
+expensive, and even the pair table on that base trails the generic
+baseline by $2.39$--$3.32\times$. Several presentations and variants gave
+no gain:
+\begin{itemize}
+\item Edwards coordinates: the same solving degree in 8 of 8 pairs.
+\item The $T_0$ $w$-form: equal degree and F4 cost, and $1.2$--$3.0\times$
+  worse per relation.
+\item Three-term Semaev sums: always worse than two-term sums on this
+  track.
+\item Cofactor lifts: about $8\times$ the F4 work for 5 hits against 0,
+  so no per-relation gain.
+\end{itemize}
+Sources: \art{research/curve25519_edwards_semaev_20261102/},
+\art{research/curve25519_t0_algebraic_20261102/},
+\art{research/curve25519_cofactor_algebraic_20261102/},
+\art{research/curve25519_leads_wave4_20261104/}.
+
+\paragraph{Scaling.} Fitted to modelled F4 work (atlas; validator report,
+no \texttt{pcc} claim), the algebraic cost grows as
+$r^{1.03}$ against rho's $r^{1/2}$, so the gap grows as $r^{0.53}$; the
+optimal $t$ is 4 at every $k$ (\art{research/curve25519_ic_atlas_20261104/}).
+The 5 November scale-ups ($k=24,28,32$; all standing unverified, no
+validator report) agree:
+\begin{itemize}
+\item F4 cost per target is the same at every $k$ ($1.000$--$1.019$).
+\item At $k=24$ the $t=10$ arm finished 2 of 6 solves. At $k=28$ it
+  finished none, and the $k=28$ gap is only an F4-cost estimate.
+\item At $k=32$ the engine refuses $p\ge2^{31}$.
+\item The cofactor-lift and three-term conclusions of $k=20$ carry over.
+\end{itemize}
+Sources: \art{research/curve25519_scale_guess_trace_20261105/},
+\art{research/curve25519_algebraic_ecbench_scale_20261105/},
+\art{research/curve25519_scale_lifts_20261105/},
+\art{research/curve25519_scale_m3_t0_20261105/}.
+
+\paragraph{What this settles.} On every Curve25519 miniature, track and
+size measured, rho with negation is ahead of every index-calculus arm at
+$w=0$. Across the band the order holds everywhere except one $k=24$
+sibling curve of the multi-curve re-baseline, where it is unresolved
+(Table~\ref{tab:pf-c25519-multi}). The generic gap grows with $k$. Collision-based variants sit at a
+derived floor near $1.9\times$, and the algebraic gap grows as about
+$r^{1/2}$. No study makes or implies a statement about the 255-bit curve,
+and none weakens its security. No Curve25519 row is on the leaderboard or
+in \texttt{benchmarks/}. Most runs were local, on a shared host, without a
+second-host replay. Three leads remain open:
+\begin{itemize}
+\item the $(w,D)$ presentation, which is untested;
+\item digit-set bases, at $0.438$--$0.479\times$ per relation on one arm
+  only;
+\item an odd-Kummer design, which has no data yet.
+\end{itemize}
+
+\section{Audits of standard curves}
+
+Several studies examined the NIST, SECG and CryptoPro curves themselves.
+None found an ECDLP weakness. The later audits are in \S\ref{sec:pt-standard}. The NIST prime-curve seeds were regenerated as
+1997--98 \texttt{drand48} output, with the skip rule and base points still
+unexplained (\art{research/nist_seed_provenance_20261016/},
+\art{research/nist_basepoint_provenance_20261017/}); a claimed P-256 $n-1$
+outlier was not established after controls, and the published $b$ sits at the
+median of every statistic over a million seed samples
+(\art{research/nist_cyclotomic_controls_20261011/},
+\art{research/p256_trapdoor_round2_20261012/}). The $j=0$ SECG curves have
+sextic twists of weak order (rho $2^{65.5}$ for secp256k1's), a fact about
+twists, not about the curves (\art{research/safecurves_trapdoor_slots_20261017/}).
+Special prime shapes change neither the distribution of $\#E$ nor the
+embedding degree, so only small-embedding-degree pairing curves open an
+SNFS-type route (\art{research/snfs_prime_families_20261023/},
+\art{research/solinas_distribution_20261023/}). A P-192 ``BREAKS'' verdict
+applies to a singular nodal cubic, an implementation weakness
+(\art{research/p192-weak-curve-20261006/}), and the P-224 directory is an
+invalid-curve attack on an unvalidated ECDH oracle
+(\art{research/p224_attack/}). The CryptoPro-B and CP6-782 work is
+constructive: GLV-2 scalar multiplication $1.25$--$1.50\times$ faster via
+isogeny-chain endomorphisms (\art{research/cryptopro_b_chain_sweep_20261006/},
+\art{research/endo_native_bench_20261016/}). Cheon's attack with auxiliary
+inputs is cheaper than matched negation rho at most sizes from 36 bits in
+ecbench's counted unit (dearer at 32 and 40 bits; no exponent separation;
+not validated;
+\S\ref{sec:gf-cheon}), and only for the DLP with auxiliary inputs; an
+earlier study's ``beats rho from 24 bits up''
+(\art{research/torsion_auxiliary_inputs_20260918/}) was not priced across
+the band, and the P-224-shape Cheon/rho ratios of a different study were
+withdrawn (\S\ref{sec:pt-standard}).
+
+\section{Literature claims that did not survive}
+
+The lit2026 programme (\art{research/lit2026_speedup_program/}) ran each
+finding of a 2025--26 search as a measured change against an interleaved
+baseline binary. Workstream W12 implemented the zero-minor
+guess-and-determine attack (Mahalanobis, arXiv~2607.09814v2): it solved
+48/48 planted targets on 16--26-bit curves, but its search phases scale
+with slope $0.905$ $[0.769,1.021]$ in $\log_2 r$ and its cost over rho
+grows from $260\times$ to $6{,}715\times$. The search is exhaustive in $r$, as the
+source's own table says. A second flagged ePrint (Hu, 2025/015) did not
+specify an implementable algorithm and is recorded as blocked. On the
+generic side, W11 cut BSGS from $16.75$ to $3.71$ multiplication
+equivalents per visited point with paired steps (wall $1.15$--$1.67\times$),
+which moves rho's and BSGS's constants, not index calculus.
+
+\section{Gaudry's $k=4$ index calculus over $\FF_{p^4}$}\label{sec:gaudry}
+
+Over $\FF_{p^k}$ with a base of points whose abscissa lies in $\FF_p$, a
+relation needs a $k$-decomposition solved by a Macaulay system. We made the
+\texttt{gaudry\_quartic} solve generic in the number of unknowns and faster
+(median whole solve $1.96$/$4.19$/$6.08\times$ at $d=4,5,6$, $37.3\to6.1$\,s
+at $d=6$, as recomputed by the validation sweep from the committed records
+on a shared host; the $\Sem5$ solve from about 30 minutes to 164--203\,s;
+every count and solution identical). Then we built FGHR's $D_4$ variant
+(\art{research/gaudry_quartic_d4_20261013/}): on a curve with rational
+2-torsion $T$, the coordinate $Y=(x-x_0-c)/(x-x_0+c)$ satisfies
+$Y(P+T)=-Y(P)$, so $\Sem5$ in $Y$ is invariant under the Weyl group $D_4$
+(order 192). In the invariants $\sigma_k=e_k(Y^2)$, $\pi=\prod Y_i$, the
+system has B\'ezout number 512 instead of 4{,}096, Macaulay degree 14
+instead of 29, and a $13{,}412\times11{,}628$ matrix instead of
+$41{,}780\times40{,}920$.
+
+At $p=269$, the cost $C_4$ of one decomposition falls from
+$1.21$--$1.23\cdot10^{12}$ to $2.54$--$2.55\cdot10^{10}$ $\FF_p$
+multiplications, $47.5$--$48.4\times$; a solve takes 4.2--5.6\,s instead of
+164--203\,s. Decompositions agree with an independent meet-in-the-middle
+enumeration on 19 of 19 solved targets; one target in 20 is degenerate
+(quotient dimension 517) and is discarded, adding about 5\% to the
+relation phase. The $Y$-line base decomposes about $1/8$ as often (pooled
+ratio $0.133$ over 8{,}000 targets; prediction $1/8\pm30\%$ held on one of
+two curves), but each column covers $\{\pm P,\pm(P+T)\}$, halving the
+unknowns.
+
+Inserted into the repository's crossover model
+(\art{research/notes/index-calculus/RESEARCH_RESIDUAL_WALKS.md} \S11.16), the measured $C_4$ and rate move
+the $k=4$ crossover with rho from $2^{149.4}$--$2^{152.7}$ to
+$2^{135.1}$--$2^{135.8}$ (cofactor $h=2$, forced by the 2-torsion), and
+the asymptotic ratio past it from $0.34$--$0.63$ to $0.12$--$0.22$ of rho.
+This was the first place in the programme where a modelled crossover
+moved, and the GLV-invariant line later moved it further
+(Chapter~\ref{ch:glvprogramme}); it moves in an \emph{extrapolated model} ($n^{1/4}$ relations, $n^{1/2}$ linear
+algebra and rho) fed by a measured constant, so it is classed as
+\cls{engineering}, not an advance. The validation sweep notes that this
+crossover was not re-derived against a rho with the negation map; against
+the negation walk, a later note puts the plain prime-order $k=4$ handover at
+$2^{156.1}$ and a $\psi$-folded one at $2^{146.0}$
+(\art{research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md}).
+The measured characteristic-two $k=4$ ladder is in \S\ref{sec:ladder}.
+Extension fields of degree four are not the fields deployed curves use.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-prime.pdf}
+\caption[]{Left: cost $C_4$ of one $k=4$ decomposition over $\FF_{p^4}$,
+$p=269$, Gaudry's $S_4$ system on the $x$-line against FGHR's $D_4$ system
+on the $Y$-line (\art{research/gaudry_quartic_d4_20261013/}). Right:
+index calculus with the PKM tower base and root finding over rho with
+negation, eight one-target workloads $\times$ three rounds per size,
+paired 95\% cluster-bootstrap intervals
+(\art{research/pkm_tower_ecbench_20261013/}).}
+\label{fig:prime}
+\end{figure}

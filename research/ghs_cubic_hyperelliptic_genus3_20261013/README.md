@@ -177,8 +177,8 @@ none); the ring identities (proved with `grind` over any
 | `τB`, `τ²B` | `tB_eq`, `ttB_eq` | proved |
 | `r = 5` | `r_eq_five` | proved |
 | `m = 3` (seven combinations non-empty) | `m_eq_three` | proved |
-| genus `3` by subcover sum and by `2^{m−2}(r−4)+1` | `genus_sum` | proved |
-| rank-2 subspace with union `{r0, r1, r2}` (hyperelliptic test) | `hyperelliptic_subspace` | proved |
+| genus `3` by subcover sum and by `2^{m−2}(r−4)+1` | `genus_sum` | proved (arithmetic of the formula over bitmasks only; that the genus equals this sum, by Kani–Rosen and Riemann–Hurwitz, is assumed) |
+| rank-2 subspace with union `{r0, r1, r2}` (hyperelliptic test) | `hyperelliptic_subspace` | proved (combinatorial part; the hyperelliptic criterion itself is assumed) |
 | branch locus of `C → D` over `{a, b}` | `triple_is_ab` | proved (combinatorial part) |
 | `u12` cover of `E0` unramified (`τB∆τ²B ⊆ B`) | `etale_subcover` | proved (combinatorial part) |
 | descent cycle on indices | `descent_cycle` | proved |

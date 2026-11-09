@@ -1,0 +1,138 @@
+{
+  "schema": "ecbench.band/v1",
+  "weights": [
+    0.0,
+    0.01,
+    0.03,
+    0.1,
+    0.3,
+    1.0
+  ],
+  "exempt_counters": [
+    "residual_table_bytes_uncharged",
+    "factor_base_vec_bytes_floor_uncharged",
+    "native_table_bytes_uncharged"
+  ],
+  "rows": [
+    {
+      "curve": "icv1-f2m53-tm56619371-dac20a85",
+      "log2_r": 44.258533022667656,
+      "arm": "descent",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        3.8432105385211734,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "charged_sum": 423134484.0,
+      "uncounted": [
+        "field_arithmetic_uncharged",
+        "hash_and_allocation_uncharged",
+        "modular_combination_uncharged",
+        "vector_declined_lanes_uncharged"
+      ]
+    },
+    {
+      "curve": "icv1-f2m53-tm56619371-dac20a85",
+      "log2_r": 44.258533022667656,
+      "arm": "pipeline",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        2.628886780791302,
+        2.6929069573780353,
+        2.8209473105515017,
+        3.269088546658636,
+        4.549492078393302,
+        9.030904439464639
+      ],
+      "charged_sum": 289438385.0,
+      "native_sum": 704857153,
+      "uncounted": [],
+      "exempt_mean_counts": {
+        "factor_base_vec_bytes_floor_uncharged": 1592544.0
+      }
+    },
+    {
+      "curve": "icv1-f2m53-tm56619371-dac20a85",
+      "log2_r": 44.258533022667656,
+      "arm": "pipeline71",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        2.754998872717404,
+        2.831784102183773,
+        2.985354561116511,
+        3.5228511673810954,
+        5.058555756708479,
+        10.43352181935432
+      ],
+      "charged_sum": 303323228.0,
+      "native_sum": 845399390,
+      "uncounted": [],
+      "exempt_mean_counts": {
+        "factor_base_vec_bytes_floor_uncharged": 1129536.0
+      }
+    },
+    {
+      "curve": "icv1-f2m53-tm56619371-dac20a85",
+      "log2_r": 44.258533022667656,
+      "arm": "rho",
+      "runs": 24,
+      "verified": 24,
+      "mean_s": [
+        0.13130155421021805,
+        0.13399859946638218,
+        0.1393926899787105,
+        0.15827200677185954,
+        0.21221291189514266,
+        0.4010060798266333
+      ],
+      "charged_sum": 14456198.751608554,
+      "native_sum": 29694258,
+      "uncounted": []
+    }
+  ],
+  "ranks": [
+    {
+      "curve": "icv1-f2m53-tm56619371-dac20a85",
+      "a": "descent",
+      "b": "pipeline",
+      "verdict": "unrankable (uncounted unpriced work)"
+    },
+    {
+      "curve": "icv1-f2m53-tm56619371-dac20a85",
+      "a": "descent",
+      "b": "pipeline71",
+      "verdict": "unrankable (uncounted unpriced work)"
+    },
+    {
+      "curve": "icv1-f2m53-tm56619371-dac20a85",
+      "a": "descent",
+      "b": "rho",
+      "verdict": "unrankable (uncounted unpriced work)"
+    },
+    {
+      "curve": "icv1-f2m53-tm56619371-dac20a85",
+      "a": "pipeline",
+      "b": "pipeline71",
+      "verdict": "pipeline < pipeline71"
+    },
+    {
+      "curve": "icv1-f2m53-tm56619371-dac20a85",
+      "a": "pipeline",
+      "b": "rho",
+      "verdict": "rho < pipeline"
+    },
+    {
+      "curve": "icv1-f2m53-tm56619371-dac20a85",
+      "a": "pipeline71",
+      "b": "rho",
+      "verdict": "rho < pipeline71"
+    }
+  ]
+}

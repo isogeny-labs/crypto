@@ -1,0 +1,485 @@
+\chapter{Corrections, retractions and withdrawn readings}\label{ch:corrections}
+
+This appendix collects the corrections, retractions, errata, withdrawn
+claims and reversed verdicts recorded in the program's evidence directories
+and ledgers. Where a chapter tells a correction at length, the entry here
+is a one-line pointer. Chapter~\ref{ch:audit}
+and \S\ref{sec:corrections} hold the corrections that moved index calculus
+against rho on the leaderboard (the retired online wins, the priced word
+XORs, rule~v8, the cross-host F4 counter drift, the volcano-crater and
+plane-quartic withdrawals); the rho-side corrections are told in
+Chapters~\ref{ch:matchedrho} and~\ref{ch:rhovariants}, and the
+unconventional-route corrections in Chapters~\ref{ch:tensor}
+and~\ref{ch:learning}. They are not repeated here.
+
+Each entry gives what was first read, the record that read it, what replaced
+the reading and when, and the source. Three conventions apply throughout.
+\begin{itemize}
+\item \emph{Standing.} Unless a row says \emph{validated}, the correction is
+  itself a producer's record, dated and additive (the frozen evidence it
+  corrects is left in place), and carries no proof-carrying-claim verdict.
+  Under the rule that every producer may be sabotaging the work, such a row
+  is an unverified assertion of its producer, as is the reading it replaced.
+\item \emph{Direction.} A correction of the rho reference or of the pricing is
+  an accounting change. None of the rows below is an improvement of index
+  calculus, and none moves a validated leaderboard row below its reference.
+\item \emph{Cross-references.} Seven corrections are carried in the main
+  text (Table~\ref{tab:corr-xref}) and listed here with a pointer only.
+\end{itemize}
+
+\begin{table}[tbp]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.2\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.17\linewidth}@{}}
+\toprule
+Item & Original reading & Correction & Main text \\
+\midrule
+H-PSEUDO character-sum constant & Fourier-flatness offset $R\approx1.28$--$1.34$, $C(p)\sim p^{0.055}$--$p^{0.079}$, open & 4 Nov: the $(x,y)$-keyed small-$x$ base is negation-closed and the null was not; against a negation-closed null $R$ is consistent with 1 (pooled 56 curves $1.005\pm0.008$); verdict \emph{explained} under a non-rejection rule, so a residual up to about $+9\%$ at $2^{20}$ is not excluded & Chapter~\ref{ch:summer} \\
+\addlinespace
+Xedni lifting & ``closed'' in exact form & 1 Nov: the Jacobson--Koblitz--Silverman--Stein--Teske obstruction is conditional (Lean audit); overbroad readings refuted; algorithm-specific bridges still open & Chapters~\ref{ch:obstructions}, \ref{ch:summer} \\
+\addlinespace
+$\ell=8$ hybrid-guess cells & the $\ell=8$ guess run had not completed & 22 Oct: four guessed variables bring every $\ell=8$ draw back to degree 4; 23 Oct: three do not, for that guess set & \S\ref{sec:binary-descent}, \S\ref{sec:frontier} \\
+\addlinespace
+Planner weight rules & \texttt{ic-planner/2}, \texttt{/3}: $1.41N_0$ (prime, $w=1$), $0.71c_0$ (Koblitz, $w\ge0.3$) & 26 Oct: both failed their preregistered out-of-sample tests; \texttt{ic-planner/4} withdraws them & \S\ref{sec:prime} \\
+\addlinespace
+EcGFp5 symmetrisation & no $m=5$ ideal degree measured & 1 Nov: $D=2^{16}=65{,}536$ at all three primes & Chapter~\ref{ch:summer} \\
+\addlinespace
+$n=83$ Weil-descent refutations & F4, F5, F6-IC, crossbred, SAT-descent and MQ-FES ``proved UNSAT'' on planted relations & 24 Oct: \texttt{FieldStructure} truncated the field table to one 64-bit word; builders now refuse such fields; every earlier $n=83$ engine refutation is void & \S\ref{sec:bo-n83} (summary in \S\ref{sec:n83}) \\
+\addlinespace
+Joux--Vitse sieve arm & 19 Oct comparisons withheld by the 20 Oct review; replication failed its rho A/A rule & 2--3 Nov: matched negation-map rho at $p=1511$; sieve below rho in every cell of the band; \emph{validated} (\texttt{VAL-20261103-c31c76}); no pcc claim, so its statement is an unverified assertion & \S\ref{sec:transfer} \\
+\bottomrule
+\end{tabularx}
+\caption[]{Corrections carried into the main text, listed here by pointer.
+Sources: \art{crypto-autoresearcher:docs/reports/hpseudo-symnull-20261104/README.md};
+\art{research/jksst_xedni_audit_20261101/};
+\art{research/dreg_closure_guess_20261022/RESULTS.md},
+\art{research/dreg_closure_guess3_20261023/RESULTS.md};
+\art{research/ic_planner_weight_rule_20261021/README.md},
+\art{research/ic_planner_weight_rule_binkob_20261026/README.md};
+\art{research/ecgfp5_quotient_solve_20261101/README.md};
+\art{research/n83_msweep_20261024/README.md};
+\art{research/jv_sieve_negrho_20261102/}.}
+\label{tab:corr-xref}
+\end{table}
+
+\section{Benchmark rows removed from the admitted table}\label{sec:corr-archive}
+
+The validation gate (19 October) froze 116 benchmark rows as unvalidated
+(pre-gate). By 6 November 65 rows had been removed from the admitted table
+to \art{benchmarks/ARCHIVE.json}, each with its
+exact former text, its SHA-256 and a disposition (Table~\ref{tab:fm-archive}).
+A row is \emph{incomplete} when its evidence lacks a replay certificate, a
+validator report or a matched rho, \emph{documentary} when it records a
+paper, census or synthesis rather than a measurement, and \emph{censored} when it rests on
+censored sessions and lower-bound costs. All 65 rows date from 13--26 October; 47 of them
+belong to the $n=83$ pipelines, the isogeny-volcano studies and the IC tool
+programme's exploration rounds. Removal is not a refutation: the archived
+text is kept as historical evidence of what was claimed.
+
+\begin{table}[tbp]
+\centering\footnotesize
+\input{figures/tab-fm-archive.tex}
+\caption[]{Benchmark rows removed from the admitted table, by topic and by
+the date in their entry name. Topics are assigned by directory-name
+keyword in \art{figures/make_tab_fm.py} (first match wins); counts from
+\art{benchmarks/ARCHIVE.json} via \art{figures/data-fm-glance.json}.}
+\label{tab:fm-archive}
+\end{table}
+
+\section{Binary and Koblitz fields}\label{sec:corr-binary}
+
+Table~\ref{tab:corr-binary} lists the binary-field items. Two need a
+sentence beyond the table.
+
+\paragraph{Torsion anchors.} The merged report of
+\art{research/ic_m2_cycle_leads_20261030} (PR~\#3009) stated that torsion
+anchors ``cost $1.5\times$ ($n=23$) to $16\times$ ($n=31$) on cofactor-4
+curves''. A frozen-protocol test at $n=41$ found the on/off trial ratio
+$0.975$ $[0.641,1.420]$, and a post-hoc replicate of 32 paired targets at
+$n=31$ gave $13.3\times$ $[10.3,17.5]$: the penalty exists at $n=31$, is about
+$1.5\times$ at $n=23$ and is absent at $n=41$, so the range is not to be
+quoted as a property of torsion anchors. A companion study on $a=0$, $n=37$
+found a penalty of $6.3$--$14.5\times$ at every cofactor-to-base ratio from
+$0.30$ to $10.84$. Its README also records that the earlier bootstrap
+intervals (PRs \#3126 and \#3138) were drawn with \texttt{mawk}'s
+non-reproducible \texttt{srand}; recomputed with a seeded generator they move
+by at most $0.02$. The earlier $n=37$ figure $0.134$ $[0.082,0.205]$ was
+off/on; it is the same measurement as the on/off $7.46$ $[4.90,11.92]$ and is
+not a reversal
+(\art{research/ic_m2_torsion_n41_20261101/REPORT.md},
+\art{research/ic_m2_torsion_ratio_n37_20261101/REPORT.md}).
+
+\paragraph{The $k=2$ collision excess.} On $y^2+xy=x^3+1$ over
+$\FF_{2^{19}}$ ($r=130{,}873$, birthday expectation $5.004$) the archived
+census read informative-to-birthday ratios of $3.397$ and $7.593$ at $k=2$
+and called them a $k$-specific collision excess. The census counted a
+colliding pair as informative unless its difference lay in the span of one
+kernel vector per generator, but the factor base is the union of
+$\langle\tau,-1\rangle$ orbits, so negation identities and $\tau$-shifted
+kernel relations were counted as informative. Replaying the archived code
+classifies 16 of 17 and 33 of 38 pairs as structural; the genuine-to-expected
+ratios are then $0.20$ and $1.00$ at $k=2$ and $0.40$ and $0.80$ at $k=3$, none
+above the band
+(\art{crypto-autoresearcher:analysis/ecdlp2m-iteration-20261009/certbin-k2-collision-audit/README.md}).
+
+\begin{table}[tbp]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.17\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.21\linewidth}@{}}
+\toprule
+Item & Original reading & Correction & Source \\
+\midrule
+Torsion anchors, cofactor 4 & PR~\#3009: $1.5$--$16\times$ more trials & 1 Nov: $0.975$ $[0.641,1.420]$ at $n=41$; not a general property (see text) & \art{research/ic_m2_torsion_n41_20261101/} \\
+\addlinespace
+Semaev 2015, $t=2$ & first fall degree ``always 4'' (\S4.5); corpus inference that these rows refute $d_{F4}\le d_{ff}$ & 2 Nov: $d_{ff}=2$ on 200 of 200 instances by a trace certificate; the solver needs degree 2 on 154 and 3 on 46, never 4, so the sharp assumption fails on 46/200 only & \art{research/semaev_t2_trace_20261102/REPORT.md}; cf.\ Corollary~\ref{cor:assump} \\
+\addlinespace
+Hamming ball $B_3$, $n=19$ & $R=1.10$ against random subspaces & $1.10$ came from one noisy subspace denominator; against 8 matched subspaces $R=0.27$ $[0.13,0.46]$ and $0.32$ $[0.14,0.55]$; \emph{not decided} & \art{crypto-autoresearcher:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-nonlinear-frob-stable-bases.yaml} \\
+\addlinespace
+SAT answers in \texttt{EV-ICPERF-390707} & five unverified SAT answers & they are decompositions on the quadratic twist $y^2+xy=x^3+1$; instrument not invalidated, SAT-over-Gr\"obner gap direction reproduced & \art{crypto-autoresearcher:ledger/evidence/EV-ICPERF-390707.yaml} \\
+\addlinespace
+Certified $k=2$ collisions & 17 and 38 pairs against $5.004$: a $k$-specific excess & instrument artefact; 16/17 and 33/38 structural (see text) & certbin audit (see text) \\
+\addlinespace
+Learned factor-base selection & producer: ``about 9 bits, identical across the band'' behind rho & 5--6 Nov: a pinned-calibration point; ridge pick $1.8/14.8/17.7$ bits ($n=17$) and $3.3/15.1/17.9$ ($n=19$) behind strong rho at $w=0/0.1/1$; the lead records independent validation & \art{crypto-autoresearcher:knowledge/leads/ecdlp/ic-binary/LEAD-ICB-learned-cost-model-factor-base-selection.yaml} \\
+\addlinespace
+Root linear-row harvest (\#1862) & raised counted word XORs about 7\% (one workload, $K_0$, $n=13$) & 24 Oct: the sign depends on size: $S$ up $9.6\%$ and $7.0\%$ at $n=11,13$, down $0.3\%$ and $4.1\%$ at $n=17,19$; every priced F4 arm stays $7$--$1{,}250\times$ strong rho & \art{research/f4_harvest_remeasure_20261024/README.md} \\
+\bottomrule
+\end{tabularx}
+\caption[]{Binary and Koblitz corrections not in the main text. All are
+producer-reported except the learned-selection row, whose atlas lead records
+a \texttt{VALIDATION.json}; the treatise did not open that repository. The
+already-recorded binary corrections (September reversals, the retired $n=61$
+$13.94\times$ and $n=83$ $18.53\times$ online readings, Table~A's understated
+gap, the contradicted degree-4 floor) are in Chapter~\ref{ch:audit} and
+\S\ref{sec:corrections}.}
+\label{tab:corr-binary}
+\end{table}
+
+\section{Prime fields}\label{sec:corr-prime}
+
+Table~\ref{tab:corr-prime} lists the prime-field items; the first needs a
+paragraph.
+
+\paragraph{Byte counters priced as operations.} The \S5a band priced
+\texttt{residual\_table\_\allowbreak bytes\_\allowbreak uncharged}, a byte count of the residual
+table, at $w$ GAE per byte. On the residual arms it was $83$--$99\%$ of $S$ at
+$w=1$, and it alone made their $w>0$ distance to rho $17$--$58\times$ rather
+than $2.6$--$5\times$. On 1~November the owner chose option~B: the band prices
+operations only, and \texttt{band.rs} lists the byte counters without pricing
+them. Re-running every committed weighted comparison under the rule turned all
+24 residual-versus-planner comparisons of \art{research/ic_prime_residual_lp_20261026/}
+from ``unresolved inside the band'' to ``residual cheaper at every weight''. It
+also resolved 36 of 136 comparisons in the planner-exhaustive study and 2 of 6
+in the Koblitz weight-rule study, and reversed no direction. Its effect cut both ways: the
+pre-registered criterion C1 of \art{research/ic_residual_scale_20261101/} is met
+in 2 of 8 cells, not 6 of 8, because the \texttt{eq} candidate's apparent gain
+at $w=1$ rested on byte counts. The $w=0$ results and the $2.59\times$
+leaderboard row are unchanged
+(\art{research/ic_byte_counter_pricing_20261101/README.md}).
+
+\begin{table}[tbp]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.17\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.21\linewidth}@{}}
+\toprule
+Item & Original reading & Correction & Source \\
+\midrule
+Residual collectors at $w>0$ & res4/rho $41$--$58\times$ at $w=1$; C1 met in 6 of 8 cells & 1 Nov, option~B: res4/rho $3.6$--$4.8\times$; C1 met in 2 of 8 & \art{research/ic_byte_counter_pricing_20261101/} \\
+\addlinespace
+Small-root lattice reach & $\varepsilon(\Sem3)=0.8408$, best margin $-0.0481$ at $m=4$ & 24 Oct (\texttt{CORR-20261024-b2a799}): wrong exponent in \texttt{smallroot\_reach.py}, $\varepsilon_{HG}=\varepsilon_{TOOL}/n$; $\varepsilon(\Sem3)=0.2803$, margin $-0.6086$ at $(4,2)$, best $-0.5161$ at $m=32$ & \art{crypto-autoresearcher:analysis/smallroot-reach/CORRECTION.md} \\
+\addlinespace
+Oracle gate of the Semaev-alternatives memo & ``$e<1$ at $m=4$'' & 4 Nov: not implied by its own cost model; a generic 2+2 MITM passes it ($s=1.93$) at cost $p^{2/3}$; correct gate $s<m-3$, i.e.\ $e<(m-3)/4$ & \art{research/semaev_alternatives_audit_20261104/README.md} \\
+\addlinespace
+Cofactor-cleared prime base & $G_0=6.180$ $[5.915,6.456]$, pass line met at every weight & 3 Nov: verdict \texttt{invalid\_controls} by the frozen rule (positive control's lower limit $1.149<1.2$); not to be cited as a gain & \art{research/ic_cofactor_clear_ab_20261103/README.md} \\
+\addlinespace
+Multi-target Koblitz figures & closest batch figure $1.17\times$ rho & accounting: $6.51\times$ batch rho at $k=32$ (Kuhn--Struik reference), $6.38\times$ with step and build priced; one target $43.7\times$ & \art{research/ic_rho_koblitz_20260923/README.md} \\
+\bottomrule
+\end{tabularx}
+\caption[]{Prime-field corrections, with one Koblitz accounting row that
+belongs with them because it changed a rho reference rule. All are
+producer-reported; the small-root correction is a single-agent computation
+that has had no independent review.}
+\label{tab:corr-prime}
+\end{table}
+
+\section{Engines and measurement}\label{sec:corr-engine}
+
+Several corrections changed the instrument, not a result
+(Table~\ref{tab:corr-engine}). Five are told at length in
+Chapter~\ref{ch:matchedrho} and only named here: calibration round 1
+(\S\ref{sec:mr-calibration}), the independent-validation host class and
+the statistics~v2 intervals with censored rho (\S\ref{sec:mr-stats}), the
+bounds frontier v1$\to$v2 (\S\ref{sec:mr-frontier}), and the $n=29$
+generator-orbit panel, which is a Frobenius-folded BSGS
+(\S\ref{sec:gf-bsgs}). They matter
+because intervals and references quoted earlier in this treatise were
+computed under the older rules.
+\begin{itemize}
+\item \emph{Accounting v2} (23 October) sized the strong Koblitz reference
+  to $r$. Its mean $S$ falls to $0.182$ $[0.171,0.196]$, $0.223$
+  $[0.201,0.248]$ and $0.678$ $[0.499,0.891]$ of the frozen id at $n=13$, 19
+  and 37, and its fixed set-up share from $83.3\%$, $71.3\%$ and $30.2\%$ to
+  $39.9\%$, $29.3\%$ and $4.3\%$. Any small-$n$ comparison against the frozen
+  strong id read rho too expensive by up to that factor. The report states
+  that this is a correction of the reference instrument, not a faster
+  algorithm (\art{research/ecbench_accounting_v2_20261023/REPORT.typ}).
+\item \emph{In-house F4 is not a published engine.} A desk review found that
+  the repository's F4 needs $10^3$--$10^7$ more operations than a brute grid
+  on the same PKM systems, so root-finding-over-F4 ratios such as those of
+  \S\ref{sec:rootfinding} (for example $383\times$) are not evidence about
+  published Gr\"obner solvers; degree measurements made with msolve are
+  unaffected (\art{research/ic_sweeper_20261024/README.md}).
+\end{itemize}
+
+\begin{table}[tbp]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.17\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.21\linewidth}@{}}
+\toprule
+Item & Original reading & Correction & Source \\
+\midrule
+Strong Koblitz rho id & frozen id, set-up $30$--$83\%$ of $S$ & 23 Oct: v2 sized to $r$, $S$ ratio $0.182$--$0.678$ (see text) & \art{research/ecbench_accounting_v2_20261023/} \\
+\addlinespace
+Runner PR \#2455 & IC online window ``about 15\% lower'' & 23 Oct: counts identical in 10 of 10 pairs; online ratio $1.067$, not distinguished; the $18.4$--$38.8\times$ shorter small-arm walls are an allocator effect (\texttt{malloc\_trim}, \texttt{/proc} reads) & \art{research/ecbench_allocator_confound_20261023/} \\
+\addlinespace
+E42 Macaulay tails & preregistered control range $[900,960]$ re-allocations & 3 Nov: the range was mis-derived (measured $245.6$); E42's kill fired with $W$ unranked; E42b re-registered before any ranking data & \art{research/e42_macaulay_tails_20261103/REPORT.typ} \\
+\bottomrule
+\end{tabularx}
+\caption[]{Instrument and measurement corrections not told elsewhere. All
+producer-reported; none changes an IC count except where the row says so.
+Calibration round 1, independent validation, statistics v2 and the bounds
+frontier v1 are in Chapter~\ref{ch:matchedrho}; the $n=29$ panel is in
+\S\ref{sec:gf-bsgs}.}
+\label{tab:corr-engine}
+\end{table}
+
+\section{Rho references}\label{sec:corr-rho}
+
+Table~\ref{tab:audit-rho} gives the rho-side changes listed with the
+leaderboard corrections. Table~\ref{tab:corr-rho} adds those that moved
+study readings and are not told elsewhere; the negation-map audit
+(\S\ref{sec:mr-negaudit}), the withdrawn Cheon/rho readings on the P-224
+shape (\S\ref{sec:gf-cheon}), the Curve25519 \texttt{wwalk} re-baseline
+(\S\ref{sec:gf-collision}) and the hyperelliptic rho reference
+(\S\ref{sec:rv-jacobian}) are in
+Chapters~\ref{ch:genericfloor}--\ref{ch:rhovariants}. One
+binary defect underlies the first two rows: the build that wrote the
+crater-automorphism and prime-automorphism sessions left the
+\texttt{rho.cubic}/\texttt{rho.quartic} class set-up ($16$--$58$ GAE per
+solve) out of each record's total
+(\art{research/class_setup_impact_20261024/}).
+
+\begin{table}[tbp]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.17\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.21\linewidth}@{}}
+\toprule
+Item & Original reading & Correction & Source \\
+\midrule
+Automorphism rho, prime & cubic/negation $0.611$, quartic/negation $0.791$ & 24 Oct: $0.647$ $[0.543,0.770]$ and $0.819$ $[0.722,0.929]$; the quartic interval no longer contains $1/\sqrt2$, so finding 1 holds for cubic only & \art{research/prime_rho_automorphism_20261015/README.md} \\
+\addlinespace
+Volcano crater controls & $j=0$ $0.697$, $j=1728$ $0.707$ & 24 Oct: $0.716$ $[0.598,0.857]$ and $0.723$ $[0.621,0.843]$; both still exclude 1 & \art{research/isogeny-volcano-cost_20261017/README.md} \\
+\addlinespace
+GLV-invariant matched walk (E27) & distances of \S9.24 & 30 Oct: every row $1.448$--$1.456\times$ further from rho at $w=0$; \emph{validated}; told in \S\ref{sec:rv-aut} & \art{research/e27_walk_20261030/REPORT.typ} \\
+\addlinespace
+Order-24 walk (E29) & crossing with order 6 at $w=1$ (\S9.33) & with its $40.6$ unpriced mod-$n$ operations per step priced, order 24 loses at every weight; the crossing was a one-op-per-step artefact & GLV note, \S9.39 (E34) \\
+\addlinespace
+Verschiebung split & round 1: $\lambda=t-1$ via $V^n$, ratio $0.49$, ``not established'' & round 2: $V^n=[2^n]\circ\pi^{-1}$ is $n$ doublings plus square roots; ratio $\ge2.5$ at $c_{\rm dbl}=8$, a provable loss & \art{research/isogeny_loop_glv_20261011/README.md} \\
+\bottomrule
+\end{tabularx}
+\caption[]{Corrections to rho references used by studies. GLV note:
+\art{research/notes/index-calculus/RESEARCH_GLV_INVARIANT_FACTOR_BASES.md}, whose
+\S9.19 also records seven textual errata found by the validation gate with no
+result, verdict or ranking changed. All rows except E27 are producer-reported.}
+\label{tab:corr-rho}
+\end{table}
+
+\section{Transfers and covers}\label{sec:corr-transfer}
+
+The transfer audit's v2 certificates (amendment 3, 26 October) changed the
+baseline itself. The model's $\sqrt{\pi r/4}$ is already rho with negation;
+dividing it again by $\sqrt c$ counted negation twice and put every baseline
+$0.5$ bit too low. The amendment also gave rho on a binary cover's Jacobian
+image the Frobenius class of the baseline curve (Koblitz cover ratios had
+been overstated by $\tfrac12\log_2(n/d)$ bits), required a margin of 8 bits
+before a price counts as below the baseline, and kept the verdict
+\texttt{refuted} only for a carried route priced as a route; formula sweeps,
+identity-path prices and unconstructed maps are now \texttt{unknown}. The
+regeneration first overwrote the v1 certificates; they were restored byte for
+byte in \texttt{v1/} on 27 October
+(\art{research/transfer_audit_20261011/PROTOCOL.md}). The other transfer
+items are in Table~\ref{tab:corr-transfer}.
+
+\begin{table}[tbp]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.17\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.21\linewidth}@{}}
+\toprule
+Item & Original reading & Correction & Source \\
+\midrule
+Transfer-audit baseline & \S4 baseline; \texttt{refuted} for any route not below it & 26 Oct: every baseline $+0.5$ bit; 8-bit margin; \texttt{refuted} narrowed (see text) & \art{research/transfer_audit_20261011/} \\
+\addlinespace
+Cover descent at the genus floor & 846 \texttt{cover\_descent} rows \texttt{formula\_advantage}; earlier reading: all rest on a genus no GHS cover has & priced at the genus the construction has: 599 remain (576 at $k=6$, 23 at $k=14$), 41 marginal, 206 boundary; rows stay \texttt{proposed} & \art{research/cover_descent_genus_floor_20261015/README.md} \\
+\addlinespace
+Hilbert stop on the weak-class cover (B0) & counted $S$ falls $2.53$--$2.64\times$ & 23 Oct: relabelling; unpriced F4-driver operations rose $8.3$--$8.5\times$; the repaired form B is engineering ($1.85$--$1.88\times$) & \art{research/ic_cover_weakclass_20261023/REPORT.md} \\
+\addlinespace
+GHS cover census, $n=4$ & preregistered: floor 21 for $E(K)[2]=\ZZ/2$; odd-class minima in $\{13,25\}$ & both failed; derived floor 25; odd class 13 iff $j\notin\FF_{q^2}$, else 37, never 25; one check bug fixed & \art{research/ghs_cover_census_n4_20261024/PROTOCOL.md} \\
+\addlinespace
+Isogeny seed, curve25519 & seed 1093 cheaper than seed 0 & 3 Nov: V2 failed (mean $S$ ratio $0.641>0.6$); interval $[0.379,1.084]$ includes 1; gain not established & \art{research/curve25519_isogeny_seed_20261103/README.md} \\
+\addlinespace
+CM canonical lift (lane L9) & closure argument as first written & \texttt{CORR-20260810-930c42}: closes only ordinary prime-field Serre--Tate/global CM models of fixed arity $2$--$9$; point-lifting routes give $\Pr\le p^{-1+o(1)}$, exponent 1 against rho's $1/2$ & \art{crypto-autoresearcher:knowledge/leads/ecdlp/transfer/LEAD-TRF-cm-canonical-lift-heights.yaml} \\
+\addlinespace
+GHS magic number & legacy \texttt{ec\_trapdoor::\allowbreak magic\_number} (plain orbit) & 13 Oct: MMT definition; consequences for ECC2K-130 are in \S\ref{sec:koblitz} and \S\ref{sec:ladder3} & \art{research/weak_isogeny_classes_20261013/REPORT.md} \\
+\bottomrule
+\end{tabularx}
+\caption[]{Corrections in the transfer and cover studies. All
+producer-reported.}
+\label{tab:corr-transfer}
+\end{table}
+
+\section{Structure: conductor gaps, curve traits and instruments}\label{sec:corr-structure}
+
+\paragraph{Conductor gaps.} The conductor-gap series has the longest
+correction trail. The CM-pairs study first stated that ``the Lean-provable
+theorem'' gave the null for generic methods. On 16 October a sheriff review
+(\texttt{SHF-20261016-3caa6f}, finding L5) noted that
+\texttt{lean/GenericInvariance.lean} covers only algorithms whose control
+flow depends on equality answers and a random tape, that is BSGS-type
+algorithms, while ecbench's rho and kangaroo hash the point representation.
+On 17 October a second review (\texttt{SHF-20261017-e4d7f6}, L-N2) withdrew
+the conclusion ``no implemented method sees the gap'', and on 28 October
+(\texttt{SHF-20261028-0f3f64}, PPN-1) the banner that still carried it was
+corrected. The open rho reading at $\ell=8209$, $1.22$ $[1.005,1.46]$ from 4
+targets, was then excluded by 12{,}288 paired solves under a fresh seed: any
+floor/crater difference is below about $1.2\%$ there. In the easy-gap tier
+($\ell\approx2^{25}$) the frozen interval $0.917$ $[0.851,0.988]$ excluded 1,
+but a preregistered twin round put the decisive floor-twin/crater-twin ratio
+at $1.040$ $[0.966,1.119]$: the shift attaches to the coordinate models, not
+to the endomorphism ring
+(\art{research/conductor_gap_cm_pairs_20261010/README.md},
+\art{research/conductor_gap_rho_large_sample_20261018/README.md}). The
+index-calculus side is in \S\ref{sec:transfer}; the remaining structural
+items are in Table~\ref{tab:corr-structure}.
+
+\begin{table}[tbp]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.17\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.21\linewidth}@{}}
+\toprule
+Item & Original reading & Correction & Source \\
+\midrule
+Conductor gap, CM pairs & ``no implemented method sees the gap''; null is a theorem for generic methods & 16, 17, 28 Oct: theorem covers BSGS-type arms only; banner withdrawn and qualified (see text) & \art{research/conductor_gap_cm_pairs_20261010/} \\
+\addlinespace
+Rho at $\ell=8209$; easy-gap tier & $1.22$ $[1.005,1.46]$; post hoc $1.17$ $[1.00,1.38]$ & 18 Oct: first excluded; second attributed to coordinate models ($1.040$ $[0.966,1.119]$) & \art{research/conductor_gap_rho_large_sample_20261018/} \\
+\addlinespace
+Round-1 crater/floor set-up gap & prime floor/crater $S$ ratio $3.10$ & round 2, A0: a closure counting defect (the floor paid $3.56\times$ the needed set-up); ratio $1.00$ & \art{research/isogeny_conductor_gap_round2_20261011/README.md} \\
+\addlinespace
+Drastic prime gap, $j=0$ & floor/crater rho quotient $0.5286$ & round 2, 32 fresh targets: $0.9468$ $[0.6622,1.3474]$ (99\%); target-sampling noise & \art{research/drastic_prime_conductor_gap_round2_20261012/README.md} \\
+\addlinespace
+NIST skip criterion & coefficient test separates the skipped curves & 25 Oct: the smaller P-224 root rejects the published model, and the two models are isomorphic; representation-dependent, not an intrinsic weakness & \art{research/nist_skip_criterion_20261025/REPORT.md} \\
+\addlinespace
+Coordinate census \texttt{EV-ECDLP-81f4d4} & strength \emph{strong} & 26 Oct (\texttt{CORR-20261026-c94668}): lowered to \emph{preliminary}, with other records of the same sheriff case & \art{crypto-autoresearcher:ledger/corrections/CORR-20261026-c94668.yaml} \\
+\addlinespace
+Weak-class instrument I1 & \emph{invalid} on all three classes & 4 Nov: the A/A gate (5\% on 20+20 draws) was miscalibrated; with a calibrated gate I1 is valid and blind; the paired-curve anomaly did not replicate (108+108 curves) & \art{crypto-autoresearcher:docs/reports/weakclass-i1-20261104/}, \art{crypto-autoresearcher:docs/reports/paired-anomaly-20261104/} \\
+\addlinespace
+Polynomial-ring form (FHJRV) & ``unavailable'' unless $b$ is a square & 2 Nov (\texttt{CORR-20261102-7e3a91}): holds for the $x$ (Kummer) class only; for $u=x/y$ on a double-odd curve the quotient is a polynomial ring & \art{crypto-autoresearcher:ledger/corrections/CORR-20261102-7e3a91.yaml} \\
+\bottomrule
+\end{tabularx}
+\caption[]{Structural corrections. All producer-reported, the sheriff
+findings included.}
+\label{tab:corr-structure}
+\end{table}
+
+\section{Unconventional routes}\label{sec:corr-exotic}
+
+\begin{table}[tbp]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.17\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.21\linewidth}@{}}
+\toprule
+Item & Original reading & Correction & Source \\
+\midrule
+Jet oracle & ``simulable with $C=1$, closed at exponent $1/2$'', a derivation ``valid at all scales''; close jet candidates by theorem & 27 Jul (\texttt{CORR-20260727-003}): withdrawn, no derivation exists; closure countermanded; simulability open; \texttt{EV-GGM-002} supersedes \texttt{EV-GGM-001} & \art{crypto-autoresearcher:ledger/corrections/CORR-20260727-003.yaml} \\
+\addlinespace
+Planted generic-group null & Stage 1 null on planted $\ZZ/n$, $n$ of 16--20 bits & \texttt{EV-ECDLP-8a5106}: O-ARTIFACT, the kangaroo check M4 missed its $0.10$ band; decision \emph{refine} & \art{crypto-autoresearcher:ledger/evidence/EV-ECDLP-8a5106.yaml} \\
+\addlinespace
+ETH-route leads & twelve leads as written in \texttt{LEADS.md} & 2 Nov errata; told in \S\ref{sec:tn-corrections} & \art{research/ic_prime_eth_leads_20261031/LEADS.md} \S9 \\
+\addlinespace
+Learned WDSat branching & learned order $16{,}097$ held-out conflicts against $3{,}092$ & confounded with the symmetry switch; told in \S\ref{sec:ln-components} & \art{cryptanalysis:experiments/ideas_learning_20261018/REPORT.md} \\
+\addlinespace
+Hashed-ECDL set-up hang & user report: Fourier-network construction impractical & 30 Oct: the AKS branch above \texttt{u64}; told in Table~\ref{tab:tn-native} & \art{research/hashed_ecdl_hash_prime_20261030/README.md} \\
+\addlinespace
+Eigen-S\'eta (not ECDLP) & \texttt{walk} variant; NIST categories 1/3/5 & 11 Oct: \texttt{walk} insecure (5/5 ciphertexts decrypted from public data); 17 Oct: categories hold only in gate count, unqualified claim withdrawn & \art{research/eigen_seta_prototype_20261011/README.md}, \art{research/eigen_seta_assessment_20261017/REPORT.md} \\
+\bottomrule
+\end{tabularx}
+\caption[]{Corrections on unconventional routes, besides H-PSEUDO and xedni
+(Table~\ref{tab:corr-xref}). All producer-reported.}
+\label{tab:corr-exotic}
+\end{table}
+
+None of the rows in Table~\ref{tab:corr-exotic} opens or closes a route by
+itself. Two changed a status in the other direction from the usual one: the
+jet correction removed a closure that had no derivation behind it, and the
+JKSST audit (Table~\ref{tab:corr-xref}) turned an exact-form closure into a
+conditional one. A withdrawn closure is a correction, not evidence for the
+route.
+
+\section{Papers, notes and provenance}\label{sec:corr-papers}
+
+Table~\ref{tab:corr-papers} lists corrections to papers and notes, and
+provenance flags that bar a record from being cited as evidence.
+
+\paragraph{The LLL degeneracy note.} The note reported two curve-specific
+failure modes: secp256k1 failing LLL at 256 bits where P-256 and
+brainpoolP256r1 succeed, and a uniform failure at 384 bits and above. Both
+were overflow bugs in the \texttt{f64} Gram--Schmidt step ($n^4$ exceeds the
+largest \texttt{f64}), and were withdrawn on 16 October
+(\texttt{SHF-20261016-3caa6f}). On the fixed code every distinct seed pair at
+256 and 384 bits recovers the key, secp256k1 included (3 of 3); P-521 at
+$k_{\rm bits}=384$ recovers 0 of 3 on scaled \texttt{f64} and 3 of 3 with
+2048-bit fixed-point Gram--Schmidt. On 17 October the mechanism sentence for
+P-521 (``catastrophic cancellation'') was withdrawn as well
+(\texttt{SHF-20261017-e4d7f6}), because with the scaling P-521's diagonal is
+exactly $2^{500}$ and the described subtraction is exact
+(\art{papers/lll-degeneracy-note/README.md}). The note has no index-calculus
+content; it is listed because it is the clearest case here of a curve
+``property'' that was a numerical bug.
+
+\begin{table}[tbp]
+\centering\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.17\linewidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.21\linewidth}@{}}
+\toprule
+Item & Original reading & Correction & Source \\
+\midrule
+LLL degeneracy note & secp256k1 and $\ge384$-bit curves fail LLL & withdrawn 16--17 Oct (see text) & \art{papers/lll-degeneracy-note/} \\
+\addlinespace
+Structural-completeness paper & ``the theorem is proven by case analysis'' & 17 Oct (\texttt{SHF-20261017-e4d7f6}, P-N4--N6): ``argued''; \S8 holds proof sketches; check counts recounted & \art{papers/structural-completeness/README.md} \\
+\addlinespace
+Isogeny-class rho paper & no test fired; inferential null & 19 Oct review: false (one B1 generator, two P1 cells, one P0 cell flagged; Kruskal--Wallis $p=0.039$); KS defect, missing tie corrections; null provisional, $p$-values not recomputed & \art{papers/isogeny-class-rho/REVIEW-20261019.md} \\
+\addlinespace
+Chung--Costello--Smith Recover & displayed Eqs.~(11), (12) & 22 Oct: in this implementation's convention the literal equations give 1{,}257 wrong signed divisors and 3 $D=0$ cases of 1{,}260; corrected equations recover all 1{,}260 & \art{research/kummer_recover_20261022/REPORT.md} \\
+\addlinespace
+\texttt{secpkk1} ladder (lit2026 W11(e)) & published 8/12/16-bit challenge cards & the cards use the opposite prime-search direction from the paper's own Algorithm~3 & \art{research/lit2026_w11_generic_engineering_20261011/README.md} \\
+\addlinespace
+Teske trapdoor evidence & \texttt{EV-ECTD-8c098d} rho-substitution prose & fabrication defect disclosed: the stated empirical justification has no supporting data & \art{crypto-autoresearcher:ledger/evidence/EV-ECTD-8c098d.yaml} \\
+\addlinespace
+Kernel-of-reduction design & \texttt{DEC-20261023-26a6de} cites \texttt{KN-LIT-7593} & the citation resolves to an unrelated AES paper & \art{crypto-autoresearcher:knowledge/leads/ecdlp/transfer/LEAD-TRF-kernel-of-reduction-lemma.yaml} \\
+\addlinespace
+Synthetic volcano study & volcano and ECDLP figures & invented data by its own banner; not evidence & \art{research/synthetic_volcano_ecdlp_20261018/README.md} \\
+\addlinespace
+Frobenius-quotient follow-up & reported SAT runs & supplied as a note; models and logs not committed; not reviewed evidence & \art{research/frobenius_quotient_followup_20260926/README.md} \\
+\addlinespace
+Scalar-3 Frobenius gate & new screen for $q=16$ & the mechanism is a rediscovery of the scalar-3/Jordan screen of \art{research/cubic_extension_transfer_20261025/}; only its extension to $q=16$ is new & \art{research/ghs_scalar3_frobenius_gate_20261027/REPORT.md} \\
+\bottomrule
+\end{tabularx}
+\caption[]{Corrections to papers and notes, and provenance flags. All
+producer-reported or sheriff-reported.}
+\label{tab:corr-papers}
+\end{table}
+
+\paragraph{What the list shows.} Three patterns recur. First, a reference or a
+pricing rule was corrected more often than an index-calculus count: the
+class set-up, the strong Koblitz id, the negation map, the byte counter and
+the transfer baseline each changed the distance to rho with no change to the
+attacking side. Second, a preregistered control or gate that failed, as in the Cheon,
+cofactor-clearing and E42 rows, voided the verdict or the ranking whatever the
+measured quantity said; the rule was applied as frozen. Third, several
+``properties'' of curves or classes (the LLL failures, the conductor-gap rho
+shifts, the NIST coefficient test) turned out to be properties of a number
+format, a coordinate model or a representation. As in
+Chapter~\ref{ch:audit}, no correction listed here moved a generic or
+leaderboard index-calculus row below a matched rho. The one row in this
+appendix that ends below rho is the Joux--Vitse sieve route, which is restricted to the \texttt{jv\_cover} weak
+class (full rational 2-torsion, never prime order) and is an accounting result
+against a newly matched reference.

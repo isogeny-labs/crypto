@@ -1,0 +1,70 @@
+{
+  "schema": "pencil-interim-retained-accounting/v1",
+  "created_utc": "2026-10-30T06:55:29Z",
+  "run_id": "pencil-p186379-20261030-c1",
+  "generation": 9,
+  "scope": "retained interim checkpoint data; running embedded session; producer verification only",
+  "planned_rows": 18,
+  "observed_rows": 4,
+  "observed_warmups": 3,
+  "observed_measured": 1,
+  "missing_rows": 14,
+  "measured_pairs_planned": 5,
+  "complete_measured_pairs": 0,
+  "cells": 36,
+  "all_cell_ratios_null": true,
+  "outcomes": {
+    "rho_verified": 2,
+    "rho_AA_verified": 1,
+    "pencil_warmup_timeout": 1
+  },
+  "native_analysis_exit": 0,
+  "canonical_package_exit": 1,
+  "canonical_package_findings": 4,
+  "canonical_check_exit": 1,
+  "canonical_check_findings": 5,
+  "post_restoration_check_exit": 1,
+  "post_restoration_check_findings": 5,
+  "protocol_body_sha256": "18d5ea7d08097c6b1c952d979a71be5d05efa82902bee1bc1470b031345f37c9",
+  "bindings": {
+    "native_analysis": {
+      "path": "native-analysis.json",
+      "sha256": "4f439949a2040d6b88cf9969c76316dfe7384f4963e75efba58c91934c83cd69"
+    },
+    "export": {
+      "path": "export.json",
+      "sha256": "7d7955749d0e8be7f93f68d6b20fe141cef8db53784f21482dadc6d096c72791"
+    },
+    "manifest": {
+      "path": "analysis-manifest.json",
+      "sha256": "6b72e8b54d41a99466b9da2720ddf75f680c2a4eaccacda956f7ebae7977d91e"
+    },
+    "request": {
+      "path": "package-request.json",
+      "sha256": "4eb498d9af447c2e305890a0320b01dac395122c1cf0a28c42798f781020e80e"
+    },
+    "history": {
+      "path": "execution-history.json",
+      "sha256": "8aabb530ebee7515f41917e4606f90accb289d758ba9a19b01aa5440d6c2dc4b"
+    },
+    "post_restoration_check": {
+      "path": "check-post-resource-restoration.stdout",
+      "sha256": "803b5d02425d38404f3f64cf8383bac8a667ed052ef3e0e46685e9d90af148e8"
+    }
+  },
+  "resource_binding": {
+    "path": "resource-observations.json",
+    "sha256": "0f25401a77a5e09e3f2da704e3189f1a93920fbf47a3c70075f6834ee07de181"
+  },
+  "resource_update": {
+    "path": "resource-observations-supported-update.json",
+    "sha256": "0cea563aa6dea9791792534f725c31369df13128bcbae90f17fb64cc0afdc9f8",
+    "role": "separate later supporting evidence; not substituted into original analysis"
+  },
+  "metadata_race": "Parent added resource support after ready signal while accounting was executing. Original exact bytes were restored; update preserved separately. Original package/check retained4/5shortfalls with no hash finding. Post-restoration check confirms same5shortfalls. Scientific raw data never changed.",
+  "new_scientific_trials": 0,
+  "scientific_solver_replays": 0,
+  "independent_verification": false,
+  "timing_qualified": false,
+  "remaining_cohort_admitted": false
+}

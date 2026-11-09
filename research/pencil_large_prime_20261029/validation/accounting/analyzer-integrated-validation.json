@@ -1,0 +1,20 @@
+{
+  "schema": "software-validation/v1",
+  "observed_utc": "2026-10-29T18:24:41.321080+00:00",
+  "command": "cargo +1.99.1 test --locked --offline --manifest-path research/pencil_large_prime_20261029/native_price/Cargo.toml",
+  "exit_code": 0,
+  "unit_tests": {
+    "passed": 16,
+    "failed": 0,
+    "ignored": 0
+  },
+  "evidence_kind": "structured transcription of exec session 72289; isolated full logs also retained",
+  "scope": "executable analyzer initial integration; independent review corrections outstanding",
+  "open_findings": [
+    "paired session/binary/seed checks",
+    "calibration total sum and addition/source-unit parity",
+    "failed/capped absent modulus retention"
+  ],
+  "cohort_runs": 0,
+  "measured_cost_ratio": null
+}

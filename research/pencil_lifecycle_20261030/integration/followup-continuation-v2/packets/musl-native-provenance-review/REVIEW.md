@@ -1,0 +1,15 @@
+# Native link provenance review
+
+The retained linker invocation and map identify the actual static runtime: the five CRT objects and libc.a come from Rust 1.99.1's x86_64-unknown-linux-musl self-contained directory. All six current hashes match their recorded candidates. The private musl libc archive has a different hash and no private-prefix map reference; its qualification does not transfer to the bundled archive.
+
+The final invocation names the five CRT objects, uses -static-pie, -nostartfiles and -nodefaultlibs, and selects libc through its library search. The map records the bundled libc LOAD and 362 archive-member references. The executable hash is 16b6eecd16e4cdc3c56bd733090ae80bb9b558f3f8b5dc449d5b8d3344d880d1. Its ELF records show no interpreter or NEEDED dependency; a dynamic section exists for static PIE.
+
+Native dependency output declares the private musl-gcc selection for ring, libsqlite3-sys and blake3. Corresponding native object members appear in retained linked archives. These declarations do not provide a complete subprocess/header trace. The final driver is printed as cc. Its present /usr/bin/cc resolution is /usr/bin/gcc and matches the recorded GCC hash; this is a current consistency observation, not independent historical process tracing.
+
+The exact installed toolchain and bundled asset hashes are known. The upstream source revision and build recipe for those bundled musl assets are not established here. Bundled-versus-private selection alone is not a reason to rebuild when the recipe permits Rust's self-contained target runtime.
+
+The source is commit b985ddb30b46abbd9a050e5753c7e301f40b07f6, tree895383ebc1fdc304045da79f3edc0d1e8a9979d8, predating the lock correction. This review does not relabel it as current-head or image-qualified.
+
+The existing static CLI receipts were read without rerunning the candidate: positive exit0 and wrong-request-hash exit2. All 22 referenced files hash-match and sum to 5,244,979 bytes; adding the 6,049-byte request gives 5,251,028 loaded bytes. The report inventories1,260 workloads,22,680 cohort slots and18 separate gate slots; these are inventory counts. Stage remains static_inventory_only, owner authentication false, software bindings incomplete and scientific execution not admitted.
+
+Evidence: evidence.json binds build receipts, binary, linker map and logs; link-arguments.json records parsed arguments without environment values; cli-readback.json binds the separate CLI receipts and all referenced inputs. No executable, image build or cloud action was run by this review. Cost ratios remain null.

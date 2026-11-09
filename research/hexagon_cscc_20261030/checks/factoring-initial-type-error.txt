@@ -1,0 +1,65 @@
+    Updating crates.io index
+ Downloading crates ...
+  Downloaded serde_json v1.0.154
+  Downloaded zmij v1.0.23
+  Downloaded num-traits v0.2.19
+  Downloaded serde v1.0.229
+  Downloaded autocfg v1.5.1
+  Downloaded cfg-if v1.0.5
+  Downloaded num-integer v0.1.47
+  Downloaded num-rational v0.4.2
+  Downloaded getrandom v0.2.17
+  Downloaded itoa v1.0.18
+  Downloaded num-bigint v0.4.8
+  Downloaded memchr v2.8.3
+  Downloaded num-bigint v0.5.1
+  Downloaded serde_core v1.0.229
+  Downloaded libc v0.2.191
+    Blocking waiting for file lock on package cache
+   Compiling autocfg v1.5.1
+   Compiling serde_core v1.0.229
+   Compiling zmij v1.0.23
+   Compiling libc v0.2.191
+   Compiling serde v1.0.229
+   Compiling num-traits v0.2.19
+   Compiling serde_json v1.0.154
+   Compiling cfg-if v1.0.5
+   Compiling memchr v2.8.3
+   Compiling num-integer v0.1.47
+   Compiling itoa v1.0.18
+   Compiling num-rational v0.4.2
+   Compiling getrandom v0.2.17
+   Compiling num-bigint v0.5.1
+   Compiling hashed-ecdl-tensor v0.1.0 (/workspace/crypto/crates/hashed-ecdl-tensor)
+error[E0277]: the trait bound `num_bigint::BigUint: From<i32>` is not satisfied
+   --> src/factoring.rs:148:54
+    |
+148 |             assert_eq!(got, expected.into_iter().map(BigUint::from).collect::<Vec<_>>());
+    |                                                      ^^^^^^^ the trait `From<i32>` is not implemented for `num_bigint::BigUint`
+    |
+    = help: `num_bigint::BigUint` implements trait `From<T>`:
+              From<bool>
+              From<u128>
+              From<u16>
+              From<u32>
+              From<u64>
+              From<u8>
+              From<usize>
+
+error[E0277]: the trait bound `num_bigint::BigUint: From<i32>` is not satisfied
+   --> src/factoring.rs:148:29
+    |
+148 |             assert_eq!(got, expected.into_iter().map(BigUint::from).collect::<Vec<_>>());
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ the trait `From<i32>` is not implemented for `num_bigint::BigUint`
+    |
+    = help: `num_bigint::BigUint` implements trait `From<T>`:
+              From<bool>
+              From<u128>
+              From<u16>
+              From<u32>
+              From<u64>
+              From<u8>
+              From<usize>
+
+For more information about this error, try `rustc --explain E0277`.
+error: could not compile `hashed-ecdl-tensor` (lib test) due to 2 previous errors

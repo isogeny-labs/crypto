@@ -1,0 +1,158 @@
+{
+  "schema": "pencil.parallel-evidence/v1",
+  "task": "T-1231",
+  "scientific_execution": false,
+  "frozen_target_scope": 1260,
+  "new_cost_ratio": null,
+  "workflow_complete": false,
+  "components": {
+    "union": {
+      "status": {
+        "schema": "formal-review/v1",
+        "subject": "signed-graph-union-mutation",
+        "producer_commit": "3d48e8e3ee78bc57067f9dd1d9f501a1c0f7efd5",
+        "machine_status": "passed",
+        "source_fidelity": "faithful_scoped",
+        "review_outcome": "validated_scoped",
+        "counts": {
+          "main": 5,
+          "producer_controls": 8,
+          "reviewer_controls": 12,
+          "readbacks": 25,
+          "producer_manifest_entries": 620
+        },
+        "acceptance": "acceptance.json",
+        "scope": "post-find decoded-field global vertex and stored-anchor equations; valid-state candidate/zero-constraint correctness",
+        "source": {
+          "path": "/home/ec2-user/crypto-pencil-signed-graph-20261029/src/cryptanalysis/three_leads.rs",
+          "sha256": "26e99b56dace8f848d055e8709bb989622e4caea65aec26d63e00805153dc3c6",
+          "lines": "1558-1712"
+        },
+        "boundaries": [
+          "initial true reduced edge and Valid prestate",
+          "two finds not composed",
+          "forest/rank/size not proved",
+          "word signs/Vec/counters/overflow/compiled behavior not modeled",
+          "invalid-state model none differs from native assertion failure"
+        ],
+        "controls": [
+          "forward positive sign with target offset",
+          "reverse target offset changes sign",
+          "signed grandchild",
+          "retained child and descendant anchors",
+          "transported parent anchor",
+          "both-fixed nonzero candidate",
+          "zero consistent",
+          "inconsistent zero state excluded by Valid",
+          "wrong reversal sign"
+        ],
+        "instrument_controls": {
+          "missing_dependency_attempt": "subject/invocation-h7k5m2iq",
+          "false_after_dependencies": "subject/invocation-egyqsts7",
+          "both_gate_exit": 1
+        },
+        "scientific_execution": false,
+        "repository_edits": false,
+        "visual_inspection": {
+          "pages": [
+            1,
+            2
+          ],
+          "svg_embedded": true,
+          "result": "all pages inspected, legible, no clipping"
+        }
+      },
+      "pdf": "union-review/report.pdf",
+      "svg": "union-review/flow.svg"
+    },
+    "division": {
+      "status": {
+        "schema": "pencil.formal-review/v1",
+        "scope": "monic quotient accumulator and exact division interface",
+        "machine": "passed",
+        "source_fidelity": "checked at polynomial-quotient and word-remainder model scope",
+        "main": 17,
+        "producer_controls": 9,
+        "reviewer_controls": 6,
+        "readbacks": 32,
+        "publication": "3d48e8e3ee",
+        "independent_review": true,
+        "full_history_blind": false,
+        "scientific_execution": false,
+        "remaining": [
+          "native quotient Vec simulation/allocation/trim",
+          "usize allocation +1 bound",
+          "nonmonic inverse branch",
+          "general pegcd"
+        ],
+        "failed_attempts": [
+          "invocation-a1w7_v6t incomplete Init.olean copy shadowed toolchain; corrected package search layout"
+        ],
+        "known_false": "invocation-m6rlssmu"
+      },
+      "pdf": "division-review/report.pdf",
+      "svg": "division-review/flow.svg"
+    },
+    "kummer_matrix": {
+      "status": {
+        "schema": "retained-matrix-review/v1",
+        "review_outcome": "validated_scoped",
+        "models": 21,
+        "actions": 105,
+        "independent_adverse_controls": 8,
+        "native_result_equal": true,
+        "full_acceptance_requires_external_bindings": true,
+        "scientific_execution": false,
+        "runtime_provenance_attested": false
+      },
+      "pdf": "matrix-review/report.pdf",
+      "svg": "matrix-review/flow.svg"
+    },
+    "runtime_parser": {
+      "status": {
+        "schema": "software.independent-review/v1",
+        "joint": "mount-diff-proposal",
+        "published_commit": "05fc018e64e948fbe91d5463036e55d4c97d13f1",
+        "machine_status": "fixed_controls_passed",
+        "parser_fidelity": "faithful_scoped",
+        "controls": {
+          "total": 43,
+          "accepted": 7,
+          "rejected": 36,
+          "all_expected": true
+        },
+        "source_sha256": "f38a3070281df684381fe3fd2d33f9ef30cce92f445f869356d6c1413dc3d518",
+        "original_v5_status": "failed",
+        "original_passed_cases": [
+          "Q0"
+        ],
+        "supervisor_integrated": false,
+        "qualification_complete": false,
+        "deployment": false,
+        "admission": false,
+        "runtime_execution": false,
+        "scientific_execution": false,
+        "writer_attribution": null,
+        "no_writes_claim": false,
+        "retained_metadata": "Q1 create and terminal selected identities/mounts agree",
+        "requirements": "AMENDMENT_REQUIREMENTS.md",
+        "reviewer": {
+          "identity": "/root/portfolio_audit",
+          "producer_authorship": false,
+          "source_first": true,
+          "blind": false
+        },
+        "primary_reference": "https://docs.docker.com/reference/cli/docker/container/diff/"
+      },
+      "pdf": "mount-review/report.pdf",
+      "svg": "mount-review/flow.svg"
+    }
+  },
+  "remaining": [
+    "union forest/size and find composition",
+    "native quotient Vec storage/trim and general pegcd",
+    "Kummer native row-fold and runtime input provenance",
+    "reviewed runtime adapter then qualification under current authorization",
+    "complete authorized scientific cohort and matched costs"
+  ]
+}

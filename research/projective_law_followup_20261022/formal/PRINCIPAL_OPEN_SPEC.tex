@@ -1,0 +1,21 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{amsmath,amssymb,booktabs}
+\title{Principal-open scheme overlap: checked formal result}
+\author{Formal result packet for independent review}
+\date{25 October 2026}
+\begin{document}
+\maketitle
+Let $A_X$ and $B_z$ be the separately presented localized affine and infinity-chart coordinate rings. Pinned Lean previously checked an algebra equivalence $A_X\simeq B_z$. Applying the contravariant spectrum functor now gives a checked scheme isomorphism $\operatorname{Spec}(A_X)\simeq\operatorname{Spec}(B_z)$. The localization morphisms into $\operatorname{Spec}(A)$ and $\operatorname{Spec}(B)$ are checked open immersions. Their ranges are precisely the basic opens $D(X)$ and $D(z)$. All five new declaration audits use only \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}.
+
+\begin{center}\begin{tabular}{p{0.67\linewidth}p{0.2\linewidth}}\toprule
+Gate & Status\\\midrule
+Two localization morphisms are open immersions & Checked\\
+Their ranges are $D(X)$ and $D(z)$ & Checked\\
+Isomorphism of the localized affine schemes & Checked\\
+Two-chart smooth projective gluing & Open\\
+Infinity stalk and divisor/$\operatorname{Pic}^0$ transport & Open\\
+Rust law semantics; rho cost & Open; unmeasured\\\bottomrule\end{tabular}\end{center}
+
+This theorem identifies the overlap affine schemes and the distinguished opens within the two separate chart spectra. It does not construct or identify a chosen smooth projective completion, transport its stalk or divisors, or prove anything about runtime cost. See \texttt{Common22PrincipalOpenSpec.lean}, \texttt{principal-open-spec.csv}, \texttt{principal-open-spec.svg}, and the pinned proof log.
+\end{document}

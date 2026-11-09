@@ -1,3 +1,5 @@
+> **Record, 2026-11-09.** The collector these sessions measured (`ic_framework/residual_fused.rs`, commit 722dfc3e3e, with the byte-formula fix b4a460705a) was dropped when this branch merged main. It duplicated main's own `targets=residual-fused` (155c62aa1e, [`../ic_residual_fused_20261031`](../ic_residual_fused_20261031/README.md)), which is the one to use. To reproduce these numbers, build `ecbench` at 6d76be583f. The explanation of the extra walk steps is in [`../ic_residual_fused_steps_20261107`](../ic_residual_fused_steps_20261107/README.md). Every claim below is an unverified assertion [pcc:unverified].
+
 # Fused residual collector (`targets=residual-fused`), 2026-10-27
 
 Status: **local L0 sandbox measurement. NOT validated under the validation

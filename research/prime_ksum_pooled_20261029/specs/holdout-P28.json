@@ -1,0 +1,123 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "prime_ksum_pooled_20261029 holdout, 28-bit prime-order curves",
+  "description": "Generic decomposition track (bounded by sqrt(r); cannot beat rho). PROTOCOL.md. Public synthetic curves and targets; no security claim.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_search",
+        "bits": 28,
+        "seed": 20261029480
+      },
+      {
+        "kind": "prime_search",
+        "bits": 28,
+        "seed": 20261029481
+      },
+      {
+        "kind": "prime_search",
+        "bits": 28,
+        "seed": 20261029482
+      },
+      {
+        "kind": "prime_search",
+        "bits": 28,
+        "seed": 20261029483
+      }
+    ],
+    "targets_per_curve": 24,
+    "target_seed": 20261029239,
+    "target_kind": "public"
+  },
+  "measurement": {
+    "rounds": 2,
+    "warmup": 1,
+    "order": "alternate",
+    "seed": 20261029249,
+    "isolation_required": "L0",
+    "timeout_seconds": 1800
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "bsgs-neg",
+      "role": "reference",
+      "method": {
+        "id": "bsgs.negation"
+      }
+    },
+    {
+      "name": "inc-sel",
+      "role": "baseline",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=407",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "26479085"
+        }
+      }
+    },
+    {
+      "name": "inc-w0",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=289",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "26479085"
+        }
+      }
+    },
+    {
+      "name": "inc-rec",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=407",
+          "oracle": "mitm:negation_folded=1",
+          "max_trials": "26479085"
+        }
+      }
+    },
+    {
+      "name": "ksum4-sel",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=21",
+          "oracle": "ksum:m=4",
+          "max_trials": "13528399621"
+        }
+      }
+    },
+    {
+      "name": "ksum5-sel",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-abscissa:size=15",
+          "oracle": "ksum:m=5",
+          "max_trials": "13528399621"
+        }
+      }
+    }
+  ]
+}

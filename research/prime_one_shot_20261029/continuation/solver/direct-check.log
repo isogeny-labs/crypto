@@ -1,0 +1,7 @@
+PASS direct negative args=1 1 1234 exit=2 reason=nonzero canonical rational Q required
+PASS direct negative args=17 2 1234 exit=2 reason=nonzero canonical rational Q required
+PASS direct negative args=0 6 witness exit=2 reason=decimal RNG seed required
+PASS direct negative args=0 6 exit=2 reason=usage: direct_ic --selftest [TRACE_DIR] | --solve Qx Qy Seed
+PASS direct_IC_targets=18 known_FB_logs=0 source_scalar_inputs=0 kernel_rank_controls=4 zero_denominator_control=PASS timings=not_collected
+PASS separate_CLI_targets=18 seed=1234 expected_scalar_arguments=0 negative_CLI=4
+scope=fixed_F17_direct_IC_correctness; cold_setup_and_all_misses_retained; timings=not_collected; scaling_claim=none

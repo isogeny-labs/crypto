@@ -1,13 +1,6 @@
 # Native prime-field factor-base size and decomposition-oracle tuning
 
-Status: **draft**. No experiment has run or been scheduled. A runnable
-protocol now exists as a DRAFT: [`PROTOCOL.md`](PROTOCOL.md), with
-[`run.sh`](run.sh), [`specs/`](specs/) and the sizing-probe specs in
-[`probes/`](probes/). It is not frozen. Blocker 1 below must land first. This
-card records the next bounded engineering experiment after historical
-evidence PR #1898. See the
-[evidence-linked handoff](../../research/factor_base_evaluation_20261015/followup_20261016/README.md)
-for the decision sequence and sources.
+Status: **ready** (protocol frozen 2026-10-29 at `main` `0e124fb1b`; [`PROTOCOL.md`](PROTOCOL.md) §12 is the freezing record). No train, holdout or control session has run. Runner: [`run.sh`](run.sh), specs [`specs/`](specs/), pre-freeze sizing probes [`probes/`](probes/). The random-base control is absent and recorded as a gap; the stride control stands in. See the [evidence-linked handoff](../../research/factor_base_evaluation_20261015/followup_20261016/README.md) for the decision sequence and sources.
 
 ## Question and decision value
 

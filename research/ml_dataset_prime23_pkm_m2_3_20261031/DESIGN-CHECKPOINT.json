@@ -1,0 +1,30 @@
+{
+  "schema": "ml-dataset.design-checkpoint/v1",
+  "campaign": "prime23-pkm-m2-m3-both-twists",
+  "status": "design_only_non_launchable",
+  "source_capability_inspection_commit": "34d67b48970bfc84227ddda3953797b20e9ebbd5",
+  "planned_cells": 4,
+  "native_attempts": 0,
+  "generated_cells": 0,
+  "seed": null,
+  "native_modulus": null,
+  "binary_sha256": null,
+  "protocol_sha256": null,
+  "archive": {
+    "uri": "s3://setec-astronomy-artifacts/store/sha256/5a99c6ee12aab3c211edf606c65b9aebe4380b65946c3b3a1f1980b2ed48d7ad",
+    "sha256": "5a99c6ee12aab3c211edf606c65b9aebe4380b65946c3b3a1f1980b2ed48d7ad",
+    "bytes": 20480,
+    "members": [
+      "research/ml_dataset_prime23_pkm_m2_3_20261031/PROTOCOL-DRAFT.md",
+      "research/ml_dataset_prime23_pkm_m2_3_20261031/plan.draft.json"
+    ],
+    "put_condition": "If-None-Match:*",
+    "fresh_get_sha256_match": true,
+    "fresh_get_byte_equal": true,
+    "fresh_get_content_length": 20480
+  },
+  "protocol_validator": {
+    "status": "deferred_until_freeze",
+    "reason": "The official experiment.protocol/v1 record requires a pinned instrument and prespecified seed; the exact native modulus, twist/order certificates, release binary, seed and protocol hash are intentionally unbound before native preflight. This prose and null-seed plan are non-launchable design records, not an experiment.protocol/v1 submission."
+  }
+}

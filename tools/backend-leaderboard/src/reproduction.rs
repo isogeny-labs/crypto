@@ -3,7 +3,10 @@
 //! or authenticates a third party's claimed machine or executable provenance.
 
 use std::collections::{BTreeMap, BTreeSet};
+use std::io::Write;
 use std::path::Path;
+use std::process::Command;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
@@ -14,6 +17,13 @@ use crate::leaderboard::{self, Leaderboard, Manifest};
 
 const LOCK_SCHEMA: &str = "ecbench.backend_reproduction_lock/v1";
 const TOOLCHAIN: &str = "1.99.1";
+const FROZEN_ARCHIVE: &str = "docs/backend-leaderboard/revisions/20261027-pre-method-registry";
+const FROZEN_LOCK: &str =
+    "docs/backend-leaderboard/revisions/20261027-pre-method-registry/reproduction.lock.json";
+const SNAPSHOT_LOCK: &str = "docs/backend-leaderboard/reproduction.lock.json";
+const SNAPSHOT: &str = "91424ecf8cc7db04e7c4a2805c9001a02a6106ca";
+const FROZEN_LOCK_SHA256: &str = "5385e70d724341e07922412b007b42e0ce685fde2c3c68f462bc7dd6f8721278";
+const CURRENT_SELECTION: [&str; 1] = ["docs/backend-leaderboard/manifest.json"];
 const SESSION_FILES: [&str; 5] = [
     "session.json",
     "host.json",
@@ -100,6 +110,246 @@ pub struct Lock {
     files: BTreeMap<String, String>,
     outputs: BTreeMap<String, String>,
     expected: Summary,
+}
+
+fn run_checked(program: &str, args: &[&str], cwd: &Path) -> Result<(), String> {
+    let output = Command::new(program)
+        .args(args)
+        .current_dir(cwd)
+        .output()
+        .map_err(|e| format!("could not start {program}: {e}"))?;
+    if output.status.success() {
+        std::io::stdout()
+            .write_all(&output.stdout)
+            .map_err(|e| e.to_string())?;
+        std::io::stderr()
+            .write_all(&output.stderr)
+            .map_err(|e| e.to_string())?;
+        return Ok(());
+    }
+    Err(format!(
+        "{program} {} failed ({}): {}{}",
+        args.join(" "),
+        output.status,
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    ))
+}
+
+fn git_show(root: &Path, revision: &str, path: &str) -> Result<Vec<u8>, String> {
+    leaderboard::relative(Path::new(path))?;
+    let spec = format!("{revision}:{path}");
+    let output = Command::new("git")
+        .args(["show", spec.as_str()])
+        .current_dir(root)
+        .output()
+        .map_err(|e| format!("could not run git show for {path}: {e}"))?;
+    if !output.status.success() {
+        return Err(format!("pinned snapshot input unavailable: {path}"));
+    }
+    Ok(output.stdout)
+}
+
+fn read_live_checked(root: &Path, relative: &str) -> Result<Option<Vec<u8>>, String> {
+    leaderboard::relative(Path::new(relative))?;
+    let base = root.canonicalize().map_err(|e| e.to_string())?;
+    let path = root.join(relative);
+    match std::fs::symlink_metadata(&path) {
+        Ok(meta) if meta.file_type().is_symlink() => {
+            Err(format!("frozen input is a symlink: {relative}"))
+        }
+        Ok(_) => {
+            let resolved = path.canonicalize().map_err(|e| e.to_string())?;
+            if !resolved.starts_with(&base) {
+                return Err(format!("frozen input escapes checkout: {relative}"));
+            }
+            std::fs::read(&resolved)
+                .map(Some)
+                .map_err(|e| format!("{relative}: {e}"))
+        }
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(e) => Err(format!("{relative}: {e}")),
+    }
+}
+
+fn read_live_or_snapshot(root: &Path, snapshot: &str, relative: &str) -> Result<Vec<u8>, String> {
+    if let Some(bytes) = read_live_checked(root, relative)? {
+        return Ok(bytes);
+    }
+    git_show(root, snapshot, relative)
+}
+
+fn verify_live_frozen_evidence(root: &Path, snapshot: &str, lock: &Lock) -> Result<(), String> {
+    let producers = producer_inputs();
+    if producers.keys().any(|path| !lock.files.contains_key(path)) {
+        return Err("frozen producer inventory incomplete".into());
+    }
+    for (path, expected) in &lock.files {
+        if producers.contains_key(path) || CURRENT_SELECTION.contains(&path.as_str()) {
+            continue;
+        }
+        if sha256_hex(&read_live_or_snapshot(root, snapshot, path)?) != *expected {
+            return Err(format!("frozen scientific input changed: {path}"));
+        }
+    }
+    for (name, expected) in &lock.outputs {
+        let relative = format!("{FROZEN_ARCHIVE}/{name}");
+        let bytes = read_live_checked(root, &relative)?
+            .ok_or_else(|| format!("frozen report output unavailable: {name}"))?;
+        if sha256_hex(&bytes) != *expected {
+            return Err(format!("frozen report output changed: {name}"));
+        }
+    }
+    Ok(())
+}
+
+fn sparse_pattern(path: &str) -> Result<String, String> {
+    leaderboard::relative(Path::new(path))?;
+    let mut pattern = String::from("/");
+    for character in path.chars() {
+        if "\\*?[]!# ".contains(character) {
+            pattern.push('\\');
+        }
+        pattern.push(character);
+    }
+    Ok(pattern)
+}
+
+/// Recheck the archived report's live provenance and reproduce it from its pinned snapshot.
+/// This replaces the former Python orchestration and retains the historical evidence contract.
+pub fn verify_frozen_report(root: &Path) -> Result<(), String> {
+    let lock_path = root.join(FROZEN_LOCK);
+    let lock_bytes =
+        std::fs::read(&lock_path).map_err(|e| format!("{}: {e}", lock_path.display()))?;
+    if sha256_hex(&lock_bytes) != FROZEN_LOCK_SHA256 {
+        return Err("reviewed frozen report lock changed; do not reseal".into());
+    }
+    let snapshot_lock = git_show(root, SNAPSHOT, SNAPSHOT_LOCK)?;
+    if snapshot_lock != lock_bytes {
+        return Err("frozen report lock differs from the pinned source snapshot".into());
+    }
+    let lock: Lock =
+        serde_json::from_slice(&lock_bytes).map_err(|e| format!("frozen report lock: {e}"))?;
+    if lock.schema != LOCK_SCHEMA || lock.toolchain != TOOLCHAIN {
+        return Err("frozen report lock schema or compiler differs".into());
+    }
+    verify_live_frozen_evidence(root, SNAPSHOT, &lock)?;
+
+    let nonce = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map_err(|e| e.to_string())?
+        .as_nanos();
+    let temporary = std::env::temp_dir().join(format!("backend-r0-{}-{nonce}", std::process::id()));
+    std::fs::create_dir_all(&temporary).map_err(|e| e.to_string())?;
+    let checkout = temporary.join("snapshot");
+    let result = (|| {
+        let checkout_arg = checkout.to_string_lossy().into_owned();
+        run_checked(
+            "git",
+            &[
+                "worktree",
+                "add",
+                "--detach",
+                "--no-checkout",
+                &checkout_arg,
+                SNAPSHOT,
+            ],
+            root,
+        )?;
+
+        let mut paths: BTreeSet<String> = lock.files.keys().cloned().collect();
+        paths.extend([SNAPSHOT_LOCK.to_string(), ".gitignore".to_string()]);
+        paths.extend(
+            lock.outputs
+                .keys()
+                .map(|name| format!("{FROZEN_ARCHIVE}/{name}")),
+        );
+        let mut patterns = String::new();
+        for path in paths {
+            patterns.push_str(&sparse_pattern(&path)?);
+            patterns.push('\n');
+        }
+        let mut sparse = Command::new("git")
+            .args(["sparse-checkout", "set", "--no-cone", "--stdin"])
+            .current_dir(&checkout)
+            .stdin(std::process::Stdio::piped())
+            .stdout(std::process::Stdio::piped())
+            .stderr(std::process::Stdio::piped())
+            .spawn()
+            .map_err(|e| format!("could not configure frozen snapshot checkout: {e}"))?;
+        sparse
+            .stdin
+            .take()
+            .ok_or("missing sparse-checkout stdin")?
+            .write_all(patterns.as_bytes())
+            .map_err(|e| e.to_string())?;
+        let output = sparse.wait_with_output().map_err(|e| e.to_string())?;
+        if !output.status.success() {
+            return Err(format!(
+                "git sparse-checkout failed: {}",
+                String::from_utf8_lossy(&output.stderr)
+            ));
+        }
+        run_checked("git", &["read-tree", "-mu", "HEAD"], &checkout)?;
+
+        // Artifact-backed inputs are intentionally absent from Git worktrees.
+        // The live checkout has already been checked against this immutable
+        // lock above, so copy only missing bytes into the historical snapshot.
+        // Keep tracked snapshot files (especially its manifest) authoritative.
+        for relative in lock.files.keys() {
+            let target = checkout.join(relative);
+            if target.exists() {
+                continue;
+            }
+            let bytes = read_live_or_snapshot(root, SNAPSHOT, relative)?;
+            let parent = target.parent().ok_or("invalid frozen input path")?;
+            std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+            std::fs::write(&target, bytes).map_err(|e| e.to_string())?;
+        }
+
+        for name in lock.outputs.keys() {
+            let relative = format!("{FROZEN_ARCHIVE}/{name}");
+            let target = checkout.join(&relative);
+            if !target.exists() {
+                let bytes = read_live_or_snapshot(root, SNAPSHOT, &relative)?;
+                let parent = target.parent().ok_or("invalid frozen output path")?;
+                std::fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+                std::fs::write(&target, bytes).map_err(|e| e.to_string())?;
+            }
+        }
+
+        eprintln!("R0 snapshot {SNAPSHOT}; lock SHA-256 {FROZEN_LOCK_SHA256}");
+        let manifest = "tools/backend-leaderboard/Cargo.toml";
+        run_checked(
+            "cargo",
+            &[
+                "+1.99.1",
+                "run",
+                "--locked",
+                "--manifest-path",
+                manifest,
+                "--",
+                "reproduce",
+                "--expected-lock-sha256",
+                FROZEN_LOCK_SHA256,
+            ],
+            &checkout,
+        )?;
+        verify_live_frozen_evidence(root, SNAPSHOT, &lock)
+    })();
+
+    let cleanup = if checkout.join(".git").exists() {
+        let checkout_arg = checkout.to_string_lossy().into_owned();
+        run_checked(
+            "git",
+            &["worktree", "remove", "--force", &checkout_arg],
+            root,
+        )
+    } else {
+        Ok(())
+    };
+    let _ = std::fs::remove_dir_all(&temporary);
+    result.and(cleanup)
 }
 
 fn file_hash(path: &Path) -> Result<String, String> {
@@ -601,6 +851,190 @@ mod tests {
 
     fn save(path: &Path, value: &Value) {
         std::fs::write(path, serde_json::to_vec_pretty(value).unwrap()).unwrap();
+    }
+
+    fn git(root: &Path, args: &[&str]) -> String {
+        let output = Command::new("git")
+            .args(args)
+            .current_dir(root)
+            .output()
+            .unwrap();
+        assert!(
+            output.status.success(),
+            "{}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        String::from_utf8_lossy(&output.stdout).trim().to_string()
+    }
+
+    fn frozen_fixture_lock(record: &[u8], output: &[u8]) -> Lock {
+        let mut files = producer_inputs();
+        files.insert(CURRENT_SELECTION[0].into(), "0".repeat(64));
+        files.insert("research/control/records.jsonl".into(), sha256_hex(record));
+        Lock {
+            schema: LOCK_SCHEMA.into(),
+            toolchain: TOOLCHAIN.into(),
+            manifest: CURRENT_SELECTION[0].into(),
+            files,
+            outputs: [("leaderboard.json".into(), sha256_hex(output))].into(),
+            expected: Summary {
+                sessions: 0,
+                entries: 0,
+                planned_without_measurements: 0,
+                count_eligible: 0,
+                ic_frontiers: 0,
+                cross_method_frontiers: 0,
+                failed_samples: 0,
+                timing_winners: 0,
+            },
+        }
+    }
+
+    #[test]
+    fn current_manifest_selection_is_exempt_but_frozen_rows_and_outputs_are_not() {
+        let root = test_dir("frozen-selection-exemption");
+        let manifest = root.join(CURRENT_SELECTION[0]);
+        let record = root.join("research/control/records.jsonl");
+        let output = root.join(FROZEN_ARCHIVE).join("leaderboard.json");
+        for path in [&manifest, &record, &output] {
+            std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        }
+        std::fs::write(&manifest, b"current selection A").unwrap();
+        std::fs::write(&record, b"frozen historical record\n").unwrap();
+        std::fs::write(&output, b"frozen leaderboard bytes\n").unwrap();
+        let lock =
+            frozen_fixture_lock(b"frozen historical record\n", b"frozen leaderboard bytes\n");
+
+        verify_live_frozen_evidence(&root, "snapshot-not-needed", &lock).unwrap();
+        std::fs::write(&manifest, b"current selection B").unwrap();
+        verify_live_frozen_evidence(&root, "snapshot-not-needed", &lock).unwrap();
+        std::fs::write(&record, b"replacement historical record\n").unwrap();
+        assert!(
+            verify_live_frozen_evidence(&root, "snapshot-not-needed", &lock)
+                .unwrap_err()
+                .contains("frozen scientific input changed")
+        );
+        std::fs::write(&record, b"frozen historical record\n").unwrap();
+        std::fs::write(&output, b"replacement leaderboard bytes\n").unwrap();
+        assert!(
+            verify_live_frozen_evidence(&root, "snapshot-not-needed", &lock)
+                .unwrap_err()
+                .contains("frozen report output changed")
+        );
+        std::fs::write(&output, b"frozen leaderboard bytes\n").unwrap();
+        std::fs::remove_file(&output).unwrap();
+        assert!(
+            verify_live_frozen_evidence(&root, "snapshot-not-needed", &lock)
+                .unwrap_err()
+                .contains("frozen report output unavailable")
+        );
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn producer_inputs_may_advance_but_the_inventory_must_be_complete() {
+        let root = test_dir("frozen-producer-advance");
+        let record = root.join("research/control/records.jsonl");
+        let output = root.join(FROZEN_ARCHIVE).join("leaderboard.json");
+        for path in [&record, &output] {
+            std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        }
+        std::fs::write(&record, b"r\n").unwrap();
+        std::fs::write(&output, b"o\n").unwrap();
+        let mut lock = frozen_fixture_lock(b"r\n", b"o\n");
+        // A sealed producer hash that differs from the live source is not an error.
+        for hash in lock
+            .files
+            .iter_mut()
+            .filter(|(path, _)| producer_inputs().contains_key(*path))
+            .map(|(_, hash)| hash)
+        {
+            *hash = "f".repeat(64);
+        }
+        verify_live_frozen_evidence(&root, "snapshot-not-needed", &lock).unwrap();
+        lock.files.remove("src/cryptanalysis/ecbench/methods.rs");
+        assert!(
+            verify_live_frozen_evidence(&root, "snapshot-not-needed", &lock)
+                .unwrap_err()
+                .contains("producer inventory incomplete")
+        );
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn archived_output_is_not_replaced_by_the_current_report() {
+        let root = test_dir("frozen-current-report");
+        let record = root.join("research/control/records.jsonl");
+        let output = root.join(FROZEN_ARCHIVE).join("leaderboard.json");
+        let current = root.join("docs/backend-leaderboard/leaderboard.json");
+        for path in [&record, &output, &current] {
+            std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        }
+        std::fs::write(&record, b"r\n").unwrap();
+        std::fs::write(&output, b"frozen\n").unwrap();
+        let lock = frozen_fixture_lock(b"r\n", b"frozen\n");
+        std::fs::write(&current, b"new producer revision\n").unwrap();
+        verify_live_frozen_evidence(&root, "snapshot-not-needed", &lock).unwrap();
+        std::fs::copy(&current, &output).unwrap();
+        assert!(
+            verify_live_frozen_evidence(&root, "snapshot-not-needed", &lock)
+                .unwrap_err()
+                .contains("frozen report output changed")
+        );
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn frozen_input_path_escape_is_refused() {
+        let root = test_dir("frozen-path-escape");
+        let mut lock = frozen_fixture_lock(b"r\n", b"o\n");
+        lock.files.insert("../escape".into(), "0".repeat(64));
+        assert!(
+            verify_live_frozen_evidence(&root, "snapshot-not-needed", &lock)
+                .unwrap_err()
+                .contains("repository-relative path")
+        );
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn modified_lock_cannot_supply_its_own_trusted_hash() {
+        let root = test_dir("frozen-modified-lock");
+        let lock_path = root.join(FROZEN_LOCK);
+        std::fs::create_dir_all(lock_path.parent().unwrap()).unwrap();
+        let lock = frozen_fixture_lock(b"r\n", b"o\n");
+        std::fs::write(&lock_path, serde_json::to_vec(&lock).unwrap()).unwrap();
+        // No git repository exists here, so reaching git would fail differently.
+        assert!(verify_frozen_report(&root)
+            .unwrap_err()
+            .contains("reviewed frozen report lock changed"));
+        std::fs::remove_dir_all(root).unwrap();
+    }
+
+    #[test]
+    fn missing_frozen_input_uses_only_the_pinned_git_snapshot() {
+        let root = test_dir("frozen-snapshot-fallback");
+        git(&root, &["init", "-q"]);
+        git(&root, &["config", "user.email", "test@example.invalid"]);
+        git(&root, &["config", "user.name", "Test"]);
+        let record = root.join("research/control/records.jsonl");
+        std::fs::create_dir_all(record.parent().unwrap()).unwrap();
+        std::fs::write(&record, b"pinned historic bytes\n").unwrap();
+        git(&root, &["add", "research/control/records.jsonl"]);
+        git(&root, &["commit", "-qm", "freeze fixture"]);
+        let snapshot = git(&root, &["rev-parse", "HEAD"]);
+        std::fs::remove_file(&record).unwrap();
+        assert_eq!(
+            read_live_or_snapshot(&root, &snapshot, "research/control/records.jsonl").unwrap(),
+            b"pinned historic bytes\n"
+        );
+        assert!(read_live_or_snapshot(
+            &root,
+            "0000000000000000000000000000000000000000",
+            "research/control/records.jsonl"
+        )
+        .is_err());
+        std::fs::remove_dir_all(root).unwrap();
     }
 
     #[test]
