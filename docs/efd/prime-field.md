@@ -171,6 +171,29 @@ These formulas are supplementary: they are not part of the current-EFD counts
 (606) and are not in the Lean manifest, which pins only the 33 current charts.
 With them the repository carries **621 machine-readable EFD formulas**.
 
+## Symbolic verification of the formula programs
+
+`tools/efd/verify_symbolic.py` proves each optimized program equals the affine
+group law stated in its model record, over the field of rational functions:
+chart inputs are encoded symbolically, curve equations are imposed with a
+Groebner basis, and the projected difference is reduced to zero. This is exact
+algebra (no sampling) and covers generic points with nonzero denominators.
+
+- Current EFD: **471/471 pass** (`docs/efd/prime-validation/symbolic.json`).
+- Legacy extended quartic: **15/15 pass** (`symbolic-legacy.json`).
+- Assumptions are applied symbolically: `Z*=1` scales, model specializations
+  (`a=0`, `a=-3`, `b=0`, ...), derived parameters (`a2=2a`, `b=-2a`,
+  `b=a^2-1`, `half*2=1`, ...), and unit-coordinate mixed charts.
+- Caveat: this is computer-algebra verification, not a Lean kernel proof. It
+  complements the Lean chart proofs and the Rust execution tests.
+
+```sh
+python3 tools/efd/verify_symbolic.py --out docs/efd/prime-validation/symbolic.json
+python3 tools/efd/verify_symbolic.py \
+  --catalogue src/prime_ecc/efd/legacy_catalogue.json \
+  --out docs/efd/prime-validation/symbolic-legacy.json
+```
+
 ## Formal verification of the chart maps
 
 `research/efd_coordinate_charts_20261108/Charts.lean` machine-checks the
@@ -193,7 +216,11 @@ checks that each chart writes `X = x*z^a`, `Y = y*z^b` (or `z/x`, `z/y`,
 bash tools/lean/proof-gate.sh research/efd_coordinate_charts_20261108/Charts.lean
 ```
 
-Result: `PASS 37 thm 0 trusted`, i.e. every theorem is proved with no `sorry`,
+Cache coordinates are also formal: `extended_cache_U/V/W/T`,
+`hessian_cache_XX/XY/XZ`, `intersection_cache_SC/DZ`, and `quartic_cache_R`
+state that the encoders write exactly the relations the catalogue declares.
+
+Result: `PASS 59 thm 0 trusted`, i.e. every theorem is proved with no `sorry`,
 `native_decide` or user axiom.
 
 ## Verification

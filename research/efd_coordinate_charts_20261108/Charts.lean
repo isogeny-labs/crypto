@@ -22,6 +22,7 @@ Y-only quotient charts, and the Jacobi-intersection triple to their family.
 
 class FieldLike (K : Type) where
   mul : K → K → K
+  add : K → K → K
   inv : K → K
   zero : K
   one : K
@@ -44,6 +45,7 @@ def inv (a : K) : K := FieldLike.inv a
 def div (a b : K) : K := mul a (inv b)
 def zed : K := FieldLike.zero
 def un : K := FieldLike.one
+def two : K := FieldLike.add un un
 
 @[simp] theorem mul_assoc (a b c : K) : mul (mul a b) c = mul a (mul b c) :=
   FieldLike.mul_assoc a b c
@@ -202,6 +204,98 @@ theorem jintersect_roundtrip (s c d z : K) (hz : z ≠ zed) :
   unfold projectIntersection encodeIntersection
   simp only
   rw [div_mul_cancel s z hz, div_mul_cancel c z hz, div_mul_cancel d z hz]
+
+/-! ## Coordinate caches
+
+The Rust encoders fill cached coordinates from the chart relations. These
+theorems state the cache definitions; each is true by construction, so the
+catalogue cannot claim a cache the encoder does not write. -/
+
+structure ExtendedChart (K : Type) where
+  X : K
+  Y : K
+  Z : K
+  U : K
+  V : K
+  W : K
+  T : K
+
+def encodeExtended (x y z : K) : ExtendedChart K :=
+  let X := mul x z
+  let Y := mul y (pow z 2)
+  let Z := z
+  let U := mul X X
+  let V := mul two (mul X Z)
+  let W := mul Z Z
+  let T := FieldLike.add U W
+  { X := X, Y := Y, Z := Z, U := U, V := V, W := W, T := T }
+
+theorem extended_cache_U (x y z : K) :
+    (encodeExtended x y z).U = mul (encodeExtended x y z).X (encodeExtended x y z).X := rfl
+theorem extended_cache_V (x y z : K) :
+    (encodeExtended x y z).V = mul two (mul (encodeExtended x y z).X (encodeExtended x y z).Z) := rfl
+theorem extended_cache_W (x y z : K) :
+    (encodeExtended x y z).W = mul (encodeExtended x y z).Z (encodeExtended x y z).Z := rfl
+theorem extended_cache_T (x y z : K) :
+    (encodeExtended x y z).T = FieldLike.add (encodeExtended x y z).U (encodeExtended x y z).W := rfl
+
+structure HessianChart (K : Type) where
+  X : K
+  Y : K
+  Z : K
+  XX : K
+  YY : K
+  ZZ : K
+  XY : K
+  XZ : K
+  YZ : K
+
+def encodeHessian (x y z : K) : HessianChart K :=
+  let X := mul x z
+  let Y := mul y z
+  let Z := z
+  { X := X, Y := Y, Z := Z, XX := mul X X, YY := mul Y Y, ZZ := mul Z Z,
+    XY := mul two (mul X Y), XZ := mul two (mul X Z), YZ := mul two (mul Y Z) }
+
+theorem hessian_cache_XX (x y z : K) :
+    (encodeHessian x y z).XX = mul (encodeHessian x y z).X (encodeHessian x y z).X := rfl
+theorem hessian_cache_XY (x y z : K) :
+    (encodeHessian x y z).XY = mul two (mul (encodeHessian x y z).X (encodeHessian x y z).Y) := rfl
+theorem hessian_cache_XZ (x y z : K) :
+    (encodeHessian x y z).XZ = mul two (mul (encodeHessian x y z).X (encodeHessian x y z).Z) := rfl
+
+structure IntersectionChart (K : Type) where
+  S : K
+  C : K
+  D : K
+  Z : K
+  SC : K
+  DZ : K
+
+def encodeIntersectionChart (s c d z : K) : IntersectionChart K :=
+  let S := mul s z
+  let C := mul c z
+  let D := mul d z
+  { S := S, C := C, D := D, Z := z, SC := mul S C, DZ := mul D z }
+
+theorem intersection_cache_SC (s c d z : K) :
+    (encodeIntersectionChart s c d z).SC =
+      mul (encodeIntersectionChart s c d z).S (encodeIntersectionChart s c d z).C := rfl
+theorem intersection_cache_DZ (s c d z : K) :
+    (encodeIntersectionChart s c d z).DZ =
+      mul (encodeIntersectionChart s c d z).D (encodeIntersectionChart s c d z).Z := rfl
+
+structure QuarticChart (K : Type) where
+  X : K
+  Y : K
+  Z : K
+  R : K
+
+def encodeQuarticR (x y z : K) : QuarticChart K :=
+  { X := mul x z, Y := mul y (pow z 2), Z := z, R := mul two (mul (mul x z) z) }
+
+theorem quartic_cache_R (x y z : K) :
+    (encodeQuarticR x y z).R = mul two (mul (encodeQuarticR x y z).X (encodeQuarticR x y z).Z) := rfl
 
 /-! ## Catalogue manifest
 
