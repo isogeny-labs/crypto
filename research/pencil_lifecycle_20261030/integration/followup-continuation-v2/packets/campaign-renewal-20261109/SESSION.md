@@ -251,3 +251,27 @@ Preinputs/build/fourcontrols/fullsuite, then queuedformalreplays.
 
 ## Errors
 No newruntimeerrorobservedatthisreadback; earlierfailuresretained.
+
+## What was done — 20:12 UTC
+Rootv4terminalfailedatworkdeadline; compile1024.496249s,listandfourcontrols passed. Fullsuiteinterruptedafter460.254020s; postcustodynotreached. Completion1761.112730s/sealpassed, sameownerMainPID0/cgroupabsentconfirmed.
+
+## Decisions made
+Charge1800:18240total, reserve2400reviewedhelperreplay,22560unreserved. Preservecompiledcache forlaterqualification; noautomaticrootretry. Bindonlytwohelperfreeze accountingfields, preserveprospectivefreezebytes.
+
+## Open threads
+Finalhelperbindingreview/publication then5calls. Completefullsuite requiresnewboundedmanualplanusingretainedcompiledcache.
+
+## Errors
+Fullsuitecapped; nopostinputreceipt andnocompletefullsuitepass claimed. No permiterrorrecorded.
+
+## What was done — 20:14 UTC
+Finalrootv4archive counted6179inventorytests; partialfullsuite2142ok45ignored18FAILED, unfinishedpkm_semaevbit_interval_m3. All18failure names andno-final-summary retained. Resulta0f596fc, archived29native/callerfilesremoteGET/hashverified.
+
+## Decisions made
+Describeattemptaspartial-suitefailuresplusdeadline, nottimeout-only. Source-onlytriageof18prerequisites started; no test rerun. Helperfinalnumericreviewe5bd6c67 passesunchanged5callsource.
+
+## Open threads
+Publishhelperfinalfreeze/rootfailurepacket; releasehelperafterexactreadback. Triagefailedtestdependencies.
+
+## Errors
+18fullsuiteFAILEDrows newlycounted; causalclassification pending. Fourseparateexactcontrolpassesunchanged.
