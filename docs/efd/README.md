@@ -58,6 +58,11 @@ sections (`tools/efd` with an optional `g12o`/`g1p` argument). A binary Edwards
 or Hessian formula requires its own model parameters and points. Selecting a
 format does not convert a Weierstrass curve into another curve model.
 
+The prime-field section is wired into the index-calculus front end through
+`cryptanalysis::efd_representations`: every model converts to the
+short-Weierstrass S3 curve and every chart can encode or decode points.  See
+[`ic-representations.md`](ic-representations.md) and `ic prime --efd-model`.
+
 ## Use
 
 Run these commands at the Rust crate root: `crypto/`, or `cryptanalysis/suite/`.

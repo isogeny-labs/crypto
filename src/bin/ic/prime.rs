@@ -12,6 +12,7 @@
 use clap::{Args, ValueEnum};
 use crypto_lib::cryptanalysis::{
     binary_small_x,
+    efd_representations::EfdRepresentation,
     prime_small_x::{
         self, exact_ic_probe_with_arity, measure, toy_curve, toy_curve_with_cofactor, Curve,
         MontField, Options, PrimeField, Pt,
@@ -21,6 +22,9 @@ use crypto_lib::cryptanalysis::{
     semaev_s3_cost::{s3_cost_binary, s3_cost_prime},
 };
 use crypto_lib::ecc::curve::CurveParams;
+use crypto_lib::ecc::field::FieldElement;
+use crypto_lib::prime_ecc::efd::Bindings;
+use num_bigint::BigUint;
 use serde::Serialize;
 use serde_json::{json, Value};
 use std::time::Instant;
@@ -81,6 +85,79 @@ pub struct PrimeArgs {
     /// path probes the pair table after subtracting one base point.
     #[arg(long, default_value_t = 2, value_parser = clap::value_parser!(u8).range(2..=3))]
     pub relation_arity: u8,
+
+    /// EFD model id: shortw, montgom, edwards, twisted, twistedhessian,
+    /// hessian, jintersect, jquartic, 2dik or 3dik. When set, the curve is
+    /// read in that model and converted to the short-Weierstrass relation
+    /// engine; `--curve` is ignored.
+    #[arg(long)]
+    pub efd_model: Option<String>,
+    /// EFD chart id (e.g. `xz`, `jacobian`, `extended`) or `affine`.
+    #[arg(long, default_value = "affine")]
+    pub efd_chart: String,
+    /// EFD model parameter, `NAME=VALUE`; repeatable.
+    #[arg(long = "efd-param", value_name = "NAME=VALUE")]
+    pub efd_params: Vec<String>,
+    /// Prime field modulus of the EFD curve.
+    #[arg(long)]
+    pub efd_p: Option<String>,
+    /// Prime subgroup order of the EFD curve.
+    #[arg(long)]
+    pub efd_order: Option<String>,
+    /// Cofactor of the EFD curve.
+    #[arg(long, default_value_t = 1)]
+    pub efd_cofactor: u64,
+    /// Generator in `--efd-chart` coordinates, comma-separated, for the exact
+    /// relation probe.
+    #[arg(long)]
+    pub efd_generator: Option<String>,
+    /// Target in `--efd-chart` coordinates, comma-separated.
+    #[arg(long)]
+    pub efd_target: Option<String>,
+    /// Lift index for quotient charts (x-only, y-only, y^2-only).
+    #[arg(long, default_value_t = 0)]
+    pub efd_lift: u32,
+    /// Lift index for the generator only; defaults to --efd-lift.
+    #[arg(long)]
+    pub efd_generator_lift: Option<u32>,
+    /// Lift index for the target only; defaults to --efd-lift.
+    #[arg(long)]
+    pub efd_target_lift: Option<u32>,
+}
+
+fn parse_big(value: &str) -> Result<BigUint, String> {
+    let value = value.trim();
+    if let Some(hex) = value
+        .strip_prefix("0x")
+        .or_else(|| value.strip_prefix("0X"))
+    {
+        BigUint::parse_bytes(hex.as_bytes(), 16).ok_or_else(|| format!("bad integer {value}"))
+    } else {
+        value
+            .parse::<BigUint>()
+            .map_err(|_| format!("bad integer {value}"))
+    }
+}
+
+fn parse_efd_bindings(items: &[String], p: &BigUint) -> Result<Bindings, String> {
+    let mut out = Bindings::new();
+    for item in items {
+        let (name, value) = item
+            .split_once('=')
+            .ok_or_else(|| format!("--efd-param expects NAME=VALUE, got {item}"))?;
+        out.insert(
+            name.trim().to_owned(),
+            FieldElement::new(parse_big(value)?, p.clone()),
+        );
+    }
+    Ok(out)
+}
+
+fn parse_chart_coords(value: &str, p: &BigUint) -> Result<Vec<FieldElement>, String> {
+    value
+        .split(',')
+        .map(|part| parse_big(part).map(|v| FieldElement::new(v, p.clone())))
+        .collect()
 }
 
 pub fn run(args: PrimeArgs) -> Result<Value, String> {
@@ -110,15 +187,107 @@ pub fn run(args: PrimeArgs) -> Result<Value, String> {
     let s3n = args.s3_trials;
     let size = args.size as usize;
     let mut ic_probe = None;
+    let mut representation = None;
+    let efd_model = args.efd_model.clone();
     if (args.setup_candidates > 0 || args.target_candidates > 0)
+        && efd_model.is_none()
         && !matches!(name.as_str(), "eccp-131" | "eccp131")
     {
-        return Err("--setup-candidates and --target-candidates currently require eccp-131".into());
+        return Err(
+            "--setup-candidates and --target-candidates require eccp-131 or --efd-model".into(),
+        );
     }
     if args.relation_arity == 3 && args.setup_candidates == 0 && args.target_candidates == 0 {
         return Err("--relation-arity 3 requires setup or target candidates".into());
     }
-    let report = if matches!(name.as_str(), "eccp-131" | "eccp131") {
+    let report = if let Some(model_id) = efd_model.as_deref() {
+        let p = parse_big(
+            args.efd_p
+                .as_deref()
+                .ok_or("--efd-model requires --efd-p")?,
+        )?;
+        let order = parse_big(
+            args.efd_order
+                .as_deref()
+                .ok_or("--efd-model requires --efd-order")?,
+        )?;
+        if order <= BigUint::from(2u8) {
+            return Err("--efd-order must exceed 2".into());
+        }
+        let params = parse_efd_bindings(&args.efd_params, &p)?;
+        let repr = EfdRepresentation::new(model_id, &args.efd_chart, &p, &params)?;
+        let chart_label = repr
+            .chart_id
+            .split_once('/')
+            .map(|(_, chart)| chart)
+            .unwrap_or(repr.chart_id.as_str());
+        let curve_name = format!("EFD {model_id}/{chart_label} over F_{p}");
+
+        macro_rules! efd_prime {
+            ($limbs:literal) => {{
+                let field = MontField::<$limbs>::new(&p)?;
+                let curve = repr.curve(
+                    field,
+                    curve_name.clone(),
+                    order.clone(),
+                    true,
+                    args.efd_cofactor,
+                )?;
+                let mut r = measure(&curve, &opts)?;
+                if raw > 0 {
+                    r.raw_base = Some(prime_small_x::raw_subgroup_fraction(
+                        &curve, size, raw, args.seed,
+                    )?);
+                }
+                if s3n > 0 {
+                    r.s3 = Some(s3_cost_prime(&curve, &opts, &r, s3n)?);
+                }
+                if let (Some(g), Some(q)) = (&args.efd_generator, &args.efd_target) {
+                    let generator_lift = args.efd_generator_lift.unwrap_or(args.efd_lift);
+                    let target_lift = args.efd_target_lift.unwrap_or(args.efd_lift);
+                    let generator = repr.decode_point(
+                        &curve.field,
+                        &parse_chart_coords(g, &p)?,
+                        generator_lift,
+                    )?;
+                    let target =
+                        repr.decode_point(&curve.field, &parse_chart_coords(q, &p)?, target_lift)?;
+                    let mut f = curve.field.clone();
+                    if !curve.on_curve(&mut f, &generator) {
+                        return Err("--efd-generator is not on the curve".into());
+                    }
+                    if !curve.on_curve(&mut f, &target) {
+                        return Err("--efd-target is not on the curve".into());
+                    }
+                    let setup = args.setup_candidates.max(1);
+                    let target_candidates = args.target_candidates.max(1);
+                    ic_probe = Some(exact_ic_probe_with_arity(
+                        &curve,
+                        &generator,
+                        &target,
+                        size,
+                        setup,
+                        target_candidates,
+                        args.seed,
+                        args.relation_arity,
+                    )?);
+                }
+                representation = Some(repr.describe());
+                r
+            }};
+        }
+        match p.bits() {
+            0..=192 => efd_prime!(3),
+            193..=256 => efd_prime!(4),
+            257..=384 => efd_prime!(6),
+            385..=576 => efd_prime!(9),
+            bits => {
+                return Err(format!(
+                    "EFD modulus {bits} bits is beyond the 576-bit prime engine"
+                ))
+            }
+        }
+    } else if matches!(name.as_str(), "eccp-131" | "eccp131") {
         let params = CurveParams::eccp131();
         let record = SecgCurve {
             name: params.name.into(),
@@ -220,6 +389,7 @@ pub fn run(args: PrimeArgs) -> Result<Value, String> {
             "exact_pair_sum_yield_and_bounded_relation_rank_descent"
         } else { "exact_pair_sum_yield_with_monte_carlo" },
         "arguments": args,
+        "representation": representation,
         "report": report,
         "ic_probe": ic_probe,
         "elapsed_seconds": started.elapsed().as_secs_f64(),

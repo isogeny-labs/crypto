@@ -169,6 +169,7 @@ pub mod eds_mov;
 pub mod eds_net;
 pub mod eds_residue;
 pub mod eds_tate;
+pub mod efd_representations;
 pub mod endo_rho;
 pub mod ext_curve;
 pub mod f4_fp;
