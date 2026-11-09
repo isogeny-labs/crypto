@@ -258,6 +258,7 @@ pub struct OperationCounts {
 }
 
 pub struct Program {
+    source: ProgramSource,
     instructions: Vec<(String, Expr)>,
     assumptions: Vec<(Expr, Expr)>,
     parameters: BTreeSet<String>,
@@ -271,8 +272,78 @@ pub(super) fn equality(s: &str) -> Result<(Expr, Expr)> {
     Ok((Expr::parse(a)?, Expr::parse(b)?))
 }
 
+/// Provenance of the straight-line program being executed.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ProgramSource {
+    /// The optimized `.op3` program served by EFD.
+    Upstream,
+    /// A program reconstructed from the pinned `data/` record. Used only when
+    /// the upstream `.op3` is incomplete or contradicts its own record; its
+    /// operation counts are record costs, not EFD's optimized counts.
+    RecordFallback,
+}
+
+fn instruction(line: &str) -> Result<(String, Expr)> {
+    let (a, b) = line
+        .split_once('=')
+        .ok_or_else(|| EfdError::Syntax(line.into()))?;
+    let name = a.trim();
+    if !matches!(Expr::parse(name)?, Expr::Variable(_)) {
+        return Err(EfdError::Syntax(line.into()));
+    }
+    Ok((name.into(), Expr::parse(b)?))
+}
+
 impl Program {
     pub(super) fn compile(formula: &Formula) -> Result<Self> {
+        let mut instructions = Vec::new();
+        for line in formula
+            .program
+            .text
+            .lines()
+            .filter(|l| !l.trim().is_empty())
+        {
+            // A handful of upstream `.op3` files contain the EFD generator's
+            // own failure notice instead of code. Keep the record and the
+            // source hash pinned, and refuse to execute rather than guess.
+            if line.trim_start().starts_with("error:") {
+                return Err(EfdError::Unsupported(format!(
+                    "{}: upstream program incomplete: {}",
+                    formula.id,
+                    line.trim()
+                )));
+            }
+            instructions.push(instruction(line)?);
+        }
+        Self::assemble(formula, instructions, ProgramSource::Upstream)
+    }
+
+    /// Reconstruct a straight-line program from the `compute NAME = EXPR`
+    /// lines of the pinned record. Every EFD record states its computation, so
+    /// this makes the eight unusable upstream programs executable without
+    /// changing the pinned bytes.
+    pub(super) fn compile_record(formula: &Formula) -> Result<Self> {
+        let mut instructions = Vec::new();
+        for line in formula.record.text.lines() {
+            let Some(body) = line.strip_prefix("compute ") else {
+                continue;
+            };
+            instructions.push(instruction(body)?);
+        }
+        if instructions.is_empty() {
+            return Err(EfdError::Unsupported(format!(
+                "{}: record has no explicit computation",
+                formula.id
+            )));
+        }
+        Self::assemble(formula, instructions, ProgramSource::RecordFallback)
+    }
+
+    fn assemble(
+        formula: &Formula,
+        instructions: Vec<(String, Expr)>,
+        source: ProgramSource,
+    ) -> Result<Self> {
         let catalogue = catalogue();
         let rep = catalogue
             .representation(&formula.representation)
@@ -295,32 +366,6 @@ impl Program {
             .chain(&formula.assumptions)
             .map(|s| equality(s))
             .collect::<Result<_>>()?;
-        let mut instructions = Vec::new();
-        for line in formula
-            .program
-            .text
-            .lines()
-            .filter(|l| !l.trim().is_empty())
-        {
-            // A handful of upstream `.op3` files contain the EFD generator's
-            // own failure notice instead of code. Keep the record and the
-            // source hash pinned, and refuse to execute rather than guess.
-            if line.trim_start().starts_with("error:") {
-                return Err(EfdError::Unsupported(format!(
-                    "{}: upstream program incomplete: {}",
-                    formula.id,
-                    line.trim()
-                )));
-            }
-            let (a, b) = line
-                .split_once('=')
-                .ok_or_else(|| EfdError::Syntax(line.into()))?;
-            let name = a.trim();
-            if !matches!(Expr::parse(name)?, Expr::Variable(_)) {
-                return Err(EfdError::Syntax(line.into()));
-            }
-            instructions.push((name.into(), Expr::parse(b)?));
-        }
         let mut invariants = Vec::new();
         for relation in &rep.relations {
             let pair = equality(relation)?;
@@ -332,12 +377,18 @@ impl Program {
             }
         }
         Ok(Self {
+            source,
             instructions,
             assumptions,
             parameters,
             invariants,
         })
     }
+
+    pub fn source(&self) -> ProgramSource {
+        self.source
+    }
+
     pub fn operation_counts(&self) -> OperationCounts {
         let mut c = OperationCounts::default();
         for (_, e) in &self.instructions {

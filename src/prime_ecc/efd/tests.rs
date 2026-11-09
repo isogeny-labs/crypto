@@ -11,8 +11,9 @@ use std::collections::BTreeSet;
 const P: u64 = 109;
 
 /// Two upstream `.op3` files compute `-(r1+l3)` where the pinned record says
-/// `r2 = -r1+l3`. They are kept byte for byte and excluded from the
-/// affine-law comparison; everything else is compared strictly.
+/// `r2 = -r1+l3`. They are kept byte for byte; verification uses the
+/// record-derived fallback for these two, and everything else is compared
+/// against the upstream program strictly.
 const KNOWN_PROGRAM_DEFECTS: &[(&str, &str)] = &[
     (
         "jintersect/standard/doubling/dbl-2001-ls",
@@ -296,6 +297,7 @@ fn complete_pinned_catalogue_and_source_hashes() {
         source_digest(&rep.source);
     }
     let mut incomplete = 0;
+    let mut fallbacks = 0;
     for f in &c.formulas {
         assert!(ids.insert(&f.id));
         source_digest(&f.record);
@@ -308,9 +310,27 @@ fn complete_pinned_catalogue_and_source_hashes() {
             }
             Err(e) => panic!("{}: {e}", f.id),
         }
+        // Every record states its computation, so every formula is executable
+        // through the record-derived fallback when the upstream code is not.
+        if f.compile().is_err() {
+            assert_eq!(
+                f.compile_record().unwrap().source(),
+                ProgramSource::RecordFallback
+            );
+            fallbacks += 1;
+        }
     }
     // Six `add-1986-cc*` programs were never emitted by the EFD generator.
     assert_eq!(incomplete, 6);
+    assert_eq!(fallbacks, 6);
+    for (id, _) in KNOWN_PROGRAM_DEFECTS {
+        let f = c.formula(id).unwrap();
+        assert!(f.compile().is_ok());
+        assert_eq!(
+            f.compile_record().unwrap().source(),
+            ProgramSource::RecordFallback
+        );
+    }
 }
 
 #[test]
@@ -353,28 +373,28 @@ fn all_471_formulas_match_affine_model_laws() {
             .iter()
             .filter(|f| f.representation == rep.id)
         {
-            if let Some((_, reason)) = KNOWN_PROGRAM_DEFECTS
+            let known_defect = KNOWN_PROGRAM_DEFECTS
                 .iter()
-                .find(|(id, _)| *id == formula.id)
-            {
-                assert!(
-                    formula.program.text.contains("-t7"),
-                    "{}: expected defect evidence",
-                    formula.id
-                );
-                coverage.push(serde_json::json!({"formula":formula.id,"prime":P,
-                    "executable":false,"defect":reason}));
-                continue;
-            }
+                .find(|(id, _)| *id == formula.id);
             let program = match formula.compile() {
-                Ok(program) => program,
+                Ok(program) if known_defect.is_none() => program,
+                Ok(_) => {
+                    assert!(
+                        formula.program.text.contains("-t7"),
+                        "{}: expected defect evidence",
+                        formula.id
+                    );
+                    formula.compile_record().unwrap()
+                }
                 Err(EfdError::Unsupported(_)) => {
                     assert!(formula.program.text.contains("error:"));
-                    coverage.push(serde_json::json!({"formula":formula.id,
-                        "prime":P,"executable":false}));
-                    continue;
+                    formula.compile_record().unwrap()
                 }
                 Err(e) => panic!("{}: {e}", formula.id),
+            };
+            let source = match program.source() {
+                ProgramSource::Upstream => "upstream",
+                ProgramSource::RecordFallback => "record-fallback",
             };
             let mut passed = 0;
             let mut attempted = 0;
@@ -482,6 +502,7 @@ fn all_471_formulas_match_affine_model_laws() {
                 formula.id
             );
             coverage.push(serde_json::json!({"formula":formula.id,"prime":P,
+                "program":source,
                 "passed":passed,"attempted":attempted,
                 "excluded_singular_or_conditional":attempted-passed}));
         }
@@ -552,9 +573,6 @@ fn checked_weierstrass_formulas_match_existing_independent_arithmetic() {
         let points = shortw_points(&curve);
         assert!(points.len() > 8);
         for formula in catalogue().formulas.iter().filter(|f| applies(f, &curve)) {
-            if formula.program.text.contains("error:") {
-                continue;
-            }
             let mut actual_formula = 0;
             for i in 0..points.len() {
                 let p = &points[i];
@@ -600,9 +618,6 @@ fn large_prime_planted_points_match_existing_arithmetic() {
         let q = p.double(&a);
         let r = p.add(&q, &a);
         for formula in catalogue().formulas.iter().filter(|f| applies(f, &curve)) {
-            if formula.program.text.contains("error:") {
-                continue;
-            }
             let addition = formula.operation == "addition";
             let result = match weierstrass_operation(
                 &curve,
