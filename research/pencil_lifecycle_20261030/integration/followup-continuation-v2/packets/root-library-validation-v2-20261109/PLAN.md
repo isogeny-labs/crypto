@@ -21,3 +21,7 @@ Sourceschecked: exactfailednative root-terminal.json and currentlauncher; priori
 ## Serial accounting and artifact update
 
 Root selected normreplay2400 before nativefixture60; draft now projects cumulative5340/remaining37860 before v2root1800reservation,36060unreserved. These are conditional until normterminal and qualification receipts arrive. Admission staysfalse. Materializedmanifest is recorded in .artifacts.json and ignored byGit; storepush reusedexistingobject, pull reusedlocalfile, verify--remote reportedzero problems. Exactc5178bytes retained. No source/fixture change or payloadexecution by thisagent. [pcc:unverified]
+
+## Final binding amendment
+
+Native logfixture passed: exactsourcehelper/systemdappend yieldedUID1000mode0600, callerflush/hash, injectedcheckpointownership retained, sameinvocation cleanup; result/exit/review/sourcepublication copied and bound. Normcompletion and2400exitdebit copied. Actualcumulative5340, remaining37860, manual1800reservation leaves36060. T1970reclaimedattempt2epoch3 explicit. Admission nowtrue conditional on rootfinalbindingreview/publicationreadback/livefence/resources; exactsource unchanged. Earlier drafts/conditionalbudgetnotes are historical and superseded by admission.json/launch.json. No launchby preparationagent. [pcc:unverified]
