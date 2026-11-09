@@ -25,8 +25,15 @@ amendment to the observed results.
    has exactly M kernel occurrences, or homogenize with a charged counter.
    Check exceptional cases D=0 outside local charts; do not cancel there.
    **Actual polynomial bridge completed:** GlobalPolynomials proves evaluation
-   equals imported baseKernel and binds the degree bound to it. Actual recursive
-   contraction homogeneity and exceptional evaluations remain open. [pcc:unverified]
+   equals imported baseKernel and binds the degree bound to it.
+   **Nov9 actual affine contraction bridge:** BooleanContraction and
+   PackedContraction prove clearing for the actual D.8 Boolean kernel. Its
+   zero-output factor becomes D-N, so no homogeneous-in-W assumption is used.
+   The actual mapped polynomial has degree<=2M(2L-1), rational point equality
+   requires D(T) nonzero, and local series clearing uses the constructed unit.
+   Generic ring-map transport includes jet quotients. Source packing is supplied
+   as an injective placement, not constructed by this component. See
+   reports/boolean-contraction-20261109/REPORT.md. [pcc:unverified]
 3. **Recovery under the correct budget.** Use all source levels. First formalize
    the actual source node counts and multiplicity, then lift three_level_margin
    to degree M(4L-2). Reprove the finite-precision Hermite evaluation bound with
@@ -39,6 +46,14 @@ amendment to the observed results.
    proofs close the finite coefficient-buffer equivalence, construct the actual
    finite inverse output and prove modular encoding/cardinality. Full Hermite
    precision and native bit costs remain open. [pcc:unverified]
+   **Nov9 exact source recovery step:** NodeMultiplicity derives actual grid
+   valuation counts, the actual ceiling budget and the full per-node taper
+   margin for 3<=u<=a and u<=M. HermiteUniqueness proves exact scaled source
+   jets determine the actual cleared packed polynomial over any Q-algebra.
+   Exact cancellation of2L does not hold in finite2^p quotients. The next
+   obligation is the actual Hermite multiplier valuation/loss bound D.10,
+   not another numerical multiplicity margin. See
+   reports/source-recovery-20261109/REPORT.md. [pcc:unverified]
 4. **Uniform modes and total recursive cost.** Derive squared Cauchy modes with
    coefficient(b+1), genuine nonzero valuations, all tiles/rows/levels, source
    variables and child entries. Charge D, inverse, factorization, tuple
