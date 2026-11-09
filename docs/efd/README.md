@@ -16,9 +16,12 @@ incomplete or contradicts its record (see `prime-field.md`).
 Coverage was checked by crawling every representation page of both sections:
 the set of `auto-code/*.op3` formula ids equals the catalogue id set exactly
 (471/471 and 135/135, no missing and no extra ids). The legacy
-`oldefd/` pages are the superseded genus-1 HTML tables; they carry no
-machine-readable records or programs, and their content is covered by these
-two sections. No genus-2 or genus-3 section exists on the site.
+`oldefd/` pages are the superseded genus-1 HTML tables. They carry no
+machine-readable records or programs (only speed records and Magma checks); the
+one coordinate system there not present in the current sections is "Extended
+Jacobi-quartic coordinates", which has no explicit formula listing to import.
+Their other content is covered by the two current sections. No genus-2 or
+genus-3 section exists on the site.
 
 Model conversions and chart conversions are drawn in
 [`conversions.md`](conversions.md) (Graphviz source in `conversions.dot`,

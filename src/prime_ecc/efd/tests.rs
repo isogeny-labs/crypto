@@ -799,6 +799,83 @@ fn every_model_has_both_weierstrass_maps() {
     );
 }
 
+/// Chart family used by the Lean round-trip proofs. Mirrors the dispatch in
+/// `formats.rs`; the Lean manifest lists the same id -> family pairs.
+fn chart_family(id: &str) -> u8 {
+    match id {
+        "shortw/jacobian" | "shortw/jacobian-0" | "shortw/jacobian-3" | "shortw/modified"
+        | "3dik/standard" => 2,
+        "shortw/projective"
+        | "shortw/projective-1"
+        | "shortw/projective-3"
+        | "edwards/projective"
+        | "twisted/projective"
+        | "twisted/extended"
+        | "twisted/extended-1"
+        | "twistedhessian/projective"
+        | "hessian/standard"
+        | "hessian/extended" => 1,
+        "shortw/w12-0" | "jquartic/xyz" | "jquartic/2xyz" | "jquartic/xxyzz"
+        | "jquartic/xxyzzr" | "jquartic/2xxyzz" | "jquartic/2xxyzzr" | "2dik/standard" => 3,
+        "shortw/xyzz" | "shortw/xyzz-3" => 4,
+        "shortw/xz" | "montgom/xz" => 5,
+        "edwards/inverted" | "twisted/inverted" => 6,
+        "edwards/yz" => 7,
+        "edwards/yzsquared" => 8,
+        id if id.starts_with("jintersect/") => 9,
+        other => panic!("unclassified chart {other}"),
+    }
+}
+
+/// The Lean development must cover exactly the catalogue charts, with each
+/// chart mapped to a family that has a machine-checked round-trip theorem.
+#[test]
+fn lean_chart_manifest_matches_catalogue() {
+    let lean = include_str!("../../../research/efd_coordinate_charts_20261108/Charts.lean");
+    for theorem in [
+        "affine_roundtrip",
+        "projective_roundtrip",
+        "jacobian_roundtrip",
+        "xyz_roundtrip",
+        "xyzz_roundtrip",
+        "x_only_roundtrip",
+        "inverted_roundtrip",
+        "yz_roundtrip",
+        "yzsquared_roundtrip",
+        "jintersect_roundtrip",
+    ] {
+        assert!(lean.contains(&format!("theorem {theorem}")), "{theorem}");
+    }
+    let start = lean.find("def charts").expect("Lean chart manifest");
+    let end = lean[start..].find(']').expect("manifest terminator") + start;
+    let body = &lean[start..end];
+    let mut entries = Vec::new();
+    let mut rest = body;
+    while let Some(open) = rest.find("(\"") {
+        let after = &rest[open + 2..];
+        let close = after.find('"').expect("chart id");
+        let id = after[..close].to_owned();
+        let tail = &after[close + 1..];
+        let comma = tail.find(',').expect("family separator");
+        let family_tail = &tail[comma + 1..];
+        let paren = family_tail.find(')').expect("family terminator");
+        let family: u8 = family_tail[..paren].trim().parse().expect("family code");
+        entries.push((id, family));
+        rest = &family_tail[paren + 1..];
+    }
+    assert_eq!(entries.len(), 33, "Lean manifest size");
+    let lean_ids: BTreeSet<&str> = entries.iter().map(|(id, _)| id.as_str()).collect();
+    let catalogue_ids: BTreeSet<&str> = catalogue()
+        .representations
+        .iter()
+        .map(|r| r.id.as_str())
+        .collect();
+    assert_eq!(lean_ids, catalogue_ids);
+    for (id, family) in entries {
+        assert_eq!(family, chart_family(&id), "{id}");
+    }
+}
+
 #[test]
 fn rejects_assumption_field_and_chart_mismatches() {
     let c = catalogue();
