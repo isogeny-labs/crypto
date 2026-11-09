@@ -29,8 +29,8 @@ as scientific timing. Existing local capacity and local checkpoints are
 user-authorized; paid compute0. [pcc:unverified]
 
 The [canonical export](evidence/census-v1/export.json) passes schema,
-protocol and file verification with0findings. The [raw archive](evidence/census-v1/raw-data.tar.gz)
-contains all40native/launch files; the [manifest](evidence/census-v1/raw-manifest.json)
+protocol and file verification with0findings. The [artifact manifest](evidence/census-v1/.artifacts.json)
+binds raw-data.tar.gz, which contains all40native/launch files; the [manifest](evidence/census-v1/raw-manifest.json)
 and [unpack/hash check](evidence/census-v1/archive-check.json) bind every byte.
 [Repeat checks](evidence/census-v1/repeat-check.json) cover rawJSON/TSV,
 C++summary/point counts, finish and analysis. Start/time/seed metadata
@@ -53,3 +53,10 @@ Formal full ten-pair ambient addition and geometric Picard/Jacobian
 identification remain separate. These exact finite model counts do not
 establish a fixed-genus asymptotic, typical/large-prime subgroup behavior,
 performance, or completion of the original14items. [pcc:unverified]
+
+Repository automation migrated the archive after publication in commit
+dbb05b1d. Local bytes remain hydrated and match the manifest SHA/size;
+standard artifact verification reports1entry/1hydrated/0problems. Other
+checkouts hydrate it with the repository artifact tool before reading
+the unchanged export paths. The original scientific export and claim pin
+remain immutable. [pcc:unverified]

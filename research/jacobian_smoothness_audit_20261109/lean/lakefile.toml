@@ -1,6 +1,6 @@
 name = "jacobian_smoothness_audit"
 version = "0.1.0"
-defaultTargets = ["MumfordSmoothness", "MumfordCantorGroup", "MumfordFiveControl", "MumfordStoll", "MumfordStollCycleGroup"]
+defaultTargets = ["MumfordSmoothness", "MumfordCantorGroup", "MumfordFiveControl", "MumfordStoll", "MumfordStollCycleGroup", "MumfordStollGeneral"]
 
 [[require]]
 name = "mathlib"
@@ -26,3 +26,7 @@ roots = ["MumfordStoll"]
 [[lean_lib]]
 name = "MumfordStollCycleGroup"
 roots = ["MumfordStollCantor", "MumfordStollCycleGroup"]
+
+[[lean_lib]]
+name = "MumfordStollGeneral"
+roots = ["MumfordStollGeneral"]
