@@ -6,8 +6,11 @@ cm_out=$cm_dir/block-tuning-v1
 cm_build=/tmp/cm-marked-scalar-build
 test -s "$cm_p/freeze-publication.json"
 test ! -e "$cm_out"
+sha256sum -c "$cm_dir/qualification/block-tune-build-v2/binaries.sha256"
+sha256sum -c "$cm_dir/qualification/block-tune-mutations-v1/binary.sha256"
 mkdir -p "$cm_out/runs"
 cp "$cm_p/launch.sh" "$cm_out/runs/launch.sh"
+sha256sum "$cm_build/block-tune" "$cm_build/block-tune-replay" "$cm_build/block-tune-mutate" > "$cm_out/runs/binaries.sha256"
 # Three build invocations and two software qualifications have already run.
 cm_invocations=5
 run_native() {
