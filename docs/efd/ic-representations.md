@@ -149,6 +149,7 @@ cargo test --lib prime_ecc::efd          # 10 tests, 471 formulas
 cargo test --lib efd_representations     # 5 tests: models, charts, IC, invalid input
 cargo test --bin ic parses_efd_integers  # CLI parsing
 cargo test --bin ic efd_catalogue_lists  # model/chart catalogue
+cargo run --release --example efd_ic     # library use on Montgomery xz
 ```
 
 The tests check:

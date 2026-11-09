@@ -39,11 +39,11 @@ enum Decoded {
 /// A curve in an EFD model plus the chart used for input and output.
 #[derive(Clone, Debug)]
 pub struct EfdRepresentation {
-    pub model_id: String,
-    pub chart_id: String,
-    pub modulus: BigUint,
-    pub params: Bindings,
-    pub bridge: WeierstrassBridge,
+    model_id: String,
+    chart_id: String,
+    modulus: BigUint,
+    params: Bindings,
+    bridge: WeierstrassBridge,
     chart: Option<&'static Representation>,
     model: &'static Model,
     one: FieldElement,
@@ -167,6 +167,31 @@ impl EfdRepresentation {
             model_coordinate_names,
             max_lift,
         })
+    }
+
+    /// The EFD model id (`shortw`, `montgom`, ...).
+    pub fn model_id(&self) -> &str {
+        &self.model_id
+    }
+
+    /// The normalized EFD chart id (`montgom/xz`, `edwards/yz`, ...).
+    pub fn chart_id(&self) -> &str {
+        &self.chart_id
+    }
+
+    /// The prime field modulus.
+    pub fn modulus(&self) -> &BigUint {
+        &self.modulus
+    }
+
+    /// Model and chart parameters.
+    pub fn params(&self) -> &Bindings {
+        &self.params
+    }
+
+    /// The long/short Weierstrass bridge (read-only view).
+    pub fn bridge(&self) -> &WeierstrassBridge {
+        &self.bridge
     }
 
     /// The short-Weierstrass `(A, B)` used by the relation engine.
@@ -726,8 +751,8 @@ mod tests {
             let rhs = x
                 .mul(&x)
                 .mul(&x)
-                .add(&repr.bridge.short_a.mul(&x))
-                .add(&repr.bridge.short_b);
+                .add(&repr.bridge().short_a.mul(&x))
+                .add(&repr.bridge().short_b);
             if let Some(y) = sqrt(&rhs) {
                 out.push((x, y));
                 if out.len() == want {
@@ -741,7 +766,7 @@ mod tests {
     fn round_trip(repr: &EfdRepresentation, x: &FieldElement, y: &FieldElement) -> Option<()> {
         let coords = repr.encode_short(x, y).ok()?;
         let (x2, y2) = repr.decode_short(&coords, 0).ok()?;
-        match repr.chart_id.as_str() {
+        match repr.chart_id() {
             "shortw/xz" | "montgom/xz" => {
                 if x2 == *x {
                     Some(())
