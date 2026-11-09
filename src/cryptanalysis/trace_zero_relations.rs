@@ -14,6 +14,8 @@ use std::time::{Duration, Instant};
 pub enum TraceZeroMembershipEncoding {
     /// Add ordinate witnesses, original curve rows and both membership bits.
     ExplicitPoints,
+    /// Classical x-only full-membership test with inverse witnesses.
+    ExplicitKummerInverse,
     /// Every allowed x is obtained from a validated full-kernel base point.
     /// Its two affine lifts differ by negation, so both lie in the kernel.
     /// Keep the finite x domain and replay actual supplied base lifts.
@@ -230,6 +232,19 @@ pub fn decompose_full_trace_zero_with_encoding(
                 Ok(n) => report.full_membership_equations = n,
                 Err(_) => {
                     report.reason = Some("full trace-zero model or variable cap");
+                    return report;
+                }
+            }
+        }
+        if encoding == TraceZeroMembershipEncoding::ExplicitKummerInverse {
+            match enc.constrain_kummer_trace_zero_summands(
+                variety,
+                limits.max_variables,
+                limits.max_polynomial_terms,
+            ) {
+                Ok(n) => report.full_membership_equations = n,
+                Err(_) => {
+                    report.reason = Some("Kummer inverse model or variable cap");
                     return report;
                 }
             }

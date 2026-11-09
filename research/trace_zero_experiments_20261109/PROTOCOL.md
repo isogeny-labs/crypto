@@ -28,6 +28,10 @@ an intermediate to lie in the original factor-base subspace.
 - 16 separate engineering preflight calls, one per arm/field; pilot targets
   are3*base[0]. Record elapsed values only to bound execution, never as an
   isolated timing or algorithm-performance result. Complete before final protocol freeze.
+  Every pilot row must pass independent validity checks; at n7/9 every arm
+  must also return Found with a valid original-group replay. Otherwise stop
+  before primary rows. The600-second outer limit includes preflight, freeze
+  preparation and primary execution; give the primary process only the remaining time.
 
 ## What the result can establish
 

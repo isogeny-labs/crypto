@@ -10,7 +10,10 @@
 use num_bigint::BigUint;
 
 use crate::binary_ecc::{
-    trace_zero::{TraceZeroAffineMode, TraceZeroError, TraceZeroVariety},
+    trace_zero::{
+        TraceZeroAffineMode, TraceZeroError, TraceZeroKummerMode, TraceZeroKummerSystem,
+        TraceZeroVariety,
+    },
     BinaryPoint,
 };
 use crate::binary_ecc::{F2mElement, IrreduciblePoly};
@@ -177,19 +180,21 @@ fn reduced_monomial(degree: usize, irr: &IrreduciblePoly) -> Vec<usize> {
     (0..n).filter(|&bit| bits[bit]).collect()
 }
 
-struct Circuit {
+pub(crate) struct Circuit {
     n: usize,
-    next: u32,
+    pub(crate) next: u32,
     reductions: Vec<Vec<usize>>,
-    square_inputs: Vec<Vec<usize>>,
+    pub(crate) square_inputs: Vec<Vec<usize>>,
     ands: Vec<(u32, u32, u32)>,
-    xors: Vec<(Vec<u32>, bool)>,
-    units: Vec<(u32, bool)>,
+    pub(crate) xors: Vec<(Vec<u32>, bool)>,
+    pub(crate) units: Vec<(u32, bool)>,
     impossible: bool,
+    fold_constants: bool,
+    known: Vec<Option<bool>>,
 }
 
 impl Circuit {
-    fn new(irr: &IrreduciblePoly) -> Self {
+    pub(crate) fn new(irr: &IrreduciblePoly) -> Self {
         let n = irr.degree as usize;
         let reductions: Vec<_> = (0..2 * n - 1)
             .map(|degree| reduced_monomial(degree, irr))
@@ -209,31 +214,86 @@ impl Circuit {
             xors: Vec::new(),
             units: Vec::new(),
             impossible: false,
+            fold_constants: false,
+            known: Vec::new(),
         }
+    }
+
+    fn enable_constant_folding(&mut self) {
+        debug_assert_eq!(self.next, 1);
+        self.fold_constants = true;
+        self.known = vec![None];
+    }
+    fn pin(&mut self, wire: u32, value: bool) {
+        self.units.push((wire, value));
+        if self.fold_constants {
+            if self.known[wire as usize].is_some_and(|old| old != value) {
+                self.impossible = true;
+            }
+            self.known[wire as usize] = Some(value);
+        }
+    }
+    fn xor(&mut self, row: Vec<u32>, rhs: bool) {
+        if self.fold_constants {
+            let mut unknown = std::collections::BTreeSet::new();
+            let mut constant = rhs;
+            for &wire in &row {
+                if let Some(value) = self.known[wire as usize] {
+                    constant ^= value;
+                } else if !unknown.remove(&wire) {
+                    unknown.insert(wire);
+                }
+            }
+            if unknown.is_empty() {
+                if constant {
+                    self.impossible = true;
+                }
+            } else if unknown.len() == 1 {
+                self.pin(*unknown.first().expect("one unknown"), constant);
+            }
+        }
+        self.xors.push((row, rhs));
     }
 
     fn wire(&mut self) -> u32 {
         let wire = self.next;
         self.next += 1;
+        if self.fold_constants {
+            self.known.push(None);
+        }
         wire
     }
 
-    fn block(&mut self) -> Vec<u32> {
+    pub(crate) fn block(&mut self) -> Vec<u32> {
         (0..self.n).map(|_| self.wire()).collect()
     }
 
-    fn equal(&mut self, left: &[u32], right: &[u32]) {
+    pub(crate) fn equal(&mut self, left: &[u32], right: &[u32]) {
         for (&a, &b) in left.iter().zip(right) {
-            self.xors.push((vec![a, b], false));
+            self.xor(vec![a, b], false);
         }
     }
 
-    fn product(&mut self, left: &[u32], right: &[u32]) -> Vec<u32> {
+    pub(crate) fn product(&mut self, left: &[u32], right: &[u32]) -> Vec<u32> {
         let mut rows = vec![Vec::new(); self.n];
         for (i, &a) in left.iter().enumerate() {
             for (j, &b) in right.iter().enumerate() {
-                let gate = self.wire();
-                self.ands.push((gate, a, b));
+                let gate = if self.fold_constants {
+                    match (self.known[a as usize], self.known[b as usize]) {
+                        (Some(false), _) | (_, Some(false)) => continue,
+                        (Some(true), _) => b,
+                        (_, Some(true)) => a,
+                        _ => {
+                            let gate = self.wire();
+                            self.ands.push((gate, a, b));
+                            gate
+                        }
+                    }
+                } else {
+                    let gate = self.wire();
+                    self.ands.push((gate, a, b));
+                    gate
+                };
                 for &output in &self.reductions[i + j] {
                     rows[output].push(gate);
                 }
@@ -242,7 +302,7 @@ impl Circuit {
         let output = self.block();
         for (bit, mut row) in rows.into_iter().enumerate() {
             row.push(output[bit]);
-            self.xors.push((row, false));
+            self.xor(row, false);
         }
         output
     }
@@ -250,7 +310,7 @@ impl Circuit {
     fn s3(&mut self, x: &[u32], y: &[u32], z: &[u32], b: &F2mElement) {
         let sum = self.block();
         for bit in 0..self.n {
-            self.xors.push((vec![sum[bit], x[bit], y[bit]], false));
+            self.xor(vec![sum[bit], x[bit], y[bit]], false);
         }
         let xy = self.product(x, y);
         let sum_z = self.product(&sum, z);
@@ -261,11 +321,11 @@ impl Circuit {
             for &input in &self.square_inputs[output] {
                 row.extend([xy[input], sum_z[input]]);
             }
-            self.xors.push((row, b_bits.bit(output as u64)));
+            self.xor(row, b_bits.bit(output as u64));
         }
     }
 
-    fn finish(self) -> Solver {
+    pub(crate) fn finish(self) -> Solver {
         let mut solver = Solver::new(self.next - 1);
         for (gate, left, right) in self.ands {
             let (gate, left, right) = (gate as Lit, left as Lit, right as Lit);
@@ -308,6 +368,8 @@ pub struct ChainedS3Encoding {
     all_summands_ordered: bool,
     full_trace_zero: Option<(TraceZeroVariety, Vec<Vec<u32>>)>,
     intermediate_trace_enforced: bool,
+    kummer_trace_zero: Option<(TraceZeroVariety, Vec<Vec<u32>>)>,
+    subspace_kummer: Option<(TraceZeroKummerSystem, Vec<Vec<u32>>)>,
 }
 
 impl ChainedS3Encoding {
@@ -318,6 +380,172 @@ impl ChainedS3Encoding {
         target_x: Option<&F2mElement>,
         identity_mask: u32,
         max_variables: u32,
+    ) -> Result<Self, ChainBuildError> {
+        Self::build_internal(
+            m,
+            irr,
+            b,
+            target_x,
+            identity_mask,
+            max_variables,
+            None,
+            false,
+        )
+    }
+
+    /// Constant field multiplication is linear. Specialize only the
+    /// already fixed target while preserving the original build default.
+    pub fn build_with_target_constants(
+        m: usize,
+        irr: &IrreduciblePoly,
+        b: &F2mElement,
+        target_x: Option<&F2mElement>,
+        identity_mask: u32,
+        max_variables: u32,
+    ) -> Result<Self, ChainBuildError> {
+        Self::build_internal(
+            m,
+            irr,
+            b,
+            target_x,
+            identity_mask,
+            max_variables,
+            None,
+            true,
+        )
+    }
+
+    /// Compile constants shared by every allowed summand code, then attach
+    /// the exact same complete finite domain. No code or sign is discarded.
+    /// Allocation retains the old conservative preflight bound.
+    pub fn build_for_domain(
+        m: usize,
+        irr: &IrreduciblePoly,
+        b: &F2mElement,
+        target_x: Option<&F2mElement>,
+        identity_mask: u32,
+        max_variables: u32,
+        codes: &[BigUint],
+        max_domain_clauses: usize,
+    ) -> Result<Self, ChainBuildError> {
+        if codes.is_empty() || codes.iter().any(|x| x.bits() > irr.degree as u64) {
+            return Err(ChainBuildError::Unsupported);
+        }
+        let required =
+            finite_domain_clause_count(codes, irr.degree, m).ok_or(ChainBuildError::Unsupported)?;
+        if required > max_domain_clauses {
+            return Err(ChainBuildError::DomainClauseCap {
+                required,
+                maximum: max_domain_clauses,
+            });
+        }
+        let common = shared_root_bits(irr.degree, codes);
+        let mut enc = Self::build_internal(
+            m,
+            irr,
+            b,
+            target_x,
+            identity_mask,
+            max_variables,
+            Some(&common),
+            true,
+        )?;
+        enc.constrain_summands(codes, max_domain_clauses)?;
+        Ok(enc)
+    }
+
+    /// Algebraic full-kernel domain, without enumerating its finite points.
+    /// Shared zero bits specialize field products; linear basis rows and
+    /// the compact inverse model constrain exactly x in V intersect x(T_n).
+    pub fn build_for_trace_zero_subspace(
+        m: usize,
+        variety: &TraceZeroVariety,
+        basis: &[F2mElement],
+        target: &BinaryPoint,
+        identity_mask: u32,
+        max_variables: u32,
+        max_terms: usize,
+    ) -> Result<Self, TraceZeroError> {
+        if !variety.contains(target) {
+            return Err(TraceZeroError::NotTraceZero);
+        }
+        let curve = variety.curve();
+        let model =
+            variety.kummer_system_over_subspace(basis, TraceZeroKummerMode::Compact, max_terms)?;
+        let base = chain_s3_max_variables(curve.m, m).ok_or(TraceZeroError::UnsupportedCurve)?;
+        let extra = (model.variables as u64 + model.auxiliary_variables() as u64) * m as u64;
+        let required = base + extra;
+        if required > max_variables as u64 || required > i32::MAX as u64 {
+            return Err(TraceZeroError::VariableCap {
+                required,
+                maximum: max_variables,
+            });
+        }
+        let common: Vec<_> = (0..curve.m)
+            .map(|bit| {
+                basis
+                    .iter()
+                    .all(|b| !b.to_biguint().bit(bit as u64))
+                    .then_some(false)
+            })
+            .collect();
+        let tx = match target {
+            BinaryPoint::Infinity => None,
+            BinaryPoint::Affine { x, .. } => Some(x),
+        };
+        let mut enc = Self::build_internal(
+            m,
+            &curve.irreducible,
+            &curve.b,
+            tx,
+            identity_mask,
+            max_variables,
+            Some(&common),
+            true,
+        )
+        .map_err(|e| match e {
+            ChainBuildError::VariableCap { required, maximum } => {
+                TraceZeroError::VariableCap { required, maximum }
+            }
+            _ => TraceZeroError::UnsupportedCurve,
+        })?;
+        let mut mappings = Vec::new();
+        for i in 0..m {
+            let wires: Vec<u32> = enc.solver.add_vars(model.variables).collect();
+            for bit in 0..curve.m as usize {
+                let mut row = vec![enc.blocks[i][bit]];
+                row.extend(
+                    basis
+                        .iter()
+                        .enumerate()
+                        .filter_map(|(j, b)| b.to_biguint().bit(bit as u64).then_some(wires[j])),
+                );
+                enc.solver.add_xor(&row, false);
+            }
+            model.append_to_solver(&mut enc.solver, &wires, max_variables)?;
+            mappings.push(wires);
+        }
+        let mut primary = Vec::new();
+        for wires in &mappings {
+            primary.extend_from_slice(&wires[..basis.len()]);
+        }
+        for wires in &mappings {
+            primary.extend_from_slice(&wires[basis.len()..]);
+        }
+        enc.solver.set_branch_priority(&primary);
+        enc.subspace_kummer = Some((model, mappings));
+        Ok(enc)
+    }
+
+    fn build_internal(
+        m: usize,
+        irr: &IrreduciblePoly,
+        b: &F2mElement,
+        target_x: Option<&F2mElement>,
+        identity_mask: u32,
+        max_variables: u32,
+        common: Option<&[Option<bool>]>,
+        fold_constants: bool,
     ) -> Result<Self, ChainBuildError> {
         let n = irr.degree;
         let Some(required) = chain_s3_max_variables(n, m) else {
@@ -344,14 +572,26 @@ impl ChainedS3Encoding {
             return Err(ChainBuildError::Unsupported);
         }
         let mut circuit = Circuit::new(irr);
+        if fold_constants {
+            circuit.enable_constant_folding();
+        }
         let blocks: Vec<Vec<u32>> = (0..2 * m - 1).map(|_| circuit.block()).collect();
         let target = &blocks[2 * m - 2];
         let target_bits = target_x.map(F2mElement::to_biguint);
         for (bit, &wire) in target.iter().enumerate() {
-            circuit.units.push((
+            circuit.pin(
                 wire,
                 target_bits.as_ref().is_some_and(|x| x.bit(bit as u64)),
-            ));
+            );
+        }
+        if let Some(common) = common {
+            for block in &blocks[..m] {
+                for (bit, value) in common.iter().enumerate() {
+                    if let Some(value) = value {
+                        circuit.pin(block[bit], *value);
+                    }
+                }
+            }
         }
 
         let mut n_s3_nodes = 0;
@@ -406,6 +646,8 @@ impl ChainedS3Encoding {
             all_summands_ordered: false,
             full_trace_zero: None,
             intermediate_trace_enforced: false,
+            kummer_trace_zero: None,
+            subspace_kummer: None,
         })
     }
 
@@ -440,6 +682,47 @@ impl ChainedS3Encoding {
         }
         self.intermediate_trace_enforced = true;
         Ok(count)
+    }
+
+    /// Full rational x-image membership with a unique inverse witness;
+    /// no free ordinate sign. This is the classical x-only halving test.
+    pub fn constrain_kummer_trace_zero_summands(
+        &mut self,
+        variety: &TraceZeroVariety,
+        max_variables: u32,
+        max_terms: usize,
+    ) -> Result<usize, TraceZeroError> {
+        let curve = variety.curve();
+        if self.kummer_trace_zero.is_some()
+            || curve.m != self.n
+            || curve.irreducible.degree != self.irr.degree
+            || curve.irreducible.low_terms != self.irr.low_terms
+            || curve.b != self.b
+        {
+            return Err(TraceZeroError::UnsupportedCurve);
+        }
+        let system = variety.kummer_system(TraceZeroKummerMode::Raw, max_terms)?;
+        let required = self.solver.n_vars() as u64
+            + (self.n as u64 + system.auxiliary_variables() as u64) * self.m as u64;
+        if required > max_variables as u64 || required > i32::MAX as u64 {
+            return Err(TraceZeroError::VariableCap {
+                required,
+                maximum: max_variables,
+            });
+        }
+        let mut inverses = Vec::new();
+        for i in 0..self.m {
+            let v: Vec<u32> = self.solver.add_vars(self.n).collect();
+            let mut wires = self.blocks[i].clone();
+            wires.extend(&v);
+            system.append_to_solver(&mut self.solver, &wires, max_variables)?;
+            inverses.push(v);
+        }
+        let mut primary: Vec<_> = self.blocks[..self.m].iter().flatten().copied().collect();
+        primary.extend(inverses.iter().flatten().copied());
+        self.solver.set_branch_priority(&primary);
+        self.kummer_trace_zero = Some((variety.clone(), inverses));
+        Ok(self.m * system.equations.len())
     }
 
     /// Install the full E_0 trace-zero rational-point equations on every
@@ -896,6 +1179,26 @@ impl ChainedS3Encoding {
                 }
             }
         }
+        if let Some((variety, inverses)) = &self.kummer_trace_zero {
+            for i in 0..self.m {
+                let x = self.decode_block(&self.blocks[i], model);
+                let v = self.decode_block(&inverses[i], model);
+                if x.mul(&v, &self.irr) != F2mElement::one(self.n) || !variety.kummer_contains_x(&x)
+                {
+                    return false;
+                }
+            }
+        }
+        if let Some((system, mappings)) = &self.subspace_kummer {
+            for (i, wires) in mappings.iter().enumerate() {
+                let bits: Vec<_> = wires.iter().map(|&w| model[w as usize - 1]).collect();
+                if system.decode_x(&bits).ok().as_ref()
+                    != Some(&self.decode_block(&self.blocks[i], model))
+                {
+                    return false;
+                }
+            }
+        }
         let values: Vec<_> = self
             .blocks
             .iter()
@@ -1087,7 +1390,12 @@ fn add_lex_leq(solver: &mut Solver, a: &[u32], b: &[u32]) {
     }
 }
 
-fn add_coordinate_domain(solver: &mut Solver, block: &[u32], codes: &[BigUint], bit: usize) {
+pub(crate) fn add_coordinate_domain(
+    solver: &mut Solver,
+    block: &[u32],
+    codes: &[BigUint],
+    bit: usize,
+) {
     fn visit(
         solver: &mut Solver,
         block: &[u32],

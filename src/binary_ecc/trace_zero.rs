@@ -50,6 +50,12 @@ pub enum TraceZeroAffineMode {
     Factored,
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum TraceZeroKummerMode {
+    Raw,
+    Compact,
+}
+
 /// Canonical squarefree Boolean ANF. Variable identifiers are zero-based.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct TraceZeroPolynomial {
@@ -346,6 +352,55 @@ impl TraceZeroVariety {
     pub fn curve(&self) -> &BinaryCurve {
         &self.curve
     }
+
+    /// X-only full-kernel membership. The inverse trace supplies rational
+    /// curve lifting, and the final bit is the classical second-halving
+    /// criterion Tr(x H(1/x^2))=0 (US7257709; no novelty claimed).
+    pub fn kummer_contains_x(&self, x: &F2mElement) -> bool {
+        if x.m_value() != self.curve.m || x.is_zero() || x.trace(&self.curve.irreducible) != 0 {
+            return false;
+        }
+        let Some(v) = x.flt_inverse(&self.curve.irreducible) else {
+            return false;
+        };
+        v.trace(&self.curve.irreducible) == 0
+            && x.mul(
+                &v.square(&self.curve.irreducible)
+                    .half_trace(&self.curve.irreducible)
+                    .expect("odd degree"),
+                &self.curve.irreducible,
+            )
+            .trace(&self.curve.irreducible)
+                == 0
+    }
+
+    /// Recover either actual point from a finite Kummer coordinate, then
+    /// check original curve/full membership. Infinity is a separate branch.
+    pub fn lift_kummer_x(
+        &self,
+        x: &F2mElement,
+        negative: bool,
+    ) -> Result<BinaryPoint, TraceZeroError> {
+        if !self.kummer_contains_x(x) {
+            return Err(TraceZeroError::NotTraceZero);
+        }
+        let v = x
+            .flt_inverse(&self.curve.irreducible)
+            .ok_or(TraceZeroError::InvalidCoordinates)?;
+        let rhs = x.add(&v.square(&self.curve.irreducible));
+        let mut y = x.mul(
+            &rhs.half_trace(&self.curve.irreducible).expect("odd degree"),
+            &self.curve.irreducible,
+        );
+        if negative {
+            y = y.add(x);
+        }
+        let p = BinaryPoint::Affine { x: x.clone(), y };
+        if !self.contains(&p) {
+            return Err(TraceZeroError::NotTraceZero);
+        }
+        Ok(p)
+    }
     pub fn dimension(&self) -> u32 {
         self.curve.m - 1
     }
@@ -482,6 +537,24 @@ impl TraceZeroVariety {
             },
         };
         Ok(point_add(&self.curve, &fp, &point_neg(p)))
+    }
+    /// Inverse of tau-1 on T_n only. Since tau^2+tau+2=0 on E_0,
+    /// (tau-1)(-tau-2)=[4]; multiplication by4 is invertible on T_n.
+    /// This preserves relation existence after transporting base and target;
+    /// it does not assert that the transported base has simpler equations.
+    pub fn inverse_cofactor_image(&self, p: &BinaryPoint) -> Result<BinaryPoint, TraceZeroError> {
+        if !self.contains(p) {
+            return Err(TraceZeroError::NotTraceZero);
+        }
+        // -tau(P)-2P = -(tau(P)-P)-3P.
+        let delta = self.cofactor_image(p)?;
+        let three = scalar_mul(&self.curve, p, &BigUint::from(3u32));
+        let conjugate = point_neg(&point_add(&self.curve, &delta, &three));
+        let mut numerator = BigUint::one();
+        while (&numerator % 4u32) != BigUint::zero() {
+            numerator += &self.order;
+        }
+        Ok(scalar_mul(&self.curve, &conjugate, &(numerator / 4u32)))
     }
     fn q_value(&self, x: &F2mElement) -> bool {
         x.mul(
@@ -825,6 +898,218 @@ pub struct TraceZeroAffineSystem {
     y: Vec<TraceZeroPolynomial>,
     x_basis: Option<Vec<F2mElement>>,
 }
+
+impl TraceZeroVariety {
+    pub fn kummer_system(
+        &self,
+        mode: TraceZeroKummerMode,
+        max_terms: usize,
+    ) -> Result<TraceZeroKummerSystem, TraceZeroError> {
+        self.kummer_system_inner(None, mode, max_terms)
+    }
+    pub fn kummer_system_over_subspace(
+        &self,
+        basis: &[F2mElement],
+        mode: TraceZeroKummerMode,
+        max_terms: usize,
+    ) -> Result<TraceZeroKummerSystem, TraceZeroError> {
+        self.kummer_system_inner(Some(basis), mode, max_terms)
+    }
+    fn kummer_system_inner(
+        &self,
+        basis: Option<&[F2mElement]>,
+        mode: TraceZeroKummerMode,
+        cap: usize,
+    ) -> Result<TraceZeroKummerSystem, TraceZeroError> {
+        if cap == 0 {
+            return Err(TraceZeroError::TermCap);
+        }
+        let n = self.curve.m as usize;
+        let compact = mode == TraceZeroKummerMode::Compact;
+        let x_variables = basis.map_or(n - usize::from(compact), |b| b.len());
+        let mut x = if let Some(b) = basis {
+            self.subspace_x(b, cap)?
+        } else {
+            vec![TraceZeroPolynomial::default(); n]
+        };
+        if basis.is_none() {
+            for i in usize::from(compact)..n {
+                x[i] = TraceZeroPolynomial::variable((i - usize::from(compact)) as u32);
+                if compact && self.trace_bits[i] {
+                    let xi = x[i].clone();
+                    x[0].xor(&xi, cap)?;
+                }
+            }
+        }
+        let mut v = vec![TraceZeroPolynomial::default(); n];
+        for i in usize::from(compact)..n {
+            v[i] = TraceZeroPolynomial::variable((x_variables + i - usize::from(compact)) as u32);
+            if compact && self.trace_bits[i] {
+                let vi = v[i].clone();
+                v[0].xor(&vi, cap)?;
+            }
+        }
+        let mut equations = self.multiply(&x, &v, cap)?;
+        equations[0].xor(&TraceZeroPolynomial::one(), cap)?;
+        if !compact {
+            if basis.is_none() {
+                let mut tx = TraceZeroPolynomial::default();
+                for i in 0..n {
+                    if self.trace_bits[i] {
+                        tx.xor(&x[i], cap)?;
+                    }
+                }
+                equations.push(tx);
+            }
+            let mut tv = TraceZeroPolynomial::default();
+            for i in 0..n {
+                if self.trace_bits[i] {
+                    tv.xor(&v[i], cap)?;
+                }
+            }
+            equations.push(tv);
+        }
+        // Expand Tr(x H(v^2)) directly as a bilinear matrix, sharing
+        // x_i v_j monomials with the inverse equations.
+        let field_basis: Vec<_> = (0..n)
+            .map(|i| F2mElement::from_bit_positions(&[i as u32], self.curve.m))
+            .collect();
+        let half_squared: Vec<_> = field_basis
+            .iter()
+            .map(|b| {
+                b.square(&self.curve.irreducible)
+                    .half_trace(&self.curve.irreducible)
+                    .expect("odd degree")
+            })
+            .collect();
+        let mut character = TraceZeroPolynomial::default();
+        for i in 0..n {
+            for j in 0..n {
+                if field_basis[i]
+                    .mul(&half_squared[j], &self.curve.irreducible)
+                    .trace(&self.curve.irreducible)
+                    != 0
+                {
+                    character.xor(&x[i].product(&v[j], cap)?, cap)?;
+                }
+            }
+        }
+        equations.push(character);
+        if equations.iter().map(|p| p.terms.len()).sum::<usize>() > cap {
+            return Err(TraceZeroError::TermCap);
+        }
+        Ok(TraceZeroKummerSystem {
+            variables: (x_variables + n - usize::from(compact)) as u32,
+            equations,
+            mode,
+            variety: self.clone(),
+            x,
+            v,
+            x_basis: basis.map(<[_]>::to_vec),
+        })
+    }
+}
+
+/// Boolean equations for the image of T_n's rational affine points under x.
+/// This is not a claim about all rational points of a geometric quotient.
+/// Each accepted x has one inverse witness and two actual point lifts.
+#[derive(Clone)]
+pub struct TraceZeroKummerSystem {
+    pub variables: u32,
+    pub equations: Vec<TraceZeroPolynomial>,
+    pub mode: TraceZeroKummerMode,
+    variety: TraceZeroVariety,
+    x: Vec<TraceZeroPolynomial>,
+    v: Vec<TraceZeroPolynomial>,
+    x_basis: Option<Vec<F2mElement>>,
+}
+impl TraceZeroKummerSystem {
+    pub fn maximum_degree(&self) -> usize {
+        self.equations
+            .iter()
+            .map(TraceZeroPolynomial::degree)
+            .max()
+            .unwrap_or(0)
+    }
+    pub fn monomials(&self) -> usize {
+        self.equations.iter().map(|p| p.terms.len()).sum()
+    }
+    pub fn auxiliary_variables(&self) -> usize {
+        TraceZeroAffineSystem::equation_keys(&self.equations).len()
+    }
+    pub fn accepts(&self, bits: &[bool]) -> bool {
+        bits.len() == self.variables as usize
+            && self
+                .equations
+                .iter()
+                .all(|p| p.evaluate(bits) == Some(false))
+    }
+    pub fn assignment(&self, x: &F2mElement) -> Result<Vec<bool>, TraceZeroError> {
+        if !self.variety.kummer_contains_x(x) {
+            return Err(TraceZeroError::NotTraceZero);
+        }
+        let n = self.variety.curve.m;
+        let compact = self.mode == TraceZeroKummerMode::Compact;
+        let inverse = x
+            .flt_inverse(&self.variety.curve.irreducible)
+            .ok_or(TraceZeroError::InvalidCoordinates)?
+            .to_biguint();
+        let mut bits = Vec::new();
+        if let Some(basis) = &self.x_basis {
+            let u = basis_coordinates(basis, x, n)?;
+            for i in 0..basis.len() {
+                bits.push(u.bit(i as u64));
+            }
+        } else {
+            let raw = x.to_biguint();
+            for i in u32::from(compact)..n {
+                bits.push(raw.bit(i as u64));
+            }
+        }
+        for i in u32::from(compact)..n {
+            bits.push(inverse.bit(i as u64));
+        }
+        Ok(bits)
+    }
+    fn value(&self, p: &[TraceZeroPolynomial], bits: &[bool]) -> F2mElement {
+        let positions: Vec<_> = p
+            .iter()
+            .enumerate()
+            .filter_map(|(i, p)| (p.evaluate(bits) == Some(true)).then_some(i as u32))
+            .collect();
+        F2mElement::from_bit_positions(&positions, self.variety.curve.m)
+    }
+    pub fn decode_x(&self, bits: &[bool]) -> Result<F2mElement, TraceZeroError> {
+        if !self.accepts(bits) {
+            return Err(TraceZeroError::InvalidCoordinates);
+        }
+        let x = self.value(&self.x, bits);
+        let v = self.value(&self.v, bits);
+        if x.mul(&v, &self.variety.curve.irreducible) != F2mElement::one(self.variety.curve.m)
+            || !self.variety.kummer_contains_x(&x)
+        {
+            return Err(TraceZeroError::NotTraceZero);
+        }
+        Ok(x)
+    }
+    pub fn lift(&self, bits: &[bool], negative: bool) -> Result<BinaryPoint, TraceZeroError> {
+        self.variety.lift_kummer_x(&self.decode_x(bits)?, negative)
+    }
+    pub fn append_to_solver(
+        &self,
+        solver: &mut Solver,
+        wires: &[u32],
+        maximum: u32,
+    ) -> Result<(), TraceZeroError> {
+        TraceZeroAffineSystem::append_equations(
+            self.variables,
+            &self.equations,
+            solver,
+            wires,
+            maximum,
+        )
+    }
+}
 impl TraceZeroAffineSystem {
     /// Some for a subspace-restricted model; x variables are coefficients
     /// in this exact ordered basis, not raw polynomial-coordinate bits.
@@ -923,8 +1208,11 @@ impl TraceZeroAffineSystem {
         Ok(p)
     }
     fn auxiliary_keys(&self) -> BTreeSet<Vec<u32>> {
+        Self::equation_keys(&self.equations)
+    }
+    fn equation_keys(equations: &[TraceZeroPolynomial]) -> BTreeSet<Vec<u32>> {
         let mut keys = BTreeSet::new();
-        for p in &self.equations {
+        for p in equations {
             for m in &p.terms {
                 for len in 2..=m.len() {
                     keys.insert(m[..len].to_vec());
@@ -943,13 +1231,22 @@ impl TraceZeroAffineSystem {
         wires: &[u32],
         maximum: u32,
     ) -> Result<(), TraceZeroError> {
-        if wires.len() != self.variables as usize
+        Self::append_equations(self.variables, &self.equations, solver, wires, maximum)
+    }
+    fn append_equations(
+        variables: u32,
+        equations: &[TraceZeroPolynomial],
+        solver: &mut Solver,
+        wires: &[u32],
+        maximum: u32,
+    ) -> Result<(), TraceZeroError> {
+        if wires.len() != variables as usize
             || wires.iter().any(|&w| w == 0 || w > solver.n_vars())
             || wires.iter().copied().collect::<BTreeSet<_>>().len() != wires.len()
         {
             return Err(TraceZeroError::InvalidCoordinates);
         }
-        let keys = self.auxiliary_keys();
+        let keys = Self::equation_keys(equations);
         let required = u64::from(solver.n_vars()) + keys.len() as u64;
         if required > u64::from(maximum) || required > i32::MAX as u64 {
             return Err(TraceZeroError::VariableCap { required, maximum });
@@ -968,7 +1265,7 @@ impl TraceZeroAffineSystem {
             solver.add_clause(vec![-g, b]);
             solver.add_clause(vec![g, -a, -b]);
         }
-        for p in &self.equations {
+        for p in equations {
             let mut row = Vec::new();
             let mut rhs = false;
             for m in &p.terms {

@@ -8,5 +8,9 @@ pub mod group_op_count;
 pub mod identity_certificate;
 #[path = "../../../../../src/cryptanalysis/sat.rs"]
 pub mod sat;
+#[path = "../../../../../src/cryptanalysis/trace_zero_point_chain.rs"]
+pub mod trace_zero_point_chain;
 #[path = "../../../../../src/cryptanalysis/trace_zero_relations.rs"]
 pub mod trace_zero_relations;
+#[path = "../../../../../src/cryptanalysis/trace_zero_subspace_relations.rs"]
+pub mod trace_zero_subspace_relations;

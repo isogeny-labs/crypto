@@ -487,6 +487,6 @@
       "checks/checkpoint-access.txt",
       "checks/workflow-read.json"
     ],
-    "preflight": "16 separate engineering calls, one per arm/n; target3*base[0], no primary comparison inference; complete before freezing final runtime metadata."
+    "preflight": "16 separate engineering calls, one per arm/n; target3*base[0], no primary comparison inference; all rows must be independently valid and n7/9 all arms must return Found with original-group replay, otherwise stop before primary rows. Complete before freezing final runtime metadata. The600-second outer cap includes pilot, freeze preparation and primary execution."
   }
 }
