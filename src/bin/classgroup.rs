@@ -114,6 +114,7 @@ fn main() {
             Some("hnf") => LinAlg::Hnf,
             _ => LinAlg::DetGcd,
         },
+        checkpoint: opts.get("checkpoint").map(std::path::PathBuf::from),
     };
     let euler_bound: u64 = opts
         .get("euler-bound")

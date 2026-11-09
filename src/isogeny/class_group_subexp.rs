@@ -320,6 +320,11 @@ pub struct SieveParams {
     pub seed: u64,
     /// How the lattice index is computed from the dense matrix.
     pub linalg: LinAlg,
+    /// Resume file: the relation pool after each sieving round, and (beside it,
+    /// with extension `det`) the determinant of every finished subset. A restart
+    /// continues from them; a checkpoint of another discriminant, bound or
+    /// matrix is ignored.
+    pub checkpoint: Option<std::path::PathBuf>,
 }
 
 /// Linear-algebra back end for the lattice index `[Z^k : L]`.
@@ -345,6 +350,7 @@ impl Default for SieveParams {
             threads: 4,
             seed: 1,
             linalg: LinAlg::DetGcd,
+            checkpoint: None,
         }
     }
 }
@@ -922,6 +928,146 @@ pub fn hnf_diagonal(rows: &[Vec<BigInt>]) -> Option<Vec<BigInt>> {
 }
 
 // ---------------------------------------------------------------------------
+// Checkpoints
+// ---------------------------------------------------------------------------
+
+/// The data a resumed run needs from the sieving phase.
+pub struct PoolCheckpoint {
+    pub pool: Vec<Relation>,
+    pub products: u64,
+    pub excess: usize,
+    pub seed: u64,
+}
+
+fn checkpoint_header(d: &BigInt, bound: u64, n: usize) -> String {
+    format!("# class_group_subexp pool v1 D={d} bound={bound} n={n}")
+}
+
+/// Write the relation pool atomically (temporary file, then rename).
+pub fn save_pool(
+    path: &std::path::Path,
+    d: &BigInt,
+    bound: u64,
+    n: usize,
+    ck: &PoolCheckpoint,
+) -> std::io::Result<()> {
+    use std::io::Write;
+    let tmp = path.with_extension("tmp");
+    {
+        let mut f = std::io::BufWriter::new(std::fs::File::create(&tmp)?);
+        writeln!(f, "{}", checkpoint_header(d, bound, n))?;
+        writeln!(f, "products {}", ck.products)?;
+        writeln!(f, "params {} {}", ck.excess, ck.seed)?;
+        for r in &ck.pool {
+            let line: Vec<String> = r.entries.iter().map(|(c, v)| format!("{c}:{v}")).collect();
+            writeln!(f, "R {}", line.join(" "))?;
+        }
+        f.flush()?;
+    }
+    std::fs::rename(tmp, path)
+}
+
+/// Read a pool checkpoint; `None` if absent or written for another problem.
+pub fn load_pool(
+    path: &std::path::Path,
+    d: &BigInt,
+    bound: u64,
+    n: usize,
+) -> Option<PoolCheckpoint> {
+    let text = std::fs::read_to_string(path).ok()?;
+    let mut lines = text.lines();
+    if lines.next()? != checkpoint_header(d, bound, n) {
+        return None;
+    }
+    let products: u64 = lines.next()?.strip_prefix("products ")?.parse().ok()?;
+    let mut it = lines.next()?.strip_prefix("params ")?.split(' ');
+    let excess: usize = it.next()?.parse().ok()?;
+    let seed: u64 = it.next()?.parse().ok()?;
+    let mut pool = Vec::new();
+    for line in lines {
+        let body = line.strip_prefix("R ")?;
+        let mut entries = Vec::new();
+        for tok in body.split(' ').filter(|t| !t.is_empty()) {
+            let (c, v) = tok.split_once(':')?;
+            let c: u32 = c.parse().ok()?;
+            if c as usize >= n {
+                return None;
+            }
+            entries.push((c, v.parse().ok()?));
+        }
+        pool.push(Relation { entries });
+    }
+    Some(PoolCheckpoint {
+        pool,
+        products,
+        excess,
+        seed,
+    })
+}
+
+/// Checksum of a dense matrix (shape and entries, mod 2^61 − 1).
+fn matrix_checksum(rows: &[Vec<BigInt>]) -> u64 {
+    let p = BigInt::from(P61);
+    let mut acc = 0u64;
+    for (i, r) in rows.iter().enumerate() {
+        for (j, x) in r.iter().enumerate() {
+            if x.is_zero() {
+                continue;
+            }
+            let v = x.mod_floor(&p).to_u64().unwrap_or(0);
+            let w = ((i as u64 + 1).wrapping_mul(0x9E37_79B9) ^ (j as u64 + 1)) % P61;
+            acc = (acc + mul_mod(v, w, P61)) % P61;
+        }
+    }
+    acc ^ ((rows.len() as u64) << 40) ^ (rows.first().map_or(0, |r| r.len()) as u64)
+}
+
+fn det_file_header(rows: &[Vec<BigInt>]) -> String {
+    format!(
+        "# class_group_subexp det v1 rows={} k={} sum={}",
+        rows.len(),
+        rows.first().map_or(0, |r| r.len()),
+        matrix_checksum(rows)
+    )
+}
+
+/// Determinants of finished subsets, by subset index; empty if the file is absent
+/// or belongs to another matrix.
+fn load_dets(path: &std::path::Path, header: &str) -> BTreeMap<usize, BigInt> {
+    let mut out = BTreeMap::new();
+    let Ok(text) = std::fs::read_to_string(path) else {
+        return out;
+    };
+    let mut lines = text.lines();
+    if lines.next() != Some(header) {
+        return out;
+    }
+    for line in lines {
+        if let Some((i, v)) = line.split_once(' ') {
+            if let (Ok(i), Some(v)) = (i.parse::<usize>(), BigInt::parse_bytes(v.as_bytes(), 10)) {
+                out.insert(i, v);
+            }
+        }
+    }
+    out
+}
+
+fn append_det(path: &std::path::Path, header: &str, fresh: bool, i: usize, v: &BigInt) {
+    use std::io::Write;
+    let open = if fresh {
+        std::fs::File::create(path)
+    } else {
+        std::fs::OpenOptions::new().append(true).open(path)
+    };
+    if let Ok(mut f) = open {
+        if fresh {
+            let _ = writeln!(f, "{header}");
+        }
+        let _ = writeln!(f, "{i} {v}");
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Index by modular determinants
 // ---------------------------------------------------------------------------
 
@@ -1174,6 +1320,7 @@ pub fn index_by_det_gcd(
     subsets: usize,
     threads: usize,
     seed: u64,
+    checkpoint: Option<&std::path::Path>,
 ) -> Option<BigInt> {
     let k = rows.first().map_or(0, |r| r.len());
     if k == 0 {
@@ -1186,7 +1333,13 @@ pub fn index_by_det_gcd(
     let mat = matrix_mod(rows, &md);
     let mut rng = Rng::new(seed);
     let mut g: Option<BigInt> = None;
+    let header = det_file_header(rows);
+    let done: BTreeMap<usize, BigInt> =
+        checkpoint.map_or_else(BTreeMap::new, |p| load_dets(p, &header));
+    let mut fresh = done.is_empty();
     for s in 0..subsets {
+        // the row order is generated before the checkpoint is consulted, so the
+        // random stream of later subsets does not depend on which were skipped
         let mut order: Vec<usize> = (0..rows.len()).collect();
         match s {
             0 => {}
@@ -1197,6 +1350,14 @@ pub fn index_by_det_gcd(
                     order.swap(i, j);
                 }
             }
+        }
+        if let Some(d) = done.get(&s) {
+            eprintln!("[class_group_subexp]   subset {s}: determinant restored from checkpoint");
+            g = Some(match g {
+                None => d.clone(),
+                Some(acc) => acc.gcd(d),
+            });
+            continue;
         }
         let t_sel = std::time::Instant::now();
         let Some(subset) = independent_subset(&mat, k, &order, &md) else {
@@ -1213,6 +1374,10 @@ pub fn index_by_det_gcd(
         );
         if d.is_zero() {
             continue;
+        }
+        if let Some(path) = checkpoint {
+            append_det(path, &header, fresh, s, &d);
+            fresh = false;
         }
         g = Some(match g {
             None => d,
@@ -1669,14 +1834,43 @@ pub fn compute(
     let mut products = 0u64;
     let mut params = params.clone();
     // relations from one sieved product are correlated (they share the product's
-    // exponent vector), so a plain n + 64 is often an index-2 sublattice; one
-    // fifth of n extra rows has closed the lattice at the first round in tests
+    // exponent vector), so a plain n + 64 is often an index-2 sublattice; three
+    // tenths of n extra rows closes the lattice at the first round at 45-50 digits
     params.excess = params.excess.max(n * 3 / 10);
     let mut last: Option<(BigInt, Dense)> = None;
+    let mut resumed = false;
+    if let Some(path) = &params.checkpoint {
+        if let Some(ck) = load_pool(path, d, bound, n) {
+            eprintln!(
+                "[class_group_subexp] resumed {} relations from {} ({} products)",
+                ck.pool.len(),
+                path.display(),
+                ck.products
+            );
+            pool = ck.pool;
+            products = ck.products;
+            params.excess = params.excess.max(ck.excess);
+            params.seed = ck.seed;
+            resumed = true;
+        }
+    }
     for round in 0..max_rounds {
-        let (rels, prods) = collect_relations(&fb, &params);
-        products += prods;
-        pool.extend(rels);
+        if !(resumed && round == 0) {
+            let (rels, prods) = collect_relations(&fb, &params);
+            products += prods;
+            pool.extend(rels);
+            if let Some(path) = &params.checkpoint {
+                let ck = PoolCheckpoint {
+                    pool: pool.clone(),
+                    products,
+                    excess: params.excess,
+                    seed: params.seed,
+                };
+                if let Err(e) = save_pool(path, d, bound, n, &ck) {
+                    eprintln!("[class_group_subexp] checkpoint not written: {e}");
+                }
+            }
+        }
         // the Hermite form costs rows × k²: keep one covering relation per
         // column first, then fill up to the target; the rest stays in the pool
         relations = select_covering(&pool, n, n + params.excess);
@@ -1702,9 +1896,17 @@ pub fn compute(
             match params.linalg {
                 LinAlg::Hnf => hnf_diagonal(&dense.rows)
                     .map(|diag| diag.iter().fold(BigInt::one(), |acc, g| acc * g)),
-                LinAlg::DetGcd => {
-                    index_by_det_gcd(&dense.rows, 4, params.threads, params.seed ^ 0x5eed)
-                }
+                LinAlg::DetGcd => index_by_det_gcd(
+                    &dense.rows,
+                    4,
+                    params.threads,
+                    params.seed ^ 0x5eed,
+                    params
+                        .checkpoint
+                        .as_ref()
+                        .map(|p| p.with_extension("det"))
+                        .as_deref(),
+                ),
             }
         };
         let Some(index) = index_opt else {
@@ -1763,6 +1965,7 @@ mod tests {
             threads: 2,
             seed: 7,
             linalg: LinAlg::Hnf,
+            checkpoint: None,
         };
         let (report, _, _) = compute(&d, bound, &params, 0.5, 6, 20_000).expect("converges");
         report.lattice_index
@@ -1801,7 +2004,7 @@ mod tests {
         .into_iter()
         .map(|r| r.into_iter().map(BigInt::from).collect())
         .collect();
-        let idx = index_by_det_gcd(&rows, 6, 2, 3).expect("full rank");
+        let idx = index_by_det_gcd(&rows, 6, 2, 3, None).expect("full rank");
         let diag = hnf_diagonal(&rows).expect("full rank");
         let hnf_index = diag.iter().fold(BigInt::one(), |acc, g| acc * g);
         assert_eq!(idx, hnf_index);
@@ -1845,6 +2048,7 @@ mod tests {
                 threads: 2,
                 seed: 5,
                 linalg: LinAlg::DetGcd,
+                checkpoint: None,
             };
             let (report, fb, _) =
                 compute(&d_big, bound, &params, 0.5, 6, 20_000).expect("converges");
@@ -1875,6 +2079,7 @@ mod tests {
             threads: 2,
             seed: 5,
             linalg: LinAlg::DetGcd,
+            checkpoint: None,
         };
         let (report, fb, _) = compute(&d, 400, &params, 0.5, 6, 20_000).unwrap();
         let hb = report.lattice_index.magnitude().clone();
@@ -1907,6 +2112,40 @@ mod tests {
     }
 
     #[test]
+    fn checkpoint_resume_gives_the_same_class_number() {
+        let d = BigInt::from(-1_000_003i64);
+        let dir = std::env::temp_dir().join(format!("cgs_ckpt_{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let path = dir.join("pool.ckpt");
+        let mut params = SieveParams {
+            half_length: 64,
+            support: 3,
+            slack_bits: 10,
+            excess: 16,
+            threads: 2,
+            seed: 9,
+            linalg: LinAlg::DetGcd,
+            checkpoint: Some(path.clone()),
+        };
+        let (first, _, _) = compute(&d, 400, &params, 0.5, 6, 20_000).unwrap();
+        assert!(path.exists(), "pool checkpoint written");
+        assert!(
+            path.with_extension("det").exists(),
+            "determinant checkpoint written"
+        );
+        // a second run resumes from both files and must agree without sieving
+        params.seed = 12345; // ignored: the checkpoint's seed wins
+        let (second, _, _) = compute(&d, 400, &params, 0.5, 6, 20_000).unwrap();
+        assert_eq!(first.lattice_index, second.lattice_index);
+        assert_eq!(first.relations, second.relations);
+        // a checkpoint of another discriminant is ignored
+        let other = BigInt::from(-1_000_020i64);
+        let (third, _, _) = compute(&other, 400, &params, 0.5, 6, 20_000).unwrap();
+        assert_eq!(third.lattice_index, BigInt::from(class_number(&other)));
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
     fn prime_forms_have_the_right_discriminant() {
         let d = BigInt::from(-1_000_020i64); // −4·3·5·7·2381, fundamental
         for fp in factor_base(&d, 200) {
@@ -1928,6 +2167,7 @@ mod tests {
             threads: 2,
             seed: 11,
             linalg: LinAlg::Hnf,
+            checkpoint: None,
         };
         let (report, fb, rels) = compute(&d, 400, &params, 0.5, 6, 20_000).unwrap();
         assert_eq!(report.lattice_index, BigInt::from(h));

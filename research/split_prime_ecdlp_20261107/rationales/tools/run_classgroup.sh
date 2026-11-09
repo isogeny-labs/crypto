@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 # Exact class groups of the P-192 Frobenius fields with the library's native
 # relation method (crypto::isogeny::class_group_subexp, binary `classgroup`).
+# Idempotent and resumable: a label whose result file exists is skipped, and a
+# label interrupted by a container restart resumes from its checkpoint
+# (data/cl/rust_<label>.ckpt for the relation pool, .det for finished
+# determinants). Re-run this script after any restart.
 # Usage: tools/run_classgroup.sh [label ...]   (default: the five P-192 census curves)
-# Output: data/cl/rust_<label>.json, one JSON object each; stderr log beside it.
+# Env: CLASSGROUP_BIN, THREADS (4), SEED (1), BOUND, HALF, SUPPORT.
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$HERE/../../../.." && pwd)"
@@ -13,11 +17,14 @@ mkdir -p "$OUT"
 labels=("$@")
 if [ ${#labels[@]} -eq 0 ]; then labels=(p192-139 p192-2198 p192-5228 p192-5405 p192-6013); fi
 for lab in "${labels[@]}"; do
+  if [ -s "$OUT/rust_${lab}.json" ]; then echo "$lab: done (result exists)"; continue; fi
   line="$(grep -P "^${lab}\t" "$INPUTS")"
   p="$(printf '%s' "$line" | cut -f6)"
   n="$(printf '%s' "$line" | cut -f8)"
+  echo "$lab: starting $(date -u +%FT%TZ)"
   "$BIN" --label "$lab" --p "$p" --n "$n" --threads "${THREADS:-4}" --seed "${SEED:-1}" \
     ${BOUND:+--bound "$BOUND"} ${HALF:+--half-length "$HALF"} ${SUPPORT:+--support "$SUPPORT"} \
-    --sub-bounds 50,163,691,2000 --out "$OUT/rust_${lab}.json" 2> "$OUT/rust_${lab}.log"
-  echo "$lab: $(grep -o '"h_bits": [0-9]*\|"ratio_to_analytic": [0-9.]*\|"accepted": [a-z]*' "$OUT/rust_${lab}.json" | tr '\n' ' ')"
+    --checkpoint "$OUT/rust_${lab}.ckpt" --sub-bounds 50,163,691,2000 \
+    --out "$OUT/rust_${lab}.json" 2>> "$OUT/rust_${lab}.log" > /dev/null
+  echo "$lab: $(grep -o '"h_bits": [0-9]*\|"ratio_to_analytic": [0-9.]*\|"accepted": [a-z]*' "$OUT/rust_${lab}.json" | tr '\n' ' ') $(date -u +%FT%TZ)"
 done
