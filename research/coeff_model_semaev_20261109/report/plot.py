@@ -53,18 +53,20 @@ def yield_panel(ax, cell, title):
     ax.set_title(title, fontsize=9)
 
 
-fig, axs = plt.subplots(1, 3, figsize=(15, 4.6))
+fig, axs = plt.subplots(1, 4, figsize=(19, 4.6))
 yield_panel(axs[0], "C40-S3", "C40-S3: p≈2^40.3, B=2^20, m=2 (S3), T=1000/arm")
-yield_panel(axs[1], "C48-S3", "C48-S3: p≈2^48, B=2^24, m=2, T=200/arm")
-yield_panel(axs[2], "C40-SIDE", "Side M (4|#E): models, p≈2^40, B=2^20")
+yield_panel(axs[1], "C48-S3", "C48-S3: p≈2^48, B=2^24, T=200/arm (registered)")
+yield_panel(axs[2], "C48-S3-T800", "C48-S3: T=800/arm (extended, amendment A2)")
+yield_panel(axs[3], "C40-SIDE", "Side M (4|#E): models, p≈2^40, B=2^20")
 fig.tight_layout()
 for ext in ("svg", "png"):
     fig.savefig(os.path.join(FIG, f"yield_per_arm.{ext}"), dpi=150)
 
 # counted cost
-fig, axs = plt.subplots(1, 3, figsize=(15, 4.2))
+fig, axs = plt.subplots(1, 4, figsize=(19, 4.2))
 for ax, cell, key, lab in [(axs[0], "C40-S3", "muls_per_base_element", "Montgomery mults per base element (exact)"),
-                           (axs[1], "C48-S3", "muls_per_base_element", "Montgomery mults per base element (exact)"),
+                           (axs[1], "C48-S3-T800", "muls_per_base_element", "Montgomery mults per base element (exact)"),
+                           (axs[3], "C40-SIDE", "muls_per_base_element", "Montgomery mults per base element (exact)"),
                            (axs[2], "C40-S4", "muls_per_target_mean", "Montgomery mults per S4 attempt (exact)")]:
     d = load(cell)
     if d is None:
