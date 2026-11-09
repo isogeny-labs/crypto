@@ -144,3 +144,16 @@ controls, not counterexamples under the trace-zero divisibility condition.
 General Hasse/geometric/field-degree bridges and original censuses remain
 open. See [scope](../research/theorem_census_20261109/COMPOSITE_TORSION.md).
 [pcc:unverified]
+
+### 2026-11-09 S4individual degrees
+
+The m4degree component now has a canonical polynomial-ring proof of
+degree4in each variable, all characteristics, with the other inputs formal.
+The fourth coefficient after specializing them is S3², and exact degree4
+holds iff S3≠0. The actual smooth F5specialization S4(0,1,4,T)=1has degree0;
+this refutes arbitrary preservation of degree, not the generic theorem.
+Whole census gate259passes,0failing/0trusted-native exceptions. See
+[source and exact scope](../research/theorem_census_20261109/S4_DEGREE.md).
+General all-mrecursion/degree, m5degree and irreducibility remain open.
+No solving-degree/regularity or attack-complexity result follows.
+[pcc:unverified]

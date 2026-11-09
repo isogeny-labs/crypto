@@ -71,6 +71,14 @@ point P=(3,3)on the source F7curve has order8and modular embedding order2.
 No full Hasse/field-degree/geometric-torsion bridge is thereby supplied.
 See [COMPOSITE_TORSION.md](COMPOSITE_TORSION.md). [pcc:unverified]
 
+The subsequent S4Degree.lean also proves canonical individual-variable
+degree4for m4in every characteristic, with the remaining three inputs
+formal, and coefficient4=S3²after specialization. The actual smooth
+F5curve y²=x³−x gives S4(0,1,4,T)=1, refuting unrestricted degree preservation,
+not the source's generic degree theorem. General all-mdegree and
+irreducibility remain open. See [S4_DEGREE.md](S4_DEGREE.md) for primary
+source read scopes and exact declaration bindings. [pcc:unverified]
+
 `corrected_prime_embedding_degree` derives k=2 for odd primes r>2 from the
 source trace definition, primality of p≥5, actual group-order divisibility,
 and the explicit Hasse premise t²≤4p. `hasse_trace_zero` supplies the missing

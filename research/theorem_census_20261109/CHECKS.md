@@ -1,6 +1,27 @@
 # Current additive proof and validation receipts
 
-The latest census gate passes205declarations,0failing and0trusted-native
+The current census gate passes259declarations,0failing and0trusted-native
+exceptions. S4Degree.lean adds actual canonical polynomials/evaluation in
+all four positions, symbolic degree4in each, the fourth-coefficient S3²
+identity/sharp specialization criterion, and the smooth F5constant1degree0
+counterexample. Packetb93977is unsigned. Native supplementIDC1h9d53585cac843775
+accepts32derived plus11extra points only for the scalar leading-term rewrite;
+actual coefficient/degree conclusions rest on Lean. See S4_DEGREE.md and
+evidence/s4-degree-gate.log. [pcc:unverified]
+
+The full local packetb93977check passes17:28:09Zat source3d1dd96b, still
+unsigned. That source was committed before the native identity issue;
+the exact proof-file digest matches. See s4-degree-verification.json for
+source/gate/packet/native bindings. No source changed after those checks.
+[pcc:unverified]
+
+Fresh17:30Zread-only ledger comparison:483main rows and483local rows,
+common prefix457, neither a prefix of the other. Equal counts do not
+mean equal histories. Main ref67242289still has blob1f8804d3;
+parent3739remains open/unmerged. See evidence/main-ledger-s4-degree.json.
+No history selected/rechained and no force push. [pcc:unverified]
+
+The preceding composite census gate passes205declarations,0failing and0trusted-native
 exceptions. CompositeTorsion.lean removes the unnecessary r-prime
 assumption from the conditional trace/Hasse modular argument and checks
 an actual point of order8on the smooth F7source curve. The explicit
@@ -61,6 +82,7 @@ already excludes the F2/r2control by gcd(r,q)=1. [pcc:unverified]
 
 | Component | Gate result | Exact receipt |
 |---|---|---|
+| Census, S4degree/leading coefficient and specialization control | 259pass,0fail,0trusted | evidence/s4-degree-gate.log |
 | Census, composite-order conditional arithmetic and actual point | 205pass,0fail,0trusted | evidence/composite-torsion-gate.log |
 | Census, first S4resultant step and degree-drop control | 197pass,0fail,0trusted | evidence/general-s4-gate.log |
 | Census, general S3and model/p-torsion controls | 167pass,0fail,0trusted | evidence/general-s3-gate.log |
