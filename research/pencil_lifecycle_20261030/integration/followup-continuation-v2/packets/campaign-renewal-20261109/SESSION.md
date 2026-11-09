@@ -275,3 +275,27 @@ Publishhelperfinalfreeze/rootfailurepacket; releasehelperafterexactreadback. Tri
 
 ## Errors
 18fullsuiteFAILEDrows newlycounted; causalclassification pending. Fourseparateexactcontrolpassesunchanged.
+
+## What was done — 20:17 UTC
+Publishedhelperfinalfreeze/releaseat5670c04498715e7f23d40b26148e59065e37fbf5 and verifiedremote. One5callhelperreplaylaunchedsession91402, freeze73e8ac05/release466cd4fb; maintainedT2070epoch1heartbeat88479 fresh.
+
+## Decisions made
+18240charged+2400reserved+22560unreserved unchanged. No otherpayload. All18fullsuitefailures archived; broader135file/runtimeprerequisiteaudit preparedsourceonly.
+
+## Open threads
+Helperpre/compile/readback/post. Runtimefixturematerialization/cachedsuite continuationrequiresreviewed additiveview andseparatecharge; noautomaticretry.
+
+## Errors
+Earlierpartiallibrarysuite remainsfailed/incomplete, notoverwrittenbyhelperwork.
+
+## What was done — 20:21 UTC
+HelperreplayfailedfirstmoduleatENatnumeralcastnormalizationline153. Priorfourrepairedproofstepspassed; theorem/readbacknotcomplete, localfaileddeclarationprintsorryAxretained. Pre47.846993/compiler35.763581/post27.499790s, total111.225177s; allthreephaseownersterminal, pre/postcustodypassed.
+
+## Decisions made
+Full2400charged:20640total,0reserved,22560remaining. Source-onlyminimalcastsuccessorproposedundernew600s cap; prospectivebudgetamendment/independentreviewrequiredbeforeanyreplay.
+
+## Open threads
+Otherreviewedformalreplays; fixtureview/librarysuitecontinuation; signed/driver qualification.
+
+## Errors
+Singlecoercionnormalizationerror preventsbranchtheoremacceptance; preservefailureanddonotusefailedcompiledartifact.
