@@ -11,5 +11,9 @@
   "historical_campaign_unchanged": true,
   "no_overlap": true,
   "automatic_retry": false,
-  "note": "Root must atomically reconcile current debits/reservations before release. Full bounded failure charges retained. No new dollars or cloud authority asserted."
+  "note": "Parent authorized single900-second attempt after final publication/readback. Parent campaign ledger remains authoritative for applying reservation. Prior recovery60 and qualification60 charged; remaining43080 before reservation. Historical campaign unchanged.",
+  "campaign_charged_seconds": 120,
+  "campaign_remaining_worker_seconds_before_materializer_reservation": 43080,
+  "materializer_reservation_seconds": 900,
+  "materializer_reservation_authorized": true
 }

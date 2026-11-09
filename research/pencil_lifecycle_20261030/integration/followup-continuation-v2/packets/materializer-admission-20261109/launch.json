@@ -1,6 +1,6 @@
 {
   "schema": "bounded-launch-command/v1",
-  "status": "draft_unreleased_publication_review_qualification_pending",
+  "status": "final_configuration_pending_publication_readback",
   "argv": [
     "/usr/bin/sudo",
     "-n",
@@ -68,6 +68,7 @@
   "worker_inner_seconds": 880,
   "root_release_required": true,
   "approval_required": false,
-  "launch_disabled": true,
-  "coordinator_release_required": true
+  "launch_disabled": false,
+  "coordinator_release_required": true,
+  "release_condition": "Exact finalized configuration must be published and read back; independent final-binding review and live lease/resource/no-overlap ownership checks required before launch."
 }

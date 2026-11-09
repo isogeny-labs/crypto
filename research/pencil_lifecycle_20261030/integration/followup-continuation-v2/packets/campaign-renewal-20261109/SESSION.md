@@ -23,3 +23,15 @@ Complete qualification harness, independent prospective review, publication and 
 
 ## Errors
 Initial incomplete Conductor heartbeat bodies returned HTTP500. Discovered authenticated task attempts readback; full task_id/attempt_id/lease_id/fencing_epoch heartbeat now succeeds. No payload started. [pcc:unverified]
+
+## What was done — 17:23 UTC
+Published exact qualification and independent review at6d380c379d, verified remote head, ran one frozen15case fault harness. Exit0,15pass; rawresult0.117305537s, charged60s. Recovery separately charged60s conservatively. [pcc:unverified]
+
+## Decisions made
+Reserve900seconds for single new materializer. Current charged120,reserved900,unreserved42180 of43200. [pcc:unverified]
+
+## Open threads
+Publish final config and capture live native ownership, then run materializer. [pcc:unverified]
+
+## Errors
+No qualification failures; no materializer or compiler executed yet. [pcc:unverified]

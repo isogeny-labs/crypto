@@ -33,3 +33,7 @@ Preserve all old evidence and lease identities; new publication/review/qualifica
 Implement and independently review qualification harness; finalize publication/review bindings and live lease/accounting; root release only afterward.
 ### Errors (what went wrong, how it was handled)
 KB wrapper absent. No execution attempted; no experimental failure or result generated.
+
+## Final configuration binding amendment
+
+The parent reports completed fifteen-case qualification and authorized one900-second materializer attempt, conditional on final publication/readback and live ownership/resource/lease checks. Copied result, exit and publication receipts are bound in preparation.json; scientific results and full materialization remain separate. Prior recovery60seconds plus qualification60seconds leaves43080seconds before materializer reservation. reviewed=true refers to the source/command review and qualified software fixtures, not terminal custody. The earlier unreleased draft is retained in Git history and review snapshots. Final configuration publication readback is recorded externally after commit; published_github_commit names the reviewed source publication6d380c379d63c49f6e1366c09701242560f4dc68. No payload was launched by this preparation agent. [pcc:unverified]
