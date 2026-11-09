@@ -23,8 +23,8 @@ fn normjet<const P:i64,const D:i64>(al:&Alg<P,D>,e0:Vec<F<P,D>>,e1:Vec<F<P,D>>)-
  let st=counts();let (w,piv)=normjet_dense(al,e0,e1);let dc=diff(st,counts());NS[2].fetch_add(dc[0],Ordering::Relaxed);NS[3].fetch_add(dc[1],Ordering::Relaxed);assert_eq!(v,w,"field norm vs dense determinant");
  if std::env::args().any(|s|s=="--dense-reference"){(w,piv)}else{(v,0)}
 }
-fn norm_controls<const P:i64,const D:i64>(g:Pt<P,D>,a:i64,r:u64)->Value {
- let bg=base(g,a,r);let al=algebra(&bg,&bg);let roots:Vec<_>=bg.baby.iter().skip(1).map(|v|v.unwrap().0).collect();let t=roots[0];let mut cases=vec![("unit".to_string(),vec![F::c(1)],vec![F::c(1)]),("simple".to_string(),vec![-t,F::c(1)],vec![F::c(1)]),("zero".to_string(),vec![F::c(0)],vec![F::c(1)])];
+fn norm_controls<const P:i64,const D:i64>(g:Pt<P,D>,a:i64,b:i64,r:u64)->Value {
+ let bg=base(g,a,r);let al=algebra(&bg,&bg,a,b);let roots:Vec<_>=bg.baby.iter().skip(1).map(|v|v.unwrap().0).collect();let t=roots[0];let mut cases=vec![("unit".to_string(),vec![F::c(1)],vec![F::c(1)]),("simple".to_string(),vec![-t,F::c(1)],vec![F::c(1)]),("zero".to_string(),vec![F::c(0)],vec![F::c(1)])];
  if roots.len()>=2{cases.push(("multiple".to_string(),pm(&[-t,F::c(1)],&[-roots[1],F::c(1)]),vec![F::c(1)]))}
  for c in 0..8{cases.push((format!("polynomial_{}",c),vec![F::c(c+1),F::c(c),F::c(1)],vec![F::c(1),F::c(c)]))}
  let mut rows=vec![];for(name,e0,e1)in cases{let st=counts();let (v,branch)=field_normjet(&al.h,&e0,&e1);let fc=diff(st,counts());let st=counts();let(w,_)=normjet_dense(&al,e0.clone(),e1.clone());let dc=diff(st,counts());let explicit=roots.iter().fold([F::c(1),F::c(0)],|v,&x|upd(v,[ev(&e0,x),ev(&e1,x)]));assert_eq!(v,w);assert_eq!(v,explicit);rows.push(json!({"name":name,"branch":branch,"jet":v.map(|x|x.code()),"field_counts":fc,"dense_counts":dc}))}

@@ -582,9 +582,9 @@ fn main() {
     let args: Vec<_> = std::env::args().collect();
     let reference = args.iter().any(|s| s == "--full-reference");
     if args.iter().any(|s| s == "--norm-controls") {
-        let x = norm_controls::<11, 2>(Some((F::c(6), F::c(2))), 2, 7);
-        let y = norm_controls::<17, 3>(Some((F::c(5), F::c(1))), 2, 19);
-        let z = norm_controls::<211, 210>(Some((F::c(3), F::c(33))), 0, 199);
+        let x = norm_controls::<11, 2>(Some((F::c(6), F::c(2))), 2, 7, 7);
+        let y = norm_controls::<17, 3>(Some((F::c(5), F::c(1))), 2, 2, 19);
+        let z = norm_controls::<211, 210>(Some((F::c(3), F::c(33))), 0, 7, 199);
         let out = json!({"all_checks_pass":true,"panels":[x,y,z],"scope":"unit/simple/multiple/zero first-coefficient controls"});
         if let Some(i) = args.iter().position(|s| s == "--check") {
             let v: Value = serde_json::from_slice(&fs::read(&args[i + 1]).unwrap()).unwrap();
