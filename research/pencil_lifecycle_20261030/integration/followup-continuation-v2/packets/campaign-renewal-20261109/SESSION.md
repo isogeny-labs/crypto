@@ -191,3 +191,27 @@ Permit qualification/cache snapshot/full library; minimal branch helper and inde
 
 ## Errors
 Branch main theorem, controls and final readback not reached. No new scientific execution or duplicate external owner.
+
+## What was done — 19:33 UTC
+Publishedcd96a80ff2033731335d2f58a75257b902037357 and verifiedremote ref. Exactlyone permitqualification exited1 after0.064546608s at fakeclockfixture class declaration beforecases. Callerreceipt retained, processreaped, no snapshot.
+
+## Decisions made
+Charge full60seconds:16320charged,0reserved,26880remaining. Minimalfixture successor requires independent review and separate release; frozenv4source remainsunchanged.
+
+## Open threads
+Qualificationfix and archive, then snapshot/fullsuite. Mathematical source/replay reviews proceed inparallel withoutpayloads.
+
+## Errors
+Classlocal datetime=DateTime shadowsmodulename beforetimezone=datetime.timezone, causingAttributeError. No permitbehavior result.
+
+## What was done — qualification scope correction
+Source readback places the failingDTclass declaration after14workerfixture testcalls. Reachingline64 supports thosecalls returned; no durablecase/result filewaswritten.
+
+## Decisions made
+Correct earlier wording beforecases: incomplete qualification before supervisorscenarios and finalserialization. No completed24case result.
+
+## Open threads
+Successorqualification review.
+
+## Errors
+Earlierprogress wording impliedzerofixtures executed; the traceback/source order supports partialexecution only.
