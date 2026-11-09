@@ -253,7 +253,9 @@ fn paired<const P: i64, const D: i64>(
             }
             alg_pivots += np;
             let d0 = ap.unwrap().0 - bp.unwrap().0;
-            assert_eq!(block, upd([d0, F::c(1)], w))
+            let chosen = upd([d0, F::c(1)], w);
+            assert_eq!(block, chosen);
+            block = chosen;
         }
         blocks.push(block.map(|x| x.code()));
         v = upd(v, block)
