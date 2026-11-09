@@ -1,31 +1,32 @@
-# Resume: crypto @ claude/fall-degree-e14-20261109
+# Resume: crypto @ claude/happy-johnson-9edk2r
 
 ## Goal
-E14 of research/fall_degree_bounds_20261008 (Amendment 19): the E13 parts that ran out of 13 GiB locally,
-on one RunPod CPU pod (cpu3g, 64 vCPU, On-Demand), hard cap USD 100.
+Run the prepared trace-line reference panel (research/trace_c1_2lp_20261027/reference-d{2,3,4,5}.json)
+on Iso Lab EKS Spot via the GitHub route (isolab-experiment.yml on main), as a measured stage
+diagnostic of the Tr_{N/d} trace-selected factor-base line against the standard subfield line and matched rho.
 
 ## Lead / hypothesis
-E14b: 6:10:3 controls d1,d3,d4 refute at degree 4 under the pe engine (completes E13b's independent check).
-E14a: exact d_F at (3,21,7) via the degree-5 pe closure. E14c: (4,28,7) with hky_window w1x (H_ell at m=4).
+Trace line lifts every nonzero x (exact, research/trace_homomorphism_tests_20261109 T4), so the
+four-summand MITM reference should need fewer trials than the standard line. This is the exact
+MITM reference only, NOT the algebraic C1 experiment of PROTOCOL.md (still blocked on the C1 oracle).
 
 ## Spec
-PREREGISTRATION.md Amendment 19 (commit a430db11e3). Pod script research/fall_degree_bounds_20261008/e14/run_pod.sh.
-Source: frozen archive fd-src-a2be6609.tgz (sha256 18b14930...) in s3://ephemeral-runs-104186811093-us-east-1/jobs/inputs/.
-Outputs: s3://ephemeral-runs-104186811093-us-east-1/jobs/e13-runpod-20261107/out.tgz (presigned PUT, reused key; valid to 2026-11-14).
+Specs frozen on main; source_revision = main HEAD at dispatch (recorded in the session log and
+research/trace_c1_2lp_20261027/isolab-20261109/LAUNCH.md). c8a.2xlarge, seconds=1800, one dispatch per size.
+Dollar ceiling: USD 10 for all four dispatches including failures.
 
 ## State
-E14 ended "not completed": RunPod terminated pod oubpztzdbbbo4s about 10:20 UTC 2026-11-09 (account balance 0) during E14b d1.
-Write-up committed (e14/score.json, RESULTS.md E14, reports/run-20261109-e14). PR open from this branch.
+Dispatches pending/in flight: see LAUNCH.md for workflow run IDs.
 
 ## Next steps
-1. Drive the E14 write-up PR to merge.
-2. Any rerun needs a new amendment: first measure pe's degree-4 matrix size on 6:10:3 d1 locally; consider E14a first; needs RunPod funds.
+1. Await each run; read step summary; download receipts only via the lab's verified route.
+2. Report per-size outcome, L2/A/A admission, and the IC/rho gap; no claim beyond the MITM reference.
 
 ## Runs in flight
-None.
+See research/trace_c1_2lp_20261027/isolab-20261109/LAUNCH.md.
 
 ## Stop and success conditions
-Nothing retried. Failed predictions stay failed.
+No automatic resubmission. A failed or ambiguous run is reconciled against its original run ID first.
 
 ## Open questions
-Whether to fund and register a rerun (user decision).
+Whether the S3 receipts are readable from this session (no valid AWS identity here).
