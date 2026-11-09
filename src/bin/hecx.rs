@@ -176,7 +176,7 @@ fn main() -> ExitCode {
     match result {
         Ok(value) => {
             if cli.json {
-                println!("{}", serde_json::to_string_pretty(&value).unwrap());
+                println!("{}", serde_json::to_string(&value).unwrap());
             } else {
                 println!("{}", serde_json::to_string_pretty(&value).unwrap());
             }
@@ -877,9 +877,7 @@ fn parse_int(s: &str) -> Result<BigUint, String> {
 }
 
 fn parse_list(s: &str) -> Result<Vec<BigUint>, String> {
-    s.split(',')
-        .map(|part| parse_int(part))
-        .collect::<Result<Vec<_>, _>>()
+    s.split(',').map(parse_int).collect::<Result<Vec<_>, _>>()
 }
 
 fn parse_point(s: &str) -> Result<(BigUint, BigUint), String> {

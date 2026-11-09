@@ -529,7 +529,7 @@ pub fn factor_order(n: &BigUint, trial_bound: u64, seed: u64) -> (Vec<(BigUint, 
     let mut rest = n.clone();
     let bound = BigUint::from(trial_bound.max(2));
     let mut d = BigUint::from(2u32);
-    while &d <= &bound && &d * &d <= rest {
+    while d <= bound && &d * &d <= rest {
         let mut e = 0u32;
         while (&rest % &d).is_zero() {
             rest /= &d;
@@ -649,8 +649,6 @@ fn rand_below(rng: &mut StdRng, n: &BigUint) -> BigUint {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::binary_ecc::f2m::{F2mElement, IrreduciblePoly};
-    use crate::binary_ecc::poly_f2m::F2mPoly;
     use crate::prime_hyperelliptic::FpPoly;
 
     fn prime_toy_curve(p: u64) -> HyperellipticCurveP {

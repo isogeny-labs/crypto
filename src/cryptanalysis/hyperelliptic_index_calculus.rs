@@ -2051,7 +2051,7 @@ pub fn prime_order_of(
 pub fn hasse_interval_big(curve: &HyperellipticCurveP) -> (BigUint, BigUint) {
     let root = curve.p.sqrt();
     let one = BigUint::one();
-    let g = curve.genus.max(1) as u32;
+    let g = curve.genus.max(1);
     let lo = if root > one {
         (&root - &one).pow(2 * g)
     } else {
