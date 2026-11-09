@@ -165,3 +165,5 @@ Publish/freeze the complete source/input/binary record before one scan, independ
 ### Errors
 
 V1 independent replay failed on two mixed-type auto declarations; corrected source and failure logs retained. No scientific scan was started or repeated. No root Cargo suite is claimed for the native-only scope. Sources checked (KB): unavailable tools/wrapper and existing block/residual contracts/references as retained.
+
+Delivery race,2026-11-09T18:00Z: after the earlier clear read, Conductor assigned the daily-log path to T-1979 before resolution. The guarded command stopped at its ownership check before any manual edit. The no-commit merge was aborted, preserving the unchanged study tree and committed qualifier results. Those results are pushed separately. No conflicted file was resolved and no frozen artifact changed. Do not bypass the new owner's equivalent shared-log lock; continue source-scoped research while delivery waits.
