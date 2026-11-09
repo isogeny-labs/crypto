@@ -138,7 +138,7 @@ fn sqrt(n: &Z) -> Z {
     }
     lo
 }
-include!("big_norm.inc.rs");
+include!("../big_norm.rs");
 fn main() {
     let args: Vec<_> = std::env::args().collect();
     let root = std::path::Path::new(&args[1]);
