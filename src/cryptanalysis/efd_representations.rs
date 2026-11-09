@@ -16,6 +16,7 @@
 use num_bigint::BigUint;
 use serde_json::{json, Value};
 
+use super::curve_traits::arith::is_prime;
 use super::prime_small_x::{Curve, PrimeField, Pt};
 use crate::ecc::field::FieldElement;
 use crate::prime_ecc::efd::{
@@ -45,18 +46,46 @@ pub struct EfdRepresentation {
     pub bridge: WeierstrassBridge,
     chart: Option<&'static Representation>,
     model: &'static Model,
+    one: FieldElement,
+    chart_variables: Vec<String>,
+    model_coordinate_names: Vec<String>,
+    max_lift: u32,
 }
 
 impl EfdRepresentation {
     /// Build a representation.  `chart_id` is an EFD chart id such as
     /// `montgom/xz`, `shortw/jacobian` or `edwards/yz`; the special value
     /// `affine` means the model's own affine coordinates.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error when the model or chart is unknown, the chart belongs
+    /// to another model, the modulus is not an odd prime, a parameter name is
+    /// not part of the model/chart, a required model parameter is missing, the
+    /// long-to-short map is singular, or a supplied chart parameter is
+    /// inconsistent with its defining relation.
     pub fn new(
         model_id: &str,
         chart_id: &str,
         modulus: &BigUint,
         params: &Bindings,
     ) -> Result<Self, String> {
+        Self::build(model_id, chart_id, modulus, params, true)
+    }
+
+    fn build(
+        model_id: &str,
+        chart_id: &str,
+        modulus: &BigUint,
+        params: &Bindings,
+        check_modulus: bool,
+    ) -> Result<Self, String> {
+        if modulus <= &BigUint::from(3u32) {
+            return Err("the EFD prime-field engine requires a modulus above 3".into());
+        }
+        if check_modulus && !is_prime(modulus) {
+            return Err("the modulus is not prime (Miller-Rabin, bases 2..53)".into());
+        }
         let catalogue = catalogue();
         let model = catalogue
             .model(model_id)
@@ -72,16 +101,59 @@ impl EfdRepresentation {
             let chart = catalogue
                 .representation(&chart_id)
                 .ok_or_else(|| format!("unknown EFD chart {chart_id}"))?;
-            if !chart.id.starts_with(&format!("{model_id}/")) {
-                return Err(format!(
-                    "chart {chart_id} does not belong to model {model_id}"
-                ));
+            if let Some((owner, _)) = chart.id.split_once('/') {
+                if owner != model_id {
+                    return Err(format!(
+                        "chart {chart_id} belongs to model {owner}, not {model_id}"
+                    ));
+                }
             }
             Some(chart)
         };
+
+        let mut allowed: std::collections::BTreeSet<String> =
+            model.parameter_names().into_iter().collect();
+        if let Some(chart) = chart {
+            allowed.extend(chart_parameter_names(chart));
+        }
+        for name in params.keys() {
+            if !allowed.contains(name) {
+                return Err(format!(
+                    "unknown parameter {name}; {} accepts {}",
+                    chart_id,
+                    allowed.into_iter().collect::<Vec<_>>().join(", ")
+                ));
+            }
+        }
         let bridge = model
             .weierstrass_bridge(modulus, params)
             .map_err(|e| format!("{e}"))?;
+        let (short_a, short_b) = bridge.short_coefficients();
+        let discriminant = (BigUint::from(4u32) * short_a.modpow(&BigUint::from(3u32), modulus)
+            + BigUint::from(27u32) * short_b.modpow(&BigUint::from(2u32), modulus))
+            % modulus;
+        if discriminant == BigUint::from(0u32) {
+            return Err("the model parameters define a singular short-Weierstrass curve".into());
+        }
+        if matches!(chart_id.as_str(), "edwards/yz" | "edwards/yzsquared") {
+            if let (Some(r), Some(d)) = (params.get("r"), params.get("d")) {
+                let lhs = r.value.modpow(&BigUint::from(2u32), modulus);
+                if lhs != d.value {
+                    return Err("the Edwards chart parameter r does not satisfy r^2 = d".into());
+                }
+            }
+        }
+
+        let chart_variables = chart
+            .map(|chart| chart.variables.clone())
+            .unwrap_or_else(|| model.coordinates());
+        let model_coordinate_names = model.coordinates();
+        let max_lift = match chart_id.as_str() {
+            "shortw/xz" | "montgom/xz" => 2,
+            // y-only: two x signs (bit 1); y^2-only: two y signs and two x signs.
+            "edwards/yz" | "edwards/yzsquared" => 4,
+            _ => 1,
+        };
         Ok(Self {
             model_id: model_id.to_owned(),
             chart_id,
@@ -90,6 +162,10 @@ impl EfdRepresentation {
             bridge,
             chart,
             model,
+            one: FieldElement::one(modulus.clone()),
+            chart_variables,
+            model_coordinate_names,
+            max_lift,
         })
     }
 
@@ -98,7 +174,27 @@ impl EfdRepresentation {
         self.bridge.short_coefficients()
     }
 
+    /// Number of distinct points a quotient chart identifies.  `1` for
+    /// point-determining charts, `2` for x-only/y-only charts, `4` for a
+    /// squared-y chart.
+    pub fn max_lift(&self) -> u32 {
+        self.max_lift
+    }
+
+    /// Chart variable names in input/output order.
+    pub fn chart_variables(&self) -> &[String] {
+        &self.chart_variables
+    }
+
+    /// Model coordinate names in affine order.
+    pub fn model_coordinates(&self) -> &[String] {
+        &self.model_coordinate_names
+    }
+
     /// Build the index-calculus curve over the supplied field.
+    ///
+    /// The caller remains responsible for knowing `order`; when
+    /// `order_is_prime` is true it is checked with Miller-Rabin.
     pub fn curve<F: PrimeField>(
         &self,
         field: F,
@@ -107,6 +203,15 @@ impl EfdRepresentation {
         order_is_prime: bool,
         cofactor: u64,
     ) -> Result<Curve<F>, String> {
+        if order <= BigUint::from(2u32) {
+            return Err("the subgroup order must exceed 2".into());
+        }
+        if cofactor == 0 {
+            return Err("the cofactor must be positive".into());
+        }
+        if order_is_prime && !is_prime(&order) {
+            return Err("the supplied subgroup order is not prime".into());
+        }
         let (a, b) = self.short_coefficients();
         Ok(Curve {
             name,
@@ -119,12 +224,50 @@ impl EfdRepresentation {
         })
     }
 
-    fn model_coordinates(&self) -> Vec<String> {
-        self.model.coordinates()
+    fn validate_lift(&self, lift: u32) -> Result<(), String> {
+        if lift >= self.max_lift {
+            return Err(format!(
+                "{} accepts lifts 0..{}, got {lift}",
+                self.chart_id,
+                self.max_lift - 1
+            ));
+        }
+        Ok(())
     }
 
-    fn one(&self) -> FieldElement {
-        FieldElement::one(self.modulus.clone())
+    fn validate_coordinates(&self, coords: &[FieldElement]) -> Result<(), String> {
+        if coords.len() != self.chart_variables.len() {
+            return Err(format!(
+                "{} takes {} coordinates, got {}",
+                self.chart_id,
+                self.chart_variables.len(),
+                coords.len()
+            ));
+        }
+        for (name, value) in self.chart_variables.iter().zip(coords) {
+            if value.modulus != self.modulus {
+                return Err(format!("coordinate {name} belongs to a different field"));
+            }
+            if value.value >= self.modulus {
+                return Err(format!("coordinate {name} is not canonical"));
+            }
+        }
+        Ok(())
+    }
+
+    fn validate_short_point(&self, x: &FieldElement, y: &FieldElement) -> Result<(), String> {
+        if x.modulus != self.modulus || y.modulus != self.modulus {
+            return Err("point belongs to a different field".into());
+        }
+        let rhs = x
+            .mul(x)
+            .mul(x)
+            .add(&self.bridge.short_a.mul(x))
+            .add(&self.bridge.short_b);
+        if y.mul(y) != rhs {
+            return Err("point is not on the short-Weierstrass curve".into());
+        }
+        Ok(())
     }
 
     fn decode_model(&self, coords: &[FieldElement]) -> Result<Decoded, String> {
@@ -152,12 +295,12 @@ impl EfdRepresentation {
                 Projection::Y2(y) => Ok(Decoded::Y2(y)),
             };
         }
-        let expected = self.model_coordinates();
-        if coords.len() != expected.len() {
+        let expected = self.model_coordinate_names.len();
+        if coords.len() != expected {
             return Err(format!(
                 "{}/affine takes {} coordinates, got {}",
                 self.model_id,
-                expected.len(),
+                expected,
                 coords.len()
             ));
         }
@@ -167,6 +310,7 @@ impl EfdRepresentation {
     /// Complete a quotient chart (x-only, y-only, y^2-only) to affine model
     /// coordinates.  `lift` selects among the points a quotient identifies.
     fn complete_model(&self, decoded: Decoded, lift: u32) -> Result<Vec<FieldElement>, String> {
+        self.validate_lift(lift)?;
         match decoded {
             Decoded::Model(coords) => Ok(coords),
             Decoded::Y(y) | Decoded::Y2(y) => {
@@ -197,7 +341,7 @@ impl EfdRepresentation {
                     .get("d")
                     .cloned()
                     .ok_or("Edwards model needs d")?;
-                let one = self.one();
+                let one = self.one.clone();
                 let y2 = y.mul(&y);
                 let c2 = c.mul(&c);
                 let num = y2.sub(&c2);
@@ -227,6 +371,8 @@ impl EfdRepresentation {
         coords: &[FieldElement],
         lift: u32,
     ) -> Result<(FieldElement, FieldElement), String> {
+        self.validate_coordinates(coords)?;
+        self.validate_lift(lift)?;
         let decoded = self.decode_model(coords)?;
         if let Decoded::X(x) = decoded {
             let xp = self.bridge.short_x(&x);
@@ -242,9 +388,12 @@ impl EfdRepresentation {
             return Ok((xp, y));
         }
         let model_coords = self.complete_model(decoded, lift)?;
-        self.model
+        let (x, y) = self
+            .model
             .to_short_weierstrass(&self.bridge, &model_coords)
-            .map_err(|e| format!("to short Weierstrass: {e}"))
+            .map_err(|e| format!("to short Weierstrass: {e}"))?;
+        self.validate_short_point(&x, &y)?;
+        Ok((x, y))
     }
 
     /// Encode a short-Weierstrass point in the selected chart.
@@ -253,6 +402,7 @@ impl EfdRepresentation {
         x: &FieldElement,
         y: &FieldElement,
     ) -> Result<Vec<FieldElement>, String> {
+        self.validate_short_point(x, y)?;
         let model_coords = self
             .model
             .from_short_weierstrass(&self.bridge, x, y)
@@ -260,6 +410,12 @@ impl EfdRepresentation {
         let Some(chart) = &self.chart else {
             return Ok(model_coords);
         };
+        if chart.id.starts_with("jintersect/") && model_coords.len() != 3 {
+            return Err(format!("{} needs three model coordinates", chart.id));
+        }
+        if !chart.id.starts_with("jintersect/") && model_coords.len() < 2 {
+            return Err(format!("{} needs two model coordinates", chart.id));
+        }
         let encoded = if chart.id.starts_with("jintersect/") {
             chart
                 .encode_jintersection(
@@ -268,7 +424,7 @@ impl EfdRepresentation {
                     &model_coords[0],
                     &model_coords[1],
                     &model_coords[2],
-                    &self.one(),
+                    &self.one,
                 )
                 .map_err(|e| format!("{}: {e}", chart.id))?
         } else {
@@ -278,7 +434,7 @@ impl EfdRepresentation {
                     &self.params,
                     &model_coords[0],
                     &model_coords[1],
-                    &self.one(),
+                    &self.one,
                 )
                 .map_err(|e| format!("{}: {e}", chart.id))?
         };
@@ -302,6 +458,9 @@ impl EfdRepresentation {
         coords: &[FieldElement],
         lift: u32,
     ) -> Result<Pt<F::E>, String> {
+        if field.modulus() != self.modulus {
+            return Err("the index-calculus field does not match the representation".into());
+        }
         let (x, y) = self.decode_short(coords, lift)?;
         Ok(Pt {
             x: field.embed_big(&x.value)?,
@@ -315,9 +474,54 @@ impl EfdRepresentation {
         field: &F,
         point: &Pt<F::E>,
     ) -> Result<Vec<FieldElement>, String> {
+        if field.modulus() != self.modulus {
+            return Err("the index-calculus field does not match the representation".into());
+        }
         let x = FieldElement::new(field.to_big(point.x), self.modulus.clone());
         let y = FieldElement::new(field.to_big(point.y), self.modulus.clone());
         self.encode_short(&x, &y)
+    }
+
+    /// Round-trip a few points of the selected chart and return a JSON record.
+    ///
+    /// This is the check behind `ic prime --efd-check`.  It enumerates small
+    /// x-coordinates on the short-Weierstrass curve, encodes each point in the
+    /// chart, decodes it, and requires the re-encoding to agree.
+    pub fn self_check(&self) -> Result<Value, String> {
+        let mut checked = 0u32;
+        for x in 0..4096u64 {
+            let x = FieldElement::new(BigUint::from(x), self.modulus.clone());
+            let rhs = x
+                .mul(&x)
+                .mul(&x)
+                .add(&self.bridge.short_a.mul(&x))
+                .add(&self.bridge.short_b);
+            let Some(y) = sqrt(&rhs) else {
+                continue;
+            };
+            let coords = self.encode_short(&x, &y)?;
+            let (x2, y2) = self.decode_short(&coords, 0)?;
+            let coords2 = self.encode_short(&x2, &y2)?;
+            if coords != coords2 {
+                return Err(format!(
+                    "{} did not round-trip a point at x={}",
+                    self.chart_id, x.value
+                ));
+            }
+            checked += 1;
+            if checked == 4 {
+                break;
+            }
+        }
+        if checked == 0 {
+            return Err("no point found on the short-Weierstrass curve".into());
+        }
+        Ok(json!({
+            "model": self.model_id,
+            "chart": self.chart_id,
+            "points_checked": checked,
+            "ok": true,
+        }))
     }
 
     /// A JSON record suitable for an `ic prime` report.
@@ -351,8 +555,15 @@ impl EfdRepresentation {
         json!({
             "model": self.model_id,
             "chart": self.chart_id,
-            "chart_variables": self.chart.as_ref().map(|c| c.variables.clone()),
+            "chart_variables": self.chart_variables.clone(),
+            "chart_parameters": self
+                .chart
+                .map(chart_parameter_names)
+                .unwrap_or_default(),
             "chart_affine_map": chart_map,
+            "max_lift": self.max_lift,
+            "model_parameters": self.model.parameter_names(),
+            "modulus_bits": self.modulus.bits(),
             "model_equations": model_equation,
             "parameters": self
                 .params
@@ -372,6 +583,18 @@ impl EfdRepresentation {
 
 fn decoded_is_squared(chart_id: &str) -> bool {
     chart_id == "edwards/yzsquared"
+}
+
+fn chart_parameter_names(chart: &Representation) -> Vec<String> {
+    chart
+        .source
+        .text
+        .lines()
+        .filter_map(|line| line.strip_prefix("parameter "))
+        .map(str::trim)
+        .filter(|name| !name.is_empty())
+        .map(str::to_owned)
+        .collect()
 }
 
 /// The model's own coordinates and parameter names, for callers that need to
@@ -394,6 +617,50 @@ pub fn chart_ids(model_id: &str) -> Vec<String> {
             .map(|rep| rep.id.clone()),
     );
     out
+}
+
+/// Check every chart of `model_id` on the supplied curve.
+///
+/// Charts whose declared assumptions do not hold for these parameters are
+/// reported with `ok: false` and their error, not silently dropped.
+pub fn check_all_charts(
+    model_id: &str,
+    modulus: &BigUint,
+    params: &Bindings,
+) -> Result<Value, String> {
+    if catalogue().model(model_id).is_none() {
+        return Err(format!("unknown EFD model {model_id}"));
+    }
+    if !is_prime(modulus) {
+        return Err("the modulus is not prime (Miller-Rabin, bases 2..53)".into());
+    }
+    let mut charts = Vec::new();
+    let mut all_ok = true;
+    for chart in chart_ids(model_id) {
+        let record = match EfdRepresentation::build(model_id, &chart, modulus, params, false) {
+            Ok(representation) => match representation.self_check() {
+                Ok(mut value) => {
+                    value["ok"] = Value::Bool(true);
+                    value
+                }
+                Err(error) => {
+                    all_ok = false;
+                    json!({"model": model_id, "chart": chart, "ok": false, "error": error})
+                }
+            },
+            Err(error) => {
+                all_ok = false;
+                json!({"model": model_id, "chart": chart, "ok": false, "error": error})
+            }
+        };
+        charts.push(record);
+    }
+    Ok(json!({
+        "model": model_id,
+        "modulus": modulus.to_string(),
+        "charts": charts,
+        "ok": all_ok,
+    }))
 }
 
 #[cfg(test)]
@@ -524,6 +791,88 @@ mod tests {
                 );
             }
         }
+    }
+
+    #[test]
+    fn rejects_invalid_models_charts_parameters_and_points() {
+        let p = BigUint::from(P);
+        let good = params_for("montgom");
+        assert!(EfdRepresentation::new("not-a-model", "affine", &p, &good).is_err());
+        assert!(EfdRepresentation::new("montgom", "not-a-chart", &p, &good).is_err());
+        assert!(EfdRepresentation::new("montgom", "shortw/jacobian", &p, &good).is_err());
+        let mut bad = good.clone();
+        bad.insert("typo".into(), fe(1));
+        assert!(EfdRepresentation::new("montgom", "affine", &p, &bad).is_err());
+
+        // Composite modulus.
+        assert!(EfdRepresentation::new(
+            "montgom",
+            "affine",
+            &(BigUint::from(P) * BigUint::from(P)),
+            &good
+        )
+        .is_err());
+
+        // Singular short-Weierstrass model.
+        let mut singular = Bindings::new();
+        singular.insert("a".into(), fe(0));
+        singular.insert("b".into(), fe(0));
+        assert!(EfdRepresentation::new("shortw", "affine", &p, &singular).is_err());
+
+        // Inconsistent Edwards chart root.
+        let mut edwards = params_for("edwards");
+        edwards.insert("r".into(), fe(7));
+        assert!(EfdRepresentation::new("edwards", "yz", &p, &edwards).is_err());
+
+        let repr = EfdRepresentation::new("montgom", "xz", &p, &good).unwrap();
+        assert_eq!(repr.max_lift(), 2);
+        assert!(repr.decode_short(&[fe(604), fe(1)], 2).is_err());
+
+        let mut noncanonical = fe(604);
+        noncanonical.value = &p + BigUint::from(1u32);
+        assert!(repr.decode_short(&[noncanonical, fe(1)], 0).is_err());
+
+        let other = FieldElement::new(BigUint::from(1u32), BigUint::from(1009u32));
+        assert!(repr.decode_short(&[other, fe(1)], 0).is_err());
+
+        let curve = repr
+            .curve(
+                SmallPrime::new(P),
+                "test".into(),
+                BigUint::from(269u64),
+                true,
+                4,
+            )
+            .unwrap();
+        assert!(repr
+            .curve(
+                SmallPrime::new(P),
+                "test".into(),
+                BigUint::from(1u64),
+                true,
+                4,
+            )
+            .is_err());
+        assert!(repr
+            .curve(
+                SmallPrime::new(P),
+                "test".into(),
+                BigUint::from(268u64),
+                true,
+                4,
+            )
+            .is_err());
+        assert_eq!(curve.order, BigUint::from(269u64));
+    }
+
+    #[test]
+    fn self_check_and_all_charts_cover_montgomery() {
+        let params = params_for("montgom");
+        let repr = EfdRepresentation::new("montgom", "xz", &BigUint::from(P), &params).unwrap();
+        let check = repr.self_check().unwrap();
+        assert_eq!(check["ok"], Value::Bool(true));
+        let all = check_all_charts("montgom", &BigUint::from(P), &params).unwrap();
+        assert_eq!(all["ok"], Value::Bool(true));
     }
 
     #[test]

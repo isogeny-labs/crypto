@@ -12,7 +12,8 @@
 use clap::{Args, ValueEnum};
 use crypto_lib::cryptanalysis::{
     binary_small_x,
-    efd_representations::EfdRepresentation,
+    curve_traits::arith::is_prime,
+    efd_representations::{chart_ids, check_all_charts, EfdRepresentation},
     prime_small_x::{
         self, exact_ic_probe_with_arity, measure, toy_curve, toy_curve_with_cofactor, Curve,
         MontField, Options, PrimeField, Pt,
@@ -23,7 +24,7 @@ use crypto_lib::cryptanalysis::{
 };
 use crypto_lib::ecc::curve::CurveParams;
 use crypto_lib::ecc::field::FieldElement;
-use crypto_lib::prime_ecc::efd::Bindings;
+use crypto_lib::prime_ecc::efd::{catalogue, Bindings};
 use num_bigint::BigUint;
 use serde::Serialize;
 use serde_json::{json, Value};
@@ -105,7 +106,7 @@ pub struct PrimeArgs {
     #[arg(long)]
     pub efd_order: Option<String>,
     /// Cofactor of the EFD curve.
-    #[arg(long, default_value_t = 1)]
+    #[arg(long, default_value_t = 1, value_parser = clap::value_parser!(u64).range(1..))]
     pub efd_cofactor: u64,
     /// Generator in `--efd-chart` coordinates, comma-separated, for the exact
     /// relation probe.
@@ -123,6 +124,13 @@ pub struct PrimeArgs {
     /// Lift index for the target only; defaults to --efd-lift.
     #[arg(long)]
     pub efd_target_lift: Option<u32>,
+    /// Print the EFD models, charts and formula counts as JSON, then exit.
+    #[arg(long)]
+    pub efd_list: bool,
+    /// Round-trip-check the selected EFD chart (or every chart with
+    /// `--efd-chart all`) and exit.
+    #[arg(long)]
+    pub efd_check: bool,
 }
 
 fn parse_big(value: &str) -> Result<BigUint, String> {
@@ -160,6 +168,39 @@ fn parse_chart_coords(value: &str, p: &BigUint) -> Result<Vec<FieldElement>, Str
         .collect()
 }
 
+fn efd_catalogue_value() -> Value {
+    let models: Vec<Value> = catalogue()
+        .models
+        .iter()
+        .map(|model| {
+            let charts: Vec<Value> = chart_ids(&model.id)
+                .into_iter()
+                .map(|chart| {
+                    let formulas = catalogue()
+                        .formulas
+                        .iter()
+                        .filter(|formula| formula.representation == chart)
+                        .count();
+                    json!({"chart": chart, "formulas": formulas})
+                })
+                .collect();
+            let equations: Vec<&str> = model
+                .source
+                .text
+                .lines()
+                .filter(|line| line.starts_with("satisfying "))
+                .collect();
+            json!({
+                "model": model.id,
+                "parameters": model.parameter_names(),
+                "equations": equations,
+                "charts": charts,
+            })
+        })
+        .collect();
+    json!({"models": models})
+}
+
 pub fn run(args: PrimeArgs) -> Result<Value, String> {
     let started = Instant::now();
     let opts = Options {
@@ -168,6 +209,38 @@ pub fn run(args: PrimeArgs) -> Result<Value, String> {
         controls: args.controls as usize,
         seed: args.seed,
     };
+    if args.efd_list {
+        return Ok(json!({
+            "schema_version": 1,
+            "operation": "efd-list",
+            "status": "complete",
+            "efd": efd_catalogue_value(),
+        }));
+    }
+    if args.efd_check {
+        let model = args
+            .efd_model
+            .as_deref()
+            .ok_or("--efd-check requires --efd-model")?;
+        let p = parse_big(
+            args.efd_p
+                .as_deref()
+                .ok_or("--efd-check requires --efd-p")?,
+        )?;
+        let params = parse_efd_bindings(&args.efd_params, &p)?;
+        let check = if args.efd_chart == "all" {
+            check_all_charts(model, &p, &params)?
+        } else {
+            EfdRepresentation::new(model, &args.efd_chart, &p, &params)?.self_check()?
+        };
+        let ok = check["ok"].as_bool().unwrap_or(false);
+        return Ok(json!({
+            "schema_version": 1,
+            "operation": "efd-check",
+            "status": if ok { "complete" } else { "checks_failed" },
+            "check": check,
+        }));
+    }
     let name = args.curve.to_ascii_lowercase();
     let toy_args = |spec: &str, what: &str| -> Result<(u32, u64, Option<u64>), String> {
         let mut parts = spec.split(',');
@@ -206,6 +279,9 @@ pub fn run(args: PrimeArgs) -> Result<Value, String> {
                 .as_deref()
                 .ok_or("--efd-model requires --efd-p")?,
         )?;
+        if !is_prime(&p) {
+            return Err("--efd-p is not prime (Miller-Rabin, bases 2..53)".into());
+        }
         let order = parse_big(
             args.efd_order
                 .as_deref()
@@ -213,6 +289,9 @@ pub fn run(args: PrimeArgs) -> Result<Value, String> {
         )?;
         if order <= BigUint::from(2u8) {
             return Err("--efd-order must exceed 2".into());
+        }
+        if !is_prime(&order) {
+            return Err("--efd-order is not prime (Miller-Rabin, bases 2..53)".into());
         }
         let params = parse_efd_bindings(&args.efd_params, &p)?;
         let repr = EfdRepresentation::new(model_id, &args.efd_chart, &p, &params)?;
@@ -258,6 +337,14 @@ pub fn run(args: PrimeArgs) -> Result<Value, String> {
                     }
                     if !curve.on_curve(&mut f, &target) {
                         return Err("--efd-target is not on the curve".into());
+                    }
+                    if curve.mul_big(&mut f, &generator, &order).is_some() {
+                        return Err(format!(
+                            "--efd-generator is not in the order-{order} subgroup"
+                        ));
+                    }
+                    if curve.mul_big(&mut f, &target, &order).is_some() {
+                        return Err(format!("--efd-target is not in the order-{order} subgroup"));
                     }
                     let setup = args.setup_candidates.max(1);
                     let target_candidates = args.target_candidates.max(1);
@@ -402,4 +489,46 @@ pub fn run(args: PrimeArgs) -> Result<Value, String> {
             "The bounded ECCp-131 probe records natural scalar-derived relations and modular rank. Zero relations or an undetermined target logarithm apply only to its enumerated base, seed, and candidate budget."
         ]
     }))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parses_efd_integers_and_coordinates() {
+        assert_eq!(parse_big("0x10").unwrap(), BigUint::from(16u32));
+        assert_eq!(parse_big("1019").unwrap(), BigUint::from(1019u32));
+        assert!(parse_big("not-a-number").is_err());
+
+        let p = BigUint::from(1019u32);
+        let coords = parse_chart_coords("604, 1", &p).unwrap();
+        assert_eq!(coords.len(), 2);
+        assert_eq!(coords[0].value, BigUint::from(604u32));
+        assert_eq!(coords[1].value, BigUint::from(1u32));
+        assert!(parse_chart_coords("604,", &p).is_err());
+
+        let bindings = parse_efd_bindings(&["a=131".into(), "b=1".into()], &p).unwrap();
+        assert_eq!(bindings["a"].value, BigUint::from(131u32));
+        assert!(parse_efd_bindings(&["a".into()], &p).is_err());
+    }
+
+    #[test]
+    fn efd_catalogue_lists_every_model_and_chart() {
+        let value = efd_catalogue_value();
+        let models = value["models"].as_array().unwrap();
+        assert_eq!(models.len(), 10);
+        let non_affine: usize = models
+            .iter()
+            .map(|model| {
+                model["charts"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .filter(|chart| chart["chart"] != "affine")
+                    .count()
+            })
+            .sum();
+        assert_eq!(non_affine, 33);
+    }
 }
