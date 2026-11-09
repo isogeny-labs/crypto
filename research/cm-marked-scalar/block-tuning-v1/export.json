@@ -1,0 +1,217 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "CM-BLOCK-PLAN-CENSUS-V1-complete",
+  "created": "2026-11-09T18:22:23Z",
+  "protocol": {
+    "path": "research/cm-marked-scalar/protocol/block-plan-census-v1/protocol.json",
+    "sha256": "ae0ddaa50b9d411171f3464998c50df18fec2836dfb862ff82e1678eb0fbb2d2",
+    "protocol_id": "CM-BLOCK-PLAN-CENSUS-V1",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex_cli/native-cpp",
+    "model": null,
+    "session": "T-1888",
+    "role": "producer"
+  },
+  "source": {
+    "repo": "isogeny-labs/crypto",
+    "commit": "850a36dd03dad00547ee0d954b59c13f47999f6e",
+    "dirty": true
+  },
+  "backend": "local",
+  "host": {
+    "path": "research/cm-marked-scalar/block-tuning-v1/host.json",
+    "sha256": "603fb88d3f576f01abaae9ed4cc7e522e9aea323d5443d8388b055534283d781",
+    "class_id": "shared-development-exact-count",
+    "summary": {
+      "cpu_model": " Intel(R) Xeon(R) 6975P-C",
+      "logical_cpus": 32,
+      "memory_bytes": null,
+      "kernel": "6.18.54-121.166.amzn2023.x86_64",
+      "hypervisor": null,
+      "isolation_tier_max": "none"
+    }
+  },
+  "arms": [
+    {
+      "id": "single",
+      "role": "baseline",
+      "binary_sha256": "869747a5566d8a79b6de7d1dea46f9d676f020040086f0f0af183de22dd63172",
+      "commit": "850a36dd03dad00547ee0d954b59c13f47999f6e"
+    },
+    {
+      "id": "binary",
+      "role": "reference",
+      "binary_sha256": "869747a5566d8a79b6de7d1dea46f9d676f020040086f0f0af183de22dd63172",
+      "commit": "850a36dd03dad00547ee0d954b59c13f47999f6e"
+    },
+    {
+      "id": "relation",
+      "role": "candidate",
+      "binary_sha256": "869747a5566d8a79b6de7d1dea46f9d676f020040086f0f0af183de22dd63172",
+      "commit": "850a36dd03dad00547ee0d954b59c13f47999f6e"
+    },
+    {
+      "id": "prior_direct",
+      "role": "reference",
+      "binary_sha256": "dabdd54316804799d4d41fa21f3518808dfff96eecfada0a27d98771c98ccf2a",
+      "commit": "df8001b87da1589ff6ab1fef590c9f33cc5c22d3"
+    },
+    {
+      "id": "prior_binary",
+      "role": "reference",
+      "binary_sha256": "dabdd54316804799d4d41fa21f3518808dfff96eecfada0a27d98771c98ccf2a",
+      "commit": "df8001b87da1589ff6ab1fef590c9f33cc5c22d3"
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "complete-parameter-census",
+      "arm": "relation",
+      "instance_id": "five-curves:all27090parameters:paired-schedules",
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "rows": 27090,
+          "minimum_sets": 80,
+          "selected_point_checks": 400,
+          "fault_controls_rejected": 4
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Exact integer/event census only; no native point-action clock"
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Standalone GMP suffix-DP every-row replay;400actual selected point checks;fourfault rejections;fresh byte-identical replay"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [],
+      "started_at": null,
+      "finished_at": null,
+      "worker": "native block-tune, one scientific scan; derived plan records are not process runs"
+    }
+  ],
+  "flow": {
+    "planned": 1,
+    "attempted": 1,
+    "completed": 1,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "research/cm-marked-scalar/block-tuning-v1/runs.tar.xz",
+      "sha256": "11f5de7252cc1a9d2f26dd878b8eb8c5b93780e843e9ee79de9415bb71c559c8",
+      "bytes": 110312,
+      "kind": "raw"
+    },
+    {
+      "path": "research/cm-marked-scalar/block-tuning-v1/plans.json",
+      "sha256": "4efa54dbf541c2a37507288abcc510881a0f86349dd24af303c929b76f2eb2fd",
+      "bytes": 19042,
+      "kind": "summary"
+    },
+    {
+      "path": "research/cm-marked-scalar/block-tuning-v1/selected-qualification.json",
+      "sha256": "b55d91981c319ef93b58710c03fa1a4aa254f312ab857c54557386507b88f1b5",
+      "bytes": 77,
+      "kind": "receipt"
+    },
+    {
+      "path": "research/cm-marked-scalar/block-tuning-v1/controls.json",
+      "sha256": "06d30fb6887466611c2d753c94e0ce132cbcef605f712f1eb76c3786c527d796",
+      "bytes": 68,
+      "kind": "receipt"
+    },
+    {
+      "path": "research/cm-marked-scalar/block-tuning-v1/native-use.json",
+      "sha256": "9c92539f136160b3894bafc866e40744757cdea4ce8aefd5773ab3eb3d5cdb54",
+      "bytes": 571,
+      "kind": "receipt"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "research/cm-marked-scalar/block_tune_replay.cpp",
+      "sha256": "15b6880add5e2d01633e3a90720a41f4561070d1258d162005a0cc28d5d42c52",
+      "bytes": 12965,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "research/cm-marked-scalar/block-tuning-v1/plans.json",
+        "sha256": "4efa54dbf541c2a37507288abcc510881a0f86349dd24af303c929b76f2eb2fd",
+        "bytes": 19042,
+        "kind": "summary"
+      },
+      {
+        "path": "research/cm-marked-scalar/block-tuning-v1/selected-qualification.json",
+        "sha256": "b55d91981c319ef93b58710c03fa1a4aa254f312ab857c54557386507b88f1b5",
+        "bytes": 77,
+        "kind": "receipt"
+      },
+      {
+        "path": "research/cm-marked-scalar/block-tuning-v1/controls.json",
+        "sha256": "06d30fb6887466611c2d753c94e0ce132cbcef605f712f1eb76c3786c527d796",
+        "bytes": 68,
+        "kind": "receipt"
+      },
+      {
+        "path": "research/cm-marked-scalar/block-tuning-v1/native-use.json",
+        "sha256": "9c92539f136160b3894bafc866e40744757cdea4ce8aefd5773ab3eb3d5cdb54",
+        "bytes": 571,
+        "kind": "receipt"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "native producer",
+      "text": "One complete27090-row finite parameter census;80minimum sets and20curve/weight plan records are derived outputs, not independent timing trials."
+    },
+    {
+      "kind": "observation",
+      "by": "native producer",
+      "text": "At primary weight1 relation minima230,265,303,451,611 remain above matched block-binary229,260,300,450,606 and prior direct228,260,300,449,606. All sensitivities retain losses within the emitted unweighted-planner family."
+    },
+    {
+      "kind": "observation",
+      "by": "native producer",
+      "text": "All planning/derivation costs remain attached to installed plans. No latency, field/allocator price or general optimality claim follows from group-call counts. Prior native timing refusal is unchanged."
+    },
+    {
+      "kind": "observation",
+      "by": "native producer",
+      "text": "Dirty=true records untracked publication receipts/new outputs at launch; frozen implementation and eight inputs were unchanged. The initial compiler failure and all fault fixtures are retained; no cloud job or unchanged scan retry."
+    }
+  ],
+  "reviews_dir": "reviews"
+}
