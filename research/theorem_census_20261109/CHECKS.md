@@ -1,6 +1,26 @@
 # Current additive proof and validation receipts
 
-The current census project gate passes167declarations,0failing and
+The current census gate passes197declarations,0failing and0trusted-native
+exceptions. It adds GeneralS4.lean's actual fixed degree2/2Mathlib
+Sylvester-resultant equivalence in every characteristic and actual F5
+degree-drop finite-root negative control. Main/control packets21757f/ce6722
+remain unsigned. SupplementIDC1hbf1f44625ee306dcaccepts32derived plus11extra
+points for the determinant coefficient rewrite; actual universal conclusions
+rest on Lean. See GENERAL_S4.md and evidence/general-s4-gate.log.
+[pcc:unverified]
+
+Both full local packet checks pass at16:26:06Zand16:28:49Z, still unsigned.
+Exact bindings are in general-s4-verification.json. Sourcee6bcfc3awas committed
+locally before the native identity was issued; its subsequent publication
+as5138061fhas exacttreebc87c746.
+No proof/issuer source changed after those checks. [pcc:unverified]
+
+Read-only main comparison at16:26Z:483rowsversus local481, common prefix457;
+neither is a prefix. Main ref67242289retains the same ledger blob1f8804d3.
+See evidence/main-ledger-general-s4.json. No chain selected/rebuilt, no
+force push, parent3739still open/unmerged. [pcc:unverified]
+
+The preceding general-S3census project gate passes167declarations,0failing and
 0trusted-native exceptions, including the full general-model S3equivalence
 in every characteristic, faithful F2/F3geometric model-domain controls and
 actual characteristic2/3p-torsion families. New main/control packets are
@@ -12,7 +32,7 @@ file digest matches. The all-characteristic/group conclusion rests on Lean.
 Both new full local packet checks pass, with exact receipt/source bindings
 in general-s3-verification.json. The identity source was committed in
 3cefe6f1before issue; published source29d09a8chas exact sharedtree7b4eadfc.
-No native curve population or frozen-data change occurred. Current-main
+No native curve population or frozen-data change occurred. At that S3checkpoint, main's
 read-only ledger comparison:483rowsversus local479, common prefix457;
 parent3739remains open/unmerged. See evidence/main-ledger-general-s3.json.
 [pcc:unverified]
@@ -27,6 +47,7 @@ already excludes the F2/r2control by gcd(r,q)=1. [pcc:unverified]
 
 | Component | Gate result | Exact receipt |
 |---|---|---|
+| Census, first S4resultant step and degree-drop control | 197pass,0fail,0trusted | evidence/general-s4-gate.log |
 | Census, general S3and model/p-torsion controls | 167pass,0fail,0trusted | evidence/general-s3-gate.log |
 | Actual walk PMF/hash graph | 21pass,0fail,0trusted | ../walk_audit_20261109/evidence/proof-gate-normalized.log |
 | Independent validator finite quadratic foundation | 11pass,0fail,0trusted | ../independent_s3_validator_20261109/evidence/proof-gate.log |

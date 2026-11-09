@@ -16,7 +16,7 @@ Those runs have not been performed in this increment. [pcc:unverified]
 
 | Item | Work performed here | Lean coverage and actual remaining requirement |
 | --- | --- | --- |
-| 1. Semaev | Reused the existing distinct-x proof and completed tangent/vertical cases and the algebraically closed zero-sum equivalence. | The2026-11-09follow-up in ../theorem_census_20261109 now proves the full general-Weierstrass equivalence in every characteristic, with short/ordinary binary specializations and actual F2/F3model-domain counterexamples, and completes the bounded native m4/m5census. General recursion/irreducibility/degree proofs remain open. Earlier finite Python evidence is historical. |
+| 1. Semaev | Reused the existing distinct-x proof and completed tangent/vertical cases and the algebraically closed zero-sum equivalence. | The2026-11-09follow-up in ../theorem_census_20261109 now proves the full general-Weierstrass equivalence in every characteristic, with short/ordinary binary specializations and actual F2/F3model-domain counterexamples, and completes the bounded native m4/m5census. The first actual fixed-degree S4resultant step and geometric degree-drop negative control are now proved there as well; general m/irreducibility/degree proofs remain open. Earlier finite Python evidence is historical. |
 | 2. BK | Read the exact node and Galbraith Theorem 26.4.1. Both exclude r dividing q−1; the node also requires gcd(r,q)=1. The earlier F7 witnesses do not refute this theorem. | `triangular_iterate_identity_iff` and `unipotent_not_identity` establish the linear core. The 2026-11-09 follow-up supplies actual F7/r3excluded-boundary torsion and an F2/r2excluded-case control for the node's coprimality condition, while preserving the original r²point-count condition. Full qualified Frobenius/basis proof and extension-field census remain pending. |
 | 3. Supersingular | Node already says p≥5. F2/F3 examples do not refute that clause; r=2 still needs qualification. | `trace_zero_prime_embedding_degree` proves exact multiplicative order 2 from r prime, r>2, r dividing q+1; `two_subgroup_embedding_degree` gives order 1 for odd q. Supersingularity, Hasse and trace-zero bridge, binary/ternary extension census and composite cyclic subgroup cases remain open. |
 | 4. Pairings/MOV/FR | Read Galbraith 26.2 and 26.4. The node already distinguishes the correct domains. | `cyclic_restriction_trivial` proves a cyclic restriction obstruction. The 2026-11-09 follow-up adds an actual F2geometric torsion/μ2counterexample to pointwise nondegeneracy when coprimality is dropped. Qualified actual Weil/Tate calculations/nondegeneracy and group-scheme bridges remain open. |
@@ -67,8 +67,9 @@ pins the actual checkout at `ca496f7898f4467a28b9733bd8a43f52f9e8e723`.
 
 No paid cloud jobs were launched. The repository checkpoint gate was attempted
 with a complete resume document and failed: no configured AWS profile or
-upload token. That blocks the new research experiments; local proof builds
-and fixed-fixture development tests continued. The selected environment also
+upload token. The user subsequently approved local checkpoints for this audit, and bounded
+native components ran in the follow-up. Local proof work continues under
+that exception and zero paid spend. The selected environment also
 has no second independent execution host. See the
 [open problem](../../problems/fourteen-target-audit-proof-and-execution-gaps.md)
 for exact remaining proof bridges and resume conditions. [pcc:unverified]

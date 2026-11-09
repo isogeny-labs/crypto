@@ -1,6 +1,6 @@
 # Skeptical Lean refutations and exact Semaev census
 
-Lean4.35.0 now proves the full S3equivalence for general Weierstrass models
+Lean4.35.0 now proves the full S3equivalence and first S4resultant step for general Weierstrass models
 in every characteristic, with all repeated-coordinate cases and actual
 Mathlib point sums. It also checks model-domain counterexamples over F2/F3,
 geometric p-torsion families, actual torsion-boundary witnesses, a direct r=2
@@ -12,10 +12,10 @@ are not refuted; their exact domains and remaining bridges stay explicit.
 [pcc:unverified]
 
 The torsion-only proof snapshot audited74declarations with0failing and
-0trusted-native exceptions. The current general-S3follow-up
-audits167declarations; the original41-declaration and intermediate96/116/134-declaration receipts are
+0trusted-native exceptions. The current general-S4follow-up
+audits197declarations; the original41-declaration and intermediate96/116/134/167-declaration receipts are
 retained as earlier snapshots. Counts include generated equation lemmas,
-not167new mathematical results. Both proof attempts and final receipts are
+not197new mathematical results. Both proof attempts and final receipts are
 retained. The torsion snapshot's unsigned PCC records are `PCC-20261109-44730b` and
 `PCC-20261109-5bd3a4`. Earlier packets omitted required declaration hashes;
 they remain as superseded records, and their failed metadata check is
@@ -44,6 +44,17 @@ and [paper-audit-backlog.json](paper-audit-backlog.json). Those are metadata
 counts; untouched papers are not labelled audited. [pcc:unverified]
 
 ## Exact counterexamples
+
+The S4follow-up proves the actual fixed degree2/2Sylvester-resultant
+zero-sum equivalence for four points, including partial sums at infinity.
+Its smooth F5curve y²=x³−x gives S3(0,0,t)=1andS3(1,1,t)=4for every
+geometric t, yet the fixed-size resultant at(0,0,1,1)is0and an actual
+zero-sum quartet exists. This refutes a finite-common-root shortcut,
+not the qualified recursion. See [GENERAL_S4.md](GENERAL_S4.md),
+[Lean proof](lean/GeneralS4.lean) and
+[proof report](reports/proof-20261109-general-s4/report.pdf).
+Unsigned packets21757f/ce6722and supplementIDC1hbf1f44625ee306dcbind this
+scope; general m/irreducibility/degree proofs remain open. [pcc:unverified]
 
 The general S3follow-up proves the algebraic-closure equivalence on the
 actual general Weierstrass model without a characteristic restriction.
@@ -206,7 +217,7 @@ only at their already-stated scope. [pcc:unverified]
 
 | Item | Current status and concrete remaining obligation |
 |---|---|
-| 1 Semaev | Partial: full general-Weierstrass S3equivalence in every characteristic now proved, including all repeated-coordinate cases and actual point sums. Prior short/ordinary binary forms are checked specializations. Rational-only converse and wrong-model extensions refuted, including actual F2/F3geometric controls. Bounded S3/S4/S5native census completed. General resultant recursion, irreducibility and degree proofs remain open; original2004PDFstill403/unread. |
+| 1 Semaev | Partial: full general-Weierstrass S3equivalence in every characteristic now proved, including all repeated-coordinate cases and actual point sums. Prior short/ordinary binary forms are checked specializations. Rational-only converse and wrong-model extensions refuted, including actual F2/F3geometric controls. First actual fixed-degree S4resultant equivalence now proved, with a faithful degree-drop control; bounded S3/S4/S5native census completed. Recursion beyond m4, irreducibility and degree proofs remain open; original2004PDFstill403/unread. |
 | 2 BK | Partial: original r²point-count formulation read; actual excluded-case geometric3-torsion witness even with9dividing#E. New F2/r2actual geometric torsion has2points all rational, refuting unrestricted set inclusion despite2notdividingq−1. The actual node already excludes this by gcd(r,q)=1; original r²condition is not refuted. Full qualified Frobenius proof and all-p<500 census remain open. |
 | 3 Supersingular | Literal all-prime k=2 assertion refuted at r=2 using the source trace definition and actual groups. FSTp239directly checked with actual cyclotomic degree1 versus nonrational2-torsion. New characteristic2a1=0and characteristic3short families have trivial geometric p-torsion in actual groups. Corrected odd-prime embedding proof remains conditional on Hasse; general trace/p-rank/classification bridge and binary/ternary census remain open. |
 | 4 Pairings | Partial: cyclic restriction obstruction, actual cyclotomic/full-torsion distinction, and actual geometric F2torsion/μ2subtypes proving every point-valued map degenerate at characteristic order. Group-scheme duality is not refuted. Actual qualified Weil/Tate constructions, nondegeneracy and MOV/FR calculations remain open. |

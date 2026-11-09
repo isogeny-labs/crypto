@@ -54,7 +54,7 @@ several actual curve/Jacobian/implementation bridges remain unresolved.
 ## Next discriminating steps
 
 1. The documented bounded Semaev census has run. Continue remaining
-   resultant/degree proofs and the all-p<500torsion/binary/ternary census
+   resultant proofs beyond m4/degree proofs and the all-p<500torsion/binary/ternary census
    obligations under their exact original scope, with a new frozen protocol
    before affected native work. Never convert finite agreement into a
    universal theorem. [pcc:unverified]
@@ -110,7 +110,25 @@ See [new proof scope](../research/theorem_census_20261109/GENERAL_S3.md).
 The current independent Rust local validator agrees on4188162triples;
 its distinct-host manual dispatch returned404and never executed. A new
 attempt needs normal workflow registration/permissions and an explicit
-protocol amendment. Main's current ledger has483rows versus local479,
+protocol amendment. At the general-S3checkpoint, main's ledger has483rows versus local479,
 common prefix457; no chain has been selected/rebuilt. Those access/integration
 dependencies do not prevent the independent local proof work above.
 [pcc:unverified]
+
+### 2026-11-09 first resultant step
+
+The actual fixed degree2/2Mathlib Sylvester-resultant equivalence for S4is
+now proved in every characteristic on nonsingular general Weierstrass
+models. A faithful geometric F5control disproves the finite-common-root
+shortcut under simultaneous degree loss while preserving the valid
+four-point zero-sum theorem. Whole census gate197passes,0failing and
+0trusted-native exceptions. See
+[scope and declarations](../research/theorem_census_20261109/GENERAL_S4.md).
+General recursion beyond m4, irreducibility and individual-variable degree
+proofs remain open. This increment adds no native population or host.
+[pcc:unverified]
+
+The16:26Zread-only ledger comparison is483main rows versus481local,
+common prefix457; both histories remain intact. Parent3739is still
+open/unmerged. Local mathematics continues independently of that merge
+dependency. [pcc:unverified]
