@@ -1,0 +1,476 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "theorem-census-20261109-native",
+  "created": "2026-11-09T02:26:08.980Z",
+  "protocol": {
+    "path": "PROTOCOL.md",
+    "sha256": "936b84b56383c2e6533dbec31a0cf13e13913df828d190e552dd83308d9fac86",
+    "protocol_id": "native-semaev-markdown-scope",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": "theorem-census-20261109",
+    "role": "producer"
+  },
+  "source": {
+    "repo": "isogeny-labs/crypto",
+    "commit": "9172a052abd0b6cf8fabbabbe0f21cf930111938",
+    "dirty": true
+  },
+  "backend": "local",
+  "host": {
+    "path": "evidence/host.json",
+    "sha256": "1619e15749fe79e96dd5ce6b705418a85099bef33b36c5beaa84b64006054402",
+    "class_id": null,
+    "summary": {
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "logical_cpus": 5,
+      "memory_bytes": 18882662400,
+      "kernel": "6.18.57",
+      "hypervisor": null,
+      "isolation_tier_max": "shared-container"
+    }
+  },
+  "arms": [
+    {
+      "id": "initial-controls",
+      "role": "baseline",
+      "binary_sha256": null,
+      "commit": null
+    },
+    {
+      "id": "native-final",
+      "role": "candidate",
+      "binary_sha256": "a9b690e8a642b745c1ced5eff38ee2eb6cf31694087600adf5b55241b8cf272a",
+      "commit": null
+    }
+  ],
+  "runs": [
+    {
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "isolation": {
+        "tier": "shared-container",
+        "contended": null,
+        "blockers": [
+          "Single selected host; no isolated timing or independent-host claim"
+        ]
+      },
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Producer assertions and controls only; no independent signed verdict"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "started_at": null,
+      "finished_at": null,
+      "worker": "selected-workspace",
+      "run_id": "controls-initial",
+      "arm": "initial-controls",
+      "instance_id": "fixed-controls",
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "artifacts": [
+        {
+          "path": "evidence/semaev-controls.stdout",
+          "sha256": "97cdceaa1f912ddca60d3a880fbf5e0b746dd316458ec25a28b91710ec642085",
+          "bytes": 57,
+          "kind": "log"
+        },
+        {
+          "path": "evidence/semaev-controls.stderr",
+          "sha256": "d63330e5570b9fa784c63947aeddc706b07a8626b52e3c8ab6776223bf80bd82",
+          "bytes": 33,
+          "kind": "log"
+        }
+      ]
+    },
+    {
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "isolation": {
+        "tier": "shared-container",
+        "contended": null,
+        "blockers": [
+          "Single selected host; no isolated timing or independent-host claim"
+        ]
+      },
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Producer assertions and controls only; no independent signed verdict"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "started_at": null,
+      "finished_at": null,
+      "worker": "selected-workspace",
+      "run_id": "controls-strengthened",
+      "arm": "native-final",
+      "instance_id": "fixed-controls",
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "artifacts": [
+        {
+          "path": "evidence/semaev-controls-final.stdout",
+          "sha256": "acd1a43c64ba622fb3bbc4998da149687ed9464e92836abb41c25a5f8c01e018",
+          "bytes": 64,
+          "kind": "log"
+        },
+        {
+          "path": "evidence/semaev-controls-final.stderr",
+          "sha256": "d63330e5570b9fa784c63947aeddc706b07a8626b52e3c8ab6776223bf80bd82",
+          "bytes": 33,
+          "kind": "log"
+        }
+      ]
+    },
+    {
+      "seed": null,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": {
+        "policy": "none",
+        "generations_written": 0,
+        "restored_from_generation": null
+      },
+      "isolation": {
+        "tier": "shared-container",
+        "contended": null,
+        "blockers": [
+          "Single selected host; no isolated timing or independent-host claim"
+        ]
+      },
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Producer assertions and controls only; no independent signed verdict"
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "started_at": null,
+      "finished_at": null,
+      "worker": "selected-workspace",
+      "run_id": "census-full",
+      "arm": "native-final",
+      "instance_id": "bounded-population",
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {
+          "q5_m3_curves": 20,
+          "q5_m3_tuples": 2500,
+          "q5_m3_zeros": 496,
+          "q5_m3_false_zeros": 0,
+          "q5_m3_missing_zeros": 0,
+          "q5_m3_expected_degree_each_variable": 2,
+          "q5_m3_degree_failures": 0,
+          "q5_m3_max_symbolic_terms": 13,
+          "q5_m4_curves": 20,
+          "q5_m4_tuples": 12500,
+          "q5_m4_zeros": 3156,
+          "q5_m4_false_zeros": 0,
+          "q5_m4_missing_zeros": 0,
+          "q5_m4_expected_degree_each_variable": 4,
+          "q5_m4_degree_failures": 0,
+          "q5_m4_max_symbolic_terms": 428,
+          "q5_m5_curves": 20,
+          "q5_m5_tuples": 62500,
+          "q5_m5_zeros": 18648,
+          "q5_m5_false_zeros": 0,
+          "q5_m5_missing_zeros": 0,
+          "q5_m5_expected_degree_each_variable": 8,
+          "q5_m5_degree_failures": 0,
+          "q5_m5_max_symbolic_terms": 45094,
+          "q7_m3_curves": 42,
+          "q7_m3_tuples": 14406,
+          "q7_m3_zeros": 2052,
+          "q7_m3_false_zeros": 0,
+          "q7_m3_missing_zeros": 0,
+          "q7_m3_expected_degree_each_variable": 2,
+          "q7_m3_degree_failures": 0,
+          "q7_m3_max_symbolic_terms": 13,
+          "q7_m4_curves": 42,
+          "q7_m4_tuples": 100842,
+          "q7_m4_zeros": 17634,
+          "q7_m4_false_zeros": 0,
+          "q7_m4_missing_zeros": 0,
+          "q7_m4_expected_degree_each_variable": 4,
+          "q7_m4_degree_failures": 0,
+          "q7_m4_max_symbolic_terms": 434,
+          "q7_m5_curves": 42,
+          "q7_m5_tuples": 705894,
+          "q7_m5_zeros": 148152,
+          "q7_m5_false_zeros": 0,
+          "q7_m5_missing_zeros": 0,
+          "q7_m5_expected_degree_each_variable": 8,
+          "q7_m5_degree_failures": 0,
+          "q7_m5_max_symbolic_terms": 48380,
+          "q11_m3_curves": 110,
+          "q11_m3_tuples": 146410,
+          "q11_m3_zeros": 13300,
+          "q11_m3_false_zeros": 0,
+          "q11_m3_missing_zeros": 0,
+          "q11_m3_expected_degree_each_variable": 2,
+          "q11_m3_degree_failures": 0,
+          "q11_m3_max_symbolic_terms": 13,
+          "q13_m3_curves": 156,
+          "q13_m3_tuples": 342732,
+          "q13_m3_zeros": 26352,
+          "q13_m3_false_zeros": 0,
+          "q13_m3_missing_zeros": 0,
+          "q13_m3_expected_degree_each_variable": 2,
+          "q13_m3_degree_failures": 0,
+          "q13_m3_max_symbolic_terms": 13,
+          "q17_m3_curves": 272,
+          "q17_m3_tuples": 1336336,
+          "q17_m3_zeros": 78592,
+          "q17_m3_false_zeros": 0,
+          "q17_m3_missing_zeros": 0,
+          "q17_m3_expected_degree_each_variable": 2,
+          "q17_m3_degree_failures": 0,
+          "q17_m3_max_symbolic_terms": 13,
+          "q19_m3_curves": 342,
+          "q19_m3_tuples": 2345778,
+          "q19_m3_zeros": 123444,
+          "q19_m3_false_zeros": 0,
+          "q19_m3_missing_zeros": 0,
+          "q19_m3_expected_degree_each_variable": 2,
+          "q19_m3_degree_failures": 0,
+          "q19_m3_max_symbolic_terms": 13,
+          "q2_m3_curves": 2,
+          "q2_m3_tuples": 16,
+          "q2_m3_zeros": 6,
+          "q2_m3_false_zeros": 0,
+          "q2_m3_missing_zeros": 0,
+          "q2_m3_expected_degree_each_variable": 2,
+          "q2_m3_degree_failures": 0,
+          "q2_m3_max_symbolic_terms": 5,
+          "q2_m4_curves": 2,
+          "q2_m4_tuples": 32,
+          "q2_m4_zeros": 16,
+          "q2_m4_false_zeros": 0,
+          "q2_m4_missing_zeros": 0,
+          "q2_m4_expected_degree_each_variable": 4,
+          "q2_m4_degree_failures": 0,
+          "q2_m4_max_symbolic_terms": 24,
+          "q2_m5_curves": 2,
+          "q2_m5_tuples": 64,
+          "q2_m5_zeros": 30,
+          "q2_m5_false_zeros": 0,
+          "q2_m5_missing_zeros": 0,
+          "q2_m5_expected_degree_each_variable": 8,
+          "q2_m5_degree_failures": 0,
+          "q2_m5_max_symbolic_terms": 729,
+          "q4_m3_curves": 12,
+          "q4_m3_tuples": 768,
+          "q4_m3_zeros": 188,
+          "q4_m3_false_zeros": 0,
+          "q4_m3_missing_zeros": 0,
+          "q4_m3_expected_degree_each_variable": 2,
+          "q4_m3_degree_failures": 0,
+          "q4_m3_max_symbolic_terms": 5,
+          "q4_m4_curves": 12,
+          "q4_m4_tuples": 3072,
+          "q4_m4_zeros": 976,
+          "q4_m4_false_zeros": 0,
+          "q4_m4_missing_zeros": 0,
+          "q4_m4_expected_degree_each_variable": 4,
+          "q4_m4_degree_failures": 0,
+          "q4_m4_max_symbolic_terms": 24,
+          "q4_m5_curves": 12,
+          "q4_m5_tuples": 12288,
+          "q4_m5_zeros": 4548,
+          "q4_m5_false_zeros": 0,
+          "q4_m5_missing_zeros": 0,
+          "q4_m5_expected_degree_each_variable": 8,
+          "q4_m5_degree_failures": 0,
+          "q4_m5_max_symbolic_terms": 729
+        }
+      },
+      "artifacts": [
+        {
+          "path": "evidence/semaev-native.jsonl",
+          "sha256": "48c17a3475ffb6cc8de0b80bc2e6d4c23412632f7c85cb84b72221484050b3bf",
+          "bytes": 2971,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/semaev-native.stderr",
+          "sha256": "d63330e5570b9fa784c63947aeddc706b07a8626b52e3c8ab6776223bf80bd82",
+          "bytes": 33,
+          "kind": "raw"
+        }
+      ]
+    }
+  ],
+  "flow": {
+    "planned": 3,
+    "attempted": 3,
+    "completed": 3,
+    "not_completed": 0,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "evidence/semaev-controls.stdout",
+      "sha256": "97cdceaa1f912ddca60d3a880fbf5e0b746dd316458ec25a28b91710ec642085",
+      "bytes": 57,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/semaev-controls.stderr",
+      "sha256": "d63330e5570b9fa784c63947aeddc706b07a8626b52e3c8ab6776223bf80bd82",
+      "bytes": 33,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/semaev-controls-final.stdout",
+      "sha256": "acd1a43c64ba622fb3bbc4998da149687ed9464e92836abb41c25a5f8c01e018",
+      "bytes": 64,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/semaev-controls-final.stderr",
+      "sha256": "d63330e5570b9fa784c63947aeddc706b07a8626b52e3c8ab6776223bf80bd82",
+      "bytes": 33,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/semaev-native.jsonl",
+      "sha256": "48c17a3475ffb6cc8de0b80bc2e6d4c23412632f7c85cb84b72221484050b3bf",
+      "bytes": 2971,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/semaev-native.stderr",
+      "sha256": "d63330e5570b9fa784c63947aeddc706b07a8626b52e3c8ab6776223bf80bd82",
+      "bytes": 33,
+      "kind": "raw"
+    },
+    {
+      "path": "PROTOCOL.md",
+      "sha256": "936b84b56383c2e6533dbec31a0cf13e13913df828d190e552dd83308d9fac86",
+      "bytes": 2058,
+      "kind": "protocol"
+    },
+    {
+      "path": "native/finite.hpp",
+      "sha256": "52bc0de38bd477be7a5712d27ad28178156e2973c2de87083428abb869a58b75",
+      "bytes": 4223,
+      "kind": "other"
+    },
+    {
+      "path": "native/semaev.cpp",
+      "sha256": "4d7b03deded10cf62650c868c04f0074e0ce505fa46f63da44a7f5d4e33a819b",
+      "bytes": 10297,
+      "kind": "other"
+    },
+    {
+      "path": "evidence/semaev-source.sha256",
+      "sha256": "be9f65f5cf9da781cd1ee7b019a406acc450b411e12fd589d4e467b8ae858c5e",
+      "bytes": 168,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/semaev-binary.sha256",
+      "sha256": "b7a1c6f741e8a540edcbcd5b4da486be2032106f58076497e31066bd5016a3f4",
+      "bytes": 99,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/compiler.txt",
+      "sha256": "6d1797e8cf1af3c4cc3040ac531c55223d2bda58677a145cafdd46f4ad55fbc5",
+      "bytes": 30,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/host.json",
+      "sha256": "1619e15749fe79e96dd5ce6b705418a85099bef33b36c5beaa84b64006054402",
+      "bytes": 283,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "reports/run-20261109-native/render.mjs",
+      "sha256": "a64ae3fd792fd392dd4e24c4633540fd4ec83f9eb9f35385b9432d8ac42bea53",
+      "bytes": 5796,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "reports/run-20261109-native/plot-data.json",
+        "sha256": "da39f36089a8fcca575654cbd5e32782ed91507eb6850045682215bb480c6138",
+        "bytes": 2061,
+        "kind": "summary"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "by": "producer",
+      "text": "Bounds were recorded in pre-run PROTOCOL.md. No committed frozen JSON protocol exists. This is an observational export; structural/file validation is not frozen-protocol acceptance."
+    },
+    {
+      "kind": "observation",
+      "by": "producer",
+      "text": "Sixteen aggregate rows came from one broad census execution, not sixteen independent executions. Initial controls predate strengthened S4/S5 controls; the old binary digest was not recorded. Clocks/start/finish timestamps were not captured."
+    }
+  ],
+  "reviews_dir": "reviews"
+}

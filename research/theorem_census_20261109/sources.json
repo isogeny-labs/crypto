@@ -1,0 +1,31 @@
+{
+  "schema": "source-audit/v1",
+  "kb": "unavailable; narrow corpus and primary-source fallback, as in previous increment",
+  "sources": [
+    {
+      "id": "FGHR2014",
+      "title": "Using Symmetries in the Index Calculus for Elliptic Curves Discrete Logarithm",
+      "url": "https://link.springer.com/content/pdf/10.1007/s00145-013-9158-5.pdf",
+      "sha256": "190a6cf398a29a3c6c2e4e3460fc94faed0984f7a9537f09f55b066a0f981f97",
+      "read_scope": "Sections2.1,3 Definitions2/5,4.1.1, Hypothesis3, Theorem4.1 and experiment tables",
+      "interpretation": "Hypothesis3 universal square-system reading fails on base-defined input; generic-instance reading and conditional complexity theorem not refuted. Section3 zero-dimensional context and nonzero-equation condition retained."
+    },
+    {
+      "id": "Mathlib",
+      "revision": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+      "read_scope": "Affine elliptic points/base change, AdjoinRoot monic coordinates and power basis, regular sequences, homogeneous components, finite vector-space cardinality"
+    },
+    {
+      "id": "Repository",
+      "revision": "ca496f7898f4467a28b9733bd8a43f52f9e8e723",
+      "read_scope": "Original fourteen exact nodes and source corrections in previous study; unchanged identity issuer/checker and SHA256"
+    },
+    {
+      "id": "experiment-protocol",
+      "repository": "aburan28/crypto-autoresearcher",
+      "revision": "b01998bd7437159134d879523bead16e66ac3da8",
+      "read_scope": "Canonical SKILL.md, export schema, protocol/check-export code; read after native run, protocol omission disclosed"
+    }
+  ],
+  "previous_source_audit": "../theorem_audit_20261108/sources.json"
+}

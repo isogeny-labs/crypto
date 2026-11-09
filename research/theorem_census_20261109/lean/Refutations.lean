@@ -1,0 +1,15 @@
+import RationalCounterexample
+import DescentCounterexample
+
+#print axioms SkepticalAudit.rational_only_s3_converse_false
+#print axioms SkepticalAudit.extensionPolynomial_irreducible
+#print axioms SkepticalAudit.coordinate_constant
+#print axioms SkepticalAudit.actual_descended_equations
+#print axioms SkepticalAudit.actual_descent_not_regular
+#print axioms SkepticalAudit.actual_descent_top_parts_not_regular
+#print axioms SkepticalAudit.extension_finrank
+#print axioms SkepticalAudit.extension_cardinality
+#print axioms SkepticalAudit.target_three_torsion
+#print axioms SkepticalAudit.symmetrization_over_extension
+#print axioms SkepticalAudit.universal_descent_regularity_counterexample
+#print axioms SkepticalAudit.symmetrization_universal

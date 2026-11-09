@@ -1,0 +1,11 @@
+name = "theorem_refutations"
+version = "0.1.0"
+defaultTargets = ["Refutations"]
+
+[[require]]
+name = "theorem_audit"
+path = "../../theorem_audit_20261108/lean"
+
+[[lean_lib]]
+name = "Refutations"
+roots = ["Refutations", "RationalCounterexample", "DescentCounterexample"]
