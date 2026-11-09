@@ -176,7 +176,7 @@ only at their already-stated scope. [pcc:unverified]
 | 10 Walks | Actual PMF fixed-support nonmixing family, actual finite hash-graph variance correction, and exhaustive3930-support mixing/82034-map collision census now pass scoped checks. Random-support averaging, nonuniform p_i and limiting collision constants remain open; qualified Hildebrand is not refuted. See ../walk_audit_20261109. |
 | 11 Standards | Screening hypotheses reviewed. Large-order anomalous Smart fixture/proof and matched rho benchmark remain open. Screened NIST recommendation is not refuted. |
 | 12 msolve/F4 | Partial static audit, exact native GB/staircase/count fixtures, and a Lean-backed preflight coefficient discrepancy/C conversion boundary. No faithful C/libm-to-F4Run refinement, full parameter-map or row-trace certificate yet. |
-| 13 Independence | Other-language fixed controls/census on this one host. Independent second-host execution remains unavailable. |
+| 13 Independence | Separate Rust S3 arithmetic now matches the complete six-prime C++ population:942models/4188162triples/244236zeros,0directional discrepancies. New actual quadratic-field Lean foundation gate11pass. The single separate-host manual dispatch returnedHTTP404, with response retained; no remote execution is claimed. See ../independent_s3_validator_20261109. |
 | 14 Negative control | Prior Lean lower/upper degree certificates, production Rust control, and actual msolve degree3known-answer run pass. No retroactive claim that older censuses used this control. |
 
 The actual higher-genus Jacobian, pairing, general geometric supersingularity and C-refinement

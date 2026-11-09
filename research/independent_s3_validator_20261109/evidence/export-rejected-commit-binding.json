@@ -1,0 +1,623 @@
+{
+  "schema": "experiment.export/v1",
+  "export_id": "independent-s3-20261109-v1",
+  "created": "2026-11-09T05:45:52.591Z",
+  "protocol": {
+    "path": "protocol.json",
+    "sha256": "44eea2cae6e05da1f23450dab8373984e369929ce9abf8a2d2227786db67e820",
+    "protocol_id": "independent-s3-20261109",
+    "version": 1
+  },
+  "producer": {
+    "runtime": "codex",
+    "model": null,
+    "session": null,
+    "role": "executor"
+  },
+  "source": {
+    "repo": "crypto",
+    "commit": "770ee2e560370eaaf08d5dca3b8d3a9a596384ba",
+    "dirty": true
+  },
+  "backend": "mixed",
+  "host": {
+    "path": "evidence/local/host.json",
+    "sha256": "0f79ee6a43e7c513c5860a45936d3269bf8968853f067423f4a4dd91ca7633a9",
+    "class_id": "local-shared-independent-s3",
+    "summary": {
+      "cpu_model": "INTEL(R) XEON(R) PLATINUM 8573C",
+      "logical_cpus": null,
+      "memory_bytes": null,
+      "kernel": "6.18.57",
+      "hypervisor": null,
+      "isolation_tier_max": "none"
+    }
+  },
+  "arms": [
+    {
+      "id": "local",
+      "role": "reference",
+      "binary_sha256": "9cee15ca13d1a8160ecfdb8d5d5219b0d52e5a7efa3a23428a8b2d0d464d6afe",
+      "commit": "770ee2e560370eaaf08d5dca3b8d3a9a596384ba"
+    },
+    {
+      "id": "github-hosted",
+      "role": "reference",
+      "binary_sha256": null,
+      "commit": null
+    }
+  ],
+  "runs": [
+    {
+      "run_id": "local-0",
+      "arm": "local",
+      "instance_id": "0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "succeeded",
+      "outcome_class": "completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {
+          "fields": 6,
+          "models": 942,
+          "tuples": 4188162,
+          "zeros": 244236,
+          "comparison": 1
+        },
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "Shared local host; no clock metric."
+        ]
+      },
+      "verification": {
+        "status": "verified",
+        "verifier": "Frozen Rust field/point checks and exact aggregate comparator against disclosed C++ known answer. One local host; no signed execution claim."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/local/actual.jsonl",
+          "sha256": "d0b53b7747be5ba07fe7591547e9d1fd90627c4a1c33dd934bdf87daa5a4a8be",
+          "bytes": 545,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/local/actual.stderr",
+          "sha256": "f45d807ab9b9e0eb69c93e1f42f058af1068ccd37431c417e7f728621794f4a9",
+          "bytes": 570,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/local/build.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/local/build.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/local/build.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/local/comparison.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/local/comparison.json",
+          "sha256": "7c5ddda5ea4783f47f65e5e0fd24b4f9d9a3312e6381d7b8731c6e30ef5747cb",
+          "bytes": 234,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/local/comparison.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/local/end-epoch",
+          "sha256": "32190368c9221451b4d747aac7fd5f08dca5f1be71b70616a3c4e413515d1c90",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/local/host.json",
+          "sha256": "0f79ee6a43e7c513c5860a45936d3269bf8968853f067423f4a4dd91ca7633a9",
+          "bytes": 615,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/local/run.exit",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/local/start-epoch",
+          "sha256": "34ad6a68e0c47a9ad3a4346c981f7edf93d116847c316438538b216400d97e21",
+          "bytes": 11,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-09T05:44:09.000Z",
+      "finished_at": "2026-11-09T05:44:11.000Z",
+      "worker": "one local host",
+      "backend_ref": "evidence/local"
+    },
+    {
+      "run_id": "github-hosted-0",
+      "arm": "github-hosted",
+      "instance_id": "0",
+      "seed": 0,
+      "replicate": 0,
+      "warmup": false,
+      "status": "infra_error",
+      "outcome_class": "not_completed",
+      "attempts": 1,
+      "resumed": 0,
+      "checkpoint": null,
+      "measurements": {
+        "counted": {},
+        "wall_seconds": null,
+        "wall_valid": false,
+        "cpu_user_seconds": null,
+        "cpu_sys_seconds": null,
+        "max_rss_bytes": null,
+        "counters": {}
+      },
+      "isolation": {
+        "tier": "none",
+        "contended": null,
+        "blockers": [
+          "No remote native process: dispatch HTTP404."
+        ]
+      },
+      "verification": {
+        "status": "not_run",
+        "verifier": "Not run: dispatch HTTP404, workflow lookup HTTP404; no inferred independent-host validation."
+      },
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/remote/default-branch-lookup.exit",
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/remote/default-branch-lookup.stderr",
+          "sha256": "d2c8985c89b29a842ac4946d13bdbc297709f44f20bb968faf9682664b211db6",
+          "bytes": 25,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/remote/default-branch-lookup.txt",
+          "sha256": "f41458d7c688bf6359b4d030f803afd6d11f9a28fd0d38c4067141dc95e7ef5b",
+          "bytes": 1496,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/remote/dispatch-response.txt",
+          "sha256": "23b4cda7013d03bad0e23b7ca82734d52a73f1ef6fb552ba3a1ba2b866f693e9",
+          "bytes": 1678,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/remote/dispatch.exit",
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/remote/dispatch.stderr",
+          "sha256": "d2c8985c89b29a842ac4946d13bdbc297709f44f20bb968faf9682664b211db6",
+          "bytes": 25,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/remote/end-epoch",
+          "sha256": "fc23a35dd2274cdb864b57fcecc2e6bf0fe8f51cc065d4b76868ee5529076af2",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/remote/start-epoch",
+          "sha256": "d6657b38011cb34600e78919672e3b83b01aa33aff069c7cd2a8c3a21ace2d8e",
+          "bytes": 11,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/remote/workflow-lookup.exit",
+          "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+          "bytes": 2,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/remote/workflow-lookup.stderr",
+          "sha256": "d2c8985c89b29a842ac4946d13bdbc297709f44f20bb968faf9682664b211db6",
+          "bytes": 25,
+          "kind": "raw"
+        },
+        {
+          "path": "evidence/remote/workflow-lookup.txt",
+          "sha256": "7bed0d5a19ee97cf41145318cf8b21df26c352f8acc0d4f92998633e513ea738",
+          "bytes": 1466,
+          "kind": "raw"
+        }
+      ],
+      "started_at": "2026-11-09T05:44:30.000Z",
+      "finished_at": "2026-11-09T05:44:31.000Z",
+      "worker": "not provisioned",
+      "backend_ref": "evidence/remote"
+    }
+  ],
+  "flow": {
+    "planned": 2,
+    "attempted": 2,
+    "completed": 1,
+    "not_completed": 1,
+    "interrupted": 0,
+    "resumed": 0,
+    "excluded": []
+  },
+  "files": [
+    {
+      "path": "protocol.json",
+      "sha256": "ad37ddddc472a249b9825dfc25c73de2aa18261d731e1cedfa55001e05e9e8b3",
+      "bytes": 16353,
+      "kind": "protocol"
+    },
+    {
+      "path": "PROTOCOL.md",
+      "sha256": "277b3aa79521c8ddd562f14e93dc351ec27079cb101f335adebba350b9d85b57",
+      "bytes": 4209,
+      "kind": "raw"
+    },
+    {
+      "path": "provenance.json",
+      "sha256": "e43368b1e37a949f42c9dedb47b0b1b84425a15af3b20e2f02eb45d0572f6581",
+      "bytes": 2194,
+      "kind": "raw"
+    },
+    {
+      "path": "frozen-files.sha256",
+      "sha256": "945e889f26fe504830d0000a71869988dad96b41a7ec9a22430d0ab3634b465f",
+      "bytes": 803,
+      "kind": "raw"
+    },
+    {
+      "path": "run-driver.sh",
+      "sha256": "e6506dcd2051988dc912564b062c5b95bea26eb8cf20e03a5d44be3d31244942",
+      "bytes": 2755,
+      "kind": "raw"
+    },
+    {
+      "path": "compare.mjs",
+      "sha256": "dbba767122d1a35870cad030b85991f874fbb53ab8afd04c5c0626c634b8d202",
+      "bytes": 1346,
+      "kind": "raw"
+    },
+    {
+      "path": "check-protocol.mjs",
+      "sha256": "2f36faf263606df3d7c0ceb2f0ac19f088620ffb81eb7d80b0e9c0968b5c84c4",
+      "bytes": 910,
+      "kind": "raw"
+    },
+    {
+      "path": "src/main.rs",
+      "sha256": "c00369fc95a64709cd2ad74d7686f9937190bcb5890d6d9e27feb8e5599c87d1",
+      "bytes": 8741,
+      "kind": "analysis"
+    },
+    {
+      "path": "evidence/local-driver.log",
+      "sha256": "6b75bf6c1225b694b9a4b4a6280563faf6fde65d49e9208c6149b95d4957e684",
+      "bytes": 3213,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/protocol-freeze.txt",
+      "sha256": "d6fb2e5f4a5bee32847c5c222f21e9aa57bc95bc1c53934c8864690d7472ecb0",
+      "bytes": 247,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/repository-visibility.json",
+      "sha256": "e17b2af637b64be4f40ae280e581e1c62bb920df8f10c0e86e53400103ed18dd",
+      "bytes": 64,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/public-runner-billing.txt",
+      "sha256": "198c55021426bba1023776db1801b6a65eb21d28a14c30c7b219573745b4e4e6",
+      "bytes": 272,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/proof-gate.log",
+      "sha256": "f1d2ffbb7e464195cc1c000f3f87f1d39bb08d6f56a79e6c9224a26953170d0a",
+      "bytes": 93,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/pcc-foundation-check.json",
+      "sha256": "f968d8df65b0c1937270e4ba2c1e79d3d7ec64d1ad2fb18ec2bc989c714759ec",
+      "bytes": 487,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/local/actual.jsonl",
+      "sha256": "d0b53b7747be5ba07fe7591547e9d1fd90627c4a1c33dd934bdf87daa5a4a8be",
+      "bytes": 545,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/local/actual.stderr",
+      "sha256": "f45d807ab9b9e0eb69c93e1f42f058af1068ccd37431c417e7f728621794f4a9",
+      "bytes": 570,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/local/build.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/local/build.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/local/build.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/local/comparison.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/local/comparison.json",
+      "sha256": "7c5ddda5ea4783f47f65e5e0fd24b4f9d9a3312e6381d7b8731c6e30ef5747cb",
+      "bytes": 234,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/local/comparison.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/local/end-epoch",
+      "sha256": "32190368c9221451b4d747aac7fd5f08dca5f1be71b70616a3c4e413515d1c90",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/local/host.json",
+      "sha256": "0f79ee6a43e7c513c5860a45936d3269bf8968853f067423f4a4dd91ca7633a9",
+      "bytes": 615,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/local/run.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/local/start-epoch",
+      "sha256": "34ad6a68e0c47a9ad3a4346c981f7edf93d116847c316438538b216400d97e21",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/remote/default-branch-lookup.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/remote/default-branch-lookup.stderr",
+      "sha256": "d2c8985c89b29a842ac4946d13bdbc297709f44f20bb968faf9682664b211db6",
+      "bytes": 25,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/remote/default-branch-lookup.txt",
+      "sha256": "f41458d7c688bf6359b4d030f803afd6d11f9a28fd0d38c4067141dc95e7ef5b",
+      "bytes": 1496,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/remote/dispatch-response.txt",
+      "sha256": "23b4cda7013d03bad0e23b7ca82734d52a73f1ef6fb552ba3a1ba2b866f693e9",
+      "bytes": 1678,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/remote/dispatch.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/remote/dispatch.stderr",
+      "sha256": "d2c8985c89b29a842ac4946d13bdbc297709f44f20bb968faf9682664b211db6",
+      "bytes": 25,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/remote/end-epoch",
+      "sha256": "fc23a35dd2274cdb864b57fcecc2e6bf0fe8f51cc065d4b76868ee5529076af2",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/remote/start-epoch",
+      "sha256": "d6657b38011cb34600e78919672e3b83b01aa33aff069c7cd2a8c3a21ace2d8e",
+      "bytes": 11,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/remote/workflow-lookup.exit",
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/remote/workflow-lookup.stderr",
+      "sha256": "d2c8985c89b29a842ac4946d13bdbc297709f44f20bb968faf9682664b211db6",
+      "bytes": 25,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/remote/workflow-lookup.txt",
+      "sha256": "7bed0d5a19ee97cf41145318cf8b21df26c352f8acc0d4f92998633e513ea738",
+      "bytes": 1466,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/p23.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/p23.jsonl",
+      "sha256": "9356520b774e3822b60eee6219d27acf7bf337cf54c0198eede2e95467c127f7",
+      "bytes": 94,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/p23.stderr",
+      "sha256": "63f4e88420ef40c02328c74296274c2f652ec1a49f52542aa4d100ed448e4825",
+      "bytes": 96,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/p23.time",
+      "sha256": "b05f05e6fb04b72076b4ccb9cff089b1876b67fac87abc6a18b7683ce41949e5",
+      "bytes": 32,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/p3.exit",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/p3.jsonl",
+      "sha256": "0e24d63f84af4220a294e9fe904cdc2424c98d8c056c36504a8ea0c01293e497",
+      "bytes": 83,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/p3.stderr",
+      "sha256": "e130623b7281cd71513ac49be746a1e2e937fb61b2f15e54aff8b523cd363abe",
+      "bytes": 92,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/p3.time",
+      "sha256": "b3751c7a2d6a37c04e78a26b1e95d43a28ca7bd61190ffada545bc5a618a5805",
+      "bytes": 32,
+      "kind": "raw"
+    },
+    {
+      "path": "evidence/preflight/source.sha256",
+      "sha256": "413c174af6041ecc386ad4460f17b0dc1c64fd5afd4b77f9138ebf8b15c39c41",
+      "bytes": 231,
+      "kind": "raw"
+    }
+  ],
+  "analysis": {
+    "script": {
+      "path": "src/main.rs",
+      "sha256": "c00369fc95a64709cd2ad74d7686f9937190bcb5890d6d9e27feb8e5599c87d1",
+      "bytes": 8741,
+      "kind": "analysis"
+    },
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "path": "evidence/local/actual.jsonl",
+        "sha256": "d0b53b7747be5ba07fe7591547e9d1fd90627c4a1c33dd934bdf87daa5a4a8be",
+        "bytes": 545,
+        "kind": "summary"
+      },
+      {
+        "path": "evidence/local/comparison.json",
+        "sha256": "7c5ddda5ea4783f47f65e5e0fd24b4f9d9a3312e6381d7b8731c6e30ef5747cb",
+        "bytes": 234,
+        "kind": "summary"
+      },
+      {
+        "path": "evidence/remote/dispatch-response.txt",
+        "sha256": "23b4cda7013d03bad0e23b7ca82734d52a73f1ef6fb552ba3a1ba2b866f693e9",
+        "bytes": 1678,
+        "kind": "receipt"
+      }
+    ],
+    "unmasked_at": null
+  },
+  "notes": [
+    {
+      "kind": "observation",
+      "text": "Fresh independent Rust implementation locally matches6fields/942models/4188162triples/244236zeros,0false/missing zeros, and all actual field/point checks. C++ reference was seen before development; not blind validation.",
+      "by": "executor"
+    },
+    {
+      "kind": "observation",
+      "text": "Source275f566e and freeze770ee2e5 were committed before full local data. Local run05:44:11Z followed protocol freeze05:43:59Z. Source source.dirty records an untracked PCC receipt/output, not a frozen source change. Source published as7b0da356; freeze published as9952aad4 before dispatch05:44:31Z. Exact tree identities retained separately.",
+      "by": "executor"
+    },
+    {
+      "kind": "observation",
+      "text": "Exactly one dispatch attempt returnedHTTP404; workflow and main-file lookups also returnedHTTP404. No remote host/compiler/binary/run is available. A missing default-branch workflow is observed; endpoint permissions may also affect404, so no exclusive cause asserted. No alternate trusted workflow, paid runner or artifact upload used.",
+      "by": "executor"
+    },
+    {
+      "kind": "observation",
+      "text": "Lean foundation gate11pass,0forbidden/native exceptions; full local PCC check passes unsigned. Compiler/runtime, binary,S4/S5 and degree proofs remain outside scope. Preflightp3/p23 preserved; no clock metric.",
+      "by": "executor"
+    }
+  ],
+  "reviews_dir": "reviews"
+}
