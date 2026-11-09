@@ -83,3 +83,15 @@ Normpre/compiler/postruns; nativefixtureandv2rootvalidationafterterminal. [pcc:u
 
 ## Errors
 Rootcampaignleaseexpiredwhilehandlingnativefailure; reclaimedT1948epoch3, noactivepayloaddependedonthatlease. Normactiveleaseheartbeatmaintainedseparately. [pcc:unverified]
+
+## What was done — 17:57 UTC
+Norm replaypassedall3phases414.677559s,pre/post16736files3111892318bytes,fourcallsexits0/0/0/1. Independentraw/sourcefidelityreview underway. [pcc:unverified]
+
+## Decisions made
+Chargefull2400norm; cumulative5280, reserve60native-logfixture,unreserved37860. RootcampaignleaseT1948reclaimedepoch5 afterexpiry; boundedcoordinationheartbeatPID4073034/session73414 at /var/tmp/pencil-campaign-heartbeat-20261109 maintainslease untiloriginaldeadlineorstopfile. It launches no payload. [pcc:unverified]
+
+## Open threads
+Run nativefixture thenfullrootv2; review andarchiveLean results. [pcc:unverified]
+
+## Errors
+Campaignmetadataheartbeat expired duringlonganalysis; original failedheartbeat leftno releasefile. Newboundedheartbeat preventsfurthercoordinationexpiry; no active nativepayloaddependedonexpiredcampaignlease. [pcc:unverified]
