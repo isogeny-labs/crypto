@@ -157,3 +157,16 @@ Whole census gate259passes,0failing/0trusted-native exceptions. See
 General all-mrecursion/degree, m5degree and irreducibility remain open.
 No solving-degree/regularity or attack-complexity result follows.
 [pcc:unverified]
+
+### 2026-11-09 general resultant degree step
+
+The actual fixed-size resultant now has a universal arbitraryDleading
+coefficient/degree proof; nonzero incoming fover a domain gives degree2D.
+The canonical S5application gives last-input degree8with all other inputs
+formal. A Lean counterexample shows that resetting Dafter specialization
+changes the operator. Whole census gate291passes,0failing/0trusted-native
+exceptions. See
+[source and scope](../research/theorem_census_20261109/RESULTANT_DEGREE_STEP.md).
+This narrows the earlier m5degree gap to the remaining input positions;
+general all-mfamily/zero-sum recursion, every-input degrees and irreducibility
+remain open. No asymptotic or complexity conclusion follows. [pcc:unverified]

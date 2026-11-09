@@ -1,6 +1,20 @@
 # Current additive proof and validation receipts
 
-The current census gate passes259declarations,0failing and0trusted-native
+The current census gate passes291declarations,0failing and0trusted-native
+exceptions. ResultantDegreeStep.lean proves the actual fixed-size arbitraryD
+coefficient/degree step and canonical S5last-input degree8; it refutes
+resetting the declared size after specialization. Packet621d56pins the
+explicit combined theorem. SupplementIDC1h7dd754d70e343323accepts32derived
+and11extra points for the fixedD4scalar monic-square resultant only.
+Universal degree/coefficient conclusions rest on Lean. See
+RESULTANT_DEGREE_STEP.md and evidence/resultant-degree-step-gate.log.
+[pcc:unverified]
+
+The full local packet621d56check passes18:39:21Zat source ddc05a59, still
+unsigned. Source was committed before issue and the native proof pointer
+matches. See resultant-degree-step-verification.json. [pcc:unverified]
+
+The preceding census gate passes259declarations,0failing and0trusted-native
 exceptions. S4Degree.lean adds actual canonical polynomials/evaluation in
 all four positions, symbolic degree4in each, the fourth-coefficient S3²
 identity/sharp specialization criterion, and the smooth F5constant1degree0
@@ -15,10 +29,11 @@ the exact proof-file digest matches. See s4-degree-verification.json for
 source/gate/packet/native bindings. No source changed after those checks.
 [pcc:unverified]
 
-Fresh17:30Zread-only ledger comparison:483main rows and483local rows,
-common prefix457, neither a prefix of the other. Equal counts do not
-mean equal histories. Main ref67242289still has blob1f8804d3;
-parent3739remains open/unmerged. See evidence/main-ledger-s4-degree.json.
+Fresh18:37Zread-only ledger comparison:483main rows and484local rows,
+common prefix457, neither a prefix of the other. Main ref50fa6a02has the
+same ledgerblob1f8804d3; parent3739remains open/unmerged. See
+evidence/main-ledger-resultant-degree-step.json. The earlier17:30receipt
+preserves its483/483row snapshot; equal counts were not equal histories.
 No history selected/rechained and no force push. [pcc:unverified]
 
 The preceding composite census gate passes205declarations,0failing and0trusted-native
@@ -82,6 +97,7 @@ already excludes the F2/r2control by gcd(r,q)=1. [pcc:unverified]
 
 | Component | Gate result | Exact receipt |
 |---|---|---|
+| Census, general fixed-size degree step and canonical S5last input | 291pass,0fail,0trusted | evidence/resultant-degree-step-gate.log |
 | Census, S4degree/leading coefficient and specialization control | 259pass,0fail,0trusted | evidence/s4-degree-gate.log |
 | Census, composite-order conditional arithmetic and actual point | 205pass,0fail,0trusted | evidence/composite-torsion-gate.log |
 | Census, first S4resultant step and degree-drop control | 197pass,0fail,0trusted | evidence/general-s4-gate.log |

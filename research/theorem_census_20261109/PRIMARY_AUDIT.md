@@ -79,6 +79,14 @@ not the source's generic degree theorem. General all-mdegree and
 irreducibility remain open. See [S4_DEGREE.md](S4_DEGREE.md) for primary
 source read scopes and exact declaration bindings. [pcc:unverified]
 
+The subsequent ResultantDegreeStep.lean proves an arbitraryDfixed-size
+resultant leading-coefficient/degree theorem and actual canonical S5degree8
+in its last input, with the other inputs independent. A separate Lean
+counterexample refutes resetting the declared Sylvester size after
+specialization. This is not a defined all-mfamily/every-input degree or
+zero-sum recursion proof. See
+[RESULTANT_DEGREE_STEP.md](RESULTANT_DEGREE_STEP.md). [pcc:unverified]
+
 `corrected_prime_embedding_degree` derives k=2 for odd primes r>2 from the
 source trace definition, primality of p≥5, actual group-order divisibility,
 and the explicit Hasse premise t²≤4p. `hasse_trace_zero` supplies the missing
@@ -99,7 +107,9 @@ support points, with fixed support size≥2, fixed positive probabilities,
 and sufficiently large prime modulus. Constants depend on the tolerance
 and probabilities. Theorem2 treats worst supports on a different scale.
 Neither statement establishes a fixed-hash adding-walk collision constant.
-Its full Lean proof and requested exact finite walk census remain open.
+The subsequent walk study completed its bounded exact support/hash census
+and scoped Lean counterexamples; the qualified random-support asymptotic
+theorem's full proof remains open. See ../walk_audit_20261109/README.md.
 [pcc:unverified]
 
 Exact publisher URLs, PDF hashes and read ranges are in `sources.json`.
@@ -112,8 +122,10 @@ in `paper-audit-backlog.json`; no untouched paper is labelled audited.
 ## Reproduction
 
 Run `lake build` and `lake env lean Refutations.lean` in `lean/`, then the
-repository proof gate at `research/theorem_census_20261109/lean`. Final
-receipts are under `evidence/proof-gate-torsion-fst/`; failed incremental
-builds are retained. No new empirical experiment, performance assertion,
-paid cloud job or independent-host census occurs in this follow-up.
+repository proof gate at `research/theorem_census_20261109/lean`. Current
+receipts are under `evidence/resultant-degree-step-gate/`; earlier torsion
+receipts remain in `evidence/proof-gate-torsion-fst/`. Failed incremental
+builds are retained. This latest proof piece runs only its scoped scalar
+identity supplement, without a new curve population, performance assertion,
+paid cloud job or independent-host census.
 [pcc:unverified]

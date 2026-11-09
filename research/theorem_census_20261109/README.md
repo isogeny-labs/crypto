@@ -1,7 +1,8 @@
 # Skeptical Lean refutations and exact Semaev census
 
-Lean4.35.0 now proves the full S3equivalence, first S4resultant step and
-S4individual symbolic degree4in every input for general Weierstrass models
+Lean4.35.0 now proves the full S3equivalence, first S4resultant step,
+S4individual symbolic degree4in every input, a general fixed-size resultant
+degree step and canonical S5last-input degree8for general Weierstrass models
 in every characteristic, with all repeated-coordinate cases and actual
 Mathlib point sums. It also checks model-domain counterexamples over F2/F3,
 geometric p-torsion families, actual torsion-boundary witnesses, a direct r=2
@@ -13,10 +14,10 @@ are not refuted; their exact domains and remaining bridges stay explicit.
 [pcc:unverified]
 
 The torsion-only proof snapshot audited74declarations with0failing and
-0trusted-native exceptions. The current S4degree follow-up
-audits259declarations; the original41-declaration and intermediate96/116/134/167/197/205-declaration receipts are
+0trusted-native exceptions. The current resultant-degree-step follow-up
+audits291declarations; the original41-declaration and intermediate96/116/134/167/197/205/259-declaration receipts are
 retained as earlier snapshots. Counts include generated equation lemmas,
-not259new mathematical results. Both proof attempts and final receipts are
+not291new mathematical results. Both proof attempts and final receipts are
 retained. The torsion snapshot's unsigned PCC records are `PCC-20261109-44730b` and
 `PCC-20261109-5bd3a4`. Earlier packets omitted required declaration hashes;
 they remain as superseded records, and their failed metadata check is
@@ -45,6 +46,18 @@ and [paper-audit-backlog.json](paper-audit-backlog.json). Those are metadata
 counts; untouched papers are not labelled audited. [pcc:unverified]
 
 ## Exact counterexamples
+
+The actual fixed-size resultant step now has a general coefficient/degree
+proof for every declared size D. Its leading coefficient is f(Z)², and its
+last-variable degree is2Dover a domain when f≠0and natDegree(f)≤D.
+Resetting Dafter specializing fto1changes the resultant: declared sizes2and0
+give degrees4and0. The actual canonical S5has last-input degree8with other
+inputs formal. See [RESULTANT_DEGREE_STEP.md](RESULTANT_DEGREE_STEP.md),
+[source](lean/ResultantDegreeStep.lean) and
+[report](reports/proof-20261109-resultant-degree-step/report.pdf).
+Packet621d56and fixedD4scalar supplementIDC1h7dd754d70e343323remain unsigned;
+the all-mcanonical family/every-input degree and irreducibility remain open.
+[pcc:unverified]
 
 The canonical S4polynomial has symbolic degree4in every input position,
 with the remaining inputs independent formal variables. For fixed other
@@ -238,7 +251,7 @@ only at their already-stated scope. [pcc:unverified]
 
 | Item | Current status and concrete remaining obligation |
 |---|---|
-| 1 Semaev | Partial: full general-Weierstrass S3equivalence in every characteristic now proved, including all repeated-coordinate cases and actual point sums. Prior short/ordinary binary forms are checked specializations. Rational-only converse and wrong-model extensions refuted, including actual F2/F3geometric controls. First actual fixed-degree S4resultant equivalence now proved, with a faithful degree-drop control; bounded S3/S4/S5native census completed. Canonical symbolic individual degree4 in each m4input and the sharp specialization criterion now also proved. Recursion/degree beyond m4 and irreducibility remain open; original2004PDFstill403/unread. |
+| 1 Semaev | Partial: full general-Weierstrass S3equivalence in every characteristic now proved, including repeated-coordinate cases and actual point sums. Short/ordinary binary forms are checked specializations. Rational-only converse and wrong-model extensions refuted, including actual F2/F3geometric controls. First actual fixed-degree S4resultant equivalence and degree-drop control proved; bounded S3/S4/S5native census completed. Canonical individual degree4 in each m4input and sharp specialization criterion proved. Universal fixed-size resultant degree step and actual S5last-input degree8now proved, with a reset-of-size counterexample. General all-mfamily/zero-sum recursion, every-input degree beyondm4 and irreducibility remain open; original2004PDFstill403/unread. |
 | 2 BK | Partial: original r²point-count formulation read; actual excluded-case geometric3-torsion witness even with9dividing#E. New F2/r2actual geometric torsion has2points all rational, refuting unrestricted set inclusion despite2notdividingq−1. The actual node already excludes this by gcd(r,q)=1; original r²condition is not refuted. Full qualified Frobenius proof and all-p<500 census remain open. |
 | 3 Supersingular | Literal all-prime k=2 assertion refuted at r=2 using the source trace definition and actual groups. FSTp239directly checked with actual cyclotomic degree1 versus nonrational2-torsion. New characteristic2a1=0and characteristic3short families have trivial geometric p-torsion in actual groups. Corrected modular embedding proof now covers every integer r>2, with an actual order8positive control, and remains conditional on Hasse; general trace/p-rank/classification bridge and binary/ternary census remain open. |
 | 4 Pairings | Partial: cyclic restriction obstruction, actual cyclotomic/full-torsion distinction, and actual geometric F2torsion/μ2subtypes proving every point-valued map degenerate at characteristic order. Group-scheme duality is not refuted. Actual qualified Weil/Tate constructions, nondegeneracy and MOV/FR calculations remain open. |
