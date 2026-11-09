@@ -1,6 +1,6 @@
 name = "common_scalar"
 version = "0.1.0"
-defaultTargets = ["CommonScalar", "RationalScalar", "LocalIntegral", "LocalCharts", "GlobalPolynomials", "LocalPrecision", "FiniteBuffers", "ResidueEncoding"]
+defaultTargets = ["CommonScalar", "RationalScalar", "LocalIntegral", "LocalCharts", "GlobalPolynomials", "LocalPrecision", "FiniteBuffers", "ResidueEncoding", "BooleanContraction", "PackedContraction"]
 [[require]]
 name = "CryptoLean"
 git = "https://github.com/aburan28/crypto-lean.git"
@@ -34,3 +34,9 @@ name = "FiniteBuffers"
 
 [[lean_lib]]
 name = "ResidueEncoding"
+
+[[lean_lib]]
+name = "BooleanContraction"
+
+[[lean_lib]]
+name = "PackedContraction"
