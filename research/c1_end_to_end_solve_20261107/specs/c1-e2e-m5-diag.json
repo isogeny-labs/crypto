@@ -1,0 +1,49 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "C1 end-to-end DIAGNOSTIC (not evidence): tw dispatch at 1 target, 1 round, no warmup",
+  "description": "Diagnostic for the 2026-11-09 stage-1 dispatches (runs 42559413871, 42559417239) that ended without a final receipt. Same code (7aaa6318), curve, arms and isolation as c1-e2e-m5-tw.json; only the workload size is reduced. Not evidence; not scored.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "f2m4_a0",
+        "m": 5,
+        "seed": 1,
+        "max_cofactor": 8
+      }
+    ],
+    "targets_per_curve": 1,
+    "target_seed": 20261107
+  },
+  "arms": [
+    {
+      "name": "rho-strong-l1",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation_strong",
+        "params": {
+          "lanes": "1",
+          "dp_bits": "auto"
+        }
+      }
+    },
+    {
+      "name": "ic-tw-a",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "bin-x-line:line=twisted,line_seed=1",
+          "oracle": "gaudry-x-bin:macaulay=26,sparsest=1,charge_unsolved=1"
+        }
+      }
+    }
+  ],
+  "measurement": {
+    "rounds": 1,
+    "warmup": 0,
+    "order": "alternate_measured",
+    "seed": 1,
+    "isolation_required": "L2",
+    "timeout_seconds": 900
+  }
+}
