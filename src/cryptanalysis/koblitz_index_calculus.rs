@@ -2764,6 +2764,55 @@ pub fn build_standard_subspace_factor_base(
     )
 }
 
+/// Keep exactly the original subspace points in the full group-trace
+/// kernel, then eliminate the redundant field-trace coordinate. This is
+/// an intersection, not a cofactor image that changes the point base.
+pub fn build_full_trace_zero_subspace_factor_base(
+    kc: &KoblitzCurve,
+    ell: u32,
+) -> Result<FrobeniusFactorBase, String> {
+    let variety = crate::binary_ecc::TraceZeroVariety::new(&kc.curve)
+        .map_err(|e| format!("full trace-zero admission: {e:?}"))?;
+    let parent = build_standard_subspace_factor_base(kc, ell)?;
+    let intersection = variety
+        .intersect_factor_base(&parent.points, &parent.subspace_basis)
+        .map_err(|e| format!("full trace-zero factor-base intersection: {e:?}"))?;
+    let points = intersection.points;
+    if points.is_empty() {
+        return Err("empty full trace-zero affine factor base".into());
+    }
+    let reduced = intersection.subspace_basis;
+    let subspace = span_f2(&reduced, kc.n);
+    finish_negation_only_factor_base(
+        kc,
+        FactorBaseDomain::StandardSubspace,
+        reduced.len() as u32,
+        subspace,
+        reduced,
+        points,
+    )
+}
+
+/// Full trace-zero native relation oracle, including identity intermediates.
+/// It preserves the factor base's indices and returns inconclusive on caps.
+pub fn full_trace_zero_decompose(
+    kc: &KoblitzCurve,
+    fb: &FrobeniusFactorBase,
+    target: &BinaryPoint,
+    m: usize,
+    limits: crate::cryptanalysis::trace_zero_relations::TraceZeroRelationLimits,
+) -> Result<
+    crate::cryptanalysis::trace_zero_relations::TraceZeroRelationReport,
+    crate::binary_ecc::TraceZeroError,
+> {
+    let variety = crate::binary_ecc::TraceZeroVariety::new(&kc.curve)?;
+    Ok(
+        crate::cryptanalysis::trace_zero_relations::decompose_full_trace_zero(
+            &variety, &fb.points, target, m, limits,
+        ),
+    )
+}
+
 /// Public cofactor image `[h]F` of an algebraic factor base.  The image
 /// is target-independent and all outputs lie in the prime-order
 /// subgroup, but no scalar preimage or discrete logarithm is retained.
