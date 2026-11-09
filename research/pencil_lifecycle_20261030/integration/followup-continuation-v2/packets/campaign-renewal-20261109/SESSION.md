@@ -143,3 +143,27 @@ Publish/review finalv3bindings then fulltests. Branchfour-step correction requir
 
 ## Errors
 Branch failedsource localaxiomprint includes sorryAx; planned13name audit and maincandidate were notreached. Rootv3earlierepoch1 heartbeat409expired, no payloadusedit; currentepoch3fresh.
+
+## What was done — 18:39 UTC
+Published finalv3admissione06e and all bound inputs at df85767861d8558043bf64c596a291c159674ca7, verified GitHubref equality. Launched one bounded full-library attempt, callerPID87723/session34684, invocation15d1304b26834459b62bd6adf6039d07. Initial maintainedlease heartbeat passed; native supervisor now maintainsT1992epoch3. Coordination-only prelaunchheartbeat53014 stopfile set; completedbranchheartbeat59286 stopped and T1984released.
+
+## Decisions made
+Keep1,800reserved and unchanged2CPU/16GiB/zero-swap/full4controls+unfilteredlibrary gate. Next correctedbranchreplay remains prospective and serial.
+
+## Open threads
+Native preinputcheck/build/tests; prospectivepivot/swap kernelreplay and unioncomposition source review. Source-only five-lane reconciliation identifies alreadycompletedcomponents before any further construction.
+
+## Errors
+No newv3error observed at launch. Priorfailedattempts and costs remain immutable.
+
+## What was done — 19:04 UTC
+Rootv3attempt failed duringcompile afterworkerobservedexpiredsupervisorpermit. Compile630.008572s/attempt991.712661s, allnativeowners terminal, failedcompletion/passedseal, full1800charged. Exactexpiredreadwasnotretained; successfulleaseheartbeats/finalfreshpermit do notproveacause. PublishedparentPR3770 ismerged. Newcontinuationbranch codex/pencil-proof-continuation-20261109 created.
+
+## Decisions made
+Actualdebit12660, reserve3600correctedbranchv2,26940unreserved. Source-onlyv4repairpreserves10-secondpermit and15-secondlease margin, addsboundedfreshread/observability andownercheckedrenewalbeforemetadata; awaitsreview/qualification/newcachebinding. Branchv2T1998epoch3maintained bycoordination-onlysession31508.
+
+## Open threads
+Publish/review branchv2finalbindingsandrunserially. Source-reviewedpivotandroot-cardinality replay protocols ready; producer-eventqualification andliteralUInt64caller construction remainprospective.
+
+## Errors
+No root testinventory/controls/fullsuite reached. Frozenfailureevidenceisarchivedwith PDF/SVG/CSV/JSON,notreplaced.

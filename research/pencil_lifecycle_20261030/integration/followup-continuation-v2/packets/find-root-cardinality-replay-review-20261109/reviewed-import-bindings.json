@@ -1,0 +1,131 @@
+[
+  {
+    "module": "GraphAlgebra",
+    "import": "Mathlib.Algebra.Field.Basic",
+    "route": "bound_cached_module",
+    "path": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/mathlib/.lake/build/lib/lean/Mathlib/Algebra/Field/Basic.olean",
+    "sha256": "4ae1d9cae134d4f7cbc2af92b57afb94beae579433ffa7c4e7f53aee52542ff0"
+  },
+  {
+    "module": "GraphAlgebra",
+    "import": "Mathlib.Tactic.Ring",
+    "route": "bound_cached_module",
+    "path": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/mathlib/.lake/build/lib/lean/Mathlib/Tactic/Ring.olean",
+    "sha256": "301e95fbad73634f1e47fe918723c2d5443cec154d15622c3475e766e9405077"
+  },
+  {
+    "module": "GraphAlgebra",
+    "import": "Mathlib.Tactic.FieldSimp",
+    "route": "bound_cached_module",
+    "path": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/mathlib/.lake/build/lib/lean/Mathlib/Tactic/FieldSimp.olean",
+    "sha256": "b8dbb458e3a8186460623d9126edab45ac05f1fb0f712203006157199b09ce5c"
+  },
+  {
+    "module": "GraphAlgebra",
+    "import": "Lean.Elab.Tactic.Omega",
+    "route": "bound_cached_module",
+    "path": "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/lib/lean/Lean/Elab/Tactic/Omega.olean",
+    "sha256": "7f58793e49ecdb4e6406a4f1579f508f115cbfb7d339600277716fa4127e64e0"
+  },
+  {
+    "module": "GraphAlgebra",
+    "import": "Lean.Elab.Tactic.Decide",
+    "route": "bound_cached_module",
+    "path": "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/lib/lean/Lean/Elab/Tactic/Decide.olean",
+    "sha256": "b19c96d4e95b7afd24030fb99eefa0b6566d3db411c0f69fdaf53b733afe4e59"
+  },
+  {
+    "module": "Find",
+    "import": "GraphAlgebra",
+    "route": "earlier_fresh_module",
+    "sha256": "9f942108cea58335d594aab25758e49202db53279947837e7679d1fec9b59962"
+  },
+  {
+    "module": "Cycles",
+    "import": "GraphAlgebra",
+    "route": "earlier_fresh_module",
+    "sha256": "9f942108cea58335d594aab25758e49202db53279947837e7679d1fec9b59962"
+  },
+  {
+    "module": "Union",
+    "import": "Find",
+    "route": "earlier_fresh_module",
+    "sha256": "339c3470af00bc9a24c862ef57f95ca980d25f4a370962e1b825a8c9ce7000ae"
+  },
+  {
+    "module": "Union",
+    "import": "Cycles",
+    "route": "earlier_fresh_module",
+    "sha256": "658db13dc4acfbf17c14021c8622baa1eda72b5762bb873e82b9f4318f296023"
+  },
+  {
+    "module": "Forest",
+    "import": "Union",
+    "route": "earlier_fresh_module",
+    "sha256": "5c977ab6a4f412d2022d4f61fd0ddb6637db80e64a0702010de7557862bcf2af"
+  },
+  {
+    "module": "Composition",
+    "import": "Forest",
+    "route": "earlier_fresh_module",
+    "sha256": "d008e4dcebee076f04ba6bb67611a1266e2774a54edd78c0e1e683043e99e1a1"
+  },
+  {
+    "module": "UnionSize",
+    "import": "Mathlib.Data.Fintype.Card",
+    "route": "bound_cached_module",
+    "path": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/mathlib/.lake/build/lib/lean/Mathlib/Data/Fintype/Card.olean",
+    "sha256": "eede1b09aa34b0139ed57873e7b36dbfcef596e2b0eb4eaaee8353ed232a0355"
+  },
+  {
+    "module": "UnionSize",
+    "import": "Mathlib.Data.Finset.Card",
+    "route": "bound_cached_module",
+    "path": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/mathlib/.lake/build/lib/lean/Mathlib/Data/Finset/Card.olean",
+    "sha256": "5819b45d1db5a99ab271f4151686f328eb48cfdd8df47b006c9c41c6f44e1d0d"
+  },
+  {
+    "module": "UnionSize",
+    "import": "Lean.Elab.Tactic.Omega",
+    "route": "bound_cached_module",
+    "path": "/home/ec2-user/.elan/toolchains/leanprover--lean4---v4.34.1/lib/lean/Lean/Elab/Tactic/Omega.olean",
+    "sha256": "7f58793e49ecdb4e6406a4f1579f508f115cbfb7d339600277716fa4127e64e0"
+  },
+  {
+    "module": "FindRootCardinality",
+    "import": "Composition",
+    "route": "earlier_fresh_module",
+    "sha256": "d41a05e932771accb0c141ab4fc3e9b482aa72ede70c64743045ae8c1811ba71"
+  },
+  {
+    "module": "FindRootCardinality",
+    "import": "UnionSize",
+    "route": "earlier_fresh_module",
+    "sha256": "61526f7b5964580272a13c8a861580688c1dfec816bad843d694cbbcd583f7ef"
+  },
+  {
+    "module": "Controls",
+    "import": "FindRootCardinality",
+    "route": "earlier_fresh_module",
+    "sha256": "1aea703be91a2dc4e0dd8de44fa575555e460a3d951bbc1665a727ae7d619554"
+  },
+  {
+    "module": "Controls",
+    "import": "Mathlib.Tactic.NormNum",
+    "route": "bound_cached_module",
+    "path": "/home/ec2-user/crypto-pr2304-persist/research/projective_law_followup_20261022/formal/.lake/packages/mathlib/.lake/build/lib/lean/Mathlib/Tactic/NormNum.olean",
+    "sha256": "325bbf27940bd90c94aafe405e154131ffec26fccef767b5d1206148c8c239f9"
+  },
+  {
+    "module": "Readback",
+    "import": "Controls",
+    "route": "earlier_fresh_module",
+    "sha256": "f43f7d0affc63c3c0902c74f55c34232b5943059d45b941b7a095b7a14240298"
+  },
+  {
+    "module": "ExpectedFailure",
+    "import": "Controls",
+    "route": "earlier_fresh_module",
+    "sha256": "f43f7d0affc63c3c0902c74f55c34232b5943059d45b941b7a095b7a14240298"
+  }
+]
