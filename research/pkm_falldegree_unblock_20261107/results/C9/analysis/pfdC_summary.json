@@ -1,0 +1,7040 @@
+{
+ "schema": "pkm-fd-stageC-analysis/v1 (scratchpad scorer, not committed)",
+ "job": "pfd-c-20261108",
+ "pod_uid": "3eeef6a6-9565-415c-918c-b3f92801aafc",
+ "protocol": "research/prime_fall_degree_20261027/PREREGISTRATION.md sha256 ef5e18ea8443d75bc61d925fadbb52406d1fe6fcfaf87d68d99a2361cd657cd2 (Amendments 1-11)",
+ "every_number": "[pcc:unverified]",
+ "files_rows": {
+  "C-t2-m10.jsonl": 2,
+  "C-t2-m10-p0.jsonl": 4,
+  "C-t2-m2.jsonl": 2,
+  "C-t2-m2-p0.jsonl": 4,
+  "C-t2-m3.jsonl": 2,
+  "C-t2-m3-p0.jsonl": 4,
+  "C-t2-m4.jsonl": 2,
+  "C-t2-m4-p0.jsonl": 4,
+  "C-t2-m5.jsonl": 2,
+  "C-t2-m5-p0.jsonl": 4,
+  "C-t2-m6.jsonl": 2,
+  "C-t2-m6-p0.jsonl": 4,
+  "C-t2-m7.jsonl": 2,
+  "C-t2-m7-p0.jsonl": 4,
+  "C-t2-m8.jsonl": 2,
+  "C-t2-m8-p0.jsonl": 4,
+  "C-t2-m9.jsonl": 2,
+  "C-t2-m9-p0.jsonl": 4,
+  "C-t3-m10.jsonl": 2,
+  "C-t3-m2.jsonl": 2,
+  "C-t3-m2-p0.jsonl": 4,
+  "C-t3-m3.jsonl": 2,
+  "C-t3-m3-p0.jsonl": 4,
+  "C-t3-m4.jsonl": 2,
+  "C-t3-m4-p0.jsonl": 4,
+  "C-t3-m5.jsonl": 2,
+  "C-t3-m5-p0.jsonl": 4,
+  "C-t3-m6.jsonl": 2,
+  "C-t3-m7.jsonl": 2,
+  "C-t3-m8.jsonl": 2,
+  "C-t3-m9.jsonl": 2
+ },
+ "instrument": {
+  "expected_C_files": 31,
+  "present_C_files": 31,
+  "missing_C_files": [],
+  "extra_C_files": [],
+  "argv_mismatch": [],
+  "exit_nonzero": [
+   "g3"
+  ],
+  "stages_in_order": [
+   "g1",
+   "g4-kummer-m2",
+   "g4-kummer-m3",
+   "g4-isogeny-m2",
+   "g4-isogeny-m3",
+   "C-t2-m2",
+   "C-t2-m2-p0",
+   "C-t2-m3",
+   "C-t2-m3-p0",
+   "C-t2-m4",
+   "C-t2-m4-p0",
+   "C-t2-m5",
+   "C-t2-m5-p0",
+   "C-t2-m6",
+   "C-t2-m6-p0",
+   "C-t2-m7",
+   "C-t2-m7-p0",
+   "C-t2-m8",
+   "C-t2-m8-p0",
+   "C-t2-m9",
+   "C-t2-m9-p0",
+   "C-t2-m10",
+   "C-t2-m10-p0",
+   "C-t3-m2",
+   "C-t3-m2-p0",
+   "C-t3-m3",
+   "C-t3-m3-p0",
+   "C-t3-m4",
+   "C-t3-m4-p0",
+   "C-t3-m5",
+   "C-t3-m5-p0",
+   "C-t3-m6",
+   "C-t3-m7",
+   "C-t3-m8",
+   "C-t3-m9",
+   "C-t3-m10",
+   "g3"
+  ],
+  "summary_line_problems": [],
+  "duplicate_draws": [],
+  "rows_failing_identity": [],
+  "rows_closure_inconsistent": [],
+  "expected_cells": 44,
+  "cells_with_rows": 44,
+  "cells_not_two_draws": [],
+  "draws_total": 88,
+  "x_r_repeated_within_prime": 0
+ },
+ "rng_identity": {
+  "stageA_checked": 12,
+  "stageA_mismatch": [],
+  "devcheck_checked": 4,
+  "devcheck_mismatch": [],
+  "devcheck_files": [
+   "devcheck_r2/dev-m4-tower.jsonl",
+   "devcheck/dev-A-m2-t1-2.jsonl",
+   "devcheck/dev-A-m2-t1-2.jsonl",
+   "devcheck/dev-M4-t2-k0.jsonl"
+  ],
+  "kummer_m2_grid_zeros": [
+   {
+    "p": 2013265921,
+    "t": 2,
+    "k": 0,
+    "x_r": 779599582,
+    "grid_zeros": 0
+   },
+   {
+    "p": 2013265921,
+    "t": 2,
+    "k": 1,
+    "x_r": 1170562132,
+    "grid_zeros": 0
+   },
+   {
+    "p": 786433,
+    "t": 2,
+    "k": 0,
+    "x_r": 497404,
+    "grid_zeros": 0
+   },
+   {
+    "p": 786433,
+    "t": 2,
+    "k": 1,
+    "x_r": 226869,
+    "grid_zeros": 0
+   },
+   {
+    "p": 2013265921,
+    "t": 3,
+    "k": 0,
+    "x_r": 506819018,
+    "grid_zeros": 0
+   },
+   {
+    "p": 2013265921,
+    "t": 3,
+    "k": 1,
+    "x_r": 1165432285,
+    "grid_zeros": 0
+   },
+   {
+    "p": 786433,
+    "t": 3,
+    "k": 0,
+    "x_r": 197976,
+    "grid_zeros": 0
+   },
+   {
+    "p": 786433,
+    "t": 3,
+    "k": 1,
+    "x_r": 149308,
+    "grid_zeros": 0
+   }
+  ]
+ },
+ "gates": {
+  "G1": {
+   "cases_ok": 6,
+   "last_line": "G1: 6 cases pass",
+   "pass": true,
+   "exit": 0
+  },
+  "G2": "not checkable: no D rows in this job",
+  "G3": {
+   "status": "pfd-c-20261108: not run (tool defect) (Amendment 11). Stage C: passed on the m <= 6 cells in job pfd-g3c-20261109 (98 capped runs, 0 disagreements); m >= 7: G3 not applicable (F4 engine capacity)",
+   "g3_exit": 101,
+   "g3_jsonl_bytes": 0,
+   "g3_log_panics": 5
+  },
+  "G4": {
+   "rows": 32,
+   "planted_rows": 32,
+   "rows_with_1_in_closure": 0,
+   "rows_planted_ok_false_or_null": 0,
+   "rows_censored": 0,
+   "rows_reaching_cmax5": 32,
+   "summary_planted_violations": 0,
+   "exits": {
+    "g4-kummer-m2": 0,
+    "g4-kummer-m3": 0,
+    "g4-isogeny-m2": 0,
+    "g4-isogeny-m3": 0
+   },
+   "cells": [
+    [
+     "isogeny",
+     786433,
+     2,
+     1
+    ],
+    [
+     "isogeny",
+     786433,
+     2,
+     2
+    ],
+    [
+     "isogeny",
+     786433,
+     2,
+     3
+    ],
+    [
+     "isogeny",
+     786433,
+     2,
+     4
+    ],
+    [
+     "isogeny",
+     786433,
+     2,
+     5
+    ],
+    [
+     "isogeny",
+     786433,
+     2,
+     6
+    ],
+    [
+     "isogeny",
+     786433,
+     3,
+     2
+    ],
+    [
+     "isogeny",
+     786433,
+     3,
+     3
+    ],
+    [
+     "kummer",
+     2013265921,
+     2,
+     1
+    ],
+    [
+     "kummer",
+     2013265921,
+     2,
+     2
+    ],
+    [
+     "kummer",
+     2013265921,
+     2,
+     3
+    ],
+    [
+     "kummer",
+     2013265921,
+     2,
+     4
+    ],
+    [
+     "kummer",
+     2013265921,
+     2,
+     5
+    ],
+    [
+     "kummer",
+     2013265921,
+     2,
+     6
+    ],
+    [
+     "kummer",
+     2013265921,
+     3,
+     2
+    ],
+    [
+     "kummer",
+     2013265921,
+     3,
+     3
+    ]
+   ],
+   "draws_per_cell": [
+    2
+   ],
+   "pass": true
+  }
+ },
+ "g4_rows": [
+  {
+   "file": "g4-kummer-m2",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 2,
+   "t": 1,
+   "k": 0,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    2,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 3
+  },
+  {
+   "file": "g4-kummer-m2",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 2,
+   "t": 1,
+   "k": 1,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    2,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 3
+  },
+  {
+   "file": "g4-kummer-m2",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 2,
+   "t": 2,
+   "k": 0,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    2,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 4
+  },
+  {
+   "file": "g4-kummer-m2",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 2,
+   "t": 2,
+   "k": 1,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    2,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 4
+  },
+  {
+   "file": "g4-kummer-m2",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 2,
+   "t": 3,
+   "k": 0,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    2,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 4
+  },
+  {
+   "file": "g4-kummer-m2",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 2,
+   "t": 3,
+   "k": 1,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    2,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 4
+  },
+  {
+   "file": "g4-kummer-m2",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 2,
+   "t": 4,
+   "k": 0,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    2,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 4
+  },
+  {
+   "file": "g4-kummer-m2",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 2,
+   "t": 4,
+   "k": 1,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    2,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 4
+  },
+  {
+   "file": "g4-kummer-m2",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 2,
+   "t": 5,
+   "k": 0,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    2,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 4
+  },
+  {
+   "file": "g4-kummer-m2",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 2,
+   "t": 5,
+   "k": 1,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    2,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 4
+  },
+  {
+   "file": "g4-kummer-m2",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 2,
+   "t": 6,
+   "k": 0,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    2,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 4
+  },
+  {
+   "file": "g4-kummer-m2",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 2,
+   "t": 6,
+   "k": 1,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    2,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 4
+  },
+  {
+   "file": "g4-kummer-m3",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 3,
+   "t": 2,
+   "k": 0,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    3,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 4
+  },
+  {
+   "file": "g4-kummer-m3",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 3,
+   "t": 2,
+   "k": 1,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    3,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 4
+  },
+  {
+   "file": "g4-kummer-m3",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 3,
+   "t": 3,
+   "k": 0,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    3,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 4
+  },
+  {
+   "file": "g4-kummer-m3",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 3,
+   "t": 3,
+   "k": 1,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    3,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 4
+  },
+  {
+   "file": "g4-isogeny-m2",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 2,
+   "t": 1,
+   "k": 0,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    2,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 3
+  },
+  {
+   "file": "g4-isogeny-m2",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 2,
+   "t": 1,
+   "k": 1,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    2,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 3
+  },
+  {
+   "file": "g4-isogeny-m2",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 2,
+   "t": 2,
+   "k": 0,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    4,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 5
+  },
+  {
+   "file": "g4-isogeny-m2",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 2,
+   "t": 2,
+   "k": 1,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    4,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 5
+  },
+  {
+   "file": "g4-isogeny-m2",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 2,
+   "t": 3,
+   "k": 0,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    4,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 5
+  },
+  {
+   "file": "g4-isogeny-m2",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 2,
+   "t": 3,
+   "k": 1,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    4,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 5
+  },
+  {
+   "file": "g4-isogeny-m2",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 2,
+   "t": 4,
+   "k": 0,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    4,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 5
+  },
+  {
+   "file": "g4-isogeny-m2",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 2,
+   "t": 4,
+   "k": 1,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    4,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 5
+  },
+  {
+   "file": "g4-isogeny-m2",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 2,
+   "t": 5,
+   "k": 0,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    4,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 5
+  },
+  {
+   "file": "g4-isogeny-m2",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 2,
+   "t": 5,
+   "k": 1,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    4,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 5
+  },
+  {
+   "file": "g4-isogeny-m2",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 2,
+   "t": 6,
+   "k": 0,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    4,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 5
+  },
+  {
+   "file": "g4-isogeny-m2",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 2,
+   "t": 6,
+   "k": 1,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    4,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 5
+  },
+  {
+   "file": "g4-isogeny-m3",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 3,
+   "t": 2,
+   "k": 0,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    4,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 5
+  },
+  {
+   "file": "g4-isogeny-m3",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 3,
+   "t": 2,
+   "k": 1,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    4,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 5
+  },
+  {
+   "file": "g4-isogeny-m3",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 3,
+   "t": 3,
+   "k": 0,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    4,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 5
+  },
+  {
+   "file": "g4-isogeny-m3",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 3,
+   "t": 3,
+   "k": 1,
+   "target": "planted",
+   "planted_ok": true,
+   "one_at_any_c": false,
+   "c_range": [
+    4,
+    5
+   ],
+   "censored": null,
+   "d_F": null,
+   "ffd": 5
+  }
+ ],
+ "censoring_draws": {
+  "limit: max_cols": 12,
+  "exact": 42,
+  "limit: budget": 4,
+  "limit: max_entries": 2,
+  "cmax reached without 1": 28
+ },
+ "cells": [
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "isogeny",
+   "m": 2,
+   "t": 2,
+   "N": 4,
+   "V": 4,
+   "n_free_F4": 0,
+   "lambda": 2.034502621329471e-05,
+   "small_base": false,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [],
+   "files": [
+    "C-t2-m2-p0.jsonl"
+   ],
+   "d_F_draws": [
+    "5",
+    "5"
+   ],
+   "censoring_draws": [
+    "exact",
+    "exact"
+   ],
+   "d_F_median": "5",
+   "d_F_median_lo": 5,
+   "d_F_median_exact": true,
+   "ffd_draws": [
+    5,
+    5
+   ],
+   "ffd_median": 5,
+   "draws_equal": true,
+   "x_r": [
+    239221,
+    184488
+   ],
+   "cols_max": 16,
+   "c_last": [
+    5,
+    5
+   ],
+   "muladds": [
+    4575,
+    4575
+   ],
+   "wall_s": [
+    0.0,
+    0.0
+   ],
+   "n_vars": 4,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "isogeny",
+   "m": 3,
+   "t": 2,
+   "N": 6,
+   "V": 4,
+   "n_free_F4": 1,
+   "lambda": 5.425340323545257e-05,
+   "small_base": false,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [],
+   "files": [
+    "C-t2-m3-p0.jsonl"
+   ],
+   "d_F_draws": [
+    "6",
+    "6"
+   ],
+   "censoring_draws": [
+    "exact",
+    "exact"
+   ],
+   "d_F_median": "6",
+   "d_F_median_lo": 6,
+   "d_F_median_exact": true,
+   "ffd_draws": [
+    5,
+    5
+   ],
+   "ffd_median": 5,
+   "draws_equal": true,
+   "x_r": [
+    490791,
+    508533
+   ],
+   "cols_max": 256,
+   "c_last": [
+    6,
+    6
+   ],
+   "muladds": [
+    2280447,
+    2280447
+   ],
+   "wall_s": [
+    0.02,
+    0.02
+   ],
+   "n_vars": 7,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "isogeny",
+   "m": 4,
+   "t": 2,
+   "N": 8,
+   "V": 4,
+   "n_free_F4": 2,
+   "lambda": 0.00010850680647090513,
+   "small_base": false,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [],
+   "files": [
+    "C-t2-m4-p0.jsonl"
+   ],
+   "d_F_draws": [
+    "6",
+    "6"
+   ],
+   "censoring_draws": [
+    "exact",
+    "exact"
+   ],
+   "d_F_median": "6",
+   "d_F_median_lo": 6,
+   "d_F_median_exact": true,
+   "ffd_draws": [
+    5,
+    5
+   ],
+   "ffd_median": 5,
+   "draws_equal": true,
+   "x_r": [
+    259537,
+    193950
+   ],
+   "cols_max": 1792,
+   "c_last": [
+    6,
+    6
+   ],
+   "muladds": [
+    376914630,
+    376914733
+   ],
+   "wall_s": [
+    0.6,
+    0.61
+   ],
+   "n_vars": 10,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "isogeny",
+   "m": 5,
+   "t": 2,
+   "N": 10,
+   "V": 4,
+   "n_free_F4": 3,
+   "lambda": 0.0001736108903534482,
+   "small_base": true,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [
+    "small base"
+   ],
+   "files": [
+    "C-t2-m5-p0.jsonl"
+   ],
+   "d_F_draws": [
+    "7",
+    "7"
+   ],
+   "censoring_draws": [
+    "exact",
+    "exact"
+   ],
+   "d_F_median": "7",
+   "d_F_median_lo": 7,
+   "d_F_median_exact": true,
+   "ffd_draws": [
+    5,
+    5
+   ],
+   "ffd_median": 5,
+   "draws_equal": true,
+   "x_r": [
+    552450,
+    408852
+   ],
+   "cols_max": 15360,
+   "c_last": [
+    7,
+    7
+   ],
+   "muladds": [
+    28852728020,
+    28852714378
+   ],
+   "wall_s": [
+    56.68,
+    56.52
+   ],
+   "n_vars": 13,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "isogeny",
+   "m": 6,
+   "t": 2,
+   "N": 12,
+   "V": 4,
+   "n_free_F4": 4,
+   "lambda": 0.00023148118713793095,
+   "small_base": true,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [
+    "small base"
+   ],
+   "files": [
+    "C-t2-m6-p0.jsonl"
+   ],
+   "d_F_draws": [
+    ">=7",
+    ">=7"
+   ],
+   "censoring_draws": [
+    "stopped by max_entries at c=7",
+    "stopped by max_entries at c=7"
+   ],
+   "d_F_median": ">=7",
+   "d_F_median_lo": 7,
+   "d_F_median_exact": false,
+   "ffd_draws": [
+    5,
+    5
+   ],
+   "ffd_median": 5,
+   "draws_equal": true,
+   "x_r": [
+    528251,
+    300423
+   ],
+   "cols_max": 61183,
+   "c_last": [
+    7,
+    7
+   ],
+   "muladds": [
+    2003441822593,
+    2003441621318
+   ],
+   "wall_s": [
+    2107.47,
+    2042.97
+   ],
+   "n_vars": 16,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "isogeny",
+   "m": 7,
+   "t": 2,
+   "N": 14,
+   "V": 4,
+   "n_free_F4": 5,
+   "lambda": 0.0002645499281576354,
+   "small_base": true,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "G3 not applicable (F4 engine capacity)",
+   "labels": [
+    "G3 not applicable (F4 engine capacity)",
+    "small base"
+   ],
+   "files": [
+    "C-t2-m7-p0.jsonl"
+   ],
+   "d_F_draws": [
+    ">7",
+    ">7"
+   ],
+   "censoring_draws": [
+    "cmax reached without 1",
+    "cmax reached without 1"
+   ],
+   "d_F_median": ">=8",
+   "d_F_median_lo": 8,
+   "d_F_median_exact": false,
+   "ffd_draws": [
+    5,
+    5
+   ],
+   "ffd_median": 5,
+   "draws_equal": true,
+   "x_r": [
+    421425,
+    8585
+   ],
+   "cols_max": 195604,
+   "c_last": [
+    7,
+    7
+   ],
+   "muladds": [
+    1674497336,
+    1674492177
+   ],
+   "wall_s": [
+    7.52,
+    7.14
+   ],
+   "n_vars": 19,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "isogeny",
+   "m": 8,
+   "t": 2,
+   "N": 16,
+   "V": 4,
+   "n_free_F4": 6,
+   "lambda": 0.0002645499281576354,
+   "small_base": true,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "G3 not applicable (F4 engine capacity)",
+   "labels": [
+    "G3 not applicable (F4 engine capacity)",
+    "small base"
+   ],
+   "files": [
+    "C-t2-m8-p0.jsonl"
+   ],
+   "d_F_draws": [
+    ">7",
+    ">7"
+   ],
+   "censoring_draws": [
+    "cmax reached without 1",
+    "cmax reached without 1"
+   ],
+   "d_F_median": ">=8",
+   "d_F_median_lo": 8,
+   "d_F_median_exact": false,
+   "ffd_draws": [
+    5,
+    5
+   ],
+   "ffd_median": 5,
+   "draws_equal": true,
+   "x_r": [
+    732978,
+    129741
+   ],
+   "cols_max": 532220,
+   "c_last": [
+    7,
+    7
+   ],
+   "muladds": [
+    2410455610,
+    2410469813
+   ],
+   "wall_s": [
+    13.03,
+    12.67
+   ],
+   "n_vars": 22,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "isogeny",
+   "m": 9,
+   "t": 2,
+   "N": 18,
+   "V": 4,
+   "n_free_F4": 7,
+   "lambda": 0.00023515549169567587,
+   "small_base": true,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "G3 not applicable (F4 engine capacity)",
+   "labels": [
+    "G3 not applicable (F4 engine capacity)",
+    "small base"
+   ],
+   "files": [
+    "C-t2-m9-p0.jsonl"
+   ],
+   "d_F_draws": [
+    ">7",
+    ">7"
+   ],
+   "censoring_draws": [
+    "cmax reached without 1",
+    "cmax reached without 1"
+   ],
+   "d_F_median": ">=8",
+   "d_F_median_lo": 8,
+   "d_F_median_exact": false,
+   "ffd_draws": [
+    5,
+    5
+   ],
+   "ffd_median": 5,
+   "draws_equal": true,
+   "x_r": [
+    492360,
+    159941
+   ],
+   "cols_max": 1280760,
+   "c_last": [
+    7,
+    7
+   ],
+   "muladds": [
+    3884856285,
+    3884851145
+   ],
+   "wall_s": [
+    23.89,
+    23.4
+   ],
+   "n_vars": 25,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "isogeny",
+   "m": 10,
+   "t": 2,
+   "N": 20,
+   "V": 4,
+   "n_free_F4": 8,
+   "lambda": 0.0001881243933565407,
+   "small_base": true,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "G3 not applicable (F4 engine capacity)",
+   "labels": [
+    "G3 not applicable (F4 engine capacity)",
+    "small base"
+   ],
+   "files": [
+    "C-t2-m10-p0.jsonl"
+   ],
+   "d_F_draws": [
+    ">=7",
+    ">=7"
+   ],
+   "censoring_draws": [
+    "stopped by max_cols at c=7",
+    "stopped by max_cols at c=7"
+   ],
+   "d_F_median": ">=7",
+   "d_F_median_lo": 7,
+   "d_F_median_exact": false,
+   "ffd_draws": [
+    5,
+    5
+   ],
+   "ffd_median": 5,
+   "draws_equal": true,
+   "x_r": [
+    447298,
+    658898
+   ],
+   "cols_max": 2798790,
+   "c_last": [
+    7,
+    7
+   ],
+   "muladds": [
+    17905486,
+    17905486
+   ],
+   "wall_s": [
+    1.45,
+    1.5
+   ],
+   "n_vars": 28,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "isogeny",
+   "m": 2,
+   "t": 3,
+   "N": 6,
+   "V": 8,
+   "n_free_F4": 0,
+   "lambda": 8.138010485317884e-05,
+   "small_base": false,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [],
+   "files": [
+    "C-t3-m2-p0.jsonl"
+   ],
+   "d_F_draws": [
+    "5",
+    "5"
+   ],
+   "censoring_draws": [
+    "exact",
+    "exact"
+   ],
+   "d_F_median": "5",
+   "d_F_median_lo": 5,
+   "d_F_median_exact": true,
+   "ffd_draws": [
+    5,
+    5
+   ],
+   "ffd_median": 5,
+   "draws_equal": true,
+   "x_r": [
+    122650,
+    742161
+   ],
+   "cols_max": 63,
+   "c_last": [
+    5,
+    5
+   ],
+   "muladds": [
+    105126,
+    105126
+   ],
+   "wall_s": [
+    0.0,
+    0.0
+   ],
+   "n_vars": 6,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "isogeny",
+   "m": 3,
+   "t": 3,
+   "N": 9,
+   "V": 8,
+   "n_free_F4": 1,
+   "lambda": 0.00043402722588362053,
+   "small_base": false,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [],
+   "files": [
+    "C-t3-m3-p0.jsonl"
+   ],
+   "d_F_draws": [
+    "6",
+    "6"
+   ],
+   "censoring_draws": [
+    "exact",
+    "exact"
+   ],
+   "d_F_median": "6",
+   "d_F_median_lo": 6,
+   "d_F_median_exact": true,
+   "ffd_draws": [
+    5,
+    5
+   ],
+   "ffd_median": 5,
+   "draws_equal": true,
+   "x_r": [
+    522597,
+    551198
+   ],
+   "cols_max": 1291,
+   "c_last": [
+    6,
+    6
+   ],
+   "muladds": [
+    550970389,
+    550970924
+   ],
+   "wall_s": [
+    0.78,
+    0.78
+   ],
+   "n_vars": 10,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "isogeny",
+   "m": 4,
+   "t": 3,
+   "N": 12,
+   "V": 8,
+   "n_free_F4": 2,
+   "lambda": 0.0017361089035344821,
+   "small_base": false,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [],
+   "files": [
+    "C-t3-m4-p0.jsonl"
+   ],
+   "d_F_draws": [
+    "7",
+    "7"
+   ],
+   "censoring_draws": [
+    "exact",
+    "exact"
+   ],
+   "d_F_median": "7",
+   "d_F_median_lo": 7,
+   "d_F_median_exact": true,
+   "ffd_draws": [
+    5,
+    5
+   ],
+   "ffd_median": 5,
+   "draws_equal": true,
+   "x_r": [
+    16052,
+    572470
+   ],
+   "cols_max": 18324,
+   "c_last": [
+    7,
+    7
+   ],
+   "muladds": [
+    155927172993,
+    155927161077
+   ],
+   "wall_s": [
+    260.86,
+    260.62
+   ],
+   "n_vars": 14,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "isogeny",
+   "m": 5,
+   "t": 3,
+   "N": 15,
+   "V": 8,
+   "n_free_F4": 3,
+   "lambda": 0.005555548491310343,
+   "small_base": false,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [],
+   "files": [
+    "C-t3-m5-p0.jsonl"
+   ],
+   "d_F_draws": [
+    ">7",
+    ">7"
+   ],
+   "censoring_draws": [
+    "cmax reached without 1",
+    "cmax reached without 1"
+   ],
+   "d_F_median": ">=8",
+   "d_F_median_lo": 8,
+   "d_F_median_exact": false,
+   "ffd_draws": [
+    5,
+    5
+   ],
+   "ffd_median": 5,
+   "draws_equal": true,
+   "x_r": [
+    463550,
+    158388
+   ],
+   "cols_max": 106970,
+   "c_last": [
+    7,
+    7
+   ],
+   "muladds": [
+    308170739,
+    308170476
+   ],
+   "wall_s": [
+    2.8,
+    2.8
+   ],
+   "n_vars": 18,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "kummer",
+   "m": 2,
+   "t": 2,
+   "N": 4,
+   "V": 4,
+   "n_free_F4": 0,
+   "lambda": 2.034502621329471e-05,
+   "small_base": false,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [],
+   "files": [
+    "C-t2-m2-p0.jsonl"
+   ],
+   "d_F_draws": [
+    "4",
+    "4"
+   ],
+   "censoring_draws": [
+    "exact",
+    "exact"
+   ],
+   "d_F_median": "4",
+   "d_F_median_lo": 4,
+   "d_F_median_exact": true,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    497404,
+    226869
+   ],
+   "cols_max": 16,
+   "c_last": [
+    4,
+    4
+   ],
+   "muladds": [
+    3485,
+    3485
+   ],
+   "wall_s": [
+    0.0,
+    0.0
+   ],
+   "n_vars": 4,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "kummer",
+   "m": 3,
+   "t": 2,
+   "N": 6,
+   "V": 4,
+   "n_free_F4": 1,
+   "lambda": 5.425340323545257e-05,
+   "small_base": false,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [],
+   "files": [
+    "C-t2-m3-p0.jsonl"
+   ],
+   "d_F_draws": [
+    "5",
+    "5"
+   ],
+   "censoring_draws": [
+    "exact",
+    "exact"
+   ],
+   "d_F_median": "5",
+   "d_F_median_lo": 5,
+   "d_F_median_exact": true,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    777156,
+    254508
+   ],
+   "cols_max": 192,
+   "c_last": [
+    5,
+    5
+   ],
+   "muladds": [
+    1151623,
+    1151623
+   ],
+   "wall_s": [
+    0.01,
+    0.01
+   ],
+   "n_vars": 7,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "kummer",
+   "m": 4,
+   "t": 2,
+   "N": 8,
+   "V": 4,
+   "n_free_F4": 2,
+   "lambda": 0.00010850680647090513,
+   "small_base": false,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [],
+   "files": [
+    "C-t2-m4-p0.jsonl"
+   ],
+   "d_F_draws": [
+    "6",
+    "6"
+   ],
+   "censoring_draws": [
+    "exact",
+    "exact"
+   ],
+   "d_F_median": "6",
+   "d_F_median_lo": 6,
+   "d_F_median_exact": true,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    173399,
+    616646
+   ],
+   "cols_max": 1792,
+   "c_last": [
+    6,
+    6
+   ],
+   "muladds": [
+    494338143,
+    494338266
+   ],
+   "wall_s": [
+    0.74,
+    0.74
+   ],
+   "n_vars": 10,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "kummer",
+   "m": 5,
+   "t": 2,
+   "N": 10,
+   "V": 4,
+   "n_free_F4": 3,
+   "lambda": 0.0001736108903534482,
+   "small_base": true,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [
+    "small base"
+   ],
+   "files": [
+    "C-t2-m5-p0.jsonl"
+   ],
+   "d_F_draws": [
+    "6",
+    "6"
+   ],
+   "censoring_draws": [
+    "exact",
+    "exact"
+   ],
+   "d_F_median": "6",
+   "d_F_median_lo": 6,
+   "d_F_median_exact": true,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    449888,
+    724186
+   ],
+   "cols_max": 7937,
+   "c_last": [
+    6,
+    6
+   ],
+   "muladds": [
+    12751805629,
+    12751812919
+   ],
+   "wall_s": [
+    19.14,
+    19.18
+   ],
+   "n_vars": 13,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "kummer",
+   "m": 6,
+   "t": 2,
+   "N": 12,
+   "V": 4,
+   "n_free_F4": 4,
+   "lambda": 0.00023148118713793095,
+   "small_base": true,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [
+    "small base"
+   ],
+   "files": [
+    "C-t2-m6-p0.jsonl"
+   ],
+   "d_F_draws": [
+    ">=7",
+    ">=7"
+   ],
+   "censoring_draws": [
+    "stopped by budget at c=7",
+    "stopped by budget at c=7"
+   ],
+   "d_F_median": ">=7",
+   "d_F_median_lo": 7,
+   "d_F_median_exact": false,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    605938,
+    494609
+   ],
+   "cols_max": 61183,
+   "c_last": [
+    7,
+    7
+   ],
+   "muladds": [
+    1919883361977,
+    1919883444674
+   ],
+   "wall_s": [
+    1877.44,
+    1937.87
+   ],
+   "n_vars": 16,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "kummer",
+   "m": 7,
+   "t": 2,
+   "N": 14,
+   "V": 4,
+   "n_free_F4": 5,
+   "lambda": 0.0002645499281576354,
+   "small_base": true,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "G3 not applicable (F4 engine capacity)",
+   "labels": [
+    "G3 not applicable (F4 engine capacity)",
+    "small base"
+   ],
+   "files": [
+    "C-t2-m7-p0.jsonl"
+   ],
+   "d_F_draws": [
+    ">7",
+    ">7"
+   ],
+   "censoring_draws": [
+    "cmax reached without 1",
+    "cmax reached without 1"
+   ],
+   "d_F_median": ">=8",
+   "d_F_median_lo": 8,
+   "d_F_median_exact": false,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    764408,
+    786286
+   ],
+   "cols_max": 195604,
+   "c_last": [
+    7,
+    7
+   ],
+   "muladds": [
+    1711986607,
+    1711987094
+   ],
+   "wall_s": [
+    6.75,
+    6.62
+   ],
+   "n_vars": 19,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "kummer",
+   "m": 8,
+   "t": 2,
+   "N": 16,
+   "V": 4,
+   "n_free_F4": 6,
+   "lambda": 0.0002645499281576354,
+   "small_base": true,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "G3 not applicable (F4 engine capacity)",
+   "labels": [
+    "G3 not applicable (F4 engine capacity)",
+    "small base"
+   ],
+   "files": [
+    "C-t2-m8-p0.jsonl"
+   ],
+   "d_F_draws": [
+    ">7",
+    ">7"
+   ],
+   "censoring_draws": [
+    "cmax reached without 1",
+    "cmax reached without 1"
+   ],
+   "d_F_median": ">=8",
+   "d_F_median_lo": 8,
+   "d_F_median_exact": false,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    437947,
+    713388
+   ],
+   "cols_max": 532220,
+   "c_last": [
+    7,
+    7
+   ],
+   "muladds": [
+    2413363560,
+    2413365022
+   ],
+   "wall_s": [
+    12.41,
+    12.25
+   ],
+   "n_vars": 22,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "kummer",
+   "m": 9,
+   "t": 2,
+   "N": 18,
+   "V": 4,
+   "n_free_F4": 7,
+   "lambda": 0.00023515549169567587,
+   "small_base": true,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "G3 not applicable (F4 engine capacity)",
+   "labels": [
+    "G3 not applicable (F4 engine capacity)",
+    "small base"
+   ],
+   "files": [
+    "C-t2-m9-p0.jsonl"
+   ],
+   "d_F_draws": [
+    ">7",
+    ">7"
+   ],
+   "censoring_draws": [
+    "cmax reached without 1",
+    "cmax reached without 1"
+   ],
+   "d_F_median": ">=8",
+   "d_F_median_lo": 8,
+   "d_F_median_exact": false,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    384494,
+    148945
+   ],
+   "cols_max": 1280760,
+   "c_last": [
+    7,
+    7
+   ],
+   "muladds": [
+    2986681301,
+    2986674900
+   ],
+   "wall_s": [
+    19.64,
+    20.0
+   ],
+   "n_vars": 25,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "kummer",
+   "m": 10,
+   "t": 2,
+   "N": 20,
+   "V": 4,
+   "n_free_F4": 8,
+   "lambda": 0.0001881243933565407,
+   "small_base": true,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "G3 not applicable (F4 engine capacity)",
+   "labels": [
+    "G3 not applicable (F4 engine capacity)",
+    "small base"
+   ],
+   "files": [
+    "C-t2-m10-p0.jsonl"
+   ],
+   "d_F_draws": [
+    ">=7",
+    ">=7"
+   ],
+   "censoring_draws": [
+    "stopped by max_cols at c=7",
+    "stopped by max_cols at c=7"
+   ],
+   "d_F_median": ">=7",
+   "d_F_median_lo": 7,
+   "d_F_median_exact": false,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    396931,
+    27447
+   ],
+   "cols_max": 2798790,
+   "c_last": [
+    7,
+    7
+   ],
+   "muladds": [
+    27370853,
+    27370853
+   ],
+   "wall_s": [
+    1.45,
+    1.72
+   ],
+   "n_vars": 28,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "kummer",
+   "m": 2,
+   "t": 3,
+   "N": 6,
+   "V": 8,
+   "n_free_F4": 0,
+   "lambda": 8.138010485317884e-05,
+   "small_base": false,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [],
+   "files": [
+    "C-t3-m2-p0.jsonl"
+   ],
+   "d_F_draws": [
+    "4",
+    "4"
+   ],
+   "censoring_draws": [
+    "exact",
+    "exact"
+   ],
+   "d_F_median": "4",
+   "d_F_median_lo": 4,
+   "d_F_median_exact": true,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    197976,
+    149308
+   ],
+   "cols_max": 57,
+   "c_last": [
+    4,
+    4
+   ],
+   "muladds": [
+    50218,
+    50218
+   ],
+   "wall_s": [
+    0.0,
+    0.0
+   ],
+   "n_vars": 6,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "kummer",
+   "m": 3,
+   "t": 3,
+   "N": 9,
+   "V": 8,
+   "n_free_F4": 1,
+   "lambda": 0.00043402722588362053,
+   "small_base": false,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [],
+   "files": [
+    "C-t3-m3-p0.jsonl"
+   ],
+   "d_F_draws": [
+    "6",
+    "6"
+   ],
+   "censoring_draws": [
+    "exact",
+    "exact"
+   ],
+   "d_F_median": "6",
+   "d_F_median_lo": 6,
+   "d_F_median_exact": true,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    460685,
+    542685
+   ],
+   "cols_max": 1291,
+   "c_last": [
+    6,
+    6
+   ],
+   "muladds": [
+    444944184,
+    444944142
+   ],
+   "wall_s": [
+    0.56,
+    0.56
+   ],
+   "n_vars": 10,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "kummer",
+   "m": 4,
+   "t": 3,
+   "N": 12,
+   "V": 8,
+   "n_free_F4": 2,
+   "lambda": 0.0017361089035344821,
+   "small_base": false,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [],
+   "files": [
+    "C-t3-m4-p0.jsonl"
+   ],
+   "d_F_draws": [
+    "7",
+    "7"
+   ],
+   "censoring_draws": [
+    "exact",
+    "exact"
+   ],
+   "d_F_median": "7",
+   "d_F_median_lo": 7,
+   "d_F_median_exact": true,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    47886,
+    265204
+   ],
+   "cols_max": 18324,
+   "c_last": [
+    7,
+    7
+   ],
+   "muladds": [
+    177531757429,
+    177531704015
+   ],
+   "wall_s": [
+    267.52,
+    274.38
+   ],
+   "n_vars": 14,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "kummer",
+   "m": 5,
+   "t": 3,
+   "N": 15,
+   "V": 8,
+   "n_free_F4": 3,
+   "lambda": 0.005555548491310343,
+   "small_base": false,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [],
+   "files": [
+    "C-t3-m5-p0.jsonl"
+   ],
+   "d_F_draws": [
+    ">7",
+    ">7"
+   ],
+   "censoring_draws": [
+    "cmax reached without 1",
+    "cmax reached without 1"
+   ],
+   "d_F_median": ">=8",
+   "d_F_median_lo": 8,
+   "d_F_median_exact": false,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    701289,
+    313352
+   ],
+   "cols_max": 106970,
+   "c_last": [
+    7,
+    7
+   ],
+   "muladds": [
+    338817690,
+    338817366
+   ],
+   "wall_s": [
+    2.66,
+    2.7
+   ],
+   "n_vars": 18,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 2013265921,
+   "prime": "P1",
+   "kind": "kummer",
+   "m": 2,
+   "t": 2,
+   "N": 4,
+   "V": 4,
+   "n_free_F4": 0,
+   "lambda": 7.947285966104623e-09,
+   "small_base": false,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [],
+   "files": [
+    "C-t2-m2.jsonl"
+   ],
+   "d_F_draws": [
+    "4",
+    "4"
+   ],
+   "censoring_draws": [
+    "exact",
+    "exact"
+   ],
+   "d_F_median": "4",
+   "d_F_median_lo": 4,
+   "d_F_median_exact": true,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    779599582,
+    1170562132
+   ],
+   "cols_max": 16,
+   "c_last": [
+    4,
+    4
+   ],
+   "muladds": [
+    3485,
+    3485
+   ],
+   "wall_s": [
+    0.0,
+    0.0
+   ],
+   "n_vars": 4,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 2013265921,
+   "prime": "P1",
+   "kind": "kummer",
+   "m": 3,
+   "t": 2,
+   "N": 6,
+   "V": 4,
+   "n_free_F4": 1,
+   "lambda": 2.1192762576278998e-08,
+   "small_base": false,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [],
+   "files": [
+    "C-t2-m3.jsonl"
+   ],
+   "d_F_draws": [
+    "5",
+    "5"
+   ],
+   "censoring_draws": [
+    "exact",
+    "exact"
+   ],
+   "d_F_median": "5",
+   "d_F_median_lo": 5,
+   "d_F_median_exact": true,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    1248628384,
+    211995743
+   ],
+   "cols_max": 192,
+   "c_last": [
+    5,
+    5
+   ],
+   "muladds": [
+    1151623,
+    1151623
+   ],
+   "wall_s": [
+    0.01,
+    0.01
+   ],
+   "n_vars": 7,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 2013265921,
+   "prime": "P1",
+   "kind": "kummer",
+   "m": 4,
+   "t": 2,
+   "N": 8,
+   "V": 4,
+   "n_free_F4": 2,
+   "lambda": 4.2385525152557996e-08,
+   "small_base": false,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [],
+   "files": [
+    "C-t2-m4.jsonl"
+   ],
+   "d_F_draws": [
+    "6",
+    "6"
+   ],
+   "censoring_draws": [
+    "exact",
+    "exact"
+   ],
+   "d_F_median": "6",
+   "d_F_median_lo": 6,
+   "d_F_median_exact": true,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    1102336260,
+    92234565
+   ],
+   "cols_max": 1792,
+   "c_last": [
+    6,
+    6
+   ],
+   "muladds": [
+    494338511,
+    494338511
+   ],
+   "wall_s": [
+    0.73,
+    0.73
+   ],
+   "n_vars": 10,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 2013265921,
+   "prime": "P1",
+   "kind": "kummer",
+   "m": 5,
+   "t": 2,
+   "N": 10,
+   "V": 4,
+   "n_free_F4": 3,
+   "lambda": 6.781684024409279e-08,
+   "small_base": true,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [
+    "small base"
+   ],
+   "files": [
+    "C-t2-m5.jsonl"
+   ],
+   "d_F_draws": [
+    "6",
+    "6"
+   ],
+   "censoring_draws": [
+    "exact",
+    "exact"
+   ],
+   "d_F_median": "6",
+   "d_F_median_lo": 6,
+   "d_F_median_exact": true,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    1506953108,
+    1192276958
+   ],
+   "cols_max": 7937,
+   "c_last": [
+    6,
+    6
+   ],
+   "muladds": [
+    12751833171,
+    12751833171
+   ],
+   "wall_s": [
+    19.0,
+    19.09
+   ],
+   "n_vars": 13,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 2013265921,
+   "prime": "P1",
+   "kind": "kummer",
+   "m": 6,
+   "t": 2,
+   "N": 12,
+   "V": 4,
+   "n_free_F4": 4,
+   "lambda": 9.042245365879039e-08,
+   "small_base": true,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [
+    "small base"
+   ],
+   "files": [
+    "C-t2-m6.jsonl"
+   ],
+   "d_F_draws": [
+    ">=7",
+    ">=7"
+   ],
+   "censoring_draws": [
+    "stopped by budget at c=7",
+    "stopped by budget at c=7"
+   ],
+   "d_F_median": ">=7",
+   "d_F_median_lo": 7,
+   "d_F_median_exact": false,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    832376253,
+    206496987
+   ],
+   "cols_max": 61183,
+   "c_last": [
+    7,
+    7
+   ],
+   "muladds": [
+    1919888251154,
+    1919888251155
+   ],
+   "wall_s": [
+    1839.91,
+    1823.35
+   ],
+   "n_vars": 16,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 2013265921,
+   "prime": "P1",
+   "kind": "kummer",
+   "m": 7,
+   "t": 2,
+   "N": 14,
+   "V": 4,
+   "n_free_F4": 5,
+   "lambda": 1.0333994703861759e-07,
+   "small_base": true,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "G3 not applicable (F4 engine capacity)",
+   "labels": [
+    "G3 not applicable (F4 engine capacity)",
+    "small base"
+   ],
+   "files": [
+    "C-t2-m7.jsonl"
+   ],
+   "d_F_draws": [
+    ">7",
+    ">7"
+   ],
+   "censoring_draws": [
+    "cmax reached without 1",
+    "cmax reached without 1"
+   ],
+   "d_F_median": ">=8",
+   "d_F_median_lo": 8,
+   "d_F_median_exact": false,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    920694645,
+    994273131
+   ],
+   "cols_max": 195604,
+   "c_last": [
+    7,
+    7
+   ],
+   "muladds": [
+    1711987706,
+    1711987706
+   ],
+   "wall_s": [
+    6.37,
+    6.61
+   ],
+   "n_vars": 19,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 2013265921,
+   "prime": "P1",
+   "kind": "kummer",
+   "m": 8,
+   "t": 2,
+   "N": 16,
+   "V": 4,
+   "n_free_F4": 6,
+   "lambda": 1.0333994703861759e-07,
+   "small_base": true,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "G3 not applicable (F4 engine capacity)",
+   "labels": [
+    "G3 not applicable (F4 engine capacity)",
+    "small base"
+   ],
+   "files": [
+    "C-t2-m8.jsonl"
+   ],
+   "d_F_draws": [
+    ">7",
+    ">7"
+   ],
+   "censoring_draws": [
+    "cmax reached without 1",
+    "cmax reached without 1"
+   ],
+   "d_F_median": ">=8",
+   "d_F_median_lo": 8,
+   "d_F_median_exact": false,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    1226528648,
+    1864669155
+   ],
+   "cols_max": 532220,
+   "c_last": [
+    7,
+    7
+   ],
+   "muladds": [
+    2413371956,
+    2413371956
+   ],
+   "wall_s": [
+    12.47,
+    12.22
+   ],
+   "n_vars": 22,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 2013265921,
+   "prime": "P1",
+   "kind": "kummer",
+   "m": 9,
+   "t": 2,
+   "N": 18,
+   "V": 4,
+   "n_free_F4": 7,
+   "lambda": 9.18577307009934e-08,
+   "small_base": true,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "G3 not applicable (F4 engine capacity)",
+   "labels": [
+    "G3 not applicable (F4 engine capacity)",
+    "small base"
+   ],
+   "files": [
+    "C-t2-m9.jsonl"
+   ],
+   "d_F_draws": [
+    ">7",
+    ">7"
+   ],
+   "censoring_draws": [
+    "cmax reached without 1",
+    "cmax reached without 1"
+   ],
+   "d_F_median": ">=8",
+   "d_F_median_lo": 8,
+   "d_F_median_exact": false,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    50032777,
+    1761217397
+   ],
+   "cols_max": 1280760,
+   "c_last": [
+    7,
+    7
+   ],
+   "muladds": [
+    2986683092,
+    2986683092
+   ],
+   "wall_s": [
+    19.79,
+    20.27
+   ],
+   "n_vars": 25,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 2013265921,
+   "prime": "P1",
+   "kind": "kummer",
+   "m": 10,
+   "t": 2,
+   "N": 20,
+   "V": 4,
+   "n_free_F4": 8,
+   "lambda": 7.348618456079473e-08,
+   "small_base": true,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "G3 not applicable (F4 engine capacity)",
+   "labels": [
+    "G3 not applicable (F4 engine capacity)",
+    "small base"
+   ],
+   "files": [
+    "C-t2-m10.jsonl"
+   ],
+   "d_F_draws": [
+    ">=7",
+    ">=7"
+   ],
+   "censoring_draws": [
+    "stopped by max_cols at c=7",
+    "stopped by max_cols at c=7"
+   ],
+   "d_F_median": ">=7",
+   "d_F_median_lo": 7,
+   "d_F_median_exact": false,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    633287140,
+    1046247177
+   ],
+   "cols_max": 2798790,
+   "c_last": [
+    7,
+    7
+   ],
+   "muladds": [
+    27370854,
+    27370854
+   ],
+   "wall_s": [
+    1.62,
+    1.58
+   ],
+   "n_vars": 28,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 2013265921,
+   "prime": "P1",
+   "kind": "kummer",
+   "m": 2,
+   "t": 3,
+   "N": 6,
+   "V": 8,
+   "n_free_F4": 0,
+   "lambda": 3.1789143864418494e-08,
+   "small_base": false,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [],
+   "files": [
+    "C-t3-m2.jsonl"
+   ],
+   "d_F_draws": [
+    "4",
+    "4"
+   ],
+   "censoring_draws": [
+    "exact",
+    "exact"
+   ],
+   "d_F_median": "4",
+   "d_F_median_lo": 4,
+   "d_F_median_exact": true,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    506819018,
+    1165432285
+   ],
+   "cols_max": 57,
+   "c_last": [
+    4,
+    4
+   ],
+   "muladds": [
+    50218,
+    50218
+   ],
+   "wall_s": [
+    0.0,
+    0.0
+   ],
+   "n_vars": 6,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 2013265921,
+   "prime": "P1",
+   "kind": "kummer",
+   "m": 3,
+   "t": 3,
+   "N": 9,
+   "V": 8,
+   "n_free_F4": 1,
+   "lambda": 1.6954210061023199e-07,
+   "small_base": false,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [],
+   "files": [
+    "C-t3-m3.jsonl"
+   ],
+   "d_F_draws": [
+    "6",
+    "6"
+   ],
+   "censoring_draws": [
+    "exact",
+    "exact"
+   ],
+   "d_F_median": "6",
+   "d_F_median_lo": 6,
+   "d_F_median_exact": true,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    388393539,
+    1389271940
+   ],
+   "cols_max": 1291,
+   "c_last": [
+    6,
+    6
+   ],
+   "muladds": [
+    444944497,
+    444944497
+   ],
+   "wall_s": [
+    0.56,
+    0.55
+   ],
+   "n_vars": 10,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 2013265921,
+   "prime": "P1",
+   "kind": "kummer",
+   "m": 4,
+   "t": 3,
+   "N": 12,
+   "V": 8,
+   "n_free_F4": 2,
+   "lambda": 6.781684024409279e-07,
+   "small_base": false,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [],
+   "files": [
+    "C-t3-m4.jsonl"
+   ],
+   "d_F_draws": [
+    "7",
+    "7"
+   ],
+   "censoring_draws": [
+    "exact",
+    "exact"
+   ],
+   "d_F_median": "7",
+   "d_F_median_lo": 7,
+   "d_F_median_exact": true,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    259303215,
+    1710525890
+   ],
+   "cols_max": 18324,
+   "c_last": [
+    7,
+    7
+   ],
+   "muladds": [
+    177532210582,
+    177532210582
+   ],
+   "wall_s": [
+    246.25,
+    247.37
+   ],
+   "n_vars": 14,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 2013265921,
+   "prime": "P1",
+   "kind": "kummer",
+   "m": 5,
+   "t": 3,
+   "N": 15,
+   "V": 8,
+   "n_free_F4": 3,
+   "lambda": 2.170138887810969e-06,
+   "small_base": false,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [],
+   "files": [
+    "C-t3-m5.jsonl"
+   ],
+   "d_F_draws": [
+    ">7",
+    ">7"
+   ],
+   "censoring_draws": [
+    "cmax reached without 1",
+    "cmax reached without 1"
+   ],
+   "d_F_median": ">=8",
+   "d_F_median_lo": 8,
+   "d_F_median_exact": false,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    1150089172,
+    1431675215
+   ],
+   "cols_max": 106970,
+   "c_last": [
+    7,
+    7
+   ],
+   "muladds": [
+    338817996,
+    338817996
+   ],
+   "wall_s": [
+    2.59,
+    2.64
+   ],
+   "n_vars": 18,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 2013265921,
+   "prime": "P1",
+   "kind": "kummer",
+   "m": 6,
+   "t": 3,
+   "N": 18,
+   "V": 8,
+   "n_free_F4": 4,
+   "lambda": 5.787037034162585e-06,
+   "small_base": false,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "within F4 capacity (G3 pending, job pfd-g3c-20261109)",
+   "labels": [],
+   "files": [
+    "C-t3-m6.jsonl"
+   ],
+   "d_F_draws": [
+    ">7",
+    ">7"
+   ],
+   "censoring_draws": [
+    "cmax reached without 1",
+    "cmax reached without 1"
+   ],
+   "d_F_median": ">=8",
+   "d_F_median_lo": 8,
+   "d_F_median_exact": false,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    1274591029,
+    189236676
+   ],
+   "cols_max": 440772,
+   "c_last": [
+    7,
+    7
+   ],
+   "muladds": [
+    520516047,
+    520516047
+   ],
+   "wall_s": [
+    5.53,
+    5.91
+   ],
+   "n_vars": 22,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 2013265921,
+   "prime": "P1",
+   "kind": "kummer",
+   "m": 7,
+   "t": 3,
+   "N": 21,
+   "V": 8,
+   "n_free_F4": 5,
+   "lambda": 1.3227513220943051e-05,
+   "small_base": false,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "G3 not applicable (F4 engine capacity)",
+   "labels": [
+    "G3 not applicable (F4 engine capacity)"
+   ],
+   "files": [
+    "C-t3-m7.jsonl"
+   ],
+   "d_F_draws": [
+    ">7",
+    ">7"
+   ],
+   "censoring_draws": [
+    "cmax reached without 1",
+    "cmax reached without 1"
+   ],
+   "d_F_median": ">=8",
+   "d_F_median_lo": 8,
+   "d_F_median_exact": false,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    1732552702,
+    210987062
+   ],
+   "cols_max": 1435347,
+   "c_last": [
+    7,
+    7
+   ],
+   "muladds": [
+    884287483,
+    884287483
+   ],
+   "wall_s": [
+    12.41,
+    12.13
+   ],
+   "n_vars": 26,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 2013265921,
+   "prime": "P1",
+   "kind": "kummer",
+   "m": 8,
+   "t": 3,
+   "N": 24,
+   "V": 8,
+   "n_free_F4": 6,
+   "lambda": 2.6455026441886102e-05,
+   "small_base": false,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "G3 not applicable (F4 engine capacity)",
+   "labels": [
+    "G3 not applicable (F4 engine capacity)"
+   ],
+   "files": [
+    "C-t3-m8.jsonl"
+   ],
+   "d_F_draws": [
+    ">=7",
+    ">=7"
+   ],
+   "censoring_draws": [
+    "stopped by max_cols at c=7",
+    "stopped by max_cols at c=7"
+   ],
+   "d_F_median": ">=7",
+   "d_F_median_lo": 7,
+   "d_F_median_exact": false,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    1387941636,
+    503471624
+   ],
+   "cols_max": 3947416,
+   "c_last": [
+    7,
+    7
+   ],
+   "muladds": [
+    9414188,
+    9414188
+   ],
+   "wall_s": [
+    1.29,
+    1.29
+   ],
+   "n_vars": 30,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 2013265921,
+   "prime": "P1",
+   "kind": "kummer",
+   "m": 9,
+   "t": 3,
+   "N": 27,
+   "V": 8,
+   "n_free_F4": 7,
+   "lambda": 4.703115811890862e-05,
+   "small_base": true,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "G3 not applicable (F4 engine capacity)",
+   "labels": [
+    "G3 not applicable (F4 engine capacity)",
+    "small base"
+   ],
+   "files": [
+    "C-t3-m9.jsonl"
+   ],
+   "d_F_draws": [
+    ">=6",
+    ">=6"
+   ],
+   "censoring_draws": [
+    "stopped by max_cols at c=6",
+    "stopped by max_cols at c=6"
+   ],
+   "d_F_median": ">=6",
+   "d_F_median_lo": 6,
+   "d_F_median_exact": false,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    617892211,
+    346423932
+   ],
+   "cols_max": 2063580,
+   "c_last": [
+    6,
+    6
+   ],
+   "muladds": [
+    243192,
+    243192
+   ],
+   "wall_s": [
+    0.14,
+    0.15
+   ],
+   "n_vars": 34,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  },
+  {
+   "p": 2013265921,
+   "prime": "P1",
+   "kind": "kummer",
+   "m": 10,
+   "t": 3,
+   "N": 30,
+   "V": 8,
+   "n_free_F4": 8,
+   "lambda": 7.52498529902538e-05,
+   "small_base": true,
+   "high_lambda_A10": false,
+   "possibly_decomposable_A7C": false,
+   "g3_label_A11": "G3 not applicable (F4 engine capacity)",
+   "labels": [
+    "G3 not applicable (F4 engine capacity)",
+    "small base"
+   ],
+   "files": [
+    "C-t3-m10.jsonl"
+   ],
+   "d_F_draws": [
+    ">=6",
+    ">=6"
+   ],
+   "censoring_draws": [
+    "stopped by max_cols at c=6",
+    "stopped by max_cols at c=6"
+   ],
+   "d_F_median": ">=6",
+   "d_F_median_lo": 6,
+   "d_F_median_exact": false,
+   "ffd_draws": [
+    4,
+    4
+   ],
+   "ffd_median": 4,
+   "draws_equal": true,
+   "x_r": [
+    144405604,
+    1848364638
+   ],
+   "cols_max": 4036392,
+   "c_last": [
+    6,
+    6
+   ],
+   "muladds": [
+    298362,
+    298362
+   ],
+   "wall_s": [
+    0.21,
+    0.21
+   ],
+   "n_vars": 38,
+   "D": null,
+   "D_note": "no D row: run.sh has no d-C stage (Amendment 3 names DC-* rows; none exist)"
+  }
+ ],
+ "H-m": [
+  {
+   "p": 2013265921,
+   "prime": "P1",
+   "kind": "kummer",
+   "t": 2,
+   "m": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+   ],
+   "d_F_median": [
+    "4",
+    "5",
+    "6",
+    "6",
+    ">=7",
+    ">=8",
+    ">=8",
+    ">=8",
+    ">=7"
+   ],
+   "ffd_median": [
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4
+   ],
+   "excluded_high_lambda": [],
+   "completed": [
+    [
+     2,
+     4
+    ],
+    [
+     3,
+     5
+    ],
+    [
+     4,
+     6
+    ],
+    [
+     5,
+     6
+    ]
+   ],
+   "H-m": "grows",
+   "robustness": {
+    "with_lower_bounds_last_m": "grows",
+    "m_le_6_only": "grows",
+    "without_small_base": "grows"
+   },
+   "rise_completed": 2
+  },
+  {
+   "p": 2013265921,
+   "prime": "P1",
+   "kind": "kummer",
+   "t": 3,
+   "m": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+   ],
+   "d_F_median": [
+    "4",
+    "6",
+    "7",
+    ">=8",
+    ">=8",
+    ">=8",
+    ">=7",
+    ">=6",
+    ">=6"
+   ],
+   "ffd_median": [
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4
+   ],
+   "excluded_high_lambda": [],
+   "completed": [
+    [
+     2,
+     4
+    ],
+    [
+     3,
+     6
+    ],
+    [
+     4,
+     7
+    ]
+   ],
+   "H-m": "grows",
+   "robustness": {
+    "with_lower_bounds_last_m": "grows",
+    "m_le_6_only": "grows",
+    "without_small_base": "grows"
+   },
+   "rise_completed": 3
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "isogeny",
+   "t": 2,
+   "m": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+   ],
+   "d_F_median": [
+    "5",
+    "6",
+    "6",
+    "7",
+    ">=7",
+    ">=8",
+    ">=8",
+    ">=8",
+    ">=7"
+   ],
+   "ffd_median": [
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5,
+    5
+   ],
+   "excluded_high_lambda": [],
+   "completed": [
+    [
+     2,
+     5
+    ],
+    [
+     3,
+     6
+    ],
+    [
+     4,
+     6
+    ],
+    [
+     5,
+     7
+    ]
+   ],
+   "H-m": "grows",
+   "robustness": {
+    "with_lower_bounds_last_m": "grows",
+    "m_le_6_only": "grows",
+    "without_small_base": "mixed"
+   },
+   "rise_completed": 2
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "isogeny",
+   "t": 3,
+   "m": [
+    2,
+    3,
+    4,
+    5
+   ],
+   "d_F_median": [
+    "5",
+    "6",
+    "7",
+    ">=8"
+   ],
+   "ffd_median": [
+    5,
+    5,
+    5,
+    5
+   ],
+   "excluded_high_lambda": [],
+   "completed": [
+    [
+     2,
+     5
+    ],
+    [
+     3,
+     6
+    ],
+    [
+     4,
+     7
+    ]
+   ],
+   "H-m": "grows",
+   "robustness": {
+    "with_lower_bounds_last_m": "grows",
+    "m_le_6_only": "grows",
+    "without_small_base": "grows"
+   },
+   "rise_completed": 2
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "kummer",
+   "t": 2,
+   "m": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+   ],
+   "d_F_median": [
+    "4",
+    "5",
+    "6",
+    "6",
+    ">=7",
+    ">=8",
+    ">=8",
+    ">=8",
+    ">=7"
+   ],
+   "ffd_median": [
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4
+   ],
+   "excluded_high_lambda": [],
+   "completed": [
+    [
+     2,
+     4
+    ],
+    [
+     3,
+     5
+    ],
+    [
+     4,
+     6
+    ],
+    [
+     5,
+     6
+    ]
+   ],
+   "H-m": "grows",
+   "robustness": {
+    "with_lower_bounds_last_m": "grows",
+    "m_le_6_only": "grows",
+    "without_small_base": "grows"
+   },
+   "rise_completed": 2
+  },
+  {
+   "p": 786433,
+   "prime": "P0",
+   "kind": "kummer",
+   "t": 3,
+   "m": [
+    2,
+    3,
+    4,
+    5
+   ],
+   "d_F_median": [
+    "4",
+    "6",
+    "7",
+    ">=8"
+   ],
+   "ffd_median": [
+    4,
+    4,
+    4,
+    4
+   ],
+   "excluded_high_lambda": [],
+   "completed": [
+    [
+     2,
+     4
+    ],
+    [
+     3,
+     6
+    ],
+    [
+     4,
+     7
+    ]
+   ],
+   "H-m": "grows",
+   "robustness": {
+    "with_lower_bounds_last_m": "grows",
+    "m_le_6_only": "grows",
+    "without_small_base": "grows"
+   },
+   "rise_completed": 3
+  }
+ ],
+ "stage_seconds": {
+  "g1": 0.0,
+  "g4-kummer-m2": 1.0,
+  "g4-kummer-m3": 0.0,
+  "g4-isogeny-m2": 9.0,
+  "g4-isogeny-m3": 1.0,
+  "C-t2-m2": 0.0,
+  "C-t2-m2-p0": 0.0,
+  "C-t2-m3": 0.0,
+  "C-t2-m3-p0": 0.0,
+  "C-t2-m4": 2.0,
+  "C-t2-m4-p0": 3.0,
+  "C-t2-m5": 38.0,
+  "C-t2-m5-p0": 152.0,
+  "C-t2-m6": 3663.0,
+  "C-t2-m6-p0": 7966.0,
+  "C-t2-m7": 13.0,
+  "C-t2-m7-p0": 29.0,
+  "C-t2-m8": 24.0,
+  "C-t2-m8-p0": 51.0,
+  "C-t2-m9": 40.0,
+  "C-t2-m9-p0": 88.0,
+  "C-t2-m10": 3.0,
+  "C-t2-m10-p0": 6.0,
+  "C-t3-m2": 0.0,
+  "C-t3-m2-p0": 1.0,
+  "C-t3-m3": 1.0,
+  "C-t3-m3-p0": 3.0,
+  "C-t3-m4": 493.0,
+  "C-t3-m4-p0": 1064.0,
+  "C-t3-m5": 5.0,
+  "C-t3-m5-p0": 12.0,
+  "C-t3-m6": 11.0,
+  "C-t3-m7": 25.0,
+  "C-t3-m8": 2.0,
+  "C-t3-m9": 0.0,
+  "C-t3-m10": 1.0,
+  "g3": 0.0
+ },
+ "committed_scorer_crosscheck": {
+  "committed_cells": 44,
+  "cell_mismatches": [],
+  "H-m_mismatches": [],
+  "committed_G2": {
+   "checked": 0,
+   "violations": 0
+  },
+  "committed_repeats": 0,
+  "committed_H-m": [
+   [
+    786433,
+    "isogeny",
+    2,
+    "grows"
+   ],
+   [
+    786433,
+    "isogeny",
+    3,
+    "grows"
+   ],
+   [
+    786433,
+    "kummer",
+    2,
+    "grows"
+   ],
+   [
+    786433,
+    "kummer",
+    3,
+    "grows"
+   ],
+   [
+    2013265921,
+    "kummer",
+    2,
+    "grows"
+   ],
+   [
+    2013265921,
+    "kummer",
+    3,
+    "grows"
+   ]
+  ]
+ },
+ "draws": [
+  {
+   "file": "C-t2-m10.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 10,
+   "t": 2,
+   "N": 20,
+   "k": 0,
+   "x_r": 633287140,
+   "curve": {
+    "a": 44273245,
+    "b": 1074629501
+   },
+   "d_F": ">=7",
+   "d_F_lo": 7,
+   "censoring": "stopped by max_cols at c=7",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6
+   ],
+   "n_vars": 28,
+   "n_free_F4": 8,
+   "cols_last": 2798790,
+   "cols_max": 2798790,
+   "c_last": 7,
+   "muladds": 27370854,
+   "wall_s": 1.620077575,
+   "timed_out_flag": true,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m10.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 10,
+   "t": 2,
+   "N": 20,
+   "k": 1,
+   "x_r": 1046247177,
+   "curve": {
+    "a": 44273245,
+    "b": 1074629501
+   },
+   "d_F": ">=7",
+   "d_F_lo": 7,
+   "censoring": "stopped by max_cols at c=7",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6
+   ],
+   "n_vars": 28,
+   "n_free_F4": 8,
+   "cols_last": 2798790,
+   "cols_max": 2798790,
+   "c_last": 7,
+   "muladds": 27370854,
+   "wall_s": 1.5796970460000002,
+   "timed_out_flag": true,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m10-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 10,
+   "t": 2,
+   "N": 20,
+   "k": 0,
+   "x_r": 396931,
+   "curve": {
+    "a": 419777,
+    "b": 236583
+   },
+   "d_F": ">=7",
+   "d_F_lo": 7,
+   "censoring": "stopped by max_cols at c=7",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6
+   ],
+   "n_vars": 28,
+   "n_free_F4": 8,
+   "cols_last": 2798790,
+   "cols_max": 2798790,
+   "c_last": 7,
+   "muladds": 27370853,
+   "wall_s": 1.449445737,
+   "timed_out_flag": true,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m10-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 10,
+   "t": 2,
+   "N": 20,
+   "k": 1,
+   "x_r": 27447,
+   "curve": {
+    "a": 419777,
+    "b": 236583
+   },
+   "d_F": ">=7",
+   "d_F_lo": 7,
+   "censoring": "stopped by max_cols at c=7",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6
+   ],
+   "n_vars": 28,
+   "n_free_F4": 8,
+   "cols_last": 2798790,
+   "cols_max": 2798790,
+   "c_last": 7,
+   "muladds": 27370853,
+   "wall_s": 1.724628338,
+   "timed_out_flag": true,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m10-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 10,
+   "t": 2,
+   "N": 20,
+   "k": 0,
+   "x_r": 447298,
+   "curve": {
+    "a": 660185,
+    "b": 601152
+   },
+   "d_F": ">=7",
+   "d_F_lo": 7,
+   "censoring": "stopped by max_cols at c=7",
+   "ffd": 5,
+   "falls": [
+    5,
+    6
+   ],
+   "n_vars": 28,
+   "n_free_F4": 8,
+   "cols_last": 2798790,
+   "cols_max": 2798790,
+   "c_last": 7,
+   "muladds": 17905486,
+   "wall_s": 1.452012518,
+   "timed_out_flag": true,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m10-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 10,
+   "t": 2,
+   "N": 20,
+   "k": 1,
+   "x_r": 658898,
+   "curve": {
+    "a": 660185,
+    "b": 601152
+   },
+   "d_F": ">=7",
+   "d_F_lo": 7,
+   "censoring": "stopped by max_cols at c=7",
+   "ffd": 5,
+   "falls": [
+    5,
+    6
+   ],
+   "n_vars": 28,
+   "n_free_F4": 8,
+   "cols_last": 2798790,
+   "cols_max": 2798790,
+   "c_last": 7,
+   "muladds": 17905486,
+   "wall_s": 1.497408243,
+   "timed_out_flag": true,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m2.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 2,
+   "t": 2,
+   "N": 4,
+   "k": 0,
+   "x_r": 779599582,
+   "curve": {
+    "a": 691435640,
+    "b": 641419325
+   },
+   "d_F": "4",
+   "d_F_lo": 4,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4
+   ],
+   "n_vars": 4,
+   "n_free_F4": 0,
+   "cols_last": 16,
+   "cols_max": 16,
+   "c_last": 4,
+   "muladds": 3485,
+   "wall_s": 0.001099639,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m2.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 2,
+   "t": 2,
+   "N": 4,
+   "k": 1,
+   "x_r": 1170562132,
+   "curve": {
+    "a": 691435640,
+    "b": 641419325
+   },
+   "d_F": "4",
+   "d_F_lo": 4,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4
+   ],
+   "n_vars": 4,
+   "n_free_F4": 0,
+   "cols_last": 16,
+   "cols_max": 16,
+   "c_last": 4,
+   "muladds": 3485,
+   "wall_s": 0.000606623,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m2-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 2,
+   "t": 2,
+   "N": 4,
+   "k": 0,
+   "x_r": 497404,
+   "curve": {
+    "a": 4298,
+    "b": 422508
+   },
+   "d_F": "4",
+   "d_F_lo": 4,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4
+   ],
+   "n_vars": 4,
+   "n_free_F4": 0,
+   "cols_last": 16,
+   "cols_max": 16,
+   "c_last": 4,
+   "muladds": 3485,
+   "wall_s": 0.001019341,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m2-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 2,
+   "t": 2,
+   "N": 4,
+   "k": 1,
+   "x_r": 226869,
+   "curve": {
+    "a": 4298,
+    "b": 422508
+   },
+   "d_F": "4",
+   "d_F_lo": 4,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4
+   ],
+   "n_vars": 4,
+   "n_free_F4": 0,
+   "cols_last": 16,
+   "cols_max": 16,
+   "c_last": 4,
+   "muladds": 3485,
+   "wall_s": 0.000543586,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m2-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 2,
+   "t": 2,
+   "N": 4,
+   "k": 0,
+   "x_r": 239221,
+   "curve": {
+    "a": 126697,
+    "b": 140101
+   },
+   "d_F": "5",
+   "d_F_lo": 5,
+   "censoring": "exact",
+   "ffd": 5,
+   "falls": [
+    5
+   ],
+   "n_vars": 4,
+   "n_free_F4": 0,
+   "cols_last": 16,
+   "cols_max": 16,
+   "c_last": 5,
+   "muladds": 4575,
+   "wall_s": 0.000689807,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m2-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 2,
+   "t": 2,
+   "N": 4,
+   "k": 1,
+   "x_r": 184488,
+   "curve": {
+    "a": 126697,
+    "b": 140101
+   },
+   "d_F": "5",
+   "d_F_lo": 5,
+   "censoring": "exact",
+   "ffd": 5,
+   "falls": [
+    5
+   ],
+   "n_vars": 4,
+   "n_free_F4": 0,
+   "cols_last": 16,
+   "cols_max": 16,
+   "c_last": 5,
+   "muladds": 4575,
+   "wall_s": 0.000703771,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m3.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 3,
+   "t": 2,
+   "N": 6,
+   "k": 0,
+   "x_r": 1248628384,
+   "curve": {
+    "a": 1469422077,
+    "b": 1277177776
+   },
+   "d_F": "5",
+   "d_F_lo": 5,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4,
+    5
+   ],
+   "n_vars": 7,
+   "n_free_F4": 1,
+   "cols_last": 192,
+   "cols_max": 192,
+   "c_last": 5,
+   "muladds": 1151623,
+   "wall_s": 0.011139155,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m3.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 3,
+   "t": 2,
+   "N": 6,
+   "k": 1,
+   "x_r": 211995743,
+   "curve": {
+    "a": 1469422077,
+    "b": 1277177776
+   },
+   "d_F": "5",
+   "d_F_lo": 5,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4,
+    5
+   ],
+   "n_vars": 7,
+   "n_free_F4": 1,
+   "cols_last": 192,
+   "cols_max": 192,
+   "c_last": 5,
+   "muladds": 1151623,
+   "wall_s": 0.010389286,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m3-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 3,
+   "t": 2,
+   "N": 6,
+   "k": 0,
+   "x_r": 777156,
+   "curve": {
+    "a": 163783,
+    "b": 557432
+   },
+   "d_F": "5",
+   "d_F_lo": 5,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4,
+    5
+   ],
+   "n_vars": 7,
+   "n_free_F4": 1,
+   "cols_last": 192,
+   "cols_max": 192,
+   "c_last": 5,
+   "muladds": 1151623,
+   "wall_s": 0.01049071,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m3-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 3,
+   "t": 2,
+   "N": 6,
+   "k": 1,
+   "x_r": 254508,
+   "curve": {
+    "a": 163783,
+    "b": 557432
+   },
+   "d_F": "5",
+   "d_F_lo": 5,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4,
+    5
+   ],
+   "n_vars": 7,
+   "n_free_F4": 1,
+   "cols_last": 192,
+   "cols_max": 192,
+   "c_last": 5,
+   "muladds": 1151623,
+   "wall_s": 0.009463078,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m3-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 3,
+   "t": 2,
+   "N": 6,
+   "k": 0,
+   "x_r": 490791,
+   "curve": {
+    "a": 342930,
+    "b": 439009
+   },
+   "d_F": "6",
+   "d_F_lo": 6,
+   "censoring": "exact",
+   "ffd": 5,
+   "falls": [
+    5,
+    6
+   ],
+   "n_vars": 7,
+   "n_free_F4": 1,
+   "cols_last": 256,
+   "cols_max": 256,
+   "c_last": 6,
+   "muladds": 2280447,
+   "wall_s": 0.019630328,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m3-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 3,
+   "t": 2,
+   "N": 6,
+   "k": 1,
+   "x_r": 508533,
+   "curve": {
+    "a": 342930,
+    "b": 439009
+   },
+   "d_F": "6",
+   "d_F_lo": 6,
+   "censoring": "exact",
+   "ffd": 5,
+   "falls": [
+    5,
+    6
+   ],
+   "n_vars": 7,
+   "n_free_F4": 1,
+   "cols_last": 256,
+   "cols_max": 256,
+   "c_last": 6,
+   "muladds": 2280447,
+   "wall_s": 0.018897548,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m4.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 4,
+   "t": 2,
+   "N": 8,
+   "k": 0,
+   "x_r": 1102336260,
+   "curve": {
+    "a": 104726224,
+    "b": 608875878
+   },
+   "d_F": "6",
+   "d_F_lo": 6,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6
+   ],
+   "n_vars": 10,
+   "n_free_F4": 2,
+   "cols_last": 1792,
+   "cols_max": 1792,
+   "c_last": 6,
+   "muladds": 494338511,
+   "wall_s": 0.731462861,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m4.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 4,
+   "t": 2,
+   "N": 8,
+   "k": 1,
+   "x_r": 92234565,
+   "curve": {
+    "a": 104726224,
+    "b": 608875878
+   },
+   "d_F": "6",
+   "d_F_lo": 6,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6
+   ],
+   "n_vars": 10,
+   "n_free_F4": 2,
+   "cols_last": 1792,
+   "cols_max": 1792,
+   "c_last": 6,
+   "muladds": 494338511,
+   "wall_s": 0.725398892,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m4-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 4,
+   "t": 2,
+   "N": 8,
+   "k": 0,
+   "x_r": 173399,
+   "curve": {
+    "a": 450254,
+    "b": 718063
+   },
+   "d_F": "6",
+   "d_F_lo": 6,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6
+   ],
+   "n_vars": 10,
+   "n_free_F4": 2,
+   "cols_last": 1792,
+   "cols_max": 1792,
+   "c_last": 6,
+   "muladds": 494338143,
+   "wall_s": 0.740783824,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m4-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 4,
+   "t": 2,
+   "N": 8,
+   "k": 1,
+   "x_r": 616646,
+   "curve": {
+    "a": 450254,
+    "b": 718063
+   },
+   "d_F": "6",
+   "d_F_lo": 6,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6
+   ],
+   "n_vars": 10,
+   "n_free_F4": 2,
+   "cols_last": 1792,
+   "cols_max": 1792,
+   "c_last": 6,
+   "muladds": 494338266,
+   "wall_s": 0.736668358,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m4-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 4,
+   "t": 2,
+   "N": 8,
+   "k": 0,
+   "x_r": 259537,
+   "curve": {
+    "a": 759765,
+    "b": 95109
+   },
+   "d_F": "6",
+   "d_F_lo": 6,
+   "censoring": "exact",
+   "ffd": 5,
+   "falls": [
+    5,
+    6
+   ],
+   "n_vars": 10,
+   "n_free_F4": 2,
+   "cols_last": 1792,
+   "cols_max": 1792,
+   "c_last": 6,
+   "muladds": 376914630,
+   "wall_s": 0.604909546,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m4-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 4,
+   "t": 2,
+   "N": 8,
+   "k": 1,
+   "x_r": 193950,
+   "curve": {
+    "a": 759765,
+    "b": 95109
+   },
+   "d_F": "6",
+   "d_F_lo": 6,
+   "censoring": "exact",
+   "ffd": 5,
+   "falls": [
+    5,
+    6
+   ],
+   "n_vars": 10,
+   "n_free_F4": 2,
+   "cols_last": 1792,
+   "cols_max": 1792,
+   "c_last": 6,
+   "muladds": 376914733,
+   "wall_s": 0.607066131,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m5.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 5,
+   "t": 2,
+   "N": 10,
+   "k": 0,
+   "x_r": 1506953108,
+   "curve": {
+    "a": 972531515,
+    "b": 194909003
+   },
+   "d_F": "6",
+   "d_F_lo": 6,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6
+   ],
+   "n_vars": 13,
+   "n_free_F4": 3,
+   "cols_last": 7937,
+   "cols_max": 7937,
+   "c_last": 6,
+   "muladds": 12751833171,
+   "wall_s": 18.998667255,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m5.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 5,
+   "t": 2,
+   "N": 10,
+   "k": 1,
+   "x_r": 1192276958,
+   "curve": {
+    "a": 972531515,
+    "b": 194909003
+   },
+   "d_F": "6",
+   "d_F_lo": 6,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6
+   ],
+   "n_vars": 13,
+   "n_free_F4": 3,
+   "cols_last": 7937,
+   "cols_max": 7937,
+   "c_last": 6,
+   "muladds": 12751833171,
+   "wall_s": 19.085466927,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m5-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 5,
+   "t": 2,
+   "N": 10,
+   "k": 0,
+   "x_r": 449888,
+   "curve": {
+    "a": 199574,
+    "b": 27968
+   },
+   "d_F": "6",
+   "d_F_lo": 6,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6
+   ],
+   "n_vars": 13,
+   "n_free_F4": 3,
+   "cols_last": 7937,
+   "cols_max": 7937,
+   "c_last": 6,
+   "muladds": 12751805629,
+   "wall_s": 19.138346426,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m5-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 5,
+   "t": 2,
+   "N": 10,
+   "k": 1,
+   "x_r": 724186,
+   "curve": {
+    "a": 199574,
+    "b": 27968
+   },
+   "d_F": "6",
+   "d_F_lo": 6,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6
+   ],
+   "n_vars": 13,
+   "n_free_F4": 3,
+   "cols_last": 7937,
+   "cols_max": 7937,
+   "c_last": 6,
+   "muladds": 12751812919,
+   "wall_s": 19.177092061,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m5-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 5,
+   "t": 2,
+   "N": 10,
+   "k": 0,
+   "x_r": 552450,
+   "curve": {
+    "a": 44303,
+    "b": 110951
+   },
+   "d_F": "7",
+   "d_F_lo": 7,
+   "censoring": "exact",
+   "ffd": 5,
+   "falls": [
+    5,
+    6,
+    7
+   ],
+   "n_vars": 13,
+   "n_free_F4": 3,
+   "cols_last": 15360,
+   "cols_max": 15360,
+   "c_last": 7,
+   "muladds": 28852728020,
+   "wall_s": 56.682723648,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m5-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 5,
+   "t": 2,
+   "N": 10,
+   "k": 1,
+   "x_r": 408852,
+   "curve": {
+    "a": 44303,
+    "b": 110951
+   },
+   "d_F": "7",
+   "d_F_lo": 7,
+   "censoring": "exact",
+   "ffd": 5,
+   "falls": [
+    5,
+    6,
+    7
+   ],
+   "n_vars": 13,
+   "n_free_F4": 3,
+   "cols_last": 15360,
+   "cols_max": 15360,
+   "c_last": 7,
+   "muladds": 28852714378,
+   "wall_s": 56.521565687,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m6.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 6,
+   "t": 2,
+   "N": 12,
+   "k": 0,
+   "x_r": 832376253,
+   "curve": {
+    "a": 1119267564,
+    "b": 90596136
+   },
+   "d_F": ">=7",
+   "d_F_lo": 7,
+   "censoring": "stopped by budget at c=7",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6
+   ],
+   "n_vars": 16,
+   "n_free_F4": 4,
+   "cols_last": 61183,
+   "cols_max": 61183,
+   "c_last": 7,
+   "muladds": 1919888251154,
+   "wall_s": 1839.913014204,
+   "timed_out_flag": true,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m6.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 6,
+   "t": 2,
+   "N": 12,
+   "k": 1,
+   "x_r": 206496987,
+   "curve": {
+    "a": 1119267564,
+    "b": 90596136
+   },
+   "d_F": ">=7",
+   "d_F_lo": 7,
+   "censoring": "stopped by budget at c=7",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6
+   ],
+   "n_vars": 16,
+   "n_free_F4": 4,
+   "cols_last": 61183,
+   "cols_max": 61183,
+   "c_last": 7,
+   "muladds": 1919888251155,
+   "wall_s": 1823.354660984,
+   "timed_out_flag": true,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m6-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 6,
+   "t": 2,
+   "N": 12,
+   "k": 0,
+   "x_r": 605938,
+   "curve": {
+    "a": 31304,
+    "b": 470565
+   },
+   "d_F": ">=7",
+   "d_F_lo": 7,
+   "censoring": "stopped by budget at c=7",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6
+   ],
+   "n_vars": 16,
+   "n_free_F4": 4,
+   "cols_last": 61183,
+   "cols_max": 61183,
+   "c_last": 7,
+   "muladds": 1919883361977,
+   "wall_s": 1877.437520735,
+   "timed_out_flag": true,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m6-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 6,
+   "t": 2,
+   "N": 12,
+   "k": 1,
+   "x_r": 494609,
+   "curve": {
+    "a": 31304,
+    "b": 470565
+   },
+   "d_F": ">=7",
+   "d_F_lo": 7,
+   "censoring": "stopped by budget at c=7",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6
+   ],
+   "n_vars": 16,
+   "n_free_F4": 4,
+   "cols_last": 61183,
+   "cols_max": 61183,
+   "c_last": 7,
+   "muladds": 1919883444674,
+   "wall_s": 1937.872707748,
+   "timed_out_flag": true,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m6-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 6,
+   "t": 2,
+   "N": 12,
+   "k": 0,
+   "x_r": 528251,
+   "curve": {
+    "a": 581383,
+    "b": 51724
+   },
+   "d_F": ">=7",
+   "d_F_lo": 7,
+   "censoring": "stopped by max_entries at c=7",
+   "ffd": 5,
+   "falls": [
+    5,
+    6
+   ],
+   "n_vars": 16,
+   "n_free_F4": 4,
+   "cols_last": 61183,
+   "cols_max": 61183,
+   "c_last": 7,
+   "muladds": 2003441822593,
+   "wall_s": 2107.469817374,
+   "timed_out_flag": true,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m6-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 6,
+   "t": 2,
+   "N": 12,
+   "k": 1,
+   "x_r": 300423,
+   "curve": {
+    "a": 581383,
+    "b": 51724
+   },
+   "d_F": ">=7",
+   "d_F_lo": 7,
+   "censoring": "stopped by max_entries at c=7",
+   "ffd": 5,
+   "falls": [
+    5,
+    6
+   ],
+   "n_vars": 16,
+   "n_free_F4": 4,
+   "cols_last": 61183,
+   "cols_max": 61183,
+   "c_last": 7,
+   "muladds": 2003441621318,
+   "wall_s": 2042.967770229,
+   "timed_out_flag": true,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m7.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 7,
+   "t": 2,
+   "N": 14,
+   "k": 0,
+   "x_r": 920694645,
+   "curve": {
+    "a": 1311914301,
+    "b": 1509204445
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "n_vars": 19,
+   "n_free_F4": 5,
+   "cols_last": 195604,
+   "cols_max": 195604,
+   "c_last": 7,
+   "muladds": 1711987706,
+   "wall_s": 6.373857298,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m7.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 7,
+   "t": 2,
+   "N": 14,
+   "k": 1,
+   "x_r": 994273131,
+   "curve": {
+    "a": 1311914301,
+    "b": 1509204445
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "n_vars": 19,
+   "n_free_F4": 5,
+   "cols_last": 195604,
+   "cols_max": 195604,
+   "c_last": 7,
+   "muladds": 1711987706,
+   "wall_s": 6.609194414,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m7-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 7,
+   "t": 2,
+   "N": 14,
+   "k": 0,
+   "x_r": 764408,
+   "curve": {
+    "a": 722955,
+    "b": 376208
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "n_vars": 19,
+   "n_free_F4": 5,
+   "cols_last": 195604,
+   "cols_max": 195604,
+   "c_last": 7,
+   "muladds": 1711986607,
+   "wall_s": 6.75152676,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m7-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 7,
+   "t": 2,
+   "N": 14,
+   "k": 1,
+   "x_r": 786286,
+   "curve": {
+    "a": 722955,
+    "b": 376208
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "n_vars": 19,
+   "n_free_F4": 5,
+   "cols_last": 195604,
+   "cols_max": 195604,
+   "c_last": 7,
+   "muladds": 1711987094,
+   "wall_s": 6.617306506,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m7-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 7,
+   "t": 2,
+   "N": 14,
+   "k": 0,
+   "x_r": 421425,
+   "curve": {
+    "a": 513265,
+    "b": 31839
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 5,
+   "falls": [
+    5,
+    6,
+    7
+   ],
+   "n_vars": 19,
+   "n_free_F4": 5,
+   "cols_last": 195604,
+   "cols_max": 195604,
+   "c_last": 7,
+   "muladds": 1674497336,
+   "wall_s": 7.524700845,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m7-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 7,
+   "t": 2,
+   "N": 14,
+   "k": 1,
+   "x_r": 8585,
+   "curve": {
+    "a": 513265,
+    "b": 31839
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 5,
+   "falls": [
+    5,
+    6,
+    7
+   ],
+   "n_vars": 19,
+   "n_free_F4": 5,
+   "cols_last": 195604,
+   "cols_max": 195604,
+   "c_last": 7,
+   "muladds": 1674492177,
+   "wall_s": 7.13951798,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m8.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 8,
+   "t": 2,
+   "N": 16,
+   "k": 0,
+   "x_r": 1226528648,
+   "curve": {
+    "a": 1006357967,
+    "b": 956544962
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "n_vars": 22,
+   "n_free_F4": 6,
+   "cols_last": 532220,
+   "cols_max": 532220,
+   "c_last": 7,
+   "muladds": 2413371956,
+   "wall_s": 12.46569256,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m8.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 8,
+   "t": 2,
+   "N": 16,
+   "k": 1,
+   "x_r": 1864669155,
+   "curve": {
+    "a": 1006357967,
+    "b": 956544962
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "n_vars": 22,
+   "n_free_F4": 6,
+   "cols_last": 532220,
+   "cols_max": 532220,
+   "c_last": 7,
+   "muladds": 2413371956,
+   "wall_s": 12.224141345,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m8-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 8,
+   "t": 2,
+   "N": 16,
+   "k": 0,
+   "x_r": 437947,
+   "curve": {
+    "a": 530956,
+    "b": 635419
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "n_vars": 22,
+   "n_free_F4": 6,
+   "cols_last": 532220,
+   "cols_max": 532220,
+   "c_last": 7,
+   "muladds": 2413363560,
+   "wall_s": 12.413085374,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m8-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 8,
+   "t": 2,
+   "N": 16,
+   "k": 1,
+   "x_r": 713388,
+   "curve": {
+    "a": 530956,
+    "b": 635419
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "n_vars": 22,
+   "n_free_F4": 6,
+   "cols_last": 532220,
+   "cols_max": 532220,
+   "c_last": 7,
+   "muladds": 2413365022,
+   "wall_s": 12.246783847,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m8-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 8,
+   "t": 2,
+   "N": 16,
+   "k": 0,
+   "x_r": 732978,
+   "curve": {
+    "a": 158395,
+    "b": 524687
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 5,
+   "falls": [
+    5,
+    6,
+    7
+   ],
+   "n_vars": 22,
+   "n_free_F4": 6,
+   "cols_last": 532220,
+   "cols_max": 532220,
+   "c_last": 7,
+   "muladds": 2410455610,
+   "wall_s": 13.033597642,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m8-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 8,
+   "t": 2,
+   "N": 16,
+   "k": 1,
+   "x_r": 129741,
+   "curve": {
+    "a": 158395,
+    "b": 524687
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 5,
+   "falls": [
+    5,
+    6,
+    7
+   ],
+   "n_vars": 22,
+   "n_free_F4": 6,
+   "cols_last": 532220,
+   "cols_max": 532220,
+   "c_last": 7,
+   "muladds": 2410469813,
+   "wall_s": 12.670250678,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m9.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 9,
+   "t": 2,
+   "N": 18,
+   "k": 0,
+   "x_r": 50032777,
+   "curve": {
+    "a": 1767557423,
+    "b": 474999768
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "n_vars": 25,
+   "n_free_F4": 7,
+   "cols_last": 1280760,
+   "cols_max": 1280760,
+   "c_last": 7,
+   "muladds": 2986683092,
+   "wall_s": 19.792846707,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m9.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 9,
+   "t": 2,
+   "N": 18,
+   "k": 1,
+   "x_r": 1761217397,
+   "curve": {
+    "a": 1767557423,
+    "b": 474999768
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "n_vars": 25,
+   "n_free_F4": 7,
+   "cols_last": 1280760,
+   "cols_max": 1280760,
+   "c_last": 7,
+   "muladds": 2986683092,
+   "wall_s": 20.273831706,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m9-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 9,
+   "t": 2,
+   "N": 18,
+   "k": 0,
+   "x_r": 384494,
+   "curve": {
+    "a": 185547,
+    "b": 19545
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "n_vars": 25,
+   "n_free_F4": 7,
+   "cols_last": 1280760,
+   "cols_max": 1280760,
+   "c_last": 7,
+   "muladds": 2986681301,
+   "wall_s": 19.641657105,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m9-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 9,
+   "t": 2,
+   "N": 18,
+   "k": 1,
+   "x_r": 148945,
+   "curve": {
+    "a": 185547,
+    "b": 19545
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "n_vars": 25,
+   "n_free_F4": 7,
+   "cols_last": 1280760,
+   "cols_max": 1280760,
+   "c_last": 7,
+   "muladds": 2986674900,
+   "wall_s": 20.002124946,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m9-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 9,
+   "t": 2,
+   "N": 18,
+   "k": 0,
+   "x_r": 492360,
+   "curve": {
+    "a": 133868,
+    "b": 749535
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 5,
+   "falls": [
+    5,
+    6,
+    7
+   ],
+   "n_vars": 25,
+   "n_free_F4": 7,
+   "cols_last": 1280760,
+   "cols_max": 1280760,
+   "c_last": 7,
+   "muladds": 3884856285,
+   "wall_s": 23.892439984,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t2-m9-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 9,
+   "t": 2,
+   "N": 18,
+   "k": 1,
+   "x_r": 159941,
+   "curve": {
+    "a": 133868,
+    "b": 749535
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 5,
+   "falls": [
+    5,
+    6,
+    7
+   ],
+   "n_vars": 25,
+   "n_free_F4": 7,
+   "cols_last": 1280760,
+   "cols_max": 1280760,
+   "c_last": 7,
+   "muladds": 3884851145,
+   "wall_s": 23.395514997,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m10.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 10,
+   "t": 3,
+   "N": 30,
+   "k": 0,
+   "x_r": 144405604,
+   "curve": {
+    "a": 1829556678,
+    "b": 570405369
+   },
+   "d_F": ">=6",
+   "d_F_lo": 6,
+   "censoring": "stopped by max_cols at c=6",
+   "ffd": 4,
+   "falls": [
+    4,
+    5
+   ],
+   "n_vars": 38,
+   "n_free_F4": 8,
+   "cols_last": 4036392,
+   "cols_max": 4036392,
+   "c_last": 6,
+   "muladds": 298362,
+   "wall_s": 0.207076732,
+   "timed_out_flag": true,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m10.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 10,
+   "t": 3,
+   "N": 30,
+   "k": 1,
+   "x_r": 1848364638,
+   "curve": {
+    "a": 1829556678,
+    "b": 570405369
+   },
+   "d_F": ">=6",
+   "d_F_lo": 6,
+   "censoring": "stopped by max_cols at c=6",
+   "ffd": 4,
+   "falls": [
+    4,
+    5
+   ],
+   "n_vars": 38,
+   "n_free_F4": 8,
+   "cols_last": 4036392,
+   "cols_max": 4036392,
+   "c_last": 6,
+   "muladds": 298362,
+   "wall_s": 0.207418274,
+   "timed_out_flag": true,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m2.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 2,
+   "t": 3,
+   "N": 6,
+   "k": 0,
+   "x_r": 506819018,
+   "curve": {
+    "a": 85921209,
+    "b": 228972833
+   },
+   "d_F": "4",
+   "d_F_lo": 4,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4
+   ],
+   "n_vars": 6,
+   "n_free_F4": 0,
+   "cols_last": 57,
+   "cols_max": 57,
+   "c_last": 4,
+   "muladds": 50218,
+   "wall_s": 0.002871577,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m2.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 2,
+   "t": 3,
+   "N": 6,
+   "k": 1,
+   "x_r": 1165432285,
+   "curve": {
+    "a": 85921209,
+    "b": 228972833
+   },
+   "d_F": "4",
+   "d_F_lo": 4,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4
+   ],
+   "n_vars": 6,
+   "n_free_F4": 0,
+   "cols_last": 57,
+   "cols_max": 57,
+   "c_last": 4,
+   "muladds": 50218,
+   "wall_s": 0.002426053,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m2-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 2,
+   "t": 3,
+   "N": 6,
+   "k": 0,
+   "x_r": 197976,
+   "curve": {
+    "a": 377254,
+    "b": 111336
+   },
+   "d_F": "4",
+   "d_F_lo": 4,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4
+   ],
+   "n_vars": 6,
+   "n_free_F4": 0,
+   "cols_last": 57,
+   "cols_max": 57,
+   "c_last": 4,
+   "muladds": 50218,
+   "wall_s": 0.002876704,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m2-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 2,
+   "t": 3,
+   "N": 6,
+   "k": 1,
+   "x_r": 149308,
+   "curve": {
+    "a": 377254,
+    "b": 111336
+   },
+   "d_F": "4",
+   "d_F_lo": 4,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4
+   ],
+   "n_vars": 6,
+   "n_free_F4": 0,
+   "cols_last": 57,
+   "cols_max": 57,
+   "c_last": 4,
+   "muladds": 50218,
+   "wall_s": 0.002431696,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m2-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 2,
+   "t": 3,
+   "N": 6,
+   "k": 0,
+   "x_r": 122650,
+   "curve": {
+    "a": 428522,
+    "b": 708928
+   },
+   "d_F": "5",
+   "d_F_lo": 5,
+   "censoring": "exact",
+   "ffd": 5,
+   "falls": [
+    5
+   ],
+   "n_vars": 6,
+   "n_free_F4": 0,
+   "cols_last": 63,
+   "cols_max": 63,
+   "c_last": 5,
+   "muladds": 105126,
+   "wall_s": 0.004009574,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m2-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 2,
+   "t": 3,
+   "N": 6,
+   "k": 1,
+   "x_r": 742161,
+   "curve": {
+    "a": 428522,
+    "b": 708928
+   },
+   "d_F": "5",
+   "d_F_lo": 5,
+   "censoring": "exact",
+   "ffd": 5,
+   "falls": [
+    5
+   ],
+   "n_vars": 6,
+   "n_free_F4": 0,
+   "cols_last": 63,
+   "cols_max": 63,
+   "c_last": 5,
+   "muladds": 105126,
+   "wall_s": 0.003810229,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m3.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 3,
+   "t": 3,
+   "N": 9,
+   "k": 0,
+   "x_r": 388393539,
+   "curve": {
+    "a": 1074985527,
+    "b": 1961266035
+   },
+   "d_F": "6",
+   "d_F_lo": 6,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6
+   ],
+   "n_vars": 10,
+   "n_free_F4": 1,
+   "cols_last": 1291,
+   "cols_max": 1291,
+   "c_last": 6,
+   "muladds": 444944497,
+   "wall_s": 0.559590147,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m3.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 3,
+   "t": 3,
+   "N": 9,
+   "k": 1,
+   "x_r": 1389271940,
+   "curve": {
+    "a": 1074985527,
+    "b": 1961266035
+   },
+   "d_F": "6",
+   "d_F_lo": 6,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6
+   ],
+   "n_vars": 10,
+   "n_free_F4": 1,
+   "cols_last": 1291,
+   "cols_max": 1291,
+   "c_last": 6,
+   "muladds": 444944497,
+   "wall_s": 0.551535025,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m3-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 3,
+   "t": 3,
+   "N": 9,
+   "k": 0,
+   "x_r": 460685,
+   "curve": {
+    "a": 766120,
+    "b": 151717
+   },
+   "d_F": "6",
+   "d_F_lo": 6,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6
+   ],
+   "n_vars": 10,
+   "n_free_F4": 1,
+   "cols_last": 1291,
+   "cols_max": 1291,
+   "c_last": 6,
+   "muladds": 444944184,
+   "wall_s": 0.560761068,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m3-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 3,
+   "t": 3,
+   "N": 9,
+   "k": 1,
+   "x_r": 542685,
+   "curve": {
+    "a": 766120,
+    "b": 151717
+   },
+   "d_F": "6",
+   "d_F_lo": 6,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6
+   ],
+   "n_vars": 10,
+   "n_free_F4": 1,
+   "cols_last": 1291,
+   "cols_max": 1291,
+   "c_last": 6,
+   "muladds": 444944142,
+   "wall_s": 0.559047089,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m3-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 3,
+   "t": 3,
+   "N": 9,
+   "k": 0,
+   "x_r": 522597,
+   "curve": {
+    "a": 581130,
+    "b": 172522
+   },
+   "d_F": "6",
+   "d_F_lo": 6,
+   "censoring": "exact",
+   "ffd": 5,
+   "falls": [
+    5,
+    6
+   ],
+   "n_vars": 10,
+   "n_free_F4": 1,
+   "cols_last": 1291,
+   "cols_max": 1291,
+   "c_last": 6,
+   "muladds": 550970389,
+   "wall_s": 0.775356314,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m3-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 3,
+   "t": 3,
+   "N": 9,
+   "k": 1,
+   "x_r": 551198,
+   "curve": {
+    "a": 581130,
+    "b": 172522
+   },
+   "d_F": "6",
+   "d_F_lo": 6,
+   "censoring": "exact",
+   "ffd": 5,
+   "falls": [
+    5,
+    6
+   ],
+   "n_vars": 10,
+   "n_free_F4": 1,
+   "cols_last": 1291,
+   "cols_max": 1291,
+   "c_last": 6,
+   "muladds": 550970924,
+   "wall_s": 0.775903113,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m4.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 4,
+   "t": 3,
+   "N": 12,
+   "k": 0,
+   "x_r": 259303215,
+   "curve": {
+    "a": 958505953,
+    "b": 263132826
+   },
+   "d_F": "7",
+   "d_F_lo": 7,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "n_vars": 14,
+   "n_free_F4": 2,
+   "cols_last": 18324,
+   "cols_max": 18324,
+   "c_last": 7,
+   "muladds": 177532210582,
+   "wall_s": 246.254891385,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m4.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 4,
+   "t": 3,
+   "N": 12,
+   "k": 1,
+   "x_r": 1710525890,
+   "curve": {
+    "a": 958505953,
+    "b": 263132826
+   },
+   "d_F": "7",
+   "d_F_lo": 7,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "n_vars": 14,
+   "n_free_F4": 2,
+   "cols_last": 18324,
+   "cols_max": 18324,
+   "c_last": 7,
+   "muladds": 177532210582,
+   "wall_s": 247.37264092,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m4-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 4,
+   "t": 3,
+   "N": 12,
+   "k": 0,
+   "x_r": 47886,
+   "curve": {
+    "a": 419215,
+    "b": 242795
+   },
+   "d_F": "7",
+   "d_F_lo": 7,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "n_vars": 14,
+   "n_free_F4": 2,
+   "cols_last": 18324,
+   "cols_max": 18324,
+   "c_last": 7,
+   "muladds": 177531757429,
+   "wall_s": 267.523771303,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m4-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 4,
+   "t": 3,
+   "N": 12,
+   "k": 1,
+   "x_r": 265204,
+   "curve": {
+    "a": 419215,
+    "b": 242795
+   },
+   "d_F": "7",
+   "d_F_lo": 7,
+   "censoring": "exact",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "n_vars": 14,
+   "n_free_F4": 2,
+   "cols_last": 18324,
+   "cols_max": 18324,
+   "c_last": 7,
+   "muladds": 177531704015,
+   "wall_s": 274.375249168,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m4-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 4,
+   "t": 3,
+   "N": 12,
+   "k": 0,
+   "x_r": 16052,
+   "curve": {
+    "a": 203417,
+    "b": 760229
+   },
+   "d_F": "7",
+   "d_F_lo": 7,
+   "censoring": "exact",
+   "ffd": 5,
+   "falls": [
+    5,
+    6,
+    7
+   ],
+   "n_vars": 14,
+   "n_free_F4": 2,
+   "cols_last": 18324,
+   "cols_max": 18324,
+   "c_last": 7,
+   "muladds": 155927172993,
+   "wall_s": 260.863598855,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m4-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 4,
+   "t": 3,
+   "N": 12,
+   "k": 1,
+   "x_r": 572470,
+   "curve": {
+    "a": 203417,
+    "b": 760229
+   },
+   "d_F": "7",
+   "d_F_lo": 7,
+   "censoring": "exact",
+   "ffd": 5,
+   "falls": [
+    5,
+    6,
+    7
+   ],
+   "n_vars": 14,
+   "n_free_F4": 2,
+   "cols_last": 18324,
+   "cols_max": 18324,
+   "c_last": 7,
+   "muladds": 155927161077,
+   "wall_s": 260.623900655,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m5.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 5,
+   "t": 3,
+   "N": 15,
+   "k": 0,
+   "x_r": 1150089172,
+   "curve": {
+    "a": 548844359,
+    "b": 313820527
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "n_vars": 18,
+   "n_free_F4": 3,
+   "cols_last": 106970,
+   "cols_max": 106970,
+   "c_last": 7,
+   "muladds": 338817996,
+   "wall_s": 2.585547341,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m5.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 5,
+   "t": 3,
+   "N": 15,
+   "k": 1,
+   "x_r": 1431675215,
+   "curve": {
+    "a": 548844359,
+    "b": 313820527
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "n_vars": 18,
+   "n_free_F4": 3,
+   "cols_last": 106970,
+   "cols_max": 106970,
+   "c_last": 7,
+   "muladds": 338817996,
+   "wall_s": 2.636271749,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m5-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 5,
+   "t": 3,
+   "N": 15,
+   "k": 0,
+   "x_r": 701289,
+   "curve": {
+    "a": 392879,
+    "b": 599598
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "n_vars": 18,
+   "n_free_F4": 3,
+   "cols_last": 106970,
+   "cols_max": 106970,
+   "c_last": 7,
+   "muladds": 338817690,
+   "wall_s": 2.66073944,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m5-p0.jsonl",
+   "p": 786433,
+   "kind": "kummer",
+   "m": 5,
+   "t": 3,
+   "N": 15,
+   "k": 1,
+   "x_r": 313352,
+   "curve": {
+    "a": 392879,
+    "b": 599598
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "n_vars": 18,
+   "n_free_F4": 3,
+   "cols_last": 106970,
+   "cols_max": 106970,
+   "c_last": 7,
+   "muladds": 338817366,
+   "wall_s": 2.698900754,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m5-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 5,
+   "t": 3,
+   "N": 15,
+   "k": 0,
+   "x_r": 463550,
+   "curve": {
+    "a": 780405,
+    "b": 769995
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 5,
+   "falls": [
+    5,
+    6,
+    7
+   ],
+   "n_vars": 18,
+   "n_free_F4": 3,
+   "cols_last": 106970,
+   "cols_max": 106970,
+   "c_last": 7,
+   "muladds": 308170739,
+   "wall_s": 2.795984314,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m5-p0.jsonl",
+   "p": 786433,
+   "kind": "isogeny",
+   "m": 5,
+   "t": 3,
+   "N": 15,
+   "k": 1,
+   "x_r": 158388,
+   "curve": {
+    "a": 780405,
+    "b": 769995
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 5,
+   "falls": [
+    5,
+    6,
+    7
+   ],
+   "n_vars": 18,
+   "n_free_F4": 3,
+   "cols_last": 106970,
+   "cols_max": 106970,
+   "c_last": 7,
+   "muladds": 308170476,
+   "wall_s": 2.804123646,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m6.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 6,
+   "t": 3,
+   "N": 18,
+   "k": 0,
+   "x_r": 1274591029,
+   "curve": {
+    "a": 120195486,
+    "b": 745793355
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "n_vars": 22,
+   "n_free_F4": 4,
+   "cols_last": 440772,
+   "cols_max": 440772,
+   "c_last": 7,
+   "muladds": 520516047,
+   "wall_s": 5.533158539,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m6.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 6,
+   "t": 3,
+   "N": 18,
+   "k": 1,
+   "x_r": 189236676,
+   "curve": {
+    "a": 120195486,
+    "b": 745793355
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "n_vars": 22,
+   "n_free_F4": 4,
+   "cols_last": 440772,
+   "cols_max": 440772,
+   "c_last": 7,
+   "muladds": 520516047,
+   "wall_s": 5.911989382,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m7.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 7,
+   "t": 3,
+   "N": 21,
+   "k": 0,
+   "x_r": 1732552702,
+   "curve": {
+    "a": 683409537,
+    "b": 1610456718
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "n_vars": 26,
+   "n_free_F4": 5,
+   "cols_last": 1435347,
+   "cols_max": 1435347,
+   "c_last": 7,
+   "muladds": 884287483,
+   "wall_s": 12.408065898,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m7.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 7,
+   "t": 3,
+   "N": 21,
+   "k": 1,
+   "x_r": 210987062,
+   "curve": {
+    "a": 683409537,
+    "b": 1610456718
+   },
+   "d_F": ">7",
+   "d_F_lo": 8,
+   "censoring": "cmax reached without 1",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6,
+    7
+   ],
+   "n_vars": 26,
+   "n_free_F4": 5,
+   "cols_last": 1435347,
+   "cols_max": 1435347,
+   "c_last": 7,
+   "muladds": 884287483,
+   "wall_s": 12.133225916,
+   "timed_out_flag": false,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m8.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 8,
+   "t": 3,
+   "N": 24,
+   "k": 0,
+   "x_r": 1387941636,
+   "curve": {
+    "a": 1382663051,
+    "b": 755544694
+   },
+   "d_F": ">=7",
+   "d_F_lo": 7,
+   "censoring": "stopped by max_cols at c=7",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6
+   ],
+   "n_vars": 30,
+   "n_free_F4": 6,
+   "cols_last": 3947416,
+   "cols_max": 3947416,
+   "c_last": 7,
+   "muladds": 9414188,
+   "wall_s": 1.291083025,
+   "timed_out_flag": true,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m8.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 8,
+   "t": 3,
+   "N": 24,
+   "k": 1,
+   "x_r": 503471624,
+   "curve": {
+    "a": 1382663051,
+    "b": 755544694
+   },
+   "d_F": ">=7",
+   "d_F_lo": 7,
+   "censoring": "stopped by max_cols at c=7",
+   "ffd": 4,
+   "falls": [
+    4,
+    5,
+    6
+   ],
+   "n_vars": 30,
+   "n_free_F4": 6,
+   "cols_last": 3947416,
+   "cols_max": 3947416,
+   "c_last": 7,
+   "muladds": 9414188,
+   "wall_s": 1.289172255,
+   "timed_out_flag": true,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m9.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 9,
+   "t": 3,
+   "N": 27,
+   "k": 0,
+   "x_r": 617892211,
+   "curve": {
+    "a": 1064041049,
+    "b": 119055492
+   },
+   "d_F": ">=6",
+   "d_F_lo": 6,
+   "censoring": "stopped by max_cols at c=6",
+   "ffd": 4,
+   "falls": [
+    4,
+    5
+   ],
+   "n_vars": 34,
+   "n_free_F4": 7,
+   "cols_last": 2063580,
+   "cols_max": 2063580,
+   "c_last": 6,
+   "muladds": 243192,
+   "wall_s": 0.144587263,
+   "timed_out_flag": true,
+   "row_ok": true,
+   "closure_consistent": true
+  },
+  {
+   "file": "C-t3-m9.jsonl",
+   "p": 2013265921,
+   "kind": "kummer",
+   "m": 9,
+   "t": 3,
+   "N": 27,
+   "k": 1,
+   "x_r": 346423932,
+   "curve": {
+    "a": 1064041049,
+    "b": 119055492
+   },
+   "d_F": ">=6",
+   "d_F_lo": 6,
+   "censoring": "stopped by max_cols at c=6",
+   "ffd": 4,
+   "falls": [
+    4,
+    5
+   ],
+   "n_vars": 34,
+   "n_free_F4": 7,
+   "cols_last": 2063580,
+   "cols_max": 2063580,
+   "c_last": 6,
+   "muladds": 243192,
+   "wall_s": 0.150229899,
+   "timed_out_flag": true,
+   "row_ok": true,
+   "closure_consistent": true
+  }
+ ],
+ "G3_job": {
+  "log_last": "G3: 98 capped runs, 0 disagreements",
+  "exit": "g3 exit 0",
+  "runs": 98,
+  "duplicates": 0,
+  "agree_true": 98,
+  "f4_timed_out": 0,
+  "seed_match_false": 0,
+  "refuted": 42,
+  "expected_runs_A11_scope": 98,
+  "missing": [],
+  "extra": [],
+  "f4_vs_expected_mismatch": [],
+  "closure_field_mismatch": [],
+  "systems": 56,
+  "cells": 28,
+  "cell_caps": [
+   {
+    "p": 786433,
+    "kind": "isogeny",
+    "m": 2,
+    "t": 2,
+    "caps": [
+     4,
+     5
+    ]
+   },
+   {
+    "p": 786433,
+    "kind": "isogeny",
+    "m": 2,
+    "t": 3,
+    "caps": [
+     4,
+     5
+    ]
+   },
+   {
+    "p": 786433,
+    "kind": "isogeny",
+    "m": 3,
+    "t": 2,
+    "caps": [
+     5,
+     6
+    ]
+   },
+   {
+    "p": 786433,
+    "kind": "isogeny",
+    "m": 3,
+    "t": 3,
+    "caps": [
+     5,
+     6
+    ]
+   },
+   {
+    "p": 786433,
+    "kind": "isogeny",
+    "m": 4,
+    "t": 2,
+    "caps": [
+     5,
+     6
+    ]
+   },
+   {
+    "p": 786433,
+    "kind": "isogeny",
+    "m": 4,
+    "t": 3,
+    "caps": [
+     6,
+     7
+    ]
+   },
+   {
+    "p": 786433,
+    "kind": "isogeny",
+    "m": 5,
+    "t": 2,
+    "caps": [
+     6,
+     7
+    ]
+   },
+   {
+    "p": 786433,
+    "kind": "isogeny",
+    "m": 5,
+    "t": 3,
+    "caps": [
+     7
+    ]
+   },
+   {
+    "p": 786433,
+    "kind": "isogeny",
+    "m": 6,
+    "t": 2,
+    "caps": [
+     6
+    ]
+   },
+   {
+    "p": 786433,
+    "kind": "kummer",
+    "m": 2,
+    "t": 2,
+    "caps": [
+     3,
+     4
+    ]
+   },
+   {
+    "p": 786433,
+    "kind": "kummer",
+    "m": 2,
+    "t": 3,
+    "caps": [
+     3,
+     4
+    ]
+   },
+   {
+    "p": 786433,
+    "kind": "kummer",
+    "m": 3,
+    "t": 2,
+    "caps": [
+     4,
+     5
+    ]
+   },
+   {
+    "p": 786433,
+    "kind": "kummer",
+    "m": 3,
+    "t": 3,
+    "caps": [
+     5,
+     6
+    ]
+   },
+   {
+    "p": 786433,
+    "kind": "kummer",
+    "m": 4,
+    "t": 2,
+    "caps": [
+     5,
+     6
+    ]
+   },
+   {
+    "p": 786433,
+    "kind": "kummer",
+    "m": 4,
+    "t": 3,
+    "caps": [
+     6,
+     7
+    ]
+   },
+   {
+    "p": 786433,
+    "kind": "kummer",
+    "m": 5,
+    "t": 2,
+    "caps": [
+     5,
+     6
+    ]
+   },
+   {
+    "p": 786433,
+    "kind": "kummer",
+    "m": 5,
+    "t": 3,
+    "caps": [
+     7
+    ]
+   },
+   {
+    "p": 786433,
+    "kind": "kummer",
+    "m": 6,
+    "t": 2,
+    "caps": [
+     6
+    ]
+   },
+   {
+    "p": 2013265921,
+    "kind": "kummer",
+    "m": 2,
+    "t": 2,
+    "caps": [
+     3,
+     4
+    ]
+   },
+   {
+    "p": 2013265921,
+    "kind": "kummer",
+    "m": 2,
+    "t": 3,
+    "caps": [
+     3,
+     4
+    ]
+   },
+   {
+    "p": 2013265921,
+    "kind": "kummer",
+    "m": 3,
+    "t": 2,
+    "caps": [
+     4,
+     5
+    ]
+   },
+   {
+    "p": 2013265921,
+    "kind": "kummer",
+    "m": 3,
+    "t": 3,
+    "caps": [
+     5,
+     6
+    ]
+   },
+   {
+    "p": 2013265921,
+    "kind": "kummer",
+    "m": 4,
+    "t": 2,
+    "caps": [
+     5,
+     6
+    ]
+   },
+   {
+    "p": 2013265921,
+    "kind": "kummer",
+    "m": 4,
+    "t": 3,
+    "caps": [
+     6,
+     7
+    ]
+   },
+   {
+    "p": 2013265921,
+    "kind": "kummer",
+    "m": 5,
+    "t": 2,
+    "caps": [
+     5,
+     6
+    ]
+   },
+   {
+    "p": 2013265921,
+    "kind": "kummer",
+    "m": 5,
+    "t": 3,
+    "caps": [
+     7
+    ]
+   },
+   {
+    "p": 2013265921,
+    "kind": "kummer",
+    "m": 6,
+    "t": 2,
+    "caps": [
+     6
+    ]
+   },
+   {
+    "p": 2013265921,
+    "kind": "kummer",
+    "m": 6,
+    "t": 3,
+    "caps": [
+     7
+    ]
+   }
+  ],
+  "m_max": 6,
+  "N_max": 18,
+  "inputs_ok": 19,
+  "inputs_listed": 19,
+  "inputs_equal_A11_19_files": true,
+  "binary_sha256": [
+   "f78f39599d75859a693d3177272e95cae79559eebb10c1ac528e0cb13e4fcee7",
+   "7e8a67030e8db88ab06be468ee3b01f7163eb6b5aa80275e690cc71102df9e7a"
+  ],
+  "host": [
+   "nproc: 12",
+   "rayon: 12",
+   "model name\t: Intel(R) Xeon(R) 6975P-C"
+  ]
+ }
+}

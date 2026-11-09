@@ -1,6 +1,6 @@
 {
   "branch": "claude/serene-davinci-ujoi58",
-  "closed_utc": null,
+  "closed_utc": "2026-11-09T20:34:56+00:00",
   "commands": [
     {
       "argv": [
@@ -41,7 +41,116 @@
     "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39"
   },
   "id": "20261108T2223Z-pkm-fd-pfd-c",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "stagec/kummer-p1-t2-median-df-m2-to-m5",
+      "note": "rise of median d_F over completed m, P1 Kummer t=2: 4,5,6,6 at m=2..5; m=6 >=7 (budget), m=7..9 >7, m=10 >=7 (max_cols). runs/C-t2-m*.jsonl. [pcc:unverified]; RESULTS_STAGE_C.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 2.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "stagec/kummer-p1-t3-median-df-m2-to-m4",
+      "note": "rise of median d_F over completed m, P1 Kummer t=3: 4,6,7 at m=2..4; m=5..7 >7, m=8 >=7, m=9,10 >=6 (max_cols). runs/C-t3-m*.jsonl. [pcc:unverified]; RESULTS_STAGE_C.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 3.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 2,
+      "name": "stagec/isogeny-p0-t2-median-df-m2-to-m5",
+      "note": "rise of median d_F over completed m, P0 2-isogeny t=2: 5,6,6,7 at m=2..5 (m=5 small base). runs/C-t2-m*-p0.jsonl. [pcc:unverified]; RESULTS_STAGE_C.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 2.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 88,
+      "name": "stagec/draws-exact-df",
+      "note": "censoring per \u00a72 over 88 draws: 42 exact; 28 cmax 7 without 1 (d_F>7); 4 budget, 2 max_entries, 12 max_cols (d_F>=c). Every m>=7 draw (28) censored, labelled 'G3 not applicable (F4 engine capacity)' (Amendment 11). [pcc:unverified]; RESULTS_STAGE_C.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 42.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 32,
+      "name": "stagec/g4-planted-rows-with-1",
+      "note": "G4 pass: 32 planted draws (16 cells x 2; Kummer P1 m=2 t=1..6, m=3 t=2,3; isogeny P0 same), closure to cmax 5; 1 in 0 closures; planted_ok true on 32/32; runs/g4-*.jsonl. U4 of stage A met. [pcc:unverified]; RESULTS_STAGE_C.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": null,
+      "name": "stagec/g1-cases-pass",
+      "note": "G1 pass: hky_fp_tower_check 'G1: 6 cases pass' (gates/g1.log). [pcc:unverified]; RESULTS_STAGE_C.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 6.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 12,
+      "name": "stagec/repeat-check-m2-vs-stagea",
+      "note": "12 of 12 stage C m=2 draws (t=2,3; P1 and P0) identical to stage A rows on x_r, curve, tower, d_F, ffd, falls, muladds. [pcc:unverified]; RESULTS_STAGE_C.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": 12.0,
+      "reference_kind": "baseline",
+      "spread": null,
+      "unit": "count",
+      "value": 12.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 6,
+      "name": "stagec/h-m-ladders-grows",
+      "note": "H-m reads 'grows in m' on 6 of 6 ladders (P1 Kummer t=2,3; P0 Kummer t=2,3; P0 2-isogeny t=2,3), completed lower medians, small-base cells entering; independent of m>=7 rows; P0 isogeny t=2 would read 'mixed' without small-base cells. [pcc:unverified]; RESULTS_STAGE_C.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 6.0
+    },
+    {
+      "baseline": null,
+      "better": "neutral",
+      "n": 98,
+      "name": "stagec/g3-disagreements-m-le-6",
+      "note": "stage C G3 in job pfd-g3c-20261109 (results/G1/7c2b54f1-.../gates/g3.log, g3.jsonl): 98 capped runs over 56 draws in 28 cells (m<=6), 0 disagreements, 0 timeouts; equals the Amendment 11 within-capacity set; m>=7 G3 not applicable. pfd-c's own g3: not run (tool defect). Study continues (A11 stop rule). [pcc:unverified]; RESULTS_STAGE_C.md (research/pkm_falldegree_unblock_20261107)",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 0.0
+    }
+  ],
   "problem": "study:pkm_falldegree_unblock_20261107:pfd-c",
   "raw": [
     {
@@ -575,18 +684,29 @@
       "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/12/12c15341f725e61de6bb7209aac1da06bd5de0e978c1c1e360b1e76e908df55c",
       "sha256": "12c15341f725e61de6bb7209aac1da06bd5de0e978c1c1e360b1e76e908df55c",
       "uploaded": true
+    },
+    {
+      "bytes": 22391,
+      "path": "research/pkm_falldegree_unblock_20261107/results/C9/analysis/scripts.tar.gz",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4d/4d681da5c5b5657cf797180abc6fba6ad4ea6cf43fa34fbedc20e349248621b8",
+      "sha256": "4d681da5c5b5657cf797180abc6fba6ad4ea6cf43fa34fbedc20e349248621b8",
+      "uploaded": true
     }
   ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
-    "png": [],
-    "svg": []
+    "pdf": "research/pkm_falldegree_unblock_20261107/results/C9/analysis/pfdC_report.pdf",
+    "png": [
+      "research/pkm_falldegree_unblock_20261107/results/C9/analysis/pfdC_fig1.png"
+    ],
+    "svg": [
+      "research/pkm_falldegree_unblock_20261107/results/C9/analysis/pfdC_fig1.svg"
+    ]
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "pkm-fd-pfd-c",
-  "status": "open",
-  "summary": "",
+  "status": "measured",
+  "summary": "PKM stage C + G4 (pfd-c, Amendments 1-11): H-m reads 'grows in m' on all six ladders (independent of the m >= 7 rows); G1 and G4 pass (stage A's G4 condition met); the job's own g3 stage did not run (tool defect, F4 capacity m <= 6); m >= 7 rows labelled 'G3 not applicable', all censored",
   "validation": null
 }
