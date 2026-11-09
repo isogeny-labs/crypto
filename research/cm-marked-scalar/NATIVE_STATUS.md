@@ -205,3 +205,5 @@ Qualify all 625 untimed cold paths and five wrong-output rejections with the new
 ### Errors
 
 No build or qualifier failure in this version. Source uses no allocator-call or wall-time proxy for e2e duration. Frozen original planners, protocols, census and refusal records stay byte-identical. No Rust code changed or local root Cargo suite ran. Sources checked (KB): tools/wrapper unavailable; same block/cold contracts and primary precomputation references as above.
+
+Shared cold outcome, 2026-11-09T18:59Z: published wrapper/source 084524a3d150 and PR update preceded its build/qualifier. Both exit 0 with no warnings; all 625 untimed full paths and five wrong-expected-output rejections pass. No new timing, allocation comparison, census or preflight was launched. The two inline-qualification scopes used four native invocations total, each capped at 120 seconds/2 GiB/thread 1; two builds and two qualifiers, zero failures/retries. This completes software integration of the compact representation with the full cold boundary; actual phase durations still require the pending quiet window. [pcc:unverified]

@@ -2,6 +2,16 @@
 
 Conductor T-1888, [PR #3674](https://github.com/isogeny-labs/crypto/pull/3674). The PR was opened before implementation and comparative execution, as requested. Native closed-relation certificates and executable rational-subgroup actions now cover P-192, P-224, P-256, P-384 and P-521. P-192 is primary. The original objective of an admitted end-to-end runtime improvement over matched regular public-scalar multiplication remains open.
 
+## Current continuation: 2026-11-09
+
+The [complete block-aware census](block-tuning-v1/README.md) covers 27,090 rows and 80 replayed minimum sets, with 400 selected point/count cases and four fault rejections. Relation D+A is 230,265,303,451,611 for P-192/P-224/P-256/P-384/P-521, versus matched folded binary 229,260,300,450,606 and prior direct 228,260,300,449,606. The finite family misses its strict count criterion; no CPU duration follows. The [inspected two-page report](reports/block-tuning-20261109T1810Z/report.pdf) retains the full domain, weights and offline planning obligation. These local results are producer-side unverified assertions pending signed PCC standing. [pcc:unverified]
+
+The user-selected existing-host quiet-window amendment retained the complete cold cost boundary but refused before any timing worker: other CPU 4.24 seconds over two seconds exceeds 0.2, PSI 0/0. No timing rows, held-out launch or retry. Its [separate inspected report](reports/block-window-20261109T1840Z/report.pdf) retains the V4 refusal. Quiet-window start/readiness is pending; no process was stopped or timing gate relaxed. [pcc:unverified]
+
+The [separate inline planner](BLOCK_COMPACT.md) now preserves exact old programs/ties with a bounded two-term representation and label bitset. Qualification reports 4,950 program/GMP checks, 1,800 exhaustive small cases, 3,150 original-mu point/full-count cases, 35,760 bank labels and seven rejected invalid inputs; the largest accepted scalar is checked with both signs. It also passes all 625 shared cold paths and five wrong-output controls. Final builds are warning-free; no allocator or function-clock measurement ran. This implementation is available for a later published timing amendment, with all its work inside the original boundary. [pcc:unverified]
+
+The sections below describe earlier dated components. Latest operational custody, exhausted attempts and ownership dependencies are in [the continuation checkpoint](BLOCK_CONTINUATION_20261109T1855Z.md) and [task-local progress](NATIVE_STATUS.md). No signed PCC standing or end-to-end gain is claimed; do not rerun old write-once launches.
+
 The [construction and exact cost ledger](CONSTRUCTION.md) explains the kernels, endpoint isomorphism, CM labels, signed orbits and all five cost vectors. The [construction report](reports/native-five-curve-20261108/report.pdf) contains the diagrams and original admission record. The subsequent [modular recoding report](reports/recoding-20261108/report.pdf) and [complete replayable census](recoding-v1/README.md) compare 30,780 schedules with symmetric direct-method optimization. P-192 saves three additions and three negations against its same-width centered fused schedule; the full direct minima remain smaller on all five curves.
 
 For each supplied variable-base point P, the relation route evaluates phi, eta, the closing isomorphism sigma(x,y)=(x/ell²,y/ell³), then [k], with k=mu/ell modulo n. Full polynomial identities prove sigma eta phi=[ell], while the native CM checks verify a+b=mu modulo n for alpha=a+b*pi. The implementation is an explicit rational-subgroup evaluator; the much larger global noninteger quotient has unexpanded residual polynomials. Its degree and construction status are retained.
@@ -22,8 +32,8 @@ The [prefix bank and complete cold-function implementation](CACHE_COLD_CONTRACT.
 | Explicit orbit object | Canonical affine representative and scalar transporter reproduced on all five curves |
 | Costed implementation | 90 native counted rows, clocks disabled; D/A/N, explicit map-formula calls, correction/setup and conversion boundaries retained |
 | Matched runtime reference | Public signed-window, OpenSSL public multiscalar and single-point references implemented; actual timing comparison pending |
-| Cold end-to-end gain | Not established; local admission refused twice. Follow-up resolves EKS routing with the existing submitter identity, but quota reads remain forbidden and reported monthly spend exceeds the supplied ceiling |
-| Timing protocol | Native schema validation passes for the initial P-384/P-521 draft; source/binary freeze and admitted backend pending |
+| Cold end-to-end gain | Not established; separate V2/V3/V4 native attempts refused before timing workers. Existing cloud budget/quota limits remain; no new submission. [pcc:unverified] |
+| Timing protocol | Published five-curve full-cold family, 25 configurations and 3500/7000 planned rows; complete admitted panels still absent. Inline planner qualifies through the same boundary but requires a new source/binary-bound amendment before timing. [pcc:unverified] |
 
 Build `make -B -j1 -C research/cm-marked-scalar native-complete construct-binary qualification-tests-binary analysis-tests`; replay `/tmp/cm-marked-scalar-build/native --qualify research/cm-marked-scalar/fixtures-v2` and `/tmp/cm-marked-scalar-build/qualification-tests research/cm-marked-scalar/fixtures-v2`. Do not rerun write-once constructions into existing output directories. Use source/binary hashes rather than shared-filesystem timestamps.
 
