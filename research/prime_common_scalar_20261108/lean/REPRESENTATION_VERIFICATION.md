@@ -28,8 +28,9 @@ buffer-budget-gate/: actual source audit279 declarations,0 additional trusted.
 stream-precision-gate/: final actual source audit289 declarations,0 additional
 trusted. Standard propext/Classical.choice/Quot.sound only. The latter default
 build includes both new libraries. Each leaf's import-inclusive fresh command
-has unique log/status paths. BufferBudget status exit0; read the StreamPrecision
-status artifact for its final outcome, without inferring it from source builds
+has unique log/status paths. Both BufferBudget and StreamPrecision status artifacts record exit0.
+Each fresh replay includes its imports; the project-wide289 declaration
+source audit covers both leaves
 [pcc:unverified].
 
 Canonical bindings: buffer-budget-claim-pins.json and

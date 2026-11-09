@@ -85,6 +85,6 @@ ecdb source changed. This new diagram contains dependencies, not measurements.
 
 The final project audit passed289 declarations with0 extra trusted axioms.
 Receipts: ../../lean/stream-precision-gate/. Only propext, Classical.choice and
-Quot.sound occur. Separate fresh StreamPrecision replay is still in flight at
-this checkpoint; its eventual status must be read from the unique status JSON,
-not inferred from the source audit [pcc:unverified].
+Quot.sound occur. Import-inclusive fresh StreamPrecision replay exited0, with source15ab03e54.
+Its unique status JSON and compressed raw log are retained under ../../lean/;
+this result is separate from the actual source audit [pcc:unverified].
