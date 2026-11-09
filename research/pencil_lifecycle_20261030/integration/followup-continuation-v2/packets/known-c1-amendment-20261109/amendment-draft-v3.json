@@ -1,0 +1,250 @@
+{
+  "schema": "pencil-known-c1-amendment-proposal/v3",
+  "created_utc": "2026-11-09T17:35:25.915063+00:00",
+  "status": "draft_not_frozen_not_admitted",
+  "intended_final_schema": "experiment.protocol/v1",
+  "canonical_protocol_validation_performed": false,
+  "independent_review": null,
+  "scientific_execution_authorized_by_this_document": false,
+  "known_data": {
+    "prior_run": "pencil-p186379-20261030-c1",
+    "observed_executions": 7,
+    "observed_measured_executions": 4,
+    "missing_executions": 11,
+    "pencil_watchdog_timeouts": 2,
+    "pencil_solves": 0,
+    "qualified_ratios": null,
+    "prior_records_enrolled_as_replacement_successes": false,
+    "preserve_b1_c1_and_all_prior_costs": true,
+    "filed_before_prior_observations": false,
+    "filed_before_new_affected_data": true,
+    "source": "research/pencil_large_prime_20261029/protocol_draft/post_c1_continuation_20261030/PLAN.md",
+    "source_sha256": "f96fd643684f260b1ddee4509087f0f32a8154ab30ff8c234f140ae88fb03137"
+  },
+  "proposed_change": {
+    "kind": "finite_difference_algorithm_counter_and_clock_instrument",
+    "algorithm_change": true,
+    "early_rejection_integrated": false,
+    "new_source_commit": "29861c9a55f9ae5a33e1e09b3866aa397fbde605",
+    "new_binary_sha256": null,
+    "new_image_digest": null,
+    "request_binding": null,
+    "donor_algorithm_and_counter_equivalence_review": null,
+    "performance_gain_claim": null,
+    "purpose": "Evaluate the source-bound finite-difference pencil instrument using retained targets/controls and explicit complete-work counters; preserve historical failures and keep partial diagnostics separate.",
+    "changes": [
+      "Both native and diagnostic-progress sieve routes use finite differences instead of repeated Horner evaluation.",
+      "Actual field arithmetic and collection-entry counts change; no old-charge padding or claim of counter equality.",
+      "Linux measurement bookkeeping changes to CLOCK_MONOTONIC nanosecond reads; timing requires new matched qualification.",
+      "Optional relation tracing and applicability/CLI/method dependencies differ; exact source comparison requires independent review."
+    ],
+    "source_comparison": {
+      "path": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/runtime-source-comparison-20261109/bindings.json",
+      "sha256": "868876b7c4eb2cee0ddea859bb85c1ecb510e1f044d96cc82a89bce0ad0d3994"
+    },
+    "candidate_root_positive_control_sha256": "555a5c62339a927579599d46c7e94265e52497dc56bacf0b13bb53c2dcd133c4"
+  },
+  "resource_envelope": {
+    "recorded_utc": "2026-11-09T17:11:39Z",
+    "cumulative_active_worker_seconds": 43200,
+    "absolute_deadline_utc": "2026-11-10T05:11:39Z",
+    "maximum_concurrent_scientific_payloads": 1,
+    "prior_allowances_reset": false,
+    "charged": [
+      "candidate",
+      "rho",
+      "rho_AA",
+      "warmups",
+      "replay",
+      "fresh_validation",
+      "recovery",
+      "failed_attempts"
+    ],
+    "proposed_collection_reserve_seconds": 1800,
+    "proposed_latest_scientific_stop_utc": "2026-11-10T04:41:39Z",
+    "collection_reserve_basis": "Scheduling reserve for terminal custody collection, versioned retrieval, native analysis and review; not a measured duration or guarantee. All active worker work within it remains charged. It does not authorize extending either deadline or cumulative cap.",
+    "effective_stop_rule": "Earliest of reconciled worker allowance exhaustion, owner-reviewed earlier operational cutoff and proposed04:41:39Z. Collection must finish by05:11:39Z; tighten cutoff for native grace. No launch until concrete enforcement and ledger bindings are reviewed.",
+    "remaining_active_worker_seconds": null,
+    "owner_enforcement_review": null,
+    "operational_request_deadline": null,
+    "resource_authorization_binding": {
+      "path": "/home/ec2-user/crypto-pencil-evidence-recovery-20261105/research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/campaign-renewal-20261109/authorization.json",
+      "sha256": "ca6b317f2da5426f7d781652fed53bfc8897f1e238943dc5b121bfe95ce9ccac"
+    },
+    "historical_campaign_balances_carried_forward": false,
+    "dollar_facts": "owner waived; unknown_not_asserted, no invented dollar allowance"
+  },
+  "cohort": {
+    "models": 21,
+    "targets_per_model": 60,
+    "workloads": 1260,
+    "arms": [
+      "pencil",
+      "rho",
+      "rho_AA"
+    ],
+    "measured_streams_per_arm": 5,
+    "warmups_per_arm": 1,
+    "base_executions": 22680,
+    "measured_arm_executions": 18900,
+    "warmup_executions": 3780,
+    "measured_candidate_reference_pairs": 6300,
+    "pricing_cells": 36,
+    "original_target_seed_stream_and_sequence_mapping_preserved": true,
+    "enrollment_scope": "full1260-disjoint-p739/v1",
+    "prior_p739_reuse_admission": null,
+    "plans": [
+      {
+        "name": "gate-p739.json",
+        "sha256": "bc57819e43862f5d9c9aee0f13b983fec186b2dd14dbc8b921d8999acc4b6776",
+        "workloads": 60,
+        "executions": 1080,
+        "classification": "prior_gate_reuse_only_if_admitted"
+      },
+      {
+        "name": "cohort-16-remainder-plan.json",
+        "sha256": "39b73d2a2ffbab3deec9dbdf9857af15a66607ca8843b8f29c64cd94c7d2d9c9",
+        "workloads": 120,
+        "executions": 2160,
+        "classification": "prospective_remainder"
+      },
+      {
+        "name": "cohort-20.json",
+        "sha256": "51a99e83c38b4d5d6b19f82337918b2f64f34b4934a5361298e84fc2f8bd432f",
+        "workloads": 180,
+        "executions": 3240,
+        "classification": "prospective_unchanged_cohort"
+      },
+      {
+        "name": "cohort-24.json",
+        "sha256": "7d34d0ce87c5a167ee1e94fecb08bcac34c9b4339570deb6377effe75efc28c4",
+        "workloads": 180,
+        "executions": 3240,
+        "classification": "prospective_unchanged_cohort"
+      },
+      {
+        "name": "cohort-28.json",
+        "sha256": "87760bc68b7598250c22976f15e4dbb36b5f2d738647de501222de1a8b27b001",
+        "workloads": 180,
+        "executions": 3240,
+        "classification": "prospective_unchanged_cohort"
+      },
+      {
+        "name": "cohort-32.json",
+        "sha256": "a9aebbc3120b61380a6936408635ac0f0e60715b4b4918dc826fbab4b578ae96",
+        "workloads": 180,
+        "executions": 3240,
+        "classification": "prospective_unchanged_cohort"
+      },
+      {
+        "name": "cohort-36.json",
+        "sha256": "6bb162d846bfbfe68b1bf7ba330abbc1e11c403b003215c960e7e71d81be3aa2",
+        "workloads": 180,
+        "executions": 3240,
+        "classification": "prospective_unchanged_cohort"
+      },
+      {
+        "name": "cohort-40.json",
+        "sha256": "8f2ec73a139f84b660573bd67c54ebfc567626ce7068a135dcb52c61891b22d5",
+        "workloads": 180,
+        "executions": 3240,
+        "classification": "prospective_unchanged_cohort"
+      }
+    ]
+  },
+  "proposed_gate": {
+    "status": "proposed_one_changed_algorithm_and_instrument_gate_pending_scientific_review",
+    "workload": "p186379-target0",
+    "plan_sha256": "481d795e6208cfb3ca648c463de2d7b232adfb7d28bebc341afa4f58e119dfcf",
+    "workloads": 1,
+    "base_executions": 18,
+    "measured_arm_executions": 15,
+    "warmup_executions": 3,
+    "measured_pairs": 5,
+    "enrolled_in_full_cohort": false,
+    "charged_separately_to_same_envelope": true,
+    "maximum_new_scientific_gate_attempts_proposed": 1,
+    "automatic_scientific_retry": false,
+    "per_execution_timeout_seconds_proposed": 3600,
+    "memory_gib_proposed": 8,
+    "matrix_coefficient_cap_proposed": 25000000,
+    "runtime_estimate_seconds": null,
+    "complete_gate_required_before_remainder": true,
+    "independent_non_wall_replay_measured_executions": 15,
+    "independent_review_required_before_remainder": true,
+    "incomplete_capped_wrong_answer_or_invalid_stops_extension": true,
+    "same_failed_instrument_retry_authorized": false
+  },
+  "metrics": {
+    "primary": "existing exact disjoint finite-count model; complete denominators only",
+    "policy": "pencil-algorithm-cost/atomic-scalar-disjoint-v1",
+    "square_prices": [
+      0,
+      0.5,
+      1
+    ],
+    "inverse_prices": [
+      1,
+      10,
+      100,
+      1000
+    ],
+    "native_prices": [
+      0,
+      0.1,
+      1
+    ],
+    "analysis_source_binding": null,
+    "coverage_review": null,
+    "partial_counter_prices_are_completed_costs": false,
+    "diagnostic_io_or_wall_converted_to_GAE": false,
+    "timing_qualified": false,
+    "timing_completion_obligation_preserved": true,
+    "missing_failed_or_capped_pairs": "retain explicit rows and null ratios; no survivor-only complete aggregate",
+    "finite_aggregate": "retain existing exact ratio-of-complete-sums contract and all36cells; no new rank or speed verdict",
+    "diagnostic_endpoint": {
+      "estimand": "run_session_origin_to_owner_post_reap_evidence_sync",
+      "scope": "Includes owner evidence read and sync; excludes process startup/input acquisition and subsequent owner receipt publication. Distinct from exact kernel/runner exit latency and scientific method clocks.",
+      "authenticated_owner_custody_required": true,
+      "exact_runner_exit_ns": null,
+      "total_active_worker_ns": null,
+      "accepted_enclosing_closure": null,
+      "owner_receipt_publication_tail_pending": true,
+      "source_review_only": true,
+      "source_review_path": "../owner-enclosing-v2-independent-review.md",
+      "source_review_sha256": "1b17f0f85aad200feba6c8943c25e274d02578a60f26f1931a1dda8a6a38da43"
+    }
+  },
+  "controls": {
+    "reference": "rho",
+    "aa": "rho_AA",
+    "candidate": "pencil",
+    "same_new_instrument_for_new_pairs": true,
+    "source_and_answer_verification": "existing public synthetic known-answer source checks plus separately reviewed replay",
+    "arm_order_and_seeds": "unchanged exact retained plans; no post-data reseeding/reordering",
+    "prior_p739_instrument_compatibility": "Finite-difference costs differ from old instrument; require actual original-row replay or independently reviewed exact per-row mapping justified for new counters before reuse. Do not relabel old costs as new; old timing remains invalid.",
+    "prior_p739_replay_requirement": "Bind independent replay or independently reviewed exact non-wall equivalence to the actual original fresh-session rows. The computation epoch 900 reproduced measured executions alone does not certify those fresh-session rows. Preserve original record/session/sequence identities and old invalid clocks."
+  },
+  "pending_final_protocol_blocks": [
+    "claim classifications and scope",
+    "instrument and executable image hashes",
+    "variable ledger",
+    "known-data amendment and scoped timing statement",
+    "fixed inputs/seeds and sample rationale",
+    "complete metric field mapping",
+    "owner/authenticated custody and active-worker enforcement",
+    "operational cutoff and actual native request",
+    "infrastructure-only retry/restore rules",
+    "gate/replay/stopping/admission decision",
+    "independent source coverage and protocol review",
+    "analysis/export/report binaries",
+    "freeze and publication receipts"
+  ],
+  "freeze": null,
+  "launch_request": null,
+  "supersedes_author_draft": {
+    "path": "/home/ec2-user/pencil-controller-review-20261029/c1-takeover-20261030/known-c1-amendment-draft/amendment-draft-v2.json",
+    "sha256": "71f4c719107093feec983b34e965c59fb336c6020ef2c9d526aebd4ed4d7e045",
+    "scope": "Prospective changed algorithm/counter/clock classification and new campaign binding; exact cohort, controls, original rows, caps, replay counts and stop rules retained."
+  }
+}
