@@ -97,3 +97,8 @@ $(BUILD_DIR)/cache-points: cache_points.cpp json.hpp
 	$(CXX) $(CXXFLAGS) cache_points.cpp -o $@ -lgmpxx -lgmp
 cache-points-binary: $(BUILD_DIR)/cache-points
 .PHONY: cache-points-binary
+$(BUILD_DIR)/block-qual: block_qual.cpp block_core.hpp cache_core.hpp native.cpp json.hpp relation_verify.hpp orbit_verify.hpp
+	mkdir -p $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) block_qual.cpp -o $@ -lcrypto -lgmpxx -lgmp
+block-qual-binary: $(BUILD_DIR)/block-qual
+.PHONY: block-qual-binary
