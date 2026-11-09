@@ -39,6 +39,8 @@ mod pdp3_koblitz;
 mod pdp_split_oracle;
 #[path = "ecbench/pkm_tower.rs"]
 mod pkm_tower;
+#[path = "ecbench/retained_chain_study.rs"]
+mod retained_chain_study;
 #[path = "ecbench/structured_s4.rs"]
 mod structured_s4;
 
@@ -67,6 +69,15 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Cmd {
+    /// Run the frozen retained-chain probe or complete toy relation pipeline.
+    /// Counters are raw observations; this command does not admit timings.
+    RetainedChainStudy {
+        #[arg(long)]
+        phase: String,
+        /// Must be a new directory; historical evidence is never overwritten.
+        #[arg(long)]
+        out: PathBuf,
+    },
     /// Check pinned diagnostic metadata without launching work.
     DiagnosticPreflight {
         #[arg(long)]
@@ -1024,6 +1035,7 @@ fn emit_claim(
 
 fn run(cli: Cli) -> Result<ExitCode, String> {
     match cli.cmd {
+        Cmd::RetainedChainStudy { phase, out } => retained_chain_study::run(&phase, &out)?,
         Cmd::DiagnosticPreflight {
             request,
             request_sha256,

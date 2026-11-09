@@ -1,0 +1,120 @@
+{
+  "schema": "ecbench.spec/v1",
+  "label": "Retained-chain m3 complete public toy pipeline",
+  "description": "Frozen diagnostic comparison; no total-cost claim without field/solver prices and independent replay.",
+  "workloads": {
+    "curves": [
+      {
+        "kind": "prime_explicit",
+        "p": 2393,
+        "a": 2390,
+        "b": 1614,
+        "group_order": 2377,
+        "r": 2377,
+        "gx": 0,
+        "gy": 80
+      }
+    ],
+    "target_seed": 20261109,
+    "targets_per_curve": 1
+  },
+  "measurement": {
+    "isolation_required": "L2",
+    "order": "alternate",
+    "rounds": 5,
+    "seed": 5,
+    "timeout_seconds": 120,
+    "warmup": 1
+  },
+  "arms": [
+    {
+      "name": "rho-neg",
+      "role": "reference",
+      "method": {
+        "id": "rho.negation"
+      }
+    },
+    {
+      "name": "full-blocks",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-kummer:t=2",
+          "oracle": "pkm-semaev:m=3,mode=full,layout=blocks,degree=5,max_nnz=1000000,audit_rank=1",
+          "targets": "walk",
+          "linalg": "incremental-gauss-full-rank-checked",
+          "max_trials": "1000",
+          "solver_budget_seconds": "1"
+        }
+      }
+    },
+    {
+      "name": "chain-blocks",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-kummer:t=2",
+          "oracle": "pkm-semaev:m=3,charts=all,layout=blocks,degree=5,max_nnz=1000000,audit_rank=1",
+          "targets": "walk",
+          "linalg": "incremental-gauss-full-rank-checked",
+          "max_trials": "1000",
+          "solver_budget_seconds": "1"
+        }
+      }
+    },
+    {
+      "name": "chain-levels",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-kummer:t=2",
+          "oracle": "pkm-semaev:m=3,charts=all,layout=levels,degree=5,max_nnz=1000000,audit_rank=1",
+          "targets": "walk",
+          "linalg": "incremental-gauss-full-rank-checked",
+          "max_trials": "1000",
+          "solver_budget_seconds": "1"
+        }
+      }
+    },
+    {
+      "name": "grid",
+      "role": "candidate",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-kummer:t=2",
+          "oracle": "pkm-semaev:m=3,engine=exhaustive,audit_rank=1",
+          "targets": "walk",
+          "linalg": "incremental-gauss-full-rank-checked",
+          "max_trials": "1000",
+          "solver_budget_seconds": "1"
+        }
+      }
+    },
+    {
+      "name": "full-blocks-aa",
+      "role": "control",
+      "method": {
+        "id": "ic.pipeline",
+        "params": {
+          "factor_base": "prime-kummer:t=2",
+          "oracle": "pkm-semaev:m=3,mode=full,layout=blocks,degree=5,max_nnz=1000000,audit_rank=1",
+          "targets": "walk",
+          "linalg": "incremental-gauss-full-rank-checked",
+          "max_trials": "1000",
+          "solver_budget_seconds": "1"
+        }
+      }
+    },
+    {
+      "name": "rho-neg-aa",
+      "role": "control",
+      "method": {
+        "id": "rho.negation"
+      }
+    }
+  ]
+}

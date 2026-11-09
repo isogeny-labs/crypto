@@ -5848,7 +5848,7 @@ fn ic_report(
             automorphisms,
         )
     });
-    let detail = json!({
+    let mut detail = json!({
         "label": rep.label,
         "decomposition": {
             "name": rep.decomposition.name,
@@ -5861,6 +5861,12 @@ fn ic_report(
         "calibration_pinned_units": calib.pinned_units,
         "framework_total_gae_before_solver_removal": rep.total_gae,
     });
+    // Opt-in audit data includes the actual row/rank transcript. Preserve it
+    // for independent replay instead of retaining only aggregate counters.
+    // Absent audits leave legacy report serialization unchanged.
+    if let Some(audit) = &rep.useful_rank {
+        detail["useful_rank"] = serde_json::to_value(audit).expect("serializable rank audit");
+    }
     SolveReport {
         recovered: rep.recovered.map(ExactScalar::from),
         exhausted: rep.exhausted,
@@ -8838,6 +8844,99 @@ mod tests {
         assert!(rel.adds >= f4.counters["relations_found"]);
         let err = run("prime-abscissa:size=8", "pkm-semaev:m=3").unwrap_err();
         assert!(err.contains("prime-kummer"), "{err}");
+    }
+
+    /// Full native relation collection and elimination, with no known-log
+    /// factor base and no planted scalar supplied to the oracle.
+    #[test]
+    fn retained_chain_pipeline_recovers_after_independent_relations() {
+        use crate::cryptanalysis::ecbench::workload::CurveSpec;
+        let spec = CurveSpec::PrimeExplicit {
+            p: 17,
+            a: 2,
+            b: 2,
+            group_order: 19,
+            r: 19,
+            gx: 5,
+            gy: 1,
+        };
+        let inst = spec.build().unwrap();
+        let facts = inst.facts(&spec);
+        let Instance::Prime(prime) = &inst else {
+            unreachable!()
+        };
+        let target = prime
+            .curve
+            .mul(&mut GroupOps::default(), prime.generator_point(), 7);
+        let coords = [format!("0x{:x}", target.x), format!("0x{:x}", target.y)];
+        for m in [3, 4] {
+            let mut reference = None;
+            for encoding in ["engine=exhaustive", "layout=blocks", "layout=levels"] {
+                let method = resolve(&MethodSpec {
+                    id: "ic.pipeline".into(),
+                    params: [
+                        ("factor_base".into(), "prime-kummer:t=2".into()),
+                        (
+                            "oracle".into(),
+                            format!(
+                            "pkm-semaev:m={m},charts=all,degree=4,max_nnz=100000,audit_rank=1,{encoding}"
+                            ),
+                        ),
+                    ]
+                    .into_iter()
+                    .collect(),
+                })
+                .unwrap();
+                let row = solve(&method, &inst, &facts, &coords, 5).unwrap();
+                assert_eq!(
+                    row.recovered,
+                    Some(ExactScalar::from(7u128)),
+                    "m={m},{encoding}"
+                );
+                assert!(row.counters["relations_found"] > 0);
+                assert!(row.counters["matrix_rank"] > 0);
+                assert!(row.counters["matrix_work"] > 0);
+                let audit: crate::cryptanalysis::ic_framework::useful_rank::RankAudit =
+                    serde_json::from_value(row.detail["useful_rank"].clone()).unwrap();
+                assert!(audit.transcript_complete);
+                assert_eq!(audit.invalid_rows, 0);
+                assert_eq!(audit.independent_rows, audit.rank as u64);
+                assert_eq!(audit.rank as u64, row.counters["matrix_rank"]);
+                let context = prime_ctx(prime, &facts, target);
+                let builder = prime_base_for("prime-kummer", prime).unwrap();
+                let (_, base_params) = Params::parse_spec("prime-kummer:t=2").unwrap();
+                let fb = builder
+                    .build(&context, &base_params, &mut GroupOps::default())
+                    .unwrap();
+                crate::cryptanalysis::ic_framework::useful_rank::replay(&context, &fb, &audit)
+                    .unwrap();
+                let mut corrupted = audit.clone();
+                corrupted.receipts[0].rhs = (corrupted.receipts[0].rhs + 1) % 19;
+                assert!(crate::cryptanalysis::ic_framework::useful_rank::replay(
+                    &context, &fb, &corrupted
+                )
+                .is_err());
+                let counts = [
+                    row.counters["targets_tried"],
+                    row.counters["relations_found"],
+                    row.counters["matrix_rank"],
+                ];
+                if let Some(expected) = reference {
+                    assert_eq!(counts, expected, "m={m},{encoding}");
+                } else {
+                    reference = Some(counts);
+                }
+                assert!(row.phases.iter().any(|p| p.name == "relations"));
+                // The runner independently checks the returned scalar by
+                // multiplication; rank alone is never used as a solve verdict.
+                assert_eq!(
+                    prime
+                        .curve
+                        .mul(&mut GroupOps::default(), prime.generator_point(), 7),
+                    target
+                );
+            }
+        }
     }
 
     /// `rootfind-subtract` is `subtract`'s search on `prime_fast`'s

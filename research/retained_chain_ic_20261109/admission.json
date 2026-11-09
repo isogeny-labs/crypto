@@ -1,0 +1,31 @@
+{
+  "schema": "retained-chain-admission/v1",
+  "observed_at_utc": "2026-11-09T16:12:00Z",
+  "state": "blocked_before_submission",
+  "cloud_jobs_submitted": 0,
+  "cloud_measurements": 0,
+  "checkpoint_gate": {
+    "command": "scripts/checkpoint.sh gate",
+    "exit_code": 1,
+    "reason": "No configured checkpoint upload profile, ambient upload credentials, or upload token"
+  },
+  "budget": {
+    "aggregate_study_ceiling_usd": 5,
+    "live_shared_daily_remainder_usd": null,
+    "live_shared_monthly_remainder_usd": null,
+    "live_reservations": null,
+    "state": "unavailable"
+  },
+  "github_alternative": {
+    "workflow": "isolab-experiment.yml",
+    "workflow_state": "active",
+    "workflow_metadata_read": "succeeded",
+    "actions_variables_read": "HTTP 403: Resource not accessible by integration",
+    "workflow_dispatch_attempted": false
+  },
+  "source_revision": null,
+  "image_digest": null,
+  "binary_sha256": null,
+  "timing_admitted": false,
+  "note": "Null identities are pending, never placeholder evidence. Local development tests are recorded separately. No paid build or experiment was submitted."
+}
