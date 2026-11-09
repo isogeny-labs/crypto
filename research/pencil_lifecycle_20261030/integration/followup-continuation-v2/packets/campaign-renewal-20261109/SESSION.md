@@ -35,3 +35,15 @@ Publish final config and capture live native ownership, then run materializer. [
 
 ## Errors
 No qualification failures; no materializer or compiler executed yet. [pcc:unverified]
+
+## What was done — 17:25 UTC
+Published final materializer bindings and qualification PDF/SVG/CSV/JSON at cd63196e3b. GitHub remote readback matched HEAD. Started single T1953 native materializer at17:25:30.983UTC, captured InvocationID44fced24fb3947ceb0813e3fde7c4ba7 and cgroup limits2CPU/4GiB/swap0/tasks512 within5seconds. Native AS/DATA qualification passed. [pcc:unverified]
+
+## Decisions made
+Keep current payload serial and preserve its900second reservation. PR3768 is open, auto-merge enabled; execution source is independently published. [pcc:unverified]
+
+## Open threads
+Supervise materializer to native terminal receipt; root-library and norm source preparations continue without payloads. [pcc:unverified]
+
+## Errors
+Git diff--check flagged standard CSV CRLF line endings in generated metrics.csv; artifact bytes retained. No new runtime error observed at this point. [pcc:unverified]
