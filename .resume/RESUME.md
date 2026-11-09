@@ -15,19 +15,23 @@ pipeline-m3.json/pipeline-m4.json. EKS Spot, 4 CPUs/4GiB, one concurrent job,
 1800-second deadline, zero retries, USD5 aggregate build/trial ceiling.
 
 ## State
-Rust core and command type-check; focused producer tests pass. Full library
-suite and command unit build are in progress. No paid build or cloud trial.
+Rust core and command type-check. Final default-feature focused checks: 15 pass,
+1 existing ignored. Command/spec-plan unit test passes. Full library attempts
+were interrupted after unrelated archived-fixture/proc-namespace failures.
+PR: https://github.com/isogeny-labs/crypto/pull/3765 (regular; auto-merge requested).
+Implementation source: 1e6184a7935f016fa1fa28cba5864ef964ada387.
+No paid build or cloud trial.
 Checkpoint gate failed: upload route unavailable. Live budget unknown; GitHub
 workflow metadata readable but variables endpoint HTTP403. See admission.json.
 
 ## Next steps
-Finish required development checks, commit/push code/protocol/specs, open regular
-PR and enable auto-merge subject to gates. Before cloud build/trial, establish
+Publish the final validation/handoff update and follow PR #3765 under the
+repository check-in cadence; no subscription/scheduling tool is available. Before cloud build/trial, establish
 configured checkpoint upload plus live balances/reservations/capacity. Preserve
 and hash all failures and producer observations; do not substitute local trials.
 
 ## Runs in flight
-No scientific runs. Local development test processes only.
+None. Scientific phases were never submitted; development checks have stopped.
 
 ## Stop and success conditions
 Do not launch while checkpoint gate fails or shared budget is unknown.

@@ -8,19 +8,29 @@ None is a cloud scaling or timing result.
 |---|---|
 | `cargo check --bin ecbench --no-default-features` | Completed successfully, including the study module |
 | `cargo test --release --lib retained_ --no-default-features` | 15 passed, 1 existing ignored, 0 failed; includes six new retained-chain/pipeline tests |
+| Final-source default-feature library binary, `retained_ --nocapture` | 15 passed, 1 existing ignored, 0 failed |
 | `cargo test --bin ecbench --no-default-features retained_study_plan` | 1 passed; both registered L2 JSON specs parsed and planned |
 | `cargo test --release --lib --no-default-features` | Started 6,280 tests; interrupted after environment failures identified; not green and not complete |
 | Device-test retry after restoring `gpu/certicom/` | All 6 passed |
 | Historical bounds-test retry after restoring its session | Passed |
-| `cargo test --release --lib` with default features | Required default-feature attempt initiated; result pending |
+| `cargo test --release --lib` with default features | Built successfully; full run interrupted after 7 known environmental failures; not green and not complete |
 | `git diff --check`; PCC prose lint | Passed at preparation time |
 | PCC ledger check | 484 entries; hash chain accepted locally |
+| PCC canaries | 59/59 classes behaved as expected locally |
 
-The first focused test run predates the final help-text change and the change
-that counts projective branches separately from guessed branches. These do not
-change arithmetic; final-source focused confirmation is pending the default
-build. A duplicate historical PKM-only run was interrupted while slow existing
-tests were still running; no pass is claimed for that whole filter.
+The final default-feature binary includes the help-text correction and separate
+projective/guessed-branch counters. The tested implementation is source commit
+`1e6184a7935f016fa1fa28cba5864ef964ada387`; subsequent handoff changes only
+documentation/metadata. Final focused confirmation completed at 2026-11-09
+16:45 UTC. A duplicate historical PKM-only run was interrupted while slow
+existing tests were still running; no pass is claimed for that whole filter.
+
+Local default-feature test binary SHA-256:
+`e0fc3c3b6239e707aaf2bd650bda5c9af880cf2a11dac2e9c12b9053321432b5`.
+Focused stdout/stderr SHA-256:
+`9071a17d369d0cf1cbe69399a2958ccc71f583f4f8e059209b01305041ea77fc`.
+Raw development logs remain in the working environment; they have not been
+archived to object storage and are not an independently attested receipt.
 
 ## Full-suite environment failures
 
@@ -46,3 +56,10 @@ The initial full attempt reported these categories before interruption:
 This is not an exhaustive clean full-suite result. Its failures are retained,
 and the normal CI/review gates remain required. The separate cloud admission
 gaps are recorded in [admission.json](admission.json).
+
+After installing the workflow-pinned AWS CLI in a local tool environment,
+the configured-client STS request and artifact retry both report `Unable to
+locate credentials`. The named `ecc-challenges-new` profile cannot be found.
+The checkpoint gate, with that client on PATH, still exits 1. Installing the
+client therefore did not resolve identity or upload access. No cloud build,
+paid job, credential export, or permission change was attempted.
