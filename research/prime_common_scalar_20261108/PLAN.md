@@ -25,8 +25,15 @@ amendment to the observed results.
    has exactly M kernel occurrences, or homogenize with a charged counter.
    Check exceptional cases D=0 outside local charts; do not cancel there.
    **Actual polynomial bridge completed:** GlobalPolynomials proves evaluation
-   equals imported baseKernel and binds the degree bound to it. Actual recursive
-   contraction homogeneity and exceptional evaluations remain open. [pcc:unverified]
+   equals imported baseKernel and binds the degree bound to it.
+   **Nov9 actual affine contraction bridge:** BooleanContraction and
+   PackedContraction prove clearing for the actual D.8 Boolean kernel. Its
+   zero-output factor becomes D-N, so no homogeneous-in-W assumption is used.
+   The actual mapped polynomial has degree<=2M(2L-1), rational point equality
+   requires D(T) nonzero, and local series clearing uses the constructed unit.
+   Generic ring-map transport includes jet quotients. Source packing is supplied
+   as an injective placement, not constructed by this component. See
+   reports/boolean-contraction-20261109/REPORT.md. [pcc:unverified]
 3. **Recovery under the correct budget.** Use all source levels. First formalize
    the actual source node counts and multiplicity, then lift three_level_margin
    to degree M(4L-2). Reprove the finite-precision Hermite evaluation bound with
@@ -39,6 +46,21 @@ amendment to the observed results.
    proofs close the finite coefficient-buffer equivalence, construct the actual
    finite inverse output and prove modular encoding/cardinality. Full Hermite
    precision and native bit costs remain open. [pcc:unverified]
+   **Nov9 exact source recovery step:** NodeMultiplicity derives actual grid
+   valuation counts, the actual ceiling budget and the full per-node taper
+   margin for 3<=u<=a and u<=M. HermiteUniqueness proves exact scaled source
+   jets determine the actual cleared packed polynomial over any Q-algebra.
+   Exact cancellation of2L does not hold in finite2^p quotients. The next
+   obligation is the actual Hermite multiplier valuation/loss bound D.10,
+   not another numerical multiplicity margin. See
+   reports/source-recovery-20261109/REPORT.md. [pcc:unverified]
+   **Nov9 actual precision step:** HermiteBasis/Grid/Valuation/Moment/Error
+   derive the actual multiplier loss6hD_i and evaluation loss4M(a+1), construct
+   the actual integral local reciprocal, and prove finite-functional stability
+   at the original p+8hD_i+8M(a+1). This is over rational integral coefficients.
+   Exact D.9 reconstruction from quotient jets and the extension/nilpotent
+   coordinate refinement remain open. See
+   reports/hermite-precision-20261109/REPORT.md. [pcc:unverified]
 4. **Uniform modes and total recursive cost.** Derive squared Cauchy modes with
    coefficient(b+1), genuine nonzero valuations, all tiles/rows/levels, source
    variables and child entries. Charge D, inverse, factorization, tuple
@@ -62,3 +84,18 @@ amendment to the observed results.
 Independent signed PCC and review are required for verified standing. Producer
 proof builds/recounts remain labelled unverified; never manufacture independence.
 This is a standing requirement, not a result. [pcc:unverified]
+
+## Nov9 constructed recovery checkpoint
+
+HermiteReconstruction, IntegralRecovery and FiniteRecovery now construct exact
+D.9 interpolation, actual integral charts, finite modular quotient buffers and
+canonical lifts, then establish integrality and the target residue at the
+original source child precision. Sourcebd8cbfe23, actual audit269 declarations,
+fresh import-inclusive replay exit0; unsigned pins and full scope are in
+reports/hermite-recovery-20261109/REPORT.md [pcc:unverified].
+
+This closes rational exact reconstruction and finite-buffer congruence in
+steps3 and5. The earlier proposed weighted D.10 identity was superseded by the
+actual involution/pairing moment argument, not established as that same formula.
+Next: prospectively admitted native correctness replay, coordinate precision
+refinement, efficient jet construction and uniform all-level bit costs.

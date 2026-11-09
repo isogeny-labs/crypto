@@ -88,6 +88,12 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
+mod prefix;
+pub use prefix::{
+    clear_prefix_cache, prefix_hint, prefix_root_counts, prefix_root_enabled, set_prefix_hint,
+    set_prefix_root,
+};
+
 static COMPACT_REFUTED_BASIS: AtomicBool = AtomicBool::new(false);
 
 /// Keep only the decisive constant row after a basis proves `1`.
