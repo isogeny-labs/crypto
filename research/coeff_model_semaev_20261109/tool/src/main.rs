@@ -17,6 +17,11 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::Instant;
 
+mod analyze;
+mod nt;
+mod setup;
+mod verify;
+
 thread_local! {
     static MULS: Cell<u64> = Cell::new(0);
     static JACS: Cell<u64> = Cell::new(0);
@@ -316,6 +321,21 @@ fn cmd_find(args: &[String]) {
     let n: u64 = args[4].parse().unwrap();
     let k: usize = args[5].parse().unwrap();
     let arg: u64 = args[6].parse().unwrap();
+    let (tst, el, fl) = find_members(mode, p, n, k, arg);
+    println!(
+        "{{\"mode\":\"{}\",\"tested\":{},\"found\":{},\"secs\":{:.3},\"members\":[{}]}}",
+        mode,
+        tst,
+        fl.len(),
+        el,
+        fl.iter()
+            .map(|(a, b, ac, bc)| format!("{{\"a_small\":{},\"b_small\":{},\"a\":{},\"b\":{}}}", a, b, ac, bc))
+            .collect::<Vec<_>>()
+            .join(",")
+    );
+}
+
+pub(crate) fn find_members(mode: &str, p: u64, n: u64, k: usize, arg: u64) -> (usize, f64, Vec<(i64, i64, u64, u64)>) {
     let f = Fp::new(p);
     let nthreads = 4usize;
     let found = Arc::new(Mutex::new(Vec::<(i64, i64, u64, u64)>::new()));
@@ -350,6 +370,7 @@ fn cmd_find(args: &[String]) {
                 let next_shell = next_shell.clone();
                 let stop_at = stop_at.clone();
                 let mode = mode.to_string();
+                let test = test;
                 hs.push(std::thread::spawn(move || {
                     let mut rng = Rng(fnv(&format!("find/{}/{}", mode, tid)));
                     loop {
@@ -431,17 +452,7 @@ fn cmd_find(args: &[String]) {
     fl.sort_by_key(|&(a, b, _, _)| (a.abs().max(b.abs()), a.abs() + b.abs(), a, b));
     let el = t0.elapsed().as_secs_f64();
     let tst = tested.load(Ordering::SeqCst);
-    println!(
-        "{{\"mode\":\"{}\",\"tested\":{},\"found\":{},\"secs\":{:.3},\"members\":[{}]}}",
-        mode,
-        tst,
-        fl.len(),
-        el,
-        fl.iter()
-            .map(|(a, b, ac, bc)| format!("{{\"a_small\":{},\"b_small\":{},\"a\":{},\"b\":{}}}", a, b, ac, bc))
-            .collect::<Vec<_>>()
-            .join(",")
-    );
+    (tst, el, fl)
 }
 
 // ---------------------------------------------------------------- arms / bases
@@ -879,6 +890,14 @@ fn main() {
     match args.get(1).map(|s| s.as_str()) {
         Some("find") => cmd_find(&args[2..]),
         Some("run") => cmd_run(),
+        Some("setup") => setup::cmd_setup(&args[2..]),
+        Some("verify") => verify::cmd_verify(&args[2..]),
+        Some("analyze") => analyze::cmd_analyze(&args[2..]),
+        Some("card") => {
+            let p: u64 = args[2].parse().unwrap();
+            let mut rng = Rng(7);
+            println!("{:?}", nt::card(p, args[3].parse().unwrap(), args[4].parse().unwrap(), &mut rng));
+        }
         _ => {
             eprintln!("usage: cmsem find <mode> <p> <a0> <b0> <n> <K> <arg> | cmsem run < cell.txt");
             std::process::exit(2);

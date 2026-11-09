@@ -164,3 +164,29 @@ Recorded in the session log.
 
 No leaderboard or benchmarks row: this is a characterization study, not an
 improvement over the index-calculus baseline (CLAUDE.md success criterion).
+
+## Amendment A1 (2026-11-09, before any analysis was run on study data)
+
+AGENTS.md "Implementation language: no Python" forbids Python for curve
+construction, harnesses and result generation. Changes:
+
+- `cmsem setup` (Rust) replaces `tool/setup.py`. It counts points by BSGS
+  (`src/nt.rs`; it agrees with PARI `ellcard` on the C40 E0, the 24-bit smoke
+  curve and the 24-bit side curve), checks the conductor by squarefree
+  trial division, and gives an analytic class-number estimate (descriptive
+  only). C48-S3 and C40-SIDE are built with it.
+- `cmsem verify` (Rust) independently re-checks every arm of every cell:
+  orders, Montgomery data, and equal j-invariants for isomorphic pairs. The
+  C40-S3 curves were built by the legacy `setup.py` (PARI) before this
+  amendment and are kept, not rebuilt. Native verification of them passes.
+- `cmsem analyze` (Rust) replaces `tool/analyze.py` with identical
+  statistics. The PRNG is SplitMix64 seeded 20261109 instead of numpy's, so
+  bootstrap CIs can differ in the last digits from what the Python script
+  would print; point estimates are identical (checked on the smoke data).
+  The legacy scripts are kept as provenance, labelled legacy.
+- C40-S4 uses the C40-S3 curves (arm subset); its cell file is derived by
+  text substitution.
+- The C40-S3 run binary is sha256 35b17f20… (FROZEN.sha256). Later cells use
+  the rebuilt binary, whose hash is recorded in FROZEN_A1.sha256. The S3/S4
+  instrument code (`s3_count`, `gl_count`, `target`, `build_base`, the run
+  loop) is unchanged.
