@@ -23,6 +23,37 @@
 //! | D2  | control, stride tiling: serpentine enumeration of a (C+2)-dimensional box, one axis (one stride) per step, strides `m^k`, `m = ceil(r^(1/(C+2)))`, seed axes strided like a and b. Deterministic. (A first draft, babies `(0,0,j)` and giants `(0,1,-i m)`, had a = 0 everywhere: every row is then proportional to `(1, -d/s)`, rank 1 forever; replaced before any D2 number was used.) |
 //! | D3  | pre-registered search: a genome of at most 16 jump vectors built by per-coordinate rules (zero, one, uniform, small, arithmetic progression, quadratic in the jump index = conic-like), a schedule (random stream, cyclic, ruler, permuted rounds) and a start vector; random-restart hill climbing on Monte Carlo E over a TRAINING sample set; the winner (lowest training E) is re-scored on a disjoint fresh sample set; only that held-out value counts. |
 //! | CE  | randomised-e control: the winner of D3 with every seed coefficient of every jump (and of the start) replaced by uniform random values. E must return to the Poisson value. |
+//!
+//! # SNC-2 Stage 0 pre-registration (`--chained`; written and committed before any chained number was run)
+//!
+//! Record: `research/curve25519_autolab_20261104/ideas/SYNTHESIS-NC-20261108.md`, SNC-2 [pcc:unverified].
+//! Zero group operations, C = 2 only, rank-3 stop rule on `(db, e1, e2)` with the seed-part guard (the engine above,
+//! unchanged). Exact chained design `CH`, fixed here:
+//!
+//! * 16 jumps `J_j = [a_j]P1 + [a'_j]P2 + K_j`, i.e. scalar vector `(K_j.c, K_j.b, a_j, a'_j)` over `(G, Q, P1, P2)`.
+//! * `K_0, K_1`: independent uniform in `Z_r^2` (the `[c]G + [b]Q` part). `K_j = K_{j-1} + K_{j-2}` mod r for
+//!   `j = 2..15` (one addition per stored jump point; set-up, not counted in E, as in NC-2).
+//! * `a_j, a'_j`: independent uniform in `[1, M]`, `M = round(1.2 sqrt(T))`, `T = round(1.75 sqrt(r))` (the wwalk
+//!   alpha rule at the record's predicted walk length). Buildable by small scalar multiplications.
+//! * Start point: `(c, b)` uniform in `Z_r^2`, `(e1, e2)` uniform in `[1, M]`. Jump choice: a stream independent
+//!   of the point (as D0). Jumps, start and stream are fresh per sample (as D0, D1). One addition per stored point.
+//! * Stop: rank 3 of the rows' `(db, e1, e2)` columns after the guard; cost = points generated; cap 10 sqrt(r).
+//! * Samples: 2000 per curve, `(d, s1, s2)` uniform, the same held-out samples as the NC-2 run (seed ^ 0xAAAA0001).
+//! * Curves: the nine NC-2 r values (k = 20: 131203, 131317, 131111; k = 24: 2097349, 2097559, 2097523;
+//!   k = 28: 33558163, 33554761, 33558059). Seed 20261108.
+//! * Per-k E = mean of the three curve means; its SE = sqrt(sum of the three squared SEs) / 3.
+//!
+//! Controls (stop and report if any is outside its interval; nothing is tuned):
+//!
+//! * D0i (iid) at C = 2, n = 20000, first r of each size: E in [1.652, 1.672] (record: 1.662 +- 0.01).
+//! * D0 (NC-2 16-jump uniform random walk) at C = 2, n = 2000, all nine curves: E in [1.66, 1.76]
+//!   (NC-2 values were 1.684 to 1.740; the walk excess over the Poisson floor is 3.5 to 4.5 percent).
+//! * CE (randomised-e control): the CH design with `(a_j, a'_j)` and start seed coordinates replaced by uniform
+//!   values in `Z_r`, n = 2000, all nine curves: E in [1.66, 1.77] ("returns to the Poisson value" plus the walk
+//!   excess; if CH shows structure, CE removes the seed-axis part of it).
+//!
+//! Falsification line (record): SNC-2 is dead at Stage 0 if chained E (per-k mean of CH) is above 1.82 at two of
+//! the three sizes. The record's prediction is 1.75 [1.70, 1.82]. Only the point value of the per-k mean is compared.
 
 use std::collections::HashMap;
 use std::hash::{BuildHasherDefault, Hasher};
