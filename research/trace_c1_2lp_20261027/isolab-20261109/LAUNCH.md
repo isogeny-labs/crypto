@@ -30,3 +30,12 @@ Filled in after each dispatch: UTC time, workflow run ID, outcome.
   Job `gh-42639382601-1` (UID `eba3a8ca-a1c3-4cd5-a506-b278481a2e92`) reached Kubernetes state `failed` about 3 minutes after submission. The launcher's `result.json` has exit code 23 (Job not succeeded), an empty `pod_uid` and an empty `results_uri`. Launcher receipts are at `s3://isolab-results-104186811093-us-east-2/runs/gh-42639382601-1/launcher/8096a7db-d8a1-4b26-ba03-95e9defdaf3b/`.
 
   The failing gate is not visible from GitHub. The pod exit code sits only in private S3, and this session has no AWS identity that can read it. Possible classes include native audit, L2 isolation, A/A control and payload execution. **No result was produced, and d2–d4 were not dispatched.** Measured rows: 0.
+
+## Failure diagnosis (2026-11-09T15:46Z)
+
+`isolab-failure-diagnosis.yml` was dispatched on main (cae9a2eb82), run 42648006875. All three matrix jobs finished `success`. The entry for 42639382601 is job 129266414007, artifact `isolab-failure-diagnosis-42639382601` (ID 13687878530, zip digest `sha256:d240f39b64ba70d6fcf696cbf7a7d6803aa71fafbf2d8754ae40b59060d39fe4`).
+
+- **S3 read was denied.** Each entry logged `An error occurred (403) when calling the HeadObject operation: Forbidden`, including the two pre-existing entries from 2026-11-01. The GitHub diagnostic role currently cannot read pod payload objects, `SHA256SUMS` included.
+- **Fallback classification.** For a 403, `diagnose-failed-run` records `artifact_access = payload_read_unavailable` and classifies from the Kubernetes container exit code. With no exit code it reports `artifact_read_unavailable`. The classification is in the artifact and the run's step summary.
+- **Not read from this session.** The artifact download host (`*.blob.core.windows.net`) is refused by this session's egress proxy, so the classification has not been read here. It is still open.
+- **Lab-side problem.** Restoring the role's `s3:GetObject` on `runs/*/<pod>/{SHA256SUMS,job-exit.json,l2-gate.json,audit.json,control-comparison.json,...}` is a lab permission change and outside this PR.
