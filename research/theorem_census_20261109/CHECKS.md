@@ -1,6 +1,23 @@
 # Current additive proof and validation receipts
 
-The current census project gate passes134declarations,0failing and
+The current census project gate passes167declarations,0failing and
+0trusted-native exceptions, including the full general-model S3equivalence
+in every characteristic, faithful F2/F3geometric model-domain controls and
+actual characteristic2/3p-torsion families. New main/control packets are
+4d5cd7/b32b34, unsigned. The polynomial-rewrite record
+IDC1h392e1740fcb7cf05accepts32derived and11extra verifier points; its proof
+file digest matches. The all-characteristic/group conclusion rests on Lean.
+[pcc:unverified]
+
+Both new full local packet checks pass, with exact receipt/source bindings
+in general-s3-verification.json. The identity source was committed in
+3cefe6f1before issue; published source29d09a8chas exact sharedtree7b4eadfc.
+No native curve population or frozen-data change occurred. Current-main
+read-only ledger comparison:483rowsversus local479, common prefix457;
+parent3739remains open/unmerged. See evidence/main-ledger-general-s3.json.
+[pcc:unverified]
+
+The earlier characteristic-torsion snapshot passed134declarations,0failing and
 0trusted-native exceptions. It adds full ordinary binary S3 equivalence,
 its actual wrong-model negative control, and actual characteristic-torsion/
 root-of-unity/cardinality/pointwise-nondegeneracy controls. These counts
@@ -10,7 +27,7 @@ already excludes the F2/r2control by gcd(r,q)=1. [pcc:unverified]
 
 | Component | Gate result | Exact receipt |
 |---|---|---|
-| Census, binary and characteristic boundary | 134pass,0fail,0trusted | evidence/characteristic-torsion-gate.log |
+| Census, general S3and model/p-torsion controls | 167pass,0fail,0trusted | evidence/general-s3-gate.log |
 | Actual walk PMF/hash graph | 21pass,0fail,0trusted | ../walk_audit_20261109/evidence/proof-gate-normalized.log |
 | Independent validator finite quadratic foundation | 11pass,0fail,0trusted | ../independent_s3_validator_20261109/evidence/proof-gate.log |
 
@@ -22,7 +39,8 @@ lookups404. No actual remote host/compiler/binary/run is asserted.
 Actual corpus qualifications and root-of-unity group-scheme distinctions
 remain explicit in CHARACTERISTIC_TORSION.md. [pcc:unverified]
 
-All applicable CI on published9915e65cpasses, including global7m22s/PCC2m38s;
+All applicable CI on published33199a83passes, including global13m1s/PCC3m12s;
+its earlier9915e65cchecks passed global7m22s/PCC2m38s.
 signing skipped on feature base. The characteristic source57a2da72published
 as374259d2with exact sharedtree84a9318f. Its follow-up CI is checked
 separately; historical CI pass is not attributed to a later head.

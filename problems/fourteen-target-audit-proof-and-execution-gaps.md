@@ -4,14 +4,14 @@
 - **Kind:** proof gaps, implementation gaps and access/tool limits; no impossibility claim
 - **Affected work:** [fourteen-target audit](../research/theorem_audit_20261108/README.md)
 - **Next action owner:** audit continuation; environment owner for credential/host provisioning
-- **Last updated:** 2026-11-08
+- **Last updated:** 2026-11-09
 
 ## Problem
 
 The request for all fourteen source audits, experiments and faithful Lean proofs
-is incomplete: the study has proof components and source corrections, while
-new experiments cannot pass the required checkpoint upload and several actual
-curve/Jacobian/implementation bridges have not been formalized.
+is incomplete: local checkpoints are now authorized and bounded native
+components have run, while independent-host execution/main integration and
+several actual curve/Jacobian/implementation bridges remain unresolved.
 [pcc:unverified]
 
 ## Evidence and uncertainty
@@ -40,10 +40,10 @@ curve/Jacobian/implementation bridges have not been formalized.
 
 ## What would unblock it
 
-- Configure a valid checkpoint upload mechanism in environment settings, or
-  receive an explicit owner change to that repository requirement. Never
-  paste a bearer token into a report or chat. This enables only the new local
-  experiments; it does not settle any theorem. [pcc:unverified]
+- The checkpoint-upload prerequisite was removed by explicit user approval
+  of local checkpoints for this audit; do not ask again. New local runs
+  still need their own frozen protocols/evidence, and this exception does
+  not authorize paid compute or settle a theorem. [pcc:unverified]
 - Supply an independently controlled execution host, or a reviewed CI run
   of the appropriate independently implemented validator and original inputs;
   retain its real provenance and signed report. [pcc:unverified]
@@ -53,10 +53,11 @@ curve/Jacobian/implementation bridges have not been formalized.
 
 ## Next discriminating steps
 
-1. With checkpoint access, resume the original native small-field census
-   obligations in items1–3, with fixtures and output scope frozen before runs.
-   The current production known-degree test remains the calibration control.
-   Never convert finite agreement into a universal theorem. [pcc:unverified]
+1. The documented bounded Semaev census has run. Continue remaining
+   resultant/degree proofs and the all-p<500torsion/binary/ternary census
+   obligations under their exact original scope, with a new frozen protocol
+   before affected native work. Never convert finite agreement into a
+   universal theorem. [pcc:unverified]
 2. For item7, provide the concrete Jacobian/factor-base/subgroup family and a
    faithful Lean group/divisor bridge; the abstract confinement theorem is
    already available and is insufficient by itself. [pcc:unverified]
@@ -93,3 +94,23 @@ scopes. All44unread-label tasks and239source records remain catalogued; the
 full fourteen-item objective and independent second-host census stay open.
 Main integration has an additional immutable-ledger fork, which was not
 resolved by selecting a side or rewriting prior rows. [pcc:unverified]
+
+### 2026-11-09 general-model extension
+
+The S3component now has a universal actual-group proof for the general
+Weierstrass model in every characteristic, not only short/ordinary binary
+forms. Both model specializations and geometric false-zero controls over
+F2/F3are checked. Actual geometric p-torsion families in characteristics2/3
+are proved without assuming a trace/Hasse bridge. Expanded project gate167
+passes,0failing/0trusted-native exceptions. General resultant recursion,
+irreducibility/degree and the other original obligations remain open.
+See [new proof scope](../research/theorem_census_20261109/GENERAL_S3.md).
+[pcc:unverified]
+
+The current independent Rust local validator agrees on4188162triples;
+its distinct-host manual dispatch returned404and never executed. A new
+attempt needs normal workflow registration/permissions and an explicit
+protocol amendment. Main's current ledger has483rows versus local479,
+common prefix457; no chain has been selected/rebuilt. Those access/integration
+dependencies do not prevent the independent local proof work above.
+[pcc:unverified]
