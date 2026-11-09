@@ -131,3 +131,8 @@ $(BUILD_DIR)/block-compact-qual: block_compact_qual.cpp block_compact.hpp block_
 	$(CXX) $(CXXFLAGS) block_compact_qual.cpp -o $@ -lcrypto -lgmpxx -lgmp
 block-compact-qual-binary: $(BUILD_DIR)/block-compact-qual
 .PHONY: block-compact-qual-binary
+$(BUILD_DIR)/block-compact-eval: block_compact_eval.cpp block_compact.hpp block_eval.cpp block_core.hpp cache_eval.cpp cache_core.hpp native.cpp json.hpp relation_verify.hpp orbit_verify.hpp
+	mkdir -p $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) block_compact_eval.cpp -o $@ -lcrypto
+block-compact-eval-binary: $(BUILD_DIR)/block-compact-eval
+.PHONY: block-compact-eval-binary

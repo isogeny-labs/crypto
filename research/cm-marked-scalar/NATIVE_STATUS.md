@@ -187,3 +187,21 @@ The scientific study scope is clear, but T-2014 now holds the daily log and PCC 
 ### Errors
 
 The first census build's mixed-auto errors are preserved. Final qualifications were warning-free; 17 of the 20 declared native backend invocations were used, including failed builds and fault controls. No census or V3 timing retry occurred. Two resumed metadata reads named absent paths (commands.sh and SESSION_RECEIPT.json); no process was repeated. Read today's committed shared log from HEAD because its sparse working path is absent. KB tools/wrapper remain unavailable; existing block/residual contracts and cited Bernstein-Lange / Grabner-Heuberger-Prodinger sources remain the literature basis. No Rust code changed and no local root Cargo suite is claimed. [pcc:unverified]
+
+## 2026-11-09T18:59Z: inline planner qualification and shared cold integration
+
+### What was done
+
+Published source/launch 1a1c09f3703c and updated PR before the two bounded build/qualifier invocations. The build is warning-free; qualifier exit 0 reports 4,950 exact original-program/GMP checks, 1,800 exhaustive small cases, 3,150 original-mu point/full-count cases and 35,760 independently checked bank labels. Two largest accepted signed-scalar boundary cases and seven domain/inline-overflow rejections pass. No timing or allocator measurement was performed. [pcc:unverified]
+
+### Decisions made
+
+Retain the original recurrence, strict tie handling, all setup operations and exact programs. A bounded two-term inline array replaces term vectors in states/transitions/results; a 2016-label bitset replaces the planner label tree. Digit/state/result/prefix allocations still exist and stay charged. Connect the inline implementation to the unchanged shared cold source through a local type/namespace substitution rather than duplicate the accounting boundary. Publish this wrapper and a separate two-invocation software-only qualification before executing it. No timing preflight is authorized by this integration.
+
+### Open threads
+
+Qualify all 625 untimed cold paths and five wrong-output rejections with the new executor inside the original complete boundary. Signed PCC standing and the quiet-window start remain pending. Shared daily log and PCC paths are held by T-2014; task-local records preserve progress without bypass. P-192 primary and all five curves/references retained. No cloud/job/controller/resource changes.
+
+### Errors
+
+No build or qualifier failure in this version. Source uses no allocator-call or wall-time proxy for e2e duration. Frozen original planners, protocols, census and refusal records stay byte-identical. No Rust code changed or local root Cargo suite ran. Sources checked (KB): tools/wrapper unavailable; same block/cold contracts and primary precomputation references as above.
