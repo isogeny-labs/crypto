@@ -1,0 +1,211 @@
+--- root-v4/durable-worker.py
++++ signed-producer/durable-worker.py
+@@ -4,9 +4,9 @@
+ P=Path(__file__).resolve().parent
+ from durable_io import atomic_json, flush_logs, load_admission, durable_limits
+ F=load_admission(P)
+-W=Path(F['workspace']); OUT=Path(F['durable_run'])/'worker'; SOURCE=W/'source'; STAGE=W/'cache-stage-v2'
+-START=time.monotonic(); END=float(os.environ['PENCIL_CHECK_END_MONOTONIC']); ACTIVE=None; INTERRUPTED=False;OWNED_OUTPUT=False;PERMIT_REQUIRED=False
+-R={'status':'failed','commands':[],'errors':[],'invocation_id':os.environ.get('INVOCATION_ID'),'source_scope':'root default-feature library tests, private candidate patch'}
++W=Path(F['workspace']); OUT=Path(F['durable_run'])/'worker'; SOURCE=W/'source'; STAGE=W/'cache'
++START=time.monotonic(); END=float(os.environ['PENCIL_CHECK_END_MONOTONIC']); ACTIVE=None; INTERRUPTED=False;OWNED_OUTPUT=False;PERMIT_REQUIRED=False;PHASE_END=END-600;BUILD_END=END-600
++R={'status':'failed','commands':[],'errors':[],'invocation_id':os.environ.get('INVOCATION_ID'),'source_scope':'fixed28 signed producer cases and7Kummer label cases; exact root-library qualification'}
+ resource.setrlimit(resource.RLIMIT_AS,(16*1024**3,16*1024**3))
+ def checkpoint(phase):
+  R['phase']=phase;R['elapsed_seconds']=time.monotonic()-START
+@@ -57,8 +57,8 @@
+ def guard():
+  if PERMIT_REQUIRED:check_permit()
+  if OWNED_OUTPUT:durable_limits(Path(F['durable_run']),F['limits'])
+- if INTERRUPTED or time.monotonic()>=END-40:raise RuntimeError('work deadline/signal')
+- if datetime.datetime.now(datetime.timezone.utc)>=datetime.datetime.fromisoformat(F['absolute_deadline']):raise RuntimeError('absolute deadline')
++ if INTERRUPTED or time.monotonic()>=min(END-40,PHASE_END):raise RuntimeError('phase/work deadline/signal')
++ if datetime.datetime.now(datetime.timezone.utc)>=datetime.datetime.fromisoformat(F['absolute_deadline'].replace('Z','+00:00')):raise RuntimeError('absolute deadline')
+  if shutil.disk_usage(W).free<6*1024**3:raise RuntimeError('free disk below6GiB')
+ def H(path):
+  guard(); h=hashlib.sha256()
+@@ -73,38 +73,15 @@
+   assert H(f)==row['sha256'],path
+ def traversal_error(error):
+  raise error
+-def verify_current_cache():
+- manifest_path=P/'current-cache.json'
+- assert H(manifest_path)==F['current_cache_sha256'],'current cache binding'
+- snapshot=json.loads(manifest_path.read_text())
+- assert snapshot['schema']=='root-current-cache/v1'
+- roots=[STAGE/name for name in ['target','cargo-home','tmp']]
+- assert snapshot['roots']==[str(root) for root in roots]
+- actual={};directories=[]
+- for root in roots:
+-  assert stat.S_ISDIR(root.lstat().st_mode),str(root)
+-  for base,dirs,names in os.walk(root,followlinks=False,onerror=traversal_error):
+-   guard();directories.append(base)
+-   for name in dirs:assert stat.S_ISDIR((Path(base)/name).lstat().st_mode),str(Path(base)/name)
+-   for name in names:
+-    f=Path(base)/name;st=f.lstat()
+-    assert stat.S_ISREG(st.st_mode),str(f)
+-    actual[str(f)]=st.st_size
+- assert sorted(directories)==snapshot['directories'],'cache directory inventory changed'
+- assert set(actual)==set(snapshot['files']),'cache file inventory changed'
+- for path,row in snapshot['files'].items():
+-  assert actual[path]==row['bytes'],path
+-  assert H(Path(path))==row['sha256'],path
+- R['current_cache_sha256']=F['current_cache_sha256']
+ 
+-ENV={'PATH':F['toolchain']+'/bin:/usr/bin:/bin','LANG':'C.UTF-8','LC_ALL':'C.UTF-8','CARGO_HOME':str(STAGE/'cargo-home'),'CARGO_TARGET_DIR':str(STAGE/'target'),'CARGO_BUILD_JOBS':'1','RUSTC':F['toolchain']+'/bin/rustc','TMPDIR':str(STAGE/'tmp'),'RUST_TEST_THREADS':'1','RUST_BACKTRACE':'0'}
+-def command(label,argv):
++ENV={'PATH':F['toolchain']+'/bin:/usr/bin:/bin','LANG':'C.UTF-8','LC_ALL':'C.UTF-8','CARGO_HOME':str(STAGE/'cargo-home'),'CARGO_TARGET_DIR':str(STAGE/'target'),'CARGO_BUILD_JOBS':'1','RUSTC':F['toolchain']+'/bin/rustc','TMPDIR':str(STAGE/'tmp'),'RUST_TEST_THREADS':'1','RUST_BACKTRACE':'0','SIGNED_BUILD_END_MONOTONIC':str(BUILD_END),'QUAL_SOURCE_REVISION':'29861c9a55f9ae5a33e1e09b3866aa397fbde605','QUAL_SOURCE_SHA256':F['source_manifest_sha256']}
++def command(label,argv,cwd=None):
+  global ACTIVE
+  guard(); row={'label':label,'argv':argv}; R['commands'].append(row); start=time.monotonic()
+  stdout=OUT/(label+'.stdout');stderr=OUT/(label+'.stderr');checkpoint('before-'+label)
+  with stdout.open('xb') as o,stderr.open('xb') as e:
+   mask=signal.pthread_sigmask(signal.SIG_BLOCK,{signal.SIGTERM,signal.SIGINT})
+-  try:ACTIVE=subprocess.Popen(argv,cwd=SOURCE,env=ENV,stdout=o,stderr=e,start_new_session=True)
++  try:ACTIVE=subprocess.Popen(argv,cwd=SOURCE if cwd is None else cwd,env=ENV,stdout=o,stderr=e,start_new_session=True)
+   finally:signal.pthread_sigmask(signal.SIG_SETMASK,mask)
+   row['pid']=ACTIVE.pid;row['pgid']=ACTIVE.pid;last=0;durable_last=0;checkpoint('running-'+label)
+   try:
+@@ -114,7 +91,7 @@
+      durable_last=time.monotonic();checkpoint('running-'+label)
+     if time.monotonic()-last>1:
+      last=time.monotonic(); total=0
+-     for base,dirs,names in os.walk(STAGE/'target'):
++     for base,dirs,names in os.walk(STAGE/'target',onerror=traversal_error):
+       for name in names:
+        f=Path(base)/name
+        try:st=f.lstat()
+@@ -123,6 +100,16 @@
+        total+=st.st_size
+      row['peak_observed_target_bytes']=max(row.get('peak_observed_target_bytes',0),total)
+      assert total<=6*1024**3,'6GiB target threshold'
++     workspace_bytes=0
++     for base,dirs,names in os.walk(W,followlinks=False,onerror=traversal_error):
++      for n in dirs:assert stat.S_ISDIR((Path(base)/n).lstat().st_mode)
++      for n in names:
++       f=Path(base)/n
++       try:st=f.lstat()
++       except FileNotFoundError:continue
++       assert stat.S_ISREG(st.st_mode),str(f)
++       workspace_bytes+=st.st_size
++     assert workspace_bytes<=8*1024**3,'private workspace8GiB ceiling'
+      logbytes=sum(f.stat().st_size for f in OUT.glob('*.std*'))
+      row['peak_observed_log_bytes']=max(row.get('peak_observed_log_bytes',0),logbytes)
+      assert logbytes<=256*1024**2,'256MiB log threshold'
+@@ -138,6 +125,25 @@
+  assert row['exit_code']==0,label+' failed'
+  guard();row['stdout_sha256']=H(stdout);row['stderr_sha256']=H(stderr)
+  return stdout.read_text(errors='replace')
++
++def verify_private_source():
++ expected=json.loads((P/'expected-source-manifest.json').read_text());actual=set()
++ for base,dirs,names in os.walk(SOURCE,followlinks=False,onerror=traversal_error):
++  guard()
++  for n in dirs:assert stat.S_ISDIR((Path(base)/n).lstat().st_mode)
++  for n in names:
++   f=Path(base)/n;name=str(f.relative_to(SOURCE));assert name in expected,name
++   assert stat.S_ISREG(f.lstat().st_mode) and f.stat().st_size==expected[name]['bytes']
++   assert H(f)==expected[name]['sha256'],name;actual.add(name)
++ assert actual==set(expected),'private source membership'
++def json_rows(output):
++ rows=[]
++ for line in output.splitlines():
++  if '{' not in line:continue
++  try:row=json.loads(line[line.index('{'):])
++  except json.JSONDecodeError:continue
++  if isinstance(row,dict):rows.append(row)
++ return rows
+ try:
+  OUT.mkdir(mode=0o700,exist_ok=False);OWNED_OUTPUT=True;checkpoint('worker-start')
+  assert os.getuid()==F['uid'] and os.getgid()==F['gid']
+@@ -148,49 +154,62 @@
+  quota,period=controls['cpu.max'].split();assert quota!='max' and int(quota)<=2*int(period)
+  assert controls['memory.max']==str(16*1024**3) and controls['memory.swap.max']=='0' and controls['pids.max']=='512'
+  R['cgroup']={'path':str(cg),'inode':cg.stat().st_ino,'controls':controls}
+- for path in [SOURCE,STAGE/'vendor',STAGE/'target',STAGE/'cargo-home',STAGE/'tmp']:assert path.is_dir(),str(path)
+- R['within_unit_input_visibility']=True;checkpoint('waiting-for-supervisor-permit')
+- wait_end=min(END-40,time.monotonic()+10)
++ assert not SOURCE.exists() and not STAGE.exists(),'fresh source/cache required'
++ checkpoint('waiting-for-supervisor-permit');wait_end=min(END-40,time.monotonic()+10)
+  while True:
+   try:check_permit();break
+   except (FileNotFoundError,AssertionError):
+    if time.monotonic()>=wait_end:raise RuntimeError('supervisor ownership permit not received')
+    time.sleep(.1)
+  PERMIT_REQUIRED=True;checkpoint('containment-and-permit-verified')
+- inputs=json.loads((P/'materialized-inputs.json').read_text());assert H(P/'materialized-inputs.json')==F['inputs_sha256']
+- for name,h in F['recipe_files'].items():assert H(P/name)==h,name
+- verify(inputs['immutable']);verify_current_cache();R['pre_inputs_verified']=True;checkpoint('inputs-verified')
+- cargo=F['toolchain']+'/bin/cargo';base=[cargo,'test','--release','--lib','--locked','--offline']
+- output=command('compile',base+['--no-run','--message-format=json'])
+- binaries=[]
++ R['build_deadline_monotonic']=BUILD_END
++ for name,h in F['packet_files'].items():assert H(P/name)==h,name
++ command('materialize',['/usr/bin/python3','-B',str(P/'materialize.py')],cwd=P)
++ materialized=json.loads((W/'materialization.json').read_text());assert materialized['status']=='passed' and materialized['build_end_monotonic']==BUILD_END
++ R['materialization_receipt_sha256']=H(W/'materialization.json');verify_private_source();R['pre_inputs_verified']=True
++ cargo=F['toolchain']+'/bin/cargo'
++ output=command('compile',[cargo,'test','--release','--lib','--locked','--offline','--no-run','--message-format=json'])
++ binaries=[];finished=[]
+  for line in output.splitlines():
+   try:entry=json.loads(line)
+   except json.JSONDecodeError:continue
+-  if entry.get('reason')=='compiler-artifact' and entry.get('target',{}).get('name')=='crypto_lib' and entry.get('profile',{}).get('test') and entry.get('executable'):binaries.append(entry['executable'])
++  if entry.get('reason')=='build-finished':finished.append(entry.get('success'))
++  target=entry.get('target',{})
++  if entry.get('reason')=='compiler-artifact' and target.get('name')=='crypto_lib' and 'lib' in target.get('kind',[]) and target.get('src_path')==str(SOURCE/'src/lib.rs') and entry.get('profile',{}).get('test') and entry.get('executable'):binaries.append(entry['executable'])
++ assert finished==[True],'one successful Cargo build-finished required'
+  assert len(set(binaries))==1,'exactly one root library test executable required'
+- binary=Path(binaries[0]);assert binary.is_relative_to(STAGE/'target') and binary.is_file()
+- R['test_binary']={'path':str(binary),'sha256':H(binary)}
+- listing=command('list',[str(binary),'--list']);names=[line[:-6] for line in listing.splitlines() if line.endswith(': test')]
+- assert len(names)>0 and len(names)==len(set(names))
+- R['test_inventory']=names
++ binary=Path(binaries[0]);assert binary.is_absolute() and binary.is_relative_to(STAGE/'target') and stat.S_ISREG(binary.lstat().st_mode)
++ R['test_binary']={'path':str(binary),'sha256':H(binary)};guard()
++ R['build_phase_finished_monotonic']=time.monotonic()
++ END=min(END,time.monotonic()+600);PHASE_END=END-40
++ R['execution_end_monotonic']=END;R['execution_deadline_monotonic']=PHASE_END;checkpoint('execution-phase-start')
++ panel=json.loads((SOURCE/'research/pencil_lifecycle_20261030/integration/followup-continuation-v2/packets/signed-producer-qualification-20261109/signed-panel.json').read_text())
+  for i,name in enumerate(F['exact_tests']):
+-  assert names.count(name)==1,name
++  assert H(binary)==R['test_binary']['sha256'],'binary changed before test'
+   out=command('exact-'+str(i),[str(binary),name,'--exact','--test-threads=1','--nocapture'])
+-  assert len(re.findall(r'test result: ok\. 1 passed; 0 failed;',out))==1,'nonzero exact test result'
+-  if i==0:assert out.count('ROOT_ADAPTER_POSITIVE_CONTROL recovered=31124 actual_routes=2 deterministic_ledgers_equal=true')==1,'positive control sentinel'
+- full=command('full-suite',base+['--','--test-threads=1'])
+- summaries=re.findall(r'test result: ok\. (\d+) passed; (\d+) failed; (\d+) ignored; (\d+) measured; (\d+) filtered out;',full)
+- assert len(summaries)==1,'exactly one unfiltered library result'
+- passed,failed,ignored,measured,filtered=map(int,summaries[0]);assert passed>0 and failed==filtered==0 and passed+ignored+measured==len(names)
+- R['full_suite']={'passed':passed,'failed':failed,'ignored':ignored,'measured':measured,'filtered':filtered}
+- assert H(binary)==R['test_binary']['sha256'],'binary changed'
+- verify(inputs['immutable']);R['post_inputs_verified']=True
+- guard();R['status']='passed'
++  assert len(re.findall(r'test result: ok\. 1 passed; 0 failed; 0 ignored; 0 measured;',out))==1,'one nonzero exact passing result required'
++  rows=json_rows(out)
++  if i==0:
++   cases=[x for x in rows if isinstance(x.get('case'),dict)];summaries=[x for x in rows if 'completed' in x]
++   assert [x['case'] for x in cases]==panel and all(x.get('pass') is True for x in cases),'exact28 fixed signed rows'
++   assert len(summaries)==1 and summaries[0].get('pass') is True and summaries[0]['completed']==28,'final completed28 after fault reruns required'
++   for key,flag in [('identity_cases','identity'),('duplicate_cases','duplicate')]:
++    count=sum(x[flag] is True for x in cases);assert count>0 and summaries[0][key]==count,'fixed native branch coverage'
++   R['signed_summary']=summaries[0]
++  else:
++   names=['informative_same','informative_opposite','redundant_same','redundant_opposite','invalid_zero_target','invalid_wrong_candidate','noncanonical']
++   cases=[x for x in rows if isinstance(x.get('case'),str)]
++   assert [x['case'] for x in cases]==names and all(x.get('pass') is True for x in cases),'exact7label rows'
++   R['kummer_cases']=cases
++ assert H(binary)==R['test_binary']['sha256'],'binary changed after tests'
++ verify_private_source()
++ manifest=Path(F['immutable_manifest']['path']);assert H(manifest)==F['immutable_manifest']['sha256'];inputs=json.loads(manifest.read_text());verify(inputs['immutable'])
++ config_key=F['donor_workspace']+'/cache-stage-v2/cargo-home/config.toml';assert H(STAGE/'cargo-home/config.toml')==inputs['immutable'][config_key]['sha256']
++ R['post_inputs_verified']=True;guard();R['status']='passed'
+ except BaseException as e:R['errors'].append({'repr':repr(e),'traceback':traceback.format_exc()})
+ finally:
+  if ACTIVE is not None:
+-  try:
+-   os.killpg(ACTIVE.pid,signal.SIGKILL);ACTIVE.wait(timeout=3)
++  try:os.killpg(ACTIVE.pid,signal.SIGKILL);ACTIVE.wait(timeout=3)
+   except BaseException as e:R['errors'].append({'cleanup':repr(e)})
+   R['status']='failed'
+  R['elapsed_seconds']=time.monotonic()-START
