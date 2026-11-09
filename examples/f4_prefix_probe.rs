@@ -64,13 +64,16 @@ fn main() {
     let fb = build_standard_subspace_factor_base(&kc, dim).expect("factor base");
     let index_of = fb.index_map();
     let st = FieldStructure::new(kc.n, &kc.curve.irreducible);
-    let engine = SolverEngine::InheritedF4 { max_degree: 3 };
+    let max_degree: u32 = flag("--max-degree")
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(3);
+    let engine = SolverEngine::InheritedF4 { max_degree };
     let target = |k: u64| kc.mul(kc.generator(), &BigUint::from(k));
     let system = |k: u64| -> (Vec<F2BoolPoly>, usize) {
         decomposition_solver_equations(&kc, &fb, &st, &target(k), m, engine)
             .expect("a supported target")
     };
-    let cell = format!("K{a}/2^{n} dim {dim} m {m}");
+    let cell = format!("K{a}/2^{n} dim {dim} m {m} D {max_degree}");
     let ks: Vec<u64> = (first..first + targets).collect();
     match mode.as_str() {
         "shape" => {
