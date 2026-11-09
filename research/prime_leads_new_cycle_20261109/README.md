@@ -138,3 +138,18 @@ PR publication is asserted here. Parent publication must retain canonical main
 artifact policy and exact current-base PCC prefix; old forked records stay
 untouched. Scientific/canonical performance and curve graphs receive no new
 value or edge from this plan.
+
+## Recorded first attempt and successor
+
+The first committed source (`f916192a4`) ran all six controls successfully and
+passed standalone strict clippy. Its formatter failed on three assertion
+layouts; aggregate exit1 and unattempted formal stages are retained in
+[the initial receipt](validation/cycle1-initial/receipt.json). These are
+unsigned producer observations, PCC-20261109-8cc866. [pcc:unverified]
+
+The new [H3 preregistration](cycle2-preregistration.json) fixes361 anchor
+directions at the same collision rank4 and query rank5, predicting342 isolating
+and19 ambiguous directions. [anchor_cycle2.rs](anchor_cycle2.rs) and the new
+[final recipe](validation/final/validate.sh) are committed before execution.
+No H3 result is claimed here. Canonical P20 input read stopped at missing
+configured credentials; no raw records or replay were obtained.

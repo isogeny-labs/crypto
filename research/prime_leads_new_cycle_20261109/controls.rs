@@ -371,39 +371,33 @@ mod tests {
     #[test]
     fn attachment_refuses_duplicate_corrupt_and_noncanonical_inputs() {
         assert!(attach(&labels(&[1, 1]), 0, 0).is_err());
-        assert!(
-            attach(
-                &[Label {
-                    point: 1,
-                    scalar: 2
-                }],
-                0,
-                0
-            )
-            .is_err()
-        );
-        assert!(
-            attach(
-                &[Label {
-                    point: 19,
-                    scalar: 0
-                }],
-                0,
-                0
-            )
-            .is_err()
-        );
-        assert!(
-            attach(
-                &[Label {
-                    point: 0,
-                    scalar: 19
-                }],
-                0,
-                0
-            )
-            .is_err()
-        );
+        assert!(attach(
+            &[Label {
+                point: 1,
+                scalar: 2
+            }],
+            0,
+            0
+        )
+        .is_err());
+        assert!(attach(
+            &[Label {
+                point: 19,
+                scalar: 0
+            }],
+            0,
+            0
+        )
+        .is_err());
+        assert!(attach(
+            &[Label {
+                point: 0,
+                scalar: 19
+            }],
+            0,
+            0
+        )
+        .is_err());
         assert!(attach(&[], 19, 19).is_err());
     }
 
