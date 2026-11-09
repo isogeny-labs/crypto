@@ -72,3 +72,24 @@ and bound. The goal must not be marked complete from the current component
 proofs, nor replaced by an assumed-bound theorem or a claim of global
 impossibility. Research can resume from these precise obligations without
 rerunning or relabelling the completed frozen panel.
+
+## Nov9 representation refinement
+
+Actual-node capacity accounting and an integral scaled accumulator are now
+formal components. The former exposes the4^a total slot-width contribution of
+simultaneous explicit buffers; the latter establishes scaled target congruence
+and valid cross-precision cancellation, supporting a streaming representation.
+See the capacity and stream-precision reports linked in PLAN.md. Native
+unscaling, coefficient generation, retained-state/recomputation costs and the
+uniform recursive theorem remain the next obligations [pcc:unverified].
+
+## Nov9 native exact recovery evidence
+
+The native finite rational recovery census now completes both physical
+invocations and the separately frozen exact recount. All180 positive cases
+and3 defective controls pass in each invocation;366 records are recounted,
+with byte-identical A/A. This is bounded component correctness evidence,
+retaining unsigned producer standing and no timing/asymptotic inference.
+The checkpoint admission is resolved under the explicit owner substitution;
+next refinement is the distinct scaled modular accumulator and its costs
+[pcc:unverified].

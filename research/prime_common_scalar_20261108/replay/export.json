@@ -1,0 +1,263 @@
+{
+  "analysis": {
+    "blinded": false,
+    "blinding_key_sha256": null,
+    "outputs": [
+      {
+        "bytes": 200,
+        "path": "research/prime_common_scalar_20261108/replay/summary.json",
+        "sha256": "83e580d54e251242e084f89e92edf6af3fff036d768525694ed6b302e2413e31"
+      }
+    ],
+    "script": {
+      "bytes": 2759,
+      "path": "research/prime_common_scalar_20261108/replay/analyze.cpp",
+      "sha256": "c5c9475220d12f5c483addcd62bd63328c76a1eb2aa241e2f7a6cac83a79ca23"
+    },
+    "unmasked_at": null
+  },
+  "arms": [
+    {
+      "binary_sha256": "3ee3a6c5741862d56b3cd12299f7b3b6b99a0b4b60ea3b1d3ac0ed3dc3ce592d",
+      "commit": "77aed44a5a68e7ba4e794bed742b04b30994da23",
+      "id": "native-census",
+      "role": "candidate"
+    },
+    {
+      "binary_sha256": "3ee3a6c5741862d56b3cd12299f7b3b6b99a0b4b60ea3b1d3ac0ed3dc3ce592d",
+      "commit": "77aed44a5a68e7ba4e794bed742b04b30994da23",
+      "id": "replay",
+      "role": "control_aa"
+    }
+  ],
+  "backend": "local",
+  "created": "2026-11-09T20:11:36Z",
+  "export_id": "prime-hermite-native-20261109-v2",
+  "files": [
+    {
+      "bytes": 50150,
+      "path": "research/prime_common_scalar_20261108/replay/runs/0/panel.tsv",
+      "sha256": "46a73583d9709c64acbcf02fbadb82734ed48b16cb5c33d85341ca74db512c09"
+    },
+    {
+      "bytes": 0,
+      "path": "research/prime_common_scalar_20261108/replay/runs/0/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 430,
+      "path": "research/prime_common_scalar_20261108/replay/runs/0/receipt.json",
+      "sha256": "5ea24cdce8699f217393978f6415df5a5e80c39cc2ed02935516751d6e73d6e5"
+    },
+    {
+      "bytes": 2,
+      "path": "research/prime_common_scalar_20261108/replay/runs/0/exit-code.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "bytes": 50150,
+      "path": "research/prime_common_scalar_20261108/replay/runs/1/panel.tsv",
+      "sha256": "46a73583d9709c64acbcf02fbadb82734ed48b16cb5c33d85341ca74db512c09"
+    },
+    {
+      "bytes": 0,
+      "path": "research/prime_common_scalar_20261108/replay/runs/1/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 430,
+      "path": "research/prime_common_scalar_20261108/replay/runs/1/receipt.json",
+      "sha256": "f90c189e840494fd75fe1e85737f7095f613158b9716ebeff7e997d499ae550f"
+    },
+    {
+      "bytes": 2,
+      "path": "research/prime_common_scalar_20261108/replay/runs/1/exit-code.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "bytes": 3357,
+      "path": "research/prime_common_scalar_20261108/replay/runs/host.txt",
+      "sha256": "215aca77bf3f0031892aeac218a69e00360d290e4f006808953c832d558a013d"
+    }
+  ],
+  "flow": {
+    "attempted": 2,
+    "completed": 2,
+    "excluded": [],
+    "interrupted": 0,
+    "not_completed": 0,
+    "planned": 2,
+    "resumed": 0
+  },
+  "host": {
+    "class_id": null,
+    "path": "research/prime_common_scalar_20261108/replay/runs/host.txt",
+    "sha256": "215aca77bf3f0031892aeac218a69e00360d290e4f006808953c832d558a013d",
+    "summary": {
+      "cpu_model": null,
+      "hypervisor": null,
+      "isolation_tier_max": "L0",
+      "kernel": null,
+      "logical_cpus": null,
+      "memory_bytes": null
+    }
+  },
+  "notes": [
+    {
+      "by": "producer",
+      "kind": "observation",
+      "text": "Two complete physical executions; embedded180 known-target cases and3 defective controls each; exact replay. Owner-authorized git checkpoints replace unavailable S3. No clocks admissible."
+    }
+  ],
+  "producer": {
+    "model": null,
+    "role": "producer",
+    "runtime": "codex",
+    "session": "hermite-native-20261109"
+  },
+  "protocol": {
+    "path": "research/prime_common_scalar_20261108/replay/protocol.json",
+    "protocol_id": "prime-hermite-native-20261109",
+    "sha256": "7d5b77252d2930a0e8da185f08e0454809af934270dfa94c1a1a44bd50d57635",
+    "version": 2
+  },
+  "reviews_dir": "reviews",
+  "runs": [
+    {
+      "arm": "native-census",
+      "artifacts": [
+        {
+          "bytes": 50150,
+          "path": "research/prime_common_scalar_20261108/replay/runs/0/panel.tsv",
+          "sha256": "46a73583d9709c64acbcf02fbadb82734ed48b16cb5c33d85341ca74db512c09"
+        },
+        {
+          "bytes": 0,
+          "path": "research/prime_common_scalar_20261108/replay/runs/0/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "bytes": 430,
+          "path": "research/prime_common_scalar_20261108/replay/runs/0/receipt.json",
+          "sha256": "5ea24cdce8699f217393978f6415df5a5e80c39cc2ed02935516751d6e73d6e5"
+        },
+        {
+          "bytes": 2,
+          "path": "research/prime_common_scalar_20261108/replay/runs/0/exit-code.txt",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "local-native-0",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-11-09T20:07:49Z",
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "CPU affinity set; host co-tenants not isolated; exact correctness only"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "rows_completed": 183
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "native-census/0",
+      "seed": 0,
+      "started_at": "2026-11-09T20:07:42Z",
+      "status": "succeeded",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer C++ GMP recount; no independent signature"
+      },
+      "warmup": false,
+      "worker": "local-codex"
+    },
+    {
+      "arm": "replay",
+      "artifacts": [
+        {
+          "bytes": 50150,
+          "path": "research/prime_common_scalar_20261108/replay/runs/1/panel.tsv",
+          "sha256": "46a73583d9709c64acbcf02fbadb82734ed48b16cb5c33d85341ca74db512c09"
+        },
+        {
+          "bytes": 0,
+          "path": "research/prime_common_scalar_20261108/replay/runs/1/stderr.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "bytes": 430,
+          "path": "research/prime_common_scalar_20261108/replay/runs/1/receipt.json",
+          "sha256": "f90c189e840494fd75fe1e85737f7095f613158b9716ebeff7e997d499ae550f"
+        },
+        {
+          "bytes": 2,
+          "path": "research/prime_common_scalar_20261108/replay/runs/1/exit-code.txt",
+          "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+        }
+      ],
+      "attempts": 1,
+      "backend_ref": "local-native-1",
+      "checkpoint": null,
+      "exclusion": {
+        "excluded": false,
+        "rule": null
+      },
+      "finished_at": "2026-11-09T20:08:00Z",
+      "instance_id": "0",
+      "isolation": {
+        "blockers": [
+          "CPU affinity set; host co-tenants not isolated; exact correctness only"
+        ],
+        "contended": null,
+        "tier": "L0"
+      },
+      "measurements": {
+        "counted": {
+          "rows_completed": 183
+        },
+        "counters": {},
+        "cpu_sys_seconds": null,
+        "cpu_user_seconds": null,
+        "max_rss_bytes": null,
+        "wall_seconds": null,
+        "wall_valid": false
+      },
+      "outcome_class": "completed",
+      "replicate": 0,
+      "resumed": 0,
+      "run_id": "replay/0",
+      "seed": 0,
+      "started_at": "2026-11-09T20:07:53Z",
+      "status": "succeeded",
+      "verification": {
+        "status": "no_claim",
+        "verifier": "Frozen producer C++ GMP recount; no independent signature"
+      },
+      "warmup": false,
+      "worker": "local-codex"
+    }
+  ],
+  "schema": "experiment.export/v1",
+  "source": {
+    "commit": "a26eb8fd31d2a102c9f12dbe98178e4cbfd57610",
+    "dirty": true,
+    "repo": "crypto"
+  }
+}
