@@ -7,7 +7,7 @@ Mathlibcfc55fc58714a59dc06e6e79edc6d1d95140d3c2.
 The default build passed. The actual source-discovering repository gate passed:
 162 declarations,0 extra trusted; foundations propext, Classical.choice,
 Quot.sound. Receipts in recovery-gate/. Official fresh import-inclusive replay
-of HermiteUniqueness is recorded separately in recovery-fresh-status.json and
+of HermiteUniqueness exited0, recorded in recovery-fresh-status.json and
 recovery-fresh-001.log. These remain unsigned producer checks [pcc:unverified].
 
 NodeMultiplicity and HermiteUniqueness are default targets. Four new canonical

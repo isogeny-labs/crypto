@@ -82,7 +82,7 @@ Mathlibcfc55fc58714a59dc06e6e79edc6d1d95140d3c2. Both new modules are default
 targets. recovery-default-build-001.log passed. The actual source-discovering
 gate reports162 declarations,0 extra trusted; foundations remain propext,
 Classical.choice and Quot.sound. Import-inclusive fresh replay of
-HermiteUniqueness is recorded in recovery-fresh-status.json and its raw log.
+HermiteUniqueness exited0; see recovery-fresh-status.json and its raw log.
 All are unsigned producer checks [pcc:unverified].
 
 | Obligation | Lean declaration | Unsigned PCC record |
