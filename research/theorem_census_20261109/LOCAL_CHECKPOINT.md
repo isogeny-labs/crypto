@@ -116,3 +116,20 @@ one-page rendering visually checked; final rasterSHA256
 Canonical independent-validator export/file hashes still pass,476ledgerrows
 retain the old prefix. Current binary-head global/PCCchecks are pending;
 signing remains skipped on the feature base. [pcc:unverified]
+
+06:24Z characteristic-torsion follow-up: source
+lean/CharacteristicTorsionBoundary.lean now classifies actual geometric
+2-torsion on E/F2:y²+xy=x³+1, proving rationalgroup4/geometrictorsion2/
+mu2values1 and all torsion rational. Set inclusion iff divisibility fails
+atq=r=2,k1; the actual corpus node already excludes this by gcd(r,q)=1,
+and the original BK source's r²point-count condition is not refuted.
+Every map from this nontrivial actual torsion group to μ2fails explicit
+pointwise nondegeneracy. The group-scheme Weil-duality version is not
+refuted. Gate134pass,0failing/0native exceptions; packet92d64dunsigned.
+Full qualified pairings/Frobenius proofs remain open. [pcc:unverified]
+
+All applicable CI on9915e65c passed, including globalbenchmark gate7m22s
+and PCCgate2m38s. This new source increment requires its own publication
+and checks. Ledger477rows retain old prefix; no native/data/protocol change.
+Report and source explanation: CHARACTERISTIC_TORSION.md and
+reports/proof-20261109-characteristic/report.pdf. [pcc:unverified]

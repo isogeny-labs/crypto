@@ -9,10 +9,10 @@ are not refuted; their exact domains and remaining bridges stay explicit.
 [pcc:unverified]
 
 The torsion-only proof snapshot audited74declarations with0failing and
-0trusted-native exceptions. The current binary follow-up audits116declarations;
-the original41-declaration and intermediate96-declaration receipts are
+0trusted-native exceptions. The current characteristic-torsion follow-up
+audits134declarations; the original41-declaration and intermediate96/116-declaration receipts are
 retained as earlier snapshots. Counts include generated equation lemmas,
-not116new mathematical results. Both proof attempts and final receipts are
+not134new mathematical results. Both proof attempts and final receipts are
 retained. The torsion snapshot's unsigned PCC records are `PCC-20261109-44730b` and
 `PCC-20261109-5bd3a4`. Earlier packets omitted required declaration hashes;
 they remain as superseded records, and their failed metadata check is
@@ -41,6 +41,21 @@ and [paper-audit-backlog.json](paper-audit-backlog.json). Those are metadata
 counts; untouched papers are not labelled audited. [pcc:unverified]
 
 ## Exact counterexamples
+
+On the nonsingular F2model y²+xy=x³+1, Lean proves #E(F2)=4,
+`#E[2](F2bar)=2`, and all geometric2-torsion rational, yet2does not divide1.
+The original BK source requires r²torsion points, so a set-inclusion
+translation also needs a characteristic/rank qualification, which the actual
+corpus node already retains as gcd(r,q)=1. This is a negative control of
+that exclusion. Every actual
+μ2-valued map on this nontrivial geometric torsion group is pointwise
+degenerate, because the actual μ2value type has1element. This refutes
+unrestricted pointwise nondegeneracy, not group-scheme Weil duality or
+qualified pairing constructions. Packet92d64dremains unsigned. See
+[CHARACTERISTIC_TORSION.md](CHARACTERISTIC_TORSION.md),
+[actual Lean objects](lean/CharacteristicTorsionBoundary.lean) and
+[proof report](reports/proof-20261109-characteristic/report.pdf).
+[pcc:unverified]
 
 The binary follow-up proves the full ordinary characteristic-two S3
 equivalence over an algebraically closed field, using actual Mathlib elliptic
@@ -176,9 +191,9 @@ only at their already-stated scope. [pcc:unverified]
 | Item | Current status and concrete remaining obligation |
 |---|---|
 | 1 Semaev | Partial: general short and ordinary binary S3 equivalences now proved with all repeated-coordinate cases in actual Mathlib point groups. Rational-only converse and wrong-model substitution refuted. Bounded S3/S4/S5 native census completed. General resultant recursion and degree proofs remain open. |
-| 2 BK | Partial: primary proof read and actual excluded-case geometric3-torsion witness, even with9dividing#E. Full qualified E[r]/Frobenius proof and all-p<500 census remain open. Qualified theorem is not refuted. |
+| 2 BK | Partial: original r²point-count formulation read; actual excluded-case geometric3-torsion witness even with9dividing#E. New F2/r2actual geometric torsion has2points all rational, refuting unrestricted set inclusion despite2notdividingq−1. The actual node already excludes this by gcd(r,q)=1; original r²condition is not refuted. Full qualified Frobenius proof and all-p<500 census remain open. |
 | 3 Supersingular | Literal all-prime k=2 assertion refuted at r=2 using the source trace definition and actual groups. FSTp239 directly checked using actual cyclotomic degree1 versus nonrational2-torsion. Corrected odd-prime proof is conditional on Hasse; general Hasse/classification and binary/ternary census remain open. |
-| 4 Pairings | Partial: cyclic restriction obstruction and actual r=2 cyclotomic/full-torsion field distinction. Actual Weil/Tate constructions, nondegeneracy and MOV/FR calculations remain open. |
+| 4 Pairings | Partial: cyclic restriction obstruction, actual cyclotomic/full-torsion distinction, and actual geometric F2torsion/μ2subtypes proving every point-valued map degenerate at characteristic order. Group-scheme duality is not refuted. Actual qualified Weil/Tate constructions, nondegeneracy and MOV/FR calculations remain open. |
 | 5 Diem size | Partial: stable branch locus fails actual Condition2.7. Scheme/ramification bridge and size bound remain open; no counterexample to the qualified bound. |
 | 6 Gaudry | Original2000 §§2–3 read; fixed-genus whole-Jacobian limit confirmed as the claim's scope. Actual higher-genus census and lower-order error remain open; small-q error alone is not a refutation. |
 | 7 Subgroup smoothness | Partial: abstract confinement proof only. A faithful higher-genus Jacobian family and subgroup proportions remain open. |
