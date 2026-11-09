@@ -1,0 +1,136 @@
+\documentclass[11pt]{article}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{amsmath,amssymb,graphicx,xurl,hyperref}
+\hypersetup{colorlinks=true,urlcolor=blue}
+\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
+\begin{document}
+{\LARGE Actual Hermite loss and source-precision stability}\par
+November 9, 2026. Mathematical source \texttt{a375671ad}.\par
+Unsigned producer evidence throughout [pcc:unverified].
+
+\textbf{Result and domain.}
+The actual normalized Hermite multiplier has a quantified valuation bound.
+The actual local reciprocal and evaluation loss are source-connected. An
+explicit finite recovery functional preserves precision using the source's
+original child precision. The exact reconstruction identity remains separate.
+The error theorems here concern the concrete rational integral ring
+$\mathcal O=\{r\in\mathbb Q:|r|_2\leq1\}$. Coordinate refinement to the
+extension/nilpotent lattice and complete bit costs remain open. No curve or
+subgroup solve, benchmark or novelty claim is made.
+
+\textbf{Actual basis and inverse.}
+Let $L=2^a$, $\alpha=2L$, $t_m=m-L$ on the actual grid,
+$h=\lceil3M/u\rceil$, $q(0)=0$ and
+$q(t)=h\max(0,u-v_2(t))$ otherwise. Construct
+\[
+ E_t(T)=\prod_{s\ne t}\left(\frac{T-s}{t-s}\right)^{q(s)},\qquad
+ E_t(t+\alpha z)=\prod_{s\ne t}\left(1+\frac{\alpha z}{t-s}\right)^{q(s)}.
+\]
+The zero-node factor has exponent zero. Each actual nonzero difference has
+absolute value below $2L$; the established ratio theorem puts
+$\alpha/(t-s)$ in $\mathcal O$. The actual local product has constant one,
+so the proof constructs its integral reciprocal and its finite mapped inverse
+buffer. It does not assume a unit for an unspecified basis.
+
+\textbf{Actual multiplier bound by pairing.}
+Exclude $0,t$ and let $m(s)$ be the actual centered representative of $t-s$.
+Lean proves the involution, both exclusions, congruence modulo $2L$ and exact
+valuation preservation. Put $v_s=v_2(s)$, $w_s=v_2(t-s)=v_2(m(s))$, $i=v_2(t)$.
+For the actual product at zero,
+\[
+ V=v_2(E_t(0))=\sum_s q(s)(v_s-w_s),\qquad
+ 2V=\sum_s(q(s)-q(m(s)))(v_s-w_s).
+\]
+The decreasing natural taper is $h$-Lipschitz, giving
+$2V\geq-h\sum_s(v_s-w_s)^2$. The actual ultrametric relation gives
+\[
+ (v_s-w_s)^2=(v_s-i)_+^2+(w_s-i)_+^2.
+\]
+Pairing makes these two sums equal. Both excluded terms have zero excess.
+Actual level counts, including the lone endpoint at top level $a$, imply
+\[
+ \sum_s(v_s-i)_+^2
+   =\sum_{j=0}^a2^{a-j}(j-i)_+^2\leq6\,2^{a-i}.
+\]
+The final bound uses the finite identity
+$\sum_{k=0}^n k^2/2^k=6-(n^2+4n+6)/2^n$.
+Thus $V\geq-6hD_i$, $D_i=2^{a-i}$, from the actual grid rather than an
+assumed moment estimate or random distribution.
+\newpage
+\textbf{Evaluation loss and actual coefficient errors.}
+The actual ceiling obeys $hu\leq4M$ for $u\leq M$.
+For $b,t\in\mathcal O$, $b\ne0$, an explicit integral numerator proves
+\[
+ b^qP(t/b)=\sum_{j<q}P_jt^jb^{q-j}\quad (\deg P<q).
+\]
+With $b=2L$, $q=4M$, this bounds the actual evaluation loss by
+$K=4M(a+1)$. Let $B=6hD_i$. The source's original child precision splits as
+\[
+ p_t=p+8hD_i+8M(a+1)=p+B+K+S,\quad S=2hD_i+4M(a+1)\geq0.
+\]
+A coefficient error $2^{p_t}c$ contributes, after division by $2^p$,
+\[
+ 2^S\,(2^BE_t(0))\,(2^Kc(-t/\alpha)^j)\in\mathcal O.
+\]
+Summing coefficients and actual sampled nodes proves that the explicit
+\texttt{recoveryFunctional} on supplied bounded quotient polynomials preserves
+precision $p$. Multiplication by the actual local reciprocal preserves input
+finite buffers. No two-power is cancelled inside a finite ring.
+
+\begin{center}
+\includegraphics[width=0.98\textwidth,height=0.43\textheight,keepaspectratio]{bridge.pdf}
+\end{center}
+Solid boxes are this component; the dashed reconstruction bridge remains open.
+
+\textbf{Remaining exact bridge.}
+Construct exact quotient truncations from an input polynomial, prove the D.9
+interpolation polynomial's jets and degree, and apply existing uniqueness to
+obtain its value at zero. The stability theorem does not assume or prove that
+reconstruction equality. Full native refinement and recursive costs remain
+separate. Earlier affine/source-recovery reports remain immutable additions.
+\newpage
+\textbf{Proof map and unsigned PCC records.}
+Canonical statement hashes are in
+\path{lean/hermite-precision-claim-pins.json}.
+
+\begin{tabular}{p{0.30\textwidth}p{0.62\textwidth}}
+Actual integral chart & \texttt{HermiteBasis.actualBasisLocalEval}\newline PCC-20261109-09b188\\[4pt]
+Finite mapped reciprocal & \texttt{HermiteBasis.}\newline\texttt{actualBasisMappedInverseBuffer}\newline PCC-20261109-348f1c\\[4pt]
+Actual mirror valuations & \texttt{HermiteGrid.actualMirrorValuation}\newline PCC-20261109-f0b5d3\\[4pt]
+Actual multiplier loss & \texttt{HermiteMoment.actualHermiteMultiplierLoss}\newline PCC-20261109-827aa4\\[4pt]
+Actual evaluation loss & \texttt{HermiteBasis.actualEvaluationLoss}\newline PCC-20261109-ad5a31\\[4pt]
+Finite-functional stability & \texttt{HermiteError.actualRecoveryFunctionalStable}\newline PCC-20261109-00cb3f\\[4pt]
+Input-buffer precision & \texttt{HermiteError.}\newline\texttt{actualLocalQuotientBufferStable}\newline PCC-20261109-fd958d
+\end{tabular}
+
+\textbf{Checks and pins.}
+Default build passed. The actual source-discovering repository gate reports
+216 declarations and zero extra trusted axioms. Foundations remain
+\texttt{propext}, \texttt{Classical.choice}, \texttt{Quot.sound}.
+Fresh import-inclusive replay exited0; see
+\path{lean/hermite-precision-fresh-status.json} and its raw log.
+All checks are unsigned producer evidence [pcc:unverified].
+
+Pinned Lean4.35.0, CryptoLean
+\path{148f5dc389b341401e06d76abe7783c4ccf42f2e}, Mathlib
+\path{cfc55fc58714a59dc06e6e79edc6d1d95140d3c2}.
+Failed build/API diagnostics are retained. No checker, gate, trust policy or
+dependency revision changed. Quantified finite sums, valuations and buffer
+statements are covered by Lean, rather than polynomial-expression certificate v1.
+
+\textbf{Sources and scope.}
+Read the pinned OpenAI October25 manuscript D.9--D.10 and the prior
+matched-recovery review, checking actual Mathlib APIs. Primary PDF SHA256:
+\path{5b1612dc2eebb2cad5b4cbe62d1fed2982f01ab1908c26f70010a651487e8123}.
+Provenance: \path{research/prime_common_kernel_20261030/sources.md}.
+KB unavailable (no MCP, wrapper exit127). This is bounded formalization,
+not an exhaustive novelty audit.
+
+\textbf{Next comparison.}
+Only after exact reconstruction and cost refinements should a separately
+prospective native campaign compare the actual original precision against the
+old doubled-budget proxy. This proof provides a mathematical reason to revisit
+that proxy without changing a historical panel number. No old run was repeated,
+no benchmark row changed and no outcome was attributed to CPU contention.
+The versioned diagram records this component's proof dependencies.
+\end{document}

@@ -20,8 +20,11 @@ theorem denominator_node (a m : ℕ) (hm : m < 2^(a+1)) :
   · intro h
     exact False.elim (h (Finset.mem_range.mpr hm))
 
-def kernel (a k : ℕ) (t : ℚ) : ℚ :=
+@[expose] def kernel (a k : ℕ) (t : ℚ) : ℚ :=
   baseKernel a k t * baseKernel a k t / denominator a t
+
+theorem rationalKernelFormula (a k : ℕ) (t : ℚ) :
+    kernel a k t = baseKernel a k t * baseKernel a k t / denominator a t := rfl
 
 theorem node_preserved (a k m : ℕ) (hk : k < 2^(a+1)) (hm : m < 2^(a+1)) :
     kernel a k ((m : ℚ)-(2^a : ℕ)) = baseKernel a k ((m : ℚ)-(2^a : ℕ)) := by
