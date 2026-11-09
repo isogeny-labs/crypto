@@ -109,3 +109,21 @@ The timing dependency is a quiet host passing the same preflight. This protocol'
 ### Errors
 
 Calibration admission exit3 is the sole attempted panel failure. No measurement child executed, so it is not a wrong-output or timing failure. The export initially used packaging timestamps for process boundaries; the unpublished derivative was corrected to null because the refusal receipt provides no such timestamps. A docs/session-receipts.md lookup was absent in this checkout; retain a task-local native session receipt instead of inventing a canonical tool result. Shared daily-log ownership remains respected; no root Cargo test result is claimed.
+
+## 2026-11-09T17:18Z: bounded block folding and complete cold qualification
+
+### What was done
+
+Implemented a16-column retained-label DP and independent GMP integer/count reconstruction. Final block-build-v4 is warning-free and passes2820 integer programs,300 exhaustive small minima,2520 original-mu point outputs and26820 independently checked bank labels;282 altered programs reject. Planted multicolumn/leading controls execute. The new shared cold interface passes625 untimed paths and five altered expected-output controls. The native analyzer passes30 synthetic tests, including separate count-matrix and arithmetic-subphase corruptions. No new comparative data or point clock has been collected.
+
+### Decisions made
+
+Every arm dispatch and object initialization begins after the first cold timestamp. The planner recodes only once; recoding, label sets, DP allocation/transitions/reconstruction are in plan_ns. The same block optimizer applies to the binary control. Point-bank setup/normalization and loop/bank destruction partition arithmetic_ns exactly; remaining program/group destruction is in destroy_ns. The original mu is unchanged. Source and PR updates preceded qualification; frozen-source publication precedes the planned single125-row untimed diagnostic and conditional3500/7000-row timing panels. P-192 primary; P-224/P-256/P-384/P-521 all reported.
+
+### Open threads
+
+Publish the qualified source/receipts, bind ten sources/nine inputs/binaries/host and freeze/push V3. Update and verify PR before the launch. Native admission and the unchanged resource limits remain mandatory. No e2e outcome follows from qualification or group-event counts alone. The prior refusal stays retained; this changed implementation follows the user's explicit new request. No cloud job, cap/role/budget change or Diem/controller restart.
+
+### Errors
+
+The first qualifier passed but retained an unused-original-function warning. Intermediate v2/v3 source snapshots were published but not executed; status files identify their supersession. Final v4 uses the original implementation as a point control and is warning-free. A no-op status patch failed to match a full line and changed nothing; the timestamped record is appended here. No root Cargo suite is claimed for these standalone C++ changes. Sources checked (KB): tools/wrapper unavailable as before; prior construction/cold contracts and Bernstein–Lange precomputation paper introduction/sections3–4 read. No novelty or new curve-registry claim.
