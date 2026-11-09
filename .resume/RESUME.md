@@ -14,19 +14,18 @@ Source: frozen archive fd-src-a2be6609.tgz (sha256 18b14930...) in s3://ephemera
 Outputs: s3://ephemeral-runs-104186811093-us-east-1/jobs/e13-runpod-20261107/out.tgz (presigned PUT, reused key; valid to 2026-11-14).
 
 ## State
-Amendment and script pushed on branch claude/fall-degree-e14-20261109. Pod being created via RunPod REST (rest.runpod.io/v1/pods).
-Conductor not installed in this container.
+E14 ended "not completed": RunPod terminated pod oubpztzdbbbo4s about 10:20 UTC 2026-11-09 (account balance 0) during E14b d1.
+Write-up committed (e14/score.json, RESULTS.md E14, reports/run-20261109-e14). PR open from this branch.
 
 ## Next steps
-1. Watch the pod; download out.tgz; verify hashes; unpack into e14/pod/.
-2. Score E14a/b/c per Amendment 19 (adapt e13/score_e13.py); E14a deg-4 entries must equal e13/local/B_3-21-7_d*.jsonl.
-3. RESULTS section, report/graph/PDF (reports/run-2026110x-e14), session log, PR ready + auto-merge.
+1. Drive the E14 write-up PR to merge.
+2. Any rerun needs a new amendment: first measure pe's degree-4 matrix size on 6:10:3 d1 locally; consider E14a first; needs RunPod funds.
 
 ## Runs in flight
-RunPod pod "fd-e14-20261109" (id recorded in session log once created). Delete it if still running after its deadline.
+None.
 
 ## Stop and success conditions
-Pod self-deletes at finish or at min(36 h, floor(100/costPerHr) h). Nothing retried. Failed predictions stay failed.
+Nothing retried. Failed predictions stay failed.
 
 ## Open questions
-None.
+Whether to fund and register a rerun (user decision).
