@@ -167,3 +167,23 @@ Publish/freeze the complete source/input/binary record before one scan, independ
 V1 independent replay failed on two mixed-type auto declarations; corrected source and failure logs retained. No scientific scan was started or repeated. No root Cargo suite is claimed for the native-only scope. Sources checked (KB): unavailable tools/wrapper and existing block/residual contracts/references as retained.
 
 Delivery race,2026-11-09T18:00Z: after the earlier clear read, Conductor assigned the daily-log path to T-1979 before resolution. The guarded command stopped at its ownership check before any manual edit. The no-commit merge was aborted, preserving the unchanged study tree and committed qualifier results. Those results are pushed separately. No conflicted file was resolved and no frozen artifact changed. Do not bypass the new owner's equivalent shared-log lock; continue source-scoped research while delivery waits.
+
+## 2026-11-09T18:55Z: completed block tuning, existing-host refusal and report custody
+
+### What was done
+
+The one frozen census completed 27,090 rows. The separately coded GMP suffix-DP replay returned 80 minimum sets; 400 selected original-mu point/count cases passed and four altered-data cases rejected at their intended checks. Fresh archive replay and deterministic repack matched. Primary relation D+A is 230,265,303,451,611, versus matched folded binary 229,260,300,450,606 and prior selected direct 228,260,300,449,606. Every declared weighting sensitivity retains a loss in this finite family. These are counts, not CPU times. Raw records were pushed as 84cb43d91459; bot be6490725cd3 externalized only the archive/metadata. Its exact 110,312-byte local backup was restored and SHA-checked without an agent S3 GET. [pcc:unverified]
+
+The user selected a quiet window on this host. The separately published V4 environment amendment (3d22ec698fe0, digest 909d66a15190fd989d183f6d29866c0152bb6c3e7498a8fb6fecddc98f566d72) retained the qualified worker, all five original scalars and full cold boundary. Its one preflight returned 3: other CPU 4.24 seconds over two seconds exceeds 0.2, PSI 0/0. Zero timing workers/rows; no held-out worker or retry. Raw records were pushed as a10b64427cd5 before the report. All three new PDF pages were rendered and visually inspected. [pcc:unverified]
+
+### Decisions made
+
+Keep full e2e latency unresolved; no function clock ran. Ask for the start/readiness of the offered quiet window and do not poll the unchanged busy condition or stop other work. Continue a separate source-only reduction of planner allocation while awaiting that answer, preserving frozen sources/records. The selected offline plans are not free per-call results. P-192 remains primary, all five curves retained. No cloud/job/controller/generator or resource/role/budget changes.
+
+### Open threads
+
+The scientific study scope is clear, but T-2014 now holds the daily log and PCC namespace. Do not bypass either; the hash-pinned PCC packet is a noncanonical draft, with no signed standing. The shared-log merge conflict remains and the previous guarded merge was aborted. Update PR with completed outcomes and inspected reports. After a real quiet-window readiness signal, any further timing requires a distinct bounded published amendment with unchanged isolation/controls and all setup/planning charged.
+
+### Errors
+
+The first census build's mixed-auto errors are preserved. Final qualifications were warning-free; 17 of the 20 declared native backend invocations were used, including failed builds and fault controls. No census or V3 timing retry occurred. Two resumed metadata reads named absent paths (commands.sh and SESSION_RECEIPT.json); no process was repeated. Read today's committed shared log from HEAD because its sparse working path is absent. KB tools/wrapper remain unavailable; existing block/residual contracts and cited Bernstein-Lange / Grabner-Heuberger-Prodinger sources remain the literature basis. No Rust code changed and no local root Cargo suite is claimed. [pcc:unverified]
