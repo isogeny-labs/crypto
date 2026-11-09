@@ -3166,16 +3166,23 @@ fn f4_with_arithmetic(
         .map(|_| ckpt::fingerprint(input, n_vars, p, opts, mode, gm, packed.is_some()));
     let mut resumed_opts: Option<F4Options> = None;
     let mut resume_rref: Option<ckpt::RrefLoaded> = None;
+    // (elapsed, field operations) of the loop-top checkpoint just read: the first
+    // step of a resumed run starts from exactly what is on disk, so it needs no
+    // rewrite of that file, and an in-step snapshot of it binds to these values.
+    let mut disk_top: Option<(Duration, u64)> = None;
     if let (Some((path, _)), Some(fp)) = (&opts.checkpoint, ck_fp) {
+        let t_read = Instant::now();
         if let Some(l) = ckpt::load_best(path, Some(fp)) {
             eprintln!(
-                "f4: resumed {} at step {}, {:.1} s of the budget already spent, {} basis elements, {} pairs",
+                "f4: resumed {} at step {}, {:.1} s of the budget already spent, {} basis elements, {} pairs (read in {:.1} s)",
                 path.display(),
                 l.steps,
                 l.elapsed.as_secs_f64(),
                 l.basis.len(),
-                l.pairs.len()
+                l.pairs.len(),
+                t_read.elapsed().as_secs_f64()
             );
+            disk_top = Some((l.elapsed, l.field_ops));
             basis = l.basis;
             alive = l.alive;
             pairs = l.pairs;
@@ -3200,14 +3207,16 @@ fn f4_with_arithmetic(
             // finished part of the reduction, so its counts continue from the
             // snapshot's.
             if !deferred && opts.weights.is_none() {
+                let t_rref = Instant::now();
                 if let Some(r) = ckpt::load_rref(&ckpt::rref_path(path), fp, l.steps, l.elapsed) {
                     eprintln!(
-                        "f4: in-step snapshot found: phase {}, column {}, {} pivots, {:.1} s spent, {} rows",
+                        "f4: in-step snapshot found: phase {}, column {}, {} pivots, {:.1} s spent, {} rows (read in {:.1} s)",
                         r.phase,
                         r.c,
                         r.pivots.len(),
                         r.elapsed.as_secs_f64(),
-                        r.rows.len()
+                        r.rows.len(),
+                        t_rref.elapsed().as_secs_f64()
                     );
                     carried.set(r.elapsed);
                     ops_carry.set(r.ops);
@@ -3304,13 +3313,23 @@ fn f4_with_arithmetic(
             eprintln!("f4: {} pairs pending, basis {}", pairs.len(), basis.len());
         }
         // the loop-top values a checkpoint of this step's top records
-        let top_el = t0.elapsed() + carried.get();
-        let top_ops = ops_carry.get() + (field_ops_now() - ops0);
-        let mut wrote_top = false;
+        let (mut top_el, mut top_ops, mut wrote_top) = match disk_top.take() {
+            Some((e, o)) => (e, o, true),
+            None => (
+                t0.elapsed() + carried.get(),
+                ops_carry.get() + (field_ops_now() - ops0),
+                false,
+            ),
+        };
         if let (Some((path, every)), Some(fp)) = (&opts.checkpoint, ck_fp) {
             let stop = opts.checkpoint_stop_after.is_some_and(|k| steps >= k);
             if stop || last_ckpt.elapsed() >= *every {
                 let tw = Instant::now();
+                if wrote_top {
+                    // rewriting the file this step started from: record the values of now
+                    top_el = t0.elapsed() + carried.get();
+                    top_ops = ops_carry.get() + (field_ops_now() - ops0);
+                }
                 let snap = ckpt::Snap {
                     fingerprint: fp,
                     n_vars,
