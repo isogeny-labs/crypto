@@ -162,7 +162,8 @@ fn main() {
     let h = bh(&e, &roots);
     let mut rows = vec![];
     for row in old["rows"].as_array().unwrap() {
-        let q = point(&row["Q"]);
+        let v = &row["Q"];
+        let q = Some(((pz(&v[0][0]), pz(&v[0][1])), (pz(&v[1][0]), pz(&v[1][1]))));
         let (qb, qg) = make(&e, &q);
         let ys: Vec<_> = qb
             .iter()
@@ -199,7 +200,7 @@ fn main() {
             rows.push(json!({"target":row["target"],"j":row["selected_j"],"block":i,"value":field(&value),"horner_counts":hc,"resultant_counts":rc}))
         }
     }
-    let out = json!({"all_checks_pass":true,"norms":rows.len(),"rows":rows,"scope":"72 prescribed P192 denominator norms; input preparation explicit; no full response"});
+    let out = json!({"whole_qualifier_counts":big::counts(),"all_checks_pass":true,"norms":rows.len(),"rows":rows,"scope":"72 prescribed P192 denominator norms; input preparation explicit; no full response"});
     if let Some(i) = args.iter().position(|s| s == "--check") {
         let v: Value = serde_json::from_slice(&std::fs::read(&args[i + 1]).unwrap()).unwrap();
         assert_eq!(out, v)

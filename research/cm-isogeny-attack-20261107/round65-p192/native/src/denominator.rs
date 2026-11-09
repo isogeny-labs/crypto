@@ -509,7 +509,7 @@ fn main() {
         &[2, 3, 5, 7, 11, 17, 197],
         &[0, 1, 2, 3, 5, 17, 198],
     );
-    let out = json!({"all_checks_pass":true,"panels":[x,y,z]});
+    let out = json!({"whole_qualifier_counts":counts(),"all_checks_pass":true,"panels":[x,y,z]});
     if let Some(i) = args.iter().position(|s| s == "--check") {
         let v: Value = serde_json::from_slice(&fs::read(&args[i + 1]).unwrap()).unwrap();
         assert_eq!(out, v)
