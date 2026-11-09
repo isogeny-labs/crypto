@@ -147,3 +147,21 @@ All per-call planning/setup/normalization/destruction costs are inside the imple
 An exact new daily-log git add initially refused the sparse path; git add --sparse staged only that authorized file and the scoped check passed. First report render failed on unquoted Typst subscript words new/old; its source/log are retained, corrected PDF rendered and both pages inspected. Final software qualifications remain warning-free. No source/test change or scientific execution was repeated for report/custody. Root Cargo suite remains unrun; no Rust source changed.
 
 Report publication note: the staged whitespace checker flags a final blank line in the preserved report render-v1.log. Its original diagnostic bytes are retained. The scoped source/report check passes with only that named raw-log exception; unrestricted whitespace success is not claimed. No scientific or replay output was changed.
+
+## 2026-11-09T17:57Z: block-aware parameter census qualification
+
+### What was done
+
+Published a new untimed census producer and independent GMP suffix-DP replay before qualification. Final block-tune-build-v2 is warning-free and passes630 paired actual block/single-column point/counter cases plus90 independent exhaustive small-model cases. The earlier mixed-type auto declarations failed compilation and remain preserved as v1. No comparative census data or clock has run.
+
+### Decisions made
+
+Cross every offset-64..64 and width2..7 for ell and all six binary controls,27090 rows. Preserve original mu and full bank setup; compare with the existing stronger direct/binary donor plan counts without repeating that census. The independent replay checks all16-column choices without producer early pruning. All four weighting sensitivities use the emitted unweighted-planner program family; no global chain or e2e claim follows. Search cost remains separate from any installed plan's first-use cost.
+
+### Open threads
+
+Publish/freeze the complete source/input/binary record before one scan, independent27090-row/80-minimum replay and400 selected point checks. PR conflict resolution can proceed now that T-1947's log scope is clear; Copilot received no response after more than25minutes, so its request is explicitly superseded by the documented local merge fallback. Preserve both complete parent log contributions and every study byte. No V3 timing retry or cloud/role/budget/cap change.
+
+### Errors
+
+V1 independent replay failed on two mixed-type auto declarations; corrected source and failure logs retained. No scientific scan was started or repeated. No root Cargo suite is claimed for the native-only scope. Sources checked (KB): unavailable tools/wrapper and existing block/residual contracts/references as retained.
