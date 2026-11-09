@@ -133,3 +133,10 @@ and PCCgate2m38s. This new source increment requires its own publication
 and checks. Ledger477rows retain old prefix; no native/data/protocol change.
 Report and source explanation: CHARACTERISTIC_TORSION.md and
 reports/proof-20261109-characteristic/report.pdf. [pcc:unverified]
+
+06:31Z source57a2da72published as374259d2, exact sharedtree84a9318f.
+Full local PCC92d64dcheck passes06:30:03Z, unsigned. Final one-page
+characteristic report/diagram visually checked after the source/node
+qualification and table-rendering fixes. All scientific assertions retain
+their explicit domain; this remains partial coverage of the14items.
+[pcc:unverified]

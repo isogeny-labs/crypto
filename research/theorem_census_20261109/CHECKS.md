@@ -1,3 +1,34 @@
+# Current additive proof and validation receipts
+
+The current census project gate passes134declarations,0failing and
+0trusted-native exceptions. It adds full ordinary binary S3 equivalence,
+its actual wrong-model negative control, and actual characteristic-torsion/
+root-of-unity/cardinality/pointwise-nondegeneracy controls. These counts
+include generated equation lemmas and are not134new independent results.
+Full local PCC checks517cb7and92d64dpass, unsigned. The qualified BKnode
+already excludes the F2/r2control by gcd(r,q)=1. [pcc:unverified]
+
+| Component | Gate result | Exact receipt |
+|---|---|---|
+| Census, binary and characteristic boundary | 134pass,0fail,0trusted | evidence/characteristic-torsion-gate.log |
+| Actual walk PMF/hash graph | 21pass,0fail,0trusted | ../walk_audit_20261109/evidence/proof-gate-normalized.log |
+| Independent validator finite quadratic foundation | 11pass,0fail,0trusted | ../independent_s3_validator_20261109/evidence/proof-gate.log |
+
+The independent Rust local run matches all6prime fields/942models/
+4188162triples/244236zeros,0false/missing zeros. Canonical export and
+file hashes pass:2planned/attempted,1completed,1not-completed. The single
+separate-host manual dispatch returnedHTTP404; workflow/default-branch
+lookups404. No actual remote host/compiler/binary/run is asserted.
+Actual corpus qualifications and root-of-unity group-scheme distinctions
+remain explicit in CHARACTERISTIC_TORSION.md. [pcc:unverified]
+
+All applicable CI on published9915e65cpasses, including global7m22s/PCC2m38s;
+signing skipped on feature base. The characteristic source57a2da72published
+as374259d2with exact sharedtree84a9318f. Its follow-up CI is checked
+separately; historical CI pass is not attributed to a later head.
+The main/parent immutable-ledger fork below remains unreconciled; no gate
+is disabled or ledger history rewritten. [pcc:unverified]
+
 # Solver-control follow-up
 
 The additive walk study now has its own21-declaration transitive gate,
@@ -9,7 +40,7 @@ hash validation passes. These are separate from the96-declaration project
 below. See ../walk_audit_20261109/README.md for scope and reports.
 [pcc:unverified]
 
-The latest expanded repository gate passes96declarations,0failing,
+The solver-control snapshot's repository gate passes96declarations,0failing,
 0trusted-native exceptions. It includes the actual bivariate quotient
 equivalence/length2 and closed support1witness. All16frozen-protocol msolve
 calls pass exact checks; the canonical export passes against that protocol

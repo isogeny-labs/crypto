@@ -62,7 +62,9 @@ snapshot and all prior mathematical statements remain intact.
 
 Final expanded gate:134declarations,0failing,0trusted-native exceptions.
 PCC-20261109-92d64d binds the combined actual-object certificate and remains
-unsigned. Previous116gate is its earlier binary-proof snapshot.
+unsigned and passes its full local check at06:30:03Z. The receipt is
+evidence/pcc-characteristic-check.json. Previous116gate is its earlier
+binary-proof snapshot.
 [pcc:unverified]
 
 Source: BK1998, Theorem1/preceding Conditions1–2 and proof, pp142–143,
