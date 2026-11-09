@@ -4,3 +4,9 @@ cmsem.c40s3-run.bin
 *.analyze.log
 *.partial-killed.*
 *.done
+# >>> artifacts: managed by tools/artifacts; bytes live in the store (see .artifacts.json)
+!.artifacts.json
+/C40-S3.jsonl.gz
+/C40-SIDE.jsonl.gz
+/C48-S3-T800.jsonl.gz
+# <<< artifacts
