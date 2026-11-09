@@ -156,3 +156,96 @@ theorem order_dvd_diff_of_nsmul_eq {a : G} {n k l : Nat} (h : IsOrder a n) (hkl 
   rw [← nsmul_add, Nat.add_sub_of_le hkl, heq]
 
 end ECDLP
+
+/-! ## Layer 0b: injectivity, modular reduction, and homomorphism reductions
+
+These are the lemmas every reduction attack uses: a discrete log is unique on
+`Fin n`, scalar multiples reduce modulo the order, and a group homomorphism
+transports a DLP instance; hardness is preserved exactly when the map is
+injective on the cyclic subgroup. -/
+
+namespace ECDLP
+
+variable {G H : Type} [AddGroup G] [AddGroup H]
+
+/-- Reducing the exponent modulo the order does not change the multiple. -/
+theorem nsmul_mod {a : G} {n k : Nat} (h : IsOrder a n) :
+    nsmul (k % n) a = nsmul k a := by
+  have hsplit : nsmul k a = add (nsmul (n * (k / n)) a) (nsmul (k % n) a) := by
+    have := nsmul_add (n * (k / n)) (k % n) a
+    rw [← (Nat.div_add_mod k n).symm] at this
+    exact this
+  have hz : nsmul (n * (k / n)) a = zero := by
+    induction (k / n) with
+    | zero => simp
+    | succ q ih =>
+        rw [Nat.mul_succ, nsmul_add, ih, h.annihilates]
+        simp
+  rw [hsplit, hz, zero_add]
+
+/-- Below the order, distinct exponents give distinct group elements. -/
+theorem nsmul_injective_below {a : G} {n : Nat} (h : IsOrder a n) {k l : Nat}
+    (hk : k < n) (hl : l < n) (heq : nsmul k a = nsmul l a) : k = l := by
+  rcases Nat.lt_trichotomy k l with hlt | heq' | hgt
+  · have hdvd : n ∣ l - k := order_dvd_diff_of_nsmul_eq h (Nat.le_of_lt hlt) heq
+    have hpos : 0 < l - k := Nat.sub_pos_of_lt hlt
+    have hle : n ≤ l - k := Nat.le_of_dvd hpos hdvd
+    have hlt' : l - k ≤ l := Nat.sub_le _ _
+    omega
+  · exact heq'
+  · have hdvd : n ∣ k - l := order_dvd_diff_of_nsmul_eq h (Nat.le_of_lt hgt) heq.symm
+    have hpos : 0 < k - l := Nat.sub_pos_of_lt hgt
+    have hle : n ≤ k - l := Nat.le_of_dvd hpos hdvd
+    have hlt' : k - l ≤ k := Nat.sub_le _ _
+    omega
+
+/-- A group homomorphism for the additive notation used here. -/
+structure Hom where
+  map : G → H
+  map_zero : map zero = zero
+  map_add : ∀ a b : G, map (add a b) = add (map a) (map b)
+
+namespace Hom
+
+variable (φ : Hom (G := G) (H := H))
+
+theorem map_nsmul (k : Nat) (a : G) : φ.map (nsmul k a) = nsmul k (φ.map a) := by
+  induction k with
+  | zero => simp [φ.map_zero]
+  | succ k ih => simp [nsmul_succ, φ.map_add, ih]
+
+theorem map_neg (a : G) : φ.map (neg a) = neg (φ.map a) := by
+  apply neg_unique
+  rw [← φ.map_add, add_neg, φ.map_zero]
+
+/-- Kernel triviality on the cyclic subgroup: an injective map keeps the DLP
+unique. -/
+theorem dlp_unique_of_injective {a q : G} {n x y : Nat} (h : IsOrder a n)
+    (hx : nsmul x a = q) (hxlt : x < n) (hylt : y < n)
+    (hmap : nsmul y (φ.map a) = φ.map q)
+    (hinj : ∀ z : G, φ.map z = zero → z = zero) : y = x := by
+  have hy : φ.map (nsmul y a) = φ.map q := by
+    rw [φ.map_nsmul, hmap]
+  have hzero : φ.map (add (nsmul y a) (neg (nsmul x a))) = zero := by
+    rw [φ.map_add, φ.map_neg, hy, hx]
+    exact add_neg _
+  have hgroup : add (nsmul y a) (neg (nsmul x a)) = zero := hinj _ hzero
+  have h1 : neg (nsmul x a) = neg (nsmul y a) := neg_unique hgroup
+  have heq : nsmul x a = nsmul y a := by
+    have := congrArg neg h1
+    simpa [neg_neg] using this
+  exact nsmul_injective_below h hylt hxlt heq.symm
+
+/-- Any solution reduces modulo the order; the DLP is well defined in `Z/n`. -/
+theorem dlp_mod_of_injective {a q : G} {n x y : Nat} (h : IsOrder a n)
+    (hx : nsmul x a = q) (hxlt : x < n)
+    (hmap : nsmul y (φ.map a) = φ.map q)
+    (hinj : ∀ z : G, φ.map z = zero → z = zero) : y % n = x := by
+  have hy : nsmul (y % n) (φ.map a) = φ.map q := by
+    rw [← φ.map_nsmul, nsmul_mod h, φ.map_nsmul, hmap]
+  have := dlp_unique_of_injective (φ := φ) h hx hxlt (Nat.mod_lt _ h.pos) hy hinj
+  simpa using this
+
+end Hom
+
+end ECDLP

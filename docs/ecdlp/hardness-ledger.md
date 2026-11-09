@@ -20,6 +20,10 @@ Status: **formal** (`Foundations.lean`, 32 theorems, 0 trusted).
 | Exact order: positive, annihilating, minimal | Defines the subgroup order used in every complexity statement | Formal |
 | Any annihilating exponent is a multiple of the order | "DLP is well defined mod n" | Formal |
 | Equal scalar multiples differ by a multiple of the order | Uniqueness of the discrete log modulo `n` | Formal |
+| `k·P = (k mod n)·P` | Reductions work modulo the order | Formal |
+| Distinct exponents below `n` give distinct elements | The map `Z/n → ⟨P⟩` is injective | Formal |
+| Homomorphisms commute with `nsmul` and `neg` | Every reduction (MOV, Pohlig–Hellman, descent) transports scalars | Formal |
+| Injective homomorphism preserves DLP uniqueness; any solution reduces mod `n` | Hardness transfers only under injective reductions; non-injective maps leave a coset ambiguity | Formal |
 
 Attack surface at this layer: none algebraically — these are the axioms every
 attack must respect. The only way to "break" the layer is to instantiate it
@@ -41,6 +45,11 @@ What is already machine-checked: the 33+1 chart round trips and the cache
 relations (Lean, `Charts.lean`), plus 486/486 formula programs symbolically
 against the pinned affine law (CAS, not kernel). Closure and associativity of
 the affine law itself are the next formal targets.
+
+Infrastructure note: core Lean 4 has no `ring`/`field_simp`, and no Mathlib
+checkout is present (the Mathlib ltar cache exists, but the source clone is
+missing). Generic closure/associativity proofs need either that checkout or a
+verified polynomial normalizer; this is the gating decision for layer 1.
 
 ## Layer 2 — generic-group lower bound
 
@@ -80,8 +89,11 @@ separately; a break here breaks deployments, not ECDLP.
 
 ## Queue (one at a time)
 
+0. **Done:** modular scalar reduction, injectivity below the order, and the
+   homomorphism reduction lemmas (`Foundations.lean`, 43 theorems).
 1. **Curve group law closure** for short Weierstrass affine addition and
-   doubling, over an abstract field with curve equation hypotheses.
+   doubling, over an abstract field with curve equation hypotheses. Blocked on
+   the ring-tactic/Mathlib decision above.
 2. **Associativity** of the chord–tangent law (the hard one; likely via the
    divisor-class/linear-equivalence argument rather than brute algebra).
 3. **BSGS correctness** and **Pohlig–Hellman** in the Layer 0 interface.
