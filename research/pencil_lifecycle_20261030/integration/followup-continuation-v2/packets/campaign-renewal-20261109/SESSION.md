@@ -71,3 +71,15 @@ Bind actualmanifest and qualification with finalrootadmission; archive nativeevi
 
 ## Errors
 No errors in completedmaterializer or wrapperqualification. [pcc:unverified]
+
+## What was done — 17:47 UTC
+Firstrootlibraryattemptfailedbeforecompiler: root-owned0600systemdlogs blocked supervisorflush; workerpermitexpiredat10.091595s,commands[]. Rootrecovered exactinvocation fromsavedinitialrawquery joinedworker/currentterminal; cgroupabsent andownedunitstopped. Full1800charged. Normsource/freezereleasepublishedabb87f605c, serialreplaystartedwith1CPU8GiB. [pcc:unverified]
+
+## Decisions made
+Use newv2rootlauncherfix exclusivecallerlogprecreation+capturebeforecheckpoint, separatelyreviewednativefixture60secondsafter norm. Preservefailedoriginalattempt. Current2880charged+2400normreserved=37920unreserved. [pcc:unverified]
+
+## Open threads
+Normpre/compiler/postruns; nativefixtureandv2rootvalidationafterterminal. [pcc:unverified]
+
+## Errors
+Rootcampaignleaseexpiredwhilehandlingnativefailure; reclaimedT1948epoch3, noactivepayloaddependedonthatlease. Normactiveleaseheartbeatmaintainedseparately. [pcc:unverified]
