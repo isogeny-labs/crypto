@@ -68,3 +68,12 @@ has been published. Separate compile job128880359995 passed workspace/all-target
 and wide-vars checks plus the core crate's tests. Those are distinct from the
 still-pending full library result. See progress-20261108T2324Z.json; the original
 queued dispatch receipt remains unchanged. No additional attempt was submitted.
+
+At the9November00:27UTC collection, the manual full-library job was terminal
+failed after its declared55-minute test-step timeout. No parent summary or
+exit receipt exists. The partial log records one ic_wide test failure, without
+its assertion diagnostic, and an unfinished long-running jv_isogeny_walk test.
+Host admission/build/source checks and the separate compile job passed. See
+[outcome-20261109T0027Z/](outcome-20261109T0027Z/) for additive receipts and exact
+raw-file hashes; the full155,880-byte archive and original ZIP remain ignored
+pending approved artifact upload. No second attempt was submitted.

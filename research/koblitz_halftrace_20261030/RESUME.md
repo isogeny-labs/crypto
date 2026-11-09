@@ -60,12 +60,15 @@ time-interface preflight, immutable source input and Rust1.99.1. Ordinary compil
 jobs remain unchanged; no new credentials, scientific run or benchmark is added.
 Published and linted the change atcda1e5810, then submitted one development
 validation: Actions42529489383, requested source/workflow head
-cda1e5810f41550a2b929cbdb6fe4ff242865617. At23:24UTC, actual host-interface
-preflight, immutable checkout/source/toolchain binding and release test-binary
-build passed. Full parent tests are running; terminal status/artifacts remain
-pending. Separate workspace/all-target/wide-vars compile job passed. Those are
-not the pending full library result. Collect at the standing cadence;
-do not submit another attempt automatically. The old local attempt stays incomplete.
+cda1e5810f41550a2b929cbdb6fe4ff242865617. Collected terminal outcome9November:
+host-interface admission, immutable binding/build and post-run source checks
+passed, but the full test step reached its declared55-minute cap. The parent
+result remains incomplete: no summary or Cargo/log-writer exit receipt. One
+ic_wide test failure is visible without its assertion diagnostic; the long-running
+jv_isogeny_walk test has no completion line. The separate compile job passed.
+All raw-file identities and short receipts are additive in outcome-20261109T0027Z;
+the155,880-byte archive/Actions ZIP remain local pending approved S3 upload.
+Do not resubmit or restart unchanged suites. The old local attempt stays incomplete.
 See development/hosted-validation-20261108/ for its bounds and receipt contract.
 
 Attach an existing approved checkpoint/lab connection or configure the approved
@@ -80,11 +83,12 @@ and verify current-head gate/size/artifacts checks before merge.
 ## Runs in flight
 No scientific run. The preparation is terminal failed. No scientific EKS request,
 Job UID, data export or result receipt exists. No development checks remain
-live locally. Hosted development run42529489383, full job128880307287, is running
-its parent tests after host admission/build passed; pinned tocda1e5810. See
-development/hosted-validation-20261108/progress-20261108T2324Z.json and the
-unchanged initial dispatch receipt. No terminal artifact exists yet. It is not
-a scientific run or a reported full-suite pass.
+live locally or in hosted development CI. Hosted run42529489383/job128880307287
+is terminal failed; its parent suite is incomplete after the55-minute test-step
+timeout, with an observed ic_wide failure. Pinned sourcecda1e5810. Temporary
+artifact13638049715 was downloaded and SHA-verified; expires22November23:28UTC.
+See development/hosted-validation-20261108/outcome-20261109T0027Z/. Earlier
+queued/progress snapshots are unchanged. No full-suite pass or retry is claimed.
 Source507829726f cache/ordered/E2E completed; E2E log reports2passed/0failed.
 Old exec73044/34529 handles are unavailable. Full-library cargo10207/test10463
 are defunct; /tmp/crypto-halftrace-nov4/full-library-attempt2.exit is absent.

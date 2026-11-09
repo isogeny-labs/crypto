@@ -1,0 +1,82 @@
+{
+  "schema": "crypto.native-halftrace-hosted-validation-outcome/v1",
+  "run_id": 42529489383,
+  "run_attempt": 1,
+  "run_url": "https://github.com/isogeny-labs/crypto/actions/runs/42529489383",
+  "requested_source_revision": "cda1e5810f41550a2b929cbdb6fe4ff242865617",
+  "workflow_run_head": "cda1e5810f41550a2b929cbdb6fe4ff242865617",
+  "run_status": "completed",
+  "run_conclusion": "failure",
+  "full_library_job_id": 128880307287,
+  "full_library_job_conclusion": "failure",
+  "result": "incomplete_step_timeout_with_observed_test_failure",
+  "test_step_timeout_minutes": 55,
+  "job_deadline_minutes": 90,
+  "cargo_parent_exit_code": null,
+  "log_writer_exit_code": null,
+  "parent_summary": null,
+  "terminal_parent_receipt_present": false,
+  "failure_observed": "cryptanalysis::ic_wide::tests::run_f2m4_is_the_one_word_pipeline",
+  "assertion_diagnostic": "not_emitted_before_timeout",
+  "long_running_test_without_completion_line": "cryptanalysis::jv_isogeny_walk::tests::end_to_end_from_a_non_weak_curve_recovers_and_verifies",
+  "timeout_cause": "Actions_enforced_declared_test_step_limit",
+  "reason_long_running_test_did_not_complete": null,
+  "nested_summaries_are_not_parent_results": true,
+  "host_interface_preflight": "passed",
+  "build_exit_code": 0,
+  "post_run_source_checks": "passed",
+  "post_run_tracked_status": "clean",
+  "separate_compile_job": {
+    "id": 128880359995,
+    "conclusion": "success",
+    "scope": [
+      "workspace_all_targets",
+      "wide_vars_lib_tests_typecheck",
+      "crypto_analysis_core_library_tests"
+    ]
+  },
+  "artifact": {
+    "id": 13638049715,
+    "name": "native-library-42529489383-1",
+    "zip_bytes": 123058,
+    "zip_sha256": "a158b153347ae6fd01e0caae377997f83656c79b1c161f40837caa71cd59f3e8",
+    "download_hash_matches_api_digest": true,
+    "expires_at": "2026-11-22T23:28:48Z",
+    "retention": "temporary_development_artifact_not_canonical_S3"
+  },
+  "receipts": {
+    "request_and_source_identity": "verified_against_requested_revision_and_local_tracked_sources",
+    "compiler_json": "retained_in_ignored_full_archive",
+    "binary_identity": "recorded_SHA256_only_binary_not_uploaded",
+    "library_log": "exact_partial_parent_bytes_retained",
+    "job_log": "decoded_GitHub_job_log_exact_tool_text_retained"
+  },
+  "archive": {
+    "file": "runs.tar.xz",
+    "bytes": 155880,
+    "sha256": "ac9902e6d2b9d2c8042a8b300332d32a553c623dac4ac84f8b992b6702eae9b4",
+    "committed": false,
+    "canonical_upload": "blocked_no_approved_uploader",
+    "extracted_tree": "runs/"
+  },
+  "old_local_attempt": "unchanged_incomplete_no_parent_result",
+  "workflow_modifications_in_collection": 0,
+  "new_dispatches": 0,
+  "automatic_retries": 0,
+  "tests_disabled": 0,
+  "native_source_modifications": 0,
+  "scientific_measurements": 0,
+  "speedup": null,
+  "performance_P1": "unresolved",
+  "auto_merge": "paused",
+  "observation_window": "2026-11-09 00:27-00:30 UTC",
+  "library_log_sha256": "cfbdc1e118cbde671f8e25bea5dd8345a471a7b4a83663fea8a7cbb674c93835",
+  "job_log_sha256": "d5d66cbb054768fa9b45914e077b4cd06f90bdd0f6bc97a81f7eedd968b8356a",
+  "test_binary_sha256": "46d16fb8056f78cea4c3aa1c35d77e1afea482cb0451363918c591a39a9681d0",
+  "previous_local_host_interface_failures": "both diagnostic publication tests report ok on hosted source; old local failures retained",
+  "upstream_test_triage": {
+    "observed_main_change_commit": "de17b7b6897387c71e41e26c3bd913a1bdabdf40",
+    "integration": "not_performed",
+    "failure_assertion_cause": "unknown_without_missing_parent_diagnostics"
+  }
+}
