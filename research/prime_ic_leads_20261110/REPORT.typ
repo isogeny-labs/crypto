@@ -59,7 +59,23 @@ Weil descent over $F_(2^n)$: one relation gives $n$ equations of degree 2 in $m 
 
 = The multiples presentation control
 
-`examples/pkm_tower_pilot.rs --controls multiples` appends to the tower system the cleared $S_(m+1)(x([2]P_1), …, x([2]P_m), x([2]R)) = 0$, with $x([2]P) = N(x)\/D(x)$, $N = x^4 - 2 a x^2 - 8 b x + a^2$, $D = 4 (x^3 + a x + b)$ (for chains, doubled partial-sum unknowns linked by $D(u_k) u'_k - N(u_k) = 0$). Same cell seed, same tower, curve and targets as the tower control; every appended equation vanishes at planted solutions (asserted). It enters at multilinear degree 6, so at $d_F ("tower") <= 5$ the two presentations must agree (P1, a built-in control); at cells with $d_F ("tower") >= 7$ the prediction is $d_F ("multiples") in {d_F - 1, d_F}$ with the $m$-slope unchanged (P2). Falsifier: a drop of at least 2 at a cell with $d_F ("tower") >= 8$, or an $m$-ladder that reads flat. Development-check rows, when run, are in `devcheck/` with their command lines; nothing is admitted.
+`examples/pkm_tower_pilot.rs --controls multiples` appends to the tower system the cleared $S_(m+1)(x([2]P_1), …, x([2]P_m), x([2]R)) = 0$, with $x([2]P) = N(x)\/D(x)$, $N = x^4 - 2 a x^2 - 8 b x + a^2$, $D = 4 (x^3 + a x + b)$ (for chains, doubled partial-sum unknowns linked by $D(u_k) u'_k - N(u_k) = 0$). Same cell seed, same tower, curve and targets as the tower control; every appended equation vanishes at planted solutions (asserted; 12/12 unit tests). It enters at multilinear degree 6, so at $m = 2$ the two presentations must agree wherever $d_F <= 5$ (P1, a built-in control); at cells with $d_F ("tower") >= 7$ the prediction was $d_F ("multiples") in {d_F - 1, d_F}$ with the slopes unchanged (P2). Falsifier: a drop of at least 2 at a cell with $d_F ("tower") >= 8$, or an $m$-ladder that reads flat.
+
+*Development check* (this host, closure engine, Kummer at $P_1$, seed `0x504B4D54`, two random targets per cell, both arms on the same targets; no isolation; every value `[pcc:unverified]`; rows and table in `devcheck/`). The tower arm reproduces stage A's medians at $t = 2..9$ and stage C's cells, the instrument check.
+
+#table(
+  columns: 5, inset: 4pt, stroke: 0.4pt,
+  [*cell*], [*$d_F$ tower*], [*$d_F$ multiples*], [*Δ*], [*falls tower / multiples*],
+  [$m = 2$, $t = 2..9$ (16 rows)], [4, 4, 4, 4, 5, 5, 5, 5], [identical on every row], [0], [identical],
+  [$m = 2$, $t = 10$], [> 6 (budget-censored)], [> 6 (same)], [—], [[4, 5] / [4, 5]],
+  [$m = 3$, $t = 2$ ($N = 6$)], [5, 5], [5, 5], [0], [[4, 5] / [4, 5]],
+  [$m = 3$, $t = 3$ ($N = 9$)], [6, 6], [5, 5], [*−1*], [[4, 5, 6] / [4, 5]],
+  [$m = 4$, $t = 2$ ($N = 8$)], [6, 6], [5, 5], [*−1*], [[4, 5, 6] / [4, 5]],
+  [$m = 4$, $t = 3$ ($N = 12$)], [7, 7], [6, 6], [*−1*], [[4, 5, 6, 7] / [4, 5, 6]],
+  [$m = 5$, $t = 2, 3$], [see `devcheck/m5_t2-3.jsonl`], [], [], [],
+)
+
+P1 holds (identical at $m = 2$, draw by draw). P2 holds and nothing reaches the falsifier: at $m >= 3$ the drop is exactly one degree on six of eight completed cells and zero on two, and both slopes are unchanged ($m = 4$: 6 → 7 against 5 → 6 from $t = 2$ to 3; $t = 3$: 6 → 7 against 5 → 6 from $m = 3$ to 4). The one-degree offset at $m >= 3$ arrives with the degree-4 doubling links and the extra unknowns $u'_k$, a presentation shift, not a change in growth. Section 4 item 3 stays closed as far as this check can test it; not tested: $[3]$- and $[4]$-multiples together, larger $N$, an F4 run on the augmented systems.
 
 = Leads, ranked
 

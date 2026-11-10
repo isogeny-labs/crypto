@@ -77,3 +77,11 @@ Run the multiples and null-support controls at `t = 2, 3`, `m = 2..5` (minutes o
 4-core host), then the `m = 4`, `N = 20` closure under Amendment 8. Outcomes: flat under
 multiples → reopen §4 item 3; grows in every presentation and in the null → file the
 mechanism and close the Kummer lane per Amendment 8's rules.
+
+## Update 2026-11-10 (development check, this host; every value `[pcc:unverified]`)
+
+The multiples control ran on Kummer `P1` cells (`research/prime_ic_leads_20261110/devcheck/`):
+identical `d_F` at `m = 2`, `t = 2..9` (P1); at `m = 3, 4` a drop of exactly one degree on six
+of eight cells and zero on two, with both slopes unchanged (P2). The falsifier (a drop of two,
+or a flat ladder) was not reached. The second "what would unblock it" item is therefore not
+met at toy scale; the record stays open on the first and third.
