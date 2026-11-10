@@ -587,26 +587,90 @@ def record_errors(root: Path, cfg: dict, rec: dict, name: str, *, require_closed
     return e
 
 
-def artifact_manifests(root: Path) -> dict[str, str]:
+MANIFEST_NAME = ".artifacts.json"
+_SKIP_DIRS = (".git", "target", "node_modules")
+
+
+def _manifests_rglob(root: Path) -> list[Path]:
+    """Reference enumeration: every .artifacts.json under root via Path.rglob."""
+    return list(root.rglob(MANIFEST_NAME))
+
+
+def _manifests_walk(root: Path) -> list[Path]:
+    """Same set as _manifests_rglob, but never descends into .git, target or node_modules
+    (artifact_manifests drops anything under them anyway) and does not follow symlinked
+    directories."""
+    out: list[Path] = []
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [d for d in dirnames if d not in _SKIP_DIRS]
+        if MANIFEST_NAME in filenames:
+            out.append(Path(dirpath) / MANIFEST_NAME)
+    return out
+
+
+def _manifests_git(root: Path) -> list[Path] | None:
+    """Tracked or untracked-but-not-ignored .artifacts.json files, from git's index.
+    None when git is unavailable or root is not the top of a git worktree."""
+    try:
+        p = subprocess.run(
+            ["git", "-C", str(root), "ls-files", "-z", "--cached", "--others", "--exclude-standard",
+             "--full-name", "--", f":(glob)**/{MANIFEST_NAME}"],
+            capture_output=True, text=True)
+        top = subprocess.run(["git", "-C", str(root), "rev-parse", "--show-toplevel"],
+                             capture_output=True, text=True)
+    except OSError:
+        return None
+    if p.returncode != 0 or top.returncode != 0 or Path(top.stdout.strip()).resolve() != root.resolve():
+        return None
+    return sorted({root / n for n in p.stdout.split("\0") if n})
+
+
+def manifest_paths(root: Path, git_list: bool | None = None) -> list[Path]:
+    """Manifest files to read: the pruned tree walk by default; git's file list when
+    `git_list` is true or BENCHREC_GIT=1 (falls back to the walk when git cannot answer).
+    The walk is the default because `git ls-files --others` walks the whole tree too and
+    measured slower (0.5 s against 0.15 s on a 286k-file checkout). A gitignored manifest
+    is only seen by the walk."""
+    if git_list is None:
+        git_list = os.environ.get("BENCHREC_GIT", "") not in ("", "0")
+    found = _manifests_git(root) if git_list else None
+    return _manifests_walk(root) if found is None else found
+
+
+def _manifest_rel(parent: Path, resolved_parent: Path, name, root: Path) -> str:
+    """(parent / name).resolve().relative_to(root).as_posix(), with the parent resolved once
+    per manifest: a plain file name needs one lstat (is it a symlink?) instead of a resolve."""
+    if isinstance(name, str) and name and "/" not in name and "\0" not in name and name not in (".", ".."):
+        q = resolved_parent / name
+        full = q.resolve() if os.path.islink(q) else q
+    else:
+        full = (parent / name).resolve()
+    fs, rs = full.as_posix(), root.as_posix().rstrip("/") + "/"
+    return fs[len(rs):] if fs.startswith(rs) else full.relative_to(root).as_posix()
+
+
+def artifact_manifests(root: Path, git_list: bool | None = None) -> dict[str, str]:
     """path -> sha256 for every file listed in a .artifacts.json manifest."""
     out: dict[str, str] = {}
-    for mf in root.rglob(".artifacts.json"):
-        if any(part in (".git", "target", "node_modules") for part in mf.parts):
+    for mf in manifest_paths(root, git_list):
+        if any(part in _SKIP_DIRS for part in mf.parts):
             continue
         try:
             data = json.loads(mf.read_text())
         except (OSError, ValueError):
             continue
         files = data.get("files", data) if isinstance(data, dict) else {}
+        parent = mf.parent
+        rparent = parent.resolve()
         if isinstance(files, dict):
             for fname, meta in files.items():
                 digest = meta.get("sha256") if isinstance(meta, dict) else None
                 if digest:
-                    out[(mf.parent / fname).resolve().relative_to(root).as_posix()] = digest
+                    out[_manifest_rel(parent, rparent, fname, root)] = digest
         elif isinstance(files, list):
             for meta in files:
                 if isinstance(meta, dict) and meta.get("sha256") and meta.get("name"):
-                    out[(mf.parent / meta["name"]).resolve().relative_to(root).as_posix()] = meta["sha256"]
+                    out[_manifest_rel(parent, rparent, meta["name"], root)] = meta["sha256"]
     return out
 
 
@@ -1235,6 +1299,9 @@ def _wrap(s: str, n: int) -> list[str]:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--root", type=Path, default=None, help="repository root (default: from cwd)")
+    ap.add_argument("--git-manifests", action="store_true",
+                    help="list .artifacts.json manifests with git ls-files instead of walking the "
+                         "tree (also BENCHREC_GIT=1); gitignored manifests are then not seen")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     p = sub.add_parser("init")
@@ -1306,6 +1373,8 @@ def main(argv=None) -> int:
     a = ap.parse_args(argv)
     root = (a.root or repo_root()).resolve()
     cfg = load_config(root)
+    if a.git_manifests:
+        os.environ["BENCHREC_GIT"] = "1"
     if a.cmd == "run" and a.command and a.command[0] == "--":
         a.command = a.command[1:]
     return a.fn(a, root, cfg)
