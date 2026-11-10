@@ -15,7 +15,20 @@
 //! - `naive`: the same `V`, membership as one univariate `x^{2^t} = g^{2^t}`
 //!   (Kummer only);
 //! - `null`: `S₃`'s monomial support with random coefficients and a
-//!   planted zero, under the same tower.
+//!   planted zero, under the same tower;
+//! - `multiples`: the `tower` system plus the "doubled relation"
+//!   consequences of `R = P_1 + … + P_m`, appended after the tower
+//!   equations: at `m = 2` the one polynomial
+//!   `D_1²D_2²·S₃(N(x_1)/D(x_1), N(x_2)/D(x_2), x([2]R))`; at `m ≥ 3` the
+//!   `m − 2` free unknowns `u'_k = x([2](P_1 + … + P_{k+2}))`, the links
+//!   `D(u_k)u'_k − N(u_k)` and the doubled chain cleared of the doubling
+//!   denominators (`N/D` is the doubling map on abscissae). Every appended
+//!   equation vanishes at every planted solution, so the zero set over `F_p`
+//!   is that of `tower`; only the presentation changes. The ring has
+//!   `m − 2` extra free variables at `m ≥ 3`, which the sparse tower
+//!   engines (`tower`, `sig`, `generic`) and `--wide` do not take: the
+//!   control runs under `--engine hky` and `--engine f4` only and is
+//!   skipped (with a printed line) by the others.
 //!
 //! Every tower, every Vélu map and every planted decomposition is checked
 //! before anything is measured, so a construction bug stops the run instead
@@ -903,6 +916,7 @@ enum Control {
     Ladder,
     Naive,
     Null,
+    Multiples,
 }
 
 impl Control {
@@ -912,6 +926,7 @@ impl Control {
             Control::Ladder => "ladder",
             Control::Naive => "naive",
             Control::Null => "null",
+            Control::Multiples => "multiples",
         }
     }
 }
@@ -934,6 +949,149 @@ fn summation(tower: &Tower, curve: &PrimeCurve, m: usize, n: usize, x_r: u64) ->
         eqs.push(s3(&u(k - 1), &x(k + 1), &u(k), a, b, p));
     }
     eqs.push(s3(&u(m - 3), &x(m - 1), &xr, a, b, p));
+    eqs
+}
+
+/// An argument of `s3_dbl_args`: a plain polynomial, or a fraction `N/D`
+/// whose denominator the call clears.
+enum Arg {
+    Plain(Pol),
+    Frac(Pol, Pol),
+}
+
+impl Arg {
+    fn parts(&self, n: usize, p: u64) -> (Pol, Pol) {
+        match self {
+            Arg::Plain(f) => (f.clone(), Pol::constant(n, 1, p)),
+            Arg::Frac(num, den) => (num.clone(), den.clone()),
+        }
+    }
+}
+
+/// The numerator and denominator of the doubling map on abscissae,
+/// `x([2]P) = N(x)/D(x)`: `N = x⁴ − 2a x² − 8b x + a²`,
+/// `D = 4(x³ + a x + b)`.
+fn dbl_nd(x: &Pol, a: u64, b: u64, p: u64) -> (Pol, Pol) {
+    let n = x.n;
+    let x2 = x.mul(x, p);
+    let x3 = x2.mul(x, p);
+    let x4 = x2.mul(&x2, p);
+    let num = x4
+        .sub(&x2.scale(mulm(2, a, p), p), p)
+        .sub(&x.scale(mulm(8, b, p), p), p)
+        .add(&Pol::constant(n, mulm(a, a, p), p), p);
+    let den = x3
+        .add(&x.scale(a, p), p)
+        .add(&Pol::constant(n, b, p), p)
+        .scale(4, p);
+    (num, den)
+}
+
+/// `S₃` on three arguments, multiplied by `D_i²` for every `Frac` argument
+/// `N_i/D_i` so that the result is a polynomial. With `(N_i, D_i)` the
+/// parts of each argument (`D_i = 1` for a plain one) the clearing is
+/// `(N₁D₂ − N₂D₁)²N₃² − 2[(N₁D₂ + N₂D₁)(N₁N₂ + aD₁D₂) + 2bD₁²D₂²]N₃D₃
+///  + D₃²[(N₁N₂ − aD₁D₂)² − 4b(N₁D₂ + N₂D₁)D₁D₂]`.
+fn s3_dbl_args(args: [Arg; 3], a: u64, b: u64, p: u64) -> Pol {
+    let n = match &args[0] {
+        Arg::Plain(f) | Arg::Frac(f, _) => f.n,
+    };
+    let (n1, d1) = args[0].parts(n, p);
+    let (n2, d2) = args[1].parts(n, p);
+    let (n3, d3) = args[2].parts(n, p);
+    let n1d2 = n1.mul(&d2, p);
+    let n2d1 = n2.mul(&d1, p);
+    let d1d2 = d1.mul(&d2, p);
+    let n1n2 = n1.mul(&n2, p);
+    let diff = n1d2.sub(&n2d1, p);
+    let sum = n1d2.add(&n2d1, p);
+    let t1 = diff.mul(&diff, p).mul(&n3, p).mul(&n3, p);
+    let inner = sum
+        .mul(&n1n2.add(&d1d2.scale(a, p), p), p)
+        .add(&d1d2.mul(&d1d2, p).scale(mulm(2, b, p), p), p);
+    let t2 = inner.mul(&n3, p).mul(&d3, p).scale(p - 2, p);
+    let q = n1n2.sub(&d1d2.scale(a, p), p);
+    let t3 = q
+        .mul(&q, p)
+        .sub(&sum.mul(&d1d2, p).scale(mulm(4, b, p), p), p)
+        .mul(&d3, p)
+        .mul(&d3, p);
+    t1.add(&t2, p).add(&t3, p)
+}
+
+/// How many equations the `multiples` control appends to the tower system:
+/// one at `m = 2`; at `m ≥ 3` the `m − 2` doubling links and the `m − 1`
+/// doubled chain equations.
+fn multiples_appended(m: usize) -> usize {
+    if m == 2 {
+        1
+    } else {
+        (m - 2) + (m - 1)
+    }
+}
+
+/// `x([2]R) = N(x_R)/D(x_R)` modulo `p`.
+fn double_abscissa(x_r: u64, a: u64, b: u64, p: u64) -> u64 {
+    let xr = Pol::constant(1, x_r, p);
+    let (num, den) = dbl_nd(&xr, a, b, p);
+    let (nv, dv) = (num.eval(&[0], p), den.eval(&[0], p));
+    assert!(
+        dv != 0,
+        "the multiples control: D(x_R) = 0, so R has order 2; the curve order is not odd"
+    );
+    mulm(nv, invm(dv, p), p)
+}
+
+/// The doubled-relation equations of the `multiples` control, in the
+/// variables of the `n`-variable system (`n` includes the `u'` unknowns at
+/// `m ≥ 3`).
+fn multiples_equations(
+    tower: &Tower,
+    curve: &PrimeCurve,
+    m: usize,
+    n: usize,
+    x_r: u64,
+) -> Vec<Pol> {
+    let p = curve.p;
+    let (a, b) = (curve.a, curve.b);
+    let x = |i: usize| Pol::var(n, i * tower.t).scale(tower.scale, p);
+    let c = Pol::constant(n, double_abscissa(x_r, a, b, p), p);
+    let frac = |i: usize| {
+        let (num, den) = dbl_nd(&x(i), a, b, p);
+        Arg::Frac(num, den)
+    };
+    if m == 2 {
+        let (n1, d1) = dbl_nd(&x(0), a, b, p);
+        let (n2, d2) = dbl_nd(&x(1), a, b, p);
+        return vec![s3_dbl_args(
+            [Arg::Frac(n1, d1), Arg::Frac(n2, d2), Arg::Plain(c)],
+            a,
+            b,
+            p,
+        )];
+    }
+    let u = |k: usize| Pol::var(n, m * tower.t + k);
+    let up = |k: usize| Pol::var(n, m * tower.t + (m - 2) + k);
+    let mut eqs = Vec::new();
+    for k in 0..m - 2 {
+        let (num, den) = dbl_nd(&u(k), a, b, p);
+        eqs.push(den.mul(&up(k), p).sub(&num, p));
+    }
+    eqs.push(s3_dbl_args([frac(0), frac(1), Arg::Plain(up(0))], a, b, p));
+    for k in 1..m - 2 {
+        eqs.push(s3_dbl_args(
+            [Arg::Plain(up(k - 1)), frac(k + 1), Arg::Plain(up(k))],
+            a,
+            b,
+            p,
+        ));
+    }
+    eqs.push(s3_dbl_args(
+        [Arg::Plain(up(m - 3)), frac(m - 1), Arg::Plain(c)],
+        a,
+        b,
+        p,
+    ));
     eqs
 }
 
@@ -993,7 +1151,9 @@ fn system(
         let sol = target.planted.then(|| target.xs.clone());
         return (vec![s, member(0), member(1)], n, sol, 0..0);
     }
-    let n = m * t + (m - 2);
+    let multiples = control == Control::Multiples;
+    // The multiples control adds the m − 2 doubled partial sums u'_k.
+    let n = m * t + (m - 2) + if multiples && m >= 3 { m - 2 } else { 0 };
     let mut eqs = summation(tower, curve, m, n, target.x_r);
     if control == Control::Null {
         // S₃'s support, random coefficients, planted zero: at m = 2 the one
@@ -1016,6 +1176,32 @@ fn system(
         eqs.extend(tower.equations(n, i * t, p));
     }
     let towers = towers_from..eqs.len();
+    let mut sol = target.solution.clone();
+    if multiples {
+        let before = eqs.len();
+        eqs.extend(multiples_equations(tower, curve, m, n, target.x_r));
+        assert_eq!(eqs.len() - before, multiples_appended(m));
+        if let Some(s) = sol.as_mut() {
+            let (a, b) = (curve.a, curve.b);
+            if m >= 3 {
+                // u'_k = x([2](P_1 + … + P_{k+2})) = N(u_k)/D(u_k).
+                for k in 0..m - 2 {
+                    let u = Pol::constant(1, s[m * t + k], p);
+                    let (num, den) = dbl_nd(&u, a, b, p);
+                    let (nv, dv) = (num.eval(&[0], p), den.eval(&[0], p));
+                    assert!(dv != 0, "D(u_{k}) = 0 at the planted solution");
+                    s.push(mulm(nv, invm(dv, p), p));
+                }
+            }
+            for (k, e) in eqs.iter().enumerate() {
+                assert_eq!(
+                    e.eval(s, p),
+                    0,
+                    "multiples equation {k} does not vanish at the planted solution"
+                );
+            }
+        }
+    }
     if control == Control::Ladder {
         let sol = target
             .solution
@@ -1025,7 +1211,7 @@ fn system(
             eqs.push(random_quadric(n, sol, p, rng));
         }
     }
-    (eqs, n, target.solution.clone(), towers)
+    (eqs, n, sol, towers)
 }
 
 // ── Measuring ──────────────────────────────────────────────────────
@@ -1320,7 +1506,7 @@ fn measure_hky(
     let ring = if cell.control == Control::Naive {
         HkyRing::new(p, Vec::new(), n)
     } else {
-        HkyRing::new(p, tower_ring(tower, cell.m, p).rules, cell.m - 2)
+        HkyRing::new(p, tower_ring(tower, cell.m, p).rules, n - cell.m * tower.t)
     };
     let gens: Vec<hky_fp_tower::NfPoly> = eqs
         .iter()
@@ -2073,6 +2259,7 @@ fn parse_args() -> Args {
                         "tower" => Control::Tower,
                         "null" => Control::Null,
                         "naive" => Control::Naive,
+                        "multiples" => Control::Multiples,
                         other => panic!("unknown control `{other}` (the ladder has its own flags)"),
                     })
                     .collect()
@@ -2250,6 +2437,16 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
             // The naive control has no tower to rewrite by.
             continue;
         }
+        if cell.control == Control::Multiples && !matches!(a.engine, Engine::F4 | Engine::Hky) {
+            // The extra free variables u'_k are not in the tower engines' rings.
+            eprintln!(
+                "-- multiples runs under --engine f4 and --engine hky only; skipping {} m={} t={}",
+                cell.kind.name(),
+                cell.m,
+                cell.t
+            );
+            continue;
+        }
         if a.targets.as_ref().is_some_and(|ts| !ts.contains(&k)) {
             continue;
         }
@@ -2359,6 +2556,10 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
             "staircase_at_stop": r.staircase_at_stop,
             "planted_ok": r.planted_ok,
         });
+        if cell.control == Control::Multiples {
+            row["multiples"] = json!(cell.m);
+            row["appended"] = json!(multiples_appended(cell.m));
+        }
         if let (Some(obj), Some(extra)) = (row.as_object_mut(), r.extra.as_object()) {
             for (k, v) in extra {
                 obj.insert(k.clone(), v.clone());
@@ -2650,6 +2851,7 @@ fn main() {
                     Control::Tower => true,
                     Control::Null => m == 2 || a.null_chain,
                     Control::Naive => m == 2 && kind == Kind::Kummer,
+                    Control::Multiples => true,
                     Control::Ladder => false,
                 })
                 .collect();
@@ -2805,5 +3007,111 @@ mod tests {
         let (tw, _, _, _) = system(Control::Tower, &tower, &curve, 3, &target, 1, &mut rng);
         assert_ne!(eqs[0].terms, tw[0].terms);
         assert_ne!(eqs[1].terms, tw[1].terms);
+    }
+
+    /// `15·2^27 + 1`.
+    const BB_PRIME: u64 = 2_013_265_921;
+
+    #[test]
+    fn doubling_formula_matches_curve_arithmetic() {
+        let p = BB_PRIME;
+        let mut rng = StdRng::seed_from_u64(0xD0B1);
+        let mut checked = 0;
+        while checked < 20 {
+            let curve = PrimeCurve {
+                p,
+                a: rng.gen_range(1..p),
+                b: rng.gen_range(1..p),
+            };
+            let pt = random_point(&curve, &mut rng);
+            if pt.infinity {
+                continue;
+            }
+            let mut ops = GroupOps::default();
+            let two = curve.add(&mut ops, pt, pt);
+            let xr = Pol::constant(1, pt.x, p);
+            let (num, den) = dbl_nd(&xr, curve.a, curve.b, p);
+            let (nv, dv) = (num.eval(&[0], p), den.eval(&[0], p));
+            if dv == 0 {
+                assert!(two.infinity);
+                continue;
+            }
+            assert_eq!(mulm(nv, invm(dv, p), p), two.x);
+            assert_eq!(double_abscissa(pt.x, curve.a, curve.b, p), two.x);
+            checked += 1;
+        }
+    }
+
+    /// A Kummer cell with a planted target, for the `multiples` tests.
+    fn multiples_cell(m: usize, t: usize, seed: u64) -> (Tower, PrimeCurve, Target, StdRng) {
+        let p = BB_PRIME;
+        let mut rng = StdRng::seed_from_u64(seed);
+        let tower = kummer(p, t, &mut rng);
+        let (curve, on) = target_curve(p, &tower, m, &mut rng);
+        let target = loop {
+            if let Some(tg) = plant(&curve, &tower, m, &on, &mut rng) {
+                break tg;
+            }
+        };
+        (tower, curve, target, rng)
+    }
+
+    fn check_multiples_vanish(m: usize, t: usize, seed: u64) {
+        let (tower, curve, target, mut rng) = multiples_cell(m, t, seed);
+        let (tw, n_tw, _, _) = system(Control::Tower, &tower, &curve, m, &target, 1, &mut rng);
+        let (eqs, n, sol, _) = system(Control::Multiples, &tower, &curve, m, &target, 1, &mut rng);
+        let sol = sol.expect("planted");
+        assert_eq!(sol.len(), n);
+        assert_eq!(eqs.len() - tw.len(), multiples_appended(m));
+        let expect = if m == 2 { 1 } else { (m - 2) + (m - 1) };
+        assert_eq!(eqs.len() - tw.len(), expect);
+        assert_eq!(n, n_tw + if m >= 3 { m - 2 } else { 0 });
+        for (k, e) in eqs.iter().enumerate() {
+            assert_eq!(e.eval(&sol, curve.p), 0, "equation {k}");
+        }
+    }
+
+    #[test]
+    fn multiples_vanish_at_planted_solution_m2() {
+        for seed in 1..=3 {
+            check_multiples_vanish(2, 3, seed);
+        }
+    }
+
+    #[test]
+    fn multiples_vanish_at_planted_solution_m4() {
+        for seed in 1..=3 {
+            check_multiples_vanish(4, 3, seed);
+        }
+    }
+
+    #[test]
+    fn multiples_vanish_at_planted_solution_m3() {
+        check_multiples_vanish(3, 3, 7);
+    }
+
+    #[test]
+    fn multiples_rows_match_tower_on_random_targets_prefix() {
+        for m in [2usize, 4] {
+            let p = BB_PRIME;
+            let mut rng = StdRng::seed_from_u64(0x77 + m as u64);
+            let tower = kummer(p, 3, &mut rng);
+            let (curve, _) = target_curve(p, &tower, m, &mut rng);
+            let target = random_target(&curve, &mut rng);
+            let (tw, _, _, _) = system(Control::Tower, &tower, &curve, m, &target, 1, &mut rng);
+            let (mu, n, sol, _) =
+                system(Control::Multiples, &tower, &curve, m, &target, 1, &mut rng);
+            assert!(sol.is_none());
+            assert_eq!(mu.len(), tw.len() + multiples_appended(m));
+            for (k, e) in tw.iter().enumerate() {
+                // Same terms, padded to the larger ring's variable count.
+                assert_eq!(e.terms.len(), mu[k].terms.len(), "equation {k}");
+                for (ex, c) in &e.terms {
+                    let mut padded = ex.clone();
+                    padded.resize(n, 0);
+                    assert_eq!(mu[k].terms.get(&padded), Some(c), "equation {k}");
+                }
+            }
+        }
     }
 }
