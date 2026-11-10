@@ -38,3 +38,17 @@ Prior that any solver reaches `e ≤ 1` (the root-solving baseline): 0.005; `e <
 ## 5. Route and outputs
 Local host; counts. `results/run.json`, README, SVG (log evaluations vs log B per solver with the
 two baselines), REPORT.pdf, session log.
+
+## 6. Disclosure and amendment before the full run
+Predictions and rules above were committed (`c8bbc80e1a`) before the tool existed. The
+implementing agent ran `--quick` (n = 12, 16; 5 instances; uniform and sa_4B): medians
+620 / 20,544 (uniform), 1,586 / 167,267 (sa_4B), root-solving baseline 6 / 43; lag-1
+autocorrelation inside the random band; not committed, not scored. Conventions made precise:
+`p` is the largest prime `≡ 3 (mod 4)` below `2^n` (prime_fast's recipe; the generator reproduces
+the committed rungs at n = 16, 20, 24, 28); P3 holds iff `|e_uniform − 2| ≤ 0.25`; P2 in-band
+means within mean ± 3 sd of the random-landscape walks; a `c = 0` state whose abscissae do not
+lift to a verified decomposition is counted as spurious and the search continues; exponent fits
+use only sizes with an exactly known median (fewer than half censored), reported over all `n` and
+over `n ≥ 20`. **Amendment:** the evaluation cap is `min(50·B², 2·10⁹)` (at n = 28 the protocol's
+`50·B²` would be `1.3·10¹⁰` per solver-instance; a solver censored at `2·10⁹` already has
+`e > 1.9` there, which decides rule 4 the same way). No prediction or rule changed.
