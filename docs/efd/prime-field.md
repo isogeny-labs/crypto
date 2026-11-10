@@ -302,7 +302,12 @@ two. Costs from a fallback program are record costs, not EFD's optimized counts.
   for `2dik` that record was observed not to reproduce the short-Weierstrass
   law induced by its own `toweierstrass` map at `p = 109`, so treat that
   family as record-faithful rather than independently group-law-verified.
-- Nothing here changes default arithmetic, routing or any rho walk.
+- The catalogue itself does not change default arithmetic, routing or any rho
+  walk.  The opt-in index-calculus integration is
+  [`cryptanalysis::efd_representations`](../../src/cryptanalysis/efd_representations.rs);
+  it converts every model to the short-Weierstrass S3 curve and accepts any of
+  the 33 charts through `ic prime --efd-model`.  See
+  [`ic-representations.md`](ic-representations.md).
 
 ## Reproducing
 

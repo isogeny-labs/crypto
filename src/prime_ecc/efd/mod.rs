@@ -16,6 +16,7 @@ use serde::Deserialize;
 use std::collections::BTreeMap;
 use std::sync::OnceLock;
 
+mod bridge;
 mod checked;
 mod formats;
 pub mod legacy;
@@ -23,6 +24,7 @@ mod program;
 #[cfg(test)]
 mod tests;
 
+pub use bridge::WeierstrassBridge;
 pub use checked::{weierstrass_operation, CheckedPoint, ExecutionPath};
 pub use formats::Projection;
 pub use program::{OperationCounts, Program, ProgramSource};
@@ -268,7 +270,7 @@ pub(super) fn check_field(modulus: &BigUint, inputs: &Bindings) -> Result<()> {
 
 /// Square root in F_p, if one exists. Uses the `p = 3 mod 4` shortcut when it
 /// applies and Tonelli--Shanks otherwise. The input modulus must be prime.
-pub(super) fn sqrt(a: &FieldElement) -> Option<FieldElement> {
+pub(crate) fn sqrt(a: &FieldElement) -> Option<FieldElement> {
     let p = &a.modulus;
     if a.is_zero() {
         return Some(a.clone());
