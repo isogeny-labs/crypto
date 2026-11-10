@@ -16,7 +16,7 @@ Re-measure inc (ic.pipeline wwalk x=0.9, the ledger incumbent wwalkGg-x09-sr-n2)
 - 2026-11-10: AMENDMENT-1 frozen (PROTOCOL.json v2, protocol_sha256 d348123a…81d6, commit ff23963210): counted-only, local L0 sessions, replicates A3/B3 (specs spec-tm1514-A3/B3.json). Replicate A (EKS run 42269476702, exit 23) is a dry run; A2/B2 withdrawn.
 - Binaries: scratchpad tm1514/bin (ecbench b8570e7f…, tm1514_analyze d0412039…).
 - Owner approved the run and a USD 5 ceiling (2026-11-06).
-- Nothing launched at checkpoint time.
+- 2026-11-10 17:29–17:37Z: A3/B3 ran locally (ECBS1h250938713613, ECBS1hdd033a38d490), both audits ok, analysis done (result.json c7c473de…d236). Result landed in REPORT.md/PDF, benchmarks/20261110-tm1514-recheck, records closed, treatise updated (claim PCC-20261110-97c3b6, unverified).
 
 ## Next steps
 1. Run A3 and B3 locally (binaries in the session scratchpad tm1514/bin, sha256 in its SHA256SUMS) into research/tm1514_recheck_20261106/sessions/A3 and sessions/B3, each under `tools/benchrec.py run`.
