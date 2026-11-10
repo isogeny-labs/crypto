@@ -1,12 +1,12 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261109T2016Z-pkm-fd-pfd-g3c",
+  "latest_record": "20261110T0357Z-curve25519-engine-items-k24",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 75,
-    "open": 2
+    "measured": 77,
+    "open": 3
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -421,6 +421,127 @@
     },
     {
       "better": "lower",
+      "first": 1.875,
+      "latest": 1.875,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.207341
+      },
+      "metric": "cost_twcj_cv0",
+      "points": [
+        {
+          "commit": "545749ac7d08",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.207341
+          },
+          "n": 512,
+          "record": "20261110T0357Z-curve25519-engine-items-k20",
+          "reference": 1.553,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=20: wwalk cv=0 costs 0.879x [0.876,0.882] the target-in-walk arm (exactly the verification ledger); chained rho set-up costs 1.53x rho-neg (dependent jumps lengthen the walk), rejected as reference",
+          "value": 1.875
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k20",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.532,
+      "latest": 1.532,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_chained_over_rhoneg_w0",
+      "points": [
+        {
+          "commit": "545749ac7d08",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261110T0357Z-curve25519-engine-items-k20",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.402,
+            1.673
+          ],
+          "summary": "k=20: wwalk cv=0 costs 0.879x [0.876,0.882] the target-in-walk arm (exactly the verification ledger); chained rho set-up costs 1.53x rho-neg (dependent jumps lengthen the walk), rejected as reference",
+          "value": 1.532
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k20",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.207,
+      "latest": 1.207,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.207
+      },
+      "metric": "ratio_cv0_over_rhoneg_w0",
+      "points": [
+        {
+          "commit": "545749ac7d08",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.207
+          },
+          "n": 8,
+          "record": "20261110T0357Z-curve25519-engine-items-k20",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            1.172,
+            1.243
+          ],
+          "summary": "k=20: wwalk cv=0 costs 0.879x [0.876,0.882] the target-in-walk arm (exactly the verification ledger); chained rho set-up costs 1.53x rho-neg (dependent jumps lengthen the walk), rejected as reference",
+          "value": 1.207
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k20",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.879,
+      "latest": 0.879,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_cv0_over_twcj_w0",
+      "points": [
+        {
+          "commit": "545749ac7d08",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261110T0357Z-curve25519-engine-items-k20",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.876,
+            0.882
+          ],
+          "summary": "k=20: wwalk cv=0 costs 0.879x [0.876,0.882] the target-in-walk arm (exactly the verification ledger); chained rho set-up costs 1.53x rho-neg (dependent jumps lengthen the walk), rejected as reference",
+          "value": 0.879
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k20",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
       "first": 1.3581,
       "latest": 1.3581,
       "latest_derived": {
@@ -539,6 +660,127 @@
       ],
       "problem": "ecdlp:curve25519-family-k20",
       "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.512,
+      "latest": 1.512,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.247525
+      },
+      "metric": "cost_twcj_cv0",
+      "points": [
+        {
+          "commit": "545749ac7d08",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.247525
+          },
+          "n": 512,
+          "record": "20261110T0357Z-curve25519-engine-items-k24",
+          "reference": 1.212,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=24: wwalk cv=0 costs 0.949x [0.948,0.951] the target-in-walk arm (exactly the verification ledger); chained rho set-up costs 2.74x rho-neg (dependent jumps lengthen the walk), rejected as reference",
+          "value": 1.512
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k24",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 2.738,
+      "latest": 2.738,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_chained_over_rhoneg_w0",
+      "points": [
+        {
+          "commit": "545749ac7d08",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261110T0357Z-curve25519-engine-items-k24",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.583,
+            2.903
+          ],
+          "summary": "k=24: wwalk cv=0 costs 0.949x [0.948,0.951] the target-in-walk arm (exactly the verification ledger); chained rho set-up costs 2.74x rho-neg (dependent jumps lengthen the walk), rejected as reference",
+          "value": 2.738
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k24",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.248,
+      "latest": 1.248,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.248
+      },
+      "metric": "ratio_cv0_over_rhoneg_w0",
+      "points": [
+        {
+          "commit": "545749ac7d08",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.248
+          },
+          "n": 8,
+          "record": "20261110T0357Z-curve25519-engine-items-k24",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            1.179,
+            1.32
+          ],
+          "summary": "k=24: wwalk cv=0 costs 0.949x [0.948,0.951] the target-in-walk arm (exactly the verification ledger); chained rho set-up costs 2.74x rho-neg (dependent jumps lengthen the walk), rejected as reference",
+          "value": 1.248
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k24",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9494,
+      "latest": 0.9494,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_cv0_over_twcj_w0",
+      "points": [
+        {
+          "commit": "545749ac7d08",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261110T0357Z-curve25519-engine-items-k24",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.948,
+            0.951
+          ],
+          "summary": "k=24: wwalk cv=0 costs 0.949x [0.948,0.951] the target-in-walk arm (exactly the verification ledger); chained rho set-up costs 2.74x rho-neg (dependent jumps lengthen the walk), rejected as reference",
+          "value": 0.9494
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k24",
+      "unit": "ratio"
     },
     {
       "better": "lower",

@@ -52,7 +52,7 @@ for ax, k in zip(axes[1:], ('k20', 'k24')):
         ax.text(i, b + 0.03, f'{b:.3f}', ha='center', va='bottom', fontsize=7.5, weight='bold')
     ax.set_xticks(range(len(names))); ax.set_xticklabels(['rho-neg', 'rho-neg\nchained', 'twcj', 'twcj\ncv=0'], fontsize=8)
     ax.set_title(f'k = {k[1:]}: phases, mean over measured runs (sqrt(r) units, w = 0)', fontsize=8.5)
-    ax.set_ylim(0, 2.6)
+    ax.set_ylim(0, 3.6)
 h, l = axes[1].get_legend_handles_labels()
 seen = {}
 for hh, ll in zip(h, l):
