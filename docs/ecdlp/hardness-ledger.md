@@ -86,14 +86,14 @@ over it is the remaining model-building step.
 | Claim | Role | Status |
 | --- | --- | --- |
 | BSGS solves DLP in `O(√n)` time and memory | Baseline square-root attack | Implemented; **correctness formal** (`Algorithms.lean`): decomposition, match existence, candidate correctness, collision-free table. The `O(√n)` time/memory bound itself is a cost premise. |
-| Pollard rho: expected `√(πn/2)` group operations | Best generic attack in practice | Implemented and measured; **algebraic correctness formal** (`Rho.lean`): finite-orbit collision, Floyd's meeting, collision-to-relation and DLP recovery. The expected-step bound remains a probability premise. |
+| Pollard rho: expected `√(πn/2)` group operations | Best generic attack in practice | Implemented and measured; **algebraic correctness formal** (`Rho.lean`): finite-orbit collision, Floyd's meeting, collision-to-relation and DLP recovery. The expected-step bound reduces to `Birthday.lean`'s `t(t-1)/N` union bound; the independence model for the rho walk remains a premise. |
 | Pohlig–Hellman reduces DLP to prime-power order subgroups and CRT | Smooth-order curves are easy | Implemented; **subgroup step and CRT assembly formal** (`Algorithms.lean`): `d·a` has order `n/d`, projection to the quotient instance, coprime CRT combination, reconstruction modulo `n`. The `∑ √(pᵢ^{eᵢ})` cost bound is a cost premise. |
 | Index calculus is subexponential when a smooth factor base exists | Breaks high-genus / small-characteristic settings | Implemented for the repo's IC campaigns; cost model empirical |
 
 ## Layer 3b — algorithm correctness (formal)
 
 `lean/Algorithms.lean` (Mathlib project; the project gate reports
-`PASS 119 thm 0 trusted`) proves that the two standard generic reductions
+`PASS 123 thm 0 trusted`) proves that the two standard generic reductions
 return the right answer, without assuming anything about cost.
 
 | Theorem | Statement |
@@ -117,7 +117,7 @@ cost/probability model exists.
 
 ## Layer 3c — Pollard rho correctness (formal)
 
-`lean/Rho.lean` (`PASS 119 thm 0 trusted` for the whole project) proves the
+`lean/Rho.lean` (`PASS 123 thm 0 trusted` for the whole project) proves the
 deterministic part of the rho attack.
 
 | Theorem | Statement |
@@ -185,6 +185,19 @@ injective and computable.  `FormalLog.lean` supplies the formal logarithm
 identity for the multiplicative model; the elliptic formal group and its
 identification with `pZ_p` remain open.
 
+## Layer 3d — birthday union bound (formal)
+
+`lean/Birthday.lean` proves the finite counting fact behind both rho and the
+generic-group bound.
+
+| Theorem | Statement |
+| --- | --- |
+| `card_fiber` | For `i ≠ j`, exactly `N^(t-1)` tuples have `f i = f j` |
+| `collision_card_le` | At most `t(t-1) N^(t-1)` of the `N^t` tuples contain a collision |
+
+Dividing by `N^t` gives the birthday bound `t(t-1)/N`; the probabilistic
+interpretation (independent uniform draws) is the remaining model premise.
+
 ## Layer 4 — curve-specific attacks (each attacks a hypothesis, not the group)
 
 | Attack | Hypothesis it breaks | Status |
@@ -216,7 +229,7 @@ separately; a break here breaks deployments, not ECDLP.
    doubling) remains to be connected to the same interface.
 3. **Done:** BSGS and Pohlig–Hellman correctness in `Algorithms.lean`, and the
    deterministic part of Pollard rho in `Rho.lean` (Mathlib project,
-   `PASS 119 thm 0 trusted`): baby/giant match equivalence, existence, candidate
+   `PASS 123 thm 0 trusted`): baby/giant match equivalence, existence, candidate
    correctness, collision-free baby table, coprime CRT combination, PH
    subgroup order, projection and reconstruction; finite-orbit collision,
    Floyd meeting, collision relation and DLP recovery. Only the cost/success
