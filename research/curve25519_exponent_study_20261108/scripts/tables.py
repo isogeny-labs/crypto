@@ -27,7 +27,10 @@ for key, g in A.items():
         c = C.get((k, r["d"], gi), {})
         cov = c.get("covered_points", {})
         T = f"{r['T']:.4g}" if r["T"] else "-"
-        st = "censored (OOM at 3.5 GB)" if r["capped"] else "complete"
+        st = "complete"
+        if r["capped"]:
+            cf = json.load(open(os.path.join(D, "cells", f"{key.rsplit('_g', 1)[0]}_d{r['d']}_g{gi}.json")))
+            st = "censored (OOM at 3.5 GB)" if cf.get("failure") else "censored (1200 s cap)"
         out.append(f"| {key} | {r['d']} | {L(r['d'])} | {c.get('columns','-')} | {c.get('base_points','-')} | {cov.get('m2','-')} | {cov.get('m3','-')} | {T} | {r['sd_max'] or '-'} | {r['max_cols'] or '-'} | {st} |")
     ok = [r for r in g["rows"] if not r["capped"] and r["T"]]
     for l in sorted({L(r["d"]) for r in ok}):
