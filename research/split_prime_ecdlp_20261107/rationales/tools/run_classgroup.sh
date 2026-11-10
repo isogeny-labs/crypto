@@ -21,8 +21,13 @@ for lab in "${labels[@]}"; do
   line="$(grep -P "^${lab}\t" "$INPUTS")"
   p="$(printf '%s' "$line" | cut -f6)"
   n="$(printf '%s' "$line" | cut -f8)"
+  # the fundamental discriminant's prime factors (PARI, facts stage) spare the binary a
+  # factorisation Pollard-Brent cannot do at 226 bits and above; verified by the binary
+  dkline="$(grep -P "^${lab}\t" "$OUT/dk_table.tsv" || true)"
+  extra=()
+  if [ -n "$dkline" ]; then extra=(--disc-primes "$(printf '%s' "$dkline" | cut -f4)" --conductor "$(printf '%s' "$dkline" | cut -f3)"); fi
   echo "$lab: starting $(date -u +%FT%TZ)"
-  "$BIN" --label "$lab" --p "$p" --n "$n" --threads "${THREADS:-4}" --seed "${SEED:-1}" \
+  "$BIN" --label "$lab" --p "$p" --n "$n" "${extra[@]}" --threads "${THREADS:-4}" --seed "${SEED:-1}" \
     ${BOUND:+--bound "$BOUND"} ${HALF:+--half-length "$HALF"} ${SUPPORT:+--support "$SUPPORT"} \
     --checkpoint "$OUT/rust_${lab}.ckpt" --sub-bounds 50,163,691,2000 \
     --out "$OUT/rust_${lab}.json" 2>> "$OUT/rust_${lab}.log" > /dev/null

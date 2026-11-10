@@ -14,7 +14,8 @@
 //! conductor is reported). Output: one JSON object (stdout and/or --out).
 
 use crypto_lib::isogeny::class_group_subexp::{
-    compute, factor_big, lattice_index, log2_big, order_checked, LinAlg, SieveParams, Splitting,
+    compute, factor_big, is_probable_prime_pub, lattice_index, log2_big, order_checked, LinAlg,
+    SieveParams, Splitting,
 };
 use num_bigint::{BigInt, BigUint};
 use num_integer::Integer;
@@ -90,7 +91,62 @@ fn main() {
         (&t * &t - BigInt::from(4) * &p, Some(p), Some(n))
     };
     assert!(delta.is_negative(), "discriminant must be negative");
-    let (dk, conductor, delta_factors) = fundamental_part(&delta);
+    // The fundamental discriminant needs the squarefree part of Δ. For the
+    // 226–258-bit discriminants Pollard–Brent cannot split a cofactor with two
+    // large prime factors, so the prime factors of D_K may be supplied
+    // (--disc-primes, from PARI's `factor`, see data/cl/facts.jsonl) together
+    // with --conductor; they are verified (each prime by Miller–Rabin, the
+    // product against |D_K|) rather than trusted.
+    let (dk, conductor, delta_factors) = match (opts.get("disc-primes"), opts.get("conductor")) {
+        (Some(list), cond) => {
+            let f: BigUint = cond.map_or(BigUint::one(), |c| parse_big(c).magnitude().clone());
+            let dk = -(delta.magnitude() / (&f * &f));
+            let dk = BigInt::from_biguint(num_bigint::Sign::Minus, dk);
+            let primes: Vec<BigUint> = list
+                .split(',')
+                .filter(|t| !t.trim().is_empty())
+                .map(|t| parse_big(t).magnitude().clone())
+                .collect();
+            let mut prod = BigUint::one();
+            for q in &primes {
+                assert!(
+                    is_probable_prime_pub(q),
+                    "--disc-primes entry is not prime: {q}"
+                );
+                prod *= q;
+            }
+            let mag = dk.magnitude().clone();
+            // |D_K| is squarefree, or 4 times a squarefree odd number, or 8 times one
+            let ok = prod == mag
+                || &prod * BigUint::from(2u32) == mag
+                || &prod * BigUint::from(4u32) == mag;
+            assert!(
+                ok,
+                "--disc-primes do not multiply to |D_K| (up to the power of 2)"
+            );
+            let mut factors: Vec<(BigUint, u32)> =
+                primes.iter().map(|q| (q.clone(), 1u32)).collect();
+            let two = BigUint::from(2u32);
+            let v2 = mag.trailing_zeros().unwrap_or(0) as u32;
+            if v2 > 0 && !primes.contains(&two) {
+                factors.push((two.clone(), v2));
+            }
+            factors.sort();
+            // delta_factors are those of Δ = f² D_K: add the conductor's primes with exponent 2
+            let (ff, complete) = factor_big(&f);
+            assert!(complete, "conductor did not factor");
+            for (q, e) in ff {
+                if let Some(entry) = factors.iter_mut().find(|(p, _)| *p == q) {
+                    entry.1 += 2 * e;
+                } else {
+                    factors.push((q, 2 * e));
+                }
+            }
+            factors.sort();
+            (dk, f, factors)
+        }
+        _ => fundamental_part(&delta),
+    };
     let t_factor = t0.elapsed().as_secs_f64();
 
     let bits = dk.magnitude().bits();

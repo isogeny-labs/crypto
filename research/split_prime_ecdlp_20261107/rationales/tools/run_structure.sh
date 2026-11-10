@@ -16,7 +16,7 @@ for res in "$OUT"/rust_p*.json; do
   h="$(grep -o '"h": [0-9]*' "$res" | head -1 | cut -d' ' -f2)"
   line="$(grep -P "^${lab}\t" "$INPUTS")"
   p="$(printf '%s' "$line" | cut -f6)"; n="$(printf '%s' "$line" | cut -f8)"
-  "$BIN" --label "$lab" --p "$p" --n "$n" --h "$h" --bound 2000 --sub-bounds 50,163,691,2000 \
+  "$BIN" --label "$lab" --p "$p" --n "$n" "${extra[@]}" --h "$h" --bound 2000 --sub-bounds 50,163,691,2000 \
     --out "$OUT/structure_${lab}.json" > /dev/null 2>> "$OUT/structure_${lab}.log"
   echo "$lab: $(grep -o '"two_rank_genus": [0-9]*\|"smallest_split_prime_bound_generating": [0-9a-z]*' "$OUT/structure_${lab}.json" | tr '\n' ' ')"
 done

@@ -1486,6 +1486,12 @@ pub fn analytic_log2_h(d: &BigInt, bound: u64) -> (f64, f64) {
     (ln_h / std::f64::consts::LN_2, log_l.exp())
 }
 
+/// Miller–Rabin with the first twelve prime bases (deterministic below 3.3·10^24,
+/// probabilistic above; used only to check supplied factorisations).
+pub fn is_probable_prime_pub(n: &BigUint) -> bool {
+    is_probable_prime_big(n)
+}
+
 fn is_probable_prime_big(n: &BigUint) -> bool {
     if *n < BigUint::from(2u32) {
         return false;
