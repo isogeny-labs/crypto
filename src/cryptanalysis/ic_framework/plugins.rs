@@ -2554,7 +2554,16 @@ impl<G: CountedGroup> DecompositionOracle<G> for WSumOracle<G::Elt> {
 /// collision is the row `du·s1 + db·log Q = −dz`, the walk stops at the
 /// first two independent rows, and they are handed to the loop with the
 /// first trial (probes run only if the cap `3T` was reached below rank 2);
-/// `cj=1` (needs `tw=1`) builds the jumps by chained additions.
+/// `cj=1` (needs `tw=1` or `tw=2`) builds the jumps by chained additions.
+/// With `tw=2` (needs `g=1`, `grow=2` and a TWO-seed base) the target walk
+/// carries both seeds: jumps `[α]P1 + [α']P2 + [γ]G + [β]Q`, every collision
+/// is the row `du1·s1 + du2·s2 + db·log Q = −dz` (rows whose seed part is
+/// zero modulo `r` are dropped), the walk stops at rank 3, cap `3T`.
+/// `lazy=1` (needs `g=1`; for the walk table, `tw=1` and `tw=2`) skips the
+/// per-collision recomputation: a row is kept on its exact key match.  The
+/// pipeline's own `[d]G = Q` check still runs and is charged; a target walk
+/// also runs that check once itself when its rows reach full rank, and on a
+/// failure recomputes (charged) and drops the bad rows and keeps walking.
 /// The verified free rows are
 /// handed to the relation loop once, with the first trial, as
 /// `Relation::Row { a: 0, b: 0 }`.  A probe hit `±E_t` is a
@@ -2625,8 +2634,9 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
             ("grow", "1: after T entries keep extending the walk (charged) until the first verified free row, at most 2T entries; 2 (needs g=1): until two independent verified rows pin both seed logs, at most 3T (default 0)"),
             ("g", "1: every jump also carries [γ_j]G, γ_j uniform in [1, r), and entries track z mod r; a collision is the affine row du·s1 + dv·s2 = −dz (default 0)"),
             ("seed", "seed of the jump and step stream, mixed with the two seeds' keys (default 0)"),
-            ("tw", "1 (needs g=1, grow=2 and a one-seed base): the target inside the walk, jumps [α]P1 + [γ]G + [β]Q, every collision a row du·s1 + db·log Q = −dz, stop at the first two independent rows, cap 3T (default 0)"),
-            ("cj", "1 (needs tw=1): build the jumps by chained additions from two base combinations [γ]G + [β]Q instead of independent scalar multiplications (default 0)"),
+            ("tw", "1 (needs g=1, grow=2 and a one-seed base): the target inside the walk, jumps [α]P1 + [γ]G + [β]Q, every collision a row du·s1 + db·log Q = −dz, stop at the first two independent rows, cap 3T; 2 (needs g=1, grow=2 and a two-seed base in distinct columns): jumps [α]P1 + [α']P2 + [γ]G + [β]Q, every collision a row du1·s1 + du2·s2 + db·log Q = −dz (rows with du1 = du2 = 0 mod r dropped), stop at rank 3, cap 3T (default 0)"),
+            ("cj", "1 (needs tw=1 or tw=2): build the jumps by chained additions from two base combinations [γ]G + [β]Q (the seed parts from the doubled multiples) instead of independent scalar multiplications (default 0)"),
+            ("lazy", "1 (needs g=1): skip the per-collision recomputation and keep each row on its exact key match (sign bit stored beside the entry); the walk, its stream and its collisions are identical, only verify_ops disappears.  The pipeline's [d]G = Q check still runs, charged.  With tw=1|2 the build also runs that check itself once when the rows reach full rank (charged as tw_lazy_check_*); on a failure it recomputes all collisions (charged), drops the rows that fail and resumes the walk.  With the walk table a wrong row is rejected by the pipeline's check (the run ends unverified; no in-run recovery) (default 0)"),
         ]
     }
 
@@ -2662,24 +2672,36 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
             g_jumps: params.flag("g"),
             grow,
         };
-        let (tw, cj) = (params.flag("tw"), params.flag("cj"));
-        if cj && !tw {
-            return Err("wwalk: cj=1 needs tw=1".into());
+        let tw = match params.get("tw") {
+            None | Some("0" | "false" | "no") => 0usize,
+            Some("1" | "true" | "yes") => 1,
+            Some("2") => 2,
+            Some(v) => return Err(format!("wwalk: tw is 0, 1 or 2, not `{v}`")),
+        };
+        let (cj, lazy) = (params.flag("cj"), params.flag("lazy"));
+        if cj && tw == 0 {
+            return Err("wwalk: cj=1 needs tw=1 or tw=2".into());
         }
-        if tw {
+        if lazy && !opts.g_jumps {
+            return Err("wwalk: lazy=1 needs g=1".into());
+        }
+        if tw > 0 {
             if !opts.g_jumps || grow != 2 {
-                return Err("wwalk: tw=1 needs g=1 and grow=2".into());
+                return Err(format!("wwalk: tw={tw} needs g=1 and grow=2"));
             }
-            let walk = TargetWalk::build(
+            let walk = TargetWalk::build_ext(
                 ctx.group,
                 ctx.generator,
                 ctx.target,
                 fb,
                 ctx.r,
+                ctx.cofactor,
                 x,
                 jumps,
                 cj,
                 seed,
+                lazy,
+                tw,
             )?;
             self.free_pending = true;
             self.free_checked = walk.collisions.len() as u64;
@@ -2691,7 +2713,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
             return Ok(());
         }
         self.tw_table = None;
-        let table = WalkTable::build_with(
+        let table = WalkTable::build_lazy(
             ctx.group,
             Some(ctx.generator),
             fb,
@@ -2700,6 +2722,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
             jumps,
             opts,
             seed,
+            lazy,
         )?;
         self.free_pending = true;
         self.free_checked = table.collisions.len() as u64;
@@ -2756,8 +2779,9 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
                     b: row.b,
                 }));
             }
-            // Two independent rows pin log Q: no probe is needed.
-            if walk.rank < 2 {
+            // Full rank (two independent rows with one seed, three with
+            // two) pins log Q: no probe is needed.
+            if walk.rank < walk.need() {
                 if let Some((sign, u, z, be)) =
                     walk.probe(ctx.group, ops, &mut counters.lookups, point)
                 {
@@ -2808,6 +2832,15 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
         m.insert("probe_hits".to_string(), self.probe_hits);
         if let Some(walk) = &self.tw_table {
             m.extend(walk.breakdown_counters());
+        }
+        if let Some(table) = &self.table {
+            if table.lazy {
+                m.insert("wwalk_lazy".to_string(), 1);
+                m.insert(
+                    "wwalk_lazy_certified_rows".to_string(),
+                    table.lazy_certified,
+                );
+            }
         }
         m
     }
@@ -5690,6 +5723,204 @@ mod wwalk_pipeline_tests {
             )
             .unwrap_err();
             assert!(err.contains(needle), "{spec}: {err}");
+        }
+    }
+
+    /// What one pipeline run of a `wwalk` spec leaves, for the pairings
+    /// below.
+    struct Pair {
+        verified: bool,
+        gae: f64,
+        verify_gae: f64,
+        ctr: BTreeMap<String, u64>,
+        trials: u64,
+        steps: u64,
+    }
+
+    fn run_pair(spec: &str, size: u64, targets: Targets, s: u64) -> Pair {
+        let inst = instance();
+        let planted = 12345 + 7919 * s;
+        let mut ops = GroupOps::default();
+        let q = inst.curve.mul(&mut ops, inst.generator_point(), planted);
+        let base = Params::parse_spec(&format!("prime-projected-abscissa:size={size},scan_cap=32"))
+            .unwrap()
+            .1;
+        let (name, oracle_params) = Params::parse_spec(&format!("{spec},seed={s}")).unwrap();
+        let ps = PipelineSpec {
+            factor_base: "prime-projected-abscissa".into(),
+            factor_base_params: base,
+            oracle: name,
+            oracle_params,
+            targets,
+            linalg: "incremental-gauss".into(),
+            max_trials: 5_000_000,
+            seed: s,
+            ..Default::default()
+        };
+        let mut oracle = WWalkOracle::<PrimePoint>::new();
+        let rep = run_pipeline(
+            &ctx(&inst, q),
+            &ps,
+            &PrimeProjectedAbscissaBase { instance: &inst },
+            &mut oracle,
+            planted,
+            &Calibration {
+                ns_per_add: 1.0,
+                ns_per_double: 1.0,
+                ..Default::default()
+            },
+            None,
+        )
+        .unwrap();
+        let ctr = DecompositionOracle::<PrimeCurve>::relation_counters(&oracle);
+        let steps = oracle
+            .target_walk()
+            .map(|w| w.steps)
+            .or_else(|| oracle.table().map(|t| t.steps))
+            .unwrap();
+        Pair {
+            verified: rep.verified && rep.recovered == Some(planted),
+            gae: rep.total_gae,
+            verify_gae: rep.verify.gae,
+            ctr,
+            trials: rep.decomposition.targets_tried,
+            steps,
+        }
+    }
+
+    /// `tw=2` (size-2 `prime-projected-abscissa` base) and `lazy=1`, end to
+    /// end on `train-k32` (cofactor 8): the planted log is recovered and
+    /// verified; a rank-3 walk solves on the first trial without a probe; a
+    /// lazy arm has the walk, probe and collision counters of its verified
+    /// twin and no verify ledger, its total is lower, and the pipeline's own
+    /// charged check still runs (`verify` phase).  The option refusals hold.
+    #[test]
+    fn wwalk_two_seed_target_walk_and_lazy_recover_with_identical_walks() {
+        let n = 12u64;
+        // (spec, base size, lazy twin)
+        for (spec, size) in [
+            ("wwalk:x=1.5,g=1,grow=2,tw=2", 2u64),
+            ("wwalk:x=1.5,g=1,grow=2,tw=2,cj=1", 2),
+            ("wwalk:x=1.5,g=1,grow=2,tw=1,cj=1", 1),
+        ] {
+            let need = if size == 2 { 3 } else { 2 };
+            let (mut eager_gae, mut lazy_gae, mut rank_full) = (0.0, 0.0, 0u64);
+            for s in 0..n {
+                let a = run_pair(spec, size, Targets::StrideGenerator, s);
+                let b = run_pair(&format!("{spec},lazy=1"), size, Targets::StrideGenerator, s);
+                assert!(a.verified, "{spec} s={s}: planted log not recovered");
+                assert!(b.verified, "{spec},lazy s={s}: planted log not recovered");
+                assert!(b.verify_gae > 0.0, "the pipeline's final check is charged");
+                assert_eq!(b.ctr["tw_lazy_failures"], 0);
+                for key in [
+                    "tw_steps",
+                    "tw_collisions",
+                    "tw_rows",
+                    "tw_rank",
+                    "tw_walk_adds",
+                    "tw_setup_adds",
+                    "tw_setup_doubles",
+                    "probe_hits",
+                    "free_rows_emitted",
+                ] {
+                    assert_eq!(a.ctr[key], b.ctr[key], "{spec} s={s}: {key}");
+                }
+                assert_eq!(a.steps, b.steps);
+                assert_eq!(b.ctr["tw_verify_adds"], 0);
+                assert_eq!(b.ctr["tw_lazy_certified_rows"], b.ctr["tw_collisions"]);
+                assert_eq!(a.trials, b.trials);
+                if size == 2 {
+                    assert_eq!(a.ctr["tw_seeds"], 2);
+                }
+                if a.ctr["tw_rank"] == need {
+                    rank_full += 1;
+                    assert_eq!(
+                        a.ctr["probe_hits"], 0,
+                        "{spec} s={s}: full rank needs no probe"
+                    );
+                    assert_eq!(a.trials, 1);
+                }
+                eager_gae += a.gae;
+                lazy_gae += b.gae;
+            }
+            eprintln!(
+                "{spec}: {n}/{n} recovered, full rank in {rank_full}, total GAE eager {eager_gae:.0} lazy {lazy_gae:.0}"
+            );
+            assert!(rank_full > 0);
+            assert!(lazy_gae < eager_gae, "{spec}: lazy is not cheaper");
+        }
+        // The C = 2 walk table, stride-generator targets: `lazy=1` leaves the
+        // walk, rows and probes alone and removes `verify_ops`.
+        let (mut eager_gae, mut lazy_gae) = (0.0, 0.0);
+        for s in 0..n {
+            let spec = "wwalk:x=1.0,g=1,grow=2";
+            let a = run_pair(spec, 2, Targets::StrideGenerator, s);
+            let b = run_pair(&format!("{spec},lazy=1"), 2, Targets::StrideGenerator, s);
+            assert!(a.verified && b.verified, "inc s={s}");
+            assert_eq!(a.steps, b.steps);
+            assert_eq!(a.ctr["probe_hits"], b.ctr["probe_hits"]);
+            assert_eq!(a.ctr["free_rows_emitted"], b.ctr["free_rows_emitted"]);
+            assert_eq!(
+                a.ctr["free_collisions_checked"],
+                b.ctr["free_collisions_checked"]
+            );
+            assert_eq!(a.trials, b.trials);
+            assert_eq!(
+                b.ctr["wwalk_lazy_certified_rows"],
+                b.ctr["free_collisions_checked"]
+            );
+            assert!(b.verify_gae > 0.0);
+            assert!(b.gae <= a.gae, "inc+lazy costs more at s={s}");
+            eager_gae += a.gae;
+            lazy_gae += b.gae;
+        }
+        eprintln!("inc: total GAE eager {eager_gae:.0} lazy {lazy_gae:.0}");
+        assert!(lazy_gae < eager_gae);
+        // Refusals.
+        let inst = instance();
+        let mut ops = GroupOps::default();
+        let q = inst.curve.mul(&mut ops, inst.generator_point(), 777);
+        let one = Params::parse_spec("prime-projected-abscissa:size=1,scan_cap=32")
+            .unwrap()
+            .1;
+        let fb1 = PrimeProjectedAbscissaBase { instance: &inst }
+            .build(&ctx(&inst, q), &one, &mut ops)
+            .unwrap();
+        let fb2 = PrimeProjectedAbscissaBase { instance: &inst }
+            .build(&ctx(&inst, q), &base_params(32), &mut ops)
+            .unwrap();
+        for (fb, spec, needle) in [
+            (&fb2, "wwalk:x=1.5,g=1,grow=2,tw=2,lazy=1", ""),
+            (&fb1, "wwalk:x=1.5,g=1,grow=2,tw=2", "exactly 2 abscissae"),
+            (&fb2, "wwalk:x=1.5,g=1,grow=2,tw=3", "tw is 0, 1 or 2"),
+            (&fb2, "wwalk:x=1.5,grow=2,tw=2", "tw=2 needs g=1 and grow=2"),
+            (
+                &fb2,
+                "wwalk:x=1.5,g=1,grow=1,tw=2",
+                "tw=2 needs g=1 and grow=2",
+            ),
+            (&fb2, "wwalk:x=1.5,lazy=1", "lazy=1 needs g=1"),
+            (
+                &fb2,
+                "wwalk:x=1.5,g=1,grow=2,cj=1",
+                "cj=1 needs tw=1 or tw=2",
+            ),
+        ] {
+            let (_, params) = Params::parse_spec(spec).unwrap();
+            let mut oracle = WWalkOracle::<PrimePoint>::new();
+            let res = DecompositionOracle::<PrimeCurve>::prepare(
+                &mut oracle,
+                &ctx(&inst, q),
+                fb,
+                &params,
+                &mut ops,
+            );
+            if needle.is_empty() {
+                assert!(res.is_ok(), "{spec}: {res:?}");
+            } else {
+                let err = res.unwrap_err();
+                assert!(err.contains(needle), "{spec}: {err}");
+            }
         }
     }
 }
