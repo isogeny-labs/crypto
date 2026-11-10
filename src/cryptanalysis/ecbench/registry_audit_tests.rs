@@ -254,6 +254,7 @@ const CASES: &[(&str, Fx, P)] = &[
     ("rho.frozen_reference", Fx::Prime18, &[]),
     ("rho.plain", Fx::Prime18, &[]),
     ("rho.negation", Fx::Prime18, &[]),
+    ("rho.negation_chained", Fx::Prime18, &[]),
     ("rho.negation_v2", Fx::Prime18, &[]),
     ("bsgs.textbook", Fx::Prime18, &[]),
     ("bsgs.interleaved", Fx::Prime18, &[]),
@@ -298,6 +299,11 @@ const CASES: &[(&str, Fx, P)] = &[
         ],
     ),
     ("ic.tensor_contraction_v1", Fx::Prime10, &[("m", "3")]),
+    (
+        "ic.tensor_contraction_cofactor_v1",
+        Fx::Cofactor2,
+        &[("m", "2")],
+    ),
     (
         "ic.prime_orbit_relations_v1",
         Fx::Prime18,
@@ -412,10 +418,14 @@ const SKIPS: &[(&str, &str)] = &[
     ("ic.pipeline_full", "reprices a recorded ic.pipeline session (price-units, full_price); no solve of its own"),
     ("ic.pipeline_wordram", "reprices a recorded ic.pipeline session (price-units, wordram_price); no solve of its own"),
     ("rho.signed_frobenius_full", "reprices a recorded session (full_price)"),
+    ("rho.signed_frobenius_v2_full", "reprices a recorded session (full_price)"),
     ("rho.signed_frobenius_strong_full", "reprices a recorded session (full_price)"),
     ("rho.signed_frobenius_wordram", "reprices a recorded session (wordram_price)"),
     ("rho.signed_frobenius_strong_wordram", "reprices a recorded session (wordram_price)"),
     ("ic.trace_line_2lp", "needs a binary curve with n = 4d on a trace-selected subfield line; no instance small enough to build in a unit test"),
+    ("cheon.pminus1_comb", "DLP with auxiliary inputs: needs the runner's static-DH oracle and a curve with d | n-1 or n+1, so a plain solve refuses; covered by tests/ecbench_cheon.rs"),
+    ("cheon.pminus1_naive", "DLP with auxiliary inputs: needs the runner's static-DH oracle and a curve with d | n-1 or n+1, so a plain solve refuses; covered by tests/ecbench_cheon.rs"),
+    ("cheon.pplus1_comb", "DLP with auxiliary inputs: needs the runner's static-DH oracle and a curve with d | n-1 or n+1, so a plain solve refuses; covered by tests/ecbench_cheon.rs"),
 ];
 
 /// Frozen ids whose phases do not sum to their total on purpose, each with
@@ -464,6 +474,7 @@ const CHECK_PHASE: &[(&str, &str)] = &[
     ("ic.known_log_ksum_v1", "target_recovery_check"),
     ("ic.known_log_mitm2_v1", "target_recovery_check"),
     ("ic.tensor_contraction_v1", "recovery_check"),
+    ("ic.tensor_contraction_cofactor_v1", "recovery_check"),
     ("ic.residual_batch", "internal_verification"),
     ("ic.residual_batch_v2", "internal_verification"),
     ("rho.multitarget_pooled", "internal_verification"),

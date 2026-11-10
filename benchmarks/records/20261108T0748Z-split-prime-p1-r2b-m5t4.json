@@ -1,0 +1,115 @@
+{
+  "branch": "claude/novel-ecdlp-algorithm-iams4j",
+  "closed_utc": "2026-11-08T11:35:26+00:00",
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "tools/task_card.py",
+        "run",
+        "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-r2b.yaml"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "note": "launched detached (setsid nohup env BENCHREC=<this record> ...); started_utc = run_start_utc from provenance.txt; wall_s = sum of receipt per-command seconds; exit from the receipt (status completed)",
+      "started_utc": "2026-11-08T07:49:05Z",
+      "wall_s": 13428.469
+    }
+  ],
+  "commit": "39635898abcbb755c3f2b0036fc321ac26759447",
+  "commit_dirty": false,
+  "created_utc": "2026-11-08T07:48:30+00:00",
+  "curve_uid": null,
+  "entries": [],
+  "host": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "cpus_online": 4,
+    "hostname": "vm",
+    "isolation": "unstated",
+    "platform": "Linux-6.18.44-fc-v310-x86_64-with-glibc2.39"
+  },
+  "id": "20261108T0748Z-split-prime-p1-r2b-m5t4",
+  "metrics": [
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "rr_degree_reached_lower_bound",
+      "note": "RR timed out at 10800 s, working in degree 7",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 6.0
+    },
+    {
+      "baseline": null,
+      "better": "lower",
+      "n": 1,
+      "name": "t_degree_reached_lower_bound",
+      "note": "T capped at 13 GiB after 2619 s",
+      "reference": null,
+      "reference_kind": null,
+      "spread": null,
+      "unit": "count",
+      "value": 9.0
+    }
+  ],
+  "problem": "ic:split-prime-p1-rr-dickson-torus",
+  "raw": [
+    {
+      "bytes": 979,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/runs/run-r2b-20261108T053603Z/parsed.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/ef/ef06cce7bdf42a71f168236e8a271a98c2be4771fe52eeb1b07fb11d921e1665",
+      "sha256": "ef06cce7bdf42a71f168236e8a271a98c2be4771fe52eeb1b07fb11d921e1665",
+      "uploaded": true
+    },
+    {
+      "bytes": 750,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/runs/run-r2b-20261108T053603Z/jobs.tsv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/b1/b15686815ebfbd09bae7c937e1a678b9fda80ef2252fcf436e1f3fb20949e5d6",
+      "sha256": "b15686815ebfbd09bae7c937e1a678b9fda80ef2252fcf436e1f3fb20949e5d6",
+      "uploaded": true
+    },
+    {
+      "bytes": 76,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/runs/run-r2b-20261108T053603Z/cells.tsv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/07/07e70d0e86e56000bfaf6a4378b9da7a5b7c2d92a23b86ce3886d1d58c43b32e",
+      "sha256": "07e70d0e86e56000bfaf6a4378b9da7a5b7c2d92a23b86ce3886d1d58c43b32e",
+      "uploaded": true
+    },
+    {
+      "bytes": 80,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/runs/run-r2b-20261108T053603Z/skips.tsv",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/c8/c839668d87696fd2d68b02f7d30821033dde4397ec5ca4829b3a7d6dd6a5948c",
+      "sha256": "c839668d87696fd2d68b02f7d30821033dde4397ec5ca4829b3a7d6dd6a5948c",
+      "uploaded": true
+    },
+    {
+      "bytes": 1146,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/runs/run-r2b-20261108T053603Z/provenance.txt",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/67/6731c3cc71d17e6b3fffdd9cd8b7a6147a04d8fb6f529cf7fd39ab3b2776d035",
+      "sha256": "6731c3cc71d17e6b3fffdd9cd8b7a6147a04d8fb6f529cf7fd39ab3b2776d035",
+      "uploaded": true
+    },
+    {
+      "bytes": 1963,
+      "path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/analysis/derived_r2b/decision_r2.json",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/61/6143047044d3ceaec49d3df08a0896f116e3e155c494cbb2362627f1b0ebfcaa",
+      "sha256": "6143047044d3ceaec49d3df08a0896f116e3e155c494cbb2362627f1b0ebfcaa",
+      "uploaded": true
+    }
+  ],
+  "repo": "crypto",
+  "reports": {
+    "pdf": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/report/REPORT.pdf",
+    "png": [],
+    "svg": []
+  },
+  "schema": "bench.record/v1",
+  "session": null,
+  "slug": "split-prime-p1-r2b-m5t4",
+  "status": "measured",
+  "summary": "P1 round 2 card B, T24 m5 t4: RR timed out at 3 h (D >= 6), T capped at 13 GiB (D >= 9); frozen rule 3 undecided",
+  "validation": null
+}

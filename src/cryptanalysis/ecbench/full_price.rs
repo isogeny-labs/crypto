@@ -36,6 +36,7 @@ pub fn base_of(id: &str) -> Option<&'static str> {
     match id {
         "ic.pipeline_full" => Some("ic.pipeline"),
         "rho.signed_frobenius_full" => Some("rho.signed_frobenius"),
+        "rho.signed_frobenius_v2_full" => Some("rho.signed_frobenius_v2"),
         "rho.signed_frobenius_strong_full" => Some("rho.signed_frobenius_strong"),
         _ => None,
     }
@@ -130,6 +131,20 @@ fn rule(counter: &str) -> Option<Rule> {
         | "scalar_multiplications"
         | "table_entries"
         | "wasted_merges" => InGroupOps,
+        // `WalkPolicy::extra_counters` (the `_v2` walks): the lost steps are
+        // inside the charged `walk_operations`, the long cycles are a count,
+        // and the distinguished-point table's queries and inserts describe
+        // the probe `distinguished_points` already charges one lookup for,
+        // as for the legacy walk; charging them again would price the v2
+        // walk above the legacy one for the same work.
+        "cycles_longer_than_window"
+        | "steps_in_walks_capped"
+        | "steps_in_walks_abandoned_in_a_cycle"
+        | "steps_in_walks_ending_at_the_identity"
+        | "steps_in_walks_out_of_budget"
+        | "lost_walk_steps"
+        | "distinguished_point_table_queries_uncharged"
+        | "distinguished_point_table_inserts_uncharged" => InGroupOps,
         "as_solves" | "legacy_as_solves_uncharged" => Units(&[("as_solve", 1.0)]),
         // Hash probes and inserts; the scan's per-abscissa loop and the
         // per-lift bookkeeping are charged one probe each.
@@ -434,6 +449,7 @@ mod tests {
         for id in [
             "ic.pipeline_full",
             "rho.signed_frobenius_full",
+            "rho.signed_frobenius_v2_full",
             "rho.signed_frobenius_strong_full",
         ] {
             assert!(base_of(id).is_some());

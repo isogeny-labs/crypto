@@ -62,7 +62,7 @@ use crate::cryptanalysis::ic_boundary::{
     binary_subspace_factor_base, decompose_mitm, decompose_mitm_frobenius, koblitz_factor_base,
     prime_factor_base, prime_factor_base_strided, BinaryGroup, BinaryInstance, ColumnFold,
     CountedGroup, FactorBase, FrobeniusPairTable, GroupOps, KSumTable, OracleCounters, PairTable,
-    PrimeCurve, PrimeInstance, PrimePoint, Relation, WSumTable, WalkOpts, WalkTable,
+    PrimeCurve, PrimeInstance, PrimePoint, Relation, TargetWalk, WSumTable, WalkOpts, WalkTable,
 };
 use crate::cryptanalysis::koblitz_factor_base_search::subspace_is_trace_zero;
 use crate::cryptanalysis::koblitz_fast::FastPoint;
@@ -2546,7 +2546,25 @@ impl<G: CountedGroup> DecompositionOracle<G> for WSumOracle<G::Elt> {
 /// Parameters: `x` (table size in units of `√r`, in `(0, 4]`), `jumps`
 /// (default 16, 2 to 64), `grow` (1: extend the walk, charged, until the
 /// first verified free row, capped at `2·T` entries; default 0), `seed`
-/// (default 0, mixed with the seeds' keys).  The verified free rows are
+/// (default 0, mixed with the seeds' keys).  A base of one abscissa is
+/// accepted with `g=1` (`F = 1`): jumps `[α_j]P1 + [γ_j]G`, a collision is
+/// the one-column affine row `du·s1 = −dz`, and `grow` stops at rank 1.
+/// With `tw=1` (needs `g=1`, `grow=2` and a one-seed base) the target is
+/// inside the walk ([`TargetWalk`]): jumps `[α]P1 + [γ]G + [β]Q`, every
+/// collision is the row `du·s1 + db·log Q = −dz`, the walk stops at the
+/// first two independent rows, and they are handed to the loop with the
+/// first trial (probes run only if the cap `3T` was reached below rank 2);
+/// `cj=1` (needs `tw=1` or `tw=2`) builds the jumps by chained additions.
+/// With `tw=2` (needs `g=1`, `grow=2` and a TWO-seed base) the target walk
+/// carries both seeds: jumps `[α]P1 + [α']P2 + [γ]G + [β]Q`, every collision
+/// is the row `du1·s1 + du2·s2 + db·log Q = −dz` (rows whose seed part is
+/// zero modulo `r` are dropped), the walk stops at rank 3, cap `3T`.
+/// `lazy=1` (needs `g=1`; for the walk table, `tw=1` and `tw=2`) skips the
+/// per-collision recomputation: a row is kept on its exact key match.  The
+/// pipeline's own `[d]G = Q` check still runs and is charged; a target walk
+/// also runs that check once itself when its rows reach full rank, and on a
+/// failure recomputes (charged) and drops the bad rows and keeps walking.
+/// The verified free rows are
 /// handed to the relation loop once, with the first trial, as
 /// `Relation::Row { a: 0, b: 0 }`.  A probe hit `±E_t` is a
 /// `Relation::Row` with the trial's own `(a, b)` and the columns
@@ -2555,6 +2573,8 @@ impl<G: CountedGroup> DecompositionOracle<G> for WSumOracle<G::Elt> {
 /// `Summands` form to return and answers `None`.
 pub struct WWalkOracle<E> {
     table: Option<WalkTable<E>>,
+    /// The `tw=1` walk (then `table` is `None`).
+    tw_table: Option<TargetWalk<E>>,
     free_pending: bool,
     free_checked: u64,
     free_emitted: u64,
@@ -2565,6 +2585,7 @@ impl<E> WWalkOracle<E> {
     pub fn new() -> Self {
         Self {
             table: None,
+            tw_table: None,
             free_pending: false,
             free_checked: 0,
             free_emitted: 0,
@@ -2575,6 +2596,11 @@ impl<E> WWalkOracle<E> {
     /// The table of the last `prepare`, for reports and tests.
     pub fn table(&self) -> Option<&WalkTable<E>> {
         self.table.as_ref()
+    }
+
+    /// The `tw=1` walk of the last `prepare`, for reports and tests.
+    pub fn target_walk(&self) -> Option<&TargetWalk<E>> {
+        self.tw_table.as_ref()
     }
 }
 
@@ -2608,6 +2634,10 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
             ("grow", "1: after T entries keep extending the walk (charged) until the first verified free row, at most 2T entries; 2 (needs g=1): until two independent verified rows pin both seed logs, at most 3T (default 0)"),
             ("g", "1: every jump also carries [γ_j]G, γ_j uniform in [1, r), and entries track z mod r; a collision is the affine row du·s1 + dv·s2 = −dz (default 0)"),
             ("seed", "seed of the jump and step stream, mixed with the two seeds' keys (default 0)"),
+            ("tw", "1 (needs g=1, grow=2 and a one-seed base): the target inside the walk, jumps [α]P1 + [γ]G + [β]Q, every collision a row du·s1 + db·log Q = −dz, stop at the first two independent rows, cap 3T; 2 (needs g=1, grow=2 and a two-seed base in distinct columns): jumps [α]P1 + [α']P2 + [γ]G + [β]Q, every collision a row du1·s1 + du2·s2 + db·log Q = −dz (rows with du1 = du2 = 0 mod r dropped), stop at rank 3, cap 3T (default 0)"),
+            ("cj", "1 (needs tw=1 or tw=2): build the jumps by chained additions from two base combinations [γ]G + [β]Q (the seed parts from the doubled multiples) instead of independent scalar multiplications (default 0)"),
+            ("lazy", "1 (needs g=1): skip the per-collision recomputation and keep each row on its exact key match (sign bit stored beside the entry); the walk, its stream and its collisions are identical, only verify_ops disappears.  The pipeline's [d]G = Q check still runs, charged.  With tw=1|2 the build also runs that check itself once when the rows reach full rank (charged as tw_lazy_check_*); on a failure it recomputes all collisions (charged), drops the rows that fail and resumes the walk.  With the walk table a wrong row is rejected by the pipeline's check (the run ends unverified; no in-run recovery) (default 0)"),
+            ("cv", "0 (needs tw=1 or tw=2; not with lazy=1): do not recompute the two entries of a key collision; the key is the exact abscissa, the key's sign bit stored in bit 63 of the entry's u word gives E_t = ±E_s, and the final [d]G = Q check (charged) fails the solve on a wrong row, with no in-run recovery; with tw=2 needs coefficients below 2^31 (default 1)"),
         ]
     }
 
@@ -2643,7 +2673,56 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
             g_jumps: params.flag("g"),
             grow,
         };
-        let table = WalkTable::build_with(
+        let tw = match params.get("tw") {
+            None | Some("0" | "false" | "no") => 0usize,
+            Some("1" | "true" | "yes") => 1,
+            Some("2") => 2,
+            Some(v) => return Err(format!("wwalk: tw is 0, 1 or 2, not `{v}`")),
+        };
+        let (cj, lazy) = (params.flag("cj"), params.flag("lazy"));
+        if cj && tw == 0 {
+            return Err("wwalk: cj=1 needs tw=1 or tw=2".into());
+        }
+        if lazy && !opts.g_jumps {
+            return Err("wwalk: lazy=1 needs g=1".into());
+        }
+        let cv = wwalk_cv(params)?;
+        if !cv && tw == 0 {
+            return Err("wwalk: cv=0 needs tw=1 or tw=2".into());
+        }
+        if !cv && lazy {
+            return Err("wwalk: cv=0 and lazy=1 are alternatives; choose one".into());
+        }
+        if tw > 0 {
+            if !opts.g_jumps || grow != 2 {
+                return Err(format!("wwalk: tw={tw} needs g=1 and grow=2"));
+            }
+            let walk = TargetWalk::build_ext_cv(
+                ctx.group,
+                ctx.generator,
+                ctx.target,
+                fb,
+                ctx.r,
+                ctx.cofactor,
+                x,
+                jumps,
+                cj,
+                seed,
+                lazy,
+                tw,
+                cv,
+            )?;
+            self.free_pending = true;
+            self.free_checked = walk.collisions.len() as u64;
+            self.free_emitted = walk.rows.len() as u64;
+            self.probe_hits = 0;
+            ops.merge(walk.build_ops);
+            self.table = None;
+            self.tw_table = Some(walk);
+            return Ok(());
+        }
+        self.tw_table = None;
+        let table = WalkTable::build_lazy(
             ctx.group,
             Some(ctx.generator),
             fb,
@@ -2652,6 +2731,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
             jumps,
             opts,
             seed,
+            lazy,
         )?;
         self.free_pending = true;
         self.free_checked = table.collisions.len() as u64;
@@ -2665,6 +2745,9 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
     }
 
     fn setup_work_native(&self) -> BTreeMap<String, u64> {
+        if let Some(walk) = &self.tw_table {
+            return table_counted(walk.work_counters());
+        }
         table_counted(
             self.table
                 .as_ref()
@@ -2696,6 +2779,32 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
         b: u64,
     ) -> Vec<Relation> {
         let mut out = Vec::new();
+        if let Some(walk) = self.tw_table.as_ref() {
+            if self.free_pending {
+                self.free_pending = false;
+                out.extend(walk.rows.iter().map(|row| Relation::Row {
+                    columns: row.columns.clone(),
+                    a: row.a,
+                    b: row.b,
+                }));
+            }
+            // Full rank (two independent rows with one seed, three with
+            // two) pins log Q: no probe is needed.
+            if walk.rank < walk.need() {
+                if let Some((sign, u, z, be)) =
+                    walk.probe(ctx.group, ops, &mut counters.lookups, point)
+                {
+                    self.probe_hits += 1;
+                    let row = walk.hit_row(fb, ctx.r, a, b, sign, u, z, be);
+                    out.push(Relation::Row {
+                        columns: row.columns,
+                        a: row.a,
+                        b: row.b,
+                    });
+                }
+            }
+            return out;
+        }
         let Some(table) = self.table.as_ref() else {
             return out;
         };
@@ -2730,7 +2839,29 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
         m.insert("free_collisions_checked".to_string(), self.free_checked);
         m.insert("free_rows_emitted".to_string(), self.free_emitted);
         m.insert("probe_hits".to_string(), self.probe_hits);
+        if let Some(walk) = &self.tw_table {
+            m.extend(walk.breakdown_counters());
+        }
+        if let Some(table) = &self.table {
+            if table.lazy {
+                m.insert("wwalk_lazy".to_string(), 1);
+                m.insert(
+                    "wwalk_lazy_certified_rows".to_string(),
+                    table.lazy_certified,
+                );
+            }
+        }
         m
+    }
+}
+
+/// `wwalk`'s `cv` parameter: absent or `1` recomputes every key collision
+/// (the committed walk), `0` does not.
+pub fn wwalk_cv(params: &Params) -> Result<bool, String> {
+    match params.get("cv") {
+        None | Some("1") => Ok(true),
+        Some("0") => Ok(false),
+        Some(v) => Err(format!("wwalk: cv is 0 or 1, not `{v}`")),
     }
 }
 
@@ -5483,6 +5614,790 @@ mod wwalk_pipeline_tests {
                 with_row as f64 / bases as f64,
                 rows as f64 / bases as f64,
                 x * x
+            );
+        }
+    }
+
+    /// `tw=1` (target in the walk, one-seed base) end to end on
+    /// `train-k32`, plain and chained jumps (`cj=1`): the planted log is
+    /// recovered with stride-generator targets; a walk that reached rank 2
+    /// solves on the first trial with no probe; the ledger breakdown sums to
+    /// the oracle set-up; the chained jumps cost fewer set-up additions; and
+    /// the option refusals hold.
+    #[test]
+    fn wwalk_target_in_walk_recovers_on_the_first_trial() {
+        let inst = instance();
+        let one = Params::parse_spec("prime-projected-abscissa:size=1,scan_cap=32")
+            .unwrap()
+            .1;
+        let run_tw = |spec: &str, s: u64| {
+            let planted = 12345 + 7919 * s;
+            let mut ops = GroupOps::default();
+            let q = inst.curve.mul(&mut ops, inst.generator_point(), planted);
+            let (name, oracle_params) = Params::parse_spec(&format!("{spec},seed={s}")).unwrap();
+            let ps = PipelineSpec {
+                factor_base: "prime-projected-abscissa".into(),
+                factor_base_params: one.clone(),
+                oracle: name,
+                oracle_params,
+                targets: Targets::StrideGenerator,
+                linalg: "incremental-gauss".into(),
+                max_trials: 5_000_000,
+                seed: s,
+                ..Default::default()
+            };
+            let mut oracle = WWalkOracle::<PrimePoint>::new();
+            let rep = run_pipeline(
+                &ctx(&inst, q),
+                &ps,
+                &PrimeProjectedAbscissaBase { instance: &inst },
+                &mut oracle,
+                planted,
+                &Calibration {
+                    ns_per_add: 1.0,
+                    ns_per_double: 1.0,
+                    ..Default::default()
+                },
+                None,
+            )
+            .unwrap();
+            let ctr = DecompositionOracle::<PrimeCurve>::relation_counters(&oracle);
+            assert!(oracle.table().is_none(), "tw=1 builds no WalkTable");
+            let walk = oracle.target_walk().expect("tw=1 builds a TargetWalk");
+            let mut sum = walk.setup_ops;
+            sum.merge(walk.walk_ops);
+            sum.merge(walk.verify_ops);
+            assert_eq!(
+                sum.gae(),
+                rep.decomposition.setup.gae,
+                "{spec} s={s}: ledgers"
+            );
+            assert_eq!(ctr["tw_walk_adds"], walk.steps);
+            (
+                rep.verified && rep.recovered == Some(planted),
+                ctr["tw_rank"],
+                ctr["probe_hits"],
+                rep.decomposition.targets_tried,
+                walk.setup_ops.adds,
+                walk.steps as f64 / (inst.r as f64).sqrt(),
+            )
+        };
+        let n = 12u64;
+        let mut setup_adds = [0u64; 2];
+        for (i, spec) in [
+            "wwalk:x=1.5,g=1,grow=2,tw=1",
+            "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1",
+        ]
+        .into_iter()
+        .enumerate()
+        {
+            let mut steps = 0.0;
+            for s in 0..n {
+                let (ok, rank, hits, trials, adds, st) = run_tw(spec, s);
+                assert!(ok, "{spec} s={s}: planted log not recovered");
+                if rank == 2 {
+                    assert_eq!(hits, 0, "{spec} s={s}: rank 2 needs no probe");
+                    assert_eq!(trials, 1, "{spec} s={s}: rank 2 solves on trial 1");
+                }
+                setup_adds[i] += adds;
+                steps += st;
+            }
+            eprintln!(
+                "{spec}: recovered {n}/{n}, mean walk steps {:.3} sqrt(r), mean set-up adds {:.1}",
+                steps / n as f64,
+                setup_adds[i] as f64 / n as f64
+            );
+        }
+        assert!(
+            setup_adds[1] * 2 < setup_adds[0],
+            "chained jumps should at least halve the set-up additions: {setup_adds:?}"
+        );
+        // Refusals: tw without g or grow=2, cj without tw, tw on two seeds.
+        let mut ops = GroupOps::default();
+        let q = inst.curve.mul(&mut ops, inst.generator_point(), 777);
+        let fb1 = PrimeProjectedAbscissaBase { instance: &inst }
+            .build(&ctx(&inst, q), &one, &mut ops)
+            .unwrap();
+        let fb2 = PrimeProjectedAbscissaBase { instance: &inst }
+            .build(&ctx(&inst, q), &base_params(32), &mut ops)
+            .unwrap();
+        for (fb, spec, needle) in [
+            (&fb1, "wwalk:x=1.5,grow=2,tw=1", "tw=1 needs g=1 and grow=2"),
+            (
+                &fb1,
+                "wwalk:x=1.5,g=1,grow=1,tw=1",
+                "tw=1 needs g=1 and grow=2",
+            ),
+            (&fb1, "wwalk:x=1.5,g=1,grow=2,cj=1", "cj=1 needs tw=1"),
+            (&fb2, "wwalk:x=1.5,g=1,grow=2,tw=1", "exactly 1 abscissa"),
+        ] {
+            let (_, params) = Params::parse_spec(spec).unwrap();
+            let mut oracle = WWalkOracle::<PrimePoint>::new();
+            let err = DecompositionOracle::<PrimeCurve>::prepare(
+                &mut oracle,
+                &ctx(&inst, q),
+                fb,
+                &params,
+                &mut ops,
+            )
+            .unwrap_err();
+            assert!(err.contains(needle), "{spec}: {err}");
+        }
+    }
+
+    /// What one pipeline run of a `wwalk` spec leaves, for the pairings
+    /// below.
+    struct Pair {
+        verified: bool,
+        gae: f64,
+        verify_gae: f64,
+        ctr: BTreeMap<String, u64>,
+        trials: u64,
+        steps: u64,
+    }
+
+    fn run_pair(spec: &str, size: u64, targets: Targets, s: u64) -> Pair {
+        let inst = instance();
+        let planted = 12345 + 7919 * s;
+        let mut ops = GroupOps::default();
+        let q = inst.curve.mul(&mut ops, inst.generator_point(), planted);
+        let base = Params::parse_spec(&format!("prime-projected-abscissa:size={size},scan_cap=32"))
+            .unwrap()
+            .1;
+        let (name, oracle_params) = Params::parse_spec(&format!("{spec},seed={s}")).unwrap();
+        let ps = PipelineSpec {
+            factor_base: "prime-projected-abscissa".into(),
+            factor_base_params: base,
+            oracle: name,
+            oracle_params,
+            targets,
+            linalg: "incremental-gauss".into(),
+            max_trials: 5_000_000,
+            seed: s,
+            ..Default::default()
+        };
+        let mut oracle = WWalkOracle::<PrimePoint>::new();
+        let rep = run_pipeline(
+            &ctx(&inst, q),
+            &ps,
+            &PrimeProjectedAbscissaBase { instance: &inst },
+            &mut oracle,
+            planted,
+            &Calibration {
+                ns_per_add: 1.0,
+                ns_per_double: 1.0,
+                ..Default::default()
+            },
+            None,
+        )
+        .unwrap();
+        let ctr = DecompositionOracle::<PrimeCurve>::relation_counters(&oracle);
+        let steps = oracle
+            .target_walk()
+            .map(|w| w.steps)
+            .or_else(|| oracle.table().map(|t| t.steps))
+            .unwrap();
+        Pair {
+            verified: rep.verified && rep.recovered == Some(planted),
+            gae: rep.total_gae,
+            verify_gae: rep.verify.gae,
+            ctr,
+            trials: rep.decomposition.targets_tried,
+            steps,
+        }
+    }
+
+    /// `tw=2` (size-2 `prime-projected-abscissa` base) and `lazy=1`, end to
+    /// end on `train-k32` (cofactor 8): the planted log is recovered and
+    /// verified; a rank-3 walk solves on the first trial without a probe; a
+    /// lazy arm has the walk, probe and collision counters of its verified
+    /// twin and no verify ledger, its total is lower, and the pipeline's own
+    /// charged check still runs (`verify` phase).  The option refusals hold.
+    #[test]
+    fn wwalk_two_seed_target_walk_and_lazy_recover_with_identical_walks() {
+        let n = 12u64;
+        // (spec, base size, lazy twin)
+        for (spec, size) in [
+            ("wwalk:x=1.5,g=1,grow=2,tw=2", 2u64),
+            ("wwalk:x=1.5,g=1,grow=2,tw=2,cj=1", 2),
+            ("wwalk:x=1.5,g=1,grow=2,tw=1,cj=1", 1),
+        ] {
+            let need = if size == 2 { 3 } else { 2 };
+            let (mut eager_gae, mut lazy_gae, mut rank_full) = (0.0, 0.0, 0u64);
+            for s in 0..n {
+                let a = run_pair(spec, size, Targets::StrideGenerator, s);
+                let b = run_pair(&format!("{spec},lazy=1"), size, Targets::StrideGenerator, s);
+                assert!(a.verified, "{spec} s={s}: planted log not recovered");
+                assert!(b.verified, "{spec},lazy s={s}: planted log not recovered");
+                assert!(b.verify_gae > 0.0, "the pipeline's final check is charged");
+                assert_eq!(b.ctr["tw_lazy_failures"], 0);
+                for key in [
+                    "tw_steps",
+                    "tw_collisions",
+                    "tw_rows",
+                    "tw_rank",
+                    "tw_walk_adds",
+                    "tw_setup_adds",
+                    "tw_setup_doubles",
+                    "probe_hits",
+                    "free_rows_emitted",
+                ] {
+                    assert_eq!(a.ctr[key], b.ctr[key], "{spec} s={s}: {key}");
+                }
+                assert_eq!(a.steps, b.steps);
+                assert_eq!(b.ctr["tw_verify_adds"], 0);
+                assert_eq!(b.ctr["tw_lazy_certified_rows"], b.ctr["tw_collisions"]);
+                assert_eq!(a.trials, b.trials);
+                if size == 2 {
+                    assert_eq!(a.ctr["tw_seeds"], 2);
+                }
+                if a.ctr["tw_rank"] == need {
+                    rank_full += 1;
+                    assert_eq!(
+                        a.ctr["probe_hits"], 0,
+                        "{spec} s={s}: full rank needs no probe"
+                    );
+                    assert_eq!(a.trials, 1);
+                }
+                eager_gae += a.gae;
+                lazy_gae += b.gae;
+            }
+            eprintln!(
+                "{spec}: {n}/{n} recovered, full rank in {rank_full}, total GAE eager {eager_gae:.0} lazy {lazy_gae:.0}"
+            );
+            assert!(rank_full > 0);
+            assert!(lazy_gae < eager_gae, "{spec}: lazy is not cheaper");
+        }
+        // The C = 2 walk table, stride-generator targets: `lazy=1` leaves the
+        // walk, rows and probes alone and removes `verify_ops`.
+        let (mut eager_gae, mut lazy_gae) = (0.0, 0.0);
+        for s in 0..n {
+            let spec = "wwalk:x=1.0,g=1,grow=2";
+            let a = run_pair(spec, 2, Targets::StrideGenerator, s);
+            let b = run_pair(&format!("{spec},lazy=1"), 2, Targets::StrideGenerator, s);
+            assert!(a.verified && b.verified, "inc s={s}");
+            assert_eq!(a.steps, b.steps);
+            assert_eq!(a.ctr["probe_hits"], b.ctr["probe_hits"]);
+            assert_eq!(a.ctr["free_rows_emitted"], b.ctr["free_rows_emitted"]);
+            assert_eq!(
+                a.ctr["free_collisions_checked"],
+                b.ctr["free_collisions_checked"]
+            );
+            assert_eq!(a.trials, b.trials);
+            assert_eq!(
+                b.ctr["wwalk_lazy_certified_rows"],
+                b.ctr["free_collisions_checked"]
+            );
+            assert!(b.verify_gae > 0.0);
+            assert!(b.gae <= a.gae, "inc+lazy costs more at s={s}");
+            eager_gae += a.gae;
+            lazy_gae += b.gae;
+        }
+        eprintln!("inc: total GAE eager {eager_gae:.0} lazy {lazy_gae:.0}");
+        assert!(lazy_gae < eager_gae);
+        // Refusals.
+        let inst = instance();
+        let mut ops = GroupOps::default();
+        let q = inst.curve.mul(&mut ops, inst.generator_point(), 777);
+        let one = Params::parse_spec("prime-projected-abscissa:size=1,scan_cap=32")
+            .unwrap()
+            .1;
+        let fb1 = PrimeProjectedAbscissaBase { instance: &inst }
+            .build(&ctx(&inst, q), &one, &mut ops)
+            .unwrap();
+        let fb2 = PrimeProjectedAbscissaBase { instance: &inst }
+            .build(&ctx(&inst, q), &base_params(32), &mut ops)
+            .unwrap();
+        for (fb, spec, needle) in [
+            (&fb2, "wwalk:x=1.5,g=1,grow=2,tw=2,lazy=1", ""),
+            (&fb1, "wwalk:x=1.5,g=1,grow=2,tw=2", "exactly 2 abscissae"),
+            (&fb2, "wwalk:x=1.5,g=1,grow=2,tw=3", "tw is 0, 1 or 2"),
+            (&fb2, "wwalk:x=1.5,grow=2,tw=2", "tw=2 needs g=1 and grow=2"),
+            (
+                &fb2,
+                "wwalk:x=1.5,g=1,grow=1,tw=2",
+                "tw=2 needs g=1 and grow=2",
+            ),
+            (&fb2, "wwalk:x=1.5,lazy=1", "lazy=1 needs g=1"),
+            (
+                &fb2,
+                "wwalk:x=1.5,g=1,grow=2,cj=1",
+                "cj=1 needs tw=1 or tw=2",
+            ),
+        ] {
+            let (_, params) = Params::parse_spec(spec).unwrap();
+            let mut oracle = WWalkOracle::<PrimePoint>::new();
+            let res = DecompositionOracle::<PrimeCurve>::prepare(
+                &mut oracle,
+                &ctx(&inst, q),
+                fb,
+                &params,
+                &mut ops,
+            );
+            if needle.is_empty() {
+                assert!(res.is_ok(), "{spec}: {res:?}");
+            } else {
+                let err = res.unwrap_err();
+                assert!(err.contains(needle), "{spec}: {err}");
+            }
+        }
+    }
+}
+
+/// **`layout=lines` is a memory layout, not a different oracle.**  The
+/// opt-in cache-line pair index and prefetched relation guard (#3116)
+/// must leave every observable of the default (`map`) layout unchanged:
+/// the decomposition of every target, the counted group operations and
+/// native counters of the table build and of every probe, the relation
+/// stream the pipeline collects, and the solved logarithm.  Checked on
+/// several small prime-field curves and seeds, for both oracles that
+/// accept the option: `mitm:negation_folded=1` and `mitm-prime-batch:m=2`.
+#[cfg(test)]
+mod layout_lines_equality_tests {
+    use super::*;
+    use crate::cryptanalysis::ic_boundary::{
+        find_prime_order_curve, prime_factor_base, prime_instance_for, Calibration, CountedGroup,
+        PrimeCurve, PrimeInstance, PrimePoint, Relation,
+    };
+    use crate::cryptanalysis::ic_framework::stages::Targets;
+    use crate::cryptanalysis::ic_framework::{run_pipeline, PipelineSpec, RunReport};
+    use rand::{rngs::StdRng, Rng, SeedableRng};
+
+    /// The two oracle specs that accept `layout`, as the CLI spells them.
+    const SPECS: [&str; 2] = ["mitm:negation_folded=1", "mitm-prime-batch:m=2"];
+
+    /// Small prime-field curves: four roster curves and two curves drawn
+    /// by `find_prime_order_curve` off the roster, with a base size each.
+    fn curves() -> Vec<(PrimeInstance, usize)> {
+        vec![
+            (prime_instance_for(14, 1), 16),
+            (prime_instance_for(16, 1), 24),
+            (prime_instance_for(18, 1), 32),
+            (prime_instance_for(20, 59297), 48),
+            (find_prime_order_curve(15, 20261106), 20),
+            (find_prime_order_curve(17, 3116), 28),
+        ]
+    }
+
+    fn oracle_for(name: &str) -> Box<dyn DecompositionOracle<PrimeCurve>> {
+        match name {
+            "mitm" => Box::new(MitmOracle::new(2)),
+            "mitm-prime-batch" => Box::new(PrimeBatchMitmOracle::new()),
+            other => panic!("no oracle {other}"),
+        }
+    }
+
+    /// `(name, default params, lines params)` for one spec string.
+    fn arms(spec: &str) -> (String, Params, Params) {
+        let (name, map) = Params::parse_spec(spec).unwrap();
+        let (_, lines) = Params::parse_spec(&format!("{spec},layout=lines")).unwrap();
+        assert_eq!(lines.get("layout"), Some("lines"));
+        assert_eq!(map.get("layout"), None);
+        (name, map, lines)
+    }
+
+    fn ctx(inst: &PrimeInstance, target: PrimePoint) -> InstanceCtx<'_, PrimeCurve> {
+        InstanceCtx {
+            group: &inst.curve,
+            generator: inst.generator_point(),
+            target,
+            r: inst.r,
+            cofactor: inst.cofactor,
+            group_order: inst.group_order,
+            name: inst.name.clone(),
+            field_degree: None,
+        }
+    }
+
+    /// The explicit `layout=map` spelling is the default, and the lines
+    /// layout is the only arm that turns the line guard on.
+    #[test]
+    fn layout_map_is_the_default_and_lines_selects_the_line_guard() {
+        let (inst, size) = curves().remove(1);
+        let fb = prime_factor_base(&inst, size);
+        let c = ctx(&inst, inst.generator_point());
+        for spec in SPECS {
+            let (name, map, lines) = arms(spec);
+            let (_, explicit) = Params::parse_spec(&format!("{spec},layout=map")).unwrap();
+            for (params, guard) in [(&map, false), (&explicit, false), (&lines, true)] {
+                let mut oracle = oracle_for(&name);
+                oracle
+                    .prepare(&c, &fb, params, &mut GroupOps::default())
+                    .unwrap();
+                assert_eq!(oracle.line_guard(), guard, "{spec} {params:?}");
+            }
+        }
+    }
+
+    /// Table build and every probe: same decompositions (as summand
+    /// indices and as the relations the pipeline is handed), same group
+    /// operations, same native counters, target by target.
+    #[test]
+    fn layout_lines_gives_identical_decompositions_and_counted_operations() {
+        for (inst, size) in curves() {
+            let fb = prime_factor_base(&inst, size);
+            let g = inst.generator_point();
+            let c = ctx(&inst, g);
+            for spec in SPECS {
+                let (name, map_params, line_params) = arms(spec);
+                let mut map = oracle_for(&name);
+                let mut lines = oracle_for(&name);
+                let mut map_build = GroupOps::default();
+                let mut line_build = GroupOps::default();
+                map.prepare(&c, &fb, &map_params, &mut map_build).unwrap();
+                lines
+                    .prepare(&c, &fb, &line_params, &mut line_build)
+                    .unwrap();
+                let label = format!("{} {spec}", inst.name);
+                assert!(!map.line_guard() && lines.line_guard(), "{label}");
+                assert_eq!(map_build, line_build, "{label}: build ops");
+                assert!(map_build.adds > 0, "{label}: the build counted nothing");
+                assert_eq!(
+                    map.setup_work_native(),
+                    lines.setup_work_native(),
+                    "{label}: build work"
+                );
+                assert_eq!(map.summands(), lines.summands(), "{label}");
+                for seed in [1u64, 7, 20261106] {
+                    let mut rng = StdRng::seed_from_u64(seed ^ inst.r);
+                    let mut map_ops = GroupOps::default();
+                    let mut line_ops = GroupOps::default();
+                    let mut map_ctr = OracleCounters::default();
+                    let mut line_ctr = OracleCounters::default();
+                    let mut hits = 0u64;
+                    let mut setup = GroupOps::default();
+                    for trial in 0..3000u64 {
+                        let (a, b) = (rng.gen_range(0..inst.r), rng.gen_range(0..inst.r));
+                        let point = inst.curve.mul(&mut setup, g, a);
+                        let point = inst.curve.add(
+                            &mut setup,
+                            point,
+                            inst.curve.mul(&mut GroupOps::default(), g, b),
+                        );
+                        lines.touch(&c, &point);
+                        let m = map.decompose(&c, &fb, &mut map_ops, &mut map_ctr, point);
+                        let l = lines.decompose(&c, &fb, &mut line_ops, &mut line_ctr, point);
+                        assert_eq!(m, l, "{label} seed {seed} trial {trial}");
+                        if let Some(w) = &m {
+                            hits += 1;
+                            let sum = w.iter().fold(None::<PrimePoint>, |acc, &i| {
+                                Some(match acc {
+                                    None => fb.points[i],
+                                    Some(s) => {
+                                        inst.curve.add(&mut GroupOps::default(), s, fb.points[i])
+                                    }
+                                })
+                            });
+                            assert_eq!(sum, Some(point), "{label}: a wrong decomposition");
+                        }
+                        let mr: Vec<Relation> = map.decompose_relations(
+                            &c,
+                            &fb,
+                            &mut map_ops,
+                            &mut map_ctr,
+                            point,
+                            a,
+                            b,
+                        );
+                        let lr: Vec<Relation> = lines.decompose_relations(
+                            &c,
+                            &fb,
+                            &mut line_ops,
+                            &mut line_ctr,
+                            point,
+                            a,
+                            b,
+                        );
+                        assert_eq!(mr, lr, "{label} seed {seed} trial {trial}: relations");
+                    }
+                    assert!(hits > 0, "{label} seed {seed}: no target decomposed");
+                    assert_eq!(map_ops, line_ops, "{label} seed {seed}: probe ops");
+                    assert_eq!(
+                        format!("{map_ctr:?}"),
+                        format!("{line_ctr:?}"),
+                        "{label} seed {seed}: probe counters"
+                    );
+                    assert!(map_ctr.lookups > 0, "{label}: no lookup counted");
+                }
+                assert_eq!(
+                    map.relation_counters(),
+                    lines.relation_counters(),
+                    "{label}: relation counters"
+                );
+            }
+        }
+    }
+
+    fn assert_same_run(map: &RunReport, lines: &RunReport, label: &str) {
+        assert_eq!(map.recovered, lines.recovered, "{label}: recovered");
+        assert_eq!(map.verified, lines.verified, "{label}: verified");
+        assert_eq!(map.exhausted, lines.exhausted, "{label}: exhausted");
+        let (fm, fl) = (&map.factor_base, &lines.factor_base);
+        assert_eq!(fm.columns, fl.columns, "{label}");
+        assert_eq!(fm.signed_points, fl.signed_points, "{label}");
+        assert_eq!(fm.cost.group_ops, fl.cost.group_ops, "{label}: base ops");
+        assert_eq!(fm.cost.native, fl.cost.native, "{label}: base native");
+        let (dm, dl) = (&map.decomposition, &lines.decomposition);
+        assert_eq!(dm.targets_tried, dl.targets_tried, "{label}: targets");
+        assert_eq!(dm.relations_found, dl.relations_found, "{label}: relations");
+        assert_eq!(dm.setup.group_ops, dl.setup.group_ops, "{label}: setup ops");
+        assert_eq!(dm.setup.native, dl.setup.native, "{label}: setup native");
+        assert_eq!(dm.setup.work_native, dl.setup.work_native, "{label}");
+        assert_eq!(dm.setup.gae, dl.setup.gae, "{label}: setup gae");
+        assert_eq!(
+            dm.cost.group_ops, dl.cost.group_ops,
+            "{label}: relation ops"
+        );
+        assert_eq!(dm.cost.native, dl.cost.native, "{label}: relation native");
+        assert_eq!(dm.cost.work_native, dl.cost.work_native, "{label}");
+        assert_eq!(dm.cost.gae, dl.cost.gae, "{label}: relation gae");
+        let (lm, ll) = (&map.linear_algebra, &lines.linear_algebra);
+        assert_eq!(
+            (lm.rows, lm.rank, lm.dependent, lm.work),
+            (ll.rows, ll.rank, ll.dependent, ll.work),
+            "{label}: linear algebra"
+        );
+        assert_eq!(lm.cost.native, ll.cost.native, "{label}");
+        assert_eq!(map.verify.group_ops, lines.verify.group_ops, "{label}");
+        assert_eq!(map.total_gae, lines.total_gae, "{label}: total gae");
+        assert_eq!(map.s, lines.s, "{label}: S");
+    }
+
+    /// End to end: the same relation counts, the same counted cost in
+    /// every phase, and the same solved logarithm, with walk, random and
+    /// batched-lane targets (the lane source is the one that prefetches).
+    #[test]
+    fn layout_lines_solves_the_same_logarithm_at_the_same_counted_cost() {
+        let calib = Calibration::default();
+        let mut solved = 0;
+        for (inst, size) in curves() {
+            let g = inst.generator_point();
+            for planted_seed in [11u64, 30_011, 20_261_106] {
+                let planted = planted_seed % inst.r;
+                let q = inst.curve.mul(&mut GroupOps::default(), g, planted);
+                let c = ctx(&inst, q);
+                for spec in SPECS {
+                    let (name, map_params, line_params) = arms(spec);
+                    for targets in [Targets::Walk, Targets::Random, Targets::WalkPrimeBatch16] {
+                        for seed in [7u64, 3116] {
+                            let run = |params: &Params| {
+                                let mut spec = PipelineSpec {
+                                    factor_base: "prime-abscissa".into(),
+                                    oracle: name.clone(),
+                                    oracle_params: params.clone(),
+                                    targets,
+                                    max_trials: 2_000_000,
+                                    seed,
+                                    ..Default::default()
+                                };
+                                spec.factor_base_params.set("size", size.to_string());
+                                let mut oracle = oracle_for(&name);
+                                run_pipeline(
+                                    &c,
+                                    &spec,
+                                    &PrimeAbscissaBase { instance: &inst },
+                                    oracle.as_mut(),
+                                    planted,
+                                    &calib,
+                                    None,
+                                )
+                                .unwrap()
+                            };
+                            let map = run(&map_params);
+                            let lines = run(&line_params);
+                            let label = format!(
+                                "{} {spec} {} seed {seed} planted {planted}",
+                                inst.name,
+                                targets.name()
+                            );
+                            assert_same_run(&map, &lines, &label);
+                            if map.verified {
+                                assert_eq!(map.recovered, Some(planted), "{label}");
+                                solved += 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // Six curves × three logs × two specs × three sources × two seeds.
+        assert_eq!(solved, 216, "every configuration should solve");
+    }
+}
+
+#[cfg(test)]
+mod free_rows_probe {
+    //! Feasibility probe (not a result): how many target-free relations the
+    //! Frobenius-folded pair table's build-time key collisions give on the
+    //! frozen orbit panel, and their rank over the column unknowns mod r.
+    use super::*;
+    use crate::cryptanalysis::ic_boundary::koblitz_instance;
+    use crate::cryptanalysis::koblitz_fast::FrobeniusCanon;
+    use num_traits::ToPrimitive;
+    use std::collections::HashMap;
+
+    fn mulmod(a: u64, b: u64, r: u64) -> u64 {
+        ((a as u128 * b as u128) % r as u128) as u64
+    }
+    fn powmod(mut a: u64, mut e: u64, r: u64) -> u64 {
+        let mut acc = 1u64;
+        while e > 0 {
+            if e & 1 == 1 {
+                acc = mulmod(acc, a, r);
+            }
+            a = mulmod(a, a, r);
+            e >>= 1;
+        }
+        acc
+    }
+    fn rank(rows: &[Vec<u64>], cols: usize, r: u64) -> usize {
+        let mut piv: Vec<Option<Vec<u64>>> = vec![None; cols];
+        let mut rk = 0;
+        for row in rows {
+            let mut v = row.clone();
+            for c in 0..cols {
+                if v[c] == 0 {
+                    continue;
+                }
+                match &piv[c] {
+                    Some(p) => {
+                        let f = v[c];
+                        for k in c..cols {
+                            v[k] = (v[k] + r - mulmod(f, p[k], r)) % r;
+                        }
+                    }
+                    None => {
+                        let inv = powmod(v[c], r - 2, r);
+                        for k in c..cols {
+                            v[k] = mulmod(v[k], inv, r);
+                        }
+                        piv[c] = Some(v);
+                        rk += 1;
+                        break;
+                    }
+                }
+            }
+            if rk == cols {
+                break;
+            }
+        }
+        rk
+    }
+
+    #[test]
+    #[ignore]
+    fn frobenius_table_free_rows_probe() {
+        let panel: &[(u8, u32, usize)] = &[
+            (0, 13, 1),
+            (1, 17, 1),
+            (0, 19, 2),
+            (0, 23, 3),
+            (1, 29, 1),
+            (0, 31, 2),
+            (0, 37, 8),
+            (0, 41, 90),
+        ];
+        for &(a, n, c) in panel {
+            let inst = koblitz_instance(a, n).expect("instance");
+            let g = BinaryGroup(&inst.fast);
+            let ctx = InstanceCtx {
+                group: &g,
+                generator: inst.generator,
+                target: inst.generator,
+                r: inst.r,
+                cofactor: inst.cofactor,
+                group_order: inst.group_order,
+                name: inst.name.clone(),
+                field_degree: Some(inst.n),
+            };
+            let (_, params) = Params::parse_spec(&format!(
+                "compact-orbit-scan:columns={c},raw_x_cap=100000000"
+            ))
+            .unwrap();
+            let mut ops = GroupOps::default();
+            let fb = CompactOrbitScanBase { instance: &inst }
+                .build(&ctx, &params, &mut ops)
+                .unwrap();
+            let r = inst.r;
+            let lambda = (&inst.koblitz.as_ref().unwrap().lambda % r)
+                .to_u64()
+                .unwrap();
+            let canon = FrobeniusCanon::new(&inst.gf, inst.n).unwrap();
+            let f = fb.points.len();
+            let cols = fb.columns;
+            // Orbit representatives exactly as FrobeniusPairTable::build_inner.
+            let mut orbit_of = vec![0u32; f];
+            let mut reps: Vec<usize> = Vec::new();
+            let mut idx: HashMap<u64, u32> = HashMap::new();
+            for i in 0..f {
+                let key = canon.canon(fb.points[i].x);
+                let next = reps.len() as u32;
+                let id = *idx.entry(key).or_insert(next);
+                if id == next {
+                    reps.push(i);
+                }
+                orbit_of[i] = id;
+            }
+            let mut map: HashMap<u64, (usize, usize, u32, FastPoint)> = HashMap::new();
+            let (mut attempts, mut collisions, mut mismatches) = (0u64, 0u64, 0u64);
+            let mut rows: Vec<Vec<u64>> = Vec::new();
+            let mut ops2 = GroupOps::default();
+            for (orbit, &rep) in reps.iter().enumerate() {
+                for j in 0..f {
+                    if (orbit_of[j] as usize) < orbit {
+                        continue;
+                    }
+                    let u = g.add(&mut ops2, fb.points[rep], fb.points[j]);
+                    if u.infinity {
+                        continue;
+                    }
+                    attempts += 1;
+                    let (key, t_u) = canon.canon_with_shift(u.x);
+                    match map.get(&key) {
+                        None => {
+                            map.insert(key, (rep, j, t_u, u));
+                        }
+                        Some(&(i0, j0, t0, u0)) => {
+                            collisions += 1;
+                            let t = (t0 + n - t_u) % n;
+                            let v = inst.fast.frobenius_k(u0, t);
+                            let s_neg = if v == u {
+                                false
+                            } else if v == g.neg(u) {
+                                true
+                            } else {
+                                mismatches += 1;
+                                continue;
+                            };
+                            let mut row = vec![0u64; cols];
+                            for &k in &[rep, j] {
+                                let col = fb.col_of[k];
+                                row[col] = (row[col] + fb.coef_of[k] % r) % r;
+                            }
+                            let lt = powmod(lambda, t as u64, r);
+                            for &k in &[i0, j0] {
+                                let col = fb.col_of[k];
+                                let mut term = mulmod(lt, fb.coef_of[k] % r, r);
+                                if !s_neg {
+                                    term = (r - term) % r;
+                                }
+                                row[col] = (row[col] + term) % r;
+                            }
+                            if row.iter().any(|&x| x != 0) {
+                                rows.push(row);
+                            }
+                        }
+                    }
+                }
+            }
+            let rk = rank(&rows, cols, r);
+            println!(
+                "n{n} a{a} c{cols} |F| {f} reps {} entries {} attempts {attempts} collisions {collisions} nonzero rows {} rank {rk} (need {}) mismatches {mismatches} r 2^{:.1}",
+                reps.len(),
+                map.len(),
+                rows.len(),
+                cols.saturating_sub(1),
+                (r as f64).log2()
             );
         }
     }

@@ -4206,7 +4206,8 @@ pub struct ScanScratch {
     /// `rests`.
     x3s: Vec<u64>,
     /// The coordinates of a [`Scan::Indices`] scan's summands, gathered
-    /// for the folding kernel.
+    /// for the folding kernel on every scan.  A [`Scan::Gathered`] scan
+    /// brings its own and leaves these unused.
     gather_x: Vec<u64>,
     gather_y: Vec<u64>,
 }
@@ -4469,7 +4470,9 @@ impl Targets {
 /// outright, which costs a gather but can express a set the base
 /// ordering does not make contiguous; factor-base orbits are not
 /// contiguous in index order, so the columns still uncovered never are
-/// either.
+/// either.  [`Scan::Gathered`] is the same index scan with its
+/// summands' coordinates gathered by the caller, once for many scans,
+/// so the folding kernel takes them as they stand.
 ///
 /// The hit rate per summand scanned is `|pairs| / r` whichever summand
 /// it is, so the choice does not change scans-per-relation; it changes
@@ -4482,7 +4485,9 @@ pub enum Scan<'a> {
     Indices(&'a [u32]),
     /// [`Scan::Indices`] with the summands' negated coordinates already
     /// gathered, in the same order: `xs[i]` and `ys[i]` are those of
-    /// `idxs[i]`.  The same scan, without its per-trial gather.
+    /// `idxs[i]`, so all three have one length.  The same scan, without
+    /// its per-trial gather.  The coordinates are read only on the
+    /// folding kernel's path; every other path reads `idxs`.
     Gathered {
         idxs: &'a [u32],
         xs: &'a [u64],
@@ -6896,7 +6901,10 @@ impl PairSumTable {
     /// gathered into `gather` first; that copy is one `FastPoint` move
     /// per summand against the curve addition it feeds, and it is
     /// inside the measured adds-per-scan constant for the targeted
-    /// path rather than assumed away.
+    /// path rather than assumed away.  A [`Scan::Gathered`] scan is an
+    /// index scan whose caller did that gather once for many scans: on
+    /// the folding kernel's path its slices go in as they stand, and
+    /// every other path reads its indices.
     pub fn witnesses_fast_scan(
         &self,
         target: FastPoint,
@@ -6984,9 +6992,20 @@ impl PairSumTable {
                     self.curve
                         .add_many_lazy_soa(target, gather_x, gather_y, x3s, lambdas, batch)
                 }
-                Scan::Gathered { xs, ys, .. } => self
-                    .curve
-                    .add_many_lazy_soa(target, xs, ys, x3s, lambdas, batch),
+                Scan::Gathered { idxs, xs, ys } => {
+                    // A shorter slice would scan fewer summands than
+                    // `Scan::len` counts; a longer one would index past
+                    // `idxs` when a rest is matched.
+                    debug_assert!(
+                        xs.len() == idxs.len() && ys.len() == idxs.len(),
+                        "Scan::Gathered: {} indices, {} and {} coordinates",
+                        idxs.len(),
+                        xs.len(),
+                        ys.len()
+                    );
+                    self.curve
+                        .add_many_lazy_soa(target, xs, ys, x3s, lambdas, batch)
+                }
             };
             if !done {
                 x3s.clear();
@@ -8516,6 +8535,14 @@ fn groebner_decompose_with_geometry(
             crate::cryptanalysis::koblitz_groebner::fall_row_gate_augment(equations, sys.n_vars)
         })
         .flatten();
+    // The links before the last never read the target: mark them for the
+    // prefix-cached root (`KIC_F4_PREFIX_ROOT=1`).  Augmented systems get
+    // no hint.
+    crate::cryptanalysis::inherited_f4::set_prefix_hint(if m >= 3 && augmented.is_none() {
+        (m - 2) * kc.n as usize
+    } else {
+        0
+    });
     let equations = augmented.as_ref().unwrap_or(equations);
     let back = order.as_deref().map(invert_permutation);
     let mut accept_root = |root| {
@@ -14139,19 +14166,29 @@ impl<'a> RelationCollector<'a> {
         doubled.extend_from_slice(&idxs);
         doubled.extend_from_slice(&idxs[..window]);
         // The summands' coordinates, gathered once here rather than by
-        // every trial's scan (`Scan::Gathered`); empty when the table
-        // keeps none, and then the scan gathers as before.
+        // every trial's scan (`Scan::Gathered`).  Only the folding
+        // kernel reads them, so they are gathered only where it can run
+        // (the scan's own `fused` condition); elsewhere they stay empty,
+        // the scan is `Scan::Indices`, and the control arm
+        // `KIC_SCAN_SOA=0` is charged nothing for them.
         let (doubled_x, doubled_y) = match self.pair_table() {
-            Some(pair) if !pair.negated_x.is_empty() => (
-                doubled
-                    .iter()
-                    .map(|&i| pair.negated_x[i as usize])
-                    .collect(),
-                doubled
-                    .iter()
-                    .map(|&i| pair.negated_y[i as usize])
-                    .collect(),
-            ),
+            Some(pair)
+                if pair.fold
+                    && pair.canon.is_some()
+                    && scan_soa_enabled()
+                    && !pair.negated_x.is_empty() =>
+            {
+                (
+                    doubled
+                        .iter()
+                        .map(|&i| pair.negated_x[i as usize])
+                        .collect(),
+                    doubled
+                        .iter()
+                        .map(|&i| pair.negated_y[i as usize])
+                        .collect(),
+                )
+            }
             _ => (Vec::new(), Vec::new()),
         };
         Some(Targets::Subset {
@@ -20589,6 +20626,7 @@ mod tests {
     /// index list hands it, in the same order.
     #[test]
     fn a_pre_gathered_scan_hands_the_sink_what_the_index_list_does() {
+        let mut fused = 0;
         for (degree, points) in [(19u32, 300usize), (31, 400)] {
             let kc = KoblitzCurve::new(0, degree).unwrap();
             let fb = build_subgroup_orbit_factor_base(&kc, 3, points).unwrap();
@@ -20612,6 +20650,32 @@ mod tests {
             let idxs: Vec<u32> = (0..base).filter(|i| i % 3 != 1).rev().collect();
             let xs: Vec<u64> = idxs.iter().map(|&i| folded.negated_x[i as usize]).collect();
             let ys: Vec<u64> = idxs.iter().map(|&i| folded.negated_y[i as usize]).collect();
+            // Whether the folding kernel, the only reader of `xs` and
+            // `ys`, runs here at all; without it both scans take the
+            // point list and the comparison below proves nothing.
+            let kernel_runs = folded.canon.is_some() && scan_soa_enabled() && {
+                let (mut x3, mut lambdas) = (Vec::new(), Vec::new());
+                fc.add_many_lazy_soa(
+                    fc.double(folded.points[0]),
+                    &folded.negated_x[1..17],
+                    &folded.negated_y[1..17],
+                    &mut x3,
+                    &mut lambdas,
+                    &mut BatchScratch::default(),
+                )
+            };
+            if kernel_runs {
+                fused += 1;
+            }
+            // A negative control: the same indices with the coordinates
+            // rotated by one, so every summand the kernel reads is its
+            // neighbour's.  Where the kernel runs, some target must then
+            // come out different, or the scan is not reading the slices.
+            let (mut xs_off, mut ys_off) = (xs.clone(), ys.clone());
+            xs_off.rotate_left(1);
+            ys_off.rotate_left(1);
+            let mut control_differs = false;
+            let mut scratch_c = ScanScratch::default();
             let (mut scratch_a, mut scratch_b) = (ScanScratch::default(), ScanScratch::default());
             let mut found = 0usize;
             for t in 1u64..300 {
@@ -20639,11 +20703,97 @@ mod tests {
                 });
                 assert_eq!(a, b, "degree {degree}, t = {t}: the scans disagree");
                 found += a.len();
+                if kernel_runs && !control_differs {
+                    let mut c = Vec::new();
+                    let shifted = Scan::Gathered {
+                        idxs: &idxs,
+                        xs: &xs_off,
+                        ys: &ys_off,
+                    };
+                    folded.witnesses_fast_scan(target, 3, shifted, &mut scratch_c, &mut |w| {
+                        c.push(w.to_vec());
+                        true
+                    });
+                    control_differs = c != a;
+                }
             }
             assert!(
                 found > 0,
                 "degree {degree}: the scans found nothing to compare"
             );
+            assert!(
+                !kernel_runs || control_differs,
+                "degree {degree}: shifted coordinates changed nothing, so the scan ignores them"
+            );
+        }
+        #[cfg(target_arch = "x86_64")]
+        if scan_soa_enabled()
+            && is_x86_feature_detected!("avx512f")
+            && is_x86_feature_detected!("vpclmulqdq")
+        {
+            assert_eq!(
+                fused, 2,
+                "the folding kernel ran at only {fused} of 2 degrees"
+            );
+        }
+    }
+
+    /// `aimed()`'s gathered coordinates must line up with its indices at
+    /// every offset a trial can draw, wraparound included: `xs[i]` and
+    /// `ys[i]` of a [`Scan::Gathered`] scan are those of `idxs[i]`.  And
+    /// they exist only where the folding kernel can read them.
+    #[test]
+    fn aimed_scans_carry_the_coordinates_of_their_indices() {
+        let kc = KoblitzCurve::new(0, 19).unwrap();
+        let fb = build_subgroup_orbit_factor_base(&kc, 3, 400).unwrap();
+        let folded = PairSumTable::build_within(
+            &kc,
+            &fb,
+            PairSumTable::folded_byte_size(fb.signed_orbits.len(), fb.points.len(), kc.n),
+        )
+        .unwrap();
+        assert!(folded.is_folded(), "expected the fold tier");
+        let base = fb.points.len();
+        // A scattered, unsorted, duplicated subset, and one wider window
+        // than the subset, so the clamp and the wrap are both exercised.
+        let named: Vec<u32> = (0..base as u32)
+            .rev()
+            .filter(|i| i % 5 == 3)
+            .chain([3, 8, 13])
+            .collect();
+        let subset = named
+            .iter()
+            .collect::<std::collections::BTreeSet<_>>()
+            .len();
+        for window in [subset / 3, subset + 7] {
+            let opts = windowed_options(window.clamp(1, base - 1));
+            let collector =
+                RelationCollector::with_pair_table(&kc, &fb, &opts, Some(&folded)).unwrap();
+            let targets = collector.aimed(&named).expect("a subset to aim at");
+            let expect_gathered =
+                folded.canon.is_some() && scan_soa_enabled() && !folded.negated_x.is_empty();
+            let mut gathered_scans = 0;
+            for t in 0..2 * subset as u64 {
+                match targets.scan(0x5eed, t, base) {
+                    Scan::Gathered { idxs, xs, ys } => {
+                        assert!(expect_gathered, "gathered where the kernel cannot run");
+                        assert_eq!(idxs.len(), targets.len());
+                        assert_eq!(xs.len(), idxs.len());
+                        assert_eq!(ys.len(), idxs.len());
+                        for (i, &k) in idxs.iter().enumerate() {
+                            assert_eq!(xs[i], folded.negated_x[k as usize], "t = {t}, i = {i}");
+                            assert_eq!(ys[i], folded.negated_y[k as usize], "t = {t}, i = {i}");
+                        }
+                        gathered_scans += 1;
+                    }
+                    Scan::Indices(idxs) => {
+                        assert!(!expect_gathered, "not gathered where the kernel runs");
+                        assert_eq!(idxs.len(), targets.len());
+                    }
+                    Scan::Cyclic { .. } => panic!("an aimed unit scans its subset"),
+                }
+            }
+            assert!(!expect_gathered || gathered_scans > 0);
         }
     }
 

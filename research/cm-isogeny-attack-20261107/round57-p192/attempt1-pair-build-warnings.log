@@ -1,0 +1,26 @@
+   Compiling paired-trace-resultant v0.1.0 (/home/ec2-user/research/cm-isogeny-attack-20261107/round57-p192/native)
+warning: unused import: `num_bigint::BigUint as Z`
+ --> src/bin/p192_pairs.rs:4:5
+  |
+4 | use num_bigint::BigUint as Z;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: unused import: `num_traits::Zero`
+ --> src/bin/p192_pairs.rs:5:5
+  |
+5 | use num_traits::Zero;
+  |     ^^^^^^^^^^^^^^^^
+
+warning: unused variable: `e`
+  --> src/bin/p192_pairs.rs:18:10
+   |
+18 | fn field(e: &big::E, x: &big::K) -> serde_json::Value {
+   |          ^ help: if this is intentional, prefix it with an underscore: `_e`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `paired-trace-resultant` (bin "p192_pairs") generated 3 warnings (run `cargo fix --bin "p192_pairs" -p paired-trace-resultant` to apply 3 suggestions)
+    Finished `release` profile [optimized] target(s) in 1.28s
+     Running `p192-round57-native-target/release/p192_pairs /home/ec2-user/research/cm-isogeny-attack-20261107/round57-p192`

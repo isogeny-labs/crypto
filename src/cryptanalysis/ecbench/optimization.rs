@@ -439,6 +439,12 @@ const POLICIES: &[PolicyDecl] = &[
         FullPrice
     ),
     policy!(
+        "rho.signed_frobenius_v2_full",
+        ImplementationAb,
+        PricingSensitivity,
+        FullPrice
+    ),
+    policy!(
         "rho.signed_frobenius_strong_full",
         NativeGrid,
         PricingSensitivity,
@@ -470,6 +476,12 @@ const POLICIES: &[PolicyDecl] = &[
     ),
     policy!(
         "ic.tensor_contraction_v1",
+        NativeGrid,
+        DiagnosticOnly,
+        StandardBand
+    ),
+    policy!(
+        "ic.tensor_contraction_cofactor_v1",
         NativeGrid,
         DiagnosticOnly,
         StandardBand
@@ -520,6 +532,14 @@ const POLICIES: &[PolicyDecl] = &[
         "rho.negation_v2",
         ImplementationAb,
         FrontierEligible,
+        StandardBand
+    ),
+    // Rejected by research/curve25519_engine_items_20261110 (1.53x and
+    // 2.74x rho.negation's cost): a diagnostic, never a frontier reference.
+    policy!(
+        "rho.negation_chained",
+        ImplementationAb,
+        DiagnosticOnly,
         StandardBand
     ),
     policy!(
@@ -580,6 +600,24 @@ const POLICIES: &[PolicyDecl] = &[
         "ic.large_prime_v2",
         NativeAdaptive,
         FrontierEligible,
+        StandardBand
+    ),
+    policy!(
+        "cheon.pminus1_comb",
+        ImplementationAb,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
+        "cheon.pminus1_naive",
+        ImplementationAb,
+        SpecializedDomain,
+        StandardBand
+    ),
+    policy!(
+        "cheon.pplus1_comb",
+        ImplementationAb,
+        SpecializedDomain,
         StandardBand
     ),
 ];

@@ -463,6 +463,106 @@ fn ic_rule(counter: &str) -> Option<Rule> {
     })
 }
 
+/// The factor base's spec name and its parameters (`name:k=v,k=v`).
+fn factor_base_spec(params: &BTreeMap<String, String>) -> Option<(&str, BTreeMap<&str, &str>)> {
+    let spec = params.get("factor_base")?;
+    let (name, rest) = spec.split_once(':').unwrap_or((spec.as_str(), ""));
+    let kv = rest
+        .split(',')
+        .filter_map(|p| p.split_once('='))
+        .map(|(k, v)| (k.trim(), v.trim()))
+        .collect();
+    Some((name.trim(), kv))
+}
+
+/// `C(n, k)`, `None` past `u128`.
+fn binomial(n: u128, k: u128) -> Option<u128> {
+    if k > n {
+        return Some(0);
+    }
+    let k = k.min(n - k);
+    let mut c: u128 = 1;
+    for i in 0..k {
+        c = c.checked_mul(n - i)? / (i + 1);
+    }
+    Some(c)
+}
+
+/// Rules of the extension of 2026-11-07 (`docs/units/BITOPS.md`,
+/// "Extensions"): counters whose increment is not a fixed primitive sum by
+/// name alone, but is one given the record's field or factor-base
+/// parameters.  `None`: not one of them (the name table decides).
+/// `Some(None)`: one of them, but this record lacks what the rule reads,
+/// so it stays unpriced.  `Some(Some(prims))`: the counter's whole work.
+fn contextual_ic_rule(
+    counter: &str,
+    count: u64,
+    widths: &Widths,
+    params: &BTreeMap<String, String>,
+) -> Option<Option<Vec<(Prim, u128)>>> {
+    match counter {
+        // `cyclotomic` and `onb-weight` (`ic_framework::plugins`) enumerate
+        // every `w`-subset of their atoms (`CyclotomicField::weight_set`:
+        // the `p = 2n + 1` powers of γ, or the `n` ONB elements), sum each
+        // subset into an accumulator (`w` additions in `F_{2^n}`) and insert
+        // the sum into an ordered set (one keyed-set probe).  The counter is
+        // the deduplicated set's size, so the work is read from the
+        // parameters, not from the count: `C(atoms, w) · (w·field_add +
+        // hash_probe)`.  The subset iterator's index updates are control.
+        "abscissae_enumerated_uncharged" => {
+            let rule = (|| {
+                let Field::Binary { n } = widths.field else {
+                    return None;
+                };
+                let (name, kv) = factor_base_spec(params)?;
+                let atoms: u128 = match name {
+                    "cyclotomic" => 2 * n as u128 + 1,
+                    "onb-weight" => n as u128,
+                    _ => return None,
+                };
+                let w: u128 = kv.get("w")?.parse().ok()?;
+                if w == 0 || w > atoms {
+                    return None;
+                }
+                let subsets = binomial(atoms, w)?;
+                // The set is the subsets' distinct sums: never larger.
+                if (count as u128) > subsets {
+                    return None;
+                }
+                Some(vec![(FieldAdd, subsets * w), (HashProbe, subsets)])
+            })();
+            Some(rule)
+        }
+        // On `y² + xy = x³ + ax² + b` there is no square root to take: a
+        // "square-root solve" of a binary-field base (`gaudry_quartic_bin`'s
+        // `lift_x`, as every binary `points_with_x`) is the Artin–Schreier
+        // lift attempt `c = x + a + b/x²`, `u² + u = c`: one squaring, one
+        // inversion, one product, two additions and the half-trace solve,
+        // done whether or not `u` exists.  (The prime-field rule, a
+        // Tonelli–Shanks root, has no binary price.)  `F_{p⁴}` keeps no rule:
+        // `gaudry_quartic::Fp4::sqrt` is Tonelli–Shanks with a random
+        // non-residue search, so one call is not a fixed primitive sum.
+        "sqrt_solves" if matches!(widths.field, Field::Binary { .. }) => Some(Some(vec![
+            (FieldSqr, count as u128),
+            (FieldInv, count as u128),
+            (FieldMul, count as u128),
+            (FieldAdd, 2 * count as u128),
+            (AsSolve, count as u128),
+        ])),
+        _ => None,
+    }
+}
+
+/// Work around a priced counter of the 2026-11-07 extension that no
+/// counter sees: the cyclotomic field's construction (the root-of-unity
+/// search's exponentiations, the ONB matrix inversion) and the
+/// `points_with_x` lift test of each abscissa visited.
+pub const CYCLOTOMIC_BASE_GAP: &str = "cyclotomic_field_construction_and_abscissa_lift_tests";
+/// The same for `bin-t-line`: the map `t ↦ x = β(t + 1)/t` of each lift
+/// attempt and a successful lift's tail (the product `y = x·u`, the sign
+/// draw and the conditional negation).
+pub const BIN_T_LINE_GAP: &str = "bin_t_line_abscissa_map_and_lift_tails";
+
 /// The `known_uncounted` item of the `ic.cm_folded_*` native backend
 /// (2026-10-21): the work its counters do not see.
 pub const CM_FOLDED_NATIVE_GAP: &str =
@@ -529,6 +629,7 @@ fn generic_rule(method: &str, counter: &str) -> Option<Rule> {
         | "giant_steps"
         | "jump_count"
         | "dp_bits"
+        | "chained_setup"
         | "starts" => Shape,
         // Kangaroo's distinguished points are probed under lookups_uncharged.
         "distinguished_points" if kangaroo => Shape,
@@ -542,6 +643,10 @@ fn generic_rule(method: &str, counter: &str) -> Option<Rule> {
         "partition_hashes_uncharged" => Prims(&[(WordOp, 12)]),
         // x^{2^t}, y^{2^t} by linear power maps.
         "frobenius_maps_uncharged" => Prims(&[(AsSolve, 2)]),
+        // The tuned walk's short-cycle window and Brent detector: one 64-bit
+        // compare each (`work_native` of the search phase, 2026-11-07;
+        // research/rho_cycle_window_bitops_20261107).
+        "cycle_window_word_ops" | "brent_word_ops" => Prims(&[(WordOp, 1)]),
         "canonicalisations_uncharged" if strong => {
             // canon(x), three more basis conversions, the Montgomery scalar
             // update.
@@ -568,6 +673,7 @@ fn gae_carries_group_ops(method: &str) -> bool {
         method,
         "rho.plain"
             | "rho.negation"
+            | "rho.negation_chained"
             | "rho.cubic"
             | "rho.quartic"
             | "rho.signed_frobenius"
@@ -591,6 +697,7 @@ fn is_ic(method: &str) -> bool {
 /// builder that does not derive its indexes through `ic_boundary`).
 fn known_uncounted(
     method: &str,
+    params: &BTreeMap<String, String>,
     solver: Option<&SolverStats>,
     phases: &[PhaseRecord],
 ) -> Vec<String> {
@@ -619,6 +726,14 @@ fn known_uncounted(
         }
         if method.starts_with("ic.cm_folded_") {
             out.push(CM_FOLDED_NATIVE_GAP);
+        }
+        if let Some((name, _)) = factor_base_spec(params) {
+            if name == "cyclotomic" || name == "onb-weight" {
+                out.push(CYCLOTOMIC_BASE_GAP);
+            }
+            if name == "bin-t-line" {
+                out.push(BIN_T_LINE_GAP);
+            }
         }
     }
     if let Some(s) = solver.filter(|s| !solver_complete(s)) {
@@ -830,6 +945,19 @@ pub fn price(x: &Priceable) -> Result<WorkBlock, String> {
                 if count == 0 {
                     continue;
                 }
+                // Extension of 2026-11-07: two counters whose increment's
+                // work depends on the record's field or parameters.
+                if let Some(rule) = contextual_ic_rule(name, count, &widths, x.method_params) {
+                    match rule {
+                        Some(ps) => {
+                            for (prim, c) in ps {
+                                *prims.entry(prim).or_default() += c;
+                            }
+                        }
+                        None => push_unique(&mut unpriced, name),
+                    }
+                    continue;
+                }
                 match ic_rule(name) {
                     Some(Shape) => {}
                     Some(Prims(ps)) => add_prims(&mut prims, ps, count as u128),
@@ -849,6 +977,21 @@ pub fn price(x: &Priceable) -> Result<WorkBlock, String> {
                             &format!("solver_{}", s.op_unit.replace(' ', "_")),
                         ),
                     }
+                }
+            }
+        }
+        if !ic {
+            // A generic method's priced work that no counter carries (the
+            // rho window's compares): in `work_native`, so committed records,
+            // which have none, replay and price as before.
+            for (name, &count) in &p.work_native {
+                if count == 0 {
+                    continue;
+                }
+                match generic_rule(method, name) {
+                    Some(Shape) => {}
+                    Some(Prims(ps)) => add_prims(&mut prims, ps, count as u128),
+                    None => push_unique(&mut unpriced, name),
                 }
             }
         }
@@ -966,7 +1109,7 @@ pub fn price(x: &Priceable) -> Result<WorkBlock, String> {
     let add = widths.gates(GroupAdd).map_err(|e| e.to_string())? as f64;
     let floor =
         (std::f64::consts::PI * r / (2.0 * x.curve.automorphisms_available as f64)).sqrt() * add;
-    let known = known_uncounted(method, x.solver, x.phases);
+    let known = known_uncounted(method, x.method_params, x.solver, x.phases);
     unpriced.sort();
     Ok(WorkBlock {
         schema: WORK_SCHEMA.into(),
@@ -1867,24 +2010,201 @@ mod tests {
         assert_eq!(w.bitops, (2 * b.gates(GroupAdd).unwrap()).to_string());
     }
 
-    /// Kept unpriced on 2026-10-21: the counter records the enumerated
-    /// set's size, not the subsets summed or their weight, so no fixed
-    /// primitive sum per increment exists.
-    #[test]
-    fn enumerated_abscissae_stay_unpriced() {
-        let c = curve("binary", 23, (1 << 21) + 5, 2);
-        let phases = vec![PhaseRecord {
+    fn price_with(
+        method: &str,
+        c: &CurveFacts,
+        params: &[(&str, &str)],
+        phases: &[PhaseRecord],
+        solver: Option<&SolverStats>,
+    ) -> WorkBlock {
+        let params: BTreeMap<String, String> = params
+            .iter()
+            .map(|(k, v)| (k.to_string(), v.to_string()))
+            .collect();
+        price(&Priceable {
+            method_id: method,
+            method_params: &params,
+            curve: c,
+            phases,
+            counters: &BTreeMap::new(),
+            solver,
+        })
+        .unwrap()
+    }
+
+    fn fb_phase(counter: &str, count: u64) -> Vec<PhaseRecord> {
+        vec![PhaseRecord {
             name: "factor_base".into(),
-            native: [("abscissae_enumerated_uncharged".to_string(), 5u64)]
-                .into_iter()
-                .collect(),
+            native: [(counter.to_string(), count)].into_iter().collect(),
             ..Default::default()
-        }];
-        let w = price_ic("ic.pipeline", &c, &phases, &BTreeMap::new());
+        }]
+    }
+
+    /// Extension of 2026-11-07: the enumerated weight set is priced from the
+    /// parameters (`C(atoms, w)` subsets, `w` additions and one probe
+    /// each), not from the counter, which is the deduplicated set's size.
+    #[test]
+    fn enumerated_abscissae_price_every_subset_from_the_parameters() {
+        let c = curve("koblitz", 23, (1 << 21) + 5, 2);
+        let ws = widths_of(&c).unwrap();
+        // n = 23: 47 powers of γ.  w = 3: C(47, 3) = 16215 subsets, the
+        // committed records' set size (research/ecbench_factor_bases_20261013).
+        let w = price_with(
+            "ic.pipeline",
+            &c,
+            &[("factor_base", "cyclotomic:w=3,columns=3")],
+            &fb_phase("abscissae_enumerated_uncharged", 16215),
+            None,
+        );
+        assert!(w.unpriced.is_empty(), "{:?}", w.unpriced);
+        let fb = &w.phases[0];
+        assert_eq!(fb.prims["field_add"], 3 * 16215);
+        assert_eq!(fb.prims["hash_probe"], 16215);
+        let expect = 3 * 16215 * ws.gates(FieldAdd).unwrap() + 16215 * ws.gates(HashProbe).unwrap();
+        assert_eq!(fb.bitops, expect.to_string());
+        // The lift tests and the field's construction stay listed.
+        assert!(w.known_uncounted.iter().any(|k| k == CYCLOTOMIC_BASE_GAP));
+        // A set smaller than its subsets (sums that coincide) is charged
+        // every subset all the same: the work is the enumeration.
+        let dup = price_with(
+            "ic.pipeline",
+            &c,
+            &[("factor_base", "cyclotomic:w=3")],
+            &fb_phase("abscissae_enumerated_uncharged", 16000),
+            None,
+        );
+        assert_eq!(dup.phases[0].prims["hash_probe"], 16215);
+        // ONB weight: n = 23 atoms, C(23, 2) = 253.
+        let onb = price_with(
+            "ic.pipeline",
+            &c,
+            &[("factor_base", "onb-weight:w=2")],
+            &fb_phase("abscissae_enumerated_uncharged", 253),
+            None,
+        );
+        assert_eq!(onb.phases[0].prims["field_add"], 2 * 253);
+        assert!(onb.unpriced.is_empty());
+        // Without the parameters the rule reads, or with a count no
+        // enumeration of them could give, the counter stays unpriced.
+        for params in [
+            &[][..],
+            &[("factor_base", "cyclotomic")][..],
+            &[("factor_base", "prime-abscissa:size=8")][..],
+        ] {
+            let w = price_with(
+                "ic.pipeline",
+                &c,
+                params,
+                &fb_phase("abscissae_enumerated_uncharged", 47),
+                None,
+            );
+            assert_eq!(
+                w.unpriced,
+                vec!["abscissae_enumerated_uncharged".to_string()]
+            );
+        }
+        let over = price_with(
+            "ic.pipeline",
+            &c,
+            &[("factor_base", "cyclotomic:w=1")],
+            &fb_phase("abscissae_enumerated_uncharged", 48),
+            None,
+        );
         assert_eq!(
-            w.unpriced,
+            over.unpriced,
             vec!["abscissae_enumerated_uncharged".to_string()]
         );
+        // A prime field has no such base.
+        let p = price_with(
+            "ic.pipeline",
+            &curve("prime", 23, (1 << 21) + 5, 2),
+            &[("factor_base", "cyclotomic:w=1")],
+            &fb_phase("abscissae_enumerated_uncharged", 47),
+            None,
+        );
+        assert_eq!(
+            p.unpriced,
+            vec!["abscissae_enumerated_uncharged".to_string()]
+        );
+    }
+
+    /// Extension of 2026-11-07: a binary-field "square-root solve" is the
+    /// Artin–Schreier lift attempt; `F_{p⁴}` keeps no rule.
+    #[test]
+    fn binary_sqrt_solves_are_artin_schreier_lifts_and_fp4_stays_unpriced() {
+        let f2m = extension_curve("icv1-f2m24-t1171-7fbf6d93", 6);
+        let ws = widths_of(&f2m).unwrap();
+        let w = price_with(
+            "ic.pipeline",
+            &f2m,
+            &[("factor_base", "bin-t-line")],
+            &fb_phase("sqrt_solves", 31),
+            None,
+        );
+        assert!(w.unpriced.is_empty(), "{:?}", w.unpriced);
+        let fb = &w.phases[0];
+        for (prim, k) in [
+            ("field_sqr", 31),
+            ("field_inv", 31),
+            ("field_mul", 31),
+            ("field_add", 62),
+            ("as_solve", 31),
+        ] {
+            assert_eq!(fb.prims[prim], k, "{prim}");
+        }
+        let one = ws.gates(FieldSqr).unwrap()
+            + ws.gates(FieldInv).unwrap()
+            + ws.gates(FieldMul).unwrap()
+            + 2 * ws.gates(FieldAdd).unwrap()
+            + ws.gates(AsSolve).unwrap();
+        assert_eq!(fb.bitops, (31 * one).to_string());
+        assert!(w.known_uncounted.iter().any(|k| k == BIN_T_LINE_GAP));
+        // The prime-field rule is untouched.
+        let p = price_with(
+            "ic.pipeline",
+            &curve("prime", 20, (1 << 19) + 21, 2),
+            &[],
+            &fb_phase("sqrt_solves", 3),
+            None,
+        );
+        assert_eq!(p.phases[0].prims["field_sqrt"], 3);
+        assert!(p.unpriced.is_empty());
+        // F_{p⁴}: still no price for its randomised Tonelli–Shanks.
+        let fp4 = extension_curve("icv1-fp5k4-tm926-7bc5b359", 5);
+        let q = price_with(
+            "ic.pipeline",
+            &fp4,
+            &[("factor_base", "fghr-y-line:zero=1")],
+            &fb_phase("sqrt_solves", 14),
+            None,
+        );
+        assert_eq!(q.unpriced.len(), 1);
+        assert!(q.unpriced[0].starts_with("field_sqrt has no bitop/v1 price"));
+    }
+
+    /// Kept unpriced on 2026-11-07 (docs/units/BITOPS.md, "Extensions"):
+    /// a CDCL conflict, and the d4 engines' modelled `F_q`/`F_p`
+    /// "multiplications", are not fixed primitive sums.
+    #[test]
+    fn conflicts_and_modelled_multiplications_stay_unpriced() {
+        let c = curve("koblitz", 17, (1 << 16) + 1, 2);
+        for unit in ["conflicts", "F_q multiplications", "F_p multiplications"] {
+            let s = SolverStats {
+                ops: 1000,
+                op_unit: unit.into(),
+                ..Default::default()
+            };
+            let phases = vec![PhaseRecord {
+                name: "relations".into(),
+                ..Default::default()
+            }];
+            let w = price_with("ic.pipeline", &c, &[], &phases, Some(&s));
+            assert_eq!(
+                w.unpriced,
+                vec![format!("solver_{}", unit.replace(' ', "_"))]
+            );
+            assert!(w.known_uncounted.iter().any(|k| k == "solver_engine_work"));
+        }
     }
 
     #[test]

@@ -96,16 +96,19 @@ class Onb:
     def mul(self, a, b):
         r = 0
         bb = b
-        i = 0
+        n = self.n
+        mask = self.allOnes
         while bb:
-            if bb & 1:
-                r ^= self.rot(a, i)
-            bb >>= 1
-            i += 1
-        return self.normalize(r)
+            low = bb & -bb
+            k = low.bit_length() - 1
+            r ^= a if k == 0 else ((a << k) | (a >> (n - k))) & mask
+            bb ^= low
+        if r & 1:
+            r ^= mask
+        return r
 
     def sqr(self, a):
-        return self.normalize(self.rot(a, 0) if False else self.frob(a, 1))
+        return self.frob(a, 1)
 
     def frob(self, a, k):
         """a -> a^(2^k), i.e. z -> z^(2^k), an index permutation."""
@@ -138,6 +141,30 @@ class Onb:
 
     def inv(self, a):
         return self.pow(a, (1 << self.m) - 2)
+
+    def batchInv(self, values):
+        """Invert nonzero field elements with one inversion and 3n products.
+
+        Montgomery's trick: build prefix products, invert the total once, then
+        recover each inverse on the way back. This turns the pair-table's n
+        independent inversions into one.
+        """
+        values = list(values)
+        if not values:
+            return []
+        if any(v == 0 for v in values):
+            raise ValueError('cannot batch-invert zero')
+        prefix = [0] * len(values)
+        product = self.one()
+        for index, value in enumerate(values):
+            prefix[index] = product
+            product = self.mul(product, value)
+        inverse = self.inv(product)
+        result = [0] * len(values)
+        for index in range(len(values) - 1, -1, -1):
+            result[index] = self.mul(inverse, prefix[index])
+            inverse = self.mul(inverse, values[index])
+        return result
 
     def gamma(self, i):
         return self.fromCoords(1 << (i - 1))

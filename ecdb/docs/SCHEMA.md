@@ -156,7 +156,7 @@ table with Vélu isogenies of elliptic curves, and `source_curve_id` /
 | Table | What it holds |
 |:--|:--|
 | `isogeny_class_fq` | isogeny classes of abelian varieties over F_q of any dimension. Holds the L-polynomial, the LMFDB-style label (computed for every q), trace, #A(F_q), point and curve counts over extensions, real Weil polynomial, p-rank, Newton slopes, ordinary / supersingular / almost-ordinary flags, simplicity and simple factors, angle rank, Q(pi), Jacobian and principal-polarization existence, twists, and LMFDB columns verbatim |
-| `curve_zeta` | the curve's own point counts and how the order was established |
+| `curve_zeta` | the curve's own point counts, #C(F_{q^k}) for k = 1..g (one per degree of the class), and how they were established (`order_method`). Genus-1 rows hold #E(F_q); the genus-2 and genus-3 cover sources hold their exact counts, see "Frobenius data of the cover sources" below |
 | `frobenius_genus1` | t, t / 2 sqrt(q), t mod p (anomalous, supersingular), Delta = t^2 - 4q with factorization and unfactored cofactors, d_K, the CM field, v = [O_K : Z[pi]] with factorization, conductor fraction, class number h(d_K) |
 | `frobenius_ell` | what the class fixes per prime l: volcano depth v_l(v), splitting in Q(pi), and the number of rational l-isogenies when l does not divide v |
 | `curve_ell_torsion` | what depends on the curve: Frobenius action on E[l] (scalar or Jordan block when l divides v, by the curve's volcano level; split / inert / ramified otherwise), its rational l-isogenies, fields of definition of l-torsion points, full l-torsion and l-isogenies, factorization pattern of psi_l |
@@ -206,6 +206,47 @@ Other polynomials sit beside the object they define:
 - defining polynomials on `field` and `number_field`;
 - characteristic polynomials on `endomorphism`;
 - f and h on `hyperelliptic_model`.
+
+### Frobenius data of the cover sources
+
+`import covers` ends by computing the exact L-polynomial of the Jacobian of
+every cover source (`curve_morphism` kind `hyperelliptic_pullback`,
+constructions `prime_quadratic_pullback_v1` and `binary_cubic_pullback_v1`) from
+the stored model (`hyperelliptic_model` f, h), and stores it as for every other
+abelian variety:
+
+- an `isogeny_class_fq` row: `l_polynomial` (ascending, degree 2g), the
+  `g.q.a1_..._ag` label from the same `weil_label` as the genus-1 rows,
+  `order_value` = L(1) = #Jac(F_q), `point_counts` = [#Jac(F_q)],
+  `curve_counts` = [#H(F_{q^k}), k = 1..g], `is_ordinary` (the middle
+  coefficient is prime to p), `has_jacobian`, status `proved` (`probable` when
+  the primality of p or the irreducibility of an extension modulus is not
+  proved), and the provenance of the method;
+- `abelian_variety.isogeny_class_id` of the source's Jacobian;
+- a `curve_zeta` row with `point_counts` = [#H(F_{q^k}), k = 1..g], the same
+  status and `order_method` = the method text.
+
+The pass is idempotent and only inserts or updates (a source that already has
+both is left alone; nothing is deleted).
+
+| Construction | Field | Method |
+|:--|:--|:--|
+| `prime_quadratic_pullback_v1`, genus 2 | F_p, 5 <= p < 2^62; GF(p^k), q < 2^48 | H: v^2 = G(u^2) is a double cover of E: v^2 = G(x) (the target) and of E': Y^2 = x G(x), and Jac(H) ~ E x E' over F_q. L = (1 - tT + qT^2)(1 - t'T + qT^2), so a1 = -(t + t') and a2 = 2q + t t'. Both traces come from group orders found by baby-step giant-step in the Hasse interval, intersecting the candidates of random points until one is left (the true order is always a candidate, so a single survivor is the order). Method "derived" |
+| the same, p < 2^22 | F_p | also #H(F_p) = p + 2 + sum chi(f(u)) counted exhaustively, which must give the same a1 |
+| the same, p < 2^12 | F_p | also #H(F_{p^2}) counted exhaustively (the character of F_{p^2} is that of the norm to F_p); a2 = (#H(F_{p^2}) - p^2 - 1 + a1^2)/2 must agree. The exhaustive counts are the stored result; method "exhaustive count" |
+| `binary_cubic_pullback_v1`, genus 3 | GF(2^m), m <= 12 | H: y^2 + u^2 y = u^7 + a u^4 + d u has one point at infinity; s = y/u^2 gives #H(F_Q) = Q + 1 + sum_{u != 0} (-1)^Tr(u^3 + a + d u^-3), counted exhaustively over F_{2^m}, F_{2^{2m}} and, when 3m <= 24 (m <= 8), F_{2^{3m}}, with a and d embedded through a root of the modulus. Three counts: L by Newton's identities (method "exhaustive count"). Two counts: L = L_E L_B, where E (y^2 + xy = x^3 + a x^2 + d^2) is counted exhaustively and the Prym surface B is fixed by the two counts (method "derived") |
+
+Cross-checks, applied to every result: L(T) has the functional-equation shape,
+#Jac > 0, and for each recorded target trace tau (the target's genus-1 class in
+ecdb), T^2 - tau T + q divides the reversed polynomial T^{2g} L(1/T). A failure
+is reported (`cover_lpoly_crosscheck_failures` and a problem line) and nothing
+is stored for that source. Cases outside the ranges above are skipped and
+counted under `cover_lpoly_skipped_*`: a prime above 62 bits, an extension field
+of 2^48 elements or more, and a binary field with m > 12 (the counts over
+F_{2^{2m}} need 2^24 elements or fewer). They need SEA or a Kloosterman-sum
+algorithm; no value is guessed. In the pinned `covers.json` the skipped sources
+are 301 genus-2 sources over F_p (63 to 638 bits), 959 over GF(p^k) (49 to 253
+bits) and 163 genus-3 sources over GF(2^m), m = 13 to 577.
 
 ### Global curves, security, evidence (`0007`)
 
@@ -318,7 +359,7 @@ the import's own checks.
 | `docs/curves/registry.json` | 20,817 curves over 891 fields. Each has a computed `genus1_invariants` row whose j equals the registry's j: 0 mismatches, Montgomery and Edwards models included through their birational maps. Also 1,808 isogeny classes, 1,023 EC1 representations (every digest reproduced from its preimage), 258 standards publications and 43,915 aliases |
 | six `isogeny_routes.json` walk outputs | 263 more curves (rebuilt model JSON reproduces each slug), 478 kernel-certified Vélu isogenies with kernel polynomials, codomains and u^2, 687 IW1 routes, and the walks' proved volcano levels. The walk curves land in their source curve's isogeny class, as Tate's theorem requires |
 | `docs/curves/traits.json` | Frobenius data for 1,808 classes (Delta = v^2 d_K re-checked by CHECK), per-prime class rows and per-curve l-torsion rows, 20,991 endomorphism rings, 26.6k volcano levels, 1,273 CM fields, subgroups, embedding degrees, twists, and 20,992 verbatim trait records |
-| `docs/curves/covers.json` | 20,815 genus-2 and genus-3 hyperelliptic curves and their Jacobians, and 20,817 explicit covers H -> E. For the 30 Montgomery and Edwards targets the polynomial map lands on an intermediate short Weierstrass model; the certificate's `target_model_map` is kept in the map with the composition stated. Two genus-2 curves each cover two models: the Montgomery and twisted Edwards models of one curve share a Weierstrass model, so they share the cover |
+| `docs/curves/covers.json` | 20,815 genus-2 and genus-3 hyperelliptic curves and their Jacobians, and 20,817 explicit covers H -> E. For the 30 Montgomery and Edwards targets the polynomial map lands on an intermediate short Weierstrass model; the certificate's `target_model_map` is kept in the map with the composition stated. Two genus-2 curves each cover two models: the Montgomery and twisted Edwards models of one curve share a Weierstrass model, so they share the cover. Every source also gets an `isogeny_class_fq` row, the link `abelian_variety.isogeny_class_id` and a `curve_zeta` row from `import covers` (`src/import/cover_lpoly.rs`): 20,853 of the 22,276 sources of the pinned file (20,842 of genus 2, 11 of genus 3); the other 1,423 are skipped, not guessed (below) |
 | `docs/curves/jacobian-transfers.json` | 61,305 priced DLP transfer routes; the cost model is in the provenance parameters |
 | level and Jacobian certificates | 19 + 1 certificates |
 | derived in SQL | 21,080 automorphism groups (79 C6, 14 C4), 21,082 attack-surface rows, 21,080 Frobenius endomorphisms, 73 subfield-tau records with their endomorphisms |
@@ -336,7 +377,7 @@ Migration `0009` adds measured results and the sibling repositories' records.
 | `docs/ic/boundary_targets.json` | 18 records (3 regimes × 6 stages), each with its next target and acceptance gates |
 | `benchmarks/` | 385 directories: 132 admitted, 26 in the archive, 227 unlisted, each with its `VALIDATION.json` when present |
 | every ecbench session in the checkout | 1,103 `ecbench.session/v1` sessions (1,127 session files; 20 of other schemas skipped; 4 duplicates), 543,290 runs (531,149 linked to a curve by slug), 1,082 paired comparisons, replay-audit summaries; `v_ecbench_arm` aggregates per session, arm and curve |
-| the sibling checkouts (`src/import/siblings.rs`) | 10,760 `external_curve_record` rows, 9,238 of them linked (by EC1, curve_uid, ICV1 slug, computed ICV1 or a unique standard name); 9,189 prime-field dataset curves imported as curves (family `dataset`, ICV1 computed from p, a, b and #E); 24,096 `measurement` rows; 1,169 singular rows, the producers' negative controls, counted and skipped |
+| the sibling checkouts (`src/import/siblings.rs`) | ml-cryptanalysis `data/ecdb/{tier1_rho,n4_rho_offset,n5_fp_costs,n7_binary_costs}.jsonl` (format `csd.ecdb-measurements/v1`, one curve per line; `n5_fp_costs` is read from its `.jsonl.gz`): a prime row is a dataset curve linked by computed ICV1 (kind `dataset_curve`), a binary row (`m`, `modulus` hex with the x^m term, `a` and `b` hex in that polynomial basis, `N` decimal) is a dataset curve too, linked by computed ICV1 through `binary_icv1` (kind `dataset_curve_binary`, kept so the record still says which field family the producer's row was; the link is the `slug` column, not the kind): the modulus must have degree m and be irreducible, b != 0 (a b = 0 row is a singular control, counted and skipped), N must lie in the Hasse interval, hex is normalised to `0x`, lower case, no leading zeros, and the slug is `icv1-f2m<m>-t<q+1-N>-<first 8 hex of SHA-256(model JSON)>` (docs/curves/ICV1.md), the same function `generated.rs` uses for census-f2m and other Sage binary records; a binary row that fails a check is a reported problem, keeps its record and measurements and has no slug; every `measurements` entry becomes one `measurement` row in its own method, metric, unit, value, sem and n (methods as the producer names them, e.g. `rho.plain`, `rho.automorphism_classes`; no constraint beyond non-empty and unique per curve with the metric), and a row with a non-finite value is a reported problem and is not inserted. Counts before this format (binary rows were still unlinked then: 9,189 is prime-field curves only): 10,760 `external_curve_record` rows, 9,238 of them linked (by EC1, curve_uid, ICV1 slug, computed ICV1 or a unique standard name); 9,189 prime-field dataset curves imported as curves (family `dataset`, ICV1 computed from p, a, b and #E); 24,096 `measurement` rows; 1,169 singular rows, the producers' negative controls, counted and skipped |
 
 Curves generated by `ecdb/sage/generate.sage` (2026-10-31, SageMath 10.9),
 every record re-verified by `ecdb import generated` before insertion (deployed counts):
