@@ -69,15 +69,15 @@ and probability theory; queued after Layer 1.
 | Claim | Role | Status |
 | --- | --- | --- |
 | BSGS solves DLP in `O(√n)` time and memory | Baseline square-root attack | Implemented; **correctness formal** (`Algorithms.lean`): decomposition, match existence, candidate correctness, collision-free table. The `O(√n)` time/memory bound itself is a cost premise. |
-| Pollard rho: expected `√(πn/2)` group operations | Best generic attack in practice | Implemented and measured; probabilistic proof open |
+| Pollard rho: expected `√(πn/2)` group operations | Best generic attack in practice | Implemented and measured; **algebraic correctness formal** (`Rho.lean`): finite-orbit collision, Floyd's meeting, collision-to-relation and DLP recovery. The expected-step bound remains a probability premise. |
 | Pohlig–Hellman reduces DLP to prime-power order subgroups and CRT | Smooth-order curves are easy | Implemented; **subgroup step and CRT assembly formal** (`Algorithms.lean`): `d·a` has order `n/d`, projection to the quotient instance, coprime CRT combination, reconstruction modulo `n`. The `∑ √(pᵢ^{eᵢ})` cost bound is a cost premise. |
 | Index calculus is subexponential when a smooth factor base exists | Breaks high-genus / small-characteristic settings | Implemented for the repo's IC campaigns; cost model empirical |
 
 ## Layer 3b — algorithm correctness (formal)
 
-`lean/Algorithms.lean` (Mathlib project, `PASS 28 thm 0 trusted` including
-Layer 1) proves that the two standard generic reductions return the right
-answer, without assuming anything about cost.
+`lean/Algorithms.lean` (Mathlib project; the project gate reports
+`PASS 36 thm 0 trusted`) proves that the two standard generic reductions
+return the right answer, without assuming anything about cost.
 
 | Theorem | Statement |
 | --- | --- |
@@ -97,6 +97,24 @@ operations and `m` stored points; PH costs `∑ √(pᵢ^{eᵢ})`; rho's `√(π
 expectation is a probability claim. None of these are consequences of group
 axioms alone, so they stay explicitly outside the kernel until a machine-checked
 cost/probability model exists.
+
+## Layer 3c — Pollard rho correctness (formal)
+
+`lean/Rho.lean` (`PASS 36 thm 0 trusted` for the whole project) proves the
+deterministic part of the rho attack.
+
+| Theorem | Statement |
+| --- | --- |
+| `exists_collision_of_finite` | Every endofunction of a finite type has `f^[i] x = f^[j] x`, `i < j` |
+| `exists_tail_cycle` | The orbit has a tail and a positive period |
+| `floyd_meets` | Some `k > 0` satisfies `f^[k] x = f^[2k] x` (tortoise meets hare) |
+| `rho_relation_mod` | Colliding `a·P + b·Q` states give `(a-a') + (b-b')·x ≡ 0` in `ZMod n` |
+| `rho_solve`, `rho_dlp_recover` | If `n` is prime and `b ≠ b'`, the relation recovers `x` exactly |
+
+The collision step is where the probability enters: the *number of steps* until
+two walks meet is the birthday bound `√(πn/2)`, and that remains a premise.
+What is proved is that once a collision with distinct `Q`-coefficients occurs,
+the recovered scalar is the discrete log, not merely a candidate.
 
 ## Layer 4 — curve-specific attacks (each attacks a hypothesis, not the group)
 
@@ -127,11 +145,13 @@ separately; a break here breaks deployments, not ECDLP.
    `Affine.slope/addX/addY`, and associativity is inherited from Mathlib's
    proven `AddCommGroup` on `Point`. Exception-case wrapping (0, P = -Q,
    doubling) remains to be connected to the same interface.
-3. **Done:** BSGS and Pohlig–Hellman correctness in `Algorithms.lean`
-   (Mathlib project, `PASS 28 thm 0 trusted`): baby/giant match equivalence,
-   existence, candidate correctness, collision-free baby table, coprime CRT
-   combination, PH subgroup order, projection and reconstruction. Only the
-   cost/success premises remain outside the kernel.
+3. **Done:** BSGS and Pohlig–Hellman correctness in `Algorithms.lean`, and the
+   deterministic part of Pollard rho in `Rho.lean` (Mathlib project,
+   `PASS 36 thm 0 trusted`): baby/giant match equivalence, existence, candidate
+   correctness, collision-free baby table, coprime CRT combination, PH
+   subgroup order, projection and reconstruction; finite-orbit collision,
+   Floyd meeting, collision relation and DLP recovery. Only the cost/success
+   premises remain outside the kernel.
 4. **Generic-group lower bound** statement and adversary model.
 5. **Done (logic):** MOV reduction formal over a biadditive map with
    `e(a,a)` of full order. Remaining: construct the Weil pairing and prove
