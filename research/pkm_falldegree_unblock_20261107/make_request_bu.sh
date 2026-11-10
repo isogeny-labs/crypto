@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Amendment 15 (R2-G, AMENDMENT_R2_G_stageB_units.md), runner revision 3: one stage B unit job request,
+# Amendment 15 (R2-G, AMENDMENT_R2_G_stageB_units.md), runner revision 4: one stage B unit job request,
 # requests_r2i/pfd-bu-<N>.json.
 # Usage: make_request_bu.sh IMAGE_JSON N STAMP [PREV | close:<ladder>:<T> | allow:<unit>:<K> | skip:<n>:<reason>]...
 #   PREV    the result prefix of an earlier unit job, exactly as that job's ISOLAB_RESULTS_URI
@@ -64,7 +64,7 @@ done
 
 image=$(jq -er .image_uri "$img"); rev=$(jq -er .source_revision "$img")
 psha=$(sha256sum "$repo/research/prime_fall_degree_20261027/PREREGISTRATION.md" | cut -d' ' -f1)
-note="Amendment 15 (R2-G) stage B unit job $n: runs G1, then the stage B units not done by the earlier jobs named in the command, in run.sh order, one pilot invocation per (ladder, t); runner revision 3 sha256 $RUNNER_SHA, started by a command that checks that hash (exit 17 if it differs); earlier jobs and arguments: ${rargs[*]:-none}; jobs not given as PREV (passed to the runner as skip: arguments): ${skips[*]:-none}. 12 vCPU, 56Gi, no pin; seconds 172800 > 90000, so the Amendment 12 price guard applies. Owner decision 8 (2026-11-10)."
+note="Amendment 15 (R2-G) stage B unit job $n: runs G1, then the stage B units not done by the earlier jobs named in the command, in run.sh order, one pilot invocation per (ladder, t); runner revision 4 sha256 $RUNNER_SHA, started by a command that checks that hash (exit 17 if it differs); earlier jobs and arguments: ${rargs[*]:-none}; jobs not given as PREV (passed to the runner as skip: arguments): ${skips[*]:-none}. 12 vCPU, 56Gi, no pin; seconds 172800 > 90000, so the Amendment 12 price guard applies. Owner decision 8 (2026-11-10)."
 [[ ${#note} -le 2048 ]] || { echo "provenance note is ${#note} characters, over the validator's 2048" >&2; exit 5; }
 
 # the runner text, newlines as Q, in pieces of at most 8000 characters
