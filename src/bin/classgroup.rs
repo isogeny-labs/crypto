@@ -195,8 +195,6 @@ fn main() {
         report.ratio_to_analytic,
         report.relations,
         report.products_sieved,
-        report.large_prime_partials,
-        report.large_prime_combined,
         report.eliminated_columns,
         report.dense_columns
     );
@@ -372,6 +370,8 @@ fn main() {
         report.ramified_primes,
         report.relations,
         report.products_sieved,
+        report.large_prime_partials,
+        report.large_prime_combined,
         report.eliminated_columns,
         report.dense_columns,
         h,
