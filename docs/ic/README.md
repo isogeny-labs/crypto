@@ -9,6 +9,11 @@ The older inspection command uses imported points for mathematical validation.
 macOS users can install `ic` and `crax` from the release DMG; see
 [macOS install and update](MACOS_INSTALL.md).
 
+**Hyperelliptic front door:** [`hecx`](HECX.md) inspects, estimates and
+solves HECDLP instances over prime and binary fields, for arbitrary genus,
+coefficients and subgroup orders, with prime- and binary-field
+index-calculus engines plus Pohlig–Hellman.
+
 **Factor-base encyclopedia:** [factor-base-encyclopedia/README.md](factor-base-encyclopedia/README.md) describes every factor base tried here and in crypto-autoresearcher (definition, existence, build cost, oracle, measured results, verdict), starting with the PKM Kummer-coset (P-224 shape) and isogeny-chain (P-192 shape) towers; PDF in the same directory.
 
 **Technique inventory:** [ECDLP_RESEARCH_TECHNIQUES.md](ECDLP_RESEARCH_TECHNIQUES.md) maps factor-base, relation, filtering, sparse-linear-algebra, and individual-logarithm research techniques to their native modules and labels each as integrated, experimental, component, or backlog.

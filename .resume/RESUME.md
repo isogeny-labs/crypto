@@ -1,38 +1,32 @@
-# Resume: crypto @ claude/elliptic-curves-graph-weaknesses-fw42m4
+# Resume: crypto @ claude/happy-johnson-9edk2r
 
 ## Goal
-Owner asked (2026-11-08, "Please run it") to run the open n = 37 test: does msolve 0.6.5 (F4,
-grevlex) reach maximal step degree 5 on a fresh m = 2 descended S3 instance at n = 37, as
-Kousidis-Wiemers report for Magma (corpus MEAS-GB-KW-TABLE1)? Locally it was OOM-killed at 15 GB.
+Run the prepared trace-line reference panel (research/trace_c1_2lp_20261027/reference-d{2,3,4,5}.json)
+on Iso Lab EKS Spot via the GitHub route (isolab-experiment.yml on main), as a measured stage
+diagnostic of the Tr_{N/d} trace-selected factor-base line against the standard subfield line and matched rho.
 
 ## Lead / hypothesis
-Petit-Quisquater Assumption 2 at m = 2 (HEUR-GB-PQ-ASSUMPTION-2). msolve gives 4 on n = 17..34 and
-n = 36 (merged in PRs #3658, #3682). Magma reports 5 from n = 37.
+Trace line lifts every nonzero x (exact, research/trace_homomorphism_tests_20261109 T4), so the
+four-summand MITM reference should need fewer trials than the standard line. This is the exact
+MITM reference only, NOT the algebraic C1 experiment of PROTOCOL.md (still blocked on the C1 oracle).
 
 ## Spec
-research/ecdlp_weakness_census_20261104/pq2_rank/f4/eks_n37/{protocol.json, run.sh, input.ms},
-committed at e63bf8e55d (publication receipt in the run's receipt directory). Input dump
-pq2_rank/f4/step_n36_37/dumps/n37_i0.json.
+Specs frozen on main; source_revision = main HEAD at dispatch (recorded in the session log and
+research/trace_c1_2lp_20261027/isolab-20261109/LAUNCH.md). c8a.2xlarge, seconds=1800, one dispatch per size.
+Dollar ceiling: USD 10 for all four dispatches including failures.
 
 ## State
-Image: isolab tasks base (aws-cli) + one layer /opt/msolve (msolve + its shared libs + loader +
-run.sh + input.ms), published with taskq/deploy/eks-karpenter/oci-layer-publish.py. Command job
-via taskq/deploy/eks-karpenter/remote/launch-remote-command (isolab.eks.command-request/v1),
-8 vCPU, 100Gi, 21600 s, retries 0, cpu-spot. Results land in
-s3://isolab-results-104186811093-us-east-2/runs/<job>/<pod-uid>/ (wrapper uploads every 10 min).
+d5 run 42639382601 failed (launcher exit 23, Job failed, no pod UID in result). Gate unknown without S3. d2-d4 not dispatched.
 
 ## Next steps
-1. Publish image, write request.json, validate, launch; record Job/Pod UIDs.
-2. Read status with an isolab.eks.command-status/v1 request; download S3 outputs, verify SHA256SUMS.
-3. Parse max step degree, check linear = k = 33; update pq2_rank README, corpus MEAS-PQ2-MSOLVE-F4,
-   session log; PR.
+1. Await each run; read step summary; download receipts only via the lab's verified route.
+2. Report per-size outcome, L2/A/A admission, and the IC/rho gap; no claim beyond the MITM reference.
 
 ## Runs in flight
-None. The C = 1 boundary study (screen and confirmation) finished; results are in PR #3660 (research/curve25519_autolab_20261104/c1).
+None.
 
 ## Stop and success conditions
-One attempt, no retries; stop at exit, OOM or 6 h. Budget ceiling USD 5 (monthly account
-headroom was USD 23.67 at submission).
+No automatic resubmission. A failed or ambiguous run is reconciled against its original run ID first.
 
 ## Open questions
-None.
+Whether the S3 receipts are readable from this session (no valid AWS identity here).
