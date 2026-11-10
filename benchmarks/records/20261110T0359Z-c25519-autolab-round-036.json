@@ -1,6 +1,6 @@
 {
   "branch": "claude/autolab-round-036",
-  "closed_utc": null,
+  "closed_utc": "2026-11-10T04:04:13+00:00",
   "commands": [
     {
       "argv": [
@@ -46,7 +46,56 @@
     "platform": "Linux-6.18.44-fc-v338-x86_64-with-glibc2.39"
   },
   "id": "20261110T0359Z-c25519-autolab-round-036",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": 2.452,
+      "better": "lower",
+      "n": 64,
+      "name": "r36selk20",
+      "note": "",
+      "reference": 1.492,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 2.446
+    },
+    {
+      "baseline": 2.182,
+      "better": "lower",
+      "n": 64,
+      "name": "r36selk24",
+      "note": "",
+      "reference": 1.125,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 2.016
+    },
+    {
+      "baseline": 1.846,
+      "better": "lower",
+      "n": 64,
+      "name": "r36selk28",
+      "note": "",
+      "reference": 1.016,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 1.768
+    },
+    {
+      "baseline": 1.88,
+      "better": "lower",
+      "n": 64,
+      "name": "r36selk32",
+      "note": "",
+      "reference": 1.005,
+      "reference_kind": "matched_rho",
+      "spread": null,
+      "unit": "S",
+      "value": 1.772
+    }
+  ],
   "problem": "ic:curve25519-family-k20-32",
   "raw": [
     {
@@ -444,14 +493,16 @@
   ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
+    "pdf": "research/curve25519_autolab_20261104/round-036/REPORT.pdf",
     "png": [],
-    "svg": []
+    "svg": [
+      "research/curve25519_autolab_20261104/round-036/round.svg"
+    ]
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "c25519-autolab-round-036",
-  "status": "open",
-  "summary": "",
+  "status": "measured",
+  "summary": "ic_autolab round 36: x/jumps sweep of tw2cj-lazy; holdout sel/inc 0.998/0.924/0.958/0.942 at k=20/24/28/32, improvement at k=24 only (0.924 [0.857, 0.996]), incumbent ratcheted to tw2l-x20-j32-n2; null elsewhere",
   "validation": null
 }
