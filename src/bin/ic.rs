@@ -94,6 +94,7 @@ struct Cli {
     store_name: Option<String>,
 }
 #[derive(Subcommand)]
+#[allow(clippy::large_enum_variant)]
 enum Action {
     /// List built-in inspection profiles.
     List,

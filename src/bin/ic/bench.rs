@@ -1263,7 +1263,7 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
                         .as_deref()
                         .ok_or("--efd-model requires --efd-p")?,
                 )?;
-                ("prime".to_string(), (u64::BITS - p.leading_zeros()) as u32)
+                ("prime".to_string(), u64::BITS - p.leading_zeros())
             } else if args.archive_manifest.is_some() {
                 ("archive".to_string(), 0)
             } else {
