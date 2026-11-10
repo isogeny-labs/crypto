@@ -168,3 +168,44 @@ sigma is a square (spread + reduce), not a permutation plus a repack.
 
 26x over where this file started, all bit-exact against include/ref.h through
 walk_step_problem.Model.
+
+## Update: launch shapes (2026-11-10, tuning pass)
+
+Sigma and frob were ~9x off their ALU bound, which said occupancy rather than
+arithmetic. Sweeping the tile width and warp count (tune.py):
+
+| kernel | best | ms | previous | |
+|---|---|---:|---:|---|
+| sigma | R=16, 2 warps | 0.0386 | 0.0682 (R=8, 4 warps) | 1.77x |
+| frob | R=8, 2 warps | 0.0725 | 0.1267 | 1.75x |
+| mul | B=128, 4 warps | 0.0163 | 0.0163 | — |
+
+Fewer warps is better because the tiles are small: four warps leave most of a
+2048-lane tile idle, two fill it.
+
+    step 0.829 ms -> 0.435 ms   150.5 M updates/s   (buffers reused, exact)
+
+As a drop-in `kernel_function` (v9.py) that also allocates and zeroes the
+14-slot limb arena and copies the output each call, the same step measures
+0.558 ms / 117.4 M updates/s, exact at 65,536 rows and at an odd 40,001-row
+batch (which exercises the padding path).
+
+## Ladder to date
+
+| step | ms | updates/s |
+|---|---:|---:|
+| v5 convolution, L4 | — | 3.0 M |
+| v5 convolution, PRO 6000 | 5.049 | 13.0 M |
+| clmad, scalar conversions | 2.582 | 25.4 M |
+| clmad, batched conversions | 1.296 | 50.6 M |
+| v6, all per-row kernels batched | 1.125 | 58.3 M |
+| v7, limbs emitted by the producer | 0.863 | 76.0 M |
+| v8, single representation | 0.829 | 79.0 M |
+| **v9, tuned launch shapes** | **0.435** | **150.5 M** |
+| v9 as a drop-in function | 0.558 | 117.4 M |
+| production client (G7) | — | 12,499 M |
+
+50x over where this started (39x as a drop-in call). The client is now 83x
+ahead, and its advantage is the algorithm: 4.81 products/update with the
+inversion batched over 16 walkers, against our 10 products and 127 sigma
+applications per step.
