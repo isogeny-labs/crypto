@@ -115,3 +115,14 @@ paths; Mathlib Ideal.span/MvPolynomial evaluation and ZMod. The refreshed
 canonical experiment-protocol skill/tool is pinned in native provenance.
 KB/Conductor are unavailable; bounded primary/repository/Mathlib fallback was
 used, without novelty or blanket source-promotion claims. [pcc:unverified]
+
+## Separate bounded crash diagnostic
+
+The new [eight-cell diagnostic](../msolve_crash_diagnostic_20261110/README.md)
+retains unchanged source, both exact linear algebra modes and original/
+combined-sanitizer builds. Originall1ordinary passes its exact known basis,
+l2ordinary segfaults, and both saturation calls hit5sdiagnosticwatchdogs.
+Allfour address+undefined calls stop earlier at hash.c409 signed1<<31.
+This does not establish the original crash/timeout cause. Exportvalidity
+is separate from successful output; packet743f20isnot_covered/unsigned.
+The existing Lean F4Run/saturation theorems remain unchanged. [pcc:unverified]

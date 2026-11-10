@@ -334,9 +334,9 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 | 7 Subgroup smoothness | Partial: complete finite Cantor-group counterexamples and growing family with all-pair arithmetic/group consistency | Full ambient group/Picard embedding and qualified typical/large-prime asymptotics |
 | 8 Bézout/multiplicity | Partial: actual quotient length/support witness and 16 native checks | General n!dⁿ bound and decomposition-system hypotheses |
 | 9 Gröbner heuristics | Partial: Lean counterexample to universal regularity reading | Generic/Joux–Vitse statements and requested exact system measurements |
-| 10 Rho walks | Partial: exact product-PMF variance theorem, duplicate-step counterexample and finite populations | Collision-time penalty and qualified asymptotic mixing proofs |
+| 10 Rho walks | Partial: actual first-collision linear lower bounds and unbounded-prime fixed-support disproof, exact product-PMF variance theorem and finite populations | Qualified random-table collision penalty and asymptotic mixing proofs |
 | 11 Standards | Partial: actual 160-bit anomalous curve/cardinality and concrete Smart finite-program certificate | Generic p-adic/complexity/native refinement and matched SafeCurves benchmark |
-| 12 msolve/F4 | Partial: exact F4Run ideal-containment theorem, saturation-reading counterexample and source/run audit | Ordinary C refinement, crash/hang diagnosis and complete trace binding |
+| 12 msolve/F4 | Partial: exact F4Run ideal-containment theorem, saturation-reading counterexample and source/run audit | Ordinary C refinement, crash/hang root-cause diagnosis beyond earlier signed-shift diagnostic, and complete trace binding |
 | 13 Independence | Blocked for the requested other-machine replay | Prior dispatch HTTP404 ran no job; one runtime available; a different authorized host or registered workflow is required |
 | 14 Negative control | Verified current control | Historical runs were not preregistered with it; no retroactive promotion |
 
@@ -384,3 +384,31 @@ schedule or manualdispatch. The separate frozen-workflow replay job restores
 No PRresearchtrigger, signer reroute, frozen protocol or original rejection
 was changed. The userhost/workflowidentifierquestionremains pending.
 [pcc:unverified]
+
+### 2026-11-10 actual first-collision counterfamily
+
+The [collision project](../research/rho_collision_audit_20261110/README.md)
+defines the least actual repeated state and proves p≤rT and T≤p for
+every labeling with increments1..r. The actual independent uniform node
+PMF satisfies p≤rE[T] and E[T]≤p. With r20, distinct/nonzero support
+and actual indegree variance19/20 hold; no realC bounds E[T]²≤Cp
+uniformly over all primesp>20. Whole gate35/0/0. [pcc:unverified]
+
+Galbraith14.2.1 chooses the increment table uniformly, while this family
+fixes1..20. Hildebrand's main average also samples support. This known
+fixed-support obstruction disproves a universal variance-only reading;
+qualified average/random-table laws remain open. No new experiment,
+paid compute or novelty claim. Exact statement pins and failed attempts
+are retained; PCC replay and signed standing recorded in the study.
+[pcc:unverified]
+
+### 2026-11-10 bounded solver diagnostic
+
+Eight new frozen cells cross exactLA1/2, original/combined-sanitizer builds
+and ordinary/saturation. OriginalLA1ordinary exact output passes; LA2
+ordinary139andbothsat5stimeouts remain. Allfourcombinedsanitizer cells
+stop at earlier hash.c409signed1shift31. This does not establish cause
+of the original failures. No source edit, Crefinement or generic-ideal
+regularity conclusion. All8outcomes retained; export passesfilechecks;
+PCC-20261110-743f20not_covered/unsigned. A separate predata address-only
+amendment is frozen to inspect beyond that first-error check. [pcc:unverified]

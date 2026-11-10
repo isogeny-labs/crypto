@@ -1,0 +1,692 @@
+{
+  "schema": "experiment.protocol/v1",
+  "protocol_id": "msolve-crash-diagnostic-20261110",
+  "version": 1,
+  "created": "2026-11-10",
+  "repository": "crypto",
+  "study_dir": "research/msolve_crash_diagnostic_20261110",
+  "authors": [
+    "Codex theorem audit"
+  ],
+  "links": {
+    "pr": "https://github.com/isogeny-labs/crypto/pull/3743",
+    "formal_source": "../theorem_census_20261109/lean/F4SaturationBoundary.lean"
+  },
+  "question": "For the already-seen F65537 Boolean crash and saturation timeout, retain sanitizer diagnostics and exact known-answer checks across original/sanitized builds and exact linear algebra1/2. No causal speed or generic correctness inference.",
+  "claims": [
+    {
+      "id": "D1",
+      "class": "exact_computation",
+      "text": "Per fixed call: raw exit, sanitizer diagnostics and literal known-answer output validation; no inference about untested modes.",
+      "decided_by": [
+        "fixed-diagnostics"
+      ]
+    },
+    {
+      "id": "D2",
+      "class": "theorem",
+      "text": "Prior actual F4Run ideal containment and saturation-domain disproof remain decided only by frozen Lean proofs.",
+      "decided_by": []
+    },
+    {
+      "id": "D3",
+      "class": "out_of_scope",
+      "text": "C refinement, source bug causality, statistical/time comparisons, generic ideals, independence and signed execution are not established by these calls.",
+      "decided_by": []
+    }
+  ],
+  "arms": [
+    {
+      "id": "original-l2-ordinary",
+      "role": "reference",
+      "description": "Fixed Boolean known-answer diagnostic cell",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "../solver_multiplicity_audit_20261109/build-msolve.sh"
+          ]
+        ],
+        "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": "2",
+          "verbosity": "0",
+          "print_gb": "2",
+          "genericity": "0",
+          "SIMD": "disabled",
+          "sanitizers": "none"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=1",
+          "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=1"
+        }
+      },
+      "parameters": {
+        "mode": "ordinary",
+        "fixture": "boolean-F65537",
+        "linear_algebra": 2,
+        "build": "original"
+      }
+    },
+    {
+      "id": "original-l2-saturation",
+      "role": "reference",
+      "description": "Fixed Boolean known-answer diagnostic cell",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "../solver_multiplicity_audit_20261109/build-msolve.sh"
+          ]
+        ],
+        "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": "2",
+          "verbosity": "0",
+          "print_gb": "2",
+          "genericity": "0",
+          "SIMD": "disabled",
+          "sanitizers": "none"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=1",
+          "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=1"
+        }
+      },
+      "parameters": {
+        "mode": "saturation",
+        "fixture": "boolean-F65537",
+        "linear_algebra": 2,
+        "build": "original"
+      }
+    },
+    {
+      "id": "sanitized-l2-ordinary",
+      "role": "candidate",
+      "description": "Fixed Boolean known-answer diagnostic cell",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "build-sanitized.sh"
+          ]
+        ],
+        "binary_sha256": "40a3ae1cfc2de0d742f33cc84ab710515c3558f400d8c0c4c7aae7d263ad5100",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": "2",
+          "verbosity": "0",
+          "print_gb": "2",
+          "genericity": "0",
+          "SIMD": "disabled",
+          "sanitizers": "address,undefined; halt first error; leaks disabled"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=1",
+          "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=1"
+        }
+      },
+      "parameters": {
+        "mode": "ordinary",
+        "fixture": "boolean-F65537",
+        "linear_algebra": 2,
+        "build": "sanitized"
+      }
+    },
+    {
+      "id": "sanitized-l2-saturation",
+      "role": "candidate",
+      "description": "Fixed Boolean known-answer diagnostic cell",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "build-sanitized.sh"
+          ]
+        ],
+        "binary_sha256": "40a3ae1cfc2de0d742f33cc84ab710515c3558f400d8c0c4c7aae7d263ad5100",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": "2",
+          "verbosity": "0",
+          "print_gb": "2",
+          "genericity": "0",
+          "SIMD": "disabled",
+          "sanitizers": "address,undefined; halt first error; leaks disabled"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=1",
+          "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=1"
+        }
+      },
+      "parameters": {
+        "mode": "saturation",
+        "fixture": "boolean-F65537",
+        "linear_algebra": 2,
+        "build": "sanitized"
+      }
+    },
+    {
+      "id": "original-l1-ordinary",
+      "role": "reference",
+      "description": "Fixed Boolean known-answer diagnostic cell",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "../solver_multiplicity_audit_20261109/build-msolve.sh"
+          ]
+        ],
+        "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": "1",
+          "verbosity": "0",
+          "print_gb": "2",
+          "genericity": "0",
+          "SIMD": "disabled",
+          "sanitizers": "none"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=1",
+          "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=1"
+        }
+      },
+      "parameters": {
+        "mode": "ordinary",
+        "fixture": "boolean-F65537",
+        "linear_algebra": 1,
+        "build": "original"
+      }
+    },
+    {
+      "id": "original-l1-saturation",
+      "role": "reference",
+      "description": "Fixed Boolean known-answer diagnostic cell",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "../solver_multiplicity_audit_20261109/build-msolve.sh"
+          ]
+        ],
+        "binary_sha256": "390a41bd8d8cb02454cd87edef5db99130baac1fae20ae83fd222ebca1aa0708",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": "1",
+          "verbosity": "0",
+          "print_gb": "2",
+          "genericity": "0",
+          "SIMD": "disabled",
+          "sanitizers": "none"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=1",
+          "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=1"
+        }
+      },
+      "parameters": {
+        "mode": "saturation",
+        "fixture": "boolean-F65537",
+        "linear_algebra": 1,
+        "build": "original"
+      }
+    },
+    {
+      "id": "sanitized-l1-ordinary",
+      "role": "candidate",
+      "description": "Fixed Boolean known-answer diagnostic cell",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "build-sanitized.sh"
+          ]
+        ],
+        "binary_sha256": "40a3ae1cfc2de0d742f33cc84ab710515c3558f400d8c0c4c7aae7d263ad5100",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": "1",
+          "verbosity": "0",
+          "print_gb": "2",
+          "genericity": "0",
+          "SIMD": "disabled",
+          "sanitizers": "address,undefined; halt first error; leaks disabled"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=1",
+          "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=1"
+        }
+      },
+      "parameters": {
+        "mode": "ordinary",
+        "fixture": "boolean-F65537",
+        "linear_algebra": 1,
+        "build": "sanitized"
+      }
+    },
+    {
+      "id": "sanitized-l1-saturation",
+      "role": "candidate",
+      "description": "Fixed Boolean known-answer diagnostic cell",
+      "instrument": {
+        "repo": "algebraic-solving/msolve",
+        "commit": "5e72b9d99eaea55fe87eb8ac945ec9e914a69327",
+        "build": [
+          [
+            "bash",
+            "build-sanitized.sh"
+          ]
+        ],
+        "binary_sha256": "40a3ae1cfc2de0d742f33cc84ab710515c3558f400d8c0c4c7aae7d263ad5100",
+        "threads": 1,
+        "flags": {
+          "linear_algebra": "1",
+          "verbosity": "0",
+          "print_gb": "2",
+          "genericity": "0",
+          "SIMD": "disabled",
+          "sanitizers": "address,undefined; halt first error; leaks disabled"
+        },
+        "env": {
+          "OMP_NUM_THREADS": "1",
+          "LD_LIBRARY_PATH": "/workspace/msolve-deps/root/usr/lib/x86_64-linux-gnu",
+          "ASAN_OPTIONS": "detect_leaks=0:abort_on_error=1:symbolize=1",
+          "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=1"
+        }
+      },
+      "parameters": {
+        "mode": "saturation",
+        "fixture": "boolean-F65537",
+        "linear_algebra": 1,
+        "build": "sanitized"
+      }
+    }
+  ],
+  "controls": {
+    "aa": {
+      "present": false,
+      "comparison": null,
+      "not_applicable_reason": "Fixed exact diagnostic cells with known answers and synthetic checker calibration. No population, noise, time, causal or statistical inference; not required for exact computation."
+    },
+    "positive": {
+      "present": false,
+      "arm": null,
+      "expected_detection": null,
+      "not_applicable_reason": "Fixed exact diagnostic cells with known answers and synthetic checker calibration. No population, noise, time, causal or statistical inference; not required for exact computation."
+    },
+    "negative": {
+      "present": false,
+      "arm": null,
+      "null_population": null,
+      "not_applicable_reason": "Fixed exact diagnostic cells with known answers and synthetic checker calibration. No population, noise, time, causal or statistical inference; not required for exact computation."
+    }
+  },
+  "variable_ledger": {
+    "independent": [
+      {
+        "name": "mode",
+        "levels": [
+          "ordinary",
+          "saturation"
+        ]
+      },
+      {
+        "name": "linear_algebra",
+        "levels": [
+          1,
+          2
+        ]
+      },
+      {
+        "name": "build",
+        "levels": [
+          "original",
+          "sanitized"
+        ]
+      }
+    ],
+    "factors": [
+      {
+        "name": "diagnostic_cell",
+        "treatment": "crossed",
+        "value": "mode x linear_algebra x build, all8cells",
+        "how": "Absolute per-cell known answers, no causal/performance claim."
+      },
+      {
+        "name": "host",
+        "treatment": "measured",
+        "value": "Linux-6.18.57-x86_64-with-glibc2.41",
+        "how": "One shared authorized local host, no clock evidence."
+      },
+      {
+        "name": "inputs_order_randomness",
+        "treatment": "fixed",
+        "value": "one ideal; listed order; one thread; genericity0; no warmups or sampled instance",
+        "how": "Preserve full argv and outcomes, no postdata retries."
+      },
+      {
+        "name": "analyst",
+        "treatment": "fixed",
+        "value": "unblinded exact expected bases",
+        "how": "Frozen analyzer and prior Lean witnesses."
+      }
+    ],
+    "comparisons": [
+      {
+        "id": "fixed-diagnostics",
+        "arms": [
+          "original-l2-ordinary",
+          "original-l2-saturation",
+          "sanitized-l2-ordinary",
+          "sanitized-l2-saturation",
+          "original-l1-ordinary",
+          "original-l1-saturation",
+          "sanitized-l1-ordinary",
+          "sanitized-l1-saturation"
+        ],
+        "differs_in": [
+          "diagnostic_cell"
+        ],
+        "design": "absolute",
+        "threshold": "Per-cell zero discrepancy from its literal known answer; failure/timeout remains not_validated."
+      }
+    ],
+    "crosses_map": false
+  },
+  "randomization": {
+    "arm_order": "fixed",
+    "seed_derivation": {
+      "method": "harness_drawn",
+      "note": "No sampled instance or random form; genericity disabled, exact sparse algebra. Any undocumented internal randomness is not used for inference."
+    },
+    "instance_sampling": {
+      "rule": "One fixed Boolean idealF65537, documented mode toggles; all8 diagnostic cells, not sampled.",
+      "independent_of_arm": true
+    },
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Literal known answers and exact arithmetic; no subjective inclusion or fit."
+    },
+    "arm_order_reason": "Exact unblinded diagnostics; full fixed factorial8cells; no timing/noise/population inference."
+  },
+  "sample_size": {
+    "instances": 1,
+    "replicates": 1,
+    "warmups": 0,
+    "power": {
+      "method": "exact",
+      "alpha": 0.05,
+      "tests_in_family": 1,
+      "correction": "none",
+      "passes": true,
+      "note": "Exactly8fixed arms x1instance x1replicate=8calls. Alpha is schema metadata, no statistical inference."
+    },
+    "preflight_runtime": {
+      "fixed_seconds": 0,
+      "per_sample_seconds": 5,
+      "threads": 1,
+      "estimated_total_seconds": 40,
+      "measured_on": "Admission bound, not measurement. Historical ordinary139/saturation60stimeout retained. New calls cap5s each, no retries."
+    }
+  },
+  "metrics": {
+    "primary": [
+      {
+        "id": "basis_ok",
+        "name": "Literal known-answer basis",
+        "unit": "exact integer or Boolean",
+        "kind": "exact",
+        "definition": "Exit0, literal expected basis, field65537 header, Buchberger S-pairs and input reductions zero.",
+        "source": "evidence/analysis.jsonl:basis_matches",
+        "aggregation": "per_row",
+        "resolution": "exact",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "dimension",
+        "name": "Known quotient dimension",
+        "unit": "exact integer or Boolean",
+        "kind": "exact",
+        "definition": "Bounded standard-monomial staircase equals3 ordinary and1 saturation.",
+        "source": "evidence/analysis.jsonl:standard_monomials",
+        "aggregation": "per_row",
+        "resolution": "exact",
+        "uncertainty": "none_exact"
+      }
+    ],
+    "secondary": [
+      {
+        "id": "boundary",
+        "name": "Evaluation witness",
+        "unit": "exact integer or Boolean",
+        "kind": "exact",
+        "definition": "Ordinary rows vanish at(0,1); saturation contains y and does not vanish there.",
+        "source": "evidence/analysis.jsonl:vanishes_at_zero_one",
+        "aggregation": "per_row",
+        "resolution": "exact",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "boolean_grid",
+        "name": "Boolean candidate zero count",
+        "unit": "integer",
+        "kind": "exact",
+        "definition": "Check only (0,0),(0,1),(1,0),(1,1), count3ordinary/1saturation; not a full F65537^2 enumeration.",
+        "source": "evidence/analysis.jsonl:boolean_grid_zeros",
+        "aggregation": "per_row",
+        "resolution": "exact",
+        "uncertainty": "none_exact"
+      },
+      {
+        "id": "sanitizer_diagnostic",
+        "name": "Raw sanitizer diagnostic",
+        "unit": "text",
+        "kind": "exact",
+        "definition": "Preserve complete stderr; do not turn presence/absence into C correctness proof.",
+        "source": "evidence/runs/*.stderr",
+        "aggregation": "per_row",
+        "resolution": "literal",
+        "uncertainty": "none_exact"
+      }
+    ]
+  },
+  "measurement": {
+    "isolation_required": "none",
+    "warmups": 0,
+    "order": "sequential",
+    "clock": "none",
+    "counters": [],
+    "record": [
+      "binary/source/input/analyzer hashes",
+      "argv",
+      "stdout/stderr/output/exit",
+      "UTC start/end timestamps (provenance only)",
+      "host and compiler provenance"
+    ],
+    "timed_primary_justification": null
+  },
+  "execution": {
+    "backend": "local",
+    "queue": null,
+    "measurement_class": "search",
+    "timeout_seconds": 5,
+    "checkpoint": {
+      "policy": "none",
+      "interval_seconds": null,
+      "grace_seconds": null,
+      "restore_validation": "none",
+      "after_restore": {
+        "wall_time": "invalid",
+        "counted_units": "valid"
+      }
+    },
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    }
+  },
+  "stopping_rules": [
+    {
+      "rule": "Exactly8listed calls, one attempt each; preserve every outcome even after first crash.",
+      "kind": "fixed_n",
+      "preregistered": true
+    },
+    {
+      "rule": "5second watchdog per call, total40second native watchdog allowance; no outcome-dependent retry.",
+      "kind": "budget",
+      "preregistered": true
+    }
+  ],
+  "invalidation_rules": [
+    "Missing/malformed output, timeout or nonzero exit is not_validated; no silent exclusion.",
+    "No parser/source fix after affected data under this protocol; preserve and label new version if correction needed."
+  ],
+  "decision_rule": {
+    "text": "fixture_pass only when every exact registered check passes for the arm; otherwise discrepancy or not_validated.",
+    "comparison_ids": [
+      "fixed-diagnostics"
+    ],
+    "threshold": "zero discrepancies",
+    "statistic": "exact polynomial equality and finite integer checks",
+    "interval": "none; exact known answers",
+    "multiple_comparison_correction": "none",
+    "effect_size_measure": "integer discrepancy from known answer",
+    "verdict_vocabulary": [
+      "fixture_pass",
+      "discrepancy",
+      "not_validated"
+    ]
+  },
+  "analysis_plan": {
+    "script": {
+      "path": "native/analyze.cpp",
+      "sha256": "8fd28ef5b7e52b35112a36bf6174ed5a2e18b77b6639c95f045402f8331dd31b"
+    },
+    "inputs": [
+      "inputs/*.ms",
+      "evidence/runs/*"
+    ],
+    "outputs": [
+      "evidence/analysis.jsonl",
+      "export.json",
+      "report.pdf"
+    ],
+    "blinded": false,
+    "frozen_before_data": true
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "review_schema": "experiment.review/v1",
+    "graphs": [
+      "reports/proof-20261110/diagnostic.svg"
+    ],
+    "report_dir": "reports/proof-20261110"
+  },
+  "inadmissible": [
+    "Promoting this fixture to general ordinary msolve F4Run refinement.",
+    "Calling saturation output an ordinary ideal consequence.",
+    "Claiming timing, statistics, independent-host validation or signed execution.",
+    "Suppressing any outcome or changing frozen expected rows/parser.",
+    "Treating four Boolean candidates as exhaustive F65537^2 enumeration or hiding the v1registration/dispatch failures."
+  ],
+  "literature": [
+    {
+      "ref": "../f4-model-imports.json; original04 F4Containment/SubspaceCriterion and original08 SolvingDegreeBound",
+      "provenance": "internal",
+      "claim": "Actual F4Run invariant and exact original model bytes."
+    },
+    {
+      "ref": "msolve@5e72b9d99eaea55fe87eb8ac945ec9e914a69327 main.c -S; msolve.c basis output2230-2252 and saturation3816-3844; f4sat.c429-458",
+      "provenance": "retrieved",
+      "claim": "-S saturates first k-1 input polys by last; -g2 returns full basis; simplify reading belongs to saturation path. msolve.c3799requires32bit field path; io.c599-615selects32bits at p>=65536."
+    },
+    {
+      "ref": "Mathlib56a00585 MvPolynomial/Ideal.span; ../lean/F4SaturationBoundary.lean and F4ExpectedOutputs.lean",
+      "provenance": "internal",
+      "claim": "Actual ideal membership, evaluation nonmembership and power-witness saturation; expected modular coefficients bound in Lean."
+    },
+    {
+      "ref": "Pinned upstream main.c advanced linear algebra1/2 flags; neogb/io.c599-615ff_bits, f4.c matrixdispatch, la_ff_32.c exact sparse and sparse/dense paths; GCC AddressSanitizer/UndefinedBehaviorSanitizer options",
+      "provenance": "retrieved",
+      "claim": "Source-guided diagnostic only; instruments may change observable failure; no source bug conclusion from outcome alone."
+    }
+  ],
+  "amendments": [
+    {
+      "id": "predata-diagnostic-after-v2-failures",
+      "filed": "2026-11-10",
+      "filed_before_affected_data": true,
+      "reason": "V2original ordinary exit139 and saturation timeout124 after60s already seen; preserve all original records. New diagnostic cells not yet run; build only completed. Diagnostic is descriptive and in-sample, not new statistical confirmation.",
+      "changes": [
+        "Cross both exact linear algebra variants with original and sanitizer builds, ordinary/saturation:8cells.",
+        "5second per-call diagnostic watchdog; instrumented errors halt first defect.",
+        "Keep same symbolic ideal, field65537, documented genericity0 and original expected bases."
+      ],
+      "supersedes_fields": [
+        "protocol_id",
+        "version",
+        "study_dir",
+        "arms",
+        "sample_size",
+        "execution",
+        "analysis_plan"
+      ]
+    }
+  ],
+  "freeze": {
+    "status": "draft",
+    "protocol_sha256": null,
+    "commit": null,
+    "frozen_at": null,
+    "filed_before_affected_data": true
+  },
+  "extensions": {
+    "original_items": [
+      9,
+      12
+    ],
+    "checkpoint_exception": "Approved zero-paid local bounded diagnostic; no EKS or new host.",
+    "in_sample": true,
+    "previous_version": {
+      "path": "../theorem_census_20261109/f4-saturation-v2/protocol.json",
+      "sha256": "db0b647e47b4333d79b36ba82fa9f0638892aba685cf9b53a0e5d934c14bfea3",
+      "export": "../theorem_census_20261109/f4-saturation-v2/export.json",
+      "observed": "ordinary139 empty output; saturation124 after60s empty output; retained, not retried under old protocol."
+    },
+    "prior_calls": 2,
+    "new_planned_calls": 8,
+    "native_budget_seconds": 40,
+    "sanitized_binary": "/workspace/msolve-deps/diagnostic-20261110/msolve"
+  }
+}
