@@ -301,6 +301,76 @@ pub fn inv_mod_u64(a: u64, p: u64) -> u64 {
     }
 }
 
+/// `a·b mod m` for a fixed modulus, with the value of
+/// `((a as u128 * b as u128) % m as u128) as u64` for every input.
+///
+/// For an odd `m < 2^63` and reduced operands the product goes through two
+/// Montgomery reductions (`a·b·R⁻¹`, then `·R²·R⁻¹`), which return the
+/// canonical remainder in `[0, m)` — the same value the 128-bit `%`
+/// (`__umodti3`, a library call) returns, without a division.  Anything
+/// else (even modulus, `m ≥ 2^63`, unreduced operand) takes the 128-bit
+/// path unchanged, so no input changes its result.  Replay class WALL:
+/// callers that swap their `u128 %` for this keep every value and every
+/// counted unit (assessment 2026-11-10, R1/R2).
+#[derive(Clone, Copy, Debug)]
+pub struct MulModN {
+    pub m: u64,
+    /// `−m⁻¹ mod 2^64` (0 when the Montgomery path is off).
+    n_inv: u64,
+    /// `2^128 mod m`.
+    r2: u64,
+    mont: bool,
+}
+
+impl MulModN {
+    pub fn new(m: u64) -> Self {
+        let mont = m & 1 == 1 && m > 1 && m < (1u64 << 63);
+        if !mont {
+            return MulModN {
+                m,
+                n_inv: 0,
+                r2: 0,
+                mont,
+            };
+        }
+        let mut inv: u64 = 1;
+        for _ in 0..6 {
+            inv = inv.wrapping_mul(2u64.wrapping_sub(m.wrapping_mul(inv)));
+        }
+        let r = ((1u128 << 64) % m as u128) as u64;
+        let r2 = ((r as u128 * r as u128) % m as u128) as u64;
+        MulModN {
+            m,
+            n_inv: inv.wrapping_neg(),
+            r2,
+            mont,
+        }
+    }
+
+    /// Montgomery reduction of `t < m·2^64`: `t·2^-64 mod m` in `[0, m)`.
+    #[inline(always)]
+    fn redc(&self, t: u128) -> u64 {
+        let q = (t as u64).wrapping_mul(self.n_inv);
+        // t + q·m < 2m·2^64 ≤ 2^128 for m < 2^63, and the quotient by 2^64
+        // is below 2m, so one conditional subtraction makes it canonical.
+        let u = ((t + q as u128 * self.m as u128) >> 64) as u64;
+        if u >= self.m {
+            u - self.m
+        } else {
+            u
+        }
+    }
+
+    #[inline(always)]
+    pub fn mul(&self, a: u64, b: u64) -> u64 {
+        if self.mont && a < self.m && b < self.m {
+            self.redc(self.redc(a as u128 * b as u128) as u128 * self.r2 as u128)
+        } else {
+            ((a as u128 * b as u128) % self.m as u128) as u64
+        }
+    }
+}
+
 #[inline(always)]
 fn add_mod(a: u64, b: u64, n: u64) -> u64 {
     let s = a + b;
@@ -2396,5 +2466,54 @@ mod tests {
         cfg.threads = cfg.threads.min(4);
         let res = rho_parallel(&fc, g, q, &cfg).unwrap();
         assert_eq!(res.log, k);
+    }
+}
+
+#[cfg(test)]
+mod mulmod_n_tests {
+    use super::MulModN;
+
+    /// `MulModN::mul` against the 128-bit remainder it replaces, on edge
+    /// and pseudo-random inputs for odd, even, small and large moduli.
+    #[test]
+    fn mulmod_n_matches_the_128_bit_remainder() {
+        let mut s = 0x9e37_79b9_7f4a_7c15u64;
+        let mut next = || {
+            s ^= s << 13;
+            s ^= s >> 7;
+            s ^= s << 17;
+            s
+        };
+        let moduli = [
+            1u64,
+            2,
+            3,
+            5,
+            15,
+            53_411,
+            65_521,
+            4_294_967_291,
+            4_294_967_296,
+            (1 << 61) - 1,
+            (1 << 62) - 57,
+            (1 << 63) - 25,
+            (1 << 63) + 29,
+            u64::MAX,
+        ];
+        for &m in &moduli {
+            let f = MulModN::new(m);
+            let mut cases = vec![(0, 0), (0, m - 1), (m - 1, m - 1), (1, m - 1)];
+            for _ in 0..2000 {
+                cases.push((next() % m, next() % m));
+                cases.push((next(), next() % m)); // unreduced operand
+            }
+            for (a, b) in cases {
+                assert_eq!(
+                    f.mul(a, b),
+                    ((a as u128 * b as u128) % m as u128) as u64,
+                    "mul {a} {b} mod {m}"
+                );
+            }
+        }
     }
 }
