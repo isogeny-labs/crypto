@@ -60,11 +60,14 @@ def setup(p, rng):
         for x, y in fs:
             FB.append(((x, 0), y)); FB.append(((x, 0), ((-y[0]) % p, (-y[1]) % p)))
         fac = factor(N2)
-        G = FB[rng.randrange(len(FB))]
+        re_ = [P for P in FB if P[1][1] == 0]; im_ = [P for P in FB if P[1][0] == 0]
+        if not re_ or not im_: continue
+        G = C.add(re_[rng.randrange(len(re_))], im_[rng.randrange(len(im_))])
+        if G is None: continue
         r = N2
         for q in fac:
             while r % q == 0 and C.mul(r//q, G) is None: r //= q
-        if r * 40 < N2 or r < 150: continue
+        if r * 8 < N2 or r < 150: continue
         return C, FB, N2, G, r
 
 def coverage(C, S, N2):
@@ -110,11 +113,10 @@ def main():
         rng = random.Random(20261110 + p)
         C, FB, N2, G, r = setup(p, rng)
         f_sub = coverage(C, FB, N2)
-        # null: 2p points a*F1+b*F2 with random a,b (negation closed), same count
-        F1, F2 = FB[rng.randrange(len(FB))], FB[rng.randrange(len(FB))]
+        # null: 2p random multiples of G (negation closed), same count
         null = []
         while len(null) < len(FB):
-            P = C.add(C.mul(rng.randrange(N2), F1), C.mul(rng.randrange(N2), F2))
+            P = C.mul(rng.randrange(1, r), G)
             if P is None or P[1] == (0, 0): continue
             null.append(P); null.append((P[0], ((-P[1][0]) % p, (-P[1][1]) % p)))
         f_null = coverage(C, null, N2)
