@@ -294,3 +294,61 @@ the complete ambient reduced-pair group law and its geometric Picard
 identification open; no unproved ambient embedding is asserted.
 The smooth fraction1versusstrictlysmallerambient result keeps that exact
 polynomial-model scope. [pcc:unverified]
+
+### 2026-11-10 actual quadratic fields F4/F9
+
+The [quadratic-field study](../research/supersingular_quadratic_fields_audit_20261110/README.md)
+now covers every general coefficient tuple over actual fields of sizes4/9
+(1024/59049tuples). Generic monic-quadratic fibre bounds handleF4.
+A proved characteristic3coordinate/count bijection reducesallF9models
+to729normalized models, with allnine81-model kernel proofs accepted.
+The source trace criterion yields actual pointcount sets1/3/5/7/9and
+4/7/10/13/16. Every prime divisor has modular degree≤6,coprimality,
+and an actual prime-order point. Explicit actual prime-order7/13curves
+bothhave modular degree3. Wholegate42/0/0,57attempt/source/resource
+files retained losslessly, including resource-aborted143attempt. [pcc:unverified]
+
+The geometric trace/p-rank/endomorphism equivalence, full torsion/roots-of-unity
+field interpretation and higher extensionsn≥3remain open. No general
+Waterhouse/Hasse premise is used to prove these finite-field classifications.
+A renewed bounded primary lookup for original Frey–Rück1994stillfails:
+AMSprimaryPDF403, JSTORprimaryPDFinaccessible throughwebtool;
+searchesfoundcitations, not a readable original. Its unread status remains.
+[pcc:unverified]
+
+### Completion review of the approved fourteen-item request
+
+The current [fourteen-item evidence map](../research/theorem_census_20261109/README.md)
+is the requirement-to-proof index. Work has reached every item; the complete
+request remains partial. An accepted narrow counterexample does not settle
+the source theorem with its hypotheses restored. [pcc:unverified]
+
+| Item | Status at this checkpoint | Concrete remainder |
+|:--|:--|:--|
+| 1 Semaev | Partial: canonical all-arity zero-sum equivalence/degrees and literal binary S4 display disproof | Full polynomial symmetry, absolute irreducibility and arbitrary-split normalization |
+| 2 BK | Partial: excluded-case disproof and actual qualified F5/r3 criterion at every positive extension degree | Generic torsion rank/determinant/Weil bridges and complete p<500 census |
+| 3 Supersingular | Partial: direct exact-degree-two counterexamples; complete general-model checks over F2/F3/F4/F9 | Higher extensions, general Hasse/classification and geometric/torsion-field bridges |
+| 4 Pairings/MOV/FR | Partial: actual composite Tate-domain counterexamples and pairing-domain controls | Canonical Weil/Tate constructions and all stated MOV/FR domains; original Frey–Rück unread |
+| 5 Diem factor base | Partial: excluded subfield family, qualified arithmetic estimate and unrestricted small-field counterexample | Scheme/admissibility geometry and qualified general factor-base bound |
+| 6 Gaudry smoothness | Partial: exact small-model counts and finite reduced-pair checks | Whole geometric Jacobian identification and fixed-genus asymptotic error proof |
+| 7 Subgroup smoothness | Partial: complete finite Cantor-group counterexamples and growing family with all-pair arithmetic/group consistency | Full ambient group/Picard embedding and qualified typical/large-prime asymptotics |
+| 8 Bézout/multiplicity | Partial: actual quotient length/support witness and 16 native checks | General n!dⁿ bound and decomposition-system hypotheses |
+| 9 Gröbner heuristics | Partial: Lean counterexample to universal regularity reading | Generic/Joux–Vitse statements and requested exact system measurements |
+| 10 Rho walks | Partial: exact product-PMF variance theorem, duplicate-step counterexample and finite populations | Collision-time penalty and qualified asymptotic mixing proofs |
+| 11 Standards | Partial: actual 160-bit anomalous curve/cardinality and concrete Smart finite-program certificate | Generic p-adic/complexity/native refinement and matched SafeCurves benchmark |
+| 12 msolve/F4 | Partial: exact F4Run ideal-containment theorem, saturation-reading counterexample and source/run audit | Ordinary C refinement, crash/hang diagnosis and complete trace binding |
+| 13 Independence | Blocked for the requested other-machine replay | Prior dispatch HTTP404 ran no job; one runtime available; a different authorized host or registered workflow is required |
+| 14 Negative control | Verified current control | Historical runs were not preregistered with it; no retroactive promotion |
+
+The accessible runtime has no callable second execution host. A fresh tool
+capability search did not expose a separate browser/remote execution host;
+the only environment service describes this task's existing managed runtime.
+The user has been asked for the missing host/workflow identifier, not for
+reapproval of the already authorized replay. No paid cloud resource has been
+launched. [pcc:unverified]
+
+The source-reading/access gaps and missing mathematical formalizations above
+remain explicit. No claim that all 44 cited sources were read or all fourteen
+original statements were proved/disproved is made. Local Lean PASS and signed
+independent standing remain separate; the new packets are unsigned.
+[pcc:unverified]
