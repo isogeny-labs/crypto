@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261110T0542Z-curve25519-engine-items-a1-k24",
+  "latest_record": "20261110T0551Z-m4gb-arith-kernels-ab",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 83,
+    "measured": 84,
     "open": 3
   },
   "repo": "crypto",
@@ -4811,6 +4811,183 @@
       ],
       "problem": "kernel:inherited_f4_solve_tree",
       "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 8.236,
+      "latest": 8.236,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "bool-root1-n35-wall",
+      "points": [
+        {
+          "commit": "0dde008ecb97",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261110T0551Z-m4gb-arith-kernels-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            7.759,
+            8.624
+          ],
+          "summary": "M4GB patch 0001 (arithmetic GF(p) dense kernels): 3.4-4.1x on random dense GF(31) n=12..16 and 1.6-2.0x on GF(65521), identical bases; patch 0002: 1.26x on wd_n16 under a 64-variable binary and clean output; GF(2) under exact-width binaries unchanged; wide-binary cells censored (cgroup OOM at ~7 GB). Local container, one thread, interleaved; unverified.",
+          "value": 8.236
+        }
+      ],
+      "problem": "kernel:m4gb_gf_p_addmul",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.294,
+      "latest": 0.294,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "gf31-n14-wall",
+      "points": [
+        {
+          "commit": "0dde008ecb97",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261110T0551Z-m4gb-arith-kernels-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.275,
+            0.3
+          ],
+          "summary": "M4GB patch 0001 (arithmetic GF(p) dense kernels): 3.4-4.1x on random dense GF(31) n=12..16 and 1.6-2.0x on GF(65521), identical bases; patch 0002: 1.26x on wd_n16 under a 64-variable binary and clean output; GF(2) under exact-width binaries unchanged; wide-binary cells censored (cgroup OOM at ~7 GB). Local container, one thread, interleaved; unverified.",
+          "value": 0.294
+        }
+      ],
+      "problem": "kernel:m4gb_gf_p_addmul",
+      "unit": "wall_s"
+    },
+    {
+      "better": "higher",
+      "first": 3.4,
+      "latest": 3.4,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "gf31-n16-speedup",
+      "points": [
+        {
+          "commit": "0dde008ecb97",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 3,
+          "record": "20261110T0551Z-m4gb-arith-kernels-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "M4GB patch 0001 (arithmetic GF(p) dense kernels): 3.4-4.1x on random dense GF(31) n=12..16 and 1.6-2.0x on GF(65521), identical bases; patch 0002: 1.26x on wd_n16 under a 64-variable binary and clean output; GF(2) under exact-width binaries unchanged; wide-binary cells censored (cgroup OOM at ~7 GB). Local container, one thread, interleaved; unverified.",
+          "value": 3.4
+        }
+      ],
+      "problem": "kernel:m4gb_gf_p_addmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 2.116,
+      "latest": 2.116,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "gf31-n16-wall",
+      "points": [
+        {
+          "commit": "0dde008ecb97",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261110T0551Z-m4gb-arith-kernels-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.046,
+            2.201
+          ],
+          "summary": "M4GB patch 0001 (arithmetic GF(p) dense kernels): 3.4-4.1x on random dense GF(31) n=12..16 and 1.6-2.0x on GF(65521), identical bases; patch 0002: 1.26x on wd_n16 under a 64-variable binary and clean output; GF(2) under exact-width binaries unchanged; wide-binary cells censored (cgroup OOM at ~7 GB). Local container, one thread, interleaved; unverified.",
+          "value": 2.116
+        }
+      ],
+      "problem": "kernel:m4gb_gf_p_addmul",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 3.749,
+      "latest": 3.749,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "gf65521-quad-n9-wall",
+      "points": [
+        {
+          "commit": "0dde008ecb97",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261110T0551Z-m4gb-arith-kernels-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            3.578,
+            3.974
+          ],
+          "summary": "M4GB patch 0001 (arithmetic GF(p) dense kernels): 3.4-4.1x on random dense GF(31) n=12..16 and 1.6-2.0x on GF(65521), identical bases; patch 0002: 1.26x on wd_n16 under a 64-variable binary and clean output; GF(2) under exact-width binaries unchanged; wide-binary cells censored (cgroup OOM at ~7 GB). Local container, one thread, interleaved; unverified.",
+          "value": 3.749
+        }
+      ],
+      "problem": "kernel:m4gb_gf_p_addmul",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.941,
+      "latest": 0.941,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "wd-n16-on-n64-binary-wall",
+      "points": [
+        {
+          "commit": "0dde008ecb97",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261110T0551Z-m4gb-arith-kernels-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.892,
+            1.079
+          ],
+          "summary": "M4GB patch 0001 (arithmetic GF(p) dense kernels): 3.4-4.1x on random dense GF(31) n=12..16 and 1.6-2.0x on GF(65521), identical bases; patch 0002: 1.26x on wd_n16 under a 64-variable binary and clean output; GF(2) under exact-width binaries unchanged; wide-binary cells censored (cgroup OOM at ~7 GB). Local container, one thread, interleaved; unverified.",
+          "value": 0.941
+        }
+      ],
+      "problem": "kernel:m4gb_gf_p_addmul",
+      "unit": "wall_s"
     },
     {
       "better": "neutral",
