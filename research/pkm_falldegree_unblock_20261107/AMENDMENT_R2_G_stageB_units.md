@@ -67,8 +67,10 @@ is generated from this table and its count is checked against these numbers befo
 4. **Resume.** A job starts by listing the done units and closed ladders of the earlier jobs of this stage (it reads their
    `progress.txt` and unit logs from S3), skips them, and continues from the first unit that is not done.
 5. **Interruption.** A Spot interruption loses only the unit in flight; that unit has no `end` line and is run again by the
-   next job. Owner decision 3 applies per unit: a unit that was in flight at two Spot interruptions is reported lost and goes to
-   the owner; the stage does not continue past a lost unit of the same ladder.
+   next job. Owner decision 3 applies per unit: a unit that was in flight in two earlier jobs without finishing is reported lost
+   and goes to the owner. A job that finds such a unit writes `lost_units.txt`, runs no unit and exits 75; stage B waits for the
+   owner. "In flight" is read from `progress.txt` (a `start` line with no `end` line); the cause of each job's end is read from
+   the EKS audit log and recorded, and a job that ended for a reason other than a Spot interruption is diagnosed before the next.
 6. **Non-zero exit.** A unit whose pilot exits non-zero is not done; the job stops and the cause is diagnosed before any
    further job (as for `pfd-c`'s gate 3).
 7. **Gates.** G1 runs at the start of every job (6 cases, seconds). G3 runs once, as a G3-only job over the done units' row
@@ -81,7 +83,8 @@ is generated from this table and its count is checked against these numbers befo
    `falls`, `first_fall_degree`, `censored_at` and `muladds`. Exception: a row that is censored by its 1800 s budget in either
    set is compared on `x_r`, `curve` and `tower` only, because a wall budget is a host effect (section 5). A mismatch
    stops stage B and is reported; no rule here says which side would be wrong. Stage C has no `D` rows, so the d-B units have
-   no such check.
+   no such check. The comparison is made by the main session when a job's units are collected, before any further stage B job
+   is submitted and before any stage B row is scored; the runner itself does not make it.
 9. **Resources.** 12 vCPU, 56Gi, no pin, job time limit 172,800 s (as `pfd-b`). Cost: US$40 per job and US$400 in total are
    unchanged; the number of jobs is not fixed in advance.
 
@@ -92,7 +95,9 @@ is generated from this table and its count is checked against these numbers befo
 - Thread count: `RAYON_NUM_THREADS=12` from the pod, as for `pfd-b`.
 - Rows: each unit's rows are the rows the registered invocation would have appended at that level. For scoring, a ladder's
   unit files are concatenated in increasing `t` into the registered file name (`B-m3-tower.jsonl`, and for the `P0` ladders
-  the kummer units then the isogeny units into `B-m3-tower-p0.jsonl`, the order the registered invocation writes them).
+  the kummer units then the isogeny units into `B-m3-tower-p0.jsonl`, the order the registered invocation writes them). Each
+  unit file ends with the pilot's per-invocation `{"summary": ...}` line; those lines are dropped in the concatenation and none
+  is made up for the ladder.
 
 ## 5. What is different, stated plainly
 
@@ -111,7 +116,17 @@ is generated from this table and its count is checked against these numbers befo
 ## 7. Runner and requests
 
 - The runner is one frozen bash script passed as the job's command (`/bin/bash -c`), like the G3-only job of Amendment 11. It is
-  in `stageb_units_runner.sh`; its SHA-256 is recorded here at the freeze. It is tested before the freeze on a local copy of the
-  frozen `pkm_tower_pilot` binary (same SHA-256 as `image/binaries.sha256`) on small levels, including the ladder stop, the
-  resume and a killed unit (`devcheck_r2g/`). Test rows are not stage data and are produced with a different `--seed`.
+  in `stageb_units_runner.sh`; its SHA-256 is recorded here at the freeze. It was written by a Sonnet agent to this draft and
+  read line by line by the main session.
+- It was tested on a local copy of the frozen binaries (the image layer; SHA-256 equal to `image/binaries.sha256`) with
+  `--seed 777`, so no test row is a stage row (`devcheck_r2g/`): the unit list (91 units, 25 ladders); a happy path; the ladder
+  stop at two budgets, against the registered-style invocation; equality of concatenated unit rows with the registered-style
+  invocation on four ladders, and a two-kind `P0` invocation against its single-kind units in order; resume after a kill; the
+  lost-unit exit; a non-zero pilot exit; and a termination signal mid-unit (the runner exits 143, kills the pilot, uploads, and
+  leaves no `end` line).
+- Not tested locally: the real `aws s3` commands (a local-directory shim was used), the 300 s background sync, `m >= 4` ladders,
+  the production budgets at large levels, the 12-thread pod. The first job is therefore watched as a test of those: its S3
+  listing and `progress.txt` are checked against the rules above before any second job is submitted.
+- Runner exits: 0 list exhausted; 10 G1 failed; 11 unit list count wrong; 12 an earlier job's `progress.txt` cannot be read;
+  20 a pilot exited non-zero; 75 a lost unit; 143 terminated by a signal.
 - Requests: `requests_r2i/pfd-bu-<n>.json`, one per job, each naming the earlier jobs' result prefixes to resume from.
