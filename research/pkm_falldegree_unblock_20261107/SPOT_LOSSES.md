@@ -15,6 +15,11 @@ relaunch under a new name. Nothing from a lost job is admitted or analysed.
 
 - Both attempts were killed by EC2 Spot interruptions before the run wrote a result row (both `runs/X-m2-t13-k0-c6.jsonl` are 0 bytes in S3). Nothing from either is admitted or analysed.
 - Under owner decision 3 the cell is reported lost. A third attempt needs the owner.
+- **Owner decision 7 (2026-11-10, about 05:25Z):** one third attempt is allowed, at 56Gi under Amendment 14
+  (`research/open_leads_execution_20261108/DECISIONS.md`). Job `pfd-x-t13-k0-c6-20261110-r2`, request
+  `requests_r2h/pfd-x-t13-k0-c6-r2.json` (equal to `requests_r2h/pfd-x-t13-k0-c6.json` except job name and provenance note; VALID).
+  It is submitted after `pfd-x-t13-k1-c6-20261108` has ended, because jobs run one at a time. If it is lost again the cell goes
+  back to the owner.
 - Money spent on the two attempts: about 30 node-minutes of a 16-vCPU Spot node, well under US$1 (derived from the times above; no price was read).
 
 ## Which nodes were interrupted (measured, EKS API-server audit log, node labels)
