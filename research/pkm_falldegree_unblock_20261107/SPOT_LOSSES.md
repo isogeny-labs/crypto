@@ -34,8 +34,11 @@ relaunch under a new name. Nothing from a lost job is admitted or analysed.
 | `pfd-x-t13-k0-c5` (03:09Z) | 112Gi | `r6i.4xlarge` | ran 17 s; not interrupted |
 | `pfd-x-t13-k0-c6-20261108` (03:27Z) | 112Gi | `r7a.4xlarge` | interrupted after 10 min |
 | `pfd-x-t13-k0-c6-20261110-r1` (03:45Z) | 112Gi | `r6a.4xlarge` | interrupted after 20 min |
+| another lab job (04:19Z; 4 CPU, 4Gi) | 4Gi | not read | its pod left the node before 07:09Z; cause not read |
+| `pfd-x-t13-k1-c6-20261108` (07:12Z; Amendment 14) | 56Gi | `m8i.4xlarge` | ran 3.2 h; not interrupted |
 
 - Every node with 128 GiB (r family) that ran longer than a minute was interrupted within about 50 minutes (4 of 4). The two 30-minute runs on `m7i.4xlarge` (64 GiB) were not. One `m7a.4xlarge` was interrupted after 31 minutes.
+- Added 2026-11-10 12:00Z: the first job under Amendment 14 (56Gi) ran 3.2 hours on `m8i.4xlarge` without an interruption. One run; it is in line with the pattern above and does not establish it.
 - That is 7 nodes. It suggests that a 112Gi request, which only r-family nodes can hold, is more exposed than a 56Gi request; it does not establish it.
 - The t = 13 and t = 14 capped requests ask for 112Gi (Amendment 7 A). Amendment 14 (`AMENDMENT_R2_F_mem56.md`) addresses that for the cells not yet launched.
 
@@ -51,3 +54,14 @@ relaunch under a new name. Nothing from a lost job is admitted or analysed.
     run did not reach them.
 - Other interruptions seen on the same pool since 2026-11-09 20:00Z (measured): `pfd-b-20261108` after 16 min, `pfd-b-20261109-r1` after
   31 min, and another lab job's node at 2026-11-10 00:26:44Z. The four t = 12 capped jobs and the two t = 13 cap-5 jobs were not interrupted.
+
+## Correction (2026-11-10 12:00Z): the "about 30 minutes" expectation was wrong
+
+- Under "Loss 1" I wrote that the relaunch "may take about 30 minutes, as the t = 12 cap-6 runs did", because the lost run's step-26
+  counters equalled the t = 12 log's.
+- The completed run `pfd-x-t13-k1-c6-20261108` (draw 1) took 11,570 s (3.2 h) and 32 steps. Its log equals the t = 12 cap-6 log through
+  step 26 and differs from step 27 on (113,847 columns against 103,785). `max_dense_entries` was 4,717,115,340 and peak memory
+  20,618 MB, against 1,357,804,954 and 6,506 MB at t = 12 (measured).
+- So a match of the first 26 steps said nothing about the rest. The statement that whether cap 6 refutes at t = 13 was unknown stands.
+- Consequence for Amendment 14: the 56Gi request was enough for this run with room to spare (about 20 GB peak; 4.7e9 dense entries
+  against the 12.8e9 limit). The amendment's rules did not depend on the expectation, and its limit rule was not triggered.
