@@ -458,3 +458,31 @@ A price guard replaces Amendment 9's instance pin. The full text, with its evide
 
 Registered per `research/open_leads_execution_20261108/DECISIONS.md` (item 1, decisions 3, 4 and 6), with the main session's
 decision of 2026-11-09 to enforce the per-job ceiling by observation instead of by the pin.
+
+## Amendment 13 (2026-11-10; the `m = 4` shape-matched null cells; before any `pfd-m4-*` or `pfd-m4n-*` job is submitted, when no `m = 4` row at `t ≥ 4` and no `m = 4` null row exists in the relaunch)
+
+Amendment 8 asks for the shape-matched null at `m = 4`, `t = 4, 5` but gives no command. This amendment fixes it. The full
+text, with the source lines and the development check, is
+`research/pkm_falldegree_unblock_20261107/AMENDMENT_R2_B_m4_null.md` (R2-B). The binding parts are restated here.
+
+- **Independence.** The text was drafted on 2026-11-08 from Amendment 8 and the pilot's source, before any relaunch row
+  existed. It uses no recorded row. Since the draft only the resource lines changed (Amendments 9 and 12).
+- **Cells.** Four null cells, each paired by `(t, k)` with a Kummer `m = 4` cell of Amendment 8:
+  `pfd-m4n-t4-k0-c7`, `pfd-m4n-t4-k1-c7` (`t = 4`, `N = 16`, `--hky-cmax 7`) and `pfd-m4n-t5-k0-c6`, `pfd-m4n-t5-k1-c6`
+  (`t = 5`, `N = 20`, `--hky-cmax 6`). `t = 5` at `c = 7` and `t = 6` have no null cell.
+- **Command** (the `m4n:` stage of `entry_r2.sh` in the frozen image), with `T`, `K`, `C` from the cell:
+  `pkm_tower_pilot --p 2013265921 --ladder-t none --planted 0 --random 2 --engine hky --kinds kummer --m 4 --controls null
+  --null-chain --hky-cmax C --hky-max-entries 13958643712 --hky-max-cols 4000000 --budget 172800 --t-min T --max-t-m4 T
+  --max-t T --targets K`. The Kummer counterpart differs only in `--controls tower` and no `--null-chain`.
+- **Resources.** 12 vCPU, 112Gi, job time limit 176,400 s, no instance pin, price guard of Amendment 12. These equal the
+  Kummer counterparts'.
+- **Order.** After G3 passed in `pfd-a`, after the Kummer counterpart of the same `(t, k)` has been submitted, and serially.
+- **Readings.** No new hypothesis. H-null (§6) is read as written on the `m = 4` ladder at the common completed `N`
+  (16 and 20). A cell censored at its `--hky-cmax` gives the one-sided value `d_F > cmax`. When both arms of a pair are
+  censored at the same cap the pair reads "mixed" for H-null, never "shape-driven". The null does not enter the Amendment 8
+  rise/flat/fall readings; those are Kummer-only. Amendment 10 does not apply (`lambda` at `m = 4`, `t = 4, 5` is far below 0.1).
+- **Stated before data.** At `t = 5`, `c = 6` both arms may be censored; the null then adds little at `N = 20`. A null closure
+  may use more memory than its counterpart; a limit stop is recorded as censored.
+- No hypothesis, §6 rule, Kummer cell, seed, image, wall budget or cost ceiling changes.
+
+Registered per `research/open_leads_execution_20261108/DECISIONS.md` (decision 6).
