@@ -359,3 +359,15 @@ still not evidence about the degree (§11.3).
 - A third RunPod launch on the same 512 GB shape (2026-11-07 04:22Z, pod
   `g0mby110kxbo6i`) was terminated after about 2 minutes, before the build
   finished, once the 405 GiB failure above was found. It produced no record.
+
+Outcome of A4 (recorded 2026-11-10 22:15Z). Pod `mw1aoh9jtgr4nk` (848 GB cgroup
+limit, `A` = 780,160,000,000 B) started the C1 closure on draw 0 at
+2026-11-07 07:10:32Z. It was still running, with no exit line, at 08:18Z and 10:20Z.
+No later observation was made: the session's next check-in reached it only on
+2026-11-10, after the pod's 14 h lifetime had ended. The pod no longer exists, and its
+`:8000` listing returns 404. Nothing from it was fetched. **C1 stays open.** The run
+is neither a result nor an allocation failure: its outcome is unknown. The only fact it
+adds is that the closure did not fail to allocate within 3 h 10 min under 780 GB,
+where the 512 GB host failed after 1,317 s. Spend: at most 14 h × $7.77 ≈ $109. The
+billed figure was not read. A retry needs the result copied off the host as the run
+ends, before the host can expire.
