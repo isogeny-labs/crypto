@@ -1085,6 +1085,127 @@ fn eval_sib(r: u64, c: usize, samples: &[Sample], m: usize) -> (Stat, Stat) {
     (stat(&pts, r), stat(&par, r))
 }
 
+/// `SP(m, M)`: like `SibGen`, but every parent draws its own random m-subset
+/// of a pool of M jumps.
+struct PoolGen {
+    r: u64,
+    pool: Vec<Vec4>,
+    m: usize,
+    parent: Vec4,
+    started: bool,
+    idx: Vec<usize>,
+    /// subset of the current parent (pool indices).
+    cur: Vec<usize>,
+    /// subsets of the parents one and two steps back.
+    s_tm1: Vec<usize>,
+    s_tm2: Vec<usize>,
+    prev_h: Option<usize>,
+    prev2_h: Option<usize>,
+    next_h: usize,
+    pos: usize,
+    parents: u64,
+    rng: Rng,
+}
+
+impl PoolGen {
+    fn new(r: u64, pool: Vec<Vec4>, m: usize, start: Vec4, stream_seed: u64) -> Self {
+        let n = pool.len();
+        PoolGen {
+            r,
+            pool,
+            m,
+            parent: start,
+            started: false,
+            idx: (0..n).collect(),
+            cur: Vec::new(),
+            s_tm1: Vec::new(),
+            s_tm2: Vec::new(),
+            prev_h: None,
+            prev2_h: None,
+            next_h: 0,
+            pos: 0,
+            parents: 0,
+            rng: Rng::new(stream_seed),
+        }
+    }
+    fn shifted(&self, h: usize, plus: bool) -> Vec4 {
+        let mut v = self.parent;
+        for i in 0..4 {
+            v[i] = if plus {
+                addmod(v[i], self.pool[h][i], self.r)
+            } else {
+                submod(v[i], self.pool[h][i], self.r)
+            };
+        }
+        v
+    }
+}
+
+impl Gen for PoolGen {
+    fn next(&mut self, _c_prev: u64, _rank: usize) -> Pt {
+        if !self.started {
+            self.started = true;
+            return Pt {
+                v: self.parent,
+                store: true,
+            };
+        }
+        loop {
+            if self.parents == 0 || self.pos == 2 * self.m {
+                if self.parents > 0 {
+                    let h = self.next_h;
+                    self.parent = self.shifted(h, true);
+                    self.prev2_h = self.prev_h;
+                    self.prev_h = Some(h);
+                    self.s_tm2 = std::mem::take(&mut self.s_tm1);
+                    self.s_tm1 = std::mem::take(&mut self.cur);
+                }
+                // fresh uniform m-subset (partial Fisher-Yates)
+                let n = self.idx.len();
+                for i in 0..self.m {
+                    let j = i + self.rng.below((n - i) as u64) as usize;
+                    self.idx.swap(i, j);
+                }
+                self.cur = self.idx[..self.m].to_vec();
+                self.next_h = self.cur[self.rng.below(self.m as u64) as usize];
+                self.pos = 0;
+                self.parents += 1;
+            }
+            let h = self.cur[self.pos / 2];
+            let plus = self.pos.is_multiple_of(2);
+            self.pos += 1;
+            // Known copies (see the header): P_t - J_{h_{t-1}} = P_{t-1}, and
+            // P_t - J_{h_{t-2}} = P_{t-2} + J_{h_{t-1}} when that child was emitted.
+            if !plus {
+                if self.prev_h == Some(h) {
+                    continue;
+                }
+                if self.prev2_h == Some(h) && self.prev_h.is_some_and(|p| self.s_tm2.contains(&p)) {
+                    continue;
+                }
+            }
+            return Pt {
+                v: self.shifted(h, plus),
+                store: true,
+            };
+        }
+    }
+    fn aux(&self) -> u64 {
+        self.parents
+    }
+}
+
+/// `(E_points, E_parents)` of `SP(m, M)` over `samples`.
+fn eval_pool(r: u64, c: usize, samples: &[Sample], m: usize, pool: usize) -> (Stat, Stat) {
+    let raw = evaluate_raw(r, c, samples, |smp| {
+        let (jumps, start, seed) = sib_design(r, c, pool, smp.design);
+        PoolGen::new(r, jumps, m, start, seed)
+    });
+    let pts: Vec<(u64, bool)> = raw.iter().map(|x| (x.0, x.1)).collect();
+    let par: Vec<(u64, bool)> = raw.iter().map(|x| (x.2, x.1)).collect();
+    (stat(&pts, r), stat(&par, r))
+}
+
 /// Aggregate per-curve stats: mean of means, SE = sqrt(sum se^2) / m.
 fn aggregate(stats: &[Stat]) -> (f64, f64) {
     let m = stats.len() as f64;
@@ -1145,6 +1266,7 @@ struct Args {
     steps: usize,
     chained: bool,
     siblings: Vec<usize>,
+    pool: Option<usize>,
 }
 
 fn parse_args() -> Result<Args, String> {
@@ -1160,6 +1282,7 @@ fn parse_args() -> Result<Args, String> {
         steps: 40,
         chained: false,
         siblings: Vec::new(),
+        pool: None,
     };
     let argv: Vec<String> = std::env::args().skip(1).collect();
     let mut i = 0;
@@ -1192,6 +1315,7 @@ fn parse_args() -> Result<Args, String> {
                     j.parse().map_err(|_| bad(key))?,
                 ));
             }
+            ("--pool", Some(v)) => a.pool = Some(v.parse().map_err(|_| bad(key))?),
             ("--siblings", Some(v)) => {
                 a.siblings = v
                     .split(',')
@@ -1217,6 +1341,11 @@ fn parse_args() -> Result<Args, String> {
     }
     if a.siblings.iter().any(|m| ![1, 2, 4, 8, 16].contains(m)) {
         return Err("--siblings values are 1, 2, 4, 8 or 16".into());
+    }
+    if let Some(pool) = a.pool {
+        if a.siblings.is_empty() || a.siblings.iter().any(|&m| m > pool) {
+            return Err("--pool M needs --siblings with every m <= M".into());
+        }
     }
     Ok(a)
 }
@@ -1364,6 +1493,9 @@ fn run_chained(args: &Args) {
 /// `--r` and `--c`, plus per-C aggregates over the given curves.
 fn run_siblings(args: &Args) {
     // aggregates keyed by (c, row name)
+    if let Some(pool) = args.pool {
+        println!("# pool mode: SP(m, M) with M={pool}");
+    }
     let mut agg: Vec<(usize, String, Vec<Stat>, Vec<Stat>)> = Vec::new();
     let mut push = |c: usize, name: String, p: Stat, q: Option<Stat>| {
         let slot = agg.iter().position(|a| a.0 == c && a.1 == name);
@@ -1391,16 +1523,27 @@ fn run_siblings(args: &Args) {
             println!("D0i E_points = {}", fmt(&d0i));
             push(c, "D0i".into(), d0i, None);
             for &m in &args.siblings {
-                let (p, q) = eval_sib(r, c, &held, m);
+                let (p, q) = match args.pool {
+                    Some(pool) => eval_pool(r, c, &held, m, pool),
+                    None => eval_sib(r, c, &held, m),
+                };
+                let tag = match args.pool {
+                    Some(pool) => format!("SP m={m:<2} M={pool}"),
+                    None => format!("SB m={m:<2}"),
+                };
                 println!(
-                    "SB m={m:<2} E_points = {}  E_parents = {:.4} +- {:.4}  rank-K hit = {:.4}  E_points/D0 = {:.4}",
+                    "{tag} E_points = {}  E_parents = {:.4} +- {:.4}  rank-K hit = {:.4}  E_points/D0 = {:.4}",
                     fmt(&p),
                     q.mean,
                     q.se,
                     1.0 - p.censored as f64 / p.n as f64,
                     p.mean / d0.mean
                 );
-                push(c, format!("SB m={m}"), p, Some(q));
+                let name = match args.pool {
+                    Some(pool) => format!("SP m={m} M={pool}"),
+                    None => format!("SB m={m}"),
+                };
+                push(c, name, p, Some(q));
             }
         }
     }
@@ -1739,5 +1882,33 @@ mod tests {
         .map(|x| (x.0, x.1))
         .collect();
         assert_eq!(a.mean, stat(&raw, r).mean);
+    }
+
+    #[test]
+    fn pool_points_are_distinct_vectors_and_counted() {
+        let r = 2_097_349u64;
+        let (pool, start, seed) = sib_design(r, 2, 16, 5);
+        let mut g = PoolGen::new(r, pool, 4, start, seed);
+        let mut seen = std::collections::HashSet::new();
+        for _ in 0..3000 {
+            assert!(seen.insert(g.next(0, 0).v));
+        }
+        assert!(g.aux() > 300 && g.aux() < 3000 / 4);
+        // subsets hold m distinct pool indices
+        let mut s: Vec<usize> = g.cur.clone();
+        s.sort_unstable();
+        s.dedup();
+        assert_eq!(s.len(), 4);
+    }
+
+    #[test]
+    fn pool_run_is_deterministic_and_below_cap() {
+        let r = 131_203u64;
+        let samples = make_samples(r, 17, 60);
+        let (a, ap) = eval_pool(r, 2, &samples, 8, 64);
+        let (b, _) = eval_pool(r, 2, &samples, 8, 64);
+        assert_eq!(a.mean, b.mean);
+        assert!(a.mean > 0.5 && a.mean < 10.5);
+        assert!(ap.mean > 0.0 && ap.mean < a.mean);
     }
 }
