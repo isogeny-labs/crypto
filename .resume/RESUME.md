@@ -1,33 +1,28 @@
-# Resume: crypto @ claude/zealous-meitner-85ipb5
+# Resume: crypto @ claude/best-leads-experiments-jikl0j
 
 ## Goal
-Owner's ask (2026-11-10): run the index-calculus decomposition benchmarks on a ladder of binary
-curves (Koblitz K and random R families, Weil descent of the Semaev polynomial) with the new
-external M4GB backend (`m4gb-f2`, PR #3812) beside the in-house engines, and see whether solve time
-per target is lower. Stage diagnostic (AGENTS.md section 2), never a speed row; all local numbers
-`[pcc:unverified]`.
+Owner's ask (2026-11-10, ~21Z): "pick our best leads and launch experiments asap".
+Selected (protocol §"Why these leads"): sibling points (`wwalk sib=8,pool=M`, PR #3847 smokes
+0.775 / 0.691 bit-op ratio to tw2cj-lazy at k = 20 / 28) and `cv=0` on the two-seed walk
+(engine items Addendum 1: twcj-cv0 / twcj 0.879 / 0.950). All numbers `[pcc:unverified]`.
 
 ## Lead / hypothesis
-Prediction: `inherited-f4` and `f4-f2` decide each target faster than `m4gb-f2` on every cell
-(decision tree with degree-bounded bases against a full reduced basis); M4GB's ratio to the
-reference grows with the number of variables. Falsifier: `m4gb-f2` median wall below `f4-f2` on any
-cell with at least 24 variables.
+Expectations E1-E4 in research/curve25519_autolab_20261104/siblings/stage1-eks/PROTOCOL.md:
+sib8-p64 / tw2cj-lazy 0.69 [0.62, 0.76] at k = 28, 0.66 [0.58, 0.74] at k = 32 (w = 0);
+p256 below 1 at k = 32; cv0 vs lazy two-sided.
 
 ## Spec
-research/m4gb_descent_ladder_20261110/README.md (protocol), run_ladder.sh (the one launcher).
-Command: target/release/ic descent --json --out <file> --families K,R --cells <n:n':2 ...>
---targets 8 --repeats 3 --budget-seconds 300 --solver fes-f2 --solver f4-f2 --solver inherited-f4
---solver m4gb-f2, with M4GB_BINARY pointing at a directory of solver_m4gb_n<N>_gf2 binaries
-(patched upstream 01860a52, patches in third_party/m4gb-patches/, built by scripts/m4gb/build.sh).
-Benchmark record: benchmarks/records/20261110T1513Z-m4gb-descent-ladder.json (open).
+research/curve25519_autolab_20261104/siblings/stage1-eks/spec-k{28,32}.json (L2, 6 rounds, 8 targets
+x 5 SNC-panel curves, 7 arms incl. rho-neg-aa A/A).
+Route: GitHub `isolab-experiment.yml` dispatched on main with source_revision = the frozen commit
+on this branch, spec_path = each spec, instance c8a.2xlarge. Container AWS keys are rejected by STS
+(placeholder), no CHECKPOINT_UPLOAD_TOKEN: S3 checkpoint push not possible from this session; Git
+push of this branch is the checkpoint.
 
-## State (closed 18:50Z: ladder measured, record closed, PR #3819 pending auto-merge)
-Branch restarted on origin/main after PR #3812 merged. M4GB binaries in the session scratchpad
-(not in Git; rebuild with scripts/m4gb/build.sh n16_gf2 ... n64_gf2). `ic` release build in
-progress. Conductor, ecdb, research-kb and isolab tooling unreachable in this container.
+## State (23:20Z: EKS failed; local L0 panel done, results committed)
+Specs + protocol written; local ecbench smoke (plan acceptance of every arm) pending; then commit,
+push, dispatch two runs, record run IDs in stage1-eks/LAUNCH.md and the session log.
 
 ## Next steps
-1. Smoke test one cell (11:6:2, K, 2 targets); then run_ladder.sh under `benchrec.py run`.
-2. Summarise per cell: median wall per engine, ratio to fes-f2 and to f4-f2, agreement with the
-   reference; graph + PDF; close the record; benchmarks entry (no table row: stage diagnostic).
-3. Session log entry; PR from this branch; auto-merge once complete.
+1. When runs finish: download artifacts (S3 receipts via workflow artifact), verify, compare, band.
+2. Report + figure + PDF (research-visuals), benchrec record close, PR.
