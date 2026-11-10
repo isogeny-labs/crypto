@@ -2557,7 +2557,7 @@ fn run_cell(cell: &Cell, a: &Args, sink: &mut Sink) -> bool {
             "planted_ok": r.planted_ok,
         });
         if cell.control == Control::Multiples {
-            row["multiples"] = json!(cell.m);
+            row["multiples"] = json!(2);
             row["appended"] = json!(multiples_appended(cell.m));
         }
         if let (Some(obj), Some(extra)) = (row.as_object_mut(), r.extra.as_object()) {
