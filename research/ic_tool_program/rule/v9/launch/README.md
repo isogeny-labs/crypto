@@ -48,3 +48,13 @@ of 200 for the day (and `isolab-monthly-account-cost` at 759.92 of 1000), so
 no Job is submitted on 2026-11-06 (COST_CONTROLS.md: no new launch while the
 remainder is exhausted). Submission waits for the daily reset and a fresh
 reading with room for the ceiling.
+
+### Owner authorization, 2026-11-10 22:0x UTC
+
+`DescribeBudgets` at 22:02 UTC (data from about 17:50 UTC): `isolab-daily-cost-100`
+USD 102.81 of 200; `isolab-monthly-account-cost` USD 1360.11 of 1300 (the
+limit had been raised from 1000); `spot-experiments-daily-25` 46.33 of 200.
+The monthly budget is exhausted, so COST_CONTROLS.md would hold the launch.
+The owner authorized this study's USD 12 ceiling despite the monthly overrun
+("Submit anyway (owner OK)", in the session), and request a1 was submitted
+on that authorization. No other launch is covered by it.
