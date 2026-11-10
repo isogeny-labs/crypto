@@ -75,7 +75,7 @@ fn invm(a: u64, p: u64) -> u64 {
 /// A small deterministic generator (splitmix64) for the interpolation points.
 pub struct Rng(pub u64);
 impl Rng {
-    pub fn next(&mut self) -> u64 {
+    pub fn next_u64(&mut self) -> u64 {
         self.0 = self.0.wrapping_add(0x9e37_79b9_7f4a_7c15);
         let mut z = self.0;
         z = (z ^ (z >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
@@ -263,7 +263,7 @@ pub fn symmetrise(
     let mut rng = Rng(seed ^ 0x5eed_5eed);
     let mut rows: Vec<Vec<u64>> = Vec::with_capacity(n + extra);
     for _ in 0..n + extra {
-        let xs: Vec<u64> = (0..m).map(|_| rng.next() % p).collect();
+        let xs: Vec<u64> = (0..m).map(|_| rng.next_u64() % p).collect();
         let e = elementary(&xs, p);
         let mut row: Vec<u64> = mons
             .iter()
@@ -281,8 +281,7 @@ pub fn symmetrise(
         rows.push(row);
     }
     // Gaussian elimination on the augmented system.
-    let mut r0 = 0usize;
-    for c in 0..n {
+    for (r0, c) in (0..n).enumerate() {
         let Some(piv) = (r0..rows.len()).find(|&r| rows[r][c] != 0) else {
             return Err(format!("symmetrise: column {c} has no pivot"));
         };
@@ -300,7 +299,6 @@ pub fn symmetrise(
                 }
             }
         }
-        r0 += 1;
     }
     for r in n..rows.len() {
         if rows[r][n] != 0 {
@@ -386,16 +384,16 @@ impl Base {
 
 /// A primitive `d`-th root of unity mod `p` (`d | p - 1`).
 pub fn primitive_root_of_unity(p: u64, d: u64) -> Option<u64> {
-    if d == 0 || (p - 1) % d != 0 {
+    if d == 0 || !(p - 1).is_multiple_of(d) {
         return None;
     }
     let mut fs = Vec::new();
     let mut n = d;
     let mut q = 2u64;
     while q * q <= n {
-        if n % q == 0 {
+        if n.is_multiple_of(q) {
             fs.push(q);
-            while n % q == 0 {
+            while n.is_multiple_of(q) {
                 n /= q;
             }
         }
@@ -417,7 +415,7 @@ pub fn factor_ascending(mut d: u64) -> Vec<u32> {
     let mut out = Vec::new();
     let mut q = 2u64;
     while q * q <= d {
-        while d % q == 0 {
+        while d.is_multiple_of(q) {
             out.push(q as u32);
             d /= q;
         }
@@ -709,7 +707,7 @@ mod tests {
                 let mut sum = Pt(None);
                 let mut xs = Vec::new();
                 for _ in 0..m {
-                    let q = pts[(rng.next() % pts.len() as u64) as usize];
+                    let q = pts[(rng.next_u64() % pts.len() as u64) as usize];
                     xs.push(q.0.unwrap().0);
                     sum = c.add(sum, q);
                 }
@@ -729,10 +727,10 @@ mod tests {
         let (p, a, b) = (1013u64, 3u64, 7u64);
         let mut rng = Rng(5);
         for m in 2..=4usize {
-            let xt = rng.next() % p;
+            let xt = rng.next_u64() % p;
             let sym = symmetrise(m, xt, a, b, p, 99).expect("fit");
             for _ in 0..20 {
-                let xs: Vec<u64> = (0..m).map(|_| rng.next() % p).collect();
+                let xs: Vec<u64> = (0..m).map(|_| rng.next_u64() % p).collect();
                 let e = elementary(&xs, p);
                 let mut v = 0u64;
                 for (ex, cf) in &sym {

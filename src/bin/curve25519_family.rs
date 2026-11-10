@@ -1590,9 +1590,9 @@ fn primitive_root(p: u64) -> u64 {
     let mut n = p - 1;
     let mut q = 2u64;
     while q * q <= n {
-        if n % q == 0 {
+        if n.is_multiple_of(q) {
             fs.push(q);
-            while n % q == 0 {
+            while n.is_multiple_of(q) {
                 n /= q;
             }
         }
