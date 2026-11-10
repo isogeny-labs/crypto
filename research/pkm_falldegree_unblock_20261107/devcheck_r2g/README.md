@@ -63,8 +63,9 @@ Results are from `test_outputs.txt` (file form); T23 repeats them through the jo
 | T21 | `close:` carried forward; `close:` without a lost unit: 16; `allow:` runs the unit, carried to a later job, 3 in flight with allow 3: 75; bad words | PASS | |
 | T22 | leftover lock with LOCK_WAIT=3: exit 13 in bounded time; handler waits for a lock released by someone else; syncer stops at the stop file (fake sleep: 2 s period) | PASS | the real 300 s period, an orphaned aws child |
 | T23 | whole suite through the request's boot command | PASS | all 25 tests PASS in `test_outputs_jobform.txt` (summary block at its end); `compare_outputs.sh test_outputs.txt test_outputs_jobform.txt` prints 0 differing lines after removing timestamps, wall times and the pids of bash's own "Killed" notices. Checked by the main session, 2026-11-10 18:00Z, on runner sha256 `33bf8d84...`. |
+| T27 | whole file-form suite with the job image's own bash 5.2.15 and gawk 5.1.0 (`IMG_BASH`, `IMG_AWK`; `test_outputs_imgshell.txt`) | PASS (all 25 tests) | differences from `test_outputs.txt`: the `bash:` line (5.2.15 vs 5.2.21); T12 counts 32 tools instead of 31 (gawk present); in T18 the unit named first in "done in more than one PREV" is DB-m3-tower-t2 instead of B-m3-tower-t2 (awk `for (u in d)` order differs between gawk and mawk; either is a correct report). Not tested: real aws, a real pod. |
 | T24 | argument and URI errors outside test mode (16, 2), PREV regex, `bash -c` form refused (2) | PASS | |
-| T25 | sha256, no capital Q, `bash -n` on every script, list hash, grep for constructs newer than bash 4.2 | PASS | bash 4.2 itself (not available; reading and grep only) |
+| T25 | sha256, no capital Q, `bash -n` on every script, list hash, grep for constructs newer than bash 4.2 | PASS | (the image has bash 5.2.15, measured; the 4.2 grep is only conservative) |
 | T26 | `make_request_bu.sh`: pieces, BOOT, exit 17 on a changed piece, arguments, skips, overrides, Q refusal, validator | PASS | the real placeholder fill at the freeze |
 
 ## Not tested
