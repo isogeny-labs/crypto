@@ -16,6 +16,12 @@ here. These are records of a decision, not results.
 | 5 | Large host for m = 4 t = 5 c = 7 and m = 4 t = 6 (80–510 GB) | **Allowed in principle.** The cluster's cost controls (`cpu-spot` 16 vCPU / 128 GiB; quota 128 GiB) do not admit such a host today, so this needs a capacity change. That change is prepared and reported separately; it is not forced into the existing pool (Amendment 8). |
 | 6 | Stage B m = 6 t = 6 rule; Amendment 8 null cells | Each is written as a dated protocol amendment **before** its cell runs. A cell with no frozen amendment does not run. |
 
+### Later owner decisions on item 1
+
+| # | date | question put to the owner | answer | what it authorizes |
+|---|---|---|---|---|
+| 7 | 2026-11-10, about 05:25Z | "Two decisions are still waiting for you: a third attempt for the lost t = 13 draw 0 cell (I recommend yes, at 56Gi), and stage B." | "Yes" | **One** third attempt of cell `pfd-x-t13-k0-c6` (t = 13, draw 0, cap 6), at 56Gi under Amendment 14, under a new job name. If it is lost again the cell goes back to the owner. Read by the main session as answering the question that had a yes/no recommendation attached. It is **not** read as choosing among the stage B options of `STAGE_B_LOST.md`; that question is put to the owner again, separately. |
+
 ## Item 2 follow-ups (`research/prime_medium_tier_rho_20261107/`)
 
 - **Independent validation.** A validator independent of the producer re-checks the six sessions: replay certificate, validator report, matched-rho reference. The verdict stays `inconclusive` whatever the validator finds. Validation does not turn the run into a leaderboard row.
