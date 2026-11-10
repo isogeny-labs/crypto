@@ -1441,6 +1441,7 @@ pub fn index_by_det_gcd(
     threads: usize,
     seed: u64,
     checkpoint: Option<&std::path::Path>,
+    early_stop: Option<(f64, f64)>,
 ) -> Option<BigInt> {
     let k = rows.first().map_or(0, |r| r.len());
     if k == 0 {
@@ -1503,6 +1504,23 @@ pub fn index_by_det_gcd(
             None => d,
             Some(acc) => acc.gcd(&d),
         });
+        // the gcd of two subset determinants is the index except with small
+        // probability; once it agrees with the analytic class number to within
+        // the tolerance, further subsets cannot lower it (an index below the
+        // estimate is impossible), so stop
+        if let (Some(acc), Some((log2_h_star, tol))) = (&g, early_stop) {
+            if s >= 1 {
+                let ratio = 2f64.powf(log2_big(acc.magnitude()) - log2_h_star);
+                if (ratio - 1.0).abs() <= tol {
+                    eprintln!(
+                        "[class_group_subexp]   gcd of {} determinants already within {:.1}% of the analytic estimate; stopping",
+                        s + 1,
+                        100.0 * tol
+                    );
+                    break;
+                }
+            }
+        }
     }
     g
 }
@@ -2038,6 +2056,7 @@ pub fn compute(
                         .as_ref()
                         .map(|p| p.with_extension("det"))
                         .as_deref(),
+                    Some((log2_h_star, tolerance)),
                 ),
             }
         };
@@ -2139,7 +2158,7 @@ mod tests {
         .into_iter()
         .map(|r| r.into_iter().map(BigInt::from).collect())
         .collect();
-        let idx = index_by_det_gcd(&rows, 6, 2, 3, None).expect("full rank");
+        let idx = index_by_det_gcd(&rows, 6, 2, 3, None, None).expect("full rank");
         let diag = hnf_diagonal(&rows).expect("full rank");
         let hnf_index = diag.iter().fold(BigInt::one(), |acc, g| acc * g);
         assert_eq!(idx, hnf_index);
