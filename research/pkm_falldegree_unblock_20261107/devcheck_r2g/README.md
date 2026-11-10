@@ -68,5 +68,7 @@ Results are from `test_outputs.txt` (file form); T23 repeats them through the jo
 | T26 | `make_request_bu.sh`: pieces, BOOT, exit 17 on a changed piece, arguments, skips, overrides, Q refusal, validator | PASS | the real placeholder fill at the freeze |
 
 ## Not tested
-Real `aws s3` commands and error output; bash 4.2; gawk; G1 failure (exit 10); exit 11 on a modified list; m >= 4 ladders; the
+Versions: the host's own tools are bash 5.2.21(1)-release and mawk 1.3.4 20240123. T27 used the image's binaries, measured from its base layer (Amazon Linux 2023): bash 5.2.15(1)-release (x86_64-amazon-linux-gnu) and GNU Awk 5.1.0, API: 3.0 (GNU MPFR 4.1.0-p13, GNU MP 6.2.1). The image has bash 5.2.15, not 4.2; T25's grep for constructs newer than 4.2 is only a conservative check.
+
+Real `aws s3` commands and error output; G1 failure (exit 10); exit 11 on a modified list; m >= 4 ladders; the
 12-thread 56Gi pod; production budgets; exit 17 inside a real pod; a SIGKILL timed between two uploads.
