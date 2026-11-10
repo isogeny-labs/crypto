@@ -5148,7 +5148,7 @@ impl PrimeInstance {
         generator: &[u64],
         lift: u32,
     ) -> Result<Self, String> {
-        if p < 5 || p >= (1u64 << 62) {
+        if !(5..(1u64 << 62)).contains(&p) {
             return Err("the EFD bench engine needs 5 <= p < 2^62".into());
         }
         if order <= 2 || cofactor == 0 {
@@ -5169,8 +5169,7 @@ impl PrimeInstance {
                 )
             })
             .collect();
-        let representation =
-            EfdRepresentation::new(model, chart, &p_big, &bindings).map_err(|e| e)?;
+        let representation = EfdRepresentation::new(model, chart, &p_big, &bindings)?;
         let (a, b) = representation.short_coefficients();
         let a = a
             .to_u64()
