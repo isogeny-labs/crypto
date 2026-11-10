@@ -878,7 +878,7 @@ fn chart_family_constants_match_encode() {
         };
         let encoded = encode(rep, &params, &point, &z).unwrap();
         match family {
-            1 | 2 | 3 | 4 => {
+            1..=4 => {
                 let (a, b, _) = family_constants(family);
                 let expected_x = if a == 1 { x.mul(&z) } else { x.mul(&z2) };
                 let expected_y = match b {

@@ -121,10 +121,7 @@ impl Representation {
                 put("Y", y.mul(&z3));
                 put("Z", z.clone());
             }
-            "shortw/projective"
-            | "shortw/projective-1"
-            | "shortw/projective-3"
-            | "edwards/projective"
+            "edwards/projective"
             | "twisted/projective"
             | "twistedhessian/projective"
             | "hessian/standard"

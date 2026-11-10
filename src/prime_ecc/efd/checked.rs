@@ -49,7 +49,7 @@ pub fn weierstrass_operation(
     check_field(&modulus, &inputs)?;
     for point in std::iter::once(p).chain(q) {
         if let Point::Affine { x, y } = point {
-            if &x.modulus != &modulus || &y.modulus != &modulus || !curve.is_on_curve(point) {
+            if x.modulus != modulus || y.modulus != modulus || !curve.is_on_curve(point) {
                 return Err(EfdError::InvalidPoint);
             }
         }
