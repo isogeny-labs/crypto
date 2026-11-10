@@ -1,5 +1,7 @@
 # tm1514 recheck: dispatch plan (draft, nothing launched)
 
+> Superseded in part by PROTOCOL-AMENDMENT-1.md (counted-only, local L0, replicates A3/B3); where they disagree the amendment governs.
+
 Study directory once committed: `research/tm1514_recheck_20261106/`.
 Protocol: `PROTOCOL.json` (experiment.protocol/v1, status `draft`; validates with
 `crypto-autoresearcher/tools/experiment_protocol.py validate`, 0 findings).

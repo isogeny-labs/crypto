@@ -1,5 +1,7 @@
 # tm1514 recheck at k = 24: protocol narrative
 
+> Superseded in part by PROTOCOL-AMENDMENT-1.md (counted-only, local L0, replicates A3/B3); where they disagree the amendment governs.
+
 Protocol `XP-20261106-tm1514-recheck`, version 1, status **draft** (not
 frozen). The machine-readable record is `PROTOCOL.json`
 (experiment.protocol/v1). Where this text and `PROTOCOL.json` differ,

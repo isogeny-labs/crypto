@@ -1,8 +1,9 @@
 # tm1514 recheck: AMENDMENT-1 (counted-only; C3 deferred)
 
-**Status: DRAFT.** It is frozen by the commit that re-freezes `PROTOCOL.json`
-with this amendment recorded, before any record of this study is read.
-Approved by the owner on 2026-11-07 ("Approved"). Filed before any data of this
+**Status: FROZEN** at 2026-11-10T17:17:31Z (`PROTOCOL.json` version 2, `protocol_sha256`
+`d348123a53bf02b49597bbfffc9f4337a24708caf1897cdb14b5550a69c081d6`), before any record of replicates A3 or B3 existed.
+Approved by the owner on 2026-11-07 ("Approved"); execution route set by the
+owner's "Resume" of 2026-11-10 (local counted sessions). Filed before any data of this
 study was read: replicate A's records were never downloaded or opened
 (`filed_before_affected_data: true`).
 
@@ -34,40 +35,66 @@ instrument cannot give at k = 24.
    and the A/A wall admission are not required; exact replay of every record
    (`ecbench verify --replay-all`) and the C0 twin identity are required.
 3. **C4** is reported at w = 0, 0.1 and 1 only (the §5a band). The measured-price
-   variants are dropped with C3.
+   variants are dropped with C3. At each w the verdict is "R_tm1514 above 1" if
+   the 95 % interval of R_tm1514(w) lies above 1, "R_tm1514 below 1" if it lies
+   below 1, and "unresolved (interval contains 1)" otherwise (same bootstrap,
+   same invalidation by C0 or C2).
 4. **C3 is deferred** to a separate protocol with an instrument whose timed
    samples each last at least 5 ms (for example, thousands of negation
    canonicalisations or walk-table lookups per sample). It is out of this
    study's scope. The repository's host-free work model (`ecbench work`,
    bitop/v1) is reported beside the band as a model, labelled as such, never as
    a measured price.
-5. **New replicates.** Two fresh replicates, A2 and B2, with new measurement seeds
-   derived as before: `sha256("crypto:research/tm1514_recheck_20261106:<suffix>")`,
-   first 16 hex digits, mod 2^53, suffixes `measurement-A2` and `measurement-B2`.
-   Targets, curves, arms, rounds, warmup and `target_seed` are unchanged.
-6. **Execution route:** _[to be fixed before freeze; see §4]_.
+5. **New replicates A3 and B3, with new targets.** Two fresh replicates, A3 and
+   B3. Each seed is `int(sha256(D)[0:16 hex]) mod 2^53`, with D the UTF-8 string
+   `crypto:research/tm1514_recheck_20261106:<suffix>`: the form that gives
+   version 1's seeds (suffix `measurement.seed:A` gives 960559345608509).
+   - `measurement.seed:A3` gives A3 `8671006997891351`.
+   - `measurement.seed:B3` gives B3 `6232168080843969`.
+   - `workloads.target_seed:3` gives the new `target_seed` `546787239895877`
+     (version 1: suffix `workloads.target_seed`, 1406057239440944).
+
+   Curves, arms, 96 targets per curve, 6 rounds and 1 warmup are unchanged.
+   The specs are `spec-tm1514-A3.json` (`ecbench plan` spec id
+   `ECS1h3d4c0d4813f4`) and `spec-tm1514-B3.json` (`ECS1h58d3eafbe575`), 16,800
+   executions each. They differ from `spec-tm1514.json` in `label`,
+   `description`, `workloads.target_seed`, `measurement.seed` and
+   `measurement.isolation_required` (L0). Method ids are version 1's. A3 and B3
+   share their 480 workloads, and none of them is a workload of version 1,
+   replicate A or any development check.
+
+   **Replicate A2 is withdrawn.** An earlier draft of this amendment named
+   replicates A2 and B2: suffixes `measurement-A2` and `measurement-B2`, seeds
+   96725836575979 and 2732357890408474, version 1's `target_seed`, spec ids
+   ECS1h02235b4f381e and ECS1h6856e77660ce. Development checks of the amended
+   analysis (2026-11-10) ran reduced copies of those specs with those seeds and
+   targets, so they produced exact rows of the planned A2/B2 sessions (100 and
+   1,200 measured rows per replicate), and the preparing session saw a summary
+   of them. No data of A2's or B2's full sessions was ever produced. Those
+   seeds and targets are not used. The dry-run rule for replicate A (item 1) is
+   unchanged.
+6. **Execution route: local L0 counted sessions** in the session container,
+   on the owner's instruction of 2026-11-10, a one-off departure from the EKS
+   default. Each replicate is one `ecbench run` session of a locally built
+   release `ecbench` (one binary for both, its sha256 in each `host.json`),
+   with `isolation_required` L0: a development host, stated as such. Each
+   session is audited with `ecbench verify --replay-all`, which must report no
+   problem and every replay reproduced. No wall time, cycle count or isolation
+   level enters any claim. Zero automatic retries; a killed or incomplete
+   session contributes nothing and is reported.
 7. **Analysis.** `examples/tm1514_analyze.rs` runs with C3/C4-measured outputs
-   disabled and without the wall-admission inputs. The change is limited to
-   that; its new sha256 is recorded at re-freeze.
+   disabled and without the wall-admission inputs (`--wall-a`/`--wall-b`
+   removed), C4 at the band weights only, and the frozen spec ids and replicate
+   labels set to A3 and B3. The change is limited to that. Previous sha256
+   `59b83670a1fc7a7cd2c41b761fa570d0cb9fb18e6409b9f8a4c8ebc04313b6f2`; new
+   sha256 `6534cfe188a2e48dd1286af37b73006c85a579687102ed0cfbd90adf1f91f197`.
+   It is run as `tm1514_analyze --a sessions/A3 --b sessions/B3 --out analysis`.
 
 ## 3. Unchanged
 
 Question, hypotheses H1 and C1b, curves, arms (rho-neg, rho-neg-aa, inc, inc-aa,
-rho-plain), 96 targets per curve, 6 rounds plus 1 warmup, `target_seed`
-1406057239440944, bootstrap seed 244596609222896, B = 10,000, the C1 rule
-(98.33 % interval of D alone decides), C1b, the C2 detection rule, the verdict
-vocabulary, and the USD 5 ceiling (one attempt spent).
-
-## 4. Open before freeze
-
-The execution route. Counts are exact and host-independent, so either route
-gives the same numbers; they differ in who can read the records.
-
-- **EKS (repository default).** The isolab job will fail the L2 gate again
-  (exit 23) after writing complete records. This amendment would accept those
-  records for counts if `audit.json` is OK and every replay reproduced. Someone
-  with lab S3 access must copy `runs/<job>/` into `sessions/A2` and `sessions/B2`.
-- **Local counted sessions.** Run in the session container with
-  `isolation_required` set to L0 (development host, stated as such), then audit
-  with `ecbench verify --replay-all`. No S3 access needed. This departs from the
-  owner's EKS default and needs the owner's explicit approval.
+rho-plain), 96 targets per curve (now drawn from the new `target_seed`, item 5),
+6 rounds plus 1 warmup, the target law (public hash-to-subgroup), bootstrap seed
+244596609222896, B = 10,000, the C1 rule (98.33 % interval of D alone decides),
+C1b, the C2 detection rule, the verdict vocabulary of C0, C1, C1b and C2, and the
+USD 5 ceiling (one attempt spent). `target_seed` changes (item 5).
