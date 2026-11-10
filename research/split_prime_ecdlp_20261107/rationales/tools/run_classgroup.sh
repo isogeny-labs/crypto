@@ -15,7 +15,7 @@ INPUTS="$ROOT/research/nist_skip_criterion_20261025/inputs.tsv"
 OUT="$HERE/../data/cl"
 mkdir -p "$OUT"
 labels=("$@")
-if [ ${#labels[@]} -eq 0 ]; then labels=(p192-139 p192-2198 p192-5228 p192-5405 p192-6013); fi
+if [ ${#labels[@]} -eq 0 ]; then labels=(p192-139 p192-2198 p192-5228 p192-5405 p192-6013 p224-7026 p224-777 p224-1485 p224-5736 p239-2185 p239-2320 p239-3048 p239-36 p239-1562 p239-2491 p239-2682 p239-2863 p256-1842 p256-876); fi
 for lab in "${labels[@]}"; do
   if [ -s "$OUT/rust_${lab}.json" ]; then echo "$lab: done (result exists)"; continue; fi
   line="$(grep -P "^${lab}\t" "$INPUTS")"

@@ -3,7 +3,7 @@
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OUT="$HERE/../data/cl"
-for res in "$OUT"/rust_p192-*.json; do
+for res in "$OUT"/rust_p*.json; do
   [ -s "$res" ] || continue
   lab="$(basename "$res" .json)"; lab="${lab#rust_}"
   [ -s "$OUT/pari_check_${lab}.json" ] && { echo "$lab: check exists"; continue; }

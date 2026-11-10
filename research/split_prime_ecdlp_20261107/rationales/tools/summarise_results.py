@@ -5,10 +5,17 @@ data/cl/rust_<label>.json, structure_<label>.json, pari_check_<label>.json."""
 import glob, json, os, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 CL = os.path.join(HERE, "..", "data", "cl")
-ROLE = {"p192-139": "published (P-192)", "p192-5228": "published (prime192v3)", "p192-6013": "published (prime192v2)",
-        "p192-2198": "skipped", "p192-5405": "skipped"}
+NAMES = {"p192-139": "P-192", "p192-5228": "prime192v3", "p192-6013": "prime192v2", "p224-7026": "P-224",
+         "p239-2185": "prime239v1", "p239-2320": "prime239v2", "p239-3048": "prime239v3", "p256-1842": "P-256"}
+ROLE = {}
+INPUTS = os.path.join(HERE, "..", "..", "..", "nist_skip_criterion_20261025", "inputs.tsv")
+for line in open(INPUTS):
+    if line.startswith("#") or not line.strip():
+        continue
+    f = line.rstrip("\n").split("\t")
+    ROLE[f[0]] = f[2] + (f" ({NAMES[f[0]]})" if f[0] in NAMES else "")
 rows = []
-for f in sorted(glob.glob(os.path.join(CL, "rust_p192-*.json"))):
+for f in sorted(glob.glob(os.path.join(CL, "rust_p*.json"))):
     r = json.load(open(f)); lab = r["label"]
     s = json.load(open(os.path.join(CL, f"structure_{lab}.json"))) if os.path.exists(os.path.join(CL, f"structure_{lab}.json")) else None
     c = json.load(open(os.path.join(CL, f"pari_check_{lab}.json"))) if os.path.exists(os.path.join(CL, f"pari_check_{lab}.json")) else None

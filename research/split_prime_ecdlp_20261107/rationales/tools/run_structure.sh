@@ -8,7 +8,7 @@ ROOT="$(cd "$HERE/../../../.." && pwd)"
 BIN="${CLASSGROUP_STRUCTURE_BIN:-$ROOT/target/release/classgroup-structure}"
 INPUTS="$ROOT/research/nist_skip_criterion_20261025/inputs.tsv"
 OUT="$HERE/../data/cl"
-for res in "$OUT"/rust_p192-*.json; do
+for res in "$OUT"/rust_p*.json; do
   [ -s "$res" ] || continue
   lab="$(basename "$res" .json)"; lab="${lab#rust_}"
   [ -s "$OUT/structure_${lab}.json" ] && { echo "$lab: structure exists"; continue; }
