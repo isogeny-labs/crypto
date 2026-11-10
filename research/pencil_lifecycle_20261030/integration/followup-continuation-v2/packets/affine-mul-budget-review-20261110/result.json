@@ -1,0 +1,38 @@
+{
+  "task": "T-2092",
+  "review_status": "supported_scoped_after_repair",
+  "source_delta": "supported_scoped",
+  "execution_admission": "not_approved",
+  "compiler_invoked": false,
+  "calls": 137,
+  "names": 26,
+  "source_files_identical": 137,
+  "original_freeze_sha256": "7347919c56723f6680e2ea26ea58f3a82534d0df68dd1f1e093bad063bc1cdf8",
+  "candidate_freeze_sha256": "5e1fffb853df99c54af0250796713fab6702969ccdf45f8fe3a3d87dce5030b5",
+  "findings": [
+    {
+      "id": "R1",
+      "severity": "blocking_packet_consistency",
+      "file": "freeze.json files.SESSION.md",
+      "expected": "0cea89fa21e94973a63510f37c176d9645656e58518f9cb45c02631a8ed37804",
+      "actual": "bb3e85f3804576b5a812b1feaea565651b4cd50711c8d0cfa399a1b2292776ce",
+      "effect": "launch.py frozen-input loop rejects prior to execution",
+      "correction": "Separate prospective corrected packet or explicit reviewed amendment pins actual SESSION.md bytes and regenerates dependent manifests/release pins; preserve original snapshot."
+    }
+  ],
+  "non_findings": [
+    "No source modules or named audit obligations removed",
+    "No resource or retry relaxation",
+    "Old expired deadline retained; fresh campaign admission must be separately reviewed and published"
+  ],
+  "repair": {
+    "freeze_sha256": "c60341601de6e0bbe8d6808fb6054789db2a5d21bfad89354511e1285c6cf870",
+    "only_delta": "files.SESSION.md digest corrected",
+    "original_preserved": "pre-session-binding-repair-freeze.json",
+    "freeze_mismatches": 0,
+    "outer_manifest_mismatches": 0,
+    "R1": "resolved in repaired snapshot",
+    "correction_record_sha256": "5c4ae4518d698d3a212186f8e44b7f3d02163ea8bbc5657a4d823098de0396d6",
+    "historical_pointer_labeling": "verified"
+  }
+}
