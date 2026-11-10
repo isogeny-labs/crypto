@@ -18,3 +18,16 @@ fall-degree study's seed `0x504B4D54` = 1347106132. Every value `[pcc:unverified
 Row fields that matter: `last_fall_degree` (`d_F`; null for planted targets, whose
 systems are consistent), `first_fall_degree`, `falls`, `censored_at`, `n_vars`,
 `n_equations`, `muladds`, `wall_s`.
+
+## `m = 5`, `t = 3`, multiples arm: memory-killed at cmax 7, rerun at cmax 6
+
+The per-draw runs with `--hky-cmax 7 --budget 3000` (commands.log) were killed by the
+container's memory cgroup, not by time: `dmesg` reports `Memory cgroup out of memory:
+Killed process … (pkm_tower_pilot) … anon-rss:13956372kB` and `anon-rss:13955008kB` (the two
+draws, run in parallel; a third kill at `anon-rss:6979952kB` is the earlier `m = 5` group's
+job). Their logs are `run_m5_t3_k{0,1}.log` (no row written). The rerun
+(`m5_t3_mult_c6_k{0,1}.jsonl`, `run_m5_t3_c6.log`) uses `--hky-cmax 6 --hky-max-entries
+250000000 --budget 1500`, one draw at a time, so a closure that outgrows the host is censored
+by the engine's own limit and written as a row. A `c = 6` closure that completes without `1`
+reads `d_F(multiples) ≥ 7` at a cell where the tower arm reads `≥ 8`: that neither fires nor
+refutes the falsifier (a drop of two) on this host, and is reported as such.
