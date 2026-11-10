@@ -35,3 +35,10 @@ Prior that P1 fails downward with a decreasing trend in `n`: 0.003.
 
 ## 5. Route and outputs
 Local host; exact counts. `results/run.json`, README, SVG (ratio vs `n`), REPORT.pdf, session log.
+
+## 6. Disclosure: what was seen before the freeze
+Predictions and rules above were committed (`c8bbc80e1a`) before the tool existed. The
+implementing agent ran `--quick` (n = 16, 3 RAND): X₂ ratios 1.007–1.025, X_E ratios 1.000–1.001,
+INT 12 nodes; consistent with P1/P2. Not committed, not scored. Sifting budget made precise:
+`2n²` adjacent swaps per sift with a 1.2× growth abort per direction. Orders reported: msb, lsb,
+sift_msb, sift_lsb. No prediction or rule changed.
