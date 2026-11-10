@@ -68,7 +68,7 @@ use crate::cryptanalysis::ic_boundary::{
     rho_walk_with_policy, signed_frobenius_rho_tuned, signed_frobenius_rho_tuned_policy,
     BinaryGroup, BinaryInstance, Calibration, CountedGroup, CubicClasses, FieldOps, GroupOps,
     NegationClasses, PhaseCost, PointClasses, PreprocessingRho, PrimeInstance, PrimePoint,
-    QuarticClasses, RhoBatchResult, RhoResult, RhoWalk, WalkPolicy,
+    PrimeRepresentation, QuarticClasses, RhoBatchResult, RhoResult, RhoWalk, WalkPolicy,
 };
 use crate::cryptanalysis::ic_framework::cm_orbit::CmOrbitBase;
 use crate::cryptanalysis::ic_framework::fiber::{
@@ -8040,6 +8040,9 @@ pub struct FbPoint {
 pub struct FactorBaseDump {
     pub schema: String,
     pub curve: CurveFacts,
+    /// EFD model/chart used for input and output, when one was selected.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub representation: Option<PrimeRepresentation>,
     pub factor_base: FactorBaseFacts,
     /// Group operations the builder charged.
     pub build_adds: u64,
@@ -8075,6 +8078,10 @@ pub fn dump_factor_base(
 ) -> Result<FactorBaseDump, String> {
     let inst = curve.build()?;
     let facts = inst.facts(curve);
+    let representation = match &inst {
+        Instance::Prime(prime) => prime.representation.clone(),
+        _ => None,
+    };
     let (name, params) = Params::parse_spec(fb_spec)?;
     if let Instance::Wide(_) = &inst {
         return Err("no factor-base plug-in runs on a wide (n > 62) curve yet".into());
@@ -8154,6 +8161,7 @@ pub fn dump_factor_base(
                 schema: FB_DUMP_SCHEMA.into(),
                 points: dump_points(&fb, |p| (p.x, p.y)),
                 curve: facts,
+                representation,
                 factor_base: fbf,
                 build_adds: total.adds,
                 build_doubles: total.doubles,
@@ -8210,6 +8218,7 @@ pub fn dump_factor_base(
                 schema: FB_DUMP_SCHEMA.into(),
                 points: dump_points(&fb, |p| (p.x, p.y)),
                 curve: facts,
+                representation,
                 factor_base: fbf,
                 build_adds: total.adds,
                 build_doubles: total.doubles,
