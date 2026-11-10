@@ -105,14 +105,18 @@ LEFT JOIN LATERAL (SELECT n.id FROM ec.number_field n WHERE n.fundamental_discri
                    ORDER BY n.id LIMIT 1) nf ON true
 ON CONFLICT (curve_id) DO NOTHING";
 
-/// Fill a row that exists with an unknown conductor; never touches a known one.
+/// Fill a row that exists with an unknown conductor; never touches a known one, and never overwrites a
+/// stored discriminant, `is_maximal`, `conductor_divides` or kind that disagrees with the proved result.
+/// Rows the guards skip are counted by the caller and reported as problems (updated < sent).
 const END_UPDATE_SQL: &str = "
 UPDATE ec.endomorphism_ring er SET discriminant = r.disc, conductor_f = r.f, is_maximal = (r.f = 1),
        conductor_divides = coalesce(er.conductor_divides, r.v), status = 'proved', method = r.method,
        provenance_id = $2::bigint
 FROM jsonb_to_recordset($1::jsonb) AS r(curve_id bigint, disc numeric, f numeric, v numeric, method text)
 WHERE er.curve_id = r.curve_id AND er.conductor_f IS NULL AND er.kind = 'imaginary_quadratic_order'
-  AND (er.conductor_divides IS NULL OR mod(er.conductor_divides, r.f) = 0)";
+  AND (er.conductor_divides IS NULL OR mod(er.conductor_divides, r.f) = 0)
+  AND (er.discriminant IS NULL OR er.discriminant = r.disc)
+  AND (er.is_maximal IS NULL OR er.is_maximal = (r.f = 1))";
 
 const LEVEL_SQL: &str = "
 INSERT INTO ec.endomorphism_level (curve_id, ell, depth, level, method, status, provenance_id)
@@ -610,6 +614,15 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
                     continue 'class;
                 }
                 agree += 1;
+            } else if let Some(d) = r.old_disc.filter(|&d| d != e.disc) {
+                // conductor unknown but a discriminant is stored: it must still agree, or the class is refused
+                report.count("end_ring_classes_refused", 1);
+                report.problem(format!(
+                    "class {class_id}: curve {} has stored discriminant {d} with no conductor, ecdb computes {} \
+                     (f = {})",
+                    r.id, e.disc, e.f
+                ));
+                continue 'class;
             }
             for &(ell, lv, depth) in &r.old_levels {
                 let (want_l, want_d) =
@@ -649,7 +662,18 @@ pub async fn import(ctx: &Ctx<'_>) -> Result<Report> {
     }
     report.count("endomorphism_rings_inserted_census_fp", bulk(client, END_SQL, &ends_census, prov).await?);
     report.count("endomorphism_rings_inserted_other", bulk(client, END_SQL, &ends_other, prov).await?);
-    report.count("endomorphism_rings_updated_null_conductor", bulk(client, END_UPDATE_SQL, &updates, prov).await?);
+    let updated = bulk(client, END_UPDATE_SQL, &updates, prov).await?;
+    report.count("endomorphism_rings_updated_null_conductor", updated);
+    let skipped = (updates.len() as u64).saturating_sub(updated);
+    if skipped > 0 {
+        // the guards in END_UPDATE_SQL refused rows whose stored kind, discriminant, is_maximal or
+        // conductor_divides contradict the proved conductor: nothing was overwritten, but say so
+        report.count("endomorphism_rings_update_refused_conflict", skipped);
+        report.problem(format!(
+            "{skipped} stored endomorphism_ring row(s) with a NULL conductor were left unchanged because their \
+             kind, discriminant, is_maximal or conductor_divides contradict the proved conductor"
+        ));
+    }
     report.count("endomorphism_levels_inserted", bulk(client, LEVEL_SQL, &levels, prov).await?);
     Ok(report)
 }
