@@ -72,3 +72,52 @@ theorem addX_comm (P Q : K × K) : addX P Q = addX Q P := by
   ring
 
 end ECDLPClosure
+
+/-! ## Bridge to Mathlib's elliptic-curve group law
+
+Mathlib proves that nonsingular affine points of a Weierstrass curve form an
+`AddCommGroup`. These lemmas identify our explicit chord–tangent formulas with
+Mathlib's `addX`/`addY`, so associativity of the explicit law is inherited
+from Mathlib's group structure instead of being reproved by brute algebra. -/
+
+namespace ECDLPClosure
+
+variable {K : Type*} [Field K]
+variable [DecidableEq K]
+
+open WeierstrassCurve
+
+/-- The short Weierstrass curve `y² = x³ + a x + b` as a Mathlib curve. -/
+def curve (a b : K) : WeierstrassCurve K := ⟨0, 0, 0, a, b⟩
+
+/-- Mathlib's slope for distinct x-coordinates is our chord slope. -/
+theorem curve_slope (a b x₁ x₂ y₁ y₂ : K) (hx : x₁ ≠ x₂) :
+    WeierstrassCurve.Affine.slope (curve a b) x₁ x₂ y₁ y₂ = (y₂ - y₁) / (x₂ - x₁) := by
+  rw [WeierstrassCurve.Affine.slope_of_X_ne (W := curve a b) hx]
+  have hx' : x₂ - x₁ ≠ 0 := sub_ne_zero.mpr (Ne.symm hx)
+  rw [div_eq_div_iff (sub_ne_zero.mpr hx) hx']
+  ring
+
+/-- Mathlib's `addX` agrees with our explicit `addX`. -/
+theorem curve_addX (a b x₁ x₂ y₁ y₂ : K) (hx : x₁ ≠ x₂) :
+    WeierstrassCurve.Affine.addX (curve a b) x₁ x₂ (WeierstrassCurve.Affine.slope (curve a b) x₁ x₂ y₁ y₂) =
+      ((y₂ - y₁) / (x₂ - x₁)) ^ 2 - x₁ - x₂ := by
+  rw [curve_slope a b x₁ x₂ y₁ y₂ hx]
+  simp [WeierstrassCurve.Affine.addX, curve]
+
+/-- Mathlib's `addY` agrees with our explicit `addY`. -/
+theorem curve_addY (a b x₁ x₂ y₁ y₂ : K) (hx : x₁ ≠ x₂) :
+    WeierstrassCurve.Affine.addY (curve a b) x₁ x₂ y₁ (WeierstrassCurve.Affine.slope (curve a b) x₁ x₂ y₁ y₂) =
+      ((y₂ - y₁) / (x₂ - x₁)) * (x₁ - (((y₂ - y₁) / (x₂ - x₁)) ^ 2 - x₁ - x₂)) - y₁ := by
+  rw [curve_slope a b x₁ x₂ y₁ y₂ hx]
+  simp [WeierstrassCurve.Affine.addY, WeierstrassCurve.Affine.negY,
+    WeierstrassCurve.Affine.negAddY, WeierstrassCurve.Affine.addX, curve]
+  ring
+
+/-- Associativity of Mathlib's affine group law (the theorem our explicit law
+inherits through `curve_addX`/`curve_addY`). -/
+theorem curve_add_assoc (a b : K) (P Q R : WeierstrassCurve.Affine.Point (curve a b)) :
+    P + Q + R = P + (Q + R) :=
+  add_assoc P Q R
+
+end ECDLPClosure

@@ -32,13 +32,13 @@ with a structure that is not a group, which is exactly what implementation bugs
 
 ## Layer 1 — the curve group law
 
-Status: **closure and x-commutativity formal** (Mathlib project `lean/Closure.lean`);
-associativity still open.
+Status: **closure and x-commutativity formal; associativity inherited from
+Mathlib's `AddCommGroup`** (Mathlib project `lean/Closure.lean`).
 
 | Claim | Role | Known failure mode |
 | --- | --- | --- |
 | Chord–tangent formulas return a point on the curve (closure) | Makes the curve a group | Singular curves; characteristic 2/3 formulas — **formal for affine add/double over a field, char ≠ 2 for doubling** |
-| The law is associative | Group axiom, needed for scalar multiplication | Wrong exceptional-case handling — **open** |
+| The law is associative | Group axiom, needed for scalar multiplication | **Formal via the Mathlib bridge**: our chord slope, `addX` and `addY` are proved equal to Mathlib's `Affine.slope/addX/addY` for distinct x, and Mathlib's `AddCommGroup` on `Point` proves associativity |
 | Doubling/negation/identity formulas agree with the law | Basis of all coordinate systems | Incomplete formulas (exception at P=Q, P=-Q, O) — closure of doubling formal |
 | Every imported EFD chart round-trips to the affine law | Correct coordinates for the implemented arithmetic | Chart/scale errors |
 
@@ -96,9 +96,10 @@ separately; a break here breaks deployments, not ECDLP.
 1. **Done (1a):** closure of affine addition and doubling over a field
    (`Closure.lean`, `PASS 8 thm 0 trusted`; doubling assumes `2 ≠ 0`), plus
    commutativity of the x-coordinate.
-2. **Associativity** of the chord–tangent law (the hard one; likely via the
-   divisor-class/linear-equivalence argument rather than brute algebra). This
-   is now the head of the queue.
+2. **Done (1b):** the explicit slope/`addX`/`addY` are bridged to Mathlib's
+   `Affine.slope/addX/addY`, and associativity is inherited from Mathlib's
+   proven `AddCommGroup` on `Point`. Exception-case wrapping (0, P = -Q,
+   doubling) remains to be connected to the same interface.
 3. **BSGS correctness** and **Pohlig–Hellman** in the Layer 0 interface.
 4. **Generic-group lower bound** statement and adversary model.
 5. **Pairing bilinearity/non-degeneracy** for the MOV reduction, then the
