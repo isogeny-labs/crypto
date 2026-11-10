@@ -111,6 +111,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::binary_ecc::{BinaryCurve, BinaryPoint, IrreduciblePoly};
 use crate::cryptanalysis::curve_id::{self, CurveId};
+use crate::cryptanalysis::efd_representations::EfdRepresentation;
 use crate::cryptanalysis::ic_measurement as measurement;
 use crate::cryptanalysis::koblitz_fast::{BatchScratch, FastCurve, FastPoint, FrobeniusCanon};
 use crate::cryptanalysis::koblitz_index_calculus::{
@@ -5107,11 +5108,166 @@ pub struct PrimeInstance {
     pub r: u64,
     pub cofactor: u64,
     pub generator: (u64, u64),
+    /// Optional EFD model/chart used for input and output.  The engine itself
+    /// still works on the short-Weierstrass `curve`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub representation: Option<PrimeRepresentation>,
+}
+
+/// The EFD model/chart carried by a [`PrimeInstance`].
+///
+/// The bench engine works on `curve` (`y² = x³ + ax + b`).  This record keeps
+/// the input/output representation and the chart lift, so a generator can be
+/// decoded from its own coordinates and results can be encoded back.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct PrimeRepresentation {
+    pub model: String,
+    pub chart: String,
+    pub params: BTreeMap<String, u64>,
+    pub lift: u32,
 }
 
 impl PrimeInstance {
     pub fn generator_point(&self) -> PrimePoint {
         PrimePoint::affine(self.generator.0, self.generator.1)
+    }
+
+    /// Build an instance from an EFD model and chart.
+    ///
+    /// `p` must fit the single-word prime engine (`p < 2^62`); the short
+    /// Weierstrass coefficients are derived from the EFD bridge.  The
+    /// generator is decoded in `chart` coordinates.
+    #[allow(clippy::too_many_arguments)]
+    pub fn from_efd(
+        model: &str,
+        chart: &str,
+        p: u64,
+        params: &BTreeMap<String, u64>,
+        order: u64,
+        cofactor: u64,
+        generator: &[u64],
+        lift: u32,
+    ) -> Result<Self, String> {
+        if !(5..(1u64 << 62)).contains(&p) {
+            return Err("the EFD bench engine needs 5 <= p < 2^62".into());
+        }
+        if order <= 2 || cofactor == 0 {
+            return Err(
+                "the EFD subgroup order must exceed 2 and the cofactor must be positive".into(),
+            );
+        }
+        if !is_prime_u64(p) {
+            return Err("the EFD modulus is not prime".into());
+        }
+        let p_big = BigUint::from(p);
+        let bindings: crate::prime_ecc::efd::Bindings = params
+            .iter()
+            .map(|(name, value)| {
+                (
+                    name.clone(),
+                    crate::ecc::field::FieldElement::new(BigUint::from(*value), p_big.clone()),
+                )
+            })
+            .collect();
+        let representation = EfdRepresentation::new(model, chart, &p_big, &bindings)?;
+        let (a, b) = representation.short_coefficients();
+        let a = a
+            .to_u64()
+            .ok_or("the EFD short-Weierstrass coefficient a exceeds u64")?;
+        let b = b
+            .to_u64()
+            .ok_or("the EFD short-Weierstrass coefficient b exceeds u64")?;
+        let group_order = order
+            .checked_mul(cofactor)
+            .ok_or("the EFD group order r*h exceeds u64")?;
+        let mut instance = Self {
+            name: format!("EFD {model}/{chart} over F_{p}"),
+            curve: PrimeCurve { p, a, b },
+            group_order,
+            r: order,
+            cofactor,
+            generator: (0, 0),
+            representation: Some(PrimeRepresentation {
+                model: model.to_owned(),
+                chart: representation.chart_id().to_owned(),
+                params: params.clone(),
+                lift,
+            }),
+        };
+        let point = instance.decode_efd_point(generator)?;
+        if !instance.curve.is_on_curve(point) {
+            return Err("the decoded generator is not on the short-Weierstrass curve".into());
+        }
+        let mut ops = GroupOps::default();
+        if instance.curve.mul(&mut ops, point, order) != PrimePoint::INFINITY {
+            return Err(format!(
+                "the decoded generator is not in the order-{order} subgroup"
+            ));
+        }
+        instance.generator = (point.x, point.y);
+        Ok(instance)
+    }
+
+    /// Build the representation recorded on this instance.
+    pub fn efd_representation(&self) -> Result<Option<EfdRepresentation>, String> {
+        let Some(rep) = &self.representation else {
+            return Ok(None);
+        };
+        let p = BigUint::from(self.curve.p);
+        let bindings: crate::prime_ecc::efd::Bindings = rep
+            .params
+            .iter()
+            .map(|(name, value)| {
+                (
+                    name.clone(),
+                    crate::ecc::field::FieldElement::new(BigUint::from(*value), p.clone()),
+                )
+            })
+            .collect();
+        EfdRepresentation::new(&rep.model, &rep.chart, &p, &bindings).map(Some)
+    }
+
+    /// Decode chart coordinates into the short-Weierstrass generator point.
+    pub fn decode_efd_point(&self, coords: &[u64]) -> Result<PrimePoint, String> {
+        let representation = self
+            .efd_representation()?
+            .ok_or("this instance has no EFD representation")?;
+        let field = crate::cryptanalysis::prime_small_x::SmallPrime::new(self.curve.p);
+        let p = BigUint::from(self.curve.p);
+        let coords: Vec<_> = coords
+            .iter()
+            .map(|value| crate::ecc::field::FieldElement::new(BigUint::from(*value), p.clone()))
+            .collect();
+        let lift = self.representation.as_ref().map_or(0, |rep| rep.lift);
+        let point = representation.decode_point(&field, &coords, lift)?;
+        Ok(PrimePoint::affine(point.x, point.y))
+    }
+
+    /// Encode a short-Weierstrass point in the recorded EFD chart.
+    pub fn encode_efd_point(&self, point: PrimePoint) -> Result<Vec<u64>, String> {
+        let representation = self
+            .efd_representation()?
+            .ok_or("this instance has no EFD representation")?;
+        let field = crate::cryptanalysis::prime_small_x::SmallPrime::new(self.curve.p);
+        let point = crate::cryptanalysis::prime_small_x::Pt {
+            x: point.x,
+            y: point.y,
+        };
+        representation
+            .encode_point(&field, &point)?
+            .into_iter()
+            .map(|value| {
+                value
+                    .value
+                    .to_u64()
+                    .ok_or_else(|| "encoded coordinate exceeds u64".to_owned())
+            })
+            .collect()
+    }
+
+    /// JSON description of the EFD representation, when present.
+    pub fn representation_json(&self) -> Result<Option<serde_json::Value>, String> {
+        Ok(self.efd_representation()?.map(|rep| rep.describe()))
     }
 
     /// The curve's ICV1 identity (`docs/curves/ICV1.md`).
@@ -5149,6 +5305,8 @@ pub fn roster_prime_instance(bits: u32) -> Option<PrimeInstance> {
         r: n,
         cofactor: c.h as u64,
         generator: (c.gx.to_u64()?, c.gy.to_u64()?),
+
+        representation: None,
     })
 }
 
@@ -5200,6 +5358,8 @@ pub fn curve25519_family_instance(k: u32) -> Option<PrimeInstance> {
         r,
         cofactor: group_order / r,
         generator: (gx, gy),
+
+        representation: None,
     })
 }
 
@@ -5251,6 +5411,8 @@ pub fn find_prime_order_curve(bits: u32, seed: u64) -> PrimeInstance {
                 r: order,
                 cofactor: 1,
                 generator: (g.x, g.y),
+
+                representation: None,
             };
         }
     }
@@ -16233,6 +16395,8 @@ mod tests {
             r: 4_294_959_973,
             cofactor: 1,
             generator: (2, 2_120_051_858),
+
+            representation: None,
         };
         for size in [1024usize, 4096] {
             let fb = prime_factor_base(&inst, size);
@@ -17009,6 +17173,8 @@ mod generator_coupling_tests {
             r,
             cofactor: 1,
             generator,
+
+            representation: None,
         }
     }
 
@@ -18567,5 +18733,41 @@ mod wwalk_table_tests {
         }
         eprintln!("lazy walk table: {bad_rows} wrong rows kept, {rejected} answers rejected");
         assert!(bad_rows > 0 && rejected > 0);
+    }
+}
+
+#[cfg(test)]
+mod efd_instance_tests {
+    use super::*;
+
+    #[test]
+    fn efd_prime_instance_decodes_and_encodes_chart_points() {
+        let params = BTreeMap::from([("a".to_string(), 131u64), ("b".to_string(), 1u64)]);
+        let inst =
+            PrimeInstance::from_efd("montgom", "xz", 1019, &params, 269, 4, &[604, 1], 0).unwrap();
+        assert_eq!(inst.curve.p, 1019);
+        assert_eq!(inst.curve.a, 55);
+        assert_eq!(inst.curve.b, 762);
+        assert_eq!(inst.r, 269);
+        assert_eq!(inst.cofactor, 4);
+        assert_eq!(inst.group_order, 269 * 4);
+        let generator = inst.generator_point();
+        assert!(inst.curve.is_on_curve(generator));
+        let encoded = inst.encode_efd_point(generator).unwrap();
+        assert_eq!(encoded, vec![604, 1]);
+        assert_eq!(inst.decode_efd_point(&encoded).unwrap(), generator);
+        assert!(inst.representation_json().unwrap().is_some());
+    }
+
+    #[test]
+    fn efd_instance_rejects_bad_modulus_and_subgroup() {
+        let params = BTreeMap::from([("a".to_string(), 131u64), ("b".to_string(), 1u64)]);
+        assert!(
+            PrimeInstance::from_efd("montgom", "xz", 1027, &params, 269, 4, &[604, 1], 0).is_err()
+        );
+        // (604,1) is order 269, not order 268.
+        assert!(
+            PrimeInstance::from_efd("montgom", "xz", 1019, &params, 268, 4, &[604, 1], 0).is_err()
+        );
     }
 }
