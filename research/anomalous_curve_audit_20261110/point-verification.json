@@ -1,0 +1,71 @@
+{
+  "schema": "anomalous-point-verification/v1",
+  "created": "2026-11-10T08:24:09.286233+00:00",
+  "source_commit": "c10e04d57874468d168a4bbcf381853e53df21ce",
+  "source_plan": "point-sources.json",
+  "source_and_candidate_pins_match": true,
+  "full_gate": {
+    "public_theorems": 59,
+    "failing": 0,
+    "trusted_native": 0,
+    "exit": 0,
+    "private_certificates": "Compiled in full, transitive standard-axiom audit through public final bindings",
+    "archive": "evidence/point-gate.tar.gz",
+    "roundtrip_equal": true
+  },
+  "packet": {
+    "claim_id": "PCC-20261110-90623b",
+    "claim_sha256": "e6f6120aa27fc4f55dd17363410006dfd393d9415f9bbacad4b00617af419de1",
+    "commit": "c10e04d57874468d168a4bbcf381853e53df21ce",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/anomalous_curve_audit_20261110/lean (PointTrace.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-10T08:22:03Z",
+    "verifier_host": "762f5fc120c9"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261110-90623b",
+    "claim_sha256": "e6f6120aa27fc4f55dd17363410006dfd393d9415f9bbacad4b00617af419de1",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "trace": {
+    "candidate_nodes": 448,
+    "order_node": 210,
+    "known_answer_node": 447,
+    "writer_reproduces_committed_lean_bytes": true,
+    "actual_point_order": "p",
+    "actual_known_answer": "Q=knownScalar\u2022G"
+  },
+  "source_control": {
+    "target": "Literal old-preprint j=-32768 statement",
+    "result": "Direct Lean negation; corrected curve has j=-32768",
+    "erratum": "Author already corrects leading digit and points; known correction, no novelty or refutation of corrected paper",
+    "read_and_visually_inspected": "Original preprint example page8; both erratum pages"
+  },
+  "report": {
+    "path": "reports/point-20261110/report.pdf",
+    "bytes": 63905,
+    "sha256": "f53d2f632f316a05740b92e8b92982d608070e8faa8cf25f581cf0d2be99ab05",
+    "pages": 2,
+    "visually_inspected_pages": [
+      1,
+      2
+    ],
+    "diagram_inspected": true
+  },
+  "remaining": "Actual whole curve point count=p, generic Smart p-adic/formal-group bridge, concrete finite-precision attack/native run, security cost and matched SafeCurves rho benchmark. Printed-source point-order/scalar counter-candidates not proved.",
+  "fresh_checker": "lean4checker unavailable; actual kernel build and complete transitive axiom gate",
+  "native_attack_runs": 0,
+  "paid_compute": 0
+}
