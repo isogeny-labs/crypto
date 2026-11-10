@@ -290,3 +290,66 @@ theorem bsgs_decomposition {n m x : Nat} (hm : 0 < m) (hx : x < n) (hn : n ≤ m
     exact (Nat.div_add_mod x m).symm
 
 end ECDLP
+
+/-! ## Layer 4 logic: the MOV reduction
+
+The MOV attack does not break the group law; it transports the DLP through a
+bilinear map to a target group. These lemmas formalise that reduction logic.
+Constructing the Weil pairing and proving its non-degeneracy is separate. -/
+
+namespace ECDLP
+
+variable {G H : Type} [AddGroup G] [AddGroup H]
+
+/-- A biadditive map, the algebraic interface of a pairing. -/
+structure Bilin where
+  e : G → G → H
+  add_left : ∀ a b c : G, e (add a b) c = add (e a c) (e b c)
+  add_right : ∀ a b c : G, e a (add b c) = add (e a b) (e a c)
+
+namespace Bilin
+
+variable (B : Bilin (G := G) (H := H))
+
+theorem e_zero_left (b : G) : B.e zero b = zero := by
+  have h : B.e zero b = add (B.e zero b) (B.e zero b) := by
+    calc B.e zero b = B.e (add zero zero) b := by rw [zero_add]
+      _ = add (B.e zero b) (B.e zero b) := B.add_left zero zero b
+  have h2 : add (B.e zero b) zero = add (B.e zero b) (B.e zero b) := by
+    rw [add_zero]
+    exact h
+  exact (add_left_cancel h2).symm
+
+theorem e_zero_right (a : G) : B.e a zero = zero := by
+  have h : B.e a zero = add (B.e a zero) (B.e a zero) := by
+    calc B.e a zero = B.e a (add zero zero) := by rw [zero_add]
+      _ = add (B.e a zero) (B.e a zero) := B.add_right a zero zero
+  have h2 : add (B.e a zero) zero = add (B.e a zero) (B.e a zero) := by
+    rw [add_zero]
+    exact h
+  exact (add_left_cancel h2).symm
+
+theorem e_nsmul_left (k : Nat) (a b : G) :
+    B.e (nsmul k a) b = nsmul k (B.e a b) := by
+  induction k with
+  | zero => simpa using B.e_zero_left b
+  | succ k ih => simp [nsmul_succ, B.add_left, ih]
+
+theorem e_nsmul_right (k : Nat) (a b : G) :
+    B.e a (nsmul k b) = nsmul k (B.e a b) := by
+  induction k with
+  | zero => simpa using B.e_zero_right a
+  | succ k ih => simp [nsmul_succ, B.add_right, ih]
+
+/-- MOV reduction: if `e(a,a)` has the same order as `a`, then a solution of
+the DLP in the target group is the unique source exponent below the order. -/
+theorem mov_reduction {a : G} {n : Nat} (_h : IsOrder a n)
+    (htarget : IsOrder (B.e a a) n) {x y : Nat} (hx : x < n) (hy : y < n)
+    (hmap : nsmul y (B.e a a) = B.e a (nsmul x a)) : y = x := by
+  have hmap' : nsmul y (B.e a a) = nsmul x (B.e a a) := by
+    rw [hmap, B.e_nsmul_right]
+  exact nsmul_injective_below htarget hy hx hmap'
+
+end Bilin
+
+end ECDLP

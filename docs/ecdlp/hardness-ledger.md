@@ -76,7 +76,7 @@ and probability theory; queued after Layer 1.
 | Attack | Hypothesis it breaks | Status |
 | --- | --- | --- |
 | Pohlig–Hellman | Order has small prime factors | Implemented |
-| MOV / Frey–Rück | Embedding degree is small; pairing is non-degenerate and computable | Implemented; bilinearity/non-degeneracy formalization open |
+| MOV / Frey–Rück | Embedding degree is small; pairing is non-degenerate and computable | Implemented; **reduction logic formal** (`Bilin` interface, `mov_reduction`); Weil pairing construction/non-degeneracy open |
 | Smart–Satoh–Araki | `#E(F_p) = p` (anomalous); p-adic elliptic logarithm | Implemented; p-adic formalization open |
 | GHS / Weil descent | Curve defined over a proper subfield / weak cover | Implemented for the repo's descent campaigns |
 | Singular curve | Discriminant zero: node or cusp | Handled by validation; group is multiplicative/additive |
@@ -102,8 +102,9 @@ separately; a break here breaks deployments, not ECDLP.
    doubling) remains to be connected to the same interface.
 3. **BSGS correctness** and **Pohlig–Hellman** in the Layer 0 interface.
 4. **Generic-group lower bound** statement and adversary model.
-5. **Pairing bilinearity/non-degeneracy** for the MOV reduction, then the
-   reduction theorem itself.
+5. **Done (logic):** MOV reduction formal over a biadditive map with
+   `e(a,a)` of full order. Remaining: construct the Weil pairing and prove
+   non-degeneracy/embedding degree.
 6. **Anomalous-curve attack** at the formal-group level.
 
 Each step lands as a Lean file with a proof-gate receipt, plus an entry here.
