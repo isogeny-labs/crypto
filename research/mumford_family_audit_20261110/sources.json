@@ -1,0 +1,184 @@
+{
+  "schema": "mumford-growing-family-source-plan/v1",
+  "created": "2026-11-10T13:06:08.960376+00:00",
+  "status": "Preissue frozen sources; whole91gatePASS/0failures/0trusted.",
+  "formal": {
+    "project": "research/mumford_family_audit_20261110/lean",
+    "theorem": "MumfordFamilyCertificateAudit.growing_family_arithmetic_certificate",
+    "statement": "theorem growing_family_arithmetic_certificate : (∀ G : ℕ,∃ t : ℕ,G<genus t) ∧ (∀ N : ℕ,∃ t : ℕ,N<exponent t) ∧ (∀ t : ℕ, (curvePolynomial t).Monic ∧ (curvePolynomial t).Separable ∧ (curvePolynomial t).natDegree=2*genus t+1 ∧ Finite (ReducedPair (genus t) (curvePolynomial t)) ∧ Nat.card (OrbitPair t)=exponent t ∧ (∀ i : OrbitIndex t,∃! R : Pair t, OneStepRun (coeffA t i) (coeffB t i) (coeffC t i) (generator t) (orbitPair t i) R) ∧ (∀ j : ℕ,∀ D : OrbitPair t,(actualStep t)^[j] D=D ↔ exponent t∣j) ∧ (Nat.card {D : OrbitPair t // Smooth D.val}:ℚ)/Nat.card (OrbitPair t)=1 ∧ (Nat.card {D : ReducedPair (genus t) (curvePolynomial t) // Smooth D}:ℚ)/ Nat.card (ReducedPair (genus t) (curvePolynomial t))<1 ∧ badPair t∉Set.range (orbitPair t))",
+    "decl_sha256": "744afb2d103a00154acf410878998d750a81941b0886c6b725f1406064f70869",
+    "sources": [
+      {
+        "path": "research/mumford_family_audit_20261110/lean/CurveFamily.lean",
+        "bytes": 4926,
+        "sha256": "e39d24971effb3aaf82ffa6c25ae7b11f2bc4c67e48c7966e4a921e8e4c29f88"
+      },
+      {
+        "path": "research/mumford_family_audit_20261110/lean/Cycle.lean",
+        "bytes": 4588,
+        "sha256": "f1615aa6b195cdcd3295018ad49db9a7dc686d7bce73c66c76c23198d7b35a01"
+      },
+      {
+        "path": "research/mumford_family_audit_20261110/lean/FamilyCertificate.lean",
+        "bytes": 2440,
+        "sha256": "4f628a597b9f4eeeb0690194edbe2cc8dbcddeedf16b7326c3678b40ffa9106a"
+      },
+      {
+        "path": "research/mumford_family_audit_20261110/lean/FamilyTransitions.lean",
+        "bytes": 4613,
+        "sha256": "5f2819946265342bfa21a032fe75f7b6833e2592f8c94a8f63fa3d4dc1357c0e"
+      },
+      {
+        "path": "research/mumford_family_audit_20261110/lean/NormalizedCantor.lean",
+        "bytes": 5050,
+        "sha256": "82579c0d58b2a2b2813e232c20f5006bf37c3d16fca1d72d4d039296e5125f13"
+      },
+      {
+        "path": "research/mumford_family_audit_20261110/lean/OrbitFamily.lean",
+        "bytes": 4915,
+        "sha256": "43f5634e05f9b360e8a95242573b5a43d9ce4e7ae1b6df32a4e90dda3f44f63c"
+      },
+      {
+        "path": "research/mumford_family_audit_20261110/lean/ReducedPairs.lean",
+        "bytes": 3078,
+        "sha256": "c56a3605d034da7fa7d1839b87cd0e5c90b2899f52cab09f690fd969f5163a73"
+      },
+      {
+        "path": "research/mumford_family_audit_20261110/lean/Successor.lean",
+        "bytes": 4045,
+        "sha256": "a2949bca917daf5a3e03e6b1c1ce91dbc561ff28d963c6142dc01c298abfa04e"
+      },
+      {
+        "path": "research/mumford_family_audit_20261110/lean/lake-manifest.json",
+        "bytes": 3554,
+        "sha256": "213bf2b942006362be9388ca12a8e12828e573d3598d862b6e26035687a4b388"
+      },
+      {
+        "path": "research/mumford_family_audit_20261110/lean/lakefile.toml",
+        "bytes": 409,
+        "sha256": "a23b8ac113b8d71fa0a7ddf33fa3d53176b23498dc1033266b00aabca811f273"
+      },
+      {
+        "path": "research/mumford_family_audit_20261110/lean/lean-toolchain",
+        "bytes": 25,
+        "sha256": "ca5f1f601d34c49079e38d7e7041eb0f2a9c227fbc1df0f404820069a052330c"
+      }
+    ],
+    "scope": "Actual polynomial reduced-pair universe overF3 with f=X^(24t+5)+1,g=12t+2. Unique normalized addition-by-(X,1) runs, exact24t+5cycles and unequal smooth fractions. No all-pair ambient group law or geometric Picard identification assumed or proved."
+  },
+  "artifacts": [
+    {
+      "path": "research/mumford_family_audit_20261110/evidence/attempts.tar.gz",
+      "bytes": 13092,
+      "sha256": "7781f715f8522288ea6b8bfbd46aa133b40c7824ad658f3a8af58f45283d51a0"
+    },
+    {
+      "path": "research/mumford_family_audit_20261110/evidence/attempts.json",
+      "bytes": 6430,
+      "sha256": "58994e9605e1ecf7c3fd3ffb671b69955bff058bcf957dd90f9eed9482380d1e"
+    },
+    {
+      "path": "research/mumford_family_audit_20261110/evidence/gate.tar.gz",
+      "bytes": 2147,
+      "sha256": "bafcc59cf75b96b6fa0e792e6891d0425b10de2247aa305c62580c5a8b75524f"
+    },
+    {
+      "path": "research/mumford_family_audit_20261110/evidence/gate.json",
+      "bytes": 1155,
+      "sha256": "d9a49423a5f4f543a127e665c05cb5b95f351a5d9026c068831c21b325aace3f"
+    },
+    {
+      "path": "research/mumford_family_audit_20261110/evidence/source-review.json",
+      "bytes": 2648,
+      "sha256": "f93df75a822c1998a7640e5bb63545aba5b6716ef78c8c86df36567b663ff290"
+    },
+    {
+      "path": "research/mumford_family_audit_20261110/stoll-identity-certificate.json",
+      "bytes": 4117,
+      "sha256": "87063cc8050a4bc2c72abf191ad7b63d4046ff4921e217c254ec39462681054c"
+    }
+  ],
+  "gate": {
+    "archive": "research/mumford_family_audit_20261110/evidence/gate.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "public_theorems": 91,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "attempts": {
+    "archive": "research/mumford_family_audit_20261110/evidence/attempts.tar.gz",
+    "files": 39,
+    "roundtrip_equal": true
+  },
+  "proof_outline": [
+    "Define all actual reduced pairs and prove finiteness by an injective bounded coefficient encoding.",
+    "Prove monicity, degree2g+1 and separability of the actual curve polynomial using an explicit Bezout identity.",
+    "Construct n distinct smooth powers (X^d,±1) plus identity and a uniform valid nonsplit pair (X²+X+2,X).",
+    "Prove unique output of normalized composition plus zero or one reduction from fullgcd/Bezout and bounded remainder equations.",
+    "Certify all five addition-by-(X,1) phases by explicit polynomial witnesses.",
+    "Define arithmetic step by its unique normalized output, then prove agreement with the candidate successor.",
+    "Injective positions conjugate the actual step to residue increment, proving return afterj iff n dividesj.",
+    "Actual orbit smooth fraction1 and strict smaller ambient smooth fraction; direct universal equality negation; unbounded genus/order."
+  ],
+  "assurance": {
+    "lean": "4.35.0",
+    "mathlib": "56a005855ea17e0b0958f73ec801ae140b0a1679",
+    "axioms": [
+      "propext",
+      "Classical.choice",
+      "Quot.sound"
+    ],
+    "holes": false,
+    "native_decide": false,
+    "paid_compute": 0,
+    "native_experiment": false,
+    "new_IDC_sampling": false,
+    "lean4checker": "Unavailable; actual kernel/transitive axiom gate.",
+    "advisories": "Legacy module advisory retained; no waiver or added elaboration setting."
+  },
+  "source_review": {
+    "schema": "mumford-growing-family-source-review/v1",
+    "created": "2026-11-10T13:06:08.959745+00:00",
+    "sources": [
+      {
+        "id": "S-STOLL-2014",
+        "url": "https://www.mathe2.uni-bayreuth.de/stoll/teaching/ArithHypKurven-SS2014/Skript-ArithHypCurves-pub-screen.pdf",
+        "pdf_sha256": "619150b20644d44b3fee4aeda6ece57d4e5a2d5b1343d0dc2dcbafd1bb9cb321",
+        "read_scope": "Lemmas4.16–4.17, Theorem4.18 and Example4.19, printedpp23–26 reread. Prior visual check of these pages retained in parent study. Not a new full-book read.",
+        "effect": "Actual reduced-pair conditions and normalized composition/reduction equations, with an explicitly missing formal Picard/Riemann–Roch identification."
+      },
+      {
+        "id": "S-JEDRZEJAK-2016",
+        "url": "https://www.impan.pl/shop/publication/transaction/download/product/91624",
+        "doi": "10.4064/aa8141-3-2016",
+        "pdf_sha256": "a69c67846fb7ec7012d4540818d9c57dfe25e0a3374c8134748b4f33cf147da3",
+        "read_scope": "Relevant introduction, Theorem2, divisor/model definitions, good-reduction section3, odd-degree torsion proof printedp111. Not full-paper read.",
+        "effect": "Known rational torsion family y²=x^(2m+1)+c² has point(0,c)−infinity of order2m+1. No novelty claim; characteristic3 polynomial arguments are separately proved in Lean."
+      },
+      {
+        "id": "S-CANTOR-1987",
+        "url": "https://www.ams.org/mcom/1987-48-177/S0025-5718-1987-0866101-0/S0025-5718-1987-0866101-0.pdf",
+        "read_scope": "Original not read. Ordinary primary AMS URLs including journals variant returned HTTP403. No bypass or replacement of an unread receipt."
+      }
+    ],
+    "repository_reads": [
+      "Existing actual finite Stoll complete Cantor group and smoothness proof maps",
+      "Original fourteen-item open-problem record",
+      "Pinned Mathlib polynomial degree/splitting/separability/gcd/remainder and finite cardinality APIs",
+      "Function iterate and Nat modular arithmetic APIs"
+    ],
+    "KB": "MCP absent; scripts/research-kb wrapper unavailable (127), bounded primary/repository/Mathlib fallback. Conductor absent.",
+    "scope": "Actual polynomial reduced-pair universe overF3 with f=X^(24t+5)+1,g=12t+2. Unique normalized addition-by-(X,1) runs, exact24t+5cycles and unequal smooth fractions. No all-pair ambient group law or geometric Picard identification assumed or proved.",
+    "remaining": [
+      "all-pair ambient Cantor group structure",
+      "geometric Picard/Jacobian correspondence",
+      "typical or large-prime subgroup asymptotics; no infinite prime-order sequence claimed"
+    ],
+    "novelty": "Known torsion construction; no novelty claim."
+  },
+  "identity_supplement": {
+    "id": "IDC1hb7102c15384f2648",
+    "scope": "Byte-identical existing base-quintic scalar quotient/remainder supplement only; does not certify characteristic3, variable exponent, cycle, cardinality or geometry. Those polynomial/arithmetic statements rest on Lean."
+  }
+}

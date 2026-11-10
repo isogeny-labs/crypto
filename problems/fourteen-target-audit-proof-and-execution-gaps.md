@@ -4,7 +4,7 @@
 - **Kind:** proof gaps, implementation gaps and access/tool limits; no impossibility claim
 - **Affected work:** [fourteen-target audit](../research/theorem_audit_20261108/README.md)
 - **Next action owner:** audit continuation; environment owner for credential/host provisioning
-- **Last updated:** 2026-11-09
+- **Last updated:** 2026-11-10
 
 ## Problem
 
@@ -221,3 +221,58 @@ but no curve call has run at this writing. Geometry/native census/scaling
 and qualified-regime requirements remain open. See
 [control scope](../research/jacobian_smoothness_audit_20261109/FIVE_CONTROL.md).
 [pcc:unverified]
+
+### 2026-11-10 actual-source and all-extension follow-up
+
+Three new separate dependent projects preserve all issued parent source
+and protocol bytes. Composite-order Tate domains directly disprove the
+literal nontrivial-root hypothesis in Galbraith26.3.3: actual F3/n4 and
+F5/n6 point groups and unit quotients, gate50/localPCC5e63e9PASS, signed
+unverified. Correct primitive-root/prime-order results remain open. See
+[the exact source boundary](../research/pairing_composite_order_audit_20261110/README.md).
+[pcc:unverified]
+
+The entire original six-page Semaev2004 author manuscript is now read,
+with its exact PDF hash retained. Its literal missing-plus binaryS4 display
+is refuted by actual F4 zero-sum points; the additive repair universally
+equals the actual resultant and all16F2tuples agree. Gate28/localPCC95607fPASS,
+signedunverified. Historical source-read receipts remain unchanged;
+generic polynomial symmetry/irreducibility/arbitrary-split normalization
+remain open. See [the original-source study](../research/semaev_source_audit_20261110/README.md).
+[pcc:unverified]
+
+For actual E/F5:y²=x³+1/r3, the geometric-torsion-inclusion criterion is
+now proved for every extension degree, with actual point images and explicit
+GaloisField5k construction/cardinality/embedding for everypositivek. The
+actual nonrational order3 witness proves every odd degree fails. Finalgate37/
+localPCC99983dPASS, signedunverified. Generic torsionrank/determinant/Weil
+necessity, actual geometriccard9 and requested allp<500census remain open.
+See [the actual BK case](../research/bk_actual_case_audit_20261110/README.md).
+[pcc:unverified]
+
+Item7's next proof target now uses the known torsion family overF3 with
+f=X^(24t+5)+1,g=12t+2: actual reduced split pairs(X^d,±1), an explicit
+nonsplit reducedpair(X²+X+2,X), and normalized Cantor addition traces.
+The variable-genus reduced-pair/Picard/Jacobian correspondence is still
+missing. A checked polynomial orbit will not be promoted to a geometric
+subgroup counterexample without that bridge. The entire14item request
+remains open; another-machine execution still requires actual authorized
+host/workflow access. [pcc:unverified]
+
+### 2026-11-10 growing-family arithmetic result
+
+The new [growing-family study](../research/mumford_family_audit_20261110/README.md)
+checks all polynomial obligations for addition by (X,1) on f=X^(24t+5)+1
+over F3, genus12t+2. Its n distinct smooth reduced pairs form an actual
+normalized arithmetic cycle of exact periodn; the finite universe of all
+valid reduced pairs has smooth fraction<1by the uniform nonsplit pair
+(X²+X+2,X). Lean directly negates equality of these cycle/ambient fractions.
+The whole91-declaration gate passes with no failing or trusted-native
+exceptions. All39attempt/source files are archived losslessly. [pcc:unverified]
+
+This supplies an unbounded-genus arithmetic family. It does not supply
+an all-pair ambient Cantor group law or geometric Picard identification.
+Those are the next formal obligations before calling this an unconditional
+geometric Jacobian subgroup family. The periods24t+5are not all prime,
+and typical/large-prime asymptotics remain separate. Known torsion-family
+prior art (Jędrzejak2016) is acknowledged; no novelty claim. [pcc:unverified]
