@@ -1,0 +1,932 @@
+{
+ "schema": "validator-report/v1",
+ "study": "research/curve25519_exponent_study_20261108",
+ "validated_at_utc": "2026-11-10T06:10Z",
+ "validator": "validator subagent (Claude Opus 5.5); did not produce the study",
+ "independent": true,
+ "status": "pass_with_errata",
+ "disposition": "validated",
+ "summary": "All measured numbers and preregistered verdicts verify. The freeze order holds. Curves, targets, census and consistency flags agree with independent code on every recorded item. 56/70 cells replay identically with the frozen binary. Every fit and interval recomputes. The verdicts (m=2 prediction failed; m=3 and m=4 lever undetermined; no lever found) follow the frozen protocol and analyse.py. Errata E1-E13 cover wording, disclosure, units and reproducibility. None changes a preregistered verdict or a fitted number.",
+ "commit": {
+  "validated_sha": "8c544a182916abb3f7c64866ec4d28e6e164d811",
+  "branch": "claude/exponent-study-20261108",
+  "tree_state": "clean (git status --short empty) before this report was written",
+  "protocol_freeze_commit": "8d0388b10a (2026-11-08T23:50:48Z)",
+  "commits_beyond_origin_main": [
+   "8d0388b10a",
+   "ebf0d285b7",
+   "51b1ba83bc (merge of origin/main)",
+   "2497c2d0e9",
+   "075ccd5a21",
+   "8c544a1829"
+  ],
+  "git_use": "read-only (rev-parse, log, show, diff, status); no commits, no pushes"
+ },
+ "binary": {
+  "path": "/home/user/ctarget-f1/release/curve25519_family",
+  "sha256": "dc2c30a4242d80281622b2cb42cbaf9cb457d041ffbc9a4d35794bb893bf3faf",
+  "matches_frozen": true,
+  "mtime_utc": "2026-11-08T23:39:58Z",
+  "note": "The dispatch named a scratchpad copy that did not exist; this validator copied the binary to its own scratchpad before use (same sha256). Nothing was built."
+ },
+ "artifact_hashes_sha256": {
+  "PROTOCOL.md": "95ca695455506447c4ce5f7f1f5de5998afa09d84b08720ecd57e07deaa07b05",
+  "README.md": "ca718890ae0579bcae9e8046f57b50a6e17f55be7b2b686d612e96e529b8909c",
+  "PRIOR_STUDIES.md": "3040fe34f164a9ae6333154d658a19d11eac32d349ba5fa9e160a678e4e1c39b",
+  "REPORT.pdf": "954612d12ba78d921ccf6f498488addfc500c5a40485a65bc47fd75a2db2bc4d",
+  "REPORT.typ": "a46c451ed437fd8d164321f43c4877516f843fdcb1ebbd788763794a2d9182db",
+  "exponent_fit.svg": "2213bb27af10808538f9e307eb62dbdeb2e514f86cbc7ec26e65edf5cbb5543b",
+  "exponent_fit.png": "2889db105a7d31472d01148c5f1e006609c21b668a713cef7c0ed7207c618aac",
+  "scripts/analyse.py": "71542bfb54e74a304b20aa7432c54abbe70187c53beb2066dc76c552d697f50a",
+  "scripts/census.py": "095aee51397339bef2cbac25fd8686769f66063fe676643c8dc2dee836f58472",
+  "scripts/figure.py": "ae4b46503892cd03960fb4b2eb5516f47ccff9316f2f9a693f65792c4ef76a0e",
+  "scripts/run_grid.py": "6dd4383bbf74467ba4a550d10c4af4926fb20da13042d942d60f58fa98dfd72d",
+  "scripts/tables.py": "e8d380ec31eff044da27e4713db9daff3672d7e7c66bdf8a77e6eca35885b03c"
+ },
+ "raw_data": [
+  {
+   "path": "cells/k18_m2_sym_d13_g0.json",
+   "sha256": "f709d35f61a05c1f97a7a459b138120dc2e68076d0a92364f1ab83cc324996e4"
+  },
+  {
+   "path": "cells/k18_m2_sym_d71_g0.json",
+   "sha256": "00ddfe4d85d5ac9df1236694dce6cd3ce4a21bfb65877fd5abf1b5b8184dbdbb"
+  },
+  {
+   "path": "cells/k18_m2_sym_d923_g0.json",
+   "sha256": "473529fa0c51f89f144cac60094db2217d9f1ec973ca3238c8a9ef33db3ff195"
+  },
+  {
+   "path": "cells/k20_m2_plain_d19_g0.json",
+   "sha256": "25625b2d75d9a73b114396c3317d610f671a759627b6a236ce58e9ccbe540bf0"
+  },
+  {
+   "path": "cells/k20_m2_plain_d21_g0.json",
+   "sha256": "6024512cc4ee503560329d2328556c927019a033713476c1c725974a9205c65e"
+  },
+  {
+   "path": "cells/k20_m2_plain_d27_g0.json",
+   "sha256": "4539b29c553b203c307abd8cbb0b099491517d938de44e46cc58529c34ea274b"
+  },
+  {
+   "path": "cells/k20_m2_plain_d3_g0.json",
+   "sha256": "36ca0e188fe162c9a79cc0fc92ce4c1f7a53b086db590bdbe8caf34cbec5a1c9"
+  },
+  {
+   "path": "cells/k20_m2_plain_d57_g0.json",
+   "sha256": "3f91eeece3a775c1ab6ea55b2c719a14b99eead247fe9f390ec3413c0bf0f18e"
+  },
+  {
+   "path": "cells/k20_m2_plain_d63_g0.json",
+   "sha256": "c375326fbd989709fb72e2beaaec7e34e605473aa2c7ed520a4bee39a4e5bf32"
+  },
+  {
+   "path": "cells/k20_m2_plain_d7_g0.json",
+   "sha256": "43631aeb791874a7385bb9816c9e165789bd29229cecd6ca1539d7639c2b6d93"
+  },
+  {
+   "path": "cells/k20_m2_plain_d9_g0.json",
+   "sha256": "7ed2de1d4eb1ad104e3cdd74ae8914a3fd5e832f72b1d60d30cb9c90c2d3a226"
+  },
+  {
+   "path": "cells/k20_m2_sym_d133_g0.json",
+   "sha256": "d8ca09d361f07f3cc71dde73b1bcb7a807819173378211977e75dd9c127c0edc"
+  },
+  {
+   "path": "cells/k20_m2_sym_d171_g0.json",
+   "sha256": "1be88ff1b6ccf303d22a9bfd72ba2205e89fdf1138397710800402bf55eca6bd"
+  },
+  {
+   "path": "cells/k20_m2_sym_d189_g0.json",
+   "sha256": "62b80830aa458f2edb0f96ae29bd9b938bad9e8771fc4874c9519cce44884e9d"
+  },
+  {
+   "path": "cells/k20_m2_sym_d19_g0.json",
+   "sha256": "0eee61cdf472178a02407c022d64092b9d1cd5b960dd85fb3872578bc7ef1107"
+  },
+  {
+   "path": "cells/k20_m2_sym_d219_g0.json",
+   "sha256": "09e28ab381f5de5b0a182fcf486612811f9a2843f1b1bca8d6d1b0bed83b81de"
+  },
+  {
+   "path": "cells/k20_m2_sym_d21_g0.json",
+   "sha256": "b98d66ff05acdb265aadcffcdc5b01cafe7497e57c99a3cb5b6123857de4f1f6"
+  },
+  {
+   "path": "cells/k20_m2_sym_d27_g0.json",
+   "sha256": "fe60fb75046e7fc31c36a93b467735eb83c7a3022cada9174cf022684263150f"
+  },
+  {
+   "path": "cells/k20_m2_sym_d27_g1.json",
+   "sha256": "a6f29d9bc2edc6028d3cbc0367b0f6a785d6f477edf53dbbc52cdae7283c7518"
+  },
+  {
+   "path": "cells/k20_m2_sym_d27_g2.json",
+   "sha256": "4b970de3057bd63680f9b1047b918a63674e27176728a18f647619329b4ca8a0"
+  },
+  {
+   "path": "cells/k20_m2_sym_d399_g0.json",
+   "sha256": "4e01d86e6ff17c12ac96fbfa459e70927aab0f3db0cbceca6afc0a9ff182a246"
+  },
+  {
+   "path": "cells/k20_m2_sym_d3_g0.json",
+   "sha256": "17e332a88648b36c2ab303a6af66c83e4898eaf3de99d7592210f147c9d379b8"
+  },
+  {
+   "path": "cells/k20_m2_sym_d511_g0.json",
+   "sha256": "b8a809bd78fbd4bfc7984568f4cf8fbf1605d500c91b03e7d1acfbdaeb195c73"
+  },
+  {
+   "path": "cells/k20_m2_sym_d513_g0.json",
+   "sha256": "c6d0e7ffc57f3d3221e873452b618033682ddd0c408fab816af818c29474c524"
+  },
+  {
+   "path": "cells/k20_m2_sym_d57_g0.json",
+   "sha256": "4478ea737e4038d0168d82cb23bfb88bd1346c1e6cec20bbf77eaa3b65a16da2"
+  },
+  {
+   "path": "cells/k20_m2_sym_d63_g0.json",
+   "sha256": "ceddd1b75ef563a004711c54f6cc537c6c55cca1ff2d586b9f2826229ad84ae7"
+  },
+  {
+   "path": "cells/k20_m2_sym_d63_g1.json",
+   "sha256": "274f8c703a067aae5eea6674b6d14f704dc56564545f0317486edfc5dd20e7af"
+  },
+  {
+   "path": "cells/k20_m2_sym_d63_g2.json",
+   "sha256": "28482370fe072300e15b290094d3da17bc5b00cde8e1a970cbf7ac5c2fc2320e"
+  },
+  {
+   "path": "cells/k20_m2_sym_d73_g0.json",
+   "sha256": "f244875f1e81d259efdd5158a1e849d371674be2b6bc0cb0e3fa35421876fb92"
+  },
+  {
+   "path": "cells/k20_m2_sym_d7_g0.json",
+   "sha256": "92737995d6dbc83b0c4ad2760185ff6bb83934a6b646ad108ee960dd04da5f4c"
+  },
+  {
+   "path": "cells/k20_m2_sym_d9_g0.json",
+   "sha256": "2c92ce49b4c9f165c71f88badc560040ee89338ef8c3bde40d5e685450fb2c6c"
+  },
+  {
+   "path": "cells/k20_m3_plain_d19_g0.json",
+   "sha256": "911f1326bf5a8768759f3e9ce668a1682186824de080f1af49f7acea9f06c909"
+  },
+  {
+   "path": "cells/k20_m3_plain_d21_g0.json",
+   "sha256": "3b456ad58a03c8443b4319f66d93bd281157124aab89bc21fcd2076a7ac05a29"
+  },
+  {
+   "path": "cells/k20_m3_plain_d27_g0.json",
+   "sha256": "7a150281edcad5f0bf5cf41256027366c746d4698758b6d41295f941076d8f70"
+  },
+  {
+   "path": "cells/k20_m3_plain_d3_g0.json",
+   "sha256": "bb4e6f196854b72f247eba947d0be9400776297a523087045ffd676baa9be349"
+  },
+  {
+   "path": "cells/k20_m3_plain_d7_g0.json",
+   "sha256": "b889b1037c3676c6c678bd9384f185cb3706e00b791a217204b0b077c0f63369"
+  },
+  {
+   "path": "cells/k20_m3_plain_d9_g0.json",
+   "sha256": "2ee3836a4e495024bdc7df58f3e914f85fe980338d42cffb4bf2fc2d6d8e942e"
+  },
+  {
+   "path": "cells/k20_m3_sym_d19_g0.json",
+   "sha256": "ed9be80e3e16cf023fcc8eb86bccf150bc2c62bfe92dadc4b5f42d3180e3b1be"
+  },
+  {
+   "path": "cells/k20_m3_sym_d21_g0.json",
+   "sha256": "8b6a4456268a970ffb9773b38e2b87bff66e0398ce89147f56bcee18c81c85d5"
+  },
+  {
+   "path": "cells/k20_m3_sym_d27_g0.json",
+   "sha256": "d3c7e78b9bfc01e2b6b04faa78ab27626969cf6a17aacac4cfcbbe6c2ec2c174"
+  },
+  {
+   "path": "cells/k20_m3_sym_d3_g0.json",
+   "sha256": "88eddfb17cfac686f21176428c4322c59dd51c9d8aaaa8936ff9d5bfb5a06139"
+  },
+  {
+   "path": "cells/k20_m3_sym_d57_g0.json",
+   "sha256": "5d3392e2063c7a8cdefdeb3e5312d9e3c46818114e25e4cf0d8c734d7c979bc2"
+  },
+  {
+   "path": "cells/k20_m3_sym_d7_g0.json",
+   "sha256": "019436d07c39dbaa4e86ff32ae8097371f55c923daaf3127c8c16b7d3a59edd6"
+  },
+  {
+   "path": "cells/k20_m3_sym_d9_g0.json",
+   "sha256": "9b7d4c28a7bc747e2531ef7fe6e487d50e1976436433dc88004a4b71a8f61bf3"
+  },
+  {
+   "path": "cells/k20_m4_sym_d19_g0.json",
+   "sha256": "d9f8a269bf47986235d6bb3cb3bced89e60a4c6f98e11096a80cebd7855daafe"
+  },
+  {
+   "path": "cells/k20_m4_sym_d3_g0.json",
+   "sha256": "a002da75f12d8a6d4ca310bb3e417fbc99623e1629d0c71b3ea91a056d6f9c70"
+  },
+  {
+   "path": "cells/k20_m4_sym_d7_g0.json",
+   "sha256": "fdd884f820874818a50bed56a9a83a53f72f0c2c7cd4180ecf5dcea7bacb9976"
+  },
+  {
+   "path": "cells/k20_m4_sym_d9_g0.json",
+   "sha256": "cc71f9fe9fa2d95fd69b8bfcb65ff4eedfbd47677aad2bf1efe53127c524619c"
+  },
+  {
+   "path": "cells/k22_m2_sym_d11_g0.json",
+   "sha256": "789c740d9f068fb2a9d255e2648d75600294913d2ae380304b5bfa988af2b252"
+  },
+  {
+   "path": "cells/k22_m2_sym_d15_g0.json",
+   "sha256": "60d93b99f6c568fbf10e5da5c3b7890a2e3b02d90e7950396b76125f7bc5f359"
+  },
+  {
+   "path": "cells/k22_m2_sym_d25_g0.json",
+   "sha256": "9fe48a9be32fd5b02b4562b02d4d388632a8d022e35c692d1005eb21ef4152b6"
+  },
+  {
+   "path": "cells/k22_m2_sym_d31_g0.json",
+   "sha256": "9cd22f7ee67a23c4d9129233d8859b8124cb1325d8e64d91125e9dcd488ad3fe"
+  },
+  {
+   "path": "cells/k22_m2_sym_d33_g0.json",
+   "sha256": "473367d6380c895d0b0c3e0bee92dd64295cc0caa03c8d435deab07518449f20"
+  },
+  {
+   "path": "cells/k22_m2_sym_d3_g0.json",
+   "sha256": "1f666dd18f2108c5c343fb75037acfdc53c25b38668e4ef2c93bf08f1e8b9ef9"
+  },
+  {
+   "path": "cells/k22_m2_sym_d41_g0.json",
+   "sha256": "1084ea79817b28bdf6e1d52b113d009a832267a5f7a6b548a8b2ed15a4a9ec70"
+  },
+  {
+   "path": "cells/k22_m2_sym_d55_g0.json",
+   "sha256": "0ad17970cf8c71d3e2647f0fd35a06c37862a7923a39458a46a5efadf0fd54b0"
+  },
+  {
+   "path": "cells/k22_m2_sym_d5_g0.json",
+   "sha256": "141145a1c62e2883962edc72255db889d666fbfb3b4f271e63290217b01d4035"
+  },
+  {
+   "path": "cells/k22_m2_sym_d75_g0.json",
+   "sha256": "cb0bf9dfd4a891efb816938bb87e28439b44bd57dcff0d8c9d108d87f5c49ba6"
+  },
+  {
+   "path": "cells/k22_m2_sym_d93_g0.json",
+   "sha256": "aee2b8e5921141dc18ec90a20a66a286edb77b9e5b608d1edb5b7a1be88499fe"
+  },
+  {
+   "path": "cells/k22_m3_sym_d11_g0.json",
+   "sha256": "00ff0e9a534fb0614624bcb6dc3910697b1d95cff6e0e4887f99cbbd8fa28d36"
+  },
+  {
+   "path": "cells/k22_m3_sym_d15_g0.json",
+   "sha256": "685ed9d2acea88701fe0b45824dc8f65dd9d2fc4843a84205dd6aa33647ca6b7"
+  },
+  {
+   "path": "cells/k22_m3_sym_d25_g0.json",
+   "sha256": "a0d5a1fd172df3a1348d6e71ece99181c1ccc40c6736065bc00fa9ac17757f82"
+  },
+  {
+   "path": "cells/k22_m3_sym_d31_g0.json",
+   "sha256": "d6dae6f81ada779af4865e6979e4e6eed98e375b88c89a496464427c63eef759"
+  },
+  {
+   "path": "cells/k22_m3_sym_d33_g0.json",
+   "sha256": "5ca376fb92c344a24e102fdf0eb0a378a34ed76c2d43132253a3c9a6514f258d"
+  },
+  {
+   "path": "cells/k22_m3_sym_d3_g0.json",
+   "sha256": "eea2c2a960e019ce67939e939bdbdab178c64a72b30d2ed3cef3c7fbc469922a"
+  },
+  {
+   "path": "cells/k22_m3_sym_d41_g0.json",
+   "sha256": "ccd17e82bd97c4724afc166b8fb66935377dbf3323bd32d7b06cdc9674707f00"
+  },
+  {
+   "path": "cells/k22_m3_sym_d55_g0.json",
+   "sha256": "10954e38f45bbccff40d6e0a885007277bfbe2b6cd4d81574ec9e49571e75309"
+  },
+  {
+   "path": "cells/k22_m3_sym_d5_g0.json",
+   "sha256": "8950a42c210c5415a9db19ff93a843372087beb4e38e082a4ad3c9470a269fdd"
+  },
+  {
+   "path": "cells/k24_m2_sym_d23_g0.json",
+   "sha256": "b2c77e063de2ef118a9d8bc5b0f34031a6eb890bacf0a4bfbe7db0dbfde16348"
+  },
+  {
+   "path": "cells/k24_m2_sym_d267_g0.json",
+   "sha256": "10545751a80238859d723e9375fbec3a1202cb974cd3bb4d9e0317bb5798d46c"
+  },
+  {
+   "path": "cells/k24_m2_sym_d3_g0.json",
+   "sha256": "2be13ab0659cd44e95dbb43ab0af6894f9e2f44da3a2a1c0284bae957f2b9df4"
+  },
+  {
+   "path": "cells/k24_m2_sym_d69_g0.json",
+   "sha256": "b3b4aba1078731502173eed65179a110805122e4f7d59439378bd6986110a83b"
+  },
+  {
+   "path": "cells/k24_m2_sym_d89_g0.json",
+   "sha256": "91fecc51943cdfca381b2593181c23f82bfaa981ce1dedcf7c8e1f075f43c1e2"
+  },
+  {
+   "path": "data/analysis.json",
+   "sha256": "a2bcf8bbcdcc096e308764765031aa219568127dba6ed0e994a56658e36086bb"
+  },
+  {
+   "path": "data/calib_sub_bits_t3.json",
+   "sha256": "62eac8fc1364afaf7e4b4869d165cf833e592b8b81ac85ab6d446374ea64ed3b"
+  },
+  {
+   "path": "data/calib_sub_bits_t4.json",
+   "sha256": "347314e66513ef3a33bff4fd0e62c8e4adc9df6438e4d82e276f014abbbffc6a"
+  },
+  {
+   "path": "data/calib_sub_bits_t5.json",
+   "sha256": "47c9ea91b6305cbcc59130ad62685daac7d3f52925158cda401b8d76c36e967e"
+  },
+  {
+   "path": "data/calib_tower_bits_t3.json",
+   "sha256": "8381b9e80326f5e16f7f189504c5f6c1b55da298e41a83f4b561c8eb21a76565"
+  },
+  {
+   "path": "data/calib_tower_bits_t4.json",
+   "sha256": "879b2c28d5ac74dcfad16108bfedebb9cb13e632f517a3d7ab13d79d1c1c9f9e"
+  },
+  {
+   "path": "data/calib_tower_bits_t5.json",
+   "sha256": "720634f497d4cd2d105f3a56a5fd1ef7467db1c66a109dde0c84bfe975305b28"
+  },
+  {
+   "path": "data/census.json",
+   "sha256": "fd213a53bb18738b08794fbebca5dc1eceece280cd1677cee5f0441975382e86"
+  },
+  {
+   "path": "data/exploratory_fits.json",
+   "sha256": "8bdd959eee06db61abbef2b930e06b4c8fdf4819f0e3f812af41b2d59a387b49"
+  },
+  {
+   "path": "data/frozen.sha256",
+   "sha256": "f20b4c211c8761e4feaee75d2c3f77e59774117613d0d1254294709e52a8e281"
+  },
+  {
+   "path": "data/run.log",
+   "sha256": "a93f0cd2ec9018067dca2cc74e8e504d536aec868d132074a9bfd963b1ca12c5"
+  },
+  {
+   "path": "data/tables.md",
+   "sha256": "58a9a4316686d58881d3dcd1e48c43eb01705e9ee72bef1d549523aa0d71c367"
+  }
+ ],
+ "headline": [
+  {
+   "name": "k20 m2 sym s (d>=9, 14 cells)",
+   "claimed": 2.77,
+   "recomputed": 2.7732,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k20 m2 sym lo95",
+   "claimed": 2.31,
+   "recomputed": 2.3129,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k20 m2 sym hi95",
+   "claimed": 3.23,
+   "recomputed": 3.2336,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k22 m2 sym s (9 cells)",
+   "claimed": 2.81,
+   "recomputed": 2.8064,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k22 m2 sym lo95",
+   "claimed": 1.81,
+   "recomputed": 1.8117,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k22 m2 sym hi95",
+   "claimed": 3.8,
+   "recomputed": 3.8012,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k24 m2 sym s (4 cells)",
+   "claimed": 2.57,
+   "recomputed": 2.5745,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k24 m2 sym lo95",
+   "claimed": 0.91,
+   "recomputed": 0.914,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k24 m2 sym hi95",
+   "claimed": 4.24,
+   "recomputed": 4.235,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k20 m2 plain s (6 cells)",
+   "claimed": 3.2,
+   "recomputed": 3.1958,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k20 m2 plain lo95",
+   "claimed": 1.67,
+   "recomputed": 1.6678,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k20 m2 plain hi95",
+   "claimed": 4.72,
+   "recomputed": 4.7237,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k20 m2 sym sensitivity s (16)",
+   "claimed": 2.8,
+   "recomputed": 2.7959,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k22 m2 sym sensitivity s (11)",
+   "claimed": 2.72,
+   "recomputed": 2.7197,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k24 m2 sym sensitivity s (5)",
+   "claimed": 2.43,
+   "recomputed": 2.4317,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k20 m2 plain sensitivity s (8)",
+   "claimed": 3.31,
+   "recomputed": 3.3087,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k20 m3 sym sensitivity s (6)",
+   "claimed": 6.44,
+   "recomputed": 6.4422,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k20 m3 sym sensitivity lo95",
+   "claimed": 3.49,
+   "recomputed": 3.4904,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k20 m3 sym sensitivity hi95",
+   "claimed": 9.39,
+   "recomputed": 9.3941,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k22 m3 sym sensitivity s (8)",
+   "claimed": 5.76,
+   "recomputed": 5.7626,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k22 m3 sym sensitivity lo95",
+   "claimed": 3.77,
+   "recomputed": 3.7734,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k22 m3 sym sensitivity hi95",
+   "claimed": 7.75,
+   "recomputed": 7.7519,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k20 m3 plain sensitivity s (5)",
+   "claimed": 6.48,
+   "recomputed": 6.4843,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k20 m3 span of d>=9 complete cells",
+   "claimed": 3.0,
+   "recomputed": 3.0,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k22 m3 span of d>=9 complete cells",
+   "claimed": 3.7,
+   "recomputed": 3.727273,
+   "rel_tol": 0.01,
+   "agrees": true
+  },
+  {
+   "name": "k20 m4 local slope 3->7",
+   "claimed": 4.81,
+   "recomputed": 4.812,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k20 m4 local slope 7->9",
+   "claimed": 34.4,
+   "recomputed": 34.403,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k20 m4 T(9)/T(3)",
+   "claimed": 340000.0,
+   "recomputed": 335579.064549,
+   "rel_tol": 0.02,
+   "agrees": true
+  },
+  {
+   "name": "k18 local slope 13->71",
+   "claimed": 2.19,
+   "recomputed": 2.187,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "k18 local slope 71->923",
+   "claimed": 3.91,
+   "recomputed": 3.913,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "m2 L1 k20 s",
+   "claimed": 2.2,
+   "recomputed": 2.1984,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "m2 L1 k22 s",
+   "claimed": 2.19,
+   "recomputed": 2.1862,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "m2 L1 k24 s",
+   "claimed": 2.21,
+   "recomputed": 2.2091,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "m2 L2 k20 s",
+   "claimed": 2.43,
+   "recomputed": 2.4329,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "m3 L1 k22 s",
+   "claimed": 4.95,
+   "recomputed": 4.9545,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "m3 L1 k20 s",
+   "claimed": 5.04,
+   "recomputed": 5.0446,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "plain-sym difference k20 m2",
+   "claimed": 0.43,
+   "recomputed": 0.4226,
+   "rel_tol": 0.02,
+   "agrees": true
+  },
+  {
+   "name": "calibration ratio t3",
+   "claimed": 3.39,
+   "recomputed": 3.39008,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "calibration ratio t4",
+   "claimed": 2.58,
+   "recomputed": 2.584757,
+   "rel_tol": 0.01,
+   "agrees": true
+  },
+  {
+   "name": "calibration ratio t5",
+   "claimed": 1.41,
+   "recomputed": 1.406218,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "E/(1.5 sqrt r) k20 m2 d3",
+   "claimed": 398000.0,
+   "recomputed": 397958.54,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "E/(1.5 sqrt r) k20 m2 d513",
+   "claimed": 14600000000.0,
+   "recomputed": 14562872223.85,
+   "rel_tol": 0.005,
+   "agrees": true
+  },
+  {
+   "name": "tower bits local slope t3->4 (|V|=2^t)",
+   "claimed": 5.5,
+   "recomputed": 5.539152,
+   "rel_tol": 0.02,
+   "agrees": true
+  },
+  {
+   "name": "tower bits local slope t4->5",
+   "claimed": 5.0,
+   "recomputed": 4.975385,
+   "rel_tol": 0.02,
+   "agrees": true
+  },
+  {
+   "name": "balanced total exponent m2 k20 2/(3-s)",
+   "claimed": 8.7,
+   "recomputed": 8.818342,
+   "rel_tol": 0.005,
+   "agrees": false,
+   "note": "README rounds s to 2.77 before dividing; unrounded value 8.82 (erratum E8)"
+  },
+  {
+   "name": "balanced total exponent m2 k22",
+   "claimed": 10.5,
+   "recomputed": 10.330579,
+   "rel_tol": 0.005,
+   "agrees": false,
+   "note": "unrounded 10.33 (erratum E8)"
+  },
+  {
+   "name": "balanced total exponent m2 k24",
+   "claimed": 4.7,
+   "recomputed": 4.700353,
+   "rel_tol": 0.01,
+   "agrees": true
+  },
+  {
+   "name": "balanced total exponent m4 local 4.81",
+   "claimed": 10.5,
+   "recomputed": 10.638298,
+   "rel_tol": 0.005,
+   "agrees": false,
+   "note": "unrounded 10.64 (erratum E8)"
+  }
+ ],
+ "checks": [
+  {
+   "id": "C1",
+   "requirement": "freeze order: protocol, runner, analyser and binary frozen before data; no frozen file changed after data",
+   "result": "pass",
+   "evidence": "data/frozen.sha256 recomputed: PROTOCOL.md 95ca6954..., scripts/run_grid.py 6dd4383b..., scripts/analyse.py 71542bfb..., binary dc2c30a4... all equal. git log origin/main..HEAD: the three frozen files and frozen.sha256 are touched only by 8d0388b10a (2026-11-08T23:50:48Z). Working-tree mtimes: PROTOCOL.md 23:32:52, run_grid.py 23:33:11, analyse.py 23:33:22, frozen.sha256 23:50:01, binary 23:39:58; first cell file (cells/k20_m2_sym_d3_g0.json) 23:50:48.71, i.e. the same second as the commit timestamp (commit order at sub-second resolution is not decidable; the file contents predate the data by ~17 min). All 73 cell files were added once and never modified (git name-status). analysis.json, exploratory_fits.json and tables.md regenerate byte-identically from the committed cells with the committed scripts.",
+   "notes": "Non-frozen scripts/tables.py was edited after data in 8c544a1829 (status label by censoring cause only, plus two new table rows); disclosed in docs/session-logs/2026-11-10.md but not in README (erratum E10)."
+  },
+  {
+   "id": "C2",
+   "requirement": "engine: system is the PKM power-map chain system with S_{m+1} written in e_1..e_m; chain correct for composite d",
+   "result": "pass (structure); paper text not checked",
+   "evidence": "src/cryptanalysis/ic_framework/subgroup_semaev.rs build_system: per summand y_{i,j}^{e_j} - y_{i,j+1}, y_{i,L-1}^{e_{L-1}} - 1, x_i = lo + g*y_{i,0}; zero set is y_{i,0} in mu_d (d points, radical since p does not divide d). factor_ascending gives primes with multiplicity, so L = Omega(d); levels, n_vars = mL (+m for sym) and input_degree match these formulas in all 70 cells with a recorded system. S_3 closed form, S_4 = Res of two S_3 (formula checked), S_5 = Res_U(S_4, S_3) by Sylvester 6x6 at formal degrees 4, 2. Interpolation on e^a with sum a_k <= 2^(m-1) is the exact span for a symmetric polynomial of degree 2^(m-1) in each variable; 12 check points. sym = plain + definitional generators e_k - sigma_k (same ideal after eliminating e). The PKM 2016 paper text was not available on this machine, so 'system (4)' is checked against PROTOCOL.md section 2 and the README's quotation, not the paper.",
+   "notes": "pkm_semaev.rs is unchanged on this branch (the dispatch's 'changes to pkm_semaev.rs' do not exist); the module doc names a 'Membership::Subgroup' variant that does not exist in pkm_semaev (doc wording only)."
+  },
+  {
+   "id": "C3",
+   "requirement": "unit tests show consistent iff target is a sum of m base points",
+   "result": "partial",
+   "evidence": "Tests read in subgroup_semaev.rs: consistency() asserts consistent <=> S_{m+1}(x, X) has a root in V^m (numeric brute force) and sums of base points => root, on p = 211 (d = 7, 15 at m = 2; d = 7 at m = 3), sym and plain. That is the protocol's gate (section 7), not 'consistent iff the target is a sum of m base points' (for m >= 3 a root can come from twist points, e.g. two twist points summing to the rational 2-torsion point). No m = 4 consistency test. The '6 passed' claim could not be re-run: no test binary of this module exists on the host (the only crypto_lib test binary was built from another tree and lists no subgroup_semaev tests) and building was not allowed; no test log is committed.",
+   "notes": "Substituted by C4 (independent brute force over every measured target)."
+  },
+  {
+   "id": "C4",
+   "requirement": "independent brute force of the consistency flag",
+   "result": "pass",
+   "evidence": "414/414 complete targets (k = 18, 20, 22, 24; all m, forms, cosets) agree with an independent root test: m = 2 by solving S_3(x1, X, z) = 0 for z and testing z in V; m = 3, 4 by enumerating all multisets of V and sign patterns with elliptic-curve arithmetic over F_{p^2} (twist points included), i.e. without any summation polynomial. 8 targets are consistent (k20 m2 d171: 1; d399: 1; d513: 2; k18 m2 d923: 4), 406 inconsistent; all match. Target abscissae: 415/415 regenerated from the seed rule (LCG, e = 1 + (st >> 11) mod (r - 1), X = x(eG)) match per_target.target_x.",
+   "notes": "verifier: scratchpad indep.py (not in repo), sha256 in validator_scripts"
+  },
+  {
+   "id": "C5",
+   "requirement": "census (|V|, columns, base points, covered) by independent arithmetic",
+   "result": "pass",
+   "evidence": "Curves recomputed with a quadratic-residue table point count: k20 p = 1,048,573 = largest prime < 2^20 with p = 5 mod 8, A = 926, A^2 - 4 non-square, #E = 1,049,624 = 8 * 131,203 (prime), twist 4 * 261,881 (prime), generator (349837, 122) = smallest u >= 2 of order r; same for k = 18 (A 78, r 32,887), 22 (A 43,186, r 524,731), 24 (A 318, r 2,097,349). Census: discrete logs of every signed base point in the cyclic group E(F_p) = Z/8r (Pohlig-Hellman + BSGS, each log re-checked by scalar multiplication), m-fold sumsets by FFT cyclic convolution, covered = nonzero sums with log = 0 mod 8. 39/39 census.json entries agree exactly (v_size, columns, base_points, covered m2, m3, m4), including cosets gidx 1, 2."
+  },
+  {
+   "id": "C6",
+   "requirement": "replay of measured cells with the frozen binary",
+   "result": "pass (56/70 cells)",
+   "evidence": "Frozen binary copied to scratchpad (sha256 dc2c30a4...7b05) and run with the runner's exact command line on every complete cell with T <= 5e8: 56/56 identical per target (target_x, field_ops, inconsistent, solving_degree_max, max_cols, max_rows) plus input_terms and sym_terms. Not replayed (cost): k20 m2 sym d399, d511, d513; k18 m2 d923; k20 m3 sym d21, d27; k20 m3 plain d21; k20 m4 d9; k22 m3 d15, d25, d31, d33, d41; and the 4 censored cells. The binary contains strings from the new module (e.g. 'curve25519_exponent_study_20261108', 'symmetrise: check point disagrees with the fit'); exact source-to-binary binding is not provable without a rebuild."
+  },
+  {
+   "id": "C7",
+   "requirement": "every fitted exponent and interval recomputed under the frozen rule",
+   "result": "pass",
+   "evidence": "Own OLS with Student-t quantiles from numerical integration (t_0.975,12 = 2.1788; the script's table agrees), T recomputed from per_target field_ops (equal to mean_field_ops in all cells). All README fits, intervals, sensitivity fits, local slopes and exploratory fixed-L fits agree to the printed precision (headline list). Censored cells are excluded; no complete cell follows a censored one in any chain; span gate uses d = |V| (v_size = d in all cells)."
+  },
+  {
+   "id": "C8",
+   "requirement": "censoring excluded and reported by cause",
+   "result": "pass",
+   "evidence": "k20_m3_sym_d57: time cap (1 target, 1,202,467 ms, degree 23, 777,369 x 798,826, 8.33e10 field ops, timed_out). k20_m4_sym_d19, k22_m3_sym_d55, k20_m3_plain_d27: exit -6 with stderr 'memory allocation of N bytes failed' under ulimit -v 3500000 (KiB of virtual address space = 3.58e9 bytes). tables.md labels all four by cause; README names three in prose and the plain d27 censoring via 'k = 20, m = 3, plain | 3 before censoring' (cause only in tables.md). No complete target exceeded 1200 s."
+  },
+  {
+   "id": "C9",
+   "requirement": "balanced-total derivation under the paper's model",
+   "result": "pass with numeric erratum",
+   "evidence": "Relation phase p^(1-(m-1)a+sa), LA p^(2a): balance a = 1/(m+1-s), total 2/(m+1-s); below 1/2 iff s < m-3; fixed-a thresholds (m=4, a=1/5: s<0.5; m=3, a=1/4: s<0) and the re-balanced m=4 threshold s<1 are correct; 's >= m-1 gives no total below p^1' is correct. Tabulated values are computed from rounded s (E8)."
+  },
+  {
+   "id": "C10",
+   "requirement": "chain-length confound",
+   "result": "confirmed (exploratory)",
+   "evidence": "OLS of ln T on ln d and L over all complete cells: k20 m2 sym slope 2.40 [2.21, 2.59], L coefficient 1.01 [0.71, 1.31]; k22 m2 2.22 [2.03, 2.41], L 1.29 [0.98, 1.60]; k24 m2 2.19 [2.02, 2.36], L 1.18 [0.65, 1.70]; k20 m3 sym 4.77 [3.35, 6.20], L 2.68 [1.23, 4.13]; k22 m3 4.98 [4.40, 5.55], L 3.84 [2.79, 4.89]. The L coefficient excludes 0 in every series, so the preregistered single-regressor slope mixes size with factorisation shape. The README discloses this and keeps the preregistered estimator as primary, which is correct; the joint fit lowers every exponent but leaves all far above the thresholds."
+  },
+  {
+   "id": "C11",
+   "requirement": "verdicts decided from the protocol text",
+   "result": "pass with one wording erratum (E9)",
+   "evidence": "lever m=4: undetermined (1 complete cell with d>=9; protocol: fewer cells -> 'undetermined'). lever m=3: undetermined (spans 3.0x, 3.7x < 4x under the frozen analyse.py gate). m=2 prediction 1.5 [1.0, 2.3]: failed (2.77 [2.31, 3.23], whole interval above 2.3; also k22 2.81, k24 2.57). m=3 prediction: undetermined. m=4 prediction 's >= 4.5 if measurable': s not measurable; only the parenthetical censoring expectation held (E9). plain vs sym < 0.5: held (0.42; 0.24 over the same d range 9..63). coset within 1.5x: held (max/min 1.000005). calibration within 5x: held (3.39, 2.58, 1.41); constant to 30%: failed. Note: the protocol sentence 'with at least 4 complete cells whose |V| spans at least 4x' can be read as gating on all complete cells; under that reading the d>=9 fits would be computed (k20 m3 5.56 [-8.75, 19.88]; k22 m3 4.51 [-1.27, 10.29]) and the m=3 lever would read 'not met' instead of 'undetermined'. The frozen analyse.py gates on the d>=9 cells, so the producer's reading is the preregistered one; no lever either way."
+  },
+  {
+   "id": "C12",
+   "requirement": "prior-studies comparison",
+   "result": "pass",
+   "evidence": "research/ic_exponent_20260926: nine Koblitz curves f2m19..f2m61, r 2^18..2^47.2, beta = 0.137 [-0.10, 0.37] (README lines 14-23). ic_m4_exponent_audit_20260928: f2m9..f2m19, F_2-subspace V, c = 0.985 [0.983, 1.018], 'Closed for this engine at these sizes' (RESULTS.md). ic_exponent_top_20260930: 'Withdrawn before anything ran'. ic_exponent_falsifiers_20261013: p = 946177, t = 8 Kummer tower, C4 exponent-sum test, m = 3 enumeration. ecdlp_exponent_assessment_20261018: only .artifacts.json and .gitignore in Git. All PRIOR_STUDIES.md rows agree; the file is correctly declared a post-data addendum."
+  },
+  {
+   "id": "C13",
+   "requirement": "pcc tagging (lint-prose)",
+   "result": "pass (mechanical); see E13",
+   "evidence": "python3 tools/pcc/pcc.py lint-prose README.md PRIOR_STUDIES.md data/tables.md docs/session-logs/2026-11-10.md: 0 findings. No pcc claim is registered; README says every number is an unverified assertion."
+  },
+  {
+   "id": "C14",
+   "requirement": "REPORT and figure consistent with README",
+   "result": "pass",
+   "evidence": "Every number in README.md occurs in REPORT.typ (the only extra numbers are typesetting sizes). exponent_fit.png: censored cells drawn as dotted lines, no fit line through m = 3 or 4, labels 'no preregistered fit'."
+  }
+ ],
+ "errata": [
+  {
+   "id": "E1",
+   "severity": "moderate",
+   "location": "README.md 'Answer' bullet 'Other readings' and section 5 rows 'lever at m = 3/4'",
+   "issue": "'Every other reading of the same cells puts s far above both thresholds' and the verdict row's 'lower bounds 3.49 and 3.77' imply that the data exclude a lever at m = 3. Only the sensitivity fits that include the boundary cells d < 9 have lower bounds above 0. The d >= 9 fits, computed despite the span gate, give k20 m3 5.56 [-8.75, 19.88] (4 cells) and k22 m3 4.51 [-1.27, 10.29] (6 cells). Both lower bounds are below the m = 3 threshold 0. At m = 4 the only three-cell fit is 9.86 [-59.9, 79.6].",
+   "fix": "Report these readings next to the sensitivity fits. Say that the point estimates and the upper bounds lie far above the thresholds, so no reading meets the lever rule. Also say that the d >= 9 cells alone do not exclude s < 0 at 95% at m = 3."
+  },
+  {
+   "id": "E2",
+   "severity": "moderate",
+   "location": "README.md 'Answer' first line ('No lever was found')",
+   "issue": "The headline gives no resource-limit caveat for m = 3 and m = 4. Those verdicts are 'undetermined' because the frozen limits (3.5 GB virtual memory via ulimit -v, 1200 s wall per target, shared 4-core host) censored the series before the required 4x span. The caveat appears only in section 9.",
+   "fix": "Write: 'No lever was found at m = 2. At m = 3 and m = 4 the frozen memory and time limits censored the series before the estimator could apply, so the verdict is undetermined. This is a resource limit, not evidence that no lever exists at larger |V|.'"
+  },
+  {
+   "id": "E3",
+   "severity": "low",
+   "location": "README.md section 1 'Unit tests' bullet",
+   "issue": "The consistency tests run on p = 211 (d = 7, 15 at m = 2 and d = 7 at m = 3), not on p = 1013. They assert 'consistent <=> S_{m+1} has a root in V^m' (and sum of base points => consistent). They do not assert 'consistent exactly when the target is a sum of m base points'; for m >= 3 twist points can give roots. There is no m = 4 consistency test, the test log is not committed, and the roots_of_unity_and_factors test is omitted from the list.",
+   "fix": "Correct the prime and the property, state that m = 4 consistency is untested, and commit the test output."
+  },
+  {
+   "id": "E4",
+   "severity": "moderate",
+   "location": "README.md section 3 'Comparison with the tower base (L10)'",
+   "issue": "L10 measured the isogeny factor base (its README title), but the 'G = 0 comparison' ran the bit-interval base, which is not L10's base. 's about 5' is two local slopes at |V| = 8 to 32 in tower-engine mul-adds; in this engine's field_ops the same base gives 5.15 and 4.10. It is compared against a fit over |V| = 9 to 513. The README also does not state that L10's per-target slope with guessing (about 1.5) is below the subgroup base's G = 0 slope (2.77; 2.20 at L = 1).",
+   "fix": "Name the base, |V| range and unit of each slope. State that at G = 0 the subgroup base is cheaper than the bit-interval base at equal |V| (e.g. |V| = 32 bits 1.79e8 vs d = 27 1.79e6 field ops). State that L10's guessing strategy on the isogeny base grows more slowly than the subgroup base at G = 0."
+  },
+  {
+   "id": "E5",
+   "severity": "low",
+   "location": "README.md section 8 'Distance to rho'",
+   "issue": "E = columns * r * T / covered is in f4_fp field_ops, but the reference 1.5 sqrt(r) counts group operations, while the text says the ratios are 'in field_ops units'. This mixes units, against AGENTS.md section 2 (convert with a recorded factor). The unpriced work is not listed (see E7).",
+   "fix": "Either convert rho to F_p multiplications with a stated or measured factor, or label the ratio 'field_ops per rho group operation'. List the unpriced counters."
+  },
+  {
+   "id": "E6",
+   "severity": "low",
+   "location": "README.md section 3, sentence 'For prime d the solving degree is d + 1'",
+   "issue": "This holds only for the sym form at m = 2 and m = 3. Exceptions: k20 m4 sym d3 (solving degree 8), and every prime-d plain cell: m = 2 d3/d7/d19 give 5/9/21, m = 3 d3/d7/d19 give 12/15/27.",
+   "fix": "Qualify the sentence: 'sym form, m = 2 and 3'."
+  },
+  {
+   "id": "E7",
+   "severity": "low",
+   "location": "README.md sections 3, 8 (and the '3.4e5-fold' sentence in Answer)",
+   "issue": "build_system calls symmetrise for every target, interpolating S~ at that target X by Gauss-Jordan elimination on a (n+12) x (n+1) matrix. n is 6, 35 and 495 monomials at m = 2, 3, 4, about 4.6e2, 3.1e4 and 6.2e7 multiplications by my count, none of it in field_ops. At m = 4 this exceeds T at d = 3 (4.2e5) and d = 7 (2.5e7); at m = 3 it exceeds T at d = 3 (1.9e4). T is F4-only by the protocol's definition, but the omitted work is unpriced and not listed.",
+   "fix": "List it as unpriced per-target system construction. It is constant in d and could be amortised to once per curve by interpolating in (e, X)."
+  },
+  {
+   "id": "E8",
+   "severity": "low",
+   "location": "README.md section 4 table",
+   "issue": "The balanced-total exponents are computed from s rounded to two decimals, which matters near the pole of 2/(m+1-s). Unrounded values: 8.82 (k20, s = 2.7732), 10.33 (k22, s = 2.8064), 4.70 (k24), 10.64 (m = 4 local slope 4.812). README gives 8.7, 10.5, 4.7, 10.5.",
+   "fix": "Use 8.8, 10.3, 4.7, 10.6 or state that the values come from the rounded s."
+  },
+  {
+   "id": "E9",
+   "severity": "low",
+   "location": "README.md section 5 row 'prediction m = 4'",
+   "issue": "'held: censored at d = 19' scores a prediction whose quantitative part ('s >= 4.5 if measurable') could not be tested, because no fit exists. Only the parenthetical expectation ('most likely capped beyond d = 9 or 21') held, and the censoring was out of memory, not a time cap.",
+   "fix": "Write 'undetermined for s (not measurable); the censoring expectation held (out of memory at d = 19)'."
+  },
+  {
+   "id": "E10",
+   "severity": "low",
+   "location": "README.md (protocol and resume paragraphs; Answer bullet 'Other readings')",
+   "issue": "(a) The non-frozen scripts/tables.py was edited after the data (8c544a1829: censoring label by cause). This is disclosed only in docs/session-logs/2026-11-10.md. (b) 'sensitivity fits that include d = 3 and 7' is wrong for k = 22, whose boundary cells are d = 3 and 5.",
+   "fix": "Add one sentence disclosing the tables.py change and its scope, and correct the boundary cells for k = 22."
+  },
+  {
+   "id": "E11",
+   "severity": "low",
+   "location": "README.md 'Resume after a container restart' and section 9",
+   "issue": "The censoring rule is wall-clock (monotonic) on a shared host, and the README records no host, nproc or concurrent load. Per the session log, the d = 27 rerun and the d = 57 censored target ran while another agent built ecbench on the same 4-core machine. d57 ran at 6.9e7 field ops/s against 2.9e8 for the d27 rerun, so its censoring may partly reflect host load. Wall-clock gaps also exist: k22_m3_sym_d55 was written 26.5 h after d41, and the original d27 attempt ran about 27 h without a cell file, against 1.5 h for the rerun. These fit a VM pause that the monotonic budget did not see, but this is not verifiable.",
+   "fix": "Record the host and concurrent load. State that d = 57 was censored by wall clock on a contended host, and that the original d = 27 attempt's elapsed real time is unexplained."
+  },
+  {
+   "id": "E12",
+   "severity": "low",
+   "location": "README.md 'Reproduce' and data/frozen.sha256",
+   "issue": "The frozen binary exists only at /home/user/ctarget-f1/release/curve25519_family, a target directory shared with another agent's builds. It is not in the artifact store. It was built from the tree at 8d0388b10a, before the merge 51b1ba83bc. 'cargo build' at HEAD gives a different binary, and the toolchain version is not recorded.",
+   "fix": "Push the binary to the artifact store (AGENTS.md section 13) under its sha256, pin the source commit 8d0388b10a and the rustc version in the README."
+  },
+  {
+   "id": "E13",
+   "severity": "low",
+   "location": "README.md sections 2 and 3",
+   "issue": "Some result sentences pass lint-prose without a tag: 'The census ... is exact', 'Almost every target lies outside the covered set, so almost every system is inconsistent', 'For prime d the solving degree is d + 1', and the table captions 'All values are measured'.",
+   "fix": "Tag them [pcc:unverified], or cite this validation as an unsigned independent check."
+  }
+ ],
+ "observations": [
+  "Protocol ambiguity (C11): the eligibility clause can be read as gating on all complete cells; the frozen analyse.py gates on the d >= 9 cells. The producer followed the frozen script.",
+  "Chain-length confound (C10) is real. A follow-up preregistration should fix L or regress on (ln |V|, L), and should name the lower envelope over factorisations (prime d is cheapest at equal |V|) as the quantity relevant to a lever.",
+  "Only 8 of 414 measured systems are consistent; at m = 3 the covered set is empty for d = 3 and 9 (k = 20) and d = 3 (k = 22), so those T values are pure refutation cost.",
+  "The m = 2 prediction failed under the preregistered estimator. The exploratory L = 1 fits (2.20, 2.19, 2.21) lie inside the predicted range 1.0 to 2.3, but a failed prediction stays failed.",
+  "Process items outside the scientific check: no bench.record/v1 record, run local rather than on the EKS route, no pcc claim. The README discloses the last; the first two are for the coordinator."
+ ],
+ "not_done": [
+  "Unit tests not re-run (no test binary of this module on the host; building was prohibited).",
+  "14 complete cells (T > 5e8) and the 4 censored cells not replayed.",
+  "PKM 2016 system (4) not compared against the paper text (paper not available locally); checked against PROTOCOL.md and the README quotation.",
+  "Source-to-binary binding not proven by rebuild."
+ ],
+ "validator_scripts": {
+  "note": "scratchpad, not in the repository; listed for provenance",
+  "fits.py": "ee8e240c6b1c7b9da647ec4ea6695c5324a8326720b82d7477902de5158e0385",
+  "indep.py": "876c98eb2d964955bd0cf2ebfb2e681eb84942fbd38377e68cebfed81a2e0473",
+  "replay.py": "9121bb3cce459454c9cc3f8cf97ef93ee3501c69d05c92f5775fa9684f4b2464",
+  "write_report.py": "a8494892c765058e77803f1553e592f915cdd252e1190e39661d672470735650"
+ }
+}
