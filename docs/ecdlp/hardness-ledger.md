@@ -57,12 +57,23 @@ still checks the proof.
 
 ## Layer 2 — generic-group lower bound
 
-Status: **assumed** (Shoup 1997, `Ω(√p)`).
+Status: **partially formal** — the counting core is machine-checked in
+`lean/Generic.lean`; the adversary/transcript model and the probability step
+remain assumptions (Shoup 1997, `Ω(√p)`).
 
 The lower bound is a statement about *algorithms that only use the group
 operation*. It does not apply to index calculus, pairings, or any attack that
 uses the curve's coordinate structure. Formalizing it needs an adversary model
-and probability theory; queued after Layer 1.
+and probability theory; the combinatorial half is now done.
+
+| Theorem | Statement |
+| --- | --- |
+| `collision_secret_unique` | For `bᵢ ≠ bⱼ` the equation `(aᵢ-aⱼ) + (bᵢ-bⱼ)·x = 0` has the unique solution `-(aᵢ-aⱼ)/(bᵢ-bⱼ)` |
+| `revealed_card_le` | With `k` known elements, at most `k(k-1)` secrets are revealed by some colliding pair |
+
+The remaining Layer 2 gap is the model: define the generic-group transcript,
+show that an algorithm without a revealing collision cannot distinguish
+secrets, and convert `k(k-1)/p` into a success-probability bound.
 
 ## Layer 3 — algorithm costs
 
@@ -76,7 +87,7 @@ and probability theory; queued after Layer 1.
 ## Layer 3b — algorithm correctness (formal)
 
 `lean/Algorithms.lean` (Mathlib project; the project gate reports
-`PASS 36 thm 0 trusted`) proves that the two standard generic reductions
+`PASS 41 thm 0 trusted`) proves that the two standard generic reductions
 return the right answer, without assuming anything about cost.
 
 | Theorem | Statement |
@@ -100,7 +111,7 @@ cost/probability model exists.
 
 ## Layer 3c — Pollard rho correctness (formal)
 
-`lean/Rho.lean` (`PASS 36 thm 0 trusted` for the whole project) proves the
+`lean/Rho.lean` (`PASS 41 thm 0 trusted` for the whole project) proves the
 deterministic part of the rho attack.
 
 | Theorem | Statement |
@@ -147,12 +158,15 @@ separately; a break here breaks deployments, not ECDLP.
    doubling) remains to be connected to the same interface.
 3. **Done:** BSGS and Pohlig–Hellman correctness in `Algorithms.lean`, and the
    deterministic part of Pollard rho in `Rho.lean` (Mathlib project,
-   `PASS 36 thm 0 trusted`): baby/giant match equivalence, existence, candidate
+   `PASS 41 thm 0 trusted`): baby/giant match equivalence, existence, candidate
    correctness, collision-free baby table, coprime CRT combination, PH
    subgroup order, projection and reconstruction; finite-orbit collision,
    Floyd meeting, collision relation and DLP recovery. Only the cost/success
    premises remain outside the kernel.
-4. **Generic-group lower bound** statement and adversary model.
+4. **Partially done (2a):** the Shoup counting core is formal in
+   `Generic.lean` (`collision_secret_unique`, `revealed_card_le`). Remaining:
+   the generic-group transcript/adversary model, the indistinguishability
+   lemma for secrets without a revealing collision, and the probability step.
 5. **Done (logic):** MOV reduction formal over a biadditive map with
    `e(a,a)` of full order. Remaining: construct the Weil pairing and prove
    non-degeneracy/embedding degree.
