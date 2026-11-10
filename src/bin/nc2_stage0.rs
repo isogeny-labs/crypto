@@ -71,10 +71,15 @@
 //! * Start `P_0`: uniform in `Z_r^(2+C)`; it is stored (set-up point, counted once in E_points).
 //! * Parent expansion: every parent `P_t` emits its children `P_t + J_h`, `P_t - J_h` for h = 1..m (order h ascending,
 //!   plus before minus), each stored and keyed. The next parent `P_{t+1} = P_t + J_{h_t}` is one of those children, so
-//!   a parent is stored once, as a child of its predecessor. The one child of `P_{t+1}` that equals `P_t` as a vector
-//!   (`P_{t+1} - J_{h_t}`) is a duplicate known by construction and is NOT emitted: from the second parent on, a parent
-//!   step adds `2m - 1` new stored points (the first adds 2m, plus the start point). E_points counts emitted points
-//!   (the engine's cost count); E_parents = parent expansions begun at stop / sqrt(r), set-up excluded.
+//!   a parent is stored once, as a child of its predecessor. Two children of `P_{t+1}` are copies of already stored
+//!   points by construction, independent of every scalar, and are NOT emitted: `P_{t+1} - J_{h_t} = P_t` and
+//!   `P_{t+1} - J_{h_{t-1}} = P_{t-1} + J_{h_t}` (the walk steps commute). So the first parent adds 2m points, the
+//!   second 2m - 1, later ones 2m - 2 (or 2m - 1 when `h_{t-1} = h_t`), about 2m - 2 + 1/m on average, plus the start
+//!   point. E_points counts emitted points (the engine's cost count); E_parents = parent expansions begun at stop /
+//!   sqrt(r), set-up excluded. AMENDMENT (before any reported number): the first commit of this header skipped only
+//!   the first copy; a unit test showed the second before the full runs, and the rule above replaces it. One n = 200
+//!   smoke run of the first version (one curve, C = 1, no table kept) was seen: m = 1, 2 censored at the cap, m = 4
+//!   about 3.9 x D0, m = 8 about 2.0 x D0, m = 16 about 1.6 x D0.
 //! * Any key collision among all stored points is a row, exactly as in the engine. Rank-K hit rate = share of samples
 //!   that reached rank K before the cap (censored samples are reported; a censored mean is a lower bound).
 //! * Samples: n = 2000 per curve, `(d, s1, s2)` uniform, the same held-out samples as NC-2 and `--chained`
@@ -248,6 +253,11 @@ struct Pt {
 /// (only the literal-hash control D0h reads it), `rank` the rank so far.
 trait Gen {
     fn next(&mut self, c_prev: u64, rank: usize) -> Pt;
+    /// Generator-specific counter read after the run (parent expansions for
+    /// `SibGen`; 0 elsewhere).
+    fn aux(&self) -> u64 {
+        0
+    }
 }
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -779,13 +789,26 @@ where
     F: Fn(&Sample) -> G + Sync,
     G: Gen,
 {
+    let raw: Vec<(u64, bool)> = evaluate_raw(r, c, samples, mk)
+        .into_iter()
+        .map(|x| (x.0, x.1))
+        .collect();
+    stat(&raw, r)
+}
+
+/// Per-sample `(points generated, reached rank K, Gen::aux)` in sample order.
+fn evaluate_raw<F, G>(r: u64, c: usize, samples: &[Sample], mk: F) -> Vec<(u64, bool, u64)>
+where
+    F: Fn(&Sample) -> G + Sync,
+    G: Gen,
+{
     let cap = (CAP_X * (r as f64).sqrt()) as u64;
     let threads = std::thread::available_parallelism()
         .map(|n| n.get())
         .unwrap_or(1)
         .min(samples.len().max(1));
     let chunk = samples.len().div_ceil(threads);
-    let mut all: Vec<(u64, bool)> = Vec::with_capacity(samples.len());
+    let mut all: Vec<(u64, bool, u64)> = Vec::with_capacity(samples.len());
     std::thread::scope(|sc| {
         let hs: Vec<_> = samples
             .chunks(chunk.max(1))
@@ -799,7 +822,7 @@ where
                             let mut g = mk(smp);
                             let o =
                                 run_sample(&mut g, r, c, smp.d, smp.s, cap, &mut map, &mut store);
-                            (o.points, o.done)
+                            (o.points, o.done, g.aux())
                         })
                         .collect::<Vec<_>>()
                 })
@@ -809,7 +832,7 @@ where
             all.extend(h.join().expect("worker"));
         }
     });
-    stat(&all, r)
+    all
 }
 
 fn eval_d0(r: u64, c: usize, samples: &[Sample], hashed: bool) -> Stat {
@@ -918,6 +941,128 @@ fn eval_chain(r: u64, samples: &[Sample], uniform_e: bool) -> Stat {
     })
 }
 
+// ------------------------------------------------------------ siblings
+
+/// `SB(m)`: stored-table walk whose every parent emits its 2m children
+/// `P +- J_h`; the walk continues from the child `P + J_{h_t}`.
+struct SibGen {
+    r: u64,
+    jumps: Vec<Vec4>,
+    parent: Vec4,
+    started: bool,
+    /// jump index of the step that produced the current parent (None for P_0).
+    prev_h: Option<usize>,
+    /// jump index of the step before that (None before the second step).
+    prev2_h: Option<usize>,
+    /// jump index of the step leaving the current parent.
+    next_h: usize,
+    /// position within the current batch, `0..2m` (even: plus, odd: minus).
+    pos: usize,
+    /// parent expansions begun so far.
+    parents: u64,
+    rng: Rng,
+}
+
+impl SibGen {
+    fn new(r: u64, jumps: Vec<Vec4>, start: Vec4, stream_seed: u64) -> Self {
+        let mut g = SibGen {
+            r,
+            jumps,
+            parent: start,
+            started: false,
+            prev_h: None,
+            prev2_h: None,
+            next_h: 0,
+            pos: 0,
+            parents: 0,
+            rng: Rng::new(stream_seed),
+        };
+        g.next_h = g.rng.below(g.jumps.len() as u64) as usize;
+        g
+    }
+    fn shifted(&self, h: usize, plus: bool) -> Vec4 {
+        let mut v = self.parent;
+        for i in 0..4 {
+            v[i] = if plus {
+                addmod(v[i], self.jumps[h][i], self.r)
+            } else {
+                submod(v[i], self.jumps[h][i], self.r)
+            };
+        }
+        v
+    }
+}
+
+impl Gen for SibGen {
+    fn next(&mut self, _c_prev: u64, _rank: usize) -> Pt {
+        if !self.started {
+            self.started = true;
+            return Pt {
+                v: self.parent,
+                store: true,
+            };
+        }
+        let m = self.jumps.len();
+        loop {
+            if self.parents == 0 || self.pos == 2 * m {
+                if self.parents > 0 {
+                    // advance the walk: the new parent is the child P + J_{h_t}
+                    let h = self.next_h;
+                    self.parent = self.shifted(h, true);
+                    self.prev2_h = self.prev_h;
+                    self.prev_h = Some(h);
+                    self.next_h = self.rng.below(m as u64) as usize;
+                }
+                self.pos = 0;
+                self.parents += 1;
+            }
+            let (h, plus) = (self.pos / 2, self.pos.is_multiple_of(2));
+            self.pos += 1;
+            // Two children of P_{t+1} are known copies of stored points, by
+            // construction and independent of the scalars:
+            //   P_{t+1} - J_{h_t}     = P_t,
+            //   P_{t+1} - J_{h_{t-1}} = P_{t-1} + J_{h_t}.
+            if !plus && (self.prev_h == Some(h) || self.prev2_h == Some(h)) {
+                continue;
+            }
+            return Pt {
+                v: self.shifted(h, plus),
+                store: true,
+            };
+        }
+    }
+    fn aux(&self) -> u64 {
+        self.parents
+    }
+}
+
+/// Per-sample design: start, then `m` jumps, all uniform; the stream seed.
+/// The start and the jump prefix do not depend on `m` (paired arms).
+fn sib_design(r: u64, c: usize, m: usize, design: u64) -> (Vec<Vec4>, Vec4, u64) {
+    let mut rng = Rng::new(design ^ 0x51B1_0006);
+    let draw = |rng: &mut Rng| {
+        let mut j = [0u64; 4];
+        for slot in j.iter_mut().take(2 + c) {
+            *slot = rng.below(r);
+        }
+        j
+    };
+    let start = draw(&mut rng);
+    let jumps = (0..m).map(|_| draw(&mut rng)).collect();
+    (jumps, start, mix(design ^ 0x51B1_0007))
+}
+
+/// `(E_points, E_parents)` of `SB(m)` over `samples`.
+fn eval_sib(r: u64, c: usize, samples: &[Sample], m: usize) -> (Stat, Stat) {
+    let raw = evaluate_raw(r, c, samples, |smp| {
+        let (jumps, start, seed) = sib_design(r, c, m, smp.design);
+        SibGen::new(r, jumps, start, seed)
+    });
+    let pts: Vec<(u64, bool)> = raw.iter().map(|x| (x.0, x.1)).collect();
+    let par: Vec<(u64, bool)> = raw.iter().map(|x| (x.2, x.1)).collect();
+    (stat(&pts, r), stat(&par, r))
+}
+
 /// Aggregate per-curve stats: mean of means, SE = sqrt(sum se^2) / m.
 fn aggregate(stats: &[Stat]) -> (f64, f64) {
     let m = stats.len() as f64;
@@ -977,6 +1122,7 @@ struct Args {
     restarts: usize,
     steps: usize,
     chained: bool,
+    siblings: Vec<usize>,
 }
 
 fn parse_args() -> Result<Args, String> {
@@ -991,6 +1137,7 @@ fn parse_args() -> Result<Args, String> {
         restarts: 8,
         steps: 40,
         chained: false,
+        siblings: Vec::new(),
     };
     let argv: Vec<String> = std::env::args().skip(1).collect();
     let mut i = 0;
@@ -1023,6 +1170,12 @@ fn parse_args() -> Result<Args, String> {
                     j.parse().map_err(|_| bad(key))?,
                 ));
             }
+            ("--siblings", Some(v)) => {
+                a.siblings = v
+                    .split(',')
+                    .map(|x| x.parse().map_err(|_| bad(key)))
+                    .collect::<Result<_, _>>()?
+            }
             ("--chained", _) => {
                 a.chained = true;
                 i += 1;
@@ -1039,6 +1192,9 @@ fn parse_args() -> Result<Args, String> {
     }
     if a.cs.iter().any(|&c| c > 2) {
         return Err("--c values are 0, 1 or 2".into());
+    }
+    if a.siblings.iter().any(|m| ![1, 2, 4, 8, 16].contains(m)) {
+        return Err("--siblings values are 1, 2, 4, 8 or 16".into());
     }
     Ok(a)
 }
@@ -1062,7 +1218,7 @@ fn main() {
         Ok(a) => a,
         Err(e) => {
             eprintln!("nc2_stage0: {e}");
-            eprintln!("usage: nc2_stage0 --r R1,R2 --c 1,2 [--n 2000] [--seed S] [--d1 x,jumps] [--no-d3] [--train 300] [--restarts 8] [--steps 40]");
+            eprintln!("usage: nc2_stage0 --r R1,R2 --c 1,2 [--n 2000] [--seed S] [--d1 x,jumps] [--no-d3] [--train 300] [--restarts 8] [--steps 40] [--chained] [--siblings m1,m2]");
             std::process::exit(2);
         }
     };
@@ -1080,6 +1236,10 @@ fn main() {
     );
     if args.chained {
         run_chained(&args);
+        return;
+    }
+    if !args.siblings.is_empty() {
+        run_siblings(&args);
         return;
     }
     let poisson = |c: usize| match c {
@@ -1175,6 +1335,71 @@ fn run_chained(args: &Args) {
     for (name, v) in ["CH ", "D0 ", "D0i", "CE "].iter().zip(agg.iter()) {
         let (m, se) = aggregate(v);
         println!("AGG {name} E = {m:.4} +- {se:.4}");
+    }
+}
+
+/// Sibling-points Stage 0: D0, D0i and `SB(m)` for each `--siblings` m, per
+/// `--r` and `--c`, plus per-C aggregates over the given curves.
+fn run_siblings(args: &Args) {
+    // aggregates keyed by (c, row name)
+    let mut agg: Vec<(usize, String, Vec<Stat>, Vec<Stat>)> = Vec::new();
+    let mut push = |c: usize, name: String, p: Stat, q: Option<Stat>| {
+        let slot = agg.iter().position(|a| a.0 == c && a.1 == name);
+        let i = slot.unwrap_or_else(|| {
+            agg.push((c, name.clone(), Vec::new(), Vec::new()));
+            agg.len() - 1
+        });
+        agg[i].2.push(p);
+        if let Some(q) = q {
+            agg[i].3.push(q);
+        }
+    };
+    for &r in &args.rs {
+        for &c in &args.cs {
+            let held = make_samples(r, args.seed ^ 0xAAAA_0001, args.n);
+            println!(
+                "\n## r={r} C={c} (K={}, sqrt(r)={:.1})",
+                c + 1,
+                (r as f64).sqrt()
+            );
+            let d0 = eval_d0(r, c, &held, false);
+            println!("D0  E_points = {}", fmt(&d0));
+            push(c, "D0".into(), d0, None);
+            let d0i = eval_d0i(r, c, &held);
+            println!("D0i E_points = {}", fmt(&d0i));
+            push(c, "D0i".into(), d0i, None);
+            for &m in &args.siblings {
+                let (p, q) = eval_sib(r, c, &held, m);
+                println!(
+                    "SB m={m:<2} E_points = {}  E_parents = {:.4} +- {:.4}  rank-K hit = {:.4}  E_points/D0 = {:.4}",
+                    fmt(&p),
+                    q.mean,
+                    q.se,
+                    1.0 - p.censored as f64 / p.n as f64,
+                    p.mean / d0.mean
+                );
+                push(c, format!("SB m={m}"), p, Some(q));
+            }
+        }
+    }
+    println!(
+        "\n## aggregate over {} curves (mean of means, SE = sqrt(sum se^2)/m)",
+        args.rs.len()
+    );
+    for (c, name, ps, qs) in &agg {
+        let (m, se) = aggregate(ps);
+        let cens: usize = ps.iter().map(|s| s.censored).sum();
+        let n: usize = ps.iter().map(|s| s.n).sum();
+        let par = if qs.is_empty() {
+            String::new()
+        } else {
+            let (pm, pse) = aggregate(qs);
+            format!("  E_parents = {pm:.4} +- {pse:.4}")
+        };
+        println!(
+            "AGG C={c} {name:<8} E_points = {m:.4} +- {se:.4}{par}  hit = {:.4}",
+            1.0 - cens as f64 / n as f64
+        );
     }
 }
 
@@ -1407,5 +1632,90 @@ mod tests {
         let b = eval_chain(r, &samples, false);
         assert_eq!(a.mean, b.mean);
         assert!(a.mean > 0.5 && a.mean < 10.5);
+    }
+
+    /// Replay `SibGen` and check the point sequence against a direct model.
+    #[test]
+    fn sibling_sequence_matches_model() {
+        let r = R;
+        let m = 3usize;
+        let (jumps, start, seed) = sib_design(r, 2, m, 99);
+        let mut g = SibGen::new(r, jumps.clone(), start, seed);
+        let mut rng = Rng::new(seed);
+        let add = |a: Vec4, b: Vec4, plus: bool| {
+            let mut v = a;
+            for i in 0..4 {
+                v[i] = if plus {
+                    addmod(a[i], b[i], r)
+                } else {
+                    submod(a[i], b[i], r)
+                };
+            }
+            v
+        };
+        assert_eq!(g.next(0, 0).v, start);
+        let mut parent = start;
+        let (mut prev, mut prev2): (Option<usize>, Option<usize>) = (None, None);
+        for t in 0..40u64 {
+            let ht = rng.below(m as u64) as usize;
+            for h in 0..m {
+                for plus in [true, false] {
+                    if !plus && (prev == Some(h) || prev2 == Some(h)) {
+                        continue;
+                    }
+                    assert_eq!(g.next(0, 0).v, add(parent, jumps[h], plus));
+                }
+            }
+            assert_eq!(g.aux(), t + 1);
+            parent = add(parent, jumps[ht], true);
+            prev2 = prev;
+            prev = Some(ht);
+        }
+    }
+
+    #[test]
+    fn sibling_points_are_distinct_vectors() {
+        // generic jumps: no emitted point repeats a vector
+        let r = 2_097_349u64;
+        let (jumps, start, seed) = sib_design(r, 2, 4, 5);
+        let mut g = SibGen::new(r, jumps, start, seed);
+        let mut seen = std::collections::HashSet::new();
+        for _ in 0..2000 {
+            assert!(seen.insert(g.next(0, 0).v));
+        }
+    }
+
+    #[test]
+    fn sibling_m16_run_is_deterministic_and_paired() {
+        let r = 131_203u64;
+        let samples = make_samples(r, 13, 60);
+        let (a, ap) = eval_sib(r, 2, &samples, 16);
+        let (b, _) = eval_sib(r, 2, &samples, 16);
+        assert_eq!(a.mean, b.mean);
+        assert!(a.mean > 0.5 && a.mean < 10.5);
+        // E_points is about 2m - 2 + 1/m times E_parents (set-up excluded)
+        assert!(a.mean / ap.mean > 25.0 && a.mean / ap.mean < 36.0);
+        // start and jump prefix do not depend on m
+        let (j4, s4, _) = sib_design(r, 2, 4, 7);
+        let (j8, s8, _) = sib_design(r, 2, 8, 7);
+        assert_eq!(s4, s8);
+        assert_eq!(&j8[..4], &j4[..]);
+    }
+
+    #[test]
+    fn siblings_flag_parses_and_evaluate_is_unchanged() {
+        // evaluate == stat(evaluate_raw)
+        let r = 131_203u64;
+        let samples = make_samples(r, 3, 40);
+        let a = eval_d0i(r, 1, &samples);
+        let raw: Vec<(u64, bool)> = evaluate_raw(r, 1, &samples, |smp| IidGen {
+            r,
+            c: 1,
+            rng: Rng::new(smp.design),
+        })
+        .into_iter()
+        .map(|x| (x.0, x.1))
+        .collect();
+        assert_eq!(a.mean, stat(&raw, r).mean);
     }
 }
