@@ -2627,6 +2627,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
             ("seed", "seed of the jump and step stream, mixed with the two seeds' keys (default 0)"),
             ("tw", "1 (needs g=1, grow=2 and a one-seed base): the target inside the walk, jumps [α]P1 + [γ]G + [β]Q, every collision a row du·s1 + db·log Q = −dz, stop at the first two independent rows, cap 3T (default 0)"),
             ("cj", "1 (needs tw=1): build the jumps by chained additions from two base combinations [γ]G + [β]Q instead of independent scalar multiplications (default 0)"),
+            ("cv", "0 (needs tw=1): do not recompute the two entries of a key collision; the key is the exact abscissa, the stored sign bit gives E_t = ±E_s, and the final [d]G = Q check (charged) fails the solve on a wrong row (default 1)"),
         ]
     }
 
@@ -2666,11 +2667,15 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
         if cj && !tw {
             return Err("wwalk: cj=1 needs tw=1".into());
         }
+        let cv = wwalk_cv(params)?;
+        if !cv && !tw {
+            return Err("wwalk: cv=0 needs tw=1".into());
+        }
         if tw {
             if !opts.g_jumps || grow != 2 {
                 return Err("wwalk: tw=1 needs g=1 and grow=2".into());
             }
-            let walk = TargetWalk::build(
+            let walk = TargetWalk::build_cv(
                 ctx.group,
                 ctx.generator,
                 ctx.target,
@@ -2680,6 +2685,7 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
                 jumps,
                 cj,
                 seed,
+                cv,
             )?;
             self.free_pending = true;
             self.free_checked = walk.collisions.len() as u64;
@@ -2810,6 +2816,16 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
             m.extend(walk.breakdown_counters());
         }
         m
+    }
+}
+
+/// `wwalk`'s `cv` parameter: absent or `1` recomputes every key collision
+/// (the committed walk), `0` does not.
+pub fn wwalk_cv(params: &Params) -> Result<bool, String> {
+    match params.get("cv") {
+        None | Some("1") => Ok(true),
+        Some("0") => Ok(false),
+        Some(v) => Err(format!("wwalk: cv is 0 or 1, not `{v}`")),
     }
 }
 
