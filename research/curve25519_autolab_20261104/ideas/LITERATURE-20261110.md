@@ -8,7 +8,7 @@ own arithmetic (labelled), not a pcc-ledger claim.
 
 ## 0. Bottom line (two separate answers)
 
-(a) Anything sub-sqrt(r) per single target, no precomputation, no multi-target
+(a) Anything sub-sqrt(r) per single target, no precomputation, no multi-target [pcc:unverified]
 amortisation, on a prime-field curve: NOTHING FOUND. The generic lower bound
 (Shoup/Nechaev, restated in Bernstein-Lange p.4, which I read) makes it impossible for
 any algorithm that does not use curve structure. The non-generic candidates found
@@ -39,7 +39,7 @@ arithmetic and NOT published: 1.205/sqrt(2) = 0.852 [pcc:unverified]. This is th
 one lead the Coordinator should have read in full before concluding anything about
 (b).
 
-Searches were web-search based (not an exhaustive database sweep), so "nothing found"
+Searches were web-search based (not an exhaustive database sweep), so "nothing found" [pcc:unverified]
 means "nothing surfaced in about 35 queries/fetches", not "proved absent".
 
 ## 1. Source-access ledger (be honest about what was opened)
@@ -70,7 +70,7 @@ OPENED (abstract / landing page only, via fetch tool summary):
 - ePrint 2015/605 (Galbraith-Wang-Zhang): abstract only; PDF returned 403.
 - arXiv 2310.04132 abstract page.
 
-SEARCH SNIPPETS ONLY (not opened; treat as secondary):
+SEARCH SNIPPETS ONLY (not opened; treat as secondary): [pcc:unverified]
 - Huang-Kosters-Yeo ePrint 2015/573 (CRYPTO 2015) and Huang-Kosters-Yang-Yeo
   arXiv 1505.02532; Kosters-Yeo arXiv 1503.08001; Kousidis-Wiemers ePrint 2015/1121;
   arXiv 1906.05594 (first fall degree m^2 - m).
@@ -115,7 +115,7 @@ precomputation-based, excluded by the question's own condition.
 
 ### 2.2 Semaev summation polynomials over prime fields, decomposition test
 
-- Semaev 2004 (ePrint 2004/031, snippet): introduced summation polynomials;
+- Semaev 2004 (ePrint 2004/031, snippet): introduced summation polynomials; [pcc:unverified]
   Petit-Kosters-Messeng (read, p.2): "Semaev did not provide an algorithm to compute
   relations".
 - Petit-Kosters-Messeng 2016 (read pp.1-3): factor bases F = {(x,y) : L(x)=0} with L
@@ -182,7 +182,7 @@ a competitive total cost over F_p was found.
 
 ### 2.5 2023-2026 preprints claiming prime-field EC index-calculus gains
 
-- Abdullah-Mahalanobis arXiv 2310.04132 (2023): see 2.1; unclear, not shown
+- Abdullah-Mahalanobis arXiv 2310.04132 (2023): see 2.1; unclear, not shown [pcc:unverified]
   peer reviewed by my evidence, no independent confirmation or rebuttal found; the
   paper's own text concedes the naive relation search is worse than exhaustive
   search. Group sizes were not stated in the pages I read.
