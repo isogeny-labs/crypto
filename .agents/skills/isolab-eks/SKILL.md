@@ -86,7 +86,13 @@ non-secret environment, receipt directory and timeout before delegation. Follow
    general-purpose and memory families. The desired ordinary ceiling is 16 vCPUs /
    128 GiB; L2 is 8 vCPUs / 32 GiB (24 vCPUs / 160 GiB combined). Verify actual
    NodePool limits and the namespace quota; the MCP overview's compiled-in
-   numbers are not a live readback. Follow
+   numbers are not a live readback. Run the read-only
+   `scripts/isolab_pool_check.sh --cpu N --memory M [--pool cpu-spot] --save <receipt>/pool.json`:
+   it counts every pod on the pool's nodes and every pod pending for the pool,
+   in all namespaces, against node allocatable, the NodePool limit and the
+   quota, and names the jobs in the way (exit 10). A check that reads only this
+   study's own Jobs by name is blind to other tenants (2026-11-10: 38 min
+   pending). Follow
    [COST_CONTROLS.md](../../../taskq/deploy/eks-karpenter/COST_CONTROLS.md).
    Commit and push source, protocol and launch configuration before builds or
    trials; run `check-experiment-git` as documented there and retain its receipt.

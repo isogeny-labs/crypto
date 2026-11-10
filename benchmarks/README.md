@@ -7,6 +7,8 @@ raw records, sources and inputs and is the source of truth; the files here
 are copies for browsing (AGENTS.md "Performance results also land in
 `benchmarks/`"). Not to be confused with `benches/` (Cargo bench sources).
 
+Infrastructure losses (killed, preempted, unlaunched runs) are counted by cause in [`losses/`](losses/); see [`docs/infra-loss-ledger.md`](../docs/infra-loss-ledger.md).
+
 **Validation gate (owner, 2026-10-19).** A row is listed here only with a replay
 certificate, a validator report and a matched rho reference named by its
 directory's `VALIDATION.json` (AGENTS.md, "Validation gate";

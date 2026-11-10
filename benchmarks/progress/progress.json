@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261110T0409Z-c25519-autolab-round-037",
+  "latest_record": "20261110T0551Z-m4gb-arith-kernels-ab",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 80,
+    "measured": 85,
     "open": 3
   },
   "repo": "crypto",
@@ -421,6 +421,224 @@
     },
     {
       "better": "lower",
+      "first": 1.875,
+      "latest": 1.866,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.48,
+        "improvement_vs_previous_percent": 0.48,
+        "value_over_reference": 1.217221
+      },
+      "metric": "cost_twcj_cv0",
+      "points": [
+        {
+          "commit": "545749ac7d08",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.207341
+          },
+          "n": 512,
+          "record": "20261110T0357Z-curve25519-engine-items-k20",
+          "reference": 1.553,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=20: wwalk cv=0 costs 0.879x [0.876,0.882] the target-in-walk arm (exactly the verification ledger); chained rho set-up costs 1.53x rho-neg (dependent jumps lengthen the walk), rejected as reference",
+          "value": 1.875
+        },
+        {
+          "commit": "9a5121756066",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.48,
+            "improvement_vs_previous_percent": 0.48,
+            "value_over_reference": 1.217221
+          },
+          "n": 512,
+          "record": "20261110T0542Z-curve25519-engine-items-a1-k20",
+          "reference": 1.533,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=20, Addendum 1 (E1 fix: cv=0 sign bit in the table entry, no second map): twcj-cv0/twcj 0.879 [0.876,0.881] at w=0 and 0.927 [0.925,0.929] at w=1 priced; A1-A4 pass; distance twcj-cv0/rho-neg 1.217 [1.166,1.271] at w=0",
+          "value": 1.866
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k20",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.532,
+      "latest": 1.532,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_chained_over_rhoneg_w0",
+      "points": [
+        {
+          "commit": "545749ac7d08",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261110T0357Z-curve25519-engine-items-k20",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            1.402,
+            1.673
+          ],
+          "summary": "k=20: wwalk cv=0 costs 0.879x [0.876,0.882] the target-in-walk arm (exactly the verification ledger); chained rho set-up costs 1.53x rho-neg (dependent jumps lengthen the walk), rejected as reference",
+          "value": 1.532
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k20",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.207,
+      "latest": 1.217,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.8285,
+        "improvement_vs_previous_percent": -0.8285,
+        "value_over_reference": 1.217
+      },
+      "metric": "ratio_cv0_over_rhoneg_w0",
+      "points": [
+        {
+          "commit": "545749ac7d08",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.207
+          },
+          "n": 8,
+          "record": "20261110T0357Z-curve25519-engine-items-k20",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            1.172,
+            1.243
+          ],
+          "summary": "k=20: wwalk cv=0 costs 0.879x [0.876,0.882] the target-in-walk arm (exactly the verification ledger); chained rho set-up costs 1.53x rho-neg (dependent jumps lengthen the walk), rejected as reference",
+          "value": 1.207
+        },
+        {
+          "commit": "9a5121756066",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": -0.8285,
+            "improvement_vs_previous_percent": -0.8285,
+            "value_over_reference": 1.217
+          },
+          "n": 8,
+          "record": "20261110T0542Z-curve25519-engine-items-a1-k20",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            1.166,
+            1.271
+          ],
+          "summary": "k=20, Addendum 1 (E1 fix: cv=0 sign bit in the table entry, no second map): twcj-cv0/twcj 0.879 [0.876,0.881] at w=0 and 0.927 [0.925,0.929] at w=1 priced; A1-A4 pass; distance twcj-cv0/rho-neg 1.217 [1.166,1.271] at w=0",
+          "value": 1.217
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k20",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.879,
+      "latest": 0.879,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_cv0_over_twcj_w0_priced",
+      "points": [
+        {
+          "commit": "9a5121756066",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261110T0542Z-curve25519-engine-items-a1-k20",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.876,
+            0.881
+          ],
+          "summary": "k=20, Addendum 1 (E1 fix: cv=0 sign bit in the table entry, no second map): twcj-cv0/twcj 0.879 [0.876,0.881] at w=0 and 0.927 [0.925,0.929] at w=1 priced; A1-A4 pass; distance twcj-cv0/rho-neg 1.217 [1.166,1.271] at w=0",
+          "value": 0.879
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k20",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.879,
+      "latest": 0.879,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_cv0_over_twcj_w0",
+      "points": [
+        {
+          "commit": "545749ac7d08",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261110T0357Z-curve25519-engine-items-k20",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.876,
+            0.882
+          ],
+          "summary": "k=20: wwalk cv=0 costs 0.879x [0.876,0.882] the target-in-walk arm (exactly the verification ledger); chained rho set-up costs 1.53x rho-neg (dependent jumps lengthen the walk), rejected as reference",
+          "value": 0.879
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k20",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.927,
+      "latest": 0.927,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_cv0_over_twcj_w1_priced",
+      "points": [
+        {
+          "commit": "9a5121756066",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261110T0542Z-curve25519-engine-items-a1-k20",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.925,
+            0.929
+          ],
+          "summary": "k=20, Addendum 1 (E1 fix: cv=0 sign bit in the table entry, no second map): twcj-cv0/twcj 0.879 [0.876,0.881] at w=0 and 0.927 [0.925,0.929] at w=1 priced; A1-A4 pass; distance twcj-cv0/rho-neg 1.217 [1.166,1.271] at w=0",
+          "value": 0.927
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k20",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
       "first": 1.3581,
       "latest": 1.3581,
       "latest_derived": {
@@ -539,6 +757,224 @@
       ],
       "problem": "ecdlp:curve25519-family-k20",
       "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.512,
+      "latest": 1.515,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.1984,
+        "improvement_vs_previous_percent": -0.1984,
+        "value_over_reference": 1.259352
+      },
+      "metric": "cost_twcj_cv0",
+      "points": [
+        {
+          "commit": "545749ac7d08",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.247525
+          },
+          "n": 512,
+          "record": "20261110T0357Z-curve25519-engine-items-k24",
+          "reference": 1.212,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=24: wwalk cv=0 costs 0.949x [0.948,0.951] the target-in-walk arm (exactly the verification ledger); chained rho set-up costs 2.74x rho-neg (dependent jumps lengthen the walk), rejected as reference",
+          "value": 1.512
+        },
+        {
+          "commit": "9a5121756066",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": -0.1984,
+            "improvement_vs_previous_percent": -0.1984,
+            "value_over_reference": 1.259352
+          },
+          "n": 512,
+          "record": "20261110T0542Z-curve25519-engine-items-a1-k24",
+          "reference": 1.203,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "k=24, Addendum 1 (E1 fix: cv=0 sign bit in the table entry, no second map): twcj-cv0/twcj 0.950 [0.948,0.951] at w=0 and 0.973 [0.972,0.974] at w=1 priced; A2, A4 pass; distance twcj-cv0/rho-neg 1.259 [1.187,1.336] at w=0",
+          "value": 1.515
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k24",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 2.738,
+      "latest": 2.738,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_chained_over_rhoneg_w0",
+      "points": [
+        {
+          "commit": "545749ac7d08",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261110T0357Z-curve25519-engine-items-k24",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.583,
+            2.903
+          ],
+          "summary": "k=24: wwalk cv=0 costs 0.949x [0.948,0.951] the target-in-walk arm (exactly the verification ledger); chained rho set-up costs 2.74x rho-neg (dependent jumps lengthen the walk), rejected as reference",
+          "value": 2.738
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k24",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 1.248,
+      "latest": 1.259,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.8814,
+        "improvement_vs_previous_percent": -0.8814,
+        "value_over_reference": 1.259
+      },
+      "metric": "ratio_cv0_over_rhoneg_w0",
+      "points": [
+        {
+          "commit": "545749ac7d08",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.248
+          },
+          "n": 8,
+          "record": "20261110T0357Z-curve25519-engine-items-k24",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            1.179,
+            1.32
+          ],
+          "summary": "k=24: wwalk cv=0 costs 0.949x [0.948,0.951] the target-in-walk arm (exactly the verification ledger); chained rho set-up costs 2.74x rho-neg (dependent jumps lengthen the walk), rejected as reference",
+          "value": 1.248
+        },
+        {
+          "commit": "9a5121756066",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": -0.8814,
+            "improvement_vs_previous_percent": -0.8814,
+            "value_over_reference": 1.259
+          },
+          "n": 8,
+          "record": "20261110T0542Z-curve25519-engine-items-a1-k24",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            1.187,
+            1.336
+          ],
+          "summary": "k=24, Addendum 1 (E1 fix: cv=0 sign bit in the table entry, no second map): twcj-cv0/twcj 0.950 [0.948,0.951] at w=0 and 0.973 [0.972,0.974] at w=1 priced; A2, A4 pass; distance twcj-cv0/rho-neg 1.259 [1.187,1.336] at w=0",
+          "value": 1.259
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k24",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.95,
+      "latest": 0.95,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_cv0_over_twcj_w0_priced",
+      "points": [
+        {
+          "commit": "9a5121756066",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261110T0542Z-curve25519-engine-items-a1-k24",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.948,
+            0.951
+          ],
+          "summary": "k=24, Addendum 1 (E1 fix: cv=0 sign bit in the table entry, no second map): twcj-cv0/twcj 0.950 [0.948,0.951] at w=0 and 0.973 [0.972,0.974] at w=1 priced; A2, A4 pass; distance twcj-cv0/rho-neg 1.259 [1.187,1.336] at w=0",
+          "value": 0.95
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k24",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.9494,
+      "latest": 0.9494,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_cv0_over_twcj_w0",
+      "points": [
+        {
+          "commit": "545749ac7d08",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261110T0357Z-curve25519-engine-items-k24",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.948,
+            0.951
+          ],
+          "summary": "k=24: wwalk cv=0 costs 0.949x [0.948,0.951] the target-in-walk arm (exactly the verification ledger); chained rho set-up costs 2.74x rho-neg (dependent jumps lengthen the walk), rejected as reference",
+          "value": 0.9494
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k24",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.973,
+      "latest": 0.973,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "ratio_cv0_over_twcj_w1_priced",
+      "points": [
+        {
+          "commit": "9a5121756066",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 8,
+          "record": "20261110T0542Z-curve25519-engine-items-a1-k24",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.972,
+            0.974
+          ],
+          "summary": "k=24, Addendum 1 (E1 fix: cv=0 sign bit in the table entry, no second map): twcj-cv0/twcj 0.950 [0.948,0.951] at w=0 and 0.973 [0.972,0.974] at w=1 priced; A2, A4 pass; distance twcj-cv0/rho-neg 1.259 [1.187,1.336] at w=0",
+          "value": 0.973
+        }
+      ],
+      "problem": "ecdlp:curve25519-family-k24",
+      "unit": "ratio"
     },
     {
       "better": "lower",
@@ -4464,6 +4900,183 @@
       ],
       "problem": "kernel:inherited_f4_solve_tree",
       "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 8.236,
+      "latest": 8.236,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "bool-root1-n35-wall",
+      "points": [
+        {
+          "commit": "0dde008ecb97",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261110T0551Z-m4gb-arith-kernels-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            7.759,
+            8.624
+          ],
+          "summary": "M4GB patch 0001 (arithmetic GF(p) dense kernels): 3.4-4.1x on random dense GF(31) n=12..16 and 1.6-2.0x on GF(65521), identical bases; patch 0002: 1.26x on wd_n16 under a 64-variable binary and clean output; GF(2) under exact-width binaries unchanged; wide-binary cells censored (cgroup OOM at ~7 GB). Local container, one thread, interleaved; unverified.",
+          "value": 8.236
+        }
+      ],
+      "problem": "kernel:m4gb_gf_p_addmul",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.294,
+      "latest": 0.294,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "gf31-n14-wall",
+      "points": [
+        {
+          "commit": "0dde008ecb97",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261110T0551Z-m4gb-arith-kernels-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.275,
+            0.3
+          ],
+          "summary": "M4GB patch 0001 (arithmetic GF(p) dense kernels): 3.4-4.1x on random dense GF(31) n=12..16 and 1.6-2.0x on GF(65521), identical bases; patch 0002: 1.26x on wd_n16 under a 64-variable binary and clean output; GF(2) under exact-width binaries unchanged; wide-binary cells censored (cgroup OOM at ~7 GB). Local container, one thread, interleaved; unverified.",
+          "value": 0.294
+        }
+      ],
+      "problem": "kernel:m4gb_gf_p_addmul",
+      "unit": "wall_s"
+    },
+    {
+      "better": "higher",
+      "first": 3.4,
+      "latest": 3.4,
+      "latest_derived": {
+        "improvement_vs_first_percent": -0.0
+      },
+      "metric": "gf31-n16-speedup",
+      "points": [
+        {
+          "commit": "0dde008ecb97",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": -0.0
+          },
+          "n": 3,
+          "record": "20261110T0551Z-m4gb-arith-kernels-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": null,
+          "summary": "M4GB patch 0001 (arithmetic GF(p) dense kernels): 3.4-4.1x on random dense GF(31) n=12..16 and 1.6-2.0x on GF(65521), identical bases; patch 0002: 1.26x on wd_n16 under a 64-variable binary and clean output; GF(2) under exact-width binaries unchanged; wide-binary cells censored (cgroup OOM at ~7 GB). Local container, one thread, interleaved; unverified.",
+          "value": 3.4
+        }
+      ],
+      "problem": "kernel:m4gb_gf_p_addmul",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 2.116,
+      "latest": 2.116,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "gf31-n16-wall",
+      "points": [
+        {
+          "commit": "0dde008ecb97",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261110T0551Z-m4gb-arith-kernels-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            2.046,
+            2.201
+          ],
+          "summary": "M4GB patch 0001 (arithmetic GF(p) dense kernels): 3.4-4.1x on random dense GF(31) n=12..16 and 1.6-2.0x on GF(65521), identical bases; patch 0002: 1.26x on wd_n16 under a 64-variable binary and clean output; GF(2) under exact-width binaries unchanged; wide-binary cells censored (cgroup OOM at ~7 GB). Local container, one thread, interleaved; unverified.",
+          "value": 2.116
+        }
+      ],
+      "problem": "kernel:m4gb_gf_p_addmul",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 3.749,
+      "latest": 3.749,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "gf65521-quad-n9-wall",
+      "points": [
+        {
+          "commit": "0dde008ecb97",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261110T0551Z-m4gb-arith-kernels-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            3.578,
+            3.974
+          ],
+          "summary": "M4GB patch 0001 (arithmetic GF(p) dense kernels): 3.4-4.1x on random dense GF(31) n=12..16 and 1.6-2.0x on GF(65521), identical bases; patch 0002: 1.26x on wd_n16 under a 64-variable binary and clean output; GF(2) under exact-width binaries unchanged; wide-binary cells censored (cgroup OOM at ~7 GB). Local container, one thread, interleaved; unverified.",
+          "value": 3.749
+        }
+      ],
+      "problem": "kernel:m4gb_gf_p_addmul",
+      "unit": "wall_s"
+    },
+    {
+      "better": "lower",
+      "first": 0.941,
+      "latest": 0.941,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "wd-n16-on-n64-binary-wall",
+      "points": [
+        {
+          "commit": "0dde008ecb97",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 3,
+          "record": "20261110T0551Z-m4gb-arith-kernels-ab",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.892,
+            1.079
+          ],
+          "summary": "M4GB patch 0001 (arithmetic GF(p) dense kernels): 3.4-4.1x on random dense GF(31) n=12..16 and 1.6-2.0x on GF(65521), identical bases; patch 0002: 1.26x on wd_n16 under a 64-variable binary and clean output; GF(2) under exact-width binaries unchanged; wide-binary cells censored (cgroup OOM at ~7 GB). Local container, one thread, interleaved; unverified.",
+          "value": 0.941
+        }
+      ],
+      "problem": "kernel:m4gb_gf_p_addmul",
+      "unit": "wall_s"
     },
     {
       "better": "neutral",

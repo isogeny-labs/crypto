@@ -86,6 +86,8 @@ Input: the frozen spec or protocol path and the main session's dispatch.
        outputs: [<receipt_directory>/result.json]
    bus_address: executor-mechanical-<topic>
    background: <true when the run exceeds ten minutes>
+   # detach_above_seconds: 540 (default) -- a command with a larger timeout_seconds
+   # runs detached and needs stdout and stderr; the executor runs `wait` after `run`
    write_scope: [research/<topic>_<date>/]
    stop_when:
      - Any command exits nonzero or reaches its timeout; retain the original request and build identity.

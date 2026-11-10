@@ -8,6 +8,36 @@ relaunch under a new name. Nothing from a lost job is admitted or analysed.
 | # | job (card) | node | pod started | interruption warning | pod killed | ran | relaunch |
 |--:|:--|:--|:--|:--|:--|:--|:--|
 | 1 | `pfd-x-t13-k0-c6-20261108` (Y3-1) | `r7a.4xlarge`, us-east-2a, spot | 2026-11-10 03:27:50Z | 03:35:08Z (Karpenter `SpotInterrupted`, NodeClaim `cpu-spot-kdj9r`, node `ip-10-84-23-34`) | 03:38:11Z, exit 137, pod reason `Terminated`, "Pod was terminated in response to imminent node shutdown." | about 10 min | `pfd-x-t13-k0-c6-20261110-r1` (`requests_r2g/pfd-x-t13-k0-c6-r1.json`, equal to the original except job name and provenance note) |
+| 2 | `pfd-x-t13-k0-c6-20261110-r1` (Y5-1; the one relaunch of loss 1) | `r6a.4xlarge`, us-east-2a, spot | 2026-11-10 03:45:40Z | 04:02:18Z (Karpenter `SpotInterrupted`, NodeClaim `cpu-spot-twfhv`, node `ip-10-84-24-207`) | 04:05:21Z, exit 137, pod reason `Terminated`, same message | about 20 min | none: owner decision 3 allows one relaunch |
+
+
+## Cell `pfd-x-t13-k0-c6` (t = 13, draw 0, cap 6): reported lost
+
+- Both attempts were killed by EC2 Spot interruptions before the run wrote a result row (both `runs/X-m2-t13-k0-c6.jsonl` are 0 bytes in S3). Nothing from either is admitted or analysed.
+- Under owner decision 3 the cell is reported lost. A third attempt needs the owner.
+- **Owner decision 7 (2026-11-10, about 05:25Z):** one third attempt is allowed, at 56Gi under Amendment 14
+  (`research/open_leads_execution_20261108/DECISIONS.md`). Job `pfd-x-t13-k0-c6-20261110-r2`, request
+  `requests_r2h/pfd-x-t13-k0-c6-r2.json` (equal to `requests_r2h/pfd-x-t13-k0-c6.json` except job name and provenance note; VALID).
+  It is submitted after `pfd-x-t13-k1-c6-20261108` has ended, because jobs run one at a time. If it is lost again the cell goes
+  back to the owner.
+- Money spent on the two attempts: about 30 node-minutes of a 16-vCPU Spot node, well under US$1 (derived from the times above; no price was read).
+
+## Which nodes were interrupted (measured, EKS API-server audit log, node labels)
+
+| job | memory request | node type | outcome |
+|:--|:--|:--|:--|
+| `pfd-b-20261108` (2026-11-09 20:36Z) | 56Gi, pinned | `r6i.4xlarge` | interrupted after 16 min |
+| `pfd-b-20261109-r1` (21:03Z) | 56Gi | `m7a.4xlarge` | interrupted after 31 min |
+| another lab job (23:36Z) | 64Gi | `r6a.4xlarge` | interrupted after about 50 min |
+| `pfd-x-t12-k0-c5`, `-k1-c5` (2026-11-10 00:27Z, 01:25Z) | 56Gi | `m7i.4xlarge` | ran 14 s and 12 s; not interrupted |
+| `pfd-x-t12-k0-c6`, `-k1-c6` (01:34Z, 02:25Z) | 56Gi | `m7i.4xlarge` | ran 30 min each; not interrupted |
+| `pfd-x-t13-k0-c5` (03:09Z) | 112Gi | `r6i.4xlarge` | ran 17 s; not interrupted |
+| `pfd-x-t13-k0-c6-20261108` (03:27Z) | 112Gi | `r7a.4xlarge` | interrupted after 10 min |
+| `pfd-x-t13-k0-c6-20261110-r1` (03:45Z) | 112Gi | `r6a.4xlarge` | interrupted after 20 min |
+
+- Every node with 128 GiB (r family) that ran longer than a minute was interrupted within about 50 minutes (4 of 4). The two 30-minute runs on `m7i.4xlarge` (64 GiB) were not. One `m7a.4xlarge` was interrupted after 31 minutes.
+- That is 7 nodes. It suggests that a 112Gi request, which only r-family nodes can hold, is more exposed than a 56Gi request; it does not establish it.
+- The t = 13 and t = 14 capped requests ask for 112Gi (Amendment 7 A). Amendment 14 (`AMENDMENT_R2_F_mem56.md`) addresses that for the cells not yet launched.
 
 ## Loss 1: what exists and what is done with it
 

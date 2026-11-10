@@ -155,16 +155,26 @@ fn main() {
         .collect();
     let mazur_idx = fmt_idx(order_of(&mazur_forms));
 
-    // smallest bound at which the split odd primes generate the whole group
+    // smallest bound at which the split odd primes generate the whole group:
+    // the subgroup order is monotone in the prefix length, so binary search it
     let mut generating: Option<u64> = None;
-    let mut forms_so_far: Vec<BinaryQuadraticForm> = Vec::new();
-    for (p, f) in &split_odd {
-        forms_so_far.push(f.clone());
-        if let Some(o) = order_of(&forms_so_far) {
-            if o == h {
-                generating = Some(*p);
-                break;
+    {
+        let order_prefix = |len: usize| -> Option<BigUint> {
+            let forms: Vec<BinaryQuadraticForm> =
+                split_odd.iter().take(len).map(|(_, f)| f.clone()).collect();
+            order_of(&forms)
+        };
+        if order_prefix(split_odd.len()) == Some(h.clone()) {
+            let (mut lo, mut hi) = (1usize, split_odd.len()); // invariant: order(hi) == h
+            while lo < hi {
+                let mid = (lo + hi) / 2;
+                if order_prefix(mid) == Some(h.clone()) {
+                    hi = mid;
+                } else {
+                    lo = mid + 1;
+                }
             }
+            generating = Some(split_odd[hi - 1].0);
         }
     }
 

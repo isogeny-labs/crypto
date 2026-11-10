@@ -1,0 +1,834 @@
+From 4012cb3080bfe3378e5e8f385f7c50a5063900ff Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Tue, 10 Nov 2026 05:06:44 +0000
+Subject: [PATCH 04/10] harness: witness rule for measurement evidence and pcc
+ claim types (I6b, I11)
+
+check_evidence_witness: EV records from 2026-11-11 that cite runs must name
+a witness (sampled_replay, independent_reexecution or certificate; advisory
+until 2026-12-11, then error). pcc: claim_type data|literature|interpretive
+required on new claims, sample-for-validation stratified at >= 3x for
+interpretive claims, standing-by-type. pcc files are lab-shared; the lock
+and mirrors update in the crypto PR.
+
+Co-Authored-By: Claude Mythos 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01AXUKfUzw574GenKpShCun6
+---
+ docs/pcc.md                            |   8 ++
+ docs/subversion-resistance-20261010.md |  26 ++++
+ templates/research-records.md          |   7 +
+ tests/test_evidence_witness.py         | 151 ++++++++++++++++++++
+ tools/check_evidence_witness.py        | 182 +++++++++++++++++++++++++
+ tools/pcc/pcc.py                       | 176 ++++++++++++++++++++++++
+ tools/pcc/test_pcc.py                  |  99 +++++++++++++-
+ 7 files changed, 647 insertions(+), 2 deletions(-)
+ create mode 100644 tests/test_evidence_witness.py
+ create mode 100644 tools/check_evidence_witness.py
+
+diff --git a/docs/pcc.md b/docs/pcc.md
+index 47364b60a9..7a718f70b9 100644
+--- a/docs/pcc.md
++++ b/docs/pcc.md
+@@ -34,6 +34,14 @@ the tool is `tools/pcc/pcc.py` (byte-identical across the lab's repositories;
+ - **Bypasses are recorded.** `CHECKPOINT_SKIP=<reason>` still works, and the
+   hook now appends a `bypass` entry to the ledger and pushes a checkpoint
+   before the command runs. Commit the ledger with the work.
++- **Claims have a type.** `--claim-type data|literature|interpretive` is
++  required for claims created on or after 2026-11-11 (older claims without it
++  count as `data`); `pcc ledger verify` fails a newer claim without it.
++  `pcc standing-by-type` counts standings per type, and
++  `pcc sample-for-validation --rate-data 1 --rate-interpretive 3 --seed N --out F`
++  draws a seeded, stratified sample for independent validation (interpretive
++  at least 3x the data rate; at least one claim per non-empty type). The sample
++  is a work list; it verifies nothing.
+ - **The verifier is tested against sabotage.** `pcc canary` plants every
+   sabotage class in the contract into a passing fixture and must reject each
+   one; CI runs it on every pull request. A new way to cheat the gate becomes a
+diff --git a/docs/subversion-resistance-20261010.md b/docs/subversion-resistance-20261010.md
+index 9315dba02f..3b0808c1f8 100644
+--- a/docs/subversion-resistance-20261010.md
++++ b/docs/subversion-resistance-20261010.md
+@@ -118,3 +118,29 @@ byte-identically. The second implementation of the metric is the part that
+ matters, and (a) is the cheap, always-available form of it. The `executor`
+ role contract should also say plainly that a checker which only re-derives
+ summaries from the driver's output is not a checker.
++
++## Status 2026-11-10
++
++The section 5 rule is now checked by `tools/check_evidence_witness.py`
++(review `crypto:docs/autoresearcher-harness-review-20261110.md`, I6b). It
++applies to an `EV-*` record dated (`recorded_at`, `created_at`, or the date in
++its id) on or after 2026-11-11 that makes a measurement claim: a run reference
++(`run_ids`, `runs`, `metrics`, `measured`) with a measurement `type`, or in an
++entry of `claims`. Such a record needs a `witness:` block of kind
++`sampled_replay` (checker path, `shares_code_with_driver: false`, fraction in
++(0, 1], miss probability), `independent_reexecution` (second implementation
++path, metric agreement) or `certificate` (verifier, certificate path). Findings
++are advisories until 2026-12-11 and errors from that day. The template is
++`templates/research-records.md`, Evidence. The check is not yet called from
++`tools/validate_ledger.py` main (wiring line: `check_evidence_witness(ctx,
++repo_root=REPO)` after `check_aged_handoffs(ctx)`).
++
++Not enforced: that a named checker really shares no code with the driver (the
++field is a declaration); that the stated fraction was replayed; that a
++certificate verifies (that is `pcc` and cairn's job); records with no date are
++exempt; the `independent_session: true` condition and the byte-identical
++`raw-result.json` of clause (b); the `external_verification` form of clause
++(c) is not accepted in place of `witness.kind: certificate`; and the
++`executor` role-contract sentence about checkers that only re-derive the
++driver's summaries is not added. Adopting the rule as program policy still
++needs its own `DEC-*` and an `AGENTS.md` amendment.
+diff --git a/templates/research-records.md b/templates/research-records.md
+index bc18e7077d..686daea8a8 100644
+--- a/templates/research-records.md
++++ b/templates/research-records.md
+@@ -431,6 +431,13 @@ evidence:
+       regresses_on: []                  # deciding axes clearly worse
+       level_moved: constant | exponent | null   # only on an advance on ops
+       improves_on: []                   # bound ids the new bound replaces
++  witness:                      # required on a measurement claim recorded on or
++                                # after 2026-11-11 (advisory until 2026-12-11, then an
++                                # error); tools/check_evidence_witness.py. One of:
++    kind: sampled_replay        # checker_path, shares_code_with_driver: false,
++                                # fraction (0 < f <= 1), miss_probability
++    # kind: independent_reexecution   # second_implementation_path, metric_agreement
++    # kind: certificate               # verifier, certificate_path
+   reviewed_by: coordinator
+ ```
+ 
+diff --git a/tests/test_evidence_witness.py b/tests/test_evidence_witness.py
+new file mode 100644
+index 0000000000..f2a387d274
+--- /dev/null
++++ b/tests/test_evidence_witness.py
+@@ -0,0 +1,151 @@
++"""Tests for tools/check_evidence_witness.py (review 2026-11-10, I6b).
++
++    python3 tests/test_evidence_witness.py
++"""
++from __future__ import annotations
++
++import os
++import subprocess
++import sys
++import tempfile
++import unittest
++
++import yaml
++
++REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
++sys.path.insert(0, os.path.join(REPO, "tools"))
++
++import check_evidence_witness as cew  # noqa: E402
++import validate_ledger                # noqa: E402
++
++BEFORE, ADVISORY, ENFORCED = "2026-11-20", "2026-11-20", "2026-12-11"
++
++
++def run_check(body: dict, today: str, root: str | None = None):
++    ctx = validate_ledger.Ctx(legacy_paths=set())
++    rid = body["id"]
++    ctx.register(rid, os.path.join(REPO, "ledger", "evidence", rid + ".yaml"), body, "evidence")
++    cew.check_evidence_witness(ctx, today, root)
++    return ctx
++
++
++def record(**kw) -> dict:
++    base = {"id": "EV-T-001", "type": "empirical", "run_ids": ["RUN-T-001"], "recorded_at": "2026-11-12"}
++    base.update(kw)
++    return base
++
++
++GOOD = {
++    "sampled_replay": {"kind": "sampled_replay", "checker_path": "checker.py", "shares_code_with_driver": False,
++                       "fraction": 0.1, "miss_probability": 0.01},
++    "independent_reexecution": {"kind": "independent_reexecution", "second_implementation_path": "second.py",
++                                "metric_agreement": True},
++    "certificate": {"kind": "certificate", "verifier": "cairn", "certificate_path": "cert.json"},
++}
++
++
++class WitnessTests(unittest.TestCase):
++    def setUp(self):
++        self.td = tempfile.TemporaryDirectory()
++        for n in ("checker.py", "second.py", "cert.json"):
++            open(os.path.join(self.td.name, n), "w").close()
++
++    def tearDown(self):
++        self.td.cleanup()
++
++    def test_positive_each_kind(self):
++        for kind, w in GOOD.items():
++            ctx = run_check(record(witness=w), ENFORCED, self.td.name)
++            self.assertEqual((ctx.errors, ctx.advisories), ([], []), kind)
++
++    def test_missing_witness_is_advisory_then_error(self):
++        ctx = run_check(record(), ADVISORY)
++        self.assertEqual(ctx.errors, [])
++        self.assertEqual(len(ctx.advisories), 1)
++        self.assertIn("no `witness:` block", ctx.advisories[0])
++        ctx = run_check(record(), ENFORCED)
++        self.assertEqual(len(ctx.errors), 1)
++        self.assertEqual(ctx.advisories, [])
++        self.assertEqual(len(run_check(record(), "2026-12-10").errors), 0)
++
++    def test_bad_kind(self):
++        ctx = run_check(record(witness={"kind": "trust_me"}), ENFORCED)
++        self.assertIn("witness.kind", ctx.errors[0])
++
++    def test_sampled_replay_negatives(self):
++        bad = [
++            ({"shares_code_with_driver": True}, "shares_code_with_driver"),
++            ({"shares_code_with_driver": None}, "shares_code_with_driver"),
++            ({"fraction": 0}, "fraction"),
++            ({"fraction": 1.5}, "fraction"),
++            ({"fraction": True}, "fraction"),
++            ({"miss_probability": 2}, "miss_probability"),
++            ({"miss_probability": None}, "miss_probability"),
++            ({"checker_path": ""}, "checker_path"),
++            ({"checker_path": "absent.py"}, "checker_path"),
++        ]
++        for change, needle in bad:
++            w = dict(GOOD["sampled_replay"], **change)
++            ctx = run_check(record(witness=w), ENFORCED, self.td.name)
++            self.assertTrue(any(needle in e for e in ctx.errors), (change, ctx.errors))
++        w = dict(GOOD["sampled_replay"], fraction=1)
++        self.assertEqual(run_check(record(witness=w), ENFORCED, self.td.name).errors, [])
++
++    def test_reexecution_negatives(self):
++        for change, needle in [({"metric_agreement": False}, "metric_agreement"),
++                               ({"metric_agreement": {"agreed": False}}, "metric_agreement"),
++                               ({"second_implementation_path": None}, "second_implementation_path")]:
++            w = dict(GOOD["independent_reexecution"], **change)
++            ctx = run_check(record(witness=w), ENFORCED, self.td.name)
++            self.assertTrue(any(needle in e for e in ctx.errors), change)
++        w = dict(GOOD["independent_reexecution"], metric_agreement={"agreed": True, "tolerance": 1e-9})
++        self.assertEqual(run_check(record(witness=w), ENFORCED, self.td.name).errors, [])
++
++    def test_certificate_negatives(self):
++        for change, needle in [({"verifier": ""}, "verifier"), ({"certificate_path": "nope.json"}, "certificate_path")]:
++            w = dict(GOOD["certificate"], **change)
++            ctx = run_check(record(witness=w), ENFORCED, self.td.name)
++            self.assertTrue(any(needle in e for e in ctx.errors), change)
++
++    def test_pre_date_exempt(self):
++        self.assertEqual(run_check(record(recorded_at="2026-11-10"), ENFORCED).errors, [])
++        self.assertEqual(run_check(record(id="EV-T-20261105-aa", recorded_at=None), ENFORCED).errors, [])
++        # A dateless record cannot be placed after the rule.
++        self.assertEqual(run_check(record(recorded_at=None), ENFORCED).errors, [])
++        # The date in the id counts when recorded_at is absent.
++        self.assertEqual(len(run_check(record(id="EV-T-20261115-aa", recorded_at=None), ENFORCED).errors), 1)
++
++    def test_non_measurement_claims_exempt(self):
++        self.assertEqual(run_check(record(type="theoretical"), ENFORCED).errors, [])
++        self.assertEqual(run_check(record(run_ids=[]), ENFORCED).errors, [])
++        self.assertEqual(run_check(record(type="literature", run_ids=[]), ENFORCED).errors, [])
++
++    def test_claims_entry_with_metrics_is_measurement(self):
++        r = record(type="theoretical", run_ids=[], claims=[{"id": "C1", "metrics": {"gae": 12}}])
++        self.assertEqual(len(run_check(r, ENFORCED).errors), 1)
++
++    def test_other_record_kinds_ignored(self):
++        ctx = validate_ledger.Ctx(legacy_paths=set())
++        ctx.register("H-T-001", "x", record(id="H-T-001"), "hypothesis")
++        cew.check_evidence_witness(ctx, ENFORCED)
++        self.assertEqual(ctx.errors, [])
++
++    def test_cli(self):
++        path = os.path.join(self.td.name, "EV-T-001.yaml")
++        with open(path, "w") as fh:
++            yaml.safe_dump({"evidence": record(witness=GOOD["certificate"])}, fh)
++        script = os.path.join(REPO, "tools", "check_evidence_witness.py")
++        r = subprocess.run([sys.executable, script, path, "--today", ENFORCED, "--root", self.td.name],
++                           capture_output=True, text=True)
++        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
++        with open(path, "w") as fh:
++            yaml.safe_dump({"evidence": record()}, fh)
++        r = subprocess.run([sys.executable, script, path, "--today", ENFORCED], capture_output=True, text=True)
++        self.assertEqual(r.returncode, 1, r.stdout)
++        r = subprocess.run([sys.executable, script, path, "--today", "2026-11-20"], capture_output=True, text=True)
++        self.assertEqual(r.returncode, 0, r.stdout)
++        self.assertIn("advisory:", r.stdout)
++
++
++if __name__ == "__main__":
++    unittest.main()
+diff --git a/tools/check_evidence_witness.py b/tools/check_evidence_witness.py
+new file mode 100644
+index 0000000000..9bd619cc10
+--- /dev/null
++++ b/tools/check_evidence_witness.py
+@@ -0,0 +1,182 @@
++#!/usr/bin/env python3
++"""Witness rule for measurement evidence (review 2026-11-10, I6b).
++
++docs/subversion-resistance-20261010.md section 5 proposed that a measurement
++run may be cited only if a witness the driver did not write backs it. This
++check binds that rule to evidence records (EV-*).
++
++Applies to an evidence record that
++  * is dated on or after RULE_FROM (2026-11-11), by `recorded_at`,
++    `created_at` or the YYYYMMDD in its id; a record with no date is exempt
++    (it cannot be placed after the rule), and
++  * makes a measurement claim: it carries a run reference (non-empty
++    `run_ids` / `runs`, or a `metrics` / `measured` field, at the top level
++    or in an entry of `claims`) and its `type` is a measurement type or it
++    states the reference in `claims`.
++
++Such a record needs a `witness:` block:
++
++  kind: sampled_replay
++    checker_path, shares_code_with_driver: false, fraction (0 < f <= 1),
++    miss_probability (0 <= p <= 1)
++  kind: independent_reexecution
++    second_implementation_path, metric_agreement (true, or a mapping with
++    `agreed: true`)
++  kind: certificate
++    verifier, certificate_path
++
++Findings are advisories until ADVISORY_UNTIL (2026-12-11) and errors from that
++day. Paths named in a witness must exist under the repository root when one is
++given. Not enforced: that the checker is in fact independent of the driver,
++that the fraction was really replayed, and records with no date.
++
++    python3 tools/check_evidence_witness.py ledger/evidence/EV-X-001.yaml [--today YYYY-MM-DD]
++
++Exit 1 when the file has a finding that is an error on `--today`, else 0.
++"""
++from __future__ import annotations
++
++import argparse
++import datetime as _dt
++import os
++import re
++import sys
++
++RULE_FROM = "2026-11-11"
++ADVISORY_UNTIL = "2026-12-11"
++WITNESS_KINDS = ("sampled_replay", "independent_reexecution", "certificate")
++MEASUREMENT_TYPES = {
++    "empirical", "measurement", "computational", "experimental", "empirical_reanalysis",
++    "experiment_results", "derivation_plus_measurement", "mixed", "mixed_exact_derivation_and_finite_controls",
++}
++RUN_FIELDS = ("run_ids", "runs", "metrics", "measured")
++_ID_DATE = re.compile(r"-(\d{8})-")
++
++
++def _present(value) -> bool:
++    return value not in (None, "", [], {}, False)
++
++
++def _has_run_reference(entry: dict) -> bool:
++    return any(_present(entry.get(f)) for f in RUN_FIELDS)
++
++
++def is_measurement_claim(body: dict) -> bool:
++    claims = body.get("claims")
++    if isinstance(claims, list) and any(isinstance(c, dict) and _has_run_reference(c) for c in claims):
++        return True
++    return _has_run_reference(body) and str(body.get("type", "")) in MEASUREMENT_TYPES
++
++
++def record_date(rec_id: str, body: dict) -> str | None:
++    for key in ("recorded_at", "created_at"):
++        v = body.get(key)
++        if _present(v):
++            s = str(v)[:10]
++            if re.match(r"^\d{4}-\d{2}-\d{2}$", s):
++                return s
++    m = _ID_DATE.search(str(rec_id))
++    if m:
++        d = m.group(1)
++        return f"{d[:4]}-{d[4:6]}-{d[6:]}"
++    return None
++
++
++def _path_ok(value, repo_root: str | None) -> bool:
++    if not isinstance(value, str) or not value.strip():
++        return False
++    return repo_root is None or os.path.exists(os.path.join(repo_root, value))
++
++
++def witness_problems(body: dict, repo_root: str | None = None) -> list[str]:
++    w = body.get("witness")
++    if not isinstance(w, dict):
++        return ["measurement claim has no `witness:` block (kind: "
++                + " | ".join(WITNESS_KINDS) + ")"]
++    kind = w.get("kind")
++    if kind not in WITNESS_KINDS:
++        return [f"witness.kind must be one of {list(WITNESS_KINDS)}, not {kind!r}"]
++    out: list[str] = []
++
++    def need_path(field: str):
++        if not _path_ok(w.get(field), repo_root):
++            out.append(f"witness.{field} must name an existing file" if repo_root
++                       else f"witness.{field} must be a non-empty path")
++
++    if kind == "sampled_replay":
++        need_path("checker_path")
++        if w.get("shares_code_with_driver") is not False:
++            out.append("witness.shares_code_with_driver must be false")
++        f = w.get("fraction")
++        if isinstance(f, bool) or not isinstance(f, (int, float)) or not 0 < f <= 1:
++            out.append("witness.fraction must be a number with 0 < fraction <= 1")
++        p = w.get("miss_probability")
++        if isinstance(p, bool) or not isinstance(p, (int, float)) or not 0 <= p <= 1:
++            out.append("witness.miss_probability must be a number in [0, 1]")
++    elif kind == "independent_reexecution":
++        need_path("second_implementation_path")
++        a = w.get("metric_agreement")
++        if not (a is True or (isinstance(a, dict) and a.get("agreed") is True)):
++            out.append("witness.metric_agreement must be true or a mapping with agreed: true")
++    else:
++        if not isinstance(w.get("verifier"), str) or not w["verifier"].strip():
++            out.append("witness.verifier must name the verifier")
++        need_path("certificate_path")
++    return out
++
++
++def check_evidence_witness(ctx, today: str | None = None, repo_root: str | None = None) -> None:
++    """validate_ledger check: `today` is YYYY-MM-DD (or YYYYMMDD); default is today's date."""
++    if today:
++        t = today if "-" in today else f"{today[:4]}-{today[4:6]}-{today[6:]}"
++    else:
++        t = _dt.date.today().isoformat()
++    enforce = t >= ADVISORY_UNTIL
++    for rec_id, kind in ctx.record_types.items():
++        if kind != "evidence":
++            continue
++        body = ctx.records[rec_id]
++        when = record_date(rec_id, body)
++        if when is None or when < RULE_FROM or not is_measurement_claim(body):
++            continue
++        for problem in witness_problems(body, repo_root):
++            msg = f"{rec_id}: {problem} (witness rule, from {RULE_FROM}; error from {ADVISORY_UNTIL})"
++            (ctx.err if enforce else ctx.advise)(ctx.ids[rec_id], msg)
++
++
++def main(argv: list[str] | None = None) -> int:
++    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
++    ap.add_argument("file")
++    ap.add_argument("--today", default=None, help="YYYY-MM-DD (default: the current date)")
++    ap.add_argument("--root", default=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
++    a = ap.parse_args(argv)
++    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
++    import yaml  # noqa: PLC0415
++    with open(a.file, encoding="utf-8") as fh:
++        doc = yaml.safe_load(fh)
++    body = doc.get("evidence", doc) if isinstance(doc, dict) else None
++    if not isinstance(body, dict):
++        print(f"{a.file}: not an evidence record", file=sys.stderr)
++        return 3
++
++    class _Ctx:
++        def __init__(self):
++            self.errors, self.advisories = [], []
++            rid = str(body.get("id", os.path.basename(a.file)))
++            self.record_types, self.records, self.ids = {rid: "evidence"}, {rid: body}, {rid: a.file}
++
++        def err(self, path, msg): self.errors.append(msg)
++        def advise(self, path, msg): self.advisories.append(msg)
++
++    ctx = _Ctx()
++    check_evidence_witness(ctx, a.today, a.root)
++    for m in ctx.advisories:
++        print(f"advisory: {m}")
++    for m in ctx.errors:
++        print(f"error: {m}")
++    print(f"evidence-witness: {len(ctx.errors)} error(s), {len(ctx.advisories)} advisory(ies)")
++    return 1 if ctx.errors else 0
++
++
++if __name__ == "__main__":
++    sys.exit(main())
+diff --git a/tools/pcc/pcc.py b/tools/pcc/pcc.py
+index 6bb3900440..20e4720311 100755
+--- a/tools/pcc/pcc.py
++++ b/tools/pcc/pcc.py
+@@ -21,6 +21,8 @@ implementation, so a verdict verifies the same way on every host.
+     pcc ledger verify [--base GITREF]
+     pcc ledger append-bypass --reason R --command C
+     pcc standing CLAIM-ID
++    pcc standing-by-type [--json]                    # standings per claim_type
++    pcc sample-for-validation --rate-data R --rate-interpretive R --seed N --out FILE
+     pcc lint-prose FILE... | --stdin
+     pcc canary                                       # the sabotage corpus
+ 
+@@ -65,6 +67,11 @@ MINIMUM_PROOFS: dict[str, list[list[str]]] = {
+     "absence": [["execution", "lean"]],
+     "statement": [],
+ }
++# Claim types (review 2026-11-10, I11): validation effort is stratified by what
++# kind of statement a claim is. Claims created before CLAIM_TYPE_REQUIRED_FROM
++# may omit the field and count as `data`; newer claims must carry it.
++CLAIM_TYPES = ("data", "literature", "interpretive")
++CLAIM_TYPE_REQUIRED_FROM = "2026-11-11"
+ STANDARD_AXIOMS = ("propext", "Classical.choice", "Quot.sound")
+ STRONG_CLAIM_RE = re.compile(
+     r"\b(prove[sd]?|verified|verifies|beats?|breakthrough|speed-?ups?|faster|secure|weak curves?|"
+@@ -931,6 +938,34 @@ def claim_digest(claim: dict[str, Any]) -> str:
+     return sha256_obj(body)
+ 
+ 
++def claim_date(claim: dict[str, Any]) -> str:
++    """Latest of created_at and the id's date, as YYYY-MM-DD, so that
++    backdating one field does not exempt a claim from the claim_type rule."""
++    created = str(claim.get("created_at", ""))[:10]
++    m = re.match(r"^PCC-([0-9]{4})([0-9]{2})([0-9]{2})-", str(claim.get("id", "")))
++    from_id = f"{m.group(1)}-{m.group(2)}-{m.group(3)}" if m else ""
++    return max(created, from_id)
++
++
++def claim_type_of(claim: dict[str, Any], later_date: str = "") -> str | None:
++    """The claim's type: its claim_type, else `data` for a legacy claim (every
++    date known for it is before CLAIM_TYPE_REQUIRED_FROM), else None."""
++    ct = claim.get("claim_type")
++    if ct is not None:
++        return ct if ct in CLAIM_TYPES else None
++    date = max(claim_date(claim), later_date)
++    return "data" if date and date < CLAIM_TYPE_REQUIRED_FROM else None
++
++
++def claim_type_problem(claim: dict[str, Any], later_date: str = "") -> str | None:
++    if "claim_type" in claim and claim["claim_type"] not in CLAIM_TYPES:
++        return f"claim_type must be one of {list(CLAIM_TYPES)}, not {claim['claim_type']!r}"
++    if claim_type_of(claim, later_date) is None:
++        return (f"claim_type is missing; claims created on or after {CLAIM_TYPE_REQUIRED_FROM} "
++                f"must set it to one of {list(CLAIM_TYPES)}")
++    return None
++
++
+ def validate_claim(claim: Any, reasons: list[str]) -> bool:
+     if not isinstance(claim, dict) or claim.get("schema") != CLAIM_SCHEMA:
+         reasons.append(f"claim: schema is not {CLAIM_SCHEMA}")
+@@ -953,6 +988,10 @@ def validate_claim(claim: Any, reasons: list[str]) -> bool:
+         if not isinstance(pr, dict) or pr.get("kind") not in PROOF_KINDS:
+             reasons.append(f"claim: proofs[{i}] kind must be one of {sorted(PROOF_KINDS)}")
+             ok = False
++    problem = claim_type_problem(claim)
++    if problem:
++        reasons.append(f"claim: {problem}")
++        ok = False
+     prod = claim.get("producer")
+     if not isinstance(prod, dict) or not re.match(r"^[0-9a-f]{40}$", str(prod.get("commit", ""))):
+         reasons.append("claim: producer.commit must be a 40-hex commit")
+@@ -1223,6 +1262,7 @@ class Fixture:
+     def claim(self, name: str, kind: str, proofs: list[dict[str, Any]], statement: str = "fixture") -> dict[str, Any]:
+         c = {"schema": CLAIM_SCHEMA, "id": f"PCC-20260101-{sha256_bytes(name.encode())[:6]}", "kind": kind,
+              "statement": statement, "scope": "canary fixture", "proofs": proofs,
++             "claim_type": "data",
+              "producer": {"commit": self.commit, "session": "fixture", "model": "none"}, "created_at": "2026-01-01T00:00:00Z"}
+         self.write(f"{CLAIMS_DIR}/{c['id']}.json", c)
+         self.claims[name] = c
+@@ -1562,6 +1602,18 @@ def _ledger_canaries(fx: Fixture) -> list[tuple[str, str, str, list[str]]]:
+         append_entry(led2, "verdict", failed_verdict,
+                      make_signature(fx.secret, "fixture-ci", "verdict", verdict_subject(failed_verdict)))
+         row("ledger:signed failing verdict", "failed", read_ledger(led2))
++        # A new claim that omits claim_type, or backdates only one field, is rejected.
++        errs: list[str] = []
++        fresh = {k: v for k, v in claim.items() if k != "claim_type"}
++        fresh["created_at"] = CLAIM_TYPE_REQUIRED_FROM + "T00:00:00Z"
++        rows.append(("ledger:new claim without claim_type", "fail",
++                     "fail" if claim_type_problem(fresh) else "pass", errs))
++        backdated = dict(fresh, created_at="2026-01-01T00:00:00Z", id="PCC-20261112-abcdef")
++        rows.append(("ledger:claim_type exemption by backdated created_at", "fail",
++                     "fail" if claim_type_problem(backdated) else "pass", errs))
++        legacy = {k: v for k, v in claim.items() if k != "claim_type"}
++        rows.append(("ledger:legacy claim without claim_type counts as data", "pass",
++                     "fail" if claim_type_problem(legacy) else "pass", errs))
+     return rows
+ 
+ 
+@@ -1625,6 +1677,94 @@ def _standings(repo: Path, kr: dict[str, Any]) -> dict[str, str]:
+     return out
+ 
+ 
++def _claim_entry_dates(entries: list[dict[str, Any]]) -> dict[str, str]:
++    out: dict[str, str] = {}
++    for e in entries:
++        if e.get("type") == "claim" and isinstance(e.get("body"), dict):
++            out.setdefault(str(e["body"].get("claim_id")), str(e.get("at", ""))[:10])
++    return out
++
++
++def check_claim_types(repo: Path, entries: list[dict[str, Any]], errors: list[str]) -> None:
++    """Every claim file must carry a valid claim_type unless it is a legacy
++    claim; the ledger entry's own date also counts against the exemption."""
++    dates = _claim_entry_dates(entries)
++    for p in sorted((repo / CLAIMS_DIR).glob("*.json")) if (repo / CLAIMS_DIR).is_dir() else []:
++        try:
++            c = load_json(p)
++        except ValueError:
++            continue
++        if not isinstance(c, dict) or c.get("schema") != CLAIM_SCHEMA:
++            continue
++        problem = claim_type_problem(c, dates.get(str(c.get("id")), ""))
++        if problem:
++            errors.append(f"claim {c.get('id')}: {problem}")
++
++
++def _all_claims(repo: Path) -> list[dict[str, Any]]:
++    out = []
++    for p in sorted((repo / CLAIMS_DIR).glob("*.json")) if (repo / CLAIMS_DIR).is_dir() else []:
++        try:
++            c = load_json(p)
++        except ValueError:
++            continue
++        if isinstance(c, dict) and isinstance(c.get("id"), str):
++            out.append(c)
++    return out
++
++
++def standing_by_type(repo: Path, kr: dict[str, Any]) -> dict[str, dict[str, int]]:
++    entries = read_ledger(repo / LEDGER_PATH)
++    dates = _claim_entry_dates(entries)
++    table: dict[str, dict[str, int]] = {t: {} for t in CLAIM_TYPES}
++    for c in _all_claims(repo):
++        t = claim_type_of(c, dates.get(c["id"], "")) or "untyped"
++        st = standing(c, entries, kr)["standing"]
++        table.setdefault(t, {})
++        table[t][st] = table[t].get(st, 0) + 1
++    return table
++
++
++def sample_for_validation(repo: Path, kr: dict[str, Any], rate_data: float, rate_interpretive: float,
++                          seed: int, rate_literature: float | None = None, base: float = 0.1) -> dict[str, Any]:
++    """Stratified, seeded draw of claims for independent validation. A claim of
++    a type with weight w is drawn when u < min(1, base*w), u = H(seed, id) in
++    [0,1); each non-empty stratum yields at least its lowest-u claim."""
++    if rate_interpretive < 3 * rate_data:
++        raise PccError("--rate-interpretive must be at least 3x --rate-data (interpretive claims are sampled at "
++                       "three times the data rate or more)")
++    weights = {"data": rate_data, "literature": rate_data if rate_literature is None else rate_literature,
++               "interpretive": rate_interpretive}
++    if min(weights.values()) <= 0 or base <= 0:
++        raise PccError("rates and --base must be positive")
++    entries = read_ledger(repo / LEDGER_PATH)
++    dates = _claim_entry_dates(entries)
++    strata: dict[str, list[tuple[float, dict[str, Any]]]] = {t: [] for t in CLAIM_TYPES}
++    untyped = []
++    for c in _all_claims(repo):
++        t = claim_type_of(c, dates.get(c["id"], ""))
++        if t is None:
++            untyped.append(c["id"])
++            continue
++        u = int(sha256_bytes(f"{seed}:{c['id']}".encode())[:15], 16) / float(16 ** 15)
++        strata[t].append((u, c))
++    chosen: list[dict[str, Any]] = []
++    summary: dict[str, Any] = {}
++    for t in CLAIM_TYPES:
++        p = min(1.0, base * weights[t])
++        rows = sorted(strata[t], key=lambda r: (r[0], r[1]["id"]))
++        picked = [r for r in rows if r[0] < p]
++        if rows and not picked:
++            picked = rows[:1]
++        summary[t] = {"weight": weights[t], "probability": p, "population": len(rows), "sampled": len(picked)}
++        for _, c in picked:
++            chosen.append({"claim_id": c["id"], "claim_type": t, "kind": c.get("kind"),
++                           "standing": standing(c, entries, kr)["standing"]})
++    chosen.sort(key=lambda r: r["claim_id"])
++    return {"schema": "pcc.validation-sample/v1", "seed": seed, "base_probability": base, "strata": summary,
++            "untyped_claims_excluded": untyped, "claims": chosen}
++
++
+ def _print_verdict(v: dict[str, Any], as_json: bool, out) -> None:
+     if as_json:
+         print(json.dumps(v, sort_keys=True), file=out)
+@@ -1660,6 +1800,9 @@ def main(argv: list[str] | None = None) -> int:
+     n.add_argument("--kind", required=True, choices=sorted(CLAIM_KINDS))
+     n.add_argument("--statement", required=True)
+     n.add_argument("--scope", default="")
++    n.add_argument("--claim-type", choices=list(CLAIM_TYPES), default=None,
++                   help="data, literature or interpretive (required for claims created on or after "
++                        f"{CLAIM_TYPE_REQUIRED_FROM})")
+     n.add_argument("--proof", action="append", default=[], help="KIND:PATH, or KIND:JSON for lean/execution")
+     n.add_argument("--session", default=os.environ.get("CLAUDE_SESSION_ID", ""))
+     n.add_argument("--model", default="")
+@@ -1694,6 +1837,17 @@ def main(argv: list[str] | None = None) -> int:
+     s.add_argument("claim")
+     s.add_argument("--json", action="store_true")
+ 
++    s = sub.add_parser("standing-by-type")
++    s.add_argument("--json", action="store_true")
++
++    s = sub.add_parser("sample-for-validation")
++    s.add_argument("--rate-data", type=float, default=1.0)
++    s.add_argument("--rate-interpretive", type=float, default=3.0)
++    s.add_argument("--rate-literature", type=float, default=None, help="default: the data rate")
++    s.add_argument("--base", type=float, default=0.1, help="probability for weight 1 (default 0.1)")
++    s.add_argument("--seed", type=int, required=True)
++    s.add_argument("--out", type=Path, required=True)
++
+     s = sub.add_parser("lint-prose")
+     s.add_argument("files", nargs="*", type=Path)
+     s.add_argument("--stdin", action="store_true")
+@@ -1732,6 +1886,8 @@ def main(argv: list[str] | None = None) -> int:
+                  "scope": a.scope, "proofs": proofs,
+                  "producer": {"commit": head_commit(repo), "session": a.session, "model": a.model},
+                  "created_at": utcnow()}
++        if a.claim_type:
++            claim["claim_type"] = a.claim_type
+         reasons: list[str] = []
+         if not validate_claim(claim, reasons):
+             raise PccError("; ".join(reasons))
+@@ -1797,6 +1953,8 @@ def main(argv: list[str] | None = None) -> int:
+                 base = read_ledger_text(text)
+                 check_chain(base, errors)
+                 check_prefix(base, head, errors)
++        if not errors:
++            check_claim_types(repo, head, errors)
+         for err in errors:
+             print(err, file=out)
+         print(f"ledger: {len(head)} entries, {'BROKEN' if errors else 'chain ok'}", file=out)
+@@ -1814,6 +1972,24 @@ def main(argv: list[str] | None = None) -> int:
+                       f"signed={v['signed']} current={v['current']}", file=out)
+         return 0 if st["standing"] == "verified" else 2
+ 
++    if a.cmd == "standing-by-type":
++        table = standing_by_type(repo, kr)
++        if a.json:
++            print(json.dumps(table, sort_keys=True), file=out)
++        else:
++            for t, counts in table.items():
++                if not counts and t not in CLAIM_TYPES:
++                    continue
++                body = ", ".join(f"{k}={v}" for k, v in sorted(counts.items())) or "none"
++                print(f"{t}: {sum(counts.values())} claim(s): {body}", file=out)
++        return 0
++
++    if a.cmd == "sample-for-validation":
++        sample = sample_for_validation(repo, kr, a.rate_data, a.rate_interpretive, a.seed, a.rate_literature, a.base)
++        a.out.write_text(json.dumps(sample, indent=1, sort_keys=True) + "\n", encoding="utf-8")
++        print(f"sample: {len(sample['claims'])} claim(s) -> {a.out}", file=out)
++        return 0
++
+     if a.cmd == "lint-prose":
+         standings = _standings(repo, kr)
+         findings: list[str] = []
+diff --git a/tools/pcc/test_pcc.py b/tools/pcc/test_pcc.py
+index 9b6a1f5031..978ebdff33 100644
+--- a/tools/pcc/test_pcc.py
++++ b/tools/pcc/test_pcc.py
+@@ -94,7 +94,7 @@ class RoundTripTests(unittest.TestCase):
+                 "P": list(pcc._SECP_G), "Q": list(Q), "k": k}
+         (self.repo / "cert.json").write_text(json.dumps(cert))
+         r = run(["claim", "new", "--kind", "solve", "--statement", "k is the discrete log of Q",
+-                 "--proof", "certificate:cert.json"], self.repo)
++                 "--claim-type", "data", "--proof", "certificate:cert.json"], self.repo)
+         self.assertEqual(r.returncode, 0, r.stderr)
+         return Path(r.stdout.strip()).stem
+ 
+@@ -129,7 +129,7 @@ class RoundTripTests(unittest.TestCase):
+         artifact = self.repo / "artifact.txt"
+         artifact.write_text("producer observation, no independent signature\n")
+         made = run(["claim", "new", "--kind", "statement", "--statement", "scoped observation",
+-                    "--proof", "attestation:artifact.txt"], self.repo)
++                    "--claim-type", "data", "--proof", "attestation:artifact.txt"], self.repo)
+         self.assertEqual(made.returncode, 0, made.stderr)
+         path = self.repo / made.stdout.strip()
+         claim = json.loads(path.read_text())
+@@ -195,6 +195,101 @@ class RoundTripTests(unittest.TestCase):
+         self.assertIn("broken ledger", r.stderr)
+ 
+ 
++class ClaimTypeTests(unittest.TestCase):
++    setUp = RoundTripTests.setUp
++    tearDown = RoundTripTests.tearDown
++    commit = RoundTripTests.commit
++    make_solve = RoundTripTests.make_solve
++    """claim_type, ledger verify, standing-by-type, sample-for-validation."""
++
++    def write_claim(self, cid: str, created: str, claim_type: str | None, kind: str = "statement") -> None:
++        c = {"schema": pcc.CLAIM_SCHEMA, "id": cid, "kind": kind, "statement": "s", "scope": "", "proofs": [],
++             "producer": {"commit": "a" * 40, "session": "", "model": ""}, "created_at": created}
++        if claim_type:
++            c["claim_type"] = claim_type
++        (self.repo / pcc.CLAIMS_DIR).mkdir(parents=True, exist_ok=True)
++        (self.repo / pcc.CLAIMS_DIR / f"{cid}.json").write_text(json.dumps(c))
++
++    def test_legacy_claim_without_type_is_data(self):
++        self.write_claim("PCC-20261105-aaaaaa", "2026-11-05T00:00:00Z", None)
++        r = run(["ledger", "verify"], self.repo)
++        self.assertEqual(r.returncode, 0, r.stdout)
++        self.assertEqual(json.loads(run(["standing-by-type", "--json"], self.repo).stdout)["data"],
++                         {"unverified": 1})
++
++    def test_new_claim_without_type_fails_ledger_verify(self):
++        self.write_claim("PCC-20261112-bbbbbb", "2026-11-12T00:00:00Z", None)
++        r = run(["ledger", "verify"], self.repo)
++        self.assertEqual(r.returncode, 1, r.stdout)
++        self.assertIn("claim_type is missing", r.stdout)
++
++    def test_backdated_created_at_does_not_exempt(self):
++        self.write_claim("PCC-20261112-cccccc", "2026-01-01T00:00:00Z", None)
++        self.assertEqual(run(["ledger", "verify"], self.repo).returncode, 1)
++
++    def test_invalid_type_fails_and_valid_new_passes(self):
++        self.write_claim("PCC-20261112-dddddd", "2026-11-12T00:00:00Z", "opinion")
++        self.assertEqual(run(["ledger", "verify"], self.repo).returncode, 1)
++        self.write_claim("PCC-20261112-dddddd", "2026-11-12T00:00:00Z", "literature")
++        self.assertEqual(run(["ledger", "verify"], self.repo).returncode, 0)
++
++    def test_validate_claim_rejects_new_untyped(self):
++        reasons: list[str] = []
++        c = {"schema": pcc.CLAIM_SCHEMA, "id": "PCC-20261112-eeeeee", "kind": "statement", "statement": "s",
++             "proofs": [], "producer": {"commit": "a" * 40}, "created_at": "2026-11-12T00:00:00Z"}
++        self.assertFalse(pcc.validate_claim(c, reasons))
++        self.assertTrue(any("claim_type" in r for r in reasons))
++        self.assertTrue(pcc.validate_claim(dict(c, claim_type="interpretive"), []))
++
++    def test_claim_new_records_type(self):
++        cid = self.make_solve()
++        c = json.loads((self.repo / pcc.CLAIMS_DIR / f"{cid}.json").read_text())
++        self.assertEqual(c["claim_type"], "data")
++
++    def populate(self):
++        for i in range(30):
++            self.write_claim(f"PCC-20261112-{i:06x}", "2026-11-12T00:00:00Z",
++                             ("data", "literature", "interpretive")[i % 3])
++
++    def test_standing_by_type_counts(self):
++        self.populate()
++        r = run(["standing-by-type"], self.repo)
++        self.assertEqual(r.returncode, 0, r.stderr)
++        self.assertIn("data: 10 claim(s): unverified=10", r.stdout)
++        self.assertIn("interpretive: 10 claim(s): unverified=10", r.stdout)
++
++    def test_sample_is_seeded_stratified_and_oversamples_interpretive(self):
++        self.populate()
++        out = self.repo / "sample.json"
++        args = ["sample-for-validation", "--rate-data", "1", "--rate-interpretive", "3", "--seed", "7",
++                "--base", "0.2", "--out", str(out)]
++        self.assertEqual(run(args, self.repo).returncode, 0)
++        first = out.read_text()
++        run(args, self.repo)
++        self.assertEqual(out.read_text(), first)  # deterministic given the seed
++        s = json.loads(first)
++        self.assertAlmostEqual(s["strata"]["interpretive"]["probability"], 0.6)
++        self.assertAlmostEqual(s["strata"]["data"]["probability"], 0.2)
++        for t in pcc.CLAIM_TYPES:
++            self.assertGreaterEqual(s["strata"][t]["sampled"], 1)
++        self.assertEqual(len(s["claims"]), sum(v["sampled"] for v in s["strata"].values()))
++        # Across seeds the interpretive stratum is drawn more often than data.
++        tot = {"data": 0, "interpretive": 0}
++        for seed in range(40):
++            st = pcc.sample_for_validation(self.repo, pcc.load_keyring(self.repo / pcc.KEYRING_PATH),
++                                           1, 3, seed, base=0.2)["strata"]
++            for t in tot:
++                tot[t] += st[t]["sampled"]
++        self.assertGreater(tot["interpretive"], 2 * tot["data"])
++
++    def test_sample_refuses_under_3x(self):
++        self.populate()
++        r = run(["sample-for-validation", "--rate-data", "1", "--rate-interpretive", "2", "--seed", "1",
++                 "--out", str(self.repo / "x.json")], self.repo)
++        self.assertEqual(r.returncode, 3)
++        self.assertIn("3x", r.stderr)
++
++
+ class LeanScanTests(unittest.TestCase):
+     def test_comment_and_string_lookalikes_are_not_holes(self):
+         src = "theorem t : 1 = 1 := rfl\n-- sorry here is a comment\n/- block sorry -/\ndef s := \"sorry\"\n"
+-- 
+2.43.0
+
