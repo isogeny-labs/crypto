@@ -1,103 +1,72 @@
-# devcheck_r2g: local test of `stageb_units_runner.sh` (draft Amendment R2-G)
+# devcheck_r2g: local test of `stageb_units_runner.sh`, revision 3 (draft Amendment R2-G)
 
-Date 2026-11-10. Development check only. Every test row here is produced with `--seed 777` (the study seed is the pilot's
-default, 1347112276); none is stage B data. Nothing was submitted to the cloud, committed or pushed. All numbers are
-`[pcc:unverified]` (local, one host, 4 vCPU, 2 rayon threads).
+Date 2026-11-10. Development check only. Every row produced here uses `--seed 777` (the study seed is the pilot's default,
+1347112276); none is stage B data. Nothing was submitted to the cloud, committed or pushed; no real S3 was used (a local
+directory shim stands in). All numbers are `[pcc:unverified]` (local, one host, 4 vCPU, 2 rayon threads, bash 5.2.21, mawk).
 
-## Binaries (verified)
-Image layer `sha256:a0f7e28e...b1971` of `isolab/tasks` (us-east-2) was downloaded with `aws ecr get-download-url-for-layer`
-and untarred into the scratchpad. `sha256sum` of `usr/local/bin/{pkm_tower_pilot,hky_fp_tower_check,prime_fall_degree_tools}`
-equals `image/binaries.sha256` for all three (f78f3959..., c36d324e..., 7e8a6703...). The tests use the real frozen pilot and G1 binary.
-
-> **Revision 2 (2026-11-10, runner sha256 773a978d...).** Sections "Files" to "NOT tested" and "Added by the main session"
-> below describe runner revision 1 (sha256 143242e2...) and PREDATE this revision; their raw outputs are
-> `test_outputs_rev1_predates_revision.txt` and `progress_rev1_predates_revision/`. T1-T6 were re-run on revision 2 (see the end);
-> `test_outputs.txt` and `progress/` are the revision 2 outputs.
+Runner under test: `stageb_units_runner.sh` revision 3 (sha256 and size are in `test_outputs.txt`, test T25, and in the
+report that accompanied this check). Frozen binaries: `sha256sum` of `pkm_tower_pilot`, `hky_fp_tower_check`,
+`prime_fall_degree_tools` in the scratchpad layer equals `image/binaries.sha256` (f78f3959..., c36d324e..., 7e8a6703...).
 
 ## Files
-- `test_driver.sh T1..T6` (and `T5k`, a kill check): the driver. It runs the runner exactly as a job does,
-  `bash -c "$(cat stageb_units_runner.sh)" stageb <PREV...>`, with `S3CP/S3SYNC/S3LS` replaced by `s3shim.sh` (a local
-  directory standing in for S3), `RAYON_NUM_THREADS=2`, `PILOT_EXTRA="--seed 777 ..."`, and `UNIT_FILTER` to small unit sets.
-- `s3shim.sh`: `cp`, `sync`, `ls` on a local directory.
-- `test_outputs.txt`: verbatim output of T1..T6 (paths shortened to `$T`, `$LAYER`).
-- `progress/`: the `progress.txt` of each test job (small).
+- `test_driver.sh Tn`: one test. Starts the runner as a FILE (`/bin/bash <runner> <args>`); with `BOOT_REQUEST=<request.json>`
+  exactly as a job does (the request's command words up to and including its last runner piece). Each test prints
+  `check PASS|FAIL: ...` lines and ends with `RESULT Tn PASS|FAIL`.
+- `run_suite.sh <out> [progress dir]`: runs T1..T22, T24, T25, T26 and writes the verbatim outputs (paths shortened to `$T`,
+  `$LAYER`, `$SCRATCH`). T23 is the same script with `BOOT_REQUEST` set.
+- `s3shim.sh`: local stand-in for `aws s3 cp|sync` (unchanged from revision 2). `shim_faults.sh`: wrapper that fails the n-th
+  progress upload, delays one, or snapshots S3 (from the review's `shim2.sh`). `fail_unit_wrapper.sh`: stands in for the pilot and
+  fails one unit by environment variable (from the review's `failwrap.sh`).
+- `compare_outputs.sh`: diff of two output files after removing timestamps, ms, elapsed seconds, pids.
+- `test_outputs.txt`, `progress/`: verbatim outputs and the `progress.txt` of every test job of the file-form run.
+- `test_outputs_jobform.txt`: the same suite started through the request (T23).
+- Predating revision 3 (kept as they were): `README_rev2_predates_revision3.md`, `test_outputs_rev2_predates_revision3.txt`,
+  `progress_rev2_predates_revision3/`, and the revision 1 files `*_rev1_predates_revision*`.
 
-Commands: `devcheck_r2g/test_driver.sh T1` ... `T6` (about 6 minutes in total; T4 and T5 contain two 75 s pilot runs each).
+## Adapted from revision 2 (T1-T15) and why
+- Start form: file form instead of `bash -c "<text>" stageb` (spec A1).
+- PASS/FAIL is now computed by `check` lines; revision 2 judged by reading.
+- Earlier jobs now need `host.txt`, `binary.sha256` and `runs/<unit>.argv` that match: real PREV jobs are unchanged; T14's hand-made
+  PREV copies host.txt and binary.sha256 from a real job and gets an argv record; T8 gained argv, host, progress, binary variants
+  and an unedited control.
+- T6 uses `fail_unit_wrapper.sh` (FAIL_UNIT) instead of an inline wrapper; same behaviour.
+- T15: `close:` is accepted only for a lost unit; the two-kill chain makes t4 lost, as before; the four bad words still give 16.
+- T13: the two jobs use different UNIT_FILTER; this is accepted because unit_filter is not compared (spec A3 lists three lines).
+- T9 also checks the abort lines; T10 adds LOCK_WAIT (refused, and non-numeric refused); T12 also runs a resume with PREV and
+  `allow:`, and hand-made lost / `close:` / tool-failure cases under the restricted PATH.
 
-## Outcomes (verbatim excerpts are in `test_outputs.txt`)
-- **T1 list: PASS.** `--list` prints 91 lines, 25 distinct ladders in the stated order (B-m3..m6 tower / p0-kummer / p0-isogeny,
-  B-m3-null, then DB-...), 49 `B-` and 42 `DB-` units, 13 hky-B ladders; max t per ladder 8,5,5 / 6,4,4 / 6,3,3 / 6,2,2 / null 8.
-  The count assertion (exit 11) was not triggered; it was not tested with a deliberately wrong list.
-- **T2 happy path: PASS.** Units `B-m3-tower-t2`, `-t3`, `DB-m3-tower-t2`: `start`/`end ... exit 0` for each, rc 0. Each
-  `.jsonl` has 2 rows plus one final `{"summary":...}` line (3 lines). All of `runs/<unit>.{jsonl,log,out}` are in the S3 copy; binary.sha256,
-  host.txt (with `prev:` line), units_done.txt, ladders_closed.txt (empty) uploaded.
-- **T3 ladder stop: PASS.** `--budget 0`: unit t2's log has `every run at t = 2 timed out; stopping`; progress has
-  `closed B-m3-tower at t=2` and `skip B-m3-tower-t3..t8 ladder-closed`; the registered-style invocation
-  (`--t-min 1 --max-t-m3 8 --max-t-m4 6 --max-t 6 --seed 777 --budget 0`) stops at t = 2 too. `--budget 2` (2 threads):
-  units t2, t3 normal, t4 `timed out; stopping`, `closed B-m3-tower at t=4`, t5..t8 skipped; the registered-style invocation
-  also stops after t = 4. (Timeout level depends on wall time: budget 2 s sits between the t3 time of ~1.2 s and t4 of
-  ~37 s, not near a boundary.) The `timed out; stopping` line goes to stderr, i.e. into `runs/<unit>.log`.
-- **T4 equivalence: PASS.** Registered-style single invocation versus concatenated units, rows only (the per-file summary line
-  is excluded), every field except `ms`, `wall_s`, `closures[].ms` (`cmp` of the sorted-key JSON): B-m3-tower t=2..4 (6 rows)
-  identical; DB-m3-tower t=2..3 (F4, 4 rows) identical; extras: B-m3-tower-p0-isogeny t=2..3 (4 rows) and
-  B-m3-null t=2..3 (`--null-chain`, 4 rows) identical. No differing field. Not compared: the `summary` line
-  (`wall_seconds`, `rows`, `seed`, `budget_seconds`), which is per invocation.
-- **T5 resume: PASS.** Job A (4 units `B-m3-tower-t2..4`, `DB-m3-tower-t2`) killed with SIGKILL of the whole process group
-  (runner, syncer, pilot) once S3's progress.txt had `start B-m3-tower-t4`; S3 holds t2, t3 files and `start t4` without `end`.
-  Job D (PREV = A): `skip B-m3-tower-t2 done-in 0`, `skip ...-t3 done-in 0`, t4 re-run (`end exit 0`), `DB-m3-tower-t2` run;
-  rc 0. Job B (PREV = A) killed again during t4. Job C (PREV = A, B): `lost B-m3-tower-t4`, `lost_units.txt` = that unit,
-  rc 75, no unit started. (The first T5 attempt had a test-harness bug and one false "pilot still running", caused by a defunct
-  zombie of the killed pilot; the driver was fixed and T5 re-run; the shown output is the re-run.)
-- **T6 non-zero exit: PASS.** `BIN` wrapper exits 3 for `runs/B-m3-tower-t3.jsonl`: `end B-m3-tower-t3 exit 3`, runner rc 20,
-  no `end ... exit 0` for t3 (grep count 0), t4 never started; t2 files and the failed unit's `.log/.out` are in S3.
+## Tests: what each shows, result, what it does not test
+Results are from `test_outputs.txt` (file form); T23 repeats them through the job form.
 
-## NOT tested
-SIGTERM handling (`trap ... TERM`; an attempt was abandoned); the real `aws s3` commands (only the shim, so `aws s3 ls`
-output parsing uses the last whitespace field of each line and `aws s3 sync` flags are untested); the 300 s background sync
-(no test ran 300 s); production flags `--budget 1800` at large levels; any P0/F4 ladder beyond the T4 extras and no m >= 4;
-a missing PREV progress.txt (runner exits 12; untested); G1 failure (exit 10; untested); the exit-11 assertion on a modified
-list; the real 12 thread / 56Gi pod.
+| Test | Shows | Result | Not tested |
+|:--|:--|:--|:--|
+| T1 | `--list`: 91 units, 25 ladders, 49 + 42, sha256 0f80105d... unchanged | PASS | exit 11 on a modified list |
+| T2 | happy path: 3 units, argv records equal the pilot words, units_done.txt, host.txt lines incl. NODE_NAME, POD_UID, ISOLAB_JOB_ID, runner_sha256 | PASS | /opt/study/build-info.json (path fixed, absent here) |
+| T3 | ladder stop (budget 0 closes at t=2, budget 2 at t=4), registered-style run stops at the same level | PASS | production budget 1800 |
+| T4 | rows of single-unit jobs equal one registered invocation (B tower, DB tower, P0 isogeny, null chain), all fields except wall times | PASS | m >= 4, other ladders |
+| T5 | SIGKILL resume: done-in skips, t4 re-run, two kills then `lost`, exit 75 | PASS | |
+| T6 | pilot exit 3: exit 20, files and end line uploaded, no end 0, later unit not started | PASS | |
+| T7 | SIGTERM mid-unit: exit 143, no pilot left, stop file, no lock, units_done = t3 only | PASS | |
+| T8 | unreadable or incomplete PREV (log, jsonl, summary, argv, host, progress, binary.sha256): exit 12, no unit started; control accepted | PASS | |
+| T9 | upload failures: exit 13, abort lines (start, files) | PASS | persistent failure leaves no abort line in S3 (final upload fails too) |
+| T10 | test-only variables incl. LOCK_WAIT refused outside test mode (exit 15), fake aws never called | PASS | |
+| T11 | an S3 command that reads stdin cannot eat the unit list | PASS | |
+| T12 | image tool set only (PATH of symlinks; no flock, python, jq; gawk absent here): runs, resume, 75, close:, tool-failure closure | PASS | gawk, bash 4.2 |
+| T13 | trailing-slash PREV: `//` keys read verbatim | PASS | real aws |
+| T14 | completeness exit 14 with a hand-made PREV | PASS | |
+| T15 | `close:` accepted for a lost unit; bad words exit 16 | PASS | |
+| T16 | tool failure twice: third and fourth job close the ladder with no argument and no rerun; failed once then passes: ladder continues; exit 75 still lists stop-line, carried-rule and tool-failure closures | PASS | OOM-killed pod path |
+| T17 | units_done.txt vs progress.txt in S3 after a failed end-line upload (retry) and after SIGTERM during that upload; invariant checked in every snapshot | PASS | SIGKILL between the units_done upload and the progress upload (units_done may then list a unit whose end line is not in S3; the next job treats it as not done) |
+| T18 | job left out: exit 12; duplicate PREV: 16; unit done in two PREVs: 12 | PASS | |
+| T19 | other pilot_extra, other runner (genuine copy), edited testmode, binary hash, argv, missing runner_sha256: exit 12 each; control accepted | PASS | |
+| T20 | start upload failing in two jobs: abort lines, third job has no lost unit and runs it | PASS | |
+| T21 | `close:` carried forward; `close:` without a lost unit: 16; `allow:` runs the unit, carried to a later job, 3 in flight with allow 3: 75; bad words | PASS | |
+| T22 | leftover lock with LOCK_WAIT=3: exit 13 in bounded time; handler waits for a lock released by someone else; syncer stops at the stop file (fake sleep: 2 s period) | PASS | the real 300 s period, an orphaned aws child |
+| T23 | whole suite through the request's boot command | PASS | all 25 tests PASS in `test_outputs_jobform.txt` (summary block at its end); `compare_outputs.sh test_outputs.txt test_outputs_jobform.txt` prints 0 differing lines after removing timestamps, wall times and the pids of bash's own "Killed" notices. Checked by the main session, 2026-11-10 18:00Z, on runner sha256 `33bf8d84...`. |
+| T24 | argument and URI errors outside test mode (16, 2), PREV regex, `bash -c` form refused (2) | PASS | |
+| T25 | sha256, no capital Q, `bash -n` on every script, list hash, grep for constructs newer than bash 4.2 | PASS | bash 4.2 itself (not available; reading and grep only) |
+| T26 | `make_request_bu.sh`: pieces, BOOT, exit 17 on a changed piece, arguments, skips, overrides, Q refusal, validator | PASS | the real placeholder fill at the freeze |
 
-## Added by the main session (2026-11-10)
-
-- **Two-kind P0 invocation against single-kind units: PASS.** Registered-style `--p 786433 ... --kinds kummer,isogeny --m 3
-  --controls tower --t-min 1 --max-t-m3 3 --max-t-m4 3 --max-t 3 --seed 777` (8 rows) against the four single-kind, single-level
-  invocations concatenated kummer t2, t3 then isogeny t2, t3: identical in every field except `ms`, `wall_s`, `closures[].ms`
-  (`cmp` of `jq -cS`), in that order.
-- **Termination signal mid-unit: PASS.** Runner started with `UNIT_FILTER='^B-m3-tower-t[34]$'`, `--seed 777`, 2 threads;
-  `kill -TERM` of the runner about 3 s into unit t4. Runner exit 143; no pilot left; the S3 copy has `end B-m3-tower-t3 exit 0`,
-  `start B-m3-tower-t4` and no `end` line for t4; `units_done.txt` lists t3 only; `ladders_closed.txt`, `host.txt`,
-  `binary.sha256` uploaded. A first attempt signalled the wrong process (a `setsid` wrapper) and showed nothing; it was repeated.
-- Still not tested: everything listed under "NOT tested" above except SIGTERM.
-
-## Revision 2 (runner sha256 773a978d5816730026e91dd596c8541fc3e0faca84585ad89dda3f577775cbe3), tests T1-T15
-
-Changes A-I: mkdir lock instead of flock; `ISOLAB_RESULTS_URI` and PREV used verbatim (no slash stripping); `< /dev/null` on every S3
-command and fd 3 for the unit-list loops; upload failures exit 13; done units' `.log` and `.jsonl` (with final `{"summary"` line)
-are fetched from the prev or exit 12 (no `ls`, no S3LS); test-only variables refused with exit 15 outside test mode; completeness
-check exit 14; `close:<ladder>:<T>` arguments (exit 16 when invalid). Beyond A-I: the final upload turns rc 0 into 13 when it fails;
-host.txt also records `testmode`, `pilot_extra`, `unit_filter`, `closed_by_rule`; a PREV progress.txt is still required (exit 12).
-Verbatim outputs: `test_outputs.txt`; progress files: `progress/`. Shim switches added: `SHIM_FAIL_PROGRESS`, `SHIM_FAIL_SYNC_RUNS`,
-`SHIM_READS_STDIN`, `SHIM_LOG`. Driver: `test_driver.sh T1..T15` (T7 uses `runner_bg`, no setsid).
-
-| Test | Result | Evidence |
-|:--|:--|:--|
-| T1 list | PASS | 91 units / 25 ladders, 49 + 42, same order |
-| T2 happy path | PASS | rc 0, 3 units `end exit 0` |
-| T3 ladder stop | PASS | budget 0 closes at t=2, budget 2 closes at t=4, rest `ladder-closed`; registered-style stops at the same levels |
-| T4 equivalence | PASS | B-m3-tower, DB-m3-tower, p0-isogeny, null: IDENTICAL except wall-time fields |
-| T5 resume | PASS | `done-in 0` skips, t4 re-run; two kills then C: `lost B-m3-tower-t4`, rc 75 |
-| T6 non-zero | PASS | rc 20, no `end t3 exit 0` |
-| T7 SIGTERM | PASS | runner rc 143, 0 live pilots, S3 progress `start t4` without `end`, units_done.txt = `B-m3-tower-t3` only |
-| T8 missing prev file | PASS | missing `.log`, missing `.jsonl`, truncated `.jsonl` (no summary): rc 12 each, 0 unit starts |
-| T9 upload failure | PASS | progress.txt cp fails: rc 13, `runs/` empty (no pilot started); runs sync fails: rc 13, 0 `end ... exit 0` lines in S3 |
-| T10 guard | PASS | each of PILOT_EXTRA, UNIT_FILTER, BIN, G1BIN, STUDY_DIR without S3CP/S3SYNC: rc 15; fake `aws` marker file absent |
-| T11 stdin hazard | PASS | shim reads stdin; all 3 units ran, rc 0 |
-| T12 image tool set | PASS | PATH = symlinks to the listed tools only (31 present; `gawk` is not installed on this host, so the link was not made and `awk` is mawk here; no flock, no python3): rc 0, 3 units, no lock dir left |
-| T13 trailing slash | PASS | job 1 at `s3://b/jobS/`: raw URIs `s3://b/jobS//runs`, `//progress.txt`; job 2 PREV `s3://b/jobS/` reads `s3://b/jobS//progress.txt`, `//runs/<unit>.log/.jsonl`; `skip ... done-in 0`, t4 run. The shim file system collapses `//`, so the layout listing shows `b/jobS/...`; the raw keys are in the shim log lines shown |
-| T14 completeness | PASS | T2: exit 0 with the filtered list exhausted. Forced exit 14: a hand-made prev with a done t4 whose log has `timed out; stopping` but t2, t3 never done: t2, t3 skipped `ladder-closed`, rc 14 |
-| T15 close:<ladder>:<T> | PASS | killed twice in t4: without the rule rc 75; with `close:B-m3-tower:4` rc 0, `skip B-m3-tower-t4 closed-by-rule`, DB-m3-tower-t2 run, `ladders_closed.txt` has `B-m3-tower t=4 by-rule`; `close:NOPE:3`, `:99`, `:1`, `:x` rc 16 |
-
-Not tested on revision 2: real `aws s3` commands and their error output, the 300 s background sync, G1 failure (exit 10),
-exit 11 on a modified list, m >= 4 ladders, the 12-thread pod, a lock left by a killed syncer in a live run (the `rmdir` in the exit
-handler is covered only through T7's normal path).
+## Not tested
+Real `aws s3` commands and error output; bash 4.2; gawk; G1 failure (exit 10); exit 11 on a modified list; m >= 4 ladders; the
+12-thread 56Gi pod; production budgets; exit 17 inside a real pod; a SIGKILL timed between two uploads.
