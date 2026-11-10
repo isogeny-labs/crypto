@@ -93,7 +93,7 @@ over it is the remaining model-building step.
 ## Layer 3b — algorithm correctness (formal)
 
 `lean/Algorithms.lean` (Mathlib project; the project gate reports
-`PASS 123 thm 0 trusted`) proves that the two standard generic reductions
+`PASS 124 thm 0 trusted`) proves that the two standard generic reductions
 return the right answer, without assuming anything about cost.
 
 | Theorem | Statement |
@@ -117,7 +117,7 @@ cost/probability model exists.
 
 ## Layer 3c — Pollard rho correctness (formal)
 
-`lean/Rho.lean` (`PASS 123 thm 0 trusted` for the whole project) proves the
+`lean/Rho.lean` (`PASS 124 thm 0 trusted` for the whole project) proves the
 deterministic part of the rho attack.
 
 | Theorem | Statement |
@@ -194,9 +194,11 @@ generic-group bound.
 | --- | --- |
 | `card_fiber` | For `i ≠ j`, exactly `N^(t-1)` tuples have `f i = f j` |
 | `collision_card_le` | At most `t(t-1) N^(t-1)` of the `N^t` tuples contain a collision |
+| `collision_prob_le` | A uniform `t`-tuple collides with probability at most `t(t-1)/N` |
 
-Dividing by `N^t` gives the birthday bound `t(t-1)/N`; the probabilistic
-interpretation (independent uniform draws) is the remaining model premise.
+The probability theorem is stated over `ℚ` for the uniform counting measure;
+the independence model for a concrete rho walk or a generic algorithm remains
+the model premise, not a kernel assumption.
 
 ## Layer 4 — curve-specific attacks (each attacks a hypothesis, not the group)
 
@@ -229,7 +231,7 @@ separately; a break here breaks deployments, not ECDLP.
    doubling) remains to be connected to the same interface.
 3. **Done:** BSGS and Pohlig–Hellman correctness in `Algorithms.lean`, and the
    deterministic part of Pollard rho in `Rho.lean` (Mathlib project,
-   `PASS 123 thm 0 trusted`): baby/giant match equivalence, existence, candidate
+   `PASS 124 thm 0 trusted`): baby/giant match equivalence, existence, candidate
    correctness, collision-free baby table, coprime CRT combination, PH
    subgroup order, projection and reconstruction; finite-orbit collision,
    Floyd meeting, collision relation and DLP recovery. Only the cost/success

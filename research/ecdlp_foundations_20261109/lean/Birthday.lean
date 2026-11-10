@@ -97,3 +97,41 @@ theorem collision_card_le (t N : ℕ) :
         rw [this]
 
 end ECDLPBirthday
+
+namespace ECDLPBirthday
+
+/-- **Birthday bound, probability form.**  A uniform `t`-tuple from a set of
+size `N > 0` contains a collision with probability at most `t(t-1)/N`. -/
+theorem collision_prob_le (t N : ℕ) (hN : 0 < N) :
+    ((Finset.univ.filter (fun f : Fin t → Fin N =>
+      ∃ i j : Fin t, i ≠ j ∧ f i = f j)).card : ℚ) / (N : ℚ) ^ t
+      ≤ (t * (t - 1) : ℚ) / N := by
+  have h := collision_card_le t N
+  rcases Nat.eq_zero_or_pos t with ht | ht
+  · subst ht
+    simp
+  · have ht1 : 1 ≤ t := ht
+    have hNq : (0 : ℚ) < N := by exact_mod_cast hN
+    have hcard : ((Finset.univ.filter (fun f : Fin t → Fin N =>
+        ∃ i j : Fin t, i ≠ j ∧ f i = f j)).card : ℚ)
+        ≤ (t : ℚ) * ((t : ℚ) - 1) * (N : ℚ) ^ (t - 1) := by
+      have h' : ((Finset.univ.filter (fun f : Fin t → Fin N =>
+          ∃ i j : Fin t, i ≠ j ∧ f i = f j)).card : ℚ)
+          ≤ ((t * (t - 1) * N ^ (t - 1) : ℕ) : ℚ) := by
+        exact_mod_cast h
+      push_cast at h'
+      rw [Nat.cast_sub ht1] at h'
+      exact h'
+    have hpow : (0 : ℚ) < (N : ℚ) ^ (t - 1) := pow_pos hNq _
+    have ht' : (N : ℚ) ^ t = (N : ℚ) * (N : ℚ) ^ (t - 1) := by
+      rw [← pow_succ']
+      congr 1
+      omega
+    rw [ht', div_le_div_iff₀ (by positivity) hNq]
+    have hmul := mul_le_mul_of_nonneg_right hcard (le_of_lt hNq)
+    calc ((Finset.univ.filter (fun f : Fin t → Fin N =>
+          ∃ i j : Fin t, i ≠ j ∧ f i = f j)).card : ℚ) * N
+        ≤ ((t : ℚ) * ((t : ℚ) - 1) * (N : ℚ) ^ (t - 1)) * N := hmul
+      _ = (t : ℚ) * ((t : ℚ) - 1) * (N * (N : ℚ) ^ (t - 1)) := by ring
+
+end ECDLPBirthday
