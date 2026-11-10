@@ -1,9 +1,18 @@
+The new [all-input degree proof](ALL_INPUT_DEGREES.md) checks sharp
+individual degree2^(m−2)for every formal input, every aritym≥3and every
+field in the actual canonical resultant family. Explicit variable
+permutations identify each input; a Lean finite-position case split covers
+all positions. The latest whole census gate passes423declarations with
+zero failures and zero trusted-native exceptions. Higher geometric recursion
+and irreducibility remain open; no degree preservation after field
+evaluation is claimed. [pcc:unverified]
+
 The new [surviving-input degree proof](RECURSIVE_FOCUS.md) gives an exact
 old-variable degree2d and leading-coefficient formula for the actual
 fixed-size resultant. The actual canonical third-newest input now has
 degree2^(m−2)at every aritym≥5, extending all-arity coverage to the three
-newest inputs. Every remaining older input still needs its transport proof.
-Latest whole census gate357passes, zero failures/zero trusted-native.
+newest inputs. The later all-input proof closes the remaining older-input degree component.
+The focus-stage whole census gate357passes, zero failures/zero trusted-native.
 [pcc:unverified]
 
 The new [trace-class consequence](SUPERSINGULAR_TRACE.md) proves modular
@@ -18,8 +27,8 @@ The [newest-pair symmetry proof](RECURSIVE_SYMMETRY.md) now shows that
 every actual recursive resultant extension is invariant under exchanging
 its two newest independent variables. Both input degrees are 2^(m−2)
 for every recursive arity m≥4. Complete census gate: 320 declarations,
-zero failures or trusted-native exceptions. Older-input symmetry/degrees
-and higher geometric recursion remain open. [pcc:unverified]
+zero failures or trusted-native exceptions. Full permutation invariance and higher geometric recursion remain open;
+the later all-input component closes formal degree coverage. [pcc:unverified]
 
 # Skeptical Lean refutations and exact Semaev census
 
@@ -94,8 +103,9 @@ actual base S3evaluation and an exact bridge to canonical S4. See
 [source](lean/RecursiveSemaevDegree.lean) and
 [report](reports/proof-20261109-recursive-semaev-degree/report.pdf).
 Packet3bc113and fixedD8scalar supplementIDC1h0872017c01480c3dremain unsigned.
-Other input degrees beyondS4, symmetry, geometric zero-sum equivalence
-beyondS4and irreducibility remain open. [pcc:unverified]
+The later all-input component proves every formal input degree. Full
+permutation symmetry, geometric zero-sum equivalence beyondS4and
+irreducibility remain open. [pcc:unverified]
 
 The actual fixed-size resultant step now has a general coefficient/degree
 proof for every declared size D. Its leading coefficient is f(Z)², and its
@@ -107,7 +117,7 @@ inputs formal. See [RESULTANT_DEGREE_STEP.md](RESULTANT_DEGREE_STEP.md),
 [report](reports/proof-20261109-resultant-degree-step/report.pdf).
 Packet621d56and fixedD4scalar supplementIDC1h7dd754d70e343323remain unsigned;
 the later recursive-family component extends the last-input degree result
-to every arity, while other input degrees/symmetry and irreducibility remain open.
+to every arity, while full permutation symmetry and irreducibility remain open.
 [pcc:unverified]
 
 The canonical S4polynomial has symbolic degree4in every input position,
@@ -303,7 +313,7 @@ only at their already-stated scope. [pcc:unverified]
 
 | Item | Current status and concrete remaining obligation |
 |---|---|
-| 1 Semaev | Partial: full general-Weierstrass S3equivalence in every characteristic, repeated-coordinate cases and actual point sums proved. Short/ordinary binary forms are checked specializations. Rational-only converse and wrong-model extensions refuted, including actual F2/F3geometric controls. Actual fixed-degree S4resultant equivalence and degree-drop control proved; bounded S3/S4/S5native census completed. Canonical individual degree4in each m4input and sharp specialization criterion proved. Universal fixed-size resultant degree step, actual recursive family and last-input degree2^(m−2)for every aritym≥3now proved; reset-of-size counterexample retained. New actual bivariate-exchange proof gives newest-pair symmetry and sharp degree for both newest inputs at every recursive aritym≥4; symmetry-stage wholegate320passes. New sharp surviving-variable degree/leading coefficient theorem gives actual canonical third-newest degree2^(m−2)at allm≥5; latest wholegate357passes. All-m geometric zero-sum recursion, remaining older input degrees and full symmetry beyondm4 and irreducibility remain open; original2004PDFstill403/unread. |
+| 1 Semaev | Partial: full general-Weierstrass S3equivalence in every characteristic, repeated-coordinate cases and actual point sums proved. Short/ordinary binary forms are checked specializations. Rational-only converse and wrong-model extensions refuted, including actual F2/F3geometric controls. Actual fixed-degree S4resultant equivalence and degree-drop control proved; bounded S3/S4/S5native census completed. Canonical individual degree4in each m4input and sharp specialization criterion proved. Universal fixed-size resultant degree step, actual recursive family and last-input degree2^(m−2)for every aritym≥3now proved; reset-of-size counterexample retained. New actual bivariate-exchange proof gives newest-pair symmetry and sharp degree for both newest inputs at every recursive aritym≥4; symmetry-stage wholegate320passes. New sharp surviving-variable degree/leading coefficient theorem gives actual canonical third-newest degree2^(m−2)at allm≥5; latest wholegate357passes. All formal input degrees are now proved through actual variable permutations with explicit Fin-position coverage; latest full census gate423passes. All-m geometric zero-sum recursion, full permutation invariance beyondm4 and irreducibility remain open; original2004PDFstill403/unread. |
 | 2 BK | Partial: original r²point-count formulation read; actual excluded-case geometric3-torsion witness even with9dividing#E. New F2/r2actual geometric torsion has2points all rational, refuting unrestricted set inclusion despite2notdividingq−1. The actual node already excludes this by gcd(r,q)=1; original r²condition is not refuted. Full qualified Frobenius proof and all-p<500 census remain open. |
 | 3 Supersingular | Literal all-prime k=2 assertion refuted at r=2 using the source trace definition and actual groups. FSTp239directly checked with actual cyclotomic degree1 versus nonrational2-torsion. New characteristic2a1=0and characteristic3short families have trivial geometric p-torsion in actual groups. Corrected modular embedding proof now covers every integer r>2, with an actual order8positive control, and remains conditional on Hasse; New trace-class module proves prime-divisor modular order in{1,2,3,4,6}, coprimality and actual prime-order point, conditional on explicit trace-square classification; composite q289/r81control has order9but is arithmetic only. Latest census gate331passes. Original Waterhouse4.1pp536–537read/visually checked. General trace/p-rank/classification and embedding-field bridges plus binary/ternary census remain open. |
 | 4 Pairings | Partial: cyclic restriction obstruction, actual cyclotomic/full-torsion distinction, and actual geometric F2torsion/μ2subtypes proving every point-valued map degenerate at characteristic order. Group-scheme duality is not refuted. Actual qualified Weil/Tate constructions, nondegeneracy and MOV/FR calculations remain open. |
