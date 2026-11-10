@@ -37,7 +37,11 @@ until it resets.
    report/PDF, validator, VALIDATION.json, benchmarks row, leaderboard, PR.
 
 ## Runs in flight
-none
+Iso Lab Job rule-v9-20261106-a1 (submitted 2026-11-10 22:02 UTC on owner authorization over the
+monthly budget; launch/README.md). Job UID 5a545fed-4434-4e26-bda4-ce55bee21c5e, pod
+33053ca8-de9a-4639-bea4-a129ce6d5461, node ip-10-84-68-133 (AMD EPYC 9R45), deadline 43200 s.
+Rows: s3://isolab-results-104186811093-us-east-2/runs/rule-v9-20261106-a1/33053ca8-de9a-4639-bea4-a129ce6d5461/
+Both pins held in the pod. On a Spot loss: launch/make-request.sh 2 <that prefix>.
 
 ## Stop and success conditions
 Rule v8's stop rule (failed row check, logarithm differing from §23, failed
