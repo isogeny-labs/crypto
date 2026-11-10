@@ -2969,17 +2969,34 @@ fn pipeline_components_applicable(m: &ResolvedMethod, inst: &Instance) -> Result
                 g_jumps: or.flag("g"),
                 grow,
             };
-            wwalk_plan_check(i.r, x, jumps, opts)?;
-            let (tw, cj) = (or.flag("tw"), or.flag("cj"));
-            if cj && !tw {
-                return Err("wwalk: cj=1 needs tw=1".into());
+            let (_, _, _, bound) = wwalk_plan_check(i.r, x, jumps, opts)?;
+            let tw = match or.get("tw") {
+                None | Some("0" | "false" | "no") => 0u8,
+                Some("1" | "true" | "yes") => 1,
+                Some("2") => 2,
+                Some(v) => return Err(format!("wwalk: tw is 0, 1 or 2, not `{v}`")),
+            };
+            let (cj, lazy) = (or.flag("cj"), or.flag("lazy"));
+            if cj && tw == 0 {
+                return Err("wwalk: cj=1 needs tw=1 or tw=2".into());
+            }
+            if lazy && !opts.g_jumps {
+                return Err("wwalk: lazy=1 needs g=1".into());
             }
             let cv = crate::cryptanalysis::ic_framework::plugins::wwalk_cv(&or)?;
-            if !cv && !tw {
-                return Err("wwalk: cv=0 needs tw=1".into());
+            if !cv && tw == 0 {
+                return Err("wwalk: cv=0 needs tw=1 or tw=2".into());
             }
-            if tw && (!opts.g_jumps || grow != 2) {
-                return Err("wwalk: tw=1 needs g=1 and grow=2".into());
+            if !cv && lazy {
+                return Err("wwalk: cv=0 and lazy=1 are alternatives; choose one".into());
+            }
+            if !cv && tw == 2 && bound >= 1 << 31 {
+                return Err(format!(
+                    "wwalk: cv=0 with tw=2 needs coefficients below 2^31 (bound {bound})"
+                ));
+            }
+            if tw > 0 && (!opts.g_jumps || grow != 2) {
+                return Err(format!("wwalk: tw={tw} needs g=1 and grow=2"));
             }
         }
         _ => {}
@@ -11117,7 +11134,8 @@ mod engine_items_tests {
         assert!(saved_total > 0.0);
     }
 
-    /// `cv` is 0 or 1 and `cv=0` needs the target walk.
+    /// `cv` is 0 or 1, `cv=0` needs the target walk, and `cv=0` with
+    /// `lazy=1` is refused.
     #[test]
     fn wwalk_cv_refusals() {
         let (inst, facts) = built(&k20());
@@ -11137,8 +11155,16 @@ mod engine_items_tests {
                 ("targets", "stride-generator"),
             ],
         );
+        let with_lazy = method(
+            "ic.pipeline",
+            &[
+                ("factor_base", "prime-projected-abscissa:size=1,scan_cap=32"),
+                ("oracle", "wwalk:x=1.5,g=1,grow=2,tw=1,cv=0,lazy=1,seed=run"),
+                ("targets", "stride-generator"),
+            ],
+        );
         let target = inst.mul_generator_hex(77).unwrap();
-        for m in [bad, no_tw] {
+        for m in [bad, no_tw, with_lazy] {
             let refused = applicable(&m, &inst, &facts).is_err()
                 || solve(&m, &inst, &facts, &target, 1).is_err();
             assert!(refused, "{:?}", m.params);
