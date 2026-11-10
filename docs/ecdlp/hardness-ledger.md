@@ -93,7 +93,7 @@ over it is the remaining model-building step.
 ## Layer 3b — algorithm correctness (formal)
 
 `lean/Algorithms.lean` (Mathlib project; the project gate reports
-`PASS 114 thm 0 trusted`) proves that the two standard generic reductions
+`PASS 119 thm 0 trusted`) proves that the two standard generic reductions
 return the right answer, without assuming anything about cost.
 
 | Theorem | Statement |
@@ -117,7 +117,7 @@ cost/probability model exists.
 
 ## Layer 3c — Pollard rho correctness (formal)
 
-`lean/Rho.lean` (`PASS 114 thm 0 trusted` for the whole project) proves the
+`lean/Rho.lean` (`PASS 119 thm 0 trusted` for the whole project) proves the
 deterministic part of the rho attack.
 
 | Theorem | Statement |
@@ -169,9 +169,21 @@ embedding degree.
 | `log_reduction` | An additive map `L : G →+ ZMod p` sends `Q = x·P` to `x·L(P) = L(Q)` |
 | `anomalous_recover` | With `L` injective and `P ≠ 0`, `x = (L(Q)/L(P)).val` for `x < p` |
 
-The open part is the p-adic elliptic logarithm: define the formal group of the
-curve, construct the isomorphism `E(F_p) → pZ_p/p²Z_p`, and prove it is
-injective and computable.
+`lean/FormalLog.lean` adds the analytic identity the construction needs, for
+the model case of the multiplicative formal group `𝔾ₘ(X,Y) = X + Y + X*Y`:
+
+| Theorem | Statement |
+| --- | --- |
+| `derivative_logOf_mul` | `(log f)' · f = f'` for `f` of constant term 1 |
+| `logOf_mul` | `log(f·g) = log f + log g` for `f,g` of constant term 1 |
+| `logOf_one`, `logOf_pow` | `log 1 = 0`, `log(fⁿ) = n · log f` |
+| `logOf_gm_law` | `log(1 + (f+g+f·g)) = log(1+f) + log(1+g)` |
+
+The open part is the p-adic elliptic logarithm: define the elliptic formal
+group, construct the isomorphism `E(F_p) → pZ_p/p²Z_p`, and prove it is
+injective and computable.  `FormalLog.lean` supplies the formal logarithm
+identity for the multiplicative model; the elliptic formal group and its
+identification with `pZ_p` remain open.
 
 ## Layer 4 — curve-specific attacks (each attacks a hypothesis, not the group)
 
@@ -204,7 +216,7 @@ separately; a break here breaks deployments, not ECDLP.
    doubling) remains to be connected to the same interface.
 3. **Done:** BSGS and Pohlig–Hellman correctness in `Algorithms.lean`, and the
    deterministic part of Pollard rho in `Rho.lean` (Mathlib project,
-   `PASS 114 thm 0 trusted`): baby/giant match equivalence, existence, candidate
+   `PASS 119 thm 0 trusted`): baby/giant match equivalence, existence, candidate
    correctness, collision-free baby table, coprime CRT combination, PH
    subgroup order, projection and reconstruction; finite-orbit collision,
    Floyd meeting, collision relation and DLP recovery. Only the cost/success
@@ -220,7 +232,8 @@ separately; a break here breaks deployments, not ECDLP.
    (`distorted_mov_reduction`). Remaining: construct the Weil/Tate pairing,
    prove bilinearity/non-degeneracy, and identify the embedding degree.
 6. **Partially done (4c):** the anomalous reduction step is formal in
-   `Anomalous.lean`. Remaining: the formal group, the p-adic elliptic
-   logarithm and its injectivity/computability.
+   `Anomalous.lean`, and the formal logarithm of `𝔾ₘ` is formal in
+   `FormalLog.lean` (`logOf_mul`, `logOf_gm_law`). Remaining: the elliptic
+   formal group, its identification with `pZ_p`, and injectivity/computability.
 
 Each step lands as a Lean file with a proof-gate receipt, plus an entry here.
