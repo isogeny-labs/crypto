@@ -2946,12 +2946,21 @@ fn pipeline_components_applicable(m: &ResolvedMethod, inst: &Instance) -> Result
                 grow,
             };
             wwalk_plan_check(i.r, x, jumps, opts)?;
-            let (tw, cj) = (or.flag("tw"), or.flag("cj"));
-            if cj && !tw {
-                return Err("wwalk: cj=1 needs tw=1".into());
+            let tw = match or.get("tw") {
+                None | Some("0" | "false" | "no") => 0u8,
+                Some("1" | "true" | "yes") => 1,
+                Some("2") => 2,
+                Some(v) => return Err(format!("wwalk: tw is 0, 1 or 2, not `{v}`")),
+            };
+            let (cj, lazy) = (or.flag("cj"), or.flag("lazy"));
+            if cj && tw == 0 {
+                return Err("wwalk: cj=1 needs tw=1 or tw=2".into());
             }
-            if tw && (!opts.g_jumps || grow != 2) {
-                return Err("wwalk: tw=1 needs g=1 and grow=2".into());
+            if lazy && !opts.g_jumps {
+                return Err("wwalk: lazy=1 needs g=1".into());
+            }
+            if tw > 0 && (!opts.g_jumps || grow != 2) {
+                return Err(format!("wwalk: tw={tw} needs g=1 and grow=2"));
             }
         }
         _ => {}
