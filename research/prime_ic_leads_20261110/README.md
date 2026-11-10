@@ -284,7 +284,8 @@ which is the instrument check.
 | `m = 3`, `t = 3` (`N = 9`) | 6, 6 | 5, 5 | **−1** | [4, 5, 6] / [4, 5] |
 | `m = 4`, `t = 2` (`N = 8`) | 6, 6 | 5, 5 | **−1** | [4, 5, 6] / [4, 5] |
 | `m = 4`, `t = 3` (`N = 12`) | 7, 7 | 6, 6 | **−1** | [4, 5, 6, 7] / [4, 5, 6] |
-| `m = 5`, `t = 2, 3` | see `devcheck/m5_t2-3.jsonl` (run after this table was written; the rows, not this sentence, are the record) | | | |
+| `m = 5`, `t = 2` (`N = 10`) | 6, 6 | 6, 6 | 0 | [4, 5, 6] / [4, 5, 6] |
+| `m = 5`, `t = 3` (`N = 15`) | > 8 (budget-censored at `c = 8`, 1,500 s; both draws) | see `devcheck/m5_t3_mult_k{0,1}.jsonl` (run per draw with cmax 7 after this table was written; the rows are the record) | — | [4, 5, 6, 7] / — |
 
 Reading against the pre-stated predictions:
 
@@ -292,7 +293,7 @@ Reading against the pre-stated predictions:
   including the fall sequences, as the degree-6 entry requires (the multiples row has one more
   equation, `n_equations` 2t+2 against 2t+1, and the same `n_vars`).
 - **P2 holds, and nothing reaches the falsifier.** At `m ≥ 3` the drop is exactly one degree on
-  six of eight completed cells and zero on the other two; no cell drops by two, and the slope
+  six of ten completed cells and zero on the other four; no cell drops by two, and the slope
   is unchanged: at `m = 4` both arms rise by one degree from `t = 2` to `t = 3` (6 → 7 and
   5 → 6), and in `m` at `t = 3` both rise by one from `m = 3` to `m = 4` (6 → 7 and 5 → 6).
   The one-degree offset at `m ≥ 3` comes with the doubling links (degree 4) and the doubled

@@ -81,7 +81,7 @@ mechanism and close the Kummer lane per Amendment 8's rules.
 ## Update 2026-11-10 (development check, this host; every value `[pcc:unverified]`)
 
 The multiples control ran on Kummer `P1` cells (`research/prime_ic_leads_20261110/devcheck/`):
-identical `d_F` at `m = 2`, `t = 2..9` (P1); at `m = 3, 4` a drop of exactly one degree on six
-of eight cells and zero on two, with both slopes unchanged (P2). The falsifier (a drop of two,
+identical `d_F` at `m = 2`, `t = 2..9` (P1); at `m = 3, 4, 5` a drop of exactly one degree on six
+of ten cells and zero on four, with both slopes unchanged (P2). The falsifier (a drop of two,
 or a flat ladder) was not reached. The second "what would unblock it" item is therefore not
 met at toy scale; the record stays open on the first and third.
