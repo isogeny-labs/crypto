@@ -354,11 +354,10 @@ impl MulModN {
         // t + q·m < 2m·2^64 ≤ 2^128 for m < 2^63, and the quotient by 2^64
         // is below 2m, so one conditional subtraction makes it canonical.
         let u = ((t + q as u128 * self.m as u128) >> 64) as u64;
-        if u >= self.m {
-            u - self.m
-        } else {
-            u
-        }
+        // A select, not a branch: on field data the comparison is a coin
+        // flip a branch predictor cannot learn.
+        let (d, borrow) = u.overflowing_sub(self.m);
+        std::hint::select_unpredictable(borrow, u, d)
     }
 
     #[inline(always)]
