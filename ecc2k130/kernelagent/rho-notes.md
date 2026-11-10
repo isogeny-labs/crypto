@@ -289,3 +289,37 @@ is now entirely algorithmic: it amortises one inversion over 16 walkers
 (4.81 products and ~8 sigma applications per update) where this step pays 10
 products and 127 sigma applications for every walker, because the benchmark
 problem *is* one affine addition with its own inversion.
+
+## Update: CUDA graph (2026-11-10, v12)
+
+Each sigma moves ~3 MB and does ~8.6M lane-ops but measured ~12 us, so a large
+part of the step was per-launch submission across ~30 launches. Fusing them
+into one kernel is not the fix (v10: register spilling), so v12 captures the
+whole launch sequence in a CUDA graph once per row count and replays it,
+copying the inputs into place first.
+
+    v11  single call   0.303 ms   216.5 M updates/s
+    v12  graph replay  0.208 ms   314.5 M updates/s   (1.45x)
+    v12  re-swept      0.214 ms   306.0 M  (best shapes still sigma R16/frob R8, 1 warp)
+
+Exact on the first input, on a second different input (the graph replays, the
+copies change), and on an odd 40,001-row batch (its own graph).
+
+Caveat: a graph pins the row count and the buffer addresses, so there is one
+graph per shape; that is fine for a benchmark and for a real walk, which has a
+fixed geometry, but it is not a general-purpose function any more.
+
+## Ladder
+
+| step | ms | updates/s |
+|---|---:|---:|
+| v5 convolution, L4 (start) | — | 3.0 M |
+| v5 convolution, PRO 6000 | 5.049 | 13.0 M |
+| clmad, batched conversions | 1.296 | 50.6 M |
+| v8, single representation | 0.829 | 79.0 M |
+| v9, shapes tuned on the step | 0.428 | 153 M |
+| v11, sigma without lane waste | 0.303 | 216 M |
+| **v12, CUDA graph replay** | **0.208** | **314 M** |
+| production client (G7) | — | 12,499 M |
+
+102x over where this file started. The client is 40x ahead.
