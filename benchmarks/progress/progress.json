@@ -1,12 +1,12 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261109T2016Z-pkm-fd-pfd-g3c",
+  "latest_record": "20261110T0159Z-c25519-snc-panel",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 0,
-    "measured": 75,
-    "open": 2
+    "measured": 76,
+    "open": 3
   },
   "repo": "crypto",
   "schema": "bench.progress/v1",
@@ -1153,6 +1153,93 @@
     },
     {
       "better": "lower",
+      "first": 2.096,
+      "latest": 2.096,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.78383
+      },
+      "metric": "inclazyk24",
+      "points": [
+        {
+          "commit": "c3781c99e574",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.78383
+          },
+          "n": 480,
+          "record": "20261110T0159Z-c25519-snc-panel",
+          "reference": 1.175,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "SNC-1/SNC-2 shared panel: lazy certification 0.9665 of inc at k=24 (0.989/0.997 at 28/32); two-seed chained target walk + lazy 0.936/0.914/0.909/0.922 of the C=2 incumbent at k=20/24/28/32, order holding across the band; ratio to rho-neg 1.61/1.63/1.74/1.78 (incumbent 1.72/1.84/1.94/1.93)",
+          "value": 2.096
+        }
+      ],
+      "problem": "ic:curve25519-family-k20-32",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.932,
+      "latest": 1.932,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.914767
+      },
+      "metric": "inclazyk28",
+      "points": [
+        {
+          "commit": "c3781c99e574",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.914767
+          },
+          "n": 480,
+          "record": "20261110T0159Z-c25519-snc-panel",
+          "reference": 1.009,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "SNC-1/SNC-2 shared panel: lazy certification 0.9665 of inc at k=24 (0.989/0.997 at 28/32); two-seed chained target walk + lazy 0.936/0.914/0.909/0.922 of the C=2 incumbent at k=20/24/28/32, order holding across the band; ratio to rho-neg 1.61/1.63/1.74/1.78 (incumbent 1.72/1.84/1.94/1.93)",
+          "value": 1.932
+        }
+      ],
+      "problem": "ic:curve25519-family-k20-32",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.908,
+      "latest": 1.908,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.929221
+      },
+      "metric": "inclazyk32",
+      "points": [
+        {
+          "commit": "c3781c99e574",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.929221
+          },
+          "n": 480,
+          "record": "20261110T0159Z-c25519-snc-panel",
+          "reference": 0.989,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "SNC-1/SNC-2 shared panel: lazy certification 0.9665 of inc at k=24 (0.989/0.997 at 28/32); two-seed chained target walk + lazy 0.936/0.914/0.909/0.922 of the C=2 incumbent at k=20/24/28/32, order holding across the band; ratio to rho-neg 1.61/1.63/1.74/1.78 (incumbent 1.72/1.84/1.94/1.93)",
+          "value": 1.908
+        }
+      ],
+      "problem": "ic:curve25519-family-k20-32",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
       "first": 0.93749694761621,
       "latest": 0.93749694761621,
       "latest_derived": {
@@ -1489,6 +1576,122 @@
           "spread": null,
           "summary": "Multi-curve re-baseline: incumbents cost 1.57x / 1.78x / 1.80x / 1.91x matched rho over five family curves at k = 20 / 24 / 28 / 32; per-curve spread about 0.2",
           "value": 1.93
+        }
+      ],
+      "problem": "ic:curve25519-family-k20-32",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 2.529,
+      "latest": 2.529,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.610828
+      },
+      "metric": "tw2cjlazyk20",
+      "points": [
+        {
+          "commit": "c3781c99e574",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.610828
+          },
+          "n": 480,
+          "record": "20261110T0159Z-c25519-snc-panel",
+          "reference": 1.57,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "SNC-1/SNC-2 shared panel: lazy certification 0.9665 of inc at k=24 (0.989/0.997 at 28/32); two-seed chained target walk + lazy 0.936/0.914/0.909/0.922 of the C=2 incumbent at k=20/24/28/32, order holding across the band; ratio to rho-neg 1.61/1.63/1.74/1.78 (incumbent 1.72/1.84/1.94/1.93)",
+          "value": 2.529
+        }
+      ],
+      "problem": "ic:curve25519-family-k20-32",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.915,
+      "latest": 1.915,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.629787
+      },
+      "metric": "tw2cjlazyk24",
+      "points": [
+        {
+          "commit": "c3781c99e574",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.629787
+          },
+          "n": 480,
+          "record": "20261110T0159Z-c25519-snc-panel",
+          "reference": 1.175,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "SNC-1/SNC-2 shared panel: lazy certification 0.9665 of inc at k=24 (0.989/0.997 at 28/32); two-seed chained target walk + lazy 0.936/0.914/0.909/0.922 of the C=2 incumbent at k=20/24/28/32, order holding across the band; ratio to rho-neg 1.61/1.63/1.74/1.78 (incumbent 1.72/1.84/1.94/1.93)",
+          "value": 1.915
+        }
+      ],
+      "problem": "ic:curve25519-family-k20-32",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.756,
+      "latest": 1.756,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.740337
+      },
+      "metric": "tw2cjlazyk28",
+      "points": [
+        {
+          "commit": "c3781c99e574",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.740337
+          },
+          "n": 480,
+          "record": "20261110T0159Z-c25519-snc-panel",
+          "reference": 1.009,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "SNC-1/SNC-2 shared panel: lazy certification 0.9665 of inc at k=24 (0.989/0.997 at 28/32); two-seed chained target walk + lazy 0.936/0.914/0.909/0.922 of the C=2 incumbent at k=20/24/28/32, order holding across the band; ratio to rho-neg 1.61/1.63/1.74/1.78 (incumbent 1.72/1.84/1.94/1.93)",
+          "value": 1.756
+        }
+      ],
+      "problem": "ic:curve25519-family-k20-32",
+      "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 1.758,
+      "latest": 1.758,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 1.777553
+      },
+      "metric": "tw2cjlazyk32",
+      "points": [
+        {
+          "commit": "c3781c99e574",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 1.777553
+          },
+          "n": 480,
+          "record": "20261110T0159Z-c25519-snc-panel",
+          "reference": 0.989,
+          "reference_kind": "matched_rho",
+          "spread": null,
+          "summary": "SNC-1/SNC-2 shared panel: lazy certification 0.9665 of inc at k=24 (0.989/0.997 at 28/32); two-seed chained target walk + lazy 0.936/0.914/0.909/0.922 of the C=2 incumbent at k=20/24/28/32, order holding across the band; ratio to rho-neg 1.61/1.63/1.74/1.78 (incumbent 1.72/1.84/1.94/1.93)",
+          "value": 1.758
         }
       ],
       "problem": "ic:curve25519-family-k20-32",
