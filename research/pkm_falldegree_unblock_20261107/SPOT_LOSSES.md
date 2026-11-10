@@ -9,6 +9,7 @@ relaunch under a new name. Nothing from a lost job is admitted or analysed.
 |--:|:--|:--|:--|:--|:--|:--|:--|
 | 1 | `pfd-x-t13-k0-c6-20261108` (Y3-1) | `r7a.4xlarge`, us-east-2a, spot | 2026-11-10 03:27:50Z | 03:35:08Z (Karpenter `SpotInterrupted`, NodeClaim `cpu-spot-kdj9r`, node `ip-10-84-23-34`) | 03:38:11Z, exit 137, pod reason `Terminated`, "Pod was terminated in response to imminent node shutdown." | about 10 min | `pfd-x-t13-k0-c6-20261110-r1` (`requests_r2g/pfd-x-t13-k0-c6-r1.json`, equal to the original except job name and provenance note) |
 | 2 | `pfd-x-t13-k0-c6-20261110-r1` (Y5-1; the one relaunch of loss 1) | `r6a.4xlarge`, us-east-2a, spot | 2026-11-10 03:45:40Z | 04:02:18Z (Karpenter `SpotInterrupted`, NodeClaim `cpu-spot-twfhv`, node `ip-10-84-24-207`) | 04:05:21Z, exit 137, pod reason `Terminated`, same message | about 20 min | none: owner decision 3 allows one relaunch |
+| 3 | `pfd-x-t13-k0-c6-20261110-r2` (Y6-1; the third attempt, owner decision 7; 56Gi, Amendment 14) | `m7i.4xlarge`, us-east-2a, spot | 2026-11-10 13:42:35Z (pod bound; submitted about 12:04Z and queued behind another lab job) | 17:30:24Z (Karpenter `SpotInterrupted`, node `ip-10-84-120-143`) | 17:33:28Z, exit 137, pod reason `Terminated`, "Pod was terminated in response to imminent node shutdown." | 3 h 51 min | none: decision 7 allowed one attempt; the cell is back with the owner |
 
 
 ## Cell `pfd-x-t13-k0-c6` (t = 13, draw 0, cap 6): reported lost
@@ -20,6 +21,13 @@ relaunch under a new name. Nothing from a lost job is admitted or analysed.
   `requests_r2h/pfd-x-t13-k0-c6-r2.json` (equal to `requests_r2h/pfd-x-t13-k0-c6.json` except job name and provenance note; VALID).
   It is submitted after `pfd-x-t13-k1-c6-20261108` has ended, because jobs run one at a time. If it is lost again the cell goes
   back to the owner.
+- **Third attempt lost (2026-11-10 17:33Z).** `pfd-x-t13-k0-c6-20261110-r2` ran 3 h 51 min on an `m7i.4xlarge` and was killed by an
+  EC2 Spot interruption (row 3 above). Its row file in S3 is 0 bytes. Its partial log was synced through step 30 (last upload
+  16:19:36Z); it is not admitted and not analysed. Decision 7 allowed one attempt, so the cell is not relaunched and goes back to
+  the owner. Draw 1 of the same cell completed in 3.2 h on a faster node (`m8i.4xlarge`).
+  - Disclosure: while watching the run I read the step lines of the partial log to estimate when it would end. Through step 30
+    its counters equal those of the completed draw 1 log. That is not a result and enters no rule; the run did not reach the
+    steps where draw 1's refutation appeared.
 - Money spent on the two attempts: about 30 node-minutes of a 16-vCPU Spot node, well under US$1 (derived from the times above; no price was read).
 
 ## Which nodes were interrupted (measured, EKS API-server audit log, node labels)
@@ -36,10 +44,12 @@ relaunch under a new name. Nothing from a lost job is admitted or analysed.
 | `pfd-x-t13-k0-c6-20261110-r1` (03:45Z) | 112Gi | `r6a.4xlarge` | interrupted after 20 min |
 | another lab job (04:19Z; 4 CPU, 4Gi) | 4Gi | not read | its pod left the node before 07:09Z; cause not read |
 | `pfd-x-t13-k1-c6-20261108` (07:12Z; Amendment 14) | 56Gi | `m8i.4xlarge` | ran 3.2 h; not interrupted |
+| `pfd-x-t13-k0-c6-20261110-r2` (13:42Z; Amendment 14) | 56Gi | `m7i.4xlarge` | interrupted after 3 h 51 min |
 
 - Every node with 128 GiB (r family) that ran longer than a minute was interrupted within about 50 minutes (4 of 4). The two 30-minute runs on `m7i.4xlarge` (64 GiB) were not. One `m7a.4xlarge` was interrupted after 31 minutes.
 - Added 2026-11-10 12:00Z: the first job under Amendment 14 (56Gi) ran 3.2 hours on `m8i.4xlarge` without an interruption. One run; it is in line with the pattern above and does not establish it.
-- That is 7 nodes. It suggests that a 112Gi request, which only r-family nodes can hold, is more exposed than a 56Gi request; it does not establish it.
+- Added 2026-11-10 17:45Z: the second long run at 56Gi was interrupted after 3 h 51 min on `m7i.4xlarge`. So a 56Gi request is not safe for runs of several hours either: of the two runs longer than 3 hours, one finished (3.2 h) and one was interrupted (3.85 h). Two runs; no rate can be stated.
+- The bullets about 112Gi requests rest on 7 nodes. They suggest that a 112Gi request, which only r-family nodes can hold, is more exposed than a 56Gi request; it does not establish it.
 - The t = 13 and t = 14 capped requests ask for 112Gi (Amendment 7 A). Amendment 14 (`AMENDMENT_R2_F_mem56.md`) addresses that for the cells not yet launched.
 
 ## Loss 1: what exists and what is done with it
