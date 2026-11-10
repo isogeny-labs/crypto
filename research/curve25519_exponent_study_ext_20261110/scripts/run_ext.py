@@ -74,7 +74,8 @@ def run_cell(k, m, d):
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
     BIN_SHA = sha256(BIN)
-    want = open(os.path.join(ROOT, "data", "frozen.sha256")).read().split()[0]
+    want = [ln.split()[0] for ln in open(os.path.join(ROOT, "data", "frozen.sha256"))
+            if ln.strip().endswith("curve25519_family")][0]
     if BIN_SHA != want:
         sys.exit(f"binary sha256 {BIN_SHA} != frozen {want}")
     print("binary ok", BIN_SHA[:16], "cap", CAP, "mem_kb", MEM_KB, flush=True)
