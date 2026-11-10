@@ -21,7 +21,7 @@ Command: target/release/ic descent --json --out <file> --families K,R --cells <n
 (patched upstream 01860a52, patches in third_party/m4gb-patches/, built by scripts/m4gb/build.sh).
 Benchmark record: benchmarks/records/20261110T1513Z-m4gb-descent-ladder.json (open).
 
-## State
+## State (closed 18:50Z: ladder measured, record closed, PR #3819 pending auto-merge)
 Branch restarted on origin/main after PR #3812 merged. M4GB binaries in the session scratchpad
 (not in Git; rebuild with scripts/m4gb/build.sh n16_gf2 ... n64_gf2). `ic` release build in
 progress. Conductor, ecdb, research-kb and isolab tooling unreachable in this container.
