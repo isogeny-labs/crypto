@@ -1,0 +1,1285 @@
+From 0229aef1c64cd839b44705084ded5cb1e5461e4b Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Tue, 10 Nov 2026 05:08:51 +0000
+Subject: [PATCH 06/10] harness: execution capacity at wake, mechanism
+ retire-or-measure registry, handoff expiry (I3, I7, I8)
+
+execution_capacity.py: declared route capacity vs approved-unrun demand
+(today: 3024 h/week declared, all unverified; demand 1759 h over 1208
+contracts). harness-mechanisms.yaml: 48 mechanisms, each with a use metric
+and a 30-day review date; mechanism_review.py runs them (challenge loop 0,
+tune-skill 0, autopilot 0, weekly evals 0, receipts with usage 1).
+check_handoff_expiry + expire_handoffs (dry run by default; 383 would
+expire today; applying is a Coordinator action).
+
+Co-Authored-By: Claude Mythos 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01AXUKfUzw574GenKpShCun6
+---
+ .claude/skills/coordinate/SKILL.md    |   1 +
+ docs/harness-mechanisms.md            |  35 +++
+ docs/harness-mechanisms.yaml          | 347 ++++++++++++++++++++++++++
+ orchestration/execution-capacity.yaml |  30 +++
+ tests/test_execution_capacity.py      |  57 +++++
+ tests/test_handoff_expiry.py          | 120 +++++++++
+ tests/test_mechanism_review.py        |  57 +++++
+ tools/check_handoff_expiry.py         | 115 +++++++++
+ tools/execution_capacity.py           | 159 ++++++++++++
+ tools/expire_handoffs.py              | 125 ++++++++++
+ tools/mechanism_review.py             | 125 ++++++++++
+ 11 files changed, 1171 insertions(+)
+ create mode 100644 docs/harness-mechanisms.md
+ create mode 100644 docs/harness-mechanisms.yaml
+ create mode 100644 orchestration/execution-capacity.yaml
+ create mode 100644 tests/test_execution_capacity.py
+ create mode 100644 tests/test_handoff_expiry.py
+ create mode 100644 tests/test_mechanism_review.py
+ create mode 100644 tools/check_handoff_expiry.py
+ create mode 100644 tools/execution_capacity.py
+ create mode 100644 tools/expire_handoffs.py
+ create mode 100644 tools/mechanism_review.py
+
+diff --git a/.claude/skills/coordinate/SKILL.md b/.claude/skills/coordinate/SKILL.md
+index 900deb4052..dc3ea66d78 100644
+--- a/.claude/skills/coordinate/SKILL.md
++++ b/.claude/skills/coordinate/SKILL.md
+@@ -53,6 +53,7 @@ protocol is complete. Do not ask the user to pick or confirm each idea.
+ 1. **Wake.** Read `AGENTS.md` and `agents/coordinator.md`. Check the bus
+    (`python3 tools/agent_bus.py inbox --as coordinator`). Read the merge digest
+    since `origin/main`. Messages confer neither authority nor evidence.
++   Run `python3 tools/execution_capacity.py`; copy its sentence into the wake receipt.
+ 2. **Bind the checkout.** For **status**, skip fetch/merge. Otherwise
+    `git fetch origin && git merge origin/main` (merge, never rebase). A conflict
+    inside an immutable record stops the session; do not edit it. Re-run
+diff --git a/docs/harness-mechanisms.md b/docs/harness-mechanisms.md
+new file mode 100644
+index 0000000000..0e9cf26f0e
+--- /dev/null
++++ b/docs/harness-mechanisms.md
+@@ -0,0 +1,35 @@
++# Harness mechanisms: retire or measure
++
++Harness review I7 (2026-11-10). Each review added mechanisms and none was
++retired; the bus, handoff returns, the challenge loop, the tuner and the eval
++had no measurement of their own effect.
++
++## Rule
++
++Every mechanism is listed in `docs/harness-mechanisms.yaml` with an owner doc,
++a `use_metric` (a shell command printing one number), `added_on` and
++`review_by` (`added_on` + 30 days). Entries cover the bus, handoff returns, the
++challenge loop, tune-skill, the autopilot, the weekly eval, session receipts,
++the instruction-budget check, the pcc canary, the approval cap, and one entry
++per `AGENTS.md` H2 section.
++
++`python3 tools/mechanism_review.py` runs each metric (120 s limit; failure is
++`unavailable`) and prints the number and days to review.
++`python3 tools/mechanism_review.py --overdue` lists mechanisms past `review_by`
++whose status is not `measured`, or whose metric is 0 or unavailable. For each,
++**make it optional and move its text to `docs/`**; do not raise a budget to
++keep it. The 30-day clock starts at registry entry, not at introduction.
++A metric of use is not a metric of effect: AGENTS.md section entries count
++citing files, so they stay `unmeasured` until someone measures an effect.
++
++## Falsifier
++
++Removal is safe only while discipline holds. If removing a mechanism coincides
++with a regression in the discipline eval (`evals/`, harness review I5), restore
++it and record the measured dependence in its registry entry. Until the eval
++produces results (none exists today), a removal is provisional.
++
++## Metrics for the programme
++
++Always-loaded words back at or below 4,000 without raising the budget; bus
++unread fraction; mechanisms with a measured effect over mechanisms total.
+diff --git a/docs/harness-mechanisms.yaml b/docs/harness-mechanisms.yaml
+new file mode 100644
+index 0000000000..b4d2b1f082
+--- /dev/null
++++ b/docs/harness-mechanisms.yaml
+@@ -0,0 +1,347 @@
++# Registry of harness mechanisms (harness review I7, 2026-11-10).
++# Each mechanism has a one-number use_metric (a shell command run from the repo
++# root) and 30 days: review_by = added_on + 30 days. A mechanism past review_by
++# with no measured use becomes optional and its text moves to docs/.
++# `python3 tools/mechanism_review.py` runs the metrics; `--overdue` lists them.
++# status: measured (the metric is a use or effect count and was > 0 when set),
++# unmeasured, retired. AGENTS.md section entries count the files that cite the
++# heading: a citation count, not an effect, hence unmeasured.
++# The 30-day clock starts at registry entry (added_on), not at the mechanism's
++# own introduction. Edit only by adding entries or changing status.
++mechanisms:
++- id: bus-pointers
++  name: Agent bus pointer messages
++  owner_doc: docs/inter-agent-messaging.md
++  use_metric: ls coordination/bus/receipts | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: handoff-returns
++  name: Handoff returns (archived_by set)
++  owner_doc: AGENTS.md
++  use_metric: grep -l '^  archived_by:' ledger/handoffs/*.yaml | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: challenge-loop
++  name: Challenge research loop
++  owner_doc: docs/challenge-research-loop.md
++  use_metric: python3 -c "import json,glob; print(sum(json.load(open(f)).get('completed_actions',0) for f in glob.glob('coordination/pilots/*/summary.json')))"
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: tune-skill
++  name: Tune-skill self-improvement loop
++  owner_doc: docs/self-improvement-loop.md
++  use_metric: 'python3 tools/self_improve.py plan | python3 -c "import sys,re; print(sum(int(x) for x in re.findall(r''\"outcomes\": (\d+)'', sys.stdin.read())))"'
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: throughput-autopilot
++  name: Throughput autopilot
++  owner_doc: docs/research-throughput-autopilot.md
++  use_metric: grep -rli autopilot coordination/sessions/receipts | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: weekly-evals
++  name: Weekly eval workflow (results present)
++  owner_doc: .github/workflows/weekly-evals.yml
++  use_metric: ls evals/results 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: session-receipts-usage
++  name: Session receipts with provider usage
++  owner_doc: tools/session_receipt.py
++  use_metric: python3 tools/session_receipt.py summary | sed -n 's/.*provider usage known for \([0-9]*\).*/\1/p' | head -1
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: instruction-budget
++  name: Instruction-budget check (always-loaded headroom, words)
++  owner_doc: tools/check_instruction_budget.py
++  use_metric: python3 tools/check_instruction_budget.py | sed -n 's/.*always loaded \([0-9]*\) words.*/\1/p' | awk '{print 6000-$1}'
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: pcc-canary
++  name: pcc canary (cases ok)
++  owner_doc: AGENTS.md
++  use_metric: python3 tools/pcc/pcc.py canary | grep -c '^ok'
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: approval-capacity-cap
++  name: 'Approval-capacity cap (receipts refused_capacity: times it bound)'
++  owner_doc: AGENTS.md
++  use_metric: grep -rl 'refused_capacity' coordination/sessions/receipts | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:literature-first
++  name: 'AGENTS.md section: Literature first'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Literature first' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:research-scope
++  name: 'AGENTS.md section: Research scope'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Research scope' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:observe-first-interpret-later
++  name: 'AGENTS.md section: Observe first; interpret later'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Observe first; interpret later' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:name-the-obstruction
++  name: 'AGENTS.md section: Name the obstruction'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Name the obstruction' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:cloud-budgets-and-github-custody
++  name: 'AGENTS.md section: Cloud budgets and GitHub custody'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Cloud budgets and GitHub custody' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:entry-points
++  name: 'AGENTS.md section: Entry points'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Entry points' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:skill-routing
++  name: 'AGENTS.md section: Skill routing'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Skill routing' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:default-research-loop
++  name: 'AGENTS.md section: Default research loop'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Default research loop' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:roles
++  name: 'AGENTS.md section: Roles'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Roles' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:visual-research-record
++  name: 'AGENTS.md section: Visual research record'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Visual research record' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:experiment-protocol-export-and-review
++  name: 'AGENTS.md section: Experiment protocol, export and review'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Experiment protocol, export and review' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:standing-user-authorization
++  name: 'AGENTS.md section: Standing user authorization'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Standing user authorization' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:model-policy
++  name: 'AGENTS.md section: Model policy'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Model policy' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:mandatory-progress-fidelity-gate
++  name: 'AGENTS.md section: Mandatory progress-fidelity gate'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Mandatory progress-fidelity gate' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:intermediate-cost-and-asymmetric-access-
++  name: 'AGENTS.md section: Intermediate-cost and asymmetric-access hypotheses'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Intermediate-cost and asymmetric-access hypotheses' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:core-rules
++  name: 'AGENTS.md section: Core rules'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Core rules' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:research-direction-integrity
++  name: 'AGENTS.md section: Research-direction integrity'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Research-direction integrity' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:goal-closure-quorum-suspended
++  name: 'AGENTS.md section: Goal closure quorum (suspended)'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Goal closure quorum (suspended)' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:goals-are-never-paused
++  name: 'AGENTS.md section: Goals are never paused'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Goals are never paused' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:ecc-comes-first-within-owner-cloud-limit
++  name: 'AGENTS.md section: ECC comes first within owner cloud limits'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'ECC comes first within owner cloud limits' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:research-direction
++  name: 'AGENTS.md section: Research direction'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Research direction' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:handoffs
++  name: 'AGENTS.md section: Handoffs'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Handoffs' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:review-architecture
++  name: 'AGENTS.md section: Review architecture'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Review architecture' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:messaging-and-coordination
++  name: 'AGENTS.md section: Messaging and coordination'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Messaging and coordination' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:concurrency-many-agents-many-worktrees
++  name: 'AGENTS.md section: Concurrency: many agents, many worktrees'
++  owner_doc: AGENTS.md
++  use_metric: 'grep -rlF --include=''*.md'' --include=''*.py'' --include=''*.yaml'' --exclude=harness-mechanisms.yaml -e ''Concurrency: many agents, many worktrees'' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l'
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:durable-research-commits
++  name: 'AGENTS.md section: Durable research commits'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Durable research commits' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:research-states
++  name: 'AGENTS.md section: Research states'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Research states' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:artifact-policy
++  name: 'AGENTS.md section: Artifact policy'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Artifact policy' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:data-files-live-in-the-artifact-store
++  name: 'AGENTS.md section: Data files live in the artifact store'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Data files live in the artifact store' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:papers
++  name: 'AGENTS.md section: Papers'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Papers' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:knowledge-retrieval
++  name: 'AGENTS.md section: Knowledge retrieval'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Knowledge retrieval' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:curve-identity-and-measured-bounds
++  name: 'AGENTS.md section: Curve identity and measured bounds'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Curve identity and measured bounds' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:weak-curve-and-isogenous-representative-
++  name: 'AGENTS.md section: Weak-curve and isogenous-representative audits'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Weak-curve and isogenous-representative audits' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:cursor-cloud-specific-instructions
++  name: 'AGENTS.md section: Cursor Cloud specific instructions'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Cursor Cloud specific instructions' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:progress-metrics-daily-lab-report
++  name: 'AGENTS.md section: Progress metrics (daily lab report)'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Progress metrics (daily lab report)' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:resume-checkpoints-in-s3-before-every-ru
++  name: 'AGENTS.md section: Resume checkpoints in S3 before every run'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Resume checkpoints in S3 before every run' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:benchmark-records-data-in-s3-metadata-in
++  name: 'AGENTS.md section: Benchmark records: data in S3, metadata in Git, one progress report'
++  owner_doc: AGENTS.md
++  use_metric: 'grep -rlF --include=''*.md'' --include=''*.py'' --include=''*.yaml'' --exclude=harness-mechanisms.yaml -e ''Benchmark records: data in S3, metadata in Git, one progress report'' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l'
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
++- id: agents-md:persistent-scientific-research-loop
++  name: 'AGENTS.md section: Persistent scientific research loop'
++  owner_doc: AGENTS.md
++  use_metric: grep -rlF --include='*.md' --include='*.py' --include='*.yaml' --exclude=harness-mechanisms.yaml -e 'Persistent scientific research loop' tools agents .claude docs orchestration plugins CLAUDE.md 2>/dev/null | wc -l
++  added_on: '2026-11-10'
++  review_by: '2026-12-10'
++  status: unmeasured
+diff --git a/orchestration/execution-capacity.yaml b/orchestration/execution-capacity.yaml
+new file mode 100644
+index 0000000000..cd04c29c4c
+--- /dev/null
++++ b/orchestration/execution-capacity.yaml
+@@ -0,0 +1,30 @@
++# Executable CPU-hours per week, by route (harness review I3, 2026-11-10).
++# Read by tools/execution_capacity.py at every Coordinator wake.
++# Every number below is `unverified`: an observation or a guess, not a quota
++# read from the provider. Replace a figure only with one you read this week and
++# set last_verified to that date. cpu_hours_per_week is a CEILING (vCPU x 168 h),
++# not a promise that Spot capacity is up.
++routes:
++  - name: isolab-eks cpu-spot
++    cpu_hours_per_week: 2352        # 14 vCPU x 168 h, one node
++    number_status: unverified
++    source_of_truth: >-
++      One 14 vCPU node observed 2026-11-10 (kubectl get nodes via isolab-eks);
++      quota and Spot interruption rate not read.
++    last_verified: 2026-11-10
++  - name: runpod
++    cpu_hours_per_week: 0           # balance-gated: 0 until topped up
++    number_status: unverified
++    source_of_truth: >-
++      Runpod billing balance (runpodctl / runpod-mcp). Set a figure only after a
++      top-up, as balance / hourly price.
++    last_verified: 2026-11-10
++  - name: local
++    cpu_hours_per_week: 672         # 4 vCPU x 168 h
++    number_status: unverified
++    source_of_truth: >-
++      Session host, 4 vCPU (nproc). Shared with the session itself.
++    last_verified: 2026-11-10
++# Demand default for an approved-unrun contract that declares no budget
++# (neither budget.total_cpu_hours nor wall_clock_seconds_per_run x maximum_runs).
++default_contract_cpu_hours: 0.5     # the modal declared total_cpu_hours in experiments/
+diff --git a/tests/test_execution_capacity.py b/tests/test_execution_capacity.py
+new file mode 100644
+index 0000000000..858dc250dc
+--- /dev/null
++++ b/tests/test_execution_capacity.py
+@@ -0,0 +1,57 @@
++import sys
++import tempfile
++import unittest
++from pathlib import Path
++
++sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
++import execution_capacity as ec  # noqa: E402
++
++
++def _spec(root: Path, exp_id: str, status: str, budget: str, runs: bool = False):
++    d = root / "experiments" / exp_id
++    d.mkdir(parents=True)
++    (d / "specification.yaml").write_text(
++        f"experiment:\n  id: {exp_id}\n  status: {status}\n  goal_id: GOAL-X\n{budget}")
++    if runs:
++        (d / "runs" / "RUN-1").mkdir(parents=True)
++        (d / "runs" / "RUN-1" / "manifest.yaml").write_text("run: {status: ok}\n")
++
++
++class ExecutionCapacityTest(unittest.TestCase):
++    def test_declared_hours(self):
++        self.assertEqual(ec.declared_hours({"total_cpu_hours": 3}), 3.0)
++        self.assertEqual(ec.declared_hours(
++            {"wall_clock_seconds_per_run": 900, "maximum_runs": 20}), 5.0)
++        self.assertIsNone(ec.declared_hours({"maximum_runs": 2}))
++        self.assertIsNone(ec.declared_hours(None))
++
++    def test_compute(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            root = Path(tmp)
++            (root / "orchestration").mkdir()
++            (root / "orchestration" / "execution-capacity.yaml").write_text(
++                "routes:\n- {name: a, cpu_hours_per_week: 100, number_status: unverified}\n"
++                "- {name: b, cpu_hours_per_week: 0}\n"
++                "default_contract_cpu_hours: 0.5\n")
++            _spec(root, "EXP-X-000001", "approved", "  plan:\n    budget:\n      total_cpu_hours: 3.0\n")
++            _spec(root, "EXP-X-000002", "approved", "")
++            _spec(root, "EXP-X-000003", "approved", "  budget: {total_cpu_hours: 9}\n", runs=True)
++            _spec(root, "EXP-X-000004", "draft", "  budget: {total_cpu_hours: 9}\n")
++            r = ec.compute(root, dispatching=2)
++        self.assertEqual(r["approved_unrun_contracts"], 2)
++        self.assertEqual(r["contracts_with_declared_budget"], 1)
++        self.assertAlmostEqual(r["demand_hours"], 3.5)
++        self.assertEqual(r["capacity_hours_per_week"], 100)
++        self.assertAlmostEqual(r["utilisation"], 0.035)
++        self.assertEqual(r["sentence"],
++                         "capacity 100 h, demand 3.5 h, dispatching 2 / recording why not")
++
++    def test_seed_file_all_unverified(self):
++        cap = ec.load_capacity(ec.CAPACITY_FILE)
++        self.assertEqual({r["name"] for r in cap["routes"]},
++                         {"isolab-eks cpu-spot", "runpod", "local"})
++        self.assertTrue(all(r["number_status"] == "unverified" for r in cap["routes"]))
++
++
++if __name__ == "__main__":
++    unittest.main()
+diff --git a/tests/test_handoff_expiry.py b/tests/test_handoff_expiry.py
+new file mode 100644
+index 0000000000..b16e20bff3
+--- /dev/null
++++ b/tests/test_handoff_expiry.py
+@@ -0,0 +1,120 @@
++import datetime as dt
++import sys
++import tempfile
++import unittest
++from pathlib import Path
++
++TOOLS = Path(__file__).resolve().parents[1] / "tools"
++sys.path.insert(0, str(TOOLS))
++import check_handoff_expiry as che  # noqa: E402
++import expire_handoffs as eh  # noqa: E402
++import validate_ledger as vl  # noqa: E402
++
++TODAY = dt.date(2026, 11, 10)
++
++
++def make_ctx(handoffs, decisions=()):
++    ctx = vl.Ctx(set())
++    for rid, body in handoffs.items():
++        ctx.register(rid, f"/x/ledger/handoffs/{rid}.yaml", body, "handoff")
++    for rid, body in decisions:
++        ctx.register(rid, f"/x/ledger/decisions/{rid}.yaml", body, "coordinator_decision")
++    return ctx
++
++
++def h(role="validator", **kw):
++    return {"from": "coordinator", "to": role, "objective": "o", "budget": {}, **kw}
++
++
++class CheckTest(unittest.TestCase):
++    def test_candidate_advisory(self):
++        ctx = make_ctx({
++            "TASK-20261001-aaaaaa": h(),                              # 40 d, open
++            "TASK-20261001-bbbbbb": h(archived_by="TASK-20261002-x"),  # returned
++            "TASK-20261105-cccccc": h(),                              # 5 d
++            "TASK-20261001-dddddd": h(status="expired"),               # already
++            "TASK-20261027-eeeeee": h(),                              # exactly 14 d
++        })
++        che.check_handoff_expiry(ctx, today=TODAY)
++        self.assertEqual(len(ctx.advisories), 1)
++        self.assertIn("expired candidate", ctx.advisories[0])
++        self.assertIn("TASK-20261001-aaaaaa", ctx.advisories[0])
++        self.assertEqual(ctx.errors, [])
++
++    def test_today_accepts_string_forms(self):
++        ctx = make_ctx({"TASK-20261001-aaaaaa": h()})
++        che.check_handoff_expiry(ctx, today="20261110")
++        che.check_handoff_expiry(ctx, today="2026-11-10")
++        self.assertEqual(len(ctx.advisories), 2)
++
++    def _six_expired(self):
++        recs = {f"TASK-2026100{i}-e0000{i}": h(status="expired", expired_on="2026-11-01")
++                for i in range(1, 7)}
++        recs["TASK-20261105-newnew"] = h()
++        recs["TASK-20261105-othrol"] = h("executor")
++        recs["TASK-20260901-oldold"] = h()   # older than the expired ones
++        return recs
++
++    def test_role_limit_error_and_clearing(self):
++        recs = self._six_expired()
++        ctx = make_ctx(recs)
++        che.check_handoff_expiry(ctx, today=TODAY)
++        self.assertEqual(len(ctx.errors), 1)
++        self.assertIn("TASK-20261105-newnew", ctx.errors[0])
++        self.assertIn("clears_expired", ctx.errors[0])
++        ids = [f"TASK-2026100{i}-e0000{i}" for i in range(1, 3)]
++        ctx = make_ctx(recs, [("DEC-20261110-abcdef", {"clears_expired": ids})])
++        che.check_handoff_expiry(ctx, today=TODAY)   # 4 left uncleared
++        self.assertEqual(ctx.errors, [])
++
++    def test_five_expired_is_allowed(self):
++        recs = {k: v for k, v in list(self._six_expired().items())[:5]}
++        recs["TASK-20261105-newnew"] = h()
++        ctx = make_ctx(recs)
++        che.check_handoff_expiry(ctx, today=TODAY)
++        self.assertEqual(ctx.errors, [])
++
++
++class ExpireTest(unittest.TestCase):
++    def test_apply_write_once_never_deletes(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            root = Path(tmp)
++            d = root / "ledger" / "handoffs"
++            d.mkdir(parents=True)
++            a = d / "TASK-20261001-aaaaaa.yaml"
++            a.write_text("handoff:\n  id: TASK-20261001-aaaaaa\n  to: validator\n  budget: {}\n")
++            b = d / "TASK-20261001-bbbbbb.yaml"
++            b.write_text("handoff:\n  id: TASK-20261001-bbbbbb\n  to: executor\n  status: assigned\n  budget: {}\n")
++            c = d / "TASK-20261001-cccccc.yaml"
++            c.write_text("handoff:\n  id: TASK-20261001-cccccc\n  to: executor\n  archived_by: TASK-20261002-zzzzzz\n")
++            before_c = c.read_text()
++            self.assertEqual(eh.main(["--repo-root", str(root), "--today", "2026-11-10"]), 0)
++            self.assertNotIn("expired", a.read_text())          # dry run
++            eh.main(["--repo-root", str(root), "--today", "2026-11-10", "--apply"])
++            ba = eh._body(a)
++            self.assertEqual((ba["status"], str(ba["expired_on"])), ("expired", "2026-11-10"))
++            bb = eh._body(b)
++            self.assertEqual((bb["status"], bb["status_before_expiry"]), ("expired", "assigned"))
++            self.assertEqual(c.read_text(), before_c)
++            first = a.read_text()
++            eh.main(["--repo-root", str(root), "--today", "2026-12-25", "--apply"])
++            self.assertEqual(a.read_text(), first)               # write-once
++            self.assertEqual(len(list(d.glob("*.yaml"))), 3)
++
++    def test_role_report(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            root = Path(tmp)
++            d = root / "ledger" / "handoffs"
++            d.mkdir(parents=True)
++            for i in range(7):
++                (d / f"TASK-2026100{i}-e0000{i}.yaml").write_text(
++                    f"handoff:\n  id: TASK-2026100{i}-e0000{i}\n  to: red-team\n  status: expired\n")
++            over = eh.role_report(eh.scan(root), [], None)
++            self.assertEqual(list(over), ["red-team"])
++            self.assertEqual(len(over["red-team"]), 7)
++            cleared = [{"clears_expired": list(over["red-team"][:3])}]
++            self.assertEqual(eh.role_report(eh.scan(root), cleared, "red-team"), {})
++
++
++if __name__ == "__main__":
++    unittest.main()
+diff --git a/tests/test_mechanism_review.py b/tests/test_mechanism_review.py
+new file mode 100644
+index 0000000000..288e746b90
+--- /dev/null
++++ b/tests/test_mechanism_review.py
+@@ -0,0 +1,57 @@
++import datetime as dt
++import sys
++import unittest
++from pathlib import Path
++
++sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
++import mechanism_review as mr  # noqa: E402
++
++TODAY = dt.date(2026, 12, 20)
++
++
++def mech(id, status, review_by="2026-12-10", cmd="echo 3"):
++    return {"id": id, "name": id, "owner_doc": "x.md", "use_metric": cmd,
++            "added_on": "2026-11-10", "review_by": review_by, "status": status}
++
++
++class MechanismReviewTest(unittest.TestCase):
++    def test_run_metric(self):
++        self.assertEqual(mr.run_metric("echo 7"), 7.0)
++        self.assertEqual(mr.run_metric("echo noise; echo 2.5"), 2.5)
++        self.assertIsNone(mr.run_metric("echo hello"))
++        self.assertIsNone(mr.run_metric("exit 3"))
++        self.assertIsNone(mr.run_metric("sleep 5", timeout=1))
++
++    def test_overdue_rules(self):
++        rows = mr.review([
++            mech("measured-used", "measured"),
++            mech("measured-zero", "measured", cmd="echo 0"),
++            mech("unmeasured-overdue", "unmeasured"),
++            mech("broken", "measured", cmd="exit 1"),
++            mech("not-yet", "unmeasured", review_by="2027-01-01"),
++            mech("retired", "retired", cmd="echo 0"),
++        ], TODAY)
++        over = {r["id"] for r in rows if r["overdue"]}
++        self.assertEqual(over, {"measured-zero", "unmeasured-overdue", "broken"})
++        by = {r["id"]: r for r in rows}
++        self.assertEqual(by["broken"]["value"], "unavailable")
++        self.assertEqual(by["not-yet"]["days_to_review"], 12)
++        self.assertIn("make optional", mr.render_overdue(rows))
++
++    def test_registry_shape(self):
++        mechs = mr.load_registry()
++        ids = [m["id"] for m in mechs]
++        self.assertEqual(len(ids), len(set(ids)))
++        for m in mechs:
++            self.assertIn(m["status"], mr.STATUSES)
++            added, rb = mr._date(m["added_on"]), mr._date(m["review_by"])
++            self.assertEqual((rb - added).days, 30, m["id"])
++            self.assertTrue(m["use_metric"] and m["owner_doc"])
++        agents = Path(mr.REPO, "AGENTS.md")
++        if agents.exists():
++            h2 = [l for l in agents.read_text().splitlines() if l.startswith("## ")]
++            self.assertEqual(sum(i.startswith("agents-md:") for i in ids), len(h2))
++
++
++if __name__ == "__main__":
++    unittest.main()
+diff --git a/tools/check_handoff_expiry.py b/tools/check_handoff_expiry.py
+new file mode 100644
+index 0000000000..527d10cce8
+--- /dev/null
++++ b/tools/check_handoff_expiry.py
+@@ -0,0 +1,115 @@
++#!/usr/bin/env python3
++"""Orphan handoffs expire (harness review I8).
++
++A dispatched `TASK-*` handoff with no `archived_by` after 14 days is an
++*expired candidate* (advisory). `tools/expire_handoffs.py --apply` records
++`status: expired` and `expired_on` on such records, write-once. A role with
++more than 5 expired handoffs cannot be dispatched a newer one: the check turns
++that into an error on the newer handoff, unless a DEC-* record lists the
++expired ids under `clears_expired`.
++
++`check_handoff_expiry(ctx, today=None)` uses the validate_ledger Ctx API
++(`record_types`, `records`, `ids`, `advise`, `err`). Wire it in
++`validate_ledger.main` next to `check_aged_handoffs(ctx)`:
++
++    from check_handoff_expiry import check_handoff_expiry
++    check_handoff_expiry(ctx)
++"""
++from __future__ import annotations
++
++import datetime as dt
++import re
++from typing import Any, Iterable
++
++EXPIRY_DAYS = 14
++EXPIRED_ROLE_LIMIT = 5
++
++_ID_DATE = re.compile(r"-(\d{8})-")
++
++
++def id_date(rec_id: str) -> dt.date | None:
++    m = _ID_DATE.search(str(rec_id or ""))
++    if not m:
++        return None
++    try:
++        return dt.datetime.strptime(m.group(1), "%Y%m%d").date()
++    except ValueError:
++        return None
++
++
++def _today(today: Any) -> dt.date:
++    if today is None:
++        return dt.date.today()
++    if isinstance(today, dt.date):
++        return today
++    s = str(today)
++    return dt.datetime.strptime(s, "%Y%m%d" if len(s) == 8 else "%Y-%m-%d").date()
++
++
++def role_of(body: dict) -> str:
++    to = body.get("to") or body.get("role") or ""
++    if isinstance(to, list):
++        to = ",".join(str(x) for x in to)
++    return str(to).strip().strip('"')
++
++
++def is_expired(body: dict) -> bool:
++    return str(body.get("status") or "") == "expired"
++
++
++def is_expired_candidate(rec_id: str, body: dict, today: dt.date) -> bool:
++    """Dispatched TASK-*, no archived_by, not yet expired, older than 14 days."""
++    if not str(rec_id).startswith("TASK-") or body.get("archived_by") or is_expired(body):
++        return False
++    when = id_date(rec_id)
++    return when is not None and (today - when).days > EXPIRY_DAYS
++
++
++def cleared_ids(decisions: Iterable[dict]) -> set[str]:
++    out: set[str] = set()
++    for body in decisions:
++        listed = body.get("clears_expired") if isinstance(body, dict) else None
++        if isinstance(listed, list):
++            out.update(str(x) for x in listed)
++    return out
++
++
++def _key(rec_id: str) -> tuple[str, str]:
++    when = id_date(rec_id)
++    return (when.isoformat() if when else "", str(rec_id))
++
++
++def roles_over_limit(handoffs: dict[str, dict], cleared: set[str],
++                     limit: int = EXPIRED_ROLE_LIMIT) -> dict[str, list[str]]:
++    """role -> uncleared expired handoff ids, for roles with more than `limit`."""
++    by_role: dict[str, list[str]] = {}
++    for rec_id, body in handoffs.items():
++        if is_expired(body) and rec_id not in cleared:
++            by_role.setdefault(role_of(body), []).append(rec_id)
++    return {r: sorted(ids, key=_key) for r, ids in by_role.items() if len(ids) > limit}
++
++
++def check_handoff_expiry(ctx, today=None) -> None:
++    now = _today(today)
++    handoffs = {rid: ctx.records[rid] for rid, kind in ctx.record_types.items()
++                if kind == "handoff" and isinstance(ctx.records[rid], dict)}
++    for rec_id, body in handoffs.items():
++        if is_expired_candidate(rec_id, body, now):
++            age = (now - id_date(rec_id)).days
++            ctx.advise(ctx.ids[rec_id],
++                       f"expired candidate: dispatched {age} days ago with no "
++                       "archived_by; run tools/expire_handoffs.py --apply or "
++                       "record its return")
++    decisions = [ctx.records[rid] for rid, kind in ctx.record_types.items()
++                 if kind == "coordinator_decision"]
++    over = roles_over_limit(handoffs, cleared_ids(decisions))
++    for role, expired in over.items():
++        newest = _key(expired[-1])
++        for rec_id, body in handoffs.items():
++            if (role_of(body) == role and not is_expired(body)
++                    and _key(rec_id) > newest):
++                ctx.err(ctx.ids[rec_id],
++                        f"role '{role}' has {len(expired)} expired handoffs "
++                        f"(limit {EXPIRED_ROLE_LIMIT}); a DEC-* record must "
++                        "list them under clears_expired before a new handoff "
++                        "is dispatched to it")
+diff --git a/tools/execution_capacity.py b/tools/execution_capacity.py
+new file mode 100644
+index 0000000000..9795a98230
+--- /dev/null
++++ b/tools/execution_capacity.py
+@@ -0,0 +1,159 @@
++#!/usr/bin/env python3
++"""Execution capacity versus approved-unrun demand (harness review I3).
++
++Read-only. Capacity comes from `orchestration/execution-capacity.yaml`
++(CPU-hours per week per route; every seeded number is `unverified`). Demand
++is the sum, over approved contracts that never ran (tools/portfolio_kpis.py's
++definition), of each specification's declared budget:
++
++1. `budget.total_cpu_hours`, else
++2. `budget.wall_clock_seconds_per_run * budget.maximum_runs / 3600`, else
++3. `default_contract_cpu_hours` from the YAML (0.5, the modal declared value).
++
++The Coordinator copies the printed sentence into its wake receipt and fills N:
++"capacity X h, demand Y h, dispatching N / recording why not".
++
++Usage:
++    python3 tools/execution_capacity.py [--dispatching N] [--json]
++"""
++from __future__ import annotations
++
++import argparse
++import json
++import sys
++from pathlib import Path
++from typing import Any
++
++import yaml
++
++sys.path.insert(0, str(Path(__file__).resolve().parent))
++import portfolio_kpis as kpis  # noqa: E402
++
++REPO = Path(__file__).resolve().parents[1]
++CAPACITY_FILE = REPO / "orchestration" / "execution-capacity.yaml"
++FALLBACK_DEFAULT_HOURS = 0.5
++
++
++def load_capacity(path: Path = CAPACITY_FILE) -> dict[str, Any]:
++    doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
++    routes = []
++    for r in doc.get("routes") or []:
++        routes.append({
++            "name": str(r.get("name")),
++            "cpu_hours_per_week": float(r.get("cpu_hours_per_week") or 0),
++            "number_status": str(r.get("number_status", "unverified")),
++            "last_verified": str(r.get("last_verified", "")),
++            "source_of_truth": " ".join(str(r.get("source_of_truth", "")).split()),
++        })
++    default = float(doc.get("default_contract_cpu_hours") or FALLBACK_DEFAULT_HOURS)
++    return {"routes": routes, "default_contract_cpu_hours": default}
++
++
++def declared_hours(spec_budget: Any) -> float | None:
++    """CPU-hours a specification's budget declares, or None."""
++    if not isinstance(spec_budget, dict):
++        return None
++    try:
++        if spec_budget.get("total_cpu_hours") is not None:
++            return float(spec_budget["total_cpu_hours"])
++        secs = spec_budget.get("wall_clock_seconds_per_run")
++        runs = spec_budget.get("maximum_runs")
++        if secs is not None and runs is not None:
++            return float(secs) * float(runs) / 3600.0
++    except (TypeError, ValueError):
++        return None
++    return None
++
++
++def find_budget(node: Any) -> Any:
++    """First `budget` mapping found anywhere in a loaded specification."""
++    if isinstance(node, dict):
++        if isinstance(node.get("budget"), dict):
++            return node["budget"]
++        for v in node.values():
++            found = find_budget(v)
++            if found is not None:
++                return found
++    elif isinstance(node, list):
++        for v in node:
++            found = find_budget(v)
++            if found is not None:
++                return found
++    return None
++
++
++def contract_hours(root: Path, exp_id: str, default: float) -> tuple[float, bool]:
++    """(hours, declared) for one experiment."""
++    spec = root / "experiments" / exp_id / "specification.yaml"
++    body = kpis._load(spec, "experiment") if spec.exists() else None
++    hours = declared_hours(find_budget(body)) if body else None
++    return (hours, True) if hours is not None else (default, False)
++
++
++def compute(root: Path = REPO, capacity_file: Path | None = None,
++            dispatching: int | None = None) -> dict[str, Any]:
++    cap = load_capacity(capacity_file or root / "orchestration" / "execution-capacity.yaml")
++    default = cap["default_contract_cpu_hours"]
++    backlog = kpis.approved_unrun(root)
++    demand, declared, contracts = 0.0, 0, 0
++    for ids in backlog.values():
++        for exp_id in ids:
++            hours, was_declared = contract_hours(root, exp_id, default)
++            demand += hours
++            contracts += 1
++            declared += was_declared
++    capacity = sum(r["cpu_hours_per_week"] for r in cap["routes"])
++    util = demand / capacity if capacity else None
++    n = "<N>" if dispatching is None else str(dispatching)
++    sentence = (f"capacity {capacity:.0f} h, demand {demand:.1f} h, "
++                f"dispatching {n} / recording why not")
++    return {
++        "routes": cap["routes"],
++        "capacity_hours_per_week": capacity,
++        "demand_hours": round(demand, 2),
++        "utilisation": None if util is None else round(util, 4),
++        "approved_unrun_contracts": contracts,
++        "contracts_with_declared_budget": declared,
++        "default_contract_cpu_hours": default,
++        "numbers_status": ("unverified" if any(r["number_status"] == "unverified"
++                                               for r in cap["routes"]) else "verified"),
++        "sentence": sentence,
++    }
++
++
++def render(r: dict[str, Any]) -> str:
++    lines = [f"{'route':<24}{'h/week':>10}  {'status':<11}last_verified"]
++    for x in r["routes"]:
++        lines.append(f"{x['name']:<24}{x['cpu_hours_per_week']:>10.0f}  "
++                     f"{x['number_status']:<11}{x['last_verified']}")
++    util = r["utilisation"]
++    lines += [
++        f"{'capacity (total)':<24}{r['capacity_hours_per_week']:>10.0f}",
++        f"{'demand (approved-unrun)':<24}{r['demand_hours']:>10.1f}  "
++        f"{r['approved_unrun_contracts']} contracts, "
++        f"{r['contracts_with_declared_budget']} with a declared budget, "
++        f"rest at {r['default_contract_cpu_hours']} h",
++        f"{'utilisation':<24}"
++        f"{'n/a' if util is None else format(util, '.1%'):>10}  "
++        f"(numbers {r['numbers_status']})",
++        "",
++        "Copy into the wake receipt (fill N):",
++        r["sentence"],
++    ]
++    return "\n".join(lines)
++
++
++def main(argv: list[str] | None = None) -> int:
++    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
++    ap.add_argument("--dispatching", type=int, default=None,
++                    help="N, the runs dispatched this wake (fills the sentence)")
++    ap.add_argument("--json", action="store_true")
++    ap.add_argument("--repo-root", type=Path, default=REPO)
++    args = ap.parse_args(argv)
++    r = compute(args.repo_root, dispatching=args.dispatching)
++    print(json.dumps(r, indent=2) if args.json else render(r))
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/tools/expire_handoffs.py b/tools/expire_handoffs.py
+new file mode 100644
+index 0000000000..2ac467e6c3
+--- /dev/null
++++ b/tools/expire_handoffs.py
+@@ -0,0 +1,125 @@
++#!/usr/bin/env python3
++"""Mark orphan handoffs expired (harness review I8).
++
++Dry run by default: lists dispatched `TASK-*` handoffs with no `archived_by`
++older than 14 days (tools/check_handoff_expiry.py). `--apply` writes
++`status: expired` and `expired_on: <date>` into each. Write-once: a record that
++already has `expired_on` is never touched, and no record is deleted. A
++pre-existing `status` is kept as `status_before_expiry`.
++
++    python3 tools/expire_handoffs.py [--apply] [--today YYYY-MM-DD]
++    python3 tools/expire_handoffs.py --role [ROLE]   # roles with >5 expired
++"""
++from __future__ import annotations
++
++import argparse
++import collections
++import datetime as dt
++import re
++import sys
++from pathlib import Path
++
++import yaml
++
++sys.path.insert(0, str(Path(__file__).resolve().parent))
++import check_handoff_expiry as che  # noqa: E402
++
++REPO = Path(__file__).resolve().parents[1]
++
++
++def _body(path: Path) -> dict | None:
++    try:
++        doc = yaml.safe_load(path.read_text(encoding="utf-8"))
++    except (OSError, ValueError, yaml.YAMLError):
++        return None
++    body = doc.get("handoff") if isinstance(doc, dict) else None
++    return body if isinstance(body, dict) else None
++
++
++def scan(root: Path) -> dict[Path, dict]:
++    out = {}
++    for p in sorted((root / "ledger" / "handoffs").glob("TASK-*.yaml")):
++        body = _body(p)
++        if body is not None:
++            out[p] = body
++    return out
++
++
++def mark_expired(path: Path, today: dt.date) -> bool:
++    """Write status/expired_on into one record. False when already expired."""
++    text = path.read_text(encoding="utf-8")
++    if re.search(r"^  expired_on:", text, re.M):
++        return False
++    status = re.search(r"^  status:[ \t]*(.*)$", text, re.M)
++    add = f"  expired_on: '{today.isoformat()}'\n"
++    if status:
++        old = status.group(1).strip()
++        if old == "expired":
++            return False
++        text = (text[:status.start()] + "  status: expired\n"
++                + (f"  status_before_expiry: {old}\n" if old else "")
++                + add + text[status.end() + 1:])
++    else:
++        text = text if text.endswith("\n") else text + "\n"
++        text += "  status: expired\n" + add
++    path.write_text(text, encoding="utf-8")
++    return True
++
++
++def role_report(handoffs: dict[Path, dict], decisions: list[dict],
++                role: str | None) -> dict[str, list[str]]:
++    by_id = {str(b.get("id") or p.stem): b for p, b in handoffs.items()}
++    over = che.roles_over_limit(by_id, che.cleared_ids(decisions))
++    return {r: ids for r, ids in over.items() if role in (None, r)}
++
++
++def _decisions(root: Path) -> list[dict]:
++    out = []
++    for p in sorted((root / "ledger" / "decisions").glob("DEC-*.yaml")):
++        try:
++            doc = yaml.safe_load(p.read_text(encoding="utf-8"))
++        except (OSError, ValueError, yaml.YAMLError):
++            continue
++        body = doc.get("coordinator_decision") if isinstance(doc, dict) else None
++        if isinstance(body, dict) and "clears_expired" in body:
++            out.append(body)
++    return out
++
++
++def main(argv: list[str] | None = None) -> int:
++    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
++    ap.add_argument("--apply", action="store_true")
++    ap.add_argument("--role", nargs="?", const="", default=None,
++                    help="report roles with more than 5 expired handoffs "
++                         "(optionally only ROLE)")
++    ap.add_argument("--today", type=dt.date.fromisoformat, default=None)
++    ap.add_argument("--repo-root", type=Path, default=REPO)
++    args = ap.parse_args(argv)
++    today = args.today or dt.date.today()
++    handoffs = scan(args.repo_root)
++    if args.role is not None:
++        over = role_report(handoffs, _decisions(args.repo_root), args.role or None)
++        if not over:
++            print("no role has more than "
++                  f"{che.EXPIRED_ROLE_LIMIT} uncleared expired handoffs")
++        for r, ids in sorted(over.items()):
++            print(f"{r}: {len(ids)} expired (> {che.EXPIRED_ROLE_LIMIT}); "
++                  "new dispatch blocked until a DEC-* lists clears_expired")
++        return 0
++    cands = [p for p, b in handoffs.items()
++             if che.is_expired_candidate(str(b.get("id") or p.stem), b, today)]
++    per_role = collections.Counter(che.role_of(handoffs[p]) for p in cands)
++    done = 0
++    for p in cands:
++        if args.apply and mark_expired(p, today):
++            done += 1
++    verb = "expired" if args.apply else "would expire"
++    print(f"{verb} {done if args.apply else len(cands)} handoff(s) "
++          f"(dispatched > {che.EXPIRY_DAYS} days, no archived_by)")
++    for r, n in per_role.most_common():
++        print(f"  {r or '(none)'}: {n}")
++    return 0
++
++
++if __name__ == "__main__":
++    sys.exit(main())
+diff --git a/tools/mechanism_review.py b/tools/mechanism_review.py
+new file mode 100644
+index 0000000000..43d275dd5b
+--- /dev/null
++++ b/tools/mechanism_review.py
+@@ -0,0 +1,125 @@
++#!/usr/bin/env python3
++"""Retire-or-measure review of harness mechanisms (harness review I7).
++
++Reads `docs/harness-mechanisms.yaml`. Each mechanism carries a `use_metric`, a
++shell command (run from the repository root) that prints one number. This tool
++runs every metric (120 s timeout; a failure, timeout or non-numeric output is
++recorded as `unavailable`), then prints the number and days to `review_by`.
++
++`--overdue` lists mechanisms past `review_by` that show no measured use: status
++is not `measured`, or the metric is 0 or unavailable. Retired mechanisms are
++skipped. The listed action: make optional, move text to docs/.
++
++Usage:
++    python3 tools/mechanism_review.py [--json] [--overdue] [--today YYYY-MM-DD]
++"""
++from __future__ import annotations
++
++import argparse
++import datetime as dt
++import json
++import re
++import subprocess
++import sys
++from pathlib import Path
++from typing import Any
++
++import yaml
++
++REPO = Path(__file__).resolve().parents[1]
++REGISTRY = REPO / "docs" / "harness-mechanisms.yaml"
++TIMEOUT_S = 120
++STATUSES = {"measured", "unmeasured", "retired"}
++_NUM = re.compile(r"^-?\d+(?:\.\d+)?$")
++
++
++def load_registry(path: Path = REGISTRY) -> list[dict[str, Any]]:
++    doc = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
++    return list(doc.get("mechanisms") or [])
++
++
++def run_metric(cmd: str, cwd: Path = REPO, timeout: int = TIMEOUT_S) -> float | None:
++    """The number the command prints (last non-empty stdout line), or None."""
++    try:
++        proc = subprocess.run(cmd, shell=True, cwd=cwd, capture_output=True,
++                              text=True, timeout=timeout)
++    except (subprocess.TimeoutExpired, OSError):
++        return None
++    if proc.returncode != 0:
++        return None
++    lines = [ln.strip() for ln in proc.stdout.splitlines() if ln.strip()]
++    if not lines or not _NUM.match(lines[-1]):
++        return None
++    return float(lines[-1])
++
++
++def _date(value: Any) -> dt.date:
++    return value if isinstance(value, dt.date) else dt.date.fromisoformat(str(value))
++
++
++def evaluate(mech: dict[str, Any], today: dt.date, value: float | None) -> dict[str, Any]:
++    review_by = _date(mech["review_by"])
++    status = str(mech.get("status", "unmeasured"))
++    no_use = status != "measured" or value is None or value == 0
++    days_left = (review_by - today).days
++    return {
++        "id": mech["id"],
++        "name": mech.get("name", ""),
++        "owner_doc": mech.get("owner_doc", ""),
++        "status": status,
++        "value": value if value is not None else "unavailable",
++        "review_by": review_by.isoformat(),
++        "days_to_review": days_left,
++        "overdue": status != "retired" and days_left < 0 and no_use,
++    }
++
++
++def review(mechs: list[dict[str, Any]], today: dt.date,
++           runner=run_metric) -> list[dict[str, Any]]:
++    out = []
++    for m in mechs:
++        value = None if m.get("status") == "retired" else runner(str(m["use_metric"]))
++        out.append(evaluate(m, today, value))
++    return out
++
++
++def render(rows: list[dict[str, Any]]) -> str:
++    lines = [f"{'id':<56}{'status':<11}{'value':>12}  {'days':>5}  review_by"]
++    for r in rows:
++        v = r["value"]
++        v = v if isinstance(v, str) else f"{v:g}"
++        lines.append(f"{r['id']:<56}{r['status']:<11}{v:>12}  "
++                     f"{r['days_to_review']:>5}  {r['review_by']}")
++    return "\n".join(lines)
++
++
++def render_overdue(rows: list[dict[str, Any]]) -> str:
++    over = [r for r in rows if r["overdue"]]
++    if not over:
++        return "no mechanism is overdue without measured use"
++    lines = [f"{len(over)} overdue with no measured use: make optional, "
++             "move text to docs/"]
++    lines += [f"  {r['id']}  ({r['owner_doc']}, review_by {r['review_by']}, "
++              f"value {r['value']})" for r in over]
++    return "\n".join(lines)
++
++
++def main(argv: list[str] | None = None) -> int:
++    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
++    ap.add_argument("--json", action="store_true")
++    ap.add_argument("--overdue", action="store_true",
++                    help="list mechanisms past review_by with no measured use")
++    ap.add_argument("--today", type=dt.date.fromisoformat, default=None)
++    ap.add_argument("--registry", type=Path, default=REGISTRY)
++    args = ap.parse_args(argv)
++    rows = review(load_registry(args.registry), args.today or dt.date.today())
++    if args.overdue:
++        rows_out = [r for r in rows if r["overdue"]]
++        print(json.dumps(rows_out, indent=2) if args.json else render_overdue(rows))
++    else:
++        print(json.dumps(rows, indent=2) if args.json else render(rows))
++    return 0
++
++
++if __name__ == "__main__":
++    sys.exit(main())
+-- 
+2.43.0
+
