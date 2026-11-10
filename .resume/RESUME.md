@@ -1,35 +1,29 @@
-# Resume: crypto @ claude/exponent-study-20261108
+# Resume: crypto @ claude/prime-field-index-calculus-atxvot
 
 ## Goal
-Exponent study (owner preregistration 2026-11-08): fit the exponent of the cost T(E,m,L) of ONE
-decomposition system against |V| for multiplicative-subgroup bases on the Curve25519-family
-miniatures, m = 2, 3, 4, symmetrised system in the elementary symmetric polynomials. Success rule:
-every verified measured improvement counts; report distance to rho.
+User request (2026-11-10): prime-field index-calculus leads; "stuck, cannot reach rho parity".
+Deliverable: research/prime_ic_leads_20261110/ (note, figures, PDF), a problem record
+(problems/prime-field-cross-summand-equation-budget.md), a new presentation control in
+examples/pkm_tower_pilot.rs (`--controls multiples`), and a local development-check ladder.
+Success rule: every verified measured improvement counts; report distance to rho; no S, no row here.
 
 ## Lead / hypothesis
-Lever iff m = 4 exponent < 0.5 (upper 95% bound too) or m = 3 exponent < 0. Prediction: m = 2 about 1.5,
-m = 3 about 3.5, m = 4 >= 4.5 or capped; no lever.
+Equation budget (note §4): one cross-summand equation per relation over F_p; the [k]-multiple
+consequences are the only free extra equations and enter at degree 6. Predictions for the
+multiples control: P1 identical d_F where d_F(tower) <= 5; P2 at d_F(tower) >= 7, d_F(multiples)
+in {d_F - 1, d_F}; falsifier: a drop >= 2 at a cell with d_F(tower) >= 8 or a flat m-ladder.
 
 ## Spec
-research/curve25519_exponent_study_20261108/PROTOCOL.md (frozen, data/frozen.sha256). Code:
-src/cryptanalysis/ic_framework/subgroup_semaev.rs (6 unit tests pass), `curve25519_family f4sub` and
-`subcensus`. Binary /home/user/ctarget-f1/release/curve25519_family. Run: python3 scripts/run_grid.py
-(4 workers, cells/*.json, resumable: finished cells skipped). Analysis: scripts/analyse.py.
+Pilot cells: Kummer, P1 = 2013265921, seed 0x504B4D54 (1347106132), --planted 0 --random 2,
+--engine hky, --controls tower,multiples; m = 2 at t = 2..10 (cmax 7); m = 3, 4 at t = 2, 3
+(cmax 8); m = 5 at t = 2, 3 (cmax 9, budget 1800). Binary: target/release/examples/pkm_tower_pilot
+built from this worktree (release build 10m58s). Rows to research/prime_ic_leads_20261110/devcheck/.
 
 ## State
-Local worktree /home/user/crypto, branch claude/exponent-study-20261108 (not pushed by instruction).
-Conductor, ecdb and research-kb unreachable. Disk about 2.6 GB free: no second target dir.
+Worktree /home/user/crypto on the designated branch; nothing pushed yet. No AWS identity here
+(no EKS, no S3 checkpoint push); KB, ecdb, cairn, Conductor unavailable. A Sonnet agent implemented
+the control (examples/pkm_tower_pilot.rs modified, smoke rows in the scratchpad).
 
 ## Next steps
-1. Run the grid; census (subcensus); calibration (bits base vs tower f4cost G=0).
-2. analyse.py; README.md with [pcc:unverified] result sentences; figure; REPORT.pdf; pcc lint-prose.
-3. Session log docs/session-logs/2026-11-08.md; local commits with the two attribution lines.
-
-## Stop and success conditions
-Stop when every grid cell is complete or censored, the analysis, README, figure, PDF and session log
-are written and committed locally. Success: fitted exponents with intervals per m (or a stated
-censoring), verdicts on the preregistered thresholds, failed predictions kept as failed.
-
-## Runs in flight
-Grid launched by scripts/run_grid.py in the background on this machine; cells land in
-research/curve25519_exponent_study_20261108/cells/. Relaunch the same command to resume.
+1. Collect the agent's report; run the devcheck ladder; tabulate rows into the note §6 / devcheck/.
+2. Session-log entries; commit; push; open the PR (ready for review, auto-merge); subscribe.
