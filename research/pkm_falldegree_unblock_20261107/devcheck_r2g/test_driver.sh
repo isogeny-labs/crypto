@@ -15,7 +15,10 @@ SEED="--seed 777"          # NOT the study seed
 if [ -n "${BOOT_REQUEST:-}" ]; then
   np=$(jq -r '.job.command[2]' "$BOOT_REQUEST" | sed -n 's/.*shift \([0-9][0-9]*\);.*/\1/p')
   mapfile -t RUNCMD < <(jq -r --argjson k "$((4 + np))" '.job.command[0:$k][]' "$BOOT_REQUEST")
-else RUNCMD=(/bin/bash "$RUNNER"); fi
+else RUNCMD=(${IMG_BASH:-/bin/bash} "$RUNNER"); fi
+# IMG_BASH=<bash binary> runs the runner with the job image's own bash; IMG_AWK=<wrapper script> puts an awk and a gawk that
+# resolve to the image's gawk first on PATH (img_gawk_wrapper.sh sets LD_LIBRARY_PATH for gawk only).
+if [ -n "${IMG_AWK:-}" ]; then IMGBIN=${WROOT:-$SP/r2g_test}/imgbin; mkdir -p "$IMGBIN"; ln -sf "$IMG_AWK" "$IMGBIN/awk"; ln -sf "$IMG_AWK" "$IMGBIN/gawk"; export PATH="$IMGBIN:$PATH"; fi
 RSHA_EXPECT=$(sha256sum "$RUNNER" | cut -d' ' -f1)
 
 # prep <jobname> <extra-env...> -- <args...>: sets ENVARR (env assignments) and ARGS; job results go to s3://b/<jobname>
@@ -226,6 +229,7 @@ T11) rm -rf "$W"; mkdir -p "$W"
     chk "rc 0 and all 3 units ran although the S3 command reads stdin" eq "$rc/$(ends0 $W/w-s1/progress.txt | wc -l)" 0/3 ;;
 T12) rm -rf "$W"; mkdir -p "$W/bin"
     for t in bash awk gawk basename cat cp cut date dirname grep head ls mkdir mktemp mv nproc rm rmdir sed sha256sum sleep sort stat tail tee timeout touch tr uname wc find xargs; do command -v $t > /dev/null && ln -s "$(command -v $t)" $W/bin/$t; done
+    [ -n "${IMG_AWK:-}" ] && { ln -sf "$IMG_AWK" $W/bin/awk; ln -sf "$IMG_AWK" $W/bin/gawk; }
     echo "tools in PATH: $(ls $W/bin | wc -l); flock present: $(PATH=$W/bin command -v flock || echo no); python3 present: $(PATH=$W/bin command -v python3 || echo no); jq present: $(PATH=$W/bin command -v jq || echo no)"
     F='^(B-m3-tower-t[23]|DB-m3-tower-t2)$'
     happy t12a PATH=$W/bin -- ; rc=$?; echo "t12a rc=$rc"; cat $W/w-t12a/progress.txt; ls $W/w-t12a/.up.lock.d 2>&1 | head -1
