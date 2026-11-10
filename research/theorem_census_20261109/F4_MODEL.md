@@ -126,3 +126,15 @@ Allfour address+undefined calls stop earlier at hash.c409 signed1<<31.
 This does not establish the original crash/timeout cause. Exportvalidity
 is separate from successful output; packet743f20isnot_covered/unsigned.
 The existing Lean F4Run/saturation theorems remain unchanged. [pcc:unverified]
+
+A later address-only protocol locates the ordinary LA2 fault at the17bit
+reducer, la_ff_32.c543. A separately frozen common-logged experiment
+records old2 copied to matrix3, then a lookup of basis3 with livebasis3.
+Changing that one lookup to the matrix table returns the exact ordinary
+known basis; both saturation cells stilltime out. Pinned16bit/current
+upstream paths alreadyusematrixlookup. The new14-declaration
+[Lean index audit](../msolve_reindex_lean_audit_20261110/README.md) proves
+operational copy semantics and direct wrong-table negation for that
+snapshot, with localPCC9f17a1PASS/signedunverified. Native4867bbremains
+not_covered. This is not a formal Ctrace/pointer/fullF4Run refinement.
+[pcc:unverified]

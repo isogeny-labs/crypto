@@ -336,7 +336,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 | 9 Gröbner heuristics | Partial: Lean counterexample to universal regularity reading | Generic/Joux–Vitse statements and requested exact system measurements |
 | 10 Rho walks | Partial: actual first-collision linear lower bounds and unbounded-prime fixed-support disproof, exact product-PMF variance theorem and finite populations | Qualified random-table collision penalty and asymptotic mixing proofs |
 | 11 Standards | Partial: actual 160-bit anomalous curve/cardinality and concrete Smart finite-program certificate | Generic p-adic/complexity/native refinement and matched SafeCurves benchmark |
-| 12 msolve/F4 | Partial: exact F4Run ideal-containment theorem, saturation-reading counterexample and source/run audit | Ordinary C refinement, crash/hang root-cause diagnosis beyond earlier signed-shift diagnostic, and complete trace binding |
+| 12 msolve/F4 | Partial: exact F4Run ideal-containment theorem, saturation-reading counterexample and source/run audit | Ordinary C refinement and complete trace binding; saturation hang beyond the tested coefficient lookup repair |
 | 13 Independence | Blocked for the requested other-machine replay | Prior dispatch HTTP404 ran no job; one runtime available; a different authorized host or registered workflow is required |
 | 14 Negative control | Verified current control | Historical runs were not preregistered with it; no retroactive promotion |
 
@@ -412,3 +412,22 @@ of the original failures. No source edit, Crefinement or generic-ideal
 regularity conclusion. All8outcomes retained; export passesfilechecks;
 PCC-20261110-743f20not_covered/unsigned. A separate predata address-only
 amendment is frozen to inspect beyond that first-error check. [pcc:unverified]
+
+### 2026-11-10 concrete sparse lookup and Lean invariant
+
+Address-only cells locate the17bitLA2READfault atla_ff_32.c543.
+A new predata common-logged2x2experiment records old[0,2,0] to
+new[2,3,4],livebasis3; baselineordinaryreads basis3andaborts134,
+one matrix-lookup backport passes its exact ordinary known answer.
+Both saturation cells stilltimeout5s. Currentupstream and pinned16bit
+alreadyusematrixlookup; no noveltyclaim. All14prior relevantF65537
+lineagecallsand4newcells retained, exportpasses; native4867bbnot_covered.
+[pcc:unverified]
+
+A separate [Lean project](../research/msolve_reindex_lean_audit_20261110/README.md)
+defines the three operational copy updates, proves correct matrix lookup
+for every coefficient content, direct wrong-table universal negation,
+and an in-range wrong-value counterexample. Fullgate14/0/0.
+This is snapshot table semantics, with no assumed Cexecution/trace,
+physicalallocation bound, parser or wholeF4Run refinement conclusion.
+Earlier signedshift and saturation diagnosis remain open. [pcc:unverified]
