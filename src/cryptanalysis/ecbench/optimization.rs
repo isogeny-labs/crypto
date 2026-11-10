@@ -534,10 +534,12 @@ const POLICIES: &[PolicyDecl] = &[
         FrontierEligible,
         StandardBand
     ),
+    // Rejected by research/curve25519_engine_items_20261110 (1.53x and
+    // 2.74x rho.negation's cost): a diagnostic, never a frontier reference.
     policy!(
         "rho.negation_chained",
         ImplementationAb,
-        FrontierEligible,
+        DiagnosticOnly,
         StandardBand
     ),
     policy!(

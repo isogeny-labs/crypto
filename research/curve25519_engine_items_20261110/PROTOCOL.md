@@ -126,3 +126,46 @@ statement: these are constant-factor changes on the generic track; the F = 1 arm
 from rho and is not decomposition-based index calculus; (B) changes the reference, not any arm,
 and lowering the reference raises every arm's distance to rho. Every result sentence ends with
 [pcc:unverified].
+
+## Addendum 1 (2026-11-10, after the validator's report; a protocol amendment, not a retune)
+
+Everything above this heading, up to and excluding the blank line before it, is the frozen text
+of 2026-11-10 (SHA-256 `36f33d55...29e6`, the first line of `data/frozen.sha256`). It is not
+altered. This addendum is appended after the first
+16 sessions ran and after the independent validator's report (`validator-report.json`), and before
+any session of the amendment runs. Its SHA-256 is recorded in `data/frozen.sha256` (second line,
+over the bytes from this heading to the end of the file) before the first amendment session starts.
+
+**Defect E1.** Section 2 says the key's sign bit is "stored beside the coefficients". The measured
+code (`TargetWalk::build_cv` at commit `b543ece570`) kept it in a second hash map (`signs`): one extra
+hash insert per stored entry and one extra lookup per collision, about one extra hash operation per
+walk step (499.2 per run at k = 20 and 1,973.6 at k = 24, the counted `table_insert_attempts`). No
+counter recorded that work, so the first 16 sessions under-charge the `twcj-cv0` arm at w > 0 in the
+default reading. The w = 0 rows (A1, A1b, A2) and the identity A3 are unaffected; A4 and the
+w > 0 (A) and cv0-distance rows of the first sessions are lower bounds for the cv0 arm.
+
+**Fix.** The sign bit now rides in the top bit of the stored entry's `u` word (`TW_SIGN_BIT`,
+bit 63; every coefficient is below 2^32 by `wwalk_plan_check`), the `signs` map is removed, and the
+walk makes exactly one table access per non-identity step in both modes (`table_probes`, tested
+against `insert_attempts`). The default `cv=1` path stores entries unchanged (the bit is never set)
+and emits the committed counters; `TargetWalk::probe` masks the bit. Steps, rows, rank, collisions
+and the recovered logarithm are those of the measured code (unit test
+`target_walk_without_collision_verify_keeps_rows_and_drops_the_ledger`, extended).
+
+**Re-measurement.** The (A) predictions A1, A1b, A2, A3 and A4 are re-decided, with the thresholds of
+section 5 unchanged, on fresh sessions with new seeds, on a binary built from the fixed code:
+
+- design of section 3 unchanged (8 single-target sessions per size, 64 measured rounds plus
+  1 warm-up per arm, `order = alternate`, k = 20 and k = 24, the same curves), with target seed
+  3026125000 + 100k + s and measurement seed 3026121000 + 100k + s (s = 0..7);
+- arms `rho-neg`, `twcj` and `twcj-cv0` as in section 3; `rho-neg-chained` is dropped, since (B)
+  was rejected and its code is unchanged;
+- audit `ecbench verify --replay 1` per session; both band readings; pooling and intervals by the
+  frozen `scripts/pooled_compare.py` and a copy of `scripts/analyse.py` restricted to these arms;
+- the cv0 distance to rho (`twcj-cv0 / rho-neg`) at w = 0, 0.1 and 1 under both readings is reported
+  as the distance remaining, not as a gate;
+- files under `amendment1/` (`specs/`, `sessions/`, `data/`, `scripts/`); a benchrec record per size.
+
+The verdicts of the first 16 sessions stay as scored there, including every failed (B)
+prediction; the amendment's verdicts are reported beside them, not instead of them. A failed
+amendment prediction stays failed.

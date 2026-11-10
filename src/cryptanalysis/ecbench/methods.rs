@@ -11034,7 +11034,13 @@ mod engine_items_tests {
         .unwrap()
     }
 
-    fn run(m: &ResolvedMethod, inst: &Instance, facts: &CurveFacts, k: u128, seed: u64) -> SolveReport {
+    fn run(
+        m: &ResolvedMethod,
+        inst: &Instance,
+        facts: &CurveFacts,
+        k: u128,
+        seed: u64,
+    ) -> SolveReport {
         let target = inst.mul_generator_hex(k).expect("a nonzero target");
         solve(m, inst, facts, &target, seed).unwrap()
     }
@@ -11071,7 +11077,11 @@ mod engine_items_tests {
 
     fn phases_sum(id: &str, rep: &SolveReport) {
         let sum: f64 = rep.phases.iter().map(|p| p.gae).sum();
-        assert!((sum - rep.total_gae).abs() < 1e-9, "{id}: phases {:?}", rep.phases);
+        assert!(
+            (sum - rep.total_gae).abs() < 1e-9,
+            "{id}: phases {:?}",
+            rep.phases
+        );
     }
 
     /// `cv=0` walks the same walk and emits the same rows as the default, so
@@ -11142,7 +11152,10 @@ mod engine_items_tests {
     #[test]
     fn rho_negation_chained_recovers_with_a_cheaper_setup() {
         let (inst, facts) = built(&k20());
-        let (plain, chained) = (method("rho.negation", &[]), method("rho.negation_chained", &[]));
+        let (plain, chained) = (
+            method("rho.negation", &[]),
+            method("rho.negation_chained", &[]),
+        );
         assert_ne!(plain.method_id, chained.method_id);
         let setup = |rep: &SolveReport| {
             rep.phases
@@ -11158,21 +11171,35 @@ mod engine_items_tests {
             assert_eq!(a.recovered, Some(ExactScalar::from(k)), "seed {seed}");
             assert_eq!(b.recovered, Some(ExactScalar::from(k)), "seed {seed}");
             phases_sum("rho.negation_chained", &b);
-            assert!(setup(&b) < setup(&a), "seed {seed}: {} vs {}", setup(&b), setup(&a));
+            assert!(
+                setup(&b) < setup(&a),
+                "seed {seed}: {} vs {}",
+                setup(&b),
+                setup(&a)
+            );
             assert_eq!(b.counters.get("chained_setup"), Some(&1));
             assert!(!a.counters.contains_key("chained_setup"));
             assert_eq!(b.counters.get("jumps"), a.counters.get("jumps"));
             assert_eq!(b.automorphisms_used, 2);
         }
-        assert_eq!(expected_s("rho.negation_chained", 2), expected_s("rho.negation", 2));
+        assert_eq!(
+            expected_s("rho.negation_chained", 2),
+            expected_s("rho.negation", 2)
+        );
     }
 
-    /// The chained table obeys its recurrence, coefficient by coefficient,
-    /// and the walk built on it still solves (the walk's own collisions are
-    /// checked by the charged `[d]G = Q`).
+    /// The chained table obeys its recurrence, point by point and
+    /// coefficient by coefficient: `M_j = M_{j-1} + M_{j-2}` and
+    /// `(a_j, b_j) = (a_{j-1} + a_{j-2}, b_{j-1} + b_{j-2}) mod r`, every
+    /// `M_j = [a_j]G + [b_j]Q`, the first two coefficients drawn in
+    /// `[1, short)`, and the set-up is two joint multiplications plus one
+    /// charged addition per later jump.  The walk built on it still solves
+    /// (the walk's own collisions are checked by the charged `[d]G = Q`).
     #[test]
     fn chained_rho_jump_table_obeys_its_recurrence() {
-        use crate::cryptanalysis::ic_boundary::{rho_walk_with_policy, NegationClasses};
+        use crate::cryptanalysis::ic_boundary::{
+            chained_jumps, rho_walk_with_policy, NegationClasses,
+        };
         let (inst, _facts) = built(&k20());
         let Instance::Prime(p) = &inst else {
             panic!("prime instance")
@@ -11183,6 +11210,35 @@ mod engine_items_tests {
         for seed in 0..8u64 {
             let mut ops = GroupOps::default();
             let q = g.mul(&mut ops, gen, 12345 + seed);
+            // The table itself.
+            let short = 1u64 << 9;
+            let count = 8usize;
+            let gq = g.add(&mut ops, gen, q);
+            let mut rng = StdRng::seed_from_u64(seed);
+            let mut table_ops = GroupOps::default();
+            let table = chained_jumps(g, &mut table_ops, &mut rng, gen, q, gq, r, short, count);
+            assert_eq!(table.len(), count);
+            for (j, &(m, a, b)) in table.iter().enumerate() {
+                let mut chk = GroupOps::default();
+                let ag = g.mul(&mut chk, gen, a);
+                let bq = g.mul(&mut chk, q, b);
+                assert!(
+                    g.add(&mut chk, ag, bq) == m,
+                    "seed {seed} j {j}: M_j != [a]G + [b]Q"
+                );
+                if j < 2 {
+                    assert!((1..short).contains(&a) && (1..short).contains(&b));
+                    continue;
+                }
+                let (m1, a1, b1) = table[j - 1];
+                let (m2, a2, b2) = table[j - 2];
+                assert!(
+                    g.add(&mut chk, m1, m2) == m,
+                    "seed {seed} j {j}: point recurrence"
+                );
+                assert_eq!(a, (a1 + a2) % r, "seed {seed} j {j}: a recurrence");
+                assert_eq!(b, (b1 + b2) % r, "seed {seed} j {j}: b recurrence");
+            }
             let res = rho_walk_with_policy(
                 g,
                 &NegationClasses { r },

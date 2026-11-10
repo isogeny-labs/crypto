@@ -2801,7 +2801,17 @@ pub fn rho_walk_with_policy<G: CountedGroup, C: RhoClasses<G>>(
     // Set-up: G + Q once, the table, the start stride.
     let gq = g.add(&mut ops, generator, target);
     let jumps: Vec<(G::Elt, u64, u64)> = if policy.chained_setup {
-        chained_jumps(g, &mut ops, &mut rng, generator, target, gq, r, short, shape.jumps)
+        chained_jumps(
+            g,
+            &mut ops,
+            &mut rng,
+            generator,
+            target,
+            gq,
+            r,
+            short,
+            shape.jumps,
+        )
     } else {
         (0..shape.jumps)
             .map(|_| {
@@ -2931,7 +2941,7 @@ pub fn rho_walk_with_policy<G: CountedGroup, C: RhoClasses<G>>(
 /// charged addition each.  A chain that meets the identity (about one
 /// draw in `r`) is drawn again from the start.
 #[allow(clippy::too_many_arguments)]
-fn chained_jumps<G: CountedGroup>(
+pub(crate) fn chained_jumps<G: CountedGroup>(
     g: &G,
     ops: &mut GroupOps,
     rng: &mut StdRng,
@@ -8655,6 +8665,11 @@ pub struct TargetWalkRow {
     pub b: u64,
 }
 
+/// The top bit of a [`TargetWalk`] entry's `u` word: with `cv=0` it holds
+/// the stored point's key sign bit.  Coefficients are below `2^32`
+/// ([`wwalk_plan_check`]), so it is never part of `u`.
+pub const TW_SIGN_BIT: u64 = 1 << 63;
+
 /// **A one-seed walk with the target inside it** (`wwalk:tw=1`, `F = 1`).
 ///
 /// With the base's single seed `P1`, the generator `G` and the target `Q`,
@@ -8689,15 +8704,20 @@ pub struct TargetWalkRow {
 /// collision is not recomputed.  The table key is the point's abscissa
 /// (the group key without its sign bit), so a key collision on a curve
 /// whose key is `abscissa·2 + sign` is exactly `E_t = ±E_s`, and the sign
-/// bit stored beside the coefficients says which; `verify_ops` stays
-/// empty.  The relation loop's final `[d]G = Q` check is kept and charged
+/// bit of the stored entry's key says which.  That bit is packed into the
+/// top bit of the entry's `u` word ([`TW_SIGN_BIT`]; every coefficient is
+/// below `2^32`, [`wwalk_plan_check`]), so `cv=0` makes exactly the table
+/// accesses of `cv=1` (one per non-identity step) and keeps no second
+/// table; `verify_ops` stays empty.  The relation loop's final `[d]G = Q` check is kept and charged
 /// as before, so a wrong row makes the solve fail (it is never retried).
 pub struct TargetWalk<E> {
-    /// Key (abscissa and sign bit, shifted) → `(u, z, b)`.
+    /// Key (abscissa and sign bit, shifted) → `(u, z, b)`.  With `cv=0`
+    /// the stored entry's key sign bit rides in [`TW_SIGN_BIT`] of `u`
+    /// (never set with `cv=1`, so the default walk is unchanged).
     map: FastMap<(u64, u64, u64)>,
-    /// With `cv=0` only: the sign bit of the stored entry's key, by table
-    /// key (empty with `cv=1`, so the default walk is unchanged).
-    signs: FastMap<bool>,
+    /// Table accesses made by the walk (one `entry` call per non-identity
+    /// step, in both modes); not emitted as a counter.
+    pub table_probes: u64,
     /// `false` with `cv=0`: collisions are not recomputed.
     pub verify_collisions: bool,
     /// With `cv=0`: collisions turned into rows from the stored sign bit.
@@ -8824,11 +8844,7 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         }
         let mut tw = Self {
             map: fast_map(t_max as usize + 1),
-            signs: if verify_collisions {
-                fast_map(0)
-            } else {
-                fast_map(t_max as usize + 1)
-            },
+            table_probes: 0,
             verify_collisions,
             unverified_collisions: 0,
             seed: seed_index,
@@ -8887,23 +8903,30 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
             tw.insert_attempts += 1;
             let full_key = g.key(&e);
             let key = full_key >> 1;
-            let kept = match tw.map.entry(key) {
+            let sign = full_key & 1 == 1;
+            tw.table_probes += 1;
+            let stored = match tw.map.entry(key) {
                 std::collections::hash_map::Entry::Vacant(slot) => {
-                    slot.insert(c);
-                    if !verify_collisions {
-                        tw.signs.insert(key, full_key & 1 == 1);
+                    if verify_collisions {
+                        slot.insert(c);
+                    } else {
+                        // cv=0: the key's sign bit rides in the top bit of
+                        // u (u < 2^32, so the bit is free); no second table.
+                        debug_assert!(c.0 & TW_SIGN_BIT == 0);
+                        slot.insert((c.0 | if sign { TW_SIGN_BIT } else { 0 }, c.1, c.2));
                     }
                     continue;
                 }
                 std::collections::hash_map::Entry::Occupied(o) => *o.get(),
             };
+            let kept = (stored.0 & !TW_SIGN_BIT, stored.1, stored.2);
             tw.collisions.push((kept, c));
             if verify_collisions {
                 tw.verify(g, fb, r, &mut verify_ops, kept, c);
             } else {
                 // Same abscissa: E_t = ±E_s; equal sign bits mean E_t = E_s.
-                let kept_sign = tw.signs.get(&key).copied().unwrap_or(false);
-                let plus = kept_sign != (full_key & 1 == 1);
+                let kept_sign = stored.0 & TW_SIGN_BIT != 0;
+                let plus = kept_sign != sign;
                 tw.unverified_collisions += 1;
                 tw.accept_row(fb, r, plus, kept, c);
             }
@@ -9129,6 +9152,8 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         *lookups += 1;
         let key = g.key(&point) >> 1;
         let (u, z, b) = *self.map.get(&key)?;
+        // Clear the cv=0 sign bit (never set with cv=1).
+        let u = u & !TW_SIGN_BIT;
         let s = self.eval(g, ops, u, z, b)?;
         if s == point {
             Some((1, u, z, b))
@@ -9204,7 +9229,10 @@ impl<E: Copy + PartialEq> TargetWalk<E> {
         if !self.verify_collisions {
             // Only with cv=0, so the default walk's counters are unchanged.
             out.insert("tw_collision_verify".into(), 0);
-            out.insert("tw_unverified_collisions".into(), self.unverified_collisions);
+            out.insert(
+                "tw_unverified_collisions".into(),
+                self.unverified_collisions,
+            );
         }
         out
     }
@@ -17468,6 +17496,39 @@ mod wwalk_table_tests {
                 assert_eq!(n.steps_rank_two, v.steps_rank_two);
                 assert_eq!(n.jump_coefs, v.jump_coefs);
                 assert_eq!(n.work_counters(), v.work_counters());
+                // E1 (validator 2026-11-10): one table, one access per
+                // non-identity step in both modes.  The sign bit rides in
+                // the top bit of `u`; masked, the cv=0 table is the cv=1
+                // table, and cv=1 never sets the bit.
+                assert_eq!(n.insert_attempts, v.insert_attempts);
+                assert_eq!(v.table_probes, v.insert_attempts);
+                assert_eq!(n.table_probes, v.table_probes);
+                assert_eq!(n.steps, n.insert_attempts + n.identities_skipped);
+                assert_eq!(n.entries, v.entries);
+                assert_eq!(n.map.len(), v.map.len());
+                for (key, &(u, z, b)) in &v.map {
+                    assert_eq!(u & TW_SIGN_BIT, 0);
+                    let &(nu, nz, nb) = n.map.get(key).expect("same keys");
+                    assert_eq!((nu & !TW_SIGN_BIT, nz, nb), (u, z, b));
+                }
+                // The relation loop's probe reads the same entry in both.
+                for &(u, z, b) in v.map.values().take(8) {
+                    let Some(pt) = v.eval(g, &mut cops, u, z, b) else {
+                        continue;
+                    };
+                    let (mut l1, mut l2) = (0u64, 0u64);
+                    let (mut o1, mut o2) = (GroupOps::default(), GroupOps::default());
+                    assert_eq!(
+                        n.probe(g, &mut o1, &mut l1, pt),
+                        v.probe(g, &mut o2, &mut l2, pt)
+                    );
+                    assert_eq!((o1, l1), (o2, l2));
+                    let neg = g.neg(pt);
+                    assert_eq!(
+                        n.probe(g, &mut o1, &mut l1, neg),
+                        v.probe(g, &mut o2, &mut l2, neg)
+                    );
+                }
                 // The ledgers: no verification, everything else unchanged.
                 assert_eq!(n.verify_ops, GroupOps::default());
                 assert_eq!(n.setup_ops, v.setup_ops);
@@ -17491,7 +17552,9 @@ mod wwalk_table_tests {
                 saved += v.verify_ops.adds;
             }
         }
-        eprintln!("cv=0 small curve: {collisions} collisions, {saved} verification additions saved");
+        eprintln!(
+            "cv=0 small curve: {collisions} collisions, {saved} verification additions saved"
+        );
         assert!(collisions > 0 && saved > 0);
     }
 }
