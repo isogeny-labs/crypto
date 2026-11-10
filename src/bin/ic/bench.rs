@@ -98,6 +98,33 @@ pub struct BenchArgs {
     /// `p ≡ 5 (mod 8)`, `#E = 8r`, `#E' = 4r'`, smallest Montgomery `A`.
     #[arg(long, default_value = "generic")]
     pub family: String,
+    /// EFD model for the prime instance (`montgom`, `edwards`, `twisted`,
+    /// `twistedhessian`, `hessian`, `jintersect`, `jquartic`, `2dik`, `3dik`).
+    /// When set, the short-Weierstrass bench engine is built from the EFD
+    /// bridge and `--efd-chart` controls input/output.
+    #[arg(long)]
+    pub efd_model: Option<String>,
+    /// EFD chart id (`affine`, `xz`, `jacobian`, `extended`, ...).
+    #[arg(long, default_value = "affine")]
+    pub efd_chart: String,
+    /// Prime field modulus of the EFD curve (`5 <= p < 2^62`).
+    #[arg(long)]
+    pub efd_p: Option<String>,
+    /// EFD model parameter, `NAME=VALUE`; repeatable.
+    #[arg(long = "efd-param", value_name = "NAME=VALUE")]
+    pub efd_params: Vec<String>,
+    /// Prime subgroup order of the EFD curve.
+    #[arg(long)]
+    pub efd_order: Option<String>,
+    /// Cofactor of the EFD curve.
+    #[arg(long, default_value_t = 1, value_parser = clap::value_parser!(u64).range(1..))]
+    pub efd_cofactor: u64,
+    /// Generator in `--efd-chart` coordinates, comma-separated.
+    #[arg(long)]
+    pub efd_generator: Option<String>,
+    /// Lift index for quotient EFD charts.
+    #[arg(long, default_value_t = 0)]
+    pub efd_lift: u32,
     /// Binary-field instance of this field degree (random curve).
     #[arg(long)]
     pub char2_degree: Option<u32>,
@@ -900,6 +927,13 @@ impl Instance {
             Instance::Wide255 => "curve25519-wide",
         }
     }
+
+    fn representation_json(&self) -> Result<Option<Value>, String> {
+        match self {
+            Instance::Prime(i) => i.representation_json(),
+            _ => Ok(None),
+        }
+    }
 }
 
 /// A sweep file: one instance, and either an explicit list of
@@ -1043,6 +1077,35 @@ fn spec_from(
     })
 }
 
+fn parse_efd_u64(value: &str) -> Result<u64, String> {
+    let value = value.trim();
+    if let Some(hex) = value
+        .strip_prefix("0x")
+        .or_else(|| value.strip_prefix("0X"))
+    {
+        u64::from_str_radix(hex, 16).map_err(|_| format!("bad integer {value}"))
+    } else {
+        value
+            .parse::<u64>()
+            .map_err(|_| format!("bad integer {value}"))
+    }
+}
+
+fn parse_efd_params(items: &[String]) -> Result<std::collections::BTreeMap<String, u64>, String> {
+    let mut out = std::collections::BTreeMap::new();
+    for item in items {
+        let (name, value) = item
+            .split_once('=')
+            .ok_or_else(|| format!("--efd-param expects NAME=VALUE, got {item}"))?;
+        out.insert(name.trim().to_owned(), parse_efd_u64(value)?);
+    }
+    Ok(out)
+}
+
+fn parse_efd_coords(value: &str) -> Result<Vec<u64>, String> {
+    value.split(',').map(parse_efd_u64).collect()
+}
+
 /// The instance `--bits`, `--char2-degree` or `--koblitz-degree` names.
 fn build_instance(regime: &str, degree: u32, args: &BenchArgs) -> Result<Instance, String> {
     Ok(match regime {
@@ -1053,6 +1116,30 @@ fn build_instance(regime: &str, degree: u32, args: &BenchArgs) -> Result<Instanc
                 ArchiveInstance::Prime(i) => Instance::Prime(i),
                 ArchiveInstance::Binary(i) => Instance::Binary(*i),
             }
+        }
+        "prime" if args.efd_model.is_some() => {
+            let model = args.efd_model.as_deref().ok_or("--efd-model required")?;
+            let p = parse_efd_u64(args.efd_p.as_deref().ok_or("--efd-model requires --efd-p")?)?;
+            let order = parse_efd_u64(
+                args.efd_order
+                    .as_deref()
+                    .ok_or("--efd-model requires --efd-order")?,
+            )?;
+            let generator = parse_efd_coords(
+                args.efd_generator
+                    .as_deref()
+                    .ok_or("--efd-model requires --efd-generator")?,
+            )?;
+            Instance::Prime(PrimeInstance::from_efd(
+                model,
+                &args.efd_chart,
+                p,
+                &parse_efd_params(&args.efd_params)?,
+                order,
+                args.efd_cofactor,
+                &generator,
+                args.efd_lift,
+            )?)
         }
         "prime" if args.family == "curve25519" && degree == 255 => {
             // The real curve, over the generic Fp256 backend.  The relation
@@ -1170,7 +1257,14 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
             )
         }
         None => {
-            let (regime, degree) = if args.archive_manifest.is_some() {
+            let (regime, degree) = if args.efd_model.is_some() {
+                let p = parse_efd_u64(
+                    args.efd_p
+                        .as_deref()
+                        .ok_or("--efd-model requires --efd-p")?,
+                )?;
+                ("prime".to_string(), (u64::BITS - p.leading_zeros()) as u32)
+            } else if args.archive_manifest.is_some() {
                 ("archive".to_string(), 0)
             } else {
                 match (args.bits, args.char2_degree, args.koblitz_degree) {
@@ -1390,7 +1484,8 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
             eprintln!("  skipped: {}", f["configuration"].as_str().unwrap_or("?"));
         }
     }
-    Ok(json!({
+    let representation = instance.representation_json()?;
+    let mut report = json!({
         "schema_version": 1,
         "operation": "bench",
         "status": if all_verified { "complete" } else { "incomplete" },
@@ -1420,7 +1515,11 @@ pub fn run(args: BenchArgs, json_only: bool) -> Result<Value, String> {
         "markdown": markdown,
         "rows": rows,
         "plan": plan_report,
-    }))
+    });
+    if let Some(representation) = representation {
+        report["representation"] = representation;
+    }
+    Ok(report)
 }
 
 #[cfg(test)]
@@ -1663,5 +1762,36 @@ mod tests {
         )
         .unwrap_err();
         assert!(err.contains("sweep"), "{err}");
+    }
+
+    #[test]
+    fn efd_flags_build_a_prime_instance_with_a_chart() {
+        let args = bench_args(&[
+            "--efd-model",
+            "montgom",
+            "--efd-p",
+            "1019",
+            "--efd-param",
+            "a=131",
+            "--efd-param",
+            "b=1",
+            "--efd-order",
+            "269",
+            "--efd-cofactor",
+            "4",
+            "--efd-generator",
+            "604,1",
+            "--efd-chart",
+            "xz",
+        ]);
+        let instance = build_instance("prime", 10, &args).unwrap();
+        let Instance::Prime(prime) = instance else {
+            panic!("EFD flags must build a prime instance");
+        };
+        assert_eq!(prime.curve.a, 55);
+        assert_eq!(prime.curve.b, 762);
+        assert_eq!(prime.r, 269);
+        assert!(prime.representation.is_some());
+        assert!(prime.representation_json().unwrap().is_some());
     }
 }

@@ -1550,6 +1550,8 @@ pub(super) fn verify_pkm_factor_base(
         r,
         cofactor,
         generator: (generator.x, generator.y),
+
+        representation: None,
     };
     let ctx = InstanceCtx {
         group: &instance.curve,
@@ -1673,6 +1675,8 @@ fn pkm_solve(
         r,
         cofactor,
         generator: (generator.x, generator.y),
+
+        representation: None,
     };
     let ctx = InstanceCtx {
         group: &instance.curve,

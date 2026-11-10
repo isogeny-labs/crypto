@@ -442,6 +442,8 @@ impl CurveSpec {
                         word("generator x", &params.gx)?,
                         word("generator y", &params.gy)?,
                     ),
+
+                    representation: None,
                 };
                 instance.name = instance.curve_id().slug;
                 Ok(Instance::Prime(instance))
@@ -518,6 +520,8 @@ impl CurveSpec {
                     r,
                     cofactor: group_order / r,
                     generator: (gx, gy),
+
+                    representation: None,
                 };
                 inst.name = inst.curve_id().slug;
                 Ok(Instance::Prime(inst))

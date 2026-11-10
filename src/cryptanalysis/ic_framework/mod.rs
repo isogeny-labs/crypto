@@ -1161,6 +1161,8 @@ mod tests {
             r: 562021,
             cofactor: 16,
             generator: (4890799, 2220468),
+
+            representation: None,
         };
         let mut scratch = GroupOps::default();
         let g = inst.generator_point();
