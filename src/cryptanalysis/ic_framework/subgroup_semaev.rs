@@ -93,11 +93,7 @@ fn s3_abg(x1: u64, x2: u64, a: u64, b: u64, p: u64) -> [u64; 3] {
     let pr = mulm(x1, x2, p);
     let beta = subm(
         0,
-        mulm(
-            2,
-            addm(mulm(s, addm(pr, a, p), p), mulm(2, b, p), p),
-            p,
-        ),
+        mulm(2, addm(mulm(s, addm(pr, a, p), p), mulm(2, b, p), p), p),
         p,
     );
     let q = subm(pr, a, p);
@@ -358,13 +354,21 @@ impl Base {
     fn linear_form(&self, p: u64) -> (u64, Vec<(usize, u64)>) {
         match self {
             Base::Subgroup { g, lo, .. } => (*lo % p, vec![(0, *g % p)]),
-            Base::Bits { t, lo } => (*lo % p, (0..*t as usize).map(|j| (j, (1u64 << j) % p)).collect()),
+            Base::Bits { t, lo } => (
+                *lo % p,
+                (0..*t as usize).map(|j| (j, (1u64 << j) % p)).collect(),
+            ),
         }
     }
     /// The `d` abscissae of `V`.
     pub fn abscissae(&self, p: u64) -> Vec<u64> {
         match self {
-            Base::Subgroup { factors, g, lo, zeta } => {
+            Base::Subgroup {
+                factors,
+                g,
+                lo,
+                zeta,
+            } => {
                 let d: u64 = factors.iter().map(|&e| u64::from(e)).product();
                 let mut z = 1u64;
                 (0..d)
@@ -643,7 +647,11 @@ mod tests {
     impl Cv {
         fn rhs(&self, x: u64) -> u64 {
             let p = self.p;
-            addm(addm(mulm(mulm(x, x, p), x, p), mulm(self.a, x, p), p), self.b, p)
+            addm(
+                addm(mulm(mulm(x, x, p), x, p), mulm(self.a, x, p), p),
+                self.b,
+                p,
+            )
         }
         fn sqrt(&self, v: u64) -> Option<u64> {
             (0..self.p).find(|&y| mulm(y, y, self.p) == v)
@@ -689,7 +697,11 @@ mod tests {
 
     #[test]
     fn summation_polynomial_vanishes_on_sums() {
-        let c = Cv { p: 1013, a: 3, b: 7 };
+        let c = Cv {
+            p: 1013,
+            a: 3,
+            b: 7,
+        };
         let pts = all_points(&c);
         let mut rng = Rng(11);
         for m in 2..=4usize {
@@ -822,7 +834,10 @@ mod tests {
                 let sys = build_system(p, a, b, &base, m, xt, form, 3).unwrap();
                 let rep = solve_system(&sys, p, 120, 200);
                 assert!(!rep.timed_out && rep.pairs_above_bound == 0);
-                assert_eq!(!rep.inconsistent, want, "X = {xt}, {form:?}, d = {d}, m = {m}");
+                assert_eq!(
+                    !rep.inconsistent, want,
+                    "X = {xt}, {form:?}, d = {d}, m = {m}"
+                );
             }
             n_consistent += usize::from(want);
         }
@@ -848,10 +863,9 @@ mod tests {
         let base = Base::Bits { t: 3, lo: 4 };
         let v = base.abscissae(p);
         for xt in 0..p {
-            let want = v.iter().any(|&x1| {
-                v.iter()
-                    .any(|&x2| semaev_eval(&[x1, x2], xt, a, b, p) == 0)
-            });
+            let want = v
+                .iter()
+                .any(|&x1| v.iter().any(|&x2| semaev_eval(&[x1, x2], xt, a, b, p) == 0));
             let sys = build_system(p, a, b, &base, 2, xt, Form::Sym, 1).unwrap();
             let rep = solve_system(&sys, p, 120, 200);
             assert_eq!(!rep.inconsistent, want, "X = {xt}");
