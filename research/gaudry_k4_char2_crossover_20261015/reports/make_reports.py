@@ -20,12 +20,18 @@ ARM_COLOUR = {"rho-neg": ORANGE, "rho-neg-aa": ORANGE, "ic-wied": BLUE, "ic-dens
 # directory, kind, note, spec file
 SESSIONS = [
     ("sessions/e-m15", "complete", "Part E, `m = 15`", "specs/SPEC-E-m15.json"),
+    ("sessions/e-m16", "complete", "Part E, `m = 16`, two targets, IC and rho (checkpointing binary)", "specs/SPEC-E-m16.json"),
     ("sessions/e-m17-rho", "complete", "Part E, `m = 17`, the rho half", "specs/SPEC-E-m17-rho.json"),
+    ("sessions/e-m17-ic-t0", "complete", "Part E, `m = 17`, IC on target 0 (checkpointing binary)", "specs/SPEC-E-m17-ic-t0.json"),
+    ("sessions/e-m17b-ic", "complete", "Part E, `m = 17`, IC on a second target (checkpointing binary)", "specs/SPEC-E-m17b-ic.json"),
+    ("sessions/e-m17b-rho", "complete", "Part E, `m = 17`, rho on the second target", "specs/SPEC-E-m17b-rho.json"),
+    ("sessions/e-m18-ic", "complete", "Part E, `m = 18`, IC (checkpointing binary, resumed)", "specs/SPEC-E-m18-ic.json"),
     ("sessions/d-ladder", "complete", "Part D, sparse against dense, `m = 8, 10, 12`", "specs/SPEC-D-ladder.json"),
+    ("sessions/d-m14", "complete", "Part D, `m = 14` (checkpointing binary)", "specs/SPEC-D-m14.json"),
     ("sessions/f-lp", "complete", "Part F, large primes, `m = 10, 12, 14`", "specs/SPEC-F-lp.json"),
-    ("sessions/e-m16.attempt3-killed", "interrupted", "Part E, `m = 16` (killed after 3 of 4 runs)", "specs/SPEC-E-m16.json"),
-    ("sessions/e-m17-ic.attempt1-killed", "interrupted", "Part E, `m = 17`, the IC half (killed after 1 of 2 runs)", "specs/SPEC-E-m17-ic.json"),
-    ("sessions/d-m14.attempt3-killed", "interrupted", "Part D, `m = 14` (killed after 2 of 3 runs)", "specs/SPEC-D-m14.json"),
+    ("sessions/e-m16.attempt3-killed", "interrupted", "Part E, `m = 16` (killed after 3 of 4 runs; superseded by `e-m16`)", "specs/SPEC-E-m16.json"),
+    ("sessions/e-m17-ic.attempt1-killed", "interrupted", "Part E, `m = 17`, the IC half (killed after 1 of 2 runs; superseded)", "specs/SPEC-E-m17-ic.json"),
+    ("sessions/d-m14.attempt3-killed", "interrupted", "Part D, `m = 14` (killed after 2 of 3 runs; superseded by `d-m14`)", "specs/SPEC-D-m14.json"),
     ("pilot/session-m10", "pilot", "Pilot P2, `m = 10`: dense, `wiedemann`, large-prime settings", "pilot/SPEC-pilot-m10.json"),
     ("pilot/session-rates", "pilot", "Pilot P3: capped rates at `m = 16, 17, 18` (exhausted by design)", "pilot/SPEC-pilot-rates.json"),
 ]
