@@ -305,6 +305,15 @@ pub struct Relation {
     pub entries: Vec<(u32, i64)>,
 }
 
+/// A relation up to one large prime `q` (above the factor base): the class of
+/// the canonical prime ideal above `q` equals `sign × Σ v_i [𝔭_i]`.
+#[derive(Clone, Debug)]
+pub struct Partial {
+    pub q: u64,
+    pub sign: i64,
+    pub entries: Vec<(u32, i64)>,
+}
+
 /// Sieve parameters.
 #[derive(Clone, Debug)]
 pub struct SieveParams {
@@ -320,6 +329,11 @@ pub struct SieveParams {
     pub seed: u64,
     /// How the lattice index is computed from the dense matrix.
     pub linalg: LinAlg,
+    /// Single-large-prime variation: a sieved value whose cofactor after the
+    /// factor base is a prime below `large_prime_factor × bound` is kept as a
+    /// partial relation, and two partials with the same large prime combine
+    /// into a full one. 0 disables it.
+    pub large_prime_factor: u64,
     /// Resume file: the relation pool after each sieving round, and (beside it,
     /// with extension `det`) the determinant of every finished subset. A restart
     /// continues from them; a checkpoint of another discriminant, bound or
@@ -350,6 +364,7 @@ impl Default for SieveParams {
             threads: 4,
             seed: 1,
             linalg: LinAlg::DetGcd,
+            large_prime_factor: 32,
             checkpoint: None,
         }
     }
@@ -412,8 +427,16 @@ fn sieve_one(
     rng: &mut Rng,
     buf: &mut [u8],
     forced: Option<u32>,
-) -> Vec<Relation> {
+    bound: u64,
+) -> (Vec<Relation>, Vec<Partial>) {
     let n = fb.len();
+    let lp_bound: u64 = if params.large_prime_factor == 0 {
+        0
+    } else {
+        bound
+            .saturating_mul(params.large_prime_factor)
+            .min(bound.saturating_mul(bound) - 1)
+    };
     // random exponent vector e with `support` entries in {−1, +1}; a forced
     // index is always part of the support so that its column gets a relation
     let mut e: BTreeMap<u32, i64> = BTreeMap::new();
@@ -504,8 +527,14 @@ fn sieve_one(
     // threshold: log2 of the largest value on the interval minus slack
     let big_m = BigInt::from(m);
     let max_val = &a * &big_m * &big_m + b.abs() * &big_m + &c;
-    let target = bits_of(&max_val) as i64 - params.slack_bits as i64;
+    let lp_bits = if lp_bound > 0 {
+        64 - lp_bound.leading_zeros() as i64
+    } else {
+        0
+    };
+    let target = bits_of(&max_val) as i64 - params.slack_bits as i64 - lp_bits;
     let mut out = Vec::new();
+    let mut partials = Vec::new();
     for (i, &lsum) in buf.iter().enumerate() {
         if (lsum as i64) < target {
             continue;
@@ -544,9 +573,19 @@ fn sieve_one(
                 fact.push((idx as u32, k));
             }
         }
-        if !nval.is_one() {
-            continue; // not B-smooth (a large-prime variant would go here)
-        }
+        // cofactor: 1 (full relation) or one prime below lp_bound (partial);
+        // every prime factor <= bound was divided out, so a cofactor below
+        // bound² is prime
+        let large: Option<u64> = if nval.is_one() {
+            None
+        } else if lp_bound > 0 && nval.bits() <= 64 {
+            match nval.to_u64() {
+                Some(q) if q > bound && q < lp_bound => Some(q),
+                _ => continue,
+            }
+        } else {
+            continue;
+        };
         // (a, b, c) is equivalent to (N, −(2ax + b), a) via (X, Y) = (xU − V, U);
         // the sign of each prime ideal is read from b_N = −(2ax + b) modulo p
         let b_n = -(BigInt::from(2) * &a * &xb + &b);
@@ -570,19 +609,43 @@ fn sieve_one(
             *v.entry(idx).or_insert(0) -= sign * k;
         }
         let entries: Vec<(u32, i64)> = v.into_iter().filter(|(_, val)| *val != 0).collect();
-        if !entries.is_empty() {
-            out.push(Relation { entries });
+        match large {
+            None => {
+                if !entries.is_empty() {
+                    out.push(Relation { entries });
+                }
+            }
+            Some(q) => {
+                // the ideal above q is read from b_N mod q; the canonical one has
+                // the smaller residue, its conjugate the inverse class
+                let bq = big_mod_u64(&b_n, q);
+                if bq == 0 {
+                    continue;
+                }
+                let sign = if bq <= q - bq { 1 } else { -1 };
+                partials.push(Partial { q, sign, entries });
+            }
         }
     }
-    out
+    (out, partials)
 }
 
 /// Collect at least `fb.len() + params.excess` relations with `params.threads` workers.
 /// Returns the relations and the number of random products sieved.
-pub fn collect_relations(fb: &[FbPrime], params: &SieveParams) -> (Vec<Relation>, u64) {
+pub fn collect_relations(
+    fb: &[FbPrime],
+    params: &SieveParams,
+    bound: u64,
+) -> (Vec<Relation>, u64, LargePrimeStats) {
     let n = fb.len();
     let target = n + params.excess;
     let found = Mutex::new(Vec::<Relation>::new());
+    // partial relations by large prime; a second partial with the same prime
+    // combines with the stored one into a full relation
+    let partials: Mutex<std::collections::HashMap<u64, Partial>> =
+        Mutex::new(std::collections::HashMap::new());
+    let n_partials = AtomicU64::new(0);
+    let n_combined = AtomicU64::new(0);
     let count = AtomicU64::new(0);
     let products = AtomicU64::new(0);
     let done = AtomicBool::new(false);
@@ -600,6 +663,9 @@ pub fn collect_relations(fb: &[FbPrime], params: &SieveParams) -> (Vec<Relation>
             let done = &done;
             let covered = &covered;
             let next_col = &next_col;
+            let partials = &partials;
+            let n_partials = &n_partials;
+            let n_combined = &n_combined;
             let mut rng = Rng::new(params.seed ^ ((t as u64 + 1) << 32));
             scope.spawn(move || {
                 let mut buf = vec![0u8; 2 * params.half_length as usize + 1];
@@ -637,8 +703,34 @@ pub fn collect_relations(fb: &[FbPrime], params: &SieveParams) -> (Vec<Relation>
                             None
                         }
                     };
-                    let rels = sieve_one(fb, params, &mut rng, &mut buf, forced);
+                    let (mut rels, parts) = sieve_one(fb, params, &mut rng, &mut buf, forced, bound);
                     products.fetch_add(1, Ordering::Relaxed);
+                    if !parts.is_empty() {
+                        n_partials.fetch_add(parts.len() as u64, Ordering::Relaxed);
+                        let mut map = partials.lock().unwrap();
+                        for pt in parts {
+                            match map.get(&pt.q) {
+                                Some(prev) => {
+                                    // prev.sign·prev.v = [𝔮] = pt.sign·pt.v, so prev.sign·prev.v − pt.sign·pt.v = 0
+                                    let mut acc: BTreeMap<u32, i64> = BTreeMap::new();
+                                    for &(c, val) in &prev.entries {
+                                        *acc.entry(c).or_insert(0) += prev.sign * val;
+                                    }
+                                    for &(c, val) in &pt.entries {
+                                        *acc.entry(c).or_insert(0) -= pt.sign * val;
+                                    }
+                                    let entries: Vec<(u32, i64)> = acc.into_iter().filter(|(_, v)| *v != 0).collect();
+                                    if !entries.is_empty() {
+                                        rels.push(Relation { entries });
+                                        n_combined.fetch_add(1, Ordering::Relaxed);
+                                    }
+                                }
+                                None => {
+                                    map.insert(pt.q, pt);
+                                }
+                            }
+                        }
+                    }
                     if !rels.is_empty() {
                         for r in &rels {
                             for &(c, _) in &r.entries {
@@ -656,7 +748,18 @@ pub fn collect_relations(fb: &[FbPrime], params: &SieveParams) -> (Vec<Relation>
     (
         found.into_inner().unwrap(),
         products.load(Ordering::Relaxed),
+        LargePrimeStats {
+            partials: n_partials.load(Ordering::Relaxed),
+            combined: n_combined.load(Ordering::Relaxed),
+        },
     )
+}
+
+/// Counts from the single-large-prime variation.
+#[derive(Clone, Copy, Debug, Default)]
+pub struct LargePrimeStats {
+    pub partials: u64,
+    pub combined: u64,
 }
 
 /// Choose at most `target` relations from `pool`: first one relation for every
@@ -1823,6 +1926,9 @@ pub struct ClassGroupReport {
     pub ramified_primes: usize,
     pub relations: usize,
     pub products_sieved: u64,
+    /// Partial relations seen and full relations made from pairs of them.
+    pub large_prime_partials: u64,
+    pub large_prime_combined: u64,
     pub eliminated_columns: usize,
     pub dense_columns: usize,
     /// `[Z^n : L]`: `h` times the index of the subgroup the relations found.
@@ -1853,6 +1959,7 @@ pub fn compute(
     let ln_abs_d = (bits_of(d) as f64) * std::f64::consts::LN_2;
     let grh_bound = 6.0 * ln_abs_d * ln_abs_d;
     let mut pool: Vec<Relation> = Vec::new();
+    let mut lp_total = LargePrimeStats::default();
     let mut relations: Vec<Relation>;
     let mut products = 0u64;
     let mut params = params.clone();
@@ -1879,8 +1986,10 @@ pub fn compute(
     }
     for round in 0..max_rounds {
         if !(resumed && round == 0) {
-            let (rels, prods) = collect_relations(&fb, &params);
+            let (rels, prods, lp) = collect_relations(&fb, &params, bound);
             products += prods;
+            lp_total.partials += lp.partials;
+            lp_total.combined += lp.combined;
             pool.extend(rels);
             if let Some(path) = &params.checkpoint {
                 let ck = PoolCheckpoint {
@@ -1955,6 +2064,8 @@ pub fn compute(
                 ramified_primes: n - split,
                 relations: relations.len(),
                 products_sieved: products,
+                large_prime_partials: lp_total.partials,
+                large_prime_combined: lp_total.combined,
                 eliminated_columns: dense.eliminated,
                 dense_columns: dense.columns.len(),
                 lattice_index: index,
@@ -1988,6 +2099,7 @@ mod tests {
             threads: 2,
             seed: 7,
             linalg: LinAlg::Hnf,
+            large_prime_factor: 32,
             checkpoint: None,
         };
         let (report, _, _) = compute(&d, bound, &params, 0.5, 6, 20_000).expect("converges");
@@ -2071,6 +2183,7 @@ mod tests {
                 threads: 2,
                 seed: 5,
                 linalg: LinAlg::DetGcd,
+                large_prime_factor: 32,
                 checkpoint: None,
             };
             let (report, fb, _) =
@@ -2102,6 +2215,7 @@ mod tests {
             threads: 2,
             seed: 5,
             linalg: LinAlg::DetGcd,
+            large_prime_factor: 32,
             checkpoint: None,
         };
         let (report, fb, _) = compute(&d, 400, &params, 0.5, 6, 20_000).unwrap();
@@ -2148,6 +2262,7 @@ mod tests {
             threads: 2,
             seed: 9,
             linalg: LinAlg::DetGcd,
+            large_prime_factor: 32,
             checkpoint: Some(path.clone()),
         };
         let (first, _, _) = compute(&d, 400, &params, 0.5, 6, 20_000).unwrap();
@@ -2190,6 +2305,7 @@ mod tests {
             threads: 2,
             seed: 11,
             linalg: LinAlg::Hnf,
+            large_prime_factor: 32,
             checkpoint: None,
         };
         let (report, fb, rels) = compute(&d, 400, &params, 0.5, 6, 20_000).unwrap();

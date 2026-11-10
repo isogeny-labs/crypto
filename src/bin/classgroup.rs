@@ -170,6 +170,7 @@ fn main() {
             Some("hnf") => LinAlg::Hnf,
             _ => LinAlg::DetGcd,
         },
+        large_prime_factor: opts.get("large-prime").map_or(32, |s| s.parse().unwrap()),
         checkpoint: opts.get("checkpoint").map(std::path::PathBuf::from),
     };
     let euler_bound: u64 = opts
@@ -194,6 +195,8 @@ fn main() {
         report.ratio_to_analytic,
         report.relations,
         report.products_sieved,
+        report.large_prime_partials,
+        report.large_prime_combined,
         report.eliminated_columns,
         report.dense_columns
     );
@@ -351,13 +354,13 @@ fn main() {
 
     let json = format!(
         "{{\"label\": \"{label}\", \"p\": {}, \"n\": {}, \"Delta\": {}, \"Delta_factorisation\": {{{}}}, \"D_K\": {}, \"D_K_bits\": {bits}, \"conductor\": {conductor}, \
-\"bound\": {bound}, \"grh_generating_bound\": {:.0}, \"factor_base\": {n}, \"split\": {}, \"ramified\": {}, \"relations\": {}, \"products_sieved\": {}, \
+\"bound\": {bound}, \"grh_generating_bound\": {:.0}, \"factor_base\": {n}, \"split\": {}, \"ramified\": {}, \"relations\": {}, \"products_sieved\": {}, \"large_prime_partials\": {}, \"large_prime_combined\": {}, \
 \"eliminated_columns\": {}, \"dense_columns\": {}, \"h\": {}, \"h_bits\": {}, \"h_log2\": {:.4}, \"analytic_log2_h\": {:.4}, \"l1_partial_euler_bound\": {euler_bound}, \"l1_partial\": {:.6}, \
 \"ratio_to_analytic\": {:.5}, \"accepted\": {accepted}, \"h_factorisation\": {{{}}}, \"h_factorisation_complete\": {h_complete}, \"two_rank_genus\": {two_rank}, \
 \"certified_by_full_order_prime\": {certified}, \"certificate_prime\": {certificate_prime}, \"order_check_failures\": {order_fail}, \"cyclic_indices\": {cyclic_json}, \
 \"index_of_subgroup_by_split_odd_le\": {{{}}}, \"index_of_subgroup_by_all_primes_le\": {{{}}}, \"mazur_split\": [{}], \"index_of_subgroup_by_mazur\": {}, \
 \"split_form_orders\": [{}], \"smallest_split_prime_with_full_order\": {certificate_prime}, \
-\"params\": {{\"half_length\": {}, \"support\": {}, \"slack_bits\": {}, \"excess\": {}, \"threads\": {}, \"seed\": {}, \"linalg\": \"{:?}\", \"tolerance\": {tolerance}}}, \
+\"params\": {{\"half_length\": {}, \"support\": {}, \"slack_bits\": {}, \"excess\": {}, \"threads\": {}, \"seed\": {}, \"linalg\": \"{:?}\", \"large_prime_factor\": {}, \"tolerance\": {tolerance}}}, \
 \"wall_s\": {{\"factor_delta\": {:.3}, \"relations_and_linalg\": {:.3}, \"orders_and_subgroups\": {:.3}, \"total\": {:.3}}}}}",
         p_opt.map_or("null".into(), |x| x.to_string()),
         n_opt.map_or("null".into(), |x| x.to_string()),
@@ -390,6 +393,7 @@ fn main() {
         params.threads,
         params.seed,
         params.linalg,
+        params.large_prime_factor,
         t_factor,
         t_relations_and_hnf,
         t_orders,
