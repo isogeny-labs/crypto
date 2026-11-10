@@ -1,3 +1,9 @@
+The new [unequal-weight PMF proof](WEIGHTED.md) verifies actual in-degree
+mean1and variance1−(a²+(1−a)²)on the complete8hash Z3ensemble, for every
+0≤a≤1; probabilities3/4and1/4give variance3/8. Expanded whole gate43passes,
+0failures/0trusted-native. This checks a variance component, with the
+collision-time penalty still open. [pcc:unverified]
+
 # Actual walk boundaries and exact finite populations
 
 Lean proves a fixed-support nonmixing family using actual PMF histories
@@ -27,10 +33,11 @@ All four frozen native calls pass, with identical outputs in both repeats:
 Uniform labels refer to the ensemble; individual fixed hash maps can have
 unequal empirical partition sizes. Both all-support and no-zero-support
 strata were frozen before data. The equal-weight penalty is shown beside
-the exact observed/mapping-baseline ratios. Nonuniform p_i, asymptotic
-constants and practical hash families remain open. [pcc:unverified]
+the exact observed/mapping-baseline ratios. General nonuniform collision populations, asymptotic
+constants and practical hash families remain open; the new finite weighted
+PMF moment is recorded separately. [pcc:unverified]
 
-The walk gate audits21declarations,0failing,0trusted-native exceptions.
+The original walk gate audits21declarations,0failing,0trusted-native exceptions.
 It includes actual uniform-history product probabilities, distinct
 increments, an event-mass bound, exact p101uniform mass, iteration
 pigeonhole, and the full-support hash-map equivalence with uniform

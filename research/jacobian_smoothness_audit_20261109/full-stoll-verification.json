@@ -1,0 +1,101 @@
+{
+  "schema": "theorem-audit-verification/v1",
+  "recorded_at": "2026-11-10T00:59:34.310Z",
+  "source_commit": "a88c6fa0f0692b471cb9472fece886b4fa3ee127",
+  "source_plan_sha256": "3ad066049021766a80cf9fed1239c55ab3abcabe5b037e414e01397d60b04cc8",
+  "source_bytes_equal_commit": true,
+  "formal": {
+    "project": "research/jacobian_smoothness_audit_20261109/lean",
+    "theorem": "MumfordStollFullGroupAudit.full_stoll_counterexample_certificate",
+    "statement": "theorem full_stoll_counterexample_certificate : curvePolynomial.Monic ∧ curvePolynomial.natDegree=5 ∧ curvePolynomial.Separable ∧ Fintype.card ReducedPair=10 ∧ Fintype.card {P : ReducedPair // P.u.Splits}=8 ∧ (point 1).u=X ∧ (point 1).v=1 ∧ Nat.Prime 5 ∧ (5:ℕ)≠3 ∧ addOrderOf (point 1)=5 ∧ properSubgroup=AddSubgroup.zmultiples (point 1) ∧ properSubgroup≠⊤ ∧ Fintype.card properSubgroup=5 ∧ Fintype.card {P : properSubgroup // P.val.u.Splits}=5 ∧ (∀ P Q : ReducedPair, SelectedRun P Q (P+Q)) ∧ (∀ P Q : ReducedPair, P+Q=cantorAdd P Q) ∧ subgroupFraction properSubgroup=1 ∧ ambientFraction=4/5 ∧ subgroupFraction properSubgroup≠ambientFraction ∧ (¬ ∀ P : ReducedPair, subgroupFraction (AddSubgroup.zmultiples P)=ambientFraction) ∧ subgroupNonzeroFraction properSubgroup=1 ∧ ambientNonzeroFraction=7/9 ∧ (¬ ∀ P : ReducedPair, subgroupNonzeroFraction (AddSubgroup.zmultiples P)=ambientNonzeroFraction)",
+    "decl_sha256": "18235f7548982d24e0c15ec939fce8985335a19330482fdec0492fbb3d7c18e4",
+    "sources": [
+      {
+        "path": "research/jacobian_smoothness_audit_20261109/lean/MumfordStoll.lean",
+        "bytes": 14531,
+        "sha256": "f33f37aa97450b83ddec77c38e8e46bbfc0b280b089ebee5f967723ac7e79e13"
+      },
+      {
+        "path": "research/jacobian_smoothness_audit_20261109/lean/MumfordStollCantor.lean",
+        "bytes": 8134,
+        "sha256": "dd3d8df8d1ce55f3aa380b8f8950343678c82c5b8d3bd7da9d5b4a0101a526cf"
+      },
+      {
+        "path": "research/jacobian_smoothness_audit_20261109/lean/MumfordStollCycleGroup.lean",
+        "bytes": 7609,
+        "sha256": "7ed577d0e275f1d690d423c85f483611a27a6819f436088319aff7475258f287"
+      },
+      {
+        "path": "research/jacobian_smoothness_audit_20261109/lean/MumfordStollGeneral.lean",
+        "bytes": 4225,
+        "sha256": "18251bbe5736ac0e5759b9127799ac726f58e299ddd59d0af82cb3c7e3fb4775"
+      },
+      {
+        "path": "research/jacobian_smoothness_audit_20261109/lean/MumfordStollProofRules.lean",
+        "bytes": 849,
+        "sha256": "dcede74102478c7b71c618f275afa5f267b05c88c951fd6a5d59697b11291c85"
+      },
+      {
+        "path": "research/jacobian_smoothness_audit_20261109/lean/MumfordStollFullCertificates.lean",
+        "bytes": 148588,
+        "sha256": "b95d6f45fa510013eab73b7a73f8870ef8abfbce0006f040c44b37689a10233f"
+      },
+      {
+        "path": "research/jacobian_smoothness_audit_20261109/lean/MumfordStollFullGroup.lean",
+        "bytes": 13446,
+        "sha256": "3aeb9e5554ce04d9af5d3d5b57fae7750b85881eecb9294f61a41cfaf1ce4789"
+      },
+      {
+        "path": "research/jacobian_smoothness_audit_20261109/lean/MumfordStollNegativeControl.lean",
+        "bytes": 766,
+        "sha256": "e41cb8c603f2d9f0345491cdf0d61f94fd357dc8b5aba6e4d5e2c760aa4b65c6"
+      }
+    ],
+    "gate": {
+      "path": "evidence/stoll-full-gate.log",
+      "declarations": 808,
+      "failing": 0,
+      "trusted_native": 0
+    },
+    "scope": "Complete actual reduced polynomial-pair group on y2=x5+1/F3, unique normalized Cantor run and all100matched additions, actual proper prime5 subgroup, direct universal fraction disproof including and excluding identity. Geometric Picard identification/scaling/qualified asymptotics remain open."
+  },
+  "proof_packet": {
+    "id": "PCC-20261110-4d413c",
+    "local_verdict": {
+      "claim_id": "PCC-20261110-4d413c",
+      "claim_sha256": "1b75f2680e40fe1a88b459c926c8951fa16931775e3b0d753c0d78cbdcf5fbdb",
+      "commit": "a88c6fa0f0692b471cb9472fece886b4fa3ee127",
+      "proofs": [
+        {
+          "kind": "lean",
+          "notes": [
+            "lean: proof gate PASS for research/jacobian_smoothness_audit_20261109/lean (MumfordStollFullGroup.lean)"
+          ],
+          "reasons": [],
+          "verdict": "pass"
+        }
+      ],
+      "reasons": [],
+      "schema": "pcc.verdict/v1",
+      "verdict": "pass",
+      "verified_at": "2026-11-10T00:58:04Z",
+      "verifier_host": "762f5fc120c9"
+    },
+    "standing": {
+      "claim_id": "PCC-20261110-4d413c",
+      "claim_sha256": "1b75f2680e40fe1a88b459c926c8951fa16931775e3b0d753c0d78cbdcf5fbdb",
+      "standing": "unverified",
+      "verdicts": []
+    }
+  },
+  "report": {
+    "path": "reports/proof-20261110-full-stoll/report.pdf",
+    "bytes": 69553,
+    "sha256": "3fafb193c31cf929317a0edacf717e78b39359694557b529f9b0537e6f749bf8",
+    "pages": 2,
+    "all_pages_visually_inspected": true,
+    "graphs_and_diagrams_inspected": true
+  },
+  "scope": "Complete actual reduced polynomial-pair group on y2=x5+1/F3, unique normalized Cantor run and all100matched additions, actual proper prime5 subgroup, direct universal fraction disproof including and excluding identity. Geometric Picard identification/scaling/qualified asymptotics remain open.",
+  "paid_compute": 0
+}

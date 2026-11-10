@@ -1,10 +1,11 @@
-Current result: [the actual prime-five Cantor cycle](STOLL_CYCLE.md) has
-smooth fraction1versusambient4/5; the whole tracked project gate passes348
-declarations/0failing/0trusted-native. The [complete native census](CENSUS.md)
-passes all4cells, two-language arithmetic and byte-identical repeats over
-all F3/F5monic quintics. [Calibration failures and controls](CALIBRATION.md)
-remain retained. Scientific standing is unsigned/unverified; full ambient
-Stoll-group/geometry and the original all14gaps stay explicit. [pcc:unverified]
+Current result: [the complete finite Stoll Cantor group](FULL_STOLL.md)
+checks all100additions and directly disproves universal cyclic smoothness
+equality: the actual order5subgroup has fraction1versusambient4/5, or
+1versus7/9when both domains exclude identity. Whole gate808passes with
+0failures/0trusted-native. The [native census](CENSUS.md) remains separate;
+[recorded witness candidates](WITNESSES.md) disclose conflicting frozen
+protocol parameter labels. Geometric/asymptotic bridges remain explicit;
+scientific PCC standing is unsigned/unverified. [pcc:unverified]
 
 # Mumford counts and a finite Cantor subgroup counterexample
 
