@@ -1,35 +1,33 @@
-# Resume: crypto @ claude/exponent-study-20261108
+# Resume: crypto @ claude/zealous-meitner-85ipb5
 
 ## Goal
-Exponent study (owner preregistration 2026-11-08): fit the exponent of the cost T(E,m,L) of ONE
-decomposition system against |V| for multiplicative-subgroup bases on the Curve25519-family
-miniatures, m = 2, 3, 4, symmetrised system in the elementary symmetric polynomials. Success rule:
-every verified measured improvement counts; report distance to rho.
+Owner's ask (2026-11-10): run the index-calculus decomposition benchmarks on a ladder of binary
+curves (Koblitz K and random R families, Weil descent of the Semaev polynomial) with the new
+external M4GB backend (`m4gb-f2`, PR #3812) beside the in-house engines, and see whether solve time
+per target is lower. Stage diagnostic (AGENTS.md section 2), never a speed row; all local numbers
+`[pcc:unverified]`.
 
 ## Lead / hypothesis
-Lever iff m = 4 exponent < 0.5 (upper 95% bound too) or m = 3 exponent < 0. Prediction: m = 2 about 1.5,
-m = 3 about 3.5, m = 4 >= 4.5 or capped; no lever.
+Prediction: `inherited-f4` and `f4-f2` decide each target faster than `m4gb-f2` on every cell
+(decision tree with degree-bounded bases against a full reduced basis); M4GB's ratio to the
+reference grows with the number of variables. Falsifier: `m4gb-f2` median wall below `f4-f2` on any
+cell with at least 24 variables.
 
 ## Spec
-research/curve25519_exponent_study_20261108/PROTOCOL.md (frozen, data/frozen.sha256). Code:
-src/cryptanalysis/ic_framework/subgroup_semaev.rs (6 unit tests pass), `curve25519_family f4sub` and
-`subcensus`. Binary /home/user/ctarget-f1/release/curve25519_family. Run: python3 scripts/run_grid.py
-(4 workers, cells/*.json, resumable: finished cells skipped). Analysis: scripts/analyse.py.
+research/m4gb_descent_ladder_20261110/README.md (protocol), run_ladder.sh (the one launcher).
+Command: target/release/ic descent --json --out <file> --families K,R --cells <n:n':2 ...>
+--targets 8 --repeats 3 --budget-seconds 300 --solver fes-f2 --solver f4-f2 --solver inherited-f4
+--solver m4gb-f2, with M4GB_BINARY pointing at a directory of solver_m4gb_n<N>_gf2 binaries
+(patched upstream 01860a52, patches in third_party/m4gb-patches/, built by scripts/m4gb/build.sh).
+Benchmark record: benchmarks/records/20261110T1513Z-m4gb-descent-ladder.json (open).
 
-## State
-Local worktree /home/user/crypto, branch claude/exponent-study-20261108 (not pushed by instruction).
-Conductor, ecdb and research-kb unreachable. Disk about 2.6 GB free: no second target dir.
+## State (closed 18:50Z: ladder measured, record closed, PR #3819 pending auto-merge)
+Branch restarted on origin/main after PR #3812 merged. M4GB binaries in the session scratchpad
+(not in Git; rebuild with scripts/m4gb/build.sh n16_gf2 ... n64_gf2). `ic` release build in
+progress. Conductor, ecdb, research-kb and isolab tooling unreachable in this container.
 
 ## Next steps
-1. Run the grid; census (subcensus); calibration (bits base vs tower f4cost G=0).
-2. analyse.py; README.md with [pcc:unverified] result sentences; figure; REPORT.pdf; pcc lint-prose.
-3. Session log docs/session-logs/2026-11-08.md; local commits with the two attribution lines.
-
-## Stop and success conditions
-Stop when every grid cell is complete or censored, the analysis, README, figure, PDF and session log
-are written and committed locally. Success: fitted exponents with intervals per m (or a stated
-censoring), verdicts on the preregistered thresholds, failed predictions kept as failed.
-
-## Runs in flight
-Grid launched by scripts/run_grid.py in the background on this machine; cells land in
-research/curve25519_exponent_study_20261108/cells/. Relaunch the same command to resume.
+1. Smoke test one cell (11:6:2, K, 2 targets); then run_ladder.sh under `benchrec.py run`.
+2. Summarise per cell: median wall per engine, ratio to fes-f2 and to f4-f2, agreement with the
+   reference; graph + PDF; close the record; benchmarks entry (no table row: stage diagnostic).
+3. Session log entry; PR from this branch; auto-merge once complete.
