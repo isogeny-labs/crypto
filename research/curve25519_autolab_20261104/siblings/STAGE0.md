@@ -151,3 +151,101 @@ The falsification line (above 1.08 x D0 at two of three sizes for any m <= 8) is
   child jumps was not run [pcc:unverified].
 * D0 here is the same-run D0 at n = 2000; the Poisson floors (1.329, 1.662) are from the NC-2 engine
   [pcc:unverified].
+
+## Sibling pool amendment (second section, dated 2026-11-10)
+
+Status: [pcc:unverified]. The first section above is unchanged and stays negative: the symmetric sibling set loses
+pairs. This section tests the owner's fix, a per-parent random m-subset of a pool of M jumps [pcc:unverified].
+
+Answer [pcc:unverified]: the amended falsification line is NOT hit. E_points / D0 for the four arms is 0.959 to 0.987
+over both C and all three sizes; for (8, 256) it is 0.959 to 0.971; sizes above 1.08 for (8, 256): 0 of 6
+(C, k) cells. The prediction 1.00 +- 0.05 holds as a band; the ratios sit below 1.00 (0.96 to 0.99) because the pool walk
+has a smaller walk excess than D0's fixed 16-jump walk (E_points / floor is 1.00 to 1.03) [pcc:unverified]. No ratio is
+below 0.95, the bug guard [pcc:unverified].
+
+Design, pre-registration and commit: header amendment (commit db2022fe35, before any pool run), mode `--pool M
+--siblings m,..` (`SP(m, M)`, struct `PoolGen`), the two known-copy children kept skipped (conditionally on the
+subsets, see the header). Tests: `cargo test --release --bin nc2_stage0` (17 passed); clippy `-D warnings` clean
+[pcc:unverified]. Commands (also `run_pool.sh`), seed 20261108, n = 2000, from the repository root, per size k with
+its three curves (the same r values as above) [pcc:unverified]:
+
+```
+./target/release/nc2_stage0 --r <3 curves> --c 1,2 --n 2000 --seed 20261108 --pool 64  --siblings 4,8  > raw/pool64-k<k>.txt
+./target/release/nc2_stage0 --r <3 curves> --c 1,2 --n 2000 --seed 20261108 --pool 256 --siblings 8,16 > raw/pool256-k<k>.txt
+```
+
+D0 and D0i controls are in every run on the same samples and reproduce the first section's values exactly (same
+samples and seed), so they are inside their intervals [pcc:unverified]. Per-k = mean of three curve means. Tables built
+by `gen_pool.py` from `raw/pool*.txt` [pcc:unverified]. Hit = 1.0000 everywhere.
+
+### C = 1, floor 1.329 [pcc:unverified]
+
+| k | m | M | E_points +- SE | E_parents +- SE | hit | E_points / D0 | E_points / floor | E_points / E_parents |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 20 | D0 | n/a | 1.3816 +- 0.0065 | n/a | 1.0000 | 1.000 | 1.040 | n/a |
+| 20 | D0i | n/a | 1.3296 +- 0.0062 | n/a | 1.0000 | 0.962 | 1.000 | n/a |
+| 20 | 4 | 64 | 1.3570 +- 0.0064 | 0.1719 +- 0.0008 | 1.0000 | 0.982 | 1.021 | 7.89 |
+| 20 | 8 | 64 | 1.3473 +- 0.0064 | 0.0860 +- 0.0004 | 1.0000 | 0.975 | 1.014 | 15.67 |
+| 20 | 8 | 256 | 1.3318 +- 0.0062 | 0.0845 +- 0.0004 | 1.0000 | 0.964 | 1.002 | 15.76 |
+| 20 | 16 | 256 | 1.3597 +- 0.0064 | 0.0438 +- 0.0002 | 1.0000 | 0.984 | 1.023 | 31.04 |
+| 24 | D0 | n/a | 1.3793 +- 0.0065 | n/a | 1.0000 | 1.000 | 1.038 | n/a |
+| 24 | D0i | n/a | 1.3296 +- 0.0061 | n/a | 1.0000 | 0.964 | 1.000 | n/a |
+| 24 | 4 | 64 | 1.3605 +- 0.0063 | 0.1717 +- 0.0008 | 1.0000 | 0.986 | 1.024 | 7.92 |
+| 24 | 8 | 64 | 1.3487 +- 0.0063 | 0.0853 +- 0.0004 | 1.0000 | 0.978 | 1.015 | 15.81 |
+| 24 | 8 | 256 | 1.3369 +- 0.0063 | 0.0840 +- 0.0004 | 1.0000 | 0.969 | 1.006 | 15.92 |
+| 24 | 16 | 256 | 1.3417 +- 0.0064 | 0.0423 +- 0.0002 | 1.0000 | 0.973 | 1.010 | 31.72 |
+| 28 | D0 | n/a | 1.3836 +- 0.0064 | n/a | 1.0000 | 1.000 | 1.041 | n/a |
+| 28 | D0i | n/a | 1.3272 +- 0.0063 | n/a | 1.0000 | 0.959 | 0.999 | n/a |
+| 28 | 4 | 64 | 1.3368 +- 0.0063 | 0.1685 +- 0.0008 | 1.0000 | 0.966 | 1.006 | 7.93 |
+| 28 | 8 | 64 | 1.3427 +- 0.0063 | 0.0847 +- 0.0004 | 1.0000 | 0.970 | 1.010 | 15.85 |
+| 28 | 8 | 256 | 1.3274 +- 0.0062 | 0.0832 +- 0.0004 | 1.0000 | 0.959 | 0.999 | 15.95 |
+| 28 | 16 | 256 | 1.3351 +- 0.0062 | 0.0419 +- 0.0002 | 1.0000 | 0.965 | 1.005 | 31.86 |
+
+### C = 2, floor 1.662 [pcc:unverified]
+
+| k | m | M | E_points +- SE | E_parents +- SE | hit | E_points / D0 | E_points / floor | E_points / E_parents |
+|--:|--:|--:|--:|--:|--:|--:|--:|--:|
+| 20 | D0 | n/a | 1.7303 +- 0.0066 | n/a | 1.0000 | 1.000 | 1.041 | n/a |
+| 20 | D0i | n/a | 1.6719 +- 0.0062 | n/a | 1.0000 | 0.966 | 1.006 | n/a |
+| 20 | 4 | 64 | 1.6734 +- 0.0063 | 0.2117 +- 0.0008 | 1.0000 | 0.967 | 1.007 | 7.90 |
+| 20 | 8 | 64 | 1.6982 +- 0.0064 | 0.1082 +- 0.0004 | 1.0000 | 0.981 | 1.022 | 15.70 |
+| 20 | 8 | 256 | 1.6758 +- 0.0063 | 0.1061 +- 0.0004 | 1.0000 | 0.969 | 1.008 | 15.79 |
+| 20 | 16 | 256 | 1.6844 +- 0.0063 | 0.0540 +- 0.0002 | 1.0000 | 0.973 | 1.013 | 31.19 |
+| 24 | D0 | n/a | 1.7119 +- 0.0065 | n/a | 1.0000 | 1.000 | 1.030 | n/a |
+| 24 | D0i | n/a | 1.6567 +- 0.0062 | n/a | 1.0000 | 0.968 | 0.997 | n/a |
+| 24 | 4 | 64 | 1.6801 +- 0.0064 | 0.2120 +- 0.0008 | 1.0000 | 0.981 | 1.011 | 7.92 |
+| 24 | 8 | 64 | 1.6904 +- 0.0063 | 0.1068 +- 0.0004 | 1.0000 | 0.987 | 1.017 | 15.83 |
+| 24 | 8 | 256 | 1.6542 +- 0.0064 | 0.1039 +- 0.0004 | 1.0000 | 0.966 | 0.995 | 15.92 |
+| 24 | 16 | 256 | 1.6722 +- 0.0063 | 0.0527 +- 0.0002 | 1.0000 | 0.977 | 1.006 | 31.73 |
+| 28 | D0 | n/a | 1.7297 +- 0.0065 | n/a | 1.0000 | 1.000 | 1.041 | n/a |
+| 28 | D0i | n/a | 1.6543 +- 0.0064 | n/a | 1.0000 | 0.956 | 0.995 | n/a |
+| 28 | 4 | 64 | 1.6786 +- 0.0063 | 0.2116 +- 0.0008 | 1.0000 | 0.970 | 1.010 | 7.93 |
+| 28 | 8 | 64 | 1.6922 +- 0.0064 | 0.1068 +- 0.0004 | 1.0000 | 0.978 | 1.018 | 15.84 |
+| 28 | 8 | 256 | 1.6791 +- 0.0064 | 0.1052 +- 0.0004 | 1.0000 | 0.971 | 1.010 | 15.96 |
+| 28 | 16 | 256 | 1.6727 +- 0.0063 | 0.0525 +- 0.0002 | 1.0000 | 0.967 | 1.006 | 31.86 |
+
+## Diagnostic: raw collisions per distinct row
+
+`diag_rows_pool.py` (Python, r = 131203, C = 1, 20 samples, walk run to 12 sqrt(r) points; output
+`raw/diag_rows_pool.txt`) [pcc:unverified]:
+
+```
+m=4 M=64 raw_collisions=2823 distinct_rows=2747 ratio=1.028 pred=1.004
+m=8 M=64 raw_collisions=2766 distinct_rows=2678 ratio=1.033 pred=1.016
+m=8 M=256 raw_collisions=2772 distinct_rows=2756 ratio=1.006 pred=1.001
+m=16 M=256 raw_collisions=2869 distinct_rows=2813 ratio=1.020 pred=1.004
+```
+
+Prediction for (8, 256): about 1.0 + (m/M)^2 = 1.001. Measured 1.006, above the prediction by 0.005 (the SE of
+the ratio is about 0.01 from 2772 raw collisions), consistent with it [pcc:unverified]. For comparison the symmetric
+set gave 2.95 at m = 16 [pcc:unverified]. The other arms read 1.02 to 1.03 against 1.004 to 1.016 predicted
+[pcc:unverified]. The diagnostic keeps identical vectors out of the count and does not apply the known-copy skip.
+
+## Caveats (pool)
+
+* The pool walk's walk excess is lower than D0's, so the ratio to D0 mixes the sibling effect with that difference;
+  the ratio to the Poisson floor is given alongside [pcc:unverified].
+* E_parents counts the parent in progress at stop as a whole parent. Cost per point (0.59 of a step per child) is
+  not applied here [pcc:unverified].
+* With (m, M) the expected parent subsets overlap, so same-parent structure other than the swap pair is not
+  excluded; the measured E says it does not matter at these sizes [pcc:unverified].
