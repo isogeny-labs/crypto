@@ -352,3 +352,20 @@ remain explicit. No claim that all 44 cited sources were read or all fourteen
 original statements were proved/disproved is made. Local Lean PASS and signed
 independent standing remain separate; the new packets are unsigned.
 [pcc:unverified]
+
+### 2026-11-10 unbounded prime-order family extension
+
+The [prime-family project](../research/mumford_prime_family_audit_20261110/README.md)
+uses the actual pinned Mathlib Dirichlet theorem, with proved coprimality5/24,
+to extract arbitrarily large t with24t+5prime. It combines actual family
+cardinality/order, all-pair normalized arithmetic, generation and fraction1
+versusambient<1. Unbounded prime-order disparity witnesses and a direct
+universal prime-family equality negation are proved. Fullgate5/0/0;
+allfiveattempt/source and fivegatefiles retained losslessly. [pcc:unverified]
+
+This extends the earlier arithmetic results to unbounded prime orders.
+The earlier source receipts did not claim this extension and remain unchanged.
+Genus grows with order; full ambient/Picard identification and typical,
+dominant-prime or fixed-genus asymptotic statements remain open. The host
+question for item13remains pending; authorized local proof work continued
+while that input was unavailable. [pcc:unverified]

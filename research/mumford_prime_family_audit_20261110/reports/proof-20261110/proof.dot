@@ -1,0 +1,13 @@
+digraph PrimeFamily {
+  graph [rankdir=TB, bgcolor="white", fontname="DejaVu Sans", nodesep=0.25, ranksep=0.3];
+  node [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=11, fillcolor="#eef3fa", color="#2d4262", margin="0.15,0.10"];
+  edge [color="#53657e", arrowsize=0.7];
+  dirichlet [label="Actual pinned Mathlib Dirichlet theorem\nq=24, a=5, coprimality proved\nPrime p > 24B+5, p congruent 5 mod 24"];
+  parameter [label="Actual division/remainder identity\nt=p/24 > B; n=24t+5=p prime\nGenus parameter g=12t+2 and order n exceed B", fillcolor="#e6f3e9"];
+  inherited [label="Frozen actual polynomial arithmetic over F3\nAll-pair normalized Cantor certificates before group transport\nActual cardinality n, generator (X,1) has order n\nEvery member is generated"];
+  primegroup [label="Unbounded prime-order arithmetic groups\nEvery member smooth: fraction 1\nFull valid-pair ambient fraction strictly smaller", fillcolor="#e6f3e9"];
+  negation [label="Counterexamples beyond every prime-order bound\nDirect universal prime-family equality negation", fillcolor="#e6f3e9"];
+  scope [label="5 declarations pass, 0 failing / 0 trusted-native\nNo assumed Dirichlet or prime-infinitude axiom\nFixed F3; genus grows with order\nFull ambient / geometric Picard bridge remains open\nSigned standing unverified", fillcolor="#fce7e7"];
+  dirichlet -> parameter; parameter -> primegroup; inherited -> primegroup;
+  primegroup -> negation; negation -> scope;
+}

@@ -1,0 +1,58 @@
+{
+  "schema": "mumford-prime-family-verification/v1",
+  "created": "2026-11-10T14:31:56.407276+00:00",
+  "source_commit": "82c6637b9ffccea264c4cd23cbbe808046b78ecd",
+  "source_plan": "sources.json",
+  "all_source_and_artifact_pins_match": true,
+  "full_gate": {
+    "archive": "research/mumford_prime_family_audit_20261110/evidence/gate.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true,
+    "public_theorems": 5,
+    "failing": 0,
+    "trusted_native": 0
+  },
+  "attempts": {
+    "archive": "research/mumford_prime_family_audit_20261110/evidence/attempts.tar.gz",
+    "files": 5,
+    "roundtrip_equal": true
+  },
+  "actual_local_verdict": {
+    "claim_id": "PCC-20261110-c2d306",
+    "claim_sha256": "9103b89b788d137d9f1d7f8b39becc9102ea1b331b111f3196513ca0382088c3",
+    "commit": "82c6637b9ffccea264c4cd23cbbe808046b78ecd",
+    "proofs": [
+      {
+        "kind": "lean",
+        "notes": [
+          "lean: proof gate PASS for research/mumford_prime_family_audit_20261110/lean (PrimeFamily.lean)"
+        ],
+        "reasons": [],
+        "verdict": "pass"
+      }
+    ],
+    "reasons": [],
+    "schema": "pcc.verdict/v1",
+    "verdict": "pass",
+    "verified_at": "2026-11-10T14:28:12Z",
+    "verifier_host": "762f5fc120c9"
+  },
+  "signed_standing": {
+    "claim_id": "PCC-20261110-c2d306",
+    "claim_sha256": "9103b89b788d137d9f1d7f8b39becc9102ea1b331b111f3196513ca0382088c3",
+    "standing": "unverified",
+    "verdicts": []
+  },
+  "scope": "Arbitrarily large prime orders in the actual polynomial arithmetic family, actual cardinality/order/generation/sum certificates and smoothness disparity. Genus grows with the order; full ambient/Picard geometry and typical/dominant-prime or fixed-genus asymptotics remain open.",
+  "report": {
+    "pages": 2,
+    "bytes": 47256,
+    "sha256": "287508e9046de1c75a3a6ceee245e7228c9f98a551301fa021b2b849cb73aea2",
+    "inspection": "Both final pages visually inspected; no clipping."
+  },
+  "ledger_prefix": {
+    "base": "308f57c29439f019297eebceb5b53df149167df2",
+    "nonempty_prefix_matches": true,
+    "guard": "evidence/ledger-prefix-guard.json"
+  }
+}
