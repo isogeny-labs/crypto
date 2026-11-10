@@ -276,3 +276,21 @@ Those are the next formal obligations before calling this an unconditional
 geometric Jacobian subgroup family. The periods24t+5are not all prime,
 and typical/large-prime asymptotics remain separate. Known torsion-family
 prior art (Jędrzejak2016) is acknowledged; no novelty claim. [pcc:unverified]
+
+### 2026-11-10 all-pair arithmetic on the growing family
+
+The [new dependent project](../research/mumford_family_group_audit_20261110/README.md)
+proves all pairwise normalized Cantor outputs and uniqueness for explicit
+selected Bézout coefficients before introducing a group law. The signed
+residue bijection respects every actual output. Transported group addition
+is then proved equal to independently defined normalized arithmetic.
+The actual generator(X,1)has exactorder24t+5, every family member is
+generated, and the earlier actualStep equals generatoraddition.
+The whole64-declaration gate passes,0failing/0trusted-native;22attempt/source
+files retained losslessly. [pcc:unverified]
+
+This closes the all-pair group-law obligation within the family. It leaves
+the complete ambient reduced-pair group law and its geometric Picard
+identification open; no unproved ambient embedding is asserted.
+The smooth fraction1versusstrictlysmallerambient result keeps that exact
+polynomial-model scope. [pcc:unverified]
