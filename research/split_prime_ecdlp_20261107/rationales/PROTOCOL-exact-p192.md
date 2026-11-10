@@ -95,3 +95,16 @@ Same method, acceptance and stop rules as above, with these additions.
 - The P-192 outcome is not used to adjust these predictions beyond what was
   written on 2026-11-08 (prediction 3's "at least four of five" becomes "at
   least 10 of 14" by the same 80 % rate).
+
+### Tuning record for the extension (2026-11-10, before the claim runs)
+
+Probes on p224-777 (226-bit D_K, factor base 147,237, 8,838 relations wanted),
+four threads, defaults otherwise: half-interval 2^14: 0.8 relations per 1,000
+products at 3,080 products/s (2.5 rel/s); 2^16: 1.53 per 1,000 at 2,320/s
+(3.5 rel/s); 2^18: 2.75 per 1,000 at 1,270/s (3.5 rel/s). Single-large-prime
+variation (factor 32) with 2^16: 2.9 per 1,000 at 2,600/s after six minutes and
+rising (7.5 rel/s). Chosen for every P-224/P-239/P-256 run: half-interval 2^16,
+large-prime factor 32, other parameters at their defaults. The large-prime
+binary reproduces PARI's class numbers at 30, 40 and 45 digits (ratios to the
+analytic estimate 1.00005, 1.0001, 1.00007). The P-192 results stand on the
+earlier parameters and are not rerun.
