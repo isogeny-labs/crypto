@@ -1,3 +1,11 @@
+The [general independent-label proof](WEIGHTED_GENERAL.md) now verifies
+actual in-degree mean 1 and variance 1−Σpᵢ² for every finite abelian group,
+every distinct finite increment support, and every normalized nonnegative
+label law. Lean also disproves dropping distinctness, even for nonzero
+increments. Whole walk gate: 70 declarations, zero failures or trusted-native
+exceptions. Collision-time and mixing asymptotics remain separate.
+[pcc:unverified]
+
 The new [unequal-weight PMF proof](WEIGHTED.md) verifies actual in-degree
 mean1and variance1−(a²+(1−a)²)on the complete8hash Z3ensemble, for every
 0≤a≤1; probabilities3/4and1/4give variance3/8. Expanded whole gate43passes,
