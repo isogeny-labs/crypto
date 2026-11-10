@@ -72,11 +72,14 @@ and probability theory; the combinatorial half is now done.
 | `revealed_card_le` | With `k` known elements, at most `k(k-1)` secrets are revealed by some colliding pair |
 | `samePattern_of_not_revealed` | All secrets outside the revealed set have the same collision pattern |
 | `correct_card_le` | A non-adaptive algorithm whose output depends only on the pattern is correct on at most `k(k-1)+1` of the `p` secrets |
+| `correct_card_le_nt` | A decision tree with `k` nontrivial adaptive tests is correct on at most `k+1` secrets |
+| `correct_card_le_depth` | A depth-`d` adaptive tree is correct on at most `2^d` secrets |
 
-The remaining Layer 2 gap is adaptivity and probability: the query set of a
-real algorithm depends on the secret (and on random coins). The same counting
-argument applies per transcript, but formalizing the transcript distribution
-and averaging over it is a separate model-building step.
+The remaining Layer 2 gap is the probability step: over a uniform secret, an
+adaptive pair of queries collides with probability at most `1/p`, and a union
+bound over the `t(t-1)/2` query pairs gives Shoup's `t²/p` shape. The decision
+tree bound is deterministic; formalizing the query distribution and averaging
+over it is the remaining model-building step.
 
 ## Layer 3 — algorithm costs
 
@@ -90,7 +93,7 @@ and averaging over it is a separate model-building step.
 ## Layer 3b — algorithm correctness (formal)
 
 `lean/Algorithms.lean` (Mathlib project; the project gate reports
-`PASS 61 thm 0 trusted`) proves that the two standard generic reductions
+`PASS 114 thm 0 trusted`) proves that the two standard generic reductions
 return the right answer, without assuming anything about cost.
 
 | Theorem | Statement |
@@ -114,7 +117,7 @@ cost/probability model exists.
 
 ## Layer 3c — Pollard rho correctness (formal)
 
-`lean/Rho.lean` (`PASS 61 thm 0 trusted` for the whole project) proves the
+`lean/Rho.lean` (`PASS 114 thm 0 trusted` for the whole project) proves the
 deterministic part of the rho attack.
 
 | Theorem | Statement |
@@ -143,9 +146,17 @@ without constructing the pairing itself.
 | `mov_reduction` | A target solution below `n` is the unique source exponent |
 | `mov_degenerate_ambiguity` | If the target order is a proper divisor, at least two exponents below `n` collide |
 
-The open part is exactly the pairing: construct the Weil pairing on `E[n]`,
-prove it is bilinear and non-degenerate, and show `e(P,P)` has full order for
-the curves where MOV applies.
+**Alternating correction.** `lean/Pairing.lean` records that the Weil pairing is
+alternating, so `e(P,P) = 0` and `addOrderOf (e P P) = 1`
+(`alt_diag_order_ne`).  The hypothesis `addOrderOf (e P P) = n > 1` of
+`Mov.lean` is therefore an abstraction, not the Weil pairing itself.  The
+supersingular attack uses a distortion map: `DistortedBilin` carries an
+additive `φ : G →+ G'`, and `distorted_mov_reduction` proves that
+`e(P, φ(P))` of full order still recovers the source exponent uniquely.
+
+The open part is now exactly the construction: build the Weil/Tate pairing,
+prove bilinearity and the distortion-map non-degeneracy, and identify the
+embedding degree.
 
 ## Layer 4c — anomalous curves (formal reduction step)
 
@@ -193,19 +204,21 @@ separately; a break here breaks deployments, not ECDLP.
    doubling) remains to be connected to the same interface.
 3. **Done:** BSGS and Pohlig–Hellman correctness in `Algorithms.lean`, and the
    deterministic part of Pollard rho in `Rho.lean` (Mathlib project,
-   `PASS 61 thm 0 trusted`): baby/giant match equivalence, existence, candidate
+   `PASS 114 thm 0 trusted`): baby/giant match equivalence, existence, candidate
    correctness, collision-free baby table, coprime CRT combination, PH
    subgroup order, projection and reconstruction; finite-orbit collision,
    Floyd meeting, collision relation and DLP recovery. Only the cost/success
    premises remain outside the kernel.
-4. **Partially done (2a):** the Shoup counting core is formal in
-   `Generic.lean` (`collision_secret_unique`, `revealed_card_le`). Remaining:
-   the generic-group transcript/adversary model, the indistinguishability
-   lemma for secrets without a revealing collision, and the probability step.
-5. **Partially done (4b):** MOV reduction formal in `Mov.lean`, including
-   target-order divisibility and the necessity of non-degeneracy. Remaining:
-   construct the Weil pairing, prove bilinearity/non-degeneracy, and identify
-   the embedding degree.
+4. **Partially done (2a/2c):** the Shoup counting core and the deterministic
+   adaptive decision-tree bound are formal in `Generic.lean` and
+   `Adaptive.lean` (`collision_secret_unique`, `revealed_card_le`,
+   `correct_card_le_nt`, `correct_card_le_depth`). Remaining: the adaptive
+   query distribution, the `1/p` collision probability and the union bound that
+   turns these into `O(t²/p)`.
+5. **Partially done (4b):** MOV reduction formal in `Mov.lean`, and
+   `Pairing.lean` adds the alternating no-go and the distortion-map interface
+   (`distorted_mov_reduction`). Remaining: construct the Weil/Tate pairing,
+   prove bilinearity/non-degeneracy, and identify the embedding degree.
 6. **Partially done (4c):** the anomalous reduction step is formal in
    `Anomalous.lean`. Remaining: the formal group, the p-adic elliptic
    logarithm and its injectivity/computability.
