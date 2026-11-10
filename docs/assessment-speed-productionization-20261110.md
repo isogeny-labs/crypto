@@ -53,7 +53,9 @@ ones unfiltered on every PR), and an 11 GB / 286k-file tree (`crypto`) that
 every clone, CI job and hook walks. Also: the nightly/fuzz schedules in
 `cryptanalysis` never fire; hand-mirrored enforcement tools
 (`benchrec.py`, `progress_metrics.py`) have drifted between repos; and the
-`benchrec` gate walks 262k files on every `git push`.
+`benchrec` gate walked the whole 286k-file tree on every `git push` (fixed in
+this PR). The two cheapest build-only fixes (C5, C6 below) also land with
+this assessment, in `cryptanalysis`.
 
 ## 2. Baselines recorded in this session
 
@@ -65,7 +67,7 @@ every clone, CI job and hook walks. Also: the nightly/fuzz schedules in
 | `ca_perfbench` quick kernels (medians) | `ca_perfbench run --samples 3 --min-samples 3 --max-seconds 5` | mont_mul_x8 13.2 ms (0.79 ns/mul); invmod 29.8 ms (≈182 ns ≈ 420 cycles/inverse); rho_ec36 30.4 ms; glv_rho_j0_32 16.3 ms; ic_precompute_zp44 16.8 ms; linsolve_sparse 10.4 ms |
 | `ca_bench generic --bits 36 --threads 4` | | EC rho-1 18 Mops/s (S=0.833), kangaroo 47 Mops/s, Zp rho-1 93 Mops/s |
 | Callgrind (Ir share) | `valgrind --tool=callgrind ca_perfbench …` | glv_rho_j0_32: ec_hash 19.8 %, ec_batch_op 16.7 %, ca_ec_endo 14.6 %, glv_class_reduce 11.5 %, ca_invmod 11.0 %; rho_ec36: ca_invmod 8.0 %; ic_precompute_zp44: spmv64 68.9 %; linsolve_sparse: spmv128 75 % |
-| `benchrec.py gate` | | 1.48 s, of which 1.57/1.74 s profiled in `artifact_manifests()` (`rglob` over 262k files, 3,188 manifests parsed) |
+| `benchrec.py gate` | 3 runs | 0.77 / 0.82 / 0.83 s wall (a first cProfile run read 1.5 s, but that was profiler overhead); `artifact_manifests()` `rglob`s the 286k-file tree and parses 3,184 manifests. **Fixed in this PR**: pruned `os.walk` + one resolve per manifest → 0.58 / 0.55 / 0.64 s, identical output and exit code, same 3,184 manifests; a `git ls-files --others` variant was measured slower (0.80–0.91 s) and is opt-in only |
 | `build_ic_leaderboard.py` build | `L.build(allow_unvalidated=True)` | 2.35 s; `sha256_file` called 3,545 × over 41 evidence dirs (0.48 s); `validation_gate.check_evidence_dir` 1.07 s |
 | Bash-tool hook overhead | checkpoint + benchrec + vault PreToolUse on a non-matching command | ≈170 ms per Bash call (95 + 62 + 13 ms), 8 `python3` spawns |
 
@@ -121,8 +123,8 @@ microbench. Existing example benches: `f4_fp_bench`, `f4_f2_bench`,
 | C2 | `ca_mix64(h) % c.r` and `(idx+1) % c.r` with `c.r` a runtime power of two → two 64-bit `div`s per step | `src/curve.c:895,947,955` | 5–15 % of GLV step | S | WALL | reported |
 | C3 | `ca_invmod`: Euclid with 64-bit `div` and 128-bit coefficients, ≈420 cycles; 8–11 % of rho/GLV Ir, dominates `ec_add_chain` | `src/modarith.c:58` | ~2 × on inversions; 4–10 % on rho/GLV | S/M | WALL for values; `CA_FC_EUCLID` diagnostic counts division steps → redefine or guard | measured (callgrind) |
 | C4 | Walk starts do one affine add (one inversion) per set scalar bit | `src/rho.c:421-445` | 10–25 % at ≤40 bits; negligible ≥55 bits | M | WALL for values; field-op diagnostics change | reported |
-| C5 | **Broken option**: the four `CA_BUILD_*_BENCH` blocks are pasted four times; `-DCA_BUILD_TAU_CHAIN_BENCH=ON` fails at configure ("target with the same name already exists") | `CMakeLists.txt:232-433` | correctness | S | build only | reproduced |
-| C6 | Every source compiled twice (SHARED and STATIC from `${CA_SOURCES}`); `ec_tau.c` (7.4 s) is the serial critical path | `CMakeLists.txt:135-154`; `src/ec_tau.c:15-40` | ≈40 % less compile CPU (39 → ~22 s user); use an OBJECT library; move generated tables to their own TU / `#embed` | S / M | build only | measured |
+| C5 | **Broken option**: the four `CA_BUILD_*_BENCH` blocks were pasted four times (byte-identical); `-DCA_BUILD_TAU_CHAIN_BENCH=ON` failed at configure ("target with the same name already exists") | `CMakeLists.txt:232-433` | correctness | S | build only | **fixed** (companion `cryptanalysis` PR): each option alone and all four together configure and build |
+| C6 | Every source compiled twice (SHARED and STATIC from `${CA_SOURCES}`); `ec_tau.c` (7.4 s) is the serial critical path | `CMakeLists.txt:135-154`; `src/ec_tau.c:15-40` | OBJECT library: measured 36.9 → 23.0 s user (−38 %), 12.9 → 11.1 s wall, fresh configure, 4 cores; ctest 19/19 both; `nm -D` symbol list and all 31 `ca_perfbench` fingerprints identical; `find_package`/pkg-config consumers from a moved prefix pass. Next: move generated tables to their own TU / `#embed` | S / M | build only | **fixed** (companion `cryptanalysis` PR) |
 | C7 | No ISA level in any deploy/CI/taskq build (`-march` absent; only `nightly.yml` sets `CA_NATIVE`); gcc GNU-mode `-ffp-contract=fast` + FMA `-march` can change the `double` maths that picks `r`, `dp_bits`, `W` | `deploy/docker/Dockerfile:37`, `.github/workflows/deploy.yml:65`, `rho.c:1076,1108-1113`, `curve.c:760` | 5–15 % (mulx/adx) | S | WALL **only with** `-ffp-contract=off`; `-march=native` on mixed Spot families risks SIGILL | reported |
 | C8 | No LTO (`CheckIPOSupported` absent); cross-file hot calls never inline | `CMakeLists.txt` | 3–10 % | S | WALL (with fp-contract off) | reported |
 | C9 | Lanczos SpMV single-threaded (69–75 % of IC precompute / linsolve) | `src/linalg.c:390,416,541-575` | 2–3.5 × on LA with 4 cores | M | WALL (exact mod-q sums, order-independent) | measured (share) |
@@ -151,7 +153,7 @@ vtable; `crates/hashed-ecdl-tensor` has no release profile.
 
 | # | Finding | Where | Gain | Effort |
 |---|---|---|---|---|
-| T1 | `artifact_manifests()` `rglob`s 262k files on every `benchrec gate` (every push / PR create) | `tools/benchrec.py:590-612` | 1.5 s → ~0.2 s via `git ls-files -z -- '*.artifacts.json'` (+ `--walk` opt-in) | S |
+| T1 | `artifact_manifests()` `rglob`s the 286k-file tree on every `benchrec gate` (every push / PR create) | `tools/benchrec.py:590-612` | **done in this PR**: 0.80 s → 0.58 s (pruned walk; `git ls-files --others` measured slower, kept opt-in). The remaining ~0.33 s is the directory walk itself; a persistent manifest index would be the next step | S |
 | T2 | Hooks spawn `python3` 3–5 × per Bash call to read JSON fields; `vault-hook` already uses `jq` | `.claude/hooks/benchrec-hook.sh`, `checkpoint-hook.sh` | ~100–130 ms per Bash call | S |
 | T3 | Leaderboard/validation gate re-hashes the same files (3,545 `sha256_file` calls, 41 dirs) | `scripts/build_ic_leaderboard.py`, `validation_gate.py` | 0.5–0.8 s of 2.35 s | S |
 | T4 | `benchrec --verify-s3` spawns one `aws` process per object; `checkpoint.sh` calls `aws configure list-profiles` repeatedly | `tools/benchrec.py:334-438`, `scripts/checkpoint.sh:69-100` | seconds per record | S–M |
