@@ -54,6 +54,49 @@
 //!
 //! Falsification line (record): SNC-2 is dead at Stage 0 if chained E (per-k mean of CH) is above 1.82 at two of
 //! the three sizes. The record's prediction is 1.75 [1.70, 1.82]. Only the point value of the per-k mean is compared.
+//!
+//! # Sibling-points Stage 0 pre-registration (`--siblings m,..`; written and committed before any sibling number was run)
+//!
+//! Question (owner request "sibling points"): in a stored-table walk, does the collision count among the 2m keyed
+//! children `P_t +- J_h` (h = 1..m) of every parent follow the same Poisson law as independent random points, when
+//! measured in STORED POINTS per sqrt(r)? Zero group operations, the engine above unchanged (same guard, same rank
+//! `K = C + 1` stop, same cap 10 sqrt(r), same x-key `min(c, r - c)`).
+//!
+//! Exact design `SB(m)`, fixed here:
+//!
+//! * Jump set `J_1..J_m`: independent uniform in `Z_r^(2+C)` (fresh per sample). The walk uses the SAME m jumps:
+//!   `P_{t+1} = P_t + J_{h_t}`, `h_t` uniform in `1..m` from a stream independent of the point (as D0). So m = 1 is
+//!   the arithmetic progression `P_0 + t J` and m = 2 a two-generator lattice walk; both are expected to be
+//!   structurally degenerate. They are run as specified and reported as measured, nothing is changed after seeing them.
+//! * Start `P_0`: uniform in `Z_r^(2+C)`; it is stored (set-up point, counted once in E_points).
+//! * Parent expansion: every parent `P_t` emits its children `P_t + J_h`, `P_t - J_h` for h = 1..m (order h ascending,
+//!   plus before minus), each stored and keyed. The next parent `P_{t+1} = P_t + J_{h_t}` is one of those children, so
+//!   a parent is stored once, as a child of its predecessor. The one child of `P_{t+1}` that equals `P_t` as a vector
+//!   (`P_{t+1} - J_{h_t}`) is a duplicate known by construction and is NOT emitted: from the second parent on, a parent
+//!   step adds `2m - 1` new stored points (the first adds 2m, plus the start point). E_points counts emitted points
+//!   (the engine's cost count); E_parents = parent expansions begun at stop / sqrt(r), set-up excluded.
+//! * Any key collision among all stored points is a row, exactly as in the engine. Rank-K hit rate = share of samples
+//!   that reached rank K before the cap (censored samples are reported; a censored mean is a lower bound).
+//! * Samples: n = 2000 per curve, `(d, s1, s2)` uniform, the same held-out samples as NC-2 and `--chained`
+//!   (`make_samples(r, seed ^ 0xAAAA0001, n)`), seed 20261108. Start and the jump prefix `J_1..J_m` are shared across
+//!   the m arms of a sample (paired); the jump-choice stream is the same for every m.
+//! * Curves: the nine NC-2 r values (k = 20: 131203, 131317, 131111; k = 24: 2097349, 2097559, 2097523;
+//!   k = 28: 33558163, 33554761, 33558059); C = 1 and C = 2; m in {1, 2, 4, 8}; m = 16 at k = 20 only.
+//!   Per-k E = mean of the three curve means; SE = sqrt(sum of the three squared SEs) / 3.
+//! * Controls in the same run on the same samples: D0 (16-jump random walk) and D0i (i.i.d. points). Reference for the
+//!   ratios is the per-k, per-C D0 of the same run (paired); the Poisson floors are 1.329 (C=1) and 1.662 (C=2).
+//!
+//! Control intervals (stop and report if outside; nothing is tuned): D0i within 3 aggregate SE of the Poisson floor;
+//! D0 per-k aggregate in [1.34, 1.43] at C = 1 and [1.68, 1.77] at C = 2 (NC-2 range: 1.368 to 1.398 and 1.684 to 1.740).
+//!
+//! Prediction [pcc:unverified]: `E_points(SB(m)) = D0 x (1.00 +- 0.03)` for every m (so about 1.38 at C = 1 and 1.72 at
+//! C = 2, the Poisson floors plus the 3 to 5 percent walk excess). Same-parent children are 2m distinct points, which
+//! cannot lose pairs among themselves beyond their own distinctness; the prediction treats the stored set as a Poisson
+//! sample of its size.
+//!
+//! Falsification [pcc:unverified]: siblings lose pairs if `E_points > 1.08 x D0` at two of the three sizes for any
+//! `m <= 8`. `E_points < 0.95 x D0` at any size is read as a bug (siblings cannot beat the Poisson law of their count),
+//! not as a gain. Only the per-k aggregate is compared.
 
 use std::collections::HashMap;
 use std::hash::{BuildHasherDefault, Hasher};
