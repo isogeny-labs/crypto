@@ -11111,7 +11111,7 @@ mod engine_items_tests {
         assert_ne!(base.method_id, cv0.method_id);
         let mut saved_total = 0.0;
         for seed in 0..12u64 {
-            let k = 1 + (seed as u128 * 104729 + 7) % (facts.r as u128 - 1);
+            let k = 1 + (seed as u128 * 104729 + 7) % (facts.r - 1);
             let d = run(&base, &inst, &facts, k, seed);
             let e = run(&explicit, &inst, &facts, k, seed);
             let n = run(&cv0, &inst, &facts, k, seed);
@@ -11191,7 +11191,7 @@ mod engine_items_tests {
                 .expect("setup phase")
         };
         for seed in 0..16u64 {
-            let k = 1 + (seed as u128 * 7919 + 3) % (facts.r as u128 - 1);
+            let k = 1 + (seed as u128 * 7919 + 3) % (facts.r - 1);
             let a = run(&plain, &inst, &facts, k, seed);
             let b = run(&chained, &inst, &facts, k, seed);
             assert_eq!(a.recovered, Some(ExactScalar::from(k)), "seed {seed}");
