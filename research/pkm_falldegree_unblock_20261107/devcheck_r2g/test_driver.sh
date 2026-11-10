@@ -1,6 +1,6 @@
 #!/bin/bash
 # Local dev-check of stageb_units_runner.sh against the REAL frozen pilot binary. Usage: test_driver.sh T1|T2|T3|T4|T5|T6
-# The runner is run exactly as in a job: /bin/bash -c "<script>" stageb <PREV...>.
+# The runner is run as /bin/bash -c "<script>" stageb <PREV...>, or (BOOT_REQUEST set) exactly as a job runs it.
 set -u
 HERE=$(cd "$(dirname "$0")" && pwd)
 RUNNER=$HERE/../stageb_units_runner.sh
@@ -8,14 +8,28 @@ SP=${SP:-/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpa
 L=${LAYER:-$SP/r2g_layer/usr/local/bin}
 W=$SP/r2g_test/${1:-x}; export FAKE_S3=$W/s3
 SEED="--seed 777"          # NOT the study seed
+# How the runner is started. Default: /bin/bash -c "<script>" stageb. With BOOT_REQUEST=<request.json> (a file written by
+# make_request_bu.sh): the first six command words of that request, i.e. the job's own two-piece form with its SHA-256 check.
+if [ -n "${BOOT_REQUEST:-}" ]; then mapfile -t RUNCMD < <(jq -r '.job.command[0:6][]' "$BOOT_REQUEST")
+else RUNCMD=(/bin/bash -c "$(cat "$RUNNER")" stageb); fi
 # runner <jobname> <extra-env...> -- <PREV...>   (job results go to s3://b/<jobname>)
 runner() {
   local job=$1; shift; local envs=(); while [ "$1" != -- ]; do envs+=("$1"); shift; done; shift
   rm -rf "$W/w-$job"
-  env ISOLAB_RESULTS_URI=s3://b/$job STUDY_DIR=$W/w-$job BIN=${BIN:-$L/pkm_tower_pilot} G1BIN=$L/hky_fp_tower_check \
-    S3CP="$HERE/s3shim.sh cp" S3SYNC="$HERE/s3shim.sh sync" S3LS="$HERE/s3shim.sh ls" RAYON_NUM_THREADS=2 "${envs[@]}" \
-    bash -c "$(cat "$RUNNER")" stageb "$@"
+  /usr/bin/env ISOLAB_RESULTS_URI=s3://b/$job STUDY_DIR=$W/w-$job BIN=${BIN:-$L/pkm_tower_pilot} G1BIN=$L/hky_fp_tower_check \
+    S3CP="$HERE/s3shim.sh cp" S3SYNC="$HERE/s3shim.sh sync" RAYON_NUM_THREADS=2 "${envs[@]}" \
+    "${RUNCMD[@]}" "$@"
 }
+runner_bg() { # same, in the background without setsid; the runner's pid is BGPID (env execs bash)
+  local job=$1; shift; local envs=(); while [ "$1" != -- ]; do envs+=("$1"); shift; done; shift
+  rm -rf "$W/w-$job"
+  /usr/bin/env ISOLAB_RESULTS_URI=s3://b/$job STUDY_DIR=$W/w-$job BIN=${BIN:-$L/pkm_tower_pilot} G1BIN=$L/hky_fp_tower_check \
+    S3CP="$HERE/s3shim.sh cp" S3SYNC="$HERE/s3shim.sh sync" RAYON_NUM_THREADS=2 "${envs[@]}" \
+    "${RUNCMD[@]}" "$@" > "$W/out-$job.txt" 2>&1 < /dev/null &
+  BGPID=$!; }
+livepilots() { ps -eo stat,cmd | grep pkm_tower_pilot | grep -v grep | grep -vc '^Z'; }
+happy() { # happy <job> : the T2 job (3 units)
+  runner $1 PILOT_EXTRA="$SEED" UNIT_FILTER='^(B-m3-tower-t[23]|DB-m3-tower-t2)$' "${@:2}"; }
 # row fields without wall time: ms, wall_s, closures[].ms
 strip() { python3 -I -c '
 import sys,json
@@ -37,12 +51,12 @@ killjob() { # SIGKILL the runner's process group (runner, syncer, pilot) = a pod
   local pg; pg=$(cat "$W/pid-$1"); kill -9 -- "-$pg" 2>/dev/null; }
 bgrunner() { # bgrunner <job> <env...> -- <PREV...>: runner in its own session (pgid = $$ of the job script), as a pod would be
   local job=$1
-  { echo "echo \$\$ > $W/pid-$job"; declare -f runner; echo "W=$W HERE=$HERE RUNNER=$RUNNER L=$L; export FAKE_S3=$FAKE_S3"
+  { echo "echo \$\$ > $W/pid-$job"; declare -f runner; declare -p RUNCMD; echo "W=$W HERE=$HERE RUNNER=$RUNNER L=$L; export FAKE_S3=$FAKE_S3"
     echo "runner $(printf '%q ' "$@")"; } > "$W/job-$job.sh"
   setsid bash "$W/job-$job.sh" > "$W/out-$job.txt" 2>&1 < /dev/null &
   sleep 0.3; }
 case ${1:-} in
-T1) bash -c "$(cat "$RUNNER")" stageb --list > $SP/r2g_test/list.txt; echo rc=$?
+T1) "${RUNCMD[@]}" --list > $SP/r2g_test/list.txt; echo rc=$?
     wc -l < $SP/r2g_test/list.txt; awk '{print $2}' $SP/r2g_test/list.txt | uniq | wc -l
     awk '{print $2}' $SP/r2g_test/list.txt | uniq | tr '\n' ' '; echo
     grep -c '^B-' $SP/r2g_test/list.txt; grep -c '^DB-' $SP/r2g_test/list.txt
@@ -106,5 +120,64 @@ EOF
 T5k) rm -rf "$W"; mkdir -p "$W"   # kill check only: is the pilot gone after the SIGKILL of the runner's process group?
     bgrunner A PILOT_EXTRA="$SEED" UNIT_FILTER='^B-m3-tower-t4$' -- ; waits3 A B-m3-tower-t4 && { ps -eo pid,pgid,cmd | grep -E "pkm_tower|job-A" | grep -v grep | cut -c1-90; echo "pgid file: $(cat $W/pid-A)"; killjob A; }
     sleep 1; echo "after kill:"; ps -eo pid,pgid,cmd | grep -E "pkm_tower|job-A|stageb" | grep -v grep | cut -c1-90 ;;
+T7) rm -rf "$W"; mkdir -p "$W"   # SIGTERM, runner started without setsid
+    runner_bg A PILOT_EXTRA="$SEED" UNIT_FILTER='^B-m3-tower-t[34]$' --
+    waits3 A B-m3-tower-t4; sleep 3; kill -TERM $BGPID; wait $BGPID; echo "runner rc=$?"
+    echo "live pilots after TERM: $(livepilots)"
+    echo "S3 progress:"; cat $W/s3/b/A/progress.txt; echo "units_done.txt (S3):"; cat $W/s3/b/A/units_done.txt; ls $W/s3/b/A ;;
+T8) rm -rf "$W"; mkdir -p "$W"
+    happy P --; echo "job P rc=$?"
+    for v in log jsonl nosummary; do
+      rm -rf $W/s3/b/Q; cp -a $W/s3/b/P $W/s3/b/Q
+      case $v in log) rm $W/s3/b/Q/runs/B-m3-tower-t3.log;; jsonl) rm $W/s3/b/Q/runs/B-m3-tower-t3.jsonl;; nosummary) sed -i '$d' $W/s3/b/Q/runs/B-m3-tower-t3.jsonl;; esac
+      echo "=== variant: $v"; runner R-$v PILOT_EXTRA="$SEED" UNIT_FILTER='^(B-m3-tower-t[23]|DB-m3-tower-t2)$' -- s3://b/Q; echo "rc=$?"
+      cat $W/w-R-$v/progress.txt; echo "unit starts: $(grep -c 'start B-\|start DB-' $W/w-R-$v/progress.txt)"
+    done ;;
+T9) rm -rf "$W"; mkdir -p "$W"; touch $W/fail1
+    echo "=== progress.txt upload fails (marker present from the start)"
+    runner u1 PILOT_EXTRA="$SEED" UNIT_FILTER='^B-m3-tower-t2$' SHIM_FAIL_PROGRESS=$W/fail1 -- ; echo "rc=$?"
+    cat $W/w-u1/progress.txt; echo "files in runs/ (no pilot started): $(ls $W/w-u1/runs | wc -l)"
+    touch $W/fail2
+    echo "=== sync of runs/ fails after the unit"
+    runner u2 PILOT_EXTRA="$SEED" UNIT_FILTER='^B-m3-tower-t2$' SHIM_FAIL_SYNC_RUNS=$W/fail2 -- ; echo "rc=$?"
+    echo "local progress:"; cat $W/w-u2/progress.txt; echo "S3 progress:"; cat $W/s3/b/u2/progress.txt
+    echo "end-exit-0 lines in S3: $(grep -c 'end B-m3-tower-t2 exit 0' $W/s3/b/u2/progress.txt)" ;;
+T10) rm -rf "$W"; mkdir -p "$W/fakebin"
+    printf '#!/bin/bash\ntouch %s/aws-called\n' "$W" > $W/fakebin/aws; chmod +x $W/fakebin/aws
+    for v in PILOT_EXTRA UNIT_FILTER BIN G1BIN STUDY_DIR; do
+      /usr/bin/env -u S3CP -u S3SYNC PATH="$W/fakebin:$PATH" ISOLAB_RESULTS_URI=s3://b/x "$v=something" "${RUNCMD[@]}"; echo "$v set: rc=$?"
+    done
+    ls $W/aws-called 2>&1 | head -1 ;;
+T11) rm -rf "$W"; mkdir -p "$W"
+    happy s1 SHIM_READS_STDIN=1 -- ; echo "rc=$?"; cat $W/w-s1/progress.txt; cat $W/w-s1/units_done.txt ;;
+T12) rm -rf "$W"; mkdir -p "$W/bin"
+    for t in bash awk gawk basename cat cp cut date dirname grep head ls mkdir mktemp mv nproc rm rmdir sed sha256sum sleep sort stat tail tee timeout touch tr uname wc find xargs; do ln -s "$(command -v $t)" $W/bin/$t; done
+    echo "tools in PATH: $(ls $W/bin | wc -l); flock present: $(PATH=$W/bin command -v flock || echo no); python3 present: $(PATH=$W/bin command -v python3 || echo no)"
+    happy t12 PATH=$W/bin -- ; echo "rc=$?"; cat $W/w-t12/progress.txt; ls $W/w-t12/.up.lock.d 2>&1 | head -1 ;;
+T13) rm -rf "$W"; mkdir -p "$W"; export SHIM_LOG=$W/ops.log
+    happy j1 ISOLAB_RESULTS_URI=s3://b/jobS/ UNIT_FILTER='^(B-m3-tower-t[23]|DB-m3-tower-t2)$' -- ; echo "job1 rc=$?"
+    runner j2 PILOT_EXTRA="$SEED" ISOLAB_RESULTS_URI=s3://b/jobS2/ UNIT_FILTER='^(B-m3-tower-t[2-4]|DB-m3-tower-t2)$' -- 's3://b/jobS/'; echo "job2 (PREV=s3://b/jobS/) rc=$?"
+    cat $W/w-j2/progress.txt
+    echo "--- raw URIs of job1 (first 12) and the PREV reads of job2:"; grep jobS/ $W/ops.log | head -12; grep 'jobS//\(progress\|runs\)' $W/ops.log | grep -c . ; grep 'cp s3://b/jobS//' $W/ops.log | head -8
+    echo "--- shim directory layout:"; (cd $W/s3 && find . -type f | sort | head -40) ;;
+T14) rm -rf "$W"; mkdir -p "$W"
+    happy j1 --; echo "T2 job (list exhausted) rc=$?"
+    echo "=== forced exit 14: a prev says ladder B-m3-tower closed at t=4 (done t4 with 'timed out; stopping') but t2, t3 were never done"
+    mkdir -p $W/s3/b/X/runs
+    printf '2026-11-10T00:00:00Z start B-m3-tower-t4\n2026-11-10T00:00:01Z end B-m3-tower-t4 exit 0\n' > $W/s3/b/X/progress.txt
+    echo '-- kummer m=3 tower: every run at t = 4 timed out; stopping' > $W/s3/b/X/runs/B-m3-tower-t4.log
+    echo '{"summary":{}}' > $W/s3/b/X/runs/B-m3-tower-t4.jsonl
+    runner j3 PILOT_EXTRA="$SEED" UNIT_FILTER='^B-m3-tower-t[234]$' -- s3://b/X; echo "rc=$?"; cat $W/w-j3/progress.txt ;;
+T15) rm -rf "$W"; mkdir -p "$W"; F='^(B-m3-tower-t[2-4]|DB-m3-tower-t2)$'
+    for j in A B; do
+      if [ $j = A ]; then PV=(); else PV=(s3://b/A); fi
+      bgrunner $j PILOT_EXTRA="$SEED" UNIT_FILTER="$F" -- "${PV[@]}"; waits3 $j B-m3-tower-t4 && killjob $j; sleep 1
+    done
+    cat $W/s3/b/B/progress.txt
+    echo "=== job C without the rule: lost"; runner C0 PILOT_EXTRA="$SEED" UNIT_FILTER="$F" -- s3://b/A s3://b/B; echo "rc=$?"
+    echo "=== job C with close:B-m3-tower:4"; runner C PILOT_EXTRA="$SEED" UNIT_FILTER="$F" -- s3://b/A s3://b/B close:B-m3-tower:4; echo "rc=$?"
+    cat $W/w-C/progress.txt; echo "ladders_closed.txt:"; cat $W/w-C/ladders_closed.txt; echo "units_done.txt:"; cat $W/w-C/units_done.txt; grep -E "prev|closed_by_rule" $W/w-C/host.txt
+    for a in close:NOPE:3 close:B-m3-tower:99 close:B-m3-tower:1 close:B-m3-tower:x; do
+      runner bad PILOT_EXTRA="$SEED" -- $a; echo "$a: rc=$?"; done ;;
 *) echo "unknown test"; exit 2 ;;
 esac
