@@ -207,6 +207,8 @@ mod projected_prime_tests {
                         r: 7,
                         cofactor: 16,
                         generator: (g.x, g.y),
+
+                        representation: None,
                     };
                 }
             }
@@ -5149,6 +5151,8 @@ mod wsum_stride_dependence_tests {
             r: 536884639,
             cofactor: 8,
             generator: (1431665017, 592057774),
+
+            representation: None,
         }
     }
 
@@ -5335,6 +5339,8 @@ mod wwalk_pipeline_tests {
             r: 536884639,
             cofactor: 8,
             generator: (1431665017, 592057774),
+
+            representation: None,
         }
     }
 

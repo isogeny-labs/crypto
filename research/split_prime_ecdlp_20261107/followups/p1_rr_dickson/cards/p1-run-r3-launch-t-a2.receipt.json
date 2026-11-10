@@ -1,0 +1,70 @@
+{
+  "card_id": "CARD-p1-r3-launch-t-a2",
+  "card_path": "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-r3-launch-t-a2.yaml",
+  "card_sha256": "907502cf8fddf7bd5a5be9785ebba0a2e6815e4515a76d85f30b95c7c2d90893",
+  "commands": [
+    {
+      "argv": [
+        "taskq/deploy/eks-karpenter/remote/launch-remote-command",
+        "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/request-t-a2.json"
+      ],
+      "attempt_log": [
+        {
+          "exit_code": 0,
+          "seconds": 675.531,
+          "timed_out": false
+        }
+      ],
+      "attempts": 1,
+      "cwd": ".",
+      "exit_code": 0,
+      "id": "launch-t",
+      "index": 1,
+      "outputs": {
+        "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/t-a2.launch.stdout": "ab54ef82c7848d6ec458fa5f2b61553c008f1e91cc6fd7ce173684d07efdf192"
+      },
+      "seconds": 675.531,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_tail": [],
+      "stdout_sha256": "ab54ef82c7848d6ec458fa5f2b61553c008f1e91cc6fd7ce173684d07efdf192",
+      "stdout_tail": [
+        "{",
+        "  \"schema\": \"isolab.eks.command-result/v1\",",
+        "  \"state\": \"active\",",
+        "  \"job_name\": \"p1r3-t-a2-20261108\",",
+        "  \"job_uid\": \"8fce259e-0d10-4bc4-995f-6c29c3eed183\",",
+        "  \"pods\": [",
+        "    {",
+        "      \"uid\": \"828468c7-4c6d-401e-b547-6af2f9224aac\",",
+        "      \"phase\": \"Pending\",",
+        "      \"node\": null,",
+        "      \"exit_code\": null",
+        "    }",
+        "  ],",
+        "  \"results_prefix\": \"s3://isolab-results-104186811093-us-east-2/runs/p1r3-t-a2-20261108/\",",
+        "  \"receipt_uri\": \"s3://isolab-results-104186811093-us-east-2/runs/p1r3-t-a2-20261108/launcher/4fd098c9-d158-423f-9ba9-0360830db190/\",",
+        "  \"request_sha256\": \"b609f5a124ba780ee45375ec13c74cfb52ae867d1e9567e53908018c1c5a59ca\",",
+        "  \"manifest_sha256\": \"c8a52d227dca84c1b9b089534cc2c6949bab022bd74baebf3d8ac4b1034dfb85\",",
+        "  \"launcher\": \"isolab-experiment-launcher:4fd098c9-d158-423f-9ba9-0360830db190\",",
+        "  \"exit_code\": 0",
+        "}"
+      ],
+      "succeeded": true,
+      "timed_out": false
+    }
+  ],
+  "commands_total": 1,
+  "commit": "e6941cb25ce6e30d9c834f2dc9e30aea6bd443fd",
+  "dirty_after": [
+    "esearch/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/t-a2/build.json",
+    "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/t-a2.launch.stderr",
+    "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/t-a2.launch.stdout",
+    "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/launch/receipts/t-a2/result.json"
+  ],
+  "dirty_before": [
+    "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-r3-launch-t-a2.launch.log",
+    "research/split_prime_ecdlp_20261107/followups/p1_rr_dickson/cards/p1-run-r3-launch-t-a2.yaml"
+  ],
+  "schema": "crypto.autoresearch.task-card-receipt.v1",
+  "status": "completed"
+}

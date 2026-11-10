@@ -1,0 +1,26 @@
+2026-11-09T02:38:43Z job p1r3-t-a2-20261108 pod 828468c7-4c6d-401e-b547-6af2f9224aac node ip-10-84-12-132.us-east-2.compute.internal system t start
+run_start_utc=2026-11-09T02:38:44Z
+system=t seed=2 VLIMIT=58720256 TLIMIT=86400
+aa8a4b238054b0fa2281243fbbc065e86a39c2788b3b41c37d8653859629e6c8  /usr/local/bin/p1tool
+7e50f8c82e7bc981c180e402e90c20d94ca60d4cf73cd22aaee02c15efb84ed7  /opt/study/calibration/../p1tool/src/main.rs
+c2722288d22c3a1eab00c0b818d0204d4a98104d059b2fd4ecb7343e8ef759fa  /usr/bin/msolve
+nproc=1
+Linux p1r3-t-a2-20261108-fd28n 6.18.54-121.166.amzn2023.x86_64 #2 SMP PREEMPT_DYNAMIC Tue Oct  6 23:11:34 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+ 02:38:44 up  3:48,  0 user,  load average: 6.04, 4.45, 4.51
+               total        used        free      shared  buff/cache   available
+Mem:        64776600     3516500    59635732         364     2257680    61260100
+Swap:              0           0           0
+cgroup_memory_max=64424509440
+msolve_processes_at_start:
+end_msolve_processes_at_start
+ms_sha256=ec0af27e8c8bec63160f1c69ced941a05379b79535942db20ce32409f836590e want=ec0af27e8c8bec63160f1c69ced941a05379b79535942db20ce32409f836590e
+/opt/study/calibration/msolve_cell.sh: line 10:    51 Segmentation fault      ( ulimit -v "${VLIMIT:-1572864}"; nice -n 10 timeout "${TLIMIT:-1200}" msolve -g 2 -t 1 -v 2 -f "$in" -o "$gb" ) > "$log" 2>&1
+{"D":9,"D_is_lower_bound":true,"Dsel":9,"exit":139,"file":"/work/results/t/t_s2.log","lastprod":9,"max_cells":1106012291775,"max_cells_dims":[847295,1305345],"quotient_dim":null,"rounds":33,"status":"cap","sumcells":2064656285121.0,"wall_s":21266.672415409,"widest_cells":1106012291775,"widest_cols":1305345,"widest_cols_by_degree":{"3":51,"4":90,"5":1142,"6":2537,"7":6982,"8":262201,"9":1305345},"widest_rows":847295}
+RUN_COMPLETE system=t "status":"cap" exit=139 wall=21266.672415409
+6146c2e54a0d290dd4d29068f2a68d27787875156b970c01578d89634447acbc  /work/results/t/provenance.txt
+eacf6b9600fa1720bc731a985e1bdc07261e73ee42dab664f955112ecdf4d5b7  /work/results/t/t_s2.emit.json
+56d6b7dd323e0abf8d66c957bbc00a4f91c005e1929725b126964201d1ad6863  /work/results/t/t_s2.ms.plant.json
+029ab05f42e70c989c69eb8c0434d613129aa325df2f6d4d4f39bef5979b7724  /work/results/t/t_s2.parse.json
+e0589ff264e50b3e432fb02b65fef0032a1a716d2967c45cf3f74573a5698b38  /work/results/t/t_s2.log
+ec0af27e8c8bec63160f1c69ced941a05379b79535942db20ce32409f836590e  /work/results/t/t_s2.ms
+2026-11-09T08:33:10Z finished exit 0
