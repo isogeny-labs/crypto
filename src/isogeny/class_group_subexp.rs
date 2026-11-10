@@ -1125,7 +1125,7 @@ fn crt_primes(count: usize) -> Vec<u64> {
         let mut is_prime = true;
         let mut d = 3u64;
         while d * d <= c {
-            if c % d == 0 {
+            if c.is_multiple_of(d) {
                 is_prime = false;
                 break;
             }
