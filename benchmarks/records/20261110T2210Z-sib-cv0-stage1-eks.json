@@ -1,7 +1,17 @@
 {
   "branch": "claude/best-leads-experiments-jikl0j",
-  "closed_utc": null,
-  "commands": [],
+  "closed_utc": "2026-11-10T23:16:10+00:00",
+  "commands": [
+    {
+      "argv": [
+        "research/curve25519_autolab_20261104/siblings/stage1-eks/run_local.sh"
+      ],
+      "cwd": ".",
+      "exit": 0,
+      "started_utc": "2026-11-10T23:12:03+00:00",
+      "wall_s": 57.007
+    }
+  ],
   "commit": "426a1267c949881b0a104fd02fce9c62cf9747c7",
   "commit_dirty": true,
   "created_utc": "2026-11-10T22:10:09+00:00",
@@ -17,19 +27,129 @@
     "platform": "Linux-6.18.44-fc-v338-x86_64-with-glibc2.39"
   },
   "id": "20261110T2210Z-sib-cv0-stage1-eks",
-  "metrics": [],
+  "metrics": [
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 240,
+      "name": "sib8_p256_over_tw2cj_lazy_gae_w0_k32",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.463,
+        0.515
+      ],
+      "unit": "ratio",
+      "value": 0.488
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 240,
+      "name": "sib8_p256_over_tw2cj_lazy_gae_w1_k32",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.932,
+        1.039
+      ],
+      "unit": "ratio",
+      "value": 0.984
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 240,
+      "name": "sib8_p64_over_tw2cj_lazy_bitop_k28",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.636,
+        0.705
+      ],
+      "unit": "ratio",
+      "value": 0.671
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 240,
+      "name": "sib8_p64_over_tw2cj_lazy_bitop_k32",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.605,
+        0.668
+      ],
+      "unit": "ratio",
+      "value": 0.635
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 240,
+      "name": "sib8_p256_over_rho_neg_bitop_k32",
+      "note": "",
+      "reference": 1.0,
+      "reference_kind": "matched_rho",
+      "spread": [
+        0.911,
+        1.063
+      ],
+      "unit": "ratio",
+      "value": 0.982
+    },
+    {
+      "baseline": 1.0,
+      "better": "lower",
+      "n": 240,
+      "name": "cv0_over_tw2cj_lazy_gae_w0_k32",
+      "note": "",
+      "reference": null,
+      "reference_kind": null,
+      "spread": [
+        0.999,
+        0.999
+      ],
+      "unit": "ratio",
+      "value": 0.999
+    }
+  ],
   "problem": "ic:curve25519-family-k28-32",
-  "raw": [],
+  "raw": [
+    {
+      "bytes": 15220222,
+      "path": "research/curve25519_autolab_20261104/siblings/stage1-eks/sessions/k28/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/03/03e25597ce265fa529adb81d499984e7128c4f8fc29f79861690adabf5f48b4d",
+      "sha256": "03e25597ce265fa529adb81d499984e7128c4f8fc29f79861690adabf5f48b4d",
+      "uploaded": false
+    },
+    {
+      "bytes": 15295792,
+      "path": "research/curve25519_autolab_20261104/siblings/stage1-eks/sessions/k32/records.jsonl",
+      "s3_uri": "s3://setec-astronomy-artifacts/store/sha256/4d/4d970badd45f362f67a238d2022640604908a773b6179ef605522068ceba0f44",
+      "sha256": "4d970badd45f362f67a238d2022640604908a773b6179ef605522068ceba0f44",
+      "uploaded": false
+    }
+  ],
   "repo": "crypto",
   "reports": {
-    "pdf": null,
-    "png": [],
-    "svg": []
+    "pdf": "benchmarks/20261110-sib-cv0-stage1-eks/REPORT.pdf",
+    "png": [
+      "benchmarks/20261110-sib-cv0-stage1-eks/stage1_ratios.png"
+    ],
+    "svg": [
+      "benchmarks/20261110-sib-cv0-stage1-eks/stage1_ratios.svg"
+    ]
   },
   "schema": "bench.record/v1",
   "session": null,
   "slug": "sib-cv0-stage1-eks",
-  "status": "open",
-  "summary": "",
+  "status": "measured",
+  "summary": "Local L0 (EKS jobs failed before any pod): sib8-p256 / tw2cj-lazy 0.488 / 0.578 / 0.984 at w = 0 / 0.1 / 1 at k = 32 (lower at every weight); bit-ops vs rho-neg 0.982 [0.911, 1.063]; cv0 within 0.3 percent; unvalidated",
   "validation": null
 }

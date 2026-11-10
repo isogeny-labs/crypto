@@ -1,11 +1,11 @@
 {
   "headline_unit": "S",
-  "latest_record": "20261110T1513Z-m4gb-descent-ladder",
+  "latest_record": "20261110T2210Z-sib-cv0-stage1-eks",
   "note": "Every value is quoted from the record it names, in that record's unit. Percentages and ratios under 'derived' are computed here from those values and are not measurements. Series in different units are never compared.",
   "records": {
     "censored": 3,
     "invalid": 1,
-    "measured": 87,
+    "measured": 88,
     "open": 3
   },
   "repo": "crypto",
@@ -2992,6 +2992,36 @@
     },
     {
       "better": "lower",
+      "first": 0.999,
+      "latest": 0.999,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "cv0_over_tw2cj_lazy_gae_w0_k32",
+      "points": [
+        {
+          "commit": "426a1267c949",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 240,
+          "record": "20261110T2210Z-sib-cv0-stage1-eks",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.999,
+            0.999
+          ],
+          "summary": "Local L0 (EKS jobs failed before any pod): sib8-p256 / tw2cj-lazy 0.488 / 0.578 / 0.984 at w = 0 / 0.1 / 1 at k = 32 (lower at every weight); bit-ops vs rho-neg 0.982 [0.911, 1.063]; cv0 within 0.3 percent; unvalidated",
+          "value": 0.999
+        }
+      ],
+      "problem": "ic:curve25519-family-k28-32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
       "first": 2.579777912430277,
       "latest": 2.579777912430277,
       "latest_derived": {
@@ -3082,6 +3112,158 @@
       ],
       "problem": "ic:curve25519-family-k28-32",
       "unit": "S"
+    },
+    {
+      "better": "lower",
+      "first": 0.982,
+      "latest": 0.982,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0,
+        "value_over_reference": 0.982
+      },
+      "metric": "sib8_p256_over_rho_neg_bitop_k32",
+      "points": [
+        {
+          "commit": "426a1267c949",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0,
+            "value_over_reference": 0.982
+          },
+          "n": 240,
+          "record": "20261110T2210Z-sib-cv0-stage1-eks",
+          "reference": 1.0,
+          "reference_kind": "matched_rho",
+          "spread": [
+            0.911,
+            1.063
+          ],
+          "summary": "Local L0 (EKS jobs failed before any pod): sib8-p256 / tw2cj-lazy 0.488 / 0.578 / 0.984 at w = 0 / 0.1 / 1 at k = 32 (lower at every weight); bit-ops vs rho-neg 0.982 [0.911, 1.063]; cv0 within 0.3 percent; unvalidated",
+          "value": 0.982
+        }
+      ],
+      "problem": "ic:curve25519-family-k28-32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.488,
+      "latest": 0.488,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "sib8_p256_over_tw2cj_lazy_gae_w0_k32",
+      "points": [
+        {
+          "commit": "426a1267c949",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 240,
+          "record": "20261110T2210Z-sib-cv0-stage1-eks",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.463,
+            0.515
+          ],
+          "summary": "Local L0 (EKS jobs failed before any pod): sib8-p256 / tw2cj-lazy 0.488 / 0.578 / 0.984 at w = 0 / 0.1 / 1 at k = 32 (lower at every weight); bit-ops vs rho-neg 0.982 [0.911, 1.063]; cv0 within 0.3 percent; unvalidated",
+          "value": 0.488
+        }
+      ],
+      "problem": "ic:curve25519-family-k28-32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.984,
+      "latest": 0.984,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "sib8_p256_over_tw2cj_lazy_gae_w1_k32",
+      "points": [
+        {
+          "commit": "426a1267c949",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 240,
+          "record": "20261110T2210Z-sib-cv0-stage1-eks",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.932,
+            1.039
+          ],
+          "summary": "Local L0 (EKS jobs failed before any pod): sib8-p256 / tw2cj-lazy 0.488 / 0.578 / 0.984 at w = 0 / 0.1 / 1 at k = 32 (lower at every weight); bit-ops vs rho-neg 0.982 [0.911, 1.063]; cv0 within 0.3 percent; unvalidated",
+          "value": 0.984
+        }
+      ],
+      "problem": "ic:curve25519-family-k28-32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.671,
+      "latest": 0.671,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "sib8_p64_over_tw2cj_lazy_bitop_k28",
+      "points": [
+        {
+          "commit": "426a1267c949",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 240,
+          "record": "20261110T2210Z-sib-cv0-stage1-eks",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.636,
+            0.705
+          ],
+          "summary": "Local L0 (EKS jobs failed before any pod): sib8-p256 / tw2cj-lazy 0.488 / 0.578 / 0.984 at w = 0 / 0.1 / 1 at k = 32 (lower at every weight); bit-ops vs rho-neg 0.982 [0.911, 1.063]; cv0 within 0.3 percent; unvalidated",
+          "value": 0.671
+        }
+      ],
+      "problem": "ic:curve25519-family-k28-32",
+      "unit": "ratio"
+    },
+    {
+      "better": "lower",
+      "first": 0.635,
+      "latest": 0.635,
+      "latest_derived": {
+        "improvement_vs_first_percent": 0.0
+      },
+      "metric": "sib8_p64_over_tw2cj_lazy_bitop_k32",
+      "points": [
+        {
+          "commit": "426a1267c949",
+          "date": "2026-11-10",
+          "derived": {
+            "improvement_vs_first_percent": 0.0
+          },
+          "n": 240,
+          "record": "20261110T2210Z-sib-cv0-stage1-eks",
+          "reference": null,
+          "reference_kind": null,
+          "spread": [
+            0.605,
+            0.668
+          ],
+          "summary": "Local L0 (EKS jobs failed before any pod): sib8-p256 / tw2cj-lazy 0.488 / 0.578 / 0.984 at w = 0 / 0.1 / 1 at k = 32 (lower at every weight); bit-ops vs rho-neg 0.982 [0.911, 1.063]; cv0 within 0.3 percent; unvalidated",
+          "value": 0.635
+        }
+      ],
+      "problem": "ic:curve25519-family-k28-32",
+      "unit": "ratio"
     },
     {
       "better": "lower",

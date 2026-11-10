@@ -19,7 +19,7 @@ on this branch, spec_path = each spec, instance c8a.2xlarge. Container AWS keys 
 (placeholder), no CHECKPOINT_UPLOAD_TOKEN: S3 checkpoint push not possible from this session; Git
 push of this branch is the checkpoint.
 
-## State
+## State (23:20Z: EKS failed; local L0 panel done, results committed)
 Specs + protocol written; local ecbench smoke (plan acceptance of every arm) pending; then commit,
 push, dispatch two runs, record run IDs in stage1-eks/LAUNCH.md and the session log.
 
