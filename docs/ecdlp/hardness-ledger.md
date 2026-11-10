@@ -10,7 +10,7 @@ Formal artifacts live in `research/ecdlp_foundations_20261109/`.
 
 ## Layer 0 — abstract group and scalar action
 
-Status: **formal** (`Foundations.lean`, 32 theorems, 0 trusted).
+Status: **formal** (`Foundations.lean`, 55 theorems, 0 trusted).
 
 | Claim | Why hardness needs it | Status |
 | --- | --- | --- |
@@ -44,8 +44,10 @@ Mathlib's `AddCommGroup`** (Mathlib project `lean/Closure.lean`).
 
 What is already machine-checked: the 33+1 chart round trips and the cache
 relations (Lean, `Charts.lean`), plus 486/486 formula programs symbolically
-against the pinned affine law (CAS, not kernel). Closure and associativity of
-the affine law itself are the next formal targets.
+against the pinned affine law (CAS, not kernel). Closure of the affine law,
+the x-commutativity of the chord sum, doubling, the opposite-point case and
+associativity (through the Mathlib bridge) are now kernel-checked in
+`lean/Closure.lean` (`PASS 17 thm 0 trusted`).
 
 Infrastructure: layer 1a uses a pinned Mathlib Lake project
 (`research/ecdlp_foundations_20261109/lean`, rev `d13f23b7...`) with `ring`,
@@ -66,10 +68,35 @@ and probability theory; queued after Layer 1.
 
 | Claim | Role | Status |
 | --- | --- | --- |
-| BSGS solves DLP in `O(√n)` time and memory | Baseline square-root attack | Implemented; **decomposition lemma formal** (every exponent below `n ≤ m²` splits as `i·m+j`, `i,j<m`); table/search correctness still queued |
+| BSGS solves DLP in `O(√n)` time and memory | Baseline square-root attack | Implemented; **correctness formal** (`Algorithms.lean`): decomposition, match existence, candidate correctness, collision-free table. The `O(√n)` time/memory bound itself is a cost premise. |
 | Pollard rho: expected `√(πn/2)` group operations | Best generic attack in practice | Implemented and measured; probabilistic proof open |
-| Pohlig–Hellman reduces DLP to prime-power order subgroups and CRT | Smooth-order curves are easy | Implemented; **subgroup step formal** (`d·a` has order `n/d` when `d ∣ n`); CRT assembly still queued |
+| Pohlig–Hellman reduces DLP to prime-power order subgroups and CRT | Smooth-order curves are easy | Implemented; **subgroup step and CRT assembly formal** (`Algorithms.lean`): `d·a` has order `n/d`, projection to the quotient instance, coprime CRT combination, reconstruction modulo `n`. The `∑ √(pᵢ^{eᵢ})` cost bound is a cost premise. |
 | Index calculus is subexponential when a smooth factor base exists | Breaks high-genus / small-characteristic settings | Implemented for the repo's IC campaigns; cost model empirical |
+
+## Layer 3b — algorithm correctness (formal)
+
+`lean/Algorithms.lean` (Mathlib project, `PASS 28 thm 0 trusted` including
+Layer 1) proves that the two standard generic reductions return the right
+answer, without assuming anything about cost.
+
+| Theorem | Statement |
+| --- | --- |
+| `baby_eq_giant_iff` | A baby/giant match is equivalent to `(i·m+j)·P = Q` |
+| `bsgs_decomposition` | `x < n ≤ m²` implies `x = i·m+j` with `i,j < m` |
+| `bsgs_exists_match` | Some baby/giant pair matches for every target `x·P`, `x < n` |
+| `bsgs_candidate_correct` | Any match yields a candidate `≡ x (mod n)` |
+| `baby_injective`, `baby_table_card` | The `m`-entry baby table has no collisions |
+| `modEq_mul_of_coprime` | Coprime congruences combine modulo the product |
+| `ph_subgroup_order` | If `d ∣ n`, then `d·P` has order `n/d` |
+| `ph_projection` | `(x mod m₁)·(m₂·P) = m₂·(x·P)`, so the quotient instance is correct |
+| `ph_reconstruct` | Knowing `x mod m₁` and `x mod m₂` gives `x mod n` |
+| `ph_prime_power_step` | The generator of the `pᵉ`-subgroup has order exactly `pᵉ` |
+
+The remaining Layer 3 claims are cost/success statements: BSGS uses `2m` group
+operations and `m` stored points; PH costs `∑ √(pᵢ^{eᵢ})`; rho's `√(πn/2)`
+expectation is a probability claim. None of these are consequences of group
+axioms alone, so they stay explicitly outside the kernel until a machine-checked
+cost/probability model exists.
 
 ## Layer 4 — curve-specific attacks (each attacks a hypothesis, not the group)
 
@@ -92,7 +119,7 @@ separately; a break here breaks deployments, not ECDLP.
 ## Queue (one at a time)
 
 0. **Done:** modular scalar reduction, injectivity below the order, and the
-   homomorphism reduction lemmas (`Foundations.lean`, 43 theorems).
+   homomorphism reduction lemmas (`Foundations.lean`, 55 theorems).
 1. **Done (1a/1b):** closure of affine addition and doubling over a field
    (`Closure.lean`, `PASS 8 thm 0 trusted`; doubling assumes `2 ≠ 0`), plus
    commutativity of the x-coordinate.
@@ -100,7 +127,11 @@ separately; a break here breaks deployments, not ECDLP.
    `Affine.slope/addX/addY`, and associativity is inherited from Mathlib's
    proven `AddCommGroup` on `Point`. Exception-case wrapping (0, P = -Q,
    doubling) remains to be connected to the same interface.
-3. **BSGS correctness** and **Pohlig–Hellman** in the Layer 0 interface.
+3. **Done:** BSGS and Pohlig–Hellman correctness in `Algorithms.lean`
+   (Mathlib project, `PASS 28 thm 0 trusted`): baby/giant match equivalence,
+   existence, candidate correctness, collision-free baby table, coprime CRT
+   combination, PH subgroup order, projection and reconstruction. Only the
+   cost/success premises remain outside the kernel.
 4. **Generic-group lower bound** statement and adversary model.
 5. **Done (logic):** MOV reduction formal over a biadditive map with
    `e(a,a)` of full order. Remaining: construct the Weil pairing and prove
