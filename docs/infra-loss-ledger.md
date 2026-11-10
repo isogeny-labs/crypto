@@ -39,7 +39,7 @@ infrastructure change is made for it.
 
 Lost CPU-hours per verified evidence record (a record that passed the
 validation gate), falling week over week. Quantified losses are a lower
-bound: records with null hours count as occurrences only.
+bound: records with null hours count as occurrences only. [pcc:unverified]
 
 ## Falsifier
 
