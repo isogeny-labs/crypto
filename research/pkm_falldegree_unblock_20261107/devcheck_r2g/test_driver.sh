@@ -1,6 +1,6 @@
 #!/bin/bash
 # Local dev-check of stageb_units_runner.sh against the REAL frozen pilot binary. Usage: test_driver.sh T1|T2|T3|T4|T5|T6
-# The runner is run exactly as in a job: /bin/bash -c "<script>" stageb <PREV...>.
+# The runner is run as /bin/bash -c "<script>" stageb <PREV...>, or (BOOT_REQUEST set) exactly as a job runs it.
 set -u
 HERE=$(cd "$(dirname "$0")" && pwd)
 RUNNER=$HERE/../stageb_units_runner.sh
@@ -8,20 +8,24 @@ SP=${SP:-/tmp/claude-0/-home-user/354dbe26-6a93-506a-a404-2fc6ef137fdc/scratchpa
 L=${LAYER:-$SP/r2g_layer/usr/local/bin}
 W=$SP/r2g_test/${1:-x}; export FAKE_S3=$W/s3
 SEED="--seed 777"          # NOT the study seed
+# How the runner is started. Default: /bin/bash -c "<script>" stageb. With BOOT_REQUEST=<request.json> (a file written by
+# make_request_bu.sh): the first six command words of that request, i.e. the job's own two-piece form with its SHA-256 check.
+if [ -n "${BOOT_REQUEST:-}" ]; then mapfile -t RUNCMD < <(jq -r '.job.command[0:6][]' "$BOOT_REQUEST")
+else RUNCMD=(/bin/bash -c "$(cat "$RUNNER")" stageb); fi
 # runner <jobname> <extra-env...> -- <PREV...>   (job results go to s3://b/<jobname>)
 runner() {
   local job=$1; shift; local envs=(); while [ "$1" != -- ]; do envs+=("$1"); shift; done; shift
   rm -rf "$W/w-$job"
   /usr/bin/env ISOLAB_RESULTS_URI=s3://b/$job STUDY_DIR=$W/w-$job BIN=${BIN:-$L/pkm_tower_pilot} G1BIN=$L/hky_fp_tower_check \
     S3CP="$HERE/s3shim.sh cp" S3SYNC="$HERE/s3shim.sh sync" RAYON_NUM_THREADS=2 "${envs[@]}" \
-    /bin/bash -c "$(cat "$RUNNER")" stageb "$@"
+    "${RUNCMD[@]}" "$@"
 }
 runner_bg() { # same, in the background without setsid; the runner's pid is BGPID (env execs bash)
   local job=$1; shift; local envs=(); while [ "$1" != -- ]; do envs+=("$1"); shift; done; shift
   rm -rf "$W/w-$job"
   /usr/bin/env ISOLAB_RESULTS_URI=s3://b/$job STUDY_DIR=$W/w-$job BIN=${BIN:-$L/pkm_tower_pilot} G1BIN=$L/hky_fp_tower_check \
     S3CP="$HERE/s3shim.sh cp" S3SYNC="$HERE/s3shim.sh sync" RAYON_NUM_THREADS=2 "${envs[@]}" \
-    /bin/bash -c "$(cat "$RUNNER")" stageb "$@" > "$W/out-$job.txt" 2>&1 < /dev/null &
+    "${RUNCMD[@]}" "$@" > "$W/out-$job.txt" 2>&1 < /dev/null &
   BGPID=$!; }
 livepilots() { ps -eo stat,cmd | grep pkm_tower_pilot | grep -v grep | grep -vc '^Z'; }
 happy() { # happy <job> : the T2 job (3 units)
@@ -47,12 +51,12 @@ killjob() { # SIGKILL the runner's process group (runner, syncer, pilot) = a pod
   local pg; pg=$(cat "$W/pid-$1"); kill -9 -- "-$pg" 2>/dev/null; }
 bgrunner() { # bgrunner <job> <env...> -- <PREV...>: runner in its own session (pgid = $$ of the job script), as a pod would be
   local job=$1
-  { echo "echo \$\$ > $W/pid-$job"; declare -f runner; echo "W=$W HERE=$HERE RUNNER=$RUNNER L=$L; export FAKE_S3=$FAKE_S3"
+  { echo "echo \$\$ > $W/pid-$job"; declare -f runner; declare -p RUNCMD; echo "W=$W HERE=$HERE RUNNER=$RUNNER L=$L; export FAKE_S3=$FAKE_S3"
     echo "runner $(printf '%q ' "$@")"; } > "$W/job-$job.sh"
   setsid bash "$W/job-$job.sh" > "$W/out-$job.txt" 2>&1 < /dev/null &
   sleep 0.3; }
 case ${1:-} in
-T1) bash -c "$(cat "$RUNNER")" stageb --list > $SP/r2g_test/list.txt; echo rc=$?
+T1) "${RUNCMD[@]}" --list > $SP/r2g_test/list.txt; echo rc=$?
     wc -l < $SP/r2g_test/list.txt; awk '{print $2}' $SP/r2g_test/list.txt | uniq | wc -l
     awk '{print $2}' $SP/r2g_test/list.txt | uniq | tr '\n' ' '; echo
     grep -c '^B-' $SP/r2g_test/list.txt; grep -c '^DB-' $SP/r2g_test/list.txt
@@ -141,7 +145,7 @@ T9) rm -rf "$W"; mkdir -p "$W"; touch $W/fail1
 T10) rm -rf "$W"; mkdir -p "$W/fakebin"
     printf '#!/bin/bash\ntouch %s/aws-called\n' "$W" > $W/fakebin/aws; chmod +x $W/fakebin/aws
     for v in PILOT_EXTRA UNIT_FILTER BIN G1BIN STUDY_DIR; do
-      /usr/bin/env -u S3CP -u S3SYNC PATH="$W/fakebin:$PATH" ISOLAB_RESULTS_URI=s3://b/x "$v=something" /bin/bash -c "$(cat "$RUNNER")" stageb; echo "$v set: rc=$?"
+      /usr/bin/env -u S3CP -u S3SYNC PATH="$W/fakebin:$PATH" ISOLAB_RESULTS_URI=s3://b/x "$v=something" "${RUNCMD[@]}"; echo "$v set: rc=$?"
     done
     ls $W/aws-called 2>&1 | head -1 ;;
 T11) rm -rf "$W"; mkdir -p "$W"
