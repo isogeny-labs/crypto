@@ -64,3 +64,34 @@ in `pari_check_<label>.json`; summary table in `README.md` §5.
 - Wall per curve 668–2502 s of computation; three container restarts and one
   harness cap interrupted the runs, each resumed from the checkpoints
   (`p192_launch_time.txt`, session logs 2026-11-09/10).
+
+## Extension to the P-224, P-239 and P-256 fields (frozen 2026-11-10 before any run)
+
+Request (user, 2026-11-10): the same computation for the remaining 14 census
+curves: P-224 (p224-777, -1485, -5736 skipped; -7026 published, conductor 3),
+P-239 (p239-36, -1562, -2491, -2682, -2863 skipped; -2185, -2320, -3048
+published; conductor 5 for -2320 and -2682), P-256 (p256-876 skipped,
+-1842 published). D_K has 221–258 bits.
+
+Same method, acceptance and stop rules as above, with these additions.
+
+- Parameters may be tuned per field *before* that field's claim runs, on the
+  sieving-rate readout of a short probe (relations per 1000 products,
+  products per second) and the dense-column count; the chosen parameters are
+  recorded in `data/cl/rust_<label>.json` (`params`) and are not changed
+  after a run is accepted. Tuning changes cost, not the answer: the lattice
+  index is an exact integer whatever the parameters.
+- Wall limit per curve: 24 h of computation for P-224/P-239, 48 h for
+  P-256, across resumptions (`.ckpt`/`.det`); overrun is recorded and is not
+  evidence about the group.
+- Predictions (from the `facts` stage, log2 h*): P-224 110.5, 110.3, 110.4,
+  108.1; P-239 117.1, 118.1, 116.8, 115.2, 117.6, 115.7, 117.7, 117.5; P-256
+  126.4, 126.9. (1) h within 5 % of h* (expected within 0.1 %). (2) The 2-rank
+  equals the genus-theory value for every curve; no cyclic group where that
+  rank is ≥ 2. (3) The split odd primes ≤ 163 generate every class group; ≤ 50
+  generate at least 10 of 14. (4) No structural quantity (2-rank, Sylow
+  invariants, generating bounds) separates published from skipped curves
+  within a field.
+- The P-192 outcome is not used to adjust these predictions beyond what was
+  written on 2026-11-08 (prediction 3's "at least four of five" becomes "at
+  least 10 of 14" by the same 80 % rate).
