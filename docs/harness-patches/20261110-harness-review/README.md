@@ -1,17 +1,21 @@
-# crypto-autoresearcher patch series: harness review 2026-11-10
+# crypto-autoresearcher harness review 2026-11-10: where the series lives
 
-Ten patches implementing `docs/autoresearcher-harness-review-20261110.md`
-(I1–I12, I6b, instruction diet) for `isogeny-labs/crypto-autoresearcher`,
-authored on branch `harness/review-20261110-fixes` from main `3ba0739cb9`.
-They live here because the authoring session had read-only access to that
-repository. Apply in the harness checkout:
+The ten patches that sat here were pushed as branch
+`harness/review-20261110-fixes` in `isogeny-labs/crypto-autoresearcher`
+(PR #3262) once this session got push access, and reconciled with PR #3180
+there (commit `a3c81fa1a1`). The branch is authoritative; the patch files were
+removed so two copies cannot drift.
+
+`main` in that repository was vaulted on 2026-11-10 (`VAULT.md`: AES-256-SIV
+clean/smudge filter keyed by `KEY`), so GitHub reports #3262 as conflicting and
+no session without `KEY` can land it. To land it in an unlocked checkout:
 
 ```sh
-git checkout -b harness/review-20261110-fixes 3ba0739cb9   # or rebase onto main
-git am /path/to/crypto/docs/harness-patches/20261110-harness-review/*.patch
-python3 tools/check_instruction_budget.py && python3 tools/check_lab_parity.py
+export KEY=...
+python3 tools/vault/vaultctl.py setup && python3 tools/vault/vaultctl.py unlock
+git fetch origin harness/review-20261110-fixes
+git merge origin/harness/review-20261110-fixes   # the clean filter stores the result as ciphertext
 ```
 
-Verification results and the per-patch contents are in
-`crypto:docs/session-logs/2026-11-10.md` (07:30Z entry) and in each patch's
-message. Delete this directory once the series is on the harness `main`.
+Verification results are in the PR description and in
+`docs/session-logs/2026-11-10.md` (07:30Z entry) here.

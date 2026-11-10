@@ -18,6 +18,8 @@ fn tiny() -> PrimeInstance {
         r: 7,
         cofactor: 1,
         generator: (0, 1),
+
+        representation: None,
     }
 }
 
