@@ -15,7 +15,7 @@ HERE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import walk_step_problem as wsp  # noqa: E402
 import kernel_v5 as K  # noqa: E402
-import v9  # noqa: E402
+import v11 as v9  # noqa: E402
 
 N = 1 << 16
 
@@ -40,11 +40,11 @@ def main():
     y = wsp._random_elements(N).cuda()
     want = K.kernel_function(x, y)
     npad = ((N + v9.MUL_B - 1) // v9.MUL_B) * v9.MUL_B
-    ws = v9._arena(npad, x.device)
+    ws = torch.empty((v9.NSLOT * npad * 3,), dtype=torch.int64, device=x.device)
     rep = {"gpu": torch.cuda.get_device_name(), "rows": N, "variants": []}
 
-    combos = [(8, 1, 8, 1), (16, 2, 8, 2), (16, 1, 8, 1), (8, 1, 8, 2),
-              (16, 2, 16, 1), (8, 2, 8, 1), (16, 1, 16, 1)]
+    combos = [(16, 1, 8, 1), (8, 1, 8, 1), (32, 1, 8, 1), (16, 1, 16, 1),
+              (8, 1, 4, 1), (32, 1, 16, 1), (16, 2, 8, 1), (64, 1, 8, 1)]
     best = None
     for sr, sw, fr, fw in combos:
         v9.SIGMA_R, v9.SIGMA_W, v9.FROB_R, v9.FROB_W = sr, sw, fr, fw

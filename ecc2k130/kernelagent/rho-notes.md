@@ -255,3 +255,37 @@ never launch-bound in the first place.
 | production client (G7) | — | 12,499 M |
 
 50x as a single call, 75x sustained, over where this file started.
+
+## Update: sigma loses its lane waste (2026-11-10, v11)
+
+Every sigma still built a 256-lane tile for 131 useful bits. Same fix the
+multiply got in v5: a 128-lane main chunk (bits 0..127 -> limbs 0 and 1) plus
+a 4-lane tail (bits 128..130 -> limb 2), so ~99% of the lanes are useful.
+
+    v9   single call 0.428 ms   153.2 M updates/s
+    v11  single call 0.303 ms   216.5 M updates/s     (1.41x)
+    v11  reused arena 0.297 ms  221.0 M
+    v11  sustained     0.289 ms 226.5 M
+
+Exact at 65,536 rows and at an odd 40,001-row batch. A shape re-sweep on the
+new kernel confirms sigma R16/1 warp and frob R8/1 warp (R32 is within noise,
+R64 is 1.7x worse).
+
+## Ladder
+
+| step | ms | updates/s |
+|---|---:|---:|
+| v5 convolution, L4 (start) | — | 3.0 M |
+| v5 convolution, PRO 6000 | 5.049 | 13.0 M |
+| clmad, batched conversions | 1.296 | 50.6 M |
+| v7, limbs emitted by the producer | 0.863 | 76.0 M |
+| v8, single representation | 0.829 | 79.0 M |
+| v9, shapes tuned on the step | 0.428 | 153 M |
+| **v11, sigma without lane waste** | **0.303** | **216 M** |
+| production client (G7) | — | 12,499 M |
+
+72x over where this file started. The client is 58x ahead, and its advantage
+is now entirely algorithmic: it amortises one inversion over 16 walkers
+(4.81 products and ~8 sigma applications per update) where this step pays 10
+products and 127 sigma applications for every walker, because the benchmark
+problem *is* one affine addition with its own inversion.
