@@ -1,5 +1,22 @@
 # p1tool: the native instrument for P1 (IDEA-20261107-RR-DICKSON-TORUS)
 
+## Opt-in preprocessing continuation (2026-11-10)
+
+`emit --system rr --reduce affine|quadratic` enables constant-pivot elimination.
+It accepts a substitution only if every remaining equation stays within the
+original maximum input degree (at most two). Without `--reduce`, historical
+emission is unchanged. This bounds input degree, **not F4 solving degree**.
+The `.plant.json` carries original/reduced input digests, original equations
+and a reverse-order reconstruction map. `lift --map FILE.ms.plant.json
+--values coordinates.json` reconstructs arbitrary reduced solutions and checks
+every original equation; coordinates are a JSON array in emitted variable order.
+It does not read the stored planted values. These are producer checks, not signed
+PCC verification. It does not provide rational root enumeration or point extraction.
+
+Implementation and the pending equal-output experiment are tracked in
+[`rr_dickson_matrix_reduction_20261110`](../../../../rr_dickson_matrix_reduction_20261110/README.md).
+No new F4 measurement is asserted by this continuation.
+
 2026-11-07. This is the instrument for proposal P1
 ([`../../../ideas/idea-generator.md`](../../../ideas/idea-generator.md), lines 41–135).
 It is a standalone Rust crate. It writes msolve 0.6.5 input files for six
