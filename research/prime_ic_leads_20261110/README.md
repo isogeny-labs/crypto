@@ -285,7 +285,7 @@ which is the instrument check.
 | `m = 4`, `t = 2` (`N = 8`) | 6, 6 | 5, 5 | **−1** | [4, 5, 6] / [4, 5] |
 | `m = 4`, `t = 3` (`N = 12`) | 7, 7 | 6, 6 | **−1** | [4, 5, 6, 7] / [4, 5, 6] |
 | `m = 5`, `t = 2` (`N = 10`) | 6, 6 | 6, 6 | 0 | [4, 5, 6] / [4, 5, 6] |
-| `m = 5`, `t = 3` (`N = 15`) | > 8 (budget-censored at `c = 8`, 1,500 s; both draws) | see `devcheck/m5_t3_mult_k{0,1}.jsonl` (run per draw with cmax 7 after this table was written; the rows are the record) | — | [4, 5, 6, 7] / — |
+| `m = 5`, `t = 3` (`N = 15`) | > 7 on both draws (`c = 7` closure complete without `1`; `c = 8` budget-censored at 1,500 s) | > 6 on both draws (`c = 6` complete without `1` in 8 s; `c = 7` censored by the entry cap `2.5·10⁸` at 399,850 columns, 400 s; the uncapped attempt was memory-killed at about 14 GB) | inconclusive | [4, 5, 6, 7] / [4, 5, 6] |
 
 Reading against the pre-stated predictions:
 
@@ -293,12 +293,15 @@ Reading against the pre-stated predictions:
   including the fall sequences, as the degree-6 entry requires (the multiples row has one more
   equation, `n_equations` 2t+2 against 2t+1, and the same `n_vars`).
 - **P2 holds, and nothing reaches the falsifier.** At `m ≥ 3` the drop is exactly one degree on
-  six of ten completed cells and zero on the other four; no cell drops by two, and the slope
+  six of ten completed cells and zero on the other four; no completed cell drops by two, and the slope
   is unchanged: at `m = 4` both arms rise by one degree from `t = 2` to `t = 3` (6 → 7 and
   5 → 6), and in `m` at `t = 3` both rise by one from `m = 3` to `m = 4` (6 → 7 and 5 → 6).
   The one-degree offset at `m ≥ 3` comes with the doubling links (degree 4) and the doubled
   chain's own unknowns `u'_k` (`n_vars` +`m − 2`), so it is a presentation shift of the kind
-  the chain presentation itself introduces, not a change in growth.
+  the chain presentation itself introduces, not a change in growth. The one cell where the
+  falsifier could still fire on this host, `m = 5`, `t = 3`, is censored on both arms (tower
+  `> 7`, multiples `> 6`) and is reported as inconclusive: it needs a host with more than
+  about 16 GB for the degree-7 closure of the augmented system, or a sparser closure engine.
 - **What this closes.** At toy scale, the one free source of extra cross-summand equations
   over `F_p` lowers the last fall degree by at most one and leaves both slopes as they were.
   §4 item 3 stays closed; the budget reading stands as far as this check can test it. What

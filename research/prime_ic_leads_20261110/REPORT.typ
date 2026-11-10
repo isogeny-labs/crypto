@@ -73,10 +73,10 @@ Weil descent over $F_(2^n)$: one relation gives $n$ equations of degree 2 in $m 
   [$m = 4$, $t = 2$ ($N = 8$)], [6, 6], [5, 5], [*−1*], [[4, 5, 6] / [4, 5]],
   [$m = 4$, $t = 3$ ($N = 12$)], [7, 7], [6, 6], [*−1*], [[4, 5, 6, 7] / [4, 5, 6]],
   [$m = 5$, $t = 2$ ($N = 10$)], [6, 6], [6, 6], [0], [[4, 5, 6] / [4, 5, 6]],
-  [$m = 5$, $t = 3$ ($N = 15$)], [> 8 (budget-censored, both draws)], [per-draw runs, cmax 7: `devcheck/m5_t3_mult_k{0,1}.jsonl`], [—], [[4, 5, 6, 7] / —],
+  [$m = 5$, $t = 3$ ($N = 15$)], [> 7 both draws ($c = 8$ budget-censored)], [> 6 both draws ($c = 7$ censored by the entry cap at 399,850 columns)], [inconclusive], [[4, 5, 6, 7] / [4, 5, 6]],
 )
 
-P1 holds (identical at $m = 2$, draw by draw). P2 holds and nothing reaches the falsifier: at $m >= 3$ the drop is exactly one degree on six of ten completed cells and zero on four, and both slopes are unchanged ($m = 4$: 6 → 7 against 5 → 6 from $t = 2$ to 3; $t = 3$: 6 → 7 against 5 → 6 from $m = 3$ to 4). The one-degree offset at $m >= 3$ arrives with the degree-4 doubling links and the extra unknowns $u'_k$, a presentation shift, not a change in growth. Section 4 item 3 stays closed as far as this check can test it; not tested: $[3]$- and $[4]$-multiples together, larger $N$, an F4 run on the augmented systems.
+P1 holds (identical at $m = 2$, draw by draw). P2 holds and nothing reaches the falsifier: at $m >= 3$ the drop is exactly one degree on six of ten completed cells and zero on four, and both slopes are unchanged ($m = 4$: 6 → 7 against 5 → 6 from $t = 2$ to 3; $t = 3$: 6 → 7 against 5 → 6 from $m = 3$ to 4). The one-degree offset at $m >= 3$ arrives with the degree-4 doubling links and the extra unknowns $u'_k$, a presentation shift, not a change in growth. The $m = 5$, $t = 3$ cell is censored on both arms (tower > 7, multiples > 6) and is inconclusive on this host. Section 4 item 3 stays closed as far as this check can test it; not tested: $[3]$- and $[4]$-multiples together, larger $N$, an F4 run on the augmented systems.
 
 = Leads, ranked
 

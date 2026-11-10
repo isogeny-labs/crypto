@@ -83,5 +83,7 @@ mechanism and close the Kummer lane per Amendment 8's rules.
 The multiples control ran on Kummer `P1` cells (`research/prime_ic_leads_20261110/devcheck/`):
 identical `d_F` at `m = 2`, `t = 2..9` (P1); at `m = 3, 4, 5` a drop of exactly one degree on six
 of ten cells and zero on four, with both slopes unchanged (P2). The falsifier (a drop of two,
-or a flat ladder) was not reached. The second "what would unblock it" item is therefore not
+or a flat ladder) was not reached on any completed cell; the `m = 5`, `t = 3` cell is censored on
+both arms (tower `> 7`, multiples `> 6`, the latter by a 2.5·10⁸-entry cap on a 15 GB host) and
+is inconclusive. The second "what would unblock it" item is therefore not
 met at toy scale; the record stays open on the first and third.
