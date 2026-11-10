@@ -53,8 +53,8 @@ ones unfiltered on every PR), and an 11 GB / 286k-file tree (`crypto`) that
 every clone, CI job and hook walks. Also: the nightly/fuzz schedules in
 `cryptanalysis` never fire; hand-mirrored enforcement tools
 (`benchrec.py`, `progress_metrics.py`) have drifted between repos; and the
-`benchrec` gate walked the whole 286k-file tree on every `git push` (fixed in
-this PR). The two cheapest build-only fixes (C5, C6 below) also land with
+`benchrec` gate walks the whole 286k-file tree on every `git push` (a
+measured fix is attached as a patch for the owner repo, see T1). The two cheapest build-only fixes (C5, C6 below) also land with
 this assessment, in `cryptanalysis`.
 
 ## 2. Baselines recorded in this session
@@ -67,7 +67,7 @@ this assessment, in `cryptanalysis`.
 | `ca_perfbench` quick kernels (medians) | `ca_perfbench run --samples 3 --min-samples 3 --max-seconds 5` | mont_mul_x8 13.2 ms (0.79 ns/mul); invmod 29.8 ms (≈182 ns ≈ 420 cycles/inverse); rho_ec36 30.4 ms; glv_rho_j0_32 16.3 ms; ic_precompute_zp44 16.8 ms; linsolve_sparse 10.4 ms |
 | `ca_bench generic --bits 36 --threads 4` | | EC rho-1 18 Mops/s (S=0.833), kangaroo 47 Mops/s, Zp rho-1 93 Mops/s |
 | Callgrind (Ir share) | `valgrind --tool=callgrind ca_perfbench …` | glv_rho_j0_32: ec_hash 19.8 %, ec_batch_op 16.7 %, ca_ec_endo 14.6 %, glv_class_reduce 11.5 %, ca_invmod 11.0 %; rho_ec36: ca_invmod 8.0 %; ic_precompute_zp44: spmv64 68.9 %; linsolve_sparse: spmv128 75 % |
-| `benchrec.py gate` | 3 runs | 0.77 / 0.82 / 0.83 s wall (a first cProfile run read 1.5 s, but that was profiler overhead); `artifact_manifests()` `rglob`s the 286k-file tree and parses 3,184 manifests. **Fixed in this PR**: pruned `os.walk` + one resolve per manifest → 0.58 / 0.55 / 0.64 s, identical output and exit code, same 3,184 manifests; a `git ls-files --others` variant was measured slower (0.80–0.91 s) and is opt-in only |
+| `benchrec.py gate` | 3 runs | 0.77 / 0.82 / 0.83 s wall (a first cProfile run read 1.5 s, but that was profiler overhead); `artifact_manifests()` `rglob`s the 286k-file tree and parses 3,184 manifests. Pruned `os.walk` + one resolve per manifest → 0.58 / 0.55 / 0.64 s, identical output and exit code, same 3,184 manifests; a `git ls-files --others` variant measured slower (0.80–0.91 s). Shipped as a patch for the owner repo (T1) |
 | `build_ic_leaderboard.py` build | `L.build(allow_unvalidated=True)` | 2.35 s; `sha256_file` called 3,545 × over 41 evidence dirs (0.48 s); `validation_gate.check_evidence_dir` 1.07 s |
 | Bash-tool hook overhead | checkpoint + benchrec + vault PreToolUse on a non-matching command | ≈170 ms per Bash call (95 + 62 + 13 ms), 8 `python3` spawns |
 
@@ -153,7 +153,7 @@ vtable; `crates/hashed-ecdl-tensor` has no release profile.
 
 | # | Finding | Where | Gain | Effort |
 |---|---|---|---|---|
-| T1 | `artifact_manifests()` `rglob`s the 286k-file tree on every `benchrec gate` (every push / PR create) | `tools/benchrec.py:590-612` | **done in this PR**: 0.80 s → 0.58 s (pruned walk; `git ls-files --others` measured slower, kept opt-in). The remaining ~0.33 s is the directory walk itself; a persistent manifest index would be the next step | S |
+| T1 | `artifact_manifests()` `rglob`s the 286k-file tree on every `benchrec gate` (every push / PR create) | `tools/benchrec.py:590-612` | measured 0.80 s → 0.58 s with a pruned walk (`git ls-files --others` measured slower, kept opt-in); remaining ~0.33 s is the directory walk itself. **Not landed here**: `tools/benchrec.py` is a lock-pinned mirror owned by `crypto-autoresearcher` (`docs/shared-code.lock.json`; the `parity` PR check refused the edit), so the change ships as `docs/assessment-speed-productionization-20261110-benchrec.patch` to apply in the owner repo and re-lock | S |
 | T2 | Hooks spawn `python3` 3–5 × per Bash call to read JSON fields; `vault-hook` already uses `jq` | `.claude/hooks/benchrec-hook.sh`, `checkpoint-hook.sh` | ~100–130 ms per Bash call | S |
 | T3 | Leaderboard/validation gate re-hashes the same files (3,545 `sha256_file` calls, 41 dirs) | `scripts/build_ic_leaderboard.py`, `validation_gate.py` | 0.5–0.8 s of 2.35 s | S |
 | T4 | `benchrec --verify-s3` spawns one `aws` process per object; `checkpoint.sh` calls `aws configure list-profiles` repeatedly | `tools/benchrec.py:334-438`, `scripts/checkpoint.sh:69-100` | seconds per record | S–M |
@@ -174,7 +174,7 @@ vtable; `crates/hashed-ecdl-tensor` has no release profile.
 9. **Python tooling hygiene** (S–M). 295 `.py` under `scripts/` (99k lines) + 60 under `tools/`; no root `pyproject.toml`, ruff or mypy; `compose_koblitz_stage*` (74 files, 15k lines, median adjacent similarity 0.64) shares a 30-line skeleton worth factoring but is not a drop-in dedupe.
 10. **Release engineering** (S–M). Root crate stays at 0.1.0; `release.yml` publishes a rolling `major.minor.run` tag with `ECC_MARCH=x86-64-v3`; no tags, no CHANGELOG, no release-please; no Docker layer cache or stripping in `isolab.yml`; no root `.dockerignore`.
 11. **Session-start hook** (M). 900 s budget; `go install …@main` unpinned; 39 install/network lines in `setup-workstation.sh`; 1.5 GB `cryptanalysis` clone and a detached 3.6 GB SageMath start. Pin versions, bake into the image, make the clone lazy.
-12. **Enforcement-tool parity** (M). `tools/` copies hand-mirrored into `cryptanalysis`: `pcc.py`, `task_card.py` identical; `benchrec.py` 1,315 vs 1,216 lines, `test_benchrec.py` 494 vs 199, `progress_metrics.py` 839 vs 305, `artifacts/*.py` and `wire_workflows.py` also diverged. One source of truth + a `check_lab_parity`-style CI check. (The hooks that refuse unrecorded benchmarks depend on this code.)
+12. **Enforcement-tool parity** (M). A lock already exists: `docs/shared-code.lock.json` pins 22 shared files by SHA-256 (13 owned by `crypto-autoresearcher`, 9 by `crypto`), checked by `tools/check_lab_parity.py` in the `parity` PR job; an edit on a mirror fails until it lands in the owner and the lock is re-cut everywhere (this PR hit exactly that on `tools/benchrec.py`). The reviewers' "no parity mechanism" claim was wrong. What remains true: the `cryptanalysis` copies of `benchrec.py` (1,216 vs 1,315 lines), `test_benchrec.py` (199 vs 494), `progress_metrics.py` (305 vs 839) and `artifacts/*.py` differ from `crypto`'s, so either those entries do not list `cryptanalysis` in `repos` or they are outside the lock; add them, and route every tooling fix through the owner repo first.
 
 ### 4b. `cryptanalysis`
 

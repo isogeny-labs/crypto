@@ -107,44 +107,6 @@ class BenchrecTest(unittest.TestCase):
         r = self.br("check", check=False)
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
 
-    def test_manifest_enumeration_git_walk_rglob_agree(self):
-        """git ls-files, the pruned walk and rglob see the same manifests (tracked and
-        untracked-not-ignored); a gitignored one is only seen by the walks; outside a git
-        worktree the git path falls back to the walk; skipped dirs never reach the result."""
-        import hashlib
-        module = self.canonical_module()
-        root = self.root.resolve()
-        def put(rel_dir, name="a.bin"):
-            d = root / rel_dir
-            d.mkdir(parents=True, exist_ok=True)
-            (d / ".artifacts.json").write_text(json.dumps(
-                {"files": {name: {"sha256": hashlib.sha256(rel_dir.encode()).hexdigest()}}}))
-        put("."); put("tracked/deep"); put("target/release"); put("node_modules/x")
-        (root / ".gitignore").write_text(".benchrec/\nignored/\n")
-        self.commit_all()
-        put("untracked/dir"); put("ignored/dir")
-        considered = lambda ps: {p for p in ps if not any(x in module._SKIP_DIRS for x in p.parts)}
-        git_set = set(module._manifests_git(root))
-        walk_set = set(module._manifests_walk(root))
-        rglob_set = considered(module._manifests_rglob(root))
-        self.assertEqual(considered(git_set), considered(walk_set) - {root / "ignored/dir/.artifacts.json"})
-        self.assertIn(root / "untracked/dir/.artifacts.json", git_set)
-        self.assertNotIn(root / "ignored/dir/.artifacts.json", git_set)
-        self.assertEqual(considered(walk_set), rglob_set)
-        self.assertEqual(walk_set & {root / "target/release/.artifacts.json"}, set())
-        def paths(git_list):
-            return module.artifact_manifests(root, git_list)
-        self.assertEqual(sorted(paths(False)), sorted(set(paths(False))))
-        self.assertEqual({k for k in paths(True)}, {k for k in paths(False)} - {"ignored/dir/a.bin"})
-        self.assertIn("a.bin", paths(False)); self.assertIn("untracked/dir/a.bin", paths(True))
-        # not a worktree: the git listing declines and manifest_paths falls back to the walk
-        with tempfile.TemporaryDirectory() as plain:
-            plain = Path(plain).resolve()
-            (plain / "m").mkdir()
-            (plain / "m" / ".artifacts.json").write_text("{}")
-            self.assertIsNone(module._manifests_git(plain))
-            self.assertEqual(module.manifest_paths(plain, True), [plain / "m" / ".artifacts.json"])
-
     def test_unknown_unit_and_bad_close_rejected(self):
         rec = self.br("init", "--slug", "unit-test", "--problem", "p:q").stdout.strip()
         r = self.br("metric", rec, "--name", "m", "--value", "1", "--unit", "furlongs", check=False)
