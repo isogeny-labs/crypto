@@ -328,7 +328,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 | 1 Semaev | Partial: canonical all-arity zero-sum equivalence/degrees and literal binary S4 display disproof | Full polynomial symmetry, absolute irreducibility and arbitrary-split normalization |
 | 2 BK | Partial: excluded-case disproof and actual qualified F5/r3 criterion at every positive extension degree | Generic torsion rank/determinant/Weil bridges and complete p<500 census |
 | 3 Supersingular | Partial: direct exact-degree-two counterexamples; complete general-model checks over F2/F3/F4/F9 | Higher extensions, general Hasse/classification and geometric/torsion-field bridges |
-| 4 Pairings/MOV/FR | Partial: actual composite Tate-domain counterexamples and pairing-domain controls | Canonical Weil/Tate constructions and all stated MOV/FR domains; original Frey–Rück unread |
+| 4 Pairings/MOV/FR | Partial: actual composite controls and exhaustive F25Miller tables with actual quotient-domain bilinearity/nondegeneracy and base-restriction disproofs | Canonical divisor/valuation identification and generic MOV/FR theorems; original Frey–Rück unread |
 | 5 Diem factor base | Partial: excluded subfield family, qualified arithmetic estimate and unrestricted small-field counterexample | Scheme/admissibility geometry and qualified general factor-base bound |
 | 6 Gaudry smoothness | Partial: exact small-model counts and finite reduced-pair checks | Whole geometric Jacobian identification and fixed-genus asymptotic error proof |
 | 7 Subgroup smoothness | Partial: complete finite Cantor-group counterexamples and growing family with all-pair arithmetic/group consistency | Full ambient group/Picard embedding and qualified typical/large-prime asymptotics |
@@ -338,7 +338,7 @@ the source theorem with its hypotheses restored. [pcc:unverified]
 | 11 Standards | Partial: actual 160-bit anomalous curve/cardinality and concrete Smart finite-program certificate | Generic p-adic/complexity/native refinement and matched SafeCurves benchmark |
 | 12 msolve/F4 | Partial: exact F4Run ideal-containment theorem, saturation-reading counterexample and source/run audit | Ordinary C refinement and complete trace binding; saturation hang beyond the tested coefficient lookup repair |
 | 13 Independence | Blocked for the requested other-machine replay | Prior dispatch HTTP404 ran no job; one runtime available; a different authorized host or registered workflow is required |
-| 14 Negative control | Verified current control | Historical runs were not preregistered with it; no retroactive promotion |
+| 14 Negative control | Current control passes locally | Historical runs were not preregistered with it; no retroactive promotion |
 
 The accessible runtime has no callable second execution host. A fresh tool
 capability search did not expose a separate browser/remote execution host;
@@ -431,3 +431,23 @@ and an in-range wrong-value counterexample. Fullgate14/0/0.
 This is snapshot table semantics, with no assumed Cexecution/trace,
 physicalallocation bound, parser or wholeF4Run refinement conclusion.
 Earlier signedshift and saturation diagnosis remain open. [pcc:unverified]
+
+### 2026-11-10 actual Miller expressions and quotient domains
+
+The [Miller project](../research/pairing_miller_audit_20261110/README.md)
+proves actualF25field, E:y²=x³+1, actual3torsioncard9/additiveindexhom,
+both81-entryMillerexpressiontables and allusednonzeroevaluationvalues.
+Actualallpoint6R=0 provesunique3torsionrepresentativesofE/3E,card9.
+Actualunitfinalexponent8hascubesaskernelandissurjectiveontocuberoots;
+bothquotient/rootstargetscard3. Raw/reducedMillerclassmapsarebilinear
+andnondegenerateonactualquotientdomains. Wholegate126/0/0. [pcc:unverified]
+
+ActualFrobenius(a,b)=(a,-b)identifiesbaseF5rationaltorsionwithPline,
+Qnonrational. TheWeilMillerrestrictionisconstant1anddirectlyfailsND.
+BaseF5unit/cubetargettrivialprecludesanyleftNDmapfromactualnonzero
+3torsion. Tangenttripleintersectionpolynomialidentitiesareprovedby
+actualcoefficientchecksanduniversalringalgebra. Canonicaldivisor/
+valuationidentification,genericMOV/FRandcomplexityremainopen; no
+sourceNDtheoremisassumed. OriginalFR94correctDOIsuffix-6confirmed
+byCrossrefbutprimaryPDFstill403/unread. No nativeexperimentorpaidcompute.
+[pcc:unverified]

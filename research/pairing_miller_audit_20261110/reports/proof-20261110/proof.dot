@@ -1,0 +1,11 @@
+digraph G {
+ graph [rankdir=TB,bgcolor="white",pad="0.15",nodesep="0.25",ranksep="0.3"];
+ node [shape=box,style="rounded,filled",fillcolor="#eaf2f8",fontname="DejaVu Sans",fontsize=12,margin="0.14,0.10"];
+ a [label="Actual F25 and E:y^2=x^3+1\nActual P,Q order3; S order2\nAll9 rational3torsion points proved"];
+ b [label="Compute both81-entry Miller tables\nAll used evaluations nonzero\nWeil: omega^det; reducedTate: omega^(2det)"];
+ c [label="Actual domains A=E(F25)[3], B=E(F25)/3E(F25)\nC=F25*/cubes; mu3=actual unit roots\n|A|=|B|=9; |C|=|mu3|=3; final exponent8",fillcolor="#d8eee4"];
+ d [label="Root-valued Weil and raw/reduced Tate-class maps\nBilinear and nondegenerate in both inputs",fillcolor="#d8eee4"];
+ e [label="F5 controls: Frobenius(a,b)=(a,-b)\nRational line has Weil value1 despite nonzero point\nBase unit/cube quotient trivial: no leftND map",fillcolor="#fbe3df"];
+ f [label="Tangent substitution=(X-x)^3 proved\nCanonical divisor/valuation identification remains open",fillcolor="#fff1d5"];
+ a -> b -> c -> d; a -> e; b -> f [style=dashed]; d -> f; e -> f;
+}
