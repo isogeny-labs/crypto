@@ -1,31 +1,33 @@
-# Resume: crypto @ claude/dreg-lfd-theory-scaling
+# Resume: crypto @ claude/zealous-meitner-85ipb5
 
 ## Goal
-User request (2026-11-05): find ways to reduce the degree of regularity / total solve time of the
-descended Semaev system. Three phases, chosen by the user: (1) theory and scaling survey, done
-(PR #3512); (2) the l = 9 guess-saturation test; (3) a multilinear closure engine prototype.
+Owner's ask (2026-11-10): run the index-calculus decomposition benchmarks on a ladder of binary
+curves (Koblitz K and random R families, Weil descent of the Semaev polynomial) with the new
+external M4GB backend (`m4gb-f2`, PR #3812) beside the in-house engines, and see whether solve time
+per target is lower. Stage diagnostic (AGENTS.md section 2), never a speed row; all local numbers
+`[pcc:unverified]`.
 
 ## Lead / hypothesis
-LEAD-ICE-descent-closure-degree-at-scale / LEAD-ICE-hybrid-guess-determine-l7. The recorded k*
-(guesses that hold degree 4) is 0, 1-2 and 4 at l = 6, 7 and 8. K_marginal predicts 7 at l = 9.
-Saturation (k* <= 5) would revive the guess route.
+Prediction: `inherited-f4` and `f4-f2` decide each target faster than `m4gb-f2` on every cell
+(decision tree with degree-bounded bases against a full reduced basis); M4GB's ratio to the
+reference grows with the number of variables. Falsifier: `m4gb-f2` median wall below `f4-f2` on any
+cell with at least 24 variables.
 
 ## Spec
-research/dreg_guess_scaling_20261106/PREREGISTRATION.md (frozen at commit 37129b4253).
+research/m4gb_descent_ladder_20261110/README.md (protocol), run_ladder.sh (the one launcher).
+Command: target/release/ic descent --json --out <file> --families K,R --cells <n:n':2 ...>
+--targets 8 --repeats 3 --budget-seconds 300 --solver fes-f2 --solver f4-f2 --solver inherited-f4
+--solver m4gb-f2, with M4GB_BINARY pointing at a directory of solver_m4gb_n<N>_gf2 binaries
+(patched upstream 01860a52, patches in third_party/m4gb-patches/, built by scripts/m4gb/build.sh).
+Benchmark record: benchmarks/records/20261110T1513Z-m4gb-descent-ladder.json (open).
 
-## State
-Gate A passed. The 4 positive controls refute at degree 4. Whole-summand runs: l = 7 and 8 done; l = 9 has 14 of 16 done, all degree 4 for nonzero x1. S5.d1.b0 refutes at degree 4 (a surprise against K_marginal). The remaining 129 branches are moving to a RunPod pod (PREREGISTRATION Amendment 1, owner chose the cloud route; $30 cap).
+## State (closed 18:50Z: ladder measured, record closed, PR #3819 pending auto-merge)
+Branch restarted on origin/main after PR #3812 merged. M4GB binaries in the session scratchpad
+(not in Git; rebuild with scripts/m4gb/build.sh n16_gf2 ... n64_gf2). `ic` release build in
+progress. Conductor, ecdb, research-kb and isolab tooling unreachable in this container.
 
 ## Next steps
-1. Launch: research/koblitz_ic_leads_build_20261024/pod/upload_launch.py run --name dreg-s5-l9 --vcpu 64 --flavors cpu3g --disk 40 --max-seconds 18000 <the 4 input files>, then push them.
-2. Fetch https://<pod>-8000.proxy.runpod.net/runs/ when STATUS reads ALLDONE; copy the records into runs/; stop the pod.
-3. Score both preregistrations, then write RESULTS, the graph and the PDF, the session log, and update PR #3512.
-
-## Runs in flight
-RunPod pod dreg-s5-l9 (id recorded in runs/queue.log once created).
-
-## Stop and success conditions
-About 12 h of container time at most. The decision rule is in the PREREGISTRATION.
-
-## Open questions
-Whether pe_closure fits about 196k columns in 15 GB.
+1. Smoke test one cell (11:6:2, K, 2 targets); then run_ladder.sh under `benchrec.py run`.
+2. Summarise per cell: median wall per engine, ratio to fes-f2 and to f4-f2, agreement with the
+   reference; graph + PDF; close the record; benchmarks entry (no table row: stage diagnostic).
+3. Session log entry; PR from this branch; auto-merge once complete.

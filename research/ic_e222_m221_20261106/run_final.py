@@ -25,7 +25,7 @@ def run(f,d,seed,arm,fb,t):
         total_ms=st.get("total_ms"),wall_ms=wall,trials=st.get("trials_total"),rels=st.get("relations_collected"))
 os.makedirs(out,exist_ok=True);t=os.path.join(out,"_t.json")
 if phase=="tune":
-    files=[f for f in sorted(glob.glob(inst+"/*.json")) if idx(f)<10]
+    files=[f for f in sorted(glob.glob(inst+"/W*.json")) if idx(f)<10]
     jobs=[(f,json.load(open(f)),1,a,fb) for f in files for a in ("B","C","Bh","Eh","D") for fb in FBS]
     random.Random("tune-v1").shuffle(jobs)
     rows=[run(f,d,s,a,fb,t) for f,d,s,a,fb in jobs]
@@ -36,7 +36,7 @@ if phase=="tune":
     json.dump(frozen,open(os.path.join(out,"frozen.json"),"w"));json.dump(rows,open(os.path.join(out,"tune_rows.json"),"w"))
 else:
     frozen=json.load(open(os.path.join(out,"frozen.json")))
-    files=[f for f in sorted(glob.glob(inst+"/*.json")) if 10<=idx(f)<30]
+    files=[f for f in sorted(glob.glob(inst+"/W*.json")) if 10<=idx(f)<30]
     jobs=[(f,json.load(open(f)),s,a,frozen[a]) for f in files for s in (1,2) for a in frozen]
     random.Random("eval-v1").shuffle(jobs)
     rows=[run(f,d,s,a,fb,t) for f,d,s,a,fb in jobs]

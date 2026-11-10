@@ -922,24 +922,26 @@ pub fn double_scalar_mul_vartime(
     acc
 }
 
-/// `R = aG + bQ` for the relation search.  `IC_SHAMIR=1` selects
-/// [`double_scalar_mul_vartime`], `IC_SHAMIR=2` the variable-time control;
-/// the default is the two separate ladders.
+/// `R = aG + bQ` for the relation search.  The default is
+/// [`Point::double_scalar_mul_vartime`] (public scalars: variable time, one
+/// interleaved word-Jacobian pass).  `IC_SHAMIR` selects an older path, kept
+/// for the controlled comparison in `RESULTS_shamir.md`: `0` the original
+/// two `scalar_mul` ladders and `add`, `1` the affine interleave, `2` two
+/// `scalar_mul_vartime` ladders and `add_vartime`.  All return the same point.
 fn relation_point(g: &Point, a: &BigUint, q: &Point, b: &BigUint, a_fe: &FieldElement) -> Point {
-    // 0 (default): two `scalar_mul` ladders and `add`; 1: one interleaved
-    // pass; 2: control, two `scalar_mul_vartime` ladders and `add_vartime`
-    // (separates the arithmetic path from the interleaving).
     static MODE: std::sync::OnceLock<u8> = std::sync::OnceLock::new();
     match *MODE.get_or_init(|| match std::env::var("IC_SHAMIR").as_deref() {
+        Ok("0") => 0,
         Ok("1") => 1,
         Ok("2") => 2,
-        _ => 0,
+        _ => 3,
     }) {
+        0 => g.scalar_mul(a, a_fe).add(&q.scalar_mul(b, a_fe), a_fe),
         1 => double_scalar_mul_vartime(g, a, q, b, a_fe),
         2 => g
             .scalar_mul_vartime(a, a_fe)
             .add_vartime(&q.scalar_mul_vartime(b, a_fe), a_fe),
-        _ => g.scalar_mul(a, a_fe).add(&q.scalar_mul(b, a_fe), a_fe),
+        _ => g.double_scalar_mul_vartime(a, q, b, a_fe),
     }
 }
 
@@ -1009,7 +1011,101 @@ fn find_one_relation_counted_with_rng<R: rand::RngCore>(
     rng: &mut R,
 ) -> Option<(Relation, usize)> {
     let x_to_idx = factor_base_x_index(factor_base);
-    find_one_relation_sweep_with_index(curve, g, q, factor_base, &x_to_idx, max_trials, rng)
+    find_one_relation_sweep_with_index(curve, g, q, factor_base, &x_to_idx, None, max_trials, rng)
+}
+
+/// The sweep's inner loop on `u64` words (small odd prime fields below 2^40): the same candidate set,
+/// in the same order, as the `BigUint` loop in [`find_one_relation_sweep_with_index`].  Experimental
+/// (`IC_FAST_SWEEP=1`, which also hoists the x-index); the default sweep is unchanged.  The design and
+/// the equality of results were first established by an independent validator's probe.
+struct WordSweep {
+    p: u64,
+    a: u64,
+    b: u64,
+    xs: Vec<Option<u64>>,
+    in_fb: Vec<bool>,
+}
+
+impl WordSweep {
+    fn new(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> Option<Self> {
+        let word = |v: &BigUint| v.to_u64_digits().first().copied().unwrap_or(0);
+        let pd = curve.p.to_u64_digits();
+        if pd.len() != 1 || pd[0] <= 2 || pd[0].is_multiple_of(2) || pd[0] >= (1u64 << 40) {
+            return None;
+        }
+        let xs: Vec<Option<u64>> = factor_base
+            .iter()
+            .map(|e| match &e.point {
+                Point::Affine { x, .. } => Some(word(&x.value)),
+                Point::Infinity => None,
+            })
+            .collect();
+        let max_x = xs.iter().flatten().copied().max().unwrap_or(0) as usize;
+        let mut in_fb = vec![false; max_x + 1];
+        for x in xs.iter().flatten() {
+            in_fb[*x as usize] = true;
+        }
+        Some(Self {
+            p: pd[0],
+            a: word(&curve.a),
+            b: word(&curve.b),
+            xs,
+            in_fb,
+        })
+    }
+
+    /// Candidate third coordinates `X` of `S_3(x1, x2, X) = 0` for factor-base element `i`, in the order
+    /// the `BigUint` loop tries them (the `+` root, then the `-` root; one candidate in the linear case).
+    fn candidates(&self, x1: u64, x2: u64) -> [Option<u64>; 2] {
+        let pw = self.p;
+        let m = |u: u64, v: u64| ((u as u128 * v as u128) % pw as u128) as u64;
+        let ad = |u: u64, v: u64| {
+            let s = u + v;
+            if s >= pw {
+                s - pw
+            } else {
+                s
+            }
+        };
+        let sb = |u: u64, v: u64| if u >= v { u - v } else { u + pw - v };
+        let ng = |u: u64| if u == 0 { 0 } else { pw - u };
+        let two_b = ad(self.b, self.b);
+        let four_b = ad(two_b, two_b);
+        let x1x2 = m(x1, x2);
+        let sum = ad(x1, x2);
+        let diff = sb(x1, x2);
+        let qa = m(diff, diff);
+        let inner = ad(m(sum, ad(x1x2, self.a)), two_b);
+        let qb = ng(ad(inner, inner));
+        let part = sb(x1x2, self.a);
+        let qc = sb(m(part, part), m(four_b, sum));
+        let mut out = [None, None];
+        if qa == 0 {
+            if qb == 0 {
+                return out;
+            }
+            if let Some(inv) = inv_mod_u64(qb, pw) {
+                out[0] = Some(m(ng(qc), inv));
+            }
+            return out;
+        }
+        let four_qa = ad(ad(qa, qa), ad(qa, qa));
+        let disc = sb(m(qb, qb), m(four_qa, qc));
+        let sq = if disc == 0 {
+            0
+        } else {
+            match sqrt_mod_p_u64(disc, pw) {
+                Some(v) => v,
+                None => return out,
+            }
+        };
+        let Some(two_qa_inv) = inv_mod_u64(ad(qa, qa), pw) else {
+            return out;
+        };
+        out[0] = Some(m(ad(ng(qb), sq), two_qa_inv));
+        out[1] = Some(m(ad(ng(qb), ng(sq)), two_qa_inv));
+        out
+    }
 }
 
 /// The square-root sweep with a prebuilt x-index.  The default path builds the
@@ -1020,6 +1116,7 @@ fn find_one_relation_sweep_with_index<R: rand::RngCore>(
     q: &Point,
     factor_base: &[FactorBaseEntry],
     x_to_idx: &std::collections::HashMap<BigUint, usize>,
+    word: Option<&WordSweep>,
     max_trials: usize,
     rng: &mut R,
 ) -> Option<(Relation, usize)> {
@@ -1043,6 +1140,32 @@ fn find_one_relation_sweep_with_index<R: rand::RngCore>(
             Point::Affine { x, .. } => x.clone(),
             Point::Infinity => continue,
         };
+
+        if let Some(w) = word {
+            let x1 = xr.value.to_u64_digits().first().copied().unwrap_or(0);
+            for (i, fb_i) in factor_base.iter().enumerate() {
+                let Some(x2) = w.xs[i] else { continue };
+                for c in w.candidates(x1, x2).into_iter().flatten() {
+                    if !((c as usize) < w.in_fb.len() && w.in_fb[c as usize]) {
+                        continue;
+                    }
+                    let candidate = curve.fe(BigUint::from(c));
+                    if let Some(rel) = try_finalise(
+                        &r,
+                        &fb_i.point,
+                        &candidate,
+                        x_to_idx,
+                        factor_base,
+                        curve,
+                        &a,
+                        &b,
+                    ) {
+                        return Some((rel, trial));
+                    }
+                }
+            }
+            continue;
+        }
 
         // Sweep each factor-base element F_i; solve
         // S₃(x_R, x_{F_i}, X) = 0  for X via the quadratic formula.
@@ -1775,26 +1898,24 @@ type PairSumTable = std::collections::HashMap<(BigUint, BigUint), (usize, i64, u
 fn build_pair_sum_table(curve: &CurveParams, factor_base: &[FactorBaseEntry]) -> PairSumTable {
     let a_fe = curve.a_fe();
     let mut table = PairSumTable::with_capacity(factor_base.len() * factor_base.len() * 2);
+    let mut put = |pt: &Point, key: (usize, i64, usize, i64)| {
+        if let Point::Affine { x, y } = pt {
+            table
+                .entry((x.value.clone(), y.value.clone()))
+                .or_insert(key);
+        }
+    };
+    // Negation is free on a curve: -(F_i + F_j) = (-F_i) + (-F_j) and -(F_i - F_j) = (-F_i) + F_j, so two
+    // (variable-time) additions per pair give all four sign combinations.
     for (i, fi) in factor_base.iter().enumerate() {
         for (j, fj) in factor_base.iter().enumerate().skip(i) {
-            for s_i in [1i64, -1i64] {
-                for s_j in [1i64, -1i64] {
-                    let pi = if s_i > 0 {
-                        fi.point.clone()
-                    } else {
-                        fi.point.neg()
-                    };
-                    let pj = if s_j > 0 {
-                        fj.point.clone()
-                    } else {
-                        fj.point.neg()
-                    };
-                    if let Point::Affine { x, y } = pi.add(&pj, &a_fe) {
-                        table
-                            .entry((x.value.clone(), y.value.clone()))
-                            .or_insert((i, s_i, j, s_j));
-                    }
-                }
+            let sum = fi.point.add_vartime(&fj.point, &a_fe);
+            put(&sum, (i, 1, j, 1));
+            put(&sum.neg_vartime(), (i, -1, j, -1));
+            if i != j {
+                let dif = fi.point.add_vartime(&fj.point.neg_vartime(), &a_fe);
+                put(&dif, (i, 1, j, -1));
+                put(&dif.neg_vartime(), (i, -1, j, 1));
             }
         }
     }
@@ -1851,6 +1972,130 @@ fn find_one_relation_table_with_rng<R: rand::RngCore>(
     None
 }
 
+/// r-adding walk state for relation sampling (experimental, `IC_WALK=1` with `IC_SUM_TABLE=1`).
+/// Each step adds one of `WALK_ARMS` precomputed points `a_k G + b_k Q` to the current point,
+/// tracking (a, b) mod n, so a trial costs one point addition instead of two scalar multiplications.
+struct SampleWalk {
+    r: Point,
+    a: BigUint,
+    b: BigUint,
+    arms: Vec<(Point, BigUint, BigUint)>,
+    steps: usize,
+}
+
+const WALK_ARMS: usize = 32;
+/// A walk whose step depends only on x enters a cycle after about sqrt(n) steps, so it is
+/// restarted from fresh random coefficients every `WALK_RESTART` steps.
+const WALK_RESTART: usize = 32;
+
+impl SampleWalk {
+    fn new<R: rand::RngCore>(curve: &CurveParams, g: &Point, q: &Point, rng: &mut R) -> Self {
+        use num_bigint::RandBigInt;
+        let a_fe = curve.a_fe();
+        let nonzero = |rng: &mut R| loop {
+            let v = rng.gen_biguint_below(&curve.n);
+            if !v.is_zero() {
+                break v;
+            }
+        };
+        let mut arms = Vec::with_capacity(WALK_ARMS);
+        for _ in 0..WALK_ARMS {
+            let (a, b) = (nonzero(rng), nonzero(rng));
+            let pt = relation_point(g, &a, q, &b, &a_fe);
+            arms.push((pt, a, b));
+        }
+        let (a, b) = (nonzero(rng), nonzero(rng));
+        let r = relation_point(g, &a, q, &b, &a_fe);
+        SampleWalk {
+            r,
+            a,
+            b,
+            arms,
+            steps: 0,
+        }
+    }
+
+    fn restart<R: rand::RngCore>(
+        &mut self,
+        curve: &CurveParams,
+        g: &Point,
+        q: &Point,
+        rng: &mut R,
+    ) {
+        use num_bigint::RandBigInt;
+        let a_fe = curve.a_fe();
+        let nonzero = |rng: &mut R| loop {
+            let v = rng.gen_biguint_below(&curve.n);
+            if !v.is_zero() {
+                break v;
+            }
+        };
+        let (a, b) = (nonzero(rng), nonzero(rng));
+        self.r = relation_point(g, &a, q, &b, &a_fe);
+        self.a = a;
+        self.b = b;
+        self.steps = 0;
+    }
+
+    fn step(&mut self, curve: &CurveParams) {
+        let a_fe = curve.a_fe();
+        self.steps += 1;
+        let k = match &self.r {
+            Point::Affine { x, .. } => {
+                (x.value.iter_u64_digits().next().unwrap_or(0) as usize) % WALK_ARMS
+            }
+            Point::Infinity => 0,
+        };
+        let (pt, ak, bk) = &self.arms[k];
+        self.r = self.r.add_vartime(pt, &a_fe);
+        self.a = (&self.a + ak) % &curve.n;
+        self.b = (&self.b + bk) % &curve.n;
+    }
+}
+
+/// Table lookup on an r-adding walk instead of fresh random (a, b).
+fn find_one_relation_table_walk<R: rand::RngCore>(
+    curve: &CurveParams,
+    g: &Point,
+    q: &Point,
+    table: &PairSumTable,
+    walk: &mut SampleWalk,
+    max_trials: usize,
+    rng: &mut R,
+) -> Option<(Relation, usize)> {
+    for trial in 1..=max_trials {
+        if walk.steps >= WALK_RESTART || matches!(walk.r, Point::Infinity) {
+            walk.restart(curve, g, q, rng);
+        }
+        walk.step(curve);
+        let key = match &walk.r {
+            Point::Affine { x, y } => (x.value.clone(), y.value.clone()),
+            Point::Infinity => continue,
+        };
+        if let Some(&(i, s_i, j, s_j)) = table.get(&key) {
+            let mut entries = Vec::new();
+            if i == j {
+                let combined = s_i + s_j;
+                if combined != 0 {
+                    entries.push((i, combined));
+                }
+            } else {
+                entries.push((i, s_i));
+                entries.push((j, s_j));
+            }
+            return Some((
+                Relation {
+                    coef_a: walk.a.clone(),
+                    coef_b: walk.b.clone(),
+                    entries,
+                },
+                trial,
+            ));
+        }
+    }
+    None
+}
+
 fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
     curve: &CurveParams,
     g: &Point,
@@ -1886,8 +2131,20 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
         None
     };
     // Experimental: IC_HOIST_SWEEP=1 builds the sweep's x-index once per solve.
-    let hoisted_index = if std::env::var("IC_HOIST_SWEEP").as_deref() == Ok("1") {
+    let fast_sweep = std::env::var("IC_FAST_SWEEP").as_deref() == Ok("1");
+    let hoisted_index = if fast_sweep || std::env::var("IC_HOIST_SWEEP").as_deref() == Ok("1") {
         Some(factor_base_x_index(&fb))
+    } else {
+        None
+    };
+    let word_sweep = if fast_sweep {
+        WordSweep::new(curve, &fb)
+    } else {
+        None
+    };
+    // Experimental: IC_WALK=1 (with IC_SUM_TABLE=1) samples along an r-adding walk.
+    let mut walk = if sum_table.is_some() && std::env::var("IC_WALK").as_deref() == Ok("1") {
+        Some(SampleWalk::new(curve, g, q, rng))
     } else {
         None
     };
@@ -1900,6 +2157,15 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
         let found = 'attempt: {
             for _ in 0..max_relation_attempts {
                 let attempt = match &sum_table {
+                    Some(t) if walk.is_some() => find_one_relation_table_walk(
+                        curve,
+                        g,
+                        q,
+                        t,
+                        walk.as_mut().expect("walk checked"),
+                        max_trials_per_relation,
+                        rng,
+                    ),
                     Some(t) => find_one_relation_table_with_rng(
                         curve,
                         g,
@@ -1915,6 +2181,7 @@ fn ec_index_calculus_dlp_staged_with_rng<R: rand::RngCore>(
                             q,
                             &fb,
                             ix,
+                            word_sweep.as_ref(),
                             max_trials_per_relation,
                             rng,
                         ),
@@ -2262,6 +2529,28 @@ mod tests {
         }
     }
 
+    /// `Point::double_scalar_mul_vartime` equals two ladders plus an add,
+    /// including `Q = -G` and zero scalars.
+    #[test]
+    fn point_double_scalar_mul_vartime_matches_two_ladders() {
+        let curve = tiny_curve();
+        let a_fe = curve.a_fe();
+        let g = curve.generator();
+        let q = g.scalar_mul(&BigUint::from(190u32), &a_fe);
+        let neg_g = g.scalar_mul(&(&curve.n - BigUint::one()), &a_fe);
+        for other in [&q, &neg_g, &g] {
+            for a in 0u32..60 {
+                for b in 0u32..60 {
+                    let (a, b) = (BigUint::from(a * 5), BigUint::from(b * 13 + (a % 3)));
+                    let want = g
+                        .scalar_mul(&a, &a_fe)
+                        .add(&other.scalar_mul(&b, &a_fe), &a_fe);
+                    assert_eq!(g.double_scalar_mul_vartime(&a, other, &b, &a_fe), want);
+                }
+            }
+        }
+    }
+
     /// Shamir interleaving equals two separate ladders plus an add.
     #[test]
     fn double_scalar_mul_matches_two_ladders() {
@@ -2361,6 +2650,169 @@ mod tests {
             gy: BigUint::from(7u32),
             n: BigUint::from(281u32),
             h: 1,
+        }
+    }
+
+    /// Sum of signed multiples of factor-base points, by the plain group law.
+    fn fb_combination(
+        curve: &CurveParams,
+        fb: &[FactorBaseEntry],
+        entries: &[(usize, i64)],
+    ) -> Point {
+        let a_fe = curve.a_fe();
+        let mut acc = Point::Infinity;
+        for &(idx, m) in entries {
+            let base = if m > 0 {
+                fb[idx].point.clone()
+            } else {
+                fb[idx].point.neg()
+            };
+            let term = base.scalar_mul(&BigUint::from(m.unsigned_abs()), &a_fe);
+            acc = acc.add(&term, &a_fe);
+        }
+        acc
+    }
+
+    /// The pair-sum table (two variable-time additions per pair, negation
+    /// free) holds exactly the keys of the plain four-addition build, and
+    /// every entry is a true decomposition `s_i F_i + s_j F_j`.
+    #[test]
+    fn pair_sum_table_is_exactly_the_four_sign_combinations() {
+        let curve = tiny_curve();
+        let a_fe = curve.a_fe();
+        let fb = build_factor_base(&curve, 12);
+        let table = build_pair_sum_table(&curve, &fb);
+        let mut reference = std::collections::HashSet::new();
+        for i in 0..fb.len() {
+            for j in i..fb.len() {
+                for s_i in [1i64, -1] {
+                    for s_j in [1i64, -1] {
+                        let pi = if s_i > 0 {
+                            fb[i].point.clone()
+                        } else {
+                            fb[i].point.neg()
+                        };
+                        let pj = if s_j > 0 {
+                            fb[j].point.clone()
+                        } else {
+                            fb[j].point.neg()
+                        };
+                        if let Point::Affine { x, y } = pi.add(&pj, &a_fe) {
+                            reference.insert((x.value.clone(), y.value.clone()));
+                        }
+                    }
+                }
+            }
+        }
+        let keys: std::collections::HashSet<_> = table.keys().cloned().collect();
+        assert_eq!(
+            keys, reference,
+            "table keys differ from the four-addition build"
+        );
+        for ((x, y), &(i, s_i, j, s_j)) in &table {
+            let pi = if s_i > 0 {
+                fb[i].point.clone()
+            } else {
+                fb[i].point.neg()
+            };
+            let pj = if s_j > 0 {
+                fb[j].point.clone()
+            } else {
+                fb[j].point.neg()
+            };
+            match pi.add(&pj, &a_fe) {
+                Point::Affine { x: x2, y: y2 } => {
+                    assert_eq!(
+                        (&x2.value, &y2.value),
+                        (x, y),
+                        "entry is not its own decomposition"
+                    )
+                }
+                Point::Infinity => panic!("an infinity sum was stored"),
+            }
+        }
+    }
+
+    /// Every relation found by the table lookup and by the restarted walk
+    /// satisfies `a G + b Q = sum of its signed factor-base terms`; the walk
+    /// keeps `r = a G + b Q` through steps and restarts.
+    #[test]
+    fn table_and_walk_relations_are_true_identities() {
+        use rand::SeedableRng;
+        let curve = tiny_curve();
+        let a_fe = curve.a_fe();
+        let g = Point::Affine {
+            x: FieldElement::new(curve.gx.clone(), curve.p.clone()),
+            y: FieldElement::new(curve.gy.clone(), curve.p.clone()),
+        };
+        let q = g.scalar_mul(&BigUint::from(57u32), &a_fe);
+        let fb = build_factor_base(&curve, 12);
+        let table = build_pair_sum_table(&curve, &fb);
+        let check = |rel: &Relation| {
+            let lhs = g
+                .scalar_mul(&rel.coef_a, &a_fe)
+                .add(&q.scalar_mul(&rel.coef_b, &a_fe), &a_fe);
+            assert_eq!(lhs, fb_combination(&curve, &fb, &rel.entries));
+        };
+        let mut rng = rand::rngs::StdRng::seed_from_u64(7);
+        for _ in 0..20 {
+            let (rel, _) =
+                find_one_relation_table_with_rng(&curve, &g, &q, &table, 100_000, &mut rng)
+                    .expect("table relation");
+            check(&rel);
+        }
+        let mut walk = SampleWalk::new(&curve, &g, &q, &mut rng);
+        for _ in 0..200 {
+            let (rel, _) =
+                find_one_relation_table_walk(&curve, &g, &q, &table, &mut walk, 100_000, &mut rng)
+                    .expect("walk relation");
+            check(&rel);
+            let on_curve = g
+                .scalar_mul(&walk.a, &a_fe)
+                .add(&q.scalar_mul(&walk.b, &a_fe), &a_fe);
+            assert_eq!(walk.r, on_curve, "walk lost r = aG + bQ");
+        }
+    }
+
+    /// The `u64` word sweep returns exactly the relations, and the same trial
+    /// counts, as the `BigUint` sweep when both consume the same random stream.
+    #[test]
+    fn word_sweep_matches_the_biguint_sweep() {
+        use rand::SeedableRng;
+        let curve = tiny_curve();
+        let a_fe = curve.a_fe();
+        let g = Point::Affine {
+            x: FieldElement::new(curve.gx.clone(), curve.p.clone()),
+            y: FieldElement::new(curve.gy.clone(), curve.p.clone()),
+        };
+        let q = g.scalar_mul(&BigUint::from(101u32), &a_fe);
+        for fb_size in [6usize, 12] {
+            let fb = build_factor_base(&curve, fb_size);
+            let x_to_idx = factor_base_x_index(&fb);
+            let word = WordSweep::new(&curve, &fb).expect("271 is a word prime");
+            let mut rng_a = rand::rngs::StdRng::seed_from_u64(11 + fb_size as u64);
+            let mut rng_b = rand::rngs::StdRng::seed_from_u64(11 + fb_size as u64);
+            for _ in 0..40 {
+                let slow = find_one_relation_sweep_with_index(
+                    &curve, &g, &q, &fb, &x_to_idx, None, 100_000, &mut rng_a,
+                )
+                .expect("BigUint sweep relation");
+                let fast = find_one_relation_sweep_with_index(
+                    &curve,
+                    &g,
+                    &q,
+                    &fb,
+                    &x_to_idx,
+                    Some(&word),
+                    100_000,
+                    &mut rng_b,
+                )
+                .expect("word sweep relation");
+                assert_eq!(slow.1, fast.1, "trial counts differ");
+                assert_eq!(slow.0.coef_a, fast.0.coef_a);
+                assert_eq!(slow.0.coef_b, fast.0.coef_b);
+                assert_eq!(slow.0.entries, fast.0.entries);
+            }
         }
     }
 

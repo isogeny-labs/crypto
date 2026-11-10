@@ -131,6 +131,18 @@ pub enum CurveSpec {
         seed: u64,
         max_cofactor: u64,
     },
+    /// `ecbench::xline_bin::find_bin_curve_a0(m, seed, max_cofactor)`: the
+    /// curve `y² + xy = x³ + b` (`a = 0`, so `Tr(a) = 0`) over the same tower
+    /// `F_{q⁴}`, `q = 2^m`, `4 ≤ m ≤ 15`, `b ∉ F_{q²}`, `#E = h·r`, `r`
+    /// prime, `h ≤ max_cofactor`: the C1 end-to-end study's family
+    /// (`research/c1_end_to_end_solve_20261107`), on which the twisted
+    /// all-lift line exists.  Built as an `f2m4_torsion` instance, so every
+    /// method that runs there runs here.
+    F2m4A0 {
+        m: u32,
+        seed: u64,
+        max_cofactor: u64,
+    },
     /// A binary curve given outright in polynomial basis. `modulus` is
     /// the complete integer bitmask, including its degree-`n` leading bit.
     /// The constructor checks irreducibility, subgroup divisibility,
@@ -430,6 +442,8 @@ impl CurveSpec {
                         word("generator x", &params.gx)?,
                         word("generator y", &params.gy)?,
                     ),
+
+                    representation: None,
                 };
                 instance.name = instance.curve_id().slug;
                 Ok(Instance::Prime(instance))
@@ -506,6 +520,8 @@ impl CurveSpec {
                     r,
                     cofactor: group_order / r,
                     generator: (gx, gy),
+
+                    representation: None,
                 };
                 inst.name = inst.curve_id().slug;
                 Ok(Instance::Prime(inst))
@@ -548,6 +564,12 @@ impl CurveSpec {
                 }
                 find_bin_curve(m, seed, max_cofactor).map(|c| Instance::F2m4(Box::new(c)))
             }
+            CurveSpec::F2m4A0 {
+                m,
+                seed,
+                max_cofactor,
+            } => crate::cryptanalysis::ecbench::xline_bin::find_bin_curve_a0(m, seed, max_cofactor)
+                .map(|c| Instance::F2m4(Box::new(c))),
             CurveSpec::Fp4Translation { p, seed } => {
                 Fp4Instance::build(p, seed).map(|i| Instance::Fp4(Box::new(i)))
             }
@@ -749,6 +771,11 @@ impl CurveSpec {
                 seed,
                 max_cofactor,
             } => format!("gaudry_quartic_bin::find_bin_curve({m}, {seed}, {max_cofactor})"),
+            CurveSpec::F2m4A0 {
+                m,
+                seed,
+                max_cofactor,
+            } => format!("ecbench::xline_bin::find_bin_curve_a0({m}, {seed}, {max_cofactor})"),
             CurveSpec::Fp4Translation { p, seed } => {
                 format!("quartic_folds::generate_translation_instance({p}, {seed}, 16)")
             }

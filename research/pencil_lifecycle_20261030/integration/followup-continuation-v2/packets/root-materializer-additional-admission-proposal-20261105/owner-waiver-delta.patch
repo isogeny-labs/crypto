@@ -1,0 +1,44 @@
+--- root-library-durable-validation-20261105/v2-draft/durable_io.py
++++ root-library-runtime-preparation-20261105/durable_io.owner-waiver-v3.py
+@@ -37,28 +37,31 @@
+ 
+ def load_admission(packet):
+     p=Path(packet);a=json.loads((p/'admission.json').read_text())
+-    assert a['schema']=='durable-root-library-admission/v2' and a['admitted'] is True
++    assert a['schema']=='durable-root-library-admission/owner-waiver-v3' and a['admitted'] is True
+     recipe=json.loads((p/'recipe-proposal.json').read_text())
+     for name in ['limits','uid','gid','exact_tests','attempts','automatic_retry','launch_command']:
+         assert a[name]==recipe[name],name
+     assert a['attempts']==1 and a['automatic_retry'] is False
+     assert len(a['exact_tests'])==4 and len(set(a['exact_tests']))==4
+-    cost=a['cost'];ceiling=cost['finite_dollar_ceiling_usd'];estimate=cost['worst_case_incremental_usd']
+-    assert finite_number(ceiling) and ceiling>0 and finite_number(estimate) and 0<estimate<=ceiling
++    waiver=a['owner_dollar_waiver']
++    assert waiver['scope']=='dollar-accounting-admission-only'
++    assert waiver['approved'] is True
+     for n,digest in a['recipe_files'].items():
+         assert Path(n).name==n and hashlib.sha256((p/n).read_bytes()).hexdigest()==digest,n
+     required={'durable_io.py','durable-launcher.py','durable-worker.py','source-bindings.json','fixture.json','candidate.patch','recipe-proposal.json','materialized-inputs.json'}
+     assert required<=set(a['recipe_files'])
+-    for field,obj in [('publication',a['publication']),('cost_allocation',cost)]:
++    for field,obj in [('publication',a['publication']),('owner_dollar_waiver',waiver)]:
+         path=p/obj['receipt_file'];assert path.parent==p
+         assert hashlib.sha256(path.read_bytes()).hexdigest()==obj['receipt_sha256']
+     pub=a['publication'];assert pub['verified_github_commit']
+-    allocation=json.loads((p/cost['receipt_file']).read_text())
+-    assert allocation['approved'] is True and allocation['one_attempt_limit']==1
+-    for k in ['total_ceiling_usd','existing_debit_usd','maximum_incremental_usd']:
+-        assert finite_number(allocation[k]) and allocation[k]>=0
+-    assert ceiling<=allocation['maximum_incremental_usd']
+-    assert allocation['existing_debit_usd']+ceiling<=allocation['total_ceiling_usd']
++    approval=json.loads((p/waiver['receipt_file']).read_text())
++    assert approval['approved'] is True and approval['scope']=='dollar-accounting-admission-only'
++    assert approval['owner_instruction']=='ignore dollar facts and run'
++    # Parent supplies the exact recorded instruction receipt; no dollar values invented.
++    assert a['absolute_deadline']=='2026-11-06T04:00:00+00:00'
++    assert a['campaign_remaining_worker_seconds']>=a['limits']['total_seconds']
++    assert type(a['campaign_remaining_worker_seconds']) is int
++    assert a['campaign_remaining_worker_seconds']<=46500
+     assert a['inputs_sha256']==a['recipe_files']['materialized-inputs.json']
+     assert set(a['lease'])=={'task_id','attempt_id','lease_id','fencing_epoch'}
+     assert type(a['lease']['fencing_epoch']) is int and a['lease']['fencing_epoch']>0
