@@ -11054,11 +11054,19 @@ mod engine_items_tests {
         )
     }
 
+    /// A counter from the report's counters, else from a phase's native
+    /// counters (the pipeline reports the target walk's under `relations`).
     fn counter(rep: &SolveReport, name: &str) -> Option<u64> {
+        let hit = |k: &String| k.as_str() == name || k.ends_with(&format!(".{name}"));
         rep.counters
             .iter()
-            .find(|(k, _)| k.as_str() == name || k.ends_with(&format!(".{name}")))
+            .find(|(k, _)| hit(k))
             .map(|(_, v)| *v)
+            .or_else(|| {
+                rep.phases
+                    .iter()
+                    .find_map(|p| p.native.iter().find(|(k, _)| hit(k)).map(|(_, v)| *v))
+            })
     }
 
     fn phases_sum(id: &str, rep: &SolveReport) {
