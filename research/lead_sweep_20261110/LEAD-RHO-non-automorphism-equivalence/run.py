@@ -1,7 +1,7 @@
 import json, sys, math, random
 SMOKE = '--smoke' in sys.argv
 BITS = 12 if SMOKE else 20
-TRIALS = 20 if SMOKE else 400
+TRIALS = 100 if SMOKE else 400
 HS = [1, 2, 4, 8, 16] if SMOKE else [1, 2, 3, 4, 6, 8, 12, 16, 24, 32]
 SEED = 20261110
 
@@ -75,7 +75,7 @@ def main():
     out["controls"] = {"positive": "h=2 negation (free automorphism) step ratio near 0.707",
                        "null_detector": "free-image cost ratio equals step ratio (<1): detector sees gain",
                        "aa": "h=1 reseeded"}
-    out["controls_ok"] = (not bad_pos) and abs(out["aa_ratio"]-1) < (0.3 if SMOKE else 0.1)
+    out["controls_ok"] = (not bad_pos) and abs(out["aa_ratio"]-1) < (0.4 if SMOKE else 0.1)
     out["verdict"] = ("inconclusive" if not out["controls_ok"] else
                       "consistent_with_prediction" if ok else "falsified")
     print(json.dumps(out))

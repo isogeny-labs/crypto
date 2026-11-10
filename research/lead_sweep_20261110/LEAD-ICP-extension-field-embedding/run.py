@@ -64,7 +64,7 @@ def setup(p, rng):
         r = N2
         for q in fac:
             while r % q == 0 and C.mul(r//q, G) is None: r //= q
-        if r * 40 < N2 or r < 200: continue
+        if r * 40 < N2 or r < 150: continue
         return C, FB, N2, G, r
 
 def coverage(C, S, N2):
@@ -103,7 +103,7 @@ def fit(xs, ys):
 
 def main():
     smoke = "--smoke" in sys.argv
-    primes = [31, 43] if smoke else [67, 103, 151, 211, 307, 431, 607]
+    primes = [67, 83] if smoke else [67, 103, 151, 211, 307, 431, 607]
     trials = 4 if smoke else 40
     rows = []
     for p in primes:
