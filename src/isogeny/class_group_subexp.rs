@@ -591,6 +591,7 @@ pub fn collect_relations(fb: &[FbPrime], params: &SieveParams) -> (Vec<Relation>
     // a product, later passes revisit the columns still missing
     let covered: Vec<AtomicBool> = (0..n).map(|_| AtomicBool::new(false)).collect();
     let next_col = AtomicU64::new(0);
+    let t_start = std::time::Instant::now();
     std::thread::scope(|scope| {
         for t in 0..params.threads.max(1) {
             let found = &found;
@@ -602,7 +603,23 @@ pub fn collect_relations(fb: &[FbPrime], params: &SieveParams) -> (Vec<Relation>
             let mut rng = Rng::new(params.seed ^ ((t as u64 + 1) << 32));
             scope.spawn(move || {
                 let mut buf = vec![0u8; 2 * params.half_length as usize + 1];
+                let mut last_report = std::time::Instant::now();
                 while !done.load(Ordering::Relaxed) {
+                    // progress line from the first worker, about once a minute
+                    if t == 0 && last_report.elapsed().as_secs() >= 60 {
+                        last_report = std::time::Instant::now();
+                        let secs = t_start.elapsed().as_secs_f64();
+                        let pr = products.load(Ordering::Relaxed);
+                        let rl = count.load(Ordering::Relaxed);
+                        let rate = rl as f64 / secs.max(1e-9);
+                        let eta = if rate > 0.0 { (target as f64 - rl as f64).max(0.0) / rate } else { f64::INFINITY };
+                        eprintln!(
+                            "[class_group_subexp]     sieving {secs:.0}s: {pr} products, {rl}/{target} relations ({:.2} rel per 1000 products, {:.1} products/s); eta {:.0}s",
+                            1000.0 * rl as f64 / pr.max(1) as f64,
+                            pr as f64 / secs.max(1e-9),
+                            eta
+                        );
+                    }
                     // pick a column to force: the next unvisited one, then any still uncovered
                     let forced = {
                         let j = next_col.fetch_add(1, Ordering::Relaxed) as usize;
