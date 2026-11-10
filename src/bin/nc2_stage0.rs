@@ -102,6 +102,28 @@
 //! Falsification [pcc:unverified]: siblings lose pairs if `E_points > 1.08 x D0` at two of the three sizes for any
 //! `m <= 8`. `E_points < 0.95 x D0` at any size is read as a bug (siblings cannot beat the Poisson law of their count),
 //! not as a gain. Only the per-k aggregate is compared.
+//!
+//! # Sibling pool amendment (`--pool M --siblings m,..`; dated 2026-11-10, written and committed before any pool number was run)
+//!
+//! Owner request after the first sibling result (the symmetric sibling set loses pairs: a collision
+//! `P_t + J_a = P_s + J_b` implies `P_t - J_b = P_s - J_a` with the same row). Break the symmetry: design `SP(m, M)`
+//! is `SB` with these changes only. A pool of M jump vectors (uniform in `Z_r^(2+C)`, fresh per sample, the first M
+//! jumps of `sib_design`) is fixed; each parent `P_t` draws its OWN uniformly random m-subset `S_t` of the pool (from
+//! the point-independent stream, partial Fisher-Yates), emits `P_t +- J_h` for `h` in `S_t`, and the walk continues
+//! `P_{t+1} = P_t + J_{h_t}` with `h_t` uniform in `S_t` (same stream). The duplicate pair above then needs `J_b` in
+//! `S_t` and `J_a` in `S_s`, probability about `(m/M)^2`. The two known-copy children stay skipped, now conditional on
+//! the sets: the minus child `b = h_{t-1}` of `P_t` is skipped (it is `P_{t-1}`), and the minus child `b = h_{t-2}` is
+//! skipped when `h_{t-1}` is in `S_{t-2}` (then it equals the emitted child `P_{t-2} + J_{h_{t-1}}`). Everything else
+//! (start stored, guard, rank K stop, cap, samples, curves, pairing of start and pool prefix across arms) is as for `SB`.
+//!
+//! Arms: (m, M) in {(4, 64), (8, 64), (8, 256), (16, 256)}; nine NC-2 curves, C = 1 and C = 2, n = 2000, seed
+//! 20261108, D0 and D0i controls in the same run (same intervals as above).
+//!
+//! Prediction [pcc:unverified]: `E_points / D0 = 1.00 +- 0.05` for each of the four arms.
+//! Falsification [pcc:unverified]: the pool does not remove the loss if `E_points > 1.08 x D0` at two of three sizes
+//! for (8, 256) (per-k aggregate; both C are checked). Below 0.95 x D0 is read as a bug, as before.
+//! Diagnostic (Python `diag_rows_pool.py`, r = 131203, C = 1, 20 samples): raw collisions per distinct row (up to
+//! sign) for (8, 256); prediction about `1.0 + (m/M)^2` (about 1.001).
 
 use std::collections::HashMap;
 use std::hash::{BuildHasherDefault, Hasher};
