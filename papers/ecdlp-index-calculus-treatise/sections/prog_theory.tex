@@ -97,7 +97,7 @@ $n=33$--45. Neither supports or refutes a subexponential claim.
 When the curve is defined over $\FF_2$ the Frobenius acts on the group,
 and Galbraith, Granger, Merz and Petit~\cite{ggmp2020} show that a
 Frobenius-invariant factor base saves a factor $\approx n$ in relations and
-$\approx n^2$ in linear algebra---more than rho's $\sqrt{2n}$---while
+$\approx n^2$ in linear algebra, more than rho's $\sqrt{2n}$, while
 concluding that Koblitz-curve security is not threatened at deployed sizes.
 Our Koblitz work (\S\ref{sec:koblitz}) builds on this.
 
@@ -113,7 +113,7 @@ from the instance and need only one relation search, improving on both;
 McGuire and Mueller~\cite{mcguire2017} avoid Gr\"obner bases altogether by
 fast evaluation of $\Sem m$ through iterated resultants, and in a second
 variant by summing $m-1$ factor-base points and testing membership of the
-result---the same mechanism as the two-summand root-finding oracle of
+result, the same mechanism as the two-summand root-finding oracle of
 \S\ref{sec:rootfinding}. All of these remain exponential and slower than
 rho; a 2024 analysis (Hu, IACR ePrint 2024/1923, an unrefereed preprint)
 again concludes that no subexponential prime-field method is known.
@@ -128,7 +128,7 @@ retained-set-up (online) results of \S\ref{sec:koblitz} must be read. A
 2026 structured-generic-group bound (Corrigan-Gibbs, Henzinger and Wu,
 IACR ePrint 2026/384; recorded at abstract level, body not read) states
 that an algorithm exploiting structure on only a $\delta$ fraction of
-elements needs $\Omega(\min(\sqrt q,1/\delta))$ time---for index
+elements needs $\Omega(\min(\sqrt q,1/\delta))$ time. For index
 calculus, the decomposable set would have to be dense \emph{and} cheaply
 testable. Whether it covers coordinate access is an open lead
 (\S\ref{sec:um-oracles}).

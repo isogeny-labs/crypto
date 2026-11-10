@@ -10,6 +10,7 @@ use std::path::{Path, PathBuf};
 use tokio_postgres::Client;
 
 pub mod certs;
+pub mod cover_lpoly;
 pub mod covers;
 pub mod derive;
 pub mod ecbench;

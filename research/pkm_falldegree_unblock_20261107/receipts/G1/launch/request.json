@@ -1,0 +1,25 @@
+{
+  "job": {
+    "command": [
+      "/bin/bash",
+      "-c",
+      "set -u; : \"${ISOLAB_RESULTS_URI:?}\"; S=/work/g3c; mkdir -p \"$S/runs\" \"$S/gates\" || exit 2; SRC='s3://isolab-results-104186811093-us-east-2/runs/pfd-c-20261108/3eeef6a6-9565-415c-918c-b3f92801aafc//runs'; for f in C-t2-m2 C-t2-m3 C-t2-m4 C-t2-m5 C-t2-m6 C-t2-m2-p0 C-t2-m3-p0 C-t2-m4-p0 C-t2-m5-p0 C-t2-m6-p0 C-t3-m2 C-t3-m3 C-t3-m4 C-t3-m5 C-t3-m6 C-t3-m2-p0 C-t3-m3-p0 C-t3-m4-p0 C-t3-m5-p0; do aws s3 cp \"$SRC/$f.jsonl\" \"$S/runs/$f.jsonl\" --only-show-errors || exit 3; done; export RAYON_NUM_THREADS=${RAYON_NUM_THREADS:-12}; (cd \"$S/runs\" && sha256sum *.jsonl) > \"$S/gates/g3-inputs.sha256\"; sha256sum /usr/local/bin/pkm_tower_pilot /usr/local/bin/prime_fall_degree_tools > \"$S/binary.sha256\"; { echo \"nproc: $(nproc)\"; echo \"rayon: $RAYON_NUM_THREADS\"; grep -m1 'model name' /proc/cpuinfo; } > \"$S/host.txt\"; /usr/local/bin/prime_fall_degree_tools gate3 \"$S\" /usr/local/bin/pkm_tower_pilot --max-n 20 --jobs 2 --budget 900 > \"$S/gates/g3.log\" 2>&1; rc=$?; grep -q ', 0 disagreements' \"$S/gates/g3.log\" || { [ \"$rc\" = 0 ] && rc=1; }; echo \"g3 exit $rc\" > \"$S/gates/g3.exit\"; aws s3 cp \"$S/binary.sha256\" \"$ISOLAB_RESULTS_URI/binary.sha256\" --only-show-errors; aws s3 cp \"$S/host.txt\" \"$ISOLAB_RESULTS_URI/host.txt\" --only-show-errors; aws s3 sync \"$S/gates\" \"$ISOLAB_RESULTS_URI/gates\" --only-show-errors; exit $rc"
+    ],
+    "cpu": 12,
+    "image": "104186811093.dkr.ecr.us-east-2.amazonaws.com/isolab/tasks@sha256:0d6b2ecd6df3f5f092fe4b6179986b041eb7d6be3b94e52d92809bdab2ff3ae8",
+    "isolation_profile": "standard",
+    "job_name": "pfd-g3c-20261109",
+    "memory": "56Gi",
+    "retries": 0,
+    "seconds": 57600,
+    "wait_seconds": 300
+  },
+  "provenance": {
+    "harness": "claude-code-subagent",
+    "note": "Amendment 11 (R2-D 4.4): stage C G3 only, over the 19 pfd-c-20261108 run files with m <= 6 (F4 engine capacity), frozen gate3 --max-n 20 --jobs 2 --budget 900. Runs before pfd-b and before any pfd-x. Pass: exit 0 and ', 0 disagreements' in gates/g3.log; one or more disagreements stop further PKM submissions (owner decides). Amendment 9 (R2-C, AMENDMENT_R2_C_cpu12.md, frozen 2026-11-08): cpu 14->12 because a 14-vCPU pod cannot be scheduled on cpu-spot (14180m > 14000m allocatable); RAYON_NUM_THREADS=12 from the pod env; instance_type r6i.4xlarge where seconds > 90000 (US$40 per job); every wall budget and seconds unchanged. Amendment 10 (R2-A, AMENDMENT_R2_A_stageB_m6t6.md, frozen 2026-11-08): protocol hash after Amendment 10; no field other than provenance changes. Amendment 11 (R2-D, AMENDMENT_R2_D_g3_scope.md, frozen 2026-11-09): G3 applies at m <= 6 (F4 engine capacity); the stage C G3-only job pfd-g3c-20261109 runs before pfd-b and any pfd-x; one or more G3 disagreements stop further PKM submissions; protocol hash after Amendment 11.",
+    "protocol_sha256": "ef5e18ea8443d75bc61d925fadbb52406d1fe6fcfaf87d68d99a2361cd657cd2",
+    "source_revision": "f13a690df016d0a457bd40579fbb9d054f486adf",
+    "study": "prime_fall_degree"
+  },
+  "schema": "isolab.eks.command-request/v1"
+}

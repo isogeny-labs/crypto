@@ -1584,6 +1584,182 @@ fn iso_census(k: u32, t: u32, seed_lo: u64, seed_hi: u64) {
     }
 }
 
+/// Smallest primitive root mod `p`.
+fn primitive_root(p: u64) -> u64 {
+    let mut fs = Vec::new();
+    let mut n = p - 1;
+    let mut q = 2u64;
+    while q * q <= n {
+        if n.is_multiple_of(q) {
+            fs.push(q);
+            while n.is_multiple_of(q) {
+                n /= q;
+            }
+        }
+        q += 1;
+    }
+    if n > 1 {
+        fs.push(n);
+    }
+    (2..p)
+        .find(|&h| fs.iter().all(|&q| powm(h, (p - 1) / q, p) != 1))
+        .unwrap()
+}
+
+/// The subgroup/bits base of the exponent study, from the command line:
+/// `sub` (`d` = order, coset `w^gidx`) or `bits` (`d` = t).
+fn study_base(
+    m: &Miniature,
+    kind: &str,
+    d: u64,
+    gidx: u64,
+    frame: &str,
+) -> crypto_lib::cryptanalysis::ic_framework::subgroup_semaev::Base {
+    use crypto_lib::cryptanalysis::ic_framework::subgroup_semaev::*;
+    let lo = match frame {
+        "mont" => m.shift % m.p,
+        "zero" => 0,
+        s => s.parse::<u64>().expect("frame: mont | zero | <lo>"),
+    };
+    match kind {
+        "bits" => Base::Bits { t: d as u32, lo },
+        _ => {
+            let w = primitive_root(m.p);
+            let zeta = primitive_root_of_unity(m.p, d).expect("d must divide p - 1");
+            Base::Subgroup {
+                factors: factor_ascending(d),
+                g: powm(w, gidx, m.p),
+                lo,
+                zeta,
+            }
+        }
+    }
+}
+
+/// `f4sub <k> <sub|bits> <d|t> <gidx> <frame> <m> <sym|plain> <targets> <seed> <cap_s>`:
+/// the decomposition system of the exponent study on `targets` random
+/// multiples of the generator, one F4 run each; one JSON object.
+fn f4sub(args: &[String]) -> Value {
+    use crypto_lib::cryptanalysis::ic_framework::subgroup_semaev::*;
+    let k: u32 = args[0].parse().unwrap();
+    let kind = args[1].as_str();
+    let d: u64 = args[2].parse().unwrap();
+    let gidx: u64 = args[3].parse().unwrap();
+    let frame = args[4].as_str();
+    let msum: usize = args[5].parse().unwrap();
+    let form = match args[6].as_str() {
+        "sym" => Form::Sym,
+        "plain" => Form::Plain,
+        f => panic!("form {f}"),
+    };
+    let targets: u64 = args[7].parse().unwrap();
+    let seed: u64 = args[8].parse().unwrap();
+    let cap_s: u64 = args[9].parse().unwrap();
+    let m = build_miniature(k);
+    let base = study_base(&m, kind, d, gidx, frame);
+    let (a, b, p) = (m.weier.a, m.weier.b, m.p);
+    let mut st = seed;
+    let mut rows = Vec::new();
+    let mut tot_ops = 0u128;
+    let mut done = 0u64;
+    let mut capped = false;
+    let (mut n_vars, mut sym_terms, mut input_terms, mut input_degree) = (0, 0, 0, 0);
+    for _ in 0..targets {
+        st = st
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(1442695040888963407);
+        let e = 1 + (st >> 11) % (m.r - 1);
+        let t = m.weier.mul(m.g, e);
+        if t.inf {
+            continue;
+        }
+        let sys = build_system(p, a, b, &base, msum, t.x, form, seed).expect("system");
+        n_vars = sys.n_vars;
+        sym_terms = sys.sym_terms;
+        input_terms = sys.input_terms;
+        input_degree = sys.input_degree;
+        let rep = solve_system(&sys, p, cap_s, 400);
+        let complete = !rep.timed_out && rep.pairs_above_bound == 0;
+        rows.push(json!({
+            "target_x": t.x, "field_ops": rep.field_ops, "complete": complete,
+            "inconsistent": rep.inconsistent, "timed_out": rep.timed_out,
+            "solving_degree_max": rep.solving_degree_max, "solving_degree": rep.solving_degree,
+            "degree_reached": rep.degree_reached, "steps": rep.steps,
+            "max_rows": rep.max_rows, "max_cols": rep.max_cols, "ms": rep.ms,
+            "basis_len": rep.basis.len(),
+        }));
+        if !complete {
+            capped = true;
+            break;
+        }
+        tot_ops += u128::from(rep.field_ops);
+        done += 1;
+    }
+    json!({
+        "study": "curve25519_exponent_study_20261108", "k": k, "p": p, "base": kind,
+        "d_or_t": d, "gidx": gidx, "frame": frame, "m": msum,
+        "form": args[6], "levels": base.levels(), "v_size": base.size(),
+        "n_vars": n_vars, "sym_terms": sym_terms, "input_terms": input_terms,
+        "input_degree": input_degree, "targets_requested": targets, "targets_done": done,
+        "seed": seed, "cap_s": cap_s, "capped": capped,
+        "mean_field_ops": if done > 0 { Some(tot_ops as f64 / done as f64) } else { None },
+        "per_target": rows,
+    })
+}
+
+/// `subcensus <k> <sub|bits> <d|t> <gidx> <frame> <mmax>`: the factor base of
+/// the study's base and its exact m-sum coverage of the order-r subgroup.
+fn subcensus(args: &[String]) -> Value {
+    use std::collections::HashSet;
+    let k: u32 = args[0].parse().unwrap();
+    let kind = args[1].as_str();
+    let d: u64 = args[2].parse().unwrap();
+    let gidx: u64 = args[3].parse().unwrap();
+    let frame = args[4].as_str();
+    let mmax: usize = args[5].parse().unwrap();
+    let m = build_miniature(k);
+    let base = study_base(&m, kind, d, gidx, frame);
+    let xs = base.abscissae(m.p);
+    let mut pts: Vec<Pt> = Vec::new();
+    let mut cols = 0u64;
+    for &x in &xs {
+        if let Some(y) = sqrtm(m.weier.rhs(x), m.p) {
+            cols += 1;
+            let q = Pt { x, y, inf: false };
+            pts.push(q);
+            if y != 0 {
+                pts.push(m.weier.neg(q));
+            }
+        }
+    }
+    let in_sub = |q: Pt| q.inf || m.weier.mul(q, m.r).inf;
+    // sums of exactly m points of the signed base (repeats allowed), distinct
+    // points R != O with [r]R = O.
+    let mut cov = serde_json::Map::new();
+    let mut cur: HashSet<(u64, u64, bool)> = HashSet::new();
+    cur.insert((0, 0, true));
+    for mm in 1..=mmax {
+        let mut nx: HashSet<(u64, u64, bool)> = HashSet::new();
+        for &(x, y, inf) in &cur {
+            let s = Pt { x, y, inf };
+            for &q in &pts {
+                let r = m.weier.add(s, q);
+                nx.insert((r.x, r.y, r.inf));
+            }
+        }
+        cur = nx;
+        if mm >= 2 {
+            let n = cur
+                .iter()
+                .filter(|&&(x, y, inf)| !inf && in_sub(Pt { x, y, inf }))
+                .count();
+            cov.insert(format!("m{mm}"), json!(n));
+        }
+    }
+    json!({"k": k, "p": m.p, "r": m.r, "base": kind, "d_or_t": d, "gidx": gidx, "frame": frame,
+           "v_size": xs.len(), "columns": cols, "base_points": pts.len(), "covered_points": cov})
+}
+
 #[allow(clippy::too_many_arguments)]
 fn f4cost_m(
     k: u32,
@@ -2217,6 +2393,12 @@ fn main() {
                 ))
                 .unwrap()
             );
+        }
+        "f4sub" => {
+            println!("{}", serde_json::to_string(&f4sub(&args[2..])).unwrap());
+        }
+        "subcensus" => {
+            println!("{}", serde_json::to_string(&subcensus(&args[2..])).unwrap());
         }
         "summarise" => {
             // summarise <out_prefix> <session_dir>...

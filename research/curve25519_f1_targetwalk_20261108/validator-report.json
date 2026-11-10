@@ -1,0 +1,177 @@
+{
+  "schema": "validator-report/v1",
+  "track": "f1-targetwalk",
+  "track_dir": "research/curve25519_f1_targetwalk_20261108",
+  "validator": "independent adversarial validator (Claude Sonnet 5.5, Validator agent), 2026-11-07",
+  "status": "pass_with_errata",
+  "disposition": "validated",
+  "validated_artifact_set": {
+    "commit": "3a383ad4a56f61ad2f4fdc1389597533a6a36cbb",
+    "commit_subject": "WIP: wwalk target-in-walk (tw=1) and chained jumps (cj=1); single-target study (validation pending)",
+    "base": "40c27ab7b369d943ab7e8d9ea7a3bd6224e61ef6 (origin/main)",
+    "branch": "claude/curve25519-index-calculus-i674j4",
+    "paths": [
+      "research/curve25519_f1_targetwalk_20261108/ (committed; sessions/*/records.jsonl are gitignored but equal the committed tarballs byte for byte, 16/16)",
+      "src/cryptanalysis/ic_boundary.rs, src/cryptanalysis/ic_framework/plugins.rs, src/cryptanalysis/ecbench/methods.rs (git diff origin/main -- src: +846/-2)",
+      "benchmarks/records/20261107T2153Z-curve25519-f1-targetwalk-k{20,24}.json"
+    ],
+    "working_tree": "clean for the artifact set. At the start `git status --short` showed one modified file outside it, research/curve25519_f1_walk_20261107/README.md (the correction note, E10). During validation the main session committed it as 56238fbb40bf1e99c3eec783e7738c66cb3ae194; `git diff 3a383ad4a5 HEAD --stat` is that one file, +4 lines, so the study directory and the three src files are byte-identical at 3a383ad4a5 and at HEAD 56238fbb40. All checks below were made on that unchanged content.",
+    "binary_on_disk": "/home/user/ctarget-f1/release/ecbench sha256 9086392a...fc007 (the post-rustfmt rebuild). The measuring binary b2d6c799...9bd8b recorded in every session.json no longer exists.",
+    "tools": "python 3.13.18 (own code, stdlib only, no producer script imported); rustc 1.97.0; cargo test with CARGO_TARGET_DIR=/home/user/ctarget-f1 (no new target dir)",
+    "own_code": "scratchpad val_pool.py, val_check23.py, val_check4.py, val_cert.py, val_phase.py, val_sim.py, val_sim2.py (not committed; they read the artifacts and write nothing in the study)"
+  },
+  "checks": [
+    {
+      "n": 1,
+      "check": "protocol and model frozen before data",
+      "result": "pass (mtime-based; no external timestamp)",
+      "evidence": "`sha256sum -c data/frozen.sha256` from the repo root: 23/23 OK (PROTOCOL.md, 16 specs, 5 scripts, data/model.json). mtimes: model.json 21:43:58Z, specs 21:44:37Z, PROTOCOL.md 21:45:12Z, analyse.py 21:45:37Z, frozen.sha256 and frozen-at.txt 22:01:16Z, binary-k20.sha256 22:01:27Z, first session preflight 22:01:27.8Z (session.json unix_ms), last 22:03:06.9Z; all 16 session starts are after the freeze. The specs inside each session dir hash to the frozen specs, 16/16. model.json reproduces byte-identically from scripts/model.py (seed 20261108). pooled_compare.py is byte-identical to the earlier study's. Seeds of the 32 specs are disjoint from the earlier study's. Caveats: the freeze has no git commit (the first commit containing PROTOCOL.md is the post-hoc WIP commit 3a383ad), the Rust source and binary are not in frozen.sha256, and unit tests (21:53Z) ran after PROTOCOL.md was last written but before the freeze, as disclosed."
+    },
+    {
+      "n": 2,
+      "check": "single-target sessions, all records verified, warm-up excluded",
+      "result": "pass",
+      "evidence": "16 specs: targets_per_curve = 1; each session's 260 records carry exactly one workload_id, target_index 0 and the spec's target_seed (20261108500+100k+s); 8 distinct workloads per k. 260/260 outcome.status = verified in each session (4160 records); per session each arm has exactly 1 warm-up and 64 measured records; all session.json status = complete; verify-*.json: ok, 0 problems, files{} hashes equal the on-disk session files, 16/16. All pooled figures in my code use the 64 measured records per arm (warmup=true skipped); my numbers equal the producer's, so its load() does the same."
+    },
+    {
+      "n": 3,
+      "check": "pooled ratios and phase breakdown recomputed",
+      "result": "pass",
+      "evidence": "Own resolver of cost.unpriced, ratio of per-session sums, linearised t interval with the tabulated t(0.975, df=7) = 2.36462. Per-session means for every arm and weight equal ecbench's own band-*.json (Rust) to < 1e-7 (the residual is the producer's 6-decimal sqrt(r) rounding). All 108 numbers (36 point-and-interval triples) in the README section 3 ratio table agree with my recomputation to rounding (programmatic compare, 0 differences); the mean-S table, the section 5 table, data/sensitivity_inserts.json and all 16 ratio/S metrics of the two benchrec records agree too. Wins of twcj-x15 over f1-x07: 8/8 sessions at w = 0, 0.1, 1 at both sizes. Phase breakdown (rho-neg, f1-x07, tw, twcj; fixed/set-up/walk/verify/probes) agrees with the README phase table to 3 d.p., and the tw ledgers (tw_setup_adds + tw_setup_doubles + tw_walk_adds + tw_verify_adds) equal oracle_setup.gae in every one of the 2048 tw records; phase GAEs sum to cost.total_gae in all records. 49 set-up doublings at k = 20 confirmed (15 + 17 + 17)."
+    },
+    {
+      "n": 4,
+      "check": "w = 1 below-rho result is an accounting artifact",
+      "result": "confirmed (with a wording erratum, E1-E3)",
+      "evidence": "cost.unpriced of rho-neg is exactly ['canonicalisations_uncharged'], 1.095 sqrt(r) per run at k = 20 and 1.031 at k = 24 (about one per step). The walk arms list no insert counter there; their work_native.table_insert_attempts (with the counted: bitop/v1 marker) is 1.012 (f1-x07), 1.413 (tw), 1.390 (twcj) sqrt(r) at k = 20 and 1.008, 1.378, 1.394 at k = 24, and src/cryptanalysis/ecbench/band.rs prices only cost.unpriced plus pinned-calibration natives (calibration_pinned_units is empty here). So the frozen band charges rho for its per-step native op and the walk arms for none. Insert-charged recomputation (own code): twcj/rho-neg = 1.396 [1.341,1.454] / 1.391 [1.334,1.449] / 1.360 [1.298,1.426] at w = 0 / 0.1 / 1 (k = 20) and 1.411 [1.334,1.494] / 1.407 [1.329,1.490] / 1.388 [1.307,1.474] (k = 24); equal to data/sensitivity_inserts.json. rho-neg is ahead at every weight under that pricing. The claim is robust and if anything conservative: the walk arms also leave a sign canonicalisation (inside g.key), an RNG draw and two mod-r additions per step uncounted (E8). ecbench's own band verdict for rho-neg vs twcj-x15 is 'unresolved inside the band' in 16/16 sessions (E3)."
+    },
+    {
+      "n": 5,
+      "check": "prediction verdicts against the frozen text",
+      "result": "pass (P6 stays failed)",
+      "evidence": "Recomputed against PROTOCOL.md section 5. P1 held (k20 twcj/f1 upper ends 0.9338, 0.9117, 0.7554 < 1); P1b held (0.9088 in [0.80,0.97]); P2 held (tw/f1 lower end 1.1322 > 1); P3 held (k24 upper end 0.9325); P4 held (tw_steps/sqrt(r) = 1.4125, 1.3895, 1.3778, 1.3940, all in [1.26,1.45]); P5 held (twcj/tw upper ends 0.8125, 0.9322); P6 FAILED at w = 1 at both sizes (lower ends 0.7932 and 0.7073 < 1; w = 0 and 0.1 lower ends 1.341/1.253 and 1.334/1.225 > 1) and the README keeps it failed and does not re-score it; P6b held (1.396, 1.411 in [1.20,1.55]); P7 held (2048/2048 tw records: tw_rank = 2, probe_hits = 0, trials = 1; the cap was never reached). 59 + 56 of 2048 tw runs have one extra dependent row (29+30 at k = 20, 31+25 at k = 24), as disclosed."
+    },
+    {
+      "n": 6,
+      "check": "code review of TargetWalk and the oracle, existing paths unchanged, tests",
+      "result": "pass",
+      "evidence": "Read the full diff. Rows: E_t = u P1 + z G + b Q with u an integer and z, b mod r; key = abscissa+1 (PrimeCurve::key >> 1), sign bit dropped, so one key per negation orbit; collision recomputed from the coefficients, plus = (E1 == -E2) uses the sum of coefficient triples, else the difference, so du*s1 + db*logQ + dz = 0, stored as Row{columns: du*coef_of, a: -dz, b: -db} with the loop's convention du*coef*x = h*(a + b*d) (unit test asserts it under brute-force logs). Rank test is the 2x2 determinant mod r; (du, db) = (0, 0) rows are dropped; the walk stops at rank 2 or 3T. Chained jumps: K_j = K_(j-1) + K_(j-2) with (gamma, beta) added mod r, one addition each, chain restarted on identity; J_j = alpha_j P1 + K_j charged (popcount(alpha) - 1 + 1) additions; ledgers sum to build_ops. eval() silently skips a bit beyond the doubled-multiple table, but u <= 1 + 3T*w equals the bound the table is sized from (bound check in wwalk_plan_check), so no bit is dropped. The tw=0 paths: plugins.rs adds only `if tw` branches and `self.tw_table = None`; methods.rs adds two Err checks and one help string. Own checks: (a) `cargo test --release --offline --lib -- wwalk target_walk plan_refuses` with CARGO_TARGET_DIR=/home/user/ctarget-f1: 15 passed, 0 failed (cached fresh test binary, 'Finished in 0.15s'), including target_walk_rows_are_affine_stop_at_rank_two_and_solve and wwalk_target_in_walk_recovers_on_the_first_trial; (b) independent Python re-implementation of the walk algebra on the real k = 20 curve (3000 walks, plain and chained): 0 bad rows, rank 2 reached and logQ solved in 3000/3000, mean steps 1.376 and 1.387 sqrt(r), extra-row runs 6.3-6.5 % (measured: 1.378-1.412, 5.5-5.8 %); (c) own op count of set-up, walk and verification on the same curve: plain 0.949 / 1.396 / 0.256, chained 0.368 / 1.373 / 0.256 sqrt(r), vs measured 0.949 / 1.412 / 0.255 and 0.368 / 1.390 / 0.255, so the Rust ledgers charge exactly what the rules imply (no under-count); (d) `ecbench plan` refuses tw=1 without g=1 (via 'grow=2 needs g=1'), tw=1 with grow=1 and cj=1 without tw; tw=1 on a two-abscissa base passes plan and fails at run time with an explicit error record ('needs a base of exactly 1 abscissa'), never silently."
+    },
+    {
+      "n": 7,
+      "check": "certificates: recovered scalar * G == target",
+      "result": "pass",
+      "evidence": "All 4160 records (16 sessions x 260, warm-ups included, all four arms) re-verified with my own affine EC arithmetic (stdlib pow(x,-1,p), double-and-add): generator and target on the curve, r*G = O, r*target = O, recovered*G == target exactly (no negated matches). 0 failures. This is the end certificate; the relation rows are not exported in the records, so relation-level certificates cannot be re-checked from the artifacts (see check 6 for my independent re-derivation of the row algebra)."
+    },
+    {
+      "n": 8,
+      "check": "replay claim (4,096 runs) spot-checked",
+      "result": "pass",
+      "evidence": "Copied sessions to scratch and ran the on-disk binary 9086392a...fc007 with `verify --replay-all`: k20-s3 and k24-s5 (new study): 'audit OK: 260 records, 260 verified, 256 replays reproduced, 0 problems' each. Existing paths: earlier-study sessions k20-s5 and k24-s2 (not the s0 sessions the producer used), all arms (rho, rho-aa, f1-x05/07/09, f2-inc): 'audit OK: 390 records, 390 verified, 384 replays reproduced, 0 problems' each, so the rebuilt binary reproduces the earlier study's counts. data/replay-all-rebuilt-binary.txt lists 16 x 256 = 4096 reproduced runs, 0 problems. Limits: the original per-session audits (--replay 1) replayed one sampled run each (16 in total), as frozen; the measuring binary b2d6c799 was overwritten by the rebuild, so source-to-measuring-binary byte identity cannot be proven, only behavioural identity on all 4096 measured runs (E5). The committed source is rustfmt-clean (`rustfmt --check` on the three files)."
+    },
+    {
+      "n": 9,
+      "check": "benchrec records and `benchrec check`",
+      "result": "pass (disclosure gap, E7)",
+      "evidence": "`python3 tools/benchrec.py check --base origin/main` -> 'benchrec: OK, 54 record(s), progress report current'. Both records: status measured, raw[0].sha256 equals sha256sum of data/sessions-k{20,24}-records.tar.gz, and the tarball members equal sessions/*/records.jsonl byte for byte (16/16); pooled_measured.json hash matches. Every metric value and spread in both records equals my recomputation (16 ratio metrics, S metrics, inserts-priced metric, twcj_walk_s). The k = 24 record lists the same 13 metrics as k = 20 in a different order (twcj_walk_s first), which fits a hand edit and re-close; `benchrec close` itself refuses to close a closed record and the committed files contain no re-close note (the WIP commit is the first commit with either record, so there is no diff to read). Both records have raw uploaded: false, commit = origin/main 40c27ab7 with commit_dirty: true (the code is not in that commit), isolation 'unstated' (counts only, so immaterial)."
+    },
+    {
+      "n": 10,
+      "check": "scope wording and overclaims",
+      "result": "pass with wording errata (E1-E3, E9)",
+      "evidence": "The README states first that F = 1 with the target in the walk is one unknown from rho, that P1 := G makes it a stored rho walk (F = 0, 0.886 sqrt(r); the 1.5x floor is Gamma(2.5)/Gamma(1.5) = 1.5000 exactly), that it does no decomposition, and that it does not belong on the IC leaderboard. No leaderboard or benchmarks/README.md row exists and no VALIDATION.json exists (grep). Every result sentence carries [pcc:unverified]. P6 is kept failed. 'Distance remaining' is given at w = 0 (1.40x, 1.41x) and the closed share of the F = 1 gap (26 %, 30 %) recomputes ((1.536-1.396)/0.536 = 0.261; (1.589-1.411)/0.589 = 0.302). The rho-reference set-up caveat (a chained rho set-up would lower the reference) is disclosed. Not disclosed: tw gives up the target-independent, reusable table of f1-x07, so the gain is single-target only (E9)."
+    }
+  ],
+  "errata": [
+    {
+      "id": "E1",
+      "severity": "moderate (wording, no verdict changes)",
+      "location": "README.md section 5, sentence 'The primary comparison against the current F = 1 arm barely moves under it'; footnote under the section 3 ratio table, 'The rows against f1-x07 compare two walk-table arms and are less affected'; same text in REPORT.typ/REPORT.pdf",
+      "issue": "Charging inserts at w = 1 moves twcj/f1-x07 from 0.734 [0.712,0.755] to 0.896 [0.867,0.926] at k = 20 and from 0.675 [0.642,0.710] to 0.883 [0.838,0.931] at k = 24, and flips tw/f1-x07 at k = 20 from 0.936 [0.906,0.968] (below 1) to 1.053 [1.017,1.091] (above 1); k = 24 0.744 -> 0.928. It barely moves only at w = 0.1 (0.887 -> 0.907; 0.861 -> 0.887). The cause is f1-x07's priced probe lookups (0.59 sqrt(r)) against its unpriced walk inserts. 'twcj below f1-x07 at every weight' survives either way (upper ends 0.926 and 0.931).",
+      "fix": "Replace the sentence by: 'stays below 1 at every weight, but its w = 1 value moves from 0.734 to 0.896 (k = 20) and from 0.675 to 0.883 (k = 24)', and drop 'are less affected' from the footnote (the w = 1 tw/f1-x07 sign at k = 20 is an artifact of the same asymmetry)."
+    },
+    {
+      "id": "E2",
+      "severity": "moderate (AGENTS.md 5a reporting contract)",
+      "location": "README.md section 5 / section 3",
+      "issue": "5a requires every unpriced counter of every arm, references included, to be listed with its count. The README names only rho's canonicalisations (one sampled run). Validator's table, mean per run in sqrt(r) units, measured rounds: band-priced native operations U (cost.unpriced): k = 20 rho-neg 1.095 (canonicalisations_uncharged), f1-x07 0.623 (lookups_uncharged 0.589, row_ops 0.018, sqrt_solves/legendre/projected_base_* 0.014), tw 0.045, twcj 0.045 (row_ops 0.028 plus the same projected-base items); k = 24 rho-neg 1.031, f1-x07 0.594, tw 0.011, twcj 0.011. Not priced by the band (work_native.table_insert_attempts): k = 20 f1-x07 1.012, tw 1.413, twcj 1.390; k = 24 1.008, 1.378, 1.394; rho-neg none.",
+      "fix": "Add this table (or an equivalent, from the records) to README section 5."
+    },
+    {
+      "id": "E3",
+      "severity": "moderate (5a ranking rule and headline wording)",
+      "location": "README.md 'Answer' paragraph ('Rho-neg is still ahead'); benchmarks/progress/PROGRESS.md headline series rows s_twcj_w1 (value/ref 0.8311 k = 20, 0.7492 k = 24, 'matched_rho'); the s_twcj_w1 metric notes of both records",
+      "issue": "Under the frozen band the order of rho-neg and twcj-x15 changes with w (rho ahead at w = 0 and 0.1, twcj ahead at w = 1), and ecbench's own band verdict is 'unresolved inside the band' in 16/16 sessions; 5a forbids calling that a win for either side. 'Rho-neg stays ahead at every weight' rests on the post hoc insert pricing. Separately, the progress headline shows twcj/matched rho = 0.83 / 0.75 at w = 1 with no asymmetry caveat (the caveat is only in the ratio_twcj_over_rho_w1 note).",
+      "fix": "State the frozen-band verdict as 'unresolved inside the band' next to the post hoc 'rho-neg ahead at every weight (inserts priced)'. For the progress rows, add the caveat via a follow-up record or progress annotation (closed records are immutable; do not hand-edit)."
+    },
+    {
+      "id": "E4",
+      "severity": "minor (numeric)",
+      "location": "README.md 'Diagnostics of the tw arms' paragraph, 'the uniform model gives 1.329 (mean) and 0.484 (sd)'; same in REPORT.typ/pdf",
+      "issue": "The exact sd of sqrt(Gamma(2,1)) is sqrt(2 - Gamma(2.5)^2) = 0.4825, not 0.484. The mean 1.329 and the first-collision 0.886 are exact. No claim depends on it (measured sd 0.474-0.508).",
+      "fix": "0.483 (or 0.4825)."
+    },
+    {
+      "id": "E5",
+      "severity": "minor (provenance)",
+      "location": "README.md section 2 (binary and rebuild); session.json git_commit/git_dirty = null; benchrec records commit/commit_dirty",
+      "issue": "The measuring binary b2d6c799 is gone (/home/user/ctarget-f1/release/ecbench is now 9086392a), the sessions are not bound to a git commit, and the benchrec records name origin/main 40c27ab7 (dirty), which does not contain the code; the code is in WIP commit 3a383ad4a5. The README discloses the rebuild and the 4096-run replay, which I reproduced on two sessions plus two earlier-study sessions, so the behaviour is established; byte identity of source and measuring binary is not.",
+      "fix": "State in the README design section: source = commit 3a383ad4a5 (or its descendant in the PR), measuring binary hash b2d6c799 (not retained), replaying binary hash 9086392a; keep the replay-all receipt as the binding."
+    },
+    {
+      "id": "E6",
+      "severity": "minor (test coverage claim)",
+      "location": "README.md section 1 ('ecbench plan refuses tw without g=1/grow=2 and cj without tw') and the pointer to data/cargo-test-plan-refuses.txt (6 passed)",
+      "issue": "Those six plan_refuses tests pre-date the change; none mentions tw or cj (grep over src/cryptanalysis/ecbench). The oracle-level refusals are tested by wwalk_target_in_walk_recovers_on_the_first_trial; the plan-level ones are not tested. I checked them by hand with `ecbench plan` and they hold; tw=1 on a two-abscissa base is not refused at plan time but fails at run time with an explicit error.",
+      "fix": "Add a plan-level test for the three refusals, or reword to say the plan refusals were checked manually and the oracle refusals by test."
+    },
+    {
+      "id": "E7",
+      "severity": "minor (record hygiene, AGENTS.md 13 / benchrec)",
+      "location": "benchmarks/records/20261107T2153Z-curve25519-f1-targetwalk-k24.json; data/sessions-k{20,24}-records.tar.gz",
+      "issue": "No committed note of the k = 24 record having been closed twice (metric order differs from k = 20; benchrec close refuses a second close). Both raw archives are 1.11 and 1.14 MB .tar.gz files committed in Git, and the records say uploaded: false; 13 says data-suffixed files over 64 KiB live in the artifact store with a .artifacts.json (the earlier study used .artifacts.json in data/ and figures/). docs/session-logs/2026-11-07.md has no entry for this study (CLAUDE.md session-log rule).",
+      "fix": "Disclose the re-close in the README or the PR; push the raw archives with tools/artifacts and commit the manifest (hashes are already recorded); add the session-log entry."
+    },
+    {
+      "id": "E8",
+      "severity": "minor (completeness of the native-work listing, direction conservative)",
+      "location": "src/cryptanalysis/ic_boundary.rs TargetWalk::work_counters; README.md section 5 ('Each arm does one native operation per step')",
+      "issue": "TargetWalk emits only table_insert_attempts and lookups. Per step it also does a sign canonicalisation (inside PrimeCurve::key), an RNG draw and two mod-r additions plus an integer addition, none counted anywhere; the 'counted:walk_bookkeeping' marker on the relations phase belongs to the relation loop's target walk, not to this table (the same gap exists in WalkTable). rho-neg's partition hash is also unlisted. So 'one native operation per step on each side' is a simplification: the walk arms have more unlisted work per step than rho, which makes the insert-priced ratios (1.36 and 1.39 at w = 1) a lower bound on the walk arms' distance to rho.",
+      "fix": "Say so in section 5, or emit walk_modr_adds and rng draws from TargetWalk::work_counters."
+    },
+    {
+      "id": "E9",
+      "severity": "minor (scope)",
+      "location": "README.md Scope paragraph and section 6",
+      "issue": "tw=1 builds the walk from the target, so nothing is reusable across targets; f1-x07's walk table is target-independent and can be amortised over many targets. The result is a single-target one (the protocol's question), and the improvement over f1-x07 does not carry to a multi-target setting.",
+      "fix": "One sentence in the Scope paragraph."
+    },
+    {
+      "id": "E10",
+      "severity": "minor (process, resolved during validation)",
+      "location": "research/curve25519_f1_walk_20261107/README.md, 'Correction (2026-11-08)' (uncommitted when I started, committed as 56238fbb40 while I worked; outside the frozen set)",
+      "issue": "The correction edits another study's README after that study's validation. I verified its numbers on the earlier study's records with my own code: F = 1 (x = 0.7) / rho-neg with inserts priced = 1.492 [1.449,1.536] and 1.471 [1.423,1.521] (w = 0.1, 1; k = 20), 1.567 [1.460,1.681] and 1.551 [1.441,1.670] (k = 24); frozen band 1.429 / 1.083 and 1.488 / 1.098; the w = 0 values 1.496 and 1.570 are unchanged. The earlier study's validator-report.json predates it.",
+      "fix": "Cross-reference the correction in the earlier study's validator-report.json (it predates the correction); the commit is done."
+    }
+  ],
+  "numbers_that_disagree": [
+    "README.md / REPORT 'sd 0.484' for the two-collision model: exact 0.4825 (E4). Nothing else: all 108 ratio-table numbers, the mean-S table, the phase table, the diagnostics table, the section 5 table, sensitivity_inserts.json, pooled_measured.json and 16+16 benchrec metrics agree with my recomputation to the printed precision.",
+    "Benign: per-session means differ from ecbench's own band-*.json by < 1e-7 because pooled_compare.py rounds sqrt(r) to 6 d.p."
+  ],
+  "refuted_claims": [],
+  "upheld_claims": [
+    "twcj-x15 costs 0.909x [0.885,0.934] of f1-x07 at k = 20 and 0.888x [0.846,0.932] at k = 24 at w = 0, below 1 at w = 0.1 and 1 as well, in 8/8 sessions per size (recomputed)",
+    "tw-x15 (plain jumps) loses to f1-x07 at k = 20 (1.166x [1.132,1.200]) and is unresolved at k = 24 (0.980x [0.939,1.023]) at w = 0",
+    "search phase 1.378-1.412 sqrt(r), 3.7-6.2 % above the two-collision floor 1.329; first row at 0.92-0.95; 2048/2048 tw runs solve at rank 2 on trial 1 with no probe",
+    "every recovered scalar satisfies recovered*G == target (4160/4160, own EC arithmetic)",
+    "w = 1 below-rho figures (0.831, 0.749) are an accounting asymmetry; with inserts priced rho-neg is 1.36x / 1.39x ahead; P6 failed as frozen and stays failed",
+    "F = 1 with the target in the walk is one unknown from rho, is not decomposition-based index calculus and earns no leaderboard row",
+    "existing wwalk paths unchanged: the rebuilt binary replays 256 + 256 new-study runs and 384 + 384 earlier-study runs (arms rho, rho-aa, f1-x05/07/09, f2-inc) with 0 problems; 15/15 relevant cargo tests pass"
+  ],
+  "limitations": [
+    "Counts only (ecbench GAE); no wall-clock claim and none validated.",
+    "mtime-based freeze evidence; the measuring binary is not retained; relation rows are not exported, so the relation-level certificate is my independent re-derivation plus the end certificate.",
+    "Validation gate: this report supplies the validator report. The record validation field is null, no VALIDATION.json exists, and no matched-rho band entry has been written by me; I did not edit evidence, records or statuses."
+  ],
+  "pcc": "Every number here is an unverified assertion [pcc:unverified]; no pcc claim id exists for this track"
+}

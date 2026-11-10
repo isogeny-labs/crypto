@@ -396,6 +396,105 @@ no checked certificate: $1\notin W_4$ by implementation~A alone. Source:
 \label{tab:fd-chain}
 \end{table}
 
+\paragraph{Per-instance records.} Tables~\ref{tab:bin-fd-inst-a}
+and~\ref{tab:bin-fd-inst-b} list all 93 committed $m=2$ instances behind
+Table~\ref{tab:fd-binary}, one row each, at the highest closure degree run.
+Table~\ref{tab:bin-fd-certs} lists the 13 certificate checks.
+Figure~\ref{fig:bin-fd-closure} plots the column count and the wall time per
+instance. At $D=4$ every recorded column count is a function of $k$ alone
+($n=39$ and $n=40$, both $k=20$, read 102{,}091), from 2{,}517 at $n=15$ to
+179{,}447 at $n=45$. The recorded wall time at the top degree runs from
+0.0\,s (R11b) to 2{,}001.3\,s (P43a). The certificate closures were
+separate runs and time a different job. For P45a the sources give three
+wall times, none with a recorded host:
+\begin{itemize}
+\item 1{,}850.7\,s in \texttt{instances.json}: the degree-4 closure
+  \texttt{lfdclose2} alone, without certificate export, imported from the
+  batch log \texttt{log3\_poly\_curve\_n45.txt} (its \texttt{provenance}
+  field; \texttt{tabulate.py} times the same call with \texttt{time.time()});
+\item about 6{,}000\,s in \texttt{certificates.txt}: the
+  \texttt{closure[\ldots]} field of \texttt{verify/cert\_batch.py}, which
+  times \texttt{mksys.py} plus \texttt{lfdclose2} with the certificate
+  path, so it includes the back-substitution that writes the 288{,}550{,}808-byte quotient
+  map; the script runs instances in a thread pool of a given worker count and
+  prints whole seconds, so the ``$\sim$'' entry was written by hand and the
+  worker count is not recorded;
+\item 2{,}950.6\,s in the 2026-10-29 replay receipt
+  \texttt{P45a.receipt.json}: the certificate-producing closure step
+  (\texttt{elapsed\_seconds}), isolation L0, \texttt{wall\_valid} false;
+  its check step took 229.1\,s, against 787\,s in
+  \texttt{certificates.txt}.
+\end{itemize}
+The first number excludes the certificate export and the other two include
+it. The sources do not split the export from the closure, and they record no
+host or concurrency, so the spread between the three is not explained further.
+Sources: \art{crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/verify/cert_batch.py},
+\art{crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/code/tabulate.py},
+\art{crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/submission-20261029/archive/P45a.receipt.json}.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-bin-fd-closure.pdf}
+\caption[]{Binary $\Sem3$ descent, $m=2$, $k=\lceil n/2\rceil$, one marker per
+instance (families offset horizontally by $\pm0.3$ for legibility). Left:
+monomial columns of the degree-4 closure matrix, instances run to $D=4$.
+Right: recorded wall time of the closure at the highest degree run (3 or 4),
+log scale; 0.0\,s values plotted at 0.05\,s. Filled markers refute
+($1\in W_D$), open markers do not ($d_{\tilde F}\ge5$). Host not recorded.
+Data: \art{figures/data-bin-fd-instances.json}, from
+\art{crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/instances.json};
+plot: \art{figures/make_fig_bin_fd_closure.py}.}
+\label{fig:bin-fd-closure}
+\end{figure}
+
+\begin{table}[p]
+\centering\scriptsize\setlength{\tabcolsep}{3.5pt}
+\input{figures/tab-bin-fd-instances-a}
+\caption[Per-instance closures, polynomial subspaces]{Per-instance closures
+of the binary $m=2$ descent, polynomial subspaces (P: curve-derived $z$; S:
+uniform $z$, Semaev's cell). $D$ is the highest closure degree run;
+$\dim W_D$ and the column count are as recorded; codim $=$ columns $-\dim W_D$
+(derived; given where $1\notin W_D$); ``$1\in W_D$'' marks refutation at
+$D$. Seconds: recorded wall time at degree $D$, host not recorded.
+$d_{\tilde F}$: last fall degree, exact or a lower bound. cert.: first eight
+hex digits of the SHA-256 of a VALID independent check of $1\notin W_4$
+(Table~\ref{tab:bin-fd-certs}). Laid out by
+\art{figures/make_fig_bin_tables.py} from
+\art{figures/data-bin-fd-instances.json}, which copies
+\art{crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/instances.json}
+and \art{crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/certificates.txt}.}
+\label{tab:bin-fd-inst-a}
+\end{table}
+
+\begin{table}[p]
+\centering\scriptsize\setlength{\tabcolsep}{3.5pt}
+\input{figures/tab-bin-fd-instances-b}
+\caption[Per-instance closures, random subspaces]{Per-instance closures of
+the binary $m=2$ descent, random subspaces (R: curve-derived $z$; U: uniform
+$z$; T: inside $\ker\operatorname{Tr}$). Columns as in
+Table~\ref{tab:bin-fd-inst-a}. R35a is listed as $\ge5$, as recorded in
+\texttt{instances.json}; Theorem~\ref{thm:lfdexact} makes it exactly 5 by
+branching (Lemma~\ref{lem:branch}). R39a and R39b have no certificate.}
+\label{tab:bin-fd-inst-b}
+\end{table}
+
+\begin{table}[t]
+\centering\scriptsize\setlength{\tabcolsep}{3pt}
+\input{figures/tab-bin-fd-certs}
+\caption[]{The 13 VALID certificate checks of $1\notin W_4(F)$: $m=2$
+instances (Q: the two satisfiable random-subspace instances, with their
+Boolean solution counts) and the $m=t=3$ chain instances C19a, C19b.
+$\dim W_d$ is the cumulative dimension of $W_4\cap B_{\le d}$; ``codim
+$\ge$'' is the certified bound; closure and check seconds as printed by
+\texttt{verify/cert\_batch.py} (wall time of system generation, closure and
+certificate export; P45a's entry is a hand-written approximation; see the
+text for its other two timings). Data:
+\art{figures/data-bin-fd-instances.json}, from
+\art{crypto-autoresearcher:analysis/semaev-m2-last-fall-degree/results/certificates.txt}
+and \texttt{instances\_sat.json}.}
+\label{tab:bin-fd-certs}
+\end{table}
+
 \paragraph{What is new, and what is not.} That the degree of regularity
 reaches 5 has been \emph{observed} before:
 \begin{itemize}

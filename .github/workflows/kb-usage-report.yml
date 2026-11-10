@@ -41,9 +41,20 @@ jobs:
           cat "$RUNNER_TEMP/kb-usage.txt" >> "$GITHUB_STEP_SUMMARY"
           python3 scripts/kb_usage_report.py --root . --ref HEAD --since 2026-11-05 \
             --json --out "$RUNNER_TEMP/kb-usage.json"
+      - name: Export merged PR bodies
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr list --state merged --limit 300             --json number,title,body,mergedAt > "$RUNNER_TEMP/prs.json"
+      - name: PR-body evidence
+        run: |
+          python3 scripts/kb_pr_evidence.py --input "$RUNNER_TEMP/prs.json"             --since 2026-11-05 | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 scripts/kb_pr_evidence.py --input "$RUNNER_TEMP/prs.json"             --since 2026-11-05 --json --out "$RUNNER_TEMP/kb-pr-evidence.json"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: kb-usage-report
-          path: ${{ runner.temp }}/kb-usage.json
+          path: |
+            ${{ runner.temp }}/kb-usage.json
+            ${{ runner.temp }}/kb-pr-evidence.json
           if-no-files-found: ignore

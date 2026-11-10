@@ -1555,6 +1555,36 @@ like-for-like cell is U2 ($64\times$); and a minimal $\FF_{q^3}$ product would
 make rho about $1.34\times$ cheaper in $\FF_p$ multiplications. Neither
 reverses the order.
 
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llrrrr@{}}
+\toprule
+Layer & Unit & $w=0$ & $w=0.1$ & $w=1$ & $w=1$, 16 seeds \\
+\midrule
+A & U1 & $0.0065$ $[0.0054,0.0080]$ & $0.1071$ $[0.0968,0.1188]$ & $0.1214$ $[0.1097,0.1346]$ & $0.1212$ \\
+A & U2 & $0.0156$ $[0.0131,0.0192]$ & $0.1165$ $[0.1053,0.1293]$ & $0.1226$ $[0.1108,0.1359]$ & $0.1223$ \\
+B & U1 & $0.0065$ $[0.0054,0.0080]$ & $0.0093$ $[0.0085,0.0103]$ & $0.0107$ $[0.0097,0.0118]$ & $0.0106$ \\
+B & U2 & $0.0156$ $[0.0131,0.0192]$ & $0.0119$ $[0.0108,0.0132]$ & $0.0110$ $[0.0100,0.0122]$ & $0.0110$ \\
+\bottomrule
+\end{tabular}
+\caption[]{The validated row: the Joux--Vitse sieve route at $p=1511$
+against the pooled matched negation rho (142 runs), sieve/rho with 95\%
+bootstrap intervals (20{,}000 resamples over cover seeds and rho runs),
+seeds 17--24; the last column is the point value over all 16 seeds.
+Layer~A charges the cover's sieve additions, lookups, enumeration
+additions and its unemitted F4, descent and linear-algebra
+multiplications as native operations (an upper bound), and rho's six
+native counters plus its $\FF_p$ additions. Layer~B charges only what each
+side emits. Every cell is below 1. Standing: validated
+(\art{research/jv_sieve_negrho_20261102/VALIDATION.json},
+\texttt{VAL-20261103-c31c76}; the validator's recomputed primary cell is
+$0.00647$ $[0.00546,0.00802]$); no \texttt{pcc} claim record. Source:
+\art{research/jv_sieve_negrho_20261102/fit.json}; extracted in
+\art{figures/data-pf-jv.json}.}
+\label{tab:pf-jv-sieve}
+\end{table}
+
 \paragraph{The Nagao arm near parity.} The 1 November crossover study ran
 the plain arm at $p=1301$, 1451 and 1601 against two rho references on the
 same instances (\art{research/jv_cover_crossover_20261101/README.md};
@@ -1595,6 +1625,58 @@ validation file. Sources: \art{research/jv_cover_crossover_20261101/},
 \art{research/jv_cover_negrho_rescore_20261101/},
 \art{research/jv_cover_fbline_20261102/}.}
 \label{tab:jac-nagao}
+\end{table}
+
+Figure~\ref{fig:pf-jv} plots the re-scoring per prime under all three
+reference estimators, with the validated sieve row at $p=1511$ for
+scale, and Table~\ref{tab:pf-jv-band} gives the band. In group additions
+the verdict is the same at $w=0$, $0.1$ and $1$ at every prime. In
+textbook multiplications the order holds at 1301 and 1451; at 1601 it is
+above rho at $w=0$ and unresolved at $w=0.1$ and $1$. The cover's native
+count omits its $\FF_p$ additions, so an ``above'' verdict can only widen
+under complete counts, while ``not resolved'' could move either way.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{figures/fig-pf-jv.pdf}
+\caption[]{Joux--Vitse cover over matched negation-map rho on the weak
+class, $w=0$. The plain Nagao arm, three cover seeds per prime, against
+42 rho runs per prime (estimator a, open squares), 126 pooled runs (b, the
+frozen primary, filled circles) or 190 runs (c, open diamonds), 95\%
+percentile bootstrap. Stars: the sieve route at
+$p=1511$, seeds 17--24, against 142 pooled rho runs (validated row,
+Table~\ref{tab:pf-jv-sieve}). Blue: group additions (U1); vermilion:
+textbook $\FF_p$ multiplications (U2). Dashed: parity. Data
+\art{figures/data-pf-jv.json} from
+\art{research/jv_cover_negrho_rescore_20261101/fit.json} and
+\art{research/jv_sieve_negrho_20261102/fit.json}.}
+\label{fig:pf-jv}
+\end{figure}
+
+\begin{table}[t]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrrrl@{}}
+\toprule
+Unit & $p$ & $w=0$ & $w=0.1$ & $w=1$ & Same at all $w$ \\
+\midrule
+U1 & 1301 & $1.405$ $[1.206,1.629]$$\uparrow$ & $1.467$ $[1.260,1.702]$$\uparrow$ & $1.498$ $[1.286,1.738]$$\uparrow$ & yes \\
+U1 & 1451 & $1.160$ $[1.020,1.338]$$\uparrow$ & $1.211$ $[1.065,1.397]$$\uparrow$ & $1.236$ $[1.088,1.426]$$\uparrow$ & yes \\
+U1 & 1601 & $0.870$ $[0.697,1.183]$ & $0.908$ $[0.727,1.235]$ & $0.927$ $[0.742,1.261]$ & yes \\
+U2 & 1301 & $3.376$ $[2.899,3.915]$$\uparrow$ & $1.873$ $[1.608,2.172]$$\uparrow$ & $1.549$ $[1.330,1.796]$$\uparrow$ & yes \\
+U2 & 1451 & $2.787$ $[2.452,3.215]$$\uparrow$ & $1.545$ $[1.360,1.783]$$\uparrow$ & $1.278$ $[1.124,1.474]$$\uparrow$ & yes \\
+U2 & 1601 & $2.090$ $[1.674,2.842]$$\uparrow$ & $1.159$ $[0.928,1.576]$ & $0.958$ $[0.767,1.304]$ & no \\
+\bottomrule
+\end{tabular}
+\caption[]{The Nagao arm's \S5a band against the pooled matched negation
+rho (estimator b, 126 runs), cover/rho with 95\% bootstrap intervals;
+native operations priced at $w$ GAE on both arms. Cover native count:
+\texttt{f4\_native\_ops}, a lower bound ($\FF_p$ additions, pair
+selection and memory traffic not emitted). $\uparrow$: interval above 1;
+unmarked: not resolved. No validation file. Source:
+\art{research/jv_cover_negrho_rescore_20261101/fit.json}
+(\texttt{band\_5a}); extracted in \art{figures/data-pf-jv.json}.}
+\label{tab:pf-jv-band}
 \end{table}
 
 \paragraph{A factor-base line search.} Choosing the factor-base line made

@@ -69,7 +69,7 @@ Factor bases (build with `ecbench fb`, publish to Git/`store:`, run
 | `verify` | audit a session from its own files, with exact replays | §9 |
 | `compare` | compare arm B against arm A, paired bootstrap intervals | §8 |
 | `table` | every arm on every curve, mean `S`, ratio to the floor and to the reference arm | §3, §8 |
-| `band` | the pricing band of AGENTS.md §5a: unpriced native work charged at each weight | AGENTS.md §5a |
+| `band` | the pricing band of AGENTS.md §5a: unpriced native work charged at each weight, and (the default since 2026-11-08) the table oracles' counted per-step inserts, which `cost.unpriced` never lists; `--no-price-table-work` is the pre-2026-11-08 reading | AGENTS.md §5a, §8 "The pricing band" |
 | `resources` | resource vectors for all measured attempts | §7 |
 | `trend` | fit how a paired ratio moves across curves from `compare --save` files | §8 |
 | `calibrate` | A/A interval coverage and false admissions across quiet and contended sessions | §8 |
@@ -489,6 +489,7 @@ default; the ids are:
 | `rho.preprocessing` | rho | Bernstein–Lange preprocessing rho on `{P, −P}`: a target-blind table of `entries` distinguished points, then the target's walks on the same map; prime curves; `entries > 0` and `dp_bits ≤ 40` refused at plan time |
 | `ic.known_log_mitm2_v1`, `ic.known_log_ksum_v1` | ic | a target-blind seeded known-log signed base and a folded two-sum table (`mitm2`, prime and one-word binary curves) or a table of every signed `k`-sum, `k = 3, 4, 5` (`ksum`, prime curves); injective `Q + [a]H` queries, no matrix. `size`, `base_multiplier`, `k`, the `max_pair_work`/`max_sums` budget and `max_trials` are checked at plan time (`known_log::plan_check`) |
 | `ic.tensor_contraction_v1` | ic | toy index calculus by exact sparse tensor contraction (`crates/ecdl-tensor-ic`); prime-order curves (cofactor 1), `m ≥ 2`, `max_restarts ≥ 1`, refused at plan time otherwise |
+| `ic.tensor_contraction_cofactor_v1` | ic | the same toy on a fixed-cofactor prime curve (#E = c·r, c > 1, r > c; `ecbench::tensor_cofactor`): free S_i ∈ E, A_i = [c]S_i hashed into F_i ⊂ G, preimages of each F_i listed once per draw; `m ≥ 2`, `max_restarts ≥ 1`, refused at plan time otherwise (c = 1 is `ic.tensor_contraction_v1`) |
 | `jacobian_image.rho3`, `jacobian_image.bsgs`, `…_field_tally` | rho, bsgs | rho and textbook BSGS in the genus-3 Jacobian image of the certified degree-three pullback of a binary curve; no source-GAE conversion exists, so `total_gae` is 0 and the Cantor and field work is counted `_uncharged` (the `_field_tally` ids tally the complete instrumented route and are accounting-only; their wall time includes the ledger) |
 | `ic.hyperelliptic_thread` | ic | the hyperelliptic thread's index calculus (ADH/Gaudry: degree-1 places folded by ±, factor-base walk, sparse elimination mod `r`, optional single large primes) on a genus 2–4 Jacobian, `hyperelliptic_*` curves only |
 | `ic.cm_folded_native_v1`, `ic.cm_folded_recurrence_v1`, `ic.cm_folded_native_d43_v1` | ic | the CM scalar-orbit signed MITM2 controls with a native backend, prime curves only; frozen: their records carry `total_gae` 0 |
@@ -529,6 +530,7 @@ Curves of higher genus and the transfers are described in
 | `ic.three_leads_genus2_pencil_symbolic_v3` | `counted_group_component_only`: the pencil's and its verification's counted group arithmetic at the source addition's price, as `_v2` | `group_field_adds_uncharged`, `group_bit_ops_uncharged` (the group ledger's additions and bit operations), `pencil_native_<k>_uncharged` (the finite-field arithmetic ledger of the cold setup and the candidate: `base_*`, `scalar_*`), `pencil_symbolic_<k>_uncharged` (every field of the symbolic-graph meter, cold setup and candidate summed) and `pencil_logical_<k>_uncharged` (the collector's and elimination's rows, terms, pivot lookups, coefficient updates, normalisations, inversions, and the solver's node and node-order operations); `unpriced` is exactly these. The `inversions` of the logical ledger and `scalar_inversions` of the arithmetic ledger count one layer each: the counters are not to be added. Allocation is unobserved (`detail.allocation_observer_available: false`) |
 | `jacobian_image.rho3_field_tally`, `jacobian_image.bsgs_field_tally` | nothing, as the untallied ids; `field_ops` and `complete_route_f2m<n>_*_uncharged` count the instrumented `F2mElement` calls of the cover construction, both pullbacks, the solve and its internal replay | the same Cantor and table work as `jacobian_image.rho3` / `.bsgs`; wall time includes the ledger |
 | `ic.tensor_contraction_v1` | every non-trivial point addition and doubling (neither input O) the toy tensor-contraction index calculus of `crates/ecdl-tensor-ic` performs, from the crate's per-phase tally: the relation targets `[u]P + [v]Q` (`relation_target`), every point addition evaluated inside the exact sparse contraction and the witness check (`relation_search`), the final `[ξ]P = Q` check (`recovery_check`); `factor_base` and `linear_algebra` charge 0. Prime-order curves only (cofactor 1) | contraction-table rows (`relation_search.contraction_rows_uncharged`), the factor-base listing, which enumerates the group (`factor_base.fb_points_listed_uncharged`) and evaluates every SHA-256 membership hash (`factor_base.fb_membership_evals_uncharged`), and elimination multiplications mod r (`linear_algebra.linalg_mulmod_uncharged`); priced across the §5a band. Exponential by construction: no [Ope26] solver |
+| `ic.tensor_contraction_cofactor_v1` | as `ic.tensor_contraction_v1`, phase by phase, including every point addition and doubling of the [c] projections evaluated inside the contraction. Fixed-cofactor curves only (c > 1) | as `ic.tensor_contraction_v1`, plus the once-per-draw scan of E for the preimages of each F_i (`factor_base.fb_preimage_scan_uncharged`); priced across the §5a band. Exponential by construction: no [Ope26] solver |
 | `ic.hyperelliptic` | Jacobian operations: the factor-base walk's step precomputation (`setup`), every relation-search step (`relations`). Not the verification: `d1.scalar_mul(k)` runs twice on a success and increments no counter (frozen; the older text of this row said it was charged) | the smoothness oracle's `F_p` multiplications, elimination row operations (phase `linear_algebra`, 0 GAE); priced across the §5a band. The factor-base scan's `F_p` work (`f(x)` and a square root at every `x` it visits) is not tallied at all |
 | `ic.hyperelliptic_v2` | as `ic.hyperelliptic`, plus every Cantor doubling and addition of both verifications (`verification`, `⌊log₂ k⌋ + 1` doublings and one addition per set bit each, in the total); `ic.hyperelliptic_v2` minus `ic.hyperelliptic` is exactly that phase | as `ic.hyperelliptic`, plus the factor-base scan's `F_p` multiplications (`factor_base_fp_muls_uncharged`, phase `factor_base`, counted by `hyper_ic::factor_base_scan_muls` over the same `x`: Horner `f(x)`, Euler test, Tonelli–Shanks); the record is a lower bound at `w = 0` |
 | `ic.cm_folded_*_v1` | nothing: `total_gae` and every phase's `gae` are 0 (the replay's operations are in `independent_replay.adds/doubles/scalar_mults` only), so `S` is 0, below the floor, and the prose `unpriced` entry names no counter. Frozen | the native backend's work (`native_*_uncharged`) |
@@ -1164,6 +1166,52 @@ method does not take).
   holds at every weight and otherwise says `unresolved inside the band`
   (or `unrankable` when a counter is uncounted). It is over the verified
   pairs, with censored pairs excluded.
+- **Table work is priced by default (owner, 2026-11-08; `--no-price-table-work`
+  for the earlier reading).** The band charges, at `w`, every counter a
+  record names in `cost.unpriced`. Prime-field rho names its per-step
+  negation canonicalisation there (`canonicalisations_uncharged`, about one
+  per step), so its per-step native work is in `U`. The index-calculus table
+  oracles (`wwalk`, the pair tables: every oracle in `ic_framework/plugins.rs`
+  that calls `table_counted()`) record their per-step hash inserts only as
+  `work_native.table_insert_attempts` behind the marker
+  `counted:table_insert_attempts`, for the bitop unit (`work.rs`), and
+  never list them in `cost.unpriced`, so a band that reads `cost.unpriced`
+  alone charges rho's per-step operation and not the walk's. That asymmetry
+  is why walk-table arms read as "unresolved inside the band" or below rho
+  at `w = 1` in `research/curve25519_f1_targetwalk_20261108` (section 5) and
+  `research/curve25519_f1_walk_20261107`. Since 2026-11-08 the default
+  reading (`band::Pricing::default()`, `table_work: true`) adds the phase
+  sum of each `band::TABLE_WORK_COUNTERS` counter to `U`, when and only when
+  the record carries the matching `counted:` marker in some phase (a count
+  without its marker is not known to be complete and is not charged).
+  `--no-price-table-work` on `band` and `compare`
+  (`band::Pricing::pre_2026_11_08()`) is the reading every band file and
+  comparison before that date was computed with, kept so they can be
+  reproduced; where one is cited again it is labelled the pre-2026-11-08
+  reading. `--price-table-work` is still accepted and does nothing. A band
+  row always lists the mean table-work counts (`table_work_mean_counts`);
+  the report names the priced counters (`priced_table_work`, present by
+  default and absent under the earlier reading, so an old band file reads
+  as it was written); the Markdown band states which reading it is. A
+  comparison carries the counts on each arm (`table_work_counts`) and the
+  priced counters in `priced_table_work`, which is part of its identity:
+  a default comparison has a different `comparison_id` from the
+  pre-2026-11-08 comparison of the same inputs, which
+  `--no-price-table-work` reproduces exactly; `legacy_comparison_id` (the
+  v1 id, before any band) is the same under both readings and is present
+  on every unweighted comparison, so calibration replays v1 files under
+  the default. `--save` keeps the plain `comparisons/a__b.json` name for
+  the unweighted pre-2026-11-08 reading, which every file saved before that
+  date is, and saves a weighted or default comparison as
+  `a__b__<comparison_id>.json`, so a new reading never overwrites an old
+  file. **The record format is unchanged**: the price is a reading of the
+  committed `work_native` maps, not a new counter, so `cost.unpriced` and
+  the phase `native` maps that `verify` compares (`audit::compare_replay`)
+  are as they were and committed sessions keep replaying "identical".
+  `bounds`, `challenge` and the backend leaderboard read `band::priced_s`
+  and so take the default reading too. Numbers under both readings and the
+  rule: `research/ecbench_table_work_pricing_20261108/`; the rule itself is
+  AGENTS.md §5a.
 - **Sessions must be complete.** `compare` refuses a session whose status
   is not `complete`. `--allow-interrupted` compares it anyway as
   descriptive evidence: the comparison records the statuses and the flag,

@@ -1,0 +1,452 @@
+From 83defb7df3059825e379c8c77fbfe83e6a9ba038 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Tue, 10 Nov 2026 05:05:33 +0000
+Subject: [PATCH 03/10] lead atlas: evidence tier ladder per lead (I10)
+
+tier 0-3 with tier_evidence per tier; --tiers, tier in --brief/--match/--render;
+--check fails a tier without evidence and advises measured progress below
+tier 2. Two leads tiered 2 on VALIDATION.json files that exist in crypto;
+two candidates left at 0 because their cited paths resolve nowhere.
+Baseline: 2/176 leads at tier >= 2.
+
+Co-Authored-By: Claude Mythos 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01AXUKfUzw574GenKpShCun6
+---
+ .claude/skills/lead-atlas/SKILL.md            |   5 +-
+ knowledge/leads/ecdlp/README.md               |  46 +++++++
+ .../LEAD-ICB-large-prime-variants.yaml        |   4 +
+ ...rned-cost-model-factor-base-selection.yaml |   3 +
+ ...EAD-ICP-prime-ic-constant-engineering.yaml |   4 +
+ .../LEAD-ICP-residual-partial-relations.yaml  |   3 +
+ tools/lead_atlas.py                           | 113 ++++++++++++++++--
+ tools/test_lead_atlas.py                      |  68 +++++++++++
+ 8 files changed, 237 insertions(+), 9 deletions(-)
+
+diff --git a/.claude/skills/lead-atlas/SKILL.md b/.claude/skills/lead-atlas/SKILL.md
+index d2a3ede5ba..1244888faa 100644
+--- a/.claude/skills/lead-atlas/SKILL.md
++++ b/.claude/skills/lead-atlas/SKILL.md
+@@ -40,10 +40,11 @@ atlas:
+    without a lead. Append `<id>\t<LEAD-id>` rows to `coverage.tsv`, keeping
+    the file sorted.
+ 4. `python3 tools/lead_atlas.py --check` must pass.
+-5. `python3 tools/lead_atlas.py --stamp <session-or-agent>` pins every
++5. Set each touched lead's `tier` and `tier_evidence` (README "Evidence tiers"); `--tiers` lists tier >= 2, `--check` advises progress claims below tier 2.
++6. `python3 tools/lead_atlas.py --stamp <session-or-agent>` pins every
+    repository's HEAD as reviewed. Stamp only after steps 1-4 covered the whole
+    delta. A partial review leaves the stamp alone and says what is left.
+-6. Commit the rows, `coverage.tsv` and `REVIEW_STATE.json` together. When
++7. Commit the rows, `coverage.tsv` and `REVIEW_STATE.json` together. When
+    dispositions changed, also refresh the atlas report and graph
+    (`research-visuals`, "Deliverables for each search round";
+    `docs/reports/ecdlp-lead-atlas-*/`).
+diff --git a/knowledge/leads/ecdlp/README.md b/knowledge/leads/ecdlp/README.md
+index e60b71feef..3e045d0458 100644
+--- a/knowledge/leads/ecdlp/README.md
++++ b/knowledge/leads/ecdlp/README.md
+@@ -17,6 +17,7 @@ python3 tools/lead_atlas.py --match "idea"   # leads and KR rows an idea collide
+ python3 tools/lead_atlas.py --delta          # watched paths changed since the last review
+ python3 tools/lead_atlas.py --coverage       # ECDLP ledger records with no lead
+ python3 tools/lead_atlas.py --pursuit        # every lead not disproven in scope
++python3 tools/lead_atlas.py --tiers          # evidence-tier counts per family, leads at tier >= 2
+ python3 tools/lead_atlas.py --check          # CI (make check-ledger)
+ python3 tools/lead_atlas.py --render --out knowledge/leads/ecdlp/ATLAS.md
+ python3 tools/lead_atlas.py --stamp <session> # close a review: pin every repo's HEAD
+@@ -117,6 +118,9 @@ related: [LEAD-...]                          # optional
+ dominated_by: LEAD-...                       # closed_dominated only
+ forecloses: [>= 3 phrases an idea would use when re-proposing this]
+ areas: [FROB, QSP]
++tier: 0                       # 0-3, see "Evidence tiers"; absent reads as 0 (untiered)
++tier_evidence:                # required when tier >= 1: path or pcc id for the tier reached
++  2: crypto:benchmarks/<dir>/VALIDATION.json
+ last_reviewed: 2026-10-24
+ ```
+ 
+@@ -132,6 +136,48 @@ Dispositions:
+ | `open_blocked` | the next step is known but blocked (`blocked_by`) |
+ | `open_unexamined` | ideas exist; no experiment or evidence has touched it |
+ 
++## Evidence tiers
++
++Promotion is by tier, not by wording. `disposition` stays narrative; `tier`
++says how far the lead's evidence has climbed (harness review 2026-11-10, I10):
++
++| tier | meaning |
++|:--|:--|
++| 0 | proposed or prose only (no `tier` field reads as 0 and is flagged `untiered`) |
++| 1 | toy exact count or Stage-0 check on a small instance, with a committed command |
++| 2 | scaled instance with a matched rho reference and the section 5a GAE band: an ecbench or autolab record with a replay certificate |
++| 3 | index-calculus leaderboard row with `VALIDATION.json` (crypto `docs/ic/LEADERBOARD.md`) |
++
++`tier_evidence` maps the tier reached to a path or pcc claim id (a lower tier is
++implied by a higher one and needs no entry of its own). `--check` fails an
++invalid tier or a tier >= 1 with no evidence for it, and advises (does not
++fail) a lead whose `status` or `best_measured` wording claims measured progress
++(`measured`, `confirmed`, `advanced`, `promoted`) at tier < 2. Rows cited
++only from pre-gate leaderboard tables or same-host, native-unpriced ecbench
++sessions are not tiered up: they lack the matched rho and band, or the
++validation record.
++
++### Metric baseline (2026-11-10)
++
++Leads with a tier-2 record / leads proposed = 2 / 176 (1.1%), at tiers
++0: 174, 1: 0, 2: 2, 3: 0 (`--tiers`). The two are ICB-large-prime-variants
++and ICP-prime-ic-constant-engineering, whose VALIDATION.json files exist in
++crypto. ICB-learned-cost-model-factor-base-selection and
++ICP-residual-partial-relations cite VALIDATION.json paths that resolve in no
++checkout and stay at tier 0 until they do. Tier 1 is empty because no lead yet
++carries a verified committed Stage-0 command; it is a backfill gap, not a
++finding.
++
++Falsification test (does tier-2 predict leaderboard rows better than status?):
++at each later review, take the leads that gained a validated leaderboard row
++(or `VALIDATION.json`-gated improvement) since the previous stamp. For each
++lead, record the tier and the `disposition` it held at the previous stamp.
++Compare the precision of "tier 2 at the earlier stamp" against "disposition
++`open_next_step`" as predictors of gaining a row, on the same leads, with a
++paired bootstrap over leads. The tier ladder is falsified if its precision is
++not above the disposition's after three reviews, or if tier-2 leads gain rows
++no more often than tier-0 leads.
++
+ ## Rules
+ 
+ 1. **A closure names its obstruction** (AGENTS.md "Research direction":
+diff --git a/knowledge/leads/ecdlp/ic-binary/LEAD-ICB-large-prime-variants.yaml b/knowledge/leads/ecdlp/ic-binary/LEAD-ICB-large-prime-variants.yaml
+index 7dd80c4be2..3ac05d2ced 100644
+--- a/knowledge/leads/ecdlp/ic-binary/LEAD-ICB-large-prime-variants.yaml
++++ b/knowledge/leads/ecdlp/ic-binary/LEAD-ICB-large-prime-variants.yaml
+@@ -77,4 +77,8 @@ forecloses:
+ - large-prime graph for Koblitz index calculus
+ areas:
+ - BINSTD
++tier: 2
++tier_evidence:
++  2: >-
++    crypto:benchmarks/20261029-icb-large-prime/VALIDATION.json (n = 53 and 61 ladder, replay certificate, validator report, band; crypto PR #2850)
+ last_reviewed: '2026-10-29'
+diff --git a/knowledge/leads/ecdlp/ic-binary/LEAD-ICB-learned-cost-model-factor-base-selection.yaml b/knowledge/leads/ecdlp/ic-binary/LEAD-ICB-learned-cost-model-factor-base-selection.yaml
+index 3f6d30e565..09b7d7826e 100644
+--- a/knowledge/leads/ecdlp/ic-binary/LEAD-ICB-learned-cost-model-factor-base-selection.yaml
++++ b/knowledge/leads/ecdlp/ic-binary/LEAD-ICB-learned-cost-model-factor-base-selection.yaml
+@@ -114,4 +114,7 @@ forecloses:
+ areas:
+ - BINSTD
+ - CERTBIN
++tier: 0
++# tier left 0 on 2026-11-10: the VALIDATION.json this lead cites was not found
++# in any checkout (crypto, cryptanalysis); tier it when the path resolves.
+ last_reviewed: '2026-11-06'
+diff --git a/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-prime-ic-constant-engineering.yaml b/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-prime-ic-constant-engineering.yaml
+index 7950df3c22..4f6dcdf7f5 100644
+--- a/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-prime-ic-constant-engineering.yaml
++++ b/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-prime-ic-constant-engineering.yaml
+@@ -162,4 +162,8 @@ forecloses:
+ - automatic recipe planner for ic.pipeline
+ areas:
+ - ICPERF
++tier: 2
++tier_evidence:
++  2: >-
++    crypto:benchmarks/20261029-prime-fb-size-20bit/VALIDATION.json (passed with caveats, 672/672 replays; second-host replay 1,008/1,008). Tier 3 not claimed: Table B validated render has pricing_ok False caveat
+ last_reviewed: '2026-10-30'
+diff --git a/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-residual-partial-relations.yaml b/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-residual-partial-relations.yaml
+index 9b573e2f97..a71d1c59bf 100644
+--- a/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-residual-partial-relations.yaml
++++ b/knowledge/leads/ecdlp/ic-prime/LEAD-ICP-residual-partial-relations.yaml
+@@ -85,4 +85,7 @@ forecloses:
+ - double large prime graph for Semaev relations
+ areas:
+ - PFDR
++tier: 0
++# tier left 0 on 2026-11-10: the VALIDATION.json this lead cites was not found
++# in any checkout (crypto, cryptanalysis); tier it when the path resolves.
+ last_reviewed: '2026-11-01'
+diff --git a/tools/lead_atlas.py b/tools/lead_atlas.py
+index cf74f2996e..cacfb60df6 100644
+--- a/tools/lead_atlas.py
++++ b/tools/lead_atlas.py
+@@ -16,6 +16,7 @@ happened since: "already done" becomes a computed answer, not a re-reading.
+     python3 tools/lead_atlas.py --delta          # what changed since the last review
+     python3 tools/lead_atlas.py --coverage       # ECC ledger records not mapped to a lead
+     python3 tools/lead_atlas.py --pursuit        # every lead not disproven in scope
++    python3 tools/lead_atlas.py --tiers          # evidence-tier counts and leads at tier >= 2
+     python3 tools/lead_atlas.py --render [--out PATH]   # ATLAS.md (derived)
+     python3 tools/lead_atlas.py --stamp          # record a completed review (REVIEW_STATE.json)
+ 
+@@ -71,6 +72,15 @@ DISPOSITIONS = CLOSED + OPEN
+ DISPROVEN = ("closed_obstructed",)
+ OBSTRUCTION_KINDS = {"theorem", "proof", "measured", "literature",
+                      "cost_model"}
++# Evidence ladder (README "Evidence tiers"). Promotion is by tier; the
++# disposition stays narrative. A lead without a `tier` field is tier 0 and
++# reported as untiered.
++TIERS = (0, 1, 2, 3)
++# Words in a lead's `status` field (when present) or in its best_measured text
++# that claim measured progress. Such a claim below tier 2 is advised, not failed.
++PROGRESS_STATUS = re.compile(r"\b(measured|confirmed|advanced|promoted)\b",
++                             re.IGNORECASE)
++PROGRESS_BEST = re.compile(r"\b(CONFIRMED|promoted|advanced)\b")
+ LEAD_ID = re.compile(r"^LEAD-([A-Z]+)-[a-z0-9][a-z0-9-]{1,47}$")
+ LEDGER_REF = re.compile(
+     r"^(H|IDEA|EV|DEC|GOAL|RQ|EXP|CORR|HO)-[A-Za-z0-9-]+$")
+@@ -172,6 +182,51 @@ def kr_ids() -> set[str]:
+ # ---------------------------------------------------------------- checking
+ 
+ 
++def tier_of(row: dict[str, Any]) -> tuple[int, bool]:
++    """(tier, untiered). A missing or invalid `tier` reads as 0, untiered."""
++    t = row.get("tier")
++    if isinstance(t, int) and not isinstance(t, bool) and t in TIERS:
++        return t, False
++    return 0, t is None
++
++
++def claims_progress(row: dict[str, Any]) -> bool:
++    """Whether the row's wording claims measured progress."""
++    if PROGRESS_STATUS.search(str(row.get("status") or "")):
++        return True
++    return bool(PROGRESS_BEST.search(str(row.get("best_measured") or "")))
++
++
++def tier_advice(rows: list[dict[str, Any]]) -> list[str]:
++    """Advisory lines: progress claimed in words, tier below 2."""
++    out = []
++    for r in rows:
++        if claims_progress(r) and tier_of(r)[0] < 2:
++            out.append(f"{r['_path']}: claims measured progress "
++                       f"(status/best_measured) but tier is "
++                       f"{tier_of(r)[0]} < 2; add a tier-2 record in "
++                       "tier_evidence or soften the wording")
++    return out
++
++
++def tier_table(rows: list[dict[str, Any]]) -> dict[str, Any]:
++    """Counts per tier per family, plus the leads at tier >= 2."""
++    by_fam: dict[str, dict[int, int]] = {}
++    untiered = 0
++    for r in rows:
++        t, u = tier_of(r)
++        untiered += u
++        by_fam.setdefault(str(r.get("family")), {k: 0 for k in TIERS})[t] += 1
++    total = {k: sum(f[k] for f in by_fam.values()) for k in TIERS}
++    high = [{"id": r["id"], "tier": tier_of(r)[0],
++             "tier_evidence": r.get("tier_evidence")}
++            for r in rows if tier_of(r)[0] >= 2]
++    n = len(rows)
++    return {"leads": n, "untiered": untiered, "total": total,
++            "by_family": by_fam, "tier2_plus": high,
++            "tier2_ratio": (len(high) / n) if n else 0.0}
++
++
+ def check_leads(rows: list[dict[str, Any]], *, strict_paths: bool = False
+                 ) -> tuple[list[str], list[str]]:
+     """Return (errors, warnings). Missing sibling repos warn, never fail."""
+@@ -258,6 +313,20 @@ def check_leads(rows: list[dict[str, Any]], *, strict_paths: bool = False
+             elif disp == "open_blocked" and not str(nxt.get("blocked_by")
+                                                     or "").strip():
+                 err("open_blocked requires next_action.blocked_by")
++        if "tier" in r:
++            tv = r.get("tier")
++            if not (isinstance(tv, int) and not isinstance(tv, bool)
++                    and tv in TIERS):
++                err(f"tier must be one of {list(TIERS)}")
++            else:
++                te = r.get("tier_evidence")
++                if tv >= 1 and not (isinstance(te, dict) and
++                                    str(te.get(tv) or te.get(str(tv))
++                                        or "").strip()):
++                    err(f"tier {tv} requires tier_evidence[{tv}] "
++                        "(path or pcc id)")
++        elif r.get("tier_evidence"):
++            err("tier_evidence without tier")
+         fc = r.get("forecloses") or []
+         if not isinstance(fc, list) or len(fc) < 3:
+             err("forecloses needs >= 3 phrases")
+@@ -584,6 +653,13 @@ def brief() -> str:
+                      ". Run `python3 tools/lead_atlas.py --delta`, fold the "
+                      "new records into leads (skill `lead-atlas`), then "
+                      "`--stamp`.")
++    tt = tier_table(rows)
++    lines.append("Evidence tiers (tier 2 = scaled, matched rho, replay "
++                 "certificate): " + ", ".join(
++                     f"tier {k} {v}" for k, v in tt["total"].items())
++                 + f"; {tt['untiered']} untiered; "
++                 f"{len(tt['tier2_plus'])}/{tt['leads']} leads at tier >= 2. "
++                 "`python3 tools/lead_atlas.py --tiers`.")
+     if cov["unmapped"]:
+         lines.append(f"{len(cov['unmapped'])} ECDLP records have no lead: "
+                      "`python3 tools/lead_atlas.py --coverage`.")
+@@ -606,7 +682,8 @@ def _tokens(text: str) -> set[str]:
+             if t not in STOP and len(t) > 2}
+ 
+ 
+-def match(query: str, limit: int = 8) -> list[tuple[float, str, str, str]]:
++def match(query: str, limit: int = 8
++          ) -> list[tuple[float, str, str, str, str]]:
+     """Rank leads (and KR rows) against an idea. Low scores prove nothing."""
+     q = _tokens(query)
+     ql = " ".join(query.lower().split())
+@@ -620,12 +697,12 @@ def match(query: str, limit: int = 8) -> list[tuple[float, str, str, str]]:
+                  + 5 * len(hits))
+         if score:
+             out.append((float(score), str(r["id"]), str(r.get("disposition")),
+-                        str(r.get("title"))))
++                        str(r.get("title")), f"T{tier_of(r)[0]}"))
+     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+     import build_frontier_map as bfm  # noqa: E402
+     for score, row, _hits in bfm.match(bfm.load_rows(), query, limit):
+         out.append((score, str(row.get("id")), "known_result",
+-                    str(row.get("title"))))
++                    str(row.get("title")), "-"))
+     out.sort(key=lambda t: (-t[0], t[1]))
+     return out[:limit]
+ 
+@@ -652,10 +729,11 @@ def render(rows: list[dict[str, Any]]) -> str:
+             "Only `closed_obstructed` leaves this queue. Known, dominated and "
+             "scale-exhausted leads remain pursued through their exact revisit "
+             "conditions.", "",
+-            "| lead | disposition | next action or revisit trigger | best measured |",
+-            "|:--|:--|:--|:--|"]
++            "| lead | tier | disposition | next action or revisit trigger | best measured |",
++            "|:--|:--|:--|:--|:--|"]
+     for r in pursuit_rows(rows):
+         out.append(f"| `{r['id']}` {_one(r.get('title'))} | "
++                   f"T{tier_of(r)[0]} | "
+                    f"{r['disposition']} | {_one(pursuit_action(r))} | "
+                    f"{_one(r.get('best_measured')) or '—'} |")
+     for fam in FAMILIES:
+@@ -735,6 +813,7 @@ def main(argv: list[str] | None = None) -> int:
+     g.add_argument("--delta", action="store_true")
+     g.add_argument("--coverage", action="store_true")
+     g.add_argument("--pursuit", action="store_true")
++    g.add_argument("--tiers", action="store_true")
+     g.add_argument("--render", action="store_true")
+     g.add_argument("--stamp", metavar="REVIEWER")
+     ap.add_argument("--out", metavar="PATH")
+@@ -759,6 +838,8 @@ def main(argv: list[str] | None = None) -> int:
+             errors.append(f"coverage.tsv: {d} is not a lead id")
+         for w in warnings:
+             print("warning: " + w, file=sys.stderr)
++        for adv in tier_advice(rows):
++            print("advice: " + adv, file=sys.stderr)
+         for e in errors:
+             print(e, file=sys.stderr)
+         if errors:
+@@ -776,8 +857,8 @@ def main(argv: list[str] | None = None) -> int:
+         elif not res:
+             print("no lead or known result shares vocabulary with this idea; "
+                   "a low score is not novelty: read ATLAS.md by family")
+-        for score, rid, disp, title in res:
+-            print(f"{score:5.0f}  {rid:44s} {disp:18s} {title}")
++        for score, rid, disp, title, tier in res:
++            print(f"{score:5.0f}  {rid:44s} {disp:18s} {tier:3s} {title}")
+         return 0
+     if a.delta:
+         dl = delta()
+@@ -819,6 +900,24 @@ def main(argv: list[str] | None = None) -> int:
+                 print(f"{r['id']:52s} {r['disposition']:20s} "
+                       f"{pursuit_action(r)}")
+         return 0
++    if a.tiers:
++        tt = tier_table(load_leads())
++        if a.json:
++            print(json.dumps(tt, indent=1))
++            return 0
++        print(f"{tt['leads']} leads, {tt['untiered']} untiered (read as 0); "
++              f"tier >= 2: {len(tt['tier2_plus'])}/{tt['leads']} "
++              f"({100 * tt['tier2_ratio']:.1f}%)")
++        print(f"{'family':12s} " + " ".join(f"{'T' + str(k):>4s}"
++                                           for k in TIERS))
++        for fam, cnt in sorted(tt["by_family"].items()):
++            print(f"{fam:12s} " + " ".join(f"{cnt[k]:4d}" for k in TIERS))
++        print(f"{'all':12s} " + " ".join(f"{tt['total'][k]:4d}"
++                                         for k in TIERS))
++        for h in tt["tier2_plus"]:
++            print(f"tier {h['tier']}  {h['id']}  "
++                  f"{json.dumps(h['tier_evidence'])}")
++        return 0
+     if a.render:
+         text = render(load_leads())
+         if a.out:
+diff --git a/tools/test_lead_atlas.py b/tools/test_lead_atlas.py
+index 96e7ab7fc3..ca519dc87e 100644
+--- a/tools/test_lead_atlas.py
++++ b/tools/test_lead_atlas.py
+@@ -153,6 +153,74 @@ class AtlasTests(unittest.TestCase):
+         self.assertIn("target-dependent arbitrary set-section", statement)
+ 
+ 
++class TierTests(unittest.TestCase):
++    def setUp(self) -> None:
++        self.rows = la.load_leads()
++        self.base = copy.deepcopy(self.rows[0])
++        for k in ("tier", "tier_evidence", "status", "best_measured"):
++            self.base.pop(k, None)
++
++    def test_default_is_zero_and_untiered(self) -> None:
++        self.assertEqual(la.tier_of(self.base), (0, True))
++        self.base["tier"] = 0
++        self.assertEqual(la.tier_of(self.base), (0, False))
++
++    def test_parse_tier(self) -> None:
++        self.base["tier"] = 2
++        self.assertEqual(la.tier_of(self.base), (2, False))
++
++    def test_invalid_tier_and_missing_evidence_fail(self) -> None:
++        bad = copy.deepcopy(self.base)
++        bad["tier"] = 7
++        errors, _ = la.check_leads([bad])
++        self.assertTrue(any("tier must be" in e for e in errors))
++        bad["tier"] = 2
++        errors, _ = la.check_leads([bad])
++        self.assertTrue(any("requires tier_evidence" in e for e in errors))
++        bad["tier_evidence"] = {2: "some/path"}
++        errors, _ = la.check_leads([bad])
++        self.assertFalse(any("tier" in e for e in errors))
++
++    def test_tiers_table(self) -> None:
++        a, b = copy.deepcopy(self.base), copy.deepcopy(self.base)
++        a["tier"], a["tier_evidence"] = 3, {3: "x"}
++        tt = la.tier_table([a, b])
++        self.assertEqual(tt["total"], {0: 1, 1: 0, 2: 0, 3: 1})
++        self.assertEqual(tt["untiered"], 1)
++        self.assertEqual([h["id"] for h in tt["tier2_plus"]], [a["id"]])
++        self.assertAlmostEqual(tt["tier2_ratio"], 0.5)
++
++    def test_progress_claim_below_tier_two_is_advised(self) -> None:
++        row = copy.deepcopy(self.base)
++        row["status"] = "measured"
++        self.assertEqual(len(la.tier_advice([row])), 1)
++        row["tier"], row["tier_evidence"] = 2, {2: "x"}
++        self.assertEqual(la.tier_advice([row]), [])
++        row2 = copy.deepcopy(self.base)
++        row2["best_measured"] = "gain CONFIRMED at n = 19"
++        self.assertEqual(len(la.tier_advice([row2])), 1)
++        self.assertEqual(la.tier_advice([self.base]), [])
++
++    def test_advice_does_not_fail_the_check(self) -> None:
++        row = copy.deepcopy(self.base)
++        row["status"] = "confirmed"
++        errors, _ = la.check_leads([row])
++        self.assertFalse(any("progress" in e for e in errors))
++
++    def test_match_and_brief_carry_tier(self) -> None:
++        hits = la.match("Frobenius-invariant factor base for Koblitz "
++                        "subfield curve index calculus")
++        self.assertTrue(all(len(h) == 5 for h in hits))
++        self.assertTrue(any(h[4].startswith("T") for h in hits))
++        self.assertIn("Evidence tiers", la.brief())
++
++    def test_backfilled_tier_two_leads_cite_validation(self) -> None:
++        for r in self.rows:
++            if la.tier_of(r)[0] >= 2:
++                self.assertIn("VALIDATION.json",
++                              str(r["tier_evidence"].get(la.tier_of(r)[0])))
++
++
+ class PriorArtLeadTests(unittest.TestCase):
+     def _errors(self, rec_id: str, block: dict) -> list[str]:
+         ctx = vl.Ctx(set())
+-- 
+2.43.0
+

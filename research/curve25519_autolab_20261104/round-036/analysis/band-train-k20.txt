@@ -1,0 +1,52 @@
+| curve | log2 r | arm | verified/runs | S(w=0) | S(w=0.1) | S(w=1) | uncounted |
+|:--|--:|:--|--:|--:|--:|--:|:--|
+| icv1-fp20-tm1050-4295f05e | 17.00 | inc | 16/16 | 2.574 | 2.823 | 5.063 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | rho-neg | 16/16 | 1.694 | 1.819 | 2.948 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | tw2l-x10-j16-n2 | 16/16 | 2.284 | 2.448 | 3.925 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | tw2l-x10-j8-n2 | 16/16 | 2.403 | 2.592 | 4.289 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | tw2l-x15-j16-n2 | 16/16 | 2.352 | 2.520 | 4.038 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | tw2l-x20-j16-n2 | 16/16 | 2.487 | 2.667 | 4.287 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | tw2l-x20-j32-n2 | 16/16 | 2.642 | 2.810 | 4.322 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | tw2l-x20-j8-n2 | 16/16 | 2.363 | 2.545 | 4.179 | — |
+| icv1-fp20-tm1050-4295f05e | 17.00 | tw2l-x30-j16-n2 | 16/16 | 2.429 | 2.603 | 4.168 | — |
+
+Table work priced in U at w per operation (the default since 2026-11-08; `--no-price-table-work` for the earlier reading): table_insert_attempts; counted in `work_native` behind a `counted:` marker, not listed in `cost.unpriced`.
+
+| curve | pair | verdict across the band |
+|:--|:--|:--|
+| icv1-fp20-tm1050-4295f05e | inc vs rho-neg | rho-neg < inc |
+| icv1-fp20-tm1050-4295f05e | inc vs tw2l-x10-j16-n2 | tw2l-x10-j16-n2 < inc |
+| icv1-fp20-tm1050-4295f05e | inc vs tw2l-x10-j8-n2 | tw2l-x10-j8-n2 < inc |
+| icv1-fp20-tm1050-4295f05e | inc vs tw2l-x15-j16-n2 | tw2l-x15-j16-n2 < inc |
+| icv1-fp20-tm1050-4295f05e | inc vs tw2l-x20-j16-n2 | tw2l-x20-j16-n2 < inc |
+| icv1-fp20-tm1050-4295f05e | inc vs tw2l-x20-j32-n2 | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | inc vs tw2l-x20-j8-n2 | tw2l-x20-j8-n2 < inc |
+| icv1-fp20-tm1050-4295f05e | inc vs tw2l-x30-j16-n2 | tw2l-x30-j16-n2 < inc |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs tw2l-x10-j16-n2 | rho-neg < tw2l-x10-j16-n2 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs tw2l-x10-j8-n2 | rho-neg < tw2l-x10-j8-n2 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs tw2l-x15-j16-n2 | rho-neg < tw2l-x15-j16-n2 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs tw2l-x20-j16-n2 | rho-neg < tw2l-x20-j16-n2 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs tw2l-x20-j32-n2 | rho-neg < tw2l-x20-j32-n2 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs tw2l-x20-j8-n2 | rho-neg < tw2l-x20-j8-n2 |
+| icv1-fp20-tm1050-4295f05e | rho-neg vs tw2l-x30-j16-n2 | rho-neg < tw2l-x30-j16-n2 |
+| icv1-fp20-tm1050-4295f05e | tw2l-x10-j16-n2 vs tw2l-x10-j8-n2 | tw2l-x10-j16-n2 < tw2l-x10-j8-n2 |
+| icv1-fp20-tm1050-4295f05e | tw2l-x10-j16-n2 vs tw2l-x15-j16-n2 | tw2l-x10-j16-n2 < tw2l-x15-j16-n2 |
+| icv1-fp20-tm1050-4295f05e | tw2l-x10-j16-n2 vs tw2l-x20-j16-n2 | tw2l-x10-j16-n2 < tw2l-x20-j16-n2 |
+| icv1-fp20-tm1050-4295f05e | tw2l-x10-j16-n2 vs tw2l-x20-j32-n2 | tw2l-x10-j16-n2 < tw2l-x20-j32-n2 |
+| icv1-fp20-tm1050-4295f05e | tw2l-x10-j16-n2 vs tw2l-x20-j8-n2 | tw2l-x10-j16-n2 < tw2l-x20-j8-n2 |
+| icv1-fp20-tm1050-4295f05e | tw2l-x10-j16-n2 vs tw2l-x30-j16-n2 | tw2l-x10-j16-n2 < tw2l-x30-j16-n2 |
+| icv1-fp20-tm1050-4295f05e | tw2l-x10-j8-n2 vs tw2l-x15-j16-n2 | tw2l-x15-j16-n2 < tw2l-x10-j8-n2 |
+| icv1-fp20-tm1050-4295f05e | tw2l-x10-j8-n2 vs tw2l-x20-j16-n2 | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | tw2l-x10-j8-n2 vs tw2l-x20-j32-n2 | tw2l-x10-j8-n2 < tw2l-x20-j32-n2 |
+| icv1-fp20-tm1050-4295f05e | tw2l-x10-j8-n2 vs tw2l-x20-j8-n2 | tw2l-x20-j8-n2 < tw2l-x10-j8-n2 |
+| icv1-fp20-tm1050-4295f05e | tw2l-x10-j8-n2 vs tw2l-x30-j16-n2 | unresolved inside the band |
+| icv1-fp20-tm1050-4295f05e | tw2l-x15-j16-n2 vs tw2l-x20-j16-n2 | tw2l-x15-j16-n2 < tw2l-x20-j16-n2 |
+| icv1-fp20-tm1050-4295f05e | tw2l-x15-j16-n2 vs tw2l-x20-j32-n2 | tw2l-x15-j16-n2 < tw2l-x20-j32-n2 |
+| icv1-fp20-tm1050-4295f05e | tw2l-x15-j16-n2 vs tw2l-x20-j8-n2 | tw2l-x15-j16-n2 < tw2l-x20-j8-n2 |
+| icv1-fp20-tm1050-4295f05e | tw2l-x15-j16-n2 vs tw2l-x30-j16-n2 | tw2l-x15-j16-n2 < tw2l-x30-j16-n2 |
+| icv1-fp20-tm1050-4295f05e | tw2l-x20-j16-n2 vs tw2l-x20-j32-n2 | tw2l-x20-j16-n2 < tw2l-x20-j32-n2 |
+| icv1-fp20-tm1050-4295f05e | tw2l-x20-j16-n2 vs tw2l-x20-j8-n2 | tw2l-x20-j8-n2 < tw2l-x20-j16-n2 |
+| icv1-fp20-tm1050-4295f05e | tw2l-x20-j16-n2 vs tw2l-x30-j16-n2 | tw2l-x30-j16-n2 < tw2l-x20-j16-n2 |
+| icv1-fp20-tm1050-4295f05e | tw2l-x20-j32-n2 vs tw2l-x20-j8-n2 | tw2l-x20-j8-n2 < tw2l-x20-j32-n2 |
+| icv1-fp20-tm1050-4295f05e | tw2l-x20-j32-n2 vs tw2l-x30-j16-n2 | tw2l-x30-j16-n2 < tw2l-x20-j32-n2 |
+| icv1-fp20-tm1050-4295f05e | tw2l-x20-j8-n2 vs tw2l-x30-j16-n2 | unresolved inside the band |

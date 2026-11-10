@@ -476,6 +476,20 @@ KB_REMINDER = (
     "claim, cross-repository question or subagent handoff (AGENTS.md \"Knowledge "
     "base first\"; skill research-kb; fallback scripts/research-kb)."
 )
+KB_UNAVAILABLE = (
+    "Research KB: unavailable here (no shared catalog at {home}). Record "
+    "`KB unavailable: <why>` under Sources checked and use the lead atlas "
+    "(crypto-autoresearcher:knowledge/leads/ecdlp/) plus a file search; a miss "
+    "is not evidence of absence."
+)
+
+
+def kb_reminder(root: Path) -> str:
+    """The reminder that can be followed in this checkout's environment."""
+    home = Path(os.environ.get("RESEARCH_KB_HOME") or (root.parent / "research-kb" / "data"))
+    if (home / "catalog.sqlite").is_file():
+        return KB_REMINDER
+    return KB_UNAVAILABLE.format(home=home)
 
 
 def cmd_session_start(args) -> int:
@@ -486,11 +500,12 @@ def cmd_session_start(args) -> int:
     root = Path(root_s)
     h = load(root)
     pending = h.get("status") == "pending" and h.get("session_id") != hook.get("session_id")
+    reminder = kb_reminder(root)
     if pending:
         msg = (f"A pending runtime handoff from {h.get('from')} ({h.get('reason')}, {h.get('written_utc')}) is in "
-               f"{root}/.resume/HANDOFF.md. " + takeover_prompt(root, h) + "\n\n" + KB_REMINDER)
+               f"{root}/.resume/HANDOFF.md. " + takeover_prompt(root, h) + "\n\n" + reminder)
     else:
-        msg = KB_REMINDER
+        msg = reminder
     runtime = args.runtime or detect_runtime(hook)
     if runtime == "claude":
         print(json.dumps({"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": msg}}))
