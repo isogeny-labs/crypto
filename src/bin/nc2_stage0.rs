@@ -23,6 +23,37 @@
 //! | D2  | control, stride tiling: serpentine enumeration of a (C+2)-dimensional box, one axis (one stride) per step, strides `m^k`, `m = ceil(r^(1/(C+2)))`, seed axes strided like a and b. Deterministic. (A first draft, babies `(0,0,j)` and giants `(0,1,-i m)`, had a = 0 everywhere: every row is then proportional to `(1, -d/s)`, rank 1 forever; replaced before any D2 number was used.) |
 //! | D3  | pre-registered search: a genome of at most 16 jump vectors built by per-coordinate rules (zero, one, uniform, small, arithmetic progression, quadratic in the jump index = conic-like), a schedule (random stream, cyclic, ruler, permuted rounds) and a start vector; random-restart hill climbing on Monte Carlo E over a TRAINING sample set; the winner (lowest training E) is re-scored on a disjoint fresh sample set; only that held-out value counts. |
 //! | CE  | randomised-e control: the winner of D3 with every seed coefficient of every jump (and of the start) replaced by uniform random values. E must return to the Poisson value. |
+//!
+//! # SNC-2 Stage 0 pre-registration (`--chained`; written and committed before any chained number was run)
+//!
+//! Record: `research/curve25519_autolab_20261104/ideas/SYNTHESIS-NC-20261108.md`, SNC-2 [pcc:unverified].
+//! Zero group operations, C = 2 only, rank-3 stop rule on `(db, e1, e2)` with the seed-part guard (the engine above,
+//! unchanged). Exact chained design `CH`, fixed here:
+//!
+//! * 16 jumps `J_j = [a_j]P1 + [a'_j]P2 + K_j`, i.e. scalar vector `(K_j.c, K_j.b, a_j, a'_j)` over `(G, Q, P1, P2)`.
+//! * `K_0, K_1`: independent uniform in `Z_r^2` (the `[c]G + [b]Q` part). `K_j = K_{j-1} + K_{j-2}` mod r for
+//!   `j = 2..15` (one addition per stored jump point; set-up, not counted in E, as in NC-2).
+//! * `a_j, a'_j`: independent uniform in `[1, M]`, `M = round(1.2 sqrt(T))`, `T = round(1.75 sqrt(r))` (the wwalk
+//!   alpha rule at the record's predicted walk length). Buildable by small scalar multiplications.
+//! * Start point: `(c, b)` uniform in `Z_r^2`, `(e1, e2)` uniform in `[1, M]`. Jump choice: a stream independent
+//!   of the point (as D0). Jumps, start and stream are fresh per sample (as D0, D1). One addition per stored point.
+//! * Stop: rank 3 of the rows' `(db, e1, e2)` columns after the guard; cost = points generated; cap 10 sqrt(r).
+//! * Samples: 2000 per curve, `(d, s1, s2)` uniform, the same held-out samples as the NC-2 run (seed ^ 0xAAAA0001).
+//! * Curves: the nine NC-2 r values (k = 20: 131203, 131317, 131111; k = 24: 2097349, 2097559, 2097523;
+//!   k = 28: 33558163, 33554761, 33558059). Seed 20261108.
+//! * Per-k E = mean of the three curve means; its SE = sqrt(sum of the three squared SEs) / 3.
+//!
+//! Controls (stop and report if any is outside its interval; nothing is tuned):
+//!
+//! * D0i (iid) at C = 2, n = 20000, first r of each size: E in [1.652, 1.672] (record: 1.662 +- 0.01).
+//! * D0 (NC-2 16-jump uniform random walk) at C = 2, n = 2000, all nine curves: E in [1.66, 1.76]
+//!   (NC-2 values were 1.684 to 1.740; the walk excess over the Poisson floor is 3.5 to 4.5 percent).
+//! * CE (randomised-e control): the CH design with `(a_j, a'_j)` and start seed coordinates replaced by uniform
+//!   values in `Z_r`, n = 2000, all nine curves: E in [1.66, 1.77] ("returns to the Poisson value" plus the walk
+//!   excess; if CH shows structure, CE removes the seed-axis part of it).
+//!
+//! Falsification line (record): SNC-2 is dead at Stage 0 if chained E (per-k mean of CH) is above 1.82 at two of
+//! the three sizes. The record's prediction is 1.75 [1.70, 1.82]. Only the point value of the per-k mean is compared.
 
 use std::collections::HashMap;
 use std::hash::{BuildHasherDefault, Hasher};
@@ -804,6 +835,54 @@ fn eval_randomised_e(r: u64, c: usize, samples: &[Sample], g: &Genome, seed: u64
     })
 }
 
+/// SNC-2 chained design (see the pre-registration in the header): wwalk alpha bound.
+fn chain_m(r: u64) -> u64 {
+    let t = (1.75 * (r as f64).sqrt()).round();
+    ((1.2 * t.sqrt()).round() as u64).max(1)
+}
+
+/// The chained C = 2 jump set and start vector.  `K_0, K_1` uniform in
+/// `Z_r^2` (coordinates 0 and 1 = G and Q parts), `K_j = K_{j-1} + K_{j-2}`;
+/// seed coordinates uniform in `[1, M]` (or in `Z_r` for the randomised-e
+/// control `uniform_e`).
+fn build_chain(r: u64, rng: &mut Rng, uniform_e: bool) -> (Vec<Vec4>, Vec4) {
+    let m = chain_m(r);
+    let seed_coord = |rng: &mut Rng| {
+        if uniform_e {
+            rng.below(r)
+        } else {
+            1 + rng.below(m)
+        }
+    };
+    let mut k = vec![[rng.below(r), rng.below(r)], [rng.below(r), rng.below(r)]];
+    for j in 2..16 {
+        let (p, q) = (k[j - 1], k[j - 2]);
+        k.push([addmod(p[0], q[0], r), addmod(p[1], q[1], r)]);
+    }
+    let jumps = k
+        .iter()
+        .map(|kj| [kj[0], kj[1], seed_coord(rng), seed_coord(rng)])
+        .collect();
+    let start = [rng.below(r), rng.below(r), seed_coord(rng), seed_coord(rng)];
+    (jumps, start)
+}
+
+fn eval_chain(r: u64, samples: &[Sample], uniform_e: bool) -> Stat {
+    evaluate(r, 2, samples, |smp| {
+        let mut rng = Rng::new(smp.design ^ 0xC4A1_0005);
+        let (jumps, start) = build_chain(r, &mut rng, uniform_e);
+        WalkGen::new(r, jumps, Sched::Random, start, rng.next())
+    })
+}
+
+/// Aggregate per-curve stats: mean of means, SE = sqrt(sum se^2) / m.
+fn aggregate(stats: &[Stat]) -> (f64, f64) {
+    let m = stats.len() as f64;
+    let mean = stats.iter().map(|s| s.mean).sum::<f64>() / m;
+    let se = stats.iter().map(|s| s.se * s.se).sum::<f64>().sqrt() / m;
+    (mean, se)
+}
+
 struct SearchResult {
     best: Genome,
     train: Stat,
@@ -854,6 +933,7 @@ struct Args {
     train: usize,
     restarts: usize,
     steps: usize,
+    chained: bool,
 }
 
 fn parse_args() -> Result<Args, String> {
@@ -867,6 +947,7 @@ fn parse_args() -> Result<Args, String> {
         train: 300,
         restarts: 8,
         steps: 40,
+        chained: false,
     };
     let argv: Vec<String> = std::env::args().skip(1).collect();
     let mut i = 0;
@@ -898,6 +979,11 @@ fn parse_args() -> Result<Args, String> {
                     x.parse().map_err(|_| bad(key))?,
                     j.parse().map_err(|_| bad(key))?,
                 ));
+            }
+            ("--chained", _) => {
+                a.chained = true;
+                i += 1;
+                continue;
             }
             ("--no-d3", _) => {
                 a.d3 = false;
@@ -949,6 +1035,10 @@ fn main() {
         args.restarts,
         args.steps
     );
+    if args.chained {
+        run_chained(&args);
+        return;
+    }
     let poisson = |c: usize| match c {
         0 => 0.886,
         1 => 1.329,
@@ -1010,6 +1100,38 @@ fn main() {
                 println!("CE  randomised-e control of D3 winner: E = {}", fmt(&ce));
             }
         }
+    }
+}
+
+/// SNC-2 Stage 0: CH, D0, D0i and CE at C = 2 on every `--r`, plus the
+/// per-invocation aggregates (one invocation per size).
+fn run_chained(args: &Args) {
+    let mut agg: [Vec<Stat>; 4] = Default::default();
+    for &r in &args.rs {
+        let held = make_samples(r, args.seed ^ 0xAAAA_0001, args.n);
+        println!(
+            "\n## r={r} C=2 (K=3, sqrt(r)={:.1}) Poisson floor 1.662, M={}",
+            (r as f64).sqrt(),
+            chain_m(r)
+        );
+        let rows = [
+            ("CH ", eval_chain(r, &held, false)),
+            ("D0 ", eval_d0(r, 2, &held, false)),
+            ("D0i", eval_d0i(r, 2, &held)),
+            ("CE ", eval_chain(r, &held, true)),
+        ];
+        for (i, (name, st)) in rows.iter().enumerate() {
+            println!("{name} E = {}", fmt(st));
+            agg[i].push(*st);
+        }
+    }
+    println!(
+        "\n## aggregate over {} curves (mean of means, SE = sqrt(sum se^2)/m)",
+        args.rs.len()
+    );
+    for (name, v) in ["CH ", "D0 ", "D0i", "CE "].iter().zip(agg.iter()) {
+        let (m, se) = aggregate(v);
+        println!("AGG {name} E = {m:.4} +- {se:.4}");
     }
 }
 
@@ -1199,5 +1321,48 @@ mod tests {
         let set: std::collections::HashSet<(u64, u64, u64)> =
             a.iter().map(|s| (s.d, s.s[0], s.s[1])).collect();
         assert!(b.iter().all(|s| !set.contains(&(s.d, s.s[0], s.s[1]))));
+    }
+
+    #[test]
+    fn chain_recurrence_and_ranges() {
+        let r = 2_097_349u64;
+        let m = chain_m(r);
+        assert_eq!(m, 60); // round(1.2 * sqrt(round(1.75 * 1448.2)))
+        let mut rng = Rng::new(7);
+        let (j, start) = build_chain(r, &mut rng, false);
+        assert_eq!(j.len(), 16);
+        for t in 2..16 {
+            assert_eq!(j[t][0], (j[t - 1][0] + j[t - 2][0]) % r);
+            assert_eq!(j[t][1], (j[t - 1][1] + j[t - 2][1]) % r);
+        }
+        for v in j.iter().chain(std::iter::once(&start)) {
+            assert!((1..=m).contains(&v[2]) && (1..=m).contains(&v[3]));
+        }
+        // randomised-e control: seed coordinates range over Z_r
+        let (ju, _) = build_chain(r, &mut Rng::new(7), true);
+        assert!(ju.iter().any(|v| v[2] > m || v[3] > m));
+    }
+
+    #[test]
+    fn aggregate_combines_means_and_ses() {
+        let mk = |mean, se| Stat {
+            mean,
+            se,
+            n: 1,
+            censored: 0,
+        };
+        let (m, se) = aggregate(&[mk(1.0, 0.3), mk(2.0, 0.4), mk(3.0, 0.0)]);
+        assert!((m - 2.0).abs() < 1e-12);
+        assert!((se - 0.5 / 3.0).abs() < 1e-12);
+    }
+
+    #[test]
+    fn chain_runs_and_is_deterministic_small_r() {
+        let r = 131_203u64;
+        let samples = make_samples(r, 11, 60);
+        let a = eval_chain(r, &samples, false);
+        let b = eval_chain(r, &samples, false);
+        assert_eq!(a.mean, b.mean);
+        assert!(a.mean > 0.5 && a.mean < 10.5);
     }
 }
