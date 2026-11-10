@@ -99,7 +99,7 @@ def cost(curve, p, sq, rng, trials, order_l=None):
     for _ in range(trials):
         while True:
             G = rand_point(a, b, p, sq, rng)
-            P = mul(N // l, G, a, p)
+            P = mul(N // l ** factor(N)[l], G, a, p)
             if P is not None: break
         k0 = rng.randrange(1, l)
         Q = mul(k0, P, a, p)
