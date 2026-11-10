@@ -35,5 +35,9 @@ if mode == "md":
     for r in rows:
         print(f"| {r['label']} | {r['rel']} | {r['prod']} | {r['dense']} | {r['wall']:.0f} |")
 elif mode == "typ":
+    # two tables: identity (wide numbers) and structure
     for r in rows:
-        print(f"  [{r['label']}], [{r['role']}], [{r['h']}], [{r['h_bits']} / {r['ratio']:.5f}], [{r['fac']}], [{r['two_rank']}], [{r['sylow']}], [{r['idx50']} / {r['idx163']} / {r['idx691']} / {r['idx2000']}], [{r['mazur']}], [{r['gen']}], [{r['pari_bad']} of {r['pari_n']}],")
+        print(f"  [{r['label']}], [{r['role']}], [{r['h']}], [{r['h_bits']} / {r['ratio']:.5f}], [{r['fac']}],")
+    print("---")
+    for r in rows:
+        print(f"  [{r['label']}], [{r['two_rank']}], [{r['sylow']}], [{r['idx50']} / {r['idx163']} / {r['idx691']} / {r['idx2000']}], [{r['mazur']}], [{r['gen']}], [{r['pari_bad']} of {r['pari_n']}],")

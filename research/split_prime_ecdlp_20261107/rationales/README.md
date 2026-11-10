@@ -421,8 +421,9 @@ the class number.
 
 *Figure 4. Left: partial L(1, χ) per field, published against skipped
 (annotated where f > 1). Right: log₂ of the class-number estimate against
-field size; squares mark exact values where `quadclassunit` has finished.
-Source `figures/plot.py`, data `data/cl/facts.jsonl` and `data/cl/cl_*.jsonl`.*
+field size; squares mark the exact class numbers of the five P-192 fields
+(relation method). Source `figures/plot.py`, data `data/cl/facts.jsonl` and
+`data/cl/rust_p192-*.json`.*
 
 **Exact class groups of the five P-192 fields (measured, native, 2026-11-10;
 replaces the pending paragraph of 2026-11-08).** Computed with the library's
