@@ -99,7 +99,7 @@ all `[pcc:unverified]`, one run per arm, no independent replay yet):
 
 ## Sources
 
-NVIDIA blog on clmad: https://developer.nvidia.com/blog/building-faster-cryptography-with-carryless-multiplication-in-nvidia-cuda-13-3/ ·
+NVIDIA blog on clmad: https://developer.nvidia.com/blog/building-faster-cryptography-with-carryless-multiplication-in-nvidia-cuda-13-3/ · [pcc:unverified]
 PTX ISA: https://docs.nvidia.com/cuda/parallel-thread-execution/index.html ·
 ptxas repro: https://github.com/robik75/ptxas-clmad-constant-operand ·
 LLVM NVPTX clmad: https://github.com/llvm/llvm-project/pull/216412 ·
