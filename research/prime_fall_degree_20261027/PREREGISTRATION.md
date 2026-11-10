@@ -399,3 +399,90 @@ The stage B `m = 6`, `t = 6` rule. The full text, with its derivation, is
 
 Registered per `research/open_leads_execution_20261108/DECISIONS.md` (item 1, decision 6: "written as a dated protocol
 amendment before its cell runs").
+
+## Amendment 11 (2026-11-09; gate G3's scope; before any stage C G3 row exists and before `pfd-b` is submitted)
+
+The F4 engine's capacity as G3's scope. The full text, with its evidence, is
+`research/pkm_falldegree_unblock_20261107/AMENDMENT_R2_D_g3_scope.md` (R2-D). The binding parts are restated here.
+
+- **Instrument limit.** `f4_fp_tower` (and `f4_tower_generic`) holds at most `MAX_FREE = 4` free variables; the pilot's tower ring
+  has `n_free = m − 2` for every kind, `t`, `p` and non-naive control. So capped F4 runs only at `m <= 6`, as Amendment 3 already
+  registers ("at most 4 free unknowns, `m ≤ 6`"). `gate3` selects rows by `N = m·t <= 20` only, so in `pfd-c-20261108` it launched
+  capped runs at `t = 2`, `m >= 7`; the pilot panicked (`f4_fp_tower.rs:736`), and `g3` exited 101 with an empty `gates/g3.jsonl`.
+- **Scope.** G3 applies as §4 registers it to closure-measured random-target cells (prefix `A-`, `B-`, `C-`, not naive, `N <= 20`)
+  with `m <= 6`. A cell with `m >= 7` is labelled **"G3 not applicable (F4 engine capacity)"**. The label depends on `m` only.
+- **Use of labelled rows.** Their closure values (`d_F` exact or censored, `ffd`) enter every §6 rule that uses closure values, as
+  registered (H-m, H-LFD). No capped-F4 value (`=D (F4)`, the Amendment 7 B bracket, a §5 D cell) exists there or may be made by any
+  engine; rows without `D` do not enter H-FFD or H-gap (§6 as written). RESULTS reports them in their own block and discloses that no
+  gate checks the closure at 5-8 free variables (G1 cases use 0, 1, 3; G3 reaches 4; G4 runs at `m = 2, 3`).
+- **`pfd-c`'s `g3` stage is recorded as "not run (tool defect)", not as a §4 gate failure.** Reasons: G3's domain is "every cell where
+  both run"; Amendment 3 registers the F4 capacity as `m ≤ 6`; `gate3` does not skip cells outside it; it panicked before comparing
+  anything, so there is no agreement or disagreement evidence. This is the main session's reading of the registered text, made before
+  any stage C G3 row exists; the owner may overrule it. The `hky-C` rows stand.
+- **Stage C G3 job.** One command job, `pfd-g3c-20261109`, on the frozen image (no new image), cpu 12, memory 56Gi, `seconds` 57600, no
+  instance pin. It copies the 19 stage C run files with `m <= 6` from `pfd-c-20261108` (chosen by file name, that is by `(m, t, p)`)
+  and runs `prime_fall_degree_tools gate3 --max-n 20 --jobs 2 --budget 900`; pass is exit 0 with ", 0 disagreements". The command is
+  frozen verbatim in R2-D §4.4.
+- **Order.** The stage C G3 job runs before `pfd-b` and before any `pfd-x` capped run.
+- **Stop rule.** Whether a disagreement stops capped F4 only or the whole study, and whether G3 is one gate or one per stage, are not
+  decided. If the stage C G3 job reports one or more disagreements (a budget timeout counts as one, as `gate3` defines it), no further
+  PKM job is submitted and the question goes to the owner with the rows. If it reports 0 disagreements, the study continues in the
+  `R2_READY.md` order.
+- **`pfd-b`.** All of its `d-B` and G3 cells are within capacity (`m <= 6`); it runs `g1 hky-B d-B g3` as requested. A budget timeout in
+  its G3 at `m = 5, 6`, where no gate run has yet been made, is a risk, not a prediction.
+- No hypothesis, §6 rule, cell, seed, budget, memory limit, image or existing command changes.
+
+Registered per `research/open_leads_execution_20261108/DECISIONS.md` (item 1, decision 6), with the main session's decisions of
+2026-11-09 (rule option 1; `g3` recorded as not run; G3-only job first; the stop rule; the `pfd-b` sentence; the job fields).
+
+## Amendment 12 (2026-11-09; resources only; before the `pfd-b` relaunch is submitted, when no stage B row is admitted)
+
+A price guard replaces Amendment 9's instance pin. The full text, with its evidence, is
+`research/pkm_falldegree_unblock_20261107/AMENDMENT_R2_E_price_guard.md` (R2-E). The binding parts are restated here.
+
+- **Loss.** `pfd-b-20261108` (pinned `r6i.4xlarge`) was lost to Spot reclamation 16 minutes after its pod started (exit 137,
+  "imminent node shutdown", EKS audit log). Nothing from it is admitted. Its one relaunch (owner decision 3) is
+  `pfd-b-20261109-r1`.
+- **Reason for the change.** Spot placement score, measured 2026-11-09: `r6i.4xlarge` alone 3 (region) and 1 (each zone); eight
+  16-vCPU m/r types together 9 (region) and 9, 9, 6 (zones). The pin confines a job of up to 49 h to one Spot pool.
+- **No pin.** Jobs with `seconds` above 90,000 are submitted without `instance_type`. Every other field is unchanged.
+- **Price guard at start.** Within 30 minutes of the pod's start the node's instance type and zone are read from the EKS audit
+  log and the latest Spot price `P` of that type and zone is read. If `(seconds/3600 + 0.25) × (P + 0.0088) > 40`, the job is
+  deleted and resubmitted under a new name. That is a cost-guard stop, not a Spot loss; nothing from the deleted job is admitted.
+- **Price guard while running.** At every check-in (at most 4 h apart), with `h` the hours since the pod started and `Pmax` the
+  highest price read so far: if `h × (Pmax + 0.0088) + (seconds/3600 + 0.25 − h) × (P + 0.0088) > 40`, the job is deleted,
+  reported as "stopped by the cost guard", nothing from it is admitted, and whether to run it again goes to the owner.
+- Each reading is recorded in the job's receipts and in RESULTS.
+- No hypothesis, §6 rule, cell, seed, command, image, memory, cpu, wall budget or job time limit changes. The US$40 per job and
+  US$400 total ceilings are unchanged.
+
+Registered per `research/open_leads_execution_20261108/DECISIONS.md` (item 1, decisions 3, 4 and 6), with the main session's
+decision of 2026-11-09 to enforce the per-job ceiling by observation instead of by the pin.
+
+## Amendment 13 (2026-11-10; the `m = 4` shape-matched null cells; before any `pfd-m4-*` or `pfd-m4n-*` job is submitted, when no `m = 4` row at `t ≥ 4` and no `m = 4` null row exists in the relaunch)
+
+Amendment 8 asks for the shape-matched null at `m = 4`, `t = 4, 5` but gives no command. This amendment fixes it. The full
+text, with the source lines and the development check, is
+`research/pkm_falldegree_unblock_20261107/AMENDMENT_R2_B_m4_null.md` (R2-B). The binding parts are restated here.
+
+- **Independence.** The text was drafted on 2026-11-08 from Amendment 8 and the pilot's source, before any relaunch row
+  existed. It uses no recorded row. Since the draft only the resource lines changed (Amendments 9 and 12).
+- **Cells.** Four null cells, each paired by `(t, k)` with a Kummer `m = 4` cell of Amendment 8:
+  `pfd-m4n-t4-k0-c7`, `pfd-m4n-t4-k1-c7` (`t = 4`, `N = 16`, `--hky-cmax 7`) and `pfd-m4n-t5-k0-c6`, `pfd-m4n-t5-k1-c6`
+  (`t = 5`, `N = 20`, `--hky-cmax 6`). `t = 5` at `c = 7` and `t = 6` have no null cell.
+- **Command** (the `m4n:` stage of `entry_r2.sh` in the frozen image), with `T`, `K`, `C` from the cell:
+  `pkm_tower_pilot --p 2013265921 --ladder-t none --planted 0 --random 2 --engine hky --kinds kummer --m 4 --controls null
+  --null-chain --hky-cmax C --hky-max-entries 13958643712 --hky-max-cols 4000000 --budget 172800 --t-min T --max-t-m4 T
+  --max-t T --targets K`. The Kummer counterpart differs only in `--controls tower` and no `--null-chain`.
+- **Resources.** 12 vCPU, 112Gi, job time limit 176,400 s, no instance pin, price guard of Amendment 12. These equal the
+  Kummer counterparts'.
+- **Order.** After G3 passed in `pfd-a`, after the Kummer counterpart of the same `(t, k)` has been submitted, and serially.
+- **Readings.** No new hypothesis. H-null (§6) is read as written on the `m = 4` ladder at the common completed `N`
+  (16 and 20). A cell censored at its `--hky-cmax` gives the one-sided value `d_F > cmax`. When both arms of a pair are
+  censored at the same cap the pair reads "mixed" for H-null, never "shape-driven". The null does not enter the Amendment 8
+  rise/flat/fall readings; those are Kummer-only. Amendment 10 does not apply (`lambda` at `m = 4`, `t = 4, 5` is far below 0.1).
+- **Stated before data.** At `t = 5`, `c = 6` both arms may be censored; the null then adds little at `N = 20`. A null closure
+  may use more memory than its counterpart; a limit stop is recorded as censored.
+- No hypothesis, §6 rule, Kummer cell, seed, image, wall budget or cost ceiling changes.
+
+Registered per `research/open_leads_execution_20261108/DECISIONS.md` (decision 6).

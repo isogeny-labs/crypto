@@ -1,0 +1,473 @@
+{
+  "amendments": [
+    {
+      "id": "github-checkpoint-substitution",
+      "filed": "2026-11-09",
+      "filed_before_affected_data": true,
+      "reason": "Explicit owner authorization replaces missing S3 transport; no census data exists.",
+      "changes": [
+        "Use committed/pushed source, run-start markers and completed/partial raw evidence in git origin as checkpoints.",
+        "Keep exact checker/analyzer binaries, all180 positive cases and3 controls, two invocations and all acceptance/stopping/resource limits unchanged."
+      ],
+      "supersedes_fields": [
+        "execution.placement.backend_authorization"
+      ]
+    }
+  ],
+  "analysis_plan": {
+    "blinded": false,
+    "frozen_before_data": true,
+    "inputs": [
+      "runs/0/panel.tsv",
+      "runs/1/panel.tsv"
+    ],
+    "outputs": [
+      "summary.json"
+    ],
+    "script": {
+      "path": "research/prime_common_scalar_20261108/replay/analyze.cpp",
+      "sha256": "c5c9475220d12f5c483addcd62bd63328c76a1eb2aa241e2f7a6cac83a79ca23"
+    }
+  },
+  "arms": [
+    {
+      "description": "One physical process containing180 recovery cases and3 defective controls",
+      "id": "native-census",
+      "instrument": {
+        "binary_sha256": "3ee3a6c5741862d56b3cd12299f7b3b6b99a0b4b60ea3b1d3ac0ed3dc3ce592d",
+        "build": [
+          [
+            "g++",
+            "-std=c++20",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "check.cpp",
+            "-lgmpxx",
+            "-lgmp",
+            "-o",
+            "check"
+          ]
+        ],
+        "commit": "77aed44a5a68e7ba4e794bed742b04b30994da23",
+        "env": {},
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "lift": [
+          0,
+          1
+        ],
+        "output_bits": [
+          1,
+          4,
+          9
+        ],
+        "placement": [
+          0,
+          1
+        ],
+        "triples": [
+          [
+            3,
+            3,
+            3
+          ],
+          [
+            3,
+            3,
+            4
+          ],
+          [
+            3,
+            3,
+            5
+          ],
+          [
+            4,
+            3,
+            4
+          ],
+          [
+            4,
+            4,
+            4
+          ]
+        ],
+        "weights": [
+          0,
+          1,
+          2
+        ]
+      },
+      "role": "candidate"
+    },
+    {
+      "description": "Identical second physical execution",
+      "id": "replay",
+      "instrument": {
+        "binary_sha256": "3ee3a6c5741862d56b3cd12299f7b3b6b99a0b4b60ea3b1d3ac0ed3dc3ce592d",
+        "build": [
+          [
+            "g++",
+            "-std=c++20",
+            "-O2",
+            "-Wall",
+            "-Wextra",
+            "-Werror",
+            "check.cpp",
+            "-lgmpxx",
+            "-lgmp",
+            "-o",
+            "check"
+          ]
+        ],
+        "commit": "77aed44a5a68e7ba4e794bed742b04b30994da23",
+        "env": {},
+        "flags": {},
+        "repo": "crypto",
+        "threads": 1
+      },
+      "parameters": {
+        "lift": [
+          0,
+          1
+        ],
+        "output_bits": [
+          1,
+          4,
+          9
+        ],
+        "placement": [
+          0,
+          1
+        ],
+        "triples": [
+          [
+            3,
+            3,
+            3
+          ],
+          [
+            3,
+            3,
+            4
+          ],
+          [
+            3,
+            3,
+            5
+          ],
+          [
+            4,
+            3,
+            4
+          ],
+          [
+            4,
+            4,
+            4
+          ]
+        ],
+        "weights": [
+          0,
+          1,
+          2
+        ]
+      },
+      "role": "control_aa",
+      "same_instrument_as": "native-census"
+    }
+  ],
+  "authors": [
+    "Codex"
+  ],
+  "claims": [
+    {
+      "class": "exact_computation",
+      "decided_by": [],
+      "id": "C1",
+      "text": "All180 frozen positive cases and3 defective controls pass exact acceptance, with byte-identical A/A execution; bounded correctness only."
+    }
+  ],
+  "controls": {
+    "aa": {
+      "comparison": "aa",
+      "not_applicable_reason": null,
+      "present": true
+    },
+    "negative": {
+      "arm": null,
+      "not_applicable_reason": "Three embedded defective controls: zero quotient, node1 +1 perturbation, affine clearing error. Exact defects, no statistical null population; no separate physical arm.",
+      "null_population": null,
+      "present": false
+    },
+    "positive": {
+      "arm": null,
+      "expected_detection": "All known-target fixtures including delta target1 and nonconstant sparse targets through the same recovery path.",
+      "not_applicable_reason": "Known-target fixtures embedded in every census, no separate physical arm.",
+      "present": false
+    }
+  },
+  "created": "2026-11-09",
+  "decision_rule": {
+    "comparison_ids": [
+      "census"
+    ],
+    "effect_size_measure": "exact correct and defect-detected counts",
+    "interval": "none: deterministic finite census",
+    "multiple_comparison_correction": "none",
+    "statistic": "183 unique accepted records per execution",
+    "text": "Require all180 positive cases,3 defective controls and exact A/A bytes; report any failure.",
+    "threshold": "all183 records and exact byte equality",
+    "verdict_vocabulary": [
+      "exact_pass",
+      "invalid",
+      "incomplete",
+      "not_run"
+    ]
+  },
+  "execution": {
+    "backend": "local",
+    "checkpoint": {
+      "after_restore": {
+        "counted_units": "valid",
+        "wall_time": "invalid"
+      },
+      "grace_seconds": null,
+      "interval_seconds": null,
+      "policy": "none",
+      "restore_validation": "none"
+    },
+    "measurement_class": "throughput",
+    "placement": {
+      "backend_authorization": "Owner approved local1CPU/2GiB/600s x2 and committed/pushed GitHub checkpoints instead of unavailable S3 in the resumed session2026-11-09. No retries or cloud spend.",
+      "cpus": 1,
+      "memory_limit_bytes": 2147483648
+    },
+    "queue": null,
+    "retries": {
+      "infrastructure_only": true,
+      "max_attempts": 1
+    },
+    "timeout_seconds": 600
+  },
+  "freeze": {
+    "status": "frozen",
+    "protocol_sha256": "7d5b77252d2930a0e8da185f08e0454809af934270dfa94c1a1a44bd50d57635",
+    "commit": "a26eb8fd31d2a102c9f12dbe98178e4cbfd57610",
+    "frozen_at": "2026-11-09T20:07:22Z",
+    "filed_before_affected_data": true
+  },
+  "inadmissible": [
+    "Timing or extrapolating census to asymptotic cost",
+    "Changing fixtures after data",
+    "Dropping failures or silently retrying",
+    "Calling producer checks signed independent verification"
+  ],
+  "invalidation_rules": [
+    "Any arithmetic/control/coverage/A-A failure invalidates census; retain partial records.",
+    "Timeout/OOM/signal/output-cap is incomplete, not a pass."
+  ],
+  "links": {
+    "protocol_note": "PROTOCOL.md"
+  },
+  "literature": [
+    {
+      "claim": "Actual recovery construction and original precision",
+      "provenance": "internal",
+      "ref": "crypto:research/prime_common_scalar_20261108/reports/hermite-recovery-20261109/REPORT.md",
+      "verified_by": "Lean source gate and fresh producer replay; unsigned"
+    },
+    {
+      "claim": "Source Hermite recovery formula D.9/D.10",
+      "provenance": "retrieved",
+      "ref": "https://github.com/openai/math/blob/7ef5c0cc5ca4b0e072b7a050fca09ab24bc6fa3a/preprints/The-Exponential-Time-Hypothesis-is-False-October-25-2026/paper.pdf",
+      "verified_by": "Pinned source read; scope checked; KB unavailable"
+    }
+  ],
+  "measurement": {
+    "clock": "counted",
+    "counters": [
+      "rows_completed"
+    ],
+    "isolation_required": "L0",
+    "order": "sequential",
+    "record": [
+      "binary_sha256",
+      "compiler_version",
+      "kernel_release",
+      "threads"
+    ],
+    "timed_primary_justification": null,
+    "warmups": 0
+  },
+  "metrics": {
+    "primary": [
+      {
+        "aggregation": "per_row",
+        "definition": "180 positive and3 defective control TSV records after exact arithmetic checks.",
+        "id": "rows_completed",
+        "kind": "exact",
+        "name": "complete unique finite census records",
+        "resolution": "1",
+        "source": "native analyzer summary.json",
+        "uncertainty": "none_exact",
+        "unit": "count"
+      }
+    ],
+    "secondary": []
+  },
+  "protocol_id": "prime-hermite-native-20261109",
+  "question": "Does the native constructed finite recovery return known contraction residues at original source precision on the fixed census?",
+  "randomization": {
+    "arm_order": "fixed",
+    "arm_order_reason": "Deterministic exact values; no timed metrics or order-sensitive cache estimates.",
+    "blinding": {
+      "analysis_labels_masked": false,
+      "how": "Exact known-target congruence and deterministic complete coverage; no adaptive/statistical analysis.",
+      "unmasked_at": null
+    },
+    "instance_sampling": {
+      "independent_of_arm": true,
+      "rule": "Exhaust all180 fixed parameter/fixture/lift combinations plus3 controls."
+    },
+    "seed_derivation": {
+      "method": "explicit_list",
+      "nonce": null,
+      "note": "No random inputs; seed0 labels exhaustive frozen finite cells.",
+      "seeds": [
+        0
+      ]
+    }
+  },
+  "reporting": {
+    "export_schema": "experiment.export/v1",
+    "graphs": [
+      "Complete fixture/control correctness counts; no timings"
+    ],
+    "report_dir": "reports",
+    "review_schema": "experiment.review/v1"
+  },
+  "repository": "crypto",
+  "sample_size": {
+    "instances": 1,
+    "power": {
+      "alpha": 0.05,
+      "correction": "none",
+      "method": "exact",
+      "min_attainable_two_sided_p": null,
+      "note": "Exact finite enumeration with replay; no population inference, p-value or statistical power claim.",
+      "passes": true,
+      "rank_test_n": null,
+      "tests_in_family": 1
+    },
+    "preflight_runtime": {
+      "estimated_total_seconds": 1200,
+      "fixed_seconds": null,
+      "measured_on": "No census preflight or timing observation; compilation only, hard600s ceiling each.",
+      "per_sample_seconds": null,
+      "threads": 1
+    },
+    "replicates": 1,
+    "warmups": 0
+  },
+  "schema": "experiment.protocol/v1",
+  "stopping_rules": [
+    {
+      "kind": "fixed_n",
+      "preregistered": true,
+      "rule": "One census then one identical replay,183 data rows each. First failure stops all remaining work; preserve partial outputs. No retries."
+    }
+  ],
+  "study_dir": "research/prime_common_scalar_20261108/replay",
+  "variable_ledger": {
+    "aa_not_applicable": null,
+    "comparisons": [
+      {
+        "arms": [
+          "native-census"
+        ],
+        "design": "absolute",
+        "differs_in": [],
+        "id": "census",
+        "reason": "Known-target exact finite census; embedded controls",
+        "threshold": "183 complete unique accepted records"
+      },
+      {
+        "arms": [
+          "native-census",
+          "replay"
+        ],
+        "design": "aa",
+        "differs_in": [],
+        "id": "aa"
+      }
+    ],
+    "crosses_map": false,
+    "factors": [
+      {
+        "how": "All fixed parameter, weight, placement, precision and lift combinations in PROTOCOL.md",
+        "name": "inputs",
+        "treatment": "crossed"
+      },
+      {
+        "how": "Source/binary/compiler/GMP identity and flags in instrument.json",
+        "name": "instrument",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Single-thread native arithmetic, one logical CPU affinity",
+        "name": "threads",
+        "treatment": "fixed",
+        "value": 1
+      },
+      {
+        "how": "CPU/kernel/SMT/NUMA/hypervisor/load in runs/host.txt; no valid clocks",
+        "name": "host",
+        "treatment": "measured"
+      },
+      {
+        "how": "Same executable, default allocator, no randomization; environment recorded as empty overrides",
+        "name": "environment_and_layout",
+        "treatment": "fixed"
+      },
+      {
+        "how": "Lexicographic census,0warmups; exact arithmetic only",
+        "name": "order_warmup",
+        "treatment": "fixed"
+      },
+      {
+        "how": "No restore/retry; signals/timeouts retained as incomplete",
+        "name": "preemption",
+        "treatment": "measured"
+      },
+      {
+        "how": "Producer analysis, no blinded or signed independence claim",
+        "name": "analyst",
+        "treatment": "fixed"
+      }
+    ],
+    "independent": [
+      {
+        "levels": [
+          "canonical",
+          "offset"
+        ],
+        "name": "lift"
+      },
+      {
+        "levels": [
+          "1",
+          "4",
+          "9"
+        ],
+        "name": "output_bits"
+      }
+    ]
+  },
+  "version": 2
+}
