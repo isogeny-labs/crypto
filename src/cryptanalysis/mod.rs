@@ -396,6 +396,7 @@ pub mod two_sylow_search;
 pub mod visual_demos;
 pub mod visualize;
 pub mod volcano;
+pub mod m4gb_oracle;
 pub mod wdsat_oracle;
 pub mod weil_charts;
 pub mod wide_gf2m;
