@@ -331,3 +331,23 @@ path = "src/bin/classgroup.rs"
 [[bin]]
 name = "classgroup-structure"
 path = "src/bin/classgroup_structure.rs"
+
+# `lab` — an opt-in build profile for long measured runs (assessment
+# 2026-11-10, R8). One codegen unit and thin LTO let the compiler inline
+# across modules (for example the `#[target_feature]` pclmul kernels into
+# their callers) and keep line tables for profilers. It changes machine code
+# only: values, counted units and RNG consumption are those of `release`,
+# but `binary_sha256` in host records differs, so name the profile beside
+# any wall-time figure and never pool timings across profiles. `release`
+# is unchanged (CI build budgets), and `panic` stays `unwind`: 31
+# `catch_unwind` sites depend on it. Build and use:
+#
+#     cargo build --profile lab --bin ecbench      # -> target/lab/ecbench
+#     ./target/lab/ecbench run --spec SPEC --out DIR
+#
+# Expect a markedly longer build than `release` (single codegen unit).
+[profile.lab]
+inherits = "release"
+codegen-units = 1
+lto = "thin"
+debug = "line-tables-only"
