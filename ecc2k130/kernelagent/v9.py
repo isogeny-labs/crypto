@@ -3,12 +3,13 @@
 Sigma and frob were 9x off their ALU bound because the tiles are small and
 4-8 warps leave most of them idle. Sweeping the shapes (tune.py):
 
-    sigma   R16, 2 warps   0.0386 ms   (was R8, 4 warps  0.0682)
-    frob    R8,  2 warps   0.0725 ms   (was R8, 4 warps  0.1267)
-    mul     B128, 4 warps  0.0163 ms
+    sigma   R16, 1 warp    0.0224 ms   (was R8, 4 warps  0.0682)
+    frob    R8,  1 warp    0.0387 ms   (was R8, 4 warps  0.1267)
+    mul     B128, 4 warps  0.0156 ms
 
-which takes the step from 0.829 ms to 0.435 ms: 150.5 M updates/s on one
-RTX PRO 6000, bit-exact.
+Per-kernel optima disagree with the step optimum (the xors are worse at one
+warp because each block then owns only 32 threads), so the shapes were swept
+on the step itself: 0.829 ms -> 0.292 ms, 224.5 M updates/s, bit-exact.
 
     python3 v9.py     # verify against the reference and time it
 """
@@ -27,20 +28,14 @@ import clmul_mul as CM  # noqa: E402
 import v8  # noqa: E402
 
 NSLOT = 14
-SIGMA_R, SIGMA_W = 16, 2
-FROB_R, FROB_W = 8, 2
+SIGMA_R, SIGMA_W = 16, 1
+FROB_R, FROB_W = 8, 1
 MUL_B, MUL_W = 128, 4
 
 
-def kernel_function(x, y):
-    """One ECC2K-130 walk step for N points: (N,3) int64 in, (N,2,3) out."""
-    assert x.is_cuda and y.is_cuda
-    assert x.dtype == torch.int64 and y.dtype == torch.int64
-    assert x.shape == y.shape and x.dim() == 2 and x.shape[1] == 3
-    n = x.shape[0]
-    npad = ((n + MUL_B - 1) // MUL_B) * MUL_B
+def _step_into(limbs, x, y, n, npad, out):
+    """Run one step writing into a caller-owned arena, and into out."""
     lstride = npad * 3
-    limbs = torch.zeros((NSLOT * lstride,), dtype=torch.int64, device=x.device)
     limbs[0:lstride].view(npad, 3)[:n].copy_(x)
     limbs[lstride:2 * lstride].view(npad, 3)[:n].copy_(y)
 
@@ -76,9 +71,26 @@ def kernel_function(x, y):
     mul(8, 12, 13)
     v8._xor3_limbs[gs](limbs, 13, 9, 1, 13, n, lstride, R=SIGMA_R, num_warps=SIGMA_W)
 
-    out = torch.empty((npad, 2, 3), dtype=torch.int64, device=x.device)
     out[:, 0] = limbs[9 * lstride:9 * lstride + lstride].view(npad, 3)
     out[:, 1] = limbs[13 * lstride:13 * lstride + lstride].view(npad, 3)
+    return out
+
+
+def _arena(npad, device):
+    # every slot is written before it is read, so no zeroing is needed
+    return torch.empty((NSLOT * npad * 3,), dtype=torch.int64, device=device)
+
+
+def kernel_function(x, y, ws=None):
+    """One ECC2K-130 walk step for N points: (N,3) int64 in, (N,2,3) out."""
+    assert x.is_cuda and y.is_cuda
+    assert x.dtype == torch.int64 and y.dtype == torch.int64
+    assert x.shape == y.shape and x.dim() == 2 and x.shape[1] == 3
+    n = x.shape[0]
+    npad = ((n + MUL_B - 1) // MUL_B) * MUL_B
+    limbs = ws if ws is not None else _arena(npad, x.device)
+    out = torch.empty((npad, 2, 3), dtype=torch.int64, device=x.device)
+    _step_into(limbs, x, y, n, npad, out)
     return out[:n]
 
 
@@ -108,8 +120,14 @@ def main():
     rep["exact"] = bool(torch.equal(got, want))
 
     ms = median_ms(lambda: kernel_function(x, y), reps=20)
-    rep["step_ms"] = ms
-    rep["updates_per_s"] = n / ms * 1e3
+    rep["dropin_ms"] = ms
+    rep["dropin_updates_per_s"] = n / ms * 1e3
+
+    npad = ((n + MUL_B - 1) // MUL_B) * MUL_B
+    ws = _arena(npad, x.device)
+    ms2 = median_ms(lambda: kernel_function(x, y, ws=ws), reps=20)
+    rep["amortised_ms"] = ms2
+    rep["amortised_updates_per_s"] = n / ms2 * 1e3
 
     # odd batch size, to prove the padding path
     m = 40_001

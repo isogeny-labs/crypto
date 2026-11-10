@@ -209,3 +209,49 @@ batch (which exercises the padding path).
 ahead, and its advantage is the algorithm: 4.81 products/update with the
 inversion batched over 16 walkers, against our 10 products and 127 sigma
 applications per step.
+
+## Update: shapes swept on the step, and a negative result (2026-11-10)
+
+Per-kernel optima do not compose: sigma likes one warp, the small xor/copy
+kernels are worse at one warp because each block then owns only 32 threads.
+Sweeping the shapes on the step itself (step_sweep.py):
+
+| sigma | frob | step | updates/s |
+|---|---|---:|---:|
+| R16, 1 warp | R8, 1 warp | 0.292 ms | 224.5 M |
+| R8, 1 warp | R8, 1 warp | 0.296 ms | 221.4 M |
+| R16, 2 warps | R8, 2 warps | 0.443 ms | 147.9 M |
+| R8, 2 warps | R8, 1 warp | 0.439 ms | 149.2 M |
+
+v9.py now carries R16/1 warp for sigma and R8/1 warp for frob. Measured on its
+own, one call at a time (cold clocks): 0.428 ms drop-in / 153.2 M updates/s,
+0.420 ms with a reused arena / 156.1 M. Under the sustained load of the sweep
+the same step ran 0.292 ms / 224.5 M, so the figure is clock-dependent; quote
+150-225 M and say which.
+
+**Fusing the whole step into one kernel does not help (v10.py).** The step is
+row-local, so it can live in registers in a single launch, and that was the
+obvious move once an empty kernel measured ~13 us on the same grid. It is
+exact at every shape tried, but slower: 1.03 ms at one warp, and the time
+scales *linearly* with warp count (1.03 / 2.01 / 4.00 ms for 1/2/4 warps),
+which is register spilling, not arithmetic. Fourteen live slots plus the
+transient (R,256) sigma tile do not fit. The 13 us "launch overhead" was an
+artefact of timing an empty kernel with a CUDA-event pair, so the step was
+never launch-bound in the first place.
+
+## Ladder, final
+
+| step | ms | updates/s |
+|---|---:|---:|
+| v5 convolution, L4 (start) | — | 3.0 M |
+| v5 convolution, PRO 6000 | 5.049 | 13.0 M |
+| clmad, scalar conversions | 2.582 | 25.4 M |
+| clmad, batched conversions | 1.296 | 50.6 M |
+| v6, all per-row kernels batched | 1.125 | 58.3 M |
+| v7, limbs emitted by the producer | 0.863 | 76.0 M |
+| v8, single representation | 0.829 | 79.0 M |
+| v9, shapes tuned on the step | 0.428 | 153 M |
+| v9 under sustained load | 0.292 | 225 M |
+| production client (G7) | — | 12,499 M |
+
+50x as a single call, 75x sustained, over where this file started.
