@@ -66,9 +66,9 @@ and probability theory; queued after Layer 1.
 
 | Claim | Role | Status |
 | --- | --- | --- |
-| BSGS solves DLP in `O(√n)` time and memory | Baseline square-root attack | Implemented; correctness formalization queued |
+| BSGS solves DLP in `O(√n)` time and memory | Baseline square-root attack | Implemented; **decomposition lemma formal** (every exponent below `n ≤ m²` splits as `i·m+j`, `i,j<m`); table/search correctness still queued |
 | Pollard rho: expected `√(πn/2)` group operations | Best generic attack in practice | Implemented and measured; probabilistic proof open |
-| Pohlig–Hellman reduces DLP to prime-power order subgroups and CRT | Smooth-order curves are easy | Implemented; correctness formalization queued |
+| Pohlig–Hellman reduces DLP to prime-power order subgroups and CRT | Smooth-order curves are easy | Implemented; **subgroup step formal** (`d·a` has order `n/d` when `d ∣ n`); CRT assembly still queued |
 | Index calculus is subexponential when a smooth factor base exists | Breaks high-genus / small-characteristic settings | Implemented for the repo's IC campaigns; cost model empirical |
 
 ## Layer 4 — curve-specific attacks (each attacks a hypothesis, not the group)
@@ -93,7 +93,7 @@ separately; a break here breaks deployments, not ECDLP.
 
 0. **Done:** modular scalar reduction, injectivity below the order, and the
    homomorphism reduction lemmas (`Foundations.lean`, 43 theorems).
-1. **Done (1a):** closure of affine addition and doubling over a field
+1. **Done (1a/1b):** closure of affine addition and doubling over a field
    (`Closure.lean`, `PASS 8 thm 0 trusted`; doubling assumes `2 ≠ 0`), plus
    commutativity of the x-coordinate.
 2. **Done (1b):** the explicit slope/`addX`/`addY` are bridged to Mathlib's

@@ -249,3 +249,44 @@ theorem dlp_mod_of_injective {a q : G} {n x y : Nat} (h : IsOrder a n)
 end Hom
 
 end ECDLP
+
+/-! ## Layer 3a: the arithmetic cores of BSGS and Pohlig--Hellman
+
+These are the group/arithmetic lemmas the reduction algorithms rest on. -/
+
+namespace ECDLP
+
+variable {G : Type} [AddGroup G]
+
+/-- Pohlig--Hellman subgroup step: if `d ∣ n` and `a` has order `n`, then
+`d·a` has order `n/d`. Solving the DLP in the smaller subgroup recovers the
+exponent modulo `n/d`. -/
+theorem nsmul_isOrder_div {a : G} {n d : Nat} (h : IsOrder a n) (hd : d ∣ n)
+    (hdpos : 0 < d) : IsOrder (nsmul d a) (n / d) := by
+  have hnpos : 0 < n := h.pos
+  refine ⟨Nat.div_pos (Nat.le_of_dvd hnpos hd) hdpos, ?_, ?_⟩
+  · show nsmul (n / d) (nsmul d a) = zero
+    rw [← nsmul_mul, Nat.div_mul_cancel hd]
+    exact h.annihilates
+  · intro m hm hlt hzero
+    have hzero' : nsmul (m * d) a = zero := by
+      rw [nsmul_mul]
+      exact hzero
+    have hmd : m * d = d * m := Nat.mul_comm m d
+    rw [hmd] at hzero'
+    have hpos : 0 < d * m := Nat.mul_pos hdpos hm
+    have hlt' : d * m < n := by
+      rw [← Nat.mul_div_cancel' hd]
+      exact Nat.mul_lt_mul_of_pos_left hlt hdpos
+    exact h.minimal hpos hlt' hzero'
+
+/-- BSGS decomposition: with a table of `m` baby steps and a modulus bound
+`n ≤ m²`, every exponent below `n` splits as `i·m + j` with `i,j < m`. -/
+theorem bsgs_decomposition {n m x : Nat} (hm : 0 < m) (hx : x < n) (hn : n ≤ m * m) :
+    ∃ i j : Nat, j < m ∧ i < m ∧ x = i * m + j := by
+  refine ⟨x / m, x % m, Nat.mod_lt _ hm, ?_, ?_⟩
+  · exact Nat.div_lt_of_lt_mul (Nat.lt_of_lt_of_le hx hn)
+  · rw [Nat.mul_comm]
+    exact (Nat.div_add_mod x m).symm
+
+end ECDLP

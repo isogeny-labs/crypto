@@ -121,3 +121,55 @@ theorem curve_add_assoc (a b : K) (P Q R : WeierstrassCurve.Affine.Point (curve 
   add_assoc P Q R
 
 end ECDLPClosure
+
+/-! ## Exceptional cases
+
+The generic bridge above covers `x₁ ≠ x₂`. The remaining cases are the
+identity, opposite points and doubling. Identity is Mathlib's `zero_add`/
+`add_zero`; opposite points use `add_of_Y_eq`; here we add the coordinate
+bridge for doubling. -/
+
+namespace ECDLPClosure
+
+variable {K : Type*} [Field K] [DecidableEq K]
+
+/-- Mathlib's slope at a point with itself is our doubling slope (short form). -/
+theorem curve_slope_self (a b x y : K) (hy : y ≠ -y) :
+    WeierstrassCurve.Affine.slope (curve a b) x x y y =
+      (3 * x ^ 2 + a) / (2 * y) := by
+  have hy' : y ≠ WeierstrassCurve.Affine.negY (curve a b) x y := by
+    simpa [curve, WeierstrassCurve.Affine.negY] using hy
+  rw [WeierstrassCurve.Affine.slope_of_Y_ne rfl hy']
+  simp [curve, WeierstrassCurve.Affine.negY]
+  ring
+
+/-- Mathlib's `addX` for a doubled point is our `dblX`. -/
+theorem curve_dblX (a b x y : K) (hy : y ≠ -y) :
+    WeierstrassCurve.Affine.addX (curve a b) x x
+        (WeierstrassCurve.Affine.slope (curve a b) x x y y) =
+      ((3 * x ^ 2 + a) / (2 * y)) ^ 2 - 2 * x := by
+  rw [curve_slope_self a b x y hy]
+  simp [WeierstrassCurve.Affine.addX, curve]
+  ring
+
+/-- Mathlib's `addY` for a doubled point is our `dblY`. -/
+theorem curve_dblY (a b x y : K) (hy : y ≠ -y) :
+    WeierstrassCurve.Affine.addY (curve a b) x x y
+        (WeierstrassCurve.Affine.slope (curve a b) x x y y) =
+      ((3 * x ^ 2 + a) / (2 * y)) * (x - (((3 * x ^ 2 + a) / (2 * y)) ^ 2 - 2 * x)) - y := by
+  rw [curve_slope_self a b x y hy]
+  simp [WeierstrassCurve.Affine.addY, WeierstrassCurve.Affine.negY,
+    WeierstrassCurve.Affine.negAddY, WeierstrassCurve.Affine.addX, curve]
+  ring
+
+/-- Opposite affine points on the short curve sum to the identity. -/
+theorem curve_add_neg {a b x y : K} {h₁ : WeierstrassCurve.Affine.Nonsingular (curve a b) x y}
+    {h₂ : WeierstrassCurve.Affine.Nonsingular (curve a b) x (WeierstrassCurve.Affine.negY (curve a b) x y)} :
+    WeierstrassCurve.Affine.Point.some x y h₁ +
+      WeierstrassCurve.Affine.Point.some x
+        (WeierstrassCurve.Affine.negY (curve a b) x y) h₂ = 0 := by
+  apply WeierstrassCurve.Affine.Point.add_of_Y_eq (x₁ := x) (x₂ := x)
+    (y₁ := y) (y₂ := WeierstrassCurve.Affine.negY (curve a b) x y) rfl
+  simp [curve, WeierstrassCurve.Affine.negY]
+
+end ECDLPClosure
