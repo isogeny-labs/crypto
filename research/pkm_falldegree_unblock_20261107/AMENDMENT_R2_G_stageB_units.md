@@ -1,6 +1,6 @@
 # DRAFT Amendment R2-G (proposed number 15): stage B as resumable units
 
-**Status: draft (second version, after an independent review), NOT applied, NOT frozen.** Written 2026-11-10 by the main
+**Status: draft (third version, after two independent reviews of the draft and its runner), NOT applied, NOT frozen.** Written 2026-11-10 by the main
 session for owner decision 8 of `research/open_leads_execution_20261108/DECISIONS.md` ("split stage B into short jobs under a
 dated amendment, reviewed before it is frozen; readings and rules stay as registered"). Target when frozen:
 `research/prime_fall_degree_20261027/PREREGISTRATION.md`, appended as "Amendment 15". It changes execution and procedure: how
@@ -42,7 +42,8 @@ Stage B's registered invocations are run as **units**. A unit is one pilot invoc
   `--t-min T --max-t-m3 T --max-t-m4 T --max-t T`, and, for the `P0` ladders, with `--kinds` naming one kind (`run.sh` passes
   `kummer,isogeny`; a ladder is one kind);
 - both draws of the level run in the unit (`--random 2`, no `--targets`), as in the registered invocation;
-- `--out runs/<ladder>-t<T>.jsonl`, stderr to `runs/<ladder>-t<T>.log`.
+- `--out runs/<ladder>-t<T>.jsonl`, stderr to `runs/<ladder>-t<T>.log`, stdout to `runs/<ladder>-t<T>.out`, and the pilot's
+  command line to `runs/<ladder>-t<T>.argv`.
 
 Ladders and levels (derived from `run.sh` and `tmax0`; `t` starts at 2 because `m >= 3`):
 
@@ -68,32 +69,51 @@ unit list from this table and refuses to start if the counts differ.
 2. **Ladder stop.** After a unit ends, if its log contains the pilot's own line "every run at t = T timed out; stopping", the
    ladder is closed and no higher level of that ladder runs, in this job or any later one. This is the pilot's decision, read
    from its output; the runner makes no judgment of its own.
-3. **Unit done.** A unit is done when the pilot exited 0, its files were uploaded, and `progress.txt` has its line
-   `end <unit> exit 0`. A done unit is never run again. Its row file is the unit's data, from the first job in which it was done.
-4. **Resume.** A job is given the result prefixes of the earlier jobs of this stage. It reads their `progress.txt`, skips their
-   done units, and for each done unit fetches its log and row file again; if any of those cannot be read, or a row file does
-   not end with the pilot's summary line, the job runs nothing and exits. It then continues from the first unit that is not done.
+3. **Unit done.** A unit is done when the pilot exited 0, its files were uploaded, and the job's `progress.txt` in S3 has its
+   line `end <unit> exit 0`. A done unit is never run again. Its row file is the unit's data. A unit can be done in one job
+   only; a job that finds a unit done in two earlier jobs runs nothing (exit 12).
+4. **Resume.** A job is given the result prefix of every earlier unit job of this stage (each exactly as that job's
+   `ISOLAB_RESULTS_URI`), except the jobs rule 9 excludes and jobs that never ran. It reads their `progress.txt`, `host.txt`
+   and `binary.sha256`, skips their done units, and for each done unit fetches its log, its row file and its recorded pilot
+   command line again. It runs nothing and exits 12 if any of these cannot be read; if a row file does not end with the
+   pilot's summary line; if an earlier job's runner hash, binary hashes, test-mode flag or extra pilot flags differ from its
+   own; if a done unit's recorded pilot command line differs from the one it would use; or if an earlier job names an earlier
+   job that this one was not given. After an exit 12 no unit has run; the main session finds the cause in the listing and
+   submits a corrected job. If a done unit's files are really gone from S3, stage B stops and goes to the owner.
 5. **Interruption.** A Spot interruption loses only the unit in flight; that unit has no `end` line and is run again by the
    next job. Owner decision 3 applies per unit: a unit that was in flight in two earlier jobs without finishing is reported lost
    and goes to the owner. A job that finds such a unit writes `lost_units.txt`, runs no unit and exits 75; stage B waits for the
-   owner. "In flight" is read from `progress.txt` (a `start` line with no `end` line). The cause of each job's end is read from
-   the EKS audit log and recorded.
+   owner. "In flight in a job" is read from that job's `progress.txt`: a `start <unit>` line with no `end <unit>` line and no
+   `abort <unit>` line (rule 6 writes `abort` when an upload failed). The count is mechanical: it does not depend on why the
+   job ended. The cause of each job's end is still read from the EKS audit log and recorded.
    - The two lost `pfd-b` attempts count toward no unit: owner decision 8 replaced the unsplit job, and the count starts with
-     the first unit job. That is the main session's reading of decision 8. Their partial files stay unread and unscored.
-   - If the owner accepts a lost unit, its ladder is closed at that level: the next job is given `close:<ladder>:<T>`, runs no
-     level of that ladder from `T` on, and the ladder is reported as "lost at t = T" with no row there. Other ladders continue.
-6. **Non-zero exit and upload failures.** A unit whose pilot exits non-zero is not done; the job stops (exit 20). A failed
-   upload also stops the job (exit 13). The cause is diagnosed before any further job. If the cause is outside the pilot (S3,
-   the node), the unit is run again by the next job. If the pilot itself exits non-zero again on that rerun, the ladder is closed
-   at that level in the same way (`close:<ladder>:<T>`), reported as "tool failure at t = T". In the registered job a failing
-   invocation ends that ladder and, for a `P0` invocation, also the isogeny ladder that follows the kummer one in the same
-   process; in unit form each ladder is its own sequence, so the sibling ladder runs. That difference is fixed here, before data.
+     the first unit job. That is the main session's reading of decision 8, stated here before any unit job exists; the owner
+     can overrule it at any time before a unit is reported lost. Their partial files stay unread and unscored.
+   - The owner has two answers to a lost unit, and only these. **Accept the loss**: the next job is given `close:<ladder>:<T>`;
+     no level of that ladder from `T` on runs, in that job or any later one, and the ladder is reported as "lost at t = T"
+     with no row there. The runner accepts `close:` only for a unit that is lost by the count above. **Allow further
+     attempts**: the next job is given `allow:<unit>:<K>`; the unit then counts as lost only when it was in flight in `K` or
+     more earlier jobs. Both are carried forward by the runner from each job's `host.txt`, so they hold in every later job
+     without being repeated. Other ladders continue in either case.
+6. **Non-zero exit and upload failures.** These are handled mechanically; no diagnosis changes what happens next.
+   - A unit whose pilot exits non-zero is not done; its files and its line `end <unit> exit N` are uploaded and the job stops
+     (exit 20). The next job runs that unit once more. If the pilot exits non-zero for that unit in a second job, the ladder
+     is closed at that level by the runner itself, in every later job, and reported as "tool failure at t = T".
+   - A failed upload stops the job (exit 13). The runner writes `abort <unit> <reason>`; the unit does not count as in flight
+     and is run again by the next job, unless its `end` line did reach S3.
+   - A pilot killed for memory alone exits non-zero and falls under the first bullet. If the whole container is killed, there
+     is no `end` line and rule 5 applies. Which of the two happens depends on the node; the rules above are applied to what
+     `progress.txt` holds.
+   - In the registered job a failing invocation ends that ladder and, for a `P0` invocation, also the isogeny ladder that
+     follows the kummer one in the same process; in unit form each ladder is its own sequence, so the sibling ladder runs.
+     That difference is fixed here, before data.
 7. **Gates.** G1 runs at the start of every job (6 cases, seconds). The `g3` stage that `pfd-b` runs inside the job (and that
    Amendment 11 refers to) is replaced by one G3-only job after the last unit. Its command is the G3-only command of Amendment 11
    (R2-D section 4.4) with these substitutions only: work directory `/work/g3b`; inputs are the row files of all done stage B
    units, fetched from the jobs that hold them; `gate3 /work/g3b pkm_tower_pilot --max-n 20 --jobs 2 --budget 900`; 12 vCPU,
-   56Gi, `seconds` 57,600. Pass is exit 0 and `, 0 disagreements`. The file list is filled mechanically from the jobs'
-   `units_done.txt`, and the filled command's SHA-256 is recorded before it is submitted. Every stage B cell has `m <= 6`, so
+   56Gi, `seconds` 57,600. Pass is exit 0 and `, 0 disagreements`. The file list is filled mechanically from the
+   `end <unit> exit 0` lines of the jobs' `progress.txt` (each job's `units_done.txt` is derived from the same lines and is a
+   cross-check only), and the filled command's SHA-256 is recorded before it is submitted. Every stage B cell has `m <= 6`, so
    Amendment 11's scope covers all of them, and its stop rule on a disagreement applies.
 8. **Repeats of stage C cells.** The `P1` tower units at `t = 2, 3` for `m = 3..6` are the cells `C-t2-m3` ... `C-t3-m6` of
    stage C (same kind, `m`, `t`, control, prime and seed), and so are the `P0` units at `t = 2, 3` that stage C ran.
@@ -107,7 +127,8 @@ unit list from this table and refuses to start if the counts differ.
    - Stage C has no `D` rows, so the d-B units have no repeat.
 9. **Cost guard.** The unit jobs have `seconds` above 90,000, so Amendment 12's price guard applies to each: the reading at
    start and at every check-in. A job stopped by the cost guard is never passed to a later job as an earlier job, and nothing
-   from it is admitted.
+   from it is admitted. The runner cannot tell such a job from a Spot loss; the request script records the exclusion
+   (`skip:<n>:costguard`) and requires every other earlier job to be given.
 10. **Resources and limits.** 12 vCPU, 56Gi, no pin, job time limit 172,800 s (as `pfd-b`). US$40 per job and US$400 in total
     are unchanged. At most 12 unit jobs are submitted without going back to the owner. Before each submission the main session
     adds up the node-hours used so far by this study, at the Spot prices read, and records the sum.
@@ -132,8 +153,8 @@ unit list from this table and refuses to start if the counts differ.
 - Rows of one stage can come from several jobs and nodes. Each job's `host.txt` and the units it finished are recorded.
 - A unit's two draws share a process, as registered; the units of a ladder do not.
 - A `P0` isogeny ladder runs even if its kummer sibling ended by a tool failure (rule 6).
-- Units lost or failed twice close their ladder at that level (rules 5 and 6); the registered job has no such case because it
-  has no resume.
+- A unit whose pilot fails in two jobs closes its ladder at that level (rule 6); a unit lost twice goes to the owner, who
+  closes the ladder or allows further attempts (rule 5). The registered job has no such cases because it has no resume.
 
 ## 6. Disclosure
 
@@ -142,26 +163,44 @@ unit list from this table and refuses to start if the counts differ.
 - When writing this I had seen all of stage A and stage C and the t = 12, 13 capped rows. None of them enters a rule here.
 - The first version of this draft had a clause that would have compared budget-censored repeats on identity fields only. The
   reviewer pointed out that it relaxed the registered repeat check. It is removed (rule 8).
+- The second version let the main session diagnose a failing unit before deciding whether to run it again, which is a choice
+  after data. Rule 6 is now mechanical.
 
 ## 7. Runner, tests and review
 
-- The runner is one frozen bash script passed as the job's command (`/bin/bash -c`), like the G3-only job of Amendment 11. It is
-  in `stageb_units_runner.sh`; its SHA-256 is recorded here at the freeze. It was written by a Sonnet agent to this draft and
-  read line by line by the main session.
+- The runner is one frozen bash script, `stageb_units_runner.sh` (revision 3); its SHA-256 is recorded here at the freeze. It
+  was written by Sonnet agents to this draft and to `SPEC` notes of the main session, and read by the main session.
+- **How a job carries it.** The lab's request validator refuses a command argument longer than 8192 characters or containing
+  a newline, so the runner cannot be one argument. `make_request_bu.sh` writes the runner into the command in pieces, with
+  each newline written as the letter Q (the runner contains no Q; the script checks). The command's first words are a
+  one-line start command that joins the pieces, restores the newlines, checks the file's SHA-256 against the frozen value
+  (exit 17 if it differs) and runs the file with the remaining arguments. So a job runs the frozen runner byte for byte or
+  runs nothing.
 - It is tested on a local copy of the frozen binaries (the image layer; SHA-256 equal to `image/binaries.sha256`) with
-  `--seed 777`, so no test row is a stage row. The tests and their verbatim outcomes are in `devcheck_r2g/`.
-- Review (red-team agent, Opus, read-only, 2026-11-10). It confirmed section 2 against the source, the unit list and every
-  ladder's flags against `run.sh`, and that the stop string is printed exactly when the registered loop over `t` ends early. It found, in the
-  first runner: errors during resume were swallowed, so a missing log could reopen a closed ladder; an `end` line could reach S3
-  before the row files; a failed upload of a `start` line could lose the in-flight count; S3 commands inside the unit loop did
-  not have their input closed; the test-only variables were neither refused nor recorded; the result prefix differed from the
-  earlier jobs' layout by a slash; and exit 0 was not checked against the list. It also found the items now in rules 5, 6, 8, 9
-  and 10 and in section 1. Separately the main session found that the image has no `flock`, which the first runner used.
-  The runner was revised for all of these and re-tested before the freeze.
-- Runner exits: 0 list accounted for; 2 no work directory; 10 G1 failed; 11 unit list count wrong; 12 an earlier job's files
-  cannot be read; 13 an upload failed; 14 list not accounted for at the end; 15 a test-only variable set in production;
-  16 a bad `close:` argument; 20 a pilot exited non-zero; 75 a lost unit; 143 terminated by a signal.
+  `--seed 777`, so no test row is a stage row. The tests and their verbatim outcomes are in `devcheck_r2g/`; the whole
+  suite is also run through the command form a job uses.
+- First review (red-team agent, Opus, read-only, 2026-11-10), of the first draft and runner. It confirmed section 2 against
+  the source, the unit list and every ladder's flags against `run.sh`, and that the stop string is printed exactly when the
+  registered loop over `t` ends early. It found, in the first runner: errors during resume were swallowed, so a missing log
+  could reopen a closed ladder; an `end` line could reach S3 before the row files; a failed upload of a `start` line could
+  lose the in-flight count; S3 commands inside the unit loop did not have their input closed; the test-only variables were
+  neither refused nor recorded; the result prefix differed from the earlier jobs' layout by a slash; and exit 0 was not
+  checked against the list. It also found the items now in rules 5, 6, 8, 9 and 10 and in section 1. Separately the main
+  session found that the image has no `flock`, which the first runner used.
+- Second review (same kind of agent, 2026-11-10), of runner revision 2 and the second draft: do not freeze. It confirmed the
+  fixes above and the argv of all 91 units against `run.sh`, and reproduced new defects: the command form of the draft
+  (`/bin/bash -c` with the whole runner) is refused by the validator; a ladder closed by rule reopened in a later job that
+  was not given the `close:` argument again; `units_done.txt` could omit a unit that `progress.txt` shows as done; the list
+  of earlier jobs was not checked (a job left out, or given twice); earlier jobs' provenance was not checked; a failed upload
+  counted as "in flight" for a pilot that never ran; the owner had no way to allow another attempt; rule 6 left a choice
+  after data. Revision 3 and this third draft address each of these (rules 3 to 7 and 9, and the bullets above).
+- Third review: of runner revision 3 and this draft, before the freeze. Its verdict is recorded here at the freeze.
+- Runner exits: 0 list accounted for; 2 no work directory or no result prefix; 10 G1 failed; 11 unit list count wrong; 12 the
+  earlier jobs' state cannot be read or does not match (rules 3 and 4); 13 an upload failed; 14 list not accounted for at the
+  end; 15 a test-only variable set in production; 16 a bad argument; 20 a pilot exited non-zero; 75 a lost unit; 143
+  terminated by a signal. Exit 17 is the start command's (the runner text does not match its hash). A container killed
+  outright shows 137.
 - Not tested locally: the real `aws s3` commands (a local-directory stand-in is used), ladders with `m >= 4`, the production
-  budgets at large levels, the 12-thread pod. The first job is therefore watched as a test of those: its S3 listing and
-  `progress.txt` are checked against the rules above before any second job is submitted.
-- Requests: `requests_r2i/pfd-bu-<n>.json`, one per job; each names the earlier jobs' result prefixes.
+  budgets at large levels, the 12-thread pod, the image's own bash. The first job is therefore watched as a test of those:
+  its S3 listing and `progress.txt` are checked against the rules above before any second job is submitted.
+- Requests: `requests_r2i/pfd-bu-<n>.json`, one per job, written by `make_request_bu.sh`.
