@@ -89,7 +89,7 @@ What moved and what did not:
   (2026-11-01) caps ECC design records at 3 ideas and 1 experiment per
   session, 12 and 6 per UTC day, and says "current deployed backends do not
   independently enforce this new check". 575 proposals in 34 days is 17 a
-  day against the stated 12.
+  day against the stated 12. [pcc:unverified]
 
 ### 1.2 What the harness knows about itself
 
@@ -140,7 +140,7 @@ What moved and what did not:
   the dispatch loop.
 - **Coordination traffic is still unread**: bus inbox `coordinator: 253`,
   `coordinator-2: 179`, `red-team: 176`, `reviewer-cd72e8: 176`, and 15
-  more addresses above 170; 444 handoffs with no return.
+  more addresses above 170; 444 handoffs with no return. [pcc:unverified]
 
 ### 1.3 What the crypto-side harness (director / executor relay) costs and loses
 
@@ -193,13 +193,13 @@ scientific research loop (11-08) and the cross-repository WIP gate (10-31).
 Of the mechanisms measured in this read, the eval, the tuner, the bus, the
 handoff return and the challenge loop have produced no measurement of their
 own effect. The one mechanism with a clear measured effect is the plainest:
-refusing approval without a runnable launcher.
+refusing approval without a runnable launcher. [pcc:unverified]
 
 ## 2. State of the world, external (brief; verification status marked)
 
 Delegated web survey (Sonnet, this session). [P] primary page fetched;
 [S] search snippet or secondary coverage; [U] not verified. Re-check before
-citing.
+citing. [pcc:unverified]
 
 - **Fixed-cost run as the unit of work.** Karpathy's `autoresearch`
   (2026-03, github.com/karpathy/autoresearch) [S]: a 5-minute training run is
@@ -256,7 +256,7 @@ citing.
   Laboratory, DeepMind AI co-scientist, FutureHouse Robin, Gauss, AlphaProof
   Nature paper, RE-Bench, FrontierMath Tier 4, HLE, bandit/successive-halving
   over research directions, multi-agent debate quality. Absence here is not
-  absence.
+  absence. [pcc:unverified]
 
 ## 3. Diagnosis
 
@@ -277,7 +277,7 @@ citing.
 5. **The program is strongest exactly where the literature says verified AI
    results come from**: machine-checkable certificates (replay certificates,
    Lean, pcc canaries, exact counts). It is weakest where the literature's
-   systems do not even try: a large speculative design corpus.
+   systems do not even try: a large speculative design corpus. [pcc:unverified]
 
 ## 4. Improved ideas, ranked by expected verified-evidence per token
 
@@ -301,7 +301,7 @@ set of ungated ones, or if probe results never change a decision (count
 decisions citing a probe). Source: autoresearch [S], AlphaEvolve [P-ish],
 CryptanalysisBench tiering [P]. **(replaces** "designed, not shelved" as the
 admission rule for ECC ideas; the 2025-10-05 decisions already asked for a
-bound.)
+bound.) [pcc:unverified]
 
 **I2. Implementation moves into the design lane, with a cap.**
 `design-experiment` may approve only a contract whose launcher it committed
@@ -340,7 +340,7 @@ into the harness receipt writer; print cost per evidence record and per
 1/520 → > 80% of Claude Code receipts in 30 days; a first
 US$-per-verified-outcome figure. Falsified only by a runtime that truly
 exposes nothing, which then records `usage_source: unavailable` and is
-counted as such.
+counted as such. [pcc:unverified]
 
 **I5. Run the discipline eval before any further harness change.** One
 credentialed run of `evals/suites/discipline.yaml` and `capability.yaml`
@@ -405,7 +405,7 @@ CPU-hours, lost US$, whether relaunched. Weekly, the top cause gets one fix
 capacity; the executor's 600 s limit must hand long runs to a tracked
 detached process by default). Metric: lost hours per verified evidence
 record, falling. Falsified if the ledger shows loss is < 10% of spend —
-then the cost is elsewhere (likely reasoning-tier tokens, I4).
+then the cost is elsewhere (likely reasoning-tier tokens, I4). [pcc:unverified]
 
 ### P3: aim the verified channel at the goal
 
@@ -476,4 +476,4 @@ neighbour did not (track by id).
 - `crypto-autoresearcher:docs/track-record-review-20261006.md`, `docs/research-loop-v2.md` (+ implementation and migration plans), `docs/research-throughput-autopilot.md`, `docs/subversion-resistance-20261010.md`, `docs/execution-proof-chain.md`, `docs/research-budget-policy.md`, `docs/model-tiers.md`, `problems/experiment-preapproval-readiness-cycle.md`, `problems/ready-plans-lack-supervisor-archive-coverage.md`, `problems/icperf-prime63-launcher-self-attested-approval.md`, `examples/capability-campaign/records/native-qualification-v3` (via a delegated Sonnet survey; its verdicts rest on the docs' own tick lists, file existence and commit dates, not on reading each tool), `docs/measuring-the-harness.md`, `docs/self-improvement-loop.md`, `docs/self-improvement/placebo-20261020/README.md`, `evals/README.md`, `docs/challenge-research-loop.md`, `docs/research-wip-policy.json`, `AGENTS.md` ("Approval is bounded by execution"), `tools/check_instruction_budget.py`, `coordination/pilots/challenge-loop-20261108-f15ebe/*`, `coordination/sessions/receipts/20261108/SR-20261108-3f31ad.yaml`; merge commits of PRs #2390, #2441, #2572, #2601, #2879, #2922, #3027, #3178, #3208.
 - `crypto:docs/token-efficiency.md`, `crypto:AGENTS.md` ("Persistent scientific research loop", "Pointers"), `crypto:docs/session-logs/2026-11-01.md` .. `2026-11-10.md`.
 - `cryptanalysis:AGENTS.md`, `cryptanalysis:CLAUDE.md`.
-- External: arXiv 2609.28614 [P], 2607.18538 [P], 2511.02864, 2509.19349, 2505.22954, 2506.20803, 2510.04618, 2511.02824, 2601.07421, 2512.17260, 2506.15740, 2511.09904 [S]; github.com/karpathy/autoresearch [S].
+- External: arXiv 2609.28614 [P], 2607.18538 [P], 2511.02864, 2509.19349, 2505.22954, 2506.20803, 2510.04618, 2511.02824, 2601.07421, 2512.17260, 2506.15740, 2511.09904 [S]; github.com/karpathy/autoresearch [S]. [pcc:unverified]
