@@ -28,10 +28,10 @@ quadratics at `m = 2`) in front of:
   `m4gb-f2` (M4GB upstream `01860a52` + patches 0001/0002, one thread,
   narrowest binary that fits, 60 s per call).
 
-Repeats 2, seed 20261110, `--targets walk`, `incremental-gauss`. (The
-degree-23 cell was briefly set to one repeat in anticipation of thousands of
-`f4-f2` calls; the finished cells need only about a hundred targets at this
-hit rate, so it runs with two like the others.)
+Repeats 2, seed 20261110, `--targets walk`, `incremental-gauss`; one repeat
+on the degree-23 cell: the degree-21 cell needed about 820 targets per
+repeat, so degree 23 needs about 1,700, and at about 2 s per `f4-f2` call
+two repeats would not fit the session's two-hour cap on one invocation.
 
 ## How the solver's work enters S, and why S is not the engine comparison
 
