@@ -2,7 +2,7 @@
 # Regenerate RESULTS.md, results.svg, results.json and REPORT.pdf from results.tsv (+ logs/).
 set -euo pipefail
 cd "$(dirname "$0")"
-rm -rf logs && mkdir -p logs && tar xzf logs.tar.gz -C . 
+if [ -f logs.tar.gz ]; then rm -rf logs && mkdir -p logs && tar xzf logs.tar.gz -C .; fi  # the tarball may live in the artifact store (.artifacts.json); fetch it with tools/artifacts/artifacts.py first
 python3 ab_report.py results.tsv RESULTS.md results.svg results.json logs results_rerun.tsv >/dev/null
 pandoc README.md RESULTS.md -s --metadata title="M4GB integration and kernel speed-up (2026-11-10)" -o REPORT.html
 chrome=$(command -v google-chrome || command -v chromium || echo /opt/pw-browsers/chromium)
