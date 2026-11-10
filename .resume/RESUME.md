@@ -1,39 +1,35 @@
-# Resume: crypto @ claude/ic-coverage-20261108
+# Resume: crypto @ claude/exponent-study-20261108
 
 ## Goal
-Coverage report of index-calculus work on the Curve25519-family miniatures
-(research/curve25519_ic_coverage_20261108/REPORT.md) and the top untried directions run as
-single-target ecbench studies under frozen protocols (research/curve25519_tw_jumps_20261108,
-research/curve25519_tw_scaling_20261108). Success rule: every verified measured improvement over
-the current best arm (twcj-x15, 1.40x rho-neg at k = 20, w = 0) counts; distance to rho reported.
+Exponent study (owner preregistration 2026-11-08): fit the exponent of the cost T(E,m,L) of ONE
+decomposition system against |V| for multiplicative-subgroup bases on the Curve25519-family
+miniatures, m = 2, 3, 4, symmetrised system in the elementary symmetric polynomials. Success rule:
+every verified measured improvement counts; report distance to rho.
 
 ## Lead / hypothesis
-Study A: the target-in-walk arm draws jump indices independently of the point, so its collision
-rate does not depend on the jump count for jumps >= 4; cutting jumps 16 -> 4 saves the set-up
-(0.116 sqrt(r) at k = 20) with no walk penalty; jumps = 2 fails. Study B: twcj's distance to
-rho at k = 28, 32 stays in [1.30, 1.55] as rho's set-up overhead vanishes.
+Lever iff m = 4 exponent < 0.5 (upper 95% bound too) or m = 3 exponent < 0. Prediction: m = 2 about 1.5,
+m = 3 about 3.5, m = 4 >= 4.5 or capped; no lever.
 
 ## Spec
-Protocols: research/curve25519_tw_jumps_20261108/PROTOCOL.md (frozen, data/frozen.sha256),
-research/curve25519_tw_scaling_20261108/PROTOCOL.md. Specs in each study's specs/. Binary:
-/home/user/ctarget-f1/release/ecbench (no code change). Launch: python3 tools/benchrec.py run
-<record> -- research/<study>/scripts/run_sessions.sh <k>.
+research/curve25519_exponent_study_20261108/PROTOCOL.md (frozen, data/frozen.sha256). Code:
+src/cryptanalysis/ic_framework/subgroup_semaev.rs (6 unit tests pass), `curve25519_family f4sub` and
+`subcensus`. Binary /home/user/ctarget-f1/release/curve25519_family. Run: python3 scripts/run_grid.py
+(4 workers, cells/*.json, resumable: finished cells skipped). Analysis: scripts/analyse.py.
 
 ## State
-Worktree /home/user/crypto-ic (sparse checkout; disk nearly full, do not build). Conductor not
-installed. research-kb and ecdb unreachable from this machine. Sessions are local L0 counted
-units only. Records: benchmarks/records/*curve25519-tw-*.json.
+Local worktree /home/user/crypto, branch claude/exponent-study-20261108 (not pushed by instruction).
+Conductor, ecdb and research-kb unreachable. Disk about 2.6 GB free: no second target dir.
 
 ## Next steps
-1. Run study A at k = 20, 24; analyse.py; README, figure, PDF; close records.
-2. Run study B at k = 28, 32; same.
-3. Coverage REPORT.md + figure + PDF; session log entry docs/session-logs/2026-11-08.md; commit.
-
-## Runs in flight
-None.
+1. Run the grid; census (subcensus); calibration (bits base vs tower f4cost G=0).
+2. analyse.py; README.md with [pcc:unverified] result sentences; figure; REPORT.pdf; pcc lint-prose.
+3. Session log docs/session-logs/2026-11-08.md; local commits with the two attribution lines.
 
 ## Stop and success conditions
-About 90 minutes of runs in total; failed predictions stay failed; no push, no PR.
+Stop when every grid cell is complete or censored, the analysis, README, figure, PDF and session log
+are written and committed locally. Success: fitted exponents with intervals per m (or a stated
+censoring), verdicts on the preregistered thresholds, failed predictions kept as failed.
 
-## Open questions
-Band pricing of table inserts (PR #3700 opt-in): both readings are reported.
+## Runs in flight
+Grid launched by scripts/run_grid.py in the background on this machine; cells land in
+research/curve25519_exponent_study_20261108/cells/. Relaunch the same command to resume.
