@@ -320,6 +320,17 @@ fn ic_rule(counter: &str) -> Option<Rule> {
         "lp_merge_ops_uncharged" | "merge_modr_mults" => {
             Prims(&[(ModrMul, 1), (ModrAdd, 1), (HashProbe, 1)])
         }
+        // The two sibling-walk counters (`wwalk` `sib=m`), priced so that a
+        // pair costs exactly the field work it performs.  A pair is charged
+        // as one group addition (`inv + 2 mul + sqr + 6 add`) and one
+        // second point; the pair performs `inv + 2 mul + 2 sqr + 8 add`
+        // (`dx`, `dy`, `x₊` two subtractions; `sy`, its negation, `x₋` two
+        // subtractions; one product and one squaring a child), so the
+        // second point is the difference: one squaring and two additions.
+        "sibling_second_points" => Prims(&[(FieldSqr, 1), (FieldAdd, 2)]),
+        // The continuing child's `y = λ·(x_P − x) − y_P`: one product and
+        // two subtractions, once a parent, beside its pair.
+        "sibling_lift_products" => Prims(&[(FieldMul, 1), (FieldAdd, 2)]),
         // One `points_with_x`: 1/x², b·x⁻², the Artin–Schreier solve, y = x·u.
         "as_solves" => Prims(&[(FieldInv, 1), (FieldSqr, 1), (FieldMul, 2), (AsSolve, 1)]),
         "lift_field_squares_uncharged" | "min_key_field_squares_uncharged" => {

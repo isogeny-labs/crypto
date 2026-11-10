@@ -2639,6 +2639,8 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
             ("tw", "1 (needs g=1, grow=2 and a one-seed base): the target inside the walk, jumps [α]P1 + [γ]G + [β]Q, every collision a row du·s1 + db·log Q = −dz, stop at the first two independent rows, cap 3T; 2 (needs g=1, grow=2 and a two-seed base in distinct columns): jumps [α]P1 + [α']P2 + [γ]G + [β]Q, every collision a row du1·s1 + du2·s2 + db·log Q = −dz (rows with du1 = du2 = 0 mod r dropped), stop at rank 3, cap 3T (default 0)"),
             ("cj", "1 (needs tw=1 or tw=2): build the jumps by chained additions from two base combinations [γ]G + [β]Q (the seed parts from the doubled multiples) instead of independent scalar multiplications (default 0)"),
             ("lazy", "1 (needs g=1): skip the per-collision recomputation and keep each row on its exact key match (sign bit stored beside the entry); the walk, its stream and its collisions are identical, only verify_ops disappears.  The pipeline's [d]G = Q check still runs, charged.  With tw=1|2 the build also runs that check itself once when the rows reach full rank (charged as tw_lazy_check_*); on a failure it recomputes all collisions (charged), drops the rows that fail and resumes the walk.  With the walk table a wrong row is rejected by the pipeline's check (the run ends unverified; no in-run recovery) (default 0)"),
+            ("sib", "1 to 16 (needs tw=1 or tw=2 and pool=M; default off): sibling points.  Every parent P draws its own random m-subset of a pool of M jump points (a product set J = A_i + K_j: a = 4 seed parts, or 8 from M = 256, and M/a chained parts K_j = K_(j-1) + K_(j-2), built as cj=1 chains them; set-up about a·popcount + M/a + M additions), and for each chosen J forms the two x-only children x(P ± J) from ONE inversion 1/(x_J − x_P); all 2m children are keyed (negation folded) with coefficient vectors c_P ± c_J and a key collision among any stored points is a row as in the target walk (lazy applies); the walk continues from P + J_h with h the first of the subset; the two known-copy minus children are not formed; stored points are capped at 3T.  Charging: a pair performs inv + 2 mul + 2 sqr + 8 add; it is charged as ONE group addition plus one unit of the native counter sibling_second_points (sqr + 2 add, the difference), so its bitop/v1 price equals its field work, and the band prices the second point at w; the continuing child's y (mul + 2 add) is the counter sibling_lift_products, once a parent; a pair whose minus child is skipped is the addition alone (one mul and two adds above what it performs); field_ops are counted as performed, never through the addition; a collision's x-only point gets its sign resolved at that time (one more addition, charged)"),
+            ("pool", "sib to 512 (needs sib): the sibling pool's size M (default off)"),
             ("cv", "0 (needs tw=1 or tw=2; not with lazy=1): do not recompute the two entries of a key collision; the key is the exact abscissa, the key's sign bit stored in bit 63 of the entry's u word gives E_t = ±E_s, and the final [d]G = Q check (charged) fails the solve on a wrong row, with no in-run recovery; with tw=2 needs coefficients below 2^31 (default 1)"),
         ]
     }
@@ -2695,25 +2697,64 @@ impl<G: CountedGroup> DecompositionOracle<G> for WWalkOracle<G::Elt> {
         if !cv && lazy {
             return Err("wwalk: cv=0 and lazy=1 are alternatives; choose one".into());
         }
+        let sib = match (params.get("sib"), params.get("pool")) {
+            (None, None) => None,
+            (Some(_), None) => return Err("wwalk: sib=m needs pool=M".into()),
+            (None, Some(_)) => return Err("wwalk: pool=M needs sib=m".into()),
+            (Some(_), Some(_)) => {
+                if tw == 0 {
+                    return Err("wwalk: sib needs tw=1 or tw=2".into());
+                }
+                let m = params.u64_or("sib", 0).map_err(|e| format!("wwalk: {e}"))?;
+                let pool = params
+                    .u64_or("pool", 0)
+                    .map_err(|e| format!("wwalk: {e}"))?;
+                Some((
+                    usize::try_from(m).map_err(|_| "wwalk: sib too large".to_string())?,
+                    usize::try_from(pool).map_err(|_| "wwalk: pool too large".to_string())?,
+                ))
+            }
+        };
         if tw > 0 {
             if !opts.g_jumps || grow != 2 {
                 return Err(format!("wwalk: tw={tw} needs g=1 and grow=2"));
             }
-            let walk = TargetWalk::build_ext_cv(
-                ctx.group,
-                ctx.generator,
-                ctx.target,
-                fb,
-                ctx.r,
-                ctx.cofactor,
-                x,
-                jumps,
-                cj,
-                seed,
-                lazy,
-                tw,
-                cv,
-            )?;
+            let walk = if sib.is_some() {
+                if !cv {
+                    return Err("wwalk: sib with cv=0 is not supported".into());
+                }
+                TargetWalk::build_ext_sib(
+                    ctx.group,
+                    ctx.generator,
+                    ctx.target,
+                    fb,
+                    ctx.r,
+                    ctx.cofactor,
+                    x,
+                    jumps,
+                    seed,
+                    lazy,
+                    tw,
+                    cv,
+                    sib,
+                )?
+            } else {
+                TargetWalk::build_ext_cv(
+                    ctx.group,
+                    ctx.generator,
+                    ctx.target,
+                    fb,
+                    ctx.r,
+                    ctx.cofactor,
+                    x,
+                    jumps,
+                    cj,
+                    seed,
+                    lazy,
+                    tw,
+                    cv,
+                )?
+            };
             self.free_pending = true;
             self.free_checked = walk.collisions.len() as u64;
             self.free_emitted = walk.rows.len() as u64;
@@ -5810,6 +5851,77 @@ mod wwalk_pipeline_tests {
             ctr,
             trials: rep.decomposition.targets_tried,
             steps,
+        }
+    }
+
+    /// `sib=m,pool=M` through the parameter parser and the pipeline: the
+    /// planted log is recovered and the pipeline's own `[d]G = Q` check
+    /// passes with one and two seeds, verified and lazy; the second-point
+    /// counter and its marker are emitted; the option refusals hold.
+    #[test]
+    fn wwalk_sibling_points_recover_end_to_end() {
+        for (spec, size) in [
+            ("wwalk:x=1.5,g=1,grow=2,tw=2,cj=1,sib=4,pool=32", 2u64),
+            ("wwalk:x=1.5,g=1,grow=2,tw=2,cj=1,sib=8,pool=64", 2),
+            ("wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,sib=4,pool=32", 1),
+        ] {
+            let mut full = 0u64;
+            for s in 0..12u64 {
+                for lazy in ["", ",lazy=1"] {
+                    let a = run_pair(&format!("{spec}{lazy}"), size, Targets::StrideGenerator, s);
+                    assert!(a.verified, "{spec}{lazy} s={s}: planted log not recovered");
+                    assert!(a.ctr["tw_sib_pairs"] + a.ctr["tw_sib_degenerate"] > 0);
+                    assert!(a.ctr["tw_sib_second_points"] <= a.ctr["tw_sib_pairs"]);
+                    if lazy.is_empty() {
+                        full += 1;
+                    } else {
+                        assert_eq!(a.ctr["tw_lazy_failures"], 0);
+                    }
+                }
+            }
+            assert_eq!(full, 12);
+        }
+        for bad in [
+            "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,sib=4",
+            "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,pool=32",
+            "wwalk:x=1.5,g=1,grow=2,tw=1,cj=1,sib=4,pool=3",
+            "wwalk:x=1.5,g=1,grow=2,sib=4,pool=32",
+        ] {
+            let inst = instance();
+            let mut ops = GroupOps::default();
+            let q = inst.curve.mul(&mut ops, inst.generator_point(), 77);
+            let (_, p) = Params::parse_spec(bad).unwrap();
+            let fb = PrimeProjectedAbscissaBase { instance: &inst };
+            let base = Params::parse_spec("prime-projected-abscissa:size=1,scan_cap=32")
+                .unwrap()
+                .1;
+            let _ = (&fb, &base);
+            let mut oracle = WWalkOracle::<PrimePoint>::new();
+            let ps = PipelineSpec {
+                factor_base: "prime-projected-abscissa".into(),
+                factor_base_params: base,
+                oracle: "wwalk".into(),
+                oracle_params: p,
+                targets: Targets::StrideGenerator,
+                linalg: "incremental-gauss".into(),
+                max_trials: 1000,
+                seed: 1,
+                ..Default::default()
+            };
+            let res = run_pipeline(
+                &ctx(&inst, q),
+                &ps,
+                &PrimeProjectedAbscissaBase { instance: &inst },
+                &mut oracle,
+                77,
+                &Calibration {
+                    ns_per_add: 1.0,
+                    ns_per_double: 1.0,
+                    ..Default::default()
+                },
+                None,
+            );
+            assert!(res.is_err(), "{bad} should be refused");
         }
     }
 
